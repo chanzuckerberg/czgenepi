@@ -274,7 +274,7 @@ dist
 # FuseBox cache
 .fusebox/
 
-# DynamoDB Local files
+# DynamoDB Local filess
 .dynamodb/
 
 # TernJS port file
@@ -295,5 +295,7 @@ node_modules
 psd
 thumb
 sketch
+
+react_dev
 
 # End of https://www.toptal.com/developers/gitignore/api/flask,react,macos,node
