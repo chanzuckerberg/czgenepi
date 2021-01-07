@@ -1,5 +1,5 @@
 {
-  "name": "ts",
+  "name": "covidr-ts-frontend",
   "version": "0.1.0",
   "private": true,
   "proxy": "http://localhost:5000",
@@ -7,7 +7,8 @@
     "start": "node scripts/start.js",
     "start-flask": "cd ../py && venv/bin/flask run --no-debugger",
     "build": "node scripts/build.js",
-    "test": "node scripts/test.js"
+    "test": "node scripts/test.js",
+    "lint": "npx prettier --write src && npx eslint --fix src"
   },
   "dependencies": {
     "@babel/core": "7.12.3",
@@ -38,8 +39,6 @@
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-jest": "^24.1.0",
     "eslint-plugin-jsx-a11y": "^6.3.1",
-    "eslint-plugin-react": "^7.21.5",
-    "eslint-plugin-react-hooks": "^4.2.0",
     "eslint-plugin-testing-library": "^3.9.2",
     "eslint-webpack-plugin": "^2.1.0",
     "file-loader": "6.1.1",
@@ -153,7 +152,11 @@
     ]
   },
   "devDependencies": {
+    "eslint-config-prettier": "^7.1.0",
+    "eslint-plugin-react": "^7.22.0",
+    "eslint-plugin-react-hooks": "^4.2.0",
     "node-sass": "^5.0.0",
+    "prettier": "^2.2.1",
     "ts-loader": "^8.0.14",
     "typescript": "^4.1.3"
   }
