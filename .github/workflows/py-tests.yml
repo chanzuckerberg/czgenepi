@@ -1,0 +1,44 @@
+# This workflow will install Python dependencies and run tests with a single version of Python
+
+name: py-tests
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - '**'
+
+# Because of https://github.com/actions/runner/issues/353, we need to explicitly set the shell to bash to get sane defaults (-o pipefail).
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  code-style:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+      - name: Set up Python 3.7
+        id: setup
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+      - name: Cache dependencies
+        id: cache-deps
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.pythonLocation }}
+          key: py-tests-code-style-v0-${{ runner.os }}-${{ steps.setup.outputs.python-version }}-${{ hashFiles('.github/workflows/py-tests.yml') }}
+      - name: Install and upgrade pip
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+        run: |
+          python -m pip install --upgrade pip wheel
+          pip install black flake8 isort mypy
+      - name: Verify code style
+        run: |
+          make -k style
