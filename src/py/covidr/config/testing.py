@@ -1,5 +1,7 @@
 from .config import Config
 
 
-class TestingConfig(Config):
-    TESTING = True
+class TestingConfig(Config, descriptive_name="test"):
+    @property
+    def TESTING(self):
+        return True

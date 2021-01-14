@@ -38,6 +38,6 @@ Python 3.7.6
 ### Autogeneration of schema migration
 
 1. Make changes to the models.
-2. Run `ENV=local alembic revision --autogenerate -m "SOME DESCRIPTIVE MESSAGE" --rev-id $(date +%Y%M%d_%H%M%S)`
+2. Run `ENV=dev alembic revision --autogenerate -m "SOME DESCRIPTIVE MESSAGE" --rev-id $(date +%Y%M%d_%H%M%S)`
 3. Verify that the schema migration generated in `database_migrations/versions/` is sane.
-4. Run `ENV=local alembic upgrade head` to test the schema migration on your local database.
+4. Run `ENV=dev alembic upgrade head` to test the schema migration on your local database.

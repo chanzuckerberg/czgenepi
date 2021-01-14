@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 
-from covidr.sandbox.runtimeenvironment import RuntimeEnvironment
+from covidr.config.config import Config
 from sqlalchemy.engine import create_engine, Engine
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -37,13 +37,13 @@ def session_scope(interface: SqlAlchemyInterface):
         session.close()
 
 
-def get_db_uri(runtime_environment: RuntimeEnvironment, readonly: bool = False) -> str:
+def get_db_uri(runtime_config: Config, readonly: bool = False) -> str:
     """Provides a URI for the database based on a runtime environment.
 
     Parameters
     ----------
-    runtime_environment : RuntimeEnvironment
-        The runtime environment tha contains the database we want to access.
+    runtime_config : Config
+        The runtime config that contains the database we want to access.
     readonly : bool
         Returns a read-only handle for the database if True. (default: False)
 
@@ -51,10 +51,9 @@ def get_db_uri(runtime_environment: RuntimeEnvironment, readonly: bool = False) 
     -------
         string that can be used to connect to a postgres database
     """
-    if readonly and not runtime_environment.has_readonly:
-        raise ValueError(
-            f"RuntimeEnvironment {runtime_environment} does not have a read-only mode."
-        )
-    # TODO: replace with fetch from AWS secrets.
-    assert runtime_environment == RuntimeEnvironment.LOCAL
-    return "postgresql://user_rw:password_rw@localhost:5432/covidr_db"
+    if readonly:
+        try:
+            return runtime_config.DATABASE_READONLY_URI
+        except NotImplementedError:
+            raise ValueError(f"Config {runtime_config} does not have a read-only mode.")
+    return runtime_config.DATABASE_URI

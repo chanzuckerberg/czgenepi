@@ -1,6 +1,12 @@
 from .config import Config
 
 
-class DevelopmentConfig(Config):
-    DEBUG = True
-    SEND_FILE_MAX_AGE_DEFAULT = 0
+class DevelopmentConfig(Config, descriptive_name="dev"):
+    @property
+    def DEBUG(self):
+        return True
+
+    @property
+    def DATABASE_URI(self):
+        # TODO: fetch this from AWS secrets?
+        return "postgresql://user_rw:password_rw@localhost:5432/covidr_db"
