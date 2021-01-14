@@ -27,3 +27,17 @@ Python 3.7.6
 ```bash
 % eb deploy covidr-staging
 ```
+
+## Database concerns
+
+### Creating and initializing the local database.
+```bash
+% make init-local-db
+```
+
+### Autogeneration of schema migration
+
+1. Make changes to the models.
+2. Run `ENV=local alembic revision --autogenerate -m "SOME DESCRIPTIVE MESSAGE" --rev-id $(date +%Y%M%d_%H%M%S)`
+3. Verify that the schema migration generated in `database_migrations/versions/` is sane.
+4. Run `ENV=local alembic upgrade head` to test the schema migration on your local database.
