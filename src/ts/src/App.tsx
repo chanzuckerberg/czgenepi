@@ -2,13 +2,20 @@ import React from "react";
 import logo from "./logo.svg";
 import "./App.scss";
 
+declare global {
+  interface Window {
+    token: string;
+  }
+}
+
 function App(): JSX.Element {
   return (
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
-          This is covidr on Flask, serving <code>src/App.tsx</code>.
+          This is COVIDr on Flask, saying<br/>
+          <code>Hello, world!</code>
         </p>
         <a
           className="App-link"

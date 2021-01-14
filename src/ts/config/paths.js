@@ -52,8 +52,7 @@ const resolveModule = (resolveFn, filePath) => {
 module.exports = {
   dotenv: resolveApp(".env"),
   appPath: resolveApp("."),
-  appDevBuild: resolveApp("../py/covidr/static/react_dev"),
-  appBuild: resolveApp("../py/covidr/static/dist"),
+  appBuild: resolveApp("../py/covidr/static"),
   appPublic: resolveApp("public"),
   appHtml: resolveApp("public/index.html"),
   appIndexJs: resolveModule(resolveApp, "src/index"),
