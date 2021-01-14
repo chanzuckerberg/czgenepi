@@ -32,7 +32,11 @@ setuptools.setup(
     long_description=description,
     packages=setuptools.find_packages(),
     python_requires=">=3.7",
-    entry_points={},
+    entry_points={
+        "console_scripts": [
+            "covidr-cli = covidr.cli.toplevel:cli",
+        ]
+    },
     include_package_data=True,
     install_requires=requirement_lines,
 )
