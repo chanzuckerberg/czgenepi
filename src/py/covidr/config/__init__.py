@@ -1,3 +1,3 @@
-from .development import DevelopmentConfig
-from .production import ProductionConfig
-from .testing import TestingConfig
+from .development import DevelopmentConfig  # noqa: F401
+from .production import ProductionConfig  # noqa: F401
+from .testing import TestingConfig  # noqa: F401
