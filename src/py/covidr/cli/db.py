@@ -1,7 +1,7 @@
 import click
+from covidr.config.development import DevelopmentConfig
 from covidr.database.connection import get_db_uri, init_db
 from covidr.database.schema import create_tables_and_schema
-from covidr.sandbox.runtimeenvironment import RuntimeEnvironment
 
 from .toplevel import cli
 
@@ -10,7 +10,7 @@ from .toplevel import cli
 @click.pass_context
 def db(ctx):
     # TODO: support multiple runtime environments.
-    ctx.obj["ENGINE"] = init_db(get_db_uri(RuntimeEnvironment.LOCAL))
+    ctx.obj["ENGINE"] = init_db(get_db_uri(DevelopmentConfig()))
 
 
 @db.command("create")

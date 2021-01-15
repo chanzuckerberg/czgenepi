@@ -39,7 +39,7 @@ setup-local-db:
 init-local-db:
 	@$(MAKE) setup-local-db
 	covidr-cli db create
-	ENV=local alembic stamp head
+	ENV=dev alembic stamp head
 
 stop-local-db:
 	@if [ "$(LOCAL_DB_CONTAINER_RUNNING_ID)" != "" ]; then \

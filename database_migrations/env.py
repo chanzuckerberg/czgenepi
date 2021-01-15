@@ -8,9 +8,9 @@ from alembic import context
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
+from covidr.config.config import Config
 from covidr.database import models
 from covidr.database.connection import get_db_uri
-from covidr.sandbox.runtimeenvironment import RuntimeEnvironment
 
 config = context.config
 
@@ -50,10 +50,10 @@ def get_uri():
         db_env = os.environ["ENV"]
     else:
         # TODO: generate the appropriate list of "RuntimeEnvironment"s from the enum.
-        raise ValueError("Must provide env variable DB=[local, staging, prod]")
+        raise ValueError("Must provide env variable DB=[dev, staging, prod]")
 
     # TODO: find the appropriate RuntimeEnvironment given the "ENV" string.
-    return get_db_uri(RuntimeEnvironment.LOCAL)
+    return get_db_uri(Config.by_descriptive_name(db_env))
 
 
 def run_migrations_offline():
