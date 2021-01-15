@@ -17,8 +17,7 @@ if os.environ.get("FLASK_ENV") == "development":
 @application.route("/", defaults={"path": ""})
 @application.route("/<path:path>")
 def serve(path):
-    return application.static_folder
-    # if path != "" and os.path.exists(application.static_folder + "/" + path):
-    #     return send_from_directory(application.static_folder, path)
-    # else:
-    #     return send_from_directory(application.static_folder, "index.html")
+    if path != "" and os.path.exists(application.static_folder + "/" + path):
+        return send_from_directory(application.static_folder, path)
+    else:
+        return send_from_directory(application.static_folder, "index.html")
