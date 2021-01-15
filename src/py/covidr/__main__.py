@@ -1,4 +1,4 @@
-from . import application
+from .app import application
 
 # Setting debug to True enables debug output. This line should be
 # removed before deploying a production app.
