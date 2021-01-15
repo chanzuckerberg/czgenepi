@@ -18,7 +18,11 @@ if os.environ.get("FLASK_ENV") == "development":
 @application.route("/<path:path>")
 def serve(path):
     header = [f'directory listing for {application.static_folder}', '']
-    dirlist = os.listdir(application.static_folder)
+    dirlist = []
+    try:
+        dirlist = os.listdir(application.static_folder)
+    except FileNotFoundError as err:
+        dirlist = [err.strerror]
     dirlist.sort()
     text = header + dirlist
     return "<br/>".join(text)
