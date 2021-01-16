@@ -14,9 +14,21 @@ covidr% .venv-ebcli/bin/pip install awsebcli
 covidr% cd src/py
 covidr/src/py% eb init --region=us-west-2 --platform python-3.7 covidr
 ```
-3. Deploy the code.  You should deploy to the `covidr-staging` environment.
+3. Pick a reasonable identifier for your target deployment environment, such as covidr-<your-user-name>.  Create the environment if you haven't done so before.  This will deploy the code as well, so if you are doing this step, skip the next one.
 ```bash
-covidr/src/py% ../../.venv-ebcli/bin/eb deploy covidr-staging
+covidr/src/py% ../../.venv-ebcli/bin/eb create covidr-myusername
+```
+4. If you have already created an environment in the past, just updating the existing deployment environment.
+```bash
+covidr/src/py% ../../.venv-ebcli/bin/eb deploy covidr-myusername
+```
+5. Visit your deployment.  This should open your deployment environment in your browser.
+```bash
+covidr/src/py% ../../.venv-ebcli/bin/eb open covidr-myusername
+```
+6. Remember to remove your environment when you are not using it.
+```bash
+covidr/src/py% ../../.venv-ebcli/bin/eb terminate covidr-myusername
 ```
 
 ## Database concerns
