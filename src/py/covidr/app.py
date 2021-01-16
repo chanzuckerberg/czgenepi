@@ -2,11 +2,12 @@ import os
 
 from covidr.config import DevelopmentConfig
 from flask import Flask, send_from_directory
+from pathlib import Path
 
-dir_path = os.path.dirname(os.path.realpath(__file__))
+static_folder = Path("static")
 
 # EB looks for an 'application' callable by default.
-application = Flask(__name__, static_folder=f"{dir_path}/static")
+application = Flask(__name__, static_folder=str(static_folder))
 
 
 if os.environ.get("FLASK_ENV") == "development":
@@ -18,7 +19,7 @@ if os.environ.get("FLASK_ENV") == "development":
 @application.route("/", defaults={"path": ""})
 @application.route("/<path:path>")
 def serve(path):
-    if path != "" and os.path.exists(application.static_folder + "/" + path):
+    if path != "" and Path(application.static_folder + "/" + path).exists():
         return send_from_directory(application.static_folder, path)
     else:
         return send_from_directory(application.static_folder, "index.html")
