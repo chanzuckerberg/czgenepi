@@ -1,8 +1,8 @@
 import os
+from pathlib import Path
 
 from covidr.config import DevelopmentConfig
 from flask import Flask, send_from_directory
-from pathlib import Path
 
 static_folder = Path("static")
 
