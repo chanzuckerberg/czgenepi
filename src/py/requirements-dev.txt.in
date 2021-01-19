@@ -2,8 +2,11 @@
 # the AWS EB CLI tools are not included because of a conflict between the
 # requirements of awsebcli and black.
 
+alembic
 black
 flake8
 isort
 mypy
+pytest
+pytest-xdist
 sqlalchemy-stubs
