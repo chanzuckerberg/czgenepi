@@ -83,14 +83,6 @@ mypy:
 GENERATED_REQUIREMENT_FILES=src/py/requirements.txt src/py/requirements-dev.txt
 SOURCE_REQUIREMENT_FILES=src/py/requirements.txt.in src/py/requirements-dev.txt.in
 
-define create_venv
-    if [[ "$(TRAVIS)" = "" ]]; then \
-        python -m venv $(1); \
-    else \
-        virtualenv -p $$(which python) $(1); \
-    fi
-endef
-
 # This rule pins the requirements with the minimal set of changes required to satisfy the
 # requirements.  This is typically run when a new requirement is added, and we want to
 # propagate the new requirement to the pin files.
@@ -109,7 +101,7 @@ pin-all-requirements:
 
 src/py/require%.txt : src/py/require%.txt.in src/py/requirements.txt.in
 	[ ! -e .$$(basename "$<")-env ] || exit 1
-	$(call create_venv, .$$(basename "$<")-env)
+	python -m venv .$$(basename "$<")-env
 	.$$(basename "$<")-env/bin/pip install -r $@
 	for src in $^; do \
 		.$$(basename "$<")-env/bin/pip install -r $$src; \
