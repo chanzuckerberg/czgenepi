@@ -1,0 +1,4 @@
+# These are the requirements to deploy this application.
+
+flask
+sqlalchemy
