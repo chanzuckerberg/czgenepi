@@ -5,10 +5,10 @@
   "proxy": "http://localhost:5000",
   "scripts": {
     "start": "node scripts/start.js",
-    "start-flask": "cd ../py && venv/bin/flask run --no-debugger",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js",
-    "lint": "npx prettier --write src && npx eslint --fix src"
+    "style": "npx prettier --write src && npx eslint --fix src",
+    "lint-ci": "npx eslint src"
   },
   "dependencies": {
     "@babel/core": "7.12.3",
@@ -74,9 +74,7 @@
     "web-vitals": "^0.2.4",
     "webpack": "4.44.2",
     "webpack-manifest-plugin": "2.2.0",
-    "workbox-webpack-plugin": "5.1.4"
-  },
-  "devDependencies": {
+    "workbox-webpack-plugin": "5.1.4",
     "eslint-config-prettier": "^7.1.0",
     "eslint-plugin-react": "^7.22.0",
     "eslint-plugin-react-hooks": "^4.2.0",
