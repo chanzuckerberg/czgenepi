@@ -47,7 +47,7 @@ That's it! Output files will automatically appear in the `static` folder of the 
 Once the source code has been placed on the target machine, but before the backend is started, the following command should be run:
 
 ```zsh
-% npm --prefix run build
+% npm --prefix src/ts run build
 ```
 
 This creates a minimized production build and places it in the previously mentioned static folder.
