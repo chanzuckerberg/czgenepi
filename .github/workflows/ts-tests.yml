@@ -35,7 +35,6 @@ jobs:
           path: ~/.npm
           key: ts-tests-code-style-v0-${{ runner.os }}-${{ steps.setup.outputs.node-version }}-${{ hashFiles('.github/workflows/ts-tests.yml') }}
       - name: Install dependencies
-        if: steps.cache-deps.outputs.cache-hit != 'true'
         run: npm --prefix src/ts ci
       - name: Verify code style
         run: npm --prefix src/ts run lint-ci
@@ -60,7 +59,6 @@ jobs:
           path: ~/.npm
           key: ts-tests-code-style-v0-${{ runner.os }}-${{ steps.setup.outputs.node-version }}-${{ hashFiles('.github/workflows/ts-tests.yml') }}
       - name: Install dependencies
-        if: steps.cache-deps.outputs.cache-hit != 'true'
         run: npm --prefix src/ts ci
       - name: Run tests
         run: npm --prefix src/ts run test
@@ -85,7 +83,6 @@ jobs:
           path: ~/.npm
           key: ts-tests-code-style-v0-${{ runner.os }}-${{ steps.setup.outputs.node-version }}-${{ hashFiles('.github/workflows/ts-tests.yml') }}
       - name: Install dependencies
-        if: steps.cache-deps.outputs.cache-hit != 'true'
         run: npm --prefix src/ts ci
       - name: Run tests
         run: npm --prefix src/ts run build
