@@ -61,7 +61,7 @@ jobs:
       - name: Install dependencies
         run: npm --prefix src/ts ci
       - name: Run tests
-        run: npm --prefix src/ts run test
+        run: npm --prefix src/ts test
 
   test-build:
     runs-on: ubuntu-latest
