@@ -27,12 +27,14 @@ From the project root directory:
 % npm --prefix src/ts install
 ```
 
-4. Start Webpack in dev mode (watches for file changes)
+## Running in development mode
+
+1. Start Webpack in dev mode (watches for file changes)
 ```zsh
 % npm --prefix src/ts start
 ```
 
-That's it! Output files will automatically appear in the `static` folder of the Flask app (src/py/covidr/static).
+That's it! Output files will automatically appear in the `static` folder of the Flask app (src/py/covidr/static). React hot reloading is not supported, so a browser refresh is required to see updated content.
 
 ## Linting
 
