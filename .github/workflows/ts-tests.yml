@@ -33,7 +33,7 @@ jobs:
           cache-name: cache-node-modules
         with:
           path: ~/.npm
-          key: ts-tests-code-style-v0-${{ runner.os }}-${{ steps.setup.outputs.node-version }}-${{ hashFiles('.github/workflows/ts-tests.yml') }}
+          key: ts-tests-v0-${{ runner.os }}-${{ steps.setup.outputs.node-version }}-${{ hashFiles('.github/workflows/ts-tests.yml') }}
       - name: Install dependencies
         run: npm --prefix src/ts ci
       - name: Verify code style
@@ -57,7 +57,7 @@ jobs:
           cache-name: cache-node-modules
         with:
           path: ~/.npm
-          key: ts-tests-code-style-v0-${{ runner.os }}-${{ steps.setup.outputs.node-version }}-${{ hashFiles('.github/workflows/ts-tests.yml') }}
+          key: ts-tests-v0-${{ runner.os }}-${{ steps.setup.outputs.node-version }}-${{ hashFiles('.github/workflows/ts-tests.yml') }}
       - name: Install dependencies
         run: npm --prefix src/ts ci
       - name: Run tests
@@ -81,7 +81,7 @@ jobs:
           cache-name: cache-node-modules
         with:
           path: ~/.npm
-          key: ts-tests-code-style-v0-${{ runner.os }}-${{ steps.setup.outputs.node-version }}-${{ hashFiles('.github/workflows/ts-tests.yml') }}
+          key: ts-tests-v0-${{ runner.os }}-${{ steps.setup.outputs.node-version }}-${{ hashFiles('.github/workflows/ts-tests.yml') }}
       - name: Install dependencies
         run: npm --prefix src/ts ci
       - name: Run tests
