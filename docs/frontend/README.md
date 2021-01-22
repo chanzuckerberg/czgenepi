@@ -4,7 +4,13 @@ The frontend is written in [TypeScript](https://www.typescriptlang.org/), using 
 
 ## Setting up a development environment
 
-The only prerequisite for working with the frontend is [Node](https://nodejs.org/en/). We aim to use the latest Active LTS release (14.15.4). If you don't have Node installed or have another version, [nvm](https://github.com/nvm-sh/nvm) is a great way to install and manage Node.
+### Install Node
+
+The only prerequisite for working with the frontend is [Node](https://nodejs.org/en/). We aim to use the latest Active LTS release (14.15.4). It can either be installed using [nvm](#nvm) or [nodeenv](#nodeenv).
+
+#### nvm
+
+[nvm](https://github.com/nvm-sh/nvm) is a great way to install and manage Node.
 
 From the **project root directory**:
 
@@ -19,7 +25,32 @@ From the **project root directory**:
 % nvm use
 ```
 
-3. Install dependencies
+#### nodeenv
+
+[nodeenv](https://github.com/ekalinin/nodeenv) is an alternative way to install Node in a python virtual environment.
+
+From the **project root directory**:
+
+1. Activate your virtual environment.
+```bash
+% . .venv/bin/activate
+```
+
+2. Install nodeenv into your virtual environment.
+```bash
+(venv) % pip install nodeenv
+```
+
+3. Install the desired version of Node.
+```bash
+(venv) % nodeenv --force --node=$(cat .nvmrc) .venv
+```
+
+### Install dependencies
+
+Once Node is installed, install the dependencies for transpiling the Typescript code.
+
+1. Install dependencies
 ```zsh
 % npm --prefix src/ts install
 ```
