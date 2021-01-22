@@ -1,7 +1,8 @@
 @import "common/styles/mixins.scss";
 
 .navbar {
-    background-color: var(--accent-dark);
+    background-color: var(--accent-light);
+    min-height: 50px;
 }
 
 .titleLink {

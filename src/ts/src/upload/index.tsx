@@ -5,7 +5,7 @@ import React from "react";
 export default function Upload(): JSX.Element {
     return (
         <div>
-            <p>Mein gott...Sie est alive!!</p>
+            <p>Upload!</p>
         </div>
     );
 }
