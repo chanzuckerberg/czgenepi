@@ -97,7 +97,6 @@
       "react-app/jest"
     ]
   },
-  "typings": "src/types/*.d.ts",
   "browserslist": {
     "production": [
       ">0.2%",
