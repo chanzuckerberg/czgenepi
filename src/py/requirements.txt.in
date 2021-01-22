@@ -1,4 +1,6 @@
 # These are the requirements to deploy this application.
 
+Authlib
 flask
+python-dotenv
 sqlalchemy

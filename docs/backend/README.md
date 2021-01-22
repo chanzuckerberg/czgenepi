@@ -1,3 +1,13 @@
+## Setup Auth0:
+
+you will need to have a specific `.env` file to read in `AUTH0` variables (place this file in `src/py/covidr`), ask project leads for this file, there will be different `.env` files for local development, staging, and production. 
+
+if deploying to a custom staging environment change this variable in the .env file:
+
+`AUTH0_CALLBACK_URL="http://<custom-staging-env-name>.us-west-2.elasticbeanstalk.com/callback"`
+
+if you are new to working on covidr ask a project lead to ask your eb staging env to the list of allowed callbacks in Auth0. 
+
 ## Deployment of the python web services
 
 Because the [AWS Elastic Beanstalk CLI](https://github.com/aws/aws-elastic-beanstalk-cli) depends on libraries that conflict with the libraries required by our development workflow, it is recommended to install the AWS EB CLI tools in a separate virtual environment.

@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import os
 from collections import MutableMapping
 from typing import Type
+
+from dotenv import find_dotenv, load_dotenv
 
 
 class Config:
@@ -38,3 +41,48 @@ class DatabaseConfig:
     @property
     def READONLY_URI(self):
         raise NotImplementedError()
+
+
+class Auth0Config:
+    def __init__(self):
+        ENV_FILE = find_dotenv()
+        if ENV_FILE:
+            load_dotenv(ENV_FILE)
+
+    @property
+    def AUTH0_CLIENT_ID(self):
+        return os.environ.get("AUTH0_CLIENT_ID")
+
+    @property
+    def AUTH0_CALLBACK_URL(self):
+        return os.environ.get("AUTH0_CALLBACK_URL")
+
+    @property
+    def AUTH0_CLIENT_SECRET(self):
+        return os.environ.get("AUTH0_CLIENT_SECRET")
+
+    @property
+    def AUTH0_DOMAIN(self):
+        return os.environ.get("AUTH0_DOMAIN")
+
+    @property
+    def AUTH0_BASE_URL(self):
+        return "https://" + self.AUTH0_DOMAIN
+
+    @property
+    def SECRET_KEY(self):
+        return os.environ.get("SECRET_KEY")
+
+    @property
+    def ACCESS_TOKEN_URL(self):
+        return self.AUTH0_BASE_URL + "/oauth/token"
+
+    @property
+    def AUTHORIZE_URL(self):
+        return self.AUTH0_BASE_URL + "/authorize"
+
+    @property
+    def CLIENT_KWARGS(self):
+        return {
+            "scope": "openid profile email",
+        }
