@@ -16,3 +16,7 @@ covidr% flask run
 
 The backend is documented [here](docs/backend/).
 
+
+## Frontend
+
+The frontend is documented [here](docs/frontend/).
