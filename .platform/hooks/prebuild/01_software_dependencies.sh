@@ -4,7 +4,7 @@ set -x
 export NVM_DIR="${HOME}/.nvm"
 # We want to be on the latest Active LTS; but should
 # set this value manually, so we can test it beforehand
-export NODE_VERSION="14.15.4"
+export NODE_VERSION=$(cat .nvmrc)
 
 # Install nvm
 if [[ ! -f "${NVM_DIR}/nvm.sh" ]]; then

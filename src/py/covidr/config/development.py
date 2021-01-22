@@ -1,4 +1,4 @@
-from .config import Config
+from .config import Config, DatabaseConfig
 
 
 class DevelopmentConfig(Config, descriptive_name="dev"):
@@ -7,8 +7,13 @@ class DevelopmentConfig(Config, descriptive_name="dev"):
         return True
 
     @property
-    def DATABASE_URI(self):
-        # TODO: fetch this from AWS secrets?
+    def DATABASE_CONFIG(self):
+        return DevelopmentDatabaseConfig()
+
+
+class DevelopmentDatabaseConfig(DatabaseConfig):
+    @property
+    def URI(self):
         return "postgresql://user_rw:password_rw@localhost:5432/covidr_db"
 
     # ensures that latest static assets are read during frontend dev work

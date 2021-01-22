@@ -26,10 +26,15 @@ class Config:
         return False
 
     @property
-    def DATABASE_URI(self):
+    def DATABASE_CONFIG(self):
+        raise NotImplementedError()
+
+
+class DatabaseConfig:
+    @property
+    def URI(self):
         raise NotImplementedError()
 
     @property
-    def DATABASE_READONLY_URI(self):
-        # raise NotImplementedError()
-        pass
+    def READONLY_URI(self):
+        raise NotImplementedError()

@@ -1,5 +1,9 @@
-from .config import Config
+from .config import Config, DatabaseConfig
 
 
 class ProductionConfig(Config, descriptive_name="prod"):
-    pass
+    ...
+
+
+class ProductionDatabaseConfig(DatabaseConfig):
+    ...
