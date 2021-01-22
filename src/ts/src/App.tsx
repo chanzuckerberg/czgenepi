@@ -8,7 +8,8 @@ function App(): JSX.Element {
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
-          This is COVIDr on Flask, saying<br/>
+          This is COVIDr on Flask, saying
+          <br />
           <code>Hello, world!</code>
         </p>
         <a
