@@ -1,0 +1,14 @@
+@import "common/styles/mixins.scss";
+
+.navbar {
+    background-color: var(--accent-dark);
+}
+
+.titleLink {
+    color: var(--white);
+
+    &:hover {
+        text-decoration: none;
+        color: var(--white);
+    }
+}

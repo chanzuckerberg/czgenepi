@@ -31,4 +31,5 @@ class Config:
 
     @property
     def DATABASE_READONLY_URI(self):
-        raise NotImplementedError()
+        # raise NotImplementedError()
+        pass

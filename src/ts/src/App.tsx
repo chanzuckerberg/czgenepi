@@ -1,28 +1,26 @@
 import React from "react";
-import logo from "./logo.svg";
-import "./App.scss";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { CZUI } from "cz-ui";
 
-function App(): JSX.Element {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          This is COVIDr on Flask, saying
-          <br />
-          <code>Hello, world!</code>
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import Upload from "upload";
+
+import NavBar from "NavBar";
+
+import "App.scss";
+
+export default function App(): JSX.Element {
+    return (
+        <Router>
+            <div className="App">
+                <CZUI>
+                    <NavBar />
+                    <Switch>
+                        <Route path="/upload">
+                            <Upload />
+                        </Route>
+                    </Switch>
+                </CZUI>
+            </div>
+        </Router>
+    );
 }
-
-export default App;
