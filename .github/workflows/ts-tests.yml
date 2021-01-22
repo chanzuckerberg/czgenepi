@@ -16,7 +16,7 @@ defaults:
     shell: bash
 
 jobs:
-  code-style:
+  ts-code-style:
     runs-on: ubuntu-latest
 
     steps:
@@ -39,7 +39,7 @@ jobs:
       - name: Verify code style
         run: npm --prefix src/ts run lint-ci
 
-  tests:
+  ts-tests:
     runs-on: ubuntu-latest
     needs: code-style
 
@@ -63,7 +63,7 @@ jobs:
       - name: Run tests
         run: npm --prefix src/ts test
 
-  test-build:
+  ts-test-build:
     runs-on: ubuntu-latest
     needs: tests
 
@@ -84,5 +84,5 @@ jobs:
           key: ts-tests-v0-${{ runner.os }}-${{ steps.setup.outputs.node-version }}-${{ hashFiles('.github/workflows/ts-tests.yml') }}
       - name: Install dependencies
         run: npm --prefix src/ts ci
-      - name: Run tests
+      - name: Transpile
         run: npm --prefix src/ts run build
