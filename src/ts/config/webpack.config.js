@@ -159,9 +159,6 @@ module.exports = function (webpackEnv) {
     // These are the "entry points" to our application.
     // This means they will be the "root" imports that are included in JS bundle.
     entry: paths.appIndexJs,
-    watchOptions: {
-      ignored: "node_modules/**"
-    },
     output: {
       // The build folder.
       path: paths.appBuild,
@@ -577,8 +574,8 @@ module.exports = function (webpackEnv) {
       // to restart the development server for webpack to discover it. This plugin
       // makes the discovery automatic so you don't have to restart.
       // See https://github.com/facebook/create-react-app/issues/186
-      // isEnvDevelopment &&
-      //   new WatchMissingNodeModulesPlugin(paths.appNodeModules),
+      isEnvDevelopment &&
+        new WatchMissingNodeModulesPlugin(paths.appNodeModules),
       isEnvProduction &&
         new MiniCssExtractPlugin({
           // Options similar to the same options in webpackOptions.output

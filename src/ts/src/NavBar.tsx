@@ -20,7 +20,6 @@ export default function NavBarCovidr(): JSX.Element {
         <div className={style.navbar}>
             <ErrorBoundary>
                 <NavBar
-                    accent
                     title={
                         <Link className={style.titleLink} to="/">
                             COVIDr?

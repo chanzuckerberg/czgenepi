@@ -24,7 +24,7 @@ module.exports = {
     },
     overrides: [
     {
-        files: ["*.d.ts"],
+        files: ["*.d.ts"], // type declaration files
         rules: {
             "@typescript-eslint/triple-slash-reference": "off",
         }
