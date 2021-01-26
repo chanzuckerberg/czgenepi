@@ -1,0 +1,15 @@
+@import "common/styles/mixins.scss";
+
+.navbar {
+    background-color: var(--primary);
+    min-height: 50px;
+}
+
+.titleLink {
+    color: var(--white);
+
+    &:hover {
+        text-decoration: none;
+        color: var(--white);
+    }
+}

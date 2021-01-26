@@ -20,8 +20,6 @@ repos:
     rev: v7.11.0
     hooks:
     - id: eslint
-      files: \.[jt]sx?$  # *.js, *.jsx, *.ts and *.tsx
-      types: [file]
       args: [--fix, --config src/ts/.eslintrc.js. --ignore-path src/ts/.eslintignore]
       additional_dependencies:
       - eslint@7.11.0
@@ -29,5 +27,9 @@ repos:
       - eslint-plugin-react-hooks@4.2.0
       - eslint-config-prettier@7.1.0
       - babel-eslint@10.1.0
-      - \@typescript-eslint/eslint-plugin@4.5.0
-      - \@typescript-eslint/parser@4.5.0
+      - "@typescript-eslint/eslint-plugin@4.5.0"
+      - "@typescript-eslint/parser@4.5.0"
+      types_or: [javascript, jsx, ts, tsx]
+      files: ^src/ts/src
+
+
