@@ -113,8 +113,9 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
-.venv
+.env/
+.venv/
+.venv-ebcli/
 env/
 venv/
 ENV/
@@ -304,3 +305,4 @@ static
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+/.ebiginore
