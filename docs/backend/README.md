@@ -9,26 +9,25 @@ Python 3.7.6
 covidr% python3.7 -m venv .venv-ebcli
 covidr% .venv-ebcli/bin/pip install awsebcli
 ```
-2. Set up the elastic beanstalk configuration in the `src/py` directory.
+2. Set up the elastic beanstalk configuration in the top-level directory.
 ```bash
-covidr% cd src/py
-covidr/src/py% eb init --region=us-west-2 --platform python-3.7 covidr
+covidr% .venv-ebcli/bin/eb init --region=us-west-2 --platform python-3.7 covidr
 ```
 3. Pick a reasonable identifier for your target deployment environment, such as covidr-<your-user-name>.  Create the environment if you haven't done so before.  This will deploy the code as well, so if you are doing this step, skip the next one.
 ```bash
-covidr/src/py% ../../.venv-ebcli/bin/eb create covidr-myusername
+covidr% .venv-ebcli/bin/eb create covidr-myusername --cname covidr-myusername
 ```
 4. If you have already created an environment in the past, just updating the existing deployment environment.
 ```bash
-covidr/src/py% ../../.venv-ebcli/bin/eb deploy covidr-myusername
+covidr% .venv-ebcli/bin/eb deploy covidr-myusername
 ```
 5. Visit your deployment.  This should open your deployment environment in your browser.
 ```bash
-covidr/src/py% ../../.venv-ebcli/bin/eb open covidr-myusername
+covidr% .venv-ebcli/bin/eb open covidr-myusername
 ```
 6. Remember to remove your environment when you are not using it.
 ```bash
-covidr/src/py% ../../.venv-ebcli/bin/eb terminate covidr-myusername
+covidr% .venv-ebcli/bin/eb terminate covidr-myusername
 ```
 
 ## Database concerns
