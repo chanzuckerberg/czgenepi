@@ -5,9 +5,9 @@ import cx from "classnames";
 import { get, without, flow, omit, set, find } from "lodash/fp";
 
 import UploadHeader from "./UploadHeader";
-import UploadSampleStep from "./UploadSampleStep";
-import UploadMetadataStep from "./UploadMetadataStep";
-import UploadReviewStep from "./UploadReviewStep";
+// import UploadSampleStep from "./UploadSampleStep";
+// import UploadMetadataStep from "./UploadMetadataStep";
+// import UploadReviewStep from "./UploadReviewStep";
 
 import style from "./index.module.scss";
 

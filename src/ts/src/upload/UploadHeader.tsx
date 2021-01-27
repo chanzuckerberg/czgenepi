@@ -3,7 +3,6 @@ import { Step } from "./types";
 import React from "react";
 import { startCase } from "lodash/fp";
 import { Label } from "semantic-ui-react";
-import { Link } from "cz-ui";
 import cx from "classnames";
 
 import style from "./index.module.scss";
