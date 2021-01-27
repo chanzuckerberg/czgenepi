@@ -155,6 +155,7 @@ export default function Upload(props: IProps): JSX.Element {
         });
     };
 
+    // Uncomment function when child components are converted to Typscript/functional components
     // Original IDSeq comment:
     // SLIGHT HACK: Keep steps mounted, so user can return to them if needed.
     // The internal state of some steps is difficult to recover if they are unmounted.
