@@ -7,8 +7,8 @@
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js",
-    "style": "npx prettier --write src && npx eslint --fix src",
-    "lint-ci": "npx eslint src"
+    "style": "npx prettier --write src && npx eslint --max-warnings 45 --fix src",
+    "lint-ci": "npx eslint --max-warnings 45 src"
   },
   "dependencies": {
     "@babel/core": "7.12.3",

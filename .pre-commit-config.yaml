@@ -20,7 +20,7 @@ repos:
     rev: v7.11.0
     hooks:
     - id: eslint
-      args: [--fix, --config src/ts/.eslintrc.js. --ignore-path src/ts/.eslintignore]
+      args: [--fix, --config src/ts/.eslintrc.js. --ignore-path src/ts/.eslintignore, --max-warnings 45]
       additional_dependencies:
       - eslint@7.11.0
       - eslint-plugin-react@7.22.0
