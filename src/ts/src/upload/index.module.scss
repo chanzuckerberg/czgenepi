@@ -1,0 +1,438 @@
+@import "cz-ui/mixins/typography";
+
+.sampleUploadFlow {
+    .inner {
+        padding: 0 60px;
+        background-color: var(--white);
+    }
+
+    &.narrow .inner {
+        padding: 60px 240px;
+    }
+}
+
+.uploadFlowStep {
+    // In order to make the flex-content take up the remaining height on the page,
+    // we need to place it in a parent container that expands to fill up the page height.
+    // This min-height takes up the remaining viewport height besides the header and the sample upload flow header.
+    min-height: calc(100vh - 160px);
+    padding-top: 20px;
+    padding-bottom: 20px;
+    display: none;
+    flex-direction: column;
+
+    .flexContent {
+        flex: 1 1 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .controls {
+        .helpText {
+            @include font-body-xs;
+            margin-bottom: 10px;
+            color: var(--gray-dark);
+        }
+
+        .continueButton {
+            margin-right: 10px;
+        }
+    }
+
+    &.visible {
+        display: flex;
+    }
+}
+
+.label {
+    @include font-header-s;
+    margin-bottom: 5px;
+
+    .infoLink {
+        @include font-header-xs;
+        margin-left: 10px;
+        color: var(--primary);
+        cursor: pointer;
+    }
+}
+
+.headerWrapper {
+    border-bottom: 4px solid var(--gray-off-white);
+}
+
+.sampleUploadFlowHeader {
+    padding: 20px 60px;
+    display: flex;
+
+    .fill {
+        flex: 1 1 0;
+    }
+
+    .title {
+        @include font-header-xl;
+        margin-bottom: 5px;
+    }
+
+    .subtitle {
+        margin-top: 5px;
+        color: var(--gray-dark);
+    }
+
+    .link {
+        // Overwrite <a> inherit rule in header.scss
+        color: var(--primary);
+        cursor: pointer;
+        margin-left: 5px;
+    }
+
+    .menu {
+        display: flex;
+
+        .option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 110px;
+
+            &.active .circle {
+                color: var(--white);
+                background-color: var(--primary);
+            }
+
+            &.enabled {
+                cursor: pointer;
+
+                .circle {
+                    color: var(--white);
+                    background-color: var(--primary);
+                    opacity: 0.3;
+                }
+            }
+        }
+
+        .circle {
+            @include font-header-xs;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 6px;
+            // Disable semantic-ui transition.
+            transition: none;
+        }
+
+        .text {
+            @include font-header-xs;
+            color: var(--black);
+        }
+    }
+}
+
+.uploadSampleStep {
+    .projectSelect {
+        margin-bottom: 30px;
+
+        .header {
+            @include font-header-xl;
+            margin-bottom: var(--space-default);
+        }
+
+        .createProjectButton {
+            @include font-header-xs;
+            color: var(--primary);
+            cursor: pointer;
+            margin-top: 4px;
+        }
+
+        .projectCreationContainer {
+            background-color: var(--gray-off-white);
+            padding: 20px;
+            margin-top: 20px;
+        }
+    }
+
+    .fileUpload {
+        position: relative;
+        margin-bottom: 10px;
+
+        .title {
+            @include font-header-xl;
+        }
+
+        .tabs {
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+    }
+}
+
+.localFilePicker {
+    height: 120px;
+
+    &.short {
+        height: 90px;
+    }
+}
+
+.remoteFileUpload {
+    .info {
+        background-color: var(--gray-off-white);
+        padding: 20px;
+        margin-bottom: 10px;
+
+        .title {
+            @include font-header-xs;
+        }
+
+        ul {
+            margin: 5px 0 10px 20px;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+
+            li {
+                @include font-body-xs;
+                list-style-type: disc;
+            }
+        }
+    }
+
+    .controls {
+        display: flex;
+
+        .connectButton {
+            margin-left: 10px;
+        }
+
+        .input {
+            flex: 1 1 0;
+            min-width: 0;
+        }
+    }
+
+    .notification {
+        margin-top: 10px;
+    }
+}
+
+.localFileUpload {
+    .info {
+        background-color: var(--gray-off-white);
+        padding: 20px;
+        margin-bottom: 10px;
+
+        .title {
+            @include font-header-xs;
+        }
+
+        ul {
+            margin: 5px 0 10px 20px;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+
+            li {
+                @include font-body-xs;
+                list-style-type: disc;
+            }
+        }
+    }
+}
+
+.uploadMetadataStep {
+    .title {
+        font-size: 26px;
+        font-weight: 600;
+        letter-spacing: 0.4px;
+        margin-bottom: 8px;
+    }
+
+    .uploadInstructions {
+        margin-top: 10px;
+    }
+
+    .hide {
+        display: none;
+    }
+}
+
+.reviewStep {
+    .title {
+        @include font-header-xl;
+    }
+
+    .uploadMsg {
+        @include font-body-m;
+        margin-bottom: 40px;
+        color: var(--gray-dark);
+    }
+
+    .reviewHeader {
+        margin: 10px 0;
+        display: flex;
+
+        .text {
+            @include font-header-l;
+        }
+
+        .links {
+            @include font-body-xs;
+            display: flex;
+            margin-left: 10px;
+            align-items: center;
+            margin-top: 5px;
+
+            &.enabled {
+                .link {
+                    color: var(--primary);
+                    cursor: pointer;
+                }
+            }
+
+            .divider {
+                margin: 0 5px;
+            }
+
+            .link {
+                color: var(--gray-light);
+                cursor: default;
+            }
+        }
+    }
+
+    .sampleContainer {
+        margin-top: 50px;
+    }
+
+    .project {
+        background-color: var(--gray-off-white);
+        padding: 25px;
+        display: flex;
+
+        .name {
+            @include font-header-m;
+        }
+
+        .publicAccess {
+            @include font-body-s;
+            color: var(--gray-darkest);
+            margin-left: 10px;
+        }
+
+        .projectIcon {
+            height: 40px;
+            width: 40px;
+            margin-right: 15px;
+        }
+
+        .text {
+            flex: 1 1 0;
+            min-width: 0;
+
+            .header {
+                display: flex;
+            }
+
+            .existingSamples {
+                @include font-body-xs;
+                color: var(--gray-dark);
+            }
+
+            .truncated {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                display: -webkit-box;
+                -webkit-line-clamp: 5;
+                -webkit-box-orient: vertical;
+            }
+
+            .showHide {
+                @include font-body-xs;
+                text-transform: uppercase;
+                display: inline-block;
+                margin-top: 5px;
+                margin-bottom: 10px;
+                color: var(--primary);
+                cursor: pointer;
+            }
+        }
+
+        .descriptionContainer {
+            @include font-body-s;
+            color: var(--gray-dark);
+            white-space: pre-wrap;
+            margin: 10px 0;
+        }
+    }
+
+    .tableScrollWrapper {
+        overflow: auto;
+        max-height: 450px;
+
+        .loadingMsg {
+            @include font-body-s;
+            margin-top: 10px;
+        }
+    }
+
+    .sampleName {
+        @include font-header-s;
+    }
+
+    .error {
+        color: var(--error-medium);
+    }
+
+    .link {
+        color: var(--primary);
+    }
+
+    .files {
+        padding: 10px 0;
+
+        .file {
+            padding: 5px 0;
+
+            &:first-child {
+                padding-top: 0;
+            }
+
+            &:last-child {
+                padding-bottom: 0;
+            }
+        }
+    }
+
+    .successMessage,
+    .error,
+    .uploadMessage {
+        @include font-body-xs;
+        margin-top: 30px;
+        margin-bottom: 10px;
+    }
+
+    .uploadMessage,
+    .successMessage {
+        color: var(--gray-dark);
+    }
+
+    .loadingIcon {
+        margin-right: 5px;
+    }
+
+    .sampleProcessingOption {
+        margin-top: var(--space-xl);
+        align-items: left;
+        justify-content: left;
+
+        // Global because Checkbox does not use CSS modules
+        :global(.label) {
+            font-size: 12px;
+            line-height: 20px;
+            margin-left: 10px;
+        }
+    }
+}
