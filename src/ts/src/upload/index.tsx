@@ -28,11 +28,11 @@ interface IProps {
     basespaceOauthRedirectUri?: string;
 }
 
-export default function Upload(props: IProps): JSX.Element {
+export default function Upload(_props: IProps): JSX.Element {
     const [currentStep, setCurrentStep] = useState<Step>(Step.UploadSamples);
     const [samples, setSamples] = useState<Array<Sample>>([]);
     const [uploadType, setUploadType] = useState<string>("");
-    const [project, setProject] = useState<any>(null);
+    const [project, setProject] = useState<Project | null>(null);
     const [sampleNamesToFiles, setSampleNamesToFiles] = useState<any>(null);
     const [metadata, setMetadata] = useState<any>(null);
     const [metadataIssues, setMetadataIssues] = useState<any>(null);
@@ -41,7 +41,7 @@ export default function Upload(props: IProps): JSX.Element {
         uploadMetadata: false,
         review: false,
     });
-    const [hostGenomes, setHostGenomes] = useState<Array<any>>([]);
+    const [hostGenomes, setHostGenomes] = useState<Array<HostGenome>>([]);
     const [workflows, setWorkflows] = useState(new Set());
     const [wetlabProtocol, setWetlabProtocol] = useState<any>(null);
 
