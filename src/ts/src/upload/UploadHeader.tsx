@@ -53,7 +53,7 @@ export default function UploadHeader(props: IProps): JSX.Element {
                         </div>
                         {currentStep === Step.UploadSamples && (
                             <div className={style.subtitle}>
-                                Upload input files.
+                                Select input files.
                             </div>
                         )}
                         {currentStep === Step.UploadMetadata && (
