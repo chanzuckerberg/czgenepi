@@ -24,7 +24,7 @@ const MENU_OPTIONS = [
 ];
 
 interface IProps {
-    currentStep: string;
+    currentStep: Step;
     samples: Array<Sample>;
     project: Project;
     onStepSelect: (step: Step) => void;
@@ -51,24 +51,18 @@ export default function UploadHeader(props: IProps): JSX.Element {
                         <div className={style.title}>
                             {startCase(currentStep)}
                         </div>
-                        {currentStep === "uploadSamples" && (
+                        {currentStep === Step.UploadSamples && (
                             <div className={style.subtitle}>
-                                Rather use our command-line interface?
-                                <Link
-                                    href="/cli_user_instructions"
-                                    className={style.link}
-                                >
-                                    View CLI Instructions.
-                                </Link>
+                                Upload input files.
                             </div>
                         )}
-                        {currentStep === "uploadMetadata" && (
+                        {currentStep === Step.UploadMetadata && (
                             <div className={style.subtitle}>
                                 This metadata will provide context around your
                                 samples and results in IDseq.
                             </div>
                         )}
-                        {currentStep === "review" && (
+                        {currentStep === Step.Review && (
                             <div className={style.subtitle}>
                                 Uploading {props.samples.length} samples to{" "}
                                 {props.project.name}
@@ -91,11 +85,9 @@ export default function UploadHeader(props: IProps): JSX.Element {
                                     onStepSelect(val.step);
                                 }}
                             >
-                                <Label
-                                    className={style.circle}
-                                    circular
-                                    text={index + 1}
-                                />
+                                <Label className={style.circle} circular={true}>
+                                    {index + 1}
+                                </Label>
                                 <div className={style.text}>{val.text}</div>
                             </div>
                         ))}
