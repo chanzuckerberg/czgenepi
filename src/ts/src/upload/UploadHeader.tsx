@@ -1,113 +1,107 @@
+import { Step } from "./types";
+
 import React from "react";
 import { startCase } from "lodash/fp";
+import { Label } from "semantic-ui-react";
+import { Link } from "cz-ui";
 import cx from "classnames";
 
-import Label from "~ui/labels/Label";
-import NarrowContainer from "~/components/layout/NarrowContainer";
-import { logAnalyticsEvent } from "~/api/analytics";
-import ExternalLink from "~/components/ui/controls/ExternalLink";
-
-import cs from "./sample_upload_flow.scss";
+import style from "./index.module.scss";
 
 const MENU_OPTIONS = [
-  {
-    text: "Samples",
-    step: "uploadSamples",
-  },
-  {
-    text: "Metadata",
-    step: "uploadMetadata",
-  },
-  {
-    text: "Review",
-    step: "review",
-  },
+    {
+        text: "Samples",
+        step: Step.UploadSamples,
+    },
+    {
+        text: "Metadata",
+        step: Step.UploadMetadata,
+    },
+    {
+        text: "Review",
+        step: Step.Review,
+    },
 ];
 
-class SampleUploadFlowHeader extends React.Component {
-  isStepEnabled = step => {
-    return this.props.stepsEnabled[step];
-  };
-
-  onStepSelect = step => {
-    if (this.isStepEnabled(step)) {
-      this.props.onStepSelect(step);
-    }
-  };
-
-  render() {
-    const { currentStep } = this.props;
-    return (
-      <div className={cs.headerWrapper}>
-        <NarrowContainer>
-          <div className={cs.sampleUploadFlowHeader}>
-            <div className={cs.titleContainer}>
-              <div className={cs.title}>{startCase(currentStep)}</div>
-              {currentStep === "uploadSamples" && (
-                <div className={cs.subtitle}>
-                  Rather use our command-line interface?
-                  <ExternalLink
-                    href="/cli_user_instructions"
-                    className={cs.link}
-                  >
-                    View CLI Instructions.
-                  </ExternalLink>
-                </div>
-              )}
-              {currentStep === "uploadMetadata" && (
-                <div className={cs.subtitle}>
-                  This metadata will provide context around your samples and
-                  results in IDseq.
-                </div>
-              )}
-              {currentStep === "review" && (
-                <div className={cs.subtitle}>
-                  Uploading {this.props.samples.length} samples to{" "}
-                  {this.props.project.name}
-                </div>
-              )}
-            </div>
-            <div className={cs.fill} />
-            <div className={cs.menu}>
-              {MENU_OPTIONS.map((val, index) => (
-                <div
-                  className={cx(
-                    cs.option,
-                    currentStep === val.step && cs.active,
-                    currentStep !== val.step &&
-                      this.isStepEnabled(val.step) &&
-                      cs.enabled
-                  )}
-                  key={val.text}
-                  onClick={() => {
-                    this.onStepSelect(val.step);
-                    logAnalyticsEvent(
-                      "SampleUploadFlowHeader_step-option_clicked",
-                      {
-                        step: val.step,
-                        text: val.text,
-                      }
-                    );
-                  }}
-                >
-                  <Label className={cs.circle} circular text={index + 1} />
-                  <div className={cs.text}>{val.text}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </NarrowContainer>
-      </div>
-    );
-  }
+interface IProps {
+    currentStep: string;
+    samples: Array<Sample>;
+    project: Project;
+    onStepSelect: (step: Step) => void;
+    stepsEnabled: Record<string, boolean>;
 }
 
-SampleUploadFlowHeader.propTypes = {
-  currentStep: PropTypes.string.isRequired,
-  samples: PropTypes.arrayOf(PropTypes.Sample),
-  project: PropTypes.Project,
-  onStepSelect: PropTypes.func.isRequired,
-  stepsEnabled: PropTypes.objectOf(PropTypes.bool),
-};
+export default function UploadHeader(props: IProps): JSX.Element {
+    const isStepEnabled = (step: Step) => {
+        return props.stepsEnabled[step];
+    };
 
-export default SampleUploadFlowHeader;
+    const onStepSelect = (step: Step) => {
+        if (isStepEnabled(step)) {
+            props.onStepSelect(step);
+        }
+    };
+
+    const { currentStep } = props;
+    return (
+        <div className={style.headerWrapper}>
+            <div>
+                <div className={style.sampleUploadFlowHeader}>
+                    <div className={style.titleContainer}>
+                        <div className={style.title}>
+                            {startCase(currentStep)}
+                        </div>
+                        {currentStep === "uploadSamples" && (
+                            <div className={style.subtitle}>
+                                Rather use our command-line interface?
+                                <Link
+                                    href="/cli_user_instructions"
+                                    className={style.link}
+                                >
+                                    View CLI Instructions.
+                                </Link>
+                            </div>
+                        )}
+                        {currentStep === "uploadMetadata" && (
+                            <div className={style.subtitle}>
+                                This metadata will provide context around your
+                                samples and results in IDseq.
+                            </div>
+                        )}
+                        {currentStep === "review" && (
+                            <div className={style.subtitle}>
+                                Uploading {props.samples.length} samples to{" "}
+                                {props.project.name}
+                            </div>
+                        )}
+                    </div>
+                    <div className={style.fill} />
+                    <div className={style.menu}>
+                        {MENU_OPTIONS.map((val, index) => (
+                            <div
+                                className={cx(
+                                    style.option,
+                                    currentStep === val.step && style.active,
+                                    currentStep !== val.step &&
+                                        isStepEnabled(val.step) &&
+                                        style.enabled
+                                )}
+                                key={val.text}
+                                onClick={() => {
+                                    onStepSelect(val.step);
+                                }}
+                            >
+                                <Label
+                                    className={style.circle}
+                                    circular
+                                    text={index + 1}
+                                />
+                                <div className={style.text}>{val.text}</div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
