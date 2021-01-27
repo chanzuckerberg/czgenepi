@@ -41,7 +41,7 @@ jobs:
 
   ts-tests:
     runs-on: ubuntu-latest
-    needs: code-style
+    needs: ts-code-style
 
     steps:
       - uses: actions/checkout@v2
@@ -65,7 +65,7 @@ jobs:
 
   ts-test-build:
     runs-on: ubuntu-latest
-    needs: tests
+    needs: ts-tests
 
     steps:
       - uses: actions/checkout@v2
