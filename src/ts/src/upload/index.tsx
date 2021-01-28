@@ -32,7 +32,7 @@ export default function Upload(_props: IProps): JSX.Element {
     const [currentStep, setCurrentStep] = useState<Step>(Step.UploadSamples);
     const [samples, setSamples] = useState<Array<Sample>>([]);
     const [uploadType, setUploadType] = useState<string>("");
-    const [project, setProject] = useState<Project | null>(null);
+    const [project, setProject] = useState<Project | undefined>(undefined);
     const [sampleNamesToFiles, setSampleNamesToFiles] = useState<any>(null);
     const [metadata, setMetadata] = useState<any>(null);
     const [metadataIssues, setMetadataIssues] = useState<any>(null);

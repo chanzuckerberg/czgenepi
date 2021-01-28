@@ -25,7 +25,7 @@ const MENU_OPTIONS = [
 interface IProps {
     currentStep: Step;
     samples: Array<Sample>;
-    project: Project;
+    project?: Project;
     onStepSelect: (step: Step) => void;
     stepsEnabled: Record<string, boolean>;
 }
@@ -64,7 +64,7 @@ export default function UploadHeader(props: IProps): JSX.Element {
                         {currentStep === Step.Review && (
                             <div className={style.subtitle}>
                                 Uploading {props.samples.length} samples to{" "}
-                                {props.project.name}
+                                {props.project?.name}
                             </div>
                         )}
                     </div>
