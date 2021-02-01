@@ -39,9 +39,7 @@ def upgrade():
             name=op.f("fk_users_group_id_groups"),
         ),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_users")),
-        sa.UniqueConstraint(
-            "auth0_user_id", name=op.f("uq_users_auth0_user_id")
-        ),
+        sa.UniqueConstraint("auth0_user_id", name=op.f("uq_users_auth0_user_id")),
         schema="aspen",
     )
     # ### end Alembic commands ###
