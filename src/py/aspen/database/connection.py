@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 
-from covidr.config.config import Config
+from aspen.config.config import Config
 from sqlalchemy.engine import create_engine, Engine
 from sqlalchemy.orm import Session, sessionmaker
 

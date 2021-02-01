@@ -7,8 +7,8 @@ from typing import Generator
 from uuid import uuid4
 
 import pytest
-from covidr.database import connection as covidr_connection
-from covidr.database import schema
+from aspen.database import connection as aspen_connection
+from aspen.database import schema
 from sqlalchemy.orm import Session
 
 USERNAME = "user_rw"
@@ -174,7 +174,7 @@ def postgres_database(postgres_instance) -> Generator[PostgresDatabase, None, No
 def postgres_database_with_schema(
     postgres_database,
 ) -> Generator[PostgresDatabase, None, None]:
-    db = covidr_connection.init_db(postgres_database.as_uri())
+    db = aspen_connection.init_db(postgres_database.as_uri())
     schema.create_tables_and_schema(db)
     yield postgres_database
 
@@ -182,8 +182,8 @@ def postgres_database_with_schema(
 @pytest.fixture()
 def sqlalchemy_interface(
     postgres_database_with_schema,
-) -> Generator[covidr_connection.SqlAlchemyInterface, None, None]:
-    interface = covidr_connection.init_db(postgres_database_with_schema.as_uri())
+) -> Generator[aspen_connection.SqlAlchemyInterface, None, None]:
+    interface = aspen_connection.init_db(postgres_database_with_schema.as_uri())
     connection = interface.engine.connect()
 
     yield interface

@@ -6,7 +6,7 @@ import ErrorBoundary from "common/components/ErrorBoundary";
 
 import style from "NavBar.module.scss";
 
-export default function NavBarCovidr(): JSX.Element {
+export default function NavBarAspen(): JSX.Element {
     const navLinks = [
         <Link key="home" to="/">
             Overview
@@ -22,7 +22,7 @@ export default function NavBarCovidr(): JSX.Element {
                 <NavBar
                     title={
                         <Link className={style.titleLink} to="/">
-                            COVIDr?
+                            Aspen?
                         </Link>
                     }
                     navLinks={navLinks}

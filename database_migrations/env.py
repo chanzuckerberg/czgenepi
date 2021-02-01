@@ -8,9 +8,9 @@ from alembic import context
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
-from covidr.config.config import Config
-from covidr.database import models
-from covidr.database.connection import get_db_uri
+from aspen.config.config import Config
+from aspen.database import models
+from aspen.database.connection import get_db_uri
 
 config = context.config
 

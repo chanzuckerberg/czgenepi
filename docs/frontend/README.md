@@ -62,7 +62,7 @@ Once Node is installed, install the dependencies for transpiling the Typescript 
 % npm --prefix src/ts start
 ```
 
-That's it! Output files will automatically appear in the `static` folder of the Flask app (src/py/covidr/static). React hot reloading is not supported, so a browser refresh is required to see updated content.
+That's it! Output files will automatically appear in the `static` folder of the Flask app (src/py/aspen/static). React hot reloading is not supported, so a browser refresh is required to see updated content.
 
 ## Linting / Style
 
