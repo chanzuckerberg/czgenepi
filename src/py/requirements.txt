@@ -10,6 +10,7 @@ idna==2.10
 itsdangerous==1.1.0
 Jinja2==2.11.2
 MarkupSafe==1.1.1
+psycopg2-binary==2.8.6
 pycparser==2.20
 python-dotenv==0.15.0
 requests==2.24.0
