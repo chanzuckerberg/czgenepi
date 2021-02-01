@@ -3,10 +3,11 @@ from functools import wraps
 from pathlib import Path
 from urllib.parse import urlencode
 
-from aspen.config import DevelopmentConfig
-from aspen.config.config import Auth0Config
 from authlib.integrations.flask_client import OAuth
 from flask import Flask, redirect, send_from_directory, session, url_for
+
+from aspen.config import DevelopmentConfig
+from aspen.config.config import Auth0Config
 
 static_folder = Path("static")
 

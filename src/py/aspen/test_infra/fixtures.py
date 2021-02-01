@@ -7,9 +7,10 @@ from typing import Generator
 from uuid import uuid4
 
 import pytest
+from sqlalchemy.orm import Session
+
 from aspen.database import connection as aspen_connection
 from aspen.database import schema
-from sqlalchemy.orm import Session
 
 USERNAME = "user_rw"
 PASSWORD = "password_rw"
