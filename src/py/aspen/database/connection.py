@@ -1,8 +1,9 @@
 from contextlib import contextmanager
 
-from aspen.config.config import Config
 from sqlalchemy.engine import create_engine, Engine
 from sqlalchemy.orm import Session, sessionmaker
+
+from aspen.config.config import Config
 
 
 class SqlAlchemyInterface:
