@@ -14,37 +14,37 @@ Because the [AWS Elastic Beanstalk CLI](https://github.com/aws/aws-elastic-beans
 
 1. Set up a virtual environment and install the EB CLI.
 ```bash
-covidr% python -V
+aspen% python -V
 Python 3.7.6
-covidr% python3.7 -m venv .venv-ebcli
-covidr% .venv-ebcli/bin/pip install awsebcli
+aspen% python3.7 -m venv .venv-ebcli
+aspen% .venv-ebcli/bin/pip install awsebcli
 ```
 2. Set up the elastic beanstalk configuration in the top-level directory.
 ```bash
-covidr% .venv-ebcli/bin/eb init --region=us-west-2 --platform python-3.7 covidr
+aspen% .venv-ebcli/bin/eb init --region=us-west-2 --platform python-3.7 aspen
 ```
-3. Pick a reasonable identifier for your target deployment environment, such as covidr-<your-user-name>.  Create the environment if you haven't done so before.  This will deploy the code as well, so if you are doing this step, skip the next one.
+3. Pick a reasonable identifier for your target deployment environment, such as aspen-<your-user-name>.  Create the environment if you haven't done so before.  This will deploy the code as well, so if you are doing this step, skip the next one.
 ```bash
-covidr% .venv-ebcli/bin/eb create covidr-myusername --cname covidr-myusername
+aspen% .venv-ebcli/bin/eb create aspen-myusername --cname aspen-myusername
 ```
 4. If you have already created an environment in the past, just updating the existing deployment environment.
 ```bash
-covidr% .venv-ebcli/bin/eb deploy covidr-myusername
+aspen% .venv-ebcli/bin/eb deploy aspen-myusername
 ```
 5. Visit your deployment.  This should open your deployment environment in your browser.
 ```bash
-covidr% .venv-ebcli/bin/eb open covidr-myusername
+aspen% .venv-ebcli/bin/eb open aspen-myusername
 ```
 6. Remember to remove your environment when you are not using it.
 ```bash
-covidr% .venv-ebcli/bin/eb terminate covidr-myusername
+aspen% .venv-ebcli/bin/eb terminate aspen-myusername
 ```
 
 ## Database concerns
 
 ### Creating and initializing the local database.
 ```bash
-covidr% make init-local-db
+aspen% make init-local-db
 ```
 
 ### Autogeneration of schema migration

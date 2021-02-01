@@ -1,1 +1,1 @@
-web: PYTHONPATH=$(pwd)/src/py/ gunicorn --bind localhost:8000 --workers 1 --threads 15 covidr.app
+web: PYTHONPATH=$(pwd)/src/py/ gunicorn --bind localhost:8000 --workers 1 --threads 15 aspen.app

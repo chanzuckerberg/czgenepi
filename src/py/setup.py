@@ -2,15 +2,15 @@ from pathlib import Path
 
 import setuptools
 
-description = "COVIDR.  Covid Tracking 2.0"
+description = "ASPEN.  Covid Tracking 2.0"
 
-# NOTE: this is not compatible with a sdist installation of covidr.
+# NOTE: this is not compatible with a sdist installation of aspen.
 requirements_file = Path(__file__).parent / "requirements.txt"
 with requirements_file.open("r") as fh:
     requirement_lines = fh.readlines()
 
 setuptools.setup(
-    name="covidr",
+    name="aspen",
     version="0.0.0",
     author=", ".join(
         [
@@ -34,7 +34,7 @@ setuptools.setup(
     python_requires=">=3.7",
     entry_points={
         "console_scripts": [
-            "covidr-cli = covidr.cli.toplevel:cli",
+            "aspen-cli = aspen.cli.toplevel:cli",
         ]
     },
     include_package_data=True,

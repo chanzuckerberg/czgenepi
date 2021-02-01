@@ -6,7 +6,7 @@ from sqlalchemy.orm import backref, relationship
 from . import modelmixins as mx
 
 meta = MetaData(
-    schema="covidr",
+    schema="aspen",
     naming_convention={
         "ix": "ix_%(column_0_label)s",
         "uq": "uq_%(table_name)s_%(column_0_name)s",

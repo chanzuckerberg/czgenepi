@@ -3,9 +3,9 @@ from functools import wraps
 from pathlib import Path
 from urllib.parse import urlencode
 
+from aspen.config import DevelopmentConfig
+from aspen.config.config import Auth0Config
 from authlib.integrations.flask_client import OAuth
-from covidr.config import DevelopmentConfig
-from covidr.config.config import Auth0Config
 from flask import Flask, redirect, send_from_directory, session, url_for
 
 static_folder = Path("static")

@@ -1,4 +1,4 @@
-from covidr.test_infra.fixtures import (  # noqa: F401
+from aspen.test_infra.fixtures import (  # noqa: F401
     postgres_database,
     postgres_database_with_schema,
     postgres_instance,
