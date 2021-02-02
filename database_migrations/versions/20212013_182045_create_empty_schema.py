@@ -1,7 +1,7 @@
 """create empty schema
 
 Revision ID: 20212013_182045
-Revises: 
+Revises:
 Create Date: 2021-01-13 18:20:45.683596
 
 """
