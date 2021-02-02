@@ -119,7 +119,7 @@ def postgres_instance(
     else:
         raise RuntimeError("DB didn't start up.")
 
-    # create the cliahub user.  we don't use this in tests, but the schema creation code
+    # create the user_ro user.  we don't use this in tests, but the schema creation code
     # will muck around with this user's permissions.
     subprocess.check_call(
         [
@@ -133,7 +133,7 @@ def postgres_instance(
             USERNAME,
             INITIAL_DATABASE,
             "-c",
-            "CREATE USER cliahub",
+            "CREATE USER user_ro",
         ],
     )
 
