@@ -5,6 +5,7 @@
 alembic
 black
 flake8
+ipython
 isort
 mypy
 pytest

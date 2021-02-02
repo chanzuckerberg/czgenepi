@@ -47,6 +47,22 @@ aspen% .venv-ebcli/bin/eb terminate aspen-myusername
 aspen% make init-local-db
 ```
 
+### Interacting with the local database.
+It is possible to interact with the local database in ipython:
+```
+% aspen-cli db interact
+Python 3.7.6 (default, Dec 22 2019, 01:09:06)
+Type 'copyright', 'credits' or 'license' for more information
+IPython 7.20.0 -- An enhanced Interactive Python. Type '?' for help.
+
+In [1]: session = engine.make_session()
+
+In [2]: session.query(User).all()
+Out[2]: []
+
+In [3]:
+```
+
 ### Autogeneration of schema migration
 
 1. Make changes to the models.
