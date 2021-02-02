@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  database:
+    image: postgres:13.0
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=user_rw
+      - POSTGRES_PASSWORD=password_rw
+    volumes:
+      - database:/var/lib/postgresql/data
+  frontend:
+    image: "${DOCKER_REPO}aspen-frontend"
+    build:
+      context: src/ts
+      target: dev
+      cache_from:
+        - "${DOCKER_REPO}aspen-frontend:branch-main"
+      args:
+        - BUILDKIT_INLINE_CACHE=1
+    restart: always
+    environment:
+      BUILD_PATH: build
+      CHOKIDAR_USEPOLLING: 'true'
+    depends_on:
+      - backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./src/ts:/usr/src/app
+      - /usr/src/app/node_modules  # Use node_modules built in container, not from the mounted source dir
+  backend:
+    image: "${DOCKER_REPO}aspen-backend"
+    build:
+      context: src/py
+      target: dev
+      cache_from:
+        - "${DOCKER_REPO}aspen-backend:branch-main"
+      args:
+        - BUILDKIT_INLINE_CACHE=1
+    restart: always
+    depends_on:
+      - database
+    ports:
+      - "3000:3000"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - RESTART_ON_FAILURE=yes
+    volumes:
+      - ./src/py:/usr/src/app
+volumes:
+  database:
