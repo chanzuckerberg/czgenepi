@@ -20,12 +20,18 @@ meta = MetaData(
 base: DeclarativeMeta = declarative_base(cls=mx.BaseMixin, metadata=meta)
 
 
+########################################################################################
+# groups and users
+
+
 class Group(base):
     """A group of users, generally a department of public health."""
 
     __tablename__ = "groups"
 
     name = Column(String, unique=True, nullable=False)
+    email = Column(String, unique=True, nullable=False)
+    address = Column(String, unique=True, nullable=False)
 
     def __repr__(self):
         return f"Group <{self.name}>"
@@ -37,11 +43,12 @@ class User(base):
     __tablename__ = "users"
 
     name = Column(String, nullable=False)
+    email = Column(String, unique=True, nullable=False)
     auth0_user_id = Column(String, unique=True, nullable=False)
     group_admin = Column(Boolean, nullable=False)
     system_admin = Column(Boolean, nullable=False)
 
-    group_id = Column(Integer, ForeignKey("groups.id"), nullable=False)
+    group_id = Column(Integer, ForeignKey(f"{Group.__tablename__}.id"), nullable=False)
     group = relationship(Group, backref=backref("users", uselist=True))
 
     def __repr__(self):
