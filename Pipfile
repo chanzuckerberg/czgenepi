@@ -10,6 +10,7 @@ psycopg2-binary = "*"
 python-dotenv = "*"
 requests = "*"
 SQLAlchemy = "*"
+sqlalchemy-enum-tables = {editable = true, path = "./third-party/sqlalchemy-enum-tables"}
 
 [dev-packages]
 alembic = "*"

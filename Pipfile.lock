@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "f79b4fd1dec16846335a87bec25f4ed7a2e8f01816fb8d62a186611f09c4e803"
+            "sha256": "00973f2ed904a6772ccc4f91f68e3afe41d6a71b3e81376ee636a5a4649cb79b"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -315,6 +315,10 @@
             ],
             "index": "pypi",
             "version": "==1.3.23"
+        },
+        "sqlalchemy-enum-tables": {
+            "editable": true,
+            "path": "./third-party/sqlalchemy-enum-tables"
         },
         "urllib3": {
             "hashes": [
