@@ -69,3 +69,7 @@ In [3]:
 2. Run `ENV=dev alembic revision --autogenerate -m "SOME DESCRIPTIVE MESSAGE" --rev-id $(date +%Y%M%d_%H%M%S)`
 3. Verify that the schema migration generated in `database_migrations/versions/` is sane.
 4. Run `ENV=dev alembic upgrade head` to test the schema migration on your local database.
+
+## Updating python dependencies
+
+To update python dependencies, update the [`Pipfile`](../../Pipfile) and run `make update-deps`.  This will update [`Pipfile.lock`](../../Pipfile.lock) and [`requirements.txt`](../../src/py/requirements.txt) (used by setup.py), and [`requirements-dev.txt`](../../src/py/requirements-dev.txt) (used by tests).

@@ -1,7 +1,0 @@
-# These are the requirements to deploy this application.
-
-Authlib
-flask
-psycopg2-binary
-python-dotenv
-sqlalchemy

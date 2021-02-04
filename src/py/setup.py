@@ -7,7 +7,11 @@ description = "ASPEN.  Covid Tracking 2.0"
 # NOTE: this is not compatible with a sdist installation of aspen.
 requirements_file = Path(__file__).parent / "requirements.txt"
 with requirements_file.open("r") as fh:
-    requirement_lines = fh.readlines()
+    requirement_lines = [
+        line
+        for line in fh.readlines()
+        if not (line.startswith("-i") or line.startswith("./"))
+    ]
 
 setuptools.setup(
     name="aspen",
