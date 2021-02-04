@@ -1,7 +1,7 @@
 """add physical_samples table
 
-Revision ID: 20214304_104338
-Revises: 20212415_112447
+Revision ID: 20210204_104338
+Revises: 20210215_112447
 Create Date: 2021-02-04 10:43:39.108565
 
 """
@@ -9,8 +9,8 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision = "20214304_104338"
-down_revision = "20212415_112447"
+revision = "20210204_104338"
+down_revision = "20210115_112447"
 branch_labels = None
 depends_on = None
 
