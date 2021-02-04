@@ -1,0 +1,69 @@
+stages:
+  - build
+  - check
+  - upload
+
+.dist: &dist_job
+  stage: build
+  image: dock.heptacle.fr/docker/whlbuild
+  script:
+    - python3 setup.py ${CI_JOB_NAME} ${SETUP_APPEND}
+  artifacts:
+    name: "$CI_JOB_NAME"
+    paths:
+      - dist/*
+
+sdist:
+  <<: *dist_job
+  variables:
+    SETUP_APPEND: --formats=gztar
+
+bdist_wheel:
+  <<: *dist_job
+
+bdist_egg:
+  <<: *dist_job
+
+.bdist:
+  <<: *dist_job
+  variables:
+    SETUP_APPEND: --formats=gztar,zip
+
+twine_check:
+  stage: check
+  image: dock.heptacle.fr/docker/whlbuild
+  script:
+    - twine check dist/*
+  dependencies:
+    - sdist
+    - bdist_wheel
+    - bdist_egg
+    # - bdist
+
+twine_upload_test:
+  stage: upload
+  image: dock.heptacle.fr/docker/whlbuild
+  script:
+    - 'twine upload --skip-existing --disable-progress-bar --verbose --repository-url https://test.pypi.org/legacy/ dist/*'
+  dependencies:
+    - sdist
+    - bdist_wheel
+    - bdist_egg
+    # - bdist
+  when: manual
+
+pack_dists:
+  stage: upload
+  image: dock.heptacle.fr/docker/whlbuild
+  script:
+    - echo dist/*
+  artifacts:
+    name: "$CI_JOB_NAME"
+    paths:
+      - dist/*
+  dependencies:
+    - sdist
+    - bdist_wheel
+    - bdist_egg
+    # - bdist
+  when: manual
