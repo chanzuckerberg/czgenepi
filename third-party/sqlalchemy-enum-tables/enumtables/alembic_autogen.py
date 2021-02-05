@@ -1,11 +1,16 @@
 
 import alembic.autogenerate
+from sqlalchemy import MetaData
 
 from . import enum_column
 from . import alembic_ops
 
-def get_declared_enums(metadata, schema, default):
-	types = set(column.type for table in metadata.tables.values() for column in table.columns if (isinstance(column, enum_column.EnumColumn) and table.schema == schema))
+def get_declared_enums(metadatas, schema, default):
+	types = set(
+		column.type
+		for metadata in metadatas
+		for table in metadata.tables.values()
+		for column in table.columns if (isinstance(column, enum_column.EnumColumn) and table.schema == schema))
 	return {typ.__enum__.__tablename__ : frozenset(typ.__enum__.__enum__.__members__) for typ in types}
 
 def is_table_present(tablename, connection):
@@ -23,7 +28,13 @@ def compare_enums(autogen_context, upgrade_ops, schema_names):
 		if schema is None:
 			schema = default
 
-		enums = get_declared_enums(autogen_context.metadata, schema, default)
+		# autogen_context.metadata can be a single MetaData instance or a sequence of
+		# them.  Normalize it so that it's always a sequence.
+		if isinstance(autogen_context.metadata, MetaData):
+			metadatas = (autogen_context.metadata,)
+		else:
+			metadatas = autogen_context.metadata
+		enums = get_declared_enums(metadatas, schema, default)
 		for table, values in enums.items():
 			if is_table_present(table, autogen_context.connection):
 				items = {r[0] for r in autogen_context.connection.execute("SELECT item_id FROM {}".format(table))}
