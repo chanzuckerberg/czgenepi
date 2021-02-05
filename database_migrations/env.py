@@ -42,13 +42,12 @@ target_metadata = [models.meta]
 
 
 def get_uri():
-    if "ENV" in os.environ:
-        db_env = os.environ["ENV"]
+    if "DB" in os.environ:
+        db_env = os.environ["DB"]
     else:
         # TODO: generate the appropriate list of "RuntimeEnvironment"s from the enum.
         raise ValueError("Must provide env variable DB=[dev, staging, prod]")
 
-    # TODO: find the appropriate RuntimeEnvironment given the "ENV" string.
     return get_db_uri(Config.by_descriptive_name(db_env))
 
 
