@@ -1,12 +1,12 @@
 """create empty schema
 
-Revision ID: 20212013_182045
+Revision ID: 20210113_182045
 Revises:
 Create Date: 2021-01-13 18:20:45.683596
 
 """
 # revision identifiers, used by Alembic.
-revision = "20212013_182045"
+revision = "20210113_182045"
 down_revision = None
 branch_labels = None
 depends_on = None
