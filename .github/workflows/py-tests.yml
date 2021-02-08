@@ -72,6 +72,7 @@ jobs:
           pip install -r src/py/requirements-dev.txt
       - name: Install aspen
         run: |
+          pip install -e ./third-party/sqlalchemy-enum-tables
           pip install -e src/py
       - name: Run with pytest
         run: |
