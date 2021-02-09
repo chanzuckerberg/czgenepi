@@ -1,5 +1,6 @@
 
 import alembic.autogenerate
+from alembic.autogenerate.render import _ident
 from sqlalchemy import MetaData
 
 from . import enum_column
@@ -13,16 +14,10 @@ def get_declared_enums(metadatas, schema, default):
 		for column in table.columns if (isinstance(column.type, enum_column.EnumType) and table.schema == schema))
 	return {typ.__enum__.__tablename__ : frozenset(typ.__enum__.__enum__.__members__) for typ in types}
 
-def is_table_present(fully_qualified_table_name, connection):
-	try:
-		connection.execute("SELECT * FROM {} LIMIT 0;".format(fully_qualified_table_name))
-	except:
-		return False
-	else:
-		return True
-
 @alembic.autogenerate.comparators.dispatch_for("schema")
 def compare_enums(autogen_context, upgrade_ops, schema_names):
+	known_tables = get_connection_tables(autogen_context, schema_names)
+
 	for schema in schema_names:
 		default = autogen_context.dialect.default_schema_name
 		if schema is None:
@@ -36,12 +31,11 @@ def compare_enums(autogen_context, upgrade_ops, schema_names):
 			metadatas = autogen_context.metadata
 		enums = get_declared_enums(metadatas, schema, default)
 		for table, values in enums.items():
-			fully_qualified_table_name = "%s.%s" % (schema, table) if schema else table
-			if is_table_present(fully_qualified_table_name, autogen_context.connection):
+			if (schema, table) in known_tables:
 				items = {
 					r[0]
 					for r in autogen_context.connection.execute(
-						"SELECT item_id FROM {}".format(fully_qualified_table_name)
+						f"SELECT {_ident('item_id')} FROM {_ident(schema)}.{_ident(table)}"
 					)
 				}
 				to_add = values - items
@@ -52,3 +46,41 @@ def compare_enums(autogen_context, upgrade_ops, schema_names):
 					upgrade_ops.ops.append(alembic_ops.EnumDeleteOp(schema, table, list(to_remove)))
 			else:
 				upgrade_ops.ops.append(alembic_ops.EnumInsertOp(schema, table, list(values)))
+
+
+def get_connection_tables(autogen_context, schema_names):
+	"""
+	Returns a sequence of (schema, tables) tuples that reflects the current state of the
+	database.
+
+	This is inspired by the code in alembic.autogenerate._autogen_for_tables
+	and alembic.autogenerate._compare_tables.
+	"""
+	inspector = autogen_context.inspector
+	default_schema_name = autogen_context.dialect.default_schema_name
+
+	conn_table_names = set()
+
+	version_table_schema = (
+		autogen_context.migration_context.version_table_schema
+	)
+	version_table = autogen_context.migration_context.version_table
+
+	for schema_name in schema_names:
+		if schema_name is None:
+			schema_name = default_schema_name
+		tables = set(inspector.get_table_names(schema=schema_name))
+		if schema_name == version_table_schema:
+			tables = tables.difference(
+				[autogen_context.migration_context.version_table]
+			)
+
+		conn_table_names.update(
+			(schema_name, tname)
+			for tname in tables
+			if autogen_context.run_name_filters(
+				tname, "table", {"schema_name": schema_name}
+			)
+		)
+
+	return conn_table_names
