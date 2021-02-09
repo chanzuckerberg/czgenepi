@@ -254,8 +254,12 @@ Table Bam {
   // For the MVP, we will just store them, in the future, we would ship them to archives and store just a pointer.
   // These should be Entities.
 
-  // optional field for gisaid submission, we'd like to get users to provide this.
-  sequencing_depth FLOAT
+  // statistics from the consensus genome pipeline.
+  sequencing_depth FLOAT [not null]
+  library_insert_size INT [not null]
+  num_base_pairs INT [not null]
+  mean_contig_length FLOAT [not null]
+  N50 INT [not null]
 
   s3_bucket VARCHAR [not null]
   s3_key VARCHAR [not null, unique]
