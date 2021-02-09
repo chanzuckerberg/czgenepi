@@ -1,6 +1,7 @@
 import os
 from logging.config import fileConfig
 
+import enumtables  # noqa: F401
 from alembic import context
 from sqlalchemy import create_engine
 
