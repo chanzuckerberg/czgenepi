@@ -6,13 +6,22 @@ from sqlalchemy import MetaData
 from . import enum_column
 from . import alembic_ops
 
+def _get_fk_table_name(column):
+	for fk in column.foreign_keys:
+		colspec = fk._get_colspec()
+		tablename, _ = colspec.split(".")
+		return tablename
+
+
 def get_declared_enums(metadatas, schema, default):
-	types = set(
-		column.type
+	enum_columns = [
+		(column, _get_fk_table_name(column))
 		for metadata in metadatas
 		for table in metadata.tables.values()
-		for column in table.columns if (isinstance(column.type, enum_column.EnumType) and table.schema == schema))
-	return {typ.__enum__.__tablename__ : frozenset(typ.__enum__.__enum__.__members__) for typ in types}
+		for column in table.columns if (isinstance(column.type, enum_column.EnumType) and table.schema == schema)
+	]
+
+	return {tablename : frozenset(column.type.__enum__.__members__) for column, tablename in enum_columns}
 
 @alembic.autogenerate.comparators.dispatch_for("schema")
 def compare_enums(autogen_context, upgrade_ops, schema_names):
