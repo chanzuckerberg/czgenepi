@@ -10,7 +10,7 @@ def get_declared_enums(metadatas, schema, default):
 		column.type
 		for metadata in metadatas
 		for table in metadata.tables.values()
-		for column in table.columns if (isinstance(column, enum_column.EnumColumn) and table.schema == schema))
+		for column in table.columns if (isinstance(column.type, enum_column.EnumType) and table.schema == schema))
 	return {typ.__enum__.__tablename__ : frozenset(typ.__enum__.__enum__.__members__) for typ in types}
 
 def is_table_present(tablename, connection):
