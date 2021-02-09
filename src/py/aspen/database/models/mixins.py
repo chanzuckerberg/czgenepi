@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer
 
-# a collection of mixin classes to help build the modelss
+# a collection of mixin classes to help build the models
 
 
 # everyone needs an auto-generated primary key

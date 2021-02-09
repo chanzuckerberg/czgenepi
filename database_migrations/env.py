@@ -8,8 +8,8 @@ from sqlalchemy import create_engine
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 from aspen.config.config import Config
-from aspen.database import models
 from aspen.database.connection import get_db_uri
+from aspen.database.models import meta
 
 config = context.config
 
@@ -33,7 +33,7 @@ target_metadata = None
 fileConfig(config.config_file_name)
 
 
-target_metadata = [models.meta]
+target_metadata = [meta]
 
 
 # other values from the config, defined by the needs of env.py,
