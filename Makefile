@@ -83,7 +83,6 @@ mypy:
 update-deps :
 	pipenv update
 	pipenv lock -r >| src/py/requirements.txt
-	pipenv lock --dev -r >| src/py/requirements-dev.txt
 
 .PHONY: update-deps
 
