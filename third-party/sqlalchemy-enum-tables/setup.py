@@ -11,7 +11,7 @@ def reqs():
 
 
 st.setup(
-	name = "SqlAlchemy Enum Tables",
+	name = "SqlAlchemy-Enum-Tables",
 	packages = st.find_packages(include = 'enumtables.*'),
 	version = "1.1.0",
 	description = "Making Python enums into SQLAlchemy tables with support for Alembic migrations",
