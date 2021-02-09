@@ -2,7 +2,7 @@ import enum
 from typing import Mapping, Union
 
 import enumtables
-from sqlalchemy import Column, DateTime, event, ForeignKey, JSON, Table, text
+from sqlalchemy import Column, DateTime, ForeignKey, JSON, Table
 from sqlalchemy.orm import relationship
 
 from .base import base, idbase
@@ -27,18 +27,6 @@ _WorkflowTypeTable = enumtables.EnumTable(
     base,
     tablename="workflowtypes",
 )
-
-
-def _after_workflowtypes_create(target, connection, **kw):
-    for workflowtype in WorkflowType:
-        connection.execute(
-            text(
-                f"INSERT INTO {target.schema}.{target.name} (item_id) VALUES (:name)"
-            ).params(name=workflowtype.value)
-        )
-
-
-event.listen(_WorkflowTypeTable.__table__, "after_create", _after_workflowtypes_create)
 
 
 _workflow_inputs_table = Table(
