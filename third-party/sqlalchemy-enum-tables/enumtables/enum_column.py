@@ -10,9 +10,9 @@ def convert_case(name):
 
 class EnumType(types.TypeDecorator):
 	impl = types.String
-	def __init__(self, enumTable = None, *args, **kwargs):
+	def __init__(self, python_enum_type = None, *args, **kwargs):
 		super().__init__(*args, **kwargs)
-		self.__enum__ = enumTable
+		self.__enum__ = python_enum_type
 	def process_bind_param(self, value, dialect):
 		if value is None:
 			return None
@@ -20,4 +20,4 @@ class EnumType(types.TypeDecorator):
 	def process_result_value(self, value, dialect):
 		if value is None:
 			return None
-		return self.__enum__.__enum__[value]
+		return self.__enum__[value]
