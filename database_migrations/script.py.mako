@@ -5,6 +5,7 @@ Revises: ${down_revision | comma,n}
 Create Date: ${create_date}
 
 """
+import enumtables  # noqa: F401
 import sqlalchemy as sa
 from alembic import op
 ${imports if imports else ""}

@@ -1,13 +1,21 @@
+from __future__ import annotations
+
 # the main models in the database
+import enum
+from typing import Type, TYPE_CHECKING, TypeVar
+
+import enumtables
 from sqlalchemy import (
     Boolean,
     Column,
     DateTime,
+    event,
     ForeignKey,
     Integer,
     JSON,
     MetaData,
     String,
+    text,
     UniqueConstraint,
 )
 from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
@@ -27,14 +35,32 @@ meta = MetaData(
 )
 # typing "base" as DeclarativeMeta is the ugly workaround for
 # https://github.com/python/mypy/issues/2477
-base: DeclarativeMeta = declarative_base(cls=mx.BaseMixin, metadata=meta)
+base: DeclarativeMeta = declarative_base(metadata=meta)
+idbase: DeclarativeMeta = declarative_base(cls=mx.BaseMixin, metadata=meta)
+
+# Mypy gets confused about whether sqlalchemy enum columns are strings or enums, see here:
+# https://github.com/dropbox/sqlalchemy-stubs/issues/114
+# This is the (gross) workaround. Keep an eye on the issue and get rid of it once it's fixed.
+if TYPE_CHECKING:
+    from sqlalchemy.sql.type_api import TypeEngine
+
+    T = TypeVar("T")
+
+    class Enum(TypeEngine[T]):
+        def __init__(self, enum: Type[T]) -> None:
+            ...
+
+
+else:
+
+    from enumtables import EnumType as Enum
 
 
 ########################################################################################
 # groups and users
 
 
-class Group(base):
+class Group(idbase):
     """A group of users, generally a department of public health."""
 
     __tablename__ = "groups"
@@ -47,7 +73,7 @@ class Group(base):
         return f"Group <{self.name}>"
 
 
-class User(base):
+class User(idbase):
     """A user."""
 
     __tablename__ = "users"
@@ -66,10 +92,69 @@ class User(base):
 
 
 ########################################################################################
+# cross-group viewing
+
+
+class DataType(enum.Enum):
+    TREES = "TREES"
+    SEQUENCES = "SEQUENCES"
+
+
+# Create the enumeration table
+# Pass your enum class and the SQLAlchemy declarative base to enumtables.EnumTable
+_DataTypeTable = enumtables.EnumTable(
+    DataType,
+    base,
+    tablename="datatypes",
+)
+
+
+def _after_datatypes_create(target, connection, **kw):
+    for datatype in DataType:
+        connection.execute(
+            text(
+                f"INSERT INTO {target.schema}.{target.name} (item_id) VALUES (:name)"
+            ).params(name=datatype.value)
+        )
+
+
+event.listen(_DataTypeTable.__table__, "after_create", _after_datatypes_create)
+
+
+class CanSee(idbase):
+    """
+    Expresses a relationship where users from a group can see some data of another
+    group.
+    """
+
+    __tablename__ = "can_see"
+
+    viewer_group_id = Column(
+        Integer, ForeignKey(f"{Group.__tablename__}.id"), nullable=False
+    )
+    viewer_group = relationship(
+        Group, backref=backref("can_see", uselist=True), foreign_keys=[viewer_group_id]
+    )
+    owner_group_id = Column(
+        Integer, ForeignKey(f"{Group.__tablename__}.id"), nullable=False
+    )
+    owner_group = relationship(
+        Group,
+        backref=backref("can_be_seen_by", uselist=True),
+        foreign_keys=[owner_group_id],
+    )
+    data_type = Column(
+        Enum(DataType),
+        ForeignKey(f"{_DataTypeTable.__tablename__}.item_id"),
+        nullable=False,
+    )
+
+
+########################################################################################
 # physical sample
 
 
-class PhysicalSample(base):
+class PhysicalSample(idbase):
     """A physical sample.  Multiple sequences can be taken of each physical sample."""
 
     __tablename__ = "physical_samples"
