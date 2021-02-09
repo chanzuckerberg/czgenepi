@@ -38,7 +38,7 @@ setup-local-db:
 init-local-db:
 	@$(MAKE) setup-local-db
 	aspen-cli db create
-	ENV=dev alembic stamp head
+	DB=dev alembic stamp head
 
 stop-local-db:
 	@if [ "$(LOCAL_DB_CONTAINER_RUNNING_ID)" != "" ]; then \
