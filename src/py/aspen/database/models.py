@@ -98,6 +98,7 @@ class User(idbase):
 class DataType(enum.Enum):
     TREES = "TREES"
     SEQUENCES = "SEQUENCES"
+    METADATA = "METADATA"
 
 
 # Create the enumeration table
