@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 from collections import MutableMapping
 from typing import Type
+import urllib.parse
 
 from dotenv import find_dotenv, load_dotenv
 
@@ -67,7 +68,7 @@ class Auth0Config:
 
     @property
     def AUTH0_BASE_URL(self):
-        return "https://" + self.AUTH0_DOMAIN
+        return f"https://{self.AUTH0_DOMAIN}"
 
     @property
     def SECRET_KEY(self):
@@ -75,11 +76,11 @@ class Auth0Config:
 
     @property
     def ACCESS_TOKEN_URL(self):
-        return self.AUTH0_BASE_URL + "/oauth/token"
+        return f"{self.AUTH0_BASE_URL}/oauth/token"
 
     @property
     def AUTHORIZE_URL(self):
-        return self.AUTH0_BASE_URL + "/authorize"
+        return f"{self.AUTH0_BASE_URL}/authorize"
 
     @property
     def CLIENT_KWARGS(self):
