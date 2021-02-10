@@ -21,7 +21,13 @@ def get_declared_enums(metadatas, schema, default):
 		for column in table.columns if (isinstance(column.type, enum_column.EnumType) and table.schema == schema)
 	]
 
-	return {tablename : frozenset(column.type.__enum__.__members__) for column, tablename in enum_columns}
+	return {
+		tablename : frozenset(
+			member._value_
+			for member in column.type.__enum__
+		)
+		for column, tablename in enum_columns
+	}
 
 @alembic.autogenerate.comparators.dispatch_for("schema")
 def compare_enums(autogen_context, upgrade_ops, schema_names):
