@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import json
 import os
 from collections import MutableMapping
 from typing import Type
 
-from dotenv import find_dotenv, load_dotenv
+import boto3
+from botocore.exceptions import ClientError
 
 
 class Config:
@@ -42,26 +44,38 @@ class Config:
 
 
 class Auth0Config:
-    def __init__(self):
-        ENV_FILE = find_dotenv()
-        if ENV_FILE:
-            load_dotenv(ENV_FILE)
+    @property
+    def AWS_SECRET(self):
+
+        secret_name = os.environ.get("SECRET_NAME")
+        region_name = os.environ.get("AWS_REGION")
+
+        session = boto3.session.Session()
+        client = session.client(service_name="secretsmanager", region_name=region_name)
+
+        try:
+            get_secret_value_response = client.get_secret_value(SecretId=secret_name)
+        except ClientError as e:
+            raise e
+        else:
+            secret = get_secret_value_response["SecretString"]
+            return json.loads(secret)
 
     @property
     def AUTH0_CLIENT_ID(self):
-        return os.environ.get("AUTH0_CLIENT_ID")
+        return self.AWS_SECRET["AUTH0_CLIENT_ID"]
 
     @property
     def AUTH0_CALLBACK_URL(self):
-        return os.environ.get("AUTH0_CALLBACK_URL")
+        return self.AWS_SECRET["AUTH0_CALLBACK_URL"]
 
     @property
     def AUTH0_CLIENT_SECRET(self):
-        return os.environ.get("AUTH0_CLIENT_SECRET")
+        return self.AWS_SECRET["AUTH0_CLIENT_SECRET"]
 
     @property
     def AUTH0_DOMAIN(self):
-        return os.environ.get("AUTH0_DOMAIN")
+        return self.AWS_SECRET["AUTH0_DOMAIN"]
 
     @property
     def AUTH0_BASE_URL(self):

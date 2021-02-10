@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 Authlib = "*"
+boto3 = "*"
 Flask = "*"
 psycopg2-binary = "*"
 python-dotenv = "*"
