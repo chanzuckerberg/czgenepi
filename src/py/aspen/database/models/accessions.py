@@ -19,7 +19,7 @@ class PublicRepositoryType(enum.Enum):
 _PublicRepositoryTypeTable = enumtables.EnumTable(
     PublicRepositoryType,
     base,
-    tablename="publicrepositorytypes",
+    tablename="public_repository_types",
 )
 
 
