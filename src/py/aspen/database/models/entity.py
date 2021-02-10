@@ -22,7 +22,7 @@ class EntityType(enum.Enum):
 _EntityTypeTable = enumtables.EnumTable(
     EntityType,
     base,
-    tablename="entitytypes",
+    tablename="entity_types",
 )
 
 

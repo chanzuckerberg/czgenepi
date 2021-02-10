@@ -23,7 +23,7 @@ class DataType(enum.Enum):
 _DataTypeTable = enumtables.EnumTable(
     DataType,
     base,
-    tablename="datatypes",
+    tablename="data_types",
 )
 
 

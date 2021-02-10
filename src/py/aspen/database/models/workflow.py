@@ -25,7 +25,7 @@ class WorkflowType(enum.Enum):
 _WorkflowTypeTable = enumtables.EnumTable(
     WorkflowType,
     base,
-    tablename="workflowtypes",
+    tablename="workflow_types",
 )
 
 
