@@ -124,6 +124,14 @@
       "react-app/jest"
     ]
   },
+  "peerDependencies": {
+    "typescript": "^3.2.1"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    }
+  },
   "browserslist": {
     "production": [
       ">0.2%",
