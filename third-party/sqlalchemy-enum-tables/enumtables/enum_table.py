@@ -1,12 +1,40 @@
+import enum
+import re
+from typing import Type
 
 import sqlalchemy as sa
-import re
 
 __all__ = ["EnumTable"]
 
 def convert_case(name):
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+
+
+def _make_after_table_create(enumtype: Type[enum.Enum], **kw):
+    """Tables used for enumtables require pre-seeded values, but the table creation
+    process does not manage this.  To do so, add a hook to the table creation to ensure
+    that we populate those entries:
+
+    event.listen(
+        MyEnumTypeTable.__table__,
+        "after_create",
+        make_after_table_create(MyEnumType),
+    )
+
+    This is automatically done by EnumTable for all classes.
+    """
+
+    def _after_table_create(target, connection, **kw):
+        for entitytype in enumtype:
+            connection.execute(
+                sa.text(
+                    f"INSERT INTO {target.schema}.{target.name} (item_id) VALUES (:val)"
+                ).params(val=entitytype.value)
+            )
+
+    return _after_table_create
+
 
 def EnumTable(enum, declBase, name = None, tablename = None, doc = None, **kwargs):
 	"""
@@ -47,4 +75,13 @@ def EnumTable(enum, declBase, name = None, tablename = None, doc = None, **kwarg
 	}
 	if doc:
 		namespace["__doc__"] = doc
-	return declBase.__class__(typename, (declBase,), namespace)
+	result = declBase.__class__(typename, (declBase,), namespace)
+
+	# register the after_create hook.
+	sa.event.listen(
+		result.__table__,
+		"after_create",
+		_make_after_table_create(enum)
+	)
+
+	return result

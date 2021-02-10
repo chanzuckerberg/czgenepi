@@ -2,7 +2,7 @@ import enum
 from typing import Mapping, Union
 
 import enumtables
-from sqlalchemy import Column, event, ForeignKey, text
+from sqlalchemy import Column, ForeignKey
 
 from .base import base, idbase
 from .enum import Enum
@@ -24,18 +24,6 @@ _EntityTypeTable = enumtables.EnumTable(
     base,
     tablename="entitytypes",
 )
-
-
-def _after_entitytypes_create(target, connection, **kw):
-    for entitytype in EntityType:
-        connection.execute(
-            text(
-                f"INSERT INTO {target.schema}.{target.name} (item_id) VALUES (:name)"
-            ).params(name=entitytype.value)
-        )
-
-
-event.listen(_EntityTypeTable.__table__, "after_create", _after_entitytypes_create)
 
 
 class Entity(idbase):

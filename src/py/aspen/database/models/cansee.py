@@ -4,7 +4,7 @@ from __future__ import annotations
 import enum
 
 import enumtables
-from sqlalchemy import Column, event, ForeignKey, Integer, text
+from sqlalchemy import Column, ForeignKey, Integer
 from sqlalchemy.orm import backref, relationship
 
 from .base import base, idbase
@@ -25,18 +25,6 @@ _DataTypeTable = enumtables.EnumTable(
     base,
     tablename="datatypes",
 )
-
-
-def _after_datatypes_create(target, connection, **kw):
-    for datatype in DataType:
-        connection.execute(
-            text(
-                f"INSERT INTO {target.schema}.{target.name} (item_id) VALUES (:name)"
-            ).params(name=datatype.value)
-        )
-
-
-event.listen(_DataTypeTable.__table__, "after_create", _after_datatypes_create)
 
 
 class CanSee(idbase):

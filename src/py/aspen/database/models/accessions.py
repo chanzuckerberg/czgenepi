@@ -1,15 +1,7 @@
 import enum
 
 import enumtables
-from sqlalchemy import (
-    Column,
-    event,
-    ForeignKey,
-    Integer,
-    String,
-    text,
-    UniqueConstraint,
-)
+from sqlalchemy import Column, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import backref, relationship
 
 from .base import base, idbase
@@ -28,22 +20,6 @@ _PublicRepositoryTypeTable = enumtables.EnumTable(
     PublicRepositoryType,
     base,
     tablename="publicrepositorytypes",
-)
-
-
-def _after_publicrepositorytypes_create(target, connection, **kw):
-    for entitytype in PublicRepositoryType:
-        connection.execute(
-            text(
-                f"INSERT INTO {target.schema}.{target.name} (item_id) VALUES (:name)"
-            ).params(name=entitytype.value)
-        )
-
-
-event.listen(
-    _PublicRepositoryTypeTable.__table__,
-    "after_create",
-    _after_publicrepositorytypes_create,
 )
 
 
