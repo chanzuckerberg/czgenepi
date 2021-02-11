@@ -6,6 +6,7 @@ from typing import Type
 
 from dotenv import find_dotenv, load_dotenv
 
+
 class Config:
     _subclasses: MutableMapping[str, Type[Config]] = dict()
 
@@ -81,7 +82,6 @@ class Auth0Config:
         }
 
 
-
 class DatabaseConfig:
     @property
     def URI(self):
@@ -90,5 +90,3 @@ class DatabaseConfig:
     @property
     def READONLY_URI(self):
         raise NotImplementedError()
-
-
