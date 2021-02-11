@@ -3,10 +3,8 @@ from __future__ import annotations
 import os
 from collections import MutableMapping
 from typing import Type
-import urllib.parse
 
 from dotenv import find_dotenv, load_dotenv
-
 
 class Config:
     _subclasses: MutableMapping[str, Type[Config]] = dict()
@@ -26,6 +24,10 @@ class Config:
         return False
 
     @property
+    def SECRET_KEY(self):
+        return os.environ.get("SECRET_KEY")
+
+    @property
     def TESTING(self):
         return False
 
@@ -33,15 +35,9 @@ class Config:
     def DATABASE_CONFIG(self):
         raise NotImplementedError()
 
-
-class DatabaseConfig:
     @property
-    def URI(self):
-        raise NotImplementedError()
-
-    @property
-    def READONLY_URI(self):
-        raise NotImplementedError()
+    def AUTH0_CONFIG(self):
+        return Auth0Config()
 
 
 class Auth0Config:
@@ -71,10 +67,6 @@ class Auth0Config:
         return f"https://{self.AUTH0_DOMAIN}"
 
     @property
-    def SECRET_KEY(self):
-        return os.environ.get("SECRET_KEY")
-
-    @property
     def ACCESS_TOKEN_URL(self):
         return f"{self.AUTH0_BASE_URL}/oauth/token"
 
@@ -87,3 +79,16 @@ class Auth0Config:
         return {
             "scope": "openid profile email",
         }
+
+
+
+class DatabaseConfig:
+    @property
+    def URI(self):
+        raise NotImplementedError()
+
+    @property
+    def READONLY_URI(self):
+        raise NotImplementedError()
+
+
