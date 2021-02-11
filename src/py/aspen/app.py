@@ -7,7 +7,6 @@ from authlib.integrations.flask_client import OAuth
 from flask import Flask, redirect, send_from_directory, session, url_for
 
 from aspen.config import DevelopmentConfig
-from aspen.config.config import Auth0Config
 
 static_folder = Path("static")
 
@@ -17,11 +16,7 @@ application = Flask(__name__, static_folder=str(static_folder))
 if os.environ.get("FLASK_ENV") == "development":
     application.config.from_object(DevelopmentConfig())
 
-
-auth0_config = Auth0Config()
-application.secret_key = auth0_config.SECRET_KEY
-
-
+auth0_config = application.config["AUTH0_CONFIG"]
 oauth = OAuth(application)
 
 auth0 = oauth.register(

@@ -25,6 +25,10 @@ class Config:
         return False
 
     @property
+    def SECRET_KEY(self):
+        return os.environ.get("SECRET_KEY")
+
+    @property
     def TESTING(self):
         return False
 
@@ -32,15 +36,9 @@ class Config:
     def DATABASE_CONFIG(self):
         raise NotImplementedError()
 
-
-class DatabaseConfig:
     @property
-    def URI(self):
-        raise NotImplementedError()
-
-    @property
-    def READONLY_URI(self):
-        raise NotImplementedError()
+    def AUTH0_CONFIG(self):
+        return Auth0Config()
 
 
 class Auth0Config:
@@ -67,22 +65,28 @@ class Auth0Config:
 
     @property
     def AUTH0_BASE_URL(self):
-        return "https://" + self.AUTH0_DOMAIN
-
-    @property
-    def SECRET_KEY(self):
-        return os.environ.get("SECRET_KEY")
+        return f"https://{self.AUTH0_DOMAIN}"
 
     @property
     def ACCESS_TOKEN_URL(self):
-        return self.AUTH0_BASE_URL + "/oauth/token"
+        return f"{self.AUTH0_BASE_URL}/oauth/token"
 
     @property
     def AUTHORIZE_URL(self):
-        return self.AUTH0_BASE_URL + "/authorize"
+        return f"{self.AUTH0_BASE_URL}/authorize"
 
     @property
     def CLIENT_KWARGS(self):
         return {
             "scope": "openid profile email",
         }
+
+
+class DatabaseConfig:
+    @property
+    def URI(self):
+        raise NotImplementedError()
+
+    @property
+    def READONLY_URI(self):
+        raise NotImplementedError()
