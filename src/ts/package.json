@@ -7,6 +7,7 @@
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js",
+    "devserver": "node scripts/devserver.js",
     "style": "npx prettier --write src && npx eslint --max-warnings 45 --fix src",
     "lint-ci": "npx eslint --max-warnings 45 src"
   },
@@ -95,7 +96,8 @@
     "jest-resolve": "26.6.0",
     "jest-watch-typeahead": "0.6.1",
     "sass-jest": "^0.1.7",
-    "webpack-cli": "^4.4.0"
+    "webpack-cli": "^4.4.0",
+    "webpack-dev-server": "3.11.0"
   },
   "eslintConfig": {
     "extends": [

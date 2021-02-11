@@ -1,8 +1,13 @@
 #!/bin/bash
 set -e
 
-if [ "$1" = 'server' -o $# -eq 0 ]; then
-    # By default run the webserver
+if [ "$1" = 'devserver' -o $# -eq 0 ]; then
+    # By default run the devserver
+    exec npm devserver
+fi
+
+if [ "$1" = 'server' ]; then
+    # Run the autobuilder
     exec npm start
 fi
 
