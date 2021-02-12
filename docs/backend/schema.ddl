@@ -186,7 +186,7 @@ Table SequencingReads {
 
   physical_sample_id INT [not null, unique, ref: - PhysicalSample.id]
   s3_bucket VARCHAR [not null]
-  s3_key VARCHAR [not null, unique]
+  s3_key VARCHAR [not null]
 
   sequencing_instrument_id INT [not null, ref: > SequencingInstrument.id]
   sequencing_protocol_id INT [not null, ref: > SequencingProtocol.id]
