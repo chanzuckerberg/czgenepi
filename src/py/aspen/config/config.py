@@ -45,7 +45,7 @@ class Config:
 
 
 class Auth0Config:
-    @property
+    @property  # type: ignore
     @lru_cache()
     def AWS_SECRET(self):
 
