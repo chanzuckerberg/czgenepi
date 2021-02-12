@@ -35,15 +35,11 @@ class CanSee(idbase):
 
     __tablename__ = "can_see"
 
-    viewer_group_id = Column(
-        Integer, ForeignKey(f"{Group.__tablename__}.id"), nullable=False
-    )
+    viewer_group_id = Column(Integer, ForeignKey(Group.id), nullable=False)
     viewer_group = relationship(
         Group, backref=backref("can_see", uselist=True), foreign_keys=[viewer_group_id]
     )
-    owner_group_id = Column(
-        Integer, ForeignKey(f"{Group.__tablename__}.id"), nullable=False
-    )
+    owner_group_id = Column(Integer, ForeignKey(Group.id), nullable=False)
     owner_group = relationship(
         Group,
         backref=backref("can_be_seen_by", uselist=True),
@@ -51,6 +47,6 @@ class CanSee(idbase):
     )
     data_type = Column(
         Enum(DataType),
-        ForeignKey(f"{_DataTypeTable.__tablename__}.item_id"),
+        ForeignKey(_DataTypeTable.item_id),
         nullable=False,
     )

@@ -34,7 +34,7 @@ class Entity(idbase):
     __tablename__ = "entities"
     entity_type = Column(
         Enum(EntityType),
-        ForeignKey(f"{_EntityTypeTable.__tablename__}.item_id"),
+        ForeignKey(_EntityTypeTable.item_id),
         nullable=False,
     )
 

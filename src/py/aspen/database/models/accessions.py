@@ -29,7 +29,7 @@ class PublicRepository(idbase):
     __tablename__ = "public_repository"
     entity_type = Column(
         Enum(PublicRepositoryType),
-        ForeignKey(f"{_PublicRepositoryTypeTable.__tablename__}.item_id"),
+        ForeignKey(_PublicRepositoryTypeTable.item_id),
         nullable=False,
     )
 
@@ -45,14 +45,14 @@ class Accession(base):
 
     entity_id = Column(
         Integer,
-        ForeignKey(f"{Entity.__tablename__}.id"),
+        ForeignKey(Entity.id),
         primary_key=True,
     )
     entity = relationship(Entity, backref=backref("accessions", uselist=True))
 
     public_repository_id = Column(
         Integer,
-        ForeignKey(f"{PublicRepository.__tablename__}.id"),
+        ForeignKey(PublicRepository.id),
         primary_key=True,
     )
     public_repository = relationship(

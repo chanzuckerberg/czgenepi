@@ -32,13 +32,13 @@ _WorkflowTypeTable = enumtables.EnumTable(
 _workflow_inputs_table = Table(
     "workflow_inputs",
     base.metadata,
-    Column("entity_id", ForeignKey(f"{Entity.__tablename__}.id"), primary_key=True),
+    Column("entity_id", ForeignKey(Entity.id), primary_key=True),
     Column("workflow_id", ForeignKey(f"{_WORKFLOW_TABLENAME}.id"), primary_key=True),
 )
 _workflow_outputs_table = Table(
     "workflow_outputs",
     base.metadata,
-    Column("entity_id", ForeignKey(f"{Entity.__tablename__}.id"), primary_key=True),
+    Column("entity_id", ForeignKey(Entity.id), primary_key=True),
     Column("workflow_id", ForeignKey(f"{_WORKFLOW_TABLENAME}.id"), primary_key=True),
 )
 
@@ -52,7 +52,7 @@ class Workflow(idbase):
 
     workflow_type = Column(
         Enum(WorkflowType),
-        ForeignKey(f"{_WorkflowTypeTable.__tablename__}.item_id"),
+        ForeignKey(_WorkflowTypeTable.item_id),
         nullable=False,
     )
     __mapper_args__: Mapping[str, Union[WorkflowType, Column]] = {

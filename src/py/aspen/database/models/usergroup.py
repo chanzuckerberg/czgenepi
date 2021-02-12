@@ -28,7 +28,7 @@ class User(idbase):
     group_admin = Column(Boolean, nullable=False)
     system_admin = Column(Boolean, nullable=False)
 
-    group_id = Column(Integer, ForeignKey(f"{Group.__tablename__}.id"), nullable=False)
+    group_id = Column(Integer, ForeignKey(Group.id), nullable=False)
     group = relationship(Group, backref=backref("users", uselist=True))
 
     def __repr__(self):
