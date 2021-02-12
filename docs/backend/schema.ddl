@@ -224,7 +224,7 @@ Table CalledPathogenGenome {
 
 // TODO: @jackkamm do the BAM/SRA records need to store any metrics?
 
-Table HostFilteredSequence {
+Table HostFilteredSequenceRead {
   id INT [pk, increment]
   entity_id INT [not null, unique, ref: - Entity.id]
 

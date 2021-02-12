@@ -7,6 +7,7 @@ from .gisaid_dump import (  # noqa: F401
     ProcessedGisaidDump,
     RawGisaidDump,
 )
+from .host_filtering import FilterRead, HostFilteredSequencingRead  # noqa: F401
 from .physical_sample import PhysicalSample  # noqa: F401
 from .sequences import (  # noqa: F401
     CalledPathogenGenome,
