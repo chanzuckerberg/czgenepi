@@ -21,7 +21,7 @@ class PhysicalSample(idbase):
 
     submitting_group_id = Column(
         Integer,
-        ForeignKey(f"{Group.__tablename__}.id"),
+        ForeignKey(Group.id),
         nullable=False,
     )
     submitting_group = relationship(
