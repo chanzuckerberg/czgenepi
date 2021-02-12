@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 from collections import MutableMapping
+from functools import lru_cache
 from typing import Type
 
 import boto3
@@ -45,6 +46,7 @@ class Config:
 
 class Auth0Config:
     @property
+    @lru_cache()
     def AWS_SECRET(self):
 
         secret_name = os.environ.get("SECRET_NAME")
