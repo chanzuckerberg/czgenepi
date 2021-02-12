@@ -8,5 +8,12 @@ from .gisaid_dump import (  # noqa: F401
     RawGisaidDump,
 )
 from .physical_sample import PhysicalSample  # noqa: F401
+from .sequences import (  # noqa: F401
+    CalledPathogenGenome,
+    SequencingInstrumentType,
+    SequencingProtocolType,
+    SequencingReads,
+    UploadedPathogenGenome,
+)
 from .usergroup import Group, User  # noqa: F401
 from .workflow import Workflow, WorkflowType  # noqa: F401
