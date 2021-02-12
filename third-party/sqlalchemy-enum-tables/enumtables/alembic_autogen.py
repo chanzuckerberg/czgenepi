@@ -9,7 +9,11 @@ from . import alembic_ops
 def _get_fk_table_name(column):
 	for fk in column.foreign_keys:
 		colspec = fk._get_colspec()
-		tablename, _ = colspec.split(".")
+		# the colspec is either in the form tablename.columnname or
+		# schemaname.tablename.columnname.
+		splitted = colspec.split(".")
+		assert len(splitted) >= 2
+		tablename = splitted[-2]
 		return tablename
 
 
