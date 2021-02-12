@@ -1,4 +1,8 @@
 """This module describes the entities and workflow for processing the gisaid dump."""
+from __future__ import annotations
+
+from typing import MutableSequence, Sequence
+
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, UniqueConstraint
 
 from .entity import Entity, EntityType
@@ -16,6 +20,15 @@ class RawGisaidDump(Entity):
 
     __mapper_args__ = {"polymorphic_identity": EntityType.RAW_GISAID_DUMP}
 
+    @property
+    def processed_gisaid_dump(self) -> Sequence[ProcessedGisaidDump]:
+        """A sequence of processed gisaid dumps generated from this raw gisaid dump."""
+        results: MutableSequence[ProcessedGisaidDump] = list()
+        for workflow, entities in self.get_children(ProcessedGisaidDump):
+            results.extend(entities)
+
+        return results
+
 
 class ProcessedGisaidDump(Entity):
     __tablename__ = "processed_gisaid_dump"
@@ -26,6 +39,13 @@ class ProcessedGisaidDump(Entity):
     s3_key = Column(String, nullable=False)
 
     __mapper_args__ = {"polymorphic_identity": EntityType.PROCESSED_GISAID_DUMP}
+
+    @property
+    def raw_gisaid_dump(self) -> RawGisaidDump:
+        """The raw gisaid dump this processed gisaid dump was generated from."""
+        parents = self.get_parents(RawGisaidDump)
+        assert len(parents) == 1
+        return parents[0]
 
 
 class GisaidDumpWorkflow(Workflow):

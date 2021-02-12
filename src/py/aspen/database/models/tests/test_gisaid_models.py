@@ -57,3 +57,6 @@ def test_workflow(session):
     assert returned_workflow.inputs[0].id == raw_gisaid_dump.id
     assert len(returned_workflow.outputs) == 1
     assert returned_workflow.outputs[0].id == processed_gisaid_dump.id
+
+    assert processed_gisaid_dump.raw_gisaid_dump == raw_gisaid_dump
+    assert processed_gisaid_dump in raw_gisaid_dump.processed_gisaid_dump
