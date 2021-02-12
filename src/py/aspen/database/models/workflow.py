@@ -1,15 +1,13 @@
 import enum
-from typing import Mapping, Union
+from typing import Mapping, MutableSequence, Union
 
 import enumtables
 from sqlalchemy import Column, DateTime, ForeignKey, JSON, Table
 from sqlalchemy.orm import relationship
 
 from .base import base, idbase
-from .entity import Entity
+from .entity import _WORKFLOW_TABLENAME, Entity
 from .enum import Enum
-
-_WORKFLOW_TABLENAME = "workflows"  # need this for a forward reference.
 
 
 class WorkflowType(enum.Enum):
@@ -31,12 +29,6 @@ _WorkflowTypeTable = enumtables.EnumTable(
 
 _workflow_inputs_table = Table(
     "workflow_inputs",
-    base.metadata,
-    Column("entity_id", ForeignKey(Entity.id), primary_key=True),
-    Column("workflow_id", ForeignKey(f"{_WORKFLOW_TABLENAME}.id"), primary_key=True),
-)
-_workflow_outputs_table = Table(
-    "workflow_outputs",
     base.metadata,
     Column("entity_id", ForeignKey(Entity.id), primary_key=True),
     Column("workflow_id", ForeignKey(f"{_WORKFLOW_TABLENAME}.id"), primary_key=True),
@@ -75,10 +67,7 @@ class Workflow(idbase):
     inputs = relationship(
         Entity,
         secondary=_workflow_inputs_table,
-        backref="workflow_consumers",
+        backref="consuming_workflows",
+        uselist=True,
     )
-    outputs = relationship(
-        Entity,
-        secondary=_workflow_outputs_table,
-        backref="workflow_producers",
-    )
+    outputs: MutableSequence[Entity]
