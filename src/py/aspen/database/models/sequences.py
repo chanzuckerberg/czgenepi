@@ -120,7 +120,8 @@ class PathogenGenome(Entity):
     # Number of sites with allele A, C, T, or G
     num_unambiguous_sites = Column(Integer, nullable=False)
 
-    # Number of sites with N, the missing allele
+    # Number of sites with N, the missing allele, typically indicating
+    # low depth
     num_n = Column(Integer, nullable=False)
 
     # Number of sites with an ambiguous allele, e.g. M, K, Y,etc.,
