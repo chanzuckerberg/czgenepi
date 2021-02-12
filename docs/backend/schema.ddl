@@ -109,6 +109,7 @@ Table PhysicalSample {
 
 Table Entity {
   id INT [pk, increment]
+  producing_workflow_id INT [ref: > Workflow.id]
 }
 
 Table WorkflowType {
@@ -125,15 +126,6 @@ Table Workflow {
 }
 
 Table WorkflowInputs {
-  entity_id INT [not null, ref: > Entity.id]
-  workflow_id INT [not null, ref: > Workflow.id]
-
-  Indexes {
-    (entity_id, workflow_id) [unique]
-  }
-}
-
-Table WorkflowOutputs {
   entity_id INT [not null, ref: > Entity.id]
   workflow_id INT [not null, ref: > Workflow.id]
 
