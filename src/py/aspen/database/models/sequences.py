@@ -116,8 +116,15 @@ class PathogenGenome(Entity):
     sequence = Column(String, nullable=False)
 
     # statistics for the pathogen genome
+
+    # Number of sites with allele A, C, T, or G
     num_unambiguous_sites = Column(Integer, nullable=False)
+
+    # Number of sites with N, the missing allele
     num_n = Column(Integer, nullable=False)
+
+    # Number of sites with an ambiguous allele, e.g. M, K, Y,etc.,
+    # indicating support for 2 or more alleles in the reads.
     num_mixed = Column(Integer, nullable=False)
 
 
