@@ -57,7 +57,7 @@ def test_uploaded_pathogen_genome(session):
         physical_sample=physical_sample,
         sequence="GAGAGACTCTCT",
         num_unambiguous_sites=8,
-        num_n=2,
+        num_missing_alleles=2,
         num_mixed=2,
     )
 
