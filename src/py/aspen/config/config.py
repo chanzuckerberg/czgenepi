@@ -4,7 +4,7 @@ import json
 import os
 from collections import MutableMapping
 from functools import lru_cache
-from typing import Type
+from typing import Any, Mapping, Type
 
 import boto3
 from botocore.exceptions import ClientError
@@ -45,9 +45,11 @@ class Config:
 
 
 class Auth0Config:
-    @property  # type: ignore
+    # this extra level of indirection
+    # (Auth0Config.AWS_SECRET -> Auth0Config._AWS_SECRET()) is because of
+    # https://github.com/python/mypy/issues/1362
     @lru_cache()
-    def AWS_SECRET(self):
+    def _AWS_SECRET(self) -> Mapping[str, Any]:
 
         secret_name = os.environ.get("SECRET_NAME")
         region_name = os.environ.get("AWS_REGION")
@@ -62,6 +64,10 @@ class Auth0Config:
         else:
             secret = get_secret_value_response["SecretString"]
             return json.loads(secret)
+
+    @property
+    def AWS_SECRET(self):
+        return self._AWS_SECRET()
 
     @property
     def AUTH0_CLIENT_ID(self):
