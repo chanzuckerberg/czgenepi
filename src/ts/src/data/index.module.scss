@@ -1,0 +1,44 @@
+.dataRoot {
+    display: flex;
+    flex-flow: column wrap;
+    align-content: flex-start;
+    height: 100%;
+
+    .navigation {
+        width: 100%;
+        margin-bottom: 1em;
+
+        .menu {
+            align-items: stretch;
+            margin-left: 2em;
+
+            .container {
+
+                .menuItem {
+                    height: 100%;
+
+                    .searchBar {
+                        margin: 0 6em 0 4em;
+                    }
+
+                    .category {
+                        // height: 100%;
+                        margin-right: 2em;
+
+                        .title {
+                            font-weight: bold;
+                            font-size: 1.1em;
+                            margin-right: 0.7em;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .view {
+        width: 100%;
+    }
+}
+
+

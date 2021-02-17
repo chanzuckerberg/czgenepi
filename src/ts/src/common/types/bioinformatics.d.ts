@@ -19,3 +19,8 @@ type Sample = {
     name: string;
     host_genome_id: number;
 };
+
+type Tree = {
+    id: number;
+    name: string;
+};
