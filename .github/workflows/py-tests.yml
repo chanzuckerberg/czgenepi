@@ -74,5 +74,7 @@ jobs:
         run: |
           pip install -e src/py
       - name: Run with pytest
+        env:
+          SECRET_KEY: secret_key
         run: |
           pytest -n4

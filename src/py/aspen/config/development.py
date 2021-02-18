@@ -1,6 +1,9 @@
 import uuid
 
 from .config import Auth0Config, Config, DatabaseConfig
+from functools import lru_cache
+
+from ..database.connection import init_db, SqlAlchemyInterface
 
 
 class DevelopmentConfig(Config, descriptive_name="dev"):
@@ -30,6 +33,14 @@ class DevelopmentDatabaseConfig(DatabaseConfig):
     def SEND_FILE_MAX_AGE_DEFAULT(self):
         """Ensures that latest static assets are read during frontend dev work."""
         return 0
+
+    @lru_cache()
+    def _INTERFACE(self) -> SqlAlchemyInterface:
+        return init_db(self.URI)
+
+    @property
+    def INTERFACE(self):
+        return self._INTERFACE()
 
 
 class DevAuth0Config(Auth0Config):
