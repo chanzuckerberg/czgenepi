@@ -1,15 +1,16 @@
-@import "common/styles/mixins.scss";
+@import "common/styles/colors";
+@import "common/styles/spacing";
 
 .navbar {
-    background-color: var(--primary);
-    min-height: 50px;
+    background-color: $black;
+    min-height: $space-xxl;
 }
 
 .titleLink {
-    color: var(--white);
+    color: $white;
 
     &:hover {
         text-decoration: none;
-        color: var(--white);
+        color: $white;
     }
 }
