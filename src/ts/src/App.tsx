@@ -16,7 +16,7 @@ const App: FunctionComponent<Props> = ({ children }) => {
         <Router>
             <div className={style.app}>
                 <div className={style.navBar}>
-                    <NavBar user="Santa Clara County"/>
+                    <NavBar/>
                 </div>
                 <div className={style.view}>
                     <Switch>
