@@ -1,6 +1,5 @@
 import React, { FunctionComponent } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import { Container } from "semantic-ui-react";
 
 import Upload from "upload";
 
@@ -9,14 +8,12 @@ import NavBar from "NavBar";
 
 import style from "App.module.scss";
 
-type Props = {};
-
-const App: FunctionComponent<Props> = ({ children }) => {
+const App: FunctionComponent<> = () => {
     return (
         <Router>
             <div className={style.app}>
                 <div className={style.navBar}>
-                    <NavBar/>
+                    <NavBar />
                 </div>
                 <div className={style.view}>
                     <Switch>
@@ -27,6 +24,6 @@ const App: FunctionComponent<Props> = ({ children }) => {
             </div>
         </Router>
     );
-}
+};
 
 export default App;
