@@ -16,6 +16,7 @@ from .base import base
 from .entity import Entity, EntityType
 from .enum import Enum
 from .sample import Sample
+from .workflow import Workflow, WorkflowType
 
 
 class SequencingInstrumentType(enum.Enum):
@@ -160,3 +161,10 @@ class CalledPathogenGenome(PathogenGenome):
     pathogen_genome_id = Column(
         Integer, ForeignKey(PathogenGenome.entity_id), primary_key=True
     )
+
+
+class CallConsensus(Workflow):
+    __tablename__ = "call_consensus_workflows"
+    __mapper_args__ = {"polymorphic_identity": WorkflowType.CALL_CONSENSUS}
+
+    workflow_id = Column(Integer, ForeignKey(Workflow.id), primary_key=True)
