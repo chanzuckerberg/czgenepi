@@ -3,7 +3,7 @@ import enum
 import enumtables
 from sqlalchemy import (
     Column,
-    DateTime,
+    Date,
     Float,
     ForeignKey,
     Integer,
@@ -107,7 +107,7 @@ class SequencingReads(Entity):
     s3_bucket = Column(String, nullable=False)
     s3_key = Column(String, nullable=False)
 
-    sequencing_date = Column(DateTime)
+    sequencing_date = Column(Date)
 
 
 class PathogenGenome(Entity):

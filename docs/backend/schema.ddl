@@ -63,7 +63,7 @@ Table Sample {
   sample_collector_contact_address VARCHAR                 // maps to sample_collector_contact_address
   authors JSONB
 
-  collection_date DATETIME [not null]                      // maps to sample_collection_date
+  collection_date DATE [not null]                          // maps to sample_collection_date
   location VARCHAR [not null]
   division VARCHAR [not null]                              // maps to geo_loc_name_state_province_region
   country VARCHAR [not null]                               // maps to geo_loc_name_country
@@ -160,7 +160,7 @@ Table SequencingReads {
   sequencing_protocol_id INT [not null, ref: > SequencingProtocol.id]
 
   // sequencing date is optional, but sample collection date should not be.
-  sequencing_date FLOAT
+  sequencing_date DATE
 
   Indexes {
     (s3_bucket, s3_key) [unique]

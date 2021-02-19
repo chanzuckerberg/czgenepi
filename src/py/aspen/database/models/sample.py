@@ -1,6 +1,6 @@
 from sqlalchemy import (
     Column,
-    DateTime,
+    Date,
     ForeignKey,
     Integer,
     JSON,
@@ -86,7 +86,7 @@ class Sample(idbase):
     )
 
     collection_date = Column(
-        DateTime,
+        Date,
         nullable=False,
         info={
             "schema_mappings": {
