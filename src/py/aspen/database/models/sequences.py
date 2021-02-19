@@ -15,7 +15,7 @@ from sqlalchemy.orm import backref, relationship
 from .base import base
 from .entity import Entity, EntityType
 from .enum import Enum
-from .physical_sample import PhysicalSample
+from .sample import Sample
 
 
 class SequencingInstrumentType(enum.Enum):
@@ -89,8 +89,8 @@ class SequencingReads(Entity):
     __mapper_args__ = {"polymorphic_identity": EntityType.SEQUENCING_READS}
 
     entity_id = Column(Integer, ForeignKey(Entity.id), primary_key=True)
-    physical_sample_id = Column(Integer, ForeignKey(PhysicalSample.id), nullable=False)
-    physical_sample = relationship(PhysicalSample, backref=backref("sequencing_reads"))
+    sample_id = Column(Integer, ForeignKey(Sample.id), nullable=False)
+    sample = relationship(Sample, backref=backref("sequencing_reads"))
 
     sequencing_instrument = Column(
         Enum(SequencingInstrumentType),
@@ -147,10 +147,8 @@ class UploadedPathogenGenome(PathogenGenome):
     pathogen_genome_id = Column(
         Integer, ForeignKey(PathogenGenome.entity_id), primary_key=True
     )
-    physical_sample_id = Column(Integer, ForeignKey(PhysicalSample.id), nullable=False)
-    physical_sample = relationship(
-        PhysicalSample, backref=backref("uploaded_pathogen_genome")
-    )
+    sample_id = Column(Integer, ForeignKey(Sample.id), nullable=False)
+    sample = relationship(Sample, backref=backref("uploaded_pathogen_genome"))
 
     sequencing_depth = Column(Float)
 
