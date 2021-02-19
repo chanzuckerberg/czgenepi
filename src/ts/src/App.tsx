@@ -8,7 +8,7 @@ import NavBar from "NavBar";
 
 import style from "App.module.scss";
 
-const App: FunctionComponent<> = () => {
+const App: FunctionComponent<React.ReactNode> = () => {
     return (
         <Router>
             <div className={style.app}>
