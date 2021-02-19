@@ -11,7 +11,7 @@ class Group(idbase):
 
     name = Column(String, unique=True, nullable=False)
     email = Column(String, unique=True, nullable=False)
-    address = Column(String, unique=True, nullable=False)
+    address = Column(String, nullable=True)
 
     def __repr__(self):
         return f"Group <{self.name}>"
