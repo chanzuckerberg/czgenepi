@@ -16,6 +16,7 @@ class DataType(enum.Enum):
     TREES = "TREES"
     SEQUENCES = "SEQUENCES"
     METADATA = "METADATA"
+    PRIVATE_IDENTIFIERS = "PRIVATE_IDENTIFIERS"
 
 
 # Create the enumeration table

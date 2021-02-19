@@ -26,7 +26,8 @@ Table TypeOfData {
   // Types of data people can view.  This table should be pre-populated with at least the following entries:
   //  1. Trees
   //  2. Sequences
-  //  3. Metadata
+  //  3. Metadata (other than private identifiers)
+  //  4. Private identifiers
   id INT [pk, increment]
   name VARCHAR [not null]
 }
