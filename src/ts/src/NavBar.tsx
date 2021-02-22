@@ -42,6 +42,45 @@ const NavBar: FunctionComponent<Props> = ({ org, user }) => {
         )
     })
 
+    const orgElements = <React.Fragment>
+                            <div className={style.seperator} />
+                            <div className={cx(style.item, style.org)}>
+                                {org}
+                            </div>
+                        </React.Fragment>
+
+    function hasOrg(): JSX.Element | null {
+        if (org === undefined) {
+            return null
+        } else {
+            return orgElements
+        }
+    }
+
+    const orgSplash = hasOrg()
+
+    const userMenu =    <div className={cx(style.item, style.user)}>
+                            <Dropdown text={user} floating direction={"left"}>
+                                <Dropdown.Menu className={style.dropdownMenu}>
+                                    {dropdownLinks}
+                                </Dropdown.Menu>
+                            </Dropdown>
+                        </div>
+
+    const signInLink =  <Link to="/login">
+                            <div className={cx(style.item, style.link)}>Sign In</div>
+                        </Link>
+
+    function isLoggedIn(): JSX.Element {
+        if (user === undefined) {
+            return signInLink
+        } else {
+            return userMenu
+        }
+    }
+
+    const rightEdge = isLoggedIn()
+
     return (
         <div className={style.bar}>
             <div className={style.contentArea}>
@@ -49,22 +88,13 @@ const NavBar: FunctionComponent<Props> = ({ org, user }) => {
                     <div className={cx(style.item, style.logo)}>
                         <AspenLogo height={"60%"}/>
                     </div>
-                    <div className={style.seperator} />
-                    <div className={cx(style.item, style.org)}>
-                        {org}
-                    </div>
+                    {orgSplash}
                 </div>
                 <div className={style.center}>
                 </div>
                 <div className={style.right}>
                     {navigationLinks}
-                    <div className={cx(style.item, style.user)}>
-                        <Dropdown text={user} floating direction={"left"}>
-                            <Dropdown.Menu className={style.dropdownMenu}>
-                                {dropdownLinks}
-                            </Dropdown.Menu>
-                        </Dropdown>
-                    </div>
+                    {rightEdge}
                 </div>
             </div>
         </div>
