@@ -11,7 +11,7 @@ const App: FunctionComponent<React.ReactNode> = () => {
         <Router>
             <div className={style.app}>
                 <div className={style.navBar}>
-                    <NavBar />
+                    <NavBar org={"Santa Clara County"} user={"Joe DeRisi"} />
                 </div>
                 <div className={style.view}>
                     <Switch>

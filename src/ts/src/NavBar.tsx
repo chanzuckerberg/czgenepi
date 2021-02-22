@@ -1,33 +1,55 @@
-import React from "react";
-import { NavBar } from "cz-ui";
+import React, { FunctionComponent } from "react";
 import { Link } from "react-router-dom";
+import { Dropdown } from "semantic-ui-react";
+import cx from "classnames";
 
-import ErrorBoundary from "common/components/ErrorBoundary";
+import { ReactComponent as AspenLogo } from "common/styles/logos/AspenLogo.svg";
 
-import style from "NavBar.module.scss";
+import style from "./NavBar.module.scss";
 
-export default function NavBarAspen(): JSX.Element {
-    const navLinks = [
-        <Link key="home" to="/">
-            Overview
-        </Link>,
-        <Link key="upload" to="/upload">
-            Upload
-        </Link>,
-    ];
+type Props = {
+    org: string;
+    user: string;
+};
+
+const LINKS: Array<Record<string, string>> = [
+    { to: "/", text: "Overview"},
+    { to: "/data", text: "Data"}
+];
+
+const NavBar: FunctionComponent<Props> = ({ org, user }: Props) => {
+
+    const navigationLinks = LINKS.map((link, index) => {
+        return (
+            <Link to={link.to} key={link.text}>
+                <div className={cx(style.item, style.link)}>{link.text}</div>
+            </Link>
+        )
+    })
 
     return (
-        <div className={style.navbar}>
-            <ErrorBoundary>
-                <NavBar
-                    title={
-                        <Link className={style.titleLink} to="/">
-                            Aspen?
-                        </Link>
-                    }
-                    navLinks={navLinks}
-                />
-            </ErrorBoundary>
+        <div className={style.bar}>
+            <div className={style.contentArea}>
+                <div className={style.left}>
+                    <div className={cx(style.item, style.logo)}>
+                        <AspenLogo height={"60%"}/>
+                    </div>
+                    <div className={style.seperator} />
+                    <div className={cx(style.item, style.org)}>
+                        {org}
+                    </div>
+                </div>
+                <div className={style.center}>
+                </div>
+                <div className={style.right}>
+                    {navigationLinks}
+                    <div className={cx(style.item, style.user)}>
+                        {user}
+                    </div>
+                </div>
+            </div>
         </div>
-    );
+    )
 }
+
+export default NavBar;
