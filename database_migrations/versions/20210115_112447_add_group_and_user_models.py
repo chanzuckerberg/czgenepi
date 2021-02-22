@@ -20,14 +20,19 @@ def upgrade():
         "groups",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
         sa.Column("name", sa.String(), nullable=False),
+        sa.Column("email", sa.String(), nullable=False),
+        sa.Column("address", sa.String(), nullable=False),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_groups")),
         sa.UniqueConstraint("name", name=op.f("uq_groups_name")),
+        sa.UniqueConstraint("email", name=op.f("uq_groups_email")),
+        sa.UniqueConstraint("address", name=op.f("uq_groups_address")),
         schema="aspen",
     )
     op.create_table(
         "users",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
         sa.Column("name", sa.String(), nullable=False),
+        sa.Column("email", sa.String(), nullable=False),
         sa.Column("auth0_user_id", sa.String(), nullable=False),
         sa.Column("group_admin", sa.Boolean(), nullable=False),
         sa.Column("system_admin", sa.Boolean(), nullable=False),
@@ -38,6 +43,7 @@ def upgrade():
             name=op.f("fk_users_group_id_groups"),
         ),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_users")),
+        sa.UniqueConstraint("email", name=op.f("uq_users_email")),
         sa.UniqueConstraint("auth0_user_id", name=op.f("uq_users_auth0_user_id")),
         schema="aspen",
     )

@@ -1,8 +1,6 @@
 import React, { FunctionComponent } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
-import Upload from "upload";
-
 import Landing from "Landing";
 import NavBar from "NavBar";
 
@@ -17,7 +15,6 @@ const App: FunctionComponent<React.ReactNode> = () => {
                 </div>
                 <div className={style.view}>
                     <Switch>
-                        <Route path="/upload" render={() => <Upload />} />
                         <Route path="/" render={() => <Landing />} />
                     </Switch>
                 </div>

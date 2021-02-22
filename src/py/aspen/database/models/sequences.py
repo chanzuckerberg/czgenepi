@@ -3,7 +3,7 @@ import enum
 import enumtables
 from sqlalchemy import (
     Column,
-    DateTime,
+    Date,
     Float,
     ForeignKey,
     Integer,
@@ -15,7 +15,8 @@ from sqlalchemy.orm import backref, relationship
 from .base import base
 from .entity import Entity, EntityType
 from .enum import Enum
-from .physical_sample import PhysicalSample
+from .sample import Sample
+from .workflow import Workflow, WorkflowType
 
 
 class SequencingInstrumentType(enum.Enum):
@@ -89,8 +90,8 @@ class SequencingReads(Entity):
     __mapper_args__ = {"polymorphic_identity": EntityType.SEQUENCING_READS}
 
     entity_id = Column(Integer, ForeignKey(Entity.id), primary_key=True)
-    physical_sample_id = Column(Integer, ForeignKey(PhysicalSample.id), nullable=False)
-    physical_sample = relationship(PhysicalSample, backref=backref("sequencing_reads"))
+    sample_id = Column(Integer, ForeignKey(Sample.id), nullable=False)
+    sample = relationship(Sample, backref=backref("sequencing_reads"))
 
     sequencing_instrument = Column(
         Enum(SequencingInstrumentType),
@@ -106,7 +107,7 @@ class SequencingReads(Entity):
     s3_bucket = Column(String, nullable=False)
     s3_key = Column(String, nullable=False)
 
-    sequencing_date = Column(DateTime)
+    sequencing_date = Column(Date)
 
 
 class PathogenGenome(Entity):
@@ -147,10 +148,8 @@ class UploadedPathogenGenome(PathogenGenome):
     pathogen_genome_id = Column(
         Integer, ForeignKey(PathogenGenome.entity_id), primary_key=True
     )
-    physical_sample_id = Column(Integer, ForeignKey(PhysicalSample.id), nullable=False)
-    physical_sample = relationship(
-        PhysicalSample, backref=backref("uploaded_pathogen_genome")
-    )
+    sample_id = Column(Integer, ForeignKey(Sample.id), nullable=False)
+    sample = relationship(Sample, backref=backref("uploaded_pathogen_genome"))
 
     sequencing_depth = Column(Float)
 
@@ -162,3 +161,10 @@ class CalledPathogenGenome(PathogenGenome):
     pathogen_genome_id = Column(
         Integer, ForeignKey(PathogenGenome.entity_id), primary_key=True
     )
+
+
+class CallConsensus(Workflow):
+    __tablename__ = "call_consensus_workflows"
+    __mapper_args__ = {"polymorphic_identity": WorkflowType.CALL_CONSENSUS}
+
+    workflow_id = Column(Integer, ForeignKey(Workflow.id), primary_key=True)

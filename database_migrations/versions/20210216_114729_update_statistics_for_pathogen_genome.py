@@ -1,6 +1,6 @@
 """update statistics for pathogen genome
 
-Revision ID: 20214716_114729
+Revision ID: 20210216_114729
 Revises: 20210212_100928
 Create Date: 2021-02-16 11:47:30.766109
 
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision = "20214716_114729"
+revision = "20210216_114729"
 down_revision = "20210212_100928"
 branch_labels = None
 depends_on = None
