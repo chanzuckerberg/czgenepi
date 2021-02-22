@@ -8,8 +8,8 @@ import { ReactComponent as AspenLogo } from "common/styles/logos/AspenLogo.svg";
 import style from "./NavBar.module.scss";
 
 type Props = {
-    org: string;
-    user: string;
+    org?: string;
+    user?: string;
 };
 
 const LINKS: Array<Record<string, string>> = [
@@ -17,12 +17,27 @@ const LINKS: Array<Record<string, string>> = [
     { to: "/data", text: "Data"}
 ];
 
-const NavBar: FunctionComponent<Props> = ({ org, user }: Props) => {
+const DROPDOWN_LINKS: Array<Record<string, string>> = [
+    { to: "/contact_us", text: "Contact Us" },
+    { to: "/terms", text: "Terms of Use" },
+    { to: "/privacy", text: "Privacy Policy" },
+    { to: "/logout", text: "Logout" }
+]
 
-    const navigationLinks = LINKS.map((link, index) => {
+const NavBar: FunctionComponent<Props> = ({ org, user }) => {
+
+    const navigationLinks = LINKS.map(link => {
         return (
             <Link to={link.to} key={link.text}>
                 <div className={cx(style.item, style.link)}>{link.text}</div>
+            </Link>
+        )
+    })
+
+    const dropdownLinks = DROPDOWN_LINKS.map(link => {
+        return (
+            <Link to={link.to} key={link.text}>
+                <Dropdown.Item className={style.dropdownLink} text={link.text} />
             </Link>
         )
     })
@@ -44,7 +59,11 @@ const NavBar: FunctionComponent<Props> = ({ org, user }: Props) => {
                 <div className={style.right}>
                     {navigationLinks}
                     <div className={cx(style.item, style.user)}>
-                        {user}
+                        <Dropdown text={user} floating direction={"left"}>
+                            <Dropdown.Menu className={style.dropdownMenu}>
+                                {dropdownLinks}
+                            </Dropdown.Menu>
+                        </Dropdown>
                     </div>
                 </div>
             </div>

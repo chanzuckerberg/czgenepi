@@ -60,5 +60,23 @@
                 background-color: $gray-dark;
             }
         }
+
+        .dropdownMenu {
+            margin: $space-s;
+
+            .dropdownLink {
+                @include font-body-m;
+                color: $black;
+                padding: $space-s $space-xxl $space-s $space-xl;
+
+                &:hover {
+                    background-color: $gray-off-white;
+                }
+
+                &:active {
+                    background-color: $white;
+                }
+            }
+        }
     }
 }
