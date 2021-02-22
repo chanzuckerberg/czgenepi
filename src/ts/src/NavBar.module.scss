@@ -18,7 +18,9 @@
             justify-content: flex-end;
         }
 
-        .left, .center, .right {
+        .left,
+        .center,
+        .right {
             div {
                 flex: 0 1 auto;
             }
