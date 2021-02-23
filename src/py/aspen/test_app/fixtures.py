@@ -1,7 +1,7 @@
 import pytest
 
-from ..app import application
-from ..config.testing import TestingConfig
+from aspen.app import application
+from aspen.config.testing import TestingConfig
 
 
 @pytest.fixture(scope="function")
