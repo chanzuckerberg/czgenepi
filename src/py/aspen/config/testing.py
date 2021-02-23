@@ -1,3 +1,4 @@
+import uuid
 from functools import lru_cache
 
 from ..database.connection import init_db, SqlAlchemyInterface
@@ -5,6 +6,10 @@ from .config import Config, DatabaseConfig
 
 
 class TestingConfig(Config, descriptive_name="test"):
+    @property
+    def SECRET_KEY(self):
+        return uuid.uuid4().hex
+
     @property
     def TESTING(self):
         return True
