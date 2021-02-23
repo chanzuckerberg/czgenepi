@@ -25,13 +25,10 @@ application = Flask(__name__, static_folder=str(static_folder))
 flask_env = os.environ.get("FLASK_ENV")
 if flask_env == "production":
     application.config.from_object(ProductionConfig())
-elif flask_env == "development":
+if flask_env == "development":
     application.config.from_object(DevelopmentConfig())
-elif flask_env == "staging":
+if flask_env == "staging":
     application.config.from_object(StagingConfig())
-else:
-    application.config.from_object(TestingConfig())
-
 
 if flask_env in ("production", "development", "staging"):
     auth0_config = application.config["AUTH0_CONFIG"]
