@@ -17,9 +17,7 @@ class DictMixin:
         d = {}
         for column in self.__table__.columns:
             column_value = getattr(self, column.name)
-            if isinstance(
-                column_value, (datetime.datetime, datetime.date)
-            ):
+            if isinstance(column_value, (datetime.datetime, datetime.date)):
                 d[column.name] = column_value.isoformat()
 
             else:
