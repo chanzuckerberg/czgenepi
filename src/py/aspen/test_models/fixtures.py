@@ -1,6 +1,6 @@
 import pytest
 
-from ..database.models.usergroup import Group, User
+from aspen.database.models.usergroup import Group, User
 
 
 @pytest.fixture(scope="function")
