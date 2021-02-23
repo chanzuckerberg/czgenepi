@@ -29,6 +29,7 @@ aspen% . .venv/bin/activate
 
 ```bash
 (.venv) aspen% npm --prefix src/ts start
+(.venv) aspen% export AWS_REGION=us-west-2
 (.venv) aspen% export FLASK_APP=aspen.app
 (.venv) aspen% export FLASK_ENV=development
 (.venv) aspen% cd src/py

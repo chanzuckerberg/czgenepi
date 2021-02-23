@@ -6,8 +6,9 @@ from collections import MutableMapping
 from functools import lru_cache
 from typing import Any, Mapping, Type
 
-import boto3
 from botocore.exceptions import ClientError
+
+from aspen import aws
 
 
 class Config:
@@ -29,7 +30,7 @@ class Config:
 
     @property
     def SECRET_KEY(self):
-        return os.environ.get("SECRET_KEY")
+        raise NotImplementedError()
 
     @property
     def TESTING(self):
@@ -41,7 +42,7 @@ class Config:
 
     @property
     def AUTH0_CONFIG(self):
-        return Auth0Config()
+        return NotImplementedError()
 
 
 class Auth0Config:
@@ -50,12 +51,10 @@ class Auth0Config:
     # https://github.com/python/mypy/issues/1362
     @lru_cache()
     def _AWS_SECRET(self) -> Mapping[str, Any]:
+        session = aws.session()
 
-        secret_name = os.environ.get("SECRET_NAME")
-        region_name = os.environ.get("AWS_REGION")
-
-        session = boto3.session.Session()
-        client = session.client(service_name="secretsmanager", region_name=region_name)
+        secret_name = os.environ.get("AUTH0_CONFIG_SECRET_NAME", "aspen-auth0")
+        client = session.client(service_name="secretsmanager")
 
         try:
             get_secret_value_response = client.get_secret_value(SecretId=secret_name)
@@ -75,7 +74,7 @@ class Auth0Config:
 
     @property
     def AUTH0_CALLBACK_URL(self):
-        return self.AWS_SECRET["AUTH0_CALLBACK_URL"]
+        raise NotImplementedError()
 
     @property
     def AUTH0_CLIENT_SECRET(self):
