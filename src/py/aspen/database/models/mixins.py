@@ -16,12 +16,13 @@ class DictMixin:
     def to_dict(self):
         d = {}
         for column in self.__table__.columns:
+            column_value = getattr(self, column.name)
             if isinstance(
-                getattr(self, column.name), (datetime.datetime, datetime.date)
+                column_value, (datetime.datetime, datetime.date)
             ):
-                d[column.name] = getattr(self, column.name).isoformat()
+                d[column.name] = column_value.isoformat()
 
             else:
-                d[column.name] = getattr(self, column.name)
+                d[column.name] = column_value
 
         return d
