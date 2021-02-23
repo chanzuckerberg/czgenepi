@@ -1,8 +1,8 @@
 import uuid
 from functools import lru_cache
 
-from .config import Auth0Config, Config, DatabaseConfig
 from ..database.connection import init_db, SqlAlchemyInterface
+from .config import Auth0Config, Config, DatabaseConfig
 
 
 class DevelopmentConfig(Config, descriptive_name="dev"):
