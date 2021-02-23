@@ -1,33 +1,109 @@
-import React from "react";
-import { NavBar } from "cz-ui";
+import React, { FunctionComponent } from "react";
 import { Link } from "react-router-dom";
+import { Dropdown } from "semantic-ui-react";
+import cx from "classnames";
 
-import ErrorBoundary from "common/components/ErrorBoundary";
+import { ReactComponent as AspenLogo } from "common/styles/logos/AspenLogo.svg";
 
-import style from "NavBar.module.scss";
+import style from "./NavBar.module.scss";
 
-export default function NavBarAspen(): JSX.Element {
-    const navLinks = [
-        <Link key="home" to="/">
-            Overview
-        </Link>,
-        <Link key="upload" to="/upload">
-            Upload
-        </Link>,
-    ];
+type Props = {
+    org?: string;
+    user?: string;
+};
 
-    return (
-        <div className={style.navbar}>
-            <ErrorBoundary>
-                <NavBar
-                    title={
-                        <Link className={style.titleLink} to="/">
-                            Aspen?
-                        </Link>
-                    }
-                    navLinks={navLinks}
+const LINKS: Array<Record<string, string>> = [
+    { to: "/", text: "Overview" },
+    { to: "/data", text: "Data" },
+];
+
+const DROPDOWN_LINKS: Array<Record<string, string>> = [
+    { to: "/contact_us", text: "Contact Us" },
+    { to: "/terms", text: "Terms of Use" },
+    { to: "/privacy", text: "Privacy Policy" },
+    { to: "/logout", text: "Logout" },
+];
+
+const NavBar: FunctionComponent<Props> = ({ org, user }: Props) => {
+    const navigationLinks = LINKS.map((link) => {
+        return (
+            <Link to={link.to} key={link.text}>
+                <div className={cx(style.item, style.link)}>{link.text}</div>
+            </Link>
+        );
+    });
+
+    const dropdownLinks = DROPDOWN_LINKS.map((link) => {
+        return (
+            <Link to={link.to} key={link.text}>
+                <Dropdown.Item
+                    className={style.dropdownLink}
+                    text={link.text}
                 />
-            </ErrorBoundary>
+            </Link>
+        );
+    });
+
+    const orgElements = (
+        <React.Fragment>
+            <div className={style.seperator} />
+            <div className={cx(style.item, style.org)}>{org}</div>
+        </React.Fragment>
+    );
+
+    function hasOrg(): JSX.Element | null {
+        if (org === undefined) {
+            return null;
+        } else {
+            return orgElements;
+        }
+    }
+
+    const orgSplash = hasOrg();
+
+    const userMenu = (
+        <div className={cx(style.item, style.user)}>
+            <Dropdown text={user} floating direction={"left"}>
+                <Dropdown.Menu className={style.dropdownMenu}>
+                    {dropdownLinks}
+                </Dropdown.Menu>
+            </Dropdown>
         </div>
     );
-}
+
+    const signInLink = (
+        <Link to="/login">
+            <div className={cx(style.item, style.link)}>Sign In</div>
+        </Link>
+    );
+
+    function isLoggedIn(): JSX.Element {
+        if (user === undefined) {
+            return signInLink;
+        } else {
+            return userMenu;
+        }
+    }
+
+    const rightEdge = isLoggedIn();
+
+    return (
+        <div className={style.bar}>
+            <div className={style.contentArea}>
+                <div className={style.left}>
+                    <div className={cx(style.item, style.logo)}>
+                        <AspenLogo height={"60%"} />
+                    </div>
+                    {orgSplash}
+                </div>
+                <div className={style.center}></div>
+                <div className={style.right}>
+                    {navigationLinks}
+                    {rightEdge}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default NavBar;

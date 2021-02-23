@@ -1,16 +1,84 @@
 @import "common/styles/colors";
 @import "common/styles/spacing";
+@import "common/styles/typography";
 
-.navbar {
+.bar {
     background-color: $black;
-    min-height: $space-xxl;
-}
 
-.titleLink {
-    color: $white;
+    .contentArea {
+        margin: 0 $space-xxl 0 $space-xxl;
 
-    &:hover {
-        text-decoration: none;
-        color: $white;
+        .left {
+            justify-content: flex-start;
+        }
+        .center {
+            justify-content: center;
+        }
+        .right {
+            justify-content: flex-end;
+        }
+
+        .left,
+        .center,
+        .right {
+            div {
+                flex: 0 1 auto;
+            }
+        }
+
+        .item {
+            height: 100%;
+            padding: $space-l $space-l $space-l $space-l;
+            font-family: $font-family-primary;
+            color: $white;
+            align-items: center;
+
+            a {
+                color: $white;
+            }
+        }
+
+        .logo {
+            height: 100%;
+        }
+
+        .seperator {
+            border-left: $space-xxxs solid $white;
+            margin: $space-l 0 $space-l 0;
+        }
+
+        .org {
+            @include font-header-xl;
+        }
+
+        .link {
+            @include font-header-m;
+
+            &:hover {
+                background-color: $gray-darkest;
+            }
+
+            &:active {
+                background-color: $gray-dark;
+            }
+        }
+
+        .dropdownMenu {
+            margin: $space-s;
+
+            .dropdownLink {
+                @include font-body-m;
+                color: $black;
+                padding: $space-s $space-xxl $space-s $space-xl;
+
+                &:hover {
+                    background-color: $gray-off-white;
+                }
+
+                &:active {
+                    background-color: $white;
+                }
+            }
+        }
     }
 }
