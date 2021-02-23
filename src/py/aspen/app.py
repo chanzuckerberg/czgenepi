@@ -11,7 +11,6 @@ from aspen.config import (
     DevelopmentConfig,
     ProductionConfig,
     StagingConfig,
-    TestingConfig,
 )
 
 from .database.connection import session_scope

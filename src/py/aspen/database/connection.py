@@ -1,7 +1,13 @@
+from __future__ import annotations
+
 from contextlib import contextmanager
+from typing import TYPE_CHECKING
 
 from sqlalchemy.engine import create_engine, Engine
 from sqlalchemy.orm import Session, sessionmaker
+
+if TYPE_CHECKING:
+    from aspen.config.config import Config
 
 
 class SqlAlchemyInterface:
@@ -36,8 +42,7 @@ def session_scope(interface: SqlAlchemyInterface):
         session.close()
 
 
-# TODO: add back in Config type hint and resolve circular dependency
-def get_db_uri(runtime_config, readonly: bool = False) -> str:
+def get_db_uri(runtime_config: Config, readonly: bool = False) -> str:
     """Provides a URI for the database based on a runtime environment.
 
     Parameters
