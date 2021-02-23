@@ -84,8 +84,8 @@ _SequencingProtocolTypeTable = enumtables.EnumTable(
 )
 
 
-class SequencingReads(Entity):
-    __tablename__ = "sequencing_reads"
+class SequencingReadCollection(Entity):
+    __tablename__ = "sequencing_read_collections"
     __table_args__ = (UniqueConstraint("s3_bucket", "s3_key"),)
     __mapper_args__ = {"polymorphic_identity": EntityType.SEQUENCING_READS}
 
