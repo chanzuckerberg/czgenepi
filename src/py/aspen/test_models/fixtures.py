@@ -12,7 +12,7 @@ def group(session) -> Group:
 
 
 @pytest.fixture(scope="function")
-def user(session, group):
+def user(session, group) -> User:
     user = User(
         name="test",
         auth0_user_id="test_auth0_id",
