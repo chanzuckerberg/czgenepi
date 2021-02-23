@@ -4,7 +4,7 @@ from aspen.database.models.usergroup import Group, User
 
 
 @pytest.fixture(scope="function")
-def group(session):
+def group(session) -> Group:
     group = Group(name="groupname", email="groupemail", address="123 Main St")
     session.add(group)
     session.commit()
