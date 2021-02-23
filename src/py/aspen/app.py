@@ -7,11 +7,7 @@ from authlib.integrations.flask_client import OAuth
 from flask import Flask, jsonify, redirect, send_from_directory, session, url_for
 from sqlalchemy.orm import joinedload
 
-from aspen.config import (
-    DevelopmentConfig,
-    ProductionConfig,
-    StagingConfig,
-)
+from aspen.config import DevelopmentConfig, ProductionConfig, StagingConfig
 
 from .database.connection import session_scope
 from .database.models.usergroup import User
