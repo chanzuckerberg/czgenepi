@@ -111,3 +111,7 @@ class DatabaseConfig:
     @property
     def READONLY_URI(self):
         raise NotImplementedError()
+
+    @property
+    def INTERFACE(self):
+        raise NotImplementedError()
