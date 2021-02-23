@@ -1,9 +1,14 @@
+import logging
 import uuid
+
+from aspen import aws
 
 from .config import Auth0Config, Config, DatabaseConfig
 
+logger = logging.getLogger(__name__)
 
-class DevelopmentConfig(Config, descriptive_name="dev"):
+
+class StagingConfig(Config, descriptive_name="staging"):
     @property
     def DEBUG(self):
         return True
@@ -14,14 +19,14 @@ class DevelopmentConfig(Config, descriptive_name="dev"):
 
     @property
     def DATABASE_CONFIG(self):
-        return DevelopmentDatabaseConfig()
+        return StagingDatabaseConfig()
 
     @property
     def AUTH0_CONFIG(self):
-        return DevAuth0Config
+        return StagingAuth0Config()
 
 
-class DevelopmentDatabaseConfig(DatabaseConfig):
+class StagingDatabaseConfig(DatabaseConfig):
     @property
     def URI(self):
         return "postgresql://user_rw:password_rw@localhost:5432/aspen_db"
@@ -32,7 +37,11 @@ class DevelopmentDatabaseConfig(DatabaseConfig):
         return 0
 
 
-class DevAuth0Config(Auth0Config):
+class StagingAuth0Config(Auth0Config):
     @property
     def AUTH0_CALLBACK_URL(self):
-        return "http://localhost:3000/callback"
+        eb_env_name = aws.elasticbeanstalk.get_environment_suffix()
+        logger.info(f"DETECTED EB_ENV as {eb_env_name}")
+        return (
+            f"http://aspen-{eb_env_name}.{aws.region()}.elasticbeanstalk.com/callback"
+        )

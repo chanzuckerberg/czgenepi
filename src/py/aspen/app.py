@@ -6,7 +6,7 @@ from urllib.parse import urlencode
 from authlib.integrations.flask_client import OAuth
 from flask import Flask, redirect, send_from_directory, session, url_for
 
-from aspen.config import DevelopmentConfig
+from aspen.config import DevelopmentConfig, StagingConfig
 
 static_folder = Path("static")
 
@@ -15,6 +15,8 @@ application = Flask(__name__, static_folder=str(static_folder))
 
 if os.environ.get("FLASK_ENV") == "development":
     application.config.from_object(DevelopmentConfig())
+if os.environ.get("FLASK_ENV") == "staging":
+    application.config.from_object(StagingConfig())
 
 auth0_config = application.config["AUTH0_CONFIG"]
 oauth = OAuth(application)
