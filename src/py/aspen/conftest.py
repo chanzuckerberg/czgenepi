@@ -7,4 +7,9 @@ from aspen.test_infra.fixtures import (  # noqa: F401
     sqlalchemy_interface,
     unused_tcp_port,
 )
-from aspen.test_models.fixtures import group, user  # noqa: F401
+from aspen.test_models.fixtures import (  # noqa: F401
+    group,
+    sample,
+    sequencing_read,
+    user,
+)

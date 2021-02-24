@@ -1,4 +1,5 @@
 import datetime
+import enum
 
 from sqlalchemy import Column, Integer
 
@@ -21,6 +22,9 @@ class DictMixin:
                 d[column.name] = column_value.isoformat()
 
             else:
-                d[column.name] = column_value
+                if isinstance(column_value, enum.Enum):
+                    d[column.name] = column_value.value
+                else:
+                    d[column.name] = column_value
 
         return d

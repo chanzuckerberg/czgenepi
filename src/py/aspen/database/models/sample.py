@@ -12,10 +12,11 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import backref, relationship
 
 from .base import idbase
+from .mixins import DictMixin
 from .usergroup import Group
 
 
-class Sample(idbase):
+class Sample(idbase, DictMixin):
     """A physical sample.  Multiple sequences can be taken of each physical sample."""
 
     __tablename__ = "samples"
