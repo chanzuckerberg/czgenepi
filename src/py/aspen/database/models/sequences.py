@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import enum
+from typing import MutableSequence, Sequence, TYPE_CHECKING
 
 import enumtables
 from sqlalchemy import (
@@ -17,6 +20,9 @@ from .entity import Entity, EntityType
 from .enum import Enum
 from .sample import Sample
 from .workflow import Workflow, WorkflowType
+
+if TYPE_CHECKING:
+    from .host_filtering import HostFilteredSequencingReadCollection
 
 
 class SequencingInstrumentType(enum.Enum):
@@ -108,6 +114,21 @@ class SequencingReadCollection(Entity):
     s3_key = Column(String, nullable=False)
 
     sequencing_date = Column(Date)
+
+    @property
+    def host_filtered_sequencing_reads(
+        self,
+    ) -> Sequence[HostFilteredSequencingReadCollection]:
+        # this import has to be here for circular dependencies reasons. :(
+        from .host_filtering import HostFilteredSequencingReadCollection
+
+        results: MutableSequence[HostFilteredSequencingReadCollection] = list()
+        for workflow, entities in self.get_children(
+            HostFilteredSequencingReadCollection
+        ):
+            results.extend(entities)
+
+        return results
 
 
 class PathogenGenome(Entity):
