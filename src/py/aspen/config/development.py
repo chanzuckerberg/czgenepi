@@ -20,7 +20,7 @@ class DevelopmentConfig(Config, descriptive_name="dev"):
 
     @property
     def AUTH0_CONFIG(self):
-        return DevAuth0Config
+        return DevAuth0Config()
 
 
 class DevelopmentDatabaseConfig(DatabaseConfig):
