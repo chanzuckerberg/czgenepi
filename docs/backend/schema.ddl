@@ -148,7 +148,7 @@ Table SequencingProtocol {
 
 // describes a single set of sequence data from the sequencer. (FASTQ)
 // these should be replaced by the `HostFilteredSequenceRead` as soon as it is available so we are not storing any host reads
-Table SequencingReads {
+Table SequencingReadCollection {
   id INT [pk, increment]
   entity_id INT [not null, unique, ref: - Entity.id]
 
@@ -200,7 +200,7 @@ Table CalledPathogenGenome {
 
 // TODO: @jackkamm do the BAM/SRA records need to store any metrics?
 
-Table HostFilteredSequenceRead {
+Table HostFilteredSequenceReadCollection {
   id INT [pk, increment]
   entity_id INT [not null, unique, ref: - Entity.id]
 

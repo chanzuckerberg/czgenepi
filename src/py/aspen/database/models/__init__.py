@@ -8,14 +8,17 @@ from .gisaid_dump import (  # noqa: F401
     ProcessedGisaidDump,
     RawGisaidDump,
 )
-from .host_filtering import FilterRead, HostFilteredSequencingRead  # noqa: F401
+from .host_filtering import (  # noqa: F401
+    FilterRead,
+    HostFilteredSequencingReadCollection,
+)
 from .sample import Sample  # noqa: F401
 from .sequences import (  # noqa: F401
     CallConsensus,
     CalledPathogenGenome,
     SequencingInstrumentType,
     SequencingProtocolType,
-    SequencingReads,
+    SequencingReadCollection,
     UploadedPathogenGenome,
 )
 from .usergroup import Group, User  # noqa: F401
