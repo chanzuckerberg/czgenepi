@@ -148,7 +148,7 @@ Table SequencingProtocol {
 
 // describes a single set of sequence data from the sequencer. (FASTQ)
 // these should be replaced by the `HostFilteredSequenceRead` as soon as it is available so we are not storing any host reads
-Table SequencingReadCollection {
+Table SequencingReadsCollection {
   id INT [pk, increment]
   entity_id INT [not null, unique, ref: - Entity.id]
 

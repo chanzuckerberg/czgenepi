@@ -22,7 +22,7 @@ from .sample import Sample
 from .workflow import Workflow, WorkflowType
 
 if TYPE_CHECKING:
-    from .host_filtering import HostFilteredSequencingReadCollection
+    from .host_filtering import HostFilteredSequencingReadsCollection
 
 
 class SequencingInstrumentType(enum.Enum):
@@ -90,14 +90,14 @@ _SequencingProtocolTypeTable = enumtables.EnumTable(
 )
 
 
-class SequencingReadCollection(Entity):
-    __tablename__ = "sequencing_read_collections"
+class SequencingReadsCollection(Entity):
+    __tablename__ = "sequencing_reads_collections"
     __table_args__ = (UniqueConstraint("s3_bucket", "s3_key"),)
     __mapper_args__ = {"polymorphic_identity": EntityType.SEQUENCING_READS}
 
     entity_id = Column(Integer, ForeignKey(Entity.id), primary_key=True)
     sample_id = Column(Integer, ForeignKey(Sample.id), nullable=False)
-    sample = relationship(Sample, backref=backref("sequencing_reads"))
+    sample = relationship(Sample, backref=backref("sequencing_reads_collection"))
 
     sequencing_instrument = Column(
         Enum(SequencingInstrumentType),
@@ -118,13 +118,13 @@ class SequencingReadCollection(Entity):
     @property
     def host_filtered_sequencing_reads(
         self,
-    ) -> Sequence[HostFilteredSequencingReadCollection]:
+    ) -> Sequence[HostFilteredSequencingReadsCollection]:
         # this import has to be here for circular dependencies reasons. :(
-        from .host_filtering import HostFilteredSequencingReadCollection
+        from .host_filtering import HostFilteredSequencingReadsCollection
 
-        results: MutableSequence[HostFilteredSequencingReadCollection] = list()
+        results: MutableSequence[HostFilteredSequencingReadsCollection] = list()
         for workflow, entities in self.get_children(
-            HostFilteredSequencingReadCollection
+            HostFilteredSequencingReadsCollection
         ):
             results.extend(entities)
 

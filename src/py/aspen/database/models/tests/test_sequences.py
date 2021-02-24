@@ -4,7 +4,7 @@ from ..sample import Sample
 from ..sequences import (
     SequencingInstrumentType,
     SequencingProtocolType,
-    SequencingReadCollection,
+    SequencingReadsCollection,
     UploadedPathogenGenome,
 )
 from ..usergroup import Group
@@ -25,7 +25,7 @@ def test_sequencing_reads(session):
         country="USA",
         organism="SARS-CoV-2",
     )
-    sequencing_reads = SequencingReadCollection(
+    sequencing_reads = SequencingReadsCollection(
         sample=sample,
         sequencing_instrument=SequencingInstrumentType.ILLUMINA_GENOME_ANALYZER_IIX,
         sequencing_protocol=SequencingProtocolType.ARTIC_V3,
