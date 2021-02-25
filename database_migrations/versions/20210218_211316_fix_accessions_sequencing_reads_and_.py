@@ -1,7 +1,5 @@
 """fix accessions, sequencing_reads, and uploaded_pathogen_genome
 
-Revision ID: 20210218_211316
-Revises: 20210224_105823
 Create Date: 2021-02-18 21:13:17.850532
 
 """

@@ -1,7 +1,5 @@
 """entities and workflow base models
 
-Revision ID: 20210204_174243
-Revises: 20210204_112248
 Create Date: 2021-02-04 17:42:44.236476
 
 """

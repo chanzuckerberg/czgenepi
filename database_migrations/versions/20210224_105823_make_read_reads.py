@@ -1,7 +1,5 @@
 """make read -> reads
 
-Revision ID: 20210224_105823
-Revises: 20210222_220412
 Create Date: 2021-02-24 10:58:25.108079
 
 """

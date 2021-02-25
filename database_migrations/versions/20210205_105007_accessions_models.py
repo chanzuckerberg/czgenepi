@@ -1,7 +1,5 @@
 """accessions models
 
-Revision ID: 20210205_105007
-Revises: 20210204_174243
 Create Date: 2021-02-05 10:50:08.345804
 
 """

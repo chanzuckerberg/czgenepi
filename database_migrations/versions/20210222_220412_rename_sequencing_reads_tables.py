@@ -1,7 +1,5 @@
 """rename *sequencing_reads tables
 
-Revision ID: 20210222_220412
-Revises: 20210218_164249
 Create Date: 2021-02-22 22:04:14.173048
 
 """

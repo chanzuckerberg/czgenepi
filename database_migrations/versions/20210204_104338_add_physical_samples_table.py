@@ -1,7 +1,5 @@
 """add physical_samples table
 
-Revision ID: 20210204_104338
-Revises: 20210215_112447
 Create Date: 2021-02-04 10:43:39.108565
 
 """

@@ -1,7 +1,5 @@
 """add private identifiers as an option for cansee datatypes
 
-Revision ID: 20210218_104830
-Revises: 20210216_114729
 Create Date: 2021-02-18 10:48:31.834354
 
 """

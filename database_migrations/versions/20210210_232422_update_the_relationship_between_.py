@@ -1,7 +1,5 @@
 """update the relationship between entities and workflows
 
-Revision ID: 20210210_232422
-Revises: 20210210_134341
 Create Date: 2021-02-10 23:24:23.837672
 
 """

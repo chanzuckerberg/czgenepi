@@ -1,7 +1,5 @@
 """add sequencing models
 
-Revision ID: 20210210_134341
-Revises: 20210210_125554
 Create Date: 2021-02-10 13:43:41.883956
 
 """
