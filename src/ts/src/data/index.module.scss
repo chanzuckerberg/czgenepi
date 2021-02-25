@@ -1,0 +1,40 @@
+@import "common/styles/spacing";
+@import "common/styles/typography";
+
+.dataRoot {
+    display: flex;
+    flex-flow: column wrap;
+    align-content: flex-start;
+    height: 100%;
+
+    .navigation {
+        width: 100%;
+        margin-bottom: $space-xl;
+
+        .menu {
+            align-items: center;
+            margin-left: $space-xxl;
+
+            .menuItem {
+                height: 100%;
+
+                .category {
+                    .title {
+                        @include font-header-l;
+                        font-family: $font-family-primary;
+                        margin-right: $space-m;
+                    }
+
+                    .count {
+                        @include font-body-l;
+                        font-family: $font-family-primary;
+                    }
+                }
+            }
+        }
+    }
+
+    .view {
+        width: 100%;
+    }
+}

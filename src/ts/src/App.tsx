@@ -1,6 +1,8 @@
 import React, { FunctionComponent } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
+import Data from "data";
+
 import Landing from "Landing";
 import NavBar from "NavBar";
 
@@ -15,6 +17,7 @@ const App: FunctionComponent<React.ReactNode> = () => {
                 </div>
                 <div className={style.view}>
                     <Switch>
+                        <Route path="/data" render={() => <Data />} />
                         <Route path="/" render={() => <Landing />} />
                     </Switch>
                 </div>
