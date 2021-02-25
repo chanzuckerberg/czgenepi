@@ -1,0 +1,16 @@
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="==MYBOUNDARY=="
+
+--==MYBOUNDARY==
+Content-Type: text/cloud-config; charset="us-ascii"
+
+packages:
+- mdadm
+- amazon-ssm-agent
+
+runcmd:
+- "aegea_bd=(/dev/disk/by-id/nvme-Amazon_EC2_NVMe_Instance_Storage_AWS?????????????????)"
+- "if [ ! -e /dev/md0 ]; then mdadm --create /dev/md0 --force --auto=yes --level=0 --chunk=256 --raid-devices=${#aegea_bd[@]} ${aegea_bd[@]}; mkfs.xfs /dev/md0; fi"
+- "mount /dev/md0 /mnt"
+
+--==MYBOUNDARY==--

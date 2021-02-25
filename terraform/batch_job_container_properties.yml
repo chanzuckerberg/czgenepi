@@ -1,0 +1,55 @@
+# This is a configuration of AWS Batch container overrides, used by the Terraform resources in this directory.
+# See https://docs.aws.amazon.com/batch/latest/APIReference/API_ContainerOverrides.html for the specification.
+# The definition source is in YAML for brevity and readability. It is compiled into JSON by a Makefile target,
+# then deployed by Terraform.
+#
+# Run "make templates" in the idseq/workflows directory to perform the YAML>JSON preprocessing step.
+
+image: "${batch_docker_image}"
+command:
+  - "/bin/bash"
+  - "-c"
+  - "for i in \"$@\"; do eval \"$i\"; done; cd /"
+  - "idseq"
+  - "set -a"
+  - "if [ -f /etc/environment ]; then source /etc/environment; fi"
+  - "if [ -f /etc/default/locale ]; then source /etc/default/locale; else export LC_ALL=C.UTF-8 LANG=C.UTF-8; fi"
+  - "set +a"
+  - "while true; do if curl -sf http://169.254.169.254/latest/meta-data/spot/instance-action; then echo WARNING: THIS SPOT INSTANCE HAS BEEN SCHEDULED FOR TERMINATION >> /dev/stderr; fi; sleep 10; done &"
+  - "put_metric() { aws cloudwatch put-metric-data --metric-name $1 --namespace idseq-$DEPLOYMENT_ENVIRONMENT --unit Percent --value $2; }"
+  - "while true; do put_metric ScratchSpaceInUse $(df --output=pcent /mnt | tail -n 1 | cut -f 1 -d %); put_metric CPULoad $(cat /proc/loadavg | cut -f 1 -d ' ' | cut -f 2 -d .); put_metric MemoryInUse $(python3 -c 'import psutil; m=psutil.virtual_memory(); print(100*(1-m.available/m.total))'); sleep 60; done &"
+  - "df -h / /mnt"
+  - "if [ -f /etc/profile ]; then source /etc/profile; fi"
+  - "set -euo pipefail"
+  - "handle_error() { echo This is the error handler }"
+  - "trap handle_error EXIT"
+  - "echo Ready to run aspen"
+environment:
+  - name: "DEPLOYMENT_ENVIRONMENT"
+    value: "${deployment_environment}"
+  - name: "AWS_DEFAULT_REGION"
+    value: "${aws_region}"
+jobRoleArn: "${batch_job_role_arn}"
+volumes:
+  - name: "scratch"
+    host:
+      sourcePath: "/mnt"
+mountPoints:
+  - sourceVolume: "scratch"
+    containerPath: "/mnt"
+    readOnly: false
+ulimits:
+  - name: "nofile"
+    hardLimit: 100000
+    softLimit: 100000
+privileged: false
+readonlyRootFilesystem: false
+
+# The AWS Batch API requires two resource quotas: vCPU and memory. Memory contention or starvation is more dangerous
+# than CPU contention (an OOM condition will cause a job to fail, while lower than expected CPU will just cause it to
+# run longer). The Batch scheduler uses both quotas to schedule (pack) jobs onto instances, but only enforces the memory
+# quota as a hard limit. We set both quotas to a token value here. The step function overrides the memory quota at
+# runtime, causing it to become the concurrency-limiting factor for job packing. (Additional logic is required in
+# miniwdl to set the memory hard limits on child containers running WDL tasks.)
+vcpus: 1
+memory: 4
