@@ -1,3 +1,6 @@
+@import "common/styles/spacing";
+@import "common/styles/typography";
+
 .dataRoot {
     display: flex;
     flex-flow: column wrap;
@@ -6,27 +9,26 @@
 
     .navigation {
         width: 100%;
-        margin-bottom: 1em;
+        margin-bottom: $space-xl;
 
         .menu {
-            align-items: stretch;
-            margin-left: 2em;
+            align-items: center;
+            margin-left: $space-xxl;
 
             .menuItem {
                 height: 100%;
 
-                .searchBar {
-                    margin: 0 6em 0 4em;
-                }
-
                 .category {
-                    // height: 100%;
-                    margin-right: 2em;
 
                     .title {
-                        font-weight: bold;
-                        font-size: 1.1em;
-                        margin-right: 0.7em;
+                        @include font-header-l;
+                        font-family: $font-family-primary;
+                        margin-right: $space-m;
+                    }
+
+                    .count {
+                        @include font-body-l;
+                        font-family: $font-family-primary;
                     }
                 }
             }
