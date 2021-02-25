@@ -1,13 +1,20 @@
 import React, { FunctionComponent } from "react";
 import { Table } from "semantic-ui-react";
 
+import { get } from "common/utils";
+
 import style from "./index.module.scss";
 
 type Props = {
     data?: Array<Sample>;
 };
 
-const TABLE_HEADERS: Array<Record<string, string>> = [
+type Headers = {
+    text: string,
+    key: keyof Sample
+}
+
+const TABLE_HEADERS: Array<Headers> = [
     { text: "Private ID", key: "privateId" },
     { text: "Public ID", key: "publicId" },
     { text: "Upload Date", key: "uploadDate" },
@@ -47,7 +54,7 @@ const Samples: FunctionComponent<Props> = ({ data = dummySamples }: Props) => {
     const sampleRow = (sample: Sample): Array<JSX.Element> => {
         return TABLE_HEADERS.map((column) => (
             <Table.Cell key={`${sample.privateId}-${column.key}`}>
-                {sample[column.key as keyof Sample]}
+                {sample[column.key]}
             </Table.Cell>
         ));
     };
