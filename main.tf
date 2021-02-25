@@ -8,10 +8,10 @@ terraform {
   }
 }
 
-module "mccloud" {
+module "aspen" {
   source = "./terraform"
 }
 
-output "mccloud" {
-  value = module.mccloud
+output "aspen" {
+  value = module.aspen
 }
