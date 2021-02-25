@@ -93,7 +93,7 @@ update-deps :
 #
 
 unit-tests:
-	pytest src/py/aspen
+	pytest -n8 src/py/aspen
 
 #
 ##############################################################
