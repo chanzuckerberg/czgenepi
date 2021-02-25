@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import abc
 import json
 import os
 from collections import MutableMapping
@@ -9,6 +10,7 @@ from typing import Any, Mapping, Type
 from botocore.exceptions import ClientError
 
 from aspen import aws
+from aspen.database.connection import SqlAlchemyInterface
 
 
 class Config:
@@ -24,28 +26,73 @@ class Config:
     def by_descriptive_name(cls, descriptive_name: str) -> Config:
         return Config._subclasses[descriptive_name]()
 
+    ####################################################################################
+    # secondary config objects.
     @property
-    def DEBUG(self):
-        return False
-
-    @property
-    def SECRET_KEY(self):
+    @abc.abstractmethod
+    def _AWS_SECRET(self) -> Mapping[str, Any]:
         raise NotImplementedError()
 
     @property
-    def TESTING(self):
+    @abc.abstractmethod
+    def DATABASE_CONFIG(self) -> DatabaseConfig:
+        raise NotImplementedError()
+
+    ####################################################################################
+    # flask properties
+    @property
+    def DEBUG(self) -> bool:
         return False
 
     @property
-    def DATABASE_CONFIG(self):
+    @abc.abstractmethod
+    def SECRET_KEY(self) -> str:
         raise NotImplementedError()
 
     @property
-    def AUTH0_CONFIG(self):
-        return NotImplementedError()
+    def TESTING(self) -> bool:
+        return False
+
+    ####################################################################################
+    # auth0 properties
+    @property
+    def AUTH0_CLIENT_ID(self) -> str:
+        return self._AWS_SECRET["AUTH0_CLIENT_ID"]
+
+    @property
+    def AUTH0_CALLBACK_URL(self) -> str:
+        raise NotImplementedError()
+
+    @property
+    def AUTH0_CLIENT_SECRET(self) -> str:
+        return self._AWS_SECRET["AUTH0_CLIENT_SECRET"]
+
+    @property
+    def AUTH0_DOMAIN(self) -> str:
+        return self._AWS_SECRET["AUTH0_DOMAIN"]
+
+    @property
+    def AUTH0_BASE_URL(self) -> str:
+        return f"https://{self.AUTH0_DOMAIN}"
+
+    @property
+    def AUTH0_ACCESS_TOKEN_URL(self) -> str:
+        return f"{self.AUTH0_BASE_URL}/oauth/token"
+
+    @property
+    def AUTH0_AUTHORIZE_URL(self) -> str:
+        return f"{self.AUTH0_BASE_URL}/authorize"
+
+    @property
+    def AUTH0_CLIENT_KWARGS(self) -> Mapping[str, Any]:
+        return {
+            "scope": "openid profile email",
+        }
 
 
-class Auth0Config:
+class SecretsConfig:
+    """This is to hold configuration fetched from AWS secrets."""
+
     # this extra level of indirection
     # (Auth0Config.AWS_SECRET -> Auth0Config._AWS_SECRET()) is because of
     # https://github.com/python/mypy/issues/1362
@@ -53,7 +100,7 @@ class Auth0Config:
     def _AWS_SECRET(self) -> Mapping[str, Any]:
         session = aws.session()
 
-        secret_name = os.environ.get("AUTH0_CONFIG_SECRET_NAME", "aspen-auth0")
+        secret_name = os.environ.get("AUTH0_CONFIG_SECRET_NAME", "aspen-config")
         client = session.client(service_name="secretsmanager")
 
         try:
@@ -65,53 +112,24 @@ class Auth0Config:
             return json.loads(secret)
 
     @property
-    def AWS_SECRET(self):
+    def AWS_SECRET(self) -> Mapping[str, Any]:
         return self._AWS_SECRET()
-
-    @property
-    def AUTH0_CLIENT_ID(self):
-        return self.AWS_SECRET["AUTH0_CLIENT_ID"]
-
-    @property
-    def AUTH0_CALLBACK_URL(self):
-        raise NotImplementedError()
-
-    @property
-    def AUTH0_CLIENT_SECRET(self):
-        return self.AWS_SECRET["AUTH0_CLIENT_SECRET"]
-
-    @property
-    def AUTH0_DOMAIN(self):
-        return self.AWS_SECRET["AUTH0_DOMAIN"]
-
-    @property
-    def AUTH0_BASE_URL(self):
-        return f"https://{self.AUTH0_DOMAIN}"
-
-    @property
-    def ACCESS_TOKEN_URL(self):
-        return f"{self.AUTH0_BASE_URL}/oauth/token"
-
-    @property
-    def AUTHORIZE_URL(self):
-        return f"{self.AUTH0_BASE_URL}/authorize"
-
-    @property
-    def CLIENT_KWARGS(self):
-        return {
-            "scope": "openid profile email",
-        }
 
 
 class DatabaseConfig:
+    """This is for the database config.  Since not all the properties are defined in all
+    implementations, it must be a separate configuration object."""
+
     @property
-    def URI(self):
+    # TODO: This should be an abstract method as well.
+    def URI(self) -> str:
         raise NotImplementedError()
 
     @property
-    def READONLY_URI(self):
+    def READONLY_URI(self) -> str:
         raise NotImplementedError()
 
     @property
-    def INTERFACE(self):
+    # TODO: This should be an abstract method as well.
+    def INTERFACE(self) -> SqlAlchemyInterface:
         raise NotImplementedError()

@@ -1,47 +1,44 @@
 import logging
 import uuid
+from typing import Any, Mapping
 
 from aspen import aws
 
-from .config import Auth0Config, Config, DatabaseConfig
+from .config import Config, DatabaseConfig, SecretsConfig
 
 logger = logging.getLogger(__name__)
 
 
 class StagingConfig(Config, descriptive_name="staging"):
-    @property
-    def DEBUG(self):
-        return True
+    def __init__(self):
+        self.secretsconfig = SecretsConfig()
 
     @property
-    def SECRET_KEY(self):
-        return uuid.uuid4().hex
+    def _AWS_SECRET(self) -> Mapping[str, Any]:
+        return self.secretsconfig.AWS_SECRET
 
     @property
-    def DATABASE_CONFIG(self):
+    def DATABASE_CONFIG(self) -> DatabaseConfig:
         return StagingDatabaseConfig()
 
     @property
-    def AUTH0_CONFIG(self):
-        return StagingAuth0Config()
-
-
-class StagingDatabaseConfig(DatabaseConfig):
-    @property
-    def URI(self):
-        return "postgresql://user_rw:password_rw@localhost:5432/aspen_db"
+    def DEBUG(self) -> bool:
+        return True
 
     @property
-    def SEND_FILE_MAX_AGE_DEFAULT(self):
-        """Ensures that latest static assets are read during frontend dev work."""
-        return 0
+    def SECRET_KEY(self) -> str:
+        return uuid.uuid4().hex
 
-
-class StagingAuth0Config(Auth0Config):
     @property
-    def AUTH0_CALLBACK_URL(self):
+    def AUTH0_CALLBACK_URL(self) -> str:
         eb_env_name = aws.elasticbeanstalk.get_environment_suffix()
         logger.info(f"DETECTED EB_ENV as {eb_env_name}")
         return (
             f"http://aspen-{eb_env_name}.{aws.region()}.elasticbeanstalk.com/callback"
         )
+
+
+class StagingDatabaseConfig(DatabaseConfig):
+    @property
+    def URI(self) -> str:
+        return "postgresql://user_rw:password_rw@localhost:5432/aspen_db"
