@@ -10,11 +10,11 @@ class AspenApp(Flask):
         super().__init__(*args, **kwargs)
         self._aspen_config = aspen_config
         if self._aspen_config is not None:
-            self.config.from_object(self._aspen_config)
+            self.config.from_mapping(**self._aspen_config.flask_properties())
 
     def _inject_config(self, aspen_config: Config):
         self._aspen_config = aspen_config
-        self.config.from_object(aspen_config)
+        self.config.from_mapping(**self._aspen_config.flask_properties())
 
     @property
     def aspen_config(self) -> Config:

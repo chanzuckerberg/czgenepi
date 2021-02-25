@@ -3,7 +3,7 @@ from functools import lru_cache
 from typing import Any, Mapping
 
 from ..database.connection import init_db, SqlAlchemyInterface
-from .config import Config, DatabaseConfig, SecretsConfig
+from .config import Config, DatabaseConfig, flaskproperty, SecretsConfig
 
 
 class DevelopmentConfig(Config, descriptive_name="dev"):
@@ -18,11 +18,11 @@ class DevelopmentConfig(Config, descriptive_name="dev"):
     def _AWS_SECRET(self) -> Mapping[str, Any]:
         return self.secretsconfig.AWS_SECRET
 
-    @property
+    @flaskproperty
     def DEBUG(self) -> bool:
         return True
 
-    @property
+    @flaskproperty
     def SECRET_KEY(self) -> str:
         return uuid.uuid4().hex
 

@@ -3,7 +3,7 @@ from functools import lru_cache
 from typing import Any, Mapping
 
 from ..database.connection import init_db, SqlAlchemyInterface
-from .config import Config, DatabaseConfig
+from .config import Config, DatabaseConfig, flaskproperty
 
 
 class TestingConfig(Config, descriptive_name="test"):
@@ -22,11 +22,11 @@ class TestingConfig(Config, descriptive_name="test"):
     def DATABASE_CONFIG(self):
         return TestingDatabaseConfig(self.db_uri)
 
-    @property
+    @flaskproperty
     def TESTING(self):
         return True
 
-    @property
+    @flaskproperty
     def SECRET_KEY(self):
         return uuid.uuid4().hex
 

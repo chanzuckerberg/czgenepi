@@ -1,7 +1,7 @@
 import uuid
 from typing import Any, Mapping
 
-from .config import Config, DatabaseConfig, SecretsConfig
+from .config import Config, DatabaseConfig, flaskproperty, SecretsConfig
 
 
 class ProductionConfig(Config, descriptive_name="prod"):
@@ -16,7 +16,7 @@ class ProductionConfig(Config, descriptive_name="prod"):
     def DATABASE_CONFIG(self) -> DatabaseConfig:
         return ProductionDatabaseConfig()
 
-    @property
+    @flaskproperty
     def SECRET_KEY(self) -> str:
         return uuid.uuid4().hex
 
