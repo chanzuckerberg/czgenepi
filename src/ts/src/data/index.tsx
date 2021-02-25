@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from "react";
 import { Switch, Route, Link } from "react-router-dom";
-import { Menu, Search, Container } from "semantic-ui-react";
+import { Menu } from "semantic-ui-react";
 
 import style from "./index.module.scss";
 
@@ -9,32 +9,47 @@ type Props = {
     trees?: Array<Tree>;
 };
 
-const Data: FunctionComponent<Props> = ({ samples = [], trees = [], children }) => {
-
+const Data: FunctionComponent<Props> = ({
+    samples = [],
+    trees = [],
+}: Props) => {
     // this constant is inside the component so we can associate
     // each category with its respective variable.
     const dataCategories = [
         { to: "/data/samples", text: "Samples", data: samples },
-        { to: "/data/phylogenetic_trees", text: "Phylogenetic Trees", data: trees }
-    ]
+        {
+            to: "/data/phylogenetic_trees",
+            text: "Phylogenetic Trees",
+            data: trees,
+        },
+    ];
 
-    const dataJSX: Record<string, Array<JSX.Element>> = { menuItems: [], routes: [] }
+    const dataJSX: Record<string, Array<JSX.Element>> = {
+        menuItems: [],
+        routes: [],
+    };
 
-    dataCategories.forEach(category => {
+    dataCategories.forEach((category) => {
         dataJSX.menuItems.push(
             <Link to={category.to} key={category.text}>
                 <Menu.Item className={style.menuItem}>
                     <div className={style.category}>
                         <span className={style.title}>{category.text}</span>
-                        <span className={style.count}>{category.data.length}</span>
+                        <span className={style.count}>
+                            {category.data.length}
+                        </span>
                     </div>
                 </Menu.Item>
             </Link>
-            );
+        );
         dataJSX.routes.push(
-            <Route path={category.to} key={category.text} render={() => <div>{category.text}</div>}/>
-        )
-    })
+            <Route
+                path={category.to}
+                key={category.text}
+                render={() => <div>{category.text}</div>}
+            />
+        );
+    });
 
     return (
         <div className={style.dataRoot}>
@@ -44,12 +59,10 @@ const Data: FunctionComponent<Props> = ({ samples = [], trees = [], children }) 
                 </Menu>
             </div>
             <div className={style.view}>
-                <Switch>
-                    {dataJSX.routes}
-                </Switch>
+                <Switch>{dataJSX.routes}</Switch>
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default Data;
