@@ -58,7 +58,7 @@ def get_db_uri(runtime_config: Config, readonly: bool = False) -> str:
     """
     if readonly:
         try:
-            return runtime_config.DATABASE_CONFIG.READONLY_URI
+            return runtime_config.DATABASE_READONLY_URI
         except NotImplementedError:
             raise ValueError(f"Config {runtime_config} does not have a read-only mode.")
-    return runtime_config.DATABASE_CONFIG.URI
+    return runtime_config.DATABASE_URI

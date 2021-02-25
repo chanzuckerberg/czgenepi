@@ -8,9 +8,7 @@ from aspen.database.connection import session_scope
 @application.route("/api/usergroup", methods=["GET"])
 @requires_auth
 def usergroup():
-    with session_scope(
-        application.aspen_config.DATABASE_CONFIG.INTERFACE
-    ) as db_session:
+    with session_scope(application.aspen_config.DATABASE_INTERFACE) as db_session:
         # since authentication is required to access view this information is guaranteed to be in session
         profile = session["profile"]
         user = get_usergroup_query(db_session, profile["user_id"]).one()

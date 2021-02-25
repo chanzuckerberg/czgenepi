@@ -1,23 +1,11 @@
 import uuid
 from functools import lru_cache
-from typing import Any, Mapping
 
 from ..database.connection import init_db, SqlAlchemyInterface
-from .config import Config, DatabaseConfig, flaskproperty, SecretsConfig
+from .config import Config, flaskproperty
 
 
 class DevelopmentConfig(Config, descriptive_name="dev"):
-    def __init__(self):
-        self.secretsconfig = SecretsConfig()
-
-    @property
-    def DATABASE_CONFIG(self) -> DatabaseConfig:
-        return DevelopmentDatabaseConfig()
-
-    @property
-    def _AWS_SECRET(self) -> Mapping[str, Any]:
-        return self.secretsconfig.AWS_SECRET
-
     @flaskproperty
     def DEBUG(self) -> bool:
         return True
@@ -30,16 +18,14 @@ class DevelopmentConfig(Config, descriptive_name="dev"):
     def AUTH0_CALLBACK_URL(self) -> str:
         return "http://localhost:3000/callback"
 
-
-class DevelopmentDatabaseConfig(DatabaseConfig):
     @property
-    def URI(self) -> str:
+    def DATABASE_URI(self) -> str:
         return "postgresql://user_rw:password_rw@localhost:5432/aspen_db"
 
     @lru_cache()
-    def _INTERFACE(self) -> SqlAlchemyInterface:
-        return init_db(self.URI)
+    def _DATABASE_INTERFACE(self) -> SqlAlchemyInterface:
+        return init_db(self.DATABASE_URI)
 
     @property
-    def INTERFACE(self) -> SqlAlchemyInterface:
-        return self._INTERFACE()
+    def DATABASE_INTERFACE(self) -> SqlAlchemyInterface:
+        return self._DATABASE_INTERFACE()
