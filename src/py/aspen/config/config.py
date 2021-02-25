@@ -100,7 +100,7 @@ class SecretsConfig:
     def _AWS_SECRET(self) -> Mapping[str, Any]:
         session = aws.session()
 
-        secret_name = os.environ.get("AUTH0_CONFIG_SECRET_NAME", "aspen-config")
+        secret_name = os.environ.get("AUTH0_CONFIG_SECRET_NAME", "aspen-auth0")
         client = session.client(service_name="secretsmanager")
 
         try:

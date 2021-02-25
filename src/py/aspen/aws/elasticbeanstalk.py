@@ -22,22 +22,23 @@ def _get_tags() -> Sequence[Dict]:
     return results
 
 
-def _get_environment_name() -> str:
+def _get_environment_name(prefix: str = "aspen-") -> str:
     """Get all Elastic Beanstalk environment name."""
     tags = _get_tags()
 
     for tag in tags:
+        environment_name = tag["Value"]
         if (
             tag["Key"] == "elasticbeanstalk:environment-name"
             and tag["ResourceType"] == "instance"
+            and environment_name.startswith(prefix)
         ):
-            return tag["Value"]
+            return environment_name
     else:
         raise ValueError("Unable to find environment name")
 
 
 def get_environment_suffix(prefix: str = "aspen-") -> str:
     """Get all Elastic Beanstalk environment name, excluding the aspen- prefix."""
-    name = _get_environment_name()
-    assert name.startswith(prefix)
+    name = _get_environment_name(prefix)
     return name[len(prefix) :]
