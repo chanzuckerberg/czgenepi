@@ -40,7 +40,7 @@ def callback_handling():
 @application.route("/login")
 def login():
     return auth0.authorize_redirect(
-        redirect_uri=application.config["AUTH0_CALLBACK_URL"]
+        redirect_uri=application.aspen_config.AUTH0_CALLBACK_URL
     )
 
 
@@ -51,7 +51,7 @@ def logout():
     # Redirect user to logout endpoint
     params = {
         "returnTo": url_for("serve", _external=True),
-        "client_id": application.config["AUTH0_CLIENT_ID"],
+        "client_id": application.aspen_config.AUTH0_CLIENT_ID,
     }
     return redirect(auth0.api_base_url + "/v2/logout?" + urlencode(params))
 
@@ -59,7 +59,9 @@ def logout():
 @application.route("/api/usergroup", methods=["GET"])
 @requires_auth
 def usergroup():
-    with session_scope(application.config["DATABASE_CONFIG"].INTERFACE) as db_session:
+    with session_scope(
+        application.aspen_config.DATABASE_CONFIG.INTERFACE
+    ) as db_session:
         # since authentication is required to access view this information is guaranteed to be in session
         profile = session["profile"]
         user = (
