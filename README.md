@@ -29,7 +29,8 @@ aspen% . .venv/bin/activate
 
 ```bash
 (.venv) aspen% npm --prefix src/ts start
-(.venv) aspen% export FLASK_APP=aspen.app
+(.venv) aspen% export AWS_REGION=us-west-2
+(.venv) aspen% export FLASK_APP=aspen.main
 (.venv) aspen% export FLASK_ENV=development
 (.venv) aspen% cd src/py
 (.venv) aspen% flask run --host localhost --port 3000  # host and port needed for auth0

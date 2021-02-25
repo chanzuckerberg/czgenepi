@@ -1,22 +1,45 @@
-from .config import Config, DatabaseConfig
+import uuid
+from functools import lru_cache
+from typing import Any, Mapping
+
+from ..database.connection import init_db, SqlAlchemyInterface
+from .config import Config, DatabaseConfig, SecretsConfig
 
 
 class DevelopmentConfig(Config, descriptive_name="dev"):
+    def __init__(self):
+        self.secretsconfig = SecretsConfig()
+
     @property
-    def DEBUG(self):
+    def DATABASE_CONFIG(self) -> DatabaseConfig:
+        return DevelopmentDatabaseConfig()
+
+    @property
+    def _AWS_SECRET(self) -> Mapping[str, Any]:
+        return self.secretsconfig.AWS_SECRET
+
+    @property
+    def DEBUG(self) -> bool:
         return True
 
     @property
-    def DATABASE_CONFIG(self):
-        return DevelopmentDatabaseConfig()
+    def SECRET_KEY(self) -> str:
+        return uuid.uuid4().hex
+
+    @property
+    def AUTH0_CALLBACK_URL(self) -> str:
+        return "http://localhost:3000/callback"
 
 
 class DevelopmentDatabaseConfig(DatabaseConfig):
     @property
-    def URI(self):
+    def URI(self) -> str:
         return "postgresql://user_rw:password_rw@localhost:5432/aspen_db"
 
+    @lru_cache()
+    def _INTERFACE(self) -> SqlAlchemyInterface:
+        return init_db(self.URI)
+
     @property
-    def SEND_FILE_MAX_AGE_DEFAULT(self):
-        """Ensures that latest static assets are read during frontend dev work."""
-        return 0
+    def INTERFACE(self) -> SqlAlchemyInterface:
+        return self._INTERFACE()

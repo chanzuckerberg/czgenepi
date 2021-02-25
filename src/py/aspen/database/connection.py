@@ -1,9 +1,13 @@
+from __future__ import annotations
+
 from contextlib import contextmanager
+from typing import TYPE_CHECKING
 
 from sqlalchemy.engine import create_engine, Engine
 from sqlalchemy.orm import Session, sessionmaker
 
-from aspen.config.config import Config
+if TYPE_CHECKING:
+    from aspen.config.config import Config
 
 
 class SqlAlchemyInterface:

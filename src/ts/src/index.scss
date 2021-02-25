@@ -1,16 +1,12 @@
-// In the future, this imported scss could be part of a library.
-@import "common/styles/theme.scss";
-
-:root {
-    @include theme-colors;
-    @include theme-elements;
-    @include theme-typography;
-}
-
 // Override some browser CSS defaults with better defaults.
 body {
     margin: 0;
     padding: 0;
+}
+
+div {
+    display: flex;
+    flex: 1 1 auto;
 }
 
 *,

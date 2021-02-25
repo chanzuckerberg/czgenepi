@@ -1,17 +1,84 @@
-.menu {
-    padding-left: 1em;
-}
+@import "common/styles/colors";
+@import "common/styles/spacing";
+@import "common/styles/typography";
 
-.user {
-    font-family: 'Open Sans', sans-serif;
-    font-size: 1.3em;
-    font-weight: normal;
-    letter-spacing: 0.1em;
-    fill: white;
-}
+.bar {
+    background-color: $black;
 
-.verticalLine {
-    border-left: 0.1em solid white;
-    height: auto;
-    margin: 0.5em 0 0.5em 0;
+    .contentArea {
+        margin: 0 $space-xxl 0 $space-xxl;
+
+        .left {
+            justify-content: flex-start;
+        }
+        .center {
+            justify-content: center;
+        }
+        .right {
+            justify-content: flex-end;
+        }
+
+        .left,
+        .center,
+        .right {
+            div {
+                flex: 0 1 auto;
+            }
+        }
+
+        .item {
+            height: 100%;
+            padding: $space-l $space-l $space-l $space-l;
+            font-family: $font-family-primary;
+            color: $white;
+            align-items: center;
+
+            a {
+                color: $white;
+            }
+        }
+
+        .logo {
+            height: 100%;
+        }
+
+        .seperator {
+            border-left: $space-xxxs solid $white;
+            margin: $space-l 0 $space-l 0;
+        }
+
+        .org {
+            @include font-header-xl;
+        }
+
+        .link {
+            @include font-header-m;
+
+            &:hover {
+                background-color: $gray-darkest;
+            }
+
+            &:active {
+                background-color: $gray-dark;
+            }
+        }
+
+        .dropdownMenu {
+            margin: $space-s;
+
+            .dropdownLink {
+                @include font-body-m;
+                color: $black;
+                padding: $space-s $space-xxl $space-s $space-xl;
+
+                &:hover {
+                    background-color: $gray-off-white;
+                }
+
+                &:active {
+                    background-color: $white;
+                }
+            }
+        }
+    }
 }

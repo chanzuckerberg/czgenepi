@@ -1,11 +1,18 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from sqlalchemy import Column, ForeignKey, Integer, String, UniqueConstraint
 
 from .entity import Entity, EntityType
 from .workflow import Workflow, WorkflowType
 
+if TYPE_CHECKING:
+    from .sequences import SequencingReadsCollection
 
-class HostFilteredSequencingRead(Entity):
-    __tablename__ = "host_filtered_sequencing_reads"
+
+class HostFilteredSequencingReadsCollection(Entity):
+    __tablename__ = "host_filtered_sequencing_reads_collections"
     __table_args__ = (UniqueConstraint("s3_bucket", "s3_key"),)
     __mapper_args__ = {"polymorphic_identity": EntityType.HOST_FILTERED_SEQUENCE_READS}
 
@@ -13,6 +20,16 @@ class HostFilteredSequencingRead(Entity):
 
     s3_bucket = Column(String, nullable=False)
     s3_key = Column(String, nullable=False)
+
+    @property
+    def sequencing_read(self) -> SequencingReadsCollection:
+        """The raw gisaid dump this processed gisaid dump was generated from."""
+        # this import has to be here for circular dependencies reasons. :(
+        from .sequences import SequencingReadsCollection
+
+        parents = self.get_parents(SequencingReadsCollection)
+        assert len(parents) == 1
+        return parents[0]
 
 
 class FilterRead(Workflow):

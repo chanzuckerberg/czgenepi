@@ -1,16 +1,15 @@
+@import "common/styles/spacing";
+
 .app {
-    display: flex;
     flex-flow: column wrap;
-    align-content: flex-start;
+    justify-content: center;
 
     .navBar {
-
+        min-height: 4em;
+        max-height: 20%;
     }
 
-    // TODO: Find better way to work with NavBar
     .view {
-        margin: 4em 1em 4em 1em;
-        height: 100%;
-        width: 100%;
+        margin: $space-s;
     }
 }

@@ -1,9 +1,12 @@
+from __future__ import annotations
+
 import enum
+from typing import MutableSequence, Sequence, TYPE_CHECKING
 
 import enumtables
 from sqlalchemy import (
     Column,
-    DateTime,
+    Date,
     Float,
     ForeignKey,
     Integer,
@@ -15,7 +18,12 @@ from sqlalchemy.orm import backref, relationship
 from .base import base
 from .entity import Entity, EntityType
 from .enum import Enum
-from .physical_sample import PhysicalSample
+from .mixins import DictMixin
+from .sample import Sample
+from .workflow import Workflow, WorkflowType
+
+if TYPE_CHECKING:
+    from .host_filtering import HostFilteredSequencingReadsCollection
 
 
 class SequencingInstrumentType(enum.Enum):
@@ -83,14 +91,14 @@ _SequencingProtocolTypeTable = enumtables.EnumTable(
 )
 
 
-class SequencingReads(Entity):
-    __tablename__ = "sequencing_reads"
+class SequencingReadsCollection(Entity, DictMixin):
+    __tablename__ = "sequencing_reads_collections"
     __table_args__ = (UniqueConstraint("s3_bucket", "s3_key"),)
     __mapper_args__ = {"polymorphic_identity": EntityType.SEQUENCING_READS}
 
     entity_id = Column(Integer, ForeignKey(Entity.id), primary_key=True)
-    physical_sample_id = Column(Integer, ForeignKey(PhysicalSample.id), nullable=False)
-    physical_sample = relationship(PhysicalSample, backref=backref("sequencing_reads"))
+    sample_id = Column(Integer, ForeignKey(Sample.id), nullable=False)
+    sample = relationship(Sample, backref=backref("sequencing_reads_collection"))
 
     sequencing_instrument = Column(
         Enum(SequencingInstrumentType),
@@ -106,7 +114,22 @@ class SequencingReads(Entity):
     s3_bucket = Column(String, nullable=False)
     s3_key = Column(String, nullable=False)
 
-    sequencing_date = Column(DateTime)
+    sequencing_date = Column(Date)
+
+    @property
+    def host_filtered_sequencing_reads(
+        self,
+    ) -> Sequence[HostFilteredSequencingReadsCollection]:
+        # this import has to be here for circular dependencies reasons. :(
+        from .host_filtering import HostFilteredSequencingReadsCollection
+
+        results: MutableSequence[HostFilteredSequencingReadsCollection] = list()
+        for workflow, entities in self.get_children(
+            HostFilteredSequencingReadsCollection
+        ):
+            results.extend(entities)
+
+        return results
 
 
 class PathogenGenome(Entity):
@@ -116,9 +139,28 @@ class PathogenGenome(Entity):
     sequence = Column(String, nullable=False)
 
     # statistics for the pathogen genome
-    num_unambiguous_sites = Column(Integer, nullable=False)
-    num_n = Column(Integer, nullable=False)
-    num_mixed = Column(Integer, nullable=False)
+
+    num_unambiguous_sites = Column(
+        Integer, nullable=False, comment="Number of sites with allele A, C, T, or G"
+    )
+
+    num_missing_alleles = Column(
+        Integer,
+        nullable=False,
+        comment=(
+            "Number of sites with N, the missing allele,"
+            " typically indicating low depth"
+        ),
+    )
+
+    num_mixed = Column(
+        Integer,
+        nullable=False,
+        comment=(
+            "Number of sites with an ambiguous allele, e.g. M, K, Y, etc.,"
+            " indicating support for 2 or more alleles in the reads."
+        ),
+    )
 
 
 class UploadedPathogenGenome(PathogenGenome):
@@ -128,10 +170,8 @@ class UploadedPathogenGenome(PathogenGenome):
     pathogen_genome_id = Column(
         Integer, ForeignKey(PathogenGenome.entity_id), primary_key=True
     )
-    physical_sample_id = Column(Integer, ForeignKey(PhysicalSample.id), nullable=False)
-    physical_sample = relationship(
-        PhysicalSample, backref=backref("uploaded_pathogen_genome")
-    )
+    sample_id = Column(Integer, ForeignKey(Sample.id), nullable=False)
+    sample = relationship(Sample, backref=backref("uploaded_pathogen_genome"))
 
     sequencing_depth = Column(Float)
 
@@ -143,3 +183,10 @@ class CalledPathogenGenome(PathogenGenome):
     pathogen_genome_id = Column(
         Integer, ForeignKey(PathogenGenome.entity_id), primary_key=True
     )
+
+
+class CallConsensus(Workflow):
+    __tablename__ = "call_consensus_workflows"
+    __mapper_args__ = {"polymorphic_identity": WorkflowType.CALL_CONSENSUS}
+
+    workflow_id = Column(Integer, ForeignKey(Workflow.id), primary_key=True)

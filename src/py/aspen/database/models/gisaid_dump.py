@@ -21,7 +21,7 @@ class RawGisaidDump(Entity):
     __mapper_args__ = {"polymorphic_identity": EntityType.RAW_GISAID_DUMP}
 
     @property
-    def processed_gisaid_dump(self) -> Sequence[ProcessedGisaidDump]:
+    def processed_gisaid_dumps(self) -> Sequence[ProcessedGisaidDump]:
         """A sequence of processed gisaid dumps generated from this raw gisaid dump."""
         results: MutableSequence[ProcessedGisaidDump] = list()
         for workflow, entities in self.get_children(ProcessedGisaidDump):

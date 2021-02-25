@@ -1,14 +1,54 @@
-## Setup Auth0:
+## AWS setup
 
-you will need to have a specific `.env` file to read in `AUTH0` variables (place this file in `src/py/covidr`), ask project leads for this file, there will be different `.env` files for local development, staging, and production. 
+### Staging setup
 
-if deploying to a custom staging environment change this variable in the .env file:
+#### AWS Secret
 
-`AUTH0_CALLBACK_URL="http://<custom-staging-env-name>.us-west-2.elasticbeanstalk.com/callback"`
+Create a secret called `aspen-auth0` with the following contents:
+```json
+{
+  "AUTH0_DOMAIN": "<MY_DOMAIN_HERE>.auth0.com",
+  "AUTH0_CLIENT_ID": "<AUTH0_CLIENT_HERE>",
+  "AUTH0_CLIENT_SECRET": "<AUTH0_CLIENT_SECRET_HERE>"
+}
+```
 
-if you are new to working on covidr ask a project lead to ask your eb staging env to the list of allowed callbacks in Auth0. 
+Take note of the ARN of the created secret, which will be needed in the next step.
 
-## Deployment of the python web services
+#### IAM setup
+
+Create an AWS IAM policy with the following rules, and name it `aspen-elasticbeanstalk-ec2-policies`.
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": "ec2:DescribeTags",
+            "Resource": "*"
+        },
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": "secretsmanager:GetSecretValue",
+            "Resource": [
+                "<ARN_FOR_SECRET>"
+            ]
+        }
+    ]
+}
+```
+
+Then create an AWS IAM role, naming it `aspen-elasticbeanstalk-ec2-role`, attaching the following policies:
+
+1. AWSElasticBeanstalkWebTier
+1. AWSElasticBeanstalkMulticontainerDocker
+1. AWSElasticBeanstalkWorkerTier
+1. aspen-elasticbeanstalk-ec2-policies
+
+## Deploying the python web services
 
 Because the [AWS Elastic Beanstalk CLI](https://github.com/aws/aws-elastic-beanstalk-cli) depends on libraries that conflict with the libraries required by our development workflow, it is recommended to install the AWS EB CLI tools in a separate virtual environment.
 
@@ -25,8 +65,11 @@ aspen% .venv-ebcli/bin/eb init --region=us-west-2 --platform python-3.7 aspen
 ```
 3. Pick a reasonable identifier for your target deployment environment, such as aspen-<your-user-name>.  Create the environment if you haven't done so before.  This will deploy the code as well, so if you are doing this step, skip the next one.
 ```bash
-aspen% .venv-ebcli/bin/eb create aspen-myusername --cname aspen-myusername
+aspen% .venv-ebcli/bin/eb create aspen-<my_username> --cname aspen-<my_username> --envvars AWS_REGION=us-west-2,FLASK_ENV=staging --instance_profile aspen-elasticbeanstalk-ec2-role
 ```
+
+If you want ssh access to the EC2 servers, add a ssh keypair using the EC2 console and add `-k <keyname>` to your `eb create` command.
+
 4. If you have already created an environment in the past, just updating the existing deployment environment.
 ```bash
 aspen% .venv-ebcli/bin/eb deploy aspen-myusername

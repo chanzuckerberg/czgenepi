@@ -5,7 +5,7 @@ Table Group {
   id INT [pk, increment]
   name VARCHAR [not null, unique]
   email VARCHAR [not null, unique]
-  address VARCHAR [not null, unique]
+  address VARCHAR // required only for repository submission. feasible that there are multiple labs at the same address.
 }
 
 Table User {
@@ -26,7 +26,8 @@ Table TypeOfData {
   // Types of data people can view.  This table should be pre-populated with at least the following entries:
   //  1. Trees
   //  2. Sequences
-  //  3. Metadata
+  //  3. Metadata (other than private identifiers)
+  //  4. Private identifiers
   id INT [pk, increment]
   name VARCHAR [not null]
 }
@@ -44,59 +45,33 @@ Table GroupCanSee {
 
 
 ///////////////////////////////////////////////////
-// Physical Samples
+// Samples
 
-Table PhysicalSample {
+Table Sample {
   id INT [pk, increment]
   submitting_group_id INT [not null, ref: > Group.id]
-  private_identifier VARCHAR [not null]
+  private_identifier VARCHAR [not null]  // ideally this is the same as specimen_collector_sample_id noted below, but many DPHs will not be comfortable sharing these
 
   original_submission JSONB [not null]
 
   // This is the public identifier we assign to this sample.  The identifier assigned by the public repositories is
   // stored on the related Accession objects.
-  public_identifer VARCHAR [not null, unique]              // maps to specimen_collector_sample_id and isolate
+  public_identifer VARCHAR [not null, unique]              // maps to isolate, force format to pathogen/country/specimen_collector_sample_id/year, e.g., USA/CZB-1234/2020
 
-  // TODO: (sidneymbell) going to see if these are necessary.
-  // collector VARCHAR [not null]                             // maps to sample_collected_by
-  // collector_email VARCHAR                                  // maps to sample_collector_contact_email
-  // collector_address VARCHAR                                // maps to sample_collector_contact_address
-  // sequencer VARCHAR                                        // maps to sequence_submitted_by
-  // sequencer_email VARCHAR                                  // maps to sequence_submitter_contact_email
-  // sequencer_address VARCHAR                                // maps to sequence_submitter_contact_address
+  sample_collected_by VARCHAR [not null]                   // maps to sample_collected_by
+  sample_collector_contact_email VARCHAR                   // maps to sample_collector_contact_email
+  sample_collector_contact_address VARCHAR                 // maps to sample_collector_contact_address
+  authors JSONB
 
-  collection_date DATETIME [not null]                      // maps to sample_collection_date
+  collection_date DATE [not null]                          // maps to sample_collection_date
   location VARCHAR [not null]
   division VARCHAR [not null]                              // maps to geo_loc_name_state_province_region
   country VARCHAR [not null]                               // maps to geo_loc_name_country
-  country_residence VARCHAR                                // maps to host_origin_geo_loc_country
-  country_exposure VARCHAR                                 // maps to location_of_exposure_geo_loc_name_country
-  travel_history VARCHAR                                   // maps to travel_history
 
   organism VARCHAR [not null]                              // maps to organism
-  purpose_of_sampling VARCHAR                              // maps to purpose_of_sampling
-  anatomical_material VARCHAR                              // maps to anatomical_material
-  anatomical_part VARCHAR                                  // maps to anatomical_part
-  body_product VARCHAR                                     // maps to body_product
-  environmental_material VARCHAR                           // maps to environmental_material
-  environmental_site VARCHAR                               // maps to environmental_site
-  collection_device VARCHAR                                // maps to collection_device
-  collection_method VARCHAR                                // maps to collection_method
-  collection_protocol VARCHAR                              // maps to collection_protocol
+  host VARCHAR                                             // maps to host_common_name (default to human)
+  purpose_of_sampling VARCHAR                              // maps to purpose_of_sampling pull pick-list values from ph4ge (can be in UI)
   specimen_processing VARCHAR                              // maps to specimen_processing
-  lab_host VARCHAR                                         // maps to lab_host
-  passage_number VARCHAR                                   // maps to passage_number
-  passage_method VARCHAR                                   // maps to passage_method
-  biomaterial_extracted VARCHAR                            // maps to biomaterial_extracted
-  host_common_name VARCHAR                                 // maps to host_common_name
-  host_scientific_name VARCHAR                             // maps to host_scientific_name
-  host_health_state VARCHAR                                // maps to host_health_state
-  host_health_status_details VARCHAR                       // maps to host_health_status_details
-  host_disease VARCHAR                                     // maps to host_disease
-
-  symptom_onset_date DATETIME                              // maps to symptom_onset_date
-  signs_and_symptoms VARCHAR                               // maps to signs_and_symptoms
-  exposure_event VARCHAR                                   // maps to exposure_event
 
   Indexes {
     (submitting_group_id, private_identifier) [unique]
@@ -172,11 +147,12 @@ Table SequencingProtocol {
 }
 
 // describes a single set of sequence data from the sequencer. (FASTQ)
-Table SequencingReads {
+// these should be replaced by the `HostFilteredSequenceRead` as soon as it is available so we are not storing any host reads
+Table SequencingReadsCollection {
   id INT [pk, increment]
   entity_id INT [not null, unique, ref: - Entity.id]
 
-  physical_sample_id INT [not null, unique, ref: - PhysicalSample.id]
+  sample_id INT [not null, unique, ref: - Sample.id]
   s3_bucket VARCHAR [not null]
   s3_key VARCHAR [not null]
 
@@ -184,7 +160,7 @@ Table SequencingReads {
   sequencing_protocol_id INT [not null, ref: > SequencingProtocol.id]
 
   // sequencing date is optional, but sample collection date should not be.
-  sequencing_date FLOAT
+  sequencing_date DATE
 
   Indexes {
     (s3_bucket, s3_key) [unique]
@@ -208,9 +184,9 @@ Table PathogenGenome {
 // describes a single sequence that was uploaded to the system directly.
 Table UploadedPathogenGenome {
   pathogen_genome_id INT [not null, unique, ref: - PathogenGenome.id]
-  physical_sample_id INT [not null, unique, ref: - PhysicalSample.id]
+  sample_id INT [not null, unique, ref: - Sample.id]
 
-  // optional field for gisaid submission, we'd like to get users to provide this.
+  // optional field for gisaid submission, we would like to get users to provide this.
   sequencing_depth FLOAT
 }
 
@@ -224,7 +200,7 @@ Table CalledPathogenGenome {
 
 // TODO: @jackkamm do the BAM/SRA records need to store any metrics?
 
-Table HostFilteredSequenceRead {
+Table HostFilteredSequenceReadCollection {
   id INT [pk, increment]
   entity_id INT [not null, unique, ref: - Entity.id]
 
