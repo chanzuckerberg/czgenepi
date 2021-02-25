@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Optional, TYPE_CHECKING
+
 from sqlalchemy import (
     Column,
     Date,
@@ -14,6 +18,9 @@ from sqlalchemy.orm import backref, relationship
 from .base import idbase
 from .mixins import DictMixin
 from .usergroup import Group
+
+if TYPE_CHECKING:
+    from .sequences import SequencingReadsCollection, UploadedPathogenGenome
 
 
 class Sample(idbase, DictMixin):
@@ -157,3 +164,6 @@ class Sample(idbase, DictMixin):
             }
         },
     )
+
+    sequencing_reads: Optional[SequencingReadsCollection]
+    uploaded_pathogen_genome: Optional[UploadedPathogenGenome]

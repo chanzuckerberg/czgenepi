@@ -97,8 +97,11 @@ class SequencingReadsCollection(Entity, DictMixin):
     __mapper_args__ = {"polymorphic_identity": EntityType.SEQUENCING_READS}
 
     entity_id = Column(Integer, ForeignKey(Entity.id), primary_key=True)
-    sample_id = Column(Integer, ForeignKey(Sample.id), nullable=False)
-    sample = relationship(Sample, backref=backref("sequencing_reads_collection"))
+    sample_id = Column(Integer, ForeignKey(Sample.id), unique=True, nullable=False)
+    sample = relationship(
+        Sample,
+        backref=backref("sequencing_reads_collection", uselist=False),
+    )
 
     sequencing_instrument = Column(
         Enum(SequencingInstrumentType),
@@ -170,8 +173,11 @@ class UploadedPathogenGenome(PathogenGenome):
     pathogen_genome_id = Column(
         Integer, ForeignKey(PathogenGenome.entity_id), primary_key=True
     )
-    sample_id = Column(Integer, ForeignKey(Sample.id), nullable=False)
-    sample = relationship(Sample, backref=backref("uploaded_pathogen_genome"))
+    sample_id = Column(Integer, ForeignKey(Sample.id), unique=True, nullable=False)
+    sample = relationship(
+        Sample,
+        backref=backref("uploaded_pathogen_genome", uselist=False),
+    )
 
     sequencing_depth = Column(Float)
 
