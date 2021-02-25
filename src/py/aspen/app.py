@@ -26,16 +26,15 @@ if flask_env == "staging":
     application.config.from_object(StagingConfig())
 
 if flask_env in ("production", "development", "staging"):
-    auth0_config = application.config["AUTH0_CONFIG"]
     oauth = OAuth(application)
     auth0 = oauth.register(
         "auth0",
-        client_id=auth0_config.AUTH0_CLIENT_ID,
-        client_secret=auth0_config.AUTH0_CLIENT_SECRET,
-        api_base_url=auth0_config.AUTH0_BASE_URL,
-        access_token_url=auth0_config.ACCESS_TOKEN_URL,
-        authorize_url=auth0_config.AUTHORIZE_URL,
-        client_kwargs=auth0_config.CLIENT_KWARGS,
+        client_id=application.config["AUTH0_CLIENT_ID"],
+        client_secret=application.config["AUTH0_CLIENT_SECRET"],
+        api_base_url=application.config["AUTH0_BASE_URL"],
+        access_token_url=application.config["AUTH0_ACCESS_TOKEN_URL"],
+        authorize_url=application.config["AUTH0_AUTHORIZE_URL"],
+        client_kwargs=application.config["AUTH0_CLIENT_KWARGS"],
     )
 
 
@@ -81,7 +80,9 @@ def callback_handling():
 
 @application.route("/login")
 def login():
-    return auth0.authorize_redirect(redirect_uri=auth0_config.AUTH0_CALLBACK_URL)
+    return auth0.authorize_redirect(
+        redirect_uri=application.config["AUTH0_CALLBACK_URL"]
+    )
 
 
 @application.route("/logout")
@@ -91,7 +92,7 @@ def logout():
     # Redirect user to logout endpoint
     params = {
         "returnTo": url_for("serve", _external=True),
-        "client_id": auth0_config.AUTH0_CLIENT_ID,
+        "client_id": application.config["AUTH0_CLIENT_ID"],
     }
     return redirect(auth0.api_base_url + "/v2/logout?" + urlencode(params))
 
