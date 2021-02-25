@@ -37,7 +37,7 @@ class PublicRepository(idbase):
     website = Column(String, nullable=False, unique=True)
 
 
-class Accession(base):
+class Accession(idbase):
     """A single accession of an entity."""
 
     __tablename__ = "accessions"
@@ -46,7 +46,7 @@ class Accession(base):
     entity_id = Column(
         Integer,
         ForeignKey(Entity.id),
-        primary_key=True,
+        nullable=False,
     )
     entity = relationship(Entity, backref=backref("accessions", uselist=True))
 
