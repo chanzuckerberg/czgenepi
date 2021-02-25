@@ -1,8 +1,6 @@
 import React, { FunctionComponent } from "react";
 import { Table } from "semantic-ui-react";
 
-import { get } from "common/utils";
-
 import style from "./index.module.scss";
 
 type Props = {
@@ -11,12 +9,12 @@ type Props = {
 
 const TABLE_HEADERS: Array<Record<string, string>> = [
     { text: "Private ID", key: "privateId" },
-    { text: "Public ID" , key : "publicId" },
+    { text: "Public ID", key: "publicId" },
     { text: "Upload Date", key: "uploadDate" },
     { text: "Collection Date", key: "collectionDate" },
     { text: "Collection Location", key: "collectionLocation" },
     { text: "GISAID", key: "gisaid" },
-]
+];
 
 const dummySamples: Array<Sample> = [
     {
@@ -36,35 +34,40 @@ const dummySamples: Array<Sample> = [
         collectionDate: "12/12/2020",
         collectionLocation: "Santa Clara County",
         gisaid: "Accepted",
-    }
-]
+    },
+];
 
-const Samples: FunctionComponent<Props> = ({ data = dummySamples }) => {
-
-    const headerRow = TABLE_HEADERS.map(column => <Table.HeaderCell key={column.key}><span className={style.header}>{column.text}</span></Table.HeaderCell>)
+const Samples: FunctionComponent<Props> = ({ data = dummySamples }: Props) => {
+    const headerRow = TABLE_HEADERS.map((column) => (
+        <Table.HeaderCell key={column.key}>
+            <span className={style.header}>{column.text}</span>
+        </Table.HeaderCell>
+    ));
 
     const sampleRow = (sample: Sample): Array<JSX.Element> => {
-        return TABLE_HEADERS.map(column => <Table.Cell key={`${sample.privateId}-${column.key}`}>{sample[column.key as keyof Sample]}</Table.Cell>)
-    }
+        return TABLE_HEADERS.map((column) => (
+            <Table.Cell key={`${sample.privateId}-${column.key}`}>
+                {sample[column.key as keyof Sample]}
+            </Table.Cell>
+        ));
+    };
 
     const tableRows = (samples: Array<Sample>): Array<JSX.Element> => {
-        return samples.map(sample => <Table.Row>{sampleRow(sample)}</Table.Row>)
-    }
+        return samples.map((sample) => (
+            <Table.Row key={sample.privateId}>{sampleRow(sample)}</Table.Row>
+        ));
+    };
 
     return (
         <div className={style.samplesRoot}>
             <Table basic="very" singleline>
                 <Table.Header>
-                    <Table.Row>
-                        {headerRow}
-                    </Table.Row>
+                    <Table.Row>{headerRow}</Table.Row>
                 </Table.Header>
-                <Table.Body>
-                    {tableRows(data)}
-                </Table.Body>
+                <Table.Body>{tableRows(data)}</Table.Body>
             </Table>
         </div>
-    )
-}
+    );
+};
 
 export default Samples;

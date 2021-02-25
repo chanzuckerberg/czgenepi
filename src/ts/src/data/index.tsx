@@ -22,13 +22,13 @@ const Data: FunctionComponent<Props> = ({
             to: "/data/samples",
             text: "Samples",
             data: samples,
-            component: <Samples />
+            component: <Samples />,
         },
         {
             to: "/data/phylogenetic_trees",
             text: "Phylogenetic Trees",
             data: trees,
-            component: undefined
+            component: undefined,
         },
     ];
 
@@ -51,13 +51,13 @@ const Data: FunctionComponent<Props> = ({
             </Link>
         );
 
-        let categoryView: (() => JSX.Element) = () => {
+        const categoryView: () => JSX.Element = () => {
             if (category.component === undefined) {
-                return (<div>{category.text}</div>)
+                return <div>{category.text}</div>;
             } else {
-                return category.component
+                return category.component;
             }
-        }
+        };
 
         dataJSX.routes.push(
             <Route
