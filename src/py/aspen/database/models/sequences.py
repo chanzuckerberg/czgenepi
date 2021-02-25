@@ -18,6 +18,7 @@ from sqlalchemy.orm import backref, relationship
 from .base import base
 from .entity import Entity, EntityType
 from .enum import Enum
+from .mixins import DictMixin
 from .sample import Sample
 from .workflow import Workflow, WorkflowType
 
@@ -90,7 +91,7 @@ _SequencingProtocolTypeTable = enumtables.EnumTable(
 )
 
 
-class SequencingReadsCollection(Entity):
+class SequencingReadsCollection(Entity, DictMixin):
     __tablename__ = "sequencing_reads_collections"
     __table_args__ = (UniqueConstraint("s3_bucket", "s3_key"),)
     __mapper_args__ = {"polymorphic_identity": EntityType.SEQUENCING_READS}

@@ -1,5 +1,13 @@
+from datetime import datetime
+
 import pytest
 
+from aspen.database.models.sample import Sample
+from aspen.database.models.sequences import (
+    SequencingInstrumentType,
+    SequencingProtocolType,
+    SequencingReadsCollection,
+)
 from aspen.database.models.usergroup import Group, User
 
 
@@ -24,3 +32,38 @@ def user(session, group) -> User:
     session.add(user)
     session.commit()
     return user
+
+
+@pytest.fixture(scope="function")
+def sample(session, group):
+    sample = Sample(
+        submitting_group=group,
+        private_identifier="private_identifer",
+        original_submission={},
+        public_identifier="public_identifier",
+        collection_date=datetime.now(),
+        sample_collected_by="sample_collector",
+        sample_collector_contact_address="sample_collector_address",
+        location="Santa Clara County",
+        division="California",
+        country="USA",
+        organism="SARS-CoV-2",
+    )
+    session.add(sample)
+    session.commit()
+    return sample
+
+
+@pytest.fixture(scope="function")
+def sequencing_read(session, sample):
+    sequencing_reads = SequencingReadsCollection(
+        sample=sample,
+        sequencing_instrument=SequencingInstrumentType.ILLUMINA_GENOME_ANALYZER_IIX,
+        sequencing_protocol=SequencingProtocolType.ARTIC_V3,
+        sequencing_date=datetime.now(),
+        s3_bucket="bucket",
+        s3_key="key",
+    )
+    session.add(sequencing_reads)
+    session.commit()
+    return sequencing_reads
