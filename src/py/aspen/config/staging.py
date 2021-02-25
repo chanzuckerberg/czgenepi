@@ -4,7 +4,7 @@ from typing import Any, Mapping
 
 from aspen import aws
 
-from .config import Config, DatabaseConfig, SecretsConfig
+from .config import Config, DatabaseConfig, flaskproperty, SecretsConfig
 
 logger = logging.getLogger(__name__)
 
@@ -21,11 +21,11 @@ class StagingConfig(Config, descriptive_name="staging"):
     def DATABASE_CONFIG(self) -> DatabaseConfig:
         return StagingDatabaseConfig()
 
-    @property
+    @flaskproperty
     def DEBUG(self) -> bool:
         return True
 
-    @property
+    @flaskproperty
     def SECRET_KEY(self) -> str:
         return uuid.uuid4().hex
 

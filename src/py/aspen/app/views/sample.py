@@ -12,7 +12,9 @@ from aspen.database.models.usergroup import Group, User
 @requires_auth
 def samples():
 
-    with session_scope(application.config["DATABASE_CONFIG"].INTERFACE) as db_session:
+    with session_scope(
+        application.aspen_config.DATABASE_CONFIG.INTERFACE
+    ) as db_session:
         profile = session["profile"]
         sequencing_reads = (
             db_session.query(SequencingReadsCollection)
