@@ -1,7 +1,5 @@
 """change some dates to a date instead of a datetime
 
-Revision ID: 20210218_164249
-Revises: 20210212_105950
 Create Date: 2021-02-18 16:42:50.891582
 
 """

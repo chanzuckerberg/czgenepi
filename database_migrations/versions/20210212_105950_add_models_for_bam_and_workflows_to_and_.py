@@ -1,7 +1,5 @@
 """add models for bam and workflows to and from bam
 
-Revision ID: 20210212_105950
-Revises: 20210218_175604
 Create Date: 2021-02-12 10:59:51.519941
 
 """

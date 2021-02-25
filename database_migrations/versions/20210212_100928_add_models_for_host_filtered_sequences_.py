@@ -1,7 +1,5 @@
 """add models for host filtered sequences and workflow
 
-Revision ID: 20210212_100928
-Revises: 20210210_232422
 Create Date: 2021-02-12 10:09:29.296192
 
 """

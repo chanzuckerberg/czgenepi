@@ -1,7 +1,5 @@
 """update statistics for pathogen genome
 
-Revision ID: 20210216_114729
-Revises: 20210212_100928
 Create Date: 2021-02-16 11:47:30.766109
 
 """

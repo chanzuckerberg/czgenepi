@@ -1,7 +1,5 @@
 """add gisaid data models
 
-Revision ID: 20210210_132846
-Revises: 20210209_134758
 Create Date: 2021-02-10 13:28:47.455763
 
 """

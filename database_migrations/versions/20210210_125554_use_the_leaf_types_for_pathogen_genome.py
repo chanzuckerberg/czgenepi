@@ -1,7 +1,5 @@
 """use the leaf types for pathogen_genome
 
-Revision ID: 20210210_125554
-Revises: 20210210_132846
 Create Date: 2021-02-10 12:55:54.816436
 
 """

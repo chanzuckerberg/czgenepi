@@ -1,7 +1,5 @@
 """update samples table
 
-Revision ID: 20210218_110710
-Revises: 20210216_114729
 Create Date: 2021-02-18 11:07:11.896915
 
 """

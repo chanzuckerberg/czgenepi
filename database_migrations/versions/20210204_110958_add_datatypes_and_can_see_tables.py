@@ -1,7 +1,5 @@
 """add datatypes and can see tables
 
-Revision ID: 20210204_110958
-Revises: 20210204_104338
 Create Date: 2021-02-04 11:09:58.589711
 
 """

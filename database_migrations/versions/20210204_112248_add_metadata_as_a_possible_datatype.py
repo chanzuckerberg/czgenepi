@@ -1,7 +1,5 @@
 """add METADATA as a possible datatype
 
-Revision ID: 20210204_112248
-Revises: 20210204_110958
 Create Date: 2021-02-04 11:22:49.102647
 
 """

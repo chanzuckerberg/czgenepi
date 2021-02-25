@@ -1,7 +1,5 @@
 """add group and user models
 
-Revision ID: 20210115_112447
-Revises: 20210113_182045
 Create Date: 2021-01-15 11:24:48.165576
 
 """
