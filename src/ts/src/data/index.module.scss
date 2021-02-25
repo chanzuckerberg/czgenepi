@@ -12,24 +12,21 @@
             align-items: stretch;
             margin-left: 2em;
 
-            .container {
+            .menuItem {
+                height: 100%;
 
-                .menuItem {
-                    height: 100%;
+                .searchBar {
+                    margin: 0 6em 0 4em;
+                }
 
-                    .searchBar {
-                        margin: 0 6em 0 4em;
-                    }
+                .category {
+                    // height: 100%;
+                    margin-right: 2em;
 
-                    .category {
-                        // height: 100%;
-                        margin-right: 2em;
-
-                        .title {
-                            font-weight: bold;
-                            font-size: 1.1em;
-                            margin-right: 0.7em;
-                        }
+                    .title {
+                        font-weight: bold;
+                        font-size: 1.1em;
+                        margin-right: 0.7em;
                     }
                 }
             }

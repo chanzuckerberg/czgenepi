@@ -10,39 +10,42 @@ type Props = {
 };
 
 const Data: FunctionComponent<Props> = ({ samples = [], trees = [], children }) => {
+
+    // this constant is inside the component so we can associate
+    // each category with its respective variable.
+    const dataCategories = [
+        { to: "/data/samples", text: "Samples", data: samples },
+        { to: "/data/phylogenetic_trees", text: "Phylogenetic Trees", data: trees }
+    ]
+
+    const dataJSX: Record<string, Array<JSX.Element>> = { menuItems: [], routes: [] }
+
+    dataCategories.forEach(category => {
+        dataJSX.menuItems.push(
+            <Link to={category.to} key={category.text}>
+                <Menu.Item className={style.menuItem}>
+                    <div className={style.category}>
+                        <span className={style.title}>{category.text}</span>
+                        <span className={style.count}>{category.data.length}</span>
+                    </div>
+                </Menu.Item>
+            </Link>
+            );
+        dataJSX.routes.push(
+            <Route path={category.to} key={category.text} render={() => <div>{category.text}</div>}/>
+        )
+    })
+
     return (
         <div className={style.dataRoot}>
             <div className={style.navigation}>
                 <Menu className={style.menu} pointing secondary>
-                    <Container className={style.container} fluid>
-                        <Menu.Item className={style.menuItem}>
-                            <div className={style.searchBar}>
-                                <Search />
-                            </div>
-                        </Menu.Item>
-                        <Link to="/data/samples">
-                        <Menu.Item className={style.menuItem}>
-                            <div className={style.category}>
-                                <span className={style.title}>Samples</span>
-                                <span className={style.count}>{samples.length}</span>
-                            </div>
-                        </Menu.Item>
-                        </Link>
-                        <Link to="/data/trees">
-                        <Menu.Item className={style.menuItem}>
-                            <div className={style.category}>
-                                <span className={style.title}>Phylogenetic Trees</span>
-                                <span className={style.count}>{trees.length}</span>
-                            </div>
-                        </Menu.Item>
-                        </Link>
-                    </Container>
+                    {dataJSX.menuItems}
                 </Menu>
             </div>
             <div className={style.view}>
                 <Switch>
-                    <Route path="/data/samples" render={() => <div>Samples</div>}/>
-                    <Route path="/data/trees" render={() => <div>Phylogenetic Trees</div>}/>
+                    {dataJSX.routes}
                 </Switch>
             </div>
         </div>
