@@ -1,6 +1,8 @@
 import React, { FunctionComponent } from "react";
-import { Switch, Route, Link } from "react-router-dom";
+import { Switch, Route, Link, Redirect } from "react-router-dom";
 import { Menu } from "semantic-ui-react";
+
+import Samples from "./samples";
 
 import style from "./index.module.scss";
 
@@ -16,11 +18,17 @@ const Data: FunctionComponent<Props> = ({
     // this constant is inside the component so we can associate
     // each category with its respective variable.
     const dataCategories = [
-        { to: "/data/samples", text: "Samples", data: samples },
+        {
+            to: "/data/samples",
+            text: "Samples",
+            data: samples,
+            component: <Samples />,
+        },
         {
             to: "/data/phylogenetic_trees",
             text: "Phylogenetic Trees",
             data: trees,
+            component: undefined,
         },
     ];
 
@@ -42,11 +50,20 @@ const Data: FunctionComponent<Props> = ({
                 </Menu.Item>
             </Link>
         );
+
+        const categoryView: () => JSX.Element = () => {
+            if (category.component === undefined) {
+                return <div>{category.text}</div>;
+            } else {
+                return category.component;
+            }
+        };
+
         dataJSX.routes.push(
             <Route
                 path={category.to}
                 key={category.text}
-                render={() => <div>{category.text}</div>}
+                render={categoryView}
             />
         );
     });
@@ -59,7 +76,10 @@ const Data: FunctionComponent<Props> = ({
                 </Menu>
             </div>
             <div className={style.view}>
-                <Switch>{dataJSX.routes}</Switch>
+                <Switch>
+                    {dataJSX.routes}
+                    <Redirect from="/data" to="/data/samples" exact />
+                </Switch>
             </div>
         </div>
     );
