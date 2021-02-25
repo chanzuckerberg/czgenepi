@@ -1,7 +1,12 @@
 # Resolve the location of this file and set APP_HOME to the root
-SOURCE="${BASH_SOURCE[0]}"
-while [ -h "$SOURCE" ] ; do SOURCE="$(readlink "$SOURCE")"; done
-export APP_HOME="$(cd -P "$(dirname "$SOURCE")" && pwd)"
+# Resolve the location of this file and set APP_HOME to the root
+if [[ -n "$ZSH_VERSION" ]]; then
+    export APP_HOME=${0:A:h}
+else
+    SOURCE="${BASH_SOURCE[0]}"
+    while [ -h "$SOURCE" ] ; do SOURCE="$(readlink "$SOURCE")"; done
+    export APP_HOME="$(cd -P "$(dirname "$SOURCE")" && pwd)"
+fi
 
 set -a
 APP_NAME=aspen
