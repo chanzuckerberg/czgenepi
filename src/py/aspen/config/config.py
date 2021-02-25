@@ -84,6 +84,32 @@ class Config:
     def by_descriptive_name(cls, descriptive_name: str) -> Config:
         return Config._subclasses[descriptive_name]()
 
+    ####################################################################################
+    # AWS secrets
+    @lru_cache()
+    def _AWS_SECRET(self) -> Mapping[str, Any]:
+        # this extra level of indirection
+        # (Auth0Config.AWS_SECRET -> Auth0Config._AWS_SECRET()) is because of
+        # https://github.com/python/mypy/issues/1362
+        session = aws.session()
+
+        secret_name = os.environ.get("AUTH0_CONFIG_SECRET_NAME", "aspen-config")
+        client = session.client(service_name="secretsmanager")
+
+        try:
+            get_secret_value_response = client.get_secret_value(SecretId=secret_name)
+        except ClientError as e:
+            raise e
+        else:
+            secret = get_secret_value_response["SecretString"]
+            return json.loads(secret)
+
+    @property
+    def AWS_SECRET(self) -> Mapping[str, Any]:
+        return self._AWS_SECRET()
+
+    ####################################################################################
+    # flask properties
     def flask_properties(self) -> Mapping[str, Any]:
         """Get a mapping from method name to the value from calling the method, for all
         the methods that are annotated as @flaskproperty."""
@@ -103,20 +129,6 @@ class Config:
 
         return result
 
-    ####################################################################################
-    # secondary config objects.
-    @property
-    @abc.abstractmethod
-    def _AWS_SECRET(self) -> Mapping[str, Any]:
-        raise NotImplementedError()
-
-    @property
-    @abc.abstractmethod
-    def DATABASE_CONFIG(self) -> DatabaseConfig:
-        raise NotImplementedError()
-
-    ####################################################################################
-    # flask properties
     @flaskproperty
     def DEBUG(self) -> bool:
         return False
@@ -134,7 +146,7 @@ class Config:
     # auth0 properties
     @property
     def AUTH0_CLIENT_ID(self) -> str:
-        return self._AWS_SECRET["AUTH0_CLIENT_ID"]
+        return self.AWS_SECRET["AUTH0_CLIENT_ID"]
 
     @property
     def AUTH0_CALLBACK_URL(self) -> str:
@@ -142,11 +154,11 @@ class Config:
 
     @property
     def AUTH0_CLIENT_SECRET(self) -> str:
-        return self._AWS_SECRET["AUTH0_CLIENT_SECRET"]
+        return self.AWS_SECRET["AUTH0_CLIENT_SECRET"]
 
     @property
     def AUTH0_DOMAIN(self) -> str:
-        return self._AWS_SECRET["AUTH0_DOMAIN"]
+        return self.AWS_SECRET["AUTH0_DOMAIN"]
 
     @property
     def AUTH0_BASE_URL(self) -> str:
@@ -166,47 +178,18 @@ class Config:
             "scope": "openid profile email",
         }
 
-
-class SecretsConfig:
-    """This is to hold configuration fetched from AWS secrets."""
-
-    # this extra level of indirection
-    # (Auth0Config.AWS_SECRET -> Auth0Config._AWS_SECRET()) is because of
-    # https://github.com/python/mypy/issues/1362
-    @lru_cache()
-    def _AWS_SECRET(self) -> Mapping[str, Any]:
-        session = aws.session()
-
-        secret_name = os.environ.get("AUTH0_CONFIG_SECRET_NAME", "aspen-config")
-        client = session.client(service_name="secretsmanager")
-
-        try:
-            get_secret_value_response = client.get_secret_value(SecretId=secret_name)
-        except ClientError as e:
-            raise e
-        else:
-            secret = get_secret_value_response["SecretString"]
-            return json.loads(secret)
-
-    @property
-    def AWS_SECRET(self) -> Mapping[str, Any]:
-        return self._AWS_SECRET()
-
-
-class DatabaseConfig:
-    """This is for the database config.  Since not all the properties are defined in all
-    implementations, it must be a separate configuration object."""
-
+    ####################################################################################
+    # database properties
     @property
     # TODO: This should be an abstract method as well.
-    def URI(self) -> str:
+    def DATABASE_URI(self) -> str:
         raise NotImplementedError()
 
     @property
-    def READONLY_URI(self) -> str:
+    def DATABASE_READONLY_URI(self) -> str:
         raise NotImplementedError()
 
     @property
     # TODO: This should be an abstract method as well.
-    def INTERFACE(self) -> SqlAlchemyInterface:
+    def DATABASE_INTERFACE(self) -> SqlAlchemyInterface:
         raise NotImplementedError()
