@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from "react";
-import { Switch, Route, Link } from "react-router-dom";
+import { Switch, Route, Link, Redirect } from "react-router-dom";
 import { Menu } from "semantic-ui-react";
 
 import Samples from "./samples";
@@ -76,7 +76,10 @@ const Data: FunctionComponent<Props> = ({
                 </Menu>
             </div>
             <div className={style.view}>
-                <Switch>{dataJSX.routes}</Switch>
+                <Switch>
+                    {dataJSX.routes}
+                    <Redirect from="/data" to="/data/samples" exact />
+                </Switch>
             </div>
         </div>
     );
