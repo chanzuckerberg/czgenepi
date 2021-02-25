@@ -6,8 +6,7 @@ from aspen.main import application
 
 @pytest.fixture(scope="function")
 def app(postgres_database):
-    application.config.from_object(TestingConfig())
-    application.config["DATABASE_CONFIG"].URI = postgres_database.as_uri()
+    application._inject_config(TestingConfig(postgres_database.as_uri()))
     yield application
 
 

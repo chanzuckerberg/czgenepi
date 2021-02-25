@@ -7,6 +7,9 @@ from .config import Config, DatabaseConfig
 
 
 class TestingConfig(Config, descriptive_name="test"):
+    def __init__(self, db_uri):
+        self.db_uri = db_uri
+
     @property
     def _AWS_SECRET(self) -> Mapping[str, Any]:
         return {
@@ -17,7 +20,7 @@ class TestingConfig(Config, descriptive_name="test"):
 
     @property
     def DATABASE_CONFIG(self):
-        return TestingDatabaseConfig()
+        return TestingDatabaseConfig(self.db_uri)
 
     @property
     def TESTING(self):
@@ -33,16 +36,12 @@ class TestingConfig(Config, descriptive_name="test"):
 
 
 class TestingDatabaseConfig(DatabaseConfig):
-    def __init__(self):
-        self._uri = None
+    def __init__(self, db_uri):
+        self.db_uri = db_uri
 
     @property
     def URI(self):
-        return self._uri
-
-    @URI.setter
-    def URI(self, uri):
-        self._uri = uri
+        return self.db_uri
 
     @lru_cache()
     def _INTERFACE(self) -> SqlAlchemyInterface:
