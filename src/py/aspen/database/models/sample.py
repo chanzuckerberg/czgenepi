@@ -165,5 +165,5 @@ class Sample(idbase, DictMixin):
         },
     )
 
-    sequencing_reads: Optional[SequencingReadsCollection]
+    sequencing_reads_collection: Optional[SequencingReadsCollection]
     uploaded_pathogen_genome: Optional[UploadedPathogenGenome]
