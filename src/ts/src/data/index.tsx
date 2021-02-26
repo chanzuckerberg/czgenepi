@@ -65,8 +65,6 @@ const Data: FunctionComponent = () => {
         );
     });
 
-    console.log(samples);
-
     return (
         <div className={style.dataRoot}>
             <div className={style.navigation}>
