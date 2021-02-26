@@ -12,6 +12,7 @@ from aspen.database.models.enum import Enum
 class PublicRepositoryType(enum.Enum):
     GISAID = "GISAID"
     NCBI_SRA = "NCBI_SRA"
+    GENBANK = "GENBANK"
 
 
 # Create the enumeration table
@@ -23,25 +24,11 @@ _PublicRepositoryTypeTable = enumtables.EnumTable(
 )
 
 
-class PublicRepository(idbase):
-    """A public repository for genetic or epidemiology data."""
-
-    __tablename__ = "public_repository"
-    repository_type = Column(
-        Enum(PublicRepositoryType),
-        ForeignKey(_PublicRepositoryTypeTable.item_id),
-        nullable=False,
-    )
-
-    name = Column(String, nullable=False, unique=True)
-    website = Column(String, nullable=False, unique=True)
-
-
 class Accession(idbase):
     """A single accession of an entity."""
 
     __tablename__ = "accessions"
-    __table_args__ = (UniqueConstraint("public_repository_id", "public_identifier"),)
+    __table_args__ = (UniqueConstraint("repository_type", "public_identifier"),)
 
     entity_id = Column(
         Integer,
@@ -50,14 +37,10 @@ class Accession(idbase):
     )
     entity = relationship(Entity, backref=backref("accessions", uselist=True))
 
-    public_repository_id = Column(
-        Integer,
-        ForeignKey(PublicRepository.id),
-        primary_key=True,
-    )
-    public_repository = relationship(
-        PublicRepository,
-        backref=backref("accessions", uselist=True),
+    repository_type = Column(
+        Enum(PublicRepositoryType),
+        ForeignKey(_PublicRepositoryTypeTable.item_id),
+        nullable=False,
     )
 
     public_identifier = Column(String, nullable=False)

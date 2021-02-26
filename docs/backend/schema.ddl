@@ -113,20 +113,14 @@ Table WorkflowInputs {
 ///////////////////////////////////////////////////
 // Public accession ids
 
-Table PublicRepository {
-  id INT [pk, increment]
-  name VARCHAR [not null, unique]
-  website VARCHAR [unique]
-}
-
 Table Accession {
   entity_id INT [not null, ref: > Entity.id]
-  public_repository_id INT [not null, ref: > PublicRepository.id]
+  // internally, repository_type is an enum
+  repository_type VARCHAR [not null]
   public_identifier VARCHAR [not null]
 
   Indexes {
-    (entity_id, public_repository_id) [unique]
-    (public_repository_id, public_identifier) [unique]
+    (repository_type, public_identifier) [unique]
   }
 }
 

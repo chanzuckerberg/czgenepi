@@ -21,6 +21,7 @@ from aspen.database.models.base import base, idbase
 from aspen.database.models.enum import Enum
 
 if TYPE_CHECKING:
+    from aspen.database.models import accessions
     from aspen.database.models.workflow import Workflow
 
 
@@ -70,6 +71,8 @@ class Entity(idbase):
     producing_workflow = relationship(
         "Workflow", backref=backref("outputs", uselist=True)
     )
+
+    accessions: MutableSequence[accessions.Accession]
 
     def get_parents(
         self,

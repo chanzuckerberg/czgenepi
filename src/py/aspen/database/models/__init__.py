@@ -1,4 +1,7 @@
-from aspen.database.models.accessions import Accession, PublicRepository  # noqa: F401
+from aspen.database.models.accessions import (  # noqa: F401
+    Accession,
+    PublicRepositoryType,
+)
 from aspen.database.models.align_read import AlignRead, Bam  # noqa: F401
 from aspen.database.models.base import meta  # noqa: F401
 from aspen.database.models.cansee import CanSee, DataType  # noqa: F401
