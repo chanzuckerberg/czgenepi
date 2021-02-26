@@ -6,6 +6,7 @@ from aspen.database.models.gisaid_dump import (
     ProcessedGisaidDump,
     RawGisaidDump,
 )
+from aspen.database.models.workflow import WorkflowStatusType
 
 
 def test_workflow(session):
@@ -15,7 +16,7 @@ def test_workflow(session):
     download_s3_key = "download_key"
     processed_s3_bucket = "processed_bucket"
     processed_s3_key = "processed_key"
-    run_date = datetime.now()
+    start_datetime = datetime.now()
     software_versions = {"test": "v0.0.1"}
     raw_gisaid_dump = RawGisaidDump(
         download_date=download_date,
@@ -29,7 +30,8 @@ def test_workflow(session):
     )
 
     workflow = GisaidDumpWorkflow(
-        run_date=run_date,
+        start_datetime=start_datetime,
+        workflow_status=WorkflowStatusType.STARTED,
         software_versions=software_versions,
         inputs=[raw_gisaid_dump],
         outputs=[processed_gisaid_dump],
