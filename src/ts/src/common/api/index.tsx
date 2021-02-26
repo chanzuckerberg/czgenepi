@@ -1,6 +1,8 @@
 // refactor as needed
 import axios from "axios";
 
+import { jsonToType } from "common/utils"
+
 const USER_MAP = new Map<string, keyof User>([
     ["auth0_user_id", "auth0UserId"],
     ["group_admin", "groupAdmin"],
@@ -10,12 +12,8 @@ export const fetchUserData = async (): Promise<
     Record<string, Group | User>
 > => {
     const response = await axios.get("/api/usergroup");
-    const group: Group = response.data.group as Group;
-    const user: User = Object.fromEntries(
-        Object.keys(response.data.user).map((key) => {
-            return [USER_MAP.get(key), response.data.user[key]];
-        })
-    );
+    const group = response.data.group as Group;
+    const user = jsonToType<User>(response.data.user, USER_MAP)
     return { group, user };
 };
 
@@ -28,13 +26,6 @@ const SAMPLE_MAP = new Map<string, keyof Sample>([
 ]);
 export const fetchSamples = async (): Promise<Array<Sample>> => {
     const response = await axios.get("/api/samples");
-    const samples: Array<Sample> = response.data.map(
-        (entry: Record<string, string>) =>
-            Object.fromEntries(
-                Object.keys(entry).map((key) => {
-                    return [SAMPLE_MAP.get(key), entry[key]];
-                })
-            )
-    );
+    const samples: Array<Sample> = response.data.map((entry: Record<string, string>) => jsonToType<Sample>(entry, SAMPLE_MAP));
     return samples;
 };
