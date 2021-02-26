@@ -10,7 +10,6 @@ from typing import Any, Callable, Mapping, Optional, Set, Type, TypeVar, Union
 from botocore.exceptions import ClientError
 
 from aspen import aws
-from aspen.database.connection import SqlAlchemyInterface
 
 ConfigLike = TypeVar("ConfigLike", bound="Config")
 
@@ -187,9 +186,4 @@ class Config:
 
     @property
     def DATABASE_READONLY_URI(self) -> str:
-        raise NotImplementedError()
-
-    @property
-    # TODO: This should be an abstract method as well.
-    def DATABASE_INTERFACE(self) -> SqlAlchemyInterface:
         raise NotImplementedError()
