@@ -1,5 +1,7 @@
 import json
 
+from aspen.app.views import api_utils
+
 
 def test_usergroup_view(session, app, client, user, group):
     with client.session_transaction() as sess:
@@ -15,11 +17,11 @@ def test_samples_view(session, app, client, user, group, sample, sequencing_read
     res = client.get("/api/samples")
     expected = [
         {
-            "collection_date": sample.collection_date.isoformat(),
+            "collection_date": api_utils.format_date(sample.collection_date),
             "collection_location": sample.location,
             "private_identifier": sample.private_identifier,
             "public_identifier": sample.public_identifier,
-            "upload_date": sequencing_read.sequencing_date.isoformat(),
+            "upload_date": api_utils.format_datetime(sequencing_read.upload_date),
         }
     ]
     assert expected == json.loads(res.get_data(as_text=True))
