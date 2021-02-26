@@ -10,7 +10,6 @@ import NavBar from "NavBar";
 import style from "App.module.scss";
 
 const App: FunctionComponent = () => {
-
     const [user, setUser] = useState<string | undefined>();
     const [org, setOrg] = useState<string | undefined>();
 
@@ -27,7 +26,7 @@ const App: FunctionComponent = () => {
         <Router>
             <div className={style.app}>
                 <div className={style.navBar}>
-                    <NavBar org={org} user={user}/>
+                    <NavBar org={org} user={user} />
                 </div>
                 <div className={style.view}>
                     <Switch>

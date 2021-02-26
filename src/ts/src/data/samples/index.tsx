@@ -1,8 +1,6 @@
 import React, { FunctionComponent } from "react";
 import { Table } from "semantic-ui-react";
 
-import { get } from "common/utils";
-
 import style from "./index.module.scss";
 
 type Props = {
@@ -10,8 +8,8 @@ type Props = {
 };
 
 interface Headers {
-    text: string,
-    key: keyof Sample
+    text: string;
+    key: keyof Sample;
 }
 
 const TABLE_HEADERS: Array<Headers> = [
@@ -23,7 +21,7 @@ const TABLE_HEADERS: Array<Headers> = [
     { text: "GISAID", key: "gisaid" },
 ];
 
-const UNDEFINED_TEXT = "---"
+const UNDEFINED_TEXT = "---";
 
 // const dummySamples: Array<Sample> = [
 //     {
@@ -53,15 +51,15 @@ const Samples: FunctionComponent<Props> = ({ data = [] }: Props) => {
 
     const sampleRow = (sample: Sample): Array<JSX.Element> => {
         return TABLE_HEADERS.map((column) => {
-            let displayData = sample[column.key]
+            let displayData = sample[column.key];
             if (displayData === undefined) {
-                displayData = UNDEFINED_TEXT
+                displayData = UNDEFINED_TEXT;
             }
             return (
                 <Table.Cell key={`${sample.privateId}-${column.key}`}>
                     {displayData}
                 </Table.Cell>
-            )
+            );
         });
     };
 

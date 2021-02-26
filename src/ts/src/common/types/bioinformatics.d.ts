@@ -15,14 +15,14 @@ type Project = {
 };
 
 interface Sample {
-    [index: string]: string,
-    privateId: string,
-    publicId: string,
-    uploadDate: string,
-    collectionDate: string,
-    collectionLocation: string,
-    gisaid?: string
-};
+    [index: string]: string;
+    privateId: string;
+    publicId: string;
+    uploadDate: string;
+    collectionDate: string;
+    collectionLocation: string;
+    gisaid?: string;
+}
 
 type Tree = {
     id: number;

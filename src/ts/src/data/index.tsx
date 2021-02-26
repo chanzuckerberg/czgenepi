@@ -15,7 +15,7 @@ const Data: FunctionComponent = () => {
     useEffect(() => {
         const setSampleData = async () => {
             const apiSamples = await fetchSamples();
-            setSamples(apiSamples)
+            setSamples(apiSamples);
         };
         setSampleData();
     }, []);
@@ -27,7 +27,7 @@ const Data: FunctionComponent = () => {
             to: "/data/samples",
             text: "Samples",
             data: samples,
-            jsx: <Samples data={samples}/>,
+            jsx: <Samples data={samples} />,
         },
         {
             to: "/data/phylogenetic_trees",
@@ -65,7 +65,7 @@ const Data: FunctionComponent = () => {
         );
     });
 
-    console.log(samples)
+    console.log(samples);
 
     return (
         <div className={style.dataRoot}>
