@@ -18,7 +18,13 @@ from sqlalchemy import and_, or_
 from sqlalchemy.orm import joinedload, Session
 
 from aspen.database.connection import session_scope, SqlAlchemyInterface
-from aspen.database.models import Group, Sample, UploadedPathogenGenome
+from aspen.database.models import (
+    Accession,
+    Group,
+    PublicRepositoryType,
+    Sample,
+    UploadedPathogenGenome,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -142,3 +148,19 @@ def import_project(
                 consensus_genome.avg_depth
             )
             sample.uploaded_pathogen_genome.sequence = consensus_genome.fasta
+
+            if czbid.genome_submission_info is not None:
+                if czbid.genome_submission_info.gisaid_accession is not None:
+                    sample.uploaded_pathogen_genome.accessions.append(
+                        Accession(
+                            repository_type=PublicRepositoryType.GISAID,
+                            public_identifier=czbid.genome_submission_info.gisaid_accession,
+                        )
+                    )
+                if czbid.genome_submission_info.genbank_accession is not None:
+                    sample.uploaded_pathogen_genome.accessions.append(
+                        Accession(
+                            repository_type=PublicRepositoryType.GENBANK,
+                            public_identifier=czbid.genome_submission_info.genbank_accession,
+                        )
+                    )
