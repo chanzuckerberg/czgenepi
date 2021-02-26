@@ -35,7 +35,7 @@
                     box-sizing: border-box;
 
                     .title {
-                        @include font-header-l;
+                        @include font-header-m;
                         margin-right: $space-m;
                         color: $gray-dark;
 
@@ -46,7 +46,7 @@
                     }
 
                     .count {
-                        @include font-body-l;
+                        @include font-body-m;
                         color: $gray-dark;
                     }
                 }
