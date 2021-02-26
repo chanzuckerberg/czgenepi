@@ -14,14 +14,14 @@ type Project = {
     name: string;
 };
 
-type Sample = {
-    id: number;
-    privateId: string;
-    publicId: string;
-    uploadDate: string;
-    collectionDate: string;
-    collectionLocation: string;
-    gisaid?: string;
+interface Sample {
+    [index: string]: string,
+    privateId: string,
+    publicId: string,
+    uploadDate: string,
+    collectionDate: string,
+    collectionLocation: string,
+    gisaid?: string
 };
 
 type Tree = {
