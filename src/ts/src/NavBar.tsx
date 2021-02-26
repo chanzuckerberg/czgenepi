@@ -25,7 +25,6 @@ const DROPDOWN_LINKS: Array<Record<string, string>> = [
 ];
 
 const NavBar: FunctionComponent<Props> = ({ org, user }: Props) => {
-
     const navigationLinks = LINKS.map((link) => {
         return (
             <Link to={link.to} key={link.text}>

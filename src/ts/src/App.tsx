@@ -1,31 +1,23 @@
 import React, { FunctionComponent, useState, useEffect } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import axios from "axios";
+
+import { fetchUserData } from "common/api";
 
 import Data from "data";
-
 import Landing from "Landing";
 import NavBar from "NavBar";
 
 import style from "App.module.scss";
 
-
-const fetchUserData = async () => {
-    const response = await axios.get("/api/usergroup");
-    return response.data;
-};
-
-
-const App: FunctionComponent<React.ReactNode> = () => {
-
-    const [user, setUser] = useState();
-    const [org, setOrg] = useState();
+const App: FunctionComponent = () => {
+    const [user, setUser] = useState<string | undefined>();
+    const [org, setOrg] = useState<string | undefined>();
 
     useEffect(() => {
         const setUserData = async () => {
-            const usergroup = await fetchUserData();
-            setUser(usergroup.user.name);
-            setOrg(usergroup.group.name);
+            const response = await fetchUserData();
+            setUser(response.user.name);
+            setOrg(response.group.name);
         };
         setUserData();
     }, []);
@@ -34,7 +26,7 @@ const App: FunctionComponent<React.ReactNode> = () => {
         <Router>
             <div className={style.app}>
                 <div className={style.navBar}>
-                    <NavBar org={org} user={user}/>
+                    <NavBar org={org} user={user} />
                 </div>
                 <div className={style.view}>
                     <Switch>

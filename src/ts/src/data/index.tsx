@@ -1,20 +1,25 @@
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, useState, useEffect } from "react";
 import { Switch, Route, Link, Redirect } from "react-router-dom";
 import { Menu } from "semantic-ui-react";
+
+import { fetchSamples } from "common/api";
 
 import Samples from "./samples";
 
 import style from "./index.module.scss";
 
-type Props = {
-    samples?: Array<Sample>;
-    trees?: Array<Tree>;
-};
+const Data: FunctionComponent = () => {
+    const [samples, setSamples] = useState<Array<Sample>>([]);
+    const [trees, setTrees] = useState<Array<Tree>>([]);
 
-const Data: FunctionComponent<Props> = ({
-    samples = [],
-    trees = [],
-}: Props) => {
+    useEffect(() => {
+        const setSampleData = async () => {
+            const apiSamples = await fetchSamples();
+            setSamples(apiSamples);
+        };
+        setSampleData();
+    }, []);
+
     // this constant is inside the component so we can associate
     // each category with its respective variable.
     const dataCategories = [
@@ -22,13 +27,13 @@ const Data: FunctionComponent<Props> = ({
             to: "/data/samples",
             text: "Samples",
             data: samples,
-            component: <Samples />,
+            jsx: <Samples data={samples} />,
         },
         {
             to: "/data/phylogenetic_trees",
             text: "Phylogenetic Trees",
             data: trees,
-            component: undefined,
+            jsx: <div>Phylogenetic Trees</div>,
         },
     ];
 
@@ -51,19 +56,11 @@ const Data: FunctionComponent<Props> = ({
             </Link>
         );
 
-        const categoryView: () => JSX.Element = () => {
-            if (category.component === undefined) {
-                return <div>{category.text}</div>;
-            } else {
-                return category.component;
-            }
-        };
-
         dataJSX.routes.push(
             <Route
                 path={category.to}
                 key={category.text}
-                render={categoryView}
+                render={() => category.jsx}
             />
         );
     });
