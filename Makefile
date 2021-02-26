@@ -15,7 +15,7 @@ LOCAL_DB_RW_USERNAME = user_rw
 LOCAL_DB_RW_PASSWORD = password_rw
 LOCAL_DB_RO_USERNAME = user_ro
 LOCAL_DB_RO_PASSWORD = password_ro
-DOCKER_IMAGE = czbiohub/covidhub-postgres:11.5-alpine
+DOCKER_IMAGE = czbiohub/covidhub-postgres:13.1-alpine
 
 start-local-db:
 	@if [ "$(LOCAL_DB_CONTAINER_ID)" == "" ]; then \
