@@ -26,6 +26,7 @@ mypy = "*"
 pytest = "*"
 pytest-xdist = "*"
 sqlalchemy-stubs = "*"
+tqdm = "*"
 
 [requires]
 python_version = "3.7"
