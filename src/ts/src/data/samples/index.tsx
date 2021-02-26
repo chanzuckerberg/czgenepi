@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from "react";
 import { Search, Table } from "semantic-ui-react";
 
-import { ReactComponent as SampleIcon } from "common/icons/Sample.svg"
+import { ReactComponent as SampleIcon } from "common/icons/Sample.svg";
 
 import style from "./index.module.scss";
 
@@ -59,11 +59,14 @@ const Samples: FunctionComponent<Props> = ({ data = dummySamples }: Props) => {
                 displayData = UNDEFINED_TEXT;
             }
             if (index === 0) {
-                icon = <SampleIcon className={style.icon}/>
+                icon = <SampleIcon className={style.icon} />;
             }
             return (
                 <Table.Cell key={`${sample.privateId}-${column.key}`}>
-                    <div className={style.cell}>{icon}{displayData}</div>
+                    <div className={style.cell}>
+                        {icon}
+                        {displayData}
+                    </div>
                 </Table.Cell>
             );
         });
@@ -78,7 +81,7 @@ const Samples: FunctionComponent<Props> = ({ data = dummySamples }: Props) => {
     return (
         <div className={style.samplesRoot}>
             <div className={style.searchBar}>
-                <Search defaultValue={"Search"}/>
+                <Search defaultValue={"Search"} />
             </div>
             <div className={style.samplesTable}>
                 <Table basic="very">

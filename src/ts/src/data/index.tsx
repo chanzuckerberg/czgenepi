@@ -52,7 +52,9 @@ const Data: FunctionComponent = () => {
             <Link to={category.to} key={category.text}>
                 <Menu.Item className={style.menuItem}>
                     <div className={style.category}>
-                        <div className={cx(style.title, focusStyle)}>{category.text}</div>
+                        <div className={cx(style.title, focusStyle)}>
+                            {category.text}
+                        </div>
                         <div className={style.count}>
                             {category.data.length}
                         </div>
