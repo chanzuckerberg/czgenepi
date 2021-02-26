@@ -72,9 +72,9 @@ const NavBar: FunctionComponent<Props> = ({ org, user }: Props) => {
     );
 
     const signInLink = (
-        <Link to="/login">
+        <a href="/login">
             <div className={cx(style.item, style.link)}>Sign In</div>
-        </Link>
+        </a>
     );
 
     function isLoggedIn(): JSX.Element {
