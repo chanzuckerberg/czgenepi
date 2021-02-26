@@ -22,6 +22,7 @@ def test_samples_view(session, app, client, user, group, sample, sequencing_read
             "private_identifier": sample.private_identifier,
             "public_identifier": sample.public_identifier,
             "upload_date": api_utils.format_datetime(sequencing_read.upload_date),
+            "gisaid": sequencing_read.accessions[0].public_identifier,
         }
     ]
     assert expected == json.loads(res.get_data(as_text=True))

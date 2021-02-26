@@ -2,8 +2,10 @@ from datetime import datetime
 
 import pytest
 
-from aspen.database.models.sample import Sample
-from aspen.database.models.sequences import (
+from aspen.database.models import (
+    Accession,
+    PublicRepositoryType,
+    Sample,
     SequencingInstrumentType,
     SequencingProtocolType,
     SequencingReadsCollection,
@@ -63,6 +65,12 @@ def sequencing_read(session, sample):
         sequencing_date=datetime.now(),
         s3_bucket="bucket",
         s3_key="key",
+    )
+    sequencing_reads.accessions.append(
+        Accession(
+            repository_type=PublicRepositoryType.GISAID,
+            public_identifier="gisaid_public_identifier",
+        )
     )
     session.add(sequencing_reads)
     session.commit()
