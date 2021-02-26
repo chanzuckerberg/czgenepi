@@ -1,8 +1,8 @@
 import sqlalchemy.event as sqlalchemy_event
 from sqlalchemy import DDL
 
-from .connection import session_scope, SqlAlchemyInterface
-from .models import meta
+from aspen.database.connection import session_scope, SqlAlchemyInterface
+from aspen.database.models import meta
 
 
 def create_tables_and_schema(interface: SqlAlchemyInterface):

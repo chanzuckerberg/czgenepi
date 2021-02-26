@@ -4,11 +4,11 @@ from typing import TYPE_CHECKING
 
 from sqlalchemy import Column, ForeignKey, Integer, String, UniqueConstraint
 
-from .entity import Entity, EntityType
-from .workflow import Workflow, WorkflowType
+from aspen.database.models.entity import Entity, EntityType
+from aspen.database.models.workflow import Workflow, WorkflowType
 
 if TYPE_CHECKING:
-    from .sequences import SequencingReadsCollection
+    from aspen.database.models.sequences import SequencingReadsCollection
 
 
 class HostFilteredSequencingReadsCollection(Entity):
@@ -25,7 +25,7 @@ class HostFilteredSequencingReadsCollection(Entity):
     def sequencing_read(self) -> SequencingReadsCollection:
         """The raw gisaid dump this processed gisaid dump was generated from."""
         # this import has to be here for circular dependencies reasons. :(
-        from .sequences import SequencingReadsCollection
+        from aspen.database.models.sequences import SequencingReadsCollection
 
         parents = self.get_parents(SequencingReadsCollection)
         assert len(parents) == 1

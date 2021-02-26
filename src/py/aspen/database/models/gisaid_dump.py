@@ -5,8 +5,8 @@ from typing import MutableSequence, Sequence
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, UniqueConstraint
 
-from .entity import Entity, EntityType
-from .workflow import Workflow, WorkflowType
+from aspen.database.models.entity import Entity, EntityType
+from aspen.database.models.workflow import Workflow, WorkflowType
 
 
 class RawGisaidDump(Entity):

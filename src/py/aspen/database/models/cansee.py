@@ -7,9 +7,9 @@ import enumtables
 from sqlalchemy import Column, ForeignKey, Integer
 from sqlalchemy.orm import backref, relationship
 
-from .base import base, idbase
-from .enum import Enum
-from .usergroup import Group
+from aspen.database.models.base import base, idbase
+from aspen.database.models.enum import Enum
+from aspen.database.models.usergroup import Group
 
 
 class DataType(enum.Enum):

@@ -1,19 +1,19 @@
 import uuid
 from functools import lru_cache
 
-from ..database.connection import init_db, SqlAlchemyInterface
-from .config import Config, flaskproperty
+from aspen.config import config
+from aspen.database.connection import init_db, SqlAlchemyInterface
 
 
-class TestingConfig(Config, descriptive_name="test"):
+class TestingConfig(config.Config, descriptive_name="test"):
     def __init__(self, db_uri):
         self.db_uri = db_uri
 
-    @flaskproperty
+    @config.flaskproperty
     def TESTING(self):
         return True
 
-    @flaskproperty
+    @config.flaskproperty
     def SECRET_KEY(self):
         return uuid.uuid4().hex
 

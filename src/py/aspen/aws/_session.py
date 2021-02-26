@@ -2,7 +2,7 @@ from typing import Optional
 
 from boto3 import Session
 
-from ._region import region
+from aspen.aws._region import region
 
 _session: Optional[Session] = None
 

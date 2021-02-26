@@ -6,9 +6,8 @@ from typing import Optional
 from authlib.integrations.flask_client import OAuth
 from flask import redirect, session
 
+from aspen.app.aspen_app import AspenApp
 from aspen.config import config, DevelopmentConfig, ProductionConfig, StagingConfig
-
-from .aspen_app import AspenApp
 
 static_folder = Path(__file__).parent.parent / "static"
 

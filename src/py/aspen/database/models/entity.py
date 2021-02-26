@@ -17,11 +17,11 @@ import enumtables
 from sqlalchemy import Column, ForeignKey, Integer
 from sqlalchemy.orm import backref, relationship
 
-from .base import base, idbase
-from .enum import Enum
+from aspen.database.models.base import base, idbase
+from aspen.database.models.enum import Enum
 
 if TYPE_CHECKING:
-    from .workflow import Workflow
+    from aspen.database.models.workflow import Workflow
 
 
 _WORKFLOW_TABLENAME = "workflows"  # need this for a forward reference.

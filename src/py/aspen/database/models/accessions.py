@@ -4,9 +4,9 @@ import enumtables
 from sqlalchemy import Column, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import backref, relationship
 
-from .base import base, idbase
-from .entity import Entity
-from .enum import Enum
+from aspen.database.models.base import base, idbase
+from aspen.database.models.entity import Entity
+from aspen.database.models.enum import Enum
 
 
 class PublicRepositoryType(enum.Enum):

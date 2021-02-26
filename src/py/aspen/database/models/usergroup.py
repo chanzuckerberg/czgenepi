@@ -1,8 +1,8 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import backref, relationship
 
-from .base import idbase
-from .mixins import DictMixin
+from aspen.database.models.base import idbase
+from aspen.database.models.mixins import DictMixin
 
 
 class Group(idbase, DictMixin):

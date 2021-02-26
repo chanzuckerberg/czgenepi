@@ -15,9 +15,9 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import backref, relationship
 
-from .base import idbase
-from .mixins import DictMixin
-from .usergroup import Group
+from aspen.database.models.base import idbase
+from aspen.database.models.mixins import DictMixin
+from aspen.database.models.usergroup import Group
 
 if TYPE_CHECKING:
     from .sequences import SequencingReadsCollection, UploadedPathogenGenome

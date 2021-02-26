@@ -15,15 +15,17 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import backref, relationship
 
-from .base import base
-from .entity import Entity, EntityType
-from .enum import Enum
-from .mixins import DictMixin
-from .sample import Sample
-from .workflow import Workflow, WorkflowType
+from aspen.database.models.base import base
+from aspen.database.models.entity import Entity, EntityType
+from aspen.database.models.enum import Enum
+from aspen.database.models.mixins import DictMixin
+from aspen.database.models.sample import Sample
+from aspen.database.models.workflow import Workflow, WorkflowType
 
 if TYPE_CHECKING:
-    from .host_filtering import HostFilteredSequencingReadsCollection
+    from aspen.database.models.host_filtering import (
+        HostFilteredSequencingReadsCollection,
+    )
 
 
 class SequencingInstrumentType(enum.Enum):
@@ -124,7 +126,9 @@ class SequencingReadsCollection(Entity, DictMixin):
         self,
     ) -> Sequence[HostFilteredSequencingReadsCollection]:
         # this import has to be here for circular dependencies reasons. :(
-        from .host_filtering import HostFilteredSequencingReadsCollection
+        from aspen.database.models.host_filtering import (
+            HostFilteredSequencingReadsCollection,
+        )
 
         results: MutableSequence[HostFilteredSequencingReadsCollection] = list()
         for workflow, entities in self.get_children(
