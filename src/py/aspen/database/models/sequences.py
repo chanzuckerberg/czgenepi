@@ -7,8 +7,10 @@ import enumtables
 from sqlalchemy import (
     Column,
     Date,
+    DateTime,
     Float,
     ForeignKey,
+    func,
     Integer,
     String,
     UniqueConstraint,
@@ -120,6 +122,7 @@ class SequencingReadsCollection(Entity, DictMixin):
     s3_key = Column(String, nullable=False)
 
     sequencing_date = Column(Date)
+    upload_date = Column(DateTime, nullable=False, server_default=func.now())
 
     @property
     def host_filtered_sequencing_reads(
@@ -184,6 +187,7 @@ class UploadedPathogenGenome(PathogenGenome):
     )
 
     sequencing_depth = Column(Float)
+    upload_date = Column(DateTime, nullable=False, server_default=func.now())
 
 
 class CalledPathogenGenome(PathogenGenome):

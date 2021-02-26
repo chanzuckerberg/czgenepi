@@ -1,6 +1,8 @@
+import logging
 import warnings
-from typing import Iterable, Mapping
+from typing import Collection, Mapping
 
+import tqdm
 from covid_database import init_db as Cinit_db
 from covid_database import SqlAlchemyInterface as CSqlAlchemyInterface
 from covid_database import util as Cutil
@@ -17,6 +19,8 @@ from sqlalchemy.orm import joinedload, Session
 
 from aspen.database.connection import session_scope, SqlAlchemyInterface
 from aspen.database.models import Group, Sample, UploadedPathogenGenome
+
+logger = logging.getLogger(__name__)
 
 
 def covidhub_interface_from_secret(secret_id: str) -> CSqlAlchemyInterface:
@@ -54,7 +58,8 @@ def import_project(
             )
             session.add(group)
 
-        consensus_genomes: Iterable[ConsensusGenome] = (
+        logger.info("Retrieving from COVIDHUB DB...")
+        consensus_genomes: Collection[ConsensusGenome] = (
             covidhub_session.query(ConsensusGenome)
             .join(SampleFastqs, CZBID, Project)
             .distinct(CZBID.id)
@@ -75,11 +80,12 @@ def import_project(
                 .joinedload(SampleFastqs.czb_id)
                 .joinedload(CZBID.genome_submission_info),
             )
+            .all()
         )
 
         external_accessions = {
             consensus_genome.sample_fastqs.czb_id.external_accession
-            for consensus_genome in consensus_genomes
+            for consensus_genome in tqdm.tqdm(consensus_genomes)
             if isinstance(consensus_genome.sample_fastqs.czb_id, DphCZBID)
         }
         external_accessions_to_samples: Mapping[str, Sample] = {
@@ -92,7 +98,8 @@ def import_project(
             )
         }
 
-        for consensus_genome in consensus_genomes:
+        logger.info("Creating new objects...")
+        for consensus_genome in tqdm.tqdm(consensus_genomes):
             czbid = consensus_genome.sample_fastqs.czb_id
             if not isinstance(czbid, DphCZBID):
                 warnings.warn(
@@ -123,6 +130,7 @@ def import_project(
                 sample.uploaded_pathogen_genome = UploadedPathogenGenome(
                     sample=sample,
                 )
+            sample.uploaded_pathogen_genome.upload_date = czbid.date_received
             sample.uploaded_pathogen_genome.num_unambiguous_sites = (
                 consensus_genome.recovered_sites
             )
