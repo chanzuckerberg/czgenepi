@@ -1,12 +1,11 @@
 import click
 from IPython.terminal.embed import InteractiveShellEmbed
 
+from aspen.cli.toplevel import cli
 from aspen.config.development import DevelopmentConfig
 from aspen.database.connection import get_db_uri, init_db
 from aspen.database.models import *  # noqa: F401, F403
 from aspen.database.schema import create_tables_and_schema
-
-from .toplevel import cli
 
 
 @cli.group()

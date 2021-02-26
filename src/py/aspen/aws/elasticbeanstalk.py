@@ -1,6 +1,6 @@
 from typing import Dict, MutableSequence, Sequence
 
-from ._session import session
+from aspen.aws._session import session
 
 
 def _get_tags() -> Sequence[Dict]:

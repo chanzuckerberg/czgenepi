@@ -1,16 +1,16 @@
 import uuid
 from functools import lru_cache
 
-from ..database.connection import init_db, SqlAlchemyInterface
-from .config import Config, flaskproperty
+from aspen.config import config
+from aspen.database.connection import init_db, SqlAlchemyInterface
 
 
-class DevelopmentConfig(Config, descriptive_name="dev"):
-    @flaskproperty
+class DevelopmentConfig(config.Config, descriptive_name="dev"):
+    @config.flaskproperty
     def DEBUG(self) -> bool:
         return True
 
-    @flaskproperty
+    @config.flaskproperty
     def SECRET_KEY(self) -> str:
         return uuid.uuid4().hex
 

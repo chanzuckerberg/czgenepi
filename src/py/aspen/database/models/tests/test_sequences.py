@@ -1,13 +1,13 @@
 from datetime import datetime
 
-from ..sample import Sample
-from ..sequences import (
+from aspen.database.models.sample import Sample
+from aspen.database.models.sequences import (
     SequencingInstrumentType,
     SequencingProtocolType,
     SequencingReadsCollection,
     UploadedPathogenGenome,
 )
-from ..usergroup import Group
+from aspen.database.models.usergroup import Group
 
 
 def test_sequencing_reads(session):

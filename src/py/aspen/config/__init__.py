@@ -1,4 +1,4 @@
-from .development import DevelopmentConfig  # noqa: F401
-from .production import ProductionConfig  # noqa: F401
-from .staging import StagingConfig  # noqa: F401
-from .testing import TestingConfig  # noqa: F401
+from aspen.config.development import DevelopmentConfig  # noqa: F401
+from aspen.config.production import ProductionConfig  # noqa: F401
+from aspen.config.staging import StagingConfig  # noqa: F401
+from aspen.config.testing import TestingConfig  # noqa: F401

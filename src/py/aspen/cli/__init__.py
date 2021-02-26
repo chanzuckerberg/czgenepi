@@ -1,1 +1,1 @@
-from . import db  # noqa: F401
+from aspen.cli import db  # noqa: F401
