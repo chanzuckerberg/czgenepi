@@ -27,7 +27,7 @@ class PublicRepository(idbase):
     """A public repository for genetic or epidemiology data."""
 
     __tablename__ = "public_repository"
-    entity_type = Column(
+    repository_type = Column(
         Enum(PublicRepositoryType),
         ForeignKey(_PublicRepositoryTypeTable.item_id),
         nullable=False,
