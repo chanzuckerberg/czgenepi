@@ -18,7 +18,7 @@ def callback_handling():
         "user_id": userinfo["sub"],
         "name": userinfo["name"],
     }
-    return redirect("/")
+    return redirect("/data/samples")
 
 
 @application.route("/login")
