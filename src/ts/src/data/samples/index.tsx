@@ -13,8 +13,8 @@ interface Headers {
 }
 
 const TABLE_HEADERS: Array<Headers> = [
-    { text: "Private ID", key: "privateID" },
-    { text: "Public ID", key: "publicID" },
+    { text: "Private ID", key: "privateId" },
+    { text: "Public ID", key: "publicId" },
     { text: "Upload Date", key: "uploadDate" },
     { text: "Collection Date", key: "collectionDate" },
     { text: "Collection Location", key: "collectionLocation" },
@@ -23,26 +23,26 @@ const TABLE_HEADERS: Array<Headers> = [
 
 const UNDEFINED_TEXT = "---";
 
-// const dummySamples: Array<Sample> = [
-//     {
-//         privateId: "0865-0004KGK00-001",
-//         publicId: "0909EEEE-55-33",
-//         uploadDate: "2/1/2021",
-//         collectionDate: "12/12/2020",
-//         collectionLocation: "Santa Clara County",
-//         gisaid: "Accepted",
-//     },
-//     {
-//         privateId: "0865-0004KGK00-001",
-//         publicId: "0909EEEE-55-33",
-//         uploadDate: "2/1/2021",
-//         collectionDate: "12/12/2020",
-//         collectionLocation: "Santa Clara County",
-//         gisaid: "Accepted",
-//     },
-// ];
+const dummySamples: Array<Sample> = [
+    {
+        privateId: "0865-0004KGK00-001",
+        publicId: "0909EEEE-55-33",
+        uploadDate: "2/1/2021",
+        collectionDate: "12/12/2020",
+        collectionLocation: "Santa Clara County",
+        gisaid: "Accepted",
+    },
+    {
+        privateId: "0865-0004KGK00-002",
+        publicId: "0909EEEE-55-34",
+        uploadDate: "2/1/2021",
+        collectionDate: "12/12/2020",
+        collectionLocation: "Santa Clara County",
+        gisaid: "Accepted",
+    },
+];
 
-const Samples: FunctionComponent<Props> = ({ data = [] }: Props) => {
+const Samples: FunctionComponent<Props> = ({ data = dummySamples }: Props) => {
     const headerRow = TABLE_HEADERS.map((column) => (
         <Table.HeaderCell key={column.key}>
             <span className={style.header}>{column.text}</span>

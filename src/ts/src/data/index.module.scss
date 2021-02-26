@@ -13,7 +13,17 @@
 
         .menu {
             align-items: center;
-            margin-left: $space-xxl;
+
+            a {
+                &:first-child {
+                    margin-left: 10em;
+
+                    div {
+                        // overwrite semantic-ui style
+                        padding-left: 0 !important;
+                    }
+                }
+            }
 
             .menuItem {
                 height: 100%;
@@ -35,6 +45,6 @@
     }
 
     .view {
-        width: 100%;
+        margin: 0 10em 0 10em;
     }
 }

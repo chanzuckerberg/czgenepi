@@ -20,8 +20,8 @@ export const fetchUserData = async (): Promise<
 const SAMPLE_MAP = new Map<string, keyof Sample>([
     ["collection_date", "collectionDate"],
     ["collection_location", "collectionLocation"],
-    ["private_identifier", "privateID"],
-    ["public_identifier", "publicID"],
+    ["private_identifier", "privateId"],
+    ["public_identifier", "publicId"],
     ["upload_date", "uploadDate"],
 ]);
 export const fetchSamples = async (): Promise<Array<Sample>> => {
