@@ -1,5 +1,7 @@
 import React, { FunctionComponent } from "react";
-import { Table } from "semantic-ui-react";
+import { Search, Table } from "semantic-ui-react";
+
+import { ReactComponent as SampleIcon } from "common/icons/Sample.svg"
 
 import style from "./index.module.scss";
 
@@ -45,19 +47,23 @@ const dummySamples: Array<Sample> = [
 const Samples: FunctionComponent<Props> = ({ data = dummySamples }: Props) => {
     const headerRow = TABLE_HEADERS.map((column) => (
         <Table.HeaderCell key={column.key}>
-            <span className={style.header}>{column.text}</span>
+            <div className={style.headerCell}>{column.text}</div>
         </Table.HeaderCell>
     ));
 
     const sampleRow = (sample: Sample): Array<JSX.Element> => {
-        return TABLE_HEADERS.map((column) => {
+        return TABLE_HEADERS.map((column, index) => {
             let displayData = sample[column.key];
+            let icon: JSX.Element | null = null;
             if (displayData === undefined) {
                 displayData = UNDEFINED_TEXT;
             }
+            if (index === 0) {
+                icon = <SampleIcon className={style.icon}/>
+            }
             return (
                 <Table.Cell key={`${sample.privateId}-${column.key}`}>
-                    {displayData}
+                    <div className={style.cell}>{icon}{displayData}</div>
                 </Table.Cell>
             );
         });
@@ -71,12 +77,17 @@ const Samples: FunctionComponent<Props> = ({ data = dummySamples }: Props) => {
 
     return (
         <div className={style.samplesRoot}>
-            <Table basic="very" singleline>
-                <Table.Header>
-                    <Table.Row>{headerRow}</Table.Row>
-                </Table.Header>
-                <Table.Body>{tableRows(data)}</Table.Body>
-            </Table>
+            <div className={style.searchBar}>
+                <Search defaultValue={"Search"}/>
+            </div>
+            <div className={style.samplesTable}>
+                <Table basic="very">
+                    <Table.Header className={style.header}>
+                        <Table.Row>{headerRow}</Table.Row>
+                    </Table.Header>
+                    <Table.Body>{tableRows(data)}</Table.Body>
+                </Table>
+            </div>
         </div>
     );
 };

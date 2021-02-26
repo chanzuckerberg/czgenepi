@@ -1,5 +1,6 @@
 @import "common/styles/spacing";
 @import "common/styles/typography";
+@import "common/styles/colors";
 
 .dataRoot {
     display: flex;
@@ -10,6 +11,7 @@
     .navigation {
         width: 100%;
         margin-bottom: $space-xl;
+        border-bottom: $space-xxs solid $gray-lightest;
 
         .menu {
             align-items: center;
@@ -29,15 +31,23 @@
                 height: 100%;
 
                 .category {
+                    align-items: center;
+                    box-sizing: border-box;
+
                     .title {
                         @include font-header-l;
-                        font-family: $font-family-primary;
                         margin-right: $space-m;
+                        color: $gray-dark;
+
+                        &.active {
+                            color: $black;
+                            border-bottom: $space-xxs solid $primary;
+                        }
                     }
 
                     .count {
                         @include font-body-l;
-                        font-family: $font-family-primary;
+                        color: $gray-dark;
                     }
                 }
             }
