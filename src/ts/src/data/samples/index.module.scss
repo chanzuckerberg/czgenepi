@@ -1,9 +1,35 @@
 @import "common/styles/colors";
+@import "common/styles/typography";
+@import "common/styles/spacing";
 
 .samplesRoot {
-    justify-content: center;
+    align-items: stretch;
+    flex-direction: column;
 
-    .header {
-        color: $gray-medium;
+    .searchBar {
+        margin: 0 0 $space-xl 0;
+        width: 20em;
+    }
+
+    .samplesTable {
+        margin: $space-m 0 0 0;
+
+        .header {
+            .headerCell {
+                @include font-header-m;
+                color: $gray-dark;
+            }
+        }
+
+        .cell {
+            @include font-header-m;
+            align-items: center;
+            margin: $space-xs 0 $space-xs 0;
+
+            .icon {
+                margin: 0 $space-l 0 $space-l;
+                fill: $gray-light;
+            }
+        }
     }
 }

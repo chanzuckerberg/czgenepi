@@ -1,6 +1,7 @@
 import React, { FunctionComponent, useState, useEffect } from "react";
 import { Switch, Route, Link, Redirect } from "react-router-dom";
 import { Menu } from "semantic-ui-react";
+import cx from "classnames";
 
 import { fetchSamples } from "common/api";
 
@@ -43,14 +44,20 @@ const Data: FunctionComponent = () => {
     };
 
     dataCategories.forEach((category) => {
+        let focusStyle = null;
+        if (location.pathname === category.to) {
+            focusStyle = style.active;
+        }
         dataJSX.menuItems.push(
             <Link to={category.to} key={category.text}>
                 <Menu.Item className={style.menuItem}>
                     <div className={style.category}>
-                        <span className={style.title}>{category.text}</span>
-                        <span className={style.count}>
+                        <div className={cx(style.title, focusStyle)}>
+                            {category.text}
+                        </div>
+                        <div className={style.count}>
                             {category.data.length}
-                        </span>
+                        </div>
                     </div>
                 </Menu.Item>
             </Link>
@@ -68,7 +75,7 @@ const Data: FunctionComponent = () => {
     return (
         <div className={style.dataRoot}>
             <div className={style.navigation}>
-                <Menu className={style.menu} pointing secondary>
+                <Menu className={style.menu} secondary>
                     {dataJSX.menuItems}
                 </Menu>
             </div>
