@@ -1,10 +1,10 @@
 import uuid
 
-from .config import Config, flaskproperty
+from aspen.config import config
 
 
-class ProductionConfig(Config, descriptive_name="prod"):
-    @flaskproperty
+class ProductionConfig(config.Config, descriptive_name="prod"):
+    @config.flaskproperty
     def SECRET_KEY(self) -> str:
         return uuid.uuid4().hex
 

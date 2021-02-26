@@ -2,18 +2,17 @@ import logging
 import uuid
 
 from aspen import aws
-
-from .config import Config, flaskproperty
+from aspen.config import config
 
 logger = logging.getLogger(__name__)
 
 
-class StagingConfig(Config, descriptive_name="staging"):
-    @flaskproperty
+class StagingConfig(config.Config, descriptive_name="staging"):
+    @config.flaskproperty
     def DEBUG(self) -> bool:
         return True
 
-    @flaskproperty
+    @config.flaskproperty
     def SECRET_KEY(self) -> str:
         return uuid.uuid4().hex
 

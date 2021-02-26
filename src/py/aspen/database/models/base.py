@@ -1,7 +1,7 @@
 from sqlalchemy import MetaData
 from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
 
-from . import mixins as mx
+from aspen.database.models import mixins as mx
 
 meta = MetaData(
     schema="aspen",

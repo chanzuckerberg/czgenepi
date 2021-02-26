@@ -5,9 +5,9 @@ import enumtables
 from sqlalchemy import Column, DateTime, ForeignKey, JSON, Table
 from sqlalchemy.orm import relationship
 
-from .base import base, idbase
-from .entity import _WORKFLOW_TABLENAME, Entity
-from .enum import Enum
+from aspen.database.models.base import base, idbase
+from aspen.database.models.entity import _WORKFLOW_TABLENAME, Entity
+from aspen.database.models.enum import Enum
 
 
 class WorkflowType(enum.Enum):
@@ -24,6 +24,21 @@ _WorkflowTypeTable = enumtables.EnumTable(
     WorkflowType,
     base,
     tablename="workflow_types",
+)
+
+
+class WorkflowStatusType(enum.Enum):
+    STARTED = "STARTED"
+    FAILED = "FAILED"
+    COMPLETED = "COMPLETED"
+
+
+# Create the enumeration table
+# Pass your enum class and the SQLAlchemy declarative base to enumtables.EnumTable
+_WorkflowStatusTypeTable = enumtables.EnumTable(
+    WorkflowStatusType,
+    base,
+    tablename="workflow_status_types",
 )
 
 
@@ -51,10 +66,21 @@ class Workflow(idbase):
         "polymorphic_on": workflow_type
     }
 
-    run_date = Column(
+    start_datetime = Column(
+        DateTime, nullable=False, comment="datetime when the workflow is started."
+    )
+    end_datetime = Column(
         DateTime,
+        nullable=True,
+        comment="datetime when the workflow is ended.  this is only valid when the workflow's status is COMPLETED.",
+    )
+
+    workflow_status = Column(
+        Enum(WorkflowStatusType),
+        ForeignKey(_WorkflowStatusTypeTable.item_id),
         nullable=False,
     )
+
     software_versions = Column(
         JSON,
         nullable=False,

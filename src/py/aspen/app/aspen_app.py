@@ -1,8 +1,10 @@
+from functools import lru_cache
 from typing import Optional
 
 from flask import Flask
 
 from aspen.config.config import Config
+from aspen.database import connection as aspen_database
 
 
 class AspenApp(Flask):
@@ -21,3 +23,11 @@ class AspenApp(Flask):
         if self._aspen_config is None:
             raise ValueError("aspen config not set")
         return self._aspen_config
+
+    @lru_cache()
+    def _DATABASE_INTERFACE(self) -> aspen_database.SqlAlchemyInterface:
+        return aspen_database.init_db(self.aspen_config.DATABASE_URI)
+
+    @property
+    def DATABASE_INTERFACE(self) -> aspen_database.SqlAlchemyInterface:
+        return self._DATABASE_INTERFACE()

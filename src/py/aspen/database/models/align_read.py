@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Float, ForeignKey, Integer, String, UniqueConstraint
 
-from .entity import Entity, EntityType
-from .workflow import Workflow, WorkflowType
+from aspen.database.models.entity import Entity, EntityType
+from aspen.database.models.workflow import Workflow, WorkflowType
 
 
 class Bam(Entity):
