@@ -25,9 +25,9 @@ class AspenApp(Flask):
         return self._aspen_config
 
     @lru_cache()
-    def _DATABASE_INTERFACE(self) -> aspen_database.SqlAlchemyInterface:
-        return aspen_database.init_db(self.aspen_config.DATABASE_URI)
+    def _DATABASE_INTERFACE(self, uri: str) -> aspen_database.SqlAlchemyInterface:
+        return aspen_database.init_db(uri)
 
     @property
     def DATABASE_INTERFACE(self) -> aspen_database.SqlAlchemyInterface:
-        return self._DATABASE_INTERFACE()
+        return self._DATABASE_INTERFACE(self.aspen_config.DATABASE_URI)
