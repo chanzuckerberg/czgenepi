@@ -57,7 +57,7 @@ def postgres_instance(
             f"POSTGRES_PASSWORD={PASSWORD}",
             "-e",
             f"POSTGRES_DB={INITIAL_DATABASE}",
-            "czbiohub/covidhub-postgres:11.5-alpine",
+            "czbiohub/covidhub-postgres:13.1-alpine",
         ],
         stdout=subprocess.PIPE,
         check=True,
