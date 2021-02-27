@@ -85,15 +85,27 @@ aspen% .venv-ebcli/bin/eb terminate aspen-myusername
 
 ## Database concerns
 
-### Creating and initializing the local database.
-```bash
-aspen% make init-local-db
+### Interacting with the local database in sql
+
+You can also connect to your local psql console by running:
+```
+(.venv) aspen% docker exec -it aspen-local psql -h localhost -d aspen_db -U user_rw
+psql (13.1)
+Type "help" for help.
+
+aspen_db=> select * from aspen.users;
+ id | name | email | auth0_user_id | group_admin | system_admin | group_id
+----+------+-------+---------------+-------------+--------------+----------
+(0 rows)
+
+aspen_db=>
 ```
 
-### Interacting with the local database.
+### Interacting with the local database in python
+
 It is possible to interact with the local database in ipython:
 ```
-% aspen-cli db interact
+(.venv) aspen% aspen-cli db interact
 Python 3.7.6 (default, Dec 22 2019, 01:09:06)
 Type 'copyright', 'credits' or 'license' for more information
 IPython 7.20.0 -- An enhanced Interactive Python. Type '?' for help.
