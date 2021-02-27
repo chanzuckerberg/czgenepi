@@ -58,7 +58,7 @@ jobs:
           python-version: 3.7
       - name: Pull the docker image
         run: |
-          docker pull czbiohub/covidhub-postgres:11.5-alpine
+          docker pull czbiohub/covidhub-postgres:13.1-alpine
       - name: Cache dependencies
         id: cache-deps
         uses: actions/cache@v2
