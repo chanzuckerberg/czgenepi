@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import logging
+import time
 from contextlib import contextmanager
 from typing import TYPE_CHECKING
 
+from sqlalchemy import event
 from sqlalchemy.engine import create_engine, Engine
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -62,3 +65,22 @@ def get_db_uri(runtime_config: Config, readonly: bool = False) -> str:
         except NotImplementedError:
             raise ValueError(f"Config {runtime_config} does not have a read-only mode.")
     return runtime_config.DATABASE_URI
+
+
+def enable_profiling():
+    logging.basicConfig()
+    logger = logging.getLogger("sqltime")
+    logger.setLevel(logging.DEBUG)
+
+    @event.listens_for(Engine, "before_cursor_execute")
+    def before_cursor_execute(
+        conn, cursor, statement, parameters, context, executemany
+    ):
+        conn.info.setdefault("query_start_time", []).append(time.time())
+        logger.debug("Start Query: %s", statement)
+
+    @event.listens_for(Engine, "after_cursor_execute")
+    def after_cursor_execute(conn, cursor, statement, parameters, context, executemany):
+        total = time.time() - conn.info["query_start_time"].pop(-1)
+        logger.debug("Query Complete!")
+        logger.debug("Total Time: %f", total)
