@@ -11,6 +11,7 @@ psycopg2-binary = "*"
 python-dotenv = "*"
 requests = "*"
 SQLAlchemy = "*"
+flask-cors = "*"
 sqlalchemy-enum-tables = {editable = true, path = "./third-party/sqlalchemy-enum-tables"}
 
 [dev-packages]

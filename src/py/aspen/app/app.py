@@ -5,6 +5,7 @@ from typing import Optional
 
 from authlib.integrations.flask_client import OAuth
 from flask import redirect, session
+from flask_cors import CORS
 
 from aspen.app.aspen_app import AspenApp
 from aspen.config import config, DevelopmentConfig, ProductionConfig, StagingConfig
@@ -26,6 +27,9 @@ else:
 application = AspenApp(
     __name__, static_folder=str(static_folder), aspen_config=aspen_config
 )
+# FIXME(mbarrien): Make this more restrictive
+allowed_origin = ["*"]
+CORS(application, max_age=600, supports_credentials=True, origins=allowed_origin, allow_headers=["Content-Type"])
 
 if flask_env in ("production", "development", "staging"):
     oauth = OAuth(application)
