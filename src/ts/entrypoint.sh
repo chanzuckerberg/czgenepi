@@ -3,7 +3,7 @@ set -e
 
 if [ "$1" = 'devserver' -o $# -eq 0 ]; then
     # By default run the devserver
-    exec npm devserver
+    exec npm run devserver
 fi
 
 if [ "$1" = 'server' ]; then
