@@ -25,6 +25,11 @@ aspen% . .venv/bin/activate
 (.venv) aspen% pipenv install --dev
 ```
 
+#### Setting up a local database
+
+1. Install docker
+1. Run `make init-local-db`
+
 ### Running the app in development mode:
 
 ```bash
