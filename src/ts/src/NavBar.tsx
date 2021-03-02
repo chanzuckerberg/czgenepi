@@ -100,7 +100,6 @@ const NavBar: FunctionComponent<Props> = ({ org, user }: Props) => {
                 </div>
                 <div className={style.center}></div>
                 <div className={style.right}>
-                    {/* navigationLinks */}
                     {rightEdge}
                 </div>
             </div>
