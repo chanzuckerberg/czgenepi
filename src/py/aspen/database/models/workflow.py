@@ -42,7 +42,7 @@ _WorkflowStatusTypeTable = enumtables.EnumTable(
 )
 
 
-_workflow_inputs_table = Table(
+WorkflowInputs = Table(
     "workflow_inputs",
     base.metadata,
     Column("entity_id", ForeignKey(Entity.id), primary_key=True),
@@ -92,7 +92,7 @@ class Workflow(idbase):
 
     inputs = relationship(
         Entity,
-        secondary=_workflow_inputs_table,
+        secondary=WorkflowInputs,
         backref="consuming_workflows",
         uselist=True,
     )
