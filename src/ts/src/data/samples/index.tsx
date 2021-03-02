@@ -26,26 +26,26 @@ function searchReducer(state: SearchState, action: SearchState): SearchState {
     return {...state, ...action}
 }
 
-const dummySamples: Array<Sample> = [
-    {
-        privateId: "0865-0004KGK00-001",
-        publicId: "0909EEEE-55-33",
-        uploadDate: "2/1/2021",
-        collectionDate: "12/12/2020",
-        collectionLocation: "Santa Clara County",
-        gisaid: "Accepted",
-    },
-    {
-        privateId: "0865-0004KGK00-002",
-        publicId: "0909EEEE-55-34",
-        uploadDate: "2/1/2021",
-        collectionDate: "12/12/2020",
-        collectionLocation: "Santa Clara County",
-        gisaid: "Accepted",
-    },
-];
+// const dummySamples: Array<Sample> = [
+//     {
+//         privateId: "0865-0004KGK00-001",
+//         publicId: "0909EEEE-55-33",
+//         uploadDate: "2/1/2021",
+//         collectionDate: "12/12/2020",
+//         collectionLocation: "Santa Clara County",
+//         gisaid: "Accepted",
+//     },
+//     {
+//         privateId: "0865-0004KGK00-002",
+//         publicId: "0909EEEE-55-34",
+//         uploadDate: "2/1/2021",
+//         collectionDate: "12/12/2020",
+//         collectionLocation: "Santa Clara County",
+//         gisaid: "Accepted",
+//     },
+// ];
 
-const Samples: FunctionComponent<Props> = ({ data = dummySamples }: Props) => {
+const Samples: FunctionComponent<Props> = ({ data = [] }: Props) => {
     // we are modifying state using hooks, so we need a reducer
     const [state, dispatch] = useReducer(searchReducer, { searching: false, results: data })
 

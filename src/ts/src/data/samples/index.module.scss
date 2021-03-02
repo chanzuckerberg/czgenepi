@@ -13,6 +13,10 @@
         width: 20em;
         border: thin solid $gray-light;
         border-radius: $border-radius-l;
+
+        &:hover {
+            border-color: $gray-medium;
+        }
     }
 
     .samplesTable {
