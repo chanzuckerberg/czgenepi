@@ -70,6 +70,30 @@ services:
       - DEFAULT_REGION=us-west-2
     volumes:
       - localstack:/tmp/localstack
+  oidc:
+    image: soluto/oidc-server-mock:0.3.0
+    ports:
+      - "4011:80"
+      - "8443:443"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      SERVER_OPTIONS_INLINE: |
+        {
+          "AccessTokenJwtType": "JWT",
+          "Discovery": {
+            "ShowKeySet": true
+          }
+        }
+      API_SCOPES_PATH: /tmp/config/api_scopes.json
+      API_RESOURCES_PATH: /tmp/config/api_resources.json
+      USERS_CONFIGURATION_PATH: /tmp/config/users.json
+      CLIENTS_CONFIGURATION_PATH: /tmp/config/clients-config.json
+      ASPNETCORE_URLS: https://+:443;http://+:80
+      # ASPNETCORE_Kestrel__Certificates__Default__Password: <password for pfx file>
+      ASPNETCORE_Kestrel__Certificates__Default__Path: /tmp/pkcs12/certificate.pfx
+    volumes:
+      - ./oauth/pkcs12:/tmp/pkcs12:ro
+      - ./oauth:/tmp/config:ro
 volumes:
   database:
   localstack:

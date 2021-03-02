@@ -307,3 +307,6 @@ static
 !.elasticbeanstalk/*.global.yml
 /.ebiginore
 
+# Local dev
+.env.ecr
+
