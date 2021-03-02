@@ -65,11 +65,7 @@ const Samples: FunctionComponent<Props> = ({ data = [] }: Props) => {
 
         const regex = new RegExp(escapeRegExp(query), "i");
         const filteredSamples = data.filter((sample) => {
-            let result = false;
-            Object.values(sample).forEach(
-                (value) => (result = result || regex.test(value))
-            );
-            return result;
+            return Object.values(sample).some((value) => regex.test(value));
         });
 
         dispatch({ searching: false, results: filteredSamples });
