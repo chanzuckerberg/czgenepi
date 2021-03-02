@@ -9,6 +9,7 @@ boto3 = "*"
 Flask = "*"
 psycopg2-binary = "*"
 python-dotenv = "*"
+pytz = "*"
 requests = "*"
 SQLAlchemy = "*"
 sqlalchemy-enum-tables = {editable = true, path = "./third-party/sqlalchemy-enum-tables"}
