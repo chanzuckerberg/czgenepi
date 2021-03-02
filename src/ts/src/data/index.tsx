@@ -28,7 +28,7 @@ const Data: FunctionComponent = () => {
             to: "/data/samples",
             text: "Samples",
             data: samples,
-            jsx: <Samples data={samples} />,
+            jsx: <Samples data={undefined} />,
         },
         {
             to: "/data/phylogenetic_trees",
