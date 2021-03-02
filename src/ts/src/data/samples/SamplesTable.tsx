@@ -7,7 +7,7 @@ import style from "./index.module.scss";
 
 interface Props {
     data?: Array<Sample>;
-};
+}
 
 interface Header {
     text: string;
@@ -67,7 +67,7 @@ const SamplesTable: FunctionComponent<Props> = ({ data = [] }: Props) => {
             </Table.Header>
             <Table.Body>{tableRows(data)}</Table.Body>
         </Table>
-    )
-}
+    );
+};
 
 export default SamplesTable;

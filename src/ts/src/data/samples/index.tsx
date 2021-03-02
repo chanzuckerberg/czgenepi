@@ -1,8 +1,6 @@
-import React, { FunctionComponent, useState, useEffect, useReducer } from "react";
+import React, { FunctionComponent, useReducer } from "react";
 import { Input } from "semantic-ui-react";
 import { escapeRegExp } from "lodash/fp";
-
-import { ReactComponent as SampleIcon } from "common/icons/Sample.svg";
 
 import SamplesTable from "./SamplesTable";
 
@@ -10,11 +8,11 @@ import style from "./index.module.scss";
 
 interface Props {
     data?: Array<Sample>;
-};
+}
 
 interface InputOnChangeData {
-    [key: string]: any
-    value: string
+    [key: string]: string;
+    value: string;
 }
 
 interface SearchState {
@@ -23,7 +21,7 @@ interface SearchState {
 }
 
 function searchReducer(state: SearchState, action: SearchState): SearchState {
-    return {...state, ...action}
+    return { ...state, ...action };
 }
 
 // const dummySamples: Array<Sample> = [
@@ -47,32 +45,46 @@ function searchReducer(state: SearchState, action: SearchState): SearchState {
 
 const Samples: FunctionComponent<Props> = ({ data = [] }: Props) => {
     // we are modifying state using hooks, so we need a reducer
-    const [state, dispatch] = useReducer(searchReducer, { searching: false, results: data })
+    const [state, dispatch] = useReducer(searchReducer, {
+        searching: false,
+        results: data,
+    });
 
     // search functions
-    const searcher = (event: React.ChangeEvent<HTMLInputElement>, fieldInput: InputOnChangeData) => {
+    const searcher = (
+        event: React.ChangeEvent<HTMLInputElement>,
+        fieldInput: InputOnChangeData
+    ) => {
         const query = fieldInput.value;
         if (query.length === 0) {
-            dispatch({ results: data })
+            dispatch({ results: data });
             return;
         }
 
-        dispatch({ searching: true })
+        dispatch({ searching: true });
 
-        const regex = new RegExp(escapeRegExp(query), 'i')
-        const filteredSamples = data.filter(sample => {
+        const regex = new RegExp(escapeRegExp(query), "i");
+        const filteredSamples = data.filter((sample) => {
             let result = false;
-            Object.values(sample).forEach(value => result = result || regex.test(value))
-            return result
-        })
+            Object.values(sample).forEach(
+                (value) => (result = result || regex.test(value))
+            );
+            return result;
+        });
 
-        dispatch({ searching: false, results: filteredSamples })
-    }
+        dispatch({ searching: false, results: filteredSamples });
+    };
 
     return (
         <div className={style.samplesRoot}>
             <div className={style.searchBar}>
-                <Input transparent icon="search" placeholder="Search" loading={state.searching} onChange={searcher}/>
+                <Input
+                    transparent
+                    icon="search"
+                    placeholder="Search"
+                    loading={state.searching}
+                    onChange={searcher}
+                />
             </div>
             <div className={style.samplesTable}>
                 <SamplesTable data={state.results} />
