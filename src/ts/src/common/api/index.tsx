@@ -31,3 +31,17 @@ export const fetchSamples = async (): Promise<Array<Sample>> => {
     );
     return samples;
 };
+
+const TREE_MAP = new Map<string, keyof Tree>([
+    ["phylo_tree_id", "id"],
+    ["pathogen_genome_count", "pathogenGenomeCount"],
+    ["completed_date", "dateCompleted"],
+]);
+export const fetchTrees = async (): Promise<Array<Tree>> => {
+    const response = await axios.get("/api/phylo_trees");
+    const trees: Array<Tree> = response.data.map(
+        (entry: Record<string, string | number>) =>
+            jsonToType<Tree>(entry, TREE_MAP)
+    );
+    return trees;
+};

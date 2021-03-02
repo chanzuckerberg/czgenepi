@@ -71,7 +71,7 @@ const NavBar: FunctionComponent<Props> = ({ org, user }: Props) => {
         </div>
     );
 
-    const simpleUserMenu = <div className={style.item}>{user}</div>
+    const simpleUserMenu = <div className={style.item}>{user}</div>;
 
     const signInLink = (
         <a href="/login">
@@ -99,9 +99,7 @@ const NavBar: FunctionComponent<Props> = ({ org, user }: Props) => {
                     {orgSplash}
                 </div>
                 <div className={style.center}></div>
-                <div className={style.right}>
-                    {rightEdge}
-                </div>
+                <div className={style.right}>{rightEdge}</div>
             </div>
         </div>
     );

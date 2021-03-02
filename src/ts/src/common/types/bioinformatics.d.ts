@@ -2,18 +2,6 @@
 /// <reference types="react" />
 /// <reference types="react-dom" />
 
-type HostGenome = {
-    id: number;
-    name: string;
-    samplesCount: number;
-    erccOnly: boolean;
-};
-
-type Project = {
-    id: number;
-    name: string;
-};
-
 interface Sample {
     [index: string]: string;
     privateId: string;
@@ -24,7 +12,9 @@ interface Sample {
     gisaid?: string;
 }
 
-type Tree = {
-    id: number;
-    name: string;
-};
+interface Tree {
+    [index: string]: string | number;
+    id: string;
+    pathogenGenomeCount: number;
+    dateCompleted: string;
+}
