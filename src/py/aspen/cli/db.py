@@ -4,7 +4,7 @@ from IPython.terminal.embed import InteractiveShellEmbed
 from aspen.cli.toplevel import cli
 from aspen.config.development import DevelopmentConfig
 from aspen.covidhub_import import import_project
-from aspen.database.connection import get_db_uri, init_db
+from aspen.database.connection import enable_profiling, get_db_uri, init_db
 from aspen.database.models import *  # noqa: F401, F403
 from aspen.database.schema import create_tables_and_schema
 
@@ -23,10 +23,14 @@ def create_db(ctx):
 
 
 @db.command("interact")
+@click.option("--profile/--no-profile", default=False)
 @click.pass_context
-def interact(ctx):
+def interact(ctx, profile):
     # these are injected into the IPython scope, but they appear to be unused.
     engine = ctx.obj["ENGINE"]  # noqa: F841
+
+    if profile:
+        enable_profiling()
 
     shell = InteractiveShellEmbed()
     shell()

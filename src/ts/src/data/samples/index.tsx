@@ -1,95 +1,89 @@
-import React, { FunctionComponent } from "react";
-import { Search, Table } from "semantic-ui-react";
+import React, { FunctionComponent, useReducer } from "react";
+import { Input } from "semantic-ui-react";
+import { escapeRegExp } from "lodash/fp";
 
-import { ReactComponent as SampleIcon } from "common/icons/Sample.svg";
+import SamplesTable from "./SamplesTable";
 
 import style from "./index.module.scss";
 
-type Props = {
+interface Props {
     data?: Array<Sample>;
-};
-
-interface Headers {
-    text: string;
-    key: keyof Sample;
 }
 
-const TABLE_HEADERS: Array<Headers> = [
-    { text: "Private ID", key: "privateId" },
-    { text: "Public ID", key: "publicId" },
-    { text: "Upload Date", key: "uploadDate" },
-    { text: "Collection Date", key: "collectionDate" },
-    { text: "Collection Location", key: "collectionLocation" },
-    { text: "GISAID", key: "gisaid" },
-];
+interface InputOnChangeData {
+    [key: string]: string;
+    value: string;
+}
 
-const UNDEFINED_TEXT = "---";
+interface SearchState {
+    searching?: boolean;
+    results?: Array<Sample>;
+}
 
-const dummySamples: Array<Sample> = [
-    {
-        privateId: "0865-0004KGK00-001",
-        publicId: "0909EEEE-55-33",
-        uploadDate: "2/1/2021",
-        collectionDate: "12/12/2020",
-        collectionLocation: "Santa Clara County",
-        gisaid: "Accepted",
-    },
-    {
-        privateId: "0865-0004KGK00-002",
-        publicId: "0909EEEE-55-34",
-        uploadDate: "2/1/2021",
-        collectionDate: "12/12/2020",
-        collectionLocation: "Santa Clara County",
-        gisaid: "Accepted",
-    },
-];
+function searchReducer(state: SearchState, action: SearchState): SearchState {
+    return { ...state, ...action };
+}
 
-const Samples: FunctionComponent<Props> = ({ data = dummySamples }: Props) => {
-    const headerRow = TABLE_HEADERS.map((column) => (
-        <Table.HeaderCell key={column.key}>
-            <div className={style.headerCell}>{column.text}</div>
-        </Table.HeaderCell>
-    ));
+// const dummySamples: Array<Sample> = [
+//     {
+//         privateId: "0865-0004KGK00-001",
+//         publicId: "0909EEEE-55-33",
+//         uploadDate: "2/1/2021",
+//         collectionDate: "12/12/2020",
+//         collectionLocation: "Santa Clara County",
+//         gisaid: "Accepted",
+//     },
+//     {
+//         privateId: "0865-0004KGK00-002",
+//         publicId: "0909EEEE-55-34",
+//         uploadDate: "2/1/2021",
+//         collectionDate: "12/12/2020",
+//         collectionLocation: "Santa Clara County",
+//         gisaid: "Accepted",
+//     },
+// ];
 
-    const sampleRow = (sample: Sample): Array<JSX.Element> => {
-        return TABLE_HEADERS.map((column, index) => {
-            let displayData = sample[column.key];
-            let icon: JSX.Element | null = null;
-            if (displayData === undefined) {
-                displayData = UNDEFINED_TEXT;
-            }
-            if (index === 0) {
-                icon = <SampleIcon className={style.icon} />;
-            }
-            return (
-                <Table.Cell key={`${sample.privateId}-${column.key}`}>
-                    <div className={style.cell}>
-                        {icon}
-                        {displayData}
-                    </div>
-                </Table.Cell>
-            );
+const Samples: FunctionComponent<Props> = ({ data = [] }: Props) => {
+    // we are modifying state using hooks, so we need a reducer
+    const [state, dispatch] = useReducer(searchReducer, {
+        searching: false,
+        results: data,
+    });
+
+    // search functions
+    const searcher = (
+        event: React.ChangeEvent<HTMLInputElement>,
+        fieldInput: InputOnChangeData
+    ) => {
+        const query = fieldInput.value;
+        if (query.length === 0) {
+            dispatch({ results: data });
+            return;
+        }
+
+        dispatch({ searching: true });
+
+        const regex = new RegExp(escapeRegExp(query), "i");
+        const filteredSamples = data.filter((sample) => {
+            return Object.values(sample).some((value) => regex.test(value));
         });
-    };
 
-    const tableRows = (samples: Array<Sample>): Array<JSX.Element> => {
-        return samples.map((sample) => (
-            <Table.Row key={sample.privateId}>{sampleRow(sample)}</Table.Row>
-        ));
+        dispatch({ searching: false, results: filteredSamples });
     };
 
     return (
         <div className={style.samplesRoot}>
             <div className={style.searchBar}>
-                <Search defaultValue={"Search"} />
+                <Input
+                    transparent
+                    icon="search"
+                    placeholder="Search"
+                    loading={state.searching}
+                    onChange={searcher}
+                />
             </div>
             <div className={style.samplesTable}>
-                <Table basic="very">
-                    <Table.Header className={style.header}>
-                        <Table.Row>{headerRow}</Table.Row>
-                    </Table.Header>
-                    <Table.Body>{tableRows(data)}</Table.Body>
-                </Table>
+                <SamplesTable data={state.results} />
             </div>
         </div>
     );
