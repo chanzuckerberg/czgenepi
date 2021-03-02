@@ -15,6 +15,7 @@ from aspen.database.models.host_filtering import (  # noqa: F401
     FilterRead,
     HostFilteredSequencingReadsCollection,
 )
+from aspen.database.models.phylo_tree import PhyloRun, PhyloTree  # noqa: F401
 from aspen.database.models.sample import Sample  # noqa: F401
 from aspen.database.models.sequences import (  # noqa: F401
     CallConsensus,
