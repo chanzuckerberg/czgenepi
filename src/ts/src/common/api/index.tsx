@@ -11,7 +11,7 @@ const USER_MAP = new Map<string, keyof User>([
 export const fetchUserData = async (): Promise<
     Record<string, Group | User>
 > => {
-    const response = await axios.get("/api/usergroup");
+    const response = await axios.get(process.env.API_URL + "/api/usergroup");
     const group = response.data.group as Group;
     const user = jsonToType<User>(response.data.user, USER_MAP);
     return { group, user };

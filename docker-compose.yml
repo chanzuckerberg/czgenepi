@@ -24,6 +24,7 @@ services:
       HOST: 0.0.0.0
       PORT: 8000
       BUILD_PATH: build
+      API_URL: http://localhost:3000
       CHOKIDAR_USEPOLLING: 'true'
     depends_on:
       - backend
