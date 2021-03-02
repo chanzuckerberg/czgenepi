@@ -3,7 +3,7 @@
 /// <reference types="react-dom" />
 
 interface Group {
-    [index: string]: string;
+    [index: string]: JSONPrimitive;
     address: string;
     email: string;
     id: number;
@@ -11,7 +11,7 @@ interface Group {
 }
 
 interface User {
-    [index: string]: number | string | boolean;
+    [index: string]: JSONPrimitive;
     auth0UserId: string;
     email: string;
     groupAdmin: boolean;

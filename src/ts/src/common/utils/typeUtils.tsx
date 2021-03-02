@@ -11,7 +11,6 @@ export function get<T, K extends keyof T>(o: T, propertyName: K): T[K] {
 // and converts the data to an object of that type with the right keys.
 // Any keys not explicitly set in the mapping will be transferred to the
 // new object.
-type JSONPrimitive = string | number | boolean;
 
 export function jsonToType<T>(
     inputObject: Record<string, JSONPrimitive>,

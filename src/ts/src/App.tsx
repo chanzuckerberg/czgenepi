@@ -15,9 +15,9 @@ const App: FunctionComponent = () => {
 
     useEffect(() => {
         const setUserData = async () => {
-            const response = await fetchUserData();
-            setUser(response.user.name);
-            setOrg(response.group.name);
+            const [groupResponse, userResponse] = await fetchUserData();
+            setUser(userResponse.name);
+            setOrg(groupResponse.name);
         };
         setUserData();
     }, []);
