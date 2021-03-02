@@ -21,6 +21,8 @@ services:
         - BUILDKIT_INLINE_CACHE=1
     restart: always
     environment:
+      HOST: 0.0.0.0
+      PORT: 8000
       BUILD_PATH: build
       CHOKIDAR_USEPOLLING: 'true'
     depends_on:
@@ -47,7 +49,26 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - RESTART_ON_FAILURE=yes
+      - BOTO_ENDPOINT_URL=http://localstack:4566
+      - AWS_ACCESS_KEY_ID=dev_access_key_id
+      - AWS_SECRET_ACCESS_KEY=dev_secret_access_key
+      - AWS_REGION=us-west-2
     volumes:
       - ./src/py:/usr/src/app
+  localstack:
+    image: localstack/localstack@sha256:7c6635493185d25165979995fb073fd789c72b6d8b17ef3a70b798d55576732f
+    ports:
+      - "4566:4566"
+    environment:
+      - HOSTNAME_EXTERNAL=localstack
+      - SERVICES=s3,secretsmanager
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+      - PORT_WEB_UI=${PORT_WEB_UI- }
+      - HOST_TMP_FOLDER=${TMPDIR}
+      - DEFAULT_REGION=us-west-2
+    volumes:
+      - localstack:/tmp/localstack
 volumes:
   database:
+  localstack:

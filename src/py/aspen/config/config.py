@@ -93,7 +93,7 @@ class Config:
         session = aws.session()
 
         secret_name = os.environ.get("AUTH0_CONFIG_SECRET_NAME", "aspen-config")
-        client = session.client(service_name="secretsmanager")
+        client = session.client(service_name="secretsmanager", endpoint_url=os.getenv("BOTO_ENDPOINT_URL"))
 
         try:
             get_secret_value_response = client.get_secret_value(SecretId=secret_name)
