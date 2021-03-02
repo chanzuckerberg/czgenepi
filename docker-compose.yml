@@ -8,6 +8,7 @@ services:
     environment:
       - POSTGRES_USER=user_rw
       - POSTGRES_PASSWORD=password_rw
+      - POSTGRES_DB=aspen_db
     volumes:
       - database:/var/lib/postgresql/data
   frontend:
@@ -54,6 +55,7 @@ services:
       - AWS_ACCESS_KEY_ID=dev_access_key_id
       - AWS_SECRET_ACCESS_KEY=dev_secret_access_key
       - AWS_REGION=us-west-2
+      - ENV=local
     volumes:
       - ./src/py:/usr/src/app
   localstack:

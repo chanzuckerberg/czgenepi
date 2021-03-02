@@ -138,6 +138,7 @@ local-init: oauth/pkcs12/certificate.pfx .env.ecr local-ecr-login ## Launch a ne
 	docker-compose $(COMPOSE_OPTS) up -d frontend backend
 	docker-compose exec -T backend pip3 install awscli
 	docker-compose exec -T backend $(BACKEND_APP_ROOT)/scripts/setup_dev_data.sh
+	docker-compose exec -e PYTHONPATH=. -e DB=local -T backend alembic upgrade head
 
 .PHONY: local-status
 local-status: ## Show the status of the containers in the dev environment.

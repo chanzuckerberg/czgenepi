@@ -47,7 +47,7 @@ def get_uri():
         db_env = os.environ["DB"]
     else:
         # TODO: generate the appropriate list of "RuntimeEnvironment"s from the enum.
-        raise ValueError("Must provide env variable DB=[dev, staging, prod]")
+        raise ValueError("Must provide env variable DB=[local, dev, staging, prod]")
 
     return get_db_uri(Config.by_descriptive_name(db_env))
 
