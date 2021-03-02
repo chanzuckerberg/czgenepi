@@ -13,8 +13,8 @@ interface Sample {
 }
 
 interface Tree {
-    [index: string]: string | number
+    [index: string]: string | number;
     id: string;
     pathogenGenomeCount: number;
     dateCompleted: string;
-};
+}
