@@ -1,14 +1,18 @@
 @import "common/styles/colors";
 @import "common/styles/typography";
 @import "common/styles/spacing";
+@import "common/styles/corners";
 
 .samplesRoot {
     align-items: stretch;
     flex-direction: column;
 
     .searchBar {
-        margin: 0 0 $space-xl 0;
+        padding: $space-m;
+        margin: 0 0 $space-m 0;
         width: 20em;
+        border: thin solid $gray-light;
+        border-radius: $border-radius-l;
     }
 
     .samplesTable {

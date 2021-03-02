@@ -72,7 +72,7 @@ const Samples: FunctionComponent<Props> = ({ data = dummySamples }: Props) => {
     return (
         <div className={style.samplesRoot}>
             <div className={style.searchBar}>
-                <Input transparent icon="search" placeholder="Search..." loading={state.searching} onChange={searcher}/>
+                <Input transparent icon="search" placeholder="Search" loading={state.searching} onChange={searcher}/>
             </div>
             <div className={style.samplesTable}>
                 <SamplesTable data={state.results} />
