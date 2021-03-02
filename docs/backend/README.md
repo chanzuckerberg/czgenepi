@@ -85,15 +85,27 @@ aspen% .venv-ebcli/bin/eb terminate aspen-myusername
 
 ## Database concerns
 
-### Creating and initializing the local database.
-```bash
-aspen% make init-local-db
+### Interacting with the local database in sql
+
+You can also connect to your local psql console by running:
+```
+(.venv) aspen% docker exec -it aspen-local psql -h localhost -d aspen_db -U user_rw
+psql (13.1)
+Type "help" for help.
+
+aspen_db=> select * from aspen.users;
+ id | name | email | auth0_user_id | group_admin | system_admin | group_id
+----+------+-------+---------------+-------------+--------------+----------
+(0 rows)
+
+aspen_db=>
 ```
 
-### Interacting with the local database.
+### Interacting with the local database in python
+
 It is possible to interact with the local database in ipython:
 ```
-% aspen-cli db interact
+(.venv) aspen% aspen-cli db interact
 Python 3.7.6 (default, Dec 22 2019, 01:09:06)
 Type 'copyright', 'credits' or 'license' for more information
 IPython 7.20.0 -- An enhanced Interactive Python. Type '?' for help.
@@ -102,6 +114,27 @@ In [1]: session = engine.make_session()
 
 In [2]: session.query(User).all()
 Out[2]: []
+
+In [3]:
+```
+
+### Profiling SqlAlchemy queries
+
+`aspen-cli db interact` has a `--profile` option that prints out every query that's executed and how long they take:
+
+```
+(.venv) aspen% aspen-cli db interact --profile
+Python 3.7.9 (default, Sep  6 2020, 13:20:25)
+Type 'copyright', 'credits' or 'license' for more information
+IPython 7.20.0 -- An enhanced Interactive Python. Type '?' for help.
+
+In [1]: session = engine.make_session()
+
+In [2]: results = session.query(Sample).all()
+DEBUG:sqltime:Start Query: SELECT aspen.samples.id AS aspen_samples_id, aspen.samples.submitting_group_id AS aspen_samples_submitting_group_id, aspen.samples.private_identifier AS aspen_samples_private_identifier, aspen.samples.original_submission AS aspen_samples_original_submission, aspen.samples.public_identifier AS aspen_samples_public_identifier, aspen.samples.sample_collected_by AS aspen_samples_sample_collected_by, aspen.samples.sample_collector_contact_email AS aspen_samples_sample_collector_contact_email, aspen.samples.sample_collector_contact_address AS aspen_samples_sample_collector_contact_address, aspen.samples.authors AS aspen_samples_authors, aspen.samples.collection_date AS aspen_samples_collection_date, aspen.samples.location AS aspen_samples_location, aspen.samples.division AS aspen_samples_division, aspen.samples.country AS aspen_samples_country, aspen.samples.organism AS aspen_samples_organism, aspen.samples.host AS aspen_samples_host, aspen.samples.purpose_of_sampling AS aspen_samples_purpose_of_sampling, aspen.samples.specimen_processing AS aspen_samples_specimen_processing
+FROM aspen.samples
+DEBUG:sqltime:Query Complete!
+DEBUG:sqltime:Total Time: 0.012416
 
 In [3]:
 ```
