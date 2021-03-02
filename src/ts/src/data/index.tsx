@@ -56,7 +56,7 @@ const Data: FunctionComponent = () => {
                             {category.text}
                         </div>
                         <div className={style.count}>
-                            {category.data.length}
+                            {category.text === "Phylogenetic Trees" ? "1" : category.data.length}
                         </div>
                     </div>
                 </Menu.Item>
