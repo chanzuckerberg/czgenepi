@@ -1,32 +1,40 @@
 from datetime import datetime
 
-import pytest
-
 from aspen.database.models import (
     Accession,
     PublicRepositoryType,
+    Sample,
     SequencingInstrumentType,
     SequencingProtocolType,
     SequencingReadsCollection,
 )
 
 
-@pytest.fixture(scope="function")
-def sequencing_read(session, sample):
+def sequencing_read_factory(
+    sample: Sample,
+    sequencing_instrument=SequencingInstrumentType.ILLUMINA_GENOME_ANALYZER_IIX,
+    sequencing_protocol=SequencingProtocolType.ARTIC_V3,
+    sequencing_date=None,
+    s3_bucket="bucket",
+    s3_key="key",
+    accessions={
+        PublicRepositoryType.GISAID: "gisaid_public_identifier",
+    },
+) -> SequencingReadsCollection:
+    sequencing_date = sequencing_date or datetime.now()
     sequencing_reads = SequencingReadsCollection(
         sample=sample,
-        sequencing_instrument=SequencingInstrumentType.ILLUMINA_GENOME_ANALYZER_IIX,
-        sequencing_protocol=SequencingProtocolType.ARTIC_V3,
-        sequencing_date=datetime.now(),
-        s3_bucket="bucket",
-        s3_key="key",
+        sequencing_instrument=sequencing_instrument,
+        sequencing_protocol=sequencing_protocol,
+        sequencing_date=sequencing_date,
+        s3_bucket=s3_bucket,
+        s3_key=s3_key,
     )
-    sequencing_reads.accessions.append(
-        Accession(
-            repository_type=PublicRepositoryType.GISAID,
-            public_identifier="gisaid_public_identifier",
+    for public_repository_type, public_identifier in accessions.items():
+        sequencing_reads.accessions.append(
+            Accession(
+                repository_type=public_repository_type,
+                public_identifier=public_identifier,
+            )
         )
-    )
-    session.add(sequencing_reads)
-    session.commit()
     return sequencing_reads

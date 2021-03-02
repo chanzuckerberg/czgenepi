@@ -1,26 +1,23 @@
-import pytest
-
 from aspen.database.models import Group, User
 
 
-@pytest.fixture(scope="function")
-def group(session) -> Group:
-    group = Group(name="groupname", email="groupemail", address="123 Main St")
-    session.add(group)
-    session.commit()
-    return group
+def group_factory(name="groupname", email="groupemail", address="123 Main St") -> Group:
+    return Group(name=name, email=email, address=address)
 
 
-@pytest.fixture(scope="function")
-def user(session, group) -> User:
-    user = User(
-        name="test",
-        auth0_user_id="test_auth0_id",
-        email="test_user@dph.org",
-        group_admin=True,
-        system_admin=True,
+def user_factory(
+    group: Group,
+    name="test",
+    auth0_user_id="test_auth0_id",
+    email="test_user@dph.org",
+    group_admin=True,
+    system_admin=True,
+) -> User:
+    return User(
+        name=name,
+        auth0_user_id=auth0_user_id,
+        email=email,
+        group_admin=group_admin,
+        system_admin=system_admin,
         group=group,
     )
-    session.add(user)
-    session.commit()
-    return user
