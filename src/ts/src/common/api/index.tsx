@@ -45,7 +45,7 @@ const USER_MAP = new Map<string, keyof User>([
     ["group_admin", "groupAdmin"],
     ["system_admin", "systemAdmin"],
 ]);
-export const fetchUserData = async (): [Group, User] =>
+export const fetchUserData = async (): Promise<[Group, User]> =>
     apiSplitResponse<[Group, User]>([new Map([]), USER_MAP], "/api/usergroup");
 
 const SAMPLE_MAP = new Map<string, keyof Sample>([
@@ -55,7 +55,7 @@ const SAMPLE_MAP = new Map<string, keyof Sample>([
     ["public_identifier", "publicId"],
     ["upload_date", "uploadDate"],
 ]);
-export const fetchSamples = async (): Sample[] =>
+export const fetchSamples = async (): Promise<Sample[]> =>
     apiCollectionResponse<Sample>(SAMPLE_MAP, "/api/samples");
 
 const TREE_MAP = new Map<string, keyof Tree>([
@@ -63,5 +63,5 @@ const TREE_MAP = new Map<string, keyof Tree>([
     ["pathogen_genome_count", "pathogenGenomeCount"],
     ["completed_date", "dateCompleted"],
 ]);
-export const fetchTrees = async (): Tree[] =>
+export const fetchTrees = async (): Promise<Tree[]> =>
     apiCollectionResponse<Tree>(TREE_MAP, "/api/phylo_trees");
