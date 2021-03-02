@@ -71,6 +71,8 @@ const NavBar: FunctionComponent<Props> = ({ org, user }: Props) => {
         </div>
     );
 
+    const simpleUserMenu = <div className={style.item}>{user}</div>
+
     const signInLink = (
         <a href="/login">
             <div className={cx(style.item, style.link)}>Sign In</div>
@@ -81,7 +83,7 @@ const NavBar: FunctionComponent<Props> = ({ org, user }: Props) => {
         if (user === undefined) {
             return signInLink;
         } else {
-            return userMenu;
+            return simpleUserMenu;
         }
     }
 
@@ -98,7 +100,7 @@ const NavBar: FunctionComponent<Props> = ({ org, user }: Props) => {
                 </div>
                 <div className={style.center}></div>
                 <div className={style.right}>
-                    {navigationLinks}
+                    {/* navigationLinks */}
                     {rightEdge}
                 </div>
             </div>
