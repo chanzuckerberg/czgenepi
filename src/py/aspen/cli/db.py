@@ -44,10 +44,30 @@ def interact(ctx, profile):
 @db.command("import-covidhub-project")
 @click.option("--covidhub-db-secret", default="cliahub/cliahub_test_db")
 @click.option("--rr-project-id", type=str, required=True)
+@click.option("--s3-src-prefix", type=str, required=True)
+@click.option("--s3-src-profile", type=str, required=True)
+@click.option("--s3-dst-prefix", type=str, required=True)
+@click.option("--s3-dst-profile", type=str, required=True)
 @click.pass_context
-def import_covidhub_project(ctx, covidhub_db_secret, rr_project_id):
+def import_covidhub_project(
+    ctx,
+    covidhub_db_secret,
+    rr_project_id,
+    s3_src_prefix,
+    s3_src_profile,
+    s3_dst_prefix,
+    s3_dst_profile,
+):
     from aspen.covidhub_import import import_project
     # these are injected into the IPython scope, but they appear to be unused.
     engine = ctx.obj["ENGINE"]
 
-    import_project(engine, covidhub_db_secret, rr_project_id)
+    import_project(
+        engine,
+        covidhub_db_secret,
+        rr_project_id,
+        s3_src_prefix,
+        s3_src_profile,
+        s3_dst_prefix,
+        s3_dst_profile,
+    )

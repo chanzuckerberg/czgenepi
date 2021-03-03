@@ -3,7 +3,7 @@ import { Switch, Route, Link, Redirect } from "react-router-dom";
 import { Menu } from "semantic-ui-react";
 import cx from "classnames";
 
-import { fetchSamples } from "common/api";
+import { fetchSamples, fetchTrees } from "common/api";
 
 import Samples from "./samples";
 
@@ -14,11 +14,12 @@ const Data: FunctionComponent = () => {
     const [trees, setTrees] = useState<Array<Tree>>([]);
 
     useEffect(() => {
-        const setSampleData = async () => {
-            const apiSamples = await fetchSamples();
-            setSamples(apiSamples);
+        const setBioinformaticsData = async () => {
+            const [apiSamples, apiTrees] = [fetchSamples(), fetchTrees()];
+            setSamples(await apiSamples);
+            setTrees(await apiTrees);
         };
-        setSampleData();
+        setBioinformaticsData();
     }, []);
 
     // this constant is inside the component so we can associate
@@ -34,7 +35,7 @@ const Data: FunctionComponent = () => {
             to: "/data/phylogenetic_trees",
             text: "Phylogenetic Trees",
             data: trees,
-            jsx: <div>Phylogenetic Trees</div>,
+            jsx: <div>{trees.length} Trees</div>,
         },
     ];
 

@@ -1,19 +1,36 @@
 import json
 
 from aspen.app.views import api_utils
+from aspen.test_infra.models.sample import sample_factory
+from aspen.test_infra.models.sequences import sequencing_read_factory
+from aspen.test_infra.models.usergroup import group_factory, user_factory
 
 
-def test_usergroup_view(session, app, client, user, group):
+def test_usergroup_view(session, app, client):
+    group = group_factory()
+    user = user_factory(group)
+    session.add(group)
+    session.commit()
     with client.session_transaction() as sess:
-        sess["profile"] = {"name": "test", "user_id": "test_auth0_id"}
+        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
     res = client.get("/api/usergroup")
     expected = {"user": user.to_dict(), "group": group.to_dict()}
     assert expected == json.loads(res.get_data(as_text=True))
 
 
-def test_samples_view(session, app, client, user, group, sample, sequencing_read):
+def test_samples_view(
+    session,
+    app,
+    client,
+):
+    group = group_factory()
+    user = user_factory(group)
+    sample = sample_factory(group)
+    sequencing_read = sequencing_read_factory(sample)
+    session.add(group)
+    session.commit()
     with client.session_transaction() as sess:
-        sess["profile"] = {"name": "test", "user_id": "test_auth0_id"}
+        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
     res = client.get("/api/samples")
     expected = [
         {
