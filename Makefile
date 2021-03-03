@@ -141,7 +141,7 @@ local-init: oauth/pkcs12/certificate.pfx .env.ecr local-ecr-login ## Launch a ne
 	docker-compose exec -T backend pip install .
 	-@docker-compose exec -e PGPASSWORD=$(LOCAL_DB_RW_USERNAME) database psql -h localhost -d $(LOCAL_DB_NAME) -U user_rw -c "CREATE USER $(LOCAL_DB_RO_USERNAME) WITH PASSWORD '$(LOCAL_DB_RO_PASSWORD)';"
 	docker-compose exec -T -e DB=local backend aspen-cli db --env local create
-	docker-compose exec -e PYTHONPATH=. -e DB=local -T backend alembic stamp head
+	docker-compose exec -e -e DB=local -T backend alembic stamp head
 
 .PHONY: local-status
 local-status: ## Show the status of the containers in the dev environment.
