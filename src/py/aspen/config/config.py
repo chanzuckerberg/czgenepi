@@ -161,15 +161,24 @@ class Config:
 
     @property
     def AUTH0_BASE_URL(self) -> str:
-        return f"https://{self.AUTH0_DOMAIN}"
+        try:
+            return self.AWS_SECRET["AUTH0_BASE_URL"]
+        except KeyError:
+            return f"https://{self.AUTH0_DOMAIN}"
 
     @property
     def AUTH0_ACCESS_TOKEN_URL(self) -> str:
-        return f"{self.AUTH0_BASE_URL}/oauth/token"
+        try:
+            return self.AWS_SECRET["AUTH0_ACCESS_TOKEN_URL"]
+        except KeyError:
+            return f"{self.AUTH0_BASE_URL}/oauth/token"
 
     @property
     def AUTH0_AUTHORIZE_URL(self) -> str:
-        return f"{self.AUTH0_BASE_URL}/authorize"
+        try:
+            return self.AWS_SECRET["AUTH0_AUTHORIZE_URL"]
+        except KeyError:
+            return f"{self.AUTH0_BASE_URL}/authorize"
 
     @property
     def AUTH0_CLIENT_KWARGS(self) -> Mapping[str, Any]:

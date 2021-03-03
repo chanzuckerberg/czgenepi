@@ -1,6 +1,6 @@
 # Separate base image so that we can use it to update the Pipfile.lock and requirements.txt file
 FROM python:3.9.1-slim AS base
-ENV FLASK_APP=aspen.app.app
+ENV FLASK_APP=aspen.main
 EXPOSE 3000
 RUN pip install --no-cache-dir pipenv
 WORKDIR /usr/src/app

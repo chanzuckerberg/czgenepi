@@ -43,6 +43,7 @@ if flask_env in ("production", "development", "local", "staging"):
         access_token_url=application.aspen_config.AUTH0_ACCESS_TOKEN_URL,
         authorize_url=application.aspen_config.AUTH0_AUTHORIZE_URL,
         client_kwargs=application.aspen_config.AUTH0_CLIENT_KWARGS,
+        verify=False, # TODO FIXME temporary hack for soluto mock
     )
 else:
     auth0 = None
