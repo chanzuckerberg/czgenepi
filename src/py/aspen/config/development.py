@@ -1,4 +1,4 @@
-import uuid
+import platform
 
 from aspen.config import config
 
@@ -10,7 +10,7 @@ class DevelopmentConfig(config.Config, descriptive_name="dev"):
 
     @config.flaskproperty
     def SECRET_KEY(self) -> str:
-        return uuid.uuid4().hex
+        return platform.node()
 
     @property
     def AUTH0_CALLBACK_URL(self) -> str:
