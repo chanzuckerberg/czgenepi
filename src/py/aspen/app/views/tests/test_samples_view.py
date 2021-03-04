@@ -2,6 +2,7 @@ import json
 from typing import Any, Sequence, Tuple
 
 from aspen.app.views import api_utils
+from aspen.app.views.sample import SAMPLE_KEY
 from aspen.database.models import CanSee, DataType, Sample, SequencingReadsCollection
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import sequencing_read_factory
@@ -22,16 +23,18 @@ def test_samples_view(
     with client.session_transaction() as sess:
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
     res = client.get("/api/samples")
-    expected = [
-        {
-            "collection_date": api_utils.format_date(sample.collection_date),
-            "collection_location": sample.location,
-            "private_identifier": sample.private_identifier,
-            "public_identifier": sample.public_identifier,
-            "upload_date": api_utils.format_datetime(sequencing_read.upload_date),
-            "gisaid": sequencing_read.accessions[0].public_identifier,
-        }
-    ]
+    expected = {
+        SAMPLE_KEY: [
+            {
+                "collection_date": api_utils.format_date(sample.collection_date),
+                "collection_location": sample.location,
+                "private_identifier": sample.private_identifier,
+                "public_identifier": sample.public_identifier,
+                "upload_date": api_utils.format_datetime(sequencing_read.upload_date),
+                "gisaid": sequencing_read.accessions[0].public_identifier,
+            }
+        ]
+    }
     assert expected == json.loads(res.get_data(as_text=True))
 
 
@@ -57,7 +60,11 @@ def _test_samples_view_cansee(
     with client.session_transaction() as sess:
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
     res = client.get("/api/samples")
-    return sample, sequencing_read_collection, json.loads(res.get_data(as_text=True))
+    return (
+        sample,
+        sequencing_read_collection,
+        json.loads(res.get_data(as_text=True))[SAMPLE_KEY],
+    )
 
 
 def test_samples_view_no_cansee(
@@ -65,12 +72,12 @@ def test_samples_view_no_cansee(
     app,
     client,
 ):
-    _, _, json_response = _test_samples_view_cansee(
+    _, _, samples = _test_samples_view_cansee(
         session,
         client,
         cansee_datatypes=(),
     )
-    assert json_response == []
+    assert samples == []
 
 
 def test_samples_view_cansee_trees(
@@ -78,12 +85,12 @@ def test_samples_view_cansee_trees(
     app,
     client,
 ):
-    _, _, json_response = _test_samples_view_cansee(
+    _, _, samples = _test_samples_view_cansee(
         session,
         client,
         cansee_datatypes=(DataType.TREES,),
     )
-    assert json_response == []
+    assert samples == []
 
 
 def test_samples_view_cansee_sequences(
@@ -91,12 +98,12 @@ def test_samples_view_cansee_sequences(
     app,
     client,
 ):
-    _, _, json_response = _test_samples_view_cansee(
+    _, _, samples = _test_samples_view_cansee(
         session,
         client,
         cansee_datatypes=(DataType.SEQUENCES,),
     )
-    assert json_response == []
+    assert samples == []
 
 
 def test_samples_view_cansee_metadata(
@@ -104,14 +111,14 @@ def test_samples_view_cansee_metadata(
     app,
     client,
 ):
-    sample, sequencing_read_collection, json_response = _test_samples_view_cansee(
+    sample, sequencing_read_collection, samples = _test_samples_view_cansee(
         session,
         client,
         cansee_datatypes=(DataType.METADATA,),
     )
 
     # no private identifier in the output.
-    assert json_response == [
+    assert samples == [
         {
             "collection_date": api_utils.format_date(sample.collection_date),
             "collection_location": sample.location,
@@ -131,14 +138,14 @@ def test_samples_view_cansee_private_identifiers(
 ):
     """This state really makes no sense because why would you be able to see private
     identifiers but not metadata??  But we'll ensure it still does the right thing."""
-    _, _, json_response = _test_samples_view_cansee(
+    _, _, samples = _test_samples_view_cansee(
         session,
         client,
         cansee_datatypes=(DataType.PRIVATE_IDENTIFIERS,),
     )
 
     # no private identifier in the output.
-    assert json_response == []
+    assert samples == []
 
 
 def test_samples_view_cansee_all(
@@ -146,14 +153,14 @@ def test_samples_view_cansee_all(
     app,
     client,
 ):
-    sample, sequencing_read_collection, json_response = _test_samples_view_cansee(
+    sample, sequencing_read_collection, samples = _test_samples_view_cansee(
         session,
         client,
         cansee_datatypes=(DataType.METADATA, DataType.PRIVATE_IDENTIFIERS),
     )
 
     # no private identifier in the output.
-    assert json_response == [
+    assert samples == [
         {
             "collection_date": api_utils.format_date(sample.collection_date),
             "collection_location": sample.location,
