@@ -15,7 +15,7 @@ from sqlalchemy import (
     String,
     UniqueConstraint,
 )
-from sqlalchemy.orm import backref, relationship
+from sqlalchemy.orm import backref, deferred, relationship
 
 from aspen.database.models.base import base
 from aspen.database.models.entity import Entity, EntityType
@@ -146,7 +146,7 @@ class PathogenGenome(Entity):
     __tablename__ = "pathogen_genomes"
 
     entity_id = Column(Integer, ForeignKey(Entity.id), primary_key=True)
-    sequence = Column(String, nullable=False)
+    sequence = deferred(Column(String, nullable=False))
 
     # statistics for the pathogen genome
 
