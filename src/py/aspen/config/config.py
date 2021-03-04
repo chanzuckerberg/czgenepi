@@ -182,9 +182,19 @@ class Config:
 
     @property
     def AUTH0_CLIENT_KWARGS(self) -> Mapping[str, Any]:
-        return {
-            "scope": "openid profile email",
-        }
+        try:
+            return self.AWS_SECRET["AUTH0_CLIENT_KWARGS"]
+        except KeyError:
+            return {
+                "scope": "openid profile email",
+            }
+
+    @property
+    def AUTH0_USERINFO_URL(self) -> str:
+        try:
+            return self.AWS_SECRET["AUTH0_USERINFO_URL"]
+        except KeyError:
+            return "userinfo"
 
     ####################################################################################
     # database properties

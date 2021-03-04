@@ -26,7 +26,8 @@ ${local_aws} secretsmanager update-secret --secret-id aspen-config --secret-stri
   "AUTH0_CLIENT_SECRET": "local-client-secret",
   "AUTH0_DOMAIN": "oidc",
   "AUTH0_BASE_URL": "'"${OIDC_INTERNAL_URL}"'",
+  "AUTH0_USERINFO_URL": "connect/userinfo",
   "AUTH0_ACCESS_TOKEN_URL": "'"${OIDC_INTERNAL_URL}"'/connect/token",
   "AUTH0_AUTHORIZE_URL": "'"${OIDC_BROWSER_URL}"'/connect/authorize",
-  "AUTH0_CLIENT_KWARGS": ""
+  "AUTH0_CLIENT_KWARGS": {"scope": "openid profile email offline_access"}
 }' || true
