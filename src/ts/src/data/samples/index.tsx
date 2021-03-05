@@ -47,7 +47,7 @@ const Samples: FunctionComponent<Props> = ({ data }: Props) => {
     // we are modifying state using hooks, so we need a reducer
     const [state, dispatch] = useReducer(searchReducer, {
         searching: false,
-        results: undefined,
+        results: data,
     });
 
     // search functions
@@ -90,18 +90,18 @@ const Samples: FunctionComponent<Props> = ({ data }: Props) => {
                 </div>
             </div>
         );
-    }
+    };
 
     if (state.results === undefined) {
         let tableData: Array<Sample> = [];
         if (data !== undefined) {
-            dispatch({ results: data })
+            dispatch({ results: data });
             tableData = data;
         }
-        return render(tableData)
+        return render(tableData);
     }
 
-    return render(state.results)
+    return render(state.results);
 };
 
 export default Samples;

@@ -56,7 +56,7 @@ const SamplesTable: FunctionComponent<Props> = ({ data }: Props) => {
 
     const tableRows = (samples?: Array<Sample>): Array<JSX.Element> => {
         if (samples === undefined) {
-            return []
+            return [];
         }
         return samples.map((sample) => (
             <Table.Row key={sample.privateId}>{sampleRow(sample)}</Table.Row>
