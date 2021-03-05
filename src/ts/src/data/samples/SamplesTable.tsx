@@ -25,7 +25,7 @@ const TABLE_HEADERS: Array<Header> = [
 
 const UNDEFINED_TEXT = "---";
 
-const SamplesTable: FunctionComponent<Props> = ({ data = [] }: Props) => {
+const SamplesTable: FunctionComponent<Props> = ({ data }: Props) => {
     // render functions
     const headerRow = TABLE_HEADERS.map((column: Header) => (
         <Table.HeaderCell key={column.key}>
@@ -54,7 +54,10 @@ const SamplesTable: FunctionComponent<Props> = ({ data = [] }: Props) => {
         });
     };
 
-    const tableRows = (samples: Array<Sample>): Array<JSX.Element> => {
+    const tableRows = (samples?: Array<Sample>): Array<JSX.Element> => {
+        if (samples === undefined) {
+            return []
+        }
         return samples.map((sample) => (
             <Table.Row key={sample.privateId}>{sampleRow(sample)}</Table.Row>
         ));
