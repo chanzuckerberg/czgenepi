@@ -21,23 +21,5 @@
 
     .samplesTable {
         margin: $space-m 0 0 0;
-
-        .header {
-            .headerCell {
-                @include font-header-s;
-                color: $gray-dark;
-            }
-        }
-
-        .cell {
-            @include font-header-s;
-            align-items: center;
-            margin: $space-xs 0 $space-xs 0;
-
-            .icon {
-                margin: 0 $space-l 0 $space-l;
-                fill: $gray-light;
-            }
-        }
     }
 }
