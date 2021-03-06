@@ -29,6 +29,7 @@ export const fetchSamples = async (): Promise<Array<Sample>> => {
     const samples: Array<Sample> = response.data.map(
         (entry: Record<string, string>) => jsonToType<Sample>(entry, SAMPLE_MAP)
     );
+    samples.forEach((sample) => (sample.type = "Sample"));
     return samples;
 };
 
@@ -43,5 +44,6 @@ export const fetchTrees = async (): Promise<Array<Tree>> => {
         (entry: Record<string, string | number>) =>
             jsonToType<Tree>(entry, TREE_MAP)
     );
+    trees.forEach((tree) => (tree.type = "Tree"));
     return trees;
 };

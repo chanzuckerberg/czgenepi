@@ -8,7 +8,7 @@ import { DataSubview } from "common/components";
 
 import style from "./index.module.scss";
 
-const SAMPLE_HEADERS: Array<Header> = [
+const SAMPLE_HEADERS: Header[] = [
     { text: "Private ID", key: "privateId" },
     { text: "Public ID", key: "publicId" },
     { text: "Upload Date", key: "uploadDate" },
@@ -17,15 +17,15 @@ const SAMPLE_HEADERS: Array<Header> = [
     { text: "GISAID", key: "gisaid" },
 ];
 
-const TREE_HEADERS: Array<Header> = [
+const TREE_HEADERS: Header[] = [
     { text: "Tree Name", key: "id" },
     { text: "Creation Date", key: "creationDate" },
     { text: "Total Samples", key: "pathogenGenomeCount" },
 ];
 
 const Data: FunctionComponent = () => {
-    const [samples, setSamples] = useState<Array<Sample> | undefined>();
-    const [trees, setTrees] = useState<Array<Tree> | undefined>();
+    const [samples, setSamples] = useState<Sample[] | undefined>();
+    const [trees, setTrees] = useState<Tree[] | undefined>();
 
     useEffect(() => {
         const setBioinformaticsData = async () => {
@@ -82,7 +82,12 @@ const Data: FunctionComponent = () => {
             <Route
                 path={category.to}
                 key={category.text}
-                render={() => <DataSubview data={category.data} headers={category.headers}/>}
+                render={() => (
+                    <DataSubview
+                        data={category.data}
+                        headers={category.headers}
+                    />
+                )}
             />
         );
     });

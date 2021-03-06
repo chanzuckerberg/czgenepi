@@ -8,7 +8,7 @@ import style from "./index.module.scss";
 
 interface Props {
     data?: BioinformaticsType[];
-    headers: Array<Header>;
+    headers: Header[];
 }
 
 interface InputOnChangeData {
@@ -18,7 +18,7 @@ interface InputOnChangeData {
 
 interface SearchState {
     searching?: boolean;
-    results?: BioinformaticsType[]
+    results?: BioinformaticsType[];
 }
 
 function searchReducer(state: SearchState, action: SearchState): SearchState {
@@ -26,7 +26,6 @@ function searchReducer(state: SearchState, action: SearchState): SearchState {
 }
 
 const DataSubview: FunctionComponent<Props> = ({ data, headers }: Props) => {
-
     // we are modifying state using hooks, so we need a reducer
     const [state, dispatch] = useReducer(searchReducer, {
         searching: false,
@@ -49,7 +48,9 @@ const DataSubview: FunctionComponent<Props> = ({ data, headers }: Props) => {
         dispatch({ searching: true });
 
         const regex = new RegExp(escapeRegExp(query), "i");
-        const filteredData = Array.prototype.filter.call(data, (item => Object.values(item).some((value) => regex.test(`${value}`))))
+        const filteredData = data.filter((item) =>
+            Object.values(item).some((value) => regex.test(`${value}`))
+        );
 
         dispatch({ searching: false, results: filteredData });
     };
@@ -67,7 +68,7 @@ const DataSubview: FunctionComponent<Props> = ({ data, headers }: Props) => {
                     />
                 </div>
                 <div className={style.samplesTable}>
-                    <DataTable data={tableData} headers={headers}/>
+                    <DataTable data={tableData} headers={headers} />
                 </div>
             </div>
         );
