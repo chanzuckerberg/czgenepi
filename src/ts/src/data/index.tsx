@@ -24,8 +24,8 @@ const TREE_HEADERS: Array<Header> = [
 ];
 
 const Data: FunctionComponent = () => {
-    const [samples, setSamples] = useState<Array<Sample>>([]);
-    const [trees, setTrees] = useState<Array<Tree>>([]);
+    const [samples, setSamples] = useState<Array<Sample> | undefined>();
+    const [trees, setTrees] = useState<Array<Tree> | undefined>();
 
     useEffect(() => {
         const setBioinformaticsData = async () => {
@@ -71,7 +71,7 @@ const Data: FunctionComponent = () => {
                             {category.text}
                         </div>
                         <div className={style.count}>
-                            {category.data.length}
+                            {category.data?.length}
                         </div>
                     </div>
                 </Menu.Item>

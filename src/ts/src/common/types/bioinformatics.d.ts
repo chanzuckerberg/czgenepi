@@ -19,5 +19,4 @@ interface Tree {
     creationDate: string;
 }
 
-type BioinformaticsData = Sample[] | Tree[]
 type BioinformaticsType = Sample | Tree

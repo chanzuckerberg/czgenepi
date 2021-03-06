@@ -7,7 +7,7 @@ import { DataTable } from "common/components";
 import style from "./index.module.scss";
 
 interface Props {
-    data?: BioinformaticsData;
+    data?: BioinformaticsType[];
     headers: Array<Header>;
 }
 
@@ -18,7 +18,7 @@ interface InputOnChangeData {
 
 interface SearchState {
     searching?: boolean;
-    results?: BioinformaticsData
+    results?: BioinformaticsType[]
 }
 
 function searchReducer(state: SearchState, action: SearchState): SearchState {
@@ -54,7 +54,7 @@ const DataSubview: FunctionComponent<Props> = ({ data, headers }: Props) => {
         dispatch({ searching: false, results: filteredData });
     };
 
-    const render = (tableData: BioinformaticsData) => {
+    const render = (tableData: BioinformaticsType[]) => {
         return (
             <div className={style.samplesRoot}>
                 <div className={style.searchBar}>
@@ -74,7 +74,7 @@ const DataSubview: FunctionComponent<Props> = ({ data, headers }: Props) => {
     };
 
     if (state.results === undefined) {
-        let tableData: BioinformaticsData = [];
+        let tableData: BioinformaticsType[] = [];
         if (data !== undefined) {
             dispatch({ results: data });
             tableData = data;

@@ -6,7 +6,7 @@ import { ReactComponent as SampleIcon } from "common/icons/Sample.svg";
 import style from "./index.module.scss";
 
 interface Props {
-    data?: BioinformaticsData;
+    data?: BioinformaticsType[];
     headers: Array<Header>;
 }
 
@@ -43,8 +43,8 @@ const DataTable: FunctionComponent<Props> = ({ data = [], headers }: Props) => {
         });
     };
 
-    function tableRows<T extends BioinformaticsType[]>(data: T): Array<JSX.Element> {
-        return data.map((item: BioinformaticsType) => (
+    function tableRows(data: BioinformaticsType[]): Array<JSX.Element> {
+        return data.map((item) => (
             <Table.Row key={item[indexingKey]}>{sampleRow(item)}</Table.Row>
         ));
     };
@@ -54,7 +54,7 @@ const DataTable: FunctionComponent<Props> = ({ data = [], headers }: Props) => {
             <Table.Header className={style.header}>
                 <Table.Row>{headerRow}</Table.Row>
             </Table.Header>
-            <Table.Body>{tableRows<typeof data>(data)}</Table.Body>
+            <Table.Body>{tableRows(data)}</Table.Body>
         </Table>
     );
 };
