@@ -17,6 +17,8 @@ from aspen.database.models import (
 from aspen.database.models.sample import Sample
 from aspen.database.models.usergroup import Group, User
 
+SAMPLE_KEY = "samples"
+
 
 def _format_created_date(sample: Sample) -> str:
     if sample.sequencing_reads_collection is not None:
@@ -100,4 +102,4 @@ def samples():
 
             results.append(returned_sample_data)
 
-        return jsonify(results)
+        return jsonify({SAMPLE_KEY: results})

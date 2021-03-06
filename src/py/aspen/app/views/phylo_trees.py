@@ -20,6 +20,8 @@ from aspen.database.models import (
 from aspen.database.models.usergroup import Group, User
 from aspen.error.recoverable import RecoverableError
 
+PHYLO_TREE_KEY = "phylo_trees"
+
 
 @application.route("/api/phylo_trees", methods=["GET"])
 @requires_auth
@@ -70,7 +72,7 @@ def phylo_trees():
                 }
             )
 
-        return jsonify(results)
+        return jsonify({PHYLO_TREE_KEY: results})
 
 
 @application.route("/api/phylo_tree/<int:phylo_tree_id>", methods=["GET"])
