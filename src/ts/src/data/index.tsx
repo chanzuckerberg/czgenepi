@@ -4,10 +4,24 @@ import { Menu } from "semantic-ui-react";
 import cx from "classnames";
 
 import { fetchSamples, fetchTrees } from "common/api";
-
-import Samples from "./samples";
+import { DataSubview } from "common/components";
 
 import style from "./index.module.scss";
+
+const SAMPLE_HEADERS: Array<Header> = [
+    { text: "Private ID", key: "privateId" },
+    { text: "Public ID", key: "publicId" },
+    { text: "Upload Date", key: "uploadDate" },
+    { text: "Collection Date", key: "collectionDate" },
+    { text: "Collection Location", key: "collectionLocation" },
+    { text: "GISAID", key: "gisaid" },
+];
+
+const TREE_HEADERS: Array<Header> = [
+    { text: "Tree Name", key: "id" },
+    { text: "Creation Date", key: "creationDate" },
+    { text: "Total Samples", key: "pathogenGenomeCount" },
+];
 
 const Data: FunctionComponent = () => {
     const [samples, setSamples] = useState<Array<Sample>>([]);
@@ -29,13 +43,13 @@ const Data: FunctionComponent = () => {
             to: "/data/samples",
             text: "Samples",
             data: samples,
-            jsx: <Samples data={samples} />,
+            headers: SAMPLE_HEADERS,
         },
         {
             to: "/data/phylogenetic_trees",
             text: "Phylogenetic Trees",
             data: trees,
-            jsx: <div>{trees.length} Trees</div>,
+            headers: TREE_HEADERS,
         },
     ];
 
@@ -68,7 +82,7 @@ const Data: FunctionComponent = () => {
             <Route
                 path={category.to}
                 key={category.text}
-                render={() => category.jsx}
+                render={() => <DataSubview data={category.data} headers={category.headers}/>}
             />
         );
     });

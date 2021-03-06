@@ -16,5 +16,8 @@ interface Tree {
     [index: string]: string | number;
     id: string;
     pathogenGenomeCount: number;
-    dateCompleted: string;
+    creationDate: string;
 }
+
+type BioinformaticsData = Sample[] | Tree[]
+type BioinformaticsType = Sample | Tree
