@@ -1,7 +1,3 @@
-/// <reference types="node" />
-/// <reference types="react" />
-/// <reference types="react-dom" />
-
 interface Group {
     [index: string]: string;
     address: string;

@@ -15,9 +15,9 @@ const Data: FunctionComponent = () => {
 
     useEffect(() => {
         const setBioinformaticsData = async () => {
-            const [apiSamples, apiTrees] = [fetchSamples(), fetchTrees()];
-            setSamples(await apiSamples);
-            setTrees(await apiTrees);
+            const [apiSamples, apiTrees]: [Sample[], Tree[]] = await Promise.all([fetchSamples(), fetchTrees()]);
+            setSamples(apiSamples);
+            setTrees(apiTrees);
         };
         setBioinformaticsData();
     }, []);

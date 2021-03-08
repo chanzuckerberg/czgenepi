@@ -1,7 +1,3 @@
-/// <reference types="node" />
-/// <reference types="react" />
-/// <reference types="react-dom" />
-
 interface Sample {
     [index: string]: string;
     privateId: string;
