@@ -7,7 +7,7 @@ import { jsonToType } from "common/utils";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 async function apiResponse<T extends any[]>(
     keys: string[],
-    mappings: Map<string, string | number>[],
+    mappings: (Map<string, string | number> | null)[],
     endpoint: string
 ): Promise<T> {
     const response = await axios.get(endpoint);
@@ -34,7 +34,7 @@ const USER_MAP = new Map<string, keyof User>([
 export const fetchUserData = (): Promise<[Group, User]> =>
     apiResponse<[Group, User]>(
         ["group", "user"],
-        [new Map<string, keyof Group>(), USER_MAP],
+        [null, USER_MAP],
         "/api/usergroup"
     );
 
