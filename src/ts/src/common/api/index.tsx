@@ -46,7 +46,11 @@ const SAMPLE_MAP = new Map<string, keyof Sample>([
     ["upload_date", "uploadDate"],
 ]);
 export const fetchSamples = (): Promise<Sample[]> =>
-    apiResponse<[Sample[]]>(["samples"], [SAMPLE_MAP], "/api/samples").then(arr => arr.flat());
+    apiResponse<[Sample[]]>(
+        ["samples"],
+        [SAMPLE_MAP],
+        "/api/samples"
+    ).then((arr) => arr.flat());
 
 const TREE_MAP = new Map<string, keyof Tree>([
     ["phylo_tree_id", "id"],
@@ -54,4 +58,8 @@ const TREE_MAP = new Map<string, keyof Tree>([
     ["completed_date", "dateCompleted"],
 ]);
 export const fetchTrees = (): Promise<Tree[]> =>
-    apiResponse<[Tree[]]>(["phylo_trees"], [TREE_MAP], "/api/phylo_trees").then(arr => arr.flat());
+    apiResponse<[Tree[]]>(
+        ["phylo_trees"],
+        [TREE_MAP],
+        "/api/phylo_trees"
+    ).then((arr) => arr.flat());
