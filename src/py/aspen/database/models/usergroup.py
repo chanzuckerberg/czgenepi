@@ -1,8 +1,16 @@
+from __future__ import annotations
+
+from collections import MutableSequence
+from typing import TYPE_CHECKING
+
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import backref, relationship
 
 from aspen.database.models.base import idbase
 from aspen.database.models.mixins import DictMixin
+
+if TYPE_CHECKING:
+    from aspen.database.models.cansee import CanSee
 
 
 class Group(idbase, DictMixin):
@@ -31,6 +39,9 @@ class User(idbase, DictMixin):
 
     group_id = Column(Integer, ForeignKey(Group.id), nullable=False)
     group = relationship(Group, backref=backref("users", uselist=True))
+
+    can_see: MutableSequence[CanSee]
+    can_be_seen_by: MutableSequence[CanSee]
 
     def __repr__(self):
         return f"User <{self.name}>"
