@@ -19,8 +19,7 @@ export function jsonToType<T>(
     Object.keys(inputObject).forEach((key) => {
         if (keyMap === null) {
             entries.push([key, inputObject[key]]);
-        }
-        else if (keyMap.has(key)) {
+        } else if (keyMap.has(key)) {
             entries.push([keyMap.get(key) as string, inputObject[key]]);
         } else {
             entries.push([key, inputObject[key]]);

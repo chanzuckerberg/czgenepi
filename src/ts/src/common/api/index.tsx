@@ -13,10 +13,12 @@ async function apiResponse<T extends APIResponse>(
 ): Promise<T> {
     const response = await axios.get(endpoint);
     const convertedData = keys.map((key, index) => {
-        type keyType = T[typeof key]
+        type keyType = T[typeof key];
         const typeData = response.data[key];
         const keyMap = mappings[index];
-        let resultData: Record<string, JSONPrimitive> | Array<Record<string, JSONPrimitive>> = {};
+        let resultData:
+            | Record<string, JSONPrimitive>
+            | Array<Record<string, JSONPrimitive>> = {};
         if (typeData instanceof Array) {
             resultData = typeData.map((entry: Record<string, JSONPrimitive>) =>
                 jsonToType<keyType>(entry, keyMap)
@@ -24,20 +26,19 @@ async function apiResponse<T extends APIResponse>(
         } else {
             resultData = jsonToType<keyType>(typeData, keyMap);
         }
-        return [key, resultData]
-    })
-    const result: T = Object.fromEntries(convertedData)
-    return result
+        return [key, resultData];
+    });
+    const result: T = Object.fromEntries(convertedData);
+    return result;
 }
 
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
 /** Calls to specific API endpoints **/
 
-
 interface UserResponse extends APIResponse {
-    "group": Group,
-    "user": User
+    group: Group;
+    user: User;
 }
 const USER_MAP = new Map<string, keyof User>([
     ["auth0_user_id", "auth0UserId"],
@@ -51,9 +52,8 @@ export const fetchUserData = (): Promise<UserResponse> =>
         "/api/usergroup"
     );
 
-
 interface SampleResponse extends APIResponse {
-    "samples": Sample[]
+    samples: Sample[];
 }
 const SAMPLE_MAP = new Map<string, keyof Sample>([
     ["collection_date", "collectionDate"],
@@ -63,15 +63,10 @@ const SAMPLE_MAP = new Map<string, keyof Sample>([
     ["upload_date", "uploadDate"],
 ]);
 export const fetchSamples = (): Promise<SampleResponse> =>
-    apiResponse<SampleResponse>(
-        ["samples"],
-        [SAMPLE_MAP],
-        "/api/samples"
-    )
-
+    apiResponse<SampleResponse>(["samples"], [SAMPLE_MAP], "/api/samples");
 
 interface TreeResponse extends APIResponse {
-    "phylo_trees": Tree[]
+    phylo_trees: Tree[];
 }
 const TREE_MAP = new Map<string, keyof Tree>([
     ["phylo_tree_id", "id"],
@@ -79,8 +74,4 @@ const TREE_MAP = new Map<string, keyof Tree>([
     ["completed_date", "dateCompleted"],
 ]);
 export const fetchTrees = (): Promise<TreeResponse> =>
-    apiResponse<TreeResponse>(
-        ["phylo_trees"],
-        [TREE_MAP],
-        "/api/phylo_trees"
-    )
+    apiResponse<TreeResponse>(["phylo_trees"], [TREE_MAP], "/api/phylo_trees");
