@@ -2,8 +2,11 @@
 /// <reference types="react" />
 /// <reference types="react-dom" />
 
-interface Sample {
-    [index: string]: string;
+interface BioinformaticsType {
+    [index: string]: JSONPrimitive
+}
+
+interface Sample extends BioinformaticsType {
     type: "Sample";
     privateId: string;
     publicId: string;
@@ -13,12 +16,9 @@ interface Sample {
     gisaid?: string;
 }
 
-interface Tree {
-    [index: string]: string | number;
+interface Tree extends BioinformaticsType {
     type: "Tree";
     id: string;
     pathogenGenomeCount: number;
     creationDate: string;
 }
-
-type BioinformaticsType = Sample | Tree;
