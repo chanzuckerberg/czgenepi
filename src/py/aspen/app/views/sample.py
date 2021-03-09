@@ -79,6 +79,7 @@ def samples():
                 or_(
                     Sample.submitting_group_id == user.group_id,
                     Sample.submitting_group_id.in_(cansee_groups_metadata),
+                    user.system_admin,
                 )
             )
         )
@@ -97,6 +98,7 @@ def samples():
             if (
                 sample.submitting_group_id == user.group_id
                 or sample.submitting_group_id in cansee_groups_private_identifiers
+                or user.system_admin
             ):
                 returned_sample_data["private_identifier"] = sample.private_identifier
 
