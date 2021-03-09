@@ -10,7 +10,7 @@ with requirements_file.open("r") as fh:
     requirement_lines = [
         line
         for line in fh.readlines()
-        if not (line.startswith("-i") or line.startswith("./"))
+        if not (line.startswith("-e") or line.startswith("-i") or line.startswith("./"))
     ]
 
 setuptools.setup(
