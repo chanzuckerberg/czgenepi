@@ -43,7 +43,7 @@ function searchReducer(state: SearchState, action: SearchState): SearchState {
 //     },
 // ];
 
-const Samples: FunctionComponent<Props> = ({ data = [] }: Props) => {
+const Samples: FunctionComponent<Props> = ({ data }: Props) => {
     // we are modifying state using hooks, so we need a reducer
     const [state, dispatch] = useReducer(searchReducer, {
         searching: false,
@@ -56,7 +56,9 @@ const Samples: FunctionComponent<Props> = ({ data = [] }: Props) => {
         fieldInput: InputOnChangeData
     ) => {
         const query = fieldInput.value;
-        if (query.length === 0) {
+        if (data === undefined) {
+            return;
+        } else if (query.length === 0) {
             dispatch({ results: data });
             return;
         }
@@ -71,22 +73,35 @@ const Samples: FunctionComponent<Props> = ({ data = [] }: Props) => {
         dispatch({ searching: false, results: filteredSamples });
     };
 
-    return (
-        <div className={style.samplesRoot}>
-            <div className={style.searchBar}>
-                <Input
-                    transparent
-                    icon="search"
-                    placeholder="Search"
-                    loading={state.searching}
-                    onChange={searcher}
-                />
+    const render = (tableData: Array<Sample>) => {
+        return (
+            <div className={style.samplesRoot}>
+                <div className={style.searchBar}>
+                    <Input
+                        transparent
+                        icon="search"
+                        placeholder="Search"
+                        loading={state.searching}
+                        onChange={searcher}
+                    />
+                </div>
+                <div className={style.samplesTable}>
+                    <SamplesTable data={tableData} />
+                </div>
             </div>
-            <div className={style.samplesTable}>
-                <SamplesTable data={state.results} />
-            </div>
-        </div>
-    );
+        );
+    };
+
+    if (state.results === undefined) {
+        let tableData: Array<Sample> = [];
+        if (data !== undefined) {
+            dispatch({ results: data });
+            tableData = data;
+        }
+        return render(tableData);
+    }
+
+    return render(state.results);
 };
 
 export default Samples;

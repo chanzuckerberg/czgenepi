@@ -10,8 +10,8 @@ import Samples from "./samples";
 import style from "./index.module.scss";
 
 const Data: FunctionComponent = () => {
-    const [samples, setSamples] = useState<Array<Sample>>([]);
-    const [trees, setTrees] = useState<Array<Tree>>([]);
+    const [samples, setSamples] = useState<Array<Sample> | undefined>();
+    const [trees, setTrees] = useState<Array<Tree> | undefined>();
 
     useEffect(() => {
         const setBioinformaticsData = async () => {
@@ -35,7 +35,7 @@ const Data: FunctionComponent = () => {
             to: "/data/phylogenetic_trees",
             text: "Phylogenetic Trees",
             data: trees,
-            jsx: <div>{trees.length} Trees</div>,
+            jsx: <div>{trees?.length} Trees</div>,
         },
     ];
 
@@ -57,7 +57,7 @@ const Data: FunctionComponent = () => {
                             {category.text}
                         </div>
                         <div className={style.count}>
-                            {category.data.length}
+                            {category.data?.length}
                         </div>
                     </div>
                 </Menu.Item>
