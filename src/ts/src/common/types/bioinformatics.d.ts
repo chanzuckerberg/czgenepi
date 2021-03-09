@@ -3,7 +3,7 @@
 /// <reference types="react-dom" />
 
 interface BioinformaticsType {
-    [index: string]: JSONPrimitive
+    [index: string]: JSONPrimitive;
 }
 
 interface Sample extends BioinformaticsType {

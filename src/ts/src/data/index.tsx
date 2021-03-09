@@ -21,7 +21,7 @@ const TREE_HEADERS: Header[] = [
     { text: "Tree Name", key: "id" },
     { text: "Creation Date", key: "creationDate" },
     { text: "Total Samples", key: "pathogenGenomeCount" },
-    { text: "", key: "downloadLink" }
+    { text: "", key: "downloadLink" },
 ];
 
 const Data: FunctionComponent = () => {
