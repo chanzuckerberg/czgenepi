@@ -13,11 +13,14 @@ export function get<T, K extends keyof T>(o: T, propertyName: K): T[K] {
 // new object.
 export function jsonToType<T>(
     inputObject: Record<string, JSONPrimitive>,
-    keyMap: Map<string, keyof T> | null
+    keyMap: Map<string, string | number> | null
 ): T {
     const entries: Array<Array<JSONPrimitive>> = [];
     Object.keys(inputObject).forEach((key) => {
-        if (keyMap && keyMap.has(key)) {
+        if (keyMap === null) {
+            entries.push([key, inputObject[key]]);
+        }
+        else if (keyMap.has(key)) {
             entries.push([keyMap.get(key) as string, inputObject[key]]);
         } else {
             entries.push([key, inputObject[key]]);
