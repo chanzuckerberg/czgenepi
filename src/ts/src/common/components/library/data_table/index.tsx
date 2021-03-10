@@ -6,45 +6,41 @@ import { ReactComponent as SampleIcon } from "common/icons/Sample.svg";
 import style from "./index.module.scss";
 
 interface Props {
-    data?: Array<Sample>;
+    data?: BioinformaticsType[];
+    headers: Header[];
 }
 
-interface Header {
-    text: string;
-    key: keyof Sample;
-}
-
-const TABLE_HEADERS: Array<Header> = [
-    { text: "Private ID", key: "privateId" },
-    { text: "Public ID", key: "publicId" },
-    { text: "Upload Date", key: "uploadDate" },
-    { text: "Collection Date", key: "collectionDate" },
-    { text: "Collection Location", key: "collectionLocation" },
-    { text: "GISAID", key: "gisaid" },
-];
+const ICONS: Record<string, JSX.Element> = {
+    Sample: <SampleIcon className={style.icon} />,
+    Tree: <span />,
+};
 
 const UNDEFINED_TEXT = "---";
 
-const SamplesTable: FunctionComponent<Props> = ({ data = [] }: Props) => {
+const DataTable: FunctionComponent<Props> = ({ data = [], headers }: Props) => {
+    const indexingKey = headers[0].key;
+
     // render functions
-    const headerRow = TABLE_HEADERS.map((column: Header) => (
+    const headerRow = headers.map((column: Header) => (
         <Table.HeaderCell key={column.key}>
             <div className={style.headerCell}>{column.text}</div>
         </Table.HeaderCell>
     ));
 
-    const sampleRow = (sample: Sample): Array<JSX.Element> => {
-        return TABLE_HEADERS.map((column, index) => {
-            let displayData = sample[column.key];
+    const sampleRow = (item: BioinformaticsType): Array<JSX.Element> => {
+        return headers.map((column, index) => {
+            let displayData: string | number | undefined = item[column.key];
             let icon: JSX.Element | null = null;
             if (displayData === undefined) {
                 displayData = UNDEFINED_TEXT;
             }
             if (index === 0) {
-                icon = <SampleIcon className={style.icon} />;
+                console.log(item.type);
+                icon = ICONS[item.type];
             }
+            console.log(icon);
             return (
-                <Table.Cell key={`${sample.privateId}-${column.key}`}>
+                <Table.Cell key={`${item[indexingKey]}-${column.key}`}>
                     <div className={style.cell}>
                         {icon}
                         {displayData}
@@ -54,11 +50,11 @@ const SamplesTable: FunctionComponent<Props> = ({ data = [] }: Props) => {
         });
     };
 
-    const tableRows = (samples: Array<Sample>): Array<JSX.Element> => {
-        return samples.map((sample) => (
-            <Table.Row key={sample.privateId}>{sampleRow(sample)}</Table.Row>
+    function tableRows(data: BioinformaticsType[]): Array<JSX.Element> {
+        return data.map((item) => (
+            <Table.Row key={item[indexingKey]}>{sampleRow(item)}</Table.Row>
         ));
-    };
+    }
 
     return (
         <Table basic="very">
@@ -70,4 +66,4 @@ const SamplesTable: FunctionComponent<Props> = ({ data = [] }: Props) => {
     );
 };
 
-export default SamplesTable;
+export { DataTable };

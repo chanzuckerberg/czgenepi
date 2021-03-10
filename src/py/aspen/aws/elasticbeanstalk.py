@@ -1,6 +1,15 @@
 from typing import Dict, MutableSequence, Sequence
 
+import requests
+
 from aspen.aws._session import session
+
+
+def _get_instance_id() -> str:
+    document = requests.get(
+        "http://169.254.169.254/latest/dynamic/instance-identity/document"
+    ).json()
+    return document["instanceId"]
 
 
 def _get_tags() -> Sequence[Dict]:
@@ -24,11 +33,13 @@ def _get_tags() -> Sequence[Dict]:
 
 def _get_environment_name() -> str:
     """Get all Elastic Beanstalk environment name."""
+    instance_id = _get_instance_id()
     tags = _get_tags()
 
     for tag in tags:
         if (
             tag["Key"] == "elasticbeanstalk:environment-name"
+            and tag["ResourceId"] == instance_id
             and tag["ResourceType"] == "instance"
         ):
             return tag["Value"]

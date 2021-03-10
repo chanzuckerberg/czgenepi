@@ -306,3 +306,8 @@ static
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
 /.ebiginore
+
+# Terraform files
+/.terraform.*/
+/.terraform.lock.hcl
+/terraform/variables.tf
