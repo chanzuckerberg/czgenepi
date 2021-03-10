@@ -135,12 +135,12 @@ local-ecr-login:
 .PHONY: local-init
 local-init: oauth/pkcs12/certificate.pfx .env.ecr local-ecr-login ## Launch a new local dev env and populate it with test data.
 	docker-compose $(COMPOSE_OPTS) up -d
-	docker-compose exec -T backend pip3 install awscli
-	docker-compose exec -T backend $(BACKEND_APP_ROOT)/scripts/setup_dev_data.sh
-	docker-compose exec -T backend pip install .
+	docker-compose exec -T utility pip3 install awscli
+	docker-compose exec -T utility $(BACKEND_APP_ROOT)/scripts/setup_dev_data.sh
+	docker-compose exec -T utility pip install .
 	-@docker-compose exec -e PGPASSWORD=$(LOCAL_DB_RW_USERNAME) database psql -h localhost -d $(LOCAL_DB_NAME) -U user_rw -c "CREATE USER $(LOCAL_DB_RO_USERNAME) WITH PASSWORD '$(LOCAL_DB_RO_PASSWORD)';"
-	docker-compose exec -T -e DB=local backend aspen-cli db --env local create
-	docker-compose exec -e DB=local -T backend alembic stamp head
+	docker-compose exec -T -e DB=local utility aspen-cli db --env local create
+	docker-compose exec -e DB=local -T utility alembic stamp head
 
 .PHONY: local-status
 local-status: ## Show the status of the containers in the dev environment.
@@ -183,32 +183,3 @@ local-logs: ## Tail the logs of the dev env containers. ex: make local-logs CONT
 .PHONY: local-shell
 local-shell: ## Open a command shell in one of the dev containers. ex: make local-shell CONTAINER=frontend
 	docker-compose exec $(CONTAINER) bash
-
-.PHONY: local-unit-test
-local-unit-test: ## Run backend tests in the dev environment
-	@if [ -z "$(path)" ]; then \
-        echo "Running all tests"; \
-		docker-compose exec -T backend bash -c "cd $(BACKEND_APP_ROOT) && make container-unittest"; \
-	else \
-		echo "Running test(s): $(path)"; \
-		docker-compose exec -T backend bash -c "cd $(BACKEND_APP_ROOT) && python -m unittest $(path)"; \
-	fi
-	if [ ! -z "$(CODECOV_TOKEN)" ]; then \
-		ci_env=$$(bash <(curl -s https://codecov.io/env)); \
-		docker-compose exec -T backend bash -c "apt-get update && apt-get install -y git"; \
-		docker-compose exec -e CI=true $$ci_env -T backend bash -c "cd $(BACKEND_APP_ROOT) && bash <(curl -s https://codecov.io/bash) -cF backend,python,unitTest"; \
-	fi
-
-.PHONY: local-functional-test
-local-functional-test: ## Run functional tests in the dev environment
-	docker-compose exec -T backend bash -c "cd $(BACKEND_APP_ROOT) && export DEPLOYMENT_STAGE=test && make container-functionaltest"
-
-.PHONY: local-smoke-test
-local-smoke-test: ## Run frontend/e2e tests in the dev environment
-	docker-compose exec -T frontend make container-smoke-test
-
-.PHONY: local-dbconsole
-local-dbconsole: ## Connect to the local postgres database.
-	psql "postgresql://user_rw:password_rw@localhost:5432"
-
-include terraform.mk

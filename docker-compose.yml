@@ -60,6 +60,32 @@ services:
       - PYTHONPATH=.
     volumes:
       - ./src/py:/usr/src/app
+  utility:
+    image: "${DOCKER_REPO}aspen-backend"
+    build:
+      context: src/py
+      target: dev
+      cache_from:
+        - "${DOCKER_REPO}aspen-backend:branch-main"
+      args:
+        - BUILDKIT_INLINE_CACHE=1
+    restart: always
+    depends_on:
+      - database
+      - localstack
+    environment:
+      - PYTHONUNBUFFERED=1
+      - RESTART_ON_FAILURE=yes
+      - BOTO_ENDPOINT_URL=http://localstack:4566
+      - AWS_ACCESS_KEY_ID=dev_access_key_id
+      - AWS_SECRET_ACCESS_KEY=dev_secret_access_key
+      - AWS_REGION=us-west-2
+      - ENV=local
+      - FLASK_ENV=local
+      - PYTHONPATH=.
+    volumes:
+      - ./src/py:/usr/src/app
+    command: ["sleep", "infinity"]
   localstack:
     image: localstack/localstack@sha256:7c6635493185d25165979995fb073fd789c72b6d8b17ef3a70b798d55576732f
     ports:
