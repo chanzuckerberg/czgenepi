@@ -2,12 +2,13 @@ import React, { FunctionComponent, useReducer } from "react";
 import { Input } from "semantic-ui-react";
 import { escapeRegExp } from "lodash/fp";
 
-import SamplesTable from "./SamplesTable";
+import { DataTable } from "common/components";
 
 import style from "./index.module.scss";
 
 interface Props {
-    data?: Array<Sample>;
+    data?: BioinformaticsType[];
+    headers: Header[];
 }
 
 interface InputOnChangeData {
@@ -17,33 +18,14 @@ interface InputOnChangeData {
 
 interface SearchState {
     searching?: boolean;
-    results?: Array<Sample>;
+    results?: BioinformaticsType[];
 }
 
 function searchReducer(state: SearchState, action: SearchState): SearchState {
     return { ...state, ...action };
 }
 
-// const dummySamples: Array<Sample> = [
-//     {
-//         privateId: "0865-0004KGK00-001",
-//         publicId: "0909EEEE-55-33",
-//         uploadDate: "2/1/2021",
-//         collectionDate: "12/12/2020",
-//         collectionLocation: "Santa Clara County",
-//         gisaid: "Accepted",
-//     },
-//     {
-//         privateId: "0865-0004KGK00-002",
-//         publicId: "0909EEEE-55-34",
-//         uploadDate: "2/1/2021",
-//         collectionDate: "12/12/2020",
-//         collectionLocation: "Santa Clara County",
-//         gisaid: "Accepted",
-//     },
-// ];
-
-const Samples: FunctionComponent<Props> = ({ data }: Props) => {
+const DataSubview: FunctionComponent<Props> = ({ data, headers }: Props) => {
     // we are modifying state using hooks, so we need a reducer
     const [state, dispatch] = useReducer(searchReducer, {
         searching: false,
@@ -66,14 +48,14 @@ const Samples: FunctionComponent<Props> = ({ data }: Props) => {
         dispatch({ searching: true });
 
         const regex = new RegExp(escapeRegExp(query), "i");
-        const filteredSamples = data.filter((sample) => {
-            return Object.values(sample).some((value) => regex.test(value));
-        });
+        const filteredData = data.filter((item) =>
+            Object.values(item).some((value) => regex.test(`${value}`))
+        );
 
-        dispatch({ searching: false, results: filteredSamples });
+        dispatch({ searching: false, results: filteredData });
     };
 
-    const render = (tableData: Array<Sample>) => {
+    const render = (tableData: BioinformaticsType[]) => {
         return (
             <div className={style.samplesRoot}>
                 <div className={style.searchBar}>
@@ -86,14 +68,14 @@ const Samples: FunctionComponent<Props> = ({ data }: Props) => {
                     />
                 </div>
                 <div className={style.samplesTable}>
-                    <SamplesTable data={tableData} />
+                    <DataTable data={tableData} headers={headers} />
                 </div>
             </div>
         );
     };
 
     if (state.results === undefined) {
-        let tableData: Array<Sample> = [];
+        let tableData: BioinformaticsType[] = [];
         if (data !== undefined) {
             dispatch({ results: data });
             tableData = data;
@@ -104,4 +86,4 @@ const Samples: FunctionComponent<Props> = ({ data }: Props) => {
     return render(state.results);
 };
 
-export default Samples;
+export { DataSubview };

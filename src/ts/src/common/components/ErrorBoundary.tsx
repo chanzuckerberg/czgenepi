@@ -1,16 +1,16 @@
 // unstyled component, taken from https://reactjs.org/docs/error-boundaries.html
 import React from "react";
 
-interface IProps {
+interface Props {
     children: React.ReactNode;
 }
 
-interface IState {
+interface State {
     hasError: boolean;
 }
 
-export default class ErrorBoundary extends React.Component<IProps, IState> {
-    constructor(props: IProps) {
+export class ErrorBoundary extends React.Component<Props, State> {
+    constructor(props: Props) {
         super(props);
         this.state = { hasError: false };
     }
