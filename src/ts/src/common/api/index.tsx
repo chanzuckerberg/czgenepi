@@ -4,7 +4,24 @@ import axios from "axios";
 import { jsonToType } from "common/utils";
 
 /** Generic functions to interface with the backend API **/
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
+const API_KEY_TO_TYPE: Record<string, string> = {
+    samples: "Sample",
+    phylo_trees: "Tree",
+    group: "Group",
+    user: "User",
+};
+
+function convert<U extends APIResponse, T extends U[keyof U]>(
+    entry: Record<string, JSONPrimitive>,
+    keyMap: Map<string, string | number> | null,
+    key: keyof U
+): T {
+    const converted = jsonToType<T>(entry, keyMap);
+    // key should always be a string anyways. no funky business please.
+    converted.type = API_KEY_TO_TYPE[String(key)];
+    return converted;
+}
 
 async function apiResponse<T extends APIResponse>(
     keys: (keyof T)[],
@@ -16,23 +33,19 @@ async function apiResponse<T extends APIResponse>(
         type keyType = T[typeof key];
         const typeData = response.data[key];
         const keyMap = mappings[index];
-        let resultData:
-            | Record<string, JSONPrimitive>
-            | Array<Record<string, JSONPrimitive>> = {};
+        let resultData: keyType | keyType[];
         if (typeData instanceof Array) {
             resultData = typeData.map((entry: Record<string, JSONPrimitive>) =>
-                jsonToType<keyType>(entry, keyMap)
+                convert<T, keyType>(entry, keyMap, key)
             );
         } else {
-            resultData = jsonToType<keyType>(typeData, keyMap);
+            resultData = convert<T, keyType>(typeData, keyMap, key);
         }
         return [key, resultData];
     });
     const result: T = Object.fromEntries(convertedData);
     return result;
 }
-
-/* eslint-enable @typescript-eslint/no-explicit-any */
 
 /** Calls to specific API endpoints **/
 

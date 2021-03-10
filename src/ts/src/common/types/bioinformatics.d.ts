@@ -1,5 +1,10 @@
-interface Sample {
-    [index: string]: string;
+interface BioinformaticsType {
+    [index: string]: JSONPrimitive;
+    type: "BioinformaticsType";
+}
+
+interface Sample extends BioinformaticsType {
+    type: "Sample";
     privateId: string;
     publicId: string;
     uploadDate: string;
@@ -8,9 +13,11 @@ interface Sample {
     gisaid?: string;
 }
 
-interface Tree {
-    [index: string]: string | number;
+interface Tree extends BioinformaticsType {
+    type: "Tree";
     id: string;
     pathogenGenomeCount: number;
     dateCompleted: string;
 }
+
+type BioinformaticsData = Sample | Tree;

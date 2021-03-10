@@ -6,7 +6,7 @@ import { ReactComponent as SampleIcon } from "common/icons/Sample.svg";
 import style from "./index.module.scss";
 
 interface Props {
-    data?: BioinformaticsType[];
+    data?: BioinformaticsData[];
     headers: Header[];
 }
 
@@ -27,9 +27,9 @@ const DataTable: FunctionComponent<Props> = ({ data = [], headers }: Props) => {
         </Table.HeaderCell>
     ));
 
-    const sampleRow = (item: BioinformaticsType): Array<JSX.Element> => {
+    const sampleRow = (item: BioinformaticsData): Array<JSX.Element> => {
         return headers.map((column, index) => {
-            let displayData: string | number | undefined = item[column.key];
+            let displayData = item[column.key];
             let icon: JSX.Element | null = null;
             if (displayData === undefined) {
                 displayData = UNDEFINED_TEXT;
@@ -50,9 +50,11 @@ const DataTable: FunctionComponent<Props> = ({ data = [], headers }: Props) => {
         });
     };
 
-    function tableRows(data: BioinformaticsType[]): Array<JSX.Element> {
+    function tableRows(data: BioinformaticsData[]): Array<JSX.Element> {
         return data.map((item) => (
-            <Table.Row key={item[indexingKey]}>{sampleRow(item)}</Table.Row>
+            <Table.Row key={`${item[indexingKey]}`}>
+                {sampleRow(item)}
+            </Table.Row>
         ));
     }
 
