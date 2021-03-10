@@ -1,5 +1,5 @@
 import json
-from typing import Any, Sequence, Tuple
+from typing import Any, Optional, Sequence, Tuple
 
 from aspen.app.views import api_utils
 from aspen.app.views.sample import SAMPLE_KEY
@@ -42,10 +42,12 @@ def _test_samples_view_cansee(
     session,
     client,
     cansee_datatypes: Sequence[DataType],
+    user_factory_kwargs: Optional[dict] = None,
 ) -> Tuple[Sample, SequencingReadsCollection, Any]:
+    user_factory_kwargs = user_factory_kwargs or {}
     owner_group = group_factory()
     viewer_group = group_factory(name="cdph", email="cdph@cdph.gov")
-    user = user_factory(viewer_group)
+    user = user_factory(viewer_group, **user_factory_kwargs)
     sample = sample_factory(owner_group)
     sequencing_read_collection = sequencing_read_factory(sample)
     for cansee_datatype in cansee_datatypes:
@@ -78,6 +80,33 @@ def test_samples_view_no_cansee(
         cansee_datatypes=(),
     )
     assert samples == []
+
+
+def test_samples_view_system_admin(
+    session,
+    app,
+    client,
+):
+    sample, sequencing_read_collection, samples = _test_samples_view_cansee(
+        session,
+        client,
+        cansee_datatypes=(),
+        user_factory_kwargs={
+            "system_admin": True,
+        },
+    )
+    assert samples == [
+        {
+            "collection_date": api_utils.format_date(sample.collection_date),
+            "collection_location": sample.location,
+            "private_identifier": sample.private_identifier,
+            "public_identifier": sample.public_identifier,
+            "upload_date": api_utils.format_datetime(
+                sequencing_read_collection.upload_date
+            ),
+            "gisaid": sequencing_read_collection.accessions[0].public_identifier,
+        }
+    ]
 
 
 def test_samples_view_cansee_trees(

@@ -10,8 +10,8 @@ def user_factory(
     name="test",
     auth0_user_id="test_auth0_id",
     email="test_user@dph.org",
-    group_admin=True,
-    system_admin=True,
+    group_admin=False,
+    system_admin=False,
 ) -> User:
     return User(
         name=name,
