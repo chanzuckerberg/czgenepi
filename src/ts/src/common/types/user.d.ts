@@ -1,9 +1,6 @@
-/// <reference types="node" />
-/// <reference types="react" />
-/// <reference types="react-dom" />
-
 interface Group {
-    [index: string]: string;
+    [index: string]: JSONPrimitive;
+    type: "Group";
     address: string;
     email: string;
     id: number;
@@ -11,7 +8,8 @@ interface Group {
 }
 
 interface User {
-    [index: string]: number | string | boolean;
+    [index: string]: JSONPrimitive;
+    type: "User";
     auth0UserId: string;
     email: string;
     groupAdmin: boolean;

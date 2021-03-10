@@ -1,9 +1,6 @@
-/// <reference types="node" />
-/// <reference types="react" />
-/// <reference types="react-dom" />
-
 interface BioinformaticsType {
     [index: string]: JSONPrimitive;
+    type: "BioinformaticsType";
 }
 
 interface Sample extends BioinformaticsType {
@@ -20,5 +17,7 @@ interface Tree extends BioinformaticsType {
     type: "Tree";
     id: string;
     pathogenGenomeCount: number;
-    creationDate: string;
+    dateCompleted: string;
 }
+
+type BioinformaticsData = Sample | Tree;
