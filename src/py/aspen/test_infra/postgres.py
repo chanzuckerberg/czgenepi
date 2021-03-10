@@ -39,7 +39,7 @@ def unused_tcp_port():
 
 @pytest.fixture(scope="session")
 def postgres_instance(
-    unused_tcp_port, timeout_s=20.0
+    unused_tcp_port, timeout_s=30.0
 ) -> Generator[PostgresInstance, None, None]:
     """Starts a postgres instance with username/password cliadb/cliadb.  Returns a tuple
     consisting of the container id, and the port the postgres instance can be reached

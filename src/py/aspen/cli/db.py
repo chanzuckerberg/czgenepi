@@ -1,6 +1,7 @@
 import click
 from IPython.terminal.embed import InteractiveShellEmbed
 
+from aspen import covidhub_import
 from aspen.cli.toplevel import cli
 from aspen.config.development import DevelopmentConfig
 from aspen.config.local import LocalConfig
@@ -62,7 +63,7 @@ def import_covidhub_project(
     # these are injected into the IPython scope, but they appear to be unused.
     engine = ctx.obj["ENGINE"]
 
-    import_project(
+    covidhub_import.import_project(
         engine,
         covidhub_db_secret,
         rr_project_id,

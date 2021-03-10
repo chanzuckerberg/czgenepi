@@ -310,3 +310,7 @@ static
 # Local dev
 .env.ecr
 
+# Terraform files
+/.terraform.*/
+/.terraform.lock.hcl
+/terraform/variables.tf

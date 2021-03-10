@@ -3,20 +3,71 @@ import axios from "axios";
 
 import { jsonToType } from "common/utils";
 
+/** Generic functions to interface with the backend API **/
+
+const API_KEY_TO_TYPE: Record<string, string> = {
+    samples: "Sample",
+    phylo_trees: "Tree",
+    group: "Group",
+    user: "User",
+};
+
+function convert<U extends APIResponse, T extends U[keyof U]>(
+    entry: Record<string, JSONPrimitive>,
+    keyMap: Map<string, string | number> | null,
+    key: keyof U
+): T {
+    const converted = jsonToType<T>(entry, keyMap);
+    // key should always be a string anyways. no funky business please.
+    converted.type = API_KEY_TO_TYPE[String(key)];
+    return converted;
+}
+
+async function apiResponse<T extends APIResponse>(
+    keys: (keyof T)[],
+    mappings: (Map<string, string | number> | null)[],
+    endpoint: string
+): Promise<T> {
+    const response = await axios.get(endpoint);
+    const convertedData = keys.map((key, index) => {
+        type keyType = T[typeof key];
+        const typeData = response.data[key];
+        const keyMap = mappings[index];
+        let resultData: keyType | keyType[];
+        if (typeData instanceof Array) {
+            resultData = typeData.map((entry: Record<string, JSONPrimitive>) =>
+                convert<T, keyType>(entry, keyMap, key)
+            );
+        } else {
+            resultData = convert<T, keyType>(typeData, keyMap, key);
+        }
+        return [key, resultData];
+    });
+    const result: T = Object.fromEntries(convertedData);
+    return result;
+}
+
+/** Calls to specific API endpoints **/
+
+interface UserResponse extends APIResponse {
+    group: Group;
+    user: User;
+}
 const USER_MAP = new Map<string, keyof User>([
     ["auth0_user_id", "auth0UserId"],
     ["group_admin", "groupAdmin"],
     ["system_admin", "systemAdmin"],
 ]);
-export const fetchUserData = async (): Promise<
-    Record<string, Group | User>
-> => {
-    const response = await axios.get(process.env.API_URL + "/api/usergroup");
-    const group = response.data.group as Group;
-    const user = jsonToType<User>(response.data.user, USER_MAP);
-    return { group, user };
-};
+export const fetchUserData = (): Promise<UserResponse> =>
+    apiResponse<UserResponse>(
+        ["group", "user"],
+        [null, USER_MAP],
+        process.env.API_URL + "/api/usergroup"
+    );
 
+interface SampleResponse extends APIResponse {
+    samples: Sample[];
+}
 const SAMPLE_MAP = new Map<string, keyof Sample>([
     ["collection_date", "collectionDate"],
     ["collection_location", "collectionLocation"],
@@ -24,24 +75,16 @@ const SAMPLE_MAP = new Map<string, keyof Sample>([
     ["public_identifier", "publicId"],
     ["upload_date", "uploadDate"],
 ]);
-export const fetchSamples = async (): Promise<Array<Sample>> => {
-    const response = await axios.get("/api/samples");
-    const samples: Array<Sample> = response.data.map(
-        (entry: Record<string, string>) => jsonToType<Sample>(entry, SAMPLE_MAP)
-    );
-    return samples;
-};
+export const fetchSamples = (): Promise<SampleResponse> =>
+    apiResponse<SampleResponse>(["samples"], [SAMPLE_MAP], "/api/samples");
 
+interface TreeResponse extends APIResponse {
+    phylo_trees: Tree[];
+}
 const TREE_MAP = new Map<string, keyof Tree>([
     ["phylo_tree_id", "id"],
     ["pathogen_genome_count", "pathogenGenomeCount"],
     ["completed_date", "dateCompleted"],
 ]);
-export const fetchTrees = async (): Promise<Array<Tree>> => {
-    const response = await axios.get("/api/phylo_trees");
-    const trees: Array<Tree> = response.data.map(
-        (entry: Record<string, string | number>) =>
-            jsonToType<Tree>(entry, TREE_MAP)
-    );
-    return trees;
-};
+export const fetchTrees = (): Promise<TreeResponse> =>
+    apiResponse<TreeResponse>(["phylo_trees"], [TREE_MAP], "/api/phylo_trees");

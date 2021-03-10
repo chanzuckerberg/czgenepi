@@ -104,6 +104,7 @@ unit-tests:
 
 #
 ##############################################################
+<<<<<<< HEAD
 
 ### Docker local dev #########################################
 #
@@ -211,3 +212,5 @@ local-smoke-test: ## Run frontend/e2e tests in the dev environment
 .PHONY: local-dbconsole
 local-dbconsole: ## Connect to the local postgres database.
 	psql "postgresql://user_rw:password_rw@localhost:5432"
+
+include terraform.mk

@@ -4,20 +4,40 @@ import { Menu } from "semantic-ui-react";
 import cx from "classnames";
 
 import { fetchSamples, fetchTrees } from "common/api";
-
-import Samples from "./samples";
+import { DataSubview } from "common/components";
 
 import style from "./index.module.scss";
 
+const SAMPLE_HEADERS: Header[] = [
+    { text: "Private ID", key: "privateId" },
+    { text: "Public ID", key: "publicId" },
+    { text: "Upload Date", key: "uploadDate" },
+    { text: "Collection Date", key: "collectionDate" },
+    { text: "Collection Location", key: "collectionLocation" },
+    { text: "GISAID", key: "gisaid" },
+];
+
+const TREE_HEADERS: Header[] = [
+    { text: "Tree Name", key: "id" },
+    { text: "Creation Date", key: "creationDate" },
+    { text: "Total Samples", key: "pathogenGenomeCount" },
+    { text: "", key: "downloadLink" },
+];
+
 const Data: FunctionComponent = () => {
-    const [samples, setSamples] = useState<Array<Sample>>([]);
-    const [trees, setTrees] = useState<Array<Tree>>([]);
+    const [samples, setSamples] = useState<Sample[] | undefined>();
+    const [trees, setTrees] = useState<Tree[] | undefined>();
 
     useEffect(() => {
         const setBioinformaticsData = async () => {
-            const [apiSamples, apiTrees] = [fetchSamples(), fetchTrees()];
-            setSamples(await apiSamples);
-            setTrees(await apiTrees);
+            const [sampleResponse, treeResponse] = await Promise.all([
+                fetchSamples(),
+                fetchTrees(),
+            ]);
+            const apiSamples = sampleResponse["samples"];
+            const apiTrees = treeResponse["phylo_trees"];
+            setSamples(apiSamples);
+            setTrees(apiTrees);
         };
         setBioinformaticsData();
     }, []);
@@ -29,13 +49,13 @@ const Data: FunctionComponent = () => {
             to: "/data/samples",
             text: "Samples",
             data: samples,
-            jsx: <Samples data={samples} />,
+            headers: SAMPLE_HEADERS,
         },
         {
             to: "/data/phylogenetic_trees",
             text: "Phylogenetic Trees",
             data: trees,
-            jsx: <div>{trees.length} Trees</div>,
+            headers: TREE_HEADERS,
         },
     ];
 
@@ -57,7 +77,7 @@ const Data: FunctionComponent = () => {
                             {category.text}
                         </div>
                         <div className={style.count}>
-                            {category.data.length}
+                            {category.data?.length}
                         </div>
                     </div>
                 </Menu.Item>
@@ -68,7 +88,12 @@ const Data: FunctionComponent = () => {
             <Route
                 path={category.to}
                 key={category.text}
-                render={() => category.jsx}
+                render={() => (
+                    <DataSubview
+                        data={category.data}
+                        headers={category.headers}
+                    />
+                )}
             />
         );
     });
