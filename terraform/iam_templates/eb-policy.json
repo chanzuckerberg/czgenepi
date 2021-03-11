@@ -12,6 +12,13 @@
       "Resource": [
           "${ASPEN_CONFIG_SECRET_ARN}"
       ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": "rds:DescribeDBInstances",
+      "Resource": [
+          "${ASPEN_DB_ARN}"
+      ]
     }
   ]
 }
