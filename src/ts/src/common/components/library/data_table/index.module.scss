@@ -19,4 +19,9 @@
         margin: 0 $space-l 0 $space-l;
         fill: $gray-light;
     }
+
+    a {
+        @include font-caps-xxs;
+        color: $primary;
+    }
 }
