@@ -138,7 +138,7 @@ local-init: oauth/pkcs12/certificate.pfx .env.ecr local-ecr-login ## Launch a ne
 	docker-compose exec -T utility pip3 install awscli
 	docker-compose exec -T utility $(BACKEND_APP_ROOT)/scripts/setup_dev_data.sh
 	docker-compose exec -T utility pip install .
-	-@docker-compose exec -e PGPASSWORD=$(LOCAL_DB_RW_USERNAME) database psql -h localhost -d $(LOCAL_DB_NAME) -U user_rw -c "CREATE USER $(LOCAL_DB_RO_USERNAME) WITH PASSWORD '$(LOCAL_DB_RO_PASSWORD)';"
+	docker-compose exec -e PGPASSWORD=$(LOCAL_DB_RW_PASSWORD) database psql -h localhost -d $(LOCAL_DB_NAME) -U $(LOCAL_DB_RW_USERNAME) -c "CREATE USER $(LOCAL_DB_RO_USERNAME) WITH PASSWORD '$(LOCAL_DB_RO_PASSWORD)';"
 	docker-compose exec -T -e DB=local utility aspen-cli db --env local create
 	docker-compose exec -e DB=local -T utility alembic stamp head
 
@@ -183,3 +183,7 @@ local-logs: ## Tail the logs of the dev env containers. ex: make local-logs CONT
 .PHONY: local-shell
 local-shell: ## Open a command shell in one of the dev containers. ex: make local-shell CONTAINER=frontend
 	docker-compose exec $(CONTAINER) bash
+
+.PHONY: local-dbconsole
+local-dbconsole: ## Connect to the local postgres database.
+	psql "postgresql://$(LOCAL_DB_RW_USERNAME):$(LOCAL_DB_RW_PASSWORD)@localhost:5432/$(LOCAL_DB_NAME)"
