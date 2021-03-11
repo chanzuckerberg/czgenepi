@@ -1,5 +1,3 @@
-import platform
-
 from aspen.config import config
 
 
@@ -7,10 +5,6 @@ class DevelopmentConfig(config.Config, descriptive_name="dev"):
     @config.flaskproperty
     def DEBUG(self) -> bool:
         return True
-
-    @config.flaskproperty
-    def SECRET_KEY(self) -> str:
-        return platform.node()
 
     @property
     def AUTH0_CALLBACK_URL(self) -> str:

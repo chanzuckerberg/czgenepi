@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import abc
 import json
 import os
+import platform
 from collections import MutableMapping
 from functools import lru_cache
 from typing import Any, Callable, Mapping, Optional, Set, Type, TypeVar, Union
@@ -58,26 +58,29 @@ class Config:
     _config_flask_properties: Optional[Set[str]] = None
     _subclasses: MutableMapping[str, Type[Config]] = dict()
 
-    def __init_subclass__(cls: Type[Config], descriptive_name: str, *args, **kwargs):
+    def __init_subclass__(
+        cls: Type[Config], descriptive_name: Optional[str] = None, *args, **kwargs
+    ):
         # the type: ignore on the next line is due to
         # https://github.com/python/mypy/issues/4660
         super().__init_subclass__(*args, **kwargs)  # type: ignore
-        Config._subclasses[descriptive_name] = cls
+        if descriptive_name is not None:
+            Config._subclasses[descriptive_name] = cls
 
-        # get a list of @flaskproperties for Config and the subclass of Config, and
-        # compare to see if there are any attributes that were marked as
-        # @flaskproperty in Config but not in the subclass.
-        if Config._config_flask_properties is None:
-            Config._config_flask_properties = _get_flaskproperty_names(Config)
-        flask_properties = _get_flaskproperty_names(cls)
+            # get a list of @flaskproperties for Config and the subclass of Config, and
+            # compare to see if there are any attributes that were marked as
+            # @flaskproperty in Config but not in the subclass.
+            if Config._config_flask_properties is None:
+                Config._config_flask_properties = _get_flaskproperty_names(Config)
+            flask_properties = _get_flaskproperty_names(cls)
 
-        if not Config._config_flask_properties.issubset(flask_properties):
-            missing_properties = Config._config_flask_properties - flask_properties
-            missing_properties_string = ", ".join(missing_properties)
-            raise Exception(
-                f"Attributes ({missing_properties_string}) defined as flask properties"
-                f" in Config but not in {cls.__name__}"
-            )
+            if not Config._config_flask_properties.issubset(flask_properties):
+                missing_properties = Config._config_flask_properties - flask_properties
+                missing_properties_string = ", ".join(missing_properties)
+                raise Exception(
+                    f"Attributes ({missing_properties_string}) defined as flask properties"
+                    f" in Config but not in {cls.__name__}"
+                )
 
     @classmethod
     def by_descriptive_name(cls, descriptive_name: str) -> Config:
@@ -133,9 +136,8 @@ class Config:
         return False
 
     @flaskproperty
-    @abc.abstractmethod
     def SECRET_KEY(self) -> str:
-        raise NotImplementedError()
+        return platform.node()
 
     @flaskproperty
     def TESTING(self) -> bool:
@@ -187,3 +189,11 @@ class Config:
     @property
     def DATABASE_READONLY_URI(self) -> str:
         raise NotImplementedError()
+
+
+class RemoteDatabaseConfig(Config):
+    """Configuration for running with a remote database."""
+
+    @property
+    def DATABASE_URI(self) -> str:
+        return "postgresql://user_rw:password_rw@localhost:5432/aspen_db"
