@@ -33,9 +33,9 @@ from aspen.database.models import (
     UploadedPathogenGenome,
     WorkflowStatusType,
 )
-from covid_database import init_db as Cinit_db
+from covid_database import init_db as covidhub_init_db
 from covid_database import SqlAlchemyInterface as CSqlAlchemyInterface
-from covid_database import util as Cutil
+from covid_database import util as covidhub_database_util
 from covid_database.models.enums import ConsensusGenomeStatus
 from covid_database.models.ngs_sample_tracking import (
     ConsensusGenome,
@@ -48,8 +48,12 @@ from covid_database.models.ngs_sample_tracking import (
 logger = logging.getLogger(__name__)
 
 
-def covidhub_interface_from_secret(secret_id: str) -> CSqlAlchemyInterface:
-    interface = Cinit_db(Cutil.get_db_uri(secret_id))
+def covidhub_interface_from_secret(
+    covidhub_aws_profile: str, secret_id: str
+) -> CSqlAlchemyInterface:
+    interface = covidhub_init_db(
+        covidhub_database_util.get_db_uri(secret_id, aws_profile=covidhub_aws_profile)
+    )
     return interface
 
 
@@ -81,14 +85,15 @@ def get_names_from_tree(tree) -> Sequence[str]:
 
 def import_project(
     interface: SqlAlchemyInterface,
+    covidhub_aws_profile: str,
     covidhub_secret_id: str,
     rr_project_id: str,
     s3_src_prefix: str,
-    s3_src_profile: str,
     s3_dst_prefix: str,
-    s3_dst_profile: str,
 ):
-    covidhub_interface = covidhub_interface_from_secret(covidhub_secret_id)
+    covidhub_interface = covidhub_interface_from_secret(
+        covidhub_aws_profile, covidhub_secret_id
+    )
     covidhub_session: Session = covidhub_interface.make_session()
 
     with session_scope(interface) as session:
@@ -224,8 +229,8 @@ def import_project(
             public_identifier_to_sample[sample.public_identifier] = sample
 
         pacific_time = pytz.timezone("US/Pacific")
-        s3_src = boto3.session.Session(profile_name=s3_src_profile).resource("s3")
-        s3_dst = boto3.session.Session(profile_name=s3_dst_profile).resource("s3")
+        s3_src = boto3.session.Session(profile_name=covidhub_aws_profile).resource("s3")
+        s3_dst = boto3.session.Session().resource("s3")
 
         src_prefix_url = S3UrlParser(s3_src_prefix)
         dst_prefix_url = S3UrlParser(s3_dst_prefix)
