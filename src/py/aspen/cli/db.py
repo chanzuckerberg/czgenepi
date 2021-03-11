@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from typing import Type
 
 import boto3
 import click
@@ -7,7 +8,7 @@ from IPython.terminal.embed import InteractiveShellEmbed
 
 from aspen import covidhub_import
 from aspen.cli.toplevel import cli
-from aspen.config.config import RemoteDatabaseConfig
+from aspen.config.config import Config, RemoteDatabaseConfig
 from aspen.config.development import DevelopmentConfig
 from aspen.database.connection import enable_profiling, get_db_uri, init_db
 from aspen.database.models import *  # noqa: F401, F403
@@ -15,10 +16,12 @@ from aspen.database.schema import create_tables_and_schema
 
 
 @cli.group()
+@click.option("--local", "config_cls", flag_value=DevelopmentConfig)
+@click.option("--remote", "config_cls", flag_value=RemoteDatabaseConfig)
 @click.pass_context
-def db(ctx):
-    # TODO: support multiple runtime environments.
-    ctx.obj["ENGINE"] = init_db(get_db_uri(DevelopmentConfig()))
+def db(ctx, config_cls: Type[Config]):
+    config = config_cls()
+    ctx.obj["ENGINE"] = init_db(get_db_uri(config))
 
 
 @db.command("set-passwords-from-secret")

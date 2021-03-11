@@ -7,6 +7,7 @@ from collections import MutableMapping
 from functools import lru_cache
 from typing import Any, Callable, Mapping, Optional, Set, Type, TypeVar, Union
 
+import boto3
 from botocore.exceptions import ClientError
 
 from aspen import aws
@@ -194,6 +195,18 @@ class Config:
 class RemoteDatabaseConfig(Config):
     """Configuration for running with a remote database."""
 
+    @flaskproperty
+    def SECRET_KEY(self) -> str:
+        return self.AWS_SECRET["FLASK_SECRET"]
+
     @property
     def DATABASE_URI(self) -> str:
-        return "postgresql://user_rw:password_rw@localhost:5432/aspen_db"
+        username = self.AWS_SECRET["DB"]["rw_username"]
+        password = self.AWS_SECRET["DB"]["rw_password"]
+
+        rds = boto3.client("rds")
+        response = rds.describe_db_instances(DBInstanceIdentifier="aspen-db")
+        instance_info = response["DBInstances"][0]
+        instance_address = instance_info["Endpoint"]["Address"]
+        instance_port = instance_info["Endpoint"]["Port"]
+        return f"postgresql://{username}:{password}@{instance_address}:{instance_port}/aspen_db"
