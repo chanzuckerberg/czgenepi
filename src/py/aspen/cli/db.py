@@ -16,7 +16,7 @@ from aspen.database.schema import create_tables_and_schema
 
 
 @cli.group()
-@click.option("--local", "config_cls", flag_value=DevelopmentConfig)
+@click.option("--local", "config_cls", flag_value=DevelopmentConfig, default=True)
 @click.option("--remote", "config_cls", flag_value=RemoteDatabaseConfig)
 @click.pass_context
 def db(ctx, config_cls: Type[Config]):
