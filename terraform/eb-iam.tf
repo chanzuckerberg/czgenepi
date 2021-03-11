@@ -6,6 +6,7 @@ resource "aws_iam_policy" "aspen-elasticbeanstalk-ec2-policies" {
   name = "aspen-elasticbeanstalk-ec2-policies"
   policy = templatefile("${path.module}/iam_templates/eb-policy.json", {
     ASPEN_CONFIG_SECRET_ARN = data.aws_secretsmanager_secret.aspen_config.arn,
+    ASPEN_DB_ARN = aws_db_instance.db.arn,
   })
 }
 
