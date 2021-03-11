@@ -159,6 +159,14 @@ class Config:
         return self.AWS_SECRET["AUTH0_CLIENT_SECRET"]
 
     @property
+    def AUTH0_MANAGEMENT_CLIENT_ID(self) -> str:
+        return self.AWS_SECRET["AUTH0_MANAGEMENT_CLIENT_ID"]
+
+    @property
+    def AUTH0_MANAGEMENT_CLIENT_SECRET(self) -> str:
+        return self.AWS_SECRET["AUTH0_MANAGEMENT_CLIENT_SECRET"]
+
+    @property
     def AUTH0_DOMAIN(self) -> str:
         return self.AWS_SECRET["AUTH0_DOMAIN"]
 

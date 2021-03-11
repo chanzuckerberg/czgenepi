@@ -20,7 +20,9 @@ from aspen.database.schema import create_tables_and_schema
 @click.option("--remote", "config_cls", flag_value=RemoteDatabaseConfig)
 @click.pass_context
 def db(ctx, config_cls: Type[Config]):
+    # TODO: support multiple runtime environments.
     config = config_cls()
+    ctx.obj["CONFIG"] = config
     ctx.obj["ENGINE"] = init_db(get_db_uri(config))
 
 
@@ -91,7 +93,9 @@ def import_covidhub_project(
     s3_dst_prefix,
 ):
     # these are injected into the IPython scope, but they appear to be unused.
-    engine = ctx.obj["ENGINE"]
+    config, engine = ctx.obj["CONFIG"], ctx.obj["ENGINE"]
+
+    auth0_usermap = covidhub_import.retrieve_auth0_users(config)
 
     covidhub_import.import_project(
         engine,
@@ -100,4 +104,5 @@ def import_covidhub_project(
         rr_project_id,
         s3_src_prefix,
         s3_dst_prefix,
+        auth0_usermap,
     )
