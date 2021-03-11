@@ -1,8 +1,13 @@
+import json
+from pathlib import Path
+
+import boto3
 import click
 from IPython.terminal.embed import InteractiveShellEmbed
 
 from aspen import covidhub_import
 from aspen.cli.toplevel import cli
+from aspen.config.config import RemoteDatabaseConfig
 from aspen.config.development import DevelopmentConfig
 from aspen.database.connection import enable_profiling, get_db_uri, init_db
 from aspen.database.models import *  # noqa: F401, F403
@@ -14,6 +19,37 @@ from aspen.database.schema import create_tables_and_schema
 def db(ctx):
     # TODO: support multiple runtime environments.
     ctx.obj["ENGINE"] = init_db(get_db_uri(DevelopmentConfig()))
+
+
+@db.command("set-passwords-from-secret")
+@click.pass_context
+def set_passwords_from_secret(ctx):
+    this_file = Path(__file__)
+    root = this_file.parent.parent.parent.parent.parent
+    default_db_credentials_file = root / "terraform" / "default-db-credentials.json"
+    with default_db_credentials_file.open("r") as fh:
+        default_db_credentials = json.load(fh)
+    admin_username = default_db_credentials["admin_username"]
+    admin_password = default_db_credentials["admin_password"]
+
+    secrets = RemoteDatabaseConfig().AWS_SECRET
+
+    # find the db instance
+    rds = boto3.client("rds")
+    response = rds.describe_db_instances(DBInstanceIdentifier="aspen-db")
+    instance_info = response["DBInstances"][0]
+    instance_address = instance_info["Endpoint"]["Address"]
+    instance_port = instance_info["Endpoint"]["Port"]
+    db_interface = init_db(
+        f"postgresql://{admin_username}:{admin_password}@{instance_address}:{instance_port}/aspen_db"
+    )
+
+    for username, password in (
+        (admin_username, secrets["DB"]["admin_password"]),
+        (default_db_credentials["rw_username"], secrets["DB"]["rw_password"]),
+        (default_db_credentials["ro_username"], secrets["DB"]["ro_password"]),
+    ):
+        db_interface.engine.execute(f"""ALTER USER {username} PASSWORD '{password}'""")
 
 
 @db.command("create")
