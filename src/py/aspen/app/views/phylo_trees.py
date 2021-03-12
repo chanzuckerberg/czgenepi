@@ -3,11 +3,11 @@ from typing import Any, Iterable, Mapping, MutableSequence, Tuple
 
 import boto3
 from flask import jsonify, session
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from sqlalchemy.orm import joinedload
 
 from aspen.app.app import application, requires_auth
-from aspen.app.views.api_utils import format_datetime
+from aspen.app.views.api_utils import format_datetime, get_usergroup_query
 from aspen.database.connection import session_scope
 from aspen.database.models import (
     PathogenGenome,
@@ -28,6 +28,11 @@ PHYLO_TREE_KEY = "phylo_trees"
 def phylo_trees():
     with session_scope(application.DATABASE_INTERFACE) as db_session:
         profile = session["profile"]
+        user = (
+            get_usergroup_query(db_session, profile["user_id"])
+            .options(joinedload(User.group, Group.can_see))
+            .one()
+        )
         # TODO: Add subquery to fetch trees for which we have can-see permissions.
         phylo_runs: Iterable[Tuple[PhyloRun, int]] = (
             db_session.query(
@@ -41,11 +46,14 @@ def phylo_trees():
             )
             .options(joinedload(PhyloRun.outputs))
             .filter(
-                PhyloRun.group_id.in_(
-                    db_session.query(Group.id)
-                    .join(User)
-                    .filter(User.auth0_user_id == profile["user_id"])
-                    .subquery()
+                or_(
+                    PhyloRun.group_id.in_(
+                        db_session.query(Group.id)
+                        .join(User)
+                        .filter(User.auth0_user_id == profile["user_id"])
+                        .subquery()
+                    ),
+                    user.system_admin,
                 )
             )
             .filter(PhyloRun.workflow_status == WorkflowStatusType.COMPLETED)
