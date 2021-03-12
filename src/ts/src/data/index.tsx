@@ -6,8 +6,8 @@ import cx from "classnames";
 import { fetchSamples, fetchTrees } from "common/api";
 import { DataSubview } from "common/components";
 
-import { SAMPLE_HEADERS, TREE_HEADERS } from "./headers"
-import { TREE_TRANSFORMS } from "./transforms"
+import { SAMPLE_HEADERS, TREE_HEADERS } from "./headers";
+import { TREE_TRANSFORMS } from "./transforms";
 
 import style from "./index.module.scss";
 
@@ -47,27 +47,30 @@ const Data: FunctionComponent = () => {
         },
     ];
 
-    const transformedCategories = dataCategories.map((category) => {
+    // run data through transforms
+    dataCategories.forEach((category) => {
         if (category.transforms === undefined || category.data === undefined) {
-            return
+            return;
         }
         const transformedData = category.data.map((datum) => {
             const transformedDatum = Object.assign({}, datum);
             category.transforms.forEach((transform) => {
-                const methodInputs = transform.inputs.map((key) => datum[key])
-                transformedDatum[transform.key] = transform.method(methodInputs)
-            })
-            return transformedDatum
-        })
+                const methodInputs = transform.inputs.map((key) => datum[key]);
+                transformedDatum[transform.key] = transform.method(
+                    methodInputs
+                );
+            });
+            return transformedDatum;
+        });
         category.data = transformedData;
-        return category
-    })
+    });
 
     const dataJSX: Record<string, Array<JSX.Element>> = {
         menuItems: [],
         routes: [],
     };
 
+    // create JSX elements from categories
     dataCategories.forEach((category) => {
         let focusStyle = null;
         if (location.pathname === category.to) {
