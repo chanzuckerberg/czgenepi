@@ -1,3 +1,8 @@
+resource "aws_security_group" "eb-security-group" {
+  name        = "eb-security-group"
+  description = "security group for eb instances"
+}
+
 resource "aws_security_group" "db-security-group" {
   name        = "db"
   description = "security group for database"
@@ -10,13 +15,16 @@ resource "aws_security_group" "db-security-group" {
   }
 }
 
-resource "aws_security_group_rule" "remote-db-access" {
-  count             = var.DEPLOYMENT_ENVIRONMENT == "prod" ? 0 : 1
-  security_group_id = aws_security_group.db-security-group.id
-  type              = "ingress"
-  description       = "ttung"
-  from_port         = 5432
-  to_port           = 5432
-  protocol          = "tcp"
-  cidr_blocks       = ["24.4.203.80/32"]
+output "aws_security_group_id" {
+  value = aws_security_group.eb-security-group.id
+}
+
+resource "aws_security_group_rule" "eb-db-access" {
+  security_group_id        = aws_security_group.db-security-group.id
+  type                     = "ingress"
+  description              = "Access given to the security group applied to all EB instances"
+  from_port                = 5432
+  to_port                  = 5432
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.eb-security-group.id
 }
