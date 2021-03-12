@@ -18,7 +18,7 @@ aspen% . .venv/bin/activate
 2. Install pipenv.
 ```bash
 (.venv) aspen% pip install pipenv
-(.venv) aspen%
+(.venv) aspen% 
 ```
 3. Install the packages required for development.
 ```bash
