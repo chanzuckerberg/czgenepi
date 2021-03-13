@@ -2,6 +2,7 @@ import React, { FunctionComponent } from "react";
 import { Table } from "semantic-ui-react";
 
 import { ReactComponent as SampleIcon } from "common/icons/Sample.svg";
+import { ReactComponent as TreeIcon } from "common/icons/PhyloTree.svg";
 
 import style from "./index.module.scss";
 
@@ -12,7 +13,7 @@ interface Props {
 
 const ICONS: Record<string, JSX.Element> = {
     Sample: <SampleIcon className={style.icon} />,
-    Tree: <span />,
+    Tree: <TreeIcon className={style.icon} />,
 };
 
 const UNDEFINED_TEXT = "---";
@@ -35,10 +36,8 @@ const DataTable: FunctionComponent<Props> = ({ data = [], headers }: Props) => {
                 displayData = UNDEFINED_TEXT;
             }
             if (index === 0) {
-                console.log(item.type);
                 icon = ICONS[item.type];
             }
-            console.log(icon);
             return (
                 <Table.Cell key={`${item[indexingKey]}-${column.key}`}>
                     <div className={style.cell}>
