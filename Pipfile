@@ -29,6 +29,7 @@ pytest-xdist = "*"
 sqlalchemy-stubs = "*"
 tqdm = "*"
 auth0-python = "*"
+aspen = {editable = true, path = "./src/py"}
 
 [requires]
 python_version = "3.7"

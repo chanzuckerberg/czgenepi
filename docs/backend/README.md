@@ -23,8 +23,14 @@ Create a secret called `aspen-config` with the following contents:
 
 #### Terraform setup
 
-1. Source the `environment` file at the top level of the repo.  You may need to set `AWS_PROFILE` or `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY` in your environment.
-1. Run the deployment flow.
+1. Install terraform:
+```bash
+aspen% brew tap hashicorp/tap
+aspen% brew install hashicorp/tap/terraform
+```
+
+2. Source the `environment` file at the top level of the repo.  You may need to set `AWS_PROFILE` or `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY` in your environment.
+3. Run the deployment flow.
 
 ```bash
 aspen% source environment

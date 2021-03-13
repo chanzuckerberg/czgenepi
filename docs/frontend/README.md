@@ -19,7 +19,7 @@ From the **project root directory**:
 % curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
 ```
 
-2. Install Node
+2. Install Node (run commands from project root)
 ```zsh
 % nvm install
 % nvm use
