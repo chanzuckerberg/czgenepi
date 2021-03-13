@@ -78,6 +78,10 @@ aspen% .venv-ebcli/bin/eb open aspen-myusername
 aspen% .venv-ebcli/bin/eb terminate aspen-myusername
 ```
 
+### Granting access to the database.
+
+Access to the database is only granted if an EC2 instance is within the security group `eb-security-group`.  Locate your environment in the [Elastic Beanstalk configuration](https://us-west-2.console.aws.amazon.com/elasticbeanstalk/home) page.  Find the configuration page for your environment.  Then under the category "Instances", click edit.  Under EC2 Security Groups, add `eb-security-group` to your launch configuration and restart your environment.
+
 ## Database concerns
 
 ### Interacting with the local database in sql
