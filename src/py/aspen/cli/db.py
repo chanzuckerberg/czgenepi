@@ -33,7 +33,7 @@ def set_passwords_from_secret(ctx):
     root = this_file.parent.parent.parent.parent.parent
     default_db_credentials_file = root / "terraform.tfvars.json"
     with default_db_credentials_file.open("r") as fh:
-        default_db_credentials = json.load(fh)
+        default_db_credentials = json.load(fh)["db_credentials"]
     admin_username = default_db_credentials["admin_username"]
     admin_password = default_db_credentials["admin_password"]
 
