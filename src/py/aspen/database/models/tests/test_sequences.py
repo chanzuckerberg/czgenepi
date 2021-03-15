@@ -1,5 +1,9 @@
 from datetime import datetime
 
+import pytest
+from sqlalchemy.exc import InvalidRequestError
+from sqlalchemy.orm import undefer
+
 from aspen.database.models.sample import Sample
 from aspen.database.models.sequences import (
     SequencingInstrumentType,
@@ -75,3 +79,19 @@ def test_uploaded_pathogen_genome(session):
         )
     )
     session.flush()
+
+    # expire the data and try to implicitly load the sequence data.  it should fail.
+    session.expire_all()
+    uploaded_pathogen_genome = session.query(UploadedPathogenGenome).one()
+    with pytest.raises(InvalidRequestError):
+        uploaded_pathogen_genome.sequence
+
+    # expire the data and try to explicitly load the sequence data.
+    # it should succeed.
+    session.expire_all()
+    uploaded_pathogen_genome = (
+        session.query(UploadedPathogenGenome)
+        .options(undefer(UploadedPathogenGenome.sequence))
+        .one()
+    )
+    uploaded_pathogen_genome.sequence
