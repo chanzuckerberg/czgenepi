@@ -10,7 +10,7 @@ resource "aws_s3_bucket" "nextstrain_jobs" {
       days = 30
       storage_class = "GLACIER"
     }
-    
+
     expiration {
       days = 90
     }

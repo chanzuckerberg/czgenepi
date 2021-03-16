@@ -13,7 +13,7 @@ resource "aws_iam_policy" "nextstrain-jobs-access-to-logs" {
   policy = file("${path.module}/iam_templates/nextstrain_jobs_access_to_logs.json")
 }
 
-resource "aws_iam_role" "nextstrain-jobs-rule" {
+resource "aws_iam_role" "nextstrain-jobs-role" {
   name = "nextstrain-jobs-rule"
   assume_role_policy = templatefile("${path.module}/iam_templates/trust_policy.json", {
     trust_services = ["ecs"]
@@ -21,7 +21,7 @@ resource "aws_iam_role" "nextstrain-jobs-rule" {
 }
 
 resource "aws_iam_role_policy_attachment" "attach-nextstrain-bucket-policy" {
-  role = aws_iam_role.nextstrain-jobs-rule.name
+  role = aws_iam_role.nextstrain-jobs-role.name
   policy_arn = aws_iam_policy.nextstrain-jobs-access-to-bucket.arn
 }
 

@@ -1,0 +1,9 @@
+{
+  "containerProperties": {
+    "command": [],
+    "image": "nextstrain/base:latest",
+    "jobRoleArn": "${JOB_ROLE_ARN}",
+    "memory": 1024,
+    "vcpus": 1,
+  }
+}
