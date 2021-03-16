@@ -1,16 +1,16 @@
 resource "aws_iam_policy" "nextstrain-jobs-access-to-batch" {
   name = "nextstrain-jobs-access-to-batch"
-  policy = templatefile("${path.module}/iam_templates/nextstrain-jobs-access-to-batch.json")
+  policy = file("${path.module}/iam_templates/nextstrain_jobs_access_to_batch.json")
 }
 
 resource "aws_iam_policy" "nextstrain-jobs-access-to-bucket" {
   name = "nextstrain-jobs-access-to-bucket"
-  policy = templatefile("${path.module}/iam_templates/nextstrain-jobs-access-to-bucket.json")
+  policy = file("${path.module}/iam_templates/nextstrain_jobs_access_to_bucket.json")
 }
 
 resource "aws_iam_policy" "nextstrain-jobs-access-to-logs" {
   name = "nextstrain-jobs-access-to-logs"
-  policy = templatefile("${path.module}/iam_templates/nextstrain-jobs-access-to-logs.json")
+  policy = file("${path.module}/iam_templates/nextstrain_jobs_access_to_logs.json")
 }
 
 resource "aws_iam_role" "nextstrain-jobs-rule" {
@@ -29,14 +29,17 @@ resource "aws_iam_group" "nextstrain-users" {
   name = "nextstrain-users"
 }
 
-resource "aws_iam_group_policy_attatchment" "attach-nextstrain-policies-to-group" {
-  for_each = toset(
-    [
-      aws_iam_policy.nextstrain-jobs-access-to-batch,
-      aws_iam_policy.nextstrain-jobs-access-to-bucket,
-      aws_iam_policy.nextstrain-jobs-access-to-logs,
-    ]
-  )
+resource "aws_iam_group_policy_attachment" "attach-batch-policy-to-nextstrain-group" {
   group = aws_iam_group.nextstrain-users.name
-  policy_arn = each.arn
+  policy_arn = aws_iam_policy.nextstrain-jobs-access-to-batch.arn
+}
+
+resource "aws_iam_group_policy_attachment" "attach-bucket-policy-to-nextstrain-group" {
+  group = aws_iam_group.nextstrain-users.name
+  policy_arn = aws_iam_policy.nextstrain-jobs-access-to-bucket.arn
+}
+
+resource "aws_iam_group_policy_attachment" "attach-logs-policy-to-nextstrain-group" {
+  group = aws_iam_group.nextstrain-users.name
+  policy_arn = aws_iam_policy.nextstrain-jobs-access-to-logs.arn
 }
