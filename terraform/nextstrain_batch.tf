@@ -84,7 +84,6 @@ resource "aws_subnet" "nextstrain-batch-subnet" {
 
 resource "aws_batch_compute_environment" "nextstrain-batch-compute-environment" {
   compute_environment_name = "nextstrain-batch-compute-environment"
-  # m5 max memory
 
   compute_resources {
     instance_role = aws_iam_instance_profile.nextstrain-ecs-instance-role.arn
