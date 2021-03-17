@@ -3,7 +3,7 @@
 from aspen.app.app import application  # noqa: F401
 from aspen.app.views.auth import callback_handling, login, logout  # noqa: F401
 from aspen.app.views.index import serve  # noqa: F401
-from aspen.app.views.magic_key import get_presigned_url
+from aspen.app.views.magic_url import magic_url, get_magic_url
 from aspen.app.views.phylo_trees import phylo_trees  # noqa: F401
 from aspen.app.views.sample import samples  # noqa: F401
 from aspen.app.views.usergroup import usergroup  # noqa: F401
