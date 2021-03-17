@@ -25,21 +25,21 @@ resource "aws_iam_role_policy_attachment" "attach-nextstrain-bucket-policy" {
   policy_arn = aws_iam_policy.nextstrain-jobs-access-to-bucket.arn
 }
 
-resource "aws_iam_group" "nextstrain-users" {
-  name = "nextstrain-users"
-}
+# resource "aws_iam_group" "nextstrain-users" {
+#   name = "nextstrain-users"
+# }
 
-resource "aws_iam_group_policy_attachment" "attach-batch-policy-to-nextstrain-group" {
-  group = aws_iam_group.nextstrain-users.name
-  policy_arn = aws_iam_policy.nextstrain-jobs-access-to-batch.arn
-}
+# resource "aws_iam_group_policy_attachment" "attach-batch-policy-to-nextstrain-group" {
+#   group = aws_iam_group.nextstrain-users.name
+#   policy_arn = aws_iam_policy.nextstrain-jobs-access-to-batch.arn
+# }
 
-resource "aws_iam_group_policy_attachment" "attach-bucket-policy-to-nextstrain-group" {
-  group = aws_iam_group.nextstrain-users.name
-  policy_arn = aws_iam_policy.nextstrain-jobs-access-to-bucket.arn
-}
+# resource "aws_iam_group_policy_attachment" "attach-bucket-policy-to-nextstrain-group" {
+#   group = aws_iam_group.nextstrain-users.name
+#   policy_arn = aws_iam_policy.nextstrain-jobs-access-to-bucket.arn
+# }
 
-resource "aws_iam_group_policy_attachment" "attach-logs-policy-to-nextstrain-group" {
-  group = aws_iam_group.nextstrain-users.name
-  policy_arn = aws_iam_policy.nextstrain-jobs-access-to-logs.arn
-}
+# resource "aws_iam_group_policy_attachment" "attach-logs-policy-to-nextstrain-group" {
+#   group = aws_iam_group.nextstrain-users.name
+#   policy_arn = aws_iam_policy.nextstrain-jobs-access-to-logs.arn
+# }
