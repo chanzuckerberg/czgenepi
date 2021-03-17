@@ -1,16 +1,18 @@
 import os
 from logging.config import fileConfig
+from typing import Mapping, Type
 
 import enumtables  # noqa: F401
 from alembic import context
 from sqlalchemy import create_engine
 
-# this is the Alembic Config object, which provides
-# access to the values within the .ini file in use.
-from aspen.config.config import Config
+from aspen.config import DevelopmentConfig
+from aspen.config.config import Config, RemoteDatabaseConfig
 from aspen.database.connection import get_db_uri
 from aspen.database.models import meta
 
+# this is the Alembic Config object, which provides
+# access to the values within the .ini file in use.
 config = context.config
 
 # Interpret the config file for Python logging.
@@ -47,9 +49,13 @@ def get_uri():
         db_env = os.environ["DB"]
     else:
         # TODO: generate the appropriate list of "RuntimeEnvironment"s from the enum.
-        raise ValueError("Must provide env variable DB=[local, dev, staging, prod]")
+        raise ValueError("Must provide env variable DB=[local, remote, dev, staging, prod]")
 
-    return get_db_uri(Config.by_descriptive_name(db_env))
+    config_mapper: Mapping[str, Type[Config]] = {
+        "local": DevelopmentConfig,
+        "remote": RemoteDatabaseConfig,
+    }
+    return get_db_uri(config_mapper[db_env]())
 
 
 def run_migrations_offline():

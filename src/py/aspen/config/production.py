@@ -1,12 +1,10 @@
-import uuid
-
 from aspen.config import config
 
 
-class ProductionConfig(config.Config, descriptive_name="prod"):
+class ProductionConfig(config.RemoteDatabaseConfig, descriptive_name="prod"):
     @config.flaskproperty
-    def SECRET_KEY(self) -> str:
-        return uuid.uuid4().hex
+    def DEBUG(self) -> bool:
+        return False
 
     @property
     def AUTH0_CALLBACK_URL(self) -> str:

@@ -14,10 +14,13 @@ interface Sample extends BioinformaticsType {
 }
 
 interface Tree extends BioinformaticsType {
+    [index: string]: JSONPrimitive | JSX.Element;
     type: "Tree";
-    id: string;
+    id: number;
+    name?: string;
     pathogenGenomeCount: number;
     dateCompleted: string;
+    downloadLink?: JSX.Element;
 }
 
 type BioinformaticsData = Sample | Tree;

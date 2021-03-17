@@ -2,28 +2,46 @@
 
 ### Staging setup
 
-#### AWS Secret
+#### AWS Secrets
 
 Create a secret called `aspen-config` with the following contents:
 ```json
 {
   "AUTH0_DOMAIN": "<MY_DOMAIN_HERE>.auth0.com",
   "AUTH0_CLIENT_ID": "<AUTH0_CLIENT_HERE>",
-  "AUTH0_CLIENT_SECRET": "<AUTH0_CLIENT_SECRET_HERE>"
+  "AUTH0_CLIENT_SECRET": "<AUTH0_CLIENT_SECRET_HERE>",
+  "DB": {
+    "admin_username": "<DB_ADMIN_USERNAME>",
+    "admin_password": "<DB_ADMIN_PASSWORD>",
+    "rw_username": "<USERNAME_FOR_READ_WRITE_USER>",
+    "rw_password": "<PASSWORD_FOR_READ_WRITE_USER>",
+    "ro_username": "<USERNAME_FOR_READ_ONLY_USER>",
+    "ro_password": "<PASSWORD_FOR_READ_ONLY_USER>"
+  }
 }
 ```
 
 #### Terraform setup
 
-1. Source the `environment` file at the top level of the repo.  You may need to set `AWS_PROFILE` or `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY` in your environment.
-1. Run the deployment flow.
+1. Install terraform:
+```bash
+aspen% brew tap hashicorp/tap
+aspen% brew install hashicorp/tap/terraform
+```
+
+2. Source the `environment` file at the top level of the repo.  You may need to set `AWS_PROFILE` or `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY` in your environment.
+3. Run the deployment flow.
 
 ```bash
 aspen% source environment
-aspen% make deploy-tf
+aspen% make deploy-tf-initial
 ```
 
-This should create the policies necessary to deploy to Elastic Beanstalk.
+This should create the policies necessary to deploy to Elastic Beanstalk and create the database.  To ensure that passwords are not stored in the terraform state, accounts are created with default passwords.  To reset them to match what is stored in AWS Secrets, run `aspen-cli db set-passwords-from-secret --environment <environment>`, where <environment> is either staging or prod.  Once the passwords are changed from the default password, subsequent runs of terraform will require pulling the password from AWS secrets to connect to the database.  The makefile rule `deploy-tf` manages that process.
+
+```bash
+aspen% make deploy-tf
+```
 
 ## Deploying the python web services
 
@@ -59,6 +77,10 @@ aspen% .venv-ebcli/bin/eb open aspen-myusername
 ```bash
 aspen% .venv-ebcli/bin/eb terminate aspen-myusername
 ```
+
+### Granting access to the database.
+
+Access to the database is only granted if an EC2 instance is within the security group `eb-security-group`.  Locate your environment in the [Elastic Beanstalk configuration](https://us-west-2.console.aws.amazon.com/elasticbeanstalk/home) page.  Find the configuration page for your environment.  Then under the category "Instances", click edit.  Under EC2 Security Groups, add `eb-security-group` to your launch configuration and restart your environment.
 
 ## Database concerns
 
@@ -119,9 +141,9 @@ In [3]:
 ### Autogeneration of schema migration
 
 1. Make changes to the models.
-2. Run `ENV=dev alembic revision --autogenerate -m "SOME DESCRIPTIVE MESSAGE" --rev-id $(date +%Y%m%d_%H%M%S)`
+2. Run `DB=local alembic revision --autogenerate -m "SOME DESCRIPTIVE MESSAGE" --rev-id $(date +%Y%m%d_%H%M%S)`
 3. Verify that the schema migration generated in `database_migrations/versions/` is sane.
-4. Run `ENV=dev alembic upgrade head` to test the schema migration on your local database.
+4. Run `DB=local alembic upgrade head` to test the schema migration on your local database.
 
 ## Updating python dependencies
 

@@ -17,7 +17,7 @@ LOCAL_DB_CONTAINER_ID = $(shell docker ps -a | grep $(LOCAL_DB_CONTAINER_NAME) |
 LOCAL_DB_CONTAINER_RUNNING_ID = $(shell docker ps | grep $(LOCAL_DB_CONTAINER_NAME) | awk '{print $$1}')
 LOCAL_DB_NAME = aspen_db
 LOCAL_DB_ADMIN_USERNAME = postgres  # This has to be "postgres" to ease moving snapshots from RDS.
-LOCAL_DB_ADMIN_PASSWORD = admin
+LOCAL_DB_ADMIN_PASSWORD = password_postgres
 LOCAL_DB_RW_USERNAME = user_rw
 LOCAL_DB_RW_PASSWORD = password_rw
 LOCAL_DB_RO_USERNAME = user_ro
@@ -45,7 +45,7 @@ setup-local-db:
 init-local-db:
 	@$(MAKE) setup-local-db
 	aspen-cli db create
-	DB=dev alembic stamp head
+	DB=local alembic stamp head
 
 stop-local-db:
 	@if [ "$(LOCAL_DB_CONTAINER_RUNNING_ID)" != "" ]; then \

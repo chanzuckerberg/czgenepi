@@ -6,23 +6,10 @@ import cx from "classnames";
 import { fetchSamples, fetchTrees } from "common/api";
 import { DataSubview } from "common/components";
 
+import { SAMPLE_HEADERS, TREE_HEADERS } from "./headers";
+import { TREE_TRANSFORMS } from "./transforms";
+
 import style from "./index.module.scss";
-
-const SAMPLE_HEADERS: Header[] = [
-    { text: "Private ID", key: "privateId" },
-    { text: "Public ID", key: "publicId" },
-    { text: "Upload Date", key: "uploadDate" },
-    { text: "Collection Date", key: "collectionDate" },
-    { text: "Collection Location", key: "collectionLocation" },
-    { text: "GISAID", key: "gisaid" },
-];
-
-const TREE_HEADERS: Header[] = [
-    { text: "Tree Name", key: "id" },
-    { text: "Creation Date", key: "creationDate" },
-    { text: "Total Samples", key: "pathogenGenomeCount" },
-    { text: "", key: "downloadLink" },
-];
 
 const Data: FunctionComponent = () => {
     const [samples, setSamples] = useState<Sample[] | undefined>();
@@ -56,14 +43,34 @@ const Data: FunctionComponent = () => {
             text: "Phylogenetic Trees",
             data: trees,
             headers: TREE_HEADERS,
+            transforms: TREE_TRANSFORMS,
         },
     ];
+
+    // run data through transforms
+    dataCategories.forEach((category) => {
+        if (category.transforms === undefined || category.data === undefined) {
+            return;
+        }
+        const transformedData = category.data.map((datum) => {
+            const transformedDatum = Object.assign({}, datum);
+            category.transforms.forEach((transform) => {
+                const methodInputs = transform.inputs.map((key) => datum[key]);
+                transformedDatum[transform.key] = transform.method(
+                    methodInputs
+                );
+            });
+            return transformedDatum;
+        });
+        category.data = transformedData;
+    });
 
     const dataJSX: Record<string, Array<JSX.Element>> = {
         menuItems: [],
         routes: [],
     };
 
+    // create JSX elements from categories
     dataCategories.forEach((category) => {
         let focusStyle = null;
         if (location.pathname === category.to) {
