@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   database:
-    image: "${DOCKER_REPO}aspen-devdb:default"
+    image: "${DOCKER_REPO}aspen-devdb:latest"
     ports:
       - "5432:5432"
     environment:

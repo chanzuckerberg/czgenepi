@@ -30,7 +30,7 @@ pytest-xdist = "*"
 sqlalchemy-stubs = "*"
 tqdm = "*"
 auth0-python = "*"
-aspen = {editable = true, path = "./src/py"}
+aspen = {editable = true, path = "."}
 
 [requires]
 python_version = "3.9"
