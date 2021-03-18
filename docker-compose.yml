@@ -58,6 +58,7 @@ services:
       - AWS_REGION=us-west-2
       - ENV=local
       - FLASK_ENV=local
+      - FLASK_APP=aspen.main
       - PYTHONPATH=.
     volumes:
       - ./src/py:/usr/src/app

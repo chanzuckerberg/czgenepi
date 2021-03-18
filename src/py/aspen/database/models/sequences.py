@@ -146,7 +146,7 @@ class PathogenGenome(Entity):
     __tablename__ = "pathogen_genomes"
 
     entity_id = Column(Integer, ForeignKey(Entity.id), primary_key=True)
-    sequence = deferred(Column(String, nullable=False), raiseload=True)
+    sequence = deferred(Column(String, nullable=False))
 
     # statistics for the pathogen genome
 
