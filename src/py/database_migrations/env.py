@@ -8,6 +8,7 @@ from sqlalchemy import create_engine
 
 from aspen.config import DevelopmentConfig
 from aspen.config.config import Config, RemoteDatabaseConfig
+from aspen.config.local import LocalConfig
 from aspen.database.connection import get_db_uri
 from aspen.database.models import meta
 
@@ -49,9 +50,10 @@ def get_uri():
         db_env = os.environ["DB"]
     else:
         # TODO: generate the appropriate list of "RuntimeEnvironment"s from the enum.
-        raise ValueError("Must provide env variable DB=[local, remote, dev, staging, prod]")
+        raise ValueError("Must provide env variable DB=[docker, local, remote, dev, staging, prod]")
 
     config_mapper: Mapping[str, Type[Config]] = {
+        "docker": LocalConfig,
         "local": DevelopmentConfig,
         "remote": RemoteDatabaseConfig,
     }

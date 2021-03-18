@@ -2,15 +2,16 @@ version: '3.8'
 
 services:
   database:
-    image: postgres:13.0
+    image: "${DOCKER_REPO}aspen-devdb:default"
     ports:
       - "5432:5432"
     environment:
       - POSTGRES_USER=user_rw
       - POSTGRES_PASSWORD=password_rw
       - POSTGRES_DB=aspen_db
-    volumes:
-      - database:/var/lib/postgresql/data
+    #volumes:
+    #  - database:/var/lib/postgresql/data
+    command: ["postgres"]
   frontend:
     image: "${DOCKER_REPO}aspen-frontend"
     build:
