@@ -58,21 +58,47 @@ resource "aws_iam_role_policy_attachment" "nextstrain-batch-service-role" {
 }
 
 
-resource "aws_vpc" "nextstrain-batch-vpc" {
-  cidr_block = "10.1.0.0/16"
+data "aws_availability_zones" "available" {}
+
+
+resource "aws_default_vpc" "default" {
+  tags = {
+    Name = "Default VPC"
+  }
+}
+
+data "aws_internet_gateway" "default" {
+  filter {
+    name   = "attachment.vpc-id"
+    values = [aws_default_vpc.default.id]
+  }
+}
+
+resource "aws_default_route_table" "default" {
+  default_route_table_id = aws_default_vpc.default.default_route_table_id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = data.aws_internet_gateway.default.id
+  }
+
+  tags = {
+    Name = "Default Route Table"
+  }
 }
 
 
-resource "aws_subnet" "nextstrain-batch-subnet" {
-  vpc_id     = aws_vpc.nextstrain-batch-vpc.id
-  cidr_block = "10.1.1.0/24"
+resource "aws_default_subnet" "default" {
+  count = length(split(",", join(",", flatten(data.aws_availability_zones.available.*.names))))
+
+  availability_zone = data.aws_availability_zones.available.names[count.index]
 }
 
 
 resource "aws_security_group" "nextstrain-batch-security-group" {
   name = "nextstrain_aws_batch_compute_environment_security_group"
   description = "security group for nextstrain batch"
-  vpc_id = aws_vpc.nextstrain-batch-vpc.id
+  vpc_id = aws_default_vpc.default.id
 
   egress {
     from_port   = 0
@@ -90,25 +116,25 @@ resource "aws_security_group" "nextstrain-batch-security-group" {
 
 
 # for increased disk space
-resource "aws_launch_template" "nextstrain-launch-template" {
-  name = "nextstrain-launch-template"
+# resource "aws_launch_template" "nextstrain-launch-template" {
+#   name = "nextstrain-launch-template"
 
-  block_device_mappings {
-    device_name = "/dev/xvdcz"
+#   block_device_mappings {
+#     device_name = "/dev/xvdcz"
 
-    ebs {
-      volume_size = 200
-      volume_type = "gp2"
-      delete_on_termination = true
-    }
-  }
-  # instance_type = "m5.2xlarge"
-  # iam_instance_profile = {
-  #   name = aws_iam_instance_profile.nextstrain-ecs-instance-role.name
-  # }x
-  user_data = base64encode(file("${path.module}/data/user_data.txt"))
+#     ebs {
+#       volume_size = 200
+#       volume_type = "gp2"
+#       delete_on_termination = true
+#     }
+#   }
+#   # instance_type = "m5.2xlarge"
+#   # iam_instance_profile = {
+#   #   name = aws_iam_instance_profile.nextstrain-ecs-instance-role.name
+#   # }x
+#   user_data = base64encode(file("${path.module}/data/user_data.txt"))
 
-}
+# }
 
 
 resource "aws_batch_compute_environment" "nextstrain-compute-environment" {
@@ -131,15 +157,13 @@ resource "aws_batch_compute_environment" "nextstrain-compute-environment" {
       aws_security_group.nextstrain-batch-security-group.id,
     ]
 
-    subnets = [
-      aws_subnet.nextstrain-batch-subnet.id,
-    ]
+    subnets = aws_default_subnet.default.*.id
 
     type = "EC2"
 
-    launch_template {
-      launch_template_id = aws_launch_template.nextstrain-launch-template.id
-    }
+    # launch_template {
+    #   launch_template_id = aws_launch_template.nextstrain-launch-template.id
+    # }
   }
 
   service_role = aws_iam_role.nextstrain-batch-service-role.arn
