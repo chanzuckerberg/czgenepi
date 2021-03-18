@@ -1,5 +1,5 @@
 SHELL := /bin/bash
-PYTHON_CODE_DIRECTORIES = database_migrations src/py
+PYTHON_CODE_DIRECTORIES = src/py
 
 ### DOCKER #################################################
 #
