@@ -59,6 +59,8 @@ services:
       - ENV=local
       - FLASK_ENV=local
       - FLASK_APP=aspen.main
+      - FLASK_DEBUG=1
+      - FLASK_SECRET_KEY=DevelopmentKey
       - PYTHONPATH=.
     volumes:
       - ./src/py:/usr/src/app

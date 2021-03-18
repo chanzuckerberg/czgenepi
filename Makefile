@@ -185,7 +185,7 @@ local-shell: ## Open a command shell in one of the dev containers. ex: make loca
 	docker-compose exec $(CONTAINER) bash
 
 .PHONY: local-pgconsole
-local-dbconsole: ## Connect to the local postgres database.
+local-pgconsole: ## Connect to the local postgres database.
 	psql "postgresql://$(LOCAL_DB_RW_USERNAME):$(LOCAL_DB_RW_PASSWORD)@localhost:5432/$(LOCAL_DB_NAME)"
 
 .PHONY: local-dbconsole
