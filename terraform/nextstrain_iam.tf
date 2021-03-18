@@ -16,7 +16,7 @@ resource "aws_iam_policy" "nextstrain-jobs-access-to-logs" {
 resource "aws_iam_role" "nextstrain-jobs-role" {
   name = "nextstrain-jobs-role"
   assume_role_policy = templatefile("${path.module}/iam_templates/trust_policy.json", {
-    trust_services = ["ecs"]
+    trust_services = ["ecs-tasks"]
   })
 }
 
