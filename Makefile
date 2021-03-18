@@ -139,8 +139,8 @@ local-init: oauth/pkcs12/certificate.pfx .env.ecr local-ecr-login ## Launch a ne
 	docker-compose exec -T utility $(BACKEND_APP_ROOT)/scripts/setup_dev_data.sh
 	docker-compose exec -T utility pip install .
 	-@docker-compose exec -e PGPASSWORD=$(LOCAL_DB_RW_PASSWORD) database psql -h localhost -d $(LOCAL_DB_NAME) -U $(LOCAL_DB_RW_USERNAME) -c "CREATE USER $(LOCAL_DB_RO_USERNAME) WITH PASSWORD '$(LOCAL_DB_RO_PASSWORD)';"
-	docker-compose exec -T -e DB=docker utility aspen-cli db --docker create
-	docker-compose exec -e DB=docker -T utility alembic stamp head
+	docker-compose exec -T utility aspen-cli db --docker create
+	docker-compose exec -T utility alembic stamp head
 
 .PHONY: local-status
 local-status: ## Show the status of the containers in the dev environment.
@@ -184,6 +184,10 @@ local-logs: ## Tail the logs of the dev env containers. ex: make local-logs CONT
 local-shell: ## Open a command shell in one of the dev containers. ex: make local-shell CONTAINER=frontend
 	docker-compose exec $(CONTAINER) bash
 
-.PHONY: local-dbconsole
+.PHONY: local-pgconsole
 local-dbconsole: ## Connect to the local postgres database.
 	psql "postgresql://$(LOCAL_DB_RW_USERNAME):$(LOCAL_DB_RW_PASSWORD)@localhost:5432/$(LOCAL_DB_NAME)"
+
+.PHONY: local-dbconsole
+local-dbconsole: ## Connect to the local postgres database.
+	docker-compose exec utility aspen-cli db --docker interact

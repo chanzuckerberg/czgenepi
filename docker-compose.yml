@@ -84,10 +84,12 @@ services:
       - AWS_REGION=us-west-2
       - ENV=local
       - FLASK_ENV=local
+      - DB=docker
       - PYTHONPATH=.
     volumes:
       - ./src/py:/usr/src/app
-    command: ["sleep", "infinity"]
+    entrypoint: []
+    command: ["./utility.sh"]
   localstack:
     image: localstack/localstack@sha256:7c6635493185d25165979995fb073fd789c72b6d8b17ef3a70b798d55576732f
     ports:
