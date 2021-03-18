@@ -50,7 +50,9 @@ def get_uri():
         db_env = os.environ["DB"]
     else:
         # TODO: generate the appropriate list of "RuntimeEnvironment"s from the enum.
-        raise ValueError("Must provide env variable DB=[docker, local, remote, dev, staging, prod]")
+        raise ValueError(
+            "Must provide env variable DB=[docker, local, remote, dev, staging, prod]"
+        )
 
     config_mapper: Mapping[str, Type[Config]] = {
         "docker": LocalConfig,

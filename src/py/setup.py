@@ -10,7 +10,13 @@ with requirements_file.open("r") as fh:
     requirement_lines = [
         line.strip()
         for line in fh.readlines()
-        if line.strip() and not (line.startswith("-i") or line.startswith("-e") or line.startswith("#") or line.startswith("./"))
+        if line.strip()
+        and not (
+            line.startswith("-i")
+            or line.startswith("-e")
+            or line.startswith("#")
+            or line.startswith("./")
+        )
     ]
 print(requirement_lines)
 

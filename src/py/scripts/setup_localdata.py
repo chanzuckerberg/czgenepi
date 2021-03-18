@@ -16,17 +16,23 @@ from aspen.database.connection import enable_profiling, get_db_uri, init_db
 from aspen.database.models import *  # noqa: F401, F403
 from aspen.database.schema import create_tables_and_schema
 
+
 def create_test_group(session):
-    g = session.query(Group).filter(Group.name=="CZI").one_or_none()
+    g = session.query(Group).filter(Group.name == "CZI").one_or_none()
     if g:
         print("Group already exists")
         return g
     print("Creating group")
-    g = Group(name="CZI", email="aspen-testuser@chanzuckerberg.com", address="601 Marshall St, Redwood City, CA 94063")
+    g = Group(
+        name="CZI",
+        email="aspen-testuser@chanzuckerberg.com",
+        address="601 Marshall St, Redwood City, CA 94063",
+    )
     session.add(g)
     session.commit()
-    g = session.query(Group).filter(Group.name=="CZI").one_or_none()
+    g = session.query(Group).filter(Group.name == "CZI").one_or_none()
     return g
+
 
 def create_test_user(session, group):
     u = session.query(User).filter(User.auth0_user_id == "User1").one_or_none()
@@ -40,13 +46,16 @@ def create_test_user(session, group):
         email="aspen-testuser@chanzuckerberg.com",
         group_admin=True,
         system_admin=True,
-        group=group
+        group=group,
     )
     session.add(u)
     return u
 
+
 def create_sample(session, group):
-    sample = session.query(Sample).filter(Sample.submitting_group == group).one_or_none()
+    sample = (
+        session.query(Sample).filter(Sample.submitting_group == group).one_or_none()
+    )
     if sample:
         print("Sample already exists")
         return sample
@@ -67,8 +76,13 @@ def create_sample(session, group):
     session.add(sample)
     return sample
 
+
 def create_sequencing_reads(session, sample):
-    sequencing_reads = session.query(SequencingReadsCollection).filter(SequencingReadsCollection.sample == sample).one_or_none()
+    sequencing_reads = (
+        session.query(SequencingReadsCollection)
+        .filter(SequencingReadsCollection.sample == sample)
+        .one_or_none()
+    )
     if sequencing_reads:
         print("Sequencing Reads already exists")
         return sequencing_reads
@@ -84,6 +98,7 @@ def create_sequencing_reads(session, sample):
     session.add(sequencing_reads)
     return sequencing_reads
 
+
 def create_test_data(engine):
     session = engine.make_session()
     group = create_test_group(session)
@@ -92,10 +107,12 @@ def create_test_data(engine):
     sequencing_reads = create_sequencing_reads(session, sample)
     session.commit()
 
+
 def get_engine():
     config = LocalConfig()
     engine = init_db(get_db_uri(config))
     return engine
+
 
 if __name__ == "__main__":
     engine = get_engine()

@@ -95,6 +95,7 @@ def import_covidhub_project(
     s3_dst_prefix,
 ):
     from aspen.covidhub_import import import_project
+
     # these are injected into the IPython scope, but they appear to be unused.
     config, engine = ctx.obj["CONFIG"], ctx.obj["ENGINE"]
 

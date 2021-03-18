@@ -8,7 +8,13 @@ from flask import redirect, session
 from flask_cors import CORS
 
 from aspen.app.aspen_app import AspenApp
-from aspen.config import config, DevelopmentConfig, ProductionConfig, StagingConfig, LocalConfig
+from aspen.config import (
+    config,
+    DevelopmentConfig,
+    ProductionConfig,
+    StagingConfig,
+    LocalConfig,
+)
 
 static_folder = Path(__file__).parent.parent / "static"
 
@@ -31,7 +37,13 @@ application = AspenApp(
 )
 # FIXME(mbarrien): Make this more restrictive
 allowed_origin = ["*"]
-CORS(application, max_age=600, supports_credentials=True, origins=allowed_origin, allow_headers=["Content-Type"])
+CORS(
+    application,
+    max_age=600,
+    supports_credentials=True,
+    origins=allowed_origin,
+    allow_headers=["Content-Type"],
+)
 
 if flask_env in ("production", "development", "local", "staging"):
     oauth = OAuth(application)
