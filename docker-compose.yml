@@ -55,6 +55,7 @@ services:
       - BOTO_ENDPOINT_URL=http://localstack:4566
       - AWS_ACCESS_KEY_ID=dev_access_key_id
       - AWS_SECRET_ACCESS_KEY=dev_secret_access_key
+      - FRONTEND_URL=http://localhost:8000
       - AWS_REGION=us-west-2
       - ENV=local
       - FLASK_ENV=local

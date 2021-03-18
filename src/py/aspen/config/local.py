@@ -16,10 +16,22 @@ class LocalConfig(config.Config, descriptive_name="local"):
             return os.getenv("FLASK_SECRET_KEY")
         return uuid.uuid4().hex
 
-    @property
-    def AUTH0_CALLBACK_URL(self) -> str:
-        return "http://localhost:3000/callback"
+    @config.flaskproperty
+    def SESSION_COOKIE_SECURE(self) -> str:
+        return True
+
+    @config.flaskproperty
+    def SESSION_COOKIE_HTTPONLY(self) -> str:
+        return True
+
+    @config.flaskproperty
+    def SESSION_COOKIE_SAMESITE(self) -> str:
+        return "Lax"
 
     @property
     def DATABASE_URI(self) -> str:
         return "postgresql://user_rw:password_rw@database:5432/aspen_db"
+
+    @property
+    def AUTH0_CALLBACK_URL(self) -> str:
+        return "http://localhost:3000/callback"

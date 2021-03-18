@@ -28,7 +28,7 @@ async function apiResponse<T extends APIResponse>(
     mappings: (Map<string, string | number> | null)[],
     endpoint: string
 ): Promise<T> {
-    const response = await axios.get(endpoint);
+    const response = await axios.get(endpoint, { withCredentials: true });
     const convertedData = keys.map((key, index) => {
         type keyType = T[typeof key];
         const typeData = response.data[key];
@@ -76,7 +76,7 @@ const SAMPLE_MAP = new Map<string, keyof Sample>([
     ["upload_date", "uploadDate"],
 ]);
 export const fetchSamples = (): Promise<SampleResponse> =>
-    apiResponse<SampleResponse>(["samples"], [SAMPLE_MAP], "/api/samples");
+    apiResponse<SampleResponse>(["samples"], [SAMPLE_MAP], process.env.API_URL + "/api/samples");
 
 interface TreeResponse extends APIResponse {
     phylo_trees: Tree[];
@@ -87,4 +87,4 @@ const TREE_MAP = new Map<string, keyof Tree>([
     ["completed_date", "creationDate"],
 ]);
 export const fetchTrees = (): Promise<TreeResponse> =>
-    apiResponse<TreeResponse>(["phylo_trees"], [TREE_MAP], "/api/phylo_trees");
+    apiResponse<TreeResponse>(["phylo_trees"], [TREE_MAP], process.env.API_URL + "/api/phylo_trees");

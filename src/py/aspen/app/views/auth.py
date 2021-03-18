@@ -1,3 +1,4 @@
+import os
 from urllib.parse import urlencode
 
 from flask import redirect, session, url_for
@@ -18,7 +19,7 @@ def callback_handling():
         "user_id": userinfo["sub"],
         "name": userinfo["name"],
     }
-    return redirect("/data/samples")
+    return redirect(os.getenv("FRONTEND_URL") + "/data/samples")
 
 
 @application.route("/login")
