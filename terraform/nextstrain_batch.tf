@@ -27,7 +27,7 @@ CONTAINER_PROPERTIES
 resource "aws_iam_role" "nextstrain-ecs-instance-role" {
   name = "nextstrain_ecs_instance_role"
   assume_role_policy = templatefile("${path.module}/iam_templates/trust_policy.json", {
-    trust_services = ["ecs", "ec2"]
+    trust_services = ["ec2"]
   })
 }
 
@@ -58,19 +58,6 @@ resource "aws_iam_role_policy_attachment" "nextstrain-batch-service-role" {
 }
 
 
-resource "aws_security_group" "nextstrain-batch-security-group" {
-  name = "nextstrain_aws_batch_compute_environment_security_group"
-  description = "security group for nextstrain batch"
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-
 resource "aws_vpc" "nextstrain-batch-vpc" {
   cidr_block = "10.1.0.0/16"
 }
@@ -82,18 +69,34 @@ resource "aws_subnet" "nextstrain-batch-subnet" {
 }
 
 
-resource "aws_batch_compute_environment" "nextstrain-batch-compute-environment" {
-  compute_environment_name = "nextstrain-batch-compute-environment"
+resource "aws_security_group" "nextstrain-batch-security-group" {
+  name = "nextstrain_aws_batch_compute_environment_security_group"
+  description = "security group for nextstrain batch"
+  vpc_id = aws_vpc.nextstrain-batch-vpc.id
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+
+resource "aws_batch_compute_environment" "nextstrain-compute-environment" {
+  compute_environment_name = "aspen-nextstrain"
 
   compute_resources {
     instance_role = aws_iam_instance_profile.nextstrain-ecs-instance-role.arn
+    ec2_key_pair = "phoenix"
 
     instance_type = [
-      "c4.large",
+      "m5.2xlarge",
     ]
 
-    max_vcpus = 64
-    min_vcpus = 0
+    max_vcpus = 128
+    min_vcpus = 8
+    desired_vcpus = 8
 
     security_group_ids = [
       aws_security_group.nextstrain-batch-security-group.id,
@@ -112,11 +115,11 @@ resource "aws_batch_compute_environment" "nextstrain-batch-compute-environment" 
 }
 
 
-resource "aws_batch_job_queue" "nextstrain_batch_job_queue" {
-  name     = "nextstrain-batch-job-queue"
+resource "aws_batch_job_queue" "nextstrain_job_queue" {
+  name     = "aspen-nextstrain"
   state    = "ENABLED"
   priority = 1
   compute_environments = [
-    aws_batch_compute_environment.nextstrain-batch-compute-environment.arn,
+    aws_batch_compute_environment.nextstrain-compute-environment.arn,
   ]
 }
