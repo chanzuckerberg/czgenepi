@@ -83,6 +83,34 @@ resource "aws_security_group" "nextstrain-batch-security-group" {
 }
 
 
+resource "aws_cloudwatch_log_group" "nextstrain-log-group" {
+  name = "/aws/batch/job"
+  retention_in_days = 60
+}
+
+
+# for increased disk space
+resource "aws_launch_template" "nextstrain-launch-template" {
+  name = "nextstrain-launch-template"
+
+  block_device_mappings {
+    device_name = "/dev/xvdcz"
+
+    ebs {
+      volume_size = 200
+      volume_type = "gp2"
+      delete_on_termination = true
+    }
+  }
+  # instance_type = "m5.2xlarge"
+  # iam_instance_profile = {
+  #   name = aws_iam_instance_profile.nextstrain-ecs-instance-role.name
+  # }x
+  user_data = file("${path.module}/data/user_data.txt")
+
+}
+
+
 resource "aws_batch_compute_environment" "nextstrain-compute-environment" {
   compute_environment_name = "aspen-nextstrain"
 
@@ -107,11 +135,16 @@ resource "aws_batch_compute_environment" "nextstrain-compute-environment" {
     ]
 
     type = "EC2"
+
+    launch_template {
+      launch_template_id = aws_launch_template.nextstrain-launch-template.id
+    }
   }
 
   service_role = aws_iam_role.nextstrain-batch-service-role.arn
   type = "MANAGED"
   depends_on   = [aws_iam_role_policy_attachment.nextstrain-batch-service-role]
+
 }
 
 
