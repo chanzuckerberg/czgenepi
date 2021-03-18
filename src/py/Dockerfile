@@ -11,6 +11,8 @@ COPY third-party ./third-party/
 # Actual dev image used for day-to-day developments
 FROM base as dev
 ENV FLASK_ENV=development
+ENV PIPENV_PYTHON=/usr/src/app/
+COPY setup.py .
 RUN pipenv install --dev --system --verbose && pipenv --clear
 COPY . .
 ENTRYPOINT ["./entrypoint.sh"]
