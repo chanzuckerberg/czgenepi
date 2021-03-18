@@ -83,10 +83,10 @@ resource "aws_security_group" "nextstrain-batch-security-group" {
 }
 
 
-resource "aws_cloudwatch_log_group" "nextstrain-log-group" {
-  name = "/aws/batch/job"
-  retention_in_days = 60
-}
+# resource "aws_cloudwatch_log_group" "nextstrain-log-group" {
+#   name = "/aws/batch/job"
+#   retention_in_days = 60
+# }
 
 
 # for increased disk space
@@ -106,7 +106,7 @@ resource "aws_launch_template" "nextstrain-launch-template" {
   # iam_instance_profile = {
   #   name = aws_iam_instance_profile.nextstrain-ecs-instance-role.name
   # }x
-  user_data = file("${path.module}/data/user_data.txt")
+  user_data = base64encode(file("${path.module}/data/user_data.txt"))
 
 }
 
@@ -116,6 +116,7 @@ resource "aws_batch_compute_environment" "nextstrain-compute-environment" {
 
   compute_resources {
     instance_role = aws_iam_instance_profile.nextstrain-ecs-instance-role.arn
+    allocation_strategy = "BEST_FIT"
     ec2_key_pair = "phoenix"
 
     instance_type = [
