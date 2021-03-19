@@ -1,7 +1,6 @@
 variable "nextstrain-batch-params" {
   type  = map
   default = {
-    retry_strategy = 1
     timeout = 14400
   }
 }
@@ -22,50 +21,10 @@ resource "aws_batch_job_definition" "nextstrain-job-definition" {
 CONTAINER_PROPERTIES
 }
 
-# resources below needed for compute environment
-
-resource "aws_iam_role" "nextstrain-ecs-instance-role" {
-  name = "nextstrain_ecs_instance_role"
-  assume_role_policy = templatefile("${path.module}/iam_templates/trust_policy.json", {
-    trust_services = ["ec2"]
-  })
-}
-
-
-resource "aws_iam_role_policy_attachment" "nextstrain-ecs-instance-role" {
-  role       = aws_iam_role.nextstrain-ecs-instance-role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
-}
-
-
-resource "aws_iam_instance_profile" "nextstrain-ecs-instance-role" {
-  name = "nextstrain_ecs_instance_profile"
-  role = aws_iam_role.nextstrain-ecs-instance-role.name
-}
-
-
-resource "aws_iam_role" "nextstrain-batch-service-role" {
-  name = "nextstrain_aws_batch_service_role"
-  assume_role_policy = templatefile("${path.module}/iam_templates/trust_policy.json", {
-    trust_services = ["batch"]
-  })
-}
-
-
-resource "aws_iam_role_policy_attachment" "nextstrain-batch-service-role" {
-  role       = aws_iam_role.nextstrain-batch-service-role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBatchServiceRole"
-}
-
 
 data "aws_availability_zones" "available" {}
 
-
-resource "aws_default_vpc" "default" {
-  tags = {
-    Name = "Default VPC"
-  }
-}
+resource "aws_default_vpc" "default" {}
 
 data "aws_internet_gateway" "default" {
   filter {
@@ -74,23 +33,18 @@ data "aws_internet_gateway" "default" {
   }
 }
 
+
 resource "aws_default_route_table" "default" {
   default_route_table_id = aws_default_vpc.default.default_route_table_id
-
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = data.aws_internet_gateway.default.id
-  }
-
-  tags = {
-    Name = "Default Route Table"
   }
 }
 
 
 resource "aws_default_subnet" "default" {
   count = length(split(",", join(",", flatten(data.aws_availability_zones.available.*.names))))
-
   availability_zone = data.aws_availability_zones.available.names[count.index]
 }
 
@@ -109,10 +63,10 @@ resource "aws_security_group" "nextstrain-batch-security-group" {
 }
 
 
-# resource "aws_cloudwatch_log_group" "nextstrain-log-group" {
-#   name = "/aws/batch/job"
-#   retention_in_days = 60
-# }
+resource "aws_cloudwatch_log_group" "nextstrain-log-group" {
+  name = "/aws/batch/job"
+  retention_in_days = 60
+}
 
 
 # for increased disk space
@@ -142,12 +96,12 @@ resource "aws_batch_compute_environment" "nextstrain-compute-environment" {
     ec2_key_pair = "phoenix"
 
     instance_type = [
-      "m5.2xlarge",
+      "m5",
     ]
 
     max_vcpus = 128
-    min_vcpus = 8
-    desired_vcpus = 8
+    min_vcpus = 0
+    desired_vcpus = 0
 
     security_group_ids = [
       aws_security_group.nextstrain-batch-security-group.id,

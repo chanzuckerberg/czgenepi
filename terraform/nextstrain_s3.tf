@@ -8,7 +8,7 @@ resource "aws_s3_bucket" "nextstrain_jobs" {
 
     transition {
       days = 30
-      storage_class = "GLACIER"
+      storage_class = "ONEZONE_IA"
     }
 
     expiration {
