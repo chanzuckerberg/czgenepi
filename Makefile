@@ -78,7 +78,8 @@ isort:
 	isort --check $(PYTHON_CODE_DIRECTORIES)/*.py $$(ls -d src/py/*/ | grep -v third-party)
 
 mypy:
-	mypy --ignore-missing-imports $(PYTHON_CODE_DIRECTORIES)/*.py $$(ls -d src/py/*/ | grep -v third-party | grep -v __pycache__)
+	# mypy --ignore-missing-imports $(PYTHON_CODE_DIRECTORIES)/*.py $$(ls -d src/py/*/ | grep -v third-party | grep -v __pycache__)
+	mypy --ignore-missing-imports src/py/aspen
 
 .PHONY: style lint black isort
 
