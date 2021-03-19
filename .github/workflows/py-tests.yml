@@ -75,6 +75,7 @@ jobs:
       - name: Install aspen
         working-directory: src/py
         run: |
+          rm src/py/__init__.py  # TODO - this is a stopgap that we should remove ASAP
           pip install -e .
       - name: Run with pytest
         run: |
