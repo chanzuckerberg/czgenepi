@@ -2,7 +2,7 @@ resource "aws_s3_bucket" "nextstrain_jobs" {
   bucket = "aspen-nextstrain-jobs"
   acl = "private"
 
-  # this is what nextstrain docs reccomend
+  # this is what nextstrain docs recommend
   lifecycle_rule {
     enabled = true
 
