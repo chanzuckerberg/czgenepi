@@ -11,7 +11,7 @@
             ],
             "Resource": [
                 "arn:aws:logs:*:*:log-group:/aws/batch/job",
-                "arn:aws:logs:*:*:log-group:/aws/batch/job:log-stream:*"
+                "arn:aws:logs:*:*:log-group:/aws/batch/job:log-stream:nextstrain-job-definition/default/*"
             ]
         }
     ]
