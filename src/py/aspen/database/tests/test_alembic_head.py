@@ -12,10 +12,12 @@ def test_single_head(postgres_database):
     alembic_cfg = Config(fspath(root / "alembic.ini"))
 
     # TODO, when running tests from the repo root, we need to add a prefix to the migration script dir.
-    script_location = alembic_cfg.get_main_option("script_location")
-    py_dir = (os.path.join(os.getenv("PWD"), "src", "py"))
+    py_dir = os.path.join(os.getenv("PWD"), "src", "py")
     if os.path.exists(py_dir):
-        alembic_cfg.set_main_option("script_location", os.path.join(py_dir, alembic_cfg.get_main_option("script_location")))
+        alembic_cfg.set_main_option(
+            "script_location",
+            os.path.join(py_dir, alembic_cfg.get_main_option("script_location")),
+        )
 
     alembic_cfg.set_main_option("sqlalchemy.url", postgres_database.as_uri())
     script = ScriptDirectory.from_config(alembic_cfg)
