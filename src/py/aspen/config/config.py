@@ -55,7 +55,7 @@ def _get_flaskproperty_names(obj: Union[Type[Config], Config]) -> Set[str]:
     return result
 
 
-class Config:
+class Config(object):
     _config_flask_properties: Optional[Set[str]] = None
     _subclasses: MutableMapping[str, Type[Config]] = dict()
 

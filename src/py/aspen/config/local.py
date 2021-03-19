@@ -13,15 +13,15 @@ class LocalConfig(config.Config, descriptive_name="local"):
     @config.flaskproperty
     def SECRET_KEY(self) -> str:
         if os.getenv("FLASK_SECRET_KEY"):
-            return os.getenv("FLASK_SECRET_KEY")
+            return os.getenv("FLASK_SECRET_KEY", "")
         return uuid.uuid4().hex
 
     @config.flaskproperty
-    def SESSION_COOKIE_SECURE(self) -> str:
+    def SESSION_COOKIE_SECURE(self) -> bool:
         return True
 
     @config.flaskproperty
-    def SESSION_COOKIE_HTTPONLY(self) -> str:
+    def SESSION_COOKIE_HTTPONLY(self) -> bool:
         return True
 
     @config.flaskproperty

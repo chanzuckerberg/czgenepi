@@ -75,10 +75,10 @@ black:
 	black --check $(PYTHON_CODE_DIRECTORIES) --exclude $(SKIP_PYTHON_STYLE_DIRECTORIES)
 
 isort:
-	isort --check $(PYTHON_CODE_DIRECTORIES) $(ls -d src/py/*/ | grep -v third-party)
+	isort --check $(PYTHON_CODE_DIRECTORIES)/*.py $$(ls -d src/py/*/ | grep -v third-party)
 
 mypy:
-	mypy --ignore-missing-imports $(PYTHON_CODE_DIRECTORIES)
+	mypy --ignore-missing-imports $(PYTHON_CODE_DIRECTORIES)/*.py $$(ls -d src/py/*/ | grep -v third-party | grep -v __pycache__)
 
 .PHONY: style lint black isort
 
