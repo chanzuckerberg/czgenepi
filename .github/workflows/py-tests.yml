@@ -79,6 +79,4 @@ jobs:
       - name: Run with pytest
         run: |
           rm src/py/__init__.py  # TODO - this is a stopgap that we should remove ASAP
-          sed -E -i 's/ database_migrations$/ src\/py\/database_migrations/' src/py/alembic.ini  # TODO, another stopgap
-          sed -i 's/script_location 
           pytest -n4
