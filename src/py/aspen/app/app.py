@@ -11,9 +11,9 @@ from aspen.app.aspen_app import AspenApp
 from aspen.config import (
     config,
     DevelopmentConfig,
+    LocalConfig,
     ProductionConfig,
     StagingConfig,
-    LocalConfig,
 )
 
 static_folder = Path(__file__).parent.parent / "static"

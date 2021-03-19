@@ -1,7 +1,7 @@
 import json
+from datetime import datetime
 from pathlib import Path
 from typing import Type
-from datetime import datetime
 
 import boto3
 import click

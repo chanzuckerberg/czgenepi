@@ -1,5 +1,6 @@
 SHELL := /bin/bash
 PYTHON_CODE_DIRECTORIES = src/py
+SKIP_PYTHON_STYLE_DIRECTORIES = src/py/third-party
 
 ### DOCKER #################################################
 #
@@ -71,10 +72,10 @@ lint:
 	flake8 --ignore "E203, E231, E501, W503" $(PYTHON_CODE_DIRECTORIES)
 
 black:
-	black --check $(PYTHON_CODE_DIRECTORIES)
+	black --check $(PYTHON_CODE_DIRECTORIES) --exclude $(SKIP_PYTHON_STYLE_DIRECTORIES)
 
 isort:
-	isort --check $(PYTHON_CODE_DIRECTORIES)
+	isort --check $(PYTHON_CODE_DIRECTORIES) $(ls -d src/py/*/ | grep -v third-party)
 
 mypy:
 	mypy --ignore-missing-imports $(PYTHON_CODE_DIRECTORIES)
