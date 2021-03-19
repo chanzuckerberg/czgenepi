@@ -3,12 +3,12 @@ from datetime import datetime
 from aspen.config.local import LocalConfig
 from aspen.database.connection import get_db_uri, init_db
 from aspen.database.models import (
-    User,
-    SequencingProtocolType,
-    SequencingInstrumentType,
-    SequencingReadsCollection,
-    Sample,
     Group,
+    Sample,
+    SequencingInstrumentType,
+    SequencingProtocolType,
+    SequencingReadsCollection,
+    User,
 )
 
 
