@@ -116,25 +116,21 @@ resource "aws_security_group" "nextstrain-batch-security-group" {
 
 
 # for increased disk space
-# resource "aws_launch_template" "nextstrain-launch-template" {
-#   name = "nextstrain-launch-template"
+resource "aws_launch_template" "nextstrain-launch-template" {
+  name = "nextstrain-launch-template"
 
-#   block_device_mappings {
-#     device_name = "/dev/xvdcz"
+  block_device_mappings {
+    device_name = "/dev/xvdcz"
 
-#     ebs {
-#       volume_size = 200
-#       volume_type = "gp2"
-#       delete_on_termination = true
-#     }
-#   }
-#   # instance_type = "m5.2xlarge"
-#   # iam_instance_profile = {
-#   #   name = aws_iam_instance_profile.nextstrain-ecs-instance-role.name
-#   # }x
-#   user_data = base64encode(file("${path.module}/data/user_data.txt"))
+    ebs {
+      volume_size = 200
+      volume_type = "gp2"
+      delete_on_termination = true
+    }
+  }
+  user_data = base64encode(file("${path.module}/data/user_data.txt"))
 
-# }
+}
 
 
 resource "aws_batch_compute_environment" "nextstrain-compute-environment" {
@@ -161,9 +157,9 @@ resource "aws_batch_compute_environment" "nextstrain-compute-environment" {
 
     type = "EC2"
 
-    # launch_template {
-    #   launch_template_id = aws_launch_template.nextstrain-launch-template.id
-    # }
+    launch_template {
+      launch_template_id = aws_launch_template.nextstrain-launch-template.id
+    }
   }
 
   service_role = aws_iam_role.nextstrain-batch-service-role.arn

@@ -25,6 +25,7 @@ resource "aws_iam_role_policy_attachment" "attach-nextstrain-bucket-policy" {
   policy_arn = aws_iam_policy.nextstrain-jobs-access-to-bucket.arn
 }
 
+# TODO: uncomment this when iam:CreateGroup permission is granted
 # resource "aws_iam_group" "nextstrain-users" {
 #   name = "nextstrain-users"
 # }
