@@ -12,6 +12,7 @@ python-dotenv = "*"
 pytz = "*"
 requests = "*"
 SQLAlchemy = "*"
+flask-cors = "*"
 sqlalchemy-enum-tables = {editable = true, path = "./third-party/sqlalchemy-enum-tables"}
 
 [dev-packages]
@@ -29,7 +30,7 @@ pytest-xdist = "*"
 sqlalchemy-stubs = "*"
 tqdm = "*"
 auth0-python = "*"
-aspen = {editable = true, path = "./src/py"}
+aspen = {editable = true, path = "."}
 
 [requires]
-python_version = "3.7"
+python_version = "3.9"

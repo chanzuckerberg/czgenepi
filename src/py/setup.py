@@ -8,10 +8,17 @@ description = "ASPEN.  Covid Tracking 2.0"
 requirements_file = Path(__file__).parent / "requirements.txt"
 with requirements_file.open("r") as fh:
     requirement_lines = [
-        line
+        line.strip()
         for line in fh.readlines()
-        if not (line.startswith("-e") or line.startswith("-i") or line.startswith("./"))
+        if line.strip()
+        and not (
+            line.startswith("-i")
+            or line.startswith("-e")
+            or line.startswith("#")
+            or line.startswith("./")
+        )
     ]
+print(requirement_lines)
 
 setuptools.setup(
     name="aspen",

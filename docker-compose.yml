@@ -1,0 +1,136 @@
+version: '3.8'
+
+services:
+  database:
+    image: "${DOCKER_REPO}aspen-devdb:latest"
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=user_rw
+      - POSTGRES_PASSWORD=password_rw
+      - POSTGRES_DB=aspen_db
+    #volumes:
+    #  - database:/var/lib/postgresql/data
+    command: ["postgres"]
+  frontend:
+    image: "${DOCKER_REPO}aspen-frontend"
+    build:
+      context: src/ts
+      target: dev
+      cache_from:
+        - "${DOCKER_REPO}aspen-frontend:branch-main"
+      args:
+        - BUILDKIT_INLINE_CACHE=1
+    restart: always
+    environment:
+      HOST: 0.0.0.0
+      PORT: 8000
+      BUILD_PATH: build
+      API_URL: http://localhost:3000
+      CHOKIDAR_USEPOLLING: 'true'
+    depends_on:
+      - backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./src/ts:/usr/src/app
+      - /usr/src/app/node_modules  # Use node_modules built in container, not from the mounted source dir
+  backend:
+    image: "${DOCKER_REPO}aspen-backend"
+    build:
+      context: src/py
+      target: dev
+      cache_from:
+        - "${DOCKER_REPO}aspen-backend:branch-main"
+      args:
+        - BUILDKIT_INLINE_CACHE=1
+    restart: always
+    depends_on:
+      - database
+    ports:
+      - "3000:3000"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - RESTART_ON_FAILURE=yes
+      - BOTO_ENDPOINT_URL=http://localstack:4566
+      - AWS_ACCESS_KEY_ID=dev_access_key_id
+      - AWS_SECRET_ACCESS_KEY=dev_secret_access_key
+      - FRONTEND_URL=http://localhost:8000
+      - AWS_REGION=us-west-2
+      - ENV=local
+      - FLASK_ENV=local
+      - FLASK_APP=aspen.main
+      - FLASK_DEBUG=1
+      - FLASK_SECRET_KEY=DevelopmentKey
+      - PYTHONPATH=.
+    volumes:
+      - ./src/py:/usr/src/app
+  utility:
+    image: "${DOCKER_REPO}aspen-backend"
+    build:
+      context: src/py
+      target: dev
+      cache_from:
+        - "${DOCKER_REPO}aspen-backend:branch-main"
+      args:
+        - BUILDKIT_INLINE_CACHE=1
+    restart: always
+    depends_on:
+      - database
+      - localstack
+    environment:
+      - PYTHONUNBUFFERED=1
+      - RESTART_ON_FAILURE=yes
+      - BOTO_ENDPOINT_URL=http://localstack:4566
+      - AWS_ACCESS_KEY_ID=dev_access_key_id
+      - AWS_SECRET_ACCESS_KEY=dev_secret_access_key
+      - AWS_REGION=us-west-2
+      - ENV=local
+      - FLASK_ENV=local
+      - DB=docker
+      - PYTHONPATH=.
+    volumes:
+      - ./src/py:/usr/src/app
+    entrypoint: []
+    command: ["./utility.sh"]
+  localstack:
+    image: localstack/localstack@sha256:7c6635493185d25165979995fb073fd789c72b6d8b17ef3a70b798d55576732f
+    ports:
+      - "4566:4566"
+    environment:
+      - HOSTNAME_EXTERNAL=localstack
+      - SERVICES=s3,secretsmanager
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+      - PORT_WEB_UI=${PORT_WEB_UI- }
+      - HOST_TMP_FOLDER=${TMPDIR}
+      - DEFAULT_REGION=us-west-2
+    volumes:
+      - localstack:/tmp/localstack
+  oidc:
+    image: soluto/oidc-server-mock:0.3.0
+    ports:
+      - "4011:80"
+      - "8443:443"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      SERVER_OPTIONS_INLINE: |
+        {
+          "AccessTokenJwtType": "JWT",
+          "Discovery": {
+            "ShowKeySet": true
+          }
+        }
+      API_SCOPES_PATH: /tmp/config/api_scopes.json
+      API_RESOURCES_PATH: /tmp/config/api_resources.json
+      USERS_CONFIGURATION_PATH: /tmp/config/users.json
+      CLIENTS_CONFIGURATION_PATH: /tmp/config/clients-config.json
+      ASPNETCORE_URLS: https://+:443;http://+:80
+      # ASPNETCORE_Kestrel__Certificates__Default__Password: <password for pfx file>
+      ASPNETCORE_Kestrel__Certificates__Default__Path: /tmp/pkcs12/certificate.pfx
+    volumes:
+      - ./oauth/pkcs12:/tmp/pkcs12:ro
+      - ./oauth:/tmp/config:ro
+volumes:
+  database:
+  localstack:

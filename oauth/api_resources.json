@@ -1,0 +1,6 @@
+[
+  {
+    "Name": "api",
+    "Scopes": ["test_scope"]
+  }
+]
