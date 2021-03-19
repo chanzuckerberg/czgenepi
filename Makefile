@@ -46,7 +46,7 @@ setup-local-db:
 init-local-db:
 	@$(MAKE) setup-local-db
 	aspen-cli db create
-	DB=local alembic stamp head
+	cd src/py; DB=local alembic stamp head
 
 stop-local-db:
 	@if [ "$(LOCAL_DB_CONTAINER_RUNNING_ID)" != "" ]; then \
