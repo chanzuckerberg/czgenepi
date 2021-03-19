@@ -78,8 +78,7 @@ isort:
 	isort --check $(PYTHON_CODE_DIRECTORIES)/*.py $$(ls -d src/py/*/ | grep -v third-party)
 
 mypy:
-	# mypy --ignore-missing-imports $(PYTHON_CODE_DIRECTORIES)/*.py $$(ls -d src/py/*/ | grep -v third-party | grep -v __pycache__)
-	true
+	mypy --ignore-missing-imports $(PYTHON_CODE_DIRECTORIES)/*.py $$(ls -d src/py/*/ | grep -v third-party | grep -v __pycache__)
 
 .PHONY: style lint black isort
 
