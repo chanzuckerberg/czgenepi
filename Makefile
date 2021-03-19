@@ -151,7 +151,7 @@ local-status: ## Show the status of the containers in the dev environment.
 .PHONY: local-rebuild
 local-rebuild: .env.ecr local-ecr-login ## Rebuild local dev without re-importing data
 	docker-compose $(COMPOSE_OPTS) build frontend backend
-	docker-compose $(COMPOSE_OPTS) up -d frontend backend database oidc localstack
+	docker-compose $(COMPOSE_OPTS) up -d
 
 .PHONY: local-sync
 local-sync: local-rebuild local-init ## Re-sync the local-environment state after modifying library deps or docker configs
