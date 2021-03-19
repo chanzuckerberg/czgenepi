@@ -87,6 +87,7 @@ resource "aws_batch_compute_environment" "nextstrain-compute-environment" {
   compute_resources {
     instance_role = aws_iam_instance_profile.nextstrain-ecs-instance-role.arn
     allocation_strategy = "BEST_FIT"
+    # TODO: create common ec2 key 
     ec2_key_pair = "phoenix"
 
     instance_type = [
