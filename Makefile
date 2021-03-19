@@ -69,7 +69,7 @@ drop-local-db:
 style: lint black isort mypy
 
 lint:
-	flake8 --ignore "E203, E231, E501, W503" $(PYTHON_CODE_DIRECTORIES)
+	flake8 --ignore "E203, E231, E501, W503" $(PYTHON_CODE_DIRECTORIES) --exclude third-party
 
 black:
 	black --check $(PYTHON_CODE_DIRECTORIES) --exclude $(SKIP_PYTHON_STYLE_DIRECTORIES)

@@ -1,20 +1,15 @@
-import json
 from datetime import datetime
-from pathlib import Path
-from typing import Type
 
-import boto3
-import click
-from IPython.terminal.embed import InteractiveShellEmbed
-
-from aspen import covidhub_import
-from aspen.cli.toplevel import cli
-from aspen.config.config import Config, RemoteDatabaseConfig
-from aspen.config.development import DevelopmentConfig
 from aspen.config.local import LocalConfig
-from aspen.database.connection import enable_profiling, get_db_uri, init_db
-from aspen.database.models import *  # noqa: F401, F403
-from aspen.database.schema import create_tables_and_schema
+from aspen.database.connection import get_db_uri, init_db
+from aspen.database.models import (
+    User,
+    SequencingProtocolType,
+    SequencingInstrumentType,
+    SequencingReadsCollection,
+    Sample,
+    Group,
+)
 
 
 def create_test_group(session):
@@ -102,9 +97,9 @@ def create_sequencing_reads(session, sample):
 def create_test_data(engine):
     session = engine.make_session()
     group = create_test_group(session)
-    user = create_test_user(session, group)
+    _ = create_test_user(session, group)
     sample = create_sample(session, group)
-    sequencing_reads = create_sequencing_reads(session, sample)
+    _ = create_sequencing_reads(session, sample)
     session.commit()
 
 
