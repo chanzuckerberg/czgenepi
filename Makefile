@@ -136,7 +136,7 @@ local-ecr-login:
 .PHONY: local-init
 local-init: oauth/pkcs12/certificate.pfx .env.ecr local-ecr-login ## Launch a new local dev env and populate it with test data.
 	docker-compose $(COMPOSE_OPTS) up -d
-	docker-compose exec -T utility pip3 install awscli
+	# docker-compose exec -T utility pip3 install awscli
 	docker-compose exec -T utility $(BACKEND_APP_ROOT)/scripts/setup_dev_data.sh
 	docker-compose exec -T utility python scripts/setup_localdata.py
 	docker-compose exec -T utility pip install .
@@ -188,7 +188,7 @@ local-shell: ## Open a command shell in one of the dev containers. ex: make loca
 
 .PHONY: local-pgconsole
 local-pgconsole: ## Connect to the local postgres database.
-	psql "postgresql://$(LOCAL_DB_RW_USERNAME):$(LOCAL_DB_RW_PASSWORD)@localhost:5432/$(LOCAL_DB_NAME)"
+	docker-compose exec database psql "postgresql://$(LOCAL_DB_RW_USERNAME):$(LOCAL_DB_RW_PASSWORD)@localhost:5432/$(LOCAL_DB_NAME)"
 
 .PHONY: local-dbconsole
 local-dbconsole: ## Connect to the local postgres database.
