@@ -199,6 +199,6 @@ local-dbconsole: ## Connect to the local postgres database.
 	docker-compose exec utility aspen-cli db --docker interact
 
 .PHONY: local-update-deps
-local-update-deps :
+local-update-deps: ## Update requirements.txt to reflect pipenv file changes.
 	docker-compose exec utility pipenv update
 	docker-compose exec utility pipenv lock -r >| src/py/requirements.txt

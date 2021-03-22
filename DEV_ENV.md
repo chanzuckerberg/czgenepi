@@ -27,6 +27,7 @@ The dev environment is initialized with AWS Secrets/S3 data in the [src/py/scrip
 
 | Command                 | Description                                                                          | Notes                                                                                                |
 | ----------------------- | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| `make help`               | Learn more about what `make` targets are available                                   |                                                          |
 | `make local-init`         | Launch a new local dev env and populate it with test data.                           |                                                          |
 | `make local-start`        | Start a local dev environment that's been stopped.                                   |                                                          |
 | `make local-stop`         | Stop the local dev environment.                                                      |                                                          |
