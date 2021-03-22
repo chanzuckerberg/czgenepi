@@ -22,33 +22,6 @@ CONTAINER_PROPERTIES
 }
 
 
-data "aws_availability_zones" "available" {}
-
-resource "aws_default_vpc" "default" {}
-
-data "aws_internet_gateway" "default" {
-  filter {
-    name   = "attachment.vpc-id"
-    values = [aws_default_vpc.default.id]
-  }
-}
-
-
-resource "aws_default_route_table" "default" {
-  default_route_table_id = aws_default_vpc.default.default_route_table_id
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = data.aws_internet_gateway.default.id
-  }
-}
-
-
-resource "aws_default_subnet" "default" {
-  count = length(split(",", join(",", flatten(data.aws_availability_zones.available.*.names))))
-  availability_zone = data.aws_availability_zones.available.names[count.index]
-}
-
-
 resource "aws_security_group" "nextstrain-batch-security-group" {
   name = "nextstrain_aws_batch_compute_environment_security_group"
   description = "security group for nextstrain batch"
@@ -87,7 +60,7 @@ resource "aws_batch_compute_environment" "nextstrain-compute-environment" {
   compute_resources {
     instance_role = aws_iam_instance_profile.nextstrain-ecs-instance-role.arn
     allocation_strategy = "BEST_FIT"
-    # TODO: create common ec2 key 
+    # TODO: create common ec2 key
     ec2_key_pair = "phoenix"
 
     instance_type = [
