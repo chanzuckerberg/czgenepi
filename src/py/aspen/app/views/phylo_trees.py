@@ -27,6 +27,7 @@ PHYLO_TREE_KEY = "phylo_trees"
 @requires_auth
 def phylo_trees():
     with session_scope(application.DATABASE_INTERFACE) as db_session:
+        # import pdb; pdb.set_trace()
         profile = session["profile"]
         user = (
             get_usergroup_query(db_session, profile["user_id"])
@@ -40,7 +41,8 @@ def phylo_trees():
                 (
                     db_session.query(func.count(1))
                     .select_from(PathogenGenome)
-                    .join(WorkflowInputs, Workflow)
+                    .join(WorkflowInputs)
+                    .join(Workflow)
                     .filter(Workflow.id == PhyloRun.workflow_id)
                 ).label("phylo_run_genome_count"),
             )
