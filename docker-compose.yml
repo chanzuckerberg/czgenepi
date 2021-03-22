@@ -9,8 +9,6 @@ services:
       - POSTGRES_USER=user_rw
       - POSTGRES_PASSWORD=password_rw
       - POSTGRES_DB=aspen_db
-    #volumes:
-    #  - database:/var/lib/postgresql/data
     command: ["postgres"]
   frontend:
     image: "${DOCKER_REPO}aspen-frontend"
