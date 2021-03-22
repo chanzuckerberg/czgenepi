@@ -21,7 +21,7 @@ Both the frontend and backend services will automatically reload when their sour
 To update the dev env to reflect changes to [src/ts/package.json](src/ts/package.json) or [src/py/Pipfile](src/py/Pipfile), run `make local-sync`
 
 ### Update Dev Data
-The dev environment is initialized with AWS Secrets/S3 data in the [src/py/scripts/setup_dev_data.sh](src/py/scripts/setup_dev_data.sh) script, as well as DB data from [src/py/database_migrations](src/py/database_migrations). To add more data, modify these scripts and run `make local-init` to reload the dev environment's data stores.
+The dev environment is initialized with AWS Secrets/S3 data in the [src/py/scripts/setup_dev_data.sh](src/py/scripts/setup_dev_data.sh) script, as well as DB migrations from [src/py/database_migrations](src/py/database_migrations). To add more data or run migrations, modify these scripts and run `make local-init` to reload the dev environment's data stores.
 
 ### Make targets for managing dev:
 
