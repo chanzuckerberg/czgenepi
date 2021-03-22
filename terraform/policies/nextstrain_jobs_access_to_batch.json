@@ -19,7 +19,7 @@
             "Sid": "VisualEditor1",
             "Effect": "Allow",
             "Action": "iam:PassRole",
-            "Resource": "arn:aws:iam::*:role/NextstrainJobsRole"
+            "Resource": "arn:aws:iam::*:role/${NEXTSTRAIN_JOBS_ROLE}"
         }
     ]
 }
