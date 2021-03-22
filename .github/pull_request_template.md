@@ -3,7 +3,7 @@
 Write a description of your pull request here
 
 #### Issue
-[ch<fill_in_issue_number>](https://app.clubhouse.io/genepi/stories/space/<fill_in_issue_number>)
+[ch<fill_in_issue_number>](https://app.clubhouse.io/genepi/story/<fill_in_issue_number>)
 
 ### Test plan
 
