@@ -145,7 +145,6 @@ local-init: oauth/pkcs12/certificate.pfx .env.ecr local-ecr-login ## Launch a ne
 	docker-compose exec -T utility $(BACKEND_APP_ROOT)/scripts/setup_dev_data.sh
 	docker-compose exec -T utility python scripts/setup_localdata.py
 	docker-compose exec -T utility pip install .
-	-@docker-compose exec -e PGPASSWORD=$(LOCAL_DB_ADMIN_PASSWORD) database psql -h localhost -d $(LOCAL_DB_NAME) -U $(LOCAL_DB_ADMIN_USERNAME) -c "CREATE USER $(LOCAL_DB_RO_USERNAME) WITH PASSWORD '$(LOCAL_DB_RO_PASSWORD)';"
 	docker-compose exec -T utility aspen-cli db --docker create
 	docker-compose exec -T utility alembic upgrade head
 
