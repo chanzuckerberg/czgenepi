@@ -17,7 +17,8 @@ LOCAL_DB_CONTAINER_NAME = aspen-local
 LOCAL_DB_CONTAINER_ID = $(shell docker ps -a | grep $(LOCAL_DB_CONTAINER_NAME) | awk '{print $$1}')
 LOCAL_DB_CONTAINER_RUNNING_ID = $(shell docker ps | grep $(LOCAL_DB_CONTAINER_NAME) | awk '{print $$1}')
 LOCAL_DB_NAME = aspen_db
-LOCAL_DB_ADMIN_USERNAME = postgres  # This has to be "postgres" to ease moving snapshots from RDS.
+# This has to be "postgres" to ease moving snapshots from RDS.
+LOCAL_DB_ADMIN_USERNAME = postgres
 LOCAL_DB_ADMIN_PASSWORD = password_postgres
 LOCAL_DB_RW_USERNAME = user_rw
 LOCAL_DB_RW_PASSWORD = password_rw
@@ -140,11 +141,11 @@ local-ecr-login:
 .PHONY: local-init
 local-init: oauth/pkcs12/certificate.pfx .env.ecr local-ecr-login ## Launch a new local dev env and populate it with test data.
 	docker-compose $(COMPOSE_OPTS) up -d
-	# docker-compose exec -T utility pip3 install awscli
+	docker-compose exec -T utility pip3 install awscli
 	docker-compose exec -T utility $(BACKEND_APP_ROOT)/scripts/setup_dev_data.sh
 	docker-compose exec -T utility python scripts/setup_localdata.py
 	docker-compose exec -T utility pip install .
-	-@docker-compose exec -e PGPASSWORD=$(LOCAL_DB_RW_PASSWORD) database psql -h localhost -d $(LOCAL_DB_NAME) -U $(LOCAL_DB_RW_USERNAME) -c "CREATE USER $(LOCAL_DB_RO_USERNAME) WITH PASSWORD '$(LOCAL_DB_RO_PASSWORD)';"
+	-@docker-compose exec -e PGPASSWORD=$(LOCAL_DB_ADMIN_PASSWORD) database psql -h localhost -d $(LOCAL_DB_NAME) -U $(LOCAL_DB_ADMIN_USERNAME) -c "CREATE USER $(LOCAL_DB_RO_USERNAME) WITH PASSWORD '$(LOCAL_DB_RO_PASSWORD)';"
 	docker-compose exec -T utility aspen-cli db --docker create
 	docker-compose exec -T utility alembic upgrade head
 
@@ -199,7 +200,7 @@ local-shell: ## Open a command shell in one of the dev containers. ex: make loca
 
 .PHONY: local-pgconsole
 local-pgconsole: ## Connect to the local postgres database.
-	docker-compose exec database psql "postgresql://$(LOCAL_DB_RW_USERNAME):$(LOCAL_DB_RW_PASSWORD)@localhost:5432/$(LOCAL_DB_NAME)"
+	docker-compose exec database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@localhost:5432/$(LOCAL_DB_NAME)"
 
 .PHONY: local-dbconsole
 local-dbconsole: ## Connect to the local postgres database.
