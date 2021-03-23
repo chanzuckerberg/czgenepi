@@ -15,7 +15,7 @@ Username: User1 / Password: pwd ([users are defined here](oauth/users.json))
 ### Containers managed by the dev environment
 The Aspen dev environment is a set of containers defined in [docker-compose.yml](docker-compose.yml). The [backend docker image](src/py/Dockerfile) and [frontend docker image](src/ts/Dockerfile) are built locally. Update any of these files as necessary and run `make local-sync` to sync your dev environment with these configs.
 
-![Dev Environment Containers](docs/images/genepi-localdev.jpg)
+![Dev Environment Containers](docs/images/genepi-localdev.png)
 
 ### Updating frontend/backend dependencies
 Both the frontend and backend services will automatically reload when their source code is modified, but they won't automatically rebuild when their dependencies (such as npm or pip package lists) change.
