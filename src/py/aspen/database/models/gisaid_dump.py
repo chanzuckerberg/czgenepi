@@ -32,11 +32,23 @@ class RawGisaidDump(Entity):
 
 class ProcessedGisaidDump(Entity):
     __tablename__ = "processed_gisaid_dump"
-    __table_args__ = (UniqueConstraint("s3_bucket", "s3_key"),)
+    __table_args__ = (
+        UniqueConstraint(
+            "s3_bucket",
+            "sequences_s3_key",
+            name="uq_processed_gisaid_dump_s3_bucket_sequences",
+        ),
+        UniqueConstraint(
+            "s3_bucket",
+            "metadata_s3_key",
+            name="uq_processed_gisaid_dump_s3_bucket_key",
+        ),
+    )
 
     entity_id = Column(Integer, ForeignKey(Entity.id), primary_key=True)
     s3_bucket = Column(String, nullable=False)
-    s3_key = Column(String, nullable=False)
+    sequences_s3_key = Column(String, nullable=False)
+    metadata_s3_key = Column(String, nullable=False)
 
     __mapper_args__ = {"polymorphic_identity": EntityType.PROCESSED_GISAID_DUMP}
 

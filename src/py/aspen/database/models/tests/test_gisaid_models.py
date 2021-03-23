@@ -15,7 +15,8 @@ def test_workflow(session):
     download_s3_bucket = "download_bucket"
     download_s3_key = "download_key"
     processed_s3_bucket = "processed_bucket"
-    processed_s3_key = "processed_key"
+    processed_sequences_s3_key = "processed_sequences_key"
+    processed_metadata_s3_key = "processed_metadata_key"
     start_datetime = datetime.now()
     software_versions = {"test": "v0.0.1"}
     raw_gisaid_dump = RawGisaidDump(
@@ -26,7 +27,8 @@ def test_workflow(session):
 
     processed_gisaid_dump = ProcessedGisaidDump(
         s3_bucket=processed_s3_bucket,
-        s3_key=processed_s3_key,
+        sequences_s3_key=processed_sequences_s3_key,
+        metadata_s3_key=processed_metadata_s3_key,
     )
 
     workflow = GisaidDumpWorkflow(
