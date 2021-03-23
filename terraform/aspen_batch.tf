@@ -5,6 +5,9 @@ variable "aspen-batch-params" {
   }
 }
 
+data "aws_region" "current" {}
+
+
 resource "aws_batch_job_definition" "aspen-batch-job-definition" {
   name = "aspen-batch-job-definition"
   type = "container"
@@ -16,7 +19,11 @@ resource "aws_batch_job_definition" "aspen-batch-job-definition" {
     "image": "cziaspen/batch:latest",
     "memory": 1024,
     "vcpus": 1,
-    "jobRoleArn": "${aws_iam_role.aspen-batch-jobs-role.arn}"
+    "jobRoleArn": "${aws_iam_role.aspen-batch-jobs-role.arn}",
+    "environment": [
+      {"name": "AWS_DEFAULT_REGION", "value": "${data.aws_region.current.name}"},
+      {"name": "DEPLOYMENT_ENVIRONMENT", "value": "${var.DEPLOYMENT_ENVIRONMENT}"}
+    ]
 }
 CONTAINER_PROPERTIES
 }
