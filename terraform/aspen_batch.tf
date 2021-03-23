@@ -69,7 +69,7 @@ resource "aws_batch_compute_environment" "aspen-batch-compute-environment" {
   compute_environment_name_prefix = "aspen-batch-"
 
   compute_resources {
-    instance_role = aws_iam_instance_profile.aspen-batch-ecs-instance-role.arn
+    instance_role = aws_iam_instance_profile.batch-ecs-instance-role.arn
     allocation_strategy = "BEST_FIT"
     # TODO: create common ec2 key
     ec2_key_pair = "phoenix"
@@ -95,10 +95,10 @@ resource "aws_batch_compute_environment" "aspen-batch-compute-environment" {
     }
   }
 
-  service_role = aws_iam_role.aspen-batch-service-role.arn
+  service_role = aws_iam_role.batch-service-role.arn
   type = "MANAGED"
   depends_on   = [
-    aws_iam_role_policy_attachment.aspen-batch-service-role
+    aws_iam_role_policy_attachment.batch-service-role
   ]
 
   lifecycle {
