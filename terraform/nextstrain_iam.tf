@@ -1,7 +1,7 @@
 resource "aws_iam_policy" "nextstrain-jobs-access-to-batch" {
   name = "nextstrain-jobs-access-to-batch"
   policy = templatefile("${path.module}/policies/nextstrain_jobs_access_to_batch.json", {
-    NEXTSTRAIN_JOBS_ROLE = aws_iam_role.nextstrain-ecs-instance-role.name
+    NEXTSTRAIN_JOBS_ROLE = aws_iam_role.batch-ecs-instance-role.name
   })
 }
 
@@ -55,37 +55,3 @@ resource "aws_iam_role_policy_attachment" "attach-nextstrain-bucket-policy" {
 #   group = aws_iam_group.nextstrain-users.name
 #   policy_arn = aws_iam_policy.nextstrain-jobs-access-to-logs.arn
 # }
-
-
-resource "aws_iam_role" "nextstrain-ecs-instance-role" {
-  name = "nextstrain_ecs_instance_role"
-  assume_role_policy = templatefile("${path.module}/iam_templates/trust_policy.json", {
-    trust_services = ["ec2"]
-  })
-}
-
-
-resource "aws_iam_role_policy_attachment" "nextstrain-ecs-instance-role" {
-  role       = aws_iam_role.nextstrain-ecs-instance-role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
-}
-
-
-resource "aws_iam_instance_profile" "nextstrain-ecs-instance-role" {
-  name = "nextstrain_ecs_instance_profile"
-  role = aws_iam_role.nextstrain-ecs-instance-role.name
-}
-
-
-resource "aws_iam_role" "nextstrain-batch-service-role" {
-  name = "nextstrain_aws_batch_service_role"
-  assume_role_policy = templatefile("${path.module}/iam_templates/trust_policy.json", {
-    trust_services = ["batch"]
-  })
-}
-
-
-resource "aws_iam_role_policy_attachment" "nextstrain-batch-service-role" {
-  role       = aws_iam_role.nextstrain-batch-service-role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBatchServiceRole"
-}
