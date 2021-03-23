@@ -55,7 +55,7 @@ resource "aws_launch_template" "nextstrain-launch-template" {
 
 
 resource "aws_batch_compute_environment" "nextstrain-compute-environment" {
-  compute_environment_name = "aspen-nextstrain"
+  compute_environment_name_prefix = "aspen-nextstrain-"
 
   compute_resources {
     instance_role = aws_iam_instance_profile.nextstrain-ecs-instance-role.arn
@@ -90,6 +90,9 @@ resource "aws_batch_compute_environment" "nextstrain-compute-environment" {
     aws_iam_role_policy_attachment.nextstrain-batch-service-role
   ]
 
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 

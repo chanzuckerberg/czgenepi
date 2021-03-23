@@ -1,6 +1,8 @@
 resource "aws_iam_policy" "nextstrain-jobs-access-to-batch" {
   name = "nextstrain-jobs-access-to-batch"
-  policy = file("${path.module}/policies/nextstrain_jobs_access_to_batch.json")
+  policy = templatefile("${path.module}/policies/nextstrain_jobs_access_to_batch.json", {
+    NEXTSTRAIN_JOBS_ROLE = aws_iam_role.nextstrain-ecs-instance-role.name
+  })
 }
 
 
