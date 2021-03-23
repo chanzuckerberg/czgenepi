@@ -5,7 +5,5 @@ from aspen.test_infra.models.usergroup import group_factory, user_factory  # noq
 from aspen.test_infra.postgres import (  # noqa: F401
     postgres_database,
     postgres_database_with_schema,
-    postgres_instance,
-    unused_tcp_port,
 )
 from aspen.test_infra.sqlalchemy import session, sqlalchemy_interface  # noqa: F401
