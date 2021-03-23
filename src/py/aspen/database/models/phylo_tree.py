@@ -27,7 +27,7 @@ class PhyloRun(Workflow):
         ForeignKey(Group.id),
         nullable=False,
     )
-    group = relationship(Group, backref=backref("phylo_runs", uselist=True))
+    group = relationship(Group, backref=backref("phylo_runs", uselist=True))  # type: ignore
 
     def tree(self) -> PhyloTree:
         """Find the tree resulting from this workflow."""

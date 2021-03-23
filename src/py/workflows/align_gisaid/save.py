@@ -4,10 +4,10 @@ import click
 
 from aspen.config.config import RemoteDatabaseConfig
 from aspen.database.connection import (
+    SqlAlchemyInterface,
     get_db_uri,
     init_db,
     session_scope,
-    SqlAlchemyInterface,
 )
 from aspen.database.models import (
     AlignedGisaidDump,

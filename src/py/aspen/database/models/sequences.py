@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import enum
-from typing import MutableSequence, Sequence, TYPE_CHECKING
+from typing import TYPE_CHECKING, MutableSequence, Sequence
 
 import enumtables
 from sqlalchemy import (
@@ -10,10 +10,10 @@ from sqlalchemy import (
     DateTime,
     Float,
     ForeignKey,
-    func,
     Integer,
     String,
     UniqueConstraint,
+    func,
 )
 from sqlalchemy.orm import backref, deferred, relationship
 
@@ -102,7 +102,7 @@ class SequencingReadsCollection(Entity, DictMixin):
 
     entity_id = Column(Integer, ForeignKey(Entity.id), primary_key=True)
     sample_id = Column(Integer, ForeignKey(Sample.id), unique=True, nullable=False)
-    sample = relationship(
+    sample = relationship(  # type: ignore
         Sample,
         backref=backref("sequencing_reads_collection", uselist=False),
     )
@@ -181,7 +181,7 @@ class UploadedPathogenGenome(PathogenGenome):
         Integer, ForeignKey(PathogenGenome.entity_id), primary_key=True
     )
     sample_id = Column(Integer, ForeignKey(Sample.id), unique=True, nullable=False)
-    sample = relationship(
+    sample = relationship(  # type: ignore
         Sample,
         backref=backref("uploaded_pathogen_genome", uselist=False),
     )

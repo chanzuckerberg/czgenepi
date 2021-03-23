@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from aspen.database.models.cansee import CanSee
 
 
-class Group(idbase, DictMixin):
+class Group(idbase, DictMixin):  # type: ignore
     """A group of users, generally a department of public health."""
 
     __tablename__ = "groups"
@@ -26,7 +26,7 @@ class Group(idbase, DictMixin):
         return f"Group <{self.name}>"
 
 
-class User(idbase, DictMixin):
+class User(idbase, DictMixin):  # type: ignore
     """A user."""
 
     __tablename__ = "users"
@@ -38,7 +38,7 @@ class User(idbase, DictMixin):
     system_admin = Column(Boolean, nullable=False)
 
     group_id = Column(Integer, ForeignKey(Group.id), nullable=False)
-    group = relationship(Group, backref=backref("users", uselist=True))
+    group = relationship(Group, backref=backref("users", uselist=True))  # type: ignore
 
     can_see: MutableSequence[CanSee]
     can_be_seen_by: MutableSequence[CanSee]

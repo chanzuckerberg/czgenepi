@@ -9,6 +9,7 @@ FROM base as dev
 ENV NODE_ENV=development
 ENV BUILD_PATH=build
 RUN npm ci --verbose --production=false && npm cache clean --force
+RUN apt-get update && apt-get install make
 USER node
 COPY . .
 ENTRYPOINT ["./entrypoint.sh"]

@@ -1,7 +1,7 @@
 import sqlalchemy.event as sqlalchemy_event
 from sqlalchemy import DDL
 
-from aspen.database.connection import session_scope, SqlAlchemyInterface
+from aspen.database.connection import SqlAlchemyInterface, session_scope
 from aspen.database.models import meta
 
 
