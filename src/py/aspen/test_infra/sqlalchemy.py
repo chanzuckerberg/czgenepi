@@ -10,10 +10,9 @@ from aspen.database import connection as aspen_connection
 def sqlalchemy_interface(
     postgres_database_with_schema,
 ) -> Generator[aspen_connection.SqlAlchemyInterface, None, None]:
-    interface = aspen_connection.init_db(postgres_database_with_schema.as_uri())
-    connection = interface.engine.connect()
+    connection = postgres_database_with_schema.engine.connect()
 
-    yield interface
+    yield postgres_database_with_schema
 
     connection.close()
 
