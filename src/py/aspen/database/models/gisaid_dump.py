@@ -65,3 +65,33 @@ class GisaidDumpWorkflow(Workflow):
     __mapper_args__ = {"polymorphic_identity": WorkflowType.PROCESS_GISAID_DUMP}
 
     workflow_id = Column(Integer, ForeignKey(Workflow.id), primary_key=True)
+
+
+class AlignedGisaidDump(Entity):
+    __tablename__ = "aligned_gisaid_dump"
+    __table_args__ = (
+        UniqueConstraint(
+            "s3_bucket",
+            "sequences_s3_key",
+            name="uq_aligned_gisaid_dump_s3_bucket_sequences",
+        ),
+        UniqueConstraint(
+            "s3_bucket",
+            "metadata_s3_key",
+            name="uq_aligned_gisaid_dump_s3_bucket_key",
+        ),
+    )
+
+    entity_id = Column(Integer, ForeignKey(Entity.id), primary_key=True)
+    s3_bucket = Column(String, nullable=False)
+    sequences_s3_key = Column(String, nullable=False)
+    metadata_s3_key = Column(String, nullable=False)
+
+    __mapper_args__ = {"polymorphic_identity": EntityType.ALIGNED_GISAID_DUMP}
+
+
+class GisaidAlignmentWorkflow(Workflow):
+    __tablename__ = "gisaid_alignment_workflows"
+    __mapper_args__ = {"polymorphic_identity": WorkflowType.ALIGN_GISAID_DUMP}
+
+    workflow_id = Column(Integer, ForeignKey(Workflow.id), primary_key=True)
