@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from typing import Generator
-import string
 import random
+import string
+from typing import Generator
 
 import pytest
 

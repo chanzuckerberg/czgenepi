@@ -4,23 +4,22 @@ import pytest
 from sqlalchemy.orm.session import Session
 
 from aspen.database import connection as aspen_connection
+from aspen.test_infra.postgres import PostgresDatabase
+from aspen.database import schema
 
 
 @pytest.fixture()
-def sqlalchemy_interface(
-    postgres_database_with_schema,
-) -> Generator[aspen_connection.SqlAlchemyInterface, None, None]:
-    connection = postgres_database_with_schema.engine.connect()
-
-    yield postgres_database_with_schema
-
+def sqlalchemy_interface(postgres_database: PostgresDatabase) -> Generator[aspen_connection.SqlAlchemyInterface, None, None]:
+    """initialize schema and yield interface"""
+    test_db_interface = aspen_connection.init_db(postgres_database.as_uri())
+    schema.create_tables_and_schema(test_db_interface)
+    connection = test_db_interface.engine.connect()
+    yield test_db_interface
     connection.close()
 
 
 @pytest.fixture()
-def session(sqlalchemy_interface) -> Generator[Session, None, None]:
+def session(sqlalchemy_interface: aspen_connection.SqlAlchemyInterface) -> Generator[Session, None, None]:
     session = sqlalchemy_interface.make_session()
-
     yield session
-
     session.close()
