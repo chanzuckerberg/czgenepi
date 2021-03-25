@@ -10,6 +10,7 @@ from aspen import covidhub_import
 from aspen.cli.toplevel import cli
 from aspen.config.config import Config, RemoteDatabaseConfig
 from aspen.config.development import DevelopmentConfig
+from aspen.config.local import LocalConfig
 from aspen.database.connection import enable_profiling, get_db_uri, init_db
 from aspen.database.models import *  # noqa: F401, F403
 from aspen.database.schema import create_tables_and_schema
@@ -18,6 +19,7 @@ from aspen.database.schema import create_tables_and_schema
 @cli.group()
 @click.option("--local", "config_cls", flag_value=DevelopmentConfig, default=True)
 @click.option("--remote", "config_cls", flag_value=RemoteDatabaseConfig)
+@click.option("--docker", "config_cls", flag_value=LocalConfig)
 @click.pass_context
 def db(ctx, config_cls: Type[Config]):
     # TODO: support multiple runtime environments.

@@ -23,11 +23,11 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 2
-      - name: Set up Python 3.7
+      - name: Set up Python 3.9
         id: setup
         uses: actions/setup-python@v1
         with:
-          python-version: 3.7
+          python-version: 3.9
       - name: Cache dependencies
         id: cache-deps
         uses: actions/cache@v2
@@ -36,6 +36,7 @@ jobs:
           key: py-tests-code-style-v1-${{ runner.os }}-${{ steps.setup.outputs.python-version }}-${{ hashFiles('.github/workflows/py-tests.yml') }}
       - name: Install and upgrade pip
         if: steps.cache-deps.outputs.cache-hit != 'true'
+        working-directory: src/py
         run: |
           python -m pip install pipenv
           pip install $(pipenv lock --requirements --dev | egrep '^(flake8|black|isort|mypy|sqlalchemy-stubs)==')
@@ -51,11 +52,11 @@ jobs:
       # Downloads a copy of the code in your repository before running CI tests
       - name: Check out repository code
         uses: actions/checkout@v2
-      - name: Set up Python 3.7
+      - name: Set up Python 3.9
         id: setup
         uses: actions/setup-python@v1
         with:
-          python-version: 3.7
+          python-version: 3.9
       - name: Pull the docker image
         run: |
           docker pull czbiohub/covidhub-postgres:13.1-alpine
@@ -67,12 +68,14 @@ jobs:
           key: py-tests-tests-v1-${{ runner.os }}-${{ steps.setup.outputs.python-version }}-${{ hashFiles('src/py/setup.py', 'src/py/requirements-dev.txt', '.github/workflows/py-tests.yml') }}
       - name: Install dependencies
         if: steps.cache-deps.outputs.cache-hit != 'true'
+        working-directory: src/py
         run: |
           python -m pip install pipenv
           pipenv install --system --dev
       - name: Install aspen
+        working-directory: src/py
         run: |
-          pip install -e src/py
+          pip install -e .
       - name: Run with pytest
         run: |
           pytest -n4

@@ -307,6 +307,9 @@ static
 !.elasticbeanstalk/*.global.yml
 /.ebiginore
 
+# Local dev
+.env.ecr
+
 # Terraform files
 /.terraform.*/
 /.terraform.lock.hcl

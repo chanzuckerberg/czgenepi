@@ -55,7 +55,7 @@ def _get_flaskproperty_names(obj: Union[Type[Config], Config]) -> Set[str]:
     return result
 
 
-class Config:
+class Config(object):
     _config_flask_properties: Optional[Set[str]] = None
     _subclasses: MutableMapping[str, Type[Config]] = dict()
 
@@ -97,7 +97,9 @@ class Config:
         session = aws.session()
 
         secret_name = os.environ.get("AUTH0_CONFIG_SECRET_NAME", "aspen-config")
-        client = session.client(service_name="secretsmanager")
+        client = session.client(
+            service_name="secretsmanager", endpoint_url=os.getenv("BOTO_ENDPOINT_URL")
+        )
 
         try:
             get_secret_value_response = client.get_secret_value(SecretId=secret_name)
@@ -172,21 +174,40 @@ class Config:
 
     @property
     def AUTH0_BASE_URL(self) -> str:
-        return f"https://{self.AUTH0_DOMAIN}"
+        try:
+            return self.AWS_SECRET["AUTH0_BASE_URL"]
+        except KeyError:
+            return f"https://{self.AUTH0_DOMAIN}"
 
     @property
     def AUTH0_ACCESS_TOKEN_URL(self) -> str:
-        return f"{self.AUTH0_BASE_URL}/oauth/token"
+        try:
+            return self.AWS_SECRET["AUTH0_ACCESS_TOKEN_URL"]
+        except KeyError:
+            return f"{self.AUTH0_BASE_URL}/oauth/token"
 
     @property
     def AUTH0_AUTHORIZE_URL(self) -> str:
-        return f"{self.AUTH0_BASE_URL}/authorize"
+        try:
+            return self.AWS_SECRET["AUTH0_AUTHORIZE_URL"]
+        except KeyError:
+            return f"{self.AUTH0_BASE_URL}/authorize"
 
     @property
     def AUTH0_CLIENT_KWARGS(self) -> Mapping[str, Any]:
-        return {
-            "scope": "openid profile email",
-        }
+        try:
+            return self.AWS_SECRET["AUTH0_CLIENT_KWARGS"]
+        except KeyError:
+            return {
+                "scope": "openid profile email",
+            }
+
+    @property
+    def AUTH0_USERINFO_URL(self) -> str:
+        try:
+            return self.AWS_SECRET["AUTH0_USERINFO_URL"]
+        except KeyError:
+            return "userinfo"
 
     ####################################################################################
     # database properties

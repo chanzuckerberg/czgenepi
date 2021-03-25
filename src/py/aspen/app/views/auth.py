@@ -1,3 +1,4 @@
+import os
 from urllib.parse import urlencode
 
 from flask import redirect, session, url_for
@@ -9,7 +10,7 @@ from aspen.app.app import application, auth0
 def callback_handling():
     # Handles response from token endpoint
     auth0.authorize_access_token()
-    resp = auth0.get("userinfo")
+    resp = auth0.get(application.aspen_config.AUTH0_USERINFO_URL)
     userinfo = resp.json()
 
     # Store the user information in flask session.
@@ -18,7 +19,7 @@ def callback_handling():
         "user_id": userinfo["sub"],
         "name": userinfo["name"],
     }
-    return redirect("/data/samples")
+    return redirect(os.getenv("FRONTEND_URL") + "/data/samples")
 
 
 @application.route("/login")
