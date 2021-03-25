@@ -75,6 +75,7 @@ resource "aws_batch_compute_environment" "aspen-batch-compute-environment" {
     ec2_key_pair = "phoenix"
 
     instance_type = [
+      "m5",
       "r5",
     ]
 
