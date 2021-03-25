@@ -43,6 +43,8 @@ services:
       args:
         - BUILDKIT_INLINE_CACHE=1
     restart: always
+    stdin_open: true   # Helps with pdb
+    tty: true   # Helps with pdb
     depends_on:
       - database
     ports:

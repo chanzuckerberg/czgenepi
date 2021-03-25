@@ -148,6 +148,10 @@ local-init: oauth/pkcs12/certificate.pfx .env.ecr local-ecr-login ## Launch a ne
 	docker-compose exec -T utility aspen-cli db --docker create
 	docker-compose exec -T utility alembic upgrade head
 
+.PHONY: backend-debugger
+backend-debugger: ## Attach to the backend service (useful for pdb)
+	docker attach $$(docker-compose ps | grep backend | cut -d ' ' -f 1 | head -n 1)
+
 .PHONY: local-status
 local-status: ## Show the status of the containers in the dev environment.
 	docker ps -a | grep --color=no -e 'CONTAINER\|aspen'
@@ -156,6 +160,9 @@ local-status: ## Show the status of the containers in the dev environment.
 local-rebuild: .env.ecr local-ecr-login ## Rebuild local dev without re-importing data
 	docker-compose $(COMPOSE_OPTS) build frontend backend
 	docker-compose $(COMPOSE_OPTS) up -d
+
+.PHONY: backend-debugger
+backend-debugger: ## Re-sync the local-environment state after modifying library deps or docker configs
 
 .PHONY: local-sync
 local-sync: local-rebuild local-init ## Re-sync the local-environment state after modifying library deps or docker configs
