@@ -65,6 +65,9 @@ services:
       - PYTHONPATH=.
     volumes:
       - ./src/py:/usr/src/app
+    entrypoint: []
+    # NOTE -- Using relative paths for entrypoints/commands breaks pycharm debugging
+    command: ["/usr/src/app/entrypoint.sh"]
   utility:
     image: "${DOCKER_REPO}aspen-backend"
     build:
