@@ -161,9 +161,6 @@ local-rebuild: .env.ecr local-ecr-login ## Rebuild local dev without re-importin
 	docker-compose $(COMPOSE_OPTS) build frontend backend
 	docker-compose $(COMPOSE_OPTS) up -d
 
-.PHONY: backend-debugger
-backend-debugger: ## Re-sync the local-environment state after modifying library deps or docker configs
-
 .PHONY: local-sync
 local-sync: local-rebuild local-init ## Re-sync the local-environment state after modifying library deps or docker configs
 
