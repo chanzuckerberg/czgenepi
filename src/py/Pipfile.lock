@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "80ba5bbdcc604e440ab697e3096656634e19a4eb401704fd8478609dcb219bb9"
+            "sha256": "2bd5fee66b0524edbd19aa0934ae37241a8955c153389ea828a9c55ffa64942b"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -26,19 +26,19 @@
         },
         "boto3": {
             "hashes": [
-                "sha256:2d1dd1ad3212c389074280c3fc714fd7b038cca259e9b179c58874d0da364de6",
-                "sha256:9c43dff5cd9c853623b3b710a6bc5181eabb3cbbdf1a74c51cc64404ffe87d41"
+                "sha256:d891964c43de16f0b43a8fa87ae786abfd4166222b5e53c1e1164514cde12073",
+                "sha256:f427d7f001f457bd2693411396897624a081d0d6a9f6c1fabf6ef565238f5282"
             ],
             "index": "pypi",
-            "version": "==1.17.37"
+            "version": "==1.17.38"
         },
         "botocore": {
             "hashes": [
-                "sha256:382d83c0a5b2106c8d0d7a67fb56945197a29cbd0f21625b032ca6941cc4ae31",
-                "sha256:c78add1ad17646cb952ee67f9f8771a26b269d682edf2708deac7c5d2bc1526d"
+                "sha256:6e6107109abad89d95c829b2c3c281d353113d4b54fcfeb65d71e58e8ebd77ed",
+                "sha256:da447f46d412749720ca08e19bf14487d35e23f2378f7245975e4f55af7570dd"
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4, 3.5'",
-            "version": "==1.20.37"
+            "version": "==1.20.38"
         },
         "certifi": {
             "hashes": [
@@ -473,11 +473,11 @@
         },
         "auth0-python": {
             "hashes": [
-                "sha256:21eae503e622a1f43c288317d7c96a1279f77ca94c16991489714907f615e0e6",
-                "sha256:ac7808d00676c5e7ffa9eaa228807ca1f8db7a0f4dc115337c80fb6d7eb2b50a"
+                "sha256:2ad17af5f0099f687cc6707ef2049364b5058c18db14e2a0a85a0eedf83ea627",
+                "sha256:7e6f816730d941993dc7cd9e840f0d2f0d9e3b88c458f43c79fb2b331ae187a1"
             ],
             "index": "pypi",
-            "version": "==3.14.0"
+            "version": "==3.15.0"
         },
         "backcall": {
             "hashes": [

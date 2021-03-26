@@ -213,7 +213,7 @@ local-dbconsole: ## Connect to the local postgres database.
 local-update-deps: ## Update requirements.txt to reflect pipenv file changes.
 	docker-compose exec utility pipenv --python 3.9
 	docker-compose exec utility pipenv update
-	docker-compose exec utility pipenv lock -r >| src/py/requirements.txt
+	docker-compose exec utility bash -c "pipenv lock -r >| requirements.txt"
 
 .PHONY: local-style
 local-style: ## run flake8, black, isort, mypy
