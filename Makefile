@@ -1,6 +1,6 @@
 SHELL := /bin/bash
-PYTHON_CODE_DIRECTORIES = src/py
-SKIP_PYTHON_STYLE_DIRECTORIES = src/py/third-party
+PYTHON_CODE_DIRECTORIES = aspen
+SKIP_PYTHON_STYLE_DIRECTORIES = aspen/third-party
 
 ### DOCKER #################################################
 #
@@ -175,17 +175,17 @@ local-stop: ## Stop the local dev environment.
 .PHONY: local-clean
 local-clean: ## Remove everything related to the local dev environment (including db data!)
 	-if [ -f ./oauth/pkcs12/server.crt ] ; then \
-	    if [ "$$(uname -s)" == "Linux" ]; then \
-	    	echo "Removing this certificate from /usr/local/share requires sudo access"; \
+		if [ "$$(uname -s)" == "Linux" ]; then \
+			echo "Removing this certificate from /usr/local/share requires sudo access"; \
 		sudo cp oauth/pkcs12/server.crt /usr/local/share/ca-certificates/; \
 		sudo update-ca-certificates; \
-	    fi; \
-	    if [ "$$(uname -s)" == "Darwin" ]; then \
-	    	export CERT=$$(docker run -v $(PWD)/oauth/pkcs12:/tmp/certs --workdir /tmp/certs --rm=true --entrypoint "" soluto/oidc-server-mock:0.3.0 bash -c "openssl x509 -in server.crt -outform DER | sha1sum | cut -d ' ' -f 1"); \
-	    	echo ""; \
-	    	echo "Removing this certificate requires sudo access"; \
-	    	sudo security delete-certificate -Z $${CERT} /Library/Keychains/System.keychain; \
-	    fi; \
+		fi; \
+		if [ "$$(uname -s)" == "Darwin" ]; then \
+			export CERT=$$(docker run -v $(PWD)/oauth/pkcs12:/tmp/certs --workdir /tmp/certs --rm=true --entrypoint "" soluto/oidc-server-mock:0.3.0 bash -c "openssl x509 -in server.crt -outform DER | sha1sum | cut -d ' ' -f 1"); \
+			echo ""; \
+			echo "Removing this certificate requires sudo access"; \
+			sudo security delete-certificate -Z $${CERT} /Library/Keychains/System.keychain; \
+		fi; \
 	fi;
 	-rm -rf ./oauth/pkcs12/server*
 	-rm -rf ./oauth/pkcs12/certificate*
@@ -211,5 +211,13 @@ local-dbconsole: ## Connect to the local postgres database.
 
 .PHONY: local-update-deps
 local-update-deps: ## Update requirements.txt to reflect pipenv file changes.
+	docker-compose exec utility pipenv --python 3.9
 	docker-compose exec utility pipenv update
 	docker-compose exec utility pipenv lock -r >| src/py/requirements.txt
+
+.PHONY: local-style
+local-style: ## run flake8, black, isort, mypy
+	docker-compose exec utility flake8 --ignore "E203, E231, E501, W503" . --exclude third-party
+	docker-compose exec utility black --check $(PYTHON_CODE_DIRECTORIES) --exclude $(SKIP_PYTHON_STYLE_DIRECTORIES)
+	docker-compose exec utility isort --check $(PYTHON_CODE_DIRECTORIES)/*.py $$(ls -d src/py/*/ | grep -v third-party)
+	docker-compose exec utility mypy --ignore-missing-imports src/py/aspen

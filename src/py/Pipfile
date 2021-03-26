@@ -29,6 +29,7 @@ pytest = "*"
 pytest-xdist = "*"
 sqlalchemy-stubs = "*"
 tqdm = "*"
+typing_extensions = "*"
 auth0-python = "*"
 aspen = {editable = true, path = "."}
 
