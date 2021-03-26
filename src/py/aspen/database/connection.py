@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import time
 from contextlib import contextmanager
-from typing import TYPE_CHECKING
+from typing import Generator, TYPE_CHECKING
 
 from sqlalchemy import event
 from sqlalchemy.engine import create_engine, Engine
@@ -32,7 +32,7 @@ def init_db(db_uri: str) -> SqlAlchemyInterface:
 
 
 @contextmanager
-def session_scope(interface: SqlAlchemyInterface):
+def session_scope(interface: SqlAlchemyInterface) -> Generator[Session, None, None]:
     """Provide a transactional scope around a series of operations."""
     session = interface.make_session()
     try:
