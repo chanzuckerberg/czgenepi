@@ -213,3 +213,22 @@ local-dbconsole: ## Connect to the local postgres database.
 local-update-deps: ## Update requirements.txt to reflect pipenv file changes.
 	docker-compose exec utility pipenv update
 	docker-compose exec utility pipenv lock -r >| src/py/requirements.txt
+
+### DOCKER ###################################################
+#
+
+build-docker: export ASPEN_DOCKER_IMAGE_VERSION=$(shell date +%Y%m%d_%H%M)
+build-docker:
+	docker pull nextstrain/base
+	docker build -t cziaspen/batch:latest --build-arg ASPEN_DOCKER_IMAGE_VERSION=$${ASPEN_DOCKER_IMAGE_VERSION} docker/aspen-batch
+	docker tag cziaspen/batch:latest cziaspen/batch:$${ASPEN_DOCKER_IMAGE_VERSION}
+	@echo "Please push the tags cziaspen/batch:latest and cziaspen/batch:$${ASPEN_DOCKER_IMAGE_VERSION} when done, i.e.,"
+	@echo "  docker push cziaspen/batch:latest"
+	@echo "  docker push cziaspen/batch:$${ASPEN_DOCKER_IMAGE_VERSION}"
+	@echo ""
+	@echo "If you wish to clean up some of your old aspen docker images, run:"
+	@echo "  docker image rm \$\$$(docker image ls -q cziaspen/batch -f 'before=cziaspen/batch:latest')"
+
+#
+##############################################################
+include terraform.mk
