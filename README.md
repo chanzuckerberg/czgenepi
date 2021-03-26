@@ -2,7 +2,6 @@
 
 This repository contains the code for the gen-epi project.
 
-
 ## Setting up a development environment
 
 ### Backend
