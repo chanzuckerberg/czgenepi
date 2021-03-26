@@ -42,7 +42,7 @@ xz -2 /ncov-ingest/data/gisaid/sequences.fasta
 ls -lR data
 
 # upload the files to S3
-bucket=aspen-data-"${DEPLOYMENT_ENVIRONMENT}"
+bucket=aspen-db-data-"${DEPLOYMENT_ENVIRONMENT}"
 sequences_key=processed_gisaid_dump/"${build_id}"/sequences.fasta.xz
 metadata_key=processed_gisaid_dump/"${build_id}"/metadata.tsv
 aws s3 cp /ncov-ingest/data/gisaid/sequences.fasta.xz s3://"${bucket}"/"${sequences_key}"

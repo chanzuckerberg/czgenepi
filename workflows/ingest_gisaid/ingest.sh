@@ -16,7 +16,7 @@ gisaid_password=$(echo "${gisaid_credentials}" | jq -r .password)
 
 curl "https://www.epicov.org/epi3/3p/exp3/export/export.json.bz2" --user "${gisaid_username}":"${gisaid_password}" | bunzip2 | xz -2 -c > /aspen/gisaid.ndjson.xz
 
-bucket=aspen-data-"${DEPLOYMENT_ENVIRONMENT}"
+bucket=aspen-db-data-"${DEPLOYMENT_ENVIRONMENT}"
 key=raw_gisaid_dump/"${build_id}"/gisaid.ndjson.xz
 aws s3 cp /aspen/gisaid.ndjson.xz s3://"${bucket}"/"${key}"
 
