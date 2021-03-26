@@ -44,11 +44,12 @@ resource "aws_launch_template" "aspen-batch-launch-template" {
     device_name = "/dev/xvdcz"
 
     ebs {
-      volume_size = 100
+      volume_size = 200
       volume_type = "gp2"
       delete_on_termination = true
     }
   }
+  update_default_version = true
   user_data = base64encode(<<-USER_DATA
     Content-Type: multipart/mixed; boundary="==BOUNDARY=="
     MIME-Version: 1.0
@@ -56,8 +57,8 @@ resource "aws_launch_template" "aspen-batch-launch-template" {
     --==BOUNDARY==
     Content-Type: text/cloud-boothook; charset="us-ascii"
 
-    # Set Docker daemon option dm.basesize so each container gets up to 100GB
-    cloud-init-per once docker_options echo 'OPTIONS="$${OPTIONS} --storage-opt dm.basesize=100GB"' >> /etc/sysconfig/docker
+    # Set Docker daemon option dm.basesize so each container gets up to 200GB
+    cloud-init-per once docker_options echo 'OPTIONS="$${OPTIONS} --storage-opt dm.basesize=200GB"' >> /etc/sysconfig/docker
 
     --==BOUNDARY==--
     USER_DATA
@@ -92,6 +93,7 @@ resource "aws_batch_compute_environment" "aspen-batch-compute-environment" {
 
     launch_template {
       launch_template_id = aws_launch_template.aspen-batch-launch-template.id
+      version = aws_launch_template.aspen-batch-launch-template.latest_version
     }
   }
 
