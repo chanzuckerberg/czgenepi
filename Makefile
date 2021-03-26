@@ -219,5 +219,5 @@ local-update-deps: ## Update requirements.txt to reflect pipenv file changes.
 local-style: ## run flake8, black, isort, mypy
 	docker-compose exec utility flake8 --ignore "E203, E231, E501, W503" . --exclude third-party
 	docker-compose exec utility black --check $(PYTHON_CODE_DIRECTORIES) --exclude $(SKIP_PYTHON_STYLE_DIRECTORIES)
-	docker-compose exec utility isort --check $(PYTHON_CODE_DIRECTORIES)/*.py $$(ls -d src/py/*/ | grep -v third-party)
-	docker-compose exec utility mypy --ignore-missing-imports src/py/aspen
+	docker-compose exec utility isort --check $(PYTHON_CODE_DIRECTORIES)/*.py $$(ls -d */ | grep -v third-party)
+	docker-compose exec utility mypy --ignore-missing-imports aspen
