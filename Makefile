@@ -1,6 +1,8 @@
 SHELL := /bin/bash
-PYTHON_CODE_DIRECTORIES = src/py
-SKIP_PYTHON_STYLE_DIRECTORIES = src/py/third-party
+STYLE_CHECK_PYTHON_CODE_DIRECTORIES = src/py workflows
+STYLE_CHECK_PYTHON_CODE_SKIPPED_DIRECTORIES = src/py/third-party
+TYPE_CHECK_BASE_PYTHON_CODE_DIRECTORIES = src/py/aspen
+TYPE_CHECK_INDIVIDUAL_PYTHON_CODE_DIRECTORIES = src/py/database_migrations $(shell ls -d workflows/*)
 
 ### DOCKER #################################################
 #
@@ -70,16 +72,23 @@ drop-local-db:
 style: lint black isort mypy
 
 lint:
-	flake8 --ignore "E203, E231, E501, W503" $(PYTHON_CODE_DIRECTORIES) --exclude third-party
+	flake8 --ignore "E203, E231, E501, W503" $(STYLE_CHECK_PYTHON_CODE_DIRECTORIES) --exclude third-party
 
 black:
-	black --check $(PYTHON_CODE_DIRECTORIES) --exclude $(SKIP_PYTHON_STYLE_DIRECTORIES)
+	black --check $(STYLE_CHECK_PYTHON_CODE_DIRECTORIES) --exclude $(STYLE_CHECK_PYTHON_CODE_SKIPPED_DIRECTORIES)
 
 isort:
-	isort --check $(PYTHON_CODE_DIRECTORIES)/*.py $$(ls -d src/py/*/ | grep -v third-party)
+	isort --check $(STYLE_CHECK_PYTHON_CODE_DIRECTORIES) --skip $(STYLE_CHECK_PYTHON_CODE_SKIPPED_DIRECTORIES)
 
-mypy:
-	mypy --ignore-missing-imports src/py/aspen
+MYPY_TARGETS = $(foreach stylecheckdir, $(TYPE_CHECK_INDIVIDUAL_PYTHON_CODE_DIRECTORIES), mypy-$(stylecheckdir))
+
+mypy: mypy-base $(MYPY_TARGETS)
+
+mypy-base:
+	mypy --ignore-missing-imports $(TYPE_CHECK_BASE_PYTHON_CODE_DIRECTORIES)
+
+$(MYPY_TARGETS): mypy-%: mypy-base
+	mypy --ignore-missing-imports $(TYPE_CHECK_BASE_PYTHON_CODE_DIRECTORIES) $*
 
 .PHONY: style lint black isort
 
