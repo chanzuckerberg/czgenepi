@@ -29,6 +29,16 @@ resource "aws_security_group_rule" "eb-db-access" {
   source_security_group_id = aws_security_group.eb-security-group.id
 }
 
+resource "aws_security_group_rule" "aspen-batch-db-access" {
+  security_group_id        = aws_security_group.db-security-group.id
+  type                     = "ingress"
+  description              = "Access given to instances in the aspen batch pipeline."
+  from_port                = 5432
+  to_port                  = 5432
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.aspen-batch-security-group.id
+}
+
 resource "aws_security_group_rule" "remote-db-access-ttung" {
   count             = var.DEPLOYMENT_ENVIRONMENT == "prod" ? 0 : 1
   security_group_id = aws_security_group.db-security-group.id
