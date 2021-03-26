@@ -98,3 +98,32 @@ class Workflow(idbase):
         uselist=True,
     )
     outputs: MutableSequence[Entity]
+
+
+class SoftwareNames(str, enum.Enum):
+    """Keys to be used in the software versions map (see Workflow.software_versions).
+    Naming the versions consistently helps us ensure we're always using the same name to
+    identify a particular piece of software."""
+
+    ASPEN_WORKFLOW = "aspen_workflow"
+    """This is the version of the aspen codebase from which the workflow is retrieved.
+    Generally speaking, the workflow revision is going to be the same as the creation
+    revision, but it can be different.  For instance, if the DB schema is updated
+    between the time the workflow starts and when it finishes, we may update the tag.
+    This way, the code reflects the state the database."""
+
+    ASPEN_CREATION = "aspen_creation"
+    """This is the version of the aspen codebase that is used to save the objects."""
+
+    NCOV_INGEST = "ncov_ingest"
+    """This is the version of the ncov-ingest repo
+    (https://github.com/nextstrain/ncov-ingest/) for transforming the raw gisaid dumps
+    into the sequence and metadata files."""
+
+    NCOV = "ncov"
+    """This is the version of the ncov repo (https://github.com/nextstrain/ncov/) for
+    aligning gisaid dumps and for nextstrain runs."""
+
+    ASPEN_DOCKER_IMAGE = "aspen_docker_image"
+    """This is the version of the aspen docker image.  This includes the nextstrain
+    tools used for gisaid alignment."""
