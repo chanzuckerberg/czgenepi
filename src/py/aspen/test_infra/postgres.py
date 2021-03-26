@@ -1,12 +1,11 @@
-from dataclasses import dataclass
 import random
 import string
+from dataclasses import dataclass
 from typing import Generator
 
 import pytest
 
 from aspen.database import connection as aspen_connection
-
 
 USERNAME = "user_rw"
 PASSWORD = "password_rw"
@@ -35,15 +34,14 @@ def postgres_database() -> Generator[PostgresDatabase, None, None]:
 
     # create random database name (for running tests in parallel)
     letters = string.ascii_lowercase
-    database_name = (''.join(random.choice(letters) for i in range(10)))
+    database_name = "".join(random.choice(letters) for i in range(10))
 
     admin_session.execute(f"create database {database_name}")
-    admin_session.execute(f"grant all privileges on database {database_name} to {USERNAME}")
-
-    postgres_test_db = PostgresDatabase(
-        database_name=database_name,
-        port=5432
+    admin_session.execute(
+        f"grant all privileges on database {database_name} to {USERNAME}"
     )
+
+    postgres_test_db = PostgresDatabase(database_name=database_name, port=5432)
 
     yield postgres_test_db
 
