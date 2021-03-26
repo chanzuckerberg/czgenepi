@@ -221,3 +221,7 @@ local-style: ## run flake8, black, isort, mypy
 	docker-compose exec utility black --check $(PYTHON_CODE_DIRECTORIES) --exclude $(SKIP_PYTHON_STYLE_DIRECTORIES)
 	docker-compose exec utility isort --check $(PYTHON_CODE_DIRECTORIES)/*.py $$(ls -d */ | grep -v third-party)
 	docker-compose exec utility mypy --ignore-missing-imports aspen
+
+.PHONY: local-pytest
+local-pytest: # run pytest
+	docker-compose exec utility pytest -n8 aspen
