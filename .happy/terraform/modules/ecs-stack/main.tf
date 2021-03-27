@@ -19,7 +19,7 @@ locals {
   migration_cmd         = ["sleep", "10"] # TODO, need amigration command
   deletion_cmd          = ["sleep", "10"] # TODO, need a deletion command
   frontend_cmd          = []
-  backend_cmd           = []
+  backend_cmd           = ["npm", "run", "serve"]
   data_load_path        = "s3://${local.secret["s3_buckets"]["aspen"]["name"]}/database/dev_data.sql"
 
   vpc_id                = local.secret["vpc_id"]
