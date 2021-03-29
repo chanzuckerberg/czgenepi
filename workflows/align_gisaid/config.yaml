@@ -1,0 +1,10 @@
+configfile:
+  - defaults/parameters.yaml
+
+# NOTE: when the number of cpus is modified, it would be prudent to modify workflows/transform_gisaid/transform.sh.
+cores: 32
+keep-going: True
+printshellcmds: True
+reason: True
+stats: stats.json
+set-threads: align=32
