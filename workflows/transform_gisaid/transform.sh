@@ -42,7 +42,7 @@ xz -2 /ncov-ingest/data/gisaid/sequences.fasta
 ls -lR data
 
 # upload the files to S3
-bucket=aspen-data-"${DEPLOYMENT_ENVIRONMENT}"
+bucket=aspen-db-data-"${DEPLOYMENT_ENVIRONMENT}"
 sequences_key=processed_gisaid_dump/"${build_id}"/sequences.fasta.xz
 metadata_key=processed_gisaid_dump/"${build_id}"/metadata.tsv
 aws s3 cp /ncov-ingest/data/gisaid/sequences.fasta.xz s3://"${bucket}"/"${sequences_key}"
@@ -75,3 +75,16 @@ entity_id=$(/aspen/.venv/bin/python workflows/transform_gisaid/save.py          
                                     --gisaid-sequences-s3-key "${sequences_key}" \
                                     --gisaid-metadata-s3-key "${metadata_key}"   \
          )
+
+# invoke the next workflow.
+# NOTE: when the number of cpus is modified, it would be prudent to modify workflows/align_gisaid/config.yaml.
+aws batch submit-job \
+    --job-name "align-gisaid"                \
+    --job-queue aspen-batch                      \
+    --job-definition aspen-batch-job-definition  \
+    --container-overrides "
+      {
+        \"command\": [\"${ASPEN_GIT_REVSPEC}\", \"workflows/align_gisaid/align.sh\", \"${entity_id}\"],
+        \"vcpus\": 32,
+        \"memory\": 420000
+      }"
