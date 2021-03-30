@@ -154,7 +154,6 @@ local-init: oauth/pkcs12/certificate.pfx .env.ecr local-ecr-login ## Launch a ne
 	docker-compose exec -T utility $(BACKEND_APP_ROOT)/scripts/setup_dev_data.sh
 	docker-compose exec -T utility python scripts/setup_localdata.py
 	docker-compose exec -T utility pip install .
-	docker-compose exec -T utility aspen-cli db --docker create
 	docker-compose exec -T utility alembic upgrade head
 
 .PHONY: backend-debugger
