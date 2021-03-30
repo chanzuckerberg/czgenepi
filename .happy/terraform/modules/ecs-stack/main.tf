@@ -21,7 +21,7 @@ locals {
   backend_cmd           = []
   frontend_cmd          = ["npm", "run", "serve"]
   nextstrain_cmd        = ""
-  data_load_path        = "s3://${local.secret["s3_buckets"]["aspen"]["name"]}/database/dev_data.sql"
+  data_load_path        = length(var.sql_import_file) > 0 ? "${local.secret["s3_buckets"]["aspen"]["name"]}/${var.sql_import_file}" : ""
 
   vpc_id                = local.secret["vpc_id"]
   subnets               = local.secret["private_subnets"]

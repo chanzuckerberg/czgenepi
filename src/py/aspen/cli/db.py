@@ -61,12 +61,15 @@ def set_passwords_from_secret(ctx):
 
 
 @db.command("create")
+@click.option("--load-data", type=str, default=lambda: os.environ.get('DATA_LOAD_PATH', '')), help="S3 URI for data to import")
 @click.pass_context
-def create_db(ctx):
+def create_db(ctx, load_data):
     engine = ctx.obj["CONFIG"]
     if not database_exists(engine.url):
         print("Database does not exist, creating database")
         create_database(engine.url)
+        if load_data:
+            import_data(load_data, engine)
     else:
         print("Database already exists")
     create_tables_and_schema(ctx.obj["ENGINE"])
@@ -82,6 +85,13 @@ def drop(ctx):
     else:
         print("Database does not exist, skipping")
         exit(1)
+
+
+def import_data(s3_path, engine):
+    s3 = boto3.resource('s3')
+    bucket_name = s3_path.split("/")[0]
+    path = "/".join(s3_path.split("/")[1:])
+    s3.Bucket(bucket_name).download_file(path, 'db_data.sql')
 
 
 @db.command("interact")
