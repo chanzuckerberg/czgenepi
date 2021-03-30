@@ -15,6 +15,7 @@ from aspen.database.connection import enable_profiling, get_db_uri, init_db
 from aspen.database.models import *  # noqa: F401, F403
 from aspen.database.schema import create_tables_and_schema
 
+from sqlalchemy_utils import database_exists, create_database, drop_database
 
 @cli.group()
 @click.option("--local", "config_cls", flag_value=DevelopmentConfig, default=True)
@@ -62,7 +63,25 @@ def set_passwords_from_secret(ctx):
 @db.command("create")
 @click.pass_context
 def create_db(ctx):
+    engine = ctx.obj["CONFIG"]
+    if not database_exists(engine.url):
+        print("Database does not exist, creating database")
+        create_database(engine.url)
+    else:
+        print("Database already exists")
     create_tables_and_schema(ctx.obj["ENGINE"])
+
+
+@db.command("drop")
+@click.pass_context
+def drop(ctx):
+    engine = ctx.obj["ENGINE"]
+    if database_exists(engine.url):
+        print("Database exists, dropping database")
+        drop_database(engine.url)
+    else:
+        print("Database does not exist, skipping")
+        exit(1)
 
 
 @db.command("interact")
