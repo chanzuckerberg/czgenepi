@@ -43,12 +43,17 @@ resource "aws_security_group" "aspen-batch-security-group" {
 }
 
 
+data "aws_ssm_parameter" "amazon-linux-2-ecs-image" {
+  name = "/aws/service/ecs/optimized-ami/amazon-linux-2/recommended/image_id"
+}
+
+
 # for increased disk space
 resource "aws_launch_template" "aspen-batch-launch-template" {
   name = "aspen-batch-launch-template"
 
   block_device_mappings {
-    device_name = "/dev/xvdcz"
+    device_name = "/dev/xvda"
 
     ebs {
       volume_size = 200
@@ -56,20 +61,8 @@ resource "aws_launch_template" "aspen-batch-launch-template" {
       delete_on_termination = true
     }
   }
+  image_id = data.aws_ssm_parameter.amazon-linux-2-ecs-image.value
   update_default_version = true
-  user_data = base64encode(<<-USER_DATA
-    Content-Type: multipart/mixed; boundary="==BOUNDARY=="
-    MIME-Version: 1.0
-
-    --==BOUNDARY==
-    Content-Type: text/cloud-boothook; charset="us-ascii"
-
-    # Set Docker daemon option dm.basesize so each container gets up to 200GB
-    cloud-init-per once docker_options echo 'OPTIONS="$${OPTIONS} --storage-opt dm.basesize=200GB"' >> /etc/sysconfig/docker
-
-    --==BOUNDARY==--
-    USER_DATA
-  )
 }
 
 
