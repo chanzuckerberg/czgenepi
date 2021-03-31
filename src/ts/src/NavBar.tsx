@@ -74,7 +74,7 @@ const NavBar: FunctionComponent<Props> = ({ org, user }: Props) => {
     const simpleUserMenu = <div className={style.item}>{user}</div>;
 
     const signInLink = (
-        <a href="/login">
+        <a href={`${process.env.API_URL}/login`}>
             <div className={cx(style.item, style.link)}>Sign In</div>
         </a>
     );
