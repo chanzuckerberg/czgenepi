@@ -148,3 +148,5 @@ In [3]:
 ## Updating python dependencies
 
 To update python dependencies, update the [`Pipfile`](../../Pipfile) and run `make update-deps`.  This will update [`Pipfile.lock`](../../Pipfile.lock) and [`requirements.txt`](../../src/py/requirements.txt) (used by setup.py), and [`requirements-dev.txt`](../../src/py/requirements-dev.txt) (used by tests).
+
+If you add a third-party library (directly or indirectly) that does not support [python typing](https://docs.python.org/3/library/typing.html), then you may need to add an entry to [`mypy.ini`](../../mypy.ini) to let mypy know [not to expect type hints for that library](https://mypy.readthedocs.io/en/stable/running_mypy.html#missing-type-hints-for-third-party-library).
