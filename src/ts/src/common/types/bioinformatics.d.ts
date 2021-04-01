@@ -19,6 +19,7 @@ interface Tree extends BioinformaticsType {
     name?: string;
     pathogenGenomeCount: number;
     dateCompleted: string;
+    downloadLink?: string;
 }
 
 type BioinformaticsData = Sample | Tree;
