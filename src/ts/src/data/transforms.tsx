@@ -1,7 +1,3 @@
-import React from "react";
-
-/* eslint-disable react/display-name */
-
 export const TREE_TRANSFORMS: Transform[] = [
     {
         key: "name",
@@ -22,16 +18,12 @@ export const TREE_TRANSFORMS: Transform[] = [
     {
         key: "downloadLink",
         inputs: ["id"],
-        method: (inputs: number[]): JSX.Element | undefined => {
+        method: (inputs: number[]): string | undefined => {
             const id = inputs[0];
             if (typeof id !== "number") {
                 return undefined;
             }
-            return (
-                <a href={`/api/phylo_tree/${id}`} download>
-                    Download
-                </a>
-            );
+            return `${process.env.API_URL}/api/phylo_tree/${id}`;
         },
     },
 ];

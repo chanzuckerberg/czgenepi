@@ -58,3 +58,19 @@
         margin: 0 10em 0 10em;
     }
 }
+
+.cell {
+    @include font-header-s;
+    align-items: center;
+    margin: $space-xs 0 $space-xs 0;
+
+    .icon {
+        margin: 0 $space-l 0 $space-l;
+        fill: $gray-light;
+    }
+
+    a {
+        @include font-caps-xxs;
+        color: $primary;
+    }
+}

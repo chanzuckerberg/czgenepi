@@ -7,8 +7,9 @@ import { DataTable } from "common/components";
 import style from "./index.module.scss";
 
 interface Props {
-    data?: BioinformaticsData[];
+    data?: Record<string | number, JSONPrimitive>[];
     headers: Header[];
+    renderer?: CustomRenderer;
 }
 
 interface InputOnChangeData {
@@ -18,14 +19,18 @@ interface InputOnChangeData {
 
 interface SearchState {
     searching?: boolean;
-    results?: BioinformaticsData[];
+    results?: Record<string | number, JSONPrimitive>[];
 }
 
 function searchReducer(state: SearchState, action: SearchState): SearchState {
     return { ...state, ...action };
 }
 
-const DataSubview: FunctionComponent<Props> = ({ data, headers }: Props) => {
+const DataSubview: FunctionComponent<Props> = ({
+    data,
+    headers,
+    renderer,
+}: Props) => {
     // we are modifying state using hooks, so we need a reducer
     const [state, dispatch] = useReducer(searchReducer, {
         searching: false,
@@ -55,7 +60,7 @@ const DataSubview: FunctionComponent<Props> = ({ data, headers }: Props) => {
         dispatch({ searching: false, results: filteredData });
     };
 
-    const render = (tableData: BioinformaticsData[]) => {
+    const render = (tableData: Record<string | number, JSONPrimitive>[]) => {
         return (
             <div className={style.samplesRoot}>
                 <div className={style.searchBar}>
@@ -68,14 +73,18 @@ const DataSubview: FunctionComponent<Props> = ({ data, headers }: Props) => {
                     />
                 </div>
                 <div className={style.samplesTable}>
-                    <DataTable data={tableData} headers={headers} />
+                    <DataTable
+                        data={tableData}
+                        headers={headers}
+                        renderer={renderer}
+                    />
                 </div>
             </div>
         );
     };
 
     if (state.results === undefined) {
-        let tableData: BioinformaticsData[] = [];
+        let tableData: Record<string | number, JSONPrimitive>[] = [];
         if (data !== undefined) {
             dispatch({ results: data });
             tableData = data;

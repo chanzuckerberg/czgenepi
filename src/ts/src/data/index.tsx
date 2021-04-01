@@ -8,6 +8,7 @@ import { DataSubview } from "common/components";
 
 import { SAMPLE_HEADERS, TREE_HEADERS } from "./headers";
 import { TREE_TRANSFORMS } from "./transforms";
+import { SampleRenderer, TreeRenderer } from "./cellRenderers";
 
 import style from "./index.module.scss";
 
@@ -37,6 +38,7 @@ const Data: FunctionComponent = () => {
             text: "Samples",
             data: samples,
             headers: SAMPLE_HEADERS,
+            renderer: SampleRenderer,
         },
         {
             to: "/data/phylogenetic_trees",
@@ -44,6 +46,7 @@ const Data: FunctionComponent = () => {
             data: trees,
             headers: TREE_HEADERS,
             transforms: TREE_TRANSFORMS,
+            renderer: TreeRenderer,
         },
     ];
 
@@ -99,6 +102,7 @@ const Data: FunctionComponent = () => {
                     <DataSubview
                         data={category.data}
                         headers={category.headers}
+                        renderer={category.renderer}
                     />
                 )}
             />
