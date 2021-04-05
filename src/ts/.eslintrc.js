@@ -1,32 +1,60 @@
+// https://www.robertcooper.me/using-eslint-and-prettier-in-a-typescript-project
 module.exports = {
-    root: true,
-    parser: "@typescript-eslint/parser",
-    plugins: ["@typescript-eslint"],
-    extends: [
-        "eslint:recommended",
-        "plugin:@typescript-eslint/recommended",
-        "plugin:react/recommended",
-        "plugin:react-hooks/recommended",
-        "prettier",
-        "prettier/@typescript-eslint",
+  env: {
+    browser: true,
+    es6: true,
+    node: true,
+  },
+  // Specifies the ESLint parser
+  extends: [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier",
+    "plugin:prettier/recommended",
+    "react-app",
+    "plugin:sonarjs/recommended",
+    "plugin:jest-playwright/recommended",
+  ],
+  overrides: [
+    // Override some TypeScript rules just for .js files
+    {
+      files: ["*.js"],
+      rules: {
+        "@typescript-eslint/no-var-requires": "off", //
+      },
+    },
+  ],
+  parser: "@typescript-eslint/parser",
+  parserOptions: {
+    ecmaFeatures: {
+      jsx: true,
+    },
+    ecmaVersion: 2020,
+    // Allows for the parsing of modern ECMAScript features
+    sourceType: "module", // Allows for the use of imports
+  },
+  plugins: ["@typescript-eslint", "react", "sonarjs"],
+  rules: {
+    "@typescript-eslint/camelcase": 0,
+    // Disable prop-types as we use TypeScript for type checking
+    "@typescript-eslint/explicit-function-return-type": "off",
+    camelcase: "off",
+    "react/jsx-no-target-blank": 0,
+    "react/prop-types": "off",
+    "sort-keys": [
+      "error",
+      "asc",
+      {
+        caseSensitive: true,
+        minKeys: 2,
+        natural: false,
+      },
     ],
-    settings: {
-        react: {
-            version: "detect",
-        }
+  },
+  settings: {
+    react: {
+      version: "detect",
     },
-    rules: {
-        "max-len": ["error", {
-            code: 120,
-        }],
-        "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }]
-    },
-    overrides: [
-        {
-            files: ["*.d.ts"], // type declaration files
-            rules: {
-                "@typescript-eslint/triple-slash-reference": "off",
-            }
-        }
-    ]
+  },
 };
