@@ -39,7 +39,7 @@ jobs:
         working-directory: src/py
         run: |
           python -m pip install pipenv
-          pip install $(pipenv lock --requirements --dev | egrep '^(flake8|black|isort|mypy|sqlalchemy-stubs)==')
+          pip install $(pipenv lock --requirements --dev | egrep '^(flake8|black|isort|mypy|sqlalchemy-stubs|pytest)==')
       - name: Verify code style
         run: |
           make -k style

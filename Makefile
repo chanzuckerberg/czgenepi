@@ -85,10 +85,10 @@ MYPY_TARGETS = $(foreach stylecheckdir, $(TYPE_CHECK_INDIVIDUAL_PYTHON_CODE_DIRE
 mypy: mypy-base $(MYPY_TARGETS)
 
 mypy-base:
-	mypy --ignore-missing-imports $(TYPE_CHECK_BASE_PYTHON_CODE_DIRECTORIES)
+	mypy $(TYPE_CHECK_BASE_PYTHON_CODE_DIRECTORIES)
 
 $(MYPY_TARGETS): mypy-%: mypy-base
-	mypy --ignore-missing-imports $(TYPE_CHECK_BASE_PYTHON_CODE_DIRECTORIES) $*
+	mypy $(TYPE_CHECK_BASE_PYTHON_CODE_DIRECTORIES) $*
 
 .PHONY: style lint black isort
 
