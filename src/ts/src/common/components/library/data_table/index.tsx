@@ -39,17 +39,12 @@ const DataTable: FunctionComponent<Props> = ({
     ): Array<JSX.Element> => {
         return headers.map((header, index) => {
             const value = item[header.key];
-            if (renderer !== undefined) {
-                console.log("used created renderer");
-                return (
-                    <Table.Cell key={`${item[indexingKey]}-${header.key}`}>
-                        {renderer({ value, header, index })}
-                    </Table.Cell>
-                );
+            if (renderer === undefined) {
+              renderer = defaultCellRenderer;
             }
             return (
                 <Table.Cell key={`${item[indexingKey]}-${header.key}`}>
-                    {defaultCellRenderer({ value, header, index })}
+                    {renderer({header, value, item, index})}
                 </Table.Cell>
             );
         });

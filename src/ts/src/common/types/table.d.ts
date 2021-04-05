@@ -5,13 +5,14 @@ interface Header {
 }
 
 interface CustomTableRenderProps {
-    value: JSONPrimitive | undefined;
     header: Header;
+    value: JSONPrimitive | undefined;
+    item: Record<string | number, JSONPrimitive>;
     index: number;
 }
 
 interface CustomRenderer extends FunctionComponent<CustomTableRenderProps> {
-    ({ value, header, index }): JSX.Element;
+    ({ header, value, item, index }): JSX.Element;
 }
 
-type CellRenderer = (value: JSONPrimitive, index: number) => JSX.Element;
+type CellRenderer = (value: JSONPrimitive, item: Record<string | number, JSONPrimitive>, index: number) => JSX.Element;

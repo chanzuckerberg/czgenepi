@@ -7,9 +7,10 @@ function createTableCellRenderer(
     customStyle?: Stylesheet
 ): CustomRenderer {
     const renderer: CustomRenderer = ({
-        value,
         header,
-        index,
+        value,
+        item,
+        index
     }: CustomTableRenderProps) => {
         let unwrappedValue;
         if (value === undefined) {
@@ -20,7 +21,7 @@ function createTableCellRenderer(
 
         if (customRenderers[header.key] !== undefined) {
             const cellRenderFunction = customRenderers[header.key];
-            return cellRenderFunction(unwrappedValue, index);
+            return cellRenderFunction(unwrappedValue, item, index);
         }
 
         return <div className={customStyle?.cell}>{unwrappedValue}</div>;
