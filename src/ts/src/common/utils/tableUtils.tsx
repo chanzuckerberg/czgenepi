@@ -4,7 +4,7 @@ const UNDEFINED_TEXT = "---";
 
 function createTableCellRenderer(
     customRenderers: Record<string | number, CellRenderer>,
-    customStyle?: Stylesheet
+    defaultRenderer: CellRenderer,
 ): CustomRenderer {
     const renderer: CustomRenderer = ({
         header,
@@ -24,7 +24,7 @@ function createTableCellRenderer(
             return cellRenderFunction(unwrappedValue, item, index);
         }
 
-        return <div className={customStyle?.cell}>{unwrappedValue}</div>;
+        return defaultRenderer(unwrappedValue, item, index);
     };
     return renderer;
 }
