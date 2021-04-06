@@ -13,7 +13,7 @@ This uses the [Happy Path setup](https://wiki.czi.team/display/TECH/Data+Portal+
   - Modify code in the `src/py` directory, and the backend api will reload automatically.
 
 ### OAuth creds
-Username: User1 / Password: pwd ([users are defined here](oauth/users.json))
+Username: User1 / Password: pwd ([users are defined here](../oauth/users.json))
 
 ### Containers managed by the dev environment
 The Aspen dev environment is a set of containers defined in [docker-compose.yml](docker-compose.yml). The [backend docker image](src/py/Dockerfile) and [frontend docker image](src/ts/Dockerfile) are built locally. Update any of these files as necessary and run `make local-sync` to sync your dev environment with these configs.
