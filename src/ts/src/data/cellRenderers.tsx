@@ -27,16 +27,20 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
 
 const SampleRenderer = createTableCellRenderer(SAMPLE_CUSTOM_RENDERERS, DEFAULT_RENDERER);
 
+const TREE_MODAL = (
+        <div className={style.treeModal}>
+
+        </div>
+    )
+
 const TREE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
     name: (value: JSONPrimitive, item: Record<string | number, JSONPrimitive>, _index: number): JSX.Element => {
         return (
-                <div className={style.cell}>
-                    <Modal modal={<span />}>
-                        {<TreeIcon className={style.icon} />}
-                        {value}
-                        {<ExternalLinkIcon className={style.icon} />}
-                    </Modal>
-                </div>
+                <Modal modal={TREE_MODAL} className={style.cell}>
+                    {<TreeIcon className={style.icon} />}
+                    {value}
+                    {<ExternalLinkIcon className={style.icon} />}
+                </Modal>
         );
     },
     downloadLink: (value: JSONPrimitive, item: Record<string | number, JSONPrimitive>, _index: number): JSX.Element => (

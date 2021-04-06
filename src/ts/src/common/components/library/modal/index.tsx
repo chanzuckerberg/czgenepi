@@ -5,6 +5,7 @@ import style from "./index.module.scss";
 
 interface Props {
     modal: JSX.Element;
+    className: string;
     customStyle?: Stylesheet;
 }
 
@@ -16,7 +17,7 @@ function modalReducer(state: ModalState, action: ModalState): ModalState {
     return { ...state, ...action };
 }
 
-const Modal: FunctionComponent<Props> = ({modal, customStyle, children }): JSX.Element => {
+const Modal: FunctionComponent<Props> = ({modal, className, customStyle, children }): JSX.Element => {
     const [state, dispatch] = useReducer(modalReducer, { displayModal: false })
 
     function renderElements(state: ModalState): JSX.Element | null {
@@ -40,12 +41,12 @@ const Modal: FunctionComponent<Props> = ({modal, customStyle, children }): JSX.E
     }
 
     return (
-        <div>
-            <div>
+        <React.Fragment>
+            <div className={className}>
                 {childrenWithTrigger(children)}
             </div>
             {renderElements(state)}
-        </div>
+        </React.Fragment>
     )
 }
 
