@@ -314,3 +314,6 @@ static
 /.terraform.*/
 /.terraform.lock.hcl
 /terraform/variables.tf
+
+# VS Code
+.vscode
