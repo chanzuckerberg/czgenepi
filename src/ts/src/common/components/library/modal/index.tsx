@@ -33,10 +33,20 @@ const Modal: FunctionComponent<Props> = ({modal, customStyle, children }): JSX.E
         return null
     }
 
+    const childrenWithTrigger = (children: React.ReactNode) => {
+        return React.Children.map(children, (child => {
+            if (React.isValidElement(child)) {
+                return React.cloneElement(child, {onClick: () => dispatch({ displayModal: true })}, null)
+            } else {
+                return <span onClick={() => dispatch({ displayModal: true })}>{child}</span>
+            }
+        }))
+    }
+
     return (
         <div>
-            <div onClick={() => dispatch({ displayModal: true })}>
-                {children}
+            <div className={style.children}>
+                {childrenWithTrigger(children)}
             </div>
             {renderElements(state)}
         </div>
