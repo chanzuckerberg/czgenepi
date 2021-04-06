@@ -21,3 +21,9 @@
         justify-content: center;
     }
 }
+
+.children {
+    &:hover {
+        cursor: pointer;
+    }
+}
