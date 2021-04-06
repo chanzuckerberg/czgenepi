@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import enum
 from typing import (
+    TYPE_CHECKING,
     Mapping,
     MutableSequence,
     Optional,
     Sequence,
     Tuple,
     Type,
-    TYPE_CHECKING,
     TypeVar,
     Union,
 )
@@ -52,7 +52,7 @@ _EntityTypeTable = enumtables.EnumTable(
 EntityGenericType = TypeVar("EntityGenericType", bound="Entity")
 
 
-class Entity(idbase):
+class Entity(idbase):  # type: ignore
     """A piece of data in the system.  It is represented as a file, though not always
     local to the system."""
 
@@ -70,7 +70,7 @@ class Entity(idbase):
     consuming_workflows: MutableSequence[Workflow]
 
     producing_workflow_id = Column(Integer, ForeignKey(f"{_WORKFLOW_TABLENAME}.id"))
-    producing_workflow = relationship(
+    producing_workflow = relationship(  # type: ignore
         "Workflow", backref=backref("outputs", uselist=True)
     )
 

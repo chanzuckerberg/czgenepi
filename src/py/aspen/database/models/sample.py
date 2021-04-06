@@ -1,16 +1,16 @@
 from __future__ import annotations
 
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import (
+    JSON,
     Column,
     Date,
     ForeignKey,
     Integer,
-    JSON,
     String,
-    text,
     UniqueConstraint,
+    text,
 )
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import backref, relationship
@@ -23,7 +23,7 @@ if TYPE_CHECKING:
     from .sequences import SequencingReadsCollection, UploadedPathogenGenome
 
 
-class Sample(idbase, DictMixin):
+class Sample(idbase, DictMixin):  # type: ignore
     """A physical sample.  Multiple sequences can be taken of each physical sample."""
 
     __tablename__ = "samples"
@@ -34,7 +34,7 @@ class Sample(idbase, DictMixin):
         ForeignKey(Group.id),
         nullable=False,
     )
-    submitting_group = relationship(Group, backref=backref("samples", uselist=True))
+    submitting_group = relationship(Group, backref=backref("samples", uselist=True))  # type: ignore
     private_identifier = Column(
         String,
         nullable=False,

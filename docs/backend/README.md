@@ -88,7 +88,7 @@ Access to the database is only granted if an EC2 instance is within the security
 
 You can also connect to your local psql console by running:
 ```
-(.venv) aspen% docker exec -it aspen-local psql -h localhost -d aspen_db -U user_rw
+aspen% make local-pgconsole
 psql (13.1)
 Type "help" for help.
 
@@ -104,10 +104,11 @@ aspen_db=>
 
 It is possible to interact with the local database in ipython:
 ```
-(.venv) aspen% aspen-cli db interact
-Python 3.7.6 (default, Dec 22 2019, 01:09:06)
+aspen% make local-dbconsole
+docker-compose exec utility aspen-cli db --docker interact
+Python 3.9.1 (default, Feb  9 2021, 07:55:26)
 Type 'copyright', 'credits' or 'license' for more information
-IPython 7.20.0 -- An enhanced Interactive Python. Type '?' for help.
+IPython 7.21.0 -- An enhanced Interactive Python. Type '?' for help.
 
 In [1]: session = engine.make_session()
 
@@ -122,10 +123,11 @@ In [3]:
 `aspen-cli db interact` has a `--profile` option that prints out every query that's executed and how long they take:
 
 ```
-(.venv) aspen% aspen-cli db interact --profile
-Python 3.7.9 (default, Sep  6 2020, 13:20:25)
+aspen% make local-dbconsole-profile 
+docker-compose exec utility aspen-cli db --docker interact --profile
+Python 3.9.1 (default, Feb  9 2021, 07:55:26)
 Type 'copyright', 'credits' or 'license' for more information
-IPython 7.20.0 -- An enhanced Interactive Python. Type '?' for help.
+IPython 7.21.0 -- An enhanced Interactive Python. Type '?' for help.
 
 In [1]: session = engine.make_session()
 
@@ -139,14 +141,16 @@ In [3]:
 ```
 
 ### Autogeneration of schema migration
-
-1. Make changes to the models.
-2. Run `DB=local alembic revision --autogenerate -m "SOME DESCRIPTIVE MESSAGE" --rev-id $(date +%Y%m%d_%H%M%S)`
-3. Verify that the schema migration generated in `database_migrations/versions/` is sane.
-4. Run `DB=local alembic upgrade head` to test the schema migration on your local database.
-
+* after modifying/adding any database table/schema code run: 
+    * `make utility-alembic-autogenerate MESSAGE="descriptive message"`
+* this will create a migration file under `src/py/database_migrations`
+  * make sure you look this file over and verify that alembic made the appropriate changes
+* run `make utility-alembic-upgrade-head`
+  * this updates your local running database, make sure you use either `make pg-console` or `make db-console` to check that changes were applied appropriately! 
+  
 ## Updating python dependencies
 
 To update python dependencies, update the [`Pipfile`](../../Pipfile) and run `make update-deps`.  This will update [`Pipfile.lock`](../../src/py/Pipfile.lock) and [`requirements.txt`](../../src/py/requirements.txt) (used by setup.py).
+You will also need to rebuild local running docker containers by running `make local-rebuild`.
 
 If you add a third-party library (directly or indirectly) that does not support [python typing](https://docs.python.org/3/library/typing.html), then you may need to add an entry to [`mypy.ini`](../../mypy.ini) to let mypy know [not to expect type hints for that library](https://mypy.readthedocs.io/en/stable/running_mypy.html#missing-type-hints-for-third-party-library).

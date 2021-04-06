@@ -9,11 +9,11 @@ from flask_cors import CORS
 
 from aspen.app.aspen_app import AspenApp
 from aspen.config import (
-    config,
     DevelopmentConfig,
     LocalConfig,
     ProductionConfig,
     StagingConfig,
+    config,
 )
 
 static_folder = Path(__file__).parent.parent / "static"

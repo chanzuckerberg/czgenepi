@@ -1,4 +1,4 @@
-from typing import Type, TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING, Type, TypeVar
 
 # https://github.com/dropbox/sqlalchemy-stubs/issues/114
 # This is the (gross) workaround. Keep an eye on the issue and get rid of it once it's fixed.

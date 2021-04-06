@@ -21,12 +21,24 @@ import pytz
 import tqdm
 from auth0.v3 import authentication as auth0_authentication
 from auth0.v3 import management as auth0_management
+from covid_database import SqlAlchemyInterface as CSqlAlchemyInterface
+from covid_database import init_db as covidhub_init_db
+from covid_database import util as covidhub_database_util
+from covid_database.models import covidtracker
+from covid_database.models.enums import ConsensusGenomeStatus
+from covid_database.models.ngs_sample_tracking import (
+    CZBID,
+    ConsensusGenome,
+    DphCZBID,
+    Project,
+    SampleFastqs,
+)
 from sqlalchemy import and_, or_
-from sqlalchemy.orm import joinedload, Session
+from sqlalchemy.orm import Session, joinedload
 
 from aspen.aws.s3 import S3UrlParser
 from aspen.config import config as aspen_config
-from aspen.database.connection import session_scope, SqlAlchemyInterface
+from aspen.database.connection import SqlAlchemyInterface, session_scope
 from aspen.database.models import (
     Accession,
     Entity,
@@ -38,18 +50,6 @@ from aspen.database.models import (
     UploadedPathogenGenome,
     User,
     WorkflowStatusType,
-)
-from covid_database import init_db as covidhub_init_db
-from covid_database import SqlAlchemyInterface as CSqlAlchemyInterface
-from covid_database import util as covidhub_database_util
-from covid_database.models import covidtracker
-from covid_database.models.enums import ConsensusGenomeStatus
-from covid_database.models.ngs_sample_tracking import (
-    ConsensusGenome,
-    CZBID,
-    DphCZBID,
-    Project,
-    SampleFastqs,
 )
 
 logger = logging.getLogger(__name__)
