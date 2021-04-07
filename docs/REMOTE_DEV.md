@@ -28,6 +28,7 @@ The general remote dev workflow is:
 1. Make some more code changes
 1. Run `./scripts/happy update <your-stack-name>` to update the remote stack with your latest changes.
 1. When you don't need your stack anymore, run `./scripts/happy delete <your-stack-name>` to free up remote dev resources.
+1. Run `./scripts/happy ssh <your-stack-name> backend` to ssh into the ecs container
 
 If you forget which stacks you've created, just run `./scripts/happy list` at any time to list the current remote dev stacks.
 
@@ -65,4 +66,3 @@ browser. Loading any TFE web page will reauthorize your token, and you can then 
 
 1. Stack name needs to be a valid DNS prefix: starts with a letter, only includes letters, numbers, and dashes, less than 64 characters in length.
 1. Yes, you have access to manipulate your teammates' remote dev stacks. This is intentional, to enable collaboration on features. Please use responsibly.
-
