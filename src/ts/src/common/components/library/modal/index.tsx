@@ -21,12 +21,15 @@ const Modal: FunctionComponent<Props> = ({modal, className, customStyle, childre
     const [state, dispatch] = useReducer(modalReducer, { displayModal: false })
 
     function renderElements(state: ModalState): JSX.Element | null {
+        const closeModal = () => dispatch({ displayModal: false })
         const elements = (
-            <div className={cx(style.background, customStyle?.background)} onClick={() => dispatch({ displayModal: false })}>
+            <React.Fragment>
+                <div className={style.background} onClick={() => dispatch({ displayModal: false })}>
+                </div>
                 <div className={style.modal}>
                     {modal}
                 </div>
-            </div>
+            </React.Fragment>
         )
         if (state.displayModal) {
             return elements

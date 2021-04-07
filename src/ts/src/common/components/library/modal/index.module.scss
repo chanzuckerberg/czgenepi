@@ -5,21 +5,22 @@
 
 .background {
     z-index: 100;
-    display: block;
-    position: absolute;
+    position: fixed;
     top: 0px;
     left: 0px;
     height: 100vh;
     width: 100vw;
-    background-color: $gray-light;
-    opacity: 50%;
+    display: flex;
+    background-color: $gray-lightest;
+    opacity: 90%;
+}
 
-    .modal {
-        z-index: 101;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
+.modal {
+    z-index: 101;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .children {

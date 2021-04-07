@@ -8,6 +8,7 @@ import { ReactComponent as SampleIcon } from "common/icons/Sample.svg";
 import { ReactComponent as TreeIcon } from "common/icons/PhyloTree.svg";
 import { ReactComponent as ExternalLinkIcon } from "common/icons/ExternalLink.svg";
 
+import { TreeModal } from "./TreeModal";
 import style from "./index.module.scss";
 
 const DEFAULT_RENDERER = (value: JSONPrimitive, item: Record<string | number, JSONPrimitive>, _index: number): JSX.Element => {
@@ -27,16 +28,11 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
 
 const SampleRenderer = createTableCellRenderer(SAMPLE_CUSTOM_RENDERERS, DEFAULT_RENDERER);
 
-const TREE_MODAL = (
-        <div className={style.treeModal}>
-
-        </div>
-    )
 
 const TREE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
     name: (value: JSONPrimitive, item: Record<string | number, JSONPrimitive>, _index: number): JSX.Element => {
         return (
-                <Modal modal={TREE_MODAL} className={style.cell}>
+                <Modal modal={<TreeModal link={""}/>} className={style.cell}>
                     {<TreeIcon className={style.icon} />}
                     {value}
                     {<ExternalLinkIcon className={style.icon} />}
