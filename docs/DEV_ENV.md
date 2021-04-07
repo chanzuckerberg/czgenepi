@@ -26,8 +26,9 @@ In addition, there is a "utility" container that is configured very similar to t
 Both the frontend and backend services will automatically reload when their source code is modified, but they won't automatically rebuild when their dependencies (such as npm or pip package lists) change.
 
 To update frontend changes:
-1. add dependency to [src/ts/package.json](src/ts/package.json)
+1. add dependency to [src/ts/package.json](src/ts/package.json) (or add a new scripts command)
 2. run `make local-sync`
+
 
 To update backend dependencies:
 1. add the dependency to [src/py/Pipfile](src/py/Pipfile)
@@ -51,6 +52,9 @@ The dev environment is initialized with AWS Secrets/S3 data in the [src/py/scrip
 | `make local-status`       | Show the status of the containers in the dev environment.                            |                                                          |
 | `make local-clean`        | Remove everything related to the local dev environment (including db data!)          |                                                          |
 | `make local-sync`         | Re-sync the local-environment state after modifying library deps or docker configs   |                                                          |
+| `make fontend-test`         | run `npm test` in the frontend container (tests confined to `src/ts`)              |                                                          |
+| `make frontend-test-build`         | run `npm run build` in `src/ts`                                             |
+| `make frontend-check-style`         | run `npm run lint-ci` in `src/ts`                                          |
 | `make utility-alembic-upgrade-head`         | Upgrade local DB with new revisions                                |                                                          |
 | `make utility-alembic-autogenerate MESSAGE="descriptive message"`  | Autogenerate migration against local DB     |                                                          |
 | `make utility-test`         | Runs pytest in `src/py`                                                                  |                                                    |
