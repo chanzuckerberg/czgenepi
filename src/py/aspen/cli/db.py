@@ -16,6 +16,7 @@ from aspen.database.connection import enable_profiling, get_db_uri, init_db
 from aspen.database.models import *  # noqa: F401, F403
 from aspen.database.schema import create_tables_and_schema
 
+
 @cli.group()
 @click.option("--local", "config_cls", flag_value=DevelopmentConfig, default=True)
 @click.option("--remote", "config_cls", flag_value=RemoteDatabaseConfig)
@@ -60,12 +61,18 @@ def set_passwords_from_secret(ctx):
 
 
 @db.command("setup")
-@click.option("--load-data", type=str, default=lambda: os.environ.get('DATA_LOAD_PATH', ''), help="S3 URI for data to import")
+@click.option(
+    "--load-data",
+    type=str,
+    default=lambda: os.environ.get("DATA_LOAD_PATH", ""),
+    help="S3 URI for data to import",
+)
 @click.pass_context
 def setup(ctx, load_data):
     """If the database we're trying to connect to doesn't exist: create it and load a default dataset into it"""
     # TODO - we can move this to the top when https://github.com/kvesteri/sqlalchemy-utils/pull/506 is merged
-    from sqlalchemy_utils import database_exists, create_database
+    from sqlalchemy_utils import create_database, database_exists
+
     conf = ctx.obj["CONFIG"]
     engine = ctx.obj["ENGINE"]
     db_uri = conf.DATABASE_URI
@@ -79,7 +86,7 @@ def setup(ctx, load_data):
         print(f"Importing {load_data}")
         import_data(load_data, db_uri)
     else:
-        print(f"Creating empty tables")
+        print("Creating empty tables")
         create_tables_and_schema(engine)
 
 
@@ -94,6 +101,7 @@ def create_db(ctx):
 def drop(ctx):
     # TODO - we can move this to the top when https://github.com/kvesteri/sqlalchemy-utils/pull/506 is merged
     from sqlalchemy_utils import database_exists, drop_database
+
     conf = ctx.obj["CONFIG"]
     db_uri = conf.DATABASE_URI
     if database_exists(db_uri):
@@ -105,16 +113,16 @@ def drop(ctx):
 
 
 def import_data(s3_path, db_uri):
-    s3 = boto3.resource('s3')
+    s3 = boto3.resource("s3")
     bucket_name = s3_path.split("/")[0]
     path = "/".join(s3_path.split("/")[1:])
     print(f"downloading {path}")
-    s3.Bucket(bucket_name).download_file(path, 'db_data.sql')
+    s3.Bucket(bucket_name).download_file(path, "db_data.sql")
     import subprocess
+
     with subprocess.Popen(["psql", db_uri], stdin=subprocess.PIPE) as proc:
         proc.stdin.write(open("db_data.sql", "rb").read())
         proc.stdin.close()
-
 
 
 @db.command("interact")
