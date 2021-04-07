@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import enum
-from typing import TYPE_CHECKING, MutableSequence, Sequence
+from typing import MutableSequence, Sequence, TYPE_CHECKING
 
 import enumtables
 from sqlalchemy import (
@@ -10,10 +10,10 @@ from sqlalchemy import (
     DateTime,
     Float,
     ForeignKey,
+    func,
     Integer,
     String,
     UniqueConstraint,
-    func,
 )
 from sqlalchemy.orm import backref, deferred, relationship
 

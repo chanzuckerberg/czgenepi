@@ -2,7 +2,7 @@ import enum
 from typing import Mapping, MutableSequence, Union
 
 import enumtables
-from sqlalchemy import JSON, Column, DateTime, ForeignKey, Table
+from sqlalchemy import Column, DateTime, ForeignKey, JSON, Table
 from sqlalchemy.orm import relationship
 
 from aspen.database.models.base import base, idbase
