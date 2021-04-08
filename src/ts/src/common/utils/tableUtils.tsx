@@ -10,7 +10,7 @@ function createTableCellRenderer(
         header,
         value,
         item,
-        index
+        index,
     }: CustomTableRenderProps) => {
         let unwrappedValue;
         if (value === undefined) {

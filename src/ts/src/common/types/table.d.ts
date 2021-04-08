@@ -15,4 +15,8 @@ interface CustomRenderer extends FunctionComponent<CustomTableRenderProps> {
     ({ header, value, item, index }): JSX.Element;
 }
 
-type CellRenderer = (value: JSONPrimitive, item: Record<string | number, JSONPrimitive>, index: number) => JSX.Element;
+type CellRenderer = (
+    value: JSONPrimitive,
+    item: Record<string | number, JSONPrimitive>,
+    index: number
+) => JSX.Element;

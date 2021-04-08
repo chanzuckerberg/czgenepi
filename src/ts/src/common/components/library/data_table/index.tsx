@@ -40,11 +40,11 @@ const DataTable: FunctionComponent<Props> = ({
         return headers.map((header, index) => {
             const value = item[header.key];
             if (renderer === undefined) {
-              renderer = defaultCellRenderer;
+                renderer = defaultCellRenderer;
             }
             return (
                 <Table.Cell key={`${item[indexingKey]}-${header.key}`}>
-                    {renderer({header, value, item, index})}
+                    {renderer({ header, value, item, index })}
                 </Table.Cell>
             );
         });
