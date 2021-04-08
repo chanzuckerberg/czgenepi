@@ -1,2 +1,2 @@
-export * from "./typeUtils";
 export * from "./tableUtils";
+export * from "./typeUtils";

@@ -1,3 +1,3 @@
 interface Stylesheet {
-    readonly [key: string]: string;
+  readonly [key: string]: string;
 }
