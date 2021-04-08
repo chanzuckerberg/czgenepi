@@ -28,3 +28,18 @@
         cursor: pointer;
     }
 }
+
+
+.modalContent {
+    display: flex;
+    flex-direction: column;
+    margin: $space-xxl;
+
+    .modalHeader {
+        @include font-header-xl;
+    }
+
+    .modalBody {
+        @include font-body-s;
+    }
+}

@@ -3,12 +3,11 @@
 import React from "react";
 
 import { Modal } from "common/components";
-import { createTableCellRenderer } from "common/utils";
+import { createTableCellRenderer, createTreeModalInfo } from "common/utils";
 import { ReactComponent as SampleIcon } from "common/icons/Sample.svg";
 import { ReactComponent as TreeIcon } from "common/icons/PhyloTree.svg";
 import { ReactComponent as ExternalLinkIcon } from "common/icons/ExternalLink.svg";
 
-import { TreeModal } from "./TreeModal";
 import style from "./index.module.scss";
 
 const DEFAULT_RENDERER = (value: JSONPrimitive, item: Record<string | number, JSONPrimitive>, _index: number): JSX.Element => {
@@ -32,7 +31,7 @@ const SampleRenderer = createTableCellRenderer(SAMPLE_CUSTOM_RENDERERS, DEFAULT_
 const TREE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
     name: (value: JSONPrimitive, item: Record<string | number, JSONPrimitive>, _index: number): JSX.Element => {
         return (
-                <Modal modal={<TreeModal link={""}/>} className={style.cell}>
+                <Modal data={createTreeModalInfo("")} className={style.cell}>
                     {<TreeIcon className={style.icon} />}
                     {value}
                     {<ExternalLinkIcon className={style.icon} />}
