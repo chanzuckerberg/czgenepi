@@ -22,6 +22,8 @@ function modalReducer(state: ModalState, action: ModalState): ModalState {
 const Modal: FunctionComponent<Props> = ({data, className, customStyle, children }): JSX.Element => {
     const [state, dispatch] = useReducer(modalReducer, { displayModal: false })
 
+    const closeModal = () => dispatch({ displayModal: false })
+
     function renderButtons(buttonInfo: ButtonInfo[] | undefined): JSX.Element | null {
         if (buttonInfo === undefined || buttonInfo.length < 1) {
             return null;
@@ -31,26 +33,25 @@ const Modal: FunctionComponent<Props> = ({data, className, customStyle, children
             let onClick: (() => void) | undefined = undefined;
             if (link === "cancel") {
                 link = undefined;
-                onClick = () => dispatch({ displayModal: false })
+                onClick = closeModal;
             }
             return <Button link={link} type={button.type} onClick={onClick}>{button.content}</Button>
         })
 
-        return <span>{buttons}</span>
+        return <React.Fragment>{buttons}</React.Fragment>
     }
 
     function renderElements(state: ModalState): JSX.Element | null {
-        const closeModal = () => dispatch({ displayModal: false })
         const elements = (
             <React.Fragment>
-                <div className={style.background} onClick={() => dispatch({ displayModal: false })}>
+                <div className={cx(style.background, customStyle?.background)} onClick={closeModal}>
                 </div>
-                <div className={style.modal}>
-                    <div className={style.modalContent}>
-                        <div className={style.modalHeader}>
+                <div className={cx(style.modal, customStyle?.modal)}>
+                    <div className={style.content}>
+                        <div className={style.header}>
                             {data.header}
                         </div>
-                        <div className={style.modalBody}>
+                        <div className={style.body}>
                             {data.body}
                         </div>
                         <div className={style.buttons}>

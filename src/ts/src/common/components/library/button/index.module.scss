@@ -11,6 +11,9 @@
     border-color: $primary;
     border-width: 0.1em;
     display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 
     &:hover {
         background-color: $primary-dark;
@@ -28,9 +31,6 @@
 
 .text {
     @include font-body-xs;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
     margin: $space-xs $space-s $space-xs $space-s
 }
 
