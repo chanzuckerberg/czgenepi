@@ -1,6 +1,6 @@
 import cx from "classnames";
+import { ReactComponent as AspenLogo } from "common/styles/logos/AspenLogo.svg";
 import React, { FunctionComponent } from "react";
-import { ReactComponent as AspenLogo } from "src/common/styles/logos/AspenLogo.svg";
 import style from "./NavBar.module.scss";
 
 type Props = {

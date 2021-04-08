@@ -1,6 +1,6 @@
 // refactor as needed
 import axios from "axios";
-import { jsonToType } from "src/common/utils";
+import { jsonToType } from "common/utils";
 
 /** Generic functions to interface with the backend API **/
 
