@@ -42,7 +42,12 @@ oauth/pkcs12/certificate.pfx:
 	sudo chown -R $$(id -u):$$(id -g) $(PWD)/oauth/pkcs12
 
 .env.ecr:
-	echo DOCKER_REPO=$$(aws sts get-caller-identity --profile $(AWS_DEV_PROFILE) | jq -r .Account).dkr.ecr.us-west-2.amazonaws.com/ > .env.ecr;
+	export AWS_ACCOUNT_ID=$$(aws sts get-caller-identity --profile $(AWS_DEV_PROFILE) | jq -r .Account); \
+	if [ -n "$${AWS_ACCOUNT_ID}" ]; then \
+		echo DOCKER_REPO=$${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/ > .env.ecr; \
+	else \
+		false; \
+	fi
 
 .PHONY: local-ecr-login
 local-ecr-login:
