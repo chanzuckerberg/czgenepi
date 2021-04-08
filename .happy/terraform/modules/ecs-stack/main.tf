@@ -16,8 +16,8 @@ locals {
   remote_dev_prefix     = var.stack_prefix
   wait_for_steady_state = var.wait_for_steady_state
 
-  migration_cmd         = ["make", "run-db-migrations"]
-  deletion_cmd          = ["make", "db-drop"]
+  migration_cmd         = ["make", "remote-db-migrations"]
+  deletion_cmd          = ["make", "remote-db-drop"]
   backend_cmd           = []
   frontend_cmd          = ["npm", "run", "serve"]
   data_load_path        = length(var.sql_import_file) > 0 ? "${local.secret["s3_buckets"]["aspen"]["name"]}/${var.sql_import_file}" : ""

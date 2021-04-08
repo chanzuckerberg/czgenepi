@@ -58,14 +58,14 @@ init-db-cli:
 	pip install git+https://github.com/kvesteri/sqlalchemy-utils@c76256c64957aa3881fb9fcc58e2d8a41b914505
 	pip install .
 
-.PHONY: run-db-migrations
-db-migrations: init-db-cli
+.PHONY: remote-db-migrations
+remote-db-migrations: init-db-cli
 	if [ ! -z "${DATA_LOAD_PATH}" ]; then \
 		apt-get install -y postgresql-client; \
 		aspen-cli db --remote setup; \
 	fi
 	DB=remote alembic upgrade head
 
-.PHONY: db-drop
-db-drop: init-db-cli
+.PHONY: remote-db-drop
+remote-db-drop: init-db-cli
 	aspen-cli db --remote drop
