@@ -1,5 +1,10 @@
-from aspen.database.models.accessions import Accession  # noqa: F401
-from aspen.database.models.accessions import PublicRepositoryType  # noqa: F401
+from sqlalchemy.orm import configure_mappers
+
+from aspen.database.models.accessions import (  # noqa: F401
+    Accession,
+    AccessionWorkflow,
+    PublicRepositoryType,
+)
 from aspen.database.models.align_read import AlignRead, Bam  # noqa: F401
 from aspen.database.models.base import meta  # noqa: F401
 from aspen.database.models.cansee import CanSee, DataType  # noqa: F401
@@ -17,8 +22,8 @@ from aspen.database.models.host_filtering import (  # noqa: F401
 )
 from aspen.database.models.phylo_tree import PhyloRun, PhyloTree  # noqa: F401
 from aspen.database.models.sample import Sample  # noqa: F401
-from aspen.database.models.sequences import CallConsensus  # noqa: F401
 from aspen.database.models.sequences import (  # noqa: F401
+    CallConsensus,
     CalledPathogenGenome,
     PathogenGenome,
     SequencingInstrumentType,
@@ -33,3 +38,5 @@ from aspen.database.models.workflow import (  # noqa: F401
     WorkflowStatusType,
     WorkflowType,
 )
+
+configure_mappers()
