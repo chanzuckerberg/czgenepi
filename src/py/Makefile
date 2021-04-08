@@ -49,8 +49,8 @@ alembic-upgrade-head:
 alembic-autogenerate:
 	alembic revision --autogenerate -m "$(MESSAGE)" --rev-id $$(date +%Y%m%d_%H%M%S)
 
-.PHONY: init-db-cli
-init-db-cli:
+.PHONY: install-aspen-cli-deps
+install-aspen-cli-deps:
 	apt-get install -y git
 	# TODO - temporary hack until sqlalchemy-utils gets updated for sqlalchemy 1.4+
 	# We're waiting on this PR: https://github.com/kvesteri/sqlalchemy-utils/pull/506
@@ -59,7 +59,7 @@ init-db-cli:
 	pip install .
 
 .PHONY: remote-db-migrations
-remote-db-migrations: init-db-cli
+remote-db-migrations: install-aspen-cli-deps
 	if [ ! -z "${DATA_LOAD_PATH}" ]; then \
 		apt-get install -y postgresql-client; \
 		aspen-cli db --remote setup; \
@@ -67,5 +67,5 @@ remote-db-migrations: init-db-cli
 	DB=remote alembic upgrade head
 
 .PHONY: remote-db-drop
-remote-db-drop: init-db-cli
+remote-db-drop: install-aspen-cli-deps
 	aspen-cli db --remote drop
