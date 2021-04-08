@@ -233,9 +233,16 @@ class RemoteDatabaseConfig(Config):
         username = self.AWS_SECRET["DB"]["rw_username"]
         password = self.AWS_SECRET["DB"]["rw_password"]
 
-        rds = boto3.client("rds")
-        response = rds.describe_db_instances(DBInstanceIdentifier="aspen-db")
-        instance_info = response["DBInstances"][0]
-        instance_address = instance_info["Endpoint"]["Address"]
-        instance_port = instance_info["Endpoint"]["Port"]
-        return f"postgresql://{username}:{password}@{instance_address}:{instance_port}/aspen_db"
+        instance_address = None
+        try:
+            instance_address = self.AWS_SECRET["DB"]["address"]
+        except KeyError:
+            # TODO, remove this fallback when we tear down the old staging env.
+            rds = boto3.client("rds")
+            response = rds.describe_db_instances(DBInstanceIdentifier="aspen-db")
+            instance_info = response["DBInstances"][0]
+            instance_address = instance_info["Endpoint"]["Address"]
+            instance_port = instance_info["Endpoint"]["Port"]
+            instance_address = f"{instance_address}:{instance_port}"
+        db_name = os.getenv("REMOTE_DEV_PREFIX", "/aspen_db")
+        return f"postgresql://{username}:{password}@{instance_address}{db_name}"

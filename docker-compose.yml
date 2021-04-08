@@ -16,7 +16,7 @@ services:
       context: src/ts
       target: dev
       cache_from:
-        - "${DOCKER_REPO}aspen-frontend:branch-main"
+        - "${DOCKER_REPO}aspen-frontend:branch-trunk"
       args:
         - BUILDKIT_INLINE_CACHE=1
     restart: always
@@ -26,8 +26,6 @@ services:
       BUILD_PATH: build
       API_URL: http://localhost:3000
       CHOKIDAR_USEPOLLING: 'true'
-    depends_on:
-      - backend
     ports:
       - "8000:8000"
     volumes:
@@ -39,7 +37,7 @@ services:
       context: src/py
       target: dev
       cache_from:
-        - "${DOCKER_REPO}aspen-backend:branch-main"
+        - "${DOCKER_REPO}aspen-backend:branch-trunk"
       args:
         - BUILDKIT_INLINE_CACHE=1
     restart: always
@@ -74,13 +72,10 @@ services:
       context: src/py
       target: dev
       cache_from:
-        - "${DOCKER_REPO}aspen-backend:branch-main"
+        - "${DOCKER_REPO}aspen-backend:branch-trunk"
       args:
         - BUILDKIT_INLINE_CACHE=1
     restart: always
-    depends_on:
-      - database
-      - localstack
     environment:
       - PYTHONUNBUFFERED=1
       - RESTART_ON_FAILURE=yes
@@ -134,6 +129,24 @@ services:
     volumes:
       - ./oauth/pkcs12:/tmp/pkcs12:ro
       - ./oauth:/tmp/config:ro
+  nextstrain:
+    image: "${DOCKER_REPO}aspen-nextstrain-errorhandler"
+    build:
+      context: docker/aspen-batch
+      cache_from:
+        - "${DOCKER_REPO}aspen-nextstrain:branch-trunk"
+      args:
+        - BUILDKIT_INLINE_CACHE=1
+    command: ["sleep", "infinity"]
+  nextstrain-errorhandler:
+    image: "${DOCKER_REPO}aspen-nextstrain-errorhandler"
+    build:
+      context: docker/nextstrain-errorhandler
+      cache_from:
+        - "${DOCKER_REPO}aspen-nextstrain-errorhandler:branch-trunk"
+      args:
+        - BUILDKIT_INLINE_CACHE=1
+    command: ["sleep", "infinity"]
 volumes:
   database:
   localstack:
