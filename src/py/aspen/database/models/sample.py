@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING, Union
 
 from sqlalchemy import (
     Column,
@@ -167,3 +167,14 @@ class Sample(idbase, DictMixin):  # type: ignore
 
     sequencing_reads_collection: Optional[SequencingReadsCollection]
     uploaded_pathogen_genome: Optional[UploadedPathogenGenome]
+
+    def get_uploaded_entity(
+        self,
+    ) -> Union[SequencingReadsCollection, UploadedPathogenGenome]:
+        if self.sequencing_reads_collection is not None:
+            return self.sequencing_reads_collection
+        elif self.uploaded_pathogen_genome is not None:
+            return self.uploaded_pathogen_genome
+        raise ValueError(
+            "Sample has neither sequencing reads nor uploaded pathogen genome."
+        )
