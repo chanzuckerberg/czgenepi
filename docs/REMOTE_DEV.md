@@ -48,6 +48,9 @@ Options:
   --help              Show this message and exit.
 ```
 
+### Remote Dev Database management
+There are two commands in the Aspen CLI that exist specifically to enable management of remote dev environments: `aspen-cli db --remote setup` and `aspen-cli db --remote drop`. The `setup` command is responsible for creating a new database in our Aurora database, and importing a db snapshot into the new database. The `drop` command drops a database when a remote dev stack is deleted.
+
 ### GitHub Action Ingegration
 A new stack can also be deployed to remote development environment through GitHub Action integration. Pushing any branch prefixed with "rdev-" will trigger the GH Action workflow to create or update a dev stack, with the stack name equals the part of branch name following the prefix, e.g. pushing branch "rdev-my-dev-branch" will deploy the stack "my-dev-branch" in the remote dev enviroment. This is useful in situation where local connections is slow.
 
