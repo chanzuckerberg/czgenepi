@@ -1,88 +1,79 @@
-# This workflow will install Typescript/React dependencies and run tests with a single version of Node
-
-name: ts-tests
+name: Push Tests - Frontend
 
 on:
   push:
     branches:
       - trunk
   pull_request:
-    branches:
-      - '**'
+    branches: "**"
 
-# Because of https://github.com/actions/runner/issues/353, we need to explicitly set the shell to bash to get sane defaults (-o pipefail).
-defaults:
-  run:
-    shell: bash
+env:
+  # Force using BuildKit instead of normal Docker, required so that metadata
+  # is written/read to allow us to use layers of previous builds as cache.
+  DOCKER_BUILDKIT: 1
+  COMPOSE_DOCKER_CLI_BUILD: 1
+  DOCKER_REPO: ${{ secrets.ECR_REPO }}/
 
 jobs:
-  ts-code-style:
-    runs-on: ubuntu-latest
-
+  ts-lint:
+    runs-on: ubuntu-20.04
     steps:
+      - name: Configure AWS prod Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-duration-seconds: 900
+      - name: Login to ECR
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ secrets.ECR_REPO }}
       - uses: actions/checkout@v2
-      - name: Set up Node 14.15
-        id: setup
-        uses: actions/setup-node@v1
-        with:
-          node-version: 14.15.4
-      - name: Cache dependencies
-        id: cache-deps
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: ~/.npm
-          key: ts-tests-v0-${{ runner.os }}-${{ steps.setup.outputs.node-version }}-${{ hashFiles('.github/workflows/ts-tests.yml') }}
-      - name: Install dependencies
-        run: npm --prefix src/ts ci
-      - name: Verify code style
-        run: npm --prefix src/ts run lint-ci
-
-  ts-tests:
-    runs-on: ubuntu-latest
-    needs: ts-code-style
-
+      - name: Lint ts
+        run: |
+          echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
+          make frontend-check-style
+  ts-test:
+    runs-on: ubuntu-20.04
     steps:
+      - name: Configure AWS prod Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-duration-seconds: 900
+      - name: Login to ECR
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ secrets.ECR_REPO }}
       - uses: actions/checkout@v2
-      - name: Set up Node 14.15
-        id: setup
-        uses: actions/setup-node@v1
-        with:
-          node-version: 14.15.4
-      - name: Cache dependencies
-        id: cache-deps
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: ~/.npm
-          key: ts-tests-v0-${{ runner.os }}-${{ steps.setup.outputs.node-version }}-${{ hashFiles('.github/workflows/ts-tests.yml') }}
-      - name: Install dependencies
-        run: npm --prefix src/ts ci
-      - name: Run tests
-        run: npm --prefix src/ts test
-
+      - name: Test ts
+        run: |
+          echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
+          make frontend-test
   ts-test-build:
-    runs-on: ubuntu-latest
-    needs: ts-code-style
-
+    runs-on: ubuntu-20.04
     steps:
+      - name: Configure AWS prod Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-duration-seconds: 900
+      - name: Login to ECR
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ secrets.ECR_REPO }}
       - uses: actions/checkout@v2
-      - name: Set up Node 14.15
-        id: setup
-        uses: actions/setup-node@v1
-        with:
-          node-version: 14.15.4
-      - name: Cache dependencies
-        id: cache-deps
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: ~/.npm
-          key: ts-tests-v0-${{ runner.os }}-${{ steps.setup.outputs.node-version }}-${{ hashFiles('.github/workflows/ts-tests.yml') }}
-      - name: Install dependencies
-        run: npm --prefix src/ts ci
-      - name: Transpile
-        run: npm --prefix src/ts run build
+      - name: Test ts build
+        run: |
+          echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
+          mkdir src/ts/build
+          chmod -R a+w src/ts/build
+          make frontend-test-build

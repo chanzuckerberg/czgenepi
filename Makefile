@@ -1,126 +1,29 @@
 SHELL := /bin/bash
-STYLE_CHECK_PYTHON_CODE_DIRECTORIES = src/py workflows
-STYLE_CHECK_PYTHON_CODE_SKIPPED_DIRECTORIES = src/py/third-party
-TYPE_CHECK_BASE_PYTHON_CODE_DIRECTORIES = src/py/aspen
-TYPE_CHECK_INDIVIDUAL_PYTHON_CODE_DIRECTORIES = src/py/database_migrations $(shell ls -d workflows/*)
 
-### DOCKER #################################################
-#
+### DOCKER ENVIRONMENTAL VARS #################################################
 export DOCKER_BUILDKIT:=1
 export COMPOSE_DOCKER_CLI_BUILD:=1
 export COMPOSE_OPTS:=--env .env.ecr
 export AWS_DEV_PROFILE=genepi-dev
 export BACKEND_APP_ROOT=/usr/src/app
 
-### DATABASE #################################################
-#
-
-LOCAL_DB_CONTAINER_NAME = aspen-local
-LOCAL_DB_CONTAINER_ID = $(shell docker ps -a | grep $(LOCAL_DB_CONTAINER_NAME) | awk '{print $$1}')
-LOCAL_DB_CONTAINER_RUNNING_ID = $(shell docker ps | grep $(LOCAL_DB_CONTAINER_NAME) | awk '{print $$1}')
+### DATABASE VARIABLES #################################################
 LOCAL_DB_NAME = aspen_db
 # This has to be "postgres" to ease moving snapshots from RDS.
 LOCAL_DB_ADMIN_USERNAME = postgres
 LOCAL_DB_ADMIN_PASSWORD = password_postgres
-LOCAL_DB_RW_USERNAME = user_rw
-LOCAL_DB_RW_PASSWORD = password_rw
-LOCAL_DB_RO_USERNAME = user_ro
-LOCAL_DB_RO_PASSWORD = password_ro
-DOCKER_IMAGE = czbiohub/covidhub-postgres:13.1-alpine
 
-start-local-db:
-	@if [ "$(LOCAL_DB_CONTAINER_ID)" == "" ]; then \
-		docker create --name $(LOCAL_DB_CONTAINER_NAME) -p 5432:5432 \
-		-e POSTGRES_USER=$(LOCAL_DB_ADMIN_USERNAME) \
-		-e POSTGRES_PASSWORD=$(LOCAL_DB_ADMIN_PASSWORD) \
-		-e POSTGRES_DB=$(LOCAL_DB_NAME) \
-		$(DOCKER_IMAGE); \
-	fi
-	@if [ "$(LOCAL_DB_CONTAINER_RUNNING_ID)" == "" ]; then \
-		docker start $(LOCAL_DB_CONTAINER_NAME) && sleep 3; \
-	fi
 
-setup-local-db:
-	@$(MAKE) start-local-db
-	@docker exec $(LOCAL_DB_CONTAINER_NAME) psql -h localhost -d $(LOCAL_DB_NAME) -U $(LOCAL_DB_ADMIN_USERNAME) -c "CREATE USER $(LOCAL_DB_RW_USERNAME) WITH PASSWORD '$(LOCAL_DB_RW_PASSWORD)';"
-	@docker exec $(LOCAL_DB_CONTAINER_NAME) psql -h localhost -d $(LOCAL_DB_NAME) -U $(LOCAL_DB_ADMIN_USERNAME) -c "CREATE USER $(LOCAL_DB_RO_USERNAME) WITH PASSWORD '$(LOCAL_DB_RO_PASSWORD)';"
-	@docker exec $(LOCAL_DB_CONTAINER_NAME) psql -h localhost -d $(LOCAL_DB_NAME) -U $(LOCAL_DB_ADMIN_USERNAME) -c "GRANT CREATE ON DATABASE $(LOCAL_DB_NAME) TO $(LOCAL_DB_RW_USERNAME);"
-
-init-local-db:
-	@$(MAKE) setup-local-db
-	aspen-cli db create
-	cd src/py; DB=local alembic stamp head
-
-stop-local-db:
-	@if [ "$(LOCAL_DB_CONTAINER_RUNNING_ID)" != "" ]; then \
-		docker stop $(LOCAL_DB_CONTAINER_NAME); \
-	fi
-
-drop-local-db:
-	@$(MAKE) stop-local-db
-	@( read -p "Delete local database container? [y/N]: " sure && case "$$sure" in [yY]) true;; *) false;; esac )
-	docker rm --force $(LOCAL_DB_CONTAINER_NAME) || true
-
-.PHONY: start-local-db setup-local-db init-local-db stop-local-db drop-local-db
-
-#
-##############################################################
-
-### STYLE CHECKS #############################################
-#
-
-style: lint black isort mypy
-
-lint:
-	flake8 --ignore "E203, E231, E501, W503" $(STYLE_CHECK_PYTHON_CODE_DIRECTORIES) --exclude third-party
-
-black:
-	black --check $(STYLE_CHECK_PYTHON_CODE_DIRECTORIES) --exclude $(STYLE_CHECK_PYTHON_CODE_SKIPPED_DIRECTORIES)
-
-isort:
-	isort --check $(STYLE_CHECK_PYTHON_CODE_DIRECTORIES) --skip $(STYLE_CHECK_PYTHON_CODE_SKIPPED_DIRECTORIES)
-
-MYPY_TARGETS = $(foreach stylecheckdir, $(TYPE_CHECK_INDIVIDUAL_PYTHON_CODE_DIRECTORIES), mypy-$(stylecheckdir))
-
-mypy: mypy-base $(MYPY_TARGETS)
-
-mypy-base:
-	mypy $(TYPE_CHECK_BASE_PYTHON_CODE_DIRECTORIES)
-
-$(MYPY_TARGETS): mypy-%: mypy-base
-	mypy $(TYPE_CHECK_BASE_PYTHON_CODE_DIRECTORIES) $*
-
-.PHONY: style lint black isort
-
-#
-##############################################################
-
-### REQUIREMENTS #############################################
-#
-
-update-deps :
-	pipenv update
-	pipenv lock -r >| src/py/requirements.txt
-
-.PHONY: update-deps
-
-#
-##############################################################
-
-### TESTTING #############################################
-#
-
-unit-tests:
-	pytest -n8 src/py/aspen
-
+### HELPFUL #################################################
 help: ## display help for this makefile
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 .PHONY: help
 
-#
-##############################################################
-### Docker local dev #########################################
-#
+.PHONY: rm-pycache
+rm-pycache: ## remove all __pycache__ files (run if encountering issues with pycharm debugger (containers exiting prematurely))
+	find . -name '__pycache__' | xargs rm -rf
+
+### DOCKER LOCAL DEV #########################################
 oauth/pkcs12/certificate.pfx:
 	# All calls to the openssl cli happen in the oidc-server-mock container.
 	@echo "Generating certificates for local dev"
@@ -139,7 +42,12 @@ oauth/pkcs12/certificate.pfx:
 	sudo chown -R $$(id -u):$$(id -g) $(PWD)/oauth/pkcs12
 
 .env.ecr:
-	echo DOCKER_REPO=$$(aws sts get-caller-identity --profile $(AWS_DEV_PROFILE) | jq -r .Account).dkr.ecr.us-west-2.amazonaws.com/ > .env.ecr;
+	export AWS_ACCOUNT_ID=$$(aws sts get-caller-identity --profile $(AWS_DEV_PROFILE) | jq -r .Account); \
+	if [ -n "$${AWS_ACCOUNT_ID}" ]; then \
+		echo DOCKER_REPO=$${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/ > .env.ecr; \
+	else \
+		false; \
+	fi
 
 .PHONY: local-ecr-login
 local-ecr-login:
@@ -150,6 +58,7 @@ local-ecr-login:
 .PHONY: local-init
 local-init: oauth/pkcs12/certificate.pfx .env.ecr local-ecr-login ## Launch a new local dev env and populate it with test data.
 	docker-compose $(COMPOSE_OPTS) up -d
+	@docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@localhost:5432/$(LOCAL_DB_NAME)" -c "alter user $(LOCAL_DB_ADMIN_USERNAME) with password '$(LOCAL_DB_ADMIN_PASSWORD)';"
 	docker-compose exec -T utility pip3 install awscli
 	docker-compose exec -T utility $(BACKEND_APP_ROOT)/scripts/setup_dev_data.sh
 	docker-compose exec -T utility python scripts/setup_localdata.py
@@ -183,17 +92,17 @@ local-stop: ## Stop the local dev environment.
 .PHONY: local-clean
 local-clean: ## Remove everything related to the local dev environment (including db data!)
 	-if [ -f ./oauth/pkcs12/server.crt ] ; then \
-	    if [ "$$(uname -s)" == "Linux" ]; then \
-	    	echo "Removing this certificate from /usr/local/share requires sudo access"; \
+		if [ "$$(uname -s)" == "Linux" ]; then \
+			echo "Removing this certificate from /usr/local/share requires sudo access"; \
 		sudo cp oauth/pkcs12/server.crt /usr/local/share/ca-certificates/; \
 		sudo update-ca-certificates; \
-	    fi; \
-	    if [ "$$(uname -s)" == "Darwin" ]; then \
-	    	export CERT=$$(docker run -v $(PWD)/oauth/pkcs12:/tmp/certs --workdir /tmp/certs --rm=true --entrypoint "" soluto/oidc-server-mock:0.3.0 bash -c "openssl x509 -in server.crt -outform DER | sha1sum | cut -d ' ' -f 1"); \
-	    	echo ""; \
-	    	echo "Removing this certificate requires sudo access"; \
-	    	sudo security delete-certificate -Z $${CERT} /Library/Keychains/System.keychain; \
-	    fi; \
+		fi; \
+		if [ "$$(uname -s)" == "Darwin" ]; then \
+			export CERT=$$(docker run -v $(PWD)/oauth/pkcs12:/tmp/certs --workdir /tmp/certs --rm=true --entrypoint "" soluto/oidc-server-mock:0.3.0 bash -c "openssl x509 -in server.crt -outform DER | sha1sum | cut -d ' ' -f 1"); \
+			echo ""; \
+			echo "Removing this certificate requires sudo access"; \
+			sudo security delete-certificate -Z $${CERT} /Library/Keychains/System.keychain; \
+		fi; \
 	fi;
 	-rm -rf ./oauth/pkcs12/server*
 	-rm -rf ./oauth/pkcs12/certificate*
@@ -217,13 +126,28 @@ local-pgconsole: ## Connect to the local postgres database.
 local-dbconsole: ## Connect to the local postgres database.
 	docker-compose exec utility aspen-cli db --docker interact
 
+.PHONY: local-dbconsole-profile
+local-dbconsole-profile: ## Connect to the local postgres database and profile queries.
+	docker-compose exec utility aspen-cli db --docker interact --profile
+
 .PHONY: local-update-deps
 local-update-deps: ## Update requirements.txt to reflect pipenv file changes.
+	docker-compose exec utility pipenv --python 3.9
 	docker-compose exec utility pipenv update
-	docker-compose exec utility pipenv lock -r >| src/py/requirements.txt
+	docker-compose exec utility bash -c "pipenv lock -r >| requirements.txt"
 
-### DOCKER ###################################################
-#
+
+### ACCESSING CONTAINER MAKE COMMANDS ###################################################
+utility-%: ## Run make commands in the utility container (src/py/Makefile)
+	docker-compose exec utility make $(subst utility-,,$@) MESSAGE="$(MESSAGE)"
+
+backend-%: .env.ecr ## Run make commands in the backend container (src/py/Makefile)
+	docker-compose $(COMPOSE_OPTS) run --no-deps --rm backend make $(subst backend-,,$@)
+
+frontend-%: .env.ecr ## Run make commands in the backend container (src/ts/Makefile)
+	docker-compose $(COMPOSE_OPTS) run -e CI=true --no-deps --rm frontend make $(subst frontend-,,$@)
+
+### DOCKER FOR WORKFLOWS ###################################################
 
 build-docker: export ASPEN_DOCKER_IMAGE_VERSION=$(shell date +%Y%m%d_%H%M)
 build-docker:
@@ -237,6 +161,6 @@ build-docker:
 	@echo "If you wish to clean up some of your old aspen docker images, run:"
 	@echo "  docker image rm \$\$$(docker image ls -q cziaspen/batch -f 'before=cziaspen/batch:latest')"
 
-#
-##############################################################
+
+### TERRAFORM ###################################################
 include terraform.mk

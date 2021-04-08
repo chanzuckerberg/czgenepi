@@ -45,13 +45,13 @@ _WorkflowStatusTypeTable = enumtables.EnumTable(
 
 WorkflowInputs = Table(
     "workflow_inputs",
-    base.metadata,
+    base.metadata,  # type: ignore
     Column("entity_id", ForeignKey(Entity.id), primary_key=True),
     Column("workflow_id", ForeignKey(f"{_WORKFLOW_TABLENAME}.id"), primary_key=True),
 )
 
 
-class Workflow(idbase):
+class Workflow(idbase):  # type: ignore
     """A workflow describes some computational process undertaken on this system that
     takes one or more entities as inputs and produces one or more entities as
     outputs."""
@@ -91,7 +91,7 @@ class Workflow(idbase):
         ),
     )
 
-    inputs = relationship(
+    inputs = relationship(  # type: ignore
         Entity,
         secondary=WorkflowInputs,
         backref="consuming_workflows",

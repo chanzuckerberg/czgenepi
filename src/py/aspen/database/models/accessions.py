@@ -24,7 +24,7 @@ _PublicRepositoryTypeTable = enumtables.EnumTable(
 )
 
 
-class Accession(idbase):
+class Accession(idbase):  # type: ignore
     """A single accession of an entity."""
 
     __tablename__ = "accessions"
@@ -35,7 +35,7 @@ class Accession(idbase):
         ForeignKey(Entity.id),
         nullable=False,
     )
-    entity = relationship(Entity, backref=backref("accessions", uselist=True))
+    entity = relationship(Entity, backref=backref("accessions", uselist=True))  # type: ignore
 
     repository_type = Column(
         Enum(PublicRepositoryType),

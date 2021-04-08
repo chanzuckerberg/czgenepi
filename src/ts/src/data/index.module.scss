@@ -1,62 +1,62 @@
-@import "common/styles/spacing";
-@import "common/styles/typography";
-@import "common/styles/colors";
+@import "src/common/styles/spacing";
+@import "src/common/styles/typography";
+@import "src/common/styles/colors";
 
 .dataRoot {
-    display: flex;
-    flex-flow: column wrap;
-    align-content: flex-start;
-    height: 100%;
+  display: flex;
+  flex-flow: column wrap;
+  align-content: flex-start;
+  height: 100%;
 
-    .navigation {
-        width: 100%;
-        margin-bottom: $space-xl;
-        border-bottom: $space-xxs solid $gray-lightest;
+  .navigation {
+    width: 100%;
+    margin-bottom: $space-xl;
+    border-bottom: $space-xxs solid $gray-lightest;
 
-        .menu {
-            align-items: center;
+    .menu {
+      align-items: center;
 
-            a {
-                &:first-child {
-                    margin-left: 10em;
+      a {
+        &:first-child {
+          margin-left: 10em;
 
-                    div {
-                        // overwrite semantic-ui style
-                        padding-left: 0 !important;
-                    }
-                }
-            }
-
-            .menuItem {
-                height: 100%;
-
-                .category {
-                    align-items: center;
-                    box-sizing: border-box;
-
-                    .title {
-                        @include font-header-m;
-                        margin-right: $space-m;
-                        color: $gray-dark;
-
-                        &.active {
-                            color: $black;
-                            border-bottom: $space-xxs solid $primary;
-                        }
-                    }
-
-                    .count {
-                        @include font-body-m;
-                        color: $gray-dark;
-                    }
-                }
-            }
+          div {
+            // overwrite semantic-ui style
+            padding-left: 0 !important;
+          }
         }
-    }
+      }
 
-    .view {
-        margin: 0 10em 0 10em;
+      .menuItem {
+        height: 100%;
+
+        .category {
+          align-items: center;
+          box-sizing: border-box;
+
+          .title {
+            @include font-header-m;
+            margin-right: $space-m;
+            color: $gray-dark;
+
+            &.active {
+              color: $black;
+              border-bottom: $space-xxs solid $primary;
+            }
+          }
+
+          .count {
+            @include font-body-m;
+            color: $gray-dark;
+          }
+        }
+      }
     }
+  }
+
+  .view {
+    margin: 0 10em 0 10em;
+  }
 }
 
 .cell {

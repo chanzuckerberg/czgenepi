@@ -1,27 +1,27 @@
-@import "common/styles/colors";
-@import "common/styles/typography";
-@import "common/styles/spacing";
-@import "common/styles/corners";
+@import "src/common/styles/colors";
+@import "src/common/styles/typography";
+@import "src/common/styles/spacing";
+@import "src/common/styles/corners";
 
 .header {
-    .headerCell {
-        @include font-header-s;
-        color: $gray-dark;
-    }
+  .headerCell {
+    @include font-header-s;
+    color: $gray-dark;
+  }
 }
 
 .cell {
-    @include font-header-s;
-    align-items: center;
-    margin: $space-xs 0 $space-xs 0;
+  @include font-header-s;
+  align-items: center;
+  margin: $space-xs 0 $space-xs 0;
 
-    .icon {
-        margin: 0 $space-l 0 $space-l;
-        fill: $gray-light;
-    }
+  .icon {
+    margin: 0 $space-l 0 $space-l;
+    fill: $gray-light;
+  }
 
-    a {
-        @include font-caps-xxs;
-        color: $primary;
-    }
+  a {
+    @include font-caps-xxs;
+    color: $primary;
+  }
 }

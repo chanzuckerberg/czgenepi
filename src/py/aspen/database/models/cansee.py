@@ -28,7 +28,7 @@ _DataTypeTable = enumtables.EnumTable(
 )
 
 
-class CanSee(idbase):
+class CanSee(idbase):  # type: ignore
     """
     Expresses a relationship where users from a group can see some data of another
     group.
@@ -37,11 +37,11 @@ class CanSee(idbase):
     __tablename__ = "can_see"
 
     viewer_group_id = Column(Integer, ForeignKey(Group.id), nullable=False)
-    viewer_group = relationship(
+    viewer_group = relationship(  # type: ignore
         Group, backref=backref("can_see", uselist=True), foreign_keys=[viewer_group_id]
     )
     owner_group_id = Column(Integer, ForeignKey(Group.id), nullable=False)
-    owner_group = relationship(
+    owner_group = relationship(  # type: ignore
         Group,
         backref=backref("can_be_seen_by", uselist=True),
         foreign_keys=[owner_group_id],

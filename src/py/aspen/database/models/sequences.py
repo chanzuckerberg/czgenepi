@@ -102,7 +102,7 @@ class SequencingReadsCollection(Entity, DictMixin):
 
     entity_id = Column(Integer, ForeignKey(Entity.id), primary_key=True)
     sample_id = Column(Integer, ForeignKey(Sample.id), unique=True, nullable=False)
-    sample = relationship(
+    sample = relationship(  # type: ignore
         Sample,
         backref=backref("sequencing_reads_collection", uselist=False),
     )
@@ -181,7 +181,7 @@ class UploadedPathogenGenome(PathogenGenome):
         Integer, ForeignKey(PathogenGenome.entity_id), primary_key=True
     )
     sample_id = Column(Integer, ForeignKey(Sample.id), unique=True, nullable=False)
-    sample = relationship(
+    sample = relationship(  # type: ignore
         Sample,
         backref=backref("uploaded_pathogen_genome", uselist=False),
     )

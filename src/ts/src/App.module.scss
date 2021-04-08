@@ -1,13 +1,10 @@
 @import "common/styles/spacing";
 
 .app {
-    flex-flow: column wrap;
-    justify-content: center;
+  flex-flow: column wrap;
+  justify-content: center;
 
-    .navBar {
-        height: 4em;
-    }
-
-    .view {
-    }
+  .navBar {
+    height: 4em;
+  }
 }
