@@ -12,19 +12,7 @@ resource "aws_sfn_state_machine" "state_machine" {
         "Parameters": {
           "JobDefinition": "${var.job_definition_arn}",
           "JobName": "${var.app_name}",
-          "JobQueue": "${var.job_queue_arn}",
-          "ContainerOverrides": {
-            "Environment": [
-              {
-                "Name": "DROPBOX_URL",
-                "Value.$": "$.url"
-              },
-              {
-                "Name": "DATASET_ID",
-                "Value.$": "$.dataset_uuid"
-              }
-            ]
-          }
+          "JobQueue": "${var.job_queue_arn}"
         },
         "End": true,
         "TimeoutSeconds": 10800,

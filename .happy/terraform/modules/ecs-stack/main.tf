@@ -20,7 +20,6 @@ locals {
   deletion_cmd          = ["make", "db-drop"]
   backend_cmd           = []
   frontend_cmd          = ["npm", "run", "serve"]
-  nextstrain_cmd        = ""
   data_load_path        = length(var.sql_import_file) > 0 ? "${local.secret["s3_buckets"]["aspen"]["name"]}/${var.sql_import_file}" : ""
 
   vpc_id                = local.secret["vpc_id"]
@@ -37,12 +36,12 @@ locals {
   external_dns          = local.secret["external_zone_name"]
   internal_dns          = local.secret["internal_zone_name"]
 
-  frontend_listener_arn = try(local.secret[local.alb_key]["frontend"]["listener_arn"], "")
-  backend_listener_arn  = try(local.secret[local.alb_key]["backend"]["listener_arn"], "")
-  frontend_alb_zone     = try(local.secret[local.alb_key]["frontend"]["zone_id"], "")
-  backend_alb_zone      = try(local.secret[local.alb_key]["backend"]["zone_id"], "")
-  frontend_alb_dns      = try(local.secret[local.alb_key]["frontend"]["dns_name"], "")
-  backend_alb_dns       = try(local.secret[local.alb_key]["backend"]["dns_name"], "")
+  frontend_listener_arn = local.secret[local.alb_key]["frontend"]["listener_arn"]
+  backend_listener_arn  = local.secret[local.alb_key]["backend"]["listener_arn"]
+  frontend_alb_zone     = local.secret[local.alb_key]["frontend"]["zone_id"]
+  backend_alb_zone      = local.secret[local.alb_key]["backend"]["zone_id"]
+  frontend_alb_dns      = local.secret[local.alb_key]["frontend"]["dns_name"]
+  backend_alb_dns       = local.secret[local.alb_key]["backend"]["dns_name"]
 
   ecs_role_arn          = local.secret["service_roles"]["ecs_role"]
   sfn_role_arn          = local.secret["service_roles"]["sfn_nextstrain"]
@@ -184,7 +183,6 @@ module nextstrain_batch {
   stack_resource_prefix = local.stack_resource_prefix
   image                 = "${local.nextstrain_image_repo}:${local.image_tag}"
   batch_role_arn        = local.batch_role_arn
-  cmd                   = local.nextstrain_cmd
   custom_stack_name     = local.custom_stack_name
   remote_dev_prefix     = local.remote_dev_prefix
   deployment_stage      = local.deployment_stage

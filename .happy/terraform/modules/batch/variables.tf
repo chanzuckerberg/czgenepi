@@ -5,7 +5,7 @@ variable stack_resource_prefix {
 
 variable app_name {
   type        = string
-  description = "Batch app name"
+  description = "Batch workflow name (job definition suffix)"
 }
 
 variable image {
@@ -18,12 +18,6 @@ variable batch_role_arn {
   description = "ARN for the role assumed by tasks"
 }
 
-variable cmd {
-  type        = string
-  description = "Command to run"
-  default     = ""
-}
-
 variable custom_stack_name {
   type        = string
   description = "Please provide the stack name"
@@ -31,7 +25,7 @@ variable custom_stack_name {
 
 variable remote_dev_prefix {
   type        = string
-  description = "S3 storage path / db schema prefix"
+  description = "Remote Dev namespace (db schema prefix)"
   default     = ""
 }
 
