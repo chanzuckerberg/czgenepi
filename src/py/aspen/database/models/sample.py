@@ -1,16 +1,16 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import Optional, TYPE_CHECKING
 
 from sqlalchemy import (
-    JSON,
     Column,
     Date,
     ForeignKey,
     Integer,
+    JSON,
     String,
-    UniqueConstraint,
     text,
+    UniqueConstraint,
 )
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import backref, relationship

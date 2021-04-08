@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import enum
 from typing import (
-    TYPE_CHECKING,
     Mapping,
     MutableSequence,
     Optional,
     Sequence,
     Tuple,
     Type,
+    TYPE_CHECKING,
     TypeVar,
     Union,
 )
