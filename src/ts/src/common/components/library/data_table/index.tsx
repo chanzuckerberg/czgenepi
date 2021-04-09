@@ -3,7 +3,7 @@ import { Table } from "semantic-ui-react";
 import style from "./index.module.scss";
 
 interface Props {
-  data?: Record<string | number, JSONPrimitive>[];
+  data?: TableItem[];
   headers: Header[];
   renderer?: CustomRenderer;
 }
@@ -33,9 +33,7 @@ const DataTable: FunctionComponent<Props> = ({
       <div className={style.headerCell}>{column.text}</div>
     </Table.HeaderCell>
   ));
-  const sampleRow = (
-    item: Record<string | number, JSONPrimitive>
-  ): Array<JSX.Element> => {
+  const sampleRow = (item: TableItem): Array<JSX.Element> => {
     return headers.map((header, index) => {
       const value = item[header.key];
       if (renderer === undefined) {
@@ -49,9 +47,7 @@ const DataTable: FunctionComponent<Props> = ({
     });
   };
 
-  function tableRows(
-    data: Record<string | number, JSONPrimitive>[]
-  ): Array<JSX.Element> {
+  function tableRows(data: TableItem[]): Array<JSX.Element> {
     return data.map((item) => (
       <Table.Row key={`${item[indexingKey]}`}>{sampleRow(item)}</Table.Row>
     ));

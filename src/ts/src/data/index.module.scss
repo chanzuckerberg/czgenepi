@@ -1,6 +1,6 @@
-@import "common/styles/spacing";
-@import "common/styles/typography";
-@import "common/styles/colors";
+@import "src/common/styles/spacing";
+@import "src/common/styles/typography";
+@import "src/common/styles/colors";
 
 .cell {
   @include font-header-s;

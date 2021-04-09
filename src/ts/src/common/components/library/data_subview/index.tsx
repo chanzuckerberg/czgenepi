@@ -1,11 +1,11 @@
-import { DataTable } from "common/components";
 import { escapeRegExp } from "lodash/fp";
 import React, { FunctionComponent, useReducer } from "react";
 import { Input } from "semantic-ui-react";
+import { DataTable } from "src/common/components";
 import style from "./index.module.scss";
 
 interface Props {
-  data?: Record<string | number, JSONPrimitive>[];
+  data?: TableItem[];
   headers: Header[];
   renderer?: CustomRenderer;
 }
@@ -17,7 +17,7 @@ interface InputOnChangeData {
 
 interface SearchState {
   searching?: boolean;
-  results?: Record<string | number, JSONPrimitive>[];
+  results?: TableItem[];
 }
 
 function searchReducer(state: SearchState, action: SearchState): SearchState {
@@ -58,7 +58,7 @@ const DataSubview: FunctionComponent<Props> = ({
     dispatch({ results: filteredData, searching: false });
   };
 
-  const render = (tableData: Record<string | number, JSONPrimitive>[]) => {
+  const render = (tableData: TableItem[]) => {
     return (
       <div className={style.samplesRoot}>
         <div className={style.searchBar}>
@@ -78,7 +78,7 @@ const DataSubview: FunctionComponent<Props> = ({
   };
 
   if (state.results === undefined) {
-    let tableData: Record<string | number, JSONPrimitive>[] = [];
+    let tableData: TableItem[] = [];
     if (data !== undefined) {
       dispatch({ results: data });
       tableData = data;

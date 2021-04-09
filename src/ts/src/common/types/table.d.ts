@@ -4,10 +4,12 @@ interface Header {
   key: string | number;
 }
 
+type TableItem = Record<string | number, JSONPrimitive>;
+
 interface CustomTableRenderProps {
   header: Header;
   value: JSONPrimitive | undefined;
-  item: Record<string | number, JSONPrimitive>;
+  item: TableItem;
   index: number;
 }
 
@@ -17,6 +19,6 @@ interface CustomRenderer extends FunctionComponent<CustomTableRenderProps> {
 
 type CellRenderer = (
   value: JSONPrimitive,
-  item: Record<string | number, JSONPrimitive>,
+  item: TableItem,
   index: number
 ) => JSX.Element;

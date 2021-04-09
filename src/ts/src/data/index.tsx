@@ -1,9 +1,9 @@
 import cx from "classnames";
-import { fetchSamples, fetchTrees } from "common/api";
-import { DataSubview } from "common/components";
 import React, { FunctionComponent, useEffect, useState } from "react";
 import { Link, Redirect, Route, Switch } from "react-router-dom";
 import { Menu } from "semantic-ui-react";
+import { fetchSamples, fetchTrees } from "src/common/api";
+import { DataSubview } from "src/common/components";
 import { SampleRenderer, TreeRenderer } from "./cellRenderers";
 import { SAMPLE_HEADERS, TREE_HEADERS } from "./headers";
 import style from "./index.module.scss";
