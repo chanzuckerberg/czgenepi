@@ -1,19 +1,38 @@
+import datetime
 import json
 import os
 from pathlib import Path
-from typing import Type
+from typing import Iterable, MutableSequence, Optional, Sequence, Type
 
 import boto3
 import click
 from IPython.terminal.embed import InteractiveShellEmbed
+from sqlalchemy.orm import joinedload
+from sqlalchemy.sql import expression
 
 from aspen import covidhub_import
 from aspen.cli.toplevel import cli
 from aspen.config.config import Config, RemoteDatabaseConfig
 from aspen.config.development import DevelopmentConfig
 from aspen.config.local import LocalConfig
-from aspen.database.connection import enable_profiling, get_db_uri, init_db
+from aspen.database.connection import (
+    enable_profiling,
+    get_db_uri,
+    init_db,
+    session_scope,
+)
 from aspen.database.models import *  # noqa: F401, F403
+from aspen.database.models import (
+    AlignedGisaidDump,
+    Entity,
+    Group,
+    PathogenGenome,
+    PhyloRun,
+    Sample,
+    SequencingReadsCollection,
+    Workflow,
+    WorkflowStatusType,
+)
 from aspen.database.schema import create_tables_and_schema
 
 
@@ -167,4 +186,149 @@ def import_covidhub_project(
         s3_src_prefix,
         s3_dst_prefix,
         auth0_usermap,
+    )
+
+
+@db.command("create-phylo-run")
+@click.option(
+    "--group-name",
+    type=str,
+    required=True,
+    help="Name of the group to create the phylo run under.",
+)
+@click.option("--all-group-sequences", is_flag=True, required=False, default=False)
+@click.option("samples", "--sample", type=str, required=False, multiple=True)
+@click.option("--aligned-gisaid-dump-id", type=int, required=False, default=None)
+@click.option(
+    "--builds-template-file",
+    type=str,
+    required=False,
+    default="src/py/workflows/nextstrain_run/builds_templates/group.yaml",
+)
+@click.option(
+    "--builds-template-args",
+    type=str,
+    required=True,
+    help=(
+        "This should be a json dictionary that is used to generate the builds file,"
+        " using string interpolation."
+    ),
+)
+@click.option(
+    "--git-refspec",
+    type=str,
+    required=True,
+    default="trunk",
+    help="The git refspec used to launch the workflow.",
+)
+@click.pass_context
+def create_phylo_run(
+    ctx,
+    group_name: str,
+    all_group_sequences: bool,
+    samples: Sequence[str],
+    aligned_gisaid_dump_id: Optional[int],
+    builds_template_file: str,
+    builds_template_args: str,
+    git_refspec: str,
+):
+    # these are injected into the IPython scope, but they appear to be unused.
+    engine = ctx.obj["ENGINE"]
+
+    with session_scope(engine) as session:
+        group = session.query(Group).filter(Group.name == group_name).one()
+
+        all_samples: Iterable[Sample] = (
+            session.query(Sample)
+            .filter(
+                expression.or_(
+                    Sample.public_identifier.in_(samples),
+                    expression.and_(
+                        expression.true()
+                        if all_group_sequences
+                        else expression.false(),
+                        Sample.submitting_group == group,
+                    ),
+                )
+            )
+            .options(
+                joinedload(Sample.sequencing_reads_collection)
+                .joinedload(SequencingReadsCollection.consuming_workflows)
+                .joinedload(Workflow.outputs)
+                .joinedload(Entity.consuming_workflows)
+                .joinedload(Workflow.outputs)
+                .joinedload(Entity.consuming_workflows)
+                .joinedload(Workflow.outputs),
+                joinedload(Sample.uploaded_pathogen_genome),
+            )
+        )
+
+        pathogen_genomes: MutableSequence[PathogenGenome] = list()
+        for sample in all_samples:
+            if sample.sequencing_reads_collection is not None:
+                sample_pathogen_genomes = (
+                    sample.sequencing_reads_collection.pathogen_genomes
+                )
+                # TODO: We are blindly using the first pathogen genome we encounter.  It
+                # should probably be based on some heuristic.
+                if len(sample_pathogen_genomes) > 0:
+                    pathogen_genomes.append(sample_pathogen_genomes[0])
+            elif sample.uploaded_pathogen_genome is not None:
+                pathogen_genomes.append(sample.uploaded_pathogen_genome)
+            else:
+                raise ValueError(
+                    "Sample without sequencing reads collection nor uploaded"
+                    " pathogen"
+                )
+        if len(pathogen_genomes) == 0:
+            raise ValueError("No sequences selected for run.")
+
+        if aligned_gisaid_dump_id is not None:
+            aligned_gisaid_dump = (
+                session.query(AlignedGisaidDump)
+                .filter(AlignedGisaidDump.entity_id == aligned_gisaid_dump_id)
+                .one()
+            )
+        else:
+            aligned_gisaid_dump = (
+                session.query(AlignedGisaidDump)
+                .join(AlignedGisaidDump.producing_workflow)
+                .order_by(Workflow.end_datetime.desc())
+                .first()
+            )
+
+        workflow: PhyloRun = PhyloRun(
+            start_datetime=datetime.datetime.now(),
+            workflow_status=WorkflowStatusType.STARTED,
+            software_versions={},
+            group=group,
+            # TODO: need build template / build args.
+        )
+        workflow.inputs = list(pathogen_genomes)
+        workflow.inputs.append(aligned_gisaid_dump)
+        workflow.template_file_path = builds_template_file
+        workflow.template_args = json.loads(builds_template_args)
+
+        session.add(workflow)
+
+        session.flush()
+
+        workflow_id = workflow.workflow_id
+
+    batch_client = boto3.client("batch")
+    # TODO: in an ideal world, some of these constants should be shared with the
+    # terraform scripts.
+    batch_client.submit_job(
+        jobName="nextstrain",
+        jobQueue="aspen-batch",
+        jobDefinition="aspen-batch-job-definition",
+        containerOverrides={
+            "command": [
+                git_refspec,
+                "src/py/workflows/nextstrain_run/build_tree.sh",
+                str(workflow_id),
+            ],
+            "vcpus": 32,
+            "memory": 370000,
+        },
     )
