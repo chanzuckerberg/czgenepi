@@ -4,14 +4,14 @@
   "private": true,
   "proxy": "http://localhost:5000",
   "scripts": {
+    "serve": "npm run build && serve -s build -l tcp://0.0.0.0:3000",
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js",
     "devserver": "node scripts/devserver.js",
     "type-check": "tsc --noEmit",
     "lint": "concurrently \"node_modules/.bin/eslint src/**/*.{ts,tsx} --quiet --fix\" \"node_modules/.bin/stylelint --fix '**/*.{js,ts,tsx,css,scss}'\"  \"npm run type-check\"",
-    "lint-ci": "concurrently \"node_modules/.bin/eslint src/**/*.{ts,tsx}\" \"node_modules/.bin/stylelint '**/*.{js,ts,tsx,css,scss}'\"  \"npm run type-check\"",
-    "prepare": "cd ../../ && husky install src/ts/.husky"
+    "lint-ci": "concurrently \"node_modules/.bin/eslint src/**/*.{ts,tsx}\" \"node_modules/.bin/stylelint '**/*.{js,ts,tsx,css,scss}'\"  \"npm run type-check\""
   },
   "dependencies": {
     "@babel/core": "7.12.3",
@@ -97,13 +97,11 @@
     "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-sonarjs": "^0.6.0",
     "expect-playwright": "^0.3.3",
-    "husky": "^6.0.0",
     "jest": "26.6.0",
     "jest-circus": "26.6.0",
     "jest-playwright-preset": "^1.5.1",
     "jest-resolve": "26.6.0",
     "jest-watch-typeahead": "0.6.1",
-    "lint-staged": "^10.5.4",
     "prettier-plugin-organize-imports": "^1.1.1",
     "sass-jest": "^0.1.7",
     "stylelint": "^13.12.0",

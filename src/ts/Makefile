@@ -2,6 +2,8 @@
 check-style:
 	npm --prefix . run lint-ci
 
+lint:
+	npm --prefix . run lint
 
 ### TESTING #############################################
 test: # run ts test
