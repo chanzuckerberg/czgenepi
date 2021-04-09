@@ -32,6 +32,7 @@ from aspen.database.models import (
     PhyloRun,
     PhyloTree,
     PublicRepositoryType,
+    RegionType,
     Sample,
     UploadedPathogenGenome,
     User,
@@ -280,6 +281,7 @@ def import_project(
             sample.location = project.location
             sample.division = "California"
             sample.country = "USA"
+            sample.region = RegionType.NORTH_AMERICA
             sample.organism = "SARS-CoV-2"
 
             if sample.uploaded_pathogen_genome is None:
