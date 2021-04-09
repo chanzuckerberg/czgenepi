@@ -13,7 +13,6 @@ from typing import (
     MutableMapping,
     Optional,
     Sequence,
-    Set,
 )
 
 import boto3
@@ -38,6 +37,7 @@ from aspen.database.models import (
     User,
     WorkflowStatusType,
 )
+from aspen.phylo_tree.identifiers import get_names_from_tree
 from covid_database import init_db as covidhub_init_db
 from covid_database import SqlAlchemyInterface as CSqlAlchemyInterface
 from covid_database import util as covidhub_database_util
@@ -84,16 +84,6 @@ def list_bucket(s3_resource, bucket: str, key_prefix: str) -> Iterator[str]:
         if not results["IsTruncated"]:
             return
         nexttoken = results["NextContinuationToken"]
-
-
-def get_names_from_tree(tree) -> Set[str]:
-    results: Set[str] = set()
-    for node in tree:
-        results.add(node["name"])
-        if "children" in node:
-            results.update(get_names_from_tree(node["children"]))
-
-    return results
 
 
 def get_or_make_group(session: Session, name: str, address: str, email: str) -> Group:
