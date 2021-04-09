@@ -1,12 +1,10 @@
 /* eslint-disable react/display-name */
 
-import React from "react";
-
 const UNDEFINED_TEXT = "---";
 
 function createTableCellRenderer(
   customRenderers: Record<string | number, CellRenderer>,
-  customStyle?: Stylesheet
+  defaultRenderer: CellRenderer
 ): CustomRenderer {
   return ({ header, value, item, index }: CustomTableRenderProps) => {
     let unwrappedValue;
@@ -21,8 +19,29 @@ function createTableCellRenderer(
       return cellRenderFunction(unwrappedValue, item, index);
     }
 
-    return <div className={customStyle?.cell}>{unwrappedValue}</div>;
+    return defaultRenderer(unwrappedValue, item, index);
   };
 }
 
-export { createTableCellRenderer };
+function createTreeModalInfo(link: string): ModalInfo {
+  return {
+    body:
+      "You are leaving Aspen and sending your data to a private visualization on auspice.us, which is not controlled by Aspen.",
+    buttons: [
+      {
+        content: "Confirm",
+        link: link,
+        type: "primary",
+      },
+      {
+        content: "Cancel",
+        link: "cancel",
+        type: "secondary",
+      },
+    ],
+    header:
+      "Please confirm you're ready to send your data to Auspice to see your tree.",
+  };
+}
+
+export { createTableCellRenderer, createTreeModalInfo };

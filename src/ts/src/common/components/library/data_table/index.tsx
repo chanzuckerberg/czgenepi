@@ -33,6 +33,7 @@ const DataTable: FunctionComponent<Props> = ({
       <div className={style.headerCell}>{column.text}</div>
     </Table.HeaderCell>
   ));
+
   const sampleRow = (item: TableItem): Array<JSX.Element> => {
     return headers.map((header, index) => {
       const value = item[header.key];
