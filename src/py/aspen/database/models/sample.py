@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import enum
 from typing import Optional, TYPE_CHECKING, Union
 
+import enumtables
 from sqlalchemy import (
     Column,
     Date,
@@ -15,12 +17,31 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import backref, relationship
 
-from aspen.database.models.base import idbase
+from aspen.database.models.base import base, idbase
+from aspen.database.models.enum import Enum
 from aspen.database.models.mixins import DictMixin
 from aspen.database.models.usergroup import Group
 
 if TYPE_CHECKING:
     from .sequences import SequencingReadsCollection, UploadedPathogenGenome
+
+
+class RegionType(enum.Enum):
+    AFRICA = "Africa"
+    ASIA = "Asia"
+    EUROPE = "Europe"
+    NORTH_AMERICA = "North America"
+    OCEANIA = "Oceania"
+    SOUTH_AMERICA = "South America"
+
+
+# Create the enumeration table
+# Pass your enum class and the SQLAlchemy declarative base to enumtables.EnumTable
+_RegionTypeTable = enumtables.EnumTable(
+    RegionType,
+    base,
+    tablename="region_types",
+)
 
 
 class Sample(idbase, DictMixin):  # type: ignore
@@ -122,6 +143,11 @@ class Sample(idbase, DictMixin):  # type: ignore
                 "PHA4GE": "geo_loc_name_country",
             }
         },
+    )
+    region = Column(
+        Enum(RegionType),
+        ForeignKey(_RegionTypeTable.item_id),
+        nullable=False,
     )
 
     organism = Column(

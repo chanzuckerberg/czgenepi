@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from aspen.database.models import Sample
+from aspen.database.models import RegionType, Sample
 
 
 def sample_factory(
@@ -14,6 +14,7 @@ def sample_factory(
     location="Santa Clara County",
     division="California",
     country="USA",
+    region=RegionType.NORTH_AMERICA,
     organism="SARS-CoV-2",
 ) -> Sample:
     original_submission = original_submission or {}
@@ -29,5 +30,6 @@ def sample_factory(
         location=location,
         division=division,
         country=country,
+        region=region,
         organism=organism,
     )

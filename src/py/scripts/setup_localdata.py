@@ -4,6 +4,7 @@ from aspen.config.local import LocalConfig
 from aspen.database.connection import get_db_uri, init_db
 from aspen.database.models import (
     Group,
+    RegionType,
     Sample,
     SequencingInstrumentType,
     SequencingProtocolType,
@@ -66,6 +67,7 @@ def create_sample(session, group):
         location="Santa Clara County",
         division="California",
         country="USA",
+        region=RegionType.NORTH_AMERICA,
         organism="SARS-CoV-2",
     )
     session.add(sample)

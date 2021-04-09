@@ -4,7 +4,7 @@ import pytest
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm import undefer
 
-from aspen.database.models.sample import Sample
+from aspen.database.models.sample import RegionType, Sample
 from aspen.database.models.sequences import (
     SequencingInstrumentType,
     SequencingProtocolType,
@@ -27,6 +27,7 @@ def test_sequencing_reads(session):
         location="Santa Clara County",
         division="California",
         country="USA",
+        region=RegionType.NORTH_AMERICA,
         organism="SARS-CoV-2",
     )
     sequencing_reads = SequencingReadsCollection(
@@ -61,6 +62,7 @@ def test_uploaded_pathogen_genome(session):
         location="Santa Clara County",
         division="California",
         country="USA",
+        region=RegionType.NORTH_AMERICA,
         organism="SARS-CoV-2",
     )
     uploaded_pathogen_genome = UploadedPathogenGenome(
