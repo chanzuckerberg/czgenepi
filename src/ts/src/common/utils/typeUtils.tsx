@@ -27,3 +27,10 @@ export function jsonToType<T>(
   });
   return Object.fromEntries(entries);
 }
+
+export function stringGuard(value: any): string {
+  if (typeof value !== "string") {
+    return String(value);
+  }
+  return value;
+}
