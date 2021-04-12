@@ -7,13 +7,10 @@ function createTableCellRenderer(
   defaultRenderer: CellRenderer
 ): CustomRenderer {
   return ({ header, value, item, index }: CustomTableRenderProps) => {
-    let unwrappedValue;
-    if (value === undefined) {
+    let unwrappedValue = value;
+    if (unwrappedValue === undefined) {
       unwrappedValue = UNDEFINED_TEXT;
-    } else {
-      unwrappedValue = value;
     }
-
     if (customRenderers[header.key] !== undefined) {
       const cellRenderFunction = customRenderers[header.key];
       return cellRenderFunction(unwrappedValue, item, index);
