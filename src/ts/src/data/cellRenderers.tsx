@@ -9,6 +9,7 @@ import {
   createTableCellRenderer,
   createTreeModalInfo,
   stringGuard,
+  stripProtocol,
 } from "src/common/utils";
 import style from "./index.module.scss";
 
@@ -44,10 +45,11 @@ const TREE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
   name: (value: JSONPrimitive): JSX.Element => {
     const stringValue = stringGuard(value);
     const treeID = stringValue.split(" ")[0];
+    const treeLocation = `${stripProtocol(process.env.API_URL)}/api/auspice/view/${treeID}/auspice.json`
     return (
       <Modal
         data={createTreeModalInfo(
-          `https://nextstrain.org/fetch/${process.env.API_URL}/api/auspice/view/${treeID}/auspice.json`
+          `https://nextstrain.org/fetch/${treeLocation}`
         )}
         className={style.cell}
       >
