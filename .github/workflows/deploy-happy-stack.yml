@@ -29,16 +29,6 @@ jobs:
           aws-region: us-west-2
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-duration-seconds: 900
-#      # Login to ECR needed solely to be able to retrieve cached layers
-#      - name: Login to Prod ECR
-#        uses: docker/login-action@v1
-#        if: github.event.deployment.environment == 'prod'
-#        with:
-#          registry: ${{ secrets.ECR_REPO_PROD }}
-#      - name: Login to ECR
-#        uses: docker/login-action@v1
-#        with:
-#          registry: ${{ secrets.ECR_REPO }}
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.event.deployment.sha }}
@@ -54,7 +44,9 @@ jobs:
         env:
           TFE_TOKEN: ${{ secrets.TFE_TOKEN }}
         run: |
-          ./scripts/happy --profile="" --env ${{ github.event.deployment.environment }} update ${{ github.event.deployment.environment }}stack --tag ${{ github.event.deployment.payload.tag }}
+          # TODO - staging deploy is disabled until after Tues demo!!
+          # ./scripts/happy --profile="" --env ${{ github.event.deployment.environment }} update ${{ github.event.deployment.environment }}stack --tag ${{ github.event.deployment.payload.tag }}
+          echo "TODO - enable staging auto deploy"
       - name: Run integration tests
         env:
           TFE_TOKEN: ${{ secrets.TFE_TOKEN }}
