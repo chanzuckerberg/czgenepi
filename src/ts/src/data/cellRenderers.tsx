@@ -17,15 +17,12 @@ const DEFAULT_RENDERER = (value: JSONPrimitive): JSX.Element => {
 };
 
 const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
-  privateId: (value: JSONPrimitive): JSX.Element => {
-    const stringValue = stringGuard(value);
-    return (
-      <div className={style.cell}>
-        {<SampleIcon className={style.icon} />}
-        {stringValue}
-      </div>
-    );
-  },
+  privateId: (value: JSONPrimitive): JSX.Element => (
+    <div className={style.cell}>
+      {<SampleIcon className={style.icon} />}
+      {value}
+    </div>
+  ),
 };
 
 const SampleRenderer = createTableCellRenderer(
