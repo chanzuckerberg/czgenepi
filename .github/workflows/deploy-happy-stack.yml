@@ -44,9 +44,7 @@ jobs:
         env:
           TFE_TOKEN: ${{ secrets.TFE_TOKEN }}
         run: |
-          # TODO - staging deploy is disabled until after Tues demo!!
-          # ./scripts/happy --profile="" --env ${{ github.event.deployment.environment }} update ${{ github.event.deployment.environment }}stack --tag ${{ github.event.deployment.payload.tag }}
-          echo "TODO - enable staging auto deploy"
+          ./scripts/happy --profile="" --env ${{ github.event.deployment.environment }} update ${{ github.event.deployment.environment }}stack --tag ${{ github.event.deployment.payload.tag }}
       - name: Run integration tests
         env:
           TFE_TOKEN: ${{ secrets.TFE_TOKEN }}
@@ -54,14 +52,7 @@ jobs:
         if: github.event.deployment.environment != 'prod'
         run: |
           echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
-          mkdir -p .local/bin
-          curl -Ls https://github.com/segmentio/chamber/releases/download/v2.9.1/chamber-v2.9.1-linux-amd64 > .local/bin/chamber &&
-          chmod +x .local/bin/chamber
-          PATH="$PATH:$(pwd)/.local/bin"
-          if [ "${DEPLOYMENT_STAGE}" == "staging" ]; then
-            export DEPLOYMENT_STAGE=staging
-          fi
-          # TODO -- run functional tests against staging!
+          echo "TODO - run functional tests against staging!"
       ### Need to write success failure way because Github API doesn't allow doing
       ### "if: always(), state: ${{ success() }}:
       - name: Set deployment status to success if no errors
