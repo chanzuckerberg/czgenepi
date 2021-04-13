@@ -146,7 +146,9 @@ def import_data(s3_path, db_uri):
 
 @db.command("interact")
 @click.option("--profile/--no-profile", default=False)
-@click.option("--connect/--no-connect", default=False, help="Connect to the db immediately")
+@click.option(
+    "--connect/--no-connect", default=False, help="Connect to the db immediately"
+)
 @click.pass_context
 def interact(ctx, profile, connect):
     # these are injected into the IPython scope, but they appear to be unused.
