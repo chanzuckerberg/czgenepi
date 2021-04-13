@@ -230,6 +230,9 @@ class RemoteDatabaseConfig(Config):
 
     @property
     def DATABASE_URI(self) -> str:
+        # Allow db uri to be overridden by env var.
+        if os.getenv("DB_URI"):
+            return os.environ["DB_URI"]
         username = self.AWS_SECRET["DB"]["rw_username"]
         password = self.AWS_SECRET["DB"]["rw_password"]
 
