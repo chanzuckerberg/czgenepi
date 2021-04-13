@@ -146,13 +146,18 @@ def import_data(s3_path, db_uri):
 
 @db.command("interact")
 @click.option("--profile/--no-profile", default=False)
+@click.option("--connect/--no-connect", default=False, help="Connect to the db immediately")
 @click.pass_context
-def interact(ctx, profile):
+def interact(ctx, profile, connect):
     # these are injected into the IPython scope, but they appear to be unused.
     engine = ctx.obj["ENGINE"]  # noqa: F841
 
     if profile:
         enable_profiling()
+
+    if connect:
+        engine._engine.connect()
+        session = engine.make_session()
 
     shell = InteractiveShellEmbed()
     shell()

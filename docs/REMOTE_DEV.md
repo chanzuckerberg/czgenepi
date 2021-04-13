@@ -31,6 +31,9 @@ The general remote dev workflow is:
 
 If you forget which stacks you've created, just run `./scripts/happy list` at any time to list the current remote dev stacks.
 
+### Connecting to remote dev databases
+From the root of this repo, run `make remotedb STACK=STACK_NAME_HERE` (replace STACK_NAME_HERE with the name of your stack!) to open a psql console on the remote dev db, or `make remoteconsole STACK=STACK_NAME_HERE` to get a python console connected to the remote dev db.
+
 ### General CLI Usage
 The CLI utility is evolving rapidly, so the best reference for which commands are available and how to use them is the CLI itself. All commands support a `--help` flag to print usage docs. For example:
 
