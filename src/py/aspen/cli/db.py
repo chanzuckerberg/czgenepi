@@ -159,7 +159,7 @@ def interact(ctx, profile, connect):
     # prevent an ssh tunnel from closing while we're composing queries.
     if connect:
         engine._engine.connect()
-        session = engine.make_session()
+        session = engine.make_session() # pylint: disable=F841
 
     shell = InteractiveShellEmbed()
     shell()
