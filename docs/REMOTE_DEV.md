@@ -34,7 +34,7 @@ If you forget which stacks you've created, just run `./scripts/happy list` at an
 ### Connecting to remote dev databases
 NOTE - You'll need to [install and configure blessclient](https://wiki.czi.team/display/SI/Install+BlessClient) first!
 
-From the root of this repo, run `make remotedb STACK=STACK_NAME_HERE` (replace STACK_NAME_HERE with the name of your stack!) to open a psql console on the remote dev db, or `make remoteconsole STACK=STACK_NAME_HERE` to get a python console connected to the remote dev db.
+From the root of this repo, run `make remote-dbconsole STACK=STACK_NAME_HERE` (replace STACK_NAME_HERE with the name of your stack!) to open a psql console on the remote dev db, or `make remote-pgconsole STACK=STACK_NAME_HERE` to get a python console connected to the remote dev db.
 
 ### General CLI Usage
 The CLI utility is evolving rapidly, so the best reference for which commands are available and how to use them is the CLI itself. All commands support a `--help` flag to print usage docs. For example:
@@ -48,7 +48,6 @@ Usage: happy create [OPTIONS] STACK_NAME
 Options:
   --tag TEXT          Tag name for docker image. Leave empty to generate one
                       automatically.
-
   --wait / --no-wait  wait for this to complete
   --help              Show this message and exit.
 ```

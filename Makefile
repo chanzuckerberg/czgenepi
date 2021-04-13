@@ -24,14 +24,14 @@ rm-pycache: ## remove all __pycache__ files (run if encountering issues with pyc
 	find . -name '__pycache__' | xargs rm -rf
 
 ### Connecting to remote dbs #########################################
-remotedb: # Get a psql console on a remote db (from OSX only!)
+remote-pgconsole: # Get a psql console on a remote db (from OSX only!)
 	export ENV=$${ENV:=rdev}; \
 	export config=$$(aws --profile $(AWS_DEV_PROFILE) secretsmanager get-secret-value --secret-id $${ENV}/aspen-config | jq -r .SecretString ); \
 	export DB_URI=$$(jq -r '"postgresql://\(.DB.admin_username):\(.DB.admin_password)@127.0.0.1:5556/$(STACK)"' <<< $$config); \
 	ssh -f -o ExitOnForwardFailure=yes -L 5556:$$(jq -r .DB.address <<< $$config):5432 $$(jq -r .bastion_host <<< $$config) sleep 10; \
 	psql $${DB_URI}
 
-remoteconsole: .env.ecr # Get a python console on a remote db (from OSX only!)
+remote-dbconsole: .env.ecr # Get a python console on a remote db (from OSX only!)
 	export ENV=$${ENV:=rdev}; \
 	export config=$$(aws --profile $(AWS_DEV_PROFILE) secretsmanager get-secret-value --secret-id $${ENV}/aspen-config | jq -r .SecretString ); \
 	export OSX_IP=$$(ipconfig getifaddr en0 || ipconfig getifaddr en1); \
