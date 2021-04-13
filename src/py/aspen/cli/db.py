@@ -155,6 +155,8 @@ def interact(ctx, profile, connect):
     if profile:
         enable_profiling()
 
+    # This forces an immediate connection to our database, which is useful to
+    # prevent an ssh tunnel from closing while we're composing queries.
     if connect:
         engine._engine.connect()
         session = engine.make_session()
