@@ -1,11 +1,13 @@
 import React, { FunctionComponent } from "react";
 import { Table } from "semantic-ui-react";
+import { EmptyState } from "../data_subview/components/EmptyState";
 import style from "./index.module.scss";
 
 interface Props {
   data?: TableItem[];
   headers: Header[];
   renderer?: CustomRenderer;
+  isLoading: boolean;
 }
 
 const UNDEFINED_TEXT = "---";
@@ -23,7 +25,8 @@ function defaultCellRenderer({ value }: CustomTableRenderProps): JSX.Element {
 const DataTable: FunctionComponent<Props> = ({
   data = [],
   headers,
-  renderer,
+  renderer = defaultCellRenderer,
+  isLoading,
 }: Props) => {
   const indexingKey = headers[0].key;
 
@@ -37,9 +40,7 @@ const DataTable: FunctionComponent<Props> = ({
   const sampleRow = (item: TableItem): Array<JSX.Element> => {
     return headers.map((header, index) => {
       const value = item[header.key];
-      if (renderer === undefined) {
-        renderer = defaultCellRenderer;
-      }
+
       return (
         <Table.Cell key={`${item[indexingKey]}-${header.key}`}>
           {renderer({ header, index, item, value })}
@@ -48,7 +49,11 @@ const DataTable: FunctionComponent<Props> = ({
     });
   };
 
-  function tableRows(data: TableItem[]): Array<JSX.Element> {
+  function tableRows(data: TableItem[]): React.ReactNode {
+    if (isLoading) {
+      return <EmptyState numOfColumns={headers.length} />;
+    }
+
     return data.map((item) => (
       <Table.Row key={`${item[indexingKey]}`}>{sampleRow(item)}</Table.Row>
     ));
