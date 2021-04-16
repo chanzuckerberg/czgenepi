@@ -31,9 +31,9 @@ In addition, there is a "utility" container that is configured very similar to t
 Both the frontend and backend services will automatically reload when their source code is modified, but they won't automatically rebuild when their dependencies (such as npm or pip package lists) change.
 
 To update frontend changes:
-
-1. add dependency to [src/ts/package.json](src/ts/package.json)
+1. add dependency to [src/ts/package.json](src/ts/package.json) (or add a new scripts command)
 2. run `make local-sync`
+
 
 To update backend dependencies:
 
@@ -47,25 +47,29 @@ The dev environment is initialized with AWS Secrets/S3 data in the [src/py/scrip
 
 ### Make targets for managing dev:
 
-| Command                                                           | Description                                                                        | Notes                                                                                                                                               |
-| ----------------------------------------------------------------- | ---------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `make help`                                                       | Learn more about what `make` targets are available                                 |                                                                                                                                                     |
-| `make local-init`                                                 | Launch a new local dev env and populate it with test data.                         |                                                                                                                                                     |
-| `make local-start`                                                | Start a local dev environment that's been stopped.                                 |                                                                                                                                                     |
-| `make local-stop`                                                 | Stop the local dev environment.                                                    |                                                                                                                                                     |
-| `make local-dbconsole`                                            | Connect to the local database.                                                     |                                                                                                                                                     |
-| `make local-logs`                                                 | Tail the logs of the dev env containers.                                           | Run `make local-logs CONTAINER=backend` to tail the logs of a specific container. Dev containers are: backend, frontend, localstack, database, oidc |
-| `make local-shell CONTAINER=frontend`                             | Open a command shell in one of the dev containers                                  | Dev containers are: backend, frontend, localstack, database, oidc                                                                                   |
-| `make local-status`                                               | Show the status of the containers in the dev environment.                          |                                                                                                                                                     |
-| `make local-clean`                                                | Remove everything related to the local dev environment (including db data!)        |                                                                                                                                                     |
-| `make local-sync`                                                 | Re-sync the local-environment state after modifying library deps or docker configs |                                                                                                                                                     |
-| `make utility-alembic-upgrade-head`                               | Upgrade local DB with new revisions                                                |                                                                                                                                                     |
-| `make utility-alembic-autogenerate MESSAGE="descriptive message"` | Autogenerate migration against local DB                                            |                                                                                                                                                     |
-| `make utility-test`                                               | Runs pytest in `src/py`                                                            |                                                                                                                                                     |
-| `make utility-check-style`                                        | Runs mypy, flake8, isort, and black style checkers against files in `src/py`       |                                                                                                                                                     |
-| `make utility-run-style`                                          | Runs isort and black against files in `src/py`                                     |                                                                                                                                                     |
-| `make backend-debugger`                                           | Attach to the backend service                                                      | use this to connect to pdb console if setting break points using pdb                                                                                |
-| `make rm-pycache`                                                 | removes all `__pycache__` files                                                    | run this command if encountering issues with pycharm debugger (containers exiting prematurely)                                                      |
+| Command                 | Description                                                                          | Notes                                                                                                |
+| ----------------------- | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| `make help`               | Learn more about what `make` targets are available                                   |                                                          |
+| `make local-init`         | Launch a new local dev env and populate it with test data.                           |                                                          |
+| `make local-start`        | Start a local dev environment that's been stopped.                                   |                                                          |
+| `make local-stop`         | Stop the local dev environment.                                                      |                                                          |
+| `make local-dbconsole`    | Connect to the local database.                                                       |                                                          |
+| `make local-logs`         | Tail the logs of the dev env containers.                                             | Run `make local-logs CONTAINER=backend` to tail the logs of a specific container. Dev containers are: backend, frontend, localstack, database, oidc |
+| `make local-shell CONTAINER=frontend`  | Open a command shell in one of the dev containers                       | Dev containers are: backend, frontend, localstack, database, oidc |
+| `make local-status`       | Show the status of the containers in the dev environment.                            |                                                          |
+| `make local-clean`        | Remove everything related to the local dev environment (including db data!)          |                                                          |
+| `make local-sync`         | Re-sync the local-environment state after modifying library deps or docker configs   |                                                          |
+| `make fontend-test`         | run `npm test` in the frontend container (tests confined to `src/ts`)              |                                                          |
+| `make frontend-test-build`         | run `npm run build` in `src/ts`                                             |
+| `make frontend-check-style`         | run `npm run lint-ci` in `src/ts`                                          |
+| `make utility-alembic-upgrade-head`         | Upgrade local DB with new revisions                                |                                                          |
+| `make utility-alembic-autogenerate MESSAGE="descriptive message"`  | Autogenerate migration against local DB     |                                                          |
+| `make utility-test`         | Runs pytest in `src/py`                                                                  |                                                    |
+| `make utility-check-style`         | Runs mypy, flake8, isort, and black style checkers against files in `src/py`      |                                                    |
+| `make utility-run-style`         | Runs isort and black against files in `src/py`                                      |                                                    |
+| `make backend-debugger`         | Attach to the backend service                                                        |  use this to connect to pdb console if setting break points using pdb   |
+| `make rm-pycache`         | removes all `__pycache__` files                                                            |  run this command if encountering issues with pycharm debugger (containers exiting prematurely)   |
+
 
 ### External dependencies
 

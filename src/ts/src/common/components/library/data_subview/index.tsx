@@ -7,6 +7,7 @@ import style from "./index.module.scss";
 interface Props {
   data?: TableItem[];
   headers: Header[];
+  isLoading: boolean;
   renderer?: CustomRenderer;
 }
 
@@ -27,6 +28,7 @@ function searchReducer(state: SearchState, action: SearchState): SearchState {
 const DataSubview: FunctionComponent<Props> = ({
   data,
   headers,
+  isLoading,
   renderer,
 }: Props) => {
   // we are modifying state using hooks, so we need a reducer
@@ -63,7 +65,6 @@ const DataSubview: FunctionComponent<Props> = ({
       <div className={style.samplesRoot}>
         <div className={style.searchBar}>
           <Input
-            transparent
             icon="search"
             placeholder="Search"
             loading={state.searching}
@@ -71,7 +72,12 @@ const DataSubview: FunctionComponent<Props> = ({
           />
         </div>
         <div className={style.samplesTable}>
-          <DataTable data={tableData} headers={headers} renderer={renderer} />
+          <DataTable
+            isLoading={isLoading}
+            data={tableData}
+            headers={headers}
+            renderer={renderer}
+          />
         </div>
       </div>
     );

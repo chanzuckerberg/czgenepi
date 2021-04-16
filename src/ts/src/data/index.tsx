@@ -12,18 +12,26 @@ import { TREE_TRANSFORMS } from "./transforms";
 const Data: FunctionComponent = () => {
   const [samples, setSamples] = useState<Sample[] | undefined>();
   const [trees, setTrees] = useState<Tree[] | undefined>();
+  const [isDataLoading, setIsDataLoading] = useState(false);
 
   useEffect(() => {
     const setBioinformaticsData = async () => {
+      setIsDataLoading(true);
+
       const [sampleResponse, treeResponse] = await Promise.all([
         fetchSamples(),
         fetchTrees(),
       ]);
+
+      setIsDataLoading(false);
+
       const apiSamples = sampleResponse["samples"];
       const apiTrees = treeResponse["phylo_trees"];
+
       setSamples(apiSamples);
       setTrees(apiTrees);
     };
+
     setBioinformaticsData();
   }, []);
 
@@ -33,6 +41,7 @@ const Data: FunctionComponent = () => {
     {
       data: samples,
       headers: SAMPLE_HEADERS,
+      isDataLoading,
       renderer: SampleRenderer,
       text: "Samples",
       to: "/data/samples",
@@ -40,6 +49,7 @@ const Data: FunctionComponent = () => {
     {
       data: trees,
       headers: TREE_HEADERS,
+      isDataLoading,
       renderer: TreeRenderer,
       text: "Phylogenetic Trees",
       to: "/data/phylogenetic_trees",
@@ -91,6 +101,7 @@ const Data: FunctionComponent = () => {
         key={category.text}
         render={() => (
           <DataSubview
+            isLoading={category.isDataLoading}
             data={category.data}
             headers={category.headers}
             renderer={category.renderer}

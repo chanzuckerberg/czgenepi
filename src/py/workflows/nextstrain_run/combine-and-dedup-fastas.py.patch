@@ -1,0 +1,29 @@
+diff --git a/scripts/combine-and-dedup-fastas.py b/scripts/combine-and-dedup-fastas.py
+index db0ffda9..8fb3d632 100644
+--- a/scripts/combine-and-dedup-fastas.py
++++ b/scripts/combine-and-dedup-fastas.py
+@@ -23,8 +23,10 @@ if __name__ == '__main__':
+     with open(args.output, "w") as output_handle:
+         # Stream sequences from all input files into a single output file,
+         # skipping duplicate records (same strain and sequence) and noting
+-        # mismatched sequences for the same strain name.
+-        for record in read_sequences(*args.input):
++        # mismatched sequences for the same strain name.  In order to
++        # prefer the latter files, we have to reverse the order of the
++        # files.
++        for record in read_sequences(*reversed(args.input)):
+             counter += 1
+             if counter % 10000 == 0:
+                 print(f"Processed {counter} records")
+@@ -49,10 +51,8 @@ if __name__ == '__main__':
+ 
+     if len(duplicate_strains) > 0:
+         print(
+-            "ERROR: Detected the following duplicate input strains with different sequences:",
++            "WARNING: Detected the following duplicate input strains with different sequences:",
+             file=sys.stderr
+         )
+         for strain in duplicate_strains:
+             print(textwrap.indent(strain, "    "), file=sys.stderr)
+-
+-        sys.exit(1)

@@ -24,7 +24,7 @@ cd /aspen/
 
 # update aspen
 aspen_workflow_rev=$(git rev-parse HEAD)
-git fetch git://github.com/chanzuckerberg/aspen "${ASPEN_GIT_REVSPEC}"
+git fetch --depth 1 git://github.com/chanzuckerberg/aspen "${ASPEN_GIT_REVSPEC}"
 git checkout FETCH_HEAD
 aspen_creation_rev=$(git rev-parse HEAD)
 

@@ -230,6 +230,9 @@ class RemoteDatabaseConfig(Config):
 
     @property
     def DATABASE_URI(self) -> str:
+        # Allow db uri to be overridden by env var.
+        if os.getenv("DB_URI"):
+            return os.environ["DB_URI"]
         username = self.AWS_SECRET["DB"]["rw_username"]
         password = self.AWS_SECRET["DB"]["rw_password"]
 
@@ -244,5 +247,5 @@ class RemoteDatabaseConfig(Config):
             instance_address = instance_info["Endpoint"]["Address"]
             instance_port = instance_info["Endpoint"]["Port"]
             instance_address = f"{instance_address}:{instance_port}"
-        db_name = os.getenv("REMOTE_DEV_PREFIX", "/aspen_db")
+        db_name = os.getenv("REMOTE_DEV_PREFIX") or "/aspen_db"
         return f"postgresql://{username}:{password}@{instance_address}{db_name}"

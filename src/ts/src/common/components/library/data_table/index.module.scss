@@ -3,25 +3,64 @@
 @import "src/common/styles/spacing";
 @import "src/common/styles/corners";
 
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
 .header {
+  display: flex;
+  // (thuang): Offset for Chrome scrollbar width
+  padding-right: $space-l;
+  border-bottom: 3px solid $gray-lightest !important;
+
   .headerCell {
+    padding-bottom: $space-m;
+    width: 100%;
+  }
+
+  .headerCellContent {
     @include font-header-s;
+
     color: $gray-dark;
   }
 }
 
 .cell {
   @include font-header-s;
+
+  display: flex;
   align-items: center;
   margin: $space-xs 0 $space-xs 0;
 
   .icon {
-    margin: 0 $space-l 0 $space-l;
+    margin: 0 $space-l;
     fill: $gray-light;
   }
 
   a {
     @include font-caps-xxs;
     color: $primary;
+  }
+}
+
+.rowContent {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: $space-l 0;
+}
+
+.tableRow {
+  display: flex;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.tableContent {
+  height: 77vh;
+  width: 100%;
+
+  > div {
+    display: inline-block;
   }
 }

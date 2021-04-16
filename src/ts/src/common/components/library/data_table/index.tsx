@@ -1,12 +1,20 @@
 import React, { FunctionComponent } from "react";
-import { Table } from "semantic-ui-react";
+import AutoSizer from "react-virtualized-auto-sizer";
+import { FixedSizeList, ListChildComponentProps } from "react-window/";
+import { EmptyState } from "../data_subview/components/EmptyState";
 import style from "./index.module.scss";
 
 interface Props {
   data?: TableItem[];
   headers: Header[];
   renderer?: CustomRenderer;
+  isLoading: boolean;
 }
+
+// (thuang): If item height changes, we need to update this value!
+const ITEM_HEIGHT_PX = 60;
+
+const LOADING_STATE_ROW_COUNT = 10;
 
 const UNDEFINED_TEXT = "---";
 
@@ -23,44 +31,68 @@ function defaultCellRenderer({ value }: CustomTableRenderProps): JSX.Element {
 const DataTable: FunctionComponent<Props> = ({
   data = [],
   headers,
-  renderer,
+  renderer = defaultCellRenderer,
+  isLoading,
 }: Props) => {
   const indexingKey = headers[0].key;
 
   // render functions
   const headerRow = headers.map((column: Header) => (
-    <Table.HeaderCell key={column.key}>
-      <div className={style.headerCell}>{column.text}</div>
-    </Table.HeaderCell>
+    <div key={column.key} className={style.headerCell}>
+      <div className={style.headerCellContent}>{column.text}</div>
+    </div>
   ));
 
-  const sampleRow = (item: TableItem): Array<JSX.Element> => {
+  const sampleRow = (item: TableItem): React.ReactNode => {
+    if (isLoading) {
+      return <EmptyState numOfColumns={headers.length} />;
+    }
+
     return headers.map((header, index) => {
       const value = item[header.key];
-      if (renderer === undefined) {
-        renderer = defaultCellRenderer;
-      }
+
       return (
-        <Table.Cell key={`${item[indexingKey]}-${header.key}`}>
+        <div
+          key={`${item[indexingKey]}-${header.key}`}
+          className={style.rowContent}
+        >
           {renderer({ header, index, item, value })}
-        </Table.Cell>
+        </div>
       );
     });
   };
 
-  function tableRows(data: TableItem[]): Array<JSX.Element> {
-    return data.map((item) => (
-      <Table.Row key={`${item[indexingKey]}`}>{sampleRow(item)}</Table.Row>
-    ));
+  function renderRow(props: ListChildComponentProps) {
+    const item = data[props.index];
+
+    return (
+      <div className={style.tableRow} style={props.style}>
+        {sampleRow(item)}
+      </div>
+    );
   }
 
   return (
-    <Table basic="very">
-      <Table.Header className={style.header}>
-        <Table.Row>{headerRow}</Table.Row>
-      </Table.Header>
-      <Table.Body>{tableRows(data)}</Table.Body>
-    </Table>
+    <div className={style.container}>
+      <div className={style.header}>{headerRow}</div>
+      <div className={style.tableContent}>
+        <AutoSizer>
+          {({ height, width }) => {
+            return (
+              <FixedSizeList
+                height={height}
+                itemData={data}
+                itemCount={isLoading ? LOADING_STATE_ROW_COUNT : data.length}
+                itemSize={ITEM_HEIGHT_PX}
+                width={width}
+              >
+                {renderRow}
+              </FixedSizeList>
+            );
+          }}
+        </AutoSizer>
+      </div>
+    </div>
   );
 };
 

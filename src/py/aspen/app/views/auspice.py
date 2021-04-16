@@ -1,12 +1,12 @@
+import json
 import logging
 import os
 from typing import Optional
 
 import boto3
-from flask import make_response, session
-import requests
+from flask import make_response
 
-from aspen.app.app import application
+from aspen.app.app import application, requires_auth
 from aspen.database.connection import session_scope
 from aspen.database.models import PhyloTree
 from aspen.error.recoverable import RecoverableError
@@ -14,12 +14,13 @@ from aspen.error.recoverable import RecoverableError
 logger = logging.getLogger(__name__)
 
 
+
 @application.route(
     "/api/auspice/view/<int:phylo_tree_id>", methods=["GET"]
 )
+@requires_auth
 def auspice_view(phylo_tree_id: int):
     with session_scope(application.DATABASE_INTERFACE) as db_session:
-        logger.info("SESSION: ", session)
         phylo_tree: Optional[PhyloTree] = (
             db_session.query(PhyloTree)
             .filter(PhyloTree.entity_id == phylo_tree_id)
@@ -37,13 +38,13 @@ def auspice_view(phylo_tree_id: int):
 
         s3_client = s3_resource.meta.client
 
-        presigned_url = (
-            s3_client.generate_presigned_url(
+        presigned_url = s3_client.generate_presigned_url(
             "get_object",
             Params={"Bucket": phylo_tree.s3_bucket, "Key": phylo_tree.s3_key},
-            ExpiresIn=3600
-            )
+            ExpiresIn=3600,
         )
 
-        return presigned_url
+        response = make_response(json.dumps({"url": presigned_url}))
+        response.headers["Content-Type"] = "text/json"
 
+        return response
