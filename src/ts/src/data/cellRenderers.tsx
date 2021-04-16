@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Modal } from "src/common/components";
+import dataTableStyle from "src/common/components/library/data_table/index.module.scss";
 import { ReactComponent as ExternalLinkIcon } from "src/common/icons/ExternalLink.svg";
 import { ReactComponent as TreeIcon } from "src/common/icons/PhyloTree.svg";
 import { ReactComponent as SampleIcon } from "src/common/icons/Sample.svg";
@@ -11,16 +12,15 @@ import {
   stringGuard,
   stripProtocol,
 } from "src/common/utils";
-import style from "./index.module.scss";
 
 const DEFAULT_RENDERER = (value: JSONPrimitive): JSX.Element => {
-  return <div className={style.cell}>{value}</div>;
+  return <div className={dataTableStyle.cell}>{value}</div>;
 };
 
 const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
   privateId: (value: JSONPrimitive): JSX.Element => (
-    <div className={style.cell}>
-      {<SampleIcon className={style.icon} />}
+    <div className={dataTableStyle.cell}>
+      {<SampleIcon className={dataTableStyle.icon} />}
       {value}
     </div>
   ),
@@ -35,7 +35,7 @@ const TREE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
   downloadLink: (value: JSONPrimitive): JSX.Element => {
     const stringValue = stringGuard(value);
     return (
-      <div className={style.cell}>
+      <div className={dataTableStyle.cell}>
         <a href={stringValue} download>
           Download
         </a>
@@ -53,11 +53,11 @@ const TREE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
         data={createTreeModalInfo(
           `https://nextstrain.org/fetch/${treeLocation}`
         )}
-        className={style.cell}
+        className={dataTableStyle.cell}
       >
-        {<TreeIcon className={style.icon} />}
+        {<TreeIcon className={dataTableStyle.icon} />}
         {stringValue}
-        {<ExternalLinkIcon className={style.icon} />}
+        {<ExternalLinkIcon className={dataTableStyle.icon} />}
       </Modal>
     );
   },
