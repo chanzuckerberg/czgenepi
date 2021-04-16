@@ -10,7 +10,6 @@ import {
   createTableCellRenderer,
   createTreeModalInfo,
   stringGuard,
-  stripProtocol,
 } from "src/common/utils";
 
 const DEFAULT_RENDERER = (value: JSONPrimitive): JSX.Element => {
@@ -44,17 +43,11 @@ const TREE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
   },
   name: (value: JSONPrimitive): JSX.Element => {
     const stringValue = stringGuard(value);
+
     const treeID = stringValue.split(" ")[0];
-    const treeLocation = `${stripProtocol(
-      process.env.API_URL
-    )}/api/auspice/view/${treeID}`;
+
     return (
-      <Modal
-        data={createTreeModalInfo(
-          `https://nextstrain.org/fetch/${treeLocation}`
-        )}
-        className={dataTableStyle.cell}
-      >
+      <Modal data={createTreeModalInfo(treeID)} className={dataTableStyle.cell}>
         {<TreeIcon className={dataTableStyle.icon} />}
         {stringValue}
         {<ExternalLinkIcon className={dataTableStyle.icon} />}
