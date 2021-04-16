@@ -10,7 +10,7 @@
 
 .header {
   display: flex;
-  // (thuang): Account for Chrome scrollbar width
+  // (thuang): Offset for Chrome scrollbar width
   padding-right: $space-l;
   border-bottom: 3px solid $gray-lightest !important;
 
