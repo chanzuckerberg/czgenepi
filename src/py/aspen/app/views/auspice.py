@@ -14,10 +14,7 @@ from aspen.error.recoverable import RecoverableError
 logger = logging.getLogger(__name__)
 
 
-
-@application.route(
-    "/api/auspice/view/<int:phylo_tree_id>", methods=["GET"]
-)
+@application.route("/api/auspice/view/<int:phylo_tree_id>", methods=["GET"])
 @requires_auth
 def auspice_view(phylo_tree_id: int):
     with session_scope(application.DATABASE_INTERFACE) as db_session:

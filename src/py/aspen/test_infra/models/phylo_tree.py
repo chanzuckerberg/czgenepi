@@ -2,8 +2,11 @@ from aspen.database.models import PhyloTree
 
 
 def phylotree_factory(
-        entity,
-        s3_bucket="test_bucket",
-        s3_key="test_tree",
-        constituent_samples
-):
+    constituent_samples,
+    bucket="test-bucket",
+    key="test-key",
+) -> PhyloTree:
+
+    return PhyloTree(
+        s3_bucket=bucket, s3_key=key, constituent_samples=constituent_samples
+    )

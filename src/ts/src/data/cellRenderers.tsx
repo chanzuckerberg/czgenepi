@@ -45,9 +45,6 @@ const TREE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
     const stringValue = stringGuard(value);
 
     const treeID = stringValue.split(" ")[0];
-    const treeLocation = `${stripProtocol(
-      process.env.API_URL
-    )}/api/auspice/view/${treeID}`;
     return (
       <Modal data={createTreeModalInfo(treeID)} className={dataTableStyle.cell}>
         {<TreeIcon className={dataTableStyle.icon} />}
