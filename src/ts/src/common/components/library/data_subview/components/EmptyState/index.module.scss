@@ -2,7 +2,17 @@
 
 @mixin commonCell {
   @include loadingAnimation;
-  flex: unset;
+}
+
+.container {
+  display: flex;
+  width: 100%;
+}
+
+.cellContainer {
+  display: flex;
+  align-items: center;
+  width: 100%;
 }
 
 .cell {
@@ -20,12 +30,12 @@
 
 .firstColumn {
   display: flex;
-  flex: unset;
+  width: 100%;
 
   .square {
     @include commonCell;
 
-    width: 40px;
+    min-width: 40px;
     height: 40px;
 
     margin-right: 12px;
@@ -34,18 +44,19 @@
   .bars {
     display: flex;
     flex-direction: column;
+    width: 100%;
 
     .long {
       @include commonBar;
 
-      width: 365px;
+      width: 80%;
       height: 12px;
     }
 
     .short {
       @include commonBar;
 
-      width: 315px;
+      width: 70%;
       height: 9px;
     }
   }

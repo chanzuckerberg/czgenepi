@@ -11,8 +11,20 @@
     margin-bottom: $space-l;
     width: 20em;
 
+    > div {
+      width: 100%;
+    }
+
     input {
       border-radius: $border-radius-l !important;
+
+      &:hover {
+        border-color: $gray-medium;
+      }
+
+      &:focus {
+        border-color: $primary;
+      }
     }
   }
 

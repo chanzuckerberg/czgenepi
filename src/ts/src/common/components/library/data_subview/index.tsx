@@ -65,7 +65,6 @@ const DataSubview: FunctionComponent<Props> = ({
       <div className={style.samplesRoot}>
         <div className={style.searchBar}>
           <Input
-            transparent
             icon="search"
             placeholder="Search"
             loading={state.searching}
