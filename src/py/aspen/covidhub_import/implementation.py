@@ -9,10 +9,9 @@ from typing import (
     Collection,
     Iterable,
     Iterator,
-    List,
     Mapping,
     MutableMapping,
-    MutableSequence,
+    Optional,
     Sequence,
 )
 
@@ -21,35 +20,35 @@ import pytz
 import tqdm
 from auth0.v3 import authentication as auth0_authentication
 from auth0.v3 import management as auth0_management
-from covid_database import SqlAlchemyInterface as CSqlAlchemyInterface
-from covid_database import init_db as covidhub_init_db
-from covid_database import util as covidhub_database_util
-from covid_database.models import covidtracker
-from covid_database.models.enums import ConsensusGenomeStatus
-from covid_database.models.ngs_sample_tracking import (
-    CZBID,
-    ConsensusGenome,
-    DphCZBID,
-    Project,
-    SampleFastqs,
-)
 from sqlalchemy import and_, or_
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import configure_mappers, joinedload, Session
 
 from aspen.aws.s3 import S3UrlParser
 from aspen.config import config as aspen_config
-from aspen.database.connection import SqlAlchemyInterface, session_scope
+from aspen.database.connection import session_scope, SqlAlchemyInterface
 from aspen.database.models import (
-    Accession,
-    Entity,
     Group,
     PhyloRun,
     PhyloTree,
     PublicRepositoryType,
+    RegionType,
     Sample,
     UploadedPathogenGenome,
     User,
     WorkflowStatusType,
+)
+from aspen.phylo_tree.identifiers import get_names_from_tree
+from covid_database import init_db as covidhub_init_db
+from covid_database import SqlAlchemyInterface as CSqlAlchemyInterface
+from covid_database import util as covidhub_database_util
+from covid_database.models import covidtracker
+from covid_database.models.enums import ConsensusGenomeStatus
+from covid_database.models.ngs_sample_tracking import (
+    ConsensusGenome,
+    CZBID,
+    DphCZBID,
+    Project,
+    SampleFastqs,
 )
 
 logger = logging.getLogger(__name__)
@@ -87,16 +86,6 @@ def list_bucket(s3_resource, bucket: str, key_prefix: str) -> Iterator[str]:
         nexttoken = results["NextContinuationToken"]
 
 
-def get_names_from_tree(tree) -> Sequence[str]:
-    results: MutableSequence[str] = list()
-    for node in tree:
-        results.append(node["name"])
-        if "children" in node:
-            results.extend(get_names_from_tree(node["children"]))
-
-    return results
-
-
 def get_or_make_group(session: Session, name: str, address: str, email: str) -> Group:
     group = session.query(Group).filter(Group.name == name).one_or_none()
     if group is None:
@@ -120,6 +109,7 @@ def import_project(
     s3_dst_prefix: str,
     auth0_usermap: Mapping[str, Auth0Entry],
 ):
+    configure_mappers()
     covidhub_interface = covidhub_interface_from_secret(
         covidhub_aws_profile, covidhub_secret_id
     )
@@ -281,6 +271,7 @@ def import_project(
             sample.location = project.location
             sample.division = "California"
             sample.country = "USA"
+            sample.region = RegionType.NORTH_AMERICA
             sample.organism = "SARS-CoV-2"
 
             if sample.uploaded_pathogen_genome is None:
@@ -301,19 +292,18 @@ def import_project(
             sample.uploaded_pathogen_genome.sequence = consensus_genome.fasta
 
             if czbid.genome_submission_info is not None:
+                repository_type: Optional[PublicRepositoryType] = None
                 if czbid.genome_submission_info.gisaid_accession is not None:
-                    sample.uploaded_pathogen_genome.accessions.append(
-                        Accession(
-                            repository_type=PublicRepositoryType.GISAID,
-                            public_identifier=czbid.genome_submission_info.gisaid_accession,
-                        )
-                    )
-                if czbid.genome_submission_info.genbank_accession is not None:
-                    sample.uploaded_pathogen_genome.accessions.append(
-                        Accession(
-                            repository_type=PublicRepositoryType.GENBANK,
-                            public_identifier=czbid.genome_submission_info.genbank_accession,
-                        )
+                    repository_type = PublicRepositoryType.GISAID
+                    public_identifier = czbid.genome_submission_info.gisaid_accession
+                elif czbid.genome_submission_info.genbank_accession is not None:
+                    repository_type = PublicRepositoryType.GENBANK
+                    public_identifier = czbid.genome_submission_info.genbank_accession
+
+                if repository_type is not None:
+                    sample.uploaded_pathogen_genome.add_accession(
+                        repository_type=repository_type,
+                        public_identifier=public_identifier,
                     )
 
             public_identifier_to_sample[sample.public_identifier] = sample
@@ -352,24 +342,21 @@ def import_project(
 
             all_public_identifiers = get_names_from_tree(tree)
 
-            all_uploaded_pathogen_genomes: List[Entity] = list()
-            for public_identifier in all_public_identifiers:
-                sample = public_identifier_to_sample.get(public_identifier)
-                if sample is not None:
-                    uploaded_pathogen_genome = sample.uploaded_pathogen_genome
-                    if uploaded_pathogen_genome is not None:
-                        all_uploaded_pathogen_genomes.append(uploaded_pathogen_genome)
+            all_uploaded_pathogen_genomes: Sequence[UploadedPathogenGenome] = [
+                sample.uploaded_pathogen_genome
+                for public_identifier, sample in public_identifier_to_sample.items()
+                if sample.uploaded_pathogen_genome is not None
+                and public_identifier in all_public_identifiers
+            ]
 
             phylo_tree = PhyloTree(
                 s3_bucket=dst_prefix_url.bucket,
                 s3_key=dst_prefix_url.key + key_prefix_removed,
             )
-            s3_dst.Bucket(phylo_tree.s3_bucket).Object(phylo_tree.s3_key).put(Body=data)
-
-            print(
-                f"s3://{src_prefix_url.bucket}/{key} ==>"
-                f" s3://{phylo_tree.s3_bucket}/{phylo_tree.s3_key}"
-            )
+            phylo_tree.constituent_samples = [
+                uploaded_pathogen_genome.sample
+                for uploaded_pathogen_genome in all_uploaded_pathogen_genomes
+            ]
 
             workflow = PhyloRun(
                 group=group,
@@ -377,9 +364,16 @@ def import_project(
                 end_datetime=dt,
                 workflow_status=WorkflowStatusType.COMPLETED,
                 software_versions={},
-                inputs=all_uploaded_pathogen_genomes,
             )
+            workflow.inputs = list(all_uploaded_pathogen_genomes)
             workflow.outputs = [phylo_tree]
+
+            s3_dst.Bucket(phylo_tree.s3_bucket).Object(phylo_tree.s3_key).put(Body=data)
+
+            print(
+                f"s3://{src_prefix_url.bucket}/{key} ==>"
+                f" s3://{phylo_tree.s3_bucket}/{phylo_tree.s3_key}"
+            )
 
 
 def retrieve_auth0_users(config: aspen_config.Config) -> Mapping[str, Auth0Entry]:

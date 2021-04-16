@@ -24,7 +24,7 @@ cd /aspen/
 
 # update aspen
 aspen_workflow_rev=$(git rev-parse HEAD)
-git fetch git://github.com/chanzuckerberg/aspen "${ASPEN_GIT_REVSPEC}"
+git fetch --depth 1 git://github.com/chanzuckerberg/aspen "${ASPEN_GIT_REVSPEC}"
 git checkout FETCH_HEAD
 aspen_creation_rev=$(git rev-parse HEAD)
 
@@ -36,13 +36,13 @@ fi
 end_time=$(date +%s)
 
 # create the objects
-entity_id=$(/aspen/.venv/bin/python workflows/ingest_gisaid/save.py              \
-                                    --aspen-workflow-rev "${aspen_workflow_rev}" \
-                                    --aspen-creation-rev "${aspen_creation_rev}" \
-                                    --start-time "${start_time}"                 \
-                                    --end-time "${end_time}"                     \
-                                    --gisaid-s3-bucket "${bucket}"               \
-                                    --gisaid-s3-key "${key}"                     \
+entity_id=$(/aspen/.venv/bin/python /aspen/src/py/workflows/ingest_gisaid/save.py \
+                                    --aspen-workflow-rev "${aspen_workflow_rev}"  \
+                                    --aspen-creation-rev "${aspen_creation_rev}"  \
+                                    --start-time "${start_time}"                  \
+                                    --end-time "${end_time}"                      \
+                                    --gisaid-s3-bucket "${bucket}"                \
+                                    --gisaid-s3-key "${key}"                      \
          )
 
 # invoke the next workflow
@@ -52,6 +52,6 @@ aws batch submit-job \
     --job-definition aspen-batch-job-definition  \
     --container-overrides "
       {
-        \"command\": [\"${ASPEN_GIT_REVSPEC}\", \"workflows/transform_gisaid/transform.sh\", \"${entity_id}\"],
+        \"command\": [\"${ASPEN_GIT_REVSPEC}\", \"src/py/workflows/transform_gisaid/transform.sh\", \"${entity_id}\"],
         \"memory\": 15000
       }"

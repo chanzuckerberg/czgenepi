@@ -64,7 +64,8 @@ resource "aws_iam_policy" "aspen-batch-jobs-policies" {
               "Resource": [
                   "arn:aws:s3:::${aws_s3_bucket.aspen-db-data.bucket}/raw_gisaid_dump/*",
                   "arn:aws:s3:::${aws_s3_bucket.aspen-db-data.bucket}/processed_gisaid_dump/*",
-                  "arn:aws:s3:::${aws_s3_bucket.aspen-db-data.bucket}/aligned_gisaid_dump/*"
+                  "arn:aws:s3:::${aws_s3_bucket.aspen-db-data.bucket}/aligned_gisaid_dump/*",
+                  "arn:aws:s3:::${aws_s3_bucket.aspen-db-data.bucket}/phylo_run/*"
               ]
           }
       ]

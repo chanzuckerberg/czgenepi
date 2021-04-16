@@ -1,11 +1,9 @@
-name: Push Tests - Backend
+name: Push Remote Dev
 
 on:
   push:
     branches:
-      - trunk
-  pull_request:
-    branches: "**"
+      - 'rdev-*'
 
 env:
   # Force using BuildKit instead of normal Docker, required so that metadata
@@ -15,10 +13,13 @@ env:
   DOCKER_REPO: ${{ secrets.ECR_REPO }}/
 
 jobs:
-  py-lint:
+  build-push-images:
     runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        component: ['frontend', 'backend', 'nextstrain', 'nextstrain-errorhandler']
     steps:
-      - name: Configure AWS prod Credentials
+      - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -31,14 +32,18 @@ jobs:
         with:
           registry: ${{ secrets.ECR_REPO }}
       - uses: actions/checkout@v2
-      - name: Lint Python
+      - name: Build component
+        shell: bash
         run: |
-          echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
-          make backend-check-style
-  py-test:
+          pip install -r .happy/requirements.txt
+          scripts/happy --profile="" push --extra-tag sha-${GITHUB_SHA:0:8} --extra-tag build-${GITHUB_RUN_NUMBER} ${{ matrix.component }}
+
+  create-update-rdev:
     runs-on: ubuntu-20.04
+    needs:
+      - build-push-images
     steps:
-      - name: Configure AWS prod Credentials
+      - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -46,13 +51,19 @@ jobs:
           aws-region: us-west-2
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-duration-seconds: 900
-      - name: Login to ECR
-        uses: docker/login-action@v1
-        with:
-          registry: ${{ secrets.ECR_REPO }}
       - uses: actions/checkout@v2
-      - name: Test Python
+      - name: Install happy dependencies
         run: |
-          echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
-          make local-init
-          make backend-test
+          pip install -r .happy/requirements.txt
+      - name: Create update rdev
+        env:
+          TFE_TOKEN: ${{ secrets.TFE_TOKEN }}
+        run: |
+          RDEV_NAME=${GITHUB_REF#refs/heads/rdev-}
+          if $(./scripts/happy --profile="" list | grep -q $RDEV_NAME); then
+            echo "Updating stack $RDEV_NAME"
+            ./scripts/happy --profile=""  update --tag build-${GITHUB_RUN_NUMBER} $RDEV_NAME
+          else
+            echo "Creating stack $RDEV_NAME"
+            ./scripts/happy --profile="" create  --tag build-${GITHUB_RUN_NUMBER} $RDEV_NAME
+          fi

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import enum
-from typing import TYPE_CHECKING, MutableSequence, Sequence
+from typing import MutableSequence, Sequence, TYPE_CHECKING
 
 import enumtables
 from sqlalchemy import (
@@ -10,10 +10,10 @@ from sqlalchemy import (
     DateTime,
     Float,
     ForeignKey,
+    func,
     Integer,
     String,
     UniqueConstraint,
-    func,
 )
 from sqlalchemy.orm import backref, deferred, relationship
 
@@ -140,6 +140,14 @@ class SequencingReadsCollection(Entity, DictMixin):
             results.extend(entities)
 
         return results
+
+    @property
+    def pathogen_genomes(self) -> Sequence[CalledPathogenGenome]:
+        return [
+            pathogen_genome
+            for host_filtered_sequencing_reads_collection in self.host_filtered_sequencing_reads
+            for pathogen_genome in host_filtered_sequencing_reads_collection.pathogen_genomes
+        ]
 
 
 class PathogenGenome(Entity):

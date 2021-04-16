@@ -1,21 +1,25 @@
 # Local Development Environment
 
-This uses the [Happy Path setup](https://wiki.czi.team/display/TECH/Data+Portal+Happy+Path+--+How+it+works) created by the shared infra team. 
+This uses the [Happy Path setup](https://wiki.czi.team/display/TECH/Data+Portal+Happy+Path+--+How+it+works) created by the shared infra team.
 
 ## Development quickstart
 
 1. [install docker](https://docs.docker.com/get-docker/). If brew is installed run `brew install docker`.
+1. [install pre-commit](https://pre-commit.com/#install). `pip install pre-commit` or `brew install pre-commit`
+1. Run `pre-commit install` to install all the git pre-commit hooks
 1. From the root of this repository, run `make local-init` to build and run the dev environment. The first build takes awhile, but subsequent runs will use cached artifacts.
 1. Visit [http://localhost:3000](http://localhost:3000) to view the backend, and [http://localhost:8000](http://localhost:8000) for the frontend.
 1. `make local-dbconsole` starts a connection with the local postgresql db.
 1. **Open the source code and start editing!**
-  - Modify code in the `src/ts` directory, save your changes and the browser will update in real time.
-  - Modify code in the `src/py` directory, and the backend api will reload automatically.
+   - Modify code in the `src/ts` directory, save your changes and the browser will update in real time.
+   - Modify code in the `src/py` directory, and the backend api will reload automatically.
 
 ### OAuth creds
-Username: User1 / Password: pwd ([users are defined here](oauth/users.json))
+
+Username: User1 / Password: pwd ([users are defined here](../oauth/users.json))
 
 ### Containers managed by the dev environment
+
 The Aspen dev environment is a set of containers defined in [docker-compose.yml](docker-compose.yml). The [backend docker image](src/py/Dockerfile) and [frontend docker image](src/ts/Dockerfile) are built locally. Update any of these files as necessary and run `make local-sync` to sync your dev environment with these configs.
 
 ![Dev Environment Containers](images/genepi-localdev.png)
@@ -23,6 +27,7 @@ The Aspen dev environment is a set of containers defined in [docker-compose.yml]
 In addition, there is a "utility" container that is configured very similar to the backend container that's useful for running ad-hoc commands and testing dependency changes.
 
 ### Updating frontend/backend dependencies
+
 Both the frontend and backend services will automatically reload when their source code is modified, but they won't automatically rebuild when their dependencies (such as npm or pip package lists) change.
 
 To update frontend changes:
@@ -31,11 +36,13 @@ To update frontend changes:
 
 
 To update backend dependencies:
+
 1. add the dependency to [src/py/Pipfile](src/py/Pipfile)
 2. run `make local-update-deps` (updates Pipfile.lock and updates requirements)
 3. run `make local-sync` (rebuilds and initializes containers with new dependency)
 
 ### Update Dev Data
+
 The dev environment is initialized with AWS Secrets/S3 data in the [src/py/scripts/setup_dev_data.sh](src/py/scripts/setup_dev_data.sh) script, as well as DB migrations from [src/py/database_migrations](src/py/database_migrations). To add more data or run migrations, modify these scripts and run `make local-init` to reload the dev environment's data stores.
 
 ### Make targets for managing dev:
@@ -65,12 +72,15 @@ The dev environment is initialized with AWS Secrets/S3 data in the [src/py/scrip
 
 
 ### External dependencies
+
 The dev environment has no network dependencies, but it launches some extra containers to mock external dependencies:
- - [LocalStack](https://github.com/localstack/localstack) to mock AWS
- - [OIDC server mock](https://github.com/Soluto/oidc-server-mock) in place of Auth0.
- - [postgres](https://hub.docker.com/_/postgres) in place of RDS.
+
+- [LocalStack](https://github.com/localstack/localstack) to mock AWS
+- [OIDC server mock](https://github.com/Soluto/oidc-server-mock) in place of Auth0.
+- [postgres](https://hub.docker.com/_/postgres) in place of RDS.
 
 #### TLS Certificate for mock authentication service
+
 Due to browser security considerations, we must run the mock authentication
 service using a self-signed certificate. The local-init and local-clean make targets
 handle managing a keypair/certificate for each dev env and installing it in the
@@ -84,5 +94,5 @@ development auth service behind a certificate. We bundle a pre-generated
 self-signed cert in for convenience.
 
 #### Configuring Pycharm with Docker Compose:
-Follow the instructions in [the wiki](https://wiki.czi.team/display/SI/PyCharm+configuration+for+Happy+Path)
 
+Follow the instructions in [the wiki](https://wiki.czi.team/display/SI/PyCharm+configuration+for+Happy+Path)

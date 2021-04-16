@@ -12,7 +12,7 @@ fi
 apt-get install -y jq
 
 # get the bucket/key from the object id
-processed_gisaid_location=$(/aspen/.venv/bin/python workflows/align_gisaid/lookup_processed_gisaid_object.py --processed-gisaid-object-id "${1}")
+processed_gisaid_location=$(/aspen/.venv/bin/python src/py/workflows/align_gisaid/lookup_processed_gisaid_object.py --processed-gisaid-object-id "${1}")
 processed_gisaid_s3_bucket=$(echo "${processed_gisaid_location}" | jq -r .bucket)
 processed_gisaid_sequences_s3_key=$(echo "${processed_gisaid_location}" | jq -r .sequences_key)
 processed_gisaid_metadata_s3_key=$(echo "${processed_gisaid_location}" | jq -r .metadata_key)
@@ -24,10 +24,10 @@ build_id=$(date +%Y%m%d-%H%M)
 mkdir -p /ncov/my_profiles/align
 cd /ncov
 git init
-git fetch git://github.com/nextstrain/ncov.git
+git fetch --depth 1 git://github.com/nextstrain/ncov.git
 git checkout FETCH_HEAD
 ncov_git_rev=$(git rev-parse HEAD)
-cp /aspen/workflows/align_gisaid/config.yaml /ncov/my_profiles/align
+cp /aspen/src/py/workflows/align_gisaid/config.yaml /ncov/my_profiles/align
 
 # fetch the gisaid dataset
 aws s3 cp --no-progress s3://"${processed_gisaid_s3_bucket}"/"${processed_gisaid_sequences_s3_key}" - | xz -d > /ncov/data/sequences.fasta
@@ -47,7 +47,7 @@ cd /aspen/
 
 # update aspen
 aspen_workflow_rev=$(git rev-parse HEAD)
-git fetch git://github.com/chanzuckerberg/aspen "$ASPEN_GIT_REVSPEC"
+git fetch --depth 1 git://github.com/chanzuckerberg/aspen "$ASPEN_GIT_REVSPEC"
 git checkout FETCH_HEAD
 aspen_creation_rev=$(git rev-parse HEAD)
 
@@ -59,7 +59,7 @@ fi
 end_time=$(date +%s)
 
 # create the objects
-entity_id=$(/aspen/.venv/bin/python workflows/align_gisaid/save.py                               \
+entity_id=$(/aspen/.venv/bin/python /aspen/src/py/workflows/align_gisaid/save.py                 \
                                     --aspen-workflow-rev "${aspen_workflow_rev}"                 \
                                     --aspen-creation-rev "${aspen_creation_rev}"                 \
                                     --ncov-rev "${ncov_git_rev}"                                 \

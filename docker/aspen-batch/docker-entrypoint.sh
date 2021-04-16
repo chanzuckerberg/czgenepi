@@ -17,7 +17,7 @@ else
     export ASPEN_GIT_REVSPEC="$1"
 
     git init
-    git fetch git://github.com/chanzuckerberg/aspen "$ASPEN_GIT_REVSPEC"
+    git fetch --depth 1 git://github.com/chanzuckerberg/aspen "$ASPEN_GIT_REVSPEC"
     git checkout FETCH_HEAD
 
     /aspen/.venv/bin/pip install -U pip

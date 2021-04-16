@@ -2,7 +2,7 @@ import enum
 from typing import Mapping, MutableSequence, Union
 
 import enumtables
-from sqlalchemy import JSON, Column, DateTime, ForeignKey, Table
+from sqlalchemy import Column, DateTime, ForeignKey, JSON, Table
 from sqlalchemy.orm import relationship
 
 from aspen.database.models.base import base, idbase
@@ -17,6 +17,7 @@ class WorkflowType(enum.Enum):
     PROCESS_GISAID_DUMP = "PROCESS_GISAID_DUMP"
     ALIGN_GISAID_DUMP = "ALIGN_GISAID_DUMP"
     PHYLO_RUN = "PHYLO_RUN"
+    PUBLIC_REPOSITORY_SUBMISSION = "PUBLIC_REPOSITORY_SUBMISSION"
 
 
 # Create the enumeration table
@@ -68,7 +69,7 @@ class Workflow(idbase):  # type: ignore
     }
 
     start_datetime = Column(
-        DateTime, nullable=False, comment="datetime when the workflow is started."
+        DateTime, nullable=True, comment="datetime when the workflow is started."
     )
     end_datetime = Column(
         DateTime,

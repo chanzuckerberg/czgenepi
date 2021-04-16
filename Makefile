@@ -23,6 +23,22 @@ help: ## display help for this makefile
 rm-pycache: ## remove all __pycache__ files (run if encountering issues with pycharm debugger (containers exiting prematurely))
 	find . -name '__pycache__' | xargs rm -rf
 
+### Connecting to remote dbs #########################################
+remote-pgconsole: # Get a psql console on a remote db (from OSX only!)
+	export ENV=$${ENV:=rdev}; \
+	export config=$$(aws --profile $(AWS_DEV_PROFILE) secretsmanager get-secret-value --secret-id $${ENV}/aspen-config | jq -r .SecretString ); \
+	export DB_URI=$$(jq -r '"postgresql://\(.DB.admin_username):\(.DB.admin_password)@127.0.0.1:5556/$(STACK)"' <<< $$config); \
+	ssh -f -o ExitOnForwardFailure=yes -L 5556:$$(jq -r .DB.address <<< $$config):5432 $$(jq -r .bastion_host <<< $$config) sleep 10; \
+	psql $${DB_URI}
+
+remote-dbconsole: .env.ecr # Get a python console on a remote db (from OSX only!)
+	export ENV=$${ENV:=rdev}; \
+	export config=$$(aws --profile $(AWS_DEV_PROFILE) secretsmanager get-secret-value --secret-id $${ENV}/aspen-config | jq -r .SecretString ); \
+	export OSX_IP=$$(ipconfig getifaddr en0 || ipconfig getifaddr en1); \
+	export DB_URI=$$(jq -r '"postgresql://\(.DB.admin_username):\(.DB.admin_password)@'$${OSX_IP}':5555/$(STACK)"' <<< $$config); \
+	ssh -f -o ExitOnForwardFailure=yes -L $${OSX_IP}:5555:$$(jq -r .DB.address <<< $$config):5432 $$(jq -r .bastion_host <<< $$config) sleep 10; \
+	docker-compose $(COMPOSE_OPTS) run -e DB_URI backend aspen-cli db --remote interact --connect
+
 ### DOCKER LOCAL DEV #########################################
 oauth/pkcs12/certificate.pfx:
 	# All calls to the openssl cli happen in the oidc-server-mock container.
@@ -42,7 +58,12 @@ oauth/pkcs12/certificate.pfx:
 	sudo chown -R $$(id -u):$$(id -g) $(PWD)/oauth/pkcs12
 
 .env.ecr:
-	echo DOCKER_REPO=$$(aws sts get-caller-identity --profile $(AWS_DEV_PROFILE) | jq -r .Account).dkr.ecr.us-west-2.amazonaws.com/ > .env.ecr;
+	export AWS_ACCOUNT_ID=$$(aws sts get-caller-identity --profile $(AWS_DEV_PROFILE) | jq -r .Account); \
+	if [ -n "$${AWS_ACCOUNT_ID}" ]; then \
+		echo DOCKER_REPO=$${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/ > .env.ecr; \
+	else \
+		false; \
+	fi
 
 .PHONY: local-ecr-login
 local-ecr-login:
@@ -56,9 +77,9 @@ local-init: oauth/pkcs12/certificate.pfx .env.ecr local-ecr-login ## Launch a ne
 	@docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@localhost:5432/$(LOCAL_DB_NAME)" -c "alter user $(LOCAL_DB_ADMIN_USERNAME) with password '$(LOCAL_DB_ADMIN_PASSWORD)';"
 	docker-compose exec -T utility pip3 install awscli
 	docker-compose exec -T utility $(BACKEND_APP_ROOT)/scripts/setup_dev_data.sh
+	docker-compose exec -T utility alembic upgrade head
 	docker-compose exec -T utility python scripts/setup_localdata.py
 	docker-compose exec -T utility pip install .
-	docker-compose exec -T utility alembic upgrade head
 
 .PHONY: backend-debugger
 backend-debugger: ## Attach to the backend service (useful for pdb)

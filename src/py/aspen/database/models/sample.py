@@ -1,26 +1,47 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+import enum
+from typing import Optional, TYPE_CHECKING, Union
 
+import enumtables
 from sqlalchemy import (
-    JSON,
     Column,
     Date,
     ForeignKey,
     Integer,
+    JSON,
     String,
-    UniqueConstraint,
     text,
+    UniqueConstraint,
 )
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import backref, relationship
 
-from aspen.database.models.base import idbase
+from aspen.database.models.base import base, idbase
+from aspen.database.models.enum import Enum
 from aspen.database.models.mixins import DictMixin
 from aspen.database.models.usergroup import Group
 
 if TYPE_CHECKING:
     from .sequences import SequencingReadsCollection, UploadedPathogenGenome
+
+
+class RegionType(enum.Enum):
+    AFRICA = "Africa"
+    ASIA = "Asia"
+    EUROPE = "Europe"
+    NORTH_AMERICA = "North America"
+    OCEANIA = "Oceania"
+    SOUTH_AMERICA = "South America"
+
+
+# Create the enumeration table
+# Pass your enum class and the SQLAlchemy declarative base to enumtables.EnumTable
+_RegionTypeTable = enumtables.EnumTable(
+    RegionType,
+    base,
+    tablename="region_types",
+)
 
 
 class Sample(idbase, DictMixin):  # type: ignore
@@ -123,6 +144,11 @@ class Sample(idbase, DictMixin):  # type: ignore
             }
         },
     )
+    region = Column(
+        Enum(RegionType),
+        ForeignKey(_RegionTypeTable.item_id),
+        nullable=False,
+    )
 
     organism = Column(
         String,
@@ -167,3 +193,14 @@ class Sample(idbase, DictMixin):  # type: ignore
 
     sequencing_reads_collection: Optional[SequencingReadsCollection]
     uploaded_pathogen_genome: Optional[UploadedPathogenGenome]
+
+    def get_uploaded_entity(
+        self,
+    ) -> Union[SequencingReadsCollection, UploadedPathogenGenome]:
+        if self.sequencing_reads_collection is not None:
+            return self.sequencing_reads_collection
+        elif self.uploaded_pathogen_genome is not None:
+            return self.uploaded_pathogen_genome
+        raise ValueError(
+            "Sample has neither sequencing reads nor uploaded pathogen genome."
+        )

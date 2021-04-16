@@ -1,42 +1,17 @@
-from datetime import datetime
-
 import pytest
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm import undefer
 
-from aspen.database.models.sample import Sample
-from aspen.database.models.sequences import (
-    SequencingInstrumentType,
-    SequencingProtocolType,
-    SequencingReadsCollection,
-    UploadedPathogenGenome,
-)
-from aspen.database.models.usergroup import Group
+from aspen.database.models.sequences import UploadedPathogenGenome
+from aspen.test_infra.models.sample import sample_factory
+from aspen.test_infra.models.sequences import sequencing_read_factory
+from aspen.test_infra.models.usergroup import group_factory
 
 
 def test_sequencing_reads(session):
-    group = Group(name="groupname", email="groupemail", address="123 Main St")
-    sample = Sample(
-        submitting_group=group,
-        private_identifier="private_identifer",
-        original_submission={},
-        public_identifier="public_identifier",
-        collection_date=datetime.now(),
-        sample_collected_by="sample_collector",
-        sample_collector_contact_address="sample_collector_address",
-        location="Santa Clara County",
-        division="California",
-        country="USA",
-        organism="SARS-CoV-2",
-    )
-    sequencing_reads = SequencingReadsCollection(
-        sample=sample,
-        sequencing_instrument=SequencingInstrumentType.ILLUMINA_GENOME_ANALYZER_IIX,
-        sequencing_protocol=SequencingProtocolType.ARTIC_V3,
-        sequencing_date=datetime.now(),
-        s3_bucket="bucket",
-        s3_key="key",
-    )
+    group = group_factory()
+    sample = sample_factory(group)
+    sequencing_reads = sequencing_read_factory(sample)
 
     session.add_all(
         (
@@ -49,20 +24,8 @@ def test_sequencing_reads(session):
 
 
 def test_uploaded_pathogen_genome(session):
-    group = Group(name="groupname", email="groupemail", address="123 Main St")
-    sample = Sample(
-        submitting_group=group,
-        private_identifier="private_identifer",
-        original_submission={},
-        public_identifier="public_identifier",
-        collection_date=datetime.now(),
-        sample_collected_by="sample_collector",
-        sample_collector_contact_address="sample_collector_address",
-        location="Santa Clara County",
-        division="California",
-        country="USA",
-        organism="SARS-CoV-2",
-    )
+    group = group_factory()
+    sample = sample_factory(group)
     uploaded_pathogen_genome = UploadedPathogenGenome(
         sample=sample,
         sequence="GAGAGACTCTCT",
