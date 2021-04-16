@@ -17,7 +17,7 @@ WORKDIR /aspen
 RUN mkdir /tmp/aspen-tmp
 RUN cd /tmp/aspen-tmp
 RUN git init
-RUN git fetch git://github.com/chanzuckerberg/aspen $REVSPEC
+RUN git fetch --depth 1 git://github.com/chanzuckerberg/aspen $REVSPEC
 RUN git checkout FETCH_HEAD
 RUN python3.7 -m venv /aspen/.venv
 RUN /aspen/.venv/bin/pip install -U pip

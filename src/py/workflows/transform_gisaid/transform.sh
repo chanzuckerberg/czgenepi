@@ -23,7 +23,7 @@ build_id=$(date +%Y%m%d-%H%M)
 mkdir -p /ncov-ingest/data/gisaid
 cd /ncov-ingest
 git init
-git fetch git://github.com/nextstrain/ncov-ingest.git
+git fetch --depth 1 git://github.com/nextstrain/ncov-ingest.git
 git checkout FETCH_HEAD
 ncov_ingest_git_rev=$(git rev-parse HEAD)
 python3.7 -m venv /ncov-ingest/.venv
@@ -52,7 +52,7 @@ cd /aspen/
 
 # update aspen
 aspen_workflow_rev=$(git rev-parse HEAD)
-git fetch git://github.com/chanzuckerberg/aspen "$ASPEN_GIT_REVSPEC"
+git fetch --depth 1 git://github.com/chanzuckerberg/aspen "$ASPEN_GIT_REVSPEC"
 git checkout FETCH_HEAD
 aspen_creation_rev=$(git rev-parse HEAD)
 

@@ -17,7 +17,7 @@ build_id=$(date +%Y%m%d-%H%M)
 mkdir -p /ncov/my_profiles/aspen /ncov/results
 cd /ncov
 git init
-git fetch git://github.com/nextstrain/ncov.git
+git fetch --depth 1 git://github.com/nextstrain/ncov.git
 git checkout FETCH_HEAD
 ncov_git_rev=$(git rev-parse HEAD)
 
@@ -53,7 +53,7 @@ cd /aspen/
 
 # update aspen
 aspen_workflow_rev=$(git rev-parse HEAD)
-git fetch git://github.com/chanzuckerberg/aspen "$ASPEN_GIT_REVSPEC"
+git fetch --depth 1 git://github.com/chanzuckerberg/aspen "$ASPEN_GIT_REVSPEC"
 git checkout FETCH_HEAD
 aspen_creation_rev=$(git rev-parse HEAD)
 
