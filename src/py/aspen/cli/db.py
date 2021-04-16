@@ -337,7 +337,7 @@ def create_phylo_run(
                 "src/py/workflows/nextstrain_run/build_tree.sh",
                 str(workflow_id),
             ],
-            "vcpus": 32,
-            "memory": 370000,
+            "vcpus": 4,
+            "memory": 32000,
         },
     )
