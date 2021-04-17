@@ -148,6 +148,7 @@ class Sample(idbase, DictMixin):  # type: ignore
         Enum(RegionType),
         ForeignKey(_RegionTypeTable.item_id),
         nullable=False,
+        comment="This is the continent this sample was collected from.",
     )
 
     organism = Column(
