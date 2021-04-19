@@ -222,6 +222,25 @@ def import_project(
             )
             .all()
         )
+        czbid_without_consensus_genomes: Iterable[DphCZBID] = (
+            covidhub_session.query(DphCZBID)
+            .join(Project)
+            .filter(
+                DphCZBID.czb_id.notin_(
+                    {
+                        consensus_genome.sample_fastqs.czb_id.czb_id
+                        for consensus_genome in consensus_genomes
+                    }
+                )
+            )
+            .filter(Project.rr_project_id == rr_project_id)
+            .options(
+                joinedload(DphCZBID.sample_fastqs).joinedload(
+                    SampleFastqs.consensus_genomes
+                ),
+                joinedload(DphCZBID.genome_submission_info),
+            )
+        )
 
         external_accessions = {
             consensus_genome.sample_fastqs.czb_id.external_accession
@@ -251,6 +270,12 @@ def import_project(
 
             sample = format_sample_for_dphczbid(
                 project, group, czbid, consensus_genome, external_accessions_to_samples
+            )
+            public_identifier_to_sample[sample.public_identifier] = sample
+
+        for czbid in tqdm.tqdm(czbid_without_consensus_genomes):
+            sample = format_sample_for_dphczbid(
+                project, group, czbid, None, external_accessions_to_samples
             )
             public_identifier_to_sample[sample.public_identifier] = sample
 
@@ -383,6 +408,8 @@ def format_sample_for_dphczbid(
                     repository_type=repository_type,
                     public_identifier=public_identifier,
                 )
+    else:
+        sample.czb_failed_genome_recovery = True
 
     return sample
 
