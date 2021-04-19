@@ -40,12 +40,16 @@ from aspen.database.schema import create_tables_and_schema
 @click.option("--local", "config_cls", flag_value=DevelopmentConfig, default=True)
 @click.option("--remote", "config_cls", flag_value=RemoteDatabaseConfig)
 @click.option("--docker", "config_cls", flag_value=LocalConfig)
+@click.option("--profile/--no-profile", default=False)
 @click.pass_context
-def db(ctx, config_cls: Type[Config]):
+def db(ctx, config_cls: Type[Config], profile: bool):
     # TODO: support multiple runtime environments.
     config = config_cls()
     ctx.obj["CONFIG"] = config
     ctx.obj["ENGINE"] = init_db(get_db_uri(config))
+
+    if profile:
+        enable_profiling()
 
 
 @db.command("set-passwords-from-secret")
@@ -145,7 +149,6 @@ def import_data(s3_path, db_uri):
 
 
 @db.command("interact")
-@click.option("--profile/--no-profile", default=False)
 @click.option(
     "--connect/--no-connect", default=False, help="Connect to the db immediately"
 )
@@ -153,9 +156,6 @@ def import_data(s3_path, db_uri):
 def interact(ctx, profile, connect):
     # these are injected into the IPython scope, but they appear to be unused.
     engine = ctx.obj["ENGINE"]  # noqa: F841
-
-    if profile:
-        enable_profiling()
 
     # This forces an immediate connection to our database, which is useful to
     # prevent an ssh tunnel from closing while we're composing queries.
