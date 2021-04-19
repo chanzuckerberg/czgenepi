@@ -248,64 +248,10 @@ def import_project(
                     f"{consensus_genome.sample_fastqs.czb_id}"
                 )
                 continue
-            if czbid.external_accession in (
-                "OCPHL2207",
-                "OCPHL2208",
-            ):
-                external_accession = f"{czbid.external_accession} ({czbid.czb_id}"
-            else:
-                external_accession = czbid.external_accession
-            sample = external_accessions_to_samples.get(external_accession, None)
-            if sample is None:
-                sample = Sample(
-                    submitting_group=group, private_identifier=external_accession
-                )
 
-            sample.original_submission = {}
-            sample.public_identifier = (
-                f"USA/{czbid.submission_base}/{czbid.collection_date.year}"
+            sample = format_sample_for_dphczbid(
+                project, group, czbid, consensus_genome, external_accessions_to_samples
             )
-            sample.sample_collected_by = project.originating_lab
-            sample.sample_collector_contact_address = project.originating_address
-            sample.collection_date = czbid.collection_date
-            sample.location = project.location
-            sample.division = "California"
-            sample.country = "USA"
-            sample.region = RegionType.NORTH_AMERICA
-            sample.organism = "SARS-CoV-2"
-
-            if sample.uploaded_pathogen_genome is None:
-                sample.uploaded_pathogen_genome = UploadedPathogenGenome(
-                    sample=sample,
-                )
-            sample.uploaded_pathogen_genome.upload_date = czbid.date_received
-            sample.uploaded_pathogen_genome.num_unambiguous_sites = (
-                consensus_genome.recovered_sites
-            )
-            sample.uploaded_pathogen_genome.num_mixed = consensus_genome.ambiguous_sites
-            sample.uploaded_pathogen_genome.num_missing_alleles = (
-                consensus_genome.missing_sites
-            )
-            sample.uploaded_pathogen_genome.sequencing_depth = (
-                consensus_genome.avg_depth
-            )
-            sample.uploaded_pathogen_genome.sequence = consensus_genome.fasta
-
-            if czbid.genome_submission_info is not None:
-                repository_type: Optional[PublicRepositoryType] = None
-                if czbid.genome_submission_info.gisaid_accession is not None:
-                    repository_type = PublicRepositoryType.GISAID
-                    public_identifier = czbid.genome_submission_info.gisaid_accession
-                elif czbid.genome_submission_info.genbank_accession is not None:
-                    repository_type = PublicRepositoryType.GENBANK
-                    public_identifier = czbid.genome_submission_info.genbank_accession
-
-                if repository_type is not None:
-                    sample.uploaded_pathogen_genome.add_accession(
-                        repository_type=repository_type,
-                        public_identifier=public_identifier,
-                    )
-
             public_identifier_to_sample[sample.public_identifier] = sample
 
         pacific_time = pytz.timezone("US/Pacific")
@@ -374,6 +320,71 @@ def import_project(
                 f"s3://{src_prefix_url.bucket}/{key} ==>"
                 f" s3://{phylo_tree.s3_bucket}/{phylo_tree.s3_key}"
             )
+
+
+def format_sample_for_dphczbid(
+    project: Project,
+    group: Group,
+    dphczbid: DphCZBID,
+    consensus_genome: Optional[ConsensusGenome],
+    external_accessions_to_samples: Mapping[str, Sample],
+) -> Sample:
+    if dphczbid.external_accession in (
+        "OCPHL2207",
+        "OCPHL2208",
+    ):
+        external_accession = f"{dphczbid.external_accession} ({dphczbid.czb_id})"
+    else:
+        external_accession = dphczbid.external_accession
+    sample = external_accessions_to_samples.get(external_accession, None)
+    if sample is None:
+        sample = Sample(submitting_group=group, private_identifier=external_accession)
+
+    sample.original_submission = {}
+    sample.public_identifier = (
+        f"USA/{dphczbid.submission_base}/{dphczbid.collection_date.year}"
+    )
+    sample.sample_collected_by = project.originating_lab
+    sample.sample_collector_contact_address = project.originating_address
+    sample.collection_date = dphczbid.collection_date
+    sample.location = project.location
+    sample.division = "California"
+    sample.country = "USA"
+    sample.region = RegionType.NORTH_AMERICA
+    sample.organism = "SARS-CoV-2"
+
+    if consensus_genome is not None:
+        if sample.uploaded_pathogen_genome is None:
+            sample.uploaded_pathogen_genome = UploadedPathogenGenome(
+                sample=sample,
+            )
+        sample.uploaded_pathogen_genome.upload_date = dphczbid.date_received
+        sample.uploaded_pathogen_genome.num_unambiguous_sites = (
+            consensus_genome.recovered_sites
+        )
+        sample.uploaded_pathogen_genome.num_mixed = consensus_genome.ambiguous_sites
+        sample.uploaded_pathogen_genome.num_missing_alleles = (
+            consensus_genome.missing_sites
+        )
+        sample.uploaded_pathogen_genome.sequencing_depth = consensus_genome.avg_depth
+        sample.uploaded_pathogen_genome.sequence = consensus_genome.fasta
+
+        if dphczbid.genome_submission_info is not None:
+            repository_type: Optional[PublicRepositoryType] = None
+            if dphczbid.genome_submission_info.gisaid_accession is not None:
+                repository_type = PublicRepositoryType.GISAID
+                public_identifier = dphczbid.genome_submission_info.gisaid_accession
+            elif dphczbid.genome_submission_info.genbank_accession is not None:
+                repository_type = PublicRepositoryType.GENBANK
+                public_identifier = dphczbid.genome_submission_info.genbank_accession
+
+            if repository_type is not None:
+                sample.uploaded_pathogen_genome.add_accession(
+                    repository_type=repository_type,
+                    public_identifier=public_identifier,
+                )
+
+    return sample
 
 
 def retrieve_auth0_users(config: aspen_config.Config) -> Mapping[str, Auth0Entry]:
