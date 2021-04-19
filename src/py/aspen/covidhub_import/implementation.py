@@ -217,7 +217,7 @@ def import_project(
             )
             .options(
                 joinedload(ConsensusGenome.sample_fastqs)
-                .joinedload(SampleFastqs.czb_id)
+                .joinedload(SampleFastqs.czb_id.of_type(DphCZBID))
                 .joinedload(CZBID.genome_submission_info),
             )
             .all()
