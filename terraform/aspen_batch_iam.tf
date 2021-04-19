@@ -2,6 +2,10 @@ data "aws_secretsmanager_secret" "gisaid-download-credentials" {
   name = "gisaid-download-credentials"
 }
 
+data "aws_secretsmanager_secret" "czb-aws-access" {
+  name = "czb-aws-access"
+}
+
 resource "aws_iam_role" "aspen-batch-jobs-role" {
   name = "aspen-batch-jobs-role"
   assume_role_policy = templatefile("${path.module}/iam_templates/trust_policy.json", {
@@ -45,7 +49,8 @@ resource "aws_iam_policy" "aspen-batch-jobs-policies" {
               "Action": "secretsmanager:GetSecretValue",
               "Resource": [
                   "${data.aws_secretsmanager_secret.aspen_config.arn}",
-                  "${data.aws_secretsmanager_secret.gisaid-download-credentials.arn}"
+                  "${data.aws_secretsmanager_secret.gisaid-download-credentials.arn}",
+                  "${data.aws_secretsmanager_secret.czb-aws-access.arn}"
               ]
           },
           {
