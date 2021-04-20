@@ -2,6 +2,14 @@
 import axios from "axios";
 import { jsonToType } from "src/common/utils";
 
+export enum API {
+  USER_DATA = "/api/usergroup",
+  SAMPLES = "/api/samples",
+  LOG_IN = "/login",
+  LOG_OUT = "/logout",
+  PHYLO_TREES = "/api/phylo_trees",
+}
+
 export const DEFAULT_FETCH_OPTIONS: RequestInit = {
   credentials: "include",
 };
@@ -64,11 +72,7 @@ const USER_MAP = new Map<string, keyof User>([
   ["system_admin", "systemAdmin"],
 ]);
 export const fetchUserData = (): Promise<UserResponse> =>
-  apiResponse<UserResponse>(
-    ["group", "user"],
-    [null, USER_MAP],
-    "/api/usergroup"
-  );
+  apiResponse<UserResponse>(["group", "user"], [null, USER_MAP], API.USER_DATA);
 
 interface SampleResponse extends APIResponse {
   samples: Sample[];
@@ -81,7 +85,7 @@ const SAMPLE_MAP = new Map<string, keyof Sample>([
   ["upload_date", "uploadDate"],
 ]);
 export const fetchSamples = (): Promise<SampleResponse> =>
-  apiResponse<SampleResponse>(["samples"], [SAMPLE_MAP], "/api/samples");
+  apiResponse<SampleResponse>(["samples"], [SAMPLE_MAP], API.SAMPLES);
 
 interface TreeResponse extends APIResponse {
   phylo_trees: Tree[];
@@ -92,4 +96,4 @@ const TREE_MAP = new Map<string, keyof Tree>([
   ["completed_date", "creationDate"],
 ]);
 export const fetchTrees = (): Promise<TreeResponse> =>
-  apiResponse<TreeResponse>(["phylo_trees"], [TREE_MAP], "/api/phylo_trees");
+  apiResponse<TreeResponse>(["phylo_trees"], [TREE_MAP], API.PHYLO_TREES);

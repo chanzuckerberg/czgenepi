@@ -8,15 +8,25 @@ COPY package*.json ./
 FROM base as dev
 ENV NODE_ENV=development
 ENV BUILD_PATH=build
-RUN npm ci --verbose --production=false && npm cache clean --force
+RUN npm i --verbose
 RUN apt-get update && apt-get install make
 RUN npm install -g serve
 USER node
 COPY . .
 ENTRYPOINT ["./entrypoint.sh"]
 
+# Actual prod image used for deployments
+FROM base as prod
+ENV NODE_ENV=production
+ENV BUILD_PATH=build
+RUN npm ci --verbose && npm cache clean --force
+RUN apt-get update && apt-get install make
+USER node
+COPY . .
+ENTRYPOINT ["./entrypoint.sh"]
+
 # Build production from files in dev
-FROM dev as builder
+FROM prod as builder
 ENV NODE_ENV=production
 RUN npm run build
 
