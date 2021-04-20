@@ -153,7 +153,7 @@ def import_data(s3_path, db_uri):
     "--connect/--no-connect", default=False, help="Connect to the db immediately"
 )
 @click.pass_context
-def interact(ctx, profile, connect):
+def interact(ctx, connect):
     # these are injected into the IPython scope, but they appear to be unused.
     engine = ctx.obj["ENGINE"]  # noqa: F841
 
