@@ -180,6 +180,11 @@ class PathogenGenome(Entity):
         ),
     )
 
+    pangolin_lineage = Column(String)
+    pangolin_probability = Column(Integer)
+    pangolin_version = Column(String)
+    pangolin_last_updated = Column(DateTime)
+
 
 class UploadedPathogenGenome(PathogenGenome):
     __tablename__ = "uploaded_pathogen_genomes"
