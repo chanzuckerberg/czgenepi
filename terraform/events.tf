@@ -44,3 +44,37 @@ resource "aws_cloudwatch_event_target" "ingest-gisaid-target" {
   }
   CONTAINER_OVERRIDES
 }
+
+
+resource "aws_cloudwatch_event_rule" "update-czb-gisaid-rule" {
+  name                = "update-czb-gisaid-rule"
+  description         = "Ingest GISAID data daily"
+  schedule_expression = "cron(0 1 ? * 1-5 *)"
+}
+
+
+resource "aws_cloudwatch_event_target" "update-czb-gisaid-target" {
+  target_id = "update-czb-gisaid-target"
+  rule      = aws_cloudwatch_event_rule.update-czb-gisaid-rule.name
+  arn       = aws_batch_job_queue.aspen-batch-job-queue.arn
+  role_arn  = aws_iam_role.cloudwatch-batch-trigger-role.arn
+
+  batch_target {
+    job_name       = "update-czb-gisaid"
+    job_definition = aws_batch_job_definition.aspen-batch-job-definition.name
+  }
+
+  # These are overrides to the defaults specified in the job definition.  See
+  # https://docs.aws.amazon.com/batch/latest/APIReference/API_ContainerOverrides.html
+  # for more details.
+  input = <<-CONTAINER_OVERRIDES
+  {
+    "ContainerOverrides": {
+      "Command": [
+        "trunk",
+        "src/py/workflows/update_czb_gisaid/update.sh"
+      ]
+    }
+  }
+  CONTAINER_OVERRIDES
+}
