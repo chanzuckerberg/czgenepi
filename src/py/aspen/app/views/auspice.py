@@ -1,10 +1,9 @@
-import json
 import logging
 import os
 from typing import Optional
 
 import boto3
-from flask import make_response
+from flask import jsonify
 
 from aspen.app.app import application, requires_auth
 from aspen.database.connection import session_scope
@@ -41,7 +40,4 @@ def auspice_view(phylo_tree_id: int):
             ExpiresIn=3600,
         )
 
-        response = make_response(json.dumps({"url": presigned_url}))
-        response.headers["Content-Type"] = "text/json"
-
-        return response
+        return jsonify({"url": presigned_url})

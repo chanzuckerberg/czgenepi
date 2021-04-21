@@ -46,11 +46,11 @@ def test_auspice_redirect_view(session, app, client, mock_s3_resource, test_data
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
 
     res = client.get(f"/api/auspice/view/{phylo_tree.id}")
-    presigned_url_sections = json.loads(res.data)["url"].split("/")
+    res_presigned = res.json["url"]
 
     # this is a little hacky, currently when calling a get request on moto generated presigned url it gets 404
     # i think this is due to calling get not being within the moto test scope, so as a workaround i''m checking that
     # the key and bucket names from the phylo tree entry are in the returned presigned url and that the response code from the view is 200
     assert res.status == "200 OK"
-    assert presigned_url_sections[3] == phylo_tree.s3_bucket
-    assert presigned_url_sections[4].startswith(phylo_tree.s3_key)
+    assert phylo_tree.s3_bucket in res_presigned
+    assert phylo_tree.s3_key in res_presigned
