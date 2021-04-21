@@ -6,7 +6,7 @@ from aspen.test_infra.models.usergroup import group_factory, user_factory
 
 
 def test_auspice_redirect_view(
-    session, app, client, s3_resource, s3_client, test_data_dir
+    session, app, client, mock_s3_resource, test_data_dir
 ):
     group = group_factory()
     session.add(group)
@@ -34,13 +34,13 @@ def test_auspice_redirect_view(
     session.commit()
 
     # We need to create the bucket since this is all in Moto's 'virtual' AWS account
-    s3_resource.create_bucket(Bucket=phylo_tree.s3_bucket)
+    mock_s3_resource.create_bucket(Bucket=phylo_tree.s3_bucket)
 
     json_test_file = test_data_dir / "ncov_aspen.json"
     with json_test_file.open() as fh:
         test_json = json.dumps(json.load(fh))
 
-    s3_client.put_object(
+    mock_s3_resource.meta.client.put_object(
         Bucket=phylo_tree.s3_bucket, Key=phylo_tree.s3_key, Body=test_json
     )
 
