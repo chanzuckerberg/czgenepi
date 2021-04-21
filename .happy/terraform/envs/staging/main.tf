@@ -8,7 +8,7 @@ module stack {
   priority            = var.priority
   stack_name          = var.stack_name
   deployment_stage    = "staging"
-  delete_protected    = true
+  delete_protected    = false
   require_okta        = false
   sql_import_file     = "db_snapshots/dev_backup.sql"
   frontend_url        = "https://staging.genepi.czi.technology"
