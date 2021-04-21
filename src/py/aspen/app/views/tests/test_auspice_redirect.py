@@ -38,8 +38,8 @@ def test_auspice_redirect_view(session, app, client, mock_s3_resource, test_data
     with json_test_file.open() as fh:
         test_json = json.dumps(json.load(fh))
 
-    mock_s3_resource.meta.client.put_object(
-        Bucket=phylo_tree.s3_bucket, Key=phylo_tree.s3_key, Body=test_json
+    mock_s3_resource.Bucket(phylo_tree.s3_bucket).Object(phylo_tree.s3_key).put(
+        Body=test_json
     )
 
     with client.session_transaction() as sess:
