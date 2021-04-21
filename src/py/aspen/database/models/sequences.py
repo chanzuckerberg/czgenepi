@@ -180,10 +180,10 @@ class PathogenGenome(Entity):
         ),
     )
 
-    pangolin_lineage = Column(String)
-    pangolin_probability = Column(Integer)
-    pangolin_version = Column(String)
-    pangolin_last_updated = Column(DateTime)
+    pangolin_lineage = Column(String, nullable=True)
+    pangolin_probability = Column(Integer, nullable=True)
+    pangolin_version = Column(String, nullable=True)
+    pangolin_last_updated = Column(DateTime, nullable=True)
 
 
 class UploadedPathogenGenome(PathogenGenome):
