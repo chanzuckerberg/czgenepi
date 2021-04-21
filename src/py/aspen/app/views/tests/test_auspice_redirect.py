@@ -5,9 +5,7 @@ from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.usergroup import group_factory, user_factory
 
 
-def test_auspice_redirect_view(
-    session, app, client, mock_s3_resource, test_data_dir
-):
+def test_auspice_redirect_view(session, app, client, mock_s3_resource, test_data_dir):
     group = group_factory()
     session.add(group)
     session.commit()
