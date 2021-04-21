@@ -38,7 +38,7 @@ resource "aws_cloudwatch_event_target" "ingest-gisaid-target" {
     "ContainerOverrides": {
       "Command": [
         "trunk",
-        "src/py/workflows/ingest_gisaid/ingest.sh"
+        "src/backend/workflows/ingest_gisaid/ingest.sh"
       ]
     }
   }
