@@ -72,7 +72,7 @@ resource "aws_cloudwatch_event_target" "update-czb-gisaid-target" {
     "ContainerOverrides": {
       "Command": [
         "trunk",
-        "src/py/workflows/update_czb_gisaid/update.sh"
+        "src/backend/workflows/update_czb_gisaid/update.sh"
       ]
     }
   }
