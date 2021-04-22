@@ -30,13 +30,13 @@ aspen_creation_rev=$(git rev-parse HEAD)
 
 if [ "${aspen_workflow_rev}" != "${aspen_creation_rev}" ]; then
     # reinstall aspen
-    /aspen/.venv/bin/pip install -e src/py
+    /aspen/.venv/bin/pip install -e src/backend
 fi
 
 end_time=$(date +%s)
 
 # create the objects
-entity_id=$(/aspen/.venv/bin/python /aspen/src/py/workflows/ingest_gisaid/save.py \
+entity_id=$(/aspen/.venv/bin/python /aspen/src/backend/workflows/ingest_gisaid/save.py \
                                     --aspen-workflow-rev "${aspen_workflow_rev}"  \
                                     --aspen-creation-rev "${aspen_creation_rev}"  \
                                     --start-time "${start_time}"                  \
@@ -52,6 +52,6 @@ aws batch submit-job \
     --job-definition aspen-batch-job-definition  \
     --container-overrides "
       {
-        \"command\": [\"${ASPEN_GIT_REVSPEC}\", \"src/py/workflows/transform_gisaid/transform.sh\", \"${entity_id}\"],
+        \"command\": [\"${ASPEN_GIT_REVSPEC}\", \"src/backend/workflows/transform_gisaid/transform.sh\", \"${entity_id}\"],
         \"memory\": 15000
       }"

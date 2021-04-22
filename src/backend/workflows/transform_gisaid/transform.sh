@@ -12,7 +12,7 @@ fi
 apt-get install -y jq gcc
 
 # get the bucket/key from the object id
-raw_gisaid_location=$(/aspen/.venv/bin/python src/py/workflows/transform_gisaid/lookup_raw_gisaid_object.py --raw-gisaid-object-id "${1}")
+raw_gisaid_location=$(/aspen/.venv/bin/python src/backend/workflows/transform_gisaid/lookup_raw_gisaid_object.py --raw-gisaid-object-id "${1}")
 raw_gisaid_s3_bucket=$(echo "${raw_gisaid_location}" | jq -r .bucket)
 raw_gisaid_s3_key=$(echo "${raw_gisaid_location}" | jq -r .key)
 
@@ -58,13 +58,13 @@ aspen_creation_rev=$(git rev-parse HEAD)
 
 if [ "${aspen_workflow_rev}" != "${aspen_creation_rev}" ]; then
     # reinstall aspen
-    /aspen/.venv/bin/pip install -e src/py
+    /aspen/.venv/bin/pip install -e src/backend
 fi
 
 end_time=$(date +%s)
 
 # create the objects
-entity_id=$(/aspen/.venv/bin/python src/py/workflows/transform_gisaid/save.py    \
+entity_id=$(/aspen/.venv/bin/python src/backend/workflows/transform_gisaid/save.py    \
                                     --aspen-workflow-rev "${aspen_workflow_rev}" \
                                     --aspen-creation-rev "${aspen_creation_rev}" \
                                     --ncov-ingest-rev "${ncov_ingest_git_rev}"   \
@@ -84,7 +84,7 @@ aws batch submit-job \
     --job-definition aspen-batch-job-definition  \
     --container-overrides "
       {
-        \"command\": [\"${ASPEN_GIT_REVSPEC}\", \"src/py/workflows/align_gisaid/align.sh\", \"${entity_id}\"],
+        \"command\": [\"${ASPEN_GIT_REVSPEC}\", \"src/backend/workflows/align_gisaid/align.sh\", \"${entity_id}\"],
         \"vcpus\": 32,
         \"memory\": 420000
       }"
