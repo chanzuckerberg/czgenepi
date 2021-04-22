@@ -22,6 +22,9 @@ class Group(idbase, DictMixin):  # type: ignore
     email = Column(String, unique=True, nullable=False)
     address = Column(String, nullable=True)
 
+    can_see: MutableSequence[CanSee]
+    can_be_seen_by: MutableSequence[CanSee]
+
     def __repr__(self):
         return f"Group <{self.name}>"
 
@@ -39,9 +42,6 @@ class User(idbase, DictMixin):  # type: ignore
 
     group_id = Column(Integer, ForeignKey(Group.id), nullable=False)
     group = relationship(Group, backref=backref("users", uselist=True))  # type: ignore
-
-    can_see: MutableSequence[CanSee]
-    can_be_seen_by: MutableSequence[CanSee]
 
     def __repr__(self):
         return f"User <{self.name}>"
