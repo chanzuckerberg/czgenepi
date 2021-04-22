@@ -6,8 +6,8 @@ services:
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_USER=user_rw
-      - POSTGRES_PASSWORD=password_rw
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password_postgres
       - POSTGRES_DB=aspen_db
     command: ["postgres"]
   frontend:

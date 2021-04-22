@@ -12,6 +12,10 @@ LOCAL_DB_NAME = aspen_db
 # This has to be "postgres" to ease moving snapshots from RDS.
 LOCAL_DB_ADMIN_USERNAME = postgres
 LOCAL_DB_ADMIN_PASSWORD = password_postgres
+LOCAL_DB_RW_USERNAME = user_rw
+LOCAL_DB_RW_PASSWORD = password_rw
+LOCAL_DB_RO_USERNAME = user_ro
+LOCAL_DB_RO_PASSWORD = password_ro
 
 
 ### HELPFUL #################################################
@@ -70,6 +74,19 @@ local-ecr-login:
 	if PROFILE=$$(aws configure list-profiles | grep $(AWS_DEV_PROFILE)); then \
 		aws ecr get-login-password --region us-west-2 --profile $(AWS_DEV_PROFILE) | docker login --username AWS --password-stdin $$(aws sts get-caller-identity --profile $(AWS_DEV_PROFILE) | jq -r .Account).dkr.ecr.us-west-2.amazonaws.com; \
 	fi
+
+.PHONY: init-empty-db
+init-empty-db:
+	docker-compose stop database
+	docker-compose rm database
+	docker-compose $(COMPOSE_OPTS) -f docker-compose.yml -f docker-compose-emptydb.yml up -d
+	sleep 10 # hack, let postgres start up cleanly.
+	-docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@localhost:5432/$(LOCAL_DB_NAME)" -c "ALTER USER $(LOCAL_DB_ADMIN_USERNAME) WITH PASSWORD '$(LOCAL_DB_ADMIN_PASSWORD)';"
+	-docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@localhost:5432/$(LOCAL_DB_NAME)" -c "CREATE USER $(LOCAL_DB_RW_USERNAME) WITH PASSWORD '$(LOCAL_DB_RW_PASSWORD)';"
+	-docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@localhost:5432/$(LOCAL_DB_NAME)" -c "CREATE USER $(LOCAL_DB_RO_USERNAME) WITH PASSWORD '$(LOCAL_DB_RO_PASSWORD)';"
+	-docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@localhost:5432/$(LOCAL_DB_NAME)" -c "GRANT ALL PRIVILEGES ON DATABASE $(LOCAL_DB_NAME) TO $(LOCAL_DB_RW_USERNAME);"
+	docker-compose exec -T utility aspen-cli db --docker create
+
 
 .PHONY: local-init
 local-init: oauth/pkcs12/certificate.pfx .env.ecr local-ecr-login ## Launch a new local dev env and populate it with test data.
