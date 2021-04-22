@@ -2,8 +2,7 @@
 ##
 ##
 FROM nextstrain/base
-# TODO (phoenix) rename this to trunk after merged in
-ARG REVSPEC=phoenix/rename
+ARG REVSPEC=trunk
 ARG ASPEN_DOCKER_IMAGE_VERSION
 ENV ASPEN_DOCKER_IMAGE_VERSION=${ASPEN_DOCKER_IMAGE_VERSION}
 
