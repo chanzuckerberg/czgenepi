@@ -141,7 +141,7 @@ def phylo_tree(phylo_tree_id: int):
         )
 
     response = make_response(phylo_tree_data)
-    response.headers["Content-Type"] = "text/json"
+    response.headers["Content-Type"] = "application/json"
     response.headers[
         "Content-Disposition"
     ] = f"attachment; filename={phylo_tree_id}.json"
