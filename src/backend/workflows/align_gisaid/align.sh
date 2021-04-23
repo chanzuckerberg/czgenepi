@@ -12,7 +12,7 @@ fi
 apt-get install -y jq
 
 # get the bucket/key from the object id
-processed_gisaid_location=$(/aspen/.venv/bin/python src/py/workflows/align_gisaid/lookup_processed_gisaid_object.py --processed-gisaid-object-id "${1}")
+processed_gisaid_location=$(/aspen/.venv/bin/python src/backend/workflows/align_gisaid/lookup_processed_gisaid_object.py --processed-gisaid-object-id "${1}")
 processed_gisaid_s3_bucket=$(echo "${processed_gisaid_location}" | jq -r .bucket)
 processed_gisaid_sequences_s3_key=$(echo "${processed_gisaid_location}" | jq -r .sequences_key)
 processed_gisaid_metadata_s3_key=$(echo "${processed_gisaid_location}" | jq -r .metadata_key)
@@ -27,7 +27,7 @@ git init
 git fetch --depth 1 git://github.com/nextstrain/ncov.git
 git checkout FETCH_HEAD
 ncov_git_rev=$(git rev-parse HEAD)
-cp /aspen/src/py/workflows/align_gisaid/config.yaml /ncov/my_profiles/align
+cp /aspen/src/backend/workflows/align_gisaid/config.yaml /ncov/my_profiles/align
 
 # fetch the gisaid dataset
 aws s3 cp --no-progress s3://"${processed_gisaid_s3_bucket}"/"${processed_gisaid_sequences_s3_key}" - | xz -d > /ncov/data/sequences.fasta
@@ -53,13 +53,13 @@ aspen_creation_rev=$(git rev-parse HEAD)
 
 if [ "${aspen_workflow_rev}" != "${aspen_creation_rev}" ]; then
     # reinstall aspen
-    /aspen/.venv/bin/pip install -e src/py
+    /aspen/.venv/bin/pip install -e src/backend
 fi
 
 end_time=$(date +%s)
 
 # create the objects
-entity_id=$(/aspen/.venv/bin/python /aspen/src/py/workflows/align_gisaid/save.py                 \
+entity_id=$(/aspen/.venv/bin/python /aspen/src/backend/workflows/align_gisaid/save.py                 \
                                     --aspen-workflow-rev "${aspen_workflow_rev}"                 \
                                     --aspen-creation-rev "${aspen_creation_rev}"                 \
                                     --ncov-rev "${ncov_git_rev}"                                 \

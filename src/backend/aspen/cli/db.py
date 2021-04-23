@@ -212,7 +212,7 @@ def import_covidhub_project(
     "--builds-template-file",
     type=str,
     required=False,
-    default="src/py/workflows/nextstrain_run/builds_templates/group.yaml",
+    default="src/backend/workflows/nextstrain_run/builds_templates/group.yaml",
 )
 @click.option(
     "--builds-template-args",
@@ -334,7 +334,7 @@ def create_phylo_run(
         containerOverrides={
             "command": [
                 git_refspec,
-                "src/py/workflows/nextstrain_run/build_tree.sh",
+                "src/backend/workflows/nextstrain_run/build_tree.sh",
                 str(workflow_id),
             ],
             "vcpus": 4,
