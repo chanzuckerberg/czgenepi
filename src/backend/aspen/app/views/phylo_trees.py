@@ -1,15 +1,16 @@
 import json
-from typing import Any, Iterable, Mapping, MutableSequence, Tuple
+from typing import Any, Iterable, Mapping, MutableSequence, Set, Tuple
 
 import boto3
 from flask import jsonify, make_response, session
 from sqlalchemy import func, or_
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, Session
 
 from aspen.app.app import application, requires_auth
 from aspen.app.views.api_utils import format_datetime, get_usergroup_query
 from aspen.database.connection import session_scope
 from aspen.database.models import (
+    DataType,
     PathogenGenome,
     PhyloRun,
     PhyloTree,
@@ -19,6 +20,7 @@ from aspen.database.models import (
 )
 from aspen.database.models.usergroup import Group, User
 from aspen.error.recoverable import RecoverableError
+from aspen.phylo_tree.identifiers import rename_nodes_on_tree
 
 PHYLO_TREE_KEY = "phylo_trees"
 
@@ -84,33 +86,64 @@ def phylo_trees():
         return jsonify({PHYLO_TREE_KEY: results})
 
 
+def _process_phylo_tree(
+    db_session: Session, phylo_tree_id: int, user_auth0_id: str
+) -> dict:
+    """Retrieves a phylo tree and renames the nodes on the tree for a given user."""
+    user: User = (
+        get_usergroup_query(db_session, user_auth0_id)
+        .options(joinedload(User.group, Group.can_see))
+        .one()
+    )
+
+    phylo_tree: PhyloTree = (
+        db_session.query(PhyloTree)
+        .filter(PhyloTree.entity_id == phylo_tree_id)
+        .options(joinedload(PhyloTree.constituent_samples))
+        .one()
+    )
+
+    can_see_group_ids: Set[int] = {user.group_id}
+    can_see_group_ids.update(
+        {
+            can_see.owner_group_id
+            for can_see in user.group.can_see
+            if can_see.data_type == DataType.PRIVATE_IDENTIFIERS
+        }
+    )
+
+    identifier_map: Mapping[str, str] = {
+        sample.public_identifier: sample.private_identifier
+        for sample in phylo_tree.constituent_samples
+        if sample.submitting_group_id in can_see_group_ids
+    }
+
+    # TODO: add access control for this tree.
+    # TODO: add a per-process shared AWS handle.
+    s3 = boto3.resource("s3")
+
+    data = (
+        s3.Bucket(phylo_tree.s3_bucket).Object(phylo_tree.s3_key).get()["Body"].read()
+    )
+    json_data = json.loads(data)
+
+    rename_nodes_on_tree([json_data["tree"]], identifier_map, "GISAID_ID")
+
+    return json_data
+
+
 @application.route("/api/phylo_tree/<int:phylo_tree_id>", methods=["GET"])
 @requires_auth
 def phylo_tree(phylo_tree_id: int):
     with session_scope(application.DATABASE_INTERFACE) as db_session:
-        phylo_tree = (
-            db_session.query(PhyloTree)
-            .filter(PhyloTree.entity_id == phylo_tree_id)
-            .one()
+        phylo_tree_data = _process_phylo_tree(
+            db_session, phylo_tree_id, session["profile"]["user_id"]
         )
-        # TODO: add access control for this tree.
-        # TODO: add a per-process shared AWS handle.
-        s3 = boto3.resource("s3")
 
-        data = (
-            s3.Bucket(phylo_tree.s3_bucket)
-            .Object(phylo_tree.s3_key)
-            .get()["Body"]
-            .read()
-        )
-        json_data = json.loads(data)
+    response = make_response(phylo_tree_data)
+    response.headers["Content-Type"] = "text/json"
+    response.headers[
+        "Content-Disposition"
+    ] = f"attachment; filename={phylo_tree_id}.json"
 
-        # TODO: replace the public identifiers with the private identifiers we have
-        # access to.
-        response = make_response(json_data)
-        response.headers["Content-Type"] = "text/json"
-        response.headers[
-            "Content-Disposition"
-        ] = f"attachment; filename={phylo_tree_id}.json"
-
-        return response
+    return response
