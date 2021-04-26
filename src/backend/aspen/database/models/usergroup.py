@@ -39,6 +39,7 @@ class User(idbase, DictMixin):  # type: ignore
     auth0_user_id = Column(String, unique=True, nullable=False)
     group_admin = Column(Boolean, nullable=False)
     system_admin = Column(Boolean, nullable=False)
+    agreed_to_tos = Column(Boolean, nullable=False, default=False)
 
     group_id = Column(Integer, ForeignKey(Group.id), nullable=False)
     group = relationship(Group, backref=backref("users", uselist=True))  # type: ignore
