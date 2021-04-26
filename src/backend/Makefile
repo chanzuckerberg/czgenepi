@@ -45,6 +45,8 @@ test: # run pytest
 alembic-upgrade-head:
 	alembic upgrade head # applies to local only
 
+alembic-undo-migration:
+	alembic downgrade -1
 
 alembic-autogenerate:
 	alembic revision --autogenerate -m "$(MESSAGE)" --rev-id $$(date +%Y%m%d_%H%M%S)

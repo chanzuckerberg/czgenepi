@@ -64,6 +64,7 @@ The dev environment is initialized with AWS Secrets/S3 data in the [src/backend/
 | `make frontend-check-style`         | run `npm run lint-ci` in `src/frontend`                                          |
 | `make utility-alembic-upgrade-head`         | Upgrade local DB with new revisions                                |                                                          |
 | `make utility-alembic-autogenerate MESSAGE="descriptive message"`  | Autogenerate migration against local DB     |                                                          |
+| `make utility-alembic-undo-migration`  | Undo the last applied migration     |                                                          |
 | `make utility-test`         | Runs pytest in `src/backend`                                                                  |                                                    |
 | `make utility-check-style`         | Runs mypy, flake8, isort, and black style checkers against files in `src/backend`      |                                                    |
 | `make utility-run-style`         | Runs isort and black against files in `src/backend`                                      |                                                    |
