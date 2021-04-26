@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
-import { FixedSizeList, ListChildComponentProps } from "react-window/";
+import { FixedSizeList, ListChildComponentProps } from "react-window";
 import { EmptyState } from "../data_subview/components/EmptyState";
 import style from "./index.module.scss";
 

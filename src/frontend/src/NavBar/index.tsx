@@ -1,13 +1,15 @@
 import cx from "classnames";
-import React, { FunctionComponent } from "react";
-import style from "./NavBar.module.scss";
+import React from "react";
+import { API } from "src/common/api";
+import UserMenu from "./components/UserMenu";
+import style from "./index.module.scss";
 
-type Props = {
+interface Props {
   org?: string;
   user?: string;
-};
+}
 
-const NavBar: FunctionComponent<Props> = ({ org, user }: Props) => {
+const NavBar = ({ org, user }: Props): JSX.Element => {
   const orgElements = (
     <React.Fragment>
       <div className={style.separator} />
@@ -25,19 +27,17 @@ const NavBar: FunctionComponent<Props> = ({ org, user }: Props) => {
 
   const orgSplash = hasOrg();
 
-  const simpleUserMenu = <div className={style.item}>{user}</div>;
-
   const signInLink = (
-    <a href={`${process.env.API_URL}/login`}>
+    <a href={process.env.API_URL + API.LOG_IN}>
       <div className={cx(style.item, style.link)}>Sign In</div>
     </a>
   );
 
   function isLoggedIn(): JSX.Element {
-    if (user === undefined) {
-      return signInLink;
+    if (user) {
+      return <UserMenu user={user} />;
     } else {
-      return simpleUserMenu;
+      return signInLink;
     }
   }
 
@@ -49,7 +49,7 @@ const NavBar: FunctionComponent<Props> = ({ org, user }: Props) => {
         <div className={style.logo}>ASPEN</div>
         {orgSplash}
       </div>
-      <div className={style.center} />
+
       <div className={style.right}>{rightEdge}</div>
     </div>
   );
