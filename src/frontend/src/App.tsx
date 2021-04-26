@@ -6,9 +6,9 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import style from "./App.module.scss";
 import { fetchUserData } from "./common/api";
 import { ROUTES } from "./common/routes";
-import Data from "./data";
-import Landing from "./Landing";
-import NavBar from "./NavBar";
+import NavBar from "./components/NavBar";
+import Data from "./views/Data";
+import Homepage from "./views/Homepage";
 
 const App: FunctionComponent = () => {
   const [user, setUser] = useState<string | undefined>();
@@ -30,12 +30,10 @@ const App: FunctionComponent = () => {
           <EmotionThemeProvider theme={defaultTheme}>
             <div className={style.app}>
               <NavBar org={org} user={user} />
-              <div className={style.view}>
-                <Switch>
-                  <Route path={ROUTES.DATA} component={Data} />
-                  <Route path={ROUTES.HOMEPAGE} component={Landing} />
-                </Switch>
-              </div>
+              <Switch>
+                <Route path={ROUTES.DATA} component={Data} />
+                <Route path={ROUTES.HOMEPAGE} component={Homepage} />
+              </Switch>
             </div>
           </EmotionThemeProvider>
         </ThemeProvider>

@@ -7,6 +7,7 @@ import { DataSubview } from "src/common/components";
 import { SampleRenderer, TreeRenderer } from "./cellRenderers";
 import { SAMPLE_HEADERS, TREE_HEADERS } from "./headers";
 import style from "./index.module.scss";
+import { Container } from "./style";
 import { TREE_TRANSFORMS } from "./transforms";
 
 const Data: FunctionComponent = () => {
@@ -112,7 +113,7 @@ const Data: FunctionComponent = () => {
   });
 
   return (
-    <div className={style.dataRoot}>
+    <Container className={style.dataRoot}>
       <div className={style.navigation}>
         <Menu className={style.menu} secondary>
           {dataJSX.menuItems}
@@ -124,7 +125,7 @@ const Data: FunctionComponent = () => {
           <Redirect from="/data" to="/data/samples" exact />
         </Switch>
       </div>
-    </div>
+    </Container>
   );
 };
 
