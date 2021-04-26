@@ -5,8 +5,8 @@ Create Date: 2021-04-26 20:41:56.570401
 """
 import enumtables  # noqa: F401
 import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
 from alembic import op
+from sqlalchemy.dialects import postgresql
 
 revision = "20210426_204155"
 down_revision = "20210420_231414"
@@ -26,9 +26,7 @@ def upgrade():
     # set existing users agreed_to_tos column as false
     conn = op.get_bind()
     sql = sa.sql.text(
-        "UPDATE aspen.users "
-        "SET agreed_to_tos = false "
-        "WHERE agreed_to_tos is NULL"
+        "UPDATE aspen.users " "SET agreed_to_tos = false " "WHERE agreed_to_tos is NULL"
     )
 
     conn.execute(sql)

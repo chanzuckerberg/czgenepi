@@ -12,7 +12,7 @@ def user_factory(
     email="test_user@dph.org",
     group_admin=False,
     system_admin=False,
-    agreed_to_tos=True
+    agreed_to_tos=True,
 ) -> User:
     return User(
         name=name,
