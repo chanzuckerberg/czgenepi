@@ -10,7 +10,7 @@ output backend_url {
 
 output delete_db_task_definition_arn {
   value       = module.stack.delete_db_task_definition_arn
-  description = "ARN of the ECS Task Definition that deletes dev databases"
+  description = "ARN of the ECS Task Definition that deletes prod database"
 }
 
 output migrate_db_task_definition_arn {
