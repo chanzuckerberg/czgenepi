@@ -40,7 +40,7 @@ def sequencing_read_factory(
 
 def uploaded_pathogen_genome_factory(
     sample,
-    sequence=">test1 NTCGGCG",
+    sequence=">test1\nNTCGGCG",
     num_unambiguous_sites=1,
     num_missing_alleles=0,
     num_mixed=0,
