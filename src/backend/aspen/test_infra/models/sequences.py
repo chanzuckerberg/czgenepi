@@ -6,6 +6,7 @@ from aspen.database.models import (
     SequencingInstrumentType,
     SequencingProtocolType,
     SequencingReadsCollection,
+    UploadedPathogenGenome,
 )
 
 
@@ -35,3 +36,31 @@ def sequencing_read_factory(
             public_identifier=public_identifier,
         )
     return sequencing_reads
+
+
+def uploaded_pathogen_genome_factory(
+    sample,
+    sequence=">test1\nNTCGGCG",
+    num_unambiguous_sites=1,
+    num_missing_alleles=0,
+    num_mixed=0,
+    pangolin_lineage=None,
+    pangolin_probability=None,
+    pangolin_version=None,
+    pangolin_last_updated=None,
+    sequencing_depth=0.1,
+    upload_date=datetime.now(),
+):
+    return UploadedPathogenGenome(
+        sample=sample,
+        sequence=sequence,
+        num_unambiguous_sites=num_unambiguous_sites,
+        num_missing_alleles=num_missing_alleles,
+        num_mixed=num_mixed,
+        pangolin_lineage=pangolin_lineage,
+        pangolin_probability=pangolin_probability,
+        pangolin_version=pangolin_version,
+        pangolin_last_updated=pangolin_last_updated,
+        sequencing_depth=sequencing_depth,
+        upload_date=upload_date,
+    )
