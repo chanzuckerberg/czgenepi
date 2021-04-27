@@ -27,9 +27,8 @@ def usergroup():
 
         if request.method == "PUT":
             update_allowed_fields: List[str] = ["name", "email", "agreed_to_tos"]
-            fields_to_update: Dict[str, Union[str, bool]] = json.loads(
-                request.get_json()
-            )
+            fields_to_update: Dict[str, Union[str, bool]] = request.get_json()
+
             for key, value in fields_to_update.items():
                 if hasattr(user, key) and key in update_allowed_fields:
                     setattr(user, key, value)
