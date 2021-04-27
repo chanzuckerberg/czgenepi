@@ -66,12 +66,12 @@ end_time=$(date +%s)
 
 # create the objects
 /aspen/.venv/bin/python /aspen/src/backend/aspen/workflows/nextstrain_run/save.py               \
-                        --aspen-workflow-rev "${aspen_workflow_rev}"                 \
-                        --aspen-creation-rev "${aspen_creation_rev}"                 \
-                        --ncov-rev "${ncov_git_rev}"                                 \
-                        --aspen-docker-image-version "${ASPEN_DOCKER_IMAGE_VERSION}" \
-                        --end-time "${end_time}"                                     \
-                        --phylo-run-id "$1"                                          \
-                        --bucket "$bucket"                                           \
-                        --key "$key"                                                 \
-                        --tree-path /ncov/auspice/ncov_aspen.json                    \
+                        --aspen-workflow-rev "${aspen_workflow_rev}"                            \
+                        --aspen-creation-rev "${aspen_creation_rev}"                            \
+                        --ncov-rev "${ncov_git_rev}"                                            \
+                        --aspen-docker-image-version "${ASPEN_DOCKER_IMAGE_VERSION}"            \
+                        --end-time "${end_time}"                                                \
+                        --phylo-run-id "$1"                                                     \
+                        --bucket "$bucket"                                                      \
+                        --key "$key"                                                            \
+                        --tree-path /ncov/auspice/ncov_aspen.json                               \

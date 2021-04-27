@@ -65,21 +65,21 @@ end_time=$(date +%s)
 
 # create the objects
 entity_id=$(/aspen/.venv/bin/python src/backend/aspen/workflows/transform_gisaid/save.py    \
-                                    --aspen-workflow-rev "${aspen_workflow_rev}" \
-                                    --aspen-creation-rev "${aspen_creation_rev}" \
-                                    --ncov-ingest-rev "${ncov_ingest_git_rev}"   \
-                                    --start-time "${start_time}"                 \
-                                    --end-time "${end_time}"                     \
-                                    --raw-gisaid-object-id "${1}"                \
-                                    --gisaid-s3-bucket "${bucket}"               \
-                                    --gisaid-sequences-s3-key "${sequences_key}" \
-                                    --gisaid-metadata-s3-key "${metadata_key}"   \
+                                    --aspen-workflow-rev "${aspen_workflow_rev}"            \
+                                    --aspen-creation-rev "${aspen_creation_rev}"            \
+                                    --ncov-ingest-rev "${ncov_ingest_git_rev}"              \
+                                    --start-time "${start_time}"                            \
+                                    --end-time "${end_time}"                                \
+                                    --raw-gisaid-object-id "${1}"                           \
+                                    --gisaid-s3-bucket "${bucket}"                          \
+                                    --gisaid-sequences-s3-key "${sequences_key}"            \
+                                    --gisaid-metadata-s3-key "${metadata_key}"              \
          )
 
 # invoke the next workflow.
 # NOTE: when the number of cpus is modified, it would be prudent to modify workflows/align_gisaid/config.yaml.
-aws batch submit-job \
-    --job-name "align-gisaid"                \
+aws batch submit-job                             \
+    --job-name "align-gisaid"                    \
     --job-queue aspen-batch                      \
     --job-definition aspen-batch-job-definition  \
     --container-overrides "

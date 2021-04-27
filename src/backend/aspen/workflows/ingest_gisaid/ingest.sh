@@ -37,12 +37,12 @@ end_time=$(date +%s)
 
 # create the objects
 entity_id=$(/aspen/.venv/bin/python /aspen/src/backend/aspen/workflows/ingest_gisaid/save.py \
-                                    --aspen-workflow-rev "${aspen_workflow_rev}"  \
-                                    --aspen-creation-rev "${aspen_creation_rev}"  \
-                                    --start-time "${start_time}"                  \
-                                    --end-time "${end_time}"                      \
-                                    --gisaid-s3-bucket "${bucket}"                \
-                                    --gisaid-s3-key "${key}"                      \
+                                    --aspen-workflow-rev "${aspen_workflow_rev}"             \
+                                    --aspen-creation-rev "${aspen_creation_rev}"             \
+                                    --start-time "${start_time}"                             \
+                                    --end-time "${end_time}"                                 \
+                                    --gisaid-s3-bucket "${bucket}"                           \
+                                    --gisaid-s3-key "${key}"                                 \
          )
 
 # invoke the next workflow

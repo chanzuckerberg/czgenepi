@@ -60,14 +60,14 @@ end_time=$(date +%s)
 
 # create the objects
 entity_id=$(/aspen/.venv/bin/python /aspen/src/backend/aspen/workflows/align_gisaid/save.py                 \
-                                    --aspen-workflow-rev "${aspen_workflow_rev}"                 \
-                                    --aspen-creation-rev "${aspen_creation_rev}"                 \
-                                    --ncov-rev "${ncov_git_rev}"                                 \
-                                    --aspen-docker-image-version "${ASPEN_DOCKER_IMAGE_VERSION}" \
-                                    --start-time "${start_time}"                                 \
-                                    --end-time "${end_time}"                                     \
-                                    --processed-gisaid-object-id "${1}"                          \
-                                    --gisaid-s3-bucket "${bucket}"                               \
-                                    --gisaid-sequences-s3-key "${sequences_key}"                 \
-                                    --gisaid-metadata-s3-key "${metadata_key}"                   \
+                                    --aspen-workflow-rev "${aspen_workflow_rev}"                            \
+                                    --aspen-creation-rev "${aspen_creation_rev}"                            \
+                                    --ncov-rev "${ncov_git_rev}"                                            \
+                                    --aspen-docker-image-version "${ASPEN_DOCKER_IMAGE_VERSION}"            \
+                                    --start-time "${start_time}"                                            \
+                                    --end-time "${end_time}"                                                \
+                                    --processed-gisaid-object-id "${1}"                                     \
+                                    --gisaid-s3-bucket "${bucket}"                                          \
+                                    --gisaid-sequences-s3-key "${sequences_key}"                            \
+                                    --gisaid-metadata-s3-key "${metadata_key}"                              \
          )
