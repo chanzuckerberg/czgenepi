@@ -1,8 +1,13 @@
 import cx from "classnames";
 import React from "react";
+import { Link } from "react-router-dom";
 import { API } from "src/common/api";
+import { ROUTES } from "src/common/routes";
 import UserMenu from "./components/UserMenu";
 import style from "./index.module.scss";
+
+// (thuang): Please make sure this value is in sync with what we have in css
+export const NAV_BAR_HEIGHT_PX = 50;
 
 interface Props {
   org?: string;
@@ -46,7 +51,9 @@ const NavBar = ({ org, user }: Props): JSX.Element => {
   return (
     <div className={style.bar}>
       <div className={style.left}>
-        <div className={style.logo}>ASPEN</div>
+        <Link to={ROUTES.HOMEPAGE}>
+          <div className={style.logo}>ASPEN</div>
+        </Link>
         {orgSplash}
       </div>
 

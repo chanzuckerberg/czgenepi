@@ -1,4 +1,5 @@
 import { Button, createStyles } from "@material-ui/core";
+import { ExpandMore } from "@material-ui/icons";
 import { makeStyles } from "@material-ui/styles";
 import { AppThemeOptions, Menu, MenuItem } from "czifui";
 import React from "react";
@@ -35,7 +36,7 @@ const UserMenu = ({ user }: UserMenuProps): JSX.Element => {
 
   return (
     <>
-      <Button onClick={handleClick} classes={classes}>
+      <Button onClick={handleClick} classes={classes} endIcon={<ExpandMore />}>
         {user}
       </Button>
       <Menu
