@@ -167,12 +167,37 @@ def interact(ctx, connect):
     shell()
 
 
+@db.command("import-covidhub-users")
+@click.option("--covidhub-aws-profile", type=str, required=True)
+@click.option("--covidhub-db-secret", default="cliahub/cliahub_test_db")
+@click.option("--rr-project-id", type=str, required=True)
+@click.pass_context
+def import_covidhub_users(
+    ctx,
+    covidhub_aws_profile,
+    covidhub_db_secret,
+    rr_project_id,
+):
+    config, engine = ctx.obj["CONFIG"], ctx.obj["ENGINE"]
+
+    auth0_usermap = covidhub_import.retrieve_auth0_users(config)
+
+    covidhub_import.import_project_users(
+        engine,
+        covidhub_aws_profile,
+        covidhub_db_secret,
+        rr_project_id,
+        auth0_usermap,
+    )
+
+
 @db.command("import-covidhub-project")
 @click.option("--covidhub-aws-profile", type=str, required=True)
 @click.option("--covidhub-db-secret", default="cliahub/cliahub_test_db")
 @click.option("--rr-project-id", type=str, required=True)
 @click.option("--s3-src-prefix", type=str, required=True)
 @click.option("--s3-dst-prefix", type=str, required=True)
+@click.option("--aspen-group-id", type=int, required=True)
 @click.pass_context
 def import_covidhub_project(
     ctx,
@@ -181,20 +206,18 @@ def import_covidhub_project(
     rr_project_id,
     s3_src_prefix,
     s3_dst_prefix,
+    aspen_group_id,
 ):
-    # these are injected into the IPython scope, but they appear to be unused.
-    config, engine = ctx.obj["CONFIG"], ctx.obj["ENGINE"]
-
-    auth0_usermap = covidhub_import.retrieve_auth0_users(config)
+    engine = ctx.obj["ENGINE"]
 
     covidhub_import.import_project(
         engine,
         covidhub_aws_profile,
         covidhub_db_secret,
         rr_project_id,
+        aspen_group_id,
         s3_src_prefix,
         s3_dst_prefix,
-        auth0_usermap,
     )
 
 
