@@ -36,7 +36,7 @@ fi
 end_time=$(date +%s)
 
 # create the objects
-entity_id=$(/aspen/.venv/bin/python /aspen/src/backend/workflows/ingest_gisaid/save.py \
+entity_id=$(/aspen/.venv/bin/python /aspen/src/backend/aspen/workflows/ingest_gisaid/save.py \
                                     --aspen-workflow-rev "${aspen_workflow_rev}"  \
                                     --aspen-creation-rev "${aspen_creation_rev}"  \
                                     --start-time "${start_time}"                  \
@@ -52,6 +52,6 @@ aws batch submit-job \
     --job-definition aspen-batch-job-definition  \
     --container-overrides "
       {
-        \"command\": [\"${ASPEN_GIT_REVSPEC}\", \"src/backend/workflows/transform_gisaid/transform.sh\", \"${entity_id}\"],
+        \"command\": [\"${ASPEN_GIT_REVSPEC}\", \"src/backend/aspen/workflows/transform_gisaid/transform.sh\", \"${entity_id}\"],
         \"memory\": 15000
       }"
