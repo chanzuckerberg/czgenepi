@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
 from aspen.database.models.sequences import CallConsensus
-from aspen.database.models.workflow import WorkflowStatusType, WorkflowType
+from aspen.database.models.workflow import WorkflowStatusType
 
 
 def call_consensus_factory(
