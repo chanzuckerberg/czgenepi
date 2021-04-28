@@ -8,10 +8,10 @@ from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
 
 def test_pangolin_export(mocker, session, postgres_database):
     group = group_factory()
-    user = user_factory(group)
 
     for i in range(0,2):
         sample = sample_factory(
+            group,
             private_identifier=f"private_identifier_{i}",
             public_identifier=f"public_identifier_{i}"
         )
@@ -21,12 +21,12 @@ def test_pangolin_export(mocker, session, postgres_database):
         session.commit()
 
     mocker.patch(
-        "aspen.config.RemoteDatabaseConfig.DATABASE_URI",
+        "aspen.config.config.RemoteDatabaseConfig.DATABASE_URI",
         return_value=postgres_database.as_uri()
     )
 
     runner = CliRunner()
-    runner.invoke(
+    result = runner.invoke(
         cli,
         [
             "--sequences",
@@ -37,7 +37,7 @@ def test_pangolin_export(mocker, session, postgres_database):
             "public_identifier_2"
         ]
     )
-
+    print(result)
 
 
 
