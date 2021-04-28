@@ -1,5 +1,10 @@
 from click.testing import CliRunner
-
+from aspen.database.connection import (
+    get_db_uri,
+    init_db,
+    session_scope,
+    SqlAlchemyInterface,
+)
 from aspen.workflows.pangolin.export import cli
 from aspen.test_infra.models.usergroup import group_factory, user_factory
 from aspen.test_infra.models.sample import sample_factory
@@ -24,6 +29,14 @@ def test_pangolin_export(mocker, session, postgres_database):
         "aspen.config.config.RemoteDatabaseConfig.DATABASE_URI",
         return_value=postgres_database.as_uri()
     )
+    mocker.patch(
+        "aspen.database.connection.get_db_uri",
+        return_value=postgres_database.as_uri()
+    )
+    # mocker.patch(
+    #     "aspen.database.connection.init_db",
+    #     return_value=postgres_database.as_uri()
+    # )
 
     runner = CliRunner()
     result = runner.invoke(
