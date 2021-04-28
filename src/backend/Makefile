@@ -4,7 +4,6 @@ TYPE_CHECK_BASE_PYTHON_CODE_DIRECTORIES = aspen
 TYPE_CHECK_INDIVIDUAL_PYTHON_CODE_DIRECTORIES = database_migrations
 
 
-
 ### CHECK STYLE #############################################
 check-style: lint black isort mypy
 
