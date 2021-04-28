@@ -16,7 +16,7 @@ def test_usergroup_view_get(session, app, client):
     assert expected == json.loads(res.get_data(as_text=True))
 
 
-def test_usergroup_view_put(session, app, client):
+def test_usergroup_view_put_pass(session, app, client):
     group = group_factory()
     user = user_factory(group, agreed_to_tos=False)
     session.add(group)
@@ -30,6 +30,21 @@ def test_usergroup_view_put(session, app, client):
     updated_user = session.query(User).filter(User.auth0_user_id == user.auth0_user_id).one()
     assert updated_user.agreed_to_tos == True
     assert res.status == 200
+
+
+def test_usergroup_view_put_fail(session, app, client):
+    group = group_factory()
+    user = user_factory(group, agreed_to_tos=False)
+    session.add(group)
+    session.commit()
+    with client.session_transaction() as sess:
+        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
+
+    data = {"fake_field": "even faker"}
+
+    res = client.put("/api/usergroup", json=json.dumps(data))
+    assert res.status == '400 BAD REQUEST'
+
 
 def test_redirect(app, client):
     res = client.get("api/usergroup")

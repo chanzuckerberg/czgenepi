@@ -1,27 +1,12 @@
 import json
 from typing import Dict, Union
 
-from flask import jsonify, session, request
+from flask import jsonify, session, request, Response
 
 from aspen.app.app import application, requires_auth
 from aspen.app.views.api_utils import get_usergroup_query
 from aspen.database.connection import session_scope
 from aspen.database.models.usergroup import User
-
-class InvalidUsage(Exception):
-    status_code = 400
-
-    def __init__(self, message, status_code=None, payload=None):
-        Exception.__init__(self)
-        self.message = message
-        if status_code is not None:
-            self.status_code = status_code
-        self.payload = payload
-
-    def to_dict(self):
-        rv = dict(self.payload or ())
-        rv['message'] = self.message
-        return rv
 
 
 @application.route("/api/usergroup", methods=["GET", "PUT"])
@@ -43,10 +28,10 @@ def usergroup():
                 if hasattr(user, key):
                     setattr(user, key, value)
                 else:
-                    raise InvalidUsage(f"User object has no attribute {key}", 400)
+                    return Response(f"User object has no attribute {key}", 400)
 
             # all fields have updated successfully
-            db_session.commit()
+            db_session.flush()
             return jsonify(success=True)
 
 
