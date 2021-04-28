@@ -12,7 +12,7 @@ fi
 apt-get install -y jq gcc
 
 # get the bucket/key from the object id
-raw_gisaid_location=$(/aspen/.venv/bin/python src/backend/workflows/transform_gisaid/lookup_raw_gisaid_object.py --raw-gisaid-object-id "${1}")
+raw_gisaid_location=$(/aspen/.venv/bin/python src/backend/aspen/workflows/transform_gisaid/lookup_raw_gisaid_object.py --raw-gisaid-object-id "${1}")
 raw_gisaid_s3_bucket=$(echo "${raw_gisaid_location}" | jq -r .bucket)
 raw_gisaid_s3_key=$(echo "${raw_gisaid_location}" | jq -r .key)
 
@@ -64,27 +64,27 @@ fi
 end_time=$(date +%s)
 
 # create the objects
-entity_id=$(/aspen/.venv/bin/python src/backend/workflows/transform_gisaid/save.py    \
-                                    --aspen-workflow-rev "${aspen_workflow_rev}" \
-                                    --aspen-creation-rev "${aspen_creation_rev}" \
-                                    --ncov-ingest-rev "${ncov_ingest_git_rev}"   \
-                                    --start-time "${start_time}"                 \
-                                    --end-time "${end_time}"                     \
-                                    --raw-gisaid-object-id "${1}"                \
-                                    --gisaid-s3-bucket "${bucket}"               \
-                                    --gisaid-sequences-s3-key "${sequences_key}" \
-                                    --gisaid-metadata-s3-key "${metadata_key}"   \
+entity_id=$(/aspen/.venv/bin/python src/backend/aspen/workflows/transform_gisaid/save.py    \
+                                    --aspen-workflow-rev "${aspen_workflow_rev}"            \
+                                    --aspen-creation-rev "${aspen_creation_rev}"            \
+                                    --ncov-ingest-rev "${ncov_ingest_git_rev}"              \
+                                    --start-time "${start_time}"                            \
+                                    --end-time "${end_time}"                                \
+                                    --raw-gisaid-object-id "${1}"                           \
+                                    --gisaid-s3-bucket "${bucket}"                          \
+                                    --gisaid-sequences-s3-key "${sequences_key}"            \
+                                    --gisaid-metadata-s3-key "${metadata_key}"              \
          )
 
 # invoke the next workflow.
 # NOTE: when the number of cpus is modified, it would be prudent to modify workflows/align_gisaid/config.yaml.
-aws batch submit-job \
-    --job-name "align-gisaid"                \
+aws batch submit-job                             \
+    --job-name "align-gisaid"                    \
     --job-queue aspen-batch                      \
     --job-definition aspen-batch-job-definition  \
     --container-overrides "
       {
-        \"command\": [\"${ASPEN_GIT_REVSPEC}\", \"src/backend/workflows/align_gisaid/align.sh\", \"${entity_id}\"],
+        \"command\": [\"${ASPEN_GIT_REVSPEC}\", \"src/backend/aspen/workflows/align_gisaid/align.sh\", \"${entity_id}\"],
         \"vcpus\": 32,
         \"memory\": 420000
       }"

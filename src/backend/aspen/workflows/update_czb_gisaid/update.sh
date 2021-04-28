@@ -11,7 +11,7 @@ aws_access_key_id=$(echo "$czb_credentials" | jq -r .AWS_ACCESS_KEY_ID)
 aws_secret_access_key=$(echo "$czb_credentials" | jq -r .AWS_SECRET_ACCESS_KEY)
 
 # get the bucket/key from the object id
-processed_gisaid_location=$(/aspen/.venv/bin/python src/backend/workflows/update_czb_gisaid/lookup_latest_processed_gisaid.py)
+processed_gisaid_location=$(/aspen/.venv/bin/python src/backend/aspen/workflows/update_czb_gisaid/lookup_latest_processed_gisaid.py)
 processed_gisaid_s3_bucket=$(echo "${processed_gisaid_location}" | jq -r .bucket)
 processed_gisaid_sequences_s3_key=$(echo "${processed_gisaid_location}" | jq -r .sequences_key)
 processed_gisaid_metadata_s3_key=$(echo "${processed_gisaid_location}" | jq -r .metadata_key)
