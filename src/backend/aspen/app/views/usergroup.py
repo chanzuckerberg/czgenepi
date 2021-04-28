@@ -26,7 +26,7 @@ def usergroup():
             return jsonify(user_groups)
 
         if request.method == "PUT":
-            fields_to_update: Dict[str : Union[str, bool]] = json.loads(
+            fields_to_update: Dict[str, Union[str, bool]] = json.loads(
                 request.get_json()
             )
             for key, value in fields_to_update.items():
