@@ -23,6 +23,7 @@ def usergroup():
             return jsonify(user_groups)
 
         if request.method == "PUT":
+            # import pdb; pdb.set_trace()
             fields_to_update: Dict[str: Union[str, bool]] = json.loads(request.get_json())
             for key, value in fields_to_update.items():
                 if hasattr(user, key):
