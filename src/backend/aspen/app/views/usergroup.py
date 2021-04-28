@@ -1,7 +1,7 @@
 import json
 from typing import Dict, Union
 
-from flask import jsonify, session, request, Response
+from flask import jsonify, request, Response, session
 
 from aspen.app.app import application, requires_auth
 from aspen.app.views.api_utils import get_usergroup_query
@@ -19,12 +19,16 @@ def usergroup():
         user: User = get_usergroup_query(db_session, profile["user_id"]).one()
 
         if request.method == "GET":
-            user_groups: Dict[str, Dict[str, Union[str, bool]]] = {"user": user.to_dict(), "group": user.group.to_dict()}
+            user_groups: Dict[str, Dict[str, Union[str, bool]]] = {
+                "user": user.to_dict(),
+                "group": user.group.to_dict(),
+            }
             return jsonify(user_groups)
 
         if request.method == "PUT":
-            # import pdb; pdb.set_trace()
-            fields_to_update: Dict[str: Union[str, bool]] = json.loads(request.get_json())
+            fields_to_update: Dict[str : Union[str, bool]] = json.loads(
+                request.get_json()
+            )
             for key, value in fields_to_update.items():
                 if hasattr(user, key):
                     setattr(user, key, value)
@@ -34,6 +38,3 @@ def usergroup():
             # all fields have updated successfully
             db_session.flush()
             return jsonify(success=True)
-
-
-
