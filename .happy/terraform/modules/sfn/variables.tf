@@ -18,16 +18,6 @@ variable ec2_queue_arn {
   description = "ARN of the batch job queue"
 }
 
-variable lambda_success_handler {
-  type        = string
-  description = "Function name for the Lambda success handler"
-}
-
-variable lambda_error_handler {
-  type        = string
-  description = "Function name for the Lambda error handler"
-}
-
 variable role_arn {
   type        = string
   description = "ARN for the role assumed by tasks"

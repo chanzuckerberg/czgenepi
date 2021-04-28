@@ -5,8 +5,6 @@ resource "aws_sfn_state_machine" "state_machine" {
   definition = jsonencode(yamldecode(templatefile("${path.module}/sfn.yml", {
     batch_ec2_job_queue_name = var.ec2_queue_arn
     batch_job_definition_name = var.job_definition_name
-    lambda_error_handler = var.lambda_error_handler
-    lambda_success_handler = var.lambda_success_handler
   })))
 
 }
