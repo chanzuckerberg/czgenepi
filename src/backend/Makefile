@@ -1,7 +1,8 @@
 STYLE_CHECK_PYTHON_CODE_DIRECTORIES = .
 STYLE_CHECK_PYTHON_CODE_SKIPPED_DIRECTORIES = third-party
 TYPE_CHECK_BASE_PYTHON_CODE_DIRECTORIES = aspen
-TYPE_CHECK_INDIVIDUAL_PYTHON_CODE_DIRECTORIES = database_migrations $(shell ls -d aspen/workflows/*)
+TYPE_CHECK_INDIVIDUAL_PYTHON_CODE_DIRECTORIES = database_migrations
+
 
 
 ### CHECK STYLE #############################################
