@@ -1,3 +1,4 @@
+import json
 import logging
 from dataclasses import dataclass
 from typing import Iterable, Mapping, MutableMapping
@@ -121,7 +122,7 @@ def import_project_users(
             user.group = group
 
         session.commit()
-        print(f"Group id: {group.id}")
+        print(json.dumps({"group_id": group.id}))
 
 
 def retrieve_auth0_users(config: aspen_config.Config) -> Mapping[str, Auth0Entry]:
