@@ -46,7 +46,7 @@ def _test_samples_view_cansee(
 ) -> Tuple[Sample, SequencingReadsCollection, Any]:
     user_factory_kwargs = user_factory_kwargs or {}
     owner_group = group_factory()
-    viewer_group = group_factory(name="cdph", email="cdph@cdph.gov")
+    viewer_group = group_factory(name="cdph")
     user = user_factory(viewer_group, **user_factory_kwargs)
     sample = sample_factory(owner_group)
     sequencing_read_collection = sequencing_read_factory(sample)

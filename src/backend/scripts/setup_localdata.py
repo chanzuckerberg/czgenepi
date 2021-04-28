@@ -21,7 +21,6 @@ def create_test_group(session):
     print("Creating group")
     g = Group(
         name="CZI",
-        email="aspen-testuser@chanzuckerberg.com",
         address="601 Marshall St, Redwood City, CA 94063",
     )
     session.add(g)
