@@ -19,7 +19,6 @@ class Group(idbase, DictMixin):  # type: ignore
     __tablename__ = "groups"
 
     name = Column(String, unique=True, nullable=False)
-    email = Column(String, unique=True, nullable=False)
     address = Column(String, nullable=True)
 
     can_see: MutableSequence[CanSee]

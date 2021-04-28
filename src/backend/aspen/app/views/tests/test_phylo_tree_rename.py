@@ -12,11 +12,9 @@ def test_phylo_tree_rename(session, mock_s3_resource, test_data_dir):
     can-see relationships.  Rename the nodes according to the can-see rules, and verify
     that the nodes are renamed correctly."""
     viewer_group = group_factory()
-    can_see_group = group_factory("can_see", email="can_see@yahoo.com")
-    wrong_can_see_group = group_factory(
-        "wrong_can_see", email="wrong_can_see@hotmail.com"
-    )
-    no_can_see_group = group_factory("no_can_see", email="no_can_see@aol.com")
+    can_see_group = group_factory("can_see")
+    wrong_can_see_group = group_factory("wrong_can_see")
+    no_can_see_group = group_factory("no_can_see")
     can_see_group.can_be_seen_by.append(
         CanSee(
             viewer_group=viewer_group,

@@ -1,8 +1,8 @@
 from aspen.database.models import Group, User
 
 
-def group_factory(name="groupname", email="groupemail", address="123 Main St") -> Group:
-    return Group(name=name, email=email, address=address)
+def group_factory(name="groupname", address="123 Main St") -> Group:
+    return Group(name=name, address=address)
 
 
 def user_factory(

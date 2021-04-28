@@ -36,14 +36,13 @@ def covidhub_interface_from_secret(
     return interface
 
 
-def get_or_make_group(session: Session, name: str, address: str, email: str) -> Group:
+def get_or_make_group(session: Session, name: str, address: str) -> Group:
     group = session.query(Group).filter(Group.name == name).one_or_none()
     if group is None:
         # copy the project info into the "group"
         group = Group(
             name=name,
             address=address,
-            email=email,
         )
         session.add(group)
 
@@ -79,8 +78,6 @@ def import_project_users(
             session,
             project.originating_lab,
             project.originating_address,
-            # FIXME: this needs to be updated.
-            email="fakeemail2@dph.gov",
         )
 
         covidhub_users: Iterable[covidtracker.UsersGroups] = covidhub_session.query(
