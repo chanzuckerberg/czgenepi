@@ -31,8 +31,9 @@ locals {
   backend_image_repo    = local.secret["ecrs"]["backend"]["url"]
   nextstrain_image_repo = local.secret["ecrs"]["nextstrain"]["url"]
   nextstrain_error_repo = local.secret["ecrs"]["nextstrain-errorhandler"]["url"]
-  batch_role_arn        = local.secret["batch_queues"]["nextstrain"]["role_arn"]
-  job_queue_arn         = local.secret["batch_queues"]["nextstrain"]["queue_arn"]
+  batch_role_arn        = local.secret["batch_queues"]["aspen"]["role_arn"]
+  ec2_queue_arn         = local.secret["batch_envs"]["aspen"]["envs"]["EC2"]["queue_arn"]
+  spot_queue_arn        = local.secret["batch_envs"]["aspen"]["envs"]["SPOT"]["queue_arn"]
   external_dns          = local.secret["external_zone_name"]
   internal_dns          = local.secret["internal_zone_name"]
 
@@ -129,15 +130,17 @@ module backend_service {
 }
 
 module nextstrain_sfn {
-  source                = "../sfn"
-  app_name              = "nextstrain"
-  stack_resource_prefix = local.stack_resource_prefix
-  job_definition_arn    = module.nextstrain_batch.batch_job_definition
-  job_queue_arn         = local.job_queue_arn
-  role_arn              = local.sfn_role_arn
-  custom_stack_name     = local.custom_stack_name
-  lambda_error_handler  = module.nextstrain_error_lambda.arn
-  deployment_stage      = local.deployment_stage
+  source                 = "../sfn"
+  app_name               = "nextstrain"
+  stack_resource_prefix  = local.stack_resource_prefix
+  job_definition_name    = module.nextstrain_batch.batch_job_definition
+  ec2_queue_arn          = local.ec2_queue_arn
+  role_arn               = local.sfn_role_arn
+  custom_stack_name      = local.custom_stack_name
+  # TODO, we should define multiple lambdas.
+  lambda_error_handler   = module.nextstrain_error_lambda.function_name
+  lambda_success_handler = module.nextstrain_error_lambda.function_name
+  deployment_stage       = local.deployment_stage
 }
 
 module nextstrain_error_lambda {

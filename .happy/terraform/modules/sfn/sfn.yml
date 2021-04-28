@@ -1,0 +1,49 @@
+Comment: SWIPE single-wdl pipeline entry point
+StartAt: RunEC2
+TimeoutSeconds: 259200 # 72 hours (total execution run time, including Batch job scheduling delays)
+States:
+  RunEC2:
+    Type: Task
+    Resource: arn:aws:states:::batch:submitJob.sync
+    Parameters:
+      JobQueue: "${batch_ec2_job_queue_name}"
+      JobName.$: $$.Execution.Name
+      JobDefinition: &JobDefinition "${batch_job_definition_name}"
+      Timeout: &RunBatchTimeout
+        AttemptDurationSeconds: 18000 # 5 hours
+      ContainerOverrides:
+        Memory.$: $.RunEC2Memory
+        Environment: &RunEnvironment
+          - Name: INPUT_JOB_TEST
+            Value.$: $.INPUT_JOB_TEST
+    ResultPath: $.BatchJobDetails.Run
+    Next: HandleSuccess
+    Retry: &BatchRetryConfig
+      - ErrorEquals: ["Batch.AWSBatchException"]
+        IntervalSeconds: 15
+        MaxAttempts: 2
+    Catch:
+      - ErrorEquals: ["States.ALL"]
+        ResultPath: $.BatchJobError.RunEC2
+        Next: HandleFailure
+  HandleSuccess:
+    Type: Task
+    Resource: arn:aws:states:::lambda:invoke
+    Parameters:
+      FunctionName: "${lambda_success_handler}"
+      Payload: &PassthroughStatePayload
+        ExecutionId.$: $$.Execution.Id
+        CurrentState.$: $$.State.Name
+        Input.$: $
+    OutputPath: $.Payload
+    End: true
+  HandleFailure:
+    # The HandleFailure state is expected to read error details, do any housekeeping necessary, then raise an exception
+    # with the error details (so they can be seen directly in the Step Functions API).
+    Type: Task
+    Resource: arn:aws:states:::lambda:invoke
+    Parameters:
+      FunctionName: "${lambda_error_handler}"
+      Payload: *PassthroughStatePayload
+    OutputPath: $.Payload
+    End: true
