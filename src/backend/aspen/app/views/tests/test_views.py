@@ -1,5 +1,6 @@
 import json
 
+from aspen.database.models.usergroup import User
 from aspen.test_infra.models.usergroup import group_factory, user_factory
 
 
@@ -17,7 +18,7 @@ def test_usergroup_view_get(session, app, client):
 
 def test_usergroup_view_put(session, app, client):
     group = group_factory()
-    user = user_factory(group)
+    user = user_factory(group, agreed_to_tos=False)
     session.add(group)
     session.commit()
     with client.session_transaction() as sess:
@@ -25,9 +26,10 @@ def test_usergroup_view_put(session, app, client):
     data = {"agreed_to_tos": True}
 
     res = client.put("/api/usergroup", json=json.dumps(data))
+
     updated_user = session.query(User).filter(User.auth0_user_id == user.auth0_user_id).one()
     assert updated_user.agreed_to_tos == True
-    assert res.status
+    assert res.status == 200
 
 def test_redirect(app, client):
     res = client.get("api/usergroup")
