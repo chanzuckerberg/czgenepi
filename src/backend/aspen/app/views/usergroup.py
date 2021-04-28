@@ -1,5 +1,5 @@
 import json
-from typing import Dict, Union, List
+from typing import Dict, List, Union
 
 from flask import jsonify, request, Response, session
 
@@ -26,11 +26,7 @@ def usergroup():
             return jsonify(user_groups)
 
         if request.method == "PUT":
-            update_allowed_fields: List[str] = [
-                "name",
-                "email",
-                "agreed_to_tos"
-            ]
+            update_allowed_fields: List[str] = ["name", "email", "agreed_to_tos"]
             fields_to_update: Dict[str, Union[str, bool]] = json.loads(
                 request.get_json()
             )
@@ -39,7 +35,8 @@ def usergroup():
                     setattr(user, key, value)
                 else:
                     return Response(
-                        f"only the following fields can be updated on the User object: {update_allowed_fields}, you provided the attribute <{key}>", 400
+                        f"only the following fields can be updated on the User object: {update_allowed_fields}, you provided the attribute <{key}>",
+                        400,
                     )
 
             # all fields have updated successfully
