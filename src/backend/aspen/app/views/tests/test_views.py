@@ -25,7 +25,7 @@ def test_usergroup_view_put_pass(session, app, client):
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
 
     data = {"agreed_to_tos": True}
-    res = client.put("/api/usergroup", json=json.dumps(data))
+    res = client.put("/api/usergroup", json=data, content_type="application/json")
 
     # start a new transaction
     session.close()
@@ -46,7 +46,7 @@ def test_usergroup_view_put_fail(session, app, client):
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
 
     data = {"fake_field": "even faker"}
-    res = client.put("/api/usergroup", json=json.dumps(data))
+    res = client.put("/api/usergroup", json=data, content_type="application/json")
 
     assert res.status == "400 BAD REQUEST"
 
