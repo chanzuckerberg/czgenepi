@@ -1,12 +1,7 @@
 from click.testing import CliRunner
-from aspen.database.connection import (
-    get_db_uri,
-    init_db,
-    session_scope,
-    SqlAlchemyInterface,
-)
+
 from aspen.workflows.pangolin.export import cli
-from aspen.test_infra.models.usergroup import group_factory, user_factory
+from aspen.test_infra.models.usergroup import group_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
 
@@ -14,7 +9,7 @@ from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
 def test_pangolin_export(mocker, session, postgres_database):
     group = group_factory()
 
-    for i in range(0,2):
+    for i in range(1,3):
         sample = sample_factory(
             group,
             private_identifier=f"private_identifier_{i}",
@@ -26,25 +21,10 @@ def test_pangolin_export(mocker, session, postgres_database):
         session.commit()
 
     mocker.patch(
-        "aspen.config.config.RemoteDatabaseConfig.DATABASE_URI",
-        return_value=postgres_database.as_uri(),
-        autospec=True
+        'aspen.config.config.RemoteDatabaseConfig.DATABASE_URI',
+        new_callable=mocker.PropertyMock,
+        return_value=postgres_database.as_uri()
     )
-    # mocker.patch(
-    #     "aspen.database.connection.init_db",
-    #     return_value=postgres_database.as_uri(),
-    #     autospec=True
-    # )
-    # mocker.patch(
-    #     "aspen.database.connection.get_db_uri",
-    #     return_value=postgres_database.as_uri(),
-    #     autospec=True
-    # )
-    # mocker.patch(
-    #     "aspen.database.connection.session_scope",
-    #     return_value=session,
-    #     autospec=True
-    # )
 
     runner = CliRunner()
     result = runner.invoke(
@@ -58,7 +38,10 @@ def test_pangolin_export(mocker, session, postgres_database):
             "public_identifier_2"
         ]
     )
-    print(result)
+    assert result.exit_code == 0
+    with open("test.fa", "r") as fh:
+        lines = fh.read()
+        assert lines == '>1\nTCGGCG>2\nTCGGCG'
 
 
 
