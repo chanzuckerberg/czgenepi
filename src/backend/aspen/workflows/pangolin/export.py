@@ -34,17 +34,17 @@ def cli(sample_public_identifier: Sequence[str], sequences_fh: io.TextIOBase):
         for sample in all_samples:
             pathogen_genome = sample.uploaded_pathogen_genome
 
-            sequence = "".join(
+            sequence: str = "".join(
                 [
                     line
-                    for line in pathogen_genome.sequence.splitlines()
+                    for line in pathogen_genome.sequence.splitlines()  # type: ignore
                     if not (line.startswith(">") or line.startswith(";"))
                 ]
             )
 
-            sequence = sequence.strip("Nn")
-            sequences_fh.write(f">{pathogen_genome.entity_id}\n")
-            sequences_fh.write(sequence)
+            stripped_sequence: str = sequence.strip("Nn")
+            sequences_fh.write(f">{pathogen_genome.entity_id}\n")  # type: ignore
+            sequences_fh.write(stripped_sequence)
 
 
 if __name__ == "__main__":
