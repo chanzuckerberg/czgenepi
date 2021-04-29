@@ -27,15 +27,23 @@ def test_pangolin_export(mocker, session, postgres_database):
 
     mocker.patch(
         "aspen.config.config.RemoteDatabaseConfig.DATABASE_URI",
-        return_value=postgres_database.as_uri()
-    )
-    mocker.patch(
-        "aspen.database.connection.get_db_uri",
-        return_value=postgres_database.as_uri()
+        return_value=postgres_database.as_uri(),
+        autospec=True
     )
     # mocker.patch(
     #     "aspen.database.connection.init_db",
-    #     return_value=postgres_database.as_uri()
+    #     return_value=postgres_database.as_uri(),
+    #     autospec=True
+    # )
+    # mocker.patch(
+    #     "aspen.database.connection.get_db_uri",
+    #     return_value=postgres_database.as_uri(),
+    #     autospec=True
+    # )
+    # mocker.patch(
+    #     "aspen.database.connection.session_scope",
+    #     return_value=session,
+    #     autospec=True
     # )
 
     runner = CliRunner()
