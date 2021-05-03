@@ -25,10 +25,4 @@ def upgrade():
 
 
 def downgrade():
-    op.alter_column(
-        "pathogen_genomes",
-        "pangolin_probability",
-        existing_type=sa.Float(),
-        type_=sa.Integer(),
-        schema="aspen",
-    )
+    raise NotImplementedError("Downgrading the database is not allowed")
