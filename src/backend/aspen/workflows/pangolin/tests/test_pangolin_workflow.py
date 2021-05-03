@@ -72,11 +72,15 @@ def test_pangolin_save(mocker, session, postgres_database):
         save_cli,
         [
             "--pangolin-csv",
-            pangolin_csv
+            pangolin_csv,
+            "--pangolin-version",
+            "v1.0",
+            "--pangolin-last-updated",
+            "05-03-2021"
         ],
     )
     assert result.exit_code == 0
-    
+
     # start new transaction
     session.stop()
     session.begin()
