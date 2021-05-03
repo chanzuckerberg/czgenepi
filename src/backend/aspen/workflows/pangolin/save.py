@@ -18,7 +18,6 @@ from aspen.database.models import PathogenGenome
 
 @click.command("save")
 @click.option("pangolin_fh", "--pangolin-csv", type=click.File("r"), required=True)
-@click.option("--pangolin-version", type=str, required=True)
 @click.option("--pangolin-last-updated", type=click.DateTime(formats=["%m-%d-%Y"]), required=True)
 def cli(
     pangolin_fh: io.TextIOBase,
@@ -32,8 +31,8 @@ def cli(
         for row in pango_csv:
             pathogen_genome = session.query(PathogenGenome).filter(PathogenGenome.entity_id== int(row["taxon"])).one()
             pathogen_genome.pangolin_lineage = row["lineage"]
-            pathogen_genome.pangolin_probability = int(row["probability"])
-            pathogen_genome.pangolin_version = pangolin_version
+            pathogen_genome.pangolin_probability = float(row["probability"])
+            pathogen_genome.pangolin_version = row["pangoLEARN_version"]
             pathogen_genome.pangolin_last_updated = pangolin_last_updated
             session.commit()
 

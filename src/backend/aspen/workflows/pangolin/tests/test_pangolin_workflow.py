@@ -73,8 +73,6 @@ def test_pangolin_save(mocker, session, postgres_database):
         [
             "--pangolin-csv",
             pangolin_csv,
-            "--pangolin-version",
-            "v1.0",
             "--pangolin-last-updated",
             "05-03-2021"
         ],
