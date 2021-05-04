@@ -11,8 +11,3 @@ test: # run ts test
 
 test-build:
 	npm --prefix . run build
-
-### BUILD/ INSTALL ##########################################
-npm-install:
-	npm i
-
