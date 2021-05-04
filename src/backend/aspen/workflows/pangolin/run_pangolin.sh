@@ -30,20 +30,20 @@ do
     args="$args --sample-public-identifier $sample_id"
 done
 
-sequences_output = "sequences.fasta"
+sequences_output="sequences.fasta"
 
 # call export script to export renamed sequences
 /aspen/.venv/bin/python /aspen/src/backend/workflows/pangolin/export.py \
   --public-identifiers $args \
-  --sequences $sequences_output
+  --sequences "$sequences_output"
 
 
 # call pangolin on the exported sequences
-lineage_report = "lineage_report.csv"
+lineage_report="lineage_report.csv"
 pangolin $sequences_output --outfile $lineage_report
 
-last_updated = date +'%m-%d-%Y'
+last_updated=date +'%m-%d-%Y'
 # save the pangolin results back to the db:
 /aspen/.venv/bin/python /aspen/src/backend/workflows/pangolin/save.py \
-  --pangolin-csv $lineage_report \
+  --pangolin-csv "$lineage_report" \
   --pangolin-last-updated $last_updated
