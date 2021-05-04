@@ -5,9 +5,14 @@ check-style:
 lint:
 	npm --prefix . run lint
 
-### TESTING #############################################
+### TESTING #################################################
 test: # run ts test
 	npm --prefix . test
 
 test-build:
 	npm --prefix . run build
+
+### BUILD/ INSTALL ##########################################
+npm-install:
+	npm i
+

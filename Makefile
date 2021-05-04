@@ -110,6 +110,7 @@ local-status: ## Show the status of the containers in the dev environment.
 local-rebuild: .env.ecr local-ecr-login ## Rebuild local dev without re-importing data
 	docker-compose $(COMPOSE_OPTS) build frontend backend utility
 	docker-compose $(COMPOSE_OPTS) up -d
+	docker-compose exec frontend make npm-install
 
 .PHONY: local-sync
 local-sync: local-rebuild local-init ## Re-sync the local-environment state after modifying library deps or docker configs
