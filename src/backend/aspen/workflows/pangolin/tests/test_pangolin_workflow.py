@@ -1,3 +1,4 @@
+from datetime import datetime
 from pathlib import Path
 
 from click.testing import CliRunner
@@ -63,28 +64,28 @@ def test_pangolin_save(mocker, session, postgres_database):
         return_value=postgres_database.as_uri(),
     )
 
-    pangolin_csv = Path(
-        Path(__file__).parent, "data", "lineage_report.csv"
-    )
+    pangolin_csv = Path(Path(__file__).parent, "data", "lineage_report.csv")
 
     runner = CliRunner()
     result = runner.invoke(
         save_cli,
-        [
-            "--pangolin-csv",
-            pangolin_csv,
-            "--pangolin-last-updated",
-            "05-03-2021"
-        ],
+        ["--pangolin-csv", pangolin_csv, "--pangolin-last-updated", "05-03-2021"],
     )
     assert result.exit_code == 0
 
     # start new transaction
-    session.stop()
+    session.close()
     session.begin()
 
     for i in range(1, 3):
-        pathogen_genome = session.query(UploadedPathogenGenome).filter(UploadedPathogenGenome.entity_id==i).one()
+        pathogen_genome = (
+            session.query(UploadedPathogenGenome)
+            .filter(UploadedPathogenGenome.entity_id == i)
+            .one()
+        )
         assert pathogen_genome.pangolin_lineage == "B.1.590"
-        assert pathogen_genome.pangolin_probability == 1
-
+        assert pathogen_genome.pangolin_probability == 1.0
+        assert pathogen_genome.pangolin_last_updated == datetime.strptime(
+            "05-03-2021", "%m-%d-%Y"
+        )
+        assert pathogen_genome.pangolin_version == "2021-04-23"
