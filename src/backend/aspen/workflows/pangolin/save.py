@@ -30,11 +30,11 @@ def cli(pangolin_fh: io.TextIOBase, pangolin_last_updated: datetime):
                 .filter(PathogenGenome.entity_id == int(row["taxon"]))
                 .one()
             )
-            pathogen_genome.pangolin_lineage: str = row["lineage"]
-            pathogen_genome.pangolin_probability: float = float(row["probability"])
+            pathogen_genome.pangolin_lineage = row["lineage"]
+            pathogen_genome.pangolin_probability = float(row["probability"])
             # TODO: change pangolin_version to date, looks like that's how pangolearn version is tracked
-            pathogen_genome.pangolin_version: str = row["pangoLEARN_version"]
-            pathogen_genome.pangolin_last_updated: datetime = pangolin_last_updated
+            pathogen_genome.pangolin_version = row["pangoLEARN_version"]
+            pathogen_genome.pangolin_last_updated = pangolin_last_updated
             session.commit()
 
 
