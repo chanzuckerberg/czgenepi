@@ -32,7 +32,7 @@ task RefreshGisaid {
     fi
     curl "~{gisaid_ndjson_export_url}" --user "${gisaid_username}":"${gisaid_password}" | \
         bunzip2 | \
-        xz -2 -c | \
+        zstdmt | \
         aws s3 cp - s3://~{gisaid_ndjson_staging_bucket}/~{gisaid_ndjson_staging_key}
     >>>
 
