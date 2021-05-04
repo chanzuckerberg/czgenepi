@@ -311,6 +311,8 @@ def import_project(
                             sample.uploaded_pathogen_genome.add_accession(
                                 repository_type=repository_type,
                                 public_identifier=public_identifier,
+                                workflow_start_datetime=datetime.datetime.now(),
+                                workflow_end_datetime=datetime.datetime.now(),
                             )
             else:
                 sample.czb_failed_genome_recovery = True
