@@ -1,9 +1,11 @@
 from datetime import datetime
-from pathlib import Path
+from pathlib import Path, PosixPath
 
-from click.testing import CliRunner
+from click.testing import CliRunner, Result
 
+from aspen.database.models.sample import Sample
 from aspen.database.models.sequences import UploadedPathogenGenome
+from aspen.database.models.usergroup import Group
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
 from aspen.test_infra.models.usergroup import group_factory
@@ -12,29 +14,34 @@ from aspen.workflows.pangolin.save import cli as save_cli
 
 
 def create_test_data(session):
-    group = group_factory()
+    group: Group = group_factory()
 
     for i in range(1, 3):
-        sample = sample_factory(
+        sample: Sample = sample_factory(
             group,
             private_identifier=f"private_identifier_{i}",
             public_identifier=f"public_identifier_{i}",
         )
         session.add(sample)
-        pathogen_genome = uploaded_pathogen_genome_factory(sample)
+        pathogen_genome: UploadedPathogenGenome = uploaded_pathogen_genome_factory(
+            sample
+        )
         session.add(pathogen_genome)
         session.commit()
+
+
+def mock_remote_db_uri(mocker, test_postgres_db_uri):
+    mocker.patch(
+        "aspen.config.config.RemoteDatabaseConfig.DATABASE_URI",
+        new_callable=mocker.PropertyMock,
+        return_value=test_postgres_db_uri,
+    )
 
 
 def test_pangolin_export(mocker, session, postgres_database):
 
     create_test_data(session)
-
-    mocker.patch(
-        "aspen.config.config.RemoteDatabaseConfig.DATABASE_URI",
-        new_callable=mocker.PropertyMock,
-        return_value=postgres_database.as_uri(),
-    )
+    mock_remote_db_uri(mocker, postgres_database.as_uri())
 
     runner = CliRunner()
     result = runner.invoke(
@@ -57,17 +64,12 @@ def test_pangolin_export(mocker, session, postgres_database):
 def test_pangolin_save(mocker, session, postgres_database):
 
     create_test_data(session)
+    mock_remote_db_uri(mocker, postgres_database.as_uri())
 
-    mocker.patch(
-        "aspen.config.config.RemoteDatabaseConfig.DATABASE_URI",
-        new_callable=mocker.PropertyMock,
-        return_value=postgres_database.as_uri(),
-    )
+    pangolin_csv: PosixPath = Path(Path(__file__).parent, "data", "lineage_report.csv")
 
-    pangolin_csv = Path(Path(__file__).parent, "data", "lineage_report.csv")
-
-    runner = CliRunner()
-    result = runner.invoke(
+    runner: CliRunner = CliRunner()
+    result: Result = runner.invoke(
         save_cli,
         ["--pangolin-csv", pangolin_csv, "--pangolin-last-updated", "05-03-2021"],
     )
@@ -78,7 +80,7 @@ def test_pangolin_save(mocker, session, postgres_database):
     session.begin()
 
     for i in range(1, 3):
-        pathogen_genome = (
+        pathogen_genome: UploadedPathogenGenome = (
             session.query(UploadedPathogenGenome)
             .filter(UploadedPathogenGenome.entity_id == i)
             .one()
