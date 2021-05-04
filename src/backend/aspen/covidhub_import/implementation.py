@@ -1,3 +1,4 @@
+import collections
 import datetime
 import json
 import logging
@@ -6,19 +7,22 @@ import warnings
 from typing import (
     Any,
     Collection,
-    Iterable,
+    DefaultDict,
     Iterator,
+    List,
     Mapping,
     MutableMapping,
+    MutableSequence,
     Optional,
     Sequence,
+    Tuple,
 )
 
 import boto3
 import pytz
 import tqdm
-from sqlalchemy import and_, or_
-from sqlalchemy.orm import configure_mappers, joinedload, Session
+from sqlalchemy import or_
+from sqlalchemy.orm import configure_mappers, joinedload, selectin_polymorphic, Session
 
 from aspen.aws.s3 import S3UrlParser
 from aspen.database.connection import session_scope, SqlAlchemyInterface
@@ -30,6 +34,7 @@ from aspen.database.models import (
     RegionType,
     Sample,
     UploadedPathogenGenome,
+    Workflow,
     WorkflowStatusType,
 )
 from aspen.phylo_tree.identifiers import get_names_from_tree
@@ -41,9 +46,21 @@ from covid_database.models.enums import ConsensusGenomeStatus
 from covid_database.models.ngs_sample_tracking import (
     ConsensusGenome,
     CZBID,
+    CZBIDRnaPlate,
     DphCZBID,
+    InternalCZBID,
     Project,
     SampleFastqs,
+)
+from covid_database.models.qpcr_processing import (
+    AccessionSample,
+    Aliquoting,
+    Extraction,
+    QPCRPlate,
+    QPCRResult,
+    QPCRRun,
+    RNAPlate,
+    SamplePlate,
 )
 
 logger = logging.getLogger(__name__)
@@ -72,6 +89,18 @@ def list_bucket(s3_resource, bucket: str, key_prefix: str) -> Iterator[str]:
         if not results["IsTruncated"]:
             return
         nexttoken = results["NextContinuationToken"]
+
+
+def _get_external_accession(external_accession: str, czbid: CZBID) -> str:
+    """Get the external accession.  If it is provided, use it as is.  Otherwise, create
+    a string out of the czbid's submission base."""
+    if external_accession is None:
+        external_accession = f"UNKNOWN_{czbid.submission_base}"
+        warnings.warn(
+            f"CZBID {czbid} does not have an external accession.  Assigning as"
+            f" {external_accession}"
+        )
+    return external_accession
 
 
 def import_project(
@@ -103,8 +132,25 @@ def import_project(
         group: Group = session.query(Group).filter(Group.id == aspen_group_id).one()
 
         logger.info("Retrieving from COVIDHUB DB...")
-        consensus_genomes: Collection[ConsensusGenome] = (
-            covidhub_session.query(ConsensusGenome)
+        group_czbids: Collection[CZBID] = (
+            covidhub_session.query(CZBID)
+            .join(Project)
+            .filter(Project.rr_project_id == rr_project_id)
+            .options(
+                selectin_polymorphic(CZBID, [DphCZBID, InternalCZBID]),
+                joinedload(CZBID.genome_submission_info),
+            )
+            .all()
+        )
+
+        # load a map of czbid name to czbid object.
+        czbid_lookup_by_str: Mapping[str, CZBID] = {
+            czbid.czb_id: czbid for czbid in group_czbids
+        }
+
+        czbid_to_consensus_genomes: Mapping[str, ConsensusGenome] = {
+            consensus_genome.sample_fastqs.czb_id.czb_id: consensus_genome
+            for consensus_genome in covidhub_session.query(ConsensusGenome)
             .join(SampleFastqs, CZBID, Project)
             .distinct(CZBID.id)
             .filter(Project.rr_project_id == rr_project_id)
@@ -120,68 +166,195 @@ def import_project(
                 ConsensusGenome.id.desc(),
             )
             .options(
-                joinedload(ConsensusGenome.sample_fastqs)
-                .joinedload(SampleFastqs.czb_id.of_type(DphCZBID))
-                .joinedload(CZBID.genome_submission_info),
-            )
-            .all()
-        )
-        czbid_without_consensus_genomes: Iterable[DphCZBID] = (
-            covidhub_session.query(DphCZBID)
-            .join(Project)
-            .filter(
-                DphCZBID.czb_id.notin_(
-                    {
-                        consensus_genome.sample_fastqs.czb_id.czb_id
-                        for consensus_genome in consensus_genomes
-                    }
+                joinedload(ConsensusGenome.sample_fastqs).joinedload(
+                    SampleFastqs.czb_id
                 )
             )
-            .filter(Project.rr_project_id == rr_project_id)
-            .options(
-                joinedload(DphCZBID.sample_fastqs).joinedload(
-                    SampleFastqs.consensus_genomes
-                ),
-                joinedload(DphCZBID.genome_submission_info),
-            )
-        )
-
-        external_accessions = {
-            consensus_genome.sample_fastqs.czb_id.external_accession
-            for consensus_genome in tqdm.tqdm(consensus_genomes)
-            if isinstance(consensus_genome.sample_fastqs.czb_id, DphCZBID)
+            .all()
         }
+
+        internal_czb_ids_metadata: Mapping[str, Tuple[str, datetime.datetime]] = {
+            czbid: (
+                _get_external_accession(external_accession, czbid_lookup_by_str[czbid]),
+                collection_date,
+            )
+            for czbid, external_accession, collection_date in covidhub_session.query(
+                InternalCZBID.czb_id.label("czb_id"),
+                AccessionSample.location_submitter_id.label("external_accession"),
+                QPCRRun.completed_at.label("collection_date"),
+            )
+            .join(
+                Project,
+                CZBIDRnaPlate,
+                RNAPlate,
+                Extraction,
+                SamplePlate,
+                AccessionSample,
+                Aliquoting,
+                QPCRPlate,
+                QPCRRun,
+            )
+            .filter(Project.rr_project_id == rr_project_id)
+            .filter(QPCRResult.well_id == CZBIDRnaPlate.well_id)
+            .filter(AccessionSample.well_id == CZBIDRnaPlate.well_id)
+            .group_by(
+                Project.rr_project_id.label("project_id"),
+                Project.collaborating_institution.label("project_name"),
+                AccessionSample.location_submitter_id.label("external_accession"),
+                InternalCZBID.czb_id.label("czb_id"),
+                QPCRRun.completed_at.label("collection_date"),
+            )
+        }
+
+        # verify that we have no duplicates for external accessions
+        external_accession_to_czbids: DefaultDict[
+            str, set[str]
+        ] = collections.defaultdict(set)
+        for czbid, (external_accession, _) in internal_czb_ids_metadata.items():
+            external_accession_to_czbids[external_accession].add(czbid)
+        czbids_to_process: MutableSequence[CZBID] = list()
+        for external_accession, czbids in external_accession_to_czbids.items():
+            if len(czbids) > 1:
+                # gather up the information for each czbid representing the external
+                # accesssion.
+                # 1. number of recovered sites
+                # 2. date
+                czbids_sorted_by_value_desc: List[
+                    Tuple[int, datetime.datetime, str]
+                ] = list()
+                for czbid in czbids:
+                    consensus_genome = czbid_to_consensus_genomes.get(czbid, None)
+                    czbids_sorted_by_value_desc.append(
+                        (
+                            consensus_genome.recovered_sites
+                            if consensus_genome is not None
+                            else -1,
+                            internal_czb_ids_metadata[czbid][1],
+                            czbid,
+                        )
+                    )
+                    czbids_sorted_by_value_desc.sort(reverse=True)
+                picked_czbid_str = czbids_sorted_by_value_desc[0][2]
+                warnings.warn(
+                    f"External accession {external_accession} represented by multiple"
+                    f" czbids: {czbids}.  Choosing {picked_czbid_str} as the czbid for"
+                    "this sample."
+                )
+                czbids_to_process.append(czbid_lookup_by_str[picked_czbid_str])
+            else:
+                czbids_to_process.append(czbid_lookup_by_str[czbids.pop()])
+
+        # load the existing samples, store as a mapping between external accession to
+        # sample.
         external_accessions_to_samples: Mapping[str, Sample] = {
             sample.private_identifier: sample
-            for sample in session.query(Sample).filter(
-                and_(
-                    Sample.submitting_group == group,
-                    Sample.private_identifier.in_(external_accessions),
+            for sample in (
+                session.query(Sample)
+                .filter(Sample.submitting_group == group)
+                .options(
+                    joinedload(Sample.uploaded_pathogen_genome)
+                    .joinedload(UploadedPathogenGenome.consuming_workflows)
+                    .joinedload(Workflow.outputs)
                 )
             )
         }
         public_identifier_to_sample: MutableMapping[str, Sample] = dict()
 
         logger.info("Creating new objects...")
-        for consensus_genome in tqdm.tqdm(consensus_genomes):
-            czbid = consensus_genome.sample_fastqs.czb_id
-            if not isinstance(czbid, DphCZBID):
-                warnings.warn(
-                    "consensus genome has non-dphczbid"
-                    f"{consensus_genome.sample_fastqs.czb_id}"
-                )
+        for czbid in tqdm.tqdm(czbids_to_process):
+            if isinstance(czbid, DphCZBID):
+                external_accession = czbid.external_accession
+                collection_date = czbid.collection_date
+                date_received = czbid.date_received or czbid.collection_date
+            elif isinstance(czbid, InternalCZBID):
+                internal_metadata = internal_czb_ids_metadata[czbid.czb_id]
+                external_accession = internal_metadata[0]
+                collection_date = internal_metadata[1]
+                date_received = internal_metadata[1]
+            else:
+                warnings.warn(f"czbid of unsupported type: {czbid}")
                 continue
 
-            sample = format_sample_for_dphczbid(
-                project, group, czbid, consensus_genome, external_accessions_to_samples
+            sample = external_accessions_to_samples.get(external_accession, None)
+            if sample is None:
+                sample = Sample(
+                    submitting_group=group, private_identifier=external_accession
+                )
+
+            sample.original_submission = {}
+            sample.public_identifier = (
+                f"USA/{czbid.submission_base}/{collection_date.year}"
             )
+            sample.sample_collected_by = project.originating_lab
+            sample.sample_collector_contact_address = project.originating_address
+            sample.collection_date = collection_date
+            sample.location = project.location
+            sample.division = "California"
+            sample.country = "USA"
+            sample.region = RegionType.NORTH_AMERICA
+            sample.organism = "SARS-CoV-2"
+
+            consensus_genome = czbid_to_consensus_genomes.get(czbid.czb_id, None)
+            if consensus_genome is not None:
+                if sample.uploaded_pathogen_genome is None:
+                    sample.uploaded_pathogen_genome = UploadedPathogenGenome(
+                        sample=sample,
+                    )
+                sample.uploaded_pathogen_genome.upload_date = date_received
+                sample.uploaded_pathogen_genome.num_unambiguous_sites = (
+                    consensus_genome.recovered_sites
+                )
+                sample.uploaded_pathogen_genome.num_mixed = (
+                    consensus_genome.ambiguous_sites
+                )
+                sample.uploaded_pathogen_genome.num_missing_alleles = (
+                    consensus_genome.missing_sites
+                )
+                sample.uploaded_pathogen_genome.sequencing_depth = (
+                    consensus_genome.avg_depth
+                )
+                sample.uploaded_pathogen_genome.sequence = consensus_genome.fasta
+
+                # if it's a dphczbid, then it might have genome submission info.
+                if (
+                    isinstance(czbid, DphCZBID)
+                    and czbid.genome_submission_info is not None
+                ):
+                    repository_type: Optional[PublicRepositoryType] = None
+                    if czbid.genome_submission_info.gisaid_accession is not None:
+                        repository_type = PublicRepositoryType.GISAID
+                        public_identifier = (
+                            czbid.genome_submission_info.gisaid_accession
+                        )
+                    elif czbid.genome_submission_info.genbank_accession is not None:
+                        repository_type = PublicRepositoryType.GENBANK
+                        public_identifier = (
+                            czbid.genome_submission_info.genbank_accession
+                        )
+
+                    if repository_type is not None:
+                        for accession in sample.uploaded_pathogen_genome.accessions():
+                            if (
+                                accession.repository_type == repository_type
+                                and accession.public_identifier == public_identifier
+                            ):
+                                break
+                        else:
+                            sample.uploaded_pathogen_genome.add_accession(
+                                repository_type=repository_type,
+                                public_identifier=public_identifier,
+                            )
+            else:
+                sample.czb_failed_genome_recovery = True
+
             public_identifier_to_sample[sample.public_identifier] = sample
 
-        for czbid in tqdm.tqdm(czbid_without_consensus_genomes):
-            sample = format_sample_for_dphczbid(
-                project, group, czbid, None, external_accessions_to_samples
+        all_phylo_trees: Mapping[Tuple[str, str], PhyloTree] = {
+            (phylo_run.s3_bucket, phylo_run.s3_key): phylo_run
+            for phylo_run in (
+                session.query(PhyloTree).join(PhyloRun).filter(PhyloRun.group == group)
             )
-            public_identifier_to_sample[sample.public_identifier] = sample
+        }
 
         pacific_time = pytz.timezone("US/Pacific")
         s3_src = boto3.session.Session(profile_name=covidhub_aws_profile).resource("s3")
@@ -190,7 +363,6 @@ def import_project(
         src_prefix_url = S3UrlParser(s3_src_prefix)
         dst_prefix_url = S3UrlParser(s3_dst_prefix)
         for key in list_bucket(s3_src, src_prefix_url.bucket, src_prefix_url.key):
-            key_prefix_removed = key[len(src_prefix_url.key) :]
             key_mo = re.match(
                 r".*_(?P<year>\d{2})(?P<month>\d{2})(?P<day>\d{2})\.json",
                 key,
@@ -201,6 +373,8 @@ def import_project(
                     " expected filename structure."
                 )
                 continue
+            key_prefix_removed = key[len(src_prefix_url.key) :]
+
             year, month, day = (
                 2000 + int(key_mo["year"]),
                 int(key_mo["month"]),
@@ -224,22 +398,27 @@ def import_project(
                 and public_identifier in all_public_identifiers
             ]
 
-            phylo_tree = PhyloTree(
-                s3_bucket=dst_prefix_url.bucket,
-                s3_key=dst_prefix_url.key + key_prefix_removed,
+            phylo_tree = all_phylo_trees.get(
+                (dst_prefix_url.bucket, dst_prefix_url.key + key_prefix_removed), None
             )
+            if phylo_tree is None:
+                phylo_tree = PhyloTree(
+                    s3_bucket=dst_prefix_url.bucket,
+                    s3_key=dst_prefix_url.key + key_prefix_removed,
+                )
             phylo_tree.constituent_samples = [
                 uploaded_pathogen_genome.sample
                 for uploaded_pathogen_genome in all_uploaded_pathogen_genomes
             ]
 
-            workflow = PhyloRun(
-                group=group,
-                start_datetime=dt,
-                end_datetime=dt,
-                workflow_status=WorkflowStatusType.COMPLETED,
-                software_versions={},
-            )
+            workflow = phylo_tree.producing_workflow
+            if workflow is None:
+                workflow = PhyloRun()
+            workflow.group = group
+            workflow.start_datetime = dt
+            workflow.end_datetime = dt
+            workflow.workflow_status = WorkflowStatusType.COMPLETED
+            workflow.software_versions = {}
             workflow.inputs = list(all_uploaded_pathogen_genomes)
             workflow.outputs = [phylo_tree]
 
@@ -249,70 +428,3 @@ def import_project(
                 f"s3://{src_prefix_url.bucket}/{key} ==>"
                 f" s3://{phylo_tree.s3_bucket}/{phylo_tree.s3_key}"
             )
-
-
-def format_sample_for_dphczbid(
-    project: Project,
-    group: Group,
-    dphczbid: DphCZBID,
-    consensus_genome: Optional[ConsensusGenome],
-    external_accessions_to_samples: Mapping[str, Sample],
-) -> Sample:
-    if dphczbid.external_accession in (
-        "OCPHL2207",
-        "OCPHL2208",
-    ):
-        external_accession = f"{dphczbid.external_accession} ({dphczbid.czb_id})"
-    else:
-        external_accession = dphczbid.external_accession
-    sample = external_accessions_to_samples.get(external_accession, None)
-    if sample is None:
-        sample = Sample(submitting_group=group, private_identifier=external_accession)
-
-    sample.original_submission = {}
-    sample.public_identifier = (
-        f"USA/{dphczbid.submission_base}/{dphczbid.collection_date.year}"
-    )
-    sample.sample_collected_by = project.originating_lab
-    sample.sample_collector_contact_address = project.originating_address
-    sample.collection_date = dphczbid.collection_date
-    sample.location = project.location
-    sample.division = "California"
-    sample.country = "USA"
-    sample.region = RegionType.NORTH_AMERICA
-    sample.organism = "SARS-CoV-2"
-
-    if consensus_genome is not None:
-        if sample.uploaded_pathogen_genome is None:
-            sample.uploaded_pathogen_genome = UploadedPathogenGenome(
-                sample=sample,
-            )
-        sample.uploaded_pathogen_genome.upload_date = dphczbid.date_received
-        sample.uploaded_pathogen_genome.num_unambiguous_sites = (
-            consensus_genome.recovered_sites
-        )
-        sample.uploaded_pathogen_genome.num_mixed = consensus_genome.ambiguous_sites
-        sample.uploaded_pathogen_genome.num_missing_alleles = (
-            consensus_genome.missing_sites
-        )
-        sample.uploaded_pathogen_genome.sequencing_depth = consensus_genome.avg_depth
-        sample.uploaded_pathogen_genome.sequence = consensus_genome.fasta
-
-        if dphczbid.genome_submission_info is not None:
-            repository_type: Optional[PublicRepositoryType] = None
-            if dphczbid.genome_submission_info.gisaid_accession is not None:
-                repository_type = PublicRepositoryType.GISAID
-                public_identifier = dphczbid.genome_submission_info.gisaid_accession
-            elif dphczbid.genome_submission_info.genbank_accession is not None:
-                repository_type = PublicRepositoryType.GENBANK
-                public_identifier = dphczbid.genome_submission_info.genbank_accession
-
-            if repository_type is not None:
-                sample.uploaded_pathogen_genome.add_accession(
-                    repository_type=repository_type,
-                    public_identifier=public_identifier,
-                )
-    else:
-        sample.czb_failed_genome_recovery = True
-
-    return sample
