@@ -33,8 +33,8 @@ done
 sequences_output="sequences.fasta"
 
 # call export script to export renamed sequences
-/aspen/.venv/bin/python /aspen/src/backend/workflows/pangolin/export.py \
-  --public-identifiers $args \
+/aspen/.venv/bin/python /aspen/src/backend/aspen/workflows/pangolin/export.py \
+  $args \
   --sequences "$sequences_output"
 
 
@@ -44,6 +44,6 @@ pangolin $sequences_output --outfile $lineage_report
 
 last_updated=date +'%m-%d-%Y'
 # save the pangolin results back to the db:
-/aspen/.venv/bin/python /aspen/src/backend/workflows/pangolin/save.py \
+/aspen/.venv/bin/python /aspen/src/backend/aspen/workflows/pangolin/save.py \
   --pangolin-csv "$lineage_report" \
   --pangolin-last-updated $last_updated
