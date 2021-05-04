@@ -40,7 +40,7 @@ sequences_output="sequences.fasta"
 
 # call pangolin on the exported sequences
 lineage_report="lineage_report.csv"
-pangolin $sequences_output --outfile $lineage_report
+pangolin $sequences_output --outfile "$lineage_report"
 
 last_updated=date +'%m-%d-%Y'
 # save the pangolin results back to the db:
