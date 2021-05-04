@@ -9,8 +9,11 @@ chmod +x Miniconda3-latest-Linux-x86_64.sh
 source ~/.bashrc
 
 # install pangolin
-git clone git@github.com:cov-lineages/pangolin.git
+mkdir pangolin
 cd pangolin
+git init
+git fetch --depth 1 git@github.com:cov-lineages/pangolin.git
+git checkout FETCH_HEAD
 conda env create -f environment.yml
 conda activate pangolin
 python setup.py install
