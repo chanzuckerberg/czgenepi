@@ -15,7 +15,7 @@ from aspen.database.models import Sample
 
 
 def check_latest_pangolin_version() -> str:
-    contents: HTTPResponse = urllib.request.urlopen(
+    contents: HTTPResponse = urllib.request.urlopen(  # type: ignore
         "https://github.com/cov-lineages/pangoLEARN/releases/latest"
     )
     # get latest version from redirected url:
@@ -34,16 +34,18 @@ def find_samples():
         all_samples: Iterable[Sample] = session.query(Sample).options(
             joinedload(Sample.uploaded_pathogen_genome)
         )
+
+        # TODO: update this comparison to be <= most_recent_pango_version
+        # once we update this field to be a date instead of string
+
         samples_to_be_updated: Iterable[str] = [
             s.public_identifier
             for s in all_samples
-            if (
-                s.uploaded_pathogen_genome.pangolin_version == None
-                or
-                # TODO: update this to be <= most_recent_pango_version once we update this field
-                # to be a date instead of string
+            if (s.uploaded_pathogen_genome.pangolin_version is None)
+            or (
                 s.uploaded_pathogen_genome.pangolin_version != most_recent_pango_version
             )
         ]
 
         # now kick off batch job with these samples?
+        return samples_to_be_updated
