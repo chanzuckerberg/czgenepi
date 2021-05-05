@@ -49,9 +49,9 @@ def cli(pangolin_fh: io.TextIOBase, pangolin_last_updated: datetime):
         for entity_id, pathogen_genome in entity_id_to_pathogen_genome.items():
             pango_info: Mapping[str, Union[str, float]] = taxon_to_pango_info[entity_id]
             pathogen_genome.pangolin_last_updated = pangolin_last_updated
-            pathogen_genome.pangolin_lineage = pango_info["lineage"]
-            pathogen_genome.pangolin_probability = pango_info["probability"]
-            pathogen_genome.pangolin_version = pango_info["version"]
+            pathogen_genome.pangolin_lineage = pango_info["lineage"]  # type: ignore
+            pathogen_genome.pangolin_probability = pango_info["probability"]  # type: ignore
+            pathogen_genome.pangolin_version = pango_info["version"]  # type: ignore
             session.commit()
 
 
