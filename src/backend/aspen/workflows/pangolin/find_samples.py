@@ -1,5 +1,4 @@
 import urllib.request
-from http.client import HTTPResponse
 from typing import Iterable
 
 from sqlalchemy.orm import joinedload
@@ -15,7 +14,7 @@ from aspen.database.models import Sample
 
 
 def check_latest_pangolin_version() -> str:
-    contents: HTTPResponse = urllib.request.urlopen(  # type: ignore
+    contents = urllib.request.urlopen(
         "https://github.com/cov-lineages/pangoLEARN/releases/latest"
     )
     # get latest version from redirected url:
