@@ -1,6 +1,7 @@
 import csv
 import io
 from datetime import datetime
+from typing import Mapping, Union
 
 import click
 
@@ -24,17 +25,28 @@ def cli(pangolin_fh: io.TextIOBase, pangolin_last_updated: datetime):
 
     with session_scope(interface) as session:
         pango_csv: csv.DictReader = csv.DictReader(pangolin_fh)
-        for row in pango_csv:
-            pathogen_genome: UploadedPathogenGenome = (
-                session.query(PathogenGenome)
-                .filter(PathogenGenome.entity_id == int(row["taxon"]))
-                .one()
+        taxon_to_pango_info: Mapping[int, Mapping[str, Union[str, float]]] = {
+            int(row["taxon"]): {
+                "lineage": row["lineage"],
+                "probability": 1.0 - float(row["conflict"]),
+                "version": row["pangoLEARN_version"],
+            }
+            for row in pango_csv
+        }
+
+        entity_id_to_pathogen_genome: Mapping[int, UploadedPathogenGenome] = {
+            pathogen_genome.entity_id: pathogen_genome
+            for pathogen_genome in session.query(PathogenGenome).filter(
+                PathogenGenome.entity_id.in_(taxon_to_pango_info.keys())
             )
-            pathogen_genome.pangolin_lineage = row["lineage"]
-            pathogen_genome.pangolin_probability = 1.0 - float(row["conflict"])  # type: ignore
-            # TODO: change pangolin_version to date, looks like that's how pangolearn version is tracked
-            pathogen_genome.pangolin_version = row["pangoLEARN_version"]
+        }
+
+        for entity_id, pathogen_genome in entity_id_to_pathogen_genome.items():
+            pango_info: Mapping[str, Union[str, float]] = taxon_to_pango_info[entity_id]
             pathogen_genome.pangolin_last_updated = pangolin_last_updated
+            pathogen_genome.pangolin_lineage = pango_info["lineage"]
+            pathogen_genome.pangolin_probability = pango_info["probability"]
+            pathogen_genome.pangolin_version = pango_info["version"]
             session.commit()
 
 
