@@ -35,11 +35,12 @@
   "exclude": [
     "node_modules",
     "public",
-    ".cache"
+    ".cache",
+    "src/server"
   ],
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-  ]
+  ],
 }
