@@ -37,7 +37,6 @@ sequences_output="sequences.fasta"
   $args \
   --sequences "$sequences_output"
 
-
 # call pangolin on the exported sequences
 lineage_report="lineage_report.csv"
 pangolin $sequences_output --outfile "$lineage_report"
