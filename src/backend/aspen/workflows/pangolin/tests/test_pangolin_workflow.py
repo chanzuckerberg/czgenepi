@@ -58,7 +58,7 @@ def test_pangolin_export(mocker, session, postgres_database):
     assert result.exit_code == 0
     with open("test.fa", "r") as fh:
         lines = fh.read()
-        assert lines == ">1\nTCGGCG>2\nTCGGCG"
+        assert lines == ">1\nTCGGCG\n>2\nTCGGCG\n"
 
 
 def test_pangolin_save(mocker, session, postgres_database):

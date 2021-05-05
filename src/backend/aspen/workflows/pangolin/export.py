@@ -44,7 +44,8 @@ def cli(sample_public_identifier: Sequence[str], sequences_fh: io.TextIOBase):
 
             stripped_sequence: str = sequence.strip("Nn")
             sequences_fh.write(f">{pathogen_genome.entity_id}\n")  # type: ignore
-            sequences_fh.write(f"{stripped_sequence}\n")
+            sequences_fh.write(stripped_sequence)
+            sequences_fh.write("\n")
 
 
 if __name__ == "__main__":
