@@ -1,6 +1,6 @@
+import urllib.request
 from http.client import HTTPResponse
 from typing import Iterable
-import urllib.request
 
 from sqlalchemy.orm import joinedload
 
@@ -15,7 +15,9 @@ from aspen.database.models import Sample
 
 
 def check_latest_pangolin_version() -> str:
-    contents: HTTPResponse = urllib.request.urlopen("https://github.com/cov-lineages/pangoLEARN/releases/latest")
+    contents: HTTPResponse = urllib.request.urlopen(
+        "https://github.com/cov-lineages/pangoLEARN/releases/latest"
+    )
     # get latest version from redirected url:
     redirected_url: str = contents.url
     latest_version: str = redirected_url.split("/")[-1]
@@ -29,19 +31,19 @@ def find_samples():
     with session_scope(interface) as session:
         # filter for sequences that were run with an older version of pangolin
 
-        all_samples: Iterable[Sample] = session.query(Sample).options(joinedload(Sample.uploaded_pathogen_genome))
+        all_samples: Iterable[Sample] = session.query(Sample).options(
+            joinedload(Sample.uploaded_pathogen_genome)
+        )
         samples_to_be_updated: Iterable[str] = [
-            s.public_identifier for s in all_samples
+            s.public_identifier
+            for s in all_samples
             if (
-                s.uploaded_pathogen_genome.pangolin_version == None or
+                s.uploaded_pathogen_genome.pangolin_version == None
+                or
                 # TODO: update this to be <= most_recent_pango_version once we update this field
                 # to be a date instead of string
                 s.uploaded_pathogen_genome.pangolin_version != most_recent_pango_version
             )
         ]
 
-        # now kick off batch job with these samples? 
-
-
-
-
+        # now kick off batch job with these samples?
