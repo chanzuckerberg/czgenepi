@@ -79,12 +79,7 @@ def test_pangolin_save(mocker, session, postgres_database):
     session.close()
     session.begin()
 
-    for i in range(1, 3):
-        pathogen_genome: UploadedPathogenGenome = (
-            session.query(UploadedPathogenGenome)
-            .filter(UploadedPathogenGenome.entity_id == i)
-            .one()
-        )
+    for pathogen_genome in session.query(UploadedPathogenGenome).all():
         assert pathogen_genome.pangolin_lineage == "B.1.590"
         assert pathogen_genome.pangolin_probability == 1.0
         assert pathogen_genome.pangolin_last_updated == datetime.strptime(
