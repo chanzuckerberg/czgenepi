@@ -1,3 +1,4 @@
+import boto3
 import json
 import logging
 from dataclasses import dataclass
@@ -28,9 +29,14 @@ class Auth0Entry:
 def covidhub_interface_from_secret(
     covidhub_aws_profile: str, secret_id: str
 ) -> CSqlAlchemyInterface:
-    interface = covidhub_init_db(
-        covidhub_database_util.get_db_uri(secret_id, aws_profile=covidhub_aws_profile)
+
+    session = boto3.session.Session(region_name="us-west-2")
+    client = session.client("secretsmanager")
+    secret = json.loads(client.get_secret_value(SecretId=secret_id)["SecretString"])
+    db_uri = "postgresql://{username}:{password}@{host}:{port}/{dbname}".format(
+        **secret
     )
+    interface = covidhub_init_db(db_uri)
     return interface
 
 
@@ -109,6 +115,7 @@ def import_project_users(
             user.group_admin = False
             user.system_admin = covidhub_user.group.name == "Admin"
             user.group = group
+            print(f"trying to save user: {user.name}, email: {user.email}, id: {covidhub_user.user_id}")
 
         session.commit()
         print(json.dumps({"group_id": group.id}))

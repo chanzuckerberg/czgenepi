@@ -164,7 +164,7 @@ def interact(ctx, connect):
 
 
 @db.command("import-covidhub-users")
-@click.option("--covidhub-aws-profile", type=str, required=True)
+@click.option("--covidhub-aws-profile", type=str, default=None)
 @click.option("--covidhub-db-secret", default="cliahub/cliahub_test_db")
 @click.option("--rr-project-id", type=str, required=True)
 @click.pass_context
@@ -175,7 +175,6 @@ def import_covidhub_users(
     rr_project_id,
 ):
     config, engine = ctx.obj["CONFIG"], ctx.obj["ENGINE"]
-
     auth0_usermap = covidhub_import.retrieve_auth0_users(config)
 
     covidhub_import.import_project_users(
@@ -188,7 +187,7 @@ def import_covidhub_users(
 
 
 @db.command("import-covidhub-project")
-@click.option("--covidhub-aws-profile", type=str, required=True)
+@click.option("--covidhub-aws-profile", type=str, default=None)
 @click.option("--covidhub-db-secret", default="cliahub/cliahub_test_db")
 @click.option("--rr-project-id", type=str, required=True)
 @click.option("--aspen-group-id", type=int, required=True)
