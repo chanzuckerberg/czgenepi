@@ -229,7 +229,7 @@ task AlignGISAID {
     # fetch the gisaid dataset
     aws s3 cp --no-progress s3://"${processed_gisaid_s3_bucket}"/"${processed_gisaid_sequences_s3_key}" - | zstdmt -d > /ncov/data/sequences.fasta
     aws s3 cp --no-progress s3://"${processed_gisaid_s3_bucket}"/"${processed_gisaid_metadata_s3_key}" /ncov/data/metadata.tsv
-    (cd /ncov; snakemake --printshellcmds results/aligned.fasta --profile my_profiles/align/ 1>&2)
+    (cd /ncov; snakemake --printshellcmds results/aligned.fasta --profile /aspen/src/backend/aspen/workflows/align_gisaid 1>&2)
 
     mv /ncov/.snakemake/log/*.snakemake.log /ncov/logs/align.txt .
 

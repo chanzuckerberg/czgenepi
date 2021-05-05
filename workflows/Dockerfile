@@ -44,6 +44,4 @@ RUN git clone --depth 1 git://github.com/chanzuckerberg/aspen && \
 RUN git clone --depth 1 git://github.com/nextstrain/ncov-ingest && \
     pip3 install nextstrain-cli csv-diff s3fs[boto3] aiobotocore[awscli,boto3] envdir fsspec pandas
 
-RUN git clone --depth 1 git://github.com/nextstrain/ncov && \
-    mkdir -p /ncov/my_profiles/align && \
-    cp /aspen/src/backend/aspen/workflows/align_gisaid/config.yaml /ncov/my_profiles/align
+RUN git clone --depth 1 git://github.com/nextstrain/ncov
