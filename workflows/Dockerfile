@@ -33,6 +33,8 @@ RUN apt-get -qq update && apt-get -qq -y install \
     awscli \
     xz-utils \
     zstd \
+    snakemake \
+    mafft \
     gcc \
     && locale-gen en_US.UTF-8
 
@@ -45,6 +47,3 @@ RUN git clone --depth 1 git://github.com/nextstrain/ncov-ingest && \
 RUN git clone --depth 1 git://github.com/nextstrain/ncov && \
     mkdir -p /ncov/my_profiles/align && \
     cp /aspen/src/backend/aspen/workflows/align_gisaid/config.yaml /ncov/my_profiles/align
-
-RUN apt-get install -y snakemake
-RUN apt-get install -y mafft
