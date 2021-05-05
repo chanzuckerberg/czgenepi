@@ -42,8 +42,8 @@ sequences_output="sequences.fasta"
 lineage_report="lineage_report.csv"
 pangolin $sequences_output --outfile "$lineage_report"
 
-last_updated=date +'%m-%d-%Y'
+last_updated=$(date +'%m-%d-%Y')
 # save the pangolin results back to the db:
 /aspen/.venv/bin/python /aspen/src/backend/aspen/workflows/pangolin/save.py \
   --pangolin-csv "$lineage_report" \
-  --pangolin-last-updated $last_updated
+  --pangolin-last-updated "$last_updated"
