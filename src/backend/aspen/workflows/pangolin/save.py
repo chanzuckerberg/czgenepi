@@ -15,6 +15,11 @@ from aspen.database.connection import (
 from aspen.database.models import PathogenGenome, UploadedPathogenGenome
 
 
+def get_probability(conflict: float) -> Union[float, None]:
+    assert conflict <= 1
+    return 1.0 - conflict
+
+
 @click.command("save")
 @click.option("pangolin_fh", "--pangolin-csv", type=click.File("r"), required=True)
 @click.option(
@@ -28,7 +33,7 @@ def cli(pangolin_fh: io.TextIOBase, pangolin_last_updated: datetime):
         taxon_to_pango_info: Mapping[int, Mapping[str, Union[str, float]]] = {
             int(row["taxon"]): {
                 "lineage": row["lineage"],
-                "probability": 1.0 - float(row["conflict"]),
+                "probability": get_probability(float(row["conflict"])),
                 "version": row["pangoLEARN_version"],
             }
             for row in pango_csv
