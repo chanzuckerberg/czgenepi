@@ -1,0 +1,55 @@
+# This is a configuration of AWS Batch container overrides, used by the Terraform resources in this directory.
+# See https://docs.aws.amazon.com/batch/latest/APIReference/API_ContainerOverrides.html for the specification.
+# The definition source is in YAML for brevity and readability. It is compiled into JSON by Terraform
+# then deployed by Terraform.
+#
+# Strings of the form ${aws_region} are interpreted by Terraform as variables. Use $${aws_region} to escape if that is not the intent.
+
+image: "${batch_docker_image}"
+command:
+  - "echo"
+  - "hello"
+environment:
+  - name: "AWS_DEFAULT_REGION"
+    value: "${aws_region}"
+  - name: "DEPLOYMENT_STAGE"
+    value: "${deployment_stage}"
+  - name: "REMOTE_DEV_PREFIX"
+    value: "${remote_dev_prefix}"
+  - name: "FRONTEND_URL"
+    value: "${frontend_url}"
+jobRoleArn: "${batch_job_role_arn}"
+volumes:
+  - name: "scratch"
+    host:
+      sourcePath: "/mnt"
+  - name: "docker_sock"
+    host:
+      sourcePath: "/var/run/docker.sock"
+mountPoints:
+  - sourceVolume: "scratch"
+    containerPath: "/mnt"
+    readOnly: false
+  - sourceVolume: "docker_sock"
+    containerPath: "/var/run/docker.sock"
+    readOnly: false
+ulimits:
+  - name: "nofile"
+    hardLimit: 100000
+    softLimit: 100000
+privileged: false
+readonlyRootFilesystem: false
+logConfiguration:
+    logDriver: "awslogs"
+    options:
+      awslogs-group: "${log_group}"
+      awslogs-region: "${aws_region}"
+
+# The AWS Batch API requires two resource quotas: vCPU and memory. Memory contention or starvation is more dangerous
+# than CPU contention (an OOM condition will cause a job to fail, while lower than expected CPU will just cause it to
+# run longer). The Batch scheduler uses both quotas to schedule (pack) jobs onto instances, but only enforces the memory
+# quota as a hard limit. We set both quotas to a token value here. The step function overrides the memory quota at
+# runtime, causing it to become the concurrency-limiting factor for job packing. (Additional logic is required in
+# miniwdl to set the memory hard limits on child containers running WDL tasks.)
+vcpus: 1
+memory: 4

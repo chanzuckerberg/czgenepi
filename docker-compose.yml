@@ -14,7 +14,6 @@ services:
     image: "${DOCKER_REPO}aspen-frontend"
     build:
       context: src/frontend
-      target: dev
       cache_from:
         - "${DOCKER_REPO}aspen-frontend:branch-trunk"
       args:
@@ -35,7 +34,6 @@ services:
     image: "${DOCKER_REPO}aspen-backend"
     build:
       context: src/backend
-      target: dev
       cache_from:
         - "${DOCKER_REPO}aspen-backend:branch-trunk"
       args:
@@ -70,7 +68,6 @@ services:
     image: "${DOCKER_REPO}aspen-backend"
     build:
       context: src/backend
-      target: dev
       cache_from:
         - "${DOCKER_REPO}aspen-backend:branch-trunk"
       args:
@@ -130,20 +127,11 @@ services:
       - ./oauth/pkcs12:/tmp/pkcs12:ro
       - ./oauth:/tmp/config:ro
   nextstrain:
-    image: "${DOCKER_REPO}aspen-nextstrain-errorhandler"
+    image: "${DOCKER_REPO}aspen-nextstrain"
     build:
       context: docker/aspen-batch
       cache_from:
         - "${DOCKER_REPO}aspen-nextstrain:branch-trunk"
-      args:
-        - BUILDKIT_INLINE_CACHE=1
-    command: ["sleep", "infinity"]
-  nextstrain-errorhandler:
-    image: "${DOCKER_REPO}aspen-nextstrain-errorhandler"
-    build:
-      context: docker/nextstrain-errorhandler
-      cache_from:
-        - "${DOCKER_REPO}aspen-nextstrain-errorhandler:branch-trunk"
       args:
         - BUILDKIT_INLINE_CACHE=1
     command: ["sleep", "infinity"]

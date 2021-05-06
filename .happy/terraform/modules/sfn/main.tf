@@ -2,49 +2,11 @@ resource "aws_sfn_state_machine" "state_machine" {
   name     = "${var.stack_resource_prefix}-${var.deployment_stage}-${var.custom_stack_name}-${var.app_name}-sfn"
   role_arn = var.role_arn
 
-  definition = <<EOF
-{
-    "StartAt": "Manage Batch task",
-    "States": {
-      "Manage Batch task": {
-        "Type": "Task",
-        "Resource": "arn:aws:states:::batch:submitJob.sync",
-        "Parameters": {
-          "JobDefinition": "${var.job_definition_arn}",
-          "JobName": "${var.app_name}",
-          "JobQueue": "${var.job_queue_arn}"
-        },
-        "End": true,
-        "TimeoutSeconds": 10800,
-        "Retry": [
-          {
-            "ErrorEquals": [
-              "States.TaskFailed"
-            ],
-            "IntervalSeconds": 1,
-            "BackoffRate": 2,
-            "MaxAttempts": 2
-          }
-        ],
-        "Catch": [
-          {
-            "ErrorEquals": [
-              "States.ALL"
-            ],
-            "Next": "HandleErrors",
-            "ResultPath": "$.error"
-          }
-        ]
-      },
-      "HandleErrors": {
-        "Type": "Task",
-        "InputPath": "$",
-        "Resource": "${var.lambda_error_handler}",
-        "End": true
-      }
-    }
-}
-EOF
+  definition = jsonencode(yamldecode(templatefile("${path.module}/sfn.yml", {
+    batch_ec2_job_queue_name = var.ec2_queue_arn
+    batch_job_definition_name = var.job_definition_name
+  })))
+
 }
 
 resource aws_cloudwatch_log_group cloud_watch_logs_group {

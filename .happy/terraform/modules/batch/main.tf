@@ -6,43 +6,17 @@ data aws_region current {}
 resource aws_batch_job_definition batch_job_def {
   type = "container"
   name = "${var.stack_resource_prefix}-${var.deployment_stage}-${var.custom_stack_name}-${var.app_name}"
-  container_properties = <<EOF
-{
-  "jobRoleArn": "${var.batch_role_arn}",
-  "image": "${var.image}",
-  "memory": 28000,
-  "environment": [
-    {
-      "name": "DEPLOYMENT_ENVIRONMENT",
-      "value": "${var.deployment_stage}"
-    },
-    {
-      "name": "DEPLOYMENT_STAGE",
-      "value": "${var.deployment_stage}"
-    },
-    {
-      "name": "AWS_DEFAULT_REGION",
-      "value": "${data.aws_region.current.name}"
-    },
-    {
-      "name": "REMOTE_DEV_PREFIX",
-      "value": "${var.remote_dev_prefix}"
-    },
-    {
-      "name": "FRONTEND_URL",
-      "value": "${var.frontend_url}"
-    }
-  ],
-  "vcpus": 2,
-  "logConfiguration": {
-    "logDriver": "awslogs",
-    "options": {
-      "awslogs-group": "${aws_cloudwatch_log_group.cloud_watch_logs_group.id}",
-      "awslogs-region": "${data.aws_region.current.name}"
-    }
-  }
-}
-EOF
+
+  container_properties = jsonencode(yamldecode(templatefile("${path.module}/container_properties.yml", {
+    app_name           = var.app_name,
+    batch_docker_image = var.image
+    aws_region         = data.aws_region.current.name,
+    batch_job_role_arn = var.batch_role_arn
+    deployment_stage   = var.deployment_stage
+    remote_dev_prefix  = var.remote_dev_prefix
+    frontend_url       = var.frontend_url
+    log_group          = aws_cloudwatch_log_group.cloud_watch_logs_group.name
+  })))
 }
 
 resource aws_cloudwatch_log_group cloud_watch_logs_group {
