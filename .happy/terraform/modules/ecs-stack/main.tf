@@ -30,9 +30,9 @@ locals {
   frontend_image_repo   = local.secret["ecrs"]["frontend"]["url"]
   backend_image_repo    = local.secret["ecrs"]["backend"]["url"]
   nextstrain_image_repo = local.secret["ecrs"]["nextstrain"]["url"]
-  nextstrain_error_repo = local.secret["ecrs"]["nextstrain-errorhandler"]["url"]
-  batch_role_arn        = local.secret["batch_queues"]["nextstrain"]["role_arn"]
-  job_queue_arn         = local.secret["batch_queues"]["nextstrain"]["queue_arn"]
+  batch_role_arn        = local.secret["batch_queues"]["aspen"]["role_arn"]
+  ec2_queue_arn         = local.secret["batch_envs"]["aspen"]["envs"]["EC2"]["queue_arn"]
+  spot_queue_arn        = local.secret["batch_envs"]["aspen"]["envs"]["SPOT"]["queue_arn"]
   external_dns          = local.secret["external_zone_name"]
   internal_dns          = local.secret["internal_zone_name"]
 
@@ -45,7 +45,6 @@ locals {
 
   ecs_role_arn          = local.secret["service_roles"]["ecs_role"]
   sfn_role_arn          = local.secret["service_roles"]["sfn_nextstrain"]
-  lambda_execution_role = local.secret["service_roles"]["nextstrain-errorhandler"]
 
   frontend_url = try(join("", ["https://", module.frontend_dns[0].dns_prefix, ".", local.external_dns]), var.frontend_url)
   backend_url  = try(join("", ["https://", module.backend_dns[0].dns_prefix, ".", local.external_dns]), var.backend_url)
@@ -129,28 +128,14 @@ module backend_service {
 }
 
 module nextstrain_sfn {
-  source                = "../sfn"
-  app_name              = "nextstrain"
-  stack_resource_prefix = local.stack_resource_prefix
-  job_definition_arn    = module.nextstrain_batch.batch_job_definition
-  job_queue_arn         = local.job_queue_arn
-  role_arn              = local.sfn_role_arn
-  custom_stack_name     = local.custom_stack_name
-  lambda_error_handler  = module.nextstrain_error_lambda.arn
-  deployment_stage      = local.deployment_stage
-}
-
-module nextstrain_error_lambda {
-  source                = "../lambda"
-  stack_resource_prefix = local.stack_resource_prefix
-  image                 = "${local.nextstrain_error_repo}:${local.image_tag}"
-  name                  = "nextstrainfailures"
-  custom_stack_name     = local.custom_stack_name
-  remote_dev_prefix     = local.remote_dev_prefix
-  deployment_stage      = local.deployment_stage
-  lambda_execution_role = local.lambda_execution_role
-  subnets               = local.subnets
-  security_groups       = local.security_groups
+  source                 = "../sfn"
+  app_name               = "nextstrain"
+  stack_resource_prefix  = local.stack_resource_prefix
+  job_definition_name    = module.nextstrain_batch.batch_job_definition
+  ec2_queue_arn          = local.ec2_queue_arn
+  role_arn               = local.sfn_role_arn
+  custom_stack_name      = local.custom_stack_name
+  deployment_stage       = local.deployment_stage
 }
 
 module migrate_db {

@@ -8,19 +8,14 @@ variable stack_resource_prefix {
   description = "Prefix for account-level resources"
 }
 
-variable job_definition_arn {
+variable job_definition_name {
   type        = string
-  description = "ARN of the batch job definition"
+  description = "Name of the batch job definition"
 }
 
-variable job_queue_arn {
+variable ec2_queue_arn {
   type        = string
   description = "ARN of the batch job queue"
-}
-
-variable lambda_error_handler {
-  type        = string
-  description = "ARN for the Lambda error handler"
 }
 
 variable role_arn {
