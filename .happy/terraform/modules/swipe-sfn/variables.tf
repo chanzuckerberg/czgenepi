@@ -8,12 +8,23 @@ variable stack_resource_prefix {
   description = "Prefix for account-level resources"
 }
 
+variable remote_dev_prefix {
+  type        = string
+  description = "Remote Dev namespace (db schema prefix)"
+  default     = ""
+}
+
 variable job_definition_name {
   type        = string
   description = "Name of the batch job definition"
 }
 
 variable ec2_queue_arn {
+  type        = string
+  description = "ARN of the batch job queue"
+}
+
+variable spot_queue_arn {
   type        = string
   description = "ARN of the batch job queue"
 }

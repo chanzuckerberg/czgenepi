@@ -3,6 +3,11 @@ variable stack_resource_prefix {
   description = "Prefix for account-level resources"
 }
 
+variable swipe_image {
+  type        = string
+  description = "ECR path to the swipe image"
+}
+
 variable app_name {
   type        = string
   description = "Batch workflow name (job definition suffix)"
