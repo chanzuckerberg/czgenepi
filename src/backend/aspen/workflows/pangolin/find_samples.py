@@ -1,5 +1,6 @@
 import urllib.request
 from typing import Iterable
+import subprocess
 
 from sqlalchemy.orm import joinedload
 
@@ -49,6 +50,7 @@ def find_samples():
         return samples_to_be_updated
 
 
-def lambda_handler(event, context):
-    find_samples()
-    # now kick off batch job with these samples?
+if __name__ == "__main__":
+    samples = find_samples()
+    subprocess.run(["sh", "run_pangolin.sh"] + samples)
+
