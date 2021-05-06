@@ -46,5 +46,9 @@ def find_samples():
             )
         ]
 
-        # now kick off batch job with these samples?
         return samples_to_be_updated
+
+
+def lambda_handler(event, context):
+    find_samples()
+    # now kick off batch job with these samples?
