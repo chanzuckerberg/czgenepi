@@ -10,6 +10,9 @@ from aspen.database.models import (
     PublicRepositoryType,
     Sample,
     SequencingReadsCollection,
+    Workflow,
+    WorkflowStatusType,
+    WorkflowType,
 )
 from aspen.test_infra.models.accession_workflow import AccessionWorkflowDirective
 from aspen.test_infra.models.sample import sample_factory
@@ -39,7 +42,146 @@ def test_samples_view(
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
                 "upload_date": api_utils.format_datetime(sequencing_read.upload_date),
-                "gisaid": sequencing_read.accessions()[0].public_identifier,
+                "gisaid": {
+                    "status": "accepted",
+                    "gisaid_id": sequencing_read.accessions()[0].public_identifier,
+                },
+            }
+        ]
+    }
+    assert expected == json.loads(res.get_data(as_text=True))
+
+
+def test_samples_view_gisaid_rejected(
+    session,
+    app,
+    client,
+):
+    group = group_factory()
+    user = user_factory(group)
+    sample = sample_factory(group)
+    consuming_workflow = Workflow()
+    consuming_workflow.workflow_type = WorkflowType.PUBLIC_REPOSITORY_SUBMISSION
+    consuming_workflow.workflow_status = WorkflowStatusType.STARTED
+    consuming_workflow.start_datetime = datetime.date.today() - datetime.timedelta(
+        days=8
+    )
+    consuming_workflow.software_versions = "gisaid"
+    # Test no GISAID accession logic
+    sequencing_read = sequencing_read_factory(
+        sample, accessions={}, consuming_workflows=[consuming_workflow]
+    )
+    session.add(group)
+    session.commit()
+    with client.session_transaction() as sess:
+        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
+    res = client.get("/api/samples")
+    expected = {
+        SAMPLE_KEY: [
+            {
+                "collection_date": api_utils.format_date(sample.collection_date),
+                "collection_location": sample.location,
+                "private_identifier": sample.private_identifier,
+                "public_identifier": sample.public_identifier,
+                "upload_date": api_utils.format_datetime(sequencing_read.upload_date),
+                "gisaid": {"status": "rejected", "gisaid_id": None},
+            }
+        ]
+    }
+    assert expected == json.loads(res.get_data(as_text=True))
+
+
+def test_samples_view_gisaid_no_info(
+    session,
+    app,
+    client,
+):
+    group = group_factory()
+    user = user_factory(group)
+    sample = sample_factory(group)
+    # Test no GISAID accession logic
+    sequencing_read = sequencing_read_factory(sample, accessions={})
+    session.add(group)
+    session.commit()
+    with client.session_transaction() as sess:
+        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
+    res = client.get("/api/samples")
+    expected = {
+        SAMPLE_KEY: [
+            {
+                "collection_date": api_utils.format_date(sample.collection_date),
+                "collection_location": sample.location,
+                "private_identifier": sample.private_identifier,
+                "public_identifier": sample.public_identifier,
+                "upload_date": api_utils.format_datetime(sequencing_read.upload_date),
+                "gisaid": {"status": "no_info", "gisaid_id": None},
+            }
+        ]
+    }
+    assert expected == json.loads(res.get_data(as_text=True))
+
+
+def test_samples_view_gisaid_not_eligible(
+    session,
+    app,
+    client,
+):
+    group = group_factory()
+    user = user_factory(group)
+    # Maek the sample as failed
+    sample = sample_factory(group, czb_failed_genome_recovery=True)
+    sequencing_read = sequencing_read_factory(sample)
+    session.add(group)
+    session.commit()
+    with client.session_transaction() as sess:
+        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
+    res = client.get("/api/samples")
+    expected = {
+        SAMPLE_KEY: [
+            {
+                "collection_date": api_utils.format_date(sample.collection_date),
+                "collection_location": sample.location,
+                "private_identifier": sample.private_identifier,
+                "public_identifier": sample.public_identifier,
+                "upload_date": api_utils.format_datetime(sequencing_read.upload_date),
+                "gisaid": {"status": "not_eligible", "gisaid_id": None},
+            }
+        ]
+    }
+    assert expected == json.loads(res.get_data(as_text=True))
+
+
+def test_samples_view_gisaid_submitted(
+    session,
+    app,
+    client,
+):
+    group = group_factory()
+    user = user_factory(group)
+    sample = sample_factory(group)
+    consuming_workflow = Workflow()
+    consuming_workflow.workflow_type = WorkflowType.PUBLIC_REPOSITORY_SUBMISSION
+    consuming_workflow.workflow_status = WorkflowStatusType.STARTED
+    consuming_workflow.start_datetime = datetime.date.today()
+    consuming_workflow.software_versions = "gisaid"
+    # create a sample with a gisaid workflow but no accession yet
+    sequencing_read = sequencing_read_factory(
+        sample, accessions={}, consuming_workflows=[consuming_workflow]
+    )
+    session.add(group)
+    session.commit()
+    with client.session_transaction() as sess:
+        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
+    res = client.get("/api/samples")
+    expected = {
+        SAMPLE_KEY: [
+            {
+                "collection_date": api_utils.format_date(sample.collection_date),
+                "collection_location": sample.location,
+                "private_identifier": sample.private_identifier,
+                "public_identifier": sample.public_identifier,
+                "upload_date": api_utils.format_datetime(sequencing_read.upload_date),
+                "gisaid": {"status": "submitted", "gisaid_id": None},
             }
         ]
     }
@@ -112,7 +254,12 @@ def test_samples_view_system_admin(
             "upload_date": api_utils.format_datetime(
                 sequencing_read_collection.upload_date
             ),
-            "gisaid": sequencing_read_collection.accessions()[0].public_identifier,
+            "gisaid": {
+                "status": "accepted",
+                "gisaid_id": sequencing_read_collection.accessions()[
+                    0
+                ].public_identifier,
+            },
         }
     ]
 
@@ -163,7 +310,12 @@ def test_samples_view_cansee_metadata(
             "upload_date": api_utils.format_datetime(
                 sequencing_read_collection.upload_date
             ),
-            "gisaid": sequencing_read_collection.accessions()[0].public_identifier,
+            "gisaid": {
+                "status": "accepted",
+                "gisaid_id": sequencing_read_collection.accessions()[
+                    0
+                ].public_identifier,
+            },
         }
     ]
 
@@ -206,7 +358,12 @@ def test_samples_view_cansee_all(
             "upload_date": api_utils.format_datetime(
                 sequencing_read_collection.upload_date
             ),
-            "gisaid": sequencing_read_collection.accessions()[0].public_identifier,
+            "gisaid": {
+                "status": "accepted",
+                "gisaid_id": sequencing_read_collection.accessions()[
+                    0
+                ].public_identifier,
+            },
         }
     ]
 
@@ -252,7 +409,10 @@ def test_samples_failed_accession(
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
                 "upload_date": api_utils.format_datetime(sequencing_read.upload_date),
-                "gisaid": "public_identifier_succeeded",
+                "gisaid": {
+                    "status": "accepted",
+                    "gisaid_id": "public_identifier_succeeded",
+                },
             }
         ]
     }
@@ -300,7 +460,10 @@ def test_samples_multiple_accession(
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
                 "upload_date": api_utils.format_datetime(sequencing_read.upload_date),
-                "gisaid": "public_identifier_later",
+                "gisaid": {
+                    "status": "accepted",
+                    "gisaid_id": "public_identifier_later",
+                },
             }
         ]
     }

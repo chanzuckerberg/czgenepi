@@ -2,7 +2,6 @@ resource "aws_s3_bucket_object" "wdl" {
   bucket = var.swipe_wdl_bucket
   key    = "${var.remote_dev_prefix}/${basename(var.wdl_path)}-v0.0.1.wdl" # Swipe lambdas require specially formatted filenames.
   source = "${path.module}/${basename(var.wdl_path)}" # TODO this is a haaaack!
-
   etag = filemd5("${path.module}/${basename(var.wdl_path)}")
 }
 
