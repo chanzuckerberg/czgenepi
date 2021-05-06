@@ -23,8 +23,8 @@ workflow LoadGISAID {
         input:
         docker_image_id = docker_image_id,
         aws_region = aws_region,
-        gisaid_ndjson_staging_bucket = gisaid_ndjson_staging_bucket,
-        gisaid_ndjson_staging_key = gisaid_ndjson_staging_key
+        gisaid_ndjson_staging_bucket = RefreshGISAID.result_bucket,
+        gisaid_ndjson_staging_key = RefreshGISAID.result_key
     }
 
     call TransformGISAID {
@@ -90,6 +90,8 @@ task RefreshGISAID {
     >>>
 
     output {
+        String result_bucket = "~{gisaid_ndjson_staging_bucket}"
+        String result_key = "~{gisaid_ndjson_staging_key}"
     }
 
     runtime {
