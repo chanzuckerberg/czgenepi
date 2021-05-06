@@ -1,18 +1,15 @@
 #!/bin/bash
 
-set -Eeuxo pipefail
+# TODO: fix pipefail flags to be informative
+#set -Eex pipefail
 
-# install miniconda
-wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
-chmod +x Miniconda3-latest-Linux-x86_64.sh
-./Miniconda3-latest-Linux-x86_64.sh -b -p $HOME/miniconda
+# activate miniconda
 eval "$($HOME/miniconda/bin/conda shell.bash hook)"
 conda init
-#source ~/.bashrc
 
 # install pangolin
-mkdir pangolin
-cd pangolin
+mkdir /pangolin
+cd /pangolin
 git init
 git fetch --depth 1 git://github.com/cov-lineages/pangolin.git
 git checkout FETCH_HEAD
@@ -32,8 +29,9 @@ done
 
 sequences_output="sequences.fasta"
 
+cd /usr/src/app/aspen/workflows/pangolin
 # call export script to export renamed sequences
-/aspen/.venv/bin/python /aspen/src/backend/aspen/workflows/pangolin/export.py \
+/usr/local/bin/python3.9 export.py \
   $args \
   --sequences "$sequences_output"
 
@@ -43,6 +41,6 @@ pangolin $sequences_output --outfile "$lineage_report"
 
 last_updated=$(date +'%m-%d-%Y')
 # save the pangolin results back to the db:
-/aspen/.venv/bin/python /aspen/src/backend/aspen/workflows/pangolin/save.py \
+/usr/local/bin/python3.9 save.py \
   --pangolin-csv "$lineage_report" \
   --pangolin-last-updated "$last_updated"
