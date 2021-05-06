@@ -16,6 +16,7 @@ def sample_factory(
     country="USA",
     region=RegionType.NORTH_AMERICA,
     organism="SARS-CoV-2",
+    czb_failed_genome_recovery=False,
 ) -> Sample:
     original_submission = original_submission or {}
     collection_date = collection_date or datetime.now()
@@ -32,4 +33,5 @@ def sample_factory(
         country=country,
         region=region,
         organism=organism,
+        czb_failed_genome_recovery=czb_failed_genome_recovery,
     )

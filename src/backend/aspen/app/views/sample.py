@@ -1,4 +1,13 @@
-from typing import Any, Mapping, MutableMapping, MutableSequence, Sequence, Set
+import datetime
+from typing import (
+    Any,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Optional,
+    Sequence,
+    Set,
+)
 
 from flask import jsonify, session
 from sqlalchemy import and_, or_
@@ -8,11 +17,19 @@ from aspen.app.app import application, requires_auth
 from aspen.app.views import api_utils
 from aspen.app.views.api_utils import get_usergroup_query
 from aspen.database.connection import session_scope
-from aspen.database.models import Accession, DataType, Entity, Workflow, WorkflowType
+from aspen.database.models import (
+    Accession,
+    DataType,
+    Entity,
+    Workflow,
+    WorkflowStatusType,
+    WorkflowType,
+)
 from aspen.database.models.sample import Sample
 from aspen.database.models.usergroup import Group, User
 
 SAMPLE_KEY = "samples"
+GISIAD_REJECTION_TIME = datetime.timedelta(days=4)
 
 
 def _format_created_date(sample: Sample) -> str:
@@ -26,12 +43,28 @@ def _format_created_date(sample: Sample) -> str:
 
 def _format_gisaid_accession(
     sample: Sample, entity_id_to_accession_map: Mapping[int, Accession]
-) -> str:
+) -> Mapping[str, Optional[str]]:
     uploaded_entity = sample.get_uploaded_entity()
+    consuming_workflows = uploaded_entity.consuming_workflows
     accession = entity_id_to_accession_map.get(uploaded_entity.entity_id, None)
+    if sample.czb_failed_genome_recovery:
+        # todo need to add the private option here for v3 a user uploads and flags a private sample
+        return {"status": "not_eligible", "gisaid_id": None}
     if accession is not None:
-        return accession.public_identifier
-    return "NOT SUBMITTED"
+        return {"status": "accepted", "gisaid_id": accession.public_identifier}
+    for workflow in consuming_workflows:
+        if (
+            workflow.workflow_type == WorkflowType.PUBLIC_REPOSITORY_SUBMISSION
+            and workflow.workflow_status == WorkflowStatusType.STARTED
+        ):
+            date_since_submitted = (
+                datetime.date.today() - workflow.start_datetime.date()
+            )
+            if date_since_submitted < GISIAD_REJECTION_TIME:
+                return {"status": "submitted", "gisaid_id": None}
+            else:
+                return {"status": "rejected", "gisaid_id": None}
+    return {"status": "no_info", "gisaid_id": None}
 
 
 @application.route("/api/samples", methods=["GET"])

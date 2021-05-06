@@ -29,6 +29,7 @@ def sequencing_read_factory(
             "gisaid_public_identifier",
         ),
     ),
+    consuming_workflows=[],
 ) -> SequencingReadsCollection:
     sequencing_date = sequencing_date or datetime.datetime.now()
     sequencing_reads = SequencingReadsCollection(
@@ -38,6 +39,7 @@ def sequencing_read_factory(
         sequencing_date=sequencing_date,
         s3_bucket=s3_bucket,
         s3_key=s3_key,
+        consuming_workflows=consuming_workflows,
     )
     for accession_workflow_directive in accessions:
         if accession_workflow_directive.end_datetime is None:
