@@ -29,7 +29,7 @@ done
 
 sequences_output="sequences.fasta"
 
-cd /usr/src/app/aspen/backend/workflows
+cd /usr/src/app/aspen/workflows/pangolin
 # call export script to export renamed sequences
 /usr/local/bin/python3.9 export.py \
   $args \

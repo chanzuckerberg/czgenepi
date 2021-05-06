@@ -167,7 +167,25 @@ module gisaid_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  data_bucket           = local.aspen_data_bucket
+  extra_args            =  {
+    db_data_bucket = local.aspen_data_bucket
+    gisaid_ndjson_staging_bucket = local.aspen_data_bucket
+    gisaid_ndjson_staging_key = "raw_gisaid_dump/cached_gisaid.zst"
+  }
+}
+
+module pangolin_sfn_config {
+  source   = "../sfn_config"
+  app_name = "pangolin-sfn"
+  image    = "${local.pangolin_image_repo}:${local.image_tag}"
+  memory   = 420000
+  wdl_path = "workflows/pangolin.wdl"
+  custom_stack_name     = local.custom_stack_name
+  deployment_stage      = local.deployment_stage
+  remote_dev_prefix     = local.remote_dev_prefix
+  stack_resource_prefix = local.stack_resource_prefix
+  swipe_comms_bucket    = local.swipe_comms_bucket
+  swipe_wdl_bucket      = local.swipe_wdl_bucket
 }
 
 module migrate_db {

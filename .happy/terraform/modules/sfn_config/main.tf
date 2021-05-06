@@ -1,9 +1,9 @@
 resource "aws_s3_bucket_object" "wdl" {
   bucket = var.swipe_wdl_bucket
   key    = "${var.remote_dev_prefix}/${basename(var.wdl_path)}-v0.0.1.wdl" # Swipe lambdas require specially formatted filenames.
-  source = "${path.module}/gisaid.wdl" # TODO this is a haaaack!
+  source = "${path.module}/${basename(var.wdl_path)}" # TODO this is a haaaack!
 
-  etag = filemd5("${path.module}/gisaid.wdl")
+  etag = filemd5("${path.module}/${basename(var.wdl_path)}")
 }
 
 resource "aws_ssm_parameter" "run_config" {
@@ -11,13 +11,11 @@ resource "aws_ssm_parameter" "run_config" {
   type  = "String"
   value = jsonencode({
     Input = {
-      Run = {
+      Run = merge(var.extra_args, {
          docker_image_id = var.image
          aws_region = "us-west-2" # FIXME hardcoded.
-         db_data_bucket = var.data_bucket
-         gisaid_ndjson_staging_bucket = var.data_bucket
-         gisaid_ndjson_staging_key = "raw_gisaid_dump/cached_gisaid.zst"
       }
+      )
     }
     OutputPrefix = "s3://${var.swipe_comms_bucket}/swipe${var.remote_dev_prefix}/${var.app_name}/results",
     RunSPOTMemory = var.memory
