@@ -45,5 +45,5 @@ export const TREE_HEADERS: Header[] = [
   {
     key: "accessionsLink",
     text: "External Accessions TSV",
-  }
+  },
 ];

@@ -35,6 +35,6 @@ export const TREE_TRANSFORMS: Transform[] = [
         return undefined;
       }
       return `${process.env.API_URL}/api/phylo_tree/sample_ids/${id}`;
-    }
-  }
+    },
+  },
 ];
