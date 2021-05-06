@@ -118,7 +118,7 @@ local-rebuild: .env.ecr local-ecr-login ## Rebuild local dev without re-importin
 
 .PHONY: local-rebuild-workflows
 local-rebuild-workflows: .env.ecr local-ecr-login ## Rebuild batch containers
-	docker-compose $(COMPOSE_OPTS) build gisaid pangolin
+	docker-compose $(COMPOSE_OPTS) build gisaid pangolin nextstrain
 	docker-compose $(COMPOSE_OPTS) up -d
 
 .PHONY: local-sync
