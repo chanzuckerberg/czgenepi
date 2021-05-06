@@ -27,9 +27,23 @@ locals {
   security_groups       = local.secret["security_groups"]
   zone                  = local.secret["zone_id"]
   cluster               = local.secret["cluster_arn"]
+
+  swipe_comms_bucket    = local.secret["s3_buckets"]["aspen_swipe_comms"]["name"]
+  swipe_wdl_bucket      = local.secret["s3_buckets"]["aspen_swipe_wdl"]["name"]
+  aspen_data_bucket     = local.secret["s3_buckets"]["aspen_data"]["name"]
+
+  # Web images
   frontend_image_repo   = local.secret["ecrs"]["frontend"]["url"]
   backend_image_repo    = local.secret["ecrs"]["backend"]["url"]
+
+  # Workflow images
+  pangolin_image_repo   = local.secret["ecrs"]["pangolin"]["url"]
   nextstrain_image_repo = local.secret["ecrs"]["nextstrain"]["url"]
+  gisaid_image_repo     = local.secret["ecrs"]["gisaid"]["url"]
+
+  # This is the wdl executor image, doesn't change on update.
+  swipe_image_repo     = local.secret["ecrs"]["swipe"]["url"]
+
   batch_role_arn        = local.secret["batch_queues"]["aspen"]["role_arn"]
   ec2_queue_arn         = local.secret["batch_envs"]["aspen"]["envs"]["EC2"]["queue_arn"]
   spot_queue_arn        = local.secret["batch_envs"]["aspen"]["envs"]["SPOT"]["queue_arn"]
@@ -90,7 +104,7 @@ module frontend_service {
   service_port          = 3000
   cmd                   = local.frontend_cmd
   deployment_stage      = local.deployment_stage
-  step_function_arn     = module.nextstrain_sfn.step_function_arn
+  step_function_arn     = module.swipe_sfn.step_function_arn
   host_match            = try(join(".", [module.frontend_dns[0].dns_prefix, local.external_dns]), "")
   priority              = local.priority
   api_url               = local.backend_url
@@ -116,7 +130,7 @@ module backend_service {
   service_port          = 3000
   cmd                   = local.backend_cmd
   deployment_stage      = local.deployment_stage
-  step_function_arn     = module.nextstrain_sfn.step_function_arn
+  step_function_arn     = module.swipe_sfn.step_function_arn
   host_match            = try(join(".", [module.backend_dns[0].dns_prefix, local.external_dns]), "")
   priority              = local.priority
   api_url               = local.backend_url
@@ -127,15 +141,33 @@ module backend_service {
   wait_for_steady_state = local.wait_for_steady_state
 }
 
-module nextstrain_sfn {
-  source                 = "../sfn"
-  app_name               = "nextstrain"
+module swipe_sfn {
+  source                 = "../swipe-sfn"
+  app_name               = "swipe-sfn"
   stack_resource_prefix  = local.stack_resource_prefix
-  job_definition_name    = module.nextstrain_batch.batch_job_definition
+  remote_dev_prefix      = local.remote_dev_prefix
+  job_definition_name    = module.swipe_batch.batch_job_definition
   ec2_queue_arn          = local.ec2_queue_arn
+  spot_queue_arn         = local.spot_queue_arn
   role_arn               = local.sfn_role_arn
   custom_stack_name      = local.custom_stack_name
   deployment_stage       = local.deployment_stage
+}
+
+# Write information on how to invoke the gisaid sfn to SSM.
+module gisaid_sfn_config {
+  source   = "../sfn_config"
+  app_name = "gisaid-sfn"
+  image    = "${local.gisaid_image_repo}:${local.image_tag}"
+  memory   = 420000
+  wdl_path = "workflows/gisaid.wdl"
+  custom_stack_name     = local.custom_stack_name
+  deployment_stage      = local.deployment_stage
+  remote_dev_prefix     = local.remote_dev_prefix
+  stack_resource_prefix = local.stack_resource_prefix
+  swipe_comms_bucket    = local.swipe_comms_bucket
+  swipe_wdl_bucket      = local.swipe_wdl_bucket
+  data_bucket           = local.aspen_data_bucket
 }
 
 module migrate_db {
@@ -162,12 +194,12 @@ module delete_db {
   deployment_stage      = local.deployment_stage
 }
 
-module nextstrain_batch {
+module swipe_batch {
   source                = "../batch"
-  app_name              = "nextstrain"
+  app_name              = "swipe"
   stack_resource_prefix = local.stack_resource_prefix
-  image                 = "${local.nextstrain_image_repo}:${local.image_tag}"
   batch_role_arn        = local.batch_role_arn
+  swipe_image            = "${local.swipe_image_repo}:rev-3" # FIXME rev shouldn't be hardcoded
   custom_stack_name     = local.custom_stack_name
   remote_dev_prefix     = local.remote_dev_prefix
   deployment_stage      = local.deployment_stage
