@@ -38,7 +38,7 @@ locals {
 
   # Workflow images
   pangolin_image_repo   = local.secret["ecrs"]["pangolin"]["url"]
-  phylotree_image_repo  = local.secret["ecrs"]["phylotree"]["url"]
+  nextstrain_image_repo = local.secret["ecrs"]["nextstrain"]["url"]
   gisaid_image_repo     = local.secret["ecrs"]["gisaid"]["url"]
 
   # This is the wdl executor image, doesn't change on update.
@@ -198,7 +198,6 @@ module swipe_batch {
   source                = "../batch"
   app_name              = "swipe"
   stack_resource_prefix = local.stack_resource_prefix
-  image                 = "${local.swipe_image_repo}:latest" # TODO hardcoded
   batch_role_arn        = local.batch_role_arn
   swipe_image            = "${local.swipe_image_repo}:rev-3" # FIXME rev shouldn't be hardcoded
   custom_stack_name     = local.custom_stack_name

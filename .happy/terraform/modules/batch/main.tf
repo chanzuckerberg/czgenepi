@@ -10,10 +10,11 @@ locals {
     aws_region         = data.aws_region.current.name,
     batch_job_role_arn = var.batch_role_arn
     deployment_stage   = var.deployment_stage
-    deployment_environment = "aspen-rdev"
     remote_dev_prefix  = var.remote_dev_prefix
     frontend_url       = var.frontend_url
     log_group          = aws_cloudwatch_log_group.cloud_watch_logs_group.name
+
+    deployment_environment = "${var.stack_resource_prefix}-${var.deployment_stage}"
   }))
 }
 

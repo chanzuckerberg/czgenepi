@@ -13,11 +13,6 @@ variable app_name {
   description = "Batch workflow name (job definition suffix)"
 }
 
-variable image {
-  type        = string
-  description = "Image name"
-}
-
 variable batch_role_arn {
   type        = string
   description = "ARN for the role assumed by tasks"

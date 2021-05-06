@@ -146,6 +146,16 @@ services:
         - BUILDKIT_INLINE_CACHE=1
     command: ["true"]
     restart: "no"
+  nextstrain:
+    image: "${DOCKER_REPO}aspen-nextstrain"
+    build:
+      context: docker/aspen-batch
+      cache_from:
+        - "${DOCKER_REPO}aspen-nextstrain:branch-trunk"
+      args:
+        - BUILDKIT_INLINE_CACHE=1
+    command: ["true"]
+    restart: "no"
 volumes:
   database:
   localstack:
