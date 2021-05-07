@@ -139,7 +139,8 @@ services:
   pangolin:
     image: "${DOCKER_REPO}aspen-pangolin"
     build:
-      context: workflows/pangolin
+      context: src/backend
+      dockerfile: Dockerfile.pangolin
       cache_from:
         - "${DOCKER_REPO}aspen-pangolin:branch-trunk"
       args:
