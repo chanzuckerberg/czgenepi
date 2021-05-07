@@ -1,6 +1,6 @@
+import subprocess
 import urllib.request
 from typing import Iterable
-import subprocess
 
 from sqlalchemy.orm import joinedload
 
@@ -53,4 +53,3 @@ def find_samples():
 if __name__ == "__main__":
     samples = find_samples()
     subprocess.run(["sh", "run_pangolin.sh"] + samples)
-
