@@ -1,7 +1,7 @@
 import { Dialog } from "@material-ui/core";
 import { Button, Link, List, ListItem, ListSubheader } from "czifui";
 import React, { useEffect, useState } from "react";
-import { logout, updateUserData } from "src/common/api";
+import { API, updateUserData } from "src/common/api";
 import { ROUTES } from "src/common/routes";
 import DialogActions from "./components/DialogActions";
 import DialogContent from "./components/DialogContent";
@@ -33,16 +33,6 @@ export default function AgreeTerms(): JSX.Element {
 
   function handleAcceptClick() {
     setHasAcceptedTerms(true);
-  }
-
-  async function handleDeclineClick() {
-    setIsLoading(true);
-    try {
-      await logout();
-    } catch {
-      setIsLoading(false);
-    }
-    setIsLoading(false);
   }
 
   return (
@@ -120,15 +110,16 @@ export default function AgreeTerms(): JSX.Element {
           >
             Accept
           </Button>
-          <Button
-            disabled={isLoading}
-            color="primary"
-            variant="outlined"
-            isRounded
-            onClick={handleDeclineClick}
-          >
-            Decline
-          </Button>
+          <a href={process.env.API_URL + API.LOG_OUT}>
+            <Button
+              disabled={isLoading}
+              color="primary"
+              variant="outlined"
+              isRounded
+            >
+              Decline
+            </Button>
+          </a>
         </DialogActions>
       </Dialog>
     </Container>

@@ -1,5 +1,3 @@
-"use strict";
-
 const path = require("path");
 const fs = require("fs");
 const getPublicUrlOrPath = require("react-dev-utils/getPublicUrlOrPath");
@@ -21,7 +19,7 @@ const publicUrlOrPath = getPublicUrlOrPath(
   process.env.PUBLIC_URL
 );
 
-const buildPath = process.env.BUILD_PATH || "../py/aspen/static";
+const buildPath = process.env.BUILD_PATH || "build";
 
 const moduleFileExtensions = [
   "web.mjs",
