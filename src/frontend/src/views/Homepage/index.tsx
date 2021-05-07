@@ -34,7 +34,7 @@ export default function Homepage(): JSX.Element {
               </Main>
               <Details>
                 This is also where you’ll receive all of your sequencing results
-                from the COVIDTracker project at the CZBiohub.
+                from the COVIDTracker project at the CZ Biohub.
               </Details>
             </Left>
 

@@ -13,8 +13,7 @@ from aspen.database.models import Group, User
 from covid_database import init_db as covidhub_init_db
 from covid_database import SqlAlchemyInterface as CSqlAlchemyInterface
 from covid_database import util as covidhub_database_util
-from covid_database.models import covidtracker
-from covid_database.models.ngs_sample_tracking import Project
+from covid_database.models import covidtracker, ngs_sample_tracking
 
 logger = logging.getLogger(__name__)
 
@@ -63,13 +62,14 @@ def import_project_users(
 
     with session_scope(interface) as session:
         project = (
-            covidhub_session.query(Project)
+            covidhub_session.query(ngs_sample_tracking.Project)
             .options(
                 joinedload(
-                    Project.covidtracker_group, covidtracker.GroupToProjects.group
+                    ngs_sample_tracking.Project.covidtracker_group,
+                    covidtracker.GroupToProjects.group,
                 )
             )
-            .filter(Project.rr_project_id == rr_project_id)
+            .filter(ngs_sample_tracking.Project.rr_project_id == rr_project_id)
             .one()
         )
 
@@ -84,8 +84,8 @@ def import_project_users(
         ).filter(
             covidtracker.UsersGroups.group_id.in_(
                 covidhub_session.query(covidtracker.GroupToProjects.group_id)
-                .join(Project)
-                .filter(Project.rr_project_id == rr_project_id)
+                .join(ngs_sample_tracking.Project)
+                .filter(ngs_sample_tracking.Project.rr_project_id == rr_project_id)
             ),
         )
 

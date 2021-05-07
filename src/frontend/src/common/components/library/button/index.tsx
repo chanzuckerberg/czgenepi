@@ -27,7 +27,11 @@ const Button: FunctionComponent<Props> = ({
   if (link === undefined) {
     return buttonElements;
   }
-  return <a href={link}>{buttonElements}</a>;
+  return (
+    <a href={link} target="_blank" rel="noopener">
+      {buttonElements}
+    </a>
+  );
 };
 
 export { Button };

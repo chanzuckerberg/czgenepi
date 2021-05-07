@@ -7,7 +7,6 @@ ENV NODE_ENV=development
 ENV BUILD_PATH=build
 RUN npm i --verbose
 RUN apt-get update && apt-get install make
-RUN npm install -g serve
 USER node
 COPY . .
 ENTRYPOINT ["./entrypoint.sh"]

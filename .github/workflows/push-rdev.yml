@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        component: ['frontend', 'backend', 'nextstrain', 'nextstrain-errorhandler']
+        component: ['frontend', 'backend', 'nextstrain']
     steps:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
