@@ -45,13 +45,13 @@ def test_samples_view(
                 "czb_failed_genome_recovery": False,
                 "gisaid": {
                     "status": "accepted",
-                    "gisaid_id": uploaded_pathogen_genome.accessions()[
+                    "gisaid_id": pathogen_genome.accessions()[
                         0
                     ].public_identifier,
                 },
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
-                "upload_date": api_utils.format_datetime(sequencing_read.upload_date),
+                "upload_date": api_utils.format_datetime(pathogen_genome.upload_date),
                 "lineage": {
                     "lineage": pathogen_genome.pangolin_lineage,
                     "probability": pathogen_genome.pangolin_probability,
