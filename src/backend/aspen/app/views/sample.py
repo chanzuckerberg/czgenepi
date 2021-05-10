@@ -195,6 +195,14 @@ def samples():
                     sample, entity_id_to_gisaid_accession_workflow_map
                 ),
                 "czb_failed_genome_recovery": sample.czb_failed_genome_recovery,
+                "lineage": {
+                    "lineage": sample.uploaded_pathogen_genome.pangolin_lineage,
+                    "probability": sample.uploaded_pathogen_genome.pangolin_probability,
+                    "version": sample.uploaded_pathogen_genome.pangolin_version,
+                    "last_updated": api_utils.format_date(
+                        sample.uploaded_pathogen_genome.pangolin_last_updated
+                    ),
+                },
             }
 
             if (
