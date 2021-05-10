@@ -1,14 +1,16 @@
-import React, { FunctionComponent } from "react";
+import React, { Fragment, FunctionComponent } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import { EmptyState } from "../data_subview/components/EmptyState";
 import style from "./index.module.scss";
+import { RowContent, TableRow } from "./style";
 
 interface Props {
   data?: TableItem[];
   headers: Header[];
-  renderer?: CustomRenderer;
   isLoading: boolean;
+  renderer?: CustomRenderer;
+  headerRenderer?: HeaderRenderer;
 }
 
 // (thuang): If item height changes, we need to update this value!
@@ -18,30 +20,41 @@ const LOADING_STATE_ROW_COUNT = 10;
 
 const UNDEFINED_TEXT = "---";
 
-function defaultCellRenderer({ value }: CustomTableRenderProps): JSX.Element {
-  let displayData;
-  if (value === undefined) {
-    displayData = UNDEFINED_TEXT;
-  } else {
-    displayData = value;
-  }
-  return <div className={style.cell}>{displayData}</div>;
+export function defaultCellRenderer({
+  value,
+}: CustomTableRenderProps): JSX.Element {
+  const displayData = value || UNDEFINED_TEXT;
+
+  return (
+    <RowContent>
+      <div className={style.cell}>{displayData}</div>
+    </RowContent>
+  );
 }
 
-const DataTable: FunctionComponent<Props> = ({
+export function defaultHeaderRenderer({
+  header,
+}: HeaderRendererProps): JSX.Element {
+  return (
+    <div key={header.key} className={style.headerCell}>
+      <div className={style.headerCellContent}>{header.text}</div>
+    </div>
+  );
+}
+
+export const DataTable: FunctionComponent<Props> = ({
   data = [],
   headers,
+  headerRenderer = defaultHeaderRenderer,
   renderer = defaultCellRenderer,
   isLoading,
 }: Props) => {
   const indexingKey = headers[0].key;
 
   // render functions
-  const headerRow = headers.map((column: Header) => (
-    <div key={column.key} className={style.headerCell}>
-      <div className={style.headerCellContent}>{column.text}</div>
-    </div>
-  ));
+  const headerRow = headers.map((header: Header, index) =>
+    headerRenderer({ header, index })
+  );
 
   const sampleRow = (item: TableItem): React.ReactNode => {
     if (isLoading) {
@@ -52,12 +65,9 @@ const DataTable: FunctionComponent<Props> = ({
       const value = item[header.key];
 
       return (
-        <div
-          key={`${item[indexingKey]}-${header.key}`}
-          className={style.rowContent}
-        >
+        <Fragment key={`${item[indexingKey]}-${header.key}`}>
           {renderer({ header, index, item, value })}
-        </div>
+        </Fragment>
       );
     });
   };
@@ -65,11 +75,7 @@ const DataTable: FunctionComponent<Props> = ({
   function renderRow(props: ListChildComponentProps) {
     const item = data[props.index];
 
-    return (
-      <div className={style.tableRow} style={props.style}>
-        {sampleRow(item)}
-      </div>
-    );
+    return <TableRow style={props.style}>{sampleRow(item)}</TableRow>;
   }
 
   return (
@@ -95,5 +101,3 @@ const DataTable: FunctionComponent<Props> = ({
     </div>
   );
 };
-
-export { DataTable };
