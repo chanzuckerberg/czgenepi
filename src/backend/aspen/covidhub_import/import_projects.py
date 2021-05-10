@@ -215,7 +215,7 @@ def import_project(
                 warnings.warn(
                     f"External accession {external_accession} represented by multiple"
                     f" czbids: {czbids}.  Choosing {picked_czbid_str} as the czbid for"
-                    "this sample."
+                    " this sample."
                 )
                 czbids_to_process.append(czbid_lookup_by_str[picked_czbid_str])
             else:
