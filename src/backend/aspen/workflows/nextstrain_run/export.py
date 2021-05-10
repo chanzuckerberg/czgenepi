@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any, Mapping, MutableMapping, Set, Tuple
 
 import click
+from sqlalchemy import and_
 from sqlalchemy.orm import aliased, joinedload, with_polymorphic
 
 from aspen.config.config import RemoteDatabaseConfig
@@ -15,11 +16,11 @@ from aspen.database.connection import (
     SqlAlchemyInterface,
 )
 from aspen.database.models import (
-    Accession,
     AlignedGisaidDump,
     Bam,
     CalledPathogenGenome,
     Entity,
+    EntityType,
     HostFilteredSequencingReadsCollection,
     PathogenGenome,
     PhyloRun,
@@ -160,14 +161,25 @@ def cli(
         ] = {
             (
                 accession.get_parents(PathogenGenome)[0].entity_id,
-                accession.repository_type,
+                PublicRepositoryType.from_entity_type(accession.entity_type),
             ): accession.public_identifier
-            for accession in session.query(Accession)
-            .join(Accession.producing_workflow)
+            for accession in session.query(Entity)
+            .join(Entity.producing_workflow)
             .join(accession_input_alias, Workflow.inputs)
             .filter(
-                accession_input_alias.id.in_(
-                    {pathogen_genome.entity_id for pathogen_genome in pathogen_genomes}
+                and_(
+                    Entity.entity_type.in_(
+                        (
+                            EntityType.GISAID_REPOSITORY_SUBMISSION,
+                            EntityType.GENBANK_REPOSITORY_SUBMISSION,
+                        )
+                    ),
+                    accession_input_alias.id.in_(
+                        {
+                            pathogen_genome.entity_id
+                            for pathogen_genome in pathogen_genomes
+                        }
+                    ),
                 )
             )
         }

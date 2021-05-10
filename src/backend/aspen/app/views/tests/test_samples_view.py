@@ -62,7 +62,7 @@ def test_samples_view_gisaid_rejected(
     user = user_factory(group)
     sample = sample_factory(group)
     consuming_workflow = Workflow()
-    consuming_workflow.workflow_type = WorkflowType.PUBLIC_REPOSITORY_SUBMISSION
+    consuming_workflow.workflow_type = WorkflowType.GISAID_REPOSITORY_SUBMISSION
     consuming_workflow.workflow_status = WorkflowStatusType.STARTED
     consuming_workflow.start_datetime = datetime.date.today() - datetime.timedelta(
         days=8
@@ -163,7 +163,7 @@ def test_samples_view_gisaid_submitted(
     user = user_factory(group)
     sample = sample_factory(group)
     consuming_workflow = Workflow()
-    consuming_workflow.workflow_type = WorkflowType.PUBLIC_REPOSITORY_SUBMISSION
+    consuming_workflow.workflow_type = WorkflowType.GISAID_REPOSITORY_SUBMISSION
     consuming_workflow.workflow_status = WorkflowStatusType.STARTED
     consuming_workflow.start_datetime = datetime.date.today()
     consuming_workflow.software_versions = "gisaid"
@@ -390,15 +390,15 @@ def test_samples_failed_accession(
         accessions=(
             # failed accession.
             AccessionWorkflowDirective(
+                PublicRepositoryType.GISAID,
                 datetime.datetime.now() - datetime.timedelta(days=1, hours=2),
-                None,
                 None,
                 None,
             ),
             AccessionWorkflowDirective(
+                PublicRepositoryType.GISAID,
                 datetime.datetime.now() - datetime.timedelta(days=1, hours=1),
                 datetime.datetime.now() - datetime.timedelta(days=1),
-                PublicRepositoryType.GISAID,
                 "public_identifier_succeeded",
             ),
         ),
@@ -442,15 +442,15 @@ def test_samples_multiple_accession(
         accessions=(
             # failed accession.
             AccessionWorkflowDirective(
+                PublicRepositoryType.GISAID,
                 datetime.datetime.now() - datetime.timedelta(days=1, hours=2),
                 datetime.datetime.now() - datetime.timedelta(days=1, hours=1),
-                PublicRepositoryType.GISAID,
                 "public_identifier_earlier",
             ),
             AccessionWorkflowDirective(
+                PublicRepositoryType.GISAID,
                 datetime.datetime.now() - datetime.timedelta(days=1, hours=1),
                 datetime.datetime.now() - datetime.timedelta(days=1),
-                PublicRepositoryType.GISAID,
                 "public_identifier_later",
             ),
         ),
