@@ -84,7 +84,7 @@ def _format_gisaid_accession(
     return {"status": "no_info", "gisaid_id": None}
 
 
-def _format_lineage(sample: Sample):
+def _format_lineage(sample: Sample) -> dict[str, Any]:
     pathogen_genome = sample.uploaded_pathogen_genome
     if pathogen_genome:
         lineage = {
