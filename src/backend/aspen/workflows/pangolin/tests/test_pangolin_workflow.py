@@ -37,7 +37,7 @@ def create_test_data(session):
 
 def mock_remote_db_uri(mocker, test_postgres_db_uri):
     mocker.patch(
-        "aspen.config.config.RemoteDatabaseConfig.DATABASE_URI",
+        "aspen.config.config.Config.DATABASE_URI",
         new_callable=mocker.PropertyMock,
         return_value=test_postgres_db_uri,
     )
