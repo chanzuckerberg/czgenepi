@@ -2,8 +2,8 @@ import datetime
 from typing import Tuple
 
 from aspen.database.models import (
-    AccessionWorkflow,
     PublicRepositoryType,
+    PublicRepositoryTypeMetadata,
     Sample,
     SequencingInstrumentType,
     SequencingProtocolType,
@@ -23,9 +23,9 @@ def sequencing_read_factory(
     s3_key="key",
     accessions: Tuple[AccessionWorkflowDirective, ...] = (
         AccessionWorkflowDirective(
-            datetime.datetime.now(),
-            datetime.datetime.now(),
             PublicRepositoryType.GISAID,
+            datetime.datetime.now(),
+            datetime.datetime.now(),
             "gisaid_public_identifier",
         ),
     ),
@@ -43,8 +43,11 @@ def sequencing_read_factory(
     )
     for accession_workflow_directive in accessions:
         if accession_workflow_directive.end_datetime is None:
+            public_repository_metadata: PublicRepositoryTypeMetadata = (
+                accession_workflow_directive.repository_type.value
+            )
             sequencing_reads.consuming_workflows.append(
-                AccessionWorkflow(
+                public_repository_metadata.accession_workflow_cls(
                     software_versions={},
                     workflow_status=WorkflowStatusType.FAILED,
                     start_datetime=accession_workflow_directive.start_datetime,

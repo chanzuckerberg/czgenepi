@@ -18,9 +18,9 @@ from aspen.app.views import api_utils
 from aspen.app.views.api_utils import get_usergroup_query
 from aspen.database.connection import session_scope
 from aspen.database.models import (
-    Accession,
     DataType,
     Entity,
+    GisaidAccession,
     Workflow,
     WorkflowStatusType,
     WorkflowType,
@@ -44,7 +44,7 @@ def _format_created_date(sample: Sample) -> str:
 
 
 def _format_gisaid_accession(
-    sample: Sample, entity_id_to_accession_map: Mapping[int, Accession]
+    sample: Sample, entity_id_to_accession_map: Mapping[int, GisaidAccession]
 ) -> Mapping[str, Optional[str]]:
     if sample.czb_failed_genome_recovery:
         # todo need to add the private option here for v3 a user uploads and flags a private sample
@@ -57,7 +57,7 @@ def _format_gisaid_accession(
         return {"status": "accepted", "gisaid_id": accession.public_identifier}
     for workflow in consuming_workflows:
         if (
-            workflow.workflow_type == WorkflowType.PUBLIC_REPOSITORY_SUBMISSION
+            workflow.workflow_type == WorkflowType.GISAID_REPOSITORY_SUBMISSION
             and workflow.workflow_status == WorkflowStatusType.STARTED
         ):
             date_since_submitted = (
@@ -124,24 +124,26 @@ def samples():
 
         # load the accessions.
         entity_alias = aliased(Entity)
-        accessions: Sequence[Accession] = (
-            db_session.query(Accession)
-            .distinct(Accession.entity_id)
-            .join(Accession.producing_workflow)
+        accessions: Sequence[GisaidAccession] = (
+            db_session.query(GisaidAccession)
+            .distinct(GisaidAccession.entity_id)
+            .join(GisaidAccession.producing_workflow)
             .join(entity_alias, Workflow.inputs)
-            .order_by(Accession.entity_id, Workflow.end_datetime.desc())
+            .order_by(GisaidAccession.entity_id, Workflow.end_datetime.desc())
             .filter(
                 and_(
-                    Workflow.workflow_type == WorkflowType.PUBLIC_REPOSITORY_SUBMISSION,
+                    Workflow.workflow_type == WorkflowType.GISAID_REPOSITORY_SUBMISSION,
                     entity_alias.id.in_(sample_entity_ids),
                 )
             )
             .options(
-                joinedload(Accession.producing_workflow).joinedload(Workflow.inputs)
+                joinedload(GisaidAccession.producing_workflow).joinedload(
+                    Workflow.inputs
+                )
             )
             .all()
         )
-        entity_id_to_accession_map: MutableMapping[int, Accession] = dict()
+        entity_id_to_accession_map: MutableMapping[int, GisaidAccession] = dict()
         for accession in accessions:
             for workflow_input in accession.producing_workflow.inputs:
                 entity_id_to_accession_map[workflow_input.entity_id] = accession

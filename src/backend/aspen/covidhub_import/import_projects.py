@@ -299,11 +299,6 @@ def import_project(
                         public_identifier = (
                             czbid.genome_submission_info.gisaid_accession
                         )
-                    elif czbid.genome_submission_info.genbank_accession is not None:
-                        repository_type = PublicRepositoryType.GENBANK
-                        public_identifier = (
-                            czbid.genome_submission_info.genbank_accession
-                        )
 
                     if repository_type is not None:
                         for accession in sample.uploaded_pathogen_genome.accessions():
