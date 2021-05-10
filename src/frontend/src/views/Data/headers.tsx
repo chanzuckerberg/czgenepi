@@ -40,10 +40,6 @@ export const TREE_HEADERS: Header[] = [
   },
   {
     key: "downloadLink",
-    text: "Download JSON",
-  },
-  {
-    key: "accessionsLink",
-    text: "External Accessions TSV",
+    text: "",
   },
 ];

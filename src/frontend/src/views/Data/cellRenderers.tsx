@@ -1,6 +1,7 @@
 /* eslint-disable react/display-name */
 
 import React from "react";
+
 import { Modal } from "src/common/components";
 import dataTableStyle from "src/common/components/library/data_table/index.module.scss";
 import { ReactComponent as ExternalLinkIcon } from "src/common/icons/ExternalLink.svg";
@@ -11,6 +12,8 @@ import {
   createTreeModalInfo,
   stringGuard,
 } from "src/common/utils";
+import TreeTableDownloadMenu from "src/components/TreeTableDownloadMenu";
+
 import { GISAIDCell, Subtext } from "./style";
 import { GISAID_STATUS_TO_TEXT } from "./utils/samples";
 
@@ -45,23 +48,12 @@ const SampleRenderer = createTableCellRenderer(
 );
 
 const TREE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
-  accessionsLink: (value: JSONPrimitive): JSX.Element => {
-    const stringValue = stringGuard(value);
+  downloadLink: (value: JSONPrimitive, item: TableItem): JSX.Element => {
+    const jsonDownloadLink = stringGuard(value);
+    const tsvDownloadLink = stringGuard(item["accessionsLink"])
     return (
       <div className={dataTableStyle.cell}>
-        <a href={stringValue} download>
-          Download TSV
-        </a>
-      </div>
-    );
-  },
-  downloadLink: (value: JSONPrimitive): JSX.Element => {
-    const stringValue = stringGuard(value);
-    return (
-      <div className={dataTableStyle.cell}>
-        <a href={stringValue} download>
-          Download JSON
-        </a>
+        <TreeTableDownloadMenu jsonLink={jsonDownloadLink} accessionsLink={tsvDownloadLink}/>
       </div>
     );
   },
