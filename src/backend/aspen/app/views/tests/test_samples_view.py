@@ -45,9 +45,7 @@ def test_samples_view(
                 "czb_failed_genome_recovery": False,
                 "gisaid": {
                     "status": "accepted",
-                    "gisaid_id": pathogen_genome.accessions()[
-                        0
-                    ].public_identifier,
+                    "gisaid_id": pathogen_genome.accessions()[0].public_identifier,
                 },
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
@@ -104,7 +102,7 @@ def test_samples_view_gisaid_rejected(
                 "gisaid": {"status": "rejected", "gisaid_id": None},
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
-                "upload_date": api_utils.format_datetime(sequencing_read.upload_date),
+                "upload_date": api_utils.format_datetime(pathogen_genome.upload_date),
                 "lineage": {
                     "lineage": pathogen_genome.pangolin_lineage,
                     "probability": pathogen_genome.pangolin_probability,
@@ -175,13 +173,6 @@ def test_samples_view_gisaid_not_eligible(
     user = user_factory(group)
     # Mark the sample as failed
     sample = sample_factory(group, czb_failed_genome_recovery=True)
-    pathogen_genome = uploaded_pathogen_genome_factory(
-        sample,
-        pangolin_lineage="B.1.590",
-        pangolin_probability=1.0,
-        pangolin_version="2021-04-23",
-        pangolin_last_updated=datetime.datetime.strptime("05-03-2021", "%m-%d-%Y"),
-    )
     session.add(group)
     session.commit()
     with client.session_transaction() as sess:
@@ -198,12 +189,10 @@ def test_samples_view_gisaid_not_eligible(
                 "public_identifier": sample.public_identifier,
                 "upload_date": api_utils.format_datetime(None),
                 "lineage": {
-                    "lineage": pathogen_genome.pangolin_lineage,
-                    "probability": pathogen_genome.pangolin_probability,
-                    "version": pathogen_genome.pangolin_version,
-                    "last_updated": api_utils.format_date(
-                        pathogen_genome.pangolin_last_updated
-                    ),
+                    "lineage": None,
+                    "probability": None,
+                    "version": None,
+                    "last_updated": None,
                 },
             }
         ]
@@ -249,9 +238,7 @@ def test_samples_view_gisaid_submitted(
                 "gisaid": {"status": "submitted", "gisaid_id": None},
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
-                "upload_date": api_utils.format_datetime(
-                    pathogen_genome.upload_date
-                ),
+                "upload_date": api_utils.format_datetime(pathogen_genome.upload_date),
                 "lineage": {
                     "lineage": pathogen_genome.pangolin_lineage,
                     "probability": pathogen_genome.pangolin_probability,
@@ -337,15 +324,11 @@ def test_samples_view_system_admin(
             "czb_failed_genome_recovery": False,
             "gisaid": {
                 "status": "accepted",
-                "gisaid_id": uploaded_pathogen_genome_collection.accessions()[
-                    0
-                ].public_identifier,
+                "gisaid_id": pathogen_genome.accessions()[0].public_identifier,
             },
             "private_identifier": sample.private_identifier,
             "public_identifier": sample.public_identifier,
-            "upload_date": api_utils.format_datetime(
-                uploaded_pathogen_genome_collection.upload_date
-            ),
+            "upload_date": api_utils.format_datetime(pathogen_genome.upload_date),
             "lineage": {
                 "lineage": pathogen_genome.pangolin_lineage,
                 "probability": pathogen_genome.pangolin_probability,
@@ -403,14 +386,10 @@ def test_samples_view_cansee_metadata(
             "czb_failed_genome_recovery": False,
             "gisaid": {
                 "status": "accepted",
-                "gisaid_id": uploaded_pathogen_genome_collection.accessions()[
-                    0
-                ].public_identifier,
+                "gisaid_id": pathogen_genome.accessions()[0].public_identifier,
             },
             "public_identifier": sample.public_identifier,
-            "upload_date": api_utils.format_datetime(
-                uploaded_pathogen_genome_collection.upload_date
-            ),
+            "upload_date": api_utils.format_datetime(pathogen_genome.upload_date),
             "lineage": {
                 "lineage": pathogen_genome.pangolin_lineage,
                 "probability": pathogen_genome.pangolin_probability,

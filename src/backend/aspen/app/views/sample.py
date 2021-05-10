@@ -84,6 +84,28 @@ def _format_gisaid_accession(
     return {"status": "no_info", "gisaid_id": None}
 
 
+def _format_lineage(sample: Sample):
+    pathogen_genome = sample.uploaded_pathogen_genome
+    if pathogen_genome:
+        lineage = {
+            "lineage": pathogen_genome.pangolin_lineage,
+            "probability": pathogen_genome.pangolin_probability,
+            "version": pathogen_genome.pangolin_version,
+            "last_updated": api_utils.format_date(
+                pathogen_genome.pangolin_last_updated
+            ),
+        }
+    else:
+        lineage = {
+            "lineage": None,
+            "probability": None,
+            "version": None,
+            "last_updated": None,
+        }
+
+    return lineage
+
+
 @application.route("/api/samples", methods=["GET"])
 @requires_auth
 def samples():
@@ -195,14 +217,7 @@ def samples():
                     sample, entity_id_to_gisaid_accession_workflow_map
                 ),
                 "czb_failed_genome_recovery": sample.czb_failed_genome_recovery,
-                "lineage": {
-                    "lineage": sample.uploaded_pathogen_genome.pangolin_lineage,
-                    "probability": sample.uploaded_pathogen_genome.pangolin_probability,
-                    "version": sample.uploaded_pathogen_genome.pangolin_version,
-                    "last_updated": api_utils.format_date(
-                        sample.uploaded_pathogen_genome.pangolin_last_updated
-                    ),
-                },
+                "lineage": _format_lineage(sample),
             }
 
             if (
