@@ -16,7 +16,11 @@ COUNTY_INFO='{
         "san_luis_obispo": {"external_project_id": "RR073e", "internal_project_ids": ["RR073i"]},
         "ventura": {"external_project_id": "RR078e"},
         "humboldt": {"external_project_id": "RR075e"},
-        "vrdl": {"external_project_id": "RR096e"}
+        "vrdl": {"external_project_id": "RR096e"},
+        "tuolumne": {"internal_project_ids": "RR095i"},
+        "fresno": {"external_project_id": "RR097e"},
+        "sfpdh": {"external_project_id": "RR083e"},
+        "tulare": {"external_project_id": "RR081e"}
 }'
 IFS=$'\n' COUNTIES=($(echo "$COUNTY_INFO" | jq -r 'keys[]'))
 

@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any, Mapping, MutableMapping, Set, Tuple
 
 import click
+from sqlalchemy import and_
 from sqlalchemy.orm import aliased, joinedload, with_polymorphic
 
 from aspen.config.config import RemoteDatabaseConfig
@@ -15,10 +16,11 @@ from aspen.database.connection import (
     SqlAlchemyInterface,
 )
 from aspen.database.models import (
-    Accession,
     AlignedGisaidDump,
+    Bam,
     CalledPathogenGenome,
     Entity,
+    EntityType,
     HostFilteredSequencingReadsCollection,
     PathogenGenome,
     PhyloRun,
@@ -90,8 +92,11 @@ def cli(
                 )
                 # load the workflows that generated the called pathogen genomes
                 .subqueryload(phylo_run_inputs.producing_workflow)
-                # load the host-filtered sequencing reads that generated the called
-                # pathogen genomes.
+                # load the BAMs that generated the called pathogen genomes.
+                .subqueryload(Workflow.inputs)
+                # load the workflows that generated the BAMs.
+                .subqueryload(Entity.producing_workflow)
+                # load the host-filtered sequencing reads that generated the BAMs.
                 .subqueryload(Workflow.inputs)
                 # load the workflows that generated the host-filtered sequencing
                 # reads.
@@ -128,9 +133,9 @@ def cli(
             if isinstance(pathogen_genome, UploadedPathogenGenome)
         }
         sequencing_reads_collections = {
-            pathogen_genome.get_parents(HostFilteredSequencingReadsCollection)[
-                0
-            ].get_parents(SequencingReadsCollection)[0]
+            pathogen_genome.get_parents(Bam)[0]
+            .get_parents(HostFilteredSequencingReadsCollection)[0]
+            .get_parents(SequencingReadsCollection)[0]
             for pathogen_genome in pathogen_genomes
             if isinstance(pathogen_genome, CalledPathogenGenome)
         }
@@ -156,14 +161,25 @@ def cli(
         ] = {
             (
                 accession.get_parents(PathogenGenome)[0].entity_id,
-                accession.repository_type,
+                PublicRepositoryType.from_entity_type(accession.entity_type),
             ): accession.public_identifier
-            for accession in session.query(Accession)
-            .join(Accession.producing_workflow)
+            for accession in session.query(Entity)
+            .join(Entity.producing_workflow)
             .join(accession_input_alias, Workflow.inputs)
             .filter(
-                accession_input_alias.id.in_(
-                    {pathogen_genome.entity_id for pathogen_genome in pathogen_genomes}
+                and_(
+                    Entity.entity_type.in_(
+                        (
+                            EntityType.GISAID_REPOSITORY_SUBMISSION,
+                            EntityType.GENBANK_REPOSITORY_SUBMISSION,
+                        )
+                    ),
+                    accession_input_alias.id.in_(
+                        {
+                            pathogen_genome.entity_id
+                            for pathogen_genome in pathogen_genomes
+                        }
+                    ),
                 )
             )
         }
