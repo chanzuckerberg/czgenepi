@@ -10,13 +10,10 @@ from aspen.database.models import (
     PublicRepositoryType,
     Sample,
     SequencingReadsCollection,
-    Workflow,
-    WorkflowStatusType,
-    WorkflowType,
 )
 from aspen.test_infra.models.accession_workflow import AccessionWorkflowDirective
 from aspen.test_infra.models.sample import sample_factory
-from aspen.test_infra.models.sequences import sequencing_read_factory
+from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
 from aspen.test_infra.models.usergroup import group_factory, user_factory
 
 
@@ -28,7 +25,7 @@ def test_samples_view(
     group = group_factory()
     user = user_factory(group)
     sample = sample_factory(group)
-    sequencing_read = sequencing_read_factory(sample)
+    uploaded_pathogen_genome = uploaded_pathogen_genome_factory(sample)
     session.add(group)
     session.commit()
     with client.session_transaction() as sess:
@@ -42,11 +39,15 @@ def test_samples_view(
                 "czb_failed_genome_recovery": False,
                 "gisaid": {
                     "status": "accepted",
-                    "gisaid_id": sequencing_read.accessions()[0].public_identifier,
+                    "gisaid_id": uploaded_pathogen_genome.accessions()[
+                        0
+                    ].public_identifier,
                 },
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
-                "upload_date": api_utils.format_datetime(sequencing_read.upload_date),
+                "upload_date": api_utils.format_datetime(
+                    uploaded_pathogen_genome.upload_date
+                ),
             }
         ]
     }
@@ -61,16 +62,17 @@ def test_samples_view_gisaid_rejected(
     group = group_factory()
     user = user_factory(group)
     sample = sample_factory(group)
-    consuming_workflow = Workflow()
-    consuming_workflow.workflow_type = WorkflowType.GISAID_REPOSITORY_SUBMISSION
-    consuming_workflow.workflow_status = WorkflowStatusType.STARTED
-    consuming_workflow.start_datetime = datetime.date.today() - datetime.timedelta(
-        days=8
-    )
-    consuming_workflow.software_versions = "gisaid"
     # Test no GISAID accession logic
-    sequencing_read = sequencing_read_factory(
-        sample, accessions={}, consuming_workflows=[consuming_workflow]
+    uploaded_pathogen_genome = uploaded_pathogen_genome_factory(
+        sample,
+        accessions=(
+            AccessionWorkflowDirective(
+                PublicRepositoryType.GISAID,
+                datetime.datetime.now() - datetime.timedelta(days=5),
+                None,
+                None,
+            ),
+        ),
     )
     session.add(group)
     session.commit()
@@ -86,7 +88,9 @@ def test_samples_view_gisaid_rejected(
                 "gisaid": {"status": "rejected", "gisaid_id": None},
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
-                "upload_date": api_utils.format_datetime(sequencing_read.upload_date),
+                "upload_date": api_utils.format_datetime(
+                    uploaded_pathogen_genome.upload_date
+                ),
             }
         ]
     }
@@ -102,7 +106,7 @@ def test_samples_view_gisaid_no_info(
     user = user_factory(group)
     sample = sample_factory(group)
     # Test no GISAID accession logic
-    sequencing_read = sequencing_read_factory(sample, accessions={})
+    uploaded_pathogen_genome = uploaded_pathogen_genome_factory(sample, accessions=())
     session.add(group)
     session.commit()
     with client.session_transaction() as sess:
@@ -117,7 +121,9 @@ def test_samples_view_gisaid_no_info(
                 "gisaid": {"status": "no_info", "gisaid_id": None},
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
-                "upload_date": api_utils.format_datetime(sequencing_read.upload_date),
+                "upload_date": api_utils.format_datetime(
+                    uploaded_pathogen_genome.upload_date
+                ),
             }
         ]
     }
@@ -162,14 +168,17 @@ def test_samples_view_gisaid_submitted(
     group = group_factory()
     user = user_factory(group)
     sample = sample_factory(group)
-    consuming_workflow = Workflow()
-    consuming_workflow.workflow_type = WorkflowType.GISAID_REPOSITORY_SUBMISSION
-    consuming_workflow.workflow_status = WorkflowStatusType.STARTED
-    consuming_workflow.start_datetime = datetime.date.today()
-    consuming_workflow.software_versions = "gisaid"
     # create a sample with a gisaid workflow but no accession yet
-    sequencing_read = sequencing_read_factory(
-        sample, accessions={}, consuming_workflows=[consuming_workflow]
+    uploaded_pathogen_genome = uploaded_pathogen_genome_factory(
+        sample,
+        accessions=(
+            AccessionWorkflowDirective(
+                PublicRepositoryType.GISAID,
+                datetime.datetime.now(),
+                None,
+                None,
+            ),
+        ),
     )
     session.add(group)
     session.commit()
@@ -185,7 +194,9 @@ def test_samples_view_gisaid_submitted(
                 "gisaid": {"status": "submitted", "gisaid_id": None},
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
-                "upload_date": api_utils.format_datetime(sequencing_read.upload_date),
+                "upload_date": api_utils.format_datetime(
+                    uploaded_pathogen_genome.upload_date
+                ),
             }
         ]
     }
@@ -203,7 +214,7 @@ def _test_samples_view_cansee(
     viewer_group = group_factory(name="cdph")
     user = user_factory(viewer_group, **user_factory_kwargs)
     sample = sample_factory(owner_group)
-    sequencing_read_collection = sequencing_read_factory(sample)
+    uploaded_pathogen_genome_collection = uploaded_pathogen_genome_factory(sample)
     for cansee_datatype in cansee_datatypes:
         CanSee(
             viewer_group=viewer_group,
@@ -218,7 +229,7 @@ def _test_samples_view_cansee(
     res = client.get("/api/samples")
     return (
         sample,
-        sequencing_read_collection,
+        uploaded_pathogen_genome_collection,
         json.loads(res.get_data(as_text=True))[SAMPLE_KEY],
     )
 
@@ -241,7 +252,7 @@ def test_samples_view_system_admin(
     app,
     client,
 ):
-    sample, sequencing_read_collection, samples = _test_samples_view_cansee(
+    sample, uploaded_pathogen_genome_collection, samples = _test_samples_view_cansee(
         session,
         client,
         cansee_datatypes=(),
@@ -256,14 +267,14 @@ def test_samples_view_system_admin(
             "czb_failed_genome_recovery": False,
             "gisaid": {
                 "status": "accepted",
-                "gisaid_id": sequencing_read_collection.accessions()[
+                "gisaid_id": uploaded_pathogen_genome_collection.accessions()[
                     0
                 ].public_identifier,
             },
             "private_identifier": sample.private_identifier,
             "public_identifier": sample.public_identifier,
             "upload_date": api_utils.format_datetime(
-                sequencing_read_collection.upload_date
+                uploaded_pathogen_genome_collection.upload_date
             ),
         }
     ]
@@ -300,7 +311,7 @@ def test_samples_view_cansee_metadata(
     app,
     client,
 ):
-    sample, sequencing_read_collection, samples = _test_samples_view_cansee(
+    sample, uploaded_pathogen_genome_collection, samples = _test_samples_view_cansee(
         session,
         client,
         cansee_datatypes=(DataType.METADATA,),
@@ -314,13 +325,13 @@ def test_samples_view_cansee_metadata(
             "czb_failed_genome_recovery": False,
             "gisaid": {
                 "status": "accepted",
-                "gisaid_id": sequencing_read_collection.accessions()[
+                "gisaid_id": uploaded_pathogen_genome_collection.accessions()[
                     0
                 ].public_identifier,
             },
             "public_identifier": sample.public_identifier,
             "upload_date": api_utils.format_datetime(
-                sequencing_read_collection.upload_date
+                uploaded_pathogen_genome_collection.upload_date
             ),
         }
     ]
@@ -348,7 +359,7 @@ def test_samples_view_cansee_all(
     app,
     client,
 ):
-    sample, sequencing_read_collection, samples = _test_samples_view_cansee(
+    sample, uploaded_pathogen_genome_collection, samples = _test_samples_view_cansee(
         session,
         client,
         cansee_datatypes=(DataType.METADATA, DataType.PRIVATE_IDENTIFIERS),
@@ -362,14 +373,14 @@ def test_samples_view_cansee_all(
             "czb_failed_genome_recovery": False,
             "gisaid": {
                 "status": "accepted",
-                "gisaid_id": sequencing_read_collection.accessions()[
+                "gisaid_id": uploaded_pathogen_genome_collection.accessions()[
                     0
                 ].public_identifier,
             },
             "private_identifier": sample.private_identifier,
             "public_identifier": sample.public_identifier,
             "upload_date": api_utils.format_datetime(
-                sequencing_read_collection.upload_date
+                uploaded_pathogen_genome_collection.upload_date
             ),
         }
     ]
@@ -385,7 +396,7 @@ def test_samples_failed_accession(
     group = group_factory()
     user = user_factory(group)
     sample = sample_factory(group)
-    sequencing_read = sequencing_read_factory(
+    uploaded_pathogen_genome = uploaded_pathogen_genome_factory(
         sample,
         accessions=(
             # failed accession.
@@ -403,6 +414,8 @@ def test_samples_failed_accession(
             ),
         ),
     )
+    for accession in uploaded_pathogen_genome.accessions():
+        print(type(accession))
     session.add(group)
     session.commit()
     with client.session_transaction() as sess:
@@ -420,7 +433,9 @@ def test_samples_failed_accession(
                 },
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
-                "upload_date": api_utils.format_datetime(sequencing_read.upload_date),
+                "upload_date": api_utils.format_datetime(
+                    uploaded_pathogen_genome.upload_date
+                ),
             }
         ]
     }
@@ -437,7 +452,7 @@ def test_samples_multiple_accession(
     group = group_factory()
     user = user_factory(group)
     sample = sample_factory(group)
-    sequencing_read = sequencing_read_factory(
+    uploaded_pathogen_genome = uploaded_pathogen_genome_factory(
         sample,
         accessions=(
             # failed accession.
@@ -472,7 +487,9 @@ def test_samples_multiple_accession(
                 },
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
-                "upload_date": api_utils.format_datetime(sequencing_read.upload_date),
+                "upload_date": api_utils.format_datetime(
+                    uploaded_pathogen_genome.upload_date
+                ),
             }
         ]
     }

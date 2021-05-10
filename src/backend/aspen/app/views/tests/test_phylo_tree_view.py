@@ -25,7 +25,7 @@ def test_phylo_tree_view(
         )
         for ix in range(n_samples)
     ]
-    _ = [uploaded_pathogen_genome_factory(sample) for sample in samples]
+    _ = [uploaded_pathogen_genome_factory(sample, accessions=()) for sample in samples]
 
     # make up to 3 trees, each with a random sample of uploaded pathogen genomes.
     trees = [
