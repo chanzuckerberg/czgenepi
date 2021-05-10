@@ -201,5 +201,9 @@ class Config(object):
     ####################################################################################
     # s3 properties
     @property
+    def DB_BUCKET(self) -> str:
+        return self.AWS_SECRET["S3_db_bucket"]
+
+    @property
     def EXTERNAL_AUSPICE_BUCKET(self) -> str:
         return self.AWS_SECRET["S3_external_auspice_bucket"]

@@ -1,6 +1,7 @@
 import datetime
 import json
 import os
+import posixpath
 from typing import Iterable, MutableSequence, Optional, Sequence, Type
 
 import boto3
@@ -181,23 +182,23 @@ def import_covidhub_project(
 @click.option("--covidhub-aws-profile", type=str, required=True)
 @click.option("--aspen-group-id", type=int, required=True)
 @click.option("--s3-src-prefix", type=str, required=True)
-@click.option("--s3-dst-prefix", type=str, required=True)
+@click.option("--s3-key-prefix", type=str, required=True)
 @click.pass_context
 def import_covidhub_trees(
     ctx,
     covidhub_aws_profile,
     aspen_group_id,
     s3_src_prefix,
-    s3_dst_prefix,
+    s3_key_prefix,
 ):
-    engine = ctx.obj["ENGINE"]
+    config, engine = ctx.obj["CONFIG"], ctx.obj["ENGINE"]
 
     covidhub_import.import_trees(
         engine,
         covidhub_aws_profile,
         aspen_group_id,
         s3_src_prefix,
-        s3_dst_prefix,
+        f"s3://f{posixpath.join(config.DB_BUCKET, s3_key_prefix)}",
     )
 
 
