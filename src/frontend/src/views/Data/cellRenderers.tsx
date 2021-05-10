@@ -2,7 +2,6 @@
 
 import { ChipProps, Tooltip } from "czifui";
 import React from "react";
-
 import { Modal } from "src/common/components";
 import { defaultCellRenderer } from "src/common/components/library/data_table";
 import dataTableStyle from "src/common/components/library/data_table/index.module.scss";
@@ -101,10 +100,13 @@ const SampleRenderer = createTableCellRenderer(
 const TREE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
   downloadLink: ({ value, item }): JSX.Element => {
     const jsonDownloadLink = stringGuard(value);
-    const tsvDownloadLink = stringGuard(item["accessionsLink"])
+    const tsvDownloadLink = stringGuard(item["accessionsLink"]);
     return (
       <RowContent>
-        <TreeTableDownloadMenu jsonLink={jsonDownloadLink} accessionsLink={tsvDownloadLink}/>
+        <TreeTableDownloadMenu
+          jsonLink={jsonDownloadLink}
+          accessionsLink={tsvDownloadLink}
+        />
       </RowContent>
     );
   },

@@ -2,7 +2,6 @@ import { Button } from "@material-ui/core";
 import { ExpandMore } from "@material-ui/icons";
 import { Menu, MenuItem } from "czifui";
 import React from "react";
-
 import style from "./index.module.scss";
 
 interface TreeTableDownloadMenuProps {
@@ -10,7 +9,10 @@ interface TreeTableDownloadMenuProps {
   accessionsLink: string;
 }
 
-const TreeTableDownloadMenu = ({ jsonLink, accessionsLink }: TreeTableDownloadMenuProps): JSX.Element => {
+const TreeTableDownloadMenu = ({
+  jsonLink,
+  accessionsLink,
+}: TreeTableDownloadMenuProps): JSX.Element => {
   const [anchorEl, setAnchorEl] = React.useState<Element | null>(null);
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = (event) => {
@@ -23,7 +25,11 @@ const TreeTableDownloadMenu = ({ jsonLink, accessionsLink }: TreeTableDownloadMe
 
   return (
     <React.Fragment>
-      <Button onClick={handleClick} className={style.button} endIcon={<ExpandMore />}>
+      <Button
+        onClick={handleClick}
+        className={style.button}
+        endIcon={<ExpandMore />}
+      >
         Download
       </Button>
       <Menu
