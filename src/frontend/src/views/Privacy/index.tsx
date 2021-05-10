@@ -1,5 +1,6 @@
 import { Link, ListItemLabel } from "czifui";
 import React from "react";
+import { ROUTES } from "src/common/routes";
 import List from "src/common/styles/support/components/List";
 import {
   B,
@@ -25,27 +26,122 @@ const PrivacyPolicy = (): JSX.Element => {
   const renderIntro = () => (
     <>
       <Title>
-        <H1>IDseq Data Privacy</H1>
-        <H4>
-          Last Updated: April 1, 2021.{" "}
-          <Link href="/terms_changes">See Recent Changes</Link>
-        </H4>
+        <H1>Aspen Privacy Policy</H1>
+        <H4>Last Updated: May 17, 2021. </H4>
       </Title>
       <P>
-        The Chan Zuckerberg Biohub Inc. (“CZ Biohub,” “we,” “ us,” or “our”)
-        provides the IDseq platform (“Services” or “IDseq”) in partnership with
-        the Chan Zuckerberg Initiative, LLC (“CZI”). This Data Privacy Notice (“
-        Privacy Notice”) describes the types of information we collect or that
-        is uploaded by website visitors (“Visitors”) and registered users
-        (“Users”), and how we use, share, and protect that information.
+        The Chan Zuckerberg Initiative Foundation, a 501(c)(3) nonprofit private
+        foundation (&quot;CZIF,&quot; &quot;we,&quot; &quot;us,&quot; or
+        &quot;our&quot;), provides the Aspen product (&quot;Services&quot; or
+        &quot;Aspen&quot;) in close collaboration with the Chan Zuckerberg
+        Biohub (&quot;CZB&quot;), and the Chan Zuckerberg Initiative, LLC
+        (&quot;CZI LLC&quot;). This Privacy Policy describes the types of
+        information we collect or that is uploaded by Aspen Users (collectively
+        &quot;Users&quot; or &quot;you&quot;, ex: registered public health
+        officials at state and/or county level Departments of Public Health
+        (&quot;DPH&quot;), other public health researchers), and how we use,
+        share, and protect that information.
+      </P>
+      <H3>About Aspen</H3>
+      <P>
+        Aspen is a tool that uses pathogen genomic sequence data to help you
+        infer how pathogens are moving through a population and how cases and
+        outbreaks are related. In order to become a User of Aspen you must be
+        acting in your organizational capacity, which means a couple things: (1)
+        your use of Aspen may be subject to your organization’s policies and (2)
+        upon sign-up, you’ll be placed into a group with other users from your
+        organization.
       </P>
       <P>
-        For ease of understanding, we’ve created the below Summary Table, which
-        pulls out some key points. More details can be found in our{" "}
-        <Link href="/faq">FAQ</Link>, as well as the full Privacy Policy below
-        and the <Link href="/terms">Terms of Use</Link> (“Terms”) that applies
-        to your use of IDseq.
+        Because of the time-sensitive nature of pathogen genomic data, we
+        strongly encourage the sharing of pathogen sequences, which are not
+        personally identifiable, with the broader scientific and public health
+        communities as soon as possible. To support this scientific
+        collaboration, Aspen submits pathogen genomes and minimal metadata
+        (collection date, sequencing lab, and location at the county level or
+        above) to{" "}
+        <B>
+          public repositories such as GISAID after 2 weeks from initial upload.
+        </B>{" "}
+        You can turn this submission off by marking your pathogen genome as
+        private within the 2-week period.{" "}
       </P>
+      <P>
+        <i>Here’s how Aspen processes and manages Upload Data:</i> Users submit
+        Raw Sequence Data (as described below) as well as information about
+        those sequences, such as the date the sample was collected (“Sample
+        Metadata” as further defined below -- Raw Sequence Data and Sample
+        Metadata together make “Upload Data”). Any human genetic data contained
+        within the Raw Sequence Data is filtered out and deleted following
+        upload, leaving genomic data only about the pathogen. This pathogen
+        genomic data is then analyzed in order to identify the
+        normally-occurring genetic mutations that make up each pathogen sample’s
+        unique genetic “barcode.” This barcode can then be used to identify
+        strains, variants, and relationships between samples.{" "}
+        <B>
+          By default, these analytical outputs will be visible to the User that
+          uploaded the Sample and other members of the User’s organization
+          (“Group”, ex: a Department of Public Health) using Aspen.
+        </B>
+      </P>
+      <P>
+        Users can then choose to share analytical outputs outside their Group.
+        We hope that this sharing of pathogen data will help to create a clearer
+        picture of how pathogens are circulating in your community and thereby
+        help advance public health goals.
+      </P>
+      <P>
+        To help you better understand our Privacy Policy, we’ve created the
+        below Summary, which includes bullets regarding Key Things to Know, as
+        well as a Table summarizing key aspects of our data practices. For more
+        information about the rules governing your use of Aspen, please also see
+        our{" "}
+        <Link href={ROUTES.TERMS} target="_blank" rel="noopener">
+          Terms of Use (“Terms”)
+        </Link>
+        .{" "}
+        <B>
+          Please remember that you are using Aspen in your organizational
+          capacity, which means that your organization’s policies will apply to
+          your use.
+        </B>
+      </P>
+
+      <H3>Key Things to Know</H3>
+      <List
+        items={[
+          "Aspen is a free and open-source tool.",
+          <span key={0}>
+            You always own the data you upload. You decide how you want your
+            data to be shared, and you can delete your data from Aspen at any
+            time. However, due to the time-sensitive nature of pathogen data, if
+            you do not wish for your Pathogen Consensus Genome to be shared with
+            the GISAID public repository,{" "}
+            <B>
+              you must mark this data as ‘Private’ within 2 weeks of
+              upload/creation of the consensus genome.
+            </B>
+          </span>,
+          "You’re using Aspen in your professional capacity, which means any pathogen sample data you upload, and any data that we generate on the basis of this, are visible to other members (Users) in your Group. This data is only available to anyone outside of your organization when it is shared by you, or by your organization (ex: with the CDPH).",
+          "Human genetic data with uploaded data is processed only so we can filter out and permanently delete it. We do not keep this non-pathogen genomic data and it’s not necessary to operate the tool. ",
+          <span key={1}>
+            Similarly, Aspen{" "}
+            <B>
+              does not contain any personally identifying metadata or
+              health-related information
+            </B>{" "}
+            and Users are not permitted to upload such data. The only metadata
+            we require is your originating lab information and Sample
+            identifier, Sample collection date, and Sample location (at the
+            county level or above). You control the metadata resolution that you
+            upload (e.g., you can choose to list only the state, or to redact
+            collection dates before uploading). We collect this metadata only
+            for the purposes of providing analyses for you, enabling you to link
+            back to your epidemiological data (outside of Aspen), and optionally
+            submitting to public repositories.
+          </span>,
+        ]}
+      ></List>
     </>
   );
 
@@ -62,32 +158,58 @@ const PrivacyPolicy = (): JSX.Element => {
           </TopRow>
           <SectionRow>
             <td colSpan={5}>
-              <B>Data you upload to or create using IDseq</B>
+              <B>Data you upload to or create using Aspen</B>
             </td>
           </SectionRow>
           <ContentRow>
             <td>
-              <B>Raw Sample Data</B>
-            </td>
-            <td>Genetic sequence files (ex: FASTA/FASTQ) uploaded by Users.</td>
-            <td>
-              Upon upload, Raw Sample Data is processed through our data
-              pipeline and all host (ex: human, mosquito) genetic information is
-              filtered out. We always filter out all human genetic information,
-              regardless of host. We use the remaining data, with Sample
-              Metadata, to create Reports and Visualizations showing the
-              microorganisms in your sample. These can be shared with other
-              IDseq users.
+              <B>Raw Sequence Data</B>
             </td>
             <td>
-              Raw Sample Data is not shared with any other IDseq user, nor is it
-              ever accessed by anyone working on IDseq unless specifically
-              requested by a User, such as to debug an issue.
+              Genetic sequence files (ex: FASTQ) uploaded by Users containing
+              both host and pathogenic genomic data.
+            </td>
+            <td>
+              <P>
+                Upon upload, Raw Sequence Data is processed through our data
+                pipeline and all human genetic information is filtered out and
+                deleted.
+              </P>
+              <P>
+                We use the remaining data, with Sample Metadata, to create the
+                Pathogen Consensus Genome and to support your creation of
+                further analytical results.
+              </P>
+            </td>
+            <td>
+              <P>
+                Raw Sequence Data is processed only to filter out host data. It
+                is not available to anyone other than you.
+              </P>
+              <P>
+                Other than as specifically requested by you, such as to debug an
+                issue, staff working on Aspen never access this data.
+              </P>
             </td>
             <td rowSpan={4}>
-              Users can request deletion of Raw Sample Data or their IDseq
-              account data by contacting us at privacy@idseq.net and we will
-              fulfill the request within 60 days.
+              <P>
+                Users can request deletion of Raw Sequence Data, Sample
+                Metadata, Pathogen Consensus Genomes, analytical outputs, or
+                their Aspen account data by contacting us at{" "}
+                <Link
+                  href="mailto:helloaspen@chanzuckerberg.com"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  helloaspen@chanzuckerberg.com
+                </Link>{" "}
+                and we will fulfill the request within 60 days.
+              </P>
+              <P>
+                Please be aware, however, that we cannot delete any Pathogen
+                Consensus Genomes or analytical outputs which have been shared
+                outside of Aspen.
+              </P>
             </td>
           </ContentRow>
           <ContentRow>
@@ -95,28 +217,29 @@ const PrivacyPolicy = (): JSX.Element => {
               <B>Sample Metadata</B>
             </td>
             <td>
-              Data about Samples annotated by Users (ex: sequencer used, sample
-              collection date).
+              Data about Samples annotated by Users (ex: sample collection date
+              or location).
             </td>
             <td>See above.</td>
             <td>
               <div>
                 <P>
-                  Report Data and Visualizations that Users create can include
-                  Sample Metadata. IDseq Users may choose to share that Report
-                  Data and/or Visualizations (including Sample Metadata) with
-                  other IDseq Users.
+                  Sample Metadata is visible to other users in your Group, as
+                  well as third party entities, such as CDPH, that your Group is
+                  visible to.
                 </P>
-                <br />
                 <P>
-                  This data is also shared with technical partners (Chan
-                  Zuckerberg Initiative, LLC - CZI LLC) and Service Providers
-                  (ex: AWS) that help operate and secure IDseq. CZI LLC and
-                  Service Providers are limited by this Privacy Policy and will
-                  not use any data shared with them for any purpose beyond
-                  operating and securing IDseq.
+                  This data is also accessible by technical partners (CZ Biohub
+                  and CZI, LLC) and Service Providers (ex: AWS) that help
+                  operate and secure Aspen. For example, we need to be able to
+                  access your data in order to back up and maintain the
+                  database.
                 </P>
-                <br />
+                <P>
+                  This Privacy Policy applies to all parties that access data to
+                  support Aspen and they will not use the data for any purpose
+                  beyond operating and securing Aspen.
+                </P>
                 <P>
                   We will never sell your data or share it with anyone that
                   does.
@@ -126,26 +249,51 @@ const PrivacyPolicy = (): JSX.Element => {
           </ContentRow>
           <ContentRow>
             <td>
-              <B>Report Data</B>
+              <B>Pathogen Consensus Genome</B>
             </td>
             <td>
-              Data about non-host microorganisms that may be contained in the
-              uploaded sample (includes Sample Metadata).
+              Data about the likely pathogen strains contained within the Raw
+              Sequence Data
             </td>
-            <td>See above.</td>
-            <td>See above.</td>
+            <td>
+              <P>See above.</P>
+              <P>
+                Users may also upload this data to Aspen directly if they have
+                assembled a pathogen consensus genome in a different program,
+                but would like to analyze that genome in Aspen.
+              </P>
+            </td>
+            <td>
+              <P>
+                Pathogen Consensus Genomes are visible to other users in your
+                Group, as well as third party entities, such as CDPH, that your
+                Group is visible to.
+              </P>
+              <P>
+                Pathogen Consensus Genomes will be shared with public
+                repositories, such as GISAID, 2 weeks after upload <B>unless</B>{" "}
+                you mark the sample as “private.” Samples marked “private” will
+                never be shared with any public repositories (ex: GISAID) or
+                other 3rd parties (ex: CDPH) unless you choose to mark them
+                “public” later on.
+              </P>
+            </td>
           </ContentRow>
           <ContentRow>
             <td>
-              <B>Visualizations</B>
+              <B>Analytical results</B>
             </td>
             <td>
-              Analyses created by Users based on Report Data (ex: heatmaps and
-              phylogenetic trees). Can include Sample Metadata.
+              Analyses created by Users based on Pathogen Consensus Genomes (ex:
+              phylogenetic trees).
+            </td>
+            <td>
+              Users use Aspen to drive analytical results that they can then
+              choose to share more broadly.
             </td>
             <td>See above.</td>
-            <td>See above.</td>
           </ContentRow>
+
           <SectionRow>
             <td colSpan={5}>
               <B>Data IDseq collects</B>
