@@ -99,13 +99,13 @@ const SampleRenderer = createTableCellRenderer(
 );
 
 const TREE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
-  downloadLink: (value: JSONPrimitive, item: TableItem): JSX.Element => {
+  downloadLink: ({ value, item }): JSX.Element => {
     const jsonDownloadLink = stringGuard(value);
     const tsvDownloadLink = stringGuard(item["accessionsLink"])
     return (
-      <div className={dataTableStyle.cell}>
+      <RowContent>
         <TreeTableDownloadMenu jsonLink={jsonDownloadLink} accessionsLink={tsvDownloadLink}/>
-      </div>
+      </RowContent>
     );
   },
   name: ({ value }): JSX.Element => {
