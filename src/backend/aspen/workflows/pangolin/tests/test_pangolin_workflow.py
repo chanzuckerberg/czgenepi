@@ -24,7 +24,8 @@ def create_test_data(session):
         )
         session.add(sample)
         pathogen_genome: UploadedPathogenGenome = uploaded_pathogen_genome_factory(
-            sample
+            sample,
+            accessions=(),
         )
         session.add(pathogen_genome)
         session.commit()
