@@ -25,13 +25,7 @@ def test_samples_view(
     group = group_factory()
     user = user_factory(group)
     sample = sample_factory(group)
-    uploaded_pathogen_genome = uploaded_pathogen_genome_factory(
-        sample,
-        pangolin_lineage="B.1.590",
-        pangolin_probability=1.0,
-        pangolin_version="2021-04-23",
-        pangolin_last_updated=datetime.datetime.now(),
-    )
+    uploaded_pathogen_genome = uploaded_pathogen_genome_factory(sample)
     session.add(group)
     session.commit()
     with client.session_transaction() as sess:
@@ -45,11 +39,15 @@ def test_samples_view(
                 "czb_failed_genome_recovery": False,
                 "gisaid": {
                     "status": "accepted",
-                    "gisaid_id": uploaded_pathogen_genome.accessions()[0].public_identifier,
+                    "gisaid_id": uploaded_pathogen_genome.accessions()[
+                        0
+                    ].public_identifier,
                 },
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
-                "upload_date": api_utils.format_datetime(uploaded_pathogen_genome.upload_date),
+                "upload_date": api_utils.format_datetime(
+                    uploaded_pathogen_genome.upload_date
+                ),
                 "lineage": {
                     "lineage": uploaded_pathogen_genome.pangolin_lineage,
                     "probability": uploaded_pathogen_genome.pangolin_probability,
@@ -83,10 +81,6 @@ def test_samples_view_gisaid_rejected(
                 None,
             ),
         ),
-        pangolin_lineage="B.1.590",
-        pangolin_probability=1.0,
-        pangolin_version="2021-04-23",
-        pangolin_last_updated=datetime.datetime.strptime("05-03-2021", "%m-%d-%Y"),
     )
     session.add(group)
     session.commit()
@@ -102,7 +96,9 @@ def test_samples_view_gisaid_rejected(
                 "gisaid": {"status": "rejected", "gisaid_id": None},
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
-                "upload_date": api_utils.format_datetime(uploaded_pathogen_genome.upload_date),
+                "upload_date": api_utils.format_datetime(
+                    uploaded_pathogen_genome.upload_date
+                ),
                 "lineage": {
                     "lineage": uploaded_pathogen_genome.pangolin_lineage,
                     "probability": uploaded_pathogen_genome.pangolin_probability,
@@ -129,10 +125,6 @@ def test_samples_view_gisaid_no_info(
     uploaded_pathogen_genome = uploaded_pathogen_genome_factory(
         sample,
         accessions=(),
-        pangolin_lineage="B.1.590",
-        pangolin_probability=1.0,
-        pangolin_version="2021-04-23",
-        pangolin_last_updated=datetime.datetime.strptime("05-03-2021", "%m-%d-%Y"),
     )
 
     session.add(group)
@@ -149,7 +141,9 @@ def test_samples_view_gisaid_no_info(
                 "gisaid": {"status": "no_info", "gisaid_id": None},
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
-                "upload_date": api_utils.format_datetime(uploaded_pathogen_genome.upload_date),
+                "upload_date": api_utils.format_datetime(
+                    uploaded_pathogen_genome.upload_date
+                ),
                 "lineage": {
                     "lineage": uploaded_pathogen_genome.pangolin_lineage,
                     "probability": uploaded_pathogen_genome.pangolin_probability,
@@ -219,10 +213,6 @@ def test_samples_view_gisaid_submitted(
                 None,
             ),
         ),
-        pangolin_lineage="B.1.590",
-        pangolin_probability=1.0,
-        pangolin_version="2021-04-23",
-        pangolin_last_updated=datetime.datetime.strptime("05-03-2021", "%m-%d-%Y"),
     )
     session.add(group)
     session.commit()
@@ -238,7 +228,9 @@ def test_samples_view_gisaid_submitted(
                 "gisaid": {"status": "submitted", "gisaid_id": None},
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
-                "upload_date": api_utils.format_datetime(uploaded_pathogen_genome.upload_date),
+                "upload_date": api_utils.format_datetime(
+                    uploaded_pathogen_genome.upload_date
+                ),
                 "lineage": {
                     "lineage": uploaded_pathogen_genome.pangolin_lineage,
                     "probability": uploaded_pathogen_genome.pangolin_probability,
@@ -264,13 +256,7 @@ def _test_samples_view_cansee(
     viewer_group = group_factory(name="cdph")
     user = user_factory(viewer_group, **user_factory_kwargs)
     sample = sample_factory(owner_group)
-    uploaded_pathogen_genome = uploaded_pathogen_genome_factory(
-        sample,
-        pangolin_lineage="B.1.590",
-        pangolin_probability=1.0,
-        pangolin_version="2021-04-23",
-        pangolin_last_updated=datetime.datetime.strptime("05-03-2021", "%m-%d-%Y"),
-    )
+    uploaded_pathogen_genome = uploaded_pathogen_genome_factory(sample)
     for cansee_datatype in cansee_datatypes:
         CanSee(
             viewer_group=viewer_group,
@@ -328,7 +314,9 @@ def test_samples_view_system_admin(
             },
             "private_identifier": sample.private_identifier,
             "public_identifier": sample.public_identifier,
-            "upload_date": api_utils.format_datetime(uploaded_pathogen_genome.upload_date),
+            "upload_date": api_utils.format_datetime(
+                uploaded_pathogen_genome.upload_date
+            ),
             "lineage": {
                 "lineage": uploaded_pathogen_genome.pangolin_lineage,
                 "probability": uploaded_pathogen_genome.pangolin_probability,
@@ -389,7 +377,9 @@ def test_samples_view_cansee_metadata(
                 "gisaid_id": uploaded_pathogen_genome.accessions()[0].public_identifier,
             },
             "public_identifier": sample.public_identifier,
-            "upload_date": api_utils.format_datetime(uploaded_pathogen_genome.upload_date),
+            "upload_date": api_utils.format_datetime(
+                uploaded_pathogen_genome.upload_date
+            ),
             "lineage": {
                 "lineage": uploaded_pathogen_genome.pangolin_lineage,
                 "probability": uploaded_pathogen_genome.pangolin_probability,
@@ -439,9 +429,7 @@ def test_samples_view_cansee_all(
             "czb_failed_genome_recovery": False,
             "gisaid": {
                 "status": "accepted",
-                "gisaid_id": uploaded_pathogen_genome.accessions()[
-                    0
-                ].public_identifier,
+                "gisaid_id": uploaded_pathogen_genome.accessions()[0].public_identifier,
             },
             "private_identifier": sample.private_identifier,
             "public_identifier": sample.public_identifier,
@@ -487,10 +475,6 @@ def test_samples_failed_accession(
                 "public_identifier_succeeded",
             ),
         ),
-        pangolin_lineage="B.1.590",
-        pangolin_probability=1.0,
-        pangolin_version="2021-04-23",
-        pangolin_last_updated=datetime.datetime.strptime("05-03-2021", "%m-%d-%Y"),
     )
 
     for accession in uploaded_pathogen_genome.accessions():
@@ -556,10 +540,6 @@ def test_samples_multiple_accession(
                 "public_identifier_later",
             ),
         ),
-        pangolin_lineage="B.1.590",
-        pangolin_probability=1.0,
-        pangolin_version="2021-04-23",
-        pangolin_last_updated=datetime.datetime.strptime("05-03-2021", "%m-%d-%Y"),
     )
     session.add(group)
     session.commit()
