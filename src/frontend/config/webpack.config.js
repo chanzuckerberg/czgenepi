@@ -1,5 +1,3 @@
-"use strict";
-
 const fs = require("fs");
 const path = require("path");
 const webpack = require("webpack");
@@ -371,6 +369,7 @@ module.exports = function (webpackEnv) {
                 ],
 
                 plugins: [
+                  require.resolve("@emotion/babel-plugin"),
                   [
                     require.resolve("babel-plugin-named-asset-import"),
                     {
@@ -523,7 +522,7 @@ module.exports = function (webpackEnv) {
           {
             inject: true,
             template: paths.appHtml,
-            filename: "index.html"
+            filename: "index.html",
           },
           isEnvProduction
             ? {

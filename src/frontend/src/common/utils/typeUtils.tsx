@@ -28,7 +28,7 @@ export function jsonToType<T>(
   return Object.fromEntries(entries);
 }
 
-export function stringGuard(value: any): string {
+export function stringGuard(value: unknown): string {
   if (typeof value !== "string") {
     return String(value);
   }

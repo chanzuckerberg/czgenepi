@@ -105,6 +105,7 @@ const SAMPLE_MAP = new Map<string, keyof Sample>([
   ["private_identifier", "privateId"],
   ["public_identifier", "publicId"],
   ["upload_date", "uploadDate"],
+  ["czb_failed_genome_recovery", "CZBFailedGenomeRecovery"],
 ]);
 export const fetchSamples = (): Promise<SampleResponse> =>
   apiResponse<SampleResponse>(["samples"], [SAMPLE_MAP], API.SAMPLES);

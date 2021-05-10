@@ -16,6 +16,7 @@ interface Sample extends BioinformaticsType {
   collectionDate: string;
   collectionLocation: string;
   gisaid: GISAID;
+  CZBFailedGenomeRecovery: boolean;
 }
 
 interface Tree extends BioinformaticsType {
