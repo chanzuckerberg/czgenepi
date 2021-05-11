@@ -1,4 +1,4 @@
-import { Link, List as RawList, ListItem } from "czifui";
+import { Link, ListItemLabel } from "czifui";
 import React from "react";
 import List from "src/common/styles/support/components/List";
 import {
@@ -17,43 +17,47 @@ export default function Terms(): JSX.Element {
   const renderIntro = () => (
     <>
       <Title>
-        <H1>IDseq Terms of Use</H1>
-        <H4>
-          Last Updated: April 1, 2021.{" "}
-          <Link href="/terms_changes">See Recent Changes</Link>
-        </H4>
+        <H1>Aspen Terms of Use</H1>
+        <H4>Last Updated: May 17, 2021. </H4>
       </Title>
       <P>
-        <B>
-          PLEASE BE ADVISED THAT THIS AGREEMENT CONTAINS AN ARBITRATION
-          PROVISION IN SECTION 9 BELOW THAT AFFECTS YOUR RIGHTS UNDER THIS
-          AGREEMENT.
-        </B>{" "}
-        EXCEPT FOR CERTAIN TYPES OF DISPUTES MENTIONED IN THAT PROVISION, YOU
-        AND CZ BIOHUB (AND ITS PARTNERS AND AFFILIATES, INCLUDING WITHOUT
-        LIMITATION CZI, LLC AND CZIF) AGREE THAT (1) DISPUTES BETWEEN US WILL BE
-        RESOLVED BY INDIVIDUAL BINDING ARBITRATION, AND (2) YOU AND CZ BIOHUB
-        (AND ITS PARTNERS AND AFFILIATES, INCLUDING WITHOUT LIMITATION CZI, LLC
-        AND CZIF) WAIVE ANY RIGHT TO PARTICIPATE IN A CLASS-ACTION LAWSUIT,
-        CLASS-WIDE ARBITRATION, OR ANY OTHER REPRESENTATIVE ACTION.
+        Please read these Terms of Use (“Terms”) before using Aspen (“Services”
+        or “Aspen”). These Terms are entered into between the Chan Zuckerberg
+        Initiative Foundation, a 501(c)(3) nonprofit private foundation,
+        (“CZIF”, “we”, “us” or “our”) and you (“User” or “you”) and govern your
+        and your organization’s use of Aspen.
       </P>
       <P>
-        Please read these Terms of Use (“Terms”) before using IDseq (“ Services”
-        or “IDseq”). These Terms are entered into between the Chan Zuckerberg
-        Biohub, Inc. (“CZ Biohub”, “ we”, “us” or “our”) and you (“User” or “
-        you”) and govern your use of IDseq. IDseq is comprised of our research
-        portal, any associated online services or platforms that link to or
-        refer to these Terms, and any databases or data accessible through the
-        portal, associated services or platforms. IDseq is designed to enable
-        the research community to investigate pathogens using metagenomic
-        sequencing data and to help further the study of infectious diseases.
+        Aspen is a tool that helps you infer how pathogens are moving through a
+        population and how cases are related to one another. Aspen comprises our
+        Genomic Epidemiology portal, any associated online services or platforms
+        that link to or refer to these Terms, and any databases or data
+        accessible through the portal, associated services or platforms.
+      </P>
+      <P>
+        Aspen is offered by the Chan Zuckerberg Initiative Foundation (“CZIF”),
+        in close collaboration with the Chan Zuckerberg Biohub (“CZB”) and the
+        Chan Zuckerberg Initiative, LLC (“CZI LLC”).
       </P>
       <P>
         Please carefully read these terms and indicate your acceptance by
-        registering for IDseq. If you do not agree to these Terms, do not
-        register for an account or use IDseq and do not use it. For more
-        information about our privacy practices, please see our{" "}
-        <Link href="/privacy">Privacy Notice</Link>.
+        registering for Aspen. If you do not agree to these Terms, do not
+        register for an account to use Aspen. For more information about our
+        privacy practices, please see the “Privacy Notice”).
+      </P>
+      <P>
+        <B>
+          PLEASE BE ADVISED THAT THIS AGREEMENT CONTAINS AN ARBITRATION
+          PROVISION IN SECTION 8 BELOW THAT AFFECTS YOUR RIGHTS UNDER THIS
+          AGREEMENT.
+        </B>{" "}
+        EXCEPT FOR CERTAIN TYPES OF DISPUTES MENTIONED IN THAT PROVISION, YOU
+        AND CZIF (AND ITS PARTNERS AND AFFILIATES, INCLUDING WITHOUT LIMITATION
+        CZB AND CZI, LLC) AGREE THAT (1) DISPUTES BETWEEN US WILL BE RESOLVED BY
+        INDIVIDUAL BINDING ARBITRATION, AND (2) YOU AND CZIF (AND ITS PARTNERS
+        AND AFFILIATES, INCLUDING WITHOUT LIMITATION CZB AND CZI, LLC) WAIVE ANY
+        RIGHT TO PARTICIPATE IN A CLASS-ACTION LAWSUIT, CLASS-WIDE ARBITRATION,
+        OR ANY OTHER REPRESENTATIVE ACTION.
       </P>
     </>
   );
@@ -61,103 +65,71 @@ export default function Terms(): JSX.Element {
   const renderSummaryOfKeyThingsToKnow = () => {
     return (
       <>
-        <H3>
-          Summary of Key Things to Know (see <Link href="/faq">FAQ</Link> for
-          more)
-        </H3>
+        <H3>Summary of Key Things to Know</H3>
         <List
           items={[
-            <span key={0}>
-              IDseq does not provide medical advice. The output from IDseq does
-              not constitute and should not be relied upon to provide medical
-              advice, diagnosis or treatment. It is intended for research,
-              educational, or informational purposes only.
+            <span key="0">
+              Aspen is a tool that helps you infer how pathogens are moving
+              through a population and how cases are related to one another.
             </span>,
-            <span key={1}>
-              You must ensure that all personally-identifying information and
-              Protected Health Information is fully removed from Sample Metadata
-              before it is uploaded to IDseq.
+            <span key="1">
+              Aspen is offered by the Chan Zuckerberg Initiative Foundation
+              (CZIF), in close collaboration with the Chan Zuckerberg Biohub
+              (CZB) and the Chan Zuckerberg Initiative, LLC (CZI LLC).
             </span>,
-            <span key={2}>
-              You are responsible for obtaining the permissions necessary to
-              collect and submit the Upload Data. You represent that you have
-              obtained, and will maintain, all consents, permissions, and
-              authorizations needed to collect, share, and export Upload Data
-              with IDseq, and for IDseq to use and share the information as
-              described in its <Link href="/privacy">Privacy Notice</Link>.
+            <span key="2">Aspen is a free and open-source tool.</span>,
+            <span key="3">
+              In order to use Aspen, you must be acting in your professional
+              capacity. This means a couple things: (1) your use of Aspen may be
+              subject to your organization’s policies and (2) upon sign-up,
+              you’ll be placed into a group with other users from your
+              organization (3) your Upload Data, and analytical results may be
+              shared with third parties in accordance with your organization’s
+              policies.
             </span>,
-            <span key={3}>
-              You may not attempt to re-identify Upload Data. By using IDseq,
-              you agree that you will not attempt to re-identify any Upload Data
-              with a person, and you will not disclose any Upload Data of other
-              Users downloaded from the Database except for the limited purposes
-              described in these Terms.
+            <span key="4">
+              Because of the time-sensitive nature of genomic pathogen data, we
+              strongly encourage you to share de-identified pathogen genome
+              sequences with the broader scientific and public health community
+              as soon as possible.{" "}
+              <B>
+                For this reason, unless you choose to mark a Sample as ‘private’
+                within 2 weeks of upload, we will automatically share Pathogen
+                Consensus Genomes with public repositories.
+              </B>{" "}
+              However, we recognize that this is not always your preference.
+              Thus, you may choose to label your data as private, so that it
+              cannot be seen by anyone outside of your group. You can also
+              delete your data at any time, either through Aspen itself or by
+              emailing{" "}
+              <Link
+                href="mailto:helloaspen@chanzuckerberg.com"
+                target="_blank"
+                rel="noopener"
+              >
+                helloaspen@chanzuckerberg.com
+              </Link>
+              .
             </span>,
-            <span key={4}>
-              IDseq does not own any research outputs you create with your
-              Report Data, such as consensus genomes and phylogenetic trees for
-              pathogens of interest. This is your data and you control it.
+            <span key="5">
+              The outputs (ex: analytical outputs, such as phylogenetic trees)
+              you create with Aspen are not personally identifiable. You must
+              also ensure that the data you upload to Aspen (Raw Sequence Data,
+              Pathogen Consensus Genomes, and Sample Metadata) are similarly not
+              personally identifiable. This means removing all{" "}
+              <Link
+                href="https://docs.google.com/document/d/1sboOmbafvMh3VYjK1-3MAUt0I13UUJfkQseq8ANLPl8/edit"
+                target="_blank"
+                rel="noopener"
+              >
+                direct identifiers
+              </Link>{" "}
+              like name, address, dates, telephone numbers, e-mail addresses, or
+              medical record numbers from data you upload to Aspen.
             </span>,
+            `Aspen does not provide medical advice. The output from Aspen does not constitute and should not be relied upon to provide medical advice, diagnosis or treatment. It is intended for research, educational, or informational purposes only.`,
           ]}
         />
-      </>
-    );
-  };
-
-  const renderAboutIDseq = () => {
-    return (
-      <>
-        <H3>About IDseq</H3>
-        <P>
-          Here’s how IDseq works: Users submit Upload Data (as described below).
-          This data may contain human and non-human genetic sequences (“ Sample
-          Data” as further defined below), as well as information about those
-          sequences, such as the date the sample was collected and the species
-          it was collected from (“Sample Metadata” as further defined below).
-          For example, a researcher might upload genetic information from
-          mosquitoes, which are often a source of infectious disease, or from
-          humans, who can be infected by such diseases. IDseq then processes
-          this Upload Data in order to identify pathogens found within the
-          genetic sequence (e.g., the mosquito may be carrying the chikungunya
-          virus).
-        </P>
-        <P>
-          “Upload Data” is data that Users upload to IDseq (other than the
-          information Users provide during registration to create an account).
-          Upload Data consists of genetic sequence information (human or
-          non-human) and metadata about those genetic sequences (such as time
-          and location of sample collection). Upload Data includes Sample Data
-          and Sample Metadata.
-        </P>
-        <P>
-          “Sample Data” is full genetic sequence data uploaded by Users. Genetic
-          sequence data contains genetic information about pathogens in the
-          sample and of the host from which the sample was taken. The host could
-          be a human or non-human (e.g., mosquito). You should not be able to
-          find any human sequence data in IDseq other than those embedded in
-          samples you yourself have uploaded. This is because we filter out and
-          discard host sequence data in order to generate Reports.
-        </P>
-        <P>
-          “Sample Metadata” includes information related to the Sample Data,
-          such as the host type (e.g., human or mosquito), upload date, and
-          tissue type and free-text research notes entered by Users. This data{" "}
-          <u>should not</u> include personally-identifying information regarding
-          the individual to whom the Sample Data relates.
-        </P>
-        <P>
-          “Report Data” is information IDseq produced from Upload Data. We
-          generate Report Data by processing Upload Data through our Data
-          Pipeline. IDseq’s “Data Pipeline” cleans (e.g., by removing duplicate
-          nucleotides) and analyzes (e.g., by matching Sample Data nucleotide
-          sequences with known pathogen sequences) the Upload Data. Report Data
-          may include, for example, data about the pathogen sequences identified
-          in the Sample Data and the frequency of such identification (“Pathogen
-          Data”) or raw numeric counts of non-personally identifying gene
-          expression profiles that were found in the Sample Data (“Gene
-          Counts”).
-        </P>
-        <P>“Database” refers to both the data and database(s) of IDseq.</P>
       </>
     );
   };
@@ -165,79 +137,91 @@ export default function Terms(): JSX.Element {
   const renderUploadAndReportDataTerms = () => (
     <>
       <H2>
-        <Number>1.</Number>Upload and Report Data.
+        <Number>1.</Number>Upload Data and Analytical Outputs you create
       </H2>
       <List
         items={[
-          <span key={0}>
-            1.1 Use of Your Upload Data. We need limited rights to your Upload
-            Data solely in order to offer IDseq for you and other Users.
-            Specifically, you grant to us a worldwide, non-exclusive,
-            royalty-free, transferable (in accordance with Section 9.2 below),
-            perpetual and irrevocable (except as set forth herein), license
-            (with the right to grant further licenses) to use, reproduce,
-            distribute, display, and create derivative works (e.g. phylogenetic
-            trees) from Upload Data in connection with providing, developing and
-            improving IDseq. You may request deletion of your Upload Data from
-            IDseq by emailing privacy@idseq.net and including a description of
-            your Upload Data that you wish to have removed. We will delete the
-            requested Upload Data within 60 days of your request. Please note,
-            that our removal from IDseq will not impact any use of Upload Data
-            by others you may have chosen to share it with prior to the
-            effective date of removal and we are not able to require others
-            Users to stop using Upload Data they accessed or downloaded prior to
-            removal. More information about Upload Data can be found in our{" "}
-            <Link href="/privacy">Privacy Notice</Link>.
+          <span key="0">
+            <ListItemLabel>No personally identifying data.</ListItemLabel>
+            The data you upload to Aspen consists of Raw Sequence Data, Pathogen
+            Consensus Genomes, and Sample Metadata (ex: date collected and
+            county-level location data). You should not be uploading any
+            information that would allow identification of any specific
+            individuals to which the Samples may relate, such as{" "}
+            <Link
+              href="https://docs.google.com/document/d/1sboOmbafvMh3VYjK1-3MAUt0I13UUJfkQseq8ANLPl8/edit"
+              target="_blank"
+              rel="noopener"
+            >
+              direct identifiers
+            </Link>{" "}
+            like name, address, symptom onset dates or case interview dates,
+            telephone numbers, e-mail addresses, or medical record numbers.
           </span>,
-          <span key={1}>
-            1.2 Use and Visibility of Your Report Data. You understand that your
-            Report Data is data generated by IDseq, does not contain
-            personally-identifying information (i.e. personal data) and may be
-            shared with other IDseq Users in order to further IDseq’s mission
-            and advance the study of infectious diseases.
-          </span>,
-          <span key={2}>
-            1.3 You represent and warrant to us and our service partners that
-            (A) your provision of the Upload Data to IDseq complies with all
-            applicable laws, rules, and regulations, including the Nagoya
-            Protocol and relevant export laws (“Applicable Law”) and industry
+          <span key="1">
+            <ListItemLabel>Compliance with laws.</ListItemLabel>
+            By uploading data to Aspen, you represent and warrant to us that (A)
+            you have all consents, permissions, and authorizations necessary for
+            uploading the data to Aspen and (B) that your uploading this data to
+            Aspen complies with applicable laws, rules, and regulations,
+            including the Nagoya Protocol and relevant export laws and industry
             guidelines and ethical standards that apply to you (e.g. CIOMS or
-            GA4GH) (“Applicable Standards”), and you will otherwise comply with
-            all Applicable Law in connection with IDseq; (B) you have all
-            consents, permissions, and authorizations necessary and sufficient
-            to provide and export the Upload Data to us for the purposes
-            described in these Terms and in our{" "}
-            <Link href="/privacy">Privacy Notice</Link> and to grant the rights
-            and permissions herein; and (C) the Upload Data -- and our use of
-            the Upload Data in accordance with these Terms and our{" "}
-            <Link href="/privacy">Privacy Notice</Link> -- does not and will not
-            violate Applicable Law or infringe or violate any third party
-            rights.
+            GA4GH). Please note that we filter out human sequence data as part
+            of processing Raw Sequence Data as such information is not necessary
+            for providing Aspen.
           </span>,
-          <span key={3}>
-            1.4 TO THE EXTENT UPLOAD DATA IS OBTAINED FROM A HUMAN, YOU AGREE
-            NOT TO PROVIDE UPLOAD DATA IN A FORM THAT CAN IDENTIFY (DIRECTLY OR
-            INDIRECTLY TAKING INTO ACCOUNT ALL THE MEANS REASONABLY LIKELY TO BE
-            USED) THE PERSON TO WHOM THE DATA RELATES OR THAT CONSTITUTES OR
-            WOULD CONSTITUTE “PROTECTED HEALTH INFORMATION” OR REGULATED HEALTH
-            INFORMATION UNDER APPLICABLE LAWS, SUCH AS THE U.S. HEALTH INSURANCE
-            PORTABILITY AND ACCOUNTABILITY ACT (“HIPAA”). For example, the
-            Upload Data shall not include any personal identifiers, including
-            without limitation name, address, dates, telephone numbers, e-mail
-            addresses, or medical health records.
+          <span key="2">
+            <ListItemLabel>Our rights and your rights.</ListItemLabel>
+            We need some basic rights to use your Upload data in order to offer
+            Aspen’s services to you. Specifically, you grant to us a license to
+            use (ex: store your data in the Aspen database), reproduce (ex:
+            backing up the Aspen database), distribute (ex: submitting to GISAID
+            on your behalf), display, and create derivative works (ex: produce
+            phylogenetic trees per your requests) from Upload data in connection
+            with offering and improving Aspen. You can request deletion of your
+            Upload Data from Aspen by emailing us at
+            helloaspen@chanzuckerberg.com.
           </span>,
-          <span key={4}>
-            1.5 To the extent that any Upload Data is obtained from a human data
-            subject, you also specifically represent and warrant to us and our
-            service partners that (A) you have provided any required notice to,
-            and obtained any necessary informed consent of, any such person for
-            the collection, use, and provision to IDseq of the Research Data;
-            and (B) your provision of the Upload Data to IDseq is covered under
-            all such notices and consents, as well as Applicable Standards and
-            Applicable Law. Please note that we filter out and discard human
-            sequence data as part of generating Report Data because we don’t
-            need this data for IDseq. See <Link href="/faq">here</Link> for more
-            details.
+          <span key="3">
+            <ListItemLabel>
+              Sharing pathogen genomes and analytical outputs.
+            </ListItemLabel>
+            Aspen gives you tools to analyze pathogen genomes and create further
+            analytical outputs from them (ex: phylogenetic trees) that allow you
+            to better understand the relationship between different pathogen
+            genomes.
+            <List
+              items={[
+                <span key="0">
+                  <ListItemLabel>Within your organization:</ListItemLabel>
+                  The pathogen genomes created from your Samples and the
+                  analytical outputs you create using Aspen are visible to other
+                  Users at your organization (ex: your DPH). You, along with
+                  other members of your Group, control whether you permit us to
+                  share this information with Users outside your organization,
+                  including as discussed below for public repositories like
+                  GISAID. In certain circumstances, we may also share your data
+                  with third party entities such as CDPH, through the Aspen
+                  tool, in line with your organization’s policies or in line
+                  with applicable law.
+                </span>,
+                <span key="1">
+                  <ListItemLabel>With public repositories:</ListItemLabel>
+                  Because of the time-sensitive nature of genomic pathogen data,
+                  we strongly encourage you to share de-identified pathogen
+                  genome sequences with the broader scientific and public health
+                  community as soon as possible.{" "}
+                  <B>
+                    For this reason, unless you choose to mark a Sample as
+                    ‘private’ within 2 weeks of upload, we will automatically
+                    share Pathogen Consensus Genomes with public repositories.
+                  </B>{" "}
+                  However, we recognize that this is not always your preference.
+                  Thus, you may choose to label your data as Private, so that it
+                  cannot be seen by anyone outside of your group.
+                </span>,
+              ]}
+            />
           </span>,
         ]}
       />
@@ -247,16 +231,12 @@ export default function Terms(): JSX.Element {
   const renderAuthorizationToUseIdseq = () => (
     <>
       <H2>
-        <Number>2.</Number>Authorization To Use IDseq.
+        <Number>2.</Number>Authorization To Use Aspen
       </H2>
       <List
         items={[
-          `2.1 Subject to and conditioned on your compliance with these Terms, we grant you permission to access and use IDseq in accordance with Applicable Law, solely for your own internal academic or internal scientific research purposes. You may not permit any third party to access or use or “share” your Account or IDseq. All persons wishing to access the Service must create their own separate account and agree to these Terms.`,
-          `2.2 IDseq may not be used to provide medical or other services to any third party (for instance, to inform or provide disease diagnoses). IDseq is not intended to diagnose, treat, cure, or prevent any disease and is not a substitute for medical advice.`,
-          `2.3 You shall not disclose or distribute the Database, in whole or in part, or any works derived from the Database to any third party for any purpose, except for the following:`,
-          `You may disclose the documents that you download from the Database using IDseq’s intended functionality to your employees and agents who are registered Users of the Service and who are engaged in conducting your research (“Research Associates”) for the sole purpose of carrying out your internal research. Your Research Associates must also agree to use IDseq and Database in accordance with these Terms.`,
-          `You may share research findings derived from use of IDseq to others, including with the public, so long as these findings include no personally-identifying information and you comply with Applicable Law and these Terms.`,
-          `You may disclose the Database to the minimum extent necessary to comply with Applicable Law or court order, so long as you promptly notify us prior to making such disclosure (to the extent Applicable Law and court order permit you to so notify us).`,
+          `You are using Aspen in your professional capacity as a User from your organization. This means that in addition to Aspen’s Terms and Privacy Policy, your organization’s policies also likely apply to your and your colleagues’ use of Aspen. Please see your organization for questions related to their policies.`,
+          `Aspen may not be used to provide medical or other services to any third party (for instance, to inform or provide disease diagnoses). Aspen is not intended to diagnose, treat, cure, or prevent any disease and is not a substitute for medical advice.`,
         ]}
       />
     </>
@@ -265,68 +245,54 @@ export default function Terms(): JSX.Element {
   const renderLimitationsOnUse = () => (
     <>
       <H2>
-        <Number>3.</Number>Limitations On Use.
+        <Number>3.</Number>Limitations On Use
       </H2>
       <List
         items={[
-          `3.1 You shall not re-identify or attempt to re-identify any Database records or content for any purpose other than responding to a request from the individual whom the record within your Upload Data is about, including without limitation to make employment decisions or to make eligibility, coverage, underwriting, premium-setting or other decisions with respect to insurance.`,
-          `3.2 You shall not otherwise access or use, or attempt to access or use, IDseq to take any action that could harm us, IDseq or its Users, or any third party, or use IDseq in any manner that violates Applicable Law or infringes or otherwise violates third party rights.`,
-          `3.3 You represent and warrant that you are a natural person of legal age who is competent and able to enter into and carry out these Terms, and, if you are using IDseq on behalf of any entity, that you are authorized to enter into these Terms on such entity’s behalf and that such entity agrees to be responsible to us if you or that entity violates these Terms.`,
-          `3.4 We may restrict or terminate your access to IDseq at any time, including for breach of these Terms. In such case we will attempt to provide you notice through the contact information we have for you.`,
-        ]}
-      />
-    </>
-  );
-
-  const renderRegistrationAndContactInfo = () => (
-    <>
-      <H2>
-        <Number>4.</Number>Registration And Contact Information.
-      </H2>
-      <List
-        items={[
-          `4.1 To access IDseq you will need to be a registered “User.” At registration, you will be asked to provide certain information (“Account Information”) to create an individual user account (an “Account”). You agree that you will not create more than one Account, or create an Account for anyone other than yourself. You may not share your Account credentials.`,
-          <span key={1}>
-            4.2 You agree to keep your Account Information accurate and
-            up-to-date. You agree that we may send to the e-mail address you
-            provide us or otherwise electronically deliver notices or
-            communications regarding IDseq, including notices of updates to
-            these terms and the <Link href="/privacy">Privacy Notice</Link>.
+          `You shall not otherwise access or use, or attempt to access or use, Aspen to take any action that could harm us, Aspen or its Users, or any third party, or use Aspen in any manner that violates applicable law or infringes or otherwise violates third party rights.`,
+          <span key="0">
+            You represent and warrant that you are a natural person over the age
+            of 16 and that you are acting in your professional capacity as
+            authorized by your DPH to enter into these Terms.
           </span>,
+          `We may restrict or terminate your access to Aspen at any time, including for breach of these Terms. If this happens, we will attempt to provide you notice through the contact information we have for you.`,
         ]}
       />
     </>
   );
 
-  const renderChangesToIdseqOrTerms = () => (
+  const renderChangesToAspenOrTerms = () => (
     <>
       <H2>
-        <Number>5.</Number>Changes To IDseq Or These Terms.
+        <Number>4.</Number>Changes To Aspen Or These Terms
       </H2>
       <List
         items={[
-          `5.1 Changes to IDseq.We may, from time to time, withdraw, suspend, change or update IDseq (including the Database) or its features without notice, subject to Applicable Law. Neither we, nor our service providers, will be liable if all or any part of IDseq is unavailable or changes at any time.`,
-          `5.2 Changes to these Terms.We may update these Terms from time to time and will notify you of material changes to the Terms, prior to their becoming effective. If you do not agree to the updated Terms, your remedy will be to close your Account prior to the effective date of those changes.`,
-          <span key={1}>
-            5.3 Closing Your Account.You can close your Account at any time.
-            Just contact us at{" "}
-            <Link href="mailto:privacy@idseq.net">privacy@idseq.net</Link>.
+          <span key="0">
+            <ListItemLabel>Changes to Aspen.</ListItemLabel>Aspen is a free
+            tool. We can’t promise Aspen will always be up and offered as it is
+            today, but if we are making material changes to its features or that
+            impact its availability, we will give you a chance to download
+            and/or delete your data so you can take it off of Aspen.
           </span>,
-        ]}
-      />
-    </>
-  );
-
-  const renderIntellectualPropertyAndSecurityTerms = () => (
-    <>
-      <H2>
-        <Number>6.</Number>Intellectual Property And Security.
-      </H2>
-      <List
-        items={[
-          `6.1 Intellectual Property Rights.Just because you upload data to IDseq, you are not giving us any ownership of your intellectual property rights (see Section 1.1 above). Subject to these Terms, we grant you a limited right to access IDseq, and we reserve all other of our intellectual property rights in IDseq. Using IDseq does not give you any ownership in our IDseq, our services or the content or information made available through IDseq that is not already yours. Trademarks and logos used in connection with IDseq are the trademarks of their respective owners. Our logos and other trademarks, service marks, graphics, and logos used for our services are trademarks or registered trademarks of ours and these Terms do not grant you any rights to use them.`,
-          `6.2 Feedback.We’d love your feedback about how to improve IDseq at help@idseq.net. That said, by giving us feedback, you agree that we can use and share it for any purpose without compensation to you. You agree that we are not required to use your feedback.`,
-          `6.3 Security.You will establish, implement, and maintain appropriate physical, technical and organizational measures that are designed to: (a) protect the security and integrity of any network or system used to access IDseq, including any Database records; and (b) guard against the accidental or unauthorized access, use, alteration or disclosure of IDseq through your Account. Please notify us immediately at security@idseq.net if you suspect your Account has been compromised or are aware of any other security issues relating to IDseq.`,
+          <span key="1">
+            <ListItemLabel>Changes to these Terms.</ListItemLabel>
+            We may update these Terms from time to time and will notify you of
+            material changes to the Terms, prior to their becoming effective. If
+            you do not agree to the updated Terms, your remedy will be to close
+            your Account prior to the effective date of those changes.
+          </span>,
+          <span key="2">
+            <ListItemLabel>Closing Your Account.</ListItemLabel>You can close
+            your Account at any time. Just contact us at{" "}
+            <Link
+              href="mailto:aspenprivacy@chanzuckerberg.com"
+              target="_blank"
+              rel="noopener"
+            >
+              aspenprivacy@chanzuckerberg.com
+            </Link>
+          </span>,
         ]}
       />
     </>
@@ -335,54 +301,182 @@ export default function Terms(): JSX.Element {
   const renderDisclaimerTerms = () => (
     <>
       <H2>
-        <Number>7.</Number>Disclaimers.
+        <Number>5.</Number>Disclaimers.
       </H2>
       <List
         items={[
-          `7.1 In order to further infectious disease research, we rely upon Users to upload data to the Database. We and our service providers do not review or correct any data uploaded into IDseq. If you would like to report any issue with IDseq or the Database please contact us at help@idseq.net. IDseq is not intended as a storage service, so please back up your Upload Data using a secure service of your choice.`,
-          `7.2 TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW:`,
-          `7.2.1 YOUR ACCESS AND USE IDSEQ AT YOUR SOLE RISK AND AGREE THAT WE AND OUR SERVICE PROVIDERS WILL NOT BE RESPONSIBLE FOR ANY ACTIONS YOU TAKE BASED ON IDSEQ OR FOR ANY INACCURATE DATA OR OUTPUTS OF IDSEQ (INCLUDING MISIDENTIFICATION OF -- OR THE FAILURE TO IDENTIFY -- DISEASE SEQUENCES).`,
-          `7.2.2 IDSEQ IS PROVIDED “AS IS” WITH ALL FAULTS, AND WE AND OUR SERVICE PROVIDERS HEREBY DISCLAIM ALL REPRESENTATIONS AND WARRANTIES, EXPRESS, STATUTORY, OR IMPLIED (INCLUDING, WITHOUT LIMITATION, IMPLIED WARRANTIES OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND ALL WARRANTIES ARISING FROM THE COURSE OF DEALING, USAGE, OR TRADE PRACTICE) WITH RESPECT TO IDSEQ. IDSEQ IS NOT INTENDED TO BE USED AND SHOULD NOT BE USED AS A MEDICAL DEVICE OR FOR PURPOSES OF MEDICAL DIAGNOSIS OR TREATMENT.`,
-          `7.2.3 FOR CLARITY AND WITHOUT LIMITING THE FOREGOING, WE AND OUR SERVICE PROVIDERS DO NOT MAKE ANY GUARANTEES (I) REGARDING THE ACCURACY, COMPLETENESS, TIMELINESS, SECURITY, AVAILABILITY OR INTEGRITY OF IDSEQ, (II) THAT IDSEQ WILL BE UNINTERRUPTED OR OPERATE IN COMBINATION WITH ANY SOFTWARE, SERVICE, SYSTEM OR OTHER DATA, OR (III) THAT IDSEQ WILL MEET ANY REQUIREMENTS OF ANY PERSON OR ENTITY, OR ANY REGULATORY APPROVALS OR REQUIREMENTS. WITHOUT LIMITATION, YOU ACKNOWLEDGE THAT IDSEQ IS NOT A BUSINESS ASSOCIATE FOR PURPOSES OF HIPAA.`,
-        ]}
-      />
-    </>
-  );
-
-  const renderLawTerms = () => (
-    <>
-      <H2>
-        <Number>8.</Number>Indemnification, Limitation Of Liability, And Choice
-        Of Law.
-      </H2>
-      <List
-        items={[
-          `8.1 To the maximum extent permitted by Applicable Law, you agree to indemnify and hold harmless CZ Biohub, its affiliates (including without limitation the Chan Zuckerberg Initiative Foundation (CZIF), the Chan Zuckerberg Initiative, LLC (CZI LLC), and their successors, assigns, officers, directors, employees, and agents (collectively, the “CZ Biohub Protected Parties”)) from and against any and all liabilities, costs, damages, charges, losses, penalties, judgments, settlements, and expenses (including reasonable attorney’s fees) (“Losses”) arising out of or related to any suit, demand, action, proceeding, or other claim by a third party (“Claims”) arising out of or relating to: (a) your actual or alleged failure to comply with Applicable Law or these Terms, (b) your Research Data, or (c) your actual or alleged violation of any third party rights.`,
-          `8.2 LIMITATION OF LIABILITY.TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE CZ BIOHUB PROTECTED PARTIES WILL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE, OR CONSEQUENTIAL DAMAGES OF ANY KIND (INCLUDING LOST PROFITS, LOST DATA, BUSINESS INTERRUPTION, OR LOSS OF GOODWILL) IRRESPECTIVE OF WHETHER SUCH DAMAGES ARISE FROM CLAIMS BROUGHT IN CONTRACT, TORT, NEGLIGENCE, WARRANTY, STRICT LIABILITY, OR ANY OTHER THEORY AT LAW OR IN EQUITY, AND EVEN IF ANY CZ BIOHUB PROTECTED PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. WITHOUT LIMITING THE FOREGOING, TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT WILL THE CZ BIOHUB PROTECTED PARTIES’ AGGREGATE LIABILITY ARISING OUT OF OR RELATING TO THESE TERMS OR IDSEQ EXCEED USD $100. THE EXCLUSIONS AND LIMITATIONS SET FORTH IN THIS SECTION 9 DO NOT APPLY TO LOSSES ARISING FROM A CZ BIOHUB PROTECTED PARTY’S GROSS NEGLIGENCE OR WILLFUL MISCONDUCT. IF ANY LIMITATION IN THIS SECTION 9 IS UNENFORCEABLE IN ANY INSTANCE, THEN SUCH LIMITATION WILL APPLY TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW.`,
-          `SOME LAWS DO NOT ALLOW THE LIMITATION OR EXCLUSION OF LIABILITY, SO THESE LIMITS MAY NOT APPLY TO YOU.`,
-          `Choice of Law / Jurisdiction / Venue. These Terms, and all matters arising out of or relating to these Terms, whether sounding in contract, tort, or statute, will be governed by, and construed in accordance with, the laws of the State of California and/or applicable federal law (including the Federal Arbitration Act), without regard to conflict of law provisions. Subject to and without waiver of the arbitration provisions below, and unless prohibited by the laws of your country, you agree that any judicial proceedings (other than small claims actions as discussed above) will be brought in and you hereby consent to the exclusive jurisdiction and venue in the state courts in the City and County of San Mateo, California, or federal court for the Northern District of California. For countries where this is not permissible, this won’t deprive you of any protection you have under the law of the country where you live, or access to the courts in that country.`,
-        ]}
-      />
-    </>
-  );
-
-  const renderMiscellaneousTerms = () => (
-    <>
-      <H2>
-        <Number>10.</Number>Miscellaneous.
-      </H2>
-      <List
-        items={[
-          `10.1 Severability. In the event any part of these Terms is deemed unenforceable, the remaining portion will remain in effect and you and we expressly authorize a court of competent jurisdiction to make the modifications that are necessary to comply with existing law, in a manner most closely representing the original intent of you and us as expressed in these Terms.`,
-          `10.2 Assignment. You may not assign or delegate your rights or obligations under these Terms, in whole or in part, without our prior written approval (not to be unreasonably withheld); any assignment or delegation in violation of this provision will be null and void. We may assign our rights or delegate our obligations under these Terms. In the event of an assignment by us, we will provide you notice through the Service or contact information you have provided to us and these Terms shall otherwise remain in full force and effect and shall bind the permitted assignee.`,
-          `10.3 Amendment. No waiver of any of the provisions of the Terms will constitute a waiver of any other provision (whether or not similar). No waiver will be binding unless executed in writing by the party to be bound by the waiver.`,
-          <span key={1}>
-            10.4 Entire Agreement. These Terms (along with the{" "}
-            <Link href="/privacy">Privacy Notice</Link>) constitute the entire
-            agreement between you and us regarding IDseq. If you wish to modify
-            these Terms, any amendment must be provided to us in writing and
-            signed by our authorized representative.
+          <span key="0">
+            We and our service providers do not review or correct any data
+            uploaded into Aspen. If you would like to report any issue with
+            Aspen please contact us at{" "}
+            <Link
+              href="mailto:aspensecurity@chanzuckerberg.com"
+              target="_blank"
+              rel="noopener"
+            >
+              aspensecurity@chanzuckerberg.com
+            </Link>
+            . Aspen is not intended as a storage service, so please back up your
+            Upload Data using a secure service of your choice, such as the
+            NCBI’s Sequence Read Archive (SRA) repository.
           </span>,
+          <span key="1">
+            <P>TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW:</P>
+            <List
+              items={[
+                <span key="0">
+                  YOUR ACCESS AND USE ASPEN AT YOUR SOLE RISK AND AGREE THAT WE
+                  AND OUR SERVICE PROVIDERS WILL NOT BE RESPONSIBLE FOR ANY
+                  ACTIONS YOU TAKE BASED ON ASPEN OR FOR ANY INACCURATE DATA OR
+                  OUTPUTS OF ASPEN.
+                </span>,
+                <span key="1">
+                  ASPEN IS PROVIDED “AS IS” WITH ALL FAULTS, AND WE AND OUR
+                  SERVICE PROVIDERS HEREBY DISCLAIM ALL REPRESENTATIONS AND
+                  WARRANTIES, EXPRESS, STATUTORY, OR IMPLIED (INCLUDING, WITHOUT
+                  LIMITATION, IMPLIED WARRANTIES OF TITLE, NON-INFRINGEMENT,
+                  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND ALL
+                  WARRANTIES ARISING FROM THE COURSE OF DEALING, USAGE, OR TRADE
+                  PRACTICE) WITH RESPECT TO ASPEN. ASPEN IS NOT INTENDED TO BE
+                  USED AND SHOULD NOT BE USED AS A MEDICAL DEVICE OR FOR
+                  PURPOSES OF MEDICAL DIAGNOSIS OR TREATMENT.
+                </span>,
+                <span key="2">
+                  FOR CLARITY AND WITHOUT LIMITING THE FOREGOING, WE AND OUR
+                  SERVICE PROVIDERS DO NOT MAKE ANY GUARANTEES (I) REGARDING THE
+                  ACCURACY, COMPLETENESS, TIMELINESS, SECURITY, AVAILABILITY OR
+                  INTEGRITY OF ASPEN, (II) THAT ASPEN WILL BE UNINTERRUPTED OR
+                  OPERATE IN COMBINATION WITH ANY SOFTWARE, SERVICE, SYSTEM OR
+                  OTHER DATA, OR (III) THAT ASPEN WILL MEET ANY REQUIREMENTS OF
+                  ANY PERSON OR ENTITY, OR ANY REGULATORY APPROVALS OR
+                  REQUIREMENTS. WITHOUT LIMITATION, YOU ACKNOWLEDGE THAT ASPEN
+                  IS NOT A BUSINESS ASSOCIATE FOR PURPOSES OF HIPAA.
+                </span>,
+              ]}
+            />
+          </span>,
+        ]}
+      />
+    </>
+  );
+
+  const renderLimitationLiability = () => (
+    <>
+      <H2>
+        <Number>6.</Number>Limitation Of Liability
+      </H2>
+      <List
+        items={[
+          <span key="0">
+            TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, CZIF AND
+            AFFILIATES (INCLUDING WITHOUT LIMITATION CHAN ZUCKERBERG INITIATIVE,
+            LLC; AND THE CHAN ZUCKERBERG BIOHUB COLLECTIVELY, THE{" "}
+            <B>“PROTECTED PARTIES”</B>) WILL NOT BE LIABLE FOR ANY INDIRECT,
+            INCIDENTAL, SPECIAL, PUNITIVE, OR CONSEQUENTIAL DAMAGES OF ANY KIND
+            (INCLUDING LOST PROFITS, LOST DATA, BUSINESS INTERRUPTION, OR LOSS
+            OF GOODWILL) IRRESPECTIVE OF WHETHER SUCH DAMAGES ARISE FROM CLAIMS
+            BROUGHT IN CONTRACT, TORT, NEGLIGENCE, WARRANTY, STRICT LIABILITY,
+            OR ANY OTHER THEORY AT LAW OR IN EQUITY, AND EVEN IF ANY PROTECTED
+            PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. WITHOUT
+            LIMITING THE FOREGOING, TO THE MAXIMUM EXTENT PERMITTED BY
+            APPLICABLE LAW, IN NO EVENT WILL THE PROTECTED PARTIES’ AGGREGATE
+            LIABILITY ARISING OUT OF OR RELATING TO THESE TERMS OR THE SERVICE
+            EXCEED USD <B>$100</B>.
+          </span>,
+        ]}
+      />
+    </>
+  );
+
+  const renderIndemnification = () => (
+    <>
+      <H2>
+        <Number>7.</Number>Indemnification
+      </H2>
+      <List
+        items={[
+          `You shall indemnify, defend and hold the Protected Parties harmless from and against, and shall pay all damages, costs, fees and expenses (including reasonable attorneys’ fees and expenses) relating to, any third party (including government entity) claim, action, suit or other proceeding (a “Claim”) to the extent arising from: (1) your gross negligence, willful misconduct or fraud; and/or (2) any misrepresentation you make regarding your permission to submit data to Aspen for your organization’s use.`,
+          `Indemnification is conditioned upon the Protected Parties giving you written notice of any such Claim, and giving you control of the defense and settlement of any such Claim, and cooperating with you in such defense. Notwithstanding anything to the contrary, (1) the Protected Parties may participate in defense of such Claim with its own counsel at its own expense and (2) you may not settle any Claim without CZIF’s prior written consent, which will not be unreasonably withheld, unless it unconditionally releases the Protected Parties of all liability, obligation, and fault.`,
+        ]}
+      />
+    </>
+  );
+
+  const renderArbitration = () => (
+    <>
+      <H2>
+        <Number>8.</Number> Arbitration
+      </H2>
+      <List
+        items={[
+          <span key="0">
+            <ListItemLabel>Final and Binding Arbitration.</ListItemLabel>We
+            endeavor and trust that we will have a productive relationship but
+            in the unlikely event we have a dispute that we can’t resolve
+            between us, and it results in a legal dispute, BOTH YOU AND WE AGREE
+            TO WAIVE OUR RESPECTIVE RIGHTS TO RESOLUTION OF DISPUTES IN A COURT
+            OF LAW BY A JUDGE OR JURY AND AGREE TO RESOLVE ANY DISPUTE BY
+            ARBITRATION, WHICH WILL BE FINAL AND BINDING, AS SET FORTH BELOW.
+          </span>,
+          <span key="1">
+            <ListItemLabel>Dispute Resolution.</ListItemLabel> In the unlikely
+            event we have a dispute arising out of or related to the use of
+            Aspen (“Dispute”) that we can’t resolve between us, you and we agree
+            that we shall (in good faith) meet and attempt to resolve the
+            Dispute within thirty (30) days. If the Dispute is not resolved
+            during such time period, then you and a representative of CZIF shall
+            (in good faith) meet and attempt to resolve the Dispute through
+            non-binding mediation with a mutually agreed upon mediator within
+            thirty (30) additional days.
+          </span>,
+          <span key="2">
+            <ListItemLabel>Mutual Agreement to Arbitrate.</ListItemLabel>If the
+            Dispute is not resolved within such time period, the Dispute shall
+            be resolved per the following arbitration terms. As the exclusive,
+            final and binding means of initiating adversarial proceedings, you
+            agree that it be resolved fully and finally by neutral and binding
+            arbitration administered by JAMS in San Mateo County, California, in
+            accordance with its Streamlined Arbitration Rules & Procedures, the
+            Federal Arbitration Act, and the substantive laws of the State of
+            California, exclusive of conflict or choice of law rules. In-person
+            proceedings will take place in San Mateo County, California and your
+            reasonable and documented travel expenses will be paid by CZIF. The
+            arbitrator shall have the power to award any type of relief that
+            would be available in a court of competent jurisdiction and will
+            issue a written decision at the end of the arbitration, which will
+            be final and binding. Judgment on any award rendered in any such
+            arbitration may be entered in any court having jurisdiction in San
+            Mateo County, California.
+          </span>,
+        ]}
+      />
+    </>
+  );
+
+  const renderChoiceOfLaw = () => (
+    <>
+      <H2>
+        <Number>9.</Number>Choice of Law and Venue
+      </H2>
+      <List
+        items={[
+          `This Agreement and any Disputes will be governed, controlled, and interpreted by and under the laws of the State of California, without giving effect to any conflicts of laws principles that require the application of the law of a different state. Notwithstanding the foregoing, to the extent such laws are inconsistent with the Federal Arbitration Act, the Federal Arbitration Act will govern. Any dispute that is not subject to arbitration (e.g., if arbitration is deemed unenforceable or inapplicable) shall be, and any judgement on any arbitration award may be, brought in the U.S. District Court for the Northern District of California or a state court located in San Mateo County, California.`,
+        ]}
+      />
+    </>
+  );
+
+  const renderGeneralTerms = () => (
+    <>
+      <H2>
+        <Number>10.</Number>General Terms
+      </H2>
+      <List
+        items={[
+          `If any provision in these Terms is held invalid or unenforceable, the other provisions will remain enforceable, and the invalid or unenforceable provision will be modified to a valid and enforceable provision that most accurately reflects the parties intentions.`,
+          `Any waiver or failure to enforce any of these Terms on one occasion will not be deemed a waiver of any other provision or of that provision on any other occasion.`,
+          `You may not assign or transfer any rights or obligations under these Terms without our consent. However, you agree that we may assign these Terms in connection with a reorganization, or to a successor or assign that agrees to assume our obligations under these Terms (and Privacy Policy) without your consent.`,
+          `Entire Agreement. These Terms (along with the Privacy Notice) constitute the entire agreement between you and us regarding Aspen. If you wish to modify these Terms, any amendment must be provided to us in writing and signed by our authorized representative.`,
         ]}
       />
     </>
@@ -391,17 +485,28 @@ export default function Terms(): JSX.Element {
   const renderContactInfo = () => (
     <>
       <H2>
-        <Number>11.</Number> Contact Information.
+        <Number>11.</Number> How to Contact Us
       </H2>
       <List
         items={[
-          <span key={0}>
+          <span key="0">
             If you have any questions, comments, or concerns with Terms, you may
             contact us at{" "}
-            <Link href="mailto:help@idseq.net">help@idseq.net</Link>
+            <Link
+              href="mailto:aspenprivacy@chanzuckerberg.com"
+              target="_blank"
+              rel="noopener"
+            >
+              aspenprivacy@chanzuckerberg.com
+            </Link>
+            .
           </span>,
-          <P key={1}>
-            Our mailing address is:
+          <P key="1">
+            Notice under these Terms must be in writing and deemed to have been
+            given on the date delivered by a nationally recognized express mail
+            service, such as Federal Express, or by certified and registered
+            mail (signature for receipt required) to CZIF as follows:
+            <br />
             <br />
             Chan Zuckerberg Initiative Foundation
             <br />
@@ -412,7 +517,15 @@ export default function Terms(): JSX.Element {
             2682 Middlefield Road, Suite i<br />
             Redwood City, CA 94063
             <br />
-            With a courtesy copy via email to: legalczi1@chanzuckerberg.com
+            With a courtesy copy via email to:{" "}
+            <Link
+              href="mailto:legalczi1@chanzuckerberg.com"
+              target="_blank"
+              rel="noopener"
+            >
+              legalczi1@chanzuckerberg.com
+            </Link>{" "}
+            (email does not constitute notice)
             <br />
           </P>,
         ]}
@@ -421,184 +534,20 @@ export default function Terms(): JSX.Element {
     </>
   );
 
-  const renderArbitrationTerms = () => (
-    <>
-      <H2>
-        <Number>9.</Number> ARBITRATION AGREEMENT AND CLASS ACTION WAIVER.
-      </H2>
-      <P>
-        THIS SECTION CONSTITUTES AN ARBITRATION AGREEMENT (“
-        <B>Arbitration Agreement</B>“); IT REQUIRES YOU AND CZ BIOHUB AND ITS
-        AFFILIATES, INCLUDING WITHOUT LIMITATION THE CHAN ZUCKERBERG INITIATIVE
-        FOUNDATION AND CHAN ZUCKERBERG INITIATIVE, LLC (COLLECTIVELY, THE “
-        <B>CZ Parties</B>“) TO AGREE TO RESOLVE ALL DISPUTES BETWEEN US THROUGH
-        BINDING INDIVIDUAL ARBITRATION, SO PLEASE READ IT CAREFULLY.
-      </P>
-      <RawList ordered>
-        <ListItem ordered>
-          <span>
-            <B>Applicability.</B> You and the CZ Parties agree that all
-            Disputes, including Enforceability Disputes, will be resolved
-            exclusively in binding arbitration on an individual basis, except
-            that you and the CZ Parties are not required to arbitrate IP
-            Disputes. Notwithstanding the foregoing, either you or the CZ
-            Parties may bring an individual action in small claims court.
-            <List
-              ordered
-              items={[
-                <span key={0}>
-                  A “<B>Dispute</B>” means a dispute, claim or controversy
-                  arising out of or relating to the CZ Parties’ products or
-                  these Terms; or whether that dispute is (1) based on past,
-                  present or future events; and (2) in contract, warranty,
-                  state, regulation, or other legal or equitable basis.
-                </span>,
-                <span key={1}>
-                  An “<B>Enforceability Dispute</B>” means a Dispute relating to
-                  the interpretation, applicability, or enforceability of this
-                  Arbitration Agreement, including the formation of the
-                  contract, the arbitrability of any Dispute, and any claim that
-                  all or any part of this agreement is void or voidable.
-                </span>,
-                <span key={2}>
-                  An “<B>IP Dispute</B>” means a Dispute relating to the
-                  ownership or enforcement of intellectual property rights.
-                </span>,
-              ]}
-            />
-          </span>
-        </ListItem>
-        <ListItem ordered>
-          <span>
-            <B>Waivers.</B>
-            <List
-              ordered
-              items={[
-                <span key={0}>
-                  <B>Waiver of Jury Right.</B> YOU AND THE CZ Parties ARE
-                  EXPRESSLY GIVING UP ALL RIGHTS TO A JURY TRIAL OR COURT TRIAL
-                  BEFORE A JUDGE. The arbitrator’s decision will be final and
-                  binding on both you and us, subject to review solely on the
-                  grounds set forth in the Federal Arbitration Act (“<B>FAA</B>
-                  ”).
-                </span>,
-                <span key={1}>
-                  <B>Waiver of Class or Consolidated Actions.</B> YOU AND THE CZ
-                  PARTIES AGREE THAT ALL DISPUTES MUST BE ARBITRATED OR
-                  LITIGATED ON AN INDIVIDUAL BASIS AND NOT ON A CLASS,
-                  COLLECTIVE ACTION, OR REPRESENTATIVE BASIS. The validity of
-                  this waiver – and whether an action may proceed as a class,
-                  collective or representative action – must be decided by a
-                  court.
-                </span>,
-              ]}
-            />
-          </span>
-        </ListItem>
-        <ListItem ordered>
-          <span>
-            <B>Initiating a Dispute.</B>
-            <List
-              ordered
-              items={[
-                `To initiate a Dispute, a party must send to the other party written notice of that Dispute containing: (a) the name, address, and contact information of the party giving notice; (b) the facts giving rise to the Dispute; and (c) the relief requested.`,
-                `You and we agree that we shall (in good faith) meet and attempt to resolve the Dispute within 30 days. If the Dispute is not resolved during that time period, then you and a representative of the applicable IDseq Party shall (in good faith) meet and attempt to resolve the Dispute through non-binding mediation with a mutually agreed-upon mediator within 30 additional days. If you and we do not reach an agreement to resolve the dispute within that 60-day period, you or we may commence an arbitration proceeding or file a claim in small claims court.`,
-              ]}
-            />
-          </span>
-        </ListItem>
-        <ListItem ordered>
-          <span>
-            <B>Arbitration Rules and Procedure.</B>
-            <List
-              ordered
-              items={[
-                <span key={0}>
-                  <B>Rules.</B> The FAA governs the interpretation and
-                  enforcement of this Arbitration Agreement. Judicial
-                  Arbitration & Mediation Services, Inc. (“<B>JAMS</B>”) will
-                  administer the arbitration before a single arbitrator, and the
-                  arbitration will be initiated and conducted according to the
-                  Streamlined Arbitration Rules and Procedures (the “
-                  <B>JAMS Rules</B>”), to the extent they are not inconsistent
-                  with the terms of this agreement. The JAMS Rules and
-                  instructions about how to initiate an arbitration are
-                  available at{" "}
-                  <Link href="https://www.jamsadr.com/rules-streamlined-arbitration">
-                    https://www.jamsadr.com/rules-streamlined-arbitration
-                  </Link>{" "}
-                  (as of the date of this agreement) or 1-800-352-5267.
-                </span>,
-                <span key={1}>
-                  <B>Fees.</B> Pursuant to the JAMS Consumer Arbitration Minimum
-                  Standards, the CZ Parties will bear all costs of the
-                  arbitration (including any JAMS Case Management Fee and all
-                  professional fees for the arbitrator’s services), except for
-                  the filing fee if you are the party initiating the
-                  arbitration.
-                </span>,
-                <span key={2}>
-                  <B>Manner and Location of Arbitration.</B> You may choose to
-                  have the arbitration conducted by telephone, in writing,
-                  online, or in person. If in person, you may choose to have the
-                  arbitration conducted (a) in San Mateo County, California, (b)
-                  in the county where you live, or (c) at another location that
-                  you and we agree upon.
-                </span>,
-              ]}
-            />
-          </span>
-        </ListItem>
-        <ListItem ordered>
-          <span>
-            <B>Confidentiality.</B> All aspects of the arbitration, including
-            without limitation the record of the proceeding, are confidential
-            and will not be open to the public, except (a) to the extent both
-            parties agree otherwise in writing, (b) as may be appropriate in any
-            subsequent proceedings between the parties, or (c) as may otherwise
-            be appropriate in response to a governmental agency or legal
-            process, provided that the party upon whom such process is served
-            shall give immediate notice of such process to the other party and
-            afford the other party an appropriate opportunity to object to such
-            process.
-          </span>
-        </ListItem>
-        <ListItem ordered>
-          <span>
-            <B>Opt-Out.</B> You may opt out of this Arbitration Agreement by
-            notifying us by mail no later than 30 days after first becoming
-            subject to it. Your notice must include your name, address, and a
-            clear statement that you want to opt out of this Arbitration
-            Agreement.
-          </span>
-        </ListItem>
-        <ListItem ordered>
-          <span>
-            <B>Severability.</B> If any portion of this Arbitration Agreement is
-            found to be unlawful, void or for any reason unenforceable, then
-            that portion shall be severed and the remainder of this Arbitration
-            Agreement shall be given full force and effect.
-          </span>
-        </ListItem>
-      </RawList>
-    </>
-  );
-
   return (
     <NarrowContainer>
       {renderIntro()}
       {renderSummaryOfKeyThingsToKnow()}
-      {renderAboutIDseq()}
       {renderUploadAndReportDataTerms()}
       {renderAuthorizationToUseIdseq()}
       {renderLimitationsOnUse()}
-      {renderRegistrationAndContactInfo()}
-      {renderChangesToIdseqOrTerms()}
-      {renderIntellectualPropertyAndSecurityTerms()}
+      {renderChangesToAspenOrTerms()}
       {renderDisclaimerTerms()}
-      {renderLawTerms()}
-      {renderArbitrationTerms()}
-      {renderMiscellaneousTerms()}
+      {renderLimitationLiability()}
+      {renderIndemnification()}
+      {renderArbitration()}
+      {renderChoiceOfLaw()}
+      {renderGeneralTerms()}
       {renderContactInfo()}
     </NarrowContainer>
   );
