@@ -16,7 +16,7 @@ COUNTY_INFO='{
         "san_luis_obispo": {"external_project_id": "RR073e", "internal_project_ids": ["RR073i"]},
         "ventura": {"external_project_id": "RR078e"},
         "humboldt": {"external_project_id": "RR075e"},
-        "vrdl": {"external_project_id": "RR096e", "skip_tree_import": true},
+        "vrdl": {"external_project_id": "RR096e"},
         "tuolumne": {"internal_project_ids": ["RR095i"]},
         "fresno": {"external_project_id": "RR097e"},
         "sfpdh": {"external_project_id": "RR083e"},
@@ -57,8 +57,6 @@ for county in "${COUNTIES[@]}"; do
 done
 
 for county in "${COUNTIES[@]}"; do
-    if [ "$(jq ".$county.skip_tree_import" <<< "$COUNTY_INFO")" != "true" ]; then
-        aspen_group_id=$(jq -r ".$county".aspen_group_id <<< "$COUNTY_INFO")
-        aspen-cli db --local import-covidhub-trees --covidhub-aws-profile biohub --s3-src-prefix s3://covidtracker-datasets/cdph/"$county" --s3-key-prefix /imported/phylo_trees/"$county" --aspen-group-id "$aspen_group_id"
-    fi
+    aspen_group_id=$(echo "$COUNTY_INFO" | jq -r ".$county".aspen_group_id <<< "$COUNTY_INFO")
+    aspen-cli db --local import-covidhub-trees --covidhub-aws-profile biohub --s3-src-prefix s3://covidtracker-datasets/cdph/"$county" --s3-key-prefix /imported/phylo_trees/"$county" --aspen-group-id "$aspen_group_id"
 done
