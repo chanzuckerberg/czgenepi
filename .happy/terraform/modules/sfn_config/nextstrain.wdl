@@ -1,7 +1,6 @@
 version 1.1
 
 workflow nextstrain {
-    String phylo_run_id
 
     input {
         String docker_image_id = "aspen-nextstrain"
@@ -11,18 +10,18 @@ workflow nextstrain {
 
     call nextstrain_workflow {
         input:
-        docker_image_id = docker_image_id
-        aws_region = aws_region
-        phylo_run_id = phylo_run_id
+        docker_image_id = docker_image_id,
+        aws_region = aws_region,
+        phylo_run_id = phylo_run_id,
     }
 }
 
 
 task nextstrain_workflow {
     input {
-        String docker_image_id
-        String aws_region
-        Integer phylo_run_id
+        String docker_image_id,
+        String aws_region,
+        Integer phylo_run_id,
     }
 
     command <<<
