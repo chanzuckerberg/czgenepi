@@ -38,18 +38,14 @@ def find_samples():
         # TODO: update this comparison to be <= most_recent_pango_version
         # once we update this field to be a date instead of string
 
-
         samples_to_be_updated: Iterable[str] = []
         for s in all_samples:
             if s.uploaded_pathogen_genome is not None:
                 if (s.uploaded_pathogen_genome.pangolin_version is None) or (
-                        s.uploaded_pathogen_genome.pangolin_version != most_recent_pango_version
+                    s.uploaded_pathogen_genome.pangolin_version
+                    != most_recent_pango_version
                 ):
                     samples_to_be_updated.append(s.public_identifier)
-
-
-
-        ]
 
         return samples_to_be_updated
 
