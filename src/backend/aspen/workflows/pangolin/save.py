@@ -5,7 +5,7 @@ from typing import Mapping, Union
 
 import click
 
-from aspen.config.config import RemoteDatabaseConfig
+from aspen.config.config import Config
 from aspen.database.connection import (
     get_db_uri,
     init_db,
@@ -26,7 +26,7 @@ def get_probability(conflict: float) -> float:
     "--pangolin-last-updated", type=click.DateTime(formats=["%m-%d-%Y"]), required=True
 )
 def cli(pangolin_fh: io.TextIOBase, pangolin_last_updated: datetime):
-    interface: SqlAlchemyInterface = init_db(get_db_uri(RemoteDatabaseConfig()))
+    interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
 
     with session_scope(interface) as session:
         pango_csv: csv.DictReader = csv.DictReader(pangolin_fh)
