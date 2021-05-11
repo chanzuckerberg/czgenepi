@@ -1,8 +1,8 @@
+import { Button } from "czifui";
 import { escapeRegExp } from "lodash/fp";
 import React, { FunctionComponent, useReducer } from "react";
-import { CSVLink, CSVDownload } from "react-csv";
+import { CSVLink } from "react-csv";
 import { Input } from "semantic-ui-react";
-import { Button } from "czifui";
 import { DataTable } from "src/common/components";
 import style from "./index.module.scss";
 
@@ -28,6 +28,35 @@ interface SearchState {
 
 function searchReducer(state: SearchState, action: SearchState): SearchState {
   return { ...state, ...action };
+}
+
+function tsvDataMap(
+  tableData: TableItem[],
+  headers: Header[],
+  subheaders: Record<string, Header[]>
+): [string[], string[][]] {
+  const tsvData = tableData.map((entry) => {
+    return headers.flatMap((header) => {
+      if (
+        typeof entry[header.key] === "object" &&
+        Object.prototype.hasOwnProperty.call(subheaders, header.key)
+      ) {
+        const subEntry = entry[header.key] as Record<string, JSONPrimitive>;
+        return subheaders[header.key].map((subheader) =>
+          String(subEntry[subheader.key])
+        );
+      }
+      return String(entry[header.key]);
+    });
+  });
+  const tsvHeaders = headers.flatMap((header) => {
+    if (Object.prototype.hasOwnProperty.call(subheaders, header.key)) {
+      return subheaders[header.key].map((subheader) => subheader.text);
+    }
+    return header.text;
+  });
+
+  return [tsvHeaders, tsvData];
 }
 
 const DataSubview: FunctionComponent<Props> = ({
@@ -68,41 +97,30 @@ const DataSubview: FunctionComponent<Props> = ({
     dispatch({ results: filteredData, searching: false });
   };
 
-  const tsvDataMap = (tableData: TableItem[]): [string[], string[][]] => {
-    const tsvData = tableData.map(entry => {
-      const values = headers.flatMap(header => {
-        if (typeof entry[header.key] === "object" && subheaders.hasOwnProperty(header.key)) {
-          const subEntry = entry[header.key] as Record<string, JSONPrimitive>
-          return subheaders[header.key].map(subheader => String(subEntry[subheader.key]))
-        }
-        return String(entry[header.key])
-      })
-      return values
-    })
-    const tsvHeaders = headers.flatMap(header => {
-      if (subheaders.hasOwnProperty(header.key)) {
-        return subheaders[header.key].map(subheader => subheader.text)
-      }
-      return header.text
-    })
-
-    return [tsvHeaders, tsvData]
-  }
-
   const render = (tableData: TableItem[]) => {
-    console.log(tableData)
-    const [tsvHeaders, tsvData] = tsvDataMap(tableData)
-    const separator = "\t"
+    console.log(tableData);
+    const [tsvHeaders, tsvData] = tsvDataMap(tableData, headers, subheaders);
+    const separator = "\t";
 
     let downloadButton: JSX.Element | null = null;
     if (viewName === "Samples") {
       downloadButton = (
-        <CSVLink data={tsvData} headers={tsvHeaders} filename="samples_overview.tsv" separator={separator}>
-          <Button variant="contained" color="primary" isRounded className={style.tsvDownloadButton}>
+        <CSVLink
+          data={tsvData}
+          headers={tsvHeaders}
+          filename="samples_overview.tsv"
+          separator={separator}
+        >
+          <Button
+            variant="contained"
+            color="primary"
+            isRounded
+            className={style.tsvDownloadButton}
+          >
             Download (.tsv)
           </Button>
         </CSVLink>
-      )
+      );
     }
 
     return (
@@ -116,9 +134,7 @@ const DataSubview: FunctionComponent<Props> = ({
               onChange={searcher}
             />
           </div>
-          <div className={style.searchBarTableDownload}>
-            {downloadButton}
-          </div>
+          <div className={style.searchBarTableDownload}>{downloadButton}</div>
         </div>
         <div className={style.samplesTable}>
           <DataTable

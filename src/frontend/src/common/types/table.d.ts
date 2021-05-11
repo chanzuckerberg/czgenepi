@@ -4,11 +4,14 @@ interface Header {
   key: string | number;
 }
 
-type TableItem = Record<string | number, JSONPrimitive | Record<string, JSONPrimitive>;
+type TableItem = Record<
+  string | number,
+  JSONPrimitive | Record<string, JSONPrimitive>
+>;
 
 interface CustomTableRenderProps {
   header: Header;
-  value?: JSONPrimitive;
+  value?: JSONPrimitive | Record<string, JSONPrimitive>;
   item: TableItem;
   index: number;
 }
