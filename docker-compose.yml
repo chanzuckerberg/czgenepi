@@ -18,6 +18,8 @@ services:
         - "${DOCKER_REPO}aspen-frontend:branch-trunk"
       args:
         - BUILDKIT_INLINE_CACHE=1
+        - HAPPY_COMMIT
+        - HAPPY_BRANCH
     restart: always
     environment:
       HOST: 0.0.0.0
@@ -132,6 +134,8 @@ services:
         - "${DOCKER_REPO}aspen-gisaid:branch-trunk"
       args:
         - BUILDKIT_INLINE_CACHE=1
+        - HAPPY_COMMIT
+        - HAPPY_BRANCH
     command: ["true"]
     restart: "no"
   pangolin:
