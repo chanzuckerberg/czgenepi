@@ -1,17 +1,29 @@
+import os
 from functools import wraps
 from pathlib import Path
+from typing import Optional
 
 from authlib.integrations.flask_client import OAuth
 from flask import redirect, session
 from flask_cors import CORS
 
 from aspen.app.aspen_app import AspenApp
+from aspen.config.config import Config
 from aspen.config.docker_compose import DockerComposeConfig
+from aspen.config.production import ProductionConfig
 
 static_folder = Path(__file__).parent.parent / "static"
 
+flask_env = os.environ.get("FLASK_ENV")
+aspen_config: Optional[Config]
+if flask_env == "production":
+    aspen_config = ProductionConfig()
+else:
+    aspen_config = DockerComposeConfig()
 application = AspenApp(
-    __name__, static_folder=str(static_folder), aspen_config=DockerComposeConfig()
+    __name__,
+    static_folder=str(static_folder),
+    aspen_config=aspen_config,
 )
 # FIXME(mbarrien): Make this more restrictive
 allowed_origin = ["*"]
