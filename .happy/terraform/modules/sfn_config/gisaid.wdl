@@ -108,20 +108,20 @@ task IngestGISAID {
     }
 
     command <<<
-    set -Eeuo pipefail
-    set -x
+    set -Eeuox pipefail
     shopt -s inherit_errexit
 
     start_time=$(date +%s)
     build_id=$(date +%Y%m%d-%H%M)
     end_time=$(date +%s)
-    aspen_workflow_rev=$(git -C /aspen rev-parse HEAD)
-    aspen_creation_rev=$(git -C /aspen rev-parse HEAD)
+    # FIXME!!
+    aspen_workflow_rev=187caf91b4fbaf5cba08f1e31cc2016d1d67e9f5
+    aspen_creation_rev=187caf91b4fbaf5cba08f1e31cc2016d1d67e9f5
 
     aws configure set region ~{aws_region}
 
     # create the objects
-    python3 /aspen/src/backend/aspen/workflows/ingest_gisaid/save.py \
+    python3 /usr/src/app/aspen/workflows/ingest_gisaid/save.py       \
             --aspen-workflow-rev "${aspen_workflow_rev}"             \
             --aspen-creation-rev "${aspen_creation_rev}"             \
             --start-time "${start_time}"                             \
@@ -149,17 +149,17 @@ task TransformGISAID {
     }
 
     command <<<
-    set -Eeuo pipefail
-    set -x
+    set -Eeuox pipefail
     shopt -s inherit_errexit
 
     aws configure set region ~{aws_region}
 
     start_time=$(date +%s)
     build_id=$(date +%Y%m%d-%H%M)
-    aspen_creation_rev=$(git -C /aspen rev-parse HEAD)
-    aspen_workflow_rev=$(git -C /aspen rev-parse HEAD)
+    aspen_workflow_rev=187caf91b4fbaf5cba08f1e31cc2016d1d67e9f5
+    aspen_creation_rev=187caf91b4fbaf5cba08f1e31cc2016d1d67e9f5
     
+    git clone --depth 1 git://github.com/nextstrain/ncov-ingest /ncov-ingest
     ncov_ingest_git_rev=$(git -C /ncov-ingest rev-parse HEAD)
 
     # decompress the gisaid dataset and transform it.
@@ -182,7 +182,7 @@ task TransformGISAID {
     end_time=$(date +%s)
 
     # create the objects
-    python3 /aspen/src/backend/aspen/workflows/transform_gisaid/save.py \
+    python3 /usr/src/app/aspen/workflows/transform_gisaid/save.py    \
             --aspen-workflow-rev "${aspen_workflow_rev}"            \
             --aspen-creation-rev "${aspen_creation_rev}"            \
             --ncov-ingest-rev "${ncov_ingest_git_rev}"              \
@@ -212,13 +212,13 @@ task AlignGISAID {
     }
 
     command <<<
-    set -Eeuo pipefail
+    set -Eeuox pipefail
     shopt -s inherit_errexit
 
     aws configure set region ~{aws_region}
 
     # get the bucket/key from the object id
-    processed_gisaid_location=$(python3 /aspen/src/backend/aspen/workflows/align_gisaid/lookup_processed_gisaid_object.py --processed-gisaid-object-id "~{processed_gisaid_object_id}")
+    processed_gisaid_location=$(python3 /usr/src/app/aspen/workflows/align_gisaid/lookup_processed_gisaid_object.py --processed-gisaid-object-id "~{processed_gisaid_object_id}")
     processed_gisaid_s3_bucket=$(echo "${processed_gisaid_location}" | jq -r .bucket)
     processed_gisaid_sequences_s3_key=$(echo "${processed_gisaid_location}" | jq -r .sequences_key)
     processed_gisaid_metadata_s3_key=$(echo "${processed_gisaid_location}" | jq -r .metadata_key)
@@ -226,12 +226,14 @@ task AlignGISAID {
     start_time=$(date +%s)
     build_id=$(date +%Y%m%d-%H%M)
 
+    # We're pinning to a specific git hash in the Dockerfile so we're not cloning this here.
+    # git clone --depth 1 git://github.com/nextstrain/ncov /ncov
     ncov_git_rev=$(git -C /ncov rev-parse HEAD)
 
     # fetch the gisaid dataset
     aws s3 cp --no-progress s3://"${processed_gisaid_s3_bucket}"/"${processed_gisaid_sequences_s3_key}" - | zstdmt -d > /ncov/data/sequences.fasta
     aws s3 cp --no-progress s3://"${processed_gisaid_s3_bucket}"/"${processed_gisaid_metadata_s3_key}" /ncov/data/metadata.tsv
-    (cd /ncov; snakemake --printshellcmds results/aligned.fasta --profile /aspen/src/backend/aspen/workflows/align_gisaid 1>&2)
+    (cd /ncov; snakemake --printshellcmds results/aligned.fasta --profile /usr/src/app/aspen/workflows/align_gisaid 1>&2)
 
     mv /ncov/.snakemake/log/*.snakemake.log /ncov/logs/align.txt .
 
@@ -244,13 +246,13 @@ task AlignGISAID {
     aws s3 cp /ncov/results/aligned.fasta.zst s3://"${bucket}"/"${sequences_key}"
     aws s3 cp /ncov/data/metadata.tsv s3://"${bucket}"/"${metadata_key}"
 
-    aspen_creation_rev=$(git -C /aspen rev-parse HEAD)
-    aspen_workflow_rev=$(git -C /aspen rev-parse HEAD)
+    aspen_workflow_rev=187caf91b4fbaf5cba08f1e31cc2016d1d67e9f5
+    aspen_creation_rev=187caf91b4fbaf5cba08f1e31cc2016d1d67e9f5
 
     end_time=$(date +%s)
 
     # create the objects
-    python3 /aspen/src/backend/aspen/workflows/align_gisaid/save.py                 \
+    python3 /usr/src/app/aspen/workflows/align_gisaid/save.py                       \
             --aspen-workflow-rev "${aspen_workflow_rev}"                            \
             --aspen-creation-rev "${aspen_creation_rev}"                            \
             --ncov-rev "${ncov_git_rev}"                                            \

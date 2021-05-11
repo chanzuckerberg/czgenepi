@@ -126,7 +126,8 @@ services:
   gisaid:
     image: "${DOCKER_REPO}aspen-gisaid"
     build:
-      context: workflows/
+      context: src/backend/
+      dockerfile: Dockerfile.gisaid
       cache_from:
         - "${DOCKER_REPO}aspen-gisaid:branch-trunk"
       args:
