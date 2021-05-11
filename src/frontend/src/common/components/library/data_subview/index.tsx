@@ -2,7 +2,7 @@ import { escapeRegExp } from "lodash/fp";
 import React, { FunctionComponent, useReducer } from "react";
 import { CSVLink, CSVDownload } from "react-csv";
 import { Input } from "semantic-ui-react";
-import { Button } from "@material-ui/core";
+import { Button } from "czifui";
 import { DataTable } from "src/common/components";
 import style from "./index.module.scss";
 
@@ -98,7 +98,7 @@ const DataSubview: FunctionComponent<Props> = ({
     if (viewName === "Samples") {
       downloadButton = (
         <CSVLink data={tsvData} headers={tsvHeaders} filename="samples_overview.tsv" separator={separator}>
-          <Button>
+          <Button variant="contained" color="primary" isRounded className={style.tsvDownloadButton}>
             Download (.tsv)
           </Button>
         </CSVLink>
