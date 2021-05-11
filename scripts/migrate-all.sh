@@ -19,7 +19,7 @@ COUNTY_INFO='{
         "vrdl": {"external_project_id": "RR096e", "skip_tree_import": true},
         "tuolumne": {"internal_project_ids": ["RR095i"]},
         "fresno": {"external_project_id": "RR097e"},
-        "sfpdh": {"external_project_id": "RR083e"},
+        "sfpdh": {"external_project_id": "RR083e", "skip_tree_import": true},
         "tulare": {"external_project_id": "RR081e"}
 }'
 IFS=$'\n' COUNTIES=($(echo "$COUNTY_INFO" | jq -r 'keys[]'))
