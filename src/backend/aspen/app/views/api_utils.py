@@ -17,7 +17,10 @@ def get_usergroup_query(session: Session, user_id: str) -> Query:
 
 
 def format_date(dt: datetime.date, format="%Y-%m-%d") -> str:
-    return dt.strftime(format)
+    if dt is not None:
+        return dt.strftime(format)
+    else:
+        return "N/A"
 
 
 def format_datetime(dt: Optional[datetime.datetime], format="%Y-%m-%d %I:%M%p") -> str:
