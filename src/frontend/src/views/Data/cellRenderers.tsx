@@ -14,6 +14,7 @@ import {
   createTreeModalInfo,
   stringGuard,
 } from "src/common/utils";
+import TreeTableDownloadMenu from "src/components/TreeTableDownloadMenu";
 import { Lineage, LineageTooltip } from "./components/LineageTooltip";
 import {
   GISAIDCell,
@@ -97,15 +98,15 @@ const SampleRenderer = createTableCellRenderer(
 );
 
 const TREE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
-  downloadLink: ({ value }): JSX.Element => {
-    const stringValue = stringGuard(value);
+  downloadLink: ({ value, item }): JSX.Element => {
+    const jsonDownloadLink = stringGuard(value);
+    const tsvDownloadLink = stringGuard(item["accessionsLink"]);
     return (
       <RowContent>
-        <div className={dataTableStyle.cell}>
-          <a href={stringValue} download>
-            Download
-          </a>
-        </div>
+        <TreeTableDownloadMenu
+          jsonLink={jsonDownloadLink}
+          accessionsLink={tsvDownloadLink}
+        />
       </RowContent>
     );
   },
