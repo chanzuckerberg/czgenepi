@@ -43,7 +43,8 @@ def find_samples():
             for sample in all_samples
             if (
                 sample.uploaded_pathogen_genome is not None
-                and sample.uploaded_pathogen_genome.pangolin_version != most_recent_pango_version
+                and sample.uploaded_pathogen_genome.pangolin_version
+                != most_recent_pango_version
             )
         ]
 
