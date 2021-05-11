@@ -32,7 +32,7 @@ def list_bucket(s3_resource, bucket: str, key_prefix: str) -> Iterator[str]:
         results = s3_resource.meta.client.list_objects_v2(
             Bucket=bucket, Prefix=key_prefix, **kwargs
         )
-        for result in results["Contents"]:
+        for result in results.get("Contents", []):
             yield result["Key"]
         if not results["IsTruncated"]:
             return
