@@ -163,23 +163,40 @@ class Config(object):
 
     @property
     def AUTH0_BASE_URL(self) -> str:
-        return self.AWS_SECRET["AUTH0_BASE_URL"]
+        try:
+            return self.AWS_SECRET["AUTH0_BASE_URL"]
+        except KeyError:
+            return f"https://{self.AUTH0_DOMAIN}"
 
     @property
     def AUTH0_ACCESS_TOKEN_URL(self) -> str:
-        return self.AWS_SECRET["AUTH0_ACCESS_TOKEN_URL"]
+        try:
+            return self.AWS_SECRET["AUTH0_ACCESS_TOKEN_URL"]
+        except KeyError:
+            return f"{self.AUTH0_BASE_URL}/oauth/token"
 
     @property
     def AUTH0_AUTHORIZE_URL(self) -> str:
-        return self.AWS_SECRET["AUTH0_AUTHORIZE_URL"]
+        try:
+            return self.AWS_SECRET["AUTH0_AUTHORIZE_URL"]
+        except KeyError:
+            return f"{self.AUTH0_BASE_URL}/authorize"
 
     @property
     def AUTH0_CLIENT_KWARGS(self) -> Mapping[str, Any]:
-        return self.AWS_SECRET["AUTH0_CLIENT_KWARGS"]
+        try:
+            return self.AWS_SECRET["AUTH0_CLIENT_KWARGS"]
+        except KeyError:
+            return {
+                "scope": "openid profile email",
+            }
 
     @property
     def AUTH0_USERINFO_URL(self) -> str:
-        return self.AWS_SECRET["AUTH0_USERINFO_URL"]
+        try:
+            return self.AWS_SECRET["AUTH0_USERINFO_URL"]
+        except KeyError:
+            return "userinfo"
 
     ####################################################################################
     # database properties
