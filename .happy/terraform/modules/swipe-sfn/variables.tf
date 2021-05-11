@@ -14,6 +14,12 @@ variable remote_dev_prefix {
   default     = ""
 }
 
+variable try_spot_first {
+  type        = bool
+  default     = false
+  description = "Whether to try running batch jobs on SPOT instances first. Enabling this requires batch jobs to be re-entrant!"
+}
+
 variable job_definition_name {
   type        = string
   description = "Name of the batch job definition"
