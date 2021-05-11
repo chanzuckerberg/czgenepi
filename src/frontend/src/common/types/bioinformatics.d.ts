@@ -8,6 +8,13 @@ interface GISAID {
   gisaid_id?: string;
 }
 
+interface Lineage {
+  last_updated: unknown;
+  lineage: unknown;
+  probability: unknown;
+  version: unknown;
+}
+
 interface Sample extends BioinformaticsType {
   type: "Sample";
   privateId: string;
@@ -17,6 +24,7 @@ interface Sample extends BioinformaticsType {
   collectionLocation: string;
   gisaid: GISAID;
   CZBFailedGenomeRecovery: boolean;
+  lineage: Lineage;
 }
 
 interface Tree extends BioinformaticsType {

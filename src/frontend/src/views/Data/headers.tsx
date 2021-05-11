@@ -29,6 +29,37 @@ export const SAMPLE_HEADERS: Header[] = [
   },
 ];
 
+export const SAMPLE_SUBHEADERS: Record<string, Header[]> = {
+  lineage: [
+    {
+      key: "lineage",
+      text: "Lineage"
+    },
+    {
+      key: "probability",
+      text: "Probability",
+    },
+    {
+      key: "last_updated",
+      text: "Last Updated",
+    },
+    {
+      key: "version",
+      text: "Version",
+    },
+  ],
+  gisaid: [
+    {
+      key: "status",
+      text: "GISAID Status",
+    },
+    {
+      key: "gisaid_id",
+      text: "GISAID ID"
+    }
+  ]
+}
+
 export const TREE_HEADERS: Header[] = [
   {
     key: "name",

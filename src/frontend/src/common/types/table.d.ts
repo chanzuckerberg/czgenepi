@@ -4,7 +4,7 @@ interface Header {
   key: string | number;
 }
 
-type TableItem = Record<string | number, JSONPrimitive>;
+type TableItem = Record<string | number, JSONPrimitive | Record<string, JSONPrimitive>;
 
 interface CustomTableRenderProps {
   header: Header;

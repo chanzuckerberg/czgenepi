@@ -8,12 +8,11 @@
   flex-direction: column;
 
   .searchBar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
     margin-bottom: $space-l;
-    width: 20em;
-
-    > div {
-      width: 100%;
-    }
 
     input {
       border-radius: $border-radius-l !important;
@@ -24,6 +23,15 @@
 
       &:focus {
         border-color: $primary;
+      }
+    }
+
+    .searchInput {
+      width: 25%;
+      min-width: 20em;
+
+      > div {
+        width: 100%;
       }
     }
   }
