@@ -22,39 +22,43 @@ COUNTY_INFO='{
         "sfpdh": {"external_project_id": "RR083e"},
         "tulare": {"external_project_id": "RR081e"}
 }'
-IFS=$'\n' COUNTIES=($(echo "$COUNTY_INFO" | jq -r 'keys[]'))
+IFS=$'\n' COUNTIES=($(jq -r 'keys[]' <<< "$COUNTY_INFO"))
 
 ################################################################################
 # import all the DPH users
 
 for county in "${COUNTIES[@]}"; do
-    for project_id in $(echo "$COUNTY_INFO" | jq -r "([.$county.external_project_id | select(.)] + (.$county.internal_project_ids // []))[]"); do
-        echo "Importing users for $county from $project_id..."
-        import_users_output=$(aspen-cli db --local import-covidhub-users --rr-project-id "$project_id" --covidhub-db-secret cliahub/cliahub_rds_read_prod  --covidhub-aws-profile biohub)
-        COUNTY_INFO=$(echo "$COUNTY_INFO" | jq -r ".$county.aspen_group_id = $(echo "$import_users_output" | jq -r .group_id)")
-        break
-    done
+    # This builds an array of the external project id, followed by all the internal project ids.  It
+    # grabs the first one and imports the users from that project.
+    project_id=$(jq -r "([.$county.external_project_id | select(.)] + (.$county.internal_project_ids // []))[0]" <<< "$COUNTY_INFO")
+    echo "Importing users for $county from $project_id..."
+
+    # aspen-cli db import-covidhub-users spits out a json structure to stdout.  capture the output.
+    import_users_output=$(aspen-cli db --local import-covidhub-users --rr-project-id "$project_id" --covidhub-db-secret cliahub/cliahub_rds_read_prod --covidhub-aws-profile biohub)
+
+    # Inject the group_id back into the COUNTY_INFO data structure.
+    COUNTY_INFO=$(jq -r ".$county.aspen_group_id = $(jq -r .group_id <<< "$import_users_output")" <<< "$COUNTY_INFO")
 done
 
 for county in "${COUNTIES[@]}"; do
-    aspen_group_id=$(echo "$COUNTY_INFO" | jq -r ".$county".aspen_group_id)
-    if [ "$(echo "$COUNTY_INFO" | jq ".$county | has(\"internal_project_ids\")")" = "true" ]; then
+    aspen_group_id=$(jq -r ".$county".aspen_group_id <<< "$COUNTY_INFO")
+    if [ "$(jq ".$county | has(\"internal_project_ids\")" <<< "$COUNTY_INFO")" = "true" ]; then
         echo "Importing internal samples for $county..."
-        for internal_project_id in $(echo "$COUNTY_INFO" | jq -r ".$county".internal_project_ids[]); do
+        for internal_project_id in $(jq -r ".$county".internal_project_ids[] <<< "$COUNTY_INFO"); do
             aspen-cli db --local import-covidhub-project --rr-project-id "$internal_project_id" --covidhub-db-secret cliahub/cliahub_rds_read_prod  --covidhub-aws-profile biohub --aspen-group-id "$aspen_group_id"
         done
     fi
 
-    if [ "$(echo "$COUNTY_INFO" | jq ".$county | has(\"external_project_id\")")" = "true" ]; then
+    if [ "$(jq ".$county | has(\"external_project_id\")" <<< "$COUNTY_INFO")" = "true" ]; then
         echo "Importing external samples for $county..."
-        external_project_id=$(echo "$COUNTY_INFO" | jq -r ".$county".external_project_id)
+        external_project_id=$(jq -r ".$county".external_project_id <<< "$COUNTY_INFO")
         aspen-cli db --local import-covidhub-project --rr-project-id "$external_project_id" --covidhub-db-secret cliahub/cliahub_rds_read_prod  --covidhub-aws-profile biohub --aspen-group-id "$aspen_group_id"
     fi
 done
 
 for county in "${COUNTIES[@]}"; do
-    if [ "$(echo "$COUNTY_INFO" | jq ".$county.skip_tree_import")" != "true" ]; then
-        aspen_group_id=$(echo "$COUNTY_INFO" | jq -r ".$county".aspen_group_id)
+    if [ "$(jq ".$county.skip_tree_import" <<< "$COUNTY_INFO")" != "true" ]; then
+        aspen_group_id=$(jq -r ".$county".aspen_group_id <<< "$COUNTY_INFO")
         aspen-cli db --local import-covidhub-trees --covidhub-aws-profile biohub --s3-src-prefix s3://covidtracker-datasets/cdph/"$county" --s3-key-prefix /imported/phylo_trees/"$county" --aspen-group-id "$aspen_group_id"
     fi
 done
