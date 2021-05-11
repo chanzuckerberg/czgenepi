@@ -1,7 +1,7 @@
 import cx from "classnames";
 import React from "react";
 import { API } from "src/common/api";
-import LogoImage from "src/common/images/logo.png";
+import LogoImage from "src/common/images/logo.svg";
 import { ROUTES } from "src/common/routes";
 import UserMenu from "./components/UserMenu";
 import style from "./index.module.scss";

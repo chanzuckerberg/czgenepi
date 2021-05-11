@@ -3,7 +3,7 @@ import { getSpacings } from "czifui";
 import { Link } from "react-router-dom";
 
 export const Logo = styled.img`
-  width: 60px;
+  height: 25px;
 
   ${(props) => {
     const spacings = getSpacings(props);
