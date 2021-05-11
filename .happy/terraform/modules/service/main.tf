@@ -40,7 +40,7 @@ resource aws_ecs_task_definition task_definition {
         "value": "${var.remote_dev_prefix}"
       },
       {
-        "name": "AUTH0_CONFIG_SECRET_NAME",
+        "name": "ASPEN_CONFIG_SECRET_NAME",
         "value": "${var.deployment_stage}/aspen-config"
       },
       {

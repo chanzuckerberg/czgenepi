@@ -85,7 +85,7 @@ class Config(object):
         # https://github.com/python/mypy/issues/1362
         session = aws.session()
 
-        secret_name = os.environ.get("AUTH0_CONFIG_SECRET_NAME", "aspen-config")
+        secret_name = os.environ.get("ASPEN_CONFIG_SECRET_NAME", "aspen-config")
         client = session.client(
             service_name="secretsmanager", endpoint_url=os.getenv("BOTO_ENDPOINT_URL")
         )
