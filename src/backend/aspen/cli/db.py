@@ -2,6 +2,7 @@ import datetime
 import json
 import os
 from typing import Iterable, MutableSequence, Optional, Sequence, Type
+import subprocess
 
 import boto3
 import click
@@ -329,20 +330,22 @@ def create_phylo_run(
 
         workflow_id = workflow.workflow_id
 
-    batch_client = boto3.client("batch")
-    # TODO: in an ideal world, some of these constants should be shared with the
-    # terraform scripts.
-    batch_client.submit_job(
-        jobName="nextstrain",
-        jobQueue="aspen-batch",
-        jobDefinition="aspen-batch-job-definition",
-        containerOverrides={
-            "command": [
-                git_refspec,
-                "src/backend/aspen/workflows/nextstrain_run/build_tree.sh",
-                str(workflow_id),
-            ],
-            "vcpus": 4,
-            "memory": 32000,
-        },
+    subprocess.run(["sh", "/usr/src/app/aspen/src/backend/aspen/workflows/nextstrain_run/build_tree.sh"] + workflow_id)
+
+    # batch_client = boto3.client("batch")
+    # # TODO: in an ideal world, some of these constants should be shared with the
+    # # terraform scripts.
+    # batch_client.submit_job(
+    #     jobName="nextstrain",
+    #     jobQueue="aspen-batch",
+    #     jobDefinition="aspen-batch-job-definition",
+    #     containerOverrides={
+    #         "command": [
+    #             git_refspec,
+    #             "src/backend/aspen/workflows/nextstrain_run/build_tree.sh",
+    #             str(workflow_id),
+    #         ],
+    #         "vcpus": 4,
+    #         "memory": 32000,
+    #     },
     )

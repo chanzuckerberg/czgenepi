@@ -27,8 +27,12 @@ task nextstrain_workflow {
     command <<<
     set -Eeuo pipefail
     shopt -s inherit_errexit
-    cd /aspen/src/backend/aspen/workflows/nextstrain_run
-    sh build_tree.sh ~{phylo_run_id}
+
+    aspen-cli db create-phylo-run  \
+      --group-name "Orange County Public Health Lab"  \
+      --all-group-sequences  \
+      --builds-template-file /usr/src/app/aspen/src/backend/aspen/workflows/nextstrain_run/group.yaml  \
+      --builds-template-args '{"division": "California", "location": "Orange County"}'
     >>>
 
     runtime {

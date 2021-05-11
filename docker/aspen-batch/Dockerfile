@@ -2,29 +2,66 @@
 ##
 ##
 FROM nextstrain/base
-ARG REVSPEC=trunk
-ARG ASPEN_DOCKER_IMAGE_VERSION
-ENV ASPEN_DOCKER_IMAGE_VERSION=${ASPEN_DOCKER_IMAGE_VERSION}
+ARG DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get install -y git
+LABEL maintainer = "Aspen"
+LABEL description = "Image for Aspen nextstrain workflow"
 
-WORKDIR /aspen
+RUN sed -i s/archive.ubuntu.com/us-west-2.ec2.archive.ubuntu.com/ /etc/apt/sources.list; \
+    echo 'APT::Install-Recommends "false";' > /etc/apt/apt.conf.d/98idseq; \
+    echo 'APT::Install-Suggests "false";' > /etc/apt/apt.conf.d/99idseq
 
-# Prepopulate the virtual environment by installing the dependencies of aspen as of a fixed rev.
-# Assuming the dependencies do not change from the time the docker image is built to the time the
-# docker image is used, this cuts startup time for the docker image.  If the dependencies DO change,
-# then pip will uninstall the prepopulated dependencies and install the correct dependencies.
-RUN mkdir /tmp/aspen-tmp
-RUN cd /tmp/aspen-tmp
-RUN git init
-RUN git fetch --depth 1 git://github.com/chanzuckerberg/aspen $REVSPEC
-RUN git checkout FETCH_HEAD
-RUN python3.7 -m venv /aspen/.venv
-RUN /aspen/.venv/bin/pip install -U pip
-RUN /aspen/.venv/bin/pip install -e src/backend/third-party/sqlalchemy-enum-tables/
-RUN /aspen/.venv/bin/pip install -e src/backend/
-RUN cd /
-RUN rm -rf /tmp/aspen-tmp
+RUN apt-get -qq update && apt-get -qq -y install \
+    git \
+    jq \
+    moreutils \
+    curl \
+    locales \
+    zip \
+    unzip \
+    httpie \
+    zlib1g-dev \
+    libhts-dev \
+    pkg-config \
+    apt-utils \
+    python3-pip \
+    python3-setuptools \
+    python3-wheel \
+    python3-yaml \
+    python3-dateutil \
+    python3-biopython \
+    python3-regex \
+    python3-dev \
+    virtualenv \
+    awscli \
+    xz-utils \
+    zstd \
+    snakemake \
+    mafft \
+    wget \
+    make \
+    gcc \
+    && locale-gen en_US.UTF-8
+RUN pip3 install --no-cache-dir awscli pipenv
 
-COPY docker-entrypoint.sh /usr/local/bin/
-ENTRYPOINT ["docker-entrypoint.sh"]
+ENV FLASK_ENV=development
+ENV PIPENV_PYTHON=/usr/src/app/
+
+RUN pip3 install nextstrain-cli csv-diff s3fs[boto3] aiobotocore[awscli,boto3] envdir fsspec pandas
+
+RUN mkdir /ncov && \
+    cd /ncov && \
+    git init && \
+    git remote add origin https://github.com/nextstrain/ncov.git && \
+    git fetch origin 3e9ad400593b24cf94d24cdb56366f339f5a165b && \
+    git reset --hard FETCH_HEAD
+
+WORKDIR /usr/src/app
+COPY requirements.txt .
+COPY Pipfile* ./
+COPY third-party ./third-party/
+COPY setup.py .
+RUN pipenv install --dev --system --verbose && pipenv --clear
+
+COPY . .
+RUN pip3 install . third-party/sqlalchemy-enum-tables
