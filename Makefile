@@ -33,9 +33,9 @@ remote-pgconsole: # Get a psql console on a remote db (from OSX only!)
 	export ENV=$${ENV:=rdev}; \
 	export AWS_PROFILE=$(shell [ $(ENV) = prod ] && echo $(AWS_PROD_PROFILE) || echo $(AWS_DEV_PROFILE)); \
 	export config=$$(aws secretsmanager get-secret-value --secret-id $${ENV}/aspen-config | jq -r .SecretString ); \
-	export DB_URI=$$(jq -r '"postgresql://\(.DB.admin_username):\(.DB.admin_password)@127.0.0.1:5556/$(DB)"' <<< $$config); \
-	echo Connecting to $$(jq -r .DB.address <<< $$config)/$(DB) via $$(jq -r .bastion_host <<< $$config); \
-	ssh -f -o ExitOnForwardFailure=yes -L 5556:$$(jq -r .DB.address <<< $$config):5432 $$(jq -r .bastion_host <<< $$config) sleep 10; \
+	export DB_URI=$$(jq -r '"postgresql://\(.DB_admin_username):\(.DB_admin_password)@127.0.0.1:5556/$(DB)"' <<< $$config); \
+	echo Connecting to $$(jq -r .DB_address <<< $$config)/$(DB) via $$(jq -r .bastion_host <<< $$config); \
+	ssh -f -o ExitOnForwardFailure=yes -L 5556:$$(jq -r .DB_address <<< $$config):5432 $$(jq -r .bastion_host <<< $$config) sleep 10; \
 	psql $${DB_URI}
 
 remote-dbconsole: .env.ecr # Get a python console on a remote db (from OSX only!)
@@ -43,9 +43,9 @@ remote-dbconsole: .env.ecr # Get a python console on a remote db (from OSX only!
 	export AWS_PROFILE=$(shell [ $(ENV) = prod ] && echo $(AWS_PROD_PROFILE) || echo $(AWS_DEV_PROFILE)); \
 	export config=$$(aws secretsmanager get-secret-value --secret-id $${ENV}/aspen-config | jq -r .SecretString ); \
 	export OSX_IP=$$(ipconfig getifaddr en0 || ipconfig getifaddr en1); \
-	export DB_URI=$$(jq -r '"postgresql://\(.DB.admin_username):\(.DB.admin_password)@'$${OSX_IP}':5555/$(DB)"' <<< $$config); \
-	echo Connecting to $$(jq -r .DB.address <<< $$config)/$(DB) via $$(jq -r .bastion_host <<< $$config); \
-	ssh -f -o ExitOnForwardFailure=yes -L $${OSX_IP}:5555:$$(jq -r .DB.address <<< $$config):5432 $$(jq -r .bastion_host <<< $$config) sleep 20; \
+	export DB_URI=$$(jq -r '"postgresql://\(.DB_admin_username):\(.DB_admin_password)@'$${OSX_IP}':5555/$(DB)"' <<< $$config); \
+	echo Connecting to $$(jq -r .DB_address <<< $$config)/$(DB) via $$(jq -r .bastion_host <<< $$config); \
+	ssh -f -o ExitOnForwardFailure=yes -L $${OSX_IP}:5555:$$(jq -r .DB_address <<< $$config):5432 $$(jq -r .bastion_host <<< $$config) sleep 20; \
 	docker-compose $(COMPOSE_OPTS) run -e DB_URI backend sh -c 'pip install . && aspen-cli db --remote interact --connect'
 
 ### DOCKER LOCAL DEV #########################################
@@ -90,7 +90,7 @@ init-empty-db:
 	-docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@localhost:5432/$(LOCAL_DB_NAME)" -c "CREATE USER $(LOCAL_DB_RW_USERNAME) WITH PASSWORD '$(LOCAL_DB_RW_PASSWORD)';"
 	-docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@localhost:5432/$(LOCAL_DB_NAME)" -c "CREATE USER $(LOCAL_DB_RO_USERNAME) WITH PASSWORD '$(LOCAL_DB_RO_PASSWORD)';"
 	-docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@localhost:5432/$(LOCAL_DB_NAME)" -c "GRANT ALL PRIVILEGES ON DATABASE $(LOCAL_DB_NAME) TO $(LOCAL_DB_RW_USERNAME);"
-	docker-compose exec -T utility aspen-cli db --docker create
+	docker-compose exec -T utility aspen-cli db --local create
 	docker-compose exec -T utility alembic stamp head
 
 
@@ -168,11 +168,11 @@ local-pgconsole: ## Connect to the local postgres database.
 
 .PHONY: local-dbconsole
 local-dbconsole: ## Connect to the local postgres database.
-	docker-compose exec utility aspen-cli db --docker interact
+	docker-compose exec utility aspen-cli db --local interact
 
 .PHONY: local-dbconsole-profile
 local-dbconsole-profile: ## Connect to the local postgres database and profile queries.
-	docker-compose exec utility aspen-cli db --docker interact --profile
+	docker-compose exec utility aspen-cli db --local interact --profile
 
 .PHONY: local-update-deps
 local-update-deps: ## Update requirements.txt to reflect pipenv file changes.

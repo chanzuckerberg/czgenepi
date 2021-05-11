@@ -29,5 +29,13 @@ ${local_aws} secretsmanager update-secret --secret-id aspen-config --secret-stri
   "AUTH0_USERINFO_URL": "connect/userinfo",
   "AUTH0_ACCESS_TOKEN_URL": "'"${OIDC_INTERNAL_URL}"'/connect/token",
   "AUTH0_AUTHORIZE_URL": "'"${OIDC_BROWSER_URL}"'/connect/authorize",
-  "AUTH0_CLIENT_KWARGS": {"scope": "openid profile email offline_access"}
+  "AUTH0_CLIENT_KWARGS": {"scope": "openid profile email offline_access"},
+  "FLASK_SECRET": "DevelopmentKey",
+  "DB_rw_username": "user_rw",
+  "DB_rw_password": "password_rw",
+  "DB_address": "database",
+  "S3_external_auspice_bucket": "aspen-external-auspice-data"
 }' || true
+
+echo "Creating s3 buckets"
+${local_aws} s3api head-bucket --bucket aspen-external-auspice-data || ${local_aws} s3 mb s3://aspen-external-auspice-data

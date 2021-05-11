@@ -48,6 +48,14 @@ def test_samples_view(
                 "upload_date": api_utils.format_datetime(
                     uploaded_pathogen_genome.upload_date
                 ),
+                "lineage": {
+                    "lineage": uploaded_pathogen_genome.pangolin_lineage,
+                    "probability": uploaded_pathogen_genome.pangolin_probability,
+                    "version": uploaded_pathogen_genome.pangolin_version,
+                    "last_updated": api_utils.format_date(
+                        uploaded_pathogen_genome.pangolin_last_updated
+                    ),
+                },
             }
         ]
     }
@@ -91,6 +99,14 @@ def test_samples_view_gisaid_rejected(
                 "upload_date": api_utils.format_datetime(
                     uploaded_pathogen_genome.upload_date
                 ),
+                "lineage": {
+                    "lineage": uploaded_pathogen_genome.pangolin_lineage,
+                    "probability": uploaded_pathogen_genome.pangolin_probability,
+                    "version": uploaded_pathogen_genome.pangolin_version,
+                    "last_updated": api_utils.format_date(
+                        uploaded_pathogen_genome.pangolin_last_updated
+                    ),
+                },
             }
         ]
     }
@@ -106,7 +122,11 @@ def test_samples_view_gisaid_no_info(
     user = user_factory(group)
     sample = sample_factory(group)
     # Test no GISAID accession logic
-    uploaded_pathogen_genome = uploaded_pathogen_genome_factory(sample, accessions=())
+    uploaded_pathogen_genome = uploaded_pathogen_genome_factory(
+        sample,
+        accessions=(),
+    )
+
     session.add(group)
     session.commit()
     with client.session_transaction() as sess:
@@ -124,6 +144,14 @@ def test_samples_view_gisaid_no_info(
                 "upload_date": api_utils.format_datetime(
                     uploaded_pathogen_genome.upload_date
                 ),
+                "lineage": {
+                    "lineage": uploaded_pathogen_genome.pangolin_lineage,
+                    "probability": uploaded_pathogen_genome.pangolin_probability,
+                    "version": uploaded_pathogen_genome.pangolin_version,
+                    "last_updated": api_utils.format_date(
+                        uploaded_pathogen_genome.pangolin_last_updated
+                    ),
+                },
             }
         ]
     }
@@ -137,7 +165,7 @@ def test_samples_view_gisaid_not_eligible(
 ):
     group = group_factory()
     user = user_factory(group)
-    # Maek the sample as failed
+    # Mark the sample as failed
     sample = sample_factory(group, czb_failed_genome_recovery=True)
     session.add(group)
     session.commit()
@@ -154,6 +182,12 @@ def test_samples_view_gisaid_not_eligible(
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
                 "upload_date": api_utils.format_datetime(None),
+                "lineage": {
+                    "lineage": None,
+                    "probability": None,
+                    "version": None,
+                    "last_updated": None,
+                },
             }
         ]
     }
@@ -197,6 +231,14 @@ def test_samples_view_gisaid_submitted(
                 "upload_date": api_utils.format_datetime(
                     uploaded_pathogen_genome.upload_date
                 ),
+                "lineage": {
+                    "lineage": uploaded_pathogen_genome.pangolin_lineage,
+                    "probability": uploaded_pathogen_genome.pangolin_probability,
+                    "version": uploaded_pathogen_genome.pangolin_version,
+                    "last_updated": api_utils.format_date(
+                        uploaded_pathogen_genome.pangolin_last_updated
+                    ),
+                },
             }
         ]
     }
@@ -214,7 +256,7 @@ def _test_samples_view_cansee(
     viewer_group = group_factory(name="cdph")
     user = user_factory(viewer_group, **user_factory_kwargs)
     sample = sample_factory(owner_group)
-    uploaded_pathogen_genome_collection = uploaded_pathogen_genome_factory(sample)
+    uploaded_pathogen_genome = uploaded_pathogen_genome_factory(sample)
     for cansee_datatype in cansee_datatypes:
         CanSee(
             viewer_group=viewer_group,
@@ -229,7 +271,7 @@ def _test_samples_view_cansee(
     res = client.get("/api/samples")
     return (
         sample,
-        uploaded_pathogen_genome_collection,
+        uploaded_pathogen_genome,
         json.loads(res.get_data(as_text=True))[SAMPLE_KEY],
     )
 
@@ -252,7 +294,8 @@ def test_samples_view_system_admin(
     app,
     client,
 ):
-    sample, uploaded_pathogen_genome_collection, samples = _test_samples_view_cansee(
+
+    sample, uploaded_pathogen_genome, samples = _test_samples_view_cansee(
         session,
         client,
         cansee_datatypes=(),
@@ -267,15 +310,21 @@ def test_samples_view_system_admin(
             "czb_failed_genome_recovery": False,
             "gisaid": {
                 "status": "accepted",
-                "gisaid_id": uploaded_pathogen_genome_collection.accessions()[
-                    0
-                ].public_identifier,
+                "gisaid_id": uploaded_pathogen_genome.accessions()[0].public_identifier,
             },
             "private_identifier": sample.private_identifier,
             "public_identifier": sample.public_identifier,
             "upload_date": api_utils.format_datetime(
-                uploaded_pathogen_genome_collection.upload_date
+                uploaded_pathogen_genome.upload_date
             ),
+            "lineage": {
+                "lineage": uploaded_pathogen_genome.pangolin_lineage,
+                "probability": uploaded_pathogen_genome.pangolin_probability,
+                "version": uploaded_pathogen_genome.pangolin_version,
+                "last_updated": api_utils.format_date(
+                    uploaded_pathogen_genome.pangolin_last_updated
+                ),
+            },
         }
     ]
 
@@ -311,7 +360,7 @@ def test_samples_view_cansee_metadata(
     app,
     client,
 ):
-    sample, uploaded_pathogen_genome_collection, samples = _test_samples_view_cansee(
+    sample, uploaded_pathogen_genome, samples = _test_samples_view_cansee(
         session,
         client,
         cansee_datatypes=(DataType.METADATA,),
@@ -325,14 +374,20 @@ def test_samples_view_cansee_metadata(
             "czb_failed_genome_recovery": False,
             "gisaid": {
                 "status": "accepted",
-                "gisaid_id": uploaded_pathogen_genome_collection.accessions()[
-                    0
-                ].public_identifier,
+                "gisaid_id": uploaded_pathogen_genome.accessions()[0].public_identifier,
             },
             "public_identifier": sample.public_identifier,
             "upload_date": api_utils.format_datetime(
-                uploaded_pathogen_genome_collection.upload_date
+                uploaded_pathogen_genome.upload_date
             ),
+            "lineage": {
+                "lineage": uploaded_pathogen_genome.pangolin_lineage,
+                "probability": uploaded_pathogen_genome.pangolin_probability,
+                "version": uploaded_pathogen_genome.pangolin_version,
+                "last_updated": api_utils.format_date(
+                    uploaded_pathogen_genome.pangolin_last_updated
+                ),
+            },
         }
     ]
 
@@ -359,7 +414,8 @@ def test_samples_view_cansee_all(
     app,
     client,
 ):
-    sample, uploaded_pathogen_genome_collection, samples = _test_samples_view_cansee(
+
+    sample, uploaded_pathogen_genome, samples = _test_samples_view_cansee(
         session,
         client,
         cansee_datatypes=(DataType.METADATA, DataType.PRIVATE_IDENTIFIERS),
@@ -373,15 +429,21 @@ def test_samples_view_cansee_all(
             "czb_failed_genome_recovery": False,
             "gisaid": {
                 "status": "accepted",
-                "gisaid_id": uploaded_pathogen_genome_collection.accessions()[
-                    0
-                ].public_identifier,
+                "gisaid_id": uploaded_pathogen_genome.accessions()[0].public_identifier,
             },
             "private_identifier": sample.private_identifier,
             "public_identifier": sample.public_identifier,
             "upload_date": api_utils.format_datetime(
-                uploaded_pathogen_genome_collection.upload_date
+                uploaded_pathogen_genome.upload_date
             ),
+            "lineage": {
+                "lineage": uploaded_pathogen_genome.pangolin_lineage,
+                "probability": uploaded_pathogen_genome.pangolin_probability,
+                "version": uploaded_pathogen_genome.pangolin_version,
+                "last_updated": api_utils.format_date(
+                    uploaded_pathogen_genome.pangolin_last_updated
+                ),
+            },
         }
     ]
 
@@ -414,6 +476,7 @@ def test_samples_failed_accession(
             ),
         ),
     )
+
     for accession in uploaded_pathogen_genome.accessions():
         print(type(accession))
     session.add(group)
@@ -436,6 +499,14 @@ def test_samples_failed_accession(
                 "upload_date": api_utils.format_datetime(
                     uploaded_pathogen_genome.upload_date
                 ),
+                "lineage": {
+                    "lineage": uploaded_pathogen_genome.pangolin_lineage,
+                    "probability": uploaded_pathogen_genome.pangolin_probability,
+                    "version": uploaded_pathogen_genome.pangolin_version,
+                    "last_updated": api_utils.format_date(
+                        uploaded_pathogen_genome.pangolin_last_updated
+                    ),
+                },
             }
         ]
     }
@@ -490,6 +561,63 @@ def test_samples_multiple_accession(
                 "upload_date": api_utils.format_datetime(
                     uploaded_pathogen_genome.upload_date
                 ),
+                "lineage": {
+                    "lineage": uploaded_pathogen_genome.pangolin_lineage,
+                    "probability": uploaded_pathogen_genome.pangolin_probability,
+                    "version": uploaded_pathogen_genome.pangolin_version,
+                    "last_updated": api_utils.format_date(
+                        uploaded_pathogen_genome.pangolin_last_updated
+                    ),
+                },
+            }
+        ]
+    }
+    assert expected == json.loads(res.get_data(as_text=True))
+
+
+def test_samples_view_no_pangolin(
+    session,
+    app,
+    client,
+):
+    group = group_factory()
+    user = user_factory(group)
+    sample = sample_factory(group)
+    uploaded_pathogen_genome = uploaded_pathogen_genome_factory(
+        sample,
+        pangolin_lineage=None,
+        pangolin_probability=None,
+        pangolin_version=None,
+        pangolin_last_updated=None,
+    )
+    session.add(group)
+    session.commit()
+    with client.session_transaction() as sess:
+        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
+    res = client.get("/api/samples")
+    expected = {
+        SAMPLE_KEY: [
+            {
+                "collection_date": api_utils.format_date(sample.collection_date),
+                "collection_location": sample.location,
+                "czb_failed_genome_recovery": False,
+                "gisaid": {
+                    "status": "accepted",
+                    "gisaid_id": uploaded_pathogen_genome.accessions()[
+                        0
+                    ].public_identifier,
+                },
+                "private_identifier": sample.private_identifier,
+                "public_identifier": sample.public_identifier,
+                "upload_date": api_utils.format_datetime(
+                    uploaded_pathogen_genome.upload_date
+                ),
+                "lineage": {
+                    "lineage": None,
+                    "probability": None,
+                    "version": None,
+                    "last_updated": "N/A",
+                },
             }
         ]
     }

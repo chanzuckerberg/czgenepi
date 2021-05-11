@@ -26,6 +26,10 @@ def create_test_data(session):
         pathogen_genome: UploadedPathogenGenome = uploaded_pathogen_genome_factory(
             sample,
             accessions=(),
+            pangolin_lineage=None,
+            pangolin_probability=None,
+            pangolin_version=None,
+            pangolin_last_updated=None,
         )
         session.add(pathogen_genome)
         session.commit()
@@ -33,7 +37,7 @@ def create_test_data(session):
 
 def mock_remote_db_uri(mocker, test_postgres_db_uri):
     mocker.patch(
-        "aspen.config.config.RemoteDatabaseConfig.DATABASE_URI",
+        "aspen.config.config.Config.DATABASE_URI",
         new_callable=mocker.PropertyMock,
         return_value=test_postgres_db_uri,
     )

@@ -217,7 +217,7 @@ module swipe_batch {
   app_name              = "swipe"
   stack_resource_prefix = local.stack_resource_prefix
   batch_role_arn        = local.batch_role_arn
-  swipe_image            = "${local.swipe_image_repo}:rev-3" # FIXME rev shouldn't be hardcoded
+  swipe_image            = "${local.swipe_image_repo}:rev-5" # FIXME rev shouldn't be hardcoded
   custom_stack_name     = local.custom_stack_name
   remote_dev_prefix     = local.remote_dev_prefix
   deployment_stage      = local.deployment_stage

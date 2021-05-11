@@ -4,7 +4,7 @@ from typing import Iterable
 
 from sqlalchemy.orm import joinedload
 
-from aspen.config.config import RemoteDatabaseConfig
+from aspen.config.config import Config
 from aspen.database.connection import (
     get_db_uri,
     init_db,
@@ -25,7 +25,7 @@ def check_latest_pangolin_version() -> str:
 
 
 def find_samples():
-    interface: SqlAlchemyInterface = init_db(get_db_uri(RemoteDatabaseConfig()))
+    interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
     most_recent_pango_version: str = check_latest_pangolin_version()
 
     with session_scope(interface) as session:
@@ -39,11 +39,12 @@ def find_samples():
         # once we update this field to be a date instead of string
 
         samples_to_be_updated: Iterable[str] = [
-            s.public_identifier
-            for s in all_samples
-            if (s.uploaded_pathogen_genome.pangolin_version is None)
-            or (
-                s.uploaded_pathogen_genome.pangolin_version != most_recent_pango_version
+            sample.public_identifier
+            for sample in all_samples
+            if (
+                sample.uploaded_pathogen_genome is not None
+                and sample.uploaded_pathogen_genome.pangolin_version
+                != most_recent_pango_version
             )
         ]
 
