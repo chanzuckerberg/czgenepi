@@ -4,7 +4,7 @@ from typing import Iterable
 
 from sqlalchemy.orm import joinedload
 
-from aspen.config.config import RemoteDatabaseConfig
+from aspen.config.config import Config
 from aspen.database.connection import (
     get_db_uri,
     init_db,
@@ -25,7 +25,7 @@ def check_latest_pangolin_version() -> str:
 
 
 def find_samples():
-    interface: SqlAlchemyInterface = init_db(get_db_uri(RemoteDatabaseConfig()))
+    interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
     most_recent_pango_version: str = check_latest_pangolin_version()
 
     with session_scope(interface) as session:
