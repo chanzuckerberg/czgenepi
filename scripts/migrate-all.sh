@@ -52,5 +52,5 @@ done
 
 for county in "${COUNTIES[@]}"; do
     aspen_group_id=$(echo "$COUNTY_INFO" | jq -r ".$county".aspen_group_id)
-    aspen-cli db --local import-covidhub-trees --covidhub-aws-profile biohub --s3-src-prefix s3://covidtracker-datasets/cdph/"$county" --s3-dst-prefix s3://aspen-db-data-dev/imported/phylo_trees/"$county" --aspen-group-id "$aspen_group_id"
+    aspen-cli db --local import-covidhub-trees --covidhub-aws-profile biohub --s3-src-prefix s3://covidtracker-datasets/cdph/"$county" --s3-key-prefix /imported/phylo_trees/"$county" --aspen-group-id "$aspen_group_id"
 done
