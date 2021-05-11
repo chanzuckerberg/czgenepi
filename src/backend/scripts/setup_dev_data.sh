@@ -33,5 +33,9 @@ ${local_aws} secretsmanager update-secret --secret-id aspen-config --secret-stri
   "FLASK_SECRET": "DevelopmentKey",
   "DB_rw_username": "user_rw",
   "DB_rw_password": "password_rw",
-  "DB_address": "database"
+  "DB_address": "database",
+  "S3_external_auspice_bucket": "aspen-external-auspice-data"
 }' || true
+
+echo "Creating s3 buckets"
+${local_aws} s3api head-bucket --bucket aspen-external-auspice-data || ${local_aws} s3 mb s3://aspen-external-auspice-data
