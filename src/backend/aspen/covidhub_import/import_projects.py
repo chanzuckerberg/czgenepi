@@ -25,6 +25,7 @@ from aspen.database.models import (
     RegionType,
     Sample,
     UploadedPathogenGenome,
+    WorkflowStatusType,
 )
 from covid_database import init_db as covidhub_init_db
 from covid_database import SqlAlchemyInterface as CSqlAlchemyInterface
@@ -323,5 +324,13 @@ def import_project(
                                 workflow_start_datetime=datetime.datetime.now(),
                                 workflow_end_datetime=datetime.datetime.now(),
                             )
+                else:
+                    sample.uploaded_pathogen_genome.consuming_workflows.append(
+                        GisaidAccessionWorkflow(
+                            software_versions={},
+                            workflow_status=WorkflowStatusType.FAILED,
+                            start_datetime=datetime.datetime.now(),
+                        )
+                    )
             else:
                 sample.czb_failed_genome_recovery = True
