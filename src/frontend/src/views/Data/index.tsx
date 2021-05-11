@@ -6,7 +6,7 @@ import { fetchSamples, fetchTrees } from "src/common/api";
 import { DataSubview } from "src/common/components";
 import { SampleRenderer, TreeRenderer } from "./cellRenderers";
 import { SampleHeader } from "./headerRenderer";
-import { SAMPLE_HEADERS, TREE_HEADERS } from "./headers";
+import { SAMPLE_HEADERS, SAMPLE_SUBHEADERS, TREE_HEADERS } from "./headers";
 import style from "./index.module.scss";
 import { Container } from "./style";
 import { TREE_TRANSFORMS } from "./transforms";
@@ -46,6 +46,7 @@ const Data: FunctionComponent = () => {
       headers: SAMPLE_HEADERS,
       isDataLoading,
       renderer: SampleRenderer,
+      subheaders: SAMPLE_SUBHEADERS,
       text: "Samples",
       to: "/data/samples",
     },
@@ -54,6 +55,7 @@ const Data: FunctionComponent = () => {
       headers: TREE_HEADERS,
       isDataLoading,
       renderer: TreeRenderer,
+      subheaders: {},
       text: "Phylogenetic Trees",
       to: "/data/phylogenetic_trees",
       transforms: TREE_TRANSFORMS,
@@ -107,8 +109,10 @@ const Data: FunctionComponent = () => {
             isLoading={category.isDataLoading}
             data={category.data}
             headers={category.headers}
+            subheaders={category.subheaders}
             headerRenderer={category.headerRenderer}
             renderer={category.renderer}
+            viewName={category.text}
           />
         )}
       />
