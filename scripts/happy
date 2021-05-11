@@ -799,6 +799,9 @@ class ArtifactBuilder:
         env["BUILDKIT_INLINE_CACHE"] = "1"
         env["COMPOSE_DOCKER_CLI_BUILD"] = "1"
         env["DOCKER_REPO"] = f"{self.config['ecr_repo']}/"
+        env["HAPPY_COMMIT"] = subprocess_output_with_default(["git", "rev-parse", "--verify", "HEAD"])
+        env["HAPPY_BRANCH"] = subprocess_output_with_default(["git", "branch", "--show-current"])
+        env["HAPPY_TAG"] = subprocess_output_with_default(["git", "describe"])
         return env
 
     def build(self, artifacts=None):

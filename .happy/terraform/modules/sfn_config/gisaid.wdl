@@ -114,9 +114,9 @@ task IngestGISAID {
     start_time=$(date +%s)
     build_id=$(date +%Y%m%d-%H%M)
     end_time=$(date +%s)
-    # FIXME!!
-    aspen_workflow_rev=187caf91b4fbaf5cba08f1e31cc2016d1d67e9f5
-    aspen_creation_rev=187caf91b4fbaf5cba08f1e31cc2016d1d67e9f5
+    # These are set by the Dockerfile and the Happy CLI
+    aspen_workflow_rev=$COMMIT_SHA
+    aspen_creation_rev=$COMMIT_SHA
 
     aws configure set region ~{aws_region}
 
@@ -156,8 +156,9 @@ task TransformGISAID {
 
     start_time=$(date +%s)
     build_id=$(date +%Y%m%d-%H%M)
-    aspen_workflow_rev=187caf91b4fbaf5cba08f1e31cc2016d1d67e9f5
-    aspen_creation_rev=187caf91b4fbaf5cba08f1e31cc2016d1d67e9f5
+    # These are set by the Dockerfile and the Happy CLI
+    aspen_workflow_rev=$COMMIT_SHA
+    aspen_creation_rev=$COMMIT_SHA
     
     git clone --depth 1 git://github.com/nextstrain/ncov-ingest /ncov-ingest
     ncov_ingest_git_rev=$(git -C /ncov-ingest rev-parse HEAD)
@@ -246,8 +247,9 @@ task AlignGISAID {
     aws s3 cp /ncov/results/aligned.fasta.zst s3://"${bucket}"/"${sequences_key}"
     aws s3 cp /ncov/data/metadata.tsv s3://"${bucket}"/"${metadata_key}"
 
-    aspen_workflow_rev=187caf91b4fbaf5cba08f1e31cc2016d1d67e9f5
-    aspen_creation_rev=187caf91b4fbaf5cba08f1e31cc2016d1d67e9f5
+    # These are set by the Dockerfile and the Happy CLI
+    aspen_workflow_rev=$COMMIT_SHA
+    aspen_creation_rev=$COMMIT_SHA
 
     end_time=$(date +%s)
 
