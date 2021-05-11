@@ -17,7 +17,7 @@ COUNTY_INFO='{
         "ventura": {"external_project_id": "RR078e"},
         "humboldt": {"external_project_id": "RR075e"},
         "vrdl": {"external_project_id": "RR096e"},
-        "tuolumne": {"internal_project_ids": "RR095i"},
+        "tuolumne": {"internal_project_ids": ["RR095i"]},
         "fresno": {"external_project_id": "RR097e"},
         "sfpdh": {"external_project_id": "RR083e"},
         "tulare": {"external_project_id": "RR081e"}
@@ -28,10 +28,12 @@ IFS=$'\n' COUNTIES=($(echo "$COUNTY_INFO" | jq -r 'keys[]'))
 # import all the DPH users
 
 for county in "${COUNTIES[@]}"; do
-    echo "Importing users for $county..."
-    external_project_id=$(echo "$COUNTY_INFO" | jq -r ."$county".external_project_id)
-    import_users_output=$(aspen-cli db --local import-covidhub-users --rr-project-id "$external_project_id" --covidhub-db-secret cliahub/cliahub_rds_read_prod  --covidhub-aws-profile biohub)
-    COUNTY_INFO=$(echo "$COUNTY_INFO" | jq -r ".$county.aspen_group_id = $(echo "$import_users_output" | jq -r .group_id)")
+    for project_id in $(echo "$COUNTY_INFO" | jq -r "([.$county.external_project_id | select(.)] + (.$county.internal_project_ids // []))[]"); do
+        echo "Importing users for $county from $project_id..."
+        import_users_output=$(aspen-cli db --local import-covidhub-users --rr-project-id "$project_id" --covidhub-db-secret cliahub/cliahub_rds_read_prod  --covidhub-aws-profile biohub)
+        COUNTY_INFO=$(echo "$COUNTY_INFO" | jq -r ".$county.aspen_group_id = $(echo "$import_users_output" | jq -r .group_id)")
+        break
+    done
 done
 
 for county in "${COUNTIES[@]}"; do
