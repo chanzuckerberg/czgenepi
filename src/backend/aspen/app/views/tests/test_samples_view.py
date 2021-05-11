@@ -573,3 +573,52 @@ def test_samples_multiple_accession(
         ]
     }
     assert expected == json.loads(res.get_data(as_text=True))
+
+
+def test_samples_view_no_pangolin(
+    session,
+    app,
+    client,
+):
+    group = group_factory()
+    user = user_factory(group)
+    sample = sample_factory(group)
+    uploaded_pathogen_genome = uploaded_pathogen_genome_factory(
+        sample,
+        pangolin_lineage=None,
+        pangolin_probability=None,
+        pangolin_version=None,
+        pangolin_last_updated=None,
+    )
+    session.add(group)
+    session.commit()
+    with client.session_transaction() as sess:
+        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
+    res = client.get("/api/samples")
+    expected = {
+        SAMPLE_KEY: [
+            {
+                "collection_date": api_utils.format_date(sample.collection_date),
+                "collection_location": sample.location,
+                "czb_failed_genome_recovery": False,
+                "gisaid": {
+                    "status": "accepted",
+                    "gisaid_id": uploaded_pathogen_genome.accessions()[
+                        0
+                    ].public_identifier,
+                },
+                "private_identifier": sample.private_identifier,
+                "public_identifier": sample.public_identifier,
+                "upload_date": api_utils.format_datetime(
+                    uploaded_pathogen_genome.upload_date
+                ),
+                "lineage": {
+                    "lineage": None,
+                    "probability": None,
+                    "version": None,
+                    "last_updated": "N/A",
+                },
+            }
+        ]
+    }
+    assert expected == json.loads(res.get_data(as_text=True))
