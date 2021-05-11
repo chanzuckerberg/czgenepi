@@ -1,4 +1,3 @@
-#FROM ubuntu:20.04
 FROM nextstrain/base
 ARG DEBIAN_FRONTEND=noninteractive
 
