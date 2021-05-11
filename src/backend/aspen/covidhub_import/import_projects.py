@@ -18,12 +18,13 @@ from sqlalchemy.orm import configure_mappers, joinedload, selectin_polymorphic, 
 
 from aspen.database.connection import session_scope, SqlAlchemyInterface
 from aspen.database.models import (
+    GisaidAccession,
+    GisaidAccessionWorkflow,
     Group,
     PublicRepositoryType,
     RegionType,
     Sample,
     UploadedPathogenGenome,
-    Workflow,
 )
 from covid_database import init_db as covidhub_init_db
 from covid_database import SqlAlchemyInterface as CSqlAlchemyInterface
@@ -230,8 +231,14 @@ def import_project(
                 .filter(Sample.submitting_group == group)
                 .options(
                     joinedload(Sample.uploaded_pathogen_genome)
-                    .joinedload(UploadedPathogenGenome.consuming_workflows)
-                    .joinedload(Workflow.outputs)
+                    .joinedload(
+                        UploadedPathogenGenome.consuming_workflows.of_type(  # type: ignore
+                            GisaidAccessionWorkflow
+                        )
+                    )
+                    .joinedload(
+                        GisaidAccessionWorkflow.outputs.of_type(GisaidAccession)  # type: ignore
+                    )
                 )
             )
         }
@@ -303,7 +310,9 @@ def import_project(
                     if repository_type is not None:
                         for accession in sample.uploaded_pathogen_genome.accessions():
                             if (
-                                accession.repository_type == repository_type
+                                isinstance(
+                                    accession, repository_type.value.accession_cls
+                                )
                                 and accession.public_identifier == public_identifier
                             ):
                                 break
