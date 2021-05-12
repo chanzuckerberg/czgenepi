@@ -55,6 +55,9 @@ const UserMenu = ({ user }: UserMenuProps): JSX.Element => {
         <Link to={ROUTES.PRIVACY} target="_blank" rel="noopener">
           <MenuItem onClick={handleClose}>Privacy Policy</MenuItem>
         </Link>
+        <Link to={ROUTES.FAQ} target="_blank" rel="noopener">
+          <MenuItem onClick={handleClose}>FAQ</MenuItem>
+        </Link>
         <a href={process.env.API_URL + API.LOG_OUT}>
           <MenuItem onClick={handleClose}>Logout</MenuItem>
         </a>
