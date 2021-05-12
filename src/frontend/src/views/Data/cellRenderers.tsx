@@ -53,15 +53,26 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
       </RowContent>
     );
   },
-  lineage: ({ value }): JSX.Element => (
-    <Tooltip title={<LineageTooltip lineage={value as Lineage} />}>
+  lineage: ({ value }): JSX.Element => {
+    const hasLineage = Boolean(value.version);
+
+    const Content = (
       <LineageRowContent>
         <LineageCell className={dataTableStyle.cell}>
           {value.lineage}
         </LineageCell>
       </LineageRowContent>
-    </Tooltip>
-  ),
+    );
+
+    return hasLineage ? (
+      <Tooltip title={<LineageTooltip lineage={value as Lineage} />}>
+        {Content}
+      </Tooltip>
+    ) : (
+      Content
+    );
+  },
+
   privateId: ({
     value,
     item,

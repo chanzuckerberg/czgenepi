@@ -32,7 +32,7 @@ const SampleRenderers: Record<string, HeaderRenderer> = {
   lineage: ({ header }): JSX.Element => (
     <div key={header.key} className={dataTableStyle.headerCell}>
       <Tooltip
-        interactive
+        arrow
         classes={{ arrow }}
         title={LINEAGE_TOOLTIP_TEXT}
         placement="bottom-start"
