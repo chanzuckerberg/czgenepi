@@ -1,6 +1,7 @@
 import json
 import os
 import uuid
+import re
 from typing import Any, Iterable, Mapping, MutableSequence, Set, Tuple
 
 import boto3
@@ -25,6 +26,13 @@ from aspen.phylo_tree.identifiers import rename_nodes_on_tree
 
 PHYLO_TREE_KEY = "phylo_trees"
 
+def humanize_tree_name(s3_key: str):
+    json_filename = s3_key.split('/')[-1]
+    basename = re.sub(r'_\d*\.json', '', json_filename)
+    title_case = basename.replace('_', ' ').title()
+    if "Ancestors" in title_case:
+        title_case = title_case.replace('Ancestors', 'Contextual')
+    return title_case
 
 @application.route("/api/phylo_trees", methods=["GET"])
 @requires_auth
@@ -85,6 +93,7 @@ def phylo_trees():
             results.append(
                 {
                     "phylo_tree_id": phylo_tree.entity_id,
+                    "name": humanize_tree_name(phylo_tree.s3_key),
                     "pathogen_genome_count": genome_count,
                     "completed_date": format_datetime(phylo_run.end_datetime),
                 }

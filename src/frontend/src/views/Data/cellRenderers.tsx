@@ -123,10 +123,9 @@ const TREE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
       </RowContent>
     );
   },
-  name: ({ value }): JSX.Element => {
+  name: ({ value, item }): JSX.Element => {
     const stringValue = stringGuard(value);
-
-    const treeID = stringValue.split(" ")[0];
+    const treeID = item.id
     return (
       <RowContent>
         <Modal
