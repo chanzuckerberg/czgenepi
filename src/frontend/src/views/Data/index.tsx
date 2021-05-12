@@ -10,6 +10,7 @@ import { SAMPLE_HEADERS, SAMPLE_SUBHEADERS, TREE_HEADERS } from "./headers";
 import style from "./index.module.scss";
 import { Container } from "./style";
 import { TREE_TRANSFORMS } from "./transforms";
+import { sortBy } from "lodash/fp";
 
 const Data: FunctionComponent = () => {
   const [samples, setSamples] = useState<Sample[] | undefined>();
@@ -46,6 +47,7 @@ const Data: FunctionComponent = () => {
       headers: SAMPLE_HEADERS,
       isDataLoading,
       renderer: SampleRenderer,
+      sort: {key: "uploadDate", direction: "asc"},
       subheaders: SAMPLE_SUBHEADERS,
       text: "Samples",
       to: "/data/samples",
@@ -62,20 +64,27 @@ const Data: FunctionComponent = () => {
     },
   ];
 
-  // run data through transforms
+  // run data through transforms and sorting
   dataCategories.forEach((category) => {
-    if (category.transforms === undefined || category.data === undefined) {
-      return;
-    }
-    const transformedData = category.data.map((datum) => {
-      const transformedDatum = Object.assign({}, datum);
-      category.transforms.forEach((transform) => {
-        const methodInputs = transform.inputs.map((key) => datum[key]);
-        transformedDatum[transform.key] = transform.method(methodInputs);
+    if (category.data && category.transforms) {
+      const transformedData = category.data.map((datum) => {
+        const transformedDatum = Object.assign({}, datum);
+        category.transforms.forEach((transform) => {
+          const methodInputs = transform.inputs.map((key) => datum[key]);
+          transformedDatum[transform.key] = transform.method(methodInputs);
+        });
+        return transformedDatum;
       });
-      return transformedDatum;
-    });
-    category.data = transformedData;
+      category.data = transformedData;
+    }
+
+    if (category.data && category.sort) {
+      let sortedData = sortBy(category.sort.key, category.data);
+      if (category.sort.direction === "desc") {
+        sortedData = sortedData.reverse();
+      }
+      category.data = sortedData;
+    }
   });
 
   const dataJSX: Record<string, Array<JSX.Element>> = {
