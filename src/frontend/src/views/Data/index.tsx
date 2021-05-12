@@ -11,6 +11,11 @@ import style from "./index.module.scss";
 import { Container } from "./style";
 import { TREE_TRANSFORMS } from "./transforms";
 
+const sortByKeys: Record<string, string> = {
+  "Samples": "uploadDate",
+  "Phylogenetic Trees": "creationDate",
+}
+
 const Data: FunctionComponent = () => {
   const [samples, setSamples] = useState<Sample[] | undefined>();
   const [trees, setTrees] = useState<Tree[] | undefined>();
@@ -77,6 +82,20 @@ const Data: FunctionComponent = () => {
     });
     category.data = transformedData;
   });
+
+  // sort data by creation date
+  dataCategories.forEach((category) => {
+    if (category.data === undefined) {
+      return;
+    }
+    const sortKey = sortByKeys[category.text]
+    console.log(sortKey)
+    const tempData: Sample[] | Tree[] = category.data.map((item) => item)
+    const sortedData: Sample[] | Tree[] = tempData.sort((a, b) => {
+      return String(a[sortKey]).localeCompare(String(b[sortKey])) * -1
+    })
+    category.data = sortedData
+  })
 
   const dataJSX: Record<string, Array<JSX.Element>> = {
     menuItems: [],

@@ -32,7 +32,7 @@ interface Tree extends BioinformaticsType {
   id: number;
   name?: string;
   pathogenGenomeCount: number;
-  dateCompleted: string;
+  creationDate: string;
   downloadLink?: string;
 }
 
