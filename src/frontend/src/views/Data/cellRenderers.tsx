@@ -57,9 +57,9 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
     const hasLineage = Boolean(value.version);
 
     const Content = (
-      <LineageRowContent>
+      <LineageRowContent hasLineage={hasLineage}>
         <LineageCell className={dataTableStyle.cell}>
-          {value.lineage}
+          {value.lineage || "Not Yet Processed"}
         </LineageCell>
       </LineageRowContent>
     );

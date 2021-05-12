@@ -28,6 +28,7 @@ export const LineageRowContent = styled(RowContent)`
   &:hover {
     ${LineageCell} {
       ${(props) => {
+        if (!props.hasLineage) return "";
         const colors = getColors(props);
 
         return `
