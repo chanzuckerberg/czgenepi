@@ -26,6 +26,16 @@ interface SearchState {
   results?: TableItem[];
 }
 
+function recursiveTest(item: Record<string | number, JSONPrimitive | Record<string, JSONPrimitive>>, query: RegExp): Boolean {
+  console.log(item)
+  return Object.values(item).some((value) => {
+    if (typeof value === "object" && value !== null) {
+      return recursiveTest(value, query)
+    }
+    return query.test(`${value}`)
+  })
+}
+
 function searchReducer(state: SearchState, action: SearchState): SearchState {
   return { ...state, ...action };
 }
@@ -91,7 +101,7 @@ const DataSubview: FunctionComponent<Props> = ({
 
     const regex = new RegExp(escapeRegExp(query), "i");
     const filteredData = data.filter((item) =>
-      Object.values(item).some((value) => regex.test(`${value}`))
+        recursiveTest(item, regex)
     );
 
     dispatch({ results: filteredData, searching: false });
