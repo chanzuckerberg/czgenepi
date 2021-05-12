@@ -6,6 +6,7 @@ from typing import Iterable, MutableSequence, Optional, Sequence, Type
 import boto3
 import click
 from IPython.terminal.embed import InteractiveShellEmbed
+from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql import expression
 from sqlalchemy_utils import create_database, database_exists, drop_database
@@ -23,6 +24,8 @@ from aspen.database.connection import (
 from aspen.database.models import *  # noqa: F401, F403
 from aspen.database.models import (
     AlignedGisaidDump,
+    CanSee,
+    DataType,
     Entity,
     Group,
     PathogenGenome,
@@ -201,6 +204,55 @@ def import_covidhub_trees(
         s3_src_prefix,
         f"s3://{config.DB_BUCKET}{s3_key_prefix}",
     )
+
+
+@db.command("add-can-see")
+@click.option("--viewer-group-id", type=int, required=True)
+@click.option("--owner-group-id", type=int, required=True)
+@click.option(
+    "datatype_str",
+    "--datatype",
+    type=click.Choice([datatype.value for datatype in DataType]),
+    required=True,
+)
+@click.pass_context
+def add_can_see(
+    ctx,
+    viewer_group_id: int,
+    owner_group_id: int,
+    datatype_str: str,
+):
+    engine = ctx.obj["ENGINE"]
+
+    with session_scope(engine) as session:
+        viewer_and_owner = (
+            session.query(Group)
+            .filter(Group.id.in_((viewer_group_id, owner_group_id)))
+            .all()
+        )
+
+        viewer_group = [
+            group for group in viewer_and_owner if group.id == viewer_group_id
+        ][0]
+        owner_group = [
+            group for group in viewer_and_owner if group.id == owner_group_id
+        ][0]
+
+        datatype = DataType(datatype_str)
+
+        # the "on-conflict-do-nothing" insert parameter is only available in the old
+        # crufty sqlalchemy API.
+        session.execute(
+            postgresql.insert(CanSee)
+            .values(
+                {
+                    CanSee.__table__.c.owner_group_id.name: owner_group.id,
+                    CanSee.__table__.c.viewer_group_id.name: viewer_group.id,
+                    CanSee.__table__.c.data_type.name: datatype,
+                }
+            )
+            .on_conflict_do_nothing()
+        )
 
 
 @db.command("create-phylo-run")
