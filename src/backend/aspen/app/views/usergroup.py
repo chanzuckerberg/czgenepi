@@ -19,8 +19,14 @@ def usergroup():
 
         if request.method == "GET":
             user_groups: Dict[str, Dict[str, Union[str, bool]]] = {
-                "user": user.to_dict(),
-                "group": user.group.to_dict(),
+                "user": {
+                    k: v
+                    for k, v in user.to_dict().items()
+                    if k in ["name", "agreed_to_tos"]
+                },
+                "group": {
+                    k: v for k, v in user.group.to_dict().items() if k in ["name"]
+                },
             }
             return jsonify(user_groups)
 

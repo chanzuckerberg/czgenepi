@@ -12,7 +12,12 @@ def test_usergroup_view_get(session, app, client):
     with client.session_transaction() as sess:
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
     res = client.get("/api/usergroup")
-    expected = {"user": user.to_dict(), "group": group.to_dict()}
+    expected = {
+        "user": {
+            k: v for k, v in user.to_dict().items() if k in ["name", "agreed_to_tos"]
+        },
+        "group": {k: v for k, v in user.group.to_dict().items() if k in ["name"]},
+    }
     assert expected == json.loads(res.get_data(as_text=True))
 
 

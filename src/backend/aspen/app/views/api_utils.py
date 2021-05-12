@@ -1,20 +1,18 @@
 import datetime
 from typing import Optional
 
-from sqlalchemy.orm import joinedload, load_only
+from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.query import Query
 from sqlalchemy.orm.session import Session
 
-from aspen.database.models.usergroup import User, Group
+from aspen.database.models.usergroup import User
 
 
 def get_usergroup_query(session: Session, user_id: str) -> Query:
     return (
         session.query(User)
-            .options(
-            load_only("auth0_user_id", "agreed_to_tos"),
-            joinedload(User.group).load_only("name")
-        ).filter(User.auth0_user_id == user_id)
+        .options(joinedload(User.group))
+        .filter(User.auth0_user_id == user_id)
     )
 
 
