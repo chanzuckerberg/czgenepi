@@ -47,7 +47,7 @@ const Data: FunctionComponent = () => {
       headers: SAMPLE_HEADERS,
       isDataLoading,
       renderer: SampleRenderer,
-      sort: {key: "uploadDate", direction: "asc"},
+      sort: {key: "uploadDate", direction: "desc"},
       subheaders: SAMPLE_SUBHEADERS,
       text: "Samples",
       to: "/data/samples",
