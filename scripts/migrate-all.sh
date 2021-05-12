@@ -40,6 +40,13 @@ for county in "${COUNTIES[@]}"; do
     COUNTY_INFO=$(jq -r ".$county.aspen_group_id = $(jq -r .group_id <<< "$import_users_output")" <<< "$COUNTY_INFO")
 done
 
+################################################################################
+# import all the admin users
+aspen_admin_group_info=$(aspen-cli db --local import-covidhub-admins --covidhub-db-secret cliahub/cliahub_rds_read_prod --covidhub-aws-profile biohub)
+
+################################################################################
+# import all the projects
+
 for county in "${COUNTIES[@]}"; do
     aspen_group_id=$(jq -r ".$county".aspen_group_id <<< "$COUNTY_INFO")
     if [ "$(jq ".$county | has(\"internal_project_ids\")" <<< "$COUNTY_INFO")" = "true" ]; then
@@ -55,6 +62,9 @@ for county in "${COUNTIES[@]}"; do
         aspen-cli db --local import-covidhub-project --rr-project-id "$external_project_id" --covidhub-db-secret cliahub/cliahub_rds_read_prod  --covidhub-aws-profile biohub --aspen-group-id "$aspen_group_id"
     fi
 done
+
+################################################################################
+# import all the trees
 
 for county in "${COUNTIES[@]}"; do
     aspen_group_id=$(echo "$COUNTY_INFO" | jq -r ".$county".aspen_group_id <<< "$COUNTY_INFO")

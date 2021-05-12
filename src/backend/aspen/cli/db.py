@@ -153,6 +153,27 @@ def import_covidhub_users(
     )
 
 
+@db.command("import-covidhub-admins")
+@click.option("--covidhub-aws-profile", type=str, required=True)
+@click.option("--covidhub-db-secret", default="cliahub/cliahub_test_db")
+@click.pass_context
+def import_covidhub_admins(
+    ctx,
+    covidhub_aws_profile,
+    covidhub_db_secret,
+):
+    config, engine = ctx.obj["CONFIG"], ctx.obj["ENGINE"]
+
+    auth0_usermap = covidhub_import.retrieve_auth0_users(config)
+
+    covidhub_import.import_covidhub_admins(
+        engine,
+        covidhub_aws_profile,
+        covidhub_db_secret,
+        auth0_usermap,
+    )
+
+
 @db.command("import-covidhub-project")
 @click.option("--covidhub-aws-profile", type=str, required=True)
 @click.option("--covidhub-db-secret", default="cliahub/cliahub_test_db")
