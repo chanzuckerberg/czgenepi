@@ -193,21 +193,21 @@ export default function Faq(): JSX.Element {
       <P>
         You can find our Privacy Policy at:{" "}
         <Link
-          href="https://aspen.cziscience.comy/privacy"
+          href="https://aspen.cziscience.com/privacy"
           target="_blank"
           rel="noopener"
         >
-          https://aspen.cziscience.comy/privacy
+          https://aspen.cziscience.com/privacy
         </Link>
       </P>
       <P>
         You can find our Terms of Service at:{" "}
         <Link
-          href="https://aspen.cziscience.comy/terms"
+          href="https://aspen.cziscience.com/terms"
           target="_blank"
           rel="noopener"
         >
-          https://aspen.cziscience.comy/terms
+          https://aspen.cziscience.com/terms
         </Link>
       </P>
 
