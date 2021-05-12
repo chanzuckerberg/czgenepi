@@ -3,7 +3,7 @@ from typing import Dict, List, Union
 from flask import jsonify, request, Response, session
 
 from aspen.app.app import application, requires_auth
-from aspen.app.views.api_utils import get_usergroup_query
+from aspen.app.views.api_utils import filter_usergroup_dict, get_usergroup_query
 from aspen.database.connection import session_scope
 from aspen.database.models.usergroup import User
 
@@ -19,14 +19,10 @@ def usergroup():
 
         if request.method == "GET":
             user_groups: Dict[str, Dict[str, Union[str, bool]]] = {
-                "user": {
-                    k: v
-                    for k, v in user.to_dict().items()
-                    if k in ["name", "agreed_to_tos"]
-                },
-                "group": {
-                    k: v for k, v in user.group.to_dict().items() if k in ["name"]
-                },
+                "user": filter_usergroup_dict(
+                    user.to_dict(), ["name", "agreed_to_tos"]
+                ),
+                "group": filter_usergroup_dict(user.group.to_dict(), ["name"]),
             }
             return jsonify(user_groups)
 

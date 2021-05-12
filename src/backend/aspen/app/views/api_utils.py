@@ -1,11 +1,18 @@
 import datetime
-from typing import Optional
+from typing import Iterable, Mapping, Optional, Union
 
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.query import Query
 from sqlalchemy.orm.session import Session
 
 from aspen.database.models.usergroup import User
+
+
+def filter_usergroup_dict(
+    unfiltered_dict: Mapping[str, Union[str, bool]],
+    fields_to_keep: Iterable[Union[str, bool]],
+) -> Mapping[str, Union[str, bool]]:
+    return {k: v for k, v in unfiltered_dict.items() if k in fields_to_keep}
 
 
 def get_usergroup_query(session: Session, user_id: str) -> Query:
