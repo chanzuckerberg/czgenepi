@@ -44,7 +44,7 @@ function createTreeModalInfo_(treeId: string): ModalInfo {
   return {
     body:
       "You are leaving Aspen and sending your data to a private " +
-      "visualization on auspice.us, which is not controlled by Aspen.",
+      "visualization on Nextstrain, which is not controlled by Aspen.",
     buttons: [
       {
         Button: createConfirmButton(treeId),
@@ -56,6 +56,6 @@ function createTreeModalInfo_(treeId: string): ModalInfo {
       },
     ],
     header:
-      "Please confirm you're ready to send your data to Auspice to see your tree.",
+      "Please confirm you're ready to send your data to Nextstrain to see your tree.",
   };
 }
