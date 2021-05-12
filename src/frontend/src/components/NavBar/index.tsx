@@ -49,7 +49,7 @@ const NavBar = ({ org, user }: Props): JSX.Element => {
 
   const rightEdge = isLoggedIn();
 
-  const route = user ? ROUTES.DATA : ROUTES.HOMEPAGE
+  const route = user ? ROUTES.DATA : ROUTES.HOMEPAGE;
 
   return (
     <div className={style.bar}>
