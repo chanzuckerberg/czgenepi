@@ -16,6 +16,7 @@ import tqdm
 from sqlalchemy import or_
 from sqlalchemy.orm import configure_mappers, joinedload, selectin_polymorphic, Session
 
+from aspen.covidhub_import.utils import covidhub_interface_from_secret
 from aspen.database.connection import session_scope, SqlAlchemyInterface
 from aspen.database.models import (
     GisaidAccession,
@@ -27,9 +28,6 @@ from aspen.database.models import (
     UploadedPathogenGenome,
     WorkflowStatusType,
 )
-from covid_database import init_db as covidhub_init_db
-from covid_database import SqlAlchemyInterface as CSqlAlchemyInterface
-from covid_database import util as covidhub_database_util
 from covid_database.models import covidtracker
 from covid_database.models.enums import ConsensusGenomeStatus, NGSProjectType
 from covid_database.models.ngs_sample_tracking import (
@@ -53,15 +51,6 @@ from covid_database.models.qpcr_processing import (
 )
 
 logger = logging.getLogger(__name__)
-
-
-def covidhub_interface_from_secret(
-    covidhub_aws_profile: str, secret_id: str
-) -> CSqlAlchemyInterface:
-    interface = covidhub_init_db(
-        covidhub_database_util.get_db_uri(secret_id, aws_profile=covidhub_aws_profile)
-    )
-    return interface
 
 
 def _get_external_accession(external_accession: str, czbid: CZBID) -> str:
