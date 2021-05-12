@@ -45,7 +45,7 @@ def test_samples_view(
                 },
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
-                "upload_date": api_utils.format_datetime(
+                "upload_date": api_utils.format_date(
                     uploaded_pathogen_genome.upload_date
                 ),
                 "lineage": {
@@ -96,7 +96,7 @@ def test_samples_view_gisaid_rejected(
                 "gisaid": {"status": "rejected", "gisaid_id": None},
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
-                "upload_date": api_utils.format_datetime(
+                "upload_date": api_utils.format_date(
                     uploaded_pathogen_genome.upload_date
                 ),
                 "lineage": {
@@ -141,7 +141,7 @@ def test_samples_view_gisaid_no_info(
                 "gisaid": {"status": "no_info", "gisaid_id": None},
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
-                "upload_date": api_utils.format_datetime(
+                "upload_date": api_utils.format_date(
                     uploaded_pathogen_genome.upload_date
                 ),
                 "lineage": {
@@ -181,7 +181,7 @@ def test_samples_view_gisaid_not_eligible(
                 "gisaid": {"status": "not_eligible", "gisaid_id": None},
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
-                "upload_date": api_utils.format_datetime(None),
+                "upload_date": api_utils.format_date(None),
                 "lineage": {
                     "lineage": None,
                     "probability": None,
@@ -228,7 +228,7 @@ def test_samples_view_gisaid_submitted(
                 "gisaid": {"status": "submitted", "gisaid_id": None},
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
-                "upload_date": api_utils.format_datetime(
+                "upload_date": api_utils.format_date(
                     uploaded_pathogen_genome.upload_date
                 ),
                 "lineage": {
@@ -314,7 +314,7 @@ def test_samples_view_system_admin(
             },
             "private_identifier": sample.private_identifier,
             "public_identifier": sample.public_identifier,
-            "upload_date": api_utils.format_datetime(
+            "upload_date": api_utils.format_date(
                 uploaded_pathogen_genome.upload_date
             ),
             "lineage": {
@@ -377,7 +377,7 @@ def test_samples_view_cansee_metadata(
                 "gisaid_id": uploaded_pathogen_genome.accessions()[0].public_identifier,
             },
             "public_identifier": sample.public_identifier,
-            "upload_date": api_utils.format_datetime(
+            "upload_date": api_utils.format_date(
                 uploaded_pathogen_genome.upload_date
             ),
             "lineage": {
@@ -433,7 +433,7 @@ def test_samples_view_cansee_all(
             },
             "private_identifier": sample.private_identifier,
             "public_identifier": sample.public_identifier,
-            "upload_date": api_utils.format_datetime(
+            "upload_date": api_utils.format_date(
                 uploaded_pathogen_genome.upload_date
             ),
             "lineage": {
@@ -496,7 +496,7 @@ def test_samples_failed_accession(
                 },
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
-                "upload_date": api_utils.format_datetime(
+                "upload_date": api_utils.format_date(
                     uploaded_pathogen_genome.upload_date
                 ),
                 "lineage": {
@@ -558,7 +558,7 @@ def test_samples_multiple_accession(
                 },
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
-                "upload_date": api_utils.format_datetime(
+                "upload_date": api_utils.format_date(
                     uploaded_pathogen_genome.upload_date
                 ),
                 "lineage": {
@@ -609,7 +609,7 @@ def test_samples_view_no_pangolin(
                 },
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
-                "upload_date": api_utils.format_datetime(
+                "upload_date": api_utils.format_date(
                     uploaded_pathogen_genome.upload_date
                 ),
                 "lineage": {
