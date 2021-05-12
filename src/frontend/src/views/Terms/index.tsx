@@ -228,7 +228,7 @@ export default function Terms(): JSX.Element {
     </>
   );
 
-  const renderAuthorizationToUseIdseq = () => (
+  const renderAuthorizationToUseAspen = () => (
     <>
       <H2>
         <Number>2.</Number>Authorization To Use Aspen
@@ -539,7 +539,7 @@ export default function Terms(): JSX.Element {
       {renderIntro()}
       {renderSummaryOfKeyThingsToKnow()}
       {renderUploadAndReportDataTerms()}
-      {renderAuthorizationToUseIdseq()}
+      {renderAuthorizationToUseAspen()}
       {renderLimitationsOnUse()}
       {renderChangesToAspenOrTerms()}
       {renderDisclaimerTerms()}

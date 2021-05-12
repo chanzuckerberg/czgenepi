@@ -763,7 +763,7 @@ const PrivacyPolicy = (): JSX.Element => {
             .
           </span>,
           `We store raw Raw Sequence Data (ex: fastq files) for 90 days following upload. If no abnormalities are found in the resulting Pathogen Consensus Genome, we discard this data. We encourage submission to NCBI’s Sequence Read Archive (SRA) repository for long-term storage and sharing.`,
-          `User Data is retained until Users delete their IDseq account as such data is required to manage the service. Users may submit account deletion requests by emailing privacy@idseq.net. We will delete personal data within 60 days following close of your account.`,
+          `User Data is retained until Users delete their Aspen account as such data is required to manage the service. Users may submit account deletion requests by emailing helloaspen@chanzuckerberg.com. We will delete personal data within 60 days following close of your account.`,
           <span key="1">
             User Data is retained until Users delete their Aspen account because
             this data is required to manage the service. Users may submit
