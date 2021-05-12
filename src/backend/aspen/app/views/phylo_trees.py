@@ -160,6 +160,8 @@ def _extract_accessions(accessions_list: list, node: dict):
     node_attributes = node["node_attrs"]
     if "external_accession" in node_attributes:
         accessions_list.append(node_attributes["external_accession"]["value"])
+    if "name" in node:
+        accessions_list.append(node["name"])
     if "children" in node:
         for child in node["children"]:
             _extract_accessions(accessions_list, child)
