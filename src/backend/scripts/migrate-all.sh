@@ -2,7 +2,16 @@
 
 set -Eeuo pipefail
 
-export AWS_PROFILE=genepi-dev
+# fetch the gisaid dataset and transform it.
+biohub_aws_acount=$(aws secretsmanager get-secret-value --secret-id czb-aws-access --query SecretString --output text)
+biohub_aws_access_key_id=$(echo "${biohub_aws_acount}" | jq -r .AWS_ACCESS_KEY_ID)
+biohub_aws_secret_access_key=$(echo "${biohub_aws_acount}" | jq -r .AWS_SECRET_ACCESS_KEY)
+
+mkdir -p ~/.aws
+cat <<<"[biohub]
+aws_access_key_id = $biohub_aws_access_key_id
+aws_secret_access_key = $biohub_aws_secret_access_key
+" > ~/.aws/credentials
 
 COUNTY_INFO='{
         "marin": {"external_project_id": "RR089e", "internal_project_ids": ["RR089i"]},
@@ -60,3 +69,4 @@ for county in "${COUNTIES[@]}"; do
     aspen_group_id=$(echo "$COUNTY_INFO" | jq -r ".$county".aspen_group_id <<< "$COUNTY_INFO")
     aspen-cli db --local import-covidhub-trees --covidhub-aws-profile biohub --s3-src-prefix s3://covidtracker-datasets/cdph/"$county" --s3-key-prefix /imported/phylo_trees/"$county" --aspen-group-id "$aspen_group_id"
 done
+
