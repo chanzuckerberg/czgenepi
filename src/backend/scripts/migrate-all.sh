@@ -49,6 +49,18 @@ for county in "${COUNTIES[@]}"; do
     COUNTY_INFO=$(jq -r ".$county.aspen_group_id = $(jq -r .group_id <<< "$import_users_output")" <<< "$COUNTY_INFO")
 done
 
+################################################################################
+# add all the can-see relationships from CDPH
+
+for county in "${COUNTIES[@]}"; do
+    if [ "$county" = "vrdl" ]; then
+        continue
+    fi
+
+    echo "Adding can-see for vrdl → $county"
+    aspen-cli db --local add-can-see --viewer-group-id $(jq -r ".vrdl.aspen_group_id" <<< "$COUNTY_INFO") --owner-group-id $(jq -r ".$county.aspen_group_id" <<< "$COUNTY_INFO") --datatype TREES
+done
+
 for county in "${COUNTIES[@]}"; do
     aspen_group_id=$(jq -r ".$county".aspen_group_id <<< "$COUNTY_INFO")
     if [ "$(jq ".$county | has(\"internal_project_ids\")" <<< "$COUNTY_INFO")" = "true" ]; then
@@ -69,4 +81,3 @@ for county in "${COUNTIES[@]}"; do
     aspen_group_id=$(echo "$COUNTY_INFO" | jq -r ".$county".aspen_group_id <<< "$COUNTY_INFO")
     aspen-cli db --local import-covidhub-trees --covidhub-aws-profile biohub --s3-src-prefix s3://covidtracker-datasets/cdph/"$county" --s3-key-prefix /imported/phylo_trees/"$county" --aspen-group-id "$aspen_group_id"
 done
-
