@@ -39,7 +39,7 @@ def _format_created_date(sample: Sample) -> str:
     elif sample.uploaded_pathogen_genome is not None:
         return api_utils.format_date(sample.uploaded_pathogen_genome.upload_date)
     elif sample.czb_failed_genome_recovery:
-        return api_utils.format_date(None)
+        return api_utils.format_datetime(None)
     else:
         return "not yet uploaded"
 
