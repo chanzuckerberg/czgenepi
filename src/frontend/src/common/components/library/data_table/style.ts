@@ -25,6 +25,7 @@ export const RowContent = styled.div`
 
     return `
       padding: ${spacings?.l}px 0;
-    `;
+      margin-right: ${spacings?.m}px;
+  `;
   }}
 `;

@@ -23,6 +23,7 @@
     @include font-header-s;
 
     color: $gray-dark;
+    margin-right: $space-m;
 
     &:hover {
       color: black;
