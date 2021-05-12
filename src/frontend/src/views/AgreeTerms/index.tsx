@@ -70,6 +70,11 @@ export default function AgreeTerms(): JSX.Element {
               protected health information.
             </ListItem>
             <ListItem fontSize="s">
+              Any human genetic data contained within the Raw Sequence Data is 
+              filtered out and deleted following upload, leaving genomic data 
+              only about the pathogen.
+            </ListItem>
+            <ListItem fontSize="s">
               We utilize industry standard best practices in information
               security, such as encrypting your data at rest and in transit, to
               ensure the security of your data.
