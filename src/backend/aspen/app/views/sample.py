@@ -35,9 +35,9 @@ GISIAD_REJECTION_TIME = datetime.timedelta(days=4)
 
 def _format_created_date(sample: Sample) -> str:
     if sample.sequencing_reads_collection is not None:
-        return api_utils.format_datetime(sample.sequencing_reads_collection.upload_date)
+        return api_utils.format_date(sample.sequencing_reads_collection.upload_date)
     elif sample.uploaded_pathogen_genome is not None:
-        return api_utils.format_datetime(sample.uploaded_pathogen_genome.upload_date)
+        return api_utils.format_date(sample.uploaded_pathogen_genome.upload_date)
     elif sample.czb_failed_genome_recovery:
         return api_utils.format_datetime(None)
     else:
