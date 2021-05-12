@@ -22,8 +22,10 @@ app.get("/*", function (_, res) {
 
 const PORT = 3000;
 
+// eslint-disable-next-line no-console
 console.log("checking port...", PORT);
 
 app.listen(PORT, () => {
+  // eslint-disable-next-line no-console
   console.log(`Server now listening on port: ${PORT}`);
 });
