@@ -785,6 +785,13 @@ class Orchestrator:
         print("done!")
 
 
+def subprocess_output_with_default(cmd, default="unknown"):
+    try:
+        return subprocess.check_output(cmd).decode().strip()
+    except subprocess.CalledProcessError:
+        return default
+
+
 class ArtifactBuilder:
     """Builds artifacts such as Docker containers. For now, this is hard coded to use docker-compose as the backend."""
 
@@ -799,6 +806,8 @@ class ArtifactBuilder:
         env["BUILDKIT_INLINE_CACHE"] = "1"
         env["COMPOSE_DOCKER_CLI_BUILD"] = "1"
         env["DOCKER_REPO"] = f"{self.config['ecr_repo']}/"
+        env["HAPPY_COMMIT"] = subprocess_output_with_default(["git", "rev-parse", "--verify", "HEAD"])
+        env["HAPPY_BRANCH"] = subprocess_output_with_default(["git", "branch", "--show-current"])
         return env
 
     def build(self, artifacts=None):

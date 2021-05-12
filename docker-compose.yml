@@ -18,6 +18,8 @@ services:
         - "${DOCKER_REPO}aspen-frontend:branch-trunk"
       args:
         - BUILDKIT_INLINE_CACHE=1
+        - HAPPY_COMMIT
+        - HAPPY_BRANCH
     restart: always
     environment:
       HOST: 0.0.0.0
@@ -126,11 +128,14 @@ services:
   gisaid:
     image: "${DOCKER_REPO}aspen-gisaid"
     build:
-      context: workflows/
+      context: src/backend/
+      dockerfile: Dockerfile.gisaid
       cache_from:
         - "${DOCKER_REPO}aspen-gisaid:branch-trunk"
       args:
         - BUILDKIT_INLINE_CACHE=1
+        - HAPPY_COMMIT
+        - HAPPY_BRANCH
     command: ["true"]
     restart: "no"
   pangolin:
