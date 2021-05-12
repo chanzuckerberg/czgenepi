@@ -133,9 +133,11 @@ const TREE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
           data={createTreeModalInfo(treeID)}
           className={dataTableStyle.cell}
         >
-          {<TreeIcon className={dataTableStyle.icon} />}
-          {stringValue}
-          {<ExternalLinkIcon className={dataTableStyle.icon} />}
+          <div className={dataTableStyle.modalTrigger}>
+            {<TreeIcon className={dataTableStyle.icon} />}
+            {stringValue}
+            {<ExternalLinkIcon className={dataTableStyle.icon} />}
+          </div>
         </Modal>
       </RowContent>
     );
