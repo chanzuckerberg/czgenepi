@@ -314,9 +314,7 @@ def test_samples_view_system_admin(
             },
             "private_identifier": sample.private_identifier,
             "public_identifier": sample.public_identifier,
-            "upload_date": api_utils.format_date(
-                uploaded_pathogen_genome.upload_date
-            ),
+            "upload_date": api_utils.format_date(uploaded_pathogen_genome.upload_date),
             "lineage": {
                 "lineage": uploaded_pathogen_genome.pangolin_lineage,
                 "probability": uploaded_pathogen_genome.pangolin_probability,
@@ -377,9 +375,7 @@ def test_samples_view_cansee_metadata(
                 "gisaid_id": uploaded_pathogen_genome.accessions()[0].public_identifier,
             },
             "public_identifier": sample.public_identifier,
-            "upload_date": api_utils.format_date(
-                uploaded_pathogen_genome.upload_date
-            ),
+            "upload_date": api_utils.format_date(uploaded_pathogen_genome.upload_date),
             "lineage": {
                 "lineage": uploaded_pathogen_genome.pangolin_lineage,
                 "probability": uploaded_pathogen_genome.pangolin_probability,
@@ -433,9 +429,7 @@ def test_samples_view_cansee_all(
             },
             "private_identifier": sample.private_identifier,
             "public_identifier": sample.public_identifier,
-            "upload_date": api_utils.format_date(
-                uploaded_pathogen_genome.upload_date
-            ),
+            "upload_date": api_utils.format_date(uploaded_pathogen_genome.upload_date),
             "lineage": {
                 "lineage": uploaded_pathogen_genome.pangolin_lineage,
                 "probability": uploaded_pathogen_genome.pangolin_probability,
