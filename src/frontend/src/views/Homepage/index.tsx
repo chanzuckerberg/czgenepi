@@ -29,7 +29,7 @@ export default function Homepage(): JSX.Element {
             <Left>
               <Title>Welcome to Aspen!</Title>
               <Main>
-                Aspen is a new tool that helps you manage, analyze and share
+                Aspen is a new tool that helps you manage, analyze, and share
                 your pathogen data for genomic epidemiology.
               </Main>
               <Details>
