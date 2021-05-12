@@ -13,7 +13,7 @@ export const Container = styled.div`
 
 export const Subtext = styled.div`
   ${fontBodyXxs}
-  ${(props) => {
+  ${(props: any) => {
     const colors = getColors(props);
 
     return `
@@ -27,7 +27,7 @@ export const LineageCell = styled.div``;
 export const LineageRowContent = styled(RowContent)`
   &:hover {
     ${LineageCell} {
-      ${(props) => {
+      ${(props: any) => {
         if (!props.hasLineage) return "";
         const colors = getColors(props);
 
@@ -40,7 +40,7 @@ export const LineageRowContent = styled(RowContent)`
 `;
 
 export const StyledChip = styled(Chip)`
-  ${(props) => {
+  ${(props: any) => {
     const spacings = getSpacings(props);
 
     return `
