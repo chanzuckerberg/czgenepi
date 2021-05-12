@@ -98,7 +98,6 @@ const DataSubview: FunctionComponent<Props> = ({
   };
 
   const render = (tableData: TableItem[]) => {
-    console.log(tableData);
     const [tsvHeaders, tsvData] = tsvDataMap(tableData, headers, subheaders);
     const separator = "\t";
 
