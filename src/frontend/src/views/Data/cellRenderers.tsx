@@ -56,12 +56,14 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
   lineage: ({ value }): JSX.Element => {
     const hasLineage = Boolean(value.version);
 
+    const Component = hasLineage ? LineageRowContent : RowContent;
+
     const Content = (
-      <LineageRowContent>
+      <Component>
         <LineageCell className={dataTableStyle.cell}>
-          {value.lineage}
+          {value.lineage || "Not Yet Processed"}
         </LineageCell>
-      </LineageRowContent>
+      </Component>
     );
 
     return hasLineage ? (
