@@ -49,10 +49,12 @@ const NavBar = ({ org, user }: Props): JSX.Element => {
 
   const rightEdge = isLoggedIn();
 
+  const route = user ? ROUTES.DATA : ROUTES.HOMEPAGE
+
   return (
     <div className={style.bar}>
       <div className={style.left}>
-        <LogoAnchor to={ROUTES.HOMEPAGE}>
+        <LogoAnchor to={route}>
           <Logo alt="logo" src={String(LogoImage)} />
         </LogoAnchor>
         {orgSplash}
