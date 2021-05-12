@@ -98,7 +98,7 @@ def import_project_users(
 
             # try to create this user in the aspen db.
             user = (
-                session.query(User).filter(User.email == auth0_user.email).one_or_none()
+                session.query(User).filter(User.auth0_user_id == auth0_user.auth0_token).one_or_none()
             )
             if user is None:
                 user = User()
