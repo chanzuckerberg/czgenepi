@@ -22,7 +22,8 @@ export class ErrorBoundary extends React.Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
     // You can also log the error to an error reporting service
-    console.log(error, errorInfo);
+    // eslint-disable-next-line no-console
+    console.error(error, errorInfo);
   }
 
   render(): React.ReactNode {
