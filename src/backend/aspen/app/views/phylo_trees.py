@@ -36,12 +36,11 @@ def phylo_trees():
             .options(joinedload(User.group).joinedload(Group.can_see))
             .one()
         )
-        cansee_viewer_group_ids: Set[int] = {
-            cansee.viewer_group_id
+        cansee_owner_group_ids: Set[int] = {
+            cansee.owner_group_id
             for cansee in user.group.can_see
             if cansee.data_type == DataType.TREES
         }
-        # TODO: Add subquery to fetch trees for which we have can-see permissions.
         phylo_run_alias = aliased(PhyloRun)
         phylo_runs: Iterable[Tuple[PhyloRun, int]] = (
             db_session.query(
@@ -69,7 +68,7 @@ def phylo_trees():
                         .subquery()
                     ),
                     user.system_admin,
-                    phylo_run_alias.group_id.in_(cansee_viewer_group_ids)
+                    phylo_run_alias.group_id.in_(cansee_owner_group_ids),
                 )
             )
             .filter(phylo_run_alias.workflow_status == WorkflowStatusType.COMPLETED)
