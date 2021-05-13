@@ -5,7 +5,8 @@ import uuid
 from typing import Any, Iterable, Mapping, MutableSequence, Set, Tuple
 
 import boto3
-from flask import jsonify, make_response, session
+import sqlalchemy
+from flask import jsonify, make_response, Response, session
 from sqlalchemy import func, or_
 from sqlalchemy.orm import aliased, joinedload, Session
 
@@ -108,16 +109,32 @@ def _process_phylo_tree(
         .options(joinedload(User.group, Group.can_see))
         .one()
     )
-
-    phylo_tree: PhyloTree = (
-        db_session.query(PhyloTree)
-        .filter(PhyloTree.entity_id == phylo_tree_id)
-        .options(joinedload(PhyloTree.constituent_samples))
-        .one()
+    can_see_group_ids_trees: Set[int] = {user.group_id}
+    can_see_group_ids_trees.update(
+        {
+            can_see.owner_group_id
+            for can_see in user.group.can_see
+            if can_see.data_type == DataType.TREES
+        }
     )
 
-    can_see_group_ids: Set[int] = {user.group_id}
-    can_see_group_ids.update(
+    try:
+        phylo_tree: PhyloTree = (
+            db_session.query(PhyloTree)
+            .join(PhyloRun)
+            .filter(PhyloTree.entity_id == phylo_tree_id)
+            .filter(PhyloRun.group_id.in_(can_see_group_ids_trees))
+            .options(joinedload(PhyloTree.constituent_samples))
+            .one()
+        )
+    except sqlalchemy.exc.NoResultFound:
+        return Response(
+            f"PhyloTree with id {phylo_tree_id} not viewable by user with id: {user.id}",
+            400,
+        )
+
+    can_see_group_ids_pi: Set[int] = {user.group_id}
+    can_see_group_ids_pi.update(
         {
             can_see.owner_group_id
             for can_see in user.group.can_see
@@ -128,7 +145,7 @@ def _process_phylo_tree(
     identifier_map: Mapping[str, str] = {
         sample.public_identifier: sample.private_identifier
         for sample in phylo_tree.constituent_samples
-        if sample.submitting_group_id in can_see_group_ids
+        if sample.submitting_group_id in can_see_group_ids_pi
     }
 
     # TODO: add access control for this tree.
@@ -153,13 +170,19 @@ def phylo_tree(phylo_tree_id: int):
             db_session, phylo_tree_id, session["profile"]["user_id"]
         )
 
-    response = make_response(phylo_tree_data)
-    response.headers["Content-Type"] = "application/json"
-    response.headers[
-        "Content-Disposition"
-    ] = f"attachment; filename={phylo_tree_id}.json"
+    # check if the security check failed
+    if isinstance(phylo_tree_data, Response):
+        # return failed response
+        return phylo_tree_data
 
-    return response
+    else:
+        response = make_response(phylo_tree_data)
+        response.headers["Content-Type"] = "application/json"
+        response.headers[
+            "Content-Disposition"
+        ] = f"attachment; filename={phylo_tree_id}.json"
+
+        return response
 
 
 def _extract_accessions(accessions_list: list, node: dict):

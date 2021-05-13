@@ -139,3 +139,79 @@ def test_phylo_trees_no_can_see(
     results = json.loads(client.get("/api/phylo_trees").get_data(as_text=True))
 
     assert len(results[PHYLO_TREE_KEY]) == 0
+
+
+def test_phylo_tree_can_see(
+    mock_s3_resource,
+    test_data_dir,
+    session,
+    app,
+    client,
+    n_samples=5,
+    n_trees=1,
+):
+    owner_group: Group = group_factory()
+    viewer_group: Group = group_factory("CADPH")
+    user: User = user_factory(viewer_group)
+    samples, _, trees = make_all_test_data(owner_group, n_samples, n_trees)
+
+    # We need to create the bucket since this is all in Moto's 'virtual' AWS account
+    phylo_tree = trees[0]  # we only have one
+    mock_s3_resource.create_bucket(Bucket=phylo_tree.s3_bucket)
+
+    json_test_file = test_data_dir / "ncov_aspen.json"
+    with json_test_file.open() as fh:
+        test_json = json.dumps(json.load(fh))
+
+    mock_s3_resource.Bucket(phylo_tree.s3_bucket).Object(phylo_tree.s3_key).put(
+        Body=test_json
+    )
+
+    CanSee(viewer_group=viewer_group, owner_group=owner_group, data_type=DataType.TREES)
+    session.add_all((owner_group, viewer_group))
+    session.commit()
+
+    with client.session_transaction() as sess:
+        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
+    results = json.loads(
+        client.get(f"/api/phylo_tree/{trees[0].id}").get_data(as_text=True)
+    )
+    assert results == json.loads(test_json)
+
+
+def test_phylo_tree_no_can_see(
+    mock_s3_resource,
+    test_data_dir,
+    session,
+    app,
+    client,
+    n_samples=5,
+    n_trees=1,
+):
+    owner_group: Group = group_factory()
+    viewer_group: Group = group_factory("CADPH")
+    user: User = user_factory(viewer_group)
+    samples, _, trees = make_all_test_data(owner_group, n_samples, n_trees)
+
+    # We need to create the bucket since this is all in Moto's 'virtual' AWS account
+    phylo_tree = trees[0]  # we only have one
+    mock_s3_resource.create_bucket(Bucket=phylo_tree.s3_bucket)
+
+    json_test_file = test_data_dir / "ncov_aspen.json"
+    with json_test_file.open() as fh:
+        test_json = json.dumps(json.load(fh))
+
+    mock_s3_resource.Bucket(phylo_tree.s3_bucket).Object(phylo_tree.s3_key).put(
+        Body=test_json
+    )
+
+    session.add_all((owner_group, viewer_group))
+    session.commit()
+
+    with client.session_transaction() as sess:
+        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
+    results = client.get(f"/api/phylo_tree/{trees[0].id}").get_data(as_text=True)
+    assert (
+        results
+        == f"PhyloTree with id {phylo_tree.id} not viewable by user with id: {user.id}"
+    )
