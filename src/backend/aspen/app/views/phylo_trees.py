@@ -33,6 +33,10 @@ def humanize_tree_name(s3_key: str):
     title_case = basename.replace("_", " ").title()
     if "Ancestors" in title_case:
         title_case = title_case.replace("Ancestors", "Contextual")
+    if " Public" in title_case:
+        title_case = title_case.replace(" Public", "")
+    if " Private" in title_case:
+        title_case = title_case.replace(" Private", "")
     return title_case
 
 
