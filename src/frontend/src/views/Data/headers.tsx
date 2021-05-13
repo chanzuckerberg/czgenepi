@@ -70,10 +70,6 @@ export const TREE_HEADERS: Header[] = [
     text: "Creation Date",
   },
   {
-    key: "pathogenGenomeCount",
-    text: "Total Samples",
-  },
-  {
     key: "downloadLink",
     text: "",
   },
