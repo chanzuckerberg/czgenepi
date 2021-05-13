@@ -1,8 +1,8 @@
 import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
 import { StylesProvider, ThemeProvider } from "@material-ui/core/styles";
-import { defaultTheme } from "czifui";
 import React, { FunctionComponent, useEffect, useState } from "react";
 import { Route, Switch } from "react-router-dom";
+import { theme } from "src/common/styles/theme";
 import style from "./App.module.scss";
 import { fetchUserData } from "./common/api";
 import { ROUTES } from "./common/routes";
@@ -43,8 +43,8 @@ const App: FunctionComponent = () => {
 
   return (
     <StylesProvider injectFirst>
-      <ThemeProvider theme={defaultTheme}>
-        <EmotionThemeProvider theme={defaultTheme}>
+      <ThemeProvider theme={theme}>
+        <EmotionThemeProvider theme={theme}>
           <div className={style.app}>
             <NavBar org={org} user={user?.name} />
             <Switch>
