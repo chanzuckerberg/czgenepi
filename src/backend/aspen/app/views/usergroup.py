@@ -1,4 +1,4 @@
-from typing import Collection, Dict, List, Union
+from typing import Collection, Dict, Union
 
 from flask import jsonify, request, Response, session
 
@@ -9,6 +9,7 @@ from aspen.database.models.usergroup import User
 
 GET_USER_FIELDS: Collection[str] = ("name", "agreed_to_tos")
 GET_GROUP_FIELDS: Collection[str] = ("name",)
+PUT_USER_FIELDS: Collection[str] = ("name", "email", "agreed_to_tos")
 
 
 @application.route("/api/usergroup", methods=["GET", "PUT"])
@@ -28,15 +29,14 @@ def usergroup():
             return jsonify(user_groups)
 
         if request.method == "PUT":
-            update_allowed_fields: List[str] = ["name", "email", "agreed_to_tos"]
             fields_to_update: Dict[str, Union[str, bool]] = request.get_json()
 
             for key, value in fields_to_update.items():
-                if hasattr(user, key) and key in update_allowed_fields:
+                if hasattr(user, key) and key in PUT_USER_FIELDS:
                     setattr(user, key, value)
                 else:
                     return Response(
-                        f"only the following fields can be updated on the User object: {update_allowed_fields}, you provided the attribute <{key}>",
+                        f"only the following fields can be updated on the User object: {PUT_USER_FIELDS}, you provided the attribute <{key}>",
                         400,
                     )
 
