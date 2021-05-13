@@ -75,7 +75,7 @@ def import_project_users(
 
         group: Group = get_or_make_group(
             session,
-            project.originating_lab,
+            project.covidtracker_group.group.name,
             project.originating_address,
         )
 
