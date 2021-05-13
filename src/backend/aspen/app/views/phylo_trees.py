@@ -2,10 +2,11 @@ import json
 import os
 import re
 import uuid
-from typing import Any, Iterable, Mapping, MutableSequence, Set, Tuple
+from typing import Any, Iterable, Mapping, MutableSequence, Set, Tuple, Union
 
 import boto3
-from flask import jsonify, make_response, session
+import sqlalchemy
+from flask import jsonify, make_response, Response, session
 from sqlalchemy import func, or_
 from sqlalchemy.orm import aliased, joinedload, Session
 
@@ -115,23 +116,39 @@ def phylo_trees():
 
 def _process_phylo_tree(
     db_session: Session, phylo_tree_id: int, user_auth0_id: str
-) -> dict:
+) -> Union[dict, Response]:
     """Retrieves a phylo tree and renames the nodes on the tree for a given user."""
     user: User = (
         get_usergroup_query(db_session, user_auth0_id)
         .options(joinedload(User.group, Group.can_see))
         .one()
     )
-
-    phylo_tree: PhyloTree = (
-        db_session.query(PhyloTree)
-        .filter(PhyloTree.entity_id == phylo_tree_id)
-        .options(joinedload(PhyloTree.constituent_samples))
-        .one()
+    can_see_group_ids_trees: Set[int] = {user.group_id}
+    can_see_group_ids_trees.update(
+        {
+            can_see.owner_group_id
+            for can_see in user.group.can_see
+            if can_see.data_type == DataType.TREES
+        }
     )
 
-    can_see_group_ids: Set[int] = {user.group_id}
-    can_see_group_ids.update(
+    try:
+        phylo_tree: PhyloTree = (
+            db_session.query(PhyloTree)
+            .join(PhyloRun)
+            .filter(PhyloTree.entity_id == phylo_tree_id)
+            .filter(PhyloRun.group_id.in_(can_see_group_ids_trees))
+            .options(joinedload(PhyloTree.constituent_samples))
+            .one()
+        )
+    except sqlalchemy.exc.NoResultFound:  # type: ignore
+        return Response(
+            f"PhyloTree with id {phylo_tree_id} not viewable by user with id: {user.id}",
+            400,
+        )
+
+    can_see_group_ids_pi: Set[int] = {user.group_id}
+    can_see_group_ids_pi.update(
         {
             can_see.owner_group_id
             for can_see in user.group.can_see
@@ -142,7 +159,7 @@ def _process_phylo_tree(
     identifier_map: Mapping[str, str] = {
         sample.public_identifier: sample.private_identifier
         for sample in phylo_tree.constituent_samples
-        if sample.submitting_group_id in can_see_group_ids
+        if sample.submitting_group_id in can_see_group_ids_pi
     }
 
     # TODO: add access control for this tree.
@@ -167,13 +184,19 @@ def phylo_tree(phylo_tree_id: int):
             db_session, phylo_tree_id, session["profile"]["user_id"]
         )
 
-    response = make_response(phylo_tree_data)
-    response.headers["Content-Type"] = "application/json"
-    response.headers[
-        "Content-Disposition"
-    ] = f"attachment; filename={phylo_tree_id}.json"
+    # check if the security check failed
+    if isinstance(phylo_tree_data, Response):
+        # return failed response
+        return phylo_tree_data
 
-    return response
+    else:
+        response = make_response(phylo_tree_data)
+        response.headers["Content-Type"] = "application/json"
+        response.headers[
+            "Content-Disposition"
+        ] = f"attachment; filename={phylo_tree_id}.json"
+
+        return response
 
 
 def _extract_accessions(accessions_list: list, node: dict):
@@ -197,16 +220,22 @@ def tree_sample_ids(phylo_tree_id: int):
         phylo_tree_data = _process_phylo_tree(
             db_session, phylo_tree_id, session["profile"]["user_id"]
         )
-    accessions = _extract_accessions([], phylo_tree_data["tree"])
-    tsv_accessions = "Sample Identifier\n" + "\n".join(accessions)
+    # check if the security check failed
+    if isinstance(phylo_tree_data, Response):
+        # return failed response
+        return phylo_tree_data
 
-    response = make_response(tsv_accessions)
-    response.headers["Content-Type"] = "text/tsv"
-    response.headers[
-        "Content-Disposition"
-    ] = f"attachment; filename={phylo_tree_id}_sample_ids.tsv"
+    else:
+        accessions = _extract_accessions([], phylo_tree_data["tree"])
+        tsv_accessions = "Sample Identifier\n" + "\n".join(accessions)
 
-    return response
+        response = make_response(tsv_accessions)
+        response.headers["Content-Type"] = "text/tsv"
+        response.headers[
+            "Content-Disposition"
+        ] = f"attachment; filename={phylo_tree_id}_sample_ids.tsv"
+
+        return response
 
 
 @application.route("/api/auspice/view/<int:phylo_tree_id>", methods=["GET"])
@@ -217,22 +246,28 @@ def auspice_view(phylo_tree_id: int):
             db_session, phylo_tree_id, session["profile"]["user_id"]
         )
 
-        s3_resource = boto3.resource(
-            "s3",
-            endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None,
-            config=boto3.session.Config(signature_version="s3v4"),
-        )
-        s3_bucket = application.aspen_config.EXTERNAL_AUSPICE_BUCKET
-        s3_key = str(uuid.uuid4())
-        s3_resource.Bucket(s3_bucket).Object(s3_key).put(
-            Body=json.dumps(phylo_tree_data)
-        )
-        s3_client = s3_resource.meta.client
+        # check if the security check failed
+        if isinstance(phylo_tree_data, Response):
+            # return failed response
+            return phylo_tree_data
 
-        presigned_url = s3_client.generate_presigned_url(
-            "get_object",
-            Params={"Bucket": s3_bucket, "Key": s3_key},
-            ExpiresIn=3600,
-        )
+        else:
+            s3_resource = boto3.resource(
+                "s3",
+                endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None,
+                config=boto3.session.Config(signature_version="s3v4"),
+            )
+            s3_bucket = application.aspen_config.EXTERNAL_AUSPICE_BUCKET
+            s3_key = str(uuid.uuid4())
+            s3_resource.Bucket(s3_bucket).Object(s3_key).put(
+                Body=json.dumps(phylo_tree_data)
+            )
+            s3_client = s3_resource.meta.client
 
-        return jsonify({"url": presigned_url})
+            presigned_url = s3_client.generate_presigned_url(
+                "get_object",
+                Params={"Bucket": s3_bucket, "Key": s3_key},
+                ExpiresIn=3600,
+            )
+
+            return jsonify({"url": presigned_url})
