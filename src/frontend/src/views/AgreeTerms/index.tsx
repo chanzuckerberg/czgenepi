@@ -2,10 +2,10 @@ import { Dialog } from "@material-ui/core";
 import { Button, Link, List, ListItem, ListSubheader } from "czifui";
 import React, { useEffect, useState } from "react";
 import { API, updateUserData } from "src/common/api";
+import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
+import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
+import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import { ROUTES } from "src/common/routes";
-import DialogActions from "./components/DialogActions";
-import DialogContent from "./components/DialogContent";
-import DialogTitle from "./components/DialogTitle";
 import { Container, Details, Title } from "./style";
 
 export default function AgreeTerms(): JSX.Element {

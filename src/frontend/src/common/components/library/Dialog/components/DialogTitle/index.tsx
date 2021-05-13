@@ -1,8 +1,10 @@
 import { DialogTitleProps } from "@material-ui/core";
 import React from "react";
-import { StyledDialogTitle } from "./style";
+import { ExtraProps, StyledDialogTitle } from "./style";
 
-const DialogTitle = (props: DialogTitleProps): JSX.Element => {
+type Props = ExtraProps & DialogTitleProps;
+
+const DialogTitle = (props: Props): JSX.Element => {
   return <StyledDialogTitle {...props} />;
 };
 
