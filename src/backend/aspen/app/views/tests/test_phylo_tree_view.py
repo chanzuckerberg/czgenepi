@@ -2,8 +2,6 @@ import json
 import random
 from typing import Collection, List, Mapping, Tuple, Union
 
-from flask.testing import FlaskClient
-
 from aspen.app.views.phylo_trees import PHYLO_TREE_KEY
 from aspen.database.models import (
     CanSee,
@@ -47,9 +45,9 @@ def make_trees(
     return [
         phylotree_factory(
             phylorun_factory(group),
-            random.sample(samples, k=random.randint(0, len(samples))),
+            random.sample(samples, k=random.randint(0, len(samples))),  # type: ignore
             key=f"key_{ix}",
-        )
+        )  # type: ignore
         for ix in range(n_trees)
     ]
 
@@ -67,7 +65,7 @@ def make_all_test_data(
     return samples, uploaded_pathogen_genomes, trees
 
 
-def check_results(client: FlaskClient, user: User, trees: Collection[PhyloTree]):
+def check_results(client, user: User, trees: Collection[PhyloTree]):
     with client.session_transaction() as sess:
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
     results: Mapping[str, List[Mapping[str, Union[str, int]]]] = json.loads(
