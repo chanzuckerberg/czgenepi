@@ -1,5 +1,7 @@
 import json
 
+from aspen.app.views.api_utils import filter_usergroup_dict
+from aspen.app.views.usergroup import GET_GROUP_FIELDS, GET_USER_FIELDS
 from aspen.database.models.usergroup import User
 from aspen.test_infra.models.usergroup import group_factory, user_factory
 
@@ -12,7 +14,10 @@ def test_usergroup_view_get(session, app, client):
     with client.session_transaction() as sess:
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
     res = client.get("/api/usergroup")
-    expected = {"user": user.to_dict(), "group": group.to_dict()}
+    expected = {
+        "user": filter_usergroup_dict(user.to_dict(), GET_USER_FIELDS),
+        "group": filter_usergroup_dict(user.group.to_dict(), GET_GROUP_FIELDS),
+    }
     assert expected == json.loads(res.get_data(as_text=True))
 
 
