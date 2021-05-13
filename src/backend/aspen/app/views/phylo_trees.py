@@ -162,6 +162,7 @@ def _extract_accessions(accessions_list: list, node: dict):
     if "external_accession" in node_attributes:
         accessions_list.append(node_attributes["external_accession"]["value"])
     if "name" in node:
+        # NODE_ is some sort of generic name and not useful
         if not re.match("NODE_", node["name"]):
             accessions_list.append(node["name"])
     if "children" in node:
