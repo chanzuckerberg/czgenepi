@@ -50,6 +50,11 @@ for county in "${COUNTIES[@]}"; do
 done
 
 ################################################################################
+# import all the admin users
+
+aspen_admin_group_info=$(aspen-cli db --local import-covidhub-admins --covidhub-db-secret cliahub/cliahub_rds_read_prod --covidhub-aws-profile biohub)
+
+################################################################################
 # add all the can-see relationships from CDPH
 
 for county in "${COUNTIES[@]}"; do
@@ -60,6 +65,9 @@ for county in "${COUNTIES[@]}"; do
     echo "Adding can-see for vrdl → $county"
     aspen-cli db --local add-can-see --viewer-group-id $(jq -r ".vrdl.aspen_group_id" <<< "$COUNTY_INFO") --owner-group-id $(jq -r ".$county.aspen_group_id" <<< "$COUNTY_INFO") --datatype TREES
 done
+
+################################################################################
+# import all the projects
 
 for county in "${COUNTIES[@]}"; do
     aspen_group_id=$(jq -r ".$county".aspen_group_id <<< "$COUNTY_INFO")
@@ -76,6 +84,9 @@ for county in "${COUNTIES[@]}"; do
         aspen-cli db --local import-covidhub-project --rr-project-id "$external_project_id" --covidhub-db-secret cliahub/cliahub_rds_read_prod  --covidhub-aws-profile biohub --aspen-group-id "$aspen_group_id"
     fi
 done
+
+################################################################################
+# import all the trees
 
 for county in "${COUNTIES[@]}"; do
     aspen_group_id=$(echo "$COUNTY_INFO" | jq -r ".$county".aspen_group_id <<< "$COUNTY_INFO")
