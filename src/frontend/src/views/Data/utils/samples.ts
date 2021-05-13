@@ -1,4 +1,4 @@
-export const GISAID_STATUS_TO_TEXT: Record<
+export const GISAID_STATUS_TO_DISPLAY: Record<
   Sample["gisaid"]["status"],
   string
 > = {

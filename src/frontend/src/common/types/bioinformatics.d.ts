@@ -37,4 +37,4 @@ interface Tree extends BioinformaticsType {
 }
 
 type BioinformaticsData = Sample | Tree;
-type BioinformaticsDataArray = Sample[] | Tree[];
+type BioinformaticsDataArray = Array<Sample | Tree>;

@@ -74,7 +74,7 @@ const Data: FunctionComponent = () => {
     }
     const transformedData = category.data.map((datum: BioinformaticsData) => {
       const transformedDatum = Object.assign({}, datum);
-      category.transforms!.forEach((transform) => {
+      category.transforms?.forEach((transform) => {
         const methodInputs = transform.inputs.map((key) => datum[key]);
         transformedDatum[transform.key] = transform.method(methodInputs);
       });
@@ -90,7 +90,7 @@ const Data: FunctionComponent = () => {
     }
     const sortKey = sortByKeys[category.text];
     const tempData: BioinformaticsDataArray = category.data.map(
-      (item: any) => item
+      (item: BioinformaticsData) => item
     );
     const sortedData: BioinformaticsDataArray = tempData.sort(
       (a: BioinformaticsData, b: BioinformaticsData) => {
