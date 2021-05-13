@@ -182,6 +182,9 @@ module gisaid_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
+  sfn_arn               = module.swipe_sfn.step_function_arn
+  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(0 0 ? * 1-5 *)"] : []
+  event_role_arn        = local.ecs_role_arn
   extra_args            =  {
     db_data_bucket = local.aspen_data_bucket
     gisaid_ndjson_staging_bucket = local.aspen_data_bucket
@@ -201,6 +204,9 @@ module pangolin_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
+  sfn_arn               = module.swipe_sfn.step_function_arn
+  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(0 0 ? * 1-5 *)"] : []
+  event_role_arn        = local.ecs_role_arn
 }
 
 module covidhub_import_sfn_config {
@@ -215,6 +221,9 @@ module covidhub_import_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
+  sfn_arn               = module.swipe_sfn.step_function_arn
+  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(0 0 ? * 1-5 *)"] : []
+  event_role_arn        = local.ecs_role_arn
 }
 
 module migrate_db {
