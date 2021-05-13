@@ -8,7 +8,7 @@ from aspen.database.connection import session_scope
 from aspen.database.models.usergroup import User
 
 GET_USER_FIELDS = ("name", "agreed_to_tos")
-GET_GROUP_FIELDS = "name"
+GET_GROUP_FIELDS = ("name",)
 
 
 @application.route("/api/usergroup", methods=["GET", "PUT"])
