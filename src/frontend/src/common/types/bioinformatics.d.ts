@@ -30,7 +30,7 @@ interface Sample extends BioinformaticsType {
 interface Tree extends BioinformaticsType {
   type: "Tree";
   id: number;
-  name?: string;
+  name: string;
   pathogenGenomeCount: number;
   creationDate: string;
   downloadLink?: string;
