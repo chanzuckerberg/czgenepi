@@ -111,7 +111,7 @@ def happy_deploy(deployment_stage, github_sha, dry_run):
         print("Error: Please set GITHUB_TOKEN environment variable")
         return
 
-    read_deployment_stage = "stage"
+    read_deployment_stage = "staging"
 
     # If github sha is not provided, get the latest succesful deployment
     # github sha of staging environment
