@@ -10,7 +10,7 @@ from aspen.database.models.usergroup import User
 
 def filter_usergroup_dict(
     unfiltered_dict: Mapping[str, Union[str, bool]],
-    fields_to_keep: Iterable[Union[str, bool]],
+    fields_to_keep: Collection[str],
 ) -> Mapping[str, Union[str, bool]]:
     return {k: v for k, v in unfiltered_dict.items() if k in fields_to_keep}
 
