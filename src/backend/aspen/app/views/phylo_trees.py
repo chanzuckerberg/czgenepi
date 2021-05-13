@@ -226,22 +226,28 @@ def auspice_view(phylo_tree_id: int):
             db_session, phylo_tree_id, session["profile"]["user_id"]
         )
 
-        s3_resource = boto3.resource(
-            "s3",
-            endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None,
-            config=boto3.session.Config(signature_version="s3v4"),
-        )
-        s3_bucket = application.aspen_config.EXTERNAL_AUSPICE_BUCKET
-        s3_key = str(uuid.uuid4())
-        s3_resource.Bucket(s3_bucket).Object(s3_key).put(
-            Body=json.dumps(phylo_tree_data)
-        )
-        s3_client = s3_resource.meta.client
+        # check if the security check failed
+        if isinstance(phylo_tree_data, Response):
+            # return failed response
+            return phylo_tree_data
 
-        presigned_url = s3_client.generate_presigned_url(
-            "get_object",
-            Params={"Bucket": s3_bucket, "Key": s3_key},
-            ExpiresIn=3600,
-        )
+        else:
+            s3_resource = boto3.resource(
+                "s3",
+                endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None,
+                config=boto3.session.Config(signature_version="s3v4"),
+            )
+            s3_bucket = application.aspen_config.EXTERNAL_AUSPICE_BUCKET
+            s3_key = str(uuid.uuid4())
+            s3_resource.Bucket(s3_bucket).Object(s3_key).put(
+                Body=json.dumps(phylo_tree_data)
+            )
+            s3_client = s3_resource.meta.client
 
-        return jsonify({"url": presigned_url})
+            presigned_url = s3_client.generate_presigned_url(
+                "get_object",
+                Params={"Bucket": s3_bucket, "Key": s3_key},
+                ExpiresIn=3600,
+            )
+
+            return jsonify({"url": presigned_url})
