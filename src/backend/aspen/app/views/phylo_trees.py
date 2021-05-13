@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import uuid
 from typing import Any, Iterable, Mapping, MutableSequence, Set, Tuple
 
@@ -160,6 +161,10 @@ def _extract_accessions(accessions_list: list, node: dict):
     node_attributes = node["node_attrs"]
     if "external_accession" in node_attributes:
         accessions_list.append(node_attributes["external_accession"]["value"])
+    if "name" in node:
+        # NODE_ is some sort of generic name and not useful
+        if not re.match("NODE_", node["name"]):
+            accessions_list.append(node["name"])
     if "children" in node:
         for child in node["children"]:
             _extract_accessions(accessions_list, child)
