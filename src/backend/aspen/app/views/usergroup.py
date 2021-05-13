@@ -36,7 +36,7 @@ def usergroup():
                     setattr(user, key, value)
                 else:
                     return Response(
-                        f"only the following fields can be updated on the User object: {update_allowed_fields}, you provided the attribute <{key}>",
+                        f"only the following fields can be updated on the User object: {PUT_USER_FIELDS}, you provided the attribute <{key}>",
                         400,
                     )
 
