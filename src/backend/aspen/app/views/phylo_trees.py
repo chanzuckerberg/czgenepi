@@ -2,7 +2,7 @@ import json
 import os
 import re
 import uuid
-from typing import Any, Iterable, Mapping, MutableSequence, Set, Tuple
+from typing import Any, Iterable, Mapping, MutableSequence, Set, Tuple, Union
 
 import boto3
 import sqlalchemy
@@ -102,7 +102,7 @@ def phylo_trees():
 
 def _process_phylo_tree(
     db_session: Session, phylo_tree_id: int, user_auth0_id: str
-) -> dict:
+) -> Union[dict, Response]:
     """Retrieves a phylo tree and renames the nodes on the tree for a given user."""
     user: User = (
         get_usergroup_query(db_session, user_auth0_id)
@@ -127,7 +127,7 @@ def _process_phylo_tree(
             .options(joinedload(PhyloTree.constituent_samples))
             .one()
         )
-    except sqlalchemy.exc.NoResultFound:
+    except sqlalchemy.exc.NoResultFound:  # type: ignore
         return Response(
             f"PhyloTree with id {phylo_tree_id} not viewable by user with id: {user.id}",
             400,
@@ -206,16 +206,22 @@ def tree_sample_ids(phylo_tree_id: int):
         phylo_tree_data = _process_phylo_tree(
             db_session, phylo_tree_id, session["profile"]["user_id"]
         )
-    accessions = _extract_accessions([], phylo_tree_data["tree"])
-    tsv_accessions = "Sample Identifier\n" + "\n".join(accessions)
+    # check if the security check failed
+    if isinstance(phylo_tree_data, Response):
+        # return failed response
+        return phylo_tree_data
 
-    response = make_response(tsv_accessions)
-    response.headers["Content-Type"] = "text/tsv"
-    response.headers[
-        "Content-Disposition"
-    ] = f"attachment; filename={phylo_tree_id}_sample_ids.tsv"
+    else:
+        accessions = _extract_accessions([], phylo_tree_data["tree"])
+        tsv_accessions = "Sample Identifier\n" + "\n".join(accessions)
 
-    return response
+        response = make_response(tsv_accessions)
+        response.headers["Content-Type"] = "text/tsv"
+        response.headers[
+            "Content-Disposition"
+        ] = f"attachment; filename={phylo_tree_id}_sample_ids.tsv"
+
+        return response
 
 
 @application.route("/api/auspice/view/<int:phylo_tree_id>", methods=["GET"])
