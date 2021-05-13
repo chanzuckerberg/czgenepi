@@ -1,8 +1,10 @@
 import { DialogActionsProps } from "@material-ui/core";
 import React from "react";
-import { StyledDialogActions } from "./style";
+import { ExtraProps, StyledDialogActions } from "./style";
 
-const DialogActions = (props: DialogActionsProps): JSX.Element => {
+type Props = ExtraProps & DialogActionsProps;
+
+const DialogActions = (props: Props): JSX.Element => {
   return <StyledDialogActions {...props} />;
 };
 

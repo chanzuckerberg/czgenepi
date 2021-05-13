@@ -2,20 +2,14 @@
 
 import { ChipProps, Tooltip } from "czifui";
 import React from "react";
-import { Modal } from "src/common/components";
 import { defaultCellRenderer } from "src/common/components/library/data_table";
 import dataTableStyle from "src/common/components/library/data_table/index.module.scss";
 import { RowContent } from "src/common/components/library/data_table/style";
-import { ReactComponent as ExternalLinkIcon } from "src/common/icons/ExternalLink.svg";
-import { ReactComponent as TreeIcon } from "src/common/icons/PhyloTree.svg";
 import { ReactComponent as SampleIcon } from "src/common/icons/Sample.svg";
-import {
-  createTableCellRenderer,
-  createTreeModalInfo,
-  stringGuard,
-} from "src/common/utils";
+import { createTableCellRenderer, stringGuard } from "src/common/utils";
 import TreeTableDownloadMenu from "src/components/TreeTableDownloadMenu";
 import { Lineage, LineageTooltip } from "./components/LineageTooltip";
+import TreeTableNameCell from "./components/TreeTableNameCell";
 import {
   GISAIDCell,
   LineageCell,
@@ -105,7 +99,7 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
   },
 };
 
-const SampleRenderer = createTableCellRenderer(
+export const SampleRenderer = createTableCellRenderer(
   SAMPLE_CUSTOM_RENDERERS,
   defaultCellRenderer
 );
@@ -123,29 +117,10 @@ const TREE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
       </RowContent>
     );
   },
-  name: ({ value, item }): JSX.Element => {
-    const stringValue = stringGuard(value);
-    const treeID = item.id;
-    return (
-      <RowContent>
-        <Modal
-          data={createTreeModalInfo(treeID)}
-          className={dataTableStyle.cell}
-        >
-          <div className={dataTableStyle.modalTrigger}>
-            {<TreeIcon className={dataTableStyle.icon} />}
-            {stringValue}
-            {<ExternalLinkIcon className={dataTableStyle.icon} />}
-          </div>
-        </Modal>
-      </RowContent>
-    );
-  },
+  name: TreeTableNameCell,
 };
 
-const TreeRenderer = createTableCellRenderer(
+export const TreeRenderer = createTableCellRenderer(
   TREE_CUSTOM_RENDERERS,
   defaultCellRenderer
 );
-
-export { SampleRenderer, TreeRenderer };

@@ -40,7 +40,7 @@ export function createTableHeaderRenderer(
 
 export const createTreeModalInfo = memoize(createTreeModalInfo_);
 
-function createTreeModalInfo_(treeId: string): ModalInfo {
+function createTreeModalInfo_(treeId: number): ModalInfo {
   return {
     body:
       "You are leaving Aspen and sending your data to a private " +

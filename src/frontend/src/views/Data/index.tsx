@@ -69,17 +69,22 @@ const Data: FunctionComponent = () => {
 
   // run data through transforms
   dataCategories.forEach((category) => {
-    if (category.transforms === undefined || category.data === undefined) {
+    if (!category.transforms || !category.data) {
       return;
     }
+
     const transformedData = category.data.map((datum: BioinformaticsData) => {
       const transformedDatum = Object.assign({}, datum);
-      category.transforms?.forEach((transform) => {
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- Asserted above
+      category.transforms!.forEach((transform) => {
         const methodInputs = transform.inputs.map((key) => datum[key]);
         transformedDatum[transform.key] = transform.method(methodInputs);
       });
+
       return transformedDatum;
     });
+
     category.data = transformedData as BioinformaticsDataArray;
   });
 

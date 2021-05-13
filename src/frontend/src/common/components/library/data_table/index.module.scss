@@ -39,9 +39,10 @@
   align-items: center;
   margin: $space-xs 0 $space-xs 0;
 
-  .modalTrigger{
+  .modalTrigger {
     display: flex;
     align-items: center;
+    cursor: pointer;
   }
 
   .icon {
