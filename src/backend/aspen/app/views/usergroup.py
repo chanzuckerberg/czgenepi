@@ -7,7 +7,6 @@ from aspen.app.views.api_utils import filter_usergroup_dict, get_usergroup_query
 from aspen.database.connection import session_scope
 from aspen.database.models.usergroup import User
 
-
 GET_USER_FIELDS: Collection[str] = ("name", "agreed_to_tos")
 GET_GROUP_FIELDS: Collection[str] = ("name",)
 PUT_USER_FIELDS: Collection[str] = ("name", "email", "agreed_to_tos")
