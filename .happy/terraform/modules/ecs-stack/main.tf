@@ -142,9 +142,23 @@ module backend_service {
   wait_for_steady_state = local.wait_for_steady_state
 }
 
+module swipe_sfn_spot {
+  source                 = "../swipe-sfn"
+  app_name               = "swipe-spot"
+  try_spot_first         = true
+  stack_resource_prefix  = local.stack_resource_prefix
+  remote_dev_prefix      = local.remote_dev_prefix
+  job_definition_name    = module.swipe_batch.batch_job_definition
+  ec2_queue_arn          = local.ec2_queue_arn
+  spot_queue_arn         = local.spot_queue_arn
+  role_arn               = local.sfn_role_arn
+  custom_stack_name      = local.custom_stack_name
+  deployment_stage       = local.deployment_stage
+}
+
 module swipe_sfn {
   source                 = "../swipe-sfn"
-  app_name               = "swipe-sfn"
+  app_name               = "swipe-ec2"
   stack_resource_prefix  = local.stack_resource_prefix
   remote_dev_prefix      = local.remote_dev_prefix
   job_definition_name    = module.swipe_batch.batch_job_definition
