@@ -1,5 +1,5 @@
 import datetime
-from typing import Iterable, Mapping, Optional, Union
+from typing import Collection, Mapping, Optional, Union
 
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.query import Query
