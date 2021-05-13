@@ -25,13 +25,22 @@ application = AspenApp(
     static_folder=str(static_folder),
     aspen_config=aspen_config,
 )
-# FIXME(mbarrien): Make this more restrictive
-allowed_origin = ["*"]
+
+deployment = os.getenv("DEPLOYMENT_STAGE")
+
+allowed_origins = []
+frontend_url = os.getenv("FRONTEND_URL")
+
+if deployment not in ["staging", "prod"]:
+    allowed_origins.append(r"^http://localhost:\d+")
+if frontend_url:
+    allowed_origins.append(frontend_url)
+
 CORS(
     application,
     max_age=600,
     supports_credentials=True,
-    origins=allowed_origin,
+    origins=allowed_origins,
     allow_headers=["Content-Type"],
 )
 
