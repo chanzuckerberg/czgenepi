@@ -8,7 +8,8 @@ from aspen.database.connection import session_scope
 from aspen.database.models.usergroup import User
 
 GET_USER_FIELDS = ("name", "agreed_to_tos")
-GET_GROUP_FIELDS = ("name")
+GET_GROUP_FIELDS = "name"
+
 
 @application.route("/api/usergroup", methods=["GET", "PUT"])
 @requires_auth
@@ -21,9 +22,7 @@ def usergroup():
 
         if request.method == "GET":
             user_groups: Dict[str, Dict[str, Union[str, bool]]] = {
-                "user": filter_usergroup_dict(
-                    user.to_dict(), GET_USER_FIELDS
-                ),
+                "user": filter_usergroup_dict(user.to_dict(), GET_USER_FIELDS),
                 "group": filter_usergroup_dict(user.group.to_dict(), GET_GROUP_FIELDS),
             }
             return jsonify(user_groups)

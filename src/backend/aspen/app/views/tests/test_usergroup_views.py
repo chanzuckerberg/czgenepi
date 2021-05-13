@@ -1,7 +1,7 @@
 import json
 
 from aspen.app.views.api_utils import filter_usergroup_dict
-from aspen.app.views.usergroup import GET_USER_FIELDS, GET_GROUP_FIELDS
+from aspen.app.views.usergroup import GET_GROUP_FIELDS, GET_USER_FIELDS
 from aspen.database.models.usergroup import User
 from aspen.test_infra.models.usergroup import group_factory, user_factory
 
