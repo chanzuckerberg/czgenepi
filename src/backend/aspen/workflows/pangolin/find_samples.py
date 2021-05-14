@@ -25,6 +25,8 @@ def check_latest_pangolin_version() -> str:
 
 
 def find_samples():
+    # TODO: create click interface for this
+
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
     most_recent_pango_version: str = check_latest_pangolin_version()
 

@@ -11,11 +11,14 @@ from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
 from aspen.test_infra.models.usergroup import group_factory
 from aspen.workflows.pangolin.export import cli as export_cli
 from aspen.workflows.pangolin.save import cli as save_cli
+from aspen.workflows.pangolin.find_samples import find_samples
 
 
 def create_test_data(session):
     group: Group = group_factory()
 
+    samples = []
+    pathogen_genomes = []
     for i in range(1, 3):
         sample: Sample = sample_factory(
             group,
@@ -23,6 +26,7 @@ def create_test_data(session):
             public_identifier=f"public_identifier_{i}",
         )
         session.add(sample)
+        samples.append(sample)
         pathogen_genome: UploadedPathogenGenome = uploaded_pathogen_genome_factory(
             sample,
             accessions=(),
@@ -32,7 +36,10 @@ def create_test_data(session):
             pangolin_last_updated=None,
         )
         session.add(pathogen_genome)
+        pathogen_genomes.append(pathogen_genome)
         session.commit()
+
+    return samples, pathogen_genomes
 
 
 def mock_remote_db_uri(mocker, test_postgres_db_uri):
@@ -41,6 +48,17 @@ def mock_remote_db_uri(mocker, test_postgres_db_uri):
         new_callable=mocker.PropertyMock,
         return_value=test_postgres_db_uri,
     )
+
+
+def test_pangolin_find_samples(mocker, session, postgres_database):
+
+    samples, _ = create_test_data(session)
+    mock_remote_db_uri(mocker, postgres_database.as_uri())
+
+    samples = find_samples()
+
+    assert samples = []
+
 
 
 def test_pangolin_export(mocker, session, postgres_database):
