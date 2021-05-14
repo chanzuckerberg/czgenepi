@@ -31,6 +31,7 @@ from aspen.database.models import (
 from covid_database.models import covidtracker
 from covid_database.models.enums import ConsensusGenomeStatus, NGSProjectType
 from covid_database.models.ngs_sample_tracking import (
+    CollaboratorCZBID,
     ConsensusGenome,
     CZBID,
     CZBIDRnaPlate,
@@ -168,7 +169,7 @@ def import_project(
                     QPCRRun.completed_at.label("collection_date"),
                 )
             }
-        if project.type == NGSProjectType.DPH:
+        else:
             czb_ids_metadata = {
                 czbid.czb_id: (czbid.external_accession, czbid.collection_date)
                 for czbid in group_czbids
@@ -244,6 +245,10 @@ def import_project(
                 external_accession = internal_metadata[0]
                 collection_date = internal_metadata[1]
                 date_received = internal_metadata[1]
+            elif isinstance(czbid, CollaboratorCZBID):
+                external_accession = czbid.external_accession
+                collection_date = czbid.collection_date
+                date_received = czbid.collection_date
             else:
                 warnings.warn(f"czbid of unsupported type: {czbid}")
                 continue
