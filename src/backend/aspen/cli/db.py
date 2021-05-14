@@ -1,6 +1,7 @@
 import datetime
 import json
 import os
+import subprocess
 from typing import Iterable, MutableSequence, Optional, Sequence, Type
 
 import boto3
@@ -106,7 +107,6 @@ def import_data(s3_path, db_uri):
     path = "/".join(s3_path.split("/")[1:])
     print(f"downloading {path}")
     s3.Bucket(bucket_name).download_file(path, "db_data.sql")
-    import subprocess
 
     with subprocess.Popen(["psql", db_uri], stdin=subprocess.PIPE) as proc:
         proc.stdin.write(open("db_data.sql", "rb").read())
