@@ -183,9 +183,9 @@ module gisaid_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   extra_args            =  {
-    db_data_bucket = local.aspen_data_bucket
-    gisaid_ndjson_staging_bucket = local.aspen_data_bucket
-    gisaid_ndjson_staging_key = "raw_gisaid_dump/cached_gisaid.zst"
+    aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
+    remote_dev_prefix = local.remote_dev_prefix
+    # We'll use the wdl default values for ndjson_cache_key and gisaid_ndjson_url
   }
 }
 
@@ -193,7 +193,7 @@ module pangolin_sfn_config {
   source   = "../sfn_config"
   app_name = "pangolin-sfn"
   image    = "${local.pangolin_image_repo}:${local.image_tag}"
-  memory   = 420000
+  memory   = 120000
   wdl_path = "workflows/pangolin.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -201,6 +201,24 @@ module pangolin_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
+}
+
+module nextstrain_sfn_config {
+  source   = "../sfn_config"
+  app_name = "nextstrain-sfn"
+  image    = "${local.nextstrain_image_repo}:${local.image_tag}"
+  memory   = 400000
+  wdl_path = "workflows/pangolin.wdl"
+  custom_stack_name     = local.custom_stack_name
+  deployment_stage      = local.deployment_stage
+  remote_dev_prefix     = local.remote_dev_prefix
+  stack_resource_prefix = local.stack_resource_prefix
+  swipe_comms_bucket    = local.swipe_comms_bucket
+  swipe_wdl_bucket      = local.swipe_wdl_bucket
+  extra_args            =  {
+    aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
+    remote_dev_prefix = local.remote_dev_prefix
+  }
 }
 
 module covidhub_import_sfn_config {
