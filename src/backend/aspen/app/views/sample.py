@@ -52,7 +52,7 @@ def _format_gisaid_accession(
 ) -> Mapping[str, Optional[str]]:
     if sample.czb_failed_genome_recovery:
         # todo need to add the private option here for v3 a user uploads and flags a private sample
-        return {"status": "not_eligible", "gisaid_id": None}
+        return {"status": "Not Eligible", "gisaid_id": None}
 
     uploaded_entity = sample.get_uploaded_entity()
     gisaid_accession_workflows = entity_id_to_gisaid_accession_workflow_map.get(
@@ -64,7 +64,7 @@ def _format_gisaid_accession(
             for output in gisaid_accession_workflow.outputs:
                 assert isinstance(output, GisaidAccession)
                 return {
-                    "status": "accepted",
+                    "status": "Accepted",
                     "gisaid_id": output.public_identifier,
                 }
             else:
@@ -78,10 +78,10 @@ def _format_gisaid_accession(
             datetime.date.today() - gisaid_accession_workflow.start_datetime.date()
         )
         if date_since_submitted < GISIAD_REJECTION_TIME:
-            return {"status": "submitted", "gisaid_id": None}
+            return {"status": "Submitted", "gisaid_id": None}
         else:
-            return {"status": "rejected", "gisaid_id": None}
-    return {"status": "no_info", "gisaid_id": None}
+            return {"status": "Rejected", "gisaid_id": None}
+    return {"status": "Not Yet Submitted", "gisaid_id": None}
 
 
 def _format_lineage(sample: Sample) -> dict[str, Any]:

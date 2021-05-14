@@ -38,7 +38,7 @@ def test_samples_view(
                 "collection_location": sample.location,
                 "czb_failed_genome_recovery": False,
                 "gisaid": {
-                    "status": "accepted",
+                    "status": "Accepted",
                     "gisaid_id": uploaded_pathogen_genome.accessions()[
                         0
                     ].public_identifier,
@@ -93,7 +93,7 @@ def test_samples_view_gisaid_rejected(
                 "collection_date": api_utils.format_date(sample.collection_date),
                 "collection_location": sample.location,
                 "czb_failed_genome_recovery": False,
-                "gisaid": {"status": "rejected", "gisaid_id": None},
+                "gisaid": {"status": "Rejected", "gisaid_id": None},
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
                 "upload_date": api_utils.format_date(
@@ -138,7 +138,7 @@ def test_samples_view_gisaid_no_info(
                 "collection_date": api_utils.format_date(sample.collection_date),
                 "collection_location": sample.location,
                 "czb_failed_genome_recovery": False,
-                "gisaid": {"status": "no_info", "gisaid_id": None},
+                "gisaid": {"status": "Not Yet Submitted", "gisaid_id": None},
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
                 "upload_date": api_utils.format_date(
@@ -178,7 +178,7 @@ def test_samples_view_gisaid_not_eligible(
                 "collection_date": api_utils.format_date(sample.collection_date),
                 "collection_location": sample.location,
                 "czb_failed_genome_recovery": True,
-                "gisaid": {"status": "not_eligible", "gisaid_id": None},
+                "gisaid": {"status": "Not Eligible", "gisaid_id": None},
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
                 "upload_date": api_utils.format_date(None),
@@ -225,7 +225,7 @@ def test_samples_view_gisaid_submitted(
                 "collection_date": api_utils.format_date(sample.collection_date),
                 "collection_location": sample.location,
                 "czb_failed_genome_recovery": False,
-                "gisaid": {"status": "submitted", "gisaid_id": None},
+                "gisaid": {"status": "Submitted", "gisaid_id": None},
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
                 "upload_date": api_utils.format_date(
@@ -309,7 +309,7 @@ def test_samples_view_system_admin(
             "collection_location": sample.location,
             "czb_failed_genome_recovery": False,
             "gisaid": {
-                "status": "accepted",
+                "status": "Accepted",
                 "gisaid_id": uploaded_pathogen_genome.accessions()[0].public_identifier,
             },
             "private_identifier": sample.private_identifier,
@@ -371,7 +371,7 @@ def test_samples_view_cansee_metadata(
             "collection_location": sample.location,
             "czb_failed_genome_recovery": False,
             "gisaid": {
-                "status": "accepted",
+                "status": "Accepted",
                 "gisaid_id": uploaded_pathogen_genome.accessions()[0].public_identifier,
             },
             "public_identifier": sample.public_identifier,
@@ -424,7 +424,7 @@ def test_samples_view_cansee_all(
             "collection_location": sample.location,
             "czb_failed_genome_recovery": False,
             "gisaid": {
-                "status": "accepted",
+                "status": "Accepted",
                 "gisaid_id": uploaded_pathogen_genome.accessions()[0].public_identifier,
             },
             "private_identifier": sample.private_identifier,
@@ -485,7 +485,7 @@ def test_samples_failed_accession(
                 "collection_location": sample.location,
                 "czb_failed_genome_recovery": False,
                 "gisaid": {
-                    "status": "accepted",
+                    "status": "Accepted",
                     "gisaid_id": "public_identifier_succeeded",
                 },
                 "private_identifier": sample.private_identifier,
@@ -547,7 +547,7 @@ def test_samples_multiple_accession(
                 "collection_location": sample.location,
                 "czb_failed_genome_recovery": False,
                 "gisaid": {
-                    "status": "accepted",
+                    "status": "Accepted",
                     "gisaid_id": "public_identifier_later",
                 },
                 "private_identifier": sample.private_identifier,
@@ -596,7 +596,7 @@ def test_samples_view_no_pangolin(
                 "collection_location": sample.location,
                 "czb_failed_genome_recovery": False,
                 "gisaid": {
-                    "status": "accepted",
+                    "status": "Accepted",
                     "gisaid_id": uploaded_pathogen_genome.accessions()[
                         0
                     ].public_identifier,
