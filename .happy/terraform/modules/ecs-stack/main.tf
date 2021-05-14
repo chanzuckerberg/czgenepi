@@ -208,7 +208,7 @@ module nextstrain_sfn_config {
   app_name = "nextstrain-sfn"
   image    = "${local.nextstrain_image_repo}:${local.image_tag}"
   memory   = 400000
-  wdl_path = "workflows/pangolin.wdl"
+  wdl_path = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
   remote_dev_prefix     = local.remote_dev_prefix
