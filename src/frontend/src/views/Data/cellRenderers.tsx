@@ -24,7 +24,6 @@ import {
   StyledChip,
   Subtext,
 } from "./style";
-import { GISAID_STATUS_TO_DISPLAY } from "./utils/samples";
 
 const LABEL_STATUS: Record<
   string,
@@ -47,7 +46,7 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
     return (
       <RowContent>
         <GISAIDCell className={dataTableStyle.cell}>
-          {GISAID_STATUS_TO_DISPLAY[status]}
+          {status}
           {gisaid_id && <Subtext>{gisaid_id}</Subtext>}
         </GISAIDCell>
       </RowContent>
