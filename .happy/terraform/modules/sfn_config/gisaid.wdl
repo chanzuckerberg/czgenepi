@@ -4,44 +4,48 @@ workflow LoadGISAID {
     input {
         String docker_image_id = "aspen-gisaid"
         String aws_region = "us-west-2"
-        String db_data_bucket = "aspen-data-rdev"
-        String gisaid_ndjson_export_url = "https://www.epicov.org/epi3/3p/exp3/export/export.json.bz2"
-        String gisaid_ndjson_staging_bucket = "aspen-data-rdev"
-        String gisaid_ndjson_staging_key = "raw_gisaid_dump/test.zst"
+        String aspen_config_secret_name
+        String remote_dev_stack_name = ""
+        String gisaid_ndjson_url = "https://www.epicov.org/epi3/3p/exp3/export/export.json.bz2"
+        String ndjson_cache_key = "raw_gisaid_dump/dl.zst"
     }
 
     call RefreshGISAID {
         input:
         docker_image_id = docker_image_id,
         aws_region = aws_region,
-        gisaid_ndjson_export_url = gisaid_ndjson_export_url,
-        gisaid_ndjson_staging_bucket = gisaid_ndjson_staging_bucket,
-        gisaid_ndjson_staging_key = gisaid_ndjson_staging_key
+        aspen_config_secret_name = aspen_config_secret_name,
+        remote_dev_stack_name = remote_dev_stack_name,
+        gisaid_ndjson_url = gisaid_ndjson_url,
+        ndjson_cache_key = ndjson_cache_key,
     }
 
     call IngestGISAID {
         input:
         docker_image_id = docker_image_id,
         aws_region = aws_region,
-        gisaid_ndjson_staging_bucket = RefreshGISAID.result_bucket,
-        gisaid_ndjson_staging_key = RefreshGISAID.result_key
+        aspen_config_secret_name = aspen_config_secret_name,
+        remote_dev_stack_name = remote_dev_stack_name,
+        ndjson_bucket = RefreshGISAID.result_bucket,
+        ndjson_cache_key = RefreshGISAID.result_key,
     }
 
     call TransformGISAID {
         input:
         docker_image_id = docker_image_id,
         aws_region = aws_region,
+        aspen_config_secret_name = aspen_config_secret_name,
+        remote_dev_stack_name = remote_dev_stack_name,
         raw_gisaid_object_id = IngestGISAID.entity_id,
-        raw_gisaid_object = "s3://~{gisaid_ndjson_staging_bucket}/~{gisaid_ndjson_staging_key}",
-        db_data_bucket = db_data_bucket
     }
 
     call AlignGISAID {
         input:
         docker_image_id = docker_image_id,
         aws_region = aws_region,
+        aspen_config_secret_name = aspen_config_secret_name,
+        remote_dev_stack_name = remote_dev_stack_name,
         processed_gisaid_object_id = TransformGISAID.entity_id,
-        db_data_bucket = db_data_bucket
     }
 
     output {
@@ -57,9 +61,10 @@ task RefreshGISAID {
     input {
         String docker_image_id
         String aws_region
-        String gisaid_ndjson_export_url
-        String gisaid_ndjson_staging_bucket
-        String gisaid_ndjson_staging_key
+        String aspen_config_secret_name
+        String remote_dev_stack_name
+        String gisaid_ndjson_url
+        String ndjson_cache_key
     }
 
     command <<<
@@ -69,29 +74,40 @@ task RefreshGISAID {
     start_time=$(date +%s)
     build_id=$(date +%Y%m%d-%H%M)
 
-    # fetch the gisaid dataset and transform it.
     aws configure set region ~{aws_region}
+
+    export ASPEN_CONFIG_SECRET_NAME=~{aspen_config_secret_name}
+    if [ "~{remote_dev_stack_name}" != "" ]; then
+        export REMOTE_DEV_PREFIX="/~{remote_dev_stack_name}"
+    fi
+
+    # fetch aspen config
+    aspen_config="$(aws secretsmanager get-secret-value --secret-id ~{aspen_config_secret_name} --query SecretString --output text)"
+    aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$aspen_config")"
+    echo "${aspen_s3_db_bucket}" > bucket_name_file
+
+    # fetch the gisaid dataset and transform it.
     gisaid_credentials=$(aws secretsmanager get-secret-value --secret-id gisaid-download-credentials --query SecretString --output text)
     gisaid_username=$(echo "${gisaid_credentials}" | jq -r .username)
     gisaid_password=$(echo "${gisaid_credentials}" | jq -r .password)
 
     staged_timestamp=0
-    if aws s3api head-object --bucket ~{gisaid_ndjson_staging_bucket} --key ~{gisaid_ndjson_staging_key}; then
-        staged_timestamp=$(aws s3api head-object --bucket ~{gisaid_ndjson_staging_bucket} --key ~{gisaid_ndjson_staging_key} | jq -r .LastModified)
+    if aws s3api head-object --bucket "${aspen_s3_db_bucket}" --key ~{ndjson_cache_key}; then
+        staged_timestamp=$(aws s3api head-object --bucket "${aspen_s3_db_bucket}" --key ~{ndjson_cache_key} | jq -r .LastModified)
     fi
-    if curl --silent --head --time-cond "$staged_timestamp" "~{gisaid_ndjson_export_url}" --user "${gisaid_username}":"${gisaid_password}" | head -n 1 | grep 304; then
-        echo "File at ~{gisaid_ndjson_export_url} has not been modified since $staged_timestamp, nothing to do"
+    if curl --silent --head --time-cond "$staged_timestamp" "~{gisaid_ndjson_url}" --user "${gisaid_username}:${gisaid_password}" | head -n 1 | grep 304; then
+        echo "File at ~{gisaid_ndjson_url} has not been modified since ${staged_timestamp}, nothing to do"
         exit
     fi
-    curl "~{gisaid_ndjson_export_url}" --user "${gisaid_username}":"${gisaid_password}" | \
+    curl "~{gisaid_ndjson_url}" --user "${gisaid_username}:${gisaid_password}" | \
         bunzip2 | \
         zstdmt | \
-        aws s3 cp - s3://~{gisaid_ndjson_staging_bucket}/~{gisaid_ndjson_staging_key}
+        aws s3 cp - "s3://${aspen_s3_db_bucket}/~{ndjson_cache_key}"
     >>>
 
     output {
-        String result_bucket = "~{gisaid_ndjson_staging_bucket}"
-        String result_key = "~{gisaid_ndjson_staging_key}"
+        String result_bucket = read_string("bucket_name_file")
+        String result_key = "~{ndjson_cache_key}"
     }
 
     runtime {
@@ -103,22 +119,38 @@ task IngestGISAID {
     input {
         String docker_image_id
         String aws_region
-        String gisaid_ndjson_staging_bucket
-        String gisaid_ndjson_staging_key
+        String aspen_config_secret_name
+        String remote_dev_stack_name
+        String ndjson_bucket
+        String ndjson_cache_key
     }
 
     command <<<
-    set -Eeuox pipefail
+    set -Eeuo pipefail
     shopt -s inherit_errexit
 
     start_time=$(date +%s)
     build_id=$(date +%Y%m%d-%H%M)
-    end_time=$(date +%s)
+
+    aws configure set region ~{aws_region}
+
+    export ASPEN_CONFIG_SECRET_NAME=~{aspen_config_secret_name}
+    if [ "~{remote_dev_stack_name}" != "" ]; then
+        export REMOTE_DEV_PREFIX="/~{remote_dev_stack_name}"
+    fi
+
     # These are set by the Dockerfile and the Happy CLI
     aspen_workflow_rev=$COMMIT_SHA
     aspen_creation_rev=$COMMIT_SHA
+    sequences_key="raw_gisaid_dump/${build_id}/gisaid.ndjson.zst"
 
-    aws configure set region ~{aws_region}
+    # fetch aspen config
+    aspen_config="$(aws secretsmanager get-secret-value --secret-id ~{aspen_config_secret_name} --query SecretString --output text)"
+    aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$aspen_config")"
+
+    aws s3 cp "s3://~{ndjson_bucket}/~{ndjson_cache_key}" "s3://${aspen_s3_db_bucket}/${sequences_key}"
+
+    end_time=$(date +%s)
 
     # create the objects
     python3 /usr/src/app/aspen/workflows/ingest_gisaid/save.py       \
@@ -126,8 +158,8 @@ task IngestGISAID {
             --aspen-creation-rev "${aspen_creation_rev}"             \
             --start-time "${start_time}"                             \
             --end-time "${end_time}"                                 \
-            --gisaid-s3-bucket "~{gisaid_ndjson_staging_bucket}"     \
-            --gisaid-s3-key "~{gisaid_ndjson_staging_key}" > entity_id
+            --gisaid-s3-bucket "${aspen_s3_db_bucket}"               \
+            --gisaid-s3-key "${sequences_key}" > entity_id
     >>>
 
     output {
@@ -143,29 +175,44 @@ task TransformGISAID {
     input {
         String docker_image_id
         String aws_region
+        String aspen_config_secret_name
+        String remote_dev_stack_name
         String raw_gisaid_object_id
-        File raw_gisaid_object
-        String db_data_bucket
     }
 
     command <<<
-    set -Eeuox pipefail
+    set -Eeuo pipefail
     shopt -s inherit_errexit
-
-    aws configure set region ~{aws_region}
 
     start_time=$(date +%s)
     build_id=$(date +%Y%m%d-%H%M)
+
+    aws configure set region ~{aws_region}
+
+    export ASPEN_CONFIG_SECRET_NAME=~{aspen_config_secret_name}
+    if [ "~{remote_dev_stack_name}" != "" ]; then
+        export REMOTE_DEV_PREFIX="/~{remote_dev_stack_name}"
+    fi
+
     # These are set by the Dockerfile and the Happy CLI
     aspen_workflow_rev=$COMMIT_SHA
     aspen_creation_rev=$COMMIT_SHA
     
+    # fetch aspen config
+    aspen_config="$(aws secretsmanager get-secret-value --secret-id ~{aspen_config_secret_name} --query SecretString --output text)"
+    aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$aspen_config")"
+
+    # get the bucket/key from the object id
+    raw_gisaid_location=$(python3 /usr/src/app/aspen/workflows/transform_gisaid/lookup_raw_gisaid_object.py --raw-gisaid-object-id "~{raw_gisaid_object_id}")
+    raw_gisaid_s3_bucket=$(echo "${raw_gisaid_location}" | jq -r .bucket)
+    raw_gisaid_s3_key=$(echo "${raw_gisaid_location}" | jq -r .key)
+
     git clone --depth 1 git://github.com/nextstrain/ncov-ingest /ncov-ingest
     ncov_ingest_git_rev=$(git -C /ncov-ingest rev-parse HEAD)
 
     # decompress the gisaid dataset and transform it.
-    zstdmt -d --stdout ~{raw_gisaid_object} > gisaid.ndjson
-    /ncov-ingest/bin/transform-gisaid \
+    aws s3 cp --no-progress "s3://${raw_gisaid_s3_bucket}/${raw_gisaid_s3_key}" - | zstdmt -d > gisaid.ndjson
+    /ncov-ingest/bin/transform-gisaid     \
         gisaid.ndjson                     \
         --output-metadata metadata.tsv    \
         --output-fasta sequences.fasta    \
@@ -175,22 +222,21 @@ task TransformGISAID {
     ls -lR
 
     # upload the files to S3
-    bucket=~{db_data_bucket}
-    sequences_key=processed_gisaid_dump/"${build_id}"/sequences.fasta.zst
-    metadata_key=processed_gisaid_dump/"${build_id}"/metadata.tsv
-    aws s3 cp sequences.fasta.zst s3://"${bucket}"/"${sequences_key}"
-    aws s3 cp metadata.tsv s3://"${bucket}"/"${metadata_key}"
+    sequences_key="processed_gisaid_dump/${build_id}/sequences.fasta.zst"
+    metadata_key="processed_gisaid_dump/${build_id}/metadata.tsv"
+    aws s3 cp sequences.fasta.zst "s3://${aspen_s3_db_bucket}/${sequences_key}"
+    aws s3 cp metadata.tsv "s3://${aspen_s3_db_bucket}/${metadata_key}"
     end_time=$(date +%s)
 
     # create the objects
-    python3 /usr/src/app/aspen/workflows/transform_gisaid/save.py    \
+    python3 /usr/src/app/aspen/workflows/transform_gisaid/save.py   \
             --aspen-workflow-rev "${aspen_workflow_rev}"            \
             --aspen-creation-rev "${aspen_creation_rev}"            \
             --ncov-ingest-rev "${ncov_ingest_git_rev}"              \
             --start-time "${start_time}"                            \
             --end-time "${end_time}"                                \
             --raw-gisaid-object-id "~{raw_gisaid_object_id}"        \
-            --gisaid-s3-bucket "${bucket}"                          \
+            --gisaid-s3-bucket "${aspen_s3_db_bucket}"              \
             --gisaid-sequences-s3-key "${sequences_key}"            \
             --gisaid-metadata-s3-key "${metadata_key}" > entity_id
     >>>
@@ -208,15 +254,28 @@ task AlignGISAID {
     input {
         String docker_image_id
         String aws_region
+        String aspen_config_secret_name
+        String remote_dev_stack_name
         String processed_gisaid_object_id
-        String db_data_bucket
     }
 
     command <<<
-    set -Eeuox pipefail
+    set -Eeuo pipefail
     shopt -s inherit_errexit
 
+    start_time=$(date +%s)
+    build_id=$(date +%Y%m%d-%H%M)
+
     aws configure set region ~{aws_region}
+
+    export ASPEN_CONFIG_SECRET_NAME=~{aspen_config_secret_name}
+    if [ "~{remote_dev_stack_name}" != "" ]; then
+        export REMOTE_DEV_PREFIX="/~{remote_dev_stack_name}"
+    fi
+
+    # fetch aspen config
+    aspen_config="$(aws secretsmanager get-secret-value --secret-id ~{aspen_config_secret_name} --query SecretString --output text)"
+    aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$aspen_config")"
 
     # get the bucket/key from the object id
     processed_gisaid_location=$(python3 /usr/src/app/aspen/workflows/align_gisaid/lookup_processed_gisaid_object.py --processed-gisaid-object-id "~{processed_gisaid_object_id}")
@@ -232,8 +291,8 @@ task AlignGISAID {
     ncov_git_rev=$(git -C /ncov rev-parse HEAD)
 
     # fetch the gisaid dataset
-    aws s3 cp --no-progress s3://"${processed_gisaid_s3_bucket}"/"${processed_gisaid_sequences_s3_key}" - | zstdmt -d > /ncov/data/sequences.fasta
-    aws s3 cp --no-progress s3://"${processed_gisaid_s3_bucket}"/"${processed_gisaid_metadata_s3_key}" /ncov/data/metadata.tsv
+    aws s3 cp --no-progress "s3://${processed_gisaid_s3_bucket}/${processed_gisaid_sequences_s3_key}" - | zstdmt -d > /ncov/data/sequences.fasta
+    aws s3 cp --no-progress "s3://${processed_gisaid_s3_bucket}/${processed_gisaid_metadata_s3_key}" /ncov/data/metadata.tsv
     mkdir /ncov/my_profiles/align_gisaid/
     cp /usr/src/app/aspen/workflows/align_gisaid/{builds.yaml,config.yaml} /ncov/my_profiles/align_gisaid/
     (cd /ncov; snakemake --printshellcmds results/aligned.fasta --profile my_profiles/align_gisaid 1>&2)
@@ -243,11 +302,10 @@ task AlignGISAID {
     zstdmt /ncov/results/aligned.fasta
 
     # upload the files to S3
-    bucket="~{db_data_bucket}"
-    sequences_key=aligned_gisaid_dump/"${build_id}"/sequences.fasta.zst
-    metadata_key=aligned_gisaid_dump/"${build_id}"/metadata.tsv
-    aws s3 cp /ncov/results/aligned.fasta.zst s3://"${bucket}"/"${sequences_key}"
-    aws s3 cp /ncov/data/metadata.tsv s3://"${bucket}"/"${metadata_key}"
+    sequences_key="aligned_gisaid_dump/${build_id}/sequences.fasta.zst"
+    metadata_key="aligned_gisaid_dump/${build_id}/metadata.tsv"
+    aws s3 cp /ncov/results/aligned.fasta.zst "s3://${aspen_s3_db_bucket}/${sequences_key}"
+    aws s3 cp /ncov/data/metadata.tsv "s3://${aspen_s3_db_bucket}/${metadata_key}"
 
     # These are set by the Dockerfile and the Happy CLI
     aspen_workflow_rev=$COMMIT_SHA
@@ -264,7 +322,7 @@ task AlignGISAID {
             --start-time "${start_time}"                                            \
             --end-time "${end_time}"                                                \
             --processed-gisaid-object-id "~{processed_gisaid_object_id}"            \
-            --gisaid-s3-bucket "${bucket}"                                          \
+            --gisaid-s3-bucket "${aspen_s3_db_bucket}"                              \
             --gisaid-sequences-s3-key "${sequences_key}"                            \
             --gisaid-metadata-s3-key "${metadata_key}" > entity_id
     >>>
