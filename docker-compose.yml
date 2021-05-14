@@ -152,7 +152,8 @@ services:
   nextstrain:
     image: "${DOCKER_REPO}aspen-nextstrain"
     build:
-      context: docker/aspen-batch
+      context: src/backend
+      dockerfile: Dockerfile.nextstrain
       cache_from:
         - "${DOCKER_REPO}aspen-nextstrain:branch-trunk"
       args:
