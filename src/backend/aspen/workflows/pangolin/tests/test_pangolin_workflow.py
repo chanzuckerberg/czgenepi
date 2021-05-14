@@ -1,5 +1,6 @@
 from datetime import datetime
 from pathlib import Path, PosixPath
+from typing import Collection
 
 from click.testing import CliRunner, Result
 
@@ -10,8 +11,8 @@ from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
 from aspen.test_infra.models.usergroup import group_factory
 from aspen.workflows.pangolin.export import cli as export_cli
-from aspen.workflows.pangolin.save import cli as save_cli
 from aspen.workflows.pangolin.find_samples import find_samples
+from aspen.workflows.pangolin.save import cli as save_cli
 
 
 def create_test_data(session):
@@ -55,10 +56,9 @@ def test_pangolin_find_samples(mocker, session, postgres_database):
     samples, _ = create_test_data(session)
     mock_remote_db_uri(mocker, postgres_database.as_uri())
 
-    samples = find_samples()
+    found_samples: Collection[str] = find_samples()
 
-    assert samples = []
-
+    assert found_samples == [sample.public_identifier for sample in samples]
 
 
 def test_pangolin_export(mocker, session, postgres_database):
