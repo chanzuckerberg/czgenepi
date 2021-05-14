@@ -5,7 +5,7 @@ workflow LoadGISAID {
         String docker_image_id = "aspen-gisaid"
         String aws_region = "us-west-2"
         String aspen_config_secret_name
-        String remote_dev_stack_name = ""
+        String remote_dev_prefix = ""
         String gisaid_ndjson_url = "https://www.epicov.org/epi3/3p/exp3/export/export.json.bz2"
         String ndjson_cache_key = "raw_gisaid_dump/dl.zst"
     }
@@ -15,7 +15,7 @@ workflow LoadGISAID {
         docker_image_id = docker_image_id,
         aws_region = aws_region,
         aspen_config_secret_name = aspen_config_secret_name,
-        remote_dev_stack_name = remote_dev_stack_name,
+        remote_dev_prefix = remote_dev_prefix,
         gisaid_ndjson_url = gisaid_ndjson_url,
         ndjson_cache_key = ndjson_cache_key,
     }
@@ -25,7 +25,7 @@ workflow LoadGISAID {
         docker_image_id = docker_image_id,
         aws_region = aws_region,
         aspen_config_secret_name = aspen_config_secret_name,
-        remote_dev_stack_name = remote_dev_stack_name,
+        remote_dev_prefix = remote_dev_prefix,
         ndjson_bucket = RefreshGISAID.result_bucket,
         ndjson_cache_key = RefreshGISAID.result_key,
     }
@@ -35,7 +35,7 @@ workflow LoadGISAID {
         docker_image_id = docker_image_id,
         aws_region = aws_region,
         aspen_config_secret_name = aspen_config_secret_name,
-        remote_dev_stack_name = remote_dev_stack_name,
+        remote_dev_prefix = remote_dev_prefix,
         raw_gisaid_object_id = IngestGISAID.entity_id,
     }
 
@@ -44,7 +44,7 @@ workflow LoadGISAID {
         docker_image_id = docker_image_id,
         aws_region = aws_region,
         aspen_config_secret_name = aspen_config_secret_name,
-        remote_dev_stack_name = remote_dev_stack_name,
+        remote_dev_prefix = remote_dev_prefix,
         processed_gisaid_object_id = TransformGISAID.entity_id,
     }
 
@@ -62,7 +62,7 @@ task RefreshGISAID {
         String docker_image_id
         String aws_region
         String aspen_config_secret_name
-        String remote_dev_stack_name
+        String remote_dev_prefix
         String gisaid_ndjson_url
         String ndjson_cache_key
     }
@@ -77,8 +77,8 @@ task RefreshGISAID {
     aws configure set region ~{aws_region}
 
     export ASPEN_CONFIG_SECRET_NAME=~{aspen_config_secret_name}
-    if [ "~{remote_dev_stack_name}" != "" ]; then
-        export REMOTE_DEV_PREFIX="/~{remote_dev_stack_name}"
+    if [ "~{remote_dev_prefix}" != "" ]; then
+        export REMOTE_DEV_PREFIX="/~{remote_dev_prefix}"
     fi
 
     # fetch aspen config
@@ -120,7 +120,7 @@ task IngestGISAID {
         String docker_image_id
         String aws_region
         String aspen_config_secret_name
-        String remote_dev_stack_name
+        String remote_dev_prefix
         String ndjson_bucket
         String ndjson_cache_key
     }
@@ -135,8 +135,8 @@ task IngestGISAID {
     aws configure set region ~{aws_region}
 
     export ASPEN_CONFIG_SECRET_NAME=~{aspen_config_secret_name}
-    if [ "~{remote_dev_stack_name}" != "" ]; then
-        export REMOTE_DEV_PREFIX="/~{remote_dev_stack_name}"
+    if [ "~{remote_dev_prefix}" != "" ]; then
+        export REMOTE_DEV_PREFIX="/~{remote_dev_prefix}"
     fi
 
     # These are set by the Dockerfile and the Happy CLI
@@ -176,7 +176,7 @@ task TransformGISAID {
         String docker_image_id
         String aws_region
         String aspen_config_secret_name
-        String remote_dev_stack_name
+        String remote_dev_prefix
         String raw_gisaid_object_id
     }
 
@@ -190,8 +190,8 @@ task TransformGISAID {
     aws configure set region ~{aws_region}
 
     export ASPEN_CONFIG_SECRET_NAME=~{aspen_config_secret_name}
-    if [ "~{remote_dev_stack_name}" != "" ]; then
-        export REMOTE_DEV_PREFIX="/~{remote_dev_stack_name}"
+    if [ "~{remote_dev_prefix}" != "" ]; then
+        export REMOTE_DEV_PREFIX="/~{remote_dev_prefix}"
     fi
 
     # These are set by the Dockerfile and the Happy CLI
@@ -255,7 +255,7 @@ task AlignGISAID {
         String docker_image_id
         String aws_region
         String aspen_config_secret_name
-        String remote_dev_stack_name
+        String remote_dev_prefix
         String processed_gisaid_object_id
     }
 
@@ -269,8 +269,8 @@ task AlignGISAID {
     aws configure set region ~{aws_region}
 
     export ASPEN_CONFIG_SECRET_NAME=~{aspen_config_secret_name}
-    if [ "~{remote_dev_stack_name}" != "" ]; then
-        export REMOTE_DEV_PREFIX="/~{remote_dev_stack_name}"
+    if [ "~{remote_dev_prefix}" != "" ]; then
+        export REMOTE_DEV_PREFIX="~{remote_dev_prefix}"
     fi
 
     # fetch aspen config
