@@ -328,13 +328,19 @@ def create_phylo_run(
         all_samples: Iterable[Sample] = (
             session.query(Sample)
             .filter(
-                expression.or_(
-                    Sample.public_identifier.in_(samples),
-                    expression.and_(
-                        expression.true()
-                        if all_group_sequences
-                        else expression.false(),
-                        Sample.submitting_group == group,
+                expression.and_(
+                    expression.or_(
+                        Sample.uploaded_pathogen_genome != None,  # noqa: E711
+                        Sample.sequencing_reads_collection != None,  # noqa: E711
+                    ),
+                    expression.or_(
+                        Sample.public_identifier.in_(samples),
+                        expression.and_(
+                            expression.true()
+                            if all_group_sequences
+                            else expression.false(),
+                            Sample.submitting_group == group,
+                        ),
                     ),
                 )
             )
@@ -401,21 +407,4 @@ def create_phylo_run(
         session.flush()
 
         workflow_id = workflow.workflow_id
-
-    batch_client = boto3.client("batch")
-    # TODO: in an ideal world, some of these constants should be shared with the
-    # terraform scripts.
-    batch_client.submit_job(
-        jobName="nextstrain",
-        jobQueue="aspen-batch",
-        jobDefinition="aspen-batch-job-definition",
-        containerOverrides={
-            "command": [
-                git_refspec,
-                "src/backend/aspen/workflows/nextstrain_run/build_tree.sh",
-                str(workflow_id),
-            ],
-            "vcpus": 4,
-            "memory": 32000,
-        },
-    )
+    print(workflow_id)
