@@ -78,7 +78,7 @@ task RefreshGISAID {
 
     export ASPEN_CONFIG_SECRET_NAME=~{aspen_config_secret_name}
     if [ "~{remote_dev_prefix}" != "" ]; then
-        export REMOTE_DEV_PREFIX="/~{remote_dev_prefix}"
+        export REMOTE_DEV_PREFIX="~{remote_dev_prefix}"
     fi
 
     # fetch aspen config
@@ -136,7 +136,7 @@ task IngestGISAID {
 
     export ASPEN_CONFIG_SECRET_NAME=~{aspen_config_secret_name}
     if [ "~{remote_dev_prefix}" != "" ]; then
-        export REMOTE_DEV_PREFIX="/~{remote_dev_prefix}"
+        export REMOTE_DEV_PREFIX="~{remote_dev_prefix}"
     fi
 
     # These are set by the Dockerfile and the Happy CLI
@@ -191,7 +191,7 @@ task TransformGISAID {
 
     export ASPEN_CONFIG_SECRET_NAME=~{aspen_config_secret_name}
     if [ "~{remote_dev_prefix}" != "" ]; then
-        export REMOTE_DEV_PREFIX="/~{remote_dev_prefix}"
+        export REMOTE_DEV_PREFIX="~{remote_dev_prefix}"
     fi
 
     # These are set by the Dockerfile and the Happy CLI
