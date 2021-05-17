@@ -274,6 +274,7 @@ def import_project(
 
             consensus_genome = czbid_to_consensus_genomes.get(czbid.czb_id, None)
             if consensus_genome is not None:
+                sample.czb_failed_genome_recovery = False
                 if sample.uploaded_pathogen_genome is None:
                     sample.uploaded_pathogen_genome = UploadedPathogenGenome(
                         sample=sample,
