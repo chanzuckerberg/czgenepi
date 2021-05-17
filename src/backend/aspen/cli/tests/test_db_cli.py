@@ -11,7 +11,7 @@ from aspen.workflows.pangolin.tests.test_pangolin_workflow import create_test_da
 def test_create_mega_fasta(mocker, session, postgres_database):
 
     create_test_data(session)
-    public_identifiers_txt: PosixPath = Path(
+    public_identifiers_txt = Path(
         Path(__file__).parent, "data", "public_identifiers.txt"
     )
 
