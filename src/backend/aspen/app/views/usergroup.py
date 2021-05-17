@@ -73,6 +73,6 @@ def usergroup():
                     return jsonify(success=True)
             else:
                 return Response(
-                    f"Insufficient permissions to create new user, only system admins are able to create new users",
+                    "Insufficient permissions to create new user, only system admins are able to create new users",
                     400,
                 )
