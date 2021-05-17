@@ -436,7 +436,12 @@ def create_mega_fasta(
 
     all_samples: Iterable[Sample] = (
         session.query(Sample)
-        .filter(Sample.public_identifier.in_(public_identifiers))
+        .filter(
+            and_(
+                Sample.uploaded_pathogen_genome != None,  # noqa: E711
+                Sample.public_identifier.in_(public_identifiers))
+            )
+        )
         .options(
             joinedload(Sample.uploaded_pathogen_genome).undefer(
                 UploadedPathogenGenome.sequence
