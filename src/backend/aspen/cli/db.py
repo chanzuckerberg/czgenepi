@@ -3,7 +3,7 @@ import io
 import json
 import os
 import subprocess
-from typing import Collection, Iterable, MutableSequence, Optional, Sequence, Type
+from typing import Iterable, MutableSequence, Optional, Sequence, Type
 
 import boto3
 import click
