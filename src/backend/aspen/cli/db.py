@@ -1,8 +1,9 @@
 import datetime
+import io
 import json
 import os
 import subprocess
-from typing import Iterable, MutableSequence, Optional, Sequence, Type
+from typing import Collection, Iterable, MutableSequence, Optional, Sequence, Type
 
 import boto3
 import click
@@ -407,4 +408,65 @@ def create_phylo_run(
         session.flush()
 
         workflow_id = workflow.workflow_id
-    print(workflow_id)
+
+    batch_client = boto3.client("batch")
+    # TODO: in an ideal world, some of these constants should be shared with the
+    # terraform scripts.
+    batch_client.submit_job(
+        jobName="nextstrain",
+        jobQueue="aspen-batch",
+        jobDefinition="aspen-batch-job-definition",
+        containerOverrides={
+            "command": [
+                git_refspec,
+                "src/backend/aspen/workflows/nextstrain_run/build_tree.sh",
+                str(workflow_id),
+            ],
+            "vcpus": 4,
+            "memory": 32000,
+        },
+    )
+
+
+@db.command("create-mega-fasta")
+@click.option("public_identifier_input_fh", "--public-identifier-csv", type=click.File("r"), required=True)
+@click.option("sequences_output_fh", "--sequences", type=click.File("w"), required=True)
+@click.pass_context
+def create_mega_fasta(
+    ctx,
+    public_identifier_input_fh: io.TextIOBase,
+    sequences_output_fh: io.TextIOBase
+):
+
+    engine = ctx.obj["ENGINE"]
+    session = engine.make_session()
+
+    public_identifiers: Collection[str] = [line.strip() for line in public_identifier_input_fh]
+
+    all_samples: Iterable[Sample] = (
+        session.query(Sample)
+        .filter(Sample.public_identifier.in_(public_identifiers))
+        .options(
+            joinedload(Sample.uploaded_pathogen_genome).undefer(
+                UploadedPathogenGenome.sequence
+            ),
+        )
+    )
+
+    for sample in all_samples:
+        # filter for samples that passed genome recovery
+        if sample.uploaded_pathogen_genome:
+            pathogen_genome: UploadedPathogenGenome = sample.uploaded_pathogen_genome
+            sequence: str = "".join(
+                [
+                    line
+                    for line in pathogen_genome.sequence.splitlines()  # type: ignore
+                    if not (line.startswith(">") or line.startswith(";"))
+                ]
+            )
+
+            stripped_sequence: str = sequence.strip("Nn")
+            sequences_output_fh.write(f">{sample.public_identifier}\n")  # type: ignore
+            sequences_output_fh.write(stripped_sequence)
+            sequences_output_fh.write("\n")
+
