@@ -430,7 +430,7 @@ def create_mega_fasta(
     engine = ctx.obj["ENGINE"]
     session = engine.make_session()
 
-    public_identifiers: Collection[str] = [
+    public_identifiers: Sequence[str] = [
         line.strip() for line in public_identifier_input_fh
     ]
 
