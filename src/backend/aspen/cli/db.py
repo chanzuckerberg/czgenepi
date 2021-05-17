@@ -429,8 +429,8 @@ def create_phylo_run(
 
 
 @db.command("create-mega-fasta")
-@click.option("public_identifier_input_fh", "--public-identifier-csv", type=click.File("r"), required=True)
-@click.option("sequences_output_fh", "--sequences", type=click.File("w"), required=True)
+@click.option("public_identifier_input_fh", "--public-identifier-txt", type=click.File("r"), required=True)
+@click.option("sequences_output_fh", "--sequences-output", type=click.File("w"), required=True)
 @click.pass_context
 def create_mega_fasta(
     ctx,
