@@ -76,13 +76,13 @@ def phylo_trees():
             .options(joinedload(phylo_run_alias.outputs))
             .filter(
                 or_(
+                    user.system_admin,
                     phylo_run_alias.group_id.in_(
                         db_session.query(Group.id)
                         .join(User)
                         .filter(User.auth0_user_id == profile["user_id"])
                         .subquery()
                     ),
-                    user.system_admin,
                     phylo_run_alias.group_id.in_(cansee_owner_group_ids),
                 )
             )
@@ -137,7 +137,12 @@ def _process_phylo_tree(
             db_session.query(PhyloTree)
             .join(PhyloRun)
             .filter(PhyloTree.entity_id == phylo_tree_id)
-            .filter(PhyloRun.group_id.in_(can_see_group_ids_trees))
+            .filter(
+                or_(
+                    user.system_admin,
+                    PhyloRun.group_id.in_(can_see_group_ids_trees),
+                )
+            )
             .options(joinedload(PhyloTree.constituent_samples))
             .one()
         )
