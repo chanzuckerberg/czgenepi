@@ -7,6 +7,9 @@ workflow nextstrain {
         String aws_region = "us-west-2"
         String aspen_config_secret_name
         String remote_dev_prefix = ""
+        String group_name
+        String template_filename
+        Map[String, String] template_args
     }
 
     call nextstrain_workflow {
@@ -14,7 +17,10 @@ workflow nextstrain {
         docker_image_id = docker_image_id,
         aws_region = aws_region,
         aspen_config_secret_name = aspen_config_secret_name,
-        remote_dev_prefix = remote_dev_prefix
+        remote_dev_prefix = remote_dev_prefix,
+        group_name = group_name,
+        template_filename = template_filename,
+        template_args = template_args
     }
 }
 
@@ -25,6 +31,9 @@ task nextstrain_workflow {
         String aws_region
         String aspen_config_secret_name
         String remote_dev_prefix
+        String group_name
+        String template_filename
+        Map[String, String] template_args
     }
 
     command <<<
@@ -45,11 +54,11 @@ task nextstrain_workflow {
     aspen_config="$(aws secretsmanager get-secret-value --secret-id ~{aspen_config_secret_name} --query SecretString --output text)"
     aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$aspen_config")"
 
-    workflow_id=$(aspen-cli db create-phylo-run                                                                       \
-                      --group-name "Orange County Public Health Lab"                                                  \
-                      --all-group-sequences                                                                           \
-                      --builds-template-file /usr/src/app/aspen/workflows/nextstrain_run/builds_templates/group.yaml  \
-                      --builds-template-args '{"division": "California", "location": "Orange County"}'
+    workflow_id=$(aspen-cli db create-phylo-run                                                                                  \
+                      --group-name "~{group_name}"                                                                               \
+                      --all-group-sequences                                                                                      \
+                      --builds-template-file /usr/src/app/aspen/workflows/nextstrain_run/builds_templates/~{template_filename}   \
+                      --builds-template-args '~{template_args}'
     )
 
     # set up ncov
