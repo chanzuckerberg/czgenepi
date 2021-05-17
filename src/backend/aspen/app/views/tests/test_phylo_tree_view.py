@@ -1,6 +1,6 @@
 import json
 import random
-from typing import Collection, List, Mapping, Tuple, Union
+from typing import Collection, List, Mapping, Sequence, Tuple, Union
 
 from aspen.app.views.phylo_trees import PHYLO_TREE_KEY
 from aspen.database.models import (
@@ -40,7 +40,7 @@ def make_uploaded_pathogen_genomes(
 
 def make_trees(
     group: Group, samples: Collection[Sample], n_trees: int
-) -> Collection[PhyloTree]:
+) -> Sequence[PhyloTree]:
     # make up to n trees, each with a random sample of uploaded pathogen genomes.
     return [
         phylotree_factory(
@@ -54,14 +54,12 @@ def make_trees(
 
 def make_all_test_data(
     group: Group, n_samples: int, n_trees: int
-) -> Tuple[
-    Collection[Sample], Collection[UploadedPathogenGenome], Collection[PhyloTree]
-]:
+) -> Tuple[Collection[Sample], Collection[UploadedPathogenGenome], Sequence[PhyloTree]]:
     samples: Collection[Sample] = make_sample_data(group, n_samples)
     uploaded_pathogen_genomes: Collection[
         UploadedPathogenGenome
     ] = make_uploaded_pathogen_genomes(samples)
-    trees: Collection[PhyloTree] = make_trees(group, samples, n_trees)
+    trees: Sequence[PhyloTree] = make_trees(group, samples, n_trees)
     return samples, uploaded_pathogen_genomes, trees
 
 
@@ -92,7 +90,7 @@ def test_phylo_tree_view(
 ):
     group: Group = group_factory()
     user: User = user_factory(group)
-    samples, _, trees = make_all_test_data(group, n_samples, n_trees)
+    _, _, trees = make_all_test_data(group, n_samples, n_trees)
 
     session.add(group)
     session.commit()
@@ -110,7 +108,7 @@ def test_phylo_trees_can_see(
     owner_group: Group = group_factory()
     viewer_group: Group = group_factory("CADPH")
     user: User = user_factory(viewer_group)
-    samples, _, trees = make_all_test_data(owner_group, n_samples, n_trees)
+    _, _, trees = make_all_test_data(owner_group, n_samples, n_trees)
 
     CanSee(viewer_group=viewer_group, owner_group=owner_group, data_type=DataType.TREES)
     session.add_all((owner_group, viewer_group))
@@ -129,7 +127,7 @@ def test_phylo_trees_no_can_see(
     owner_group: Group = group_factory()
     viewer_group: Group = group_factory("CADPH")
     user: User = user_factory(viewer_group)
-    samples, _, trees = make_all_test_data(owner_group, n_samples, n_trees)
+    _, _, trees = make_all_test_data(owner_group, n_samples, n_trees)
 
     session.add_all((owner_group, viewer_group))
     session.commit()
@@ -139,6 +137,24 @@ def test_phylo_trees_no_can_see(
     results = json.loads(client.get("/api/phylo_trees").get_data(as_text=True))
 
     assert len(results[PHYLO_TREE_KEY]) == 0
+
+
+def test_phylo_trees_admin(
+    session,
+    app,
+    client,
+    n_samples=5,
+    n_trees=3,
+):
+    owner_group: Group = group_factory()
+    viewer_group: Group = group_factory("admin")
+    user: User = user_factory(viewer_group, system_admin=True)
+    _, _, trees = make_all_test_data(owner_group, n_samples, n_trees)
+
+    session.add_all((owner_group, viewer_group))
+    session.commit()
+
+    check_results(client, user, trees)
 
 
 def test_phylo_tree_can_see(
@@ -153,7 +169,7 @@ def test_phylo_tree_can_see(
     owner_group: Group = group_factory()
     viewer_group: Group = group_factory("CADPH")
     user: User = user_factory(viewer_group)
-    samples, _, trees = make_all_test_data(owner_group, n_samples, n_trees)
+    _, _, trees = make_all_test_data(owner_group, n_samples, n_trees)
 
     # We need to create the bucket since this is all in Moto's 'virtual' AWS account
     phylo_tree = trees[0]  # we only have one
@@ -191,7 +207,7 @@ def test_phylo_tree_no_can_see(
     owner_group: Group = group_factory()
     viewer_group: Group = group_factory("CADPH")
     user: User = user_factory(viewer_group)
-    samples, _, trees = make_all_test_data(owner_group, n_samples, n_trees)
+    _, _, trees = make_all_test_data(owner_group, n_samples, n_trees)
 
     # We need to create the bucket since this is all in Moto's 'virtual' AWS account
     phylo_tree = trees[0]  # we only have one
@@ -215,3 +231,40 @@ def test_phylo_tree_no_can_see(
         results
         == f"PhyloTree with id {phylo_tree.id} not viewable by user with id: {user.id}"
     )
+
+
+def test_phylo_tree_admin(
+    mock_s3_resource,
+    test_data_dir,
+    session,
+    app,
+    client,
+    n_samples=5,
+    n_trees=1,
+):
+    owner_group: Group = group_factory()
+    viewer_group: Group = group_factory("admin")
+    user: User = user_factory(viewer_group, system_admin=True)
+    _, _, trees = make_all_test_data(owner_group, n_samples, n_trees)
+
+    # We need to create the bucket since this is all in Moto's 'virtual' AWS account
+    phylo_tree = trees[0]  # we only have one
+    mock_s3_resource.create_bucket(Bucket=phylo_tree.s3_bucket)
+
+    json_test_file = test_data_dir / "ncov_aspen.json"
+    with json_test_file.open() as fh:
+        test_json = json.dumps(json.load(fh))
+
+    mock_s3_resource.Bucket(phylo_tree.s3_bucket).Object(phylo_tree.s3_key).put(
+        Body=test_json
+    )
+
+    session.add_all((owner_group, viewer_group))
+    session.commit()
+
+    with client.session_transaction() as sess:
+        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
+    results = json.loads(
+        client.get(f"/api/phylo_tree/{trees[0].id}").get_data(as_text=True)
+    )
+    assert results == json.loads(test_json)
