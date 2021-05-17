@@ -56,6 +56,18 @@ def test_usergroup_view_put_fail(session, app, client):
     assert res.status == "400 BAD REQUEST"
 
 
+def test_usergroup_view_post_pass(session, app, client):
+    group = group_factory()
+    session.add(group)
+    session.commit()
+    with client.session_transaction() as sess:
+        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
+
+    data = {"fake_field": "even faker"}
+    res = client.put("/api/usergroup", json=data, content_type="application/json")
+
+    assert res.status == "200 OK"
+
 def test_redirect(app, client):
     res = client.get("api/usergroup")
     assert res.status == "302 FOUND"
