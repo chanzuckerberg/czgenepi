@@ -409,24 +409,7 @@ def create_phylo_run(
         session.flush()
 
         workflow_id = workflow.workflow_id
-
-    batch_client = boto3.client("batch")
-    # TODO: in an ideal world, some of these constants should be shared with the
-    # terraform scripts.
-    batch_client.submit_job(
-        jobName="nextstrain",
-        jobQueue="aspen-batch",
-        jobDefinition="aspen-batch-job-definition",
-        containerOverrides={
-            "command": [
-                git_refspec,
-                "src/backend/aspen/workflows/nextstrain_run/build_tree.sh",
-                str(workflow_id),
-            ],
-            "vcpus": 4,
-            "memory": 32000,
-        },
-    )
+    print(workflow_id)
 
 
 @db.command("create-mega-fasta")
