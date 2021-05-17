@@ -453,6 +453,7 @@ def create_mega_fasta(
         )
     )
 
+    # TODO: this code is now used in multiple places, find central location to store this
     for sample in all_samples:
         # filter for samples that passed genome recovery
         if sample.uploaded_pathogen_genome:
