@@ -55,7 +55,7 @@ def usergroup():
         if request.method == "POST":
             if user.system_admin:
                 # check we're only getting fields that we expect
-                new_user_data: Dict[str : Union[str, bool]] = {
+                new_user_data: Dict[str, Union[str, bool]] = {
                     k: v for k, v in request.get_json().items() if k in POST_USER_FIELDS
                 }
                 missing_required_fields = [
