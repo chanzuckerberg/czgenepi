@@ -34,6 +34,7 @@ from aspen.database.models import (
     PhyloRun,
     Sample,
     SequencingReadsCollection,
+    UploadedPathogenGenome,
     Workflow,
     WorkflowStatusType,
 )
@@ -429,19 +430,26 @@ def create_phylo_run(
 
 
 @db.command("create-mega-fasta")
-@click.option("public_identifier_input_fh", "--public-identifier-txt", type=click.File("r"), required=True)
-@click.option("sequences_output_fh", "--sequences-output", type=click.File("w"), required=True)
+@click.option(
+    "public_identifier_input_fh",
+    "--public-identifier-txt",
+    type=click.File("r"),
+    required=True,
+)
+@click.option(
+    "sequences_output_fh", "--sequences-output", type=click.File("w"), required=True
+)
 @click.pass_context
 def create_mega_fasta(
-    ctx,
-    public_identifier_input_fh: io.TextIOBase,
-    sequences_output_fh: io.TextIOBase
+    ctx, public_identifier_input_fh: io.TextIOBase, sequences_output_fh: io.TextIOBase
 ):
 
     engine = ctx.obj["ENGINE"]
     session = engine.make_session()
 
-    public_identifiers: Collection[str] = [line.strip() for line in public_identifier_input_fh]
+    public_identifiers: Collection[str] = [
+        line.strip() for line in public_identifier_input_fh
+    ]
 
     all_samples: Iterable[Sample] = (
         session.query(Sample)
@@ -470,4 +478,3 @@ def create_mega_fasta(
             sequences_output_fh.write(f">{sample.public_identifier}\n")  # type: ignore
             sequences_output_fh.write(stripped_sequence)
             sequences_output_fh.write("\n")
-
