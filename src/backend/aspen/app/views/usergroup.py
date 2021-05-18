@@ -10,9 +10,17 @@ from aspen.database.models.usergroup import User
 GET_USER_FIELDS: Collection[str] = ("name", "agreed_to_tos")
 GET_GROUP_FIELDS: Collection[str] = ("name",)
 PUT_USER_FIELDS: Collection[str] = ("name", "email", "agreed_to_tos")
+POST_USER_FIELDS: Collection[str] = (
+    "name",
+    "email",
+    "auth0_user_id",
+    "group_admin",
+    "system_admin",
+    "group_id",
+)
 
 
-@application.route("/api/usergroup", methods=["GET", "PUT"])
+@application.route("/api/usergroup", methods=["GET", "PUT", "POST"])
 @requires_auth
 def usergroup():
     with session_scope(application.DATABASE_INTERFACE) as db_session:
@@ -43,3 +51,28 @@ def usergroup():
             # all fields have updated successfully
             db_session.flush()
             return jsonify(success=True)
+
+        if request.method == "POST":
+            if user.system_admin:
+                # check we're only getting fields that we expect
+                new_user_data: Dict[str, Union[str, bool]] = {
+                    k: v for k, v in request.get_json().items() if k in POST_USER_FIELDS
+                }
+                missing_required_fields = [
+                    f for f in POST_USER_FIELDS if f not in new_user_data.keys()
+                ]
+                if missing_required_fields:
+                    return Response(
+                        f"Insufficient information required to create new user, {missing_required_fields} are required",
+                        400,
+                    )
+                else:
+                    user = User(**new_user_data)
+                    db_session.add(user)
+                    db_session.flush()
+                    return jsonify(success=True)
+            else:
+                return Response(
+                    "Insufficient permissions to create new user, only system admins are able to create new users",
+                    400,
+                )

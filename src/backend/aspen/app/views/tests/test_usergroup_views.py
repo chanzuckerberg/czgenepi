@@ -56,6 +56,85 @@ def test_usergroup_view_put_fail(session, app, client):
     assert res.status == "400 BAD REQUEST"
 
 
+def test_usergroup_view_post_pass(session, app, client):
+    group = group_factory()
+    new_user_group = group_factory(name="new_group")
+    user = user_factory(group, system_admin=True)
+    session.add(group)
+    session.add(new_user_group)
+    session.commit()
+    with client.session_transaction() as sess:
+        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
+
+    data = {
+        "name": "new_user",
+        "email": "new_user@hotmail.com",
+        "auth0_user_id": "test_auth0_id_new",
+        "group_admin": False,
+        "system_admin": False,
+        "group_id": new_user_group.id,
+    }
+    res = client.post("/api/usergroup", json=data, content_type="application/json")
+
+    assert res.status == "200 OK"
+    session.close()
+    session.begin()
+    new_user = session.query(User).filter(User.name == data["name"]).one_or_none()
+    assert new_user is not None
+
+
+def test_usergroup_view_post_fail_not_system_admin(session, app, client):
+    group = group_factory()
+    new_user_group = group_factory(name="new_group")
+    user = user_factory(group, system_admin=False)
+    session.add(group)
+    session.add(new_user_group)
+    session.commit()
+    with client.session_transaction() as sess:
+        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
+
+    data = {
+        "name": "new_user",
+        "email": "new_user@hotmail.com",
+        "auth0_user_id": "test_auth0_id_new",
+        "group_admin": False,
+        "system_admin": False,
+        "group_id": new_user_group.id,
+    }
+    res = client.post("/api/usergroup", json=data, content_type="application/json")
+
+    assert res.status == "400 BAD REQUEST"
+    assert (
+        res.get_data()
+        == b"Insufficient permissions to create new user, only system admins are able to create new users"
+    )
+
+
+def test_usergroup_view_post_fail_insufficient_info(session, app, client):
+    group = group_factory()
+    new_user_group = group_factory(name="new_group")
+    user = user_factory(group, system_admin=True)
+    session.add(group)
+    session.add(new_user_group)
+    session.commit()
+    with client.session_transaction() as sess:
+        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
+
+    data = {
+        "name": "new_user",
+        "group_admin": False,
+        "system_admin": False,
+        "group_id": new_user_group.id,
+    }
+    res = client.post("/api/usergroup", json=data, content_type="application/json")
+
+    assert res.status == "400 BAD REQUEST"
+    assert (
+        res.get_data()
+        == b"Insufficient information required to create new user, ['email', 'auth0_user_id'] are required"
+    )
+
+
 def test_redirect(app, client):
     res = client.get("api/usergroup")
     assert res.status == "302 FOUND"
