@@ -68,7 +68,6 @@ variable deployment_stage {
 }
 
 variable extra_args {
-  type = map(string)
   description = "some stuff"
   default = {}
 }
