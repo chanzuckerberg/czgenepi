@@ -8,6 +8,7 @@ workflow nextstrain {
         String aspen_config_secret_name
         String remote_dev_prefix = ""
         String group_name
+        String s3_filestem
         String template_filename
         Map[String, String] template_args
     }
@@ -19,6 +20,7 @@ workflow nextstrain {
         aspen_config_secret_name = aspen_config_secret_name,
         remote_dev_prefix = remote_dev_prefix,
         group_name = group_name,
+        s3_filestem = s3_filestem,
         template_filename = template_filename,
         template_args = template_args
     }
@@ -32,6 +34,7 @@ task nextstrain_workflow {
         String aspen_config_secret_name
         String remote_dev_prefix
         String group_name
+        String s3_filestem
         String template_filename
         Map[String, String] template_args
     }
@@ -93,7 +96,7 @@ task nextstrain_workflow {
     snakemake --printshellcmds auspice/ncov_aspen.json --profile my_profiles/aspen/  --resources=mem_mb=312320
 
     # upload the tree to S3
-    key="phylo_run/${build_id}/ncov_aspen.json"
+    key="phylo_run/${build_id}/~{s3_filestem}.json"
     aws s3 cp /ncov/auspice/ncov_aspen.json "s3://${aspen_s3_db_bucket}/${key}"
 
     # update aspen
