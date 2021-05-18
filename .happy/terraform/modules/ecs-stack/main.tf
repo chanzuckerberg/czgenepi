@@ -272,15 +272,15 @@ module nextstrain_scc_contextual_sfn_config {
   sfn_arn               = module.swipe_sfn.step_function_arn
   schedule_expressions  = contains(["prod", "staging"], local.deployment_stage) ? ["cron(0 0 ? * 1-5 *)"] : []
   event_role_arn        = local.ecs_role_arn
-   extra_args            =  {
+  extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
     remote_dev_prefix        = local.remote_dev_prefix
     group_name               = "Santa Clara County Public Health"
     s3_filestem              = "Santa Clara Contextual"
     template_filename        = "group_plus_context.yaml"
     template_args            = {
-     division = "California"
-     location = "Santa Clara County"
+      division = "California"
+      location = "Santa Clara County"
     }
   }
 }
