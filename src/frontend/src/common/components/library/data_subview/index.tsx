@@ -8,8 +8,9 @@ import style from "./index.module.scss";
 
 interface Props {
   data?: TableItem[];
+  defaultSortKey: string[];
   headers: Header[];
-  subheaders: Record<string, Header[]>;
+  subheaders: Record<string, SubHeader[]>;
   isLoading: boolean;
   renderer?: CustomRenderer;
   headerRenderer?: CustomRenderer;
@@ -45,7 +46,7 @@ function searchReducer(state: SearchState, action: SearchState): SearchState {
 function tsvDataMap(
   tableData: TableItem[],
   headers: Header[],
-  subheaders: Record<string, Header[]>
+  subheaders: Record<string, SubHeader[]>
 ): [string[], string[][]] {
   const tsvData = tableData.map((entry) => {
     return headers.flatMap((header) => {
@@ -73,6 +74,7 @@ function tsvDataMap(
 
 const DataSubview: FunctionComponent<Props> = ({
   data,
+  defaultSortKey,
   headers,
   subheaders,
   isLoading,
@@ -107,12 +109,11 @@ const DataSubview: FunctionComponent<Props> = ({
     dispatch({ results: filteredData, searching: false });
   };
 
-  const render = (tableData: TableItem[]) => {
-    const [tsvHeaders, tsvData] = tsvDataMap(tableData, headers, subheaders);
-    const separator = "\t";
-
+  const render = (tableData?: TableItem[]) => {
     let downloadButton: JSX.Element | null = null;
-    if (viewName === "Samples") {
+    if (viewName === "Samples" && tableData !== undefined) {
+      const [tsvHeaders, tsvData] = tsvDataMap(tableData, headers, subheaders);
+      const separator = "\t";
       downloadButton = (
         <CSVLink
           data={tsvData}
@@ -149,6 +150,7 @@ const DataSubview: FunctionComponent<Props> = ({
           <DataTable
             isLoading={isLoading}
             data={tableData}
+            defaultSortKey={defaultSortKey}
             headers={headers}
             headerRenderer={headerRenderer}
             renderer={renderer}
@@ -159,7 +161,7 @@ const DataSubview: FunctionComponent<Props> = ({
   };
 
   if (state.results === undefined) {
-    let tableData: TableItem[] = [];
+    let tableData = undefined;
     if (data !== undefined) {
       dispatch({ results: data });
       tableData = data;
