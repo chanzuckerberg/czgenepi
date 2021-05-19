@@ -233,7 +233,7 @@ module nextstrain_template_sfn_config {
 module covidhub_import_sfn_config {
   source   = "../sfn_config"
   app_name = "covidhub-import-sfn"
-  image    = "${local.covidhub_import_image_repo}:may-13-trunk"
+  image    = "${local.covidhub_import_image_repo}:may-17"
   memory   = 16000
   wdl_path = "workflows/covidhub-import.wdl"
   custom_stack_name     = local.custom_stack_name
