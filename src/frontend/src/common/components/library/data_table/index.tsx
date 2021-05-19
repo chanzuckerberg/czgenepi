@@ -1,12 +1,10 @@
+import { get, isEqual } from "lodash/fp";
 import React, { Fragment, FunctionComponent, useReducer } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
-import { get, isEqual } from "lodash/fp";
-
+import { ReactComponent as SortArrowDownIcon } from "src/common/icons/IconArrowDownSmall.svg";
+import { ReactComponent as SortArrowUpIcon } from "src/common/icons/IconArrowUpSmall.svg";
 import { EmptyState } from "../data_subview/components/EmptyState";
-import { ReactComponent as SortArrowDownIcon } from "src/common/icons/IconArrowDownSmall.svg"
-import { ReactComponent as SortArrowUpIcon } from "src/common/icons/IconArrowUpSmall.svg"
-
 import style from "./index.module.scss";
 import { RowContent, TableRow } from "./style";
 
@@ -48,14 +46,18 @@ export function defaultHeaderRenderer({
   );
 }
 
-function sortData(data: TableItem[], sortKey: string[], ascending: boolean): TableItem[] {
+function sortData(
+  data: TableItem[],
+  sortKey: string[],
+  ascending: boolean
+): TableItem[] {
   return data.sort((a, b): number => {
-    let order = String(get(sortKey, a)).localeCompare(String(get(sortKey, b)))
+    let order = String(get(sortKey, a)).localeCompare(String(get(sortKey, b)));
     if (!ascending) {
-      order = order * -1
+      order = order * -1;
     }
-    return order
-  })
+    return order;
+  });
 }
 
 interface TableState {
@@ -77,8 +79,16 @@ function reducer(state: TableState, action: TableAction) {
   if (newData === undefined) {
     return state;
   }
-  const newSort = sortData(newData, action.newState.sortKey, action.newState.ascending)
-  return { data: newSort, sortKey: action.newState.sortKey, ascending: action.newState.ascending }
+  const newSort = sortData(
+    newData,
+    action.newState.sortKey,
+    action.newState.ascending
+  );
+  return {
+    ascending: action.newState.ascending,
+    data: newSort,
+    sortKey: action.newState.sortKey,
+  };
 }
 
 export const DataTable: FunctionComponent<Props> = ({
@@ -89,7 +99,11 @@ export const DataTable: FunctionComponent<Props> = ({
   renderer = defaultCellRenderer,
   isLoading,
 }: Props) => {
-  const [state, dispatch] = useReducer(reducer, { data: data, sortKey: defaultSortKey, ascending: false })
+  const [state, dispatch] = useReducer(reducer, {
+    ascending: false,
+    data: data,
+    sortKey: defaultSortKey,
+  });
 
   const indexingKey = headers[0].key;
 
@@ -98,26 +112,33 @@ export const DataTable: FunctionComponent<Props> = ({
     if (isEqual(newSortKey, state.sortKey)) {
       ascending = !state.ascending;
     }
-    dispatch({ type: "sort", newState: { sortKey: newSortKey, ascending: ascending }})
-  }
+    dispatch({
+      newState: { ascending: ascending, sortKey: newSortKey },
+      type: "sort",
+    });
+  };
 
   // render functions
   const headerRow = headers.map((header: Header, index) => {
-      const headerJSX = headerRenderer({ header, index })
-      let sortIndicator: JSX.Element | null = null;
-      if (isEqual(header.sortKey, state.sortKey)) {
-        sortIndicator = <SortArrowDownIcon/>
-        if (state.ascending) {
-          sortIndicator = <SortArrowUpIcon/>
-        }
+    const headerJSX = headerRenderer({ header, index });
+    let sortIndicator: JSX.Element | null = null;
+    if (isEqual(header.sortKey, state.sortKey)) {
+      sortIndicator = <SortArrowDownIcon />;
+      if (state.ascending) {
+        sortIndicator = <SortArrowUpIcon />;
       }
-      return (
-        <div onClick={() => handleSortClick(header.sortKey)} key={header.sortKey.join("-")} className={style.headerMetaCell}>
-          {headerJSX}{sortIndicator}
-        </div>
-      )
     }
-  );
+    return (
+      <div
+        onClick={() => handleSortClick(header.sortKey)}
+        key={header.sortKey.join("-")}
+        className={style.headerMetaCell}
+      >
+        {headerJSX}
+        {sortIndicator}
+      </div>
+    );
+  });
 
   const sampleRow = (item: TableItem): React.ReactNode => {
     if (isLoading) {
@@ -151,7 +172,9 @@ export const DataTable: FunctionComponent<Props> = ({
                 <FixedSizeList
                   height={height}
                   itemData={tableData}
-                  itemCount={isLoading ? LOADING_STATE_ROW_COUNT : tableData.length}
+                  itemCount={
+                    isLoading ? LOADING_STATE_ROW_COUNT : tableData.length
+                  }
                   itemSize={ITEM_HEIGHT_PX}
                   width={width}
                 >
@@ -163,12 +186,15 @@ export const DataTable: FunctionComponent<Props> = ({
         </div>
       </div>
     );
-  }
+  };
 
   if (state.data === undefined) {
     let tableData: TableItem[] = [];
     if (data !== undefined) {
-      dispatch({ type: "initialize", newState: { data: data, sortKey: defaultSortKey, ascending: false }});
+      dispatch({
+        newState: { ascending: false, data: data, sortKey: defaultSortKey },
+        type: "initialize",
+      });
       tableData = sortData(data, defaultSortKey, false);
     }
     return render(tableData);
