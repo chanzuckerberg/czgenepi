@@ -4,7 +4,7 @@ module nextstrain_scc_local_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-scc-local-sfn"
   image    = "${local.nextstrain_image_repo}:${local.image_tag}"
-  memory   = 32000
+  memory   = 64000
   wdl_path = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -13,7 +13,7 @@ module nextstrain_scc_local_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn_spot.step_function_arn
-  schedule_expressions  = contains(["prod", "staging"], local.deployment_stage) ? ["cron(0 10 ? * 1-5 *)"] : []
+  schedule_expressions  = contains(["prod", "staging"], local.deployment_stage) ? ["cron(15 19 ? * 1-5 *)"] : []
   event_role_arn        = local.event_role_arn
    extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
@@ -32,7 +32,7 @@ module nextstrain_scc_contextual_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-scc-contextual-sfn"
   image    = "${local.nextstrain_image_repo}:${local.image_tag}"
-  memory   = 32000
+  memory   = 64000
   wdl_path = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -41,7 +41,7 @@ module nextstrain_scc_contextual_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn_spot.step_function_arn
-  schedule_expressions  = contains(["prod", "staging"], local.deployment_stage) ? ["cron(0 10 ? * 1-5 *)"] : []
+  schedule_expressions  = contains(["prod", "staging"], local.deployment_stage) ? ["cron(15 19 ? * 1-5 *)"] : []
   event_role_arn        = local.event_role_arn
   extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
@@ -60,7 +60,7 @@ module nextstrain_alameda_local_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-alameda-local-sfn"
   image    = "${local.nextstrain_image_repo}:${local.image_tag}"
-  memory   = 32000
+  memory   = 64000
   wdl_path = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -69,7 +69,7 @@ module nextstrain_alameda_local_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn_spot.step_function_arn
-  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(0 10 ? * 1-5 *)"] : []
+  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(15 19 ? * 1-5 *)"] : []
   event_role_arn        = local.event_role_arn
    extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
@@ -88,7 +88,7 @@ module nextstrain_alameda_contextual_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-alameda-contextual-sfn"
   image    = "${local.nextstrain_image_repo}:${local.image_tag}"
-  memory   = 32000
+  memory   = 64000
   wdl_path = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -97,7 +97,7 @@ module nextstrain_alameda_contextual_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn_spot.step_function_arn
-  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(0 10 ? * 1-5 *)"] : []
+  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(15 19 ? * 1-5 *)"] : []
   event_role_arn        = local.event_role_arn
   extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
@@ -116,7 +116,7 @@ module nextstrain_contra_costa_local_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-contra-costa-local-sfn"
   image    = "${local.nextstrain_image_repo}:${local.image_tag}"
-  memory   = 32000
+  memory   = 64000
   wdl_path = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -125,7 +125,7 @@ module nextstrain_contra_costa_local_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn_spot.step_function_arn
-  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(0 10 ? * 1-5 *)"] : []
+  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(15 19 ? * 1-5 *)"] : []
   event_role_arn        = local.event_role_arn
    extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
@@ -144,7 +144,7 @@ module nextstrain_contra_costa_contextual_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-contra-costa-contextual-sfn"
   image    = "${local.nextstrain_image_repo}:${local.image_tag}"
-  memory   = 32000
+  memory   = 64000
   wdl_path = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -153,7 +153,7 @@ module nextstrain_contra_costa_contextual_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn_spot.step_function_arn
-  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(0 10 ? * 1-5 *)"] : []
+  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(15 19 ? * 1-5 *)"] : []
   event_role_arn        = local.event_role_arn
   extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
@@ -172,7 +172,7 @@ module nextstrain_fresno_local_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-fresno-local-sfn"
   image    = "${local.nextstrain_image_repo}:${local.image_tag}"
-  memory   = 32000
+  memory   = 64000
   wdl_path = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -181,7 +181,7 @@ module nextstrain_fresno_local_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn_spot.step_function_arn
-  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(0 10 ? * 1-5 *)"] : []
+  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(15 19 ? * 1-5 *)"] : []
   event_role_arn        = local.event_role_arn
    extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
@@ -200,7 +200,7 @@ module nextstrain_fresno_contextual_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-fresno-contextual-sfn"
   image    = "${local.nextstrain_image_repo}:${local.image_tag}"
-  memory   = 32000
+  memory   = 64000
   wdl_path = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -209,7 +209,7 @@ module nextstrain_fresno_contextual_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn_spot.step_function_arn
-  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(0 10 ? * 1-5 *)"] : []
+  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(15 19 ? * 1-5 *)"] : []
   event_role_arn        = local.event_role_arn
   extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
@@ -228,7 +228,7 @@ module nextstrain_humboldt_local_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-humboldt-local-sfn"
   image    = "${local.nextstrain_image_repo}:${local.image_tag}"
-  memory   = 32000
+  memory   = 64000
   wdl_path = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -237,7 +237,7 @@ module nextstrain_humboldt_local_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn_spot.step_function_arn
-  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(0 10 ? * 1-5 *)"] : []
+  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(15 19 ? * 1-5 *)"] : []
   event_role_arn        = local.event_role_arn
    extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
@@ -256,7 +256,7 @@ module nextstrain_humboldt_contextual_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-humboldt-contextual-sfn"
   image    = "${local.nextstrain_image_repo}:${local.image_tag}"
-  memory   = 32000
+  memory   = 64000
   wdl_path = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -265,7 +265,7 @@ module nextstrain_humboldt_contextual_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn_spot.step_function_arn
-  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(0 10 ? * 1-5 *)"] : []
+  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(15 19 ? * 1-5 *)"] : []
   event_role_arn        = local.event_role_arn
   extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
@@ -284,7 +284,7 @@ module nextstrain_marin_local_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-marin-local-sfn"
   image    = "${local.nextstrain_image_repo}:${local.image_tag}"
-  memory   = 32000
+  memory   = 64000
   wdl_path = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -293,7 +293,7 @@ module nextstrain_marin_local_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn_spot.step_function_arn
-  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(0 10 ? * 1-5 *)"] : []
+  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(15 19 ? * 1-5 *)"] : []
   event_role_arn        = local.event_role_arn
    extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
@@ -312,7 +312,7 @@ module nextstrain_marin_contextual_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-marin-contextual-sfn"
   image    = "${local.nextstrain_image_repo}:${local.image_tag}"
-  memory   = 32000
+  memory   = 64000
   wdl_path = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -321,7 +321,7 @@ module nextstrain_marin_contextual_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn_spot.step_function_arn
-  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(0 10 ? * 1-5 *)"] : []
+  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(15 19 ? * 1-5 *)"] : []
   event_role_arn        = local.event_role_arn
   extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
@@ -340,7 +340,7 @@ module nextstrain_monterey_local_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-monterey-local-sfn"
   image    = "${local.nextstrain_image_repo}:${local.image_tag}"
-  memory   = 32000
+  memory   = 64000
   wdl_path = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -349,7 +349,7 @@ module nextstrain_monterey_local_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn_spot.step_function_arn
-  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(0 10 ? * 1-5 *)"] : []
+  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(15 19 ? * 1-5 *)"] : []
   event_role_arn        = local.event_role_arn
    extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
@@ -368,7 +368,7 @@ module nextstrain_monterey_contextual_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-monterey-contextual-sfn"
   image    = "${local.nextstrain_image_repo}:${local.image_tag}"
-  memory   = 32000
+  memory   = 64000
   wdl_path = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -377,7 +377,7 @@ module nextstrain_monterey_contextual_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn_spot.step_function_arn
-  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(0 10 ? * 1-5 *)"] : []
+  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(15 19 ? * 1-5 *)"] : []
   event_role_arn        = local.event_role_arn
   extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
@@ -396,7 +396,7 @@ module nextstrain_orange_local_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-orange-local-sfn"
   image    = "${local.nextstrain_image_repo}:${local.image_tag}"
-  memory   = 32000
+  memory   = 64000
   wdl_path = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -405,7 +405,7 @@ module nextstrain_orange_local_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn_spot.step_function_arn
-  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(0 10 ? * 1-5 *)"] : []
+  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(15 19 ? * 1-5 *)"] : []
   event_role_arn        = local.event_role_arn
    extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
@@ -424,7 +424,7 @@ module nextstrain_orange_contextual_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-orange-contextual-sfn"
   image    = "${local.nextstrain_image_repo}:${local.image_tag}"
-  memory   = 32000
+  memory   = 64000
   wdl_path = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -433,7 +433,7 @@ module nextstrain_orange_contextual_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn_spot.step_function_arn
-  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(0 10 ? * 1-5 *)"] : []
+  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(15 19 ? * 1-5 *)"] : []
   event_role_arn        = local.event_role_arn
   extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
@@ -452,7 +452,7 @@ module nextstrain_san_bernardino_local_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-san-bernardino-local-sfn"
   image    = "${local.nextstrain_image_repo}:${local.image_tag}"
-  memory   = 32000
+  memory   = 64000
   wdl_path = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -461,7 +461,7 @@ module nextstrain_san_bernardino_local_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn_spot.step_function_arn
-  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(0 10 ? * 1-5 *)"] : []
+  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(15 19 ? * 1-5 *)"] : []
   event_role_arn        = local.event_role_arn
    extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
@@ -480,7 +480,7 @@ module nextstrain_san_bernardino_contextual_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-san-bernardino-contextual-sfn"
   image    = "${local.nextstrain_image_repo}:${local.image_tag}"
-  memory   = 32000
+  memory   = 64000
   wdl_path = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -489,7 +489,7 @@ module nextstrain_san_bernardino_contextual_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn_spot.step_function_arn
-  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(0 10 ? * 1-5 *)"] : []
+  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(15 19 ? * 1-5 *)"] : []
   event_role_arn        = local.event_role_arn
   extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
@@ -508,7 +508,7 @@ module nextstrain_san_joaquin_local_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-san-joaquin-local-sfn"
   image    = "${local.nextstrain_image_repo}:${local.image_tag}"
-  memory   = 32000
+  memory   = 64000
   wdl_path = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -517,7 +517,7 @@ module nextstrain_san_joaquin_local_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn_spot.step_function_arn
-  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(0 10 ? * 1-5 *)"] : []
+  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(15 19 ? * 1-5 *)"] : []
   event_role_arn        = local.event_role_arn
    extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
@@ -536,7 +536,7 @@ module nextstrain_san_joaquin_contextual_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-san-joaquin-contextual-sfn"
   image    = "${local.nextstrain_image_repo}:${local.image_tag}"
-  memory   = 32000
+  memory   = 64000
   wdl_path = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -545,7 +545,7 @@ module nextstrain_san_joaquin_contextual_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn_spot.step_function_arn
-  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(0 10 ? * 1-5 *)"] : []
+  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(15 19 ? * 1-5 *)"] : []
   event_role_arn        = local.event_role_arn
   extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
@@ -564,7 +564,7 @@ module nextstrain_san_luis_obispo_local_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-san-luis-obispo-local-sfn"
   image    = "${local.nextstrain_image_repo}:${local.image_tag}"
-  memory   = 32000
+  memory   = 64000
   wdl_path = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -573,7 +573,7 @@ module nextstrain_san_luis_obispo_local_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn_spot.step_function_arn
-  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(0 10 ? * 1-5 *)"] : []
+  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(15 19 ? * 1-5 *)"] : []
   event_role_arn        = local.event_role_arn
    extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
@@ -592,7 +592,7 @@ module nextstrain_san_luis_obispo_contextual_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-san-luis-obispo-contextual-sfn"
   image    = "${local.nextstrain_image_repo}:${local.image_tag}"
-  memory   = 32000
+  memory   = 64000
   wdl_path = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -601,7 +601,7 @@ module nextstrain_san_luis_obispo_contextual_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn_spot.step_function_arn
-  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(0 10 ? * 1-5 *)"] : []
+  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(15 19 ? * 1-5 *)"] : []
   event_role_arn        = local.event_role_arn
   extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
@@ -620,7 +620,7 @@ module nextstrain_san_francisco_local_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-san-francisco-local-sfn"
   image    = "${local.nextstrain_image_repo}:${local.image_tag}"
-  memory   = 32000
+  memory   = 64000
   wdl_path = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -629,7 +629,7 @@ module nextstrain_san_francisco_local_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn_spot.step_function_arn
-  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(0 10 ? * 1-5 *)"] : []
+  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(15 19 ? * 1-5 *)"] : []
   event_role_arn        = local.event_role_arn
    extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
@@ -648,7 +648,7 @@ module nextstrain_san_francisco_contextual_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-san-francisco-contextual-sfn"
   image    = "${local.nextstrain_image_repo}:${local.image_tag}"
-  memory   = 32000
+  memory   = 64000
   wdl_path = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -657,7 +657,7 @@ module nextstrain_san_francisco_contextual_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn_spot.step_function_arn
-  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(0 10 ? * 1-5 *)"] : []
+  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(15 19 ? * 1-5 *)"] : []
   event_role_arn        = local.event_role_arn
   extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
@@ -676,7 +676,7 @@ module nextstrain_tulare_local_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-tulare-local-sfn"
   image    = "${local.nextstrain_image_repo}:${local.image_tag}"
-  memory   = 32000
+  memory   = 64000
   wdl_path = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -685,7 +685,7 @@ module nextstrain_tulare_local_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn_spot.step_function_arn
-  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(0 10 ? * 1-5 *)"] : []
+  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(15 19 ? * 1-5 *)"] : []
   event_role_arn        = local.event_role_arn
    extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
@@ -704,7 +704,7 @@ module nextstrain_tulare_contextual_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-tulare-contextual-sfn"
   image    = "${local.nextstrain_image_repo}:${local.image_tag}"
-  memory   = 32000
+  memory   = 64000
   wdl_path = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -713,7 +713,7 @@ module nextstrain_tulare_contextual_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn_spot.step_function_arn
-  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(0 10 ? * 1-5 *)"] : []
+  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(15 19 ? * 1-5 *)"] : []
   event_role_arn        = local.event_role_arn
   extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
@@ -732,7 +732,7 @@ module nextstrain_tuolumne_local_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-tuolumne-local-sfn"
   image    = "${local.nextstrain_image_repo}:${local.image_tag}"
-  memory   = 32000
+  memory   = 64000
   wdl_path = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -741,7 +741,7 @@ module nextstrain_tuolumne_local_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn_spot.step_function_arn
-  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(0 10 ? * 1-5 *)"] : []
+  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(15 19 ? * 1-5 *)"] : []
   event_role_arn        = local.event_role_arn
    extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
@@ -760,7 +760,7 @@ module nextstrain_tuolumne_contextual_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-tuolumne-contextual-sfn"
   image    = "${local.nextstrain_image_repo}:${local.image_tag}"
-  memory   = 32000
+  memory   = 64000
   wdl_path = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -769,7 +769,7 @@ module nextstrain_tuolumne_contextual_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn_spot.step_function_arn
-  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(0 10 ? * 1-5 *)"] : []
+  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(15 19 ? * 1-5 *)"] : []
   event_role_arn        = local.event_role_arn
   extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
@@ -788,7 +788,7 @@ module nextstrain_ventura_local_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-ventura-local-sfn"
   image    = "${local.nextstrain_image_repo}:${local.image_tag}"
-  memory   = 32000
+  memory   = 64000
   wdl_path = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -797,7 +797,7 @@ module nextstrain_ventura_local_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn_spot.step_function_arn
-  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(0 10 ? * 1-5 *)"] : []
+  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(15 19 ? * 1-5 *)"] : []
   event_role_arn        = local.event_role_arn
    extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
@@ -816,7 +816,7 @@ module nextstrain_ventura_contextual_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-ventura-contextual-sfn"
   image    = "${local.nextstrain_image_repo}:${local.image_tag}"
-  memory   = 32000
+  memory   = 64000
   wdl_path = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -825,7 +825,7 @@ module nextstrain_ventura_contextual_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn_spot.step_function_arn
-  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(0 10 ? * 1-5 *)"] : []
+  schedule_expressions  = local.deployment_stage == "prod" ? ["cron(15 19 ? * 1-5 *)"] : []
   event_role_arn        = local.event_role_arn
   extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"

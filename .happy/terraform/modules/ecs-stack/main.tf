@@ -214,7 +214,7 @@ module nextstrain_template_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-sfn"
   image    = "${local.nextstrain_image_repo}:${local.image_tag}"
-  memory   = 32000
+  memory   = 64000
   wdl_path = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
