@@ -108,7 +108,7 @@ export const DataTable: FunctionComponent<Props> = ({
         }
       }
       return (
-        <div onClick={() => handleSortClick(header.sortKey)} key={header.sortKey.join("-")} className={style.headerCell}>
+        <div onClick={() => handleSortClick(header.sortKey)} key={header.sortKey.join("-")} className={style.headerMetaCell}>
           {headerJSX}{sortIndicator}
         </div>
       )

@@ -14,16 +14,21 @@
   padding-right: $space-l;
   border-bottom: 3px solid $gray-lightest !important;
 
+  .headerMetaCell {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+  }
+
   .headerCell {
     padding-bottom: $space-m;
-    width: 100%;
   }
 
   .headerCellContent {
     @include font-header-s;
 
     color: $gray-dark;
-    margin-right: $space-m;
+    margin-right: $space-xxs;
 
     &:hover {
       color: black;
