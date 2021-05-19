@@ -76,18 +76,14 @@ function reducer(state: TableState, action: TableAction) {
   if (newState.data === undefined) {
     newState.data = state.data;
   }
-  return initializeData(newState)
+  return initializeData(newState);
 }
 
 function initializeData(state: TableState): TableState {
   if (state.data === undefined) {
     return state;
   }
-  const newSort = sortData(
-    state.data,
-    state.sortKey,
-    state.ascending
-  );
+  const newSort = sortData(state.data, state.sortKey, state.ascending);
   return {
     ascending: state.ascending,
     data: newSort,
@@ -103,7 +99,11 @@ export const DataTable: FunctionComponent<Props> = ({
   renderer = defaultCellRenderer,
   isLoading,
 }: Props) => {
-  const [state, dispatch] = useReducer(reducer, { data, sortKey: defaultSortKey, ascending: false }, initializeData);
+  const [state, dispatch] = useReducer(
+    reducer,
+    { ascending: false, data, sortKey: defaultSortKey },
+    initializeData
+  );
 
   const indexingKey = headers[0].key;
 
