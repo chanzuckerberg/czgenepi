@@ -2,7 +2,11 @@ import React, { Fragment, FunctionComponent, useReducer } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import { get, isEqual } from "lodash/fp";
+
 import { EmptyState } from "../data_subview/components/EmptyState";
+import { ReactComponent as SortArrowDownIcon } from "src/common/icons/IconArrowDownSmall.svg"
+import { ReactComponent as SortArrowUpIcon } from "src/common/icons/IconArrowUpSmall.svg"
+
 import style from "./index.module.scss";
 import { RowContent, TableRow } from "./style";
 
@@ -100,11 +104,11 @@ export const DataTable: FunctionComponent<Props> = ({
   // render functions
   const headerRow = headers.map((header: Header, index) => {
       const headerJSX = headerRenderer({ header, index })
-      let sortIndicator = null;
+      let sortIndicator: JSX.Element | null = null;
       if (isEqual(header.sortKey, state.sortKey)) {
-        sortIndicator = "▼"
+        sortIndicator = <SortArrowDownIcon/>
         if (state.ascending) {
-          sortIndicator = "▲"
+          sortIndicator = <SortArrowUpIcon/>
         }
       }
       return (

@@ -18,6 +18,12 @@
     display: flex;
     width: 100%;
     flex-direction: row;
+    align-items: baseline;
+
+    svg {
+      fill: $black;
+      width: $icon-xs;
+    }
   }
 
   .headerCell {
@@ -31,7 +37,7 @@
     margin-right: $space-xxs;
 
     &:hover {
-      color: black;
+      color: $black;
       cursor: default;
     }
   }
