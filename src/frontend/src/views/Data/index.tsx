@@ -11,11 +11,6 @@ import style from "./index.module.scss";
 import { Container } from "./style";
 import { TREE_TRANSFORMS } from "./transforms";
 
-const sortByKeys: Record<string, string> = {
-  "Phylogenetic Trees": "creationDate",
-  Samples: "uploadDate",
-};
-
 const Data: FunctionComponent = () => {
   const [samples, setSamples] = useState<Sample[] | undefined>();
   const [trees, setTrees] = useState<Tree[] | undefined>();
@@ -47,6 +42,7 @@ const Data: FunctionComponent = () => {
   const dataCategories: DataCategory[] = [
     {
       data: samples,
+      defaultSortKey: ["uploadDate"],
       headerRenderer: SampleHeader,
       headers: SAMPLE_HEADERS,
       isDataLoading,
@@ -57,6 +53,7 @@ const Data: FunctionComponent = () => {
     },
     {
       data: trees,
+      defaultSortKey: ["creationDate"],
       headers: TREE_HEADERS,
       isDataLoading,
       renderer: TreeRenderer,
@@ -86,23 +83,6 @@ const Data: FunctionComponent = () => {
     });
 
     category.data = transformedData as BioinformaticsDataArray;
-  });
-
-  // sort data by creation date
-  dataCategories.forEach((category) => {
-    if (category.data === undefined) {
-      return;
-    }
-    const sortKey = sortByKeys[category.text];
-    const tempData: BioinformaticsDataArray = category.data.map(
-      (item: BioinformaticsData) => item
-    );
-    const sortedData: BioinformaticsDataArray = tempData.sort(
-      (a: BioinformaticsData, b: BioinformaticsData) => {
-        return String(a[sortKey]).localeCompare(String(b[sortKey])) * -1;
-      }
-    );
-    category.data = sortedData;
   });
 
   const dataJSX: Record<string, Array<JSX.Element>> = {
@@ -135,6 +115,7 @@ const Data: FunctionComponent = () => {
           <DataSubview
             isLoading={category.isDataLoading}
             data={category.data}
+            defaultSortKey={category.defaultSortKey}
             headers={category.headers}
             subheaders={category.subheaders}
             headerRenderer={category.headerRenderer}
