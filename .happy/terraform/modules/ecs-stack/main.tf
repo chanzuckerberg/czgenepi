@@ -59,6 +59,7 @@ locals {
   backend_alb_dns       = local.secret[local.alb_key]["backend"]["dns_name"]
 
   ecs_role_arn          = local.secret["service_roles"]["ecs_role"]
+  event_role_arn        = local.secret["service_roles"]["event_role"]
   sfn_role_arn          = local.secret["service_roles"]["sfn_nextstrain"]
 
   frontend_url = try(join("", ["https://", module.frontend_dns[0].dns_prefix, ".", local.external_dns]), var.frontend_url)
@@ -182,9 +183,9 @@ module gisaid_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
-  schedule_expressions  = contains(["prod", "staging"], local.deployment_stage) ? ["cron(0 0 ? * 1-5 *)"] : []
-  event_role_arn        = local.ecs_role_arn
+  sfn_arn               = module.swipe_sfn_spot.step_function_arn
+  schedule_expressions  = contains(["prod", "staging"], local.deployment_stage) ? ["cron(0 6 ? * 1-5 *)"] : []
+  event_role_arn        = local.event_role_arn
   extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
     remote_dev_prefix = local.remote_dev_prefix
@@ -204,9 +205,9 @@ module pangolin_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
-  schedule_expressions  = contains(["prod", "staging"], local.deployment_stage) ? ["cron(0 0 ? * 1-5 *)"] : []
-  event_role_arn        = local.ecs_role_arn
+  sfn_arn               = module.swipe_sfn_spot.step_function_arn
+  schedule_expressions  = contains(["prod", "staging"], local.deployment_stage) ? ["cron(0 6 ? * 1-5 *)"] : []
+  event_role_arn        = local.event_role_arn
 }
 
 module nextstrain_template_sfn_config {
@@ -221,8 +222,8 @@ module nextstrain_template_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
-  event_role_arn        = local.ecs_role_arn
+  sfn_arn               = module.swipe_sfn_spot.step_function_arn
+  event_role_arn        = local.event_role_arn
    extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
     remote_dev_prefix        = local.remote_dev_prefix
@@ -241,9 +242,9 @@ module covidhub_import_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
-  schedule_expressions  = contains(["prod", "staging"], local.deployment_stage) ? ["cron(0 0 ? * 1-5 *)"] : []
-  event_role_arn        = local.ecs_role_arn
+  sfn_arn               = module.swipe_sfn_spot.step_function_arn
+  schedule_expressions  = contains(["prod", "staging"], local.deployment_stage) ? ["cron(0 6 ? * 1-5 *)"] : []
+  event_role_arn        = local.event_role_arn
 }
 
 module migrate_db {
