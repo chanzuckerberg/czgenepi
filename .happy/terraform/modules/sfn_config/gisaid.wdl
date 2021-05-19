@@ -135,7 +135,7 @@ task TransformGISAID {
     # These are set by the Dockerfile and the Happy CLI
     aspen_workflow_rev=$COMMIT_SHA
     aspen_creation_rev=$COMMIT_SHA
-    
+
     # fetch aspen config
     aspen_config="$(aws secretsmanager get-secret-value --secret-id ~{aspen_config_secret_name} --query SecretString --output text)"
     aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$aspen_config")"
@@ -157,7 +157,6 @@ task TransformGISAID {
         --output-unix-newline
 
     zstdmt sequences.fasta
-    ls -lR
 
     # upload the files to S3
     sequences_key="processed_gisaid_dump/${build_id}/sequences.fasta.zst"

@@ -43,6 +43,9 @@ task nextstrain_workflow {
     set -Eeuxo pipefail
     shopt -s inherit_errexit
 
+    df 1>&2
+    cat /proc/meminfo 1>&2
+
     start_time=$(date +%s)
     build_id=$(date +%Y%m%d-%H%M)
 
