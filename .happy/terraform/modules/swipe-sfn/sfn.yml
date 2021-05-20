@@ -23,6 +23,7 @@ States:
       Timeout: &RunBatchTimeout
         AttemptDurationSeconds: 18000 # 5 hours
       ContainerOverrides:
+        Vcpus.$: $.RunSPOTVcpu
         Memory.$: $.RunSPOTMemory
         Environment: &RunEnvironment
           - Name: AWS_DEFAULT_REGION
@@ -78,6 +79,7 @@ States:
       JobDefinition: *JobDefinition
       Timeout: *RunBatchTimeout
       ContainerOverrides:
+        Vcpus.$: $.RunEC2Vcpu
         Memory.$: $.RunEC2Memory
         Environment: *RunEnvironment
     ResultPath: $.BatchJobDetails.Run

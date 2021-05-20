@@ -175,6 +175,7 @@ module gisaid_sfn_config {
   source   = "../sfn_config"
   app_name = "gisaid-sfn"
   image    = "${local.gisaid_image_repo}:${local.image_tag}"
+  vcpus    = 32
   memory   = 420000
   wdl_path = "workflows/gisaid.wdl"
   custom_stack_name     = local.custom_stack_name
@@ -214,6 +215,7 @@ module nextstrain_template_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-sfn"
   image    = "${local.nextstrain_image_repo}:${local.image_tag}"
+  vcpus    = 4
   memory   = 64000
   wdl_path = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
