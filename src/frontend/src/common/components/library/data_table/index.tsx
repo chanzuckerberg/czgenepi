@@ -77,10 +77,10 @@ export const DataTable: FunctionComponent<Props> = ({
   renderer = defaultCellRenderer,
   isLoading,
 }: Props) => {
-  const [state, dispatch] = useReducer(
-    reducer,
-    { ascending: false, sortKey: defaultSortKey }
-  );
+  const [state, dispatch] = useReducer(reducer, {
+    ascending: false,
+    sortKey: defaultSortKey,
+  });
 
   const indexingKey = headers[0].key;
 
@@ -91,7 +91,7 @@ export const DataTable: FunctionComponent<Props> = ({
     }
     dispatch({
       ascending: ascending,
-      sortKey: newSortKey
+      sortKey: newSortKey,
     });
   };
 
@@ -168,7 +168,6 @@ export const DataTable: FunctionComponent<Props> = ({
   if (data === undefined) {
     return render([]);
   }
-  console.log(state)
-  const sortedData = sortData(data, state.sortKey, state.ascending)
-  return render(sortedData)
+  const sortedData = sortData(data, state.sortKey, state.ascending);
+  return render(sortedData);
 };

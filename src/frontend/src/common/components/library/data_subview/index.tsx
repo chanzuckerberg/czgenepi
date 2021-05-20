@@ -109,7 +109,6 @@ const DataSubview: FunctionComponent<Props> = ({
   };
 
   const render = (tableData?: TableItem[]) => {
-    console.log(tableData)
     let downloadButton: JSX.Element | null = null;
     if (viewName === "Samples" && tableData !== undefined) {
       const [tsvHeaders, tsvData] = tsvDataMap(tableData, headers, subheaders);
