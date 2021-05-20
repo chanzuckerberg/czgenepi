@@ -34,12 +34,20 @@ refine:
 # Sampling groups that end with an `_early` suffix will omit data from the last 18 weeks.  Sampling groups that end with a `_late` suffix will only consider data from the last 18 weeks.
 subsampling:
   group_only:
+    # Do not subsample Aspen data. For genomes on both Aspen and Gisaid, de-duplication keeps the Aspen copy, so none of the Aspen genomes would be removed.
+    # The Aspen fasta here is already filtered by group.
+    allAspen:
+      exclude: "--exclude-where 'aspen!=yes'"
+      
+    # Subsample genomes on Gisaid.
     group_early:
+      exclude: "--exclude-where 'aspen=yes'"
       group_by: "year month"
       max_sequences: 500
       query: --query "(location == '{{location}}') & (division == '{{division}}')"
-
+      
     group_late:
+      exclude: "--exclude-where 'aspen=yes'"
       group_by: "year month"
       max_sequences: 2000
       query: --query "(location == '{{location}}') & (division == '{{division}}')"
