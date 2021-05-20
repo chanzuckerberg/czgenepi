@@ -61,34 +61,12 @@ function sortData(
 }
 
 interface TableState {
-  data?: TableItem[];
   sortKey: string[];
   ascending: boolean;
 }
 
-interface TableAction {
-  type: "sort" | "initialize";
-  newState: TableState;
-}
-
-function reducer(state: TableState, action: TableAction) {
-  const newState = action.newState;
-  if (newState.data === undefined) {
-    newState.data = state.data;
-  }
-  return initializeData(newState);
-}
-
-function initializeData(state: TableState): TableState {
-  if (state.data === undefined) {
-    return state;
-  }
-  const newSort = sortData(state.data, state.sortKey, state.ascending);
-  return {
-    ascending: state.ascending,
-    data: newSort,
-    sortKey: state.sortKey,
-  };
+function reducer(state: TableState, action: TableState) {
+  return { ...state, ...action };
 }
 
 export const DataTable: FunctionComponent<Props> = ({
@@ -101,8 +79,7 @@ export const DataTable: FunctionComponent<Props> = ({
 }: Props) => {
   const [state, dispatch] = useReducer(
     reducer,
-    { ascending: false, data, sortKey: defaultSortKey },
-    initializeData
+    { ascending: false, sortKey: defaultSortKey }
   );
 
   const indexingKey = headers[0].key;
@@ -113,8 +90,8 @@ export const DataTable: FunctionComponent<Props> = ({
       ascending = !state.ascending;
     }
     dispatch({
-      newState: { ascending: ascending, sortKey: newSortKey },
-      type: "sort",
+      ascending: ascending,
+      sortKey: newSortKey
     });
   };
 
@@ -188,16 +165,10 @@ export const DataTable: FunctionComponent<Props> = ({
     );
   };
 
-  if (state.data === undefined) {
-    let tableData: TableItem[] = [];
-    if (data !== undefined) {
-      dispatch({
-        newState: { ascending: false, data: data, sortKey: defaultSortKey },
-        type: "initialize",
-      });
-      tableData = sortData(data, defaultSortKey, false);
-    }
-    return render(tableData);
+  if (data === undefined) {
+    return render([]);
   }
-  return render(state.data);
+  console.log(state)
+  const sortedData = sortData(data, state.sortKey, state.ascending)
+  return render(sortedData)
 };

@@ -105,11 +105,11 @@ const DataSubview: FunctionComponent<Props> = ({
 
     const regex = new RegExp(escapeRegExp(query), "i");
     const filteredData = data.filter((item) => recursiveTest(item, regex));
-
     dispatch({ results: filteredData, searching: false });
   };
 
   const render = (tableData?: TableItem[]) => {
+    console.log(tableData)
     let downloadButton: JSX.Element | null = null;
     if (viewName === "Samples" && tableData !== undefined) {
       const [tsvHeaders, tsvData] = tsvDataMap(tableData, headers, subheaders);
@@ -159,7 +159,6 @@ const DataSubview: FunctionComponent<Props> = ({
       </div>
     );
   };
-
   if (state.results === undefined) {
     let tableData = undefined;
     if (data !== undefined) {
