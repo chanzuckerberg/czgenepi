@@ -1,35 +1,42 @@
 export const SAMPLE_HEADERS: Header[] = [
   {
     key: "privateId",
+    sortKey: ["privateId"],
     text: "Private ID",
   },
   {
     key: "publicId",
+    sortKey: ["publicId"],
     text: "Public ID",
   },
   {
     key: "uploadDate",
+    sortKey: ["uploadDate"],
     text: "Upload Date",
   },
   {
     key: "collectionDate",
+    sortKey: ["collectionDate"],
     text: "Collection Date",
   },
   {
     key: "collectionLocation",
+    sortKey: ["collectionLocation"],
     text: "Collection Location",
   },
   {
     key: "lineage",
+    sortKey: ["lineage", "lineage"],
     text: "Lineage",
   },
   {
     key: "gisaid",
+    sortKey: ["gisaid", "status"],
     text: "GISAID",
   },
 ];
 
-export const SAMPLE_SUBHEADERS: Record<string, Header[]> = {
+export const SAMPLE_SUBHEADERS: Record<string, SubHeader[]> = {
   gisaid: [
     {
       key: "status",
@@ -63,14 +70,17 @@ export const SAMPLE_SUBHEADERS: Record<string, Header[]> = {
 export const TREE_HEADERS: Header[] = [
   {
     key: "name",
+    sortKey: ["name"],
     text: "Tree Name",
   },
   {
     key: "creationDate",
+    sortKey: ["creationDate"],
     text: "Creation Date",
   },
   {
     key: "downloadLink",
+    sortKey: ["downloadLink"],
     text: "",
   },
 ];
