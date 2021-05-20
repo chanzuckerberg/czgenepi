@@ -36,7 +36,7 @@ subsampling:
   group_only:
     # Do not subsample Aspen data. 
     # The Aspen fasta here is already filtered by group.
-    allAspen:
+    all_aspen:
       exclude: "--exclude-where 'aspen!=yes'"
       
     # Subsample genomes on Gisaid.
