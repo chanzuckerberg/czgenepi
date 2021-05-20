@@ -1,12 +1,7 @@
 interface Header {
-  [index: string]: string | number | string[];
+  [index: string]: string;
   text: string;
   key: string | number;
-  sortKey: string[];
-}
-
-interface SubHeader extends Header {
-  sortKey?: string[];
 }
 
 type TableItem = Record<
