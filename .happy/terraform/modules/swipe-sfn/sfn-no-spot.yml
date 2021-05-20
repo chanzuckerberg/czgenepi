@@ -23,6 +23,7 @@ States:
       Timeout:
         AttemptDurationSeconds: 18000 # 5 hours
       ContainerOverrides:
+        Vcpus.$: $.RunEC2Vcpu
         Memory.$: $.RunEC2Memory
         Environment:
           - Name: AWS_DEFAULT_REGION

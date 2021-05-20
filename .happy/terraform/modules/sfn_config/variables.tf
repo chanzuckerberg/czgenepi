@@ -8,6 +8,12 @@ variable image {
   description = "Image URL"
 }
 
+variable vcpus {
+  type        = number
+  description = "How many vcpus to allocate to the batch job"
+  default     = 1
+}
+
 variable memory {
   type        = number
   description = "How much memory to allocate to the batch job"
