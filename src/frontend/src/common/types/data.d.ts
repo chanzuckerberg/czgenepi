@@ -6,12 +6,11 @@ interface Transform {
 
 interface DataCategory {
   data: BioinformaticsDataArray | undefined;
-  defaultSortKey: string[];
   headerRenderer?: CustomRenderer;
   headers: Header[];
   isDataLoading: boolean;
   renderer?: CustomRenderer;
-  subheaders: Record<string, SubHeader[]>;
+  subheaders: Record<string, Header[]>;
   text: string;
   to: string;
   transforms?: Transform[];

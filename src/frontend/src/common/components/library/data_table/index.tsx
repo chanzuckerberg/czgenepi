@@ -1,9 +1,6 @@
-import { get, isEqual } from "lodash/fp";
-import React, { Fragment, FunctionComponent, useReducer } from "react";
+import React, { Fragment, FunctionComponent } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
-import { ReactComponent as SortArrowDownIcon } from "src/common/icons/IconArrowDownSmall.svg";
-import { ReactComponent as SortArrowUpIcon } from "src/common/icons/IconArrowUpSmall.svg";
 import { EmptyState } from "../data_subview/components/EmptyState";
 import style from "./index.module.scss";
 import { RowContent, TableRow } from "./style";
@@ -11,7 +8,6 @@ import { RowContent, TableRow } from "./style";
 interface Props {
   data?: TableItem[];
   headers: Header[];
-  defaultSortKey: string[];
   isLoading: boolean;
   renderer?: CustomRenderer;
   headerRenderer?: HeaderRenderer;
@@ -46,99 +42,19 @@ export function defaultHeaderRenderer({
   );
 }
 
-function sortData(
-  data: TableItem[],
-  sortKey: string[],
-  ascending: boolean
-): TableItem[] {
-  return data.sort((a, b): number => {
-    let order = String(get(sortKey, a)).localeCompare(String(get(sortKey, b)));
-    if (!ascending) {
-      order = order * -1;
-    }
-    return order;
-  });
-}
-
-interface TableState {
-  data?: TableItem[];
-  sortKey: string[];
-  ascending: boolean;
-}
-
-interface TableAction {
-  type: "sort" | "initialize";
-  newState: TableState;
-}
-
-function reducer(state: TableState, action: TableAction) {
-  const newState = action.newState;
-  if (newState.data === undefined) {
-    newState.data = state.data;
-  }
-  return initializeData(newState);
-}
-
-function initializeData(state: TableState): TableState {
-  if (state.data === undefined) {
-    return state;
-  }
-  const newSort = sortData(state.data, state.sortKey, state.ascending);
-  return {
-    ascending: state.ascending,
-    data: newSort,
-    sortKey: state.sortKey,
-  };
-}
-
 export const DataTable: FunctionComponent<Props> = ({
-  data,
+  data = [],
   headers,
-  defaultSortKey,
   headerRenderer = defaultHeaderRenderer,
   renderer = defaultCellRenderer,
   isLoading,
 }: Props) => {
-  const [state, dispatch] = useReducer(
-    reducer,
-    { ascending: false, data, sortKey: defaultSortKey },
-    initializeData
-  );
-
   const indexingKey = headers[0].key;
 
-  const handleSortClick = (newSortKey: string[]) => {
-    let ascending = false;
-    if (isEqual(newSortKey, state.sortKey)) {
-      ascending = !state.ascending;
-    }
-    dispatch({
-      newState: { ascending: ascending, sortKey: newSortKey },
-      type: "sort",
-    });
-  };
-
   // render functions
-  const headerRow = headers.map((header: Header, index) => {
-    const headerJSX = headerRenderer({ header, index });
-    let sortIndicator: JSX.Element | null = null;
-    if (isEqual(header.sortKey, state.sortKey)) {
-      sortIndicator = <SortArrowDownIcon />;
-      if (state.ascending) {
-        sortIndicator = <SortArrowUpIcon />;
-      }
-    }
-    return (
-      <div
-        onClick={() => handleSortClick(header.sortKey)}
-        key={header.sortKey.join("-")}
-        className={style.headerMetaCell}
-      >
-        {headerJSX}
-        {sortIndicator}
-      </div>
-    );
-  });
+  const headerRow = headers.map((header: Header, index) =>
+    headerRenderer({ header, index })
+  );
 
   const sampleRow = (item: TableItem): React.ReactNode => {
     if (isLoading) {
@@ -156,48 +72,32 @@ export const DataTable: FunctionComponent<Props> = ({
     });
   };
 
-  const render = (tableData: TableItem[]) => {
-    function renderRow(props: ListChildComponentProps) {
-      const item = tableData[props.index];
+  function renderRow(props: ListChildComponentProps) {
+    const item = data[props.index];
 
-      return <TableRow style={props.style}>{sampleRow(item)}</TableRow>;
-    }
-    return (
-      <div className={style.container}>
-        <div className={style.header}>{headerRow}</div>
-        <div className={style.tableContent}>
-          <AutoSizer>
-            {({ height, width }) => {
-              return (
-                <FixedSizeList
-                  height={height}
-                  itemData={tableData}
-                  itemCount={
-                    isLoading ? LOADING_STATE_ROW_COUNT : tableData.length
-                  }
-                  itemSize={ITEM_HEIGHT_PX}
-                  width={width}
-                >
-                  {renderRow}
-                </FixedSizeList>
-              );
-            }}
-          </AutoSizer>
-        </div>
-      </div>
-    );
-  };
-
-  if (state.data === undefined) {
-    let tableData: TableItem[] = [];
-    if (data !== undefined) {
-      dispatch({
-        newState: { ascending: false, data: data, sortKey: defaultSortKey },
-        type: "initialize",
-      });
-      tableData = sortData(data, defaultSortKey, false);
-    }
-    return render(tableData);
+    return <TableRow style={props.style}>{sampleRow(item)}</TableRow>;
   }
-  return render(state.data);
+
+  return (
+    <div className={style.container}>
+      <div className={style.header}>{headerRow}</div>
+      <div className={style.tableContent}>
+        <AutoSizer>
+          {({ height, width }) => {
+            return (
+              <FixedSizeList
+                height={height}
+                itemData={data}
+                itemCount={isLoading ? LOADING_STATE_ROW_COUNT : data.length}
+                itemSize={ITEM_HEIGHT_PX}
+                width={width}
+              >
+                {renderRow}
+              </FixedSizeList>
+            );
+          }}
+        </AutoSizer>
+      </div>
+    </div>
+  );
 };
