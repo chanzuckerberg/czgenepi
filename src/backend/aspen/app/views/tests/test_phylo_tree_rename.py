@@ -91,3 +91,55 @@ def test_phylo_tree_rename(session, mock_s3_resource, test_data_dir):
             ],
         }
     }
+
+
+def test_phylo_tree_rename_admin(session, mock_s3_resource, test_data_dir):
+    """Create a set of samples belonging to a different group, but visible because the
+    viewer is an admin.  Verify that the nodes are renamed correctly."""
+    viewer_group = group_factory()
+    owner_group = group_factory("no_can_see")
+    session.add_all([viewer_group, owner_group])
+
+    user = user_factory(viewer_group)
+
+    renamed_sample = sample_factory(
+        viewer_group,
+        private_identifier="private_identifier_1",
+        public_identifier="public_identifier_1",
+    )
+
+    phylo_tree = phylotree_factory(
+        phylorun_factory(viewer_group),
+        [renamed_sample],
+    )
+
+    # We need to create the bucket since this is all in Moto's 'virtual' AWS account
+    mock_s3_resource.create_bucket(Bucket=phylo_tree.s3_bucket)
+
+    json_test_file = test_data_dir / "ncov_aspen.json"
+    with json_test_file.open() as fh:
+        test_json = json.dumps(json.load(fh))
+
+    mock_s3_resource.Bucket(phylo_tree.s3_bucket).Object(phylo_tree.s3_key).put(
+        Body=test_json
+    )
+
+    # this is mandatory because we use an id to reference the tree.
+    session.commit()
+
+    tree = _process_phylo_tree(session, phylo_tree.entity_id, user.auth0_user_id)
+
+    assert tree == {
+        "tree": {
+            "name": "private_identifier_1",
+            "GISAID_ID": "public_identifier_1",
+            "children": [
+                {"name": "public_identifier_2"},
+                {"name": "public_identifier_3"},
+                {
+                    "name": "public_identifier_4",
+                    "children": [{"name": "public_identifier_5"}],
+                },
+            ],
+        }
+    }
