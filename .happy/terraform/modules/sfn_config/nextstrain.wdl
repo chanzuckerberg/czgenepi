@@ -75,9 +75,6 @@ task nextstrain_workflow {
     git checkout FETCH_HEAD
     ncov_git_rev=$(git rev-parse HEAD)
 
-    # patch ncov/scripts/combine-and-dedup-fastas.py
-    patch -p1 < /usr/src/app/aspen/workflows/nextstrain_run/combine-and-dedup-fastas.py.patch
-
     cp /usr/src/app/aspen/workflows/nextstrain_run/nextstrain_profile/* /ncov/my_profiles/aspen/
 
     # dump the sequences, metadata, and builds.yaml for a run out to disk.
