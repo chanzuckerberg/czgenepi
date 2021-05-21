@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { getColors, getSpacings } from "czifui";
+import { getColors, getSpacings, Props } from "czifui";
 
 export const TableRow = styled.div`
   display: flex;
@@ -20,6 +20,7 @@ export const RowContent = styled.div`
   display: flex;
   align-items: center;
   width: 100%;
+
   ${(props) => {
     const spacings = getSpacings(props);
 
@@ -29,3 +30,13 @@ export const RowContent = styled.div`
   `;
   }}
 `;
+
+export const icon = (props: Props) => {
+  const colors = getColors(props);
+  const spacings = getSpacings(props);
+
+  return `
+    margin: 0 ${spacings?.l}px;
+    fill: ${colors?.gray[500]};
+  `;
+};
