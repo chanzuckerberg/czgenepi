@@ -2,7 +2,7 @@ import json
 import os
 import re
 import uuid
-from typing import Any, Iterable, Mapping, MutableSequence, Set, Tuple, Union
+from typing import Any, Callable, Iterable, Mapping, MutableSequence, Set, Tuple, Union
 
 import boto3
 import sqlalchemy
@@ -152,22 +152,31 @@ def _process_phylo_tree(
             400,
         )
 
-    can_see_group_ids_pi: Set[int] = {user.group_id}
-    can_see_group_ids_pi.update(
-        {
-            can_see.owner_group_id
-            for can_see in user.group.can_see
-            if can_see.data_type == DataType.PRIVATE_IDENTIFIERS
-        }
-    )
+    sample_filter: Callable[[Sample], bool]
+    if user.system_admin:
+
+        def sample_filter(_: Sample):
+            return True
+
+    else:
+        can_see_group_ids_pi: Set[int] = {user.group_id}
+        can_see_group_ids_pi.update(
+            {
+                can_see.owner_group_id
+                for can_see in user.group.can_see
+                if can_see.data_type == DataType.PRIVATE_IDENTIFIERS
+            }
+        )
+
+        def sample_filter(sample: Sample):
+            return sample.submitting_group_id in can_see_group_ids_pi
 
     identifier_map: Mapping[str, str] = {
         sample.public_identifier: sample.private_identifier
         for sample in phylo_tree.constituent_samples
-        if sample.submitting_group_id in can_see_group_ids_pi
+        if sample_filter(sample)
     }
 
-    # TODO: add access control for this tree.
     # TODO: add a per-process shared AWS handle.
     s3 = boto3.resource("s3")
 
