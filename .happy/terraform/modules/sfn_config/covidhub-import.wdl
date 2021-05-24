@@ -22,7 +22,7 @@ task covidhub_import_workflow {
     command <<<
     echo "RUNNING MIGRATE SCRIPT"
     chmod +x /usr/src/app/scripts/migrate-all.sh
-    /usr/src/app/scripts/migrate-all.sh
+    /usr/src/app/scripts/migrate-all.sh 1>&2
     >>>
 
     runtime {
