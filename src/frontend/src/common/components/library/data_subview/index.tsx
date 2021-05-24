@@ -119,6 +119,7 @@ const DataSubview: FunctionComponent<Props> = ({
           headers={tsvHeaders}
           filename="samples_overview.tsv"
           separator={separator}
+          data-test-id="download-tsv-link"
         >
           <Button
             variant="contained"
@@ -141,6 +142,7 @@ const DataSubview: FunctionComponent<Props> = ({
               placeholder="Search"
               loading={state.searching}
               onChange={searcher}
+              data-test-id="search"
             />
           </div>
           <div className={style.searchBarTableDownload}>{downloadButton}</div>

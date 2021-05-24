@@ -49,13 +49,14 @@ const ConfirmButton = (props: Props) => {
       variant="contained"
       isRounded
       disabled={isLoading || hasError || !url}
+      data-test-id="tree-link-button"
     >
       {getText({ hasError, isLoading })}
     </Button>
   );
 
   return url ? (
-    <Link href={url} target="_blank" rel="noopener">
+    <Link data-test-id="tree-link" href={url} target="_blank" rel="noopener">
       {Content}
     </Link>
   ) : (

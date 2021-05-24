@@ -30,7 +30,7 @@ const TreeVizModal = ({ info, open, onClose }: Props): JSX.Element => {
         <Header>{header}</Header>
       </DialogTitle>
       <DialogContent narrow>
-        <Content>{body}</Content>
+        <Content data-test-id="modal-content">{body}</Content>
       </DialogContent>
       <DialogActions narrow>
         {ConfirmButton && <ConfirmButton onClick={onClose} />}

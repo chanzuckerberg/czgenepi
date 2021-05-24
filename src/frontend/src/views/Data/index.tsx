@@ -122,7 +122,12 @@ const Data: FunctionComponent = () => {
         <a href="passHref">
           <Menu.Item className={style.menuItem}>
             <div className={style.category}>
-              <div className={cx(style.title, focusStyle)}>{category.text}</div>
+              <div
+                className={cx(style.title, focusStyle)}
+                data-test-id="data-menu-item"
+              >
+                {category.text}
+              </div>
               <div className={style.count}>{category.data?.length}</div>
             </div>
           </Menu.Item>
@@ -143,7 +148,7 @@ const Data: FunctionComponent = () => {
         <title>Aspen {title && " | " + title}</title>
       </Head>
 
-      <div className={style.navigation}>
+      <div className={style.navigation} data-test-id="data-menu-items">
         <Menu className={style.menu} secondary>
           {dataJSX.menuItems}
         </Menu>

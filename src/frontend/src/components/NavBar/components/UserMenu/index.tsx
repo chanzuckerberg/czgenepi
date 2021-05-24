@@ -36,7 +36,12 @@ const UserMenu = ({ user }: UserMenuProps): JSX.Element => {
 
   return (
     <>
-      <Button onClick={handleClick} classes={classes} endIcon={<ExpandMore />}>
+      <Button
+        data-test-id="nav-user-menu"
+        onClick={handleClick}
+        classes={classes}
+        endIcon={<ExpandMore />}
+      >
         {user}
       </Button>
       <Menu

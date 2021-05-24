@@ -36,7 +36,7 @@ const NavBar = (): JSX.Element => {
   const orgSplash = hasOrg();
 
   const signInLink = (
-    <a href={ENV.API_URL + API.LOG_IN}>
+    <a href={ENV.API_URL + API.LOG_IN} data-test-id="navbar-sign-in-link">
       <div className={cx(style.item, style.link)}>Sign In</div>
     </a>
   );
@@ -54,11 +54,11 @@ const NavBar = (): JSX.Element => {
   const route = user ? ROUTES.DATA : ROUTES.HOMEPAGE;
 
   return (
-    <div className={style.bar}>
+    <div className={style.bar} data-test-id="navbar">
       <div className={style.left}>
         <Link href={route} passHref>
           <LogoAnchor href="passHref">
-            <Logo />
+            <Logo data-test-id="logo" />
           </LogoAnchor>
         </Link>
         {orgSplash}
