@@ -1,9 +1,9 @@
 from typing import Collection, Dict, Mapping, Union
 
-from flask import jsonify, request, Response, session
 from auth0.v3 import authentication as auth0_authentication
-from auth0.v3.management import Auth0
 from auth0.v3.exceptions import Auth0Error
+from auth0.v3.management import Auth0
+from flask import jsonify, request, Response, session
 
 from aspen.app.app import application, requires_auth
 from aspen.app.views.api_utils import filter_usergroup_dict, get_usergroup_query
@@ -30,11 +30,9 @@ def create_auth0_entry(name, email, password, config) -> str:
 
     get_token = auth0_authentication.GetToken(domain)
     token = get_token.client_credentials(
-        client_id,
-        client_secret,
-        'https://{}/api/v2/'.format(domain)
+        client_id, client_secret, "https://{}/api/v2/".format(domain)
     )
-    mgmt_api_token: auth0_authentication.get_token.GetToken = token['access_token']
+    mgmt_api_token: auth0_authentication.get_token.GetToken = token["access_token"]
 
     auth0: Auth0 = Auth0(domain, mgmt_api_token)
     try:
@@ -42,9 +40,9 @@ def create_auth0_entry(name, email, password, config) -> str:
             {
                 "connection": "Username-Password-Authentication",
                 "email": email,
-                 "name": name,
-                 "password": password,
-             }
+                "name": name,
+                "password": password,
+            }
         )
     except Auth0Error as e:
         return Response(e.message, e.status_code)
@@ -88,10 +86,14 @@ def usergroup():
             if user.system_admin:
                 # check we're only getting fields that we expect
                 new_user_data: Dict[str, Union[str, bool]] = {
-                    k: v for k, v in request.get_json().items() if k in POST_USER_REQUIRED_FIELDS + POST_USER_OPTIONAL_FIELDS
+                    k: v
+                    for k, v in request.get_json().items()
+                    if k in POST_USER_REQUIRED_FIELDS + POST_USER_OPTIONAL_FIELDS
                 }
                 missing_required_fields = [
-                    f for f in POST_USER_REQUIRED_FIELDS if f not in new_user_data.keys()
+                    f
+                    for f in POST_USER_REQUIRED_FIELDS
+                    if f not in new_user_data.keys()
                 ]
                 if missing_required_fields:
                     return Response(
@@ -100,7 +102,14 @@ def usergroup():
                     )
                 else:
                     if "auth0_user_id" not in new_user_data.keys():
-                        user_created: Union[Mapping[str, Union[str, bool]], Response] = create_auth0_entry(new_user_data["name"], new_user_data["email"], "pwd", application.aspen_config)
+                        user_created: Union[
+                            Mapping[str, Union[str, bool]], Response
+                        ] = create_auth0_entry(
+                            new_user_data["name"],
+                            new_user_data["email"],
+                            "pwd",
+                            application.aspen_config,
+                        )
                         # check if any issues trying to create new user
                         if isinstance(user_created, Response):
                             return user_created

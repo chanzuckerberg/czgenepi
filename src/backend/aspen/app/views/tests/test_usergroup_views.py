@@ -95,7 +95,7 @@ def test_usergroup_view_post_pass_no_auth0_user_id(mocker, session, app, client)
 
     mocker.patch(
         "aspen.app.views.usergroup.create_auth0_entry",
-        return_value={"user_id": "new_auth0_entry"}
+        return_value={"user_id": "new_auth0_entry"},
     )
 
     with client.session_transaction() as sess:
@@ -127,7 +127,7 @@ def test_usergroup_view_post_fail_no_auth0_user_id(mocker, session, app, client)
 
     mocker.patch(
         "aspen.app.views.usergroup.create_auth0_entry",
-        return_value=Response("Auth0Error", 400)
+        return_value=Response("Auth0Error", 400),
     )
 
     with client.session_transaction() as sess:
@@ -143,10 +143,7 @@ def test_usergroup_view_post_fail_no_auth0_user_id(mocker, session, app, client)
     res = client.post("/api/usergroup", json=data, content_type="application/json")
 
     assert res.status == "400 BAD REQUEST"
-    assert (
-        res.get_data()
-        == b"Auth0Error"
-    )
+    assert res.get_data() == b"Auth0Error"
 
 
 def test_usergroup_view_post_fail_not_system_admin(session, app, client):
