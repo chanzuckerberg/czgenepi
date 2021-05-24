@@ -213,30 +213,30 @@ def import_project(
             else:
                 czbids_to_process.append(czbid_lookup_by_str[czbids.pop()])
 
-            # load the existing samples, store as a mapping between external accession to
-            # sample.
-            samples = (
-                session.query(Sample)
-                .filter(Sample.submitting_group == group)
-                .options(
-                    joinedload(Sample.uploaded_pathogen_genome)
-                    .joinedload(
-                        UploadedPathogenGenome.consuming_workflows.of_type(  # type: ignore
-                            GisaidAccessionWorkflow
-                        )
-                    )
-                    .joinedload(
-                        GisaidAccessionWorkflow.outputs.of_type(GisaidAccession)  # type: ignore
+        # load the existing samples, store as a mapping between external accession to
+        # sample.
+        samples = (
+            session.query(Sample)
+            .filter(Sample.submitting_group == group)
+            .options(
+                joinedload(Sample.uploaded_pathogen_genome)
+                .joinedload(
+                    UploadedPathogenGenome.consuming_workflows.of_type(  # type: ignore
+                        GisaidAccessionWorkflow
                     )
                 )
-                .all()
+                .joinedload(
+                    GisaidAccessionWorkflow.outputs.of_type(GisaidAccession)  # type: ignore
+                )
             )
-            external_accessions_to_samples: Mapping[str, Sample] = {
-                sample.private_identifier: sample for sample in samples
-            }
-            public_id_to_samples: Mapping[str, Sample] = {
-                sample.public_identifier: sample for sample in samples
-            }
+            .all()
+        )
+        external_accessions_to_samples: Mapping[str, Sample] = {
+            sample.private_identifier: sample for sample in samples
+        }
+        public_id_to_samples: Mapping[str, Sample] = {
+            sample.public_identifier: sample for sample in samples
+        }
 
         logger.info("Creating new objects...")
         for czbid in tqdm.tqdm(czbids_to_process):
