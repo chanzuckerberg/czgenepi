@@ -1,4 +1,5 @@
 import datetime
+import io
 import json
 import os
 import subprocess
@@ -7,6 +8,7 @@ from typing import Iterable, MutableSequence, Optional, Sequence, Type
 import boto3
 import click
 from IPython.terminal.embed import InteractiveShellEmbed
+from sqlalchemy import and_
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql import expression
@@ -33,6 +35,7 @@ from aspen.database.models import (
     PhyloRun,
     Sample,
     SequencingReadsCollection,
+    UploadedPathogenGenome,
     Workflow,
     WorkflowStatusType,
 )
@@ -408,3 +411,62 @@ def create_phylo_run(
 
         workflow_id = workflow.workflow_id
     print(workflow_id)
+
+
+@db.command("create-mega-fasta")
+@click.option(
+    "public_identifier_input_fh",
+    "--public-identifier-txt",
+    type=click.File("r"),
+    required=True,
+)
+@click.option(
+    "sequences_output_fh", "--sequences-output", type=click.File("w"), required=True
+)
+@click.pass_context
+def create_mega_fasta(
+    ctx, public_identifier_input_fh: io.TextIOBase, sequences_output_fh: io.TextIOBase
+):
+
+    engine = ctx.obj["ENGINE"]
+    with session_scope(engine) as session:
+
+        public_identifiers: Sequence[str] = [
+            line.strip() for line in public_identifier_input_fh
+        ]
+
+        all_samples: Iterable[Sample] = (
+            session.query(Sample)
+            .filter(
+                and_(
+                    Sample.uploaded_pathogen_genome != None,  # noqa: E711
+                    Sample.public_identifier.in_(public_identifiers),
+                )
+            )
+            .options(
+                joinedload(Sample.uploaded_pathogen_genome).undefer(
+                    UploadedPathogenGenome.sequence
+                ),
+            )
+        )
+
+        # TODO: this code is now used in multiple places, find central location to store this
+        for sample in all_samples:
+            # filter for samples that passed genome recovery
+            # TODO: handle case for if CalledPathogenGenome
+            if sample.uploaded_pathogen_genome:
+                pathogen_genome: UploadedPathogenGenome = (
+                    sample.uploaded_pathogen_genome
+                )
+                sequence: str = "".join(
+                    [
+                        line
+                        for line in pathogen_genome.sequence.splitlines()  # type: ignore
+                        if not (line.startswith(">") or line.startswith(";"))
+                    ]
+                )
+
+                stripped_sequence: str = sequence.strip("Nn")
+                sequences_output_fh.write(f">{sample.public_identifier}\n")  # type: ignore
+                sequences_output_fh.write(stripped_sequence)
+                sequences_output_fh.write("\n")

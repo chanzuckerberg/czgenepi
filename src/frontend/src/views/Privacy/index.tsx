@@ -1,4 +1,5 @@
 import { Link, ListItemLabel } from "czifui";
+import Head from "next/head";
 import React from "react";
 import { ROUTES } from "src/common/routes";
 import List from "src/common/styles/support/components/List";
@@ -867,22 +868,27 @@ const PrivacyPolicy = (): JSX.Element => {
   );
 
   return (
-    <Container>
-      <NarrowContainer>
-        {renderIntro()}
-        {renderSummaryTable()}
-        {renderUploadDataPolicy()}
-        {renderReportDataPolicy()}
-        {renderVisitorAndUserDataPolicy()}
-        {renderVendorAndThirdPartyPolicy()}
-        {renderInformationProtectionPolicy()}
-        {renderDataRetentionAndDeletionPolicy()}
-        {renderUserDataChoicesPolicy()}
-        {renderDataLocation()}
-        {renderContactInfo()}
-        {renderChangesToPrivacyNotice()}
-      </NarrowContainer>
-    </Container>
+    <>
+      <Head>
+        <title>Aspen | Privacy</title>
+      </Head>
+      <Container>
+        <NarrowContainer>
+          {renderIntro()}
+          {renderSummaryTable()}
+          {renderUploadDataPolicy()}
+          {renderReportDataPolicy()}
+          {renderVisitorAndUserDataPolicy()}
+          {renderVendorAndThirdPartyPolicy()}
+          {renderInformationProtectionPolicy()}
+          {renderDataRetentionAndDeletionPolicy()}
+          {renderUserDataChoicesPolicy()}
+          {renderDataLocation()}
+          {renderContactInfo()}
+          {renderChangesToPrivacyNotice()}
+        </NarrowContainer>
+      </Container>
+    </>
   );
 };
 

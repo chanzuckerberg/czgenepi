@@ -8,6 +8,12 @@ variable image {
   description = "Image URL"
 }
 
+variable vcpus {
+  type        = number
+  description = "How many vcpus to allocate to the batch job"
+  default     = 1
+}
+
 variable memory {
   type        = number
   description = "How much memory to allocate to the batch job"
@@ -43,6 +49,24 @@ variable custom_stack_name {
   description = "Please provide the stack name"
 }
 
+variable schedule_expressions {
+  type        = list(string)
+  description = "list of strings to use for triggering a SFN on a schedule. ex: [\"cron(0 0 ? * 1-5 *)\"]"
+  default     = []
+}
+
+variable event_role_arn {
+  type        = string
+  description = "Role ARN to use to trigger a scheduled SFN"
+  default     = ""
+}
+
+variable sfn_arn {
+  type        = string
+  description = "ARN of the SFN to invoke on a schedule"
+  default     = ""
+}
+
 variable deployment_stage {
   type        = string
   description = "The name of the deployment stage of the Application"
@@ -50,7 +74,6 @@ variable deployment_stage {
 }
 
 variable extra_args {
-  type = map(string)
   description = "some stuff"
   default = {}
 }

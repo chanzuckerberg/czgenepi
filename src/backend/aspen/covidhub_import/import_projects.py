@@ -215,23 +215,27 @@ def import_project(
 
         # load the existing samples, store as a mapping between external accession to
         # sample.
-        external_accessions_to_samples: Mapping[str, Sample] = {
-            sample.private_identifier: sample
-            for sample in (
-                session.query(Sample)
-                .filter(Sample.submitting_group == group)
-                .options(
-                    joinedload(Sample.uploaded_pathogen_genome)
-                    .joinedload(
-                        UploadedPathogenGenome.consuming_workflows.of_type(  # type: ignore
-                            GisaidAccessionWorkflow
-                        )
-                    )
-                    .joinedload(
-                        GisaidAccessionWorkflow.outputs.of_type(GisaidAccession)  # type: ignore
+        samples = (
+            session.query(Sample)
+            .filter(Sample.submitting_group == group)
+            .options(
+                joinedload(Sample.uploaded_pathogen_genome)
+                .joinedload(
+                    UploadedPathogenGenome.consuming_workflows.of_type(  # type: ignore
+                        GisaidAccessionWorkflow
                     )
                 )
+                .joinedload(
+                    GisaidAccessionWorkflow.outputs.of_type(GisaidAccession)  # type: ignore
+                )
             )
+            .all()
+        )
+        external_accessions_to_samples: Mapping[str, Sample] = {
+            sample.private_identifier: sample for sample in samples
+        }
+        public_id_to_samples: Mapping[str, Sample] = {
+            sample.public_identifier: sample for sample in samples
         }
 
         logger.info("Creating new objects...")
@@ -253,6 +257,13 @@ def import_project(
                 warnings.warn(f"czbid of unsupported type: {czbid}")
                 continue
 
+            public_identifier = f"USA/{czbid.submission_base}/{collection_date.year}"
+            sample = public_id_to_samples.get(public_identifier, None)
+            if sample and "UNKNOWN_" in external_accession:
+                # this is the weird edge case where there was an internal accession with an
+                # ID and one without, we should skip the one without
+                continue
+
             sample = external_accessions_to_samples.get(external_accession, None)
             if sample is None:
                 sample = Sample(
@@ -260,9 +271,7 @@ def import_project(
                 )
 
             sample.original_submission = {}
-            sample.public_identifier = (
-                f"USA/{czbid.submission_base}/{collection_date.year}"
-            )
+            sample.public_identifier = sample.public_identifier = public_identifier
             sample.sample_collected_by = project.originating_lab
             sample.sample_collector_contact_address = project.originating_address
             sample.collection_date = collection_date
@@ -274,6 +283,7 @@ def import_project(
 
             consensus_genome = czbid_to_consensus_genomes.get(czbid.czb_id, None)
             if consensus_genome is not None:
+                sample.czb_failed_genome_recovery = False
                 if sample.uploaded_pathogen_genome is None:
                     sample.uploaded_pathogen_genome = UploadedPathogenGenome(
                         sample=sample,

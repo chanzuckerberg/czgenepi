@@ -59,6 +59,7 @@ locals {
   backend_alb_dns       = local.secret[local.alb_key]["backend"]["dns_name"]
 
   ecs_role_arn          = local.secret["service_roles"]["ecs_role"]
+  event_role_arn        = local.secret["service_roles"]["event_role"]
   sfn_role_arn          = local.secret["service_roles"]["sfn_nextstrain"]
 
   frontend_url = try(join("", ["https://", module.frontend_dns[0].dns_prefix, ".", local.external_dns]), var.frontend_url)
@@ -174,6 +175,7 @@ module gisaid_sfn_config {
   source   = "../sfn_config"
   app_name = "gisaid-sfn"
   image    = "${local.gisaid_image_repo}:${local.image_tag}"
+  vcpus    = 32
   memory   = 420000
   wdl_path = "workflows/gisaid.wdl"
   custom_stack_name     = local.custom_stack_name
@@ -182,6 +184,9 @@ module gisaid_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
+  sfn_arn               = module.swipe_sfn_spot.step_function_arn
+  schedule_expressions  = contains(["prod", "staging"], local.deployment_stage) ? ["cron(0 6 ? * 1-5 *)"] : []
+  event_role_arn        = local.event_role_arn
   extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
     remote_dev_prefix = local.remote_dev_prefix
@@ -201,13 +206,17 @@ module pangolin_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
+  sfn_arn               = module.swipe_sfn_spot.step_function_arn
+  schedule_expressions  = contains(["prod", "staging"], local.deployment_stage) ? ["cron(0 6 ? * 1-5 *)"] : []
+  event_role_arn        = local.event_role_arn
 }
 
-module nextstrain_sfn_config {
+module nextstrain_template_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-sfn"
   image    = "${local.nextstrain_image_repo}:${local.image_tag}"
-  memory   = 400000
+  vcpus    = 4
+  memory   = 64000
   wdl_path = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -215,16 +224,18 @@ module nextstrain_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  extra_args            =  {
+  sfn_arn               = module.swipe_sfn_spot.step_function_arn
+  event_role_arn        = local.event_role_arn
+   extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
-    remote_dev_prefix = local.remote_dev_prefix
+    remote_dev_prefix        = local.remote_dev_prefix
   }
 }
 
 module covidhub_import_sfn_config {
   source   = "../sfn_config"
   app_name = "covidhub-import-sfn"
-  image    = "${local.covidhub_import_image_repo}:may-13-trunk"
+  image    = "${local.covidhub_import_image_repo}:may-24-fix
   memory   = 16000
   wdl_path = "workflows/covidhub-import.wdl"
   custom_stack_name     = local.custom_stack_name
@@ -233,6 +244,9 @@ module covidhub_import_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
+  sfn_arn               = module.swipe_sfn_spot.step_function_arn
+  schedule_expressions  = contains(["prod", "staging"], local.deployment_stage) ? ["cron(0 6 ? * 1-5 *)"] : []
+  event_role_arn        = local.event_role_arn
 }
 
 module migrate_db {
@@ -264,7 +278,7 @@ module swipe_batch {
   app_name              = "swipe"
   stack_resource_prefix = local.stack_resource_prefix
   batch_role_arn        = local.batch_role_arn
-  swipe_image            = "${local.swipe_image_repo}:rev-5" # FIXME rev shouldn't be hardcoded
+  swipe_image            = "${local.swipe_image_repo}:rev-6" # FIXME rev shouldn't be hardcoded
   custom_stack_name     = local.custom_stack_name
   remote_dev_prefix     = local.remote_dev_prefix
   deployment_stage      = local.deployment_stage

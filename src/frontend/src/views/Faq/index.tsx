@@ -1,4 +1,5 @@
 import { Link } from "czifui";
+import Head from "next/head";
 import React from "react";
 import { ROUTES } from "src/common/routes";
 import List from "src/common/styles/support/components/List";
@@ -310,12 +311,17 @@ export default function Faq(): JSX.Element {
   );
 
   return (
-    <NarrowContainer>
-      {renderIntro()}
-      {renderHowToUseAspen()}
-      {renderCOVIDTrackerProgram()}
-      {renderPrivacyAndDataSharing()}
-      <div style={{ height: "50px" }} />
-    </NarrowContainer>
+    <>
+      <Head>
+        <title>Aspen | FAQ</title>
+      </Head>
+      <NarrowContainer>
+        {renderIntro()}
+        {renderHowToUseAspen()}
+        {renderCOVIDTrackerProgram()}
+        {renderPrivacyAndDataSharing()}
+        <div style={{ height: "50px" }} />
+      </NarrowContainer>
+    </>
   );
 }

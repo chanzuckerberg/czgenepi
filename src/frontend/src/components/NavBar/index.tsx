@@ -1,7 +1,9 @@
 import cx from "classnames";
+import Link from "next/link";
 import React from "react";
 import { API } from "src/common/api";
-import LogoImage from "src/common/images/logo.svg";
+import ENV from "src/common/constants/ENV";
+import { useUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
 import UserMenu from "./components/UserMenu";
 import style from "./index.module.scss";
@@ -10,21 +12,21 @@ import { Logo, LogoAnchor } from "./style";
 // (thuang): Please make sure this value is in sync with what we have in css
 export const NAV_BAR_HEIGHT_PX = 50;
 
-interface Props {
-  org?: string;
-  user?: string;
-}
+const NavBar = (): JSX.Element => {
+  const { data } = useUserInfo();
 
-const NavBar = ({ org, user }: Props): JSX.Element => {
+  const group = data?.group;
+  const user = data?.user;
+
   const orgElements = (
     <React.Fragment>
       <div className={style.separator} />
-      <div className={cx(style.item, style.org)}>{org}</div>
+      <div className={cx(style.item, style.org)}>{group?.name}</div>
     </React.Fragment>
   );
 
   function hasOrg(): JSX.Element | null {
-    if (org === undefined) {
+    if (group === undefined) {
       return null;
     } else {
       return orgElements;
@@ -34,14 +36,14 @@ const NavBar = ({ org, user }: Props): JSX.Element => {
   const orgSplash = hasOrg();
 
   const signInLink = (
-    <a href={process.env.API_URL + API.LOG_IN}>
+    <a href={ENV.API_URL + API.LOG_IN}>
       <div className={cx(style.item, style.link)}>Sign In</div>
     </a>
   );
 
   function isLoggedIn(): JSX.Element {
     if (user) {
-      return <UserMenu user={user} />;
+      return <UserMenu user={user.name} />;
     } else {
       return signInLink;
     }
@@ -54,9 +56,11 @@ const NavBar = ({ org, user }: Props): JSX.Element => {
   return (
     <div className={style.bar}>
       <div className={style.left}>
-        <LogoAnchor to={route}>
-          <Logo alt="logo" src={String(LogoImage)} />
-        </LogoAnchor>
+        <Link href={route} passHref>
+          <LogoAnchor href="passHref">
+            <Logo />
+          </LogoAnchor>
+        </Link>
         {orgSplash}
       </div>
 

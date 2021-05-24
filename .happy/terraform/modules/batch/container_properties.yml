@@ -33,14 +33,14 @@ command:
     put_metric MemoryInUse $(python3 -c 'import psutil; m=psutil.virtual_memory(); print(100*(1-m.available/m.total))');
     sleep 60;
     done &
-  - "mkdir -p /mnt/download_cache; touch /mnt/download_cache/.cleaner_lock"
+  - "mkdir -p /mnt/download_cache; touch /mnt/download_cache/_miniwdl_flock"
   - >-
     clean_wd() {
     (shopt -s nullglob;
     for wf_log in /mnt/20??????_??????_*/workflow.log; do
     flock -n $wf_log rm -rf $(dirname $wf_log) || true;
     done;
-    flock -x /mnt/download_cache/.cleaner_lock clean_download_cache.sh /mnt/download_cache $DOWNLOAD_CACHE_MAX_GB)
+    flock -x /mnt/download_cache/_miniwdl_flock clean_download_cache.sh /mnt/download_cache $DOWNLOAD_CACHE_MAX_GB)
     }
   - "clean_wd"
   - "df -h / /mnt"
@@ -65,7 +65,7 @@ command:
     fi
     }
   - "trap handle_error EXIT"
-  - 'miniwdl run --dir /mnt $(basename "$WDL_WORKFLOW_URI") --input wdl_input.json --verbose --error-json --log-json > wdl_output.json'
+  - 'miniwdl run --dir /mnt $(basename "$WDL_WORKFLOW_URI") --input wdl_input.json --verbose --error-json -o wdl_output.json'
   - "clean_wd"
 environment:
   - name: "AWS_DEFAULT_REGION"

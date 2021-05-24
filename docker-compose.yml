@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   database:
@@ -26,12 +26,12 @@ services:
       PORT: 8000
       BUILD_PATH: build
       API_URL: http://localhost:3000
-      CHOKIDAR_USEPOLLING: 'true'
+      CHOKIDAR_USEPOLLING: "true"
     ports:
       - "8000:8000"
     volumes:
       - ./src/frontend:/usr/src/app
-      - /usr/src/app/node_modules  # Use node_modules built in container, not from the mounted source dir
+      - /usr/src/app/node_modules # Use node_modules built in container, not from the mounted source dir
   backend:
     image: "${DOCKER_REPO}aspen-backend"
     build:
@@ -41,8 +41,8 @@ services:
       args:
         - BUILDKIT_INLINE_CACHE=1
     restart: always
-    stdin_open: true   # Helps with pdb
-    tty: true   # Helps with pdb
+    stdin_open: true # Helps with pdb
+    tty: true # Helps with pdb
     depends_on:
       - database
     ports:

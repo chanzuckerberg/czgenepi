@@ -8,6 +8,7 @@ workflow nextstrain {
         String aspen_config_secret_name
         String remote_dev_prefix = ""
         String group_name
+        String s3_filestem
         String template_filename
         Map[String, String] template_args
     }
@@ -19,6 +20,7 @@ workflow nextstrain {
         aspen_config_secret_name = aspen_config_secret_name,
         remote_dev_prefix = remote_dev_prefix,
         group_name = group_name,
+        s3_filestem = s3_filestem,
         template_filename = template_filename,
         template_args = template_args
     }
@@ -32,6 +34,7 @@ task nextstrain_workflow {
         String aspen_config_secret_name
         String remote_dev_prefix
         String group_name
+        String s3_filestem
         String template_filename
         Map[String, String] template_args
     }
@@ -39,6 +42,9 @@ task nextstrain_workflow {
     command <<<
     set -Eeuxo pipefail
     shopt -s inherit_errexit
+
+    df 1>&2
+    cat /proc/meminfo 1>&2
 
     start_time=$(date +%s)
     build_id=$(date +%Y%m%d-%H%M)
@@ -69,9 +75,6 @@ task nextstrain_workflow {
     git checkout FETCH_HEAD
     ncov_git_rev=$(git rev-parse HEAD)
 
-    # patch ncov/scripts/combine-and-dedup-fastas.py
-    patch -p1 < /usr/src/app/aspen/workflows/nextstrain_run/combine-and-dedup-fastas.py.patch
-
     cp /usr/src/app/aspen/workflows/nextstrain_run/nextstrain_profile/* /ncov/my_profiles/aspen/
 
     # dump the sequences, metadata, and builds.yaml for a run out to disk.
@@ -87,13 +90,13 @@ task nextstrain_workflow {
     aligned_gisaid_metadata_s3_key=$(echo "${aligned_gisaid_location}" | jq -r .metadata_key)
 
     # fetch the gisaid dataset
-    aws s3 cp --no-progress "s3://${aligned_gisaid_s3_bucket}/${aligned_gisaid_sequences_s3_key}" - | zstdmt -d > /ncov/results/aligned_gisaid.fasta
+    aws s3 cp --no-progress "s3://${aligned_gisaid_s3_bucket}/${aligned_gisaid_sequences_s3_key}" - | zstdmt -d | xz -2 > /ncov/results/aligned_gisaid.fasta.xz
     aws s3 cp --no-progress "s3://${aligned_gisaid_s3_bucket}/${aligned_gisaid_metadata_s3_key}" /ncov/data/metadata_gisaid.tsv
 
     snakemake --printshellcmds auspice/ncov_aspen.json --profile my_profiles/aspen/  --resources=mem_mb=312320
 
     # upload the tree to S3
-    key="phylo_run/${build_id}/ncov_aspen.json"
+    key="phylo_run/${build_id}/~{s3_filestem}.json"
     aws s3 cp /ncov/auspice/ncov_aspen.json "s3://${aspen_s3_db_bucket}/${key}"
 
     # update aspen

@@ -10,6 +10,7 @@ import {
   getSpacings,
 } from "czifui";
 import { pageContentHeight } from "src/common/styles/mixins/global";
+import ConsensusGenomes from "./ConsensusGenomes.svg";
 
 export const Container = styled.div`
   ${pageContentHeight}
@@ -99,7 +100,7 @@ export const ButtonContainer = styled.div`
   justify-content: center;
 `;
 
-export const Virus = styled.img`
+export const Virus = styled(ConsensusGenomes)`
   width: 65px;
   height: 65px;
 `;

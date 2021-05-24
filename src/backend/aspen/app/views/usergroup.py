@@ -51,7 +51,7 @@ def create_auth0_entry(
 
     return user_created
 
-
+  
 @application.route("/api/usergroup", methods=["GET", "PUT", "POST"])
 @requires_auth
 def usergroup():

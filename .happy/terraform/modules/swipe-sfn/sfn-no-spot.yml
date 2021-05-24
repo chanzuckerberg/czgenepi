@@ -21,8 +21,9 @@ States:
       JobName.$: $$.Execution.Name
       JobDefinition: "${batch_job_definition_name}"
       Timeout:
-        AttemptDurationSeconds: 18000 # 5 hours
+        AttemptDurationSeconds: 36000 # 10 hours
       ContainerOverrides:
+        Vcpus.$: $.RunEC2Vcpu
         Memory.$: $.RunEC2Memory
         Environment:
           - Name: AWS_DEFAULT_REGION

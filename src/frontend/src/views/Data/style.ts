@@ -22,7 +22,9 @@ export const Subtext = styled.div`
   }}
 `;
 
-export const LineageCell = styled.div``;
+export const LineageCell = styled.div`
+  /* Created for LineageRowContent to target */
+`;
 
 export const LineageRowContent = styled(RowContent)`
   &:hover {

@@ -7,17 +7,6 @@ workflow LoadGISAID {
         String aspen_config_secret_name
         String remote_dev_prefix = ""
         String gisaid_ndjson_url = "https://www.epicov.org/epi3/3p/exp3/export/export.json.bz2"
-        String ndjson_cache_key = "raw_gisaid_dump/dl.zst"
-    }
-
-    call RefreshGISAID {
-        input:
-        docker_image_id = docker_image_id,
-        aws_region = aws_region,
-        aspen_config_secret_name = aspen_config_secret_name,
-        remote_dev_prefix = remote_dev_prefix,
-        gisaid_ndjson_url = gisaid_ndjson_url,
-        ndjson_cache_key = ndjson_cache_key,
     }
 
     call IngestGISAID {
@@ -26,8 +15,7 @@ workflow LoadGISAID {
         aws_region = aws_region,
         aspen_config_secret_name = aspen_config_secret_name,
         remote_dev_prefix = remote_dev_prefix,
-        ndjson_bucket = RefreshGISAID.result_bucket,
-        ndjson_cache_key = RefreshGISAID.result_key,
+        gisaid_ndjson_url = gisaid_ndjson_url
     }
 
     call TransformGISAID {
@@ -57,72 +45,13 @@ workflow LoadGISAID {
     }
 }
 
-task RefreshGISAID {
-    input {
-        String docker_image_id
-        String aws_region
-        String aspen_config_secret_name
-        String remote_dev_prefix
-        String gisaid_ndjson_url
-        String ndjson_cache_key
-    }
-
-    command <<<
-    set -Eeuo pipefail
-    shopt -s inherit_errexit
-
-    start_time=$(date +%s)
-    build_id=$(date +%Y%m%d-%H%M)
-
-    aws configure set region ~{aws_region}
-
-    export ASPEN_CONFIG_SECRET_NAME=~{aspen_config_secret_name}
-    if [ "~{remote_dev_prefix}" != "" ]; then
-        export REMOTE_DEV_PREFIX="~{remote_dev_prefix}"
-    fi
-
-    # fetch aspen config
-    aspen_config="$(aws secretsmanager get-secret-value --secret-id ~{aspen_config_secret_name} --query SecretString --output text)"
-    aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$aspen_config")"
-    echo "${aspen_s3_db_bucket}" > bucket_name_file
-
-    # fetch the gisaid dataset and transform it.
-    gisaid_credentials=$(aws secretsmanager get-secret-value --secret-id gisaid-download-credentials --query SecretString --output text)
-    gisaid_username=$(echo "${gisaid_credentials}" | jq -r .username)
-    gisaid_password=$(echo "${gisaid_credentials}" | jq -r .password)
-
-    staged_timestamp=0
-    if aws s3api head-object --bucket "${aspen_s3_db_bucket}" --key ~{ndjson_cache_key}; then
-        staged_timestamp=$(aws s3api head-object --bucket "${aspen_s3_db_bucket}" --key ~{ndjson_cache_key} | jq -r .LastModified)
-    fi
-    if curl --silent --head --time-cond "$staged_timestamp" "~{gisaid_ndjson_url}" --user "${gisaid_username}:${gisaid_password}" | head -n 1 | grep 304; then
-        echo "File at ~{gisaid_ndjson_url} has not been modified since ${staged_timestamp}, nothing to do"
-        exit
-    fi
-    curl "~{gisaid_ndjson_url}" --user "${gisaid_username}:${gisaid_password}" | \
-        bunzip2 | \
-        zstdmt | \
-        aws s3 cp - "s3://${aspen_s3_db_bucket}/~{ndjson_cache_key}"
-    >>>
-
-    output {
-        String result_bucket = read_string("bucket_name_file")
-        String result_key = "~{ndjson_cache_key}"
-    }
-
-    runtime {
-        docker: docker_image_id
-    }
-}
-
 task IngestGISAID {
     input {
         String docker_image_id
         String aws_region
         String aspen_config_secret_name
         String remote_dev_prefix
-        String ndjson_bucket
-        String ndjson_cache_key
+        String gisaid_ndjson_url
     }
 
     command <<<
@@ -142,13 +71,22 @@ task IngestGISAID {
     # These are set by the Dockerfile and the Happy CLI
     aspen_workflow_rev=$COMMIT_SHA
     aspen_creation_rev=$COMMIT_SHA
-    sequences_key="raw_gisaid_dump/${build_id}/gisaid.ndjson.zst"
 
     # fetch aspen config
     aspen_config="$(aws secretsmanager get-secret-value --secret-id ~{aspen_config_secret_name} --query SecretString --output text)"
     aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$aspen_config")"
+    sequences_key="raw_gisaid_dump/${build_id}/gisaid.ndjson.zst"
 
-    aws s3 cp "s3://~{ndjson_bucket}/~{ndjson_cache_key}" "s3://${aspen_s3_db_bucket}/${sequences_key}"
+    # fetch the gisaid dataset and transform it.
+    gisaid_credentials=$(aws secretsmanager get-secret-value --secret-id gisaid-download-credentials --query SecretString --output text)
+    gisaid_username=$(echo "${gisaid_credentials}" | jq -r .username)
+    gisaid_password=$(echo "${gisaid_credentials}" | jq -r .password)
+
+    curl "~{gisaid_ndjson_url}" --user "${gisaid_username}:${gisaid_password}" | \
+        bunzip2 | \
+        zstdmt > sequences.fasta.zst
+
+    aws s3 cp sequences.fasta.zst "s3://${aspen_s3_db_bucket}/${sequences_key}"
 
     end_time=$(date +%s)
 
@@ -197,7 +135,7 @@ task TransformGISAID {
     # These are set by the Dockerfile and the Happy CLI
     aspen_workflow_rev=$COMMIT_SHA
     aspen_creation_rev=$COMMIT_SHA
-    
+
     # fetch aspen config
     aspen_config="$(aws secretsmanager get-secret-value --secret-id ~{aspen_config_secret_name} --query SecretString --output text)"
     aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$aspen_config")"
@@ -219,7 +157,6 @@ task TransformGISAID {
         --output-unix-newline
 
     zstdmt sequences.fasta
-    ls -lR
 
     # upload the files to S3
     sequences_key="processed_gisaid_dump/${build_id}/sequences.fasta.zst"
