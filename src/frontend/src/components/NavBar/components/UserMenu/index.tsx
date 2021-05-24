@@ -1,10 +1,10 @@
-import { Button, createStyles } from "@material-ui/core";
+import { Button } from "@material-ui/core";
 import { ExpandMore } from "@material-ui/icons";
-import { makeStyles } from "@material-ui/styles";
+import { createStyles, makeStyles } from "@material-ui/styles";
 import { AppThemeOptions, Menu, MenuItem } from "czifui";
 import React from "react";
-import { Link } from "react-router-dom";
 import { API } from "src/common/api";
+import ENV from "src/common/constants/ENV";
 import { ROUTES } from "src/common/routes";
 
 const useStyles = makeStyles((theme: AppThemeOptions) => {
@@ -49,16 +49,16 @@ const UserMenu = ({ user }: UserMenuProps): JSX.Element => {
         <a href={ROUTES.CONTACT_US_EMAIL} target="_blank" rel="noopener">
           <MenuItem onClick={handleClose}>Contact us</MenuItem>
         </a>
-        <Link to={ROUTES.TERMS} target="_blank" rel="noopener">
+        <a href={ROUTES.TERMS} target="_blank" rel="noopener">
           <MenuItem onClick={handleClose}>Terms of Use</MenuItem>
-        </Link>
-        <Link to={ROUTES.PRIVACY} target="_blank" rel="noopener">
+        </a>
+        <a href={ROUTES.PRIVACY} target="_blank" rel="noopener">
           <MenuItem onClick={handleClose}>Privacy Policy</MenuItem>
-        </Link>
-        <Link to={ROUTES.FAQ} target="_blank" rel="noopener">
+        </a>
+        <a href={ROUTES.FAQ} target="_blank" rel="noopener">
           <MenuItem onClick={handleClose}>FAQ</MenuItem>
-        </Link>
-        <a href={process.env.API_URL + API.LOG_OUT}>
+        </a>
+        <a href={ENV.API_URL + API.LOG_OUT}>
           <MenuItem onClick={handleClose}>Logout</MenuItem>
         </a>
       </Menu>

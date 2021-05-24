@@ -1,6 +1,7 @@
 import { Button, ButtonProps, Link } from "czifui";
 import React, { FC, useEffect, useState } from "react";
 import { DEFAULT_FETCH_OPTIONS } from "src/common/api";
+import ENV from "src/common/constants/ENV";
 import { stripProtocol } from "../../urlUtils";
 
 interface Props extends ButtonProps {
@@ -74,7 +75,7 @@ export const createConfirmButton = (treeId: number): FC => {
 
 async function getTreeUrl(treeId: number) {
   const result = await fetch(
-    `${process.env.API_URL}/api/auspice/view/${treeId}`,
+    `${ENV.API_URL}/api/auspice/view/${treeId}`,
     DEFAULT_FETCH_OPTIONS
   );
 

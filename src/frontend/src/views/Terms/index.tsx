@@ -1,4 +1,5 @@
 import { Link, ListItemLabel } from "czifui";
+import Head from "next/head";
 import React from "react";
 import List from "src/common/styles/support/components/List";
 import {
@@ -535,20 +536,25 @@ export default function Terms(): JSX.Element {
   );
 
   return (
-    <NarrowContainer>
-      {renderIntro()}
-      {renderSummaryOfKeyThingsToKnow()}
-      {renderUploadAndReportDataTerms()}
-      {renderAuthorizationToUseAspen()}
-      {renderLimitationsOnUse()}
-      {renderChangesToAspenOrTerms()}
-      {renderDisclaimerTerms()}
-      {renderLimitationLiability()}
-      {renderIndemnification()}
-      {renderArbitration()}
-      {renderChoiceOfLaw()}
-      {renderGeneralTerms()}
-      {renderContactInfo()}
-    </NarrowContainer>
+    <>
+      <Head>
+        <title>Aspen | Terms of Service</title>
+      </Head>
+      <NarrowContainer>
+        {renderIntro()}
+        {renderSummaryOfKeyThingsToKnow()}
+        {renderUploadAndReportDataTerms()}
+        {renderAuthorizationToUseAspen()}
+        {renderLimitationsOnUse()}
+        {renderChangesToAspenOrTerms()}
+        {renderDisclaimerTerms()}
+        {renderLimitationLiability()}
+        {renderIndemnification()}
+        {renderArbitration()}
+        {renderChoiceOfLaw()}
+        {renderGeneralTerms()}
+        {renderContactInfo()}
+      </NarrowContainer>
+    </>
   );
 }

@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import dataTableStyle from "src/common/components/library/data_table/index.module.scss";
-import { ReactComponent as TreeIcon } from "src/common/icons/PhyloTree.svg";
+import TreeIcon from "src/common/icons/PhyloTree.svg";
 import { createTreeModalInfo } from "src/common/utils";
 import TreeVizModal from "../TreeVizModal";
-import { CellWrapper, StyledExternalLinkIcon, StyledRowContent } from "./style";
+import { CellWrapper, StyledOpenInNewIcon, StyledRowContent } from "./style";
 
 interface NameProps {
   value: string;
@@ -37,7 +37,7 @@ const TreeTableNameCell = ({ value, item }: NameProps): JSX.Element => {
         <CellWrapper>
           <TreeIcon className={dataTableStyle.icon} />
           {value}
-          <StyledExternalLinkIcon />
+          <StyledOpenInNewIcon />
         </CellWrapper>
       </StyledRowContent>
     </>

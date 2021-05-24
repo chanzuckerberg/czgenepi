@@ -1,9 +1,14 @@
 import cx from "classnames";
+import Head from "next/head";
+import Link from "next/link";
+import { useRouter } from "next/router";
 import React, { FunctionComponent, useEffect, useState } from "react";
-import { Link, Redirect, Route, Switch } from "react-router-dom";
 import { Menu } from "semantic-ui-react";
 import { fetchSamples, fetchTrees } from "src/common/api";
-import { DataSubview } from "src/common/components";
+import { useProtectedRoute } from "src/common/queries/auth";
+import { DataSubview } from "../../common/components";
+import { EMPTY_OBJECT } from "../../common/constants/empty";
+import { ROUTES } from "../../common/routes";
 import { SampleRenderer, TreeRenderer } from "./cellRenderers";
 import { SampleHeader } from "./headerRenderer";
 import { SAMPLE_HEADERS, SAMPLE_SUBHEADERS, TREE_HEADERS } from "./headers";
@@ -11,10 +16,19 @@ import style from "./index.module.scss";
 import { Container } from "./style";
 import { TREE_TRANSFORMS } from "./transforms";
 
+const TITLE: Record<string, string> = {
+  [ROUTES.DATA_SAMPLES]: "Samples",
+  [ROUTES.PHYLO_TREES]: "Phylogenetic Trees",
+};
+
 const Data: FunctionComponent = () => {
+  useProtectedRoute();
+
   const [samples, setSamples] = useState<Sample[] | undefined>();
   const [trees, setTrees] = useState<Tree[] | undefined>();
   const [isDataLoading, setIsDataLoading] = useState(false);
+
+  const router = useRouter();
 
   useEffect(() => {
     const setBioinformaticsData = async () => {
@@ -37,6 +51,12 @@ const Data: FunctionComponent = () => {
     setBioinformaticsData();
   }, []);
 
+  useEffect(() => {
+    if (router.asPath === ROUTES.DATA) {
+      router.push(ROUTES.DATA_SAMPLES);
+    }
+  });
+
   // this constant is inside the component so we can associate
   // each category with its respective variable.
   const dataCategories: DataCategory[] = [
@@ -49,7 +69,7 @@ const Data: FunctionComponent = () => {
       renderer: SampleRenderer,
       subheaders: SAMPLE_SUBHEADERS,
       text: "Samples",
-      to: "/data/samples",
+      to: ROUTES.DATA_SAMPLES,
     },
     {
       data: trees,
@@ -57,9 +77,9 @@ const Data: FunctionComponent = () => {
       headers: TREE_HEADERS,
       isDataLoading,
       renderer: TreeRenderer,
-      subheaders: {},
+      subheaders: EMPTY_OBJECT,
       text: "Phylogenetic Trees",
-      to: "/data/phylogenetic_trees",
+      to: ROUTES.PHYLO_TREES,
       transforms: TREE_TRANSFORMS,
     },
   ];
@@ -87,58 +107,59 @@ const Data: FunctionComponent = () => {
 
   const dataJSX: Record<string, Array<JSX.Element>> = {
     menuItems: [],
-    routes: [],
   };
 
   // create JSX elements from categories
   dataCategories.forEach((category) => {
     let focusStyle = null;
-    if (window.location.pathname === category.to) {
+
+    if (router.asPath === category.to) {
       focusStyle = style.active;
     }
-    dataJSX.menuItems.push(
-      <Link to={category.to} key={category.text}>
-        <Menu.Item className={style.menuItem}>
-          <div className={style.category}>
-            <div className={cx(style.title, focusStyle)}>{category.text}</div>
-            <div className={style.count}>{category.data?.length}</div>
-          </div>
-        </Menu.Item>
-      </Link>
-    );
 
-    dataJSX.routes.push(
-      <Route
-        path={category.to}
-        key={category.text}
-        render={() => (
-          <DataSubview
-            isLoading={category.isDataLoading}
-            data={category.data}
-            defaultSortKey={category.defaultSortKey}
-            headers={category.headers}
-            subheaders={category.subheaders}
-            headerRenderer={category.headerRenderer}
-            renderer={category.renderer}
-            viewName={category.text}
-          />
-        )}
-      />
+    dataJSX.menuItems.push(
+      <Link href={category.to} key={category.text} passHref>
+        <a href="passHref">
+          <Menu.Item className={style.menuItem}>
+            <div className={style.category}>
+              <div className={cx(style.title, focusStyle)}>{category.text}</div>
+              <div className={style.count}>{category.data?.length}</div>
+            </div>
+          </Menu.Item>
+        </a>
+      </Link>
     );
   });
 
+  const title = TITLE[router.asPath];
+
+  const category =
+    dataCategories.find((category) => category.to === router.asPath) ||
+    dataCategories[0];
+
   return (
     <Container className={style.dataRoot}>
+      <Head>
+        <title>Aspen {title && " | " + title}</title>
+      </Head>
+
       <div className={style.navigation}>
         <Menu className={style.menu} secondary>
           {dataJSX.menuItems}
         </Menu>
       </div>
       <div className={style.view}>
-        <Switch>
-          {dataJSX.routes}
-          <Redirect from="/data" to="/data/samples" exact />
-        </Switch>
+        <DataSubview
+          key={router.asPath}
+          isLoading={category.isDataLoading}
+          data={category.data}
+          defaultSortKey={category.defaultSortKey}
+          headers={category.headers}
+          subheaders={category.subheaders}
+          headerRenderer={category.headerRenderer}
+          renderer={category.renderer}
+          viewName={category.text}
+        />
       </div>
     </Container>
   );
