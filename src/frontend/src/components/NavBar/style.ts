@@ -1,8 +1,8 @@
 import styled from "@emotion/styled";
 import { getSpacings } from "czifui";
-import { Link } from "react-router-dom";
+import LogoImage from "src/common/images/logo.svg";
 
-export const Logo = styled.img`
+export const Logo = styled(LogoImage)`
   height: 25px;
 
   ${(props) => {
@@ -14,7 +14,7 @@ export const Logo = styled.img`
   }}
 `;
 
-export const LogoAnchor = styled(Link)`
+export const LogoAnchor = styled.a`
   display: flex;
   align-items: center;
   justify-content: center;

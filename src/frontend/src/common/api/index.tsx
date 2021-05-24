@@ -1,9 +1,8 @@
-// refactor as needed
-import axios from "axios";
+import ENV from "src/common/constants/ENV";
 import { jsonToType } from "src/common/utils";
 
 export enum API {
-  USER_DATA = "/api/usergroup",
+  USER_INFO = "/api/usergroup",
   SAMPLES = "/api/samples",
   LOG_IN = "/login",
   LOG_OUT = "/logout",
@@ -46,18 +45,22 @@ function convert<U extends APIResponse, T extends U[keyof U]>(
   return converted;
 }
 
-async function apiResponse<T extends APIResponse>(
+export async function apiResponse<T extends APIResponse>(
   keys: (keyof T)[],
   mappings: (Map<string, string | number> | null)[],
   endpoint: string
 ): Promise<T> {
-  const response = await axios.get(process.env.API_URL + endpoint, {
-    withCredentials: true,
-  });
+  const response = await fetch(ENV.API_URL + endpoint, DEFAULT_FETCH_OPTIONS);
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw result;
+  }
 
   const convertedData = keys.map((key, index) => {
     type keyType = T[typeof key];
-    const typeData = response.data[key];
+    const typeData = result[key];
     const keyMap = mappings[index];
     let resultData: keyType | keyType[];
     if (typeData instanceof Array) {
@@ -69,32 +72,11 @@ async function apiResponse<T extends APIResponse>(
     }
     return [key, resultData];
   });
+
   return Object.fromEntries(convertedData);
 }
 
 /** Calls to specific API endpoints **/
-
-interface UserResponse extends APIResponse {
-  group: Group;
-  user: User;
-}
-const USER_MAP = new Map<string, keyof User>([
-  ["auth0_user_id", "auth0UserId"],
-  ["group_admin", "groupAdmin"],
-  ["system_admin", "systemAdmin"],
-  ["group_id", "groupId"],
-  ["agreed_to_tos", "agreedToTos"],
-]);
-export const fetchUserData = (): Promise<UserResponse> =>
-  apiResponse<UserResponse>(["group", "user"], [null, USER_MAP], API.USER_DATA);
-
-export const updateUserData = (user: Partial<User>): Promise<Response> => {
-  return fetch(process.env.API_URL + API.USER_DATA, {
-    ...DEFAULT_PUT_OPTIONS,
-    ...DEFAULT_HEADERS_MUTATION_OPTIONS,
-    body: JSON.stringify(user),
-  });
-};
 
 interface SampleResponse extends APIResponse {
   samples: Sample[];
@@ -107,6 +89,7 @@ const SAMPLE_MAP = new Map<string, keyof Sample>([
   ["upload_date", "uploadDate"],
   ["czb_failed_genome_recovery", "CZBFailedGenomeRecovery"],
 ]);
+
 export const fetchSamples = (): Promise<SampleResponse> =>
   apiResponse<SampleResponse>(["samples"], [SAMPLE_MAP], API.SAMPLES);
 

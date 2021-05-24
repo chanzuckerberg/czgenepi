@@ -1,3 +1,7 @@
+import ENV from "src/common/constants/ENV";
+
+const { API_URL } = ENV;
+
 export const TREE_TRANSFORMS: Transform[] = [
   {
     inputs: ["id"],
@@ -7,7 +11,7 @@ export const TREE_TRANSFORMS: Transform[] = [
       if (typeof id !== "number") {
         return undefined;
       }
-      return `${process.env.API_URL}/api/phylo_tree/${id}`;
+      return `${API_URL}/api/phylo_tree/${id}`;
     },
   },
   {
@@ -18,7 +22,7 @@ export const TREE_TRANSFORMS: Transform[] = [
       if (typeof id !== "number") {
         return undefined;
       }
-      return `${process.env.API_URL}/api/phylo_tree/sample_ids/${id}`;
+      return `${API_URL}/api/phylo_tree/sample_ids/${id}`;
     },
   },
 ];

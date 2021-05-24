@@ -158,12 +158,15 @@ const DataSubview: FunctionComponent<Props> = ({
       </div>
     );
   };
-  if (state.results === undefined) {
-    let tableData = undefined;
-    if (data !== undefined) {
+
+  if (!state.results) {
+    let tableData;
+
+    if (data) {
       dispatch({ results: data });
       tableData = data;
     }
+
     return render(tableData);
   }
 

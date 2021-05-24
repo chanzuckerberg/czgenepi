@@ -1,10 +1,10 @@
 import styled from "@emotion/styled";
 import { getColors } from "czifui";
 import { RowContent } from "src/common/components/library/data_table/style";
-import { ReactComponent as ExternalLinkIcon } from "src/common/icons/ExternalLink.svg";
+import OpenInNewIcon from "src/common/icons/OpenInNew.svg";
 import { icon } from "../../../../common/components/library/data_table/style";
 
-export const StyledExternalLinkIcon = styled(ExternalLinkIcon)`
+export const StyledOpenInNewIcon = styled(OpenInNewIcon)`
   ${icon}
 `;
 
@@ -12,7 +12,7 @@ export const StyledRowContent = styled(RowContent)`
   cursor: pointer;
 
   :hover {
-    ${StyledExternalLinkIcon} {
+    ${StyledOpenInNewIcon} {
       ${(props) => {
         const colors = getColors(props);
 
@@ -24,7 +24,7 @@ export const StyledRowContent = styled(RowContent)`
   }
 
   :active {
-    ${StyledExternalLinkIcon} {
+    ${StyledOpenInNewIcon} {
       ${(props) => {
         const colors = getColors(props);
 

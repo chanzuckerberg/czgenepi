@@ -5,7 +5,7 @@ import React from "react";
 import { defaultCellRenderer } from "src/common/components/library/data_table";
 import dataTableStyle from "src/common/components/library/data_table/index.module.scss";
 import { RowContent } from "src/common/components/library/data_table/style";
-import { ReactComponent as SampleIcon } from "src/common/icons/Sample.svg";
+import SampleIcon from "src/common/icons/Sample.svg";
 import { createTableCellRenderer, stringGuard } from "src/common/utils";
 import TreeTableDownloadMenu from "src/components/TreeTableDownloadMenu";
 import { Lineage, LineageTooltip } from "./components/LineageTooltip";

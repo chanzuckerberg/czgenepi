@@ -1,9 +1,10 @@
 #!/bin/bash
+
 set -e
 
 if [ "$1" = 'devserver' -o $# -eq 0 ]; then
-    # By default run the devserver
-    exec npm run devserver
+    # By default run Next.js dev mode
+    exec npm run dev -- -p "${PORT:=3000}"
 fi
 
 if [ "$1" = 'server' ]; then
