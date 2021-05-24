@@ -213,11 +213,9 @@ def import_project(
             else:
                 czbids_to_process.append(czbid_lookup_by_str[czbids.pop()])
 
-        # load the existing samples, store as a mapping between external accession to
-        # sample.
-        external_accessions_to_samples: Mapping[str, Sample] = {
-            sample.private_identifier: sample
-            for sample in (
+            # load the existing samples, store as a mapping between external accession to
+            # sample.
+            samples = (
                 session.query(Sample)
                 .filter(Sample.submitting_group == group)
                 .options(
@@ -231,8 +229,14 @@ def import_project(
                         GisaidAccessionWorkflow.outputs.of_type(GisaidAccession)  # type: ignore
                     )
                 )
+                .all()
             )
-        }
+            external_accessions_to_samples: Mapping[str, Sample] = {
+                sample.private_identifier: sample for sample in samples
+            }
+            public_id_to_samples: Mapping[str, Sample] = {
+                sample.public_identifier: sample for sample in samples
+            }
 
         logger.info("Creating new objects...")
         for czbid in tqdm.tqdm(czbids_to_process):
@@ -253,6 +257,13 @@ def import_project(
                 warnings.warn(f"czbid of unsupported type: {czbid}")
                 continue
 
+            public_identifier = f"USA/{czbid.submission_base}/{collection_date.year}"
+            sample = public_id_to_samples.get(public_identifier, None)
+            if sample and "UNKNOWN_" in external_accession:
+                # this is the weird edge case where there was an internal accession with an
+                # ID and one without, we should skip the one without
+                continue
+
             sample = external_accessions_to_samples.get(external_accession, None)
             if sample is None:
                 sample = Sample(
@@ -260,9 +271,7 @@ def import_project(
                 )
 
             sample.original_submission = {}
-            sample.public_identifier = (
-                f"USA/{czbid.submission_base}/{collection_date.year}"
-            )
+            sample.public_identifier = sample.public_identifier = public_identifier
             sample.sample_collected_by = project.originating_lab
             sample.sample_collector_contact_address = project.originating_address
             sample.collection_date = collection_date
