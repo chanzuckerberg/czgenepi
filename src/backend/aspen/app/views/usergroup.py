@@ -23,7 +23,9 @@ POST_USER_REQUIRED_FIELDS: Collection[str] = (
 POST_USER_OPTIONAL_FIELDS: Collection[str] = ("auth0_user_id",)
 
 
-def create_auth0_entry(name, email, password, config) -> str:
+def create_auth0_entry(
+    name, email, password, config
+) -> Union[Mapping[str, Union[str, bool, Collection]], Response]:
     domain: str = config.AUTH0_DOMAIN
     client_id: str = config.AUTH0_MANAGEMENT_CLIENT_ID
     client_secret: str = config.AUTH0_MANAGEMENT_CLIENT_SECRET
@@ -36,7 +38,7 @@ def create_auth0_entry(name, email, password, config) -> str:
 
     auth0: Auth0 = Auth0(domain, mgmt_api_token)
     try:
-        user_created: Mapping[str, Union[Collection, str, bool]] = auth0.users.create(
+        user_created: Mapping[str, Union[str, bool, Collection]] = auth0.users.create(
             {
                 "connection": "Username-Password-Authentication",
                 "email": email,
@@ -103,7 +105,7 @@ def usergroup():
                 else:
                     if "auth0_user_id" not in new_user_data.keys():
                         user_created: Union[
-                            Mapping[str, Union[str, bool]], Response
+                            Mapping[str, Union[str, bool, Collection]], Response
                         ] = create_auth0_entry(
                             new_user_data["name"],
                             new_user_data["email"],
