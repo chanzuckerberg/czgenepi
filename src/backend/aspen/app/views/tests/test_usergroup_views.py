@@ -1,5 +1,7 @@
 import json
 
+from flask import Response
+
 from aspen.app.views.api_utils import filter_usergroup_dict
 from aspen.app.views.usergroup import GET_GROUP_FIELDS, GET_USER_FIELDS
 from aspen.database.models.usergroup import User
@@ -56,7 +58,7 @@ def test_usergroup_view_put_fail(session, app, client):
     assert res.status == "400 BAD REQUEST"
 
 
-def test_usergroup_view_post_pass(session, app, client):
+def test_usergroup_view_post_pass_w_auth0_user_id(session, app, client):
     group = group_factory()
     new_user_group = group_factory(name="new_group")
     user = user_factory(group, system_admin=True)
@@ -81,6 +83,67 @@ def test_usergroup_view_post_pass(session, app, client):
     session.begin()
     new_user = session.query(User).filter(User.name == data["name"]).one_or_none()
     assert new_user is not None
+
+
+def test_usergroup_view_post_pass_no_auth0_user_id(mocker, session, app, client):
+    group = group_factory()
+    new_user_group = group_factory(name="new_group")
+    user = user_factory(group, system_admin=True)
+    session.add(group)
+    session.add(new_user_group)
+    session.commit()
+
+    mocker.patch(
+        "aspen.app.views.usergroup.create_auth0_entry",
+        return_value={"user_id": "new_auth0_entry"},
+    )
+
+    with client.session_transaction() as sess:
+        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
+
+    data = {
+        "name": "new_user",
+        "email": "new_user@hotmail.com",
+        "group_admin": False,
+        "system_admin": False,
+        "group_id": new_user_group.id,
+    }
+    res = client.post("/api/usergroup", json=data, content_type="application/json")
+
+    assert res.status == "200 OK"
+    session.close()
+    session.begin()
+    new_user = session.query(User).filter(User.name == data["name"]).one_or_none()
+    assert new_user is not None
+
+
+def test_usergroup_view_post_fail_no_auth0_user_id(mocker, session, app, client):
+    group = group_factory()
+    new_user_group = group_factory(name="new_group")
+    user = user_factory(group, system_admin=True)
+    session.add(group)
+    session.add(new_user_group)
+    session.commit()
+
+    mocker.patch(
+        "aspen.app.views.usergroup.create_auth0_entry",
+        return_value=Response("Auth0Error", 400),
+    )
+
+    with client.session_transaction() as sess:
+        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
+
+    data = {
+        "name": "new_user",
+        "email": "new_user@hotmail.com",
+        "group_admin": False,
+        "system_admin": False,
+        "group_id": new_user_group.id,
+    }
+    res = client.post("/api/usergroup", json=data, content_type="application/json")
+
+    assert res.status == "400 BAD REQUEST"
+    assert res.get_data() == b"Auth0Error"
 
 
 def test_usergroup_view_post_fail_not_system_admin(session, app, client):
@@ -122,7 +185,7 @@ def test_usergroup_view_post_fail_insufficient_info(session, app, client):
 
     data = {
         "name": "new_user",
-        "group_admin": False,
+        "auth0_user_id": "test_auth0_id_new",
         "system_admin": False,
         "group_id": new_user_group.id,
     }
@@ -131,7 +194,7 @@ def test_usergroup_view_post_fail_insufficient_info(session, app, client):
     assert res.status == "400 BAD REQUEST"
     assert (
         res.get_data()
-        == b"Insufficient information required to create new user, ['email', 'auth0_user_id'] are required"
+        == b"Insufficient information required to create new user, ['email', 'group_admin'] are required"
     )
 
 
