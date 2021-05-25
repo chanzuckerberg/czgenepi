@@ -7,6 +7,7 @@ from flask import jsonify, request, Response, session
 
 from aspen.app.app import application, requires_auth
 from aspen.app.views.api_utils import filter_usergroup_dict, get_usergroup_query
+from aspen.config.config import Config
 from aspen.database.connection import session_scope
 from aspen.database.models.usergroup import User
 
@@ -24,9 +25,9 @@ POST_USER_OPTIONAL_FIELDS: Collection[str] = ("auth0_user_id",)
 
 
 def create_auth0_entry(
-    name: str, 
-    email: str, 
-    password: str, 
+    name: str,
+    email: str,
+    password: str,
     config: Config,
 ) -> Union[Mapping[str, Union[str, bool, Collection]], Response]:
     domain: str = config.AUTH0_DOMAIN
@@ -107,7 +108,7 @@ def usergroup():
                     )
                 else:
                     if "auth0_user_id" not in new_user_data.keys():
-                        user_created: Union[
+                        user_created_or_response: Union[
                             Mapping[str, Union[str, bool, Collection]], Response
                         ] = create_auth0_entry(
                             new_user_data["name"],
@@ -116,9 +117,11 @@ def usergroup():
                             application.aspen_config,
                         )
                         # check if any issues trying to create new user
-                        if isinstance(user_created, Response):
-                            return user_created
-                        new_user_data.update({"auth0_user_id": user_created["user_id"]})
+                        if isinstance(user_created_or_response, Response):
+                            return user_created_or_response
+                        new_user_data.update(
+                            {"auth0_user_id": user_created_or_response["user_id"]}
+                        )
 
                     user = User(**new_user_data)
                     db_session.add(user)
