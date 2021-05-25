@@ -24,7 +24,10 @@ POST_USER_OPTIONAL_FIELDS: Collection[str] = ("auth0_user_id",)
 
 
 def create_auth0_entry(
-    name, email, password, config
+    name: str, 
+    email: str, 
+    password: str, 
+    config: Config,
 ) -> Union[Mapping[str, Union[str, bool, Collection]], Response]:
     domain: str = config.AUTH0_DOMAIN
     client_id: str = config.AUTH0_MANAGEMENT_CLIENT_ID
