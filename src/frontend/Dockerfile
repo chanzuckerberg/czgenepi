@@ -5,9 +5,9 @@ RUN chown node:node /usr/src/app
 COPY package*.json ./
 ENV NODE_ENV=development
 ENV BUILD_PATH=build
-RUN npm ci --verbose --no-optional && npm cache clean --force
 RUN apt-get update && apt-get install make
 USER node
+RUN npm ci --verbose --no-optional && npm cache clean --force
 COPY . .
 ENTRYPOINT ["./entrypoint.sh"]
 ARG HAPPY_COMMIT="unknown"
