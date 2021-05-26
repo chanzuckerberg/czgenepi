@@ -30,9 +30,6 @@ jobs:
           role-to-assume: ${{ secrets.AWS_PROD_ROLE_TO_ASSUME }}
           role-duration-seconds: 900
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 2
-      - run: git checkout HEAD^
       - name: Install happy dependencies
         run: |
           pip install -r .happy/requirements.txt
