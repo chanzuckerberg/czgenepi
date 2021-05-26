@@ -37,7 +37,7 @@ jobs:
         env:
           TFE_TOKEN: ${{ secrets.TFE_TOKEN }}
         run: |
-          export DEPLOY_SHA=sha-$(py ./scripts/happy-deploy.py staging --get-latest)
+          export DEPLOY_SHA=sha-$(python3 ./scripts/happy-deploy.py staging --get-latest)
           ./scripts/happy --profile="" --env rdev update lvr-deploy-test --tag $DEPLOY_SHA
       - uses: act10ns/slack@v1
         with:
