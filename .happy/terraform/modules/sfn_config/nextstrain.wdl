@@ -98,6 +98,7 @@ task nextstrain_workflow {
     # upload the tree to S3
     key="phylo_run/${build_id}/~{s3_filestem}.json"
     aws s3 cp /ncov/auspice/ncov_aspen.json "s3://${aspen_s3_db_bucket}/${key}"
+    aws s3 cp /ncov/.snakemake/log/ "s3://${aspen_s3_db_bucket}/phylo_run/${build_id}/" --recursive
 
     # update aspen
     aspen_workflow_rev=WHATEVER
