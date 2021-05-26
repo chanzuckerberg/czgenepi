@@ -101,15 +101,17 @@ def trigger_deploy(github_api_token, deployment_stage, github_sha, dry_run):
     print("Deployment successful")
 
 def validate_sha(ctx, param, value):
-    if len(value) < 8:
-        raise click.BadParameter("Github SHA must be at least 8 characters!")
+    if value is not None:
+        if len(value) < 8:
+            raise click.BadParameter("Github SHA must be at least 8 characters!")
     return value
 
 @click.command()
 @click.argument("deployment_stage")
 @click.option("--github-sha", callback=validate_sha, help="github sha to be deployed", default=None)
 @click.option("--dry-run", help="do not perform actual deployment", default=False, is_flag=True)
-def happy_deploy(deployment_stage, github_sha, dry_run):
+@click.option("--get-latest", help="get (short) github sha of latest successful deployment", default=False, is_flag=True)
+def happy_deploy(deployment_stage, github_sha, dry_run, get_latest):
     api_token = os.getenv("GITHUB_TOKEN")
     if api_token is None:
         print("Error: Please set GITHUB_TOKEN environment variable")
@@ -121,8 +123,10 @@ def happy_deploy(deployment_stage, github_sha, dry_run):
     # github sha of staging environment
     if github_sha is None:
         github_sha, parsed_t = get_latest_successful_deployment(api_token, read_deployment_stage)
+        if get_latest:
+            print(github_sha[0:8])
+            return
         print(f"Latest succesful '{read_deployment_stage}' deployment on {parsed_t}: commit {github_sha}")
-
     if github_sha is None:
         print(
             f"Error: Could not find a successful deployment for deployment stage {read_deployment_stage}, and no --github_sha was given"
