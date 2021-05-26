@@ -171,7 +171,7 @@ jobs:
         with:
           registry: ${{ secrets.ECR_REPO }}
       - uses: actions/checkout@v2
-      - run: docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/${{ matrix.image.name }}:branch-trunk --cache-to=type=inline,mode=max -t ${{ secrets.ECR_REPO }}/${{ matrix.image.name }}:sha-${GITHUB_SHA:0:8} -f ${{ matrix.image.dockerfile }} --push ${{ matrix.image.context }}
+      - run: docker buildx build --build-arg HAPPY_COMMIT=${GITHUB_SHA} --build-arg HAPPY_BRANCH=${GITHUB_REF} --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/${{ matrix.image.name }}:branch-trunk --cache-to=type=inline,mode=max -t ${{ secrets.ECR_REPO }}/${{ matrix.image.name }}:sha-${GITHUB_SHA:0:8} -f ${{ matrix.image.dockerfile }} --push ${{ matrix.image.context }}
   update-stage:
     needs:
       - build-push-images
