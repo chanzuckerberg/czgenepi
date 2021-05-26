@@ -1,9 +1,9 @@
-name: Scheduled Prod Deploy
+name: Scheduled Prod Deploy Test
 
 on:
-  schedule:
-    # Weekly Mondays & Thursdays @ 15:00 UTC (8am PST)
-    - cron: '0 15 * * 1,4'
+  push:
+    branches:
+      - lvreynoso/scheduled_prod_deploy
 
 env:
   DOCKER_BUILDKIT: 1
@@ -27,7 +27,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-2
-          role-to-assume: ${{ secrets.AWS_PROD_ROLE_TO_ASSUME }}
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-duration-seconds: 900
       - uses: actions/checkout@v2
       - name: Install happy dependencies
@@ -38,7 +38,7 @@ jobs:
           TFE_TOKEN: ${{ secrets.TFE_TOKEN }}
         run: |
           export DEPLOY_SHA=sha-$(py ./scripts/happy-deploy.py staging --get-latest)
-          ./scripts/happy --profile="" --env prod update prodstack --tag $DEPLOY_SHA
+          ./scripts/happy --profile="" --env rdev update lvr-deploy-test --tag $DEPLOY_SHA
       - uses: act10ns/slack@v1
         with:
           status: ${{ job.status }}
