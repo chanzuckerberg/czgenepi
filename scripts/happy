@@ -870,6 +870,27 @@ def run_tasks(ctx, stack, task_type, wait=False, show_logs=True):
     for task in tasks:
         orchestrator.run_task(task, wait=wait, show_logs=show_logs)
 
+def check_images_exist(ctx, tag):
+    """Make sure all of our service images actually exist if we're trying to deploy via tag"""
+    ecrs = ctx.obj["config"].ecrs
+    ecr_client = AwsSession.get_client(ctx, "ecr")
+    # Use a list of images managed by docker-compose
+    builder_config = {"ecr_repo": "", "env": ""}  # We don't need ECR names here.
+    builder = ArtifactBuilder(builder_config)
+    images = builder.get_compose_services().keys()
+    for image_name, repository in ecrs.items():
+        if image_name not in images:
+            continue
+        registry_id = repository["url"].split(".")[0]
+        repo_name = "/".join(repository["url"].split("/")[1:])
+
+        manifest = ecr_client.batch_get_image(
+            registryId=registry_id, repositoryName=repo_name, imageIds=[{"imageTag": tag}]
+        )
+        if manifest and manifest["images"]:
+            continue
+        raise CliError(f"Tag {tag} doesn't exist for {repository['url']}! Please use a valid tag")
+
 
 @cli.command()
 @click.argument("stack_name")
@@ -910,8 +931,9 @@ def logs(ctx, stack_name, service, since):
 @click.option("--tag", help="Tag name for docker image. Leave empty to generate one automatically.", default=None)
 @click.option("--wait/--no-wait", is_flag=True, default=True, help="wait for this to complete")
 @click.option("--force", is_flag=True, default=False, help="Ignore already-exists errors")
+@click.option("--skip-check-tag", is_flag=True, default=False, help="Skip checking that the specified tag exists (requires --tag)")
 @click.pass_context
-def create(ctx, stack_name, tag, wait, force):
+def create(ctx, stack_name, tag, wait, force, skip_check_tag):
     """Create a new stack with a given tag"""
     stackmgr = ctx.obj["stack_mgr"]
     if stack_name in stackmgr.stacks:
@@ -919,6 +941,8 @@ def create(ctx, stack_name, tag, wait, force):
             print(f"Stack {stack_name} already exists")
         else:
             raise CliError(f"Stack {stack_name} already exists")
+    if tag and not skip_check_tag:
+        check_images_exist(ctx, tag)
 
     stack_meta = StackMeta(ctx, stack_name)
     stack_meta.load({"happy/meta/configsecret": ctx.obj["config"].secret_arn})
@@ -964,14 +988,17 @@ def config_tarball(source_dir):
 @click.option("--tag", help="Tag name for docker image. Leave empty to generate one automatically.", default=None)
 @click.option("--wait/--no-wait", is_flag=True, default=True, help="wait for this to complete")
 @click.option("--skip-migrations/--do-migrations", is_flag=True, default=False, help="Skip running migrations")
+@click.option("--skip-check-tag", is_flag=True, default=False, help="Skip checking that the specified tag exists (requires --tag)")
 @click.pass_context
-def update(ctx, stack_name, tag, wait, skip_migrations):
+def update(ctx, stack_name, tag, wait, skip_migrations, skip_check_tag):
     """Update a dev stack tag version"""
     stackmgr = ctx.obj["stack_mgr"]
     try:
         stack = stackmgr.stacks[stack_name]
     except KeyError:
         raise CliError(f"Stack {stack_name} does not exist")
+    if tag and not skip_check_tag:
+        check_images_exist(ctx, tag)
 
     print(f"updating {stack_name}")
     if not tag:
