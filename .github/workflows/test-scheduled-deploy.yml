@@ -15,13 +15,13 @@ jobs:
   upgrade:
     runs-on: ubuntu-20.04
     environment:
-      name: prod
+      name: staging
     steps:
       - uses: act10ns/slack@v1
         with:
           status: starting
         if: always()
-      - name: Configure AWS Prod Credentials
+      - name: Configure AWS RDEV Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
