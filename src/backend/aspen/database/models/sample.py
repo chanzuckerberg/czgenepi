@@ -58,6 +58,7 @@ class Sample(idbase, DictMixin):  # type: ignore
         nullable=False,
     )
     submitting_group = relationship(Group, backref=backref("samples", uselist=True))  # type: ignore
+    private = Column(Boolean, nullable=False, default=False)
     private_identifier = Column(
         String,
         nullable=False,
