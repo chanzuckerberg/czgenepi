@@ -98,7 +98,9 @@ def import_project(
             .join(Project)
             .filter(Project.rr_project_id == rr_project_id)
             .options(
-                selectin_polymorphic(CZBID, [DphCZBID, InternalCZBID]),
+                selectin_polymorphic(
+                    CZBID, [CollaboratorCZBID, DphCZBID, InternalCZBID]
+                ),
                 joinedload(CZBID.genome_submission_info),
             )
             .all()
@@ -133,7 +135,7 @@ def import_project(
             )
             .all()
         }
-        czb_ids_metadata: Mapping[str, Tuple[str, datetime.datetime]] = {}
+        czb_ids_metadata: Mapping[str, Tuple[str, datetime.datetime]]
         if project.type == NGSProjectType.INTERNAL:
             czb_ids_metadata = {
                 czbid: (
