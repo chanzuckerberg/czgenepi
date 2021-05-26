@@ -34,6 +34,8 @@ jobs:
       - name: Lint ts
         run: |
           echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
+          # Build frontend image
+          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/aspen-frontend:branch-trunk -t ${{ secrets.ECR_REPO }}/aspen-frontend:latest src/frontend
           make frontend-check-style
   ts-test:
     runs-on: ubuntu-20.04
@@ -54,6 +56,8 @@ jobs:
       - name: Test ts
         run: |
           echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
+          # Build frontend
+          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/aspen-frontend:branch-trunk -t ${{ secrets.ECR_REPO }}/aspen-frontend:latest src/frontend
           make frontend-test
   ts-test-build:
     runs-on: ubuntu-20.04
@@ -76,6 +80,8 @@ jobs:
           echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
           mkdir src/frontend/build
           chmod -R a+w src/frontend/build
+          # Build frontend
+          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/aspen-frontend:branch-trunk -t ${{ secrets.ECR_REPO }}/aspen-frontend:latest src/frontend
           make frontend-test-build
   py-lint:
     runs-on: ubuntu-20.04
@@ -96,6 +102,8 @@ jobs:
       - name: Lint Python
         run: |
           echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
+          # Build backend image
+          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/aspen-backend:branch-trunk -t ${{ secrets.ECR_REPO }}/aspen-backend:latest src/backend
           make backend-check-style
   py-test:
     runs-on: ubuntu-20.04
@@ -116,20 +124,57 @@ jobs:
       - name: Test Python
         run: |
           echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
+          # Build backend image
+          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/aspen-backend:branch-trunk -t ${{ secrets.ECR_REPO }}/aspen-backend:latest src/backend
+          # Build frontend
+          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/aspen-frontend:branch-trunk -t ${{ secrets.ECR_REPO }}/aspen-frontend:latest src/frontend
           make local-init
           make backend-test
-      - name: Push images
-        if: github.ref == 'refs/heads/trunk'
-        run: |
-          pip install -r .happy/requirements.txt
-          scripts/happy --profile="" push --extra-tag sha-${GITHUB_SHA:0:8} --extra-tag build-${GITHUB_RUN_NUMBER}
-  update-stage:
+  build-push-images:
+    if: github.ref == 'refs/heads/trunk'
+    runs-on: ubuntu-20.04
     needs:
       - ts-lint
       - ts-test
       - ts-test-build
       - py-lint
       - py-test
+    strategy:
+      matrix:
+        image:
+        - dockerfile: src/backend/Dockerfile.gisaid
+          context: ./src/backend/
+          name: aspen-gisaid
+        - dockerfile: src/backend/Dockerfile.nextstrain
+          context: ./src/backend/
+          name: aspen-nextstrain
+        - dockerfile: src/backend/Dockerfile.pangolin
+          context: ./src/backend/
+          name: aspen-pangolin
+        - dockerfile: src/backend/Dockerfile
+          context: ./src/backend/
+          name: aspen-backend
+        - dockerfile: src/frontend/Dockerfile
+          context: ./src/frontend/
+          name: aspen-frontend
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-duration-seconds: 900
+      - name: Login to ECR
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ secrets.ECR_REPO }}
+      - uses: actions/checkout@v2
+      - run: docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/${{ matrix.image.name }}:branch-trunk --cache-to=type=inline,mode=max -t ${{ secrets.ECR_REPO }}/${{ matrix.image.name }}:sha-${GITHUB_SHA:0:8} -f ${{ matrix.image.dockerfile }} --push ${{ matrix.image.context }}
+  update-stage:
+    needs:
+      - build-push-images
     runs-on: ubuntu-20.04
     if: github.ref == 'refs/heads/trunk'
     steps:
@@ -169,6 +214,5 @@ jobs:
           # See https://github.community/t/can-i-avoid-creating-a-check-run-from-a-job-needed-for-deployments-api/16426
         env:
           GITHUB_TOKEN: ${{ secrets.CZIBUILDBOT_GITHUB_TOKEN }}
-
 
 
