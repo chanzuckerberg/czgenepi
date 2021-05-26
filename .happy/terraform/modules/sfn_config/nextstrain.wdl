@@ -93,12 +93,11 @@ task nextstrain_workflow {
     aws s3 cp --no-progress "s3://${aligned_gisaid_s3_bucket}/${aligned_gisaid_sequences_s3_key}" - | zstdmt -d | xz -2 > /ncov/results/aligned_gisaid.fasta.xz
     aws s3 cp --no-progress "s3://${aligned_gisaid_s3_bucket}/${aligned_gisaid_metadata_s3_key}" /ncov/data/metadata_gisaid.tsv
 
-    snakemake --printshellcmds auspice/ncov_aspen.json --profile my_profiles/aspen/  --resources=mem_mb=312320
+    snakemake --printshellcmds auspice/ncov_aspen.json --profile my_profiles/aspen/  --resources=mem_mb=312320 || aws s3 cp /ncov/.snakemake/log/ "s3://${aspen_s3_db_bucket}/phylo_run/${build_id}/" --recursive
 
     # upload the tree to S3
     key="phylo_run/${build_id}/~{s3_filestem}.json"
     aws s3 cp /ncov/auspice/ncov_aspen.json "s3://${aspen_s3_db_bucket}/${key}"
-    aws s3 cp /ncov/.snakemake/log/ "s3://${aspen_s3_db_bucket}/phylo_run/${build_id}/" --recursive
 
     # update aspen
     aspen_workflow_rev=WHATEVER

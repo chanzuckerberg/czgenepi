@@ -98,7 +98,9 @@ def import_project(
             .join(Project)
             .filter(Project.rr_project_id == rr_project_id)
             .options(
-                selectin_polymorphic(CZBID, [DphCZBID, InternalCZBID]),
+                selectin_polymorphic(
+                    CZBID, [CollaboratorCZBID, DphCZBID, InternalCZBID]
+                ),
                 joinedload(CZBID.genome_submission_info),
             )
             .all()
@@ -133,7 +135,7 @@ def import_project(
             )
             .all()
         }
-        czb_ids_metadata: Mapping[str, Tuple[str, datetime.datetime]] = {}
+        czb_ids_metadata: Mapping[str, Tuple[str, datetime.datetime]]
         if project.type == NGSProjectType.INTERNAL:
             czb_ids_metadata = {
                 czbid: (
@@ -329,12 +331,23 @@ def import_project(
                                 workflow_end_datetime=datetime.datetime.now(),
                             )
                 else:
-                    sample.uploaded_pathogen_genome.consuming_workflows.append(
-                        GisaidAccessionWorkflow(
-                            software_versions={},
-                            workflow_status=WorkflowStatusType.FAILED,
-                            start_datetime=datetime.datetime.now(),
+                    # is there already a failed gisaid accession workflow?
+                    for (
+                        consuming_workflow
+                    ) in sample.uploaded_pathogen_genome.consuming_workflows:
+                        if (
+                            isinstance(consuming_workflow, GisaidAccessionWorkflow)
+                            and consuming_workflow.workflow_status
+                            == WorkflowStatusType.FAILED
+                        ):
+                            break
+                    else:
+                        sample.uploaded_pathogen_genome.consuming_workflows.append(
+                            GisaidAccessionWorkflow(
+                                software_versions={},
+                                workflow_status=WorkflowStatusType.FAILED,
+                                start_datetime=datetime.datetime.now(),
+                            )
                         )
-                    )
             else:
                 sample.czb_failed_genome_recovery = True
