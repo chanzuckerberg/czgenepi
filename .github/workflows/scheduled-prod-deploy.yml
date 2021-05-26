@@ -32,19 +32,15 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 2
-        run: git checkout HEAD^
+      - run: git checkout HEAD^
       - name: Install happy dependencies
         run: |
           pip install -r .happy/requirements.txt
-      - name: Get latest successful staging deployment
-        env:
-          TFE_TOKEN: ${{ secrets.TFE_TOKEN }}
-        run: |
-          export DEPLOY_SHA=sha-$(py ./scripts/happy-deploy.py staging --get-latest)
       - name: Update deployment
         env:
           TFE_TOKEN: ${{ secrets.TFE_TOKEN }}
         run: |
+          export DEPLOY_SHA=sha-$(py ./scripts/happy-deploy.py staging --get-latest)
           ./scripts/happy --profile="" --env prod update prodstack --tag $DEPLOY_SHA
       - name: Run integration tests
         env:
