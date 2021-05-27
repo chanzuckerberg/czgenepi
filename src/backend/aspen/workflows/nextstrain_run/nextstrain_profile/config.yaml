@@ -2,9 +2,10 @@ configfile:
   - defaults/parameters.yaml
   - my_profiles/aspen/builds.yaml
 
-cores: 4
+cores: 10
 keep-going: False
 printshellcmds: True
 reason: True
 stats: stats.json
-set-threads: tree=4
+set-threads: tree=8
+set-threads: align=8
