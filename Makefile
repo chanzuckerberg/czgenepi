@@ -207,4 +207,8 @@ build-docker:
 
 
 ### TERRAFORM ###################################################
+.PHONY: tf-lint
+tf-lint:
+	set -e; for i in $$(find .happy/terraform/envs ! -path .happy/terraform/envs -type d -maxdepth 1); do echo $${i}; pushd $${i}; terraform init; terraform validate; tflint --module; popd; done
+
 include terraform.mk
