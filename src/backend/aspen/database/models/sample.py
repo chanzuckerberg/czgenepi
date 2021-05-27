@@ -58,11 +58,10 @@ class Sample(idbase, DictMixin):  # type: ignore
         nullable=False,
     )
     submitting_group = relationship(Group, backref=backref("samples", uselist=True))  # type: ignore
-    # TODO: change this to false in the future when local/ remote env snapshots are updated?
     uploaded_by_id = Column(
         Integer,
         ForeignKey(User.id),
-        nullable=True,
+        nullable=False,
     )
     uploaded_by = relationship(User, backref=backref("samples", uselist=True))  # type: ignore
     private = Column(Boolean, nullable=False, default=False)

@@ -29,6 +29,35 @@ def upgrade():
         referent_schema="aspen",
     )
 
+    conn = op.get_bind()
+
+    # create aspen admin user group
+    create_group_sql = sa.sql.text(
+        "INSERT INTO aspen.groups (name, address) VALUES ('ASPEN ADMIN GROUP', 'stub')"
+    )
+    conn.execute(create_group_sql)
+
+    # create aspin admin user
+    create_user_sql = sa.sql.text(
+        "INSERT INTO aspen.users (name, email, auth0_user_id, agreed_to_tos, group_admin, system_admin, group_id) (SELECT 'ASPEN ADMIN', 'aspen_admin@chanzuckerberg.com', 'stub', 't', 't', 't', id from aspen.groups where name='ASPEN ADMIN GROUP');"
+    )
+    conn.execute(create_user_sql)
+
+    # backfill uploaded_by field to aspen admin
+    backfill_sql = sa.sql.text(
+        "UPDATE aspen.samples SET uploaded_by_id = aspen.users.id FROM aspen.users WHERE aspen.users.name = 'ASPEN ADMIN'"
+    )
+    conn.execute(backfill_sql)
+
+    # set field to be non-nullable
+    op.alter_column(
+        "samples",
+        "uploaded_by_id",
+        existing_type=sa.Integer,
+        nullable=False,
+        schema="aspen",
+    )
+
 
 def downgrade():
     op.drop_constraint(
