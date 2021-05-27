@@ -10,6 +10,7 @@ from aspen.database.models import (
     PublicRepositoryType,
     Sample,
     SequencingReadsCollection,
+    UploadedPathogenGenome
 )
 from aspen.test_infra.models.accession_workflow import AccessionWorkflowDirective
 from aspen.test_infra.models.sample import sample_factory
@@ -616,3 +617,92 @@ def test_samples_view_no_pangolin(
         ]
     }
     assert expected == json.loads(res.get_data(as_text=True))
+
+
+def test_samples_create_view_pass(
+    session,
+    app,
+    client,
+):
+    group = group_factory()
+    user = user_factory(group)
+    session.add(group)
+    session.commit()
+    with client.session_transaction() as sess:
+        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
+
+    data = [
+        {
+            "sample": {
+                "private_identifier": "private",
+                "collection_date": api_utils.format_date(datetime.datetime.now()),
+                "location": "Ventura County",
+                "private": True,
+            },
+            "pathogen_genome": {
+                "sequence": "AAAAAAAAA",
+            }
+        },
+        {
+            "sample": {
+                "private_identifier": "private2",
+                "collection_date": api_utils.format_date(datetime.datetime.now()),
+                "location": "Ventura County",
+                "private": True,
+            },
+            "pathogen_genome": {
+                "sequence": "AAAAAAAAA",
+            }
+        }
+    ]
+    res = client.post("/api/samples/create", json=data, content_type="application/json")
+    assert res.status == "200 OK"
+    session.close()
+    session.begin()
+
+    samples = session.query(Sample.private_identifier.in_(["private", "private2"])).all()
+    uploaded_pathogen_genomes = session.query(UploadedPathogenGenome).all()
+
+    assert len(samples) == 2
+    assert len(uploaded_pathogen_genomes) == 2
+    assert True
+
+
+def test_samples_create_view_fail_missing_required_fields(
+    session,
+    app,
+    client,
+):
+    group = group_factory()
+    user = user_factory(group)
+    session.add(group)
+    session.commit()
+    with client.session_transaction() as sess:
+        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
+
+    data = [
+        {
+            "sample": {
+                "private_identifier": "private",
+                "collection_date": api_utils.format_date(datetime.datetime.now()),
+                "private": True,
+            },
+            "pathogen_genome": {
+                "sequence": "AAAAAAAAA",
+            }
+        },
+        {
+            "sample": {
+                "private_identifier": "private2",
+                "collection_date": api_utils.format_date(datetime.datetime.now()),
+                "location": "Ventura County",
+                "private": True,
+            },
+            "pathogen_genome": {
+                "sequence": "AAAAAAAAA",
+            }
+        }
+    ]
+    res = client.post("/api/samples/create", json=data, content_type="application/json")
+    assert res.status == "400 BAD REQUEST"
+    assert res.get_data()

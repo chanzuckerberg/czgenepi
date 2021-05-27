@@ -35,3 +35,28 @@ def format_datetime(dt: Optional[datetime.datetime], format="%Y-%m-%d %I:%M%p") 
         return dt.strftime(format)
     else:
         return "N/A"
+
+
+def check_data(
+        data: list[str],
+        required_fields:tuple,
+        optional_fields: tuple
+) -> tuple[bool, Optional[list[str]], Optional[list[str]]]:
+
+    # check all required fields are present:
+    missing_required = [i for i in required_fields if i not in data]
+
+    # check no fields were added that are unexpected
+    unexpected = [i for i in data if i not in required_fields+optional_fields]
+
+    if missing_required or unexpected:
+        return False, missing_required, unexpected
+
+    else:
+        # data is clean
+        return True
+
+
+
+
+

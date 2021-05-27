@@ -2,7 +2,7 @@ import datetime
 from collections import defaultdict
 from typing import Any, Mapping, MutableSequence, Optional, Sequence, Set
 
-from flask import jsonify, session
+from flask import jsonify, session, request, Response
 from sqlalchemy import or_
 from sqlalchemy.orm import joinedload
 
@@ -24,6 +24,7 @@ from aspen.database.models import (
     SequencingReadsCollection,
     UploadedPathogenGenome,
     WorkflowStatusType,
+    Sample
 )
 from aspen.database.models.sample import Sample
 from aspen.database.models.usergroup import Group, User
@@ -31,6 +32,33 @@ from aspen.error.recoverable import RecoverableError
 
 SAMPLE_KEY = "samples"
 GISIAD_REJECTION_TIME = datetime.timedelta(days=4)
+SAMPLES_POST_REQUIRED_FIELDS = [
+    "private",
+    "private_identifier",
+    "collection_date",
+    "location",
+    "sequence"  # from PathogenGenome
+]
+SAMPLES_POST_OPTIONAL_FIELDS = [
+    "original_submission",
+    "public_identifier",
+    "sample_collected_by",
+    "sample_collector_contact_email",
+    "sample_collector_contact_address",
+    "authors",
+    "division",
+    "country",
+    "region",
+    "organism",
+    "host",
+    "purpose_of_sampling",
+    "specimen_processing",
+    "czb_failed_genome_recovery"
+    "sequencing_depth",  # from UploadedPathogenGenome
+    "num_unambiguous_sites",  # from PathogenGenome
+    "num_missing_alleles",  # from PathogenGenome
+    "num_mixed"  # from PathogenGenome
+]
 
 
 def _format_created_date(sample: Sample) -> str:
@@ -230,3 +258,55 @@ def samples():
             results.append(returned_sample_data)
 
         return jsonify({SAMPLE_KEY: results})
+
+
+@application.route("/api/samples/create", methods=["POST"])
+@requires_auth
+def create_sample():
+    with session_scope(application.DATABASE_INTERFACE) as db_session:
+        profile = session["profile"]
+
+        user = (
+            get_usergroup_query(db_session, profile["user_id"])
+            .options(joinedload(User.group))
+            .one()
+        )
+        request_data = request.get_json()
+
+        samples = []
+        uploaded_pathogen_genomes = []
+        for data in request_data:
+            data_ok: bool
+            missing_fields: Optional[list[str]]
+            unexpected_fields: Optional[list[str]]
+            data_ok, missing_fields, unexpected_fields = api_utils.check_data(
+                data["sample"].keys() + data["pathogen_genome"].keys(),
+                SAMPLES_POST_REQUIRED_FIELDS,
+                SAMPLES_POST_OPTIONAL_FIELDS
+            )
+            if data_ok:
+                sample = Sample(
+                    submitting_group=user.group,
+                    **data["sample"]
+
+                )
+                upload_pathogen_genome = UploadedPathogenGenome(
+                    sample=sample,
+                    **data["pathogen_genome"]
+                )
+                samples.append(sample)
+                uploaded_pathogen_genomes.append(upload_pathogen_genome)
+            else:
+                return Response(
+                    f"Missing required fields {missing_fields} or encountered unexpected fields {unexpected_fields}",
+                    400
+                )
+
+        session.add_all(samples)
+        session.add_all(uploaded_pathogen_genomes)
+        return jsonify(success=True)
+
+
+
+
+
