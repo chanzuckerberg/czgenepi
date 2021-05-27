@@ -15,6 +15,20 @@ env:
   DOCKER_REPO: ${{ secrets.ECR_REPO }}/
 
 jobs:
+  tf-lint:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: terraform-linters/setup-tflint@v1
+        name: Setup TFLint
+        with:
+          tflint_version: v0.28.1
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 0.13.5
+      - uses: actions/checkout@v2
+      - name: run tflint
+        run: |
+          make tf-lint
   ts-lint:
     runs-on: ubuntu-20.04
     steps:
@@ -134,6 +148,7 @@ jobs:
     if: github.ref == 'refs/heads/trunk'
     runs-on: ubuntu-20.04
     needs:
+      - tf-lint
       - ts-lint
       - ts-test
       - ts-test-build
