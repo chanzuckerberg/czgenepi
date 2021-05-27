@@ -32,7 +32,9 @@ allowed_origins = []
 frontend_url = os.getenv("FRONTEND_URL")
 
 if deployment not in ["staging", "prod"]:
-    allowed_origins.extend([r"http://.*\.genepinet\.local:\d+", r"^http://localhost:\d+"])
+    allowed_origins.extend(
+        [r"http://.*\.genepinet\.local:\d+", r"^http://localhost:\d+"]
+    )
 if frontend_url:
     allowed_origins.append(frontend_url)
 
