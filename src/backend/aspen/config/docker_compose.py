@@ -9,7 +9,7 @@ class DockerComposeConfig(config.Config):
 
     @config.flaskproperty
     def SESSION_COOKIE_SECURE(self) -> bool:
-        return True
+        return False
 
     @config.flaskproperty
     def SESSION_COOKIE_HTTPONLY(self) -> bool:

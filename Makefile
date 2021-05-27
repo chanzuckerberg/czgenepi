@@ -166,6 +166,7 @@ local-clean: local-nohostconfig ## Remove everything related to the local dev en
 	docker-compose rm -sf
 	-docker volume rm aspen_database
 	-docker volume rm aspen_localstack
+	-docker network rm aspen_genepinet
 
 .PHONY: local-logs
 local-logs: ## Tail the logs of the dev env containers. ex: make local-logs CONTAINER=backend
