@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from aspen.database.models import RegionType, Sample
-from aspen.test_infra.models.usergroup import user_factory
 
 
 def sample_factory(

@@ -54,7 +54,7 @@ def make_trees(
 
 
 def make_all_test_data(
-    group: Group, user: User,  n_samples: int, n_trees: int
+    group: Group, user: User, n_samples: int, n_trees: int
 ) -> Tuple[Collection[Sample], Collection[UploadedPathogenGenome], Sequence[PhyloTree]]:
     samples: Collection[Sample] = make_sample_data(group, user, n_samples)
     uploaded_pathogen_genomes: Collection[
