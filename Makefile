@@ -10,6 +10,7 @@ export BACKEND_APP_ROOT=/usr/src/app
 
 ### DATABASE VARIABLES #################################################
 LOCAL_DB_NAME = aspen_db
+LOCAL_DB_SERVER = localhost:5432
 # This has to be "postgres" to ease moving snapshots from RDS.
 LOCAL_DB_ADMIN_USERNAME = postgres
 LOCAL_DB_ADMIN_PASSWORD = password_postgres
@@ -49,6 +50,18 @@ remote-dbconsole: .env.ecr # Get a python console on a remote db (from OSX only!
 	docker-compose $(COMPOSE_OPTS) run -e DB_URI backend sh -c 'pip install . && aspen-cli db --remote interact --connect'
 
 ### DOCKER LOCAL DEV #########################################
+.PHONY: local-hostconfig
+local-hostconfig:
+	if [ "$$(uname -s)" == "Darwin" ]; then \
+	  sudo ./scripts/happy hosts install; \
+	fi
+
+.PHONY: local-nohostconfig
+local-nohostconfig:
+	if [ "$$(uname -s)" == "Darwin" ]; then \
+	  sudo ./scripts/happy hosts uninstall; \
+	fi
+
 oauth/pkcs12/certificate.pfx:
 	# All calls to the openssl cli happen in the oidc-server-mock container.
 	@echo "Generating certificates for local dev"
@@ -86,18 +99,18 @@ init-empty-db:
 	docker-compose rm database
 	docker-compose $(COMPOSE_OPTS) -f docker-compose.yml -f docker-compose-emptydb.yml up -d
 	sleep 10 # hack, let postgres start up cleanly.
-	-docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@localhost:5432/$(LOCAL_DB_NAME)" -c "ALTER USER $(LOCAL_DB_ADMIN_USERNAME) WITH PASSWORD '$(LOCAL_DB_ADMIN_PASSWORD)';"
-	-docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@localhost:5432/$(LOCAL_DB_NAME)" -c "CREATE USER $(LOCAL_DB_RW_USERNAME) WITH PASSWORD '$(LOCAL_DB_RW_PASSWORD)';"
-	-docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@localhost:5432/$(LOCAL_DB_NAME)" -c "CREATE USER $(LOCAL_DB_RO_USERNAME) WITH PASSWORD '$(LOCAL_DB_RO_PASSWORD)';"
-	-docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@localhost:5432/$(LOCAL_DB_NAME)" -c "GRANT ALL PRIVILEGES ON DATABASE $(LOCAL_DB_NAME) TO $(LOCAL_DB_RW_USERNAME);"
+	-docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c "ALTER USER $(LOCAL_DB_ADMIN_USERNAME) WITH PASSWORD '$(LOCAL_DB_ADMIN_PASSWORD)';"
+	-docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c "CREATE USER $(LOCAL_DB_RW_USERNAME) WITH PASSWORD '$(LOCAL_DB_RW_PASSWORD)';"
+	-docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c "CREATE USER $(LOCAL_DB_RO_USERNAME) WITH PASSWORD '$(LOCAL_DB_RO_PASSWORD)';"
+	-docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c "GRANT ALL PRIVILEGES ON DATABASE $(LOCAL_DB_NAME) TO $(LOCAL_DB_RW_USERNAME);"
 	docker-compose exec -T utility aspen-cli db --local create
 	docker-compose exec -T utility alembic stamp head
 
 
 .PHONY: local-init
-local-init: oauth/pkcs12/certificate.pfx .env.ecr local-ecr-login ## Launch a new local dev env and populate it with test data.
+local-init: oauth/pkcs12/certificate.pfx .env.ecr local-ecr-login local-hostconfig ## Launch a new local dev env and populate it with test data.
 	docker-compose $(COMPOSE_OPTS) up -d database frontend backend localstack oidc utility
-	@docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@localhost:5432/$(LOCAL_DB_NAME)" -c "alter user $(LOCAL_DB_ADMIN_USERNAME) with password '$(LOCAL_DB_ADMIN_PASSWORD)';"
+	@docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c "alter user $(LOCAL_DB_ADMIN_USERNAME) with password '$(LOCAL_DB_ADMIN_PASSWORD)';"
 	docker-compose exec -T utility pip3 install awscli
 	docker-compose exec -T utility $(BACKEND_APP_ROOT)/scripts/setup_dev_data.sh
 	docker-compose exec -T utility alembic upgrade head
@@ -123,7 +136,7 @@ local-rebuild-workflows: .env.ecr local-ecr-login ## Rebuild batch containers
 	docker-compose $(COMPOSE_OPTS) up -d
 
 .PHONY: local-sync
-local-sync: local-rebuild local-init ## Re-sync the local-environment state after modifying library deps or docker configs
+local-sync: local-rebuild local-init local-hostconfig ## Re-sync the local-environment state after modifying library deps or docker configs
 
 .PHONY: local-start
 local-start: .env.ecr ## Start a local dev environment that's been stopped.
@@ -134,7 +147,7 @@ local-stop: ## Stop the local dev environment.
 	docker-compose stop
 
 .PHONY: local-clean
-local-clean: ## Remove everything related to the local dev environment (including db data!)
+local-clean: local-nohostconfig ## Remove everything related to the local dev environment (including db data!)
 	-if [ -f ./oauth/pkcs12/server.crt ] ; then \
 		if [ "$$(uname -s)" == "Linux" ]; then \
 			echo "Removing this certificate from /usr/local/share requires sudo access"; \
@@ -164,7 +177,7 @@ local-shell: ## Open a command shell in one of the dev containers. ex: make loca
 
 .PHONY: local-pgconsole
 local-pgconsole: ## Connect to the local postgres database.
-	docker-compose exec database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@localhost:5432/$(LOCAL_DB_NAME)"
+	docker-compose exec database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)"
 
 .PHONY: local-dbconsole
 local-dbconsole: ## Connect to the local postgres database.

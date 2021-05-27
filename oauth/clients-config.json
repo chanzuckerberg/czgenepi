@@ -8,8 +8,8 @@
             "authorization_code"
         ],
         "RedirectUris": [
-            "https://localhost:3000/callback",
-            "http://localhost:3000/callback"
+            "https://backend.genepinet.local:3000/callback",
+            "http://backend.genepinet.local:3000/callback"
         ],
         "AllowedScopes": [
            "openid", "profile", "email", "offline_access"
