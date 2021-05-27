@@ -18,10 +18,11 @@ from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
 from aspen.test_infra.models.usergroup import group_factory, user_factory
 
 
-def make_sample_data(group: Group, n_samples: int) -> Collection[Sample]:
+def make_sample_data(group: Group, user: User, n_samples: int) -> Collection[Sample]:
     samples: Collection[Sample] = [
         sample_factory(
             group,
+            user,
             public_identifier=f"public_identifier_{ix}",
             private_identifier=f"private_identifier_{ix}",
         )
@@ -53,9 +54,9 @@ def make_trees(
 
 
 def make_all_test_data(
-    group: Group, n_samples: int, n_trees: int
+    group: Group, user: User,  n_samples: int, n_trees: int
 ) -> Tuple[Collection[Sample], Collection[UploadedPathogenGenome], Sequence[PhyloTree]]:
-    samples: Collection[Sample] = make_sample_data(group, n_samples)
+    samples: Collection[Sample] = make_sample_data(group, user, n_samples)
     uploaded_pathogen_genomes: Collection[
         UploadedPathogenGenome
     ] = make_uploaded_pathogen_genomes(samples)
@@ -90,7 +91,7 @@ def test_phylo_tree_view(
 ):
     group: Group = group_factory()
     user: User = user_factory(group)
-    _, _, trees = make_all_test_data(group, n_samples, n_trees)
+    _, _, trees = make_all_test_data(group, user, n_samples, n_trees)
 
     session.add(group)
     session.commit()
@@ -108,7 +109,7 @@ def test_phylo_trees_can_see(
     owner_group: Group = group_factory()
     viewer_group: Group = group_factory("CADPH")
     user: User = user_factory(viewer_group)
-    _, _, trees = make_all_test_data(owner_group, n_samples, n_trees)
+    _, _, trees = make_all_test_data(owner_group, user, n_samples, n_trees)
 
     CanSee(viewer_group=viewer_group, owner_group=owner_group, data_type=DataType.TREES)
     session.add_all((owner_group, viewer_group))
@@ -127,7 +128,7 @@ def test_phylo_trees_no_can_see(
     owner_group: Group = group_factory()
     viewer_group: Group = group_factory("CADPH")
     user: User = user_factory(viewer_group)
-    _, _, trees = make_all_test_data(owner_group, n_samples, n_trees)
+    _, _, trees = make_all_test_data(owner_group, user, n_samples, n_trees)
 
     session.add_all((owner_group, viewer_group))
     session.commit()
@@ -149,7 +150,7 @@ def test_phylo_trees_admin(
     owner_group: Group = group_factory()
     viewer_group: Group = group_factory("admin")
     user: User = user_factory(viewer_group, system_admin=True)
-    _, _, trees = make_all_test_data(owner_group, n_samples, n_trees)
+    _, _, trees = make_all_test_data(owner_group, user, n_samples, n_trees)
 
     session.add_all((owner_group, viewer_group))
     session.commit()
@@ -169,7 +170,7 @@ def test_phylo_tree_can_see(
     owner_group: Group = group_factory()
     viewer_group: Group = group_factory("CADPH")
     user: User = user_factory(viewer_group)
-    _, _, trees = make_all_test_data(owner_group, n_samples, n_trees)
+    _, _, trees = make_all_test_data(owner_group, user, n_samples, n_trees)
 
     # We need to create the bucket since this is all in Moto's 'virtual' AWS account
     phylo_tree = trees[0]  # we only have one
@@ -207,7 +208,7 @@ def test_phylo_tree_no_can_see(
     owner_group: Group = group_factory()
     viewer_group: Group = group_factory("CADPH")
     user: User = user_factory(viewer_group)
-    _, _, trees = make_all_test_data(owner_group, n_samples, n_trees)
+    _, _, trees = make_all_test_data(owner_group, user, n_samples, n_trees)
 
     # We need to create the bucket since this is all in Moto's 'virtual' AWS account
     phylo_tree = trees[0]  # we only have one
@@ -245,7 +246,7 @@ def test_phylo_tree_admin(
     owner_group: Group = group_factory()
     viewer_group: Group = group_factory("admin")
     user: User = user_factory(viewer_group, system_admin=True)
-    _, _, trees = make_all_test_data(owner_group, n_samples, n_trees)
+    _, _, trees = make_all_test_data(owner_group, user, n_samples, n_trees)
 
     # We need to create the bucket since this is all in Moto's 'virtual' AWS account
     phylo_tree = trees[0]  # we only have one

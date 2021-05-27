@@ -37,21 +37,25 @@ def test_phylo_tree_rename(session, mock_s3_resource, test_data_dir):
 
     local_sample = sample_factory(
         viewer_group,
+        user,
         private_identifier="private_identifier_1",
         public_identifier="public_identifier_1",
     )
     can_see_sample = sample_factory(
         can_see_group,
+        user,
         private_identifier="private_identifier_2",
         public_identifier="public_identifier_2",
     )
     wrong_can_see_sample = sample_factory(
         wrong_can_see_group,
+        user,
         private_identifier="private_identifer_3",
         public_identifier="public_identifier_3",
     )
     no_can_see_sample = sample_factory(
         no_can_see_group,
+        user,
         private_identifier="private_identifer_4",
         public_identifier="public_identifier_4",
     )
@@ -104,6 +108,7 @@ def test_phylo_tree_rename_admin(session, mock_s3_resource, test_data_dir):
 
     renamed_sample = sample_factory(
         viewer_group,
+        user,
         private_identifier="private_identifier_1",
         public_identifier="public_identifier_1",
     )

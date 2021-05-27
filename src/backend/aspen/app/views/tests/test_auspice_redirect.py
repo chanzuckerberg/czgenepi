@@ -11,8 +11,11 @@ from aspen.test_infra.models.usergroup import group_factory, user_factory
 def test_auspice_redirect_view(session, app, client, mock_s3_resource, test_data_dir):
     viewer_group = group_factory()
     can_see_group = group_factory("can_see")
+    can_see_user = user_factory(can_see_group, name="can_see_user", auth0_user_id="can_see_user_auth0_id", email="can_see_user@dph.org")
     wrong_can_see_group = group_factory("wrong_can_see")
+    wrong_can_see_user = user_factory(wrong_can_see_group, name="wrong_can_see_user", auth0_user_id="wrong_can_see_user_auth0_id", email="wrong_can_see_user@dph.org")
     no_can_see_group = group_factory("no_can_see")
+    no_can_see_user = user_factory(no_can_see_group, name="no_can_see_user", auth0_user_id="no_can_see_user_auth0_id", email="no_can_see_user@dph.org")
     can_see_group.can_be_seen_by.append(
         CanSee(
             viewer_group=viewer_group,
@@ -35,21 +38,25 @@ def test_auspice_redirect_view(session, app, client, mock_s3_resource, test_data
 
     local_sample = sample_factory(
         viewer_group,
+        user,
         private_identifier="private_identifier_1",
         public_identifier="public_identifier_1",
     )
     can_see_sample = sample_factory(
         can_see_group,
+        can_see_user,
         private_identifier="private_identifier_2",
         public_identifier="public_identifier_2",
     )
     wrong_can_see_sample = sample_factory(
         wrong_can_see_group,
+        wrong_can_see_user,
         private_identifier="private_identifer_3",
         public_identifier="public_identifier_3",
     )
     no_can_see_sample = sample_factory(
         no_can_see_group,
+        no_can_see_user,
         private_identifier="private_identifer_4",
         public_identifier="public_identifier_4",
     )

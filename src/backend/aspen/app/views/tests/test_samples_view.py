@@ -24,7 +24,7 @@ def test_samples_view(
 ):
     group = group_factory()
     user = user_factory(group)
-    sample = sample_factory(group)
+    sample = sample_factory(group, user)
     uploaded_pathogen_genome = uploaded_pathogen_genome_factory(sample)
     session.add(group)
     session.commit()
@@ -69,7 +69,7 @@ def test_samples_view_gisaid_rejected(
 ):
     group = group_factory()
     user = user_factory(group)
-    sample = sample_factory(group)
+    sample = sample_factory(group, user)
     # Test no GISAID accession logic
     uploaded_pathogen_genome = uploaded_pathogen_genome_factory(
         sample,
@@ -120,7 +120,7 @@ def test_samples_view_gisaid_no_info(
 ):
     group = group_factory()
     user = user_factory(group)
-    sample = sample_factory(group)
+    sample = sample_factory(group, user)
     # Test no GISAID accession logic
     uploaded_pathogen_genome = uploaded_pathogen_genome_factory(
         sample,
@@ -166,7 +166,7 @@ def test_samples_view_gisaid_not_eligible(
     group = group_factory()
     user = user_factory(group)
     # Mark the sample as failed
-    sample = sample_factory(group, czb_failed_genome_recovery=True)
+    sample = sample_factory(group, user, czb_failed_genome_recovery=True)
     session.add(group)
     session.commit()
     with client.session_transaction() as sess:
@@ -201,7 +201,7 @@ def test_samples_view_gisaid_submitted(
 ):
     group = group_factory()
     user = user_factory(group)
-    sample = sample_factory(group)
+    sample = sample_factory(group, user)
     # create a sample with a gisaid workflow but no accession yet
     uploaded_pathogen_genome = uploaded_pathogen_genome_factory(
         sample,
@@ -255,7 +255,7 @@ def _test_samples_view_cansee(
     owner_group = group_factory()
     viewer_group = group_factory(name="cdph")
     user = user_factory(viewer_group, **user_factory_kwargs)
-    sample = sample_factory(owner_group)
+    sample = sample_factory(owner_group, user)
     uploaded_pathogen_genome = uploaded_pathogen_genome_factory(sample)
     for cansee_datatype in cansee_datatypes:
         CanSee(
@@ -451,7 +451,7 @@ def test_samples_failed_accession(
     view should return the successful accession ID."""
     group = group_factory()
     user = user_factory(group)
-    sample = sample_factory(group)
+    sample = sample_factory(group, user)
     uploaded_pathogen_genome = uploaded_pathogen_genome_factory(
         sample,
         accessions=(
@@ -516,7 +516,7 @@ def test_samples_multiple_accession(
     return the latest accession ID."""
     group = group_factory()
     user = user_factory(group)
-    sample = sample_factory(group)
+    sample = sample_factory(group, user)
     uploaded_pathogen_genome = uploaded_pathogen_genome_factory(
         sample,
         accessions=(
@@ -576,7 +576,7 @@ def test_samples_view_no_pangolin(
 ):
     group = group_factory()
     user = user_factory(group)
-    sample = sample_factory(group)
+    sample = sample_factory(group, user)
     uploaded_pathogen_genome = uploaded_pathogen_genome_factory(
         sample,
         pangolin_lineage=None,

@@ -5,12 +5,13 @@ from sqlalchemy.orm import undefer
 from aspen.database.models.sequences import UploadedPathogenGenome
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import sequencing_read_factory
-from aspen.test_infra.models.usergroup import group_factory
+from aspen.test_infra.models.usergroup import group_factory, user_factory
 
 
 def test_sequencing_reads(session):
     group = group_factory()
-    sample = sample_factory(group)
+    uploaded_by_user = user_factory(group)
+    sample = sample_factory(group, uploaded_by_user)
     sequencing_reads = sequencing_read_factory(sample)
 
     session.add_all(
@@ -25,7 +26,8 @@ def test_sequencing_reads(session):
 
 def test_uploaded_pathogen_genome(session):
     group = group_factory()
-    sample = sample_factory(group)
+    uploaded_by_user = user_factory(group)
+    sample = sample_factory(group, uploaded_by_user)
     uploaded_pathogen_genome = UploadedPathogenGenome(
         sample=sample,
         sequence="GAGAGACTCTCT",
