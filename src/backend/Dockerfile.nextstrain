@@ -28,7 +28,7 @@ RUN mkdir /ncov && \
     cd /ncov && \
     git init && \
     git remote add origin https://github.com/nextstrain/ncov.git && \
-    git fetch origin 3e9ad400593b24cf94d24cdb56366f339f5a165b && \
+    git fetch origin master && \
     git reset --hard FETCH_HEAD
 
 WORKDIR /usr/src/app
