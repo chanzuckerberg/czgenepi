@@ -26,6 +26,7 @@ from aspen.database.models import (
     RegionType,
     Sample,
     UploadedPathogenGenome,
+    User,
     WorkflowStatusType,
 )
 from covid_database.models import covidtracker
@@ -267,13 +268,15 @@ def import_project(
                 continue
 
             sample = external_accessions_to_samples.get(external_accession, None)
+            uploaded_by_user = session.query(User).filter(User.name == "ASPEN ADMIN").one()
             if sample is None:
                 sample = Sample(
-                    submitting_group=group, private_identifier=external_accession
+                    submitting_group=group, private_identifier=external_accession, uploaded_by=uploaded_by_user
                 )
 
             sample.original_submission = {}
             sample.public_identifier = sample.public_identifier = public_identifier
+            sample.uploaded_by = uploaded_by_user
             sample.sample_collected_by = project.originating_lab
             sample.sample_collector_contact_address = project.originating_address
             sample.collection_date = collection_date
