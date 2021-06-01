@@ -268,10 +268,14 @@ def import_project(
                 continue
 
             sample = external_accessions_to_samples.get(external_accession, None)
-            uploaded_by_user = session.query(User).filter(User.name == "ASPEN ADMIN").one()
+            uploaded_by_user = (
+                session.query(User).filter(User.name == "ASPEN ADMIN").one()
+            )
             if sample is None:
                 sample = Sample(
-                    submitting_group=group, private_identifier=external_accession, uploaded_by=uploaded_by_user
+                    submitting_group=group,
+                    private_identifier=external_accession,
+                    uploaded_by=uploaded_by_user,
                 )
 
             sample.original_submission = {}
