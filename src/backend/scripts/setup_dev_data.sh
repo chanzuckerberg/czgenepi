@@ -4,18 +4,18 @@ export AWS_DEFAULT_REGION=us-west-2
 export AWS_ACCESS_KEY_ID=nonce
 export AWS_SECRET_ACCESS_KEY=nonce
 
-export FRONTEND_URL=http://localhost:8000
-export BACKEND_URL=http://localhost:3000
+export FRONTEND_URL=http://frontend.genepinet.local:8000
+export BACKEND_URL=http://backend.genepinet.local:3000
 
 # NOTE: This script is intended to run INSIDE the dockerized dev environment!
 # If you need to run it directly on your laptop for some reason, change
 # localstack below to localhost
-export LOCALSTACK_URL=http://localstack:4566
+export LOCALSTACK_URL=http://localstack.genepinet.local:4566
 
 # How the backend can reach the OIDC idp
-export OIDC_INTERNAL_URL=http://oidc
+export OIDC_INTERNAL_URL=http://oidc.genepinet.local
 # How a web browser can reach the OIDC idp
-export OIDC_BROWSER_URL=https://localhost:8443
+export OIDC_BROWSER_URL=https://oidc.genepinet.local:8443
 
 echo "Creating secretsmanager secrets"
 local_aws="aws --endpoint-url=${LOCALSTACK_URL}"
@@ -33,9 +33,13 @@ ${local_aws} secretsmanager update-secret --secret-id aspen-config --secret-stri
   "FLASK_SECRET": "DevelopmentKey",
   "DB_rw_username": "user_rw",
   "DB_rw_password": "password_rw",
-  "DB_address": "database",
+  "DB_address": "database.genepinet.local",
   "S3_external_auspice_bucket": "aspen-external-auspice-data"
 }' || true
 
 echo "Creating s3 buckets"
 ${local_aws} s3api head-bucket --bucket aspen-external-auspice-data || ${local_aws} s3 mb s3://aspen-external-auspice-data
+echo
+echo "Dev env is up and running!"
+echo "  Frontend: ${FRONTEND_URL}"
+echo "  Backend: ${BACKEND_URL}"

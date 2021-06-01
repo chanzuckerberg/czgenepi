@@ -9,7 +9,7 @@ class DockerComposeConfig(config.Config):
 
     @config.flaskproperty
     def SESSION_COOKIE_SECURE(self) -> bool:
-        return True
+        return False
 
     @config.flaskproperty
     def SESSION_COOKIE_HTTPONLY(self) -> bool:
@@ -21,4 +21,4 @@ class DockerComposeConfig(config.Config):
 
     @property
     def AUTH0_CALLBACK_URL(self) -> str:
-        return "http://localhost:3000/callback"
+        return "http://backend.genepinet.local:3000/callback"
