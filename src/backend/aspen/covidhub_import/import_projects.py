@@ -282,6 +282,7 @@ def import_project(
             sample.country = "USA"
             sample.region = RegionType.NORTH_AMERICA
             sample.organism = "SARS-CoV-2"
+            sample.private = False
 
             consensus_genome = czbid_to_consensus_genomes.get(czbid.czb_id, None)
             if consensus_genome is not None:
