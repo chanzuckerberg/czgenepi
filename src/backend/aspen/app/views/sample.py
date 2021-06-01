@@ -2,7 +2,7 @@ import datetime
 from collections import defaultdict
 from typing import Any, Mapping, MutableSequence, Optional, Sequence, Set
 
-from flask import jsonify, session, request, Response
+from flask import jsonify, request, Response, session
 from sqlalchemy import or_
 from sqlalchemy.orm import joinedload
 
@@ -21,10 +21,10 @@ from aspen.database.models import (
     GisaidAccession,
     GisaidAccessionWorkflow,
     HostFilteredSequencingReadsCollection,
+    Sample,
     SequencingReadsCollection,
     UploadedPathogenGenome,
     WorkflowStatusType,
-    Sample
 )
 from aspen.database.models.sample import Sample
 from aspen.database.models.usergroup import Group, User
@@ -37,7 +37,7 @@ SAMPLES_POST_REQUIRED_FIELDS = [
     "private_identifier",
     "collection_date",
     "location",
-    "sequence"  # from PathogenGenome
+    "sequence",  # from PathogenGenome
 ]
 SAMPLES_POST_OPTIONAL_FIELDS = [
     "original_submission",
@@ -53,11 +53,10 @@ SAMPLES_POST_OPTIONAL_FIELDS = [
     "host",
     "purpose_of_sampling",
     "specimen_processing",
-    "czb_failed_genome_recovery"
-    "sequencing_depth",  # from UploadedPathogenGenome
+    "czb_failed_genome_recovery" "sequencing_depth",  # from UploadedPathogenGenome
     "num_unambiguous_sites",  # from PathogenGenome
     "num_missing_alleles",  # from PathogenGenome
-    "num_mixed"  # from PathogenGenome
+    "num_mixed",  # from PathogenGenome
 ]
 
 
@@ -280,33 +279,31 @@ def create_sample():
             missing_fields: Optional[list[str]]
             unexpected_fields: Optional[list[str]]
             data_ok, missing_fields, unexpected_fields = api_utils.check_data(
-                data["sample"].keys() + data["pathogen_genome"].keys(),
+                list(data["sample"].keys()),
+                list(data["pathogen_genome"].keys()),
                 SAMPLES_POST_REQUIRED_FIELDS,
-                SAMPLES_POST_OPTIONAL_FIELDS
+                SAMPLES_POST_OPTIONAL_FIELDS,
             )
             if data_ok:
                 sample = Sample(
-                    submitting_group=user.group,
-                    **data["sample"]
-
+                    submitting_group=user.group, uploaded_by=user, **data["sample"]
                 )
                 upload_pathogen_genome = UploadedPathogenGenome(
-                    sample=sample,
-                    **data["pathogen_genome"]
+                    sample=sample, **data["pathogen_genome"]
                 )
                 samples.append(sample)
                 uploaded_pathogen_genomes.append(upload_pathogen_genome)
+
             else:
                 return Response(
                     f"Missing required fields {missing_fields} or encountered unexpected fields {unexpected_fields}",
-                    400
+                    400,
                 )
+        try:
+            db_session.add_all(samples)
+            db_session.add_all(uploaded_pathogen_genomes)
+            # catch all exceptions regarding adding data to db
+        except Exception as e:
+            return Response(e.message, 400)
 
-        session.add_all(samples)
-        session.add_all(uploaded_pathogen_genomes)
         return jsonify(success=True)
-
-
-
-
-

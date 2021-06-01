@@ -10,7 +10,7 @@ from aspen.database.models import (
     PublicRepositoryType,
     Sample,
     SequencingReadsCollection,
-    UploadedPathogenGenome
+    UploadedPathogenGenome,
 )
 from aspen.test_infra.models.accession_workflow import AccessionWorkflowDirective
 from aspen.test_infra.models.sample import sample_factory
@@ -641,7 +641,7 @@ def test_samples_create_view_pass(
             },
             "pathogen_genome": {
                 "sequence": "AAAAAAAAA",
-            }
+            },
         },
         {
             "sample": {
@@ -652,15 +652,17 @@ def test_samples_create_view_pass(
             },
             "pathogen_genome": {
                 "sequence": "AAAAAAAAA",
-            }
-        }
+            },
+        },
     ]
     res = client.post("/api/samples/create", json=data, content_type="application/json")
     assert res.status == "200 OK"
     session.close()
     session.begin()
 
-    samples = session.query(Sample.private_identifier.in_(["private", "private2"])).all()
+    samples = session.query(
+        Sample.private_identifier.in_(["private", "private2"])
+    ).all()
     uploaded_pathogen_genomes = session.query(UploadedPathogenGenome).all()
 
     assert len(samples) == 2
@@ -689,7 +691,7 @@ def test_samples_create_view_fail_missing_required_fields(
             },
             "pathogen_genome": {
                 "sequence": "AAAAAAAAA",
-            }
+            },
         },
         {
             "sample": {
@@ -700,8 +702,8 @@ def test_samples_create_view_fail_missing_required_fields(
             },
             "pathogen_genome": {
                 "sequence": "AAAAAAAAA",
-            }
-        }
+            },
+        },
     ]
     res = client.post("/api/samples/create", json=data, content_type="application/json")
     assert res.status == "400 BAD REQUEST"
