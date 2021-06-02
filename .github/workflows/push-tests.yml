@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - trunk
-      - jgadling/lint-wdl
   pull_request:
     branches: "**"
 
