@@ -5,6 +5,7 @@ from aspen.database.models import RegionType, Sample
 
 def sample_factory(
     submitting_group,
+    uploaded_by,
     private_identifier="private_identifer",
     original_submission=None,
     public_identifier="public_identifier",
@@ -22,6 +23,7 @@ def sample_factory(
     collection_date = collection_date or datetime.now()
     return Sample(
         submitting_group=submitting_group,
+        uploaded_by=uploaded_by,
         private_identifier=private_identifier,
         original_submission=original_submission,
         public_identifier=public_identifier,

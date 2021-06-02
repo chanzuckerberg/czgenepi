@@ -22,7 +22,7 @@ from sqlalchemy.orm import backref, relationship
 from aspen.database.models.base import base, idbase
 from aspen.database.models.enum import Enum
 from aspen.database.models.mixins import DictMixin
-from aspen.database.models.usergroup import Group
+from aspen.database.models.usergroup import Group, User
 
 if TYPE_CHECKING:
     from .sequences import SequencingReadsCollection, UploadedPathogenGenome
@@ -58,6 +58,12 @@ class Sample(idbase, DictMixin):  # type: ignore
         nullable=False,
     )
     submitting_group = relationship(Group, backref=backref("samples", uselist=True))  # type: ignore
+    uploaded_by_id = Column(
+        Integer,
+        ForeignKey(User.id),
+        nullable=False,
+    )
+    uploaded_by = relationship(User, backref=backref("samples", uselist=True))  # type: ignore
     private = Column(Boolean, nullable=False, default=False)
     private_identifier = Column(
         String,

@@ -47,7 +47,7 @@ def create_test_user(session, group):
     return u
 
 
-def create_sample(session, group):
+def create_sample(session, group, uploaded_by_user):
     sample = (
         session.query(Sample).filter(Sample.submitting_group == group).one_or_none()
     )
@@ -58,6 +58,7 @@ def create_sample(session, group):
     sample = Sample(
         submitting_group=group,
         private_identifier="private_identifer",
+        uploaded_by=uploaded_by_user,
         original_submission={},
         public_identifier="public_identifier",
         collection_date=datetime.now(),
@@ -98,8 +99,8 @@ def create_sequencing_reads(session, sample):
 def create_test_data(engine):
     session = engine.make_session()
     group = create_test_group(session)
-    _ = create_test_user(session, group)
-    sample = create_sample(session, group)
+    user = create_test_user(session, group)
+    sample = create_sample(session, group, user)
     _ = create_sequencing_reads(session, sample)
     session.commit()
 

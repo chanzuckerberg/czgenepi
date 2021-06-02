@@ -9,7 +9,7 @@ from aspen.database.models.sequences import UploadedPathogenGenome
 from aspen.database.models.usergroup import Group
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
-from aspen.test_infra.models.usergroup import group_factory
+from aspen.test_infra.models.usergroup import group_factory, user_factory
 from aspen.workflows.pangolin.export import cli as export_cli
 from aspen.workflows.pangolin.find_samples import find_samples
 from aspen.workflows.pangolin.save import cli as save_cli
@@ -17,12 +17,14 @@ from aspen.workflows.pangolin.save import cli as save_cli
 
 def create_test_data(session):
     group: Group = group_factory()
+    uploaded_by_user = user_factory(group)
 
     samples = []
     pathogen_genomes = []
     for i in range(1, 3):
         sample: Sample = sample_factory(
             group,
+            uploaded_by_user,
             private_identifier=f"private_identifier_{i}",
             public_identifier=f"public_identifier_{i}",
         )
