@@ -20,6 +20,11 @@ class Group(idbase, DictMixin):  # type: ignore
 
     name = Column(String, unique=True, nullable=False)
     address = Column(String, nullable=True)
+    prefix = Column(
+        String,
+        nullable=True,
+        comment="used for creating public identifiers for samples",
+    )
 
     can_see: MutableSequence[CanSee]
     can_be_seen_by: MutableSequence[CanSee]
