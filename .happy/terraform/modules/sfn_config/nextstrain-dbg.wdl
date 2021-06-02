@@ -101,7 +101,7 @@ task nextstrain_workflow {
         [ -e /done ] && break
         sleep 5
     done
-    >>>
+
 
     runtime {
         docker: docker_image_id
