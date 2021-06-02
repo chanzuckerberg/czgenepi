@@ -36,6 +36,7 @@ SAMPLES_POST_REQUIRED_FIELDS = [
     "private",
     "private_identifier",
     "collection_date",
+    "original_submission",
     "location",
     "sequence",  # from PathogenGenome
 ]
