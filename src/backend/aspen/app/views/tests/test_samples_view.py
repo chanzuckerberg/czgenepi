@@ -619,7 +619,7 @@ def test_samples_view_no_pangolin(
     assert expected == json.loads(res.get_data(as_text=True))
 
 
-def test_samples_create_view_pass(
+def test_samples_create_view_pass_no_public_id(
     session,
     app,
     client,
@@ -641,6 +641,9 @@ def test_samples_create_view_pass(
             },
             "pathogen_genome": {
                 "sequence": "AAAAAAAAA",
+                "num_unambiguous_sites": 2,
+                "num_missing_alleles": 2,
+                "num_mixed": 2,
             },
         },
         {
@@ -652,6 +655,9 @@ def test_samples_create_view_pass(
             },
             "pathogen_genome": {
                 "sequence": "AAAAAAAAA",
+                "num_unambiguous_sites": 2,
+                "num_missing_alleles": 2,
+                "num_mixed": 2,
             },
         },
     ]
@@ -667,7 +673,9 @@ def test_samples_create_view_pass(
 
     assert len(samples) == 2
     assert len(uploaded_pathogen_genomes) == 2
-    assert True
+    # check that creating new public identifiers works
+    public_ids = sorted([i.public_identifier for i in session.query(Sample).all()])
+    assert ["USA/groupname-1/2021", "USA/groupname-2/2021"] == public_ids
 
 
 def test_samples_create_view_fail_missing_required_fields(
@@ -707,4 +715,7 @@ def test_samples_create_view_fail_missing_required_fields(
     ]
     res = client.post("/api/samples/create", json=data, content_type="application/json")
     assert res.status == "400 BAD REQUEST"
-    assert res.get_data()
+    assert (
+        res.get_data()
+        == b"Missing required fields ['location', 'num_unambiguous_sites', 'num_missing_alleles', 'num_mixed'] or encountered unexpected fields []"
+    )

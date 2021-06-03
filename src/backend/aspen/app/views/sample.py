@@ -26,7 +26,7 @@ from aspen.database.models import (
     UploadedPathogenGenome,
     WorkflowStatusType,
 )
-from aspen.database.models.sample import Sample
+from aspen.database.models.sample import RegionType
 from aspen.database.models.usergroup import Group, User
 from aspen.error.recoverable import RecoverableError
 
@@ -36,9 +36,11 @@ SAMPLES_POST_REQUIRED_FIELDS = [
     "private",
     "private_identifier",
     "collection_date",
-    "original_submission",
     "location",
     "sequence",  # from PathogenGenome
+    "num_unambiguous_sites",  # from PathogenGenome
+    "num_missing_alleles",  # from PathogenGenome
+    "num_mixed",  # from PathogenGenome
 ]
 SAMPLES_POST_OPTIONAL_FIELDS = [
     "original_submission",
@@ -273,8 +275,6 @@ def create_sample():
         )
         request_data = request.get_json()
 
-        samples = []
-        uploaded_pathogen_genomes = []
         for data in request_data:
             data_ok: bool
             missing_fields: Optional[list[str]]
@@ -286,25 +286,35 @@ def create_sample():
                 SAMPLES_POST_OPTIONAL_FIELDS,
             )
             if data_ok:
-                sample = Sample(
-                    submitting_group=user.group, uploaded_by=user, **data["sample"]
-                )
+                sample_args = {
+                    "submitting_group": user.group,
+                    "uploaded_by": user,
+                    "sample_collected_by": user.group.name,
+                    "sample_collector_contact_address": user.group.address,
+                    "division": "California",
+                    "country": "USA",
+                    "region": RegionType.NORTH_AMERICA,
+                    "organism": "Severe acute respiratory syndrome coronavirus 2",
+                    **data["sample"],
+                }
+                if "authors" not in sample_args:
+                    sample_args["authors"] = [
+                        user.group.name,
+                    ]
+
+                # have to save the objects serially due to public_id default using primary key field
+                sample = Sample(**sample_args)
                 upload_pathogen_genome = UploadedPathogenGenome(
                     sample=sample, **data["pathogen_genome"]
                 )
-                samples.append(sample)
-                uploaded_pathogen_genomes.append(upload_pathogen_genome)
+                db_session.add(sample)
+                db_session.add(upload_pathogen_genome)
+                db_session.commit()
 
             else:
                 return Response(
                     f"Missing required fields {missing_fields} or encountered unexpected fields {unexpected_fields}",
                     400,
                 )
-        try:
-            db_session.add_all(samples)
-            db_session.add_all(uploaded_pathogen_genomes)
-            # catch all exceptions regarding adding data to db
-        except Exception as e:
-            return Response(e.message, 400)
 
         return jsonify(success=True)

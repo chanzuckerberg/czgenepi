@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import enum
+from datetime import datetime
 from typing import Optional, TYPE_CHECKING, Union
 
 import enumtables
@@ -19,6 +20,7 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import backref, relationship
 
+from aspen.database.connection import session_scope, SqlAlchemyInterface
 from aspen.database.models.base import base, idbase
 from aspen.database.models.enum import Enum
 from aspen.database.models.mixins import DictMixin
@@ -44,6 +46,25 @@ _RegionTypeTable = enumtables.EnumTable(
     base,
     tablename="region_types",
 )
+
+
+def create_public_id(context):
+    current_parameters = context.get_current_parameters()
+    interface = SqlAlchemyInterface(context.engine)
+    with session_scope(interface) as session:
+        group = (
+            session.query(Group)
+            .filter(Group.id == current_parameters["submitting_group_id"])
+            .one()
+        )
+        all_samples = session.query(Sample).all()
+        # find the current sample primary key
+        if all_samples:
+            id = max([s.id for s in session.query(Sample).all()]) + 1
+        else:
+            id = 1
+        current_year = datetime.today().strftime("%Y")
+        return f"USA/{group.prefix}-{id}/{current_year}"
 
 
 class Sample(idbase, DictMixin):  # type: ignore
@@ -83,6 +104,7 @@ class Sample(idbase, DictMixin):  # type: ignore
     public_identifier = Column(
         String,
         nullable=False,
+        default=create_public_id,
         unique=True,
         comment="This is the public identifier we assign to this sample.",
     )
