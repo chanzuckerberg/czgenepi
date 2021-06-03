@@ -1,11 +1,9 @@
 import styled from "@emotion/styled";
 import { Chip, fontBodyXxs, getColors, getSpacings } from "czifui";
 import { RowContent } from "src/common/components/library/data_table/style";
-import { pageContentHeight } from "src/common/styles/mixins/global";
+import { PageContent } from "src/common/styles/mixins/global";
 
-export const Container = styled.div`
-  ${pageContentHeight}
-
+export const Container = styled(PageContent)`
   display: flex;
   flex-flow: column wrap;
   align-content: flex-start;

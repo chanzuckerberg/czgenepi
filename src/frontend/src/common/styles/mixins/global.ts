@@ -1,6 +1,6 @@
-import { css } from "@emotion/react";
+import styled from "@emotion/styled";
 import { NAV_BAR_HEIGHT_PX } from "src/components/NavBar";
 
-export const pageContentHeight = css`
+export const PageContent = styled.div`
   height: calc(100% - ${NAV_BAR_HEIGHT_PX}px);
 `;
