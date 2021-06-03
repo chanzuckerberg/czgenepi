@@ -46,7 +46,7 @@ def upgrade():
         "Ventura County Public Health Laboratory": "CA-VC-",
         "CDPH": "CA-CDPH",
         "admin": "ADMIN",
-        "ASPEN ADMIN GROUP": "stub"
+        "ASPEN ADMIN GROUP": "stub",
     }
 
     set_prefix_sql = sa.sql.text(

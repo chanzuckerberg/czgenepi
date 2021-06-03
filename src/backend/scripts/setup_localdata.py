@@ -20,8 +20,7 @@ def create_test_group(session):
         return g
     print("Creating group")
     g = Group(
-        name="CZI",
-        address="601 Marshall St, Redwood City, CA 94063",
+        name="CZI", address="601 Marshall St, Redwood City, CA 94063", prefix="CZI"
     )
     session.add(g)
     session.commit()

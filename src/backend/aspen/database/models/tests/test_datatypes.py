@@ -4,7 +4,6 @@ from aspen.database.models import CanSee, DataType, Group
 from aspen.test_infra.models.usergroup import group_factory
 
 
-
 def test_can_see_constructor_with_datatype(session: Session):
     """Test that we can construct a CanSee object with a `data_type` argument."""
     group1 = group_factory(name="group1", address="address1")
