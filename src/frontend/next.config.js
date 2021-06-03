@@ -51,7 +51,7 @@ module.exports = withImages({
                 "https://fonts.googleapis.com",
               ],
               upgradeInsecureRequests: true,
-              workerSrc: true,
+              workerSrc: ["'self'", "blob:"],
             },
           },
         }),

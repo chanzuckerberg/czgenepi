@@ -1,10 +1,5 @@
 import styled from "@emotion/styled";
 import { fontBodyS, fontHeaderS, getColors, getSpacings } from "czifui";
-import { pageContentHeight } from "src/common/styles/mixins/global";
-
-export const Container = styled.div`
-  ${pageContentHeight}
-`;
 
 export const Table = styled.table`
   margin: 25px 0px;
