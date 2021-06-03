@@ -15,6 +15,15 @@ env:
   DOCKER_REPO: ${{ secrets.ECR_REPO }}/
 
 jobs:
+  wdl-lint:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: run wdl check
+        run: |
+          pip3 install miniwdl==1.1.4
+          sudo apt-get install -y shellcheck
+          make wdl-lint
   tf-lint:
     runs-on: ubuntu-20.04
     steps:

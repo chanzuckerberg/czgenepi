@@ -219,6 +219,11 @@ build-docker:
 	@echo "If you wish to clean up some of your old aspen docker images, run:"
 	@echo "  docker image rm \$\$$(docker image ls -q cziaspen/batch -f 'before=cziaspen/batch:latest')"
 
+### WDL ###################################################
+.PHONY: wdl-lint
+wdl-lint:
+	set -e; for i in $$(find .happy/terraform/modules/sfn_config -name '*.wdl'); do echo $${i}; miniwdl check $${i}; done
+
 
 ### TERRAFORM ###################################################
 .PHONY: tf-lint
