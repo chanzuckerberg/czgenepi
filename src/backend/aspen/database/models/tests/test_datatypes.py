@@ -1,12 +1,13 @@
 from sqlalchemy.orm import Session
 
-from aspen.database.models import CanSee, DataType, Group
+from aspen.database.models import CanSee, DataType
+from aspen.test_infra.models.usergroup import group_factory
 
 
 def test_can_see_constructor_with_datatype(session: Session):
     """Test that we can construct a CanSee object with a `data_type` argument."""
-    group1 = Group(name="group1", address="address1")
-    group2 = Group(name="group2", address="address2")
+    group1 = group_factory(name="group1", address="address1")
+    group2 = group_factory(name="group2", address="address2")
     can_see = CanSee(viewer_group=group1, owner_group=group2, data_type=DataType.TREES)
 
     session.add_all((group1, group2, can_see))
@@ -17,8 +18,8 @@ def test_can_see_constructor_with_datatype(session: Session):
 
 def test_can_see_datatype_filter(session: Session):
     """Test that we can filter by the datatype."""
-    group1 = Group(name="group1", address="address1")
-    group2 = Group(name="group2", address="address2")
+    group1 = group_factory(name="group1", address="address1")
+    group2 = group_factory(name="group2", address="address2")
     can_see = CanSee(
         viewer_group=group1,
         owner_group=group2,
