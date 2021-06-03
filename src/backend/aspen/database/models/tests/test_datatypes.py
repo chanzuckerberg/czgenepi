@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from aspen.database.models import CanSee, DataType, Group
+from aspen.database.models import CanSee, DataType
 from aspen.test_infra.models.usergroup import group_factory
 
 
