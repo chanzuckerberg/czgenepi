@@ -87,6 +87,7 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
           <PrivateIdValueWrapper>
             {value}
             <StyledChip
+              data-test-id="sample-status"
               size="small"
               label={label.label}
               status={label.status}

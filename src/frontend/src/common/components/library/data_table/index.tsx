@@ -26,12 +26,15 @@ const UNDEFINED_TEXT = "---";
 
 export function defaultCellRenderer({
   value,
+  header,
 }: CustomTableRenderProps): JSX.Element {
   const displayData = value || UNDEFINED_TEXT;
 
   return (
     <RowContent>
-      <div className={style.cell}>{displayData}</div>
+      <div className={style.cell} data-test-id={`row-${header.key}`}>
+        {displayData}
+      </div>
     </RowContent>
   );
 }
@@ -110,6 +113,7 @@ export const DataTable: FunctionComponent<Props> = ({
         onClick={() => handleSortClick(header.sortKey)}
         key={header.sortKey.join("-")}
         className={style.headerMetaCell}
+        data-test-id="header-cell"
       >
         {headerJSX}
         {sortIndicator}
@@ -137,11 +141,17 @@ export const DataTable: FunctionComponent<Props> = ({
     function renderRow(props: ListChildComponentProps) {
       const item = tableData[props.index];
 
-      return <TableRow style={props.style}>{sampleRow(item)}</TableRow>;
+      return (
+        <TableRow style={props.style} data-test-id="table-row">
+          {sampleRow(item)}
+        </TableRow>
+      );
     }
     return (
       <div className={style.container}>
-        <div className={style.header}>{headerRow}</div>
+        <div className={style.header} data-test-id="header-row">
+          {headerRow}
+        </div>
         <div className={style.tableContent}>
           <AutoSizer>
             {({ height, width }) => {

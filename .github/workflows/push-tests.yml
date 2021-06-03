@@ -81,7 +81,7 @@ jobs:
           echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
           # Build frontend
           docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/aspen-frontend:branch-trunk -t ${{ secrets.ECR_REPO }}/aspen-frontend:latest src/frontend
-          make frontend-test
+          make frontend-tests
   ts-test-build:
     runs-on: ubuntu-20.04
     steps:
@@ -125,7 +125,7 @@ jobs:
       - name: Lint Python
         run: |
           echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
-          # Build backend image
+          # Build backend
           docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/aspen-backend:branch-trunk -t ${{ secrets.ECR_REPO }}/aspen-backend:latest src/backend
           make backend-check-style
   py-test:
@@ -166,21 +166,21 @@ jobs:
     strategy:
       matrix:
         image:
-        - dockerfile: src/backend/Dockerfile.gisaid
-          context: ./src/backend/
-          name: aspen-gisaid
-        - dockerfile: src/backend/Dockerfile.nextstrain
-          context: ./src/backend/
-          name: aspen-nextstrain
-        - dockerfile: src/backend/Dockerfile.pangolin
-          context: ./src/backend/
-          name: aspen-pangolin
-        - dockerfile: src/backend/Dockerfile
-          context: ./src/backend/
-          name: aspen-backend
-        - dockerfile: src/frontend/Dockerfile
-          context: ./src/frontend/
-          name: aspen-frontend
+          - dockerfile: src/backend/Dockerfile.gisaid
+            context: ./src/backend/
+            name: aspen-gisaid
+          - dockerfile: src/backend/Dockerfile.nextstrain
+            context: ./src/backend/
+            name: aspen-nextstrain
+          - dockerfile: src/backend/Dockerfile.pangolin
+            context: ./src/backend/
+            name: aspen-pangolin
+          - dockerfile: src/backend/Dockerfile
+            context: ./src/backend/
+            name: aspen-backend
+          - dockerfile: src/frontend/Dockerfile
+            context: ./src/frontend/
+            name: aspen-frontend
     steps:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -228,7 +228,7 @@ jobs:
           auto_merge: false
           environment: staging
           payload: ${{ env.payload }}
-          required_contexts: ""  # Temporary hack to avoid checking Github Status for the commit
+          required_contexts: "" # Temporary hack to avoid checking Github Status for the commit
           # TODO: Avoid circular dependency on the deploy step; this step hasn't finished yet so
           # it's not considered ready for deploy normally by required_contexts, but we need to
           # deploy for this to be considered ready.
@@ -238,5 +238,3 @@ jobs:
           # See https://github.community/t/can-i-avoid-creating-a-check-run-from-a-job-needed-for-deployments-api/16426
         env:
           GITHUB_TOKEN: ${{ secrets.CZIBUILDBOT_GITHUB_TOKEN }}
-
-

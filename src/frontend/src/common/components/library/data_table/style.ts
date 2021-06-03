@@ -31,7 +31,7 @@ export const RowContent = styled.div`
   }}
 `;
 
-export const icon = (props: Props) => {
+export const icon = (props: Props): string => {
   const colors = getColors(props);
   const spacings = getSpacings(props);
 

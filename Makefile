@@ -194,7 +194,6 @@ local-update-deps: ## Update requirements.txt to reflect pipenv file changes.
 	docker-compose exec utility pipenv update
 	docker-compose exec utility bash -c "pipenv lock -r >| requirements.txt"
 
-
 ### ACCESSING CONTAINER MAKE COMMANDS ###################################################
 utility-%: ## Run make commands in the utility container (src/backend/Makefile)
 	docker-compose exec utility make $(subst utility-,,$@) MESSAGE="$(MESSAGE)"
@@ -202,7 +201,7 @@ utility-%: ## Run make commands in the utility container (src/backend/Makefile)
 backend-%: .env.ecr ## Run make commands in the backend container (src/backend/Makefile)
 	docker-compose $(COMPOSE_OPTS) run --no-deps --rm backend make $(subst backend-,,$@)
 
-frontend-%: .env.ecr ## Run make commands in the backend container (src/frontend/Makefile)
+frontend-%: .env.ecr ## Run make commands in the frontend container (src/frontend/Makefile)
 	docker-compose $(COMPOSE_OPTS) run -e CI=true --no-deps --rm frontend make $(subst frontend-,,$@)
 
 ### DOCKER FOR WORKFLOWS ###################################################

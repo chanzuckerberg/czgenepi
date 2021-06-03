@@ -34,7 +34,7 @@ const TreeTableNameCell = ({ value, item }: NameProps): JSX.Element => {
         className={dataTableStyle.cell}
         onClick={handleClickOpen}
       >
-        <CellWrapper>
+        <CellWrapper data-test-id="tree-name-cell">
           <TreeIcon className={dataTableStyle.icon} />
           {value}
           <StyledOpenInNewIcon />

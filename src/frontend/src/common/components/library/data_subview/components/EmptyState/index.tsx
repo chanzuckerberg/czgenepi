@@ -18,7 +18,11 @@ function EmptyCells({ numOfColumns = 0 }): JSX.Element {
     <>
       {Array.from(Array(numOfColumns)).map((_, index) => {
         return (
-          <div key={index} className={style.cellContainer}>
+          <div
+            key={index}
+            className={style.cellContainer}
+            data-test-id="loading-cell"
+          >
             {index ? <div className={style.cell} /> : <FirstColumn />}
           </div>
         );
