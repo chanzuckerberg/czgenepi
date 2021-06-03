@@ -1,5 +1,5 @@
 import datetime
-from typing import Collection, Mapping, Optional, Union
+from typing import Collection, List, Mapping, Optional, Tuple, Union
 
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.query import Query
@@ -42,14 +42,16 @@ def check_data(
     pathogen_genome_fields: list[str],
     required_fields: tuple,
     optional_fields: tuple,
-) -> tuple[bool, Optional[list[str]], Optional[list[str]]]:
+) -> Tuple[bool, List[str], List[str]]:
 
     combined_fields: list[str] = sample_fields + pathogen_genome_fields
     # check all required fields are present:
-    missing_required = [i for i in required_fields if i not in combined_fields]
+    missing_required: list[str] = [
+        i for i in required_fields if i not in combined_fields
+    ]
 
     # check no fields were added that are unexpected
-    unexpected = [
+    unexpected: list[str] = [
         i for i in combined_fields if i not in required_fields + optional_fields
     ]
 
@@ -59,4 +61,3 @@ def check_data(
     else:
         # data is clean
         return True, [], []
-

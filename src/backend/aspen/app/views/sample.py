@@ -266,9 +266,9 @@ def samples():
 @requires_auth
 def create_sample():
     with session_scope(application.DATABASE_INTERFACE) as db_session:
-        profile = session["profile"]
+        profile: Mapping[str, str] = session["profile"]
 
-        user = (
+        user: User = (
             get_usergroup_query(db_session, profile["user_id"])
             .options(joinedload(User.group))
             .one()
@@ -286,7 +286,7 @@ def create_sample():
                 SAMPLES_POST_OPTIONAL_FIELDS,
             )
             if data_ok:
-                sample_args = {
+                sample_args: Mapping[str, Any] = {
                     "submitting_group": user.group,
                     "uploaded_by": user,
                     "sample_collected_by": user.group.name,
@@ -303,8 +303,8 @@ def create_sample():
                     ]
 
                 # have to save the objects serially due to public_id default using primary key field
-                sample = Sample(**sample_args)
-                upload_pathogen_genome = UploadedPathogenGenome(
+                sample: Sample = Sample(**sample_args)
+                upload_pathogen_genome: UploadedPathogenGenome = UploadedPathogenGenome(
                     sample=sample, **data["pathogen_genome"]
                 )
                 db_session.add(sample)
