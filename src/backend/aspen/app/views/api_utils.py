@@ -60,7 +60,3 @@ def check_data(
         # data is clean
         return True, [], []
 
-
-# def create_public_id(user: User, sample_id: int) -> str:
-#     current_year = datetime.datetime.today().strftime("%Y")
-#     return f"USA/{user.group.prefix}-{sample_id}/{current_year}"
