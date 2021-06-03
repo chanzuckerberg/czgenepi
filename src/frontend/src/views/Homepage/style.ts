@@ -9,12 +9,10 @@ import {
   getShadows,
   getSpacings,
 } from "czifui";
-import { pageContentHeight } from "src/common/styles/mixins/global";
+import { PageContent } from "src/common/styles/mixins/global";
 import ConsensusGenomes from "./ConsensusGenomes.svg";
 
-export const Container = styled.div`
-  ${pageContentHeight}
-
+export const Container = styled(PageContent)`
   display: flex;
   flex-direction: column;
 `;
