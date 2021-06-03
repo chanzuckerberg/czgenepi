@@ -45,6 +45,8 @@ def upgrade():
         "Tuolumne County Public Health": "CA-TLMNC-",
         "Ventura County Public Health Laboratory": "CA-VC-",
         "CDPH": "CA-CDPH",
+        "admin": "ADMIN",
+        "ASPEN ADMIN GROUP": "stub"
     }
 
     set_prefix_sql = sa.sql.text(
@@ -54,6 +56,15 @@ def upgrade():
     conn = op.get_bind()
     for name, prefix in name_to_prefix.items():
         conn.execute(set_prefix_sql.bindparams(prefix=prefix, name=name))
+
+    # set prefix to be non-nullable
+    op.alter_column(
+        "group",
+        "prefix",
+        existing_type=sa.String(),
+        nullable=False,
+        schema="aspen",
+    )
 
 
 def downgrade():

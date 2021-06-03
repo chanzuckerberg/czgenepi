@@ -23,7 +23,7 @@ class Group(idbase, DictMixin):  # type: ignore
     prefix = Column(
         String,
         unique=True,
-        nullable=True,
+        nullable=False,
         comment="used for creating public identifiers for samples",
     )
 
