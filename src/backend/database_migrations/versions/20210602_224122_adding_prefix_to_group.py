@@ -57,9 +57,15 @@ def upgrade():
     for name, prefix in name_to_prefix.items():
         conn.execute(set_prefix_sql.bindparams(prefix=prefix, name=name))
 
+    # for the case when running migration locally (and group names don't match remote exactly)
+    set_the_rest_sql = sa.sql.text(
+        "UPDATE aspen.groups SET prefix = id WHERE prefix is NULL"
+    )
+    conn.execute(set_the_rest_sql)
+
     # set prefix to be non-nullable
     op.alter_column(
-        "group",
+        "groups",
         "prefix",
         existing_type=sa.String(),
         nullable=False,
