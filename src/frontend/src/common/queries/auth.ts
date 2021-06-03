@@ -55,7 +55,7 @@ export function useUserInfo(): UseQueryResult<UserResponse, unknown> {
   });
 }
 
-export function useProtectedRoute(): void {
+export function useProtectedRoute(): UseQueryResult<UserResponse, unknown> {
   const router = useRouter();
   const result = useUserInfo();
 
@@ -64,4 +64,6 @@ export function useProtectedRoute(): void {
   if (!isLoading && !data) {
     router.push(ROUTES.HOMEPAGE);
   }
+
+  return result;
 }
