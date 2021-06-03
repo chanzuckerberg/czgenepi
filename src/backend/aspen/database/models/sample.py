@@ -76,6 +76,7 @@ class Sample(idbase, DictMixin):  # type: ignore
     original_submission = Column(
         JSON,
         nullable=False,
+        default={},
         comment="This is the original metadata submitted by the user.",
     )
 
@@ -203,7 +204,7 @@ class Sample(idbase, DictMixin):  # type: ignore
 
     czb_failed_genome_recovery = Column(
         Boolean,
-        nullable=False,
+        nullable=True,
         default=False,
         server_default=sql.expression.false(),
         comment=(
