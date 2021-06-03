@@ -24,6 +24,9 @@ def upgrade():
         ),
         schema="aspen",
     )
+    op.create_unique_constraint(
+        op.f("uq_groups_prefix"), "groups", ["prefix"], schema="aspen"
+    )
 
     name_to_prefix = {
         "Alameda County Public Health Department": "CA-ACPHD-",
@@ -54,4 +57,7 @@ def upgrade():
 
 
 def downgrade():
+    op.drop_constraint(
+        op.f("uq_groups_prefix"), "groups", schema="aspen", type_="unique"
+    )
     op.drop_column("groups", "prefix", schema="aspen")

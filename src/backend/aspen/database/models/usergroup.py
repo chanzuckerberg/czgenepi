@@ -22,6 +22,7 @@ class Group(idbase, DictMixin):  # type: ignore
     address = Column(String, nullable=True)
     prefix = Column(
         String,
+        unique=True,
         nullable=True,
         comment="used for creating public identifiers for samples",
     )
