@@ -57,9 +57,6 @@ SAMPLES_POST_OPTIONAL_FIELDS = [
     "czb_failed_genome_recovery",
     # following fields from PathogenGenome
     "sequencing_depth",
-    "num_unambiguous_sites",
-    "num_missing_alleles",
-    "num_mixed",
 ]
 
 

@@ -58,6 +58,5 @@ def check_data(
     if missing_required or unexpected:
         return False, missing_required, unexpected
 
-    else:
-        # data is clean
-        return True, [], []
+    # data is clean
+    return True, [], []
