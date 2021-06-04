@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import enum
 from datetime import datetime
-from typing import Optional, TYPE_CHECKING, Union
+from typing import Collection, Mapping, Optional, TYPE_CHECKING, Union
 
 import enumtables
 from sqlalchemy import (
@@ -48,22 +48,25 @@ _RegionTypeTable = enumtables.EnumTable(
 )
 
 
-def create_public_id(context):
-    current_parameters = context.get_current_parameters()
+def create_public_id(context) -> str:
+    current_parameters: Mapping[
+        str, Union[str, bool, datetime]
+    ] = context.get_current_parameters()
     interface = SqlAlchemyInterface(context.engine)
     with session_scope(interface) as session:
-        group = (
+        group: Group = (
             session.query(Group)
             .filter(Group.id == current_parameters["submitting_group_id"])
             .one()
         )
-        all_samples = session.query(Sample).all()
+        all_samples: Collection[Sample] = session.query(Sample).all()
         # find the current sample primary key
+        id: int
         if all_samples:
             id = max([s.id for s in session.query(Sample).all()]) + 1
         else:
             id = 1
-        current_year = datetime.today().strftime("%Y")
+        current_year: str = datetime.today().strftime("%Y")
         return f"USA/{group.prefix}-{id}/{current_year}"
 
 
