@@ -37,10 +37,11 @@ SAMPLES_POST_REQUIRED_FIELDS = [
     "private_identifier",
     "collection_date",
     "location",
-    "sequence",  # from PathogenGenome
-    "num_unambiguous_sites",  # from PathogenGenome
-    "num_missing_alleles",  # from PathogenGenome
-    "num_mixed",  # from PathogenGenome
+    # following fields from PathogenGenome
+    "sequence",
+    "num_unambiguous_sites",
+    "num_missing_alleles",
+    "num_mixed",
 ]
 SAMPLES_POST_OPTIONAL_FIELDS = [
     "original_submission",
@@ -56,10 +57,12 @@ SAMPLES_POST_OPTIONAL_FIELDS = [
     "host",
     "purpose_of_sampling",
     "specimen_processing",
-    "czb_failed_genome_recovery" "sequencing_depth",  # from UploadedPathogenGenome
-    "num_unambiguous_sites",  # from PathogenGenome
-    "num_missing_alleles",  # from PathogenGenome
-    "num_mixed",  # from PathogenGenome
+    "czb_failed_genome_recovery",
+    # following fields from PathogenGenome
+    "sequencing_depth",
+    "num_unambiguous_sites",
+    "num_missing_alleles",
+    "num_mixed",
 ]
 
 

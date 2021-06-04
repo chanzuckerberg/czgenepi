@@ -67,7 +67,8 @@ def create_public_id(context) -> str:
         else:
             id = 1
         current_year: str = datetime.today().strftime("%Y")
-        return f"USA/{group.prefix}-{id}/{current_year}"
+        country: str = current_parameters["country"]  # type: ignore
+        return f"{country}/{group.prefix}-{id}/{current_year}"
 
 
 class Sample(idbase, DictMixin):  # type: ignore
