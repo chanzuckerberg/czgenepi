@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import enum
 from datetime import datetime
-from typing import Collection, Mapping, Optional, TYPE_CHECKING, Union
+from typing import Mapping, Optional, TYPE_CHECKING, Union
 
 import enumtables
 from sqlalchemy import (
@@ -10,6 +10,7 @@ from sqlalchemy import (
     Column,
     Date,
     ForeignKey,
+    func,
     Integer,
     JSON,
     sql,
@@ -59,16 +60,17 @@ def create_public_id(context) -> str:
             .filter(Group.id == current_parameters["submitting_group_id"])
             .one()
         )
-        all_samples: Collection[Sample] = session.query(Sample).all()
-        # find the current sample primary key
-        id: int
-        if all_samples:
-            id = max([s.id for s in session.query(Sample).all()]) + 1
-        else:
-            id = 1
+        next_id: Union[int, None] = session.query(func.max(Sample.id)).scalar()
+
+        # catch if no max
+        if not next_id:
+            next_id = 0
+
+        next_id += 1
+
         current_year: str = datetime.today().strftime("%Y")
         country: str = current_parameters["country"]  # type: ignore
-        return f"{country}/{group.prefix}-{id}/{current_year}"
+        return f"{country}/{group.prefix}-{next_id}/{current_year}"
 
 
 class Sample(idbase, DictMixin):  # type: ignore

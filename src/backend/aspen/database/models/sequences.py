@@ -157,23 +157,38 @@ class PathogenGenome(Entity):
     sequence = deferred(Column(String, nullable=False), raiseload=True)
 
     # statistics for the pathogen genome
+    def calculate_num_unambiguous_sites(self):
+        return sum((1 for i in self.current_parameters["sequence"] if i in ("ACTGU")))
 
     num_unambiguous_sites = Column(
-        Integer, nullable=False, comment="Number of sites with allele A, C, T, or G"
+        Integer,
+        nullable=False,
+        default=calculate_num_unambiguous_sites,
+        comment="Number of sites with allele A, C, T, U or G",
     )
+
+    def calculate_num_missing_alleles(self):
+        return sum((1 for i in self.current_parameters["sequence"] if i == "N"))
 
     num_missing_alleles = Column(
         Integer,
         nullable=False,
+        default=calculate_num_missing_alleles,
         comment=(
             "Number of sites with N, the missing allele,"
             " typically indicating low depth"
         ),
     )
 
+    def calculate_num_mixed(self):
+        return sum(
+            (1 for i in self.current_parameters["sequence"] if i not in ("ACTGU"))
+        )
+
     num_mixed = Column(
         Integer,
         nullable=False,
+        default=calculate_num_mixed,
         comment=(
             "Number of sites with an ambiguous allele, e.g. M, K, Y, etc.,"
             " indicating support for 2 or more alleles in the reads."

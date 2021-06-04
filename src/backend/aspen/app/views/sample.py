@@ -39,9 +39,6 @@ SAMPLES_POST_REQUIRED_FIELDS = [
     "location",
     # following fields from PathogenGenome
     "sequence",
-    "num_unambiguous_sites",
-    "num_missing_alleles",
-    "num_mixed",
 ]
 SAMPLES_POST_OPTIONAL_FIELDS = [
     "original_submission",

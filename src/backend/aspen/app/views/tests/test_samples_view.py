@@ -2,6 +2,8 @@ import datetime
 import json
 from typing import Any, Optional, Sequence, Tuple
 
+from sqlalchemy.orm import joinedload
+
 from aspen.app.views import api_utils
 from aspen.app.views.sample import SAMPLE_KEY
 from aspen.database.models import (
@@ -640,10 +642,7 @@ def test_samples_create_view_pass_no_public_id(
                 "private": True,
             },
             "pathogen_genome": {
-                "sequence": "AAAAAAAAA",
-                "num_unambiguous_sites": 2,
-                "num_missing_alleles": 2,
-                "num_mixed": 2,
+                "sequence": "AAAAAXNTCG",
             },
         },
         {
@@ -654,10 +653,7 @@ def test_samples_create_view_pass_no_public_id(
                 "private": True,
             },
             "pathogen_genome": {
-                "sequence": "AAAAAAAAA",
-                "num_unambiguous_sites": 2,
-                "num_missing_alleles": 2,
-                "num_mixed": 2,
+                "sequence": "AACTGTNNNN",
             },
         },
     ]
@@ -677,6 +673,17 @@ def test_samples_create_view_pass_no_public_id(
     public_ids = sorted([i.public_identifier for i in session.query(Sample).all()])
     assert ["USA/groupname-1/2021", "USA/groupname-2/2021"] == public_ids
 
+    sample_1 = (
+        session.query(Sample)
+        .options(joinedload(Sample.uploaded_pathogen_genome))
+        .filter(Sample.private_identifier == "private")
+        .one()
+    )
+
+    assert sample_1.uploaded_pathogen_genome.num_mixed == 2
+    assert sample_1.uploaded_pathogen_genome.num_unambiguous_sites == 8
+    assert sample_1.uploaded_pathogen_genome.num_missing_alleles == 1
+
 
 def test_samples_create_view_fail_missing_required_fields(
     session,
@@ -695,7 +702,6 @@ def test_samples_create_view_fail_missing_required_fields(
             "sample": {
                 "private_identifier": "private",
                 "collection_date": api_utils.format_date(datetime.datetime.now()),
-                "private": True,
             },
             "pathogen_genome": {
                 "sequence": "AAAAAAAAA",
@@ -717,5 +723,5 @@ def test_samples_create_view_fail_missing_required_fields(
     assert res.status == "400 BAD REQUEST"
     assert (
         res.get_data()
-        == b"Missing required fields ['location', 'num_unambiguous_sites', 'num_missing_alleles', 'num_mixed'] or encountered unexpected fields []"
+        == b"Missing required fields ['private', 'location'] or encountered unexpected fields []"
     )
