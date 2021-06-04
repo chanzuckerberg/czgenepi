@@ -182,7 +182,7 @@ class PathogenGenome(Entity):
 
     def calculate_num_mixed(self):
         return sum(
-            (1 for i in self.current_parameters["sequence"] if i not in ("ACTGU"))
+            (1 for i in self.current_parameters["sequence"] if i not in ("ACTGUN-"))
         )
 
     num_mixed = Column(

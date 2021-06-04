@@ -680,7 +680,7 @@ def test_samples_create_view_pass_no_public_id(
         .one()
     )
 
-    assert sample_1.uploaded_pathogen_genome.num_mixed == 2
+    assert sample_1.uploaded_pathogen_genome.num_mixed == 1
     assert sample_1.uploaded_pathogen_genome.num_unambiguous_sites == 8
     assert sample_1.uploaded_pathogen_genome.num_missing_alleles == 1
 
