@@ -1,4 +1,6 @@
-import React from "react";
+import deepEqual from "deep-equal";
+import React, { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { Metadata } from "src/views/Upload/components/common/types";
 import DateField from "./components/DateField";
 
@@ -13,16 +15,34 @@ export default function Row({
   metadata,
   handleMetadata,
 }: Props): JSX.Element {
-  const handleValue = (fieldKey: string, value: string) => {
-    handleMetadata(id, { ...metadata, [fieldKey]: value });
-  };
+  const {
+    register,
+    watch,
+    formState: { errors },
+  } = useForm({
+    defaultValues: metadata,
+    mode: "onTouched",
+  });
+
+  const watchAllFields = watch();
+
+  // DEBUG
+  // DEBUG
+  // DEBUG
+  console.log("---errors", errors);
+
+  useEffect(() => {
+    if (!deepEqual(metadata, watchAllFields)) {
+      handleMetadata(id, watchAllFields);
+    }
+  }, [watchAllFields]);
 
   return (
     <div>
       {id}
       <div>
-        <DateField fieldKey="collectionDate" handleValue={handleValue} />
-        <DateField fieldKey="sequencingDate" handleValue={handleValue} />
+        <DateField register={register} fieldKey="collectionDate" />
+        <DateField register={register} fieldKey="sequencingDate" />
       </div>
     </div>
   );
