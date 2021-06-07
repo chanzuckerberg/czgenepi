@@ -2,7 +2,7 @@ import datetime
 from collections import defaultdict
 from typing import Any, Mapping, MutableSequence, Optional, Sequence, Set
 
-from flask import jsonify, session
+from flask import jsonify, request, Response, session
 from sqlalchemy import or_
 from sqlalchemy.orm import joinedload
 
@@ -21,16 +21,43 @@ from aspen.database.models import (
     GisaidAccession,
     GisaidAccessionWorkflow,
     HostFilteredSequencingReadsCollection,
+    Sample,
     SequencingReadsCollection,
     UploadedPathogenGenome,
     WorkflowStatusType,
 )
-from aspen.database.models.sample import Sample
+from aspen.database.models.sample import RegionType
 from aspen.database.models.usergroup import Group, User
 from aspen.error.recoverable import RecoverableError
 
 SAMPLE_KEY = "samples"
 GISIAD_REJECTION_TIME = datetime.timedelta(days=4)
+SAMPLES_POST_REQUIRED_FIELDS = [
+    "private",
+    "private_identifier",
+    "collection_date",
+    "location",
+    # following fields from PathogenGenome
+    "sequence",
+]
+SAMPLES_POST_OPTIONAL_FIELDS = [
+    "original_submission",
+    "public_identifier",
+    "sample_collected_by",
+    "sample_collector_contact_email",
+    "sample_collector_contact_address",
+    "authors",
+    "division",
+    "country",
+    "region",
+    "organism",
+    "host",
+    "purpose_of_sampling",
+    "specimen_processing",
+    "czb_failed_genome_recovery",
+    # following fields from PathogenGenome
+    "sequencing_depth",
+]
 
 
 def _format_created_date(sample: Sample) -> str:
@@ -230,3 +257,61 @@ def samples():
             results.append(returned_sample_data)
 
         return jsonify({SAMPLE_KEY: results})
+
+
+@application.route("/api/samples/create", methods=["POST"])
+@requires_auth
+def create_sample():
+    with session_scope(application.DATABASE_INTERFACE) as db_session:
+        profile: Mapping[str, str] = session["profile"]
+
+        user: User = (
+            get_usergroup_query(db_session, profile["user_id"])
+            .options(joinedload(User.group))
+            .one()
+        )
+        request_data = request.get_json()
+
+        for data in request_data:
+            data_ok: bool
+            missing_fields: Optional[list[str]]
+            unexpected_fields: Optional[list[str]]
+            data_ok, missing_fields, unexpected_fields = api_utils.check_data(
+                list(data["sample"].keys()),
+                list(data["pathogen_genome"].keys()),
+                SAMPLES_POST_REQUIRED_FIELDS,
+                SAMPLES_POST_OPTIONAL_FIELDS,
+            )
+            if data_ok:
+                sample_args: Mapping[str, Any] = {
+                    "submitting_group": user.group,
+                    "uploaded_by": user,
+                    "sample_collected_by": user.group.name,
+                    "sample_collector_contact_address": user.group.address,
+                    "division": "California",
+                    "country": "USA",
+                    "region": RegionType.NORTH_AMERICA,
+                    "organism": "Severe acute respiratory syndrome coronavirus 2",
+                    **data["sample"],
+                }
+                if "authors" not in sample_args:
+                    sample_args["authors"] = [
+                        user.group.name,
+                    ]
+
+                # have to save the objects serially due to public_id default using primary key field
+                sample: Sample = Sample(**sample_args)
+                upload_pathogen_genome: UploadedPathogenGenome = UploadedPathogenGenome(
+                    sample=sample, **data["pathogen_genome"]
+                )
+                db_session.add(sample)
+                db_session.add(upload_pathogen_genome)
+                db_session.commit()
+
+            else:
+                return Response(
+                    f"Missing required fields {missing_fields} or encountered unexpected fields {unexpected_fields}",
+                    400,
+                )
+
+        return jsonify(success=True)
