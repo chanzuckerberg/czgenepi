@@ -6,6 +6,7 @@ import { ROUTES } from "src/common/routes";
 import Progress from "../common/Progress";
 import { Content, Header, Title } from "../common/style";
 import { Props } from "../common/types";
+import Table from "./components/Table";
 
 export default function Review({ samples, metadata }: Props): JSX.Element {
   // DEBUG
@@ -27,6 +28,7 @@ export default function Review({ samples, metadata }: Props): JSX.Element {
       </Header>
       <Content>
         Content
+        <Table metadata={metadata} />
         <div>
           <Button isRounded color="primary" variant="contained">
             Start Upload

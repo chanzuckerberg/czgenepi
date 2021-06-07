@@ -1,6 +1,5 @@
 import cx from "classnames";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import React from "react";
 import ENV from "src/common/constants/ENV";
 import { useUserInfo } from "src/common/queries/auth";
@@ -22,23 +21,13 @@ export default function RightNav(): JSX.Element {
   );
 
   function IsLoggedIn(): JSX.Element {
-    const router = useRouter();
-
-    const isUploadRoute = router.asPath.includes(ROUTES.UPLOAD);
-
     if (user) {
-      const uploadHref = isUploadRoute
-        ? ROUTES.DATA_SAMPLES
-        : ROUTES.UPLOAD_STEP1;
-
-      const uploadText = isUploadRoute ? "Cancel Upload" : "Upload";
-
       return (
         <>
-          <Link href={uploadHref} passHref>
+          <Link href={ROUTES.UPLOAD_STEP1} passHref>
             <a href="passHref">
               <UploadButton isRounded variant="outlined">
-                {uploadText}
+                Upload
               </UploadButton>
             </a>
           </Link>

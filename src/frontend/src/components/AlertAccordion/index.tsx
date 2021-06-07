@@ -11,7 +11,6 @@ interface Props {
   className?: string;
 }
 
-// TODO(thuang): This will be an accordion with collapse state!
 export default function AlertAccordion({
   title,
   message,

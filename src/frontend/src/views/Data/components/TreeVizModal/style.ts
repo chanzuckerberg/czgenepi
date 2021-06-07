@@ -3,6 +3,7 @@ import { fontBodyS, fontHeaderXl, getColors, getSpacings, Props } from "czifui";
 
 export const Header = styled.div`
   ${fontHeaderXl}
+
   ${(props: Props) => {
     const spacings = getSpacings(props);
 

@@ -94,7 +94,9 @@ async function handleZip(file: Uint8Array): Promise<ParseOutcome> {
  * a map with sample id as key and sequence as value in O(N)
  */
 function handleFastaText(text: string): ParseOutcome {
-  const lines = text.split("\n");
+  // (thuang): Take different operating systems into account
+  //  https://stackoverflow.com/a/45709854
+  const lines = text.split(/\r?\n/);
 
   let result: Sequences = {};
   let errors: ParseErrors = {};
