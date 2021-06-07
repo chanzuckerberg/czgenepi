@@ -29,6 +29,7 @@ export default function Row({
   // DEBUG
   // DEBUG
   // DEBUG
+  // eslint-disable-next-line no-console
   console.log("---errors", errors);
 
   useEffect(() => {

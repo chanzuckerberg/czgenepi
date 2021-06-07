@@ -2,6 +2,8 @@ import datetime
 import json
 from typing import Any, Optional, Sequence, Tuple
 
+from sqlalchemy.orm import joinedload
+
 from aspen.app.views import api_utils
 from aspen.app.views.sample import SAMPLE_KEY
 from aspen.database.models import (
@@ -10,6 +12,7 @@ from aspen.database.models import (
     PublicRepositoryType,
     Sample,
     SequencingReadsCollection,
+    UploadedPathogenGenome,
 )
 from aspen.test_infra.models.accession_workflow import AccessionWorkflowDirective
 from aspen.test_infra.models.sample import sample_factory
@@ -616,3 +619,109 @@ def test_samples_view_no_pangolin(
         ]
     }
     assert expected == json.loads(res.get_data(as_text=True))
+
+
+def test_samples_create_view_pass_no_public_id(
+    session,
+    app,
+    client,
+):
+    group = group_factory()
+    user = user_factory(group)
+    session.add(group)
+    session.commit()
+    with client.session_transaction() as sess:
+        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
+
+    data = [
+        {
+            "sample": {
+                "private_identifier": "private",
+                "collection_date": api_utils.format_date(datetime.datetime.now()),
+                "location": "Ventura County",
+                "private": True,
+            },
+            "pathogen_genome": {
+                "sequence": "AAAAAXNTCG",
+            },
+        },
+        {
+            "sample": {
+                "private_identifier": "private2",
+                "collection_date": api_utils.format_date(datetime.datetime.now()),
+                "location": "Ventura County",
+                "private": True,
+            },
+            "pathogen_genome": {
+                "sequence": "AACTGTNNNN",
+            },
+        },
+    ]
+    res = client.post("/api/samples/create", json=data, content_type="application/json")
+    assert res.status == "200 OK"
+    session.close()
+    session.begin()
+
+    samples = session.query(
+        Sample.private_identifier.in_(["private", "private2"])
+    ).all()
+    uploaded_pathogen_genomes = session.query(UploadedPathogenGenome).all()
+
+    assert len(samples) == 2
+    assert len(uploaded_pathogen_genomes) == 2
+    # check that creating new public identifiers works
+    public_ids = sorted([i.public_identifier for i in session.query(Sample).all()])
+    assert ["USA/groupname-1/2021", "USA/groupname-2/2021"] == public_ids
+
+    sample_1 = (
+        session.query(Sample)
+        .options(joinedload(Sample.uploaded_pathogen_genome))
+        .filter(Sample.private_identifier == "private")
+        .one()
+    )
+
+    assert sample_1.uploaded_pathogen_genome.num_mixed == 1
+    assert sample_1.uploaded_pathogen_genome.num_unambiguous_sites == 8
+    assert sample_1.uploaded_pathogen_genome.num_missing_alleles == 1
+
+
+def test_samples_create_view_fail_missing_required_fields(
+    session,
+    app,
+    client,
+):
+    group = group_factory()
+    user = user_factory(group)
+    session.add(group)
+    session.commit()
+    with client.session_transaction() as sess:
+        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
+
+    data = [
+        {
+            "sample": {
+                "private_identifier": "private",
+                "collection_date": api_utils.format_date(datetime.datetime.now()),
+            },
+            "pathogen_genome": {
+                "sequence": "AAAAAAAAA",
+            },
+        },
+        {
+            "sample": {
+                "private_identifier": "private2",
+                "collection_date": api_utils.format_date(datetime.datetime.now()),
+                "location": "Ventura County",
+                "private": True,
+            },
+            "pathogen_genome": {
+                "sequence": "AAAAAAAAA",
+            },
+        },
+    ]
+    res = client.post("/api/samples/create", json=data, content_type="application/json")
+    assert res.status == "400 BAD REQUEST"
+    assert (
+        res.get_data()
+        == b"Missing required fields ['private', 'location'] or encountered unexpected fields []"
+    )
