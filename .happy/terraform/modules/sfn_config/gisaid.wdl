@@ -148,6 +148,9 @@ task TransformGISAID {
     git clone --depth 1 git://github.com/nextstrain/ncov-ingest /ncov-ingest
     ncov_ingest_git_rev=$(git -C /ncov-ingest rev-parse HEAD)
 
+    # modify location rules from ncov-ingest. Southern San Joaquin Valley would be left blank in the default version
+    sed -i 's/Southern San Joaquin Valley\tNorth America\/USA\/California\//Southern San Joaquin Valley\tNorth America\/USA\/California\/Southern San Joaquin Valley/' /ncov-ingest/source-data/gisaid_geoLocationRules.tsv
+
     # decompress the gisaid dataset and transform it.
     aws s3 cp --no-progress "s3://${raw_gisaid_s3_bucket}/${raw_gisaid_s3_key}" - | zstdmt -d > gisaid.ndjson
     /ncov-ingest/bin/transform-gisaid     \
