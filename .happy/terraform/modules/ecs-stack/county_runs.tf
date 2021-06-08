@@ -372,7 +372,7 @@ module nextstrain_monterey_local_sfn_config {
     template_filename        = "group.yaml"
     template_args            = {
      division = "California"
-     location = "Monterey County"
+     location = "Monterey County CA"
     }
   }
 }
@@ -401,7 +401,7 @@ module nextstrain_monterey_contextual_sfn_config {
     template_filename        = "group_plus_context.yaml"
     template_args            = {
       division = "California"
-      location = "Monterey County"
+      location = "Monterey County CA"
     }
   }
 }
@@ -430,7 +430,7 @@ module nextstrain_orange_local_sfn_config {
     template_filename        = "group.yaml"
     template_args            = {
      division = "California"
-     location = "Orange County"
+     location = "Orange County CA"
     }
   }
 }
@@ -459,7 +459,7 @@ module nextstrain_orange_contextual_sfn_config {
     template_filename        = "group_plus_context.yaml"
     template_args            = {
       division = "California"
-      location = "Orange County"
+      location = "Orange County CA"
     }
   }
 }
@@ -720,7 +720,7 @@ module nextstrain_tulare_local_sfn_config {
     template_filename        = "group.yaml"
     template_args            = {
      division = "California"
-     location = "Tulare County"
+     location = "Southern San Joaquin Valley"
     }
   }
 }
@@ -749,7 +749,7 @@ module nextstrain_tulare_contextual_sfn_config {
     template_filename        = "group_plus_context.yaml"
     template_args            = {
       division = "California"
-      location = "Tulare County"
+      location = "Southern San Joaquin Valley"
     }
   }
 }
