@@ -7,6 +7,7 @@ interface Props {
   text?: string;
   multiple?: boolean;
   accept?: string;
+  className?: string;
 }
 
 export default function FilePicker({
@@ -14,6 +15,7 @@ export default function FilePicker({
   text = "Select files",
   multiple = false,
   accept = "",
+  className,
 }: Props): JSX.Element {
   const hiddenFileInput = useRef<HTMLInputElement>(null);
 
@@ -34,7 +36,7 @@ export default function FilePicker({
   };
 
   return (
-    <>
+    <div className={className}>
       <Button color="primary" variant="contained" onClick={handleClick}>
         {text}
       </Button>
@@ -46,6 +48,6 @@ export default function FilePicker({
         multiple={multiple}
         accept={accept}
       />
-    </>
+    </div>
   );
 }
