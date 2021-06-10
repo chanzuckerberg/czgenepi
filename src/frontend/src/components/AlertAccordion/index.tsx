@@ -1,10 +1,11 @@
+import { ErrorOutline } from "@material-ui/icons";
+import { Alert, AlertProps } from "czifui";
 import React from "react";
-import { Wrapper } from "./style";
 
 interface Props {
   title: React.ReactNode;
   message: React.ReactNode;
-  variant: "success" | "info" | "error" | "warning";
+  severity: AlertProps["severity"];
   className?: string;
 }
 
@@ -12,13 +13,13 @@ interface Props {
 export default function AlertAccordion({
   title,
   message,
-  variant,
+  severity,
   className,
 }: Props): JSX.Element {
   return (
-    <Wrapper className={className} variant={variant}>
+    <Alert className={className} severity={severity} icon={<ErrorOutline />}>
       <div>{title}</div>
       {message}
-    </Wrapper>
+    </Alert>
   );
 }

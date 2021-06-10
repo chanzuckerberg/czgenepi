@@ -81,7 +81,7 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
           REMOVE ALL
         </Button>
         <AlertAccordion
-          variant="error"
+          severity="error"
           title="Some of your files could not be uploaded."
           message={"Error table component here: " + JSON.stringify(parseErrors)}
         />
