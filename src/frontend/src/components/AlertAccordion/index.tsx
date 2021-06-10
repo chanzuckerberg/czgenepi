@@ -1,5 +1,6 @@
 import React from "react";
 import { Wrapper } from "./style";
+import { StyledAlert, ErrorOutline } from "czifui";
 
 interface Props {
   title: React.ReactNode;
@@ -16,9 +17,9 @@ export default function AlertAccordion({
   className,
 }: Props): JSX.Element {
   return (
-    <Wrapper className={className} variant={variant}>
+    <StyledAlert className={className} variant={variant} severity="error" icon={<ErrorOutline />}>
       <div>{title}</div>
       {message}
-    </Wrapper>
+    </StyledAlert>
   );
 }
