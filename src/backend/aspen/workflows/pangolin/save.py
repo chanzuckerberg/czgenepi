@@ -33,7 +33,8 @@ def cli(pangolin_fh: io.TextIOBase, pangolin_last_updated: datetime):
         taxon_to_pango_info: Mapping[int, Mapping[str, Union[str, float]]] = {
             int(row["taxon"]): {
                 "lineage": row["lineage"],
-                "probability": get_probability(float(row["conflict"])),
+                "probability": get_probability(float(row["conflict"]))
+                if row["conflict"] != '' else '',
                 "version": row["pangoLEARN_version"],
             }
             for row in pango_csv
