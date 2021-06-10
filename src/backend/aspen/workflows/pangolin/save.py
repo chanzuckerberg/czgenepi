@@ -34,7 +34,8 @@ def cli(pangolin_fh: io.TextIOBase, pangolin_last_updated: datetime):
             int(row["taxon"]): {
                 "lineage": row["lineage"],
                 "probability": get_probability(float(row["conflict"]))
-                if row["conflict"] != '' else '',
+                if row["conflict"] != ""
+                else 1,
                 "version": row["pangoLEARN_version"],
             }
             for row in pango_csv
