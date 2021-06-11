@@ -22,7 +22,6 @@ def get_probability(ambiguity_score: float) -> int:
     that had to be imputed from the reference sequence.
     Round and multiply by 100 --> percentage for easier user comprehension.
     """
-    assert 0 <= ambiguity_score <= 1
     return round((1 - ambiguity_score) * 100)
 
 
@@ -39,7 +38,8 @@ def cli(pangolin_fh: io.TextIOBase, pangolin_last_updated: datetime):
         taxon_to_pango_info: Mapping[int, Mapping[str, Union[str, float]]] = {
             int(row["taxon"]): {
                 "lineage": row["lineage"],
-                "probability": get_probability(float(row["ambiguity_score"])),
+                "probability": get_probability(float(row["ambiguity_score"]))
+                if row["ambiguity_score"] else 100,
                 "version": row["pangoLEARN_version"],
             }
             for row in pango_csv
