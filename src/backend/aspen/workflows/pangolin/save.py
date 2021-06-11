@@ -40,7 +40,7 @@ def cli(pangolin_fh: io.TextIOBase, pangolin_last_updated: datetime):
                 "lineage": row["lineage"],
                 "probability": get_probability(float(row["ambiguity_score"]))
                 if row["ambiguity_score"]
-                else None,
+                else "",
                 "version": row["pangoLEARN_version"],
             }
             for row in pango_csv
