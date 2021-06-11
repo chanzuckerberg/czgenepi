@@ -15,9 +15,15 @@ from aspen.database.connection import (
 from aspen.database.models import PathogenGenome, UploadedPathogenGenome
 
 
-def get_probability(conflict: float) -> float:
-    assert conflict <= 1
-    return 1.0 - conflict
+def get_probability(ambiguity_score: float) -> int:
+    """
+    Estimate confidence percentage based on the `ambiguity_score`.
+    Per pangolin docs, this is basically the number of lineage-defining sites
+    that had to be imputed from the reference sequence.
+    Round and multiply by 100 --> percentage for easier user comprehension.
+    """
+    assert 0 <= ambiguity_score <= 1
+    return round((1 - ambiguity_score) * 100)
 
 
 @click.command("save")
@@ -33,7 +39,7 @@ def cli(pangolin_fh: io.TextIOBase, pangolin_last_updated: datetime):
         taxon_to_pango_info: Mapping[int, Mapping[str, Union[str, float]]] = {
             int(row["taxon"]): {
                 "lineage": row["lineage"],
-                "probability": get_probability(float(row["conflict"])),
+                "probability": get_probability(float(row["ambiguity_score"])),
                 "version": row["pangoLEARN_version"],
             }
             for row in pango_csv
