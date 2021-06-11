@@ -30,7 +30,7 @@ PHYLO_TREE_KEY = "phylo_trees"
 
 def humanize_tree_name(s3_key: str):
     json_filename = s3_key.split("/")[-1]
-    basename = re.sub(r"_\d*\.json", "", json_filename)
+    basename = re.sub(r".json", "", json_filename)
     title_case = basename.replace("_", " ").title()
     if "Ancestors" in title_case:
         title_case = title_case.replace("Ancestors", "Contextual")
