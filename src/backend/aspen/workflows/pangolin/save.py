@@ -35,7 +35,7 @@ def cli(pangolin_fh: io.TextIOBase, pangolin_last_updated: datetime):
 
     with session_scope(interface) as session:
         pango_csv: csv.DictReader = csv.DictReader(pangolin_fh)
-        taxon_to_pango_info: Mapping[int, Mapping[str, Union[str, float]]] = {
+        taxon_to_pango_info: Mapping[int, Mapping[str, Union[str, float, None]]] = {
             int(row["taxon"]): {
                 "lineage": row["lineage"],
                 "probability": get_probability(float(row["ambiguity_score"]))
@@ -54,7 +54,9 @@ def cli(pangolin_fh: io.TextIOBase, pangolin_last_updated: datetime):
         }
 
         for entity_id, pathogen_genome in entity_id_to_pathogen_genome.items():
-            pango_info: Mapping[str, Union[str, float]] = taxon_to_pango_info[entity_id]
+            pango_info: Mapping[str, Union[str, float, None]] = taxon_to_pango_info[
+                entity_id
+            ]
             pathogen_genome.pangolin_last_updated = pangolin_last_updated
             pathogen_genome.pangolin_lineage = pango_info["lineage"]  # type: ignore
             pathogen_genome.pangolin_probability = pango_info["probability"]  # type: ignore
