@@ -20,9 +20,18 @@ export interface ParseOutcome {
   errors: ParseErrors;
 }
 
+export enum WARNING_CODE {
+  /**
+   * (thuang): We have detected conflicting info and auto-corrected something
+   * for the user
+   */
+  AUTO_CORRECT,
+}
+
 export enum ERROR_CODE {
   DEFAULT,
   INVALID_NAME,
+  MISSING_FIELD,
 }
 
 export interface ErrorCode {
