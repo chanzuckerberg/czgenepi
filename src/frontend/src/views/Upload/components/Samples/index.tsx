@@ -122,21 +122,20 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
             ]}
           />
         )}
-        {parseErrors && (
+        <ContentWrapper>
+          <StyledFilePicker
+            text="Select Fasta Files"
+            multiple
+            handleFiles={handleFileChange}
+            accept=".fasta,.fa,.gz,.zip"
+          />
+          {parseErrors && (
           <AlertAccordion
             severity="error"
             title="Some of your files could not be uploaded."
             message={<AlertTable parseErrors={parseErrors} />}
           />
         )}
-
-        <ContentWrapper>
-          <StyledFilePicker
-            text="Select Fasta Files"
-            multiple
-            handleFiles={handleFileChange}
-            accept=".fasta,.fa,.gz,.zip,.tree"
-          />
           {samples && (
             <>
               <StyledContainerSpaceBetween>
