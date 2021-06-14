@@ -1,12 +1,16 @@
 import { Table as MuiTable, TableBody, TableHead } from "@material-ui/core";
 import React, { useCallback, useEffect, useState } from "react";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
-import { METADATA_KEYS_TO_HEADERS } from "../../../common/constants";
+import {
+  METADATA_KEYS_TO_HEADERS,
+  SAMPLE_COUNT,
+} from "../../../common/constants";
 import { Metadata, Props as CommonProps } from "../../../common/types";
 import Row from "./components/Row";
 import {
   IdColumn,
   IsPrivateTableCell,
+  LoadingMessage,
   Overflow,
   StyledTableCell,
   StyledTableContainer,
@@ -30,9 +34,25 @@ export default function Table({
   autocorrectWarnings,
 }: Props): JSX.Element {
   const [isTouched, setIsTouched] = useState(hasImportedFile);
+  const [isReadyToRenderTable, setIsReadyToTenderTable] = useState(false);
 
   const [rowValidation, setRowValidation] =
     useState<Record<string, boolean>>(EMPTY_OBJECT);
+
+  useEffect(() => {
+    if (!metadata) {
+      return setIsReadyToTenderTable(true);
+    }
+
+    const timeout = setTimeout(
+      () => {
+        setIsReadyToTenderTable(true);
+      },
+      Object.keys(metadata).length > SAMPLE_COUNT ? 1 * 1000 : 0
+    );
+
+    return () => clearTimeout(timeout);
+  }, []);
 
   useEffect(() => {
     if (hasImportedFile) {
@@ -80,6 +100,14 @@ export default function Table({
   };
 
   const applyToAllColumn = useCallback(applyToAllColumn_, []);
+
+  if (!isReadyToRenderTable) {
+    return (
+      <Overflow>
+        <LoadingMessage>Loading form...</LoadingMessage>
+      </Overflow>
+    );
+  }
 
   return (
     <Overflow>
