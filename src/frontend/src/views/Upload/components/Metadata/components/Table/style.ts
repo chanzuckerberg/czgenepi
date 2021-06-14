@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import { TableCell, TableContainer, TableRow } from "@material-ui/core";
-import { fontHeaderXs, getColors, getSpacings } from "czifui";
+import { fontBodyM, fontHeaderXs, getColors, getSpacings } from "czifui";
 
 export const Overflow = styled.div`
   overflow: auto;
@@ -71,4 +71,8 @@ export const StyledTableRow = styled(TableRow)`
   .MuiTableCell-stickyHeader {
     background-color: white;
   }
+`;
+
+export const LoadingMessage = styled.div`
+  ${fontBodyM}
 `;

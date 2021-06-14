@@ -12,6 +12,7 @@ interface Props {
   shouldConfirm?: boolean;
   confirmTitle?: string;
   confirmContent?: string;
+  isDisabled?: boolean;
 }
 
 export default function FilePicker({
@@ -23,6 +24,7 @@ export default function FilePicker({
   shouldConfirm,
   confirmTitle = "",
   confirmContent = "",
+  isDisabled = false,
 }: Props): JSX.Element {
   const [isOpen, setIsOpen] = useState(false);
   const hiddenFileInput = useRef<HTMLInputElement>(null);
@@ -61,6 +63,7 @@ export default function FilePicker({
         color="primary"
         variant="contained"
         onClick={shouldConfirm ? openDialog : handleClick}
+        disabled={isDisabled}
       >
         {text}
       </Button>
