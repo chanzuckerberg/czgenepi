@@ -1,15 +1,14 @@
+import { MenuItem } from "czifui";
 import { FormikContextType } from "formik";
 import React from "react";
 import { Metadata } from "src/views/Upload/components/common/types";
 import ApplyToAllColumn from "../common/ApplyToAllColumn";
-import { StyledTextField } from "./style";
+import { COUNTIES } from "./COUNTIES";
+import { MenuSubtext, StyledTextField } from "./style";
 
-// "YYYY-MM-DD".length
-const DATE_LENGTH = 10;
-
-const INPUT_PROPS = {
-  maxLength: DATE_LENGTH,
-  minLength: DATE_LENGTH,
+const SELECT_PROPS = {
+  displayEmpty: true,
+  renderValue,
 };
 
 interface Props {
@@ -19,7 +18,7 @@ interface Props {
   isFirstRow: boolean;
 }
 
-export default function DateField({
+export default function LocationField({
   fieldKey,
   formik,
   applyToAllColumn,
@@ -33,14 +32,14 @@ export default function DateField({
 
   return (
     <StyledTextField
+      select
+      SelectProps={SELECT_PROPS}
       name={fieldKey}
-      inputProps={INPUT_PROPS}
-      placeholder="YYYY-MM-DD"
+      value={value}
       margin="dense"
       variant="outlined"
       onChange={handleChange}
       onBlur={handleBlur}
-      value={value}
       error={Boolean(errorMessage)}
       helperText={
         errorMessage ||
@@ -52,6 +51,25 @@ export default function DateField({
           />
         ))
       }
-    />
+    >
+      <MenuItem value="" disabled>
+        Select County
+      </MenuItem>
+      {COUNTIES.map((county) => {
+        return (
+          <MenuItem key={county} value={county}>
+            {county}
+            {(county === "California" && (
+              <MenuSubtext>County not specified</MenuSubtext>
+            )) ||
+              null}
+          </MenuItem>
+        );
+      })}
+    </StyledTextField>
   );
+}
+
+function renderValue(value: unknown): React.ReactNode {
+  return <>{value}</>;
 }
