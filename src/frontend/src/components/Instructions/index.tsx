@@ -4,7 +4,7 @@ import { Title, Wrapper } from "./style";
 
 interface Props {
   title: string;
-  items: string[];
+  items: React.ReactNode[];
   ordered?: boolean;
   className?: string;
 }
@@ -19,9 +19,9 @@ export default function Instructions({
     <Wrapper className={className}>
       <Title>{title}</Title>
       <List ordered={ordered}>
-        {items.map((item) => {
+        {items.map((item, index) => {
           return (
-            <ListItem fontSize="s" key={item} ordered={ordered}>
+            <ListItem fontSize="s" key={index} ordered={ordered}>
               {item}
             </ListItem>
           );

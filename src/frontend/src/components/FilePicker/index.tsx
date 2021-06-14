@@ -1,5 +1,6 @@
 import { Button } from "czifui";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
+import ConfirmDialog from "./components/ConfirmDialog";
 import { HiddenInput } from "./style";
 
 interface Props {
@@ -8,6 +9,9 @@ interface Props {
   multiple?: boolean;
   accept?: string;
   className?: string;
+  shouldConfirm?: boolean;
+  confirmTitle?: string;
+  confirmContent?: string;
 }
 
 export default function FilePicker({
@@ -16,10 +20,14 @@ export default function FilePicker({
   multiple = false,
   accept = "",
   className,
+  shouldConfirm,
+  confirmTitle = "",
+  confirmContent = "",
 }: Props): JSX.Element {
+  const [isOpen, setIsOpen] = useState(false);
   const hiddenFileInput = useRef<HTMLInputElement>(null);
 
-  const handleClick = () => {
+  function handleClick() {
     const current = hiddenFileInput.current;
 
     if (!current) return;
@@ -27,17 +35,33 @@ export default function FilePicker({
     current.value = "";
 
     current.click();
-  };
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (isOpen) {
+      setIsOpen(false);
+    }
+  }
+
+  function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     const files = (event.target as HTMLInputElement).files;
 
     handleFiles(files);
-  };
+  }
+
+  function handleClose() {
+    setIsOpen(false);
+  }
+
+  function openDialog() {
+    setIsOpen(true);
+  }
 
   return (
     <div className={className}>
-      <Button color="primary" variant="contained" onClick={handleClick}>
+      <Button
+        color="primary"
+        variant="contained"
+        onClick={shouldConfirm ? openDialog : handleClick}
+      >
         {text}
       </Button>
 
@@ -48,6 +72,16 @@ export default function FilePicker({
         multiple={multiple}
         accept={accept}
       />
+
+      {shouldConfirm && (
+        <ConfirmDialog
+          onConfirm={handleClick}
+          open={isOpen}
+          onClose={handleClose}
+          title={confirmTitle}
+          content={confirmContent}
+        />
+      )}
     </div>
   );
 }

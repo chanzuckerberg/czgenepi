@@ -3,15 +3,15 @@ import React, { useEffect, useState } from "react";
 import { ROUTES } from "src/common/routes";
 import { useProtectedRoute } from "../../common/queries/auth";
 import {
-  Metadata as IMetadata,
   Props,
   SampleIdToMetadata,
   Samples as ISamples,
 } from "./components/common/types";
-import Metadata from "./components/Metadata";
+import Metadata, { EMPTY_METADATA } from "./components/Metadata";
 import Review from "./components/Review";
 import Samples from "./components/Samples";
 import { StyledPageContent } from "./style";
+import { useNavigationPrompt } from "./useNavigationPrompt";
 
 type Routes = ROUTES.UPLOAD_STEP1 | ROUTES.UPLOAD_STEP2 | ROUTES.UPLOAD_STEP3;
 
@@ -37,25 +37,19 @@ const SAMPLES = {
       "TGCAGGCTGCTTACGGTTTCGTCCGTGTTGCAGCCGAGGTTCATCTTAAAGATGGCACTTGTGGCTT",
   },
   "GOOD-FILE-3": {
-    filename: "bad-sample.fa",
+    filename: "sample3.fa",
     sequence:
       "TGCAGGCTGCTTACGGTTTCGTCCGTGTTGCAGCCGATCATCAGCACATCAGTTTGCCTGTTTTACAGG",
   },
   "GOOD-FILE-4": {
-    filename: "bad-sample.fa",
+    filename: "sample4.fa",
     sequence:
       "TGCAAACGAGAAAACACACGTCCAACTCAGTTTGCCGACGTCAACATCTTAAAGATGGCACTTGTGGCTT",
   },
-};
-
-const EMPTY_METADATA: IMetadata = {
-  collectionDate: undefined,
-  collectionLocation: undefined,
-  islAccessionNumber: undefined,
-  keepPrivate: undefined,
-  publicId: undefined,
-  sequencingDate: undefined,
-  submittedToGisaid: undefined,
+  "GOOD-FILE-5": {
+    filename: "sample5.fa",
+    sequence: "TGCAAACGAGAAAACACACGTCCATTTGCCGACATCTTAAAGATGGCACTTGTGGCTT",
+  },
 };
 
 export default function Upload(): JSX.Element | null {
@@ -68,6 +62,8 @@ export default function Upload(): JSX.Element | null {
   const [metadata, setMetadata] = useState<SampleIdToMetadata | null>(null);
 
   const router = useRouter();
+
+  useNavigationPrompt();
 
   useEffect(() => {
     if (!samples) {
