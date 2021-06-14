@@ -1,5 +1,11 @@
 import styled from "@emotion/styled";
-import { Button, fontHeaderXl, fontCapsXxs, getSpacings, getColors } from "czifui";
+import {
+  Button,
+  fontCapsXxs,
+  fontHeaderXl,
+  getColors,
+  getSpacings,
+} from "czifui";
 import FilePicker from "src/components/FilePicker";
 import { marginBottom } from "../common/style";
 
@@ -54,7 +60,7 @@ export const StyledContainerSpaceBetween = styled.div`
 `;
 
 export const StyledInstructionsButton = styled(Button)`
-  ${fontCapsXxs};
+  ${fontCapsXxs}
   ${(props) => {
     const spacings = getSpacings(props);
     const colors = getColors(props);
@@ -71,12 +77,17 @@ export const StyledInstructionsButton = styled(Button)`
 `;
 
 export const StyledRemoveAllButton = styled(Button)`
-  ${fontCapsXxs};
+  ${fontCapsXxs}
   ${(props) => {
     const spacings = getSpacings(props);
+    const colors = getColors(props);
     return `
       margin-right: ${spacings?.s}px;
       margin-left: ${spacings?.s}px;
+      &:hover {
+        background-color: transparent;
+        color: ${colors?.primary[500]};
+      }
     `;
   }}
 `;
