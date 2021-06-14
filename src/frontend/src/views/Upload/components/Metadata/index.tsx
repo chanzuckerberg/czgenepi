@@ -14,6 +14,7 @@ import Progress from "../common/Progress";
 import {
   ButtonWrapper,
   Content,
+  ContinueButton,
   Header,
   StyledInstructions,
   Subtitle,
@@ -22,7 +23,6 @@ import {
 import ImportFile from "./components/ImportFile";
 import { ParseResult } from "./components/ImportFile/parseFile";
 import Table from "./components/Table";
-import { ContinueButton } from "./style";
 
 export const EMPTY_METADATA: IMetadata = {
   collectionDate: "",
@@ -104,6 +104,7 @@ export default function Metadata({
           setMetadata={setMetadata}
           autocorrectWarnings={autocorrectWarnings}
         />
+
         <ButtonWrapper>
           <NextStepWrapper isValid={isValid}>
             <ContinueButton

@@ -38,9 +38,10 @@ import {
 
 export default function Samples({ samples, setSamples }: Props): JSX.Element {
   const [parseErrors, setParseErrors] = useState<ParseErrors | null>(null);
-  const [sampleCount, setSampleCount] = useState<number>(0);
-  const [fileCount, setFileCount] = useState<number>(0);
-  const [showInstructions, setShowInstructions] = useState<boolean>(true);
+  const [sampleCount, setSampleCount] = useState(0);
+  const [fileCount, setFileCount] = useState(0);
+  const [showInstructions, setShowInstructions] = useState(true);
+  const [isLoadingFile, setIsLoadingFile] = useState(false);
 
   useEffect(() => {
     if (samples) {
@@ -53,7 +54,11 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
   const handleFileChange = async (files: FileList | null) => {
     if (!files) return;
 
+    setIsLoadingFile(true);
+
     const { result, errors } = await handleFiles(files);
+
+    setIsLoadingFile(false);
 
     setSamples({
       ...removeSamplesFromTheSameFiles(samples, result),
@@ -124,10 +129,11 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
         )}
         <ContentWrapper>
           <StyledFilePicker
-            text="Select Fasta Files"
+            text={isLoadingFile ? "Loading..." : "Select Fasta Files"}
             multiple
             handleFiles={handleFileChange}
             accept=".fasta,.fa,.gz,.zip"
+            isDisabled={isLoadingFile}
           />
           {parseErrors && (
             <AlertAccordion
@@ -153,6 +159,7 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
                   REMOVE ALL
                 </StyledRemoveAllButton>
               </StyledContainerSpaceBetween>
+
               <Table samples={samples} />
             </>
           )}
