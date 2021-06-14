@@ -68,6 +68,7 @@ export const StyledInstructionsButton = styled(Button)`
       margin-right: ${spacings?.s}px;
       margin-left: ${spacings?.m}px;
       margin-top: ${spacings.s}px;
+      margin-bottom: ${spacings.l}px;
       &:hover {
         background-color: transparent;
         color: ${colors?.primary[500]};
