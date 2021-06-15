@@ -42,12 +42,14 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
   const [fileCount, setFileCount] = useState(0);
   const [showInstructions, setShowInstructions] = useState(true);
   const [isLoadingFile, setIsLoadingFile] = useState(false);
+  const [tooManySamples, setTooManySamples] = useState(false);
 
   useEffect(() => {
     if (samples) {
       const counts = getUploadCounts(samples);
       setSampleCount(counts.sampleCount);
       setFileCount(counts.fileCount);
+      setTooManySamples(Object.keys(samples).length > 500);
     }
   }, [samples]);
 
@@ -124,6 +126,9 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
                 and lower case), numbers (0-9), periods (.), hyphens (-),
                 underscores (_), and backslashes (/). Spaces are not allowed.
               </span>,
+              <span key="4">
+                The maximum number of samples accommodated per upload is 500.
+              </span>,
             ]}
           />
         )}
@@ -172,7 +177,7 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
                 isRounded
                 color="primary"
                 variant="contained"
-                disabled={!hasSamples(samples)}
+                disabled={!hasSamples(samples) || tooManySamples}
               >
                 Continue
               </StyledButton>

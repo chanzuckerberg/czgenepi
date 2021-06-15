@@ -34,7 +34,12 @@ export async function handleFiles(
         ];
       })
     );
-
+    if (Object.keys(result).length > 500) {
+      finalErrors = {
+        ...finalErrors,
+        [ERROR_CODE.OVER_MAX_SAMPLES]: [file.name],
+      };
+    }
     finalResult = { ...finalResult, ...samplesWithFilename };
     finalErrors = deepmerge(finalErrors, errors);
   }

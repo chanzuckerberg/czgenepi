@@ -16,6 +16,8 @@ const ERROR_CODE_MESSAGES: Record<ERROR_CODE, string> = {
   [ERROR_CODE.INVALID_NAME]:
     "File or Sample Private ID did not meet our requirements, please update and retry. File and sample names must be no longer than 120 characters and can only contain letters from the English alphabet (A-Z, upper and lower case), numbers (0-9), periods (.), hyphens (-), underscores (_), and backslashes (/). Spaces are not allowed.  ",
   [ERROR_CODE.MISSING_FIELD]: "placeholder",
+  [ERROR_CODE.OVER_MAX_SAMPLES]:
+    "This file contains more than 500 samples, which exceeds the maximum for each upload process. Please limit the samples to 500 or less",
 };
 
 interface Props {
