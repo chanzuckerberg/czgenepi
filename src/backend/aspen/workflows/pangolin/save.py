@@ -15,7 +15,7 @@ from aspen.database.connection import (
 from aspen.database.models import PathogenGenome, UploadedPathogenGenome
 
 
-def get_probability(row) -> int:
+def get_probability(row: dict) -> Union[int, None]:
     """
     Estimate confidence percentage based on the `ambiguity_score`.
     Per pangolin docs, this is basically the number of lineage-defining sites
