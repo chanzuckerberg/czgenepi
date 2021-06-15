@@ -42,12 +42,16 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
   const [fileCount, setFileCount] = useState(0);
   const [showInstructions, setShowInstructions] = useState(true);
   const [isLoadingFile, setIsLoadingFile] = useState(false);
+  const [tooManySamples, setTooManySamples] = useState(false);
 
   useEffect(() => {
     if (samples) {
       const counts = getUploadCounts(samples);
       setSampleCount(counts.sampleCount);
       setFileCount(counts.fileCount);
+      if (Object.keys(samples).length > 500) {
+        setTooManySamples(true);
+      }
     }
   }, [samples]);
 
@@ -175,7 +179,7 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
                 isRounded
                 color="primary"
                 variant="contained"
-                disabled={!hasSamples(samples)}
+                disabled={!hasSamples(samples) || tooManySamples}
               >
                 Continue
               </StyledButton>
