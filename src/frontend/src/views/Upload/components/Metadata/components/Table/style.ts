@@ -50,7 +50,7 @@ export const IsPrivateTableCell = styled(StyledTableCell)`
     const spacings = getSpacings(props);
 
     return `
-      padding: ${spacings?.l}px 0;
+      padding: ${spacings?.l}px ${spacings?.l}px;
       border-left: solid 2px ${colors?.gray[200]};
       border-right: solid 2px ${colors?.gray[200]};
     `;
