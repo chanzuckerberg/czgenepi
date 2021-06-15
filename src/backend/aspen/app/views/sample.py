@@ -275,6 +275,12 @@ def create_sample():
         )
         request_data = request.get_json()
 
+        already_exists = api_utils.check_duplicate_samples(request_data, db_session)
+        if already_exists:
+            return Response(
+                f"Duplicate fields found in db private_identifiers {already_exists['existing_private_ids']} and public_identifiers: private_identifiers {already_exists['existing_public_ids']}",
+                400,
+            )
         for data in request_data:
             data_ok: bool
             missing_fields: Optional[list[str]]

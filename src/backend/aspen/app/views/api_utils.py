@@ -5,7 +5,7 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.query import Query
 from sqlalchemy.orm.session import Session
 
-from aspen.database.models.usergroup import User
+from aspen.database.models import Sample, User
 
 
 def filter_usergroup_dict(
@@ -41,6 +41,35 @@ def format_sequencing_date(dt: str, format="%Y-%m-%d") -> str:
     if dt == "":
         return None
     return datetime.datetime.strptime(dt, format)
+
+
+def check_duplicate_samples(data: Mapping, session):
+    private_ids = []
+    public_ids = []
+
+    for d in data:
+        private_ids.append(d["sample"]["private_identifier"])
+        if "public_identifier" in d["sample"].keys():
+            public_ids.append(d["sample"]["public_identifier"])
+
+    existing_private_ids = [
+        i.private_identifier
+        for i in session.query(Sample)
+        .filter(Sample.private_identifier.in_(private_ids))
+        .all()
+    ]
+    existing_public_ids = [
+        i.public_identifier
+        for i in session.query(Sample)
+        .filter(Sample.public_identifier.in_(public_ids))
+        .all()
+    ]
+
+    if existing_private_ids or existing_public_ids:
+        return {
+            "existing_private_ids": existing_private_ids,
+            "existing_public_ids": existing_public_ids,
+        }
 
 
 def check_data(

@@ -757,6 +757,59 @@ def test_samples_create_view_pass_no_sequencing_date(
     assert sample_1.uploaded_pathogen_genome.num_missing_alleles == 1
 
 
+def test_samples_create_view_fail_duplicate_ids(
+    session,
+    app,
+    client,
+):
+    group = group_factory()
+    user = user_factory(group)
+    session.add(group)
+    sample = sample_factory(
+        group, user, private_identifier="private", public_identifier="public"
+    )
+    session.add(sample)
+    session.commit()
+    with client.session_transaction() as sess:
+        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
+
+    data = [
+        {
+            "sample": {
+                "private_identifier": "private",
+                "public_identifier": "public",
+                "collection_date": api_utils.format_date(datetime.datetime.now()),
+                "location": "Ventura County",
+                "private": True,
+            },
+            "pathogen_genome": {
+                "sequence": "AAAAAXNTCG",
+                "sequencing_date": "",
+                "isl_access_number": "test_accession_number",
+            },
+        },
+        {
+            "sample": {
+                "private_identifier": "private",
+                "collection_date": api_utils.format_date(datetime.datetime.now()),
+                "location": "Ventura County",
+                "private": True,
+            },
+            "pathogen_genome": {
+                "sequence": "AACTGTNNNN",
+                "sequencing_date": "",
+                "isl_access_number": "test_accession_number2",
+            },
+        },
+    ]
+    res = client.post("/api/samples/create", json=data, content_type="application/json")
+    assert res.status == "400 BAD REQUEST"
+    assert (
+        res.get_data()
+        == b"Duplicate fields found in db private_identifiers ['private'] and public_identifiers: private_identifiers ['public']"
+    )
+
+
 def test_samples_create_view_fail_missing_required_fields(
     session,
     app,
