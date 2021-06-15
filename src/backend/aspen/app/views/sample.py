@@ -1,6 +1,6 @@
 import datetime
 from collections import defaultdict
-from typing import Any, Mapping, MutableSequence, Optional, Sequence, Set
+from typing import Any, Mapping, MutableSequence, Optional, Sequence, Set, Union
 
 from flask import jsonify, request, Response, session
 from sqlalchemy import or_
@@ -275,7 +275,9 @@ def create_sample():
         )
         request_data = request.get_json()
 
-        already_exists = api_utils.check_duplicate_samples(request_data, db_session)
+        already_exists: Union[
+            None, Mapping[str, list[str]]
+        ] = api_utils.check_duplicate_samples(request_data, db_session)
         if already_exists:
             return Response(
                 f"Duplicate fields found in db private_identifiers {already_exists['existing_private_ids']} and public_identifiers: private_identifiers {already_exists['existing_public_ids']}",

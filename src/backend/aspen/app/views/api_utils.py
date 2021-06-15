@@ -45,22 +45,24 @@ def format_sequencing_date(
     return datetime.datetime.strptime(dt, format)
 
 
-def check_duplicate_samples(data: Mapping, session):
-    private_ids = []
-    public_ids = []
+def check_duplicate_samples(
+    data: Mapping, session
+) -> Union[None, Mapping[str, list[str]]]:
+    private_ids: list = []
+    public_ids: list = []
 
     for d in data:
         private_ids.append(d["sample"]["private_identifier"])
         if "public_identifier" in d["sample"].keys():
             public_ids.append(d["sample"]["public_identifier"])
 
-    existing_private_ids = [
+    existing_private_ids: list[str] = [
         i.private_identifier
         for i in session.query(Sample)
         .filter(Sample.private_identifier.in_(private_ids))
         .all()
     ]
-    existing_public_ids = [
+    existing_public_ids: list[str] = [
         i.public_identifier
         for i in session.query(Sample)
         .filter(Sample.public_identifier.in_(public_ids))
@@ -72,6 +74,8 @@ def check_duplicate_samples(data: Mapping, session):
             "existing_private_ids": existing_private_ids,
             "existing_public_ids": existing_public_ids,
         }
+
+    return None
 
 
 def check_data(
