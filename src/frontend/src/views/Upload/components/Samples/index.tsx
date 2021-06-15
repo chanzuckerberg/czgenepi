@@ -2,50 +2,65 @@ import { Close } from "@material-ui/icons";
 import { Button } from "czifui";
 import Head from "next/head";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ROUTES } from "src/common/routes";
 import AlertAccordion from "src/components/AlertAccordion";
-import FilePicker from "src/components/FilePicker";
-import Instructions from "src/components/Instructions";
 import Progress from "../common/Progress";
-import { Content, Header, Title } from "../common/style";
-import { ParseErrors, Props, Samples as ISamples } from "../common/types";
-import { handleFiles } from "./utils";
+import {
+  ButtonWrapper,
+  Content,
+  Header,
+  StyledInstructions,
+  Subtitle,
+  Title,
+} from "../common/style";
+import { ParseErrors, Props } from "../common/types";
+import AlertTable from "./components/AlertTable";
+import Table from "./components/Table";
+import {
+  ContentWrapper,
+  SemiBold,
+  StyledButton,
+  StyledContainerLeft,
+  StyledContainerSpaceBetween,
+  StyledFilePicker,
+  StyledInstructionsButton,
+  StyledRemoveAllButton,
+  StyledTitle,
+  StyledUploadCount,
+} from "./style";
+import {
+  getUploadCounts,
+  handleFiles,
+  hasSamples,
+  removeSamplesFromTheSameFiles,
+} from "./utils";
 
 export default function Samples({ samples, setSamples }: Props): JSX.Element {
   const [parseErrors, setParseErrors] = useState<ParseErrors | null>(null);
+  const [sampleCount, setSampleCount] = useState<number>(0);
+  const [fileCount, setFileCount] = useState<number>(0);
+  const [showInstructions, setShowInstructions] = useState<boolean>(true);
 
-  // DEBUG
-  // DEBUG
-  // DEBUG
-  // eslint-disable-next-line no-console
-  console.log(
-    "--------->current samples in React state",
-    JSON.stringify(samples)
-  );
+  useEffect(() => {
+    if (samples) {
+      const counts = getUploadCounts(samples);
+      setSampleCount(counts.sampleCount);
+      setFileCount(counts.fileCount);
+    }
+  }, [samples]);
 
   const handleFileChange = async (files: FileList | null) => {
     if (!files) return;
 
     const { result, errors } = await handleFiles(files);
 
-    // DEBUG
-    // DEBUG
-    // DEBUG
-    // (thuang): This is for you to see the parsed JS object in the console!
-    // eslint-disable-next-line no-console
-    console.log("@@@@@@@@@@@@ parsed result", result);
-    // eslint-disable-next-line no-console
-    console.log("@@@@@@@@@@@@ parsed errors", errors);
-    // eslint-disable-next-line no-console
-    console.log("-----Object.keys(result)", Object.keys(result));
-    // eslint-disable-next-line no-console
-    console.log("-----Object.keys(result).length", Object.keys(result).length);
-
     setSamples({
       ...removeSamplesFromTheSameFiles(samples, result),
       ...result,
     });
+
+    if (Object.keys(errors).length === 0) return;
 
     setParseErrors(errors);
   };
@@ -55,43 +70,105 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
     setParseErrors(null);
   };
 
+  const handleInstructionsClick = () => {
+    setShowInstructions(!showInstructions);
+  };
+
   return (
     <>
       <Head>
         <title>Aspen | Upload Sample</title>
       </Head>
       <Header>
-        <Title>Step 1</Title>
+        <div>
+          <Title>Upload Samples</Title>
+          <Subtitle>
+            We&apos;ll start with selecting samples from your consensus genome
+            files.
+          </Subtitle>
+        </div>
         <Progress step="1" />
       </Header>
       <Content>
-        <Instructions title="File instructions" items={["a", "b", "c"]} />
-        <FilePicker
-          text="Select Fasta Files"
-          multiple
-          handleFiles={handleFileChange}
-          accept=".fasta,.fa,.gz,.zip"
-        />
-        <Button
-          color="primary"
-          variant="text"
-          onClick={handleRemoveAllClick}
-          startIcon={<Close />}
-        >
-          REMOVE ALL
-        </Button>
-        <AlertAccordion
-          severity="error"
-          title="Some of your files could not be uploaded."
-          message={"Error table component here: " + JSON.stringify(parseErrors)}
-        />
+        <StyledContainerLeft>
+          <StyledTitle>Select SARS-CoV-2 Consensus Genome Files</StyledTitle>
+          <StyledInstructionsButton
+            color="primary"
+            onClick={handleInstructionsClick}
+          >
+            {showInstructions ? "LESS" : "MORE"} INFO
+          </StyledInstructionsButton>
+        </StyledContainerLeft>
+        {showInstructions && (
+          <StyledInstructions
+            title="File instructions"
+            items={[
+              <span key="1">
+                <SemiBold>
+                  Do not include any PII in the Sample name or file name.
+                </SemiBold>{" "}
+                Your sample name should be the sample&apos;s Private ID.
+              </span>,
+              <span key="2">
+                Accepted file formats: fasta (.fa or .fasta), fasta.gz (.fa.gz),
+                fasta.zip
+              </span>,
+              <span key="3">
+                File and sample names must be no longer than 120 characters and
+                can only contain letters from the English alphabet (A-Z, upper
+                and lower case), numbers (0-9), periods (.), hyphens (-),
+                underscores (_), and backslashes (/). Spaces are not allowed.
+              </span>,
+            ]}
+          />
+        )}
+        <ContentWrapper>
+          <StyledFilePicker
+            text="Select Fasta Files"
+            multiple
+            handleFiles={handleFileChange}
+            accept=".fasta,.fa,.gz,.zip"
+          />
+          {parseErrors && (
+            <AlertAccordion
+              severity="error"
+              title="Some of your files could not be uploaded."
+              message={<AlertTable parseErrors={parseErrors} />}
+            />
+          )}
+          {samples && (
+            <>
+              <StyledContainerSpaceBetween>
+                <StyledUploadCount>
+                  {fileCount} {fileCount > 1 ? "files" : "file"} imported, with{" "}
+                  {sampleCount} {sampleCount > 1 ? "samples" : "sample"}{" "}
+                  selected for upload
+                </StyledUploadCount>
+                <StyledRemoveAllButton
+                  color="primary"
+                  variant="text"
+                  onClick={handleRemoveAllClick}
+                  startIcon={<Close />}
+                >
+                  REMOVE ALL
+                </StyledRemoveAllButton>
+              </StyledContainerSpaceBetween>
+              <Table samples={samples} />
+            </>
+          )}
+        </ContentWrapper>
 
-        <div>
+        <ButtonWrapper>
           <Link href={ROUTES.UPLOAD_STEP2} passHref>
             <a href="passHref">
-              <Button isRounded color="primary" variant="contained">
+              <StyledButton
+                isRounded
+                color="primary"
+                variant="contained"
+                disabled={!hasSamples(samples)}
+              >
                 Continue
-              </Button>
+              </StyledButton>
             </a>
           </Link>
           <Link href={ROUTES.DATA_SAMPLES} passHref>
@@ -101,28 +178,8 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
               </Button>
             </a>
           </Link>
-        </div>
+        </ButtonWrapper>
       </Content>
     </>
   );
-}
-
-function removeSamplesFromTheSameFiles(
-  samples: ISamples | null,
-  newSamples: ISamples
-) {
-  if (!samples) return samples;
-
-  const newFiles = new Set(
-    Object.values(newSamples).map((sample) => sample.filename)
-  );
-
-  const result: ISamples = {};
-
-  for (const [id, sample] of Object.entries(samples)) {
-    if (newFiles.has(sample.filename)) continue;
-    result[id] = sample;
-  }
-
-  return result;
 }

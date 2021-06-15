@@ -8,7 +8,7 @@ export interface Sample {
 
 export type Samples = Record<string, Sample>;
 
-export type ParseErrors = Record<number, string[]>;
+export type ParseErrors = Record<string, string[]>;
 
 export interface ParseOutcomeWithFilenames {
   result: Samples;
@@ -29,9 +29,19 @@ export enum WARNING_CODE {
 }
 
 export enum ERROR_CODE {
-  DEFAULT,
+  DEFAULT, // BAD FILE NAME
   INVALID_NAME,
   MISSING_FIELD,
+}
+
+export interface DEFAULT {
+  code: 1;
+  message: "test message";
+}
+
+export interface INVALID_NAME {
+  code: 2;
+  message: "test message invalid name";
 }
 
 export interface ErrorCode {

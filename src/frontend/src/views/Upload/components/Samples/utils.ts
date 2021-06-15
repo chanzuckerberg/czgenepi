@@ -15,7 +15,7 @@ export async function handleFiles(
   files: FileList
 ): Promise<ParseOutcomeWithFilenames> {
   let finalResult: Samples = {};
-  let finalErrors: ParseErrors = {};
+  let finalErrors = {} as ParseErrors;
 
   for (const file of Array.from(files)) {
     const { result, errors } = await handleFile(
@@ -55,20 +55,24 @@ export async function handleFile(
   }
 
   if (filename.includes(".gz")) {
-    return handleGz(file);
+    return handleGz(file, filename);
   }
 
   if (filename.includes(".fasta") || filename.includes(".fa")) {
-    return handleFastaText(await strFromU8(file));
+    return handleFastaText(await strFromU8(file), filename);
   }
 
+  // Encountered unexpected file extension
   return { errors: { [ERROR_CODE.DEFAULT]: [filename] }, result: {} };
 }
 
-async function handleGz(file: Uint8Array): Promise<ParseOutcome> {
+async function handleGz(
+  file: Uint8Array,
+  filename: string
+): Promise<ParseOutcome> {
   return new Promise((resolve) => {
     gunzip(file, (_, data) => {
-      resolve(handleFastaText(strFromU8(data)));
+      resolve(handleFastaText(strFromU8(data), filename));
     });
   });
 }
@@ -93,7 +97,7 @@ async function handleZip(file: Uint8Array): Promise<ParseOutcome> {
  * (thuang): Use two pointers to convert Fasta text into
  * a map with sample id as key and sequence as value in O(N)
  */
-function handleFastaText(text: string): ParseOutcome {
+function handleFastaText(text: string, filename: string): ParseOutcome {
   // (thuang): Take different operating systems into account
   //  https://stackoverflow.com/a/45709854
   const lines = text.split(/\r?\n/);
@@ -116,7 +120,7 @@ function handleFastaText(text: string): ParseOutcome {
         ...errors,
         [ERROR_CODE.INVALID_NAME]: [
           ...(errors[ERROR_CODE.INVALID_NAME] || []),
-          iLine,
+          filename,
         ],
       };
 
@@ -166,4 +170,42 @@ function unzipToFiles(file: Uint8Array): Promise<Record<string, Uint8Array>> {
       resolve(validFiles);
     });
   });
+}
+
+export function getUploadCounts(samples: Samples): {
+  sampleCount: number;
+  fileCount: number;
+} {
+  const numSamples: number = Object.keys(samples).length;
+  const uniqueFiles = new Set();
+  Object.values(samples).forEach((entry) => {
+    uniqueFiles.add(entry.filename);
+  });
+  return { fileCount: uniqueFiles.size, sampleCount: numSamples };
+}
+
+export function removeSamplesFromTheSameFiles(
+  samples: Samples | null,
+  newSamples: Samples
+): Samples | null {
+  if (!samples) return samples;
+
+  const newFiles = new Set(
+    Object.values(newSamples).map((sample) => sample.filename)
+  );
+
+  const result: Samples = {};
+
+  for (const [id, sample] of Object.entries(samples)) {
+    if (newFiles.has(sample.filename)) continue;
+    result[id] = sample;
+  }
+
+  return result;
+}
+
+export function hasSamples(samples: Samples | null): boolean {
+  if (!samples) return false;
+
+  return Object.keys(samples).length > 0;
 }

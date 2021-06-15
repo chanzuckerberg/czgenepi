@@ -11,11 +11,18 @@ import {
   WARNING_CODE,
 } from "src/views/Upload/components/common/types";
 import Progress from "../common/Progress";
-import { Content, Header, Subtitle, Title } from "../common/style";
+import {
+  ButtonWrapper,
+  Content,
+  Header,
+  StyledInstructions,
+  Subtitle,
+  Title,
+} from "../common/style";
 import ImportFile from "./components/ImportFile";
 import { ParseResult } from "./components/ImportFile/parseFile";
 import Table from "./components/Table";
-import { ButtonWrapper, ContinueButton, StyledInstructions } from "./style";
+import { ContinueButton } from "./style";
 
 export const EMPTY_METADATA: IMetadata = {
   collectionDate: "",
