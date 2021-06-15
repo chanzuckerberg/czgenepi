@@ -37,7 +37,9 @@ def format_datetime(dt: Optional[datetime.datetime], format="%Y-%m-%d %I:%M%p") 
         return "N/A"
 
 
-def format_sequencing_date(dt: str, format="%Y-%m-%d") -> str:
+def format_sequencing_date(
+    dt: str, format="%Y-%m-%d"
+) -> Union[None, datetime.datetime]:
     if dt == "":
         return None
     return datetime.datetime.strptime(dt, format)

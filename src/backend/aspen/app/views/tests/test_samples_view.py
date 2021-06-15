@@ -724,7 +724,7 @@ def test_samples_create_view_pass_no_sequencing_date(
             },
             "pathogen_genome": {
                 "sequence": "AACTGTNNNN",
-                "sequencing_date": "",
+                "sequencing_date": "2021-06-15",
                 "isl_access_number": "test_accession_number2",
             },
         },
