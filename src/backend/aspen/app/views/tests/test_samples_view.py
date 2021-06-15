@@ -806,7 +806,7 @@ def test_samples_create_view_fail_duplicate_ids(
     assert res.status == "400 BAD REQUEST"
     assert (
         res.get_data()
-        == b"Duplicate fields found in db private_identifiers ['private'] and public_identifiers: private_identifiers ['public']"
+        == b"Duplicate fields found in db private_identifiers ['private'] and public_identifiers: ['public']"
     )
 
 
