@@ -130,12 +130,12 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
             accept=".fasta,.fa,.gz,.zip"
           />
           {parseErrors && (
-          <AlertAccordion
-            severity="error"
-            title="Some of your files could not be uploaded."
-            message={<AlertTable parseErrors={parseErrors} />}
-          />
-        )}
+            <AlertAccordion
+              severity="error"
+              title="Some of your files could not be uploaded."
+              message={<AlertTable parseErrors={parseErrors} />}
+            />
+          )}
           {samples && (
             <>
               <StyledContainerSpaceBetween>
