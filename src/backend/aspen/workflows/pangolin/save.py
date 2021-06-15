@@ -23,7 +23,7 @@ def get_probability(row) -> int:
     Round and multiply by 100 --> percentage for easier user comprehension.
     """
     if row["ambiguity_score"] != "":
-        return round(ambiguity_score * 100)
+        return round(row["ambiguity_score"] * 100)
     elif "Assigned using designation hash" in row["note"]:
         return 100
     else:
