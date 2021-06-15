@@ -1,5 +1,20 @@
 import styled from "@emotion/styled";
-import { fontBodyS, fontHeaderXxl, getColors, getSpacings } from "czifui";
+import {
+  fontBodyS,
+  fontHeaderXxl,
+  getColors,
+  getSpacings,
+  Props,
+} from "czifui";
+import Instructions from "src/components/Instructions";
+
+export function marginBottom(props: Props): string {
+  const spacings = getSpacings(props);
+
+  return `
+      margin-bottom: ${spacings?.xl}px;
+    `;
+}
 
 export const Header = styled.div`
   display: flex;
@@ -35,4 +50,12 @@ export const Title = styled.div`
 
 export const Subtitle = styled.div`
   ${fontBodyS}
+`;
+
+export const ButtonWrapper = styled.div`
+  ${marginBottom}
+`;
+
+export const StyledInstructions = styled(Instructions)`
+  ${marginBottom}
 `;
