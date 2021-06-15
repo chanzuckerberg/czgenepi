@@ -308,7 +308,9 @@ def create_sample():
                     UploadedPathogenGenome(
                         sample=sample,
                         sequence=data["pathogen_genome"]["sequence"],
-                        sequencing_date=data["pathogen_genome"]["sequencing_date"],
+                        sequencing_date=api_utils.format_sequencing_date(
+                            data["pathogen_genome"]["sequencing_date"]
+                        ),
                     )
                 )
                 if "isl_access_number" in data["pathogen_genome"]:

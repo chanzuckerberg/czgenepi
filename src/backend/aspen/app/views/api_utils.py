@@ -37,6 +37,12 @@ def format_datetime(dt: Optional[datetime.datetime], format="%Y-%m-%d %I:%M%p") 
         return "N/A"
 
 
+def format_sequencing_date(dt: str, format="%Y-%m-%d") -> str:
+    if dt == "":
+        return None
+    return datetime.datetime.strptime(dt, format)
+
+
 def check_data(
     sample_fields: list[str],
     pathogen_genome_fields: list[str],
