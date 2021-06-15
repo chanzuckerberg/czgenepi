@@ -1,5 +1,5 @@
 import { Button } from "czifui";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import FilePicker from "src/components/FilePicker";
 import {
@@ -22,8 +22,6 @@ interface Props {
   samples: CommonProps["samples"];
 }
 
-export type Warnings = ParseResult["warningMessages"];
-
 export default function ImportFile({
   handleMetadata,
   samples,
@@ -33,6 +31,27 @@ export default function ImportFile({
   const [missingFields, setMissingFields] = useState<string[]>([]);
   const [autocorrectCount, setAutocorrectCount] = useState<number>(0);
   const [filename, setFilename] = useState("");
+  const [parseResult, setParseResult] = useState<ParseResult | null>(null);
+  const [unusedSampleIds, setUnusedSampleIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!parseResult) return;
+
+    const { data } = parseResult;
+
+    const parseResultSampleIds = new Set(Object.keys(data));
+    const sampleIds = new Set(Object.keys(samples || EMPTY_OBJECT));
+
+    const unusedSampleIds = [];
+
+    for (const parseResultSampleId of parseResultSampleIds) {
+      if (sampleIds.has(parseResultSampleId)) continue;
+
+      unusedSampleIds.push(parseResultSampleId);
+    }
+
+    setUnusedSampleIds(unusedSampleIds);
+  }, [parseResult]);
 
   const handleInstructionsClick = () => {
     setIsInstructionsShown(!isInstructionsShown);
@@ -56,6 +75,7 @@ export default function ImportFile({
     setMissingFields(missingFields);
     setAutocorrectCount(autocorrectCount);
     setFilename(filename);
+    setParseResult(result);
 
     handleMetadata(result);
   };
@@ -92,7 +112,9 @@ export default function ImportFile({
         />
       </div>
 
-      <RenderOrNull condition={hasImportedFile}>
+      <RenderOrNull
+        condition={hasImportedFile && !isParseResultCompletelyUnused}
+      >
         <Success filename={filename} />
       </RenderOrNull>
 
@@ -102,6 +124,10 @@ export default function ImportFile({
 
       <RenderOrNull condition={autocorrectCount}>
         <Warning sampleCount={autocorrectCount} />
+      </RenderOrNull>
+
+      <RenderOrNull condition={unusedSampleIds.length}>
+        <Warning unusedSampleIds={unusedSampleIds} />
       </RenderOrNull>
     </Wrapper>
   );
@@ -153,4 +179,13 @@ function RenderOrNull({
   if (!condition) return null;
 
   return <>{children}</>;
+}
+
+function isParseResultCompletelyUnused(
+  unusedSampleIds: string[],
+  parseResult: ParseResult
+) {
+  const { data } = parseResult;
+
+  return unusedSampleIds.length === Object.keys(data).length;
 }
