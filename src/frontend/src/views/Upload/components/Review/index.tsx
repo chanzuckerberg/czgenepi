@@ -1,6 +1,6 @@
-import { Button, Checkbox } from "czifui";
+import { Button, Checkbox, Link } from "czifui";
 import Head from "next/head";
-import Link from "next/link";
+import NextLink from "next/link";
 import React, { useState } from "react";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { useUserInfo } from "src/common/queries/auth";
@@ -27,7 +27,6 @@ import {
 export default function Review({ samples, metadata }: Props): JSX.Element {
   const { data } = useUserInfo();
   const [isConsentChecked, setIsConsentChecked] = useState(false);
-  const [isPublicChecked, setIsPublicChecked] = useState(false);
 
   const group = data?.group;
 
@@ -35,10 +34,6 @@ export default function Review({ samples, metadata }: Props): JSX.Element {
 
   function handleConsentCheck() {
     setIsConsentChecked((prevState: boolean) => !prevState);
-  }
-
-  function handlePublicCheck() {
-    setIsPublicChecked((prevState: boolean) => !prevState);
   }
 
   return (
@@ -59,40 +54,45 @@ export default function Review({ samples, metadata }: Props): JSX.Element {
       <Content>
         <ContentTitleWrapper>
           <ContentTitle>Sample Info</ContentTitle>
-          <Link href={ROUTES.UPLOAD_STEP1} passHref>
+          <NextLink href={ROUTES.UPLOAD_STEP1} passHref>
             <a href="passHref">
               <Button color="primary" variant="text">
                 Edit Samples
               </Button>
             </a>
-          </Link>
-          <Link href={ROUTES.UPLOAD_STEP2} passHref>
+          </NextLink>
+          <NextLink href={ROUTES.UPLOAD_STEP2} passHref>
             <a href="passHref">
               <Button color="primary" variant="text">
                 Edit Metadata
               </Button>
             </a>
-          </Link>
+          </NextLink>
         </ContentTitleWrapper>
 
         <Table metadata={metadata} />
 
         <CheckboxWrapper>
           <CheckboxText onClick={handleConsentCheck}>
-            <Checkbox checked={isConsentChecked} color="primary" />I agree that
-            the data I am uploading to Aspen has been lawfully collected and
-            that I have all the necessary consents, permissions, and
-            authorizations needed to collect, share and export data as outlined
-            in the Terms and Data Privacy Notice. I have reviewed the data that
-            I am uploading and can confirm that I am not uploading any
-            personally identifiable information.
-          </CheckboxText>
-
-          <CheckboxText onClick={handlePublicCheck}>
-            <Checkbox checked={isPublicChecked} color="primary" />I understand
-            that samples marked Public will be shared with California Department
-            of Health on Aspen and that sharing samples on Aspen does not
-            satisfy CDPH reporting requirements.
+            <Checkbox checked={isConsentChecked} color="primary" />
+            <span>
+              I agree that the data I am uploading to Aspen has been lawfully
+              collected and that I have all the necessary consents, permissions,
+              and authorizations needed to collect, share and export data as
+              outlined in the{" "}
+              <Link href={ROUTES.TERMS} target="_blank" rel="noopener">
+                Terms
+              </Link>{" "}
+              and{" "}
+              <Link href={ROUTES.PRIVACY} target="_blank" rel="noopener">
+                Privacy Policy
+              </Link>
+              . I have reviewed the data that I am uploading and can confirm
+              that I am not uploading any personally identifiable information. I
+              understand that samples marked Public will be shared with
+              California Department of Health on Aspen and that sharing samples
+              on Aspen does not satisfy CDPH reporting requirements.
+            </span>
           </CheckboxText>
         </CheckboxWrapper>
 
@@ -100,15 +100,15 @@ export default function Review({ samples, metadata }: Props): JSX.Element {
           <Upload
             samples={samples}
             metadata={metadata}
-            isDisabled={!isConsentChecked || !isPublicChecked}
+            isDisabled={!isConsentChecked}
           />
-          <Link href={ROUTES.UPLOAD_STEP2} passHref>
+          <NextLink href={ROUTES.UPLOAD_STEP2} passHref>
             <a href="passHref">
               <Button isRounded color="primary" variant="outlined">
                 Back
               </Button>
             </a>
-          </Link>
+          </NextLink>
         </ButtonWrapper>
       </Content>
     </>
