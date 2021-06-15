@@ -1,4 +1,6 @@
 inputs:
+##TODO: should move gisaid samples that match the county over & split this by
+## "in jurisdiction" and "not in jurisdiction"
   - name: "gisaid"
     metadata: "data/metadata_gisaid.tsv"
     sequences: "data/sequences_gisaid.fasta"
@@ -15,10 +17,6 @@ builds:
     subsampling_scheme: group_only
     title: '{location}, {division}'
 
-## custom rules
-custom_rules:
-  - nextstrain_profiles/nextstrain/subsampling_ranges.smk
-
 ## Auxiliary files
 files:
   lat_longs: "my_profiles/aspen/lat_longs.tsv"
@@ -34,12 +32,9 @@ refine:
 # Sampling groups that end with an `_early` suffix will omit data from the last 18 weeks.  Sampling groups that end with a `_late` suffix will only consider data from the last 18 weeks.
 subsampling:
   group_only:
-    group_early:
-      group_by: "year month"
-      max_sequences: 500
-      query: --query "(location == '{{location}}') & (division == '{{division}}')"
-
-    group_late:
-      group_by: "year month"
-      max_sequences: 2000
-      query: --query "(location == '{{location}}') & (division == '{{division}}')"
+    group_by: "region" ## NOTE: this shouldn't do anything, but have to include the arg to trigger priority-based subsampling (old augur quirk)
+    max_sequences: 3000
+    query: --query "(location == '{{location}}') & (division == '{{division}}')"
+    priorities:
+      type: "file"
+      file: "my_profiles/aspen/aspen_priorities.tsv"
