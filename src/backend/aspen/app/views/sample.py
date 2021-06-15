@@ -21,11 +21,11 @@ from aspen.database.models import (
     GisaidAccession,
     GisaidAccessionWorkflow,
     HostFilteredSequencingReadsCollection,
+    PublicRepositoryType,
     Sample,
     SequencingReadsCollection,
     UploadedPathogenGenome,
     WorkflowStatusType,
-    PublicRepositoryType
 )
 from aspen.database.models.sample import RegionType
 from aspen.database.models.usergroup import Group, User
@@ -59,7 +59,7 @@ SAMPLES_POST_OPTIONAL_FIELDS = [
     # following fields from PathogenGenome
     "sequencing_date",
     "sequencing_depth",
-    "isl_access_number"
+    "isl_access_number",
 ]
 
 
@@ -304,10 +304,12 @@ def create_sample():
 
                 # have to save the objects serially due to public_id default using primary key field
                 sample: Sample = Sample(**sample_args)
-                uploaded_pathogen_genome: UploadedPathogenGenome = UploadedPathogenGenome(
-                    sample=sample,
-                    sequence=data["pathogen_genome"]["sequence"],
-                    sequencing_date=data["pathogen_genome"]["sequencing_date"]
+                uploaded_pathogen_genome: UploadedPathogenGenome = (
+                    UploadedPathogenGenome(
+                        sample=sample,
+                        sequence=data["pathogen_genome"]["sequence"],
+                        sequencing_date=data["pathogen_genome"]["sequencing_date"],
+                    )
                 )
                 if "isl_access_number" in data["pathogen_genome"]:
                     uploaded_pathogen_genome.add_accession(

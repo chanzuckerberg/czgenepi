@@ -644,7 +644,7 @@ def test_samples_create_view_pass_no_public_id(
             "pathogen_genome": {
                 "sequence": "AAAAAXNTCG",
                 "sequencing_date": api_utils.format_date(datetime.datetime.now()),
-                "isl_access_number": "test_accession_number"
+                "isl_access_number": "test_accession_number",
             },
         },
         {
@@ -657,7 +657,7 @@ def test_samples_create_view_pass_no_public_id(
             "pathogen_genome": {
                 "sequence": "AACTGTNNNN",
                 "sequencing_date": api_utils.format_date(datetime.datetime.now()),
-                "isl_access_number": "test_accession_number2"
+                "isl_access_number": "test_accession_number2",
             },
         },
     ]
