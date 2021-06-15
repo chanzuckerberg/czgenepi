@@ -225,6 +225,7 @@ def cli(
                     (pathogen_genome.entity_id, PublicRepositoryType.GENBANK), ""
                 ),
                 "date": sample.collection_date.strftime("%Y-%m-%d"),
+                "date_submitted": sample.uploaded_pathogen_genome.upload_date.strftime("%Y-%m-%d"),
                 "region": sample.region.value,
                 "country": sample.country,
                 "division": sample.division,
