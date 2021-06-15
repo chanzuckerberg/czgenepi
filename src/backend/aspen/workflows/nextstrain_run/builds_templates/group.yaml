@@ -17,7 +17,7 @@ builds:
 
 ## custom rules
 custom_rules:
-  - nextstrain_profiles/nextstrain/subsampling_ranges.smk
+  - my_profiles/aspen/subsampling_ranges.smk
 
 ## Auxiliary files
 files:
