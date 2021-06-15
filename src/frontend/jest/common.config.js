@@ -25,7 +25,4 @@ module.exports = {
   rootDir: "../",
   testMatch: ["<rootDir>/**/**/*.{spec,test}.{js,jsx,ts,tsx,scss}"],
   testPathIgnorePatterns: ["<rootDir>/node_modules/", "<rootDir>/build/"],
-  transform: {
-    "^.+\\.(tsx?|jsx?)$": `<rootDir>/jest/jest-preprocess.js`,
-  },
 };
