@@ -124,6 +124,9 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
                 and lower case), numbers (0-9), periods (.), hyphens (-),
                 underscores (_), and backslashes (/). Spaces are not allowed.
               </span>,
+              <span key="4">
+                The maximum number of samples accommodated per upload is 500.
+            </span>,
             ]}
           />
         )}
