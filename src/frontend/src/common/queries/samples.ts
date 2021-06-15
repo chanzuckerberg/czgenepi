@@ -68,5 +68,5 @@ export async function createSamples({
 
   if (response.ok) return await response.json();
 
-  throw Error(response.statusText);
+  throw Error(`${response.statusText}: ${await response.text()}`);
 }
