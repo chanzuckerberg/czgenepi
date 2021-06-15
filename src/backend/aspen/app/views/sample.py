@@ -1,6 +1,6 @@
 import datetime
 from collections import defaultdict
-from typing import Any, Mapping, MutableSequence, Optional, Sequence, Set
+from typing import Any, Mapping, MutableSequence, Optional, Sequence, Set, Union
 
 from flask import jsonify, request, Response, session
 from sqlalchemy import or_
@@ -275,6 +275,14 @@ def create_sample():
         )
         request_data = request.get_json()
 
+        already_exists: Union[
+            None, Mapping[str, list[str]]
+        ] = api_utils.check_duplicate_samples(request_data, db_session)
+        if already_exists:
+            return Response(
+                f"Duplicate fields found in db private_identifiers {already_exists['existing_private_ids']} and public_identifiers: private_identifiers {already_exists['existing_public_ids']}",
+                400,
+            )
         for data in request_data:
             data_ok: bool
             missing_fields: Optional[list[str]]
@@ -308,7 +316,9 @@ def create_sample():
                     UploadedPathogenGenome(
                         sample=sample,
                         sequence=data["pathogen_genome"]["sequence"],
-                        sequencing_date=data["pathogen_genome"]["sequencing_date"],
+                        sequencing_date=api_utils.format_sequencing_date(
+                            data["pathogen_genome"]["sequencing_date"]
+                        ),
                     )
                 )
                 if "isl_access_number" in data["pathogen_genome"]:
