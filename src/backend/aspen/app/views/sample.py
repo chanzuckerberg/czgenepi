@@ -40,7 +40,6 @@ SAMPLES_POST_REQUIRED_FIELDS = [
     "location",
     # following fields from PathogenGenome
     "sequence",
-    "sequencing_date"
 ]
 SAMPLES_POST_OPTIONAL_FIELDS = [
     "original_submission",
@@ -58,6 +57,7 @@ SAMPLES_POST_OPTIONAL_FIELDS = [
     "specimen_processing",
     "czb_failed_genome_recovery",
     # following fields from PathogenGenome
+    "sequencing_date",
     "sequencing_depth",
     "isl_access_number"
 ]
@@ -305,7 +305,9 @@ def create_sample():
                 # have to save the objects serially due to public_id default using primary key field
                 sample: Sample = Sample(**sample_args)
                 uploaded_pathogen_genome: UploadedPathogenGenome = UploadedPathogenGenome(
-                    sample=sample, **data["pathogen_genome"]
+                    sample=sample,
+                    sequence=data["pathogen_genome"]["sequence"],
+                    sequencing_date=data["pathogen_genome"]["sequencing_date"]
                 )
                 if "isl_access_number" in data["pathogen_genome"]:
                     uploaded_pathogen_genome.add_accession(
