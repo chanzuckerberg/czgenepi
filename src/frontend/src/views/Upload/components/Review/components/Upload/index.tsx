@@ -70,18 +70,20 @@ export default function Upload({
               {getPrimaryButtonText()}
             </Button>
           </PrimaryButtonWrapper>
-          <NextLink href={ROUTES.DATA_SAMPLES} passHref>
-            <a href="passRef">
-              <Button
-                color="primary"
-                variant="outlined"
-                isRounded
-                onClick={handleClose}
-              >
-                Cancel
-              </Button>
-            </a>
-          </NextLink>
+          {!isSuccess && (
+            <NextLink href={ROUTES.DATA_SAMPLES} passHref>
+              <a href="passRef">
+                <Button
+                  color="primary"
+                  variant="outlined"
+                  isRounded
+                  onClick={handleClose}
+                >
+                  Cancel
+                </Button>
+              </a>
+            </NextLink>
+          )}
         </StyledDialogActions>
       </Dialog>
 
