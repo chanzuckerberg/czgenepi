@@ -643,7 +643,7 @@ def test_samples_create_view_pass_no_public_id(
                 "private": True,
             },
             "pathogen_genome": {
-                "sequence": "AAAAAXNTCG",
+                "sequence": "AAAKAANTCG",
                 "sequencing_date": api_utils.format_date(datetime.datetime.now()),
                 "isl_access_number": "test_accession_number",
             },
@@ -716,7 +716,7 @@ def test_samples_create_view_pass_no_sequencing_date(
                 "private": True,
             },
             "pathogen_genome": {
-                "sequence": "AAAAAXNTCG",
+                "sequence": "AAAKAANTCG",
                 "sequencing_date": "",
                 "isl_access_number": "test_accession_number",
             },
@@ -730,7 +730,7 @@ def test_samples_create_view_pass_no_sequencing_date(
                 "private": True,
             },
             "pathogen_genome": {
-                "sequence": "AACTGTNNNN",
+                "sequence": "AACTKGTNNNN",
                 "sequencing_date": "2021-06-15",
                 "isl_access_number": "test_accession_number2",
             },
@@ -765,6 +765,42 @@ def test_samples_create_view_pass_no_sequencing_date(
     assert sample_1.uploaded_pathogen_genome.num_mixed == 1
     assert sample_1.uploaded_pathogen_genome.num_unambiguous_sites == 8
     assert sample_1.uploaded_pathogen_genome.num_missing_alleles == 1
+
+
+def test_samples_create_view_invalid_sequence(
+    session,
+    app,
+    client,
+):
+    group = group_factory()
+    user = user_factory(group)
+    session.add(group)
+    session.commit()
+    with client.session_transaction() as sess:
+        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
+
+    data = [
+        {
+            "sample": {
+                "private_identifier": "private",
+                "public_identifier": "",
+                "collection_date": api_utils.format_date(datetime.datetime.now()),
+                "location": "Ventura County",
+                "private": True,
+            },
+            "pathogen_genome": {
+                "sequence": "123456",
+                "sequencing_date": "",
+                "isl_access_number": "test_accession_number",
+            },
+        },
+    ]
+    res = client.post("/api/samples/create", json=data, content_type="application/json")
+    assert res.status == "400 BAD REQUEST"
+    assert (
+        res.get_data() == b"Sample private contains invalid sequence characters,"
+        b" accepted characters are [WSKMYRVHDBNZNATCGU-]"
+    )
 
 
 def test_samples_create_view_fail_duplicate_ids(

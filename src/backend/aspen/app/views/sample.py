@@ -8,7 +8,7 @@ from sqlalchemy.orm import joinedload
 
 from aspen.app.app import application, requires_auth
 from aspen.app.views import api_utils
-from aspen.app.views.api_utils import get_usergroup_query
+from aspen.app.views.api_utils import check_valid_sequence, get_usergroup_query
 from aspen.database.connection import session_scope
 from aspen.database.models import (
     AlignRead,
@@ -340,6 +340,15 @@ def create_sample():
                     ]
 
                 sample: Sample = Sample(**sample_args)
+                # check that pathogen_genome sequence has only valid characters
+                sequence = data["pathogen_genome"]["sequence"]
+                if not check_valid_sequence(sequence):
+                    return Response(
+                        f"Sample {sample.private_identifier} contains invalid sequence characters, "
+                        f"accepted characters are [WSKMYRVHDBNZNATCGU-]",
+                        400,
+                    )
+
                 uploaded_pathogen_genome: UploadedPathogenGenome = (
                     UploadedPathogenGenome(
                         sample=sample,

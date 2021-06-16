@@ -101,3 +101,10 @@ def check_data(
 
     # data is clean
     return True, [], []
+
+
+def check_valid_sequence(sequence: str) -> bool:
+    """
+    Check that the sequence string only contains valid sequence characters
+    """
+    return set(sequence).issubset(set("WSKMYRVHDBNZNATCGU-"))
