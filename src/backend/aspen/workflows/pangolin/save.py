@@ -15,9 +15,14 @@ from aspen.database.connection import (
 from aspen.database.models import PathogenGenome, UploadedPathogenGenome
 
 
-def get_probability(conflict: float) -> float:
-    assert conflict <= 1
-    return 1.0 - conflict
+def get_probability(ambiguity_score: float) -> int:
+    """
+    Estimate confidence percentage based on the `ambiguity_score`.
+    Per pangolin docs, this is basically the number of lineage-defining sites
+    that had to be imputed from the reference sequence.
+    Round and multiply by 100 --> percentage for easier user comprehension.
+    """
+    return round(ambiguity_score * 100)
 
 
 @click.command("save")
@@ -30,10 +35,12 @@ def cli(pangolin_fh: io.TextIOBase, pangolin_last_updated: datetime):
 
     with session_scope(interface) as session:
         pango_csv: csv.DictReader = csv.DictReader(pangolin_fh)
-        taxon_to_pango_info: Mapping[int, Mapping[str, Union[str, float]]] = {
+        taxon_to_pango_info: Mapping[int, Mapping[str, Union[str, float, None]]] = {
             int(row["taxon"]): {
                 "lineage": row["lineage"],
-                "probability": get_probability(float(row["conflict"])),
+                "probability": get_probability(float(row["ambiguity_score"]))
+                if row["ambiguity_score"]
+                else None,
                 "version": row["pangoLEARN_version"],
             }
             for row in pango_csv
@@ -47,7 +54,9 @@ def cli(pangolin_fh: io.TextIOBase, pangolin_last_updated: datetime):
         }
 
         for entity_id, pathogen_genome in entity_id_to_pathogen_genome.items():
-            pango_info: Mapping[str, Union[str, float]] = taxon_to_pango_info[entity_id]
+            pango_info: Mapping[str, Union[str, float, None]] = taxon_to_pango_info[
+                entity_id
+            ]
             pathogen_genome.pangolin_last_updated = pangolin_last_updated
             pathogen_genome.pangolin_lineage = pango_info["lineage"]  # type: ignore
             pathogen_genome.pangolin_probability = pango_info["probability"]  # type: ignore

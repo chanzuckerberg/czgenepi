@@ -1,6 +1,6 @@
 import datetime
 from collections import defaultdict
-from typing import Any, Mapping, MutableSequence, Optional, Sequence, Set
+from typing import Any, Mapping, MutableSequence, Optional, Sequence, Set, Union
 
 from flask import jsonify, request, Response, session
 from sqlalchemy import or_
@@ -21,6 +21,7 @@ from aspen.database.models import (
     GisaidAccession,
     GisaidAccessionWorkflow,
     HostFilteredSequencingReadsCollection,
+    PublicRepositoryType,
     Sample,
     SequencingReadsCollection,
     UploadedPathogenGenome,
@@ -56,7 +57,9 @@ SAMPLES_POST_OPTIONAL_FIELDS = [
     "specimen_processing",
     "czb_failed_genome_recovery",
     # following fields from PathogenGenome
+    "sequencing_date",
     "sequencing_depth",
+    "isl_access_number",
 ]
 
 
@@ -272,6 +275,14 @@ def create_sample():
         )
         request_data = request.get_json()
 
+        already_exists: Union[
+            None, Mapping[str, list[str]]
+        ] = api_utils.check_duplicate_samples(request_data, db_session)
+        if already_exists:
+            return Response(
+                f"Duplicate fields found in db private_identifiers {already_exists['existing_private_ids']} and public_identifiers: {already_exists['existing_public_ids']}",
+                400,
+            )
         for data in request_data:
             data_ok: bool
             missing_fields: Optional[list[str]]
@@ -301,11 +312,24 @@ def create_sample():
 
                 # have to save the objects serially due to public_id default using primary key field
                 sample: Sample = Sample(**sample_args)
-                upload_pathogen_genome: UploadedPathogenGenome = UploadedPathogenGenome(
-                    sample=sample, **data["pathogen_genome"]
+                uploaded_pathogen_genome: UploadedPathogenGenome = (
+                    UploadedPathogenGenome(
+                        sample=sample,
+                        sequence=data["pathogen_genome"]["sequence"],
+                        sequencing_date=api_utils.format_sequencing_date(
+                            data["pathogen_genome"]["sequencing_date"]
+                        ),
+                    )
                 )
+                if "isl_access_number" in data["pathogen_genome"]:
+                    uploaded_pathogen_genome.add_accession(
+                        repository_type=PublicRepositoryType.GISAID,
+                        public_identifier=data["pathogen_genome"]["isl_access_number"],
+                        workflow_start_datetime=datetime.datetime.now(),
+                        workflow_end_datetime=datetime.datetime.now(),
+                    )
                 db_session.add(sample)
-                db_session.add(upload_pathogen_genome)
+                db_session.add(uploaded_pathogen_genome)
                 db_session.commit()
 
             else:
