@@ -21,7 +21,6 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import backref, relationship, Session
 
-from aspen.database.connection import session_scope, SqlAlchemyInterface
 from aspen.database.models.base import base, idbase
 from aspen.database.models.enum import Enum
 from aspen.database.models.mixins import DictMixin

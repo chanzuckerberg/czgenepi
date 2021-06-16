@@ -1,10 +1,10 @@
 import datetime
 import sys
 from collections import defaultdict
-from typing import Any, List, Mapping, MutableSequence, Optional, Sequence, Set, Union
+from typing import Any, Mapping, MutableSequence, Optional, Sequence, Set, Union
 
 from flask import jsonify, request, Response, session
-from sqlalchemy import func, or_
+from sqlalchemy import or_
 from sqlalchemy.orm import joinedload
 
 from aspen.app.app import application, requires_auth
@@ -310,16 +310,20 @@ def create_sample():
                     "private_identifier": data["sample"]["private_identifier"],
                     "collection_date": data["sample"]["collection_date"],
                     "location": data["sample"]["location"],
-                    "public_identifier": data["sample"]["public_identifier"]
-                    if data["sample"]["public_identifier"]
-                    else public_ids.pop(0),
                 }
+
+                if "public_identifier" in data["sample"].keys():
+                    sample_args["public_identifier"] = data["sample"][
+                        "public_identifier"
+                    ]
+                else:
+                    sample_args["public_identifier"] = public_ids.pop(0)
+
                 if "authors" not in sample_args:
                     sample_args["authors"] = [
                         user.group.name,
                     ]
 
-                # have to save the objects serially due to public_id default using primary key field
                 sample: Sample = Sample(**sample_args)
                 uploaded_pathogen_genome: UploadedPathogenGenome = (
                     UploadedPathogenGenome(
@@ -347,5 +351,9 @@ def create_sample():
                 )
         # todo add try catch here
         # don't persist the changes unless all models save successfully
-        db_session.commit()
+        try:
+            db_session.commit()
+        except Exception as e:
+            return Response(f"Error encountered when saving data: {e}", 400)
+
         return jsonify(success=True)
