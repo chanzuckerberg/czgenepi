@@ -32,6 +32,7 @@ export enum ERROR_CODE {
   DEFAULT, // BAD FILE NAME
   INVALID_NAME,
   MISSING_FIELD,
+  OVER_MAX_SAMPLES,
 }
 
 export interface DEFAULT {

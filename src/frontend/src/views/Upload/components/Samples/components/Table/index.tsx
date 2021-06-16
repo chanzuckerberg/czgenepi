@@ -1,7 +1,9 @@
 import { Table as MuiTable, TableBody, TableRow } from "@material-ui/core";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { SAMPLE_COUNT } from "../../../common/constants";
 import { Samples } from "../../../common/types";
 import {
+  LoadingMessage,
   Overflow,
   StyledHeaderTableCell,
   StyledTableCell,
@@ -14,6 +16,31 @@ interface Props {
 }
 
 export default function Table({ samples }: Props): JSX.Element {
+  const [isReadyToRenderTable, setIsReadyToTenderTable] = useState(false);
+
+  useEffect(() => {
+    if (!samples) {
+      return setIsReadyToTenderTable(true);
+    }
+
+    const timeout = setTimeout(
+      () => {
+        setIsReadyToTenderTable(true);
+      },
+      Object.keys(samples).length > SAMPLE_COUNT ? 1 * 1000 : 0
+    );
+
+    return () => clearTimeout(timeout);
+  }, []);
+
+  if (!isReadyToRenderTable) {
+    return (
+      <Overflow>
+        <LoadingMessage>Loading samples...</LoadingMessage>
+      </Overflow>
+    );
+  }
+
   return (
     <Overflow>
       <StyledTableContainer>
