@@ -637,6 +637,7 @@ def test_samples_create_view_pass_no_public_id(
         {
             "sample": {
                 "private_identifier": "private",
+                "public_identifier": "",
                 "collection_date": api_utils.format_date(datetime.datetime.now()),
                 "location": "Ventura County",
                 "private": True,
@@ -650,6 +651,7 @@ def test_samples_create_view_pass_no_public_id(
         {
             "sample": {
                 "private_identifier": "private2",
+                "public_identifier": "",
                 "collection_date": api_utils.format_date(datetime.datetime.now()),
                 "location": "Ventura County",
                 "private": True,
@@ -675,7 +677,10 @@ def test_samples_create_view_pass_no_public_id(
     assert len(uploaded_pathogen_genomes) == 2
     # check that creating new public identifiers works
     public_ids = sorted([i.public_identifier for i in session.query(Sample).all()])
-    assert ["USA/groupname-1/2021", "USA/groupname-2/2021"] == public_ids
+    assert [
+        "hCoV-19/USA/groupname-1/2021",
+        "hCoV-19/USA/groupname-2/2021",
+    ] == public_ids
 
     sample_1 = (
         session.query(Sample)
@@ -705,6 +710,7 @@ def test_samples_create_view_pass_no_sequencing_date(
         {
             "sample": {
                 "private_identifier": "private",
+                "public_identifier": "",
                 "collection_date": api_utils.format_date(datetime.datetime.now()),
                 "location": "Ventura County",
                 "private": True,
@@ -718,6 +724,7 @@ def test_samples_create_view_pass_no_sequencing_date(
         {
             "sample": {
                 "private_identifier": "private2",
+                "public_identifier": "",
                 "collection_date": api_utils.format_date(datetime.datetime.now()),
                 "location": "Ventura County",
                 "private": True,
@@ -743,7 +750,10 @@ def test_samples_create_view_pass_no_sequencing_date(
     assert len(uploaded_pathogen_genomes) == 2
     # check that creating new public identifiers works
     public_ids = sorted([i.public_identifier for i in session.query(Sample).all()])
-    assert ["USA/groupname-1/2021", "USA/groupname-2/2021"] == public_ids
+    assert [
+        "hCoV-19/USA/groupname-1/2021",
+        "hCoV-19/USA/groupname-2/2021",
+    ] == public_ids
 
     sample_1 = (
         session.query(Sample)
@@ -791,6 +801,7 @@ def test_samples_create_view_fail_duplicate_ids(
         {
             "sample": {
                 "private_identifier": "private",
+                "public_identifier": "",
                 "collection_date": api_utils.format_date(datetime.datetime.now()),
                 "location": "Ventura County",
                 "private": True,
@@ -826,6 +837,7 @@ def test_samples_create_view_fail_missing_required_fields(
         {
             "sample": {
                 "private_identifier": "private",
+                "public_identifier": "",
                 "collection_date": api_utils.format_date(datetime.datetime.now()),
             },
             "pathogen_genome": {

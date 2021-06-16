@@ -27,10 +27,14 @@ from aspen.database.models import (
     UploadedPathogenGenome,
     WorkflowStatusType,
 )
-from aspen.database.models.sample import RegionType
+from aspen.database.models.sample import create_public_ids, RegionType
 from aspen.database.models.usergroup import Group, User
 from aspen.error.recoverable import RecoverableError
 
+DEFAULT_DIVISION = "California"
+DEFAULT_COUNTRY = "USA"
+DEFAULT_ORGANISM = "Severe acute respiratory syndrome coronavirus 2"
+USER_SUBMITTED_TO_GISAID_ISL_NOT_PROVIDED = "Not Provided"
 SAMPLE_KEY = "samples"
 GISIAD_REJECTION_TIME = datetime.timedelta(days=4)
 SAMPLES_POST_REQUIRED_FIELDS = [
@@ -93,6 +97,14 @@ def _format_gisaid_accession(
             # hey there should be an output...
             for output in gisaid_accession_workflow.outputs:
                 assert isinstance(output, GisaidAccession)
+                if (
+                    output.public_identifier
+                    == USER_SUBMITTED_TO_GISAID_ISL_NOT_PROVIDED
+                ):
+                    return {
+                        "status": "Submitted",
+                        "gisaid_id": output.public_identifier,
+                    }
                 return {
                     "status": "Accepted",
                     "gisaid_id": output.public_identifier,
@@ -141,7 +153,6 @@ def _format_lineage(sample: Sample) -> dict[str, Any]:
 def samples():
     with session_scope(application.DATABASE_INTERFACE) as db_session:
         profile = session["profile"]
-
         user = (
             get_usergroup_query(db_session, profile["user_id"])
             .options(joinedload(User.group).joinedload(Group.can_see))
@@ -283,6 +294,7 @@ def create_sample():
                 f"Duplicate fields found in db private_identifiers {already_exists['existing_private_ids']} and public_identifiers: {already_exists['existing_public_ids']}",
                 400,
             )
+        public_ids = create_public_ids(user.group_id, db_session, len(request_data))
         for data in request_data:
             data_ok: bool
             missing_fields: Optional[list[str]]
@@ -294,23 +306,39 @@ def create_sample():
                 SAMPLES_POST_OPTIONAL_FIELDS,
             )
             if data_ok:
+
+                # GISAID Stuff
+                if data["sample"]["public_identifier"]:
+                    # if they provided a public_id they marked true to "submitted to gisaid"
+                    submitted_to_gisaid = True
+                    public_identifier = data["sample"]["public_identifier"]
+                else:
+                    # if they did not mark true to "submitted to gisaid generate a new public id for
+                    # them
+                    submitted_to_gisaid = False
+                    public_identifier = public_ids.pop(0)
+
                 sample_args: Mapping[str, Any] = {
                     "submitting_group": user.group,
                     "uploaded_by": user,
                     "sample_collected_by": user.group.name,
                     "sample_collector_contact_address": user.group.address,
-                    "division": "California",
-                    "country": "USA",
+                    "division": DEFAULT_DIVISION,
+                    "country": DEFAULT_COUNTRY,
                     "region": RegionType.NORTH_AMERICA,
-                    "organism": "Severe acute respiratory syndrome coronavirus 2",
-                    **data["sample"],
+                    "organism": DEFAULT_ORGANISM,
+                    "private_identifier": data["sample"]["private_identifier"],
+                    "collection_date": data["sample"]["collection_date"],
+                    "location": data["sample"]["location"],
+                    "private": data["sample"]["private"],
+                    "public_identifier": public_identifier,
                 }
+
                 if "authors" not in sample_args:
                     sample_args["authors"] = [
                         user.group.name,
                     ]
 
-                # have to save the objects serially due to public_id default using primary key field
                 sample: Sample = Sample(**sample_args)
                 uploaded_pathogen_genome: UploadedPathogenGenome = (
                     UploadedPathogenGenome(
@@ -321,21 +349,33 @@ def create_sample():
                         ),
                     )
                 )
-                if "isl_access_number" in data["pathogen_genome"]:
+                if data["pathogen_genome"]["isl_access_number"]:
                     uploaded_pathogen_genome.add_accession(
                         repository_type=PublicRepositoryType.GISAID,
                         public_identifier=data["pathogen_genome"]["isl_access_number"],
                         workflow_start_datetime=datetime.datetime.now(),
                         workflow_end_datetime=datetime.datetime.now(),
                     )
+                elif submitted_to_gisaid:
+                    # in this scenario they've checked yes to previously submitted to GISAID but did
+                    # not provide an isl-number, we mark it as UNKNOWN for now.
+                    uploaded_pathogen_genome.add_accession(
+                        repository_type=PublicRepositoryType.GISAID,
+                        public_identifier=USER_SUBMITTED_TO_GISAID_ISL_NOT_PROVIDED,
+                        workflow_start_datetime=datetime.datetime.now(),
+                        workflow_end_datetime=datetime.datetime.now(),
+                    )
+
                 db_session.add(sample)
                 db_session.add(uploaded_pathogen_genome)
-                db_session.commit()
 
             else:
                 return Response(
                     f"Missing required fields {missing_fields} or encountered unexpected fields {unexpected_fields}",
                     400,
                 )
-
+        try:
+            db_session.commit()
+        except Exception as e:
+            return Response(f"Error encountered when saving data: {e}", 400)
         return jsonify(success=True)
