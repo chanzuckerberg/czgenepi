@@ -28,7 +28,7 @@ export default function Upload(): JSX.Element | null {
 
   const router = useRouter();
 
-  useNavigationPrompt();
+  const cancelPrompt = useNavigationPrompt();
 
   useEffect(() => {
     if (!samples) {
@@ -60,6 +60,7 @@ export default function Upload(): JSX.Element | null {
           setSamples={setSamples}
           metadata={metadata}
           setMetadata={setMetadata}
+          cancelPrompt={cancelPrompt}
         />
       )}
     </StyledPageContent>
