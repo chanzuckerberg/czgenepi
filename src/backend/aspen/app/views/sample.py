@@ -286,6 +286,9 @@ def create_sample():
             )
         public_ids = create_public_ids(user.group_id, db_session, len(request_data))
         sys.stdout.write(f"PUBLIC IDS: {public_ids}")
+
+        samples_for_upload = []
+        pathogen_genomes_for_upload = []
         for data in request_data:
             data_ok: bool
             missing_fields: Optional[list[str]]
@@ -341,8 +344,9 @@ def create_sample():
                         workflow_start_datetime=datetime.datetime.now(),
                         workflow_end_datetime=datetime.datetime.now(),
                     )
-                    db_session.add(sample)
-                    db_session.add(uploaded_pathogen_genome)
+
+                samples_for_upload.append(sample)
+                pathogen_genomes_for_upload.append(uploaded_pathogen_genome)
 
             else:
                 return Response(
@@ -352,8 +356,12 @@ def create_sample():
         # todo add try catch here
         # don't persist the changes unless all models save successfully
         try:
+            db_session.add_all(samples_for_upload)
+            db_session.add_all(pathogen_genomes_for_upload)
             db_session.commit()
         except Exception as e:
+            sys.stdout.write(f"ERROR encountered {e}")
+            db_session.rollback()
             return Response(f"Error encountered when saving data: {e}", 400)
 
         return jsonify(success=True)
