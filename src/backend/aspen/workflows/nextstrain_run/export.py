@@ -217,9 +217,13 @@ def cli(
 
             upload_date = None
             if sample.sequencing_reads_collection is not None:
-                upload_date = sample.sequencing_reads_collection.upload_date.strftime("%Y-%m-%d")
+                upload_date = sample.sequencing_reads_collection.upload_date.strftime(
+                    "%Y-%m-%d"
+                )
             elif sample.uploaded_pathogen_genome is not None:
-                upload_date = sample.uploaded_pathogen_genome.upload_date.strftime("%Y-%m-%d")
+                upload_date = sample.uploaded_pathogen_genome.upload_date.strftime(
+                    "%Y-%m-%d"
+                )
 
             aspen_metadata_row: MutableMapping[str, Any] = {
                 "strain": sample.public_identifier,
