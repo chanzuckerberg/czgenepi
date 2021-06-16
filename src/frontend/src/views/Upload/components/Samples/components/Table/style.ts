@@ -1,6 +1,12 @@
 import styled from "@emotion/styled";
 import { TableCell, TableContainer, TableHead } from "@material-ui/core";
-import { fontBodyXs, fontHeaderXs, getColors, getSpacings } from "czifui";
+import {
+  fontBodyM,
+  fontBodyXs,
+  fontHeaderXs,
+  getColors,
+  getSpacings,
+} from "czifui";
 
 export const Overflow = styled.div`
   overflow: auto;
@@ -38,7 +44,7 @@ export const StyledHeaderTableCell = styled(TableCell)`
       padding: ${spacings?.m}px 0;
       color: ${colors?.gray[400]};
       border-bottom: solid 2px ${colors?.gray[200]};
-      
+
     `;
   }}
 `;
@@ -51,4 +57,8 @@ export const StyledTableHead = styled(TableHead)`
       padding: ${spacings?.m}px 0;
     `;
   }}
+`;
+
+export const LoadingMessage = styled.div`
+  ${fontBodyM}
 `;

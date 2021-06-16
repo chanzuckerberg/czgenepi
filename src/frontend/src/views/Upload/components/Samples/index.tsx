@@ -38,22 +38,29 @@ import {
 
 export default function Samples({ samples, setSamples }: Props): JSX.Element {
   const [parseErrors, setParseErrors] = useState<ParseErrors | null>(null);
-  const [sampleCount, setSampleCount] = useState<number>(0);
-  const [fileCount, setFileCount] = useState<number>(0);
-  const [showInstructions, setShowInstructions] = useState<boolean>(true);
+  const [sampleCount, setSampleCount] = useState(0);
+  const [fileCount, setFileCount] = useState(0);
+  const [showInstructions, setShowInstructions] = useState(true);
+  const [isLoadingFile, setIsLoadingFile] = useState(false);
+  const [tooManySamples, setTooManySamples] = useState(false);
 
   useEffect(() => {
     if (samples) {
       const counts = getUploadCounts(samples);
       setSampleCount(counts.sampleCount);
       setFileCount(counts.fileCount);
+      setTooManySamples(Object.keys(samples).length > 500);
     }
   }, [samples]);
 
   const handleFileChange = async (files: FileList | null) => {
     if (!files) return;
 
+    setIsLoadingFile(true);
+
     const { result, errors } = await handleFiles(files);
+
+    setIsLoadingFile(false);
 
     setSamples({
       ...removeSamplesFromTheSameFiles(samples, result),
@@ -119,20 +126,24 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
                 and lower case), numbers (0-9), periods (.), hyphens (-),
                 underscores (_), and backslashes (/). Spaces are not allowed.
               </span>,
+              <span key="4">
+                The maximum number of samples accommodated per upload is 500.
+              </span>,
             ]}
           />
         )}
         <ContentWrapper>
           <StyledFilePicker
-            text="Select Fasta Files"
+            text={isLoadingFile ? "Loading..." : "Select Fasta Files"}
             multiple
             handleFiles={handleFileChange}
             accept=".fasta,.fa,.gz,.zip"
+            isDisabled={isLoadingFile}
           />
           {parseErrors && (
             <AlertAccordion
               severity="error"
-              title="Some of your files could not be uploaded."
+              title="Some of your files or samples could not be imported."
               message={<AlertTable parseErrors={parseErrors} />}
             />
           )}
@@ -153,6 +164,7 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
                   REMOVE ALL
                 </StyledRemoveAllButton>
               </StyledContainerSpaceBetween>
+
               <Table samples={samples} />
             </>
           )}
@@ -165,7 +177,7 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
                 isRounded
                 color="primary"
                 variant="contained"
-                disabled={!hasSamples(samples)}
+                disabled={!hasSamples(samples) || tooManySamples}
               >
                 Continue
               </StyledButton>

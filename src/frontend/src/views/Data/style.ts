@@ -57,3 +57,13 @@ export const PrivateIdValueWrapper = styled.div`
   display: flex;
   flex-direction: column;
 `;
+
+export const SampleIconWrapper = styled.span`
+  position: relative;
+`;
+
+export const PrivacyIcon = styled.span`
+  position: absolute;
+  left: 30px;
+  bottom: -2px;
+`;

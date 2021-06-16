@@ -11,10 +11,11 @@ interface Props {
 
 const ERROR_CODE_TO_MESSAGE: Record<
   ERROR_CODE,
-  (props: MessageProps) => JSX.Element
+  ((props: MessageProps) => JSX.Element) | string
 > = {
   [ERROR_CODE.INVALID_NAME]: InvalidNameMessage,
   [ERROR_CODE.MISSING_FIELD]: MissingFieldMessage,
+  [ERROR_CODE.OVER_MAX_SAMPLES]: "placeholder",
   [ERROR_CODE.DEFAULT]: DefaultMessage,
 };
 
@@ -32,6 +33,7 @@ export default function Error({
       count
     )} to correct any errors before proceeding:`,
     [ERROR_CODE.MISSING_FIELD]: "Import Failed, file missing required data.",
+    [ERROR_CODE.OVER_MAX_SAMPLES]: "placeholder",
     [ERROR_CODE.DEFAULT]:
       "Something went wrong, please try again or contact us!",
   };

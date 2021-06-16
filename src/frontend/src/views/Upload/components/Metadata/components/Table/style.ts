@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import { TableCell, TableContainer, TableRow } from "@material-ui/core";
-import { fontHeaderXs, getColors, getSpacings } from "czifui";
+import { fontBodyM, fontHeaderXs, getColors, getSpacings } from "czifui";
 
 export const Overflow = styled.div`
   overflow: auto;
@@ -50,7 +50,7 @@ export const IsPrivateTableCell = styled(StyledTableCell)`
     const spacings = getSpacings(props);
 
     return `
-      padding: ${spacings?.l}px 0;
+      padding: ${spacings?.l}px ${spacings?.l}px;
       border-left: solid 2px ${colors?.gray[200]};
       border-right: solid 2px ${colors?.gray[200]};
     `;
@@ -71,4 +71,8 @@ export const StyledTableRow = styled(TableRow)`
   .MuiTableCell-stickyHeader {
     background-color: white;
   }
+`;
+
+export const LoadingMessage = styled.div`
+  ${fontBodyM}
 `;
