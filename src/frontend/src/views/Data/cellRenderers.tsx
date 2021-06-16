@@ -1,5 +1,6 @@
 /* eslint-disable react/display-name */
 
+import { Lock, Public } from "@material-ui/icons";
 import { ChipProps, Tooltip } from "czifui";
 import React from "react";
 import { defaultCellRenderer } from "src/common/components/library/data_table";
@@ -14,7 +15,9 @@ import {
   GISAIDCell,
   LineageCell,
   LineageRowContent,
+  PrivacyIcon,
   PrivateIdValueWrapper,
+  SampleIconWrapper,
   StyledChip,
   Subtext,
 } from "./style";
@@ -75,7 +78,7 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
     value: string;
     item: Sample;
   }): JSX.Element => {
-    const { CZBFailedGenomeRecovery } = item;
+    const { CZBFailedGenomeRecovery, private: isPrivate } = item;
     const label = CZBFailedGenomeRecovery
       ? LABEL_STATUS.error
       : LABEL_STATUS.success;
@@ -83,7 +86,16 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
     return (
       <RowContent>
         <div className={dataTableStyle.cell}>
-          <SampleIcon className={dataTableStyle.icon} />
+          <SampleIconWrapper>
+            <SampleIcon className={dataTableStyle.icon} />
+            <PrivacyIcon>
+              {isPrivate ? (
+                <Lock color="primary" />
+              ) : (
+                <Public color="primary" />
+              )}
+            </PrivacyIcon>
+          </SampleIconWrapper>
           <PrivateIdValueWrapper>
             {value}
             <StyledChip
