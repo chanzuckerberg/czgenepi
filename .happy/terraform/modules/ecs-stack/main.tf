@@ -185,7 +185,7 @@ module gisaid_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn_spot.step_function_arn
-  schedule_expressions  = contains(["prod", "staging"], local.deployment_stage) ? ["cron(0 6 ? * 1-5 *)"] : []
+  schedule_expressions  = contains(["prod", "staging"], local.deployment_stage) ? ["cron(0 20 ? * 2-6 *)"] : []
   event_role_arn        = local.event_role_arn
   extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
@@ -207,7 +207,7 @@ module pangolin_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn_spot.step_function_arn
-  schedule_expressions  = contains(["prod", "staging"], local.deployment_stage) ? ["cron(0 6 ? * 1-5 *)"] : []
+  schedule_expressions  = contains(["prod", "staging"], local.deployment_stage) ? ["cron(0 18,23 ? * 2-6 *)"] : []
   event_role_arn        = local.event_role_arn
 }
 
