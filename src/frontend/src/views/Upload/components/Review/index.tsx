@@ -24,7 +24,11 @@ import {
   ContentTitleWrapper,
 } from "./style";
 
-export default function Review({ samples, metadata }: Props): JSX.Element {
+export default function Review({
+  samples,
+  metadata,
+  cancelPrompt,
+}: Props): JSX.Element {
   const { data } = useUserInfo();
   const [isConsentChecked, setIsConsentChecked] = useState(false);
 
@@ -101,6 +105,7 @@ export default function Review({ samples, metadata }: Props): JSX.Element {
             samples={samples}
             metadata={metadata}
             isDisabled={!isConsentChecked}
+            cancelPrompt={cancelPrompt}
           />
           <NextLink href={ROUTES.UPLOAD_STEP2} passHref>
             <a href="passHref">
