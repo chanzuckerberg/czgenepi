@@ -149,7 +149,7 @@ task TransformGISAID {
     ncov_ingest_git_rev=$(git -C /ncov-ingest rev-parse HEAD)
 
     # modify location rules from ncov-ingest. Southern San Joaquin Valley would be left blank in the default version
-    sed -i -e 's/Southern San Joaquin Valley\tNorth America\/USA\/California\//Southern San Joaquin Valley\tNorth America\/USA\/California\/Southern San Joaquin Valley/' \
+    sed -i -e 's/Southern San Joaquin Valley\tNorth America\/USA\/California\//Southern San Joaquin Valley\tNorth America\/USA\/California\/Tulare County/' \
     -e 's/Orange County CA/Orange County/' \
     -e 's/Monterey County CA/Monterey County/' \
     /ncov-ingest/source-data/gisaid_geoLocationRules.tsv
