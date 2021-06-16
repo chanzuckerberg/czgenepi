@@ -65,6 +65,7 @@ export interface Props {
   setSamples: React.Dispatch<React.SetStateAction<Samples | null>>;
   metadata: SampleIdToMetadata | null;
   setMetadata: React.Dispatch<React.SetStateAction<SampleIdToMetadata | null>>;
+  cancelPrompt: () => void;
 }
 
 export type SampleIdToMetadata = Record<string, Metadata>;

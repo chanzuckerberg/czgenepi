@@ -17,10 +17,12 @@ import {
 
 const DATE_ERROR_MESSAGE = "Update format to YYYY-MM-DD";
 
+const DATE_REGEX = /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/;
+
 const validationSchema = yup.object({
   collectionDate: yup
     .string()
-    .matches(/^\d{4}-\d{2}-\d{2}$/, DATE_ERROR_MESSAGE)
+    .matches(DATE_REGEX, DATE_ERROR_MESSAGE)
     .min(10, DATE_ERROR_MESSAGE)
     .max(10, DATE_ERROR_MESSAGE)
     .required("Required"),
@@ -31,7 +33,7 @@ const validationSchema = yup.object({
   }),
   sequencingDate: yup
     .string()
-    .matches(/^\d{4}-\d{2}-\d{2}$/, DATE_ERROR_MESSAGE)
+    .matches(DATE_REGEX, DATE_ERROR_MESSAGE)
     .min(10, DATE_ERROR_MESSAGE)
     .max(10, DATE_ERROR_MESSAGE),
   submittedToGisaid: yup.boolean(),

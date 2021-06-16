@@ -14,6 +14,7 @@ module.exports = {
     "plugin:jest-playwright/recommended",
     "prettier",
     "plugin:prettier/recommended",
+    "plugin:react-hooks/recommended",
   ],
   overrides: [
     // Override some TypeScript rules just for .js files

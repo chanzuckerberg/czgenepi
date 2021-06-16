@@ -23,17 +23,25 @@ interface Props {
   isDisabled: boolean;
   samples: Samples | null;
   metadata: SampleIdToMetadata | null;
+  cancelPrompt: () => void;
 }
 
 export default function Upload({
   isDisabled,
   samples,
   metadata,
+  cancelPrompt,
 }: Props): JSX.Element {
   const [isOpen, setIsOpen] = useState(false);
 
-  const { mutate, isLoading, isSuccess, isError, error } =
-    useMutation(createSamples);
+  const { mutate, isLoading, isSuccess, isError, error } = useMutation(
+    createSamples,
+    {
+      onSuccess: () => {
+        cancelPrompt();
+      },
+    }
+  );
 
   return (
     <>

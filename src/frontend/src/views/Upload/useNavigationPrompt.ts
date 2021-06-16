@@ -1,19 +1,15 @@
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ROUTES } from "src/common/routes";
 
 const MESSAGE =
   "Leave current upload? If you leave, your current upload " +
   "will be canceled and your work will not be saved.";
 
-let leaveConfirmed = false;
+export function useNavigationPrompt(message: string = MESSAGE): () => void {
+  const [shouldShow, setShouldShow] = useState(true);
 
-export function useNavigationPrompt(message: string = MESSAGE): void {
   const router = useRouter();
-
-  useEffect(() => {
-    leaveConfirmed = false;
-  }, []);
 
   useEffect(() => {
     const handleWindowClose = (event: BeforeUnloadEvent) => {
@@ -33,16 +29,16 @@ export function useNavigationPrompt(message: string = MESSAGE): void {
     return () => {
       window.removeEventListener("beforeunload", handleWindowClose);
     };
-  }, []);
+  }, [message]);
 
   useEffect(() => {
     function handleRouteChangeStart(route: string) {
       if (route.includes(ROUTES.UPLOAD)) return;
 
-      if (leaveConfirmed) return;
+      if (!shouldShow) return;
 
       if (window.confirm(message)) {
-        leaveConfirmed = true;
+        setShouldShow(false);
       } else {
         router.events.emit("routeChangeError");
         throw "routeChange aborted";
@@ -54,5 +50,9 @@ export function useNavigationPrompt(message: string = MESSAGE): void {
     return () => {
       router.events.off("routeChangeStart", handleRouteChangeStart);
     };
+  }, [shouldShow, message, router.events]);
+
+  return useCallback(() => {
+    setShouldShow(false);
   }, []);
 }
