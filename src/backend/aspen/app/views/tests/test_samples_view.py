@@ -640,6 +640,7 @@ def test_samples_create_view_pass_no_public_id(
                 "collection_date": api_utils.format_date(datetime.datetime.now()),
                 "location": "Ventura County",
                 "private": True,
+                "public_identifier": "",
             },
             "pathogen_genome": {
                 "sequence": "AAAAAXNTCG",
@@ -653,6 +654,7 @@ def test_samples_create_view_pass_no_public_id(
                 "collection_date": api_utils.format_date(datetime.datetime.now()),
                 "location": "Ventura County",
                 "private": True,
+                "public_identifier": "",
             },
             "pathogen_genome": {
                 "sequence": "AACTGTNNNN",
@@ -708,6 +710,7 @@ def test_samples_create_view_pass_no_sequencing_date(
                 "collection_date": api_utils.format_date(datetime.datetime.now()),
                 "location": "Ventura County",
                 "private": True,
+                "public_identifier": ""
             },
             "pathogen_genome": {
                 "sequence": "AAAAAXNTCG",
@@ -721,6 +724,7 @@ def test_samples_create_view_pass_no_sequencing_date(
                 "collection_date": api_utils.format_date(datetime.datetime.now()),
                 "location": "Ventura County",
                 "private": True,
+                "public_identifier": ""
             },
             "pathogen_genome": {
                 "sequence": "AACTGTNNNN",
@@ -794,6 +798,7 @@ def test_samples_create_view_fail_duplicate_ids(
                 "collection_date": api_utils.format_date(datetime.datetime.now()),
                 "location": "Ventura County",
                 "private": True,
+                "public_identifier": ""
             },
             "pathogen_genome": {
                 "sequence": "AACTGTNNNN",
@@ -827,6 +832,7 @@ def test_samples_create_view_fail_missing_required_fields(
             "sample": {
                 "private_identifier": "private",
                 "collection_date": api_utils.format_date(datetime.datetime.now()),
+                "public_identifier": ""
             },
             "pathogen_genome": {
                 "sequence": "AAAAAAAAA",
@@ -838,6 +844,7 @@ def test_samples_create_view_fail_missing_required_fields(
                 "collection_date": api_utils.format_date(datetime.datetime.now()),
                 "location": "Ventura County",
                 "private": True,
+                "public_identifier": ""
             },
             "pathogen_genome": {
                 "sequence": "AAAAAAAAA",

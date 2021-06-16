@@ -315,7 +315,8 @@ def create_sample():
                     "location": data["sample"]["location"],
                 }
 
-                if "public_identifier" in data["sample"].keys():
+                if data["sample"]["public_identifier"] != "":
+                    # check that this is not an empty string
                     sample_args["public_identifier"] = data["sample"][
                         "public_identifier"
                     ]
