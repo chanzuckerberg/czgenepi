@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import enum
 from datetime import datetime
-from typing import Mapping, Optional, TYPE_CHECKING, Union
+from typing import List, Optional, TYPE_CHECKING, Union
 
 import enumtables
 from sqlalchemy import (
@@ -19,7 +19,7 @@ from sqlalchemy import (
     UniqueConstraint,
 )
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import backref, relationship
+from sqlalchemy.orm import backref, relationship, Session
 
 from aspen.database.connection import session_scope, SqlAlchemyInterface
 from aspen.database.models.base import base, idbase
@@ -49,28 +49,40 @@ _RegionTypeTable = enumtables.EnumTable(
 )
 
 
-def create_public_id(context) -> str:
-    current_parameters: Mapping[
-        str, Union[str, bool, datetime]
-    ] = context.get_current_parameters()
-    interface = SqlAlchemyInterface(context.engine)
-    with session_scope(interface) as session:
-        group: Group = (
-            session.query(Group)
-            .filter(Group.id == current_parameters["submitting_group_id"])
-            .one()
-        )
-        next_id: Union[int, None] = session.query(func.max(Sample.id)).scalar()
+def create_public_ids(
+    group_id: int, db_session: Session, num_needed: int, country: str = "USA"
+) -> List[str]:
+    """
+    Generate a list of viable public ids for a specific group
 
-        # catch if no max
-        if not next_id:
-            next_id = 0
+    Parameters
+    ----------
+    group_id :
+        The group_id to generate public ids for
+    session :
+        An open DB session object
+    number_needed :
+        The number of czb_ids to generate
 
-        next_id += 1
+    Returns
+    --------
+    A list of newly generated public_ids
+    """
 
+    group: Group = db_session.query(Group).filter(Group.id == group_id).one()
+    next_id: Union[int, None] = db_session.query(func.max(Sample.id)).scalar()
+
+    # catch if no max
+    if not next_id:
+        next_id = 0
+    next_id += 1
+    ids: List[str] = []
+    for i in range(num_needed):
         current_year: str = datetime.today().strftime("%Y")
-        country: str = current_parameters["country"]  # type: ignore
-        return f"{country}/{group.prefix}-{next_id}/{current_year}"
+        country: str = country  # type: ignore
+        ids.append(f"{country}/{group.prefix}-{next_id}/{current_year}")
+        next_id += 1
+    return ids
 
 
 class Sample(idbase, DictMixin):  # type: ignore
@@ -110,7 +122,6 @@ class Sample(idbase, DictMixin):  # type: ignore
     public_identifier = Column(
         String,
         nullable=False,
-        default=create_public_id,
         unique=True,
         comment="This is the public identifier we assign to this sample.",
     )

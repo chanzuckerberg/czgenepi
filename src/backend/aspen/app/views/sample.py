@@ -1,9 +1,10 @@
 import datetime
+import sys
 from collections import defaultdict
-from typing import Any, Mapping, MutableSequence, Optional, Sequence, Set, Union
+from typing import Any, List, Mapping, MutableSequence, Optional, Sequence, Set, Union
 
 from flask import jsonify, request, Response, session
-from sqlalchemy import or_
+from sqlalchemy import func, or_
 from sqlalchemy.orm import joinedload
 
 from aspen.app.app import application, requires_auth
@@ -27,7 +28,7 @@ from aspen.database.models import (
     UploadedPathogenGenome,
     WorkflowStatusType,
 )
-from aspen.database.models.sample import RegionType
+from aspen.database.models.sample import create_public_ids, RegionType
 from aspen.database.models.usergroup import Group, User
 from aspen.error.recoverable import RecoverableError
 
@@ -283,6 +284,8 @@ def create_sample():
                 f"Duplicate fields found in db private_identifiers {already_exists['existing_private_ids']} and public_identifiers: {already_exists['existing_public_ids']}",
                 400,
             )
+        public_ids = create_public_ids(user.group_id, db_session, len(request_data))
+        sys.stdout.write(f"PUBLIC IDS: {public_ids}")
         for data in request_data:
             data_ok: bool
             missing_fields: Optional[list[str]]
@@ -293,6 +296,7 @@ def create_sample():
                 SAMPLES_POST_REQUIRED_FIELDS,
                 SAMPLES_POST_OPTIONAL_FIELDS,
             )
+
             if data_ok:
                 sample_args: Mapping[str, Any] = {
                     "submitting_group": user.group,
@@ -303,7 +307,12 @@ def create_sample():
                     "country": "USA",
                     "region": RegionType.NORTH_AMERICA,
                     "organism": "Severe acute respiratory syndrome coronavirus 2",
-                    **data["sample"],
+                    "private_identifier": data["sample"]["private_identifier"],
+                    "collection_date": data["sample"]["collection_date"],
+                    "location": data["sample"]["location"],
+                    "public_identifier": data["sample"]["public_identifier"]
+                    if data["sample"]["public_identifier"]
+                    else public_ids.pop(0),
                 }
                 if "authors" not in sample_args:
                     sample_args["authors"] = [
@@ -321,21 +330,22 @@ def create_sample():
                         ),
                     )
                 )
-                if "isl_access_number" in data["pathogen_genome"]:
+                if data["pathogen_genome"]["isl_access_number"]:
                     uploaded_pathogen_genome.add_accession(
                         repository_type=PublicRepositoryType.GISAID,
                         public_identifier=data["pathogen_genome"]["isl_access_number"],
                         workflow_start_datetime=datetime.datetime.now(),
                         workflow_end_datetime=datetime.datetime.now(),
                     )
-                db_session.add(sample)
-                db_session.add(uploaded_pathogen_genome)
-                db_session.commit()
+                    db_session.add(sample)
+                    db_session.add(uploaded_pathogen_genome)
 
             else:
                 return Response(
                     f"Missing required fields {missing_fields} or encountered unexpected fields {unexpected_fields}",
                     400,
                 )
-
+        # todo add try catch here
+        # don't persist the changes unless all models save successfully
+        db_session.commit()
         return jsonify(success=True)
