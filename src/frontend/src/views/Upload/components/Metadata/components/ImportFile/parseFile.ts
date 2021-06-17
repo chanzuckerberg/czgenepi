@@ -121,15 +121,10 @@ function buildMetadata({ headers, row, warningMessages }: RowInfo) {
 }
 
 function convertValue(key: string, value: string) {
-  if (key === "keepPrivate") {
-    if (value.toUpperCase() === "YES") {
-      return true;
-    }
+  if (key === "keepPrivate" || key === "submittedToGisaid") {
+    if (value.toUpperCase() === "YES") return true;
     return false;
   }
-  if (value.toUpperCase() === "YES") return true;
-  if (value.toUpperCase() === "NO") return false;
-
   return value;
 }
 
