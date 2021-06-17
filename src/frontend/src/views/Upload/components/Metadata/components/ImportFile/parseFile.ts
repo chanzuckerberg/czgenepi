@@ -117,13 +117,11 @@ function buildMetadata({ headers, row, warningMessages }: RowInfo) {
   ) {
     metadata.collectionLocation = "";
   }
-  console.log("METADATA: ", metadata);
   return metadata;
 }
 
 function convertValue(key: string, value: string) {
   if (key === "keepPrivate") {
-    console.log("KEY check cleared: ", key);
     if (value === "") return true;
   }
   if (value.toUpperCase() === "YES") return true;
