@@ -31,7 +31,7 @@ export default function Warning({
           ", "
         )}`,
       title: `${unusedSampleIds.length} ${maybePluralize(
-        "sample",
+        "Sample",
         unusedSampleIds.length
       )} in metadata file ${maybePluralize(
         "was",

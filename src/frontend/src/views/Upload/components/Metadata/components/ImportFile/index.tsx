@@ -113,7 +113,10 @@ export default function ImportFile({
       </div>
 
       <RenderOrNull
-        condition={hasImportedFile && !isParseResultCompletelyUnused}
+        condition={
+          hasImportedFile &&
+          !getIsParseResultCompletelyUnused(unusedSampleIds, parseResult)
+        }
       >
         <Success filename={filename} />
       </RenderOrNull>
@@ -181,10 +184,12 @@ function RenderOrNull({
   return <>{children}</>;
 }
 
-function isParseResultCompletelyUnused(
+function getIsParseResultCompletelyUnused(
   unusedSampleIds: string[],
-  parseResult: ParseResult
+  parseResult: ParseResult | null
 ) {
+  if (!parseResult) return true;
+
   const { data } = parseResult;
 
   return unusedSampleIds.length === Object.keys(data).length;

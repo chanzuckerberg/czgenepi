@@ -3,7 +3,7 @@ import { ExpandMore } from "@material-ui/icons";
 import { AlertTitle } from "@material-ui/lab";
 import { AlertProps } from "czifui";
 import React, { useState } from "react";
-import { StyledAlert } from "./style";
+import { StyledAlert, Title } from "./style";
 
 interface Props {
   title?: string;
@@ -34,7 +34,11 @@ export default function AlertAccordion({
         </IconButton>
       }
     >
-      {title && <AlertTitle>{title}</AlertTitle>}
+      {title && (
+        <AlertTitle>
+          <Title>{title}</Title>
+        </AlertTitle>
+      )}
       {isShown && message}
     </StyledAlert>
   );

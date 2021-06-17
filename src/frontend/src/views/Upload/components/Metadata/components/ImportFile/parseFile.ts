@@ -142,6 +142,7 @@ function autocorrect(
   ) {
     metadata.collectionLocation = "";
   }
+
   return metadata;
 }
 
