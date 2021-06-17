@@ -366,6 +366,7 @@ def create_sample():
                     # not provide an isl-number, we mark it as UNKNOWN for now.
                     uploaded_pathogen_genome.add_accession(
                         repository_type=PublicRepositoryType.GISAID,
+                        public_identifier=None,
                         workflow_start_datetime=datetime.datetime.now(),
                         workflow_end_datetime=datetime.datetime.now(),
                     )

@@ -140,7 +140,7 @@ class Entity(idbase):  # type: ignore
     def add_accession(
         self,
         repository_type: PublicRepositoryType,
-        public_identifier: str,
+        public_identifier: Union[str, None],
         workflow_start_datetime: datetime.datetime,
         workflow_end_datetime: datetime.datetime,
     ):
