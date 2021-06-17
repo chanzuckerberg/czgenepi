@@ -34,7 +34,6 @@ from aspen.error.recoverable import RecoverableError
 DEFAULT_DIVISION = "California"
 DEFAULT_COUNTRY = "USA"
 DEFAULT_ORGANISM = "Severe acute respiratory syndrome coronavirus 2"
-USER_SUBMITTED_TO_GISAID_ISL_NOT_PROVIDED = "Not Provided"
 SAMPLE_KEY = "samples"
 GISIAD_REJECTION_TIME = datetime.timedelta(days=4)
 SAMPLES_POST_REQUIRED_FIELDS = [
@@ -97,13 +96,10 @@ def _format_gisaid_accession(
             # hey there should be an output...
             for output in gisaid_accession_workflow.outputs:
                 assert isinstance(output, GisaidAccession)
-                if (
-                    output.public_identifier
-                    == USER_SUBMITTED_TO_GISAID_ISL_NOT_PROVIDED
-                ):
+                if not output.public_identifier:
                     return {
                         "status": "Submitted",
-                        "gisaid_id": output.public_identifier,
+                        "gisaid_id": "Not Provided",
                     }
                 return {
                     "status": "Accepted",
@@ -370,7 +366,7 @@ def create_sample():
                     # not provide an isl-number, we mark it as UNKNOWN for now.
                     uploaded_pathogen_genome.add_accession(
                         repository_type=PublicRepositoryType.GISAID,
-                        public_identifier=USER_SUBMITTED_TO_GISAID_ISL_NOT_PROVIDED,
+                        public_identifier=None,
                         workflow_start_datetime=datetime.datetime.now(),
                         workflow_end_datetime=datetime.datetime.now(),
                     )
