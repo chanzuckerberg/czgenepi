@@ -90,7 +90,7 @@ function buildMetadata({ headers, row, warningMessages }: RowInfo) {
     const key = HEADERS_TO_METADATA_KEYS[headers[i]];
 
     if (key) {
-      metadata[key] = convertValue(value);
+      metadata[key] = convertValue(key, value);
     }
   }
 
@@ -121,7 +121,11 @@ function buildMetadata({ headers, row, warningMessages }: RowInfo) {
   return metadata;
 }
 
-function convertValue(value: string) {
+function convertValue(key: string, value: string) {
+  if (key === "keepPrivate") {
+    console.log("KEY check cleared: ", key);
+    if (value === "") return true;
+  }
   if (value.toUpperCase() === "YES") return true;
   if (value.toUpperCase() === "NO") return false;
 
