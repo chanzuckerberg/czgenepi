@@ -95,7 +95,7 @@ function buildMetadata({ headers, row, warningMessages }: RowInfo) {
     const key = HEADERS_TO_METADATA_KEYS[headers[i]];
 
     if (key) {
-      metadata[key] = convertValue(value);
+      metadata[key] = convertValue(key, value);
     }
   }
 
@@ -142,14 +142,14 @@ function autocorrect(
   ) {
     metadata.collectionLocation = "";
   }
-
   return metadata;
 }
 
-function convertValue(value: string) {
-  if (value === "Yes") return true;
-  if (value === "No") return false;
-
+function convertValue(key: string, value: string) {
+  if (key === "keepPrivate" || key === "submittedToGisaid") {
+    if (value.toUpperCase() === "YES") return true;
+    return false;
+  }
   return value;
 }
 
