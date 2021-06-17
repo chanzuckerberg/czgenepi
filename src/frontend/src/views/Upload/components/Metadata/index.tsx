@@ -2,7 +2,7 @@ import { Button, Link } from "czifui";
 import Head from "next/head";
 import NextLink from "next/link";
 import React, { useState } from "react";
-import { EMPTY_ARRAY } from "src/common/constants/empty";
+import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { ROUTES } from "src/common/routes";
 import {
   Metadata as IMetadata,
@@ -21,7 +21,10 @@ import {
   Title,
 } from "../common/style";
 import ImportFile from "./components/ImportFile";
-import { ParseResult } from "./components/ImportFile/parseFile";
+import {
+  ParseResult,
+  SampleIdToWarningMessages,
+} from "./components/ImportFile/parseFile";
 import Table from "./components/Table";
 
 export const EMPTY_METADATA: IMetadata = {
@@ -42,7 +45,7 @@ export default function Metadata({
   const [isValid, setIsValid] = useState(false);
   const [hasImportedFile, setHasImportedFile] = useState(false);
   const [autocorrectWarnings, setAutocorrectWarnings] =
-    useState<string[]>(EMPTY_ARRAY);
+    useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
 
   function handleMetadata(result: ParseResult) {
     const { data: sampleIdToMetadata, warningMessages } = result;
@@ -57,8 +60,9 @@ export default function Metadata({
     }
 
     setMetadata(newMetadata);
+
     setAutocorrectWarnings(
-      Array.from(warningMessages.get(WARNING_CODE.AUTO_CORRECT) || [])
+      warningMessages.get(WARNING_CODE.AUTO_CORRECT) || EMPTY_OBJECT
     );
     setHasImportedFile(true);
   }

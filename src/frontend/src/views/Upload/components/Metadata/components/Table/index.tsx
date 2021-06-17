@@ -6,6 +6,7 @@ import {
   SAMPLE_COUNT,
 } from "../../../common/constants";
 import { Metadata, Props as CommonProps } from "../../../common/types";
+import { SampleIdToWarningMessages } from "../ImportFile/parseFile";
 import Row from "./components/Row";
 import {
   IdColumn,
@@ -23,7 +24,7 @@ interface Props {
   setMetadata: CommonProps["setMetadata"];
   setIsValid: React.Dispatch<React.SetStateAction<boolean>>;
   hasImportedFile: boolean;
-  autocorrectWarnings: string[];
+  autocorrectWarnings: SampleIdToWarningMessages;
 }
 
 export default function Table({
@@ -80,7 +81,7 @@ export default function Table({
     });
   };
 
-  const handleRowMetadata = useCallback(handleRowMetadata_, []);
+  const handleRowMetadata = useCallback(handleRowMetadata_, [setMetadata]);
 
   const applyToAllColumn_ = (fieldKey: keyof Metadata, value: unknown) => {
     setMetadata((prevMetadata) => {
@@ -156,7 +157,7 @@ export default function Table({
                         handleMetadata={handleRowMetadata}
                         applyToAllColumn={applyToAllColumn}
                         handleRowValidation={handleRowValidation}
-                        isAutocorrected={autocorrectWarnings.includes(sampleId)}
+                        warnings={autocorrectWarnings[sampleId]}
                       />
                     );
                   }

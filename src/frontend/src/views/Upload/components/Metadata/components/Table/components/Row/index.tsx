@@ -47,7 +47,7 @@ interface Props {
   isFirstRow: boolean;
   handleRowValidation: (id: string, isValid: boolean) => void;
   isTouched: boolean;
-  isAutocorrected: boolean;
+  warnings?: Set<keyof Metadata>;
 }
 
 export default React.memo(function Row({
@@ -58,7 +58,7 @@ export default React.memo(function Row({
   isFirstRow,
   handleRowValidation,
   isTouched,
-  isAutocorrected,
+  warnings = new Set(),
 }: Props): JSX.Element {
   const formik = useFormik({
     enableReinitialize: true,
@@ -79,11 +79,11 @@ export default React.memo(function Row({
     }
 
     setTouched(newTouched, true);
-  }, [isTouched, values]);
+  }, [isTouched, setTouched, values]);
 
   useEffect(() => {
     handleRowValidation(id, isValid);
-  }, [isValid]);
+  }, [isValid, handleRowValidation, id]);
 
   useEffect(() => {
     validateForm(values);
@@ -127,6 +127,7 @@ export default React.memo(function Row({
           formik={formik}
           fieldKey="keepPrivate"
           isDisabled={Boolean(values.submittedToGisaid)}
+          isAutocorrected={warnings.has("keepPrivate")}
         />
       </IsPrivateTableCell>
       <StyledTableCell align="center" component="div">
@@ -134,7 +135,7 @@ export default React.memo(function Row({
           formik={formik}
           fieldKey="submittedToGisaid"
           isDisabled={Boolean(values.keepPrivate)}
-          isAutocorrected={isAutocorrected}
+          isAutocorrected={warnings.has("submittedToGisaid")}
         />
       </StyledTableCell>
       <StyledTableCell component="div">
