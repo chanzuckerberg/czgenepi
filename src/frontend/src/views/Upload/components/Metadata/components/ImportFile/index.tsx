@@ -14,7 +14,7 @@ import Warning from "./components/Alerts/Warning";
 import DownloadTemplate from "./components/DownloadTemplate";
 import Instructions from "./components/Instructions";
 import { EXAMPLES } from "./constants";
-import { parseFile, ParseResult } from "./parseFile";
+import { parseFile, ParseResult, SampleIdToWarningMessages } from "./parseFile";
 import { IntroWrapper, Title, TitleWrapper, Wrapper } from "./style";
 
 interface Props {
@@ -69,7 +69,7 @@ export default function ImportFile({
     );
 
     const autocorrectCount =
-      warningMessages.get(WARNING_CODE.AUTO_CORRECT)?.size || 0;
+      getAutocorrectCount(warningMessages.get(WARNING_CODE.AUTO_CORRECT)) || 0;
 
     setHasImportedFile(true);
     setMissingFields(missingFields);
@@ -188,4 +188,10 @@ function isParseResultCompletelyUnused(
   const { data } = parseResult;
 
   return unusedSampleIds.length === Object.keys(data).length;
+}
+
+function getAutocorrectCount(
+  sampleIdToWarningMessages: SampleIdToWarningMessages = {}
+) {
+  return Object.keys(sampleIdToWarningMessages).length;
 }

@@ -12,11 +12,13 @@ import {
 } from "../../../common/types";
 import { COUNTIES } from "../Table/components/Row/components/LocationField/COUNTIES";
 
+export type SampleIdToWarningMessages = Record<string, Set<keyof Metadata>>;
+
 export interface RowInfo {
   row: string[];
   rowIndex: number;
   errorMessages: Map<ERROR_CODE, Set<string>>;
-  warningMessages: Map<WARNING_CODE, Set<string>>;
+  warningMessages: Map<WARNING_CODE, SampleIdToWarningMessages>;
   headers: string[] | null;
 }
 
@@ -24,7 +26,7 @@ export interface ParseResult {
   data: SampleIdToMetadata;
   errorMessages: Map<ERROR_CODE, Set<string>>;
   filename: string;
-  warningMessages: Map<WARNING_CODE, Set<string>>;
+  warningMessages: Map<WARNING_CODE, SampleIdToWarningMessages>;
 }
 
 export function parseFile(file: File): Promise<ParseResult> {
@@ -35,7 +37,10 @@ export function parseFile(file: File): Promise<ParseResult> {
 
         const sampleIdToMetadata: Record<string, Metadata> = {};
         const errorMessages = new Map<ERROR_CODE, Set<string>>();
-        const warningMessages = new Map<WARNING_CODE, Set<string>>();
+        const warningMessages = new Map<
+          WARNING_CODE,
+          SampleIdToWarningMessages
+        >();
 
         for (let i = 0; i < rows.length; i++) {
           const row = rows[i];
@@ -94,18 +99,38 @@ function buildMetadata({ headers, row, warningMessages }: RowInfo) {
     }
   }
 
+  return autocorrect(metadata, warningMessages);
+}
+
+function autocorrect(
+  metadata: ParsedMetadata,
+  warningMessages: ParseResult["warningMessages"]
+) {
   /**
    * (thuang): Set `submittedToGisaid` to `true`, if related optional
    * fields are present
    */
   if (metadata.publicId || metadata.islAccessionNumber) {
-    const autoCorrect =
-      warningMessages.get(WARNING_CODE.AUTO_CORRECT) || new Set();
+    const sampleIdToCorrectedKeys =
+      warningMessages.get(WARNING_CODE.AUTO_CORRECT) || {};
 
-    autoCorrect.add(metadata.sampleId as string);
-    warningMessages.set(WARNING_CODE.AUTO_CORRECT, autoCorrect);
+    const correctedKeys = new Set<keyof Metadata>();
 
-    metadata.submittedToGisaid = true;
+    if (!metadata.submittedToGisaid) {
+      metadata.submittedToGisaid = true;
+      correctedKeys.add("submittedToGisaid");
+    }
+
+    if (metadata.keepPrivate) {
+      metadata.keepPrivate = false;
+      correctedKeys.add("keepPrivate");
+    }
+
+    if (correctedKeys.size) {
+      sampleIdToCorrectedKeys[metadata.sampleId as string] = correctedKeys;
+    }
+
+    warningMessages.set(WARNING_CODE.AUTO_CORRECT, sampleIdToCorrectedKeys);
   }
 
   /**
