@@ -107,7 +107,7 @@ function buildMetadata({ headers, row, warningMessages }: RowInfo) {
 
     metadata.submittedToGisaid = true;
   }
-
+  
   /**
    * (thuang): Reset county to "" if value is not on the list `COUNTIES`
    */
@@ -117,13 +117,13 @@ function buildMetadata({ headers, row, warningMessages }: RowInfo) {
   ) {
     metadata.collectionLocation = "";
   }
-
+  console.log("METADATA: ", metadata);
   return metadata;
 }
 
 function convertValue(value: string) {
-  if (value === "Yes") return true;
-  if (value === "No") return false;
+  if (value.toUpperCase() === "YES") return true;
+  if (value.toUpperCase() === "NO") return false;
 
   return value;
 }
