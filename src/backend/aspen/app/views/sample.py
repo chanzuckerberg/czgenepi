@@ -255,6 +255,7 @@ def samples():
                 ),
                 "czb_failed_genome_recovery": sample.czb_failed_genome_recovery,
                 "lineage": _format_lineage(sample),
+                "private": sample.private,
             }
 
             if (

@@ -27,7 +27,7 @@ def test_samples_view(
 ):
     group = group_factory()
     user = user_factory(group)
-    sample = sample_factory(group, user)
+    sample = sample_factory(group, user, private=True)
     uploaded_pathogen_genome = uploaded_pathogen_genome_factory(sample)
     session.add(group)
     session.commit()
@@ -59,6 +59,7 @@ def test_samples_view(
                         uploaded_pathogen_genome.pangolin_last_updated
                     ),
                 },
+                "private": True,
             }
         ]
     }
@@ -110,6 +111,7 @@ def test_samples_view_gisaid_rejected(
                         uploaded_pathogen_genome.pangolin_last_updated
                     ),
                 },
+                "private": False,
             }
         ]
     }
@@ -155,6 +157,7 @@ def test_samples_view_gisaid_no_info(
                         uploaded_pathogen_genome.pangolin_last_updated
                     ),
                 },
+                "private": False,
             }
         ]
     }
@@ -191,6 +194,7 @@ def test_samples_view_gisaid_not_eligible(
                     "version": None,
                     "last_updated": None,
                 },
+                "private": False,
             }
         ]
     }
@@ -242,6 +246,7 @@ def test_samples_view_gisaid_submitted(
                         uploaded_pathogen_genome.pangolin_last_updated
                     ),
                 },
+                "private": False,
             }
         ]
     }
@@ -326,6 +331,7 @@ def test_samples_view_system_admin(
                     uploaded_pathogen_genome.pangolin_last_updated
                 ),
             },
+            "private": False,
         }
     ]
 
@@ -387,6 +393,7 @@ def test_samples_view_cansee_metadata(
                     uploaded_pathogen_genome.pangolin_last_updated
                 ),
             },
+            "private": False,
         }
     ]
 
@@ -441,6 +448,7 @@ def test_samples_view_cansee_all(
                     uploaded_pathogen_genome.pangolin_last_updated
                 ),
             },
+            "private": False,
         }
     ]
 
@@ -504,6 +512,7 @@ def test_samples_failed_accession(
                         uploaded_pathogen_genome.pangolin_last_updated
                     ),
                 },
+                "private": False,
             }
         ]
     }
@@ -566,6 +575,7 @@ def test_samples_multiple_accession(
                         uploaded_pathogen_genome.pangolin_last_updated
                     ),
                 },
+                "private": False,
             }
         ]
     }
@@ -615,6 +625,7 @@ def test_samples_view_no_pangolin(
                     "version": None,
                     "last_updated": "N/A",
                 },
+                "private": False,
             }
         ]
     }
