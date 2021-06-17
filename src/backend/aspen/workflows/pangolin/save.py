@@ -22,7 +22,7 @@ def get_probability(row: dict) -> Union[int, None]:
     that had to be imputed from the reference sequence.
     Round and multiply by 100 --> percentage for easier user comprehension.
     """
-    if row["ambiguity_score"] != "":
+    if row["ambiguity_score"]:
         return round(row["ambiguity_score"] * 100)
     elif "Assigned using designation hash" in row["note"]:
         return 100
