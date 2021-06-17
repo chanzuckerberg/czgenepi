@@ -32,7 +32,7 @@ class GisaidAccession(Accession):
 
     entity_id = Column(Integer, ForeignKey(Entity.id), primary_key=True)
 
-    public_identifier = Column(String, nullable=False)
+    public_identifier = Column(String, nullable=True)
 
     @classmethod
     def attach_to_entity(
