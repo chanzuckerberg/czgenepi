@@ -1,11 +1,9 @@
 import styled from "@emotion/styled";
 import { Chip, fontBodyXxs, getColors, getSpacings } from "czifui";
 import { RowContent } from "src/common/components/library/data_table/style";
-import { pageContentHeight } from "src/common/styles/mixins/global";
+import { PageContent } from "src/common/styles/mixins/global";
 
-export const Container = styled.div`
-  ${pageContentHeight}
-
+export const Container = styled(PageContent)`
   display: flex;
   flex-flow: column wrap;
   align-content: flex-start;
@@ -58,4 +56,14 @@ export const GISAIDCell = styled.div`
 export const PrivateIdValueWrapper = styled.div`
   display: flex;
   flex-direction: column;
+`;
+
+export const SampleIconWrapper = styled.span`
+  position: relative;
+`;
+
+export const PrivacyIcon = styled.span`
+  position: absolute;
+  left: 30px;
+  bottom: -2px;
 `;

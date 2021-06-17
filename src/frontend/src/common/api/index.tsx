@@ -7,7 +7,14 @@ export enum API {
   LOG_IN = "/login",
   LOG_OUT = "/logout",
   PHYLO_TREES = "/api/phylo_trees",
+  SAMPLES_CREATE = "/api/samples/create",
 }
+
+export const DEFAULT_HEADERS_MUTATION_OPTIONS: RequestInit = {
+  headers: {
+    "Content-Type": "application/json",
+  },
+};
 
 export const DEFAULT_FETCH_OPTIONS: RequestInit = {
   credentials: "include",
@@ -18,10 +25,10 @@ export const DEFAULT_PUT_OPTIONS: RequestInit = {
   method: "PUT",
 };
 
-export const DEFAULT_HEADERS_MUTATION_OPTIONS: RequestInit = {
-  headers: {
-    "Content-Type": "application/json",
-  },
+export const DEFAULT_POST_OPTIONS: RequestInit = {
+  credentials: "include",
+  method: "POST",
+  ...DEFAULT_HEADERS_MUTATION_OPTIONS,
 };
 
 /** Generic functions to interface with the backend API **/

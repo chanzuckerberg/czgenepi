@@ -14,8 +14,8 @@ import {
   P,
   Title,
 } from "src/common/styles/support/style";
+import { PageContent } from "../../common/styles/mixins/global";
 import {
-  Container,
   ContentRow,
   SectionRow,
   Table,
@@ -872,7 +872,7 @@ const PrivacyPolicy = (): JSX.Element => {
       <Head>
         <title>Aspen | Privacy</title>
       </Head>
-      <Container>
+      <PageContent>
         <NarrowContainer>
           {renderIntro()}
           {renderSummaryTable()}
@@ -887,7 +887,7 @@ const PrivacyPolicy = (): JSX.Element => {
           {renderContactInfo()}
           {renderChangesToPrivacyNotice()}
         </NarrowContainer>
-      </Container>
+      </PageContent>
     </>
   );
 };

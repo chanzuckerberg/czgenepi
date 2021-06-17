@@ -10,7 +10,8 @@ import DialogTitle from "src/common/components/library/Dialog/components/DialogT
 import ENV from "src/common/constants/ENV";
 import { updateUserInfo, useProtectedRoute } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
-import { Container, Details, Title } from "./style";
+import { PageContent } from "../../common/styles/mixins/global";
+import { Details, Title } from "./style";
 
 export default function AgreeTerms(): JSX.Element {
   useProtectedRoute();
@@ -46,7 +47,7 @@ export default function AgreeTerms(): JSX.Element {
       <Head>
         <title>Aspen | Agree Terms of Service</title>
       </Head>
-      <Container>
+      <PageContent>
         <Dialog open>
           <DialogTitle>
             <Title>
@@ -131,7 +132,7 @@ export default function AgreeTerms(): JSX.Element {
             </a>
           </DialogActions>
         </Dialog>
-      </Container>
+      </PageContent>
     </>
   );
 }
