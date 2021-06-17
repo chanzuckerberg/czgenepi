@@ -107,7 +107,7 @@ function buildMetadata({ headers, row, warningMessages }: RowInfo) {
 
     metadata.submittedToGisaid = true;
   }
-  
+
   /**
    * (thuang): Reset county to "" if value is not on the list `COUNTIES`
    */
@@ -121,9 +121,7 @@ function buildMetadata({ headers, row, warningMessages }: RowInfo) {
 }
 
 function convertValue(key: string, value: string) {
-  if (key === "keepPrivate") {
-    if (value === "") return true;
-  }
+  if (key === "keepPrivate" && value === "") return true;
   if (value.toUpperCase() === "YES") return true;
   if (value.toUpperCase() === "NO") return false;
 
