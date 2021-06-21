@@ -51,7 +51,6 @@ export async function handleFile(
   filename: string,
   file: Uint8Array
 ): Promise<ParseOutcome> {
-
   if (filename.includes(".zip")) {
     return handleZip(file);
   }

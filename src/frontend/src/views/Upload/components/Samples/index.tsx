@@ -121,10 +121,10 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
                 fasta.zip
               </span>,
               <span key="3">
-                Sample names must be no longer than 120 characters and
-                can only contain letters from the English alphabet (A-Z, upper
-                and lower case), numbers (0-9), periods (.), hyphens (-),
-                underscores (_), and backslashes (/). Spaces are not allowed.
+                Sample names must be no longer than 120 characters and can only
+                contain letters from the English alphabet (A-Z, upper and lower
+                case), numbers (0-9), periods (.), hyphens (-), underscores (_),
+                and backslashes (/). Spaces are not allowed.
               </span>,
               <span key="4">
                 The maximum number of samples accommodated per upload is 500.
