@@ -27,7 +27,7 @@ def test_samples_view(
 ):
     group = group_factory()
     user = user_factory(group)
-    sample = sample_factory(group, user)
+    sample = sample_factory(group, user, private=True)
     uploaded_pathogen_genome = uploaded_pathogen_genome_factory(sample)
     session.add(group)
     session.commit()
@@ -59,6 +59,7 @@ def test_samples_view(
                         uploaded_pathogen_genome.pangolin_last_updated
                     ),
                 },
+                "private": True,
             }
         ]
     }
@@ -110,6 +111,7 @@ def test_samples_view_gisaid_rejected(
                         uploaded_pathogen_genome.pangolin_last_updated
                     ),
                 },
+                "private": False,
             }
         ]
     }
@@ -155,6 +157,7 @@ def test_samples_view_gisaid_no_info(
                         uploaded_pathogen_genome.pangolin_last_updated
                     ),
                 },
+                "private": False,
             }
         ]
     }
@@ -191,6 +194,7 @@ def test_samples_view_gisaid_not_eligible(
                     "version": None,
                     "last_updated": None,
                 },
+                "private": False,
             }
         ]
     }
@@ -242,6 +246,7 @@ def test_samples_view_gisaid_submitted(
                         uploaded_pathogen_genome.pangolin_last_updated
                     ),
                 },
+                "private": False,
             }
         ]
     }
@@ -326,6 +331,7 @@ def test_samples_view_system_admin(
                     uploaded_pathogen_genome.pangolin_last_updated
                 ),
             },
+            "private": False,
         }
     ]
 
@@ -387,6 +393,7 @@ def test_samples_view_cansee_metadata(
                     uploaded_pathogen_genome.pangolin_last_updated
                 ),
             },
+            "private": False,
         }
     ]
 
@@ -441,6 +448,7 @@ def test_samples_view_cansee_all(
                     uploaded_pathogen_genome.pangolin_last_updated
                 ),
             },
+            "private": False,
         }
     ]
 
@@ -504,6 +512,7 @@ def test_samples_failed_accession(
                         uploaded_pathogen_genome.pangolin_last_updated
                     ),
                 },
+                "private": False,
             }
         ]
     }
@@ -566,6 +575,7 @@ def test_samples_multiple_accession(
                         uploaded_pathogen_genome.pangolin_last_updated
                     ),
                 },
+                "private": False,
             }
         ]
     }
@@ -615,6 +625,7 @@ def test_samples_view_no_pangolin(
                     "version": None,
                     "last_updated": "N/A",
                 },
+                "private": False,
             }
         ]
     }
@@ -637,23 +648,29 @@ def test_samples_create_view_pass_no_public_id(
         {
             "sample": {
                 "private_identifier": "private",
+                "public_identifier": "",
                 "collection_date": api_utils.format_date(datetime.datetime.now()),
                 "location": "Ventura County",
                 "private": True,
             },
             "pathogen_genome": {
-                "sequence": "AAAAAXNTCG",
+                "sequence": "AAAKAANTCG",
+                "sequencing_date": api_utils.format_date(datetime.datetime.now()),
+                "isl_access_number": "test_accession_number",
             },
         },
         {
             "sample": {
                 "private_identifier": "private2",
+                "public_identifier": "",
                 "collection_date": api_utils.format_date(datetime.datetime.now()),
                 "location": "Ventura County",
                 "private": True,
             },
             "pathogen_genome": {
                 "sequence": "AACTGTNNNN",
+                "sequencing_date": api_utils.format_date(datetime.datetime.now()),
+                "isl_access_number": "test_accession_number2",
             },
         },
     ]
@@ -671,7 +688,10 @@ def test_samples_create_view_pass_no_public_id(
     assert len(uploaded_pathogen_genomes) == 2
     # check that creating new public identifiers works
     public_ids = sorted([i.public_identifier for i in session.query(Sample).all()])
-    assert ["USA/groupname-1/2021", "USA/groupname-2/2021"] == public_ids
+    assert [
+        "hCoV-19/USA/groupname-1/2021",
+        "hCoV-19/USA/groupname-2/2021",
+    ] == public_ids
 
     sample_1 = (
         session.query(Sample)
@@ -683,6 +703,169 @@ def test_samples_create_view_pass_no_public_id(
     assert sample_1.uploaded_pathogen_genome.num_mixed == 1
     assert sample_1.uploaded_pathogen_genome.num_unambiguous_sites == 8
     assert sample_1.uploaded_pathogen_genome.num_missing_alleles == 1
+
+
+def test_samples_create_view_pass_no_sequencing_date(
+    session,
+    app,
+    client,
+):
+    group = group_factory()
+    user = user_factory(group)
+    session.add(group)
+    session.commit()
+    with client.session_transaction() as sess:
+        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
+
+    data = [
+        {
+            "sample": {
+                "private_identifier": "private",
+                "public_identifier": "",
+                "collection_date": api_utils.format_date(datetime.datetime.now()),
+                "location": "Ventura County",
+                "private": True,
+            },
+            "pathogen_genome": {
+                "sequence": "AAAKAANTCG",
+                "sequencing_date": "",
+                "isl_access_number": "test_accession_number",
+            },
+        },
+        {
+            "sample": {
+                "private_identifier": "private2",
+                "public_identifier": "",
+                "collection_date": api_utils.format_date(datetime.datetime.now()),
+                "location": "Ventura County",
+                "private": True,
+            },
+            "pathogen_genome": {
+                "sequence": "AACTKGTNNNN",
+                "sequencing_date": "2021-06-15",
+                "isl_access_number": "test_accession_number2",
+            },
+        },
+    ]
+    res = client.post("/api/samples/create", json=data, content_type="application/json")
+    assert res.status == "200 OK"
+    session.close()
+    session.begin()
+
+    samples = session.query(
+        Sample.private_identifier.in_(["private", "private2"])
+    ).all()
+    uploaded_pathogen_genomes = session.query(UploadedPathogenGenome).all()
+
+    assert len(samples) == 2
+    assert len(uploaded_pathogen_genomes) == 2
+    # check that creating new public identifiers works
+    public_ids = sorted([i.public_identifier for i in session.query(Sample).all()])
+    assert [
+        "hCoV-19/USA/groupname-1/2021",
+        "hCoV-19/USA/groupname-2/2021",
+    ] == public_ids
+
+    sample_1 = (
+        session.query(Sample)
+        .options(joinedload(Sample.uploaded_pathogen_genome))
+        .filter(Sample.private_identifier == "private")
+        .one()
+    )
+
+    assert sample_1.uploaded_pathogen_genome.num_mixed == 1
+    assert sample_1.uploaded_pathogen_genome.num_unambiguous_sites == 8
+    assert sample_1.uploaded_pathogen_genome.num_missing_alleles == 1
+
+
+def test_samples_create_view_invalid_sequence(
+    session,
+    app,
+    client,
+):
+    group = group_factory()
+    user = user_factory(group)
+    session.add(group)
+    session.commit()
+    with client.session_transaction() as sess:
+        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
+
+    data = [
+        {
+            "sample": {
+                "private_identifier": "private",
+                "public_identifier": "",
+                "collection_date": api_utils.format_date(datetime.datetime.now()),
+                "location": "Ventura County",
+                "private": True,
+            },
+            "pathogen_genome": {
+                "sequence": "123456",
+                "sequencing_date": "",
+                "isl_access_number": "test_accession_number",
+            },
+        },
+    ]
+    res = client.post("/api/samples/create", json=data, content_type="application/json")
+    assert res.status == "400 BAD REQUEST"
+    assert (
+        res.get_data() == b"Sample private contains invalid sequence characters,"
+        b" accepted characters are [WSKMYRVHDBNZNATCGU-]"
+    )
+
+
+def test_samples_create_view_fail_duplicate_ids(
+    session,
+    app,
+    client,
+):
+    group = group_factory()
+    user = user_factory(group)
+    session.add(group)
+    sample = sample_factory(
+        group, user, private_identifier="private", public_identifier="public"
+    )
+    session.add(sample)
+    session.commit()
+    with client.session_transaction() as sess:
+        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
+
+    data = [
+        {
+            "sample": {
+                "private_identifier": "private",
+                "public_identifier": "public",
+                "collection_date": api_utils.format_date(datetime.datetime.now()),
+                "location": "Ventura County",
+                "private": True,
+            },
+            "pathogen_genome": {
+                "sequence": "AAAAAXNTCG",
+                "sequencing_date": "",
+                "isl_access_number": "test_accession_number",
+            },
+        },
+        {
+            "sample": {
+                "private_identifier": "private",
+                "public_identifier": "",
+                "collection_date": api_utils.format_date(datetime.datetime.now()),
+                "location": "Ventura County",
+                "private": True,
+            },
+            "pathogen_genome": {
+                "sequence": "AACTGTNNNN",
+                "sequencing_date": "",
+                "isl_access_number": "test_accession_number2",
+            },
+        },
+    ]
+    res = client.post("/api/samples/create", json=data, content_type="application/json")
+    assert res.status == "400 BAD REQUEST"
+    assert (
+        res.get_data()
+        == b"Duplicate fields found in db private_identifiers ['private'] and public_identifiers: ['public']"
+    )
 
 
 def test_samples_create_view_fail_missing_required_fields(
@@ -701,6 +884,7 @@ def test_samples_create_view_fail_missing_required_fields(
         {
             "sample": {
                 "private_identifier": "private",
+                "public_identifier": "",
                 "collection_date": api_utils.format_date(datetime.datetime.now()),
             },
             "pathogen_genome": {

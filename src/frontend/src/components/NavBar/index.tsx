@@ -1,11 +1,9 @@
 import cx from "classnames";
 import Link from "next/link";
 import React from "react";
-import { API } from "src/common/api";
-import ENV from "src/common/constants/ENV";
 import { useUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
-import UserMenu from "./components/UserMenu";
+import RightNav from "./components/RightNav";
 import style from "./index.module.scss";
 import { Logo, LogoAnchor } from "./style";
 
@@ -16,7 +14,6 @@ const NavBar = (): JSX.Element => {
   const { data } = useUserInfo();
 
   const group = data?.group;
-  const user = data?.user;
 
   const orgElements = (
     <React.Fragment>
@@ -35,23 +32,7 @@ const NavBar = (): JSX.Element => {
 
   const orgSplash = hasOrg();
 
-  const signInLink = (
-    <a href={ENV.API_URL + API.LOG_IN} data-test-id="navbar-sign-in-link">
-      <div className={cx(style.item, style.link)}>Sign In</div>
-    </a>
-  );
-
-  function isLoggedIn(): JSX.Element {
-    if (user) {
-      return <UserMenu user={user.name} />;
-    } else {
-      return signInLink;
-    }
-  }
-
-  const rightEdge = isLoggedIn();
-
-  const route = user ? ROUTES.DATA : ROUTES.HOMEPAGE;
+  const route = data ? ROUTES.DATA : ROUTES.HOMEPAGE;
 
   return (
     <div className={style.bar} data-test-id="navbar">
@@ -64,7 +45,9 @@ const NavBar = (): JSX.Element => {
         {orgSplash}
       </div>
 
-      <div className={style.right}>{rightEdge}</div>
+      <div className={style.right}>
+        <RightNav />
+      </div>
     </div>
   );
 };

@@ -17,6 +17,10 @@ builds:
     subsampling_scheme: group_plus_context
     title: '{location}, {division} and related contextual samples'
 
+## custom rules
+custom_rules:
+  - my_profiles/aspen/subsampling_ranges.smk
+
 ## Auxiliary files
 files:
   lat_longs: "my_profiles/aspen/lat_longs.tsv"

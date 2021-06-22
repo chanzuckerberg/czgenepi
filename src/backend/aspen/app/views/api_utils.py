@@ -5,7 +5,7 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.query import Query
 from sqlalchemy.orm.session import Session
 
-from aspen.database.models.usergroup import User
+from aspen.database.models import Sample, User
 
 
 def filter_usergroup_dict(
@@ -37,6 +37,47 @@ def format_datetime(dt: Optional[datetime.datetime], format="%Y-%m-%d %I:%M%p") 
         return "N/A"
 
 
+def format_sequencing_date(
+    dt: str, format="%Y-%m-%d"
+) -> Union[None, datetime.datetime]:
+    if dt == "":
+        return None
+    return datetime.datetime.strptime(dt, format)
+
+
+def check_duplicate_samples(
+    data: Mapping, session
+) -> Union[None, Mapping[str, list[str]]]:
+    private_ids: list = []
+    public_ids: list = []
+
+    for d in data:
+        private_ids.append(d["sample"]["private_identifier"])
+        if "public_identifier" in d["sample"].keys():
+            public_ids.append(d["sample"]["public_identifier"])
+
+    existing_private_ids: list[str] = [
+        i.private_identifier
+        for i in session.query(Sample)
+        .filter(Sample.private_identifier.in_(private_ids))
+        .all()
+    ]
+    existing_public_ids: list[str] = [
+        i.public_identifier
+        for i in session.query(Sample)
+        .filter(Sample.public_identifier.in_(public_ids))
+        .all()
+    ]
+
+    if existing_private_ids or existing_public_ids:
+        return {
+            "existing_private_ids": existing_private_ids,
+            "existing_public_ids": existing_public_ids,
+        }
+
+    return None
+
+
 def check_data(
     sample_fields: list[str],
     pathogen_genome_fields: list[str],
@@ -60,3 +101,10 @@ def check_data(
 
     # data is clean
     return True, [], []
+
+
+def check_valid_sequence(sequence: str) -> bool:
+    """
+    Check that the sequence string only contains valid sequence characters
+    """
+    return set(sequence).issubset(set("WSKMYRVHDBNZNATCGU-"))

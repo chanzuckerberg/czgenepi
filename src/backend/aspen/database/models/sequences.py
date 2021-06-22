@@ -155,6 +155,7 @@ class PathogenGenome(Entity):
 
     entity_id = Column(Integer, ForeignKey(Entity.id), primary_key=True)
     sequence = deferred(Column(String, nullable=False), raiseload=True)
+    sequencing_date = Column(Date, nullable=True)
 
     # statistics for the pathogen genome
     def calculate_num_unambiguous_sites(self):

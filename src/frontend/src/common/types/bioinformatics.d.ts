@@ -25,6 +25,7 @@ interface Sample extends BioinformaticsType {
   gisaid: GISAID;
   CZBFailedGenomeRecovery: boolean;
   lineage: Lineage;
+  private?: boolean;
 }
 
 interface Tree extends BioinformaticsType {

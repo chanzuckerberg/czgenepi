@@ -8,4 +8,8 @@ export enum ROUTES {
   FAQ = "/faq",
   DATA_SAMPLES = "/data/samples",
   PHYLO_TREES = "/data/phylogenetic_trees",
+  UPLOAD = "/upload",
+  UPLOAD_STEP1 = "/upload/1",
+  UPLOAD_STEP2 = "/upload/2",
+  UPLOAD_STEP3 = "/upload/3",
 }
