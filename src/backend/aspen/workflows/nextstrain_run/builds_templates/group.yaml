@@ -37,4 +37,4 @@ subsampling:
     query: --query "(location == '{{location}}') & (division == '{{division}}')"
     priorities:
       type: "file"
-      file: "my_profiles/aspen/aspen_priorities.tsv"
+      file: "results/priorities.tsv"
