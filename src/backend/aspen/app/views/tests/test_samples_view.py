@@ -847,6 +847,60 @@ def test_samples_create_view_fail_duplicate_ids(
         },
         {
             "sample": {
+                "private_identifier": "private1",
+                "public_identifier": "",
+                "collection_date": api_utils.format_date(datetime.datetime.now()),
+                "location": "Ventura County",
+                "private": True,
+            },
+            "pathogen_genome": {
+                "sequence": "AACTGTNNNN",
+                "sequencing_date": "",
+                "isl_access_number": "test_accession_number2",
+            },
+        },
+    ]
+    res = client.post("/api/samples/create", json=data, content_type="application/json")
+    assert res.status == "400 BAD REQUEST"
+    assert (
+        res.get_data()
+        == b"Error inserting data, private_identifiers ['private'] or public_identifiers: ['public'] already exist in our database, please remove these samples before proceeding with upload."
+    )
+
+
+def test_samples_create_view_fail_duplicate_ids_in_request_data(
+    session,
+    app,
+    client,
+):
+    group = group_factory()
+    user = user_factory(group)
+    session.add(group)
+    sample = sample_factory(
+        group, user, private_identifier="private", public_identifier="public"
+    )
+    session.add(sample)
+    session.commit()
+    with client.session_transaction() as sess:
+        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
+
+    data = [
+        {
+            "sample": {
+                "private_identifier": "private",
+                "public_identifier": "public",
+                "collection_date": api_utils.format_date(datetime.datetime.now()),
+                "location": "Ventura County",
+                "private": True,
+            },
+            "pathogen_genome": {
+                "sequence": "AAAAAXNTCG",
+                "sequencing_date": "",
+                "isl_access_number": "test_accession_number",
+            },
+        },
+        {
+            "sample": {
                 "private_identifier": "private",
                 "public_identifier": "",
                 "collection_date": api_utils.format_date(datetime.datetime.now()),
@@ -864,7 +918,7 @@ def test_samples_create_view_fail_duplicate_ids(
     assert res.status == "400 BAD REQUEST"
     assert (
         res.get_data()
-        == b"Duplicate fields found in db private_identifiers ['private'] and public_identifiers: ['public']"
+        == b"Error processing data, either duplicate private_identifiers: ['private'] or duplicate public identifiers: [] exist in the upload files, please rename duplicates before proceeding with upload."
     )
 
 

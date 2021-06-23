@@ -283,12 +283,21 @@ def create_sample():
         )
         request_data = request.get_json()
 
+        duplicates_in_request: Union[
+            None, Mapping[str, list[str]]
+        ] = api_utils.check_duplicate_data_in_request(request_data)
+        if duplicates_in_request:
+            return Response(
+                f"Error processing data, either duplicate private_identifiers: {duplicates_in_request['duplicate_private_ids']} or duplicate public identifiers: {duplicates_in_request['duplicate_public_ids']} exist in the upload files, please rename duplicates before proceeding with upload.",
+                400,
+            )
+
         already_exists: Union[
             None, Mapping[str, list[str]]
         ] = api_utils.check_duplicate_samples(request_data, db_session)
         if already_exists:
             return Response(
-                f"Duplicate fields found in db private_identifiers {already_exists['existing_private_ids']} and public_identifiers: {already_exists['existing_public_ids']}",
+                f"Error inserting data, private_identifiers {already_exists['existing_private_ids']} or public_identifiers: {already_exists['existing_public_ids']} already exist in our database, please remove these samples before proceeding with upload.",
                 400,
             )
         public_ids = create_public_ids(user.group_id, db_session, len(request_data))
