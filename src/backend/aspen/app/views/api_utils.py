@@ -1,4 +1,5 @@
 import datetime
+from collections import Counter
 from typing import Collection, List, Mapping, Optional, Tuple, Union
 
 from sqlalchemy.orm import joinedload
@@ -45,9 +46,7 @@ def format_sequencing_date(
     return datetime.datetime.strptime(dt, format)
 
 
-def check_duplicate_samples(
-    data: Mapping, session
-) -> Union[None, Mapping[str, list[str]]]:
+def get_all_identifiers_in_request(data: Mapping) -> Tuple[list[str], list[str]]:
     private_ids: list = []
     public_ids: list = []
 
@@ -55,6 +54,14 @@ def check_duplicate_samples(
         private_ids.append(d["sample"]["private_identifier"])
         if "public_identifier" in d["sample"].keys():
             public_ids.append(d["sample"]["public_identifier"])
+
+    return private_ids, public_ids
+
+
+def check_duplicate_samples(
+    data: Mapping, session
+) -> Union[None, Mapping[str, list[str]]]:
+    private_ids, public_ids = get_all_identifiers_in_request(data)
 
     existing_private_ids: list[str] = [
         i.private_identifier
@@ -73,6 +80,24 @@ def check_duplicate_samples(
         return {
             "existing_private_ids": existing_private_ids,
             "existing_public_ids": existing_public_ids,
+        }
+
+    return None
+
+
+def check_duplicate_data_in_request(
+    data: Mapping,
+) -> Union[None, Mapping[str, list[str]]]:
+    private_ids, public_ids = get_all_identifiers_in_request(data)
+    private_id_counts = [id for id, count in Counter(private_ids).items() if count > 1]
+    public_id_counts = [
+        id for id, count in Counter(public_ids).items() if count > 1 and id != ""
+    ]
+
+    if private_id_counts or public_id_counts:
+        return {
+            "duplicate_private_ids": private_id_counts,
+            "duplicate_public_ids": public_id_counts,
         }
 
     return None
