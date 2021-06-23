@@ -918,7 +918,7 @@ def test_samples_create_view_fail_duplicate_ids_in_request_data(
     assert res.status == "400 BAD REQUEST"
     assert (
         res.get_data()
-        == b"Error processing data, either duplicate private_identifiers: ['private'] or duplicate public identifiers: [] are trying to be uploaded at the same time, please remove duplicates before proceeding with upload."
+        == b"Error processing data, either duplicate private_identifiers: ['private'] or duplicate public identifiers: [] exist in the upload files, please rename duplicates before proceeding with upload."
     )
 
 

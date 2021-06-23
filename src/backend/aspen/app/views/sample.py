@@ -288,7 +288,7 @@ def create_sample():
         ] = api_utils.check_duplicate_data_in_request(request_data)
         if duplicates_in_request:
             return Response(
-                f"Error processing data, either duplicate private_identifiers: {duplicates_in_request['duplicate_private_ids']} or duplicate public identifiers: {duplicates_in_request['duplicate_public_ids']} are trying to be uploaded at the same time, please remove duplicates before proceeding with upload.",
+                f"Error processing data, either duplicate private_identifiers: {duplicates_in_request['duplicate_private_ids']} or duplicate public identifiers: {duplicates_in_request['duplicate_public_ids']} exist in the upload files, please rename duplicates before proceeding with upload.",
                 400,
             )
 
