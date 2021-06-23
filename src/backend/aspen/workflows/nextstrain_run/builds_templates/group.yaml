@@ -36,10 +36,10 @@ subsampling:
   group_only:
     group_early:
       group_by: "year month"
-      max_sequences: 500
+      max_sequences: 1000
       query: --query "(location == '{{location}}') & (division == '{{division}}')"
 
     group_late:
       group_by: "year month"
-      max_sequences: 2000
+      max_sequences: 2500
       query: --query "(location == '{{location}}') & (division == '{{division}}')"
