@@ -345,16 +345,15 @@ def create_sample():
                         user.group.name,
                     ]
 
-                sample: Sample = Sample(**sample_args)
-                # check that pathogen_genome sequence has only valid characters
                 sequence = data["pathogen_genome"]["sequence"]
                 if not check_valid_sequence(sequence):
                     return Response(
-                        f"Sample {sample.private_identifier} contains invalid sequence characters, "
+                        f"Sample {sample_args['private_identifier']} contains invalid sequence characters, "
                         f"accepted characters are [WSKMYRVHDBNZNATCGU-]",
                         400,
                     )
 
+                sample: Sample = Sample(**sample_args)
                 uploaded_pathogen_genome: UploadedPathogenGenome = (
                     UploadedPathogenGenome(
                         sample=sample,
