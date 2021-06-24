@@ -11,19 +11,12 @@ from aspen.app.views import api_utils
 from aspen.app.views.api_utils import check_valid_sequence, get_usergroup_query
 from aspen.database.connection import session_scope
 from aspen.database.models import (
-    AlignRead,
-    Bam,
-    CallConsensus,
-    CalledPathogenGenome,
     DataType,
     Entity,
-    FilterRead,
     GisaidAccession,
     GisaidAccessionWorkflow,
-    HostFilteredSequencingReadsCollection,
     PublicRepositoryType,
     Sample,
-    SequencingReadsCollection,
     UploadedPathogenGenome,
     WorkflowStatusType,
 )
@@ -178,21 +171,7 @@ def samples():
             )
             .options(
                 joinedload(Sample.uploaded_pathogen_genome),
-                joinedload(Sample.sequencing_reads_collection)
-                .joinedload(
-                    SequencingReadsCollection.consuming_workflows.of_type(FilterRead)
-                )
-                .joinedload(
-                    FilterRead.outputs.of_type(HostFilteredSequencingReadsCollection)
-                )
-                .joinedload(
-                    HostFilteredSequencingReadsCollection.consuming_workflows.of_type(
-                        AlignRead
-                    )
-                )
-                .joinedload(AlignRead.outputs.of_type(Bam))
-                .joinedload(Bam.consuming_workflows.of_type(CallConsensus))
-                .joinedload(CallConsensus.outputs.of_type(CalledPathogenGenome)),
+                joinedload(Sample.sequencing_reads_collection),
             )
             .all()
         )
@@ -200,10 +179,6 @@ def samples():
         for sample in samples:
             if sample.uploaded_pathogen_genome is not None:
                 sample_entity_ids.append(sample.uploaded_pathogen_genome.entity_id)
-            elif sample.sequencing_reads_collection is not None:
-                # TODO: get the best called pathogen genome for the sequencing read
-                # collection.
-                ...
 
         # load the gisaid_accessioning workflows.
         gisaid_accession_workflows: Sequence[GisaidAccessionWorkflow] = (
@@ -221,9 +196,7 @@ def samples():
         ] = defaultdict(list)
         for gisaid_accession_workflow in gisaid_accession_workflows:
             for workflow_input in gisaid_accession_workflow.inputs:
-                if isinstance(
-                    workflow_input, (UploadedPathogenGenome, SequencingReadsCollection)
-                ):
+                if isinstance(workflow_input, (UploadedPathogenGenome)):
                     entity_id_to_gisaid_accession_workflow_map[
                         workflow_input.entity_id
                     ].append(gisaid_accession_workflow)
