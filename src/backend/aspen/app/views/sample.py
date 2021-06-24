@@ -312,7 +312,6 @@ def create_sample():
                 SAMPLES_POST_OPTIONAL_FIELDS,
             )
             if data_ok:
-
                 # GISAID Stuff
                 if data["sample"]["public_identifier"]:
                     # if they provided a public_id they marked true to "submitted to gisaid"
@@ -347,6 +346,8 @@ def create_sample():
 
                 sequence = data["pathogen_genome"]["sequence"]
                 if not check_valid_sequence(sequence):
+                    # make sure we don't save any samples already added to the session
+                    db_session.rollback()
                     return Response(
                         f"Sample {sample_args['private_identifier']} contains invalid sequence characters, "
                         f"accepted characters are [WSKMYRVHDBNZNATCGU-]",
