@@ -264,6 +264,26 @@ def _test_samples_view_cansee(
     viewer_group = group_factory(name="cdph")
     user = user_factory(viewer_group, **user_factory_kwargs)
     sample = sample_factory(owner_group, user)
+    # create a private sample as well to make sure it doesn't get shown unless admin
+    private_sample = sample_factory(
+        owner_group,
+        user,
+        private=True,
+        private_identifier="private_id",
+        public_identifier="public_id_2",
+    )
+    uploaded_pathogen_genome_factory(
+        private_sample,
+        accessions=(
+            AccessionWorkflowDirective(
+                PublicRepositoryType.GISAID,
+                datetime.datetime.now(),
+                None,
+                None,
+            ),
+        ),
+    )
+
     uploaded_pathogen_genome = uploaded_pathogen_genome_factory(sample)
     for cansee_datatype in cansee_datatypes:
         CanSee(
@@ -313,26 +333,37 @@ def test_samples_view_system_admin(
     )
     assert samples == [
         {
-            "collection_date": api_utils.format_date(sample.collection_date),
-            "collection_location": sample.location,
+            "collection_date": "2021-06-25",
+            "collection_location": "Santa Clara County",
             "czb_failed_genome_recovery": False,
-            "gisaid": {
-                "status": "Accepted",
-                "gisaid_id": uploaded_pathogen_genome.accessions()[0].public_identifier,
-            },
-            "private_identifier": sample.private_identifier,
-            "public_identifier": sample.public_identifier,
-            "upload_date": api_utils.format_date(uploaded_pathogen_genome.upload_date),
+            "gisaid": {"gisaid_id": None, "status": "Submitted"},
             "lineage": {
-                "lineage": uploaded_pathogen_genome.pangolin_lineage,
-                "probability": uploaded_pathogen_genome.pangolin_probability,
-                "version": uploaded_pathogen_genome.pangolin_version,
-                "last_updated": api_utils.format_date(
-                    uploaded_pathogen_genome.pangolin_last_updated
-                ),
+                "last_updated": "2021-06-25",
+                "lineage": "B.1.590",
+                "probability": 1.0,
+                "version": "2021-04-23",
+            },
+            "private": True,
+            "private_identifier": "private_id",
+            "public_identifier": "public_id_2",
+            "upload_date": "2021-06-25",
+        },
+        {
+            "collection_date": "2021-06-25",
+            "collection_location": "Santa Clara County",
+            "czb_failed_genome_recovery": False,
+            "gisaid": {"gisaid_id": "gisaid_public_identifier", "status": "Accepted"},
+            "lineage": {
+                "last_updated": "2021-06-25",
+                "lineage": "B.1.590",
+                "probability": 1.0,
+                "version": "2021-04-23",
             },
             "private": False,
-        }
+            "private_identifier": "private_identifer",
+            "public_identifier": "public_identifier",
+            "upload_date": "2021-06-25",
+        },
     ]
 
 

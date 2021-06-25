@@ -3,7 +3,7 @@ from collections import defaultdict
 from typing import Any, Mapping, MutableSequence, Optional, Sequence, Set, Union
 
 from flask import jsonify, request, Response, session
-from sqlalchemy import or_
+from sqlalchemy import and_, or_
 from sqlalchemy.orm import joinedload
 
 from aspen.app.app import application, requires_auth
@@ -172,7 +172,10 @@ def samples():
             .filter(
                 or_(
                     Sample.submitting_group_id == user.group_id,
-                    Sample.submitting_group_id.in_(cansee_groups_metadata),
+                    and_(
+                        Sample.submitting_group_id.in_(cansee_groups_metadata),
+                        ~Sample.private,
+                    ),
                     user.system_admin,
                 )
             )
