@@ -173,7 +173,7 @@ def _process_phylo_tree(
 
     identifier_map: Mapping[str, str] = {
         sample.public_identifier.replace(
-            "hCoV-19/",""
+            "hCoV-19/", ""
         ) : sample.private_identifier
         for sample in phylo_tree.constituent_samples
         if sample_filter(sample)
