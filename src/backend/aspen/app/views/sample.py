@@ -1,8 +1,18 @@
 import datetime
+import tempfile
 from collections import defaultdict
-from typing import Any, Mapping, MutableSequence, Optional, Sequence, Set, Union
+from typing import (
+    Any,
+    Iterable,
+    Mapping,
+    MutableSequence,
+    Optional,
+    Sequence,
+    Set,
+    Union,
+)
 
-from flask import jsonify, request, Response, session
+from flask import jsonify, request, Response, send_file, session
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import joinedload
 
@@ -142,6 +152,95 @@ def _format_lineage(sample: Sample) -> dict[str, Any]:
         }
 
     return lineage
+
+
+@application.route("/api/sequences", methods=["GET"])
+@requires_auth
+def prepare_sequences_download():
+    with session_scope(application.DATABASE_INTERFACE) as db_session:
+        profile = session["profile"]
+        user = (
+            get_usergroup_query(db_session, profile["user_id"])
+            .options(joinedload(User.group).joinedload(Group.can_see))
+            .one()
+        )
+        request_data = request.get_json()
+        sample_ids = request_data["requested_sequences"]["sample_ids"]
+
+        # query for samples
+        all_samples: Iterable[Sample] = (
+            db_session.query(Sample)
+            .filter(
+                and_(
+                    Sample.uploaded_pathogen_genome != None,  # noqa: E711
+                    or_(
+                        Sample.private_identifier.in_(sample_ids),
+                        Sample.public_identifier.in_(sample_ids),
+                    ),
+                )
+            )
+            .options(
+                joinedload(Sample.uploaded_pathogen_genome).undefer(
+                    UploadedPathogenGenome.sequence
+                ),
+            )
+        )
+        # check that user has access to the samples
+        group_ids = set(sample.submitting_group_id for sample in all_samples)
+        cansee_groups: Set[int] = {
+            cansee.owner_group_id
+            for cansee in user.group.can_see
+            if cansee.data_type == DataType.SEQUENCES
+        }
+        # add the users own group
+        cansee_groups.add(user.group_id)
+        if not group_ids.issubset(cansee_groups):
+            return Response(
+                "User does not have access the requested sequences",
+                400,
+            )
+
+        cansee_groups_private_identifiers: Set[int] = {
+            cansee.owner_group_id
+            for cansee in user.group.can_see
+            if cansee.data_type == DataType.PRIVATE_IDENTIFIERS
+        }
+        # create output file
+        fasta_file = tempfile.NamedTemporaryFile("w+t")
+        with open(fasta_file.name, "w") as f:
+            for sample in all_samples:
+                if sample.uploaded_pathogen_genome:
+                    pathogen_genome: UploadedPathogenGenome = (
+                        sample.uploaded_pathogen_genome
+                    )
+                    sequence: str = "".join(
+                        [
+                            line
+                            for line in pathogen_genome.sequence.splitlines()  # type: ignore
+                            if not (line.startswith(">") or line.startswith(";"))
+                        ]
+                    )
+                    stripped_sequence: str = sequence.strip("Nn")
+                    # use private id if the user has access to it, else public id
+                    if (
+                        sample.submitting_group_id == user.group_id
+                        or sample.submitting_group_id
+                        in cansee_groups_private_identifiers
+                        or user.system_admin
+                    ):
+                        f.write(f">{sample.private_identifier}\n")  # type: ignore
+                    else:
+                        f.write(f">{sample.public_identifier}\n")
+                    f.write(stripped_sequence)
+                    f.write("\n")
+
+        fasta_filename = f"{user.group.name}_sample_sequences.fasta"
+        res = send_file(
+            fasta_file, attachment_filename=fasta_filename, as_attachment=True
+        )
+        # remove the file
+        f.close()
+        return res
 
 
 @application.route("/api/samples", methods=["GET"])
