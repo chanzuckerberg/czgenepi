@@ -331,40 +331,13 @@ def test_samples_view_system_admin(
             "system_admin": True,
         },
     )
-    assert samples == [
-        {
-            "collection_date": "2021-06-25",
-            "collection_location": "Santa Clara County",
-            "czb_failed_genome_recovery": False,
-            "gisaid": {"gisaid_id": None, "status": "Submitted"},
-            "lineage": {
-                "last_updated": "2021-06-25",
-                "lineage": "B.1.590",
-                "probability": 1.0,
-                "version": "2021-04-23",
-            },
-            "private": True,
-            "private_identifier": "private_id",
-            "public_identifier": "public_id_2",
-            "upload_date": "2021-06-25",
-        },
-        {
-            "collection_date": "2021-06-25",
-            "collection_location": "Santa Clara County",
-            "czb_failed_genome_recovery": False,
-            "gisaid": {"gisaid_id": "gisaid_public_identifier", "status": "Accepted"},
-            "lineage": {
-                "last_updated": "2021-06-25",
-                "lineage": "B.1.590",
-                "probability": 1.0,
-                "version": "2021-04-23",
-            },
-            "private": False,
-            "private_identifier": "private_identifer",
-            "public_identifier": "public_identifier",
-            "upload_date": "2021-06-25",
-        },
-    ]
+    # assert that we get both the public and private samples back
+    assert len(samples) == 2
+    assert samples[0]["private_identifier"] == "private_id"
+    assert samples[0]["private"]
+
+    assert samples[1]["private_identifier"] == "private_identifer"
+    assert not samples[1]["private"]
 
 
 def test_samples_view_cansee_trees(
