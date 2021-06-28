@@ -172,7 +172,7 @@ def _process_phylo_tree(
             return sample.submitting_group_id in can_see_group_ids_pi
 
     identifier_map: Mapping[str, str] = {
-        sample.public_identifier: sample.private_identifier
+        sample.public_identifier.replace("hCoV-19/","") : sample.private_identifier
         for sample in phylo_tree.constituent_samples
         if sample_filter(sample)
     }
