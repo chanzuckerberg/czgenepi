@@ -24,6 +24,7 @@ export const StyledButton = styled(Button)`
 
 export const StyledFilePicker = styled(FilePicker)`
   ${(props) => {
+    console.log("PROPS: ", props);
     const spacings = getSpacings(props);
     return `
       margin-right: ${spacings?.m}px;

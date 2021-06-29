@@ -53,9 +53,7 @@ export default function Upload({
       >
         <StyledDialogContent>
           <ImageWrapper>
-            <StyledImageDiv>
             {getImage()}
-            </StyledImageDiv>
           </ImageWrapper>
           <Title>{getTitleText()}</Title>
           <Subtitle>{getSubtitleText()}</Subtitle>
@@ -177,8 +175,7 @@ export default function Upload({
   }
 
   function getImage(): JSX.Element {
-    if (isError) return <UploadFailImage height="114" width="148" />;
-    console.log("there was no error");
-    return <UploadImage height="115" width="148" />;
+    if (isError) return <UploadFailImage height="96" width="147" />;
+    return <UploadImage height="115" width="143" />;
   }
 }
