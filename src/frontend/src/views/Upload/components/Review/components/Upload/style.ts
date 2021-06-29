@@ -43,6 +43,6 @@ export const StyledDialogActions = styled(DialogActions)`
   ${centerContent}
 `;
 
-export const StyledImage = styled(Image)`
+export const StyledImageDiv = styled.div`
   object-fit: contain;
 `;
