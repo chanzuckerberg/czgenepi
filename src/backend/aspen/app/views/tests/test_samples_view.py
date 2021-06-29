@@ -333,11 +333,10 @@ def test_samples_view_system_admin(
     )
     # assert that we get both the public and private samples back
     assert len(samples) == 2
-    assert samples[0]["private_identifier"] == "private_id"
-    assert samples[0]["private"]
-
-    assert samples[1]["private_identifier"] == "private_identifer"
-    assert not samples[1]["private"]
+    private_ids = {sample["private_identifier"] for sample in samples}
+    private = {sample["private"] for sample in samples}
+    assert private_ids == {"private_identifer", "private_id"}
+    assert private == {True, False}
 
 
 def test_samples_view_cansee_trees(
