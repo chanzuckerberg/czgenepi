@@ -129,25 +129,49 @@ function handleFastaText(text: string, filename: string): ParseOutcome {
       continue;
     }
 
-    // Aggregate sequence line by line
-    for (let j = i + 1; j < lines.length; j++) {
-      const jLine = lines[j];
+    const { newIndex, sequence } = aggregateSequence(i, lines);
 
-      if (!jLine || jLine.includes(">")) {
-        i = j;
-        break;
-      }
+    i = newIndex;
 
+    if (sequence) {
       const id = iLine.replace(">", "");
 
       result = {
         ...result,
-        [id]: (result[id] || "") + jLine,
+        [id]: sequence,
       };
     }
   }
 
   return { errors, result };
+}
+
+function aggregateSequence(
+  i: number,
+  lines: string[]
+): { newIndex: number; sequence: string } {
+  let newIndex = i;
+  let sequence = "";
+
+  // (thuang): `j` starts at `i + 1` to be on the first line of sequence,
+  // since `i` should be the `id` line
+  for (let j = i + 1; j < lines.length; j++) {
+    const jLine = lines[j];
+
+    if (!jLine || jLine.includes(">")) {
+      newIndex = j;
+      break;
+    }
+
+    sequence += jLine;
+
+    // (thuang): j has reached the end of file
+    if (j === lines.length - 1) {
+      newIndex = lines.length;
+    }
+  }
+
+  return { newIndex, sequence };
 }
 
 function unzipToFiles(file: Uint8Array): Promise<Record<string, Uint8Array>> {
