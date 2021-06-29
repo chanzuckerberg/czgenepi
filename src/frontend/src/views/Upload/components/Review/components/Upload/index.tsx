@@ -12,12 +12,11 @@ import {
   ImageWrapper,
   StyledDialogActions,
   StyledDialogContent,
-  StyledImageDiv,
+  StyledUploadFailedImage,
+  StyledUploadImage,
   Subtitle,
   Title,
 } from "./style";
-import UploadImage from "./ImgUploadPrimary.svg";
-import UploadFailImage from "./ImgUploadFailPrimary.svg";
 
 interface Props {
   isDisabled: boolean;
@@ -52,9 +51,7 @@ export default function Upload({
         onClose={handleClose}
       >
         <StyledDialogContent>
-          <ImageWrapper>
-            {getImage()}
-          </ImageWrapper>
+          <ImageWrapper>{getImage()}</ImageWrapper>
           <Title>{getTitleText()}</Title>
           <Subtitle>{getSubtitleText()}</Subtitle>
         </StyledDialogContent>
@@ -175,7 +172,10 @@ export default function Upload({
   }
 
   function getImage(): JSX.Element {
-    if (isError) return <UploadFailImage height="96" width="147" />;
-    return <UploadImage height="115" width="143" />;
+    if (isError) {
+      return <StyledUploadFailedImage height="96" width="148" />;
+    }
+
+    return <StyledUploadImage height="115" width="148" />;
   }
 }
