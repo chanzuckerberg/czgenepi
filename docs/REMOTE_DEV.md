@@ -29,7 +29,9 @@ The general remote dev workflow is:
 1. When you don't need your stack anymore, run `./scripts/happy delete <your-stack-name>` to free up remote dev resources.
 1. Run `./scripts/happy shell <your-stack-name> backend` to ssh into an ecs backend container for debugging
 
-If you forget which stacks you've created, just run `./scripts/happy list` at any time to list the current remote dev stacks.
+If you forget which stacks you've created, just run `./scripts/happy list` at any time to list the current remote dev stacks. 
+
+If you need to reset your remote dev stack DB run `./scripts/happy migrate <your-stack-name> --reset`.
 
 ### Connecting to remote dev databases
 NOTE - You'll need to [install and configure blessclient](https://wiki.czi.team/display/SI/Install+BlessClient) first!
