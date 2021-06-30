@@ -43,33 +43,29 @@ States:
           - Name: SFN_CURRENT_STATE
             Value.$: $$.State.Name
     ResultPath: $.BatchJobDetails.Run
-    Next: RunSPOTReadOutput
+    Next: RunReadOutput
     Retry: &BatchRetryConfig
       - ErrorEquals: ["Batch.AWSBatchException"]
         IntervalSeconds: 15
         MaxAttempts: 3
+        BackoffRate: 2.0
     Catch:
       - ErrorEquals: ["States.ALL"]
         ResultPath: $.BatchJobError.RunSPOT
-        Next: RunSPOTReadOutput
-  RunSPOTReadOutput:
-    Type: Task
-    Resource: arn:aws:states:::lambda:invoke
-    Parameters: &ReadOutputParameters
-      FunctionName: "${process-stage-output}"
-      Payload: *PassthroughStatePayload
-    OutputPath: $.Payload
-    Next: HandleSuccess
-    Catch:
-      - ErrorEquals: &InputErrors
-          - InvalidInputFileError
-          - InsufficientReadsError
-          - BrokenReadPairError
-          - InvalidFileFormatError
-        Next: HandleFailure
-      - ErrorEquals: ["States.ALL"]
-        ResultPath: $.BatchJobError.RunSPOT
+        Next: RunGetCause
+  RunGetCause:
+    Type: Pass
+    Parameters:
+      "Cause.$": "States.StringToJson($.BatchJobError.RunSPOT.Cause)"
+    ResultPath: "$.BatchJobError.RunSPOT"
+    Next: RunDetectError
+  RunDetectError:
+    Type: Choice
+    Choices:
+      - Variable: "$.BatchJobError.RunSPOT.Cause.StatusReason"
+        StringMatches: "Host EC2 (instance i-*) terminated."
         Next: RunEC2
+    Default: RunReadOutput
   RunEC2:
     Type: Task
     Resource: arn:aws:states:::batch:submitJob.sync
@@ -83,16 +79,18 @@ States:
         Memory.$: $.RunEC2Memory
         Environment: *RunEnvironment
     ResultPath: $.BatchJobDetails.Run
-    Next: RunEC2ReadOutput
+    Next: RunReadOutput
     Retry: *BatchRetryConfig
     Catch:
       - ErrorEquals: ["States.ALL"]
         ResultPath: $.BatchJobError.RunEC2
-        Next: RunEC2ReadOutput
-  RunEC2ReadOutput:
+        Next: RunReadOutput
+  RunReadOutput:
     Type: Task
     Resource: arn:aws:states:::lambda:invoke
-    Parameters: *ReadOutputParameters
+    Parameters:
+      FunctionName: "${process-stage-output}"
+      Payload: *PassthroughStatePayload
     OutputPath: $.Payload
     Next: HandleSuccess
     Catch:
