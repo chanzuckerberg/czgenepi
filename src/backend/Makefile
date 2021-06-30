@@ -54,6 +54,7 @@ alembic-autogenerate:
 .PHONY: remote-db-migrations
 remote-db-migrations:
 	if [ ! -z "${DATA_LOAD_PATH}" ]; then \
+		apt-get update; \
 		apt-get install -y postgresql-client; \
 		aspen-cli db --remote setup; \
 	fi
