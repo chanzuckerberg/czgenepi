@@ -1,8 +1,9 @@
 import styled from "@emotion/styled";
-import { fontBodyS, fontHeaderXl, getSpacings } from "czifui";
-import Image from "next/image";
+import { fontBodyS, fontHeaderXl, getColors, getSpacings } from "czifui";
 import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
+import UploadImage from "./Upload.svg";
+import UploadFailedImage from "./UploadFailed.svg";
 
 export const Title = styled.span`
   ${fontHeaderXl}
@@ -43,6 +44,22 @@ export const StyledDialogActions = styled(DialogActions)`
   ${centerContent}
 `;
 
-export const StyledImage = styled(Image)`
-  object-fit: contain;
+export const StyledUploadImage = styled(UploadImage)`
+  ${(props) => {
+    const colors = getColors(props);
+
+    return `
+      fill: ${colors?.primary[400]};
+    `;
+  }}
+`;
+
+export const StyledUploadFailedImage = styled(UploadFailedImage)`
+  ${(props) => {
+    const colors = getColors(props);
+
+    return `
+      fill: ${colors?.error[400]};
+    `;
+  }}
 `;
