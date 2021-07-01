@@ -51,7 +51,7 @@ States:
     Catch:
       - ErrorEquals: ["States.ALL"]
         ResultPath: $.BatchJobError.RunEC2
-        Next: RunEC2ReadOutput
+        Next: RunReadOutput
   RunReadOutput:
     Type: Task
     Resource: arn:aws:states:::lambda:invoke
