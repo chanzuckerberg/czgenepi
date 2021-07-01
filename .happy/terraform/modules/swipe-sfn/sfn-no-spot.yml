@@ -43,7 +43,7 @@ States:
           - Name: SFN_CURRENT_STATE
             Value.$: $$.State.Name
     ResultPath: $.BatchJobDetails.Run
-    Next: RunEC2ReadOutput
+    Next: RunReadOutput
     Retry:
       - ErrorEquals: ["Batch.AWSBatchException"]
         IntervalSeconds: 15
@@ -52,7 +52,7 @@ States:
       - ErrorEquals: ["States.ALL"]
         ResultPath: $.BatchJobError.RunEC2
         Next: RunEC2ReadOutput
-  RunEC2ReadOutput:
+  RunReadOutput:
     Type: Task
     Resource: arn:aws:states:::lambda:invoke
     Parameters:
