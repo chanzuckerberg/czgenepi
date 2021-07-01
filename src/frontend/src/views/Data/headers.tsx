@@ -13,7 +13,7 @@ export const SAMPLE_HEADERS: Header[] = [
     key: "uploadDate",
     sortKey: ["uploadDate"],
     text: "Upload Date",
-  },
+  }, 
   {
     key: "collectionDate",
     sortKey: ["collectionDate"],

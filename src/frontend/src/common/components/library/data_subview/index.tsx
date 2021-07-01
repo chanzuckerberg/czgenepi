@@ -49,16 +49,21 @@ function tsvDataMap(
   subheaders: Record<string, SubHeader[]>
 ): [string[], string[][]] {
   const tsvData = tableData.map((entry) => {
+    console.log("ENTRY: ", entry);
+    // console.log("SUBHEADERS: ", subheaders);
     return headers.flatMap((header) => {
+      // console.log("HEADER FLATTED: ", header);
       if (
         typeof entry[header.key] === "object" &&
         Object.prototype.hasOwnProperty.call(subheaders, header.key)
       ) {
+        // console.log("HEADER KEY: ", header.key);
         const subEntry = entry[header.key] as Record<string, JSONPrimitive>;
         return subheaders[header.key].map((subheader) =>
           String(subEntry[subheader.key])
         );
       }
+      // console.log("HEADER KEY DOWN HERE: ", header.key)
       return String(entry[header.key]);
     });
   });
@@ -111,6 +116,8 @@ const DataSubview: FunctionComponent<Props> = ({
   const render = (tableData?: TableItem[]) => {
     let downloadButton: JSX.Element | null = null;
     if (viewName === "Samples" && tableData !== undefined) {
+      console.log("INITIAL HEADERS: ", headers);
+      console.log("SUBHEADERS: ", subheaders);
       const [tsvHeaders, tsvData] = tsvDataMap(tableData, headers, subheaders);
       const separator = "\t";
       downloadButton = (
