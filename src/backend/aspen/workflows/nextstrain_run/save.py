@@ -121,7 +121,7 @@ def cli(
         included_samples: MutableSequence[Sample] = list()
         for uploaded_pathogen_genome in uploaded_pathogen_genomes:
             if (
-                uploaded_pathogen_genome.sample.public_identifier
+                uploaded_pathogen_genome.sample.public_identifier.replace("hCoV-19/", "")
                 in all_public_identifiers
             ):
                 included_samples.append(uploaded_pathogen_genome.sample)
