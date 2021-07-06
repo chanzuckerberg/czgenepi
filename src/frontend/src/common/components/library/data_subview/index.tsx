@@ -49,7 +49,9 @@ function tsvDataMap(
   subheaders: Record<string, SubHeader[]>
 ): [string[], string[][]] {
   const tsvData = tableData.map((entry) => {
+    headers[7] = {key: "CZBFailedGenomeRecovery", sortKey: ["CZBFailedGenomeRecovery"], text: "Genome Recovery Status"};
     console.log("ENTRY: ", entry);
+    console.log("HEADERS: ", headers);
     // console.log("SUBHEADERS: ", subheaders);
     return headers.flatMap((header) => {
       // console.log("HEADER FLATTED: ", header);
