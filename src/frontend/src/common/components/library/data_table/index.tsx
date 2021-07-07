@@ -140,6 +140,7 @@ export const DataTable: FunctionComponent<Props> = ({
   const render = (tableData: TableItem[]) => {
     function renderRow(props: ListChildComponentProps) {
       const item = tableData[props.index];
+
       return (
         <TableRow style={props.style} data-test-id="table-row">
           {sampleRow(item)}
