@@ -48,28 +48,26 @@ function tsvDataMap(
   headers: Header[],
   subheaders: Record<string, SubHeader[]>
 ): [string[], string[][]] {
+  let headersCopy = [ ...headers ];
+  headersCopy[7] = {key: "CZBFailedGenomeRecovery", sortKey: ["CZBFailedGenomeRecovery"], text: "Successful Genome Recovery"};
+
   const tsvData = tableData.map((entry) => {
-    headers[7] = {key: "CZBFailedGenomeRecovery", sortKey: ["CZBFailedGenomeRecovery"], text: "Genome Recovery Status"};
-    console.log("ENTRY: ", entry);
-    console.log("HEADERS: ", headers);
-    // console.log("SUBHEADERS: ", subheaders);
-    return headers.flatMap((header) => {
-      // console.log("HEADER FLATTED: ", header);
+    
+    return headersCopy.flatMap((header) => {
+
       if (
         typeof entry[header.key] === "object" &&
         Object.prototype.hasOwnProperty.call(subheaders, header.key)
       ) {
-        // console.log("HEADER KEY: ", header.key);
         const subEntry = entry[header.key] as Record<string, JSONPrimitive>;
         return subheaders[header.key].map((subheader) =>
           String(subEntry[subheader.key])
         );
       }
-      // console.log("HEADER KEY DOWN HERE: ", header.key)
       return String(entry[header.key]);
     });
   });
-  const tsvHeaders = headers.flatMap((header) => {
+  const tsvHeaders = headersCopy.flatMap((header) => {
     if (Object.prototype.hasOwnProperty.call(subheaders, header.key)) {
       return subheaders[header.key].map((subheader) => subheader.text);
     }
@@ -118,8 +116,6 @@ const DataSubview: FunctionComponent<Props> = ({
   const render = (tableData?: TableItem[]) => {
     let downloadButton: JSX.Element | null = null;
     if (viewName === "Samples" && tableData !== undefined) {
-      console.log("INITIAL HEADERS: ", headers);
-      console.log("SUBHEADERS: ", subheaders);
       const [tsvHeaders, tsvData] = tsvDataMap(tableData, headers, subheaders);
       const separator = "\t";
       downloadButton = (
