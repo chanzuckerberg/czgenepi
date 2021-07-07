@@ -66,7 +66,6 @@ function tsvDataMap(
         );
       }
       if (header.key == "CZBFailedGenomeRecovery") {
-        // this is strange but this is how the status is determined in cellRenderers
         if (entry[header.key]) {
           return "Failed";
         } else {
