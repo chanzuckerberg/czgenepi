@@ -49,10 +49,8 @@ function tsvDataMap(
   subheaders: Record<string, SubHeader[]>
 ): [string[], string[][]] {
   let headersCopy = [ ...headers ];
-  headersCopy[7] = {key: "CZBFailedGenomeRecovery", sortKey: ["CZBFailedGenomeRecovery"], text: "Successful Genome Recovery"};
-
+  headersCopy[7] = {key: "CZBFailedGenomeRecovery", sortKey: ["CZBFailedGenomeRecovery"], text: "Genome Recovery"};
   const tsvData = tableData.map((entry) => {
-    
     return headersCopy.flatMap((header) => {
 
       if (
@@ -64,7 +62,16 @@ function tsvDataMap(
           String(subEntry[subheader.key])
         );
       }
-      return String(entry[header.key]);
+      if ( header.key == "CZBFailedGenomeRecovery" ) {
+        // this is strange but this is how the status is determined in cellRenderers
+        if (entry[header.key] == false) {
+          return "success";
+        } else {
+          return "failed";
+        }
+      } else {
+        return String(entry[header.key]);
+      }
     });
   });
   const tsvHeaders = headersCopy.flatMap((header) => {
