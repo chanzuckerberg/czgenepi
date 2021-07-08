@@ -1,4 +1,6 @@
 import os
+import sentry_sdk
+
 from functools import wraps
 from pathlib import Path
 from typing import Optional
@@ -57,6 +59,17 @@ auth0 = oauth.register(
     client_kwargs=application.aspen_config.AUTH0_CLIENT_KWARGS,
 )
 
+# We should be able to allow this in all environments and only alert on prod.
+sentry_sdk.init(
+    application.aspen_config.SENTRY_URL,
+
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    # We recommend adjusting this value in production.
+    traces_sample_rate=1.0
+)
+
+division_by_zero = 1 / 0
 
 # use this to wrap protected views
 def requires_auth(f):
