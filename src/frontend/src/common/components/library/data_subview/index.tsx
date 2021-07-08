@@ -48,8 +48,14 @@ function tsvDataMap(
   headers: Header[],
   subheaders: Record<string, SubHeader[]>
 ): [string[], string[][]] {
+  const headersDownload = [...headers];
+  headersDownload[7] = {
+    key: "CZBFailedGenomeRecovery",
+    sortKey: ["CZBFailedGenomeRecovery"],
+    text: "Genome Recovery",
+  };
   const tsvData = tableData.map((entry) => {
-    return headers.flatMap((header) => {
+    return headersDownload.flatMap((header) => {
       if (
         typeof entry[header.key] === "object" &&
         Object.prototype.hasOwnProperty.call(subheaders, header.key)
@@ -59,10 +65,18 @@ function tsvDataMap(
           String(subEntry[subheader.key])
         );
       }
-      return String(entry[header.key]);
+      if (header.key == "CZBFailedGenomeRecovery") {
+        if (entry[header.key]) {
+          return "Failed";
+        } else {
+          return "Success";
+        }
+      } else {
+        return String(entry[header.key]);
+      }
     });
   });
-  const tsvHeaders = headers.flatMap((header) => {
+  const tsvHeaders = headersDownload.flatMap((header) => {
     if (Object.prototype.hasOwnProperty.call(subheaders, header.key)) {
       return subheaders[header.key].map((subheader) => subheader.text);
     }
