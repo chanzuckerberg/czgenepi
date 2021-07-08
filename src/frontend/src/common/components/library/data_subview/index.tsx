@@ -1,10 +1,30 @@
-import { Button } from "czifui";
+import { Button, Tooltip } from "czifui";
 import { escapeRegExp } from "lodash/fp";
-import React, { FunctionComponent, useReducer } from "react";
-import { CSVLink } from "react-csv";
+import React, {
+  FunctionComponent,
+  useEffect,
+  useReducer,
+  useState,
+} from "react";
 import { Input } from "semantic-ui-react";
 import { DataTable } from "src/common/components";
+import DownloadModal from "./components/DownloadModal";
 import style from "./index.module.scss";
+import {
+  BoldText,
+  DismissButton,
+  Divider,
+  DownloadButtonWrapper,
+  DownloadWrapper,
+  StyledAlert,
+  StyledChip,
+  StyledDiv,
+  StyledDownloadDisabledImage,
+  StyledDownloadImage,
+  StyledLink,
+  TooltipDescriptionText,
+  TooltipHeaderText,
+} from "./style";
 
 interface Props {
   data?: TableItem[];
@@ -44,46 +64,53 @@ function searchReducer(state: SearchState, action: SearchState): SearchState {
 }
 
 function tsvDataMap(
-  tableData: TableItem[],
+  checkedSamples: string[],
+  tableData: TableItem[] | undefined,
   headers: Header[],
   subheaders: Record<string, SubHeader[]>
-): [string[], string[][]] {
+): [string[], string[][]] | undefined {
   const headersDownload = [...headers];
   headersDownload[7] = {
     key: "CZBFailedGenomeRecovery",
     sortKey: ["CZBFailedGenomeRecovery"],
     text: "Genome Recovery",
   };
-  const tsvData = tableData.map((entry) => {
-    return headersDownload.flatMap((header) => {
-      if (
-        typeof entry[header.key] === "object" &&
-        Object.prototype.hasOwnProperty.call(subheaders, header.key)
-      ) {
-        const subEntry = entry[header.key] as Record<string, JSONPrimitive>;
-        return subheaders[header.key].map((subheader) =>
-          String(subEntry[subheader.key])
-        );
-      }
-      if (header.key == "CZBFailedGenomeRecovery") {
-        if (entry[header.key]) {
-          return "Failed";
-        } else {
-          return "Success";
+  if (tableData !== undefined) {
+    const filteredTableData = [...tableData];
+    const filteredTableDataForReals = filteredTableData.filter((entry) =>
+      checkedSamples.includes(entry["publicId"].toString())
+    );
+    const tsvData = filteredTableDataForReals.map((entry) => {
+      return headersDownload.flatMap((header) => {
+        if (
+          typeof entry[header.key] === "object" &&
+          Object.prototype.hasOwnProperty.call(subheaders, header.key)
+        ) {
+          const subEntry = entry[header.key] as Record<string, JSONPrimitive>;
+          return subheaders[header.key].map((subheader) =>
+            String(subEntry[subheader.key])
+          );
         }
-      } else {
-        return String(entry[header.key]);
-      }
+        if (header.key == "CZBFailedGenomeRecovery") {
+          if (entry[header.key]) {
+            return "Failed";
+          } else {
+            return "Success";
+          }
+        } else {
+          return String(entry[header.key]);
+        }
+      });
     });
-  });
-  const tsvHeaders = headersDownload.flatMap((header) => {
-    if (Object.prototype.hasOwnProperty.call(subheaders, header.key)) {
-      return subheaders[header.key].map((subheader) => subheader.text);
-    }
-    return header.text;
-  });
+    const tsvHeaders = headersDownload.flatMap((header) => {
+      if (Object.prototype.hasOwnProperty.call(subheaders, header.key)) {
+        return subheaders[header.key].map((subheader) => subheader.text);
+      }
+      return header.text;
+    });
 
-  return [tsvHeaders, tsvData];
+    return [tsvHeaders, tsvData];
+  }
 }
 
 const DataSubview: FunctionComponent<Props> = ({
@@ -101,6 +128,111 @@ const DataSubview: FunctionComponent<Props> = ({
     results: data,
     searching: false,
   });
+
+  const [checkedSamples, setCheckedSamples] = useState<any[]>([]);
+  const [isHeaderChecked, setIsHeaderChecked] = useState<boolean>(false);
+  const [showCheckboxes, setShowCheckboxes] = useState<boolean>(false);
+  const [isHeaderIndeterminant, setHeaderIndeterminant] =
+    useState<boolean>(false);
+  const [open, setOpen] = useState(false);
+  const [isDownloadDisabled, setDownloadDisabled] = useState<boolean>(true);
+  const [failedSamples, setFailedSamples] = useState<string[]>([]);
+  const [downloadFailed, setDownloadFailed] = useState<boolean>(false);
+  // for download modal
+  const [isMetadataSelected, setMetadataSelected] = useState<boolean>(false);
+  const [isFastaSelected, setFastaSelected] = useState<boolean>(false);
+  const [isFastaDisabled, setFastaDisabled] = useState<boolean>(false);
+
+  const handleDownloadClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleDownloadClose = () => {
+    setOpen(false);
+    setMetadataSelected(false);
+    setFastaSelected(false);
+  };
+
+  useEffect(() => {
+    // add all samples if header checkbox is selected
+    if (isHeaderChecked) {
+      const allPublicIds: any[] = [];
+      for (const key in data) {
+        allPublicIds.push(data[key as any].publicId);
+      }
+      setCheckedSamples(allPublicIds);
+    } else {
+      setFailedSamples([]);
+      setCheckedSamples([]);
+    }
+  }, [isHeaderChecked]);
+
+  useEffect(() => {
+    // Only show checkboxes on the sample datatable
+    if (viewName === "Samples") {
+      setShowCheckboxes(true);
+    }
+  }, [viewName]);
+
+  useEffect(() => {
+    // determine if mixed state (user has custom selected samples)
+    if (data) {
+      const sizeData: number = Object.keys(data).length;
+      if (checkedSamples.length === 0 || checkedSamples.length === sizeData) {
+        setHeaderIndeterminant(false);
+      } else {
+        setHeaderIndeterminant(true);
+      }
+    }
+  }, [checkedSamples]);
+
+  useEffect(() => {
+    // disable sample download if no samples are selected
+    if (checkedSamples.length === 0) {
+      setDownloadDisabled(true);
+    } else {
+      setDownloadDisabled(false);
+    }
+  });
+
+  useEffect(() => {
+    // if there is an error then close the modal.
+    if (downloadFailed) {
+      setOpen(false);
+    }
+  });
+
+  function handleHeaderCheckboxClick() {
+    if (isHeaderIndeterminant) {
+      // clear all samples when selecting checkbox when indeterminate
+      setCheckedSamples([]);
+      setFailedSamples([]);
+      setIsHeaderChecked(false);
+    } else {
+      setIsHeaderChecked((prevState: boolean) => !prevState);
+    }
+  }
+
+  function handleRowCheckboxClick(
+    sampleId: string,
+    failedGenomeRecovery: boolean
+  ) {
+    if (checkedSamples.includes(sampleId)) {
+      setCheckedSamples(checkedSamples.filter((id) => id !== sampleId));
+      if (failedGenomeRecovery) {
+        setFailedSamples(failedSamples.filter((id) => id !== sampleId));
+      }
+    } else {
+      setCheckedSamples([...checkedSamples, sampleId]);
+      if (failedGenomeRecovery) {
+        setFailedSamples([...failedSamples, sampleId]);
+      }
+    }
+  }
+
+  function handleDismissErrorClick() {
+    setDownloadFailed(false);
+  }
 
   // search functions
   const searcher = (
@@ -122,56 +254,124 @@ const DataSubview: FunctionComponent<Props> = ({
     dispatch({ results: filteredData, searching: false });
   };
 
+  const DOWNLOAD_TOOLTIP_TEXT = (
+    <div>
+      <TooltipHeaderText>Download</TooltipHeaderText>
+      <TooltipDescriptionText>Select at least 1 sample</TooltipDescriptionText>
+    </div>
+  );
+
   const render = (tableData?: TableItem[]) => {
     let downloadButton: JSX.Element | null = null;
     if (viewName === "Samples" && tableData !== undefined) {
-      const [tsvHeaders, tsvData] = tsvDataMap(tableData, headers, subheaders);
-      const separator = "\t";
       downloadButton = (
-        <CSVLink
-          data={tsvData}
-          headers={tsvHeaders}
-          filename="samples_overview.tsv"
-          separator={separator}
-          data-test-id="download-tsv-link"
-        >
-          <Button
-            variant="contained"
-            color="primary"
-            isRounded
-            className={style.tsvDownloadButton}
+        <DownloadWrapper>
+          <StyledChip
+            size="medium"
+            label={checkedSamples.length}
+            status="info"
+          />
+          <StyledDiv>Selected </StyledDiv>
+          <Divider />
+          <Tooltip
+            title={DOWNLOAD_TOOLTIP_TEXT}
+            disableHoverListener={!isDownloadDisabled}
+            arrow={true}
+            inverted={true}
+            placement="top-start"
           >
-            Download (.tsv)
-          </Button>
-        </CSVLink>
+            <span>
+              <Button
+                onClick={handleDownloadClickOpen}
+                disabled={isDownloadDisabled}
+                style={{ backgroundColor: "transparent" }}
+              >
+                {isDownloadDisabled ? (
+                  <StyledDownloadDisabledImage />
+                ) : (
+                  <StyledDownloadImage />
+                )}
+              </Button>
+            </span>
+          </Tooltip>
+        </DownloadWrapper>
       );
     }
 
     return (
-      <div className={style.samplesRoot}>
-        <div className={style.searchBar}>
-          <div className={style.searchInput}>
-            <Input
-              icon="search"
-              placeholder="Search"
-              loading={state.searching}
-              onChange={searcher}
-              data-test-id="search"
+      <>
+        {tableData !== undefined && viewName === "Samples" && (
+          <DownloadModal
+            sampleIds={checkedSamples}
+            failedSamples={failedSamples}
+            setDownloadFailed={setDownloadFailed}
+            isMetadataSelected={isMetadataSelected}
+            setMetadataSelected={setMetadataSelected}
+            isFastaSelected={isFastaSelected}
+            setFastaSelected={setFastaSelected}
+            isFastaDisabled={isFastaDisabled}
+            setFastaDisabled={setFastaDisabled}
+            tsvData={tsvDataMap(checkedSamples, tableData, headers, subheaders)}
+            open={open}
+            onClose={handleDownloadClose}
+          />
+        )}
+        <div className={style.samplesRoot}>
+          <div className={style.searchBar}>
+            <div className={style.searchInput}>
+              <Input
+                icon="search"
+                placeholder="Search"
+                loading={state.searching}
+                onChange={searcher}
+                data-test-id="search"
+              />
+            </div>
+            <DownloadButtonWrapper>
+              {downloadFailed ? (
+                <StyledAlert className="elevated" severity="error">
+                  <div>
+                    <BoldText>
+                      Something went wrong and we were unable to complete one or
+                      more of your downloads
+                    </BoldText>
+                    Please try again later or{" "}
+                    <StyledLink
+                      href="mailto:aspenprivacy@chanzuckerberg.com"
+                      target="_blank"
+                      rel="noopener"
+                    >
+                      contact us
+                    </StyledLink>{" "}
+                    for help.
+                  </div>
+                  <DismissButton onClick={handleDismissErrorClick}>
+                    DISMISS
+                  </DismissButton>
+                </StyledAlert>
+              ) : (
+                downloadButton
+              )}
+            </DownloadButtonWrapper>
+          </div>
+          <div className={style.samplesTable}>
+            <DataTable
+              isLoading={isLoading}
+              checkedSamples={checkedSamples}
+              showCheckboxes={showCheckboxes}
+              handleRowCheckboxClick={handleRowCheckboxClick}
+              isHeaderChecked={isHeaderChecked}
+              handleHeaderCheckboxClick={handleHeaderCheckboxClick}
+              isHeaderIndeterminant={isHeaderIndeterminant}
+              data={tableData}
+              defaultSortKey={defaultSortKey}
+              headers={headers}
+              headerRenderer={headerRenderer}
+              renderer={renderer}
             />
           </div>
-          <div className={style.searchBarTableDownload}>{downloadButton}</div>
         </div>
-        <div className={style.samplesTable}>
-          <DataTable
-            isLoading={isLoading}
-            data={tableData}
-            defaultSortKey={defaultSortKey}
-            headers={headers}
-            headerRenderer={headerRenderer}
-            renderer={renderer}
-          />
-        </div>
-      </div>
+      </>
     );
   };
 
