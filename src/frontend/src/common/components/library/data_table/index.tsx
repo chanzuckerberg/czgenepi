@@ -1,21 +1,31 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 /** TODO: Re-evaluate if there really is a complexity problem here **/
-
 import { get, isEqual } from "lodash/fp";
-import React, { Fragment, FunctionComponent, useReducer } from "react";
+import React, {
+  Fragment,
+  FunctionComponent,
+  useEffect,
+  useReducer,
+  useState,
+} from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import SortArrowDownIcon from "src/common/icons/IconArrowDownSmall.svg";
 import SortArrowUpIcon from "src/common/icons/IconArrowUpSmall.svg";
 import { EmptyState } from "../data_subview/components/EmptyState";
 import style from "./index.module.scss";
-import { RowContent, TableRow } from "./style";
+import { HeaderCheckbox, RowCheckbox, RowContent, TableRow } from "./style";
 
 interface Props {
   data?: TableItem[];
   headers: Header[];
   defaultSortKey: string[];
   isLoading: boolean;
+  checkedSamples: any[];
+  isHeaderChecked: boolean;
+  showCheckboxes: boolean;
+  handleHeaderCheckboxClick(): void;
+  handleRowCheckboxClick(sampleId: string): void;
   renderer?: CustomRenderer;
   headerRenderer?: HeaderRenderer;
 }
@@ -82,11 +92,30 @@ export const DataTable: FunctionComponent<Props> = ({
   headerRenderer = defaultHeaderRenderer,
   renderer = defaultCellRenderer,
   isLoading,
+  checkedSamples,
+  showCheckboxes,
+  handleHeaderCheckboxClick,
+  handleRowCheckboxClick,
+  isHeaderChecked,
 }: Props) => {
   const [state, dispatch] = useReducer(reducer, {
     ascending: false,
     sortKey: defaultSortKey,
   });
+
+  const [isHeaderDisabled, setHeaderDisabled] = useState(false);
+
+  useEffect(() => {
+    // determine if mixed state (user has custom selected samples)
+    if (data) {
+      const sizeData: number = Object.keys(data).length;
+      if (checkedSamples.length === 0 || checkedSamples.length === sizeData) {
+        setHeaderDisabled(false);
+      } else {
+        setHeaderDisabled(true);
+      }
+    }
+  }, [checkedSamples]);
 
   const indexingKey = headers[0].key;
 
@@ -128,7 +157,6 @@ export const DataTable: FunctionComponent<Props> = ({
     if (isLoading) {
       return <EmptyState numOfColumns={headers.length} />;
     }
-
     return headers.map((header, index) => {
       const value = item[header.key];
 
@@ -140,11 +168,44 @@ export const DataTable: FunctionComponent<Props> = ({
     });
   };
 
+  const headerCheckbox = (): React.ReactNode => {
+    function handleClick() {
+      handleHeaderCheckboxClick();
+    }
+    return (
+      <HeaderCheckbox
+        color="primary"
+        checked={isHeaderChecked}
+        onClick={handleClick}
+        disabled={isHeaderDisabled}
+        indeterminate={isHeaderDisabled}
+      />
+    );
+  };
+
+  const rowCheckbox = (item: TableItem): React.ReactNode => {
+    let handleClick;
+    if (item !== undefined) {
+      const checked: boolean = checkedSamples.includes(item.privateId);
+      handleClick = function handleClick() {
+        handleRowCheckboxClick(item.privateId.toString());
+      };
+      return (
+        <RowCheckbox
+          color="primary"
+          onClick={handleClick}
+          checked={checked || isHeaderChecked}
+        />
+      );
+    }
+  };
+
   const render = (tableData: TableItem[]) => {
     function renderRow(props: ListChildComponentProps) {
       const item = tableData[props.index];
       return (
         <TableRow style={props.style} data-test-id="table-row">
+          {showCheckboxes && rowCheckbox(item)}
           {item === undefined ? null : sampleRow(item)}
         </TableRow>
       );
@@ -153,6 +214,7 @@ export const DataTable: FunctionComponent<Props> = ({
     return (
       <div className={style.container}>
         <div className={style.header} data-test-id="header-row">
+          {showCheckboxes && headerCheckbox()}
           {headerRow}
         </div>
         <div className={style.tableContent}>

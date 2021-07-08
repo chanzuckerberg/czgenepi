@@ -1,6 +1,11 @@
 import { Button } from "czifui";
 import { escapeRegExp } from "lodash/fp";
-import React, { FunctionComponent, useReducer } from "react";
+import React, {
+  FunctionComponent,
+  useEffect,
+  useReducer,
+  useState,
+} from "react";
 import { CSVLink } from "react-csv";
 import { Input } from "semantic-ui-react";
 import { DataTable } from "src/common/components";
@@ -102,6 +107,40 @@ const DataSubview: FunctionComponent<Props> = ({
     searching: false,
   });
 
+  const [checkedSamples, setCheckedSamples] = useState<any[]>([]);
+  const [isHeaderChecked, setIsHeaderChecked] = useState<boolean>(false);
+  const [showCheckboxes, setShowCheckboxes] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (isHeaderChecked) {
+      const allPrivateIds: any[] = [];
+      for (const key in data) {
+        allPrivateIds.push(data[key as any].privateId);
+      }
+      setCheckedSamples(allPrivateIds);
+    } else {
+      setCheckedSamples([]);
+    }
+  }, [isHeaderChecked]);
+
+  useEffect(() => {
+    if (viewName === "Samples") {
+      setShowCheckboxes(true);
+    }
+  }, [viewName]);
+
+  function handleHeaderCheckboxClick() {
+    setIsHeaderChecked((prevState: boolean) => !prevState);
+  }
+
+  function handleRowCheckboxClick(sampleId: string) {
+    if (checkedSamples.includes(sampleId)) {
+      setCheckedSamples(checkedSamples.filter((id) => id !== sampleId));
+    } else {
+      setCheckedSamples([...checkedSamples, sampleId]);
+    }
+  }
+
   // search functions
   const searcher = (
     _event: React.ChangeEvent<HTMLInputElement>,
@@ -164,6 +203,11 @@ const DataSubview: FunctionComponent<Props> = ({
         <div className={style.samplesTable}>
           <DataTable
             isLoading={isLoading}
+            checkedSamples={checkedSamples}
+            showCheckboxes={showCheckboxes}
+            handleRowCheckboxClick={handleRowCheckboxClick}
+            isHeaderChecked={isHeaderChecked}
+            handleHeaderCheckboxClick={handleHeaderCheckboxClick}
             data={tableData}
             defaultSortKey={defaultSortKey}
             headers={headers}
