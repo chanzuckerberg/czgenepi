@@ -5,6 +5,9 @@ inputs:
   - name: "aspen"
     metadata: "data/metadata_aspen.tsv"
     sequences: "data/sequences_aspen.fasta"
+  - name: "selected"
+    metadata: "data/metadata_selected.tsv"
+    sequences: "data/sequences_selected.fasta"
 
 builds:
   aspen:
@@ -17,7 +20,7 @@ builds:
 
 ## custom rules
 custom_rules:
-  - my_profiles/aspen/subsampling_ranges.smk
+  - nextstrain_profiles/nextstrain-gisaid/subsampling_ranges.smk
 
 ## Auxiliary files
 files:
@@ -31,15 +34,14 @@ refine:
   keep_polytomies: True
 
 ## Subsampling schemas
-# Sampling groups that end with an `_early` suffix will omit data from the last 18 weeks.  Sampling groups that end with a `_late` suffix will only consider data from the last 18 weeks.
 subsampling:
   group_only:
-    group_early:
+    focal:
+      exclude: "--exclude-where 'selected!=yes'"
+    same_county:
       group_by: "year month"
-      max_sequences: 1000
+      max_sequences: 100
       query: --query "(location == '{{location}}') & (division == '{{division}}')"
-
-    group_late:
-      group_by: "year month"
-      max_sequences: 2500
-      query: --query "(location == '{{location}}') & (division == '{{division}}')"
+      priorities:
+        type: "proximity"
+        focus: "focal"
