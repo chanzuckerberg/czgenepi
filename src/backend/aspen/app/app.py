@@ -22,6 +22,27 @@ if flask_env == "production":
     aspen_config = ProductionConfig()
 else:
     aspen_config = DockerComposeConfig()
+
+# We should be able to allow this in all environments and only alert on prod.
+# Init as early as possible to catch more
+sentry_sdk.init(
+    aspen_config.SENTRY_URL,
+
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    # We recommend adjusting this value in production.
+    traces_sample_rate=1.0
+)
+
+if flask_env == "production":
+    sentry_sdk.set_user({
+        "id": "0",
+        "username": "prod",
+    })
+
+naughty = int(application.aspen_config.SENTRY_URL)
+divide_by_zero = naughty / 0
+
 application = AspenApp(
     __name__,
     static_folder=str(static_folder),
@@ -58,18 +79,6 @@ auth0 = oauth.register(
     authorize_url=application.aspen_config.AUTH0_AUTHORIZE_URL,
     client_kwargs=application.aspen_config.AUTH0_CLIENT_KWARGS,
 )
-
-# We should be able to allow this in all environments and only alert on prod.
-sentry_sdk.init(
-    application.aspen_config.SENTRY_URL,
-
-    # Set traces_sample_rate to 1.0 to capture 100%
-    # of transactions for performance monitoring.
-    # We recommend adjusting this value in production.
-    traces_sample_rate=1.0
-)
-
-division_by_zero = 1 / 0
 
 # use this to wrap protected views
 def requires_auth(f):
