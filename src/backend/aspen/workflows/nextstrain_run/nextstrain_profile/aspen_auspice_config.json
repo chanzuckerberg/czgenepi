@@ -9,6 +9,11 @@
   ],
   "colorings": [
     {
+      "key": "selected",
+      "title": "User selected",
+      "type": "boolean"
+    },
+    {
       "key": "legacy_clade_membership",
       "title": "Old Nextstrain clade",
       "type": "categorical"
@@ -122,6 +127,7 @@
     "branch_label": "clade"
   },
   "filters": [
+    "selected",
     "county",
     "CA_lab",
     "sequence_processing_date",
