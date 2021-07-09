@@ -3,6 +3,7 @@ from functools import wraps
 from pathlib import Path
 from typing import Optional
 
+import sentry_sdk
 from authlib.integrations.flask_client import OAuth
 from flask import redirect, session
 from flask_cors import CORS
@@ -20,6 +21,17 @@ if flask_env == "production":
     aspen_config = ProductionConfig()
 else:
     aspen_config = DockerComposeConfig()
+
+# We should be able to allow this in all environments and only alert on prod.
+# Init as early as possible to catch more
+sentry_sdk.init(
+    aspen_config.SENTRY_URL,
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    # We recommend adjusting this value in production.
+    traces_sample_rate=1.0,
+)
+
 application = AspenApp(
     __name__,
     static_folder=str(static_folder),

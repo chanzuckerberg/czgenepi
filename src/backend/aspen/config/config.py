@@ -224,3 +224,14 @@ class Config(object):
     @property
     def EXTERNAL_AUSPICE_BUCKET(self) -> str:
         return self.AWS_SECRET["S3_external_auspice_bucket"]
+
+    ####################################################################################
+    # sentry properties
+    @property
+    def SENTRY_URL(self) -> str:
+        if os.getenv("SENTRY_URL"):
+            return os.environ["SENTRY_URL"]
+        try:
+            return self.AWS_SECRET["SENTRY_URL"]
+        except KeyError:
+            return ""
