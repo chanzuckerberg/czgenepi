@@ -1,10 +1,9 @@
 import os
-import sentry_sdk
-
 from functools import wraps
 from pathlib import Path
 from typing import Optional
 
+import sentry_sdk
 from authlib.integrations.flask_client import OAuth
 from flask import redirect, session
 from flask_cors import CORS
@@ -27,11 +26,10 @@ else:
 # Init as early as possible to catch more
 sentry_sdk.init(
     aspen_config.SENTRY_URL,
-
     # Set traces_sample_rate to 1.0 to capture 100%
     # of transactions for performance monitoring.
     # We recommend adjusting this value in production.
-    traces_sample_rate=1.0
+    traces_sample_rate=1.0,
 )
 
 application = AspenApp(
@@ -70,6 +68,7 @@ auth0 = oauth.register(
     authorize_url=application.aspen_config.AUTH0_AUTHORIZE_URL,
     client_kwargs=application.aspen_config.AUTH0_CLIENT_KWARGS,
 )
+
 
 # use this to wrap protected views
 def requires_auth(f):
