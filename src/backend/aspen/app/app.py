@@ -34,15 +34,6 @@ sentry_sdk.init(
     traces_sample_rate=1.0
 )
 
-if flask_env == "production":
-    sentry_sdk.set_user({
-        "id": "0",
-        "username": "prod",
-    })
-
-naughty = int(application.aspen_config.SENTRY_URL)
-divide_by_zero = naughty / 0
-
 application = AspenApp(
     __name__,
     static_folder=str(static_folder),
