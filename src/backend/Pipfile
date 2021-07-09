@@ -30,6 +30,8 @@ moto = {version = "*", extras = ["s3"]}
 mypy = "*"
 pytest = "*"
 pytest-xdist = "*"
+types-pytz = "*"
+types-requests = "*"
 sqlalchemy-stubs = "*"
 tqdm = "*"
 typing-extensions = "*"
