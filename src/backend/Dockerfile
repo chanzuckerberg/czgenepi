@@ -2,7 +2,6 @@
 FROM python:3.9.1-slim AS base
 ENV FLASK_APP=aspen.main
 EXPOSE 3000
-RUN pip install --upgrade pip
 RUN pip install --no-cache-dir pipenv
 WORKDIR /usr/src/app
 COPY requirements.txt .
