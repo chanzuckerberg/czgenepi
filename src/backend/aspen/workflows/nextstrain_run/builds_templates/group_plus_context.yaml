@@ -42,7 +42,7 @@ subsampling:
 
     group:
       group_by: "year month"
-      max_sequences: 500
+      max_sequences: 200
       query: --query "(location == '{{location}}') & (division == '{{division}}')"
       priorities:
         type: "proximity"
@@ -50,7 +50,7 @@ subsampling:
 
     state:
       group_by: "location year month"
-      max_sequences: 200
+      max_sequences: 100
       query: --query "(location != '{{location}}') & (division == '{{division}}')" # exclude add'l samples from {{location}}
       priorities:
         type: "proximity"
@@ -58,7 +58,7 @@ subsampling:
 
     country:
       group_by: "division year month"
-      max_sequences: 100
+      max_sequences: 50
       query: --query "(division != '{{division}}') & (country == '{{country}}')" # exclude add'l samples from CA
       priorities:
         type: "proximity"
@@ -72,4 +72,7 @@ subsampling:
         type: "proximity"
         focus: "focal"
 
-
+    international_serial_sampling:
+      group_by: "region year month"
+      seq_per_group: 5
+      query: --query "(country != '{{country}}')" 
