@@ -425,7 +425,7 @@ module nextstrain_orange_local_sfn_config {
    extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
     remote_dev_prefix        = local.remote_dev_prefix
-    group_name               = "Orange County Health Care Agency"
+    group_name               = "Orange County Public Health Laboratory"
     s3_filestem              = "Orange Local"
     template_filename        = "group.yaml"
     template_args            = {
@@ -454,7 +454,7 @@ module nextstrain_orange_contextual_sfn_config {
   extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
     remote_dev_prefix        = local.remote_dev_prefix
-    group_name               = "Orange County Health Care Agency"
+    group_name               = "Orange County Public Health Laboratory"
     s3_filestem              = "Orange Contextual"
     template_filename        = "group_plus_context.yaml"
     template_args            = {
