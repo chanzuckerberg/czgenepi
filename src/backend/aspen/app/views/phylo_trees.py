@@ -6,13 +6,12 @@ from typing import Any, Callable, Iterable, Mapping, MutableSequence, Set, Tuple
 
 import boto3
 import sqlalchemy
-from flask import jsonify, make_response, Response, session
+from flask import jsonify, make_response, Response, g
 from sqlalchemy import func, or_
 from sqlalchemy.orm import aliased, joinedload, Session
 
 from aspen.app.app import application, requires_auth
-from aspen.app.views.api_utils import format_datetime, get_usergroup_query
-from aspen.database.connection import session_scope
+from aspen.app.views.api_utils import format_datetime
 from aspen.database.models import (
     DataType,
     PhyloRun,
@@ -21,7 +20,7 @@ from aspen.database.models import (
     Sample,
     WorkflowStatusType,
 )
-from aspen.database.models.usergroup import Group, User
+from aspen.database.models.usergroup import User
 from aspen.error.recoverable import RecoverableError
 from aspen.phylo_tree.identifiers import rename_nodes_on_tree
 
@@ -44,85 +43,67 @@ def humanize_tree_name(s3_key: str):
 @application.route("/api/phylo_trees", methods=["GET"])
 @requires_auth
 def phylo_trees():
-    with session_scope(application.DATABASE_INTERFACE) as db_session:
-        profile = session["profile"]
-        user = (
-            get_usergroup_query(db_session, profile["user_id"])
-            .options(joinedload(User.group).joinedload(Group.can_see))
-            .one()
-        )
-        cansee_owner_group_ids: Set[int] = {
-            cansee.owner_group_id
-            for cansee in user.group.can_see
-            if cansee.data_type == DataType.TREES
-        }
-        phylo_run_alias = aliased(PhyloRun)
-        phylo_runs: Iterable[Tuple[PhyloRun, int]] = (
-            db_session.query(
-                phylo_run_alias,
-                (
-                    db_session.query(func.count(1))
-                    .select_from(Sample)
-                    .join(PhyloTreeSamples)
-                    .join(
-                        PhyloTree,
-                        PhyloTreeSamples.columns.phylo_tree_id == PhyloTree.entity_id,
-                    )
-                    .filter(
-                        PhyloTree.producing_workflow_id == phylo_run_alias.workflow_id
-                    )
-                ).label("phylo_run_genome_count"),
-            )
-            .options(joinedload(phylo_run_alias.outputs))
-            .filter(
-                or_(
-                    user.system_admin,
-                    phylo_run_alias.group_id.in_(
-                        db_session.query(Group.id)
-                        .join(User)
-                        .filter(User.auth0_user_id == profile["user_id"])
-                        .subquery()
-                    ),
-                    phylo_run_alias.group_id.in_(cansee_owner_group_ids),
+    user = g.auth_user
+    cansee_owner_group_ids: Set[int] = {
+        cansee.owner_group_id
+        for cansee in user.group.can_see
+        if cansee.data_type == DataType.TREES
+    }
+    phylo_run_alias = aliased(PhyloRun)
+    phylo_runs: Iterable[Tuple[PhyloRun, int]] = (
+        g.db_session.query(
+            phylo_run_alias,
+            (
+                g.db_session.query(func.count(1))
+                .select_from(Sample)
+                .join(PhyloTreeSamples)
+                .join(
+                    PhyloTree,
+                    PhyloTreeSamples.columns.phylo_tree_id == PhyloTree.entity_id,
                 )
+                .filter(PhyloTree.producing_workflow_id == phylo_run_alias.workflow_id)
+            ).label("phylo_run_genome_count"),
+        )
+        .options(joinedload(phylo_run_alias.outputs))
+        .filter(
+            or_(
+                user.system_admin,
+                phylo_run_alias.group_id == user.group.id,
+                phylo_run_alias.group_id.in_(cansee_owner_group_ids),
             )
-            .filter(phylo_run_alias.workflow_status == WorkflowStatusType.COMPLETED)
+        )
+        .filter(phylo_run_alias.workflow_status == WorkflowStatusType.COMPLETED)
+    )
+
+    # filter for only information we need in sample table view
+    results: MutableSequence[Mapping[str, Any]] = list()
+    for phylo_run, genome_count in phylo_runs:
+        phylo_tree: PhyloTree
+        for output in phylo_run.outputs:
+            if isinstance(output, PhyloTree):
+                phylo_tree = output
+                break
+        else:
+            raise RecoverableError(
+                f"phylo run (workflow id={phylo_run.workflow_id}) does not have a"
+                " phylo tree output."
+            )
+        results.append(
+            {
+                "phylo_tree_id": phylo_tree.entity_id,
+                "name": humanize_tree_name(phylo_tree.s3_key),
+                "pathogen_genome_count": genome_count,
+                "completed_date": format_datetime(phylo_run.end_datetime),
+            }
         )
 
-        # filter for only information we need in sample table view
-        results: MutableSequence[Mapping[str, Any]] = list()
-        for phylo_run, genome_count in phylo_runs:
-            phylo_tree: PhyloTree
-            for output in phylo_run.outputs:
-                if isinstance(output, PhyloTree):
-                    phylo_tree = output
-                    break
-            else:
-                raise RecoverableError(
-                    f"phylo run (workflow id={phylo_run.workflow_id}) does not have a"
-                    " phylo tree output."
-                )
-            results.append(
-                {
-                    "phylo_tree_id": phylo_tree.entity_id,
-                    "name": humanize_tree_name(phylo_tree.s3_key),
-                    "pathogen_genome_count": genome_count,
-                    "completed_date": format_datetime(phylo_run.end_datetime),
-                }
-            )
-
-        return jsonify({PHYLO_TREE_KEY: results})
+    return jsonify({PHYLO_TREE_KEY: results})
 
 
 def _process_phylo_tree(
-    db_session: Session, phylo_tree_id: int, user_auth0_id: str
+    db_session: Session, phylo_tree_id: int, user: User
 ) -> Union[dict, Response]:
     """Retrieves a phylo tree and renames the nodes on the tree for a given user."""
-    user: User = (
-        get_usergroup_query(db_session, user_auth0_id)
-        .options(joinedload(User.group, Group.can_see))
-        .one()
-    )
     can_see_group_ids_trees: Set[int] = {user.group_id}
     can_see_group_ids_trees.update(
         {
@@ -193,10 +174,7 @@ def _process_phylo_tree(
 @application.route("/api/phylo_tree/<int:phylo_tree_id>", methods=["GET"])
 @requires_auth
 def phylo_tree(phylo_tree_id: int):
-    with session_scope(application.DATABASE_INTERFACE) as db_session:
-        phylo_tree_data = _process_phylo_tree(
-            db_session, phylo_tree_id, session["profile"]["user_id"]
-        )
+    phylo_tree_data = _process_phylo_tree(g.db_session, phylo_tree_id, g.auth_user)
 
     # check if the security check failed
     if isinstance(phylo_tree_data, Response):
@@ -230,10 +208,7 @@ def _extract_accessions(accessions_list: list, node: dict):
 @application.route("/api/phylo_tree/sample_ids/<int:phylo_tree_id>", methods=["GET"])
 @requires_auth
 def tree_sample_ids(phylo_tree_id: int):
-    with session_scope(application.DATABASE_INTERFACE) as db_session:
-        phylo_tree_data = _process_phylo_tree(
-            db_session, phylo_tree_id, session["profile"]["user_id"]
-        )
+    phylo_tree_data = _process_phylo_tree(g.db_session, phylo_tree_id, g.auth_user)
     # check if the security check failed
     if isinstance(phylo_tree_data, Response):
         # return failed response
@@ -255,33 +230,30 @@ def tree_sample_ids(phylo_tree_id: int):
 @application.route("/api/auspice/view/<int:phylo_tree_id>", methods=["GET"])
 @requires_auth
 def auspice_view(phylo_tree_id: int):
-    with session_scope(application.DATABASE_INTERFACE) as db_session:
-        phylo_tree_data = _process_phylo_tree(
-            db_session, phylo_tree_id, session["profile"]["user_id"]
+    phylo_tree_data = _process_phylo_tree(g.db_session, phylo_tree_id, g.auth_user)
+
+    # check if the security check failed
+    if isinstance(phylo_tree_data, Response):
+        # return failed response
+        return phylo_tree_data
+
+    else:
+        s3_resource = boto3.resource(
+            "s3",
+            endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None,
+            config=boto3.session.Config(signature_version="s3v4"),
+        )
+        s3_bucket = application.aspen_config.EXTERNAL_AUSPICE_BUCKET
+        s3_key = str(uuid.uuid4())
+        s3_resource.Bucket(s3_bucket).Object(s3_key).put(
+            Body=json.dumps(phylo_tree_data)
+        )
+        s3_client = s3_resource.meta.client
+
+        presigned_url = s3_client.generate_presigned_url(
+            "get_object",
+            Params={"Bucket": s3_bucket, "Key": s3_key},
+            ExpiresIn=3600,
         )
 
-        # check if the security check failed
-        if isinstance(phylo_tree_data, Response):
-            # return failed response
-            return phylo_tree_data
-
-        else:
-            s3_resource = boto3.resource(
-                "s3",
-                endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None,
-                config=boto3.session.Config(signature_version="s3v4"),
-            )
-            s3_bucket = application.aspen_config.EXTERNAL_AUSPICE_BUCKET
-            s3_key = str(uuid.uuid4())
-            s3_resource.Bucket(s3_bucket).Object(s3_key).put(
-                Body=json.dumps(phylo_tree_data)
-            )
-            s3_client = s3_resource.meta.client
-
-            presigned_url = s3_client.generate_presigned_url(
-                "get_object",
-                Params={"Bucket": s3_bucket, "Key": s3_key},
-                ExpiresIn=3600,
-            )
-
-            return jsonify({"url": presigned_url})
+        return jsonify({"url": presigned_url})

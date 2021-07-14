@@ -5,7 +5,7 @@ from typing import Optional
 
 import sentry_sdk
 from authlib.integrations.flask_client import OAuth
-from flask import redirect, session
+from flask import request, redirect, session, g
 from flask_cors import CORS
 from sentry_sdk.integrations.flask import FlaskIntegration
 
@@ -13,6 +13,13 @@ from aspen.app.aspen_app import AspenApp
 from aspen.config.config import Config
 from aspen.config.docker_compose import DockerComposeConfig
 from aspen.config.production import ProductionConfig
+from auth0.v3.exceptions import TokenValidationError
+from auth0.v3.authentication.token_verifier import (
+    TokenVerifier,
+    AsymmetricSignatureVerifier,
+)
+from aspen.app.views.api_utils import get_usergroup_query
+from aspen.database.connection import session_scope
 
 static_folder = Path(__file__).parent.parent / "static"
 
@@ -73,20 +80,64 @@ auth0 = oauth.register(
 )
 
 
+def validate_auth_header(auth_header):
+    parts = auth_header.split()
+
+    if parts[0].lower() != "bearer":
+        raise TokenValidationError("Authorization header must start with Bearer")
+    elif len(parts) == 1:
+        raise TokenValidationError("Token not found")
+    elif len(parts) > 2:
+        raise TokenValidationError("Authorization header must be Bearer token")
+
+    id_token = parts[1]
+
+    domain = application.aspen_config.AUTH0_DOMAIN
+    client_id = application.aspen_config.AUTH0_CLIENT_ID
+
+    jwks_url = f"https://{domain}/.well-known/jwks.json"
+    issuer = f"https://{domain}/"
+
+    # Adapted from https://github.com/auth0/auth0-python#id-token-validation
+    sv = AsymmetricSignatureVerifier(jwks_url)  # Reusable instance
+    payload = sv.verify_signature(id_token)
+    tv = TokenVerifier(signature_verifier=sv, issuer=issuer, audience=client_id)
+    tv._verify_payload(payload)
+    return payload
+
+
+def setup_userinfo(user_id):
+    user = get_usergroup_query(g.db_session, user_id).one()
+    g.auth_user = user
+    sentry_sdk.set_user(
+        {
+            "id": session["profile"]["user_id"],
+            "name": session["profile"]["name"],
+        }
+    )
+
+
 # use this to wrap protected views
 def requires_auth(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        if "profile" not in session:
-            # Redirect to Login page
+        auth_header = request.headers.get("authorization")
+        auth0_user_id = None
+        if auth_header:
+            try:
+                payload = validate_auth_header(auth_header)
+                auth0_user_id = payload["sub"]
+            except TokenValidationError as err:
+                application.logger.debug(f"Token validation error: {err}")
+        elif "profile" in session:
+            auth0_user_id = session["profile"]["user_id"]
+        # Redirect to Login page
+        if not auth0_user_id:
             return redirect("/login")
-
-        sentry_sdk.set_user(
-            {
-                "id": session["profile"]["user_id"],
-                "name": session["profile"]["name"],
-            }
-        )
-        return f(*args, **kwargs)
-
+        with session_scope(application.DATABASE_INTERFACE) as db_session:
+            g.db_session = db_session
+            setup_userinfo(auth0_user_id)
+            if not g.auth_user:
+                return redirect("/login")
+            return f(*args, **kwargs)
     return decorated

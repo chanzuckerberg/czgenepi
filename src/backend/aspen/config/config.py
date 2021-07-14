@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import os
-from collections import MutableMapping
+from collections.abc import MutableMapping
 from functools import lru_cache
 from typing import Any, Callable, Mapping, Optional, Set, Type, TypeVar, Union
 

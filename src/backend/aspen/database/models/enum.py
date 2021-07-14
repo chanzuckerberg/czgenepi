@@ -14,3 +14,4 @@ if TYPE_CHECKING:
 
 else:
     from enumtables import EnumType as Enum  # noqa: F401
+    Enum.cache_ok = True  # SqlAlchemy 1.4 requires us to set a cache_ok flag on type decorators.
