@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Optional
 
 import sentry_sdk
+from sentry_sdk.integrations.flask import FlaskIntegration
 from authlib.integrations.flask_client import OAuth
 from flask import redirect, session
 from flask_cors import CORS
@@ -22,23 +23,28 @@ if flask_env == "production":
 else:
     aspen_config = DockerComposeConfig()
 
+deployment = os.getenv("DEPLOYMENT_STAGE")
+
 # We should be able to allow this in all environments and only alert on prod.
 # Init as early as possible to catch more
 sentry_sdk.init(
-    aspen_config.SENTRY_URL,
+    dsn=aspen_config.SENTRY_URL,
+    integrations=[FlaskIntegration()],
     # Set traces_sample_rate to 1.0 to capture 100%
     # of transactions for performance monitoring.
     # We recommend adjusting this value in production.
     traces_sample_rate=1.0,
 )
+sentry_sdk.set_user({
+    "id": os.getenv("EC2_INSTANCE_ID"),
+    "deployment_stage": deployment
+})
 
 application = AspenApp(
     __name__,
     static_folder=str(static_folder),
     aspen_config=aspen_config,
 )
-
-deployment = os.getenv("DEPLOYMENT_STAGE")
 
 allowed_origins = []
 frontend_url = os.getenv("FRONTEND_URL")
