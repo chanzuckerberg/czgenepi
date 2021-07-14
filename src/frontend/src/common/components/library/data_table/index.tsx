@@ -138,15 +138,20 @@ export const DataTable: FunctionComponent<Props> = ({
   };
 
   const render = (tableData: TableItem[]) => {
+    
     function renderRow(props: ListChildComponentProps) {
       const item = tableData[props.index];
-
-      return (
-        <TableRow style={props.style} data-test-id="table-row">
-          {sampleRow(item)}
-        </TableRow>
-      );
+      if (item == undefined) {
+        return;
+      } else {
+        return (
+          <TableRow style={props.style} data-test-id="table-row">
+            {sampleRow(item)}
+          </TableRow>
+        );
+      }
     }
+    
     return (
       <div className={style.container}>
         <div className={style.header} data-test-id="header-row">
