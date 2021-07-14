@@ -4,10 +4,10 @@ from pathlib import Path
 from typing import Optional
 
 import sentry_sdk
-from sentry_sdk.integrations.flask import FlaskIntegration
 from authlib.integrations.flask_client import OAuth
 from flask import redirect, session
 from flask_cors import CORS
+from sentry_sdk.integrations.flask import FlaskIntegration
 
 from aspen.app.aspen_app import AspenApp
 from aspen.config.config import Config
@@ -35,10 +35,9 @@ sentry_sdk.init(
     # We recommend adjusting this value in production.
     traces_sample_rate=1.0,
 )
-sentry_sdk.set_user({
-    "id": os.getenv("EC2_INSTANCE_ID"),
-    "deployment_stage": deployment
-})
+sentry_sdk.set_user(
+    {"id": os.getenv("EC2_INSTANCE_ID"), "deployment_stage": deployment}
+)
 
 application = AspenApp(
     __name__,
