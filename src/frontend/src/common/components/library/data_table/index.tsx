@@ -1,3 +1,6 @@
+/* eslint-disable sonarjs/cognitive-complexity */
+/** TODO: Re-evaluate if there really is a complexity problem here **/
+
 import { get, isEqual } from "lodash/fp";
 import React, { Fragment, FunctionComponent, useReducer } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
@@ -138,20 +141,15 @@ export const DataTable: FunctionComponent<Props> = ({
   };
 
   const render = (tableData: TableItem[]) => {
-    
     function renderRow(props: ListChildComponentProps) {
       const item = tableData[props.index];
-      if (item == undefined) {
-        return;
-      } else {
-        return (
-          <TableRow style={props.style} data-test-id="table-row">
-            {sampleRow(item)}
-          </TableRow>
-        );
-      }
+      return (
+        <TableRow style={props.style} data-test-id="table-row">
+          {item === undefined ? null : sampleRow(item)}
+        </TableRow>
+      );
     }
-    
+
     return (
       <div className={style.container}>
         <div className={style.header} data-test-id="header-row">
