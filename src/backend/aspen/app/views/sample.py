@@ -1,6 +1,6 @@
 import datetime
-import tempfile
 from collections import defaultdict
+from aspen.database.connection import session_scope
 from typing import (
     Any,
     Iterable,
@@ -12,7 +12,7 @@ from typing import (
     Union,
 )
 
-from flask import jsonify, request, Response, send_file, g
+from flask import g, jsonify, request, Response, stream_with_context
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import joinedload
 
@@ -149,81 +149,105 @@ def _format_lineage(sample: Sample) -> dict[str, Any]:
 @application.route("/api/sequences", methods=["GET"])
 @requires_auth
 def prepare_sequences_download():
+    # stream output file
     user = g.auth_user
+    fasta_filename = f"{user.group.name}_sample_sequences.fasta"
     request_data = request.get_json()
     sample_ids = request_data["requested_sequences"]["sample_ids"]
 
-    # query for samples
-    all_samples: Iterable[Sample] = (
-        g.db_session.query(Sample)
-        .filter(
+    @stream_with_context
+    def stream_samples(cansee_groups_private_identifiers):
+        with session_scope(application.DATABASE_INTERFACE) as db_session:
+            sample_ids = request_data["requested_sequences"]["sample_ids"]
+
+            # query for samples
+            all_samples: Iterable[Sample] = (
+                db_session.query(Sample)
+                .yield_per(
+                    5
+                )  # Streams a few DB rows at a time but our query must return one row per resolved object.
+                .filter(
+                    and_(
+                        Sample.uploaded_pathogen_genome != None,  # noqa: E711
+                        or_(
+                            Sample.private_identifier.in_(sample_ids),
+                            Sample.public_identifier.in_(sample_ids),
+                        ),
+                    )
+                )
+                .options(
+                    joinedload(Sample.uploaded_pathogen_genome).undefer(
+                        UploadedPathogenGenome.sequence
+                    ),
+                )
+            )
+
+            for sample in all_samples:
+                if sample.uploaded_pathogen_genome:
+                    pathogen_genome: UploadedPathogenGenome = (
+                        sample.uploaded_pathogen_genome
+                    )
+                    sequence: str = "".join(
+                        [
+                            line
+                            for line in pathogen_genome.sequence.splitlines()  # type: ignore
+                            if not (line.startswith(">") or line.startswith(";"))
+                        ]
+                    )
+                    stripped_sequence: str = sequence.strip("Nn")
+                    # use private id if the user has access to it, else public id
+                    if (
+                        sample.submitting_group_id == user.group_id
+                        or sample.submitting_group_id
+                        in cansee_groups_private_identifiers
+                        or user.system_admin
+                    ):
+                        yield (f">{sample.private_identifier}\n")  # type: ignore
+                    else:
+                        yield (f">{sample.public_identifier}\n")
+                    yield (stripped_sequence)
+                    yield ("\n")
+
+    # query for samples we don't have access to
+    cansee_groups: Set[int] = {}
+    cansee_groups_private_identifiers: Set[int] = {}
+    if not user.system_admin:
+        cansee_groups: Set[int] = {
+            cansee.owner_group_id
+            for cansee in user.group.can_see
+            if cansee.data_type == DataType.SEQUENCES
+        }
+        # add the users own group
+        cansee_groups.add(user.group_id)
+
+        cansee_groups_private_identifiers: Set[int] = {
+            cansee.owner_group_id
+            for cansee in user.group.can_see
+            if cansee.data_type == DataType.PRIVATE_IDENTIFIERS
+        }
+
+        denied_samples: Iterable[Sample] = g.db_session.query(Sample).filter(
+            and_(Sample.submitting_group_id.not_in(cansee_groups)),
             and_(
                 Sample.uploaded_pathogen_genome != None,  # noqa: E711
                 or_(
                     Sample.private_identifier.in_(sample_ids),
                     Sample.public_identifier.in_(sample_ids),
                 ),
-            )
-        )
-        .options(
-            joinedload(Sample.uploaded_pathogen_genome).undefer(
-                UploadedPathogenGenome.sequence
             ),
         )
-    )
-    # check that user has access to the samples
-    group_ids = set(sample.submitting_group_id for sample in all_samples)
-    cansee_groups: Set[int] = {
-        cansee.owner_group_id
-        for cansee in user.group.can_see
-        if cansee.data_type == DataType.SEQUENCES
-    }
-    # add the users own group
-    cansee_groups.add(user.group_id)
-    if not group_ids.issubset(cansee_groups):
-        return Response(
-            "User does not have access the requested sequences",
-            400,
-        )
-
-    cansee_groups_private_identifiers: Set[int] = {
-        cansee.owner_group_id
-        for cansee in user.group.can_see
-        if cansee.data_type == DataType.PRIVATE_IDENTIFIERS
-    }
-    # create output file
-    fasta_file = tempfile.NamedTemporaryFile("w+t")
-    with open(fasta_file.name, "w") as f:
-        for sample in all_samples:
-            if sample.uploaded_pathogen_genome:
-                pathogen_genome: UploadedPathogenGenome = (
-                    sample.uploaded_pathogen_genome
-                )
-                sequence: str = "".join(
-                    [
-                        line
-                        for line in pathogen_genome.sequence.splitlines()  # type: ignore
-                        if not (line.startswith(">") or line.startswith(";"))
-                    ]
-                )
-                stripped_sequence: str = sequence.strip("Nn")
-                # use private id if the user has access to it, else public id
-                if (
-                    sample.submitting_group_id == user.group_id
-                    or sample.submitting_group_id in cansee_groups_private_identifiers
-                    or user.system_admin
-                ):
-                    f.write(f">{sample.private_identifier}\n")  # type: ignore
-                else:
-                    f.write(f">{sample.public_identifier}\n")
-                f.write(stripped_sequence)
-                f.write("\n")
-
-    fasta_filename = f"{user.group.name}_sample_sequences.fasta"
-    res = send_file(fasta_file, download_name=fasta_filename, as_attachment=True)
-    # remove the file
-    f.close()
-    return res
+        # check that user has access to the requested samples
+        for denied_sample in denied_samples:
+            return Response(
+                "User does not have access the requested sequences",
+                403,
+            )
+    # Detach all ORM objects (makes them read-only!) from the DB session for our generator.
+    g.db_session.expunge_all()
+    generator = stream_samples(cansee_groups_private_identifiers)
+    resp = Response(generator, mimetype="application/binary")
+    resp.headers["Content-Disposition"] = f"attachment; filename={fasta_filename}"
+    return resp
 
 
 @application.route("/api/samples", methods=["GET"])

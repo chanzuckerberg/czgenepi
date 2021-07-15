@@ -66,7 +66,7 @@ def test_prepare_sequences_download_no_access(
     }
 
     res = client.get("/api/sequences", json=data)
-    assert res.status == "400 BAD REQUEST"
+    assert res.status == "403 FORBIDDEN"
     assert res.get_data() == b"User does not have access the requested sequences"
 
 

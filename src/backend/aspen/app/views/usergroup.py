@@ -3,7 +3,7 @@ from typing import Collection, Dict, Mapping, Union
 from auth0.v3 import authentication as auth0_authentication
 from auth0.v3.exceptions import Auth0Error
 from auth0.v3.management import Auth0
-from flask import jsonify, request, Response, g
+from flask import g, jsonify, request, Response
 
 from aspen.app.app import application, requires_auth
 from aspen.app.views.api_utils import filter_usergroup_dict
