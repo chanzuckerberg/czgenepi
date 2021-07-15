@@ -9,6 +9,7 @@ export AWS_PROD_PROFILE=genepi-prod
 export BACKEND_APP_ROOT=/usr/src/app
 
 ### DATABASE VARIABLES #################################################
+DB_SEARCH_PATH=aspen
 LOCAL_DB_NAME = aspen_db
 LOCAL_DB_SERVER = localhost:5432
 # This has to be "postgres" to ease moving snapshots from RDS.
@@ -37,7 +38,7 @@ remote-pgconsole: # Get a psql console on a remote db (from OSX only!)
 	export DB_URI=$$(jq -r '"postgresql://\(.DB_admin_username):\(.DB_admin_password)@127.0.0.1:5556/$(DB)"' <<< $$config); \
 	echo Connecting to $$(jq -r .DB_address <<< $$config)/$(DB) via $$(jq -r .bastion_host <<< $$config); \
 	ssh -f -o ExitOnForwardFailure=yes -L 5556:$$(jq -r .DB_address <<< $$config):5432 $$(jq -r .bastion_host <<< $$config) sleep 10; \
-	psql $${DB_URI}
+	psql $${DB_URI}?options=--search_path%3d$(DB_SEARCH_PATH)
 
 remote-dbconsole: .env.ecr # Get a python console on a remote db (from OSX only!)
 	export ENV=$${ENV:=rdev}; \
@@ -178,7 +179,7 @@ local-shell: ## Open a command shell in one of the dev containers. ex: make loca
 
 .PHONY: local-pgconsole
 local-pgconsole: ## Connect to the local postgres database.
-	docker-compose exec database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)"
+	docker-compose exec database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)?options=--search_path%3d$(DB_SEARCH_PATH)"
 
 .PHONY: local-dbconsole
 local-dbconsole: ## Connect to the local postgres database.
