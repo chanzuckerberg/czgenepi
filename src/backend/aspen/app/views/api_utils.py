@@ -6,7 +6,7 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.query import Query
 from sqlalchemy.orm.session import Session
 
-from aspen.database.models import Sample, User, Group
+from aspen.database.models import Group, Sample, User
 
 
 def filter_usergroup_dict(

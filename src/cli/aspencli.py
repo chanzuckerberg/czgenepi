@@ -96,11 +96,11 @@ class ApiClient:
         self.url = url
         self.token_handler = token_handler
 
-    def get(self, path):
+    def get(self, path, **kwargs):
         access_token = self.token_handler.get_id_token()
         headers = {"Authorization": f"Bearer {access_token}"}
         url = f"{self.url}{path}"
-        return requests.get(url, headers=headers, allow_redirects=False)
+        return requests.get(url, headers=headers, allow_redirects=False, **kwargs)
 
 
 class CliConfig:
@@ -121,7 +121,7 @@ class CliConfig:
             "client_id": "U3b2iUQ6zqlbBOl7Y397E3d9gzxBCZBm",
             "verify": True,
         },
-        "localx": {
+        "local": {
             "auth_url": "https://oidc.genepinet.local:8443",
             "client_id": "local-client-id",
             "verify": False,
@@ -178,6 +178,22 @@ def userinfo():
 def get_userinfo(ctx):
     api_client = ctx.obj["api_client"]
     resp = api_client.get("/api/usergroup")
+    print(resp.text)
+
+
+@cli.group()
+def samples():
+    pass
+
+
+@samples.command(name="download")
+@click.argument("sample_ids", nargs=-1)
+@click.pass_context
+def download_samples(ctx, sample_ids):
+    api_client = ctx.obj["api_client"]
+    payload = {"requested_sequences": {"sample_ids": sample_ids}}
+    resp = api_client.get("/api/sequences", json=payload)
+    print(resp.headers)
     print(resp.text)
 
 

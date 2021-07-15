@@ -6,7 +6,7 @@ from typing import Any, Callable, Iterable, Mapping, MutableSequence, Set, Tuple
 
 import boto3
 import sqlalchemy
-from flask import jsonify, make_response, Response, g
+from flask import g, jsonify, make_response, Response
 from sqlalchemy import func, or_
 from sqlalchemy.orm import aliased, joinedload, Session
 

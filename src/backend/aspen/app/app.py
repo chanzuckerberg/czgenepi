@@ -4,21 +4,21 @@ from pathlib import Path
 from typing import Optional
 
 import sentry_sdk
+from auth0.v3.authentication.token_verifier import (
+    AsymmetricSignatureVerifier,
+    TokenVerifier,
+)
+from auth0.v3.exceptions import TokenValidationError
 from authlib.integrations.flask_client import OAuth
-from flask import request, redirect, session, g
+from flask import g, redirect, request, session
 from flask_cors import CORS
 from sentry_sdk.integrations.flask import FlaskIntegration
 
 from aspen.app.aspen_app import AspenApp
+from aspen.app.views.api_utils import get_usergroup_query
 from aspen.config.config import Config
 from aspen.config.docker_compose import DockerComposeConfig
 from aspen.config.production import ProductionConfig
-from auth0.v3.exceptions import TokenValidationError
-from auth0.v3.authentication.token_verifier import (
-    TokenVerifier,
-    AsymmetricSignatureVerifier,
-)
-from aspen.app.views.api_utils import get_usergroup_query
 from aspen.database.connection import session_scope
 
 static_folder = Path(__file__).parent.parent / "static"
