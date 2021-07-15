@@ -30,13 +30,11 @@ deployment = os.getenv("DEPLOYMENT_STAGE")
 sentry_sdk.init(
     dsn=aspen_config.SENTRY_URL,
     integrations=[FlaskIntegration()],
+    environment=deployment,
     # Set traces_sample_rate to 1.0 to capture 100%
     # of transactions for performance monitoring.
     # We recommend adjusting this value in production.
     traces_sample_rate=1.0,
-)
-sentry_sdk.set_user(
-    {"id": os.getenv("EC2_INSTANCE_ID"), "deployment_stage": deployment}
 )
 
 application = AspenApp(
@@ -82,6 +80,13 @@ def requires_auth(f):
         if "profile" not in session:
             # Redirect to Login page
             return redirect("/login")
+
+        sentry_sdk.set_user(
+            {
+                "id": session["profile"]["user_id"],
+                "name": session["profile"]["name"],
+            }
+        )
         return f(*args, **kwargs)
 
     return decorated
