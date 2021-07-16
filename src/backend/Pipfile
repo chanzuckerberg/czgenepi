@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 Authlib = "*"
 boto3 = "*"
+# Click 8 has a regression issue, so we are pinning it to 7.1.2
+click = "== 7.1.2"
 Flask = "*"
 psycopg2-binary = "*"
 python-dotenv = "*"
