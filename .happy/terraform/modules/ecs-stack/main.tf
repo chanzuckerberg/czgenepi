@@ -45,11 +45,12 @@ locals {
   # This is the wdl executor image, doesn't change on update.
   swipe_image_repo     = local.secret["ecrs"]["swipe"]["url"]
 
-  batch_role_arn        = local.secret["batch_queues"]["aspen"]["role_arn"]
-  ec2_queue_arn         = local.secret["batch_envs"]["aspen"]["envs"]["EC2"]["queue_arn"]
-  spot_queue_arn        = local.secret["batch_envs"]["aspen"]["envs"]["SPOT"]["queue_arn"]
-  external_dns          = local.secret["external_zone_name"]
-  internal_dns          = local.secret["internal_zone_name"]
+  batch_role_arn             = local.secret["batch_queues"]["aspen"]["role_arn"]
+  ec2_queue_arn              = local.secret["batch_envs"]["aspen"]["envs"]["EC2"]["queue_arn"]
+  spot_queue_arn             = local.secret["batch_envs"]["aspen"]["envs"]["SPOT"]["queue_arn"]
+  state_change_sns_topic_arn = local.secret["batch_envs"]["aspen"]["state_change_sns_topic_arn"]
+  external_dns               = local.secret["external_zone_name"]
+  internal_dns               = local.secret["internal_zone_name"]
 
   frontend_listener_arn = local.secret[local.alb_key]["frontend"]["listener_arn"]
   backend_listener_arn  = local.secret[local.alb_key]["backend"]["listener_arn"]
@@ -144,30 +145,32 @@ module backend_service {
 }
 
 module swipe_sfn_spot {
-  source                 = "../swipe-sfn"
-  app_name               = "swipe-spot"
-  try_spot_first         = true
-  stack_resource_prefix  = local.stack_resource_prefix
-  remote_dev_prefix      = local.remote_dev_prefix
-  job_definition_name    = module.swipe_batch.batch_job_definition
-  ec2_queue_arn          = local.ec2_queue_arn
-  spot_queue_arn         = local.spot_queue_arn
-  role_arn               = local.sfn_role_arn
-  custom_stack_name      = local.custom_stack_name
-  deployment_stage       = local.deployment_stage
+  source                     = "../swipe-sfn"
+  app_name                   = "swipe-spot"
+  try_spot_first             = true
+  stack_resource_prefix      = local.stack_resource_prefix
+  remote_dev_prefix          = local.remote_dev_prefix
+  job_definition_name        = module.swipe_batch.batch_job_definition
+  ec2_queue_arn              = local.ec2_queue_arn
+  spot_queue_arn             = local.spot_queue_arn
+  state_change_sns_topic_arn = local.state_change_sns_topic_arn
+  role_arn                   = local.sfn_role_arn
+  custom_stack_name          = local.custom_stack_name
+  deployment_stage           = local.deployment_stage
 }
 
 module swipe_sfn {
-  source                 = "../swipe-sfn"
-  app_name               = "swipe-ec2"
-  stack_resource_prefix  = local.stack_resource_prefix
-  remote_dev_prefix      = local.remote_dev_prefix
-  job_definition_name    = module.swipe_batch.batch_job_definition
-  ec2_queue_arn          = local.ec2_queue_arn
-  spot_queue_arn         = local.spot_queue_arn
-  role_arn               = local.sfn_role_arn
-  custom_stack_name      = local.custom_stack_name
-  deployment_stage       = local.deployment_stage
+  source                     = "../swipe-sfn"
+  app_name                   = "swipe-ec2"
+  stack_resource_prefix      = local.stack_resource_prefix
+  remote_dev_prefix          = local.remote_dev_prefix
+  job_definition_name        = module.swipe_batch.batch_job_definition
+  ec2_queue_arn              = local.ec2_queue_arn
+  spot_queue_arn             = local.spot_queue_arn
+  state_change_sns_topic_arn = local.state_change_sns_topic_arn
+  role_arn                   = local.sfn_role_arn
+  custom_stack_name          = local.custom_stack_name
+  deployment_stage           = local.deployment_stage
 }
 
 # Write information on how to invoke the gisaid sfn to SSM.
