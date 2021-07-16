@@ -7,6 +7,7 @@ import sentry_sdk
 from authlib.integrations.flask_client import OAuth
 from flask import redirect, session
 from flask_cors import CORS
+from sentry_sdk.integrations.flask import FlaskIntegration
 
 from aspen.app.aspen_app import AspenApp
 from aspen.config.config import Config
@@ -22,10 +23,14 @@ if flask_env == "production":
 else:
     aspen_config = DockerComposeConfig()
 
+deployment = os.getenv("DEPLOYMENT_STAGE")
+
 # We should be able to allow this in all environments and only alert on prod.
 # Init as early as possible to catch more
 sentry_sdk.init(
-    aspen_config.SENTRY_URL,
+    dsn=aspen_config.SENTRY_URL,
+    integrations=[FlaskIntegration()],
+    environment=deployment,
     # Set traces_sample_rate to 1.0 to capture 100%
     # of transactions for performance monitoring.
     # We recommend adjusting this value in production.
@@ -37,8 +42,6 @@ application = AspenApp(
     static_folder=str(static_folder),
     aspen_config=aspen_config,
 )
-
-deployment = os.getenv("DEPLOYMENT_STAGE")
 
 allowed_origins = []
 frontend_url = os.getenv("FRONTEND_URL")
@@ -77,6 +80,13 @@ def requires_auth(f):
         if "profile" not in session:
             # Redirect to Login page
             return redirect("/login")
+
+        sentry_sdk.set_user(
+            {
+                "id": session["profile"]["user_id"],
+                "name": session["profile"]["name"],
+            }
+        )
         return f(*args, **kwargs)
 
     return decorated
