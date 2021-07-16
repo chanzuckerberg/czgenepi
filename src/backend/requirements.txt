@@ -5,7 +5,6 @@
 #    pipenv lock --requirements
 #
 
-[]
 -i https://pypi.org/simple
 -e ./third-party/sqlalchemy-enum-tables
 authlib==0.15.4
