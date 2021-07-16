@@ -43,7 +43,7 @@ States:
           - Name: SFN_CURRENT_STATE
             Value.$: $$.State.Name
     ResultPath: $.BatchJobDetails.Run
-    Next: HandleSuccess
+    Next: RunReadOutput
     Retry: &BatchRetryConfig
       - ErrorEquals: ["Batch.AWSBatchException"]
         IntervalSeconds: 15
@@ -65,7 +65,7 @@ States:
       - Variable: "$.BatchJobError.RunSPOT.Cause.StatusReason"
         StringMatches: "Host EC2 (instance i-*) terminated."
         Next: RunEC2
-    Default: HandleFailure
+    Default: RunReadOutput
   RunEC2:
     Type: Task
     Resource: arn:aws:states:::batch:submitJob.sync
@@ -79,11 +79,22 @@ States:
         Memory.$: $.RunEC2Memory
         Environment: *RunEnvironment
     ResultPath: $.BatchJobDetails.Run
-    Next: HandleSuccess
+    Next: RunReadOutput
     Retry: *BatchRetryConfig
     Catch:
       - ErrorEquals: ["States.ALL"]
         ResultPath: $.BatchJobError.RunEC2
+        Next: RunReadOutput
+  RunReadOutput:
+    Type: Task
+    Resource: arn:aws:states:::lambda:invoke
+    Parameters:
+      FunctionName: "${process-stage-output}"
+      Payload: *PassthroughStatePayload
+    OutputPath: $.Payload
+    Next: HandleSuccess
+    Catch:
+      - ErrorEquals: ["States.ALL"]
         Next: HandleFailure
   HandleSuccess:
     Type: Task
