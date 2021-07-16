@@ -40,7 +40,7 @@ subsampling:
       exclude: "--exclude-where 'selected!=yes'"
     same_county:
       group_by: "year month"
-      max_sequences: 100
+      max_sequences: 3000
       query: --query "(location == '{{location}}') & (division == '{{division}}')"
       priorities:
         type: "proximity"
