@@ -239,7 +239,7 @@ def prepare_sequences_download():
         # check that user has access to the requested samples
         for denied_sample in denied_samples:
             return Response(
-                "User does not have access the requested sequences",
+                "User does not have access to the requested sequences",
                 403,
             )
     # Detach all ORM objects (makes them read-only!) from the DB session for our generator.
