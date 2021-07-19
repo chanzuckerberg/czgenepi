@@ -1,6 +1,5 @@
 import datetime
 from collections import defaultdict
-from aspen.database.connection import session_scope
 from typing import (
     Any,
     Iterable,
@@ -19,6 +18,7 @@ from sqlalchemy.orm import joinedload
 from aspen.app.app import application, requires_auth
 from aspen.app.views import api_utils
 from aspen.app.views.api_utils import check_valid_sequence
+from aspen.database.connection import session_scope
 from aspen.database.models import (
     DataType,
     Entity,
