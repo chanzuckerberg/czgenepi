@@ -1,5 +1,5 @@
 from sqlalchemy import MetaData
-from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
+from sqlalchemy.ext.declarative import declarative_base
 
 from aspen.database.models import mixins as mx
 
@@ -13,7 +13,5 @@ meta = MetaData(
         "pk": "pk_%(table_name)s",
     },
 )
-# typing "base" as DeclarativeMeta is the ugly workaround for
-# https://github.com/python/mypy/issues/2477
-base: DeclarativeMeta = declarative_base(metadata=meta)
-idbase: DeclarativeMeta = declarative_base(cls=mx.BaseMixin, metadata=meta)
+base = declarative_base(metadata=meta)
+idbase = declarative_base(cls=mx.BaseMixin, metadata=meta)

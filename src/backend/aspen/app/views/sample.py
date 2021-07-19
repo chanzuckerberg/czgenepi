@@ -1,5 +1,4 @@
 import datetime
-import tempfile
 from collections import defaultdict
 from typing import (
     Any,
@@ -12,13 +11,13 @@ from typing import (
     Union,
 )
 
-from flask import jsonify, request, Response, send_file, session
+from flask import g, jsonify, request, Response, stream_with_context
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import joinedload
 
 from aspen.app.app import application, requires_auth
 from aspen.app.views import api_utils
-from aspen.app.views.api_utils import check_valid_sequence, get_usergroup_query
+from aspen.app.views.api_utils import check_valid_sequence
 from aspen.database.connection import session_scope
 from aspen.database.models import (
     DataType,
@@ -31,7 +30,7 @@ from aspen.database.models import (
     WorkflowStatusType,
 )
 from aspen.database.models.sample import create_public_ids, RegionType
-from aspen.database.models.usergroup import Group, User
+from aspen.database.models.usergroup import User
 from aspen.error.recoverable import RecoverableError
 
 DEFAULT_DIVISION = "California"
@@ -150,57 +149,39 @@ def _format_lineage(sample: Sample) -> dict[str, Any]:
 @application.route("/api/sequences", methods=["GET"])
 @requires_auth
 def prepare_sequences_download():
-    with session_scope(application.DATABASE_INTERFACE) as db_session:
-        profile = session["profile"]
-        user = (
-            get_usergroup_query(db_session, profile["user_id"])
-            .options(joinedload(User.group).joinedload(Group.can_see))
-            .one()
-        )
-        request_data = request.get_json()
-        sample_ids = request_data["requested_sequences"]["sample_ids"]
+    # stream output file
+    user = g.auth_user
+    fasta_filename = f"{user.group.name}_sample_sequences.fasta"
+    request_data = request.get_json()
+    sample_ids = request_data["requested_sequences"]["sample_ids"]
 
-        # query for samples
-        all_samples: Iterable[Sample] = (
-            db_session.query(Sample)
-            .filter(
-                and_(
-                    Sample.uploaded_pathogen_genome != None,  # noqa: E711
-                    or_(
-                        Sample.private_identifier.in_(sample_ids),
-                        Sample.public_identifier.in_(sample_ids),
+    @stream_with_context
+    def stream_samples(cansee_groups_private_identifiers):
+        with session_scope(application.DATABASE_INTERFACE) as db_session:
+            sample_ids = request_data["requested_sequences"]["sample_ids"]
+
+            # query for samples
+            all_samples: Iterable[Sample] = (
+                db_session.query(Sample)
+                .yield_per(
+                    5
+                )  # Streams a few DB rows at a time but our query must return one row per resolved object.
+                .filter(
+                    and_(
+                        Sample.uploaded_pathogen_genome != None,  # noqa: E711
+                        or_(
+                            Sample.private_identifier.in_(sample_ids),
+                            Sample.public_identifier.in_(sample_ids),
+                        ),
+                    )
+                )
+                .options(
+                    joinedload(Sample.uploaded_pathogen_genome).undefer(
+                        UploadedPathogenGenome.sequence
                     ),
                 )
             )
-            .options(
-                joinedload(Sample.uploaded_pathogen_genome).undefer(
-                    UploadedPathogenGenome.sequence
-                ),
-            )
-        )
-        # check that user has access to the samples
-        group_ids = set(sample.submitting_group_id for sample in all_samples)
-        cansee_groups: Set[int] = {
-            cansee.owner_group_id
-            for cansee in user.group.can_see
-            if cansee.data_type == DataType.SEQUENCES
-        }
-        # add the users own group
-        cansee_groups.add(user.group_id)
-        if not group_ids.issubset(cansee_groups):
-            return Response(
-                "User does not have access the requested sequences",
-                400,
-            )
 
-        cansee_groups_private_identifiers: Set[int] = {
-            cansee.owner_group_id
-            for cansee in user.group.can_see
-            if cansee.data_type == DataType.PRIVATE_IDENTIFIERS
-        }
-        # create output file
-        fasta_file = tempfile.NamedTemporaryFile("w+t")
-        with open(fasta_file.name, "w") as f:
             for sample in all_samples:
                 if sample.uploaded_pathogen_genome:
                     pathogen_genome: UploadedPathogenGenome = (
@@ -221,251 +202,269 @@ def prepare_sequences_download():
                         in cansee_groups_private_identifiers
                         or user.system_admin
                     ):
-                        f.write(f">{sample.private_identifier}\n")  # type: ignore
+                        yield (f">{sample.private_identifier}\n")  # type: ignore
                     else:
-                        f.write(f">{sample.public_identifier}\n")
-                    f.write(stripped_sequence)
-                    f.write("\n")
+                        yield (f">{sample.public_identifier}\n")
+                    yield (stripped_sequence)
+                    yield ("\n")
 
-        fasta_filename = f"{user.group.name}_sample_sequences.fasta"
-        res = send_file(
-            fasta_file, attachment_filename=fasta_filename, as_attachment=True
-        )
-        # remove the file
-        f.close()
-        return res
-
-
-@application.route("/api/samples", methods=["GET"])
-@requires_auth
-def samples():
-    with session_scope(application.DATABASE_INTERFACE) as db_session:
-        profile = session["profile"]
-        user = (
-            get_usergroup_query(db_session, profile["user_id"])
-            .options(joinedload(User.group).joinedload(Group.can_see))
-            .one()
-        )
-
-        cansee_groups_metadata: Set[int] = {
+    # query for samples we don't have access to
+    cansee_groups: Set[int] = {}
+    cansee_groups_private_identifiers: Set[int] = {}
+    if not user.system_admin:
+        cansee_groups: Set[int] = {
             cansee.owner_group_id
             for cansee in user.group.can_see
-            if cansee.data_type == DataType.METADATA
+            if cansee.data_type == DataType.SEQUENCES
         }
+        # add the users own group
+        cansee_groups.add(user.group_id)
+
         cansee_groups_private_identifiers: Set[int] = {
             cansee.owner_group_id
             for cansee in user.group.can_see
             if cansee.data_type == DataType.PRIVATE_IDENTIFIERS
         }
 
-        # load the samples.
-        samples: Sequence[Sample] = (
-            db_session.query(Sample)
-            .filter(
+        denied_samples: Iterable[Sample] = g.db_session.query(Sample).filter(
+            and_(Sample.submitting_group_id.not_in(cansee_groups)),
+            and_(
+                Sample.uploaded_pathogen_genome != None,  # noqa: E711
                 or_(
-                    Sample.submitting_group_id == user.group_id,
-                    and_(
-                        Sample.submitting_group_id.in_(cansee_groups_metadata),
-                        ~Sample.private,
-                    ),
-                    user.system_admin,
-                )
-            )
-            .options(
-                joinedload(Sample.uploaded_pathogen_genome),
-                joinedload(Sample.sequencing_reads_collection),
-            )
-            .all()
-        )
-        sample_entity_ids: MutableSequence[int] = list()
-        for sample in samples:
-            if sample.uploaded_pathogen_genome is not None:
-                sample_entity_ids.append(sample.uploaded_pathogen_genome.entity_id)
-
-        # load the gisaid_accessioning workflows.
-        gisaid_accession_workflows: Sequence[GisaidAccessionWorkflow] = (
-            db_session.query(GisaidAccessionWorkflow)
-            .join(GisaidAccessionWorkflow.inputs)
-            .filter(Entity.id.in_(sample_entity_ids))
-            .options(
-                joinedload(GisaidAccessionWorkflow.inputs),
-                joinedload(GisaidAccessionWorkflow.outputs.of_type(GisaidAccession)),
-            )
-            .all()
-        )
-        entity_id_to_gisaid_accession_workflow_map: defaultdict[
-            int, list[GisaidAccessionWorkflow]
-        ] = defaultdict(list)
-        for gisaid_accession_workflow in gisaid_accession_workflows:
-            for workflow_input in gisaid_accession_workflow.inputs:
-                if isinstance(workflow_input, (UploadedPathogenGenome)):
-                    entity_id_to_gisaid_accession_workflow_map[
-                        workflow_input.entity_id
-                    ].append(gisaid_accession_workflow)
-        for (
-            gisaid_accession_workflow_list
-        ) in entity_id_to_gisaid_accession_workflow_map.values():
-            # sort by success, date.
-            gisaid_accession_workflow_list.sort(
-                key=lambda gisaid_accession_workflow: (
-                    1
-                    if gisaid_accession_workflow.workflow_status
-                    == WorkflowStatusType.COMPLETED
-                    else 0,
-                    gisaid_accession_workflow.start_datetime,
+                    Sample.private_identifier.in_(sample_ids),
+                    Sample.public_identifier.in_(sample_ids),
                 ),
-                reverse=True,
+            ),
+        )
+        # check that user has access to the requested samples
+        for denied_sample in denied_samples:
+            return Response(
+                "User does not have access to the requested sequences",
+                403,
             )
+    # Detach all ORM objects (makes them read-only!) from the DB session for our generator.
+    g.db_session.expunge_all()
+    generator = stream_samples(cansee_groups_private_identifiers)
+    resp = Response(generator, mimetype="application/binary")
+    resp.headers["Content-Disposition"] = f"attachment; filename={fasta_filename}"
+    return resp
 
-        # filter for only information we need in sample table view
-        results: MutableSequence[Mapping[str, Any]] = list()
-        for sample in samples:
-            returned_sample_data = {
-                "public_identifier": sample.public_identifier,
-                "upload_date": _format_created_date(sample),
-                "collection_date": api_utils.format_date(sample.collection_date),
-                "collection_location": sample.location,
-                "gisaid": _format_gisaid_accession(
-                    sample, entity_id_to_gisaid_accession_workflow_map
+
+@application.route("/api/samples", methods=["GET"])
+@requires_auth
+def samples():
+    user = g.auth_user
+
+    cansee_groups_metadata: Set[int] = {
+        cansee.owner_group_id
+        for cansee in user.group.can_see
+        if cansee.data_type == DataType.METADATA
+    }
+    cansee_groups_private_identifiers: Set[int] = {
+        cansee.owner_group_id
+        for cansee in user.group.can_see
+        if cansee.data_type == DataType.PRIVATE_IDENTIFIERS
+    }
+
+    # load the samples.
+    samples: Sequence[Sample] = (
+        g.db_session.query(Sample)
+        .filter(
+            or_(
+                Sample.submitting_group_id == user.group_id,
+                and_(
+                    Sample.submitting_group_id.in_(cansee_groups_metadata),
+                    ~Sample.private,
                 ),
-                "czb_failed_genome_recovery": sample.czb_failed_genome_recovery,
-                "lineage": _format_lineage(sample),
-                "private": sample.private,
-            }
+                user.system_admin,
+            )
+        )
+        .options(
+            joinedload(Sample.uploaded_pathogen_genome),
+            joinedload(Sample.sequencing_reads_collection),
+        )
+        .all()
+    )
+    sample_entity_ids: MutableSequence[int] = list()
+    for sample in samples:
+        if sample.uploaded_pathogen_genome is not None:
+            sample_entity_ids.append(sample.uploaded_pathogen_genome.entity_id)
 
-            if (
-                sample.submitting_group_id == user.group_id
-                or sample.submitting_group_id in cansee_groups_private_identifiers
-                or user.system_admin
-            ):
-                returned_sample_data["private_identifier"] = sample.private_identifier
+    # load the gisaid_accessioning workflows.
+    gisaid_accession_workflows: Sequence[GisaidAccessionWorkflow] = (
+        g.db_session.query(GisaidAccessionWorkflow)
+        .join(GisaidAccessionWorkflow.inputs)
+        .filter(Entity.id.in_(sample_entity_ids))
+        .options(
+            joinedload(GisaidAccessionWorkflow.inputs),
+            joinedload(GisaidAccessionWorkflow.outputs.of_type(GisaidAccession)),
+        )
+        .all()
+    )
+    entity_id_to_gisaid_accession_workflow_map: defaultdict[
+        int, list[GisaidAccessionWorkflow]
+    ] = defaultdict(list)
+    for gisaid_accession_workflow in gisaid_accession_workflows:
+        for workflow_input in gisaid_accession_workflow.inputs:
+            if isinstance(workflow_input, (UploadedPathogenGenome)):
+                entity_id_to_gisaid_accession_workflow_map[
+                    workflow_input.entity_id
+                ].append(gisaid_accession_workflow)
+    for (
+        gisaid_accession_workflow_list
+    ) in entity_id_to_gisaid_accession_workflow_map.values():
+        # sort by success, date.
+        gisaid_accession_workflow_list.sort(
+            key=lambda gisaid_accession_workflow: (
+                1
+                if gisaid_accession_workflow.workflow_status
+                == WorkflowStatusType.COMPLETED
+                else 0,
+                gisaid_accession_workflow.start_datetime,
+            ),
+            reverse=True,
+        )
 
-            results.append(returned_sample_data)
+    # filter for only information we need in sample table view
+    results: MutableSequence[Mapping[str, Any]] = list()
+    for sample in samples:
+        returned_sample_data = {
+            "public_identifier": sample.public_identifier,
+            "upload_date": _format_created_date(sample),
+            "collection_date": api_utils.format_date(sample.collection_date),
+            "collection_location": sample.location,
+            "gisaid": _format_gisaid_accession(
+                sample, entity_id_to_gisaid_accession_workflow_map
+            ),
+            "czb_failed_genome_recovery": sample.czb_failed_genome_recovery,
+            "lineage": _format_lineage(sample),
+            "private": sample.private,
+        }
 
-        return jsonify({SAMPLE_KEY: results})
+        if (
+            sample.submitting_group_id == user.group_id
+            or sample.submitting_group_id in cansee_groups_private_identifiers
+            or user.system_admin
+        ):
+            returned_sample_data["private_identifier"] = sample.private_identifier
+
+        results.append(returned_sample_data)
+
+    return jsonify({SAMPLE_KEY: results})
 
 
 @application.route("/api/samples/create", methods=["POST"])
 @requires_auth
 def create_sample():
-    with session_scope(application.DATABASE_INTERFACE) as db_session:
-        profile: Mapping[str, str] = session["profile"]
+    user: User = g.auth_user
+    request_data = request.get_json()
 
-        user: User = (
-            get_usergroup_query(db_session, profile["user_id"])
-            .options(joinedload(User.group))
-            .one()
+    duplicates_in_request: Union[
+        None, Mapping[str, list[str]]
+    ] = api_utils.check_duplicate_data_in_request(request_data)
+    if duplicates_in_request:
+        return Response(
+            f"Error processing data, either duplicate private_identifiers: {duplicates_in_request['duplicate_private_ids']} or duplicate public identifiers: {duplicates_in_request['duplicate_public_ids']} exist in the upload files, please rename duplicates before proceeding with upload.",
+            400,
         )
-        request_data = request.get_json()
 
-        duplicates_in_request: Union[
-            None, Mapping[str, list[str]]
-        ] = api_utils.check_duplicate_data_in_request(request_data)
-        if duplicates_in_request:
-            return Response(
-                f"Error processing data, either duplicate private_identifiers: {duplicates_in_request['duplicate_private_ids']} or duplicate public identifiers: {duplicates_in_request['duplicate_public_ids']} exist in the upload files, please rename duplicates before proceeding with upload.",
-                400,
-            )
-
-        already_exists: Union[
-            None, Mapping[str, list[str]]
-        ] = api_utils.check_duplicate_samples(request_data, db_session)
-        if already_exists:
-            return Response(
-                f"Error inserting data, private_identifiers {already_exists['existing_private_ids']} or public_identifiers: {already_exists['existing_public_ids']} already exist in our database, please remove these samples before proceeding with upload.",
-                400,
-            )
-        public_ids = create_public_ids(user.group_id, db_session, len(request_data))
-        for data in request_data:
-            data_ok: bool
-            missing_fields: Optional[list[str]]
-            unexpected_fields: Optional[list[str]]
-            data_ok, missing_fields, unexpected_fields = api_utils.check_data(
-                list(data["sample"].keys()),
-                list(data["pathogen_genome"].keys()),
-                SAMPLES_POST_REQUIRED_FIELDS,
-                SAMPLES_POST_OPTIONAL_FIELDS,
-            )
-            if data_ok:
-                # GISAID Stuff
-                if data["sample"]["public_identifier"]:
-                    # if they provided a public_id they marked true to "submitted to gisaid"
-                    submitted_to_gisaid = True
-                    public_identifier = data["sample"]["public_identifier"]
-                else:
-                    # if they did not mark true to "submitted to gisaid generate a new public id for
-                    # them
-                    submitted_to_gisaid = False
-                    public_identifier = public_ids.pop(0)
-
-                sample_args: Mapping[str, Any] = {
-                    "submitting_group": user.group,
-                    "uploaded_by": user,
-                    "sample_collected_by": user.group.name,
-                    "sample_collector_contact_address": user.group.address,
-                    "division": DEFAULT_DIVISION,
-                    "country": DEFAULT_COUNTRY,
-                    "region": RegionType.NORTH_AMERICA,
-                    "organism": DEFAULT_ORGANISM,
-                    "private_identifier": data["sample"]["private_identifier"],
-                    "collection_date": data["sample"]["collection_date"],
-                    "location": data["sample"]["location"],
-                    "private": data["sample"]["private"],
-                    "public_identifier": public_identifier,
-                }
-
-                if "authors" not in sample_args:
-                    sample_args["authors"] = [
-                        user.group.name,
-                    ]
-
-                sequence = data["pathogen_genome"]["sequence"]
-                if not check_valid_sequence(sequence):
-                    # make sure we don't save any samples already added to the session
-                    db_session.rollback()
-                    return Response(
-                        f"Sample {sample_args['private_identifier']} contains invalid sequence characters, "
-                        f"accepted characters are [WSKMYRVHDBNZNATCGU-]",
-                        400,
-                    )
-
-                sample: Sample = Sample(**sample_args)
-                uploaded_pathogen_genome: UploadedPathogenGenome = (
-                    UploadedPathogenGenome(
-                        sample=sample,
-                        sequence=data["pathogen_genome"]["sequence"],
-                        sequencing_date=api_utils.format_sequencing_date(
-                            data["pathogen_genome"]["sequencing_date"]
-                        ),
-                    )
-                )
-                if data["pathogen_genome"]["isl_access_number"]:
-                    uploaded_pathogen_genome.add_accession(
-                        repository_type=PublicRepositoryType.GISAID,
-                        public_identifier=data["pathogen_genome"]["isl_access_number"],
-                        workflow_start_datetime=datetime.datetime.now(),
-                        workflow_end_datetime=datetime.datetime.now(),
-                    )
-                elif submitted_to_gisaid:
-                    # in this scenario they've checked yes to previously submitted to GISAID but did
-                    # not provide an isl-number, we mark it as UNKNOWN for now.
-                    uploaded_pathogen_genome.add_accession(
-                        repository_type=PublicRepositoryType.GISAID,
-                        public_identifier=None,
-                        workflow_start_datetime=datetime.datetime.now(),
-                        workflow_end_datetime=datetime.datetime.now(),
-                    )
-
-                db_session.add(sample)
-                db_session.add(uploaded_pathogen_genome)
-
+    already_exists: Union[
+        None, Mapping[str, list[str]]
+    ] = api_utils.check_duplicate_samples(request_data, g.db_session)
+    if already_exists:
+        return Response(
+            f"Error inserting data, private_identifiers {already_exists['existing_private_ids']} or public_identifiers: {already_exists['existing_public_ids']} already exist in our database, please remove these samples before proceeding with upload.",
+            400,
+        )
+    public_ids = create_public_ids(user.group_id, g.db_session, len(request_data))
+    for data in request_data:
+        data_ok: bool
+        missing_fields: Optional[list[str]]
+        unexpected_fields: Optional[list[str]]
+        data_ok, missing_fields, unexpected_fields = api_utils.check_data(
+            list(data["sample"].keys()),
+            list(data["pathogen_genome"].keys()),
+            SAMPLES_POST_REQUIRED_FIELDS,
+            SAMPLES_POST_OPTIONAL_FIELDS,
+        )
+        if data_ok:
+            # GISAID Stuff
+            if data["sample"]["public_identifier"]:
+                # if they provided a public_id they marked true to "submitted to gisaid"
+                submitted_to_gisaid = True
+                public_identifier = data["sample"]["public_identifier"]
             else:
+                # if they did not mark true to "submitted to gisaid generate a new public id for
+                # them
+                submitted_to_gisaid = False
+                public_identifier = public_ids.pop(0)
+
+            sample_args: Mapping[str, Any] = {
+                "submitting_group": user.group,
+                "uploaded_by": user,
+                "sample_collected_by": user.group.name,
+                "sample_collector_contact_address": user.group.address,
+                "division": DEFAULT_DIVISION,
+                "country": DEFAULT_COUNTRY,
+                "region": RegionType.NORTH_AMERICA,
+                "organism": DEFAULT_ORGANISM,
+                "private_identifier": data["sample"]["private_identifier"],
+                "collection_date": data["sample"]["collection_date"],
+                "location": data["sample"]["location"],
+                "private": data["sample"]["private"],
+                "public_identifier": public_identifier,
+            }
+
+            if "authors" not in sample_args:
+                sample_args["authors"] = [
+                    user.group.name,
+                ]
+
+            sequence = data["pathogen_genome"]["sequence"]
+            if not check_valid_sequence(sequence):
+                # make sure we don't save any samples already added to the session
+                g.db_session.rollback()
                 return Response(
-                    f"Missing required fields {missing_fields} or encountered unexpected fields {unexpected_fields}",
+                    f"Sample {sample_args['private_identifier']} contains invalid sequence characters, "
+                    f"accepted characters are [WSKMYRVHDBNZNATCGU-]",
                     400,
                 )
-        try:
-            db_session.commit()
-        except Exception as e:
-            return Response(f"Error encountered when saving data: {e}", 400)
-        return jsonify(success=True)
+
+            sample: Sample = Sample(**sample_args)
+            uploaded_pathogen_genome: UploadedPathogenGenome = UploadedPathogenGenome(
+                sample=sample,
+                sequence=data["pathogen_genome"]["sequence"],
+                sequencing_date=api_utils.format_sequencing_date(
+                    data["pathogen_genome"]["sequencing_date"]
+                ),
+            )
+            if data["pathogen_genome"]["isl_access_number"]:
+                uploaded_pathogen_genome.add_accession(
+                    repository_type=PublicRepositoryType.GISAID,
+                    public_identifier=data["pathogen_genome"]["isl_access_number"],
+                    workflow_start_datetime=datetime.datetime.now(),
+                    workflow_end_datetime=datetime.datetime.now(),
+                )
+            elif submitted_to_gisaid:
+                # in this scenario they've checked yes to previously submitted to GISAID but did
+                # not provide an isl-number, we mark it as UNKNOWN for now.
+                uploaded_pathogen_genome.add_accession(
+                    repository_type=PublicRepositoryType.GISAID,
+                    public_identifier=None,
+                    workflow_start_datetime=datetime.datetime.now(),
+                    workflow_end_datetime=datetime.datetime.now(),
+                )
+
+            g.db_session.add(sample)
+            g.db_session.add(uploaded_pathogen_genome)
+
+        else:
+            return Response(
+                f"Missing required fields {missing_fields} or encountered unexpected fields {unexpected_fields}",
+                400,
+            )
+    try:
+        g.db_session.commit()
+    except Exception as e:
+        return Response(f"Error encountered when saving data: {e}", 400)
+    return jsonify(success=True)

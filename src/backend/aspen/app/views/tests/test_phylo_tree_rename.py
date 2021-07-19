@@ -79,7 +79,7 @@ def test_phylo_tree_rename(session, mock_s3_resource, test_data_dir):
     # this is mandatory because we use an id to reference the tree.
     session.commit()
 
-    tree = _process_phylo_tree(session, phylo_tree.entity_id, user.auth0_user_id)
+    tree = _process_phylo_tree(session, phylo_tree.entity_id, user)
 
     assert tree == {
         "tree": {
@@ -132,7 +132,7 @@ def test_phylo_tree_rename_admin(session, mock_s3_resource, test_data_dir):
     # this is mandatory because we use an id to reference the tree.
     session.commit()
 
-    tree = _process_phylo_tree(session, phylo_tree.entity_id, user.auth0_user_id)
+    tree = _process_phylo_tree(session, phylo_tree.entity_id, user)
 
     assert tree == {
         "tree": {

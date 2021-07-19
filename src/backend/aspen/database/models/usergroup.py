@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections import MutableSequence
+from collections.abc import MutableSequence
 from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
