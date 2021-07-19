@@ -110,7 +110,7 @@ class CliConfig:
     api_urls = {
         "staging": "https://api.staging.genepi.czi.technology",
         "prod": "https://api.aspen.cziscience.com",
-        "rdev": "https://someenv-backend.dev.genepi.czi.technology",
+        "rdev": "https://{stack}-backend.dev.genepi.czi.technology",
         "local": "http://backend.genepinet.local:3000",
     }
     oauth_config = {
@@ -131,9 +131,11 @@ class CliConfig:
         },
     }
 
-    def __init__(self, env, api=None):
+    def __init__(self, env, api=None, stack=None):
         if not api:
             api = self.api_urls.get(env)
+        if stack:
+            api = api.format(stack=stack)
         self.api = api
         self.env = env
 
@@ -163,10 +165,14 @@ class CliConfig:
     "--api",
     help="Aspen API endpoint to use - this overrides the default value chosen by the --env flag",
 )
+@click.option(
+    "--stack",
+    help="Aspen rdev stack to query",
+)
 @click.pass_context
-def cli(ctx, env, api):
+def cli(ctx, env, api, stack):
     ctx.ensure_object(dict)
-    config = CliConfig(env, api)
+    config = CliConfig(env, api, stack)
     ctx.obj["config"] = config
     ctx.obj["api_client"] = config.get_api_client()
 
