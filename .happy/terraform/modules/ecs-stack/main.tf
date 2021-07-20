@@ -143,23 +143,9 @@ module backend_service {
   wait_for_steady_state = local.wait_for_steady_state
 }
 
-module swipe_sfn_spot {
-  source                 = "../swipe-sfn"
-  app_name               = "swipe-spot"
-  try_spot_first         = true
-  stack_resource_prefix  = local.stack_resource_prefix
-  remote_dev_prefix      = local.remote_dev_prefix
-  job_definition_name    = module.swipe_batch.batch_job_definition
-  ec2_queue_arn          = local.ec2_queue_arn
-  spot_queue_arn         = local.spot_queue_arn
-  role_arn               = local.sfn_role_arn
-  custom_stack_name      = local.custom_stack_name
-  deployment_stage       = local.deployment_stage
-}
-
 module swipe_sfn {
   source                 = "../swipe-sfn"
-  app_name               = "swipe-ec2"
+  app_name               = "swipe-spot"
   stack_resource_prefix  = local.stack_resource_prefix
   remote_dev_prefix      = local.remote_dev_prefix
   job_definition_name    = module.swipe_batch.batch_job_definition
@@ -184,7 +170,7 @@ module gisaid_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn_spot.step_function_arn
+  sfn_arn               = module.swipe_sfn.step_function_arn
   schedule_expressions  = contains(["prod", "staging"], local.deployment_stage) ? ["cron(0 20 ? * MON-FRI *)"] : []
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -206,7 +192,7 @@ module pangolin_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn_spot.step_function_arn
+  sfn_arn               = module.swipe_sfn.step_function_arn
   schedule_expressions  = contains(["prod", "staging"], local.deployment_stage) ? ["cron(0 18,23 ? * MON-FRI *)"] : []
   event_role_arn        = local.event_role_arn
 }
@@ -224,7 +210,7 @@ module nextstrain_template_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn_spot.step_function_arn
+  sfn_arn               = module.swipe_sfn.step_function_arn
   event_role_arn        = local.event_role_arn
    extra_args            =  {
     aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
@@ -244,7 +230,7 @@ module covidhub_import_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn_spot.step_function_arn
+  sfn_arn               = module.swipe_sfn.step_function_arn
   event_role_arn        = local.event_role_arn
 }
 
