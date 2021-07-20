@@ -5,6 +5,7 @@ import json
 import time
 import os.path
 from urllib.parse import urlparse
+import webbrowser
 import keyring
 from auth0.v3.authentication.token_verifier import (
     TokenVerifier,
@@ -64,10 +65,12 @@ class TokenHandler:
         )
         auth_resp.raise_for_status()
         device_info = auth_resp.json()
-        print(f"Your device code is {device_info['user_code']}")
         print(
-            f"Click this link to continue: {device_info['verification_uri_complete']}"
+            "Opening this link in a browser:\n"
+            f"    {device_info['verification_uri_complete']}\n"
+            "Click confirm to continue"
         )
+        webbrowser.open_new_tab(device_info['verification_uri_complete'])
         poll_payload = {
             "client_id": self.client_id,
             "device_code": device_info["device_code"],
@@ -107,7 +110,7 @@ class CliConfig:
     api_urls = {
         "staging": "https://api.staging.genepi.czi.technology",
         "prod": "https://api.aspen.cziscience.com",
-        "rdev": "https://someenv-backend.dev.genepi.czi.technology",
+        "rdev": "https://{stack}-backend.dev.genepi.czi.technology",
         "local": "http://backend.genepinet.local:3000",
     }
     oauth_config = {
@@ -118,7 +121,7 @@ class CliConfig:
         },
         "default": {
             "auth_url": "https://covidtracker-staging.auth0.com",
-            "client_id": "U3b2iUQ6zqlbBOl7Y397E3d9gzxBCZBm",
+            "client_id": "YIKBzdeiwgSoMZ88Fo1F65Ebd16Rj5mP",
             "verify": True,
         },
         "local": {
@@ -128,9 +131,11 @@ class CliConfig:
         },
     }
 
-    def __init__(self, env, api=None):
+    def __init__(self, env, api=None, stack=None):
         if not api:
             api = self.api_urls.get(env)
+        if stack:
+            api = api.format(stack=stack)
         self.api = api
         self.env = env
 
@@ -160,10 +165,14 @@ class CliConfig:
     "--api",
     help="Aspen API endpoint to use - this overrides the default value chosen by the --env flag",
 )
+@click.option(
+    "--stack",
+    help="Aspen rdev stack to query",
+)
 @click.pass_context
-def cli(ctx, env, api):
+def cli(ctx, env, api, stack):
     ctx.ensure_object(dict)
-    config = CliConfig(env, api)
+    config = CliConfig(env, api, stack)
     ctx.obj["config"] = config
     ctx.obj["api_client"] = config.get_api_client()
 
