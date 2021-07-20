@@ -1,16 +1,16 @@
-import React, { useEffect } from "react";
 import * as Sentry from "@sentry/nextjs";
+import React from "react";
 import { useUserInfo } from "src/common/queries/auth";
 
 const SentryWatcher = (): JSX.Element => {
-  const { data } = useUserInfo()
+  const { data } = useUserInfo();
   if (data) {
     Sentry.setUser({
+      group: data.group.name,
       name: data.user.name,
-      group: data.group.name
-    })
+    });
   }
-  return (<span/>)
-}
+  return <span />;
+};
 
 export default SentryWatcher;
