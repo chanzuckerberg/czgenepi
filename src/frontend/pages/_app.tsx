@@ -7,7 +7,7 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import "semantic-ui-css/semantic.min.css";
 import style from "src/App.module.scss";
 import { theme } from "src/common/styles/theme";
-import SentryWatcher from "src/components/Sentry";
+import SentryWatcher from "src/components/SentryWatcher";
 import NavBar from "src/components/NavBar";
 
 const queryClient = new QueryClient();
