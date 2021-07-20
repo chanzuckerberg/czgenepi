@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y make wget \
   libxss1 libxtst6 ca-certificates fonts-liberation libappindicator1 libnss3 \
   lsb-release xdg-utils \
   && rm -rf /var/lib/apt/lists/*
+RUN curl -sL https://sentry.io/get-cli/ | bash
 COPY package*.json ./
 USER node
 RUN npm ci --verbose --no-optional && npm cache clean --force
