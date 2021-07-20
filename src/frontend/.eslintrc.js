@@ -39,6 +39,7 @@ module.exports = {
     "@typescript-eslint/camelcase": 0,
     // Disable prop-types as we use TypeScript for type checking
     "@typescript-eslint/explicit-function-return-type": "off",
+    "sonarjs/cognitive-complexity": "off",
     camelcase: "off",
     "no-console": "error",
     "react/jsx-no-target-blank": 0,
