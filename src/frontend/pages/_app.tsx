@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import "semantic-ui-css/semantic.min.css";
 import style from "src/App.module.scss";
 import { theme } from "src/common/styles/theme";
+import SentryWatcher from "src/components/Sentry";
 import NavBar from "src/components/NavBar";
 
 const queryClient = new QueryClient();
@@ -21,6 +22,7 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
     if (jssStyles) {
       jssStyles.parentElement?.removeChild(jssStyles);
     }
+
   }, []);
 
   return (
@@ -36,6 +38,7 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
           <ThemeProvider theme={theme}>
             <EmotionThemeProvider theme={theme}>
               <div className={style.app}>
+                <SentryWatcher />
                 <NavBar />
                 <Component {...pageProps} />
               </div>

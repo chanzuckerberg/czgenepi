@@ -25,7 +25,6 @@
     "@material-ui/lab": "^4.0.0-alpha.57",
     "@material-ui/styles": "^4.11.3",
     "@sentry/nextjs": "^6.9.0",
-    "@sentry/react": "^6.9.0",
     "@sentry/tracing": "^6.9.0",
     "@types/classnames": "^2.2.11",
     "@types/lodash": "^4.14.168",
