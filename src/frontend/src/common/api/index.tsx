@@ -8,6 +8,7 @@ export enum API {
   LOG_OUT = "/logout",
   PHYLO_TREES = "/api/phylo_trees",
   SAMPLES_CREATE = "/api/samples/create",
+  SAMPLES_FASTA_DOWNLOAD = "/api/sequences",
 }
 
 export const DEFAULT_HEADERS_MUTATION_OPTIONS: RequestInit = {

@@ -42,6 +42,7 @@ export const icon = (props: Props): string => {
 };
 
 export const RowCheckbox = styled(Checkbox)`
+  padding-right: 0px;
   &:hover {
     background-color: transparent;
     &.Mui-checked {
@@ -72,12 +73,3 @@ export const HeaderCheckbox = styled(Checkbox)`
     `;
   }}
 `;
-
-// export const HeaderIndeterminateCheckBoxIcon = styled(IndeterminateCheckBoxIcon)`
-//   ${(props) => {
-//     const colors = getColors(props);
-//     return `
-//       color: ${colors?.primary[500]};
-//     `;
-//   }}
-// `;

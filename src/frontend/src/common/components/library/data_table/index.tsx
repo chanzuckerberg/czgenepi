@@ -1,11 +1,5 @@
 import { get, isEqual } from "lodash/fp";
-import React, {
-  Fragment,
-  FunctionComponent,
-  useEffect,
-  useReducer,
-  useState,
-} from "react";
+import React, { Fragment, FunctionComponent, useReducer } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import SortArrowDownIcon from "src/common/icons/IconArrowDownSmall.svg";
@@ -21,9 +15,10 @@ interface Props {
   isLoading: boolean;
   checkedSamples: any[];
   isHeaderChecked: boolean;
+  isHeaderIndeterminant: boolean;
   showCheckboxes: boolean;
   handleHeaderCheckboxClick(): void;
-  handleRowCheckboxClick(sampleId: string): void;
+  handleRowCheckboxClick(sampleId: string, failedGenomeRecovery: boolean): void;
   renderer?: CustomRenderer;
   headerRenderer?: HeaderRenderer;
 }
@@ -95,25 +90,12 @@ export const DataTable: FunctionComponent<Props> = ({
   handleHeaderCheckboxClick,
   handleRowCheckboxClick,
   isHeaderChecked,
+  isHeaderIndeterminant,
 }: Props) => {
   const [state, dispatch] = useReducer(reducer, {
     ascending: false,
     sortKey: defaultSortKey,
   });
-
-  const [isHeaderDisabled, setHeaderDisabled] = useState(false);
-
-  useEffect(() => {
-    // determine if mixed state (user has custom selected samples)
-    if (data) {
-      const sizeData: number = Object.keys(data).length;
-      if (checkedSamples.length === 0 || checkedSamples.length === sizeData) {
-        setHeaderDisabled(false);
-      } else {
-        setHeaderDisabled(true);
-      }
-    }
-  }, [checkedSamples]);
 
   const indexingKey = headers[0].key;
 
@@ -175,8 +157,7 @@ export const DataTable: FunctionComponent<Props> = ({
         color="primary"
         checked={isHeaderChecked}
         onClick={handleClick}
-        disabled={isHeaderDisabled}
-        indeterminate={isHeaderDisabled}
+        indeterminate={isHeaderIndeterminant}
       />
     );
   };
@@ -184,16 +165,15 @@ export const DataTable: FunctionComponent<Props> = ({
   const rowCheckbox = (item: TableItem): React.ReactNode => {
     let handleClick;
     if (item !== undefined) {
-      const checked: boolean = checkedSamples.includes(item.privateId);
+      const checked: boolean = checkedSamples.includes(item.publicId);
       handleClick = function handleClick() {
-        handleRowCheckboxClick(item.privateId.toString());
+        handleRowCheckboxClick(
+          item.publicId.toString(),
+          Boolean(item.CZBFailedGenomeRecovery)
+        );
       };
       return (
-        <RowCheckbox
-          color="primary"
-          onClick={handleClick}
-          checked={checked || isHeaderChecked}
-        />
+        <RowCheckbox color="primary" onClick={handleClick} checked={checked} />
       );
     }
   };
