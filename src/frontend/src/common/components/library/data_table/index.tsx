@@ -103,16 +103,16 @@ export const DataTable: FunctionComponent<Props> = ({
     sortKey: defaultSortKey,
   });
 
-  const [isHeaderDisabled, setHeaderDisabled] = useState(false);
+  const [isHeaderIndeterminant, setHeaderIndeterminant] = useState(false);
 
   useEffect(() => {
     // determine if mixed state (user has custom selected samples)
     if (data) {
       const sizeData: number = Object.keys(data).length;
       if (checkedSamples.length === 0 || checkedSamples.length === sizeData) {
-        setHeaderDisabled(false);
+        setHeaderIndeterminant(false);
       } else {
-        setHeaderDisabled(true);
+        setHeaderIndeterminant(true);
       }
     }
   }, [checkedSamples]);
@@ -177,9 +177,7 @@ export const DataTable: FunctionComponent<Props> = ({
         color="primary"
         checked={isHeaderChecked}
         onClick={handleClick}
-        // disabled={isHeaderDisabled}
-        disabled={false}
-        indeterminate={isHeaderDisabled}
+        indeterminate={isHeaderIndeterminant}
       />
     );
   };
