@@ -58,7 +58,7 @@ jobs:
         run: |
           echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
           # Build frontend image
-          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/aspen-frontend:branch-trunk -t ${{ secrets.ECR_REPO }}/aspen-frontend:latest src/frontend
+          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/aspen-frontend:branch-trunk --secret id=SENTRY_AUTH_TOKEN -t ${{ secrets.ECR_REPO }}/aspen-frontend:latest src/frontend
           make frontend-check-style
   ts-test:
     runs-on: ubuntu-20.04

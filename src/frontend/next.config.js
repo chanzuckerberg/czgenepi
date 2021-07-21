@@ -90,6 +90,9 @@ const SentryWebpackPluginOptions = {
   // https://github.com/getsentry/sentry-webpack-plugin#options.
 };
 
+module.exports = moduleExports
 // Make sure adding Sentry options is the last code to run before exporting, to
 // ensure that our source maps include changes from all other Webpack plugins
-module.exports = withSentryConfig(moduleExports, SentryWebpackPluginOptions);
+if (isProdBuild) {
+  module.exports = withSentryConfig(moduleExports, SentryWebpackPluginOptions);
+}
