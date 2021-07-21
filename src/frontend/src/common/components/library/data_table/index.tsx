@@ -177,7 +177,8 @@ export const DataTable: FunctionComponent<Props> = ({
         color="primary"
         checked={isHeaderChecked}
         onClick={handleClick}
-        disabled={isHeaderDisabled}
+        // disabled={isHeaderDisabled}
+        disabled={false}
         indeterminate={isHeaderDisabled}
       />
     );
