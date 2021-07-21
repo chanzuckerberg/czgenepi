@@ -12,7 +12,8 @@ env:
   # is written/read to allow us to use layers of previous builds as cache.
   DOCKER_BUILDKIT: 1
   COMPOSE_DOCKER_CLI_BUILD: 1
-  DOCKER_REPO: ${{ secrets.ECR_REPO }}/
+  DOCKER_REPO: ${{ secrets.ECR_REPO }}
+  SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
 jobs:
   wdl-lint:
@@ -58,7 +59,7 @@ jobs:
         run: |
           echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
           # Build frontend image
-          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/aspen-frontend:branch-trunk --secret id=SENTRY_AUTH_TOKEN -t ${{ secrets.ECR_REPO }}/aspen-frontend:latest src/frontend
+          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/aspen-frontend:branch-trunk -t ${{ secrets.ECR_REPO }}/aspen-frontend:latest src/frontend
           make frontend-check-style
   ts-test:
     runs-on: ubuntu-20.04
@@ -104,7 +105,7 @@ jobs:
           mkdir src/frontend/build
           chmod -R a+w src/frontend/build
           # Build frontend
-          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/aspen-frontend:branch-trunk -t ${{ secrets.ECR_REPO }}/aspen-frontend:latest src/frontend
+          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/aspen-frontend:branch-trunk --secret id=SENTRY_AUTH_TOKEN -t ${{ secrets.ECR_REPO }}/aspen-frontend:latest src/frontend
           make frontend-test-build
   py-lint:
     runs-on: ubuntu-20.04
