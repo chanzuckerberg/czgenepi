@@ -4,9 +4,7 @@ import { get, isEqual } from "lodash/fp";
 import React, {
   Fragment,
   FunctionComponent,
-  useEffect,
   useReducer,
-  useState,
 } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
@@ -23,6 +21,7 @@ interface Props {
   isLoading: boolean;
   checkedSamples: any[];
   isHeaderChecked: boolean;
+  isHeaderIndeterminant: boolean;
   showCheckboxes: boolean;
   handleHeaderCheckboxClick(): void;
   handleRowCheckboxClick(sampleId: string): void;
@@ -97,25 +96,12 @@ export const DataTable: FunctionComponent<Props> = ({
   handleHeaderCheckboxClick,
   handleRowCheckboxClick,
   isHeaderChecked,
+  isHeaderIndeterminant
 }: Props) => {
   const [state, dispatch] = useReducer(reducer, {
     ascending: false,
     sortKey: defaultSortKey,
   });
-
-  const [isHeaderIndeterminant, setHeaderIndeterminant] = useState(false);
-
-  useEffect(() => {
-    // determine if mixed state (user has custom selected samples)
-    if (data) {
-      const sizeData: number = Object.keys(data).length;
-      if (checkedSamples.length === 0 || checkedSamples.length === sizeData) {
-        setHeaderIndeterminant(false);
-      } else {
-        setHeaderIndeterminant(true);
-      }
-    }
-  }, [checkedSamples]);
 
   const indexingKey = headers[0].key;
 

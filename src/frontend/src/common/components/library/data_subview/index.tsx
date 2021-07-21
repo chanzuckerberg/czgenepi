@@ -110,6 +110,7 @@ const DataSubview: FunctionComponent<Props> = ({
   const [checkedSamples, setCheckedSamples] = useState<any[]>([]);
   const [isHeaderChecked, setIsHeaderChecked] = useState<boolean>(false);
   const [showCheckboxes, setShowCheckboxes] = useState<boolean>(false);
+  const [isHeaderIndeterminant, setHeaderIndeterminant] = useState<boolean>(false);
 
   useEffect(() => {
     if (isHeaderChecked) {
@@ -129,7 +130,23 @@ const DataSubview: FunctionComponent<Props> = ({
     }
   }, [viewName]);
 
+  useEffect(() => {
+    // determine if mixed state (user has custom selected samples)
+    if (data) {
+      const sizeData: number = Object.keys(data).length;
+      if (checkedSamples.length === 0 || checkedSamples.length === sizeData) {
+        setHeaderIndeterminant(false);
+      } else {
+        setHeaderIndeterminant(true);
+      }
+    }
+  }, [checkedSamples]);
+
   function handleHeaderCheckboxClick() {
+    if (isHeaderIndeterminant) {
+      // clear all samples when selecting checkbox when indeterminate
+      setCheckedSamples([]);
+    }
     setIsHeaderChecked((prevState: boolean) => !prevState);
   }
 
@@ -174,6 +191,8 @@ const DataSubview: FunctionComponent<Props> = ({
           separator={separator}
           data-test-id="download-tsv-link"
         >
+          <Chip size="medium" label={checkedSamples.length} status="info" /> 
+          <StyledDiv>Selected </StyledDiv>
           <Button
             variant="contained"
             color="primary"
@@ -208,6 +227,7 @@ const DataSubview: FunctionComponent<Props> = ({
             handleRowCheckboxClick={handleRowCheckboxClick}
             isHeaderChecked={isHeaderChecked}
             handleHeaderCheckboxClick={handleHeaderCheckboxClick}
+            isHeaderIndeterminant={isHeaderIndeterminant}
             data={tableData}
             defaultSortKey={defaultSortKey}
             headers={headers}
