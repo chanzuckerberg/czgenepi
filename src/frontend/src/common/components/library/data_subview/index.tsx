@@ -11,6 +11,7 @@ import { Input } from "semantic-ui-react";
 import { Chip } from "czifui";
 import { DataTable } from "src/common/components";
 import style from "./index.module.scss";
+import { StyledDiv } from "./style"
 
 interface Props {
   data?: TableItem[];
@@ -195,7 +196,8 @@ const DataSubview: FunctionComponent<Props> = ({
           separator={separator}
           data-test-id="download-tsv-link"
         >
-          <Chip size="medium" label={checkedSamples.length} status="info" />
+          <Chip size="medium" label={checkedSamples.length} status="info" /> 
+          <StyledDiv>Selected </StyledDiv>
           <Button
             variant="contained"
             color="primary"
