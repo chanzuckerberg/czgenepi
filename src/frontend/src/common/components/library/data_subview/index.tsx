@@ -8,6 +8,7 @@ import React, {
 } from "react";
 import { CSVLink } from "react-csv";
 import { Input } from "semantic-ui-react";
+import { Chip } from "czifui";
 import { DataTable } from "src/common/components";
 import style from "./index.module.scss";
 
@@ -194,6 +195,7 @@ const DataSubview: FunctionComponent<Props> = ({
           separator={separator}
           data-test-id="download-tsv-link"
         >
+          <Chip size="medium" label={checkedSamples.length} status="info" />
           <Button
             variant="contained"
             color="primary"
