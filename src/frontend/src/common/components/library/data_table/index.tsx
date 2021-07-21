@@ -1,6 +1,3 @@
-/* eslint-disable sonarjs/cognitive-complexity */
-/** TODO: Re-evaluate if there really is a complexity problem here **/
-
 import { get, isEqual } from "lodash/fp";
 import React, { Fragment, FunctionComponent, useReducer } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
