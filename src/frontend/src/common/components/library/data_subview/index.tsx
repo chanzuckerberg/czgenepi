@@ -110,7 +110,8 @@ const DataSubview: FunctionComponent<Props> = ({
   const [checkedSamples, setCheckedSamples] = useState<any[]>([]);
   const [isHeaderChecked, setIsHeaderChecked] = useState<boolean>(false);
   const [showCheckboxes, setShowCheckboxes] = useState<boolean>(false);
-  const [isHeaderIndeterminant, setHeaderIndeterminant] = useState<boolean>(false);
+  const [isHeaderIndeterminant, setHeaderIndeterminant] =
+    useState<boolean>(false);
 
   useEffect(() => {
     if (isHeaderChecked) {
@@ -144,7 +145,6 @@ const DataSubview: FunctionComponent<Props> = ({
 
   function handleHeaderCheckboxClick() {
     if (isHeaderIndeterminant) {
-      console.log("HEADER INDETERMINATE, SET CHECKED SAMPLES TO 0")
       // clear all samples when selecting checkbox when indeterminate
       setCheckedSamples([]);
       setIsHeaderChecked(false);
@@ -152,7 +152,6 @@ const DataSubview: FunctionComponent<Props> = ({
       setIsHeaderChecked((prevState: boolean) => !prevState);
     }
   }
-  console.log("CHECKED SAMPLES: ", checkedSamples);
 
   function handleRowCheckboxClick(sampleId: string) {
     if (checkedSamples.includes(sampleId)) {

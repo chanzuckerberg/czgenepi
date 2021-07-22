@@ -42,7 +42,7 @@ export const icon = (props: Props): string => {
 };
 
 export const RowCheckbox = styled(Checkbox)`
-  padding-right: 0px; 
+  padding-right: 0px;
   &:hover {
     background-color: transparent;
     &.Mui-checked {
