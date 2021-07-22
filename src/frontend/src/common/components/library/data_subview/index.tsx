@@ -1,4 +1,3 @@
-import { Button } from "czifui";
 import { escapeRegExp } from "lodash/fp";
 import React, {
   FunctionComponent,
