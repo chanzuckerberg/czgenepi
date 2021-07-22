@@ -120,7 +120,7 @@
     "region"
   ],
   "display_defaults": {
-    "color_by": "county",
+    "color_by": "selected",
     "distance_measure": "div",
     "geo_resolution": "location",
     "map_triplicate": false,
