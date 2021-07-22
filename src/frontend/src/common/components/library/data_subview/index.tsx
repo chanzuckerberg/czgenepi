@@ -144,11 +144,15 @@ const DataSubview: FunctionComponent<Props> = ({
 
   function handleHeaderCheckboxClick() {
     if (isHeaderIndeterminant) {
+      console.log("HEADER INDETERMINATE, SET CHECKED SAMPLES TO 0")
       // clear all samples when selecting checkbox when indeterminate
       setCheckedSamples([]);
+      setIsHeaderChecked(false);
+    } else {
+      setIsHeaderChecked((prevState: boolean) => !prevState);
     }
-    setIsHeaderChecked((prevState: boolean) => !prevState);
   }
+  console.log("CHECKED SAMPLES: ", checkedSamples);
 
   function handleRowCheckboxClick(sampleId: string) {
     if (checkedSamples.includes(sampleId)) {
@@ -191,8 +195,6 @@ const DataSubview: FunctionComponent<Props> = ({
           separator={separator}
           data-test-id="download-tsv-link"
         >
-          <Chip size="medium" label={checkedSamples.length} status="info" /> 
-          <StyledDiv>Selected </StyledDiv>
           <Button
             variant="contained"
             color="primary"
