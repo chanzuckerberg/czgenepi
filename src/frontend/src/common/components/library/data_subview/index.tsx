@@ -11,7 +11,7 @@ import { Input } from "semantic-ui-react";
 import { Chip } from "czifui";
 import { DataTable } from "src/common/components";
 import style from "./index.module.scss";
-import { StyledDiv, StyledDownloadImage, DownloadWrapper } from "./style"
+import { StyledDiv, StyledDownloadImage, DownloadWrapper, DownloadButtonWrapper } from "./style"
 
 interface Props {
   data?: TableItem[];
@@ -217,7 +217,7 @@ const DataSubview: FunctionComponent<Props> = ({
               data-test-id="search"
             />
           </div>
-          <div className={style.searchBarTableDownload}>{downloadButton}</div>
+          <DownloadButtonWrapper>{downloadButton}</DownloadButtonWrapper>
         </div>
         <div className={style.samplesTable}>
           <DataTable

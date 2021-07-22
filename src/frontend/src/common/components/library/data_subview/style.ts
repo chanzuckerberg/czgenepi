@@ -18,7 +18,13 @@ export const StyledDiv = styled.div`
   }}
 `;
 
+export const DownloadButtonWrapper = styled.div`
+  width: 20em;
+  float: right;
+`;
+
 export const DownloadWrapper = styled.div`
+  float: right;
   ${(props) => {
     const spacings = getSpacings(props);
     return `
@@ -28,16 +34,16 @@ export const DownloadWrapper = styled.div`
 `;
 
 export const StyledDownloadImage = styled(DownloadImage)`
-  width: 32px;
+  width: 50px;
   height: 32px;
   viewBox: 0 0 32 32;
   ${(props) => {
     const colors = getColors(props);
     const spacings = getSpacings(props);
-    console.log("COLORS: ", colors);
     return `
       fill: ${colors?.primary[600]};
       padding-top: ${spacings?.xs}px;
+      padding-left: ${spacings?.m}px;
     `;
   }}
 `;
