@@ -74,5 +74,5 @@ subsampling:
 
     international_serial_sampling:
       group_by: "region year month"
-      seq_per_group: 5
+      seq_per_group: 2
       query: --query "(country != '{{country}}')" 
