@@ -11,7 +11,7 @@ import { Input } from "semantic-ui-react";
 import { Chip } from "czifui";
 import { DataTable } from "src/common/components";
 import style from "./index.module.scss";
-import { StyledDiv } from "./style"
+import { StyledDiv, StyledDownloadImage, ImageWrapper } from "./style"
 
 interface Props {
   data?: TableItem[];
@@ -198,14 +198,7 @@ const DataSubview: FunctionComponent<Props> = ({
         >
           <Chip size="medium" label={checkedSamples.length} status="info" /> 
           <StyledDiv>Selected </StyledDiv>
-          <Button
-            variant="contained"
-            color="primary"
-            isRounded
-            className={style.tsvDownloadButton}
-          >
-            Download (.tsv)
-          </Button>
+          <StyledDownloadImage />
         </CSVLink>
       );
     }
