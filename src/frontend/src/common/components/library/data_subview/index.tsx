@@ -11,7 +11,7 @@ import { Input } from "semantic-ui-react";
 import { Chip } from "czifui";
 import { DataTable } from "src/common/components";
 import style from "./index.module.scss";
-import { StyledDiv, StyledDownloadImage, ImageWrapper } from "./style"
+import { StyledDiv, StyledDownloadImage, DownloadWrapper } from "./style"
 
 interface Props {
   data?: TableItem[];
@@ -189,6 +189,7 @@ const DataSubview: FunctionComponent<Props> = ({
       const [tsvHeaders, tsvData] = tsvDataMap(tableData, headers, subheaders);
       const separator = "\t";
       downloadButton = (
+        <DownloadWrapper>
         <CSVLink
           data={tsvData}
           headers={tsvHeaders}
@@ -200,6 +201,7 @@ const DataSubview: FunctionComponent<Props> = ({
           <StyledDiv>Selected </StyledDiv>
           <StyledDownloadImage />
         </CSVLink>
+        </DownloadWrapper>
       );
     }
 
