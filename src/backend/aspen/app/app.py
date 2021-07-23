@@ -111,8 +111,8 @@ def setup_userinfo(user_id):
     g.auth_user = user
     sentry_sdk.set_user(
         {
-            "id": session["profile"]["user_id"],
-            "name": session["profile"]["name"],
+            "id": user.id,
+            "auth0_uid": user.auth0_user_id,
         }
     )
 
@@ -128,7 +128,7 @@ def requires_auth(f):
                 payload = validate_auth_header(auth_header)
                 auth0_user_id = payload["sub"]
             except TokenValidationError as err:
-                application.logger.debug(f"Token validation error: {err}")
+                application.logger.warn(f"Token validation error: {err}")
         elif "profile" in session:
             auth0_user_id = session["profile"]["user_id"]
         # Redirect to Login page

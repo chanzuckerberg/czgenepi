@@ -17,7 +17,22 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        component: ['frontend', 'backend', 'nextstrain']
+        image:
+          - dockerfile: src/backend/Dockerfile.gisaid
+            context: ./src/backend/
+            name: aspen-gisaid
+          - dockerfile: src/backend/Dockerfile.nextstrain
+            context: ./src/backend/
+            name: aspen-nextstrain
+          - dockerfile: src/backend/Dockerfile.pangolin
+            context: ./src/backend/
+            name: aspen-pangolin
+          - dockerfile: src/backend/Dockerfile
+            context: ./src/backend/
+            name: aspen-backend
+          - dockerfile: src/frontend/Dockerfile
+            context: ./src/frontend/
+            name: aspen-frontend
     steps:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -32,11 +47,7 @@ jobs:
         with:
           registry: ${{ secrets.ECR_REPO }}
       - uses: actions/checkout@v2
-      - name: Build component
-        shell: bash
-        run: |
-          pip install -r .happy/requirements.txt
-          scripts/happy --profile="" push --extra-tag sha-${GITHUB_SHA:0:8} --extra-tag build-${GITHUB_RUN_NUMBER} ${{ matrix.component }}
+      - run: docker buildx build --build-arg HAPPY_COMMIT=${GITHUB_SHA} --build-arg HAPPY_BRANCH=${GITHUB_REF} --cache-from ${{ secrets.ECR_REPO }}/${{ matrix.image.name }}:branch-${GITHUB_REF##*/}  --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/${{ matrix.image.name }}:branch-trunk --cache-to=type=inline,mode=max -t ${{ secrets.ECR_REPO }}/${{ matrix.image.name }}:sha-${GITHUB_SHA:0:8}  -t ${{ secrets.ECR_REPO }}/${{ matrix.image.name }}:branch-${GITHUB_REF##*/} -f ${{ matrix.image.dockerfile }} --push ${{ matrix.image.context }}
 
   create-update-rdev:
     runs-on: ubuntu-20.04
@@ -62,8 +73,8 @@ jobs:
           RDEV_NAME=${GITHUB_REF#refs/heads/rdev-}
           if $(./scripts/happy --profile="" list | grep -q $RDEV_NAME); then
             echo "Updating stack $RDEV_NAME"
-            ./scripts/happy --profile=""  update --tag build-${GITHUB_RUN_NUMBER} $RDEV_NAME
+            ./scripts/happy --profile=""  update --tag sha-${GITHUB_SHA:0:8} $RDEV_NAME
           else
             echo "Creating stack $RDEV_NAME"
-            ./scripts/happy --profile="" create  --tag build-${GITHUB_RUN_NUMBER} $RDEV_NAME
+            ./scripts/happy --profile="" create  --tag sha-${GITHUB_SHA:0:8} $RDEV_NAME
           fi
