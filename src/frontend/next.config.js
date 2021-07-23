@@ -13,7 +13,7 @@ const webpack = require("webpack");
 
 const { createSecureHeaders } = require("next-secure-headers");
 
-const isProdBuild = ENV.NODE_ENV === nodeEnv.PRODUCTION;
+const isProdBuild = ["staging", "prod"].includes(process.env.DEPLOYMENT_STAGE);
 
 const SCRIPT_SRC = ["'self'"];
 
@@ -85,14 +85,12 @@ const SentryWebpackPluginOptions = {
   // recommended:
   //   release, url, org, project, authToken, configFile, stripPrefix,
   //   urlPrefix, include, ignore
+  silent: !isProdBuild
 
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options.
 };
 
-module.exports = moduleExports
 // Make sure adding Sentry options is the last code to run before exporting, to
 // ensure that our source maps include changes from all other Webpack plugins
-if (isProdBuild) {
-  module.exports = withSentryConfig(moduleExports, SentryWebpackPluginOptions);
-}
+module.exports = isProdBuild ? withSentryConfig(moduleExports, SentryWebpackPluginOptions) : moduleExports

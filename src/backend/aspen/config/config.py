@@ -233,5 +233,5 @@ class Config(object):
             return os.environ["SENTRY_BACKEND_DSN"]
         try:
             return self.AWS_SECRET["SENTRY_BACKEND_DSN"]
-        except KeyError:
+        except (KeyError, ClientError):
             return ""

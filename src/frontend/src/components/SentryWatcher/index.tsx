@@ -12,12 +12,6 @@ const SentryWatcher = (): JSX.Element => {
       name: data.user.name,
     });
   }
-  console.log("ENV", ENV)
-  console.log("isProdBuild", ENV.NODE_ENV === nodeEnv.PRODUCTION)
-
-  // now crash
-  const test = {}
-  console.log(test["crash"].push("please"))
 
   return <span />;
 };
