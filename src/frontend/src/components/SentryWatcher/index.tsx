@@ -11,15 +11,6 @@ const SentryWatcher = (): JSX.Element => {
     });
   }
 
-  console.log(process.env.DEPLOYMENT_STAGE)
-  console.log(process.env.SENTRY_FRONTEND_DSN)
-  console.log(process.env.SENTRY_AUTH_TOKEN)
-
-  // intentional
-  if (data) {
-    throw new Error("RDEV error!");
-  }
-
   return <span />;
 };
 
