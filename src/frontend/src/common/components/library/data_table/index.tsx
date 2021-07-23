@@ -175,9 +175,6 @@ export const DataTable: FunctionComponent<Props> = ({
     );
   };
 
-  // intentional
-  throw new Error("RDEV error!")
-
   if (data === undefined) {
     return render([]);
   }

@@ -1,8 +1,6 @@
 import * as Sentry from "@sentry/nextjs";
 import React from "react";
 import { useUserInfo } from "src/common/queries/auth";
-import ENV from "src/common/constants/ENV";
-import nodeEnv from "src/common/constants/nodeEnv";
 
 const SentryWatcher = (): JSX.Element => {
   const { data } = useUserInfo();
@@ -11,6 +9,15 @@ const SentryWatcher = (): JSX.Element => {
       group: data.group.name,
       name: data.user.name,
     });
+  }
+
+  console.log(process.env.DEPLOYMENT_STAGE)
+  console.log(process.env.SENTRY_FRONTEND_DSN)
+  console.log(process.env.SENTRY_AUTH_TOKEN)
+
+  // intentional
+  if (data) {
+    throw new Error("RDEV error!");
   }
 
   return <span />;
