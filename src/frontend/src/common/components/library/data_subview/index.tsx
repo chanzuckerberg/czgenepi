@@ -9,6 +9,8 @@ import { CSVLink } from "react-csv";
 import { Input } from "semantic-ui-react";
 import { Chip } from "czifui";
 import { DataTable } from "src/common/components";
+import DownloadModal from "src/common/components/library/data_subview/components/DownloadModal"
+import { createDownloadModalInfo } from "src/common/utils";
 import style from "./index.module.scss";
 import { StyledDiv, StyledDownloadImage, DownloadWrapper, DownloadButtonWrapper } from "./style"
 
@@ -113,6 +115,15 @@ const DataSubview: FunctionComponent<Props> = ({
   const [showCheckboxes, setShowCheckboxes] = useState<boolean>(false);
   const [isHeaderIndeterminant, setHeaderIndeterminant] =
     useState<boolean>(false);
+  const [open, setOpen] = useState(false);
+
+  const handleDownloadClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleDownloadClose = () => {
+    setOpen(false);
+  };
 
   useEffect(() => {
     if (isHeaderChecked) {
@@ -157,7 +168,7 @@ const DataSubview: FunctionComponent<Props> = ({
   function handleRowCheckboxClick(sampleId: string) {
     if (checkedSamples.includes(sampleId)) {
       setCheckedSamples(checkedSamples.filter((id) => id !== sampleId));
-    } else {
+    } else { 
       setCheckedSamples([...checkedSamples, sampleId]);
     }
   }
@@ -194,6 +205,7 @@ const DataSubview: FunctionComponent<Props> = ({
           headers={tsvHeaders}
           filename="samples_overview.tsv"
           separator={separator}
+          onClick={handleDownloadClickOpen}
           data-test-id="download-tsv-link"
         >
           <Chip size="medium" label={checkedSamples.length} status="info" /> 
@@ -205,6 +217,12 @@ const DataSubview: FunctionComponent<Props> = ({
     }
 
     return (
+      <>
+      <DownloadModal
+      open={open}
+      onClose={handleDownloadClose}
+      info={createDownloadModalInfo(5)}
+      />
       <div className={style.samplesRoot}>
         <div className={style.searchBar}>
           <div className={style.searchInput}>
@@ -235,6 +253,7 @@ const DataSubview: FunctionComponent<Props> = ({
           />
         </div>
       </div>
+    </>
     );
   };
 

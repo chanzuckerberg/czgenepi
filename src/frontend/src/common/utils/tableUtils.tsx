@@ -59,3 +59,27 @@ function createTreeModalInfo_(treeId: number): ModalInfo {
       "Please confirm you're ready to send your data to Nextstrain to see your tree.",
   };
 }
+
+export const createDownloadModalInfo = memoize(createDownloadModalInfo_);
+
+
+function createDownloadModalInfo_(treeId: number): ModalInfo {
+  return {
+    body:
+      "You are leaving Aspen and sending your data to a private " +
+      "visualization on Nextstrain, which is not controlled by Aspen.",
+    buttons: [
+      {
+        Button: createConfirmButton(treeId),
+      },
+      {
+        content: "Cancel",
+        link: "cancel",
+        type: "secondary",
+      },
+    ],
+    header:
+      "Please confirm you're ready to send your data to Nextstrain to see your tree.",
+  };
+}
+
