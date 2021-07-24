@@ -221,7 +221,7 @@ const DataSubview: FunctionComponent<Props> = ({
       <DownloadModal
       open={open}
       onClose={handleDownloadClose}
-      info={createDownloadModalInfo(5)}
+      info={createDownloadModalInfo(checkedSamples)}
       />
       <div className={style.samplesRoot}>
         <div className={style.searchBar}>

@@ -1,6 +1,9 @@
 import { memoize } from "lodash/fp";
 import { ModalInfo } from "../types/ui";
 import { createConfirmButton } from "./TreeModal/ConfirmButton";
+import { createDownloadButton } from "./DownloadModal/DownloadButton"
+import { Checkbox } from "semantic-ui-react";
+import {Checkbox as CheckboxCZIFUI } from "czifui";
 
 /* eslint-disable react/display-name */
 
@@ -63,14 +66,18 @@ function createTreeModalInfo_(treeId: number): ModalInfo {
 export const createDownloadModalInfo = memoize(createDownloadModalInfo_);
 
 
-function createDownloadModalInfo_(treeId: number): ModalInfo {
+function createDownloadModalInfo_(privateIds: Array[string]): ModalInfo {
   return {
     body:
-      "You are leaving Aspen and sending your data to a private " +
-      "visualization on Nextstrain, which is not controlled by Aspen.",
+      <>
+      <CheckboxCZIFUI color="primary" /><text>"Consensus Genome (consensus.fa)" </text>
+      <text>"Download multiple consensus genomes in a single, concatenated file"</text>
+      <CheckboxCZIFUI color="primary" /><text>"Sample Metadata (sample_metadata.tsv)" </text>
+      <text>"Sample metadata including Private and Public IDs, Collection Date, Sequencing Date, Lineage, GISAID Status, and ISL Accession #."</text>
+      </>,
     buttons: [
       {
-        Button: createConfirmButton(treeId),
+        Button: createConfirmButton(privateIds),
       },
       {
         content: "Cancel",
@@ -79,7 +86,7 @@ function createDownloadModalInfo_(treeId: number): ModalInfo {
       },
     ],
     header:
-      "Please confirm you're ready to send your data to Nextstrain to see your tree.",
+      "Select Download",
   };
 }
 
