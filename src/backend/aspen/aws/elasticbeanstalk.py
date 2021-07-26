@@ -6,8 +6,12 @@ from aspen.aws._session import session
 
 
 def _get_instance_id() -> str:
+    # supporting IMDSv2 instances
+    token = requests.put("http://169.254.169.254/latest/api/token",
+                         headers={"X-aws-ec2-metadata-token-ttl-seconds": 21600})
     document = requests.get(
-        "http://169.254.169.254/latest/dynamic/instance-identity/document"
+        "http://169.254.169.254/latest/dynamic/instance-identity/document",
+        headers={"X-aws-ec2-metadata-token": token}
     ).json()
     return document["instanceId"]
 
@@ -51,4 +55,4 @@ def get_environment_suffix(prefix: str = "aspen-") -> str:
     """Get all Elastic Beanstalk environment name, excluding the aspen- prefix."""
     name = _get_environment_name()
     assert name.startswith(prefix)
-    return name[len(prefix) :]
+    return name[len(prefix):]
