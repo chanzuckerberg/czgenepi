@@ -1,10 +1,3 @@
-// This file sets a custom webpack configuration to use our Next.js app
-// with Sentry.
-// https://nextjs.org/docs/api-reference/next.config.js/introduction
-// https://docs.sentry.io/platforms/javascript/guides/nextjs/
-
-const { withSentryConfig } = require("@sentry/nextjs");
-
 const withImages = require("next-images");
 
 const nodeEnv = require(__dirname + "/src/common/constants/nodeEnv.js");
@@ -13,18 +6,14 @@ const webpack = require("webpack");
 
 const { createSecureHeaders } = require("next-secure-headers");
 
-const isProdBuild = ["staging", "prod"].includes(process.env.DEPLOYMENT_STAGE);
+const isProdBuild = ENV.NODE_ENV === nodeEnv.PRODUCTION;
 
 const SCRIPT_SRC = ["'self'"];
 
-const moduleExports = withImages({
+module.exports = withImages({
   distDir: ENV.BUILD_PATH,
   fileExtensions: ["jpg", "jpeg", "png", "gif", "ico", "webp", "jp2", "avif"],
   future: { webpack5: true },
-  sentry: {
-    disableServerWebpackPlugin: !isProdBuild,
-    disableClientWebpackPlugin: !isProdBuild,
-  },
 
   async generateBuildId() {
     // Return null to allow next.js to fallback to default behavior
@@ -82,19 +71,3 @@ const moduleExports = withImages({
     return config;
   },
 });
-
-const SentryWebpackPluginOptions = {
-  // Additional config options for the Sentry Webpack plugin. Keep in mind that
-  // the following options are set automatically, and overriding them is not
-  // recommended:
-  //   release, url, org, project, authToken, configFile, stripPrefix,
-  //   urlPrefix, include, ignore
-  silent: !isProdBuild
-
-  // For all available options, see:
-  // https://github.com/getsentry/sentry-webpack-plugin#options.
-};
-
-// Make sure adding Sentry options is the last code to run before exporting, to
-// ensure that our source maps include changes from all other Webpack plugins
-module.exports = withSentryConfig(moduleExports, SentryWebpackPluginOptions)
