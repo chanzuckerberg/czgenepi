@@ -38,3 +38,23 @@ resource aws_cloudwatch_log_group cloud_watch_logs_group {
   retention_in_days = 365
   name              = "/${var.stack_resource_prefix}/${var.deployment_stage}/${var.custom_stack_name}/${var.app_name}-sfn"
 }
+
+// State Change Notifications
+resource "aws_cloudwatch_event_rule" "sfn_state_change_rule" {
+  name        = "${var.stack_resource_prefix}-${var.deployment_stage}-${var.custom_stack_name}-${var.app_name}-sfn-state-change"
+  description = "Monitor SFN for status changes."
+
+  event_pattern = jsonencode({
+    source      = ["aws.states"]
+    detail-type = ["Step Functions Execution Status Change"]
+    detail = {
+      stateMachineArn = [aws_sfn_state_machine.state_machine.arn]
+    }
+  })
+}
+
+resource "aws_cloudwatch_event_target" "sfn_state_change_rule_target" {
+  rule      = aws_cloudwatch_event_rule.sfn_state_change_rule.name
+  target_id = "SendToSNS"
+  arn       = var.state_change_sns_topic_arn
+}

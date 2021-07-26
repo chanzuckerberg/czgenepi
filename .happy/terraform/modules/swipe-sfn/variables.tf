@@ -29,6 +29,11 @@ variable spot_queue_arn {
   description = "ARN of the batch job queue"
 }
 
+variable state_change_sns_topic_arn {
+  type        = string
+  description = "ARN of the SNS topic to notify of Step Function state changes"
+}
+
 variable role_arn {
   type        = string
   description = "ARN for the role assumed by tasks"
