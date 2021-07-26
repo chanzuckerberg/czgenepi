@@ -67,6 +67,8 @@ locals {
   backend_url  = try(join("", ["https://", module.backend_dns[0].dns_prefix, ".", local.external_dns]), var.backend_url)
 
   stack_resource_prefix = "aspen"
+
+  state_change_sns_topic_arn = local.secret["sns_topics"]["state_change"]
 }
 
 module frontend_dns {
