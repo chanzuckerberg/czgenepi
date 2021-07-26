@@ -50,7 +50,7 @@ def phylo_trees():
         if cansee.data_type == DataType.TREES
     }
     phylo_run_alias = aliased(PhyloRun)
-    phylo_runs: Iterable[Tuple[PhyloRun, int]] = (
+    phylo_runs: Iterable[PhyloRun] = (
         g.db_session.query(
             phylo_run_alias,
         )
