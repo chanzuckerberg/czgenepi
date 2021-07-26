@@ -21,6 +21,10 @@ const moduleExports = withImages({
   distDir: ENV.BUILD_PATH,
   fileExtensions: ["jpg", "jpeg", "png", "gif", "ico", "webp", "jp2", "avif"],
   future: { webpack5: true },
+  sentry: {
+    disableServerWebpackPlugin: !isProdBuild,
+    disableClientWebpackPlugin: !isProdBuild,
+  },
 
   async generateBuildId() {
     // Return null to allow next.js to fallback to default behavior
