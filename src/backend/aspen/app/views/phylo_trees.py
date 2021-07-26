@@ -2,12 +2,12 @@ import json
 import os
 import re
 import uuid
-from typing import Any, Callable, Iterable, Mapping, MutableSequence, Set, Tuple, Union
+from typing import Any, Callable, Iterable, Mapping, MutableSequence, Set, Union
 
 import boto3
 import sqlalchemy
 from flask import g, jsonify, make_response, Response
-from sqlalchemy import func, or_
+from sqlalchemy import or_
 from sqlalchemy.orm import aliased, joinedload, Session
 
 from aspen.app.app import application, requires_auth
@@ -16,7 +16,6 @@ from aspen.database.models import (
     DataType,
     PhyloRun,
     PhyloTree,
-    PhyloTreeSamples,
     Sample,
     WorkflowStatusType,
 )
