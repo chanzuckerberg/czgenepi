@@ -48,7 +48,6 @@ locals {
   batch_role_arn             = local.secret["batch_queues"]["aspen"]["role_arn"]
   ec2_queue_arn              = local.secret["batch_envs"]["aspen"]["envs"]["EC2"]["queue_arn"]
   spot_queue_arn             = local.secret["batch_envs"]["aspen"]["envs"]["SPOT"]["queue_arn"]
-  state_change_sns_topic_arn = local.secret["batch_envs"]["aspen"]["state_change_sns_topic_arn"]
   external_dns               = local.secret["external_zone_name"]
   internal_dns               = local.secret["internal_zone_name"]
 
