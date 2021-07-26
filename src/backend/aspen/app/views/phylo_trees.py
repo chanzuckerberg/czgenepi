@@ -53,16 +53,6 @@ def phylo_trees():
     phylo_runs: Iterable[Tuple[PhyloRun, int]] = (
         g.db_session.query(
             phylo_run_alias,
-            (
-                g.db_session.query(func.count(1))
-                .select_from(Sample)
-                .join(PhyloTreeSamples)
-                .join(
-                    PhyloTree,
-                    PhyloTreeSamples.columns.phylo_tree_id == PhyloTree.entity_id,
-                )
-                .filter(PhyloTree.producing_workflow_id == phylo_run_alias.workflow_id)
-            ).label("phylo_run_genome_count"),
         )
         .options(joinedload(phylo_run_alias.outputs))
         .filter(
@@ -77,7 +67,7 @@ def phylo_trees():
 
     # filter for only information we need in sample table view
     results: MutableSequence[Mapping[str, Any]] = list()
-    for phylo_run, genome_count in phylo_runs:
+    for phylo_run in phylo_runs:
         phylo_tree: PhyloTree
         for output in phylo_run.outputs:
             if isinstance(output, PhyloTree):
@@ -92,7 +82,7 @@ def phylo_trees():
             {
                 "phylo_tree_id": phylo_tree.entity_id,
                 "name": humanize_tree_name(phylo_tree.s3_key),
-                "pathogen_genome_count": genome_count,
+                "pathogen_genome_count": 0,  # Leaving this field in place temporarily for reverse-compatibility
                 "completed_date": format_datetime(phylo_run.end_datetime),
             }
         )
