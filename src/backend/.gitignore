@@ -2,8 +2,3 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
-# Elastic Beanstalk Files
-.elasticbeanstalk/*
-!.elasticbeanstalk/*.cfg.yml
-!.elasticbeanstalk/*.global.yml
