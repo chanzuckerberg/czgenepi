@@ -12,7 +12,7 @@ env:
   # is written/read to allow us to use layers of previous builds as cache.
   DOCKER_BUILDKIT: 1
   COMPOSE_DOCKER_CLI_BUILD: 1
-  DOCKER_REPO: ${{ secrets.ECR_REPO }}
+  DOCKER_REPO: ${{ secrets.ECR_REPO }}/
   SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
 jobs:
