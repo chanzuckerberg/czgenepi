@@ -105,6 +105,12 @@ class ApiClient:
         url = f"{self.url}{path}"
         return requests.get(url, headers=headers, allow_redirects=False, **kwargs)
 
+    def post(self, path, **kwargs):
+        access_token = self.token_handler.get_id_token()
+        headers = {"Authorization": f"Bearer {access_token}"}
+        url = f"{self.url}{path}"
+        return requests.post(url, headers=headers, allow_redirects=False, **kwargs)
+
 
 class CliConfig:
     api_urls = {
@@ -201,7 +207,7 @@ def samples():
 def download_samples(ctx, sample_ids):
     api_client = ctx.obj["api_client"]
     payload = {"requested_sequences": {"sample_ids": sample_ids}}
-    resp = api_client.get("/api/sequences", json=payload)
+    resp = api_client.post("/api/sequences", json=payload)
     print(resp.headers)
     print(resp.text)
 

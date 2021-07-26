@@ -26,7 +26,7 @@ def test_prepare_sequences_download(
             "sample_ids": [sample.public_identifier],
         }
     }
-    res = client.get("/api/sequences", json=data)
+    res = client.post("/api/sequences", json=data)
     assert res.status == "200 OK"
     expected_filename = f"{user.group.name}_sample_sequences.fasta"
     assert (
@@ -65,7 +65,7 @@ def test_prepare_sequences_download_no_access(
         }
     }
 
-    res = client.get("/api/sequences", json=data)
+    res = client.post("/api/sequences", json=data)
     assert res.status == "403 FORBIDDEN"
     assert res.get_data() == b"User does not have access to the requested sequences"
 
@@ -100,7 +100,7 @@ def test_prepare_sequences_download_no_private_id_access(
             "sample_ids": [sample.public_identifier],
         }
     }
-    res = client.get("/api/sequences", json=data)
+    res = client.post("/api/sequences", json=data)
     assert res.status == "200 OK"
     expected_filename = f"{user.group.name}_sample_sequences.fasta"
     assert (
