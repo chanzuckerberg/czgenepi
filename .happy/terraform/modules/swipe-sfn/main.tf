@@ -13,7 +13,7 @@ locals {
     "report_metrics" = "${local.lambda_env}-report_metrics"
     "report_spot_interruption" = "${local.lambda_env}-report_spot_interruption"
   }
-  template_file = var.try_spot_first ? "${path.module}/sfn.yml" : "${path.module}/sfn-no-spot.yml"
+  template_file = "${path.module}/sfn.yml"
   sfn_def = yamldecode(templatefile(local.template_file, merge(local.lambdas, {
     deployment_environment = local.env
     deployment_stage = var.deployment_stage

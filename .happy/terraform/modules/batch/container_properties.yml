@@ -9,7 +9,7 @@ image: "${batch_docker_image}"
 command:
   - "/bin/bash"
   - "-c"
-  - "for i in \"$@\"; do eval \"$i\"; done; cd /"
+  - 'for i in "$@"; do eval "$i"; done; cd /'
   - "swipe"
   - "set -a"
   - "if [ -f /etc/environment ]; then source /etc/environment; fi"
@@ -17,7 +17,7 @@ command:
   - "set +a"
   - >-
     while true; do
-    if curl -sf http://169.254.169.254/latest/meta-data/spot/instance-action; then
+    if TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"` && curl -H "X-aws-ec2-metadata-token: $TOKEN" -sf http://169.254.169.254/latest/meta-data/spot/instance-action; then
     echo WARNING: THIS SPOT INSTANCE HAS BEEN SCHEDULED FOR TERMINATION >> /dev/stderr;
     fi;
     sleep 10;
@@ -126,10 +126,10 @@ ulimits:
 privileged: false
 readonlyRootFilesystem: false
 logConfiguration:
-    logDriver: "awslogs"
-    options:
-      awslogs-group: "${log_group}"
-      awslogs-region: "${aws_region}"
+  logDriver: "awslogs"
+  options:
+    awslogs-group: "${log_group}"
+    awslogs-region: "${aws_region}"
 
 # The AWS Batch API requires two resource quotas: vCPU and memory. Memory contention or starvation is more dangerous
 # than CPU contention (an OOM condition will cause a job to fail, while lower than expected CPU will just cause it to
