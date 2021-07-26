@@ -21,10 +21,6 @@ const moduleExports = withImages({
   distDir: ENV.BUILD_PATH,
   fileExtensions: ["jpg", "jpeg", "png", "gif", "ico", "webp", "jp2", "avif"],
   future: { webpack5: true },
-  // sentry: {
-  //   disableServerWebpackPlugin: !isProdBuild,
-  //   disableClientWebpackPlugin: !isProdBuild,
-  // },
 
   async generateBuildId() {
     // Return null to allow next.js to fallback to default behavior
@@ -78,23 +74,17 @@ const moduleExports = withImages({
     });
 
     config.plugins.push(new webpack.EnvironmentPlugin(ENV));
-
+    config.devtool = "source-map";
+    config.output = {
+      ...config.output,
+      // Make maps auto-detectable by sentry-cli
+      filename: "[name].js",
+      sourceMapFilename: "[name].js.map",
+    };
     return config;
   },
 });
 
-const SentryWebpackPluginOptions = {
-  // Additional config options for the Sentry Webpack plugin. Keep in mind that
-  // the following options are set automatically, and overriding them is not
-  // recommended:
-  //   release, url, org, project, authToken, configFile, stripPrefix,
-  //   urlPrefix, include, ignore
-  // silent: !isProdBuild
-
-  // For all available options, see:
-  // https://github.com/getsentry/sentry-webpack-plugin#options.
-};
-
 // Make sure adding Sentry options is the last code to run before exporting, to
 // ensure that our source maps include changes from all other Webpack plugins
-module.exports = withSentryConfig(moduleExports, SentryWebpackPluginOptions)
+module.exports = withSentryConfig(moduleExports)

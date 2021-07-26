@@ -4,7 +4,6 @@ RUN chown node:node /usr/src/app
 ENV NODE_ENV=development
 ENV BUILD_PATH=build
 ENV PATH /usr/src/app/node_modules/.bin:$PATH
-ENV SENTRY_PROPERTIES /usr/src/app/sentry.properties
 RUN apt-get update && apt-get install -y make wget \
   gconf-service gettext-base libasound2 libatk1.0-0 libatk-bridge2.0-0 libc6 \
   libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 \
@@ -14,7 +13,9 @@ RUN apt-get update && apt-get install -y make wget \
   libxss1 libxtst6 ca-certificates fonts-liberation libappindicator1 libnss3 \
   lsb-release xdg-utils \
   && rm -rf /var/lib/apt/lists/*
-RUN curl -sL https://sentry.io/get-cli/ | bash
+
+ENV SENTRY_PROPERTIES /usr/src/app/sentry.properties
+
 COPY package*.json ./
 USER node
 RUN npm ci --verbose --no-optional && npm cache clean --force
