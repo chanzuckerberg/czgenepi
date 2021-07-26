@@ -21,10 +21,10 @@ const moduleExports = withImages({
   distDir: ENV.BUILD_PATH,
   fileExtensions: ["jpg", "jpeg", "png", "gif", "ico", "webp", "jp2", "avif"],
   future: { webpack5: true },
-  sentry: {
-    disableServerWebpackPlugin: !isProdBuild,
-    disableClientWebpackPlugin: !isProdBuild,
-  },
+  // sentry: {
+  //   disableServerWebpackPlugin: !isProdBuild,
+  //   disableClientWebpackPlugin: !isProdBuild,
+  // },
 
   async generateBuildId() {
     // Return null to allow next.js to fallback to default behavior
@@ -89,7 +89,7 @@ const SentryWebpackPluginOptions = {
   // recommended:
   //   release, url, org, project, authToken, configFile, stripPrefix,
   //   urlPrefix, include, ignore
-  silent: !isProdBuild
+  // silent: !isProdBuild
 
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options.
