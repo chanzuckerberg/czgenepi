@@ -3,7 +3,7 @@ import {
   SampleIdToMetadata,
   Samples,
 } from "src/views/Upload/components/common/types";
-import { API, DEFAULT_POST_OPTIONS } from "../api";
+import { API, DEFAULT_POST_OPTIONS, DEFAULT_FETCH_OPTIONS } from "../api";
 import { API_URL } from "../constants/ENV";
 
 interface SamplePayload {
@@ -16,6 +16,27 @@ interface SamplePayload {
   pathogen_genome: {
     sequence: string;
   };
+}
+
+interface SampleFastaDownloadPayload {
+  requested_sequences: {
+    sample_ids: string[]
+  }
+}
+
+export async function downloadSamplesFasta({
+  sampleIds
+}: {
+  sampleIds: string[]
+}): Promise<unknown> {
+  const payload: SampleFastaDownloadPayload[] = [{requested_sequences: {sample_ids: sampleIds},];
+  const response = await fetch(API_URL + API.SAMPLES_FASTA_DOWNLOAD, {
+    ...DEFAULT_FETCH_OPTIONS,
+    body: JSON.stringify(payload),
+  });
+  if (response.ok) return await response.json();
+
+  throw Error(`${response.statusText}: ${await response.text()}`);
 }
 
 export async function createSamples({

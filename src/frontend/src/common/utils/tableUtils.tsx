@@ -70,20 +70,15 @@ function createDownloadModalInfo_(privateIds: Array[string]): ModalInfo {
   return {
     body:
       <>
-      <CheckboxCZIFUI color="primary" /><text>"Consensus Genome (consensus.fa)" </text>
-      <text>"Download multiple consensus genomes in a single, concatenated file"</text>
-      <CheckboxCZIFUI color="primary" /><text>"Sample Metadata (sample_metadata.tsv)" </text>
-      <text>"Sample metadata including Private and Public IDs, Collection Date, Sequencing Date, Lineage, GISAID Status, and ISL Accession #."</text>
+      <CheckboxCZIFUI color="primary" /><text>Consensus Genome (consensus.fa) </text>
+      <div>Download multiple consensus genomes in a single, concatenated file</div>
+      <CheckboxCZIFUI color="primary" /><text>Sample Metadata (sample_metadata.tsv)</text>
+      <div>Sample metadata including Private and Public IDs, Collection Date, Sequencing Date, Lineage, GISAID Status, and ISL Accession #.</div>
       </>,
     buttons: [
       {
-        Button: createConfirmButton(privateIds),
-      },
-      {
-        content: "Cancel",
-        link: "cancel",
-        type: "secondary",
-      },
+        Button: createDownloadButton(privateIds),
+      }
     ],
     header:
       "Select Download",
