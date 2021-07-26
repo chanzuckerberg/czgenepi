@@ -146,7 +146,7 @@ def _format_lineage(sample: Sample) -> dict[str, Any]:
     return lineage
 
 
-@application.route("/api/sequences", methods=["GET"])
+@application.route("/api/sequences", methods=["POST"])
 @requires_auth
 def prepare_sequences_download():
     # stream output file
