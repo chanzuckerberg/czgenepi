@@ -228,10 +228,10 @@ class Config(object):
     ####################################################################################
     # sentry properties
     @property
-    def SENTRY_URL(self) -> str:
-        if os.getenv("SENTRY_URL"):
-            return os.environ["SENTRY_URL"]
+    def SENTRY_DSN(self) -> str:
+        if os.getenv("SENTRY_BACKEND_DSN"):
+            return os.environ["SENTRY_BACKEND_DSN"]
         try:
-            return self.AWS_SECRET["SENTRY_URL"]
-        except KeyError:
+            return self.AWS_SECRET["SENTRY_BACKEND_DSN"]
+        except (KeyError, ClientError):
             return ""
