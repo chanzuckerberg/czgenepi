@@ -77,8 +77,13 @@ function createDownloadModalInfo_(privateIds: Array[string]): ModalInfo {
       </>,
     buttons: [
       {
-        Button: createDownloadButton(privateIds),
-      }
+        Button: createConfirmButton(privateIds),
+      },
+      {
+        content: "Cancel",
+        link: "cancel",
+        type: "secondary",
+      },
     ],
     header:
       "Select Download",
