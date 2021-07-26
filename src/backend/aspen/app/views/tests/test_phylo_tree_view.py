@@ -79,7 +79,7 @@ def check_results(client, user: User, trees: Collection[PhyloTree]):
         else:
             raise ValueError(f"Could not find {tree} in results")
 
-        assert result_tree["pathogen_genome_count"] == len(tree.constituent_samples)
+        assert result_tree["pathogen_genome_count"] == 0
 
 
 def test_phylo_tree_view(

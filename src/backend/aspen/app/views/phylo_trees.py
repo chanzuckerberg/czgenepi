@@ -2,12 +2,12 @@ import json
 import os
 import re
 import uuid
-from typing import Any, Callable, Iterable, Mapping, MutableSequence, Set, Tuple, Union
+from typing import Any, Callable, Iterable, Mapping, MutableSequence, Set, Union
 
 import boto3
 import sqlalchemy
 from flask import g, jsonify, make_response, Response
-from sqlalchemy import func, or_
+from sqlalchemy import or_
 from sqlalchemy.orm import aliased, joinedload, Session
 
 from aspen.app.app import application, requires_auth
@@ -16,7 +16,6 @@ from aspen.database.models import (
     DataType,
     PhyloRun,
     PhyloTree,
-    PhyloTreeSamples,
     Sample,
     WorkflowStatusType,
 )
@@ -50,19 +49,9 @@ def phylo_trees():
         if cansee.data_type == DataType.TREES
     }
     phylo_run_alias = aliased(PhyloRun)
-    phylo_runs: Iterable[Tuple[PhyloRun, int]] = (
+    phylo_runs: Iterable[PhyloRun] = (
         g.db_session.query(
             phylo_run_alias,
-            (
-                g.db_session.query(func.count(1))
-                .select_from(Sample)
-                .join(PhyloTreeSamples)
-                .join(
-                    PhyloTree,
-                    PhyloTreeSamples.columns.phylo_tree_id == PhyloTree.entity_id,
-                )
-                .filter(PhyloTree.producing_workflow_id == phylo_run_alias.workflow_id)
-            ).label("phylo_run_genome_count"),
         )
         .options(joinedload(phylo_run_alias.outputs))
         .filter(
@@ -77,7 +66,7 @@ def phylo_trees():
 
     # filter for only information we need in sample table view
     results: MutableSequence[Mapping[str, Any]] = list()
-    for phylo_run, genome_count in phylo_runs:
+    for phylo_run in phylo_runs:
         phylo_tree: PhyloTree
         for output in phylo_run.outputs:
             if isinstance(output, PhyloTree):
@@ -92,7 +81,7 @@ def phylo_trees():
             {
                 "phylo_tree_id": phylo_tree.entity_id,
                 "name": humanize_tree_name(phylo_tree.s3_key),
-                "pathogen_genome_count": genome_count,
+                "pathogen_genome_count": 0,  # Leaving this field in place temporarily for reverse-compatibility
                 "completed_date": format_datetime(phylo_run.end_datetime),
             }
         )
