@@ -1,6 +1,9 @@
 import { memoize } from "lodash/fp";
 import { ModalInfo } from "../types/ui";
 import { createConfirmButton } from "./TreeModal/ConfirmButton";
+import { createDownloadButton } from "./DownloadModal/DownloadButton"
+import { Checkbox } from "semantic-ui-react";
+import {Checkbox as CheckboxCZIFUI } from "czifui";
 
 /* eslint-disable react/display-name */
 
@@ -59,3 +62,31 @@ function createTreeModalInfo_(treeId: number): ModalInfo {
       "Please confirm you're ready to send your data to Nextstrain to see your tree.",
   };
 }
+
+export const createDownloadModalInfo = memoize(createDownloadModalInfo_);
+
+
+function createDownloadModalInfo_(privateIds: Array[string]): ModalInfo {
+  return {
+    body:
+      <>
+      <CheckboxCZIFUI color="primary" /><text>"Consensus Genome (consensus.fa)" </text>
+      <text>"Download multiple consensus genomes in a single, concatenated file"</text>
+      <CheckboxCZIFUI color="primary" /><text>"Sample Metadata (sample_metadata.tsv)" </text>
+      <text>"Sample metadata including Private and Public IDs, Collection Date, Sequencing Date, Lineage, GISAID Status, and ISL Accession #."</text>
+      </>,
+    buttons: [
+      {
+        Button: createConfirmButton(privateIds),
+      },
+      {
+        content: "Cancel",
+        link: "cancel",
+        type: "secondary",
+      },
+    ],
+    header:
+      "Select Download",
+  };
+}
+
