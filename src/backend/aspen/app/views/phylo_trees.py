@@ -53,7 +53,10 @@ def phylo_trees():
         g.db_session.query(
             phylo_run_alias,
         )
-        .options(joinedload(phylo_run_alias.outputs))
+        .options(
+            joinedload(phylo_run_alias.outputs),
+            joinedload(phylo_run_alias.outputs.of_type(PhyloTree)),
+        )
         .filter(
             or_(
                 user.system_admin,
