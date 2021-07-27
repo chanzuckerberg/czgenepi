@@ -7,7 +7,6 @@ import enumtables  # noqa: F401
 import sqlalchemy as sa
 from alembic import op
 
-# revision identifiers, used by Alembic.
 revision = "20210727_111359"
 down_revision = "20210617_201052"
 branch_labels = None
@@ -16,11 +15,11 @@ depends_on = None
 
 def upgrade():
     op.add_column(
-        "phylo_runs",
+        "phylo_trees",
         sa.Column("name", sa.String(), nullable=True),
         schema="aspen",
     )
 
 
 def downgrade():
-    op.drop_column("phylo_runs", "name", schema="aspen")
+    op.drop_column("phylo_trees", "name", schema="aspen")
