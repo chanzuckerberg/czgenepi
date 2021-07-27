@@ -1,12 +1,14 @@
 import datetime
 from collections import Counter
-from typing import Collection, List, Mapping, Optional, Tuple, Union
+from typing import Collection, Iterable, List, Mapping, Optional, Set, Tuple, Union
 
+from flask import g, Response
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.query import Query
 from sqlalchemy.orm.session import Session
+from sqlalchemy.sql.expression import and_, or_
 
-from aspen.database.models import Group, Sample, User
+from aspen.database.models import DataType, Group, Sample, User
 
 
 def filter_usergroup_dict(
@@ -133,3 +135,44 @@ def check_valid_sequence(sequence: str) -> bool:
     Check that the sequence string only contains valid sequence characters
     """
     return set(sequence.upper()).issubset(set("WSKMYRVHDBNZNATCGU-"))
+
+
+# TODO - This needs to be updated to handle name collisions between public & private sample ID's,
+#        and also collisions between private sample ID's in different groups better.
+def validate_sample_access(user: User, sample_ids: Set[str]) -> Optional[Response]:
+    # query for samples we don't have access to
+    cansee_groups: Set[int] = {}
+    cansee_groups_private_identifiers: Set[int] = {}
+    # System admins can see everything.
+    if user.system_admin:
+        return
+    cansee_groups: Set[int] = {
+        cansee.owner_group_id
+        for cansee in user.group.can_see
+        if cansee.data_type == DataType.SEQUENCES
+    }
+    # add the users own group
+    cansee_groups.add(user.group_id)
+
+    cansee_groups_private_identifiers: Set[int] = {
+        cansee.owner_group_id
+        for cansee in user.group.can_see
+        if cansee.data_type == DataType.PRIVATE_IDENTIFIERS
+    }
+
+    denied_samples: Iterable[Sample] = g.db_session.query(Sample).filter(
+        and_(Sample.submitting_group_id.not_in(cansee_groups)),
+        and_(
+            Sample.uploaded_pathogen_genome != None,  # noqa: E711
+            or_(
+                Sample.private_identifier.in_(sample_ids),
+                Sample.public_identifier.in_(sample_ids),
+            ),
+        ),
+    )
+    # check that user has access to the requested samples
+    for denied_sample in denied_samples:
+        return Response(
+            "User does not have access to the requested sequences",
+            403,
+        )

@@ -1,12 +1,30 @@
 from aspen.database.models import Group, User
 
 
-def group_factory(name="groupname", address="123 Main St", prefix=None) -> Group:
+def group_factory(
+    name="groupname",
+    address="123 Main St",
+    prefix=None,
+    location="Metropolis",
+    division="West",
+) -> Group:
     if not prefix:
         # shortcut so we don't need to specify prefix
-        return Group(name=name, address=address, prefix=name)
+        return Group(
+            name=name,
+            address=address,
+            prefix=name,
+            location=location,
+            division=division,
+        )
     else:
-        return Group(name=name, address=address, prefix=prefix)
+        return Group(
+            name=name,
+            address=address,
+            prefix=prefix,
+            location=location,
+            division=division,
+        )
 
 
 def user_factory(
