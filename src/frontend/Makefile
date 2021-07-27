@@ -14,3 +14,6 @@ e2e: # run ts test
 
 test-build:
 	npm --prefix . run build
+
+upload-sourcemaps:
+	sentry-cli releases files $(COMMIT_SHA) upload-sourcemaps .
