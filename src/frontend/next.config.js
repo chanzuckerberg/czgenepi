@@ -74,13 +74,17 @@ const moduleExports = withImages({
     });
 
     config.plugins.push(new webpack.EnvironmentPlugin(ENV));
-    config.devtool = "source-map";
-    config.output = {
-      ...config.output,
-      // Make maps auto-detectable by sentry-cli
-      filename: "[name].js",
-      sourceMapFilename: "[name].js.map",
-    };
+
+    if (process.env.CI && process.env.SENTRY_AUTH_TOKEN && ENV.COMMIT_SHA) {
+      config.plugins.push(
+        new SentryWebpackPlugin({
+          include: ".next",
+          ignore: ["node_modules", "cypress", "test"],
+          urlPrefix: "~/_next",
+        }),
+      );
+    }
+
     return config;
   },
 });

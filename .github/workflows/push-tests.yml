@@ -225,7 +225,6 @@ jobs:
           # Build frontend
           docker buildx build --build-arg HAPPY_COMMIT=${GITHUB_SHA} --build-arg HAPPY_BRANCH=${GITHUB_REF} --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/aspen-frontend:branch-trunk --secret id=SENTRY_AUTH_TOKEN -t ${{ secrets.ECR_REPO }}/aspen-frontend:latest src/frontend
           make frontend-test-build
-          make frontend-upload-sourcemaps
   update-stage:
     needs:
       - build-push-images
