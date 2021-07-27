@@ -215,17 +215,17 @@ jobs:
         with:
           registry: ${{ secrets.ECR_REPO }}
       - name: Update Sentry Sourcemaps
-      - uses: actions/checkout@v2
-      - env:
+        uses: actions/checkout@v2
+        env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-      - run: |
-        echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
-        mkdir src/frontend/build
-        chmod -R a+w src/frontend/build
-        # Build frontend
-        docker buildx build --build-arg HAPPY_COMMIT=${GITHUB_SHA} --build-arg HAPPY_BRANCH=${GITHUB_REF} --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/aspen-frontend:branch-trunk --secret id=SENTRY_AUTH_TOKEN -t ${{ secrets.ECR_REPO }}/aspen-frontend:latest src/frontend
-        make frontend-test-build
-        make frontend-upload-sourcemaps
+        run: |
+          echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
+          mkdir src/frontend/build
+          chmod -R a+w src/frontend/build
+          # Build frontend
+          docker buildx build --build-arg HAPPY_COMMIT=${GITHUB_SHA} --build-arg HAPPY_BRANCH=${GITHUB_REF} --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/aspen-frontend:branch-trunk --secret id=SENTRY_AUTH_TOKEN -t ${{ secrets.ECR_REPO }}/aspen-frontend:latest src/frontend
+          make frontend-test-build
+          make frontend-upload-sourcemaps
   update-stage:
     needs:
       - build-push-images
