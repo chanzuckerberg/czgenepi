@@ -107,7 +107,14 @@ def validate_auth_header(auth_header):
 
 
 def setup_userinfo(user_id):
-    user = get_usergroup_query(g.db_session, user_id).one()
+    sentry_sdk.set_user(
+        {
+            "requested_user_id": user_id,
+        }
+    )
+    user = get_usergroup_query(g.db_session, user_id).one_or_none()
+    if not user:
+        return redirect("/login")
     g.auth_user = user
     sentry_sdk.set_user(
         {
