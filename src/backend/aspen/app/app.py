@@ -114,7 +114,9 @@ def setup_userinfo(user_id):
     )
     user = get_usergroup_query(g.db_session, user_id).one_or_none()
     if not user:
-        sentry_sdk.capture_message(f'Requested auth0_user_id {user_id} not found in usergroup query.')
+        sentry_sdk.capture_message(
+            f"Requested auth0_user_id {user_id} not found in usergroup query."
+        )
         return redirect("/login")
     g.auth_user = user
     sentry_sdk.set_user(
