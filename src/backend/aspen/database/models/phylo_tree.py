@@ -42,6 +42,7 @@ class PhyloTree(Entity):
 
     s3_bucket = Column(String, nullable=False)
     s3_key = Column(String, nullable=False)
+    name = Column(String, nullable=True)
 
     constituent_samples = relationship(  # type: ignore
         Sample,
