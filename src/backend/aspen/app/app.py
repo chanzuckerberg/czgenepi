@@ -13,6 +13,7 @@ from authlib.integrations.flask_client import OAuth
 from flask import g, redirect, request, session
 from flask_cors import CORS
 from sentry_sdk.integrations.flask import FlaskIntegration
+from sqlalchemy.orm.exc import NoResultFound
 
 from aspen.app.aspen_app import AspenApp
 from aspen.app.views.api_utils import get_usergroup_query
@@ -112,8 +113,9 @@ def setup_userinfo(user_id):
             "requested_user_id": user_id,
         }
     )
-    user = get_usergroup_query(g.db_session, user_id).one_or_none()
-    if not user:
+    try:
+        user = get_usergroup_query(g.db_session, user_id).one()
+    except NoResultFound:
         sentry_sdk.capture_message(
             f"Requested auth0_user_id {user_id} not found in usergroup query."
         )
