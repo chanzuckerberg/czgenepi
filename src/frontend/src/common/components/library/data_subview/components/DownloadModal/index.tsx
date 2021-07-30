@@ -43,6 +43,7 @@ const DownloadModal = ({
   const { data } = useUserInfo();
   const groupName = data?.group?.name.toLowerCase().replace(/ /g, "_"); // format group name for sequences download file
   const downloadDate = new Date();
+  const separator = "\t";
   const [isMetadataSelected, setMetadataSelected] = useState<boolean>(false);
   const [isFastaSelected, setFastaSelected] = useState<boolean>(false);
   const [isFastaDisabled, setFastaDisabled] = useState<boolean>(false);
@@ -56,8 +57,6 @@ const DownloadModal = ({
       setTsvRows(Rows);
     }
   }, [tsvData]);
-
-  const separator = "\t";
 
   useEffect(() => {
     if (JSON.stringify(sampleIds) === JSON.stringify(failedSamples)) {
