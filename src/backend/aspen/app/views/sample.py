@@ -17,7 +17,7 @@ from sqlalchemy.orm import joinedload
 
 from aspen.app.app import application, requires_auth
 from aspen.app.views import api_utils
-from aspen.app.views.api_utils import check_valid_sequence, validate_sample_access, add_sample_filters
+from aspen.app.views.api_utils import check_valid_sequence, authz_sample_filters
 from aspen.database.connection import session_scope
 from aspen.database.models import (
     DataType,
@@ -172,7 +172,8 @@ def prepare_sequences_download():
                     ),
                 )
             )
-            all_samples = add_sample_filters(all_samples, sample_ids, user)
+            # Enforce AuthZ
+            all_samples = authz_sample_filters(all_samples, sample_ids, user)
 
             for sample in all_samples:
                 if sample.uploaded_pathogen_genome:
@@ -199,11 +200,6 @@ def prepare_sequences_download():
                         yield (f">{sample.public_identifier}\n")
                     yield (stripped_sequence)
                     yield ("\n")
-
-    # Make sure we have access to these samples
-    resp = validate_sample_access(user, set(sample_ids))
-    if resp:
-        return resp
 
     cansee_groups_private_identifiers: Set[int] = {
         cansee.owner_group_id

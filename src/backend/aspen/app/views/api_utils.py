@@ -137,7 +137,7 @@ def check_valid_sequence(sequence: str) -> bool:
     return set(sequence.upper()).issubset(set("WSKMYRVHDBNZNATCGU-"))
 
 
-def add_sample_filters(query: Query, sample_ids: Set[str], user: User) -> Query:
+def authz_sample_filters(query: Query, sample_ids: Set[str], user: User) -> Query:
     # No filters for system admins
     if user.system_admin:
         return query
@@ -152,6 +152,7 @@ def add_sample_filters(query: Query, sample_ids: Set[str], user: User) -> Query:
     cansee_groups.add(user.group_id)
 
     # Which groups can this user query private identifiers for?
+    # NOTE - this asssumes PRIVATE_IDENTIFIERS permission is a superset of SEQUENCES
     cansee_groups_private_identifiers: Set[int] = {
         cansee.owner_group_id
         for cansee in user.group.can_see
@@ -168,46 +169,3 @@ def add_sample_filters(query: Query, sample_ids: Set[str], user: User) -> Query:
              Sample.private_identifier.in_(sample_ids)),
         ))
     return query
-
-
-
-# TODO - This needs to be updated to handle name collisions between public & private sample ID's,
-#        and also collisions between private sample ID's in different groups better.
-def validate_sample_access(user: User, sample_ids: Set[str]) -> Optional[Response]:
-    return
-    # query for samples we don't have access to
-    cansee_groups: Set[int] = {}
-    cansee_groups_private_identifiers: Set[int] = {}
-    # System admins can see everything.
-    if user.system_admin:
-        return
-    cansee_groups: Set[int] = {
-        cansee.owner_group_id
-        for cansee in user.group.can_see
-        if cansee.data_type == DataType.SEQUENCES
-    }
-    # add the users own group
-    cansee_groups.add(user.group_id)
-
-    cansee_groups_private_identifiers: Set[int] = {
-        cansee.owner_group_id
-        for cansee in user.group.can_see
-        if cansee.data_type == DataType.PRIVATE_IDENTIFIERS
-    }
-
-    denied_samples: Iterable[Sample] = g.db_session.query(Sample).filter(
-        and_(Sample.submitting_group_id.not_in(cansee_groups)),
-        and_(
-            Sample.uploaded_pathogen_genome != None,  # noqa: E711
-            or_(
-                Sample.private_identifier.in_(sample_ids),
-                Sample.public_identifier.in_(sample_ids),
-            ),
-        ),
-    )
-    # check that user has access to the requested samples
-    for denied_sample in denied_samples:
-        return Response(
-            "User does not have access to the requested sequences",
-            403,
-        )

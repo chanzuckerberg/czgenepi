@@ -10,7 +10,7 @@ from sqlalchemy import or_
 from sqlalchemy.orm import joinedload
 
 from aspen.app.app import application, requires_auth
-from aspen.app.views.api_utils import validate_sample_access
+from aspen.app.views.api_utils import authz_sample_filters
 from aspen.database.models import (
     AlignedGisaidDump,
     PathogenGenome,
@@ -74,12 +74,7 @@ def start_phylo_run():
         return Response(str(verr), 400)
     sample_ids = request_data["samples"]
 
-    # Step 2 - make sure we have access to all the requested samples, return error if not.
-    resp = validate_sample_access(user, set(sample_ids))
-    if resp:
-        return resp
-
-    # Step 3 - run big sample query per the old db cli
+    # Step 2 - prepare big sample query per the old db cli
     all_samples: Iterable[Sample] = (
         g.db_session.query(Sample)
         .filter(
@@ -92,6 +87,8 @@ def start_phylo_run():
             joinedload(Sample.uploaded_pathogen_genome, innerjoin=True),
         )
     )
+    # Step 3 - Enforce AuthZ
+    all_samples = authz_sample_filters(all_samples, sample_ids, user)
 
     pathogen_genomes: MutableSequence[PathogenGenome] = list()
     for sample in all_samples:
