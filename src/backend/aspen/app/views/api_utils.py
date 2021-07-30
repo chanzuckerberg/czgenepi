@@ -137,9 +137,44 @@ def check_valid_sequence(sequence: str) -> bool:
     return set(sequence.upper()).issubset(set("WSKMYRVHDBNZNATCGU-"))
 
 
+def add_sample_filters(query: Query, sample_ids: Set[str], user: User) -> Query:
+    # No filters for system admins
+    if user.system_admin:
+        return query
+
+    # Which groups can this user query public identifiers for?
+    cansee_groups: Set[int] = {
+        cansee.owner_group_id
+        for cansee in user.group.can_see
+        if cansee.data_type == DataType.SEQUENCES
+    }
+    # add the user's own group
+    cansee_groups.add(user.group_id)
+
+    # Which groups can this user query private identifiers for?
+    cansee_groups_private_identifiers: Set[int] = {
+        cansee.owner_group_id
+        for cansee in user.group.can_see
+        if cansee.data_type == DataType.PRIVATE_IDENTIFIERS
+    }
+    # add the user's own group
+    cansee_groups_private_identifiers.add(user.group_id)
+
+    cansee_groups.add(user.group_id)
+    query = query.filter(or_(
+        and_(Sample.submitting_group_id.in_(cansee_groups),
+             Sample.public_identifier.in_(sample_ids)),
+        and_(Sample.submitting_group_id.in_(cansee_groups_private_identifiers),
+             Sample.private_identifier.in_(sample_ids)),
+        ))
+    return query
+
+
+
 # TODO - This needs to be updated to handle name collisions between public & private sample ID's,
 #        and also collisions between private sample ID's in different groups better.
 def validate_sample_access(user: User, sample_ids: Set[str]) -> Optional[Response]:
+    return
     # query for samples we don't have access to
     cansee_groups: Set[int] = {}
     cansee_groups_private_identifiers: Set[int] = {}

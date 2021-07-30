@@ -17,7 +17,7 @@ from sqlalchemy.orm import joinedload
 
 from aspen.app.app import application, requires_auth
 from aspen.app.views import api_utils
-from aspen.app.views.api_utils import check_valid_sequence, validate_sample_access
+from aspen.app.views.api_utils import check_valid_sequence, validate_sample_access, add_sample_filters
 from aspen.database.connection import session_scope
 from aspen.database.models import (
     DataType,
@@ -166,21 +166,13 @@ def prepare_sequences_download():
                 .yield_per(
                     5
                 )  # Streams a few DB rows at a time but our query must return one row per resolved object.
-                .filter(
-                    and_(
-                        Sample.uploaded_pathogen_genome != None,  # noqa: E711
-                        or_(
-                            Sample.private_identifier.in_(sample_ids),
-                            Sample.public_identifier.in_(sample_ids),
-                        ),
-                    )
-                )
                 .options(
-                    joinedload(Sample.uploaded_pathogen_genome).undefer(
+                    joinedload(Sample.uploaded_pathogen_genome, innerjoin=True).undefer(
                         UploadedPathogenGenome.sequence
                     ),
                 )
             )
+            all_samples = add_sample_filters(all_samples, sample_ids, user)
 
             for sample in all_samples:
                 if sample.uploaded_pathogen_genome:

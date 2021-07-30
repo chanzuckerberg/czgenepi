@@ -56,7 +56,17 @@ def uploaded_pathogen_genome_factory(
             "gisaid_public_identifier",
         ),
     ),
+    gisaid_public_identifier="gisaid_public_identifier",
 ):
+    if not accessions:
+        accessions: Sequence[AccessionWorkflowDirective] = (
+            AccessionWorkflowDirective(
+                PublicRepositoryType.GISAID,
+                datetime.datetime.now(),
+                datetime.datetime.now(),
+                gisaid_public_identifier,
+            ),
+        )
     uploaded_pathogen_genome = UploadedPathogenGenome(
         sample=sample,
         sequence=sequence,
