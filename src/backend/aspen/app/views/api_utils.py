@@ -140,6 +140,10 @@ def check_valid_sequence(sequence: str) -> bool:
 def authz_sample_filters(query: Query, sample_ids: Set[str], user: User) -> Query:
     # No filters for system admins
     if user.system_admin:
+        query = query.filter(or_(
+             Sample.public_identifier.in_(sample_ids),
+             Sample.private_identifier.in_(sample_ids),
+        ))
         return query
 
     # Which groups can this user query public identifiers for?

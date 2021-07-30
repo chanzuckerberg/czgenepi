@@ -105,7 +105,6 @@ def start_phylo_run():
             f"User requested sample id's they didn't have access to ({missing_sample_ids})"
         )
 
-    row = g.db_session.query(AlignedGisaidDump).one()
     aligned_gisaid_dump = (
         g.db_session.query(AlignedGisaidDump)
         .join(AlignedGisaidDump.producing_workflow)
@@ -113,7 +112,7 @@ def start_phylo_run():
         .first()
     )
     if not aligned_gisaid_dump:
-        raise ValueError("No gisaid dump for run.")
+        return Response("No gisaid dump for run", 500)
 
     template_path_prefix = "src/backend/aspen/workflows/nextstrain_run/builds_templates"
     builds_template_file = (
