@@ -81,7 +81,9 @@ const DownloadModal = ({
     onSuccess: (data: any) => {
       const link = document.createElement("a");
       link.href = window.URL.createObjectURL(data);
-      link.download = `${groupName}_sample_sequences_${downloadDate.toISOString().slice(0, 10)}.fasta`;
+      link.download = `${groupName}_sample_sequences_${downloadDate
+        .toISOString()
+        .slice(0, 10)}.fasta`;
       link.click();
       onClose();
       // reset all selection data

@@ -187,7 +187,7 @@ const DataSubview: FunctionComponent<Props> = ({
   });
 
   useEffect(() => {
-    // if there is an error than close the modal.
+    // if there is an error then close the modal.
     if (downloadFailed) {
       setOpen(false);
     }
