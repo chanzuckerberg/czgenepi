@@ -1,5 +1,6 @@
 import datetime
 import json
+import sentry_sdk
 
 from typing import Iterable, MutableSequence
 
@@ -77,12 +78,6 @@ def start_phylo_run():
     # Step 2 - prepare big sample query per the old db cli
     all_samples: Iterable[Sample] = (
         g.db_session.query(Sample)
-        .filter(
-            or_(
-                Sample.private_identifier.in_(sample_ids),
-                Sample.public_identifier.in_(sample_ids),
-            )
-        )
         .options(
             joinedload(Sample.uploaded_pathogen_genome, innerjoin=True),
         )
@@ -91,10 +86,24 @@ def start_phylo_run():
     all_samples = authz_sample_filters(all_samples, sample_ids, user)
 
     pathogen_genomes: MutableSequence[PathogenGenome] = list()
+    missing_sample_ids = list(sample_ids)  # Make a copy of sample id's
     for sample in all_samples:
         pathogen_genomes.append(sample.uploaded_pathogen_genome)
+        try:
+            missing_sample_ids.remove(sample.private_identifier)
+        except ValueError:
+            pass
+        try:
+            missing_sample_ids.remove(sample.public_identifier)
+        except ValueError:
+            pass
     if len(pathogen_genomes) == 0:
         raise ValueError("No sequences selected for run.")
+
+    if missing_sample_ids:
+        sentry_sdk.capture_message(
+            f"User requested sample id's they didn't have access to ({missing_sample_ids})"
+        )
 
     row = g.db_session.query(AlignedGisaidDump).one()
     aligned_gisaid_dump = (
