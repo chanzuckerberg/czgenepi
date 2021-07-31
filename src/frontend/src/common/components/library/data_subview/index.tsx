@@ -1,4 +1,4 @@
-import { Button, Chip } from "czifui";
+import { Button, Chip, Tooltip } from "czifui";
 import { escapeRegExp } from "lodash/fp";
 import React, {
   FunctionComponent,
@@ -250,19 +250,27 @@ const DataSubview: FunctionComponent<Props> = ({
     if (viewName === "Samples" && tableData !== undefined) {
       downloadButton = (
         <DownloadWrapper>
-          <Button
-            onClick={handleDownloadClickOpen}
-            disabled={isDownloadDisabled}
-          >
-            <Chip size="medium" label={checkedSamples.length} status="info" />
-            <StyledDiv>Selected </StyledDiv>
-            <Divider />
-            {isDownloadDisabled ? (
-              <StyledDownloadDisabledImage />
-            ) : (
-              <StyledDownloadImage />
-            )}
-          </Button>
+          <Tooltip title="Download some samples" arrow={true}>
+            <span>
+              <Button
+                onClick={handleDownloadClickOpen}
+                disabled={isDownloadDisabled}
+              >
+                <Chip
+                  size="medium"
+                  label={checkedSamples.length}
+                  status="info"
+                />
+                <StyledDiv>Selected </StyledDiv>
+                <Divider />
+                {isDownloadDisabled ? (
+                  <StyledDownloadDisabledImage />
+                ) : (
+                  <StyledDownloadImage />
+                )}
+              </Button>
+            </span>
+          </Tooltip>
         </DownloadWrapper>
       );
     }
