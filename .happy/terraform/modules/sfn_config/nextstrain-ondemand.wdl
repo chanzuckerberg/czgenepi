@@ -9,6 +9,7 @@ workflow nextstrain {
         String remote_dev_prefix = ""
         Int    workflow_id
         String s3_filestem
+        String tree_name
     }
 
     call nextstrain_workflow {
@@ -19,6 +20,7 @@ workflow nextstrain {
         remote_dev_prefix = remote_dev_prefix,
         workflow_id = workflow_id,
         s3_filestem = s3_filestem,
+        tree_name = tree_name
     }
 }
 
@@ -31,6 +33,7 @@ task nextstrain_workflow {
         String remote_dev_prefix
         Int    workflow_id
         String s3_filestem
+        String tree_name
     }
 
     command <<<
@@ -106,6 +109,7 @@ task nextstrain_workflow {
         --bucket "${aspen_s3_db_bucket}"                                        \
         --key "${key}"                                                          \
         --tree-path ncov/auspice/ncov_aspen.json                                \
+        --tree-name "~{tree_name}"                                              \
     >>>
 
     runtime {

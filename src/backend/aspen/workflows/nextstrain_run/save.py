@@ -41,6 +41,7 @@ from aspen.phylo_tree.identifiers import get_names_from_tree
 @click.option("--bucket", type=str, required=True)
 @click.option("--key", type=str, required=True)
 @click.option("--tree-path", type=click.File("r"), required=True)
+@click.option("--tree-name", type=str, required=False)
 def cli(
     aspen_workflow_rev: str,
     aspen_creation_rev: str,
@@ -51,6 +52,7 @@ def cli(
     bucket: str,
     key: str,
     tree_path: io.TextIOBase,
+    tree_name: str,
 ):
     end_time_datetime = datetime.datetime.fromtimestamp(end_time)
 
@@ -140,6 +142,9 @@ def cli(
             s3_key=key,
             constituent_samples=included_samples,
         )
+
+        if tree_name:
+            phylo_tree.name = tree_name
 
         # update the run object with the metadata about the run.
         phylo_run.end_datetime = end_time_datetime
