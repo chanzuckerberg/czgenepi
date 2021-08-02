@@ -187,5 +187,4 @@ services:
 networks:
   genepinet:
 volumes:
-  database:
   localstack:
