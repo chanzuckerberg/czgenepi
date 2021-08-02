@@ -14,7 +14,6 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.sql import expression
 from sqlalchemy_utils import create_database, database_exists, drop_database
 
-from aspen import covidhub_import
 from aspen.cli.toplevel import cli
 from aspen.config.config import Config
 from aspen.config.docker_compose import DockerComposeConfig
@@ -133,101 +132,6 @@ def interact(ctx, connect):
 
     shell = InteractiveShellEmbed()
     shell()
-
-
-@db.command("import-covidhub-users")
-@click.option("--covidhub-aws-profile", type=str, required=True)
-@click.option("--covidhub-db-secret", default="cliahub/cliahub_test_db")
-@click.option("--rr-project-id", type=str, required=True)
-@click.pass_context
-def import_covidhub_users(
-    ctx,
-    covidhub_aws_profile,
-    covidhub_db_secret,
-    rr_project_id,
-):
-    config, engine = ctx.obj["CONFIG"], ctx.obj["ENGINE"]
-
-    auth0_usermap = covidhub_import.retrieve_auth0_users(config)
-
-    covidhub_import.import_project_users(
-        engine,
-        covidhub_aws_profile,
-        covidhub_db_secret,
-        rr_project_id,
-        auth0_usermap,
-    )
-
-
-@db.command("import-covidhub-admins")
-@click.option("--covidhub-aws-profile", type=str, required=True)
-@click.option("--covidhub-db-secret", default="cliahub/cliahub_test_db")
-@click.pass_context
-def import_covidhub_admins(
-    ctx,
-    covidhub_aws_profile,
-    covidhub_db_secret,
-):
-    config, engine = ctx.obj["CONFIG"], ctx.obj["ENGINE"]
-
-    auth0_usermap = covidhub_import.retrieve_auth0_users(config)
-
-    covidhub_import.import_covidhub_admins(
-        engine,
-        covidhub_aws_profile,
-        covidhub_db_secret,
-        auth0_usermap,
-    )
-
-
-@db.command("import-covidhub-project")
-@click.option("--covidhub-aws-profile", type=str, required=True)
-@click.option("--covidhub-db-secret", default="cliahub/cliahub_test_db")
-@click.option("--rr-project-id", type=str, required=True)
-@click.option("--aspen-group-id", type=int, required=True)
-@click.pass_context
-def import_covidhub_project(
-    ctx,
-    covidhub_aws_profile,
-    covidhub_db_secret,
-    rr_project_id,
-    aspen_group_id,
-):
-    engine = ctx.obj["ENGINE"]
-
-    covidhub_import.import_project(
-        engine,
-        covidhub_aws_profile,
-        covidhub_db_secret,
-        rr_project_id,
-        aspen_group_id,
-    )
-
-
-@db.command("import-covidhub-trees")
-@click.option("--covidhub-aws-profile", type=str, required=True)
-@click.option("--aspen-group-id", type=int, required=True)
-@click.option("--s3-src-prefix", type=str, required=True)
-@click.option("--s3-key-prefix", type=str, required=True)
-@click.pass_context
-def import_covidhub_trees(
-    ctx,
-    covidhub_aws_profile,
-    aspen_group_id,
-    s3_src_prefix,
-    s3_key_prefix,
-):
-    config, engine = ctx.obj["CONFIG"], ctx.obj["ENGINE"]
-
-    if not s3_key_prefix.startswith("/"):
-        s3_key_prefix = f"/{s3_key_prefix}"
-    covidhub_import.import_trees(
-        engine,
-        covidhub_aws_profile,
-        aspen_group_id,
-        s3_src_prefix,
-        f"s3://{config.DB_BUCKET}{s3_key_prefix}",
-    )
 
 
 @db.command("add-can-see")
