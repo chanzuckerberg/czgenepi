@@ -52,7 +52,7 @@ def cli(
     bucket: str,
     key: str,
     tree_path: io.TextIOBase,
-    tree_name: str,
+    tree_name: Optional[str] = None,
 ):
     end_time_datetime = datetime.datetime.fromtimestamp(end_time)
 
