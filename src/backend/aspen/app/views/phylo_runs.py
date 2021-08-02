@@ -130,6 +130,7 @@ def start_phylo_run():
         software_versions={},
         group=group,
         template_file_path=builds_template_file,
+        # TODO!! THIS IS THE WRONG TYPE!!!!!
         template_args=json.dumps(builds_template_args),
     )
 
@@ -140,4 +141,8 @@ def start_phylo_run():
     g.db_session.flush()
 
     responseschema = PhyloRunResponseSchema()
+
+    # TODO - invoke a step function!
+    # boto3.invok_step_something(parameters)
+    
     return jsonify(responseschema.dump(workflow))

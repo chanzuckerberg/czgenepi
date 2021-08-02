@@ -150,6 +150,7 @@ def cli(
             SoftwareNames.NCOV: ncov_rev,
             SoftwareNames.ASPEN_DOCKER_IMAGE: aspen_docker_image_version,
         }
+        # TODO - write the name of the phylo_run to the phylo tree
         phylo_run.outputs = [phylo_tree]
 
 
