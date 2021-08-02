@@ -114,7 +114,7 @@ def start_phylo_run():
     if not aligned_gisaid_dump:
         return Response("No gisaid dump for run", 500)
 
-    template_path_prefix = "src/backend/aspen/workflows/nextstrain_run/builds_templates"
+    template_path_prefix = "/usr/src/app/aspen/workflows/nextstrain_run/builds_templates"
     builds_template_file = (
         f"{template_path_prefix}/{PHYLO_TREE_TYPES[request_data['tree_type']]}"
     )
