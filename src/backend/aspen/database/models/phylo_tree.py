@@ -81,6 +81,8 @@ class PhyloRun(Workflow):
     """The arguments, in conjunction with the template file, used to produce the final
     builds file."""
 
+    name = Column(String, nullable=True)
+
     def tree(self) -> PhyloTree:
         """Find the tree resulting from this workflow."""
         for output in self.outputs:
