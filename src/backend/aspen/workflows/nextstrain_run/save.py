@@ -139,6 +139,7 @@ def cli(
             s3_bucket=bucket,
             s3_key=key,
             constituent_samples=included_samples,
+            name=phylo_run.name,
         )
 
         # update the run object with the metadata about the run.
