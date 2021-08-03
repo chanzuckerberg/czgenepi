@@ -98,7 +98,7 @@ def cli(
             .one()
         )
 
-        # Net new stuff we're working on TODO
+        # If we're writing a file for all county-wide samples, generate it here.
         if county_sequences_fh:
             # Get all samples for the group
             group = phylo_run.group
