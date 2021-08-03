@@ -148,7 +148,6 @@ def start_phylo_run():
     # TODO - invoke a step function!
     # boto3.invok_step_something(parameters)
     aspen_config = application.aspen_config
-    output_prefix_config_version = f"NEXTSTRAIN_RESULT_OUTPUT_PREFIX_{request_data['tree_type'].upper()}"
 
     sfn_input_json = {
       "Input": {
@@ -162,12 +161,12 @@ def start_phylo_run():
           "workflow_id": workflow.id,
         },
       },
-      "OutputPrefix": aspen_config[output_prefix_config_version],
-      "RUN_WDL_URI": aspen_config.SWIPE_WDL_URI,
-      "RunEC2Memory": aspen_config.EC2_MEMORY,
-      "RunEC2Vcpu": aspen_config.EC2_VCPU,
-      "RunSPOTMemory": aspen_config.SPOT_MEMORY,
-      "RunSPOTVcpu": aspen_config.SPOT_VCPU,
+      "OutputPrefix": aspen_config.NEXTSTRAIN_OUTPUT_PREFIX,
+      "RUN_WDL_URI": aspen_config.RUN_WDL_URI,
+      "RunEC2Memory": aspen_config.NEXTSTRAIN_EC2_MEMORY,
+      "RunEC2Vcpu": aspen_config.NEXTSTRAIN_EC2_VCPU,
+      "RunSPOTMemory": aspen_config.NEXTSTRAIN_SPOT_MEMORY,
+      "RunSPOTVcpu": aspen_config.NEXTSTRAIN_SPOT_VCPU,
     }
 
     session = aws.session()
@@ -178,7 +177,7 @@ def start_phylo_run():
 
     try:
         response = client.start_execution(
-            stateMachineArn=os.getenv("NEXTSTRAIN_SFN_ARM"),
+            stateMachineArn=os.environ.get("NEXTSTRAIN_SFN_ARM"),
             name=f"{group.name}-{user.name}-ondemand-nextstrain-build-{start_datetime}",
             input=json.dumps(sfn_input_json)
         )
