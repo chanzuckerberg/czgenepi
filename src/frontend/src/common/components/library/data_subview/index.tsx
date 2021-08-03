@@ -288,7 +288,7 @@ const DataSubview: FunctionComponent<Props> = ({
               <Button
                 onClick={handleDownloadClickOpen}
                 disabled={isDownloadDisabled}
-                style={{ backgroundColor: "transparent" }}
+                style={{ backgroundColor: "transparent"}}
               >
                 {isDownloadDisabled ? (
                   <StyledDownloadDisabledImage />

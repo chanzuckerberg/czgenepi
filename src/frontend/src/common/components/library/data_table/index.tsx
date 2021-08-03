@@ -164,7 +164,7 @@ export const DataTable: FunctionComponent<Props> = ({
   };
 
   const rowCheckbox = (item: TableItem): React.ReactNode => {
-    const checked: boolean = checkedSamples.includes(item.publicId);
+    const checked: boolean = checkedSamples.includes(item?.publicId);
     const handleClick = function handleClick() {
       handleRowCheckboxClick(
         String(item.publicId),

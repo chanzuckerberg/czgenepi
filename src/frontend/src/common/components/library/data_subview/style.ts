@@ -4,6 +4,7 @@ import {
   Button,
   Chip,
   fontBodyXs,
+  fontHeaderXs,
   getColors,
   getFontWeights,
   getSpacings,
@@ -12,6 +13,7 @@ import {
 import DownloadImage from "./IconDownload.svg";
 
 export const StyledDiv = styled.div`
+  {fontHeaderXs}
   float: left;
   ${(props) => {
     const spacings = getSpacings(props);
@@ -44,8 +46,12 @@ export const StyledChip = styled(Chip)`
   float: left;
   ${(props) => {
     const spacings = getSpacings(props);
+    const colors = getColors(props);
+    const fontWeights = getFontWeights(props);
     return `
       margin-top: ${spacings?.s}px;
+      background-color: ${colors?.gray[200]};
+      font-weight: ${fontWeights?.semibold}; 
     `;
   }}
 `;
@@ -67,7 +73,7 @@ export const DownloadWrapper = styled.div`
 `;
 
 export const StyledDownloadImage = styled(DownloadImage)`
-  width: 50px;
+  width: 32px;
   height: 32px;
   float: left;
   ${(props) => {
@@ -82,7 +88,7 @@ export const StyledDownloadImage = styled(DownloadImage)`
 `;
 
 export const StyledDownloadDisabledImage = styled(DownloadImage)`
-  width: 50px;
+  width: 32px;
   height: 32px;
   float: left;
   ${(props) => {
