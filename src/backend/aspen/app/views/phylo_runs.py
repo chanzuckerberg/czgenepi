@@ -129,8 +129,7 @@ def start_phylo_run():
         software_versions={},
         group=group,
         template_file_path=builds_template_file,
-        # TODO!! THIS IS THE WRONG TYPE!!!!!
-        template_args=json.dumps(builds_template_args),
+        template_args=builds_template_args,
         name=request_data["name"],
     )
 

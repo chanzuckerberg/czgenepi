@@ -114,11 +114,7 @@ def cli(
             )
             pathogen_genomes = [ sample.uploaded_pathogen_genome for sample in all_samples ]
             # Write all those samples to the sequences/metadata files
-            import pdb
-            pdb.set_trace()
-            do_smart_things_with_pathogen_list(session, pathogen_genomes, county_sequences_fh, county_metadata_fh)
-
-            # Success!
+            write_sequences_files(session, pathogen_genomes, county_sequences_fh, county_metadata_fh)
 
         # Populate builds.yaml file with values from the phylo_run template_args
         # and write them to the filesystem
@@ -130,7 +126,6 @@ def cli(
             if isinstance(phylo_run.template_args, Mapping)
             else {}
         )
-        print(template_args)
         builds_file_fh.write(build_template.format(**template_args))
 
         # get all the children that are pathogen genomes
@@ -142,7 +137,7 @@ def cli(
             inp for inp in phylo_run.inputs if isinstance(inp, AlignedGisaidDump)
         ][0]
 
-        do_smart_things_with_pathogen_list(session, pathogen_genomes, sequences_fh, metadata_fh)
+        write_sequences_files(session, pathogen_genomes, sequences_fh, metadata_fh)
 
         print(
             json.dumps(
@@ -154,7 +149,7 @@ def cli(
             )
         )
 
-def do_smart_things_with_pathogen_list(session, pathogen_genomes, sequences_fh, metadata_fh):
+def write_sequences_files(session, pathogen_genomes, sequences_fh, metadata_fh):
     # Create a list of the inputted pathogen genomes that are uploaded pathogen genomes
     uploaded_pathogen_genomes = {
         pathogen_genome
