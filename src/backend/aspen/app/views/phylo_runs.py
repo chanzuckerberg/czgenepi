@@ -121,7 +121,6 @@ def start_phylo_run():
     builds_template_args = {
         "division": group.division,
         "location": group.location,
-        "run_name": request_data["name"],
     }
 
     workflow: PhyloRun = PhyloRun(
@@ -132,6 +131,7 @@ def start_phylo_run():
         template_file_path=builds_template_file,
         # TODO!! THIS IS THE WRONG TYPE!!!!!
         template_args=json.dumps(builds_template_args),
+        name=request_data["name"],
     )
 
     workflow.inputs = list(pathogen_genomes)
