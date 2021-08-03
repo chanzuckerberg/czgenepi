@@ -148,7 +148,7 @@ def start_phylo_run():
     # TODO - invoke a step function!
     # boto3.invok_step_something(parameters)
     aspen_config = application.aspen_config
-    output_prefix_config_version = f"NEXTSTRAIN_RESULT_OUTPUT_PREFIX_{request_data['tree_type']}"
+    output_prefix_config_version = f"NEXTSTRAIN_RESULT_OUTPUT_PREFIX_{request_data['tree_type'].upper()}"
 
     sfn_input_json = {
       "Input": {
