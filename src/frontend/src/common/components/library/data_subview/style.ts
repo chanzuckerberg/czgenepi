@@ -80,7 +80,7 @@ export const StyledDownloadImage = styled(DownloadImage)`
     const colors = getColors(props);
     const spacings = getSpacings(props);
     return `
-      fill: ${colors?.primary[600]};
+      fill: ${colors?.primary[400]};
       margin-top: ${spacings?.xxxs}px;
       margin-left: ${spacings?.s}px;
     `;
