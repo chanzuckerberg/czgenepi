@@ -45,9 +45,9 @@ export const Title = styled.span`
 `;
 
 export const CheckBoxInfo = styled.div`
+  ${fontBodyS}
   position: inline-block;
   float: left;
-  ${fontBodyS}
   ${(props) => {
     const spacings = getSpacings(props);
     return `

@@ -75,7 +75,7 @@ function tsvDataMap(
     sortKey: ["CZBFailedGenomeRecovery"],
     text: "Genome Recovery",
   };
-  if (tableData !== undefined) {
+  if (tableData) {
     const filteredTableData = [...tableData];
     const filteredTableDataForReals = filteredTableData.filter((entry) =>
       checkedSamples.includes(entry["publicId"].toString())
@@ -155,12 +155,12 @@ const DataSubview: FunctionComponent<Props> = ({
   useEffect(() => {
     // add all samples if header checkbox is selected
     if (isHeaderChecked) {
-      const allPublicIds: any[] = [];
-      const failedSamples: any[] = [];
+      const allPublicIds: string[] = [];
+      const failedSamples: string[] = [];
       for (const key in data) {
-        allPublicIds.push(data[key as any].publicId);
+        allPublicIds.push(data[key as any].publicId.toString());
         if (data[key as any].CZBFailedGenomeRecovery) {
-          failedSamples.push(data[key as any].publicId);
+          failedSamples.push(data[key as any].publicId.toString());
         }
       }
       setCheckedSamples(allPublicIds);
@@ -181,7 +181,7 @@ const DataSubview: FunctionComponent<Props> = ({
   useEffect(() => {
     // determine if mixed state (user has custom selected samples)
     if (data) {
-      const sizeData: number = Object.keys(data).length;
+      const sizeData = Object.keys(data).length;
       if (checkedSamples.length === 0 || checkedSamples.length === sizeData) {
         setHeaderIndeterminant(false);
       } else {
@@ -278,10 +278,10 @@ const DataSubview: FunctionComponent<Props> = ({
           <StyledDiv>Selected </StyledDiv>
           <Divider />
           <Tooltip
+            arrow
+            inverted
             title={DOWNLOAD_TOOLTIP_TEXT}
             disableHoverListener={!isDownloadDisabled}
-            arrow={true}
-            inverted={true}
             placement="top-start"
           >
             <span>

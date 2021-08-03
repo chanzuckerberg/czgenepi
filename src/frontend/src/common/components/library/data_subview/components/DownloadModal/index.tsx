@@ -95,6 +95,7 @@ const DownloadModal = ({
         .toISOString()
         .slice(0, 10)}.fasta`;
       link.click();
+      link.remove();
       onClose();
     },
   });

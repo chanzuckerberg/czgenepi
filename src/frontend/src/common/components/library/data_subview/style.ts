@@ -5,20 +5,21 @@ import {
   Chip,
   fontBodyXs,
   getColors,
+  getFontWeights,
   getSpacings,
   Link,
 } from "czifui";
 import DownloadImage from "./IconDownload.svg";
 
 export const StyledDiv = styled.div`
-  font-weight: 550;
   float: left;
-
   ${(props) => {
     const spacings = getSpacings(props);
+    const fontWeights = getFontWeights(props);
     return `
     margin-left: ${spacings?.m}px;
     margin-top: ${spacings?.l}px;
+    font-weight: ${fontWeights?.semibold}; 
     color: black;
     `;
   }}
@@ -96,22 +97,29 @@ export const StyledDownloadDisabledImage = styled(DownloadImage)`
 `;
 
 export const BoldText = styled.div`
-  font-weight: 600;
+  ${(props) => {
+    const fontWeights = getFontWeights(props);
+
+    return `
+        font-weight: ${fontWeights?.semibold}; 
+      `;
+  }}
 `;
 
 export const DismissButton = styled(Button)`
   ${fontBodyXs}
-  font-weight: 600;
   &:hover {
     background-color: transparent;
   }
   ${(props) => {
     const spacings = getSpacings(props);
+    const fontWeights = getFontWeights(props);
     return `
-            margin-top: ${spacings?.xl}px;
-            margin-left: 0px;
-            padding-left: 0px;
-        `;
+      font-weight: ${fontWeights?.semibold}; 
+      margin-top: ${spacings?.xl}px;
+      margin-left: 0px;
+      padding-left: 0px;
+    `;
   }}
 `;
 

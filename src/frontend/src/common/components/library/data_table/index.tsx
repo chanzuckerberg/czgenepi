@@ -2,6 +2,7 @@ import { get, isEqual } from "lodash/fp";
 import React, { Fragment, FunctionComponent, useReducer } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
+import { noop } from "src/common/constants/empty";
 import SortArrowDownIcon from "src/common/icons/IconArrowDownSmall.svg";
 import SortArrowUpIcon from "src/common/icons/IconArrowUpSmall.svg";
 import { EmptyState } from "../data_subview/components/EmptyState";
@@ -163,19 +164,20 @@ export const DataTable: FunctionComponent<Props> = ({
   };
 
   const rowCheckbox = (item: TableItem): React.ReactNode => {
-    let handleClick;
-    if (item !== undefined) {
-      const checked: boolean = checkedSamples.includes(item.publicId);
-      handleClick = function handleClick() {
-        handleRowCheckboxClick(
-          item.publicId.toString(),
-          Boolean(item.CZBFailedGenomeRecovery)
-        );
-      };
-      return (
-        <RowCheckbox color="primary" onClick={handleClick} checked={checked} />
+    const checked: boolean = checkedSamples.includes(item.publicId);
+    const handleClick = function handleClick() {
+      handleRowCheckboxClick(
+        String(item.publicId),
+        Boolean(item.CZBFailedGenomeRecovery)
       );
-    }
+    };
+    return (
+      <RowCheckbox
+        color="primary"
+        onClick={item ? handleClick : noop}
+        checked={checked}
+      />
+    );
   };
 
   const render = (tableData: TableItem[]) => {
@@ -184,7 +186,7 @@ export const DataTable: FunctionComponent<Props> = ({
       return (
         <TableRow style={props.style} data-test-id="table-row">
           {showCheckboxes && rowCheckbox(item)}
-          {item === undefined ? null : sampleRow(item)}
+          {item ? sampleRow(item) : null}
         </TableRow>
       );
     }
