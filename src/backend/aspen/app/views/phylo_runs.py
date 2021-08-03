@@ -21,6 +21,8 @@ from aspen.database.models import (
     WorkflowStatusType,
 )
 
+from aspen import aws
+
 # What kinds of nextstrain build configs does this endpoint support?
 PHYLO_TREE_TYPES = {
     "local": "local.yaml",
@@ -122,9 +124,10 @@ def start_phylo_run():
         "division": group.division,
         "location": group.location,
     }
+    start_datetime=datetime.datetime.now()
 
     workflow: PhyloRun = PhyloRun(
-        start_datetime=datetime.datetime.now(),
+        start_datetime=start_datetime,
         workflow_status=WorkflowStatusType.STARTED,
         software_versions={},
         group=group,
@@ -143,5 +146,39 @@ def start_phylo_run():
 
     # TODO - invoke a step function!
     # boto3.invok_step_something(parameters)
+    aspen_config = application.aspen_config
+    output_prefix_config_version = f"NEXTSTRAIN_RESULT_OUTPUT_PREFIX_{request_data['tree_type']}"
+
+    sfn_input_json = {
+      "Input": {
+        "Run": {
+          "aspen_config_secret_name": os.environ.get("ASPEN_CONFIG_SECRET_NAME", "aspen-config"),
+          "aws_region": aws.region(),
+          "docker_image_id": aspen_config.NEXTSTRAIN_DOCKER_IMAGE_ID,
+          "group_name": group.name,
+          "remote_dev_prefix": "",
+          "s3_filestem": f"{group.location} {request_data["tree_type"].capitalize()}",
+          "workflow_id": workflow.id,
+        },
+      },
+      "OutputPrefix": aspen_config[output_prefix_config_version],
+      "RUN_WDL_URI": aspen_config.SWIPE_WDL_URI,
+      "RunEC2Memory": aspen_config.EC2_MEMORY,
+      "RunEC2Vcpu": aspen_config.EC2_VCPU,
+      "RunSPOTMemory": aspen_config.SPOT_MEMORY,
+      "RunSPOTVcpu": aspen_config.SPOT_VCPU,
+    }
+
+    session = aws.session()
+    client = session.client(
+        service_name="stepfunctions",
+        endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None
+    )
+
+    response = client.start_execution(
+        stateMachineArn=os.getenv("NEXTSTRAIN_SFN_ARM"),
+        name=f"{group.name}-{user.name}-ondemand-nextstrain-build-{start_datetime}",
+        input=json.dumps(sfn_input_json)
+    )
     
     return jsonify(responseschema.dump(workflow))
