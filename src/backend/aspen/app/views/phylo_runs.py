@@ -9,6 +9,7 @@ from marshmallow import fields, Schema, validate
 from marshmallow.exceptions import ValidationError
 from sqlalchemy import or_
 from sqlalchemy.orm import joinedload
+from botocore.exceptions import ClientError
 
 from aspen.app.app import application, requires_auth
 from aspen.app.views.api_utils import authz_sample_filters
@@ -175,10 +176,13 @@ def start_phylo_run():
         endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None
     )
 
-    response = client.start_execution(
-        stateMachineArn=os.getenv("NEXTSTRAIN_SFN_ARM"),
-        name=f"{group.name}-{user.name}-ondemand-nextstrain-build-{start_datetime}",
-        input=json.dumps(sfn_input_json)
-    )
+    try:
+        response = client.start_execution(
+            stateMachineArn=os.getenv("NEXTSTRAIN_SFN_ARM"),
+            name=f"{group.name}-{user.name}-ondemand-nextstrain-build-{start_datetime}",
+            input=json.dumps(sfn_input_json)
+        )
+    except ClientError as e:
+        return Response("Error starting phylo run", 500)
     
     return jsonify(responseschema.dump(workflow))
