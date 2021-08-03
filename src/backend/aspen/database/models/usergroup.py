@@ -26,6 +26,8 @@ class Group(idbase, DictMixin):  # type: ignore
         nullable=False,
         comment="used for creating public identifiers for samples",
     )
+    division = Column(String, nullable=True)
+    location = Column(String, nullable=True)
 
     can_see: MutableSequence[CanSee]
     can_be_seen_by: MutableSequence[CanSee]
