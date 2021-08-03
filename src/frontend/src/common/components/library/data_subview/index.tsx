@@ -138,7 +138,6 @@ const DataSubview: FunctionComponent<Props> = ({
   const [isDownloadDisabled, setDownloadDisabled] = useState<boolean>(true);
   const [failedSamples, setFailedSamples] = useState<string[]>([]);
   const [downloadFailed, setDownloadFailed] = useState<boolean>(false);
-  // for download modal
   const [isMetadataSelected, setMetadataSelected] = useState<boolean>(false);
   const [isFastaSelected, setFastaSelected] = useState<boolean>(false);
   const [isFastaDisabled, setFastaDisabled] = useState<boolean>(false);
@@ -157,15 +156,20 @@ const DataSubview: FunctionComponent<Props> = ({
     // add all samples if header checkbox is selected
     if (isHeaderChecked) {
       const allPublicIds: any[] = [];
+      const failedSamples: any[] = [];
       for (const key in data) {
         allPublicIds.push(data[key as any].publicId);
+        if (data[key as any].CZBFailedGenomeRecovery) {
+          failedSamples.push(data[key as any].publicId);
+        }
       }
       setCheckedSamples(allPublicIds);
+      setFailedSamples(failedSamples);
     } else {
       setFailedSamples([]);
       setCheckedSamples([]);
     }
-  }, [isHeaderChecked]);
+  }, [isHeaderChecked, data]);
 
   useEffect(() => {
     // Only show checkboxes on the sample datatable
@@ -184,7 +188,7 @@ const DataSubview: FunctionComponent<Props> = ({
         setHeaderIndeterminant(true);
       }
     }
-  }, [checkedSamples]);
+  }, [checkedSamples, data]);
 
   useEffect(() => {
     // disable sample download if no samples are selected
@@ -193,14 +197,14 @@ const DataSubview: FunctionComponent<Props> = ({
     } else {
       setDownloadDisabled(false);
     }
-  });
+  }, [checkedSamples]);
 
   useEffect(() => {
     // if there is an error then close the modal.
     if (downloadFailed) {
       setOpen(false);
     }
-  });
+  }, [downloadFailed]);
 
   function handleHeaderCheckboxClick() {
     if (isHeaderIndeterminant) {
