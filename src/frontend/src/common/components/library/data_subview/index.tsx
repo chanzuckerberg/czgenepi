@@ -14,7 +14,6 @@ import {
   BoldText,
   DismissButton,
   Divider,
-  DownloadButtonWrapper,
   DownloadWrapper,
   StyledAlert,
   StyledButton,
@@ -299,7 +298,6 @@ const DataSubview: FunctionComponent<Props> = ({
               <StyledButton
                 onClick={handleDownloadClickOpen}
                 disabled={isDownloadDisabled}
-                // style={{ backgroundColor: "transparent"}}
               >
                 {isDownloadDisabled ? (
                   <StyledDownloadDisabledImage />
@@ -342,7 +340,7 @@ const DataSubview: FunctionComponent<Props> = ({
                 data-test-id="search"
               />
             </div>
-            <DownloadButtonWrapper>
+            <div>
               {downloadFailed ? (
                 <StyledAlert className="elevated" severity="error">
                   <div>
@@ -367,7 +365,7 @@ const DataSubview: FunctionComponent<Props> = ({
               ) : (
                 downloadButton
               )}
-            </DownloadButtonWrapper>
+            </div>
           </div>
           <div className={style.samplesTable}>
             <DataTable
