@@ -80,8 +80,9 @@ class Config(object):
     # Stack name
     @property
     def STACK_PREFIX(self) -> str:
-        remote_prefix = os.getenv("REMOTE_DEV_PREFIX")
-        stack_name = remote_prefix if remote_prefix else f"{os.getenv("DEPLOYMENT_STAGE")}stack"
+        remote_prefix = os.environ.get("REMOTE_DEV_PREFIX")
+        deployment_stage = os.environ.get("DEPLOYMENT_STAGE")
+        stack_name = remote_prefix if remote_prefix else f"{deployment_stage}stack"
         return stack_name
 
     ####################################################################################
