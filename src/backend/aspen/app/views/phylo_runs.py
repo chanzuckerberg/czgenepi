@@ -157,7 +157,7 @@ def start_phylo_run():
           "aws_region": aws.region(),
           "docker_image_id": aspen_config.NEXTSTRAIN_DOCKER_IMAGE_ID,
           "group_name": group.name,
-          "remote_dev_prefix": "",
+          "remote_dev_prefix": os.environ.get("REMOTE_DEV_PREFIX"),
           "s3_filestem": f"{group.location} {request_data['tree_type'].capitalize()}",
           "workflow_id": workflow.id,
         },
