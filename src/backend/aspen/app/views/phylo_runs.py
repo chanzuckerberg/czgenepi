@@ -177,7 +177,7 @@ def start_phylo_run():
 
     try:
         response = client.start_execution(
-            stateMachineArn=os.environ.get("NEXTSTRAIN_SFN_ARM"),
+            stateMachineArn=os.environ.get("NEXTSTRAIN_SFN_ARN"),
             name=f"{group.name}-{user.name}-ondemand-nextstrain-build-{start_datetime}",
             input=json.dumps(sfn_input_json)
         )
