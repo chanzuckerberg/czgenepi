@@ -200,7 +200,7 @@ const DownloadModal = ({
   function getBackgroundFastaColor() {
     if (isFastaDisabled) {
       // TODO: access this styling with props instead of hardcoding
-      return { color: "#999999" };
+      return { backgroundColor: "transparent", color: "#999999" };
     } else {
       return getBackgroundColor(isFastaSelected);
     }

@@ -100,7 +100,7 @@ export const StyledButton = styled(Button)`
   ${(props) => {
     const spacings = getSpacings(props);
     return `
-        margin-top: ${spacings?.l}px;
+        margin-top: ${spacings?.xxl}px;
         `;
   }}
 `;
