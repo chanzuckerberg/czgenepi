@@ -11,7 +11,7 @@ import {
   getColors,
   getFontWeights,
   getSpacings,
-w} from "czifui";
+} from "czifui";
 
 export const Header = styled.div`
   ${fontHeaderXl}
@@ -82,7 +82,6 @@ export const DownloadType = styled.div`
 
     `;
   }}
-  
 `;
 
 export const StyledButton = styled(Button)`

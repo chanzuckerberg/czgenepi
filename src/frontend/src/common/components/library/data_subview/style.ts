@@ -40,7 +40,6 @@ export const Divider = styled.div`
 
 export const StyledChip = styled(Chip)`
   ${(props) => {
-    const spacings = getSpacings(props);
     const colors = getColors(props);
     const fontWeights = getFontWeights(props);
     return `
@@ -91,7 +90,6 @@ export const StyledDownloadImage = styled(DownloadImage)`
   height: 32px;
   ${(props) => {
     const colors = getColors(props);
-    const spacings = getSpacings(props);
     return `
       fill: ${colors?.primary[400]};
     `;
@@ -103,7 +101,6 @@ export const StyledDownloadDisabledImage = styled(DownloadImage)`
   height: 32px;
   ${(props) => {
     const colors = getColors(props);
-    const spacings = getSpacings(props);
     return `
         fill: ${colors?.gray[300]};
     `;
@@ -113,7 +110,6 @@ export const StyledDownloadDisabledImage = styled(DownloadImage)`
 export const BoldText = styled.div`
   ${(props) => {
     const fontWeights = getFontWeights(props);
-
     return `
         font-weight: ${fontWeights?.semibold};
       `;
