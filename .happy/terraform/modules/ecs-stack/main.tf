@@ -221,27 +221,6 @@ module nextstrain_template_sfn_config {
   }
 }
 
-module nextstrain_template_sfn_config {
-  source   = "../sfn_config"
-  app_name = "nextstrain-ondemand"
-  image    = "${local.nextstrain_image_repo}:${local.image_tag}"
-  vcpus    = 10
-  memory   = 64000
-  wdl_path = "workflows/nextstrain-ondemand.wdl"
-  custom_stack_name     = local.custom_stack_name
-  deployment_stage      = local.deployment_stage
-  remote_dev_prefix     = local.remote_dev_prefix
-  stack_resource_prefix = local.stack_resource_prefix
-  swipe_comms_bucket    = local.swipe_comms_bucket
-  swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
-  event_role_arn        = local.event_role_arn
-   extra_args            =  {
-    aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
-    remote_dev_prefix        = local.remote_dev_prefix
-  }
-}
-
 module covidhub_import_sfn_config {
   source   = "../sfn_config"
   app_name = "covidhub-import-sfn"
