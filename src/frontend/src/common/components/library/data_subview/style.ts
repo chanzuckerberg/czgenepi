@@ -81,6 +81,7 @@ export const StyledButton = styled(Button)`
     return `
       fill: ${colors?.gray[300]};
       margin: ${spacings?.xxxs}px;
+      padding: ${spacings?.xs}px;
     `;
   }}
 `;
