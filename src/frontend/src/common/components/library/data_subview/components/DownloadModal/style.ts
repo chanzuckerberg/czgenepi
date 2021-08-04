@@ -58,6 +58,14 @@ export const Container = styled.div`
 
 export const StyledSpan = styled.span`
   border-radius: 5px;
+  ${(props) => {
+    const colors = getColors(props);
+    return `
+      &:hover {
+        background-color: ${colors?.gray[100]};
+      }
+    `;
+  }}
 `;
 
 export const CheckBoxWrapper = styled.div`
@@ -65,8 +73,12 @@ export const CheckBoxWrapper = styled.div`
   border-radius: 5px;
   ${(props) => {
     const spacings = getSpacings(props);
+    const colors = getColors(props);
     return `
       margin-bottom: ${spacings?.xxs}px;
+      &:hover {
+        background-color: ${colors?.gray[100]};
+      }
     `;
   }}
 `;
