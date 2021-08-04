@@ -1,7 +1,7 @@
 import { Dialog } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import { Alert, Tooltip } from "czifui";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { CSVLink } from "react-csv";
 import { useMutation } from "react-query";
 import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
@@ -60,6 +60,8 @@ const DownloadModal = ({
   const separator = "\t";
   const [tsvRows, setTsvRows] = useState<string[][]>([]);
   const [tsvHeaders, setTsvHeaders] = useState<string[]>([]);
+  const [anchorEl, setAnchorEl] = useState<Boolean>(false);
+  const tooltipRef = useCallback(node => setAnchorEl(node), []);
 
   useEffect(() => {
     if (tsvData) {
@@ -136,7 +138,10 @@ const DownloadModal = ({
               inverted
               title={FASTA_DISABLED_TOOLTIP_TEXT}
               disableHoverListener={!isFastaDisabled}
-              placement="top-start"
+              placement="top"
+              PopperProps={{
+                anchorEl,
+              }}
             >
               <StyledSpan style={getBackgroundFastaColor()}>
                 <CheckBoxWrapper>
@@ -151,7 +156,7 @@ const DownloadModal = ({
                     <DownloadType style={getBackgroundFastaColor()}>
                       Consensus Genome{" "}
                     </DownloadType>{" "}
-                    (consensus.fa)
+                    <span ref={tooltipRef}>(consensus.fa)</span>
                     <DownloadTypeInfo>
                       Download multiple consensus genomes in a single,
                       concatenated file
