@@ -82,7 +82,7 @@ class Config(object):
     def STACK_PREFIX(self) -> str:
         remote_prefix = os.environ.get("REMOTE_DEV_PREFIX")
         deployment_stage = os.environ.get("DEPLOYMENT_STAGE")
-        stack_name = remote_prefix if remote_prefix else f"{deployment_stage}stack"
+        stack_name = remote_prefix if remote_prefix else f"/{deployment_stage}stack"
         return stack_name
 
     ####################################################################################
@@ -252,7 +252,7 @@ class Config(object):
         session = aws.session()
 
         deployment_stage = os.environ.get("DEPLOYMENT_STAGE")
-        parameter_name = f"/aspen/{deployment_stage}/{self.STACK_PREFIX}/{parameter_suffix}"
+        parameter_name = f"/aspen/{deployment_stage}{self.STACK_PREFIX}/{parameter_suffix}"
         client = session.client(
             service_name="ssm", endpoint_url=os.environ.get("BOTO_ENDPOINT_URL")
         )
