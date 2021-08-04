@@ -1497,12 +1497,13 @@ def upgrade():
     )
     for sample in samples_to_update:
         epi_isl = MISSING_EPI_ISL_MAPPING[sample.public_identifier]
-        sample.uploaded_pathogen_genome.add_accession(
-            repository_type=PublicRepositoryType.GISAID,
-            public_identifier=epi_isl,
-            workflow_start_datetime=datetime.datetime.now(),
-            workflow_end_datetime=datetime.datetime.now(),
-        )
+        if sample.uploaded_pathogen_genome:
+            sample.uploaded_pathogen_genome.add_accession(
+                repository_type=PublicRepositoryType.GISAID,
+                public_identifier=epi_isl,
+                workflow_start_datetime=datetime.datetime.now(),
+                workflow_end_datetime=datetime.datetime.now(),
+            )
     session.commit()
 
 
