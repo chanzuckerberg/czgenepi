@@ -216,6 +216,22 @@ def download_samples(ctx, sample_ids):
     print(resp.headers)
     print(resp.text)
 
+@cli.group()
+def phylo_run():
+    pass
+
+@phylo_run.command(name="start")
+@click.option("-n","--name", required=True, type=str)
+@click.option("-t","--type", "tree_type", required=True, type=click.Choice(["local", "contextual"], case_sensitive=False))
+@click.argument("sample_ids", nargs=-1)
+@click.pass_context
+def start_phylo_run(ctx, name, tree_type, sample_ids):
+    # print("Name:", name, "Tree type:", tree_type, "Sample ids:", sample_ids)
+    api_client = ctx.obj["api_client"]
+    payload = { "name": name, "tree_type": tree_type, "samples": sample_ids }
+    resp = api_client.post("/api/phylo_runs", json=payload)
+    print(resp.headers)
+    print(resp.text)
 
 if __name__ == "__main__":
     cli()

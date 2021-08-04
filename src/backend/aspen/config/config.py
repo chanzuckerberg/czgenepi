@@ -272,7 +272,7 @@ class Config(object):
     ####################################################################################
     # SFN runtime input properties
     @property
-    def NEXSTRAIN_DOCKER_IMAGE_ID(self) -> str:
+    def NEXTSTRAIN_DOCKER_IMAGE_ID(self) -> str:
         return self.AWS_NEXTSTRAIN_SFN_PARAMETER["Input"]["Run"]["docker_image_id"]
 
     ####################################################################################
