@@ -292,7 +292,7 @@ const DataSubview: FunctionComponent<Props> = ({
                 ? DOWNLOAD_TOOLTIP_TEXT_DISABLED
                 : DOWNLOAD_TOOLTIP_TEXT_ENABLED
             }
-            placement="top-start"
+            placement="top"
           >
             <span>
               <StyledButton
