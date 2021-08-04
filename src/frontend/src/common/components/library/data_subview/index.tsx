@@ -23,6 +23,7 @@ import {
   StyledDownloadDisabledImage,
   StyledDownloadImage,
   StyledLink,
+  StyledSpan,
   TooltipDescriptionText,
   TooltipHeaderText,
 } from "./style";
@@ -294,7 +295,7 @@ const DataSubview: FunctionComponent<Props> = ({
             }
             placement="top"
           >
-            <span>
+            <StyledSpan>
               <StyledButton
                 onClick={handleDownloadClickOpen}
                 disabled={isDownloadDisabled}
@@ -306,7 +307,7 @@ const DataSubview: FunctionComponent<Props> = ({
                   <StyledDownloadImage />
                 )}
               </StyledButton>
-            </span>
+            </StyledSpan>
           </Tooltip>
         </DownloadWrapper>
       );

@@ -122,7 +122,7 @@ const DownloadModal = ({
         <StyledIconButton onClick={onClose}>
           <CloseIcon />
         </StyledIconButton>
-        <Header>Download Samples</Header>
+        <Header>Select Download</Header>
         <Title>
           {sampleIds.length} Sample{sampleIds.length > 1 && "s"} Selected
         </Title>

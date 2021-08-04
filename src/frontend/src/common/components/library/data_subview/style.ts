@@ -72,10 +72,14 @@ export const DownloadWrapper = styled.div`
   }}
 `;
 
+export const StyledSpan = styled.span`
+  display: flex;
+`;
+
 export const StyledButton = styled(Button)`
-  display: inline-block;
-  width: 2px;
-  height: 45px;
+  flex: 0 0 0;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   ${(props) => {
     const colors = getColors(props);
@@ -83,7 +87,7 @@ export const StyledButton = styled(Button)`
     return `
       fill: ${colors?.gray[300]};
       // margin-top: ${spacings?.xxxs}px;
-      margin-left: ${spacings?.xxs}px;
+      // margin-left: ${spacings?.xxs}px;
     `;
   }}
 `;
@@ -98,7 +102,7 @@ export const StyledDownloadImage = styled(DownloadImage)`
     return `
       fill: ${colors?.primary[400]};
       margin-top: ${spacings?.xxxs}px;
-      margin-left: ${spacings?.s}px;
+      // margin-left: ${spacings?.s}px;
     `;
   }}
 `;
@@ -113,7 +117,7 @@ export const StyledDownloadDisabledImage = styled(DownloadImage)`
     return `
         fill: ${colors?.gray[300]};
         margin-top: ${spacings?.xxxs}px;
-        margin-left: ${spacings?.s}px;
+        // margin-left: ${spacings?.s}px;
     `;
   }}
 `;
