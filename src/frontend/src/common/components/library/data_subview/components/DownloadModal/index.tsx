@@ -60,8 +60,8 @@ const DownloadModal = ({
   const separator = "\t";
   const [tsvRows, setTsvRows] = useState<string[][]>([]);
   const [tsvHeaders, setTsvHeaders] = useState<string[]>([]);
-  const [anchorEl, setAnchorEl] = useState<Boolean>(false);
-  const tooltipRef = useCallback(node => setAnchorEl(node), []);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement>();
+  const tooltipRef = useCallback((node) => setAnchorEl(node), []);
 
   useEffect(() => {
     if (tsvData) {
