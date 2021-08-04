@@ -251,7 +251,8 @@ class Config(object):
     def _AWS_SSM_PARAMETER(self, parameter_suffix) -> Mapping[str, Any]:
         session = aws.session()
 
-        parameter_name = f"/aspen/{os.environ.get("DEPLOYMENT_STAGE")}/{self.STACK_PREFIX}/{parameter_suffix}"
+        deployment_stage = os.environ.get("DEPLOYMENT_STAGE")
+        parameter_name = f"/aspen/{deployment_stage}/{self.STACK_PREFIX}/{parameter_suffix}"
         client = session.client(
             service_name="ssm", endpoint_url=os.environ.get("BOTO_ENDPOINT_URL")
         )
