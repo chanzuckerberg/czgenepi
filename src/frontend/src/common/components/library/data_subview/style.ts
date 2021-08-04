@@ -86,7 +86,7 @@ export const StyledButton = styled(Button)`
     const spacings = getSpacings(props);
     return `
       fill: ${colors?.gray[300]};
-      // margin-top: ${spacings?.xxxs}px;
+      margin-top: ${spacings?.l}px;
       // margin-left: ${spacings?.xxs}px;
     `;
   }}

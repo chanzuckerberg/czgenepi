@@ -6,20 +6,15 @@ import {
   fontBodyM,
   fontBodyS,
   fontBodyXs,
+  fontBodyXxs,
   fontHeaderXl,
   getColors,
+  getFontWeights,
   getSpacings,
-  Props,
-} from "czifui";
+w} from "czifui";
 
 export const Header = styled.div`
   ${fontHeaderXl}
-  ${(props: Props) => {
-    const spacings = getSpacings(props);
-    return `
-      margin-bottom: ${spacings?.s}px;
-    `;
-  }}
 `;
 
 export const Content = styled.div`
@@ -61,8 +56,13 @@ export const Container = styled.div`
   display: grid;
 `;
 
+export const StyledSpan = styled.span`
+
+`;
+
 export const CheckBoxWrapper = styled.div`
   width: 500px;
+  border-radius: 5px;
   ${(props) => {
     const spacings = getSpacings(props);
     return `
@@ -72,9 +72,17 @@ export const CheckBoxWrapper = styled.div`
 `;
 
 export const DownloadType = styled.div`
+  ${fontBodyXs}
   display: inline-block;
-  font-weight: 600;
   color: black;
+  ${(props) => {
+    const fontWeights = getFontWeights(props);
+    return `
+    font-weight: ${fontWeights?.semibold}; 
+
+    `;
+  }}
+  
 `;
 
 export const StyledButton = styled(Button)`
@@ -87,7 +95,7 @@ export const StyledButton = styled(Button)`
 `;
 
 export const DownloadTypeInfo = styled.div`
-  ${fontBodyXs}
+  ${fontBodyXxs}
   width: 400px;
 `;
 

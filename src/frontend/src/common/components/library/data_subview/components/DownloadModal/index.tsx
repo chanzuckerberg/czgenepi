@@ -159,7 +159,7 @@ const DownloadModal = ({
                 </CheckBoxWrapper>
               </span>
             </Tooltip>
-            <div style={{ height: "5px" }}></div>
+            <div style={{ height: "4px" }}></div>
             <CheckBoxWrapper style={getBackgroundColor(isMetadataSelected)}>
               <CheckBoxInfo>
                 <StyledCheckbox color="primary" onClick={handleMetadataClick} />
