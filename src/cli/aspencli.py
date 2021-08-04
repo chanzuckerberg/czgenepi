@@ -99,15 +99,20 @@ class ApiClient:
         self.url = url
         self.token_handler = token_handler
 
-    def get(self, path, **kwargs):
+    def get_headers(self):
         access_token = self.token_handler.get_id_token()
         headers = {"Authorization": f"Bearer {access_token}"}
+        if os.getenv("OAUTH2_PROXY_COOKIE"):
+            headers["Cookie"] = f"_oauth2_proxy={os.getenv('OAUTH2_PROXY_COOKIE')}"
+        return headers
+
+    def get(self, path, **kwargs):
+        headers = self.get_headers()
         url = f"{self.url}{path}"
         return requests.get(url, headers=headers, allow_redirects=False, **kwargs)
 
     def post(self, path, **kwargs):
-        access_token = self.token_handler.get_id_token()
-        headers = {"Authorization": f"Bearer {access_token}"}
+        headers = self.get_headers()
         url = f"{self.url}{path}"
         return requests.post(url, headers=headers, allow_redirects=False, **kwargs)
 
