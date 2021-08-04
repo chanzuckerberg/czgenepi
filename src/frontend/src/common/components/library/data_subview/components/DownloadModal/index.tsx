@@ -132,10 +132,10 @@ const DownloadModal = ({
         <Content data-test-id="modal-content">
           <Container>
             <Tooltip
+              arrow
+              inverted
               title={FASTA_DISABLED_TOOLTIP_TEXT}
               disableHoverListener={!isFastaDisabled}
-              arrow={true}
-              inverted={true}
               placement="top-start"
             >
               <StyledSpan style={getBackgroundFastaColor()}>
