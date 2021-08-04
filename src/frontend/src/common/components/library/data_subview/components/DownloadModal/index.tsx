@@ -21,6 +21,7 @@ import {
   StyledButton,
   StyledCheckbox,
   StyledIconButton,
+  StyledSpan,
   Title,
 } from "./style";
 
@@ -137,7 +138,7 @@ const DownloadModal = ({
               inverted={true}
               placement="top-start"
             >
-              <span style={getBackgroundFastaColor()}>
+              <StyledSpan style={getBackgroundFastaColor()}>
                 <CheckBoxWrapper>
                   <CheckBoxInfo>
                     <StyledCheckbox
@@ -157,7 +158,7 @@ const DownloadModal = ({
                     </DownloadTypeInfo>
                   </CheckBoxInfo>
                 </CheckBoxWrapper>
-              </span>
+              </StyledSpan>
             </Tooltip>
             <div style={{ height: "4px" }}></div>
             <CheckBoxWrapper style={getBackgroundColor(isMetadataSelected)}>

@@ -57,7 +57,7 @@ export const Container = styled.div`
 `;
 
 export const StyledSpan = styled.span`
-
+  border-radius: 5px;
 `;
 
 export const CheckBoxWrapper = styled.div`

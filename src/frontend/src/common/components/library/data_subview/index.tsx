@@ -79,7 +79,7 @@ function tsvDataMap(
   if (tableData) {
     const filteredTableData = [...tableData];
     const filteredTableDataForReals = filteredTableData.filter((entry) =>
-      checkedSamples.includes(entry["publicId"].toString())
+      checkedSamples.includes(String(entry["publicId"]))
     );
     const tsvData = filteredTableDataForReals.map((entry) => {
       return headersDownload.flatMap((header) => {
@@ -159,9 +159,9 @@ const DataSubview: FunctionComponent<Props> = ({
       const allPublicIds: string[] = [];
       const failedSamples: string[] = [];
       for (const key in data) {
-        allPublicIds.push(data[key as any].publicId.toString());
+        allPublicIds.push(String(data[key as any].publicId));
         if (data[key as any].CZBFailedGenomeRecovery) {
-          failedSamples.push(data[key as any].publicId.toString());
+          failedSamples.push(String(data[key as any].publicId));
         }
       }
       setCheckedSamples(allPublicIds);
