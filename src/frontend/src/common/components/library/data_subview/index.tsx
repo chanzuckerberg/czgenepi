@@ -1,4 +1,4 @@
-import { Button, Tooltip } from "czifui";
+import { Tooltip } from "czifui";
 import { escapeRegExp } from "lodash/fp";
 import React, {
   FunctionComponent,
@@ -17,6 +17,7 @@ import {
   DownloadButtonWrapper,
   DownloadWrapper,
   StyledAlert,
+  StyledButton,
   StyledChip,
   StyledDiv,
   StyledDownloadDisabledImage,
@@ -258,10 +259,16 @@ const DataSubview: FunctionComponent<Props> = ({
     dispatch({ results: filteredData, searching: false });
   };
 
-  const DOWNLOAD_TOOLTIP_TEXT = (
+  const DOWNLOAD_TOOLTIP_TEXT_DISABLED = (
     <div>
       <TooltipHeaderText>Download</TooltipHeaderText>
       <TooltipDescriptionText>Select at least 1 sample</TooltipDescriptionText>
+    </div>
+  );
+
+  const DOWNLOAD_TOOLTIP_TEXT_ENABLED = (
+    <div>
+      <TooltipHeaderText>Download</TooltipHeaderText>
     </div>
   );
 
@@ -280,22 +287,25 @@ const DataSubview: FunctionComponent<Props> = ({
           <Tooltip
             arrow
             inverted
-            title={DOWNLOAD_TOOLTIP_TEXT}
-            disableHoverListener={!isDownloadDisabled}
+            title={
+              isDownloadDisabled
+                ? DOWNLOAD_TOOLTIP_TEXT_DISABLED
+                : DOWNLOAD_TOOLTIP_TEXT_ENABLED
+            }
             placement="top-start"
           >
             <span>
-              <Button
+              <StyledButton
                 onClick={handleDownloadClickOpen}
                 disabled={isDownloadDisabled}
-                style={{ backgroundColor: "transparent"}}
+                // style={{ backgroundColor: "transparent"}}
               >
                 {isDownloadDisabled ? (
                   <StyledDownloadDisabledImage />
                 ) : (
                   <StyledDownloadImage />
                 )}
-              </Button>
+              </StyledButton>
             </span>
           </Tooltip>
         </DownloadWrapper>

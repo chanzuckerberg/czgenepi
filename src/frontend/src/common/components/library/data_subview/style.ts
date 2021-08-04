@@ -13,7 +13,7 @@ import {
 import DownloadImage from "./IconDownload.svg";
 
 export const StyledDiv = styled.div`
-  {fontHeaderXs}
+  ${fontHeaderXs}
   float: left;
   ${(props) => {
     const spacings = getSpacings(props);
@@ -68,6 +68,22 @@ export const DownloadWrapper = styled.div`
     const spacings = getSpacings(props);
     return `
       padding-bottom: ${spacings?.xxl}px;
+    `;
+  }}
+`;
+
+export const StyledButton = styled(Button)`
+  display: inline-block;
+  width: 2px;
+  height: 45px;
+  border-radius: 50%;
+  ${(props) => {
+    const colors = getColors(props);
+    const spacings = getSpacings(props);
+    return `
+      fill: ${colors?.gray[300]};
+      // margin-top: ${spacings?.xxxs}px;
+      margin-left: ${spacings?.xxs}px;
     `;
   }}
 `;
