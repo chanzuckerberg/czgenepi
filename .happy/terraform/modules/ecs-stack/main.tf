@@ -221,22 +221,6 @@ module nextstrain_template_sfn_config {
   }
 }
 
-module covidhub_import_sfn_config {
-  source   = "../sfn_config"
-  app_name = "covidhub-import-sfn"
-  image    = "${local.covidhub_import_image_repo}:june-1-uploaded-by"
-  memory   = 16000
-  wdl_path = "workflows/covidhub-import.wdl"
-  custom_stack_name     = local.custom_stack_name
-  deployment_stage      = local.deployment_stage
-  remote_dev_prefix     = local.remote_dev_prefix
-  stack_resource_prefix = local.stack_resource_prefix
-  swipe_comms_bucket    = local.swipe_comms_bucket
-  swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
-  event_role_arn        = local.event_role_arn
-}
-
 module migrate_db {
   source                = "../migration"
   stack_resource_prefix = local.stack_resource_prefix
