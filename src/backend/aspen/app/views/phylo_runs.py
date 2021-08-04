@@ -1,6 +1,7 @@
 import datetime
 import json
 import sentry_sdk
+import os
 
 from typing import Iterable, MutableSequence
 
@@ -157,7 +158,7 @@ def start_phylo_run():
           "docker_image_id": aspen_config.NEXTSTRAIN_DOCKER_IMAGE_ID,
           "group_name": group.name,
           "remote_dev_prefix": "",
-          "s3_filestem": f"{group.location} {request_data["tree_type"].capitalize()}",
+          "s3_filestem": f"{group.location} {request_data['tree_type'].capitalize()}",
           "workflow_id": workflow.id,
         },
       },
@@ -176,12 +177,12 @@ def start_phylo_run():
     )
 
     try:
-        response = client.start_execution(
+        client.start_execution(
             stateMachineArn=os.environ.get("NEXTSTRAIN_SFN_ARN"),
             name=f"{group.name}-{user.name}-ondemand-nextstrain-build-{start_datetime}",
             input=json.dumps(sfn_input_json)
         )
-    except ClientError as e:
+    except ClientError:
         return Response("Error starting phylo run", 500)
     
     return jsonify(responseschema.dump(workflow))

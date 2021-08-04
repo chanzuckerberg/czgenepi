@@ -2,7 +2,7 @@ import csv
 import io
 import json
 from pathlib import Path
-from typing import Any, Mapping, MutableMapping, Set, Tuple
+from typing import Any, Mapping, MutableMapping, Set, Tuple, Iterable
 
 import click
 from sqlalchemy import and_
