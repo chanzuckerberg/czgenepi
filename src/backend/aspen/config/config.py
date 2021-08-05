@@ -247,7 +247,7 @@ class Config(object):
 
     ####################################################################################
     # SSM Parameter properties
-    @lru_cache
+    @lru_cache()
     def _AWS_SSM_PARAMETER(self, parameter_suffix) -> Mapping[str, Any]:
         session = aws.session()
 
