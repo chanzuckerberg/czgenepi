@@ -267,7 +267,7 @@ class Config(object):
 
     @property
     def AWS_NEXTSTRAIN_SFN_PARAMETER(self) -> Mapping[str, Any]:
-        return self._AWS_SSM_PARAMETER("nextstrain-sfn")
+        return self._AWS_SSM_PARAMETER("nextstrain-ondemand-sfn")
 
     ####################################################################################
     # SFN runtime input properties
