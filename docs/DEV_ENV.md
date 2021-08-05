@@ -1,6 +1,6 @@
 # Local Development Environment
 
-This uses the [Happy Path setup](https://wiki.czi.team/display/TECH/Data+Portal+Happy+Path+--+How+it+works) created by the shared infra team.
+This uses the [Happy Path setup](https://czi.atlassian.net/wiki/spaces/SI/pages/2050588714/Happy+CLI#Installation) created by the shared infra team.
 
 ## Development quickstart
 
@@ -59,9 +59,11 @@ The dev environment is initialized with AWS Secrets/S3 data in the [src/backend/
 | `make local-status`                                               | Show the status of the containers in the dev environment.                          |                                                                                                                                                     |
 | `make local-clean`                                                | Remove everything related to the local dev environment (including db data!)        |                                                                                                                                                     |
 | `make local-sync`                                                 | Re-sync the local-environment state after modifying library deps or docker configs |                                                                                                                                                     |
-| `make frontend-test`                                               | run `npm test` in the frontend container (tests confined to `src/frontend`)        |                                                                                                                                                     |
-| `make frontend-test-build`                                        | run `npm run build` in `src/frontend`                                              |
-| `make frontend-check-style`                                       | run `npm run lint-ci` in `src/frontend`                                            |
+| `make frontend-tests`                                             | run `npm test` in the frontend container (unit tests confined to `src/frontend`)|                                                                                                                                                     |
+| `make frontend-e2e`                                               | run `npm run e2e` in the frontend container (end to end tests confined to `src/frontend`)|                                                                                                                                                     |
+| `make frontend-lint`                                              | run `npm run lint` to lint (eslint & stylelint) and autofix front end code |                                                                                                                                                     |
+| `make frontend-test-build`                                        | run `npm run build` in `src/frontend`                                              |                                                                                                                                                     |
+| `make frontend-check-style`                                       | run `npm run lint-ci` in `src/frontend` to lint (eslint & stylelint) but NOT fix front end code |                                                                                                                                                     |
 | `make utility-alembic-upgrade-head`                               | Upgrade local DB with new revisions                                                |                                                                                                                                                     |
 | `make utility-alembic-autogenerate MESSAGE="descriptive message"` | Autogenerate migration against local DB                                            |                                                                                                                                                     |
 | `make utility-alembic-undo-migration`                             | Undo the last applied migration                                                    |                                                                                                                                                     |
@@ -95,4 +97,4 @@ self-signed cert in for convenience.
 
 #### Configuring Pycharm with Docker Compose:
 
-Follow the instructions in [the wiki](https://wiki.czi.team/display/SI/PyCharm+configuration+for+Happy+Path)
+Follow the instructions in [the wiki](https://czi.atlassian.net/wiki/spaces/SI/pages/1801100933/PyCharm+configuration+for+Happy+Path)
