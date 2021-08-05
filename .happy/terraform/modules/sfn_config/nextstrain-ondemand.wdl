@@ -68,7 +68,7 @@ task nextstrain_workflow {
     # dump the sequences, metadata, and builds.yaml for a run out to disk.
     aligned_gisaid_location=$(
         python3 /usr/src/app/aspen/workflows/nextstrain_run/export.py \
-               --phylo-run-id "${workflow_id}"                        \
+               --phylo-run-id "~{workflow_id}"                        \
                --county-sequences ncov/data/sequences_aspen.fasta     \
                --county-metadata ncov/data/metadata_aspen.tsv         \
                --sequences ncov/data/sequences_selected.fasta         \
@@ -102,7 +102,7 @@ task nextstrain_workflow {
         --ncov-rev "${ncov_git_rev}"                                            \
         --aspen-docker-image-version ""                                         \
         --end-time "${end_time}"                                                \
-        --phylo-run-id "${workflow_id}"                                         \
+        --phylo-run-id "~{workflow_id}"                                         \
         --bucket "${aspen_s3_db_bucket}"                                        \
         --key "${key}"                                                          \
         --tree-path ncov/auspice/ncov_aspen.json                                \
