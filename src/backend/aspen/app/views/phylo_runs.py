@@ -1,4 +1,5 @@
 import datetime
+import string
 import json
 import sentry_sdk
 import os
@@ -126,7 +127,7 @@ def start_phylo_run():
         "division": group.division,
         "location": group.location,
     }
-    start_datetime=datetime.datetime.now()
+    start_datetime=str(datetime.datetime.now())
 
     workflow: PhyloRun = PhyloRun(
         start_datetime=start_datetime,
@@ -176,13 +177,13 @@ def start_phylo_run():
         endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None
     )
 
-    try:
-        client.start_execution(
-            stateMachineArn=os.environ.get("NEXTSTRAIN_SFN_ARN"),
-            name=f"{group.name}-{user.name}-ondemand-nextstrain-build-{start_datetime}",
-            input=json.dumps(sfn_input_json)
-        )
-    except ClientError:
-        return Response("Error starting phylo run", 500)
+    aws_safe_name_formatting_table = str.maketrans(" :","--")
+    aws_formatted_datetime = start_datetime.translate(aws_safe_name_formatting_table)
+
+    client.start_execution(
+        stateMachineArn=os.environ.get("NEXTSTRAIN_SFN_ARN"),
+        name=f"{group.name}-{user.name}-ondemand-nextstrain-build-{start_datetime}",
+        input=json.dumps(sfn_input_json)
+    )
     
     return jsonify(responseschema.dump(workflow))
