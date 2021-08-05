@@ -127,7 +127,7 @@ def start_phylo_run():
         "division": group.division,
         "location": group.location,
     }
-    start_datetime=str(datetime.datetime.now())
+    start_datetime=datetime.datetime.now()
 
     workflow: PhyloRun = PhyloRun(
         start_datetime=start_datetime,
@@ -178,7 +178,7 @@ def start_phylo_run():
     )
 
     aws_safe_name_formatting_table = str.maketrans(" :.","---")
-    aws_formatted_datetime = start_datetime.translate(aws_safe_name_formatting_table)
+    aws_formatted_datetime = str(start_datetime).translate(aws_safe_name_formatting_table)
 
     client.start_execution(
         stateMachineArn=os.environ.get("NEXTSTRAIN_SFN_ARN"),
