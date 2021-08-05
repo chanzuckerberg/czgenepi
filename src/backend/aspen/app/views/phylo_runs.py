@@ -177,7 +177,7 @@ def start_phylo_run():
         endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None
     )
 
-    aws_safe_name_formatting_table = str.maketrans(" :","--")
+    aws_safe_name_formatting_table = str.maketrans(" :.","---")
     aws_formatted_datetime = start_datetime.translate(aws_safe_name_formatting_table)
 
     client.start_execution(
