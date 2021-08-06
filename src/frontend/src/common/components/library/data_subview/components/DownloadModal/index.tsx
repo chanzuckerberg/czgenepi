@@ -58,6 +58,9 @@ const DownloadModal = ({
   const groupName = data?.group?.name.toLowerCase().replace(/ /g, "_"); // format group name for sequences download file
   const downloadDate = new Date();
   const separator = "\t";
+  const downloadPrefix = `${groupName}_sample_sequences_${downloadDate
+    .toISOString()
+    .slice(0, 10)}`;
   const [tsvRows, setTsvRows] = useState<string[][]>([]);
   const [tsvHeaders, setTsvHeaders] = useState<string[]>([]);
   const [anchorEl, setAnchorEl] = useState<HTMLElement>();
@@ -94,9 +97,7 @@ const DownloadModal = ({
     onSuccess: (data: any) => {
       const link = document.createElement("a");
       link.href = window.URL.createObjectURL(data);
-      link.download = `${groupName}_sample_sequences_${downloadDate
-        .toISOString()
-        .slice(0, 10)}.fasta`;
+      link.download = `${downloadPrefix}.fasta`;
       link.click();
       link.remove();
       onClose();
@@ -220,9 +221,7 @@ const DownloadModal = ({
 
   function getDownloadButton(): JSX.Element | undefined {
     // button will have different functionality depending on download type selected
-    const metadataFilename = `${groupName}_sample_sequences_${downloadDate
-      .toISOString()
-      .slice(0, 10)}_metadata.tsv`;
+    const metadataFilename = `${downloadPrefix}_metadata.tsv`;
 
     if (isMetadataSelected && !isFastaSelected) {
       return (
