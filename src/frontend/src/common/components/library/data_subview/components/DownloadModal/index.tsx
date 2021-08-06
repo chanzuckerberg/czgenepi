@@ -220,12 +220,16 @@ const DownloadModal = ({
 
   function getDownloadButton(): JSX.Element | undefined {
     // button will have different functionality depending on download type selected
+    const metadataFilename = `${groupName}_sample_sequences_${downloadDate
+      .toISOString()
+      .slice(0, 10)}_metadata.tsv`;
+
     if (isMetadataSelected && !isFastaSelected) {
       return (
         <CSVLink
           data={tsvRows}
           headers={tsvHeaders}
-          filename="samples_overview.tsv"
+          filename={metadataFilename}
           separator={separator}
           data-test-id="download-tsv-link"
         >
@@ -247,7 +251,7 @@ const DownloadModal = ({
         <CSVLink
           data={tsvRows}
           headers={tsvHeaders}
-          filename="samples_overview.tsv"
+          filename={metadataFilename}
           separator={separator}
           data-test-id="download-tsv-link"
         >
