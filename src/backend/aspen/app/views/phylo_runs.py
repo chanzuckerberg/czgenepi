@@ -2,6 +2,7 @@ import datetime
 import string
 import json
 import sentry_sdk
+import re
 import os
 
 from typing import Iterable, MutableSequence
@@ -157,8 +158,9 @@ def start_phylo_run():
           "aspen_config_secret_name": os.environ.get("ASPEN_CONFIG_SECRET_NAME", "aspen-config"),
           "aws_region": aws.region(),
           "docker_image_id": aspen_config.NEXTSTRAIN_DOCKER_IMAGE_ID,
-          "remote_dev_prefix": os.environ.get("REMOTE_DEV_PREFIX"),
-          "s3_filestem": f"{group.location} {request_data['tree_type'].capitalize()}",
+          "group_name": group.name,
+          "remote_dev_prefix": os.getenv("REMOTE_DEV_PREFIX"),
+          "s3_filestem": f"{group.location}/{request_data['tree_type'].capitalize()}",
           "workflow_id": workflow.id,
         },
       },
@@ -176,13 +178,16 @@ def start_phylo_run():
         endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None
     )
 
+
     aws_safe_name_formatting_table = str.maketrans(" :.","---")
     aws_formatted_datetime = str(start_datetime).translate(aws_safe_name_formatting_table)
+    execution_name = f"{group.name}-{user.name}-ondemand-nextstrain-build-{aws_formatted_datetime}"
+    execution_name = re.sub(r'[^0-9a-zA-Z-]', r'-', execution_name)
 
     client.start_execution(
         stateMachineArn=os.environ.get("NEXTSTRAIN_SFN_ARN"),
-        name=f"{group.name}-{user.name}-ondemand-nextstrain-build-{aws_formatted_datetime}",
+        name=execution_name,
         input=json.dumps(sfn_input_json)
     )
-    
+
     return jsonify(responseschema.dump(workflow))
