@@ -53,7 +53,7 @@ export default function Table({
     );
 
     return () => clearTimeout(timeout);
-  }, []);
+  }, [metadata]);
 
   useEffect(() => {
     if (hasImportedFile) {
@@ -65,7 +65,7 @@ export default function Table({
     const isValid = Object.values(rowValidation).every((isValid) => isValid);
 
     setIsValid(isValid);
-  }, [rowValidation]);
+  }, [rowValidation, setIsValid]);
 
   const handleRowValidation_ = (id: string, isValid: boolean) => {
     if (rowValidation[id] === isValid) return;
@@ -73,7 +73,9 @@ export default function Table({
     setRowValidation((prevState) => ({ ...prevState, [id]: isValid }));
   };
 
-  const handleRowValidation = useCallback(handleRowValidation_, []);
+  const handleRowValidation = useCallback(handleRowValidation_, [
+    rowValidation,
+  ]);
 
   const handleRowMetadata_ = (id: string, sampleMetadata: Metadata) => {
     setMetadata((prevMetadata) => {
@@ -100,7 +102,7 @@ export default function Table({
     });
   };
 
-  const applyToAllColumn = useCallback(applyToAllColumn_, []);
+  const applyToAllColumn = useCallback(applyToAllColumn_, [setMetadata]);
 
   if (!isReadyToRenderTable) {
     return (
