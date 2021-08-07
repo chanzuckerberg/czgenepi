@@ -9,18 +9,49 @@ import webbrowser
 import keyring
 from auth0.v3.authentication.token_verifier import (
     TokenVerifier,
+    JwksFetcher,
     AsymmetricSignatureVerifier,
 )
 
+class InsecureJwksFetcher(JwksFetcher):
+    def _fetch_jwks(self, force=False):
+        has_expired = self._cache_date + self._cache_ttl < time.time()
+
+        if not force and not has_expired:
+            # Return from cache
+            self._cache_is_fresh = False
+            return self._cache_value
+
+        # Invalidate cache and fetch fresh data
+        self._cache_value = {}
+        response = requests.get(self._jwks_url, verify=False)
+
+        if response.ok:
+            # Update cache
+            jwks = response.json()
+            self._cache_value = self._parse_jwks(jwks)
+            self._cache_is_fresh = True
+            self._cache_date = time.time()
+        return self._cache_value
 
 class TokenHandler:
-    def __init__(self, client_id, auth_url, keyring, verify=True):
+    def __init__(self, client_id, auth_url, keyring, oauth_api_config, verify=True):
         parsed_url = urlparse(auth_url)
         self.auth_url = auth_url
         self.domain = parsed_url.netloc
         self.client_id = client_id
         self.keyring = keyring
         self.verify = verify
+        self.waiting_status_code = oauth_api_config["waiting_status_code"]
+        self.poll_url = oauth_api_config["poll_url"].format(auth_url=self.auth_url)
+        self.device_auth_url = oauth_api_config["device_auth_url"].format(auth_url=self.auth_url)
+        self.jwks_url = oauth_api_config["jwks_url"].format(auth_url=self.auth_url)
+        self.client_secret = oauth_api_config["client_secret"]
+        if self.verify:
+            self.sv = AsymmetricSignatureVerifier(self.jwks_url)
+        else:
+            self.sv = AsymmetricSignatureVerifier(self.jwks_url)
+            self.sv._fetcher = InsecureJwksFetcher(self.jwks_url)
 
     def get_id_token(self):
         creds = self.load_creds()
@@ -30,10 +61,8 @@ class TokenHandler:
         return creds["id_token"]
 
     def decode_token(self, token):
-        jwks_url = f"{self.auth_url}/.well-known/jwks.json"
         issuer = f"{self.auth_url}/"
-        sv = AsymmetricSignatureVerifier(jwks_url)  # Reusable instance
-        payload = sv.verify_signature(token)
+        payload = self.sv.verify_signature(token)
         return payload
 
     def load_creds(self):
@@ -57,8 +86,10 @@ class TokenHandler:
         headers = {"content-type": "application/x-www-form-urlencoded"}
         json_headers = {"content-type": "application/json"}
         payload = {"client_id": self.client_id, "scope": "openid profile email"}
+        if self.client_secret:
+            payload["client_secret"] = self.client_secret
         auth_resp = requests.post(
-            f"{self.auth_url}/oauth/device/code",
+            self.device_auth_url,
             headers=headers,
             data=payload,
             verify=self.verify,
@@ -77,14 +108,16 @@ class TokenHandler:
             "audience": self.client_id,
             "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
         }
+        if self.client_secret:
+            poll_payload["client_secret"] = self.client_secret
         while True:
             res = requests.post(
-                f"{self.auth_url}/oauth/token",
+                self.poll_url,
                 headers=headers,
                 data=poll_payload,
                 verify=self.verify,
             )
-            if res.status_code == 403:
+            if res.status_code == self.waiting_status_code:
                 print("waiting...")
                 time.sleep(device_info["interval"])
                 continue
@@ -119,22 +152,38 @@ class CliConfig:
         "rdev": "https://{stack}-backend.dev.genepi.czi.technology",
         "local": "http://backend.genepinet.local:3000",
     }
+    default_oauth_api = {
+        "device_auth_url": "{auth_url}/oauth/device/code",
+        "poll_url": "{auth_url}/oauth/token",
+        "waiting_status_code": 403,
+        "client_secret": None,
+        "jwks_url": "{auth_url}/.well-known/jwks.json",
+    }
     oauth_config = {
         "prod": {
             "auth_url": "https://covidtracker.us.auth0.com",
             "client_id": "PAl0i5pE2rfNS184du02LpAHK5lDhcE2",
             "verify": True,
+            "oauth_api_config": default_oauth_api,
         },
         "default": {
             "auth_url": "https://covidtracker-staging.auth0.com",
             "client_id": "YIKBzdeiwgSoMZ88Fo1F65Ebd16Rj5mP",
             "verify": True,
+            "oauth_api_config": default_oauth_api,
         },
         "local": {
             "auth_url": "https://oidc.genepinet.local:8443",
             "client_id": "local-client-id",
             "verify": False,
-        },
+            "oauth_api_config": {
+                "waiting_status_code": 400,
+                "device_auth_url": "{auth_url}/connect/deviceauthorization",
+                "poll_url": "{auth_url}/connect/token",
+                "client_secret": "local-client-secret",
+                "jwks_url": "{auth_url}/.well-known/openid-configuration/jwks",
+            }
+        }
     }
 
     def __init__(self, env, api=None, stack=None):
@@ -154,6 +203,7 @@ class CliConfig:
             client_id=auth_config["client_id"],
             auth_url=auth_config["auth_url"],
             keyring=keyring.get_keyring(),
+            oauth_api_config=auth_config["oauth_api_config"],
             verify=auth_config["verify"],
         )
         api_client = ApiClient(self.api, token_handler)

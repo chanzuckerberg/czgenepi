@@ -24,7 +24,7 @@ ${local_aws} secretsmanager update-secret --secret-id aspen-config --secret-stri
   "AUTH0_CLIENT_ID": "local-client-id",
   "AUTH0_CALLBACK_URL": "'"${BACKEND_URL}"'/callback",
   "AUTH0_CLIENT_SECRET": "local-client-secret",
-  "AUTH0_DOMAIN": "oidc",
+  "AUTH0_DOMAIN": "oidc.genepinet.local:8443",
   "AUTH0_BASE_URL": "'"${OIDC_INTERNAL_URL}"'",
   "AUTH0_USERINFO_URL": "connect/userinfo",
   "AUTH0_ACCESS_TOKEN_URL": "'"${OIDC_INTERNAL_URL}"'/connect/token",
