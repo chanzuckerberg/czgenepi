@@ -58,9 +58,12 @@ const DownloadModal = ({
   const groupName = data?.group?.name.toLowerCase().replace(/ /g, "_"); // format group name for sequences download file
   const downloadDate = new Date();
   const separator = "\t";
-  const downloadPrefix = `${groupName}_sample_sequences_${downloadDate
+  const fastaDownloadName = `${groupName}_sample_sequences_${downloadDate
     .toISOString()
-    .slice(0, 10)}`;
+    .slice(0, 10)}.fasta`;
+  const metadataDownloadName = `${groupName}_sample_metadata_${downloadDate
+    .toISOString()
+    .slice(0, 10)}.tsv`;
   const [tsvRows, setTsvRows] = useState<string[][]>([]);
   const [tsvHeaders, setTsvHeaders] = useState<string[]>([]);
   const [anchorEl, setAnchorEl] = useState<HTMLElement>();
@@ -97,7 +100,7 @@ const DownloadModal = ({
     onSuccess: (data: any) => {
       const link = document.createElement("a");
       link.href = window.URL.createObjectURL(data);
-      link.download = `${downloadPrefix}.fasta`;
+      link.download = fastaDownloadName;
       link.click();
       link.remove();
       onClose();
@@ -157,7 +160,7 @@ const DownloadModal = ({
                     <DownloadType style={getBackgroundFastaColor()}>
                       Consensus Genome{" "}
                     </DownloadType>{" "}
-                    <span ref={tooltipRef}>(consensus.fa)</span>
+                    <span ref={tooltipRef}>(.fasta)</span>
                     <DownloadTypeInfo>
                       Download multiple consensus genomes in a single,
                       concatenated file
@@ -172,8 +175,7 @@ const DownloadModal = ({
                 <StyledCheckbox color="primary" onClick={handleMetadataClick} />
               </CheckBoxInfo>
               <CheckBoxInfo>
-                <DownloadType>Sample Metadata </DownloadType>{" "}
-                (sample_metadata.tsv)
+                <DownloadType>Sample Metadata </DownloadType> (.tsv)
                 <DownloadTypeInfo>
                   Sample metadata including Private and Public IDs, Collection
                   Date, Sequencing Date, Lineage, GISAID Status, and ISL
@@ -221,14 +223,13 @@ const DownloadModal = ({
 
   function getDownloadButton(): JSX.Element | undefined {
     // button will have different functionality depending on download type selected
-    const metadataFilename = `${downloadPrefix}_metadata.tsv`;
 
     if (isMetadataSelected && !isFastaSelected) {
       return (
         <CSVLink
           data={tsvRows}
           headers={tsvHeaders}
-          filename={metadataFilename}
+          filename={metadataDownloadName}
           separator={separator}
           data-test-id="download-tsv-link"
         >
@@ -250,7 +251,7 @@ const DownloadModal = ({
         <CSVLink
           data={tsvRows}
           headers={tsvHeaders}
-          filename={metadataFilename}
+          filename={metadataDownloadName}
           separator={separator}
           data-test-id="download-tsv-link"
         >
