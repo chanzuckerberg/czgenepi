@@ -153,7 +153,6 @@ def prepare_sequences_download():
     user = g.auth_user
     fasta_filename = f"{user.group.name}_sample_sequences.fasta"
     request_data = request.get_json()
-    sample_ids = request_data["requested_sequences"]["sample_ids"]
 
     @stream_with_context
     def stream_samples(cansee_groups_private_identifiers):

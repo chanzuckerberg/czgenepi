@@ -1,8 +1,7 @@
 import datetime
 from collections import Counter
-from typing import Collection, Iterable, List, Mapping, Optional, Set, Tuple, Union
+from typing import Collection, List, Mapping, Optional, Set, Tuple, Union
 
-from flask import g, Response
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.query import Query
 from sqlalchemy.orm.session import Session

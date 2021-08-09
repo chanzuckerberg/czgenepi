@@ -2,15 +2,12 @@ import datetime
 import json
 import os
 import re
-import string
 from typing import Iterable, MutableSequence
 
 import sentry_sdk
-from botocore.exceptions import ClientError
 from flask import g, jsonify, request, Response
 from marshmallow import fields, Schema, validate
 from marshmallow.exceptions import ValidationError
-from sqlalchemy import or_
 from sqlalchemy.orm import joinedload
 
 from aspen import aws
@@ -51,6 +48,7 @@ class GroupResponseSchema(Schema):
 
 class WorkflowStatusSchema(Schema):
     name = fields.String()
+
 
 class PhyloRunResponseSchema(Schema):
     id = fields.Int()

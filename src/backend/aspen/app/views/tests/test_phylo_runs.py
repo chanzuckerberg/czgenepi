@@ -1,6 +1,5 @@
 import json
 
-from aspen.database.models import CanSee, DataType
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
 from aspen.test_infra.models.usergroup import group_factory, user_factory
@@ -42,6 +41,7 @@ def test_create_phylo_run(
     assert response["group"]["name"] == group.name
     assert "id" in response
 
+
 def test_create_invalid_phylo_run_name(
     session,
     app,
@@ -68,6 +68,7 @@ def test_create_invalid_phylo_run_name(
     }
     res = client.post("/api/phylo_runs", json=data)
     assert res.status == "400 BAD REQUEST"
+
 
 def test_create_invalid_phylo_run_tree_type(
     session,
@@ -96,6 +97,7 @@ def test_create_invalid_phylo_run_tree_type(
     res = client.post("/api/phylo_runs", json=data)
     assert res.status == "400 BAD REQUEST"
 
+
 def test_create_invalid_phylo_run_bad_sample_id(
     session,
     app,
@@ -122,6 +124,7 @@ def test_create_invalid_phylo_run_bad_sample_id(
     }
     res = client.post("/api/phylo_runs", json=data)
     assert res.status == "400 BAD REQUEST"
+
 
 def test_create_invalid_phylo_run_sample_cannot_see(
     session,
@@ -154,6 +157,7 @@ def test_create_invalid_phylo_run_sample_cannot_see(
     }
     res = client.post("/api/phylo_runs", json=data)
     assert res.status == "400 BAD REQUEST"
+
 
 def test_create_phylo_run_unauthorized_access_redirect(
     session,

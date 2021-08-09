@@ -17,16 +17,12 @@ from aspen.database.connection import (
 )
 from aspen.database.models import (
     AlignedGisaidDump,
-    Bam,
-    CalledPathogenGenome,
     Entity,
     EntityType,
-    HostFilteredSequencingReadsCollection,
     PathogenGenome,
     PhyloRun,
     PublicRepositoryType,
     Sample,
-    SequencingReadsCollection,
     UploadedPathogenGenome,
 )
 from aspen.database.models.workflow import Workflow
