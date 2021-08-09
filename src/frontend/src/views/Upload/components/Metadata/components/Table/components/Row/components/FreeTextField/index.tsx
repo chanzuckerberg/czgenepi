@@ -13,14 +13,15 @@ export default function FreeTextField({
   fieldKey,
   formik,
   isShown,
-}: Props): JSX.Element {
+}: Props): JSX.Element | null {
   const { handleChange, handleBlur, values, touched, errors } = formik;
 
   const errorMessage = touched[fieldKey] && errors[fieldKey];
 
+  if (!isShown) return null;
+
   return (
     <StyledTextField
-      isShown={isShown}
       name={fieldKey}
       margin="dense"
       variant="outlined"
