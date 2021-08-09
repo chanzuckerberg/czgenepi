@@ -135,9 +135,6 @@ export const DataTable: FunctionComponent<Props> = ({
   });
 
   const sampleRow = (item: TableItem): React.ReactNode => {
-    if (isLoading) {
-      return <EmptyState numOfColumns={headers.length} />;
-    }
     return headers.map((header, index) => {
       const value = item[header.key];
 
@@ -186,7 +183,12 @@ export const DataTable: FunctionComponent<Props> = ({
       return (
         <TableRow style={props.style} data-test-id="table-row">
           {showCheckboxes && rowCheckbox(item)}
-          {item ? sampleRow(item) : null}
+          {item ? (
+            sampleRow(item)
+          ) : (
+            <EmptyState numOfColumns={headers.length} />
+          )}
+          )
         </TableRow>
       );
     }
