@@ -96,7 +96,7 @@ class Config(object):
 
         secret_name = os.environ.get("ASPEN_CONFIG_SECRET_NAME", "aspen-config")
         client = session.client(
-            service_name="secretsmanager", endpoint_url=os.getenv("BOTO_ENDPOINT_URL")
+            service_name="secretsmanager", endpoint_url=os.environ.get("BOTO_ENDPOINT_URL")
         )
 
         try:

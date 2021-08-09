@@ -52,7 +52,6 @@ class GroupResponseSchema(Schema):
 class WorkflowStatusSchema(Schema):
     name = fields.String()
 
-
 class PhyloRunResponseSchema(Schema):
     id = fields.Int()
     start_datetime = fields.DateTime()
@@ -60,7 +59,7 @@ class PhyloRunResponseSchema(Schema):
     workflow_status = fields.Pluck(WorkflowStatusSchema, "name")
     group = fields.Nested(GroupResponseSchema, only=("id", "name"))
     template_file_path = fields.String()
-    template_args = fields.String()
+    template_args = fields.Nested(GroupResponseSchema, only=("division", "location"))
 
 
 @application.route("/api/phylo_runs", methods=["POST"])
@@ -177,12 +176,8 @@ def start_phylo_run():
         endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None,
     )
 
-    aws_safe_name_formatting_table = str.maketrans(" :.", "---")
-    aws_formatted_datetime = str(start_datetime).translate(
-        aws_safe_name_formatting_table
-    )
     execution_name = (
-        f"{group.name}-{user.name}-ondemand-nextstrain-build-{aws_formatted_datetime}"
+        f"{group.name}-{user.name}-ondemand-nextstrain-build-{str(start_datetime)}"
     )
     execution_name = re.sub(r"[^0-9a-zA-Z-]", r"-", execution_name)
 
@@ -192,4 +187,4 @@ def start_phylo_run():
         input=json.dumps(sfn_input_json),
     )
 
-    return jsonify(responseschema.dump(workflow))
+    return jsonify(responseschema.dumps(workflow))
