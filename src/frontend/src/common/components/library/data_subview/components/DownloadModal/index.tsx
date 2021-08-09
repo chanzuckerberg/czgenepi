@@ -124,6 +124,7 @@ const DownloadModal = ({
       disableEscapeKeyDown
       open={open}
       onClose={onClose}
+      maxWidth="m"
     >
       <DialogTitle>
         <StyledIconButton onClick={onClose}>
