@@ -1,4 +1,5 @@
 import { Table as MuiTable, TableBody, TableHead } from "@material-ui/core";
+import { reduce } from "lodash";
 import React, { useCallback, useEffect, useState } from "react";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import {
@@ -53,7 +54,7 @@ export default function Table({
     );
 
     return () => clearTimeout(timeout);
-  }, []);
+  }, [metadata]);
 
   useEffect(() => {
     if (hasImportedFile) {
@@ -65,7 +66,7 @@ export default function Table({
     const isValid = Object.values(rowValidation).every((isValid) => isValid);
 
     setIsValid(isValid);
-  }, [rowValidation]);
+  }, [rowValidation, setIsValid]);
 
   const handleRowValidation_ = (id: string, isValid: boolean) => {
     if (rowValidation[id] === isValid) return;
@@ -73,7 +74,9 @@ export default function Table({
     setRowValidation((prevState) => ({ ...prevState, [id]: isValid }));
   };
 
-  const handleRowValidation = useCallback(handleRowValidation_, []);
+  const handleRowValidation = useCallback(handleRowValidation_, [
+    rowValidation,
+  ]);
 
   const handleRowMetadata_ = (id: string, sampleMetadata: Metadata) => {
     setMetadata((prevMetadata) => {
@@ -100,7 +103,7 @@ export default function Table({
     });
   };
 
-  const applyToAllColumn = useCallback(applyToAllColumn_, []);
+  const applyToAllColumn = useCallback(applyToAllColumn_, [setMetadata]);
 
   if (!isReadyToRenderTable) {
     return (
@@ -109,6 +112,16 @@ export default function Table({
       </Overflow>
     );
   }
+
+  const shouldShowGISAIDFields = reduce(
+    metadata,
+    (shouldShow, data) => {
+      if (shouldShow) return true;
+      if (data?.submittedToGisaid) return true;
+      return false;
+    },
+    false
+  );
 
   return (
     <Overflow>
@@ -135,12 +148,16 @@ export default function Table({
                 <SubmittedToGisaidTableCell align="center" component="div">
                   {METADATA_KEYS_TO_HEADERS.submittedToGisaid}
                 </SubmittedToGisaidTableCell>
-                <StyledTableCell component="div">
-                  {METADATA_KEYS_TO_HEADERS.publicId}
-                </StyledTableCell>
-                <StyledTableCell component="div">
-                  {METADATA_KEYS_TO_HEADERS.islAccessionNumber}
-                </StyledTableCell>
+                {shouldShowGISAIDFields && (
+                  <>
+                    <StyledTableCell component="div">
+                      {METADATA_KEYS_TO_HEADERS.publicId}
+                    </StyledTableCell>
+                    <StyledTableCell component="div">
+                      {METADATA_KEYS_TO_HEADERS.islAccessionNumber}
+                    </StyledTableCell>
+                  </>
+                )}
               </StyledTableRow>
             </TableHead>
             {metadata && (
