@@ -252,7 +252,9 @@ class Config(object):
         session = aws.session()
 
         deployment_stage = os.environ.get("DEPLOYMENT_STAGE")
-        parameter_name = f"/aspen/{deployment_stage}{self.STACK_PREFIX}/{parameter_suffix}"
+        parameter_name = (
+            f"/aspen/{deployment_stage}{self.STACK_PREFIX}/{parameter_suffix}"
+        )
         client = session.client(
             service_name="ssm", endpoint_url=os.environ.get("BOTO_ENDPOINT_URL")
         )
@@ -288,15 +290,15 @@ class Config(object):
     @property
     def NEXTSTRAIN_EC2_MEMORY(self) -> str:
         return self.AWS_NEXTSTRAIN_SFN_PARAMETER["RunEC2Memory"]
-    
+
     @property
     def NEXTSTRAIN_EC2_VCPU(self) -> str:
         return self.AWS_NEXTSTRAIN_SFN_PARAMETER["RunEC2Vcpu"]
-    
+
     @property
     def NEXTSTRAIN_SPOT_MEMORY(self) -> str:
         return self.AWS_NEXTSTRAIN_SFN_PARAMETER["RunSPOTMemory"]
-    
+
     @property
     def NEXTSTRAIN_SPOT_VCPU(self) -> str:
         return self.AWS_NEXTSTRAIN_SFN_PARAMETER["RunSPOTVcpu"]

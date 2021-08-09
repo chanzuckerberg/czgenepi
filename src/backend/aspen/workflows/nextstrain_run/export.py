@@ -2,7 +2,7 @@ import csv
 import io
 import json
 from pathlib import Path
-from typing import Any, Mapping, MutableMapping, Set, Tuple, Iterable
+from typing import Any, Iterable, Mapping, MutableMapping, Set, Tuple
 
 import click
 from sqlalchemy import and_
@@ -66,8 +66,12 @@ METADATA_CSV_FIELDS = [
 @click.option("sequences_fh", "--sequences", type=click.File("w"), required=True)
 @click.option("metadata_fh", "--metadata", type=click.File("w"), required=True)
 @click.option("builds_file_fh", "--builds-file", type=click.File("w"), required=True)
-@click.option("county_sequences_fh", "--county-sequences", type=click.File("w"), required=False)
-@click.option("county_metadata_fh", "--county-metadata", type=click.File("w"), required=False)
+@click.option(
+    "county_sequences_fh", "--county-sequences", type=click.File("w"), required=False
+)
+@click.option(
+    "county_metadata_fh", "--county-metadata", type=click.File("w"), required=False
+)
 def cli(
     phylo_run_id: int,
     sequences_fh: io.TextIOBase,
@@ -104,17 +108,20 @@ def cli(
             group = phylo_run.group
             all_samples: Iterable[Sample] = (
                 session.query(Sample)
-                .filter(
-                    Sample.submitting_group_id == group.id
-                )
+                .filter(Sample.submitting_group_id == group.id)
                 .options(
                     joinedload(Sample.uploaded_pathogen_genome, innerjoin=True).undefer(
-                        PathogenGenome.sequence)
+                        PathogenGenome.sequence
+                    )
                 )
             )
-            pathogen_genomes = [ sample.uploaded_pathogen_genome for sample in all_samples ]
+            pathogen_genomes = [
+                sample.uploaded_pathogen_genome for sample in all_samples
+            ]
             # Write all those samples to the sequences/metadata files
-            write_sequences_files(session, pathogen_genomes, county_sequences_fh, county_metadata_fh)
+            write_sequences_files(
+                session, pathogen_genomes, county_sequences_fh, county_metadata_fh
+            )
 
         # Populate builds.yaml file with values from the phylo_run template_args
         # and write them to the filesystem
@@ -148,6 +155,7 @@ def cli(
                 }
             )
         )
+
 
 def write_sequences_files(session, pathogen_genomes, sequences_fh, metadata_fh):
     # Create a list of the inputted pathogen genomes that are uploaded pathogen genomes
@@ -187,19 +195,14 @@ def write_sequences_files(session, pathogen_genomes, sequences_fh, metadata_fh):
                     )
                 ),
                 accession_input_alias.id.in_(
-                    {
-                        pathogen_genome.entity_id
-                        for pathogen_genome in pathogen_genomes
-                    }
+                    {pathogen_genome.entity_id for pathogen_genome in pathogen_genomes}
                 ),
             )
         )
     }
 
     aspen_samples: Set[str] = set()
-    metadata_csv_fh = csv.DictWriter(
-        metadata_fh, METADATA_CSV_FIELDS, delimiter="\t"
-    )
+    metadata_csv_fh = csv.DictWriter(metadata_fh, METADATA_CSV_FIELDS, delimiter="\t")
     metadata_csv_fh.writeheader()
     for pathogen_genome in pathogen_genomes:
         # find the corresponding sample
@@ -261,6 +264,7 @@ def write_sequences_files(session, pathogen_genomes, sequences_fh, metadata_fh):
         sequences_fh.write(f">{sample.public_identifier}\n")
         sequences_fh.write(sequence)
         sequences_fh.write("\n")
+
 
 if __name__ == "__main__":
     cli()

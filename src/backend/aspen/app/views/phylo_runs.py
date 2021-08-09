@@ -1,19 +1,19 @@
 import datetime
-import string
 import json
-import sentry_sdk
-import re
 import os
-
+import re
+import string
 from typing import Iterable, MutableSequence
 
+import sentry_sdk
+from botocore.exceptions import ClientError
 from flask import g, jsonify, request, Response
 from marshmallow import fields, Schema, validate
 from marshmallow.exceptions import ValidationError
 from sqlalchemy import or_
 from sqlalchemy.orm import joinedload
-from botocore.exceptions import ClientError
 
+from aspen import aws
 from aspen.app.app import application, requires_auth
 from aspen.app.views.api_utils import authz_sample_filters
 from aspen.database.models import (
@@ -24,8 +24,6 @@ from aspen.database.models import (
     Workflow,
     WorkflowStatusType,
 )
-
-from aspen import aws
 
 # What kinds of nextstrain build configs does this endpoint support?
 PHYLO_TREE_TYPES = {
@@ -82,11 +80,8 @@ def start_phylo_run():
     sample_ids = request_data["samples"]
 
     # Step 2 - prepare big sample query per the old db cli
-    all_samples: Iterable[Sample] = (
-        g.db_session.query(Sample)
-        .options(
-            joinedload(Sample.uploaded_pathogen_genome, innerjoin=True),
-        )
+    all_samples: Iterable[Sample] = g.db_session.query(Sample).options(
+        joinedload(Sample.uploaded_pathogen_genome, innerjoin=True),
     )
     # Step 3 - Enforce AuthZ
     all_samples = authz_sample_filters(all_samples, sample_ids, user)
@@ -120,7 +115,9 @@ def start_phylo_run():
     if not aligned_gisaid_dump:
         return Response("No gisaid dump for run", 500)
 
-    template_path_prefix = "/usr/src/app/aspen/workflows/nextstrain_run/builds_templates"
+    template_path_prefix = (
+        "/usr/src/app/aspen/workflows/nextstrain_run/builds_templates"
+    )
     builds_template_file = (
         f"{template_path_prefix}/{PHYLO_TREE_TYPES[request_data['tree_type']]}"
     )
@@ -128,7 +125,7 @@ def start_phylo_run():
         "division": group.division,
         "location": group.location,
     }
-    start_datetime=datetime.datetime.now()
+    start_datetime = datetime.datetime.now()
 
     workflow: PhyloRun = PhyloRun(
         start_datetime=start_datetime,
@@ -153,41 +150,46 @@ def start_phylo_run():
     aspen_config = application.aspen_config
 
     sfn_input_json = {
-      "Input": {
-        "Run": {
-          "aspen_config_secret_name": os.environ.get("ASPEN_CONFIG_SECRET_NAME", "aspen-config"),
-          "aws_region": aws.region(),
-          "docker_image_id": aspen_config.NEXTSTRAIN_DOCKER_IMAGE_ID,
-          "group_name": group.name,
-          "remote_dev_prefix": os.getenv("REMOTE_DEV_PREFIX"),
-          "s3_filestem": f"{group.location}/{request_data['tree_type'].capitalize()}",
-          "workflow_id": workflow.id,
+        "Input": {
+            "Run": {
+                "aspen_config_secret_name": os.environ.get(
+                    "ASPEN_CONFIG_SECRET_NAME", "aspen-config"
+                ),
+                "aws_region": aws.region(),
+                "docker_image_id": aspen_config.NEXTSTRAIN_DOCKER_IMAGE_ID,
+                "group_name": group.name,
+                "remote_dev_prefix": os.getenv("REMOTE_DEV_PREFIX"),
+                "s3_filestem": f"{group.location}/{request_data['tree_type'].capitalize()}",
+                "workflow_id": workflow.id,
+            },
         },
-      },
-      "OutputPrefix": aspen_config.NEXTSTRAIN_OUTPUT_PREFIX,
-      "RUN_WDL_URI": aspen_config.RUN_WDL_URI,
-      "RunEC2Memory": aspen_config.NEXTSTRAIN_EC2_MEMORY,
-      "RunEC2Vcpu": aspen_config.NEXTSTRAIN_EC2_VCPU,
-      "RunSPOTMemory": aspen_config.NEXTSTRAIN_SPOT_MEMORY,
-      "RunSPOTVcpu": aspen_config.NEXTSTRAIN_SPOT_VCPU,
+        "OutputPrefix": aspen_config.NEXTSTRAIN_OUTPUT_PREFIX,
+        "RUN_WDL_URI": aspen_config.RUN_WDL_URI,
+        "RunEC2Memory": aspen_config.NEXTSTRAIN_EC2_MEMORY,
+        "RunEC2Vcpu": aspen_config.NEXTSTRAIN_EC2_VCPU,
+        "RunSPOTMemory": aspen_config.NEXTSTRAIN_SPOT_MEMORY,
+        "RunSPOTVcpu": aspen_config.NEXTSTRAIN_SPOT_VCPU,
     }
 
     session = aws.session()
     client = session.client(
         service_name="stepfunctions",
-        endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None
+        endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None,
     )
 
-
-    aws_safe_name_formatting_table = str.maketrans(" :.","---")
-    aws_formatted_datetime = str(start_datetime).translate(aws_safe_name_formatting_table)
-    execution_name = f"{group.name}-{user.name}-ondemand-nextstrain-build-{aws_formatted_datetime}"
-    execution_name = re.sub(r'[^0-9a-zA-Z-]', r'-', execution_name)
+    aws_safe_name_formatting_table = str.maketrans(" :.", "---")
+    aws_formatted_datetime = str(start_datetime).translate(
+        aws_safe_name_formatting_table
+    )
+    execution_name = (
+        f"{group.name}-{user.name}-ondemand-nextstrain-build-{aws_formatted_datetime}"
+    )
+    execution_name = re.sub(r"[^0-9a-zA-Z-]", r"-", execution_name)
 
     client.start_execution(
         stateMachineArn=os.environ.get("NEXTSTRAIN_SFN_ARN"),
         name=execution_name,
-        input=json.dumps(sfn_input_json)
+        input=json.dumps(sfn_input_json),
     )
 
     return jsonify(responseschema.dump(workflow))
