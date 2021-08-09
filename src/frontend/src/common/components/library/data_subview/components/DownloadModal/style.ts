@@ -69,7 +69,6 @@ export const StyledSpan = styled.span`
 `;
 
 export const CheckBoxWrapper = styled.div`
-  width: auto;
   border-radius: 5px;
   ${(props) => {
     const spacings = getSpacings(props);

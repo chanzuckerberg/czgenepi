@@ -124,7 +124,6 @@ const DownloadModal = ({
       disableEscapeKeyDown
       open={open}
       onClose={onClose}
-      maxWidth="md"
     >
       <DialogTitle>
         <StyledIconButton onClick={onClose}>
@@ -161,7 +160,7 @@ const DownloadModal = ({
                     <DownloadType style={getBackgroundFastaColor()}>
                       Consensus Genome{" "}
                     </DownloadType>{" "}
-                    <span ref={tooltipRef}>({fastaDownloadName})</span>
+                    <span ref={tooltipRef}>(.fasta)</span>
                     <DownloadTypeInfo>
                       Download multiple consensus genomes in a single,
                       concatenated file
@@ -176,8 +175,7 @@ const DownloadModal = ({
                 <StyledCheckbox color="primary" onClick={handleMetadataClick} />
               </CheckBoxInfo>
               <CheckBoxInfo>
-                <DownloadType>Sample Metadata </DownloadType> (
-                {metadataDownloadName})
+                <DownloadType>Sample Metadata </DownloadType> (.tsv)
                 <DownloadTypeInfo>
                   Sample metadata including Private and Public IDs, Collection
                   Date, Sequencing Date, Lineage, GISAID Status, and ISL
