@@ -21,7 +21,7 @@ Each engineer can run as many remote development *stacks* as they like. Each sta
 The general remote dev workflow is:
 
 1. Make some code changes
-1. Run `./scripts/happy create <your-stack-name>` to create a new stack
+1. Run `./scripts/happy create <your-stack-name>` to create a new stack (note: some special characters including underscores are not supported)
 1. Visit the URL printed by the create step, share it with the team, etc.
 1. Run `./scripts/happy logs <your-stack-name> backend` to tail the logs of the aspen api.
 1. Make some more code changes
@@ -29,12 +29,12 @@ The general remote dev workflow is:
 1. When you don't need your stack anymore, run `./scripts/happy delete <your-stack-name>` to free up remote dev resources.
 1. Run `./scripts/happy shell <your-stack-name> backend` to ssh into an ecs backend container for debugging
 
-If you forget which stacks you've created, just run `./scripts/happy list` at any time to list the current remote dev stacks. 
+If you forget which stacks you've created, just run `./scripts/happy list` at any time to list the current remote dev stacks.
 
 If you need to reset your remote dev stack DB run `./scripts/happy migrate <your-stack-name> --reset`.
 
 ### Connecting to remote dev databases
-NOTE - You'll need to [install and configure blessclient](https://wiki.czi.team/display/SI/Install+BlessClient) first!
+NOTE - You'll need to [install and configure blessclient](https://czi.atlassian.net/wiki/spaces/SI/pages/1779598774/Install+BlessClient) first!
 
 From the root of this repo, run `make remote-dbconsole DB=STACK_NAME_HERE` (replace STACK_NAME_HERE with the name of your stack!) to open a psql console on the remote dev db, or `make remote-pgconsole DB=STACK_NAME_HERE` to get a python console connected to the remote dev db.
 
