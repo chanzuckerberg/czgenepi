@@ -56,9 +56,9 @@ export function defaultHeaderRenderer({
   );
 }
 
-function defaultSorting(a: TableItem[], b: TableItem[], sortKey: string[]) {
+function defaultSorting(a: TableItem, b: TableItem, sortKey: string[]) {
   return String(get(sortKey, a)).localeCompare(String(get(sortKey, b)));
-};
+}
 
 function sortData(
   data: TableItem[],
