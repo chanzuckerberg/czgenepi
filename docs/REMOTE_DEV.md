@@ -21,7 +21,7 @@ Each engineer can run as many remote development *stacks* as they like. Each sta
 The general remote dev workflow is:
 
 1. Make some code changes
-1. Run `./scripts/happy create <your-stack-name>` to create a new stack
+1. Run `./scripts/happy create <your-stack-name>` to create a new stack (note: some special characters including underscores are not supported)
 1. Visit the URL printed by the create step, share it with the team, etc.
 1. Run `./scripts/happy logs <your-stack-name> backend` to tail the logs of the aspen api.
 1. Make some more code changes
