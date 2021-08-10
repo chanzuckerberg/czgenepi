@@ -226,7 +226,6 @@ def phylo_run():
 @click.argument("sample_ids", nargs=-1)
 @click.pass_context
 def start_phylo_run(ctx, name, tree_type, sample_ids):
-    # print("Name:", name, "Tree type:", tree_type, "Sample ids:", sample_ids)
     api_client = ctx.obj["api_client"]
     payload = { "name": name, "tree_type": tree_type, "samples": sample_ids }
     resp = api_client.post("/api/phylo_runs", json=payload)
