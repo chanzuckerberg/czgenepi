@@ -56,6 +56,10 @@ export function defaultHeaderRenderer({
   );
 }
 
+function defaultSorting(a: TableItem[], b: TableItem[], sortKey: string[]) {
+  return String(get(sortKey, a)).localeCompare(String(get(sortKey, b)));
+};
+
 function sortData(
   data: TableItem[],
   sortKey: string[],
@@ -73,10 +77,10 @@ function sortData(
       } else if (uploadDateBIsNA && !uploadDateAIsNA) {
         order = 1;
       } else {
-        order = String(get(sortKey, a)).localeCompare(String(get(sortKey, b)));
+        order = defaultSorting(a, b, sortKey);
       }
     } else {
-      order = String(get(sortKey, a)).localeCompare(String(get(sortKey, b)));
+      order = defaultSorting(a, b, sortKey);
     }
 
     if (!ascending) {
