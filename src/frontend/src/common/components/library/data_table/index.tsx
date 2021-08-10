@@ -56,17 +56,38 @@ export function defaultHeaderRenderer({
   );
 }
 
+function defaultSorting(a: TableItem, b: TableItem, sortKey: string[]) {
+  return String(get(sortKey, a)).localeCompare(String(get(sortKey, b)));
+}
+
 function sortData(
   data: TableItem[],
   sortKey: string[],
   ascending: boolean
 ): TableItem[] {
   return data.sort((a, b): number => {
-    let order = String(get(sortKey, a)).localeCompare(String(get(sortKey, b)));
-    if (!ascending) {
-      order = order * -1;
+    let order = 0;
+    if (sortKey[0] === "uploadDate") {
+      const uploadDateAIsNA = a["uploadDate"] === "N/A";
+      const uploadDateBIsNA = b["uploadDate"] === "N/A";
+      if (uploadDateAIsNA && uploadDateBIsNA) {
+        order = 0;
+      } else if (uploadDateAIsNA && !uploadDateBIsNA) {
+        order = -1;
+      } else if (uploadDateBIsNA && !uploadDateAIsNA) {
+        order = 1;
+      } else {
+        order = defaultSorting(a, b, sortKey);
+      }
+    } else {
+      order = defaultSorting(a, b, sortKey);
     }
-    return order;
+
+    if (!ascending) {
+      return order * -1;
+    } else {
+      return order;
+    }
   });
 }
 
