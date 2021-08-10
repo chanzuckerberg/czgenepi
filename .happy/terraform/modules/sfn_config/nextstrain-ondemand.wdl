@@ -41,7 +41,7 @@ task nextstrain_workflow {
     cat /proc/meminfo 1>&2
 
     start_time=$(date +%s)
-    build_id=$(date +%Y%m%d-%H%M)
+    build_date=$(date +%Y%m%d)
 
     export ASPEN_CONFIG_SECRET_NAME=~{aspen_config_secret_name}
     if [ "~{remote_dev_prefix}" != "" ]; then
@@ -83,10 +83,10 @@ task nextstrain_workflow {
     aws s3 cp --no-progress "s3://${aligned_gisaid_s3_bucket}/${aligned_gisaid_sequences_s3_key}" - | zstdmt -d | xz -2 > ncov/results/aligned_gisaid.fasta.xz
     aws s3 cp --no-progress "s3://${aligned_gisaid_s3_bucket}/${aligned_gisaid_metadata_s3_key}" ncov/data/metadata_gisaid.tsv
 
-    (cd ncov && snakemake --printshellcmds auspice/ncov_aspen.json --profile my_profiles/aspen/ --resources=mem_mb=312320) || aws s3 cp ncov/.snakemake/log/ "s3://${aspen_s3_db_bucket}/phylo_run/${build_id}/" --recursive
+    (cd ncov && snakemake --printshellcmds auspice/ncov_aspen.json --profile my_profiles/aspen/ --resources=mem_mb=312320) || aws s3 cp ncov/.snakemake/log/ "s3://${aspen_s3_db_bucket}/phylo_run/${build_date}/~{s3_filestem}/~{workflow_id}/logs/" --recursive
 
     # upload the tree to S3
-    key="phylo_run/${build_id}/~{s3_filestem}.json"
+    key="phylo_run/${build_date}/~{s3_filestem}/~{workflow_id}/ncov.json"
     aws s3 cp ncov/auspice/ncov_aspen.json "s3://${aspen_s3_db_bucket}/${key}"
 
     # update aspen

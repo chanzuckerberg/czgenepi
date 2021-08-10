@@ -8,23 +8,16 @@ def group_factory(
     location="Metropolis",
     division="West",
 ) -> Group:
+    # shortcut so we don't need to specify prefix
     if not prefix:
-        # shortcut so we don't need to specify prefix
-        return Group(
-            name=name,
-            address=address,
-            prefix=name,
-            location=location,
-            division=division,
-        )
-    else:
-        return Group(
-            name=name,
-            address=address,
-            prefix=prefix,
-            location=location,
-            division=division,
-        )
+        prefix = name
+    return Group(
+        name=name,
+        address=address,
+        prefix=prefix,
+        location=location,
+        division=division,
+    )
 
 
 def user_factory(
