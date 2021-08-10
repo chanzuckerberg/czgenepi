@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { Checkbox, getColors, getSpacings, Props } from "czifui";
+import { getColors, getSpacings, Props } from "czifui";
 
 export const TableRow = styled.div`
   display: flex;
@@ -40,36 +40,3 @@ export const icon = (props: Props): string => {
     fill: ${colors?.gray[500]};
   `;
 };
-
-export const RowCheckbox = styled(Checkbox)`
-  padding-right: 0px;
-  &:hover {
-    background-color: transparent;
-    &.Mui-checked {
-      background-color: transparent;
-    }
-  }
-`;
-
-export const HeaderCheckbox = styled(Checkbox)`
-  padding: 0;
-  &:hover {
-    background-color: transparent;
-    &.Mui-checked {
-      background-color: transparent;
-    }
-  }
-  ${(props) => {
-    const spacings = getSpacings(props);
-    const colors = getColors(props);
-
-    return `
-      padding-right: ${spacings?.l}px;
-      padding-left: ${spacings?.m}px;
-      padding-bottom: ${spacings?.l}px;
-      &.MuiCheckbox-indeterminate {
-        color: ${colors?.primary[500]};
-      }
-    `;
-  }}
-`;

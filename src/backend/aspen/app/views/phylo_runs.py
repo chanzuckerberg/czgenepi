@@ -84,15 +84,20 @@ def start_phylo_run():
     all_samples = authz_sample_filters(all_samples, sample_ids, user)
 
     pathogen_genomes: MutableSequence[PathogenGenome] = list()
-    found_sample_ids = set()
+    missing_sample_ids = list(sample_ids)  # Make a copy of sample id's
     for sample in all_samples:
         pathogen_genomes.append(sample.uploaded_pathogen_genome)
-        found_sample_ids.add(sample.private_identifier)
-        found_sample_ids.add(sample.public_identifier)
+        try:
+            missing_sample_ids.remove(sample.private_identifier)
+        except ValueError:
+            pass
+        try:
+            missing_sample_ids.remove(sample.public_identifier)
+        except ValueError:
+            pass
     if len(pathogen_genomes) == 0:
         raise ValueError("No sequences selected for run.")
 
-    missing_sample_ids = set(sample_ids) - found_sample_ids
     if missing_sample_ids:
         sentry_sdk.capture_message(
             f"User requested sample id's they didn't have access to ({missing_sample_ids})"
