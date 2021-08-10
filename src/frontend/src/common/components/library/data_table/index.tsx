@@ -188,7 +188,6 @@ export const DataTable: FunctionComponent<Props> = ({
           ) : (
             <EmptyState numOfColumns={headers.length} />
           )}
-          )
         </TableRow>
       );
     }
