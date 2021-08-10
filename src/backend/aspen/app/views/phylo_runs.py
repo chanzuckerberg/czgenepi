@@ -6,12 +6,16 @@ from typing import Iterable, MutableSequence
 
 import sentry_sdk
 from flask import g, jsonify, request, Response
-from marshmallow import fields, Schema, validate
 from marshmallow.exceptions import ValidationError
 from sqlalchemy.orm import joinedload
 
 from aspen import aws
 from aspen.app.app import application, requires_auth
+from aspen.app.serializers import (
+    PHYLO_TREE_TYPES,
+    PhyloRunRequestSchema,
+    PhyloRunResponseSchema,
+)
 from aspen.app.views.api_utils import authz_sample_filters
 from aspen.database.models import (
     AlignedGisaidDump,
@@ -21,43 +25,6 @@ from aspen.database.models import (
     Workflow,
     WorkflowStatusType,
 )
-
-# What kinds of nextstrain build configs does this endpoint support?
-PHYLO_TREE_TYPES = {
-    "local": "local.yaml",
-    "contextual": "contextual.yaml",
-}
-
-
-class PhyloRunRequestSchema(Schema):
-    name = fields.String(required=True, validate=validate.Length(min=1, max=128))
-    samples = fields.List(fields.String(), required=True)
-    tree_type = fields.String(
-        required=True, validate=validate.OneOf(PHYLO_TREE_TYPES.keys())
-    )
-
-
-class GroupResponseSchema(Schema):
-    id = fields.Int()
-    name = fields.String()
-    address = fields.String()
-    prefix = fields.String()
-    division = fields.String()
-    location = fields.String()
-
-
-class WorkflowStatusSchema(Schema):
-    name = fields.String()
-
-
-class PhyloRunResponseSchema(Schema):
-    id = fields.Int()
-    start_datetime = fields.DateTime()
-    end_datetime = fields.DateTime()
-    workflow_status = fields.Pluck(WorkflowStatusSchema, "name")
-    group = fields.Nested(GroupResponseSchema, only=("id", "name"))
-    template_file_path = fields.String()
-    template_args = fields.Nested(GroupResponseSchema, only=("division", "location"))
 
 
 @application.route("/api/phylo_runs", methods=["POST"])
@@ -83,6 +50,7 @@ def start_phylo_run():
     # Step 3 - Enforce AuthZ
     all_samples = authz_sample_filters(all_samples, sample_ids, user)
 
+    # Step 4 - Create a phylo run & associated input rows in the DB
     pathogen_genomes: MutableSequence[PathogenGenome] = list()
     found_sample_ids = set()
     for sample in all_samples:
@@ -137,10 +105,8 @@ def start_phylo_run():
 
     responseschema = PhyloRunResponseSchema()
 
-    # TODO - invoke a step function!
-    # boto3.invok_step_something(parameters)
+    # Step 5 - Kick off the phylo run job.
     aspen_config = application.aspen_config
-
     sfn_input_json = {
         "Input": {
             "Run": {
