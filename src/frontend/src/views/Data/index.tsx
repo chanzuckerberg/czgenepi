@@ -177,7 +177,6 @@ const Data: FunctionComponent = () => {
           headerRenderer={category.headerRenderer}
           renderer={category.renderer}
           viewName={category.text}
-          shouldShowFilters={shouldShowFilters}
         />
       </FlexContainer>
     </Container>

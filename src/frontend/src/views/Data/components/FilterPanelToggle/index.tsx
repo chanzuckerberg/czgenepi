@@ -6,11 +6,11 @@ interface Props {
   onClick: () => void;
 }
 
-export const FilterPanelToggle: FC = ({ onClick }: Props) => {
+export const FilterPanelToggle: FC<Props> = ({ onClick }): JSX.Element => {
   return (
     <StyledDiv>
       <IconButtonBubble onClick={onClick}>
-        <StyledIconFilters size="large" />
+        <StyledIconFilters />
       </IconButtonBubble>
     </StyledDiv>
   );
