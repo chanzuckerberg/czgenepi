@@ -67,3 +67,7 @@ export const PrivacyIcon = styled.span`
   left: 30px;
   bottom: -2px;
 `;
+
+export const FlexContainer = styled.div`
+  display: flex;
+`;
