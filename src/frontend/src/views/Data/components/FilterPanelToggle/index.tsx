@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { StyledButton } from "src/common/components/library/data_subview/style";
+import { IconButtonBubble } from "src/common/styles/support/style";
 import { StyledDiv, StyledIconFilters } from "./style";
 
 interface Props {
@@ -9,9 +9,9 @@ interface Props {
 export const FilterPanelToggle: FC = ({ onClick }: Props) => {
   return (
     <StyledDiv>
-      <StyledButton onClick={onClick}>
+      <IconButtonBubble onClick={onClick}>
         <StyledIconFilters size="large" />
-      </StyledButton>
+      </IconButtonBubble>
     </StyledDiv>
   );
 };

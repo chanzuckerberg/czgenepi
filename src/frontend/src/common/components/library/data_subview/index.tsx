@@ -9,6 +9,7 @@ import React, {
 import { Input } from "semantic-ui-react";
 import { DataTable } from "src/common/components";
 import { VIEWNAME } from "src/common/constants/types";
+import { IconButtonBubble } from "src/common/styles/support/style";
 import DownloadModal from "./components/DownloadModal";
 import style from "./index.module.scss";
 import {
@@ -17,7 +18,6 @@ import {
   Divider,
   DownloadWrapper,
   StyledAlert,
-  StyledButton,
   StyledChip,
   StyledDiv,
   StyledDownloadDisabledImage,
@@ -297,7 +297,7 @@ const DataSubview: FunctionComponent<Props> = ({
             placement="top"
           >
             <StyledSpan>
-              <StyledButton
+              <IconButtonBubble
                 onClick={handleDownloadClickOpen}
                 disabled={isDownloadDisabled}
               >
@@ -306,7 +306,7 @@ const DataSubview: FunctionComponent<Props> = ({
                 ) : (
                   <StyledDownloadImage />
                 )}
-              </StyledButton>
+              </IconButtonBubble>
             </StyledSpan>
           </Tooltip>
         </DownloadWrapper>
