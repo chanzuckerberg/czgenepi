@@ -66,6 +66,8 @@ services:
       - ENV=local
       - FLASK_APP=aspen.main
       - FLASK_DEBUG=1
+      - DEPLOYMENT_STAGE=local
+      - NEXTSTRAIN_SFN_ARN=arn:aws:states:us-west-2:000000000000:stateMachine:nextstrain-sfn
       - PYTHONPATH=.
     volumes:
       - ./src/backend:/usr/src/app
@@ -109,7 +111,7 @@ services:
       - "4566:4566"
     environment:
       - HOSTNAME_EXTERNAL=localstack
-      - SERVICES=s3,secretsmanager
+      - SERVICES=s3,secretsmanager,stepfunctions,ssm,iam
       - DEBUG=1
       - DATA_DIR=/tmp/localstack/data
       - PORT_WEB_UI=${PORT_WEB_UI- }
@@ -187,5 +189,4 @@ services:
 networks:
   genepinet:
 volumes:
-  database:
   localstack:

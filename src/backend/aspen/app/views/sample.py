@@ -17,7 +17,7 @@ from sqlalchemy.orm import joinedload
 
 from aspen.app.app import application, requires_auth
 from aspen.app.views import api_utils
-from aspen.app.views.api_utils import check_valid_sequence
+from aspen.app.views.api_utils import authz_sample_filters, check_valid_sequence
 from aspen.database.connection import session_scope
 from aspen.database.models import (
     DataType,
@@ -153,7 +153,6 @@ def prepare_sequences_download():
     user = g.auth_user
     fasta_filename = f"{user.group.name}_sample_sequences.fasta"
     request_data = request.get_json()
-    sample_ids = request_data["requested_sequences"]["sample_ids"]
 
     @stream_with_context
     def stream_samples(cansee_groups_private_identifiers):
@@ -166,21 +165,14 @@ def prepare_sequences_download():
                 .yield_per(
                     5
                 )  # Streams a few DB rows at a time but our query must return one row per resolved object.
-                .filter(
-                    and_(
-                        Sample.uploaded_pathogen_genome != None,  # noqa: E711
-                        or_(
-                            Sample.private_identifier.in_(sample_ids),
-                            Sample.public_identifier.in_(sample_ids),
-                        ),
-                    )
-                )
                 .options(
-                    joinedload(Sample.uploaded_pathogen_genome).undefer(
+                    joinedload(Sample.uploaded_pathogen_genome, innerjoin=True).undefer(
                         UploadedPathogenGenome.sequence
                     ),
                 )
             )
+            # Enforce AuthZ
+            all_samples = authz_sample_filters(all_samples, sample_ids, user)
 
             for sample in all_samples:
                 if sample.uploaded_pathogen_genome:
@@ -208,40 +200,12 @@ def prepare_sequences_download():
                     yield (stripped_sequence)
                     yield ("\n")
 
-    # query for samples we don't have access to
-    cansee_groups: Set[int] = {}
-    cansee_groups_private_identifiers: Set[int] = {}
-    if not user.system_admin:
-        cansee_groups: Set[int] = {
-            cansee.owner_group_id
-            for cansee in user.group.can_see
-            if cansee.data_type == DataType.SEQUENCES
-        }
-        # add the users own group
-        cansee_groups.add(user.group_id)
+    cansee_groups_private_identifiers: Set[int] = {
+        cansee.owner_group_id
+        for cansee in user.group.can_see
+        if cansee.data_type == DataType.PRIVATE_IDENTIFIERS
+    }
 
-        cansee_groups_private_identifiers: Set[int] = {
-            cansee.owner_group_id
-            for cansee in user.group.can_see
-            if cansee.data_type == DataType.PRIVATE_IDENTIFIERS
-        }
-
-        denied_samples: Iterable[Sample] = g.db_session.query(Sample).filter(
-            and_(Sample.submitting_group_id.not_in(cansee_groups)),
-            and_(
-                Sample.uploaded_pathogen_genome != None,  # noqa: E711
-                or_(
-                    Sample.private_identifier.in_(sample_ids),
-                    Sample.public_identifier.in_(sample_ids),
-                ),
-            ),
-        )
-        # check that user has access to the requested samples
-        for denied_sample in denied_samples:
-            return Response(
-                "User does not have access to the requested sequences",
-                403,
-            )
     # Detach all ORM objects (makes them read-only!) from the DB session for our generator.
     g.db_session.expunge_all()
     generator = stream_samples(cansee_groups_private_identifiers)

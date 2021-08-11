@@ -95,6 +95,7 @@ _SequencingProtocolTypeTable = enumtables.EnumTable(
 )
 
 
+# TODO, this model isn't being used right now.
 class SequencingReadsCollection(Entity, DictMixin):
     __tablename__ = "sequencing_reads_collections"
     __table_args__ = (UniqueConstraint("s3_bucket", "s3_key"),)

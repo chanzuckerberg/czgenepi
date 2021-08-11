@@ -1,12 +1,13 @@
 import datetime
 from collections import Counter
-from typing import Collection, List, Mapping, Optional, Tuple, Union
+from typing import Collection, List, Mapping, Optional, Set, Tuple, Union
 
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.query import Query
 from sqlalchemy.orm.session import Session
+from sqlalchemy.sql.expression import and_, or_
 
-from aspen.database.models import Group, Sample, User
+from aspen.database.models import DataType, Group, Sample, User
 
 
 def filter_usergroup_dict(
@@ -133,3 +134,49 @@ def check_valid_sequence(sequence: str) -> bool:
     Check that the sequence string only contains valid sequence characters
     """
     return set(sequence.upper()).issubset(set("WSKMYRVHDBNZNATCGU-"))
+
+
+def authz_sample_filters(query: Query, sample_ids: Set[str], user: User) -> Query:
+    # No filters for system admins
+    if user.system_admin:
+        query = query.filter(
+            or_(
+                Sample.public_identifier.in_(sample_ids),
+                Sample.private_identifier.in_(sample_ids),
+            )
+        )
+        return query
+
+    # Which groups can this user query public identifiers for?
+    cansee_groups: Set[int] = {
+        cansee.owner_group_id
+        for cansee in user.group.can_see
+        if cansee.data_type == DataType.SEQUENCES
+    }
+    # add the user's own group
+    cansee_groups.add(user.group_id)
+
+    # Which groups can this user query private identifiers for?
+    # NOTE - this asssumes PRIVATE_IDENTIFIERS permission is a superset of SEQUENCES
+    cansee_groups_private_identifiers: Set[int] = {
+        cansee.owner_group_id
+        for cansee in user.group.can_see
+        if cansee.data_type == DataType.PRIVATE_IDENTIFIERS
+    }
+    # add the user's own group
+    cansee_groups_private_identifiers.add(user.group_id)
+
+    cansee_groups.add(user.group_id)
+    query = query.filter(
+        or_(
+            and_(
+                Sample.submitting_group_id.in_(cansee_groups),
+                Sample.public_identifier.in_(sample_ids),
+            ),
+            and_(
+                Sample.submitting_group_id.in_(cansee_groups_private_identifiers),
+                Sample.private_identifier.in_(sample_ids),
+            ),
+        )
+    )
+    return query

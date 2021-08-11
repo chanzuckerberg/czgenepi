@@ -1,0 +1,78 @@
+inputs:
+  - name: "gisaid"
+    metadata: "data/metadata_gisaid.tsv"
+    sequences: "data/sequences_gisaid.fasta"
+  - name: "aspen"
+    metadata: "data/metadata_aspen.tsv"
+    sequences: "data/sequences_aspen.fasta"
+  - name: "selected"
+    metadata: "data/metadata_selected.tsv"
+    sequences: "data/sequences_selected.fasta"
+
+builds:
+  aspen:
+    country: USA
+    division: {division}
+    location: {location}
+    region: North America
+    subsampling_scheme: group_plus_context
+    title: '{location}, {division} and related contextual samples'
+
+## custom rules
+custom_rules:
+  - nextstrain_profiles/nextstrain-gisaid/subsampling_ranges.smk
+
+## Auxiliary files
+files:
+  lat_longs: "my_profiles/aspen/lat_longs.tsv"
+  ordering: "my_profiles/aspen/ordering.tsv"
+  description: "my_profiles/aspen/covidtrackerca.md"
+  auspice_config: "my_profiles/aspen/aspen_auspice_config_v2.json"
+
+## Parameters
+refine:
+  keep_polytomies: True
+
+## Subsampling schemas
+# Number of max_sequences will be an external variable total to half of user selected samples
+subsampling:
+  group_plus_context:
+    focal:
+      exclude: "--exclude-where 'selected!=yes'"
+
+    group:
+      group_by: "year month"
+      max_sequences: 200
+      query: --query "(location == '{{location}}') & (division == '{{division}}')"
+      priorities:
+        type: "proximity"
+        focus: "focal"
+
+    state:
+      group_by: "location year month"
+      max_sequences: 100
+      query: --query "(location != '{{location}}') & (division == '{{division}}')" # exclude add'l samples from {{location}}
+      priorities:
+        type: "proximity"
+        focus: "focal"
+
+    country:
+      group_by: "division year month"
+      max_sequences: 50
+      query: --query "(division != '{{division}}') & (country == '{{country}}')" # exclude add'l samples from CA
+      priorities:
+        type: "proximity"
+        focus: "focal"
+
+    international:
+      group_by: "region year month"
+      max_sequences: 20
+      query: --query "(country != '{{country}}')" # exclude add'l samples from USA
+      priorities:
+        type: "proximity"
+        focus: "focal"
+
+    international_serial_sampling:
+      group_by: "region year month"
+      seq_per_group: 2
+      query: --query "(country != '{{country}}')" 

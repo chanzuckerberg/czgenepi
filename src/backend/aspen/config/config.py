@@ -77,6 +77,15 @@ class Config(object):
             )
 
     ####################################################################################
+    # Stack name
+    @property
+    def STACK_PREFIX(self) -> str:
+        remote_prefix = os.environ.get("REMOTE_DEV_PREFIX")
+        deployment_stage = os.environ.get("DEPLOYMENT_STAGE")
+        stack_name = remote_prefix if remote_prefix else f"/{deployment_stage}stack"
+        return stack_name
+
+    ####################################################################################
     # AWS secrets
     @lru_cache()
     def _AWS_SECRET(self) -> Mapping[str, Any]:
@@ -87,7 +96,8 @@ class Config(object):
 
         secret_name = os.environ.get("ASPEN_CONFIG_SECRET_NAME", "aspen-config")
         client = session.client(
-            service_name="secretsmanager", endpoint_url=os.getenv("BOTO_ENDPOINT_URL")
+            service_name="secretsmanager",
+            endpoint_url=os.environ.get("BOTO_ENDPOINT_URL"),
         )
 
         try:
@@ -235,3 +245,61 @@ class Config(object):
             return self.AWS_SECRET["SENTRY_URL"]
         except KeyError:
             return ""
+
+    ####################################################################################
+    # SSM Parameter properties
+    @lru_cache()
+    def _AWS_SSM_PARAMETER(self, parameter_suffix) -> Mapping[str, Any]:
+        session = aws.session()
+
+        deployment_stage = os.environ.get("DEPLOYMENT_STAGE")
+        parameter_name = (
+            f"/aspen/{deployment_stage}{self.STACK_PREFIX}/{parameter_suffix}"
+        )
+        client = session.client(
+            service_name="ssm", endpoint_url=os.environ.get("BOTO_ENDPOINT_URL")
+        )
+
+        try:
+            get_parameter = client.get_parameter(Name=parameter_name)
+        except ClientError as e:
+            raise e
+        else:
+            parameter = get_parameter["Parameter"]["Value"]
+            return json.loads(parameter)
+
+    @property
+    def AWS_NEXTSTRAIN_SFN_PARAMETER(self) -> Mapping[str, Any]:
+        return self._AWS_SSM_PARAMETER("nextstrain-ondemand-sfn")
+
+    ####################################################################################
+    # SFN runtime input properties
+    @property
+    def NEXTSTRAIN_DOCKER_IMAGE_ID(self) -> str:
+        return self.AWS_NEXTSTRAIN_SFN_PARAMETER["Input"]["Run"]["docker_image_id"]
+
+    ####################################################################################
+    # SFN batch config properties
+    @property
+    def NEXTSTRAIN_OUTPUT_PREFIX(self) -> str:
+        return self.AWS_NEXTSTRAIN_SFN_PARAMETER["OutputPrefix"]
+
+    @property
+    def RUN_WDL_URI(self) -> str:
+        return self.AWS_NEXTSTRAIN_SFN_PARAMETER["RUN_WDL_URI"]
+
+    @property
+    def NEXTSTRAIN_EC2_MEMORY(self) -> str:
+        return self.AWS_NEXTSTRAIN_SFN_PARAMETER["RunEC2Memory"]
+
+    @property
+    def NEXTSTRAIN_EC2_VCPU(self) -> str:
+        return self.AWS_NEXTSTRAIN_SFN_PARAMETER["RunEC2Vcpu"]
+
+    @property
+    def NEXTSTRAIN_SPOT_MEMORY(self) -> str:
+        return self.AWS_NEXTSTRAIN_SFN_PARAMETER["RunSPOTMemory"]
+
+    @property
+    def NEXTSTRAIN_SPOT_VCPU(self) -> str:
+        return self.AWS_NEXTSTRAIN_SFN_PARAMETER["RunSPOTVcpu"]

@@ -165,7 +165,6 @@ local-clean: local-nohostconfig ## Remove everything related to the local dev en
 	-rm -rf ./oauth/pkcs12/server*
 	-rm -rf ./oauth/pkcs12/certificate*
 	docker-compose rm -sf
-	-docker volume rm aspen_database
 	-docker volume rm aspen_localstack
 	-docker network rm aspen_genepinet
 

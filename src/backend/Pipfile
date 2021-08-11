@@ -7,6 +7,7 @@ name = "pypi"
 Authlib = "*"
 boto3 = "*"
 # Click 8 has a regression issue, so we are pinning it to 7.1.2
+# https://github.com/pallets/click/issues/2012
 click = "== 7.1.2"
 Flask = "*"
 psycopg2-binary = "*"
@@ -15,6 +16,7 @@ pytz = "*"
 requests = "*"
 SQLAlchemy = "*"
 flask-cors = "*"
+marshmallow = "*"
 sqlalchemy-enum-tables = {editable = true, path = "./third-party/sqlalchemy-enum-tables"}
 SQLAlchemy-Utils = "0.37.1"
 sentry-sdk = {version = "*", extras = ["flask"]}
