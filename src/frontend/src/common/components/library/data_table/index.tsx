@@ -22,6 +22,7 @@ interface Props {
   handleRowCheckboxClick(sampleId: string, failedGenomeRecovery: boolean): void;
   renderer?: CustomRenderer;
   headerRenderer?: HeaderRenderer;
+  shouldShowFilters: boolean;
 }
 
 // (thuang): If item height changes, we need to update this value!
@@ -113,6 +114,7 @@ export const DataTable: FunctionComponent<Props> = ({
   handleRowCheckboxClick,
   isHeaderChecked,
   isHeaderIndeterminant,
+  shouldShowFilters,
 }: Props) => {
   const [state, dispatch] = useReducer(reducer, {
     ascending: false,

@@ -12,6 +12,7 @@ import { EMPTY_OBJECT } from "../../common/constants/empty";
 import { VIEWNAME } from "../../common/constants/types";
 import { ROUTES } from "../../common/routes";
 import { SampleRenderer, TreeRenderer } from "./cellRenderers";
+import { FilterPanelToggle } from "./components/FilterPanelToggle";
 import { SampleHeader } from "./headerRenderer";
 import { SAMPLE_HEADERS, SAMPLE_SUBHEADERS, TREE_HEADERS } from "./headers";
 import style from "./index.module.scss";
@@ -29,6 +30,7 @@ const Data: FunctionComponent = () => {
   const [samples, setSamples] = useState<Sample[] | undefined>();
   const [trees, setTrees] = useState<Tree[] | undefined>();
   const [isDataLoading, setIsDataLoading] = useState(false);
+  const [shouldShowFilters, setShouldShowFilters] = useState<boolean>(true);
 
   const router = useRouter();
 
@@ -150,13 +152,21 @@ const Data: FunctionComponent = () => {
         <title>Aspen {title && " | " + title}</title>
       </Head>
 
-      <div className={style.navigation} data-test-id="data-menu-items">
+      <FlexContainer
+        className={style.navigation}
+        data-test-id="data-menu-items"
+      >
+        <FilterPanelToggle
+          onClick={() => {
+            setShouldShowFilters(!shouldShowFilters);
+          }}
+        />
         <Menu className={style.menu} secondary>
           {dataJSX.menuItems}
         </Menu>
-      </div>
+      </FlexContainer>
       <FlexContainer className={style.view}>
-        {category.text === "Samples" && <FilterPanel />}
+        {category.text === "Samples" && shouldShowFilters && <FilterPanel />}
         <DataSubview
           key={router.asPath}
           isLoading={category.isDataLoading}
@@ -167,6 +177,7 @@ const Data: FunctionComponent = () => {
           headerRenderer={category.headerRenderer}
           renderer={category.renderer}
           viewName={category.text}
+          shouldShowFilters={shouldShowFilters}
         />
       </FlexContainer>
     </Container>
