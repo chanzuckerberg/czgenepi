@@ -6,13 +6,15 @@
 .samplesRoot {
   align-items: stretch;
   flex-direction: column;
+  padding: $space-xl;
 
   .searchBar {
     display: flex;
     flex-direction: row;
+    align-items: center;
     justify-content: space-between;
     width: 100%;
-    margin-bottom: $space-l;
+    margin-bottom: $space-xxl;
 
     input {
       border-radius: $border-radius-l !important;
