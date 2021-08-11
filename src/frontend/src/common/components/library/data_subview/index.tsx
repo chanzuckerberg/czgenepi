@@ -135,7 +135,6 @@ const DataSubview: FunctionComponent<Props> = ({
   const [showCheckboxes, setShowCheckboxes] = useState<boolean>(false);
   const [isHeaderIndeterminant, setHeaderIndeterminant] =
     useState<boolean>(false);
-  // used to check indeterminate state
   const [open, setOpen] = useState(false);
   const [isDownloadDisabled, setDownloadDisabled] = useState<boolean>(true);
   const [failedSamples, setFailedSamples] = useState<any[]>([]);
