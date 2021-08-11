@@ -21,6 +21,7 @@ import {
   StyledDiv,
   StyledDownloadDisabledImage,
   StyledDownloadImage,
+  StyledFlexChildDiv,
   StyledLink,
   StyledSpan,
   TooltipDescriptionText,
@@ -267,7 +268,7 @@ const DataSubview: FunctionComponent<Props> = ({
             onClose={handleDownloadClose}
           />
         )}
-        <div className={style.samplesRoot}>
+        <StyledFlexChildDiv className={style.samplesRoot}>
           <div className={style.searchBar}>
             <div className={style.searchInput}>
               <Input
@@ -320,7 +321,7 @@ const DataSubview: FunctionComponent<Props> = ({
               renderer={renderer}
             />
           </div>
-        </div>
+        </StyledFlexChildDiv>
       </>
     );
   };
