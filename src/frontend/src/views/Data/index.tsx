@@ -9,6 +9,7 @@ import { useProtectedRoute } from "src/common/queries/auth";
 import { FilterPanel } from "src/components/FilterPanel";
 import { DataSubview } from "../../common/components";
 import { EMPTY_OBJECT } from "../../common/constants/empty";
+import { VIEWNAME } from "../../common/constants/types";
 import { ROUTES } from "../../common/routes";
 import { SampleRenderer, TreeRenderer } from "./cellRenderers";
 import { SampleHeader } from "./headerRenderer";
@@ -69,7 +70,7 @@ const Data: FunctionComponent = () => {
       isDataLoading,
       renderer: SampleRenderer,
       subheaders: SAMPLE_SUBHEADERS,
-      text: "Samples",
+      text: VIEWNAME.SAMPLES,
       to: ROUTES.DATA_SAMPLES,
     },
     {
@@ -79,7 +80,7 @@ const Data: FunctionComponent = () => {
       isDataLoading,
       renderer: TreeRenderer,
       subheaders: EMPTY_OBJECT,
-      text: "Phylogenetic Trees",
+      text: VIEWNAME.TREES,
       to: ROUTES.PHYLO_TREES,
       transforms: TREE_TRANSFORMS,
     },
