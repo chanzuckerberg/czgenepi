@@ -6,6 +6,7 @@ import React, { FunctionComponent, useEffect, useState } from "react";
 import { Menu } from "semantic-ui-react";
 import { fetchSamples, fetchTrees } from "src/common/api";
 import { useProtectedRoute } from "src/common/queries/auth";
+import { FilterPanel } from "src/components/FilterPanel";
 import { DataSubview } from "../../common/components";
 import { EMPTY_OBJECT } from "../../common/constants/empty";
 import { ROUTES } from "../../common/routes";
@@ -13,7 +14,7 @@ import { SampleRenderer, TreeRenderer } from "./cellRenderers";
 import { SampleHeader } from "./headerRenderer";
 import { SAMPLE_HEADERS, SAMPLE_SUBHEADERS, TREE_HEADERS } from "./headers";
 import style from "./index.module.scss";
-import { Container } from "./style";
+import { Container, FlexContainer } from "./style";
 import { TREE_TRANSFORMS } from "./transforms";
 
 const TITLE: Record<string, string> = {
@@ -153,7 +154,8 @@ const Data: FunctionComponent = () => {
           {dataJSX.menuItems}
         </Menu>
       </div>
-      <div className={style.view}>
+      <FlexContainer className={style.view}>
+        {category.text === "Samples" && <FilterPanel />}
         <DataSubview
           key={router.asPath}
           isLoading={category.isDataLoading}
@@ -165,7 +167,7 @@ const Data: FunctionComponent = () => {
           renderer={category.renderer}
           viewName={category.text}
         />
-      </div>
+      </FlexContainer>
     </Container>
   );
 };

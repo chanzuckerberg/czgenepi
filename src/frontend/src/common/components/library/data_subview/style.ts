@@ -52,12 +52,6 @@ export const StyledChip = styled(Chip)`
 export const DownloadWrapper = styled.div`
   align-items: center;
   display: flex;
-  ${(props) => {
-    const spacings = getSpacings(props);
-    return `
-      padding-bottom: ${spacings?.xxl}px;
-    `;
-  }}
 `;
 
 export const StyledSpan = styled.span`
@@ -160,4 +154,8 @@ export const TooltipDescriptionText = styled.div`
       color: ${colors?.gray[400]};
   `;
   }}
+`;
+
+export const StyledFlexChildDiv = styled.div`
+  flex: 1 1 0;
 `;
