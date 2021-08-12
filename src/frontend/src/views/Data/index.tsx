@@ -9,8 +9,10 @@ import { useProtectedRoute } from "src/common/queries/auth";
 import { FilterPanel } from "src/components/FilterPanel";
 import { DataSubview } from "../../common/components";
 import { EMPTY_OBJECT } from "../../common/constants/empty";
+import { VIEWNAME } from "../../common/constants/types";
 import { ROUTES } from "../../common/routes";
 import { SampleRenderer, TreeRenderer } from "./cellRenderers";
+import { FilterPanelToggle } from "./components/FilterPanelToggle";
 import { SampleHeader } from "./headerRenderer";
 import { SAMPLE_HEADERS, SAMPLE_SUBHEADERS, TREE_HEADERS } from "./headers";
 import style from "./index.module.scss";
@@ -28,6 +30,7 @@ const Data: FunctionComponent = () => {
   const [samples, setSamples] = useState<Sample[] | undefined>();
   const [trees, setTrees] = useState<Tree[] | undefined>();
   const [isDataLoading, setIsDataLoading] = useState(false);
+  const [shouldShowFilters, setShouldShowFilters] = useState<boolean>(true);
 
   const router = useRouter();
 
@@ -69,7 +72,7 @@ const Data: FunctionComponent = () => {
       isDataLoading,
       renderer: SampleRenderer,
       subheaders: SAMPLE_SUBHEADERS,
-      text: "Samples",
+      text: VIEWNAME.SAMPLES,
       to: ROUTES.DATA_SAMPLES,
     },
     {
@@ -79,7 +82,7 @@ const Data: FunctionComponent = () => {
       isDataLoading,
       renderer: TreeRenderer,
       subheaders: EMPTY_OBJECT,
-      text: "Phylogenetic Trees",
+      text: VIEWNAME.TREES,
       to: ROUTES.PHYLO_TREES,
       transforms: TREE_TRANSFORMS,
     },
@@ -149,13 +152,21 @@ const Data: FunctionComponent = () => {
         <title>Aspen {title && " | " + title}</title>
       </Head>
 
-      <div className={style.navigation} data-test-id="data-menu-items">
+      <FlexContainer
+        className={style.navigation}
+        data-test-id="data-menu-items"
+      >
+        <FilterPanelToggle
+          onClick={() => {
+            setShouldShowFilters(!shouldShowFilters);
+          }}
+        />
         <Menu className={style.menu} secondary>
           {dataJSX.menuItems}
         </Menu>
-      </div>
+      </FlexContainer>
       <FlexContainer className={style.view}>
-        {category.text === "Samples" && <FilterPanel />}
+        {category.text === "Samples" && shouldShowFilters && <FilterPanel />}
         <DataSubview
           key={router.asPath}
           isLoading={category.isDataLoading}
