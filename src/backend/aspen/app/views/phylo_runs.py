@@ -97,6 +97,11 @@ def start_phylo_run():
         name=request_data["name"],
     )
 
+    # TODO -- our build pipeline assumes we've selected some samples, and everything stops making
+    # sense if we have an empty includes.txt.
+    if not pathogen_genomes:
+        raise Exception("No valid pathogen genomes found, not running tree build!")
+
     workflow.inputs = list(pathogen_genomes)
     workflow.inputs.append(aligned_gisaid_dump)
 
