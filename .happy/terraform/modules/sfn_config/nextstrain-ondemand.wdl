@@ -71,10 +71,12 @@ task nextstrain_workflow {
                --phylo-run-id "~{workflow_id}"                        \
                --county-sequences ncov/data/sequences_aspen.fasta     \
                --county-metadata ncov/data/metadata_aspen.tsv         \
-               --sequences ncov/data/sequences_selected.fasta         \
-               --metadata ncov/data/metadata_selected.tsv             \
+               --selected ncov/data/include.txt                       \
                --builds-file ncov/my_profiles/aspen/builds.yaml       \
     )
+    # If we didn't have any explicitly selected samples, copy the reference genomes to include.txt
+    if [ ! -e ncov/data/include.txt ]; then cp ncov/defaults/include.txt ncov/data/include.txt; fi;
+
     aligned_gisaid_s3_bucket=$(echo "${aligned_gisaid_location}" | jq -r .bucket)
     aligned_gisaid_sequences_s3_key=$(echo "${aligned_gisaid_location}" | jq -r .sequences_key)
     aligned_gisaid_metadata_s3_key=$(echo "${aligned_gisaid_location}" | jq -r .metadata_key)

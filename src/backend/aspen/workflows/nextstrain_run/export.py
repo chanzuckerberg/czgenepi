@@ -59,8 +59,9 @@ METADATA_CSV_FIELDS = [
 
 @click.command("save")
 @click.option("--phylo-run-id", type=int, required=True)
-@click.option("sequences_fh", "--sequences", type=click.File("w"), required=True)
-@click.option("metadata_fh", "--metadata", type=click.File("w"), required=True)
+@click.option("sequences_fh", "--sequences", type=click.File("w"), required=False)
+@click.option("selected_fh", "--selected", type=click.File("w"), required=False)
+@click.option("metadata_fh", "--metadata", type=click.File("w"), required=False)
 @click.option("builds_file_fh", "--builds-file", type=click.File("w"), required=True)
 @click.option(
     "county_sequences_fh", "--county-sequences", type=click.File("w"), required=False
@@ -71,6 +72,7 @@ METADATA_CSV_FIELDS = [
 def cli(
     phylo_run_id: int,
     sequences_fh: io.TextIOBase,
+    selected_fh: io.TextIOBase,
     metadata_fh: io.TextIOBase,
     builds_file_fh: io.TextIOBase,
     county_sequences_fh: io.TextIOBase,
@@ -140,7 +142,10 @@ def cli(
             inp for inp in phylo_run.inputs if isinstance(inp, AlignedGisaidDump)
         ][0]
 
-        write_sequences_files(session, pathogen_genomes, sequences_fh, metadata_fh)
+        if sequences_fh:
+            write_sequences_files(session, pathogen_genomes, sequences_fh, metadata_fh)
+        if selected_fh:
+            write_includes_file(session, pathogen_genomes, selected_fh)
 
         print(
             json.dumps(
@@ -151,6 +156,24 @@ def cli(
                 }
             )
         )
+
+
+def write_includes_file(session, pathogen_genomes, selected_fh):
+    # Create a list of the inputted pathogen genomes that are uploaded pathogen genomes
+    sample_ids: List[int] = [
+        pathogen_genome.sample_id
+        for pathogen_genome in pathogen_genomes
+        if isinstance(pathogen_genome, UploadedPathogenGenome)
+    ]
+
+    # Write an includes.txt with the sample ID's.
+    sample_query = session.query(Sample).filter(Sample.id.in_(sample_ids))
+    num_samples = 0
+    for sample in sample_query:
+        public_identifier = sample.public_identifier
+        if public_identifier.lower().startswith("hcov-19"):
+            public_identifier = public_identifier[8:]
+        selected_fh.write(f"{public_identifier}\n")
 
 
 def write_sequences_files(session, pathogen_genomes, sequences_fh, metadata_fh):
