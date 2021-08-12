@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
 import {
+  Button,
   fontBodyS,
   fontBodyXxs,
   fontHeaderM,
@@ -7,6 +8,7 @@ import {
   fontHeaderXxl,
   getColors,
   getFontWeights,
+  getSpacings,
 } from "czifui";
 
 export const NarrowContainer = styled.div`
@@ -71,4 +73,20 @@ export const P = styled.p`
 
 export const Title = styled.div`
   margin-bottom: 50px;
+`;
+
+export const IconButtonBubble = styled(Button)`
+  border-radius: 50%;
+  flex: 0 0 0;
+  min-width: unset;
+
+  ${(props) => {
+    const colors = getColors(props);
+    const spacings = getSpacings(props);
+    return `
+      fill: ${colors?.gray[300]};
+      margin: ${spacings?.xxxs}px;
+      padding: ${spacings?.xs}px;
+    `;
+  }}
 `;
