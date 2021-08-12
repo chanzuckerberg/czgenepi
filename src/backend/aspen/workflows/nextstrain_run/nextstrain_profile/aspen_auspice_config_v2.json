@@ -2,21 +2,26 @@
   "title": "Genomic epidemiology of novel coronavirus",
   "build_url": "https://github.com/nextstrain/ncov",
   "maintainers": [
-    {"name": "Chan Zuckerberg Biohub",
-     "url": "https://www.czbiohub.org"},
+    {"name": "Chan Zuckerberg Initiative",
+     "url": "https://chanzuckerberg.com"},
     {"name": "California Departments of Public Health",
      "url": "https://www.cdph.ca.gov/Pages/LocalHealthServicesAndOffices.aspx#"}
   ],
   "colorings": [
     {
-      "key": "selected",
-      "title": "User selection",
-      "type": "boolean"
+      "key": "emerging_lineage",
+      "title": "Emerging Lineage",
+      "type": "categorical"
     },
     {
       "key": "pangolin_lineage",
       "title": "Pangolin lineage",
       "type": "categorical"
+    },
+    {
+      "key": "S1_mutations",
+      "title": "S1 mutations",
+      "type": "continuous"
     },
     {
       "key": "location",
@@ -39,21 +44,6 @@
       "type": "categorical"
     },
     {
-      "key": "host",
-      "title": "Host",
-      "type": "categorical"
-    },
-    {
-      "key": "age",
-      "title": "Age",
-      "type": "continuous"
-    },
-    {
-      "key": "sex",
-      "title": "Sex",
-      "type": "categorical"
-    },
-    {
       "key": "author",
       "title": "Authors",
       "type": "categorical"
@@ -67,21 +57,6 @@
       "key": "submitting_lab",
       "title": "Submitting Lab",
       "type": "categorical"
-    },
-    {
-      "key": "country_exposure",
-      "title": "Country of exposure",
-      "type": "categorical"
-    },
-    {
-      "key": "division_exposure",
-      "title": "Division of exposure",
-      "type": "categorical"
-    },
-    {
-      "key": "region_exposure",
-      "title": "Region of exposure",
-      "type": "categorical"
     }
   ],
   "geo_resolutions": [
@@ -91,14 +66,13 @@
     "region"
   ],
   "display_defaults": {
-    "color_by": "selected",
+    "color_by": "emerging_lineage",
     "distance_measure": "div",
     "geo_resolution": "location",
     "map_triplicate": false,
     "branch_label": "clade"
   },
   "filters": [
-    "selected",
     "clade_membership",
     "region",
     "country",
