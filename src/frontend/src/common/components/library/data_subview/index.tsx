@@ -131,10 +131,7 @@ const DataSubview: FunctionComponent<Props> = ({
   });
 
   const [checkedSamples, setCheckedSamples] = useState<any[]>([]);
-  const [isHeaderChecked, setIsHeaderChecked] = useState<boolean>(false);
   const [showCheckboxes, setShowCheckboxes] = useState<boolean>(false);
-  const [isHeaderIndeterminant, setHeaderIndeterminant] =
-    useState<boolean>(false);
   const [open, setOpen] = useState(false);
   const [isDownloadDisabled, setDownloadDisabled] = useState<boolean>(true);
   const [failedSamples, setFailedSamples] = useState<any[]>([]);
@@ -175,48 +172,6 @@ const DataSubview: FunctionComponent<Props> = ({
       setOpen(false);
     }
   }, [downloadFailed]);
-
-  function handleHeaderCheckboxClick(
-    newPublicIds: string[],
-    newFailedIds: string[]
-  ) {
-    if (isHeaderIndeterminant || isHeaderChecked) {
-      // remove samples in current data selection when selecting checkbox when indeterminate
-      const newCheckedSamples = checkedSamples.filter(
-        (el) => !newPublicIds.includes(el)
-      );
-      const newFailedSamples = failedSamples.filter(
-        (el) => !newFailedIds.includes(el)
-      );
-      setCheckedSamples(newCheckedSamples);
-      setFailedSamples(newFailedSamples);
-      setIsHeaderChecked(false);
-      setHeaderIndeterminant(false);
-    }
-    if (!isHeaderChecked && !isHeaderIndeterminant) {
-      // set isHeaderChecked to true, add all samples in current view
-      setCheckedSamples(checkedSamples.concat(newPublicIds));
-      setFailedSamples(failedSamples.concat(newFailedIds));
-      setIsHeaderChecked(true);
-    }
-  }
-
-  function handleRowCheckboxClick(
-    sampleId: string,
-    failedGenomeRecovery: boolean
-  ) {
-    if (checkedSamples.includes(sampleId)) {
-      setCheckedSamples(checkedSamples.filter((id) => id !== sampleId));
-      if (failedGenomeRecovery) {
-        setFailedSamples(failedSamples.filter((id) => id !== sampleId));
-      }
-    } else {
-      setCheckedSamples([...checkedSamples, sampleId]);
-      if (failedGenomeRecovery) {
-        setFailedSamples([...failedSamples, sampleId]);
-      }
-    }
-  }
 
   function handleDismissErrorClick() {
     setDownloadFailed(false);
@@ -354,13 +309,10 @@ const DataSubview: FunctionComponent<Props> = ({
             <DataTable
               isLoading={isLoading}
               checkedSamples={checkedSamples}
+              setCheckedSamples={setCheckedSamples}
+              failedSamples={failedSamples}
+              setFailedSamples={setFailedSamples}
               showCheckboxes={showCheckboxes}
-              handleRowCheckboxClick={handleRowCheckboxClick}
-              isHeaderChecked={isHeaderChecked}
-              setIsHeaderChecked={setIsHeaderChecked}
-              handleHeaderCheckboxClick={handleHeaderCheckboxClick}
-              isHeaderIndeterminant={isHeaderIndeterminant}
-              setHeaderIndeterminant={setHeaderIndeterminant}
               data={tableData}
               defaultSortKey={defaultSortKey}
               headers={headers}
