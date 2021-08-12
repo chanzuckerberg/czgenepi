@@ -165,7 +165,7 @@ export const DataTable: FunctionComponent<Props> = ({
       } else {
         setHeaderIndeterminant(true);
       }
-      if (publicIds.length > 0) {
+      if (publicIds.length > 0 && publicIds.length !== sizeData) {
         setIsHeaderChecked(false);
       }
       if (publicIds.length === sizeData) {
