@@ -165,14 +165,6 @@ export const DataTable: FunctionComponent<Props> = ({
       } else {
         setHeaderIndeterminant(true);
       }
-    }
-  }, [data, checkedSamples, setHeaderIndeterminant]);
-
-  useEffect(() => {
-    // used to determine if header is checked
-    if (data) {
-      const publicIds = extractPublicIdsFromData(data, checkedSamples, true);
-      const sizeData = Object.keys(data).length;
       if (publicIds.length > 0) {
         setIsHeaderChecked(false);
       }
@@ -183,7 +175,7 @@ export const DataTable: FunctionComponent<Props> = ({
         setIsHeaderChecked(false);
       }
     }
-  }, [data, checkedSamples, setIsHeaderChecked]);
+  }, [data, checkedSamples, setHeaderIndeterminant, setIsHeaderChecked]);
 
   function handleHeaderCheckboxClick(
     newPublicIds: string[],
