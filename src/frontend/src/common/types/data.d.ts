@@ -12,7 +12,7 @@ interface DataCategory {
   isDataLoading: boolean;
   renderer?: CustomRenderer;
   subheaders: Record<string, SubHeader[]>;
-  text: string;
+  text: VIEWNAME;
   to: string;
   transforms?: Transform[];
 }
