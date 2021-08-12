@@ -74,8 +74,11 @@ task nextstrain_workflow {
                --selected ncov/data/include.txt                       \
                --builds-file ncov/my_profiles/aspen/builds.yaml       \
     )
-    # If we didn't have any explicitly selected samples, copy the reference genomes to include.txt
-    if [ ! -e ncov/data/include.txt ]; then cp ncov/defaults/include.txt ncov/data/include.txt; fi;
+    # If we don't have any county samples, copy the reference genomes to to our county file
+    if [ ! -e ncov/data/sequences_aspen.fasta ]; then
+        cp ncov/data/references_sequences.fasta ncov/data/sequences_aspen.fasta;
+        cp ncov/data/references_metadata.tsv ncov/data/metadata_aspen.tsv;
+    fi;
 
     # If this is a contextual build, disable crowding penalty
     if grep -q group_plus_context ncov/my_profiles/aspen/builds.yaml; then patch ncov/workflow/snakemake_rules/main_workflow.smk < /usr/src/app/aspen/workflows/nextstrain_run/patches/local_ncov_settings.patch; fi
