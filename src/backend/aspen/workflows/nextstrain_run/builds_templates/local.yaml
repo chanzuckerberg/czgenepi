@@ -40,22 +40,8 @@ subsampling:
   group_only:
     root:
       exclude: "--exclude-where 'root_ref!=yes'"
-    focal:
-      exclude: "--exclude-all"
-    closest:
-      max_sequences: 100
-      priorities:
-        type: "proximity"
-        focus: "focal"
+
     same_county:
       group_by: "year month"
       max_sequences: 2000
-      query: --query "(location == '{{location}}') & (division == '{{division}}')"
-      priorities:
-        type: "proximity"
-        focus: "focal"
-
-    county_serial_sampling:
-      group_by: "year month"
-      seq_per_group: 10
       query: --query "(location == '{{location}}') & (division == '{{division}}')"
