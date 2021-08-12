@@ -46,7 +46,7 @@ export const CheckBoxInfo = styled.div`
   ${(props) => {
     const spacings = getSpacings(props);
     return `
-      margin-top: ${spacings?.l}px; 
+      margin-top: ${spacings?.l}px;
       margin-bottom: ${spacings?.l}px;
     `;
   }}
@@ -90,8 +90,7 @@ export const DownloadType = styled.div`
   ${(props) => {
     const fontWeights = getFontWeights(props);
     return `
-    font-weight: ${fontWeights?.semibold}; 
-
+      font-weight: ${fontWeights?.semibold};
     `;
   }}
 `;
@@ -100,8 +99,8 @@ export const StyledButton = styled(Button)`
   ${(props) => {
     const spacings = getSpacings(props);
     return `
-        margin-top: ${spacings?.xxl}px;
-        `;
+      margin-top: ${spacings?.xxl}px;
+    `;
   }}
 `;
 
@@ -119,8 +118,8 @@ export const StyledIconButton = styled(IconButton)`
   ${(props) => {
     const spacings = getSpacings(props);
     return `
-        padding-bottom: ${spacings?.l}px;
-        `;
+      padding-bottom: ${spacings?.l}px;
+    `;
   }}
 `;
 
