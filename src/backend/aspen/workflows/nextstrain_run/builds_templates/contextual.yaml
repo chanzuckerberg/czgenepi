@@ -24,7 +24,7 @@ custom_rules:
 
 ## Auxiliary files
 files:
-  include: "my_profiles/aspen/include.txt"
+  include: "data/include.txt"
   lat_longs: "my_profiles/aspen/lat_longs.tsv"
   ordering: "my_profiles/aspen/ordering.tsv"
   description: "my_profiles/aspen/covidtrackerca.md"
