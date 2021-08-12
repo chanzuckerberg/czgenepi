@@ -7,6 +7,7 @@ export const StyledFilterPanel = styled.div`
     const spacings = getSpacings(props);
     return `
     border-right: ${spacings?.xxxs}px ${colors?.gray[200]} solid;
+    padding: ${spacings?.xl}px;
     width: 200px;
     `;
   }}

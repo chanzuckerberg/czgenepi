@@ -8,6 +8,8 @@ import React, {
 } from "react";
 import { Input } from "semantic-ui-react";
 import { DataTable } from "src/common/components";
+import { VIEWNAME } from "src/common/constants/types";
+import { IconButtonBubble } from "src/common/styles/support/style";
 import DownloadModal from "./components/DownloadModal";
 import style from "./index.module.scss";
 import {
@@ -16,7 +18,6 @@ import {
   Divider,
   DownloadWrapper,
   StyledAlert,
-  StyledButton,
   StyledChip,
   StyledDiv,
   StyledDownloadDisabledImage,
@@ -36,7 +37,7 @@ interface Props {
   isLoading: boolean;
   renderer?: CustomRenderer;
   headerRenderer?: CustomRenderer;
-  viewName: string;
+  viewName: VIEWNAME;
 }
 
 interface InputOnChangeData {
@@ -153,7 +154,7 @@ const DataSubview: FunctionComponent<Props> = ({
 
   useEffect(() => {
     // Only show checkboxes on the sample datatable
-    if (viewName === "Samples") {
+    if (viewName === VIEWNAME.SAMPLES) {
       setShowCheckboxes(true);
     }
   }, [viewName]);
@@ -213,7 +214,7 @@ const DataSubview: FunctionComponent<Props> = ({
 
   const render = (tableData?: TableItem[]) => {
     let downloadButton: JSX.Element | null = null;
-    if (viewName === "Samples" && tableData !== undefined) {
+    if (viewName === VIEWNAME.SAMPLES && tableData !== undefined) {
       downloadButton = (
         <DownloadWrapper>
           <StyledChip
@@ -234,7 +235,7 @@ const DataSubview: FunctionComponent<Props> = ({
             placement="top"
           >
             <StyledSpan>
-              <StyledButton
+              <IconButtonBubble
                 onClick={handleDownloadClickOpen}
                 disabled={isDownloadDisabled}
               >
@@ -243,7 +244,7 @@ const DataSubview: FunctionComponent<Props> = ({
                 ) : (
                   <StyledDownloadImage />
                 )}
-              </StyledButton>
+              </IconButtonBubble>
             </StyledSpan>
           </Tooltip>
         </DownloadWrapper>
@@ -252,7 +253,7 @@ const DataSubview: FunctionComponent<Props> = ({
 
     return (
       <>
-        {tableData !== undefined && viewName === "Samples" && (
+        {tableData !== undefined && viewName === VIEWNAME.SAMPLES && (
           <DownloadModal
             sampleIds={checkedSamples}
             failedSamples={failedSamples}

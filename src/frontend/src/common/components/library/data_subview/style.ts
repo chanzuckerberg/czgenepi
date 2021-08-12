@@ -64,21 +64,6 @@ export const StyledSpan = styled.span`
   }}
 `;
 
-export const StyledButton = styled(Button)`
-  border-radius: 50%;
-  flex: 0 0 0;
-  min-width: unset;
-  ${(props) => {
-    const colors = getColors(props);
-    const spacings = getSpacings(props);
-    return `
-      fill: ${colors?.gray[300]};
-      margin: ${spacings?.xxxs}px;
-      padding: ${spacings?.xs}px;
-    `;
-  }}
-`;
-
 export const StyledDownloadImage = styled(DownloadImage)`
   width: 32px;
   height: 32px;
