@@ -44,6 +44,11 @@
       "type": "categorical"
     },
     {
+      "key": "country_exposure",
+      "title": "Country of exposure",
+      "type": "categorical"
+    },
+    {
       "key": "author",
       "title": "Authors",
       "type": "categorical"
