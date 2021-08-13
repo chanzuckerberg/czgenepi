@@ -44,7 +44,7 @@
 }
 
 .cell {
-  @include font-body-xs;
+  @include font-header-xs;
 
   display: flex;
   align-items: center;
