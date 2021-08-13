@@ -109,7 +109,7 @@ function extractPublicIdsFromData(
         publicIds.push(id);
       }
     } else {
-      publicIds.push(String(data[key as any].publicId));
+      publicIds.push(id);
     }
   }
   return publicIds;
