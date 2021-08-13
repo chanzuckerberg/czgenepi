@@ -131,13 +131,10 @@ const DataSubview: FunctionComponent<Props> = ({
   });
 
   const [checkedSamples, setCheckedSamples] = useState<any[]>([]);
-  const [isHeaderChecked, setIsHeaderChecked] = useState<boolean>(false);
   const [showCheckboxes, setShowCheckboxes] = useState<boolean>(false);
-  const [isHeaderIndeterminant, setHeaderIndeterminant] =
-    useState<boolean>(false);
   const [open, setOpen] = useState(false);
   const [isDownloadDisabled, setDownloadDisabled] = useState<boolean>(true);
-  const [failedSamples, setFailedSamples] = useState<string[]>([]);
+  const [failedSamples, setFailedSamples] = useState<any[]>([]);
   const [downloadFailed, setDownloadFailed] = useState<boolean>(false);
   const [isMetadataSelected, setMetadataSelected] = useState<boolean>(false);
   const [isFastaSelected, setFastaSelected] = useState<boolean>(false);
@@ -154,42 +151,11 @@ const DataSubview: FunctionComponent<Props> = ({
   };
 
   useEffect(() => {
-    // add all samples if header checkbox is selected
-    if (isHeaderChecked) {
-      const allPublicIds: string[] = [];
-      const failedSamples: string[] = [];
-      for (const key in data) {
-        allPublicIds.push(String(data[key as any].publicId));
-        if (data[key as any].CZBFailedGenomeRecovery) {
-          failedSamples.push(String(data[key as any].publicId));
-        }
-      }
-      setCheckedSamples(allPublicIds);
-      setFailedSamples(failedSamples);
-    } else {
-      setFailedSamples([]);
-      setCheckedSamples([]);
-    }
-  }, [isHeaderChecked, data]);
-
-  useEffect(() => {
     // Only show checkboxes on the sample datatable
     if (viewName === "Samples") {
       setShowCheckboxes(true);
     }
   }, [viewName]);
-
-  useEffect(() => {
-    // determine if mixed state (user has custom selected samples)
-    if (data) {
-      const sizeData = Object.keys(data).length;
-      if (checkedSamples.length === 0 || checkedSamples.length === sizeData) {
-        setHeaderIndeterminant(false);
-      } else {
-        setHeaderIndeterminant(true);
-      }
-    }
-  }, [checkedSamples, data]);
 
   useEffect(() => {
     // disable sample download if no samples are selected
@@ -206,34 +172,6 @@ const DataSubview: FunctionComponent<Props> = ({
       setOpen(false);
     }
   }, [downloadFailed]);
-
-  function handleHeaderCheckboxClick() {
-    if (isHeaderIndeterminant) {
-      // clear all samples when selecting checkbox when indeterminate
-      setCheckedSamples([]);
-      setFailedSamples([]);
-      setIsHeaderChecked(false);
-    } else {
-      setIsHeaderChecked((prevState: boolean) => !prevState);
-    }
-  }
-
-  function handleRowCheckboxClick(
-    sampleId: string,
-    failedGenomeRecovery: boolean
-  ) {
-    if (checkedSamples.includes(sampleId)) {
-      setCheckedSamples(checkedSamples.filter((id) => id !== sampleId));
-      if (failedGenomeRecovery) {
-        setFailedSamples(failedSamples.filter((id) => id !== sampleId));
-      }
-    } else {
-      setCheckedSamples([...checkedSamples, sampleId]);
-      if (failedGenomeRecovery) {
-        setFailedSamples([...failedSamples, sampleId]);
-      }
-    }
-  }
 
   function handleDismissErrorClick() {
     setDownloadFailed(false);
@@ -371,11 +309,10 @@ const DataSubview: FunctionComponent<Props> = ({
             <DataTable
               isLoading={isLoading}
               checkedSamples={checkedSamples}
+              setCheckedSamples={setCheckedSamples}
+              failedSamples={failedSamples}
+              setFailedSamples={setFailedSamples}
               showCheckboxes={showCheckboxes}
-              handleRowCheckboxClick={handleRowCheckboxClick}
-              isHeaderChecked={isHeaderChecked}
-              handleHeaderCheckboxClick={handleHeaderCheckboxClick}
-              isHeaderIndeterminant={isHeaderIndeterminant}
               data={tableData}
               defaultSortKey={defaultSortKey}
               headers={headers}

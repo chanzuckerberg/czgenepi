@@ -1,5 +1,11 @@
 import { get, isEqual } from "lodash/fp";
-import React, { Fragment, FunctionComponent, useReducer } from "react";
+import React, {
+  Fragment,
+  FunctionComponent,
+  useEffect,
+  useReducer,
+  useState,
+} from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import { noop } from "src/common/constants/empty";
@@ -15,11 +21,10 @@ interface Props {
   defaultSortKey: string[];
   isLoading: boolean;
   checkedSamples: any[];
-  isHeaderChecked: boolean;
-  isHeaderIndeterminant: boolean;
+  setCheckedSamples(samples: string[]): void;
+  failedSamples: any[];
+  setFailedSamples(samples: string[]): void;
   showCheckboxes: boolean;
-  handleHeaderCheckboxClick(): void;
-  handleRowCheckboxClick(sampleId: string, failedGenomeRecovery: boolean): void;
   renderer?: CustomRenderer;
   headerRenderer?: HeaderRenderer;
 }
@@ -91,6 +96,35 @@ function sortData(
   });
 }
 
+function extractPublicIdsFromData(
+  data: TableItem[],
+  checkedSamples: string[],
+  onlyCheckedSamples: boolean
+): string[] {
+  const publicIds: string[] = [];
+  for (const key in data) {
+    const id = String(data[key as any].publicId);
+    if (onlyCheckedSamples) {
+      if (checkedSamples.includes(id)) {
+        publicIds.push(id);
+      }
+    } else {
+      publicIds.push(id);
+    }
+  }
+  return publicIds;
+}
+
+function extractPublicIdsFromDataWFailedGenomeRecovery(data: TableItem[]) {
+  const failedSamples: string[] = [];
+  for (const key in data) {
+    if (data[key as any].CZBFailedGenomeRecovery) {
+      failedSamples.push(String(data[key as any].publicId));
+    }
+  }
+  return failedSamples;
+}
+
 interface TableState {
   sortKey: string[];
   ascending: boolean;
@@ -108,16 +142,82 @@ export const DataTable: FunctionComponent<Props> = ({
   renderer = defaultCellRenderer,
   isLoading,
   checkedSamples,
+  setCheckedSamples,
+  failedSamples,
+  setFailedSamples,
   showCheckboxes,
-  handleHeaderCheckboxClick,
-  handleRowCheckboxClick,
-  isHeaderChecked,
-  isHeaderIndeterminant,
 }: Props) => {
+  const [isHeaderChecked, setIsHeaderChecked] = useState<boolean>(false);
+  const [isHeaderIndeterminant, setHeaderIndeterminant] =
+    useState<boolean>(false);
   const [state, dispatch] = useReducer(reducer, {
     ascending: false,
     sortKey: defaultSortKey,
   });
+
+  useEffect(() => {
+    // used to determine if header is indeterminate
+    if (data) {
+      const publicIds = extractPublicIdsFromData(data, checkedSamples, true);
+      const sizeData = Object.keys(data).length;
+      if (publicIds.length === sizeData || publicIds.length === 0) {
+        setHeaderIndeterminant(false);
+      } else {
+        setHeaderIndeterminant(true);
+      }
+      if (publicIds.length > 0 && publicIds.length !== sizeData) {
+        setIsHeaderChecked(false);
+      }
+      if (publicIds.length === sizeData) {
+        setIsHeaderChecked(true);
+      }
+      if (sizeData === 0) {
+        setIsHeaderChecked(false);
+      }
+    }
+  }, [data, checkedSamples, setHeaderIndeterminant, setIsHeaderChecked]);
+
+  function handleHeaderCheckboxClick(
+    newPublicIds: string[],
+    newFailedIds: string[]
+  ) {
+    if (isHeaderIndeterminant || isHeaderChecked) {
+      // remove samples in current data selection when selecting checkbox when indeterminate
+      const newCheckedSamples = checkedSamples.filter(
+        (el) => !newPublicIds.includes(el)
+      );
+      const newFailedSamples = failedSamples.filter(
+        (el) => !newFailedIds.includes(el)
+      );
+      setCheckedSamples(newCheckedSamples);
+      setFailedSamples(newFailedSamples);
+      setIsHeaderChecked(false);
+      setHeaderIndeterminant(false);
+    }
+    if (!isHeaderChecked && !isHeaderIndeterminant) {
+      // set isHeaderChecked to true, add all samples in current view
+      setCheckedSamples(checkedSamples.concat(newPublicIds));
+      setFailedSamples(failedSamples.concat(newFailedIds));
+      setIsHeaderChecked(true);
+    }
+  }
+
+  function handleRowCheckboxClick(
+    sampleId: string,
+    failedGenomeRecovery: boolean
+  ) {
+    if (checkedSamples.includes(sampleId)) {
+      setCheckedSamples(checkedSamples.filter((id) => id !== sampleId));
+      if (failedGenomeRecovery) {
+        setFailedSamples(failedSamples.filter((id) => id !== sampleId));
+      }
+    } else {
+      setCheckedSamples([...checkedSamples, sampleId]);
+      if (failedGenomeRecovery) {
+        setFailedSamples([...failedSamples, sampleId]);
+      }
+    }
+  }
 
   const indexingKey = headers[0].key;
 
@@ -169,8 +269,14 @@ export const DataTable: FunctionComponent<Props> = ({
 
   const headerCheckbox = (): React.ReactNode => {
     function handleClick() {
-      handleHeaderCheckboxClick();
+      if (data) {
+        const publicIds = extractPublicIdsFromData(data, checkedSamples, false);
+        const failedSamples =
+          extractPublicIdsFromDataWFailedGenomeRecovery(data);
+        handleHeaderCheckboxClick(publicIds, failedSamples);
+      }
     }
+
     return (
       <HeaderCheckbox
         color="primary"
