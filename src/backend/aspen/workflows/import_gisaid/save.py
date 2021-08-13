@@ -1,23 +1,20 @@
 import datetime
+import arrow
 
 import click
 import uuid
 import csv
+import io
 
 from aspen.config.config import Config
+from sqlalchemy.dialects.postgresql import insert
 from aspen.database.connection import (
     get_db_uri,
     init_db,
     session_scope,
     SqlAlchemyInterface,
 )
-from aspen.database.models import (
-    AlignedGisaidDump,
-    GisaidAlignmentWorkflow,
-    ProcessedGisaidDump,
-    WorkflowStatusType,
-)
-from aspen.database.models.workflow import SoftwareNames
+from aspen.database.models import GisaidMetadata
 
 
 @click.command("save")
@@ -25,18 +22,34 @@ from aspen.database.models.workflow import SoftwareNames
 def cli(
     metadata_fh: io.TextIOBase,
 ):
-    import_id = str(uuid.uuid1)
-    rd = csv.reader(metadata_fh, delimiter="\t", quotechar='"')
-    headers = rd.next()
-    interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
-    with session_scope(interface) as session:
-        for row in rd:
-            # add row to the db
-            SomeDbModel.insert(field1, field2, field3)
+    import_id = str(uuid.uuid1())
+    data = csv.DictReader(metadata_fh, delimiter="\t")
 
-        session.flush()
-        # delete from SomeDbModel where import_id != {import_id}
-        print("huge success!")
+    interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
+    fields_to_import = ["strain", "pango_lineage", "GISAID_clade", "region", "division", "location"]
+    num_rows = 0
+    with session_scope(interface) as session:
+        session.autoflush = True
+        for row in data:
+            num_rows += 1
+            # add this row to the db
+            strain = row["strain"]
+            metadata_fields = { field.lower(): row[field] for field in fields_to_import }
+            metadata_fields["import_id"] = import_id
+            metadata_fields["date"] = arrow.get(row['date']).datetime
+            upsert_statement = insert(GisaidMetadata, bind=session).values(
+                **metadata_fields
+            )
+            upsert_statement = upsert_statement.on_conflict_do_update(
+                index_elements=['strain'],
+                set_=metadata_fields
+            )
+            session.execute(upsert_statement)
+        # Delete any rows that weren't part of the latest import.
+        session.query(GisaidMetadata).filter(GisaidMetadata.import_id != import_id).delete()
+        session.commit()
+
+        print(f"Successfully imported {num_rows}")
 
 
 if __name__ == "__main__":
