@@ -151,14 +151,14 @@ def setup_userinfo(user_id):
         sentry_sdk.capture_message(
             f"Requested auth0_user_id {user_id} not found in usergroup query."
         )
-        return redirect("/login")
-    g.auth_user = user
+        return None
     sentry_sdk.set_user(
         {
             "id": user.id,
             "auth0_uid": user.auth0_user_id,
         }
     )
+    return user
 
 
 # use this to wrap protected views
@@ -180,9 +180,13 @@ def requires_auth(f):
             return redirect("/login")
         with session_scope(application.DATABASE_INTERFACE) as db_session:
             g.db_session = db_session
-            setup_userinfo(auth0_user_id)
-            if not g.auth_user:
+            found_auth_user = setup_userinfo(auth0_user_id)
+            if not found_auth_user:
+                # login attempt from user not in DB
+                # TODO: return response to user that they do not have an account with aspen.
                 return redirect("/login")
+            else:
+                g.auth_user = found_auth_user
             return f(*args, **kwargs)
 
     return decorated
