@@ -27,6 +27,8 @@ import {
   StyledSpan,
   TooltipDescriptionText,
   TooltipHeaderText,
+  StyledTreeBuildImage,
+  StyledTreeBuildDisabledImage,
 } from "./style";
 
 interface Props {
@@ -235,6 +237,16 @@ const DataSubview: FunctionComponent<Props> = ({
             placement="top"
           >
             <StyledSpan>
+            <IconButtonBubble
+                onClick={handleDownloadClickOpen}
+                disabled={isDownloadDisabled}
+              >
+                {isDownloadDisabled ? (
+                  <StyledTreeBuildDisabledImage />
+                ) : (
+                  <StyledTreeBuildImage />
+                )}
+              </IconButtonBubble>
               <IconButtonBubble
                 onClick={handleDownloadClickOpen}
                 disabled={isDownloadDisabled}

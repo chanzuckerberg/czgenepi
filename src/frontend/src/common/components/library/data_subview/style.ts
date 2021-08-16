@@ -11,6 +11,7 @@ import {
   Link,
 } from "czifui";
 import DownloadImage from "./IconDownload.svg";
+import TreeBuildImade from "./IconTreebuild.svg";
 
 export const StyledDiv = styled.div`
   ${fontHeaderXs}
@@ -78,6 +79,28 @@ export const StyledDownloadImage = styled(DownloadImage)`
 export const StyledDownloadDisabledImage = styled(DownloadImage)`
   width: 32px;
   height: 32px;
+  ${(props) => {
+    const colors = getColors(props);
+    return `
+        fill: ${colors?.gray[300]};
+    `;
+  }}
+`;
+
+export const StyledTreeBuildImage = styled(TreeBuildImade)`
+  width: 32px;
+  height: 26px;
+  ${(props) => {
+    const colors = getColors(props);
+    return `
+      fill: ${colors?.primary[400]};
+    `;
+  }}
+`;
+
+export const StyledTreeBuildDisabledImage = styled(TreeBuildImade)`
+  width: 32px;
+  height: 26px;
   ${(props) => {
     const colors = getColors(props);
     return `
