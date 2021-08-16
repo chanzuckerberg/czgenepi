@@ -165,7 +165,6 @@ local-clean: local-nohostconfig ## Remove everything related to the local dev en
 	-rm -rf ./oauth/pkcs12/server*
 	-rm -rf ./oauth/pkcs12/certificate*
 	docker-compose rm -sf
-	-docker volume rm aspen_database
 	-docker volume rm aspen_localstack
 	-docker network rm aspen_genepinet
 
@@ -229,5 +228,3 @@ wdl-lint:
 .PHONY: tf-lint
 tf-lint:
 	set -e; for i in $$(find .happy/terraform/envs ! -path .happy/terraform/envs -type d -maxdepth 1); do echo $${i}; pushd $${i}; terraform init; terraform validate; tflint --module; popd; done
-
-include terraform.mk

@@ -132,15 +132,20 @@ class ApiClient:
         self.url = url
         self.token_handler = token_handler
 
-    def get(self, path, **kwargs):
+    def get_headers(self):
         access_token = self.token_handler.get_id_token()
         headers = {"Authorization": f"Bearer {access_token}"}
+        if os.getenv("OAUTH2_PROXY_COOKIE"):
+            headers["Cookie"] = f"_oauth2_proxy={os.getenv('OAUTH2_PROXY_COOKIE')}"
+        return headers
+
+    def get(self, path, **kwargs):
+        headers = self.get_headers()
         url = f"{self.url}{path}"
         return requests.get(url, headers=headers, allow_redirects=False, **kwargs)
 
     def post(self, path, **kwargs):
-        access_token = self.token_handler.get_id_token()
-        headers = {"Authorization": f"Bearer {access_token}"}
+        headers = self.get_headers()
         url = f"{self.url}{path}"
         return requests.post(url, headers=headers, allow_redirects=False, **kwargs)
 
@@ -261,6 +266,23 @@ def download_samples(ctx, sample_ids):
     print(resp.headers)
     print(resp.text)
 
+@cli.group()
+def phylo_run():
+    pass
+
+@phylo_run.command(name="start")
+@click.option("-n","--name", required=True, type=str)
+@click.option("-t","--type", "tree_type", required=True, type=click.Choice(["local", "contextual"], case_sensitive=False))
+@click.option("-h", "--show-headers", is_flag=True)
+@click.argument("sample_ids", nargs=-1)
+@click.pass_context
+def start_phylo_run(ctx, name, tree_type, sample_ids, show_headers):
+    api_client = ctx.obj["api_client"]
+    payload = { "name": name, "tree_type": tree_type, "samples": sample_ids }
+    resp = api_client.post("/api/phylo_runs", json=payload)
+    if show_headers:
+        print(resp.headers)
+    print(resp.text)
 
 if __name__ == "__main__":
     cli()
