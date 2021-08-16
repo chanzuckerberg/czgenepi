@@ -43,6 +43,14 @@ class PhyloTree(Entity):
     s3_bucket = Column(String, nullable=False)
     s3_key = Column(String, nullable=False)
     name = Column(String, nullable=True)
+    # Store a list of gisaid ID's we're going to use as inputs
+    # to the phylo run.
+    gisaid_ids = Column(
+        JSONB,
+        nullable=False,
+        default=text("'[]'::jsonb"),
+        server_default=text("'[]'::jsonb"),
+    )
 
     constituent_samples = relationship(  # type: ignore
         Sample,
