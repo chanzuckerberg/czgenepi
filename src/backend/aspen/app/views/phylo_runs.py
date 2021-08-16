@@ -18,6 +18,7 @@ from aspen.app.serializers import (
 )
 from aspen.app.views.api_utils import authz_sample_filters
 from aspen.database.models import (
+    GisaidMetadata,
     AlignedGisaidDump,
     PathogenGenome,
     PhyloRun,
@@ -60,11 +61,27 @@ def start_phylo_run():
     if len(pathogen_genomes) == 0:
         raise ValueError("No sequences selected for run.")
 
+    # These are the sample ID's that don't match the aspen db
     missing_sample_ids = set(sample_ids) - found_sample_ids
+
+    # Store the list of matching ID's so we can stuff it in our jsonb column later
+    gisaid_ids = set()
+    # See if these missing samples match Gisaid ID's
+    gisaid_matches: Iterable[GisaidMetadata] = g.db_session.query(GisaidMetadata).filter(GisaidMetadata.strain.in_(missing_sample_ids))
+    for gisaid_match in gisaid_matches:
+        gisaid_ids.add(gisaid_match.strain)
+
+    # Do we have any samples that don't match either dataset?
+    missing_sample_ids = missing_sample_ids - gisaid_ids
+
+    # Throw an error if we have any sample ID's that didn't match county samples OR gisaid samples.
     if missing_sample_ids:
-        sentry_sdk.capture_message(
-            f"User requested sample id's they didn't have access to ({missing_sample_ids})"
-        )
+        # TODO - our exception handling needs to be smarter!!!
+        return jsonify({"error": "missing ids", "ids": list(missing_sample_ids)})
+        #sentry_sdk.capture_message(
+        #    f"User requested invalid samples ({missing_sample_ids})"
+        #)
+        #return BadRequest(f"Invalid sample ID's ({missing_sample_ids})")
 
     aligned_gisaid_dump = (
         g.db_session.query(AlignedGisaidDump)
@@ -95,6 +112,7 @@ def start_phylo_run():
         template_file_path=builds_template_file,
         template_args=builds_template_args,
         name=request_data["name"],
+        gisaid_ids=list(gisaid_ids),
     )
 
     # TODO -- our build pipeline assumes we've selected some samples, and everything stops making
