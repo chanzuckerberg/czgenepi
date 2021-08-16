@@ -1,4 +1,3 @@
-import { Tooltip } from "czifui";
 import { escapeRegExp } from "lodash/fp";
 import React, {
   FunctionComponent,
@@ -9,8 +8,8 @@ import React, {
 import { Input } from "semantic-ui-react";
 import { DataTable } from "src/common/components";
 import { VIEWNAME } from "src/common/constants/types";
-import { IconButtonBubble } from "src/common/styles/support/style";
 import DownloadModal from "./components/DownloadModal";
+import { IconButton } from "./components/IconButton";
 import style from "./index.module.scss";
 import {
   BoldText,
@@ -24,11 +23,10 @@ import {
   StyledDownloadImage,
   StyledFlexChildDiv,
   StyledLink,
-  StyledSpan,
+  StyledTreeBuildDisabledImage,
+  StyledTreeBuildImage,
   TooltipDescriptionText,
   TooltipHeaderText,
-  StyledTreeBuildImage,
-  StyledTreeBuildDisabledImage,
 } from "./style";
 
 interface Props {
@@ -214,6 +212,21 @@ const DataSubview: FunctionComponent<Props> = ({
     </div>
   );
 
+  const TREE_BUILD_TOOLTIP_TEXT_DISABLED = (
+    <div>
+      <TooltipHeaderText>Create Phylogenetic Tree</TooltipHeaderText>
+      <TooltipDescriptionText>
+        {"Select at least 1 and <2000 recovered samples"}
+      </TooltipDescriptionText>
+    </div>
+  );
+
+  const TREE_BUILD_TOOLTIP_TEXT_ENABLED = (
+    <div>
+      <TooltipHeaderText>Create Phylogenetic Tree</TooltipHeaderText>
+    </div>
+  );
+
   const render = (tableData?: TableItem[]) => {
     let downloadButton: JSX.Element | null = null;
     if (viewName === VIEWNAME.SAMPLES && tableData !== undefined) {
@@ -226,39 +239,22 @@ const DataSubview: FunctionComponent<Props> = ({
           />
           <StyledDiv>Selected </StyledDiv>
           <Divider />
-          <Tooltip
-            arrow
-            inverted
-            title={
-              isDownloadDisabled
-                ? DOWNLOAD_TOOLTIP_TEXT_DISABLED
-                : DOWNLOAD_TOOLTIP_TEXT_ENABLED
-            }
-            placement="top"
-          >
-            <StyledSpan>
-            <IconButtonBubble
-                onClick={handleDownloadClickOpen}
-                disabled={isDownloadDisabled}
-              >
-                {isDownloadDisabled ? (
-                  <StyledTreeBuildDisabledImage />
-                ) : (
-                  <StyledTreeBuildImage />
-                )}
-              </IconButtonBubble>
-              <IconButtonBubble
-                onClick={handleDownloadClickOpen}
-                disabled={isDownloadDisabled}
-              >
-                {isDownloadDisabled ? (
-                  <StyledDownloadDisabledImage />
-                ) : (
-                  <StyledDownloadImage />
-                )}
-              </IconButtonBubble>
-            </StyledSpan>
-          </Tooltip>
+          <IconButton
+            onClick={handleDownloadClickOpen}
+            disabled={isDownloadDisabled}
+            svgDisabled={<StyledTreeBuildDisabledImage />}
+            svgEnabled={<StyledTreeBuildImage />}
+            tooltipTextDisabled={TREE_BUILD_TOOLTIP_TEXT_DISABLED}
+            tooltipTextEnabled={TREE_BUILD_TOOLTIP_TEXT_ENABLED}
+          />
+          <IconButton
+            onClick={handleDownloadClickOpen}
+            disabled={isDownloadDisabled}
+            svgDisabled={<StyledDownloadDisabledImage />}
+            svgEnabled={<StyledDownloadImage />}
+            tooltipTextDisabled={DOWNLOAD_TOOLTIP_TEXT_DISABLED}
+            tooltipTextEnabled={DOWNLOAD_TOOLTIP_TEXT_ENABLED}
+          />
         </DownloadWrapper>
       );
     }
