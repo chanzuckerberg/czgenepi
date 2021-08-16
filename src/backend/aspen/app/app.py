@@ -187,9 +187,6 @@ def requires_auth(f):
                 return redirect("/login")
             else:
                 g.auth_user = found_auth_user
-            
-            if not g.auth_user:
-                return redirect("/login")
             return f(*args, **kwargs)
 
     return decorated
