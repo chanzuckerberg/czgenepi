@@ -18,6 +18,35 @@ interface SamplePayload {
   };
 }
 
+interface CreateTreePayload {
+  name: string;
+  samples: string[];
+  tree_type: string;
+}
+
+export async function createTree({
+  name,
+  samples,
+  tree_type,
+}: {
+  name: string;
+  tree_type: string;
+  samples: string[];
+}): Promise<unknown> {
+  const payload: CreateTreePayload = {
+    name: name,
+    samples: samples,
+    tree_type: tree_type,
+  };
+  const response = await fetch(API_URL + API.CREATE_TREE, {
+    ...DEFAULT_POST_OPTIONS,
+    body: JSON.stringify(payload),
+  });
+  if (response.ok) return await response.blob();
+
+  throw Error(`${response.statusText}: ${await response.text()}`);
+}
+
 interface SampleFastaDownloadPayload {
   requested_sequences: {
     sample_ids: string[];

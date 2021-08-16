@@ -8,6 +8,7 @@ import React, {
 import { Input } from "semantic-ui-react";
 import { DataTable } from "src/common/components";
 import { VIEWNAME } from "src/common/constants/types";
+import { CreateTreeModal } from "./components/createTreeModal";
 import DownloadModal from "./components/DownloadModal";
 import { IconButton } from "./components/IconButton";
 import style from "./index.module.scss";
@@ -141,9 +142,20 @@ const DataSubview: FunctionComponent<Props> = ({
   const [isMetadataSelected, setMetadataSelected] = useState<boolean>(false);
   const [isFastaSelected, setFastaSelected] = useState<boolean>(false);
   const [isFastaDisabled, setFastaDisabled] = useState<boolean>(false);
+  const [createTreeModalOpen, setCreateTreeModalOpen] =
+    useState<boolean>(false);
+  const [createTreeFailed, setCreateTreeFailed] = useState<boolean>(false);
 
   const handleDownloadClickOpen = () => {
     setOpen(true);
+  };
+
+  const handleCreateTreeClickOpen = () => {
+    setCreateTreeModalOpen(true);
+  };
+
+  const handleCreateTreeClose = () => {
+    setCreateTreeModalOpen(false);
   };
 
   const handleDownloadClose = () => {
@@ -240,7 +252,7 @@ const DataSubview: FunctionComponent<Props> = ({
           <StyledDiv>Selected </StyledDiv>
           <Divider />
           <IconButton
-            onClick={handleDownloadClickOpen}
+            onClick={handleCreateTreeClickOpen}
             disabled={isDownloadDisabled}
             svgDisabled={<StyledTreeBuildDisabledImage />}
             svgEnabled={<StyledTreeBuildImage />}
@@ -262,20 +274,34 @@ const DataSubview: FunctionComponent<Props> = ({
     return (
       <>
         {tableData !== undefined && viewName === VIEWNAME.SAMPLES && (
-          <DownloadModal
-            sampleIds={checkedSamples}
-            failedSamples={failedSamples}
-            setDownloadFailed={setDownloadFailed}
-            isMetadataSelected={isMetadataSelected}
-            setMetadataSelected={setMetadataSelected}
-            isFastaSelected={isFastaSelected}
-            setFastaSelected={setFastaSelected}
-            isFastaDisabled={isFastaDisabled}
-            setFastaDisabled={setFastaDisabled}
-            tsvData={tsvDataMap(checkedSamples, tableData, headers, subheaders)}
-            open={open}
-            onClose={handleDownloadClose}
-          />
+          <>
+            <DownloadModal
+              sampleIds={checkedSamples}
+              failedSamples={failedSamples}
+              setDownloadFailed={setDownloadFailed}
+              isMetadataSelected={isMetadataSelected}
+              setMetadataSelected={setMetadataSelected}
+              isFastaSelected={isFastaSelected}
+              setFastaSelected={setFastaSelected}
+              isFastaDisabled={isFastaDisabled}
+              setFastaDisabled={setFastaDisabled}
+              tsvData={tsvDataMap(
+                checkedSamples,
+                tableData,
+                headers,
+                subheaders
+              )}
+              open={open}
+              onClose={handleDownloadClose}
+            />
+            <CreateTreeModal
+              sampleIds={checkedSamples}
+              failedSamples={failedSamples}
+              open={createTreeModalOpen}
+              onClose={handleCreateTreeClose}
+              setCreateTreeFailed={setCreateTreeFailed}
+            />
+          </>
         )}
         <StyledFlexChildDiv className={style.samplesRoot}>
           <div className={style.searchBar}>

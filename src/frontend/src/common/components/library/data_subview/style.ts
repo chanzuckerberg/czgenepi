@@ -77,9 +77,11 @@ export const StyledDownloadDisabledImage = styled(DownloadImage)`
   }}
 `;
 
-export const StyledTreeBuildImage = StyledDownloadImage.withComponent(TreeBuildImage);
+export const StyledTreeBuildImage =
+  StyledDownloadImage.withComponent(TreeBuildImage);
 
-export const StyledTreeBuildDisabledImage = StyledDownloadDisabledImage.withComponent(TreeBuildImage);
+export const StyledTreeBuildDisabledImage =
+  StyledDownloadDisabledImage.withComponent(TreeBuildImage);
 
 export const BoldText = styled.div`
   ${(props) => {
