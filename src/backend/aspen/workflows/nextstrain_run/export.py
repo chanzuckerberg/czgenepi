@@ -145,7 +145,7 @@ def cli(
         if sequences_fh:
             write_sequences_files(session, pathogen_genomes, sequences_fh, metadata_fh)
         if selected_fh:
-            write_includes_file(session, pathogen_genomes, selected_fh)
+            write_includes_file(session, phylo_run, pathogen_genomes, selected_fh)
 
         print(
             json.dumps(
@@ -158,7 +158,7 @@ def cli(
         )
 
 
-def write_includes_file(session, pathogen_genomes, selected_fh):
+def write_includes_file(session, phylo_run, pathogen_genomes, selected_fh):
     # Create a list of the inputted pathogen genomes that are uploaded pathogen genomes
     sample_ids: List[int] = [
         pathogen_genome.sample_id
@@ -174,6 +174,8 @@ def write_includes_file(session, pathogen_genomes, selected_fh):
         if public_identifier.lower().startswith("hcov-19"):
             public_identifier = public_identifier[8:]
         selected_fh.write(f"{public_identifier}\n")
+    for gisaid_id in phylo_run.gisaid_ids:
+        selected_fh.write(f"{gisaid_id}\n")
 
 
 def write_sequences_files(session, pathogen_genomes, sequences_fh, metadata_fh):
