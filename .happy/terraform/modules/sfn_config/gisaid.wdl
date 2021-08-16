@@ -302,7 +302,7 @@ task ImportGISAID {
 
     command <<<
     set -Eeuo pipefail
-    
+
     export ASPEN_CONFIG_SECRET_NAME=~{aspen_config_secret_name}
     if [ "~{remote_dev_prefix}" != "" ]; then
         export REMOTE_DEV_PREFIX="~{remote_dev_prefix}"
