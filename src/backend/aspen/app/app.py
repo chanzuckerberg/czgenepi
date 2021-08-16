@@ -180,7 +180,14 @@ def requires_auth(f):
             return redirect("/login")
         with session_scope(application.DATABASE_INTERFACE) as db_session:
             g.db_session = db_session
-            g.auth_user = setup_userinfo(auth0_user_id)
+            found_auth_user = setup_userinfo(auth0_user_id)
+            if not found_auth_user:
+                # login attempt from user not in DB
+                # TODO: return response to user that they do not have an account with aspen.
+                return redirect("/login")
+            else:
+                g.auth_user = found_auth_user
+            
             if not g.auth_user:
                 return redirect("/login")
             return f(*args, **kwargs)
