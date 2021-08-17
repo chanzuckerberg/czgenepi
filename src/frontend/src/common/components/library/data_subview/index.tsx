@@ -135,19 +135,19 @@ const DataSubview: FunctionComponent<Props> = ({
 
   const [checkedSamples, setCheckedSamples] = useState<any[]>([]);
   const [showCheckboxes, setShowCheckboxes] = useState<boolean>(false);
-  const [open, setOpen] = useState(false);
+  const [isDownloadModalOpen, setDownloadModalOpen] = useState(false);
   const [isDownloadDisabled, setDownloadDisabled] = useState<boolean>(true);
   const [failedSamples, setFailedSamples] = useState<any[]>([]);
   const [downloadFailed, setDownloadFailed] = useState<boolean>(false);
   const [isMetadataSelected, setMetadataSelected] = useState<boolean>(false);
   const [isFastaSelected, setFastaSelected] = useState<boolean>(false);
   const [isFastaDisabled, setFastaDisabled] = useState<boolean>(false);
-  const [createTreeModalOpen, setCreateTreeModalOpen] =
+  const [isCreateTreeModalOpen, setCreateTreeModalOpen] =
     useState<boolean>(false);
-  const [createTreeFailed, setCreateTreeFailed] = useState<boolean>(false);
+  const [didCreateTreeFailed, setCreateTreeFailed] = useState<boolean>(false);
 
   const handleDownloadClickOpen = () => {
-    setOpen(true);
+    setDownloadModalOpen(true);
   };
 
   const handleCreateTreeClickOpen = () => {
@@ -159,7 +159,7 @@ const DataSubview: FunctionComponent<Props> = ({
   };
 
   const handleDownloadClose = () => {
-    setOpen(false);
+    setDownloadModalOpen(false);
     setMetadataSelected(false);
     setFastaSelected(false);
   };
@@ -188,10 +188,10 @@ const DataSubview: FunctionComponent<Props> = ({
   }, [downloadFailed]);
 
   useEffect(() => {
-    if (createTreeFailed) {
+    if (didCreateTreeFailed) {
       setCreateTreeModalOpen(false);
     }
-  }, [createTreeFailed]);
+  }, [didCreateTreeFailed]);
 
   function handleDismissErrorClick() {
     setDownloadFailed(false);
@@ -297,13 +297,13 @@ const DataSubview: FunctionComponent<Props> = ({
                 headers,
                 subheaders
               )}
-              open={open}
+              open={isDownloadModalOpen}
               onClose={handleDownloadClose}
             />
             <CreateTreeModal
               sampleIds={checkedSamples}
               failedSamples={failedSamples}
-              open={createTreeModalOpen}
+              open={isCreateTreeModalOpen}
               onClose={handleCreateTreeClose}
               setCreateTreeFailed={setCreateTreeFailed}
             />
