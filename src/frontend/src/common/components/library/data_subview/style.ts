@@ -11,7 +11,7 @@ import {
   Link,
 } from "czifui";
 import DownloadImage from "./IconDownload.svg";
-import TreeBuildImage from "./IconTreebuild.svg";
+import TreeBuildImage from "./IconPhylotree.svg";
 
 export const StyledDiv = styled.div`
   ${fontHeaderXs}
