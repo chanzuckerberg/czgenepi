@@ -187,6 +187,12 @@ const DataSubview: FunctionComponent<Props> = ({
     }
   }, [downloadFailed]);
 
+  useEffect(() => {
+    if (createTreeFailed) {
+      setCreateTreeModalOpen(false);
+    }
+  }, [createTreeFailed]);
+
   function handleDismissErrorClick() {
     setDownloadFailed(false);
   }
