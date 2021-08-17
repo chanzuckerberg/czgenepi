@@ -35,7 +35,7 @@ export const CreateTreeModal = ({
     onError: () => {
       setCreateTreeFailed(true);
     },
-    onSuccess: (data: any) => {
+    onSuccess: () => {
       setTreeName("");
       setTreeType("");
       onClose();
