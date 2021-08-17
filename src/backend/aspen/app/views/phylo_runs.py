@@ -5,7 +5,7 @@ import re
 from typing import Iterable, MutableSequence
 
 import sentry_sdk
-from flask import g, jsonify, request, Response
+from flask import g, jsonify, request, make_response
 from marshmallow.exceptions import ValidationError
 from sqlalchemy.orm import joinedload
 
@@ -41,7 +41,10 @@ def start_phylo_run():
     try:
         request_data = validator.load(request.get_json())
     except ValidationError as verr:
-        return Response(str(verr), 400)
+        sentry_sdk.capture_message(f"Invalid API request to /api/phyloruns", "info")
+        response = make_response(str(verr), 400)
+        response.headers['Content-Type'] = 'text/json'
+        return response
     sample_ids = request_data["samples"]
 
     # Step 2 - prepare big sample query per the old db cli
@@ -59,7 +62,10 @@ def start_phylo_run():
         found_sample_ids.add(sample.private_identifier)
         found_sample_ids.add(sample.public_identifier)
     if len(pathogen_genomes) == 0:
-        raise ValueError("No sequences selected for run.")
+        sentry_sdk.capture_message(f"No sequences selected for run from {sample_ids}.", "error")
+        response = make_response(jsonify({"error": "No sequences selected for run"}), 400)
+        response.headers['Content-Type'] = 'text/json'
+        return response
 
     # These are the sample ID's that don't match the aspen db
     missing_sample_ids = set(sample_ids) - found_sample_ids
@@ -76,12 +82,11 @@ def start_phylo_run():
 
     # Throw an error if we have any sample ID's that didn't match county samples OR gisaid samples.
     if missing_sample_ids:
-        # TODO - our exception handling needs to be smarter!!!
-        return jsonify({"error": "missing ids", "ids": list(missing_sample_ids)})
-        #sentry_sdk.capture_message(
-        #    f"User requested invalid samples ({missing_sample_ids})"
-        #)
-        #return BadRequest(f"Invalid sample ID's ({missing_sample_ids})")
+        sentry_sdk.capture_message(
+           f"User requested invalid samples ({missing_sample_ids})")
+        response = make_response(jsonify({"error": "missing ids", "ids": list(missing_sample_ids)}), 400)
+        response.headers['Content-Type'] = 'text/json'
+        return response
 
     aligned_gisaid_dump = (
         g.db_session.query(AlignedGisaidDump)
@@ -90,7 +95,10 @@ def start_phylo_run():
         .first()
     )
     if not aligned_gisaid_dump:
-        return Response("No gisaid dump for run", 500)
+        sentry_sdk.capture_message(f"No Aligned Gisaid Dump found! Cannot create PhyloRun!", "fatal")
+        response = make_response(jsonify({"error": "No gisaid dump for run"}), 500)
+        response.headers['Content-Type'] = 'text/json'
+        return response
 
     template_path_prefix = (
         "/usr/src/app/aspen/workflows/nextstrain_run/builds_templates"
@@ -118,7 +126,10 @@ def start_phylo_run():
     # TODO -- our build pipeline assumes we've selected some samples, and everything stops making
     # sense if we have an empty includes.txt.
     if not pathogen_genomes:
-        raise Exception("No valid pathogen genomes found, not running tree build!")
+        sentry_sdk.capture_message(f"No valid pathogen genomes found among local sample ids {found_sample_ids} or gisaid ids {gisaid_ids}! Not running tree build.", "error")
+        response = make_response(jsonify({"error": "No valid pathogen genomes found. Not running tree build."}), 500)
+        response.headers['Content-Type'] = 'text/json'
+        return response
 
     workflow.inputs = list(pathogen_genomes)
     workflow.inputs.append(aligned_gisaid_dump)
@@ -168,4 +179,6 @@ def start_phylo_run():
         input=json.dumps(sfn_input_json),
     )
 
-    return jsonify(responseschema.dumps(workflow))
+    response = make_response(jsonify(responseschema.dumps(workflow)), 200)
+    response.headers['Content-Type'] = 'text/json'
+    return response
