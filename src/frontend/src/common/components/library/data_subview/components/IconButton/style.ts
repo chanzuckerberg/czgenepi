@@ -6,7 +6,7 @@ export const StyledSpan = styled.span`
   ${(props) => {
     const spacings = getSpacings(props);
     return `
-    margin-left: ${spacings?.m}px;
-  `;
+      margin-left: ${spacings?.m}px;
+    `;
   }}
 `;
