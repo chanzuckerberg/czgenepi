@@ -43,7 +43,7 @@ def start_phylo_run():
     except ValidationError as verr:
         sentry_sdk.capture_message(f"Invalid API request to /api/phyloruns", "info")
         response = make_response(str(verr), 400)
-        response.headers['Content-Type'] = 'text/json'
+        response.headers['Content-Type'] = 'application/json'
         return response
     sample_ids = request_data["samples"]
 
@@ -64,7 +64,7 @@ def start_phylo_run():
     if len(pathogen_genomes) == 0:
         sentry_sdk.capture_message(f"No sequences selected for run from {sample_ids}.", "error")
         response = make_response(jsonify({"error": "No sequences selected for run"}), 400)
-        response.headers['Content-Type'] = 'text/json'
+        response.headers['Content-Type'] = 'application/json'
         return response
 
     # These are the sample ID's that don't match the aspen db
@@ -85,7 +85,7 @@ def start_phylo_run():
         sentry_sdk.capture_message(
            f"User requested invalid samples ({missing_sample_ids})")
         response = make_response(jsonify({"error": "missing ids", "ids": list(missing_sample_ids)}), 400)
-        response.headers['Content-Type'] = 'text/json'
+        response.headers['Content-Type'] = 'application/json'
         return response
 
     aligned_gisaid_dump = (
@@ -97,7 +97,7 @@ def start_phylo_run():
     if not aligned_gisaid_dump:
         sentry_sdk.capture_message(f"No Aligned Gisaid Dump found! Cannot create PhyloRun!", "fatal")
         response = make_response(jsonify({"error": "No gisaid dump for run"}), 500)
-        response.headers['Content-Type'] = 'text/json'
+        response.headers['Content-Type'] = 'application/json'
         return response
 
     template_path_prefix = (
@@ -128,7 +128,7 @@ def start_phylo_run():
     if not pathogen_genomes:
         sentry_sdk.capture_message(f"No valid pathogen genomes found among local sample ids {found_sample_ids} or gisaid ids {gisaid_ids}! Not running tree build.", "error")
         response = make_response(jsonify({"error": "No valid pathogen genomes found. Not running tree build."}), 500)
-        response.headers['Content-Type'] = 'text/json'
+        response.headers['Content-Type'] = 'application/json'
         return response
 
     workflow.inputs = list(pathogen_genomes)
@@ -180,5 +180,5 @@ def start_phylo_run():
     )
 
     response = make_response(jsonify(responseschema.dumps(workflow)), 200)
-    response.headers['Content-Type'] = 'text/json'
+    response.headers['Content-Type'] = 'application/json'
     return response
