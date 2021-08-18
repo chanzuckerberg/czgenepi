@@ -25,9 +25,7 @@ def upgrade():
         sa.Column("division", sa.String(), nullable=True),
         sa.Column("location", sa.String(), nullable=True),
         sa.Column("import_id", sa.String(), nullable=False),
-        sa.PrimaryKeyConstraint(
-            "strain", name=op.f("pk_gisaid_metadata")
-        ),
+        sa.PrimaryKeyConstraint("strain", name=op.f("pk_gisaid_metadata")),
         schema="aspen",
     )
 

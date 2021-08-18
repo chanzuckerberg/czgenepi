@@ -17,6 +17,7 @@ from aspen.database.models.gisaid_dump import (  # noqa: F401
     ProcessedGisaidDump,
     RawGisaidDump,
 )
+from aspen.database.models.gisaid_metadata import GisaidMetadata  # noqa: F401
 from aspen.database.models.host_filtering import (  # noqa: F401
     FilterRead,
     HostFilteredSequencingReadsCollection,
@@ -37,7 +38,6 @@ from aspen.database.models.sequences import (  # noqa: F401
     UploadedPathogenGenome,
 )
 from aspen.database.models.usergroup import Group, User  # noqa: F401
-from aspen.database.models.gisaid_metadata import GisaidMetadata  # noqa: F401
 from aspen.database.models.workflow import (  # noqa: F401
     Workflow,
     WorkflowInputs,

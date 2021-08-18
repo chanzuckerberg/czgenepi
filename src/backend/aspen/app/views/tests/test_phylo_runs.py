@@ -1,5 +1,6 @@
 import json
 
+from aspen.test_infra.models.gisaid_metadata import gisaid_metadata_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
 from aspen.test_infra.models.usergroup import group_factory, user_factory
@@ -12,7 +13,7 @@ def test_create_phylo_run(
     client,
 ):
     """
-    Test a regular phylo tree creation.
+    Test phylo tree creation, local-only samples.
     """
     group = group_factory()
     user = user_factory(group)
@@ -29,6 +30,44 @@ def test_create_phylo_run(
         "name": "test phylorun",
         "tree_type": "contextual",
         "samples": [sample.public_identifier],
+    }
+    res = client.post("/api/phylo_runs", json=data)
+    assert res.status == "200 OK"
+    response = json.loads(res.json)
+    template_args = response["template_args"]
+    assert template_args["division"] == group.division
+    assert template_args["location"] == group.location
+    assert "contextual.yaml" in response["template_file_path"]
+    assert response["workflow_status"] == "STARTED"
+    assert response["group"]["name"] == group.name
+    assert "id" in response
+
+
+def test_create_phylo_run_with_gisaid_ids(
+    session,
+    app,
+    client,
+):
+    """
+    Test phylo tree creation that includes a reference to a GISAID sequence.
+    """
+    group = group_factory()
+    user = user_factory(group)
+    sample = sample_factory(group, user)
+    uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
+    gisaid_dump = aligned_gisaid_dump_factory()
+    gisaid_sample = gisaid_metadata_factory()
+    session.add(group)
+    session.add(gisaid_dump)
+    session.add(gisaid_sample)
+    session.commit()
+
+    with client.session_transaction() as sess:
+        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
+    data = {
+        "name": "test phylorun",
+        "tree_type": "contextual",
+        "samples": [sample.public_identifier, gisaid_sample.strain],
     }
     res = client.post("/api/phylo_runs", json=data)
     assert res.status == "200 OK"
