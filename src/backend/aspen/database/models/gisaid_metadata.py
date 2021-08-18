@@ -19,4 +19,3 @@ class GisaidMetadata(base):
     )  # Can be a value outside our RegionTable enum
     division = Column(String, nullable=True)
     location = Column(String, nullable=True)
-    import_id = Column(String, nullable=True)

@@ -310,8 +310,9 @@ task ImportGISAID {
         export REMOTE_DEV_PREFIX="~{remote_dev_prefix}"
     fi
 
+    export PYTHONUNBUFFERED=true
     python3 /usr/src/app/aspen/workflows/import_gisaid/save.py       \
-            --metadata-file ~{gisaid_metadata}
+            --metadata-file ~{gisaid_metadata} 1>&2
     >>>
 
     runtime {
