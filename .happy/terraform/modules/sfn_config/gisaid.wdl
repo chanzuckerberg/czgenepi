@@ -42,7 +42,7 @@ workflow LoadGISAID {
         aws_region = aws_region,
         aspen_config_secret_name = aspen_config_secret_name,
         remote_dev_prefix = remote_dev_prefix,
-        gisaid_metadata = AlignGisaid.gisaid_metadata,
+        gisaid_metadata = AlignGISAID.gisaid_metadata,
     }
 
     output {
@@ -277,11 +277,12 @@ task AlignGISAID {
             --gisaid-s3-bucket "${aspen_s3_db_bucket}"                              \
             --gisaid-sequences-s3-key "${sequences_key}"                            \
             --gisaid-metadata-s3-key "${metadata_key}" > entity_id
+    cp /ncov/data/metadata.tsv metatdata.tsv  # Support wdl output paths.
     >>>
 
     output {
         Array[File] snakemake_logs = glob("*.snakemake.log")
-	File gisaid_metadata = "/ncov/data/metadata.tsv"
+	File gisaid_metadata = "metadata.tsv"
         File align_log = "align.txt"
         String entity_id = read_string("entity_id")
     }
@@ -302,6 +303,7 @@ task ImportGISAID {
 
     command <<<
     set -Eeuo pipefail
+    aws configure set region ~{aws_region}
 
     export ASPEN_CONFIG_SECRET_NAME=~{aspen_config_secret_name}
     if [ "~{remote_dev_prefix}" != "" ]; then
