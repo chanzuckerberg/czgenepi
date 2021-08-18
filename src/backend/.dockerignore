@@ -1,8 +1,14 @@
+**/*.pyc
+**/*.swp
+**/*.swo
 *.egg-info
 *.egg/
 *.pyc
 *.swp
+*.swo
+**/__pycache__
 
 .tox
 .coverage
-__pycache__
+.pytest_cache
+.mypy_cache

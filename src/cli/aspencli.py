@@ -4,7 +4,7 @@ import requests
 import json
 import time
 import os.path
-from urllib.parse import urlparse
+from urllib.parse import urlparse, quote
 import webbrowser
 import keyring
 from auth0.v3.authentication.token_verifier import (
@@ -236,6 +236,25 @@ def cli(ctx, env, api, stack):
     config = CliConfig(env, api, stack)
     ctx.obj["config"] = config
     ctx.obj["api_client"] = config.get_api_client()
+
+
+@cli.group()
+def usher():
+    pass
+
+
+@usher.command(name="get-link")
+@click.argument("sample_ids", nargs=-1)
+@click.pass_context
+def get_link(ctx, sample_ids):
+    api_client = ctx.obj["api_client"]
+    payload = {"samples": sample_ids}
+    resp = api_client.post("/api/sequences/getfastaurl", json=payload)
+    print(resp.text)
+    resp_info = resp.json()
+    s3_url = resp_info["url"]
+    print(f"https://genome.ucsc.edu/cgi-bin/hgPhyloPlace?db=wuhCor1&remoteFile={quote(s3_url)}")
+
 
 
 @cli.group()
