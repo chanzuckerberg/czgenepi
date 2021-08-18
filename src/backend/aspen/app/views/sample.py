@@ -164,8 +164,8 @@ def prepare_sequences_download():
         with session_scope(application.DATABASE_INTERFACE) as db_session:
             sample_ids = request_data["requested_sequences"]["sample_ids"]
             streamer = FastaStreamer(user, sample_ids, db_session)
-            for item in streamer.stream():
-                yield item
+            for line in streamer.stream():
+                yield line
 
     # Detach all ORM objects (makes them read-only!) from the DB session for our generator.
     g.db_session.expunge_all()
@@ -190,14 +190,14 @@ def getfastaurl():
     )
     s3_client = s3_resource.meta.client
     uuid = uuid4()
-    s3_key = f"fastaurlfiles/{user.group.name}_{uuid}.fasta"
+    s3_key = f"fasta-url-files/{user.group.name}/{uuid}.fasta"
     s3_write_fh = smart_open.open(
         f"s3://{s3_bucket}/{s3_key}", "w", transport_params=dict(client=s3_client)
     )
     # Write selected samples to s3
     streamer = FastaStreamer(user, sample_ids, g.db_session)
-    for item in streamer.stream():
-        s3_write_fh.write(item)
+    for line in streamer.stream():
+        s3_write_fh.write(line)
     s3_write_fh.close()
 
     presigned_url = s3_client.generate_presigned_url(
