@@ -1,4 +1,3 @@
-import { Tooltip } from "czifui";
 import { escapeRegExp } from "lodash/fp";
 import React, {
   FunctionComponent,
@@ -9,8 +8,9 @@ import React, {
 import { Input } from "semantic-ui-react";
 import { DataTable } from "src/common/components";
 import { VIEWNAME } from "src/common/constants/types";
-import { IconButtonBubble } from "src/common/styles/support/style";
+import { CreateTreeModal } from "./components/createTreeModal";
 import DownloadModal from "./components/DownloadModal";
+import { IconButton } from "./components/IconButton";
 import style from "./index.module.scss";
 import {
   BoldText,
@@ -24,7 +24,8 @@ import {
   StyledDownloadImage,
   StyledFlexChildDiv,
   StyledLink,
-  StyledSpan,
+  StyledTreeBuildDisabledImage,
+  StyledTreeBuildImage,
   TooltipDescriptionText,
   TooltipHeaderText,
 } from "./style";
@@ -134,20 +135,31 @@ const DataSubview: FunctionComponent<Props> = ({
 
   const [checkedSamples, setCheckedSamples] = useState<any[]>([]);
   const [showCheckboxes, setShowCheckboxes] = useState<boolean>(false);
-  const [open, setOpen] = useState(false);
+  const [isDownloadModalOpen, setDownloadModalOpen] = useState(false);
   const [isDownloadDisabled, setDownloadDisabled] = useState<boolean>(true);
   const [failedSamples, setFailedSamples] = useState<any[]>([]);
   const [downloadFailed, setDownloadFailed] = useState<boolean>(false);
   const [isMetadataSelected, setMetadataSelected] = useState<boolean>(false);
   const [isFastaSelected, setFastaSelected] = useState<boolean>(false);
   const [isFastaDisabled, setFastaDisabled] = useState<boolean>(false);
+  const [isCreateTreeModalOpen, setCreateTreeModalOpen] =
+    useState<boolean>(false);
+  const [didCreateTreeFailed, setCreateTreeFailed] = useState<boolean>(false);
 
   const handleDownloadClickOpen = () => {
-    setOpen(true);
+    setDownloadModalOpen(true);
+  };
+
+  const handleCreateTreeClickOpen = () => {
+    setCreateTreeModalOpen(true);
+  };
+
+  const handleCreateTreeClose = () => {
+    setCreateTreeModalOpen(false);
   };
 
   const handleDownloadClose = () => {
-    setOpen(false);
+    setDownloadModalOpen(false);
     setMetadataSelected(false);
     setFastaSelected(false);
   };
@@ -171,9 +183,15 @@ const DataSubview: FunctionComponent<Props> = ({
   useEffect(() => {
     // if there is an error then close the modal.
     if (downloadFailed) {
-      setOpen(false);
+      setDownloadModalOpen(false);
     }
   }, [downloadFailed]);
+
+  useEffect(() => {
+    if (didCreateTreeFailed) {
+      setCreateTreeModalOpen(false);
+    }
+  }, [didCreateTreeFailed]);
 
   function handleDismissErrorClick() {
     setDownloadFailed(false);
@@ -212,6 +230,21 @@ const DataSubview: FunctionComponent<Props> = ({
     </div>
   );
 
+  const TREE_BUILD_TOOLTIP_TEXT_DISABLED = (
+    <div>
+      <TooltipHeaderText>Create Phylogenetic Tree</TooltipHeaderText>
+      <TooltipDescriptionText>
+        {"Select at least 1 and <2000 recovered samples"}
+      </TooltipDescriptionText>
+    </div>
+  );
+
+  const TREE_BUILD_TOOLTIP_TEXT_ENABLED = (
+    <div>
+      <TooltipHeaderText>Create Phylogenetic Tree</TooltipHeaderText>
+    </div>
+  );
+
   const render = (tableData?: TableItem[]) => {
     let downloadButton: JSX.Element | null = null;
     if (viewName === VIEWNAME.SAMPLES && tableData !== undefined) {
@@ -224,29 +257,22 @@ const DataSubview: FunctionComponent<Props> = ({
           />
           <StyledDiv>Selected </StyledDiv>
           <Divider />
-          <Tooltip
-            arrow
-            inverted
-            title={
-              isDownloadDisabled
-                ? DOWNLOAD_TOOLTIP_TEXT_DISABLED
-                : DOWNLOAD_TOOLTIP_TEXT_ENABLED
-            }
-            placement="top"
-          >
-            <StyledSpan>
-              <IconButtonBubble
-                onClick={handleDownloadClickOpen}
-                disabled={isDownloadDisabled}
-              >
-                {isDownloadDisabled ? (
-                  <StyledDownloadDisabledImage />
-                ) : (
-                  <StyledDownloadImage />
-                )}
-              </IconButtonBubble>
-            </StyledSpan>
-          </Tooltip>
+          <IconButton
+            onClick={handleCreateTreeClickOpen}
+            disabled={isDownloadDisabled}
+            svgDisabled={<StyledTreeBuildDisabledImage />}
+            svgEnabled={<StyledTreeBuildImage />}
+            tooltipTextDisabled={TREE_BUILD_TOOLTIP_TEXT_DISABLED}
+            tooltipTextEnabled={TREE_BUILD_TOOLTIP_TEXT_ENABLED}
+          />
+          <IconButton
+            onClick={handleDownloadClickOpen}
+            disabled={isDownloadDisabled}
+            svgDisabled={<StyledDownloadDisabledImage />}
+            svgEnabled={<StyledDownloadImage />}
+            tooltipTextDisabled={DOWNLOAD_TOOLTIP_TEXT_DISABLED}
+            tooltipTextEnabled={DOWNLOAD_TOOLTIP_TEXT_ENABLED}
+          />
         </DownloadWrapper>
       );
     }
@@ -254,20 +280,34 @@ const DataSubview: FunctionComponent<Props> = ({
     return (
       <>
         {tableData !== undefined && viewName === VIEWNAME.SAMPLES && (
-          <DownloadModal
-            sampleIds={checkedSamples}
-            failedSamples={failedSamples}
-            setDownloadFailed={setDownloadFailed}
-            isMetadataSelected={isMetadataSelected}
-            setMetadataSelected={setMetadataSelected}
-            isFastaSelected={isFastaSelected}
-            setFastaSelected={setFastaSelected}
-            isFastaDisabled={isFastaDisabled}
-            setFastaDisabled={setFastaDisabled}
-            tsvData={tsvDataMap(checkedSamples, tableData, headers, subheaders)}
-            open={open}
-            onClose={handleDownloadClose}
-          />
+          <>
+            <DownloadModal
+              sampleIds={checkedSamples}
+              failedSamples={failedSamples}
+              setDownloadFailed={setDownloadFailed}
+              isMetadataSelected={isMetadataSelected}
+              setMetadataSelected={setMetadataSelected}
+              isFastaSelected={isFastaSelected}
+              setFastaSelected={setFastaSelected}
+              isFastaDisabled={isFastaDisabled}
+              setFastaDisabled={setFastaDisabled}
+              tsvData={tsvDataMap(
+                checkedSamples,
+                tableData,
+                headers,
+                subheaders
+              )}
+              open={isDownloadModalOpen}
+              onClose={handleDownloadClose}
+            />
+            <CreateTreeModal
+              sampleIds={checkedSamples}
+              failedSamples={failedSamples}
+              open={isCreateTreeModalOpen}
+              onClose={handleCreateTreeClose}
+              setCreateTreeFailed={setCreateTreeFailed}
+            />
+          </>
         )}
         <StyledFlexChildDiv className={style.samplesRoot}>
           <div className={style.searchBar}>
