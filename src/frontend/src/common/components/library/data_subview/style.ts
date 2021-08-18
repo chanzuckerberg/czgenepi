@@ -11,6 +11,7 @@ import {
   Link,
 } from "czifui";
 import DownloadImage from "./IconDownload.svg";
+import TreeBuildImage from "./IconPhylotree.svg";
 
 export const StyledDiv = styled.div`
   ${fontHeaderXs}
@@ -54,16 +55,6 @@ export const DownloadWrapper = styled.div`
   display: flex;
 `;
 
-export const StyledSpan = styled.span`
-  display: flex;
-  ${(props) => {
-    const spacings = getSpacings(props);
-    return `
-      margin-left: ${spacings?.m}px;
-    `;
-  }}
-`;
-
 export const StyledDownloadImage = styled(DownloadImage)`
   width: 32px;
   height: 32px;
@@ -85,6 +76,12 @@ export const StyledDownloadDisabledImage = styled(DownloadImage)`
     `;
   }}
 `;
+
+export const StyledTreeBuildImage =
+  StyledDownloadImage.withComponent(TreeBuildImage);
+
+export const StyledTreeBuildDisabledImage =
+  StyledDownloadDisabledImage.withComponent(TreeBuildImage);
 
 export const BoldText = styled.div`
   ${(props) => {
