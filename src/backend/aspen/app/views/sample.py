@@ -20,7 +20,6 @@ from sqlalchemy import and_, or_
 from sqlalchemy.orm import joinedload
 
 from aspen.app.app import application, requires_auth
-from aspen.fileio.fasta_streamer import FastaStreamer
 from aspen.app.views import api_utils
 from aspen.app.views.api_utils import authz_sample_filters, check_valid_sequence
 from aspen.database.connection import session_scope
@@ -37,6 +36,7 @@ from aspen.database.models import (
 from aspen.database.models.sample import create_public_ids, RegionType
 from aspen.database.models.usergroup import User
 from aspen.error.recoverable import RecoverableError
+from aspen.fileio.fasta_streamer import FastaStreamer
 
 DEFAULT_DIVISION = "California"
 DEFAULT_COUNTRY = "USA"
