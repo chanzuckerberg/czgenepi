@@ -36,7 +36,10 @@ def cli(
             strain = row["strain"]
             metadata_fields = { field.lower(): row[field] for field in fields_to_import }
             metadata_fields["import_id"] = import_id
-            metadata_fields["date"] = arrow.get(row['date']).datetime
+            try:
+                metadata_fields["date"] = arrow.get(row['date']).datetime
+            except arrow.parser.ParserError:
+                metadata_fields["date"] = None  # Date isn't parseable
             upsert_statement = insert(GisaidMetadata, bind=session).values(
                 **metadata_fields
             )
