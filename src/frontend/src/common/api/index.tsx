@@ -9,6 +9,7 @@ export enum API {
   PHYLO_TREES = "/api/phylo_trees",
   SAMPLES_CREATE = "/api/samples/create",
   SAMPLES_FASTA_DOWNLOAD = "/api/sequences",
+  CREATE_TREE = "/api/phylo_runs",
 }
 
 export const DEFAULT_HEADERS_MUTATION_OPTIONS: RequestInit = {
