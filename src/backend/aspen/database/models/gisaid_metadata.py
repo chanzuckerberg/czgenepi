@@ -1,6 +1,6 @@
 from sqlalchemy import Column, DateTime, String
 
-from aspen.database.models.base import base
+from aspen.database.models import base
 
 
 class GisaidMetadata(base):
