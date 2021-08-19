@@ -7,7 +7,6 @@ import uuid
 import arrow
 import click
 from sqlalchemy import Column, MetaData, Table
-from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.schema import CreateTable, DropTable
 
 from aspen.config.config import Config
@@ -74,7 +73,6 @@ def cli(
         for row in data:
             num_rows += 1
             # add this row to the db
-            strain = row["strain"]
             metadata_fields = {field.lower(): row[field] for field in fields_to_import}
             if num_rows % 20000 == 0:
                 session.execute(temp_table.insert(), objects)

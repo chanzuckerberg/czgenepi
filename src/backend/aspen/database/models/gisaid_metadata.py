@@ -1,5 +1,3 @@
-from typing import Mapping
-
 from sqlalchemy import Column, DateTime, String
 
 from aspen.database.models.base import base

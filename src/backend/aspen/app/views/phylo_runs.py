@@ -41,7 +41,7 @@ def start_phylo_run():
     try:
         request_data = validator.load(request.get_json())
     except ValidationError as verr:
-        sentry_sdk.capture_message(f"Invalid API request to /api/phyloruns", "info")
+        sentry_sdk.capture_message("Invalid API request to /api/phyloruns", "info")
         response = make_response(str(verr), 400)
         response.headers["Content-Type"] = "application/json"
         return response
@@ -105,7 +105,7 @@ def start_phylo_run():
     )
     if not aligned_gisaid_dump:
         sentry_sdk.capture_message(
-            f"No Aligned Gisaid Dump found! Cannot create PhyloRun!", "fatal"
+            "No Aligned Gisaid Dump found! Cannot create PhyloRun!", "fatal"
         )
         response = make_response(jsonify({"error": "No gisaid dump for run"}), 500)
         response.headers["Content-Type"] = "application/json"

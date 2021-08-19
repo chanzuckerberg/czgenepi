@@ -2,7 +2,7 @@ import csv
 import io
 import json
 from pathlib import Path
-from typing import Any, Iterable, Mapping, MutableMapping, Set, Tuple
+from typing import Any, Iterable, List, Mapping, MutableMapping, Set, Tuple
 
 import click
 from sqlalchemy import and_
@@ -168,7 +168,6 @@ def write_includes_file(session, phylo_run, pathogen_genomes, selected_fh):
 
     # Write an includes.txt with the sample ID's.
     sample_query = session.query(Sample).filter(Sample.id.in_(sample_ids))
-    num_samples = 0
     for sample in sample_query:
         public_identifier = sample.public_identifier
         if public_identifier.lower().startswith("hcov-19"):

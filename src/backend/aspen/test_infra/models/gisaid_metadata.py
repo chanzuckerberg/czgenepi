@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from aspen.database.models import GisaidMetadata, RegionType
+from aspen.database.models import GisaidMetadata
 
 
 def gisaid_metadata_factory(
