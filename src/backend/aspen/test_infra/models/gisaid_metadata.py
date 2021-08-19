@@ -8,7 +8,7 @@ def gisaid_metadata_factory(
     pango_lineage="B.1.617.2",
     gisaid_clade="T",  # T for test
     date=None,
-    region="North America",  # Not necessarily in our Sample enum
+    region="North America",  # Not necessarily in our Sample/RegionType enum
     division="California",
     location="Alameda County",
 ) -> GisaidMetadata:
