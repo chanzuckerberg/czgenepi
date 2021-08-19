@@ -1,15 +1,7 @@
 import datetime
 import os
 from collections import defaultdict
-from typing import (
-    Any,
-    Mapping,
-    MutableSequence,
-    Optional,
-    Sequence,
-    Set,
-    Union,
-)
+from typing import Any, Mapping, MutableSequence, Optional, Sequence, Set, Union
 from uuid import uuid4
 
 import boto3
