@@ -38,6 +38,8 @@ interface Props {
   renderer?: CustomRenderer;
   headerRenderer?: CustomRenderer;
   viewName: VIEWNAME;
+  //TODO better type
+  dataFilterFunc?: (data) => any;
 }
 
 interface InputOnChangeData {
@@ -125,6 +127,7 @@ const DataSubview: FunctionComponent<Props> = ({
   renderer,
   headerRenderer,
   viewName,
+  dataFilterFunc,
 }: Props) => {
   // we are modifying state using hooks, so we need a reducer
   const [state, dispatch] = useReducer(searchReducer, {
@@ -315,7 +318,7 @@ const DataSubview: FunctionComponent<Props> = ({
               failedSamples={failedSamples}
               setFailedSamples={setFailedSamples}
               showCheckboxes={showCheckboxes}
-              data={tableData}
+              data={dataFilterFunc ? dataFilterFunc(tableData) : tableData}
               defaultSortKey={defaultSortKey}
               headers={headers}
               headerRenderer={headerRenderer}
