@@ -1,10 +1,10 @@
 from sqlalchemy import Column, DateTime, String
 
-from aspen.database.models.base import idbase
+from aspen.database.models.base import base
 from aspen.database.models.mixins import DictMixin
 
 
-class GisaidMetadata(idbase, DictMixin):
+class GisaidMetadata(base, DictMixin):  # type: ignore
     """Nightly snapshot of gisaid metadata"""
 
     __tablename__ = "gisaid_metadata"
