@@ -11,7 +11,6 @@ def gisaid_metadata_factory(
     region="North America",  # Not necessarily in our Sample enum
     division="California",
     location="Alameda County",
-    import_id="import_id",
 ) -> GisaidMetadata:
     date = date or datetime.now()
     return GisaidMetadata(
@@ -22,5 +21,4 @@ def gisaid_metadata_factory(
         region=region,
         division=division,
         location=location,
-        import_id=import_id,
     )
