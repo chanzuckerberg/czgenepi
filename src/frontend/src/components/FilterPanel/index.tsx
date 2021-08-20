@@ -109,7 +109,6 @@ const FilterPanel: FC<Props> = ({ setDataFilterFunc }) => {
 
   return (
     <StyledFilterPanel>
-      I am a filter panel
       <CollectionDateFilter
         updateCollectionDateFilter={updateCollectionDateFilter}
       />
