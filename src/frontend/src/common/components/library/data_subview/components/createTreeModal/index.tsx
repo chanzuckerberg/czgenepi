@@ -1,8 +1,8 @@
 import { Dialog } from "@material-ui/core";
-import Radio from "@material-ui/core/Radio";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import CloseIcon from "@material-ui/icons/Close";
-import React, { useState } from "react";
+import { Alert, Link } from "czifui";
+import React, { useEffect, useState } from "react";
 import { useMutation } from "react-query";
 import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
@@ -11,23 +11,29 @@ import { createTree } from "src/common/queries/trees";
 import {
   Content,
   Header,
-  StyledButton,
   StyledIconButton,
   Title,
 } from "../DownloadModal/style";
 import { RadioLabelContextual, RadioLabelLocal } from "./components/RadioLabel";
 import {
+  CreateTreeInfo,
   FieldTitle,
   InstructionsNotSemiBold,
   InstructionsSemiBold,
+  StyledButton,
+  StyledErrorOutlinedIcon,
   StyledFormControlLabel,
+  StyledInfoOutlinedIcon,
   StyledInstructions,
   StyledInstructionsButton,
-  StyledTextField,
   StyledRadio,
-  TreeNameSection,
-  TreeTypeSection,
+  StyledTextField,
+  StyledTooltip,
+  TextFieldAlert,
   TreeNameInfoWrapper,
+  TreeNameSection,
+  TreeNameTooLongAlert,
+  TreeTypeSection,
 } from "./style";
 
 interface Props {
@@ -46,17 +52,54 @@ export const CreateTreeModal = ({
   setCreateTreeFailed,
 }: Props): JSX.Element => {
   const [treeName, setTreeName] = useState<string>("");
+  const [isTreeNameTooLong, setTreeNameTooLong] = useState<boolean>(false);
+  const [isTreeBuildDisabled, setTreeBuildDisabled] = useState<boolean>(false);
   const [treeType, setTreeType] = useState<string>("");
+  const [isContextual, setContextual] = useState<boolean>(true);
+  const [isLocal, setLocal] = useState<boolean>(true);
   const [areInstructionsShown, setInstructionsShown] = useState(false);
-  console.log("tree name: ", treeName);
-  console.log("tree type: ", treeType);
+  const [isCreateTreeButtonPressed, setCreateTreeButtonPressed] =
+    useState(false);
+
+  useEffect(() => {
+    if (treeType === "contextual") {
+      setLocal(false);
+      setContextual(true);
+    } else if (treeType === "local") {
+      setContextual(false);
+      setLocal(true);
+    } else {
+      setContextual(false);
+      setLocal(false);
+    }
+  }, [treeType]);
+
+  useEffect(() => {
+    const treeNameLength = treeName.length;
+    if (treeNameLength > 128) {
+      setTreeNameTooLong(true);
+      setTreeBuildDisabled(true);
+    } else if (treeNameLength === 0) {
+      setTreeBuildDisabled(true);
+    } else {
+      setTreeNameTooLong(false);
+      if (isContextual || isLocal) {
+        setTreeBuildDisabled(false);
+      } else {
+        setTreeBuildDisabled(true);
+      }
+    }
+  }, [treeName, isContextual, isLocal]);
+
   const mutation = useMutation(createTree, {
     onError: () => {
       setCreateTreeFailed(true);
+      setCreateTreeButtonPressed(false);
     },
     onSuccess: () => {
       setTreeName("");
       setTreeType("");
+      setCreateTreeButtonPressed(false);
       onClose();
     },
   });
@@ -65,11 +108,21 @@ export const CreateTreeModal = ({
     setInstructionsShown((prevState: boolean) => !prevState);
   };
 
-  const handleSubmit = (evt) => {
+  const handleSubmit = (evt: any) => {
     evt.preventDefault();
-    console.log(evt);
-    // mutation.mutate({ sampleIds, treeName, treeType });
+    setCreateTreeButtonPressed(true);
+    mutation.mutate({ sampleIds, treeName, treeType });
   };
+
+  const TREE_TYPE_TOOLTIP_TEXT = (
+    <div>
+      We add public samples, from GISAID, to your tree to provide important
+      context for interpreting your results.{" "}
+      <Link href="https://docs.google.com/document/d/1_iQgwl3hn_pjlZLX-n0alUbbhgSPZvpW_0620Hk_kB4/edit">
+        Read our guide to learn more.
+      </Link>
+    </div>
+  );
 
   return (
     <Dialog
@@ -97,11 +150,12 @@ export const CreateTreeModal = ({
                   color="primary"
                   onClick={handleInstructionsClick}
                 >
-                {areInstructionsShown ? "LESS" : "MORE"} INFO
+                  {areInstructionsShown ? "LESS" : "MORE"} INFO
                 </StyledInstructionsButton>
               </TreeNameInfoWrapper>
               {areInstructionsShown && (
                 <StyledInstructions
+                  title=""
                   items={[
                     <span key="1">
                       <InstructionsSemiBold>
@@ -118,14 +172,34 @@ export const CreateTreeModal = ({
               )}
               <StyledTextField
                 fullWidth
+                error={isTreeNameTooLong}
                 id="outlined-basic"
                 variant="outlined"
                 value={treeName}
                 onChange={(e) => setTreeName(e.target.value)}
               />
+              {isTreeNameTooLong && (
+                <TreeNameTooLongAlert>
+                  <StyledErrorOutlinedIcon />
+                  <TextFieldAlert>
+                    Name exceeds the 128 character limit.
+                  </TextFieldAlert>
+                </TreeNameTooLongAlert>
+              )}
             </TreeNameSection>
             <TreeTypeSection>
-              <FieldTitle>Include publicly-available samples from: </FieldTitle>
+              <TreeNameInfoWrapper>
+                <FieldTitle>
+                  Include publicly-available samples from:{" "}
+                </FieldTitle>
+                <StyledTooltip
+                  arrow
+                  title={TREE_TYPE_TOOLTIP_TEXT}
+                  placement="top"
+                >
+                  <StyledInfoOutlinedIcon />
+                </StyledTooltip>
+              </TreeNameInfoWrapper>
               <RadioGroup
                 value={treeType}
                 onChange={(e) => setTreeType(e.target.value)}
@@ -133,26 +207,45 @@ export const CreateTreeModal = ({
                 <StyledFormControlLabel
                   value="contextual"
                   control={<StyledRadio />}
-                  label={<RadioLabelContextual />}
+                  label={<RadioLabelContextual selected={isContextual} />}
                 />
                 <StyledFormControlLabel
                   value="local"
                   control={<StyledRadio />}
-                  label={<RadioLabelLocal />}
+                  label={<RadioLabelLocal selected={isLocal} />}
                 />
               </RadioGroup>
             </TreeTypeSection>
+            {failedSamples.length > 0 && (
+              <Alert severity="warning">
+                <InstructionsSemiBold>
+                  {" "}
+                  {failedSamples.length} Selected Sample
+                  {failedSamples.length > 1 && "s"} wont be included in your
+                  tree{" "}
+                </InstructionsSemiBold>
+                <InstructionsNotSemiBold>
+                  because they failed genome recovery.
+                </InstructionsNotSemiBold>
+              </Alert>
+            )}
             <StyledButton
               color="primary"
               variant="contained"
               isRounded
-              disabled={false}
+              disabled={isTreeBuildDisabled}
               type="submit"
               value="Submit"
             >
               Create Tree
             </StyledButton>
           </form>
+          {isCreateTreeButtonPressed && (
+            <CreateTreeInfo>
+              Creating a new tree can take up to X hours. We will notify you
+              when your tree is ready.
+            </CreateTreeInfo>
+          )}
         </Content>
       </DialogContent>
       <DialogActions></DialogActions>

@@ -1,7 +1,9 @@
 import styled from "@emotion/styled";
-import TextField from "@material-ui/core/TextField";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Radio from "@material-ui/core/Radio";
+import TextField from "@material-ui/core/TextField";
+import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
+import InfoOutlinedIcon from "@material-ui/icons/InfoOutlined";
 import {
   Button,
   fontBodyXs,
@@ -10,6 +12,7 @@ import {
   getColors,
   getFontWeights,
   getSpacings,
+  Tooltip,
 } from "czifui";
 import Instructions from "src/components/Instructions";
 
@@ -24,8 +27,8 @@ export const FieldTitle = styled.div`
     const spacings = getSpacings(props);
     return `
       margin-top: ${spacings?.l}px;
-      margin-right: ${spacings?.m}px;
-      margin-bottom: ${spacings?.xxxs}px;
+      margin-right: ${spacings?.xs}px;
+      margin-bottom: ${spacings?.s}px;
     `;
   }}
 `;
@@ -35,6 +38,7 @@ export const StyledInstructions = styled(Instructions)`
     const spacings = getSpacings(props);
     return `
       margin-bottom: ${spacings?.xs}px;
+      padding: ${spacings?.l}
     `;
   }}
 `;
@@ -68,7 +72,6 @@ export const StyledInstructionsButton = styled(Button)`
     const colors = getColors(props);
     return `
       margin-right: ${spacings?.s}px;
-      margin-left: ${spacings?.m}px;
       margin-top: ${spacings?.s}px;
       &:hover {
         background-color: transparent;
@@ -84,7 +87,7 @@ export const StyledRadio = styled(Radio)`
     const colors = getColors(props);
     return `
       color: ${colors?.primary[500]};
-      &:checked {
+      &.Mui-checked {
         color: ${colors?.primary[500]};
       }
     `;
@@ -92,7 +95,16 @@ export const StyledRadio = styled(Radio)`
 `;
 
 export const TreeNameSection = styled.div`
-    ${(props) => {
+  ${(props) => {
+    const spacings = getSpacings(props);
+    return `
+      margin-top: ${spacings?.s}px;
+    `;
+  }}
+`;
+
+export const TreeTypeSection = styled.div`
+  ${(props) => {
     const spacings = getSpacings(props);
     return `
       margin-top: ${spacings?.s}px;
@@ -101,12 +113,86 @@ export const TreeNameSection = styled.div`
   }}
 `;
 
-export const TreeTypeSection = styled.div`
-    ${(props) => {
+export const TreeNameInfoWrapper = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+export const TreeNameTooLongAlert = styled.div`
+  display: flex;
+  align-items: center;
+  ${(props) => {
     const spacings = getSpacings(props);
     return `
-      margin-top: ${spacings?.s}px;
-      margin-bottom: ${spacings?.s}px;
+      margin-top: ${spacings?.xs}px;
+      margin-bottom: ${spacings?.xl}px;
+    `;
+  }}
+`;
+
+export const CreateTreeInfo = styled.div`
+  ${(props) => {
+    const colors = getColors(props);
+    const spacings = getSpacings(props);
+    return `
+      color: ${colors?.gray[400]};
+      margin-top: ${spacings?.l}px;
+    `;
+  }}
+`;
+
+export const StyledButton = styled(Button)`
+  ${(props) => {
+    const spacings = getSpacings(props);
+    const colors = getColors(props);
+    return `
+      margin-top: ${spacings?.xxl}px;
+      &:active {
+        background-color: ${colors?.gray[400]};
+      }
+    `;
+  }}
+`;
+
+export const StyledTooltip = styled(Tooltip)`
+  ${(props) => {
+    const spacings = getSpacings(props);
+    return `
+      margin-left: ${spacings?.xs}px;
+    `;
+  }}
+`;
+
+export const StyledInfoOutlinedIcon = styled(InfoOutlinedIcon)`
+  ${(props) => {
+    const colors = getColors(props);
+    const spacings = getSpacings(props);
+    return `
+      color: ${colors?.gray[400]};
+      &:hover {
+        color: ${colors?.primary[400]};
+      }
+      margin-top: ${spacings?.xs}px;
+    `;
+  }}
+`;
+
+export const TextFieldAlert = styled.div`
+  ${(props) => {
+    const colors = getColors(props);
+    return `
+      color: ${colors?.error[400]};
+    `;
+  }}
+`;
+
+export const StyledErrorOutlinedIcon = styled(ErrorOutlineIcon)`
+  ${(props) => {
+    const colors = getColors(props);
+    const spacings = getSpacings(props);
+    return `
+      color: ${colors?.error[400]};
+      margin-right: ${spacings?.s}px;
     `;
   }}
 `;
@@ -114,9 +200,20 @@ export const TreeTypeSection = styled.div`
 export const StyledFormControlLabel = styled(FormControlLabel)`
   display: flex;
   align-items: flex-start;
-`;
-
-export const TreeNameInfoWrapper = styled.div`
-  display: flex;
-  align-items: center;
+  border-radius: 5px;
+  margin-left: 0px;
+  margin-right: 0px;
+  ${(props) => {
+    const colors = getColors(props);
+    const spacings = getSpacings(props);
+    return `
+      &:hover {
+        background-color: ${colors?.gray[100]};
+      }
+      &:checked { 
+        background-color: ${colors?.gray[100]};
+      }
+      margin-bottom: ${spacings?.s}px;
+    `;
+  }}
 `;
