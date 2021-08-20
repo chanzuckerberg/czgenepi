@@ -1,7 +1,39 @@
 import { filter, forEach } from "lodash";
-import React, { FC, useEffect, useState } from "react";
+import React, {
+  Dispatch,
+  FC,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
 import { CollectionDateFilter } from "./components/CollectionDateFilter";
 import { StyledFilterPanel } from "./style";
+
+type DateType = string | undefined;
+enum TypeFilterType {
+  Date = "date",
+  Single = "single",
+  Multiple = "multiple",
+}
+interface Props {
+  setDataFilterFunc: Dispatch<
+    SetStateAction<(data: TableItem[]) => TableItem[]>
+  >;
+}
+
+interface FilterParamsType {
+  end?: DateType;
+  start?: DateType;
+}
+interface FilterType {
+  key: string;
+  params: FilterParamsType;
+  type: TypeFilterType;
+}
+
+interface FiltersType {
+  [filterKey: string]: FilterType;
+}
 
 // * (mlila): `key` should be the name of the column you are filtering on
 const DATA_FILTER_INIT = {
@@ -11,18 +43,18 @@ const DATA_FILTER_INIT = {
       end: undefined,
       start: undefined,
     },
-    type: "date",
+    type: TypeFilterType.Date,
   },
 };
 
-const applyFilter = (data, dataFilter) => {
-  if (!data) return;
+const applyFilter = (data: TableItem[], dataFilter: FilterType) => {
+  if (!data) return [];
 
   const { key, params, type } = dataFilter;
   if (!key || !params || !type) return data;
 
   switch (type) {
-    case "date":
+    case TypeFilterType.Date:
       return filter(data, (d) => {
         const doesPassFilterCheckStart =
           !params.start || d[key] >= params.start;
@@ -37,16 +69,15 @@ const applyFilter = (data, dataFilter) => {
   }
 };
 
-const FilterPanel: FC = ({ setDataFilterFunc }: Props) => {
-  //TODOO better type here
-  const [dataFilters, setDataFilters] = useState<any[]>(DATA_FILTER_INIT);
+const FilterPanel: FC<Props> = ({ setDataFilterFunc }) => {
+  const [dataFilters, setDataFilters] = useState<FiltersType>(DATA_FILTER_INIT);
 
   useEffect(() => {
     const wrappedFilterFunc = () => {
-      const filterFunc = (filters) => {
-        return (data) => {
-          let filteredData = { ...data };
-          forEach(filters, (filter) => {
+      const filterFunc = (filters: FiltersType) => {
+        return (data: TableItem[]) => {
+          let filteredData = [...data];
+          forEach(filters, (filter: FilterType) => {
             filteredData = applyFilter(filteredData, filter);
           });
           return filteredData;
@@ -58,8 +89,8 @@ const FilterPanel: FC = ({ setDataFilterFunc }: Props) => {
     setDataFilterFunc(wrappedFilterFunc);
   }, [dataFilters, setDataFilterFunc]);
 
-  const updateDataFilter = (filterKey, params) => {
-    const type = dataFilters[filterKey]?.type;
+  const updateDataFilter = (filterKey: string, params: FilterParamsType) => {
+    const type = dataFilters[filterKey]?.type as TypeFilterType;
     const newFilters = {
       ...dataFilters,
       [filterKey]: {
@@ -72,7 +103,7 @@ const FilterPanel: FC = ({ setDataFilterFunc }: Props) => {
     setDataFilters(newFilters);
   };
 
-  const updateCollectionDateFilter = (start, end) => {
+  const updateCollectionDateFilter = (start: DateType, end: DateType) => {
     updateDataFilter("collectionDate", { end, start });
   };
 

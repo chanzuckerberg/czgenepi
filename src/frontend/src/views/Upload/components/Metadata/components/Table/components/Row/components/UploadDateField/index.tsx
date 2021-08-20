@@ -1,16 +1,8 @@
 import { FormikContextType } from "formik";
 import React from "react";
+import DateField from "src/components/DateField";
 import { Metadata } from "src/views/Upload/components/common/types";
 import ApplyToAllColumn from "../common/ApplyToAllColumn";
-import { StyledTextField } from "./style";
-
-// "YYYY-MM-DD".length
-const DATE_LENGTH = 10;
-
-const INPUT_PROPS = {
-  maxLength: DATE_LENGTH,
-  minLength: DATE_LENGTH,
-};
 
 interface Props {
   fieldKey: keyof Metadata;
@@ -19,29 +11,22 @@ interface Props {
   isFirstRow: boolean;
 }
 
-export default function DateField({
+export default function UploadDateField({
   fieldKey,
   formik,
   applyToAllColumn,
   isFirstRow,
 }: Props): JSX.Element {
-  const { handleChange, handleBlur, values, touched, errors } = formik;
+  const { values, touched, errors } = formik;
 
   const errorMessage = touched[fieldKey] && errors[fieldKey];
 
   const value = values[fieldKey] || "";
 
   return (
-    <StyledTextField
-      name={fieldKey}
-      inputProps={INPUT_PROPS}
-      placeholder="YYYY-MM-DD"
-      margin="dense"
-      variant="outlined"
-      onChange={handleChange}
-      onBlur={handleBlur}
-      value={value}
-      error={Boolean(errorMessage)}
+    <DateField
+      fieldKey={fieldKey}
+      formik={formik}
       helperText={
         errorMessage ||
         (isFirstRow && value && (

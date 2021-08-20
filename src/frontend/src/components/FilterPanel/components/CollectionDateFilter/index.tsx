@@ -2,17 +2,24 @@ import { Button, Menu, MenuItem } from "czifui";
 import { useFormik } from "formik";
 import { noop } from "lodash";
 import React, { FC, useEffect, useState } from "react";
-//TODO: move this to a more central location
-import DateField from "src/views/Upload/components/Metadata/components/Table/components/Row/components/DateField";
+import DateField from "src/components/DateField";
+import {
+  DATE_ERROR_MESSAGE,
+  DATE_REGEX,
+} from "src/components/DateField/constants";
 import * as yup from "yup";
 import { StyledDateRange, StyledText } from "./style";
 
-//TODO: move these to a constants file and DRY
-const DATE_ERROR_MESSAGE = "Update format to YYYY-MM-DD";
+type FromattedDateType = string | undefined;
+type DateType = FromattedDateType | Date;
 
-const DATE_REGEX = /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/;
+interface Props {
+  updateCollectionDateFilter: (
+    start: FromattedDateType,
+    end: FromattedDateType
+  ) => void;
+}
 
-//TODO: can this also be a constant? not sure.
 const validationSchema = yup.object({
   collectionDateEnd: yup
     .string()
@@ -26,8 +33,7 @@ const validationSchema = yup.object({
     .max(10, DATE_ERROR_MESSAGE),
 });
 
-//TODO add type interface
-const CollectionDateFilter: FC = ({ updateCollectionDateFilter }) => {
+const CollectionDateFilter: FC<Props> = ({ updateCollectionDateFilter }) => {
   const [anchorEl, setAnchorEl] = useState<HTMLElement>();
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = (event) => {
@@ -53,19 +59,20 @@ const CollectionDateFilter: FC = ({ updateCollectionDateFilter }) => {
     validateForm(values);
   }, [validateForm, values]);
 
-  const formatDate = (d) => {
+  const formatDate = (d: DateType) => {
+    if (d === undefined) return d;
     if (typeof d === "string") return d;
 
     return d.toISOString().substring(0, 10);
   };
 
-  const setCollectionDatesFromRange = (start, end) => {
+  const setCollectionDatesFromRange = (start: DateType, end: DateType) => {
     updateCollectionDateFilter(formatDate(start), formatDate(end));
 
     handleClose();
   };
 
-  const setCollectionDatesFromOffset = (nDays) => {
+  const setCollectionDatesFromOffset = (nDays: number) => {
     const start = new Date();
     start.setDate(start.getDate() - nDays);
 
@@ -77,7 +84,7 @@ const CollectionDateFilter: FC = ({ updateCollectionDateFilter }) => {
   //TODO use new sds component for single select on preset date ranges
   return (
     <>
-      <Button onClick={handleClick}>Click me!</Button>
+      <Button onClick={handleClick}>Collection Date</Button>
       <Menu
         anchorEl={anchorEl}
         keepMounted
@@ -86,20 +93,9 @@ const CollectionDateFilter: FC = ({ updateCollectionDateFilter }) => {
         getContentAnchorEl={null}
       >
         <StyledDateRange>
-          {/* TODO: possibly abstract out the unneeded props here */}
-          <DateField
-            fieldKey="collectionDateStart"
-            formik={formik}
-            applyToAllColumn={noop}
-            isFirstRow={false}
-          />
+          <DateField fieldKey="collectionDateStart" formik={formik} />
           <StyledText>to</StyledText>
-          <DateField
-            fieldKey="collectionDateEnd"
-            formik={formik}
-            applyToAllColumn={noop}
-            isFirstRow={false}
-          />
+          <DateField fieldKey="collectionDateEnd" formik={formik} />
           <Button
             onClick={() => {
               setCollectionDatesFromRange(

@@ -38,8 +38,7 @@ interface Props {
   renderer?: CustomRenderer;
   headerRenderer?: CustomRenderer;
   viewName: VIEWNAME;
-  //TODO better type
-  dataFilterFunc?: (data) => any;
+  dataFilterFunc?: (data: TableItem[]) => TableItem[];
 }
 
 interface InputOnChangeData {
@@ -318,7 +317,11 @@ const DataSubview: FunctionComponent<Props> = ({
               failedSamples={failedSamples}
               setFailedSamples={setFailedSamples}
               showCheckboxes={showCheckboxes}
-              data={dataFilterFunc ? dataFilterFunc(tableData) : tableData}
+              data={
+                dataFilterFunc && tableData
+                  ? dataFilterFunc(tableData)
+                  : tableData
+              }
               defaultSortKey={defaultSortKey}
               headers={headers}
               headerRenderer={headerRenderer}

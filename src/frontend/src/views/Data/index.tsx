@@ -31,8 +31,7 @@ const Data: FunctionComponent = () => {
   const [trees, setTrees] = useState<Tree[] | undefined>();
   const [isDataLoading, setIsDataLoading] = useState(false);
   const [shouldShowFilters, setShouldShowFilters] = useState<boolean>(true);
-  //TODO make custom type
-  const [dataFilterFunc, setDataFilterFunc] = useState<() => void>();
+  const [dataFilterFunc, setDataFilterFunc] = useState<any>();
 
   const router = useRouter();
 
