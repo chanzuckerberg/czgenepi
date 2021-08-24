@@ -359,6 +359,7 @@ export const DataTable: FunctionComponent<Props> = ({
   if (data === undefined) {
     return render([]);
   }
+
   const sortedData = sortData(data, state.sortKey, state.ascending);
   return render(sortedData);
 };
