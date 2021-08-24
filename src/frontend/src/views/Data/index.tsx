@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import React, { FunctionComponent, useEffect, useState } from "react";
 import { Menu } from "semantic-ui-react";
 import { fetchSamples, fetchTrees } from "src/common/api";
-import { useProtectedRoute } from "src/common/queries/auth";
+import { useProtectedRoute, protectedRoute } from "src/common/queries/auth";
 import { DataSubview } from "../../common/components";
 import { EMPTY_OBJECT } from "../../common/constants/empty";
 import { ROUTES } from "../../common/routes";
@@ -16,19 +16,26 @@ import style from "./index.module.scss";
 import { Container } from "./style";
 import { TREE_TRANSFORMS } from "./transforms";
 
+import {AgreeTerms } from "src/views/AgreeTerms"
+import { useUserInfo } from "../../common/queries/auth";
+
 const TITLE: Record<string, string> = {
   [ROUTES.DATA_SAMPLES]: "Samples",
   [ROUTES.PHYLO_TREES]: "Phylogenetic Trees",
 };
 
 const Data: FunctionComponent = () => {
-  useProtectedRoute();
-
   const [samples, setSamples] = useState<Sample[] | undefined>();
   const [trees, setTrees] = useState<Tree[] | undefined>();
   const [isDataLoading, setIsDataLoading] = useState(false);
-
+  const result = useUserInfo();
   const router = useRouter();
+
+  useEffect(() => {
+    if (result) {
+      protectedRoute(result, router);
+    }
+  });
 
   useEffect(() => {
     const setBioinformaticsData = async () => {
