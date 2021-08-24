@@ -31,6 +31,7 @@ const Data: FunctionComponent = () => {
   const [trees, setTrees] = useState<Tree[] | undefined>();
   const [isDataLoading, setIsDataLoading] = useState(false);
   const [shouldShowFilters, setShouldShowFilters] = useState<boolean>(true);
+  const [dataFilterFunc, setDataFilterFunc] = useState<any>();
 
   const router = useRouter();
 
@@ -146,6 +147,8 @@ const Data: FunctionComponent = () => {
     dataCategories.find((category) => category.to === router.asPath) ||
     dataCategories[0];
 
+  const viewName = category.text;
+
   return (
     <Container className={style.dataRoot}>
       <Head>
@@ -166,7 +169,9 @@ const Data: FunctionComponent = () => {
         </Menu>
       </FlexContainer>
       <FlexContainer className={style.view}>
-        {category.text === "Samples" && shouldShowFilters && <FilterPanel />}
+        {viewName === "Samples" && shouldShowFilters && (
+          <FilterPanel setDataFilterFunc={setDataFilterFunc} />
+        )}
         <DataSubview
           key={router.asPath}
           isLoading={category.isDataLoading}
@@ -176,7 +181,8 @@ const Data: FunctionComponent = () => {
           subheaders={category.subheaders}
           headerRenderer={category.headerRenderer}
           renderer={category.renderer}
-          viewName={category.text}
+          viewName={viewName}
+          dataFilterFunc={viewName === "Samples" ? dataFilterFunc : undefined}
         />
       </FlexContainer>
     </Container>
