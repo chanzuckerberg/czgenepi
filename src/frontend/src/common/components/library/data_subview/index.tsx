@@ -137,6 +137,7 @@ const DataSubview: FunctionComponent<Props> = ({
   const [showCheckboxes, setShowCheckboxes] = useState<boolean>(false);
   const [isDownloadModalOpen, setDownloadModalOpen] = useState(false);
   const [isDownloadDisabled, setDownloadDisabled] = useState<boolean>(true);
+  const [isCreateTreeDisabled, setCreateTreeDisabled] = useState<boolean>(true);
   const [failedSamples, setFailedSamples] = useState<any[]>([]);
   const [downloadFailed, setDownloadFailed] = useState<boolean>(false);
   const [isMetadataSelected, setMetadataSelected] = useState<boolean>(false);
@@ -173,10 +174,16 @@ const DataSubview: FunctionComponent<Props> = ({
 
   useEffect(() => {
     // disable sample download if no samples are selected
-    if (checkedSamples.length === 0) {
+    const numberCheckedSamples = checkedSamples.length;
+    if (numberCheckedSamples === 0) {
       setDownloadDisabled(true);
     } else {
       setDownloadDisabled(false);
+      if (numberCheckedSamples > 2000) {
+        setCreateTreeDisabled(true);
+      } else {
+        setCreateTreeDisabled(false);
+      }
     }
   }, [checkedSamples]);
 
@@ -259,7 +266,7 @@ const DataSubview: FunctionComponent<Props> = ({
           <Divider />
           <IconButton
             onClick={handleCreateTreeClickOpen}
-            disabled={isDownloadDisabled}
+            disabled={isCreateTreeDisabled}
             svgDisabled={<StyledTreeBuildDisabledImage />}
             svgEnabled={<StyledTreeBuildImage />}
             tooltipTextDisabled={TREE_BUILD_TOOLTIP_TEXT_DISABLED}
