@@ -55,13 +55,15 @@ export function useUserInfo(): UseQueryResult<UserResponse, unknown> {
   });
 }
 
-export function protectedRoute(
+export function protectRoute(
   result: UseQueryResult<UserResponse, unknown>,
   router: NextRouter
 ): void {
   const { isLoading, data } = result;
+  console.log("DATA: ", data);
 
-  if (!data?.user?.agreedToTos) {
+  if (data && !data?.user?.agreedToTos) {
+    console.log("redirecting: ", data?.user?.agreedToTos);
     router.push(ROUTES.AGREE_TERMS);
   }
   if (!isLoading && !data) {

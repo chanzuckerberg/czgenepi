@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import React, { FunctionComponent, useEffect, useState } from "react";
 import { Menu } from "semantic-ui-react";
 import { fetchSamples, fetchTrees } from "src/common/api";
-import { protectedRoute } from "src/common/queries/auth";
+import { protectRoute } from "src/common/queries/auth";
 import { DataSubview } from "../../common/components";
 import { EMPTY_OBJECT } from "../../common/constants/empty";
 import { useUserInfo } from "../../common/queries/auth";
@@ -31,7 +31,7 @@ const Data: FunctionComponent = () => {
 
   useEffect(() => {
     if (result) {
-      protectedRoute(result, router);
+      protectRoute(result, router);
     }
   });
 

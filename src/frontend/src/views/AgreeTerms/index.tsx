@@ -9,9 +9,7 @@ import DialogContent from "src/common/components/library/Dialog/components/Dialo
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import ENV from "src/common/constants/ENV";
 import {
-  protectedRoute,
   updateUserInfo,
-  useUserInfo,
 } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
 import { PageContent } from "../../common/styles/mixins/global";
@@ -22,13 +20,6 @@ export default function AgreeTerms(): JSX.Element {
   const [shouldRedirect, setShouldRedirect] = useState(false);
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
   const router = useRouter();
-  const result = useUserInfo();
-
-  useEffect(() => {
-    if (result) {
-      protectedRoute(result, router);
-    }
-  });
 
   useEffect(() => {
     if (shouldRedirect) {

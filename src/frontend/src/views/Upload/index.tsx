@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { ROUTES } from "src/common/routes";
-import { protectedRoute, useUserInfo } from "../../common/queries/auth";
+import { protectRoute, useUserInfo } from "../../common/queries/auth";
 import {
   Props,
   SampleIdToMetadata,
@@ -31,7 +31,7 @@ export default function Upload(): JSX.Element | null {
 
   useEffect(() => {
     if (result) {
-      protectedRoute(result, router);
+      protectRoute(result, router);
     }
   });
 
