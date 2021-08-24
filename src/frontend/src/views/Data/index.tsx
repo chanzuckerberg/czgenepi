@@ -5,9 +5,10 @@ import { useRouter } from "next/router";
 import React, { FunctionComponent, useEffect, useState } from "react";
 import { Menu } from "semantic-ui-react";
 import { fetchSamples, fetchTrees } from "src/common/api";
-import { useProtectedRoute, protectedRoute } from "src/common/queries/auth";
+import { protectedRoute } from "src/common/queries/auth";
 import { DataSubview } from "../../common/components";
 import { EMPTY_OBJECT } from "../../common/constants/empty";
+import { useUserInfo } from "../../common/queries/auth";
 import { ROUTES } from "../../common/routes";
 import { SampleRenderer, TreeRenderer } from "./cellRenderers";
 import { SampleHeader } from "./headerRenderer";
@@ -15,9 +16,6 @@ import { SAMPLE_HEADERS, SAMPLE_SUBHEADERS, TREE_HEADERS } from "./headers";
 import style from "./index.module.scss";
 import { Container } from "./style";
 import { TREE_TRANSFORMS } from "./transforms";
-
-import {AgreeTerms } from "src/views/AgreeTerms"
-import { useUserInfo } from "../../common/queries/auth";
 
 const TITLE: Record<string, string> = {
   [ROUTES.DATA_SAMPLES]: "Samples",

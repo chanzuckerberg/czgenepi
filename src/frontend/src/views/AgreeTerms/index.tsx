@@ -8,14 +8,16 @@ import DialogActions from "src/common/components/library/Dialog/components/Dialo
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import ENV from "src/common/constants/ENV";
-import { updateUserInfo, protectedRoute, useUserInfo } from "src/common/queries/auth";
+import {
+  protectedRoute,
+  updateUserInfo,
+  useUserInfo,
+} from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
 import { PageContent } from "../../common/styles/mixins/global";
 import { Details, Title } from "./style";
 
-
 export default function AgreeTerms(): JSX.Element {
-
   const [isLoading, setIsLoading] = useState(false);
   const [shouldRedirect, setShouldRedirect] = useState(false);
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
