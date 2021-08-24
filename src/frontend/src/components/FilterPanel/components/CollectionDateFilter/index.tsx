@@ -10,13 +10,13 @@ import {
 import * as yup from "yup";
 import { StyledDateRange, StyledText } from "./style";
 
-type FromattedDateType = string | undefined;
-type DateType = FromattedDateType | Date;
+type FormattedDateType = string | undefined;
+type DateType = FormattedDateType | Date;
 
 interface Props {
   updateCollectionDateFilter: (
-    start: FromattedDateType,
-    end: FromattedDateType
+    start: FormattedDateType,
+    end: FormattedDateType
   ) => void;
 }
 
