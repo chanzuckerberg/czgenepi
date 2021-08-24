@@ -2,7 +2,6 @@ import { FormikContextType } from "formik";
 import React from "react";
 import { StyledTextField } from "./style";
 
-// "YYYY-MM-DD".length
 const DATE_LENGTH = 10;
 
 const INPUT_PROPS = {
