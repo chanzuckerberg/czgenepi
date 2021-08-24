@@ -1,10 +1,7 @@
 import { FormikContextType } from "formik";
 import React from "react";
-import { Metadata } from "src/views/Upload/components/common/types";
-import ApplyToAllColumn from "../common/ApplyToAllColumn";
 import { StyledTextField } from "./style";
 
-// "YYYY-MM-DD".length
 const DATE_LENGTH = 10;
 
 const INPUT_PROPS = {
@@ -13,17 +10,15 @@ const INPUT_PROPS = {
 };
 
 interface Props {
-  fieldKey: keyof Metadata;
-  formik: FormikContextType<Metadata>;
-  applyToAllColumn: (fieldKey: keyof Metadata, value: unknown) => void;
-  isFirstRow: boolean;
+  fieldKey: string;
+  formik: FormikContextType<any>;
+  helperText?: any;
 }
 
 export default function DateField({
   fieldKey,
   formik,
-  applyToAllColumn,
-  isFirstRow,
+  helperText,
 }: Props): JSX.Element {
   const { handleChange, handleBlur, values, touched, errors } = formik;
 
@@ -42,16 +37,7 @@ export default function DateField({
       onBlur={handleBlur}
       value={value}
       error={Boolean(errorMessage)}
-      helperText={
-        errorMessage ||
-        (isFirstRow && value && (
-          <ApplyToAllColumn
-            fieldKey={fieldKey}
-            value={value}
-            handleClick={applyToAllColumn}
-          />
-        ))
-      }
+      helperText={helperText || errorMessage}
     />
   );
 }
