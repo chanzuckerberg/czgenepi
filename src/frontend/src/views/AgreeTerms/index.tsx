@@ -8,9 +8,7 @@ import DialogActions from "src/common/components/library/Dialog/components/Dialo
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import ENV from "src/common/constants/ENV";
-import {
-  updateUserInfo,
-} from "src/common/queries/auth";
+import { updateUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
 import { PageContent } from "../../common/styles/mixins/global";
 import { Details, Title } from "./style";

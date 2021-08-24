@@ -60,10 +60,8 @@ export function protectRoute(
   router: NextRouter
 ): void {
   const { isLoading, data } = result;
-  console.log("DATA: ", data);
 
   if (data && !data?.user?.agreedToTos) {
-    console.log("redirecting: ", data?.user?.agreedToTos);
     router.push(ROUTES.AGREE_TERMS);
   }
   if (!isLoading && !data) {
