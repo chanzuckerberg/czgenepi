@@ -38,7 +38,7 @@ export const StyledInstructions = styled(Instructions)`
     const spacings = getSpacings(props);
     return `
       margin-bottom: ${spacings?.xs}px;
-      padding: ${spacings?.l}
+      padding: ${spacings?.l};
     `;
   }}
 `;
