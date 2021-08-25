@@ -42,7 +42,7 @@ export const LabelLight = styled.span`
       margin-top: ${spacings?.l}px;
       margin-right: ${spacings?.m}px;
       margin-bottom: ${spacings?.xxxs}px;
-      color: color: ${colors?.gray[300]};
+      color: ${colors?.gray[300]};
     `;
   }}
 `;
