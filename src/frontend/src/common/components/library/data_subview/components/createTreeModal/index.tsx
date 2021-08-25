@@ -1,4 +1,3 @@
-import { Dialog } from "@material-ui/core";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import CloseIcon from "@material-ui/icons/Close";
 import { Alert, Link } from "czifui";
@@ -21,6 +20,7 @@ import {
   InstructionsNotSemiBold,
   InstructionsSemiBold,
   StyledButton,
+  StyledDialog,
   StyledErrorOutlinedIcon,
   StyledFormControlLabel,
   StyledInfoOutlinedIcon,
@@ -123,11 +123,12 @@ export const CreateTreeModal = ({
   );
 
   return (
-    <Dialog
+    <StyledDialog
       disableBackdropClick
       disableEscapeKeyDown
       open={open}
       onClose={onClose}
+      style={{minWidth:"600px"}}
     >
       <DialogTitle>
         <StyledIconButton onClick={onClose}>
@@ -249,6 +250,6 @@ export const CreateTreeModal = ({
         </Content>
       </DialogContent>
       <DialogActions></DialogActions>
-    </Dialog>
+    </StyledDialog>
   );
 };

@@ -1,3 +1,4 @@
+import { Dialog } from "@material-ui/core";
 import styled from "@emotion/styled";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Radio from "@material-ui/core/Radio";
@@ -216,4 +217,8 @@ export const StyledFormControlLabel = styled(FormControlLabel)`
       margin-bottom: ${spacings?.s}px;
     `;
   }}
+`;
+
+export const StyledDialog = styled(Dialog)`
+  min-width: 600px;
 `;
