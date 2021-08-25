@@ -11,8 +11,8 @@ interface Props {
 const UploadDateFilter: FC<Props> = ({ updateUploadDateFilter }) => {
   return (
     <DateFilter
-      filterKeyEnd="uploadDateEnd"
-      filterKeyStart="uploadDateStart"
+      fieldKeyEnd="uploadDateEnd"
+      fieldKeyStart="uploadDateStart"
       inputLabel="Upload Date"
       updateDateFilter={updateUploadDateFilter}
     />

@@ -11,8 +11,8 @@ interface Props {
 const CollectionDateFilter: FC<Props> = ({ updateCollectionDateFilter }) => {
   return (
     <DateFilter
-      filterKeyEnd="collectionDateEnd"
-      filterKeyStart="collectionDateStart"
+      fieldKeyEnd="collectionDateEnd"
+      fieldKeyStart="collectionDateStart"
       inputLabel="Collection Date"
       updateDateFilter={updateCollectionDateFilter}
     />
