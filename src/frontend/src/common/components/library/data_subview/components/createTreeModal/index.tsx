@@ -56,7 +56,7 @@ export const CreateTreeModal = ({
   const [isTreeBuildDisabled, setTreeBuildDisabled] = useState<boolean>(false);
   const [treeType, setTreeType] = useState<string>("");
   const [isContextual, setContextual] = useState<boolean>(true);
-  const [isLocal, setLocal] = useState<boolean>(true);
+  const [isLocal, setLocal] = useState<boolean>(false);
   const [areInstructionsShown, setInstructionsShown] = useState<boolean>(false);
   const [isCreateTreeButtonPressed, setCreateTreeButtonPressed] =
     useState<boolean>(false);
@@ -65,12 +65,10 @@ export const CreateTreeModal = ({
     if (treeType === "contextual") {
       setLocal(false);
       setContextual(true);
-    } else if (treeType === "local") {
+    }
+    if (treeType === "local") {
       setContextual(false);
       setLocal(true);
-    } else {
-      setContextual(false);
-      setLocal(false);
     }
   }, [treeType]);
 
@@ -206,11 +204,13 @@ export const CreateTreeModal = ({
               >
                 <StyledFormControlLabel
                   value="contextual"
+                  checked={isContextual}
                   control={<StyledRadio />}
                   label={<RadioLabelContextual selected={isContextual} />}
                 />
                 <StyledFormControlLabel
                   value="local"
+                  checked={isLocal}
                   control={<StyledRadio />}
                   label={<RadioLabelLocal selected={isLocal} />}
                 />
