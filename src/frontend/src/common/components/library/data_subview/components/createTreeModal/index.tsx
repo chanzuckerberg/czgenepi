@@ -59,7 +59,7 @@ export const CreateTreeModal = ({
   const [isLocal, setLocal] = useState<boolean>(true);
   const [areInstructionsShown, setInstructionsShown] = useState<boolean>(false);
   const [isCreateTreeButtonPressed, setCreateTreeButtonPressed] =
-    useState(false);
+    useState<boolean>(false);
 
   useEffect(() => {
     if (treeType === "contextual") {
