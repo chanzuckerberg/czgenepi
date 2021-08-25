@@ -2,7 +2,7 @@ import { Dialog } from "@material-ui/core";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import CloseIcon from "@material-ui/icons/Close";
 import { Alert, Link } from "czifui";
-import React, { useEffect, useState } from "react";
+import React, { SyntheticEvent, useEffect, useState } from "react";
 import { useMutation } from "react-query";
 import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
@@ -108,7 +108,7 @@ export const CreateTreeModal = ({
     setInstructionsShown((prevState: boolean) => !prevState);
   };
 
-  const handleSubmit = (evt: any) => {
+  const handleSubmit = (evt: SyntheticEvent) => {
     evt.preventDefault();
     setCreateTreeButtonPressed(true);
     mutation.mutate({ sampleIds, treeName, treeType });
@@ -221,8 +221,8 @@ export const CreateTreeModal = ({
                 <InstructionsSemiBold>
                   {" "}
                   {failedSamples.length} Selected Sample
-                  {failedSamples.length > 1 && "s"} won't be included in your
-                  tree{" "}
+                  {failedSamples.length > 1 && "s"} {"won't"} be included in
+                  your tree{" "}
                 </InstructionsSemiBold>
                 <InstructionsNotSemiBold>
                   because they failed genome recovery.
