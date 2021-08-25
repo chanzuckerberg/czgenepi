@@ -242,7 +242,7 @@ export const CreateTreeModal = ({
           </form>
           {isCreateTreeButtonPressed && (
             <CreateTreeInfo>
-              Creating a new tree can take up to X hours. We will notify you
+              Creating a new tree can take up to 12 hours. We will notify you
               when your tree is ready.
             </CreateTreeInfo>
           )}
