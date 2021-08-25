@@ -221,7 +221,7 @@ export const CreateTreeModal = ({
                 <InstructionsSemiBold>
                   {" "}
                   {failedSamples.length} Selected Sample
-                  {failedSamples.length > 1 && "s"} wont be included in your
+                  {failedSamples.length > 1 && "s"} won't be included in your
                   tree{" "}
                 </InstructionsSemiBold>
                 <InstructionsNotSemiBold>
