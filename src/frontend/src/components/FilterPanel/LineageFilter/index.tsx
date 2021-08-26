@@ -1,46 +1,119 @@
-import { MenuSelect } from "czifui";
-import React from "react";
+import ButtonBase from "@material-ui/core/ButtonBase";
+import Popper from "@material-ui/core/Popper";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import { AutocompleteCloseReason } from "@material-ui/lab";
+import { Chip, MenuSelect } from "czifui";
+import React, { useEffect, useState } from "react";
+import { DefaultMenuSelectOption } from "../index";
 
-const LineageSelect = () => {
+interface Props {
+  options: DefaultMenuSelectOption[];
+  updateLineageFilter: () => void;
+}
+
+const LineageFilter = (props: Props): JSX.Element => {
+  const { options = [], updateLineageFilter } = props;
+
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [value, setValue] = useState<DefaultMenuSelectOption[] | null>([]);
+  const [pendingValue, setPendingValue] = useState<
+    DefaultMenuSelectOption[] | null
+  >([]);
+
+  useEffect(() => {
+    updateLineageFilter(value?.map((d) => d.name));
+  }, [updateLineageFilter, value]);
+
+  const open = Boolean(anchorEl);
+  const id = open ? "lineage-filter" : undefined;
+
   return (
     <>
-      <div className={classes.root}>
-        <ButtonBase
-          disableRipple
-          className={classes.button}
-          aria-describedby={id}
-          onClick={handleClick}
-        >
-          <span>Click Target</span>
+      <div>
+        <ButtonBase disableRipple aria-describedby={id} onClick={handleClick}>
+          <span>Lineage</span>
           <ExpandMoreIcon />
         </ButtonBase>
 
-        <Chips value={value} multiple={multiple} onDelete={handleDelete} />
+        <Chips value={value} onDelete={handleDelete} />
       </div>
-      <Popper
-        id={id}
-        open={open}
-        anchorEl={anchorEl}
-        className={classes.popper}
-      >
+      <Popper id={id} open={open} anchorEl={anchorEl}>
         <MenuSelect
+          disableCloseOnSelect
+          multiple
           open
-          search={search}
+          search
           onClose={handleClose}
-          multiple={multiple}
-          classes={{
-            paper: classes.paper,
-            popperDisablePortal: classes.popperDisablePortal,
-          }}
-          value={multiple ? pendingValue : value}
+          value={pendingValue}
           onChange={handleChange}
-          disableCloseOnSelect={multiple}
           options={options}
-          {...props}
         />
       </Popper>
     </>
   );
+
+  function handleClick(event: React.MouseEvent<HTMLElement>) {
+    setPendingValue(value as DefaultMenuSelectOption[]);
+    setAnchorEl(event.currentTarget);
+  }
+
+  function handleClose(
+    _: React.ChangeEvent<unknown>,
+    reason: AutocompleteCloseReason
+  ) {
+    if (reason === "toggleInput") {
+      return;
+    }
+
+    setValue(pendingValue);
+
+    if (anchorEl) {
+      anchorEl.focus();
+    }
+
+    setAnchorEl(null);
+  }
+
+  function handleChange(
+    _: React.ChangeEvent<unknown>,
+    newValue: DefaultMenuSelectOption[] | null
+  ) {
+    return setPendingValue(newValue as DefaultMenuSelectOption[]);
+  }
+
+  function handleDelete(option: DefaultMenuSelectOption) {
+    const newValue = (value as DefaultMenuSelectOption[]).filter(
+      (item) => item !== option
+    );
+
+    setValue(newValue);
+  }
 };
 
-export { LineageSelect };
+interface ChipsProps {
+  value: DefaultMenuSelectOption[] | null;
+  onDelete: (option: DefaultMenuSelectOption) => void;
+}
+
+function Chips({ value, onDelete }: ChipsProps): JSX.Element | null {
+  if (!value) return null;
+
+  return (
+    <div>
+      {(value as DefaultMenuSelectOption[]).map((item) => {
+        const { name } = item;
+
+        return (
+          <Chip
+            size="medium"
+            key={name}
+            label={name}
+            onDelete={() => onDelete(item)}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
+export { LineageFilter };

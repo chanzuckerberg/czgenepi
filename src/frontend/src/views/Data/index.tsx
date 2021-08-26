@@ -150,9 +150,15 @@ const Data: FunctionComponent = () => {
 
   const viewName = category.text;
 
-  const lineages = uniq(
-    compact(category.data?.map((d) => d.lineage?.lineage))
-  ).sort();
+  // * (mlila): normally I would want to do this transfrom inside the component
+  // * using the data, but LineageFilter renders a child compnent that seems
+  // * to reference the parent's props (?). Passing in only the lineages, or
+  // * incomplete options causes the component to break
+  const lineages = uniq(compact(category.data?.map((d) => d.lineage?.lineage)))
+    .sort()
+    .map((l) => {
+      return { name: l };
+    });
 
   return (
     <Container className={style.dataRoot}>

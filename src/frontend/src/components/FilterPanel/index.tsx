@@ -1,4 +1,4 @@
-import { filter, forEach } from "lodash";
+import { filter, forEach, isEqual } from "lodash";
 import React, {
   Dispatch,
   FC,
@@ -16,8 +16,12 @@ enum TypeFilterType {
   Single = "single",
   Multiple = "multiple",
 }
+export interface DefaultMenuSelectOption {
+  name: string;
+}
+
 interface Props {
-  lineages: string[];
+  lineages: DefaultMenuSelectOption[];
   setDataFilterFunc: Dispatch<
     SetStateAction<(data: TableItem[]) => TableItem[]>
   >;
@@ -53,7 +57,7 @@ const DATA_FILTER_INIT = {
     params: {
       selected: [],
     },
-    transform: (d) => d.lineage.lineage,
+    transform: (d) => d.lineage?.lineage,
     type: "multiple",
   },
 };
@@ -126,7 +130,14 @@ const FilterPanel: FC<Props> = ({ lineages, setDataFilterFunc }) => {
   };
 
   const updateLineageFilter = (selected: string[]) => {
-    updateDataFilter("lineage", { selected });
+    const prevSelected = dataFilters.lineage?.params.selected;
+
+    // * (mlila): need to do a comparison here, or else the component gets into
+    // * an infinite state loop (because arrays are compared by identity rather
+    // * than content, by default)
+    if (!isEqual(prevSelected, selected)) {
+      updateDataFilter("lineage", { selected });
+    }
   };
 
   return (
@@ -135,10 +146,8 @@ const FilterPanel: FC<Props> = ({ lineages, setDataFilterFunc }) => {
         updateCollectionDateFilter={updateCollectionDateFilter}
       />
       <LineageFilter
+        options={lineages}
         updateLineageFilter={updateLineageFilter}
-        options={lineages.map((l) => {
-          return { name: l };
-        })}
       />
     </StyledFilterPanel>
   );
