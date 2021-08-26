@@ -14,7 +14,7 @@ import { PageContent } from "../../common/styles/mixins/global";
 import { Details, Title } from "./style";
 
 export default function AgreeTerms(): JSX.Element {
-  // useProtectedRoute();
+  useProtectedRoute();
   const [isLoading, setIsLoading] = useState(false);
   const [shouldRedirect, setShouldRedirect] = useState(false);
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);

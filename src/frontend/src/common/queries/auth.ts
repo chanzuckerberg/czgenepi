@@ -61,13 +61,12 @@ export function useProtectedRoute(): UseQueryResult<UserResponse, unknown> {
 
   const { isLoading, data } = result;
   const agreedToTOS = data?.user?.agreedToTos;
-  console.log("agreedToTOS: ", agreedToTOS);
 
   if (!isLoading && !data) {
     router.push(ROUTES.HOMEPAGE);
   }
 
-  if (!isLoading && !agreedToTOS) {
+  if (!isLoading && !agreedToTOS && router.asPath !== ROUTES.AGREE_TERMS) {
     router.push(ROUTES.AGREE_TERMS);
   }
 
