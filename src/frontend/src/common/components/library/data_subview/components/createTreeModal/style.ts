@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Radio from "@material-ui/core/Radio";
 import TextField from "@material-ui/core/TextField";
@@ -18,6 +19,11 @@ import {
 } from "czifui";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import Instructions from "src/components/Instructions";
+
+
+export const StyledDialogContent = styled(DialogContent)`
+  width: 600px;
+`;
 
 export const Title = styled.span`
   ${fontBodyS}

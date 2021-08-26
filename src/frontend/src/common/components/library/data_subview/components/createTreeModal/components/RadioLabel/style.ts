@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
+
 import {
   fontBodyXxs,
   fontHeaderXs,
@@ -64,7 +64,7 @@ export const StyledListItem = styled(ListItem)`
   }}
 `;
 
-export const StyledListItemText = styled(ListItemText)`
+export const SmallText = styled.span`
   ${fontBodyXxs}
 `;
 
@@ -87,9 +87,14 @@ export const StyledDiv = styled.div`
   }}
 `;
 
-export const StyledIconCheckSmall = styled(IconCheckSmall)`
+const smallIconSize = `
   width: 14px;
   height: 14px;
+  transform: scale(0.7);
+`;
+
+export const StyledIconCheckSmall = styled(IconCheckSmall)`
+  ${smallIconSize}
   ${(props) => {
     const colors = getColors(props);
     return `
@@ -99,8 +104,7 @@ export const StyledIconCheckSmall = styled(IconCheckSmall)`
 `;
 
 export const StyledIconXSmall = styled(IconCloseSmall)`
-  width: 14px;
-  height: 14px;
+  ${smallIconSize}
   ${(props) => {
     const colors = getColors(props);
     return `

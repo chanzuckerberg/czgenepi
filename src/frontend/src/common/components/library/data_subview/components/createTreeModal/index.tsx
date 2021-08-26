@@ -1,10 +1,10 @@
-import { Dialog } from "@material-ui/core";
+
 import RadioGroup from "@material-ui/core/RadioGroup";
 import CloseIcon from "@material-ui/icons/Close";
 import { Alert, Link } from "czifui";
 import React, { SyntheticEvent, useEffect, useState } from "react";
 import { useMutation } from "react-query";
-import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
+import { Dialog } from "@material-ui/core";
 import { createTree } from "src/common/queries/trees";
 import { Header, StyledIconButton } from "../DownloadModal/style";
 import { RadioLabelContextual, RadioLabelLocal } from "./components/RadioLabel";
@@ -15,6 +15,7 @@ import {
   InstructionsNotSemiBold,
   InstructionsSemiBold,
   StyledButton,
+  StyledDialogContent,
   StyledDialogTitle,
   StyledErrorOutlinedIcon,
   StyledFormControlLabel,
@@ -132,7 +133,7 @@ export const CreateTreeModal = ({
           {sampleIds.length} Sample{sampleIds.length > 1 && "s"} Selected
         </Title>
       </StyledDialogTitle>
-      <DialogContent>
+      <StyledDialogContent>
         <Content data-test-id="modal-content">
           <form onSubmit={handleSubmit}>
             <TreeNameSection>
@@ -240,7 +241,7 @@ export const CreateTreeModal = ({
             your tree is ready.
           </CreateTreeInfo>
         </Content>
-      </DialogContent>
+      </StyledDialogContent>
     </Dialog>
   );
 };
