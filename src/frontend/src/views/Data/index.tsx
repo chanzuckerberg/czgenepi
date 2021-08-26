@@ -170,6 +170,7 @@ const Data: FunctionComponent = () => {
       </FlexContainer>
       <FlexContainer className={style.view}>
         {viewName === "Samples" && shouldShowFilters && (
+          // TODO (mlila): replace with sds filterpanel once it's complete
           <FilterPanel setDataFilterFunc={setDataFilterFunc} />
         )}
         <DataSubview

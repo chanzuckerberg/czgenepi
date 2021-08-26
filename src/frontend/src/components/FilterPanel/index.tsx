@@ -7,6 +7,7 @@ import React, {
   useState,
 } from "react";
 import { CollectionDateFilter } from "./components/CollectionDateFilter";
+import { LineageFilter } from "./LineageFilter";
 import { StyledFilterPanel } from "./style";
 
 type DateType = string | undefined;
@@ -28,6 +29,7 @@ interface FilterParamsType {
 interface FilterType {
   key: string;
   params: FilterParamsType;
+  transform?: (d: any) => any;
   type: TypeFilterType;
 }
 
@@ -45,25 +47,39 @@ const DATA_FILTER_INIT = {
     },
     type: TypeFilterType.Date,
   },
+  lineage: {
+    key: "lineage",
+    params: {
+      selected: [],
+    },
+    transform: (d) => d.lineage.lineage,
+    type: "multiple",
+  },
 };
 
 const applyFilter = (data: TableItem[], dataFilter: FilterType) => {
   if (!data) return [];
 
-  const { key, params, type } = dataFilter;
+  const { key, params, transform, type } = dataFilter;
   if (!key || !params || !type) return data;
+  const { end, start, selected } = params;
 
   switch (type) {
     case TypeFilterType.Date:
       return filter(data, (d) => {
-        const doesPassFilterCheckStart =
-          !params.start || d[key] >= params.start;
-        const doesPassFilterCheckEnd = !params.end || d[key] <= params.end;
+        const doesPassFilterCheckStart = !start || d[key] >= start;
+        const doesPassFilterCheckEnd = !end || d[key] <= end;
 
         return doesPassFilterCheckStart && doesPassFilterCheckEnd;
       });
-    case "single":
-    case "multiple":
+    case TypeFilterType.Multiple:
+      if (selected.length === 0) return data;
+
+      return filter(data, (d) => {
+        const value = transform ? transform(d) : d;
+        return selected.includes(value);
+      });
+    case TypeFilterType.Single:
     default:
       return data;
   }
@@ -90,12 +106,13 @@ const FilterPanel: FC<Props> = ({ setDataFilterFunc }) => {
   }, [dataFilters, setDataFilterFunc]);
 
   const updateDataFilter = (filterKey: string, params: FilterParamsType) => {
-    const type = dataFilters[filterKey]?.type as TypeFilterType;
+    const { transform, type } = dataFilters[filterKey];
     const newFilters = {
       ...dataFilters,
       [filterKey]: {
         key: filterKey,
         params,
+        transform,
         type,
       },
     };
@@ -107,11 +124,16 @@ const FilterPanel: FC<Props> = ({ setDataFilterFunc }) => {
     updateDataFilter("collectionDate", { end, start });
   };
 
+  const updateLineageFilter = (selected: string[]) => {
+    updateDataFilter("lineage", { selected });
+  };
+
   return (
     <StyledFilterPanel>
       <CollectionDateFilter
         updateCollectionDateFilter={updateCollectionDateFilter}
       />
+      <LineageFilter updateLineageFilter={updateLineageFilter} />
     </StyledFilterPanel>
   );
 };
