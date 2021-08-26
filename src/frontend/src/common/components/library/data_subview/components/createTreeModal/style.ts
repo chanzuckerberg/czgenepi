@@ -28,30 +28,12 @@ const SmallImageSize = `
 `;
 
 const InstructionsCommon = `
-  ${fontBodyXs}
   color: black;
 `;
 
 const AlertInstructionsCommon = `
   ${fontBodyXxxs}
   color: black;
-`;
-
-const FontWeightSemiBold = `
-  ${(props: Props) => {
-    const fontWeights = getFontWeights(props);
-    return `
-      font-weight: ${fontWeights?.semibold};
-    `;
-  }}
-`;
-const FontWeightRegular = `
-  ${(props: Props) => {
-    const fontWeights = getFontWeights(props);
-    return `
-      font-weight: ${fontWeights?.regular};
-    `;
-  }}
 `;
 
 export const StyledDialogContent = styled(DialogContent)`
@@ -115,22 +97,34 @@ export const StyledInstructions = styled(Instructions)`
 
 export const InstructionsSemiBold = styled.span`
   ${InstructionsCommon}
-  ${FontWeightSemiBold}
+  ${fontBodyXs}
+  ${(props: Props) => {
+    const fontWeights = getFontWeights(props);
+    const spacings = getSpacings(props);
+    return `
+      font-weight: ${fontWeights?.semibold};
+      margin-bottom: ${spacings?.xxs}
+    `;
+  }}
 `;
 
 export const InstructionsNotSemiBold = styled.span`
   ${InstructionsCommon}
-  ${FontWeightRegular}
+  ${fontBodyXs}
 `;
 
 export const AlertInstructionsSemiBold = styled.span`
   ${AlertInstructionsCommon}
-  ${FontWeightSemiBold}
+  ${(props: Props) => {
+    const fontWeights = getFontWeights(props);
+    return `
+      font-weight: ${fontWeights?.semibold};
+    `;
+  }}
 `;
 
 export const AlertInstructionsNotSemiBold = styled.span`
   ${AlertInstructionsCommon}
-  ${FontWeightRegular}
 `;
 
 export const StyledInstructionsButton = styled(Button)`
