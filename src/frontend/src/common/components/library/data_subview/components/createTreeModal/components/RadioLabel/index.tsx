@@ -1,17 +1,17 @@
 // eslint-disable @typescript-eslint/explicit-member-accessibility
-import { List } from "czifui";
 import ListItemText from "@material-ui/core/ListItemText";
+import { List } from "czifui";
 import React from "react";
 import {
   Label,
   LabelLight,
   LabelMain,
+  SmallText,
   StyledDiv,
   StyledIconCheckSmall,
   StyledIconXSmall,
   StyledListItem,
   StyledListItemIcon,
-  SmallText,
 } from "./style";
 
 interface Props {
@@ -41,9 +41,9 @@ export const RadioLabelContextual = ({ selected }: Props): JSX.Element => {
             </StyledListItemIcon>
             <ListItemText>
               <SmallText>
-                Best for seeing relationships between your selected samples, other{" "}
-                samples you have uploaded to Aspen, and publicly-available samples
-                on GISAID.
+                Best for seeing relationships between your selected samples,
+                other samples you have uploaded to Aspen, and publicly-available
+                samples on GISAID.
               </SmallText>
             </ListItemText>
           </StyledListItem>
@@ -76,8 +76,8 @@ export const RadioLabelLocal = ({ selected }: Props): JSX.Element => {
             </StyledListItemIcon>
             <ListItemText>
               <SmallText>
-                Not recommended for epidemiological interpretation due to lack of
-                visibility into viral diversity outside of your county and
+                Not recommended for epidemiological interpretation due to lack
+                of visibility into viral diversity outside of your county and
                 omission of closely-related samples.
               </SmallText>
             </ListItemText>

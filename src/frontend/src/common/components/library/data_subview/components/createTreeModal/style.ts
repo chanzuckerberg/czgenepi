@@ -1,11 +1,10 @@
 import styled from "@emotion/styled";
-import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Radio from "@material-ui/core/Radio";
 import TextField from "@material-ui/core/TextField";
 import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
 import InfoOutlinedIcon from "@material-ui/icons/InfoOutlined";
-import ReportProblemOutlinedIcon from '@material-ui/icons/ReportProblemOutlined';
+import ReportProblemOutlinedIcon from "@material-ui/icons/ReportProblemOutlined";
 import {
   Button,
   fontBodyS,
@@ -16,11 +15,44 @@ import {
   getColors,
   getFontWeights,
   getSpacings,
+  Props,
   Tooltip,
 } from "czifui";
+import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import Instructions from "src/components/Instructions";
 
+const SmallImageSize = `
+  width: 14px;
+  height: 14px;
+`;
+
+const InstructionsCommon = `
+  ${fontBodyXs}
+  color: black;
+`;
+
+const AlertInstructionsCommon = `
+  ${fontBodyXxxs}
+  color: black;
+`;
+
+const FontWeightSemiBold = `
+  ${(props: Props) => {
+    const fontWeights = getFontWeights(props);
+    return `
+      font-weight: ${fontWeights?.semibold};
+    `;
+  }}
+`;
+const FontWeightRegular = `
+  ${(props: Props) => {
+    const fontWeights = getFontWeights(props);
+    return `
+      font-weight: ${fontWeights?.regular};
+    `;
+  }}
+`;
 
 export const StyledDialogContent = styled(DialogContent)`
   width: 600px;
@@ -82,47 +114,23 @@ export const StyledInstructions = styled(Instructions)`
 `;
 
 export const InstructionsSemiBold = styled.span`
-  ${fontBodyXs}
-  color: black;
-  ${(props) => {
-    const fontWeights = getFontWeights(props);
-    return `
-      font-weight: ${fontWeights?.semibold};
-    `;
-  }}
+  ${InstructionsCommon}
+  ${FontWeightSemiBold}
 `;
 
 export const InstructionsNotSemiBold = styled.span`
-  ${fontBodyXs}
-  color: black;
-  ${(props) => {
-    const fontWeights = getFontWeights(props);
-    return `
-      font-weight: ${fontWeights?.regular};
-    `;
-  }}
+  ${InstructionsCommon}
+  ${FontWeightRegular}
 `;
 
 export const AlertInstructionsSemiBold = styled.span`
-  ${fontBodyXxxs}
-  color: black;
-  ${(props) => {
-    const fontWeights = getFontWeights(props);
-    return `
-      font-weight: ${fontWeights?.semibold};
-    `;
-  }}
+  ${AlertInstructionsCommon}
+  ${FontWeightSemiBold}
 `;
 
 export const AlertInstructionsNotSemiBold = styled.span`
-  ${fontBodyXxxs}
-  color: black;
-  ${(props) => {
-    const fontWeights = getFontWeights(props);
-    return `
-      font-weight: ${fontWeights?.regular};
-    `;
-  }}
+  ${AlertInstructionsCommon}
+  ${FontWeightRegular}
 `;
 
 export const StyledInstructionsButton = styled(Button)`
@@ -223,11 +231,6 @@ export const StyledTooltip = styled(Tooltip)`
       margin-left: ${spacings?.xxs}px;
     `;
   }}
-`;
-
-const SmallImageSize = `
-  width: 14px;
-  height: 14px;
 `;
 
 export const StyledInfoOutlinedIcon = styled(InfoOutlinedIcon)`

@@ -1,16 +1,15 @@
-
+import { Dialog } from "@material-ui/core";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import CloseIcon from "@material-ui/icons/Close";
 import { Alert, Link } from "czifui";
 import React, { SyntheticEvent, useEffect, useState } from "react";
 import { useMutation } from "react-query";
-import { Dialog } from "@material-ui/core";
 import { createTree } from "src/common/queries/trees";
 import { Header, StyledIconButton } from "../DownloadModal/style";
 import { RadioLabelContextual, RadioLabelLocal } from "./components/RadioLabel";
 import {
-  AlertInstructionsSemiBold,
   AlertInstructionsNotSemiBold,
+  AlertInstructionsSemiBold,
   Content,
   CreateTreeInfo,
   FieldTitle,
