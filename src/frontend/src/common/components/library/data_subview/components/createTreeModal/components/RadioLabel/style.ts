@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
+import ListItemText from "@material-ui/core/ListItemText";
 import {
   fontBodyXxs,
   fontHeaderXs,
@@ -15,7 +16,7 @@ export const Label = styled.div`
   ${(props) => {
     const spacings = getSpacings(props);
     return `
-      margin-bottom: ${spacings?.s}px;
+      margin-bottom: ${spacings?.xs}px;
     `;
   }}
 `;
@@ -27,7 +28,7 @@ export const LabelMain = styled.span`
     const spacings = getSpacings(props);
     return `
       margin-top: ${spacings?.l}px;
-      margin-right: ${spacings?.m}px;
+      margin-right: ${spacings?.xxs}px;
       margin-bottom: ${spacings?.xxxs}px;
     `;
   }}
@@ -36,9 +37,11 @@ export const LabelMain = styled.span`
 export const LabelLight = styled.span`
   ${fontHeaderXs}
   ${(props) => {
+    const fontWeights = getFontWeights(props);
     const spacings = getSpacings(props);
     const colors = getColors(props);
     return `
+      font-weight: ${fontWeights?.regular};
       margin-top: ${spacings?.l}px;
       margin-right: ${spacings?.m}px;
       margin-bottom: ${spacings?.xxxs}px;
@@ -48,7 +51,7 @@ export const LabelLight = styled.span`
 `;
 
 export const StyledListItem = styled(ListItem)`
-  ${fontBodyXxs}
+  color: black;
   display: flex;
   align-items: flex-start;
   ${(props) => {
@@ -61,8 +64,12 @@ export const StyledListItem = styled(ListItem)`
   }}
 `;
 
+export const StyledListItemText = styled(ListItemText)`
+  ${fontBodyXxs}
+`;
+
 export const StyledListItemIcon = styled(ListItemIcon)`
-  min-width: 32px;
+  min-width: 28px;
   ${(props) => {
     const spacings = getSpacings(props);
     return `

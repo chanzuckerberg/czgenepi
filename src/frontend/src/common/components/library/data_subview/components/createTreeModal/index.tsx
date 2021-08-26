@@ -1,26 +1,21 @@
+import { Dialog } from "@material-ui/core";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import CloseIcon from "@material-ui/icons/Close";
 import { Alert, Link } from "czifui";
 import React, { SyntheticEvent, useEffect, useState } from "react";
 import { useMutation } from "react-query";
-import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
-import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import { createTree } from "src/common/queries/trees";
-import {
-  Content,
-  Header,
-  StyledIconButton,
-  Title,
-} from "../DownloadModal/style";
+import { Header, StyledIconButton } from "../DownloadModal/style";
 import { RadioLabelContextual, RadioLabelLocal } from "./components/RadioLabel";
 import {
+  Content,
   CreateTreeInfo,
   FieldTitle,
   InstructionsNotSemiBold,
   InstructionsSemiBold,
   StyledButton,
-  StyledDialog,
+  StyledDialogTitle,
   StyledErrorOutlinedIcon,
   StyledFormControlLabel,
   StyledInfoOutlinedIcon,
@@ -30,6 +25,7 @@ import {
   StyledTextField,
   StyledTooltip,
   TextFieldAlert,
+  Title,
   TreeNameInfoWrapper,
   TreeNameSection,
   TreeNameTooLongAlert,
@@ -58,8 +54,7 @@ export const CreateTreeModal = ({
   const [isContextual, setContextual] = useState<boolean>(true);
   const [isLocal, setLocal] = useState<boolean>(false);
   const [areInstructionsShown, setInstructionsShown] = useState<boolean>(false);
-  const [isCreateTreeButtonPressed, setCreateTreeButtonPressed] =
-    useState<boolean>(false);
+  useState<boolean>(false);
 
   useEffect(() => {
     if (treeType === "contextual") {
@@ -92,12 +87,10 @@ export const CreateTreeModal = ({
   const mutation = useMutation(createTree, {
     onError: () => {
       setCreateTreeFailed(true);
-      setCreateTreeButtonPressed(false);
     },
     onSuccess: () => {
       setTreeName("");
       setTreeType("");
-      setCreateTreeButtonPressed(false);
       onClose();
     },
   });
@@ -108,7 +101,6 @@ export const CreateTreeModal = ({
 
   const handleSubmit = (evt: SyntheticEvent) => {
     evt.preventDefault();
-    setCreateTreeButtonPressed(true);
     mutation.mutate({ sampleIds, treeName, treeType });
   };
 
@@ -123,14 +115,15 @@ export const CreateTreeModal = ({
   );
 
   return (
-    <StyledDialog
+    <Dialog
       disableBackdropClick
       disableEscapeKeyDown
       open={open}
       onClose={onClose}
-      style={{minWidth:"600px"}}
+      fullWidth={true}
+      maxWidth={"sm"}
     >
-      <DialogTitle>
+      <StyledDialogTitle>
         <StyledIconButton onClick={onClose}>
           <CloseIcon />
         </StyledIconButton>
@@ -138,7 +131,7 @@ export const CreateTreeModal = ({
         <Title>
           {sampleIds.length} Sample{sampleIds.length > 1 && "s"} Selected
         </Title>
-      </DialogTitle>
+      </StyledDialogTitle>
       <DialogContent>
         <Content data-test-id="modal-content">
           <form onSubmit={handleSubmit}>
@@ -175,6 +168,7 @@ export const CreateTreeModal = ({
                 id="outlined-basic"
                 variant="outlined"
                 value={treeName}
+                size="small"
                 onChange={(e) => setTreeName(e.target.value)}
               />
               {isTreeNameTooLong && (
@@ -241,15 +235,12 @@ export const CreateTreeModal = ({
               Create Tree
             </StyledButton>
           </form>
-          {isCreateTreeButtonPressed && (
-            <CreateTreeInfo>
-              Creating a new tree can take up to 12 hours. We will notify you
-              when your tree is ready.
-            </CreateTreeInfo>
-          )}
+          <CreateTreeInfo>
+            Creating a new tree can take up to 12 hours. We will notify you when
+            your tree is ready.
+          </CreateTreeInfo>
         </Content>
       </DialogContent>
-      <DialogActions></DialogActions>
-    </StyledDialog>
+    </Dialog>
   );
 };

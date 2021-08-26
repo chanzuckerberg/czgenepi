@@ -1,4 +1,3 @@
-import { Dialog } from "@material-ui/core";
 import styled from "@emotion/styled";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Radio from "@material-ui/core/Radio";
@@ -7,7 +6,9 @@ import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
 import InfoOutlinedIcon from "@material-ui/icons/InfoOutlined";
 import {
   Button,
+  fontBodyS,
   fontBodyXs,
+  fontBodyXxxs,
   fontCapsXxs,
   fontHeaderXs,
   getColors,
@@ -15,10 +16,38 @@ import {
   getSpacings,
   Tooltip,
 } from "czifui";
+import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import Instructions from "src/components/Instructions";
+
+export const Title = styled.span`
+  ${fontBodyS}
+  ${(props) => {
+    const colors = getColors(props);
+    const spacings = getSpacings(props);
+    return `
+      color: ${colors?.gray[500]};
+      margin-bottom: ${spacings?.l}px;
+    `;
+  }}
+`;
+
+export const StyledDialogTitle = styled(DialogTitle)`
+  ${(props) => {
+    const spacings = getSpacings(props);
+    return `
+      padding-bottom: ${spacings?.l}px; 
+    `;
+  }}
+`;
 
 export const StyledTextField = styled(TextField)`
   color: black;
+  ${(props) => {
+    const spacings = getSpacings(props);
+    return `
+      padding: ${spacings?.s}px;
+    `;
+  }}
 `;
 
 export const FieldTitle = styled.div`
@@ -28,18 +57,19 @@ export const FieldTitle = styled.div`
     const spacings = getSpacings(props);
     return `
       margin-top: ${spacings?.l}px;
-      margin-right: ${spacings?.xs}px;
       margin-bottom: ${spacings?.s}px;
     `;
   }}
 `;
 
 export const StyledInstructions = styled(Instructions)`
+  border-radius: 4px;
+  color: black;
   ${(props) => {
     const spacings = getSpacings(props);
     return `
       margin-bottom: ${spacings?.xs}px;
-      padding: ${spacings?.l};
+      padding: ${spacings?.l}px;
     `;
   }}
 `;
@@ -68,12 +98,13 @@ export const InstructionsNotSemiBold = styled.span`
 
 export const StyledInstructionsButton = styled(Button)`
   ${fontCapsXxs}
+  padding-left: 0px;
   ${(props) => {
     const spacings = getSpacings(props);
     const colors = getColors(props);
     return `
-      margin-right: ${spacings?.s}px;
       margin-top: ${spacings?.s}px;
+      margin-left: ${spacings?.m}px; 
       &:hover {
         background-color: transparent;
         color: ${colors?.primary[500]};
@@ -120,6 +151,7 @@ export const TreeNameInfoWrapper = styled.div`
 `;
 
 export const TreeNameTooLongAlert = styled.div`
+  ${fontBodyXxxs}
   display: flex;
   align-items: center;
   ${(props) => {
@@ -159,12 +191,14 @@ export const StyledTooltip = styled(Tooltip)`
   ${(props) => {
     const spacings = getSpacings(props);
     return `
-      margin-left: ${spacings?.xs}px;
+      margin-left: ${spacings?.xxs}px;
     `;
   }}
 `;
 
 export const StyledInfoOutlinedIcon = styled(InfoOutlinedIcon)`
+  width: 14px;
+  height: 14px;
   ${(props) => {
     const colors = getColors(props);
     const spacings = getSpacings(props);
@@ -173,7 +207,7 @@ export const StyledInfoOutlinedIcon = styled(InfoOutlinedIcon)`
       &:hover {
         color: ${colors?.primary[400]};
       }
-      margin-top: ${spacings?.xs}px;
+      margin-top: ${spacings?.s}px;
     `;
   }}
 `;
@@ -188,12 +222,14 @@ export const TextFieldAlert = styled.div`
 `;
 
 export const StyledErrorOutlinedIcon = styled(ErrorOutlineIcon)`
+  height: 14px;
+  width: 14px;
   ${(props) => {
     const colors = getColors(props);
     const spacings = getSpacings(props);
     return `
       color: ${colors?.error[400]};
-      margin-right: ${spacings?.s}px;
+      margin-right: ${spacings?.xs}px;
     `;
   }}
 `;
@@ -211,7 +247,7 @@ export const StyledFormControlLabel = styled(FormControlLabel)`
       &:hover {
         background-color: ${colors?.gray[100]};
       }
-      &:checked { 
+      :checked { 
         background-color: ${colors?.gray[100]};
       }
       margin-bottom: ${spacings?.s}px;
@@ -219,6 +255,12 @@ export const StyledFormControlLabel = styled(FormControlLabel)`
   }}
 `;
 
-export const StyledDialog = styled(Dialog)`
-  min-width: 600px;
+export const Content = styled.div`
+  ${fontBodyS}
+  ${(props) => {
+    const colors = getColors(props);
+    return `
+      color: ${colors?.gray[500]};
+    `;
+  }}
 `;

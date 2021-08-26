@@ -1,5 +1,4 @@
 // eslint-disable @typescript-eslint/explicit-member-accessibility
-import ListItemText from "@material-ui/core/ListItemText";
 import { List } from "czifui";
 import React from "react";
 import {
@@ -11,6 +10,7 @@ import {
   StyledIconXSmall,
   StyledListItem,
   StyledListItemIcon,
+  StyledListItemText,
 } from "./style";
 
 interface Props {
@@ -22,7 +22,7 @@ export const RadioLabelContextual = ({ selected }: Props): JSX.Element => {
     <StyledDiv>
       <Label>
         <LabelMain>My county and other regions </LabelMain>
-        <LabelLight>- Recommended</LabelLight>
+        <LabelLight>— Recommended</LabelLight>
       </Label>
       {selected && (
         <List>
@@ -30,17 +30,19 @@ export const RadioLabelContextual = ({ selected }: Props): JSX.Element => {
             <StyledListItemIcon>
               <StyledIconCheckSmall />
             </StyledListItemIcon>
-            <ListItemText>Best for local outbreak investigation.</ListItemText>
+            <StyledListItemText>
+              Best for local outbreak investigation.
+            </StyledListItemText>
           </StyledListItem>
           <StyledListItem button={false as any}>
             <StyledListItemIcon>
               <StyledIconCheckSmall />
             </StyledListItemIcon>
-            <ListItemText>
+            <StyledListItemText>
               Best for seeing relationships between your selected samples, other{" "}
               samples you have uploaded to Aspen, and publicly-available samples
               on GISAID.
-            </ListItemText>
+            </StyledListItemText>
           </StyledListItem>
         </List>
       )}
@@ -58,20 +60,20 @@ export const RadioLabelLocal = ({ selected }: Props): JSX.Element => {
             <StyledListItemIcon>
               <StyledIconCheckSmall />
             </StyledListItemIcon>
-            <ListItemText>
+            <StyledListItemText>
               Useful for seeing viral diversity in your county that may not be
               captured by your own sampling effort.
-            </ListItemText>
+            </StyledListItemText>
           </StyledListItem>
           <StyledListItem button={false as any}>
             <StyledListItemIcon>
               <StyledIconXSmall />
             </StyledListItemIcon>
-            <ListItemText>
+            <StyledListItemText>
               Not recommended for epidemiological interpretation due to lack of
               visibility into viral diversity outside of your county and
               omission of closely-related samples.
-            </ListItemText>
+            </StyledListItemText>
           </StyledListItem>
         </List>
       )}
