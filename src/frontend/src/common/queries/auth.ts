@@ -60,9 +60,11 @@ export function protectRoute(
   router: NextRouter
 ): void {
   const { isLoading, data } = result;
-
-  if (data && !data?.user?.agreedToTos) {
-    router.push(ROUTES.AGREE_TERMS);
+  const agreedToTOS = data?.user?.agreedToTos;
+  if (data) {
+    if (!agreedToTOS && router.asPath !== ROUTES.AGREE_TERMS) {
+      router.push(ROUTES.AGREE_TERMS);
+    }
   }
   if (!isLoading && !data) {
     router.push(ROUTES.HOMEPAGE);
