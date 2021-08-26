@@ -9,6 +9,8 @@ import { createTree } from "src/common/queries/trees";
 import { Header, StyledIconButton } from "../DownloadModal/style";
 import { RadioLabelContextual, RadioLabelLocal } from "./components/RadioLabel";
 import {
+  AlertInstructionsSemiBold,
+  AlertInstructionsNotSemiBold,
   Content,
   CreateTreeInfo,
   FieldTitle,
@@ -25,6 +27,7 @@ import {
   StyledRadio,
   StyledTextField,
   StyledTooltip,
+  StyledWarningIcon,
   TextFieldAlert,
   Title,
   TreeNameInfoWrapper,
@@ -213,16 +216,16 @@ export const CreateTreeModal = ({
               </RadioGroup>
             </TreeTypeSection>
             {failedSamples.length > 0 && (
-              <Alert severity="warning">
-                <InstructionsSemiBold>
+              <Alert icon={<StyledWarningIcon />} severity="warning">
+                <AlertInstructionsSemiBold>
                   {" "}
                   {failedSamples.length} Selected Sample
                   {failedSamples.length > 1 && "s"} {"won't"} be included in
                   your tree{" "}
-                </InstructionsSemiBold>
-                <InstructionsNotSemiBold>
+                </AlertInstructionsSemiBold>
+                <AlertInstructionsNotSemiBold>
                   because they failed genome recovery.
-                </InstructionsNotSemiBold>
+                </AlertInstructionsNotSemiBold>
               </Alert>
             )}
             <StyledButton

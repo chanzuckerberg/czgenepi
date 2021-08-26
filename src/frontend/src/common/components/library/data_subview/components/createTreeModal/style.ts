@@ -5,6 +5,7 @@ import Radio from "@material-ui/core/Radio";
 import TextField from "@material-ui/core/TextField";
 import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
 import InfoOutlinedIcon from "@material-ui/icons/InfoOutlined";
+import ReportProblemOutlinedIcon from '@material-ui/icons/ReportProblemOutlined';
 import {
   Button,
   fontBodyS,
@@ -93,6 +94,28 @@ export const InstructionsSemiBold = styled.span`
 
 export const InstructionsNotSemiBold = styled.span`
   ${fontBodyXs}
+  color: black;
+  ${(props) => {
+    const fontWeights = getFontWeights(props);
+    return `
+      font-weight: ${fontWeights?.regular};
+    `;
+  }}
+`;
+
+export const AlertInstructionsSemiBold = styled.span`
+  ${fontBodyXxxs}
+  color: black;
+  ${(props) => {
+    const fontWeights = getFontWeights(props);
+    return `
+      font-weight: ${fontWeights?.semibold};
+    `;
+  }}
+`;
+
+export const AlertInstructionsNotSemiBold = styled.span`
+  ${fontBodyXxxs}
   color: black;
   ${(props) => {
     const fontWeights = getFontWeights(props);
@@ -202,9 +225,13 @@ export const StyledTooltip = styled(Tooltip)`
   }}
 `;
 
-export const StyledInfoOutlinedIcon = styled(InfoOutlinedIcon)`
+const SmallImageSize = `
   width: 14px;
   height: 14px;
+`;
+
+export const StyledInfoOutlinedIcon = styled(InfoOutlinedIcon)`
+  ${SmallImageSize}
   ${(props) => {
     const colors = getColors(props);
     const spacings = getSpacings(props);
@@ -228,14 +255,23 @@ export const TextFieldAlert = styled.div`
 `;
 
 export const StyledErrorOutlinedIcon = styled(ErrorOutlineIcon)`
-  height: 14px;
-  width: 14px;
+  ${SmallImageSize}
   ${(props) => {
     const colors = getColors(props);
     const spacings = getSpacings(props);
     return `
       color: ${colors?.error[400]};
       margin-right: ${spacings?.xs}px;
+    `;
+  }}
+`;
+
+export const StyledWarningIcon = styled(ReportProblemOutlinedIcon)`
+  ${SmallImageSize}
+  ${(props) => {
+    const spacings = getSpacings(props);
+    return `
+      margin-top: ${spacings?.xxs}px;
     `;
   }}
 `;
