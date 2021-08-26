@@ -243,13 +243,12 @@ export const StyledFormControlLabel = styled(FormControlLabel)`
   ${(props) => {
     const colors = getColors(props);
     const spacings = getSpacings(props);
+    const checked = props.checked;
     return `
       &:hover {
         background-color: ${colors?.gray[100]};
       }
-      :checked { 
-        background-color: ${colors?.gray[100]};
-      }
+      background-color: ${checked ? colors?.gray[100] : "transparent"};
       margin-bottom: ${spacings?.s}px;
     `;
   }}
