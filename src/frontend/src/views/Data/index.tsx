@@ -5,10 +5,9 @@ import { useRouter } from "next/router";
 import React, { FunctionComponent, useEffect, useState } from "react";
 import { Menu } from "semantic-ui-react";
 import { fetchSamples, fetchTrees } from "src/common/api";
-import { protectRoute } from "src/common/queries/auth";
+import { useProtectedRoute } from "src/common/queries/auth";
 import { DataSubview } from "../../common/components";
 import { EMPTY_OBJECT } from "../../common/constants/empty";
-import { useUserInfo } from "../../common/queries/auth";
 import { ROUTES } from "../../common/routes";
 import { SampleRenderer, TreeRenderer } from "./cellRenderers";
 import { SampleHeader } from "./headerRenderer";
@@ -23,17 +22,13 @@ const TITLE: Record<string, string> = {
 };
 
 const Data: FunctionComponent = () => {
+  useProtectedRoute();
+
   const [samples, setSamples] = useState<Sample[] | undefined>();
   const [trees, setTrees] = useState<Tree[] | undefined>();
   const [isDataLoading, setIsDataLoading] = useState(false);
-  const result = useUserInfo();
-  const router = useRouter();
 
-  useEffect(() => {
-    if (result) {
-      protectRoute(result, router);
-    }
-  });
+  const router = useRouter();
 
   useEffect(() => {
     const setBioinformaticsData = async () => {

@@ -1,4 +1,4 @@
-import { NextRouter } from "next/router";
+import { useRouter } from "next/router";
 import { useQuery, UseQueryResult } from "react-query";
 import ENV from "src/common/constants/ENV";
 import {
@@ -55,18 +55,21 @@ export function useUserInfo(): UseQueryResult<UserResponse, unknown> {
   });
 }
 
-export function protectRoute(
-  result: UseQueryResult<UserResponse, unknown>,
-  router: NextRouter
-): void {
+export function useProtectedRoute(): UseQueryResult<UserResponse, unknown> {
+  const router = useRouter();
+  const result = useUserInfo();
+
   const { isLoading, data } = result;
   const agreedToTOS = data?.user?.agreedToTos;
-  if (data) {
-    if (!agreedToTOS && router.asPath !== ROUTES.AGREE_TERMS) {
-      router.push(ROUTES.AGREE_TERMS);
-    }
-  }
+  console.log("agreedToTOS: ", agreedToTOS);
+
   if (!isLoading && !data) {
     router.push(ROUTES.HOMEPAGE);
   }
+
+  if (!isLoading && !agreedToTOS) {
+    router.push(ROUTES.AGREE_TERMS);
+  }
+
+  return result;
 }

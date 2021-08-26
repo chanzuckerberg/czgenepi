@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { ROUTES } from "src/common/routes";
-import { protectRoute, useUserInfo } from "../../common/queries/auth";
+import { useProtectedRoute } from "../../common/queries/auth";
 import {
   Props,
   SampleIdToMetadata,
@@ -22,18 +22,11 @@ const routeToComponent: Record<Routes, (props: Props) => JSX.Element> = {
 };
 
 export default function Upload(): JSX.Element | null {
+  const { data, isLoading } = useProtectedRoute();
   const [samples, setSamples] = useState<ISamples | null>(null);
   const [metadata, setMetadata] = useState<SampleIdToMetadata | null>(null);
 
   const router = useRouter();
-  const result = useUserInfo();
-  const { data, isLoading } = result;
-
-  useEffect(() => {
-    if (result) {
-      protectRoute(result, router);
-    }
-  });
 
   const cancelPrompt = useNavigationPrompt();
 
