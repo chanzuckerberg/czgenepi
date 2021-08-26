@@ -1,4 +1,5 @@
 import cx from "classnames";
+import { compact, uniq } from "lodash";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -149,6 +150,10 @@ const Data: FunctionComponent = () => {
 
   const viewName = category.text;
 
+  const lineages = uniq(
+    compact(category.data?.map((d) => d.lineage?.lineage))
+  ).sort();
+
   return (
     <Container className={style.dataRoot}>
       <Head>
@@ -171,7 +176,10 @@ const Data: FunctionComponent = () => {
       <FlexContainer className={style.view}>
         {viewName === "Samples" && shouldShowFilters && (
           // TODO (mlila): replace with sds filterpanel once it's complete
-          <FilterPanel setDataFilterFunc={setDataFilterFunc} />
+          <FilterPanel
+            lineages={lineages}
+            setDataFilterFunc={setDataFilterFunc}
+          />
         )}
         <DataSubview
           key={router.asPath}

@@ -17,6 +17,7 @@ enum TypeFilterType {
   Multiple = "multiple",
 }
 interface Props {
+  lineages: string[];
   setDataFilterFunc: Dispatch<
     SetStateAction<(data: TableItem[]) => TableItem[]>
   >;
@@ -85,7 +86,7 @@ const applyFilter = (data: TableItem[], dataFilter: FilterType) => {
   }
 };
 
-const FilterPanel: FC<Props> = ({ setDataFilterFunc }) => {
+const FilterPanel: FC<Props> = ({ lineages, setDataFilterFunc }) => {
   const [dataFilters, setDataFilters] = useState<FiltersType>(DATA_FILTER_INIT);
 
   useEffect(() => {
@@ -133,7 +134,12 @@ const FilterPanel: FC<Props> = ({ setDataFilterFunc }) => {
       <CollectionDateFilter
         updateCollectionDateFilter={updateCollectionDateFilter}
       />
-      <LineageFilter updateLineageFilter={updateLineageFilter} />
+      <LineageFilter
+        updateLineageFilter={updateLineageFilter}
+        options={lineages.map((l) => {
+          return { name: l };
+        })}
+      />
     </StyledFilterPanel>
   );
 };
