@@ -353,7 +353,8 @@ def create_sample():
         )
         if data_ok:
             # GISAID Stuff
-            if data["sample"]["public_identifier"]:
+            public_identifier = data["sample"].get("public_identifier")
+            if public_identifier:
                 # if they provided a public_id they marked true to "submitted to gisaid"
                 submitted_to_gisaid = True
                 public_identifier = data["sample"]["public_identifier"]
