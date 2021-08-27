@@ -1,6 +1,7 @@
-from typing import Iterable, Set
+from typing import Set
 
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, Session
+from sqlalchemy.orm.query import Query
 
 from aspen.app.views.api_utils import authz_sample_filters
 from aspen.database.models import DataType, Sample, UploadedPathogenGenome
@@ -8,7 +9,7 @@ from aspen.database.models.usergroup import User
 
 
 class FastaStreamer:
-    def __init__(self, user: User, sample_ids, db_session):
+    def __init__(self, user: User, sample_ids: Set[str], db_session: Session):
         self.user = user
         self.cansee_groups_private_identifiers: Set[int] = {
             cansee.owner_group_id
@@ -16,7 +17,7 @@ class FastaStreamer:
             if cansee.data_type == DataType.PRIVATE_IDENTIFIERS
         }
         # query for samples
-        self.all_samples: Iterable[Sample] = (
+        self.all_samples: Query = (
             db_session.query(Sample)
             .yield_per(
                 5
