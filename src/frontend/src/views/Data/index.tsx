@@ -55,7 +55,7 @@ const Data: FunctionComponent = () => {
     if (router.asPath === ROUTES.DATA) {
       router.push(ROUTES.DATA_SAMPLES);
     }
-  });
+  }, [router]);
 
   // this constant is inside the component so we can associate
   // each category with its respective variable.
