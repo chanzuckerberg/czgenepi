@@ -1,5 +1,12 @@
 import { useRouter } from "next/router";
-import { useQuery, UseQueryResult } from "react-query";
+import { useEffect } from "react";
+import {
+  useMutation,
+  UseMutationResult,
+  useQuery,
+  useQueryClient,
+  UseQueryResult,
+} from "react-query";
 import ENV from "src/common/constants/ENV";
 import {
   API,
@@ -41,13 +48,28 @@ const USER_MAP = new Map<string, keyof User>([
 export const fetchUserInfo = (): Promise<UserResponse> =>
   apiResponse<UserResponse>(["group", "user"], [null, USER_MAP], API.USER_INFO);
 
-export const updateUserInfo = (user: Partial<User>): Promise<Response> => {
+const updateUserInfo = (user: Partial<User>): Promise<Response> => {
   return fetch(API_URL + API.USER_INFO, {
     ...DEFAULT_PUT_OPTIONS,
     ...DEFAULT_HEADERS_MUTATION_OPTIONS,
     body: JSON.stringify(user),
   });
 };
+
+export function useUpdateUserInfo(): UseMutationResult<
+  Response,
+  unknown,
+  Partial<User>,
+  unknown
+> {
+  const queryClient = useQueryClient();
+
+  return useMutation(updateUserInfo, {
+    onSuccess: async () => {
+      await queryClient.invalidateQueries([USE_USER_INFO]);
+    },
+  });
+}
 
 export function useUserInfo(): UseQueryResult<UserResponse, unknown> {
   return useQuery([USE_USER_INFO], fetchUserInfo, {
@@ -60,10 +82,19 @@ export function useProtectedRoute(): UseQueryResult<UserResponse, unknown> {
   const result = useUserInfo();
 
   const { isLoading, data } = result;
+  const agreedToTOS = data?.user?.agreedToTos;
 
-  if (!isLoading && !data) {
-    router.push(ROUTES.HOMEPAGE);
-  }
+  useEffect(() => {
+    if (!isLoading && !data) {
+      router.push(ROUTES.HOMEPAGE);
+    }
+  }, [isLoading, data, router]);
+
+  useEffect(() => {
+    if (!isLoading && !agreedToTOS && router.asPath !== ROUTES.AGREE_TERMS) {
+      router.push(ROUTES.AGREE_TERMS);
+    }
+  }, [isLoading, data, router, agreedToTOS]);
 
   return result;
 }
