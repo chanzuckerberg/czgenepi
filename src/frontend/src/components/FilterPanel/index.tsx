@@ -7,6 +7,7 @@ import React, {
   useState,
 } from "react";
 import { CollectionDateFilter } from "./components/CollectionDateFilter";
+import { UploadDateFilter } from "./components/UploadDateFilter";
 import { StyledFilterPanel } from "./style";
 
 type DateType = string | undefined;
@@ -39,6 +40,14 @@ interface FiltersType {
 const DATA_FILTER_INIT = {
   collectionDate: {
     key: "collectionDate",
+    params: {
+      end: undefined,
+      start: undefined,
+    },
+    type: TypeFilterType.Date,
+  },
+  uploadDate: {
+    key: "uploadDate",
     params: {
       end: undefined,
       start: undefined,
@@ -107,11 +116,16 @@ const FilterPanel: FC<Props> = ({ setDataFilterFunc }) => {
     updateDataFilter("collectionDate", { end, start });
   };
 
+  const updateUploadDateFilter = (start: DateType, end: DateType) => {
+    updateDataFilter("uploadDate", { end, start });
+  };
+
   return (
     <StyledFilterPanel>
       <CollectionDateFilter
         updateCollectionDateFilter={updateCollectionDateFilter}
       />
+      <UploadDateFilter updateUploadDateFilter={updateUploadDateFilter} />
     </StyledFilterPanel>
   );
 };
