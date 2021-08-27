@@ -7,6 +7,7 @@ import React, {
   useState,
 } from "react";
 import { CollectionDateFilter } from "./components/CollectionDateFilter";
+import { UploadDateFilter } from "./components/UploadDateFilter";
 import { LineageFilter } from "./LineageFilter";
 import { StyledFilterPanel } from "./style";
 
@@ -60,6 +61,14 @@ const DATA_FILTER_INIT = {
     },
     transform: (d: Sample) => d.lineage?.lineage,
     type: TypeFilterType.Multiple,
+  },
+  uploadDate: {
+    key: "uploadDate",
+    params: {
+      end: undefined,
+      start: undefined,
+    },
+    type: TypeFilterType.Date,
   },
 };
 
@@ -130,6 +139,10 @@ const FilterPanel: FC<Props> = ({ lineages, setDataFilterFunc }) => {
     updateDataFilter("collectionDate", { end, start });
   };
 
+  const updateUploadDateFilter = (start: DateType, end: DateType) => {
+    updateDataFilter("uploadDate", { end, start });
+  };
+
   const updateLineageFilter = (selected: string[]) => {
     const prevSelected = dataFilters.lineage?.params.selected;
 
@@ -146,6 +159,7 @@ const FilterPanel: FC<Props> = ({ lineages, setDataFilterFunc }) => {
       <CollectionDateFilter
         updateCollectionDateFilter={updateCollectionDateFilter}
       />
+      <UploadDateFilter updateUploadDateFilter={updateUploadDateFilter} />
       <LineageFilter
         options={lineages}
         updateLineageFilter={updateLineageFilter}
