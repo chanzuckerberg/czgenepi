@@ -44,7 +44,7 @@ RUN pip3 install --no-cache-dir awscli pipenv
 ENV FLASK_ENV=development
 ENV PIPENV_PYTHON=/usr/src/app/
 
-RUN pip3 install nextstrain-cli csv-diff s3fs[boto3] aiobotocore[awscli,boto3] envdir fsspec pandas
+RUN pip3 install nextstrain-cli csv-diff s3fs[boto3] aiobotocore[awscli,boto3] envdir fsspec pandas arrow
 
 RUN mkdir /ncov && \
     cd /ncov && \

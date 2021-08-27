@@ -68,6 +68,15 @@ class PhyloRun(Workflow):
     group = relationship(Group, backref=backref("phylo_runs", uselist=True))  # type: ignore
 
     template_file_path = Column(String, nullable=True)
+
+    # Store a list of gisaid ID's we're going to use as inputs
+    # to the phylo run.
+    gisaid_ids = Column(
+        JSONB,
+        nullable=False,
+        default=text("'[]'::jsonb"),
+        server_default=text("'[]'::jsonb"),
+    )
     """This is the path, relative to aspen root, for the builds template file.  For all
     new builds, this should be set.  However, for runs imported from covidhub, this
     would not be available."""

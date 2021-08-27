@@ -71,10 +71,18 @@ task nextstrain_workflow {
                --phylo-run-id "~{workflow_id}"                        \
                --county-sequences ncov/data/sequences_aspen.fasta     \
                --county-metadata ncov/data/metadata_aspen.tsv         \
-               --sequences ncov/data/sequences_selected.fasta         \
-               --metadata ncov/data/metadata_selected.tsv             \
+               --selected ncov/data/include.txt                       \
                --builds-file ncov/my_profiles/aspen/builds.yaml       \
     )
+    # If we don't have any county samples, copy the reference genomes to to our county file
+    if [ ! -e ncov/data/sequences_aspen.fasta ]; then
+        cp ncov/data/references_sequences.fasta ncov/data/sequences_aspen.fasta;
+        cp ncov/data/references_metadata.tsv ncov/data/metadata_aspen.tsv;
+    fi;
+
+    # If this is a contextual build, disable crowding penalty
+    if grep -q group_plus_context ncov/my_profiles/aspen/builds.yaml; then patch ncov/workflow/snakemake_rules/main_workflow.smk < /usr/src/app/aspen/workflows/nextstrain_run/patches/local_ncov_settings.patch; fi
+
     aligned_gisaid_s3_bucket=$(echo "${aligned_gisaid_location}" | jq -r .bucket)
     aligned_gisaid_sequences_s3_key=$(echo "${aligned_gisaid_location}" | jq -r .sequences_key)
     aligned_gisaid_metadata_s3_key=$(echo "${aligned_gisaid_location}" | jq -r .metadata_key)

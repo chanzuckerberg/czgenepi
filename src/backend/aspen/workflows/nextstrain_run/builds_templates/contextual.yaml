@@ -1,13 +1,13 @@
 inputs:
+  - name: "root_ref"
+    metadata: "data/references_metadata.tsv"
+    sequences: "data/references_sequences.fasta"
   - name: "gisaid"
     metadata: "data/metadata_gisaid.tsv"
     sequences: "data/sequences_gisaid.fasta"
   - name: "aspen"
     metadata: "data/metadata_aspen.tsv"
     sequences: "data/sequences_aspen.fasta"
-  - name: "selected"
-    metadata: "data/metadata_selected.tsv"
-    sequences: "data/sequences_selected.fasta"
 
 builds:
   aspen:
@@ -24,6 +24,7 @@ custom_rules:
 
 ## Auxiliary files
 files:
+  include: "data/include.txt"
   lat_longs: "my_profiles/aspen/lat_longs.tsv"
   ordering: "my_profiles/aspen/ordering.tsv"
   description: "my_profiles/aspen/covidtrackerca.md"
@@ -32,13 +33,20 @@ files:
 ## Parameters
 refine:
   keep_polytomies: True
+  clock_filter_iqd: 3
 
 ## Subsampling schemas
-# Number of max_sequences will be an external variable total to half of user selected samples
 subsampling:
   group_plus_context:
+    root:
+      exclude: "--exclude-where 'root_ref!=yes'"
     focal:
-      exclude: "--exclude-where 'selected!=yes'"
+      exclude: "--exclude-all"
+    closest:
+      max_sequences: 100
+      priorities:
+        type: "proximity"
+        focus: "focal"
 
     group:
       group_by: "year month"
@@ -75,4 +83,4 @@ subsampling:
     international_serial_sampling:
       group_by: "region year month"
       seq_per_group: 2
-      query: --query "(country != '{{country}}')" 
+      query: --query "(country != '{{country}}')"

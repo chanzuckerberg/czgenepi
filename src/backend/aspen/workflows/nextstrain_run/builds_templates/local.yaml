@@ -1,13 +1,13 @@
 inputs:
+  - name: "root_ref"
+    metadata: "data/references_metadata.tsv"
+    sequences: "data/references_sequences.fasta"
   - name: "gisaid"
     metadata: "data/metadata_gisaid.tsv"
     sequences: "data/sequences_gisaid.fasta"
   - name: "aspen"
     metadata: "data/metadata_aspen.tsv"
     sequences: "data/sequences_aspen.fasta"
-  - name: "selected"
-    metadata: "data/metadata_selected.tsv"
-    sequences: "data/sequences_selected.fasta"
 
 builds:
   aspen:
@@ -24,6 +24,7 @@ custom_rules:
 
 ## Auxiliary files
 files:
+  include: "data/include.txt"
   lat_longs: "my_profiles/aspen/lat_longs.tsv"
   ordering: "my_profiles/aspen/ordering.tsv"
   description: "my_profiles/aspen/covidtrackerca.md"
@@ -32,16 +33,15 @@ files:
 ## Parameters
 refine:
   keep_polytomies: True
+  clock_filter_iqd: 3
 
 ## Subsampling schemas
 subsampling:
   group_only:
-    focal:
-      exclude: "--exclude-where 'selected!=yes'"
+    root:
+      exclude: "--exclude-where 'root_ref!=yes'"
+
     same_county:
       group_by: "year month"
       max_sequences: 2000
       query: --query "(location == '{{location}}') & (division == '{{division}}')"
-      priorities:
-        type: "proximity"
-        focus: "focal"
