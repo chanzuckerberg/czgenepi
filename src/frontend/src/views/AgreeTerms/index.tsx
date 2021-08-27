@@ -8,17 +8,21 @@ import DialogActions from "src/common/components/library/Dialog/components/Dialo
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import ENV from "src/common/constants/ENV";
-import { updateUserInfo, useProtectedRoute } from "src/common/queries/auth";
+import { useUpdateUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
 import { PageContent } from "../../common/styles/mixins/global";
 import { Details, Title } from "./style";
 
 export default function AgreeTerms(): JSX.Element {
-  useProtectedRoute();
   const [isLoading, setIsLoading] = useState(false);
   const [shouldRedirect, setShouldRedirect] = useState(false);
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
   const router = useRouter();
+  const {
+    mutate: updateUserInfo,
+    isSuccess,
+    isLoading: isUpdatingUserInfo,
+  } = useUpdateUserInfo();
 
   useEffect(() => {
     if (shouldRedirect) {
@@ -27,16 +31,18 @@ export default function AgreeTerms(): JSX.Element {
   }, [shouldRedirect, router]);
 
   useEffect(() => {
-    if (!hasAcceptedTerms) return;
+    if (!hasAcceptedTerms || isUpdatingUserInfo) return;
+    if (isSuccess) {
+      return setShouldRedirect(true);
+    }
 
     agreeTos();
 
     async function agreeTos() {
       setIsLoading(true);
-      await updateUserInfo({ agreed_to_tos: true });
-      setShouldRedirect(true);
+      updateUserInfo({ agreed_to_tos: true });
     }
-  }, [hasAcceptedTerms]);
+  }, [hasAcceptedTerms, isUpdatingUserInfo, isSuccess, updateUserInfo]);
 
   function handleAcceptClick() {
     setHasAcceptedTerms(true);
