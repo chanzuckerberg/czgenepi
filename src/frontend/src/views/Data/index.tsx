@@ -154,10 +154,11 @@ const Data: FunctionComponent = () => {
   // * using the data, but LineageFilter renders a child compnent that seems
   // * to reference the parent's props (?). Passing in only the lineages, or
   // * incomplete options causes the component to break
-  const lineages = uniq(compact(category.data?.map((d) => d.lineage?.lineage)))
+  const sampleArr = viewName === "Samples" ? (category.data as Sample[]) : [];
+  const lineages = uniq(compact(sampleArr?.map((d) => d.lineage?.lineage)))
     .sort()
     .map((l) => {
-      return { name: l };
+      return { name: l as string };
     });
 
   return (

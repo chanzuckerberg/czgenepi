@@ -29,6 +29,7 @@ interface Props {
 
 interface FilterParamsType {
   end?: DateType;
+  selected?: string[];
   start?: DateType;
 }
 interface FilterType {
@@ -57,8 +58,8 @@ const DATA_FILTER_INIT = {
     params: {
       selected: [],
     },
-    transform: (d) => d.lineage?.lineage,
-    type: "multiple",
+    transform: (d: Sample) => d.lineage?.lineage,
+    type: TypeFilterType.Multiple,
   },
 };
 
@@ -67,7 +68,7 @@ const applyFilter = (data: TableItem[], dataFilter: FilterType) => {
 
   const { key, params, transform, type } = dataFilter;
   if (!key || !params || !type) return data;
-  const { end, start, selected } = params;
+  const { end, start, selected = [] } = params;
 
   switch (type) {
     case TypeFilterType.Date:

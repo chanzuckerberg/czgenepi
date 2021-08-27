@@ -8,20 +8,22 @@ import { DefaultMenuSelectOption } from "../index";
 
 interface Props {
   options: DefaultMenuSelectOption[];
-  updateLineageFilter: () => void;
+  updateLineageFilter: (lineages: string[]) => void;
 }
 
 const LineageFilter = (props: Props): JSX.Element => {
   const { options = [], updateLineageFilter } = props;
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const [value, setValue] = useState<DefaultMenuSelectOption[] | null>([]);
+  const [value, setValue] = useState<DefaultMenuSelectOption[] | undefined>([]);
   const [pendingValue, setPendingValue] = useState<
-    DefaultMenuSelectOption[] | null
+    DefaultMenuSelectOption[] | undefined
   >([]);
 
   useEffect(() => {
-    updateLineageFilter(value?.map((d) => d.name));
+    if (value) {
+      updateLineageFilter(value.map((d) => d.name));
+    }
   }, [updateLineageFilter, value]);
 
   const open = Boolean(anchorEl);
@@ -76,7 +78,7 @@ const LineageFilter = (props: Props): JSX.Element => {
 
   function handleChange(
     _: React.ChangeEvent<unknown>,
-    newValue: DefaultMenuSelectOption[] | null
+    newValue: DefaultMenuSelectOption[] | undefined
   ) {
     return setPendingValue(newValue as DefaultMenuSelectOption[]);
   }
@@ -91,7 +93,7 @@ const LineageFilter = (props: Props): JSX.Element => {
 };
 
 interface ChipsProps {
-  value: DefaultMenuSelectOption[] | null;
+  value?: DefaultMenuSelectOption[];
   onDelete: (option: DefaultMenuSelectOption) => void;
 }
 

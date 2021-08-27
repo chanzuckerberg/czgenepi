@@ -83,7 +83,7 @@ const DownloadModal = ({
     } else {
       setFastaDisabled(false);
     }
-  }, [sampleIds, failedSamples]);
+  }, [sampleIds, failedSamples, setFastaDisabled]);
 
   const handleMetadataClick = function () {
     setMetadataSelected(!isMetadataSelected);
@@ -150,9 +150,9 @@ const DownloadModal = ({
               <StyledSpan style={getBackgroundFastaColor()}>
                 <CheckBoxWrapper>
                   <CheckBoxInfo>
+                    {/* @ts-expect-error need to update checkbox state after upgrading sds */}
                     <StyledCheckbox
-                      color="primary"
-                      onClick={handleFastaClick}
+                      onChange={handleFastaClick}
                       disabled={isFastaDisabled}
                     />
                   </CheckBoxInfo>
@@ -172,7 +172,8 @@ const DownloadModal = ({
             <div style={{ height: "4px" }}></div>
             <CheckBoxWrapper style={getBackgroundColor(isMetadataSelected)}>
               <CheckBoxInfo>
-                <StyledCheckbox color="primary" onClick={handleMetadataClick} />
+                {/* @ts-expect-error need to update checkbox state after upgrading sds */}
+                <StyledCheckbox onChange={handleMetadataClick} />
               </CheckBoxInfo>
               <CheckBoxInfo>
                 <DownloadType>Sample Metadata </DownloadType> (.tsv)
