@@ -140,4 +140,6 @@ export const TooltipDescriptionText = styled.div`
 
 export const StyledFlexChildDiv = styled.div`
   flex: 1 1 0;
+  margin: 0 auto;
+  max-width: 1308px;
 `;
