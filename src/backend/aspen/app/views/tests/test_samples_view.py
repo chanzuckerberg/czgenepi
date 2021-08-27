@@ -651,7 +651,6 @@ def test_samples_create_view_pass_no_public_id(
         {
             "sample": {
                 "private_identifier": "private",
-                "public_identifier": "",
                 "collection_date": api_utils.format_date(datetime.datetime.now()),
                 "location": "Ventura County",
                 "private": True,
@@ -665,7 +664,6 @@ def test_samples_create_view_pass_no_public_id(
         {
             "sample": {
                 "private_identifier": "private2",
-                "public_identifier": "",
                 "collection_date": api_utils.format_date(datetime.datetime.now()),
                 "location": "Ventura County",
                 "private": True,
