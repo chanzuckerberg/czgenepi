@@ -77,7 +77,6 @@ export const FieldTitle = styled.div`
   ${(props) => {
     const spacings = getSpacings(props);
     return `
-      margin-top: ${spacings?.l}px;
       margin-bottom: ${spacings?.s}px;
     `;
   }}
