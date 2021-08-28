@@ -9,8 +9,9 @@ import {
   Button,
   fontBodyS,
   fontBodyXs,
+  fontBodyXxs,
   fontBodyXxxs,
-  fontCapsXxs,
+  fontCapsXxxs,
   fontHeaderXs,
   getColors,
   getFontWeights,
@@ -63,10 +64,11 @@ export const StyledDialogTitle = styled(DialogTitle)`
 
 export const StyledTextField = styled(TextField)`
   color: black;
+  padding: 0px;
   ${(props) => {
     const spacings = getSpacings(props);
     return `
-      padding: ${spacings?.s}px;
+      padding-bottom: ${spacings?.s}px; 
     `;
   }}
 `;
@@ -77,7 +79,7 @@ export const FieldTitle = styled.div`
   ${(props) => {
     const spacings = getSpacings(props);
     return `
-      margin-bottom: ${spacings?.s}px;
+      margin-bottom: ${spacings?.xxs}px;
     `;
   }}
 `;
@@ -127,14 +129,14 @@ export const AlertInstructionsNotSemiBold = styled.span`
 `;
 
 export const StyledInstructionsButton = styled(Button)`
-  ${fontCapsXxs}
+  ${fontCapsXxxs}
   padding-left: 0px;
   ${(props) => {
     const spacings = getSpacings(props);
     const colors = getColors(props);
     return `
-      margin-top: ${spacings?.s}px;
       margin-left: ${spacings?.m}px; 
+      padding-top: ${spacings?.xxs}px;
       &:hover {
         background-color: transparent;
         color: ${colors?.primary[500]};
@@ -148,9 +150,12 @@ export const StyledRadio = styled(Radio)`
   ${(props) => {
     const colors = getColors(props);
     return `
-      color: ${colors?.primary[500]};
+      color: ${colors?.gray[400]};
       &.Mui-checked {
         color: ${colors?.primary[500]};
+      }
+      &:hover {
+        color: ${colors?.gray[500]};
       }
     `;
   }}
@@ -187,13 +192,14 @@ export const TreeNameTooLongAlert = styled.div`
   ${(props) => {
     const spacings = getSpacings(props);
     return `
-      margin-top: ${spacings?.xs}px;
+      margin-top: ${spacings?.xxxs}px;
       margin-bottom: ${spacings?.xl}px;
     `;
   }}
 `;
 
 export const CreateTreeInfo = styled.div`
+  ${fontBodyXxs}
   ${(props) => {
     const colors = getColors(props);
     const spacings = getSpacings(props);
@@ -230,13 +236,12 @@ export const StyledInfoOutlinedIcon = styled(InfoOutlinedIcon)`
   ${SmallImageSize}
   ${(props) => {
     const colors = getColors(props);
-    const spacings = getSpacings(props);
     return `
-      color: ${colors?.gray[400]};
+      color: ${colors?.gray[500]};
       &:hover {
         color: ${colors?.primary[400]};
       }
-      margin-top: ${spacings?.s}px;
+
     `;
   }}
 `;
@@ -288,6 +293,7 @@ export const StyledFormControlLabel = styled(FormControlLabel)`
       }
       background-color: ${checked ? colors?.gray[100] : "transparent"};
       margin-bottom: ${spacings?.s}px;
+      padding: ${spacings?.l}px;
     `;
   }}
 `;

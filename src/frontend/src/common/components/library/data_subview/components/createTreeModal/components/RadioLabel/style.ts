@@ -15,7 +15,7 @@ export const Label = styled.div`
   ${(props) => {
     const spacings = getSpacings(props);
     return `
-      margin-bottom: ${spacings?.xs}px;
+      margin-bottom: ${spacings?.xxxs}px;
     `;
   }}
 `;
@@ -44,7 +44,7 @@ export const LabelLight = styled.span`
       margin-top: ${spacings?.l}px;
       margin-right: ${spacings?.m}px;
       margin-bottom: ${spacings?.xxxs}px;
-      color: ${colors?.gray[300]};
+      color: ${colors?.gray[500]};
     `;
   }}
 `;
@@ -53,12 +53,13 @@ export const StyledListItem = styled(ListItem)`
   color: black;
   display: flex;
   align-items: flex-start;
+  padding: 0px;
   ${(props) => {
     const fontWeights = getFontWeights(props);
     const spacings = getSpacings(props);
     return `
       font-weight: ${fontWeights?.regular};
-      padding: ${spacings?.xxxs}px;
+      padding-bottom: ${spacings?.xxxs}px;
     `;
   }}
 `;

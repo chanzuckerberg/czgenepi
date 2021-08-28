@@ -140,7 +140,7 @@ export const CreateTreeModal = ({
           <form onSubmit={handleSubmit}>
             <TreeNameSection>
               <TreeNameInfoWrapper>
-                <FieldTitle>Tree Name: </FieldTitle>
+                <FieldTitle>Tree Name</FieldTitle>
                 <StyledInstructionsButton
                   color="primary"
                   onClick={handleInstructionsClick}
