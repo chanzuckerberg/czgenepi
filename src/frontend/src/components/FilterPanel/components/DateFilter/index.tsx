@@ -27,6 +27,9 @@ const DateFilter: FC<Props> = ({
   inputLabel,
   updateDateFilter,
 }) => {
+  // TODO (mlila): use state for start/end to display to user when they reopen filter
+  const [startDate, setStartDate] = useState<FormattedDateType>();
+  const [endDate, setEndDate] = useState<FormattedDateType>();
   const [anchorEl, setAnchorEl] = useState<HTMLElement>();
 
   const validationSchema = yup.object({
@@ -103,18 +106,34 @@ const DateFilter: FC<Props> = ({
         onClose={handleClose}
         getContentAnchorEl={null}
       >
-        <StyledDateRange>
-          <DateField fieldKey={fieldKeyStart} formik={formik} />
-          <StyledText>to</StyledText>
-          <DateField fieldKey={fieldKeyEnd} formik={formik} />
-          <Button
-            onClick={() => {
-              setDatesFromRange(values[fieldKeyStart], values[fieldKeyEnd]);
-            }}
-          >
-            Apply
-          </Button>
-        </StyledDateRange>
+        <StyledManualDate>
+          <StyledDateRange>
+            <DateField
+              fieldKey={fieldKeyStart}
+              formik={formik}
+              onChange={(e) => {
+                setStartDate(e.target.value);
+              }}
+            />
+            <StyledText>to</StyledText>
+            <DateField
+              fieldKey={fieldKeyEnd}
+              formik={formik}
+              onChange={(e) => {
+                setEndDate(e.target.value);
+              }}
+            />
+          </StyledDateRange>
+          {(startDate || endDate) && (
+            <Button
+              onClick={() => {
+                setDatesFromRange(values[fieldKeyStart], values[fieldKeyEnd]);
+              }}
+            >
+              Apply
+            </Button>
+          )}
+        </StyledManualDate>
         <MenuItem onClick={() => setDatesFromOffset(7)}>Last 7 Days</MenuItem>
         <MenuItem onClick={() => setDatesFromOffset(30)}>Last 30 Days</MenuItem>
         <MenuItem onClick={() => setDatesFromOffset(90)}>

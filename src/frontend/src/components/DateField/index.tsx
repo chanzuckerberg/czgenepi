@@ -13,12 +13,14 @@ interface Props {
   fieldKey: string;
   formik: FormikContextType<any>;
   helperText?: any;
+  onChange?: (d: FormattedDateType) => void;
 }
 
 export default function DateField({
   fieldKey,
   formik,
   helperText,
+  onChange,
 }: Props): JSX.Element {
   const { handleChange, handleBlur, values, touched, errors } = formik;
 
@@ -33,7 +35,10 @@ export default function DateField({
       placeholder="YYYY-MM-DD"
       margin="dense"
       variant="outlined"
-      onChange={handleChange}
+      onChange={(e) => {
+        onChange(e);
+        handleChange(e);
+      }}
       onBlur={handleBlur}
       value={value}
       error={Boolean(errorMessage)}
