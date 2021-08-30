@@ -3,7 +3,7 @@ import React from "react";
 import { Title, Wrapper } from "./style";
 
 interface Props {
-  title: string;
+  title: string | undefined;
   items: React.ReactNode[];
   ordered?: boolean;
   className?: string;
@@ -17,7 +17,7 @@ export default function Instructions({
 }: Props): JSX.Element {
   return (
     <Wrapper className={className}>
-      <Title>{title}</Title>
+      {title && <Title>{title}</Title>}
       <List ordered={ordered}>
         {items.map((item, index) => {
           return (

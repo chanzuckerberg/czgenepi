@@ -101,10 +101,8 @@ export const InstructionsSemiBold = styled.span`
   ${fontBodyXs}
   ${(props: Props) => {
     const fontWeights = getFontWeights(props);
-    const spacings = getSpacings(props);
     return `
       font-weight: ${fontWeights?.semibold};
-      margin-bottom: ${spacings?.xxs}
     `;
   }}
 `;

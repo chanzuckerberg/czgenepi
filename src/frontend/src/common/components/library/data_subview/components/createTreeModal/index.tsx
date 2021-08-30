@@ -150,18 +150,13 @@ export const CreateTreeModal = ({
               </TreeNameInfoWrapper>
               {areInstructionsShown && (
                 <StyledInstructions
-                  title=""
                   items={[
-                    <span key="1">
-                      <InstructionsSemiBold>
-                        Do not include any PII in your Tree name.
-                      </InstructionsSemiBold>{" "}
-                    </span>,
-                    <span key="2">
-                      <InstructionsNotSemiBold>
-                        Tree names must be no longer than 128 characters.
-                      </InstructionsNotSemiBold>
-                    </span>,
+                    <InstructionsSemiBold key="1">
+                      Do not include any PII in your Tree name.
+                    </InstructionsSemiBold>,
+                    <InstructionsNotSemiBold key="2">
+                      Tree names must be no longer than 128 characters.
+                    </InstructionsNotSemiBold>
                   ]}
                 />
               )}
