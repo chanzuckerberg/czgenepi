@@ -1,23 +1,18 @@
 import datetime
+import os
 from collections import defaultdict
-from typing import (
-    Any,
-    Iterable,
-    Mapping,
-    MutableSequence,
-    Optional,
-    Sequence,
-    Set,
-    Union,
-)
+from typing import Any, Mapping, MutableSequence, Optional, Sequence, Set, Union
+from uuid import uuid4
 
+import boto3
+import smart_open
 from flask import g, jsonify, request, Response, stream_with_context
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import joinedload
 
 from aspen.app.app import application, requires_auth
 from aspen.app.views import api_utils
-from aspen.app.views.api_utils import authz_sample_filters, check_valid_sequence
+from aspen.app.views.api_utils import check_valid_sequence
 from aspen.database.connection import session_scope
 from aspen.database.models import (
     DataType,
@@ -32,6 +27,7 @@ from aspen.database.models import (
 from aspen.database.models.sample import create_public_ids, RegionType
 from aspen.database.models.usergroup import User
 from aspen.error.recoverable import RecoverableError
+from aspen.fileio.fasta_streamer import FastaStreamer
 
 DEFAULT_DIVISION = "California"
 DEFAULT_COUNTRY = "USA"
@@ -155,63 +151,53 @@ def prepare_sequences_download():
     request_data = request.get_json()
 
     @stream_with_context
-    def stream_samples(cansee_groups_private_identifiers):
+    def stream_samples():
         with session_scope(application.DATABASE_INTERFACE) as db_session:
             sample_ids = request_data["requested_sequences"]["sample_ids"]
-
-            # query for samples
-            all_samples: Iterable[Sample] = (
-                db_session.query(Sample)
-                .yield_per(
-                    5
-                )  # Streams a few DB rows at a time but our query must return one row per resolved object.
-                .options(
-                    joinedload(Sample.uploaded_pathogen_genome, innerjoin=True).undefer(
-                        UploadedPathogenGenome.sequence
-                    ),
-                )
-            )
-            # Enforce AuthZ
-            all_samples = authz_sample_filters(all_samples, sample_ids, user)
-
-            for sample in all_samples:
-                if sample.uploaded_pathogen_genome:
-                    pathogen_genome: UploadedPathogenGenome = (
-                        sample.uploaded_pathogen_genome
-                    )
-                    sequence: str = "".join(
-                        [
-                            line
-                            for line in pathogen_genome.sequence.splitlines()  # type: ignore
-                            if not (line.startswith(">") or line.startswith(";"))
-                        ]
-                    )
-                    stripped_sequence: str = sequence.strip("Nn")
-                    # use private id if the user has access to it, else public id
-                    if (
-                        sample.submitting_group_id == user.group_id
-                        or sample.submitting_group_id
-                        in cansee_groups_private_identifiers
-                        or user.system_admin
-                    ):
-                        yield (f">{sample.private_identifier}\n")  # type: ignore
-                    else:
-                        yield (f">{sample.public_identifier}\n")
-                    yield (stripped_sequence)
-                    yield ("\n")
-
-    cansee_groups_private_identifiers: Set[int] = {
-        cansee.owner_group_id
-        for cansee in user.group.can_see
-        if cansee.data_type == DataType.PRIVATE_IDENTIFIERS
-    }
+            streamer = FastaStreamer(user, sample_ids, db_session)
+            for line in streamer.stream():
+                yield line
 
     # Detach all ORM objects (makes them read-only!) from the DB session for our generator.
     g.db_session.expunge_all()
-    generator = stream_samples(cansee_groups_private_identifiers)
+    generator = stream_samples()
     resp = Response(generator, mimetype="application/binary")
     resp.headers["Content-Disposition"] = f"attachment; filename={fasta_filename}"
     return resp
+
+
+@application.route("/api/sequences/getfastaurl", methods=["POST"])
+@requires_auth
+def getfastaurl():
+    user = g.auth_user
+    request_data = request.get_json()
+    sample_ids = request_data["samples"]
+
+    s3_bucket = application.aspen_config.EXTERNAL_AUSPICE_BUCKET
+    s3_resource = boto3.resource(
+        "s3",
+        endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None,
+        config=boto3.session.Config(signature_version="s3v4"),
+    )
+    s3_client = s3_resource.meta.client
+    uuid = uuid4()
+    s3_key = f"fasta-url-files/{user.group.name}/{uuid}.fasta"
+    s3_write_fh = smart_open.open(
+        f"s3://{s3_bucket}/{s3_key}", "w", transport_params=dict(client=s3_client)
+    )
+    # Write selected samples to s3
+    streamer = FastaStreamer(user, sample_ids, g.db_session)
+    for line in streamer.stream():
+        s3_write_fh.write(line)
+    s3_write_fh.close()
+
+    presigned_url = s3_client.generate_presigned_url(
+        "get_object",
+        Params={"Bucket": s3_bucket, "Key": s3_key},
+        ExpiresIn=3600,
+    )
+
+    return jsonify({"url": presigned_url})
 
 
 @application.route("/api/samples", methods=["GET"])

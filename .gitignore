@@ -308,6 +308,9 @@ static
 /terraform/variables.tf
 .terraform
 
+# Jetbrains
+.idea
+
 # VS Code
 .vscode
 
