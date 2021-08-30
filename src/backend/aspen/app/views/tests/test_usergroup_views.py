@@ -169,7 +169,7 @@ def test_usergroup_view_post_fail_not_system_admin(session, app, client):
     assert res.status == "400 BAD REQUEST"
     assert (
         res.get_data()
-        == b"Insufficient permissions to create new user, only system admins are able to create new users"
+        == b'{"error":"Insufficient permissions to create new user, only system admins are able to create new users"}\n'
     )
 
 
@@ -194,7 +194,7 @@ def test_usergroup_view_post_fail_insufficient_info(session, app, client):
     assert res.status == "400 BAD REQUEST"
     assert (
         res.get_data()
-        == b"Insufficient information required to create new user, ['email', 'group_admin'] are required"
+        == b'{"error":"Insufficient information required to create new user, [\'email\', \'group_admin\'] are required"}\n'
     )
 
 

@@ -810,8 +810,9 @@ def test_samples_create_view_invalid_sequence(
     res = client.post("/api/samples/create", json=data, content_type="application/json")
     assert res.status == "400 BAD REQUEST"
     assert (
-        res.get_data() == b"Sample private contains invalid sequence characters,"
-        b" accepted characters are [WSKMYRVHDBNZNATCGU-]"
+        res.get_data()
+        == b'{"error":"Sample private contains invalid sequence characters,'
+        b' accepted characters are [WSKMYRVHDBNZNATCGU-]"}\n'
     )
 
 
@@ -865,7 +866,7 @@ def test_samples_create_view_fail_duplicate_ids(
     assert res.status == "400 BAD REQUEST"
     assert (
         res.get_data()
-        == b"Error inserting data, private_identifiers ['private'] or public_identifiers: ['public'] already exist in our database, please remove these samples before proceeding with upload."
+        == b"{\"error\":\"Error inserting data, private_identifiers ['private'] or public_identifiers: ['public'] already exist in our database, please remove these samples before proceeding with upload.\"}\n"
     )
 
 
@@ -919,7 +920,7 @@ def test_samples_create_view_fail_duplicate_ids_in_request_data(
     assert res.status == "400 BAD REQUEST"
     assert (
         res.get_data()
-        == b"Error processing data, either duplicate private_identifiers: ['private'] or duplicate public identifiers: [] exist in the upload files, please rename duplicates before proceeding with upload."
+        == b'{"error":"Error processing data, either duplicate private_identifiers: [\'private\'] or duplicate public identifiers: [] exist in the upload files, please rename duplicates before proceeding with upload."}\n'
     )
 
 
@@ -962,5 +963,5 @@ def test_samples_create_view_fail_missing_required_fields(
     assert res.status == "400 BAD REQUEST"
     assert (
         res.get_data()
-        == b"Missing required fields ['private', 'location'] or encountered unexpected fields []"
+        == b"{\"error\":\"Missing required fields ['private', 'location'] or encountered unexpected fields []\"}\n"
     )
