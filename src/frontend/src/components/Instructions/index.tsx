@@ -3,7 +3,7 @@ import React from "react";
 import { Title, Wrapper } from "./style";
 
 interface Props {
-  title: string | undefined;
+  title?: string | undefined;
   items: React.ReactNode[];
   ordered?: boolean;
   className?: string;

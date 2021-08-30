@@ -156,7 +156,7 @@ export const CreateTreeModal = ({
                     </InstructionsSemiBold>,
                     <InstructionsNotSemiBold key="2">
                       Tree names must be no longer than 128 characters.
-                    </InstructionsNotSemiBold>
+                    </InstructionsNotSemiBold>,
                   ]}
                 />
               )}
