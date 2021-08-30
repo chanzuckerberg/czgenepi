@@ -7,6 +7,7 @@ import React, {
   useState,
 } from "react";
 import { CollectionDateFilter } from "./components/CollectionDateFilter";
+import { GenomeRecoveryFilter } from "./components/GenomeRecoveryFilter";
 import { LineageFilter } from "./components/LineageFilter";
 import { UploadDateFilter } from "./components/UploadDateFilter";
 import { StyledFilterPanel } from "./style";
@@ -46,6 +47,14 @@ interface FiltersType {
 
 // * (mlila): `key` should be the name of the column you are filtering on
 const DATA_FILTER_INIT = {
+  CZBFailedGenomeRecovery: {
+    key: "CZBFailedGenomeRecovery",
+    params: {
+      selected: undefined,
+    },
+    transform: (d: Sample) => d.CZBFailedGenomeRecovery,
+    type: TypeFilterType.Single,
+  },
   collectionDate: {
     key: "collectionDate",
     params: {
@@ -95,6 +104,12 @@ const applyFilter = (data: TableItem[], dataFilter: FilterType) => {
         return selected.includes(value);
       });
     case TypeFilterType.Single:
+      if (!selected) return data;
+
+      return filter(data, (d) => {
+        const value = transform ? transform(d) : d;
+        return selected === value;
+      });
     default:
       return data;
   }
@@ -154,6 +169,15 @@ const FilterPanel: FC<Props> = ({ lineages, setDataFilterFunc }) => {
     }
   };
 
+  const updateGenomeRecoveryFilter = (selected: string) => {
+    const prevSelected = dataFilters.CZBFailedGenomeRecovery?.params.selected;
+    const isFailed = selected === "Failed";
+
+    if (!isEqual(prevSelected, isFailed)) {
+      updateDataFilter("CZBFailedGenomeRecovery", { selected: isFailed });
+    }
+  };
+
   return (
     <StyledFilterPanel>
       <CollectionDateFilter
@@ -163,6 +187,9 @@ const FilterPanel: FC<Props> = ({ lineages, setDataFilterFunc }) => {
       <LineageFilter
         options={lineages}
         updateLineageFilter={updateLineageFilter}
+      />
+      <GenomeRecoveryFilter
+        updateGenomeRecoveryFilter={updateGenomeRecoveryFilter}
       />
     </StyledFilterPanel>
   );
