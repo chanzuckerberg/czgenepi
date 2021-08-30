@@ -94,7 +94,7 @@ def phylo_trees():
             "completed_date": format_datetime(phylo_run.end_datetime),
             "status": phylo_run.workflow_status.value,
             "workflow_id": phylo_run.workflow_id,
-            "pathogen_genome_count": 0  # TODO: do we still need this?
+            "pathogen_genome_count": 0,  # TODO: do we still need this?
         }
         results.append(result)
 
