@@ -2,7 +2,16 @@ import json
 import os
 import re
 import uuid
-from typing import Any, Callable, Iterable, Mapping, MutableSequence, Set, Union
+from typing import (
+    Any,
+    Callable,
+    Iterable,
+    Mapping,
+    MutableSequence,
+    Optional,
+    Set,
+    Union,
+)
 
 import boto3
 import sqlalchemy
@@ -12,15 +21,8 @@ from sqlalchemy.orm import aliased, joinedload, Session
 
 from aspen.app.app import application, requires_auth
 from aspen.app.views.api_utils import format_date, format_datetime
-from aspen.database.models import (
-    DataType,
-    PhyloRun,
-    PhyloTree,
-    Sample,
-    WorkflowStatusType,
-)
+from aspen.database.models import DataType, PhyloRun, PhyloTree, Sample
 from aspen.database.models.usergroup import User
-from aspen.error.recoverable import RecoverableError
 from aspen.phylo_tree.identifiers import rename_nodes_on_tree
 
 PHYLO_TREE_KEY = "phylo_trees"
@@ -40,10 +42,8 @@ def humanize_tree_name(s3_key: str):
 
 
 def generate_tree_name_from_template(phylo_run: PhyloRun) -> str:
-    template_data = json.loads(phylo_run.template_args)
-    if template_data["run_name"]:
-        return template_data["run_name"]
-    return f"{phylo_run.group.name} Tree {format_date(phylo_run.start_datetime)}"
+    template_args = json.loads(phylo_run.template_args)  # type: ignore
+    return f"{template_args['location']} Tree {format_date(phylo_run.start_datetime)}"
 
 
 @application.route("/api/phylo_trees", methods=["GET"])
