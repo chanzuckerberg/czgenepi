@@ -287,10 +287,15 @@ export const DataTable: FunctionComponent<Props> = ({
 
     return (
       <HeaderCheckbox
-        color="primary"
         checked={isHeaderChecked}
         onClick={handleClick}
-        indeterminate={isHeaderIndeterminant}
+        stage={
+          isHeaderIndeterminant
+            ? "indeterminate"
+            : isHeaderChecked
+            ? "checked"
+            : "unchecked"
+        }
       />
     );
   };
@@ -305,9 +310,9 @@ export const DataTable: FunctionComponent<Props> = ({
     };
     return (
       <RowCheckbox
-        color="primary"
-        onClick={item ? handleClick : noop}
+        onChange={item ? handleClick : noop}
         checked={checked}
+        stage={checked ? "checked" : "unchecked"}
       />
     );
   };

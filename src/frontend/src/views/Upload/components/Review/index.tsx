@@ -78,7 +78,10 @@ export default function Review({
 
         <CheckboxWrapper>
           <CheckboxText onClick={handleConsentCheck}>
-            <Checkbox checked={isConsentChecked} color="primary" />
+            <Checkbox
+              checked={isConsentChecked}
+              stage={isConsentChecked ? "checked" : "unchecked"}
+            />
             <span>
               I agree that the data I am uploading to Aspen has been lawfully
               collected and that I have all the necessary consents, permissions,
