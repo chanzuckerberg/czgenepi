@@ -1,4 +1,4 @@
-import { Button, Menu, MenuItem } from "czifui";
+import { Menu, MenuItem } from "czifui";
 import { useFormik } from "formik";
 import { noop } from "lodash";
 import React, { FC, useEffect, useState } from "react";
@@ -9,7 +9,12 @@ import {
 } from "src/components/DateField/constants";
 import * as yup from "yup";
 import { StyledFilterWrapper, StyledInputDropdown } from "../../style";
-import { StyledDateRange, StyledText } from "./style";
+import {
+  StyledButton,
+  StyledDateRange,
+  StyledManualDate,
+  StyledText,
+} from "./style";
 
 export type FormattedDateType = string | undefined;
 export type DateType = FormattedDateType | Date;
@@ -125,15 +130,18 @@ const DateFilter: FC<Props> = ({
             />
           </StyledDateRange>
           {(startDate || endDate) && (
-            <Button
+            <StyledButton
+              color="primary"
+              variant="contained"
               onClick={() => {
                 setDatesFromRange(values[fieldKeyStart], values[fieldKeyEnd]);
               }}
             >
               Apply
-            </Button>
+            </StyledButton>
           )}
         </StyledManualDate>
+        {/* TODO (mlila): use a single select here instead */}
         <MenuItem onClick={() => setDatesFromOffset(7)}>Last 7 Days</MenuItem>
         <MenuItem onClick={() => setDatesFromOffset(30)}>Last 30 Days</MenuItem>
         <MenuItem onClick={() => setDatesFromOffset(90)}>
