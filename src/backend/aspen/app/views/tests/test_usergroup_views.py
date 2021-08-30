@@ -194,7 +194,7 @@ def test_usergroup_view_post_fail_insufficient_info(session, app, client):
     assert res.status == "400 BAD REQUEST"
     assert (
         res.get_data()
-        == b'{"error":"Insufficient information required to create new user, [\'email\', \'group_admin\'] are required"}\n'
+        == b"{\"error\":\"Insufficient information required to create new user, ['email', 'group_admin'] are required\"}\n"
     )
 
 
