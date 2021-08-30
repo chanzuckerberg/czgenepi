@@ -5,14 +5,14 @@ import { DefaultMenuSelectOption } from "../../index";
 import { StyledInputDropdown } from "../../style";
 
 interface Props {
-  updateGenomeRecoveryFilter: (selected: string) => void;
+  updateGenomeRecoveryFilter: (selected?: string) => void;
 }
 
 const GenomeRecoveryFilter = ({
   updateGenomeRecoveryFilter,
 }: Props): JSX.Element => {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const [value, setValue] = useState<DefaultMenuSelectOption>();
+  const [value, setValue] = useState<DefaultMenuSelectOption | null>();
 
   useEffect(() => {
     updateGenomeRecoveryFilter(value?.name);
@@ -43,20 +43,25 @@ const GenomeRecoveryFilter = ({
 
   const handleChange = (
     _: React.ChangeEvent<unknown>,
-    newValue: DefaultMenuSelectOption | DefaultMenuSelectOption[] | null
+    newValue: DefaultMenuSelectOption | null
   ) => {
     setValue(newValue as DefaultMenuSelectOption);
   };
 
   const handleDelete = () => {
-    setValue();
+    setValue(null);
   };
 
   // TODO (mlila): replace with sds complex filter when complete
   return (
     <>
-      <div onClick={handleClick}>
-        <StyledInputDropdown sdsStyle="minimal" label="Genome Recovery" />
+      <div>
+        <StyledInputDropdown
+          sdsStyle="minimal"
+          label="Genome Recovery"
+          // @ts-expect-error remove line when inputdropdown types fixed in sds
+          onClick={handleClick}
+        />
         <Chips value={value} onDelete={handleDelete} />
       </div>
       <Popper id={id} open={open} anchorEl={anchorEl}>
@@ -73,8 +78,8 @@ const GenomeRecoveryFilter = ({
 };
 
 interface ChipsProps {
-  value: DefaultMenuSelectOption | DefaultMenuSelectOption[] | null;
-  onDelete: (option: DefaultMenuSelectOption) => void;
+  value?: DefaultMenuSelectOption | null;
+  onDelete: () => void;
 }
 
 const Chips = ({ value, onDelete }: ChipsProps): JSX.Element | null => {
