@@ -21,7 +21,9 @@ const TreeTableNameCell = ({ value, item }: NameProps): JSX.Element => {
     setOpen(false);
   };
 
-  const treeId = item.id;
+  // TODO: Create a pathway to handle Trees with no id, for trees
+  // that are in progress or failed
+  const treeId = item.id as number;
 
   return (
     <>
