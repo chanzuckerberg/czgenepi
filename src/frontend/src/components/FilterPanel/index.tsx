@@ -61,6 +61,7 @@ const DATA_FILTER_INIT = {
       end: undefined,
       start: undefined,
     },
+    transform: (d: Sample) => d.collectionDate,
     type: TypeFilterType.Date,
   },
   lineage: {
@@ -77,6 +78,7 @@ const DATA_FILTER_INIT = {
       end: undefined,
       start: undefined,
     },
+    transform: (d: Sample) => d.uploadDate,
     type: TypeFilterType.Date,
   },
 };
@@ -86,13 +88,14 @@ const applyFilter = (data: TableItem[], dataFilter: FilterType) => {
 
   const { key, params, transform, type } = dataFilter;
   if (!key || !params || !type) return data;
-  const { end, start, selected = [] } = params;
+  const { end, start, selected } = params;
 
   switch (type) {
     case TypeFilterType.Date:
       return filter(data, (d) => {
-        const doesPassFilterCheckStart = !start || d[key] >= start;
-        const doesPassFilterCheckEnd = !end || d[key] <= end;
+        const value = transform ? transform(d) : d;
+        const doesPassFilterCheckStart = !start || value >= start;
+        const doesPassFilterCheckEnd = !end || value <= end;
 
         return doesPassFilterCheckStart && doesPassFilterCheckEnd;
       });
