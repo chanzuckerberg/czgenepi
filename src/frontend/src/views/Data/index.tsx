@@ -1,4 +1,5 @@
 import cx from "classnames";
+import { compact, uniq } from "lodash";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -149,6 +150,17 @@ const Data: FunctionComponent = () => {
 
   const viewName = category.text;
 
+  // * (mlila): normally I would want to do this transfrom inside the component
+  // * using the data, but LineageFilter renders a child compnent that seems
+  // * to reference the parent's props (?). Passing in only the lineages, or
+  // * incomplete options causes the component to break
+  const sampleArr = viewName === "Samples" ? (category.data as Sample[]) : [];
+  const lineages = uniq(compact(sampleArr?.map((d) => d.lineage?.lineage)))
+    .sort()
+    .map((l) => {
+      return { name: l as string };
+    });
+
   return (
     <Container className={style.dataRoot}>
       <Head>
@@ -170,7 +182,11 @@ const Data: FunctionComponent = () => {
       </FlexContainer>
       <FlexContainer className={style.view}>
         {viewName === "Samples" && shouldShowFilters && (
-          <FilterPanel setDataFilterFunc={setDataFilterFunc} />
+          // TODO (mlila): replace with sds filterpanel once it's complete
+          <FilterPanel
+            lineages={lineages}
+            setDataFilterFunc={setDataFilterFunc}
+          />
         )}
         <DataSubview
           key={router.asPath}
