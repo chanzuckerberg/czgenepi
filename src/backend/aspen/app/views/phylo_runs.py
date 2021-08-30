@@ -10,6 +10,7 @@ from marshmallow.exceptions import ValidationError
 from sqlalchemy.orm import joinedload
 
 from aspen import aws
+from aspen.app import exceptions as ex
 from aspen.app.app import application, requires_auth
 from aspen.app.serializers import (
     PHYLO_TREE_TYPES,
@@ -42,9 +43,7 @@ def start_phylo_run():
         request_data = validator.load(request.get_json())
     except ValidationError as verr:
         sentry_sdk.capture_message("Invalid API request to /api/phyloruns", "info")
-        response = make_response(str(verr), 400)
-        response.headers["Content-Type"] = "application/json"
-        return response
+        raise ex.BadRequestException(str(verr))
     sample_ids = request_data["samples"]
 
     # Step 2 - prepare big sample query per the old db cli
@@ -65,11 +64,7 @@ def start_phylo_run():
         sentry_sdk.capture_message(
             f"No sequences selected for run from {sample_ids}.", "error"
         )
-        response = make_response(
-            jsonify({"error": "No sequences selected for run"}), 400
-        )
-        response.headers["Content-Type"] = "application/json"
-        return response
+        raise ex.BadRequestException("No sequences selected for run")
 
     # These are the sample ID's that don't match the aspen db
     missing_sample_ids = set(sample_ids) - found_sample_ids
@@ -91,11 +86,7 @@ def start_phylo_run():
         sentry_sdk.capture_message(
             f"User requested invalid samples ({missing_sample_ids})"
         )
-        response = make_response(
-            jsonify({"error": "missing ids", "ids": list(missing_sample_ids)}), 400
-        )
-        response.headers["Content-Type"] = "application/json"
-        return response
+        raise ex.BadRequestException("missing ids", {"ids": list(missing_sample_ids)})
 
     aligned_gisaid_dump = (
         g.db_session.query(AlignedGisaidDump)
@@ -107,9 +98,7 @@ def start_phylo_run():
         sentry_sdk.capture_message(
             "No Aligned Gisaid Dump found! Cannot create PhyloRun!", "fatal"
         )
-        response = make_response(jsonify({"error": "No gisaid dump for run"}), 500)
-        response.headers["Content-Type"] = "application/json"
-        return response
+        raise ex.ServerException("No gisaid dump for run")
 
     template_path_prefix = (
         "/usr/src/app/aspen/workflows/nextstrain_run/builds_templates"
@@ -141,14 +130,9 @@ def start_phylo_run():
             f"No valid pathogen genomes found among local sample ids {found_sample_ids} or gisaid ids {gisaid_ids}! Not running tree build.",
             "error",
         )
-        response = make_response(
-            jsonify(
-                {"error": "No valid pathogen genomes found. Not running tree build."}
-            ),
-            500,
+        raise ex.ServerException(
+            "No valid pathogen genomes found. Not running tree build."
         )
-        response.headers["Content-Type"] = "application/json"
-        return response
 
     workflow.inputs = list(pathogen_genomes)
     workflow.inputs.append(aligned_gisaid_dump)

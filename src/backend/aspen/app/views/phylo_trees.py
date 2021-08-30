@@ -10,6 +10,7 @@ from flask import g, jsonify, make_response, Response
 from sqlalchemy import or_
 from sqlalchemy.orm import aliased, joinedload, Session
 
+from aspen.app import exceptions as ex
 from aspen.app.app import application, requires_auth
 from aspen.app.views.api_utils import format_datetime
 from aspen.database.models import (
@@ -120,9 +121,8 @@ def _process_phylo_tree(
             .one()
         )
     except sqlalchemy.exc.NoResultFound:  # type: ignore
-        return Response(
-            f"PhyloTree with id {phylo_tree_id} not viewable by user with id: {user.id}",
-            400,
+        raise ex.BadRequestException(
+            f"PhyloTree with id {phylo_tree_id} not viewable by user with id: {user.id}"
         )
 
     sample_filter: Callable[[Sample], bool]

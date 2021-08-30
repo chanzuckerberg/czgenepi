@@ -18,6 +18,7 @@ from flask_cors import CORS
 from sentry_sdk.integrations.flask import FlaskIntegration
 from sqlalchemy.orm.exc import NoResultFound
 
+from aspen.app import exceptions as ex
 from aspen.app.aspen_app import AspenApp
 from aspen.app.views.api_utils import get_usergroup_query
 from aspen.config.config import Config
@@ -178,15 +179,18 @@ def requires_auth(f):
         # Redirect to Login page
         if not auth0_user_id:
             return redirect("/login")
-        with session_scope(application.DATABASE_INTERFACE) as db_session:
-            g.db_session = db_session
-            found_auth_user = setup_userinfo(auth0_user_id)
-            if not found_auth_user:
-                # login attempt from user not in DB
-                # TODO: return response to user that they do not have an account with aspen.
-                return redirect("/login")
-            else:
-                g.auth_user = found_auth_user
-            return f(*args, **kwargs)
+        try:
+            with session_scope(application.DATABASE_INTERFACE) as db_session:
+                g.db_session = db_session
+                found_auth_user = setup_userinfo(auth0_user_id)
+                if not found_auth_user:
+                    # login attempt from user not in DB
+                    # TODO: return response to user that they do not have an account with aspen.
+                    return redirect("/login")
+                else:
+                    g.auth_user = found_auth_user
+                return f(*args, **kwargs)
+        except ex.AspenException as err:
+            return err.make_response()
 
     return decorated

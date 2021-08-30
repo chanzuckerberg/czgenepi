@@ -5,6 +5,7 @@ from auth0.v3.exceptions import Auth0Error
 from auth0.v3.management import Auth0
 from flask import g, jsonify, request, Response
 
+from aspen.app import exceptions as ex
 from aspen.app.app import application, requires_auth
 from aspen.app.views.api_utils import filter_usergroup_dict
 from aspen.config.config import Config
@@ -73,54 +74,44 @@ def usergroup():
             if hasattr(user, key) and key in PUT_USER_FIELDS:
                 setattr(user, key, value)
             else:
-                return Response(
-                    f"only the following fields can be updated on the User object: {PUT_USER_FIELDS}, you provided the attribute <{key}>",
-                    400,
-                )
+                err = f"only the following fields can be updated on the User object: {PUT_USER_FIELDS}, you provided the attribute <{key}>"
+                raise ex.BadRequestException(err)
 
         # all fields have updated successfully
         g.db_session.flush()
         return jsonify(success=True)
 
     if request.method == "POST":
-        if user.system_admin:
-            # check we're only getting fields that we expect
-            new_user_data: Dict[str, Union[str, bool]] = {
-                k: v
-                for k, v in request.get_json().items()
-                if k in POST_USER_REQUIRED_FIELDS + POST_USER_OPTIONAL_FIELDS
-            }
-            missing_required_fields = [
-                f for f in POST_USER_REQUIRED_FIELDS if f not in new_user_data.keys()
-            ]
-            if missing_required_fields:
-                return Response(
-                    f"Insufficient information required to create new user, {missing_required_fields} are required",
-                    400,
-                )
-            else:
-                if "auth0_user_id" not in new_user_data.keys():
-                    user_created_or_response: Union[
-                        Mapping[str, Union[str, bool, Collection]], Response
-                    ] = create_auth0_entry(
-                        new_user_data["name"],
-                        new_user_data["email"],
-                        "pwd",
-                        application.aspen_config,
-                    )
-                    # check if any issues trying to create new user
-                    if isinstance(user_created_or_response, Response):
-                        return user_created_or_response
-                    new_user_data.update(
-                        {"auth0_user_id": user_created_or_response["user_id"]}
-                    )
-
-                user = User(**new_user_data)
-                g.db_session.add(user)
-                g.db_session.flush()
-                return jsonify(success=True)
-        else:
-            return Response(
-                "Insufficient permissions to create new user, only system admins are able to create new users",
-                400,
+        if not user.system_admin:
+            err = "Insufficient permissions to create new user, only system admins are able to create new users"
+            raise ex.BadRequestException(err)
+        # check we're only getting fields that we expect
+        new_user_data: Dict[str, Union[str, bool]] = {
+            k: v
+            for k, v in request.get_json().items()
+            if k in POST_USER_REQUIRED_FIELDS + POST_USER_OPTIONAL_FIELDS
+        }
+        missing_required_fields = [
+            f for f in POST_USER_REQUIRED_FIELDS if f not in new_user_data.keys()
+        ]
+        if missing_required_fields:
+            err = f"Insufficient information required to create new user, {missing_required_fields} are required"
+            raise ex.BadRequestException(err)
+        if "auth0_user_id" not in new_user_data.keys():
+            user_created_or_response: Union[
+                Mapping[str, Union[str, bool, Collection]], Response
+            ] = create_auth0_entry(
+                new_user_data["name"],
+                new_user_data["email"],
+                "pwd",
+                application.aspen_config,
             )
+            # check if any issues trying to create new user
+            if isinstance(user_created_or_response, Response):
+                return user_created_or_response
+            new_user_data.update({"auth0_user_id": user_created_or_response["user_id"]})
+
+        user = User(**new_user_data)
+        g.db_session.add(user)
+        g.db_session.flush()
+        return jsonify(success=True)
