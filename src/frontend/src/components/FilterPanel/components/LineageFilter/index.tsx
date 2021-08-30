@@ -1,9 +1,9 @@
 import Popper from "@material-ui/core/Popper";
 import { AutocompleteCloseReason } from "@material-ui/lab";
-import { Chip, MenuSelect } from "czifui";
+import { MenuSelect } from "czifui";
 import React, { useEffect, useState } from "react";
 import { DefaultMenuSelectOption } from "../../index";
-import { StyledInputDropdown } from "../../style";
+import { StyledChip, StyledFilterWrapper, StyledInputDropdown } from "../../style";
 
 interface Props {
   options: DefaultMenuSelectOption[];
@@ -29,8 +29,8 @@ const LineageFilter = (props: Props): JSX.Element => {
   const id = open ? "lineage-filter" : undefined;
 
   return (
-    <div>
-      <div>
+    <>
+      <StyledFilterWrapper>
         <StyledInputDropdown
           sdsStyle="minimal"
           label="Lineage"
@@ -38,7 +38,7 @@ const LineageFilter = (props: Props): JSX.Element => {
           onClick={handleClick}
         />
         <Chips value={value} onDelete={handleDelete} />
-      </div>
+      </StyledFilterWrapper>
       <Popper id={id} open={open} anchorEl={anchorEl}>
         <MenuSelect
           disableCloseOnSelect
@@ -51,7 +51,7 @@ const LineageFilter = (props: Props): JSX.Element => {
           options={options}
         />
       </Popper>
-    </div>
+    </>
   );
 
   function handleClick(event: React.MouseEvent<HTMLElement>) {
@@ -97,6 +97,7 @@ interface ChipsProps {
   onDelete: (option: DefaultMenuSelectOption) => void;
 }
 
+// TODO (mlila): replace with sds tag when it's complete
 function Chips({ value, onDelete }: ChipsProps): JSX.Element | null {
   if (!value) return null;
 
@@ -106,7 +107,7 @@ function Chips({ value, onDelete }: ChipsProps): JSX.Element | null {
         const { name } = item;
 
         return (
-          <Chip
+          <StyledChip
             size="medium"
             key={name}
             label={name}
