@@ -7,8 +7,8 @@ import React, {
   useState,
 } from "react";
 import { CollectionDateFilter } from "./components/CollectionDateFilter";
+import { LineageFilter } from "./components/LineageFilter";
 import { UploadDateFilter } from "./components/UploadDateFilter";
-import { LineageFilter } from "./LineageFilter";
 import { StyledFilterPanel } from "./style";
 
 type DateType = string | undefined;

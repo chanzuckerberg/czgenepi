@@ -4,7 +4,7 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { AutocompleteCloseReason } from "@material-ui/lab";
 import { Chip, MenuSelect } from "czifui";
 import React, { useEffect, useState } from "react";
-import { DefaultMenuSelectOption } from "../index";
+import { DefaultMenuSelectOption } from "../../index";
 
 interface Props {
   options: DefaultMenuSelectOption[];
