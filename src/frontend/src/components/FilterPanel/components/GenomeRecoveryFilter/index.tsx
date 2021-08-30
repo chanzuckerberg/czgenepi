@@ -1,8 +1,8 @@
 import Popper from "@material-ui/core/Popper";
 import { Chip, MenuSelect } from "czifui";
 import React, { useEffect, useState } from "react";
+import { DefaultMenuSelectOption } from "../../index";
 import { StyledInputDropdown } from "../../style";
-import { DefaultMenuSelectOption } from "../index";
 
 interface Props {
   updateGenomeRecoveryFilter: (selected: string) => void;
