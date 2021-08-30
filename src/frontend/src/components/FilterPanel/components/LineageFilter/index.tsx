@@ -1,10 +1,9 @@
-import ButtonBase from "@material-ui/core/ButtonBase";
 import Popper from "@material-ui/core/Popper";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { AutocompleteCloseReason } from "@material-ui/lab";
 import { Chip, MenuSelect } from "czifui";
 import React, { useEffect, useState } from "react";
 import { DefaultMenuSelectOption } from "../../index";
+import { StyledInputDropdown } from "../../style";
 
 interface Props {
   options: DefaultMenuSelectOption[];
@@ -30,13 +29,14 @@ const LineageFilter = (props: Props): JSX.Element => {
   const id = open ? "lineage-filter" : undefined;
 
   return (
-    <>
+    <div>
       <div>
-        <ButtonBase disableRipple aria-describedby={id} onClick={handleClick}>
-          <span>Lineage</span>
-          <ExpandMoreIcon />
-        </ButtonBase>
-
+        <StyledInputDropdown
+          sdsStyle="minimal"
+          label="Lineage"
+          // @ts-expect-error remove line when inputdropdown types fixed in sds
+          onClick={handleClick}
+        />
         <Chips value={value} onDelete={handleDelete} />
       </div>
       <Popper id={id} open={open} anchorEl={anchorEl}>
@@ -51,7 +51,7 @@ const LineageFilter = (props: Props): JSX.Element => {
           options={options}
         />
       </Popper>
-    </>
+    </div>
   );
 
   function handleClick(event: React.MouseEvent<HTMLElement>) {

@@ -54,7 +54,7 @@ const GenomeRecoveryFilter = ({
 
   // TODO (mlila): replace with sds complex filter when complete
   return (
-    <>
+    <div>
       <div>
         <StyledInputDropdown
           sdsStyle="minimal"
@@ -73,7 +73,7 @@ const GenomeRecoveryFilter = ({
           options={OPTIONS}
         />
       </Popper>
-    </>
+    </div>
   );
 };
 

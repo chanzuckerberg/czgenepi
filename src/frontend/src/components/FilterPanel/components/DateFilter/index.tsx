@@ -8,6 +8,7 @@ import {
   DATE_REGEX,
 } from "src/components/DateField/constants";
 import * as yup from "yup";
+import { StyledInputDropdown } from "../../style";
 import { StyledDateRange, StyledText } from "./style";
 
 export type FormattedDateType = string | undefined;
@@ -88,8 +89,13 @@ const DateFilter: FC<Props> = ({
 
   //TODO use new sds component for single select on preset date ranges
   return (
-    <>
-      <Button onClick={handleClick}>{inputLabel}</Button>
+    <div>
+      <StyledInputDropdown
+        sdsStyle="minimal"
+        label={inputLabel}
+        // @ts-expect-error remove line when inputdropdown types fixed in sds
+        onClick={handleClick}
+      />
       <Menu
         anchorEl={anchorEl}
         keepMounted
@@ -119,7 +125,7 @@ const DateFilter: FC<Props> = ({
         </MenuItem>
         <MenuItem onClick={() => setDatesFromOffset(365)}>Last Year</MenuItem>
       </Menu>
-    </>
+    </div>
   );
 };
 
