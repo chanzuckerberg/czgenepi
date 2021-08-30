@@ -51,7 +51,7 @@ export default function ImportFile({
     }
 
     setUnusedSampleIds(unusedSampleIds);
-  }, [parseResult]);
+  }, [parseResult, samples]);
 
   const handleInstructionsClick = () => {
     setIsInstructionsShown(!isInstructionsShown);
