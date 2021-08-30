@@ -17,6 +17,7 @@ def phylorun_factory(
     start_datetime: Union[datetime.datetime, _SentinelType] = _sentinel,
     end_datetime: Union[datetime.datetime, _SentinelType] = _sentinel,
     software_versions: Union[Mapping[str, str], _SentinelType] = _sentinel,
+    template_args: Mapping[str, str] = {},
 ):
     start_datetime = (
         start_datetime
@@ -37,6 +38,7 @@ def phylorun_factory(
         start_datetime=start_datetime,
         end_datetime=end_datetime,
         software_versions=software_versions,
+        template_args=template_args,
     )
 
 

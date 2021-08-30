@@ -42,7 +42,7 @@ def humanize_tree_name(s3_key: str):
 
 
 def generate_tree_name_from_template(phylo_run: PhyloRun) -> str:
-    template_args = json.loads(phylo_run.template_args)  # type: ignore
+    template_args = phylo_run.template_args
     return f"{template_args['location']} Tree {format_date(phylo_run.start_datetime)}"
 
 

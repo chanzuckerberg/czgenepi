@@ -8,9 +8,11 @@ from aspen.database.models import (
     DataType,
     Group,
     PhyloTree,
+    PhyloRun,
     Sample,
     UploadedPathogenGenome,
     User,
+    WorkflowStatusType,
 )
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
 from aspen.test_infra.models.sample import sample_factory
@@ -52,6 +54,14 @@ def make_trees(
         for ix in range(n_trees)
     ]
 
+def make_runs_with_no_trees(group: Group) -> Collection[PhyloRun]:
+    # Make an in-progress run and a failed run.
+    other_statuses = [WorkflowStatusType.STARTED, WorkflowStatusType.FAILED]
+    template_args = {
+        "division": group.division,
+        "location": group.location,
+    }
+    return [phylorun_factory(group, workflow_status=status, template_args=template_args) for status in other_statuses]
 
 def make_all_test_data(
     group: Group, user: User, n_samples: int, n_trees: int
@@ -61,7 +71,8 @@ def make_all_test_data(
         UploadedPathogenGenome
     ] = make_uploaded_pathogen_genomes(samples)
     trees: Sequence[PhyloTree] = make_trees(group, samples, n_trees)
-    return samples, uploaded_pathogen_genomes, trees
+    treeless_runs: Collection[PhyloRun] = make_runs_with_no_trees(group)
+    return samples, uploaded_pathogen_genomes, trees, treeless_runs
 
 
 def check_results(client, user: User, trees: Collection[PhyloTree]):
@@ -91,13 +102,42 @@ def test_phylo_tree_view(
 ):
     group: Group = group_factory()
     user: User = user_factory(group)
-    _, _, trees = make_all_test_data(group, user, n_samples, n_trees)
+    _, _, trees, _ = make_all_test_data(group, user, n_samples, n_trees)
 
     session.add(group)
     session.commit()
 
     check_results(client, user, trees)
 
+def test_in_progress_and_failed_trees(
+    session,
+    app,
+    client,
+    n_samples=5,
+    n_trees=3,
+):
+    group: Group = group_factory()
+    user: User = user_factory(group)
+    _, _, _, treeless_runs = make_all_test_data(group, user, n_samples, n_trees)
+
+    session.add(group)
+    session.commit()
+
+    with client.session_transaction() as sess:
+        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
+    results: Mapping[str, List[Mapping[str, Union[str, int]]]] = json.loads(
+        client.get("/api/phylo_trees").get_data(as_text=True)
+    )
+
+    results_trees = results[PHYLO_TREE_KEY]
+    results_incomplete_trees = [tree for tree in results_trees if tree["status"] != WorkflowStatusType.COMPLETED.value]
+    assert len(results_incomplete_trees) == len(treeless_runs)
+    for incomplete in results_incomplete_trees:
+        assert incomplete["phylo_tree_id"] is None
+        assert incomplete["name"] is not None
+    assert len([tree for tree in results_incomplete_trees if tree["status"] == WorkflowStatusType.STARTED.value]) == 1
+    assert len([tree for tree in results_incomplete_trees if tree["status"] == WorkflowStatusType.FAILED.value]) == 1
+    
 
 def test_phylo_trees_can_see(
     session,
@@ -109,7 +149,7 @@ def test_phylo_trees_can_see(
     owner_group: Group = group_factory()
     viewer_group: Group = group_factory("CADPH")
     user: User = user_factory(viewer_group)
-    _, _, trees = make_all_test_data(owner_group, user, n_samples, n_trees)
+    _, _, trees, _ = make_all_test_data(owner_group, user, n_samples, n_trees)
 
     CanSee(viewer_group=viewer_group, owner_group=owner_group, data_type=DataType.TREES)
     session.add_all((owner_group, viewer_group))
@@ -128,7 +168,7 @@ def test_phylo_trees_no_can_see(
     owner_group: Group = group_factory()
     viewer_group: Group = group_factory("CADPH")
     user: User = user_factory(viewer_group)
-    _, _, trees = make_all_test_data(owner_group, user, n_samples, n_trees)
+    _, _, trees, _ = make_all_test_data(owner_group, user, n_samples, n_trees)
 
     session.add_all((owner_group, viewer_group))
     session.commit()
@@ -150,7 +190,7 @@ def test_phylo_trees_admin(
     owner_group: Group = group_factory()
     viewer_group: Group = group_factory("admin")
     user: User = user_factory(viewer_group, system_admin=True)
-    _, _, trees = make_all_test_data(owner_group, user, n_samples, n_trees)
+    _, _, trees, _ = make_all_test_data(owner_group, user, n_samples, n_trees)
 
     session.add_all((owner_group, viewer_group))
     session.commit()
@@ -170,7 +210,7 @@ def test_phylo_tree_can_see(
     owner_group: Group = group_factory()
     viewer_group: Group = group_factory("CADPH")
     user: User = user_factory(viewer_group)
-    _, _, trees = make_all_test_data(owner_group, user, n_samples, n_trees)
+    _, _, trees, _ = make_all_test_data(owner_group, user, n_samples, n_trees)
 
     # We need to create the bucket since this is all in Moto's 'virtual' AWS account
     phylo_tree = trees[0]  # we only have one
@@ -208,7 +248,7 @@ def test_phylo_tree_no_can_see(
     owner_group: Group = group_factory()
     viewer_group: Group = group_factory("CADPH")
     user: User = user_factory(viewer_group)
-    _, _, trees = make_all_test_data(owner_group, user, n_samples, n_trees)
+    _, _, trees, _ = make_all_test_data(owner_group, user, n_samples, n_trees)
 
     # We need to create the bucket since this is all in Moto's 'virtual' AWS account
     phylo_tree = trees[0]  # we only have one
@@ -246,7 +286,7 @@ def test_phylo_tree_admin(
     owner_group: Group = group_factory()
     viewer_group: Group = group_factory("admin")
     user: User = user_factory(viewer_group, system_admin=True)
-    _, _, trees = make_all_test_data(owner_group, user, n_samples, n_trees)
+    _, _, trees, _ = make_all_test_data(owner_group, user, n_samples, n_trees)
 
     # We need to create the bucket since this is all in Moto's 'virtual' AWS account
     phylo_tree = trees[0]  # we only have one
