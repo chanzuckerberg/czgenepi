@@ -2,7 +2,11 @@ import Popper from "@material-ui/core/Popper";
 import { MenuSelect } from "czifui";
 import React, { useEffect, useState } from "react";
 import { DefaultMenuSelectOption } from "../../index";
-import { StyledChip, StyledFilterWrapper, StyledInputDropdown } from "../../style";
+import {
+  StyledChip,
+  StyledFilterWrapper,
+  StyledInputDropdown,
+} from "../../style";
 
 interface Props {
   updateGenomeRecoveryFilter: (selected?: string) => void;

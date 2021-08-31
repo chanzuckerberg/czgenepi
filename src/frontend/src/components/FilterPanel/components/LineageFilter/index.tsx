@@ -3,7 +3,11 @@ import { AutocompleteCloseReason } from "@material-ui/lab";
 import { MenuSelect } from "czifui";
 import React, { useEffect, useState } from "react";
 import { DefaultMenuSelectOption } from "../../index";
-import { StyledChip, StyledFilterWrapper, StyledInputDropdown } from "../../style";
+import {
+  StyledChip,
+  StyledFilterWrapper,
+  StyledInputDropdown,
+} from "../../style";
 
 interface Props {
   options: DefaultMenuSelectOption[];

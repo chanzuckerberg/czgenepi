@@ -18,7 +18,7 @@ export const StyledManualDate = styled.div`
     const spacings = getSpacings(props);
     return `
       border-bottom: 1px solid ${colors?.gray[200]};
-      padding-bottom: ${spacings?.xxs + spacings?.m}px;
+      padding-bottom: ${(spacings?.xxs ?? 0) + (spacings?.m ?? 0)}px;
       padding-top: ${spacings?.m}px;
       padding-right: ${spacings?.xxs}px;
       padding-left: ${spacings?.xxs}px;

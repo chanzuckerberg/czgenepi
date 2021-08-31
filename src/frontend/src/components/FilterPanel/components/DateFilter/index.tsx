@@ -2,7 +2,7 @@ import { Menu, MenuItem } from "czifui";
 import { useFormik } from "formik";
 import { noop } from "lodash";
 import React, { FC, useEffect, useState } from "react";
-import DateField from "src/components/DateField";
+import DateField, { FormattedDateType } from "src/components/DateField";
 import {
   DATE_ERROR_MESSAGE,
   DATE_REGEX,
@@ -16,7 +16,6 @@ import {
   StyledText,
 } from "./style";
 
-export type FormattedDateType = string | undefined;
 export type DateType = FormattedDateType | Date;
 
 interface Props {
@@ -117,7 +116,8 @@ const DateFilter: FC<Props> = ({
               fieldKey={fieldKeyStart}
               formik={formik}
               onChange={(e) => {
-                setStartDate(e.target.value);
+                const target = e.target as HTMLTextAreaElement;
+                setStartDate(target?.value);
               }}
             />
             <StyledText>to</StyledText>
@@ -125,7 +125,8 @@ const DateFilter: FC<Props> = ({
               fieldKey={fieldKeyEnd}
               formik={formik}
               onChange={(e) => {
-                setEndDate(e.target.value);
+                const target = e.target as HTMLTextAreaElement;
+                setEndDate(target?.value);
               }}
             />
           </StyledDateRange>
