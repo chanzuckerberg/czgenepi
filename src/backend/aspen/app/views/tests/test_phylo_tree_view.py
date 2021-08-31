@@ -7,8 +7,8 @@ from aspen.database.models import (
     CanSee,
     DataType,
     Group,
-    PhyloTree,
     PhyloRun,
+    PhyloTree,
     Sample,
     UploadedPathogenGenome,
     User,
@@ -54,6 +54,7 @@ def make_trees(
         for ix in range(n_trees)
     ]
 
+
 def make_runs_with_no_trees(group: Group) -> Collection[PhyloRun]:
     # Make an in-progress run and a failed run.
     other_statuses = [WorkflowStatusType.STARTED, WorkflowStatusType.FAILED]
@@ -61,11 +62,20 @@ def make_runs_with_no_trees(group: Group) -> Collection[PhyloRun]:
         "division": group.division,
         "location": group.location,
     }
-    return [phylorun_factory(group, workflow_status=status, template_args=template_args) for status in other_statuses]
+    return [
+        phylorun_factory(group, workflow_status=status, template_args=template_args)
+        for status in other_statuses
+    ]
+
 
 def make_all_test_data(
     group: Group, user: User, n_samples: int, n_trees: int
-) -> Tuple[Collection[Sample], Collection[UploadedPathogenGenome], Sequence[PhyloTree]]:
+) -> Tuple[
+    Collection[Sample],
+    Collection[UploadedPathogenGenome],
+    Sequence[PhyloTree],
+    Collection[PhyloRun],
+]:
     samples: Collection[Sample] = make_sample_data(group, user, n_samples)
     uploaded_pathogen_genomes: Collection[
         UploadedPathogenGenome
@@ -109,6 +119,7 @@ def test_phylo_tree_view(
 
     check_results(client, user, trees)
 
+
 def test_in_progress_and_failed_trees(
     session,
     app,
@@ -130,14 +141,36 @@ def test_in_progress_and_failed_trees(
     )
 
     results_trees = results[PHYLO_TREE_KEY]
-    results_incomplete_trees = [tree for tree in results_trees if tree["status"] != WorkflowStatusType.COMPLETED.value]
+    results_incomplete_trees = [
+        tree
+        for tree in results_trees
+        if tree["status"] != WorkflowStatusType.COMPLETED.value
+    ]
     assert len(results_incomplete_trees) == len(treeless_runs)
     for incomplete in results_incomplete_trees:
         assert incomplete["phylo_tree_id"] is None
         assert incomplete["name"] is not None
-    assert len([tree for tree in results_incomplete_trees if tree["status"] == WorkflowStatusType.STARTED.value]) == 1
-    assert len([tree for tree in results_incomplete_trees if tree["status"] == WorkflowStatusType.FAILED.value]) == 1
-    
+    assert (
+        len(
+            [
+                tree
+                for tree in results_incomplete_trees
+                if tree["status"] == WorkflowStatusType.STARTED.value
+            ]
+        )
+        == 1
+    )
+    assert (
+        len(
+            [
+                tree
+                for tree in results_incomplete_trees
+                if tree["status"] == WorkflowStatusType.FAILED.value
+            ]
+        )
+        == 1
+    )
+
 
 def test_phylo_trees_can_see(
     session,

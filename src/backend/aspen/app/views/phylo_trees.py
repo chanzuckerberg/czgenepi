@@ -42,8 +42,14 @@ def humanize_tree_name(s3_key: str):
 
 
 def generate_tree_name_from_template(phylo_run: PhyloRun) -> str:
-    template_args = phylo_run.template_args
-    return f"{template_args['location']} Tree {format_date(phylo_run.start_datetime)}"
+    # template_args should be transparently deserialized into a python dict.
+    # but if something is wrong with the data in the column (i.e. the json is
+    # double escaped), it will be a string instead.
+    location = phylo_run.group.location  # safe default
+    if isinstance(phylo_run.template_args, Mapping):
+        template_args = phylo_run.template_args
+        location = template_args["location"]
+    return f"{location} Tree {format_date(phylo_run.start_datetime)}"
 
 
 @application.route("/api/phylo_trees", methods=["GET"])
@@ -76,7 +82,13 @@ def phylo_trees():
     results: MutableSequence[Mapping[str, Any]] = list()
     for phylo_run in phylo_runs:
         phylo_tree: Optional[PhyloTree] = None
-        result: Mapping[str, Any] = {}
+        result: Mapping[str, Any] = {
+            "started_date": format_datetime(phylo_run.start_datetime),
+            "completed_date": format_datetime(phylo_run.end_datetime),
+            "status": phylo_run.workflow_status.value,
+            "workflow_id": phylo_run.workflow_id,
+            "pathogen_genome_count": 0,  # TODO: do we still need this?
+        }
         for output in phylo_run.outputs:
             if isinstance(output, PhyloTree):
                 phylo_tree = output
@@ -89,13 +101,6 @@ def phylo_trees():
                 "phylo_tree_id": None,
                 "name": phylo_run.name or generate_tree_name_from_template(phylo_run),
             }
-        result = result | {
-            "started_date": format_datetime(phylo_run.start_datetime),
-            "completed_date": format_datetime(phylo_run.end_datetime),
-            "status": phylo_run.workflow_status.value,
-            "workflow_id": phylo_run.workflow_id,
-            "pathogen_genome_count": 0,  # TODO: do we still need this?
-        }
         results.append(result)
 
     return jsonify({PHYLO_TREE_KEY: results})
