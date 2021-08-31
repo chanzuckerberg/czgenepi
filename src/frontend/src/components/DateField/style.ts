@@ -7,8 +7,7 @@ export const StyledTextField = styled(TextField)`
     const spacings = getSpacings(props);
 
     return `
-      min-width: ${(spacings?.l || 0) + 120}px;
-      padding-right: ${spacings?.l}px;
+      width: ${(spacings?.l || 0) + 120}px;
       margin: 0;
     `;
   }}

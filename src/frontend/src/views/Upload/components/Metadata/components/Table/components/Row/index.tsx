@@ -15,6 +15,7 @@ import UploadDateField from "./components/UploadDateField";
 import {
   Id,
   IsPrivateTableCell,
+  StyledDiv,
   StyledTableCell,
   StyledTableRow,
 } from "./style";
@@ -99,12 +100,14 @@ export default React.memo(function Row({
         <Id>{id}</Id>
       </StyledTableCell>
       <StyledTableCell component="div">
-        <UploadDateField
-          isFirstRow={isFirstRow}
-          applyToAllColumn={applyToAllColumn}
-          formik={formik}
-          fieldKey="collectionDate"
-        />
+        <StyledDiv>
+          <UploadDateField
+            isFirstRow={isFirstRow}
+            applyToAllColumn={applyToAllColumn}
+            formik={formik}
+            fieldKey="collectionDate"
+          />
+        </StyledDiv>
       </StyledTableCell>
       <StyledTableCell component="div">
         <LocationField
@@ -115,12 +118,14 @@ export default React.memo(function Row({
         />
       </StyledTableCell>
       <StyledTableCell component="div">
-        <UploadDateField
-          isFirstRow={isFirstRow}
-          applyToAllColumn={applyToAllColumn}
-          formik={formik}
-          fieldKey="sequencingDate"
-        />
+        <StyledDiv>
+          <UploadDateField
+            isFirstRow={isFirstRow}
+            applyToAllColumn={applyToAllColumn}
+            formik={formik}
+            fieldKey="sequencingDate"
+          />
+        </StyledDiv>
       </StyledTableCell>
       <IsPrivateTableCell align="center" component="div">
         <ToggleField
