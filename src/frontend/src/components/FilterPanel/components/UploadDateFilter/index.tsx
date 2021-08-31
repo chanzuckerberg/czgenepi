@@ -1,6 +1,6 @@
 import React, { FC } from "react";
-import { DateFilter, FormattedDateType } from "../DateFilter";
-
+import { FormattedDateType } from "src/components/DateField";
+import { DateFilter } from "../DateFilter";
 interface Props {
   updateUploadDateFilter: (
     start: FormattedDateType,
