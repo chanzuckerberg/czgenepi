@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { getColors, getSpacings } from "czifui";
+import { getColors, getSpacings, InputDropdown } from "czifui";
 
 export const StyledFilterPanel = styled.div`
   ${(props) => {
@@ -11,4 +11,8 @@ export const StyledFilterPanel = styled.div`
     width: 200px;
     `;
   }}
+`;
+
+export const StyledInputDropdown = styled(InputDropdown)`
+  text-transform: uppercase;
 `;
