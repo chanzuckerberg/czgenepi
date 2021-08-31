@@ -67,3 +67,13 @@ export const IsPrivateTableCell = styled(TableCell)`
     `;
   }}
 `;
+
+export const StyledDiv = styled.div`
+  ${(props) => {
+    const spacings = getSpacings(props);
+
+    return `
+      padding-right: ${spacings?.l}px;
+    `;
+  }}
+`;

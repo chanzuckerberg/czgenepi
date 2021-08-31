@@ -1,10 +1,13 @@
-import ButtonBase from "@material-ui/core/ButtonBase";
 import Popper from "@material-ui/core/Popper";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { AutocompleteCloseReason } from "@material-ui/lab";
-import { Chip, MenuSelect } from "czifui";
+import { MenuSelect } from "czifui";
 import React, { useEffect, useState } from "react";
 import { DefaultMenuSelectOption } from "../../index";
+import {
+  StyledChip,
+  StyledFilterWrapper,
+  StyledInputDropdown,
+} from "../../style";
 
 interface Props {
   options: DefaultMenuSelectOption[];
@@ -31,14 +34,15 @@ const LineageFilter = (props: Props): JSX.Element => {
 
   return (
     <>
-      <div>
-        <ButtonBase disableRipple aria-describedby={id} onClick={handleClick}>
-          <span>Lineage</span>
-          <ExpandMoreIcon />
-        </ButtonBase>
-
+      <StyledFilterWrapper>
+        <StyledInputDropdown
+          sdsStyle="minimal"
+          label="Lineage"
+          // @ts-expect-error remove line when inputdropdown types fixed in sds
+          onClick={handleClick}
+        />
         <Chips value={value} onDelete={handleDelete} />
-      </div>
+      </StyledFilterWrapper>
       <Popper id={id} open={open} anchorEl={anchorEl}>
         <MenuSelect
           disableCloseOnSelect
@@ -97,6 +101,7 @@ interface ChipsProps {
   onDelete: (option: DefaultMenuSelectOption) => void;
 }
 
+// TODO (mlila): replace with sds tag when it's complete
 function Chips({ value, onDelete }: ChipsProps): JSX.Element | null {
   if (!value) return null;
 
@@ -106,7 +111,7 @@ function Chips({ value, onDelete }: ChipsProps): JSX.Element | null {
         const { name } = item;
 
         return (
-          <Chip
+          <StyledChip
             size="medium"
             key={name}
             label={name}
