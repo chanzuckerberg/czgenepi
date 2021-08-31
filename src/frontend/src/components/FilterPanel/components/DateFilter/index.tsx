@@ -1,16 +1,21 @@
-import { Button, Menu, MenuItem } from "czifui";
+import { Menu, MenuItem } from "czifui";
 import { useFormik } from "formik";
 import { noop } from "lodash";
 import React, { FC, useEffect, useState } from "react";
-import DateField from "src/components/DateField";
+import DateField, { FormattedDateType } from "src/components/DateField";
 import {
   DATE_ERROR_MESSAGE,
   DATE_REGEX,
 } from "src/components/DateField/constants";
 import * as yup from "yup";
-import { StyledDateRange, StyledText } from "./style";
+import { StyledFilterWrapper, StyledInputDropdown } from "../../style";
+import {
+  StyledButton,
+  StyledDateRange,
+  StyledManualDate,
+  StyledText,
+} from "./style";
 
-export type FormattedDateType = string | undefined;
 export type DateType = FormattedDateType | Date;
 
 interface Props {
@@ -26,6 +31,9 @@ const DateFilter: FC<Props> = ({
   inputLabel,
   updateDateFilter,
 }) => {
+  // TODO (mlila): use state for start/end to display to user when they reopen filter
+  const [startDate, setStartDate] = useState<FormattedDateType>();
+  const [endDate, setEndDate] = useState<FormattedDateType>();
   const [anchorEl, setAnchorEl] = useState<HTMLElement>();
 
   const validationSchema = yup.object({
@@ -88,8 +96,13 @@ const DateFilter: FC<Props> = ({
 
   //TODO use new sds component for single select on preset date ranges
   return (
-    <>
-      <Button onClick={handleClick}>{inputLabel}</Button>
+    <StyledFilterWrapper>
+      <StyledInputDropdown
+        sdsStyle="minimal"
+        label={inputLabel}
+        // @ts-expect-error remove line when inputdropdown types fixed in sds
+        onClick={handleClick}
+      />
       <Menu
         anchorEl={anchorEl}
         keepMounted
@@ -97,18 +110,39 @@ const DateFilter: FC<Props> = ({
         onClose={handleClose}
         getContentAnchorEl={null}
       >
-        <StyledDateRange>
-          <DateField fieldKey={fieldKeyStart} formik={formik} />
-          <StyledText>to</StyledText>
-          <DateField fieldKey={fieldKeyEnd} formik={formik} />
-          <Button
-            onClick={() => {
-              setDatesFromRange(values[fieldKeyStart], values[fieldKeyEnd]);
-            }}
-          >
-            Apply
-          </Button>
-        </StyledDateRange>
+        <StyledManualDate>
+          <StyledDateRange>
+            <DateField
+              fieldKey={fieldKeyStart}
+              formik={formik}
+              onChange={(e) => {
+                const target = e.target as HTMLTextAreaElement;
+                setStartDate(target?.value);
+              }}
+            />
+            <StyledText>to</StyledText>
+            <DateField
+              fieldKey={fieldKeyEnd}
+              formik={formik}
+              onChange={(e) => {
+                const target = e.target as HTMLTextAreaElement;
+                setEndDate(target?.value);
+              }}
+            />
+          </StyledDateRange>
+          {(startDate || endDate) && (
+            <StyledButton
+              color="primary"
+              variant="contained"
+              onClick={() => {
+                setDatesFromRange(values[fieldKeyStart], values[fieldKeyEnd]);
+              }}
+            >
+              Apply
+            </StyledButton>
+          )}
+        </StyledManualDate>
+        {/* TODO (mlila): use a single select here instead */}
         <MenuItem onClick={() => setDatesFromOffset(7)}>Last 7 Days</MenuItem>
         <MenuItem onClick={() => setDatesFromOffset(30)}>Last 30 Days</MenuItem>
         <MenuItem onClick={() => setDatesFromOffset(90)}>
@@ -119,7 +153,7 @@ const DateFilter: FC<Props> = ({
         </MenuItem>
         <MenuItem onClick={() => setDatesFromOffset(365)}>Last Year</MenuItem>
       </Menu>
-    </>
+    </StyledFilterWrapper>
   );
 };
 
