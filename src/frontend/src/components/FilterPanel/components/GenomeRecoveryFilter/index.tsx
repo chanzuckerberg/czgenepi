@@ -1,8 +1,12 @@
 import Popper from "@material-ui/core/Popper";
-import { Chip, MenuSelect } from "czifui";
+import { MenuSelect } from "czifui";
 import React, { useEffect, useState } from "react";
 import { DefaultMenuSelectOption } from "../../index";
-import { StyledInputDropdown } from "../../style";
+import {
+  StyledChip,
+  StyledFilterWrapper,
+  StyledInputDropdown,
+} from "../../style";
 
 interface Props {
   updateGenomeRecoveryFilter: (selected?: string) => void;
@@ -55,7 +59,7 @@ const GenomeRecoveryFilter = ({
   // TODO (mlila): replace with sds complex filter when complete
   return (
     <>
-      <div>
+      <StyledFilterWrapper>
         <StyledInputDropdown
           sdsStyle="minimal"
           label="Genome Recovery"
@@ -63,7 +67,7 @@ const GenomeRecoveryFilter = ({
           onClick={handleClick}
         />
         <Chips value={value} onDelete={handleDelete} />
-      </div>
+      </StyledFilterWrapper>
       <Popper id={id} open={open} anchorEl={anchorEl}>
         <MenuSelect
           open
@@ -82,11 +86,12 @@ interface ChipsProps {
   onDelete: () => void;
 }
 
+// TODO (mlila): replace with sds tag when it's complete
 const Chips = ({ value, onDelete }: ChipsProps): JSX.Element | null => {
   if (!value) return null;
   const { name } = value as never;
 
-  return <Chip size="medium" label={name} onDelete={onDelete} />;
+  return <StyledChip size="medium" label={name} onDelete={onDelete} />;
 };
 
 export { GenomeRecoveryFilter };
