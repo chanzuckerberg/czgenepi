@@ -7,6 +7,7 @@ import React, {
   useState,
 } from "react";
 import { CollectionDateFilter } from "./components/CollectionDateFilter";
+import { GenomeRecoveryFilter } from "./components/GenomeRecoveryFilter";
 import { LineageFilter } from "./components/LineageFilter";
 import { UploadDateFilter } from "./components/UploadDateFilter";
 import { StyledFilterPanel } from "./style";
@@ -30,7 +31,8 @@ interface Props {
 
 interface FilterParamsType {
   end?: DateType;
-  selected?: string[];
+  multiSelected?: string[];
+  selected?: string | undefined;
   start?: DateType;
 }
 interface FilterType {
@@ -46,18 +48,28 @@ interface FiltersType {
 
 // * (mlila): `key` should be the name of the column you are filtering on
 const DATA_FILTER_INIT = {
+  CZBFailedGenomeRecovery: {
+    key: "CZBFailedGenomeRecovery",
+    params: {
+      selected: undefined,
+    },
+    transform: (d: Sample) =>
+      d.CZBFailedGenomeRecovery ? "Failed" : "Complete",
+    type: TypeFilterType.Single,
+  },
   collectionDate: {
     key: "collectionDate",
     params: {
       end: undefined,
       start: undefined,
     },
+    transform: (d: Sample) => d.collectionDate,
     type: TypeFilterType.Date,
   },
   lineage: {
     key: "lineage",
     params: {
-      selected: [],
+      multiSelected: [],
     },
     transform: (d: Sample) => d.lineage?.lineage,
     type: TypeFilterType.Multiple,
@@ -68,6 +80,7 @@ const DATA_FILTER_INIT = {
       end: undefined,
       start: undefined,
     },
+    transform: (d: Sample) => d.uploadDate,
     type: TypeFilterType.Date,
   },
 };
@@ -77,24 +90,31 @@ const applyFilter = (data: TableItem[], dataFilter: FilterType) => {
 
   const { key, params, transform, type } = dataFilter;
   if (!key || !params || !type) return data;
-  const { end, start, selected = [] } = params;
+  const { end, start, multiSelected = [], selected } = params;
 
   switch (type) {
     case TypeFilterType.Date:
       return filter(data, (d) => {
-        const doesPassFilterCheckStart = !start || d[key] >= start;
-        const doesPassFilterCheckEnd = !end || d[key] <= end;
+        const value = transform ? transform(d) : d;
+        const doesPassFilterCheckStart = !start || value >= start;
+        const doesPassFilterCheckEnd = !end || value <= end;
 
         return doesPassFilterCheckStart && doesPassFilterCheckEnd;
       });
     case TypeFilterType.Multiple:
-      if (selected.length === 0) return data;
+      if (multiSelected.length === 0) return data;
 
       return filter(data, (d) => {
         const value = transform ? transform(d) : d;
-        return selected.includes(value);
+        return multiSelected.includes(value);
       });
     case TypeFilterType.Single:
+      if (!selected) return data;
+
+      return filter(data, (d) => {
+        const value = transform ? transform(d) : d;
+        return selected === value;
+      });
     default:
       return data;
   }
@@ -143,14 +163,22 @@ const FilterPanel: FC<Props> = ({ lineages, setDataFilterFunc }) => {
     updateDataFilter("uploadDate", { end, start });
   };
 
-  const updateLineageFilter = (selected: string[]) => {
-    const prevSelected = dataFilters.lineage?.params.selected;
+  const updateLineageFilter = (multiSelected: string[]) => {
+    const prevSelected = dataFilters.lineage?.params.multiSelected;
 
     // * (mlila): need to do a comparison here, or else the component gets into
     // * an infinite state loop (because arrays are compared by identity rather
     // * than content, by default)
+    if (!isEqual(prevSelected, multiSelected)) {
+      updateDataFilter("lineage", { multiSelected });
+    }
+  };
+
+  const updateGenomeRecoveryFilter = (selected?: string) => {
+    const prevSelected = dataFilters.CZBFailedGenomeRecovery?.params.selected;
+
     if (!isEqual(prevSelected, selected)) {
-      updateDataFilter("lineage", { selected });
+      updateDataFilter("CZBFailedGenomeRecovery", { selected });
     }
   };
 
@@ -163,6 +191,9 @@ const FilterPanel: FC<Props> = ({ lineages, setDataFilterFunc }) => {
       <LineageFilter
         options={lineages}
         updateLineageFilter={updateLineageFilter}
+      />
+      <GenomeRecoveryFilter
+        updateGenomeRecoveryFilter={updateGenomeRecoveryFilter}
       />
     </StyledFilterPanel>
   );
