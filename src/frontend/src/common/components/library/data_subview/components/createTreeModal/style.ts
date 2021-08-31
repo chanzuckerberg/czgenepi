@@ -147,9 +147,13 @@ export const StyledInstructionsButton = styled(Button)`
 
 export const StyledRadio = styled(Radio)`
   vertical-align: top;
+  height: 20px;
+  width: 20px;
   ${(props) => {
     const colors = getColors(props);
+    const spacings = getSpacings(props);
     return `
+      margin-right: ${spacings?.s}px;
       color: ${colors?.gray[400]};
       &.Mui-checked {
         color: ${colors?.primary[500]};
@@ -233,7 +237,8 @@ export const StyledTooltip = styled(Tooltip)`
 `;
 
 export const StyledInfoOutlinedIcon = styled(InfoOutlinedIcon)`
-  ${SmallImageSize}
+  width: 14px;
+  height: 15px;
   ${(props) => {
     const colors = getColors(props);
     return `

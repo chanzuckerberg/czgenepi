@@ -69,20 +69,11 @@ export const SmallText = styled.span`
 `;
 
 export const StyledListItemIcon = styled(ListItemIcon)`
-  min-width: 28px;
+  min-width: 24px;
   ${(props) => {
     const spacings = getSpacings(props);
     return `
       margin-top: ${spacings?.s}px;
-    `;
-  }}
-`;
-
-export const StyledDiv = styled.div`
-  ${(props) => {
-    const spacings = getSpacings(props);
-    return `
-      margin-top: ${spacings?.m}px;
     `;
   }}
 `;

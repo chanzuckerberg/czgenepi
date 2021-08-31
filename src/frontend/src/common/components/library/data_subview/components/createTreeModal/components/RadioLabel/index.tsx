@@ -7,7 +7,6 @@ import {
   LabelLight,
   LabelMain,
   SmallText,
-  StyledDiv,
   StyledIconCheckSmall,
   StyledIconXSmall,
   StyledListItem,
@@ -20,7 +19,7 @@ interface Props {
 
 export const RadioLabelContextual = ({ selected }: Props): JSX.Element => {
   return (
-    <StyledDiv>
+    <div>
       <Label>
         <LabelMain>My county and other regions </LabelMain>
         <LabelLight>— Recommended</LabelLight>
@@ -49,14 +48,16 @@ export const RadioLabelContextual = ({ selected }: Props): JSX.Element => {
           </StyledListItem>
         </List>
       )}
-    </StyledDiv>
+    </div>
   );
 };
 
 export const RadioLabelLocal = ({ selected }: Props): JSX.Element => {
   return (
-    <StyledDiv>
-      <LabelMain>My county only </LabelMain>
+    <div>
+      <Label>
+        <LabelMain>My county only </LabelMain>
+      </Label>
       {selected && (
         <List>
           <StyledListItem button={false as any}>
@@ -84,6 +85,6 @@ export const RadioLabelLocal = ({ selected }: Props): JSX.Element => {
           </StyledListItem>
         </List>
       )}
-    </StyledDiv>
+    </div>
   );
 };
