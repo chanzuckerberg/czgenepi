@@ -1,5 +1,5 @@
 import { FormikContextType } from "formik";
-import React from "react";
+import React, { ChangeEvent } from "react";
 import { StyledTextField } from "./style";
 
 const DATE_LENGTH = 10;
@@ -9,16 +9,20 @@ const INPUT_PROPS = {
   minLength: DATE_LENGTH,
 };
 
+export type FormattedDateType = string | undefined;
+
 interface Props {
   fieldKey: string;
   formik: FormikContextType<any>;
   helperText?: any;
+  onChange?: (d: ChangeEvent) => void;
 }
 
 export default function DateField({
   fieldKey,
   formik,
   helperText,
+  onChange,
 }: Props): JSX.Element {
   const { handleChange, handleBlur, values, touched, errors } = formik;
 
@@ -33,7 +37,10 @@ export default function DateField({
       placeholder="YYYY-MM-DD"
       margin="dense"
       variant="outlined"
-      onChange={handleChange}
+      onChange={(e) => {
+        onChange && onChange(e);
+        handleChange(e);
+      }}
       onBlur={handleBlur}
       value={value}
       error={Boolean(errorMessage)}
