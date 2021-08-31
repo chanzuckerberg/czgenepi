@@ -179,6 +179,7 @@ const DataSubview: FunctionComponent<Props> = ({
     const numberCheckedSamples = checkedSamples.length;
     if (numberCheckedSamples === 0) {
       setDownloadDisabled(true);
+      setCreateTreeDisabled(true);
     } else {
       setDownloadDisabled(false);
       if (numberCheckedSamples > 2000) {
