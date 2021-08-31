@@ -108,6 +108,8 @@ const TREE_MAP = new Map<string, keyof Tree>([
   ["phylo_tree_id", "id"],
   ["pathogen_genome_count", "pathogenGenomeCount"],
   ["completed_date", "creationDate"],
+  ["started_date", "startedDate"],
+  ["workflow_id", "workflowId"],
 ]);
 export const fetchTrees = (): Promise<TreeResponse> =>
   apiResponse<TreeResponse>(["phylo_trees"], [TREE_MAP], API.PHYLO_TREES);

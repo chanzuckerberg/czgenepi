@@ -2,7 +2,16 @@ import json
 import os
 import re
 import uuid
-from typing import Any, Callable, Iterable, Mapping, MutableSequence, Set, Union
+from typing import (
+    Any,
+    Callable,
+    Iterable,
+    Mapping,
+    MutableSequence,
+    Optional,
+    Set,
+    Union,
+)
 
 import boto3
 import sqlalchemy
@@ -11,16 +20,9 @@ from sqlalchemy import or_
 from sqlalchemy.orm import aliased, joinedload, Session
 
 from aspen.app.app import application, requires_auth
-from aspen.app.views.api_utils import format_datetime
-from aspen.database.models import (
-    DataType,
-    PhyloRun,
-    PhyloTree,
-    Sample,
-    WorkflowStatusType,
-)
+from aspen.app.views.api_utils import format_date, format_datetime
+from aspen.database.models import DataType, PhyloRun, PhyloTree, Sample
 from aspen.database.models.usergroup import User
-from aspen.error.recoverable import RecoverableError
 from aspen.phylo_tree.identifiers import rename_nodes_on_tree
 
 PHYLO_TREE_KEY = "phylo_trees"
@@ -39,6 +41,17 @@ def humanize_tree_name(s3_key: str):
     return title_case
 
 
+def generate_tree_name_from_template(phylo_run: PhyloRun) -> str:
+    # template_args should be transparently deserialized into a python dict.
+    # but if something is wrong with the data in the column (i.e. the json is
+    # double escaped), it will be a string instead.
+    location = phylo_run.group.location  # safe default
+    if isinstance(phylo_run.template_args, Mapping):
+        template_args = phylo_run.template_args
+        location = template_args["location"]
+    return f"{location} Tree {format_date(phylo_run.start_datetime)}"
+
+
 @application.route("/api/phylo_trees", methods=["GET"])
 @requires_auth
 def phylo_trees():
@@ -54,7 +67,6 @@ def phylo_trees():
             phylo_run_alias,
         )
         .options(
-            joinedload(phylo_run_alias.outputs),
             joinedload(phylo_run_alias.outputs.of_type(PhyloTree)),
         )
         .filter(
@@ -64,30 +76,32 @@ def phylo_trees():
                 phylo_run_alias.group_id.in_(cansee_owner_group_ids),
             )
         )
-        .filter(phylo_run_alias.workflow_status == WorkflowStatusType.COMPLETED)
     )
 
     # filter for only information we need in sample table view
     results: MutableSequence[Mapping[str, Any]] = list()
     for phylo_run in phylo_runs:
-        phylo_tree: PhyloTree
+        phylo_tree: Optional[PhyloTree] = None
+        result: Mapping[str, Any] = {
+            "started_date": format_datetime(phylo_run.start_datetime),
+            "completed_date": format_datetime(phylo_run.end_datetime),
+            "status": phylo_run.workflow_status.value,
+            "workflow_id": phylo_run.workflow_id,
+            "pathogen_genome_count": 0,  # TODO: do we still need this?
+        }
         for output in phylo_run.outputs:
             if isinstance(output, PhyloTree):
                 phylo_tree = output
-                break
-        else:
-            raise RecoverableError(
-                f"phylo run (workflow id={phylo_run.workflow_id}) does not have a"
-                " phylo tree output."
-            )
-        results.append(
-            {
-                "phylo_tree_id": phylo_tree.entity_id,
-                "name": humanize_tree_name(phylo_tree.s3_key),
-                "pathogen_genome_count": 0,  # Leaving this field in place temporarily for reverse-compatibility
-                "completed_date": format_datetime(phylo_run.end_datetime),
+                result = result | {
+                    "phylo_tree_id": phylo_tree.entity_id,
+                    "name": phylo_tree.name or humanize_tree_name(phylo_tree.s3_key),
+                }
+        if not phylo_tree:
+            result = result | {
+                "phylo_tree_id": None,
+                "name": phylo_run.name or generate_tree_name_from_template(phylo_run),
             }
-        )
+        results.append(result)
 
     return jsonify({PHYLO_TREE_KEY: results})
 
