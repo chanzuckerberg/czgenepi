@@ -10,7 +10,6 @@ from flask import g, jsonify, request, Response, stream_with_context
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import joinedload
 
-from aspen.error import http_exceptions as ex
 from aspen.app.app import application, requires_auth
 from aspen.app.views import api_utils
 from aspen.app.views.api_utils import check_valid_sequence
@@ -27,6 +26,7 @@ from aspen.database.models import (
 )
 from aspen.database.models.sample import create_public_ids, RegionType
 from aspen.database.models.usergroup import User
+from aspen.error import http_exceptions as ex
 from aspen.error.recoverable import RecoverableError
 from aspen.fileio.fasta_streamer import FastaStreamer
 

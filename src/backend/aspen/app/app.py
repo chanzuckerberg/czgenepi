@@ -18,13 +18,13 @@ from flask_cors import CORS
 from sentry_sdk.integrations.flask import FlaskIntegration
 from sqlalchemy.orm.exc import NoResultFound
 
-from aspen.error import http_exceptions as ex
 from aspen.app.aspen_app import AspenApp
 from aspen.app.views.api_utils import get_usergroup_query
 from aspen.config.config import Config
 from aspen.config.docker_compose import DockerComposeConfig
 from aspen.config.production import ProductionConfig
 from aspen.database.connection import session_scope
+from aspen.error import http_exceptions as ex
 
 static_folder = Path(__file__).parent.parent / "static"
 
@@ -55,9 +55,11 @@ application = AspenApp(
     aspen_config=aspen_config,
 )
 
+
 @application.errorhandler(ex.AspenException)
 def handle_bad_request(err):
     return err.make_response()
+
 
 allowed_origins = []
 frontend_url = os.getenv("FRONTEND_URL")
