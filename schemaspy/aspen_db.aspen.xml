@@ -1,0 +1,544 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<database name="aspen_db" schema="aspen" type="PostgreSQL - 13.1">
+   <sequences>
+      <sequence increment="1" name="can_see_id_seq" startValue="1"/>
+      <sequence increment="1" name="entities_id_seq" startValue="1"/>
+      <sequence increment="1" name="groups_id_seq" startValue="1"/>
+      <sequence increment="1" name="samples_id_seq" startValue="1"/>
+      <sequence increment="1" name="users_id_seq" startValue="1"/>
+      <sequence increment="1" name="workflows_id_seq" startValue="1"/>
+   </sequences>
+   <tables>
+      <table name="align_read_workflows" numRows="0" remarks="" schema="aspen" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="workflow_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="id" foreignKey="fk_align_read_workflows_workflow_id_workflows" implied="false" onDeleteCascade="false" schema="aspen" table="workflows"/>
+         </column>
+         <primaryKey column="workflow_id" sequenceNumberInPK="1"/>
+         <index name="pk_align_read_workflows" unique="true">
+            <column ascending="true" name="workflow_id"/>
+         </index>
+      </table>
+      <table name="aligned_gisaid_dump" numRows="0" remarks="" schema="aspen" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="entity_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="id" foreignKey="fk_aligned_gisaid_dump_entity_id_entities" implied="false" onDeleteCascade="false" schema="aspen" table="entities"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="s3_bucket" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="sequences_s3_key" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="3" name="metadata_s3_key" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <primaryKey column="entity_id" sequenceNumberInPK="1"/>
+         <index name="pk_aligned_gisaid_dump" unique="true">
+            <column ascending="true" name="entity_id"/>
+         </index>
+         <index name="uq_aligned_gisaid_dump_s3_bucket_key" unique="true">
+            <column ascending="true" name="s3_bucket"/>
+            <column ascending="true" name="metadata_s3_key"/>
+         </index>
+         <index name="uq_aligned_gisaid_dump_s3_bucket_sequences" unique="true">
+            <column ascending="true" name="s3_bucket"/>
+            <column ascending="true" name="sequences_s3_key"/>
+         </index>
+      </table>
+      <table name="bams" numRows="0" remarks="" schema="aspen" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="entity_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="id" foreignKey="fk_bams_entity_id_entities" implied="false" onDeleteCascade="false" schema="aspen" table="entities"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="s3_bucket" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="s3_key" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="17" id="3" name="sequencing_depth" nullable="false" remarks="" size="17" type="float8" typeCode="8"/>
+         <primaryKey column="entity_id" sequenceNumberInPK="1"/>
+         <index name="pk_bams" unique="true">
+            <column ascending="true" name="entity_id"/>
+         </index>
+         <index name="uq_bams_s3_bucket" unique="true">
+            <column ascending="true" name="s3_bucket"/>
+            <column ascending="true" name="s3_key"/>
+         </index>
+      </table>
+      <table name="call_consensus_workflows" numRows="0" remarks="" schema="aspen" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="workflow_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="id" foreignKey="fk_call_consensus_workflows_workflow_id_workflows" implied="false" onDeleteCascade="false" schema="aspen" table="workflows"/>
+         </column>
+         <primaryKey column="workflow_id" sequenceNumberInPK="1"/>
+         <index name="pk_call_consensus_workflows" unique="true">
+            <column ascending="true" name="workflow_id"/>
+         </index>
+      </table>
+      <table name="called_pathogen_genomes" numRows="0" remarks="" schema="aspen" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="pathogen_genome_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="entity_id" foreignKey="fk_called_pathogen_genomes_pathogen_genome_id_pathogen_genomes" implied="false" onDeleteCascade="false" schema="aspen" table="pathogen_genomes"/>
+         </column>
+         <primaryKey column="pathogen_genome_id" sequenceNumberInPK="1"/>
+         <index name="pk_called_pathogen_genomes" unique="true">
+            <column ascending="true" name="pathogen_genome_id"/>
+         </index>
+      </table>
+      <table name="can_see" numRows="0" remarks="" schema="aspen" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('aspen.can_see_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="viewer_group_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="id" foreignKey="fk_can_see_viewer_group_id_groups" implied="false" onDeleteCascade="false" schema="aspen" table="groups"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="owner_group_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="id" foreignKey="fk_can_see_owner_group_id_groups" implied="false" onDeleteCascade="false" schema="aspen" table="groups"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="3" name="data_type" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12">
+            <parent column="item_id" foreignKey="fk_can_see_data_type_data_types" implied="false" onDeleteCascade="false" schema="aspen" table="data_types"/>
+         </column>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="pk_can_see" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+      </table>
+      <table name="data_types" numRows="4" remarks="" schema="aspen" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="item_id" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12">
+            <child column="data_type" foreignKey="fk_can_see_data_type_data_types" implied="false" onDeleteCascade="false" schema="aspen" table="can_see"/>
+         </column>
+         <primaryKey column="item_id" sequenceNumberInPK="1"/>
+         <index name="pk_data_types" unique="true">
+            <column ascending="true" name="item_id"/>
+         </index>
+      </table>
+      <table name="entities" numRows="1668" remarks="" schema="aspen" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('aspen.entities_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial" typeCode="4">
+            <child column="entity_id" foreignKey="fk_aligned_gisaid_dump_entity_id_entities" implied="false" onDeleteCascade="false" schema="aspen" table="aligned_gisaid_dump"/>
+            <child column="entity_id" foreignKey="fk_bams_entity_id_entities" implied="false" onDeleteCascade="false" schema="aspen" table="bams"/>
+            <child column="entity_id" foreignKey="fk_genbank_accessions_entity_id_entities" implied="false" onDeleteCascade="false" schema="aspen" table="genbank_accessions"/>
+            <child column="entity_id" foreignKey="fk_gisaid_accessions_entity_id_entities" implied="false" onDeleteCascade="false" schema="aspen" table="gisaid_accessions"/>
+            <child column="entity_id" foreignKey="fk_host_filtered_sequencing_reads_collections_entity_id_be9e" implied="false" onDeleteCascade="false" schema="aspen" table="host_filtered_sequencing_reads_collections"/>
+            <child column="entity_id" foreignKey="fk_pathogen_genomes_entity_id_entities" implied="false" onDeleteCascade="false" schema="aspen" table="pathogen_genomes"/>
+            <child column="entity_id" foreignKey="fk_phylo_trees_entity_id_entities" implied="false" onDeleteCascade="false" schema="aspen" table="phylo_trees"/>
+            <child column="entity_id" foreignKey="fk_processed_gisaid_dump_entity_id_entities" implied="false" onDeleteCascade="false" schema="aspen" table="processed_gisaid_dump"/>
+            <child column="entity_id" foreignKey="fk_raw_gisaid_dump_entity_id_entities" implied="false" onDeleteCascade="false" schema="aspen" table="raw_gisaid_dump"/>
+            <child column="entity_id" foreignKey="fk_sequencing_reads_collections_entity_id_entities" implied="false" onDeleteCascade="false" schema="aspen" table="sequencing_reads_collections"/>
+            <child column="entity_id" foreignKey="fk_workflow_inputs_entity_id_entities" implied="false" onDeleteCascade="false" schema="aspen" table="workflow_inputs"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="entity_type" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12">
+            <parent column="item_id" foreignKey="fk_entities_entity_type_entity_types" implied="false" onDeleteCascade="false" schema="aspen" table="entity_types"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="producing_workflow_id" nullable="true" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="id" foreignKey="fk_entities_producing_workflow_id_workflows" implied="false" onDeleteCascade="false" schema="aspen" table="workflows"/>
+         </column>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="pk_entities" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+      </table>
+      <table name="entity_types" numRows="11" remarks="" schema="aspen" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="item_id" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12">
+            <child column="entity_type" foreignKey="fk_entities_entity_type_entity_types" implied="false" onDeleteCascade="false" schema="aspen" table="entities"/>
+         </column>
+         <primaryKey column="item_id" sequenceNumberInPK="1"/>
+         <index name="pk_entity_types" unique="true">
+            <column ascending="true" name="item_id"/>
+         </index>
+      </table>
+      <table name="filter_read_workflows" numRows="0" remarks="" schema="aspen" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="workflow_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="id" foreignKey="fk_filter_read_workflows_workflow_id_workflows" implied="false" onDeleteCascade="false" schema="aspen" table="workflows"/>
+         </column>
+         <primaryKey column="workflow_id" sequenceNumberInPK="1"/>
+         <index name="pk_filter_read_workflows" unique="true">
+            <column ascending="true" name="workflow_id"/>
+         </index>
+      </table>
+      <table name="genbank_accession_workflows" numRows="0" remarks="" schema="aspen" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="workflow_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="id" foreignKey="fk_genbank_accession_workflows_workflow_id_workflows" implied="false" onDeleteCascade="false" schema="aspen" table="workflows"/>
+         </column>
+         <primaryKey column="workflow_id" sequenceNumberInPK="1"/>
+         <index name="pk_genbank_accession_workflows" unique="true">
+            <column ascending="true" name="workflow_id"/>
+         </index>
+      </table>
+      <table name="genbank_accessions" numRows="0" remarks="" schema="aspen" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="entity_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="id" foreignKey="fk_genbank_accessions_entity_id_entities" implied="false" onDeleteCascade="false" schema="aspen" table="entities"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="public_identifier" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <primaryKey column="entity_id" sequenceNumberInPK="1"/>
+         <index name="pk_genbank_accessions" unique="true">
+            <column ascending="true" name="entity_id"/>
+         </index>
+         <index name="uq_genbank_accessions_public_identifier" unique="true">
+            <column ascending="true" name="public_identifier"/>
+         </index>
+      </table>
+      <table name="gisaid_accession_workflows" numRows="0" remarks="" schema="aspen" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="workflow_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="id" foreignKey="fk_gisaid_accession_workflows_workflow_id_workflows" implied="false" onDeleteCascade="false" schema="aspen" table="workflows"/>
+         </column>
+         <primaryKey column="workflow_id" sequenceNumberInPK="1"/>
+         <index name="pk_gisaid_accession_workflows" unique="true">
+            <column ascending="true" name="workflow_id"/>
+         </index>
+      </table>
+      <table name="gisaid_accessions" numRows="0" remarks="" schema="aspen" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="entity_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="id" foreignKey="fk_gisaid_accessions_entity_id_entities" implied="false" onDeleteCascade="false" schema="aspen" table="entities"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="public_identifier" nullable="true" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <primaryKey column="entity_id" sequenceNumberInPK="1"/>
+         <index name="pk_gisaid_accessions" unique="true">
+            <column ascending="true" name="entity_id"/>
+         </index>
+         <index name="uq_gisaid_accessions_public_identifier" unique="true">
+            <column ascending="true" name="public_identifier"/>
+         </index>
+      </table>
+      <table name="gisaid_alignment_workflows" numRows="0" remarks="" schema="aspen" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="workflow_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="id" foreignKey="fk_gisaid_alignment_workflows_workflow_id_workflows" implied="false" onDeleteCascade="false" schema="aspen" table="workflows"/>
+         </column>
+         <primaryKey column="workflow_id" sequenceNumberInPK="1"/>
+         <index name="pk_gisaid_alignment_workflows" unique="true">
+            <column ascending="true" name="workflow_id"/>
+         </index>
+      </table>
+      <table name="gisaid_workflows" numRows="0" remarks="" schema="aspen" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="workflow_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="id" foreignKey="fk_gisaid_workflows_workflow_id_workflows" implied="false" onDeleteCascade="false" schema="aspen" table="workflows"/>
+         </column>
+         <primaryKey column="workflow_id" sequenceNumberInPK="1"/>
+         <index name="pk_gisaid_workflows" unique="true">
+            <column ascending="true" name="workflow_id"/>
+         </index>
+      </table>
+      <table name="groups" numRows="3" remarks="" schema="aspen" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('aspen.groups_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial" typeCode="4">
+            <child column="owner_group_id" foreignKey="fk_can_see_owner_group_id_groups" implied="false" onDeleteCascade="false" schema="aspen" table="can_see"/>
+            <child column="viewer_group_id" foreignKey="fk_can_see_viewer_group_id_groups" implied="false" onDeleteCascade="false" schema="aspen" table="can_see"/>
+            <child column="group_id" foreignKey="fk_phylo_runs_group_id_groups" implied="false" onDeleteCascade="false" schema="aspen" table="phylo_runs"/>
+            <child column="submitting_group_id" foreignKey="fk_samples_submitting_group_id_groups" implied="false" onDeleteCascade="false" schema="aspen" table="samples"/>
+            <child column="group_id" foreignKey="fk_users_group_id_groups" implied="false" onDeleteCascade="false" schema="aspen" table="users"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="name" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="address" nullable="true" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="3" name="prefix" nullable="false" remarks="used for creating public identifiers for samples" size="2147483647" type="varchar" typeCode="12"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="pk_groups" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="uq_groups_name" unique="true">
+            <column ascending="true" name="name"/>
+         </index>
+         <index name="uq_groups_prefix" unique="true">
+            <column ascending="true" name="prefix"/>
+         </index>
+      </table>
+      <table name="host_filtered_sequencing_reads_collections" numRows="0" remarks="" schema="aspen" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="entity_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="id" foreignKey="fk_host_filtered_sequencing_reads_collections_entity_id_be9e" implied="false" onDeleteCascade="false" schema="aspen" table="entities"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="s3_bucket" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="s3_key" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <primaryKey column="entity_id" sequenceNumberInPK="1"/>
+         <index name="pk_host_filtered_sequencing_reads_collections" unique="true">
+            <column ascending="true" name="entity_id"/>
+         </index>
+         <index name="uq_host_filtered_sequencing_reads_collections_s3_bucket" unique="true">
+            <column ascending="true" name="s3_bucket"/>
+            <column ascending="true" name="s3_key"/>
+         </index>
+      </table>
+      <table name="pathogen_genomes" numRows="1643" remarks="" schema="aspen" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="entity_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <child column="pathogen_genome_id" foreignKey="fk_called_pathogen_genomes_pathogen_genome_id_pathogen_genomes" implied="false" onDeleteCascade="false" schema="aspen" table="called_pathogen_genomes"/>
+            <child column="pathogen_genome_id" foreignKey="fk_uploaded_pathogen_genomes_pathogen_genome_id_pathoge_d57a" implied="false" onDeleteCascade="false" schema="aspen" table="uploaded_pathogen_genomes"/>
+            <parent column="id" foreignKey="fk_pathogen_genomes_entity_id_entities" implied="false" onDeleteCascade="false" schema="aspen" table="entities"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="sequence" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="num_unambiguous_sites" nullable="false" remarks="Number of sites with allele A, C, T, or G" size="10" type="int4" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="3" name="num_missing_alleles" nullable="false" remarks="Number of sites with N, the missing allele, typically indicating low depth" size="10" type="int4" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="4" name="num_mixed" nullable="false" remarks="Number of sites with an ambiguous allele, e.g. M, K, Y, etc., indicating support for 2 or more alleles in the reads." size="10" type="int4" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="5" name="pangolin_last_updated" nullable="true" remarks="" size="29" type="timestamp" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="6" name="pangolin_lineage" nullable="true" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="17" id="7" name="pangolin_probability" nullable="true" remarks="" size="17" type="float8" typeCode="8"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="8" name="pangolin_version" nullable="true" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="9" name="sequencing_date" nullable="true" remarks="" size="13" type="date" typeCode="91"/>
+         <primaryKey column="entity_id" sequenceNumberInPK="1"/>
+         <index name="pk_pathogen_genomes" unique="true">
+            <column ascending="true" name="entity_id"/>
+         </index>
+      </table>
+      <table name="phylo_runs" numRows="24" remarks="" schema="aspen" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="workflow_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="id" foreignKey="fk_phylo_runs_workflow_id_workflows" implied="false" onDeleteCascade="false" schema="aspen" table="workflows"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="group_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="id" foreignKey="fk_phylo_runs_group_id_groups" implied="false" onDeleteCascade="false" schema="aspen" table="groups"/>
+         </column>
+         <column autoUpdated="false" defaultValue="'{}'::jsonb" digits="0" id="2" name="template_args" nullable="false" remarks="" size="2147483647" type="jsonb" typeCode="1111"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="3" name="template_file_path" nullable="true" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="4" name="name" nullable="true" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <primaryKey column="workflow_id" sequenceNumberInPK="1"/>
+         <index name="pk_phylo_runs" unique="true">
+            <column ascending="true" name="workflow_id"/>
+         </index>
+      </table>
+      <table name="phylo_tree_samples" numRows="0" remarks="" schema="aspen" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="sample_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="id" foreignKey="fk_phylo_tree_samples_sample_id_samples" implied="false" onDeleteCascade="false" schema="aspen" table="samples"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="phylo_tree_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="entity_id" foreignKey="fk_phylo_tree_samples_phylo_tree_id_phylo_trees" implied="false" onDeleteCascade="false" schema="aspen" table="phylo_trees"/>
+         </column>
+         <primaryKey column="sample_id" sequenceNumberInPK="1"/>
+         <primaryKey column="phylo_tree_id" sequenceNumberInPK="2"/>
+         <index name="pk_phylo_tree_samples" unique="true">
+            <column ascending="true" name="sample_id"/>
+            <column ascending="true" name="phylo_tree_id"/>
+         </index>
+      </table>
+      <table name="phylo_trees" numRows="24" remarks="" schema="aspen" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="entity_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <child column="phylo_tree_id" foreignKey="fk_phylo_tree_samples_phylo_tree_id_phylo_trees" implied="false" onDeleteCascade="false" schema="aspen" table="phylo_tree_samples"/>
+            <parent column="id" foreignKey="fk_phylo_trees_entity_id_entities" implied="false" onDeleteCascade="false" schema="aspen" table="entities"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="s3_bucket" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="s3_key" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <primaryKey column="entity_id" sequenceNumberInPK="1"/>
+         <index name="pk_phylo_trees" unique="true">
+            <column ascending="true" name="entity_id"/>
+         </index>
+         <index name="uq_phylo_trees_s3_bucket" unique="true">
+            <column ascending="true" name="s3_bucket"/>
+            <column ascending="true" name="s3_key"/>
+         </index>
+      </table>
+      <table name="processed_gisaid_dump" numRows="0" remarks="" schema="aspen" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="entity_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="id" foreignKey="fk_processed_gisaid_dump_entity_id_entities" implied="false" onDeleteCascade="false" schema="aspen" table="entities"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="s3_bucket" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="metadata_s3_key" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="3" name="sequences_s3_key" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <primaryKey column="entity_id" sequenceNumberInPK="1"/>
+         <index name="pk_processed_gisaid_dump" unique="true">
+            <column ascending="true" name="entity_id"/>
+         </index>
+         <index name="uq_processed_gisaid_dump_s3_bucket_key" unique="true">
+            <column ascending="true" name="s3_bucket"/>
+            <column ascending="true" name="metadata_s3_key"/>
+         </index>
+         <index name="uq_processed_gisaid_dump_s3_bucket_sequences" unique="true">
+            <column ascending="true" name="s3_bucket"/>
+            <column ascending="true" name="sequences_s3_key"/>
+         </index>
+      </table>
+      <table name="raw_gisaid_dump" numRows="0" remarks="" schema="aspen" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="entity_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="id" foreignKey="fk_raw_gisaid_dump_entity_id_entities" implied="false" onDeleteCascade="false" schema="aspen" table="entities"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="1" name="download_date" nullable="false" remarks="" size="29" type="timestamp" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="s3_bucket" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="3" name="s3_key" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <primaryKey column="entity_id" sequenceNumberInPK="1"/>
+         <index name="pk_raw_gisaid_dump" unique="true">
+            <column ascending="true" name="entity_id"/>
+         </index>
+         <index name="uq_raw_gisaid_dump_s3_bucket" unique="true">
+            <column ascending="true" name="s3_bucket"/>
+            <column ascending="true" name="s3_key"/>
+         </index>
+      </table>
+      <table name="region_types" numRows="6" remarks="" schema="aspen" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="item_id" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12">
+            <child column="region" foreignKey="fk_samples_region_region_types" implied="false" onDeleteCascade="false" schema="aspen" table="samples"/>
+         </column>
+         <primaryKey column="item_id" sequenceNumberInPK="1"/>
+         <index name="pk_region_types" unique="true">
+            <column ascending="true" name="item_id"/>
+         </index>
+      </table>
+      <table name="samples" numRows="1644" remarks="" schema="aspen" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('aspen.samples_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial" typeCode="4">
+            <child column="sample_id" foreignKey="fk_phylo_tree_samples_sample_id_samples" implied="false" onDeleteCascade="false" schema="aspen" table="phylo_tree_samples"/>
+            <child column="sample_id" foreignKey="fk_sequencing_reads_collections_sample_id_samples" implied="false" onDeleteCascade="false" schema="aspen" table="sequencing_reads_collections"/>
+            <child column="sample_id" foreignKey="fk_uploaded_pathogen_genomes_sample_id_samples" implied="false" onDeleteCascade="false" schema="aspen" table="uploaded_pathogen_genomes"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="submitting_group_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="id" foreignKey="fk_samples_submitting_group_id_groups" implied="false" onDeleteCascade="false" schema="aspen" table="groups"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="private_identifier" nullable="false" remarks="This is the private identifier groups (DPHs) will use to map data back to their internal databases." size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="3" name="original_submission" nullable="false" remarks="This is the original metadata submitted by the user." size="2147483647" type="json" typeCode="1111"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="4" name="public_identifier" nullable="false" remarks="This is the public identifier we assign to this sample." size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="sample_collected_by" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="6" name="sample_collector_contact_email" nullable="true" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="7" name="sample_collector_contact_address" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="'[]'::jsonb" digits="0" id="8" name="authors" nullable="false" remarks="" size="2147483647" type="jsonb" typeCode="1111"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="9" name="collection_date" nullable="false" remarks="" size="13" type="date" typeCode="91"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="10" name="location" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="11" name="division" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="12" name="country" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="13" name="organism" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="14" name="host" nullable="true" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="15" name="purpose_of_sampling" nullable="true" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="16" name="specimen_processing" nullable="true" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="17" name="region" nullable="false" remarks="This is the continent this sample was collected from." size="2147483647" type="varchar" typeCode="12">
+            <parent column="item_id" foreignKey="fk_samples_region_region_types" implied="false" onDeleteCascade="false" schema="aspen" table="region_types"/>
+         </column>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="18" name="czb_failed_genome_recovery" nullable="true" remarks="This is set to true iff this is sample sequenced by CZB and failed genome recovery." size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="19" name="private" nullable="false" remarks="" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="20" name="uploaded_by_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="id" foreignKey="fk_samples_uploaded_by_id_users" implied="false" onDeleteCascade="false" schema="aspen" table="users"/>
+         </column>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="pk_samples" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="uq_samples_public_identifier" unique="true">
+            <column ascending="true" name="public_identifier"/>
+         </index>
+         <index name="uq_samples_submitting_group_id" unique="true">
+            <column ascending="true" name="submitting_group_id"/>
+            <column ascending="true" name="private_identifier"/>
+         </index>
+      </table>
+      <table name="sequencing_instrument_types" numRows="40" remarks="" schema="aspen" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="item_id" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12">
+            <child column="sequencing_instrument" foreignKey="fk_sequencing_reads_collections_sequencing_instrument_s_90ef" implied="false" onDeleteCascade="false" schema="aspen" table="sequencing_reads_collections"/>
+         </column>
+         <primaryKey column="item_id" sequenceNumberInPK="1"/>
+         <index name="pk_sequencing_instrument_types" unique="true">
+            <column ascending="true" name="item_id"/>
+         </index>
+      </table>
+      <table name="sequencing_protocol_types" numRows="1" remarks="" schema="aspen" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="item_id" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12">
+            <child column="sequencing_protocol" foreignKey="fk_sequencing_reads_collections_sequencing_protocol_seq_9195" implied="false" onDeleteCascade="false" schema="aspen" table="sequencing_reads_collections"/>
+         </column>
+         <primaryKey column="item_id" sequenceNumberInPK="1"/>
+         <index name="pk_sequencing_protocol_types" unique="true">
+            <column ascending="true" name="item_id"/>
+         </index>
+      </table>
+      <table name="sequencing_reads_collections" numRows="1" remarks="" schema="aspen" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="entity_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="id" foreignKey="fk_sequencing_reads_collections_entity_id_entities" implied="false" onDeleteCascade="false" schema="aspen" table="entities"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="sample_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="id" foreignKey="fk_sequencing_reads_collections_sample_id_samples" implied="false" onDeleteCascade="false" schema="aspen" table="samples"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="sequencing_instrument" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12">
+            <parent column="item_id" foreignKey="fk_sequencing_reads_collections_sequencing_instrument_s_90ef" implied="false" onDeleteCascade="false" schema="aspen" table="sequencing_instrument_types"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="3" name="sequencing_protocol" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12">
+            <parent column="item_id" foreignKey="fk_sequencing_reads_collections_sequencing_protocol_seq_9195" implied="false" onDeleteCascade="false" schema="aspen" table="sequencing_protocol_types"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="4" name="s3_bucket" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="s3_key" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="6" name="sequencing_date" nullable="true" remarks="" size="13" type="date" typeCode="91"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="7" name="upload_date" nullable="false" remarks="" size="29" type="timestamp" typeCode="93"/>
+         <primaryKey column="entity_id" sequenceNumberInPK="1"/>
+         <index name="pk_sequencing_reads_collections" unique="true">
+            <column ascending="true" name="entity_id"/>
+         </index>
+         <index name="uq_sequencing_reads_collections_s3_bucket" unique="true">
+            <column ascending="true" name="s3_bucket"/>
+            <column ascending="true" name="s3_key"/>
+         </index>
+         <index name="uq_sequencing_reads_collections_sample_id" unique="true">
+            <column ascending="true" name="sample_id"/>
+         </index>
+      </table>
+      <table name="uploaded_pathogen_genomes" numRows="1643" remarks="" schema="aspen" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="pathogen_genome_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="entity_id" foreignKey="fk_uploaded_pathogen_genomes_pathogen_genome_id_pathoge_d57a" implied="false" onDeleteCascade="false" schema="aspen" table="pathogen_genomes"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="sample_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="id" foreignKey="fk_uploaded_pathogen_genomes_sample_id_samples" implied="false" onDeleteCascade="false" schema="aspen" table="samples"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="17" id="2" name="sequencing_depth" nullable="true" remarks="" size="17" type="float8" typeCode="8"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="3" name="upload_date" nullable="false" remarks="" size="29" type="timestamp" typeCode="93"/>
+         <primaryKey column="pathogen_genome_id" sequenceNumberInPK="1"/>
+         <index name="pk_uploaded_pathogen_genomes" unique="true">
+            <column ascending="true" name="pathogen_genome_id"/>
+         </index>
+         <index name="uq_uploaded_pathogen_genomes_sample_id" unique="true">
+            <column ascending="true" name="sample_id"/>
+         </index>
+      </table>
+      <table name="users" numRows="2" remarks="" schema="aspen" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('aspen.users_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial" typeCode="4">
+            <child column="uploaded_by_id" foreignKey="fk_samples_uploaded_by_id_users" implied="false" onDeleteCascade="false" schema="aspen" table="samples"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="name" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="email" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="3" name="auth0_user_id" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="4" name="group_admin" nullable="false" remarks="" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="system_admin" nullable="false" remarks="" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="6" name="group_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="id" foreignKey="fk_users_group_id_groups" implied="false" onDeleteCascade="false" schema="aspen" table="groups"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="7" name="agreed_to_tos" nullable="false" remarks="" size="1" type="bool" typeCode="-7"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="pk_users" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="uq_users_auth0_user_id" unique="true">
+            <column ascending="true" name="auth0_user_id"/>
+         </index>
+         <index name="uq_users_email" unique="true">
+            <column ascending="true" name="email"/>
+         </index>
+      </table>
+      <table name="workflow_inputs" numRows="25411" remarks="" schema="aspen" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="entity_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="id" foreignKey="fk_workflow_inputs_entity_id_entities" implied="false" onDeleteCascade="false" schema="aspen" table="entities"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="workflow_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="id" foreignKey="fk_workflow_inputs_workflow_id_workflows" implied="false" onDeleteCascade="false" schema="aspen" table="workflows"/>
+         </column>
+         <primaryKey column="entity_id" sequenceNumberInPK="1"/>
+         <primaryKey column="workflow_id" sequenceNumberInPK="2"/>
+         <index name="pk_workflow_inputs" unique="true">
+            <column ascending="true" name="entity_id"/>
+            <column ascending="true" name="workflow_id"/>
+         </index>
+      </table>
+      <table name="workflow_status_types" numRows="3" remarks="" schema="aspen" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="item_id" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12">
+            <child column="workflow_status" foreignKey="fk_workflows_workflow_status_workflow_status_types" implied="false" onDeleteCascade="false" schema="aspen" table="workflows"/>
+         </column>
+         <primaryKey column="item_id" sequenceNumberInPK="1"/>
+         <index name="pk_workflow_status_types" unique="true">
+            <column ascending="true" name="item_id"/>
+         </index>
+      </table>
+      <table name="workflow_types" numRows="8" remarks="" schema="aspen" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="item_id" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12">
+            <child column="workflow_type" foreignKey="fk_workflows_workflow_type_workflow_types" implied="false" onDeleteCascade="false" schema="aspen" table="workflows"/>
+         </column>
+         <primaryKey column="item_id" sequenceNumberInPK="1"/>
+         <index name="pk_workflow_types" unique="true">
+            <column ascending="true" name="item_id"/>
+         </index>
+      </table>
+      <table name="workflows" numRows="24" remarks="" schema="aspen" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('aspen.workflows_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial" typeCode="4">
+            <child column="workflow_id" foreignKey="fk_align_read_workflows_workflow_id_workflows" implied="false" onDeleteCascade="false" schema="aspen" table="align_read_workflows"/>
+            <child column="workflow_id" foreignKey="fk_call_consensus_workflows_workflow_id_workflows" implied="false" onDeleteCascade="false" schema="aspen" table="call_consensus_workflows"/>
+            <child column="producing_workflow_id" foreignKey="fk_entities_producing_workflow_id_workflows" implied="false" onDeleteCascade="false" schema="aspen" table="entities"/>
+            <child column="workflow_id" foreignKey="fk_filter_read_workflows_workflow_id_workflows" implied="false" onDeleteCascade="false" schema="aspen" table="filter_read_workflows"/>
+            <child column="workflow_id" foreignKey="fk_genbank_accession_workflows_workflow_id_workflows" implied="false" onDeleteCascade="false" schema="aspen" table="genbank_accession_workflows"/>
+            <child column="workflow_id" foreignKey="fk_gisaid_accession_workflows_workflow_id_workflows" implied="false" onDeleteCascade="false" schema="aspen" table="gisaid_accession_workflows"/>
+            <child column="workflow_id" foreignKey="fk_gisaid_alignment_workflows_workflow_id_workflows" implied="false" onDeleteCascade="false" schema="aspen" table="gisaid_alignment_workflows"/>
+            <child column="workflow_id" foreignKey="fk_gisaid_workflows_workflow_id_workflows" implied="false" onDeleteCascade="false" schema="aspen" table="gisaid_workflows"/>
+            <child column="workflow_id" foreignKey="fk_phylo_runs_workflow_id_workflows" implied="false" onDeleteCascade="false" schema="aspen" table="phylo_runs"/>
+            <child column="workflow_id" foreignKey="fk_workflow_inputs_workflow_id_workflows" implied="false" onDeleteCascade="false" schema="aspen" table="workflow_inputs"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="workflow_type" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12">
+            <parent column="item_id" foreignKey="fk_workflows_workflow_type_workflow_types" implied="false" onDeleteCascade="false" schema="aspen" table="workflow_types"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="2" name="start_datetime" nullable="true" remarks="datetime when the workflow is started." size="29" type="timestamp" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="3" name="end_datetime" nullable="true" remarks="datetime when the workflow is ended.  this is only valid when the workflow's status is COMPLETED." size="29" type="timestamp" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="4" name="workflow_status" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12">
+            <parent column="item_id" foreignKey="fk_workflows_workflow_status_workflow_status_types" implied="false" onDeleteCascade="false" schema="aspen" table="workflow_status_types"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="software_versions" nullable="false" remarks="A mapping between all the tools used in this workflow and the version used." size="2147483647" type="json" typeCode="1111"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="pk_workflows" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+      </table>
+   </tables>
+</database>

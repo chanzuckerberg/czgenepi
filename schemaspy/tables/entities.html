@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>entities - aspen_db Database</title>
+        <!-- Tell the browser to be responsive to screen width -->
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+        <link rel="icon" type="image/png" sizes="16x16" href="../favicon.png">
+        <!-- Bootstrap 3.3.5 -->
+        <link rel="stylesheet" href="../bower/admin-lte/bootstrap/css/bootstrap.min.css">
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="../bower/font-awesome/css/font-awesome.min.css">
+        <!-- Ionicons -->
+        <link rel="stylesheet" href="../bower/ionicons/css/ionicons.min.css">
+        <!-- DataTables -->
+        <link rel="stylesheet" href="../bower/datatables.net-bs/css/dataTables.bootstrap.min.css">
+        <link rel="stylesheet" href="../bower/datatables.net-buttons-bs/css/buttons.bootstrap.min.css">
+        <!-- Code Mirror -->
+        <link rel="stylesheet" href="../bower/codemirror/codemirror.css">
+        <!-- Fonts -->
+        <link href='../fonts/indieflower/indie-flower.css' rel='stylesheet' type='text/css'>
+        <link href='../fonts/source-sans-pro/source-sans-pro.css' rel='stylesheet' type='text/css'>
+
+        <!-- Theme style -->
+        <link rel="stylesheet" href="../bower/admin-lte/dist/css/AdminLTE.min.css">
+        <!-- Salvattore -->
+        <link rel="stylesheet" href="../bower/salvattore/salvattore.css">
+        <!-- AdminLTE Skins. Choose a skin from the css/skins
+           folder instead of downloading all of them to reduce the load. -->
+        <link rel="stylesheet" href="../bower/admin-lte/dist/css/skins/_all-skins.min.css">
+        <!-- SchemaSpy -->
+        <link rel="stylesheet" href="../schemaSpy.css">
+
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+        <script src="../bower/html5shiv/html5shiv.min.js"></script>
+        <script src="../bower/respond/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
+    <body class="hold-transition skin-blue layout-top-nav">
+        <div class="wrapper">
+            <header class="main-header">
+                <nav class="navbar navbar-static-top">
+                    <div class="container">
+                        <div class="navbar-header">
+                            <a href="../index.html" class="navbar-brand"><b>aspen_db</b> Database</a>
+                            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse"><i class="fa fa-bars"></i></button>
+                        </div>
+
+                        <!-- Collect the nav links, forms, and other content for toggling -->
+                        <div class="collapse navbar-collapse pull-left" id="navbar-collapse">
+                            <ul class="nav navbar-nav">
+                                <li><a href="../index.html">Tables <span class="sr-only">(current)</span></a></li>
+                                <li><a href="../columns.html" title="All of the columns in the schema">Columns</a></li>
+                                <li><a href="../constraints.html" title="Useful for diagnosing error messages that just give constraint name or number">Constraints</a></li>
+                                <li><a href="../relationships.html" title="Diagram of table relationships">Relationships</a></li>
+                                <li><a href="../orphans.html" title="View of tables with neither parents nor children">Orphan&nbsp;Tables</a></li>
+                                <li><a href="../anomalies.html" title="Things that might not be quite right">Anomalies</a></li>
+                                <li><a href="../routines.html" title="Procedures and functions">Routines</a></li>
+                            </ul>
+                        </div>
+                        <!-- /.navbar-collapse -->
+                        <!-- Navbar Right Menu -->
+                    </div>
+                    <!-- /.container-fluid -->
+                </nav>
+            </header>
+            <!-- Main content -->
+            <!-- Full Width Column -->
+            <div class="content-wrapper">
+                <!-- Content Header (Page header) -->
+                <section class="content-header">
+                    <h1>entities</h1><p><span id="recordNumber">1668</span> rows</p><br />
+                </section>
+                <!-- Main content -->
+                <section class="content">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+                            <h3 id="Columns" class="box-title">Columns</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <table id="standard_table" class="table table-bordered table-striped dataTable" role="grid">
+                                <thead align='left'>
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Type</th>
+                                    <th>Size</th>
+                                    <th title='Are nulls allowed?'>Nulls</th>
+                                    <th title='Is column automatically updated?'>Auto</th>
+                                    <th title='Default value'>Default</th>
+                                    <th title='Columns in tables that reference this column'>Children</th>
+                                    <th title='Columns in tables that are referenced by this column'>Parents</th>
+                                    <th title='Comments' class="toggle"><span>Comments</span></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="id">id</span></td>
+                                    <td>serial</td>
+                                    <td>10</td>
+                                    <td title=''></td>
+                                    <td title='Automatically updated by the database'>√</td>
+                                    <td>nextval(&#39;aspen.entities_id_seq&#39;::regclass)</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                            <tr>
+                                                <td title="aligned_gisaid_dump.entity_id references entities.id via fk_aligned_gisaid_dump_entity_id_entities"><a href='aligned_gisaid_dump.html'>aligned_gisaid_dump</a><span class='relatedKey'>.entity_id</span></td>
+                                                <td class="constraint detail">fk_aligned_gisaid_dump_entity_id_entities<span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="bams.entity_id references entities.id via fk_bams_entity_id_entities"><a href='bams.html'>bams</a><span class='relatedKey'>.entity_id</span></td>
+                                                <td class="constraint detail">fk_bams_entity_id_entities<span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="genbank_accessions.entity_id references entities.id via fk_genbank_accessions_entity_id_entities"><a href='genbank_accessions.html'>genbank_accessions</a><span class='relatedKey'>.entity_id</span></td>
+                                                <td class="constraint detail">fk_genbank_accessions_entity_id_entities<span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="gisaid_accessions.entity_id references entities.id via fk_gisaid_accessions_entity_id_entities"><a href='gisaid_accessions.html'>gisaid_accessions</a><span class='relatedKey'>.entity_id</span></td>
+                                                <td class="constraint detail">fk_gisaid_accessions_entity_id_entities<span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="host_filtered_sequencing_reads_collections.entity_id references entities.id via fk_host_filtered_sequencing_reads_collections_entity_id_be9e"><a href='host_filtered_sequencing_reads_collections.html'>host_filtered_sequencing_reads_collections</a><span class='relatedKey'>.entity_id</span></td>
+                                                <td class="constraint detail">fk_host_filtered_sequencing_reads_collections_entity_id_be9e<span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="pathogen_genomes.entity_id references entities.id via fk_pathogen_genomes_entity_id_entities"><a href='pathogen_genomes.html'>pathogen_genomes</a><span class='relatedKey'>.entity_id</span></td>
+                                                <td class="constraint detail">fk_pathogen_genomes_entity_id_entities<span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="phylo_trees.entity_id references entities.id via fk_phylo_trees_entity_id_entities"><a href='phylo_trees.html'>phylo_trees</a><span class='relatedKey'>.entity_id</span></td>
+                                                <td class="constraint detail">fk_phylo_trees_entity_id_entities<span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="processed_gisaid_dump.entity_id references entities.id via fk_processed_gisaid_dump_entity_id_entities"><a href='processed_gisaid_dump.html'>processed_gisaid_dump</a><span class='relatedKey'>.entity_id</span></td>
+                                                <td class="constraint detail">fk_processed_gisaid_dump_entity_id_entities<span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="raw_gisaid_dump.entity_id references entities.id via fk_raw_gisaid_dump_entity_id_entities"><a href='raw_gisaid_dump.html'>raw_gisaid_dump</a><span class='relatedKey'>.entity_id</span></td>
+                                                <td class="constraint detail">fk_raw_gisaid_dump_entity_id_entities<span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="sequencing_reads_collections.entity_id references entities.id via fk_sequencing_reads_collections_entity_id_entities"><a href='sequencing_reads_collections.html'>sequencing_reads_collections</a><span class='relatedKey'>.entity_id</span></td>
+                                                <td class="constraint detail">fk_sequencing_reads_collections_entity_id_entities<span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="workflow_inputs.entity_id references entities.id via fk_workflow_inputs_entity_id_entities"><a href='workflow_inputs.html'>workflow_inputs</a><span class='relatedKey'>.entity_id</span></td>
+                                                <td class="constraint detail">fk_workflow_inputs_entity_id_entities<span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="entity_type">entity_type</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title=''></td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                            <tr>
+                                                <td title="entities.entity_type references entity_types.item_id via fk_entities_entity_type_entity_types"><a href='entity_types.html'>entity_types</a><span class='relatedKey'>.item_id</span></td>
+                                                <td class="constraint detail">fk_entities_entity_type_entity_types<span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="producing_workflow_id">producing_workflow_id</span></td>
+                                    <td>int4</td>
+                                    <td>10</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                            <tr>
+                                                <td title="entities.producing_workflow_id references workflows.id via fk_entities_producing_workflow_id_workflows"><a href='workflows.html'>workflows</a><span class='relatedKey'>.id</span></td>
+                                                <td class="constraint detail">fk_entities_producing_workflow_id_workflows<span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <i class="fa fa-sitemap"></i>
+                            <h3 id="Indexes" class="box-title">Indexes</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <table id="indexes_table" class="table table-bordered table-striped dataTable" role="grid">
+                                <thead>
+                                <tr>
+                                    <th>Constraint Name</th>
+                                    <th>Type</th>
+                                    <th>Sort</th>
+                                    <th>Column(s)</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey'></i> pk_entities</td>
+                                    <td>Primary key</td>
+                                    <td><span title='Ascending'>Asc</span></td>
+                                    <td>id</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div><!-- /.box-body -->
+                    </div>
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <i class="fa fa-code-fork"></i>
+                            <h3 id="Relationships" class="box-title">Relationships</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <div class="nav-tabs-custom"><!-- Tabs within a box -->
+                                <h5>Close relationships within degrees of separation</h5>
+                                <ul class="nav nav-tabs pull-left ui-sortable-handle">
+                                    <li class="active"><a href="#oneDegreeImg-chart" data-toggle="tab" aria-expanded="true">One</a></li>
+                                    <li class=""><a href="#twodegreesDegreeImg-chart" data-toggle="tab" aria-expanded="true">Two degrees</a></li>
+                                </ul>
+                                <div class="tab-content no-padding">
+                                    <div class="chart tab-pane active" id="oneDegreeImg-chart" style="position: relative; overflow-x:auto;">
+                                        <map id="oneDegreeRelationshipsDiagram" name="oneDegreeRelationshipsDiagram">
+<area shape="rect" id="node1" href="aligned_gisaid_dump.html" target="_top" title="aligned_gisaid_dump" alt="" coords="771,287,1013,468">
+<area shape="rect" id="node2" href="entities.html" target="_top" title="entities" alt="" coords="243,1041,643,1199">
+<area shape="rect" id="node4" href="entity_types.html" target="_top" title="entity_types" alt="" coords="11,1073,193,1167">
+<area shape="rect" id="node5" href="workflows.html" target="_top" title="workflows" alt="" coords="5,1331,199,1507">
+<area shape="rect" id="node3" href="bams.html" target="_top" title="bams" alt="" coords="795,485,989,661">
+<area shape="rect" id="node6" href="genbank_accessions.html" target="_top" title="genbank_accessions" alt="" coords="774,679,1010,801">
+<area shape="rect" id="node7" href="gisaid_accessions.html" target="_top" title="gisaid_accessions" alt="" coords="785,819,999,941">
+<area shape="rect" id="node8" href="host_filtered_sequencing_reads_collections.html" target="_top" title="host_filtered_sequencing_reads_collections" alt="" coords="687,959,1097,1111">
+<area shape="rect" id="node9" href="pathogen_genomes.html" target="_top" title="pathogen_genomes" alt="" coords="769,1128,1015,1245">
+<area shape="rect" id="node10" href="phylo_trees.html" target="_top" title="phylo_trees" alt="" coords="805,1263,979,1415">
+<area shape="rect" id="node11" href="processed_gisaid_dump.html" target="_top" title="processed_gisaid_dump" alt="" coords="761,1432,1023,1613">
+<area shape="rect" id="node12" href="raw_gisaid_dump.html" target="_top" title="raw_gisaid_dump" alt="" coords="784,1631,1000,1807">
+<area shape="rect" id="node13" href="sequencing_reads_collections.html" target="_top" title="sequencing_reads_collections" alt="" coords="738,5,1046,269">
+<area shape="rect" id="node14" href="workflow_inputs.html" target="_top" title="workflow_inputs" alt="" coords="787,1824,997,1947">
+</map>
+                                        <a name='diagram'><img id="oneDegreeImg" src="../diagrams/tables/entities.1degree.png" usemap="#oneDegreeRelationshipsDiagram" class="diagram" border="0" align="left"></a>
+                                    </div>
+                                    <div class="chart tab-pane " id="twodegreesDegreeImg-chart" style="position: relative; overflow-x:auto;">
+                                        <map id="twoDegreesRelationshipsDiagram" name="twoDegreesRelationshipsDiagram">
+<area shape="rect" id="node1" href="align_read_workflows.html" target="_top" title="align_read_workflows" alt="" coords="621,948,867,1036">
+<area shape="rect" id="node2" href="workflows.html" target="_top" title="workflows" alt="" coords="307,1315,500,1491">
+<area shape="rect" id="node29" href="workflow_status_types.html" target="_top" title="workflow_status_types" alt="" coords="5,1413,263,1501">
+<area shape="rect" id="node30" href="workflow_types.html" target="_top" title="workflow_types" alt="" coords="32,1308,236,1396">
+<area shape="rect" id="node3" href="aligned_gisaid_dump.html" target="_top" title="aligned_gisaid_dump" alt="" coords="1072,5,1315,187">
+<area shape="rect" id="node4" href="entities.html" target="_top" title="entities" alt="" coords="544,773,944,931">
+<area shape="rect" id="node9" href="entity_types.html" target="_top" title="entity_types" alt="" coords="313,805,494,899">
+<area shape="rect" id="node5" href="bams.html" target="_top" title="bams" alt="" coords="1097,204,1290,380">
+<area shape="rect" id="node6" href="call_consensus_workflows.html" target="_top" title="call_consensus_workflows" alt="" coords="605,1053,883,1141">
+<area shape="rect" id="node7" href="called_pathogen_genomes.html" target="_top" title="called_pathogen_genomes" alt="" coords="1456,400,1739,488">
+<area shape="rect" id="node8" href="pathogen_genomes.html" target="_top" title="pathogen_genomes" alt="" coords="1071,397,1316,515">
+<area shape="rect" id="node10" href="filter_read_workflows.html" target="_top" title="filter_read_workflows" alt="" coords="620,1159,868,1247">
+<area shape="rect" id="node11" href="genbank_accession_workflows.html" target="_top" title="genbank_accession_workflows" alt="" coords="588,1264,900,1352">
+<area shape="rect" id="node12" href="genbank_accessions.html" target="_top" title="genbank_accessions" alt="" coords="1075,532,1311,655">
+<area shape="rect" id="node13" href="gisaid_accession_workflows.html" target="_top" title="gisaid_accession_workflows" alt="" coords="599,1369,889,1457">
+<area shape="rect" id="node14" href="gisaid_accessions.html" target="_top" title="gisaid_accessions" alt="" coords="1086,672,1301,795">
+<area shape="rect" id="node15" href="gisaid_alignment_workflows.html" target="_top" title="gisaid_alignment_workflows" alt="" coords="595,1475,893,1563">
+<area shape="rect" id="node16" href="gisaid_workflows.html" target="_top" title="gisaid_workflows" alt="" coords="637,1580,851,1668">
+<area shape="rect" id="node17" href="host_filtered_sequencing_reads_collections.html" target="_top" title="host_filtered_sequencing_reads_collections" alt="" coords="988,812,1399,964">
+<area shape="rect" id="node18" href="phylo_runs.html" target="_top" title="phylo_runs" alt="" coords="659,1685,829,1773">
+<area shape="rect" id="node19" href="phylo_tree_samples.html" target="_top" title="phylo_tree_samples" alt="" coords="1480,1309,1715,1397">
+<area shape="rect" id="node20" href="phylo_trees.html" target="_top" title="phylo_trees" alt="" coords="1106,981,1281,1133">
+<area shape="rect" id="node21" href="samples.html" target="_top" title="samples" alt="" coords="1109,1543,1278,1631">
+<area shape="rect" id="node22" href="processed_gisaid_dump.html" target="_top" title="processed_gisaid_dump" alt="" coords="1062,1151,1325,1332">
+<area shape="rect" id="node23" href="raw_gisaid_dump.html" target="_top" title="raw_gisaid_dump" alt="" coords="1085,1349,1301,1525">
+<area shape="rect" id="node24" href="sequencing_reads_collections.html" target="_top" title="sequencing_reads_collections" alt="" coords="1443,1685,1751,1949">
+<area shape="rect" id="node25" href="sequencing_instrument_types.html" target="_top" title="sequencing_instrument_types" alt="" coords="1037,1824,1350,1912">
+<area shape="rect" id="node26" href="sequencing_protocol_types.html" target="_top" title="sequencing_protocol_types" alt="" coords="1048,1929,1339,2017">
+<area shape="rect" id="node27" href="uploaded_pathogen_genomes.html" target="_top" title="uploaded_pathogen_genomes" alt="" coords="1443,971,1752,1059">
+<area shape="rect" id="node28" href="workflow_inputs.html" target="_top" title="workflow_inputs" alt="" coords="1088,1684,1299,1807">
+</map>
+                                        <a name='diagram'><img id="twodegreesDegreeImg" src="../diagrams/tables/entities.2degrees.png" usemap="#twoDegreesRelationshipsDiagram" class="diagram" border="0" align="left"></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><!-- /.box-body -->
+                    </div>
+                </section>
+                <script>
+                    var config = {
+                        pagination: true
+                    }
+                </script>
+            </div>
+            <!-- /.content-wrapper -->
+            <footer class="main-footer">
+                <div>
+                    <div class="pull-right hidden-xs">
+                        <a href="https://github.com/schemaspy/schemaspy" title="GitHub for SchemaSpy"><i class="fa fa-github-square fa-2x"></i></a>
+                        <a href="http://stackoverflow.com/questions/tagged/schemaspy" title="StackOverflow for SchemaSpy"><i class="fa fa-stack-overflow fa-2x"></i></a>
+                    </div>
+                    <strong>Generated by <a href="http://schemaspy.org/" class="logo-text"><i class="fa fa-database"></i> SchemaSpy 6.1.0</a></strong>
+                </div>
+                <!-- /.container -->
+            </footer>
+        </div>
+        <!-- ./wrapper -->
+
+        <!-- jQuery 2.2.3 -->
+        <script src="../bower/admin-lte/plugins/jQuery/jquery-2.2.3.min.js"></script>
+        <script src="../bower/admin-lte/plugins/jQueryUI/jquery-ui.min.js"></script>
+        <!-- Bootstrap 3.3.5 -->
+        <script src="../bower/admin-lte/bootstrap/js/bootstrap.min.js"></script>
+        <!-- DataTables -->
+        <script src="../bower/datatables.net/jquery.dataTables.min.js"></script>
+        <script src="../bower/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+        <script src="../bower/datatables.net-buttons/dataTables.buttons.min.js"></script>
+        <script src="../bower/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+        <script src="../bower/datatables.net-buttons/buttons.html5.min.js"></script>
+        <script src="../bower/datatables.net-buttons/buttons.print.min.js"></script>
+        <script src="../bower/datatables.net-buttons/buttons.colVis.min.js"></script>
+        <!-- SheetJS -->
+        <script src="../bower/js-xlsx/xlsx.full.min.js"></script>
+        <!-- pdfmake -->
+        <script src="../bower/pdfmake/pdfmake.min.js"></script>
+        <script src="../bower/pdfmake/vfs_fonts.js"></script>
+        <!-- SlimScroll -->
+        <script src="../bower/admin-lte/plugins/slimScroll/jquery.slimscroll.min.js"></script>
+        <!-- FastClick -->
+        <script src="../bower/admin-lte/plugins/fastclick/fastclick.js"></script>
+        <!-- Salvattore -->
+        <script src="../bower/salvattore/salvattore.min.js"></script>
+        <!-- AnchorJS -->
+        <script src="../bower/anchor-js/anchor.min.js"></script>
+        <!-- CodeMirror -->
+        <script src="../bower/codemirror/codemirror.js"></script>
+        <script src="../bower/codemirror/sql.js"></script>
+        <!-- AdminLTE App -->
+        <script src="../bower/admin-lte/dist/js/app.min.js"></script>
+        <script src="table.js"></script>
+        <script src="../schemaSpy.js"></script>
+    </body>
+</html>
