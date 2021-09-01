@@ -2,16 +2,7 @@ import json
 import os
 import re
 import uuid
-from typing import (
-    Any,
-    Callable,
-    Iterable,
-    Mapping,
-    MutableSequence,
-    Optional,
-    Set,
-    Union,
-)
+from typing import Any, Callable, Iterable, Mapping, MutableSequence, Optional, Set
 
 import boto3
 import sqlalchemy
