@@ -150,9 +150,13 @@ const FilterPanel: FC<Props> = ({
       const { params, type } = f;
       let hasDefinedParam = false;
 
-      forEach(Object.keys(params), (k) => {
+      type keyType = keyof FilterParamsType;
+      const keys = Object.keys(params) as keyType[];
+
+      forEach(keys, (k) => {
+        const param = params[k];
         const isActive =
-          type === TypeFilterType.Multiple ? params[k].length > 0 : params[k];
+          param && type === TypeFilterType.Multiple ? param.length > 0 : param;
 
         if (isActive) {
           hasDefinedParam = true;
