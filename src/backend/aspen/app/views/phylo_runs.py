@@ -10,7 +10,7 @@ from marshmallow.exceptions import ValidationError
 from sqlalchemy.orm import joinedload
 
 from aspen import aws
-from aspen.app import exceptions as ex
+from aspen.error import http_exceptions as ex
 from aspen.app.app import application, requires_auth
 from aspen.app.serializers import (
     PHYLO_TREE_TYPES,

@@ -10,7 +10,7 @@ from flask import g, jsonify, make_response, Response
 from sqlalchemy import or_
 from sqlalchemy.orm import aliased, joinedload, Session
 
-from aspen.app import exceptions as ex
+from aspen.error import http_exceptions as ex
 from aspen.app.app import application, requires_auth
 from aspen.app.views.api_utils import format_datetime
 from aspen.database.models import (

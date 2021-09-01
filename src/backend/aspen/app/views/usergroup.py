@@ -5,7 +5,7 @@ from auth0.v3.exceptions import Auth0Error
 from auth0.v3.management import Auth0
 from flask import g, jsonify, request, Response
 
-from aspen.app import exceptions as ex
+from aspen.error import http_exceptions as ex
 from aspen.app.app import application, requires_auth
 from aspen.app.views.api_utils import filter_usergroup_dict
 from aspen.config.config import Config
