@@ -15,7 +15,7 @@ from typing import (
 
 import boto3
 import sqlalchemy
-from flask import g, jsonify, make_response, Response
+from flask import g, jsonify, make_response
 from sqlalchemy import or_
 from sqlalchemy.orm import aliased, joinedload, Session
 
@@ -107,9 +107,7 @@ def phylo_trees():
     return jsonify({PHYLO_TREE_KEY: results})
 
 
-def _process_phylo_tree(
-    db_session: Session, phylo_tree_id: int, user: User
-) -> Union[dict, Response]:
+def _process_phylo_tree(db_session: Session, phylo_tree_id: int, user: User) -> dict:
     """Retrieves a phylo tree and renames the nodes on the tree for a given user."""
     can_see_group_ids_trees: Set[int] = {user.group_id}
     can_see_group_ids_trees.update(
@@ -181,20 +179,13 @@ def _process_phylo_tree(
 @requires_auth
 def phylo_tree(phylo_tree_id: int):
     phylo_tree_data = _process_phylo_tree(g.db_session, phylo_tree_id, g.auth_user)
+    response = make_response(phylo_tree_data)
+    response.headers["Content-Type"] = "application/json"
+    response.headers[
+        "Content-Disposition"
+    ] = f"attachment; filename={phylo_tree_id}.json"
 
-    # check if the security check failed
-    if isinstance(phylo_tree_data, Response):
-        # return failed response
-        return phylo_tree_data
-
-    else:
-        response = make_response(phylo_tree_data)
-        response.headers["Content-Type"] = "application/json"
-        response.headers[
-            "Content-Disposition"
-        ] = f"attachment; filename={phylo_tree_id}.json"
-
-        return response
+    return response
 
 
 def _extract_accessions(accessions_list: list, node: dict):
@@ -215,22 +206,16 @@ def _extract_accessions(accessions_list: list, node: dict):
 @requires_auth
 def tree_sample_ids(phylo_tree_id: int):
     phylo_tree_data = _process_phylo_tree(g.db_session, phylo_tree_id, g.auth_user)
-    # check if the security check failed
-    if isinstance(phylo_tree_data, Response):
-        # return failed response
-        return phylo_tree_data
+    accessions = _extract_accessions([], phylo_tree_data["tree"])
+    tsv_accessions = "Sample Identifier\n" + "\n".join(accessions)
 
-    else:
-        accessions = _extract_accessions([], phylo_tree_data["tree"])
-        tsv_accessions = "Sample Identifier\n" + "\n".join(accessions)
+    response = make_response(tsv_accessions)
+    response.headers["Content-Type"] = "text/tsv"
+    response.headers[
+        "Content-Disposition"
+    ] = f"attachment; filename={phylo_tree_id}_sample_ids.tsv"
 
-        response = make_response(tsv_accessions)
-        response.headers["Content-Type"] = "text/tsv"
-        response.headers[
-            "Content-Disposition"
-        ] = f"attachment; filename={phylo_tree_id}_sample_ids.tsv"
-
-        return response
+    return response
 
 
 @application.route("/api/auspice/view/<int:phylo_tree_id>", methods=["GET"])
@@ -238,28 +223,20 @@ def tree_sample_ids(phylo_tree_id: int):
 def auspice_view(phylo_tree_id: int):
     phylo_tree_data = _process_phylo_tree(g.db_session, phylo_tree_id, g.auth_user)
 
-    # check if the security check failed
-    if isinstance(phylo_tree_data, Response):
-        # return failed response
-        return phylo_tree_data
+    s3_resource = boto3.resource(
+        "s3",
+        endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None,
+        config=boto3.session.Config(signature_version="s3v4"),
+    )
+    s3_bucket = application.aspen_config.EXTERNAL_AUSPICE_BUCKET
+    s3_key = str(uuid.uuid4())
+    s3_resource.Bucket(s3_bucket).Object(s3_key).put(Body=json.dumps(phylo_tree_data))
+    s3_client = s3_resource.meta.client
 
-    else:
-        s3_resource = boto3.resource(
-            "s3",
-            endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None,
-            config=boto3.session.Config(signature_version="s3v4"),
-        )
-        s3_bucket = application.aspen_config.EXTERNAL_AUSPICE_BUCKET
-        s3_key = str(uuid.uuid4())
-        s3_resource.Bucket(s3_bucket).Object(s3_key).put(
-            Body=json.dumps(phylo_tree_data)
-        )
-        s3_client = s3_resource.meta.client
+    presigned_url = s3_client.generate_presigned_url(
+        "get_object",
+        Params={"Bucket": s3_bucket, "Key": s3_key},
+        ExpiresIn=3600,
+    )
 
-        presigned_url = s3_client.generate_presigned_url(
-            "get_object",
-            Params={"Bucket": s3_bucket, "Key": s3_key},
-            ExpiresIn=3600,
-        )
-
-        return jsonify({"url": presigned_url})
+    return jsonify({"url": presigned_url})
