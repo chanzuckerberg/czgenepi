@@ -24,10 +24,12 @@ _PHYLO_TREE_TABLENAME = "phylo_trees"
 
 # # #
 
+
 class TreeType(enum.Enum):
     OVERVIEW = "OVERVIEW"
     TARGETED = "TARGETED"
     NON_CONTEXTUALIZED = "NON_CONTEXTUALIZED"
+
 
 _TreeTypeTable = enumtables.EnumTable(
     TreeType,

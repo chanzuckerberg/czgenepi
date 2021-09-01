@@ -55,6 +55,16 @@ def upgrade():
         schema="aspen",
     )
 
+    ancestors_to_overview_sql = sa.sql.text(
+        "UPDATE aspen.phylo_trees SET tree_type = 'OVERVIEW' WHERE phylo_trees.s3_key LIKE '%ancestors%';"
+    )
+    local_to_non_contextualized_sql = sa.sql.text(
+        "UPDATE aspen.phylo_trees SET tree_type = 'NON_CONTEXTUALIZED' WHERE phylo_trees.s3_key LIKE '%local%';"
+    )
+    conn = op.get_bind()
+    conn.execute(ancestors_to_overview_sql)
+    conn.execute(local_to_non_contextualized_sql)
+
 
 def downgrade():
     op.drop_constraint(
