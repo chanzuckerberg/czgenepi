@@ -24,6 +24,7 @@ export interface DefaultMenuSelectOption {
 
 interface Props {
   lineages: DefaultMenuSelectOption[];
+  setActiveFilterCount: (count: number) => void;
   setDataFilterFunc: Dispatch<
     SetStateAction<(data: TableItem[]) => TableItem[]>
   >;
@@ -120,7 +121,11 @@ const applyFilter = (data: TableItem[], dataFilter: FilterType) => {
   }
 };
 
-const FilterPanel: FC<Props> = ({ lineages, setDataFilterFunc }) => {
+const FilterPanel: FC<Props> = ({
+  lineages,
+  setActiveFilterCount,
+  setDataFilterFunc,
+}) => {
   const [dataFilters, setDataFilters] = useState<FiltersType>(DATA_FILTER_INIT);
 
   useEffect(() => {
@@ -139,6 +144,26 @@ const FilterPanel: FC<Props> = ({ lineages, setDataFilterFunc }) => {
 
     setDataFilterFunc(wrappedFilterFunc);
   }, [dataFilters, setDataFilterFunc]);
+
+  useEffect(() => {
+    const activeFilters = filter(dataFilters, (f) => {
+      const { params, type } = f;
+      let hasDefinedParam = false;
+
+      forEach(Object.keys(params), (k) => {
+        const isActive =
+          type === TypeFilterType.Multiple ? params[k].length > 0 : params[k];
+
+        if (isActive) {
+          hasDefinedParam = true;
+        }
+      });
+
+      return hasDefinedParam;
+    });
+
+    setActiveFilterCount(activeFilters.length);
+  }, [dataFilters, setActiveFilterCount]);
 
   const updateDataFilter = (filterKey: string, params: FilterParamsType) => {
     const { transform, type } = dataFilters[filterKey];
