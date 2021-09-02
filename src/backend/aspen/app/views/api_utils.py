@@ -183,7 +183,7 @@ def authz_sample_filters(query: Query, sample_ids: Set[str], user: User) -> Quer
 
 
 # TODO, this is incredibly similar to sample authz filters. Generalize these!
-def authz_phylo_tree_filters(query: Query, tree_ids: Set[str], user: User) -> Query:
+def authz_phylo_tree_filters(query: Query, tree_ids: Set[int], user: User) -> Query:
     # No filters for system admins
     if user.system_admin:
         query = query.filter(

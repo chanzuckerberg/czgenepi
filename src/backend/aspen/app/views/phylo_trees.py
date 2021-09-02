@@ -116,7 +116,7 @@ def _process_phylo_tree(db_session: Session, phylo_tree_id: int, user: User) -> 
         .join(PhyloRun)
         .options(joinedload(PhyloTree.constituent_samples))
     )
-    tree_query = authz_phylo_tree_filters(tree_query, [phylo_tree_id], user)
+    tree_query = authz_phylo_tree_filters(tree_query, {phylo_tree_id}, user)
     phylo_tree: PhyloTree
     try:
         phylo_tree = tree_query.one()
