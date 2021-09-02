@@ -7,7 +7,7 @@ from sqlalchemy.orm.query import Query
 from sqlalchemy.orm.session import Session
 from sqlalchemy.sql.expression import and_, or_
 
-from aspen.database.models import DataType, Group, PhyloTree, Sample, User
+from aspen.database.models import DataType, Group, PhyloRun, PhyloTree, Sample, User
 
 
 def filter_usergroup_dict(

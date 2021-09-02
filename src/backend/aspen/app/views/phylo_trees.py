@@ -186,12 +186,12 @@ def _get_selected_samples(db_session, phylo_tree_id):
     )
 
     phylo_run = phylo_tree.producing_workflow
-    all_samples = set(phylo_run.gisaid_ids)
+    selected_samples = set(phylo_run.gisaid_ids)
     for uploaded_pathogen_genome in phylo_run.inputs:
         sample = uploaded_pathogen_genome.sample
-        all_samples.add(sample.public_identifier.replace("hCoV-19/", ""))
-        all_samples.add(sample.private_identifier)
-    return all_samples
+        selected_samples.add(sample.public_identifier.replace("hCoV-19/", ""))
+        selected_samples.add(sample.private_identifier)
+    return selected_samples
 
 
 @application.route("/api/phylo_tree/<int:phylo_tree_id>", methods=["GET"])
