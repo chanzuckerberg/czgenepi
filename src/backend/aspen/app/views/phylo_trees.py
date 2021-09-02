@@ -8,7 +8,7 @@ import boto3
 import sqlalchemy
 from flask import g, jsonify, make_response
 from sqlalchemy import or_
-from sqlalchemy.orm import aliased, joinedload, Session
+from sqlalchemy.orm import aliased, contains_eager, joinedload, Query, Session
 
 from aspen.app.app import application, requires_auth
 from aspen.app.views.api_utils import (
@@ -16,10 +16,16 @@ from aspen.app.views.api_utils import (
     format_date,
     format_datetime,
 )
-from aspen.database.models import DataType, PhyloRun, PhyloTree, Sample
+from aspen.database.models import (
+    DataType,
+    PhyloRun,
+    PhyloTree,
+    Sample,
+    UploadedPathogenGenome,
+)
 from aspen.database.models.usergroup import User
 from aspen.error import http_exceptions as ex
-from aspen.fileio.tsv_streamer import MetadataTsvStreamer
+from aspen.fileio.tsv_streamer import MetadataTSVStreamer
 from aspen.phylo_tree.identifiers import rename_nodes_on_tree
 
 PHYLO_TREE_KEY = "phylo_trees"
@@ -144,8 +150,11 @@ def _process_phylo_tree(db_session: Session, phylo_tree_id: int, user: User) -> 
         if sample_filter(sample)
     }
 
-    # TODO: add a per-process shared AWS handle.
-    s3 = boto3.resource("s3")
+    s3 = boto3.resource(
+        "s3",
+        endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None,
+        config=boto3.session.Config(signature_version="s3v4"),
+    )
 
     data = (
         s3.Bucket(phylo_tree.s3_bucket).Object(phylo_tree.s3_key).get()["Body"].read()
@@ -155,6 +164,34 @@ def _process_phylo_tree(db_session: Session, phylo_tree_id: int, user: User) -> 
     rename_nodes_on_tree([json_data["tree"]], identifier_map, "GISAID_ID")
 
     return json_data
+
+
+def _get_selected_samples(db_session, phylo_tree_id):
+    # SqlAlchemy requires aliasing for any queries that join to the same table (in this case, entities)
+    # multiple times via joined table inheritance
+    # ref: https://github.com/sqlalchemy/sqlalchemy/discussions/6972
+    entity_alias = aliased(UploadedPathogenGenome, flat=True)
+    phylo_tree: PhyloTree = (
+        db_session.query(PhyloTree)
+        .join(PhyloRun, PhyloTree.producing_workflow.of_type(PhyloRun))
+        .outerjoin(entity_alias, PhyloRun.inputs.of_type(entity_alias))
+        .outerjoin(Sample)
+        .filter(PhyloTree.entity_id == phylo_tree_id)
+        .options(
+            contains_eager(PhyloTree.producing_workflow.of_type(PhyloRun))
+            .contains_eager(PhyloRun.inputs.of_type(entity_alias))
+            .contains_eager(entity_alias.sample)
+        )
+        .one()
+    )
+
+    phylo_run = phylo_tree.producing_workflow
+    all_samples = set(phylo_run.gisaid_ids)
+    for uploaded_pathogen_genome in phylo_run.inputs:
+        sample = uploaded_pathogen_genome.sample
+        all_samples.add(sample.public_identifier.replace("hCoV-19/", ""))
+        all_samples.add(sample.private_identifier)
+    return all_samples
 
 
 @application.route("/api/phylo_tree/<int:phylo_tree_id>", methods=["GET"])
@@ -189,10 +226,11 @@ def _extract_accessions(accessions_list: list, node: dict):
 def tree_sample_ids(phylo_tree_id: int):
     phylo_tree_data = _process_phylo_tree(g.db_session, phylo_tree_id, g.auth_user)
     accessions = _extract_accessions([], phylo_tree_data["tree"])
+    selected_samples = _get_selected_samples(g.db_session, phylo_tree_id)
 
     filename: str = f"{phylo_tree_id}_sample_ids.tsv"
-    streamer = MetadataTSVStreamer(filename, accessions)
-    return streamer.stream()
+    streamer = MetadataTSVStreamer(filename, accessions, selected_samples)
+    return streamer.get_response()
 
 
 @application.route("/api/auspice/view/<int:phylo_tree_id>", methods=["GET"])
