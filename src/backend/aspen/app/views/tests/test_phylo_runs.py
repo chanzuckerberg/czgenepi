@@ -178,7 +178,9 @@ def test_create_invalid_phylo_run_sample_cannot_see(
     sample = sample_factory(group, user)
 
     group2 = group_factory(name="The Other Group")
-    user2 = user_factory(group2, email="test_user@othergroup.org", auth0_user_id="other_test_auth0_id")
+    user2 = user_factory(
+        group2, email="test_user@othergroup.org", auth0_user_id="other_test_auth0_id"
+    )
     sample2 = sample_factory(group2, user2, public_identifier="USA/OTHER/123456")
 
     gisaid_dump = aligned_gisaid_dump_factory()
