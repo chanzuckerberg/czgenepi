@@ -250,6 +250,7 @@ task AlignGISAID {
     (cd /ncov; snakemake --printshellcmds results/aligned.fasta --profile my_profiles/align_gisaid 1>&2)
 
     mv /ncov/.snakemake/log/*.snakemake.log /ncov/logs/align.txt .
+    cp /ncov/data/metadata.tsv .  # Support wdl output paths.
 
     zstdmt /ncov/results/aligned.fasta
 
@@ -277,7 +278,6 @@ task AlignGISAID {
             --gisaid-s3-bucket "${aspen_s3_db_bucket}"                              \
             --gisaid-sequences-s3-key "${sequences_key}"                            \
             --gisaid-metadata-s3-key "${metadata_key}" > entity_id
-    cp /ncov/data/metadata.tsv metatdata.tsv  # Support wdl output paths.
     >>>
 
     output {
