@@ -55,5 +55,5 @@ def phylotree_factory(
         s3_key=key,
         constituent_samples=constituent_samples,
         producing_workflow=phylorun,
-        tree_type=phylorun.tree_type
+        tree_type=phylorun.tree_type,
     )
