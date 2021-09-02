@@ -28,12 +28,22 @@ def upgrade():
     )
     op.add_column(
         "phylo_runs",
-        sa.Column("tree_type", enumtables.enum_column.EnumType(), nullable=False, server_default="UNKNOWN"),
+        sa.Column(
+            "tree_type",
+            enumtables.enum_column.EnumType(),
+            nullable=False,
+            server_default="UNKNOWN",
+        ),
         schema="aspen",
     )
     op.add_column(
         "phylo_trees",
-        sa.Column("tree_type", enumtables.enum_column.EnumType(), nullable=False, server_default="UNKNOWN"),
+        sa.Column(
+            "tree_type",
+            enumtables.enum_column.EnumType(),
+            nullable=False,
+            server_default="UNKNOWN",
+        ),
         schema="aspen",
     )
     op.create_foreign_key(
