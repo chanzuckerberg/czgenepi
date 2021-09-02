@@ -22,13 +22,12 @@ from aspen.database.models.workflow import Workflow, WorkflowType
 
 _PHYLO_TREE_TABLENAME = "phylo_trees"
 
-# # #
-
 
 class TreeType(enum.Enum):
     OVERVIEW = "OVERVIEW"
     TARGETED = "TARGETED"
     NON_CONTEXTUALIZED = "NON_CONTEXTUALIZED"
+    UNKNOWN = "UNKNOWN"  # For old data imported from COVIDHub. Should never show up otherwise.
 
 
 _TreeTypeTable = enumtables.EnumTable(
@@ -37,7 +36,12 @@ _TreeTypeTable = enumtables.EnumTable(
     tablename="tree_types",
 )
 
-# # #
+TemplateTreeTypeMap = {
+    "contextual.yaml": TreeType.OVERVIEW,
+    "group_plus_context.yaml": TreeType.OVERVIEW,
+    "group.yaml": TreeType.NON_CONTEXTUALIZED,
+    "local.yaml": TreeType.NON_CONTEXTUALIZED,
+}
 
 PhyloTreeSamples = Table(
     "phylo_tree_samples",

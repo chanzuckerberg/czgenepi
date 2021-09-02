@@ -23,6 +23,7 @@ from aspen.database.models import (
     PathogenGenome,
     PhyloRun,
     Sample,
+    TreeType,
     Workflow,
     WorkflowStatusType,
 )
@@ -38,8 +39,13 @@ def start_phylo_run():
 
     # Step 1 - Validate our request body
     validator = PhyloRunRequestSchema()
+    request_json = request.get_json()
+    # We use uppercase string values in the enum but we don't particularly
+    # care what case the request is in.
+    if isinstance(request_json["tree_type"], str):
+        request_json["tree_type"] = request_json["tree_type"].upper()
     try:
-        request_data = validator.load(request.get_json())
+        request_data = validator.load(request_json)
     except ValidationError as verr:
         sentry_sdk.capture_message("Invalid API request to /api/phyloruns", "info")
         response = make_response(str(verr), 400)
@@ -132,6 +138,7 @@ def start_phylo_run():
         template_args=builds_template_args,
         name=request_data["name"],
         gisaid_ids=list(gisaid_ids),
+        tree_type=TreeType(request_data["tree_type"]),
     )
 
     # TODO -- our build pipeline assumes we've selected some samples, and everything stops making

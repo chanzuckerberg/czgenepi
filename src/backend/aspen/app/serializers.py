@@ -1,9 +1,12 @@
 from marshmallow import fields, Schema, validate
 
+from aspen.database.models import TreeType
+
 # What kinds of ondemand nextstrain builds do we support?
 PHYLO_TREE_TYPES = {
-    "local": "local.yaml",
-    "contextual": "contextual.yaml",
+    TreeType.NON_CONTEXTUALIZED.value: "local.yaml",
+    TreeType.OVERVIEW.value: "contextual.yaml",
+    TreeType.TARGETED.value: None,
 }
 
 

@@ -34,6 +34,7 @@ from aspen.database.models import (
     PhyloRun,
     Sample,
     SequencingReadsCollection,
+    TemplateTreeTypeMap,
     UploadedPathogenGenome,
     Workflow,
     WorkflowStatusType,
@@ -297,12 +298,15 @@ def create_phylo_run(
                 .first()
             )
 
+        template_filename = os.path.basename(builds_template_file)
+        tree_type = TemplateTreeTypeMap[template_filename]
+
         workflow: PhyloRun = PhyloRun(
             start_datetime=datetime.datetime.now(),
             workflow_status=WorkflowStatusType.STARTED,
             software_versions={},
             group=group,
-            # TODO: need build template / build args.
+            tree_type=tree_type,
         )
         workflow.inputs = list(pathogen_genomes)
         workflow.inputs.append(aligned_gisaid_dump)

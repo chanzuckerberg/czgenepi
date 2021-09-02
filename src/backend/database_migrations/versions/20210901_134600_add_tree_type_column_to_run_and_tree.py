@@ -80,12 +80,12 @@ def upgrade():
     copy_tree_tree_type_to_run_sql = sa.sql.text(
         "UPDATE aspen.phylo_runs SET tree_type = subquery.tree_type FROM (SELECT producing_workflow_id, tree_type FROM aspen.entities INNER JOIN aspen.phylo_trees ON entities.id = phylo_trees.entity_id) AS subquery WHERE phylo_runs.workflow_id = subquery.producing_workflow_id"
     )
-    # update remaining runs without phylo trees but with some contextual information
+    # update remaining runs without phylo trees but with some information on tree type
     assign_overview_to_group_plus_context_sql = sa.sql.text(
-        "UPDATE aspen.phylo_runs SET tree_type = 'OVERVIEW' WHERE phylo_runs.tree_type = 'UNKNOWN' AND phylo_runs.template_file_path LIKE '%group_plus_context.yaml%';"
+        "UPDATE aspen.phylo_runs SET tree_type = 'OVERVIEW' WHERE phylo_runs.tree_type = 'UNKNOWN' AND phylo_runs.template_file_path LIKE '%group_plus_context.yaml%' OR phylo_runs.template_file_path LIKE '%contextual.yaml%';"
     )
     assign_non_contextualized_to_group_sql = sa.sql.text(
-        "UPDATE aspen.phylo_runs SET tree_type = 'NON_CONTEXTUALIZED' WHERE phylo_runs.tree_type = 'UNKNOWN' AND phylo_runs.template_file_path LIKE '%group.yaml%';"
+        "UPDATE aspen.phylo_runs SET tree_type = 'NON_CONTEXTUALIZED' WHERE phylo_runs.tree_type = 'UNKNOWN' AND phylo_runs.template_file_path LIKE '%group.yaml%' OR phylo_runs.template_file_path LIKE '%local.yaml%';"
     )
     conn.execute(copy_tree_tree_type_to_run_sql)
     conn.execute(assign_overview_to_group_plus_context_sql)
