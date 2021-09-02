@@ -2,6 +2,8 @@ import json
 import random
 from typing import Collection, List, Mapping, Sequence, Tuple, Union
 
+from botocore.client import ClientError
+
 from aspen.app.views.phylo_trees import PHYLO_TREE_KEY
 from aspen.database.models import (
     CanSee,
@@ -245,9 +247,13 @@ def test_phylo_tree_can_see(
     user: User = user_factory(viewer_group)
     _, _, trees, _ = make_all_test_data(owner_group, user, n_samples, n_trees)
 
-    # We need to create the bucket since this is all in Moto's 'virtual' AWS account
     phylo_tree = trees[0]  # we only have one
-    mock_s3_resource.create_bucket(Bucket=phylo_tree.s3_bucket)
+    # Create the bucket if it doesn't exist in localstack.
+    try:
+        mock_s3_resource.meta.client.head_bucket(Bucket=phylo_tree.s3_bucket)
+    except ClientError:
+        # The bucket does not exist or you have no access.
+        mock_s3_resource.create_bucket(Bucket=phylo_tree.s3_bucket)
 
     json_test_file = test_data_dir / "ncov_aspen.json"
     with json_test_file.open() as fh:
@@ -283,9 +289,13 @@ def test_phylo_tree_no_can_see(
     user: User = user_factory(viewer_group)
     _, _, trees, _ = make_all_test_data(owner_group, user, n_samples, n_trees)
 
-    # We need to create the bucket since this is all in Moto's 'virtual' AWS account
     phylo_tree = trees[0]  # we only have one
-    mock_s3_resource.create_bucket(Bucket=phylo_tree.s3_bucket)
+    # Create the bucket if it doesn't exist in localstack.
+    try:
+        mock_s3_resource.meta.client.head_bucket(Bucket=phylo_tree.s3_bucket)
+    except ClientError:
+        # The bucket does not exist or you have no access.
+        mock_s3_resource.create_bucket(Bucket=phylo_tree.s3_bucket)
 
     json_test_file = test_data_dir / "ncov_aspen.json"
     with json_test_file.open() as fh:
@@ -321,9 +331,13 @@ def test_phylo_tree_admin(
     user: User = user_factory(viewer_group, system_admin=True)
     _, _, trees, _ = make_all_test_data(owner_group, user, n_samples, n_trees)
 
-    # We need to create the bucket since this is all in Moto's 'virtual' AWS account
     phylo_tree = trees[0]  # we only have one
-    mock_s3_resource.create_bucket(Bucket=phylo_tree.s3_bucket)
+    # Create the bucket if it doesn't exist in localstack.
+    try:
+        mock_s3_resource.meta.client.head_bucket(Bucket=phylo_tree.s3_bucket)
+    except ClientError:
+        # The bucket does not exist or you have no access.
+        mock_s3_resource.create_bucket(Bucket=phylo_tree.s3_bucket)
 
     json_test_file = test_data_dir / "ncov_aspen.json"
     with json_test_file.open() as fh:

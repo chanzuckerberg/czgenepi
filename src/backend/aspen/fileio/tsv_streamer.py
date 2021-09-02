@@ -1,10 +1,7 @@
 import csv
-from io import StringIO
-from typing import Any, Callable, Iterable, Mapping, Optional, Set
+from typing import Any, Iterable, Mapping
 
-from flask import g, jsonify, request, Response, stream_with_context
-
-from aspen.database.connection import session_scope
+from flask import Response, stream_with_context
 
 
 class SimpleStringWriter:
