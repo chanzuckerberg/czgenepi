@@ -33,6 +33,7 @@ const Data: FunctionComponent = () => {
   const [isDataLoading, setIsDataLoading] = useState(false);
   const [shouldShowFilters, setShouldShowFilters] = useState<boolean>(true);
   const [dataFilterFunc, setDataFilterFunc] = useState<any>();
+  const [activeFilterCount, setActiveFilterCount] = useState<number>(0);
 
   const router = useRouter();
 
@@ -175,6 +176,7 @@ const Data: FunctionComponent = () => {
         data-test-id="data-menu-items"
       >
         <FilterPanelToggle
+          activeFilterCount={activeFilterCount}
           onClick={() => {
             setShouldShowFilters(!shouldShowFilters);
           }}
@@ -188,6 +190,7 @@ const Data: FunctionComponent = () => {
           // TODO (mlila): replace with sds filterpanel once it's complete
           <FilterPanel
             lineages={lineages}
+            setActiveFilterCount={setActiveFilterCount}
             setDataFilterFunc={setDataFilterFunc}
           />
         )}
