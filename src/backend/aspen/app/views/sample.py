@@ -26,6 +26,7 @@ from aspen.database.models import (
 )
 from aspen.database.models.sample import create_public_ids, RegionType
 from aspen.database.models.usergroup import User
+from aspen.error import http_exceptions as ex
 from aspen.error.recoverable import RecoverableError
 from aspen.fileio.fasta_streamer import FastaStreamer
 
@@ -313,18 +314,16 @@ def create_sample():
         None, Mapping[str, list[str]]
     ] = api_utils.check_duplicate_data_in_request(request_data)
     if duplicates_in_request:
-        return Response(
+        raise ex.BadRequestException(
             f"Error processing data, either duplicate private_identifiers: {duplicates_in_request['duplicate_private_ids']} or duplicate public identifiers: {duplicates_in_request['duplicate_public_ids']} exist in the upload files, please rename duplicates before proceeding with upload.",
-            400,
         )
 
     already_exists: Union[
         None, Mapping[str, list[str]]
     ] = api_utils.check_duplicate_samples(request_data, g.db_session)
     if already_exists:
-        return Response(
+        raise ex.BadRequestException(
             f"Error inserting data, private_identifiers {already_exists['existing_private_ids']} or public_identifiers: {already_exists['existing_public_ids']} already exist in our database, please remove these samples before proceeding with upload.",
-            400,
         )
     public_ids = create_public_ids(user.group_id, g.db_session, len(request_data))
     for data in request_data:
@@ -375,10 +374,9 @@ def create_sample():
             if not check_valid_sequence(sequence):
                 # make sure we don't save any samples already added to the session
                 g.db_session.rollback()
-                return Response(
+                raise ex.BadRequestException(
                     f"Sample {sample_args['private_identifier']} contains invalid sequence characters, "
                     f"accepted characters are [WSKMYRVHDBNZNATCGU-]",
-                    400,
                 )
 
             sample: Sample = Sample(**sample_args)
@@ -410,12 +408,11 @@ def create_sample():
             g.db_session.add(uploaded_pathogen_genome)
 
         else:
-            return Response(
+            raise ex.BadRequestException(
                 f"Missing required fields {missing_fields} or encountered unexpected fields {unexpected_fields}",
-                400,
             )
     try:
         g.db_session.commit()
     except Exception as e:
-        return Response(f"Error encountered when saving data: {e}", 400)
+        raise ex.BadRequestException(f"Error encountered when saving data: {e}")
     return jsonify(success=True)

@@ -24,6 +24,7 @@ from aspen.config.config import Config
 from aspen.config.docker_compose import DockerComposeConfig
 from aspen.config.production import ProductionConfig
 from aspen.database.connection import session_scope
+from aspen.error import http_exceptions as ex
 
 static_folder = Path(__file__).parent.parent / "static"
 
@@ -53,6 +54,12 @@ application = AspenApp(
     static_folder=str(static_folder),
     aspen_config=aspen_config,
 )
+
+
+@application.errorhandler(ex.AspenException)
+def handle_bad_request(err):
+    return err.make_response()
+
 
 allowed_origins = []
 frontend_url = os.getenv("FRONTEND_URL")
