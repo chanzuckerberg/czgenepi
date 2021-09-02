@@ -88,7 +88,7 @@ def phylo_trees():
             "status": phylo_run.workflow_status.value,
             "workflow_id": phylo_run.workflow_id,
             "pathogen_genome_count": 0,  # TODO: do we still need this?,
-            "tree_type": phylo_run.tree_type,
+            "tree_type": phylo_run.tree_type.value,
         }
         for output in phylo_run.outputs:
             if isinstance(output, PhyloTree):

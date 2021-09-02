@@ -184,6 +184,7 @@ def test_create_invalid_phylo_run_sample_cannot_see(
     gisaid_dump = aligned_gisaid_dump_factory()
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     session.add(group)
+    session.add(group2)
     session.add(gisaid_dump)
     session.commit()
 
