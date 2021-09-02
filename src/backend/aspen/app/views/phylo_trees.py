@@ -11,10 +11,15 @@ from sqlalchemy import or_
 from sqlalchemy.orm import aliased, joinedload, Session
 
 from aspen.app.app import application, requires_auth
-from aspen.app.views.api_utils import format_date, format_datetime
+from aspen.app.views.api_utils import (
+    authz_phylo_tree_filters,
+    format_date,
+    format_datetime,
+)
 from aspen.database.models import DataType, PhyloRun, PhyloTree, Sample
 from aspen.database.models.usergroup import User
 from aspen.error import http_exceptions as ex
+from aspen.fileio.tsv_streamer import MetadataTsvStreamer
 from aspen.phylo_tree.identifiers import rename_nodes_on_tree
 
 PHYLO_TREE_KEY = "phylo_trees"
@@ -100,29 +105,15 @@ def phylo_trees():
 
 def _process_phylo_tree(db_session: Session, phylo_tree_id: int, user: User) -> dict:
     """Retrieves a phylo tree and renames the nodes on the tree for a given user."""
-    can_see_group_ids_trees: Set[int] = {user.group_id}
-    can_see_group_ids_trees.update(
-        {
-            can_see.owner_group_id
-            for can_see in user.group.can_see
-            if can_see.data_type == DataType.TREES
-        }
+    tree_query: Query = (
+        db_session.query(PhyloTree)
+        .join(PhyloRun)
+        .options(joinedload(PhyloTree.constituent_samples))
     )
-
+    tree_query = authz_phylo_tree_filters(tree_query, [phylo_tree_id], user)
+    phylo_tree: PhyloTree
     try:
-        phylo_tree: PhyloTree = (
-            db_session.query(PhyloTree)
-            .join(PhyloRun)
-            .filter(PhyloTree.entity_id == phylo_tree_id)
-            .filter(
-                or_(
-                    user.system_admin,
-                    PhyloRun.group_id.in_(can_see_group_ids_trees),
-                )
-            )
-            .options(joinedload(PhyloTree.constituent_samples))
-            .one()
-        )
+        phylo_tree = tree_query.one()
     except sqlalchemy.exc.NoResultFound:  # type: ignore
         raise ex.BadRequestException(
             f"PhyloTree with id {phylo_tree_id} not viewable by user with id: {user.id}"
@@ -198,15 +189,10 @@ def _extract_accessions(accessions_list: list, node: dict):
 def tree_sample_ids(phylo_tree_id: int):
     phylo_tree_data = _process_phylo_tree(g.db_session, phylo_tree_id, g.auth_user)
     accessions = _extract_accessions([], phylo_tree_data["tree"])
-    tsv_accessions = "Sample Identifier\n" + "\n".join(accessions)
 
-    response = make_response(tsv_accessions)
-    response.headers["Content-Type"] = "text/tsv"
-    response.headers[
-        "Content-Disposition"
-    ] = f"attachment; filename={phylo_tree_id}_sample_ids.tsv"
-
-    return response
+    filename: str = f"{phylo_tree_id}_sample_ids.tsv"
+    streamer = MetadataTSVStreamer(filename, accessions)
+    return streamer.stream()
 
 
 @application.route("/api/auspice/view/<int:phylo_tree_id>", methods=["GET"])

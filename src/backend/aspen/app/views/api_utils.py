@@ -180,3 +180,30 @@ def authz_sample_filters(query: Query, sample_ids: Set[str], user: User) -> Quer
         )
     )
     return query
+
+
+# TODO, this is incredibly similar to sample authz filters. Generalize these!
+def authz_phylo_tree_filters(query: Query, tree_ids: Set[str], user: User) -> Query:
+    # No filters for system admins
+    if user.system_admin:
+        query = query.filter(
+            PhyloTree.entity_id.in_(tree_ids),
+        )
+        return query
+
+    # Which groups can this user query trees for?
+    cansee_groups: Set[int] = {
+        cansee.owner_group_id
+        for cansee in user.group.can_see
+        if cansee.data_type == DataType.TREES
+    }
+    # add the user's own group
+    cansee_groups.add(user.group_id)
+
+    query = query.filter(
+        and_(
+            PhyloRun.group_id.in_(cansee_groups),
+            PhyloTree.entity_id.in_(tree_ids),
+        ),
+    )
+    return query
