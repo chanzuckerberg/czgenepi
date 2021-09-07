@@ -208,7 +208,7 @@ def phylo_tree(phylo_tree_id: int):
 
 
 def _extract_accessions(accessions_list: list, node: dict):
-    node_attributes = node["node_attrs"]
+    node_attributes = node.get("node_attrs", {})
     if "external_accession" in node_attributes:
         accessions_list.append(node_attributes["external_accession"]["value"])
     if "name" in node:

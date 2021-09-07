@@ -1,7 +1,12 @@
 import datetime
-from typing import Mapping, Union
+from typing import Iterable, Mapping, Union
 
-from aspen.database.models import PhyloRun, PhyloTree, WorkflowStatusType
+from aspen.database.models import (
+    PhyloRun,
+    PhyloTree,
+    UploadedPathogenGenome,
+    WorkflowStatusType,
+)
 
 
 class _SentinelType:
@@ -18,6 +23,8 @@ def phylorun_factory(
     end_datetime: Union[datetime.datetime, _SentinelType] = _sentinel,
     software_versions: Union[Mapping[str, str], _SentinelType] = _sentinel,
     template_args: Mapping[str, str] = {},
+    inputs: Iterable[UploadedPathogenGenome] = [],
+    gisaid_ids: Iterable[str] = [],
 ):
     start_datetime = (
         start_datetime
@@ -39,6 +46,8 @@ def phylorun_factory(
         end_datetime=end_datetime,
         software_versions=software_versions,
         template_args=template_args,
+        gisaid_ids=gisaid_ids,
+        inputs=inputs,
     )
 
 
