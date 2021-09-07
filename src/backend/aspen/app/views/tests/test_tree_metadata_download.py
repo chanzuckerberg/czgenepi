@@ -63,11 +63,11 @@ def test_tree_metadata_download(
     expected_filename = f"{tree.id}_sample_ids.tsv"
     expected_document = (
         "Sample Identifier\tSelected\r\n"
-        "public_identifier_1	n\r\n"
-        "public_identifier_2	n\r\n"
-        "public_identifier_3	n\r\n"
-        "public_identifier_4	n\r\n"
-        "public_identifier_5	n\r\n"
+        "public_identifier_1	no\r\n"
+        "public_identifier_2	no\r\n"
+        "public_identifier_3	no\r\n"
+        "public_identifier_4	no\r\n"
+        "public_identifier_5	no\r\n"
     )
     file_contents = str(res.data, encoding="UTF-8")
     assert file_contents == expected_document
@@ -132,11 +132,11 @@ def test_private_id_matrix(
             "expected_status": "200 OK",
             "expected_data": (
                 "Sample Identifier\tSelected\r\n"
-                "public_identifier_1	y\r\n"
-                "public_identifier_2	y\r\n"
-                "public_identifier_3	n\r\n"
-                "public_identifier_4	n\r\n"
-                "public_identifier_5	n\r\n"
+                "public_identifier_1	yes\r\n"
+                "public_identifier_2	yes\r\n"
+                "public_identifier_3	no\r\n"
+                "public_identifier_4	no\r\n"
+                "public_identifier_5	no\r\n"
             ),
         },
         {
@@ -144,11 +144,11 @@ def test_private_id_matrix(
             "expected_status": "200 OK",
             "expected_data": (
                 "Sample Identifier\tSelected\r\n"
-                "private_identifier_1	y\r\n"
-                "public_identifier_2	y\r\n"
-                "public_identifier_3	n\r\n"
-                "public_identifier_4	n\r\n"
-                "public_identifier_5	n\r\n"
+                "private_identifier_1	yes\r\n"
+                "public_identifier_2	yes\r\n"
+                "public_identifier_3	no\r\n"
+                "public_identifier_4	no\r\n"
+                "public_identifier_5	no\r\n"
             ),
         },
     ]

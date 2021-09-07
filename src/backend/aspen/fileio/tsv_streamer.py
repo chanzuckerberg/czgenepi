@@ -56,6 +56,6 @@ class MetadataTSVStreamer(TSVStreamer):
     def generate_row(self, item):
         data: Mapping[str, Any] = {
             "Sample Identifier": item,
-            "Selected": "y" if item in self.selected else "n",
+            "Selected": "yes" if item in self.selected else "no",
         }
         return data
