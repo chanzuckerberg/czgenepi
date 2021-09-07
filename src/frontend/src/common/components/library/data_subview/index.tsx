@@ -1,4 +1,5 @@
 import { escapeRegExp } from "lodash/fp";
+import NextLink from "next/link";
 import React, {
   FunctionComponent,
   useEffect,
@@ -8,16 +9,17 @@ import React, {
 import { Input } from "semantic-ui-react";
 import { DataTable } from "src/common/components";
 import { VIEWNAME } from "src/common/constants/types";
+import { ROUTES } from "src/common/routes";
+import { AfterModalAlert } from "./components/AfterModalAlert";
 import { CreateTreeModal } from "./components/createTreeModal";
 import DownloadModal from "./components/DownloadModal";
 import { IconButton } from "./components/IconButton";
 import style from "./index.module.scss";
 import {
-  BoldText,
-  DismissButton,
+  CreateTreeModalDiv,
   Divider,
   DownloadWrapper,
-  StyledAlert,
+  StyledButton,
   StyledChip,
   StyledDiv,
   StyledDownloadDisabledImage,
@@ -147,6 +149,7 @@ const DataSubview: FunctionComponent<Props> = ({
   const [isFastaDisabled, setFastaDisabled] = useState<boolean>(false);
   const [isCreateTreeModalOpen, setCreateTreeModalOpen] =
     useState<boolean>(false);
+  const [hasCreateTreeStarted, setCreateTreeStarted] = useState<boolean>(false);
   const [didCreateTreeFailed, setCreateTreeFailed] = useState<boolean>(false);
 
   const handleDownloadClickOpen = () => {
@@ -159,6 +162,14 @@ const DataSubview: FunctionComponent<Props> = ({
 
   const handleCreateTreeClose = () => {
     setCreateTreeModalOpen(false);
+  };
+
+  const handleCreateTreeFailed = () => {
+    setCreateTreeFailed(true);
+  };
+
+  const handleSetCreateTreeStarted = () => {
+    setCreateTreeStarted(true);
   };
 
   const handleDownloadClose = () => {
@@ -203,9 +214,23 @@ const DataSubview: FunctionComponent<Props> = ({
     }
   }, [didCreateTreeFailed]);
 
-  function handleDismissErrorClick() {
+  function handleDismissDownloadErrorClick() {
     setDownloadFailed(false);
   }
+
+  function handleDismissCreateTreeErrorClick() {
+    setCreateTreeFailed(false);
+  }
+
+  function handleCreateTreeStartedModalClose() {
+    setCreateTreeStarted(false);
+  }
+
+  useEffect(() => {
+    setTimeout(() => {
+      setCreateTreeStarted(false);
+    }, 12000);
+  }, [hasCreateTreeStarted]);
 
   // search functions
   const searcher = (
@@ -311,7 +336,8 @@ const DataSubview: FunctionComponent<Props> = ({
               failedSamples={failedSamples}
               open={isCreateTreeModalOpen}
               onClose={handleCreateTreeClose}
-              setCreateTreeFailed={setCreateTreeFailed}
+              handleCreateTreeFailed={handleCreateTreeFailed}
+              handleSetCreateTreeStarted={handleSetCreateTreeStarted}
             />
           </>
         )}
@@ -327,29 +353,77 @@ const DataSubview: FunctionComponent<Props> = ({
               />
             </div>
             <div>
-              {downloadFailed ? (
-                <StyledAlert className="elevated" severity="error">
-                  <div>
-                    <BoldText>
-                      Something went wrong and we were unable to complete one or
-                      more of your downloads
-                    </BoldText>
-                    Please try again later or{" "}
-                    <StyledLink
-                      href="mailto:aspenprivacy@chanzuckerberg.com"
-                      target="_blank"
-                      rel="noopener"
-                    >
-                      contact us
-                    </StyledLink>{" "}
-                    for help.
-                  </div>
-                  <DismissButton onClick={handleDismissErrorClick}>
-                    DISMISS
-                  </DismissButton>
-                </StyledAlert>
-              ) : (
-                downloadButton
+              {!downloadFailed &&
+                !hasCreateTreeStarted &&
+                !didCreateTreeFailed &&
+                downloadButton}
+              {downloadFailed && (
+                <AfterModalAlert
+                  alertClassName={"elevated"}
+                  alertSeverity={"error"}
+                  boldText={
+                    "Something went wrong and we were unable to complete one or more of your downloads"
+                  }
+                  lightText={
+                    <>
+                      Please try again later or{" "}
+                      <StyledLink
+                        href="mailto:aspenprivacy@chanzuckerberg.com"
+                        target="_blank"
+                        rel="noopener"
+                      >
+                        contact us
+                      </StyledLink>{" "}
+                      for help.
+                    </>
+                  }
+                  handleDismiss={handleDismissDownloadErrorClick}
+                />
+              )}
+              {didCreateTreeFailed && (
+                <AfterModalAlert
+                  alertClassName={"elevated"}
+                  alertSeverity={"error"}
+                  boldText={
+                    "Something went wrong and we were unable to start your tree build"
+                  }
+                  lightText={
+                    <>
+                      Please try again later or{" "}
+                      <StyledLink
+                        href="mailto:aspenprivacy@chanzuckerberg.com"
+                        target="_blank"
+                        rel="noopener"
+                      >
+                        contact us
+                      </StyledLink>{" "}
+                      for help.
+                    </>
+                  }
+                  handleDismiss={handleDismissCreateTreeErrorClick}
+                />
+              )}
+              {hasCreateTreeStarted && (
+                <AfterModalAlert
+                  alertClassName={"elevated"}
+                  alertSeverity={"info"}
+                  lightText={
+                    <CreateTreeModalDiv>
+                      Your tree is being created. It may take up to 12 hours to
+                      process.
+                      <NextLink href={ROUTES.PHYLO_TREES} passHref>
+                        <a href="passRef">
+                          <StyledButton
+                            color="primary"
+                            onClick={handleCreateTreeStartedModalClose}
+                          >
+                            VIEW MY TREES
+                          </StyledButton>
+                        </a>
+                      </NextLink>
+                    </CreateTreeModalDiv>
+                  }
+                />
               )}
             </div>
           </div>
