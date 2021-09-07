@@ -260,12 +260,7 @@ const DataSubview: FunctionComponent<Props> = ({
     if (viewName === VIEWNAME.SAMPLES && tableData !== undefined) {
       downloadButton = (
         <DownloadWrapper>
-          <StyledChip
-            size="medium"
-            label={checkedSamples.length}
-            status="info"
-            isRounded={true}
-          />
+          <StyledChip size="medium" label={checkedSamples.length} />
           <StyledDiv>Selected </StyledDiv>
           <Divider />
           <IconButton
