@@ -1,8 +1,8 @@
 import styled from "@emotion/styled";
+import { Chip } from "@material-ui/core";
 import {
   Alert,
   Button,
-  Chip,
   fontBodyXs,
   fontHeaderXs,
   getColors,
@@ -40,12 +40,14 @@ export const Divider = styled.div`
 `;
 
 export const StyledChip = styled(Chip)`
+  border-radius: 25px;
   ${(props) => {
     const colors = getColors(props);
     const fontWeights = getFontWeights(props);
     return `
       background-color: ${colors?.gray[200]};
       font-weight: ${fontWeights?.semibold};
+      color: ${colors?.primary[500]};  
     `;
   }}
 `;

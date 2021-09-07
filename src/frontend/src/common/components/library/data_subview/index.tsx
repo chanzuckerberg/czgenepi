@@ -264,6 +264,7 @@ const DataSubview: FunctionComponent<Props> = ({
             size="medium"
             label={checkedSamples.length}
             status="info"
+            isRounded={true}
           />
           <StyledDiv>Selected </StyledDiv>
           <Divider />
