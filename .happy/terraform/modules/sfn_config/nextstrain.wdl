@@ -11,6 +11,7 @@ workflow nextstrain {
         String s3_filestem
         String template_filename
         Map[String, String] template_args
+        String tree_type
     }
 
     call nextstrain_workflow {
@@ -22,7 +23,8 @@ workflow nextstrain {
         group_name = group_name,
         s3_filestem = s3_filestem,
         template_filename = template_filename,
-        template_args = template_args
+        template_args = template_args,
+        tree_type = tree_type
     }
 }
 
@@ -37,6 +39,7 @@ task nextstrain_workflow {
         String s3_filestem
         String template_filename
         Map[String, String] template_args
+        String tree_type
     }
 
     command <<<
@@ -64,7 +67,8 @@ task nextstrain_workflow {
                       --group-name "~{group_name}"                                                                               \
                       --all-group-sequences                                                                                      \
                       --builds-template-file /usr/src/app/aspen/workflows/nextstrain_run/builds_templates/~{template_filename}   \
-                      --builds-template-args '~{template_args}'
+                      --builds-template-args '~{template_args}'                                                                  \
+                      --tree-type "~{tree_type}"
     )
 
     # set up ncov

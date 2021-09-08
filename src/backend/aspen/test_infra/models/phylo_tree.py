@@ -1,7 +1,7 @@
 import datetime
 from typing import Mapping, Union
 
-from aspen.database.models import PhyloRun, PhyloTree, WorkflowStatusType
+from aspen.database.models import PhyloRun, PhyloTree, TreeType, WorkflowStatusType
 
 
 class _SentinelType:
@@ -18,6 +18,7 @@ def phylorun_factory(
     end_datetime: Union[datetime.datetime, _SentinelType] = _sentinel,
     software_versions: Union[Mapping[str, str], _SentinelType] = _sentinel,
     template_args: Mapping[str, str] = {},
+    tree_type=TreeType.OVERVIEW,
 ):
     start_datetime = (
         start_datetime
@@ -39,6 +40,7 @@ def phylorun_factory(
         end_datetime=end_datetime,
         software_versions=software_versions,
         template_args=template_args,
+        tree_type=tree_type,
     )
 
 
@@ -53,4 +55,5 @@ def phylotree_factory(
         s3_key=key,
         constituent_samples=constituent_samples,
         producing_workflow=phylorun,
+        tree_type=phylorun.tree_type,
     )

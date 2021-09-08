@@ -28,7 +28,7 @@ def test_create_phylo_run(
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
     data = {
         "name": "test phylorun",
-        "tree_type": "contextual",
+        "tree_type": "overview",
         "samples": [sample.public_identifier],
     }
     res = client.post("/api/phylo_runs", json=data)
@@ -66,7 +66,7 @@ def test_create_phylo_run_with_gisaid_ids(
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
     data = {
         "name": "test phylorun",
-        "tree_type": "contextual",
+        "tree_type": "overview",
         "samples": [sample.public_identifier, gisaid_sample.strain],
     }
     res = client.post("/api/phylo_runs", json=data)
@@ -102,7 +102,7 @@ def test_create_invalid_phylo_run_name(
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
     data = {
         "name": 3.1415926535,
-        "tree_type": "contextual",
+        "tree_type": "overview",
         "samples": [sample.public_identifier],
     }
     res = client.post("/api/phylo_runs", json=data)
@@ -158,7 +158,7 @@ def test_create_invalid_phylo_run_bad_sample_id(
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
     data = {
         "name": "test phylorun",
-        "tree_type": "global",
+        "tree_type": "overview",
         "samples": [sample.public_identifier, "bad_sample_identifier"],
     }
     res = client.post("/api/phylo_runs", json=data)
@@ -178,12 +178,15 @@ def test_create_invalid_phylo_run_sample_cannot_see(
     sample = sample_factory(group, user)
 
     group2 = group_factory(name="The Other Group")
-    user2 = user_factory(group2)
-    sample2 = sample_factory(group2, user2)
+    user2 = user_factory(
+        group2, email="test_user@othergroup.org", auth0_user_id="other_test_auth0_id"
+    )
+    sample2 = sample_factory(group2, user2, public_identifier="USA/OTHER/123456")
 
     gisaid_dump = aligned_gisaid_dump_factory()
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     session.add(group)
+    session.add(group2)
     session.add(gisaid_dump)
     session.commit()
 
@@ -191,7 +194,7 @@ def test_create_invalid_phylo_run_sample_cannot_see(
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
     data = {
         "name": "test phylorun",
-        "tree_type": "global",
+        "tree_type": "overview",
         "samples": [sample.public_identifier, sample2.public_identifier],
     }
     res = client.post("/api/phylo_runs", json=data)
@@ -218,7 +221,7 @@ def test_create_phylo_run_unauthorized_access_redirect(
 
     data = {
         "name": "test phylorun",
-        "tree_type": "global",
+        "tree_type": "overview",
         "samples": [sample.public_identifier],
     }
     res = client.post("/api/phylo_runs", json=data)
