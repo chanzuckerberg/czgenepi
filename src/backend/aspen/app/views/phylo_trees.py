@@ -40,7 +40,7 @@ def generate_tree_name_from_template(phylo_run: PhyloRun) -> str:
     location = phylo_run.group.location  # safe default
     if isinstance(phylo_run.template_args, Mapping):
         template_args = phylo_run.template_args
-        location = template_args["location"]
+        location = template_args.get("location", location)
     return f"{location} Tree {format_date(phylo_run.start_datetime)}"
 
 
