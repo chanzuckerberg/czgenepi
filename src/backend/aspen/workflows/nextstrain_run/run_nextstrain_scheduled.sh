@@ -30,8 +30,6 @@ TEMPLATE_ARGS=$(jq -c . < "${TEMPLATE_ARGS_FILE}")
 
 workflow_id=$(aspen-cli db create-phylo-run                                                                           \
                   --group-name "${GROUP_NAME}"                                                                               \
-                  --all-group-sequences                                                                                      \
-                  --builds-template-file "/usr/src/app/aspen/workflows/nextstrain_run/builds_templates/${TEMPLATE_FILENAME}" \
                   --builds-template-args "${TEMPLATE_ARGS}"                                                                  \
                   --tree-type "${TREE_TYPE}"
 )

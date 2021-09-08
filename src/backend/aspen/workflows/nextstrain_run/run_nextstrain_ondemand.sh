@@ -33,8 +33,8 @@ cp /usr/src/app/aspen/workflows/nextstrain_run/nextstrain_profile/* /ncov/my_pro
 aligned_gisaid_location=$(
     python3 /usr/src/app/aspen/workflows/nextstrain_run/export.py \
            --phylo-run-id "${WORKFLOW_ID}"                        \
-           --county-sequences /ncov/data/sequences_aspen.fasta     \
-           --county-metadata /ncov/data/metadata_aspen.tsv         \
+           --sequences /ncov/data/sequences_aspen.fasta     \
+           --metadata /ncov/data/metadata_aspen.tsv         \
            --selected /ncov/data/include.txt                       \
            --builds-file /ncov/my_profiles/aspen/builds.yaml       \
 )

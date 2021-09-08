@@ -12,6 +12,7 @@ from aspen.database.models import (
     WorkflowStatusType,
 )
 from aspen.test_infra.models.accession_workflow import AccessionWorkflowDirective
+from aspen.test_infra.models.sample import sample_factory
 
 
 def sequencing_read_factory(
@@ -95,3 +96,24 @@ def uploaded_pathogen_genome_factory(
             )
 
     return uploaded_pathogen_genome
+
+
+def uploaded_pathogen_genome_multifactory(group, uploaded_by_user, num_genomes):
+    pathogen_genomes = []
+    for i in range(num_genomes):
+        sample: Sample = sample_factory(
+            group,
+            uploaded_by_user,
+            private_identifier=f"private_identifier_{i}",
+            public_identifier=f"public_identifier_{i}",
+        )
+        pathogen_genome: UploadedPathogenGenome = uploaded_pathogen_genome_factory(
+            sample,
+            accessions=(),
+            pangolin_lineage=None,
+            pangolin_probability=None,
+            pangolin_version=None,
+            pangolin_last_updated=None,
+        )
+        pathogen_genomes.append(pathogen_genome)
+    return pathogen_genomes
