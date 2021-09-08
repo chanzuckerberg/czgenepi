@@ -4,6 +4,7 @@ from typing import Iterable, Mapping, Union
 from aspen.database.models import (
     PhyloRun,
     PhyloTree,
+    TreeType,
     UploadedPathogenGenome,
     WorkflowStatusType,
 )
@@ -22,10 +23,18 @@ def phylorun_factory(
     start_datetime: Union[datetime.datetime, _SentinelType] = _sentinel,
     end_datetime: Union[datetime.datetime, _SentinelType] = _sentinel,
     software_versions: Union[Mapping[str, str], _SentinelType] = _sentinel,
-    template_args: Mapping[str, str] = {},
-    inputs: Iterable[UploadedPathogenGenome] = [],
-    gisaid_ids: Iterable[str] = [],
+    template_args: Mapping[str, str] = None,
+    inputs: Iterable[UploadedPathogenGenome] = None,
+    gisaid_ids: Iterable[str] = None,
+    tree_type=TreeType.OVERVIEW,
 ):
+    if not inputs:
+        inputs = []
+    if not gisaid_ids:
+        gisaid_ids = []
+    if not template_args:
+        template_args = {}
+
     start_datetime = (
         start_datetime
         if not isinstance(start_datetime, _SentinelType)
@@ -48,6 +57,7 @@ def phylorun_factory(
         template_args=template_args,
         gisaid_ids=gisaid_ids,
         inputs=inputs,
+        tree_type=tree_type,
     )
 
 
@@ -62,4 +72,5 @@ def phylotree_factory(
         s3_key=key,
         constituent_samples=constituent_samples,
         producing_workflow=phylorun,
+        tree_type=phylorun.tree_type,
     )

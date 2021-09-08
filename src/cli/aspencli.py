@@ -303,7 +303,7 @@ def phylo_run():
 
 @phylo_run.command(name="start")
 @click.option("-n","--name", required=True, type=str)
-@click.option("-t","--type", "tree_type", required=True, type=click.Choice(["local", "contextual"], case_sensitive=False))
+@click.option("-t","--type", "tree_type", required=True, type=click.Choice(["OVERVIEW", "TARGETED", "NON_CONTEXTUALIZED"], case_sensitive=False))
 @click.option("-h", "--show-headers", is_flag=True)
 @click.argument("sample_ids", nargs=-1)
 @click.pass_context

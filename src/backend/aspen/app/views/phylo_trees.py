@@ -51,7 +51,7 @@ def generate_tree_name_from_template(phylo_run: PhyloRun) -> str:
     location = phylo_run.group.location  # safe default
     if isinstance(phylo_run.template_args, Mapping):
         template_args = phylo_run.template_args
-        location = template_args["location"]
+        location = template_args.get("location", location)
     return f"{location} Tree {format_date(phylo_run.start_datetime)}"
 
 
@@ -90,7 +90,8 @@ def phylo_trees():
             "completed_date": format_datetime(phylo_run.end_datetime),
             "status": phylo_run.workflow_status.value,
             "workflow_id": phylo_run.workflow_id,
-            "pathogen_genome_count": 0,  # TODO: do we still need this?
+            "pathogen_genome_count": 0,  # TODO: do we still need this?,
+            "tree_type": phylo_run.tree_type.value,
         }
         for output in phylo_run.outputs:
             if isinstance(output, PhyloTree):

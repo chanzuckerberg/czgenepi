@@ -1,3 +1,6 @@
+import enum
+
+import enumtables
 from sqlalchemy import (
     Column,
     ForeignKey,
@@ -12,12 +15,26 @@ from sqlalchemy.orm import backref, relationship
 
 from aspen.database.models.base import base
 from aspen.database.models.entity import Entity, EntityType
+from aspen.database.models.enum import Enum
 from aspen.database.models.sample import Sample
 from aspen.database.models.usergroup import Group
 from aspen.database.models.workflow import Workflow, WorkflowType
 
 _PHYLO_TREE_TABLENAME = "phylo_trees"
 
+
+class TreeType(enum.Enum):
+    OVERVIEW = "OVERVIEW"
+    TARGETED = "TARGETED"
+    NON_CONTEXTUALIZED = "NON_CONTEXTUALIZED"
+    UNKNOWN = "UNKNOWN"  # For old data imported from COVIDHub. Should never show up otherwise.
+
+
+_TreeTypeTable = enumtables.EnumTable(
+    TreeType,
+    base,
+    tablename="tree_types",
+)
 
 PhyloTreeSamples = Table(
     "phylo_tree_samples",
@@ -49,6 +66,12 @@ class PhyloTree(Entity):
         secondary=PhyloTreeSamples,
         backref="phylo_trees",
         uselist=True,
+    )
+
+    tree_type = Column(
+        Enum(TreeType),
+        ForeignKey(_TreeTypeTable.item_id),
+        nullable=False,
     )
 
     def __str__(self) -> str:
@@ -91,6 +114,12 @@ class PhyloRun(Workflow):
     builds file."""
 
     name = Column(String, nullable=True)
+
+    tree_type = Column(
+        Enum(TreeType),
+        ForeignKey(_TreeTypeTable.item_id),
+        nullable=False,
+    )
 
     def tree(self) -> PhyloTree:
         """Find the tree resulting from this workflow."""

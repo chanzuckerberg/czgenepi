@@ -34,6 +34,7 @@ from aspen.database.models import (
     PhyloRun,
     Sample,
     SequencingReadsCollection,
+    TreeType,
     UploadedPathogenGenome,
     Workflow,
     WorkflowStatusType,
@@ -215,6 +216,15 @@ def add_can_see(
     default="trunk",
     help="The git refspec used to launch the workflow.",
 )
+@click.option(
+    "--tree-type",
+    "tree_type",
+    required=True,
+    type=click.Choice(
+        ["OVERVIEW", "TARGETED", "NON_CONTEXTUALIZED"], case_sensitive=False
+    ),
+    help="The type of phylo tree to create.",
+)
 @click.pass_context
 def create_phylo_run(
     ctx,
@@ -224,6 +234,7 @@ def create_phylo_run(
     aligned_gisaid_dump_id: Optional[int],
     builds_template_file: str,
     builds_template_args: str,
+    tree_type: str,
     git_refspec: str,
 ):
     # these are injected into the IPython scope, but they appear to be unused.
@@ -302,7 +313,7 @@ def create_phylo_run(
             workflow_status=WorkflowStatusType.STARTED,
             software_versions={},
             group=group,
-            # TODO: need build template / build args.
+            tree_type=TreeType(tree_type),
         )
         workflow.inputs = list(pathogen_genomes)
         workflow.inputs.append(aligned_gisaid_dump)

@@ -26,6 +26,7 @@ module nextstrain_scc_local_sfn_config {
      division = "California"
      location = "Santa Clara County"
     }
+    tree_type                = "NON_CONTEXTUALIZED"
   }
 }
 
@@ -55,6 +56,7 @@ module nextstrain_scc_contextual_sfn_config {
       division = "California"
       location = "Santa Clara County"
     }
+    tree_type                = "OVERVIEW"
   }
 }
 
@@ -84,6 +86,7 @@ module nextstrain_alameda_local_sfn_config {
      division = "California"
      location = "Alameda County"
     }
+    tree_type                = "NON_CONTEXTUALIZED"
   }
 }
 
@@ -113,6 +116,7 @@ module nextstrain_alameda_contextual_sfn_config {
       division = "California"
       location = "Alameda County"
     }
+    tree_type                = "OVERVIEW"
   }
 }
 
@@ -142,6 +146,7 @@ module nextstrain_contra_costa_local_sfn_config {
      division = "California"
      location = "Contra Costa County"
     }
+    tree_type                = "NON_CONTEXTUALIZED"
   }
 }
 
@@ -171,6 +176,7 @@ module nextstrain_contra_costa_contextual_sfn_config {
       division = "California"
       location = "Contra Costa County"
     }
+    tree_type                = "OVERVIEW"
   }
 }
 
@@ -200,6 +206,7 @@ module nextstrain_fresno_local_sfn_config {
      division = "California"
      location = "Fresno County"
     }
+    tree_type                = "NON_CONTEXTUALIZED"
   }
 }
 
@@ -229,6 +236,7 @@ module nextstrain_fresno_contextual_sfn_config {
       division = "California"
       location = "Fresno County"
     }
+    tree_type                = "OVERVIEW"
   }
 }
 
@@ -258,6 +266,7 @@ module nextstrain_humboldt_local_sfn_config {
      division = "California"
      location = "Humboldt County"
     }
+    tree_type                = "NON_CONTEXTUALIZED"
   }
 }
 
@@ -287,6 +296,7 @@ module nextstrain_humboldt_contextual_sfn_config {
       division = "California"
       location = "Humboldt County"
     }
+    tree_type                = "OVERVIEW"
   }
 }
 
@@ -316,6 +326,7 @@ module nextstrain_marin_local_sfn_config {
      division = "California"
      location = "Marin County"
     }
+    tree_type                = "NON_CONTEXTUALIZED"
   }
 }
 
@@ -345,6 +356,7 @@ module nextstrain_marin_contextual_sfn_config {
       division = "California"
       location = "Marin County"
     }
+    tree_type                = "OVERVIEW"
   }
 }
 
@@ -374,6 +386,7 @@ module nextstrain_monterey_local_sfn_config {
      division = "California"
      location = "Monterey County"
     }
+    tree_type                = "NON_CONTEXTUALIZED"
   }
 }
 
@@ -403,6 +416,7 @@ module nextstrain_monterey_contextual_sfn_config {
       division = "California"
       location = "Monterey County"
     }
+    tree_type                = "OVERVIEW"
   }
 }
 
@@ -432,6 +446,7 @@ module nextstrain_orange_local_sfn_config {
      division = "California"
      location = "Orange County"
     }
+    tree_type                = "NON_CONTEXTUALIZED"
   }
 }
 
@@ -461,6 +476,7 @@ module nextstrain_orange_contextual_sfn_config {
       division = "California"
       location = "Orange County"
     }
+    tree_type                = "OVERVIEW"
   }
 }
 
@@ -490,6 +506,7 @@ module nextstrain_san_bernardino_local_sfn_config {
      division = "California"
      location = "San Bernardino County"
     }
+    tree_type                = "NON_CONTEXTUALIZED"
   }
 }
 
@@ -519,6 +536,7 @@ module nextstrain_san_bernardino_contextual_sfn_config {
       division = "California"
       location = "San Bernardino County"
     }
+    tree_type                = "OVERVIEW"
   }
 }
 
@@ -548,6 +566,7 @@ module nextstrain_del_norte_local_sfn_config {
      division = "California"
      location = "Del Norte County"
     }
+    tree_type                = "NON_CONTEXTUALIZED"
   }
 }
 
@@ -577,6 +596,7 @@ module nextstrain_del_norte_contextual_sfn_config {
       division = "California"
       location = "Del Norte County"
     }
+    tree_type                = "OVERVIEW"
   }
 }
 
@@ -606,6 +626,7 @@ module nextstrain_san_joaquin_local_sfn_config {
      division = "California"
      location = "San Joaquin County"
     }
+    tree_type                = "NON_CONTEXTUALIZED"
   }
 }
 
@@ -635,6 +656,7 @@ module nextstrain_san_joaquin_contextual_sfn_config {
       division = "California"
       location = "San Joaquin County"
     }
+    tree_type                = "OVERVIEW"
   }
 }
 
@@ -664,6 +686,7 @@ module nextstrain_san_luis_obispo_local_sfn_config {
      division = "California"
      location = "San Luis Obispo County"
     }
+    tree_type                = "NON_CONTEXTUALIZED"
   }
 }
 
@@ -693,6 +716,7 @@ module nextstrain_san_luis_obispo_contextual_sfn_config {
       division = "California"
       location = "San Luis Obispo County"
     }
+    tree_type                = "OVERVIEW"
   }
 }
 
@@ -722,6 +746,7 @@ module nextstrain_san_francisco_local_sfn_config {
      division = "California"
      location = "San Francisco County"
     }
+    tree_type                = "NON_CONTEXTUALIZED"
   }
 }
 
@@ -751,6 +776,7 @@ module nextstrain_san_francisco_contextual_sfn_config {
       division = "California"
       location = "San Francisco County"
     }
+    tree_type                = "OVERVIEW"
   }
 }
 
@@ -780,6 +806,7 @@ module nextstrain_tulare_local_sfn_config {
      division = "California"
      location = "Tulare County"
     }
+    tree_type                = "NON_CONTEXTUALIZED"
   }
 }
 
@@ -809,6 +836,7 @@ module nextstrain_tulare_contextual_sfn_config {
       division = "California"
       location = "Tulare County"
     }
+    tree_type                = "OVERVIEW"
   }
 }
 
@@ -838,6 +866,7 @@ module nextstrain_tuolumne_local_sfn_config {
      division = "California"
      location = "Tuolumne County"
     }
+    tree_type                = "NON_CONTEXTUALIZED"
   }
 }
 
@@ -867,6 +896,7 @@ module nextstrain_tuolumne_contextual_sfn_config {
       division = "California"
       location = "Tuolumne County"
     }
+    tree_type                = "OVERVIEW"
   }
 }
 
@@ -896,6 +926,7 @@ module nextstrain_ventura_local_sfn_config {
      division = "California"
      location = "Ventura County"
     }
+    tree_type                = "NON_CONTEXTUALIZED"
   }
 }
 
@@ -925,5 +956,6 @@ module nextstrain_ventura_contextual_sfn_config {
       division = "California"
       location = "Ventura County"
     }
+    tree_type                = "OVERVIEW"
   }
 }

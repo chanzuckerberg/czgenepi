@@ -26,6 +26,7 @@ from aspen.database.models.phylo_tree import (  # noqa: F401
     PhyloRun,
     PhyloTree,
     PhyloTreeSamples,
+    TreeType,
 )
 from aspen.database.models.sample import RegionType, Sample  # noqa: F401
 from aspen.database.models.sequences import (  # noqa: F401
