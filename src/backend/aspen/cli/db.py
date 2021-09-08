@@ -218,8 +218,12 @@ def add_can_see(
 )
 @click.option(
     "--tree-type",
-    required=True, 
-    type=click.Choice(["OVERVIEW", "TARGETED", "NON_CONTEXTUALIZED"], case_sensitive=False)
+    "tree_type",
+    required=True,
+    type=click.Choice(
+        ["OVERVIEW", "TARGETED", "NON_CONTEXTUALIZED"], case_sensitive=False
+    ),
+    help="The type of phylo tree to create.",
 )
 @click.pass_context
 def create_phylo_run(
