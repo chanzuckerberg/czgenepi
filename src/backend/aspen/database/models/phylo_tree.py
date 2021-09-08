@@ -36,13 +36,6 @@ _TreeTypeTable = enumtables.EnumTable(
     tablename="tree_types",
 )
 
-TemplateTreeTypeMap = {
-    "contextual.yaml": TreeType.OVERVIEW,
-    "group_plus_context.yaml": TreeType.OVERVIEW,
-    "group.yaml": TreeType.NON_CONTEXTUALIZED,
-    "local.yaml": TreeType.NON_CONTEXTUALIZED,
-}
-
 PhyloTreeSamples = Table(
     "phylo_tree_samples",
     base.metadata,  # type: ignore
