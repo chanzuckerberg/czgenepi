@@ -303,7 +303,7 @@ def test_phylo_tree_no_can_see(
     results = client.get(f"/api/phylo_tree/{trees[0].id}").get_data(as_text=True)
     assert (
         results
-        == f"PhyloTree with id {phylo_tree.id} not viewable by user with id: {user.id}"
+        == f'{{"error":"PhyloTree with id {phylo_tree.id} not viewable by user with id: {user.id}"}}\n'
     )
 
 

@@ -1,10 +1,9 @@
 import json
 
-from flask import Response
-
 from aspen.app.views.api_utils import filter_usergroup_dict
 from aspen.app.views.usergroup import GET_GROUP_FIELDS, GET_USER_FIELDS
 from aspen.database.models.usergroup import User
+from aspen.error import http_exceptions as ex
 from aspen.test_infra.models.usergroup import group_factory, user_factory
 
 
@@ -127,7 +126,7 @@ def test_usergroup_view_post_fail_no_auth0_user_id(mocker, session, app, client)
 
     mocker.patch(
         "aspen.app.views.usergroup.create_auth0_entry",
-        return_value=Response("Auth0Error", 400),
+        side_effect=ex.BadRequestException("Auth0Error"),
     )
 
     with client.session_transaction() as sess:
@@ -143,7 +142,7 @@ def test_usergroup_view_post_fail_no_auth0_user_id(mocker, session, app, client)
     res = client.post("/api/usergroup", json=data, content_type="application/json")
 
     assert res.status == "400 BAD REQUEST"
-    assert res.get_data() == b"Auth0Error"
+    assert res.get_data() == b'{"error":"Auth0Error"}\n'
 
 
 def test_usergroup_view_post_fail_not_system_admin(session, app, client):
@@ -169,7 +168,7 @@ def test_usergroup_view_post_fail_not_system_admin(session, app, client):
     assert res.status == "400 BAD REQUEST"
     assert (
         res.get_data()
-        == b"Insufficient permissions to create new user, only system admins are able to create new users"
+        == b'{"error":"Insufficient permissions to create new user, only system admins are able to create new users"}\n'
     )
 
 
@@ -194,7 +193,7 @@ def test_usergroup_view_post_fail_insufficient_info(session, app, client):
     assert res.status == "400 BAD REQUEST"
     assert (
         res.get_data()
-        == b"Insufficient information required to create new user, ['email', 'group_admin'] are required"
+        == b"{\"error\":\"Insufficient information required to create new user, ['email', 'group_admin'] are required\"}\n"
     )
 
 
