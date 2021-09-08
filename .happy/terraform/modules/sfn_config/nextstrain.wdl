@@ -67,7 +67,7 @@ task nextstrain_workflow {
                       --group-name "~{group_name}"                                                                               \
                       --all-group-sequences                                                                                      \
                       --builds-template-file /usr/src/app/aspen/workflows/nextstrain_run/builds_templates/~{template_filename}   \
-                      --builds-template-args '~{template_args}'
+                      --builds-template-args '~{template_args}'                                                                  \
                       --tree-type "~{tree_type}"
     )
 
