@@ -216,6 +216,11 @@ def add_can_see(
     default="trunk",
     help="The git refspec used to launch the workflow.",
 )
+@click.option(
+    "--tree-type",
+    required=True, 
+    type=click.Choice(["OVERVIEW", "TARGETED", "NON_CONTEXTUALIZED"], case_sensitive=False)
+)
 @click.pass_context
 def create_phylo_run(
     ctx,
