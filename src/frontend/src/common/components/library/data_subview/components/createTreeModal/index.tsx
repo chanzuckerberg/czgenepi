@@ -249,8 +249,7 @@ export const CreateTreeModal = ({
             </StyledButton>
           </form>
           <CreateTreeInfo>
-            Creating a new tree can take up to 12 hours. We will notify you when
-            your tree is ready.
+            Creating a new tree can take up to 12 hours.
           </CreateTreeInfo>
         </Content>
       </StyledDialogContent>
