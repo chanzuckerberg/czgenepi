@@ -354,10 +354,7 @@ const DataSubview: FunctionComponent<Props> = ({
               />
             </div>
             <div>
-              {!downloadFailed &&
-                !hasCreateTreeStarted &&
-                !didCreateTreeFailed &&
-                downloadButton}
+              {downloadButton}
               {downloadFailed && (
                 <AfterModalAlert
                   alertClassName={"elevated"}
