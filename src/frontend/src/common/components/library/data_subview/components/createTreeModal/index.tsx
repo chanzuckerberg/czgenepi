@@ -120,7 +120,11 @@ export const CreateTreeModal = ({
   const TREE_TYPE_TOOLTIP_TEXT = (
     <div>
       Select the Tree Type best suited for the question you are trying to anwer.{" "}
-      <Link href="https://docs.google.com/document/d/1_iQgwl3hn_pjlZLX-n0alUbbhgSPZvpW_0620Hk_kB4/edit?usp=sharing]">
+      <Link
+        href="https://docs.google.com/document/d/1_iQgwl3hn_pjlZLX-n0alUbbhgSPZvpW_0620Hk_kB4/edit?usp=sharing]"
+        target="_blank"
+        rel="noopener"
+      >
         Read our guide to learn more.
       </Link>
     </div>
