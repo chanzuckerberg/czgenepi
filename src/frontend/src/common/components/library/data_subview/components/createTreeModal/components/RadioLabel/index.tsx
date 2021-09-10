@@ -17,13 +17,17 @@ interface Props {
   selected: boolean;
 }
 
-export const RadioLabelContextual = ({ selected }: Props): JSX.Element => {
+export const RadioLabelTargeted = ({ selected }: Props): JSX.Element => {
   return (
     <div>
       <Label>
-        <LabelMain>My county and other regions </LabelMain>
+        <LabelMain>Targeted </LabelMain>
         <LabelLight>— Recommended</LabelLight>
       </Label>
+      <SmallText>
+        Includes additional publicly-available samples on GISAID from your
+        jurisdiction and other regions.
+      </SmallText>
       {selected && (
         <List>
           <StyledListItem button={false as any}>
@@ -40,7 +44,7 @@ export const RadioLabelContextual = ({ selected }: Props): JSX.Element => {
             </StyledListItemIcon>
             <ListItemText>
               <SmallText>
-                Best for seeing relationships between your selected samples,
+                Useful for seeing relationships between your selected samples,
                 other samples you have uploaded to Aspen, and publicly-available
                 samples on GISAID.
               </SmallText>
@@ -52,12 +56,18 @@ export const RadioLabelContextual = ({ selected }: Props): JSX.Element => {
   );
 };
 
-export const RadioLabelLocal = ({ selected }: Props): JSX.Element => {
+export const RadioLabelNonContextualized = ({
+  selected,
+}: Props): JSX.Element => {
   return (
     <div>
       <Label>
-        <LabelMain>My county only </LabelMain>
+        <LabelMain>Non-Contextualized </LabelMain>
       </Label>
+      <SmallText>
+        Includes additional publicly-available samples on GISAID from your
+        jurisdiction only.
+      </SmallText>
       {selected && (
         <List>
           <StyledListItem button={false as any}>
@@ -66,8 +76,18 @@ export const RadioLabelLocal = ({ selected }: Props): JSX.Element => {
             </StyledListItemIcon>
             <ListItemText>
               <SmallText>
-                Useful for seeing viral diversity in your county that may not be
-                captured by your own sampling effort.
+                Best for uncovering sampling bias in your own sampling effort.
+              </SmallText>
+            </ListItemText>
+          </StyledListItem>
+          <StyledListItem button={false as any}>
+            <StyledListItemIcon>
+              <StyledIconCheckSmall />
+            </StyledListItemIcon>
+            <ListItemText>
+              <SmallText>
+                Useful for seeing viral diversity in your jurisdiction that may
+                not be captured by your own sampling effort.
               </SmallText>
             </ListItemText>
           </StyledListItem>
@@ -78,8 +98,8 @@ export const RadioLabelLocal = ({ selected }: Props): JSX.Element => {
             <ListItemText>
               <SmallText>
                 Not recommended for epidemiological interpretation due to lack
-                of visibility into viral diversity outside of your county and
-                omission of closely-related samples.
+                of visibility into viral diversity outside of your jurisdiction
+                and omission of closely-related samples.
               </SmallText>
             </ListItemText>
           </StyledListItem>

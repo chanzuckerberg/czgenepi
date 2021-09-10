@@ -178,9 +178,7 @@ def start_phylo_run():
         endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None,
     )
 
-    execution_name = (
-        f"{group.name}-{user.name}-ondemand-nextstrain-build-{str(start_datetime)}"
-    )
+    execution_name = f"{group.prefix}-ondemand-nextstrain-{str(start_datetime)}"
     execution_name = re.sub(r"[^0-9a-zA-Z-]", r"-", execution_name)
 
     client.start_execution(

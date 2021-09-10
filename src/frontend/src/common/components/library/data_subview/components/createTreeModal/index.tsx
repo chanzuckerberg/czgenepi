@@ -6,7 +6,10 @@ import React, { SyntheticEvent, useEffect, useState } from "react";
 import { useMutation } from "react-query";
 import { createTree } from "src/common/queries/trees";
 import { Header, StyledIconButton } from "../DownloadModal/style";
-import { RadioLabelContextual, RadioLabelLocal } from "./components/RadioLabel";
+import {
+  RadioLabelNonContextualized,
+  RadioLabelTargeted,
+} from "./components/RadioLabel";
 import {
   AlertInstructionsNotSemiBold,
   AlertInstructionsSemiBold,
@@ -40,35 +43,26 @@ interface Props {
   failedSamples: any[];
   open: boolean;
   onClose: () => void;
-  setCreateTreeFailed: (hasFailed: boolean) => void;
+  handleCreateTreeFailed: () => void;
+  handleSetCreateTreeStarted: () => void;
 }
+
+export type TreeType = "TARGETED" | "NON_CONTEXTUALIZED";
 
 export const CreateTreeModal = ({
   sampleIds,
   failedSamples,
   open,
   onClose,
-  setCreateTreeFailed,
+  handleCreateTreeFailed,
+  handleSetCreateTreeStarted,
 }: Props): JSX.Element => {
   const [treeName, setTreeName] = useState<string>("");
   const [isTreeNameTooLong, setTreeNameTooLong] = useState<boolean>(false);
   const [isTreeBuildDisabled, setTreeBuildDisabled] = useState<boolean>(false);
-  const [treeType, setTreeType] = useState<string>("");
-  const [isContextual, setContextual] = useState<boolean>(true);
-  const [isLocal, setLocal] = useState<boolean>(false);
+  const [treeType, setTreeType] = useState<TreeType>("TARGETED");
   const [areInstructionsShown, setInstructionsShown] = useState<boolean>(false);
   useState<boolean>(false);
-
-  useEffect(() => {
-    if (treeType === "contextual") {
-      setLocal(false);
-      setContextual(true);
-    }
-    if (treeType === "local") {
-      setContextual(false);
-      setLocal(true);
-    }
-  }, [treeType]);
 
   useEffect(() => {
     const treeNameLength = treeName.length;
@@ -79,22 +73,26 @@ export const CreateTreeModal = ({
       setTreeBuildDisabled(true);
     } else {
       setTreeNameTooLong(false);
-      if (isContextual || isLocal) {
+      if (treeType === "TARGETED" || treeType === "NON_CONTEXTUALIZED") {
         setTreeBuildDisabled(false);
       } else {
         setTreeBuildDisabled(true);
       }
     }
-  }, [treeName, isContextual, isLocal]);
+  }, [treeName, treeType]);
 
   const mutation = useMutation(createTree, {
     onError: () => {
-      setCreateTreeFailed(true);
+      setTreeName("");
+      setTreeType("TARGETED");
+      handleCreateTreeFailed();
+      onClose();
     },
     onSuccess: () => {
       setTreeName("");
-      setTreeType("");
+      setTreeType("TARGETED");
       onClose();
+      handleSetCreateTreeStarted();
     },
   });
 
@@ -104,14 +102,17 @@ export const CreateTreeModal = ({
 
   const handleSubmit = (evt: SyntheticEvent) => {
     evt.preventDefault();
+    sampleIds = sampleIds.filter((id) => !failedSamples.includes(id));
     mutation.mutate({ sampleIds, treeName, treeType });
   };
-
   const TREE_TYPE_TOOLTIP_TEXT = (
     <div>
-      We add public samples, from GISAID, to your tree to provide important
-      context for interpreting your results.{" "}
-      <Link href="https://docs.google.com/document/d/1_iQgwl3hn_pjlZLX-n0alUbbhgSPZvpW_0620Hk_kB4/edit">
+      Select the Tree Type best suited for the question you are trying to anwer.{" "}
+      <Link
+        href="https://docs.google.com/document/d/1_iQgwl3hn_pjlZLX-n0alUbbhgSPZvpW_0620Hk_kB4/edit"
+        target="_blank"
+        rel="noopener"
+      >
         Read our guide to learn more.
       </Link>
     </div>
@@ -180,9 +181,7 @@ export const CreateTreeModal = ({
             </TreeNameSection>
             <TreeTypeSection>
               <TreeNameInfoWrapper>
-                <FieldTitle>
-                  Include publicly-available samples from:{" "}
-                </FieldTitle>
+                <FieldTitle>Tree Type: </FieldTitle>
                 <StyledTooltip
                   arrow
                   title={TREE_TYPE_TOOLTIP_TEXT}
@@ -193,19 +192,25 @@ export const CreateTreeModal = ({
               </TreeNameInfoWrapper>
               <RadioGroup
                 value={treeType}
-                onChange={(e) => setTreeType(e.target.value)}
+                onChange={(e) => setTreeType(e.target.value as TreeType)}
               >
                 <StyledFormControlLabel
-                  value="contextual"
-                  checked={isContextual}
+                  value="TARGETED"
+                  checked={treeType === "TARGETED"}
                   control={<StyledRadio />}
-                  label={<RadioLabelContextual selected={isContextual} />}
+                  label={
+                    <RadioLabelTargeted selected={treeType === "TARGETED"} />
+                  }
                 />
                 <StyledFormControlLabel
-                  value="local"
-                  checked={isLocal}
+                  value="NON_CONTEXTUALIZED"
+                  checked={treeType === "NON_CONTEXTUALIZED"}
                   control={<StyledRadio />}
-                  label={<RadioLabelLocal selected={isLocal} />}
+                  label={
+                    <RadioLabelNonContextualized
+                      selected={treeType === "NON_CONTEXTUALIZED"}
+                    />
+                  }
                 />
               </RadioGroup>
             </TreeTypeSection>
@@ -234,8 +239,7 @@ export const CreateTreeModal = ({
             </StyledButton>
           </form>
           <CreateTreeInfo>
-            Creating a new tree can take up to 12 hours. We will notify you when
-            your tree is ready.
+            Creating a new tree can take up to 12 hours.
           </CreateTreeInfo>
         </Content>
       </StyledDialogContent>

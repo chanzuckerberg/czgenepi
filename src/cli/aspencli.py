@@ -269,6 +269,18 @@ def get_userinfo(ctx):
     resp = api_client.get("/api/usergroup")
     print(resp.text)
 
+@cli.group()
+def phylo_trees():
+    pass
+
+@phylo_trees.command(name="get-sample-ids")
+@click.argument("tree_id")
+@click.pass_context
+def get_tree_sample_ids(ctx, tree_id):
+    api_client = ctx.obj["api_client"]
+    resp = api_client.get(f"/api/phylo_tree/sample_ids/{tree_id}")
+    print(resp.text)
+
 
 @cli.group()
 def samples():
