@@ -47,6 +47,8 @@ interface Props {
   handleSetCreateTreeStarted: () => void;
 }
 
+export type TreeType = "TARGETED" | "NON_CONTEXTUALIZED";
+
 export const CreateTreeModal = ({
   sampleIds,
   failedSamples,
@@ -58,7 +60,7 @@ export const CreateTreeModal = ({
   const [treeName, setTreeName] = useState<string>("");
   const [isTreeNameTooLong, setTreeNameTooLong] = useState<boolean>(false);
   const [isTreeBuildDisabled, setTreeBuildDisabled] = useState<boolean>(false);
-  const [treeType, setTreeType] = useState<string>("TARGETED");
+  const [treeType, setTreeType] = useState<TreeType>("TARGETED");
   const [areInstructionsShown, setInstructionsShown] = useState<boolean>(false);
   useState<boolean>(false);
 
@@ -103,12 +105,11 @@ export const CreateTreeModal = ({
     sampleIds = sampleIds.filter((id) => !failedSamples.includes(id));
     mutation.mutate({ sampleIds, treeName, treeType });
   };
-
   const TREE_TYPE_TOOLTIP_TEXT = (
     <div>
       Select the Tree Type best suited for the question you are trying to anwer.{" "}
       <Link
-        href="https://docs.google.com/document/d/1_iQgwl3hn_pjlZLX-n0alUbbhgSPZvpW_0620Hk_kB4/edit?usp=sharing]"
+        href="https://docs.google.com/document/d/1_iQgwl3hn_pjlZLX-n0alUbbhgSPZvpW_0620Hk_kB4/edit"
         target="_blank"
         rel="noopener"
       >
@@ -191,7 +192,7 @@ export const CreateTreeModal = ({
               </TreeNameInfoWrapper>
               <RadioGroup
                 value={treeType}
-                onChange={(e) => setTreeType(e.target.value)}
+                onChange={(e) => setTreeType(e.target.value as TreeType)}
               >
                 <StyledFormControlLabel
                   value="TARGETED"
