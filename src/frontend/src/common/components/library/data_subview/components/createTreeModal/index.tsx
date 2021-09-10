@@ -59,21 +59,8 @@ export const CreateTreeModal = ({
   const [isTreeNameTooLong, setTreeNameTooLong] = useState<boolean>(false);
   const [isTreeBuildDisabled, setTreeBuildDisabled] = useState<boolean>(false);
   const [treeType, setTreeType] = useState<string>("TARGETED");
-  const [isTargeted, setTargeted] = useState<boolean>(true);
-  const [isNonContextualized, setNoneContextualized] = useState<boolean>(false);
   const [areInstructionsShown, setInstructionsShown] = useState<boolean>(false);
   useState<boolean>(false);
-
-  useEffect(() => {
-    if (treeType === "TARGETED") {
-      setNoneContextualized(false);
-      setTargeted(true);
-    }
-    if (treeType === "NON_CONTEXTUALIZED") {
-      setTargeted(false);
-      setNoneContextualized(true);
-    }
-  }, [treeType]);
 
   useEffect(() => {
     const treeNameLength = treeName.length;
@@ -84,13 +71,13 @@ export const CreateTreeModal = ({
       setTreeBuildDisabled(true);
     } else {
       setTreeNameTooLong(false);
-      if (isTargeted || isNonContextualized) {
+      if (treeType === "TARGETED" || treeType === "NON_CONTEXTUALIZED") {
         setTreeBuildDisabled(false);
       } else {
         setTreeBuildDisabled(true);
       }
     }
-  }, [treeName, isTargeted, isNonContextualized]);
+  }, [treeName, treeType]);
 
   const mutation = useMutation(createTree, {
     onError: () => {
@@ -208,17 +195,19 @@ export const CreateTreeModal = ({
               >
                 <StyledFormControlLabel
                   value="TARGETED"
-                  checked={isTargeted}
+                  checked={treeType === "TARGETED"}
                   control={<StyledRadio />}
-                  label={<RadioLabelTargeted selected={isTargeted} />}
+                  label={
+                    <RadioLabelTargeted selected={treeType === "TARGETED"} />
+                  }
                 />
                 <StyledFormControlLabel
                   value="NON_CONTEXTUALIZED"
-                  checked={isNonContextualized}
+                  checked={treeType === "NON_CONTEXTUALIZED"}
                   control={<StyledRadio />}
                   label={
                     <RadioLabelNonContextualized
-                      selected={isNonContextualized}
+                      selected={treeType === "NON_CONTEXTUALIZED"}
                     />
                   }
                 />
