@@ -1,9 +1,8 @@
 import styled from "@emotion/styled";
 import {
-  Alert,
   Button,
   Chip,
-  fontBodyXs,
+  fontBodyXxs,
   fontHeaderXs,
   getColors,
   getFontWeights,
@@ -37,6 +36,29 @@ export const Divider = styled.div`
     border-right: 1px solid ${colors?.gray[500]};
     `;
   }}
+`;
+
+export const StyledButton = styled(Button)`
+  ${fontBodyXxs}
+  color: black;
+  &:hover {
+    background-color: transparent;
+  }
+  ${(props) => {
+    const spacings = getSpacings(props);
+    const fontWeights = getFontWeights(props);
+    return `
+      font-weight: ${fontWeights?.semibold};
+      margin-top: ${spacings?.xs}px;
+      margin-left: 0px;
+      padding-left: 0px;
+    `;
+  }}
+`;
+
+export const CreateTreeModalDiv = styled.div`
+  display: flex;
+  flex-direction: column;
 `;
 
 export const StyledChip = styled(Chip)`
@@ -90,32 +112,6 @@ export const BoldText = styled.div`
         font-weight: ${fontWeights?.semibold};
       `;
   }}
-`;
-
-export const DismissButton = styled(Button)`
-  ${fontBodyXs}
-  &:hover {
-    background-color: transparent;
-  }
-  ${(props) => {
-    const spacings = getSpacings(props);
-    const fontWeights = getFontWeights(props);
-    return `
-      font-weight: ${fontWeights?.semibold};
-      margin-top: ${spacings?.xl}px;
-      margin-left: 0px;
-      padding-left: 0px;
-    `;
-  }}
-`;
-
-export const StyledAlert = styled(Alert)`
-  position: absolute;
-  z-index: 1;
-  box-shadow: 5px 10px;
-  width: 500px;
-  margin-top: -30px;
-  right: 15px;
 `;
 
 export const StyledLink = styled(Link)`
