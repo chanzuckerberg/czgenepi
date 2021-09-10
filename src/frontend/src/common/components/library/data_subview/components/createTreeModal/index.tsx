@@ -94,6 +94,8 @@ export const CreateTreeModal = ({
 
   const mutation = useMutation(createTree, {
     onError: () => {
+      setTreeName("");
+      setTreeType("TARGETED");
       handleCreateTreeFailed();
       onClose();
     },

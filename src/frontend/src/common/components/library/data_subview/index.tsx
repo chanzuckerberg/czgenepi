@@ -1,3 +1,4 @@
+import { Fade } from "@material-ui/core";
 import { escapeRegExp } from "lodash/fp";
 import NextLink from "next/link";
 import React, {
@@ -229,7 +230,7 @@ const DataSubview: FunctionComponent<Props> = ({
   useEffect(() => {
     setTimeout(() => {
       setCreateTreeStarted(false);
-    }, 12000);
+    }, 10000);
   }, [hasCreateTreeStarted]);
 
   // search functions
@@ -403,28 +404,30 @@ const DataSubview: FunctionComponent<Props> = ({
                   handleDismiss={handleDismissCreateTreeErrorClick}
                 />
               )}
-              {hasCreateTreeStarted && (
-                <AfterModalAlert
-                  alertClassName={"elevated"}
-                  alertSeverity={"info"}
-                  lightText={
-                    <CreateTreeModalDiv>
-                      Your tree is being created. It may take up to 12 hours to
-                      process.
-                      <NextLink href={ROUTES.PHYLO_TREES} passHref>
-                        <a href="passRef">
-                          <StyledButton
-                            color="primary"
-                            onClick={handleCreateTreeStartedModalClose}
-                          >
-                            VIEW MY TREES
-                          </StyledButton>
-                        </a>
-                      </NextLink>
-                    </CreateTreeModalDiv>
-                  }
-                />
-              )}
+              <Fade in={hasCreateTreeStarted} enter={false} timeout={2000}>
+                <div>
+                  <AfterModalAlert
+                    alertClassName={"elevated"}
+                    alertSeverity={"info"}
+                    lightText={
+                      <CreateTreeModalDiv>
+                        Your tree is being created. It may take up to 12 hours
+                        to process.
+                        <NextLink href={ROUTES.PHYLO_TREES} passHref>
+                          <a href="passRef">
+                            <StyledButton
+                              color="primary"
+                              onClick={handleCreateTreeStartedModalClose}
+                            >
+                              VIEW MY TREES
+                            </StyledButton>
+                          </a>
+                        </NextLink>
+                      </CreateTreeModalDiv>
+                    }
+                  />
+                </div>
+              </Fade>
             </div>
           </div>
           <div className={style.samplesTable}>
