@@ -230,7 +230,7 @@ const DataSubview: FunctionComponent<Props> = ({
   useEffect(() => {
     setTimeout(() => {
       setCreateTreeStarted(false);
-    }, 10000);
+    }, 12000);
   }, [hasCreateTreeStarted]);
 
   // search functions
@@ -404,7 +404,13 @@ const DataSubview: FunctionComponent<Props> = ({
                   handleDismiss={handleDismissCreateTreeErrorClick}
                 />
               )}
-              <Fade in={hasCreateTreeStarted} enter={false} timeout={2000}>
+              <Fade
+                in={hasCreateTreeStarted}
+                appear={false}
+                enter={false}
+                timeout={1000}
+                unmountOnExit={true}
+              >
                 <div>
                   <AfterModalAlert
                     alertClassName={"elevated"}
