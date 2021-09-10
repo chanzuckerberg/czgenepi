@@ -35,7 +35,7 @@ export const RadioLabelTargeted = ({ selected }: Props): JSX.Element => {
               <StyledIconCheckSmall />
             </StyledListItemIcon>
             <ListItemText>
-              <SmallText>Best for local outbreak investigation. </SmallText>
+              <SmallText>Best for local outbreak investigation.</SmallText>
             </ListItemText>
           </StyledListItem>
           <StyledListItem button={false as any}>
