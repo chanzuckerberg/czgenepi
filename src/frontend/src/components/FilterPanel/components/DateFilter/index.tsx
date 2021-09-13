@@ -8,7 +8,11 @@ import {
   DATE_REGEX,
 } from "src/components/DateField/constants";
 import * as yup from "yup";
-import { StyledFilterWrapper, StyledInputDropdown } from "../../style";
+import {
+  StyledChip,
+  StyledFilterWrapper,
+  StyledInputDropdown,
+} from "../../style";
 import {
   StyledButton,
   StyledDateRange,
@@ -29,11 +33,14 @@ const DateFilter: FC<Props> = ({
   fieldKeyEnd,
   fieldKeyStart,
   inputLabel,
-  updateDateFilter,
+  updateDateFilter, // Don't directly call, use below `setDatesFromRange` instead
 }) => {
-  // TODO (mlila): use state for start/end to display to user when they reopen filter
+  // `startDate` and `endDate` represent the active filter dates. Update on filter change.
   const [startDate, setStartDate] = useState<FormattedDateType>();
   const [endDate, setEndDate] = useState<FormattedDateType>();
+  // `working...` versions are internal display while user enters date string.
+  const [workingStartDate, setWorkingStartDate] = useState<FormattedDateType>();
+  const [workingEndDate, setWorkingEndDate] = useState<FormattedDateType>();
   const [anchorEl, setAnchorEl] = useState<HTMLElement>();
 
   const validationSchema = yup.object({
@@ -66,7 +73,7 @@ const DateFilter: FC<Props> = ({
     validationSchema,
   });
 
-  const { values, validateForm } = formik;
+  const { values, validateForm, setFieldValue } = formik;
 
   useEffect(() => {
     validateForm(values);
@@ -79,9 +86,20 @@ const DateFilter: FC<Props> = ({
     return d.toISOString().substring(0, 10);
   };
 
+  // Use this over directly using `updateDateFilter` prop so we track filter changes.
+  // In addition to setting upstream filter, also sets internal date states.
   const setDatesFromRange = (start: DateType, end: DateType) => {
-    updateDateFilter(formatDate(start), formatDate(end));
+    const newStartDate = formatDate(start);
+    const newEndDate = formatDate(end);
+    setStartDate(newStartDate);
+    setEndDate(newEndDate);
+    // Also set `working...` versions and formik so visibile next time user opens dropdown
+    setWorkingStartDate(newStartDate);
+    setFieldValue(fieldKeyStart, newStartDate);
+    setWorkingEndDate(newEndDate);
+    setFieldValue(fieldKeyEnd, newEndDate);
 
+    updateDateFilter(newStartDate, newEndDate);
     handleClose();
   };
 
@@ -89,12 +107,10 @@ const DateFilter: FC<Props> = ({
     const start = new Date();
     start.setDate(start.getDate() - nDays);
 
-    const end = new Date();
-
-    setDatesFromRange(start, end);
+    setDatesFromRange(start, undefined);
   };
 
-  //TODO use new sds component for single select on preset date ranges
+  //TODO when it's available, use sds component for single select on preset date ranges
   return (
     <StyledFilterWrapper>
       <StyledInputDropdown
@@ -117,7 +133,7 @@ const DateFilter: FC<Props> = ({
               formik={formik}
               onChange={(e) => {
                 const target = e.target as HTMLTextAreaElement;
-                setStartDate(target?.value);
+                setWorkingStartDate(target?.value);
               }}
             />
             <StyledText>to</StyledText>
@@ -126,11 +142,11 @@ const DateFilter: FC<Props> = ({
               formik={formik}
               onChange={(e) => {
                 const target = e.target as HTMLTextAreaElement;
-                setEndDate(target?.value);
+                setWorkingEndDate(target?.value);
               }}
             />
           </StyledDateRange>
-          {(startDate || endDate) && (
+          {(workingStartDate || workingEndDate) && (
             <StyledButton
               color="primary"
               variant="contained"
@@ -153,8 +169,39 @@ const DateFilter: FC<Props> = ({
         </MenuItem>
         <MenuItem onClick={() => setDatesFromOffset(365)}>Last Year</MenuItem>
       </Menu>
+      <DateChip
+        startDate={startDate}
+        endDate={endDate}
+        deleteDateFilter={() => setDatesFromRange(undefined, undefined)}
+      />
     </StyledFilterWrapper>
   );
 };
+
+interface DateChipProps {
+  startDate?: DateType;
+  endDate?: DateType;
+  deleteDateFilter: () => void;
+}
+
+function DateChip({
+  startDate,
+  endDate,
+  deleteDateFilter,
+}: DateChipProps): JSX.Element | null {
+  // DateChip should only display if we have at least one of startDate/endDate
+  if (!startDate && !endDate) return null;
+
+  // Get the date chip message. Structure varies if only one of the two dates.
+  // Might be worth extracting date message to a common helper func elsewhere?
+  const dateIntervalLabel = `${startDate || "Prior"} to ${endDate || "Today"}`;
+  return (
+    <StyledChip
+      size="medium"
+      label={dateIntervalLabel}
+      onDelete={deleteDateFilter}
+    />
+  );
+}
 
 export { DateFilter };
