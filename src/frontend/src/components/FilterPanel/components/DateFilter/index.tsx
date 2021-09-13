@@ -194,7 +194,7 @@ function DateChip({
 
   // Get the date chip message. Structure varies if only one of the two dates.
   // Might be worth extracting date message to a common helper func elsewhere?
-  const dateIntervalLabel = `${startDate || "Prior"} to ${endDate || "today"}`;
+  const dateIntervalLabel = `${startDate || "Prior"} to ${endDate || "Today"}`;
   return (
     <StyledChip
       size="medium"
