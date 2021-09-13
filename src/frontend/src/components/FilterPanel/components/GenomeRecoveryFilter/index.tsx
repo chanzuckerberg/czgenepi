@@ -63,7 +63,6 @@ const GenomeRecoveryFilter = ({
         <StyledInputDropdown
           sdsStyle="minimal"
           label="Genome Recovery"
-          // @ts-expect-error remove line when inputdropdown types fixed in sds
           onClick={handleClick}
         />
         <Chips value={value} onDelete={handleDelete} />

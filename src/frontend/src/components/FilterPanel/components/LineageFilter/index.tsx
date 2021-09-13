@@ -1,13 +1,6 @@
-import Popper from "@material-ui/core/Popper";
-import { AutocompleteCloseReason } from "@material-ui/lab";
-import { MenuSelect } from "czifui";
+import { ComplexFilter } from "czifui";
 import React, { useEffect, useState } from "react";
 import { DefaultMenuSelectOption } from "../../index";
-import {
-  StyledChip,
-  StyledFilterWrapper,
-  StyledInputDropdown,
-} from "../../style";
 
 interface Props {
   options: DefaultMenuSelectOption[];
@@ -17,110 +10,48 @@ interface Props {
 const LineageFilter = (props: Props): JSX.Element => {
   const { options = [], updateLineageFilter } = props;
 
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const [value, setValue] = useState<DefaultMenuSelectOption[] | undefined>([]);
-  const [pendingValue, setPendingValue] = useState<
-    DefaultMenuSelectOption[] | undefined
-  >([]);
+  // FIXME (Vince) -- TypeScript has slayed me. Or maybe the intereaction with czifui?
+  // Types break because the `onChange` value must accept single DefaultMenuSelectOption
+  // and null as possible input args. But if we do that, then `value` is implied to possibly
+  // be those, which it can't be because of required `.map` below.
+  // Not sure how to go about fixing this. Probably some forced assertion? But where?
+  const [value, setValue] = useState<DefaultMenuSelectOption[]>([]);
 
   useEffect(() => {
     if (value) {
-      updateLineageFilter(value.map((d) => d.name));
+      updateLineageFilter(value.map((d: DefaultMenuSelectOption) => d.name));
     }
   }, [updateLineageFilter, value]);
 
-  const open = Boolean(anchorEl);
-  const id = open ? "lineage-filter" : undefined;
+  // (vince) To tweak the internal style of dropdown in ComplexFilter, need to
+  // create a specialized set of props to insert CSS via raw `style` put into
+  // underlying HTML tag.
+  // TODO -- This approach is very different. Talk to SDS team about ways to avoid.
+  const PROPS_FOR_INPUT_DROPDOWN = {
+    sdsStyle: "minimal", // Would be defaulted, but must set everything now.
+    // This `style` gets directly put in as HTML style and interpolated to CSS.
+    style: {
+      padding: "0",
+      textTransform: "uppercase",
+    },
+  } as const;
 
+  // TODO (vince) -- BUG -- Need to talk to Timmy
+  // The ComplexFilter is not displaying previously selected options as I'd expect.
+  // It shouldn't need an explicit `value` passed in (this would make it isControlled
+  // in the czifui ComplexFilter interally), the non-controlled versions in Storybook
+  // maintain state of selected options on open and close. But here it's not...
   return (
-    <>
-      <StyledFilterWrapper>
-        <StyledInputDropdown
-          sdsStyle="minimal"
-          label="Lineage"
-          // @ts-expect-error remove line when inputdropdown types fixed in sds
-          onClick={handleClick}
-        />
-        <Chips value={value} onDelete={handleDelete} />
-      </StyledFilterWrapper>
-      <Popper id={id} open={open} anchorEl={anchorEl}>
-        <MenuSelect
-          disableCloseOnSelect
-          multiple
-          open
-          search
-          onClose={handleClose}
-          value={pendingValue}
-          onChange={handleChange}
-          options={options}
-        />
-      </Popper>
-    </>
+    <ComplexFilter
+      label="Lineage"
+      options={options}
+      /* @ts-expect-error -- TODO look into czifui ComplexFilter type for onChange*/
+      onChange={setValue}
+      multiple
+      search
+      InputDropdownProps={PROPS_FOR_INPUT_DROPDOWN}
+    />
   );
-
-  function handleClick(event: React.MouseEvent<HTMLElement>) {
-    setPendingValue(value as DefaultMenuSelectOption[]);
-    setAnchorEl(event.currentTarget);
-  }
-
-  function handleClose(
-    _: React.ChangeEvent<unknown>,
-    reason: AutocompleteCloseReason
-  ) {
-    if (reason === "toggleInput") {
-      return;
-    }
-
-    setValue(pendingValue);
-
-    if (anchorEl) {
-      anchorEl.focus();
-    }
-
-    setAnchorEl(null);
-  }
-
-  function handleChange(
-    _: React.ChangeEvent<unknown>,
-    newValue: DefaultMenuSelectOption[] | undefined
-  ) {
-    return setPendingValue(newValue as DefaultMenuSelectOption[]);
-  }
-
-  function handleDelete(option: DefaultMenuSelectOption) {
-    const newValue = (value as DefaultMenuSelectOption[]).filter(
-      (item) => item !== option
-    );
-
-    setValue(newValue);
-  }
 };
-
-interface ChipsProps {
-  value?: DefaultMenuSelectOption[];
-  onDelete: (option: DefaultMenuSelectOption) => void;
-}
-
-// TODO (mlila): replace with sds tag when it's complete
-function Chips({ value, onDelete }: ChipsProps): JSX.Element | null {
-  if (!value) return null;
-
-  return (
-    <div>
-      {(value as DefaultMenuSelectOption[]).map((item) => {
-        const { name } = item;
-
-        return (
-          <StyledChip
-            size="medium"
-            key={name}
-            label={name}
-            onDelete={() => onDelete(item)}
-          />
-        );
-      })}
-    </div>
-  );
-}
 
 export { LineageFilter };
