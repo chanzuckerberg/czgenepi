@@ -45,6 +45,7 @@ const LineageFilter = (props: Props): JSX.Element => {
     <ComplexFilter
       label="Lineage"
       options={options}
+      /* @ts-expect-error -- TODO look into czifui ComplexFilter type for onChange*/
       onChange={setValue}
       multiple
       search

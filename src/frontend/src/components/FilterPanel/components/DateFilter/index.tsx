@@ -9,9 +9,9 @@ import {
 } from "src/components/DateField/constants";
 import * as yup from "yup";
 import {
+  StyledChip,
   StyledFilterWrapper,
   StyledInputDropdown,
-  StyledChip,
 } from "../../style";
 import {
   StyledButton,
@@ -73,11 +73,7 @@ const DateFilter: FC<Props> = ({
     validationSchema,
   });
 
-  const {
-    values,
-    validateForm,
-    setFieldValue,
-  } = formik;
+  const { values, validateForm, setFieldValue } = formik;
 
   useEffect(() => {
     validateForm(values);
@@ -89,7 +85,6 @@ const DateFilter: FC<Props> = ({
 
     return d.toISOString().substring(0, 10);
   };
-
 
   // Use this over directly using `updateDateFilter` prop so we track filter changes.
   // In addition to setting upstream filter, also sets internal date states.
@@ -114,7 +109,6 @@ const DateFilter: FC<Props> = ({
 
     setDatesFromRange(start, undefined);
   };
-
 
   //TODO when it's available, use sds component for single select on preset date ranges
   return (
@@ -184,14 +178,13 @@ const DateFilter: FC<Props> = ({
   );
 };
 
-
 interface DateChipProps {
   startDate?: DateType;
   endDate?: DateType;
   deleteDateFilter: () => void;
 }
 
-function DateChip ({
+function DateChip({
   startDate,
   endDate,
   deleteDateFilter,
@@ -201,7 +194,7 @@ function DateChip ({
 
   // Get the date chip message. Structure varies if only one of the two dates.
   // Might be worth extracting date message to a common helper func elsewhere?
-  const dateIntervalLabel = `${startDate || 'Prior'} to ${endDate || 'today'}`;
+  const dateIntervalLabel = `${startDate || "Prior"} to ${endDate || "today"}`;
   return (
     <StyledChip
       size="medium"
