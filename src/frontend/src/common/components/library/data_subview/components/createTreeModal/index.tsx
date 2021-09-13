@@ -184,6 +184,7 @@ export const CreateTreeModal = ({
                 <FieldTitle>Tree Type: </FieldTitle>
                 <StyledTooltip
                   arrow
+                  leaveDelay={1000}
                   title={TREE_TYPE_TOOLTIP_TEXT}
                   placement="top"
                 >
