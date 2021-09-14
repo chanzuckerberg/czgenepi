@@ -1,6 +1,5 @@
-import { ComplexFilter } from "czifui";
+import { ComplexFilter, ComplexFilterValue, DefaultMenuSelectOption } from "czifui";
 import React, { useEffect, useState } from "react";
-import { DefaultMenuSelectOption } from "../../index";
 
 interface Props {
   options: DefaultMenuSelectOption[];
@@ -15,11 +14,11 @@ const LineageFilter = (props: Props): JSX.Element => {
   // and null as possible input args. But if we do that, then `value` is implied to possibly
   // be those, which it can't be because of required `.map` below.
   // Not sure how to go about fixing this. Probably some forced assertion? But where?
-  const [value, setValue] = useState<DefaultMenuSelectOption[]>([]);
+  const [value, setValue] = useState<ComplexFilterValue>([]);
 
   useEffect(() => {
     if (value) {
-      updateLineageFilter(value.map((d: DefaultMenuSelectOption) => d.name));
+      updateLineageFilter((value as DefaultMenuSelectOption[]).map((d) => d.name));
     }
   }, [updateLineageFilter, value]);
 
@@ -45,7 +44,6 @@ const LineageFilter = (props: Props): JSX.Element => {
     <ComplexFilter
       label="Lineage"
       options={options}
-      /* @ts-expect-error -- TODO look into czifui ComplexFilter type for onChange*/
       onChange={setValue}
       multiple
       search
