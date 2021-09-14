@@ -4,9 +4,9 @@ from aspen.database.models import TreeType
 
 # What kinds of ondemand nextstrain builds do we support?
 PHYLO_TREE_TYPES = {
-    TreeType.NON_CONTEXTUALIZED.value: "local.yaml",
-    TreeType.OVERVIEW.value: "contextual.yaml",
-    TreeType.TARGETED.value: None,
+    TreeType.NON_CONTEXTUALIZED.value: "non_contextualized.yaml",
+    TreeType.OVERVIEW.value: None,
+    TreeType.TARGETED.value: "targeted.yaml",
 }
 
 
