@@ -96,6 +96,8 @@ const applyFilter = (data: TableItem[], dataFilter: FilterType) => {
 
   switch (type) {
     case TypeFilterType.Date:
+      if (!start && !end) return data;
+
       return filter(data, (d) => {
         const value = transform ? transform(d) : d;
 
