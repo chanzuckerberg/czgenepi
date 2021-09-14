@@ -28,7 +28,7 @@ def test_create_phylo_run(
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
     data = {
         "name": "test phylorun",
-        "tree_type": "overview",
+        "tree_type": "targeted",
         "samples": [sample.public_identifier],
     }
     res = client.post("/api/phylo_runs", json=data)
@@ -37,7 +37,7 @@ def test_create_phylo_run(
     template_args = response["template_args"]
     assert template_args["division"] == group.division
     assert template_args["location"] == group.location
-    assert "contextual.yaml" in response["template_file_path"]
+    assert "targeted.yaml" in response["template_file_path"]
     assert response["workflow_status"] == "STARTED"
     assert response["group"]["name"] == group.name
     assert "id" in response
@@ -66,7 +66,7 @@ def test_create_phylo_run_with_gisaid_ids(
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
     data = {
         "name": "test phylorun",
-        "tree_type": "overview",
+        "tree_type": "non_contextualized",
         "samples": [sample.public_identifier, gisaid_sample.strain],
     }
     res = client.post("/api/phylo_runs", json=data)
@@ -75,7 +75,7 @@ def test_create_phylo_run_with_gisaid_ids(
     template_args = response["template_args"]
     assert template_args["division"] == group.division
     assert template_args["location"] == group.location
-    assert "contextual.yaml" in response["template_file_path"]
+    assert "non_contextualized.yaml" in response["template_file_path"]
     assert response["workflow_status"] == "STARTED"
     assert response["group"]["name"] == group.name
     assert "id" in response
@@ -102,7 +102,7 @@ def test_create_invalid_phylo_run_name(
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
     data = {
         "name": 3.1415926535,
-        "tree_type": "overview",
+        "tree_type": "targeted",
         "samples": [sample.public_identifier],
     }
     res = client.post("/api/phylo_runs", json=data)
@@ -158,7 +158,7 @@ def test_create_invalid_phylo_run_bad_sample_id(
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
     data = {
         "name": "test phylorun",
-        "tree_type": "overview",
+        "tree_type": "non_contextualized",
         "samples": [sample.public_identifier, "bad_sample_identifier"],
     }
     res = client.post("/api/phylo_runs", json=data)
@@ -194,7 +194,7 @@ def test_create_invalid_phylo_run_sample_cannot_see(
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
     data = {
         "name": "test phylorun",
-        "tree_type": "overview",
+        "tree_type": "non_contextualized",
         "samples": [sample.public_identifier, sample2.public_identifier],
     }
     res = client.post("/api/phylo_runs", json=data)
@@ -221,7 +221,7 @@ def test_create_phylo_run_unauthorized_access_redirect(
 
     data = {
         "name": "test phylorun",
-        "tree_type": "overview",
+        "tree_type": "non_contextualized",
         "samples": [sample.public_identifier],
     }
     res = client.post("/api/phylo_runs", json=data)
