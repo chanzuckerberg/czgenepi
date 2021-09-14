@@ -213,10 +213,10 @@ const FilterPanel: FC<Props> = ({
 
   return (
     <StyledFilterPanel>
+      <UploadDateFilter updateUploadDateFilter={updateUploadDateFilter} />
       <CollectionDateFilter
         updateCollectionDateFilter={updateCollectionDateFilter}
       />
-      <UploadDateFilter updateUploadDateFilter={updateUploadDateFilter} />
       <LineageFilter
         options={lineages}
         updateLineageFilter={updateLineageFilter}
