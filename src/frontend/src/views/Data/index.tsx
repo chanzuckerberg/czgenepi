@@ -186,10 +186,11 @@ const Data: FunctionComponent = () => {
         </Menu>
       </FlexContainer>
       <FlexContainer className={style.view}>
-        {viewName === "Samples" && shouldShowFilters && (
+        {viewName === "Samples" && (
           // TODO (mlila): replace with sds filterpanel once it's complete
           <FilterPanel
             lineages={lineages}
+            isOpen={shouldShowFilters}
             setActiveFilterCount={setActiveFilterCount}
             setDataFilterFunc={setDataFilterFunc}
           />

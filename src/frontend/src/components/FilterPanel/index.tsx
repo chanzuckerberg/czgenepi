@@ -23,6 +23,7 @@ export interface DefaultMenuSelectOption {
 }
 
 interface Props {
+  isOpen: boolean;
   lineages: DefaultMenuSelectOption[];
   setActiveFilterCount: (count: number) => void;
   setDataFilterFunc: Dispatch<
@@ -122,6 +123,7 @@ const applyFilter = (data: TableItem[], dataFilter: FilterType) => {
 };
 
 const FilterPanel: FC<Props> = ({
+  isOpen,
   lineages,
   setActiveFilterCount,
   setDataFilterFunc,
@@ -210,6 +212,8 @@ const FilterPanel: FC<Props> = ({
       updateDataFilter("CZBFailedGenomeRecovery", { selected });
     }
   };
+
+  if (!isOpen) return null;
 
   return (
     <StyledFilterPanel>
