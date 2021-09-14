@@ -97,6 +97,9 @@ const applyFilter = (data: TableItem[], dataFilter: FilterType) => {
     case TypeFilterType.Date:
       return filter(data, (d) => {
         const value = transform ? transform(d) : d;
+
+        if (!value) return false;
+
         const doesPassFilterCheckStart = !start || value >= start;
         const doesPassFilterCheckEnd = !end || value <= end;
 
