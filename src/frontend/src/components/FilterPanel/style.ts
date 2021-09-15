@@ -3,10 +3,12 @@ import { Chip, getColors, getSpacings, InputDropdown } from "czifui";
 
 export const StyledFilterPanel = styled.div`
   ${(props) => {
+    const { isOpen } = props;
     const colors = getColors(props);
     const spacings = getSpacings(props);
     return `
       border-right: ${spacings?.xxxs}px ${colors?.gray[200]} solid;
+      display: ${isOpen ? "block" : "none"};
       padding: ${spacings?.xl}px;
       width: 240px;
     `;

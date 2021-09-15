@@ -213,10 +213,8 @@ const FilterPanel: FC<Props> = ({
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <StyledFilterPanel>
+    <StyledFilterPanel isOpen={isOpen}>
       <CollectionDateFilter
         updateCollectionDateFilter={updateCollectionDateFilter}
       />
