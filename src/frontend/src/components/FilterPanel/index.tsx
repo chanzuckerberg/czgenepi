@@ -6,6 +6,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
+import { DATE_REGEX } from "../DateField/constants";
 import { CollectionDateFilter } from "./components/CollectionDateFilter";
 import { GenomeRecoveryFilter } from "./components/GenomeRecoveryFilter";
 import { LineageFilter } from "./components/LineageFilter";
@@ -96,8 +97,13 @@ const applyFilter = (data: TableItem[], dataFilter: FilterType) => {
 
   switch (type) {
     case TypeFilterType.Date:
+      if (!start && !end) return data;
+
       return filter(data, (d) => {
         const value = transform ? transform(d) : d;
+
+        if (!DATE_REGEX.test(value)) return false;
+
         const doesPassFilterCheckStart = !start || value >= start;
         const doesPassFilterCheckEnd = !end || value <= end;
 
@@ -215,10 +221,10 @@ const FilterPanel: FC<Props> = ({
 
   return (
     <StyledFilterPanel isOpen={isOpen}>
+      <UploadDateFilter updateUploadDateFilter={updateUploadDateFilter} />
       <CollectionDateFilter
         updateCollectionDateFilter={updateCollectionDateFilter}
       />
-      <UploadDateFilter updateUploadDateFilter={updateUploadDateFilter} />
       <LineageFilter
         options={lineages}
         updateLineageFilter={updateLineageFilter}
