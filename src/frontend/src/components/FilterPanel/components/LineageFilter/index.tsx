@@ -1,4 +1,8 @@
-import { ComplexFilter, ComplexFilterValue, DefaultMenuSelectOption } from "czifui";
+import {
+  ComplexFilter,
+  ComplexFilterValue,
+  DefaultMenuSelectOption,
+} from "czifui";
 import React, { useEffect, useState } from "react";
 
 interface Props {
@@ -6,19 +10,30 @@ interface Props {
   updateLineageFilter: (lineages: string[]) => void;
 }
 
+// ComplexFilter defaults to checking if option is selected (is a value) by equality.
+// However, because our options are objects that are dynamically generated, object
+// equality is always false because they're not the same object, even if same content.
+// Instead, we must create a custom selection checker to check underlying value.
+const getOptionSelected = (
+  option: DefaultMenuSelectOption,
+  value: DefaultMenuSelectOption
+) => {
+  return option.name === value.name;
+};
+// ComplexFilter doesn't directly do the check, it's done by its child MenuSelect
+const optionCheckingMenuSelectProps = {
+  getOptionSelected: getOptionSelected,
+};
+
 const LineageFilter = (props: Props): JSX.Element => {
   const { options = [], updateLineageFilter } = props;
-
-  // FIXME (Vince) -- TypeScript has slayed me. Or maybe the intereaction with czifui?
-  // Types break because the `onChange` value must accept single DefaultMenuSelectOption
-  // and null as possible input args. But if we do that, then `value` is implied to possibly
-  // be those, which it can't be because of required `.map` below.
-  // Not sure how to go about fixing this. Probably some forced assertion? But where?
   const [value, setValue] = useState<ComplexFilterValue>([]);
 
   useEffect(() => {
     if (value) {
-      updateLineageFilter((value as DefaultMenuSelectOption[]).map((d) => d.name));
+      updateLineageFilter(
+        (value as DefaultMenuSelectOption[]).map((d) => d.name)
+      );
     }
   }, [updateLineageFilter, value]);
 
@@ -35,16 +50,12 @@ const LineageFilter = (props: Props): JSX.Element => {
     },
   } as const;
 
-  // TODO (vince) -- BUG -- Need to talk to Timmy
-  // The ComplexFilter is not displaying previously selected options as I'd expect.
-  // It shouldn't need an explicit `value` passed in (this would make it isControlled
-  // in the czifui ComplexFilter interally), the non-controlled versions in Storybook
-  // maintain state of selected options on open and close. But here it's not...
   return (
     <ComplexFilter
       label="Lineage"
       options={options}
       onChange={setValue}
+      MenuSelectProps={optionCheckingMenuSelectProps}
       multiple
       search
       InputDropdownProps={PROPS_FOR_INPUT_DROPDOWN}
