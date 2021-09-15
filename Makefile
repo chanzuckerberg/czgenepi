@@ -3,7 +3,7 @@ SHELL := /bin/bash
 ### DOCKER ENVIRONMENTAL VARS #################################################
 export DOCKER_BUILDKIT:=1
 export COMPOSE_DOCKER_CLI_BUILD:=1
-export COMPOSE_OPTS:=--env .env.ecr
+export COMPOSE_OPTS:=--env-file .env.ecr
 export AWS_DEV_PROFILE=genepi-dev
 export AWS_PROD_PROFILE=genepi-prod
 export BACKEND_APP_ROOT=/usr/src/app

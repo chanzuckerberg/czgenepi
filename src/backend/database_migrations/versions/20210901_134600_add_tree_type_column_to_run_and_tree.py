@@ -82,10 +82,10 @@ def upgrade():
     )
     # update remaining runs without phylo trees but with some information on tree type
     assign_overview_to_group_plus_context_sql = sa.sql.text(
-        "UPDATE aspen.phylo_runs SET tree_type = 'OVERVIEW' WHERE phylo_runs.tree_type = 'UNKNOWN' AND (phylo_runs.template_file_path LIKE '%group_plus_context.yaml%' OR phylo_runs.template_file_path LIKE '%contextual.yaml%');"
+        "UPDATE aspen.phylo_runs SET tree_type = 'OVERVIEW' WHERE phylo_runs.tree_type = 'UNKNOWN' AND (phylo_runs.template_file_path LIKE '%group_plus_context.yaml%');"
     )
     assign_non_contextualized_to_group_sql = sa.sql.text(
-        "UPDATE aspen.phylo_runs SET tree_type = 'NON_CONTEXTUALIZED' WHERE phylo_runs.tree_type = 'UNKNOWN' AND (phylo_runs.template_file_path LIKE '%group.yaml%' OR phylo_runs.template_file_path LIKE '%local.yaml%');"
+        "UPDATE aspen.phylo_runs SET tree_type = 'NON_CONTEXTUALIZED' WHERE phylo_runs.tree_type = 'UNKNOWN' AND (phylo_runs.template_file_path LIKE '%group.yaml%');"
     )
     conn.execute(copy_tree_tree_type_to_run_sql)
     conn.execute(assign_overview_to_group_plus_context_sql)
