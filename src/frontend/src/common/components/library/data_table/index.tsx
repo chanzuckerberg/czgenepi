@@ -14,10 +14,10 @@ import SortArrowUpIcon from "src/common/icons/IconArrowUpSmall.svg";
 import { EmptyState } from "../data_subview/components/EmptyState";
 import style from "./index.module.scss";
 import {
-  TableHeader,
   HeaderCheckbox,
   RowCheckbox,
   RowContent,
+  TableHeader,
   TableRow,
 } from "./style";
 
@@ -241,7 +241,7 @@ export const DataTable: FunctionComponent<Props> = ({
   // render functions
   const headerRow = headers.map((header: Header, index) => {
     const headerJSX = headerRenderer({ header, index });
-    const align = header.align
+    const align = header.align;
     let sortIndicator: JSX.Element | null = null;
     if (isEqual(header.sortKey, state.sortKey)) {
       sortIndicator = <SortArrowDownIcon />;

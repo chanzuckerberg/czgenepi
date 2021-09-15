@@ -17,13 +17,13 @@ export const TableRow = styled.div`
 `;
 
 export interface ExtraProps extends Props {
-  header?: string;
+  header?: Header;
 }
 
 const doNotForwardProps = ["header"];
 
 export const RowContent = styled("div", {
-  shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
+  shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as Header),
 })`
   display: flex;
   align-items: center;
@@ -31,7 +31,7 @@ export const RowContent = styled("div", {
 
   ${(props: ExtraProps) => {
     const { header } = props;
-    const align = ( header && header.align !== undefined ) ? header.align : "left"
+    const align = header && header.align !== undefined ? header.align : "left";
     const spacings = getSpacings(props);
 
     return `
@@ -94,7 +94,7 @@ export const TableHeader = styled("div", {
 })`
   ${(props: AlignProps) => {
     const { align } = props;
-    const justify = ( align !== undefined) ? align : "left"
+    const justify = align !== undefined ? align : "left";
 
     return `
       justify-content: ${justify};

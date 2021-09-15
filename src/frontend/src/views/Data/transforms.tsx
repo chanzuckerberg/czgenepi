@@ -30,16 +30,18 @@ export const TREE_TRANSFORMS: Transform[] = [
     key: "treeType",
     method: (inputs: string[]): string | undefined => {
       const tree_type = inputs[0];
-      if (typeof tree_type !== "string" || tree_type.toLowerCase() == "unknown") {
+      if (
+        typeof tree_type !== "string" ||
+        tree_type.toLowerCase() == "unknown"
+      ) {
         return undefined;
       }
-      var name_parts = tree_type.toLowerCase().split('_')
-      for (var i = 0; i < name_parts.length; i++) {
-	  var part = name_parts[i]
-          name_parts[i] = part.charAt(0).toUpperCase() + part.slice(1)
+      const name_parts = tree_type.toLowerCase().split("_");
+      for (let i = 0; i < name_parts.length; i++) {
+        const part = name_parts[i];
+        name_parts[i] = part.charAt(0).toUpperCase() + part.slice(1);
       }
-      return name_parts.join("-")
+      return name_parts.join("-");
     },
   },
 ];
-
