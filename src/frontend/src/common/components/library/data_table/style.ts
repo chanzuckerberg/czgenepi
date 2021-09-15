@@ -23,7 +23,7 @@ export interface ExtraProps extends Props {
 const doNotForwardProps = ["header"];
 
 export const RowContent = styled("div", {
-  shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as Header),
+  shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
 })`
   display: flex;
   align-items: center;
