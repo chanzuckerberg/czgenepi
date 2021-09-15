@@ -57,7 +57,6 @@ export const CreateTreeModal = ({
   handleCreateTreeFailed,
   handleSetCreateTreeStarted,
 }: Props): JSX.Element => {
-
   const [treeName, setTreeName] = useState<string>("");
   const [isTreeNameTooLong, setTreeNameTooLong] = useState<boolean>(false);
   const [isTreeBuildDisabled, setTreeBuildDisabled] = useState<boolean>(false);
