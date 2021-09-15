@@ -415,7 +415,8 @@ const DataSubview: FunctionComponent<Props> = ({
                     lightText={
                       <CreateTreeModalDiv>
                         Your tree is being created. It may take up to 12 hours
-                        to process.
+                        to process. You will be able find your new tree on the
+                        Phylogenetic Trees page when it is ready.
                         <NextLink href={ROUTES.PHYLO_TREES} passHref>
                           <a href="passRef">
                             <StyledButton
