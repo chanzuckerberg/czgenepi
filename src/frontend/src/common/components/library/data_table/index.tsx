@@ -254,7 +254,6 @@ export const DataTable: FunctionComponent<Props> = ({
         key={header.sortKey.join("-")}
         className={style.headerMetaCell}
         data-test-id="header-cell"
-        view="samples"
       >
         {headerJSX}
         {sortIndicator}
