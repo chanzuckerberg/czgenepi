@@ -31,11 +31,11 @@ export const RowContent = styled("div", {
 
   ${(props: ExtraProps) => {
     const { header } = props;
-    const shouldCenter = header === "treeType";
+    const align = ( header && header.align !== undefined ) ? header.align : "left"
     const spacings = getSpacings(props);
 
     return `
-      justify-content: ${shouldCenter ? "center" : "left"};
+      justify-content: ${align};
       padding: ${spacings?.l}px 0;
       margin-right: ${spacings?.m}px;
   `;
@@ -85,6 +85,19 @@ export const HeaderCheckbox = styled(Checkbox)`
   }}
 `;
 
-export const CenteredTableHeader = styled.div`
-  justify-content: center;
+export interface AlignProps extends Props {
+  align?: string;
+}
+
+export const TableHeader = styled("div", {
+  shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
+})`
+  ${(props: AlignProps) => {
+    const { align } = props;
+    const justify = ( align !== undefined) ? align : "left"
+
+    return `
+      justify-content: ${justify};
+  `;
+  }}
 `;
