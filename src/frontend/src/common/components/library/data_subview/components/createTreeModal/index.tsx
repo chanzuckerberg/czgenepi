@@ -57,12 +57,24 @@ export const CreateTreeModal = ({
   handleCreateTreeFailed,
   handleSetCreateTreeStarted,
 }: Props): JSX.Element => {
+
   const [treeName, setTreeName] = useState<string>("");
   const [isTreeNameTooLong, setTreeNameTooLong] = useState<boolean>(false);
   const [isTreeBuildDisabled, setTreeBuildDisabled] = useState<boolean>(false);
   const [treeType, setTreeType] = useState<TreeType>("TARGETED");
   const [areInstructionsShown, setInstructionsShown] = useState<boolean>(false);
   useState<boolean>(false);
+
+  const clearState = function () {
+    setTreeName("");
+    setTreeType("TARGETED");
+    setInstructionsShown(false);
+  };
+
+  const handleClose = function () {
+    clearState();
+    onClose();
+  };
 
   useEffect(() => {
     const treeNameLength = treeName.length;
@@ -83,16 +95,12 @@ export const CreateTreeModal = ({
 
   const mutation = useMutation(createTree, {
     onError: () => {
-      setTreeName("");
-      setTreeType("TARGETED");
       handleCreateTreeFailed();
-      onClose();
+      handleClose();
     },
     onSuccess: () => {
-      setTreeName("");
-      setTreeType("TARGETED");
-      onClose();
       handleSetCreateTreeStarted();
+      handleClose();
     },
   });
 
@@ -123,12 +131,12 @@ export const CreateTreeModal = ({
       disableBackdropClick
       disableEscapeKeyDown
       open={open}
-      onClose={onClose}
+      onClose={handleClose}
       fullWidth={true}
       maxWidth={"sm"}
     >
       <StyledDialogTitle>
-        <StyledIconButton onClick={onClose}>
+        <StyledIconButton onClick={handleClose}>
           <CloseIcon />
         </StyledIconButton>
         <Header>Create New Phylogenetic Tree</Header>
