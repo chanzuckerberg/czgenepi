@@ -24,6 +24,7 @@ export interface DefaultMenuSelectOption {
 }
 
 interface Props {
+  isOpen: boolean;
   lineages: DefaultMenuSelectOption[];
   setActiveFilterCount: (count: number) => void;
   setDataFilterFunc: Dispatch<
@@ -128,6 +129,7 @@ const applyFilter = (data: TableItem[], dataFilter: FilterType) => {
 };
 
 const FilterPanel: FC<Props> = ({
+  isOpen,
   lineages,
   setActiveFilterCount,
   setDataFilterFunc,
@@ -218,7 +220,7 @@ const FilterPanel: FC<Props> = ({
   };
 
   return (
-    <StyledFilterPanel>
+    <StyledFilterPanel isOpen={isOpen}>
       <UploadDateFilter updateUploadDateFilter={updateUploadDateFilter} />
       <CollectionDateFilter
         updateCollectionDateFilter={updateCollectionDateFilter}
