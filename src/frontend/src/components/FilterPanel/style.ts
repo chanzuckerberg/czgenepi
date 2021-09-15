@@ -1,12 +1,23 @@
 import styled from "@emotion/styled";
-import { Chip, getColors, getSpacings, InputDropdown } from "czifui";
+import { Chip, getColors, getSpacings, InputDropdown, Props } from "czifui";
 
-export const StyledFilterPanel = styled.div`
-  ${(props) => {
+export interface ExtraProps extends Props {
+  isOpen?: boolean;
+}
+
+// * Please keep this in sync with the props used in `ExtraProps`
+const doNotForwardProps = ["isOpen"];
+
+export const StyledFilterPanel = styled("div", {
+  shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
+})`
+  ${(props: ExtraProps) => {
+    const { isOpen } = props;
     const colors = getColors(props);
     const spacings = getSpacings(props);
     return `
       border-right: ${spacings?.xxxs}px ${colors?.gray[200]} solid;
+      display: ${isOpen ? "block" : "none"};
       padding: ${spacings?.xl}px;
       width: 240px;
     `;
