@@ -16,15 +16,26 @@ export const TableRow = styled.div`
   }}
 `;
 
-export const RowContent = styled.div`
+export interface ExtraProps extends Props {
+  header?: string;
+}
+
+const doNotForwardProps = ["header"];
+
+export const RowContent = styled("div", {
+  shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
+})`
   display: flex;
   align-items: center;
   width: 100%;
 
-  ${(props) => {
+  ${(props: ExtraProps) => {
+    const { header } = props;
+    const shouldCenter = header === "treeType";
     const spacings = getSpacings(props);
 
     return `
+      justify-content: ${shouldCenter ? "center" : "left"};
       padding: ${spacings?.l}px 0;
       margin-right: ${spacings?.m}px;
   `;
@@ -72,4 +83,8 @@ export const HeaderCheckbox = styled(Checkbox)`
       }
     `;
   }}
+`;
+
+export const CenteredTableHeader = styled.div`
+  justify-content: center;
 `;

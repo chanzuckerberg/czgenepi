@@ -13,7 +13,13 @@ import SortArrowDownIcon from "src/common/icons/IconArrowDownSmall.svg";
 import SortArrowUpIcon from "src/common/icons/IconArrowUpSmall.svg";
 import { EmptyState } from "../data_subview/components/EmptyState";
 import style from "./index.module.scss";
-import { HeaderCheckbox, RowCheckbox, RowContent, TableRow } from "./style";
+import {
+  CenteredTableHeader,
+  HeaderCheckbox,
+  RowCheckbox,
+  RowContent,
+  TableRow,
+} from "./style";
 
 interface Props {
   data?: TableItem[];
@@ -43,7 +49,7 @@ export function defaultCellRenderer({
   const displayData = value || UNDEFINED_TEXT;
 
   return (
-    <RowContent>
+    <RowContent header={header.key}>
       <div className={style.cell} data-test-id={`row-${header.key}`}>
         {displayData}
       </div>
@@ -243,15 +249,16 @@ export const DataTable: FunctionComponent<Props> = ({
       }
     }
     return (
-      <div
+      <CenteredTableHeader
         onClick={() => handleSortClick(header.sortKey)}
         key={header.sortKey.join("-")}
         className={style.headerMetaCell}
         data-test-id="header-cell"
+        view="samples"
       >
         {headerJSX}
         {sortIndicator}
-      </div>
+      </CenteredTableHeader>
     );
   });
 

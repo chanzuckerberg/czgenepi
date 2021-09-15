@@ -75,7 +75,7 @@ export const TREE_HEADERS: Header[] = [
   },
   {
     key: "treeType",
-    sortKey: [],
+    sortKey: ["treeType"],
     text: "Tree Type",
   },
   {
