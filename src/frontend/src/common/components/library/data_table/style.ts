@@ -31,7 +31,7 @@ export const RowContent = styled("div", {
 
   ${(props: ExtraProps) => {
     const { header } = props;
-    const align = header && header.align !== undefined ? header.align : "left";
+    const align = header?.align ?? "left";
     const spacings = getSpacings(props);
 
     return `
