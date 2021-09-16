@@ -3,6 +3,7 @@ interface Header {
   text: string;
   key: string | number;
   sortKey: string[];
+  align?: string;
 }
 
 interface SubHeader extends Header {

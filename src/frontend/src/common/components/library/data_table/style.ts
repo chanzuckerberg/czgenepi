@@ -16,15 +16,26 @@ export const TableRow = styled.div`
   }}
 `;
 
-export const RowContent = styled.div`
+export interface ExtraProps extends Props {
+  header?: Header;
+}
+
+const doNotForwardProps = ["header"];
+
+export const RowContent = styled("div", {
+  shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
+})`
   display: flex;
   align-items: center;
   width: 100%;
 
-  ${(props) => {
+  ${(props: ExtraProps) => {
+    const { header } = props;
+    const align = header?.align ?? "left";
     const spacings = getSpacings(props);
 
     return `
+      justify-content: ${align};
       padding: ${spacings?.l}px 0;
       margin-right: ${spacings?.m}px;
   `;
@@ -71,5 +82,20 @@ export const HeaderCheckbox = styled(Checkbox)`
         color: ${colors?.primary[500]};
       }
     `;
+  }}
+`;
+
+export interface AlignProps extends Props {
+  align?: string;
+}
+
+export const TableHeader = styled("div")`
+  ${(props: AlignProps) => {
+    const { align } = props;
+    const justify = align ?? "left";
+
+    return `
+      justify-content: ${justify};
+  `;
   }}
 `;

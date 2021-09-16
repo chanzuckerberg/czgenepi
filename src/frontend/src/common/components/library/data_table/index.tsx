@@ -13,7 +13,13 @@ import SortArrowDownIcon from "src/common/icons/IconArrowDownSmall.svg";
 import SortArrowUpIcon from "src/common/icons/IconArrowUpSmall.svg";
 import { EmptyState } from "../data_subview/components/EmptyState";
 import style from "./index.module.scss";
-import { HeaderCheckbox, RowCheckbox, RowContent, TableRow } from "./style";
+import {
+  HeaderCheckbox,
+  RowCheckbox,
+  RowContent,
+  TableHeader,
+  TableRow,
+} from "./style";
 
 interface Props {
   data?: TableItem[];
@@ -43,7 +49,7 @@ export function defaultCellRenderer({
   const displayData = value || UNDEFINED_TEXT;
 
   return (
-    <RowContent>
+    <RowContent header={header}>
       <div className={style.cell} data-test-id={`row-${header.key}`}>
         {displayData}
       </div>
@@ -235,6 +241,7 @@ export const DataTable: FunctionComponent<Props> = ({
   // render functions
   const headerRow = headers.map((header: Header, index) => {
     const headerJSX = headerRenderer({ header, index });
+    const align = header.align;
     let sortIndicator: JSX.Element | null = null;
     if (isEqual(header.sortKey, state.sortKey)) {
       sortIndicator = <SortArrowDownIcon />;
@@ -243,15 +250,16 @@ export const DataTable: FunctionComponent<Props> = ({
       }
     }
     return (
-      <div
+      <TableHeader
         onClick={() => handleSortClick(header.sortKey)}
         key={header.sortKey.join("-")}
         className={style.headerMetaCell}
         data-test-id="header-cell"
+        align={align}
       >
         {headerJSX}
         {sortIndicator}
-      </div>
+      </TableHeader>
     );
   });
 

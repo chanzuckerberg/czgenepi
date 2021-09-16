@@ -108,6 +108,7 @@ const TREE_MAP = new Map<string, keyof Tree>([
   ["phylo_tree_id", "id"],
   ["pathogen_genome_count", "pathogenGenomeCount"],
   ["completed_date", "creationDate"],
+  ["tree_type", "treeType"],
   ["started_date", "startedDate"],
   ["workflow_id", "workflowId"],
 ]);

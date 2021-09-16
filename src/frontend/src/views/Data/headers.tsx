@@ -74,6 +74,12 @@ export const TREE_HEADERS: Header[] = [
     text: "Tree Name",
   },
   {
+    align: "center",
+    key: "treeType",
+    sortKey: ["treeType"],
+    text: "Tree Type",
+  },
+  {
     key: "creationDate",
     sortKey: ["creationDate"],
     text: "Creation Date",
