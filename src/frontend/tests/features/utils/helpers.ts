@@ -52,9 +52,11 @@ export async function tryUntil(
 
       break;
     } catch (error) {
-      retry += 1;
-      savedError = error;
-      await page.waitForTimeout(WAIT_FOR_MS);
+      if (error instanceof Error) {
+        retry += 1;
+        savedError = error;
+        await page.waitForTimeout(WAIT_FOR_MS);
+      }
     }
   }
 
