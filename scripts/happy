@@ -829,7 +829,7 @@ class ArtifactBuilder:
     def get_compose_args(self):
         compose_args = ["--file", self.config["compose_file"]]
         if self.config["env"]:
-            compose_args += ["--env", self.config["env"]]
+            compose_args += ["--env-file", self.config["env"]]
         return compose_args
 
     def get_compose_services(self):
