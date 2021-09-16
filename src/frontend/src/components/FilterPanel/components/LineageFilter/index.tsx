@@ -22,7 +22,7 @@ const getOptionSelected = (
 };
 // ComplexFilter doesn't directly do the check, it's done by its child MenuSelect
 const optionCheckingMenuSelectProps = {
-  getOptionSelected: getOptionSelected,
+  getOptionSelected,
 };
 
 const LineageFilter = (props: Props): JSX.Element => {
