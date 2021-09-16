@@ -6,18 +6,9 @@
 # activate miniconda
 eval "$($HOME/miniconda/bin/conda shell.bash hook)"
 conda init
-
-# install pangolin
-mkdir /pangolin
-cd /pangolin
-git init
-git fetch --depth 1 git://github.com/cov-lineages/pangolin.git
-git checkout FETCH_HEAD
-conda env create -f environment.yml
 conda activate pangolin
-python setup.py install
 
-# check pangolin installation worked:
+# check pangolin is present:
 pangolin -pv
 
 # process all trailing args to include --sample-public-identifiers flag

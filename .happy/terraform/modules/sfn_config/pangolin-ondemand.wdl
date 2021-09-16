@@ -4,12 +4,14 @@ workflow pangolin {
     input {
         String docker_image_id = "pangolin:latest"
         String aws_region = "us-west-2"
+        Array[String] samples
     }
 
     call pangolin_workflow {
         input:
         docker_image_id = docker_image_id,
         aws_region = aws_region,
+        samples = samples,
     }
 }
 
@@ -17,12 +19,12 @@ task pangolin_workflow {
     input {
         String docker_image_id
         String aws_region
+        Array[String] samples
     }
 
     command <<<
     cd /usr/src/app/aspen/workflows/pangolin
-    ./update_pangolin.sh
-    /usr/local/bin/python3.9 find_samples.py
+    bash ./run_pangolin.sh "~{samples}"
     >>>
 
     runtime {
