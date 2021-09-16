@@ -55,4 +55,4 @@ def find_samples():
 
 if __name__ == "__main__":
     samples = find_samples()
-    subprocess.run(["sh", "run_pangolin.sh"] + samples)
+    subprocess.run(["bash", "run_pangolin.sh"] + samples)
