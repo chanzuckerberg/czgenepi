@@ -89,9 +89,7 @@ export interface AlignProps extends Props {
   align?: string;
 }
 
-export const TableHeader = styled("div", {
-  shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
-})`
+export const TableHeader = styled("div")`
   ${(props: AlignProps) => {
     const { align } = props;
     const justify = align ?? "left";
