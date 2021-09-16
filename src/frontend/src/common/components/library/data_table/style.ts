@@ -94,7 +94,7 @@ export const TableHeader = styled("div", {
 })`
   ${(props: AlignProps) => {
     const { align } = props;
-    const justify = align !== undefined ? align : "left";
+    const justify = align ?? "left";
 
     return `
       justify-content: ${justify};
