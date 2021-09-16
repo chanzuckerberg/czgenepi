@@ -7,6 +7,7 @@ from typing import Generator, TYPE_CHECKING
 
 from sqlalchemy import event
 from sqlalchemy.engine import create_engine, Engine
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import Session, sessionmaker
 
 if TYPE_CHECKING:
@@ -14,9 +15,15 @@ if TYPE_CHECKING:
 
 
 class SqlAlchemyInterface:
-    def __init__(self, engine: Engine):
+    def __init__(self, engine: Engine, use_async: bool = False):
         self._engine = engine
-        self._session_maker = sessionmaker(bind=engine)
+        if use_async:
+            session = sessionmaker(
+                engine, expire_on_commit=False, class_=AsyncSession, future=True
+            )
+        else:
+            session = sessionmaker(bind=engine)
+        self._session_maker = session
 
     @property
     def engine(self) -> Engine:
@@ -24,6 +31,17 @@ class SqlAlchemyInterface:
 
     def make_session(self) -> Session:
         return self._session_maker()
+
+
+def init_async_db(db_uri: str) -> SqlAlchemyInterface:
+    engine = create_async_engine(
+        db_uri,
+        echo=False,
+        pool_size=5,
+        max_overflow=5,
+        future=True,
+    )
+    return SqlAlchemyInterface(engine, use_async=True)
 
 
 def init_db(db_uri: str) -> SqlAlchemyInterface:
