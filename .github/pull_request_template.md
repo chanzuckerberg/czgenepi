@@ -1,10 +1,16 @@
-### Description
+### Summary:
+- **What:** `<brief description>`
+- **Ticket:** [sc<fill_in_issue_number>](https://app.shortcut.com/genepi/story/<fill_in_issue_number>)
+- **Env:** `<rdev link>`
 
-Write a description of your pull request here
+### Demos:
 
-#### Issue
-[ch<fill_in_issue_number>](https://app.clubhouse.io/genepi/story/<fill_in_issue_number>)
+### Notes:
 
-### Test plan
-
-Write how your changes are tested, or give a convincing reason why they can't be tested automatically.
+### Checklist:
+- [x] I merged latest `<base branch>`
+- [x] I manually verified the change
+- [x] I added labels to my PR
+- [ ] I tested in multiple browsers
+- [ ] I added relevant unit tests
+- [ ] I have notified others of changes they need to make locally (migrations, jobs, package updates, etc)
