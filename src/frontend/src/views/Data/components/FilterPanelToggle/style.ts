@@ -5,7 +5,6 @@ import { fontHeaderXxxs, getColors, getCorners, getSpacings } from "czifui";
 export const StyledDiv = styled.div`
   display: flex;
   align-items: center;
-  align-content: center;
   height: 42px;
   cursor: pointer;
   position: relative;
