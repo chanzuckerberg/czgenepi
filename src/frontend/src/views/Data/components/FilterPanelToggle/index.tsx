@@ -15,9 +15,9 @@ export const FilterPanelToggle: FC<Props> = ({
 }): JSX.Element => {
   const [isActive, setIsActive] = useState<boolean>(true);
 
-  const handleclick = (e) => {
+  const handleclick = () => {
     setIsActive(!isActive);
-    onClick(e);
+    onClick();
   };
 
   return (
@@ -36,11 +36,7 @@ export const FilterPanelToggle: FC<Props> = ({
           sdsSize="large"
           sdsType="secondary"
         >
-          <SvgIcon
-            fillContrast="white"
-            viewBox="0 0 32 32"
-            component={IconFilters}
-          />
+          <SvgIcon viewBox="0 0 32 32" component={IconFilters} />
           {activeFilterCount > 0 && (
             <StyledBadge>{activeFilterCount}</StyledBadge>
           )}
