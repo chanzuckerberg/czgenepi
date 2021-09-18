@@ -8,7 +8,7 @@ const TreeCreateHelpLink = (): JSX.Element => {
     "https://docs.google.com/document/d/1_iQgwl3hn_pjlZLX-n0alUbbhgSPZvpW_0620Hk_kB4/edit?usp=sharing";
   return (
     <StyledDiv>
-      <StyledLink href={HREF}>
+      <StyledLink target="_blank" rel="noopener" href={HREF}>
         <IconInsightSmall />
         <StyledSpan>How can I create my own tree?</StyledSpan>
         <IconArrowRightSmall />
