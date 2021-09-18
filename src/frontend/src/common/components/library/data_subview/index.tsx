@@ -15,6 +15,7 @@ import { AfterModalAlert } from "./components/AfterModalAlert";
 import { CreateTreeModal } from "./components/createTreeModal";
 import DownloadModal from "./components/DownloadModal";
 import { IconButton } from "./components/IconButton";
+import { TreeCreateHelpLink } from "./components/TreeCreateHelpLink";
 import style from "./index.module.scss";
 import {
   CreateTreeModalDiv,
@@ -354,6 +355,7 @@ const DataSubview: FunctionComponent<Props> = ({
               />
             </div>
             <div>
+              {viewName === VIEWNAME.TREES && <TreeCreateHelpLink />}
               {downloadButton}
               {downloadFailed && (
                 <AfterModalAlert
