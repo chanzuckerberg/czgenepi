@@ -132,7 +132,7 @@ const TREE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
   },
   name: TreeTableNameCell,
   treeType: ({ value, header }: CustomTableRenderProps): JSX.Element => (
-    <TreeTypeTooltip value={value}>
+    <TreeTypeTooltip value={value as string}>
       <RowContent header={header}>
         <div data-test-id={`row-${header.key}`}>{value}</div>
       </RowContent>

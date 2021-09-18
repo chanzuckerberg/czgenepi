@@ -2,7 +2,7 @@ import { Link, Tooltip } from "czifui";
 import React from "react";
 
 interface Props {
-  children: React.ReactNode;
+  children: React.ReactElement;
   value: string;
 }
 
