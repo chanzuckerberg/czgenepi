@@ -1,6 +1,30 @@
 import React, { FC } from "react";
 import { FormattedDateType } from "src/components/DateField";
-import { DateFilter } from "../DateFilter";
+import { DateFilter, DateMenuOption } from "../DateFilter";
+
+const MENU_OPTIONS_COLLECTION_DATE: DateMenuOption[] = [
+  {
+    name: "Last 7 Days",
+    numDaysStartOffset: 7,
+  },
+  {
+    name: "Last 30 Days",
+    numDaysStartOffset: 30,
+  },
+  // Average month has ~30.4 days, so that's why the non-round numbers
+  {
+    name: "Last 3 Months",
+    numDaysStartOffset: 91,
+  },
+  {
+    name: "Last 6 Months",
+    numDaysStartOffset: 182,
+  },
+  {
+    name: "Last Year",
+    numDaysStartOffset: 365,
+  },
+];
 
 interface Props {
   updateCollectionDateFilter: (
@@ -16,6 +40,7 @@ const CollectionDateFilter: FC<Props> = ({ updateCollectionDateFilter }) => {
       fieldKeyStart="collectionDateStart"
       inputLabel="Collection Date"
       updateDateFilter={updateCollectionDateFilter}
+      menuOptions={MENU_OPTIONS_COLLECTION_DATE}
     />
   );
 };

@@ -22,11 +22,20 @@ import {
 
 export type DateType = FormattedDateType | Date;
 
+export interface DateMenuOption {
+  name: string; // Must be UNIQUE because we assume can be used as key/id
+  // For both `numDays...` it's relative to now() when option is chosen.
+  // Assume start is guaranteed, but end cap is not.
+  numDaysEndOffset?: number;  // How far back end of date interval is
+  numDaysStartOffset: number; // How far back start of date interval is
+}
+
 interface Props {
   fieldKeyEnd: string;
   fieldKeyStart: string;
   inputLabel: string;
   updateDateFilter: (start: FormattedDateType, end: FormattedDateType) => void;
+  menuOptions: DateMenuOption[];
 }
 
 const DateFilter: FC<Props> = ({
@@ -34,6 +43,7 @@ const DateFilter: FC<Props> = ({
   fieldKeyStart,
   inputLabel,
   updateDateFilter, // Don't directly call, use below `setDatesFromRange` instead
+  menuOptions,
 }) => {
   // `startDate` and `endDate` represent the active filter dates. Update on filter change.
   const [startDate, setStartDate] = useState<FormattedDateType>();
@@ -41,6 +51,8 @@ const DateFilter: FC<Props> = ({
   // `working...` versions are internal display while user enters date string.
   const [workingStartDate, setWorkingStartDate] = useState<FormattedDateType>();
   const [workingEndDate, setWorkingEndDate] = useState<FormattedDateType>();
+  // What menu option is chosen. If none chosen, `null`.
+  const [selectedDateMenuOption, setSelectedDateMenuOption] = useState<DateMenuOption | null>(null);
   const [anchorEl, setAnchorEl] = useState<HTMLElement>();
 
   const validationSchema = yup.object({
@@ -103,11 +115,29 @@ const DateFilter: FC<Props> = ({
     handleClose();
   };
 
-  const setDatesFromOffset = (nDays: number) => {
+  const setDatesFromMenuOption = (dateOption: DateMenuOption) => {
+    console.log(dateOption); // REMOVE VOODOO
+    setSelectedDateMenuOption(dateOption);
+    // We assume start to interval is always guaranteed, but not necessarily end
     const start = new Date();
-    start.setDate(start.getDate() - nDays);
+    start.setDate(start.getDate() - dateOption.numDaysStartOffset);
+    let end = undefined;
+    if (dateOption.numDaysEndOffset) {
+      end = new Date();
+      end.setDate(end.getDate() - dateOption.numDaysEndOffset);
+    }
+    setDatesFromRange(start, end);
+  };
 
-    setDatesFromRange(start, undefined);
+  const setDatesFromFields = (start: DateType, end: DateType) => {
+    // Since using fields instead, clear out selected menu option
+    setSelectedDateMenuOption(null);
+    setDatesFromRange(start, end);
+  };
+
+  const deleteDateFilter = () => {
+    setSelectedDateMenuOption(null);
+    setDatesFromRange(undefined, undefined);
   };
 
   //TODO when it's available, use sds component for single select on preset date ranges
@@ -151,7 +181,7 @@ const DateFilter: FC<Props> = ({
               color="primary"
               variant="contained"
               onClick={() => {
-                setDatesFromRange(values[fieldKeyStart], values[fieldKeyEnd]);
+                setDatesFromFields(values[fieldKeyStart], values[fieldKeyEnd]);
               }}
             >
               Apply
@@ -159,20 +189,20 @@ const DateFilter: FC<Props> = ({
           )}
         </StyledManualDate>
         {/* TODO (mlila): use a single select here instead */}
-        <MenuItem onClick={() => setDatesFromOffset(7)}>Last 7 Days</MenuItem>
-        <MenuItem onClick={() => setDatesFromOffset(30)}>Last 30 Days</MenuItem>
-        <MenuItem onClick={() => setDatesFromOffset(90)}>
-          Last 3 Months
-        </MenuItem>
-        <MenuItem onClick={() => setDatesFromOffset(180)}>
-          Last 6 Months
-        </MenuItem>
-        <MenuItem onClick={() => setDatesFromOffset(365)}>Last Year</MenuItem>
+        {menuOptions.map((dateOption) => (
+          <MenuItem
+            key={dateOption.name}
+            onClick={() => setDatesFromMenuOption(dateOption)}
+            selected={Boolean(selectedDateMenuOption && selectedDateMenuOption.name === dateOption.name)}
+          >
+            {dateOption.name}
+          </MenuItem>
+        ))}
       </Menu>
       <DateChip
         startDate={startDate}
         endDate={endDate}
-        deleteDateFilter={() => setDatesFromRange(undefined, undefined)}
+        deleteDateFilter={deleteDateFilter}
       />
     </StyledFilterWrapper>
   );
