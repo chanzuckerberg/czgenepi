@@ -48,9 +48,6 @@ const DateFilter: FC<Props> = ({
   // `startDate` and `endDate` represent the active filter dates. Update on filter change.
   const [startDate, setStartDate] = useState<FormattedDateType>();
   const [endDate, setEndDate] = useState<FormattedDateType>();
-  // `working...` versions are internal display while user enters date string.
-  const [workingStartDate, setWorkingStartDate] = useState<FormattedDateType>();
-  const [workingEndDate, setWorkingEndDate] = useState<FormattedDateType>();
   // What menu option is chosen. If none chosen, `null`.
   const [selectedDateMenuOption, setSelectedDateMenuOption] = useState<DateMenuOption | null>(null);
   const [anchorEl, setAnchorEl] = useState<HTMLElement>();
@@ -85,11 +82,19 @@ const DateFilter: FC<Props> = ({
     validationSchema,
   });
 
-  const { values, validateForm, setFieldValue } = formik;
-
+  const { values, validateForm, isValid, setFieldValue } = formik;
   useEffect(() => {
-    validateForm(values);
+    validateForm(values).then(() => console.log('YOOOLO'));
+    console.log(validateForm(values));
+    console.log("isValid", isValid); // REMOVE
   }, [validateForm, values]);
+  // HACK (vince): Because `isValid` runs async, but starting empty fields of undefined
+  // is considered valid
+  // AGGGHHH SLOW ASYNC
+  let areFieldsValid = false;
+  if ((values[fieldKeyStart] || values[fieldKeyEnd]) && isValid) {
+    areFieldsValid = true;
+  }
 
   const formatDate = (d: DateType) => {
     if (d === undefined) return d;
@@ -99,26 +104,24 @@ const DateFilter: FC<Props> = ({
   };
 
   // Use this over directly using `updateDateFilter` prop so we track filter changes.
-  // In addition to setting upstream filter, also sets internal date states.
   const setDatesFromRange = (start: DateType, end: DateType) => {
+    console.log("areFieldsValid", areFieldsValid); // REMOVE
     const newStartDate = formatDate(start);
     const newEndDate = formatDate(end);
     setStartDate(newStartDate);
     setEndDate(newEndDate);
-    // Also set `working...` versions and formik so visibile next time user opens dropdown
-    setWorkingStartDate(newStartDate);
-    setFieldValue(fieldKeyStart, newStartDate);
-    setWorkingEndDate(newEndDate);
-    setFieldValue(fieldKeyEnd, newEndDate);
 
     updateDateFilter(newStartDate, newEndDate);
     handleClose();
   };
 
   const setDatesFromMenuOption = (dateOption: DateMenuOption) => {
-    console.log(dateOption); // REMOVE VOODOO
     setSelectedDateMenuOption(dateOption);
-    // We assume start to interval is always guaranteed, but not necessarily end
+    // Selecting a menu option clears out anything entered in the fields.
+    setFieldValue(fieldKeyStart, undefined);
+    setFieldValue(fieldKeyEnd, undefined);
+
+    // We assume start of interval is always guaranteed, but not necessarily end
     const start = new Date();
     start.setDate(start.getDate() - dateOption.numDaysStartOffset);
     let end = undefined;
@@ -161,28 +164,21 @@ const DateFilter: FC<Props> = ({
             <DateField
               fieldKey={fieldKeyStart}
               formik={formik}
-              onChange={(e) => {
-                const target = e.target as HTMLTextAreaElement;
-                setWorkingStartDate(target?.value);
-              }}
             />
             <StyledText>to</StyledText>
             <DateField
               fieldKey={fieldKeyEnd}
               formik={formik}
-              onChange={(e) => {
-                const target = e.target as HTMLTextAreaElement;
-                setWorkingEndDate(target?.value);
-              }}
             />
           </StyledDateRange>
-          {(workingStartDate || workingEndDate) && (
+          {(values[fieldKeyStart] || values[fieldKeyEnd]) && (
             <StyledButton
               color="primary"
               variant="contained"
               onClick={() => {
                 setDatesFromFields(values[fieldKeyStart], values[fieldKeyEnd]);
               }}
+              disabled={!areFieldsValid}
             >
               Apply
             </StyledButton>
@@ -202,6 +198,7 @@ const DateFilter: FC<Props> = ({
       <DateChip
         startDate={startDate}
         endDate={endDate}
+        selectedDateMenuOption={selectedDateMenuOption}
         deleteDateFilter={deleteDateFilter}
       />
     </StyledFilterWrapper>
@@ -211,12 +208,14 @@ const DateFilter: FC<Props> = ({
 interface DateChipProps {
   startDate?: DateType;
   endDate?: DateType;
+  selectedDateMenuOption: DateMenuOption | null;
   deleteDateFilter: () => void;
 }
 
 function DateChip({
   startDate,
   endDate,
+  selectedDateMenuOption,
   deleteDateFilter,
 }: DateChipProps): JSX.Element | null {
   // DateChip should only display if we have at least one of startDate/endDate
@@ -224,7 +223,9 @@ function DateChip({
 
   // Get the date chip message. Structure varies if only one of the two dates.
   // Might be worth extracting date message to a common helper func elsewhere?
-  const dateIntervalLabel = `${startDate || "Prior"} to ${endDate || "Today"}`;
+  let dateIntervalLabel = `${startDate || "Prior"} to ${endDate || "Today"}`;
+  // If a date menu option was selected, just use its specific name instead
+  if (selectedDateMenuOption) { dateIntervalLabel = selectedDateMenuOption.name; }
   return (
     <StyledChip
       size="medium"
