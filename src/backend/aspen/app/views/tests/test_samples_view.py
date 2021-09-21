@@ -975,7 +975,7 @@ def test_update_sample_public_ids(
     group = group_factory()
     user = user_factory(group)
     session.add(group)
-    session.commit()
+
     private_to_public = dict(
         zip(
             ["private1", "private2", "private3"],
@@ -988,6 +988,8 @@ def test_update_sample_public_ids(
             group, user, private_identifier=priv, public_identifier=pub.strip("_update")
         )
         session.add(sample)
+
+    session.commit()
 
     with client.session_transaction() as sess:
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
