@@ -28,6 +28,20 @@ const LINEAGE_TOOLTIP_TEXT = (
   </div>
 );
 
+const TREE_TYPE_TOOLTIP_TEXT = (
+  <div>
+    <b>Tree Type:</b> Aspen-defined profiles for tree building based on primary
+    use case and build settings.{" "}
+    <Link
+      href="https://docs.google.com/document/d/1_iQgwl3hn_pjlZLX-n0alUbbhgSPZvpW_0620Hk_kB4/edit?usp=sharing"
+      target="_blank"
+      rel="noopener"
+    >
+      Read our guide to learn more.
+    </Link>
+  </div>
+);
+
 const SampleRenderers: Record<string, HeaderRenderer> = {
   lineage: ({ header }): JSX.Element => (
     <div key={header.key} className={dataTableStyle.headerCell}>
@@ -43,7 +57,27 @@ const SampleRenderers: Record<string, HeaderRenderer> = {
   ),
 };
 
+const TreeRenderers: Record<string, HeaderRenderer> = {
+  treeType: ({ header }): JSX.Element => (
+    <div key={header.key} className={dataTableStyle.headerCell}>
+      <Tooltip
+        arrow
+        classes={{ arrow }}
+        title={TREE_TYPE_TOOLTIP_TEXT}
+        placement="bottom-start"
+      >
+        <div className={dataTableStyle.headerCellContent}>{header.text}</div>
+      </Tooltip>
+    </div>
+  ),
+};
+
 export const SampleHeader = createTableHeaderRenderer(
   SampleRenderers,
+  defaultHeaderRenderer
+);
+
+export const TreeHeader = createTableHeaderRenderer(
+  TreeRenderers,
   defaultHeaderRenderer
 );
