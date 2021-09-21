@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { Chip, getColors, getSpacings, InputDropdown, Props } from "czifui";
+import { Chip, getColors, getSpacings, InputDropdown, Props, fontCapsXxxs } from "czifui";
 
 export interface ExtraProps extends Props {
   isOpen?: boolean;
@@ -25,9 +25,9 @@ export const StyledFilterPanel = styled("div", {
 `;
 
 export const StyledInputDropdown = styled(InputDropdown)`
+  ${fontCapsXxxs}
   padding: 0;
   text-align: left;
-  text-transform: uppercase;
 `;
 
 export const StyledFilterWrapper = styled.div`
