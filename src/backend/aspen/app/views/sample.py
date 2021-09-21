@@ -424,6 +424,11 @@ def update_sample_public_ids():
     user: User = g.auth_user
     request_data = request.get_json()
 
+    if not user.system_admin:
+        raise ex.BadRequestException(
+            f"user making update request must be a system admin",
+        )
+
     request_private_ids: list[str] = request_data["private_ids"]
     request_public_ids: list[str] = request_data["public_ids"]
     private_to_public: Mapping[str, str] = {

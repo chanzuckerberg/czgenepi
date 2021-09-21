@@ -973,7 +973,7 @@ def test_update_sample_public_ids(
     client,
 ):
     group = group_factory()
-    user = user_factory(group)
+    user = user_factory(group, system_admin=True)
     session.add(group)
 
     private_to_public = dict(
@@ -1020,7 +1020,7 @@ def test_update_sample_public_ids_duplicate_public_id(
     client,
 ):
     group = group_factory()
-    user = user_factory(group)
+    user = user_factory(group, system_admin=True)
     session.add(group)
     private_to_public = dict(
         zip(
@@ -1060,7 +1060,7 @@ def test_update_sample_public_ids_private_ids_not_found(
     client,
 ):
     group = group_factory()
-    user = user_factory(group)
+    user = user_factory(group, system_admin=True)
     session.add(group)
     session.commit()
     private_to_public = dict(
@@ -1085,4 +1085,38 @@ def test_update_sample_public_ids_private_ids_not_found(
     assert (
         res.get_data()
         == b"{\"error\":\"Private Identifiers ['private1', 'private2', 'private3'] not found in DB\"}\n"
+    )
+
+
+def test_update_sample_public_ids_not_system_admin(
+    session,
+    app,
+    client,
+):
+    group = group_factory()
+    user = user_factory(group, system_admin=False)
+    session.add(group)
+    session.commit()
+    private_to_public = dict(
+        zip(
+            ["private1", "private2", "private3"],
+            ["public1_update", "public2_update", "public3_update"],
+        )
+    )
+
+    with client.session_transaction() as sess:
+        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
+
+    data = {
+        "group_id": group.id,
+        "private_ids": [i for i in private_to_public.keys()],
+        "public_ids": [i for i in private_to_public.values()],
+    }
+    res = client.post(
+        "/api/samples/update/publicids", json=data, content_type="application/json"
+    )
+    assert res.status == "400 BAD REQUEST"
+    assert (
+        res.get_data()
+        == b'{"error":"user making update request must be a system admin"}\n'
     )
