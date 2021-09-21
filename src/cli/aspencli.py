@@ -301,8 +301,8 @@ def download_samples(ctx, sample_ids):
 
 @samples.command(name="update_public_ids")
 @click.option("group_id", "--group-id", type=int, required=True)
-@click.option("public_identifiers", "--public-identifiers", nargs=-1)
-@click.option("private_identifiers", "--private-identifiers", nargs=-1)
+@click.option("public_identifiers", "--public-identifiers")
+@click.option("private_identifiers", "--private-identifiers")
 @click.option(
     "private_to_public_id_mapping_fh",
     "--private-to-public-id-mapping",
@@ -317,15 +317,15 @@ def update_public_ids(ctx, group_id, public_identifiers, private_identifiers, pr
         private_identifiers = []
         public_identifiers = []
         for row in csvreader:
-            private_identifiers.append(row["private_id"])
-            public_identifiers.append(row["public_id"])
+            private_identifiers.append(row["private_identifier"])
+            public_identifiers.append(row["public_identifier"])
 
     payload = {
         "group_id": group_id,
         "private_ids": private_identifiers,
         "public_ids": public_identifiers,
     }
-    resp = api_client.post("/api/sequences", json=payload)
+    resp = api_client.post("/api/samples/update/publicids", json=payload)
     print(resp.headers)
     print(resp.text)
 
