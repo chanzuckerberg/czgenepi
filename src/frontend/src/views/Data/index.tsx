@@ -14,7 +14,7 @@ import { VIEWNAME } from "../../common/constants/types";
 import { ROUTES } from "../../common/routes";
 import { SampleRenderer, TreeRenderer } from "./cellRenderers";
 import { FilterPanelToggle } from "./components/FilterPanelToggle";
-import { SampleHeader } from "./headerRenderer";
+import { SampleHeader, TreeHeader } from "./headerRenderer";
 import { SAMPLE_HEADERS, SAMPLE_SUBHEADERS, TREE_HEADERS } from "./headers";
 import style from "./index.module.scss";
 import { Container, FlexContainer } from "./style";
@@ -84,6 +84,7 @@ const Data: FunctionComponent = () => {
     {
       data: trees,
       defaultSortKey: ["creationDate"],
+      headerRenderer: TreeHeader,
       headers: TREE_HEADERS,
       isDataLoading,
       renderer: TreeRenderer,

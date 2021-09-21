@@ -11,6 +11,7 @@ import { createTableCellRenderer, stringGuard } from "src/common/utils";
 import TreeTableDownloadMenu from "src/components/TreeTableDownloadMenu";
 import { Lineage, LineageTooltip } from "./components/LineageTooltip";
 import TreeTableNameCell from "./components/TreeTableNameCell";
+import { TreeTypeTooltip } from "./components/TreeTypeTooltip";
 import {
   GISAIDCell,
   LineageCell,
@@ -130,6 +131,13 @@ const TREE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
     );
   },
   name: TreeTableNameCell,
+  treeType: ({ value, header }: CustomTableRenderProps): JSX.Element => (
+    <TreeTypeTooltip value={value as string}>
+      <RowContent header={header}>
+        <div data-test-id={`row-${header.key}`}>{value}</div>
+      </RowContent>
+    </TreeTypeTooltip>
+  ),
 };
 
 export const TreeRenderer = createTableCellRenderer(
