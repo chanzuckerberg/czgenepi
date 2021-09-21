@@ -59,23 +59,33 @@ def get_all_identifiers_in_request(data: Mapping) -> Tuple[list[str], list[str]]
     return private_ids, public_ids
 
 
+def get_existing_private_ids(
+    private_ids: list[str], session, group_id=None
+) -> list[str]:
+    samples = session.query(Sample).filter(Sample.private_identifier.in_(private_ids))
+
+    if group_id:
+        samples = samples.filter(Sample.submitting_group_id == group_id)
+
+    return [i.private_identifier for i in samples.all()]
+
+
+def get_existing_public_ids(public_ids: list[str], session, group_id=None) -> list[str]:
+    samples = session.query(Sample).filter(Sample.public_identifier.in_(public_ids))
+
+    if group_id:
+        samples = samples.filter(Sample.submitting_group_id == group_id)
+
+    return [i.public_identifier for i in samples.all()]
+
+
 def check_duplicate_samples(
     data: Mapping, session
 ) -> Union[None, Mapping[str, list[str]]]:
     private_ids, public_ids = get_all_identifiers_in_request(data)
 
-    existing_private_ids: list[str] = [
-        i.private_identifier
-        for i in session.query(Sample)
-        .filter(Sample.private_identifier.in_(private_ids))
-        .all()
-    ]
-    existing_public_ids: list[str] = [
-        i.public_identifier
-        for i in session.query(Sample)
-        .filter(Sample.public_identifier.in_(public_ids))
-        .all()
-    ]
+    existing_private_ids: list[str] = get_existing_private_ids(private_ids, session)
+    existing_public_ids: list[str] = get_existing_public_ids(public_ids, session)
 
     if existing_private_ids or existing_public_ids:
         return {

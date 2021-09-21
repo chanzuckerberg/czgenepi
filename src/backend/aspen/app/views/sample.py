@@ -416,3 +416,60 @@ def create_sample():
     except Exception as e:
         raise ex.BadRequestException(f"Error encountered when saving data: {e}")
     return jsonify(success=True)
+
+
+@application.route("/api/samples/update/publicids", methods=["POST"])
+@requires_auth
+def update_sample_public_ids():
+    user: User = g.auth_user
+    request_data = request.get_json()
+
+    request_private_ids: list[str] = request_data["private_ids"]
+    request_public_ids: list[str] = request_data["public_ids"]
+    private_to_public: Mapping[str, str] = {
+        private: public
+        for (private, public) in zip(request_private_ids, request_public_ids)
+    }
+
+    group_id: int = request_data.get("group_id")
+    # group id not supplied, use user group_id
+    if not group_id:
+        group_id = user.group_id
+
+    # check that all private_identifiers exist
+    existing_private_ids: list[str] = api_utils.get_existing_private_ids(
+        request_private_ids, g.db_session, group_id=group_id
+    )
+    missing_private_identifiers = [
+        s for s in request_private_ids if s not in existing_private_ids
+    ]
+    if missing_private_identifiers:
+        raise ex.BadRequestException(
+            f"Private Identifiers {missing_private_identifiers} not found in DB",
+        )
+
+    # check that public_identifiers don't already exist
+    existing_public_ids: list[str] = api_utils.get_existing_public_ids(
+        request_public_ids, g.db_session, group_id=group_id
+    )
+    if existing_public_ids:
+        raise ex.BadRequestException(
+            f"Public Identifiers {existing_public_ids} are already in the database",
+        )
+
+    samples_to_update = (
+        g.db_session.query(Sample)
+        .filter(
+            and_(
+                Sample.submitting_group_id == request_data["group_id"],
+                Sample.private_identifier.in_(private_to_public.keys()),
+            )
+        )
+        .all()
+    )
+    for s in samples_to_update:
+        s.public_identifier = private_to_public[s.private_identifier]
+        g.db_session.add(s)
+
+    g.db_session.commit()
+    return jsonify(success=True)

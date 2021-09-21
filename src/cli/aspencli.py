@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import click
+import csv
 import requests
 import json
 import time
@@ -296,6 +297,38 @@ def download_samples(ctx, sample_ids):
     resp = api_client.post("/api/sequences", json=payload)
     print(resp.headers)
     print(resp.text)
+
+
+@samples.command(name="update_public_ids")
+@click.option("group_id", "--group-id", type=int, required=True)
+@click.option("public_identifiers", "--public-identifiers", nargs=-1)
+@click.option("private_identifiers", "--private-identifiers", nargs=-1)
+@click.option(
+    "private_to_public_id_mapping_fh",
+    "--private-to-public-id-mapping",
+    type=click.File("r"),
+    required=True,
+)
+@click.pass_context
+def update_public_ids(ctx, group_id, public_identifiers, private_identifiers, private_to_public_id_mapping_fh):
+    api_client = ctx.obj["api_client"]
+    if private_to_public_id_mapping_fh:
+        csvreader = csv.DictReader(private_to_public_id_mapping_fh)
+        private_identifiers = []
+        public_identifiers = []
+        for row in csvreader:
+            private_identifiers.append(row["private_id"])
+            public_identifiers.append(row["public_id"])
+
+    payload = {
+        "group_id": group_id,
+        "private_ids": private_identifiers,
+        "public_ids": public_identifiers,
+    }
+    resp = api_client.post("/api/sequences", json=payload)
+    print(resp.headers)
+    print(resp.text)
+
 
 @cli.group()
 def phylo_run():
