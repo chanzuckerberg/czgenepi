@@ -1,5 +1,12 @@
 import styled from "@emotion/styled";
-import { Chip, getColors, getSpacings, InputDropdown, Props, fontCapsXxxs } from "czifui";
+import {
+  Chip,
+  fontCapsXxxs,
+  getColors,
+  getSpacings,
+  InputDropdown,
+  Props,
+} from "czifui";
 
 export interface ExtraProps extends Props {
   isOpen?: boolean;
