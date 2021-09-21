@@ -1,6 +1,6 @@
 import { Menu, MenuItem } from "czifui";
 import { useFormik } from "formik";
-import { noop, isEmpty } from "lodash";
+import { isEmpty, noop } from "lodash";
 import React, { FC, useEffect, useState } from "react";
 import DateField, { FormattedDateType } from "src/components/DateField";
 import {
@@ -26,7 +26,7 @@ export interface DateMenuOption {
   name: string; // Must be UNIQUE because we assume can be used as key/id
   // For both `numDays...` it's relative to now() when option is chosen.
   // Assume start is guaranteed, but end cap is not.
-  numDaysEndOffset?: number;  // How far back end of date interval is
+  numDaysEndOffset?: number; // How far back end of date interval is
   numDaysStartOffset: number; // How far back start of date interval is
 }
 
@@ -50,9 +50,10 @@ const DateFilter: FC<Props> = ({
   const [endDate, setEndDate] = useState<FormattedDateType>();
   // Are fields valid and user should be allowed to hit the "Apply" button?
   // Related to some async form validation weirdness. See `validateForm` call below.
-  const [areFieldsValid, setAreFieldsValid] = useState<Boolean>(false);
+  const [areFieldsValid, setAreFieldsValid] = useState<boolean>(false);
   // What menu option is chosen. If none chosen, `null`.
-  const [selectedDateMenuOption, setSelectedDateMenuOption] = useState<DateMenuOption | null>(null);
+  const [selectedDateMenuOption, setSelectedDateMenuOption] =
+    useState<DateMenuOption | null>(null);
   const [anchorEl, setAnchorEl] = useState<HTMLElement>();
 
   const validationSchema = yup.object({
@@ -174,15 +175,9 @@ const DateFilter: FC<Props> = ({
       >
         <StyledManualDate>
           <StyledDateRange>
-            <DateField
-              fieldKey={fieldKeyStart}
-              formik={formik}
-            />
+            <DateField fieldKey={fieldKeyStart} formik={formik} />
             <StyledText>to</StyledText>
-            <DateField
-              fieldKey={fieldKeyEnd}
-              formik={formik}
-            />
+            <DateField fieldKey={fieldKeyEnd} formik={formik} />
           </StyledDateRange>
           {(values[fieldKeyStart] || values[fieldKeyEnd]) && (
             <StyledButton
@@ -202,7 +197,10 @@ const DateFilter: FC<Props> = ({
           <MenuItem
             key={dateOption.name}
             onClick={() => setDatesFromMenuOption(dateOption)}
-            selected={Boolean(selectedDateMenuOption && selectedDateMenuOption.name === dateOption.name)}
+            selected={Boolean(
+              selectedDateMenuOption &&
+                selectedDateMenuOption.name === dateOption.name
+            )}
           >
             {dateOption.name}
           </MenuItem>
@@ -238,7 +236,9 @@ function DateChip({
   // Might be worth extracting date message to a common helper func elsewhere?
   let dateIntervalLabel = `${startDate || "Prior"} to ${endDate || "Today"}`;
   // If a date menu option was selected, just use its specific name instead
-  if (selectedDateMenuOption) { dateIntervalLabel = selectedDateMenuOption.name; }
+  if (selectedDateMenuOption) {
+    dateIntervalLabel = selectedDateMenuOption.name;
+  }
   return (
     <StyledChip
       size="medium"

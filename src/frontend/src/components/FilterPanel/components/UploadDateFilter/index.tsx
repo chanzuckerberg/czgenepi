@@ -2,7 +2,6 @@ import React, { FC } from "react";
 import { FormattedDateType } from "src/components/DateField";
 import { DateFilter, DateMenuOption } from "../DateFilter";
 
-
 const MENU_OPTIONS_UPLOAD_DATE: DateMenuOption[] = [
   {
     name: "Today",
@@ -10,15 +9,14 @@ const MENU_OPTIONS_UPLOAD_DATE: DateMenuOption[] = [
   },
   {
     name: "Yesterday",
+    numDaysEndOffset: 1,
     numDaysStartOffset: 1,
-    numDaysEndOffset: 1
   },
   {
     name: "Last 7 Days",
-    numDaysStartOffset: 7
+    numDaysStartOffset: 7,
   },
 ];
-
 
 interface Props {
   updateUploadDateFilter: (
