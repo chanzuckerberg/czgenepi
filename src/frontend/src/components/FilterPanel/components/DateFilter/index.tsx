@@ -109,7 +109,12 @@ const DateFilter: FC<Props> = ({
         setAreFieldsValid(false);
       }
     });
-  }, [validateForm, values]);
+  }, [
+    validateForm,
+    values,
+    fieldKeyEnd, // Shouldn't change, but makes linter happy and JIC
+    fieldKeyStart, // Shouldn't change, but makes linter happy and JIC
+  ]);
 
   const formatDate = (d: DateType) => {
     if (d === undefined) return d;
