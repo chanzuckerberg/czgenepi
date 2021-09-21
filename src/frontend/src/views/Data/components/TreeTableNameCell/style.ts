@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { getColors, Props } from "czifui";
+import { getColors, getSpacings, Props } from "czifui";
 import { RowContent } from "src/common/components/library/data_table/style";
 import OpenInNewIcon from "src/common/icons/OpenInNew.svg";
 import { icon } from "../../../../common/components/library/data_table/style";
@@ -14,6 +14,14 @@ export const StyledOpenInNewIcon = styled(OpenInNewIcon, {
   shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
 })`
   ${icon}
+  flex: 0 0 auto;
+
+  ${(props) => {
+    const spacings = getSpacings(props);
+    return `
+      margin: 0 0 0 ${spacings?.l}px;
+    `;
+  }}
 
   ${(props: ExtraProps) => {
     const { disabled } = props;
@@ -30,6 +38,8 @@ export const StyledOpenInNewIcon = styled(OpenInNewIcon, {
 export const StyledRowContent = styled(RowContent, {
   shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
 })`
+  flex: 2 0 40%;
+
   ${(props: ExtraProps) => {
     const { disabled } = props;
     const colors = getColors(props);
