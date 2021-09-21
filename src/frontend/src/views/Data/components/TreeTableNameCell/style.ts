@@ -2,10 +2,7 @@ import styled from "@emotion/styled";
 import { getColors, getSpacings, Props } from "czifui";
 import { RowContent } from "src/common/components/library/data_table/style";
 import OpenInNewIcon from "src/common/icons/OpenInNew.svg";
-import {
-  icon,
-  nameCell,
-} from "../../../../common/components/library/data_table/style";
+import { icon } from "../../../../common/components/library/data_table/style";
 
 export interface ExtraProps extends Props {
   disabled?: boolean;
