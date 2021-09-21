@@ -1,6 +1,6 @@
 import { Menu, MenuItem } from "czifui";
 import { useFormik } from "formik";
-import { noop } from "lodash";
+import { noop, isEmpty } from "lodash";
 import React, { FC, useEffect, useState } from "react";
 import DateField, { FormattedDateType } from "src/components/DateField";
 import {
@@ -48,6 +48,9 @@ const DateFilter: FC<Props> = ({
   // `startDate` and `endDate` represent the active filter dates. Update on filter change.
   const [startDate, setStartDate] = useState<FormattedDateType>();
   const [endDate, setEndDate] = useState<FormattedDateType>();
+  // Are fields valid and user should be allowed to hit the "Apply" button?
+  // Related to some async form validation weirdness. See `validateForm` call below.
+  const [areFieldsValid, setAreFieldsValid] = useState<Boolean>(false);
   // What menu option is chosen. If none chosen, `null`.
   const [selectedDateMenuOption, setSelectedDateMenuOption] = useState<DateMenuOption | null>(null);
   const [anchorEl, setAnchorEl] = useState<HTMLElement>();
@@ -82,19 +85,30 @@ const DateFilter: FC<Props> = ({
     validationSchema,
   });
 
-  const { values, validateForm, isValid, setFieldValue } = formik;
+  const { values, validateForm, setFieldValue } = formik;
   useEffect(() => {
-    validateForm(values).then(() => console.log('YOOOLO'));
-    console.log(validateForm(values));
-    console.log("isValid", isValid); // REMOVE
+    // HACK (vince) -- get around async validation weirdness
+    // The below `.then()` clause is all to handle some async weirdness around validation.
+    // Because an `undefined` value for date field is considered okay -- we do not require
+    // user to have two dates, one can be empty so it's an "uncapped" interval -- this means
+    // the date field form technically starts as "valid". The instant a user types a char
+    // though, "Apply" button appears. It /should/ be disabled because field is invalid
+    // until a full date is entered. But the formik validation is async, so the empty
+    // field it just was briefly causes the button to be enabled before formik validation
+    // kicks in, and it becomes invalid ~50ms later, which causes visual flicker.
+    // So the below async part and associated state is purely to avoid that visual flicker.
+    validateForm(values).then((validateFormErrors) => {
+      if (
+        isEmpty(validateFormErrors) && // empty formik object here means no errors
+        // Also must have at least one field filled before we consider useable.
+        (values[fieldKeyStart] || values[fieldKeyEnd])
+      ) {
+        setAreFieldsValid(true);
+      } else {
+        setAreFieldsValid(false);
+      }
+    });
   }, [validateForm, values]);
-  // HACK (vince): Because `isValid` runs async, but starting empty fields of undefined
-  // is considered valid
-  // AGGGHHH SLOW ASYNC
-  let areFieldsValid = false;
-  if ((values[fieldKeyStart] || values[fieldKeyEnd]) && isValid) {
-    areFieldsValid = true;
-  }
 
   const formatDate = (d: DateType) => {
     if (d === undefined) return d;
@@ -105,7 +119,6 @@ const DateFilter: FC<Props> = ({
 
   // Use this over directly using `updateDateFilter` prop so we track filter changes.
   const setDatesFromRange = (start: DateType, end: DateType) => {
-    console.log("areFieldsValid", areFieldsValid); // REMOVE
     const newStartDate = formatDate(start);
     const newEndDate = formatDate(end);
     setStartDate(newStartDate);
@@ -185,7 +198,7 @@ const DateFilter: FC<Props> = ({
           )}
         </StyledManualDate>
         {/* TODO (mlila): use a single select here instead */}
-        {menuOptions.map((dateOption) => (
+        {menuOptions.map((dateOption: DateMenuOption) => (
           <MenuItem
             key={dateOption.name}
             onClick={() => setDatesFromMenuOption(dateOption)}
