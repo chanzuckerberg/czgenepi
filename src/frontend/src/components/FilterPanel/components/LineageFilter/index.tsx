@@ -21,7 +21,7 @@ const getOptionSelected = (
   return option.name === value.name;
 };
 // ComplexFilter doesn't directly do the check, it's done by its child MenuSelect
-const optionCheckingMenuSelectProps = {
+const MenuSelectProps = {
   getOptionSelected,
 };
 
@@ -57,7 +57,7 @@ const LineageFilter = (props: Props): JSX.Element => {
       label="Lineage"
       options={options}
       onChange={setValue}
-      MenuSelectProps={optionCheckingMenuSelectProps}
+      MenuSelectProps={MenuSelectProps}
       multiple
       search
       InputDropdownProps={PROPS_FOR_INPUT_DROPDOWN}
