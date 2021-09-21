@@ -1,4 +1,3 @@
-import csv
 import datetime
 import io
 import json
@@ -183,39 +182,6 @@ def add_can_see(
             )
             .on_conflict_do_nothing()
         )
-
-
-@db.command("update-public-ids")
-@click.option("--group-id", type=int, required=True)
-@click.option(
-    "private_to_public_id_mapping_fh",
-    "--private-to-public-id-mapping",
-    type=click.File("r"),
-    required=True,
-)
-@click.pass_context
-def update_public_ids(
-    ctx, group_id: int, private_to_public_id_mapping_fh: io.TextIOBase
-):
-    engine = ctx.obj["ENGINE"]
-    csvreader = csv.DictReader(private_to_public_id_mapping_fh)
-    private_to_public = {row["private_id"]: row["public_id"] for row in csvreader}
-    with session_scope(engine) as session:
-        samples_to_update = (
-            session.query(Sample)
-            .filter(
-                and_(
-                    Sample.submitting_group_id == group_id,
-                    Sample.private_identifier.in_(private_to_public.keys()),
-                )
-            )
-            .all()
-        )
-        for s in samples_to_update:
-            s.public_identifier = private_to_public[s.private_identifier]
-            session.add(s)
-
-        session.commit()
 
 
 @db.command("create-phylo-run")
