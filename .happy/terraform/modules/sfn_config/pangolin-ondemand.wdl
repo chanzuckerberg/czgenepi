@@ -24,7 +24,7 @@ task pangolin_workflow {
 
     command <<<
     cd /usr/src/app/aspen/workflows/pangolin
-    ./run_pangolin.sh "~{samples}"
+    ./run_pangolin.sh ~{sep(' ', samples)}
     >>>
 
     runtime {
