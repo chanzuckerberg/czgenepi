@@ -437,7 +437,8 @@ def update_sample_public_ids():
     }
 
     group_id: int = request_data.get("group_id")
-    # group id not supplied, use user group_id
+
+    # group id not supplied (when admin is making request), use the user.group_id instead
     if not group_id:
         group_id = user.group_id
 
