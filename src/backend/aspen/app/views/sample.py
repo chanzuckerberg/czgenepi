@@ -326,6 +326,7 @@ def create_sample():
             f"Error inserting data, private_identifiers {already_exists['existing_private_ids']} or public_identifiers: {already_exists['existing_public_ids']} already exist in our database, please remove these samples before proceeding with upload.",
         )
     public_ids = create_public_ids(user.group_id, g.db_session, len(request_data))
+    pangolin_sample_ids: Sequence[str] = []  # Pass sample public ids to pangolin job
     for data in request_data:
         data_ok: bool
         missing_fields: Optional[list[str]]
@@ -406,7 +407,7 @@ def create_sample():
 
             g.db_session.add(sample)
             g.db_session.add(uploaded_pathogen_genome)
-
+            pangolin_sample_ids.append(sample.public_identifier)
         else:
             raise ex.BadRequestException(
                 f"Missing required fields {missing_fields} or encountered unexpected fields {unexpected_fields}",
@@ -421,14 +422,9 @@ def create_sample():
     sfn_input_json = {
         "Input": {
             "Run": {
-                "aspen_config_secret_name": os.environ.get(
-                    "ASPEN_CONFIG_SECRET_NAME", "aspen-config"
-                ),
                 "aws_region": aws.region(),
                 "docker_image_id": aspen_config.PANGOLIN_DOCKER_IMAGE_ID,
-                "remote_dev_prefix": os.getenv("REMOTE_DEV_PREFIX"),
-                "s3_filestem": f"{group.location}/{request_data['tree_type'].capitalize()}",
-                "workflow_id": workflow.id,
+                "samples": pangolin_sample_ids,
             },
         },
         "OutputPrefix": f"{aspen_config.PANGOLIN_OUTPUT_PREFIX}/{workflow.id}",

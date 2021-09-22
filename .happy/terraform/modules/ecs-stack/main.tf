@@ -200,6 +200,22 @@ module pangolin_sfn_config {
   event_role_arn        = local.event_role_arn
 }
 
+module pangolin_ondemand_sfn_config {
+  source   = "../sfn_config"
+  app_name = "pangolin-ondemand-sfn"
+  image    = "${local.pangolin_image_repo}:${local.image_tag}"
+  memory   = 120000
+  wdl_path = "workflows/pangolin-ondemand.wdl"
+  custom_stack_name     = local.custom_stack_name
+  deployment_stage      = local.deployment_stage
+  remote_dev_prefix     = local.remote_dev_prefix
+  stack_resource_prefix = local.stack_resource_prefix
+  swipe_comms_bucket    = local.swipe_comms_bucket
+  swipe_wdl_bucket      = local.swipe_wdl_bucket
+  sfn_arn               = module.swipe_sfn.step_function_arn
+  event_role_arn        = local.event_role_arn
+}
+
 module nextstrain_template_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-sfn"
