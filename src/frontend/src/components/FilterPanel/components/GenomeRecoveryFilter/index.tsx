@@ -12,6 +12,15 @@ interface Props {
   updateGenomeRecoveryFilter: (selected?: string) => void;
 }
 
+const GENOME_RECOVERY_OPTIONS = [
+  {
+    name: "Complete",
+  },
+  {
+    name: "Failed",
+  },
+];
+
 const GenomeRecoveryFilter = ({
   updateGenomeRecoveryFilter,
 }: Props): JSX.Element => {
@@ -24,14 +33,6 @@ const GenomeRecoveryFilter = ({
 
   const open = Boolean(anchorEl);
   const id = "genome-recovery";
-  const OPTIONS = [
-    {
-      name: "Complete",
-    },
-    {
-      name: "Failed",
-    },
-  ];
 
   const handleClose = () => {
     if (anchorEl) {
@@ -57,6 +58,12 @@ const GenomeRecoveryFilter = ({
   };
 
   // TODO (mlila): replace with sds complex filter when complete
+  // (vince): For the most part, will be a simple drop-in replacement, but there
+  // are some styling difficulties right now. See notes in LineageFilter about
+  // czifui 0.0.55, but also, even with that version I think it won't work
+  // immediately because of the `Wrapper` component in how ComplexFilter is
+  // implemented locking it to 150px width. Whenever we make the change over,
+  // expect to need to figure that out as part of it.
   return (
     <>
       <StyledFilterWrapper>
@@ -73,7 +80,7 @@ const GenomeRecoveryFilter = ({
           onClose={handleClose}
           value={value}
           onChange={handleChange}
-          options={OPTIONS}
+          options={GENOME_RECOVERY_OPTIONS}
         />
       </Popper>
     </>
