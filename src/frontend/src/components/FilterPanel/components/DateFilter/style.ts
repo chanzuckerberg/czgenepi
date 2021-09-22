@@ -59,8 +59,3 @@ export const StyledErrorMessage = styled.span`
   ${fontBodyXxxs}
   color: red;
 `;
-
-export const StyledErrorButtonWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
