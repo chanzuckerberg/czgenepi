@@ -7,11 +7,13 @@ import style from "./index.module.scss";
 interface TreeTableDownloadMenuProps {
   jsonLink: string;
   accessionsLink: string;
+  shouldAllowDownload: boolean;
 }
 
 const TreeTableDownloadMenu = ({
   jsonLink,
   accessionsLink,
+  shouldAllowDownload,
 }: TreeTableDownloadMenuProps): JSX.Element => {
   const [anchorEl, setAnchorEl] = React.useState<Element | null>(null);
 
@@ -39,9 +41,11 @@ const TreeTableDownloadMenu = ({
         onClose={handleClose}
         getContentAnchorEl={null}
       >
-        <a href={jsonLink} target="_blank" rel="noopener">
-          <MenuItem onClick={handleClose}>{"Tree file (.json)"}</MenuItem>
-        </a>
+        {shouldAllowDownload && (
+          <a href={jsonLink} target="_blank" rel="noopener">
+            <MenuItem onClick={handleClose}>{"Tree file (.json)"}</MenuItem>
+          </a>
+        )}
         <a href={accessionsLink} target="_blank" rel="noopener">
           <MenuItem onClick={handleClose}>{"Private IDs (.tsv)"}</MenuItem>
         </a>
