@@ -134,7 +134,6 @@ module backend_service {
   service_port          = 3000
   cmd                   = local.backend_cmd
   deployment_stage      = local.deployment_stage
-  step_function_arn     = module.swipe_sfn.step_function_arn
   host_match            = try(join(".", [module.backend_dns[0].dns_prefix, local.external_dns]), "")
   priority              = local.priority
   api_url               = local.backend_url
