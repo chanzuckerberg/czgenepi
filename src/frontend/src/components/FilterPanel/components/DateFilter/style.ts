@@ -2,6 +2,7 @@ import styled from "@emotion/styled";
 import {
   Button,
   fontBodyXs,
+  fontBodyXxxs,
   getColors,
   getFontWeights,
   getSpacings,
@@ -45,4 +46,16 @@ export const StyledButton = styled(Button)`
       margin-top: ${spacings?.xs}px;
     `;
   }}
+`;
+
+export const ErrorMessageHolder = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+export const StyledErrorMessage = styled.span`
+  /* set max-width here so that there's space for both error messages to be present and be spaced appropriately */
+  max-width: 159px;
+  ${fontBodyXxxs}
+  color: red;
 `;

@@ -14,8 +14,10 @@ import {
   StyledInputDropdown,
 } from "../../style";
 import {
+  ErrorMessageHolder,
   StyledButton,
   StyledDateRange,
+  StyledErrorMessage,
   StyledManualDate,
   StyledText,
 } from "./style";
@@ -96,7 +98,10 @@ export const DateFilter: FC<Props> = ({
 
   // formik `isValid` actually gets set after `isValidating` goes back to false
   // So we have to check both to avoid visual flicker in Apply button.
-  const { values, setFieldValue, isValid, isValidating } = formik;
+  const { values, setFieldValue, isValid, isValidating, errors } = formik;
+
+  const errorMessageFieldKeyStart = errors[fieldKeyStart];
+  const errorMessageFieldKeyEnd = errors[fieldKeyEnd];
 
   // Use this over directly using `updateDateFilter` prop so we track filter changes.
   const setDatesFromRange = (start: DateType, end: DateType) => {
@@ -159,6 +164,18 @@ export const DateFilter: FC<Props> = ({
             <StyledText>to</StyledText>
             <DateField fieldKey={fieldKeyEnd} formik={formik} />
           </StyledDateRange>
+          <ErrorMessageHolder>
+            {errorMessageFieldKeyStart ? (
+              <StyledErrorMessage>{errors[fieldKeyStart]}</StyledErrorMessage>
+            ) : (
+              <StyledErrorMessage />
+            )}
+            {errorMessageFieldKeyEnd ? (
+              <StyledErrorMessage>{errors[fieldKeyEnd]}</StyledErrorMessage>
+            ) : (
+              <StyledErrorMessage />
+            )}
+          </ErrorMessageHolder>
           {(values[fieldKeyStart] || values[fieldKeyEnd]) && (
             <StyledButton
               color="primary"
