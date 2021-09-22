@@ -426,7 +426,7 @@ def update_sample_public_ids():
 
     if not user.system_admin:
         raise ex.BadRequestException(
-            f"user making update request must be a system admin",
+            "user making update request must be a system admin",
         )
 
     request_private_ids: list[str] = request_data["private_ids"]
