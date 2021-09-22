@@ -284,6 +284,7 @@ class Config(object):
 
     @property
     def NEXTSTRAIN_SFN_ARN(self) -> str:
+        print(self.AWS_NEXTSTRAIN_SFN_PARAMETER)
         return self.AWS_NEXTSTRAIN_SFN_PARAMETER["SFNArn"]
 
     @property
@@ -314,6 +315,7 @@ class Config(object):
     # Pangolin SFN config properties
     @property
     def PANGOLIN_DOCKER_IMAGE_ID(self) -> str:
+        print(self.AWS_PANGOLIN_SFN_PARAMETER)
         return self.AWS_PANGOLIN_SFN_PARAMETER["Input"]["Run"]["docker_image_id"]
 
     @property
