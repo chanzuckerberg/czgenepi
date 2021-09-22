@@ -415,4 +415,43 @@ def create_sample():
         g.db_session.commit()
     except Exception as e:
         raise ex.BadRequestException(f"Error encountered when saving data: {e}")
+
+    # Kick off the Pangolin batch job
+    aspen_config = application.aspen_config
+    sfn_input_json = {
+        "Input": {
+            "Run": {
+                "aspen_config_secret_name": os.environ.get(
+                    "ASPEN_CONFIG_SECRET_NAME", "aspen-config"
+                ),
+                "aws_region": aws.region(),
+                "docker_image_id": aspen_config.PANGOLIN_DOCKER_IMAGE_ID,
+                "remote_dev_prefix": os.getenv("REMOTE_DEV_PREFIX"),
+                "s3_filestem": f"{group.location}/{request_data['tree_type'].capitalize()}",
+                "workflow_id": workflow.id,
+            },
+        },
+        "OutputPrefix": f"{aspen_config.PANGOLIN_OUTPUT_PREFIX}/{workflow.id}",
+        "RUN_WDL_URI": aspen_config.PANGOLIN_WDL_URI,
+        "RunEC2Memory": aspen_config.PANGOLIN_EC2_MEMORY,
+        "RunEC2Vcpu": aspen_config.PANGOLIN_EC2_VCPU,
+        "RunSPOTMemory": aspen_config.PANGOLIN_SPOT_MEMORY,
+        "RunSPOTVcpu": aspen_config.PANGOLIN_SPOT_VCPU,
+    }
+
+    session = aws.session()
+    client = session.client(
+        service_name="stepfunctions",
+        endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None,
+    )
+
+    execution_name = f"{group.prefix}-ondemand-pangolin-{str(start_datetime)}"
+    execution_name = re.sub(r"[^0-9a-zA-Z-]", r"-", execution_name)
+
+    client.start_execution(
+        stateMachineArn=os.environ.get("NEXTSTRAIN_SFN_ARN"),
+        name=execution_name,
+        input=json.dumps(sfn_input_json),
+    )
+
     return jsonify(success=True)

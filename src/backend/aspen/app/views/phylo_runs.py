@@ -165,7 +165,7 @@ def start_phylo_run():
             },
         },
         "OutputPrefix": f"{aspen_config.NEXTSTRAIN_OUTPUT_PREFIX}/{workflow.id}",
-        "RUN_WDL_URI": aspen_config.RUN_WDL_URI,
+        "RUN_WDL_URI": aspen_config.NEXTSTRAIN_WDL_URI,
         "RunEC2Memory": aspen_config.NEXTSTRAIN_EC2_MEMORY,
         "RunEC2Vcpu": aspen_config.NEXTSTRAIN_EC2_VCPU,
         "RunSPOTMemory": aspen_config.NEXTSTRAIN_SPOT_MEMORY,

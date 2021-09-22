@@ -272,20 +272,22 @@ class Config(object):
     def AWS_NEXTSTRAIN_SFN_PARAMETER(self) -> Mapping[str, Any]:
         return self._AWS_SSM_PARAMETER("nextstrain-ondemand-sfn")
 
+    @property
+    def AWS_PANGOLIN_SFN_PARAMTER(self) -> Mapping[str, Any]:
+        return self._AWS_SSM_PARAMETER("pangolin-ondemand-sfn")
+
     ####################################################################################
-    # SFN runtime input properties
+    # Nextstrain SFN config properties
     @property
     def NEXTSTRAIN_DOCKER_IMAGE_ID(self) -> str:
         return self.AWS_NEXTSTRAIN_SFN_PARAMETER["Input"]["Run"]["docker_image_id"]
 
-    ####################################################################################
-    # SFN batch config properties
     @property
     def NEXTSTRAIN_OUTPUT_PREFIX(self) -> str:
         return self.AWS_NEXTSTRAIN_SFN_PARAMETER["OutputPrefix"]
 
     @property
-    def RUN_WDL_URI(self) -> str:
+    def NEXTSTRAIN_WDL_URI(self) -> str:
         return self.AWS_NEXTSTRAIN_SFN_PARAMETER["RUN_WDL_URI"]
 
     @property
@@ -303,3 +305,33 @@ class Config(object):
     @property
     def NEXTSTRAIN_SPOT_VCPU(self) -> str:
         return self.AWS_NEXTSTRAIN_SFN_PARAMETER["RunSPOTVcpu"]
+
+    ####################################################################################
+    # Pangolin SFN config properties
+    @property
+    def PANGOLIN_DOCKER_IMAGE_ID(self) -> str:
+        return self.AWS_PANGOLIN_SFN_PARAMETER["Input"]["Run"]["docker_image_id"]
+
+    @property
+    def PANGOLIN_OUTPUT_PREFIX(self) -> str:
+        return self.AWS_PANGOLIN_SFN_PARAMETER["OutputPrefix"]
+
+    @property
+    def PANGOLIN_WDL_URI(self) -> str:
+        return self.AWS_PANGOLIN_SFN_PARAMETER["RUN_WDL_URI"]
+
+    @property
+    def PANGOLIN_EC2_MEMORY(self) -> str:
+        return self.AWS_PANGOLIN_SFN_PARAMETER["RunEC2Memory"]
+
+    @property
+    def PANGOLIN_EC2_VCPU(self) -> str:
+        return self.AWS_PANGOLIN_SFN_PARAMETER["RunEC2Vcpu"]
+
+    @property
+    def PANGOLIN_SPOT_MEMORY(self) -> str:
+        return self.AWS_PANGOLIN_SFN_PARAMETER["RunSPOTMemory"]
+
+    @property
+    def PANGOLIN_SPOT_VCPU(self) -> str:
+        return self.AWS_PANGOLIN_SFN_PARAMETER["RunSPOTVcpu"]
