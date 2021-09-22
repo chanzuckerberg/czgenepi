@@ -283,6 +283,10 @@ class Config(object):
         return self.AWS_NEXTSTRAIN_SFN_PARAMETER["Input"]["Run"]["docker_image_id"]
 
     @property
+    def NEXTSTRAIN_SFN_ARN(self) -> str:
+        return self.AWS_NEXTSTRAIN_SFN_PARAMETER["SFNArn"]
+
+    @property
     def NEXTSTRAIN_OUTPUT_PREFIX(self) -> str:
         return self.AWS_NEXTSTRAIN_SFN_PARAMETER["OutputPrefix"]
 
@@ -311,6 +315,10 @@ class Config(object):
     @property
     def PANGOLIN_DOCKER_IMAGE_ID(self) -> str:
         return self.AWS_PANGOLIN_SFN_PARAMETER["Input"]["Run"]["docker_image_id"]
+
+    @property
+    def PANGOLIN_SFN_ARN(self) -> str:
+        return self.AWS_NEXTSTRAIN_SFN_PARAMETER["SFNArn"]
 
     @property
     def PANGOLIN_OUTPUT_PREFIX(self) -> str:

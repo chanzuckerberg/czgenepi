@@ -99,11 +99,6 @@ variable deployment_stage {
   default     = "dev"
 }
 
-variable step_function_arn {
-  type        = string
-  description = "ARN for the step function called by the app"
-}
-
 variable priority {
   type        = number
   description = "Listener rule priority number within the given listener"

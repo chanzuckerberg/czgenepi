@@ -8,11 +8,12 @@ locals {
       )
     }
     OutputPrefix = "s3://${var.swipe_comms_bucket}/swipe${var.remote_dev_prefix}/${var.app_name}/results",
-    RunSPOTMemory = var.memory
-    RunEC2Memory = var.memory
-    RunSPOTVcpu = var.vcpus
-    RunEC2Vcpu = var.vcpus
-    RUN_WDL_URI = "s3://${aws_s3_bucket_object.wdl.bucket}${aws_s3_bucket_object.wdl.key}"
+    RunSPOTMemory = var.memory,
+    RunEC2Memory = var.memory,
+    RunSPOTVcpu = var.vcpus,
+    RunEC2Vcpu = var.vcpus,
+    RUN_WDL_URI = "s3://${aws_s3_bucket_object.wdl.bucket}${aws_s3_bucket_object.wdl.key}",
+    SFNArn = var.sfn_arn,
   })
 }
 

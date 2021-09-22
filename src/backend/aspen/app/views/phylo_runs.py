@@ -182,7 +182,7 @@ def start_phylo_run():
     execution_name = re.sub(r"[^0-9a-zA-Z-]", r"-", execution_name)
 
     client.start_execution(
-        stateMachineArn=os.environ.get("NEXTSTRAIN_SFN_ARN"),
+        stateMachineArn=aspen_config.NEXTSTRAIN_SFN_ARN,
         name=execution_name,
         input=json.dumps(sfn_input_json),
     )

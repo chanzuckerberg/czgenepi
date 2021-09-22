@@ -56,10 +56,6 @@ resource aws_ecs_task_definition task_definition {
         "value": "${var.frontend_url}"
       },
       {
-        "name": "NEXTSTRAIN_SFN_ARN",
-        "value": "${var.step_function_arn}"
-      },
-      {
         "name": "API_URL",
         "value": "${var.api_url}"
       },
