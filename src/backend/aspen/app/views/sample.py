@@ -308,7 +308,7 @@ def samples():
     return jsonify({SAMPLE_KEY: results})
 
 
-def _kick_off_pangolin(group, sample_ids):
+def _kick_off_pangolin(group_prefix: str, sample_ids: Sequence[str]):
     aspen_config = application.aspen_config
     sfn_input_json = {
         "Input": {
@@ -332,7 +332,7 @@ def _kick_off_pangolin(group, sample_ids):
         endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None,
     )
 
-    execution_name = f"{group.prefix}-ondemand-pangolin-{str(datetime.datetime.now())}"
+    execution_name = f"{group_prefix}-ondemand-pangolin-{str(datetime.datetime.now())}"
     execution_name = re.sub(r"[^0-9a-zA-Z-]", r"-", execution_name)
 
     client.start_execution(
@@ -458,7 +458,7 @@ def create_sample():
 
     #  Run as a separate thread, so any errors here won't affect sample uploads
     pangolin_job = threading.Thread(
-        target=_kick_off_pangolin, args=(group, pangolin_sample_ids)
+        target=_kick_off_pangolin, args=(group.prefix, pangolin_sample_ids)
     )
     pangolin_job.start()
 
