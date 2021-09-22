@@ -1,5 +1,7 @@
 import datetime
+import json
 import os
+import re
 from collections import defaultdict
 from typing import Any, Mapping, MutableSequence, Optional, Sequence, Set, Union
 from uuid import uuid4
@@ -428,7 +430,7 @@ def create_sample():
                 "samples": pangolin_sample_ids,
             },
         },
-        "OutputPrefix": f"{aspen_config.PANGOLIN_OUTPUT_PREFIX}/{workflow.id}",
+        "OutputPrefix": f"{aspen_config.PANGOLIN_OUTPUT_PREFIX}",
         "RUN_WDL_URI": aspen_config.PANGOLIN_WDL_URI,
         "RunEC2Memory": aspen_config.PANGOLIN_EC2_MEMORY,
         "RunEC2Vcpu": aspen_config.PANGOLIN_EC2_VCPU,
@@ -442,7 +444,9 @@ def create_sample():
         endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None,
     )
 
-    execution_name = f"{group.prefix}-ondemand-pangolin-{str(start_datetime)}"
+    execution_name = (
+        f"{user.group.prefix}-ondemand-pangolin-{str(datetime.datetime.now())}"
+    )
     execution_name = re.sub(r"[^0-9a-zA-Z-]", r"-", execution_name)
 
     client.start_execution(

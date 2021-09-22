@@ -273,7 +273,7 @@ class Config(object):
         return self._AWS_SSM_PARAMETER("nextstrain-ondemand-sfn")
 
     @property
-    def AWS_PANGOLIN_SFN_PARAMTER(self) -> Mapping[str, Any]:
+    def AWS_PANGOLIN_SFN_PARAMETER(self) -> Mapping[str, Any]:
         return self._AWS_SSM_PARAMETER("pangolin-ondemand-sfn")
 
     ####################################################################################
@@ -318,7 +318,7 @@ class Config(object):
 
     @property
     def PANGOLIN_SFN_ARN(self) -> str:
-        return self.AWS_NEXTSTRAIN_SFN_PARAMETER["SFNArn"]
+        return self.AWS_PANGOLIN_SFN_PARAMETER["SFNArn"]
 
     @property
     def PANGOLIN_OUTPUT_PREFIX(self) -> str:
