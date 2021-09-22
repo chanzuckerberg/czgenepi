@@ -6,6 +6,7 @@ import React from "react";
 import { defaultCellRenderer } from "src/common/components/library/data_table";
 import dataTableStyle from "src/common/components/library/data_table/index.module.scss";
 import { RowContent } from "src/common/components/library/data_table/style";
+import { TREE_STATUS } from "src/common/constants/types";
 import SampleIcon from "src/common/icons/Sample.svg";
 import { createTableCellRenderer, stringGuard } from "src/common/utils";
 import TreeTableDownloadMenu from "src/components/TreeTableDownloadMenu";
@@ -121,11 +122,13 @@ const TREE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
   downloadLink: ({ value, item }): JSX.Element => {
     const jsonDownloadLink = stringGuard(value);
     const tsvDownloadLink = stringGuard(item["accessionsLink"]);
+    const shouldAllowDownload = item?.status === TREE_STATUS.Completed;
     return (
       <RowContent>
         <TreeTableDownloadMenu
           jsonLink={jsonDownloadLink}
           accessionsLink={tsvDownloadLink}
+          shouldAllowDownload={shouldAllowDownload}
         />
       </RowContent>
     );

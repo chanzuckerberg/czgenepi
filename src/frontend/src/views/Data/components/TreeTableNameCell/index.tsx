@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import dataTableStyle from "src/common/components/library/data_table/index.module.scss";
+import { TREE_STATUS } from "src/common/constants/types";
 import TreeIcon from "src/common/icons/PhyloTree.svg";
 import { createTreeModalInfo } from "src/common/utils";
 import TreeVizModal from "../TreeVizModal";
@@ -12,9 +13,10 @@ interface NameProps {
 
 const TreeTableNameCell = ({ value, item }: NameProps): JSX.Element => {
   const [open, setOpen] = useState(false);
+  const isDisabled = item?.status !== TREE_STATUS.Completed;
 
   const handleClickOpen = () => {
-    setOpen(true);
+    if (!isDisabled) setOpen(true);
   };
 
   const handleClose = () => {
@@ -35,11 +37,12 @@ const TreeTableNameCell = ({ value, item }: NameProps): JSX.Element => {
       <StyledRowContent
         className={dataTableStyle.cell}
         onClick={handleClickOpen}
+        disabled={isDisabled}
       >
         <CellWrapper data-test-id="tree-name-cell">
           <TreeIcon className={dataTableStyle.icon} />
           {value}
-          <StyledOpenInNewIcon />
+          <StyledOpenInNewIcon disabled={isDisabled} />
         </CellWrapper>
       </StyledRowContent>
     </>
