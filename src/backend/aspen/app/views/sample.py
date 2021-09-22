@@ -10,6 +10,7 @@ from flask import g, jsonify, request, Response, stream_with_context
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import joinedload
 
+from aspen import aws
 from aspen.app.app import application, requires_auth
 from aspen.app.views import api_utils
 from aspen.app.views.api_utils import check_valid_sequence
