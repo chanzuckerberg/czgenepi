@@ -14,13 +14,13 @@ import TreeTableNameCell from "./components/TreeTableNameCell";
 import { TreeTypeTooltip } from "./components/TreeTypeTooltip";
 import {
   GISAIDCell,
-  LineageCell,
-  LineageRowContent,
   PrivacyIcon,
   PrivateIdValueWrapper,
   SampleIconWrapper,
   StyledChip,
   Subtext,
+  UnderlinedCell,
+  UnderlinedRowContent,
 } from "./style";
 
 const LABEL_STATUS: Record<
@@ -53,13 +53,13 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
   lineage: ({ value }): JSX.Element => {
     const hasLineage = Boolean(value.version);
 
-    const Component = hasLineage ? LineageRowContent : RowContent;
+    const Component = hasLineage ? UnderlinedRowContent : RowContent;
 
     const Content = (
       <Component>
-        <LineageCell className={dataTableStyle.cell}>
+        <UnderlinedCell className={dataTableStyle.cell}>
           {value.lineage || "Not Yet Processed"}
-        </LineageCell>
+        </UnderlinedCell>
       </Component>
     );
 
@@ -133,9 +133,11 @@ const TREE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
   name: TreeTableNameCell,
   treeType: ({ value, header }: CustomTableRenderProps): JSX.Element => (
     <TreeTypeTooltip value={value as string}>
-      <RowContent header={header}>
-        <div data-test-id={`row-${header.key}`}>{value}</div>
-      </RowContent>
+      <UnderlinedRowContent header={header}>
+        <UnderlinedCell data-test-id={`row-${header.key}`}>
+          {value}
+        </UnderlinedCell>
+      </UnderlinedRowContent>
     </TreeTypeTooltip>
   ),
 };
