@@ -87,14 +87,18 @@ export const HeaderCheckbox = styled(Checkbox)`
 
 export interface AlignProps extends Props {
   align?: string;
+  wide?: boolean;
 }
 
 export const TableHeader = styled("div")`
   ${(props: AlignProps) => {
-    const { align } = props;
+    const { align, wide } = props;
     const justify = align ?? "left";
 
     return `
+      &:first-of-type {
+        flex: ${wide ? "2 0 40%" : ""};
+      }
       justify-content: ${justify};
   `;
   }}
