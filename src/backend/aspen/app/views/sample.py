@@ -2,6 +2,7 @@ import datetime
 import json
 import os
 import re
+import threading
 from collections import defaultdict
 from typing import Any, Mapping, MutableSequence, Optional, Sequence, Set, Union
 from uuid import uuid4
@@ -307,6 +308,43 @@ def samples():
     return jsonify({SAMPLE_KEY: results})
 
 
+def _kick_off_pangolin(user, sample_ids):
+    # Kick off the Pangolin batch job
+    aspen_config = application.aspen_config
+    sfn_input_json = {
+        "Input": {
+            "Run": {
+                "aws_region": aws.region(),
+                "docker_image_id": aspen_config.PANGOLIN_DOCKER_IMAGE_ID,
+                "samples": sample_ids,
+            },
+        },
+        "OutputPrefix": f"{aspen_config.PANGOLIN_OUTPUT_PREFIX}",
+        "RUN_WDL_URI": aspen_config.PANGOLIN_WDL_URI,
+        "RunEC2Memory": aspen_config.PANGOLIN_EC2_MEMORY,
+        "RunEC2Vcpu": aspen_config.PANGOLIN_EC2_VCPU,
+        "RunSPOTMemory": aspen_config.PANGOLIN_SPOT_MEMORY,
+        "RunSPOTVcpu": aspen_config.PANGOLIN_SPOT_VCPU,
+    }
+
+    session = aws.session()
+    client = session.client(
+        service_name="stepfunctions",
+        endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None,
+    )
+
+    execution_name = (
+        f"{user.group.prefix}-ondemand-pangolin-{str(datetime.datetime.now())}"
+    )
+    execution_name = re.sub(r"[^0-9a-zA-Z-]", r"-", execution_name)
+
+    client.start_execution(
+        stateMachineArn=aspen_config.PANGOLIN_SFN_ARN,
+        name=execution_name,
+        input=json.dumps(sfn_input_json),
+    )
+
+
 @application.route("/api/samples/create", methods=["POST"])
 @requires_auth
 def create_sample():
@@ -420,39 +458,10 @@ def create_sample():
     except Exception as e:
         raise ex.BadRequestException(f"Error encountered when saving data: {e}")
 
-    # Kick off the Pangolin batch job
-    aspen_config = application.aspen_config
-    sfn_input_json = {
-        "Input": {
-            "Run": {
-                "aws_region": aws.region(),
-                "docker_image_id": aspen_config.PANGOLIN_DOCKER_IMAGE_ID,
-                "samples": pangolin_sample_ids,
-            },
-        },
-        "OutputPrefix": f"{aspen_config.PANGOLIN_OUTPUT_PREFIX}",
-        "RUN_WDL_URI": aspen_config.PANGOLIN_WDL_URI,
-        "RunEC2Memory": aspen_config.PANGOLIN_EC2_MEMORY,
-        "RunEC2Vcpu": aspen_config.PANGOLIN_EC2_VCPU,
-        "RunSPOTMemory": aspen_config.PANGOLIN_SPOT_MEMORY,
-        "RunSPOTVcpu": aspen_config.PANGOLIN_SPOT_VCPU,
-    }
-
-    session = aws.session()
-    client = session.client(
-        service_name="stepfunctions",
-        endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None,
+    #  Run as a separate thread, so any errors here won't affect sample uploads
+    pangolin_job = threading.Thread(
+        target=_kick_off_pangolin, args=(user, pangolin_sample_ids)
     )
-
-    execution_name = (
-        f"{user.group.prefix}-ondemand-pangolin-{str(datetime.datetime.now())}"
-    )
-    execution_name = re.sub(r"[^0-9a-zA-Z-]", r"-", execution_name)
-
-    client.start_execution(
-        stateMachineArn=aspen_config.PANGOLIN_SFN_ARN,
-        name=execution_name,
-        input=json.dumps(sfn_input_json),
-    )
+    pangolin_job.start()
 
     return jsonify(success=True)
