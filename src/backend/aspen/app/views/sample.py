@@ -29,7 +29,7 @@ from aspen.database.models import (
     WorkflowStatusType,
 )
 from aspen.database.models.sample import create_public_ids, RegionType
-from aspen.database.models.usergroup import User
+from aspen.database.models.usergroup import Group, User
 from aspen.error import http_exceptions as ex
 from aspen.error.recoverable import RecoverableError
 from aspen.fileio.fasta_streamer import FastaStreamer
@@ -308,8 +308,7 @@ def samples():
     return jsonify({SAMPLE_KEY: results})
 
 
-def _kick_off_pangolin(user, sample_ids):
-    # Kick off the Pangolin batch job
+def _kick_off_pangolin(group, sample_ids):
     aspen_config = application.aspen_config
     sfn_input_json = {
         "Input": {
@@ -333,9 +332,7 @@ def _kick_off_pangolin(user, sample_ids):
         endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None,
     )
 
-    execution_name = (
-        f"{user.group.prefix}-ondemand-pangolin-{str(datetime.datetime.now())}"
-    )
+    execution_name = f"{group.prefix}-ondemand-pangolin-{str(datetime.datetime.now())}"
     execution_name = re.sub(r"[^0-9a-zA-Z-]", r"-", execution_name)
 
     client.start_execution(
@@ -349,6 +346,7 @@ def _kick_off_pangolin(user, sample_ids):
 @requires_auth
 def create_sample():
     user: User = g.auth_user
+    group: Group = user.group
     request_data = request.get_json()
 
     duplicates_in_request: Union[
@@ -460,7 +458,7 @@ def create_sample():
 
     #  Run as a separate thread, so any errors here won't affect sample uploads
     pangolin_job = threading.Thread(
-        target=_kick_off_pangolin, args=(user, pangolin_sample_ids)
+        target=_kick_off_pangolin, args=(group, pangolin_sample_ids)
     )
     pangolin_job.start()
 
