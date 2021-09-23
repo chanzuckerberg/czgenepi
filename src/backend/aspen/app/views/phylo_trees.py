@@ -16,6 +16,7 @@ from aspen.app.views.api_utils import (
     format_date,
     format_datetime,
 )
+from datetime import timedelta, datetime
 from aspen.database.models import (
     DataType,
     PhyloRun,
@@ -105,6 +106,8 @@ def phylo_trees():
                 "phylo_tree_id": None,
                 "name": phylo_run.name or generate_tree_name_from_template(phylo_run),
             }
+            if phylo_run.start_datetime and phylo_run.start_datetime < (datetime.now() - timedelta(hours=12)):
+                result["status"] = "FAILED"
         results.append(result)
 
     return jsonify({PHYLO_TREE_KEY: results})
