@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import {
   Chip,
+  ComplexFilter,
   fontCapsXxxs,
   getColors,
   getSpacings,
@@ -55,6 +56,17 @@ export const StyledChip = styled(Chip)`
     const spacings = getSpacings(props);
     return `
       margin: ${spacings?.xxs}px ${spacings?.xxs}px 0 0;
+    `;
+  }}
+`;
+
+export const StyledComplexFilter = styled(ComplexFilter)`
+  ${(props) => {
+    const spacings = getSpacings(props);
+    return `
+      margin: ${spacings?.l}px 0;
+      width: 200px;
+      }
     `;
   }}
 `;

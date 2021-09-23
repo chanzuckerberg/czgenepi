@@ -44,7 +44,7 @@ export default function DateField({
       onBlur={handleBlur}
       value={value}
       error={Boolean(errorMessage)}
-      helperText={helperText || errorMessage}
+      helperText={helperText}
     />
   );
 }
