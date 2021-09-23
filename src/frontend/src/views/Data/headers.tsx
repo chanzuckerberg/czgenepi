@@ -75,14 +75,15 @@ export const TREE_HEADERS: Header[] = [
   },
   {
     align: "center",
-    key: "treeType",
-    sortKey: ["treeType"],
-    text: "Tree Type",
-  },
-  {
     key: "creationDate",
     sortKey: ["creationDate"],
     text: "Creation Date",
+  },
+  {
+    align: "center",
+    key: "treeType",
+    sortKey: ["treeType"],
+    text: "Tree Type",
   },
   {
     key: "downloadLink",
