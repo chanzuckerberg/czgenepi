@@ -68,6 +68,7 @@ export const CreateTreeModal = ({
     setTreeName("");
     setTreeType("TARGETED");
     setInstructionsShown(false);
+    setTreeNameTooLong(false);
   };
 
   const handleClose = function () {
