@@ -49,10 +49,7 @@ const Data: FunctionComponent = () => {
       setIsDataLoading(false);
 
       const apiSamples = sampleResponse["samples"];
-      // TODO: Support in-progress and failed trees
-      const apiTrees = treeResponse["phylo_trees"].filter(
-        (tree) => tree.status === "COMPLETED"
-      );
+      const apiTrees = treeResponse["phylo_trees"];
 
       setSamples(apiSamples);
       setTrees(apiTrees);
