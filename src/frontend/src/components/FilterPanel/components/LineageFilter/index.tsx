@@ -1,9 +1,6 @@
-import {
-  ComplexFilter,
-  ComplexFilterValue,
-  DefaultMenuSelectOption,
-} from "czifui";
+import { ComplexFilterValue, DefaultMenuSelectOption } from "czifui";
 import React, { useEffect, useState } from "react";
+import { StyledComplexFilter } from "../../style";
 
 interface Props {
   options: DefaultMenuSelectOption[];
@@ -21,7 +18,7 @@ const getOptionSelected = (
   return option.name === value.name;
 };
 // ComplexFilter doesn't directly do the check, it's done by its child MenuSelect
-const optionCheckingMenuSelectProps = {
+const MenuSelectProps = {
   getOptionSelected,
 };
 
@@ -38,11 +35,11 @@ const LineageFilter = (props: Props): JSX.Element => {
   }, [updateLineageFilter, value]);
 
   // TODO -- With czifui 0.0.55, the `InputDropdownComponent` was exposed so it
-  // can be directly styled and passed in as we do with others. Once we've upgraded
-  // to 0.0.55+, this should be swapped over so it matches the approach we do elsewhere.
+  // can be directly styled and passed in as we do with others.
+  // This should be swapped over so it matches the approach we do elsewhere.
   // (vince) To tweak the internal style of dropdown in ComplexFilter, need to
   // create a specialized set of props to insert CSS via raw `style` put into
-  // underlying HTML tag. [As of czifui 0.0.53. See above for newer.]
+  // underlying HTML tag. Was done when we were on czifui 0.0.53.
   const PROPS_FOR_INPUT_DROPDOWN = {
     sdsStyle: "minimal", // Would be defaulted, but must set everything now.
     // This `style` gets directly put in as HTML style and interpolated to CSS.
@@ -53,11 +50,11 @@ const LineageFilter = (props: Props): JSX.Element => {
   } as const;
 
   return (
-    <ComplexFilter
+    <StyledComplexFilter
       label="Lineage"
       options={options}
       onChange={setValue}
-      MenuSelectProps={optionCheckingMenuSelectProps}
+      MenuSelectProps={MenuSelectProps}
       multiple
       search
       InputDropdownProps={PROPS_FOR_INPUT_DROPDOWN}
