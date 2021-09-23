@@ -31,6 +31,7 @@ const TreeTableDownloadMenu = ({
         onClick={handleClick}
         className={style.button}
         endIcon={<ExpandMore />}
+        disabled={!shouldAllowDownload}
       >
         Download
       </Button>
@@ -41,11 +42,9 @@ const TreeTableDownloadMenu = ({
         onClose={handleClose}
         getContentAnchorEl={null}
       >
-        {shouldAllowDownload && (
-          <a href={jsonLink} target="_blank" rel="noopener">
-            <MenuItem onClick={handleClose}>{"Tree file (.json)"}</MenuItem>
-          </a>
-        )}
+        <a href={jsonLink} target="_blank" rel="noopener">
+          <MenuItem onClick={handleClose}>{"Tree file (.json)"}</MenuItem>
+        </a>
         <a href={accessionsLink} target="_blank" rel="noopener">
           <MenuItem onClick={handleClose}>{"Private IDs (.tsv)"}</MenuItem>
         </a>
