@@ -467,7 +467,7 @@ def update_sample_public_ids():
         g.db_session.query(Sample)
         .filter(
             and_(
-                Sample.submitting_group_id == request_data["group_id"],
+                Sample.submitting_group_id == group_id,
                 Sample.private_identifier.in_(private_to_public.keys()),
             )
         )
