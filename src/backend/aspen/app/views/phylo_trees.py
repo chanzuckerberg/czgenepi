@@ -2,6 +2,7 @@ import json
 import os
 import re
 import uuid
+from datetime import datetime, timedelta
 from typing import Any, Callable, Iterable, Mapping, MutableSequence, Optional, Set
 
 import boto3
@@ -105,6 +106,10 @@ def phylo_trees():
                 "phylo_tree_id": None,
                 "name": phylo_run.name or generate_tree_name_from_template(phylo_run),
             }
+            if phylo_run.start_datetime and phylo_run.start_datetime < (
+                datetime.now() - timedelta(hours=12)
+            ):
+                result["status"] = "FAILED"
         results.append(result)
 
     return jsonify({PHYLO_TREE_KEY: results})
