@@ -74,7 +74,7 @@ ${local_aws} ssm put-parameter --name /aspen/local/localstack/nextstrain-ondeman
   "RunEC2Vcpu":10,
   "RunSPOTMemory":64000,
   "RunSPOTVcpu":10,
-  "SFNArn":'${LOCAL_SFN_ARN}'
+  "StateMachineArn":'${LOCAL_SFN_ARN}'
 }'
 ${local_aws} ssm delete-parameter --name /aspen/local/localstack/pangolin-ondemand-sfn
 ${local_aws} ssm put-parameter --name /aspen/local/localstack/pangolin-ondemand-sfn --value '{
@@ -89,7 +89,7 @@ ${local_aws} ssm put-parameter --name /aspen/local/localstack/pangolin-ondemand-
   "RunEC2Vcpu":1,
   "RunSPOTMemory":120000,
   "RunSPOTVcpu":1,
-  "SFNArn":'${LOCAL_SFN_ARN}'
+  "StateMachineArn":'${LOCAL_SFN_ARN}'
 }'
 
 echo "Creating s3 buckets"

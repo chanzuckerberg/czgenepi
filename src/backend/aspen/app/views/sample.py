@@ -309,21 +309,21 @@ def samples():
 
 
 def _kick_off_pangolin(group_prefix: str, sample_ids: Sequence[str]):
-    aspen_config = application.aspen_config
+    sfn_params = application.aspen_config.AWS_PANGOLIN_SFN_PARAMETERS
     sfn_input_json = {
         "Input": {
             "Run": {
                 "aws_region": aws.region(),
-                "docker_image_id": aspen_config.PANGOLIN_DOCKER_IMAGE_ID,
+                "docker_image_id": sfn_params["Input"]["Run"]["docker_image_id"],
                 "samples": sample_ids,
             },
         },
-        "OutputPrefix": f"{aspen_config.PANGOLIN_OUTPUT_PREFIX}",
-        "RUN_WDL_URI": aspen_config.PANGOLIN_WDL_URI,
-        "RunEC2Memory": aspen_config.PANGOLIN_EC2_MEMORY,
-        "RunEC2Vcpu": aspen_config.PANGOLIN_EC2_VCPU,
-        "RunSPOTMemory": aspen_config.PANGOLIN_SPOT_MEMORY,
-        "RunSPOTVcpu": aspen_config.PANGOLIN_SPOT_VCPU,
+        "OutputPrefix": f"{sfn_params['OutputPrefix']}",
+        "RUN_WDL_URI": sfn_params["RUN_WDL_URI"],
+        "RunEC2Memory": sfn_params["RunEC2Memory"],
+        "RunEC2Vcpu": sfn_params["RunEC2Vcpu"],
+        "RunSPOTMemory": sfn_params["RunSPOTMemory"],
+        "RunSPOTVcpu": sfn_params["RunSPOTVcpu"],
     }
 
     session = aws.session()
@@ -336,7 +336,7 @@ def _kick_off_pangolin(group_prefix: str, sample_ids: Sequence[str]):
     execution_name = re.sub(r"[^0-9a-zA-Z-]", r"-", execution_name)
 
     client.start_execution(
-        stateMachineArn=aspen_config.PANGOLIN_SFN_ARN,
+        stateMachineArn=sfn_params["StateMachineArn"],
         name=execution_name,
         input=json.dumps(sfn_input_json),
     )

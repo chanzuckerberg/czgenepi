@@ -13,7 +13,7 @@ locals {
     RunSPOTVcpu = var.vcpus,
     RunEC2Vcpu = var.vcpus,
     RUN_WDL_URI = "s3://${aws_s3_bucket_object.wdl.bucket}${aws_s3_bucket_object.wdl.key}",
-    SFNArn = var.sfn_arn,
+    StateMachineArn = var.sfn_arn,
   })
 }
 
