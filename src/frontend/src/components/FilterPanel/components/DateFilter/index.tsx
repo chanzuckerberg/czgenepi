@@ -1,7 +1,7 @@
 import { Menu, MenuItem } from "czifui";
 import { useFormik } from "formik";
 import { noop } from "lodash";
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useMemo, useState } from "react";
 import DateField, { FormattedDateType } from "src/components/DateField";
 import {
   DATE_ERROR_MESSAGE,
@@ -14,47 +14,53 @@ import {
   StyledInputDropdown,
 } from "../../style";
 import {
+  ErrorMessageHolder,
   StyledButton,
   StyledDateRange,
+  StyledErrorMessage,
   StyledManualDate,
   StyledText,
 } from "./style";
 
 export type DateType = FormattedDateType | Date;
 
+const formatDate = (d: DateType) => {
+  if (d === undefined) return d;
+  if (typeof d === "string") return d;
+
+  return d.toISOString().substring(0, 10);
+};
+
+export interface DateMenuOption {
+  name: string; // Must be UNIQUE because we assume can be used as key/id
+  // For both `numDays...` it's relative to now() when option is chosen.
+  // Assume start is guaranteed, but end cap is not.
+  numDaysEndOffset?: number; // How far back end of date interval is
+  numDaysStartOffset: number; // How far back start of date interval is
+}
+
 interface Props {
   fieldKeyEnd: string;
   fieldKeyStart: string;
   inputLabel: string;
   updateDateFilter: (start: FormattedDateType, end: FormattedDateType) => void;
+  menuOptions: DateMenuOption[];
 }
 
-const DateFilter: FC<Props> = ({
+export const DateFilter: FC<Props> = ({
   fieldKeyEnd,
   fieldKeyStart,
   inputLabel,
   updateDateFilter, // Don't directly call, use below `setDatesFromRange` instead
+  menuOptions,
 }) => {
   // `startDate` and `endDate` represent the active filter dates. Update on filter change.
   const [startDate, setStartDate] = useState<FormattedDateType>();
   const [endDate, setEndDate] = useState<FormattedDateType>();
-  // `working...` versions are internal display while user enters date string.
-  const [workingStartDate, setWorkingStartDate] = useState<FormattedDateType>();
-  const [workingEndDate, setWorkingEndDate] = useState<FormattedDateType>();
+  // What menu option is chosen. If none chosen, `null`.
+  const [selectedDateMenuOption, setSelectedDateMenuOption] =
+    useState<DateMenuOption | null>(null);
   const [anchorEl, setAnchorEl] = useState<HTMLElement>();
-
-  const validationSchema = yup.object({
-    [fieldKeyEnd]: yup
-      .string()
-      .matches(DATE_REGEX, DATE_ERROR_MESSAGE)
-      .min(10, DATE_ERROR_MESSAGE)
-      .max(10, DATE_ERROR_MESSAGE),
-    [fieldKeyStart]: yup
-      .string()
-      .matches(DATE_REGEX, DATE_ERROR_MESSAGE)
-      .min(10, DATE_ERROR_MESSAGE)
-      .max(10, DATE_ERROR_MESSAGE),
-  });
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = (event) => {
     setAnchorEl(event.currentTarget);
@@ -63,6 +69,23 @@ const DateFilter: FC<Props> = ({
   const handleClose = () => {
     setAnchorEl(undefined);
   };
+
+  const validationSchema = useMemo(
+    () =>
+      yup.object({
+        [fieldKeyEnd]: yup
+          .string()
+          .matches(DATE_REGEX, DATE_ERROR_MESSAGE)
+          .min(10, DATE_ERROR_MESSAGE)
+          .max(10, DATE_ERROR_MESSAGE),
+        [fieldKeyStart]: yup
+          .string()
+          .matches(DATE_REGEX, DATE_ERROR_MESSAGE)
+          .min(10, DATE_ERROR_MESSAGE)
+          .max(10, DATE_ERROR_MESSAGE),
+      }),
+    [fieldKeyStart, fieldKeyEnd] // Should never actually change, but JIC
+  );
 
   const formik = useFormik({
     initialValues: {
@@ -73,41 +96,50 @@ const DateFilter: FC<Props> = ({
     validationSchema,
   });
 
-  const { values, validateForm, setFieldValue } = formik;
+  // formik `isValid` actually gets set after `isValidating` goes back to false
+  // So we have to check both to avoid visual flicker in Apply button.
+  const { values, setFieldValue, isValid, isValidating, errors } = formik;
 
-  useEffect(() => {
-    validateForm(values);
-  }, [validateForm, values]);
-
-  const formatDate = (d: DateType) => {
-    if (d === undefined) return d;
-    if (typeof d === "string") return d;
-
-    return d.toISOString().substring(0, 10);
-  };
+  const errorMessageFieldKeyStart = errors[fieldKeyStart];
+  const errorMessageFieldKeyEnd = errors[fieldKeyEnd];
 
   // Use this over directly using `updateDateFilter` prop so we track filter changes.
-  // In addition to setting upstream filter, also sets internal date states.
   const setDatesFromRange = (start: DateType, end: DateType) => {
     const newStartDate = formatDate(start);
     const newEndDate = formatDate(end);
     setStartDate(newStartDate);
     setEndDate(newEndDate);
-    // Also set `working...` versions and formik so visibile next time user opens dropdown
-    setWorkingStartDate(newStartDate);
-    setFieldValue(fieldKeyStart, newStartDate);
-    setWorkingEndDate(newEndDate);
-    setFieldValue(fieldKeyEnd, newEndDate);
 
     updateDateFilter(newStartDate, newEndDate);
     handleClose();
   };
 
-  const setDatesFromOffset = (nDays: number) => {
-    const start = new Date();
-    start.setDate(start.getDate() - nDays);
+  const setDatesFromMenuOption = (dateOption: DateMenuOption) => {
+    setSelectedDateMenuOption(dateOption);
+    // Selecting a menu option clears out anything entered in the fields.
+    setFieldValue(fieldKeyStart, undefined);
+    setFieldValue(fieldKeyEnd, undefined);
 
-    setDatesFromRange(start, undefined);
+    // We assume start of interval is always guaranteed, but not necessarily end
+    const start = new Date();
+    start.setDate(start.getDate() - dateOption.numDaysStartOffset);
+    let end = undefined;
+    if (dateOption.numDaysEndOffset) {
+      end = new Date();
+      end.setDate(end.getDate() - dateOption.numDaysEndOffset);
+    }
+    setDatesFromRange(start, end);
+  };
+
+  const setDatesFromFields = (start: DateType, end: DateType) => {
+    // Since using fields instead, clear out selected menu option
+    setSelectedDateMenuOption(null);
+    setDatesFromRange(start, end);
+  };
+
+  const deleteDateFilter = () => {
+    setSelectedDateMenuOption(null);
+    setDatesFromRange(undefined, undefined);
   };
 
   //TODO when it's available, use sds component for single select on preset date ranges
@@ -128,51 +160,54 @@ const DateFilter: FC<Props> = ({
       >
         <StyledManualDate>
           <StyledDateRange>
-            <DateField
-              fieldKey={fieldKeyStart}
-              formik={formik}
-              onChange={(e) => {
-                const target = e.target as HTMLTextAreaElement;
-                setWorkingStartDate(target?.value);
-              }}
-            />
+            <DateField fieldKey={fieldKeyStart} formik={formik} />
             <StyledText>to</StyledText>
-            <DateField
-              fieldKey={fieldKeyEnd}
-              formik={formik}
-              onChange={(e) => {
-                const target = e.target as HTMLTextAreaElement;
-                setWorkingEndDate(target?.value);
-              }}
-            />
+            <DateField fieldKey={fieldKeyEnd} formik={formik} />
           </StyledDateRange>
-          {(workingStartDate || workingEndDate) && (
+          <ErrorMessageHolder>
+            {errorMessageFieldKeyStart ? (
+              <StyledErrorMessage>{errors[fieldKeyStart]}</StyledErrorMessage>
+            ) : (
+              <StyledErrorMessage />
+            )}
+            {errorMessageFieldKeyEnd ? (
+              <StyledErrorMessage>{errors[fieldKeyEnd]}</StyledErrorMessage>
+            ) : (
+              <StyledErrorMessage />
+            )}
+          </ErrorMessageHolder>
+          {(values[fieldKeyStart] || values[fieldKeyEnd]) && (
             <StyledButton
               color="primary"
               variant="contained"
               onClick={() => {
-                setDatesFromRange(values[fieldKeyStart], values[fieldKeyEnd]);
+                setDatesFromFields(values[fieldKeyStart], values[fieldKeyEnd]);
               }}
+              disabled={isValidating || !isValid}
             >
               Apply
             </StyledButton>
           )}
         </StyledManualDate>
         {/* TODO (mlila): use a single select here instead */}
-        <MenuItem onClick={() => setDatesFromOffset(7)}>Last 7 Days</MenuItem>
-        <MenuItem onClick={() => setDatesFromOffset(30)}>Last 30 Days</MenuItem>
-        <MenuItem onClick={() => setDatesFromOffset(90)}>
-          Last 3 Months
-        </MenuItem>
-        <MenuItem onClick={() => setDatesFromOffset(180)}>
-          Last 6 Months
-        </MenuItem>
-        <MenuItem onClick={() => setDatesFromOffset(365)}>Last Year</MenuItem>
+        {menuOptions.map((dateOption: DateMenuOption) => (
+          <MenuItem
+            key={dateOption.name}
+            onClick={() => setDatesFromMenuOption(dateOption)}
+            selected={Boolean(
+              selectedDateMenuOption &&
+                selectedDateMenuOption.name === dateOption.name
+            )}
+          >
+            {dateOption.name}
+          </MenuItem>
+        ))}
       </Menu>
       <DateChip
         startDate={startDate}
         endDate={endDate}
-        deleteDateFilter={() => setDatesFromRange(undefined, undefined)}
+        selectedDateMenuOption={selectedDateMenuOption}
+        deleteDateFilter={deleteDateFilter}
       />
     </StyledFilterWrapper>
   );
@@ -181,12 +216,14 @@ const DateFilter: FC<Props> = ({
 interface DateChipProps {
   startDate?: DateType;
   endDate?: DateType;
+  selectedDateMenuOption: DateMenuOption | null;
   deleteDateFilter: () => void;
 }
 
 function DateChip({
   startDate,
   endDate,
+  selectedDateMenuOption,
   deleteDateFilter,
 }: DateChipProps): JSX.Element | null {
   // DateChip should only display if we have at least one of startDate/endDate
@@ -194,7 +231,11 @@ function DateChip({
 
   // Get the date chip message. Structure varies if only one of the two dates.
   // Might be worth extracting date message to a common helper func elsewhere?
-  const dateIntervalLabel = `${startDate || "Prior"} to ${endDate || "Today"}`;
+  let dateIntervalLabel = `${startDate || "Prior"} to ${endDate || "Today"}`;
+  // If a date menu option was selected, just use its specific name instead
+  if (selectedDateMenuOption) {
+    dateIntervalLabel = selectedDateMenuOption.name;
+  }
   return (
     <StyledChip
       size="medium"
@@ -203,5 +244,3 @@ function DateChip({
     />
   );
 }
-
-export { DateFilter };
