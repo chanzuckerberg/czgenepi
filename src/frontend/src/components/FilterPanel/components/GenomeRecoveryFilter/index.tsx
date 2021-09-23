@@ -1,12 +1,5 @@
-import Popper from "@material-ui/core/Popper";
-import { MenuSelect } from "czifui";
-import React, { useEffect, useState } from "react";
-import { DefaultMenuSelectOption } from "../../index";
-import {
-  StyledChip,
-  StyledFilterWrapper,
-  StyledInputDropdown,
-} from "../../style";
+import { ComplexFilter, DefaultMenuSelectOption, ComplexFilterValue } from "czifui";
+import React from "react";
 
 interface Props {
   updateGenomeRecoveryFilter: (selected?: string) => void;
@@ -21,40 +14,25 @@ const GENOME_RECOVERY_OPTIONS = [
   },
 ];
 
+// Because czifui ComplexFilter expects callback that handles both single
+// and multi case at same time, we sidestep type issue with this.
+type CallbackTypeWorkaround = (options: ComplexFilterValue) => void;
+
+const PROPS_FOR_INPUT_DROPDOWN = {
+  sdsStyle: "minimal", // Would be defaulted, but must set everything now.
+  // This `style` gets directly put in as HTML style and interpolated to CSS.
+  style: {
+    padding: "0",
+    textTransform: "uppercase",
+  },
+} as const;
+
 const GenomeRecoveryFilter = ({
   updateGenomeRecoveryFilter,
 }: Props): JSX.Element => {
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const [value, setValue] = useState<DefaultMenuSelectOption | null>();
 
-  useEffect(() => {
-    updateGenomeRecoveryFilter(value?.name);
-  }, [updateGenomeRecoveryFilter, value]);
-
-  const open = Boolean(anchorEl);
-  const id = "genome-recovery";
-
-  const handleClose = () => {
-    if (anchorEl) {
-      anchorEl.focus();
-    }
-
-    setAnchorEl(null);
-  };
-
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleChange = (
-    _: React.ChangeEvent<unknown>,
-    newValue: DefaultMenuSelectOption | null
-  ) => {
-    setValue(newValue as DefaultMenuSelectOption);
-  };
-
-  const handleDelete = () => {
-    setValue(null);
+  const onChange = (selectedOption: DefaultMenuSelectOption | null) => {
+    updateGenomeRecoveryFilter(selectedOption?.name);
   };
 
   // TODO (mlila): replace with sds complex filter when complete
@@ -65,39 +43,13 @@ const GenomeRecoveryFilter = ({
   // implemented locking it to 150px width. Whenever we make the change over,
   // expect to need to figure that out as part of it.
   return (
-    <>
-      <StyledFilterWrapper>
-        <StyledInputDropdown
-          sdsStyle="minimal"
-          label="Genome Recovery"
-          onClick={handleClick}
-        />
-        <Chips value={value} onDelete={handleDelete} />
-      </StyledFilterWrapper>
-      <Popper id={id} open={open} anchorEl={anchorEl}>
-        <MenuSelect
-          open
-          onClose={handleClose}
-          value={value}
-          onChange={handleChange}
-          options={GENOME_RECOVERY_OPTIONS}
-        />
-      </Popper>
-    </>
+    <ComplexFilter
+      label="Genome Recovery"
+      options={GENOME_RECOVERY_OPTIONS}
+      onChange={onChange as CallbackTypeWorkaround}
+      InputDropdownProps={PROPS_FOR_INPUT_DROPDOWN}
+    />
   );
-};
-
-interface ChipsProps {
-  value?: DefaultMenuSelectOption | null;
-  onDelete: () => void;
-}
-
-// TODO (mlila): replace with sds tag when it's complete
-const Chips = ({ value, onDelete }: ChipsProps): JSX.Element | null => {
-  if (!value) return null;
-  const { name } = value as never;
-
-  return <StyledChip size="medium" label={name} onDelete={onDelete} />;
 };
 
 export { GenomeRecoveryFilter };
