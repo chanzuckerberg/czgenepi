@@ -15,4 +15,5 @@ export const COUNTIES = [
   "Tulare County",
   "Tuolumne County",
   "Ventura County",
+  "Chicago",
 ];

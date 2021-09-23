@@ -10,6 +10,7 @@ import DialogTitle from "src/common/components/library/Dialog/components/DialogT
 import ENV from "src/common/constants/ENV";
 import { useUpdateUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
+import { B } from "src/common/styles/support/style";
 import { PageContent } from "../../common/styles/mixins/global";
 import { Details, Title } from "./style";
 
@@ -67,23 +68,22 @@ export default function AgreeTerms(): JSX.Element {
                 key things to know:
               </ListSubheader>
               <ListItem fontSize="s">
-                You always own and control the data you upload.
+                You &nbsp;<B>always</B>&nbsp; own and control the data you
+                upload.
               </ListItem>
               <ListItem fontSize="s">
-                Only other members of your group can see your data. CDPH can see
+                Only other members of your group can see your data. Other
+                organizations that you share your data with can see your
                 samples, but not your private, internal identifiers.
               </ListItem>
               <ListItem fontSize="s">
-                New sequences will be automatically submitted to GISAID two
-                weeks after upload.
+                You can mark a sample as "private" anytime. "Private" samples
+                are not shared with other organizations, but are visible to your
+                group.
               </ListItem>
               <ListItem fontSize="s">
-                You can mark a sample as “private” anytime during the first two
-                weeks after upload. “Private” samples are not shared with CDPH
-                or GISAID, but are visible to your group.{" "}
-              </ListItem>
-              <ListItem fontSize="s">
-                Aspen does not support protected health information.
+                Aspen does not contain any personally identifiable information
+                or protected health information.
               </ListItem>
               <ListItem fontSize="s">
                 We utilize industry standard best practices in information
@@ -111,7 +111,11 @@ export default function AgreeTerms(): JSX.Element {
                 >
                   get in touch
                 </Link>{" "}
-                if you have any questions or concerns, we’re here to help.
+                if you have any questions or concerns, we’re here to help!
+                <br />
+                <br />
+                By clicking “Accept” below, you indicate that you agree to these
+                terms and policies. <br />
               </Details>
             </List>
           </DialogContent>
