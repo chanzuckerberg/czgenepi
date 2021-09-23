@@ -241,9 +241,9 @@ export const DataTable: FunctionComponent<Props> = ({
   // render functions
   const headerRow = headers.map((header: Header, index) => {
     const headerJSX = headerRenderer({ header, index });
-    const align = header.align;
+    const { align, key, sortKey } = header;
     let sortIndicator: JSX.Element | null = null;
-    if (isEqual(header.sortKey, state.sortKey)) {
+    if (isEqual(sortKey, state.sortKey)) {
       sortIndicator = <SortArrowDownIcon />;
       if (state.ascending) {
         sortIndicator = <SortArrowUpIcon />;
@@ -251,11 +251,13 @@ export const DataTable: FunctionComponent<Props> = ({
     }
     return (
       <TableHeader
-        onClick={() => handleSortClick(header.sortKey)}
-        key={header.sortKey.join("-")}
+        onClick={() => handleSortClick(sortKey)}
+        key={sortKey.join("-")}
         className={style.headerMetaCell}
         data-test-id="header-cell"
         align={align}
+        // * Tree name column should be slightly wider than the rest to accommodate status tags
+        wide={key === "name"}
       >
         {headerJSX}
         {sortIndicator}
