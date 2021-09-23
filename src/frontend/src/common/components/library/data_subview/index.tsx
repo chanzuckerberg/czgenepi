@@ -153,7 +153,6 @@ const DataSubview: FunctionComponent<Props> = ({
     useState<boolean>(false);
   const [hasCreateTreeStarted, setCreateTreeStarted] = useState<boolean>(false);
   const [didCreateTreeFailed, setCreateTreeFailed] = useState<boolean>(false);
-
   const handleDownloadClickOpen = () => {
     setDownloadModalOpen(true);
   };
@@ -417,8 +416,8 @@ const DataSubview: FunctionComponent<Props> = ({
                     lightText={
                       <CreateTreeModalDiv>
                         Your tree is being created. It may take up to 12 hours
-                        to process. You will be able find your new tree on the
-                        Phylogenetic Trees page when it is ready.
+                        to process To check your tree’s status, visit the
+                        Phylogenetic Tree page.
                         <NextLink href={ROUTES.PHYLO_TREES} passHref>
                           <a href="passRef">
                             <StyledButton
