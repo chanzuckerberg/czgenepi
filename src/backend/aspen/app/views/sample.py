@@ -1,5 +1,8 @@
 import datetime
+import json
 import os
+import re
+import threading
 from collections import defaultdict
 from typing import Any, Mapping, MutableSequence, Optional, Sequence, Set, Union
 from uuid import uuid4
@@ -10,6 +13,7 @@ from flask import g, jsonify, request, Response, stream_with_context
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import joinedload
 
+from aspen import aws
 from aspen.app.app import application, requires_auth
 from aspen.app.views import api_utils
 from aspen.app.views.api_utils import check_valid_sequence
@@ -25,7 +29,7 @@ from aspen.database.models import (
     WorkflowStatusType,
 )
 from aspen.database.models.sample import create_public_ids, RegionType
-from aspen.database.models.usergroup import User
+from aspen.database.models.usergroup import Group, User
 from aspen.error import http_exceptions as ex
 from aspen.error.recoverable import RecoverableError
 from aspen.fileio.fasta_streamer import FastaStreamer
@@ -304,10 +308,45 @@ def samples():
     return jsonify({SAMPLE_KEY: results})
 
 
+def _kick_off_pangolin(group_prefix: str, sample_ids: Sequence[str]):
+    sfn_params = application.aspen_config.AWS_PANGOLIN_SFN_PARAMETERS
+    sfn_input_json = {
+        "Input": {
+            "Run": {
+                "aws_region": aws.region(),
+                "docker_image_id": sfn_params["Input"]["Run"]["docker_image_id"],
+                "samples": sample_ids,
+            },
+        },
+        "OutputPrefix": f"{sfn_params['OutputPrefix']}",
+        "RUN_WDL_URI": sfn_params["RUN_WDL_URI"],
+        "RunEC2Memory": sfn_params["RunEC2Memory"],
+        "RunEC2Vcpu": sfn_params["RunEC2Vcpu"],
+        "RunSPOTMemory": sfn_params["RunSPOTMemory"],
+        "RunSPOTVcpu": sfn_params["RunSPOTVcpu"],
+    }
+
+    session = aws.session()
+    client = session.client(
+        service_name="stepfunctions",
+        endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None,
+    )
+
+    execution_name = f"{group_prefix}-ondemand-pangolin-{str(datetime.datetime.now())}"
+    execution_name = re.sub(r"[^0-9a-zA-Z-]", r"-", execution_name)
+
+    client.start_execution(
+        stateMachineArn=sfn_params["StateMachineArn"],
+        name=execution_name,
+        input=json.dumps(sfn_input_json),
+    )
+
+
 @application.route("/api/samples/create", methods=["POST"])
 @requires_auth
 def create_sample():
     user: User = g.auth_user
+    group: Group = user.group
     request_data = request.get_json()
 
     duplicates_in_request: Union[
@@ -326,6 +365,7 @@ def create_sample():
             f"Error inserting data, private_identifiers {already_exists['existing_private_ids']} or public_identifiers: {already_exists['existing_public_ids']} already exist in our database, please remove these samples before proceeding with upload.",
         )
     public_ids = create_public_ids(user.group_id, g.db_session, len(request_data))
+    pangolin_sample_ids: Sequence[str] = []  # Pass sample public ids to pangolin job
     for data in request_data:
         data_ok: bool
         missing_fields: Optional[list[str]]
@@ -406,7 +446,7 @@ def create_sample():
 
             g.db_session.add(sample)
             g.db_session.add(uploaded_pathogen_genome)
-
+            pangolin_sample_ids.append(sample.public_identifier)
         else:
             raise ex.BadRequestException(
                 f"Missing required fields {missing_fields} or encountered unexpected fields {unexpected_fields}",
@@ -415,4 +455,11 @@ def create_sample():
         g.db_session.commit()
     except Exception as e:
         raise ex.BadRequestException(f"Error encountered when saving data: {e}")
+
+    #  Run as a separate thread, so any errors here won't affect sample uploads
+    pangolin_job = threading.Thread(
+        target=_kick_off_pangolin, args=(group.prefix, pangolin_sample_ids)
+    )
+    pangolin_job.start()
+
     return jsonify(success=True)

@@ -150,7 +150,7 @@ def start_phylo_run():
     responseschema = PhyloRunResponseSchema()
 
     # Step 5 - Kick off the phylo run job.
-    aspen_config = application.aspen_config
+    sfn_params = application.aspen_config.AWS_NEXTSTRAIN_SFN_PARAMETERS
     sfn_input_json = {
         "Input": {
             "Run": {
@@ -158,18 +158,18 @@ def start_phylo_run():
                     "ASPEN_CONFIG_SECRET_NAME", "aspen-config"
                 ),
                 "aws_region": aws.region(),
-                "docker_image_id": aspen_config.NEXTSTRAIN_DOCKER_IMAGE_ID,
+                "docker_image_id": sfn_params["Input"]["Run"]["docker_image_id"],
                 "remote_dev_prefix": os.getenv("REMOTE_DEV_PREFIX"),
                 "s3_filestem": f"{group.location}/{request_data['tree_type'].capitalize()}",
                 "workflow_id": workflow.id,
             },
         },
-        "OutputPrefix": f"{aspen_config.NEXTSTRAIN_OUTPUT_PREFIX}/{workflow.id}",
-        "RUN_WDL_URI": aspen_config.RUN_WDL_URI,
-        "RunEC2Memory": aspen_config.NEXTSTRAIN_EC2_MEMORY,
-        "RunEC2Vcpu": aspen_config.NEXTSTRAIN_EC2_VCPU,
-        "RunSPOTMemory": aspen_config.NEXTSTRAIN_SPOT_MEMORY,
-        "RunSPOTVcpu": aspen_config.NEXTSTRAIN_SPOT_VCPU,
+        "OutputPrefix": f"{sfn_params['OutputPrefix']}/{workflow.id}",
+        "RUN_WDL_URI": sfn_params["RUN_WDL_URI"],
+        "RunEC2Memory": sfn_params["RunEC2Memory"],
+        "RunEC2Vcpu": sfn_params["RunEC2Vcpu"],
+        "RunSPOTMemory": sfn_params["RunSPOTMemory"],
+        "RunSPOTVcpu": sfn_params["RunSPOTVcpu"],
     }
 
     session = aws.session()
@@ -182,7 +182,7 @@ def start_phylo_run():
     execution_name = re.sub(r"[^0-9a-zA-Z-]", r"-", execution_name)
 
     client.start_execution(
-        stateMachineArn=os.environ.get("NEXTSTRAIN_SFN_ARN"),
+        stateMachineArn=sfn_params["StateMachineArn"],
         name=execution_name,
         input=json.dumps(sfn_input_json),
     )

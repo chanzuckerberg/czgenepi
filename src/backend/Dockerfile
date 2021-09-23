@@ -10,6 +10,6 @@ COPY third-party ./third-party/
 ENV PIPENV_PYTHON=/usr/src/app/
 COPY setup.py .
 RUN pipenv install --dev --system --verbose && pipenv --clear
-RUN apt-get update && apt-get install make
+RUN apt-get update && apt-get -y install make jq
 COPY . .
 ENTRYPOINT ["./entrypoint.sh"]
