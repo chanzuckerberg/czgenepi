@@ -75,8 +75,10 @@ export const TREE_HEADERS: Header[] = [
   },
   {
     align: "center",
-    key: "creationDate",
-    sortKey: ["creationDate"],
+    key: "startedDate",
+    sortKey: ["startedDate"],
+    // using startedDate instead of creationDate,
+    // startedDate is populated for all phylorun statuses, creationDate only applies to completed trees
     text: "Creation Date",
   },
   {
