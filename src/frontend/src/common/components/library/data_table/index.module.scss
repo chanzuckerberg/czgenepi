@@ -11,7 +11,7 @@
 .header {
   display: flex;
   // (thuang): Offset for Chrome scrollbar width
-  padding-right: $space-l;
+  padding: 0 $space-l;
   border-bottom: 3px solid $gray-lightest !important;
 
   .headerMetaCell {

@@ -15,6 +15,12 @@ interface Lineage {
   version: unknown;
 }
 
+enum TREE_STATUS {
+  Completed = "COMPLETED",
+  Failed = "FAILED",
+  Started = "STARTED",
+}
+
 interface Sample extends BioinformaticsType {
   type: "Sample";
   privateId: string;
@@ -36,7 +42,7 @@ interface Tree extends BioinformaticsType {
   creationDate: string;
   startedDate: string;
   workflowId: string;
-  status: string;
+  status: TREE_STATUS;
   downloadLink?: string;
 }
 
