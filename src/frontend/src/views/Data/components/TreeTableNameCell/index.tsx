@@ -4,6 +4,7 @@ import { TREE_STATUS } from "src/common/constants/types";
 import TreeIcon from "src/common/icons/PhyloTree.svg";
 import { createTreeModalInfo } from "src/common/utils";
 import TreeVizModal from "../TreeVizModal";
+import { PhyloTreeStatusTag } from "./components/PhyloTreeStatusTag";
 import { CellWrapper, StyledOpenInNewIcon, StyledRowContent } from "./style";
 
 interface NameProps {
@@ -13,7 +14,8 @@ interface NameProps {
 
 const TreeTableNameCell = ({ value, item }: NameProps): JSX.Element => {
   const [open, setOpen] = useState(false);
-  const isDisabled = item?.status !== TREE_STATUS.Completed;
+  const status = item?.status;
+  const isDisabled = status !== TREE_STATUS.Completed;
 
   const handleClickOpen = () => {
     if (!isDisabled) setOpen(true);
@@ -43,6 +45,7 @@ const TreeTableNameCell = ({ value, item }: NameProps): JSX.Element => {
           <TreeIcon className={dataTableStyle.icon} />
           {value}
           <StyledOpenInNewIcon disabled={isDisabled} />
+          <PhyloTreeStatusTag treeStatus={status} />
         </CellWrapper>
       </StyledRowContent>
     </>
