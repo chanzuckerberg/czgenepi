@@ -80,7 +80,7 @@ const Data: FunctionComponent = () => {
     },
     {
       data: trees,
-      defaultSortKey: ["creationDate"],
+      defaultSortKey: ["startedDate"],
       headerRenderer: TreeHeader,
       headers: TREE_HEADERS,
       isDataLoading,
