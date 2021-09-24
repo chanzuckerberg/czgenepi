@@ -76,9 +76,9 @@ export default function AgreeTerms(): JSX.Element {
                 samples, but not your private, internal identifiers.
               </ListItem>
               <ListItem fontSize="s">
-                You can mark a sample as "private" anytime. "Private" samples
-                are not shared with other organizations, but are visible to your
-                group.
+                You can mark a sample as &quot;private&quot; anytime.
+                &quot;Private&quot; samples are not shared with other
+                organizations, but are visible to your group.
               </ListItem>
               <ListItem fontSize="s">
                 Aspen does not contain any personally identifiable information
