@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import { get, isEqual } from "lodash/fp";
 import React, {
   Fragment,
@@ -334,9 +335,14 @@ export const DataTable: FunctionComponent<Props> = ({
       );
     }
 
+    const headerStyleClass = classNames(
+      style.header, // All headers use this class
+      { [style.headerWithCheckbox]: showCheckboxes } // If checkbox, addl class to tweak it
+    );
+
     return (
       <div className={style.container}>
-        <div className={style.header} data-test-id="header-row">
+        <div className={headerStyleClass} data-test-id="header-row">
           {showCheckboxes && headerCheckbox()}
           {headerRow}
         </div>
