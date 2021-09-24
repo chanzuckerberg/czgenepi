@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import { get, isEqual } from "lodash/fp";
 import React, {
   Fragment,
@@ -334,13 +335,10 @@ export const DataTable: FunctionComponent<Props> = ({
       );
     }
 
-    // All headers use the base style.header
-    let headerStyleClass = style.header;
-    if (showCheckboxes) {
-      // However, if header needs to show checkbox, we add additional style
-      // to override certain aspects of header. See style file for more.
-      headerStyleClass = headerStyleClass + " " + style.headerWithCheckbox;
-    }
+    const headerStyleClass = classNames(
+      style.header, // All headers use this class
+      { [style.headerWithCheckbox]: showCheckboxes } // If checkbox, addl class to tweak it
+    );
 
     return (
       <div className={style.container}>
