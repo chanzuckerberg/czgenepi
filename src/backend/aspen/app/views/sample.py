@@ -429,12 +429,9 @@ def update_sample_public_ids():
             "user making update request must be a system admin",
         )
 
-    request_private_ids: list[str] = request_data["private_ids"]
-    request_public_ids: list[str] = request_data["public_ids"]
-    private_to_public: Mapping[str, str] = {
-        private: public
-        for (private, public) in zip(request_private_ids, request_public_ids)
-    }
+    private_to_public: Mapping[str, str] = request_data["id_mapping"]
+    request_private_ids: list[str] = private_to_public.keys()
+    request_public_ids: list[str] = private_to_public.values()
 
     group_id: int = request_data["group_id"]
 

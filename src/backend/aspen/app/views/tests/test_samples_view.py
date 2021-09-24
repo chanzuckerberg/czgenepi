@@ -994,11 +994,8 @@ def test_update_sample_public_ids(
     with client.session_transaction() as sess:
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
 
-    data = {
-        "group_id": group.id,
-        "private_ids": [i for i in private_to_public.keys()],
-        "public_ids": [i for i in private_to_public.values()],
-    }
+    data = {"group_id": group.id, "id_mapping": private_to_public}
+
     res = client.post(
         "/api/samples/update/publicids", json=data, content_type="application/json"
     )
@@ -1040,10 +1037,7 @@ def test_update_sample_public_ids_duplicate_public_id(
     with client.session_transaction() as sess:
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
 
-    data = {
-        "private_ids": [i for i in private_to_public.keys()],
-        "public_ids": [i for i in private_to_public.values()],
-    }
+    data = {"group_id": group.id, "id_mapping": private_to_public}
     res = client.post(
         "/api/samples/update/publicids", json=data, content_type="application/json"
     )
@@ -1073,11 +1067,7 @@ def test_update_sample_public_ids_private_ids_not_found(
     with client.session_transaction() as sess:
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
 
-    data = {
-        "group_id": group.id,
-        "private_ids": [i for i in private_to_public.keys()],
-        "public_ids": [i for i in private_to_public.values()],
-    }
+    data = {"group_id": group.id, "id_mapping": private_to_public}
     res = client.post(
         "/api/samples/update/publicids", json=data, content_type="application/json"
     )
@@ -1107,11 +1097,7 @@ def test_update_sample_public_ids_not_system_admin(
     with client.session_transaction() as sess:
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
 
-    data = {
-        "group_id": group.id,
-        "private_ids": [i for i in private_to_public.keys()],
-        "public_ids": [i for i in private_to_public.values()],
-    }
+    data = {"group_id": group.id, "id_mapping": private_to_public}
     res = client.post(
         "/api/samples/update/publicids", json=data, content_type="application/json"
     )
