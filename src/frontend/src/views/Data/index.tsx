@@ -43,7 +43,7 @@ const Data: FunctionComponent = () => {
   useEffect(() => {
     const setBioinformaticsData = async () => {
       setIsDataLoading(true);
-      const [sampleResponse] = await Promise.all([fetchSamples()]);
+      const sampleResponse = await fetchSamples();
       setIsDataLoading(false);
 
       const apiSamples = sampleResponse["samples"];
