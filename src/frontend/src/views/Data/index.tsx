@@ -5,8 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { FunctionComponent, useEffect, useState } from "react";
 import { Menu } from "semantic-ui-react";
-import { fetchSamples, fetchTrees } from "src/common/api";
+import { fetchSamples } from "src/common/api";
 import { useProtectedRoute } from "src/common/queries/auth";
+import { useTreeInfo } from "src/common/queries/trees";
 import { FilterPanel } from "src/components/FilterPanel";
 import { DataSubview } from "../../common/components";
 import { EMPTY_OBJECT } from "../../common/constants/empty";
@@ -29,7 +30,6 @@ const Data: FunctionComponent = () => {
   useProtectedRoute();
 
   const [samples, setSamples] = useState<Sample[] | undefined>();
-  const [trees, setTrees] = useState<Tree[] | undefined>();
   const [isDataLoading, setIsDataLoading] = useState(false);
   const [shouldShowFilters, setShouldShowFilters] = useState<boolean>(true);
   const [dataFilterFunc, setDataFilterFunc] = useState<any>();
@@ -37,22 +37,17 @@ const Data: FunctionComponent = () => {
 
   const router = useRouter();
 
+  const treeResponse = useTreeInfo();
+  const trees = treeResponse?.data?.["phylo_trees"] ?? [];
+
   useEffect(() => {
     const setBioinformaticsData = async () => {
       setIsDataLoading(true);
-
-      const [sampleResponse, treeResponse] = await Promise.all([
-        fetchSamples(),
-        fetchTrees(),
-      ]);
-
+      const [sampleResponse] = await Promise.all([fetchSamples()]);
       setIsDataLoading(false);
 
       const apiSamples = sampleResponse["samples"];
-      const apiTrees = treeResponse["phylo_trees"];
-
       setSamples(apiSamples);
-      setTrees(apiTrees);
     };
 
     setBioinformaticsData();
