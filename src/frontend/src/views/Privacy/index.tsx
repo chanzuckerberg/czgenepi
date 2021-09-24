@@ -9,7 +9,6 @@ import {
   H2,
   H3,
   H4,
-  I,
   NarrowContainer,
   Number,
   P,
@@ -54,17 +53,17 @@ const PrivacyPolicy = (): JSX.Element => {
         organization.
       </P>
       <P>
-        <I>Here’s how Aspen processes and manages Upload Data:</I>
-        Users submit Raw Sequence Data (as described below) as well as
-        information about those sequences, such as the date the sample was
-        collected ("Sample Metadata" as further defined below -- Raw Sequence
-        Data and Sample Metadata together make "Upload Data"). Any human genetic
-        data contained within the Raw Sequence Data is filtered out and deleted
-        following upload, leaving genomic data only about the pathogen. This
-        pathogen genomic data is then analyzed in order to identify the
-        normally-occurring genetic mutations that make up each pathogen sample’s
-        unique genetic "barcode." This barcode can then be used to identify
-        strains, variants, and relationships between samples.{" "}
+        Here’s how Aspen processes and manages Upload Data: Users submit Raw
+        Sequence Data (as described below) as well as information about those
+        sequences, such as the date the sample was collected ("Sample Metadata"
+        as further defined below -- Raw Sequence Data and Sample Metadata
+        together make "Upload Data"). Any human genetic data contained within
+        the Raw Sequence Data is filtered out and deleted following upload,
+        leaving genomic data only about the pathogen. This pathogen genomic data
+        is then analyzed in order to identify the normally-occurring genetic
+        mutations that make up each pathogen sample’s unique genetic "barcode."
+        This barcode can then be used to identify strains, variants, and
+        relationships between samples.{" "}
         <B>
           By default, these analytical outputs will be visible to the User that
           uploaded the Sample and other members of the User’s organization

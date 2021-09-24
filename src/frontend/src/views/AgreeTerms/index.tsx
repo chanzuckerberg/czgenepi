@@ -10,9 +10,8 @@ import DialogTitle from "src/common/components/library/Dialog/components/DialogT
 import ENV from "src/common/constants/ENV";
 import { useUpdateUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
-import { B } from "src/common/styles/support/style";
 import { PageContent } from "../../common/styles/mixins/global";
-import { Details, Title } from "./style";
+import { Details, SpacedBold, Title } from "./style";
 
 export default function AgreeTerms(): JSX.Element {
   const [isLoading, setIsLoading] = useState(false);
@@ -68,7 +67,7 @@ export default function AgreeTerms(): JSX.Element {
                 key things to know:
               </ListSubheader>
               <ListItem fontSize="s">
-                You &nbsp;<B>always</B>&nbsp; own and control the data you
+                You <SpacedBold>always</SpacedBold> own and control the data you
                 upload.
               </ListItem>
               <ListItem fontSize="s">
