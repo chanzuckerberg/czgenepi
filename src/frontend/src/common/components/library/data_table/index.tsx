@@ -334,12 +334,17 @@ export const DataTable: FunctionComponent<Props> = ({
       );
     }
 
+    // All headers use the base style.header
+    let headerStyleClass = style.header;
+    if (showCheckboxes) {
+      // However, if header needs to show checkbox, we add additional style
+      // to override certain aspects of header. See style file for more.
+      headerStyleClass = headerStyleClass + " " + style.headerWithCheckbox;
+    }
+
     return (
       <div className={style.container}>
-        <div
-          className={showCheckboxes ? style.headerWithCheckbox : style.header}
-          data-test-id="header-row"
-        >
+        <div className={headerStyleClass} data-test-id="header-row">
           {showCheckboxes && headerCheckbox()}
           {headerRow}
         </div>
