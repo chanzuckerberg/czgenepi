@@ -436,11 +436,7 @@ def update_sample_public_ids():
         for (private, public) in zip(request_private_ids, request_public_ids)
     }
 
-    group_id: int = request_data.get("group_id")
-
-    # group id not supplied (when admin is making request), use the user.group_id instead
-    if not group_id:
-        group_id = user.group_id
+    group_id: int = request_data["group_id"]
 
     # check that all private_identifiers exist
     existing_private_ids: list[str] = api_utils.get_existing_private_ids(
