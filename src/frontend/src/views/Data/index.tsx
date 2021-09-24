@@ -30,6 +30,7 @@ const Data: FunctionComponent = () => {
   useProtectedRoute();
 
   const [samples, setSamples] = useState<Sample[] | undefined>();
+  const [trees, setTrees] = useState<Tree[] | undefined>();
   const [isDataLoading, setIsDataLoading] = useState(false);
   const [shouldShowFilters, setShouldShowFilters] = useState<boolean>(true);
   const [dataFilterFunc, setDataFilterFunc] = useState<any>();
@@ -38,20 +39,24 @@ const Data: FunctionComponent = () => {
   const router = useRouter();
 
   const treeResponse = useTreeInfo();
-  const trees = treeResponse?.data?.["phylo_trees"] ?? [];
+  const { data, isLoading } = treeResponse;
 
   useEffect(() => {
     const setBioinformaticsData = async () => {
       setIsDataLoading(true);
+      if (isLoading) return;
       const sampleResponse = await fetchSamples();
       setIsDataLoading(false);
 
       const apiSamples = sampleResponse["samples"];
+      const apiTrees = data?.phylo_trees;
+
       setSamples(apiSamples);
+      setTrees(apiTrees);
     };
 
     setBioinformaticsData();
-  }, []);
+  }, [isLoading, data]);
 
   useEffect(() => {
     if (router.asPath === ROUTES.DATA) {
