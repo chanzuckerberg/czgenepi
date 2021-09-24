@@ -336,7 +336,10 @@ export const DataTable: FunctionComponent<Props> = ({
 
     return (
       <div className={style.container}>
-        <div className={style.header} data-test-id="header-row">
+        <div
+          className={showCheckboxes ? style.headerWithCheckbox : style.header}
+          data-test-id="header-row"
+        >
           {showCheckboxes && headerCheckbox()}
           {headerRow}
         </div>

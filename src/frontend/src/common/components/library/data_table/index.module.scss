@@ -8,10 +8,49 @@
   flex-direction: column;
 }
 
+// NOTE see associated `headerWithCheckbox` just below
 .header {
   display: flex;
-  // (thuang): Offset for Chrome scrollbar width
   padding: 0 $space-l;
+  border-bottom: 3px solid $gray-lightest !important;
+
+  .headerMetaCell {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    align-items: baseline;
+
+    svg {
+      fill: $black;
+      width: $icon-xs;
+    }
+  }
+
+  .headerCell {
+    padding-bottom: $space-m;
+  }
+
+  .headerCellContent {
+    @include font-header-s;
+
+    color: $gray-dark;
+    margin-right: $space-xxs;
+
+    &:hover {
+      color: $black;
+      cursor: default;
+    }
+  }
+}
+
+// HACK (vince) Checkboxes in header require different padding, but because of all the
+// other child classes, we can't just change the top level header styling and not affect
+// classes downstream. So this is a copy-paste of above, but purely to target padding.
+// I don't like it either. But long-term we're moving away to Emotion `styled`, so I
+// think this is sane in the short-term.
+.headerWithCheckbox {
+  display: flex;
+  padding: 0; // Needed for checkbox in header to keep alignment with checkboxes in rows
   border-bottom: 3px solid $gray-lightest !important;
 
   .headerMetaCell {
