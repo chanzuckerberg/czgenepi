@@ -8,9 +8,9 @@
   flex-direction: column;
 }
 
+// NOTE see associated `headerWithCheckbox` just below
 .header {
   display: flex;
-  // (thuang): Offset for Chrome scrollbar width
   padding: 0 $space-l;
   border-bottom: 3px solid $gray-lightest !important;
 
@@ -41,6 +41,14 @@
       cursor: default;
     }
   }
+}
+
+// Checkboxes in a header need to match alignment of row checkboxes below, so
+// we override padding. Headers with checkboxes should use above `.header` class
+// AND this class together. Because it comes second, it overrides, but everything
+// else continues to work as usual.
+.headerWithCheckbox{
+  padding: 0;
 }
 
 .cell {
