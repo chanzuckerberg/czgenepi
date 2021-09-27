@@ -34,6 +34,7 @@ task nextstrain_workflow {
     }
 
     command <<<
+    set -Euxo pipefail
     # setup
     export AWS_REGION=~{aws_region}
     export ASPEN_CONFIG_SECRET_NAME=~{aspen_config_secret_name}
