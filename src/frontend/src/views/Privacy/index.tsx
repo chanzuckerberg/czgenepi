@@ -28,20 +28,20 @@ const PrivacyPolicy = (): JSX.Element => {
     <>
       <Title>
         <H1>Aspen Privacy Policy</H1>
-        <H4>Last Updated: May 17, 2021. </H4>
+        <H4>Last Updated: September 27, 2021</H4>
       </Title>
       <P>
         The Chan Zuckerberg Initiative Foundation, a 501(c)(3) nonprofit private
-        foundation (&quot;CZIF,&quot; &quot;we,&quot; &quot;us,&quot; or
+        foundation (&quot;<B>CZIF</B>,&quot; &quot;we,&quot; &quot;us,&quot; or
         &quot;our&quot;), provides the Aspen product (&quot;Services&quot; or
         &quot;Aspen&quot;) in close collaboration with the Chan Zuckerberg
-        Biohub (&quot;CZB&quot;), and the Chan Zuckerberg Initiative, LLC
-        (&quot;CZI LLC&quot;). This Privacy Policy describes the types of
+        Biohub (&quot;<B>CZB</B>&quot;), and the Chan Zuckerberg Initiative, LLC
+        (&quot;<B>CZI LLC</B>&quot;). This Privacy Policy describes the types of
         information we collect or that is uploaded by Aspen Users (collectively
         &quot;Users&quot; or &quot;you&quot;, ex: registered public health
         officials at state and/or county level Departments of Public Health
-        (&quot;DPH&quot;), other public health researchers), and how we use,
-        share, and protect that information.
+        (&quot;<B>DPH</B>&quot;), other public health researchers), and how we
+        use, share, and protect that information.
       </P>
       <H3>About Aspen</H3>
       <P>
@@ -54,35 +54,21 @@ const PrivacyPolicy = (): JSX.Element => {
         organization.
       </P>
       <P>
-        Because of the time-sensitive nature of pathogen genomic data, we
-        strongly encourage the sharing of pathogen sequences, which are not
-        personally identifiable, with the broader scientific and public health
-        communities as soon as possible. To support this scientific
-        collaboration, Aspen submits pathogen genomes and minimal metadata
-        (collection date, sequencing lab, and location at the county level or
-        above) to{" "}
-        <B>
-          public repositories such as GISAID after 2 weeks from initial upload.
-        </B>{" "}
-        You can turn this submission off by marking your pathogen genome as
-        private within the 2-week period.{" "}
-      </P>
-      <P>
-        <i>Here’s how Aspen processes and manages Upload Data:</i> Users submit
-        Raw Sequence Data (as described below) as well as information about
-        those sequences, such as the date the sample was collected (“Sample
-        Metadata” as further defined below -- Raw Sequence Data and Sample
-        Metadata together make “Upload Data”). Any human genetic data contained
-        within the Raw Sequence Data is filtered out and deleted following
-        upload, leaving genomic data only about the pathogen. This pathogen
-        genomic data is then analyzed in order to identify the
+        Here’s how Aspen processes and manages Upload Data: Users submit Raw
+        Sequence Data (as described below) as well as information about those
+        sequences, such as the date the sample was collected (&quot;Sample
+        Metadata&quot; as further defined below -- Raw Sequence Data and Sample
+        Metadata together make &quot;Upload Data&quot;). Any human genetic data
+        contained within the Raw Sequence Data is filtered out and deleted
+        following upload, leaving genomic data only about the pathogen. This
+        pathogen genomic data is then analyzed in order to identify the
         normally-occurring genetic mutations that make up each pathogen sample’s
-        unique genetic “barcode.” This barcode can then be used to identify
-        strains, variants, and relationships between samples.{" "}
+        unique genetic &quot;barcode.&quot; This barcode can then be used to
+        identify strains, variants, and relationships between samples.{" "}
         <B>
           By default, these analytical outputs will be visible to the User that
           uploaded the Sample and other members of the User’s organization
-          (“Group”, ex: a Department of Public Health) using Aspen.
+          (&quot;Group&quot;, ex: a Department of Public Health) using Aspen.
         </B>
       </P>
       <P>
@@ -98,34 +84,20 @@ const PrivacyPolicy = (): JSX.Element => {
         information about the rules governing your use of Aspen, please also see
         our{" "}
         <Link href={ROUTES.TERMS} target="_blank" rel="noopener">
-          Terms of Use (“Terms”)
+          Terms of Use (&quot;Terms&quot;)
         </Link>
-        .{" "}
-        <B>
-          Please remember that you are using Aspen in your organizational
-          capacity, which means that your organization’s policies will apply to
-          your use.
-        </B>
+        . Please remember that you are using Aspen in your organizational
+        capacity, which means that your organization’s policies will apply to
+        your use.
       </P>
 
       <H3>Key Things to Know</H3>
       <List
         items={[
           "Aspen is a free and open-source tool.",
+          "You always own the data you upload. You decide how you want your data to be shared, and you can delete your data from Aspen at any time. You’re using Aspen in your professional capacity, which means any pathogen sample data you upload, and any data that we generate on the basis of this, are visible to other members (Users) in your Group. This data is only available to anyone outside of your organization when it is shared by you, or by your Group. Other organizations that you share your data with can see your samples, but not your private, internal identifiers.",
+          "Human genetic data with uploaded data is processed only so we can filter out and permanently delete it. We do not keep this non-pathogen genomic data and it’s not necessary to operate the tool.",
           <span key="0">
-            You always own the data you upload. You decide how you want your
-            data to be shared, and you can delete your data from Aspen at any
-            time. However, due to the time-sensitive nature of pathogen data, if
-            you do not wish for your Pathogen Consensus Genome to be shared with
-            the GISAID public repository,{" "}
-            <B>
-              you must mark this data as ‘Private’ within 2 weeks of
-              upload/creation of the consensus genome.
-            </B>
-          </span>,
-          "You’re using Aspen in your professional capacity, which means any pathogen sample data you upload, and any data that we generate on the basis of this, are visible to other members (Users) in your Group. This data is only available to anyone outside of your organization when it is shared by you, or by your organization (ex: with the CDPH).",
-          "Human genetic data with uploaded data is processed only so we can filter out and permanently delete it. We do not keep this non-pathogen genomic data and it’s not necessary to operate the tool. ",
-          <span key="1">
             Similarly, Aspen{" "}
             <B>
               does not contain any personally identifying metadata or
@@ -226,9 +198,11 @@ const PrivacyPolicy = (): JSX.Element => {
               <div>
                 <P>
                   Sample Metadata is visible to other users in your Group, as
-                  well as third party entities, such as CDPH, that your Group is
-                  visible to.
+                  well as third party entities that your Group is visible to.
+                  These entities can see your samples, but not your private,
+                  internal identifiers.
                 </P>
+
                 <P>
                   This data is also accessible by technical partners (CZ Biohub
                   and CZI, LLC) and Service Providers (ex: AWS) that help
@@ -236,11 +210,13 @@ const PrivacyPolicy = (): JSX.Element => {
                   access your data in order to back up and maintain the
                   database.
                 </P>
+
                 <P>
                   This Privacy Policy applies to all parties that access data to
                   support Aspen and they will not use the data for any purpose
                   beyond operating and securing Aspen.
                 </P>
+
                 <P>
                   We will never sell your data or share it with anyone that
                   does.
@@ -267,16 +243,13 @@ const PrivacyPolicy = (): JSX.Element => {
             <td>
               <P>
                 Pathogen Consensus Genomes are visible to other users in your
-                Group, as well as third party entities, such as CDPH, that your
-                Group is visible to.
+                Group, as well as third party entities that your Group is
+                visible to.
               </P>
               <P>
-                Pathogen Consensus Genomes will be shared with public
-                repositories, such as GISAID, 2 weeks after upload <B>unless</B>{" "}
-                you mark the sample as “private.” Samples marked “private” will
-                never be shared with any public repositories (ex: GISAID) or
-                other 3rd parties (ex: CDPH) unless you choose to mark them
-                “public” later on.
+                Samples marked &quot;private&quot; will never be shared beyond
+                your Group unless you choose to mark them &quot;public&quot;
+                later on.
               </P>
             </td>
           </ContentRow>
@@ -294,8 +267,8 @@ const PrivacyPolicy = (): JSX.Element => {
             </td>
             <td>
               Analytical results you create are visible to other users in your
-              Group, as well as third party entities, such as CDPH, that your
-              Group is visible to.
+              Group, as well as third party entities, that your Group is visible
+              to.
             </td>
           </ContentRow>
 
@@ -376,13 +349,13 @@ const PrivacyPolicy = (): JSX.Element => {
       <P>
         &quot;Upload Data&quot; is data that Users upload to Aspen (other than
         the information which is provided during registration to create a User
-        account). Upload Data consists of pathogen genomic data (including “Raw
-        Sequence Data”, which includes both host and pathogenic genome data and
-        “Pathogen Consensus Genomes,” which is only pathogenic genome data) and
-        corresponding metadata (“Sample Metadata”, such as time and location of
-        sample collection). In the event that human genetic sequence information
-        is uploaded as part of the Upload, it is removed as part of processing
-        the Upload.
+        account). Upload Data consists of pathogen genomic data (including
+        &quot;Raw Sequence Data&quot;, which includes both host and pathogenic
+        genome data and &quot;Pathogen Consensus Genomes,&quot; which is only
+        pathogenic genome data) and corresponding metadata (&quot;Sample
+        Metadata&quot;, such as time and location of sample collection). In the
+        event that human genetic sequence information is uploaded as part of the
+        Upload, it is removed as part of processing the Upload.
       </P>
       <P>
         As described in our{" "}
@@ -403,31 +376,31 @@ const PrivacyPolicy = (): JSX.Element => {
       <List
         items={[
           <span key="0">
-            <ListItemLabel>Raw Sequence Data:</ListItemLabel> “Raw Sequence
-            Data” is genomic sequence data, including both host and pathogenic
-            data. As part of the process of processing this data uploaded to
-            Aspen, any identifiable human genetic data is filtered and removed.
-            This means that Aspen should <B>not</B> contain any human sequence
-            data. Note that if there are no issues identified with the
-            corresponding Pathogen Consensus Genome, the Raw Sequencing Data
-            will be permanently deleted from our backend after 90 days. We
+            <ListItemLabel>Raw Sequence Data:</ListItemLabel> &quot;Raw Sequence
+            Data&quot; is genomic sequence data, including both host and
+            pathogenic data. As part of the process of processing this data
+            uploaded to Aspen, any identifiable human genetic data is filtered
+            and removed. This means that Aspen should <B>not</B> contain any
+            human sequence data. Note that if there are no issues identified
+            with the corresponding Pathogen Consensus Genome, the Raw Sequencing
+            Data will be permanently deleted from our backend after 90 days. We
             encourage Users to submit raw reads to the Sequencing Read Archive
             for long-term storage.
           </span>,
           <span key="1">
-            <ListItemLabel>Pathogen Consensus Genomes:</ListItemLabel> “Pathogen
-            Consensus Genomes” are genetic sequences of pathogens, such as
-            SARS-CoV-2, mapped to pathogen-specific reference genomes. These may
-            either be uploaded directly to Aspen or generated by Aspen from
-            uploaded Raw Sequence Data (see below).
+            <ListItemLabel>Pathogen Consensus Genomes:</ListItemLabel>{" "}
+            &quot;Pathogen Consensus Genomes&quot; are genetic sequences of
+            pathogens, such as SARS-CoV-2, mapped to pathogen-specific reference
+            genomes. These may either be uploaded directly to Aspen or generated
+            by Aspen from uploaded Raw Sequence Data (see below).
           </span>,
           <span key="2">
-            <ListItemLabel>Sample Metadata:</ListItemLabel> “Sample Metadata”
-            includes information related to the Raw Sequence Data, such as the
-            upload date, location, originating lab or purpose of the sampling
-            (e.g. surveillance, outbreak investigation, etc). Users{" "}
-            <u>should not</u> include personally-identifying information or
-            protected health information regarding the individual to whom the
+            <ListItemLabel>Sample Metadata:</ListItemLabel> &quot;Sample
+            Metadata&quot; includes information related to the Raw Sequence
+            Data, such as the upload date, location, originating lab or purpose
+            of the sampling (e.g. surveillance, outbreak investigation, etc).
+            Users <u>should not</u> include personally-identifying information
+            or protected health information regarding the individual to whom the
             Raw Sequence Data relates.
           </span>,
         ]}
@@ -450,7 +423,7 @@ const PrivacyPolicy = (): JSX.Element => {
       <P>Upload Data is used for the following purposes:</P>
       <List
         items={[
-          `To provide Users and their Groups with a “Pathogen Consensus Genome.” The Pathogen Consensus Genome  is provided on a per-Raw Sequence basis.`,
+          `To provide Users and their Groups with a &quot;Pathogen Consensus Genome.&quot; The Pathogen Consensus Genome  is provided on a per-Raw Sequence basis.`,
           `To provide Users and their Groups with analytical outputs that help identify variation and relationship between samples, such as phylogenetic trees.`,
           `To improve the way Aspen processes Pathogen Consensus Genomes and Users’ ability to use Aspen to create useful analytical outputs.`,
           `To troubleshoot in the event you reach out to us with a specific issue related to your Upload Data.`,
@@ -466,19 +439,21 @@ const PrivacyPolicy = (): JSX.Element => {
       <P>
         Raw Sequence Data and Sample Metadata are shared back to the Users that
         uploaded the data, as well as other Users within the same organization
-        (your “Group”). Please note that while the Raw Sequence Data is
-        temporarily visible to other members of your Group, this data is not
+        (your &quot;Group&quot;). Please note that while the Raw Sequence Data
+        is temporarily visible to other members of your Group, this data is not
         retained on the Aspen platform.
       </P>
       <P>
         We may also share your Pathogen Consensus Genomes (whether uploaded by
-        you or generated by us) and/or analytical outputs in accordance with the
-        provisions of your organization’s policies and/or as required by law.
-        For example, certain Users currently allow the California Department of
-        Public Health (“CDPH”) to access data within their Group. Where such
-        access is allowed by Groups, the CDPH access this data through their own
-        Aspen accounts, and may have similar viewing permissions as members of
-        the uploading organization Group.
+        you or generated by us) and/or analytical outputs with third parties in
+        accordance with the provisions of your organization’s policies and/or as
+        required by law. For example, certain Users in California currently
+        allow the California Department of Public Health (&quot;CDPH&quot;) to
+        access data from their Group. Where such access is allowed by Groups,
+        the third party can access this data through their own Aspen accounts,
+        and may have similar viewing permissions as members of the uploading
+        Group. However, they will not have access to your private, internal
+        identifiers.
       </P>
       <P>
         You control the sharing of Raw Sequence Data and Sample Metadata which
@@ -489,8 +464,8 @@ const PrivacyPolicy = (): JSX.Element => {
       <P>
         Pathogen Consensus Genomes, whether uploaded by you or generated by
         Aspen, will be shared by us with public repositories (as set out below)
-        unless you choose to mark this information as “private.” In the event
-        that the Pathogen Consensus Genome is created by us, it will
+        unless you choose to mark this information as &quot;private.&quot; In
+        the event that the Pathogen Consensus Genome is created by us, it will
         automatically be marked as private if the corresponding Raw Sequence
         Data is marked private.
       </P>
@@ -540,38 +515,23 @@ const PrivacyPolicy = (): JSX.Element => {
         Who can see your Pathogen Consensus Genomes and analytical outputs?
       </UnderLineHeader>
       <P>
-        By default, we will share Pathogen Consensus Genomes with the Global
-        Initiative for Sharing all Influenza Data (“GISAID”) 2 weeks after
-        upload. However, by marking the Raw Sequence Data / the uploaded
-        Pathogen Consensus Genome as ‘private’ you can turn off the settings
-        enabling us to share this data <B>within</B> the 2 week period. Please
-        note that we cannot mark a sample as ‘private’ after this 2 week period
-        has elapsed, as we will have shared the data with GISAID at this point.
-      </P>
-      <P>
-        We encourage sharing this data as in genomic epidemiology, there are
-        strong community norms and ethical obligations to share pathogen genome
-        data as quickly, transparently and in as discoverable a manner as
-        possible. This requires that timely submission to public repositories
-        (e.g., GISAID, NCBI) be the default. However, we do understand that, in
-        public health, data (including pathogen genomes and metadata) can be
-        very sensitive. Because of this, Users have full control over their data
-        and the ability to mark samples as “private” (never to leave the
-        application). If you wish to exercise this option, please ensure to mark
-        the relevant data as ‘private’ within 2 weeks of upload.
+        Users have full control over their data and the ability to mark samples
+        as &quot;private&quot;. Private samples will never be shared outside of
+        your Group unless you choose to mark them as &quot;public&quot; later
+        on.
       </P>
 
       <UnderLineHeader>Who can see your analytical results?</UnderLineHeader>
       <P>
         Analytical results, including phylogenetic trees, generated from your
         Upload Data and Pathogen Consensus Genomes are the property of your
-        organization group only, and can only be seen by you and members of your
-        group. You and your group control who to share them with and when.
+        Group only, and can only be seen by you and members of your group. You
+        and your group control who to share them with and when.
       </P>
       <P>
         Additionally, as outlined above, this data may be visible in some form
-        to third parties (for example, the CDPH) in accordance with your
-        organization’s policies, or in accordance with applicable law.
+        to third parties in accordance with your organization’s policies, or in
+        accordance with applicable law.
       </P>
     </>
   );
@@ -595,25 +555,26 @@ const PrivacyPolicy = (): JSX.Element => {
           <span key="0">
             <ListItemLabel>User Data.</ListItemLabel>
             User Data is any information we collect from a User about that User
-            (“User Data”). It may include information necessary to create or
-            access your account such as your name, email, Group name and contact
-            email, and login credentials.
+            (&quot;User Data&quot;). It may include information necessary to
+            create or access your account such as your name, email, Group name
+            and contact email, and login credentials.
           </span>,
           <span key="1">
             <ListItemLabel>Analytics</ListItemLabel>
             When Users visit or use our Service, we may automatically collect
             some information so that we can understand the way in which our tool
             is being used. We may collect some Device Data or Analytics
-            Information in order to do this. “Device Data” includes information
-            about your browser type and operating system, IP address and/or
-            device ID. “Analytics Information” relates to any of your requests,
-            queries, or use of the Services, such as the amount of time spent
-            viewing particular web pages. We use Analytics Information in
-            accordance with our legitimate interests. Any data which we collect
-            for analytics purposes will be stored in a de-identified and
-            aggregated manner wherever possible; any analytics data that is not
-            able to be aggregated and de-identified will not be shared beyond
-            the Aspen team and will be stored for no longer than is necessary.
+            Information in order to do this. &quot;Device Data&quot; includes
+            information about your browser type and operating system, IP address
+            and/or device ID. &quot;Analytics Information&quot; relates to any
+            of your requests, queries, or use of the Services, such as the
+            amount of time spent viewing particular web pages. We use Analytics
+            Information in accordance with our legitimate interests. Any data
+            which we collect for analytics purposes will be stored in a
+            de-identified and aggregated manner wherever possible; any analytics
+            data that is not able to be aggregated and de-identified will not be
+            shared beyond the Aspen team and will be stored for no longer than
+            is necessary.
           </span>,
         ]}
       />
@@ -671,25 +632,26 @@ const PrivacyPolicy = (): JSX.Element => {
       </P>
       <P>
         Users have the option to share their analytical outputs with certain
-        third party tools, such as GISAID. You control whether to use this
-        integration or not.
+        third party tools. You control whether to use these integrations or not.
       </P>
       <P>
         In certain circumstances, we also share your Upload Data and analytical
-        results with other governmental, public health entities, such as the
-        CDPH, in accordance with your organization’s policies and with
-        applicable law.
+        results with other governmental, public health entities in accordance
+        with your organization’s policies and with applicable law. For example,
+        certain Users in California currently allow the California Department of
+        Public Health (&quot;CDPH&quot;) to access Upload Data and analytical
+        results from their Group.
       </P>
       <P>
         In the unlikely event that we can no longer keep operating Aspen or
         believe that its purpose is better served by having another entity
         operating it, we may transfer Aspen and all data existing therein
         (Upload Data, analytical outputs, and User Data) so that Users can
-        continue to be served. We will always let you know before this happens,
-        and you will have the option to delete your account and any data you’ve
-        uploaded. Should this occur, the entity to which we transfer your data
-        will be obliged to use it in a manner that is consistent with this
-        Privacy Policy and our{" "}
+        continue to be served. We will always let you know <B>before</B> this
+        happens, and you will have the option to delete your account and any
+        data you’ve uploaded. Should this occur, the entity to which we transfer
+        your data will be obliged to use it in a manner that is consistent with
+        this Privacy Policy and our{" "}
         <Link href={ROUTES.TERMS} target="_blank" rel="noopener">
           Terms
         </Link>

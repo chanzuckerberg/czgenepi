@@ -16,3 +16,7 @@ export const Details = styled.p`
     `;
   }}
 `;
+
+export const SpacedBold = styled.b`
+  padding: 0 0.3em;
+`;

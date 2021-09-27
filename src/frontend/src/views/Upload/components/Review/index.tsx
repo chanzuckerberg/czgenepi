@@ -92,10 +92,7 @@ export default function Review({
                 Privacy Policy
               </Link>
               . I have reviewed the data that I am uploading and can confirm
-              that I am not uploading any personally identifiable information. I
-              understand that samples marked Public will be shared with
-              California Department of Health on Aspen and that sharing samples
-              on Aspen does not satisfy CDPH reporting requirements.
+              that I am not uploading any personally identifiable information.
             </span>
           </CheckboxText>
         </CheckboxWrapper>

@@ -86,9 +86,9 @@ export default function Metadata({
         <StyledInstructions
           title="Sample Privacy & Sharing"
           items={[
-            "By default, all samples are shared with the California Department of Health.",
-            "Samples shared with CDPH on Aspen do not satisfy CDPH reporting requirements.",
-            `If a sample should remain private to your County, please update the “Sample is Private” setting to “Yes”. Private samples will not be shared with CDPH through Aspen.`,
+            `Samples are only available to anyone outside of your Group when it is shared by you, or by your Group. Other organizations that you share your data with (i.e. CDPH for California jurisdictions) can see your samples, but not your private, internal identifiers.`,
+            `If a sample should remain private to your Group, please update the “Sample is Private” setting to “Yes”. These samples will never be shared beyond your Group unless you choose to change their access level later on.`,
+            `Check local requirements for reporting to public health authorities. These may not be met by uploading samples to Aspen.`,
             <p key="1">
               Please read our{" "}
               <Link href={ROUTES.PRIVACY} target="_blank" rel="noopener">
