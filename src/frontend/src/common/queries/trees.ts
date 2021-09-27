@@ -1,11 +1,32 @@
-import { API, DEFAULT_POST_OPTIONS } from "../api";
+import {
+  useMutation,
+  UseMutationResult,
+  useQuery,
+  useQueryClient,
+  UseQueryResult,
+} from "react-query";
+import { API, DEFAULT_POST_OPTIONS, fetchTrees, TreeResponse } from "../api";
 import { API_URL } from "../constants/ENV";
+import { ENTITIES } from "./entities";
 
 interface CreateTreePayload {
   name: string;
   samples: string[];
   tree_type: string;
 }
+
+// * these two types should stay in sync. There is technically a way to do it in TS, but it is
+// * very convoluted: https://stackoverflow.com/questions/44323441
+interface CreateTreeType {
+  treeName: string;
+  sampleIds: string[];
+  treeType: string;
+}
+
+export const USE_TREE_INFO = {
+  entities: [ENTITIES.TREE_INFO],
+  id: "treeInfo",
+};
 
 export async function createTree({
   sampleIds,
@@ -28,4 +49,35 @@ export async function createTree({
   if (response.ok) return await response.json();
 
   throw Error(`${response.statusText}: ${await response.text()}`);
+}
+
+interface CreateTreeCallbacks {
+  onError: () => void;
+  onSuccess: () => void;
+}
+
+export function useCreateTree({
+  onError,
+  onSuccess,
+}: CreateTreeCallbacks): UseMutationResult<
+  unknown,
+  unknown,
+  CreateTreeType,
+  unknown
+> {
+  const queryClient = useQueryClient();
+
+  return useMutation(createTree, {
+    onError,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries([USE_TREE_INFO]);
+      onSuccess();
+    },
+  });
+}
+
+export function useTreeInfo(): UseQueryResult<TreeResponse, unknown> {
+  return useQuery([USE_TREE_INFO], fetchTrees, {
+    retry: false,
+  });
 }
