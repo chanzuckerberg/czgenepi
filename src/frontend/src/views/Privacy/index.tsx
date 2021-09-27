@@ -28,7 +28,7 @@ const PrivacyPolicy = (): JSX.Element => {
     <>
       <Title>
         <H1>Aspen Privacy Policy</H1>
-        <H4>Last Updated: September 24, 2021</H4>
+        <H4>Last Updated: September 27, 2021</H4>
       </Title>
       <P>
         The Chan Zuckerberg Initiative Foundation, a 501(c)(3) nonprofit private
