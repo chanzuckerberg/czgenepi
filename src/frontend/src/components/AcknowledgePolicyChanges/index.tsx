@@ -1,13 +1,16 @@
 import React from "react";
 import {
   Container,
+  StyledIconInfo,
 } from "./style";
 
 const AcknowledgePolicyChanges = () => {
   return (
     <Container>
       <p>hi</p>
-      <p>there</p>
+      <p>
+        <StyledIconInfo />
+        there</p>
       <p>world</p>
     </Container>
   );
