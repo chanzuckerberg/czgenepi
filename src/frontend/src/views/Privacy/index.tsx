@@ -86,9 +86,12 @@ const PrivacyPolicy = (): JSX.Element => {
         <Link href={ROUTES.TERMS} target="_blank" rel="noopener">
           Terms of Use (&quot;Terms&quot;)
         </Link>
-        . <B>Please remember that you are using Aspen in your organizational
-        capacity, which means that your organization’s policies will apply to
-        your use.</B>
+        .{" "}
+        <B>
+          Please remember that you are using Aspen in your organizational
+          capacity, which means that your organization’s policies will apply to
+          your use.
+        </B>
       </P>
 
       <H3>Key Things to Know</H3>
