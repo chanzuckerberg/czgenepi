@@ -102,7 +102,7 @@ const SAMPLE_MAP = new Map<string, keyof Sample>([
 export const fetchSamples = (): Promise<SampleResponse> =>
   apiResponse<SampleResponse>(["samples"], [SAMPLE_MAP], API.SAMPLES);
 
-interface TreeResponse extends APIResponse {
+export interface TreeResponse extends APIResponse {
   phylo_trees: Tree[];
 }
 const TREE_MAP = new Map<string, keyof Tree>([

@@ -153,6 +153,7 @@ const DataSubview: FunctionComponent<Props> = ({
     useState<boolean>(false);
   const [hasCreateTreeStarted, setCreateTreeStarted] = useState<boolean>(false);
   const [didCreateTreeFailed, setCreateTreeFailed] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const handleDownloadClickOpen = () => {
     setDownloadModalOpen(true);
   };
@@ -178,6 +179,10 @@ const DataSubview: FunctionComponent<Props> = ({
     setMetadataSelected(false);
     setFastaSelected(false);
   };
+
+  useEffect(() => {
+    searcher(searchQuery);
+  }, [data]);
 
   useEffect(() => {
     // Only show checkboxes on the sample datatable
@@ -233,12 +238,17 @@ const DataSubview: FunctionComponent<Props> = ({
     }, 12000);
   }, [hasCreateTreeStarted]);
 
-  // search functions
-  const searcher = (
+  const onChange = (
     _event: React.ChangeEvent<HTMLInputElement>,
     fieldInput: InputOnChangeData
   ) => {
     const query = fieldInput.value;
+    searcher(query);
+    setSearchQuery(query);
+  };
+
+  // search functions
+  const searcher = (query: string): void => {
     if (data === undefined) {
       return;
     } else if (query.length === 0) {
@@ -349,7 +359,7 @@ const DataSubview: FunctionComponent<Props> = ({
                 icon="search"
                 placeholder="Search"
                 loading={state.searching}
-                onChange={searcher}
+                onChange={onChange}
                 data-test-id="search"
               />
             </div>
