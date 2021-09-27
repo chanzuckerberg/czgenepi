@@ -57,5 +57,10 @@ export const StyledErrorMessage = styled.span`
   /* set max-width here so that there's space for both error messages to be present and be spaced appropriately */
   max-width: 159px;
   ${fontBodyXxxs}
-  color: red;
+  ${(props) => {
+    const colors = getColors(props);
+    return `
+      color: ${colors?.error[600]};
+    `;
+  }}
 `;
