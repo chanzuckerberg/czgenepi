@@ -10,24 +10,24 @@ export const SAMPLE_HEADERS: Header[] = [
     text: "Public ID",
   },
   {
-    key: "uploadDate",
-    sortKey: ["uploadDate"],
-    text: "Upload Date",
-  },
-  {
     key: "collectionDate",
     sortKey: ["collectionDate"],
     text: "Collection Date",
   },
   {
-    key: "collectionLocation",
-    sortKey: ["collectionLocation"],
-    text: "Collection Location",
-  },
-  {
     key: "lineage",
     sortKey: ["lineage", "lineage"],
     text: "Lineage",
+  },
+  {
+    key: "uploadDate",
+    sortKey: ["uploadDate"],
+    text: "Upload Date",
+  },
+  {
+    key: "collectionLocation",
+    sortKey: ["collectionLocation"],
+    text: "Collection Location",
   },
   {
     key: "gisaid",
