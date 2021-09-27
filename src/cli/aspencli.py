@@ -311,12 +311,9 @@ def download_samples(ctx, sample_ids):
 def update_public_ids(ctx, group_id, private_to_public_id_mapping_fh):
     api_client = ctx.obj["api_client"]
 
-    def strip_lr_spaces(id: str) -> str:
-        return id.lstrip().rstrip()
-
     csvreader = csv.DictReader(private_to_public_id_mapping_fh)
     private_to_public = {
-        strip_lr_spaces(row["private_identifier"]): strip_lr_spaces(row["public_identifier"])
+        row["private_identifier"].strip(): row["public_identifier"].strip()
         for row in csvreader
     }
 
