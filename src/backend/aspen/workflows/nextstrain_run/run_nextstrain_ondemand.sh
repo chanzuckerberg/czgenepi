@@ -1,7 +1,7 @@
 set -Eeuxo pipefail
 shopt -s inherit_errexit
 
-exit 99
+exit 1
 
 df 1>&2
 cat /proc/meminfo 1>&2
