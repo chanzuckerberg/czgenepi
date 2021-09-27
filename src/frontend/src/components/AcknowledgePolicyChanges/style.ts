@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
-import { fontBodyS, Link, getColors, getSpacings, getIconSizes } from "czifui";
-import IconInfo from "src/common/icons/IconInfo.svg"
 import CloseIcon from "@material-ui/icons/Close";
+import { fontBodyS, getColors, getIconSizes, getSpacings, Link } from "czifui";
+import IconInfo from "src/common/icons/IconInfo.svg";
 
 // Note the use of `DummyCenteringSpacer`. Explanation with it.
 export const Container = styled.div`
