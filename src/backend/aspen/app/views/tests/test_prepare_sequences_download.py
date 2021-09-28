@@ -149,7 +149,14 @@ def test_access_matrix(
     sample3 = sample_factory(
         viewer_group, user, private_identifier="sample3", public_identifier="pub3"
     )
-    sequences = {"sample1": "CAT", "sample2": "TAC", "sample3": "ATC"}
+    sample4 = sample_factory(
+        owner_group1,
+        user,
+        private_identifier="sample4",
+        public_identifier="pub4",
+        private=True,
+    )
+    sequences = {"sample1": "CAT", "sample2": "TAC", "sample3": "ATC", "sample4": "CCC"}
     accessions = {
         sequence_name: AccessionWorkflowDirective(
             PublicRepositoryType.GISAID,
@@ -157,7 +164,7 @@ def test_access_matrix(
             datetime.datetime.now(),
             sequence_name,
         )
-        for sequence_name in ["seq1", "seq2", "seq3"]
+        for sequence_name in ["seq1", "seq2", "seq3", "seq4"]
     }
 
     uploaded_pathogen_genome_factory(
@@ -168,6 +175,9 @@ def test_access_matrix(
     )
     uploaded_pathogen_genome_factory(
         sample3, accessions=[accessions["seq3"]], sequence="ATC"
+    )
+    uploaded_pathogen_genome_factory(
+        sample4, accessions=[accessions["seq4"]], sequence="CCC"
     )
 
     session.add_all((owner_group1, owner_group2, viewer_group))
@@ -182,20 +192,22 @@ def test_access_matrix(
                 sample1.public_identifier,
                 sample2.public_identifier,
                 sample3.public_identifier,
+                sample4.public_identifier,
             ],
             "expected_public": [sample1],
             "expected_private": [sample3],
-            "not_expected": [sample2],
+            "not_expected": [sample2, sample4],
         },
         {
             "samples": [
                 sample1.private_identifier,
                 sample2.private_identifier,
                 sample3.private_identifier,
+                sample4.private_identifier,
             ],
             "expected_public": [],
             "expected_private": [sample2, sample3],
-            "not_expected": [sample1],
+            "not_expected": [sample1, sample4],
         },
     ]
     for case in matrix:
