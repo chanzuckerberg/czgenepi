@@ -276,18 +276,14 @@ const DataSubview: FunctionComponent<Props> = ({
     </div>
   );
 
-  const TREE_BUILD_TOOLTIP_TEXT_DISABLED = (
+  const TREE_BUILD_TOOLTIP_TEXT = (isDisabled: boolean) => (
     <div>
-      <TooltipHeaderText>Create Phylogenetic Tree</TooltipHeaderText>
-      <TooltipDescriptionText>
-        {"Select at least 1 and <2000 recovered samples"}
-      </TooltipDescriptionText>
-    </div>
-  );
-
-  const TREE_BUILD_TOOLTIP_TEXT_ENABLED = (
-    <div>
-      <TooltipHeaderText>Create Phylogenetic Tree</TooltipHeaderText>
+      <TooltipHeaderText>Run Phylogenetic Analysis</TooltipHeaderText>
+      {isDisabled && (
+        <TooltipDescriptionText>
+          {"Select at least 1 and <2000 recovered samples"}
+        </TooltipDescriptionText>
+      )}
     </div>
   );
 
@@ -304,8 +300,8 @@ const DataSubview: FunctionComponent<Props> = ({
             disabled={isCreateTreeDisabled}
             svgDisabled={<StyledTreeBuildDisabledImage />}
             svgEnabled={<StyledTreeBuildImage />}
-            tooltipTextDisabled={TREE_BUILD_TOOLTIP_TEXT_DISABLED}
-            tooltipTextEnabled={TREE_BUILD_TOOLTIP_TEXT_ENABLED}
+            tooltipTextDisabled={TREE_BUILD_TOOLTIP_TEXT(true)}
+            tooltipTextEnabled={TREE_BUILD_TOOLTIP_TEXT(false)}
           />
           <IconButton
             onClick={handleDownloadClickOpen}
