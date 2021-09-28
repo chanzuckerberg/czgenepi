@@ -16,7 +16,7 @@ builds:
     location: {location}
     region: North America
     subsampling_scheme: group_only
-    title: '{location}, {division}'
+    title: '{location}, {division} samples'
 
 ## custom rules
 custom_rules:
@@ -27,7 +27,7 @@ files:
   include: "data/include.txt"
   lat_longs: "my_profiles/aspen/lat_longs.tsv"
   ordering: "my_profiles/aspen/ordering.tsv"
-  description: "my_profiles/aspen/covidtrackerca.md"
+  description: "my_profiles/aspen/description_non_contextualized.md"
   auspice_config: "my_profiles/aspen/aspen_auspice_config_v2.json"
 
 ## Parameters
