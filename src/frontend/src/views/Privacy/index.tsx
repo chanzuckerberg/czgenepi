@@ -86,16 +86,20 @@ const PrivacyPolicy = (): JSX.Element => {
         <Link href={ROUTES.TERMS} target="_blank" rel="noopener">
           Terms of Use (&quot;Terms&quot;)
         </Link>
-        . Please remember that you are using Aspen in your organizational
-        capacity, which means that your organization’s policies will apply to
-        your use.
+        .{" "}
+        <B>
+          Please remember that you are using Aspen in your organizational
+          capacity, which means that your organization’s policies will apply to
+          your use.
+        </B>
       </P>
 
       <H3>Key Things to Know</H3>
       <List
         items={[
           "Aspen is a free and open-source tool.",
-          "You always own the data you upload. You decide how you want your data to be shared, and you can delete your data from Aspen at any time. You’re using Aspen in your professional capacity, which means any pathogen sample data you upload, and any data that we generate on the basis of this, are visible to other members (Users) in your Group. This data is only available to anyone outside of your organization when it is shared by you, or by your Group. Other organizations that you share your data with can see your samples, but not your private, internal identifiers.",
+          "You always own the data you upload. You decide how you want your data to be shared, and you can delete your data from Aspen at any time.",
+          "You’re using Aspen in your professional capacity, which means any pathogen sample data you upload, and any data that we generate on the basis of this, are visible to other members (Users) in your Group. This data is only available to anyone outside of your organization when it is shared by you, or by your Group. Other organizations that you share your data with can see your samples, but not your private, internal identifiers.",
           "Human genetic data with uploaded data is processed only so we can filter out and permanently delete it. We do not keep this non-pathogen genomic data and it’s not necessary to operate the tool.",
           <span key="0">
             Similarly, Aspen{" "}
