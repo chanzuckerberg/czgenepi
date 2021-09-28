@@ -12,9 +12,18 @@ from aspen.config.config import Config
 from aspen.database.models.usergroup import User
 from aspen.error import http_exceptions as ex
 
-GET_USER_FIELDS: Collection[str] = ("name", "agreed_to_tos")
+GET_USER_FIELDS: Collection[str] = (
+    "name",
+    "agreed_to_tos",
+    "acknowledged_policy_version",
+)
 GET_GROUP_FIELDS: Collection[str] = ("name",)
-PUT_USER_FIELDS: Collection[str] = ("name", "email", "agreed_to_tos")
+PUT_USER_FIELDS: Collection[str] = (
+    "name",
+    "email",
+    "agreed_to_tos",
+    "acknowledged_policy_version",
+)
 POST_USER_REQUIRED_FIELDS: Collection[str] = (
     "name",
     "email",
