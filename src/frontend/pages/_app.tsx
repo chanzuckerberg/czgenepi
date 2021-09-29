@@ -7,10 +7,12 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import "semantic-ui-css/semantic.min.css";
 import style from "src/App.module.scss";
 import { theme } from "src/common/styles/theme";
+import { setFeatureFlagsFromQueryParams } from "src/common/utils/featureFlags";
 import NavBar from "src/components/NavBar";
 import AcknowledgePolicyChanges from "src/components/AcknowledgePolicyChanges";
 
 const queryClient = new QueryClient();
+setFeatureFlagsFromQueryParams();
 
 const App = ({ Component, pageProps }: AppProps): JSX.Element => {
   // (thuang): MUI related SSR setup
