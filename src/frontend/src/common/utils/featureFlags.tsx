@@ -7,7 +7,7 @@ import {
 const FEATURE_FLAG_PREFIX = "genepi-ff-";
 
 interface FeatureFlag {
-  isActive: boolean;
+  isDisabled: boolean;
   key: string;
 }
 
@@ -18,7 +18,7 @@ interface FlagsObj {
 // we can add more keys to each flag as needed
 export const FEATURE_FLAGS: FlagsObj = {
   mayasFlag: {
-    isActive: true,
+    isDisabled: false,
     key: "mayasFlag",
   },
 };
@@ -31,12 +31,12 @@ const isStrTrue = (str: string | null): boolean => {
 };
 
 export const usesFeatureFlag = (flag: FeatureFlag): boolean => {
-  const { isActive, key } = flag;
+  const { isDisabled, key } = flag;
 
   const storedValue = getLocalStorage(FEATURE_FLAG_PREFIX + key);
   const isBrowserUsingFlag = isStrTrue(storedValue ?? "");
 
-  if (isActive && isBrowserUsingFlag) return true;
+  if (!isDisabled && isBrowserUsingFlag) return true;
   return false;
 };
 
