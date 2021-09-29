@@ -1,4 +1,5 @@
 import datetime
+import logging
 import os
 
 import click
@@ -13,6 +14,8 @@ from aspen.database.connection import (
 from aspen.database.models import PhyloRun
 from aspen.database.models.workflow import SoftwareNames, WorkflowStatusType
 
+logging.basicConfig(level=logging.INFO)
+
 @click.command("error")
 @click.option("--phylo-run-id", type=int, required=True)
 @click.option("--ncov-rev", type=str, required=False)
@@ -22,9 +25,9 @@ def fail_run(
     end_time: int,
     phylo_run_id: int,
 ):
-    print("I have been triggered because an error has been detected in this run.")
+    logging.info("An error has been detected in this run.")
     if phylo_run_id == -1:
-        print("Error occurred before a valid phylo run was created. No run to mark as failed.")
+        logging.info("Error occurred before a valid phylo run was created. No run to mark as failed.")
         return
     end_time_datetime = datetime.datetime.fromtimestamp(end_time)
 
@@ -44,6 +47,7 @@ def fail_run(
         phylo_run.software_versions = {
             SoftwareNames.NCOV: ncov_rev,
         }
+    logging.info(f"PhyloRun {phylo_run_id} marked as failed.")
 
 
 if __name__ == '__main__':

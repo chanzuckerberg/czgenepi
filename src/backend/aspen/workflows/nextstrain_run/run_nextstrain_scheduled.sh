@@ -16,8 +16,6 @@ shopt -s inherit_errexit
 df 1>&2
 cat /proc/meminfo 1>&2
 
-exit 1
-
 start_time=$(date +%s)
 build_id=$(date +%Y%m%d-%H%M)
 
@@ -45,6 +43,8 @@ mkdir -p ncov/my_profiles/aspen ncov/results
 export ncov_git_rev=$(cd ncov && git rev-parse HEAD)
 
 cp /usr/src/app/aspen/workflows/nextstrain_run/nextstrain_profile/* ncov/my_profiles/aspen/
+
+exit 1
 
 # dump the sequences, metadata, and builds.yaml for a run out to disk.
 aligned_gisaid_location=$(
