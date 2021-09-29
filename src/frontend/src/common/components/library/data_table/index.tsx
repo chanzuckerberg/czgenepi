@@ -12,6 +12,7 @@ import { FixedSizeList, ListChildComponentProps } from "react-window";
 import { noop } from "src/common/constants/empty";
 import SortArrowDownIcon from "src/common/icons/IconArrowDownSmall.svg";
 import SortArrowUpIcon from "src/common/icons/IconArrowUpSmall.svg";
+import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import { EmptyState } from "../data_subview/components/EmptyState";
 import style from "./index.module.scss";
 import {
@@ -321,6 +322,10 @@ export const DataTable: FunctionComponent<Props> = ({
   };
 
   const render = (tableData: TableItem[]) => {
+    if (usesFeatureFlag(FEATURE_FLAGS.mayasFlag)) {
+      return "FEATURE FLAG IN USE...";
+    }
+
     function renderRow(props: ListChildComponentProps) {
       const item = tableData[props.index];
       return (
