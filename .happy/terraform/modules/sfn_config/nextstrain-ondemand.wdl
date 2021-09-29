@@ -50,7 +50,12 @@ task nextstrain_workflow {
 
     # error handling
     if [[ $? != 0 ]]; then
-        python3 /usr/src/app/aspen/workflows/nextstrain_run/error.py
+        end_time=$(date +%s)
+        python3 /usr/src/app/aspen/workflows/nextstrain_run/error.py            \
+        --ncov-rev "${ncov_git_rev}"                                            \
+        --end-time "${end_time}"                                                \
+        --phylo-run-id "~{workflow_id}"                                         \
+
         exit 1
     fi
     >>>

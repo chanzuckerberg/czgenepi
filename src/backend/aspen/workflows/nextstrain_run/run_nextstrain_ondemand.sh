@@ -31,7 +31,7 @@ mkdir -p ncov/my_profiles/aspen ncov/results
  git fetch --depth 1 git://github.com/nextstrain/ncov.git &&
  git checkout FETCH_HEAD
 )
-ncov_git_rev=$(cd ncov && git rev-parse HEAD)
+export ncov_git_rev=$(cd ncov && git rev-parse HEAD)
 
 cp /usr/src/app/aspen/workflows/nextstrain_run/nextstrain_profile/* ncov/my_profiles/aspen/
 
