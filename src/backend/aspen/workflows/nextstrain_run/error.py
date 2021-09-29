@@ -18,8 +18,6 @@ from aspen.database.models.workflow import SoftwareNames, WorkflowStatusType
 @click.option("--ncov-rev", type=str, required=False)
 @click.option("--end-time", type=int, required=True)
 def fail_run(
-    aspen_workflow_rev: str,
-    aspen_creation_rev: str,
     ncov_rev: str,
     end_time: int,
     phylo_run_id: int,
