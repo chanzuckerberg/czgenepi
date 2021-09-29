@@ -8,7 +8,7 @@ const FEATURE_FLAG_PREFIX = "genepi-ff-";
 
 interface FeatureFlag {
   isActive: boolean;
-  param: string;
+  key: string;
 }
 
 interface FlagsObj {
@@ -25,7 +25,8 @@ export const FEATURE_FLAGS: FlagsObj = {
 
 const allowedKeys = Object.keys(FEATURE_FLAGS) as string[];
 
-const isStrTrue = (str: string): boolean => {
+const isStrTrue = (str: string | null): boolean => {
+  if (!str) return false;
   return str === "true";
 };
 
@@ -33,7 +34,7 @@ export const usesFeatureFlag = (flag: FeatureFlag): boolean => {
   const { isActive, key } = flag;
 
   const storedValue = getLocalStorage(FEATURE_FLAG_PREFIX + key);
-  const isBrowserUsingFlag = isStrTrue(storedValue);
+  const isBrowserUsingFlag = isStrTrue(storedValue ?? "");
 
   if (isActive && isBrowserUsingFlag) return true;
   return false;
@@ -57,6 +58,5 @@ export const setFeatureFlagsFromQueryParams = (): void => {
 };
 
 const setFeatureFlag = (key: string, value: string) => {
-  const URLValueAsBooleanString = isStrTrue(value);
-  setLocalStorage(FEATURE_FLAG_PREFIX + key, URLValueAsBooleanString);
+  setLocalStorage(FEATURE_FLAG_PREFIX + key, value);
 };
