@@ -45,20 +45,20 @@ task nextstrain_workflow {
     command <<<
     set -Euxo pipefail
     # setup
-    export AWS_REGION=~{aws_region}
-    export ASPEN_CONFIG_SECRET_NAME=~{aspen_config_secret_name}
+    export AWS_REGION="~{aws_region}"
+    export ASPEN_CONFIG_SECRET_NAME="~{aspen_config_secret_name}"
     if [ "~{remote_dev_prefix}" != "" ]; then
         export REMOTE_DEV_PREFIX="~{remote_dev_prefix}"
     fi
-    export S3_FILESTEM=~{s3_filestem}
-    export GROUP_NAME=~{group_name}
-    export TEMPLATE_FILENAME=~{template_filename}
-    export TEMPLATE_ARGS=~{template_args}
-    export TREE_TYPE=~{tree_type}
+    export S3_FILESTEM="~{s3_filestem}"
+    export GROUP_NAME="~{group_name}"
+    export TEMPLATE_FILENAME="~{template_filename}"
+    export TEMPLATE_ARGS="~{template_args}"
+    export TREE_TYPE="~{tree_type}"
 
     # Just in case the run script bails out before defining these vars
     export ncov_git_rev="NONE"
-    export workflow_id=-1
+    export workflow_id="-1"
 
     # run main workflow
     cd /usr/src/app/aspen/workflows/nextstrain_run

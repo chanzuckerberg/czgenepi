@@ -36,13 +36,13 @@ task nextstrain_workflow {
     command <<<
     set -Euxo pipefail
     # setup
-    export AWS_REGION=~{aws_region}
-    export ASPEN_CONFIG_SECRET_NAME=~{aspen_config_secret_name}
+    export AWS_REGION="~{aws_region}"
+    export ASPEN_CONFIG_SECRET_NAME="~{aspen_config_secret_name}"
     if [ "~{remote_dev_prefix}" != "" ]; then
         export REMOTE_DEV_PREFIX="~{remote_dev_prefix}"
     fi
-    export WORKFLOW_ID=~{workflow_id}
-    export S3_FILESTEM=~{s3_filestem}
+    export WORKFLOW_ID="~{workflow_id}"
+    export S3_FILESTEM="~{s3_filestem}"
 
     # Just in case the run script bails out before defining this var
     export ncov_git_rev="NONE"
