@@ -24,6 +24,7 @@ export const USE_USER_INFO = {
   id: "userInfo",
 };
 
+// FIXME (vince): I can't find this used anywhere? If that's true, should delete.
 export interface UserInfoResponse {
   email?: string;
   email_verified?: boolean;
@@ -32,7 +33,7 @@ export interface UserInfoResponse {
   name?: string;
 }
 
-interface UserResponse extends APIResponse {
+export interface UserResponse extends APIResponse {
   group: Group;
   user: User;
 }
@@ -43,6 +44,7 @@ const USER_MAP = new Map<string, keyof User>([
   ["system_admin", "systemAdmin"],
   ["group_id", "groupId"],
   ["agreed_to_tos", "agreedToTos"],
+  ["acknowledged_policy_version", "acknowledgedPolicyVersion"],
 ]);
 
 export const fetchUserInfo = (): Promise<UserResponse> =>
