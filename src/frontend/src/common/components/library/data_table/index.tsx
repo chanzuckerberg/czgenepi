@@ -323,7 +323,7 @@ export const DataTable: FunctionComponent<Props> = ({
 
   const render = (tableData: TableItem[]) => {
     if (usesFeatureFlag(FEATURE_FLAGS.mayasFlag)) {
-      return "FEATURE FLAG IN USE...";
+      return <div>FEATURE FLAG IN USE...</div>;
     }
 
     function renderRow(props: ListChildComponentProps) {

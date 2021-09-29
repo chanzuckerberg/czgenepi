@@ -9,8 +9,7 @@ export function stripProtocol(url?: string): string {
 export function hasQueryParam(param: string): boolean {
   if (typeof window !== "undefined") {
     const urlSearchParams = new URLSearchParams(window.location.search);
-    const params = Object.fromEntries(urlSearchParams.entries());
-    return Object.keys(params).includes(param);
+    return urlSearchParams.has(param);
   }
 
   return false;
