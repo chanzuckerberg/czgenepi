@@ -1,3 +1,15 @@
+/**
+ * Banner to notify user of any changes to policies.
+ *
+ * When we make changes to legal-type policies (eg, Privacy Policy, Terms of
+ * Service, etc), we need to notify the user these changes have happened. Banner
+ * points out the changes, and when closed, we track that the user has acknowledged
+ * the current round of changes so we can stop showing them the banner.
+ *
+ * If the policies change again in the future, the banner can be brought back
+ * for previously acknowledged users by changing date of CURRENT_POLICY_VERSION.
+ */
+
 import React from "react";
 import {
   UserResponse,
@@ -15,8 +27,14 @@ import {
   StyledLink,
 } from "./style";
 
-// VOODOO DOCME
-const CURRENT_POLICY_VERSION = "2021-09-28";
+/**
+ * Date of most recent change in legal and legal-adjacent policies (eg, Privacy Policy,
+ * Terms of Service, etc). If any of those are changed, this should be updated.
+ * Changing value will cause banner to start appearing for already existing users
+ * until they acknowledge the latest changes by closing the banner.
+ * Backend requires date format of YYYY-MM-DD, can't use arbitrary string!
+ */
+const CURRENT_POLICY_VERSION = "2021-09-30"; // NOTE: YYYY-MM-DD is critical
 
 /**
  * Determine if the user needs to acknowledge the current version of policies.
