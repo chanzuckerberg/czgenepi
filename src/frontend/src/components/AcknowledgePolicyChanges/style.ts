@@ -3,7 +3,8 @@ import CloseIcon from "@material-ui/icons/Close";
 import { fontBodyS, getColors, getIconSizes, getSpacings, Link } from "czifui";
 import IconInfo from "src/common/icons/IconInfo.svg";
 
-// Note the use of `DummyCenteringSpacer`. Explanation with it.
+// Note that how we use flex here depends on `DummyCenteringSpacer`.
+// Explanation of what's going on commented with that component below.
 export const Container = styled.div`
   width: 100%;
   min-height: 40px;

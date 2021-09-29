@@ -24,15 +24,6 @@ export const USE_USER_INFO = {
   id: "userInfo",
 };
 
-// FIXME (vince): I can't find this used anywhere? If that's true, should delete.
-export interface UserInfoResponse {
-  email?: string;
-  email_verified?: boolean;
-  id?: string;
-  is_authenticated?: boolean;
-  name?: string;
-}
-
 export interface UserResponse extends APIResponse {
   group: Group;
   user: User;
