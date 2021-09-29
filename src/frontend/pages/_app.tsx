@@ -8,6 +8,7 @@ import "semantic-ui-css/semantic.min.css";
 import style from "src/App.module.scss";
 import { theme } from "src/common/styles/theme";
 import NavBar from "src/components/NavBar";
+import AcknowledgePolicyChanges from "src/components/AcknowledgePolicyChanges";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
             <EmotionThemeProvider theme={theme}>
               <div className={style.app}>
                 <NavBar />
+                <AcknowledgePolicyChanges />
                 <Component {...pageProps} />
               </div>
             </EmotionThemeProvider>
