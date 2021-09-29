@@ -44,6 +44,9 @@ task nextstrain_workflow {
     export WORKFLOW_ID=~{workflow_id}
     export S3_FILESTEM=~{s3_filestem}
 
+    # Just in case the run script bails out before defining this var
+    export ncov_git_rev="NONE"
+
     # run main workflow
     cd /usr/src/app/aspen/workflows/nextstrain_run
     ./run_nextstrain_ondemand.sh
