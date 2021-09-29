@@ -10,6 +10,7 @@ import DialogTitle from "src/common/components/library/Dialog/components/DialogT
 import ENV from "src/common/constants/ENV";
 import { useUpdateUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
+import { CURRENT_POLICY_VERSION } from "src/components/AcknowledgePolicyChanges";
 import { PageContent } from "../../common/styles/mixins/global";
 import { Details, SpacedBold, Title } from "./style";
 
@@ -40,7 +41,11 @@ export default function AgreeTerms(): JSX.Element {
 
     async function agreeTos() {
       setIsLoading(true);
-      updateUserInfo({ agreed_to_tos: true });
+      updateUserInfo({
+        // Agreeing to ToS also means implicit acknowledgment of current policies
+        acknowledged_policy_version: CURRENT_POLICY_VERSION,
+        agreed_to_tos: true,
+      });
     }
   }, [hasAcceptedTerms, isUpdatingUserInfo, isSuccess, updateUserInfo]);
 

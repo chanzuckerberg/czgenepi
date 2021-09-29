@@ -34,7 +34,7 @@ import {
  * until they acknowledge the latest changes by closing the banner.
  * Backend requires date format of YYYY-MM-DD, can't use arbitrary string!
  */
-const CURRENT_POLICY_VERSION = "2021-09-30"; // NOTE: YYYY-MM-DD is critical
+export const CURRENT_POLICY_VERSION = "2021-09-30"; // NOTE: YYYY-MM-DD is critical
 
 /**
  * Determine if the user needs to acknowledge the current version of policies.
