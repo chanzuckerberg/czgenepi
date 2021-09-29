@@ -1,3 +1,12 @@
+#!/bin/bash
+
+# WDL inputs available through environmental vars:
+# AWS_REGION
+# ASPEN_CONFIG_SECRET_NAME
+# REMOTE_DEV_PREFIX (if set)
+# WORKFLOW_ID
+# S3_FILESTEM
+
 set -Eeuxo pipefail
 shopt -s inherit_errexit
 
@@ -9,10 +18,10 @@ cat /proc/meminfo 1>&2
 start_time=$(date +%s)
 build_date=$(date +%Y%m%d)
 
-aws configure set region ~{aws_region}
+aws configure set region $AWS_REGION
 
 # fetch aspen config
-aspen_config="$(aws secretsmanager get-secret-value --secret-id ~{aspen_config_secret_name} --query SecretString --output text)"
+aspen_config="$(aws secretsmanager get-secret-value --secret-id $ASPEN_CONFIG_SECRET_NAME --query SecretString --output text)"
 aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$aspen_config")"
 
 # set up ncov
@@ -29,7 +38,7 @@ cp /usr/src/app/aspen/workflows/nextstrain_run/nextstrain_profile/* ncov/my_prof
 # dump the sequences, metadata, and builds.yaml for a run out to disk.
 aligned_gisaid_location=$(
     python3 /usr/src/app/aspen/workflows/nextstrain_run/export.py \
-           --phylo-run-id "~{workflow_id}"                        \
+           --phylo-run-id "${WORKFLOW_ID}"                        \
            --county-sequences ncov/data/sequences_aspen.fasta     \
            --county-metadata ncov/data/metadata_aspen.tsv         \
            --selected ncov/data/include.txt                       \
@@ -52,10 +61,10 @@ aligned_gisaid_metadata_s3_key=$(echo "${aligned_gisaid_location}" | jq -r .meta
 aws s3 cp --no-progress "s3://${aligned_gisaid_s3_bucket}/${aligned_gisaid_sequences_s3_key}" - | zstdmt -d | xz -2 > ncov/results/aligned_gisaid.fasta.xz
 aws s3 cp --no-progress "s3://${aligned_gisaid_s3_bucket}/${aligned_gisaid_metadata_s3_key}" ncov/data/metadata_gisaid.tsv
 
-(cd ncov && snakemake --printshellcmds auspice/ncov_aspen.json --profile my_profiles/aspen/ --resources=mem_mb=312320) || aws s3 cp ncov/.snakemake/log/ "s3://${aspen_s3_db_bucket}/phylo_run/${build_date}/~{s3_filestem}/~{workflow_id}/logs/" --recursive
+(cd ncov && snakemake --printshellcmds auspice/ncov_aspen.json --profile my_profiles/aspen/ --resources=mem_mb=312320) || aws s3 cp ncov/.snakemake/log/ "s3://${aspen_s3_db_bucket}/phylo_run/${build_date}/${S3_FILESTEM}/${WORKFLOW_ID}/logs/" --recursive
 
 # upload the tree to S3
-key="phylo_run/${build_date}/~{s3_filestem}/~{workflow_id}/ncov.json"
+key="phylo_run/${build_date}/${S3_FILESTEM}/${WORKFLOW_ID}/ncov.json"
 aws s3 cp ncov/auspice/ncov_aspen.json "s3://${aspen_s3_db_bucket}/${key}"
 
 # update aspen
@@ -71,7 +80,7 @@ python3 /usr/src/app/aspen/workflows/nextstrain_run/save.py                 \
     --ncov-rev "${ncov_git_rev}"                                            \
     --aspen-docker-image-version ""                                         \
     --end-time "${end_time}"                                                \
-    --phylo-run-id "~{workflow_id}"                                         \
+    --phylo-run-id "${WORKFLOW_ID}"                                         \
     --bucket "${aspen_s3_db_bucket}"                                        \
     --key "${key}"                                                          \
     --tree-path ncov/auspice/ncov_aspen.json                                \
