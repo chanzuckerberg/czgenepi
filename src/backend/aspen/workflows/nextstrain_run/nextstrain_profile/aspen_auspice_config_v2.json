@@ -84,7 +84,8 @@
     "host",
     "submitting_lab",
     "originating_lab",
-    "author"
+    "author",
+    "pango_lineage"
   ],
   "panels": [
     "tree",
