@@ -47,9 +47,9 @@ export const DummyCenteringSpacer = styled.div`
 // Both the margin-block and margin are here just to override defaults
 // (margin-block is coming in from user agent, plain margin is an upstream CSS)
 export const MainText = styled.p`
+  ${fontBodyS}
   margin-block: 0;
   margin: 0;
-  ${fontBodyS}
   text-align: center;
   color: white;
 `;

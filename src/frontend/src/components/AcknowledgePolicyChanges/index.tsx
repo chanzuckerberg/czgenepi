@@ -83,7 +83,7 @@ const AcknowledgePolicyChanges = () => {
         <B>We are no longer supporting automatic GISAID submissions. </B>
         This change is reflected in our updated{" "}
         <StyledLink href={ROUTES.TERMS} target="_blank" rel="noopener">
-          Terms of Service
+          Terms of Use
         </StyledLink>{" "}
         and{" "}
         <StyledLink href={ROUTES.PRIVACY} target="_blank" rel="noopener">
