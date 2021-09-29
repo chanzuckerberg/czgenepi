@@ -23,6 +23,9 @@ def fail_run(
     phylo_run_id: int,
 ):
     print("I have been triggered because an error has been detected in this run.")
+    if phylo_run_id == -1:
+        print("Error occurred before a valid phylo run was created. No run to mark as failed.")
+        return
     end_time_datetime = datetime.datetime.fromtimestamp(end_time)
 
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
