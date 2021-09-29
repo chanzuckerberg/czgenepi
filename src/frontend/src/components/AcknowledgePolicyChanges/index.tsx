@@ -89,7 +89,7 @@ const AcknowledgePolicyChanges = () => {
         <StyledLink href={ROUTES.PRIVACY} target="_blank" rel="noopener">
           Privacy Policy
         </StyledLink>{" "}
-        effective September XX.
+        effective September 30.
       </MainText>
       <StyledCloseIcon onClick={handleClick} />
     </Container>
