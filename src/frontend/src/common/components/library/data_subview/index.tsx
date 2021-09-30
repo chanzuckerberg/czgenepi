@@ -157,7 +157,7 @@ const DataSubview: FunctionComponent<Props> = ({
     setDownloadModalOpen(true);
   };
 
-  const handleCreateNSTreeClickOpen = () => {
+  const handleCreateNSTreeOpen = () => {
     setIsNSCreateTreeModalOpen(true);
   };
 
@@ -283,7 +283,10 @@ const DataSubview: FunctionComponent<Props> = ({
           <StyledChip isRounded label={checkedSamples.length} status="info" />
           <StyledDiv>Selected </StyledDiv>
           <Divider />
-          <TreeSelectionMenu isDisabled={isCreateTreeDisabled} />
+          <TreeSelectionMenu
+            isDisabled={isCreateTreeDisabled}
+            handleCreateNSTreeOpen={handleCreateNSTreeOpen}
+          />
           <IconButton
             onClick={handleDownloadClickOpen}
             disabled={isDownloadDisabled}

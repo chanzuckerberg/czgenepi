@@ -1,14 +1,19 @@
 import { Menu, MenuItem } from "czifui";
 import React from "react";
+import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import { TooltipDescriptionText, TooltipHeaderText } from "../../style";
 import { IconButton } from "../IconButton";
 import { StyledTreeBuildDisabledImage, StyledTreeBuildImage } from "./style";
 
 interface Props {
   isDisabled: boolean;
+  handleCreateNSTreeOpen: () => void;
 }
 
-const TreeSelectionMenu = ({ isDisabled }: Props): JSX.Element => {
+const TreeSelectionMenu = ({
+  isDisabled,
+  handleCreateNSTreeOpen,
+}: Props): JSX.Element => {
   const [anchorEl, setAnchorEl] = React.useState<Element | null>(null);
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = (event) => {
@@ -17,6 +22,11 @@ const TreeSelectionMenu = ({ isDisabled }: Props): JSX.Element => {
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleClickNS = () => {
+    handleCreateNSTreeOpen();
+    handleClose();
   };
 
   const TREE_BUILD_TOOLTIP_TEXT = (shouldShowDisabledTooltip: boolean) => (
@@ -55,8 +65,14 @@ const TreeSelectionMenu = ({ isDisabled }: Props): JSX.Element => {
         onClose={handleClose}
         getContentAnchorEl={null}
       >
-        <MenuItem onClick={handleClose}>Nextstrain Phlyogenetic Tree</MenuItem>
-        <MenuItem onClick={handleClose}>UShER Phylogenetic Placement</MenuItem>
+        <MenuItem onClick={handleClickNS}>
+          Nextstrain Phlyogenetic Tree
+        </MenuItem>
+        {usesFeatureFlag(FEATURE_FLAGS.usher) && (
+          <MenuItem onClick={handleClose}>
+            UShER Phylogenetic Placement
+          </MenuItem>
+        )}
       </Menu>
     </>
   );

@@ -18,8 +18,12 @@ interface FlagsObj {
 // we can add more keys to each flag as needed
 export const FEATURE_FLAGS: FlagsObj = {
   mayasFlag: {
-    isDisabled: false,
+    isDisabled: true,
     key: "mayasFlag",
+  },
+  usher: {
+    isDisabled: false,
+    key: "usher",
   },
 };
 
