@@ -12,10 +12,11 @@ import { DataTable } from "src/common/components";
 import { VIEWNAME } from "src/common/constants/types";
 import { ROUTES } from "src/common/routes";
 import { AfterModalAlert } from "./components/AfterModalAlert";
-import { CreateTreeModal } from "./components/createTreeModal";
+import { CreateNSTreeModal } from "./components/CreateNSTreeModal";
 import DownloadModal from "./components/DownloadModal";
 import { IconButton } from "./components/IconButton";
 import { TreeCreateHelpLink } from "./components/TreeCreateHelpLink";
+import { TreeSelectionMenu } from "./components/TreeSelectionMenu";
 import style from "./index.module.scss";
 import {
   CreateTreeModalDiv,
@@ -28,8 +29,6 @@ import {
   StyledDownloadImage,
   StyledFlexChildDiv,
   StyledLink,
-  StyledTreeBuildDisabledImage,
-  StyledTreeBuildImage,
   TooltipDescriptionText,
   TooltipHeaderText,
 } from "./style";
@@ -149,7 +148,7 @@ const DataSubview: FunctionComponent<Props> = ({
   const [isMetadataSelected, setMetadataSelected] = useState<boolean>(false);
   const [isFastaSelected, setFastaSelected] = useState<boolean>(false);
   const [isFastaDisabled, setFastaDisabled] = useState<boolean>(false);
-  const [isCreateTreeModalOpen, setCreateTreeModalOpen] =
+  const [isNSCreateTreeModalOpen, setIsNSCreateTreeModalOpen] =
     useState<boolean>(false);
   const [hasCreateTreeStarted, setCreateTreeStarted] = useState<boolean>(false);
   const [didCreateTreeFailed, setCreateTreeFailed] = useState<boolean>(false);
@@ -158,12 +157,12 @@ const DataSubview: FunctionComponent<Props> = ({
     setDownloadModalOpen(true);
   };
 
-  const handleCreateTreeClickOpen = () => {
-    setCreateTreeModalOpen(true);
+  const handleCreateNSTreeClickOpen = () => {
+    setIsNSCreateTreeModalOpen(true);
   };
 
   const handleCreateTreeClose = () => {
-    setCreateTreeModalOpen(false);
+    setIsNSCreateTreeModalOpen(false);
   };
 
   const handleCreateTreeFailed = () => {
@@ -216,7 +215,7 @@ const DataSubview: FunctionComponent<Props> = ({
 
   useEffect(() => {
     if (didCreateTreeFailed) {
-      setCreateTreeModalOpen(false);
+      setIsNSCreateTreeModalOpen(false);
     }
   }, [didCreateTreeFailed]);
 
@@ -276,17 +275,6 @@ const DataSubview: FunctionComponent<Props> = ({
     </div>
   );
 
-  const TREE_BUILD_TOOLTIP_TEXT = (isDisabled: boolean) => (
-    <div>
-      <TooltipHeaderText>Run Phylogenetic Analysis</TooltipHeaderText>
-      {isDisabled && (
-        <TooltipDescriptionText>
-          {"Select at least 1 and <2000 recovered samples"}
-        </TooltipDescriptionText>
-      )}
-    </div>
-  );
-
   const render = (tableData?: TableItem[]) => {
     let downloadButton: JSX.Element | null = null;
     if (viewName === VIEWNAME.SAMPLES && tableData !== undefined) {
@@ -295,14 +283,7 @@ const DataSubview: FunctionComponent<Props> = ({
           <StyledChip isRounded label={checkedSamples.length} status="info" />
           <StyledDiv>Selected </StyledDiv>
           <Divider />
-          <IconButton
-            onClick={handleCreateTreeClickOpen}
-            disabled={isCreateTreeDisabled}
-            svgDisabled={<StyledTreeBuildDisabledImage />}
-            svgEnabled={<StyledTreeBuildImage />}
-            tooltipTextDisabled={TREE_BUILD_TOOLTIP_TEXT(true)}
-            tooltipTextEnabled={TREE_BUILD_TOOLTIP_TEXT(false)}
-          />
+          <TreeSelectionMenu isDisabled={isCreateTreeDisabled} />
           <IconButton
             onClick={handleDownloadClickOpen}
             disabled={isDownloadDisabled}
@@ -338,10 +319,10 @@ const DataSubview: FunctionComponent<Props> = ({
               open={isDownloadModalOpen}
               onClose={handleDownloadClose}
             />
-            <CreateTreeModal
+            <CreateNSTreeModal
               sampleIds={checkedSamples}
               failedSamples={failedSamples}
-              open={isCreateTreeModalOpen}
+              open={isNSCreateTreeModalOpen}
               onClose={handleCreateTreeClose}
               handleCreateTreeFailed={handleCreateTreeFailed}
               handleSetCreateTreeStarted={handleSetCreateTreeStarted}

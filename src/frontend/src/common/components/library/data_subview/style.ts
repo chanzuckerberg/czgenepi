@@ -9,8 +9,7 @@ import {
   getSpacings,
   Link,
 } from "czifui";
-import DownloadImage from "./IconDownload.svg";
-import TreeBuildImage from "./IconPhylotree.svg";
+import DownloadImage from "src/common/icons/IconDownload.svg";
 
 export const StyledDiv = styled.div`
   ${fontHeaderXs}
@@ -98,12 +97,6 @@ export const StyledDownloadDisabledImage = styled(DownloadImage)`
     `;
   }}
 `;
-
-export const StyledTreeBuildImage =
-  StyledDownloadImage.withComponent(TreeBuildImage);
-
-export const StyledTreeBuildDisabledImage =
-  StyledDownloadDisabledImage.withComponent(TreeBuildImage);
 
 export const BoldText = styled.div`
   ${(props) => {

@@ -1,5 +1,6 @@
 import { Menu, MenuItem } from "czifui";
 import React from "react";
+import { TooltipDescriptionText, TooltipHeaderText } from "../../style";
 import { IconButton } from "../IconButton";
 import { StyledTreeBuildDisabledImage, StyledTreeBuildImage } from "./style";
 
@@ -41,6 +42,14 @@ const TreeSelectionMenu = ({ isDisabled }: Props): JSX.Element => {
       />
       <Menu
         anchorEl={anchorEl}
+        anchorOrigin={{
+          horizontal: "right",
+          vertical: "bottom",
+        }}
+        transformOrigin={{
+          horizontal: "right",
+          vertical: "top",
+        }}
         keepMounted
         open={Boolean(anchorEl)}
         onClose={handleClose}
