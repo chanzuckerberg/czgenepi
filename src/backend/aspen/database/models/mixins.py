@@ -4,7 +4,7 @@ from typing import Any, List, Optional, Tuple, Type, TypeVar
 
 import sqlalchemy as sa
 from sqlalchemy import Column, Integer
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import declarative_mixin, selectinload  # type: ignore
 
 from aspen.api.deps import get_db
 
@@ -13,7 +13,9 @@ TIDBase = TypeVar("TIDBase", bound="BaseMixin")
 
 
 # a collection of mixin classes to help build the models
-@sa.orm.declarative_mixin
+
+# TODO fix type hints for sa query.
+@declarative_mixin  # type: ignore
 class Base:
     @classmethod
     def _get_query(
@@ -21,12 +23,12 @@ class Base:
         prefetch: Optional[Tuple[str, ...]] = None,
         options: Optional[List[Any]] = None,
     ) -> Any:
-        query = sa.select(cls)
+        query = sa.select(cls)  # type: ignore
         if prefetch:
             if not options:
                 options = []
             options.extend(selectinload(getattr(cls, x)) for x in prefetch)
-            query = query.options(*options).execution_options(populate_existing=True)
+            query = query.options(*options).execution_options(populate_existing=True)  # type: ignore
         return query
 
     @classmethod
