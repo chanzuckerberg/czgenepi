@@ -2,7 +2,7 @@
 locals {
   nextstrain_sfn_memory = 64000
   nextstrain_sfn_vcpus = 10
-  nextstrain_cron_schedule = contains(["prod", "staging"], local.deployment_stage) ? ["cron(0 5 ? * MON *)"] : []
+  nextstrain_cron_schedule = contains(["prod", "staging"], local.deployment_stage) ? ["cron(0 5 ? * MON-SAT *)"] : []
 }
 
 module nextstrain_scc_contextual_sfn_config {
