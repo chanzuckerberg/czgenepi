@@ -1,6 +1,6 @@
-from typing import List, Optional
+from typing import List
 
-from pydantic import BaseModel, PositiveInt
+from pydantic import BaseModel
 
 
 class Base(BaseModel):
@@ -9,7 +9,7 @@ class Base(BaseModel):
 
 
 class UserBase(Base):
-    agreed_to_tos: bool = None
+    agreed_to_tos: bool = False
 
 
 class User(UserBase):

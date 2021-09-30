@@ -1,8 +1,6 @@
 from typing import Any, Mapping, Optional
 
-from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from pydantic.error_wrappers import ErrorWrapper
 from starlette.requests import Request
 
 
@@ -26,7 +24,7 @@ class AspenException(Exception):
 
 
 async def exception_handler(request: Request, exc: AspenException) -> JSONResponse:
-    return err.make_response()
+    return exc.make_response()
 
 
 class UnauthorizedException(AspenException):

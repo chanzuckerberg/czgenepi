@@ -1,3 +1,5 @@
+from fastapi import APIRouter
+
 from aspen.api.schemas.health import Health as healthschema
 
 router = APIRouter()

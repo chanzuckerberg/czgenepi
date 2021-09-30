@@ -1,15 +1,19 @@
 import datetime
 import enum
-from typing import Any, Dict, List, NoReturn, Optional, Tuple, Type, TypeVar
+from typing import Any, List, Optional, Tuple, Type, TypeVar
 
 import sqlalchemy as sa
 from sqlalchemy import Column, Integer
+from sqlalchemy.orm import selectinload
 
 from aspen.api.deps import get_db
 
 TBase = TypeVar("TBase", bound="Base")
+TIDBase = TypeVar("TIDBase", bound="BaseMixin")
+
 
 # a collection of mixin classes to help build the models
+@sa.orm.declarative_mixin
 class Base:
     @classmethod
     def _get_query(
@@ -34,22 +38,22 @@ class Base:
         db_execute = await db.execute(query)
         return db_execute.scalars().all()
 
-    @classmethod
-    async def get_by_id(
-        cls: Type[TBase], obj_id: int, prefetch: Optional[Tuple[str, ...]] = None
-    ) -> Optional[TBase]:
-        query = cls._get_query(prefetch).where(cls.id == obj_id)
-        db = get_db()
-        db_execute = await db.execute(query)
-        instance = db_execute.scalars().first()
-        return instance
-
 
 # everyone needs an auto-generated primary key
 class BaseMixin(Base):
     """Base model: all models have integer primary keys"""
 
     id = Column(Integer, primary_key=True, autoincrement=True)
+
+    @classmethod
+    async def get_by_id(
+        cls: Type[TIDBase], obj_id: int, prefetch: Optional[Tuple[str, ...]] = None
+    ) -> Optional[TIDBase]:
+        query = cls._get_query(prefetch).where(cls.id == obj_id)
+        db = get_db()
+        db_execute = await db.execute(query)
+        instance = db_execute.scalars().first()
+        return instance
 
 
 class DictMixin(Base):

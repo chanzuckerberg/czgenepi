@@ -1,6 +1,5 @@
 import json
 import logging
-import multiprocessing
 import os
 import sys
 
@@ -35,3 +34,4 @@ log_data = {
     "errorlog": errorlog,
     "accesslog": accesslog,
 }
+print(json.dumps(log_data))

@@ -1,24 +1,15 @@
-from __future__ import annotations
-
-import functools
 import json
 import os
-from collections.abc import MutableMapping
 from functools import lru_cache
-from typing import Any, Callable, Mapping, Optional, Set, Type, TypeVar, Union
+from typing import Any, Mapping
 
 from boto3 import Session
 from botocore.exceptions import ClientError
-
-ConfigLike = TypeVar("ConfigLike", bound="Config")
-
 from pydantic import BaseSettings
-from sqlalchemy.engine.url import URL
 
 
 class Settings(BaseSettings):
     SERVICE_NAME: str = "FastApi"
-    DEBUG: bool = False
 
     DB_DRIVER: str = "postgresql+asyncpg"
 
