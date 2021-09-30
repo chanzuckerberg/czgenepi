@@ -1,5 +1,5 @@
 import { Menu, MenuItem } from "czifui";
-import React from "react";
+import React, { MouseEventHandler, useState } from "react";
 import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import { TooltipDescriptionText, TooltipHeaderText } from "../../style";
 import { IconButton } from "../IconButton";
@@ -14,9 +14,9 @@ const TreeSelectionMenu = ({
   isDisabled,
   handleCreateNSTreeOpen,
 }: Props): JSX.Element => {
-  const [anchorEl, setAnchorEl] = React.useState<Element | null>(null);
+  const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 
-  const handleClick: React.MouseEventHandler<HTMLButtonElement> = (event) => {
+  const handleClick: MouseEventHandler<HTMLButtonElement> = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
