@@ -28,13 +28,14 @@ aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$aspen_config")"
 # Recover template args
 TEMPLATE_ARGS=$(jq -c . < "${TEMPLATE_ARGS_FILE}")
 
-export workflow_id=$(aspen-cli db create-phylo-run                                                                           \
+workflow_id=$(aspen-cli db create-phylo-run                                                                           \
                   --group-name "${GROUP_NAME}"                                                                               \
                   --all-group-sequences                                                                                      \
                   --builds-template-file "/usr/src/app/aspen/workflows/nextstrain_run/builds_templates/${TEMPLATE_FILENAME}" \
                   --builds-template-args "${TEMPLATE_ARGS}"                                                                  \
                   --tree-type "${TREE_TYPE}"
 )
+echo "${workflow_id}" >| "/tmp/workflow_id"
 
 # set up ncov
 mkdir -p ncov/my_profiles/aspen ncov/results
@@ -43,7 +44,8 @@ mkdir -p ncov/my_profiles/aspen ncov/results
  git fetch --depth 1 git://github.com/nextstrain/ncov.git &&
  git checkout FETCH_HEAD
 )
-export ncov_git_rev=$(cd ncov && git rev-parse HEAD)
+ncov_git_rev=$(cd ncov && git rev-parse HEAD)
+echo "${ncov_git_rev}" >| "/tmp/ncov_git_rev"
 
 cp /usr/src/app/aspen/workflows/nextstrain_run/nextstrain_profile/* ncov/my_profiles/aspen/
 
