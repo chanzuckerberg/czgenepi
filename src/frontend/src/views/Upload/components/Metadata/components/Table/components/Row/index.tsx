@@ -2,22 +2,23 @@ import deepEqual from "deep-equal";
 import { useFormik } from "formik";
 import React, { useEffect } from "react";
 import { noop } from "src/common/constants/empty";
+import {
+  DATE_ERROR_MESSAGE,
+  DATE_REGEX,
+} from "src/components/DateField/constants";
 import { Metadata } from "src/views/Upload/components/common/types";
 import * as yup from "yup";
-import DateField from "./components/DateField";
 import FreeTextField from "./components/FreeTextField";
 import LocationField from "./components/LocationField";
 import ToggleField from "./components/ToggleField";
+import UploadDateField from "./components/UploadDateField";
 import {
   Id,
   IsPrivateTableCell,
+  StyledDiv,
   StyledTableCell,
   StyledTableRow,
 } from "./style";
-
-const DATE_ERROR_MESSAGE = "Update format to YYYY-MM-DD";
-
-const DATE_REGEX = /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/;
 
 const validationSchema = yup.object({
   collectionDate: yup
@@ -99,12 +100,14 @@ export default React.memo(function Row({
         <Id>{id}</Id>
       </StyledTableCell>
       <StyledTableCell component="div">
-        <DateField
-          isFirstRow={isFirstRow}
-          applyToAllColumn={applyToAllColumn}
-          formik={formik}
-          fieldKey="collectionDate"
-        />
+        <StyledDiv>
+          <UploadDateField
+            isFirstRow={isFirstRow}
+            applyToAllColumn={applyToAllColumn}
+            formik={formik}
+            fieldKey="collectionDate"
+          />
+        </StyledDiv>
       </StyledTableCell>
       <StyledTableCell component="div">
         <LocationField
@@ -115,12 +118,14 @@ export default React.memo(function Row({
         />
       </StyledTableCell>
       <StyledTableCell component="div">
-        <DateField
-          isFirstRow={isFirstRow}
-          applyToAllColumn={applyToAllColumn}
-          formik={formik}
-          fieldKey="sequencingDate"
-        />
+        <StyledDiv>
+          <UploadDateField
+            isFirstRow={isFirstRow}
+            applyToAllColumn={applyToAllColumn}
+            formik={formik}
+            fieldKey="sequencingDate"
+          />
+        </StyledDiv>
       </StyledTableCell>
       <IsPrivateTableCell align="center" component="div">
         <ToggleField

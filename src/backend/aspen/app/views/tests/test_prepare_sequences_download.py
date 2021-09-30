@@ -129,6 +129,12 @@ def test_access_matrix(
     owner_group2 = group_factory(name="group2")
     viewer_group = group_factory(name="CDPH")
     user = user_factory(viewer_group)
+    owner = user_factory(
+        owner_group1,
+        email="owner@ownersite.com",
+        name="Owner User",
+        auth0_user_id="owner1",
+    )
     # give the viewer group access to the sequences from the owner group
     CanSee(
         viewer_group=viewer_group,
@@ -149,7 +155,14 @@ def test_access_matrix(
     sample3 = sample_factory(
         viewer_group, user, private_identifier="sample3", public_identifier="pub3"
     )
-    sequences = {"sample1": "CAT", "sample2": "TAC", "sample3": "ATC"}
+    sample4 = sample_factory(
+        owner_group1,
+        user,
+        private_identifier="sample4",
+        public_identifier="pub4",
+        private=True,
+    )
+    sequences = {"sample1": "CAT", "sample2": "TAC", "sample3": "ATC", "sample4": "CCC"}
     accessions = {
         sequence_name: AccessionWorkflowDirective(
             PublicRepositoryType.GISAID,
@@ -157,7 +170,7 @@ def test_access_matrix(
             datetime.datetime.now(),
             sequence_name,
         )
-        for sequence_name in ["seq1", "seq2", "seq3"]
+        for sequence_name in ["seq1", "seq2", "seq3", "seq4"]
     }
 
     uploaded_pathogen_genome_factory(
@@ -169,9 +182,27 @@ def test_access_matrix(
     uploaded_pathogen_genome_factory(
         sample3, accessions=[accessions["seq3"]], sequence="ATC"
     )
+    uploaded_pathogen_genome_factory(
+        sample4, accessions=[accessions["seq4"]], sequence="CCC"
+    )
 
-    session.add_all((owner_group1, owner_group2, viewer_group))
+    session.add_all((owner_group1, owner_group2, viewer_group, owner))
     session.commit()
+
+    # Make sure sample owners can see their own (shared & private) samples.
+    with client.session_transaction() as sess:
+        sess["profile"] = {"name": owner.name, "user_id": owner.auth0_user_id}
+    data = {
+        "requested_sequences": {
+            "sample_ids": [sample1.public_identifier, sample4.public_identifier]
+        }
+    }
+    res = client.post("/api/sequences", json=data)
+    file_contents = str(res.data, encoding="UTF-8")
+
+    # Assert that we get the correct public, private id's and sequences.
+    assert f">{sample1.private_identifier}" in file_contents
+    assert f">{sample4.private_identifier}" in file_contents
 
     with client.session_transaction() as sess:
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
@@ -182,20 +213,22 @@ def test_access_matrix(
                 sample1.public_identifier,
                 sample2.public_identifier,
                 sample3.public_identifier,
+                sample4.public_identifier,
             ],
             "expected_public": [sample1],
             "expected_private": [sample3],
-            "not_expected": [sample2],
+            "not_expected": [sample2, sample4],
         },
         {
             "samples": [
                 sample1.private_identifier,
                 sample2.private_identifier,
                 sample3.private_identifier,
+                sample4.private_identifier,
             ],
             "expected_public": [],
             "expected_private": [sample2, sample3],
-            "not_expected": [sample1],
+            "not_expected": [sample1, sample4],
         },
     ]
     for case in matrix:

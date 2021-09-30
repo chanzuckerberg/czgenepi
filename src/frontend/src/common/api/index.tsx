@@ -9,6 +9,7 @@ export enum API {
   PHYLO_TREES = "/api/phylo_trees",
   SAMPLES_CREATE = "/api/samples/create",
   SAMPLES_FASTA_DOWNLOAD = "/api/sequences",
+  CREATE_TREE = "/api/phylo_runs",
 }
 
 export const DEFAULT_HEADERS_MUTATION_OPTIONS: RequestInit = {
@@ -101,7 +102,7 @@ const SAMPLE_MAP = new Map<string, keyof Sample>([
 export const fetchSamples = (): Promise<SampleResponse> =>
   apiResponse<SampleResponse>(["samples"], [SAMPLE_MAP], API.SAMPLES);
 
-interface TreeResponse extends APIResponse {
+export interface TreeResponse extends APIResponse {
   phylo_trees: Tree[];
 }
 const TREE_MAP = new Map<string, keyof Tree>([

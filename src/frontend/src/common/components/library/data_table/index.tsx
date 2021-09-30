@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import { get, isEqual } from "lodash/fp";
 import React, {
   Fragment,
@@ -11,6 +12,7 @@ import { FixedSizeList, ListChildComponentProps } from "react-window";
 import { noop } from "src/common/constants/empty";
 import SortArrowDownIcon from "src/common/icons/IconArrowDownSmall.svg";
 import SortArrowUpIcon from "src/common/icons/IconArrowUpSmall.svg";
+import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import { EmptyState } from "../data_subview/components/EmptyState";
 import style from "./index.module.scss";
 import {
@@ -241,9 +243,9 @@ export const DataTable: FunctionComponent<Props> = ({
   // render functions
   const headerRow = headers.map((header: Header, index) => {
     const headerJSX = headerRenderer({ header, index });
-    const align = header.align;
+    const { align, key, sortKey } = header;
     let sortIndicator: JSX.Element | null = null;
-    if (isEqual(header.sortKey, state.sortKey)) {
+    if (isEqual(sortKey, state.sortKey)) {
       sortIndicator = <SortArrowDownIcon />;
       if (state.ascending) {
         sortIndicator = <SortArrowUpIcon />;
@@ -251,11 +253,13 @@ export const DataTable: FunctionComponent<Props> = ({
     }
     return (
       <TableHeader
-        onClick={() => handleSortClick(header.sortKey)}
-        key={header.sortKey.join("-")}
+        onClick={() => handleSortClick(sortKey)}
+        key={sortKey.join("-")}
         className={style.headerMetaCell}
         data-test-id="header-cell"
         align={align}
+        // * Tree name column should be slightly wider than the rest to accommodate status tags
+        wide={key === "name"}
       >
         {headerJSX}
         {sortIndicator}
@@ -287,10 +291,15 @@ export const DataTable: FunctionComponent<Props> = ({
 
     return (
       <HeaderCheckbox
-        color="primary"
         checked={isHeaderChecked}
         onClick={handleClick}
-        indeterminate={isHeaderIndeterminant}
+        stage={
+          isHeaderIndeterminant
+            ? "indeterminate"
+            : isHeaderChecked
+            ? "checked"
+            : "unchecked"
+        }
       />
     );
   };
@@ -305,14 +314,18 @@ export const DataTable: FunctionComponent<Props> = ({
     };
     return (
       <RowCheckbox
-        color="primary"
-        onClick={item ? handleClick : noop}
+        onChange={item ? handleClick : noop}
         checked={checked}
+        stage={checked ? "checked" : "unchecked"}
       />
     );
   };
 
   const render = (tableData: TableItem[]) => {
+    if (usesFeatureFlag(FEATURE_FLAGS.mayasFlag)) {
+      return <div>FEATURE FLAG IN USE...</div>;
+    }
+
     function renderRow(props: ListChildComponentProps) {
       const item = tableData[props.index];
       return (
@@ -327,9 +340,14 @@ export const DataTable: FunctionComponent<Props> = ({
       );
     }
 
+    const headerStyleClass = classNames(
+      style.header, // All headers use this class
+      { [style.headerWithCheckbox]: showCheckboxes } // If checkbox, addl class to tweak it
+    );
+
     return (
       <div className={style.container}>
-        <div className={style.header} data-test-id="header-row">
+        <div className={headerStyleClass} data-test-id="header-row">
           {showCheckboxes && headerCheckbox()}
           {headerRow}
         </div>
@@ -359,6 +377,7 @@ export const DataTable: FunctionComponent<Props> = ({
   if (data === undefined) {
     return render([]);
   }
+
   const sortedData = sortData(data, state.sortKey, state.ascending);
   return render(sortedData);
 };

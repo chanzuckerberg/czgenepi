@@ -1,19 +1,24 @@
 import cx from "classnames";
+import { compact, uniq } from "lodash";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { FunctionComponent, useEffect, useState } from "react";
 import { Menu } from "semantic-ui-react";
-import { fetchSamples, fetchTrees } from "src/common/api";
+import { fetchSamples } from "src/common/api";
 import { useProtectedRoute } from "src/common/queries/auth";
+import { useTreeInfo } from "src/common/queries/trees";
+import { FilterPanel } from "src/components/FilterPanel";
 import { DataSubview } from "../../common/components";
 import { EMPTY_OBJECT } from "../../common/constants/empty";
+import { VIEWNAME } from "../../common/constants/types";
 import { ROUTES } from "../../common/routes";
 import { SampleRenderer, TreeRenderer } from "./cellRenderers";
-import { SampleHeader } from "./headerRenderer";
+import { FilterPanelToggle } from "./components/FilterPanelToggle";
+import { SampleHeader, TreeHeader } from "./headerRenderer";
 import { SAMPLE_HEADERS, SAMPLE_SUBHEADERS, TREE_HEADERS } from "./headers";
 import style from "./index.module.scss";
-import { Container } from "./style";
+import { Container, FlexContainer } from "./style";
 import { TREE_TRANSFORMS } from "./transforms";
 
 const TITLE: Record<string, string> = {
@@ -27,32 +32,31 @@ const Data: FunctionComponent = () => {
   const [samples, setSamples] = useState<Sample[] | undefined>();
   const [trees, setTrees] = useState<Tree[] | undefined>();
   const [isDataLoading, setIsDataLoading] = useState(false);
+  const [shouldShowFilters, setShouldShowFilters] = useState<boolean>(true);
+  const [dataFilterFunc, setDataFilterFunc] = useState<any>();
+  const [activeFilterCount, setActiveFilterCount] = useState<number>(0);
 
   const router = useRouter();
+
+  const treeResponse = useTreeInfo();
+  const { data, isLoading } = treeResponse;
 
   useEffect(() => {
     const setBioinformaticsData = async () => {
       setIsDataLoading(true);
-
-      const [sampleResponse, treeResponse] = await Promise.all([
-        fetchSamples(),
-        fetchTrees(),
-      ]);
-
+      if (isLoading) return;
+      const sampleResponse = await fetchSamples();
       setIsDataLoading(false);
 
       const apiSamples = sampleResponse["samples"];
-      // TODO: Support in-progress and failed trees
-      const apiTrees = treeResponse["phylo_trees"].filter(
-        (tree) => tree.status === "COMPLETED"
-      );
+      const apiTrees = data?.phylo_trees;
 
       setSamples(apiSamples);
       setTrees(apiTrees);
     };
 
     setBioinformaticsData();
-  }, []);
+  }, [isLoading, data]);
 
   useEffect(() => {
     if (router.asPath === ROUTES.DATA) {
@@ -71,17 +75,18 @@ const Data: FunctionComponent = () => {
       isDataLoading,
       renderer: SampleRenderer,
       subheaders: SAMPLE_SUBHEADERS,
-      text: "Samples",
+      text: VIEWNAME.SAMPLES,
       to: ROUTES.DATA_SAMPLES,
     },
     {
       data: trees,
-      defaultSortKey: ["creationDate"],
+      defaultSortKey: ["startedDate"],
+      headerRenderer: TreeHeader,
       headers: TREE_HEADERS,
       isDataLoading,
       renderer: TreeRenderer,
       subheaders: EMPTY_OBJECT,
-      text: "Phylogenetic Trees",
+      text: VIEWNAME.TREES,
       to: ROUTES.PHYLO_TREES,
       transforms: TREE_TRANSFORMS,
     },
@@ -145,18 +150,49 @@ const Data: FunctionComponent = () => {
     dataCategories.find((category) => category.to === router.asPath) ||
     dataCategories[0];
 
+  const viewName = category.text;
+
+  // * (mlila): normally I would want to do this transfrom inside the component
+  // * using the data, but LineageFilter renders a child compnent that seems
+  // * to reference the parent's props (?). Passing in only the lineages, or
+  // * incomplete options causes the component to break
+  const sampleArr = viewName === "Samples" ? (category.data as Sample[]) : [];
+  const lineages = uniq(compact(sampleArr?.map((d) => d.lineage?.lineage)))
+    .sort()
+    .map((l) => {
+      return { name: l as string };
+    });
+
   return (
     <Container className={style.dataRoot}>
       <Head>
         <title>Aspen {title && " | " + title}</title>
       </Head>
 
-      <div className={style.navigation} data-test-id="data-menu-items">
+      <FlexContainer
+        className={style.navigation}
+        data-test-id="data-menu-items"
+      >
+        <FilterPanelToggle
+          activeFilterCount={activeFilterCount}
+          onClick={() => {
+            setShouldShowFilters(!shouldShowFilters);
+          }}
+        />
         <Menu className={style.menu} secondary>
           {dataJSX.menuItems}
         </Menu>
-      </div>
-      <div className={style.view}>
+      </FlexContainer>
+      <FlexContainer className={style.view}>
+        {viewName === "Samples" && (
+          // TODO (mlila): replace with sds filterpanel once it's complete
+          <FilterPanel
+            lineages={lineages}
+            isOpen={shouldShowFilters}
+            setActiveFilterCount={setActiveFilterCount}
+            setDataFilterFunc={setDataFilterFunc}
+          />
+        )}
         <DataSubview
           key={router.asPath}
           isLoading={category.isDataLoading}
@@ -166,9 +202,10 @@ const Data: FunctionComponent = () => {
           subheaders={category.subheaders}
           headerRenderer={category.headerRenderer}
           renderer={category.renderer}
-          viewName={category.text}
+          viewName={viewName}
+          dataFilterFunc={viewName === "Samples" ? dataFilterFunc : undefined}
         />
-      </div>
+      </FlexContainer>
     </Container>
   );
 };

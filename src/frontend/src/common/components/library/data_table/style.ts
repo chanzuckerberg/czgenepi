@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { Checkbox, getColors, getSpacings, Props } from "czifui";
+import { Checkbox, fontHeaderXs, getColors, getSpacings, Props } from "czifui";
 
 export const TableRow = styled.div`
   display: flex;
@@ -25,6 +25,7 @@ const doNotForwardProps = ["header"];
 export const RowContent = styled("div", {
   shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
 })`
+  ${fontHeaderXs}
   display: flex;
   align-items: center;
   width: 100%;
@@ -87,14 +88,18 @@ export const HeaderCheckbox = styled(Checkbox)`
 
 export interface AlignProps extends Props {
   align?: string;
+  wide?: boolean;
 }
 
 export const TableHeader = styled("div")`
   ${(props: AlignProps) => {
-    const { align } = props;
+    const { align, wide } = props;
     const justify = align ?? "left";
 
     return `
+      &:first-of-type {
+        flex: ${wide ? "2 0 40%" : ""};
+      }
       justify-content: ${justify};
   `;
   }}

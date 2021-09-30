@@ -1,9 +1,8 @@
 import styled from "@emotion/styled";
 import {
-  Alert,
   Button,
   Chip,
-  fontBodyXs,
+  fontBodyXxs,
   fontHeaderXs,
   getColors,
   getFontWeights,
@@ -11,6 +10,7 @@ import {
   Link,
 } from "czifui";
 import DownloadImage from "./IconDownload.svg";
+import TreeBuildImage from "./IconPhylotree.svg";
 
 export const StyledDiv = styled.div`
   ${fontHeaderXs}
@@ -38,6 +38,29 @@ export const Divider = styled.div`
   }}
 `;
 
+export const StyledButton = styled(Button)`
+  ${fontBodyXxs}
+  color: black;
+  &:hover {
+    background-color: transparent;
+  }
+  ${(props) => {
+    const spacings = getSpacings(props);
+    const fontWeights = getFontWeights(props);
+    return `
+      font-weight: ${fontWeights?.semibold};
+      margin-top: ${spacings?.xs}px;
+      margin-left: 0px;
+      padding-left: 0px;
+    `;
+  }}
+`;
+
+export const CreateTreeModalDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
 export const StyledChip = styled(Chip)`
   ${(props) => {
     const colors = getColors(props);
@@ -52,37 +75,6 @@ export const StyledChip = styled(Chip)`
 export const DownloadWrapper = styled.div`
   align-items: center;
   display: flex;
-  ${(props) => {
-    const spacings = getSpacings(props);
-    return `
-      padding-bottom: ${spacings?.xxl}px;
-    `;
-  }}
-`;
-
-export const StyledSpan = styled.span`
-  display: flex;
-  ${(props) => {
-    const spacings = getSpacings(props);
-    return `
-      margin-left: ${spacings?.m}px;
-    `;
-  }}
-`;
-
-export const StyledButton = styled(Button)`
-  border-radius: 50%;
-  flex: 0 0 0;
-  min-width: unset;
-  ${(props) => {
-    const colors = getColors(props);
-    const spacings = getSpacings(props);
-    return `
-      fill: ${colors?.gray[300]};
-      margin: ${spacings?.xxxs}px;
-      padding: ${spacings?.xs}px;
-    `;
-  }}
 `;
 
 export const StyledDownloadImage = styled(DownloadImage)`
@@ -107,6 +99,12 @@ export const StyledDownloadDisabledImage = styled(DownloadImage)`
   }}
 `;
 
+export const StyledTreeBuildImage =
+  StyledDownloadImage.withComponent(TreeBuildImage);
+
+export const StyledTreeBuildDisabledImage =
+  StyledDownloadDisabledImage.withComponent(TreeBuildImage);
+
 export const BoldText = styled.div`
   ${(props) => {
     const fontWeights = getFontWeights(props);
@@ -114,32 +112,6 @@ export const BoldText = styled.div`
         font-weight: ${fontWeights?.semibold};
       `;
   }}
-`;
-
-export const DismissButton = styled(Button)`
-  ${fontBodyXs}
-  &:hover {
-    background-color: transparent;
-  }
-  ${(props) => {
-    const spacings = getSpacings(props);
-    const fontWeights = getFontWeights(props);
-    return `
-      font-weight: ${fontWeights?.semibold};
-      margin-top: ${spacings?.xl}px;
-      margin-left: 0px;
-      padding-left: 0px;
-    `;
-  }}
-`;
-
-export const StyledAlert = styled(Alert)`
-  position: absolute;
-  z-index: 1;
-  box-shadow: 5px 10px;
-  width: 500px;
-  margin-top: -30px;
-  right: 15px;
 `;
 
 export const StyledLink = styled(Link)`
@@ -160,4 +132,10 @@ export const TooltipDescriptionText = styled.div`
       color: ${colors?.gray[400]};
   `;
   }}
+`;
+
+export const StyledFlexChildDiv = styled.div`
+  flex: 1 1 0;
+  margin: 0 auto;
+  max-width: 1308px;
 `;

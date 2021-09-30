@@ -1,5 +1,6 @@
-import { Tooltip } from "czifui";
+import { Fade } from "@material-ui/core";
 import { escapeRegExp } from "lodash/fp";
+import NextLink from "next/link";
 import React, {
   FunctionComponent,
   useEffect,
@@ -8,21 +9,27 @@ import React, {
 } from "react";
 import { Input } from "semantic-ui-react";
 import { DataTable } from "src/common/components";
+import { VIEWNAME } from "src/common/constants/types";
+import { ROUTES } from "src/common/routes";
+import { AfterModalAlert } from "./components/AfterModalAlert";
+import { CreateTreeModal } from "./components/createTreeModal";
 import DownloadModal from "./components/DownloadModal";
+import { IconButton } from "./components/IconButton";
+import { TreeCreateHelpLink } from "./components/TreeCreateHelpLink";
 import style from "./index.module.scss";
 import {
-  BoldText,
-  DismissButton,
+  CreateTreeModalDiv,
   Divider,
   DownloadWrapper,
-  StyledAlert,
   StyledButton,
   StyledChip,
   StyledDiv,
   StyledDownloadDisabledImage,
   StyledDownloadImage,
+  StyledFlexChildDiv,
   StyledLink,
-  StyledSpan,
+  StyledTreeBuildDisabledImage,
+  StyledTreeBuildImage,
   TooltipDescriptionText,
   TooltipHeaderText,
 } from "./style";
@@ -35,7 +42,8 @@ interface Props {
   isLoading: boolean;
   renderer?: CustomRenderer;
   headerRenderer?: CustomRenderer;
-  viewName: string;
+  viewName: VIEWNAME;
+  dataFilterFunc?: (data: TableItem[]) => TableItem[];
 }
 
 interface InputOnChangeData {
@@ -123,6 +131,7 @@ const DataSubview: FunctionComponent<Props> = ({
   renderer,
   headerRenderer,
   viewName,
+  dataFilterFunc,
 }: Props) => {
   // we are modifying state using hooks, so we need a reducer
   const [state, dispatch] = useReducer(searchReducer, {
@@ -132,57 +141,114 @@ const DataSubview: FunctionComponent<Props> = ({
 
   const [checkedSamples, setCheckedSamples] = useState<any[]>([]);
   const [showCheckboxes, setShowCheckboxes] = useState<boolean>(false);
-  const [open, setOpen] = useState(false);
+  const [isDownloadModalOpen, setDownloadModalOpen] = useState(false);
   const [isDownloadDisabled, setDownloadDisabled] = useState<boolean>(true);
+  const [isCreateTreeDisabled, setCreateTreeDisabled] = useState<boolean>(true);
   const [failedSamples, setFailedSamples] = useState<any[]>([]);
   const [downloadFailed, setDownloadFailed] = useState<boolean>(false);
   const [isMetadataSelected, setMetadataSelected] = useState<boolean>(false);
   const [isFastaSelected, setFastaSelected] = useState<boolean>(false);
   const [isFastaDisabled, setFastaDisabled] = useState<boolean>(false);
-
+  const [isCreateTreeModalOpen, setCreateTreeModalOpen] =
+    useState<boolean>(false);
+  const [hasCreateTreeStarted, setCreateTreeStarted] = useState<boolean>(false);
+  const [didCreateTreeFailed, setCreateTreeFailed] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const handleDownloadClickOpen = () => {
-    setOpen(true);
+    setDownloadModalOpen(true);
+  };
+
+  const handleCreateTreeClickOpen = () => {
+    setCreateTreeModalOpen(true);
+  };
+
+  const handleCreateTreeClose = () => {
+    setCreateTreeModalOpen(false);
+  };
+
+  const handleCreateTreeFailed = () => {
+    setCreateTreeFailed(true);
+  };
+
+  const handleSetCreateTreeStarted = () => {
+    setCreateTreeStarted(true);
   };
 
   const handleDownloadClose = () => {
-    setOpen(false);
+    setDownloadModalOpen(false);
     setMetadataSelected(false);
     setFastaSelected(false);
   };
 
   useEffect(() => {
+    searcher(searchQuery);
+  }, [data]);
+
+  useEffect(() => {
     // Only show checkboxes on the sample datatable
-    if (viewName === "Samples") {
+    if (viewName === VIEWNAME.SAMPLES) {
       setShowCheckboxes(true);
     }
   }, [viewName]);
 
   useEffect(() => {
     // disable sample download if no samples are selected
-    if (checkedSamples.length === 0) {
+    const numberCheckedSamples = checkedSamples.length;
+    if (numberCheckedSamples === 0) {
       setDownloadDisabled(true);
+      setCreateTreeDisabled(true);
     } else {
       setDownloadDisabled(false);
+      if (numberCheckedSamples > 2000) {
+        setCreateTreeDisabled(true);
+      } else {
+        setCreateTreeDisabled(false);
+      }
     }
   }, [checkedSamples]);
 
   useEffect(() => {
     // if there is an error then close the modal.
     if (downloadFailed) {
-      setOpen(false);
+      setDownloadModalOpen(false);
     }
   }, [downloadFailed]);
 
-  function handleDismissErrorClick() {
+  useEffect(() => {
+    if (didCreateTreeFailed) {
+      setCreateTreeModalOpen(false);
+    }
+  }, [didCreateTreeFailed]);
+
+  function handleDismissDownloadErrorClick() {
     setDownloadFailed(false);
   }
 
-  // search functions
-  const searcher = (
+  function handleDismissCreateTreeErrorClick() {
+    setCreateTreeFailed(false);
+  }
+
+  function handleCreateTreeStartedModalClose() {
+    setCreateTreeStarted(false);
+  }
+
+  useEffect(() => {
+    setTimeout(() => {
+      setCreateTreeStarted(false);
+    }, 12000);
+  }, [hasCreateTreeStarted]);
+
+  const onChange = (
     _event: React.ChangeEvent<HTMLInputElement>,
     fieldInput: InputOnChangeData
   ) => {
     const query = fieldInput.value;
+    searcher(query);
+    setSearchQuery(query);
+  };
+
+  // search functions
+  const searcher = (query: string): void => {
     if (data === undefined) {
       return;
     } else if (query.length === 0) {
@@ -210,99 +276,173 @@ const DataSubview: FunctionComponent<Props> = ({
     </div>
   );
 
+  const TREE_BUILD_TOOLTIP_TEXT_DISABLED = (
+    <div>
+      <TooltipHeaderText>Create Phylogenetic Tree</TooltipHeaderText>
+      <TooltipDescriptionText>
+        {"Select at least 1 and <2000 recovered samples"}
+      </TooltipDescriptionText>
+    </div>
+  );
+
+  const TREE_BUILD_TOOLTIP_TEXT_ENABLED = (
+    <div>
+      <TooltipHeaderText>Create Phylogenetic Tree</TooltipHeaderText>
+    </div>
+  );
+
   const render = (tableData?: TableItem[]) => {
     let downloadButton: JSX.Element | null = null;
-    if (viewName === "Samples" && tableData !== undefined) {
+    if (viewName === VIEWNAME.SAMPLES && tableData !== undefined) {
       downloadButton = (
         <DownloadWrapper>
-          <StyledChip
-            size="medium"
-            label={checkedSamples.length}
-            status="info"
-          />
+          <StyledChip isRounded label={checkedSamples.length} status="info" />
           <StyledDiv>Selected </StyledDiv>
           <Divider />
-          <Tooltip
-            arrow
-            inverted
-            title={
-              isDownloadDisabled
-                ? DOWNLOAD_TOOLTIP_TEXT_DISABLED
-                : DOWNLOAD_TOOLTIP_TEXT_ENABLED
-            }
-            placement="top"
-          >
-            <StyledSpan>
-              <StyledButton
-                onClick={handleDownloadClickOpen}
-                disabled={isDownloadDisabled}
-              >
-                {isDownloadDisabled ? (
-                  <StyledDownloadDisabledImage />
-                ) : (
-                  <StyledDownloadImage />
-                )}
-              </StyledButton>
-            </StyledSpan>
-          </Tooltip>
+          <IconButton
+            onClick={handleCreateTreeClickOpen}
+            disabled={isCreateTreeDisabled}
+            svgDisabled={<StyledTreeBuildDisabledImage />}
+            svgEnabled={<StyledTreeBuildImage />}
+            tooltipTextDisabled={TREE_BUILD_TOOLTIP_TEXT_DISABLED}
+            tooltipTextEnabled={TREE_BUILD_TOOLTIP_TEXT_ENABLED}
+          />
+          <IconButton
+            onClick={handleDownloadClickOpen}
+            disabled={isDownloadDisabled}
+            svgDisabled={<StyledDownloadDisabledImage />}
+            svgEnabled={<StyledDownloadImage />}
+            tooltipTextDisabled={DOWNLOAD_TOOLTIP_TEXT_DISABLED}
+            tooltipTextEnabled={DOWNLOAD_TOOLTIP_TEXT_ENABLED}
+          />
         </DownloadWrapper>
       );
     }
 
     return (
       <>
-        {tableData !== undefined && viewName === "Samples" && (
-          <DownloadModal
-            sampleIds={checkedSamples}
-            failedSamples={failedSamples}
-            setDownloadFailed={setDownloadFailed}
-            isMetadataSelected={isMetadataSelected}
-            setMetadataSelected={setMetadataSelected}
-            isFastaSelected={isFastaSelected}
-            setFastaSelected={setFastaSelected}
-            isFastaDisabled={isFastaDisabled}
-            setFastaDisabled={setFastaDisabled}
-            tsvData={tsvDataMap(checkedSamples, tableData, headers, subheaders)}
-            open={open}
-            onClose={handleDownloadClose}
-          />
+        {tableData !== undefined && viewName === VIEWNAME.SAMPLES && (
+          <>
+            <DownloadModal
+              sampleIds={checkedSamples}
+              failedSamples={failedSamples}
+              setDownloadFailed={setDownloadFailed}
+              isMetadataSelected={isMetadataSelected}
+              setMetadataSelected={setMetadataSelected}
+              isFastaSelected={isFastaSelected}
+              setFastaSelected={setFastaSelected}
+              isFastaDisabled={isFastaDisabled}
+              setFastaDisabled={setFastaDisabled}
+              tsvData={tsvDataMap(
+                checkedSamples,
+                tableData,
+                headers,
+                subheaders
+              )}
+              open={isDownloadModalOpen}
+              onClose={handleDownloadClose}
+            />
+            <CreateTreeModal
+              sampleIds={checkedSamples}
+              failedSamples={failedSamples}
+              open={isCreateTreeModalOpen}
+              onClose={handleCreateTreeClose}
+              handleCreateTreeFailed={handleCreateTreeFailed}
+              handleSetCreateTreeStarted={handleSetCreateTreeStarted}
+            />
+          </>
         )}
-        <div className={style.samplesRoot}>
+        <StyledFlexChildDiv className={style.samplesRoot}>
           <div className={style.searchBar}>
             <div className={style.searchInput}>
               <Input
                 icon="search"
                 placeholder="Search"
                 loading={state.searching}
-                onChange={searcher}
+                onChange={onChange}
                 data-test-id="search"
               />
             </div>
             <div>
-              {downloadFailed ? (
-                <StyledAlert className="elevated" severity="error">
-                  <div>
-                    <BoldText>
-                      Something went wrong and we were unable to complete one or
-                      more of your downloads
-                    </BoldText>
-                    Please try again later or{" "}
-                    <StyledLink
-                      href="mailto:aspenprivacy@chanzuckerberg.com"
-                      target="_blank"
-                      rel="noopener"
-                    >
-                      contact us
-                    </StyledLink>{" "}
-                    for help.
-                  </div>
-                  <DismissButton onClick={handleDismissErrorClick}>
-                    DISMISS
-                  </DismissButton>
-                </StyledAlert>
-              ) : (
-                downloadButton
+              {viewName === VIEWNAME.TREES && <TreeCreateHelpLink />}
+              {downloadButton}
+              {downloadFailed && (
+                <AfterModalAlert
+                  alertClassName={"elevated"}
+                  alertSeverity={"error"}
+                  boldText={
+                    "Something went wrong and we were unable to complete one or more of your downloads"
+                  }
+                  lightText={
+                    <>
+                      Please try again later or{" "}
+                      <StyledLink
+                        href="mailto:aspenprivacy@chanzuckerberg.com"
+                        target="_blank"
+                        rel="noopener"
+                      >
+                        contact us
+                      </StyledLink>{" "}
+                      for help.
+                    </>
+                  }
+                  handleDismiss={handleDismissDownloadErrorClick}
+                />
               )}
+              {didCreateTreeFailed && (
+                <AfterModalAlert
+                  alertClassName={"elevated"}
+                  alertSeverity={"error"}
+                  boldText={
+                    "Something went wrong and we were unable to start your tree build"
+                  }
+                  lightText={
+                    <>
+                      Please try again later or{" "}
+                      <StyledLink
+                        href="mailto:aspenprivacy@chanzuckerberg.com"
+                        target="_blank"
+                        rel="noopener"
+                      >
+                        contact us
+                      </StyledLink>{" "}
+                      for help.
+                    </>
+                  }
+                  handleDismiss={handleDismissCreateTreeErrorClick}
+                />
+              )}
+              <Fade
+                in={hasCreateTreeStarted}
+                appear={false}
+                enter={false}
+                timeout={1000}
+                unmountOnExit={true}
+              >
+                <div>
+                  <AfterModalAlert
+                    alertClassName={"elevated"}
+                    alertSeverity={"info"}
+                    lightText={
+                      <CreateTreeModalDiv>
+                        Your tree is being created. It may take up to 12 hours
+                        to process. To check your tree’s status, visit the
+                        Phylogenetic Tree page.
+                        <NextLink href={ROUTES.PHYLO_TREES} passHref>
+                          <a href="passRef">
+                            <StyledButton
+                              color="primary"
+                              onClick={handleCreateTreeStartedModalClose}
+                            >
+                              VIEW MY TREES
+                            </StyledButton>
+                          </a>
+                        </NextLink>
+                      </CreateTreeModalDiv>
+                    }
+                  />
+                </div>
+              </Fade>
             </div>
           </div>
           <div className={style.samplesTable}>
@@ -313,14 +453,18 @@ const DataSubview: FunctionComponent<Props> = ({
               failedSamples={failedSamples}
               setFailedSamples={setFailedSamples}
               showCheckboxes={showCheckboxes}
-              data={tableData}
+              data={
+                dataFilterFunc && tableData
+                  ? dataFilterFunc(tableData)
+                  : tableData
+              }
               defaultSortKey={defaultSortKey}
               headers={headers}
               headerRenderer={headerRenderer}
               renderer={renderer}
             />
           </div>
-        </div>
+        </StyledFlexChildDiv>
       </>
     );
   };

@@ -27,7 +27,7 @@ files:
   include: "data/include.txt"
   lat_longs: "my_profiles/aspen/lat_longs.tsv"
   ordering: "my_profiles/aspen/ordering.tsv"
-  description: "my_profiles/aspen/covidtrackerca.md"
+  description: "my_profiles/aspen/description_targeted.md"
   auspice_config: "my_profiles/aspen/aspen_auspice_config_v2.json"
 
 ## Parameters

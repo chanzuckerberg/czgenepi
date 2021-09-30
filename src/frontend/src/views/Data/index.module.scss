@@ -5,21 +5,15 @@
 .dataRoot {
   .navigation {
     width: 100%;
-    margin-bottom: $space-xl;
     border-bottom: $space-xxs solid $gray-lightest;
 
     .menu {
       align-items: center;
+      margin: 0;
 
-      a {
-        &:first-child {
-          margin-left: 10em;
-
-          div {
-            // overwrite semantic-ui style
-            padding-left: 0 !important;
-          }
-        }
+      a div {
+        // overwrite semantic-ui style
+        padding-left: 0 !important;
       }
 
       .menuItem {
@@ -55,8 +49,6 @@
     // This is needed to ensure the div doesn't disappear
     // when the viewport height is too short
     height: calc(100% - 74px);
-    margin: 0 auto; 
     width: calc(100% - 14px);
-    max-width:1308px;
   }
 }

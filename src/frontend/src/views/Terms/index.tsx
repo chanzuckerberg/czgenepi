@@ -19,7 +19,7 @@ export default function Terms(): JSX.Element {
     <>
       <Title>
         <H1>Aspen Terms of Use</H1>
-        <H4>Last Updated: September 27, 2021. </H4>
+        <H4>Last Updated: September 30, 2021. </H4>
       </Title>
       <P>
         Please read these Terms of Use (&quot;Terms&quot;) before using Aspen

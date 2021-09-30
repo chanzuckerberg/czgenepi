@@ -6,20 +6,23 @@ import React from "react";
 import { defaultCellRenderer } from "src/common/components/library/data_table";
 import dataTableStyle from "src/common/components/library/data_table/index.module.scss";
 import { RowContent } from "src/common/components/library/data_table/style";
+import { TREE_STATUS } from "src/common/constants/types";
 import SampleIcon from "src/common/icons/Sample.svg";
 import { createTableCellRenderer, stringGuard } from "src/common/utils";
 import TreeTableDownloadMenu from "src/components/TreeTableDownloadMenu";
 import { Lineage, LineageTooltip } from "./components/LineageTooltip";
 import TreeTableNameCell from "./components/TreeTableNameCell";
+import { TreeTypeTooltip } from "./components/TreeTypeTooltip";
+import style from "./index.module.scss";
 import {
   GISAIDCell,
-  LineageCell,
-  LineageRowContent,
   PrivacyIcon,
   PrivateIdValueWrapper,
   SampleIconWrapper,
   StyledChip,
   Subtext,
+  UnderlinedCell,
+  UnderlinedRowContent,
 } from "./style";
 
 const LABEL_STATUS: Record<
@@ -52,13 +55,13 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
   lineage: ({ value }): JSX.Element => {
     const hasLineage = Boolean(value.version);
 
-    const Component = hasLineage ? LineageRowContent : RowContent;
+    const Component = hasLineage ? UnderlinedRowContent : RowContent;
 
     const Content = (
       <Component>
-        <LineageCell className={dataTableStyle.cell}>
+        <UnderlinedCell className={dataTableStyle.cell}>
           {value.lineage || "Not Yet Processed"}
-        </LineageCell>
+        </UnderlinedCell>
       </Component>
     );
 
@@ -120,16 +123,37 @@ const TREE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
   downloadLink: ({ value, item }): JSX.Element => {
     const jsonDownloadLink = stringGuard(value);
     const tsvDownloadLink = stringGuard(item["accessionsLink"]);
+    const shouldAllowDownload = item?.status === TREE_STATUS.Completed;
     return (
       <RowContent>
         <TreeTableDownloadMenu
           jsonLink={jsonDownloadLink}
           accessionsLink={tsvDownloadLink}
+          shouldAllowDownload={shouldAllowDownload}
         />
       </RowContent>
     );
   },
   name: TreeTableNameCell,
+  startedDate: ({ value, header }): JSX.Element => {
+    const dateNoTime = value.split(" ")[0];
+    return (
+      <RowContent header={header}>
+        <div className={style.cell} data-test-id={`row-${header.key}`}>
+          {dateNoTime}
+        </div>
+      </RowContent>
+    );
+  },
+  treeType: ({ value, header }: CustomTableRenderProps): JSX.Element => (
+    <TreeTypeTooltip value={value as string}>
+      <UnderlinedRowContent header={header}>
+        <UnderlinedCell data-test-id={`row-${header.key}`}>
+          {value}
+        </UnderlinedCell>
+      </UnderlinedRowContent>
+    </TreeTypeTooltip>
+  ),
 };
 
 export const TreeRenderer = createTableCellRenderer(

@@ -31,7 +31,7 @@ export default function Table({ samples }: Props): JSX.Element {
     );
 
     return () => clearTimeout(timeout);
-  }, []);
+  }, [samples]);
 
   if (!isReadyToRenderTable) {
     return (

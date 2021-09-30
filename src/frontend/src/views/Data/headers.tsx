@@ -10,24 +10,24 @@ export const SAMPLE_HEADERS: Header[] = [
     text: "Public ID",
   },
   {
-    key: "uploadDate",
-    sortKey: ["uploadDate"],
-    text: "Upload Date",
-  },
-  {
     key: "collectionDate",
     sortKey: ["collectionDate"],
     text: "Collection Date",
   },
   {
-    key: "collectionLocation",
-    sortKey: ["collectionLocation"],
-    text: "Collection Location",
-  },
-  {
     key: "lineage",
     sortKey: ["lineage", "lineage"],
     text: "Lineage",
+  },
+  {
+    key: "uploadDate",
+    sortKey: ["uploadDate"],
+    text: "Upload Date",
+  },
+  {
+    key: "collectionLocation",
+    sortKey: ["collectionLocation"],
+    text: "Collection Location",
   },
   {
     key: "gisaid",
@@ -75,14 +75,17 @@ export const TREE_HEADERS: Header[] = [
   },
   {
     align: "center",
+    key: "startedDate",
+    sortKey: ["startedDate"],
+    // using startedDate instead of creationDate,
+    // startedDate is populated for all phylorun statuses, creationDate only applies to completed trees
+    text: "Creation Date",
+  },
+  {
+    align: "center",
     key: "treeType",
     sortKey: ["treeType"],
     text: "Tree Type",
-  },
-  {
-    key: "creationDate",
-    sortKey: ["creationDate"],
-    text: "Creation Date",
   },
   {
     key: "downloadLink",

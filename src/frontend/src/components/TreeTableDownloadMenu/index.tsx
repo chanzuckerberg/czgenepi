@@ -7,11 +7,13 @@ import style from "./index.module.scss";
 interface TreeTableDownloadMenuProps {
   jsonLink: string;
   accessionsLink: string;
+  shouldAllowDownload: boolean;
 }
 
 const TreeTableDownloadMenu = ({
   jsonLink,
   accessionsLink,
+  shouldAllowDownload,
 }: TreeTableDownloadMenuProps): JSX.Element => {
   const [anchorEl, setAnchorEl] = React.useState<Element | null>(null);
 
@@ -29,6 +31,7 @@ const TreeTableDownloadMenu = ({
         onClick={handleClick}
         className={style.button}
         endIcon={<ExpandMore />}
+        disabled={!shouldAllowDownload}
       >
         Download
       </Button>

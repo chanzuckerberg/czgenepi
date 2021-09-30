@@ -278,6 +278,7 @@ def write_sequences_files(session, pathogen_genomes, sequences_fh, metadata_fh):
             "originating_lab": sample.sample_collected_by,
             "submitting_lab": sample.submitting_group.name,
             "authors": ", ".join(sample.authors),
+            "pango_lineage": sample.uploaded_pathogen_genome.pangolin_lineage,
         }
 
         metadata_csv_fh.writerow(aspen_metadata_row)

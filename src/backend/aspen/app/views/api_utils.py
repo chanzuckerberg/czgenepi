@@ -189,6 +189,9 @@ def authz_sample_filters(query: Query, sample_ids: Set[str], user: User) -> Quer
             ),
         )
     )
+    query = query.filter(
+        and_(or_(~Sample.private, Sample.submitting_group_id == user.group_id))
+    )
     return query
 
 

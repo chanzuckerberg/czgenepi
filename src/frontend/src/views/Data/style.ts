@@ -20,13 +20,13 @@ export const Subtext = styled.div`
   }}
 `;
 
-export const LineageCell = styled.div`
-  /* Created for LineageRowContent to target */
+export const UnderlinedCell = styled.div`
+  /* Created for UnderlinedRowContent to target */
 `;
 
-export const LineageRowContent = styled(RowContent)`
+export const UnderlinedRowContent = styled(RowContent)`
   &:hover {
-    ${LineageCell} {
+    ${UnderlinedCell} {
       ${(props) => {
         const colors = getColors(props);
 
@@ -66,4 +66,8 @@ export const PrivacyIcon = styled.span`
   position: absolute;
   left: 30px;
   bottom: -2px;
+`;
+
+export const FlexContainer = styled.div`
+  display: flex;
 `;

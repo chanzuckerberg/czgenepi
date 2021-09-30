@@ -18,4 +18,5 @@ interface User {
   name: string;
   systemAdmin: boolean;
   agreedToTos: boolean;
+  acknowledgedPolicyVersion: string | null; // Date or null in DB. ISO 8601: "YYYY-MM-DD"
 }

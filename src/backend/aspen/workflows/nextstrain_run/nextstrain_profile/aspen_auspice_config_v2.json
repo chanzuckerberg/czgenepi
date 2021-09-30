@@ -3,9 +3,7 @@
   "build_url": "https://github.com/nextstrain/ncov",
   "maintainers": [
     {"name": "Chan Zuckerberg Initiative",
-     "url": "https://chanzuckerberg.com"},
-    {"name": "California Departments of Public Health",
-     "url": "https://www.cdph.ca.gov/Pages/LocalHealthServicesAndOffices.aspx#"}
+     "url": "https://chanzuckerberg.com"}
   ],
   "colorings": [
     {
@@ -14,7 +12,7 @@
       "type": "categorical"
     },
     {
-      "key": "pangolin_lineage",
+      "key": "pango_lineage",
       "title": "Pangolin lineage",
       "type": "categorical"
     },
@@ -86,7 +84,8 @@
     "host",
     "submitting_lab",
     "originating_lab",
-    "author"
+    "author",
+    "pango_lineage"
   ],
   "panels": [
     "tree",
