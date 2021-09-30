@@ -7,7 +7,7 @@
 # S3_FILESTEM
 # GROUP_NAME
 # TEMPLATE_FILENAME
-# TEMPLATE_ARGS
+# TEMPLATE_ARGS_FILE
 # TREE_TYPE
 
 set -Eeuxo pipefail
@@ -24,6 +24,9 @@ aws configure set region $AWS_REGION
 # fetch aspen config
 aspen_config="$(aws secretsmanager get-secret-value --secret-id $ASPEN_CONFIG_SECRET_NAME --query SecretString --output text)"
 aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$aspen_config")"
+
+# Recover template args
+TEMPLATE_ARGS=$(jq -c . < "${TEMPLATE_ARGS_FILE}")
 
 export workflow_id=$(aspen-cli db create-phylo-run                                                                           \
                   --group-name "${GROUP_NAME}"                                                                               \

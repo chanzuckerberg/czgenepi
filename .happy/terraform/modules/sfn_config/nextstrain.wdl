@@ -53,7 +53,8 @@ task nextstrain_workflow {
     export S3_FILESTEM="~{s3_filestem}"
     export GROUP_NAME="~{group_name}"
     export TEMPLATE_FILENAME="~{template_filename}"
-    export TEMPLATE_ARGS="~{template_args}"
+    # We aren't supposed to serialize Map inputs on the command line.
+    export TEMPLATE_ARGS_FILE="~{write_json(template_args)}"
     export TREE_TYPE="~{tree_type}"
 
     # Just in case the run script bails out before defining these vars
