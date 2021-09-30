@@ -19,6 +19,7 @@ import { TreeCreateHelpLink } from "./components/TreeCreateHelpLink";
 import { TreeSelectionMenu } from "./components/TreeSelectionMenu";
 import { UsherConfirmationModal } from "./components/UsherConfirmationModal";
 import { UsherPreparingModal } from "./components/UsherPreparingModal";
+import { UsherModal } from "./components/UsherModal";
 import style from "./index.module.scss";
 import {
   CreateTreeModalDiv,
@@ -152,6 +153,7 @@ const DataSubview: FunctionComponent<Props> = ({
   const [isFastaDisabled, setFastaDisabled] = useState<boolean>(false);
   const [isNSCreateTreeModalOpen, setIsNSCreateTreeModalOpen] =
     useState<boolean>(false);
+  const [isUsherModalOpen, setUsherModalOpen] = useState<boolean>(true);
   const [hasCreateTreeStarted, setCreateTreeStarted] = useState<boolean>(false);
   const [didCreateTreeFailed, setCreateTreeFailed] = useState<boolean>(false);
   const [isUsherConfirmOpen, setIsUsherConfirmOpen] = useState<boolean>(false);
@@ -168,6 +170,10 @@ const DataSubview: FunctionComponent<Props> = ({
 
   const handleCreateTreeClose = () => {
     setIsNSCreateTreeModalOpen(false);
+  };
+
+  const handleUsherModalClose = () => {
+    setUsherModalOpen(false);
   };
 
   const handleCreateTreeFailed = () => {
@@ -342,6 +348,12 @@ const DataSubview: FunctionComponent<Props> = ({
             <UsherPreparingModal
               isOpen={isUsherPreparingOpen}
               onClose={() => setIsUsherPreparingOpen(false)}
+            />
+            <UsherModal
+              sampleIds={checkedSamples}
+              failedSamples={failedSamples}
+              open={isUsherModalOpen}
+              onClose={handleUsherModalClose}
             />
           </>
         )}
