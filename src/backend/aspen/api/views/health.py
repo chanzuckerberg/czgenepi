@@ -1,9 +1,3 @@
-from typing import List
-
-import sqlalchemy as sa
-from fastapi import APIRouter, HTTPException
-from pydantic import parse_obj_as
-
 from aspen.api.schemas.health import Health as healthschema
 
 router = APIRouter()
