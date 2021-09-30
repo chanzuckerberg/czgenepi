@@ -49,7 +49,6 @@ echo "${ncov_git_rev}" >| "/tmp/ncov_git_rev"
 
 cp /usr/src/app/aspen/workflows/nextstrain_run/nextstrain_profile/* ncov/my_profiles/aspen/
 
-exit 1
 
 # dump the sequences, metadata, and builds.yaml for a run out to disk.
 aligned_gisaid_location=$(

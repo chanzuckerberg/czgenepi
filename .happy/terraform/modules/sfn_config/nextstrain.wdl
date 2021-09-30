@@ -58,7 +58,7 @@ task nextstrain_workflow {
     export TREE_TYPE="~{tree_type}"
 
     # Just in case the run script bails out before defining these vars
-    ncov_git_rev="NONE"
+    ncov_git_rev=""
     workflow_id="-1"
 
     # run main workflow

@@ -45,7 +45,7 @@ task nextstrain_workflow {
     export S3_FILESTEM="~{s3_filestem}"
 
     # Just in case the run script bails out before defining this var
-    ncov_git_rev="NONE"
+    ncov_git_rev=""
 
     # run main workflow
     cd /usr/src/app/aspen/workflows/nextstrain_run
