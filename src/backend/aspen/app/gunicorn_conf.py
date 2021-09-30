@@ -12,7 +12,7 @@ logging.basicConfig(
 
 # Gunicorn config variables
 loglevel = os.getenv("LOG_LEVEL", "info")
-workers = os.getenv("WORKERS", 4)
+workers = os.getenv("WORKERS", 8)
 bind = "unix:///var/run/gunicorn.sock"
 errorlog = "-"
 worker_tmp_dir = "/dev/shm"

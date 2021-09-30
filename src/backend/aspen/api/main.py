@@ -15,6 +15,7 @@ def get_app() -> FastAPI:
         dependencies=[Depends(set_db)],
     )
 
+    # Warning - do not enable this route!
     # _app.include_router(user_router, prefix="/v2/users")
     _app.include_router(health_router, prefix="/v2/health")
 
