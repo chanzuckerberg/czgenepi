@@ -1,6 +1,5 @@
 import datetime
 import logging
-import os
 
 import click
 
@@ -16,6 +15,7 @@ from aspen.database.models.workflow import SoftwareNames, WorkflowStatusType
 
 logging.basicConfig(level=logging.INFO)
 
+
 @click.command("error")
 @click.option("--phylo-run-id", type=int, required=True)
 @click.option("--ncov-rev", type=str, required=False)
@@ -27,16 +27,16 @@ def fail_run(
 ):
     logging.info("An error has been detected in this run.")
     if phylo_run_id == -1:
-        logging.info("Error occurred before a valid phylo run was created. No run to mark as failed.")
+        logging.info(
+            "Error occurred before a valid phylo run was created. No run to mark as failed."
+        )
         return
     end_time_datetime = datetime.datetime.fromtimestamp(end_time)
 
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
     with session_scope(interface) as session:
         phylo_run: PhyloRun = (
-            session.query(PhyloRun)
-            .filter(PhyloRun.workflow_id == phylo_run_id)
-            .one_or_none()
+            session.query(PhyloRun).filter(PhyloRun.workflow_id == phylo_run_id).one()
         )
 
         assert phylo_run.workflow_status != WorkflowStatusType.COMPLETED
@@ -50,5 +50,5 @@ def fail_run(
     logging.info(f"PhyloRun {phylo_run_id} marked as failed.")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     fail_run()
