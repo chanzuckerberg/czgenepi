@@ -198,7 +198,7 @@ def add_can_see(
     "--builds-template-file",
     type=str,
     required=False,
-    default="src/backend/aspen/workflows/nextstrain_run/builds_templates/group.yaml",
+    default="src/backend/aspen/workflows/nextstrain_run/builds_templates/group_plus_context.yaml",
 )
 @click.option(
     "--builds-template-args",
