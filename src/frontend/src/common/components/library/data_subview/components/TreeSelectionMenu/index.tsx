@@ -66,7 +66,7 @@ const TreeSelectionMenu = ({
         getContentAnchorEl={null}
       >
         <MenuItem onClick={handleClickNS}>
-          Nextstrain Phlyogenetic Tree
+          Nextstrain Phylogenetic Tree
         </MenuItem>
         {usesFeatureFlag(FEATURE_FLAGS.usher) && (
           <MenuItem onClick={handleClose}>
