@@ -2,7 +2,6 @@ from typing import Any, Mapping, Optional
 
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from flask import jsonify, make_response, Response
 from pydantic.error_wrappers import ErrorWrapper
 from starlette.requests import Request
 
@@ -14,7 +13,7 @@ class AspenException(Exception):
         super().__init__(msg)
         self.extra = extra
 
-    def make_response(self) -> Response:
+    def make_response(self) -> JSONResponse:
         err = str(self)
         respdata = {"error": err}
         if self.extra:

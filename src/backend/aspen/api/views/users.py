@@ -22,5 +22,5 @@ async def list_users() -> userlistschema:
 async def get_user(user_id: int) -> userschema:
     instance = await User.get_by_id(user_id)
     if not instance:
-        raise HTTPException(status_code=404, detail="Deck is not found")
+        raise HTTPException(status_code=404, detail="User is not found")
     return userschema.from_orm(instance)
