@@ -48,7 +48,7 @@ interface Props {
 
 export type TreeType = "TARGETED" | "NON_CONTEXTUALIZED";
 
-export const CreateTreeModal = ({
+export const CreateNSTreeModal = ({
   sampleIds,
   failedSamples,
   open,

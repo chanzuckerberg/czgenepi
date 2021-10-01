@@ -8,8 +8,8 @@ import {
   getFontWeights,
   getSpacings,
 } from "czifui";
-import IconCheckSmall from "./IconCheckSmall.svg";
-import IconCloseSmall from "./IconCloseSmall.svg";
+import IconCheckSmall from "src/common/icons/IconCheckSmall.svg";
+import IconCloseSmall from "src/common/icons/IconCloseSmall.svg";
 
 export const Label = styled.div`
   ${(props) => {
