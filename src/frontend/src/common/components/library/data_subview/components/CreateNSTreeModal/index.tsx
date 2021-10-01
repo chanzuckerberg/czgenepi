@@ -5,6 +5,7 @@ import { Alert } from "czifui";
 import React, { SyntheticEvent, useEffect, useState } from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { useCreateTree } from "src/common/queries/trees";
+import { pluralize } from "src/common/utils/strUtils";
 import { Header, StyledIconButton } from "../DownloadModal/style";
 import {
   RadioLabelNonContextualized,
@@ -137,7 +138,7 @@ export const CreateNSTreeModal = ({
         </StyledIconButton>
         <Header>Create New Phylogenetic Tree</Header>
         <Title>
-          {sampleIds.length} Sample{sampleIds.length > 1 && "s"} Selected
+          {sampleIds.length} {pluralize("Sample", sampleIds.length)} Selected
         </Title>
       </StyledDialogTitle>
       <StyledDialogContent>
@@ -223,9 +224,9 @@ export const CreateNSTreeModal = ({
               <Alert icon={<StyledWarningIcon />} severity="warning">
                 <AlertInstructionsSemiBold>
                   {" "}
-                  {failedSamples.length} Selected Sample
-                  {failedSamples.length > 1 && "s"} {"won't"} be included in
-                  your tree{" "}
+                  {failedSamples.length} Selected
+                  {pluralize("Sample", failedSamples.length)} {"won't"}
+                  be included in your tree{" "}
                 </AlertInstructionsSemiBold>
                 <AlertInstructionsNotSemiBold>
                   because they failed genome recovery.

@@ -2,6 +2,7 @@ import { Dialog } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import React, { useState } from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
+import { pluralize } from "src/common/utils/strUtils";
 import {
   Content,
   StyledButton,
@@ -88,7 +89,7 @@ export const UsherModal = ({
           </StyledTooltip>
         </FlexWrapper>
         <Title>
-          {sampleIds.length} Sample{sampleIds.length > 1 && "s"} Selected
+          {sampleIds.length} {pluralize("Sample", sampleIds.length)} Selected
         </Title>
       </StyledDialogTitle>
       <StyledDialogContent>

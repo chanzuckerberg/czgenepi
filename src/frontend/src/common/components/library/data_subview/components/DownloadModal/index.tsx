@@ -9,6 +9,7 @@ import DialogContent from "src/common/components/library/Dialog/components/Dialo
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import { useUserInfo } from "src/common/queries/auth";
 import { downloadSamplesFasta } from "src/common/queries/samples";
+import { pluralize } from "src/common/utils/strUtils";
 import { TooltipDescriptionText, TooltipHeaderText } from "../../style";
 import {
   CheckBoxInfo,
@@ -131,7 +132,7 @@ const DownloadModal = ({
         </StyledIconButton>
         <Header>Select Download</Header>
         <Title>
-          {sampleIds.length} Sample{sampleIds.length > 1 && "s"} Selected
+          {sampleIds.length} {pluralize("Sample", sampleIds.length)} Selected
         </Title>
       </DialogTitle>
       <DialogContent>
@@ -189,8 +190,8 @@ const DownloadModal = ({
             !isFastaDisabled && ( //ignore alert if fasta is already disabled
               <Alert severity="warning">
                 <DownloadType>
-                  {" "}
-                  {failedSamples.length} sample{failedSamples.length > 1 && "s"}{" "}
+                  {failedSamples.length}
+                  {pluralize("sample", failedSamples.length)}
                   will not be included in your Consensus Genome download
                 </DownloadType>
                 <DownloadTypeInfo>
