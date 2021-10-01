@@ -24,7 +24,7 @@ def upgrade():
     mark_failed_sql = sa.sql.text(
         "UPDATE aspen.workflows SET workflow_status = 'FAILED', end_datetime = :now WHERE workflow_type = 'PHYLO_RUN' AND workflow_status = 'STARTED' AND start_datetime <= :cutoff"
     )
-    params = {"now": now, "cutoff": forty_eight_hours_ago}
+    params = {"now": now.isoformat(), "cutoff": forty_eight_hours_ago.isoformat()}
 
     conn = op.get_bind()
     conn.execute(mark_failed_sql, params)
