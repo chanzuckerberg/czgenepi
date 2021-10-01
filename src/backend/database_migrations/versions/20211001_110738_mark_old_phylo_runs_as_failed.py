@@ -3,11 +3,11 @@
 Create Date: 2021-10-01 11:07:38.260898
 
 """
+import datetime
+
 import enumtables  # noqa: F401
 import sqlalchemy as sa
 from alembic import op
-
-import datetime
 
 # revision identifiers, used by Alembic.
 revision = "20211001_110738"
@@ -24,7 +24,9 @@ def upgrade():
     mark_failed_sql = sa.sql.text(
         "UPDATE aspen.workflows SET workflow_status = 'FAILED', end_datetime = :now WHERE workflow_type = 'PHYLO_RUN' AND workflow_status = 'STARTED' AND start_datetime <= :cutoff"
     )
-    params = { "now": now, "cutoff": forty_eight_hours_ago }
+    params = {"now": now, "cutoff": forty_eight_hours_ago}
+
+    conn = op.get_bind()
     conn.execute(mark_failed_sql, params)
 
 
