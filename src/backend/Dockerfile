@@ -16,11 +16,8 @@ RUN wget https://raw.githubusercontent.com/python-poetry/poetry/1.1.10/get-poetr
     rm get-poetry*
 WORKDIR /usr/src/app
 
-COPY third-party ./third-party/
-COPY pyproject.toml .
-COPY poetry.lock .
-COPY environment.yaml .
-COPY third-party ./third-party/
+COPY pyproject.toml poetry.lock environment.yaml ./
+COPY third-party ./third-party
 RUN /opt/poetry/bin/poetry config virtualenvs.create false && \
     /opt/poetry/bin/poetry install
 ENV PYTHONPATH=.
