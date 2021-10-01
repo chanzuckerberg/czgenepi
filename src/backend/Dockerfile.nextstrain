@@ -18,10 +18,17 @@ RUN apt-get -qq update && apt-get -qq -y install \
     locales \
     zstd \
     && locale-gen en_US.UTF-8
-RUN pip3 install --no-cache-dir awscli pipenv
+
+# Install poetry
+ENV POETRY_HOME /opt/poetry/
+RUN apt install -y libdigest-sha-perl
+RUN wget https://raw.githubusercontent.com/python-poetry/poetry/1.1.10/get-poetry.py && \
+    echo "e973b3badb95a916bfe250c22eeb7253130fd87312afa326eb02b8bdcea8f4a7  get-poetry.py" > get-poetry.py.sha256 && \
+    shasum -a 256 -c get-poetry.py.sha256 && \
+    python get-poetry.py && \
+    rm get-poetry*
 
 ENV FLASK_ENV=development
-ENV PIPENV_PYTHON=/usr/src/app/
 
 RUN pip3 install nextstrain-cli csv-diff s3fs[boto3] aiobotocore[awscli,boto3] envdir fsspec pandas
 
@@ -33,11 +40,16 @@ RUN mkdir /ncov && \
     git reset --hard FETCH_HEAD
 
 WORKDIR /usr/src/app
-COPY requirements.txt .
-COPY Pipfile* ./
+
+# Poetry: install app
+COPY pyproject.toml .
+COPY poetry.lock .
+COPY environment.yaml .
 COPY third-party ./third-party/
-COPY setup.py .
-RUN pipenv install --dev --system --verbose && pipenv --clear
+RUN /opt/poetry/bin/poetry config virtualenvs.create false && \
+    /opt/poetry/bin/poetry install
+ENV PYTHONPATH=.
 
 COPY . .
-RUN pip3 install . third-party/sqlalchemy-enum-tables
+# Install the aspen package
+RUN /opt/poetry/bin/poetry install
