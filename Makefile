@@ -188,7 +188,7 @@ local-dbconsole-profile: ## Connect to the local postgres database and profile q
 	docker-compose exec utility aspen-cli db --local interact --profile
 
 .PHONY: local-update-deps
-local-update-deps: ## Update requirements.txt to reflect pyproject.toml file changes.
+local-update-deps: ## Update poetry.lock to reflect pyproject.toml file changes.
 	docker-compose exec utility /opt/poetry/bin/poetry update
 
 ### ACCESSING CONTAINER MAKE COMMANDS ###################################################
