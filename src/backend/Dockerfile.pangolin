@@ -26,10 +26,8 @@ COPY aspen/workflows/pangolin/install_pangolin.sh .
 RUN bash install_pangolin.sh
 
 # Poetry: install app
-COPY pyproject.toml .
-COPY poetry.lock .
-COPY environment.yaml .
-COPY third-party ./third-party/
+COPY pyproject.toml poetry.lock environment.yaml ./
+COPY third-party ./third-party
 RUN /opt/poetry/bin/poetry config virtualenvs.create false && \
     /opt/poetry/bin/poetry install
 ENV PYTHONPATH=.

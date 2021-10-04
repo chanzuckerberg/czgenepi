@@ -5,7 +5,7 @@ import re
 from typing import Iterable, MutableSequence
 
 import sentry_sdk
-from flask import g, jsonify, make_response, request
+from flask import g, make_response, request
 from marshmallow.exceptions import ValidationError
 from sqlalchemy.orm import joinedload
 
@@ -187,6 +187,6 @@ def start_phylo_run():
         input=json.dumps(sfn_input_json),
     )
 
-    response = make_response(jsonify(responseschema.dumps(workflow)), 200)
+    response = make_response(responseschema.dumps(workflow), 200)
     response.headers["Content-Type"] = "application/json"
     return response

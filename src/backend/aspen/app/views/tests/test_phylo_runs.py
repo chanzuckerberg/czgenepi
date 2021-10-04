@@ -1,5 +1,3 @@
-import json
-
 from aspen.test_infra.models.gisaid_metadata import gisaid_metadata_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
@@ -33,7 +31,7 @@ def test_create_phylo_run(
     }
     res = client.post("/api/phylo_runs", json=data)
     assert res.status == "200 OK"
-    response = json.loads(res.json)
+    response = res.json
     template_args = response["template_args"]
     assert template_args["division"] == group.division
     assert template_args["location"] == group.location
@@ -71,7 +69,7 @@ def test_create_phylo_run_with_gisaid_ids(
     }
     res = client.post("/api/phylo_runs", json=data)
     assert res.status == "200 OK"
-    response = json.loads(res.json)
+    response = res.json
     template_args = response["template_args"]
     assert template_args["division"] == group.division
     assert template_args["location"] == group.location

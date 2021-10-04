@@ -61,10 +61,8 @@ RUN mkdir /ncov && \
     git reset --hard FETCH_HEAD
 
 # Poetry: install app
-COPY pyproject.toml .
-COPY poetry.lock .
-COPY environment.yaml .
-COPY third-party ./third-party/
+COPY pyproject.toml poetry.lock environment.yaml ./
+COPY third-party ./third-party
 RUN /opt/poetry/bin/poetry config virtualenvs.create false && \
     /opt/poetry/bin/poetry install
 ENV PYTHONPATH=.

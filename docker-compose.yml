@@ -73,7 +73,7 @@ services:
       - ./src/backend:/usr/src/app
     entrypoint: []
     # NOTE -- Using relative paths for entrypoints/commands breaks pycharm debugging
-    command: ["/usr/src/app/entrypoint.sh"]
+    command: ["/usr/local/bin/supervisord", "-c", "/usr/src/app/etc/supervisord.conf"]
     networks:
       genepinet:
         aliases:

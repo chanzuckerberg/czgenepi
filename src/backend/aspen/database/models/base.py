@@ -13,5 +13,6 @@ meta = MetaData(
         "pk": "pk_%(table_name)s",
     },
 )
+
 base = declarative_base(metadata=meta)
 idbase = declarative_base(cls=mx.BaseMixin, metadata=meta)
