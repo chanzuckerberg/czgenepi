@@ -35,10 +35,6 @@ refine:
 ## not subsample Aspen data by location
 subsampling:
   group_plus_context:
-
-    aspen:
-      exclude: "--exclude-where 'aspen!=yes'"
-
     group:
       group_by: "year month"
       max_sequences: 2000
