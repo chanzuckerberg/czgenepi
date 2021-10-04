@@ -41,7 +41,7 @@ def cli(
     gisaid_s3_bucket: str,
     gisaid_sequences_s3_key: str,
     gisaid_metadata_s3_key: str,
-    test: bool
+    test: bool,
 ):
     if test:
         print("Success!")
