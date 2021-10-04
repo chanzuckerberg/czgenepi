@@ -41,6 +41,7 @@ from aspen.phylo_tree.identifiers import get_names_from_tree
 @click.option("--bucket", type=str, required=True)
 @click.option("--key", type=str, required=True)
 @click.option("--tree-path", type=click.File("r"), required=True)
+@click.option("--test", type=bool, is_flag=True)
 def cli(
     aspen_workflow_rev: str,
     aspen_creation_rev: str,
@@ -51,7 +52,11 @@ def cli(
     bucket: str,
     key: str,
     tree_path: io.TextIOBase,
+    test: bool,
 ):
+    if test:
+        print("Success!")
+        return
     end_time_datetime = datetime.datetime.fromtimestamp(end_time)
 
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))

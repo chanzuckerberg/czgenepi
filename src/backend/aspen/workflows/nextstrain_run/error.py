@@ -20,11 +20,16 @@ logging.basicConfig(level=logging.INFO)
 @click.option("--phylo-run-id", type=int, required=True)
 @click.option("--ncov-rev", type=str, required=False)
 @click.option("--end-time", type=int, required=True)
+@click.option("--test", type=bool, is_flag=True)
 def fail_run(
     ncov_rev: str,
     end_time: int,
     phylo_run_id: int,
+    test: bool,
 ):
+    if test:
+        print("Success!")
+        return
     logging.info("An error has been detected in this run.")
     if phylo_run_id == -1:
         logging.info(

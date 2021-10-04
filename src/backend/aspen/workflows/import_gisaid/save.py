@@ -49,9 +49,14 @@ def drop_temp_table(session, table_obj):
 
 @click.command("save")
 @click.option("metadata_fh", "--metadata-file", type=click.File("r"), required=True)
+@click.option("--test", type=bool, is_flag=True)
 def cli(
     metadata_fh: io.TextIOBase,
+    test: bool,
 ):
+    if test:
+        print("Success!")
+        return
     data = csv.DictReader(metadata_fh, delimiter="\t")
 
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))

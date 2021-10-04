@@ -117,6 +117,16 @@ local-init: oauth/pkcs12/certificate.pfx .env.ecr local-ecr-login local-hostconf
 	docker-compose exec -T utility python scripts/setup_localdata.py
 	docker-compose exec -T utility pip install .
 
+.PHONY: check-images
+check-images: ## Spot-check the gisaid image
+	docker-compose $(COMPOSE_OPTS) run --no-deps --rm gisaid /usr/src/app/aspen/workflows/test-gisaid.sh
+	docker-compose $(COMPOSE_OPTS) run --no-deps --rm nextstrain /usr/src/app/aspen/workflows/test-nextstrain.sh
+	docker-compose $(COMPOSE_OPTS) run --no-deps --rm pangolin /usr/src/app/aspen/workflows/test-pangolin.sh
+
+.PHONY: imagecheck-aspen-%
+imagecheck-aspen-%: ## Spot-check the gisaid image
+	docker run --rm $(IMAGE) /usr/src/app/aspen/workflows/test-$(subst imagecheck-aspen-,,$@).sh
+
 .PHONY: backend-debugger
 backend-debugger: ## Attach to the backend service (useful for pdb)
 	docker attach $$(docker-compose ps | grep backend | cut -d ' ' -f 1 | head -n 1)

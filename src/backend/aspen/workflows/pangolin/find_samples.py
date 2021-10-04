@@ -2,6 +2,7 @@ import subprocess
 import urllib.request
 from typing import Iterable
 
+import click
 from sqlalchemy.orm import joinedload
 
 from aspen.config.config import Config
@@ -24,8 +25,12 @@ def check_latest_pangolin_version() -> str:
     return latest_version
 
 
-def find_samples():
-    # TODO: create click interface for this
+@click.command("find_samples")
+@click.option("--test", type=bool, is_flag=True)
+def find_samples(test: bool):
+    if test:
+        print("Success!")
+        return
 
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
     most_recent_pango_version: str = check_latest_pangolin_version()
