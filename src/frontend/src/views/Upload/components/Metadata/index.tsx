@@ -92,8 +92,8 @@ export default function Metadata({
             `Check local requirements for reporting to public health authorities. These may not be met by uploading samples to Aspen.`,
             <p key="1">
               Please read our{" "}
-              <NewTabLink href={ROUTES.PRIVACY}>Privacy Policy</NewTabLink>
-              for more information.
+              <NewTabLink href={ROUTES.PRIVACY}>Privacy Policy</NewTabLink> for
+              more information.
             </p>,
           ]}
         />
