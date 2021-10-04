@@ -112,7 +112,6 @@ init-empty-db:
 local-init: oauth/pkcs12/certificate.pfx .env.ecr local-ecr-login local-hostconfig ## Launch a new local dev env and populate it with test data.
 	docker-compose $(COMPOSE_OPTS) up -d database frontend backend localstack oidc utility
 	@docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c "alter user $(LOCAL_DB_ADMIN_USERNAME) with password '$(LOCAL_DB_ADMIN_PASSWORD)';"
-	docker-compose exec -T utility pip3 install awscli
 	docker-compose exec -T utility $(BACKEND_APP_ROOT)/scripts/setup_dev_data.sh
 	docker-compose exec -T utility alembic upgrade head
 	docker-compose exec -T utility python scripts/setup_localdata.py
@@ -189,10 +188,8 @@ local-dbconsole-profile: ## Connect to the local postgres database and profile q
 	docker-compose exec utility aspen-cli db --local interact --profile
 
 .PHONY: local-update-deps
-local-update-deps: ## Update requirements.txt to reflect pipenv file changes.
-	docker-compose exec utility pipenv --python 3.9
-	docker-compose exec utility pipenv update
-	docker-compose exec utility bash -c "pipenv lock -r >| requirements.txt"
+local-update-deps: ## Update poetry.lock to reflect pyproject.toml file changes.
+	docker-compose exec utility /opt/poetry/bin/poetry update
 
 ### ACCESSING CONTAINER MAKE COMMANDS ###################################################
 utility-%: ## Run make commands in the utility container (src/backend/Makefile)

@@ -2,14 +2,29 @@
 FROM python:3.9.1-slim AS base
 ENV FLASK_APP=aspen.main
 EXPOSE 3000
-RUN pip install --no-cache-dir pipenv
+
+# Utility
+RUN apt-get update && apt-get install -y vim procps wget make jq
+
+# Install poetry
+ENV POETRY_HOME /opt/poetry/
+RUN apt install -y libdigest-sha-perl
+RUN wget https://raw.githubusercontent.com/python-poetry/poetry/1.1.10/get-poetry.py && \
+    echo "e973b3badb95a916bfe250c22eeb7253130fd87312afa326eb02b8bdcea8f4a7  get-poetry.py" > get-poetry.py.sha256 && \
+    shasum -a 256 -c get-poetry.py.sha256 && \
+    python get-poetry.py && \
+    rm get-poetry*
 WORKDIR /usr/src/app
-COPY requirements.txt .
-COPY Pipfile* ./
+
 COPY third-party ./third-party/
-ENV PIPENV_PYTHON=/usr/src/app/
-COPY setup.py .
-RUN pipenv install --dev --system --verbose && pipenv --clear
-RUN apt-get update && apt-get -y install make jq
+COPY pyproject.toml .
+COPY poetry.lock .
+COPY environment.yaml .
+COPY third-party ./third-party/
+RUN /opt/poetry/bin/poetry config virtualenvs.create false && \
+    /opt/poetry/bin/poetry install
+ENV PYTHONPATH=.
+
 COPY . .
+RUN /opt/poetry/bin/poetry install
 ENTRYPOINT ["./entrypoint.sh"]

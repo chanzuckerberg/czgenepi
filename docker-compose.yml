@@ -100,7 +100,7 @@ services:
     volumes:
       - ./src/backend:/usr/src/app
     entrypoint: []
-    command: ["./utility.sh"]
+    command: ["sleep", "infinity"]
     networks:
       genepinet:
         aliases:
@@ -163,7 +163,16 @@ services:
         - HAPPY_COMMIT
         - HAPPY_BRANCH
     command: ["true"]
+    environment:
+      - AWS_REGION=us-west-2
+      - BOTO_ENDPOINT_URL=http://localstack.genepinet.local:4566
+      - AWS_ACCESS_KEY_ID=dev_access_key_id
+      - AWS_SECRET_ACCESS_KEY=dev_secret_access_key
     restart: "no"
+    networks:
+      genepinet:
+        aliases:
+          - gisaid.genepinet.local
   pangolin:
     image: "${DOCKER_REPO}aspen-pangolin"
     build:
@@ -173,8 +182,17 @@ services:
         - "${DOCKER_REPO}aspen-pangolin:branch-trunk"
       args:
         - BUILDKIT_INLINE_CACHE=1
+    environment:
+      - AWS_REGION=us-west-2
+      - BOTO_ENDPOINT_URL=http://localstack.genepinet.local:4566
+      - AWS_ACCESS_KEY_ID=dev_access_key_id
+      - AWS_SECRET_ACCESS_KEY=dev_secret_access_key
     command: ["true"]
     restart: "no"
+    networks:
+      genepinet:
+        aliases:
+          - pangolin.genepinet.local
   nextstrain:
     image: "${DOCKER_REPO}aspen-nextstrain"
     build:
@@ -184,8 +202,17 @@ services:
         - "${DOCKER_REPO}aspen-nextstrain:branch-trunk"
       args:
         - BUILDKIT_INLINE_CACHE=1
+    environment:
+      - AWS_REGION=us-west-2
+      - BOTO_ENDPOINT_URL=http://localstack.genepinet.local:4566
+      - AWS_ACCESS_KEY_ID=dev_access_key_id
+      - AWS_SECRET_ACCESS_KEY=dev_secret_access_key
     command: ["true"]
     restart: "no"
+    networks:
+      genepinet:
+        aliases:
+          - nextstrain.genepinet.local
 networks:
   genepinet:
 volumes:
