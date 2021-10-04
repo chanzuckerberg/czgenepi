@@ -1,11 +1,6 @@
 import styled from "@emotion/styled";
-import {
-  fontBodyXs,
-  getColors,
-  getFontWeights,
-  getSpacings,
-  Link,
-} from "czifui";
+import { fontBodyXs, getColors, getFontWeights, getSpacings } from "czifui";
+import { NewTabLink } from "../../../NewTabLink";
 
 export const StyledDiv = styled.div`
   ${(props) => {
@@ -30,7 +25,7 @@ export const StyledDiv = styled.div`
   }}
 `;
 
-export const StyledLink = styled(Link)`
+export const StyledLink = styled(NewTabLink)`
   display: flex;
   align-items: center;
 `;

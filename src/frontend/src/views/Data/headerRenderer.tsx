@@ -1,10 +1,11 @@
 /* eslint-disable react/display-name */
 
 import { css } from "@emotion/css";
-import { Link, Tooltip } from "czifui";
+import { Tooltip } from "czifui";
 import React from "react";
 import { defaultHeaderRenderer } from "src/common/components/library/data_table";
 import dataTableStyle from "src/common/components/library/data_table/index.module.scss";
+import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { createTableHeaderRenderer } from "src/common/utils";
 
 const arrow = css`
@@ -18,13 +19,9 @@ const LINEAGE_TOOLTIP_TEXT = (
     biological characteristics of the virus. We continually update these
     lineages based on the evolving Pangolin designations. Lineages determined by
     Pangolin.{" "}
-    <Link
-      href="https://cov-lineages.org/pangolin.html"
-      target="_blank"
-      rel="noopener"
-    >
+    <NewTabLink href="https://cov-lineages.org/pangolin.html">
       Learn more.
-    </Link>
+    </NewTabLink>
   </div>
 );
 
@@ -32,13 +29,9 @@ const TREE_TYPE_TOOLTIP_TEXT = (
   <div>
     <b>Tree Type:</b> Aspen-defined profiles for tree building based on primary
     use case and build settings.{" "}
-    <Link
-      href="https://docs.google.com/document/d/1_iQgwl3hn_pjlZLX-n0alUbbhgSPZvpW_0620Hk_kB4/edit?usp=sharing"
-      target="_blank"
-      rel="noopener"
-    >
+    <NewTabLink href="https://docs.google.com/document/d/1_iQgwl3hn_pjlZLX-n0alUbbhgSPZvpW_0620Hk_kB4/edit?usp=sharing">
       Read our guide to learn more.
-    </Link>
+    </NewTabLink>
   </div>
 );
 

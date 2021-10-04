@@ -1,7 +1,8 @@
-import { Button, Link } from "czifui";
+import { Button } from "czifui";
 import Head from "next/head";
 import NextLink from "next/link";
 import React, { useState } from "react";
+import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { ROUTES } from "src/common/routes";
 import {
@@ -91,9 +92,9 @@ export default function Metadata({
             `Check local requirements for reporting to public health authorities. These may not be met by uploading samples to Aspen.`,
             <p key="1">
               Please read our{" "}
-              <Link href={ROUTES.PRIVACY} target="_blank" rel="noopener">
+              <NewTabLink href={ROUTES.PRIVACY}>
                 Privacy Policy
-              </Link>{" "}
+              </NewTabLink>{" "}
               for more information.
             </p>,
           ]}

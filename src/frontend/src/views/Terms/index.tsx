@@ -1,6 +1,7 @@
-import { Link, ListItemLabel } from "czifui";
+import { ListItemLabel } from "czifui";
 import Head from "next/head";
 import React from "react";
+import { NewTabLink } from "src/common/components/library/NewTabLink";
 import List from "src/common/styles/support/components/List";
 import {
   B,
@@ -102,13 +103,9 @@ export default function Terms(): JSX.Element {
               Data, Pathogen Consensus Genomes, and Sample Metadata) are
               similarly <B>not</B> personally identifiable. This means removing
               all{" "}
-              <Link
-                href="https://docs.google.com/document/d/1sboOmbafvMh3VYjK1-3MAUt0I13UUJfkQseq8ANLPl8/edit"
-                target="_blank"
-                rel="noopener"
-              >
+              <NewTabLink href="https://docs.google.com/document/d/1sboOmbafvMh3VYjK1-3MAUt0I13UUJfkQseq8ANLPl8/edit">
                 direct identifiers
-              </Link>{" "}
+              </NewTabLink>{" "}
               like name, address, dates, telephone numbers, e-mail addresses, or
               medical record numbers from data you upload to Aspen.
             </span>,
@@ -133,13 +130,9 @@ export default function Terms(): JSX.Element {
             county-level location data). You should <B>not</B> be uploading any
             information that would allow identification of any specific
             individuals to which the Samples may relate, such as{" "}
-            <Link
-              href="https://docs.google.com/document/d/1sboOmbafvMh3VYjK1-3MAUt0I13UUJfkQseq8ANLPl8/edit"
-              target="_blank"
-              rel="noopener"
-            >
+            <NewTabLink href="https://docs.google.com/document/d/1sboOmbafvMh3VYjK1-3MAUt0I13UUJfkQseq8ANLPl8/edit">
               direct identifiers
-            </Link>{" "}
+            </NewTabLink>{" "}
             like name, address, symptom onset dates or case interview dates,
             telephone numbers, e-mail addresses, or medical record numbers.
           </span>,
@@ -165,13 +158,9 @@ export default function Terms(): JSX.Element {
             from Upload data in connection with offering and improving Aspen.
             You can request deletion of your Upload Data from Aspen by emailing
             us at{" "}
-            <Link
-              href="mailto:helloaspen@chanzuckerberg.com"
-              target="_blank"
-              rel="noopener"
-            >
+            <NewTabLink href="mailto:helloaspen@chanzuckerberg.com">
               helloaspen@chanzuckerberg.com
-            </Link>{" "}
+            </NewTabLink>{" "}
           </span>,
           <span key="3">
             <ListItemLabel>
@@ -262,13 +251,9 @@ export default function Terms(): JSX.Element {
           <span key="2">
             <ListItemLabel>Closing Your Account.</ListItemLabel>You can close
             your Account at any time. Just contact us at{" "}
-            <Link
-              href="mailto:aspenprivacy@chanzuckerberg.com"
-              target="_blank"
-              rel="noopener"
-            >
+            <NewTabLink href="mailto:aspenprivacy@chanzuckerberg.com">
               aspenprivacy@chanzuckerberg.com
-            </Link>
+            </NewTabLink>
           </span>,
         ]}
       />
@@ -286,13 +271,9 @@ export default function Terms(): JSX.Element {
             We and our service providers do not review or correct any data
             uploaded into Aspen. If you would like to report any issue with
             Aspen please contact us at{" "}
-            <Link
-              href="mailto:aspensecurity@chanzuckerberg.com"
-              target="_blank"
-              rel="noopener"
-            >
+            <NewTabLink href="mailto:aspensecurity@chanzuckerberg.com">
               aspensecurity@chanzuckerberg.com
-            </Link>
+            </NewTabLink>
             . Aspen is not intended as a storage service, so please back up your
             Upload Data using a secure service of your choice, such as the
             NCBI’s Sequence Read Archive (SRA) repository.
@@ -470,13 +451,9 @@ export default function Terms(): JSX.Element {
           <span key="0">
             If you have any questions, comments, or concerns with Terms, you may
             contact us at{" "}
-            <Link
-              href="mailto:aspenprivacy@chanzuckerberg.com"
-              target="_blank"
-              rel="noopener"
-            >
+            <NewTabLink href="mailto:aspenprivacy@chanzuckerberg.com">
               aspenprivacy@chanzuckerberg.com
-            </Link>
+            </NewTabLink>
             .
           </span>,
           <P key="1">
@@ -496,13 +473,9 @@ export default function Terms(): JSX.Element {
             Redwood City, CA 94063
             <br />
             With a courtesy copy via email to:{" "}
-            <Link
-              href="mailto:legalczi1@chanzuckerberg.com"
-              target="_blank"
-              rel="noopener"
-            >
+            <NewTabLink href="mailto:legalczi1@chanzuckerberg.com">
               legalczi1@chanzuckerberg.com
-            </Link>{" "}
+            </NewTabLink>{" "}
             (email does not constitute notice)
             <br />
           </P>,

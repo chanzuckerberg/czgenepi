@@ -1,8 +1,9 @@
 import { Dialog } from "@material-ui/core";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import CloseIcon from "@material-ui/icons/Close";
-import { Alert, Link } from "czifui";
+import { Alert } from "czifui";
 import React, { SyntheticEvent, useEffect, useState } from "react";
+import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { useCreateTree } from "src/common/queries/trees";
 import { Header, StyledIconButton } from "../DownloadModal/style";
 import {
@@ -115,13 +116,9 @@ export const CreateNSTreeModal = ({
   const TREE_TYPE_TOOLTIP_TEXT = (
     <div>
       Select the Tree Type best suited for the question you are trying to anwer.{" "}
-      <Link
-        href="https://docs.google.com/document/d/1_iQgwl3hn_pjlZLX-n0alUbbhgSPZvpW_0620Hk_kB4/edit"
-        target="_blank"
-        rel="noopener"
-      >
+      <NewTabLink href="https://docs.google.com/document/d/1_iQgwl3hn_pjlZLX-n0alUbbhgSPZvpW_0620Hk_kB4/edit">
         Read our guide to learn more.
-      </Link>
+      </NewTabLink>
     </div>
   );
 

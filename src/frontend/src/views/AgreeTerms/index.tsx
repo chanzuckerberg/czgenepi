@@ -1,5 +1,5 @@
 import { Dialog } from "@material-ui/core";
-import { Button, Link, List, ListItem, ListSubheader } from "czifui";
+import { Button, List, ListItem, ListSubheader } from "czifui";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
@@ -7,6 +7,7 @@ import { API } from "src/common/api";
 import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
+import { NewTabLink } from "src/common/components/library/NewTabLink";
 import ENV from "src/common/constants/ENV";
 import { useUpdateUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
@@ -96,25 +97,15 @@ export default function AgreeTerms(): JSX.Element {
               </ListItem>
               <Details>
                 Take a look at our full{" "}
-                <Link href={ROUTES.TERMS} target="_blank" rel="noopener">
-                  Terms of Service
-                </Link>{" "}
+                <NewTabLink href={ROUTES.TERMS}>Terms of Service</NewTabLink>{" "}
                 and{" "}
-                <Link href={ROUTES.PRIVACY} target="_blank" rel="noopener">
-                  Privacy Policy
-                </Link>
-                . We’ve put together an{" "}
-                <Link href={ROUTES.FAQ} target="_blank" rel="noopener">
-                  FAQ
-                </Link>{" "}
-                to make these easier to understand. Please{" "}
-                <Link
-                  href={ROUTES.CONTACT_US_EMAIL}
-                  target="_blank"
-                  rel="noopener"
-                >
+                <NewTabLink href={ROUTES.PRIVACY}>Privacy Policy</NewTabLink>.
+                We’ve put together an{" "}
+                <NewTabLink href={ROUTES.FAQ}>FAQ</NewTabLink> to make these
+                easier to understand. Please{" "}
+                <NewTabLink href={ROUTES.CONTACT_US_EMAIL}>
                   get in touch
-                </Link>{" "}
+                </NewTabLink>{" "}
                 if you have any questions or concerns, we’re here to help!
                 <br />
                 <br />

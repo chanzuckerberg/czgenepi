@@ -356,11 +356,7 @@ const DataSubview: FunctionComponent<Props> = ({
                   lightText={
                     <>
                       Please try again later or{" "}
-                      <StyledLink
-                        href="mailto:aspenprivacy@chanzuckerberg.com"
-                        target="_blank"
-                        rel="noopener"
-                      >
+                      <StyledLink href="mailto:aspenprivacy@chanzuckerberg.com">
                         contact us
                       </StyledLink>{" "}
                       for help.
@@ -379,11 +375,7 @@ const DataSubview: FunctionComponent<Props> = ({
                   lightText={
                     <>
                       Please try again later or{" "}
-                      <StyledLink
-                        href="mailto:aspenprivacy@chanzuckerberg.com"
-                        target="_blank"
-                        rel="noopener"
-                      >
+                      <StyledLink href="mailto:aspenprivacy@chanzuckerberg.com">
                         contact us
                       </StyledLink>{" "}
                       for help.

@@ -82,14 +82,9 @@ const AcknowledgePolicyChanges = () => {
         <StyledIconInfo />
         <B>We are no longer supporting automatic GISAID submissions. </B>
         This change is reflected in our updated{" "}
-        <StyledLink href={ROUTES.TERMS} target="_blank" rel="noopener">
-          Terms of Use
-        </StyledLink>{" "}
-        and{" "}
-        <StyledLink href={ROUTES.PRIVACY} target="_blank" rel="noopener">
-          Privacy Policy
-        </StyledLink>{" "}
-        effective September 30.
+        <StyledLink href={ROUTES.TERMS}>Terms of Use</StyledLink> and{" "}
+        <StyledLink href={ROUTES.PRIVACY}>Privacy Policy</StyledLink> effective
+        September 30.
       </MainText>
       <StyledCloseIcon onClick={handleClick} />
     </Container>
