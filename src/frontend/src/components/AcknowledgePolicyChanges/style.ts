@@ -56,7 +56,7 @@ export const MainText = styled.p`
   color: white;
 `;
 
-export const StyledLink = styled(NewTabLink)`
+export const StyledNewTabLink = styled(NewTabLink)`
   color: white;
   text-decoration: underline;
   text-decoration-style: dashed;

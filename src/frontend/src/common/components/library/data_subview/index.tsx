@@ -28,7 +28,7 @@ import {
   StyledDownloadDisabledImage,
   StyledDownloadImage,
   StyledFlexChildDiv,
-  StyledLink,
+  StyledNewTabLink,
   TooltipDescriptionText,
   TooltipHeaderText,
 } from "./style";
@@ -356,9 +356,9 @@ const DataSubview: FunctionComponent<Props> = ({
                   lightText={
                     <>
                       Please try again later or{" "}
-                      <StyledLink href="mailto:aspenprivacy@chanzuckerberg.com">
+                      <StyledNewTabLink href="mailto:aspenprivacy@chanzuckerberg.com">
                         contact us
-                      </StyledLink>{" "}
+                      </StyledNewTabLink>{" "}
                       for help.
                     </>
                   }
@@ -375,9 +375,9 @@ const DataSubview: FunctionComponent<Props> = ({
                   lightText={
                     <>
                       Please try again later or{" "}
-                      <StyledLink href="mailto:aspenprivacy@chanzuckerberg.com">
+                      <StyledNewTabLink href="mailto:aspenprivacy@chanzuckerberg.com">
                         contact us
-                      </StyledLink>{" "}
+                      </StyledNewTabLink>{" "}
                       for help.
                     </>
                   }

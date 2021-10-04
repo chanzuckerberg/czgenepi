@@ -25,7 +25,7 @@ export const StyledDiv = styled.div`
   }}
 `;
 
-export const StyledLink = styled(NewTabLink)`
+export const StyledNewTabLink = styled(NewTabLink)`
   display: flex;
   align-items: center;
 `;

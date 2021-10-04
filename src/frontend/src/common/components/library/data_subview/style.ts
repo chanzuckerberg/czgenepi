@@ -107,7 +107,7 @@ export const BoldText = styled.div`
   }}
 `;
 
-export const StyledLink = styled(NewTabLink)`
+export const StyledNewTabLink = styled(NewTabLink)`
   color: black;
   border-bottom: 1px dotted black;
 `;
