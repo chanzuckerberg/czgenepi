@@ -1,5 +1,6 @@
-from fastapi import Depends, FastAPI
 from functools import partial
+
+from fastapi import Depends, FastAPI
 
 from aspen.api.config.config import settings
 from aspen.api.deps import set_db
