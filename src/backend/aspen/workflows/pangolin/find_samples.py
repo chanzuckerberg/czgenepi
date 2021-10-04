@@ -25,13 +25,7 @@ def check_latest_pangolin_version() -> str:
     return latest_version
 
 
-@click.command("find_samples")
-@click.option("--test", type=bool, is_flag=True)
-def find_samples(test: bool):
-    if test:
-        print("Success!")
-        return
-
+def find_samples():
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
     most_recent_pango_version: str = check_latest_pangolin_version()
 
@@ -57,7 +51,14 @@ def find_samples(test: bool):
 
         return samples_to_be_updated
 
-
-if __name__ == "__main__":
+@click.command("find_samples")
+@click.option("--test", type=bool, is_flag=True)
+def run_command(test: bool):
+    if test:
+        print("Success!")
+        return
     samples = find_samples()
     subprocess.run(["bash", "run_pangolin.sh"] + samples)
+
+if __name__ == "__main__":
+    run_command()
