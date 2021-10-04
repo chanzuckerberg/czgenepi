@@ -17,7 +17,7 @@ builds:
 
 ## custom rules
 custom_rules:
-  - my_profiles/aspen/subsampling_ranges.smk
+  - nextstrain_profiles/nextstrain-gisaid/subsampling_ranges.smk
 
 ## Auxiliary files
 files:
@@ -30,64 +30,40 @@ files:
 refine:
   keep_polytomies: True
 
+
 ## Subsampling schemas
-# Sampling groups that end with an `_early` suffix will omit data from the last 18 weeks.  Sampling groups that end with a `_late` suffix will only consider data from the last 18 weeks.
+## not subsample Aspen data by location
 subsampling:
   group_plus_context:
-    group_early:
-      group_by: "year month"
-      max_sequences: 500
-      query: --query "(location == '{{location}}') & (division == '{{division}}')"
 
-    group_late:
+    aspen:
+      exclude: "--exclude-where 'aspen!=yes'"
+
+    group:
       group_by: "year month"
       max_sequences: 2000
       query: --query "(location == '{{location}}') & (division == '{{division}}')"
 
-    state_early:
+    state:
       group_by: "location year month"
-      max_sequences: 200
+      max_sequences: 500
       query: --query "(location != '{{location}}') & (division == '{{division}}')" # exclude add'l samples from {{location}}
       priorities:
         type: "proximity"
-        focus: "group_late"
+        focus: "group"
 
-    state_late:
-      group_by: "location year month"
+    country:
+      group_by: "division year month"
       max_sequences: 400
-      query: --query "(location != '{{location}}') & (division == '{{division}}')" # exclude add'l samples from {{location}}
+      query: --query "(division != '{{division}}') & (country == '{{country}}')" # exclude add'l samples from CA
       priorities:
         type: "proximity"
-        focus: "group_late"
+        focus: "group"
 
-    country_early:
-      group_by: "division year month"
+    international:
+      group_by: "region year month"
       max_sequences: 100
-      query: --query "(division != '{{division}}') & (country == '{{country}}')" # exclude add'l samples from CA
-      priorities:
-        type: "proximity"
-        focus: "group_late"
-
-    country_late:
-      group_by: "division year month"
-      max_sequences: 200
-      query: --query "(division != '{{division}}') & (country == '{{country}}')" # exclude add'l samples from CA
-      priorities:
-        type: "proximity"
-        focus: "group_late"
-
-    international_early:
-      group_by: "region year month"
-      max_sequences: 20
       query: --query "(country != '{{country}}')" # exclude add'l samples from USA
       priorities:
           type: "proximity"
-          focus: "group_late"
-
-    international_late:
-      group_by: "region year month"
-      max_sequences: 30
-      query: --query "(country != '{{country}}')" # exclude add'l samples from USA
-      priorities:
-          type: "proximity"
-          focus: "group_late"
+          focus: "group"
