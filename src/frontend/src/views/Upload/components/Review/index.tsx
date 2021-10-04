@@ -1,7 +1,8 @@
-import { Button, Checkbox, Link } from "czifui";
+import { Button, Checkbox } from "czifui";
 import Head from "next/head";
 import NextLink from "next/link";
 import React, { useState } from "react";
+import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { useUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
@@ -86,16 +87,10 @@ export default function Review({
               I agree that the data I am uploading to Aspen has been lawfully
               collected and that I have all the necessary consents, permissions,
               and authorizations needed to collect, share and export data as
-              outlined in the{" "}
-              <Link href={ROUTES.TERMS} target="_blank" rel="noopener">
-                Terms
-              </Link>{" "}
-              and{" "}
-              <Link href={ROUTES.PRIVACY} target="_blank" rel="noopener">
-                Privacy Policy
-              </Link>
-              . I have reviewed the data that I am uploading and can confirm
-              that I am not uploading any personally identifiable information.
+              outlined in the <NewTabLink href={ROUTES.TERMS}>Terms</NewTabLink>{" "}
+              and <NewTabLink href={ROUTES.PRIVACY}>Privacy Policy</NewTabLink>.
+              I have reviewed the data that I am uploading and can confirm that
+              I am not uploading any personally identifiable information.
             </span>
           </CheckboxText>
         </CheckboxWrapper>

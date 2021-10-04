@@ -7,8 +7,8 @@ import {
   getColors,
   getFontWeights,
   getSpacings,
-  Link,
 } from "czifui";
+import { NewTabLink } from "src/common/components/library/NewTabLink";
 import DownloadImage from "src/common/icons/IconDownload.svg";
 
 export const StyledDiv = styled.div`
@@ -107,7 +107,7 @@ export const BoldText = styled.div`
   }}
 `;
 
-export const StyledLink = styled(Link)`
+export const StyledNewTabLink = styled(NewTabLink)`
   color: black;
   border-bottom: 1px dotted black;
 `;

@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import CloseIcon from "@material-ui/icons/Close";
-import { fontBodyS, getColors, getIconSizes, getSpacings, Link } from "czifui";
+import { fontBodyS, getColors, getIconSizes, getSpacings } from "czifui";
+import { NewTabLink } from "src/common/components/library/NewTabLink";
 import IconInfo from "src/common/icons/IconInfo.svg";
 
 // Note that how we use flex here depends on `DummyCenteringSpacer`.
@@ -55,7 +56,7 @@ export const MainText = styled.p`
   color: white;
 `;
 
-export const StyledLink = styled(Link)`
+export const StyledNewTabLink = styled(NewTabLink)`
   color: white;
   text-decoration: underline;
   text-decoration-style: dashed;

@@ -1,5 +1,6 @@
-import { Link, Tooltip } from "czifui";
+import { Tooltip } from "czifui";
 import React from "react";
+import { NewTabLink } from "src/common/components/library/NewTabLink";
 
 interface Props {
   children: React.ReactElement;
@@ -29,13 +30,9 @@ export const TreeTypeTooltip = ({ children, value }: Props): JSX.Element => {
   const TOOLTIP_TEXT = (
     <div>
       {content}{" "}
-      <Link
-        href="https://docs.google.com/document/d/1_iQgwl3hn_pjlZLX-n0alUbbhgSPZvpW_0620Hk_kB4/edit?usp=sharing"
-        target="_blank"
-        rel="noopener"
-      >
+      <NewTabLink href="https://docs.google.com/document/d/1_iQgwl3hn_pjlZLX-n0alUbbhgSPZvpW_0620Hk_kB4/edit?usp=sharing">
         Learn more
-      </Link>
+      </NewTabLink>
     </div>
   );
 

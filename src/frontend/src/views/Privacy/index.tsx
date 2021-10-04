@@ -1,6 +1,7 @@
-import { Link, ListItemLabel } from "czifui";
+import { ListItemLabel } from "czifui";
 import Head from "next/head";
 import React from "react";
+import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { ROUTES } from "src/common/routes";
 import List from "src/common/styles/support/components/List";
 import {
@@ -83,9 +84,9 @@ const PrivacyPolicy = (): JSX.Element => {
         well as a Table summarizing key aspects of our data practices. For more
         information about the rules governing your use of Aspen, please also see
         our{" "}
-        <Link href={ROUTES.TERMS} target="_blank" rel="noopener">
+        <NewTabLink href={ROUTES.TERMS}>
           Terms of Use (&quot;Terms&quot;)
-        </Link>
+        </NewTabLink>
         .{" "}
         <B>
           Please remember that you are using Aspen in your organizational
@@ -173,13 +174,9 @@ const PrivacyPolicy = (): JSX.Element => {
                 Users can request deletion of Raw Sequence Data, Sample
                 Metadata, Pathogen Consensus Genomes, analytical outputs, or
                 their Aspen account data by contacting us at{" "}
-                <Link
-                  href="mailto:helloaspen@chanzuckerberg.com"
-                  target="_blank"
-                  rel="noopener"
-                >
+                <NewTabLink href="mailto:helloaspen@chanzuckerberg.com">
                   helloaspen@chanzuckerberg.com
-                </Link>{" "}
+                </NewTabLink>{" "}
                 and we will fulfill the request within 60 days.
               </P>
               <P>
@@ -317,13 +314,9 @@ const PrivacyPolicy = (): JSX.Element => {
             <td rowSpan={2}>
               Users can request deletion of their Aspen account data by
               contacting us at{" "}
-              <Link
-                href="mailto:helloaspen@chanzuckerberg.com"
-                target="_blank"
-                rel="noopener"
-              >
+              <NewTabLink href="mailto:helloaspen@chanzuckerberg.com">
                 helloaspen@chanzuckerberg.com
-              </Link>{" "}
+              </NewTabLink>{" "}
               and we will fulfill the request within 60 days.
             </td>
           </ContentRow>
@@ -362,11 +355,8 @@ const PrivacyPolicy = (): JSX.Element => {
         Upload, it is removed as part of processing the Upload.
       </P>
       <P>
-        As described in our{" "}
-        <Link href={ROUTES.TERMS} target="_blank" rel="noopener">
-          Terms
-        </Link>
-        , Users are required to obtain and maintain all necessary consents,
+        As described in our <NewTabLink href={ROUTES.TERMS}>Terms</NewTabLink>,
+        Users are required to obtain and maintain all necessary consents,
         permissions, and authorizations required by applicable laws prior to
         uploading, sharing, and exporting Upload Data with the Services.
       </P>
@@ -412,13 +402,9 @@ const PrivacyPolicy = (): JSX.Element => {
       <P>
         If you are able to find data in Aspen or any Sample Metadata that you
         believe is identifying, please let us know at{" "}
-        <Link
-          href="mailto:aspenprivacy@chanzuckerberg.com"
-          target="_blank"
-          rel="noopener"
-        >
+        <NewTabLink href="mailto:aspenprivacy@chanzuckerberg.com">
           aspenprivacy@chanzuckerberg.com
-        </Link>{" "}
+        </NewTabLink>{" "}
         and we will address it.
       </P>
       <P>
@@ -656,10 +642,7 @@ const PrivacyPolicy = (): JSX.Element => {
         data you’ve uploaded. Should this occur, the entity to which we transfer
         your data will be obliged to use it in a manner that is consistent with
         this Privacy Policy and our{" "}
-        <Link href={ROUTES.TERMS} target="_blank" rel="noopener">
-          Terms
-        </Link>
-        .
+        <NewTabLink href={ROUTES.TERMS}>Terms</NewTabLink>.
       </P>
       <P>
         We may disclose Upload Data, analytical outputs, and/or User Data if we
@@ -668,10 +651,7 @@ const PrivacyPolicy = (): JSX.Element => {
         on us; (b) to protect or defend our rights or property or those of
         Users; and/or (c) to investigate or assist in preventing any violation
         or potential violation of this Privacy Policy, or our{" "}
-        <Link href={ROUTES.TERMS} target="_blank" rel="noopener">
-          Terms
-        </Link>
-        .
+        <NewTabLink href={ROUTES.TERMS}>Terms</NewTabLink>.
       </P>
     </>
   );
@@ -693,13 +673,9 @@ const PrivacyPolicy = (): JSX.Element => {
       <P>
         Security takes ongoing work and we will continue to monitor and adjust
         our security measures as Aspen develops. Please notify us immediately at{" "}
-        <Link
-          href="mailto:aspensecurity@chanzuckerberg.com"
-          target="_blank"
-          rel="noopener"
-        >
+        <NewTabLink href="mailto:aspensecurity@chanzuckerberg.com">
           aspensecurity@chanzuckerberg.com
-        </Link>{" "}
+        </NewTabLink>{" "}
         if you suspect your account has been compromised or are aware of any
         other security issues relating to Aspen.
       </P>
@@ -720,13 +696,9 @@ const PrivacyPolicy = (): JSX.Element => {
             We retain Pathogen Consensus Genomes, Sample Metadata and analytical
             outputs until Users delete them from Aspen. Users may delete their
             data by contacting us at{" "}
-            <Link
-              href="mailto:helloaspen@chanzuckerberg.com"
-              target="_blank"
-              rel="noopener"
-            >
+            <NewTabLink href="mailto:helloaspen@chanzuckerberg.com">
               helloaspen@chanzuckerberg.com
-            </Link>
+            </NewTabLink>
             .
           </span>,
           `We store Raw Sequence Data (ex: fastq files) for 90 days following upload. If no abnormalities are found in the resulting Pathogen Consensus Genome, we discard this data. We encourage submission to NCBI’s Sequence Read Archive (SRA) repository for long-term storage and sharing.`,
@@ -734,13 +706,9 @@ const PrivacyPolicy = (): JSX.Element => {
             User Data is retained until Users delete their Aspen account because
             this data is required to manage the service. Users may submit
             account deletion requests by emailing{" "}
-            <Link
-              href="mailto:helloaspen@chanzuckerberg.com"
-              target="_blank"
-              rel="noopener"
-            >
+            <NewTabLink href="mailto:helloaspen@chanzuckerberg.com">
               helloaspen@chanzuckerberg.com
-            </Link>
+            </NewTabLink>
             . We will delete personal data within 60 days following the closure
             of your account.
           </span>,
@@ -768,13 +736,9 @@ const PrivacyPolicy = (): JSX.Element => {
           <span key="0">
             If you have any questions about our processing of any data, please
             contact us at{" "}
-            <Link
-              href="mailto:aspenprivacy@chanzuckerberg.com"
-              target="_blank"
-              rel="noopener"
-            >
+            <NewTabLink href="mailto:aspenprivacy@chanzuckerberg.com">
               aspenprivacy@chanzuckerberg.com
-            </Link>
+            </NewTabLink>
             .
           </span>,
         ]}
@@ -789,12 +753,9 @@ const PrivacyPolicy = (): JSX.Element => {
       </H2>
       <P>
         Aspen is a US-based service. If you want to use Aspen, you must first
-        agree to our{" "}
-        <Link href={ROUTES.TERMS} target="_blank" rel="noopener">
-          Terms
-        </Link>
-        , which set out the contract between Aspen and our Users. We operate in
-        the United States, and use technical infrastructure in the United States
+        agree to our <NewTabLink href={ROUTES.TERMS}>Terms</NewTabLink>, which
+        set out the contract between Aspen and our Users. We operate in the
+        United States, and use technical infrastructure in the United States to
         to deliver the Services to you.
       </P>
     </>
@@ -808,13 +769,9 @@ const PrivacyPolicy = (): JSX.Element => {
       <P>
         If you have any questions, comments, or concerns with this Privacy
         Policy, you may contact us at{" "}
-        <Link
-          href="mailto:aspenprivacy@chanzuckerberg.com"
-          target="_blank"
-          rel="noopener"
-        >
+        <NewTabLink href="mailto:aspenprivacy@chanzuckerberg.com">
           aspenprivacy@chanzuckerberg.com
-        </Link>
+        </NewTabLink>
         .
       </P>
     </>

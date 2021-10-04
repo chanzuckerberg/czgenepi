@@ -1,6 +1,7 @@
-import { Button, ButtonProps, Link } from "czifui";
+import { Button, ButtonProps } from "czifui";
 import React, { FC, useEffect, useState } from "react";
 import { DEFAULT_FETCH_OPTIONS } from "src/common/api";
+import { NewTabLink } from "src/common/components/library/NewTabLink";
 import ENV from "src/common/constants/ENV";
 import { stripProtocol } from "../../urlUtils";
 
@@ -56,9 +57,9 @@ const ConfirmButton = (props: Props) => {
   );
 
   return url ? (
-    <Link data-test-id="tree-link" href={url} target="_blank" rel="noopener">
+    <NewTabLink data-test-id="tree-link" href={url}>
       {Content}
-    </Link>
+    </NewTabLink>
   ) : (
     Content
   );

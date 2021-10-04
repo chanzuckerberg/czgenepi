@@ -1,6 +1,6 @@
-import { Link } from "czifui";
 import Head from "next/head";
 import React from "react";
+import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { ROUTES } from "src/common/routes";
 import List from "src/common/styles/support/components/List";
 import {
@@ -28,9 +28,7 @@ export default function Faq(): JSX.Element {
         <H3>How do I login?</H3>
         <P>
           Navigate to{" "}
-          <Link href={ROUTES.HOMEPAGE} target="_blank" rel="noopener">
-            aspen.cziscience.com
-          </Link>{" "}
+          <NewTabLink href={ROUTES.HOMEPAGE}>aspen.cziscience.com</NewTabLink>{" "}
           and click on the “Sign In” button in the center of the page. You
           should be redirected to a login screen where you can enter your email
           address and password.{" "}
@@ -83,38 +81,26 @@ export default function Faq(): JSX.Element {
           Once completed, you can drag and drop this TSV file onto your tree
           visualizations in Nextstrain. Your private metadata spreadsheet will
           never leave your computer;{" "}
-          <Link
-            href="https://docs.nextstrain.org/projects/auspice/en/stable/advanced-functionality/drag-drop-csv-tsv.html"
-            target="_blank"
-            rel="noopener"
-          >
+          <NewTabLink href="https://docs.nextstrain.org/projects/auspice/en/stable/advanced-functionality/drag-drop-csv-tsv.html">
             see here for more details.
-          </Link>
+          </NewTabLink>
         </P>
         <P>
           We’re also hard at work thinking of new ways to enable you to securely
           overlay PHI / PII directly in Aspen. If you have ideas or requests,
           please let us know at{" "}
-          <Link
-            href="mailto:helloaspen@chanzuckerberg.com"
-            target="_blank"
-            rel="noopener"
-          >
+          <NewTabLink href="mailto:helloaspen@chanzuckerberg.com">
             helloaspen@chanzuckerberg.com
-          </Link>
+          </NewTabLink>
           !
         </P>
 
         <H3>How can I get support or make a feature request?</H3>
         <P>
           Our team is here to support you! Please reach out to us anytime at{" "}
-          <Link
-            href="mailto:helloaspen@chanzuckerberg.com"
-            target="_blank"
-            rel="noopener"
-          >
+          <NewTabLink href="mailto:helloaspen@chanzuckerberg.com">
             helloaspen@chanzuckerberg.com
-          </Link>
+          </NewTabLink>
           . We regularly monitor that inbox for support requests, bug reports,
           and feature requests. Aspen is still in its early stages, and we work
           closely with our users to improve the experience -- we read and
@@ -126,13 +112,9 @@ export default function Faq(): JSX.Element {
         <H3>How can I delete my data?</H3>
         <P>
           Please reach out to our team at{" "}
-          <Link
-            href="mailto:helloaspen@chanzuckerberg.com"
-            target="_blank"
-            rel="noopener"
-          >
+          <NewTabLink href="mailto:helloaspen@chanzuckerberg.com">
             helloaspen@chanzuckerberg.com
-          </Link>{" "}
+          </NewTabLink>{" "}
           with your deletion requests and we will handle it within 60 days. When
           we delete your data, we remove it from our database and any file
           storage we have. In a future version of Aspen, you will have the
@@ -149,22 +131,14 @@ export default function Faq(): JSX.Element {
       <H3>Where can I find links to the COVID Tracker Seminar Series?</H3>
       <P>
         You can find links to recordings of all previous seminars at{" "}
-        <Link
-          href="https://covidtracker.czbiohub.org/resources"
-          target="_blank"
-          rel="noopener"
-        >
+        <NewTabLink href="https://covidtracker.czbiohub.org/resources">
           https://covidtracker.czbiohub.org/resources
-        </Link>
+        </NewTabLink>
         . If you would like to be added to the calendar invitation for any
         future seminars please email{" "}
-        <Link
-          href="mailto:ablack@contractor.chanzuckerberg.com"
-          target="_blank"
-          rel="noopener"
-        >
+        <NewTabLink href="mailto:ablack@contractor.chanzuckerberg.com">
           Alli Black
-        </Link>
+        </NewTabLink>
         .
       </P>
 
@@ -174,13 +148,9 @@ export default function Faq(): JSX.Element {
       </H3>
       <P>
         Aggregate statistics on genomes sequenced by the Biohub can be found at{" "}
-        <Link
-          href="https://covidtracker.czbiohub.org/statistics"
-          target="_blank"
-          rel="noopener"
-        >
+        <NewTabLink href="https://covidtracker.czbiohub.org/statistics">
           https://covidtracker.czbiohub.org/statistics
-        </Link>
+        </NewTabLink>
         . This page is available to the public.
       </P>
     </>
@@ -193,23 +163,15 @@ export default function Faq(): JSX.Element {
       <H3>Where can I view the Privacy Policy & ToS?</H3>
       <P>
         You can find our Privacy Policy at:{" "}
-        <Link
-          href="https://aspen.cziscience.com/privacy"
-          target="_blank"
-          rel="noopener"
-        >
+        <NewTabLink href="https://aspen.cziscience.com/privacy">
           https://aspen.cziscience.com/privacy
-        </Link>
+        </NewTabLink>
       </P>
       <P>
         You can find our Terms of Service at:{" "}
-        <Link
-          href="https://aspen.cziscience.com/terms"
-          target="_blank"
-          rel="noopener"
-        >
+        <NewTabLink href="https://aspen.cziscience.com/terms">
           https://aspen.cziscience.com/terms
-        </Link>
+        </NewTabLink>
       </P>
 
       <P>A summary of key things to know: </P>
@@ -225,13 +187,9 @@ export default function Faq(): JSX.Element {
             first two weeks after upload. &quot;Private&quot; samples are not
             shared with CDPH or GISAID, but are visible to your group. (For now,
             please send us a quick{" "}
-            <Link
-              href="mailto:helloaspen@chanzuckerberg.com"
-              target="_blank"
-              rel="noopener"
-            >
+            <NewTabLink href="mailto:helloaspen@chanzuckerberg.com">
               email
-            </Link>{" "}
+            </NewTabLink>{" "}
             to mark samples as &quot;private.&quot;)
           </span>,
           `Aspen does not support protected health information.`,
@@ -285,16 +243,10 @@ export default function Faq(): JSX.Element {
         In our work with any service provider, we always prioritize the security
         of your data and preventing unauthorized access (e.g., by encrypting
         your data at rest and in transit). All service providers are bound by
-        Aspen’s{" "}
-        <Link href={ROUTES.TERMS} target="_blank" rel="noopener">
-          Terms of Service
-        </Link>{" "}
-        and{" "}
-        <Link href={ROUTES.PRIVACY} target="_blank" rel="noopener">
-          Privacy Policy
-        </Link>
-        , and are only permitted to use your data to provide the relevant
-        services that we rely on in order to offer Aspen to you.
+        Aspen’s <NewTabLink href={ROUTES.TERMS}>Terms of Service</NewTabLink>{" "}
+        and <NewTabLink href={ROUTES.PRIVACY}>Privacy Policy</NewTabLink>, and
+        are only permitted to use your data to provide the relevant services
+        that we rely on in order to offer Aspen to you.
       </P>
 
       <H3>How do I share my data with CDPH?</H3>

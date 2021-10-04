@@ -1,9 +1,10 @@
 import { Dialog } from "@material-ui/core";
 import { AlertTitle } from "@material-ui/lab";
-import { Alert, Button, Link } from "czifui";
+import { Alert, Button } from "czifui";
 import NextLink from "next/link";
 import React, { useState } from "react";
 import { useMutation } from "react-query";
+import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { createSamples } from "src/common/queries/samples";
 import { ROUTES } from "src/common/routes";
 import { ContinueButton } from "../../../common/style";
@@ -128,13 +129,9 @@ export default function Upload({
           </AlertTitle>
           <div>
             You may retry or{" "}
-            <Link
-              href="mailto:helloaspen@chanzuckerberg.com"
-              target="_blank"
-              rel="noopener"
-            >
+            <NewTabLink href="mailto:helloaspen@chanzuckerberg.com">
               contact us
-            </Link>{" "}
+            </NewTabLink>{" "}
             for help.
           </div>
           {message && <div>System message: {message}</div>}
