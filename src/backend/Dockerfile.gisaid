@@ -61,6 +61,7 @@ RUN mkdir /ncov && \
     git reset --hard FETCH_HEAD
 
 # Poetry: install app
+WORKDIR /usr/src/app
 COPY pyproject.toml poetry.lock environment.yaml ./
 COPY third-party ./third-party
 RUN /opt/poetry/bin/poetry config virtualenvs.create false && \
