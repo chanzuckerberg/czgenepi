@@ -1,27 +1,39 @@
 FROM python:3.9.1-slim AS base
 ENV FLASK_APP=aspen.main
 EXPOSE 3000
-RUN pip install --no-cache-dir pipenv
+
+# Install poetry
+ENV POETRY_HOME /opt/poetry/
+RUN apt update && apt install -y libdigest-sha-perl wget
+RUN wget https://raw.githubusercontent.com/python-poetry/poetry/1.1.10/get-poetry.py && \
+    echo "e973b3badb95a916bfe250c22eeb7253130fd87312afa326eb02b8bdcea8f4a7  get-poetry.py" > get-poetry.py.sha256 && \
+    shasum -a 256 -c get-poetry.py.sha256 && \
+    python get-poetry.py && \
+    rm get-poetry*
+
 WORKDIR /usr/src/app
-COPY requirements.txt .
-COPY Pipfile* ./
-COPY third-party ./third-party/
-ENV FLASK_ENV=development
-ENV PIPENV_PYTHON=/usr/src/app/
-COPY setup.py .
-RUN pipenv install --dev --system --verbose && pipenv --clear
-RUN apt-get update && apt-get install make
-RUN apt-get install -y wget
-RUN apt-get install -y git
-RUN apt-get install -y jq
-RUN pip install awscli
+
+RUN apt-get update && apt-get install -y make wget git jq
+
 # install miniconda
 RUN wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
 RUN chmod +x Miniconda3-latest-Linux-x86_64.sh
 RUN ./Miniconda3-latest-Linux-x86_64.sh -b -p $HOME/miniconda
 RUN eval "$($HOME/miniconda/bin/conda shell.bash hook)" && conda init
 
-COPY . .
-
 # install pangolin
-RUN /usr/src/app/aspen/workflows/pangolin/install_pangolin.sh
+COPY aspen/workflows/pangolin/install_pangolin.sh .
+RUN bash install_pangolin.sh
+
+# Poetry: install app
+COPY pyproject.toml .
+COPY poetry.lock .
+COPY environment.yaml .
+COPY third-party ./third-party/
+RUN /opt/poetry/bin/poetry config virtualenvs.create false && \
+    /opt/poetry/bin/poetry install
+ENV PYTHONPATH=.
+
+COPY . .
+# Install the aspen package
+RUN /opt/poetry/bin/poetry install

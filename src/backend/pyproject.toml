@@ -1,3 +1,67 @@
-[build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta:__legacy__"
+[tool.poetry]
+name = "aspen"
+version = "0.1.0"
+description = "ASPEN.  Covid Tracking 2.0"
+authors = ["Aspen Team <info@chanzuckerberg.com>"]
+
+[tool.poetry.scripts]
+aspen-cli = "aspen.cli.toplevel:cli"
+
+[tool.poetry.dependencies]
+auth0-python = "3.16.2"
+awscli = "^1.16.180"
+python = "^3.7"
+Authlib = "0.15.4"
+blinker = "1.4"
+boto3 = "1.18.0"
+botocore = "1.21.23"
+certifi = "2021.5.30"
+cffi = "1.14.6"
+charset-normalizer = "2.0.4"
+click = "7.1.2"
+cryptography = "3.4.7"
+Flask-Cors = "3.0.10"
+Flask = "2.0.1"
+greenlet = "1.1.1"
+idna = "3.2"
+itsdangerous = "2.0.1"
+Jinja2 = "3.0.1"
+jmespath = "0.10.0"
+marshmallow = "3.13.0"
+MarkupSafe = "2.0.1"
+psycopg2-binary = "2.9.1"
+pycparser = "2.20"
+python-dateutil = "2.8.2"
+python-dotenv = "0.19.0"
+pytz = "2021.1"
+requests = "2.26.0"
+s3transfer = "0.5.0"
+sentry-sdk = {version = "1.3.1", extras = ["flask"]}
+six = "1.16.0"
+smart-open = "5.1.0"
+SQLAlchemy-Utils = "0.37.8"
+SQLAlchemy = "1.4.22"
+urllib3 = "1.26.6"
+Werkzeug = "2.0.1"
+sqlalchemy-enum-tables = {path = "third-party/sqlalchemy-enum-tables"}
+asyncpg = "^0.24.0"
+fastapi = "^0.68.1"
+uvicorn = {extras = ["standard"], version = "^0.15.0"}
+gunicorn = "^20.1.0"
+
+[tool.poetry.dev-dependencies]
+alembic = "^1.7.3"
+pytest = "6.2.4"
+pytest-xdist = "^2.4.0"
+pytest-mock = "^3.6.1"
+isort = "^5.9.3"
+moto = "^2.2.8"
+tqdm = "^4.62.3"
+flake8 = "^3.9.2"
+black = "^21.9b0"
+ipython = "^7.28.0"
+mypy = "^0.910"
+sqlalchemy-stubs = "^0.4"
+types-pytz = "^2021.1.2"
+types-requests = "^2.25.9"
+typing-extensions = "^3.10.0"
