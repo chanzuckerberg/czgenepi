@@ -1,9 +1,10 @@
 from fastapi import Depends, FastAPI
+from functools import partial
 
 from aspen.api.config.config import settings
 from aspen.api.deps import set_db
 from aspen.api.error.http_exceptions import AspenException, exception_handler
-from aspen.api.views.health import router as health_router
+from aspen.api.views import health
 
 
 def get_app() -> FastAPI:
@@ -12,12 +13,12 @@ def get_app() -> FastAPI:
         debug=settings.DEBUG,
         openapi_url="/v2/openapi.json",
         docs_url="/v2/docs",
-        dependencies=[Depends(set_db)],
+        dependencies=[Depends(partial(set_db, settings))],
     )
 
     # Warning - do not enable this route!
-    # _app.include_router(user_router, prefix="/v2/users")
-    _app.include_router(health_router, prefix="/v2/health")
+    # _app.include_router(users.router, prefix="/v2/users")
+    _app.include_router(health.router, prefix="/v2/health")
 
     _app.add_exception_handler(
         AspenException,

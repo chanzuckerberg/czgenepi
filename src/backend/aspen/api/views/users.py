@@ -13,7 +13,7 @@ async def list_users() -> userlistschema:
     return userlistschema.parse_obj({"items": objects})
 
 
-@router.get("/{user_id}/", response_model=userschema)
+@router.get("/{user_id}", response_model=userschema)
 async def get_user(user_id: int) -> userschema:
     instance = await User.get_by_id(user_id)
     if not instance:

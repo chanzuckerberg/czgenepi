@@ -3,7 +3,6 @@ from typing import Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from aspen.api.config.config import settings
 from aspen.database.connection import init_async_db
 
 session_context_var: ContextVar[Optional[AsyncSession]] = ContextVar(
@@ -11,7 +10,7 @@ session_context_var: ContextVar[Optional[AsyncSession]] = ContextVar(
 )
 
 
-async def set_db():
+async def set_db(settings):
     """Store db session in the context var and reset it"""
     db = init_async_db(settings.DB_DSN)
     session = db.make_session()
