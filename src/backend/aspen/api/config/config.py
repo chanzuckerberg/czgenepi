@@ -72,7 +72,8 @@ class Settings(BaseSettings):
 
     @property
     def AUTH0_CALLBACK_URL(self) -> str:
-        raise NotImplementedError()
+        # TODO FIXME
+        return "http://backend.genepinet.local:3000/callback"
 
     @property
     def AUTH0_CLIENT_SECRET(self) -> str:
