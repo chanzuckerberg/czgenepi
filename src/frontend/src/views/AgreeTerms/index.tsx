@@ -9,22 +9,48 @@ import DialogContent from "src/common/components/library/Dialog/components/Dialo
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import ENV from "src/common/constants/ENV";
-import { useUpdateUserInfo } from "src/common/queries/auth";
+import { useUserInfo, useUpdateUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
 import { CURRENT_POLICY_VERSION } from "src/components/AcknowledgePolicyChanges";
 import { PageContent } from "../../common/styles/mixins/global";
 import { Details, SpacedBold, Title } from "./style";
 
-export default function AgreeTerms(): JSX.Element {
+export default function AgreeTerms(): JSX.Element | null {
   const [isLoading, setIsLoading] = useState(false);
+  // `isTosViewable` -- Should user see ToS page? Only toggles 0 or 1 per mount.
+  // Prevents flashing page at users who should be redirected instead of seeing it.
+  const [isTosViewable, setIsTosViewable] = useState(false);
   const [shouldRedirect, setShouldRedirect] = useState(false);
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
   const router = useRouter();
+  const {
+    data: userInfo,
+    isLoading: isLoadingUserInfo,
+  } = useUserInfo();
   const {
     mutate: updateUserInfo,
     isSuccess,
     isLoading: isUpdatingUserInfo,
   } = useUpdateUserInfo();
+
+  // Only show the page to logged in users who have not already agreed to ToS
+  useEffect(() => {
+    console.log("AgreeTerms useEffect is firing"); // REMOVE
+    // Wait for `useUserInfo` to complete; ToS interaction redirects take precedence
+    if (!isTosViewable && !isLoadingUserInfo) {
+      console.log("isLoading completed in useProtectedRoute effect"); // REMOVE
+      const agreedToTOS = userInfo?.user?.agreedToTos;
+      if (!userInfo) { // Lack of userInfo implicitly means user is not logged in.
+        console.log('Pushing to Homepage from inside AgreeTerms!') // REMOVE
+        router.push(ROUTES.HOMEPAGE);
+      } else if (agreedToTOS) {
+        console.log('Pushing to data page from inside AgreeTerms!'); //REMOVE
+        router.push(ROUTES.DATA);
+      } else { // else case: User logged in, not agreed to ToS. Show the page.
+        setIsTosViewable(true);
+      }
+    }
+  }, [isTosViewable, isLoadingUserInfo, userInfo, router]);
 
   useEffect(() => {
     if (shouldRedirect) {
@@ -54,6 +80,12 @@ export default function AgreeTerms(): JSX.Element {
     setHasAcceptedTerms(true);
   }
 
+  // Don't want to display ToS instantly on visiting page.
+  // Wait until established if they should be shown it (or get redirected instead)
+  if (!isTosViewable) {
+    return null;
+  }
+  // Okay, user needs to agree to ToS before they can use the app. Show them page.
   return (
     <>
       <Head>
