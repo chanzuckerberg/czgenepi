@@ -17,6 +17,7 @@ import DownloadModal from "./components/DownloadModal";
 import { IconButton } from "./components/IconButton";
 import { TreeCreateHelpLink } from "./components/TreeCreateHelpLink";
 import { TreeSelectionMenu } from "./components/TreeSelectionMenu";
+import { UsherConfirmationModal } from "./components/UsherConfirmationModal";
 import style from "./index.module.scss";
 import {
   CreateTreeModalDiv,
@@ -152,6 +153,7 @@ const DataSubview: FunctionComponent<Props> = ({
     useState<boolean>(false);
   const [hasCreateTreeStarted, setCreateTreeStarted] = useState<boolean>(false);
   const [didCreateTreeFailed, setCreateTreeFailed] = useState<boolean>(false);
+  const [isUsherConfirmOpen, setIsUsherConfirmOpen] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const handleDownloadClickOpen = () => {
     setDownloadModalOpen(true);
@@ -329,6 +331,10 @@ const DataSubview: FunctionComponent<Props> = ({
               onClose={handleCreateTreeClose}
               handleCreateTreeFailed={handleCreateTreeFailed}
               handleSetCreateTreeStarted={handleSetCreateTreeStarted}
+            />
+            <UsherConfirmationModal
+              isOpen={isUsherConfirmOpen}
+              onClose={() => setIsUsherConfirmOpen(false)}
             />
           </>
         )}
