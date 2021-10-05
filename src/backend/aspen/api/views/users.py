@@ -3,12 +3,14 @@ from fastapi import APIRouter, HTTPException
 from aspen.api.schemas.users import User as userschema
 from aspen.api.schemas.users import Users as userlistschema
 from aspen.database.models.usergroup import User
+from starlette.requests import Request
 
 router = APIRouter()
 
 
 @router.get("/", response_model=userlistschema)
-async def list_users() -> userlistschema:
+async def list_users(request: Request) -> userlistschema:
+    print(request.session)
     objects = await User.all()
     return userlistschema.parse_obj({"items": objects})
 
