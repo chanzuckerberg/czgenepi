@@ -72,8 +72,11 @@ class Settings(BaseSettings):
 
     @property
     def AUTH0_CALLBACK_URL(self) -> str:
-        # TODO FIXME
-        return "http://backend.genepinet.local:3000/callback"
+        flask_env = os.environ.get("FLASK_ENV")
+        if flask_env == "production":
+            return f"{os.getenv('API_URL', '')}/v2/auth/callback"
+        else:
+            return "http://backend.genepinet.local:3000/v2/auth/callback"
 
     @property
     def AUTH0_CLIENT_SECRET(self) -> str:
