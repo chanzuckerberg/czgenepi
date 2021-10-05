@@ -124,8 +124,12 @@ check-images: ## Spot-check the gisaid image
 	docker-compose $(COMPOSE_OPTS) run --no-deps --rm pangolin /usr/src/app/aspen/workflows/test-pangolin.sh
 
 .PHONY: imagecheck-aspen-%
-imagecheck-aspen-%: ## Spot-check the gisaid image
+imagecheck-aspen-%: ## Spot-check backend/batch images
 	docker run --rm $(IMAGE) /usr/src/app/aspen/workflows/test-$(subst imagecheck-aspen-,,$@).sh
+
+.PHONY: imagecheck-aspen-frontend
+imagecheck-aspen-frontend: ## Spot-check frontend image
+	true
 
 .PHONY: backend-debugger
 backend-debugger: ## Attach to the backend service (useful for pdb)
