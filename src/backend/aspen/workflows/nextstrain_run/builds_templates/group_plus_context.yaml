@@ -32,7 +32,6 @@ refine:
 
 
 ## Subsampling schemas
-## not subsample Aspen data by location
 subsampling:
   group_plus_context:
     group:
@@ -43,7 +42,7 @@ subsampling:
     state:
       group_by: "location year month"
       max_sequences: 500
-      query: --query "(location != '{{location}}') & (division == '{{division}}')" # exclude add'l samples from {{location}}
+      query: --query "(location != '{{location}}') & (division == '{{division}}')" # exclude add'l samples from location
       priorities:
         type: "proximity"
         focus: "group"
@@ -51,7 +50,7 @@ subsampling:
     country:
       group_by: "division year month"
       max_sequences: 400
-      query: --query "(division != '{{division}}') & (country == '{{country}}')" # exclude add'l samples from CA
+      query: --query "(division != '{{division}}') & (country == '{{country}}')" # exclude add'l samples from division
       priorities:
         type: "proximity"
         focus: "group"
@@ -59,7 +58,7 @@ subsampling:
     international:
       group_by: "region year month"
       max_sequences: 100
-      query: --query "(country != '{{country}}')" # exclude add'l samples from USA
+      query: --query "(country != '{{country}}')" # exclude add'l samples from country
       priorities:
           type: "proximity"
           focus: "group"
