@@ -75,19 +75,21 @@ export function useProtectedRoute(): UseQueryResult<UserResponse, unknown> {
   const result = useUserInfo();
 
   const { isLoading, data } = result;
-  const agreedToTOS = data?.user?.agreedToTos;
 
   useEffect(() => {
-    if (!isLoading && !data) {
-      router.push(ROUTES.HOMEPAGE);
+    console.log("useProtectedRoute useEffect is firing"); // REMOVE
+    if (!isLoading) { // Wait for the `useUserInfo` call to complete
+      console.log("isLoading completed in useProtectedRoute effect"); // REMOVE
+      const agreedToTOS = data?.user?.agreedToTos;
+      if (!data) { // Lack of user data implicitly means user is not logged in.
+        console.log('Pushing to Homepage!') // REMOVE
+        router.push(ROUTES.HOMEPAGE);
+      } else if (!agreedToTOS && router.asPath !== ROUTES.AGREE_TERMS) {
+        console.log('Pushing to agree terms!'); //REMOVE
+        router.push(ROUTES.AGREE_TERMS);
+      } // else case: User is logged in and has agreed to ToS. Leave them be.
     }
   }, [isLoading, data, router]);
-
-  useEffect(() => {
-    if (!isLoading && !agreedToTOS && router.asPath !== ROUTES.AGREE_TERMS) {
-      router.push(ROUTES.AGREE_TERMS);
-    }
-  }, [isLoading, data, router, agreedToTOS]);
 
   return result;
 }
