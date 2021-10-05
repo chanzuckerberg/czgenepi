@@ -153,7 +153,7 @@ const DataSubview: FunctionComponent<Props> = ({
     useState<boolean>(false);
   const [hasCreateTreeStarted, setCreateTreeStarted] = useState<boolean>(false);
   const [didCreateTreeFailed, setCreateTreeFailed] = useState<boolean>(false);
-  const [isUsherConfirmOpen, setIsUsherConfirmOpen] = useState<boolean>(true);
+  const [isUsherConfirmOpen, setIsUsherConfirmOpen] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const handleDownloadClickOpen = () => {
     setDownloadModalOpen(true);
