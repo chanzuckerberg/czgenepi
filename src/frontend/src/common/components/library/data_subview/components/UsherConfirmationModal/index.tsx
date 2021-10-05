@@ -1,7 +1,7 @@
 import React from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import usherLogo from "src/common/images/usher.png";
-import ConfirmDialog from "src/components/FilePicker/components/ConfirmDialog";
+import ConfirmDialog from "src/components/ConfirmDialog";
 import { StyledImg, StyledP } from "./style";
 
 interface Props {
