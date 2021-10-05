@@ -71,6 +71,14 @@ class Settings(BaseSettings):
         return self.AWS_SECRET["AUTH0_CLIENT_ID"]
 
     @property
+    def AUTH0_LOGOUT_URL(self) -> str:
+        flask_env = os.environ.get("FLASK_ENV")
+        if flask_env == "production":
+            return f"{self.AUTH0_BASE_URL}/v2/logout"
+        else:
+            return f"https://{self.AUTH0_DOMAIN}/Account/Logout"
+
+    @property
     def AUTH0_CALLBACK_URL(self) -> str:
         flask_env = os.environ.get("FLASK_ENV")
         if flask_env == "production":

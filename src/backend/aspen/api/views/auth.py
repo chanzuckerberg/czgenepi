@@ -1,4 +1,5 @@
 import os
+from urllib.parse import urlencode
 
 from authlib.integrations.starlette_client import OAuth
 from fastapi import APIRouter, HTTPException
@@ -64,4 +65,4 @@ async def logout(request: Request):
         "returnTo": os.getenv("FRONTEND_URL"),
         "client_id": settings.AUTH0_CLIENT_ID,
     }
-    return RedirectResponse(auth0.api_base_url + "/v2/logout?" + urlencode(params))
+    return RedirectResponse(f"{settings.AUTH0_LOGOUT_URL}?{urlencode(params)}")
