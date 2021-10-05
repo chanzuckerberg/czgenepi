@@ -32,7 +32,7 @@ export const StyledFooter = styled.div`
     return `
       color: ${colors?.gray[500]};
       padding: 0 ${spacings?.xxl}px ${spacings?.xxl}px ${spacings?.xxl}px;
-      margin: -${spacings?.s + spacings?.xl}px 0 0 0;
+      margin: -${(spacings?.s || 0) + (spacings?.xl || 0)}px 0 0 0;
     `;
   }}
 `;

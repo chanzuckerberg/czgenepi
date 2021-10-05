@@ -12,7 +12,7 @@ interface Props {
 const UsherConfirmationModal = ({ isOpen, onClose }: Props): JSX.Element => {
   const title = (
     <>
-      <StyledImg src={usherLogo} />
+      <StyledImg src={usherLogo as string} />
       <div>You are now leaving Aspen.</div>
     </>
   );

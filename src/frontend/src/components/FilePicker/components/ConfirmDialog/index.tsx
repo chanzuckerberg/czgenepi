@@ -10,7 +10,7 @@ interface Props {
   open: boolean;
   onClose: () => void;
   onConfirm: () => void;
-  title: string;
+  title: string | JSX.Element;
   content: string | JSX.Element;
   footer?: string;
 }
