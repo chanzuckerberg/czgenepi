@@ -69,6 +69,7 @@ METADATA_CSV_FIELDS = [
 @click.option(
     "county_metadata_fh", "--county-metadata", type=click.File("w"), required=False
 )
+@click.option("--test", type=bool, is_flag=True)
 def cli(
     phylo_run_id: int,
     sequences_fh: io.TextIOBase,
@@ -77,7 +78,11 @@ def cli(
     builds_file_fh: io.TextIOBase,
     county_sequences_fh: io.TextIOBase,
     county_metadata_fh: io.TextIOBase,
+    test: bool,
 ):
+    if test:
+        print("Success!")
+        return
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
 
     with session_scope(interface) as session:

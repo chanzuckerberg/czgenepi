@@ -19,6 +19,7 @@ from aspen.database.models import RawGisaidDump
 @click.option("--end-time", type=int, required=True)
 @click.option("--gisaid-s3-bucket", type=str, required=True)
 @click.option("--gisaid-s3-key", type=str, required=True)
+@click.option("--test", type=bool, is_flag=True)
 def cli(
     aspen_workflow_rev: str,
     aspen_creation_rev: str,
@@ -26,7 +27,11 @@ def cli(
     end_time: int,
     gisaid_s3_bucket: str,
     gisaid_s3_key: str,
+    test: bool,
 ):
+    if test:
+        print("Success!")
+        return
     start_time_datetime = datetime.datetime.fromtimestamp(start_time)
 
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))

@@ -29,6 +29,7 @@ from aspen.database.models.workflow import SoftwareNames
 @click.option("--gisaid-s3-bucket", type=str, required=True)
 @click.option("--gisaid-sequences-s3-key", type=str, required=True)
 @click.option("--gisaid-metadata-s3-key", type=str, required=True)
+@click.option("--test", type=bool, is_flag=True)
 def cli(
     aspen_workflow_rev: str,
     aspen_creation_rev: str,
@@ -40,7 +41,11 @@ def cli(
     gisaid_s3_bucket: str,
     gisaid_sequences_s3_key: str,
     gisaid_metadata_s3_key: str,
+    test: bool,
 ):
+    if test:
+        print("Success!")
+        return
     start_time_datetime = datetime.datetime.fromtimestamp(start_time)
     end_time_datetime = datetime.datetime.fromtimestamp(end_time)
 
