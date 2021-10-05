@@ -51,6 +51,7 @@ def find_samples():
 
         return samples_to_be_updated
 
+
 @click.command("find_samples")
 @click.option("--test", type=bool, is_flag=True)
 def run_command(test: bool):
@@ -59,6 +60,7 @@ def run_command(test: bool):
         return
     samples = find_samples()
     subprocess.run(["bash", "run_pangolin.sh"] + samples)
+
 
 if __name__ == "__main__":
     run_command()
