@@ -16,35 +16,33 @@ import { PageContent } from "../../common/styles/mixins/global";
 import { Details, SpacedBold, Title } from "./style";
 
 export default function AgreeTerms(): JSX.Element | null {
-  const [isLoading, setIsLoading] = useState(false);
-  // `isTosViewable` -- Should user see ToS page? Only toggles 0 or 1 per mount.
+  // `isTosViewable` -- Should user see ToS page?
   // Prevents flashing page at users who should be redirected instead of seeing it.
   const [isTosViewable, setIsTosViewable] = useState(false);
-  const [shouldRedirect, setShouldRedirect] = useState(false);
-  const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
+
   const router = useRouter();
+
   const {
     data: userInfo,
     isLoading: isLoadingUserInfo,
   } = useUserInfo();
   const {
     mutate: updateUserInfo,
-    isSuccess,
+    // NOTE: We only update user info in case of acceptance, and we rely on this
+    // `isSuccess` to only kick off after accepting ToS. If we eventually need
+    // declining ToS to update the user info, this component will need refactoring.
+    isSuccess: isSuccessUpdatingUserInfo,
     isLoading: isUpdatingUserInfo,
   } = useUpdateUserInfo();
 
   // Only show the page to logged in users who have not already agreed to ToS
   useEffect(() => {
-    console.log("AgreeTerms useEffect is firing"); // REMOVE
     // Wait for `useUserInfo` to complete; ToS interaction redirects take precedence
     if (!isTosViewable && !isLoadingUserInfo) {
-      console.log("isLoading completed in useProtectedRoute effect"); // REMOVE
       const agreedToTOS = userInfo?.user?.agreedToTos;
       if (!userInfo) { // Lack of userInfo implicitly means user is not logged in.
-        console.log('Pushing to Homepage from inside AgreeTerms!') // REMOVE
         router.push(ROUTES.HOMEPAGE);
       } else if (agreedToTOS) {
-        console.log('Pushing to data page from inside AgreeTerms!'); //REMOVE
         router.push(ROUTES.DATA);
       } else { // else case: User logged in, not agreed to ToS. Show the page.
         setIsTosViewable(true);
@@ -53,31 +51,17 @@ export default function AgreeTerms(): JSX.Element | null {
   }, [isTosViewable, isLoadingUserInfo, userInfo, router]);
 
   useEffect(() => {
-    if (shouldRedirect) {
+    if (isSuccessUpdatingUserInfo) { // Backend successfully wrote the ToS acceptance
       router.push(ROUTES.DATA);
     }
-  }, [shouldRedirect, router]);
-
-  useEffect(() => {
-    if (!hasAcceptedTerms || isUpdatingUserInfo) return;
-    if (isSuccess) {
-      return setShouldRedirect(true);
-    }
-
-    agreeTos();
-
-    async function agreeTos() {
-      setIsLoading(true);
-      updateUserInfo({
-        // Agreeing to ToS also means implicit acknowledgment of current policies
-        acknowledged_policy_version: CURRENT_POLICY_VERSION,
-        agreed_to_tos: true,
-      });
-    }
-  }, [hasAcceptedTerms, isUpdatingUserInfo, isSuccess, updateUserInfo]);
+  }, [isSuccessUpdatingUserInfo, router]);
 
   function handleAcceptClick() {
-    setHasAcceptedTerms(true);
+    updateUserInfo({
+      // Agreeing to ToS also means implicit acknowledgment of current policies
+      acknowledged_policy_version: CURRENT_POLICY_VERSION,
+      agreed_to_tos: true,
+    });
   }
 
   // Don't want to display ToS instantly on visiting page.
@@ -148,7 +132,7 @@ export default function AgreeTerms(): JSX.Element | null {
           </DialogContent>
           <DialogActions>
             <Button
-              disabled={isLoading}
+              disabled={isUpdatingUserInfo}
               color="primary"
               variant="contained"
               isRounded
@@ -159,7 +143,7 @@ export default function AgreeTerms(): JSX.Element | null {
             </Button>
             <a href={ENV.API_URL + API.LOG_OUT}>
               <Button
-                disabled={isLoading}
+                disabled={isUpdatingUserInfo}
                 color="primary"
                 variant="outlined"
                 isRounded
