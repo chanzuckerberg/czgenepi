@@ -6,6 +6,7 @@ from aspen.api.middleware.session import SessionMiddleware
 
 from aspen.api.config.config import settings
 from aspen.api.deps import set_db
+from aspen.api.auth import get_auth_user
 from aspen.api.error.http_exceptions import AspenException, exception_handler
 from aspen.api.views import auth, health, users
 
@@ -37,7 +38,7 @@ def get_app() -> FastAPI:
     _app.add_middleware(SessionMiddleware, secret_key=settings.SECRET_KEY)
 
     # Warning - do not enable this route!
-    _app.include_router(users.router, prefix="/v2/users")
+    _app.include_router(users.router, prefix="/v2/users", dependencies=[Depends(get_auth_user)])
     _app.include_router(health.router, prefix="/v2/health")
     _app.include_router(auth.router, prefix="/v2/auth")
 

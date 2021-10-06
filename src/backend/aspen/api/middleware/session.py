@@ -78,14 +78,8 @@ class SessionMiddleware:
         await self.app(scope, receive, send_wrapper)
 
     def encode_flask_cookie(self, data):
-        print("=== Flask cookie encoding ===")
-        print(json.dumps(data))
         return self.signer.dumps(data)
 
     def decode_flask_cookie(self, cookie_text):
-        print("=== Flask cookie decoding ===")
-        print(cookie_text)
         cookie_data = self.signer.loads(cookie_text)
-        print("=== DECODED ===")
-        print(cookie_data)
         return self.signer.loads(cookie_text)

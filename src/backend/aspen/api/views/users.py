@@ -10,7 +10,6 @@ router = APIRouter()
 
 @router.get("/", response_model=userlistschema)
 async def list_users(request: Request) -> userlistschema:
-    print(request.session)
     objects = await User.all()
     return userlistschema.parse_obj({"items": objects})
 

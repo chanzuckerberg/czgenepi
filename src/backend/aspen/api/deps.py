@@ -28,3 +28,4 @@ def get_db():
     if session is None:
         raise Exception("Missing session")
     return session
+
