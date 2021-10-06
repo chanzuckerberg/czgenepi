@@ -17,6 +17,7 @@ import DownloadModal from "./components/DownloadModal";
 import { IconButton } from "./components/IconButton";
 import { TreeCreateHelpLink } from "./components/TreeCreateHelpLink";
 import { TreeSelectionMenu } from "./components/TreeSelectionMenu";
+import { UsherConfirmationModal } from "./components/UsherConfirmationModal";
 import { UsherPreparingModal } from "./components/UsherPreparingModal";
 import style from "./index.module.scss";
 import {
@@ -153,6 +154,7 @@ const DataSubview: FunctionComponent<Props> = ({
     useState<boolean>(false);
   const [hasCreateTreeStarted, setCreateTreeStarted] = useState<boolean>(false);
   const [didCreateTreeFailed, setCreateTreeFailed] = useState<boolean>(false);
+  const [isUsherConfirmOpen, setIsUsherConfirmOpen] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isUsherPreparingOpen, setIsUsherPreparingOpen] =
     useState<boolean>(false);
@@ -333,12 +335,16 @@ const DataSubview: FunctionComponent<Props> = ({
               handleCreateTreeFailed={handleCreateTreeFailed}
               handleSetCreateTreeStarted={handleSetCreateTreeStarted}
             />
+            <UsherConfirmationModal
+              isOpen={isUsherConfirmOpen}
+              onClose={() => setIsUsherConfirmOpen(false)}
+            />
+            <UsherPreparingModal
+              isOpen={isUsherPreparingOpen}
+              onClose={() => setIsUsherPreparingOpen(false)}
+            />
           </>
         )}
-        <UsherPreparingModal
-          isOpen={isUsherPreparingOpen}
-          onClose={() => setIsUsherPreparingOpen(false)}
-        />
         <StyledFlexChildDiv className={style.samplesRoot}>
           <div className={style.searchBar}>
             <div className={style.searchInput}>
