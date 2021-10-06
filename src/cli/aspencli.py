@@ -263,11 +263,11 @@ def user():
     pass
 
 
-@user.command(name="list")
+@user.command(name="me")
 @click.pass_context
-def list(ctx):
+def me(ctx):
     api_client = ctx.obj["api_client"]
-    resp = api_client.get("/v2/users/")
+    resp = api_client.get("/v2/users/me")
     print(resp.text)
 
 

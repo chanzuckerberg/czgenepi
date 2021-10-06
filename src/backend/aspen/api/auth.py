@@ -28,7 +28,7 @@ async def setup_userinfo(user_id):
     try:
         userquery = get_usergroup_query(session, user_id)
         userwait = await session.execute(userquery)
-        user = userwait.unique().one()
+        user = userwait.unique().scalars().first()
     except NoResultFound:
         # sentry_sdk.capture_message(
         #     f"Requested auth0_user_id {user_id} not found in usergroup query."
