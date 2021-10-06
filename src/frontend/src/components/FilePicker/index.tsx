@@ -1,6 +1,6 @@
 import { Button } from "czifui";
 import React, { useRef, useState } from "react";
-import ConfirmDialog from "./components/ConfirmDialog";
+import ConfirmDialog from "../ConfirmDialog";
 import { HiddenInput } from "./style";
 
 interface Props {

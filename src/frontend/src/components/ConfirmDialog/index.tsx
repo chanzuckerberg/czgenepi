@@ -4,14 +4,15 @@ import React from "react";
 import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
-import { Content, Title } from "./style";
+import { Content, StyledFooter, Title } from "./style";
 
 interface Props {
   open: boolean;
   onClose: () => void;
   onConfirm: () => void;
-  title: string;
-  content: string;
+  title: string | JSX.Element;
+  content: string | JSX.Element;
+  footer?: string;
 }
 
 export default function ConfirmDialog({
@@ -20,6 +21,7 @@ export default function ConfirmDialog({
   onConfirm,
   title,
   content,
+  footer,
 }: Props): JSX.Element {
   return (
     <Dialog
@@ -47,6 +49,7 @@ export default function ConfirmDialog({
           Cancel
         </Button>
       </DialogActions>
+      <StyledFooter>{footer}</StyledFooter>
     </Dialog>
   );
 }
