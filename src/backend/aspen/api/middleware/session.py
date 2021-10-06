@@ -1,30 +1,33 @@
-import json
+import hashlib
 import typing
-from base64 import b64decode, b64encode
 
-import itsdangerous
+from flask.json.tag import TaggedJSONSerializer
+from flask.sessions import SecureCookieSessionInterface
+from itsdangerous import URLSafeTimedSerializer
 from itsdangerous.exc import BadSignature
-
 from starlette.datastructures import MutableHeaders, Secret
 from starlette.requests import HTTPConnection
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
-from flask.sessions import SecureCookieSessionInterface
 
 
 class SessionMiddleware:
     def __init__(
         self,
         app: ASGIApp,
-        secret_key: typing.Union[str, Secret],
+        secret_key: str,
         session_cookie: str = "session",
         max_age: int = 14 * 24 * 60 * 60,  # 14 days, in seconds
         same_site: str = "lax",
         https_only: bool = False,
     ) -> None:
         self.app = app
-        self.secret_key = secret_key # This must be set so the signing serializer can access it.
-        cookie_encoder = SecureCookieSessionInterface()
-        self.signer = cookie_encoder.get_signing_serializer(self)
+        signer_kwargs = dict(key_derivation="hmac", digest_method=hashlib.sha1)
+        self.signer = URLSafeTimedSerializer(
+            secret_key,
+            salt="cookie-session",
+            serializer=TaggedJSONSerializer(),
+            signer_kwargs=signer_kwargs,
+        )
         self.session_cookie = session_cookie
         self.max_age = max_age
         self.security_flags = "httponly; samesite=" + same_site
@@ -81,5 +84,4 @@ class SessionMiddleware:
         return self.signer.dumps(data)
 
     def decode_flask_cookie(self, cookie_text):
-        cookie_data = self.signer.loads(cookie_text)
         return self.signer.loads(cookie_text)

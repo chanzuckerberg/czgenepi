@@ -259,6 +259,19 @@ def get_link(ctx, sample_ids):
 
 
 @cli.group()
+def user():
+    pass
+
+
+@user.command(name="list")
+@click.pass_context
+def list(ctx):
+    api_client = ctx.obj["api_client"]
+    resp = api_client.get("/v2/users/")
+    print(resp.text)
+
+
+@cli.group()
 def userinfo():
     pass
 
