@@ -2,7 +2,6 @@ from fastapi import APIRouter, HTTPException
 from starlette.requests import Request
 
 from aspen.api.schemas.users import User as userschema
-from aspen.api.schemas.users import Users as userlistschema
 from aspen.database.models.usergroup import User
 
 router = APIRouter()

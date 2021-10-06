@@ -1,11 +1,9 @@
 import hashlib
-import typing
 
 from flask.json.tag import TaggedJSONSerializer
-from flask.sessions import SecureCookieSessionInterface
 from itsdangerous import URLSafeTimedSerializer
 from itsdangerous.exc import BadSignature
-from starlette.datastructures import MutableHeaders, Secret
+from starlette.datastructures import MutableHeaders
 from starlette.requests import HTTPConnection
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
