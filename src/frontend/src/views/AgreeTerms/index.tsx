@@ -9,7 +9,7 @@ import DialogContent from "src/common/components/library/Dialog/components/Dialo
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import ENV from "src/common/constants/ENV";
-import { useUserInfo, useUpdateUserInfo } from "src/common/queries/auth";
+import { useUpdateUserInfo, useUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
 import { CURRENT_POLICY_VERSION } from "src/components/AcknowledgePolicyChanges";
 import { PageContent } from "../../common/styles/mixins/global";
@@ -22,10 +22,7 @@ export default function AgreeTerms(): JSX.Element | null {
 
   const router = useRouter();
 
-  const {
-    data: userInfo,
-    isLoading: isLoadingUserInfo,
-  } = useUserInfo();
+  const { data: userInfo, isLoading: isLoadingUserInfo } = useUserInfo();
   const {
     mutate: updateUserInfo,
     // NOTE: We only update user info in case of acceptance, and we rely on this
@@ -35,23 +32,28 @@ export default function AgreeTerms(): JSX.Element | null {
     isLoading: isUpdatingUserInfo,
   } = useUpdateUserInfo();
 
-  // Only show the page to logged in users who have not already agreed to ToS
+  // Only show the page to logged in users who have not already agreed to ToS.
+  // If they're not in that specific overlap, we'll redirect them elsewhere.
   useEffect(() => {
-    // Wait for `useUserInfo` to complete; ToS interaction redirects take precedence
+    // Once we show, we no longer consider redirecting.
+    // But before we show, we need to wait for userInfo to load.
     if (!isTosViewable && !isLoadingUserInfo) {
       const agreedToTOS = userInfo?.user?.agreedToTos;
-      if (!userInfo) { // Lack of userInfo implicitly means user is not logged in.
+      if (!userInfo) {
+        // Lack of userInfo implicitly means user is not logged in.
         router.push(ROUTES.HOMEPAGE);
       } else if (agreedToTOS) {
         router.push(ROUTES.DATA);
-      } else { // else case: User logged in, not agreed to ToS. Show the page.
+      } else {
+        // User is logged in, but not agreed to ToS. Show the ToS page.
         setIsTosViewable(true);
       }
     }
   }, [isTosViewable, isLoadingUserInfo, userInfo, router]);
 
   useEffect(() => {
-    if (isSuccessUpdatingUserInfo) { // Backend successfully wrote the ToS acceptance
+    if (isSuccessUpdatingUserInfo) {
+      // Backend successfully wrote the ToS acceptance
       router.push(ROUTES.DATA);
     }
   }, [isSuccessUpdatingUserInfo, router]);

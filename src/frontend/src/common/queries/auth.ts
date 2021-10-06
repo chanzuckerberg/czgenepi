@@ -39,7 +39,11 @@ const USER_MAP = new Map<string, keyof User>([
 ]);
 
 export const fetchUserInfo = (): Promise<UserResponse> => {
-  return apiResponse<UserResponse>(["group", "user"], [null, USER_MAP], API.USER_INFO);
+  return apiResponse<UserResponse>(
+    ["group", "user"],
+    [null, USER_MAP],
+    API.USER_INFO
+  );
 };
 
 const updateUserInfo = (user: Partial<User>): Promise<Response> => {
@@ -78,9 +82,11 @@ export function useProtectedRoute(): UseQueryResult<UserResponse, unknown> {
   const { isLoading, data } = result;
 
   useEffect(() => {
-    if (!isLoading) { // Wait for the `useUserInfo` call to complete
+    // Wait for the `useUserInfo` call to complete
+    if (!isLoading) {
       const agreedToTOS = data?.user?.agreedToTos;
-      if (!data) { // Lack of user data implicitly means user is not logged in.
+      if (!data) {
+        // Lack of user data implicitly means user is not logged in.
         router.push(ROUTES.HOMEPAGE);
       } else if (!agreedToTOS && router.asPath !== ROUTES.AGREE_TERMS) {
         router.push(ROUTES.AGREE_TERMS);
