@@ -15,6 +15,10 @@ interface CreateTreePayload {
   tree_type: string;
 }
 
+interface getFastaURLPayload {
+  samples: string[];
+}
+
 // * these two types should stay in sync. There is technically a way to do it in TS, but it is
 // * very convoluted: https://stackoverflow.com/questions/44323441
 interface CreateTreeType {
@@ -43,6 +47,23 @@ export async function createTree({
     tree_type: treeType,
   };
   const response = await fetch(API_URL + API.CREATE_TREE, {
+    ...DEFAULT_POST_OPTIONS,
+    body: JSON.stringify(payload),
+  });
+  if (response.ok) return await response.json();
+
+  throw Error(`${response.statusText}: ${await response.text()}`);
+}
+
+export async function getFastaURL({
+  sampleIds,
+}: {
+  sampleIds: string[];
+}): Promise<unknown> {
+  const payload: getFastaURLPayload = {
+    samples: sampleIds,
+  };
+  const response = await fetch(API_URL + API.GET_FASTA_URL, {
     ...DEFAULT_POST_OPTIONS,
     body: JSON.stringify(payload),
   });

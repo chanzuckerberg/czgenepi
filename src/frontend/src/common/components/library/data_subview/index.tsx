@@ -18,8 +18,8 @@ import { IconButton } from "./components/IconButton";
 import { TreeCreateHelpLink } from "./components/TreeCreateHelpLink";
 import { TreeSelectionMenu } from "./components/TreeSelectionMenu";
 import { UsherConfirmationModal } from "./components/UsherConfirmationModal";
-import { UsherPreparingModal } from "./components/UsherPreparingModal";
 import { UsherModal } from "./components/UsherModal";
+import { UsherPreparingModal } from "./components/UsherPreparingModal";
 import style from "./index.module.scss";
 import {
   CreateTreeModalDiv,
