@@ -26,7 +26,7 @@ aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$aspen_config")"
 mkdir -p ncov/my_profiles/aspen ncov/results
 (cd ncov &&
  git init &&
- git fetch --depth 1 git://github.com/nextstrain/ncov.git &&
+ git fetch --depth 1 git://github.com/nextstrain/ncov.git 30435fb &&
  git checkout FETCH_HEAD
 )
 ncov_git_rev=$(cd ncov && git rev-parse HEAD)
