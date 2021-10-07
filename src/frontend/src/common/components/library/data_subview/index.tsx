@@ -172,6 +172,10 @@ const DataSubview: FunctionComponent<Props> = ({
     setIsNSCreateTreeModalOpen(false);
   };
 
+  const handleUsherModalOpen = () => {
+    setUsherModalOpen(true);
+  };
+
   const handleUsherModalClose = () => {
     setUsherModalOpen(false);
   };
@@ -297,6 +301,7 @@ const DataSubview: FunctionComponent<Props> = ({
           <TreeSelectionMenu
             isDisabled={isCreateTreeDisabled}
             handleCreateNSTreeOpen={handleCreateNSTreeOpen}
+            handleCreateUsherTreeOpen={handleUsherModalOpen}
           />
           <IconButton
             onClick={handleDownloadClickOpen}

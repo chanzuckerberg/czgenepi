@@ -55,7 +55,7 @@ const SAMPLES_PER_SUBTREE_TOOLTIP_TEXT = (
   </div>
 );
 
-
+// TODO (mlila): give this a more specific name since there are 3 modals related to usher
 export const UsherModal = ({
   sampleIds,
   failedSamples,
