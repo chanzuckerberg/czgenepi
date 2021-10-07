@@ -3,7 +3,9 @@ name: Scheduled Prod Deploy
 on:
   schedule:
     # Weekly Mondays & Thursdays @ 15:00 UTC (8am PST)
-    - cron: '0 15 * * 1,4'
+    # - cron: '0 15 * * 1,4'
+    # Weekly Mondays 15:00 UTC (8am PST)
+    - cron: '0 15 * * 1'
 
 env:
   DOCKER_BUILDKIT: 1
