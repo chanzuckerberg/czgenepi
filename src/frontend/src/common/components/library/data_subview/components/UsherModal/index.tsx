@@ -1,6 +1,7 @@
 import { Dialog } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import React, { useState } from "react";
+import { NewTabLink } from "src/common/components/library/NewTabLink";
 import {
   Content,
   StyledButton,
@@ -11,7 +12,7 @@ import {
   Title,
   TreeNameInfoWrapper,
   TreeNameSection,
-} from "../createTreeModal/style";
+} from "../CreateNSTreeModal/style";
 import { Header, StyledIconButton } from "../DownloadModal/style";
 import {
   FieldTitle,
@@ -28,6 +29,31 @@ interface Props {
   open: boolean;
   onClose: () => void;
 }
+
+const MAIN_USHER_TOOLTIP_TEXT = (
+  <div>
+    UShER is a third-party tool and has its own policies.{" "}
+    <NewTabLink href="https://genome.ucsc.edu/cgi-bin/hgPhyloPlace">
+      Learn more about UShER.
+    </NewTabLink>
+  </div>
+);
+
+const PHYLOGENETIC_TREE_VERSION_TOOLTIP_TEXT = (
+  <div>
+    Phylogenetic trees are updated daily by UShER.{" "}
+    <NewTabLink href="https://pubmed.ncbi.nlm.nih.gov/34469548">
+      Learn more.
+    </NewTabLink>
+  </div>
+);
+
+const SAMPLES_PER_SUBTREE_TOOLTIP_TEXT = (
+  <div>
+    We recommend setting this number to at least 5x the number of selected samples, and no less than 50.
+  </div>
+);
+
 
 export const UsherModal = ({
   sampleIds,
@@ -54,8 +80,8 @@ export const UsherModal = ({
           <Header>Run Phylogenetic Placement with UShER</Header>
           <StyledTooltip
             arrow
-            leaveDelay={1000}
-            title={"Placeholder"}
+            leaveDelay={200}
+            title={MAIN_USHER_TOOLTIP_TEXT}
             placement="top"
           >
             <StyledInfoOutlinedIcon />
@@ -98,8 +124,8 @@ export const UsherModal = ({
               </FieldTitleSettings>
               <StyledTooltip
                 arrow
-                leaveDelay={1000}
-                title={"Placeholder"}
+                leaveDelay={200}
+                title={PHYLOGENETIC_TREE_VERSION_TOOLTIP_TEXT}
                 placement="top"
               >
                 <StyledInfoOutlinedIcon />
@@ -111,8 +137,7 @@ export const UsherModal = ({
               </FieldTitleSettings>
               <StyledTooltip
                 arrow
-                leaveDelay={1000}
-                title={"Placeholder"}
+                title={SAMPLES_PER_SUBTREE_TOOLTIP_TEXT}
                 placement="top"
               >
                 <StyledInfoOutlinedIcon />
