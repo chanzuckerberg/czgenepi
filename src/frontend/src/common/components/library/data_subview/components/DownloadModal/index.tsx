@@ -28,12 +28,6 @@ import {
 interface Props {
   sampleIds: string[];
   failedSamples: any[];
-  isMetadataSelected: boolean;
-  setMetadataSelected: (prevState: boolean) => void;
-  isFastaSelected: boolean;
-  setFastaSelected: (prevState: boolean) => void;
-  isFastaDisabled: boolean;
-  setFastaDisabled: (prevState: boolean) => void;
   tsvData: [string[], string[][]] | undefined;
   open: boolean;
   onClose: () => void;
@@ -43,12 +37,6 @@ interface Props {
 const DownloadModal = ({
   sampleIds,
   failedSamples,
-  isMetadataSelected,
-  setMetadataSelected,
-  isFastaSelected,
-  setFastaSelected,
-  isFastaDisabled,
-  setFastaDisabled,
   tsvData,
   open,
   onClose,
@@ -68,6 +56,10 @@ const DownloadModal = ({
   const [tsvHeaders, setTsvHeaders] = useState<string[]>([]);
   const [anchorEl, setAnchorEl] = useState<HTMLElement>();
   const tooltipRef = useCallback((node) => setAnchorEl(node), []);
+
+  const [isFastaDisabled, setFastaDisabled] = useState<boolean>(false);
+  const [isFastaSelected, setFastaSelected] = useState<boolean>(false);
+  const [isMetadataSelected, setMetadataSelected] = useState<boolean>(false);
 
   useEffect(() => {
     if (tsvData) {
@@ -93,6 +85,12 @@ const DownloadModal = ({
     setFastaSelected(!isFastaSelected);
   };
 
+  const handleCloseModal = () => {
+    setFastaSelected(false);
+    setMetadataSelected(false);
+    onClose();
+  };
+
   const mutation = useMutation(downloadSamplesFasta, {
     onError: () => {
       setDownloadFailed(true);
@@ -103,7 +101,7 @@ const DownloadModal = ({
       link.download = fastaDownloadName;
       link.click();
       link.remove();
-      onClose();
+      handleCloseModal();
     },
   });
 
@@ -123,10 +121,10 @@ const DownloadModal = ({
       disableBackdropClick
       disableEscapeKeyDown
       open={open}
-      onClose={onClose}
+      onClose={handleCloseModal}
     >
       <DialogTitle>
-        <StyledIconButton onClick={onClose}>
+        <StyledIconButton onClick={handleCloseModal}>
           <CloseIcon />
         </StyledIconButton>
         <Header>Select Download</Header>
@@ -239,7 +237,7 @@ const DownloadModal = ({
             variant="contained"
             isRounded
             disabled={false}
-            onClick={onClose}
+            onClick={handleCloseModal}
           >
             {getDownloadButtonText()}
           </StyledButton>
