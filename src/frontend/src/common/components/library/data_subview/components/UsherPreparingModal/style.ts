@@ -9,6 +9,7 @@ export const StyledDialog = styled(Dialog)`
     return `
       .MuiDialog-paper {
         padding: ${spacings?.xxl}px;
+        max-width: 400px;
       }
     `;
   }}
