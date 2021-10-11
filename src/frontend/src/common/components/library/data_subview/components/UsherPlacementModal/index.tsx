@@ -33,8 +33,7 @@ interface Props {
   onClose: () => void;
 }
 
-// TODO (mlila): give this a more specific name since there are 3 modals related to usher
-export const UsherModal = ({
+export const UsherPlacementModal = ({
   sampleIds,
   failedSamples,
   open,

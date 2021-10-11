@@ -18,7 +18,7 @@ import { IconButton } from "./components/IconButton";
 import { TreeCreateHelpLink } from "./components/TreeCreateHelpLink";
 import { TreeSelectionMenu } from "./components/TreeSelectionMenu";
 import { UsherConfirmationModal } from "./components/UsherConfirmationModal";
-import { UsherModal } from "./components/UsherModal";
+import { UsherPlacementModal } from "./components/UsherPlacementModal";
 import { UsherPreparingModal } from "./components/UsherPreparingModal";
 import style from "./index.module.scss";
 import {
@@ -153,7 +153,7 @@ const DataSubview: FunctionComponent<Props> = ({
   const [isFastaDisabled, setFastaDisabled] = useState<boolean>(false);
   const [isNSCreateTreeModalOpen, setIsNSCreateTreeModalOpen] =
     useState<boolean>(false);
-  const [isUsherModalOpen, setUsherModalOpen] = useState<boolean>(true);
+  const [isUsherPlacementModalOpen, setUsherPlacementModalOpen] = useState<boolean>(true);
   const [hasCreateTreeStarted, setCreateTreeStarted] = useState<boolean>(false);
   const [didCreateTreeFailed, setCreateTreeFailed] = useState<boolean>(false);
   const [isUsherConfirmOpen, setIsUsherConfirmOpen] = useState<boolean>(false);
@@ -172,12 +172,12 @@ const DataSubview: FunctionComponent<Props> = ({
     setIsNSCreateTreeModalOpen(false);
   };
 
-  const handleUsherModalOpen = () => {
-    setUsherModalOpen(true);
+  const handleUsherPlacementModalOpen = () => {
+    setUsherPlacementModalOpen(true);
   };
 
-  const handleUsherModalClose = () => {
-    setUsherModalOpen(false);
+  const handleUsherPlacementModalClose = () => {
+    setUsherPlacementModalOpen(false);
   };
 
   const handleCreateTreeFailed = () => {
@@ -301,7 +301,7 @@ const DataSubview: FunctionComponent<Props> = ({
           <TreeSelectionMenu
             isDisabled={isCreateTreeDisabled}
             handleCreateNSTreeOpen={handleCreateNSTreeOpen}
-            handleCreateUsherTreeOpen={handleUsherModalOpen}
+            handleCreateUsherTreeOpen={handleUsherPlacementModalOpen}
           />
           <IconButton
             onClick={handleDownloadClickOpen}
@@ -354,11 +354,11 @@ const DataSubview: FunctionComponent<Props> = ({
               isOpen={isUsherPreparingOpen}
               onClose={() => setIsUsherPreparingOpen(false)}
             />
-            <UsherModal
+            <UsherPlacementModal
               sampleIds={checkedSamples}
               failedSamples={failedSamples}
-              open={isUsherModalOpen}
-              onClose={handleUsherModalClose}
+              open={isUsherPlacementModalOpen}
+              onClose={handleUsherPlacementModalClose}
             />
           </>
         )}
