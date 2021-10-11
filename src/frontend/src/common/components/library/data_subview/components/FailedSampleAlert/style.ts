@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import ReportProblemOutlinedIcon from "@material-ui/icons/ReportProblemOutlined";
+import ErrorOutlineOutlinedIcon from "@material-ui/icons/ErrorOutlineOutlined";
 import {
   fontBodyXxxs,
   getFontWeights,
@@ -26,7 +26,7 @@ export const AlertInstructionsNotSemiBold = styled.span`
   ${AlertInstructionsCommon}
 `;
 
-export const StyledWarningIcon = styled(ReportProblemOutlinedIcon)`
+export const StyledWarningIcon = styled(ErrorOutlineOutlinedIcon)`
   ${(props) => {
     const iconSizes = getIconSizes(props);
     const spacings = getSpacings(props);
