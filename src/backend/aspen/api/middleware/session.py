@@ -57,22 +57,12 @@ class SessionMiddleware:
                     # We have session data to persist.
                     data = self.encode_flask_cookie(scope["session"])
                     headers = MutableHeaders(scope=message)
-                    header_value = "%s=%s; path=%s; Max-Age=%d; %s" % (
-                        self.session_cookie,
-                        data,
-                        path,
-                        self.max_age,
-                        self.security_flags,
-                    )
+                    header_value = f"{self.session_cookie}={data}; path={path}; Max-Age={self.max_age}; {self.security_flags}"
                     headers.append("Set-Cookie", header_value)
                 elif not initial_session_was_empty:
                     # The session has been cleared.
                     headers = MutableHeaders(scope=message)
-                    header_value = "{}={}; {}".format(
-                        self.session_cookie,
-                        f"null; path={path}; expires=Thu, 01 Jan 1970 00:00:00 GMT;",
-                        self.security_flags,
-                    )
+                    header_value = f"{self.session_cookie}=null; path={path}; expires=Thu, 01 Jan 1970 00:00:00 GMT; {self.security_flags}"
                     headers.append("Set-Cookie", header_value)
             await send(message)
 
