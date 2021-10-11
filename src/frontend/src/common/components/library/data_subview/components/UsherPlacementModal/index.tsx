@@ -33,6 +33,11 @@ interface Props {
   onClose: () => void;
 }
 
+const getDefaultNumSamplesPerSubtree = (numSelected: number): number => {
+  const DEFAULT_MULTIPLIER = 5;
+  return Math.max(50, numSelected * DEFAULT_MULTIPLIER);
+};
+
 export const UsherPlacementModal = ({
   sampleIds,
   failedSamples,
@@ -41,6 +46,8 @@ export const UsherPlacementModal = ({
 }: Props): JSX.Element => {
   const [isUsherDisabled, setUsherDisabled] = useState<boolean>(false);
   const [fastaURL, setFastaURL] = useState<string>("");
+
+  const defaultNumSamples = getDefaultNumSamplesPerSubtree(sampleIds?.length);
 
   const mutation = useMutation(getFastaURL, {
     onError: (err) => {
@@ -166,8 +173,8 @@ export const UsherPlacementModal = ({
               </FlexWrapper>
               <StyledTextField
                 id="outlined-basic"
-                label="50"
                 variant="outlined"
+                defaultValue={defaultNumSamples}
               />
             </TreeNameSection>
             <StyledButton
