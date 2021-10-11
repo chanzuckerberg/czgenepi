@@ -2,12 +2,14 @@ import logging
 
 import sqlalchemy as sa
 from auth0.v3.exceptions import TokenValidationError
+from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.query import Query
 from starlette.requests import Request
 
+import aspen.api.error.http_exceptions as ex
 from aspen.api.config.config import settings
 from aspen.api.deps import get_db
 from aspen.auth.device_auth import validate_auth_header
@@ -70,3 +72,9 @@ async def get_auth_user(request: Request):
     # available. For now we seem to have `request` when we need it,
     # but we can change this if necessary.
     request.state.auth_user = found_auth_user
+    return found_auth_user
+
+
+async def get_admin_user(auth_user=Depends(get_auth_user)):
+    if not auth_user.system_admin:
+        raise ex.UnauthorizedException("Not authorized")
