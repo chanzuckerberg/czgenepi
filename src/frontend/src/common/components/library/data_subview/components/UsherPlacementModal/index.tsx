@@ -17,6 +17,7 @@ import {
   TreeNameSection,
 } from "../CreateNSTreeModal/style";
 import { Header, StyledIconButton } from "../DownloadModal/style";
+import { FailedSampleAlert } from "../FailedSampleAlert";
 import {
   FieldTitle,
   FieldTitleSettings,
@@ -176,6 +177,7 @@ export const UsherPlacementModal = ({
                 variant="outlined"
                 defaultValue={defaultNumSamples}
               />
+              <FailedSampleAlert numFailedSamples={failedSamples?.length} />
             </TreeNameSection>
             <StyledButton
               color="primary"
