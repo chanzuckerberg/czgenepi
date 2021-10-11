@@ -55,7 +55,7 @@ async def get_auth_user(request: Request):
         except TokenValidationError as err:
             logging.warn(f"Token validation error: {err}")
     elif "profile" in request.session:
-        auth0_user_id = request.session["profile"]["user_id"]
+        auth0_user_id = request.session["profile"].get("user_id")
     # Redirect to Login page
     if not auth0_user_id:
         # TODO - redirect to login.
