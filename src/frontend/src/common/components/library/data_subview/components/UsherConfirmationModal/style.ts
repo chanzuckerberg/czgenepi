@@ -1,6 +1,10 @@
 import styled from "@emotion/styled";
-import { getColors, getSpacings } from "czifui";
+import { fontHeaderXl, getColors, getSpacings } from "czifui";
 import { P } from "src/common/styles/support/style";
+
+export const StyledHeader = styled.div`
+  ${fontHeaderXl}
+`;
 
 export const StyledImg = styled("img")`
   height: 45px;

@@ -14,7 +14,7 @@ export const Title = styled.div`
     const spacings = getSpacings(props);
 
     return `
-      margin-bottom: ${spacings?.s}px;
+      margin-bottom: ${spacings?.xxxs}px;
     `;
   }}
 `;

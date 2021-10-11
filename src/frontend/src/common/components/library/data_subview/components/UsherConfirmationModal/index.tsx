@@ -2,7 +2,7 @@ import React from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import usherLogo from "src/common/images/usher.png";
 import ConfirmDialog from "src/components/ConfirmDialog";
-import { StyledImg, StyledP } from "./style";
+import { StyledHeader, StyledImg, StyledP } from "./style";
 
 interface Props {
   isOpen: boolean;
@@ -13,7 +13,7 @@ const UsherConfirmationModal = ({ isOpen, onClose }: Props): JSX.Element => {
   const title = (
     <>
       <StyledImg src={usherLogo as string} />
-      <div>You are now leaving Aspen.</div>
+      <StyledHeader>You are now leaving Aspen.</StyledHeader>
     </>
   );
 
