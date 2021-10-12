@@ -20,6 +20,10 @@ export const StyledDialogActions = styled(DialogActions, {
 
     return `
       padding: 0 ${spacings?.xxl}px ${spacings?.xxl}px ${spacings?.xxl}px;
+
+      &.MuiDialogActions-spacing > :not(:first-child) {
+        margin-left: ${spacings?.m}px;
+      }
     `;
   }}
 

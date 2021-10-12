@@ -75,7 +75,7 @@ task nextstrain_workflow {
     mkdir -p ncov/my_profiles/aspen ncov/results
     (cd ncov &&
      git init &&
-     git fetch --depth 1 git://github.com/nextstrain/ncov.git &&
+     git fetch --depth 1 git://github.com/nextstrain/ncov.git 30435fb9ec8de2f045167fb90adfec12f123e80a &&
      git checkout FETCH_HEAD
     )
     ncov_git_rev=$(cd ncov && git rev-parse HEAD)

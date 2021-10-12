@@ -148,18 +148,16 @@ const DataSubview: FunctionComponent<Props> = ({
   const [isCreateTreeDisabled, setCreateTreeDisabled] = useState<boolean>(true);
   const [failedSamples, setFailedSamples] = useState<any[]>([]);
   const [downloadFailed, setDownloadFailed] = useState<boolean>(false);
-  const [isMetadataSelected, setMetadataSelected] = useState<boolean>(false);
-  const [isFastaSelected, setFastaSelected] = useState<boolean>(false);
-  const [isFastaDisabled, setFastaDisabled] = useState<boolean>(false);
   const [isNSCreateTreeModalOpen, setIsNSCreateTreeModalOpen] =
     useState<boolean>(false);
   const [isUsherPlacementModalOpen, setUsherPlacementModalOpen] = useState<boolean>(true);
   const [hasCreateTreeStarted, setCreateTreeStarted] = useState<boolean>(false);
   const [didCreateTreeFailed, setCreateTreeFailed] = useState<boolean>(false);
   const [isUsherConfirmOpen, setIsUsherConfirmOpen] = useState<boolean>(false);
-  const [searchQuery, setSearchQuery] = useState<string>("");
   const [isUsherPreparingOpen, setIsUsherPreparingOpen] =
     useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+
   const handleDownloadClickOpen = () => {
     setDownloadModalOpen(true);
   };
@@ -190,8 +188,6 @@ const DataSubview: FunctionComponent<Props> = ({
 
   const handleDownloadClose = () => {
     setDownloadModalOpen(false);
-    setMetadataSelected(false);
-    setFastaSelected(false);
   };
 
   useEffect(() => {
@@ -323,12 +319,6 @@ const DataSubview: FunctionComponent<Props> = ({
               sampleIds={checkedSamples}
               failedSamples={failedSamples}
               setDownloadFailed={setDownloadFailed}
-              isMetadataSelected={isMetadataSelected}
-              setMetadataSelected={setMetadataSelected}
-              isFastaSelected={isFastaSelected}
-              setFastaSelected={setFastaSelected}
-              isFastaDisabled={isFastaDisabled}
-              setFastaDisabled={setFastaDisabled}
               tsvData={tsvDataMap(
                 checkedSamples,
                 tableData,

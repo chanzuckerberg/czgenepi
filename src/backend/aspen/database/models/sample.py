@@ -61,7 +61,7 @@ def create_public_ids(
     session :
         An open DB session object
     number_needed :
-        The number of czb_ids to generate
+        The number of aspen public ids to generate
 
     Returns
     --------
@@ -76,10 +76,12 @@ def create_public_ids(
         next_id = 0
     next_id += 1
     ids: List[str] = []
+    # some group prefixes already have a dash, but if they don't add a dash to the end
+    group_prefix = group.prefix if group.prefix[-1] == "-" else f"{group.prefix}-"
     for i in range(num_needed):
         current_year: str = datetime.today().strftime("%Y")
         country: str = country  # type: ignore
-        ids.append(f"hCoV-19/{country}/{group.prefix}-{next_id}/{current_year}")
+        ids.append(f"hCoV-19/{country}/{group_prefix}{next_id}/{current_year}")
         next_id += 1
     return ids
 

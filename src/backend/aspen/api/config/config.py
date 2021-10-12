@@ -71,8 +71,23 @@ class Settings(BaseSettings):
         return self.AWS_SECRET["AUTH0_CLIENT_ID"]
 
     @property
+    def AUTH0_LOGOUT_URL(self) -> str:
+        flask_env = os.environ.get("FLASK_ENV")
+        if flask_env == "production":
+            return f"{self.AUTH0_BASE_URL}/v2/logout"
+        else:
+            return f"https://{self.AUTH0_DOMAIN}/Account/Logout"
+
+    @property
     def AUTH0_CALLBACK_URL(self) -> str:
-        raise NotImplementedError()
+        flask_env = os.environ.get("FLASK_ENV")
+        api_url = os.environ.get("API_URL")
+        if not api_url:
+            raise Exception("Missing API_URL in config!")
+        if flask_env == "production":
+            return f"{api_url}/v2/auth/callback"
+        else:
+            return "http://backend.genepinet.local:3000/v2/auth/callback"
 
     @property
     def AUTH0_CLIENT_SECRET(self) -> str:

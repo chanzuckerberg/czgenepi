@@ -9,51 +9,69 @@ import DialogContent from "src/common/components/library/Dialog/components/Dialo
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import ENV from "src/common/constants/ENV";
-import { useUpdateUserInfo } from "src/common/queries/auth";
+import { useUpdateUserInfo, useUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
 import { CURRENT_POLICY_VERSION } from "src/components/AcknowledgePolicyChanges";
 import { PageContent } from "../../common/styles/mixins/global";
 import { Details, SpacedBold, Title } from "./style";
 
-export default function AgreeTerms(): JSX.Element {
-  const [isLoading, setIsLoading] = useState(false);
-  const [shouldRedirect, setShouldRedirect] = useState(false);
-  const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
+export default function AgreeTerms(): JSX.Element | null {
+  // `isTosViewable` -- Should user see ToS page?
+  // Prevents flashing page at users who should be redirected instead of seeing it.
+  const [isTosViewable, setIsTosViewable] = useState(false);
+
   const router = useRouter();
+
+  const { data: userInfo, isLoading: isLoadingUserInfo } = useUserInfo();
   const {
     mutate: updateUserInfo,
-    isSuccess,
+    // NOTE: We only update user info in case of acceptance, and we rely on this
+    // `isSuccess` to only kick off after accepting ToS. If we eventually need
+    // declining ToS to update the user info, this component will need refactoring.
+    isSuccess: isSuccessUpdatingUserInfo,
     isLoading: isUpdatingUserInfo,
   } = useUpdateUserInfo();
 
+  // Only show the page to logged in users who have not already agreed to ToS.
+  // If they're not in that specific overlap, we'll redirect them elsewhere.
   useEffect(() => {
-    if (shouldRedirect) {
+    // Once we show, we no longer consider redirecting.
+    // But before we show, we need to wait for userInfo to load.
+    if (!isTosViewable && !isLoadingUserInfo) {
+      const agreedToTOS = userInfo?.user?.agreedToTos;
+      if (!userInfo) {
+        // Lack of userInfo implicitly means user is not logged in.
+        router.push(ROUTES.HOMEPAGE);
+      } else if (agreedToTOS) {
+        router.push(ROUTES.DATA);
+      } else {
+        // User is logged in, but not agreed to ToS. Show the ToS page.
+        setIsTosViewable(true);
+      }
+    }
+  }, [isTosViewable, isLoadingUserInfo, userInfo, router]);
+
+  useEffect(() => {
+    if (isSuccessUpdatingUserInfo) {
+      // Backend successfully wrote the ToS acceptance
       router.push(ROUTES.DATA);
     }
-  }, [shouldRedirect, router]);
-
-  useEffect(() => {
-    if (!hasAcceptedTerms || isUpdatingUserInfo) return;
-    if (isSuccess) {
-      return setShouldRedirect(true);
-    }
-
-    agreeTos();
-
-    async function agreeTos() {
-      setIsLoading(true);
-      updateUserInfo({
-        // Agreeing to ToS also means implicit acknowledgment of current policies
-        acknowledged_policy_version: CURRENT_POLICY_VERSION,
-        agreed_to_tos: true,
-      });
-    }
-  }, [hasAcceptedTerms, isUpdatingUserInfo, isSuccess, updateUserInfo]);
+  }, [isSuccessUpdatingUserInfo, router]);
 
   function handleAcceptClick() {
-    setHasAcceptedTerms(true);
+    updateUserInfo({
+      // Agreeing to ToS also means implicit acknowledgment of current policies
+      acknowledged_policy_version: CURRENT_POLICY_VERSION,
+      agreed_to_tos: true,
+    });
   }
 
+  // Don't want to display ToS instantly on visiting page.
+  // Wait until established if they should be shown it (or get redirected instead)
+  if (!isTosViewable) {
+    return null;
+  }
+  // Okay, user needs to agree to ToS before they can use the app. Show them page.
   return (
     <>
       <Head>
@@ -116,7 +134,7 @@ export default function AgreeTerms(): JSX.Element {
           </DialogContent>
           <DialogActions>
             <Button
-              disabled={isLoading}
+              disabled={isUpdatingUserInfo}
               color="primary"
               variant="contained"
               isRounded
@@ -127,7 +145,7 @@ export default function AgreeTerms(): JSX.Element {
             </Button>
             <a href={ENV.API_URL + API.LOG_OUT}>
               <Button
-                disabled={isLoading}
+                disabled={isUpdatingUserInfo}
                 color="primary"
                 variant="outlined"
                 isRounded
