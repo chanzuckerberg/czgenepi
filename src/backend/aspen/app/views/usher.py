@@ -1,9 +1,10 @@
 """Views for handling anything related to UShER"""
-from typing import Any, Iterable, Mapping, Sequence
+from typing import Iterable
 
 from flask import g, jsonify
 
 from aspen.app.app import application, requires_auth
+from aspen.app.serializers import UsherOptionResponseSchema
 from aspen.database.models.usher import UsherOption
 
 
@@ -25,6 +26,5 @@ def get_usher_tree_options():
         .all()
     )
 
-    serializable_options: Sequence[Mapping[str, Any]]
-    serializable_options = [option.to_dict() for option in usher_options]
-    return jsonify({"usher_options": serializable_options})
+    options_schema = UsherOptionResponseSchema(many=True)
+    return jsonify({"usher_options": options_schema.dump(usher_options)})
