@@ -16,7 +16,11 @@ from aspen.app.serializers import (
     PhyloRunRequestSchema,
     PhyloRunResponseSchema,
 )
-from aspen.app.views.api_utils import authz_sample_filters
+from aspen.app.views.api_utils import (
+    authz_sample_filters,
+    get_matching_gisaid_ids,
+    get_missing_sample_ids,
+)
 from aspen.database.models import (
     AlignedGisaidDump,
     GisaidMetadata,
@@ -56,35 +60,17 @@ def start_phylo_run():
     all_samples: Iterable[Sample] = g.db_session.query(Sample).options(
         joinedload(Sample.uploaded_pathogen_genome, innerjoin=True),
     )
-    # Step 3 - Enforce AuthZ
+
+    # Step 3 - Enforce AuthZ (check if user has permission to see private identifiers)
     all_samples = authz_sample_filters(all_samples, sample_ids, user)
 
-    # Step 4 - Create a phylo run & associated input rows in the DB
-    pathogen_genomes: MutableSequence[PathogenGenome] = list()
-    found_sample_ids = set()
-    for sample in all_samples:
-        pathogen_genomes.append(sample.uploaded_pathogen_genome)
-        found_sample_ids.add(sample.private_identifier)
-        found_sample_ids.add(sample.public_identifier)
-    if len(pathogen_genomes) == 0:
-        sentry_sdk.capture_message(
-            f"No sequences selected for run from {sample_ids}.", "error"
-        )
-        raise ex.BadRequestException("No sequences selected for run")
+    # Are there any sample ID's that don't match sample table public and private identifiers
+    missing_sample_ids = get_missing_sample_ids(sample_ids, all_samples)
 
-    # These are the sample ID's that don't match the aspen db
-    missing_sample_ids = set(sample_ids) - found_sample_ids
+    # See if these missing_sample_ids match any Gisaid IDs
+    gisaid_ids = get_matching_gisaid_ids(missing_sample_ids, g.db_session)
 
-    # Store the list of matching ID's so we can stuff it in our jsonb column later
-    gisaid_ids = set()
-    # See if these missing samples match Gisaid ID's
-    gisaid_matches: Iterable[GisaidMetadata] = g.db_session.query(
-        GisaidMetadata
-    ).filter(GisaidMetadata.strain.in_(missing_sample_ids))
-    for gisaid_match in gisaid_matches:
-        gisaid_ids.add(gisaid_match.strain)
-
-    # Do we have any samples that don't match either dataset?
+    # Do we have any samples that are not aspen private or public identifiers or gisaid identifiers?
     missing_sample_ids = missing_sample_ids - gisaid_ids
 
     # Throw an error if we have any sample ID's that didn't match county samples OR gisaid samples.
@@ -93,6 +79,16 @@ def start_phylo_run():
             f"User requested invalid samples ({missing_sample_ids})"
         )
         raise ex.BadRequestException("missing ids", {"ids": list(missing_sample_ids)})
+
+    # Step 4 - Create a phylo run & associated input rows in the DB
+    pathogen_genomes: MutableSequence[PathogenGenome] = list()
+    for sample in all_samples:
+        pathogen_genomes.append(sample.uploaded_pathogen_genome)
+    if len(pathogen_genomes) == 0:
+        sentry_sdk.capture_message(
+            f"No sequences selected for run from {sample_ids}.", "error"
+        )
+        raise ex.BadRequestException("No sequences selected for run")
 
     aligned_gisaid_dump = (
         g.db_session.query(AlignedGisaidDump)
