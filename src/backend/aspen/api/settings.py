@@ -238,7 +238,7 @@ class Settings(BaseSettings):
         )  # https://github.com/samuelcolvin/pydantic/issues/1241
 
 
-@lru_cache()
+@lru_cache
 def get_settings() -> Settings:
     settings = Settings()
     return settings

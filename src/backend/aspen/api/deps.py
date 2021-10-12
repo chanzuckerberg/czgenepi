@@ -3,7 +3,7 @@ from typing import Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from aspen.api.config.config import get_settings
+from aspen.api.settings import get_settings
 from aspen.database.connection import init_async_db
 
 session_context_var: ContextVar[Optional[AsyncSession]] = ContextVar(

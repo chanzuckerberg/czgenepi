@@ -3,24 +3,24 @@ from functools import lru_cache
 from urllib.parse import urlencode
 
 from authlib.integrations.base_client.errors import OAuthError
-from authlib.integrations.starlette_client import OAuth, StarletteOAuth2App
+from authlib.integrations.starlette_client import OAuth, StarletteRemoteApp
 from fastapi import APIRouter, Depends
 from fastapi.responses import RedirectResponse
 from starlette.requests import Request
 
 import aspen.api.error.http_exceptions as ex
-from aspen.api.config.config import get_settings, Settings
+from aspen.api.settings import get_settings, Settings
 
 # From the example here:
 # https://github.com/authlib/demo-oauth-client/tree/master/fastapi-google-login
 router = APIRouter()
 
 
-@lru_cache()
-def get_auth0_client() -> StarletteOAuth2App:
+@lru_cache
+def get_auth0_client() -> StarletteRemoteApp:
     # TODO - settings is an unhashable type, so we can't make it a Dependency
     # *and* use the lru_cache decorator on this getter. We should probably use
-    # fastapi's built-in dependency caching instead of lru_cache() here, but
+    # fastapi's built-in dependency caching instead of lru_cache here, but
     # it needs a little more thought first.
     # see: https://github.com/tiangolo/fastapi/issues/1985
     settings: Settings = get_settings()

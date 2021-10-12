@@ -10,8 +10,8 @@ from sqlalchemy.orm.query import Query
 from starlette.requests import Request
 
 import aspen.api.error.http_exceptions as ex
-from aspen.api.config.config import get_settings
 from aspen.api.deps import get_db
+from aspen.api.settings import get_settings
 from aspen.auth.device_auth import validate_auth_header
 from aspen.database.models import Group, User
 
