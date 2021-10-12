@@ -46,7 +46,6 @@ def get_app() -> FastAPI:
     )
     _app.add_middleware(SessionMiddleware, secret_key=settings.SECRET_KEY)
 
-    # Warning - do not enable this route!
     _app.include_router(
         users.router, prefix="/v2/users", dependencies=[Depends(get_auth_user)]
     )

@@ -9,7 +9,9 @@ from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):
-    SERVICE_NAME: str = "FastApi"
+    """Pydantic Settings object - do not instantiate it directly, please use get_settings() as a dependency where possible"""
+
+    SERVICE_NAME: str = "Aspen"
 
     DB_DRIVER: str = "postgresql+asyncpg"
 
