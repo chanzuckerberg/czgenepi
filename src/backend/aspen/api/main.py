@@ -1,14 +1,13 @@
 import os
-from functools import partial
 
 from fastapi import Depends, FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
 from aspen.api.auth import get_auth_user
-from aspen.api.config.config import settings
 from aspen.api.deps import set_db
 from aspen.api.error.http_exceptions import AspenException, exception_handler
 from aspen.api.middleware.session import SessionMiddleware
+from aspen.api.settings import get_settings
 from aspen.api.views import auth, health, users
 
 
@@ -27,12 +26,13 @@ def get_allowed_origins():
 
 
 def get_app() -> FastAPI:
+    settings = get_settings()
     _app = FastAPI(
         title=settings.SERVICE_NAME,
         debug=settings.DEBUG,
         openapi_url="/v2/openapi.json",
         docs_url="/v2/docs",
-        dependencies=[Depends(partial(set_db, settings))],
+        dependencies=[Depends(set_db)],
     )
 
     # Configure CORS
@@ -46,7 +46,6 @@ def get_app() -> FastAPI:
     )
     _app.add_middleware(SessionMiddleware, secret_key=settings.SECRET_KEY)
 
-    # Warning - do not enable this route!
     _app.include_router(
         users.router, prefix="/v2/users", dependencies=[Depends(get_auth_user)]
     )
