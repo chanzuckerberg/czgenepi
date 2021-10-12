@@ -2,7 +2,7 @@ name: Scheduled Prod Deploy
 
 on:
   schedule:
-     Weekly Mondays & Thursdays @ 16:00 UTC (9am PST)
+    # Weekly Mondays & Thursdays @ 16:00 UTC (9am PST)
      - cron: '0 16 * * 1,4'
 
 env:
