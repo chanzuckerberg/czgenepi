@@ -140,10 +140,15 @@ export const UsherPlacementModal = ({
                   inferring relationships between samples.
                 </StyledListItem>
                 <StyledListItem>
-                  Note: To see all of your samples together on one tree with
-                  closely-related contextual sequences, or to enable more
-                  Nextstrain visualization features, use the Nextstrain tree
-                  build option. Learn more.
+                  <div>
+                    Note: To see all of your samples together on one tree with
+                    closely-related contextual sequences, or to enable more
+                    Nextstrain visualization features, use the Nextstrain tree
+                    build option.{" "}
+                    <NewTabLink href="https://docs.google.com/document/d/1_iQgwl3hn_pjlZLX-n0alUbbhgSPZvpW_0620Hk_kB4/edit?usp=sharing">
+                      Learn more.
+                    </NewTabLink>
+                  </div>
                 </StyledListItem>
               </StyledList>
               <FieldTitle>Settings</FieldTitle>
