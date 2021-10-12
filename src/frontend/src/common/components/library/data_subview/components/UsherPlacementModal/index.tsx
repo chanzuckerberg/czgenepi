@@ -1,9 +1,11 @@
 import { Dialog } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
-import React, { SyntheticEvent, useState } from "react";
+import { Dropdown } from "czifui";
+import { forEach } from "lodash";
+import React, { SyntheticEvent, useEffect, useState } from "react";
 import { useMutation } from "react-query";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
-import { getFastaURL } from "src/common/queries/trees";
+import { getFastaURL, getUsherOptions } from "src/common/queries/trees";
 import { pluralize } from "src/common/utils/strUtils";
 import {
   Content,
@@ -33,6 +35,13 @@ interface Props {
   open: boolean;
   onClose: () => void;
 }
+interface DropdownOptionProps {
+  id: number;
+  description: string;
+  name?: string;
+  value: string;
+  priority: number;
+}
 
 const getDefaultNumSamplesPerSubtree = (numSelected: number): number => {
   const DEFAULT_MULTIPLIER = 5;
@@ -45,10 +54,30 @@ export const UsherPlacementModal = ({
   open,
   onClose,
 }: Props): JSX.Element => {
-  const [isUsherDisabled, setUsherDisabled] = useState<boolean>(false);
+  const [dropdownLabel, setDropdownLabel] = useState<string>("");
+  const [dropdownOptions, setDropdownOptions] =
+    useState<DropdownOptionProps[]>();
   const [fastaURL, setFastaURL] = useState<string>("");
 
   const defaultNumSamples = getDefaultNumSamplesPerSubtree(sampleIds?.length);
+
+  useEffect(() => {
+    const fetchUsherOpts = async () => {
+      const resp = await getUsherOptions();
+      const options = resp.usher_options;
+      forEach(options, (opt) => (opt.name = opt.description));
+
+      options.sort((a, b) => {
+        const aPri = a?.priority ?? 0;
+        const bPri = b?.priority ?? 0;
+        return aPri - bPri;
+      });
+
+      setDropdownOptions(options);
+    };
+
+    fetchUsherOpts();
+  }, []);
 
   const mutation = useMutation(getFastaURL, {
     onError: (err) => {

@@ -5,7 +5,13 @@ import {
   useQueryClient,
   UseQueryResult,
 } from "react-query";
-import { API, DEFAULT_POST_OPTIONS, fetchTrees, TreeResponse } from "../api";
+import {
+  API,
+  DEFAULT_FETCH_OPTIONS,
+  DEFAULT_POST_OPTIONS,
+  fetchTrees,
+  TreeResponse,
+} from "../api";
 import { API_URL } from "../constants/ENV";
 import { ENTITIES } from "./entities";
 
@@ -66,6 +72,15 @@ export async function getFastaURL({
   const response = await fetch(API_URL + API.GET_FASTA_URL, {
     ...DEFAULT_POST_OPTIONS,
     body: JSON.stringify(payload),
+  });
+  if (response.ok) return await response.json();
+
+  throw Error(`${response.statusText}: ${await response.text()}`);
+}
+
+export async function getUsherOptions(): Promise<unknown> {
+  const response = await fetch(API_URL + API.USHER_TREE_OPTIONS, {
+    ...DEFAULT_FETCH_OPTIONS,
   });
   if (response.ok) return await response.json();
 
