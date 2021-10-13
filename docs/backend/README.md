@@ -81,18 +81,22 @@ You will also need to rebuild local running docker containers by running `make l
 If you add a third-party library (directly or indirectly) that does not support [python typing](https://docs.python.org/3/library/typing.html), then you may need to add an entry to [`mypy.ini`](../../mypy.ini) to let mypy know [not to expect type hints for that library](https://mypy.readthedocs.io/en/stable/running_mypy.html#missing-type-hints-for-third-party-library).
 
 
-## Adding new users to the staging db:
-* get username / password credentials from aws secrets manager (:
-  * `aws secretsmanager get-secret-value --secret-id aspen-config`
+## Adding new users to the staging/prod db:
+Create a new user to the auth0 covidtracker tenet, take note of auth0 user id
+* connect to staging aspen_db
+  * `make remote-pgconsole ENV=<staging|prod> DB=aspen_db`
 
-* get RDS host and port information:
-  * `aws rds describe-db-instances --db-instance-identifier aspen-db`
-
-* connect to aspen db using psql:
-  * `psql -h <RDS host> -p <RDS port> -U user_rw aspen_db`
-    ```sql
-    aspen_db=> set search_path to aspen;
+* execute insert sql:
+  * ```sql
     aspen_db=> INSERT INTO users (name, email, auth0_user_id, group_admin, system_admin, group_id) VALUES ('<name>', '<email>', '<auth0 user ID>', 'f', 't', <group ID>);
     ```
     * to see all possible group ids:
       * `select * from groups;`
+
+## How to use aspencli:
+the cli is useful to call api endpoints through the terminal. To start using the cli you must be logged into rdev, staging, or prod with your aspen system admin account. 
+
+Example endpoint call to update public_ids based on private to public id mapping csv file (column headers must be named `private_identifier`,`public_identifier`, no line numbering)
+* `python src/cli/aspencli.py --env <local|staging|prod|rdev> samples update_public_ids --group-id 1 --private-to-public-id-mapping ~/Downloads/test_rename_public_identifiers.csv`
+
+  * if using rdev also specify the stack name with `--stack <stack-name>` flag
