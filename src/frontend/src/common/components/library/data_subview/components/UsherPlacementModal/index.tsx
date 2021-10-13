@@ -9,7 +9,6 @@ import { getFastaURL, getUsherOptions } from "src/common/queries/trees";
 import { pluralize } from "src/common/utils/strUtils";
 import {
   Content,
-  StyledButton,
   StyledDialogContent,
   StyledDialogTitle,
   StyledInfoOutlinedIcon,
@@ -24,6 +23,7 @@ import {
   FieldTitle,
   FieldTitleSettings,
   FlexWrapper,
+  StyledButton,
   StyledList,
   StyledListItem,
   StyledSuggestionText,

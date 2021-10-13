@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import TextField from "@material-ui/core/TextField";
 import {
+  Button,
   fontBodyXs,
   fontBodyXxxs,
   fontHeaderM,
@@ -96,6 +97,20 @@ export const StyledWarningIcon = styled(WarningIcon)`
     return `
       color: ${colors?.warning[400]};
       margin-top: 0;
+    `;
+  }}
+`;
+
+export const StyledButton = styled(Button)`
+  ${(props) => {
+    const spacings = getSpacings(props);
+    const colors = getColors(props);
+    return `
+      margin-top: ${spacings?.xl}px;
+      margin-bottom: ${spacings?.l}px;
+      &:active {
+        background-color: ${colors?.gray[400]};
+      }
     `;
   }}
 `;
