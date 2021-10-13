@@ -1,7 +1,7 @@
 import { Dialog } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import { Dropdown } from "czifui";
-import { forEach } from "lodash";
+import { debounce, forEach } from "lodash";
 import React, { SyntheticEvent, useEffect, useState } from "react";
 import { useMutation } from "react-query";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
@@ -26,7 +26,9 @@ import {
   FlexWrapper,
   StyledList,
   StyledListItem,
+  StyledSuggestionText,
   StyledTextField,
+  StyledWarningIcon,
 } from "./style";
 
 interface Props {
@@ -43,9 +45,10 @@ interface DropdownOptionProps {
   priority: number;
 }
 
+export const SUGGESTED_MIN_SAMPLES = 50;
 const getDefaultNumSamplesPerSubtree = (numSelected: number): number => {
   const DEFAULT_MULTIPLIER = 5;
-  return Math.max(50, numSelected * DEFAULT_MULTIPLIER);
+  return Math.max(SUGGESTED_MIN_SAMPLES, numSelected * DEFAULT_MULTIPLIER);
 };
 
 export const UsherPlacementModal = ({
@@ -58,6 +61,8 @@ export const UsherPlacementModal = ({
   const [dropdownOptions, setDropdownOptions] =
     useState<DropdownOptionProps[]>();
   const [fastaURL, setFastaURL] = useState<string>("");
+  const [isUsherDisabled, setUsherDisabled] = useState<boolean>(false);
+  const [shouldShowWarning, setShouldShowWarning] = useState<boolean>(false);
 
   const defaultNumSamples = getDefaultNumSamplesPerSubtree(sampleIds?.length);
 
@@ -119,6 +124,12 @@ export const UsherPlacementModal = ({
       samples, and no less than 50.
     </div>
   );
+
+  const onNumSamplesChange = debounce((e) => {
+    const numSamples = e?.target?.value;
+    const showWarning = !numSamples || numSamples < SUGGESTED_MIN_SAMPLES;
+    setShouldShowWarning(showWarning);
+  }, 1000);
 
   return (
     <Dialog
@@ -210,7 +221,16 @@ export const UsherPlacementModal = ({
                 id="outlined-basic"
                 variant="outlined"
                 defaultValue={defaultNumSamples}
+                onChange={onNumSamplesChange}
               />
+              {shouldShowWarning && (
+                <FlexWrapper>
+                  <StyledWarningIcon />
+                  <StyledSuggestionText>
+                    We recommend a value no lower than 50.
+                  </StyledSuggestionText>
+                </FlexWrapper>
+              )}
               <FailedSampleAlert numFailedSamples={failedSamples?.length} />
             </TreeNameSection>
             <StyledButton

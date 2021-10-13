@@ -2,6 +2,7 @@ import styled from "@emotion/styled";
 import TextField from "@material-ui/core/TextField";
 import {
   fontBodyXs,
+  fontBodyXxxs,
   fontHeaderM,
   fontHeaderXs,
   getColors,
@@ -9,6 +10,7 @@ import {
   List,
   ListItem,
 } from "czifui";
+import { StyledWarningIcon as WarningIcon } from "../FailedSampleAlert/style";
 
 export const StyledListItem = styled(ListItem)`
   ${fontBodyXs}
@@ -53,13 +55,17 @@ export const FieldTitleSettings = styled.div`
   }}
 `;
 
-export const StyledTextField = styled(TextField)`
+const doNotForwardProps = ["showWarning"];
+
+export const StyledTextField = styled(TextField, {
+  shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
+})`
   width: 150px;
   ${(props) => {
     const spacings = getSpacings(props);
     return `
-      margin-bottom: ${spacings?.xl}px;
-      margin-top: ${spacings?.xs}px;;
+      margin-bottom: ${spacings?.xxs}px;
+      margin-top: ${spacings?.xs}px;
     `;
   }}
 `;
@@ -67,4 +73,29 @@ export const StyledTextField = styled(TextField)`
 export const FlexWrapper = styled.div`
   display: flex;
   align-items: center;
+`;
+
+export const StyledSuggestionText = styled.div`
+  ${fontBodyXxxs}
+
+  ${(props) => {
+    const colors = getColors(props);
+    const spacings = getSpacings(props);
+
+    return `
+      color: ${colors?.warning[600]};
+      margin-left: ${spacings?.s}px;
+    `;
+  }}
+`;
+
+export const StyledWarningIcon = styled(WarningIcon)`
+  ${(props) => {
+    const colors = getColors(props);
+
+    return `
+      color: ${colors?.warning[400]};
+      margin-top: 0;
+    `;
+  }}
 `;
