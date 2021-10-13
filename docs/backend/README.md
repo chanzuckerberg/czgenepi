@@ -94,8 +94,7 @@ Create a new user to the auth0 covidtracker tenet, take note of auth0 user id
       * `select * from groups;`
 
 ## How to use aspencli:
-the cli is useful to call api endpoints through the terminal. To start using the cli you must be logged into rdev, staging, or prod with your
-aspen system admin account. 
+the cli is useful to call api endpoints through the terminal. To start using the cli you must be logged into rdev, staging, or prod with your aspen system admin account. 
 
 Example endpoint call to update public_ids based on private to public id mapping csv file (column headers must be named `private_identifier`,`public_identifier`, no line numbering)
 * `python src/cli/aspencli.py --env <local|staging|prod|rdev> samples update_public_ids --group-id 1 --private-to-public-id-mapping ~/Downloads/test_rename_public_identifiers.csv`
