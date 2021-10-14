@@ -128,11 +128,19 @@ export const UsherPlacementModal = ({
     </div>
   );
 
-  const onNumSamplesChange = debounce((e) => {
-    const numSamples = e?.target?.value;
-    const showWarning = !numSamples || numSamples < SUGGESTED_MIN_SAMPLES;
-    setShouldShowWarning(showWarning);
-  }, 1000);
+  const onOptionChange = (opt: DropdownOptionProps) => {
+    setDropdownLabel(opt?.name);
+  };
+
+  const onNumSamplesChange = debounce(
+    (e) => {
+      const numSamples = e?.target?.value;
+      const showWarning = !numSamples || numSamples < SUGGESTED_MIN_SAMPLES;
+      setShouldShowWarning(showWarning);
+    },
+    1000,
+    { maxWait: 1000 }
+  );
 
   return (
     <Dialog
@@ -233,6 +241,7 @@ export const UsherPlacementModal = ({
                 variant="outlined"
                 defaultValue={defaultNumSamples}
                 onChange={onNumSamplesChange}
+                showWarning={shouldShowWarning}
               />
               {shouldShowWarning && (
                 <FlexWrapper>
