@@ -150,10 +150,12 @@ const DataSubview: FunctionComponent<Props> = ({
   const [downloadFailed, setDownloadFailed] = useState<boolean>(false);
   const [isNSCreateTreeModalOpen, setIsNSCreateTreeModalOpen] =
     useState<boolean>(false);
-  const [isUsherPlacementModalOpen, setUsherPlacementModalOpen] = useState<boolean>(true);
   const [hasCreateTreeStarted, setCreateTreeStarted] = useState<boolean>(false);
   const [didCreateTreeFailed, setCreateTreeFailed] = useState<boolean>(false);
+  const [isUsherPlacementModalOpen, setUsherPlacementModalOpen] =
+    useState<boolean>(true);
   const [isUsherConfirmOpen, setIsUsherConfirmOpen] = useState<boolean>(false);
+  const [usherFastaURL, setUsherFastaURL] = useState<string>("");
   const [isUsherPreparingOpen, setIsUsherPreparingOpen] =
     useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -336,6 +338,13 @@ const DataSubview: FunctionComponent<Props> = ({
               handleCreateTreeFailed={handleCreateTreeFailed}
               handleSetCreateTreeStarted={handleSetCreateTreeStarted}
             />
+            <UsherPlacementModal
+              sampleIds={checkedSamples}
+              failedSamples={failedSamples}
+              open={isUsherPlacementModalOpen}
+              onClose={handleUsherPlacementModalClose}
+              setUsherFastaURL={setUsherFastaURL}
+            />
             <UsherConfirmationModal
               isOpen={isUsherConfirmOpen}
               onClose={() => setIsUsherConfirmOpen(false)}
@@ -343,12 +352,7 @@ const DataSubview: FunctionComponent<Props> = ({
             <UsherPreparingModal
               isOpen={isUsherPreparingOpen}
               onClose={() => setIsUsherPreparingOpen(false)}
-            />
-            <UsherPlacementModal
-              sampleIds={checkedSamples}
-              failedSamples={failedSamples}
-              open={isUsherPlacementModalOpen}
-              onClose={handleUsherPlacementModalClose}
+              usherFastaURL={usherFastaURL}
             />
           </>
         )}

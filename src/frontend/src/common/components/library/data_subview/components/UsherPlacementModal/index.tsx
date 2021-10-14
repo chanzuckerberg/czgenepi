@@ -24,6 +24,7 @@ import {
   FieldTitleSettings,
   FlexWrapper,
   StyledButton,
+  StyledInputDropdown,
   StyledList,
   StyledListItem,
   StyledSuggestionText,
@@ -36,6 +37,7 @@ interface Props {
   failedSamples: string[];
   open: boolean;
   onClose: () => void;
+  setUsherFastaUrl(): string;
 }
 interface DropdownOptionProps {
   id: number;
@@ -56,11 +58,12 @@ export const UsherPlacementModal = ({
   failedSamples,
   open,
   onClose,
+  setUsherFastaUrl,
 }: Props): JSX.Element => {
   const [dropdownLabel, setDropdownLabel] = useState<string>("");
-  const [dropdownOptions, setDropdownOptions] =
-    useState<DropdownOptionProps[]>();
-  const [fastaURL, setFastaURL] = useState<string>("");
+  const [dropdownOptions, setDropdownOptions] = useState<DropdownOptionProps[]>(
+    []
+  );
   const [isUsherDisabled, setUsherDisabled] = useState<boolean>(false);
   const [shouldShowWarning, setShouldShowWarning] = useState<boolean>(false);
 
@@ -89,7 +92,7 @@ export const UsherPlacementModal = ({
       onClose();
     },
     onSuccess: (data) => {
-      setFastaURL(data.url);
+      setUsherFastaUrl(data.url);
       onClose();
     },
   });
@@ -134,10 +137,11 @@ export const UsherPlacementModal = ({
   return (
     <Dialog
       disableBackdropClick
+      disableEnforceFocus
       disableEscapeKeyDown
       open={open}
       onClose={onClose}
-      fullWidth={true}
+      fullWidth
       maxWidth={"sm"}
     >
       <StyledDialogTitle>
@@ -205,6 +209,13 @@ export const UsherPlacementModal = ({
                   <StyledInfoOutlinedIcon />
                 </StyledTooltip>
               </FlexWrapper>
+              <Dropdown
+                label={dropdownLabel}
+                onChange={onOptionChange}
+                InputDropdownComponent={StyledInputDropdown}
+                InputDropdownProps={{ sdsStyle: "square" }}
+                options={dropdownOptions}
+              />
               <FlexWrapper>
                 <FieldTitleSettings>
                   Number of samples per subtree showing sample placement:

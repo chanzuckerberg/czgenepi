@@ -8,10 +8,13 @@ import {
   fontHeaderXs,
   getColors,
   getSpacings,
+  InputDropdown,
   List,
   ListItem,
 } from "czifui";
 import { StyledWarningIcon as WarningIcon } from "../FailedSampleAlert/style";
+
+const INPUT_HEIGHT = "34px";
 
 export const StyledListItem = styled(ListItem)`
   ${fontBodyXs}
@@ -36,10 +39,10 @@ export const StyledList = styled(List)`
 
 export const FieldTitle = styled.div`
   ${fontHeaderM}
-  color: black;
   ${(props) => {
     const spacings = getSpacings(props);
     return `
+      color: black;
       margin-bottom: ${spacings?.xxs}px;
     `;
   }}
@@ -56,17 +59,21 @@ export const FieldTitleSettings = styled.div`
   }}
 `;
 
-const doNotForwardProps = ["showWarning"];
+const doNotForwardProps = ["shouldShowWarning"];
 
 export const StyledTextField = styled(TextField, {
   shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
 })`
-  width: 150px;
   ${(props) => {
     const spacings = getSpacings(props);
     return `
       margin-bottom: ${spacings?.xxs}px;
       margin-top: ${spacings?.xs}px;
+      width: 150px;
+
+      .MuiInputBase-root {
+        height: ${INPUT_HEIGHT};
+      }
     `;
   }}
 `;
@@ -111,6 +118,18 @@ export const StyledButton = styled(Button)`
       &:active {
         background-color: ${colors?.gray[400]};
       }
+    `;
+  }}
+`;
+
+export const StyledInputDropdown = styled(InputDropdown)`
+  ${(props) => {
+    const spacings = getSpacings(props);
+
+    return `
+      margin-bottom: ${spacings?.xl}px;
+      width: 100%;
+      height: ${INPUT_HEIGHT};
     `;
   }}
 `;
