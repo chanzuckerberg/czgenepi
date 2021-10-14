@@ -377,7 +377,7 @@ def create_sample():
 
     already_exists: Union[
         None, Mapping[str, list[str]]
-    ] = api_utils.check_duplicate_samples(request_data, g.db_session)
+    ] = api_utils.check_duplicate_samples(request_data, g.db_session, user.group_id)
     if already_exists:
         raise ex.BadRequestException(
             f"Error inserting data, private_identifiers {already_exists['existing_private_ids']} or public_identifiers: {already_exists['existing_public_ids']} already exist in our database, please remove these samples before proceeding with upload.",

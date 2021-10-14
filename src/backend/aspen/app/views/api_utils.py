@@ -72,7 +72,7 @@ def get_existing_private_ids(
 ) -> list[str]:
     samples = session.query(Sample).filter(Sample.private_identifier.in_(private_ids))
 
-    if group_id:
+    if group_id is not None:
         samples = samples.filter(Sample.submitting_group_id == group_id)
 
     return [i.private_identifier for i in samples.all()]
@@ -83,19 +83,32 @@ def get_existing_public_ids(
 ) -> list[str]:
     samples = session.query(Sample).filter(Sample.public_identifier.in_(public_ids))
 
-    if group_id:
+    if group_id is not None:
         samples = samples.filter(Sample.submitting_group_id == group_id)
 
     return [i.public_identifier for i in samples.all()]
 
 
 def check_duplicate_samples(
-    data: Mapping, session: Session
+    data: Mapping,
+    session: Session,
+    group_id: Union[None, int] = None,
 ) -> Union[None, Mapping[str, list[str]]]:
+    """
+    Checks incoming `data` for duplicate private/public IDs of pre-existing IDs.
+
+    If called with a `group_id` arg, limits to only searching for duplicates within
+    the given group. If no group given, searches globally for duplicate IDs and will
+    match against any ID in any group that is already existing.
+    """
     private_ids, public_ids = get_all_identifiers_in_request(data)
 
-    existing_private_ids: list[str] = get_existing_private_ids(private_ids, session)
-    existing_public_ids: list[str] = get_existing_public_ids(public_ids, session)
+    existing_private_ids: list[str] = get_existing_private_ids(
+        private_ids, session, group_id
+    )
+    existing_public_ids: list[str] = get_existing_public_ids(
+        public_ids, session, group_id
+    )
 
     if existing_private_ids or existing_public_ids:
         return {
