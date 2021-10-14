@@ -20,6 +20,13 @@ class PostgresDatabase:
     def as_uri(self):
         return f"postgresql://{USERNAME}:{PASSWORD}@database:{self.port}/{self.database_name}"
 
+@dataclass
+class AsyncPostgresDatabase:
+    database_name: str
+    port: int
+    def as_uri(self):
+        return f"postgresql+asyncpg://{USERNAME}:{PASSWORD}@database:{self.port}/{self.database_name}"
+
 
 @pytest.fixture()
 def postgres_database() -> Generator[PostgresDatabase, None, None]:
@@ -46,3 +53,28 @@ def postgres_database() -> Generator[PostgresDatabase, None, None]:
     yield postgres_test_db
 
     admin_session.execute(f"drop database {database_name} with (force)")
+
+@pytest.fixture()
+async def async_postgres_database() -> Generator[AsyncPostgresDatabase, None, None]:
+    """Creates a postgres test database named a random string with username/password user_rw/password_rw, yields it, and then drops it."""
+
+    # create admin sql connection to create test database
+    admin_uri = "postgresql+asyncpg://postgres:password_postgres@database:5432/aspen_db"
+    # set isolation level to allow admin to create db
+    admin_sql_interface = aspen_connection.init_async_db(admin_uri, isolation_level="AUTOCOMMIT")
+    admin_session = admin_sql_interface.make_session()
+
+    # create random database name (for running tests in parallel)
+    letters = string.ascii_lowercase
+    database_name = "".join(random.choice(letters) for i in range(10))
+
+    await admin_session.execute(f"create database {database_name}")
+    await admin_session.execute(
+        f"grant all privileges on database {database_name} to {USERNAME}"
+    )
+
+    postgres_test_db = AsyncPostgresDatabase(database_name=database_name, port=5432)
+
+    yield postgres_test_db
+
+    await admin_session.execute(f"drop database {database_name} with (force)")
