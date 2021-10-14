@@ -19,11 +19,10 @@ from aspen.app.serializers import (
 from aspen.app.views.api_utils import (
     authz_sample_filters,
     get_matching_gisaid_ids,
-    get_missing_sample_ids,
+    get_missing_and_found_sample_ids,
 )
 from aspen.database.models import (
     AlignedGisaidDump,
-    GisaidMetadata,
     PathogenGenome,
     PhyloRun,
     Sample,
@@ -65,7 +64,9 @@ def start_phylo_run():
     all_samples = authz_sample_filters(all_samples, sample_ids, user)
 
     # Are there any sample ID's that don't match sample table public and private identifiers
-    missing_sample_ids = get_missing_sample_ids(sample_ids, all_samples)
+    missing_sample_ids, found_sample_ids = get_missing_and_found_sample_ids(
+        sample_ids, all_samples
+    )
 
     # See if these missing_sample_ids match any Gisaid IDs
     gisaid_ids = get_matching_gisaid_ids(missing_sample_ids, g.db_session)

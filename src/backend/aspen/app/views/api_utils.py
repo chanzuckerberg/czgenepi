@@ -1,6 +1,6 @@
 import datetime
 from collections import Counter
-from typing import Collection, Iterable, List, Mapping, Optional, Set, Tuple, Union
+from typing import Any, Collection, Iterable, List, Mapping, Optional, Set, Tuple, Union
 
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.query import Query
@@ -232,7 +232,9 @@ def authz_phylo_tree_filters(query: Query, tree_ids: Set[int], user: User) -> Qu
     return query
 
 
-def get_missing_sample_ids(sample_ids: Iterable[str], all_samples: Query) -> Set[str]:
+def get_missing_and_found_sample_ids(
+    sample_ids: Iterable[str], all_samples: Query
+) -> Tuple[Set[str], Set[Any]]:
     """
     Check a list of sample identifiers against Sample table public and private identifiers
 
@@ -244,6 +246,7 @@ def get_missing_sample_ids(sample_ids: Iterable[str], all_samples: Query) -> Set
 
     Returns:
             missing_sample_ids (Set[str]): Set of idenitifiers that did not match against any sample public or private identifiers
+            found_sample_ids (Set[str]): Set of idenitifiers found as either public or private identifiers
 
     """
     found_sample_ids = set()
@@ -253,7 +256,7 @@ def get_missing_sample_ids(sample_ids: Iterable[str], all_samples: Query) -> Set
 
     # These are the sample ID's that don't match the aspen db
     missing_sample_ids = set(sample_ids) - found_sample_ids
-    return missing_sample_ids
+    return missing_sample_ids, found_sample_ids
 
 
 def get_matching_gisaid_ids(sample_ids: Iterable[str], session: Session) -> Set[str]:
@@ -277,7 +280,7 @@ def get_matching_gisaid_ids(sample_ids: Iterable[str], session: Session) -> Set[
     # (Gisaid data is prepped by Nextstrain which strips off this prefix)
 
     # first create a mapping of ids that were stripped (so we can return unstripped id later)
-    stripped_mapping: Mapping[str:str] = {s.strip("hCoV-19/"): s for s in sample_ids}
+    stripped_mapping: Mapping[str, str] = {s.strip("hCoV-19/"): s for s in sample_ids}
 
     gisaid_matches: Iterable[GisaidMetadata] = session.query(GisaidMetadata).filter(
         GisaidMetadata.strain.in_(stripped_mapping.keys())

@@ -1,17 +1,18 @@
-from typing import Iterable
+from typing import Iterable, Set
 
 import sentry_sdk
 from flask import g, make_response, request
 from marshmallow.exceptions import ValidationError
+from sqlalchemy.orm.query import Query
 
 from aspen.app.app import application, requires_auth
 from aspen.app.serializers import ValidateIDsRequestSchema, ValidateIDsResponseSchema
 from aspen.app.views.api_utils import (
     authz_sample_filters,
     get_matching_gisaid_ids,
-    get_missing_sample_ids,
+    get_missing_and_found_sample_ids,
 )
-from aspen.database.models import GisaidMetadata, Sample
+from aspen.database.models import Sample
 from aspen.error import http_exceptions as ex
 
 
@@ -40,16 +41,17 @@ def validate_ids():
     all_samples: Iterable[Sample] = g.db_session.query(Sample)
 
     # get all samples from request that the user has permission to use
-    all_samples = authz_sample_filters(all_samples, sample_ids, user)
+    all_samples: Query = authz_sample_filters(all_samples, sample_ids, user)
 
     # Are there any sample ID's that don't match sample table public and private identifiers
-    missing_sample_ids = get_missing_sample_ids(sample_ids, all_samples)
+    missing_sample_ids: Set[str]
+    missing_sample_ids, _ = get_missing_and_found_sample_ids(sample_ids, all_samples)
 
     # See if these missing_sample_ids match any Gisaid identifiers
-    gisaid_ids = get_matching_gisaid_ids(missing_sample_ids, g.db_session)
+    gisaid_ids: Set[str] = get_matching_gisaid_ids(missing_sample_ids, g.db_session)
 
     # Do we have any samples that are not aspen private or public identifiers or gisaid identifiers?
-    missing_sample_ids = missing_sample_ids - gisaid_ids
+    missing_sample_ids: Set[str] = missing_sample_ids - gisaid_ids
 
     responseschema = ValidateIDsResponseSchema()
 
