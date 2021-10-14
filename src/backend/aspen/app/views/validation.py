@@ -18,6 +18,11 @@ from aspen.error import http_exceptions as ex
 @application.route("/api/validate/ids")
 @requires_auth
 def validate_ids():
+    """
+    take in a list of identifiers and checks if all idenitifiers exist as either Sample public or private identifiers, or GisaidMetadata strain names
+
+    returns a response with list of missing identifiers if any, otherwise will return an empty list
+    """
 
     user = g.auth_user
 
