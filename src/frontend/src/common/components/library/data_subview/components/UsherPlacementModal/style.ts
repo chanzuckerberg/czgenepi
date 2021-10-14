@@ -37,7 +37,7 @@ export const StyledList = styled(List)`
   }}
 `;
 
-export const FieldTitle = styled.div`
+export const StyledSectionHeader = styled.div`
   ${fontHeaderM}
   ${(props) => {
     const spacings = getSpacings(props);
@@ -48,15 +48,9 @@ export const FieldTitle = styled.div`
   }}
 `;
 
-export const FieldTitleSettings = styled.div`
+export const StyledFieldTitleText = styled.div`
   ${fontHeaderXs}
   color: black;
-  ${(props) => {
-    const spacings = getSpacings(props);
-    return `
-      margin-bottom: ${spacings?.xxs}px;
-    `;
-  }}
 `;
 
 const doNotForwardProps = ["shouldShowWarning"];
@@ -128,6 +122,7 @@ export const StyledInputDropdown = styled(InputDropdown)`
 
     return `
       margin-bottom: ${spacings?.xl}px;
+      margin-top: ${spacings?.xxs}px;
       width: 100%;
       height: ${INPUT_HEIGHT};
     `;

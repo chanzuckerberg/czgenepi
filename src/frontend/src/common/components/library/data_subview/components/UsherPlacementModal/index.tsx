@@ -20,13 +20,13 @@ import {
 import { Header, StyledIconButton } from "../DownloadModal/style";
 import { FailedSampleAlert } from "../FailedSampleAlert";
 import {
-  FieldTitle,
-  FieldTitleSettings,
+  StyledFieldTitleText,
   FlexWrapper,
   StyledButton,
   StyledInputDropdown,
   StyledList,
   StyledListItem,
+  StyledSectionHeader,
   StyledSuggestionText,
   StyledTextField,
   StyledWarningIcon,
@@ -176,7 +176,7 @@ export const UsherPlacementModal = ({
           <form onSubmit={handleSubmit}>
             <TreeNameSection>
               <TreeNameInfoWrapper>
-                <FieldTitle>Use UShER for: </FieldTitle>
+                <StyledSectionHeader>Use UShER for: </StyledSectionHeader>
               </TreeNameInfoWrapper>
               <StyledList>
                 <StyledListItem>
@@ -203,11 +203,11 @@ export const UsherPlacementModal = ({
                   </div>
                 </StyledListItem>
               </StyledList>
-              <FieldTitle>Settings</FieldTitle>
+              <StyledSectionHeader>Settings</StyledSectionHeader>
               <FlexWrapper>
-                <FieldTitleSettings>
+                <StyledFieldTitleText>
                   Place Samples onto Phylogenetic Tree Version:
-                </FieldTitleSettings>
+                </StyledFieldTitleText>
                 <StyledTooltip
                   arrow
                   leaveDelay={200}
@@ -225,9 +225,9 @@ export const UsherPlacementModal = ({
                 options={dropdownOptions}
               />
               <FlexWrapper>
-                <FieldTitleSettings>
+                <StyledFieldTitleText>
                   Number of samples per subtree showing sample placement:
-                </FieldTitleSettings>
+                </StyledFieldTitleText>
                 <StyledTooltip
                   arrow
                   title={SAMPLES_PER_SUBTREE_TOOLTIP_TEXT}
