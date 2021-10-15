@@ -53,11 +53,7 @@ export const StyledFieldTitleText = styled.div`
   color: black;
 `;
 
-const doNotForwardProps = ["shouldShowWarning"];
-
-export const StyledTextField = styled(TextField, {
-  shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
-})`
+export const StyledTextField = styled(TextField)`
   ${(props) => {
     const spacings = getSpacings(props);
     return `

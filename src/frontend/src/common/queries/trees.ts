@@ -25,6 +25,10 @@ interface getFastaURLPayload {
   samples: string[];
 }
 
+export interface FastaDataType {
+  url: string;
+}
+
 // * these two types should stay in sync. There is technically a way to do it in TS, but it is
 // * very convoluted: https://stackoverflow.com/questions/44323441
 interface CreateTreeType {
@@ -65,7 +69,7 @@ export async function getFastaURL({
   sampleIds,
 }: {
   sampleIds: string[];
-}): Promise<unknown> {
+}): Promise<FastaDataType> {
   const payload: getFastaURLPayload = {
     samples: sampleIds,
   };

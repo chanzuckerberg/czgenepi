@@ -1,11 +1,15 @@
 import { Dialog } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
-import { Dropdown } from "czifui";
+import { DefaultMenuSelectOption, Dropdown, InputDropdown } from "czifui";
 import { debounce, forEach } from "lodash";
 import React, { SyntheticEvent, useEffect, useState } from "react";
 import { useMutation } from "react-query";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
-import { getFastaURL, getUsherOptions } from "src/common/queries/trees";
+import {
+  FastaDataType,
+  getFastaURL,
+  getUsherOptions,
+} from "src/common/queries/trees";
 import { pluralize } from "src/common/utils/strUtils";
 import {
   Content,
@@ -43,9 +47,13 @@ interface Props {
 interface DropdownOptionProps {
   id: number;
   description: string;
-  name?: string;
+  name: string;
   value: string;
   priority: number;
+}
+
+interface UsherDataType {
+  usher_options: DropdownOptionProps[];
 }
 
 export const SUGGESTED_MIN_SAMPLES = 50;
@@ -72,7 +80,7 @@ export const UsherPlacementModal = ({
 
   useEffect(() => {
     const fetchUsherOpts = async () => {
-      const resp = await getUsherOptions();
+      const resp = (await getUsherOptions()) as UsherDataType;
       const options = resp.usher_options;
       forEach(options, (opt) => (opt.name = opt.description));
 
@@ -97,7 +105,7 @@ export const UsherPlacementModal = ({
     onError: () => {
       onClose();
     },
-    onSuccess: (data) => {
+    onSuccess: (data: FastaDataType) => {
       const url = data?.url;
       if (url) onLinkCreateSuccess(data.url);
     },
@@ -134,7 +142,12 @@ export const UsherPlacementModal = ({
     </div>
   );
 
-  const onOptionChange = (opt: DropdownOptionProps) => {
+  const onOptionChange = (opt: DefaultMenuSelectOption | null) => {
+    if (!opt) {
+      setDropdownLabel("");
+      return;
+    }
+
     setDropdownLabel(opt?.name);
   };
 
@@ -227,7 +240,9 @@ export const UsherPlacementModal = ({
               <Dropdown
                 label={dropdownLabel}
                 onChange={onOptionChange}
-                InputDropdownComponent={StyledInputDropdown}
+                InputDropdownComponent={
+                  StyledInputDropdown as typeof InputDropdown
+                }
                 InputDropdownProps={{ sdsStyle: "square" }}
                 options={dropdownOptions}
               />
@@ -248,7 +263,6 @@ export const UsherPlacementModal = ({
                 variant="outlined"
                 defaultValue={defaultNumSamples}
                 onChange={onNumSamplesChange}
-                showWarning={shouldShowWarning}
               />
               {shouldShowWarning && (
                 <FlexWrapper>
