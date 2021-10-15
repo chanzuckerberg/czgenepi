@@ -60,7 +60,7 @@ def start_phylo_run():
         joinedload(Sample.uploaded_pathogen_genome, innerjoin=True),
     )
 
-    # Step 3 - Enforce AuthZ (check if user has permission to see private identifiers)
+    # Step 3 - Enforce AuthZ (check if user has permission to see private identifiers and scope down the search for matching ID's to groups that the user has read access to.)
     user_visible_samples = authz_sample_filters(all_samples, sample_ids, user)
 
     # Are there any sample ID's that don't match sample table public and private identifiers

@@ -563,7 +563,7 @@ def validate_ids():
 
     all_samples: Iterable[Sample] = g.db_session.query(Sample)
 
-    # get all samples from request that the user has permission to use
+    # get all samples from request that the user has permission to use and scope down the search for matching ID's to groups that the user has read access to.
     user_visible_samples: Query = authz_sample_filters(all_samples, sample_ids, user)
 
     # Are there any sample ID's that don't match sample table public and private identifiers
