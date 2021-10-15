@@ -4,7 +4,6 @@ from fastapi import Depends, FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
 from aspen.api.auth import get_auth_user
-from aspen.api.deps import set_db
 from aspen.api.error.http_exceptions import AspenException, exception_handler
 from aspen.api.middleware.session import SessionMiddleware
 from aspen.api.settings import get_settings
@@ -32,7 +31,6 @@ def get_app() -> FastAPI:
         debug=settings.DEBUG,
         openapi_url="/v2/openapi.json",
         docs_url="/v2/docs",
-        dependencies=[Depends(set_db)],
     )
 
     # Configure CORS

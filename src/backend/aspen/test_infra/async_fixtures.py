@@ -16,7 +16,6 @@ INITIAL_DATABASE = "postgres"
 
 pytestmark = pytest.mark.anyio
 
-
 @dataclass
 class AsyncPostgresDatabase:
     database_name: str

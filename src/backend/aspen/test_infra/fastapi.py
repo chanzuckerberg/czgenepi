@@ -7,11 +7,11 @@ from aspen.api.main import app
 pytestmark = pytest.mark.anyio
 
 @pytest.fixture(scope="function")
-def fastapi_app(postgres_database):
+def xxfastapi_app(postgres_database):
     yield app
 
 
 @pytest.fixture(scope="function")
-async def fastapi_client(fastapi_app):
+async def xxfastapi_client(fastapi_app):
     client = AsyncClient(app=app)
     return client
