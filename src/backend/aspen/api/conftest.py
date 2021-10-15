@@ -58,7 +58,7 @@ async def async_db() -> AsyncGenerator[AsyncPostgresDatabase, None]:
     yield postgres_test_db
 
     await admin_session.execute(f"drop database {database_name} with (force)")
-    await admin_session.close()
+    await admin_session.close()  # type: ignore
 
 
 @pytest.fixture()
