@@ -1,4 +1,5 @@
 import os
+from typing import List
 
 from fastapi import Depends, FastAPI
 from starlette.middleware.cors import CORSMiddleware
@@ -10,7 +11,7 @@ from aspen.api.settings import get_settings
 from aspen.api.views import auth, health, users
 
 
-def get_allowed_origins():
+def get_allowed_origins() -> List[str]:
     allowed_origins = []
     deployment = os.getenv("DEPLOYMENT_STAGE")
     frontend_url = os.getenv("FRONTEND_URL")

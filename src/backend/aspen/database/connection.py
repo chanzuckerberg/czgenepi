@@ -35,12 +35,7 @@ class SqlAlchemyInterface:
 
 def init_async_db(db_uri: str, **kwargs) -> SqlAlchemyInterface:
     engine = create_async_engine(
-        db_uri,
-        echo=False,
-        pool_size=5,
-        max_overflow=5,
-        future=True,
-        **kwargs
+        db_uri, echo=False, pool_size=5, max_overflow=5, future=True, **kwargs
     )
     return SqlAlchemyInterface(engine, use_async=True)
 

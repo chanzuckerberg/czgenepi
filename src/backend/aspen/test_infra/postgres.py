@@ -21,15 +21,6 @@ class PostgresDatabase:
         return f"postgresql://{USERNAME}:{PASSWORD}@database:{self.port}/{self.database_name}"
 
 
-@dataclass
-class AsyncPostgresDatabase:
-    database_name: str
-    port: int
-
-    def as_uri(self):
-        return f"postgresql+asyncpg://{USERNAME}:{PASSWORD}@database:{self.port}/{self.database_name}"
-
-
 @pytest.fixture()
 def postgres_database() -> Generator[PostgresDatabase, None, None]:
     """Creates a postgres test database named a random string with username/password user_rw/password_rw, yields it, and then drops it."""

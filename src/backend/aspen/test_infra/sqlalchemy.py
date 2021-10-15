@@ -5,7 +5,7 @@ from sqlalchemy.orm.session import Session
 
 from aspen.database import connection as aspen_connection
 from aspen.database import schema
-from aspen.test_infra.postgres import PostgresDatabase, AsyncPostgresDatabase
+from aspen.test_infra.postgres import PostgresDatabase
 
 
 @pytest.fixture()

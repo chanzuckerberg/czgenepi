@@ -46,7 +46,7 @@ class BaseMixin(Base):
 
     @classmethod
     async def get_by_id(
-            cls: Type[TIDBase], db, obj_id: int, prefetch: Optional[Tuple[str, ...]] = None
+        cls: Type[TIDBase], db, obj_id: int, prefetch: Optional[Tuple[str, ...]] = None
     ) -> Optional[TIDBase]:
         print(type(db))
         query = cls._get_query(prefetch).where(cls.id == obj_id)

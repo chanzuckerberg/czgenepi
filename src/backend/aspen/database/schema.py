@@ -17,6 +17,7 @@ def create_tables_and_schema(interface: SqlAlchemyInterface):
         meta.create_all(bind=interface.engine)
         reset_permissions(session, meta.schema)
 
+
 async def async_create_tables_and_schema(interface: SqlAlchemyInterface):
     """Creates the schema and all tables"""
     sqlalchemy_event.listen(

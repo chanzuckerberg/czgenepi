@@ -177,7 +177,7 @@ class Settings(BaseSettings):
     ####################################################################################
     # SSM Parameter properties
     @lru_cache
-    def _AWS_SSM_PARAMETER(self, parameter_suffix) -> Mapping[str, Any]:
+    def _AWS_SSM_PARAMETER(self, parameter_suffix: str) -> Mapping[str, Any]:
         session = Session(region_name=self.AWS_REGION)
 
         deployment_stage = os.environ.get("DEPLOYMENT_STAGE")
