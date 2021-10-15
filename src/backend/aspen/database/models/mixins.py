@@ -6,8 +6,6 @@ import sqlalchemy as sa
 from sqlalchemy import Column, Integer
 from sqlalchemy.orm import declarative_mixin, selectinload  # type: ignore
 
-from aspen.api.deps import get_db
-
 TBase = TypeVar("TBase", bound="Base")
 TIDBase = TypeVar("TIDBase", bound="BaseMixin")
 
@@ -33,10 +31,9 @@ class Base:
 
     @classmethod
     async def all(
-        cls: Type[TBase], prefetch: Optional[Tuple[str, ...]] = None
+        cls: Type[TBase], db, prefetch: Optional[Tuple[str, ...]] = None
     ) -> List[TBase]:
         query = cls._get_query(prefetch)
-        db = get_db()
         db_execute = await db.execute(query)
         return db_execute.scalars().all()
 
@@ -49,10 +46,10 @@ class BaseMixin(Base):
 
     @classmethod
     async def get_by_id(
-        cls: Type[TIDBase], obj_id: int, prefetch: Optional[Tuple[str, ...]] = None
+            cls: Type[TIDBase], db, obj_id: int, prefetch: Optional[Tuple[str, ...]] = None
     ) -> Optional[TIDBase]:
+        print(type(db))
         query = cls._get_query(prefetch).where(cls.id == obj_id)
-        db = get_db()
         db_execute = await db.execute(query)
         instance = db_execute.scalars().first()
         return instance

@@ -24,12 +24,11 @@ def get_usergroup_query(session: AsyncSession, user_id: str) -> Query:
     )
 
 
-async def setup_userinfo(user_id):
+async def setup_userinfo(db, user_id):
     # sentry_sdk.set_user( { "requested_user_id": user_id, })
-    session = get_db()
     try:
-        userquery = get_usergroup_query(session, user_id)
-        userwait = await session.execute(userquery)
+        userquery = get_usergroup_query(db, user_id)
+        userwait = await db.execute(userquery)
         user = userwait.unique().scalars().first()
     except NoResultFound:
         # sentry_sdk.capture_message(
@@ -45,7 +44,7 @@ async def setup_userinfo(user_id):
     return user
 
 
-async def get_auth_user(request: Request):
+async def get_auth_user(request: Request, db=Depends(get_db)):
     settings = get_settings()
     auth_header = request.headers.get("authorization")
     auth0_user_id = None
@@ -63,7 +62,7 @@ async def get_auth_user(request: Request):
     if not auth0_user_id:
         # TODO - redirect to login.
         raise Exception("No Userid Found!")
-    found_auth_user = await setup_userinfo(auth0_user_id)
+    found_auth_user = await setup_userinfo(db, auth0_user_id)
     if not found_auth_user:
         # login attempt from user not in DB
         # TODO - redirect to login.
