@@ -27,7 +27,6 @@ class GisaidAccession(Accession):
     """A single GISAID accession of a pathogen genome."""
 
     __tablename__ = "gisaid_accessions"
-    __table_args__ = (UniqueConstraint("public_identifier"),)
     __mapper_args__ = {"polymorphic_identity": EntityType.GISAID_REPOSITORY_SUBMISSION}
 
     entity_id = Column(Integer, ForeignKey(Entity.id), primary_key=True)
