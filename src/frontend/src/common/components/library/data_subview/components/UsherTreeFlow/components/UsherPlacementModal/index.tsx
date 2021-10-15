@@ -16,9 +16,9 @@ import {
   Title,
   TreeNameInfoWrapper,
   TreeNameSection,
-} from "../CreateNSTreeModal/style";
-import { Header, StyledIconButton } from "../DownloadModal/style";
-import { FailedSampleAlert } from "../FailedSampleAlert";
+} from "../../../CreateNSTreeModal/style";
+import { Header, StyledIconButton } from "../../../DownloadModal/style";
+import { FailedSampleAlert } from "../../../FailedSampleAlert";
 import {
   FlexWrapper,
   StyledButton,
@@ -37,7 +37,7 @@ interface Props {
   failedSamples: string[];
   open: boolean;
   onClose: () => void;
-  onLinkCreateSuccess(url?: string): voi;
+  onLinkCreateSuccess(url?: string): void;
 }
 
 interface DropdownOptionProps {

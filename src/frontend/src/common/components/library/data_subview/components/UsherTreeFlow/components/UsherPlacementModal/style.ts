@@ -12,7 +12,7 @@ import {
   List,
   ListItem,
 } from "czifui";
-import { StyledWarningIcon as WarningIcon } from "../FailedSampleAlert/style";
+import { StyledWarningIcon as WarningIcon } from "../../../FailedSampleAlert/style";
 
 const INPUT_HEIGHT = "34px";
 
