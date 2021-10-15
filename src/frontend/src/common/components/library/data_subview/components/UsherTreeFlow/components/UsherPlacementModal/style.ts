@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import { Dialog } from "@material-ui/core";
 import TextField from "@material-ui/core/TextField";
 import {
   Button,
@@ -123,4 +124,11 @@ export const StyledInputDropdown = styled(InputDropdown)`
       height: ${INPUT_HEIGHT};
     `;
   }}
+`;
+
+// TODO (mlila): this can be removed when we are on czifui version 1.1.2 or higher
+export const StyledDialog = styled(Dialog)`
+  + [role="tooltip"] {
+    z-index: 1400;
+  }
 `;

@@ -1,4 +1,3 @@
-import { Dialog } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import { DefaultMenuSelectOption, Dropdown, InputDropdown } from "czifui";
 import { debounce, forEach } from "lodash";
@@ -26,6 +25,7 @@ import { FailedSampleAlert } from "../../../FailedSampleAlert";
 import {
   FlexWrapper,
   StyledButton,
+  StyledDialog,
   StyledFieldTitleText,
   StyledInputDropdown,
   StyledList,
@@ -163,7 +163,7 @@ export const UsherPlacementModal = ({
   );
 
   return (
-    <Dialog
+    <StyledDialog
       disableBackdropClick
       disableEnforceFocus
       disableEscapeKeyDown
@@ -287,6 +287,6 @@ export const UsherPlacementModal = ({
           </form>
         </Content>
       </StyledDialogContent>
-    </Dialog>
+    </StyledDialog>
   );
 };
