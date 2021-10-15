@@ -88,6 +88,11 @@ export const UsherPlacementModal = ({
     fetchUsherOpts();
   }, []);
 
+  useEffect(() => {
+    const hasValidSamplesSelected = sampleIds?.length > failedSamples?.length;
+    setUsherDisabled(!hasValidSamplesSelected);
+  }, [sampleIds, failedSamples]);
+
   const mutation = useMutation(getFastaURL, {
     onError: () => {
       onClose();

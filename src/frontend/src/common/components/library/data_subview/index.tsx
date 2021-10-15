@@ -178,6 +178,7 @@ const DataSubview: FunctionComponent<Props> = ({
 
   const handleUsherPlacementModalClose = () => {
     setUsherPlacementModalOpen(false);
+    setUsherFastaUrl("");
   };
 
   const onLinkCreateSuccess = (url: string) => {
@@ -186,8 +187,19 @@ const DataSubview: FunctionComponent<Props> = ({
   };
 
   const handleUsherConfirmationModalClose = () => {
+    handleUsherPlacementModalClose();
+    setIsUsherConfirmOpen(false);
+    setIsUsherPreparingOpen(false);
+  };
+
+  const handleUsherConfirmationModalConfirm = () => {
     setIsUsherConfirmOpen(false);
     setIsUsherPreparingOpen(true);
+  };
+
+  const handleUsherPreparingModalClose = () => {
+    handleUsherPlacementModalClose();
+    setIsUsherPreparingOpen(false);
   };
 
   const handleCreateTreeFailed = () => {
@@ -358,10 +370,11 @@ const DataSubview: FunctionComponent<Props> = ({
             <UsherConfirmationModal
               isOpen={isUsherConfirmOpen}
               onClose={handleUsherConfirmationModalClose}
+              onConfirm={handleUsherConfirmationModalConfirm}
             />
             <UsherPreparingModal
               isOpen={isUsherPreparingOpen}
-              onClose={() => setIsUsherPreparingOpen(false)}
+              onClose={handleUsherPreparingModalClose}
               usherFastaUrl={usherFastaUrl}
             />
           </>
