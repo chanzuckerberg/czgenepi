@@ -132,14 +132,15 @@ export const UsherPlacementModal = ({
     setDropdownLabel(opt?.name);
   };
 
+  const ONE_SECOND = 1000;
   const onNumSamplesChange = debounce(
     (e) => {
       const numSamples = e?.target?.value;
       const showWarning = !numSamples || numSamples < SUGGESTED_MIN_SAMPLES;
       setShouldShowWarning(showWarning);
     },
-    1000,
-    { maxWait: 1000 }
+    ONE_SECOND,
+    { maxWait: ONE_SECOND }
   );
 
   return (
