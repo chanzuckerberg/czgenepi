@@ -97,9 +97,9 @@ class Sample(idbase, DictMixin):  # type: ignore
             "submitting_group_id",
             "public_identifier",
             # To avoid overlapping above unique index, explicitly set `name` here
-            name='uq_samples_submitting_group_id_public_identifier'
-            ),
-        )
+            name="uq_samples_submitting_group_id_public_identifier",
+        ),
+    )
 
     submitting_group_id = Column(
         Integer,

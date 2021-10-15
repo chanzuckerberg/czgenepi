@@ -4,7 +4,6 @@ Create Date: 2021-10-15 20:59:01.637737
 
 """
 import enumtables  # noqa: F401
-import sqlalchemy as sa
 from alembic import op
 
 revision = "20211015_205900"
