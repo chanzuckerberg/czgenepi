@@ -155,7 +155,7 @@ const DataSubview: FunctionComponent<Props> = ({
   const [isUsherPlacementModalOpen, setUsherPlacementModalOpen] =
     useState<boolean>(true);
   const [isUsherConfirmOpen, setIsUsherConfirmOpen] = useState<boolean>(false);
-  const [usherFastaURL, setUsherFastaURL] = useState<string>("");
+  const [usherFastaUrl, setUsherFastaUrl] = useState<string>("");
   const [isUsherPreparingOpen, setIsUsherPreparingOpen] =
     useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -178,6 +178,16 @@ const DataSubview: FunctionComponent<Props> = ({
 
   const handleUsherPlacementModalClose = () => {
     setUsherPlacementModalOpen(false);
+  };
+
+  const onLinkCreateSuccess = (url: string) => {
+    setUsherFastaUrl(url);
+    setIsUsherConfirmOpen(true);
+  };
+
+  const handleUsherConfirmationModalClose = () => {
+    setIsUsherConfirmOpen(false);
+    setIsUsherPreparingOpen(true);
   };
 
   const handleCreateTreeFailed = () => {
@@ -343,16 +353,16 @@ const DataSubview: FunctionComponent<Props> = ({
               failedSamples={failedSamples}
               open={isUsherPlacementModalOpen}
               onClose={handleUsherPlacementModalClose}
-              setUsherFastaURL={setUsherFastaURL}
+              onLinkCreateSuccess={onLinkCreateSuccess}
             />
             <UsherConfirmationModal
               isOpen={isUsherConfirmOpen}
-              onClose={() => setIsUsherConfirmOpen(false)}
+              onClose={handleUsherConfirmationModalClose}
             />
             <UsherPreparingModal
               isOpen={isUsherPreparingOpen}
               onClose={() => setIsUsherPreparingOpen(false)}
-              usherFastaURL={usherFastaURL}
+              usherFastaUrl={usherFastaUrl}
             />
           </>
         )}

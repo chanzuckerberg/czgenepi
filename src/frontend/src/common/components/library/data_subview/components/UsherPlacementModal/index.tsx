@@ -20,9 +20,9 @@ import {
 import { Header, StyledIconButton } from "../DownloadModal/style";
 import { FailedSampleAlert } from "../FailedSampleAlert";
 import {
-  StyledFieldTitleText,
   FlexWrapper,
   StyledButton,
+  StyledFieldTitleText,
   StyledInputDropdown,
   StyledList,
   StyledListItem,
@@ -37,8 +37,9 @@ interface Props {
   failedSamples: string[];
   open: boolean;
   onClose: () => void;
-  setUsherFastaUrl(): string;
+  onLinkCreateSuccess(url?: string): voi;
 }
+
 interface DropdownOptionProps {
   id: number;
   description: string;
@@ -54,11 +55,11 @@ const getDefaultNumSamplesPerSubtree = (numSelected: number): number => {
 };
 
 export const UsherPlacementModal = ({
-  sampleIds,
   failedSamples,
-  open,
+  sampleIds,
   onClose,
-  setUsherFastaUrl,
+  onLinkCreateSuccess,
+  open,
 }: Props): JSX.Element => {
   const [dropdownLabel, setDropdownLabel] = useState<string>("");
   const [dropdownOptions, setDropdownOptions] = useState<DropdownOptionProps[]>(
@@ -92,8 +93,8 @@ export const UsherPlacementModal = ({
       onClose();
     },
     onSuccess: (data) => {
-      setUsherFastaUrl(data.url);
-      onClose();
+      const url = data?.url;
+      if (url) onLinkCreateSuccess(data.url);
     },
   });
 
