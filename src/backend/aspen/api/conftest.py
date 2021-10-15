@@ -58,6 +58,7 @@ async def async_db() -> AsyncGenerator[AsyncPostgresDatabase, None]:
     yield postgres_test_db
 
     await admin_session.execute(f"drop database {database_name} with (force)")
+    await admin_session.close()
 
 
 @pytest.fixture()
@@ -106,16 +107,16 @@ async def override_get_auth_user(
 
 
 @pytest.fixture()
-async def app(
+async def api(
     async_db: AsyncPostgresDatabase,
 ) -> FastAPI:
-    app = get_app()
-    app.dependency_overrides[get_db] = partial(override_get_db, async_db)
-    app.dependency_overrides[get_auth_user] = override_get_auth_user
-    return app
+    api = get_app()
+    api.dependency_overrides[get_db] = partial(override_get_db, async_db)
+    api.dependency_overrides[get_auth_user] = override_get_auth_user
+    return api
 
 
 @pytest.fixture(scope="function")
-async def http_client(app: FastAPI) -> AsyncGenerator[AsyncClient, None]:
-    async with AsyncClient(app=app, base_url="http://test") as client:
+async def http_client(api: FastAPI) -> AsyncGenerator[AsyncClient, None]:
+    async with AsyncClient(app=api, base_url="http://test") as client:
         yield client

@@ -4,6 +4,7 @@ from typing import Any, List, Optional, Tuple, Type, TypeVar
 
 import sqlalchemy as sa
 from sqlalchemy import Column, Integer
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import declarative_mixin, selectinload  # type: ignore
 
 TBase = TypeVar("TBase", bound="Base")
@@ -31,7 +32,7 @@ class Base:
 
     @classmethod
     async def all(
-        cls: Type[TBase], db, prefetch: Optional[Tuple[str, ...]] = None
+        cls: Type[TBase], db: AsyncSession, prefetch: Optional[Tuple[str, ...]] = None
     ) -> List[TBase]:
         query = cls._get_query(prefetch)
         db_execute = await db.execute(query)
@@ -46,9 +47,11 @@ class BaseMixin(Base):
 
     @classmethod
     async def get_by_id(
-        cls: Type[TIDBase], db, obj_id: int, prefetch: Optional[Tuple[str, ...]] = None
+        cls: Type[TIDBase],
+        db: AsyncSession,
+        obj_id: int,
+        prefetch: Optional[Tuple[str, ...]] = None,
     ) -> Optional[TIDBase]:
-        print(type(db))
         query = cls._get_query(prefetch).where(cls.id == obj_id)
         db_execute = await db.execute(query)
         instance = db_execute.scalars().first()
