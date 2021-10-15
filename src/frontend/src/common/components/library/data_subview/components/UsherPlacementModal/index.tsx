@@ -76,7 +76,7 @@ export const UsherPlacementModal = ({
       const options = resp.usher_options;
       forEach(options, (opt) => (opt.name = opt.description));
 
-      options.sort((a, b) => {
+      options.sort((a: DropdownOptionProps, b: DropdownOptionProps) => {
         const aPri = a?.priority ?? 0;
         const bPri = b?.priority ?? 0;
         return aPri - bPri;
@@ -89,7 +89,7 @@ export const UsherPlacementModal = ({
   }, []);
 
   const mutation = useMutation(getFastaURL, {
-    onError: (err) => {
+    onError: () => {
       onClose();
     },
     onSuccess: (data) => {

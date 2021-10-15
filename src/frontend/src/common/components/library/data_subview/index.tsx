@@ -153,7 +153,7 @@ const DataSubview: FunctionComponent<Props> = ({
   const [hasCreateTreeStarted, setCreateTreeStarted] = useState<boolean>(false);
   const [didCreateTreeFailed, setCreateTreeFailed] = useState<boolean>(false);
   const [isUsherPlacementModalOpen, setUsherPlacementModalOpen] =
-    useState<boolean>(true);
+    useState<boolean>(false);
   const [isUsherConfirmOpen, setIsUsherConfirmOpen] = useState<boolean>(false);
   const [usherFastaUrl, setUsherFastaUrl] = useState<string>("");
   const [isUsherPreparingOpen, setIsUsherPreparingOpen] =

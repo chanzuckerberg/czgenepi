@@ -11,7 +11,7 @@ interface Props {
   numFailedSamples: number;
 }
 
-const FailedSampleAlert = ({ numFailedSamples }: Props): JSX.Element => {
+const FailedSampleAlert = ({ numFailedSamples }: Props): JSX.Element | null => {
   if (numFailedSamples <= 0) return null;
 
   return (

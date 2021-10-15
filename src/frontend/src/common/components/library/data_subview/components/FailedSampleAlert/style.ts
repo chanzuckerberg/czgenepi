@@ -14,7 +14,7 @@ const AlertInstructionsCommon = `
 
 export const AlertInstructionsSemiBold = styled.span`
   ${AlertInstructionsCommon}
-  ${(props: Props) => {
+  ${(props) => {
     const fontWeights = getFontWeights(props);
     return `
       font-weight: ${fontWeights?.semibold};
