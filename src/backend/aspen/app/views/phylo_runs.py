@@ -61,11 +61,11 @@ def start_phylo_run():
     )
 
     # Step 3 - Enforce AuthZ (check if user has permission to see private identifiers)
-    all_samples = authz_sample_filters(all_samples, sample_ids, user)
+    user_visible_samples = authz_sample_filters(all_samples, sample_ids, user)
 
     # Are there any sample ID's that don't match sample table public and private identifiers
     missing_sample_ids, found_sample_ids = get_missing_and_found_sample_ids(
-        sample_ids, all_samples
+        sample_ids, user_visible_samples
     )
 
     # See if these missing_sample_ids match any Gisaid IDs
@@ -83,7 +83,7 @@ def start_phylo_run():
 
     # Step 4 - Create a phylo run & associated input rows in the DB
     pathogen_genomes: MutableSequence[PathogenGenome] = list()
-    for sample in all_samples:
+    for sample in user_visible_samples:
         pathogen_genomes.append(sample.uploaded_pathogen_genome)
     if len(pathogen_genomes) == 0:
         sentry_sdk.capture_message(
