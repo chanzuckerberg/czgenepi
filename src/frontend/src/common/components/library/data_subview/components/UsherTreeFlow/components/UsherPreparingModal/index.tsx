@@ -25,7 +25,7 @@ const UsherPreparingModal = ({
       return;
     }
 
-    if (!hasOpenedUrl) {
+    if (isOpen && !hasOpenedUrl) {
       setHasOpenedUrl(true);
       setTimeout(() => {
         if (!fastaUrl) return;
@@ -40,7 +40,7 @@ const UsherPreparingModal = ({
         onClose();
       }, TIME_MODAL_SHOWN);
     }
-  }, [fastaUrl, hasOpenedUrl, onClose]);
+  }, [fastaUrl, hasOpenedUrl, isOpen, onClose]);
 
   return (
     <StyledDialog open={isOpen} maxWidth="xs">

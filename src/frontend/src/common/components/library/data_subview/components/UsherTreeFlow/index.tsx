@@ -40,7 +40,6 @@ const UsherTreeFlow = ({
   const handleConfirmationClose = () => {
     handlePlacementClose();
     setIsConfirmOpen(false);
-    setIsPreparingOpen(false);
   };
 
   const handleConfirmationConfirm = () => {
