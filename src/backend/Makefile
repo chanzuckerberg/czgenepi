@@ -1,7 +1,6 @@
 STYLE_CHECK_PYTHON_CODE_DIRECTORIES = .
 STYLE_CHECK_PYTHON_CODE_SKIPPED_DIRECTORIES = third-party
 TYPE_CHECK_BASE_PYTHON_CODE_DIRECTORIES = aspen
-TYPE_CHECK_INDIVIDUAL_PYTHON_CODE_DIRECTORIES = database_migrations
 
 
 ### CHECK STYLE #############################################
@@ -16,15 +15,9 @@ black:
 isort:
 	isort --profile black --check $(STYLE_CHECK_PYTHON_CODE_DIRECTORIES) --skip $(STYLE_CHECK_PYTHON_CODE_SKIPPED_DIRECTORIES) 
 
-MYPY_TARGETS = $(foreach stylecheckdir, $(TYPE_CHECK_INDIVIDUAL_PYTHON_CODE_DIRECTORIES), mypy-$(stylecheckdir))
-
-mypy: mypy-base $(MYPY_TARGETS)
-
-mypy-base:
-	mypy --ignore-missing-imports $(TYPE_CHECK_BASE_PYTHON_CODE_DIRECTORIES)
-
-$(MYPY_TARGETS): mypy-%: mypy-base
-	mypy --ignore-missing-imports $(TYPE_CHECK_BASE_PYTHON_CODE_DIRECTORIES) $*
+mypy:
+	mypy --ignore-missing-imports aspen
+	mypy --ignore-missing-imports database_migrations
 
 
 ### RUN STYLE #############################################

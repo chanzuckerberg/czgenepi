@@ -1,38 +1,53 @@
 import os
+from functools import lru_cache
 from urllib.parse import urlencode
 
 from authlib.integrations.base_client.errors import OAuthError
-from authlib.integrations.starlette_client import OAuth
-from fastapi import APIRouter
+from authlib.integrations.starlette_client import OAuth, StarletteRemoteApp
+from fastapi import APIRouter, Depends
 from fastapi.responses import RedirectResponse
 from starlette.requests import Request
 
 import aspen.api.error.http_exceptions as ex
-from aspen.api.config.config import settings
+from aspen.api.settings import get_settings, Settings
 
 # From the example here:
 # https://github.com/authlib/demo-oauth-client/tree/master/fastapi-google-login
 router = APIRouter()
 
-oauth = OAuth()
-auth0 = oauth.register(
-    "auth0",
-    client_id=settings.AUTH0_CLIENT_ID,
-    client_secret=settings.AUTH0_CLIENT_SECRET,
-    api_base_url=settings.AUTH0_BASE_URL,
-    access_token_url=settings.AUTH0_ACCESS_TOKEN_URL,
-    authorize_url=settings.AUTH0_AUTHORIZE_URL,
-    client_kwargs=settings.AUTH0_CLIENT_KWARGS,
-)
+
+@lru_cache
+def get_auth0_client() -> StarletteRemoteApp:
+    # TODO - settings is an unhashable type, so we can't make it a Dependency
+    # *and* use the lru_cache decorator on this getter. We should probably use
+    # fastapi's built-in dependency caching instead of lru_cache here, but
+    # it needs a little more thought first.
+    # see: https://github.com/tiangolo/fastapi/issues/1985
+    settings: Settings = get_settings()
+    oauth = OAuth()
+    auth0 = oauth.register(
+        "auth0",
+        client_id=settings.AUTH0_CLIENT_ID,
+        client_secret=settings.AUTH0_CLIENT_SECRET,
+        api_base_url=settings.AUTH0_BASE_URL,
+        access_token_url=settings.AUTH0_ACCESS_TOKEN_URL,
+        authorize_url=settings.AUTH0_AUTHORIZE_URL,
+        client_kwargs=settings.AUTH0_CLIENT_KWARGS,
+    )
+    return auth0
 
 
 @router.get("/login")
-async def login(request: Request):
+async def login(
+    request: Request,
+    auth0=Depends(get_auth0_client),
+    settings: Settings = Depends(get_settings),
+):
     return await auth0.authorize_redirect(request, settings.AUTH0_CALLBACK_URL)
 
 
 @router.get("/callback")
-async def auth(request: Request):
+async def auth(request: Request, auth0=Depends(get_auth0_client)):
     try:
         token = await auth0.authorize_access_token(request)
     except OAuthError:
@@ -56,7 +71,7 @@ async def auth(request: Request):
 
 
 @router.get("/logout")
-async def logout(request: Request):
+async def logout(request: Request, settings: Settings = Depends(get_settings)):
     # Clear session stored data
     request.session.pop("jwt_payload", None)
     request.session.pop("profile", None)
