@@ -28,8 +28,8 @@ const UsherTreeFlow = ({
   };
 
   const handlePlacementClose = () => {
-    setIsPlacementOpen(false);
     setFastaUrl("");
+    setIsPlacementOpen(false);
   };
 
   const onLinkCreateSuccess = (url: string) => {

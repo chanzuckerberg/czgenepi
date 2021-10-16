@@ -1,5 +1,5 @@
 import { LoadingIndicator } from "czifui";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { StyledDialog, StyledP, StyledTitle } from "./style";
 
 interface Props {
@@ -17,20 +17,30 @@ const UsherPreparingModal = ({
   isOpen,
   onClose,
 }: Props): JSX.Element => {
+  const [hasOpenedUrl, setHasOpenedUrl] = useState<boolean>(false);
+
   useEffect(() => {
-    setTimeout(() => {
-      if (!fastaUrl) return;
+    if (!fastaUrl) {
+      setHasOpenedUrl(false);
+      return;
+    }
 
-      const link = document.createElement("a");
-      link.href = `${USHER_URL + fastaUrl}`;
-      link.target = "_blank";
-      link.rel = "noopener";
-      link.click();
-      link.remove();
+    if (!hasOpenedUrl) {
+      setHasOpenedUrl(true);
+      setTimeout(() => {
+        if (!fastaUrl) return;
 
-      onClose();
-    }, TIME_MODAL_SHOWN);
-  });
+        const link = document.createElement("a");
+        link.href = `${USHER_URL + fastaUrl}`;
+        link.target = "_blank";
+        link.rel = "noopener";
+        link.click();
+        link.remove();
+
+        onClose();
+      }, TIME_MODAL_SHOWN);
+    }
+  }, [fastaUrl, hasOpenedUrl, onClose]);
 
   return (
     <StyledDialog open={isOpen} maxWidth="xs">
