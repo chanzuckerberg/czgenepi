@@ -1,4 +1,5 @@
 import hashlib
+from typing import Any, Mapping, Union
 
 from flask.json.tag import TaggedJSONSerializer
 from itsdangerous import URLSafeTimedSerializer
@@ -57,7 +58,7 @@ class SessionMiddleware:
                     # We have session data to persist.
                     data = self.encode_flask_cookie(scope["session"])
                     headers = MutableHeaders(scope=message)
-                    header_value = f"{self.session_cookie}={data}; path={path}; Max-Age={self.max_age}; {self.security_flags}"
+                    header_value = f"{self.session_cookie}={data}; path={path}; Max-Age={self.max_age}; {self.security_flags}"  # type: ignore
                     headers.append("Set-Cookie", header_value)
                 elif not initial_session_was_empty:
                     # The session has been cleared.
@@ -68,8 +69,8 @@ class SessionMiddleware:
 
         await self.app(scope, receive, send_wrapper)
 
-    def encode_flask_cookie(self, data):
+    def encode_flask_cookie(self, data: Mapping[str, Any]) -> Union[str, bytes]:
         return self.signer.dumps(data)
 
-    def decode_flask_cookie(self, cookie_text):
+    def decode_flask_cookie(self, cookie_text: Union[str, bytes]) -> Mapping[str, Any]:
         return self.signer.loads(cookie_text)

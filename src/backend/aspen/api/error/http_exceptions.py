@@ -7,7 +7,7 @@ from starlette.requests import Request
 class AspenException(Exception):
     status_code = 500
 
-    def __init__(self, msg, extra: Optional[Mapping[str, Any]] = None):
+    def __init__(self, msg: str, extra: Optional[Mapping[str, Any]] = None):
         super().__init__(msg)
         self.extra = extra
 

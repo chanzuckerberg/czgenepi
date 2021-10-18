@@ -7,6 +7,7 @@ from authlib.integrations.starlette_client import OAuth, StarletteRemoteApp
 from fastapi import APIRouter, Depends
 from fastapi.responses import RedirectResponse
 from starlette.requests import Request
+from starlette.responses import Response
 
 import aspen.api.error.http_exceptions as ex
 from aspen.api.settings import get_settings, Settings
@@ -40,14 +41,16 @@ def get_auth0_client() -> StarletteRemoteApp:
 @router.get("/login")
 async def login(
     request: Request,
-    auth0=Depends(get_auth0_client),
+    auth0: StarletteRemoteApp = Depends(get_auth0_client),
     settings: Settings = Depends(get_settings),
-):
+) -> Response:
     return await auth0.authorize_redirect(request, settings.AUTH0_CALLBACK_URL)
 
 
 @router.get("/callback")
-async def auth(request: Request, auth0=Depends(get_auth0_client)):
+async def auth(
+    request: Request, auth0: StarletteRemoteApp = Depends(get_auth0_client)
+) -> Response:
     try:
         token = await auth0.authorize_access_token(request)
     except OAuthError:
@@ -62,16 +65,11 @@ async def auth(request: Request, auth0=Depends(get_auth0_client)):
         }
     return RedirectResponse(os.getenv("FRONTEND_URL", "") + "/data/samples")
 
-    # Store the user information in flask session.
-    request.session["jwt_payload"] = userinfo
-    request.session["profile"] = {
-        "user_id": userinfo["sub"],
-        "name": userinfo["name"],
-    }
-
 
 @router.get("/logout")
-async def logout(request: Request, settings: Settings = Depends(get_settings)):
+async def logout(
+    request: Request, settings: Settings = Depends(get_settings)
+) -> Response:
     # Clear session stored data
     request.session.pop("jwt_payload", None)
     request.session.pop("profile", None)
