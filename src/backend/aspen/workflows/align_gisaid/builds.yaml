@@ -1,1 +1,6 @@
+inputs:
+  - name: "gisaid"
+    metadata: "data/metadata.tsv"
+    sequences: "data/sequences.fasta"
+
 use_nextalign: true
