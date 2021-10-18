@@ -6,6 +6,7 @@ interface Props {
   fastaUrl: string;
   isOpen: boolean;
   onClose(): void;
+  treeType: string;
 }
 
 type TimeoutType = ReturnType<typeof setTimeout> | undefined;
@@ -13,11 +14,13 @@ type TimeoutType = ReturnType<typeof setTimeout> | undefined;
 const TIME_MODAL_SHOWN = 5000; // 5 seconds
 const USHER_URL =
   "https://genome.ucsc.edu/cgi-bin/hgPhyloPlace?db=wuhCor1&remoteFile=";
+const USHER_TREE_TYPE_QUERY = "&phyloPlaceTree=";
 
 const UsherPreparingModal = ({
   fastaUrl,
   isOpen,
   onClose,
+  treeType,
 }: Props): JSX.Element => {
   const [hasOpenedUrl, setHasOpenedUrl] = useState<boolean>(false);
   const [timer, setTimer] = useState<TimeoutType>();
@@ -26,7 +29,9 @@ const UsherPreparingModal = ({
     if (!fastaUrl) return;
 
     const link = document.createElement("a");
-    link.href = `${USHER_URL + fastaUrl}`;
+    link.href = `${USHER_URL}${encodeURIComponent(
+      fastaUrl
+    )}${USHER_TREE_TYPE_QUERY}${treeType}`;
     link.target = "_blank";
     link.rel = "noopener";
     link.click();
@@ -35,7 +40,7 @@ const UsherPreparingModal = ({
     onClose();
     if (timer) clearTimeout(timer);
     setTimer(undefined);
-  }, [fastaUrl, onClose, timer]);
+  }, [fastaUrl, onClose, timer, treeType]);
 
   useEffect(() => {
     // The s3 link was cleared by the parent, so future renders of this component

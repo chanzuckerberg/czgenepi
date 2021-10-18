@@ -74,6 +74,7 @@ export const UsherPlacementModal = ({
   );
   const [isUsherDisabled, setUsherDisabled] = useState<boolean>(false);
   const [shouldShowWarning, setShouldShowWarning] = useState<boolean>(false);
+  const [treeType, setTreeType] = useState<string>("");
 
   const defaultNumSamples = getDefaultNumSamplesPerSubtree(sampleIds?.length);
 
@@ -110,7 +111,7 @@ export const UsherPlacementModal = ({
     },
     onSuccess: (data: FastaResponseType) => {
       const url = data?.url;
-      if (url) onLinkCreateSuccess(data.url);
+      if (url) onLinkCreateSuccess(data.url, treeType);
     },
   });
 
@@ -148,10 +149,12 @@ export const UsherPlacementModal = ({
   const onOptionChange = (opt: DefaultMenuSelectOption | null) => {
     if (!opt) {
       setDropdownLabel("");
+      setTreeType("");
       return;
     }
 
     setDropdownLabel(opt?.name);
+    setTreeType(opt?.value);
   };
 
   const ONE_SECOND = 1000;
