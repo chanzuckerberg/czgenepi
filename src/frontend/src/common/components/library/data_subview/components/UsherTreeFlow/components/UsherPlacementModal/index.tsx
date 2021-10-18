@@ -2,12 +2,11 @@ import CloseIcon from "@material-ui/icons/Close";
 import { DefaultMenuSelectOption, Dropdown, InputDropdown } from "czifui";
 import { cloneDeep, debounce } from "lodash";
 import React, { SyntheticEvent, useEffect, useState } from "react";
-import { useMutation } from "react-query";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import {
-  FastaDataType,
-  getFastaURL,
+  FastaResponseType,
   getUsherOptions,
+  useFastaFetch,
 } from "src/common/queries/trees";
 import { pluralize } from "src/common/utils/strUtils";
 import {
@@ -105,11 +104,11 @@ export const UsherPlacementModal = ({
     setUsherDisabled(!hasValidSamplesSelected);
   }, [sampleIds, failedSamples]);
 
-  const mutation = useMutation(getFastaURL, {
+  const fastaFetch = useFastaFetch({
     onError: () => {
       onClose();
     },
-    onSuccess: (data: FastaDataType) => {
+    onSuccess: (data: FastaResponseType) => {
       const url = data?.url;
       if (url) onLinkCreateSuccess(data.url);
     },
@@ -118,7 +117,7 @@ export const UsherPlacementModal = ({
   const handleSubmit = (evt: SyntheticEvent) => {
     evt.preventDefault();
     sampleIds = sampleIds.filter((id) => !failedSamples.includes(id));
-    mutation.mutate({ sampleIds });
+    fastaFetch.mutate({ sampleIds });
   };
 
   const MAIN_USHER_TOOLTIP_TEXT = (
