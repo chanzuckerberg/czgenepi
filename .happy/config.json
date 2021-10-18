@@ -4,6 +4,30 @@
     "default_env": "rdev",
     "app": "aspen",
     "default_compose_env": ".env.ecr",
+    "slice_default_tag": "branch-trunk",
+    "slices": {
+      "frontend": {
+        "build_images": ["frontend"]
+      },
+      "backend": {
+        "build_images": ["backend"]
+      },
+      "fullstack": {
+        "build_images": ["frontend", "backend"]
+      },
+      "batch": {
+        "build_images": ["nextstrain", "pangolin", "gisaid"]
+      },
+      "nextstrain": {
+        "build_images": ["nextstrain"]
+      },
+      "pangolin": {
+        "build_images": ["pangolin"]
+      },
+      "gisaid": {
+        "build_images": ["gisaid"]
+      }
+    },
     "environments": {
         "rdev": {
             "aws_profile": "genepi-dev",

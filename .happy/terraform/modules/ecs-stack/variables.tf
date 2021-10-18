@@ -10,9 +10,15 @@ variable aws_role {
   default     = ""
 }
 
+variable image_tags {
+   type        = map(string)
+   description = "Override image tag for each docker image"
+   default     = {}
+}
+
 variable image_tag {
    type        = string
-  description = "Please provide an image tag"
+   description = "Please provide a default image tag"
 }
 
 variable priority {

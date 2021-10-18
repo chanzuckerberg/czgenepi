@@ -100,7 +100,9 @@ class StackMeta:
         "instance": "happy/instance",
         "owner": "happy/meta/owner",
         "priority": "happy/meta/priority",
+        "slice": "happy/meta/slice",
         "imagetag": "happy/meta/imagetag",
+        "imagetags": "happy/meta/imagetags",
         "configsecret": "happy/meta/configsecret",
         "created": "happy/meta/created-at",
         "updated": "happy/meta/updated-at",
@@ -110,6 +112,7 @@ class StackMeta:
         "instance": "stack_name",
         "priority": "priority",
         "imagetag": "image_tag",
+        "imagetags": "image_tags",
         "configsecret": "happy_config_secret",
     }
 
@@ -149,7 +152,7 @@ class StackMeta:
     def parameters(self):
         return {v: self.meta[k] for k, v in self.parameter_map.items()}
 
-    def update(self, tag, stack_mgr):
+    def update(self, tag, stack_tags, stack_mgr):
         stacks = stack_mgr.stacks
 
         # Track timestamps for this stack
@@ -158,6 +161,7 @@ class StackMeta:
             self.created = now
 
         self.imagetag = tag
+        self.imagetags = stack_tags
         self.updated = now
 
         if not self.owner:
@@ -253,7 +257,10 @@ class Stack:
             sensitive=False,
         )
         for k, v in self.meta.parameters.items():
-            self.workspace.set_var(k, str(v), "", sensitive=False)
+            if k == "image_tags":
+                self.workspace.set_var(k, json.dumps(v), "", sensitive=False)
+            else:
+                self.workspace.set_var(k, str(v), "", sensitive=False)
         self.workspace.reset_cache()  # Resets known vars
 
         with config_tarball(self.stack_mgr.config.terraform_directory) as targz_file:
@@ -925,6 +932,21 @@ def logs(ctx, stack_name, service, since):
     orchestrator = ctx.obj["orchestrator"]
     orchestrator.logs(stack_name, service, since)
 
+def build_slice(ctx, slice_name, default_tag=None):
+    config = ctx.obj["config"]
+    if slice_name not in config.slices:
+        valid_slices = ", ".join(config["slices"].keys())
+        raise CliError(f"Slice {slice_name} is invalid - valid names: {valid_slices}")
+
+    build_images = config.slices[slice_name]["build_images"]
+    slice_tag = generate_tag(ctx)
+    ctx.invoke(push, images=build_images, tag=slice_tag)
+
+    if not default_tag:
+        default_tag = config.slice_default_tag
+    stacktags = {slice_img: slice_tag for slice_img in build_images}
+    return stacktags, default_tag
+
 
 @cli.command()
 @click.argument("stack_name")
@@ -932,8 +954,10 @@ def logs(ctx, stack_name, service, since):
 @click.option("--wait/--no-wait", is_flag=True, default=True, help="wait for this to complete")
 @click.option("--force", is_flag=True, default=False, help="Ignore already-exists errors")
 @click.option("--skip-check-tag", is_flag=True, default=False, help="Skip checking that the specified tag exists (requires --tag)")
+@click.option("--slice", "-s", "slice_name", help="If you only need to test a slice of the app, specify it here")
+@click.option("--slice-default-tag", help="For stacks using slices, override the default tag for any images that aren't being built & pushed by the slice")
 @click.pass_context
-def create(ctx, stack_name, tag, wait, force, skip_check_tag):
+def create(ctx, stack_name, tag, wait, force, skip_check_tag, slice_name, slice_default_tag):
     """Create a new stack with a given tag"""
     stackmgr = ctx.obj["stack_mgr"]
     if stack_name in stackmgr.stacks:
@@ -944,12 +968,16 @@ def create(ctx, stack_name, tag, wait, force, skip_check_tag):
     if tag and not skip_check_tag:
         check_images_exist(ctx, tag)
 
+    stacktags = {}
+    if slice_name:
+        stacktags, tag = build_slice(ctx, slice_name, slice_default_tag)
+
     stack_meta = StackMeta(ctx, stack_name)
     stack_meta.load({"happy/meta/configsecret": ctx.obj["config"].secret_arn})
     if not tag:
         tag = generate_tag(ctx)
         ctx.invoke(push, tag=tag)
-    stack_meta.update(tag, stackmgr)
+    stack_meta.update(tag, stacktags, stackmgr)
     print(f"creating {stack_name}")
 
     stack = stackmgr.add(stack_name)
@@ -990,7 +1018,9 @@ def config_tarball(source_dir):
 @click.option("--skip-migrations/--do-migrations", is_flag=True, default=False, help="Skip running migrations")
 @click.option("--skip-check-tag", is_flag=True, default=False, help="Skip checking that the specified tag exists (requires --tag)")
 @click.pass_context
-def update(ctx, stack_name, tag, wait, skip_migrations, skip_check_tag):
+@click.option("--slice", "-s", "slice_name", help="If you only need to test a slice of the app, specify it here")
+@click.option("--slice-default-tag", help="For stacks using slices, override the default tag for any images that aren't being built & pushed by the slice")
+def update(ctx, stack_name, tag, wait, skip_migrations, skip_check_tag, slice_name, slice_default_tag):
     """Update a dev stack tag version"""
     stackmgr = ctx.obj["stack_mgr"]
     try:
@@ -1001,6 +1031,11 @@ def update(ctx, stack_name, tag, wait, skip_migrations, skip_check_tag):
         check_images_exist(ctx, tag)
 
     print(f"updating {stack_name}")
+
+    stacktags = {}
+    if slice_name:
+        stacktags, tag = build_slice(ctx, slice_name, slice_default_tag)
+
     if not tag:
         tag = generate_tag(ctx)
         ctx.invoke(push, tag=tag)
@@ -1008,7 +1043,7 @@ def update(ctx, stack_name, tag, wait, skip_migrations, skip_check_tag):
     stack_meta = stack.meta
     # Reset the configsecret if it has changed
     stack_meta.load({"happy/meta/configsecret": ctx.obj["config"].secret_arn})
-    stack_meta.update(tag, stackmgr)
+    stack_meta.update(tag, stacktags, stackmgr)
     success = stack.apply(wait or not skip_migrations)
     if not success:
         raise CliError("Apply failed, skipping migrations")
@@ -1076,12 +1111,15 @@ def list_command(ctx):
     env = ctx.obj["config"].env
     stackmgr = ctx.obj["stack_mgr"]
     print(f"Listing stacks in environment '{env}'")
-    headings = ["Name", "Owner", "Tag", "Status", "URLs"]
+    headings = ["Name", "Owner", "Tags", "Status", "URLs"]
     tp = TablePrinter(headings)
     for name, info in stackmgr.stacks.items():
         url = info.outputs.get("frontend_url", "")
         status = info.status
-        tp.add_row([name, info.meta.owner, info.meta.imagetag, status, url])
+        tag = info.meta.imagetag
+        if info.meta.imagetags:
+            tag = ", ".join(set(info.meta.imagetags.values()) | {tag})
+        tp.add_row([name, info.meta.owner, tag, status, url])
     tp.print()
 
 

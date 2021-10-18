@@ -8,7 +8,7 @@ locals {
 module nextstrain_scc_contextual_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-scc-contextual-sfn"
-  image    = "${local.nextstrain_image_repo}:${local.image_tag}"
+  image    = "${local.nextstrain_image}"
   vcpus    = local.nextstrain_sfn_vcpus
   memory   = local.nextstrain_sfn_memory
   wdl_path = "workflows/nextstrain.wdl"
@@ -38,7 +38,7 @@ module nextstrain_scc_contextual_sfn_config {
 module nextstrain_alameda_contextual_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-alameda-contextual-sfn"
-  image    = "${local.nextstrain_image_repo}:${local.image_tag}"
+  image    = "${local.nextstrain_image}"
   vcpus    = local.nextstrain_sfn_vcpus
   memory   = local.nextstrain_sfn_memory
   wdl_path = "workflows/nextstrain.wdl"
@@ -68,7 +68,7 @@ module nextstrain_alameda_contextual_sfn_config {
 module nextstrain_contra_costa_contextual_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-contra-costa-contextual-sfn"
-  image    = "${local.nextstrain_image_repo}:${local.image_tag}"
+  image    = "${local.nextstrain_image}"
   vcpus    = local.nextstrain_sfn_vcpus
   memory   = local.nextstrain_sfn_memory
   wdl_path = "workflows/nextstrain.wdl"
@@ -98,7 +98,7 @@ module nextstrain_contra_costa_contextual_sfn_config {
 module nextstrain_fresno_contextual_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-fresno-contextual-sfn"
-  image    = "${local.nextstrain_image_repo}:${local.image_tag}"
+  image    = "${local.nextstrain_image}"
   vcpus    = local.nextstrain_sfn_vcpus
   memory   = local.nextstrain_sfn_memory
   wdl_path = "workflows/nextstrain.wdl"
@@ -128,7 +128,7 @@ module nextstrain_fresno_contextual_sfn_config {
 module nextstrain_humboldt_contextual_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-humboldt-contextual-sfn"
-  image    = "${local.nextstrain_image_repo}:${local.image_tag}"
+  image    = "${local.nextstrain_image}"
   vcpus    = local.nextstrain_sfn_vcpus
   memory   = local.nextstrain_sfn_memory
   wdl_path = "workflows/nextstrain.wdl"
@@ -158,7 +158,7 @@ module nextstrain_humboldt_contextual_sfn_config {
 module nextstrain_marin_contextual_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-marin-contextual-sfn"
-  image    = "${local.nextstrain_image_repo}:${local.image_tag}"
+  image    = "${local.nextstrain_image}"
   vcpus    = local.nextstrain_sfn_vcpus
   memory   = local.nextstrain_sfn_memory
   wdl_path = "workflows/nextstrain.wdl"
@@ -188,7 +188,7 @@ module nextstrain_marin_contextual_sfn_config {
 module nextstrain_monterey_contextual_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-monterey-contextual-sfn"
-  image    = "${local.nextstrain_image_repo}:${local.image_tag}"
+  image    = "${local.nextstrain_image}"
   vcpus    = local.nextstrain_sfn_vcpus
   memory   = local.nextstrain_sfn_memory
   wdl_path = "workflows/nextstrain.wdl"
@@ -218,7 +218,7 @@ module nextstrain_monterey_contextual_sfn_config {
 module nextstrain_orange_contextual_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-orange-contextual-sfn"
-  image    = "${local.nextstrain_image_repo}:${local.image_tag}"
+  image    = "${local.nextstrain_image}"
   vcpus    = local.nextstrain_sfn_vcpus
   memory   = local.nextstrain_sfn_memory
   wdl_path = "workflows/nextstrain.wdl"
@@ -248,7 +248,7 @@ module nextstrain_orange_contextual_sfn_config {
 module nextstrain_san_bernardino_contextual_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-san-bernardino-contextual-sfn"
-  image    = "${local.nextstrain_image_repo}:${local.image_tag}"
+  image    = "${local.nextstrain_image}"
   vcpus    = local.nextstrain_sfn_vcpus
   memory   = local.nextstrain_sfn_memory
   wdl_path = "workflows/nextstrain.wdl"
@@ -278,7 +278,7 @@ module nextstrain_san_bernardino_contextual_sfn_config {
 module nextstrain_del_norte_contextual_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-del-norte-sfn"
-  image    = "${local.nextstrain_image_repo}:${local.image_tag}"
+  image    = "${local.nextstrain_image}"
   vcpus    = local.nextstrain_sfn_vcpus
   memory   = local.nextstrain_sfn_memory
   wdl_path = "workflows/nextstrain.wdl"
@@ -308,7 +308,7 @@ module nextstrain_del_norte_contextual_sfn_config {
 module nextstrain_san_joaquin_contextual_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-san-joaquin-contextual-sfn"
-  image    = "${local.nextstrain_image_repo}:${local.image_tag}"
+  image    = "${local.nextstrain_image}"
   vcpus    = local.nextstrain_sfn_vcpus
   memory   = local.nextstrain_sfn_memory
   wdl_path = "workflows/nextstrain.wdl"
@@ -338,7 +338,7 @@ module nextstrain_san_joaquin_contextual_sfn_config {
 module nextstrain_san_luis_obispo_contextual_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-san-luis-obispo-contextual-sfn"
-  image    = "${local.nextstrain_image_repo}:${local.image_tag}"
+  image    = "${local.nextstrain_image}"
   vcpus    = local.nextstrain_sfn_vcpus
   memory   = local.nextstrain_sfn_memory
   wdl_path = "workflows/nextstrain.wdl"
@@ -368,7 +368,7 @@ module nextstrain_san_luis_obispo_contextual_sfn_config {
 module nextstrain_san_francisco_contextual_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-san-francisco-contextual-sfn"
-  image    = "${local.nextstrain_image_repo}:${local.image_tag}"
+  image    = "${local.nextstrain_image}"
   vcpus    = local.nextstrain_sfn_vcpus
   memory   = local.nextstrain_sfn_memory
   wdl_path = "workflows/nextstrain.wdl"
@@ -399,7 +399,7 @@ module nextstrain_san_francisco_contextual_sfn_config {
 module nextstrain_tulare_contextual_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-tulare-contextual-sfn"
-  image    = "${local.nextstrain_image_repo}:${local.image_tag}"
+  image    = "${local.nextstrain_image}"
   vcpus    = local.nextstrain_sfn_vcpus
   memory   = local.nextstrain_sfn_memory
   wdl_path = "workflows/nextstrain.wdl"
@@ -429,7 +429,7 @@ module nextstrain_tulare_contextual_sfn_config {
 module nextstrain_tuolumne_contextual_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-tuolumne-contextual-sfn"
-  image    = "${local.nextstrain_image_repo}:${local.image_tag}"
+  image    = "${local.nextstrain_image}"
   vcpus    = local.nextstrain_sfn_vcpus
   memory   = local.nextstrain_sfn_memory
   wdl_path = "workflows/nextstrain.wdl"
@@ -459,7 +459,7 @@ module nextstrain_tuolumne_contextual_sfn_config {
 module nextstrain_ventura_contextual_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-ventura-contextual-sfn"
-  image    = "${local.nextstrain_image_repo}:${local.image_tag}"
+  image    = "${local.nextstrain_image}"
   vcpus    = local.nextstrain_sfn_vcpus
   memory   = local.nextstrain_sfn_memory
   wdl_path = "workflows/nextstrain.wdl"
