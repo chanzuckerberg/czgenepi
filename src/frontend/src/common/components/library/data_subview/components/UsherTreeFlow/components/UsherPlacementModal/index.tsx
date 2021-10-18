@@ -11,7 +11,6 @@ import { pluralize } from "src/common/utils/strUtils";
 import {
   Content,
   StyledDialogTitle,
-  StyledInfoOutlinedIcon,
   StyledTooltip,
   Title,
   TreeNameInfoWrapper,
@@ -25,6 +24,7 @@ import {
   StyledDialog,
   StyledDialogContent,
   StyledFieldTitleText,
+  StyledInfoIcon,
   StyledInputDropdown,
   StyledList,
   StyledListItem,
@@ -189,7 +189,7 @@ export const UsherPlacementModal = ({
             title={MAIN_USHER_TOOLTIP_TEXT}
             placement="top"
           >
-            <StyledInfoOutlinedIcon />
+            <StyledInfoIcon />
           </StyledTooltip>
         </FlexWrapper>
         <Title>
@@ -237,7 +237,7 @@ export const UsherPlacementModal = ({
                   title={PHYLOGENETIC_TREE_VERSION_TOOLTIP_TEXT}
                   placement="top"
                 >
-                  <StyledInfoOutlinedIcon />
+                  <StyledInfoIcon />
                 </StyledTooltip>
               </StyledFieldTitleText>
               <Dropdown
@@ -258,7 +258,7 @@ export const UsherPlacementModal = ({
                   title={SAMPLES_PER_SUBTREE_TOOLTIP_TEXT}
                   placement="top"
                 >
-                  <StyledInfoOutlinedIcon />
+                  <StyledInfoIcon />
                 </StyledTooltip>
               </StyledFieldTitleText>
               <StyledTextField

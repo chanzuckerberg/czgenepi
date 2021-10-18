@@ -14,7 +14,10 @@ import {
   List,
   ListItem,
 } from "czifui";
-import { StyledDialogContent as DialogContent } from "../../../CreateNSTreeModal/style";
+import {
+  StyledDialogContent as DialogContent,
+  StyledInfoOutlinedIcon as InfoIcon,
+} from "../../../CreateNSTreeModal/style";
 import { StyledWarningIcon as WarningIcon } from "../../../FailedSampleAlert/style";
 
 const INPUT_HEIGHT = "34px";
@@ -169,4 +172,8 @@ export const StyledCloseIcon = styled(CloseIcon)`
       top: ${spacings?.xl}px;
     `;
   }}
+`;
+
+export const StyledInfoIcon = styled(InfoIcon)`
+  margin-top: 3px;
 `;
