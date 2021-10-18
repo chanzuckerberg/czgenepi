@@ -1,6 +1,6 @@
 import CloseIcon from "@material-ui/icons/Close";
 import { DefaultMenuSelectOption, Dropdown, InputDropdown } from "czifui";
-import { debounce, forEach } from "lodash";
+import { cloneDeep, debounce } from "lodash";
 import React, { SyntheticEvent, useEffect, useState } from "react";
 import { useMutation } from "react-query";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
@@ -81,8 +81,12 @@ export const UsherPlacementModal = ({
   useEffect(() => {
     const fetchUsherOpts = async () => {
       const resp = (await getUsherOptions()) as UsherDataType;
-      const options = resp.usher_options;
-      forEach(options, (opt) => (opt.name = opt.description));
+      const apiOptions = resp.usher_options;
+      const options = apiOptions.map((opt) => {
+        const newOpt = cloneDeep(opt);
+        newOpt.name = opt.description;
+        return newOpt;
+      });
 
       options.sort((a: DropdownOptionProps, b: DropdownOptionProps) => {
         const aPri = a?.priority ?? 0;
