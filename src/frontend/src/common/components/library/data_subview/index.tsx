@@ -17,8 +17,7 @@ import DownloadModal from "./components/DownloadModal";
 import { IconButton } from "./components/IconButton";
 import { TreeCreateHelpLink } from "./components/TreeCreateHelpLink";
 import { TreeSelectionMenu } from "./components/TreeSelectionMenu";
-import { UsherConfirmationModal } from "./components/UsherConfirmationModal";
-import { UsherPreparingModal } from "./components/UsherPreparingModal";
+import { UsherTreeFlow } from "./components/UsherTreeFlow";
 import style from "./index.module.scss";
 import {
   CreateTreeModalDiv,
@@ -140,19 +139,18 @@ const DataSubview: FunctionComponent<Props> = ({
     searching: false,
   });
 
-  const [checkedSamples, setCheckedSamples] = useState<any[]>([]);
+  const [checkedSamples, setCheckedSamples] = useState<string[]>([]);
   const [showCheckboxes, setShowCheckboxes] = useState<boolean>(false);
   const [isDownloadModalOpen, setDownloadModalOpen] = useState(false);
   const [isDownloadDisabled, setDownloadDisabled] = useState<boolean>(true);
   const [isCreateTreeDisabled, setCreateTreeDisabled] = useState<boolean>(true);
-  const [failedSamples, setFailedSamples] = useState<any[]>([]);
+  const [failedSamples, setFailedSamples] = useState<string[]>([]);
   const [downloadFailed, setDownloadFailed] = useState<boolean>(false);
   const [isNSCreateTreeModalOpen, setIsNSCreateTreeModalOpen] =
     useState<boolean>(false);
   const [hasCreateTreeStarted, setCreateTreeStarted] = useState<boolean>(false);
   const [didCreateTreeFailed, setCreateTreeFailed] = useState<boolean>(false);
-  const [isUsherConfirmOpen, setIsUsherConfirmOpen] = useState<boolean>(false);
-  const [isUsherPreparingOpen, setIsUsherPreparingOpen] =
+  const [shouldStartUsherFlow, setShouldStartUsherFlow] =
     useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
 
@@ -179,6 +177,10 @@ const DataSubview: FunctionComponent<Props> = ({
   const handleDownloadClose = () => {
     setDownloadModalOpen(false);
   };
+
+  useEffect(() => {
+    if (shouldStartUsherFlow) setShouldStartUsherFlow(false);
+  }, [shouldStartUsherFlow]);
 
   useEffect(() => {
     searcher(searchQuery);
@@ -287,6 +289,7 @@ const DataSubview: FunctionComponent<Props> = ({
           <TreeSelectionMenu
             isDisabled={isCreateTreeDisabled}
             handleCreateNSTreeOpen={handleCreateNSTreeOpen}
+            handleCreateUsherTreeOpen={() => setShouldStartUsherFlow(true)}
           />
           <IconButton
             onClick={handleDownloadClickOpen}
@@ -325,13 +328,10 @@ const DataSubview: FunctionComponent<Props> = ({
               handleCreateTreeFailed={handleCreateTreeFailed}
               handleSetCreateTreeStarted={handleSetCreateTreeStarted}
             />
-            <UsherConfirmationModal
-              isOpen={isUsherConfirmOpen}
-              onClose={() => setIsUsherConfirmOpen(false)}
-            />
-            <UsherPreparingModal
-              isOpen={isUsherPreparingOpen}
-              onClose={() => setIsUsherPreparingOpen(false)}
+            <UsherTreeFlow
+              checkedSamples={checkedSamples}
+              failedSamples={failedSamples}
+              shouldStartUsherFlow={shouldStartUsherFlow}
             />
           </>
         )}

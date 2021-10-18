@@ -1,6 +1,7 @@
-import { ComplexFilterValue, DefaultMenuSelectOption } from "czifui";
+import { DefaultMenuSelectOption } from "czifui";
 import React from "react";
 import { StyledComplexFilter } from "../../style";
+import { ComplexFilterValue } from "../LineageFilter";
 
 interface Props {
   updateGenomeRecoveryFilter: (selected?: string) => void;

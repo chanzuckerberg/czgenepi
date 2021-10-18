@@ -1,18 +1,17 @@
 import { Dialog } from "@material-ui/core";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import CloseIcon from "@material-ui/icons/Close";
-import { Alert } from "czifui";
 import React, { SyntheticEvent, useEffect, useState } from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { useCreateTree } from "src/common/queries/trees";
+import { pluralize } from "src/common/utils/strUtils";
 import { Header, StyledIconButton } from "../DownloadModal/style";
+import { FailedSampleAlert } from "../FailedSampleAlert";
 import {
   RadioLabelNonContextualized,
   RadioLabelTargeted,
 } from "./components/RadioLabel";
 import {
-  AlertInstructionsNotSemiBold,
-  AlertInstructionsSemiBold,
   Content,
   CreateTreeInfo,
   FieldTitle,
@@ -29,7 +28,6 @@ import {
   StyledRadio,
   StyledTextField,
   StyledTooltip,
-  StyledWarningIcon,
   TextFieldAlert,
   Title,
   TreeNameInfoWrapper,
@@ -137,7 +135,7 @@ export const CreateNSTreeModal = ({
         </StyledIconButton>
         <Header>Create New Phylogenetic Tree</Header>
         <Title>
-          {sampleIds.length} Sample{sampleIds.length > 1 && "s"} Selected
+          {sampleIds.length} {pluralize("Sample", sampleIds.length)} Selected
         </Title>
       </StyledDialogTitle>
       <StyledDialogContent>
@@ -219,19 +217,7 @@ export const CreateNSTreeModal = ({
                 />
               </RadioGroup>
             </TreeTypeSection>
-            {failedSamples.length > 0 && (
-              <Alert icon={<StyledWarningIcon />} severity="warning">
-                <AlertInstructionsSemiBold>
-                  {" "}
-                  {failedSamples.length} Selected Sample
-                  {failedSamples.length > 1 && "s"} {"won't"} be included in
-                  your tree{" "}
-                </AlertInstructionsSemiBold>
-                <AlertInstructionsNotSemiBold>
-                  because they failed genome recovery.
-                </AlertInstructionsNotSemiBold>
-              </Alert>
-            )}
+            <FailedSampleAlert numFailedSamples={failedSamples?.length} />
             <StyledButton
               color="primary"
               variant="contained"

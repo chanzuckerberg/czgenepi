@@ -4,7 +4,6 @@ import Radio from "@material-ui/core/Radio";
 import TextField from "@material-ui/core/TextField";
 import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
 import InfoOutlinedIcon from "@material-ui/icons/InfoOutlined";
-import ReportProblemOutlinedIcon from "@material-ui/icons/ReportProblemOutlined";
 import {
   Button,
   fontBodyS,
@@ -15,6 +14,7 @@ import {
   fontHeaderXs,
   getColors,
   getFontWeights,
+  getIconSizes,
   getSpacings,
   Props,
   Tooltip,
@@ -23,17 +23,7 @@ import DialogContent from "src/common/components/library/Dialog/components/Dialo
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import Instructions from "src/components/Instructions";
 
-const SmallImageSize = `
-  width: 14px;
-  height: 14px;
-`;
-
 const InstructionsCommon = `
-  color: black;
-`;
-
-const AlertInstructionsCommon = `
-  ${fontBodyXxxs}
   color: black;
 `;
 
@@ -57,7 +47,7 @@ export const StyledDialogTitle = styled(DialogTitle)`
   ${(props) => {
     const spacings = getSpacings(props);
     return `
-      padding-bottom: ${spacings?.l}px; 
+      padding-bottom: ${spacings?.l}px;
     `;
   }}
 `;
@@ -68,7 +58,7 @@ export const StyledTextField = styled(TextField)`
   ${(props) => {
     const spacings = getSpacings(props);
     return `
-      padding-bottom: ${spacings?.s}px; 
+      padding-bottom: ${spacings?.s}px;
     `;
   }}
 `;
@@ -114,20 +104,6 @@ export const InstructionsNotSemiBold = styled.span`
   ${fontBodyXs}
 `;
 
-export const AlertInstructionsSemiBold = styled.span`
-  ${AlertInstructionsCommon}
-  ${(props: Props) => {
-    const fontWeights = getFontWeights(props);
-    return `
-      font-weight: ${fontWeights?.semibold};
-    `;
-  }}
-`;
-
-export const AlertInstructionsNotSemiBold = styled.span`
-  ${AlertInstructionsCommon}
-`;
-
 export const StyledInstructionsButton = styled(Button)`
   ${fontCapsXxxs}
   padding-left: 0px;
@@ -135,7 +111,7 @@ export const StyledInstructionsButton = styled(Button)`
     const spacings = getSpacings(props);
     const colors = getColors(props);
     return `
-      margin-left: ${spacings?.m}px; 
+      margin-left: ${spacings?.m}px;
       padding-top: ${spacings?.xxs}px;
       &:hover {
         background-color: transparent;
@@ -261,23 +237,15 @@ export const TextFieldAlert = styled.div`
 `;
 
 export const StyledErrorOutlinedIcon = styled(ErrorOutlineIcon)`
-  ${SmallImageSize}
   ${(props) => {
     const colors = getColors(props);
+    const iconSizes = getIconSizes(props);
     const spacings = getSpacings(props);
     return `
       color: ${colors?.error[400]};
       margin-right: ${spacings?.xs}px;
-    `;
-  }}
-`;
-
-export const StyledWarningIcon = styled(ReportProblemOutlinedIcon)`
-  ${SmallImageSize}
-  ${(props) => {
-    const spacings = getSpacings(props);
-    return `
-      margin-top: ${spacings?.xxs}px;
+      height: ${iconSizes?.s.height}px;
+      width: ${iconSizes?.s.width}px;
     `;
   }}
 `;

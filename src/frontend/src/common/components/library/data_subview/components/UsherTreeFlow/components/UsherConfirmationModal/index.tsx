@@ -7,9 +7,14 @@ import { StyledHeader, StyledImg, StyledP } from "./style";
 interface Props {
   isOpen: boolean;
   onClose(): void;
+  onConfirm(): void;
 }
 
-const UsherConfirmationModal = ({ isOpen, onClose }: Props): JSX.Element => {
+const UsherConfirmationModal = ({
+  isOpen,
+  onClose,
+  onConfirm,
+}: Props): JSX.Element => {
   const title = (
     <>
       <StyledImg src={usherLogo as string} />
@@ -37,11 +42,7 @@ const UsherConfirmationModal = ({ isOpen, onClose }: Props): JSX.Element => {
       <ConfirmDialog
         open={isOpen}
         onClose={onClose}
-        onConfirm={() => {
-          // TODO (mlila): add in code for opening redirect modal when this
-          // TODO   is clicked (work in ticket #161398)
-          onClose();
-        }}
+        onConfirm={onConfirm}
         title={title}
         content={content}
         footer="It may take a few minutes to process your samples."

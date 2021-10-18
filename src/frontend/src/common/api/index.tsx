@@ -10,6 +10,8 @@ export enum API {
   SAMPLES_CREATE = "/api/samples/create",
   SAMPLES_FASTA_DOWNLOAD = "/api/sequences",
   CREATE_TREE = "/api/phylo_runs",
+  GET_FASTA_URL = "/api/sequences/getfastaurl",
+  USHER_TREE_OPTIONS = "/api/usher/tree_options",
 }
 
 export const DEFAULT_HEADERS_MUTATION_OPTIONS: RequestInit = {

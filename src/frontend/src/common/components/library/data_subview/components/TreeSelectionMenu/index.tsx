@@ -8,11 +8,13 @@ import { StyledTreeBuildDisabledImage, StyledTreeBuildImage } from "./style";
 interface Props {
   isDisabled: boolean;
   handleCreateNSTreeOpen: () => void;
+  handleCreateUsherTreeOpen: () => void;
 }
 
 const TreeSelectionMenu = ({
   isDisabled,
   handleCreateNSTreeOpen,
+  handleCreateUsherTreeOpen,
 }: Props): JSX.Element => {
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 
@@ -26,6 +28,11 @@ const TreeSelectionMenu = ({
 
   const handleClickNS = () => {
     handleCreateNSTreeOpen();
+    handleClose();
+  };
+
+  const handleClickUsher = () => {
+    handleCreateUsherTreeOpen();
     handleClose();
   };
 
@@ -69,7 +76,7 @@ const TreeSelectionMenu = ({
           Nextstrain Phylogenetic Tree
         </MenuItem>
         {usesFeatureFlag(FEATURE_FLAGS.usher) && (
-          <MenuItem onClick={handleClose}>
+          <MenuItem onClick={handleClickUsher}>
             UShER Phylogenetic Placement
           </MenuItem>
         )}

@@ -1,4 +1,4 @@
-import { ComplexFilterValue, DefaultMenuSelectOption } from "czifui";
+import { DefaultMenuSelectOption } from "czifui";
 import React, { useEffect, useState } from "react";
 import { StyledComplexFilter } from "../../style";
 
@@ -6,6 +6,11 @@ interface Props {
   options: DefaultMenuSelectOption[];
   updateLineageFilter: (lineages: string[]) => void;
 }
+
+export type ComplexFilterValue =
+  | DefaultMenuSelectOption[]
+  | DefaultMenuSelectOption
+  | null;
 
 // ComplexFilter defaults to checking if option is selected (is a value) by equality.
 // However, because our options are objects that are dynamically generated, object
