@@ -1,4 +1,3 @@
-import CloseIcon from "@material-ui/icons/Close";
 import { DefaultMenuSelectOption, Dropdown, InputDropdown } from "czifui";
 import { debounce, forEach } from "lodash";
 import React, { SyntheticEvent, useEffect, useState } from "react";
@@ -12,20 +11,20 @@ import {
 import { pluralize } from "src/common/utils/strUtils";
 import {
   Content,
-  StyledDialogContent,
   StyledDialogTitle,
   StyledInfoOutlinedIcon,
   StyledTooltip,
   Title,
   TreeNameInfoWrapper,
-  TreeNameSection,
 } from "../../../CreateNSTreeModal/style";
-import { Header, StyledIconButton } from "../../../DownloadModal/style";
+import { Header } from "../../../DownloadModal/style";
 import { FailedSampleAlert } from "../../../FailedSampleAlert";
 import {
   FlexWrapper,
   StyledButton,
+  StyledCloseIcon,
   StyledDialog,
+  StyledDialogContent,
   StyledFieldTitleText,
   StyledInputDropdown,
   StyledList,
@@ -173,9 +172,7 @@ export const UsherPlacementModal = ({
       maxWidth={"sm"}
     >
       <StyledDialogTitle>
-        <StyledIconButton onClick={onClose}>
-          <CloseIcon />
-        </StyledIconButton>
+        <StyledCloseIcon onClick={onClose} />
         <FlexWrapper>
           <Header>Run Phylogenetic Placement with UShER</Header>
           <StyledTooltip
@@ -194,7 +191,7 @@ export const UsherPlacementModal = ({
       <StyledDialogContent>
         <Content data-test-id="modal-content">
           <form onSubmit={handleSubmit}>
-            <TreeNameSection>
+            <div>
               <TreeNameInfoWrapper>
                 <StyledSectionHeader>Use UShER for: </StyledSectionHeader>
               </TreeNameInfoWrapper>
@@ -224,10 +221,8 @@ export const UsherPlacementModal = ({
                 </StyledListItem>
               </StyledList>
               <StyledSectionHeader>Settings</StyledSectionHeader>
-              <FlexWrapper>
-                <StyledFieldTitleText>
-                  Place Samples onto Phylogenetic Tree Version:
-                </StyledFieldTitleText>
+              <StyledFieldTitleText>
+                <span>Place Samples onto Phylogenetic Tree Version:</span>
                 <StyledTooltip
                   arrow
                   leaveDelay={200}
@@ -236,7 +231,7 @@ export const UsherPlacementModal = ({
                 >
                   <StyledInfoOutlinedIcon />
                 </StyledTooltip>
-              </FlexWrapper>
+              </StyledFieldTitleText>
               <Dropdown
                 label={dropdownLabel}
                 onChange={onOptionChange}
@@ -246,10 +241,10 @@ export const UsherPlacementModal = ({
                 InputDropdownProps={{ sdsStyle: "square" }}
                 options={dropdownOptions}
               />
-              <FlexWrapper>
-                <StyledFieldTitleText>
+              <StyledFieldTitleText>
+                <span>
                   Number of samples per subtree showing sample placement:
-                </StyledFieldTitleText>
+                </span>
                 <StyledTooltip
                   arrow
                   title={SAMPLES_PER_SUBTREE_TOOLTIP_TEXT}
@@ -257,7 +252,7 @@ export const UsherPlacementModal = ({
                 >
                   <StyledInfoOutlinedIcon />
                 </StyledTooltip>
-              </FlexWrapper>
+              </StyledFieldTitleText>
               <StyledTextField
                 id="outlined-basic"
                 variant="outlined"
@@ -273,7 +268,7 @@ export const UsherPlacementModal = ({
                 </FlexWrapper>
               )}
               <FailedSampleAlert numFailedSamples={failedSamples?.length} />
-            </TreeNameSection>
+            </div>
             <StyledButton
               color="primary"
               variant="contained"
