@@ -21,13 +21,16 @@ mypy:
 
 
 ### RUN STYLE #############################################
-run-style: run-black run-isort
+run-style: run-autoflake run-black run-isort
 
 run-black:
 	black $(STYLE_CHECK_PYTHON_CODE_DIRECTORIES) --exclude $(STYLE_CHECK_PYTHON_CODE_SKIPPED_DIRECTORIES)
 
 run-isort:
 	isort --profile black $(STYLE_CHECK_PYTHON_CODE_DIRECTORIES) --skip $(STYLE_CHECK_PYTHON_CODE_SKIPPED_DIRECTORIES) 
+
+run-autoflake:
+	autoflake -i --remove-all-unused-imports --remove-unused-variables -r $(TYPE_CHECK_BASE_PYTHON_CODE_DIRECTORIES)
 
 
 ### TESTING #############################################
