@@ -75,7 +75,7 @@ task nextstrain_workflow {
     mkdir -p ncov/my_profiles/aspen ncov/results
     (cd ncov &&
      git init &&
-     git fetch --depth 1 git://github.com/nextstrain/ncov.git 30435fb9ec8de2f045167fb90adfec12f123e80a &&
+     git fetch --depth 1 git://github.com/nextstrain/ncov.git &&
      git checkout FETCH_HEAD
     )
     ncov_git_rev=$(cd ncov && git rev-parse HEAD)
@@ -95,8 +95,8 @@ task nextstrain_workflow {
     aligned_gisaid_metadata_s3_key=$(echo "${aligned_gisaid_location}" | jq -r .metadata_key)
 
     # fetch the gisaid dataset
-    aws s3 cp --no-progress "s3://${aligned_gisaid_s3_bucket}/${aligned_gisaid_sequences_s3_key}" - | zstdmt -d | xz -2 > ncov/results/aligned_gisaid.fasta.xz
-    aws s3 cp --no-progress "s3://${aligned_gisaid_s3_bucket}/${aligned_gisaid_metadata_s3_key}" ncov/data/metadata_gisaid.tsv
+    aws s3 cp --no-progress "s3://${aligned_gisaid_s3_bucket}/${aligned_gisaid_sequences_s3_key}" ncov/results/
+    aws s3 cp --no-progress "s3://${aligned_gisaid_s3_bucket}/${aligned_gisaid_metadata_s3_key}" ncov/results/
 
     >&2 echo "You should exec into the docker container and run \"snakemake --printshellcmds auspice/ncov_aspen.json --profile my_profiles/aspen/  --resources=mem_mb=312320\" in the ncov subdirectory"
     >&2 echo "When you are done with the docker container, run \"touch /done\"."
