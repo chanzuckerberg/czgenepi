@@ -71,6 +71,7 @@ export const UsherPlacementModal = ({
   const [dropdownOptions, setDropdownOptions] = useState<DropdownOptionProps[]>(
     []
   );
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isUsherDisabled, setUsherDisabled] = useState<boolean>(false);
   const [shouldShowWarning, setShouldShowWarning] = useState<boolean>(false);
 
@@ -100,16 +101,19 @@ export const UsherPlacementModal = ({
 
   useEffect(() => {
     const hasValidSamplesSelected = sampleIds?.length > failedSamples?.length;
-    setUsherDisabled(!hasValidSamplesSelected);
-  }, [sampleIds, failedSamples]);
+    const shouldDisable = !hasValidSamplesSelected || isLoading;
+    setUsherDisabled(shouldDisable);
+  }, [sampleIds, failedSamples, isLoading]);
 
   const fastaFetch = useFastaFetch({
     onError: () => {
+      setIsLoading(false);
       onClose();
     },
     onSuccess: (data: FastaResponseType) => {
       const url = data?.url;
       if (url) onLinkCreateSuccess(data.url);
+      setIsLoading(false);
     },
   });
 
@@ -117,6 +121,7 @@ export const UsherPlacementModal = ({
     evt.preventDefault();
     sampleIds = sampleIds.filter((id) => !failedSamples.includes(id));
     fastaFetch.mutate({ sampleIds });
+    setIsLoading(true);
   };
 
   const MAIN_USHER_TOOLTIP_TEXT = (
@@ -280,7 +285,7 @@ export const UsherPlacementModal = ({
               type="submit"
               value="Submit"
             >
-              Create Placement
+              {isLoading ? "Loading ..." : "Create Placement"}
             </StyledButton>
           </form>
         </Content>
