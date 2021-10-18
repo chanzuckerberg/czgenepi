@@ -1,11 +1,12 @@
-from fastapi.testclient import TestClient
+import pytest
+from httpx import AsyncClient
 
 from aspen.api.main import app
 
-client = TestClient(app)
+pytestmark = pytest.mark.asyncio
 
 
-def test_healthcheck() -> None:
-    response = client.get("/v2/health")
+async def test_healthcheck(http_client: AsyncClient) -> None:
+    response = await http_client.get("/v2/health")
     assert response.status_code == 200
     assert response.json() == {"healthy": True}
