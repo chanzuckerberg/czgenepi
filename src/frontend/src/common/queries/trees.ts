@@ -15,26 +15,32 @@ import {
 import { API_URL } from "../constants/ENV";
 import { ENTITIES } from "./entities";
 
+// * these two types should stay in sync. There is technically a way to do it in TS, but it is
+// * very convoluted: https://stackoverflow.com/questions/44323441
 interface CreateTreePayload {
   name: string;
   samples: string[];
   tree_type: string;
 }
 
-interface getFastaURLPayload {
-  samples: string[];
-}
-
-export interface FastaDataType {
-  url: string;
-}
-
-// * these two types should stay in sync. There is technically a way to do it in TS, but it is
-// * very convoluted: https://stackoverflow.com/questions/44323441
 interface CreateTreeType {
   treeName: string;
   sampleIds: string[];
   treeType: string;
+}
+
+// * these two types should stay in sync. There is technically a way to do it in TS, but it is
+// * very convoluted: https://stackoverflow.com/questions/44323441
+interface FastaURLPayloadType {
+  samples: string[];
+}
+
+interface FastaRequestType {
+  sampleIds: string[];
+}
+
+export interface FastaResponseType {
+  url: string;
 }
 
 export const USE_TREE_INFO = {
@@ -69,8 +75,8 @@ export async function getFastaURL({
   sampleIds,
 }: {
   sampleIds: string[];
-}): Promise<FastaDataType> {
-  const payload: getFastaURLPayload = {
+}): Promise<FastaResponseType> {
+  const payload: FastaURLPayloadType = {
     samples: sampleIds,
   };
   const response = await fetch(API_URL + API.GET_FASTA_URL, {
@@ -91,9 +97,17 @@ export async function getUsherOptions(): Promise<unknown> {
   throw Error(`${response.statusText}: ${await response.text()}`);
 }
 
-interface CreateTreeCallbacks {
+interface MutationCallbacks<T> {
   onError: () => void;
-  onSuccess: () => void;
+  onSuccess: (data: T) => void;
+}
+type FastaFetchCallbacks = MutationCallbacks<FastaResponseType>;
+type CreateTreeCallbacks = MutationCallbacks<void>;
+
+export function useFastaFetch(
+  callbacks: FastaFetchCallbacks
+): UseMutationResult<FastaResponseType, unknown, FastaRequestType, unknown> {
+  return useMutation(getFastaURL, callbacks);
 }
 
 export function useCreateTree({

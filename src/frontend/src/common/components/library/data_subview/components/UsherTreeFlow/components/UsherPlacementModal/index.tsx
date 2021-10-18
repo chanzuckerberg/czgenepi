@@ -1,13 +1,12 @@
 import CloseIcon from "@material-ui/icons/Close";
 import { DefaultMenuSelectOption, Dropdown, InputDropdown } from "czifui";
-import { debounce, forEach } from "lodash";
+import { cloneDeep, debounce } from "lodash";
 import React, { SyntheticEvent, useEffect, useState } from "react";
-import { useMutation } from "react-query";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import {
-  FastaDataType,
-  getFastaURL,
+  FastaResponseType,
   getUsherOptions,
+  useFastaFetch,
 } from "src/common/queries/trees";
 import { pluralize } from "src/common/utils/strUtils";
 import {
@@ -81,8 +80,12 @@ export const UsherPlacementModal = ({
   useEffect(() => {
     const fetchUsherOpts = async () => {
       const resp = (await getUsherOptions()) as UsherDataType;
-      const options = resp.usher_options;
-      forEach(options, (opt) => (opt.name = opt.description));
+      const apiOptions = resp.usher_options;
+      const options = apiOptions.map((opt) => {
+        const newOpt = cloneDeep(opt);
+        newOpt.name = opt.description;
+        return newOpt;
+      });
 
       options.sort((a: DropdownOptionProps, b: DropdownOptionProps) => {
         const aPri = a?.priority ?? 0;
@@ -101,11 +104,11 @@ export const UsherPlacementModal = ({
     setUsherDisabled(!hasValidSamplesSelected);
   }, [sampleIds, failedSamples]);
 
-  const mutation = useMutation(getFastaURL, {
+  const fastaFetch = useFastaFetch({
     onError: () => {
       onClose();
     },
-    onSuccess: (data: FastaDataType) => {
+    onSuccess: (data: FastaResponseType) => {
       const url = data?.url;
       if (url) onLinkCreateSuccess(data.url);
     },
@@ -114,7 +117,7 @@ export const UsherPlacementModal = ({
   const handleSubmit = (evt: SyntheticEvent) => {
     evt.preventDefault();
     sampleIds = sampleIds.filter((id) => !failedSamples.includes(id));
-    mutation.mutate({ sampleIds });
+    fastaFetch.mutate({ sampleIds });
   };
 
   const MAIN_USHER_TOOLTIP_TEXT = (
