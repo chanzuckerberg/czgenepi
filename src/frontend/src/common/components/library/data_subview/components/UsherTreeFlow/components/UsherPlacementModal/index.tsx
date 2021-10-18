@@ -40,13 +40,12 @@ interface Props {
   failedSamples: string[];
   open: boolean;
   onClose: () => void;
-  onLinkCreateSuccess(url?: string): void;
+  onLinkCreateSuccess(url: string, treeType: string): void;
 }
 
-interface DropdownOptionProps {
+interface DropdownOptionProps extends DefaultMenuSelectOption {
   id: number;
   description: string;
-  name: string;
   value: string;
   priority: number;
 }
@@ -146,15 +145,17 @@ export const UsherPlacementModal = ({
     </div>
   );
 
-  const onOptionChange = (opt: DefaultMenuSelectOption | null) => {
+  const onOptionChange = (opt: DefaultMenuSelectOption | null): void => {
     if (!opt) {
       setDropdownLabel("");
       setTreeType("");
       return;
     }
 
-    setDropdownLabel(opt?.name);
-    setTreeType(opt?.value);
+    const { name, value } = opt as DropdownOptionProps;
+
+    setDropdownLabel(name);
+    setTreeType(value);
   };
 
   const ONE_SECOND = 1000;
