@@ -98,6 +98,13 @@ def _format_created_date(sample: Sample) -> str:
         return "not yet uploaded"
 
 
+def _format_sequencing_date(sample: Sample) -> str:
+    # Using `get_uploaded_entity` may be unnecessary since it conditionally pulls from
+    # sequencing_reads_collection as well, but that model isn't used right now.
+    sequenced_entity = sample.get_uploaded_entity()
+    return api_utils.format_date(sequenced_entity.sequencing_date)
+
+
 def _format_gisaid_accession(
     sample: Sample,
     entity_id_to_gisaid_accession_workflow_map: defaultdict[
@@ -305,6 +312,7 @@ def samples():
             "public_identifier": sample.public_identifier,
             "upload_date": _format_created_date(sample),
             "collection_date": api_utils.format_date(sample.collection_date),
+            "sequencing_date": _format_sequencing_date(sample),
             "collection_location": sample.location,
             "gisaid": _format_gisaid_accession(
                 sample, entity_id_to_gisaid_accession_workflow_map
