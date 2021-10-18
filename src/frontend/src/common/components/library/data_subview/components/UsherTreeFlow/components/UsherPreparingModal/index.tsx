@@ -8,6 +8,8 @@ interface Props {
   onClose(): void;
 }
 
+type TimeoutType = ReturnType<typeof setTimeout> | undefined;
+
 const TIME_MODAL_SHOWN = 5000; // 5 seconds
 const USHER_URL =
   "https://genome.ucsc.edu/cgi-bin/hgPhyloPlace?db=wuhCor1&remoteFile=";
@@ -18,7 +20,7 @@ const UsherPreparingModal = ({
   onClose,
 }: Props): JSX.Element => {
   const [hasOpenedUrl, setHasOpenedUrl] = useState<boolean>(false);
-  const [timer, setTimer] = useState<ReturnType<typeof setTimeout>>();
+  const [timer, setTimer] = useState<TimeoutType>();
 
   const openUsher = useCallback(() => {
     if (!fastaUrl) return;
@@ -31,8 +33,8 @@ const UsherPreparingModal = ({
     link.remove();
 
     onClose();
-    setTimer();
-    clearTimeout(timer);
+    setTimer(undefined);
+    if (timer) clearTimeout(timer);
   }, [fastaUrl, onClose, timer]);
 
   useEffect(() => {
