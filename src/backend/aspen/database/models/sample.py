@@ -90,7 +90,16 @@ class Sample(idbase, DictMixin):  # type: ignore
     """A physical sample.  Multiple sequences can be taken of each physical sample."""
 
     __tablename__ = "samples"
-    __table_args__ = (UniqueConstraint("submitting_group_id", "private_identifier"),)
+    __table_args__ = (
+        # Unique index uses default name format of `uq_samples_submitting_group_id`
+        UniqueConstraint("submitting_group_id", "private_identifier"),
+        UniqueConstraint(
+            "submitting_group_id",
+            "public_identifier",
+            # To avoid overlapping above unique index, explicitly set `name` here
+            name="uq_samples_submitting_group_id_public_identifier",
+        ),
+    )
 
     submitting_group_id = Column(
         Integer,
@@ -123,7 +132,6 @@ class Sample(idbase, DictMixin):  # type: ignore
     public_identifier = Column(
         String,
         nullable=False,
-        unique=True,
         comment="This is the public identifier we assign to this sample.",
     )
 
