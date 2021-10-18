@@ -1,8 +1,6 @@
 import pytest
 from httpx import AsyncClient
 
-from aspen.api.main import app
-
 pytestmark = pytest.mark.asyncio
 
 
