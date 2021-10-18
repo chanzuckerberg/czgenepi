@@ -33,8 +33,8 @@ const UsherPreparingModal = ({
     link.remove();
 
     onClose();
-    setTimer(undefined);
     if (timer) clearTimeout(timer);
+    setTimer(undefined);
   }, [fastaUrl, onClose, timer]);
 
   useEffect(() => {
