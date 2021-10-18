@@ -29,7 +29,11 @@ def get_usergroup_query(session: AsyncSession, auth0_user_id: str) -> Query:
 async def setup_userinfo(
     session: AsyncSession, auth0_user_id: str
 ) -> Union[User, None]:
-    sentry_sdk.set_user({ "requested_user_id": auth0_user_id, })
+    sentry_sdk.set_user(
+        {
+            "requested_user_id": auth0_user_id,
+        }
+    )
     try:
         userquery = get_usergroup_query(session, auth0_user_id)
         userwait = await session.execute(userquery)

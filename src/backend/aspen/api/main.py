@@ -2,8 +2,8 @@ import os
 from typing import List
 
 import sentry_sdk
-from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 from fastapi import Depends, FastAPI
+from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 from starlette.middleware.cors import CORSMiddleware
 
 from aspen.api.auth import get_auth_user
