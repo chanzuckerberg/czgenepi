@@ -167,8 +167,6 @@ class Settings(BaseSettings):
     # sentry properties
     @cached_property
     def SENTRY_BACKEND_DSN(self) -> str:
-        if os.getenv("SENTRY_BACKEND_DSN"):
-            return os.environ["SENTRY_BACKEND_DSN"]
         try:
             return self.AWS_SECRET["SENTRY_BACKEND_DSN"]
         except KeyError:
