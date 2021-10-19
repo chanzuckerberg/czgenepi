@@ -18,6 +18,7 @@ const UsherTreeFlow = ({
   const [isConfirmOpen, setIsConfirmOpen] = useState<boolean>(false);
   const [isPreparingOpen, setIsPreparingOpen] = useState<boolean>(false);
   const [fastaUrl, setFastaUrl] = useState<string>("");
+  const [selectedTreeType, setSelectedTreeType] = useState<string>("");
 
   useEffect(() => {
     if (shouldStartUsherFlow) handlePlacementOpen();
@@ -29,12 +30,14 @@ const UsherTreeFlow = ({
 
   const handlePlacementClose = () => {
     setFastaUrl("");
+    setSelectedTreeType("");
     setIsPlacementOpen(false);
   };
 
-  const onLinkCreateSuccess = (url: string) => {
+  const onLinkCreateSuccess = (url: string, treeType: string) => {
     setFastaUrl(url);
     setIsConfirmOpen(true);
+    setSelectedTreeType(treeType);
   };
 
   const handleConfirmationClose = () => {
@@ -67,9 +70,10 @@ const UsherTreeFlow = ({
         onConfirm={handleConfirmationConfirm}
       />
       <UsherPreparingModal
+        fastaUrl={fastaUrl}
         isOpen={isPreparingOpen}
         onClose={handlePreparingClose}
-        fastaUrl={fastaUrl}
+        treeType={selectedTreeType}
       />
     </>
   );

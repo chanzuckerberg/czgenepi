@@ -40,13 +40,12 @@ interface Props {
   failedSamples: string[];
   open: boolean;
   onClose: () => void;
-  onLinkCreateSuccess(url?: string): void;
+  onLinkCreateSuccess(url: string, treeType: string): void;
 }
 
-interface DropdownOptionProps {
+interface DropdownOptionProps extends DefaultMenuSelectOption {
   id: number;
   description: string;
-  name: string;
   value: string;
   priority: number;
 }
@@ -74,6 +73,7 @@ export const UsherPlacementModal = ({
   );
   const [isUsherDisabled, setUsherDisabled] = useState<boolean>(false);
   const [shouldShowWarning, setShouldShowWarning] = useState<boolean>(false);
+  const [treeType, setTreeType] = useState<string>("");
 
   const defaultNumSamples = getDefaultNumSamplesPerSubtree(sampleIds?.length);
 
@@ -110,7 +110,7 @@ export const UsherPlacementModal = ({
     },
     onSuccess: (data: FastaResponseType) => {
       const url = data?.url;
-      if (url) onLinkCreateSuccess(data.url);
+      if (url) onLinkCreateSuccess(data.url, treeType);
     },
   });
 
@@ -145,13 +145,17 @@ export const UsherPlacementModal = ({
     </div>
   );
 
-  const onOptionChange = (opt: DefaultMenuSelectOption | null) => {
+  const onOptionChange = (opt: DefaultMenuSelectOption | null): void => {
     if (!opt) {
       setDropdownLabel("");
+      setTreeType("");
       return;
     }
 
-    setDropdownLabel(opt?.name);
+    const { name, value } = opt as DropdownOptionProps;
+
+    setDropdownLabel(name);
+    setTreeType(value);
   };
 
   const ONE_SECOND = 1000;
