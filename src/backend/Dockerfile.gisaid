@@ -53,13 +53,6 @@ RUN wget https://raw.githubusercontent.com/python-poetry/poetry/1.1.10/get-poetr
 
 RUN pip3 install nextstrain-cli csv-diff s3fs[boto3] aiobotocore[awscli,boto3] envdir fsspec pandas arrow
 
-RUN mkdir /ncov && \
-    cd /ncov && \
-    git init && \
-    git remote add origin https://github.com/nextstrain/ncov.git && \
-    git fetch origin 3e9ad400593b24cf94d24cdb56366f339f5a165b && \
-    git reset --hard FETCH_HEAD
-
 # Poetry: install app
 WORKDIR /usr/src/app
 COPY pyproject.toml poetry.lock environment.yaml ./

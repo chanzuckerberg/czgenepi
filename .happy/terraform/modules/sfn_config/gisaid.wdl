@@ -238,8 +238,7 @@ task AlignGISAID {
     start_time=$(date +%s)
     build_id=$(date +%Y%m%d-%H%M)
 
-    # We're pinning to a specific git hash in the Dockerfile so we're not cloning this here.
-    # git clone --depth 1 git://github.com/nextstrain/ncov /ncov
+    git clone --depth 1 git://github.com/nextstrain/ncov /ncov
     ncov_git_rev=$(git -C /ncov rev-parse HEAD)
 
     # fetch the gisaid dataset
@@ -247,18 +246,17 @@ task AlignGISAID {
     aws s3 cp --no-progress "s3://${processed_gisaid_s3_bucket}/${processed_gisaid_metadata_s3_key}" /ncov/data/metadata.tsv
     mkdir /ncov/my_profiles/align_gisaid/
     cp /usr/src/app/aspen/workflows/align_gisaid/{builds.yaml,config.yaml} /ncov/my_profiles/align_gisaid/
-    (cd /ncov; snakemake --printshellcmds results/aligned.fasta --profile my_profiles/align_gisaid 1>&2)
+    (cd /ncov; snakemake --printshellcmds results/filtered_gisaid.fasta.xz --profile my_profiles/align_gisaid || aws s3 cp /ncov/.snakemake/log/ "s3://${aspen_s3_db_bucket}/aligned_gisaid_dump/${build_id}/" --recursive)  
 
-    mv /ncov/.snakemake/log/*.snakemake.log /ncov/logs/align.txt .
-    cp /ncov/data/metadata.tsv .  # Support wdl output paths.
-
-    zstdmt /ncov/results/aligned.fasta
+    mv /ncov/.snakemake/log/*.snakemake.log /ncov/logs/filtered_gisaid.txt .
+    unxz -k /ncov/results/sanitized_metadata_gisaid.tsv.xz  # make an unzipped version for ImportGISAID. The zipped version goes to S3
+    mv /ncov/results/sanitized_metadata_gisaid.tsv metadata.tsv  # this is for wdl to pipe into ImportGISAID.
 
     # upload the files to S3
-    sequences_key="aligned_gisaid_dump/${build_id}/sequences.fasta.zst"
-    metadata_key="aligned_gisaid_dump/${build_id}/metadata.tsv"
-    aws s3 cp /ncov/results/aligned.fasta.zst "s3://${aspen_s3_db_bucket}/${sequences_key}"
-    aws s3 cp /ncov/data/metadata.tsv "s3://${aspen_s3_db_bucket}/${metadata_key}"
+    sequences_key="aligned_gisaid_dump/${build_id}/filtered_gisaid.fasta.xz"
+    metadata_key="aligned_gisaid_dump/${build_id}/sanitized_metadata_gisaid.tsv.xz"
+    aws s3 cp /ncov/results/filtered_gisaid.fasta.xz "s3://${aspen_s3_db_bucket}/${sequences_key}"
+    aws s3 cp /ncov/results/sanitized_metadata_gisaid.tsv.xz "s3://${aspen_s3_db_bucket}/${metadata_key}"
 
     # These are set by the Dockerfile and the Happy CLI
     aspen_workflow_rev=$COMMIT_SHA
@@ -282,8 +280,8 @@ task AlignGISAID {
 
     output {
         Array[File] snakemake_logs = glob("*.snakemake.log")
-	File gisaid_metadata = "metadata.tsv"
-        File align_log = "align.txt"
+        File gisaid_metadata = "metadata.tsv"
+        File align_log = "filtered_gisaid.txt"
         String entity_id = read_string("entity_id")
     }
 
