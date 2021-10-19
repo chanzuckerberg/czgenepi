@@ -1,7 +1,9 @@
 import os
 from typing import List
 
+import sentry_sdk
 from fastapi import Depends, FastAPI
+from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 from starlette.middleware.cors import CORSMiddleware
 
 from aspen.api.auth import get_auth_user
@@ -44,6 +46,13 @@ def get_app() -> FastAPI:
         allow_methods=["*"],
     )
     _app.add_middleware(SessionMiddleware, secret_key=settings.SECRET_KEY)
+
+    sentry_sdk.init(
+        dsn=settings.SENTRY_BACKEND_DSN,
+        environment=os.environ.get("DEPLOYMENT_STAGE"),
+        traces_sample_rate=1.0,
+    )
+    _app.add_middleware(SentryAsgiMiddleware)
 
     _app.include_router(
         users.router, prefix="/v2/users", dependencies=[Depends(get_auth_user)]

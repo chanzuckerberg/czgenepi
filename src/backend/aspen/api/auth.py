@@ -1,6 +1,7 @@
 import logging
 from typing import Union
 
+import sentry_sdk
 import sqlalchemy as sa
 from auth0.v3.exceptions import TokenValidationError
 from fastapi import Depends
@@ -28,22 +29,26 @@ def get_usergroup_query(session: AsyncSession, auth0_user_id: str) -> Query:
 async def setup_userinfo(
     session: AsyncSession, auth0_user_id: str
 ) -> Union[User, None]:
-    # sentry_sdk.set_user( { "requested_user_id": auth0_user_id, })
+    sentry_sdk.set_user(
+        {
+            "requested_user_id": auth0_user_id,
+        }
+    )
     try:
         userquery = get_usergroup_query(session, auth0_user_id)
         userwait = await session.execute(userquery)
         user = userwait.unique().scalars().first()
     except NoResultFound:
-        # sentry_sdk.capture_message(
-        #     f"Requested auth0_user_id {auth0_user_id} not found in usergroup query."
-        # )
+        sentry_sdk.capture_message(
+            f"Requested auth0_user_id {auth0_user_id} not found in usergroup query."
+        )
         return None
-    # sentry_sdk.set_user(
-    #     {
-    #         "id": user.id,
-    #         "auth0_uid": user.auth0_auth0_user_id,
-    #     }
-    # )
+    sentry_sdk.set_user(
+        {
+            "id": user.id,
+            "auth0_uid": user.auth0_user_id,
+        }
+    )
     return user
 
 
