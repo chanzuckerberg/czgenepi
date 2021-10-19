@@ -31,7 +31,6 @@ import {
   TextFieldAlert,
   Title,
   TreeNameInfoWrapper,
-  TreeNameSection,
   TreeNameTooLongAlert,
   TreeTypeSection,
 } from "./style";
@@ -141,7 +140,7 @@ export const CreateNSTreeModal = ({
       <StyledDialogContent>
         <Content data-test-id="modal-content">
           <form onSubmit={handleSubmit}>
-            <TreeNameSection>
+            <div>
               <TreeNameInfoWrapper>
                 <FieldTitle>Tree Name</FieldTitle>
                 <StyledInstructionsButton
@@ -180,7 +179,7 @@ export const CreateNSTreeModal = ({
                   </TextFieldAlert>
                 </TreeNameTooLongAlert>
               )}
-            </TreeNameSection>
+            </div>
             <TreeTypeSection>
               <TreeNameInfoWrapper>
                 <FieldTitle>Tree Type: </FieldTitle>

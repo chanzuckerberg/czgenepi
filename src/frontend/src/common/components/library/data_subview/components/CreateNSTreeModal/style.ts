@@ -141,15 +141,6 @@ export const StyledRadio = styled(Radio)`
   }}
 `;
 
-export const TreeNameSection = styled.div`
-  ${(props) => {
-    const spacings = getSpacings(props);
-    return `
-      margin-top: ${spacings?.s}px;
-    `;
-  }}
-`;
-
 export const TreeTypeSection = styled.div`
   ${(props) => {
     const spacings = getSpacings(props);
