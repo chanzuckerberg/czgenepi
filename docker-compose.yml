@@ -13,7 +13,7 @@ services:
     networks:
       genepinet:
         aliases:
-          - database.genepinet.local
+          - database.genepinet.localdev
   frontend:
     image: "${DOCKER_REPO}aspen-frontend"
     build:
@@ -29,7 +29,7 @@ services:
       HOST: 0.0.0.0
       PORT: 8000
       BUILD_PATH: build
-      API_URL: http://backend.genepinet.local:3000
+      API_URL: http://backend.genepinet.localdev:3000
       CHOKIDAR_USEPOLLING: "true"
     ports:
       - "8000:8000"
@@ -39,7 +39,7 @@ services:
     networks:
       genepinet:
         aliases:
-          - frontend.genepinet.local
+          - frontend.genepinet.localdev
   backend:
     image: "${DOCKER_REPO}aspen-backend"
     build:
@@ -58,10 +58,10 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - RESTART_ON_FAILURE=yes
-      - BOTO_ENDPOINT_URL=http://localstack.genepinet.local:4566
+      - BOTO_ENDPOINT_URL=http://localstack.genepinet.localdev:4566
       - AWS_ACCESS_KEY_ID=dev_access_key_id
       - AWS_SECRET_ACCESS_KEY=dev_secret_access_key
-      - FRONTEND_URL=http://frontend.genepinet.local:8000
+      - FRONTEND_URL=http://frontend.genepinet.localdev:8000
       - AWS_REGION=us-west-2
       - ENV=local
       - FLASK_APP=aspen.main
@@ -77,7 +77,7 @@ services:
     networks:
       genepinet:
         aliases:
-          - backend.genepinet.local
+          - backend.genepinet.localdev
   utility:
     image: "${DOCKER_REPO}aspen-backend"
     build:
@@ -90,7 +90,7 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - RESTART_ON_FAILURE=yes
-      - BOTO_ENDPOINT_URL=http://localstack.genepinet.local:4566
+      - BOTO_ENDPOINT_URL=http://localstack.genepinet.localdev:4566
       - AWS_ACCESS_KEY_ID=dev_access_key_id
       - AWS_SECRET_ACCESS_KEY=dev_secret_access_key
       - AWS_REGION=us-west-2
@@ -104,7 +104,7 @@ services:
     networks:
       genepinet:
         aliases:
-          - utility.genepinet.local
+          - utility.genepinet.localdev
   localstack:
     image: localstack/localstack@sha256:7c6635493185d25165979995fb073fd789c72b6d8b17ef3a70b798d55576732f
     ports:
@@ -122,7 +122,7 @@ services:
     networks:
       genepinet:
         aliases:
-          - localstack.genepinet.local
+          - localstack.genepinet.localdev
   oidc:
     image: soluto/oidc-server-mock:0.3.0
     ports:
@@ -150,7 +150,7 @@ services:
     networks:
       genepinet:
         aliases:
-          - oidc.genepinet.local
+          - oidc.genepinet.localdev
   gisaid:
     image: "${DOCKER_REPO}aspen-gisaid"
     build:
@@ -165,14 +165,14 @@ services:
     command: ["true"]
     environment:
       - AWS_REGION=us-west-2
-      - BOTO_ENDPOINT_URL=http://localstack.genepinet.local:4566
+      - BOTO_ENDPOINT_URL=http://localstack.genepinet.localdev:4566
       - AWS_ACCESS_KEY_ID=dev_access_key_id
       - AWS_SECRET_ACCESS_KEY=dev_secret_access_key
     restart: "no"
     networks:
       genepinet:
         aliases:
-          - gisaid.genepinet.local
+          - gisaid.genepinet.localdev
   pangolin:
     image: "${DOCKER_REPO}aspen-pangolin"
     build:
@@ -184,7 +184,7 @@ services:
         - BUILDKIT_INLINE_CACHE=1
     environment:
       - AWS_REGION=us-west-2
-      - BOTO_ENDPOINT_URL=http://localstack.genepinet.local:4566
+      - BOTO_ENDPOINT_URL=http://localstack.genepinet.localdev:4566
       - AWS_ACCESS_KEY_ID=dev_access_key_id
       - AWS_SECRET_ACCESS_KEY=dev_secret_access_key
     command: ["true"]
@@ -192,7 +192,7 @@ services:
     networks:
       genepinet:
         aliases:
-          - pangolin.genepinet.local
+          - pangolin.genepinet.localdev
   nextstrain:
     image: "${DOCKER_REPO}aspen-nextstrain"
     build:
@@ -204,7 +204,7 @@ services:
         - BUILDKIT_INLINE_CACHE=1
     environment:
       - AWS_REGION=us-west-2
-      - BOTO_ENDPOINT_URL=http://localstack.genepinet.local:4566
+      - BOTO_ENDPOINT_URL=http://localstack.genepinet.localdev:4566
       - AWS_ACCESS_KEY_ID=dev_access_key_id
       - AWS_SECRET_ACCESS_KEY=dev_secret_access_key
     command: ["true"]
@@ -212,7 +212,7 @@ services:
     networks:
       genepinet:
         aliases:
-          - nextstrain.genepinet.local
+          - nextstrain.genepinet.localdev
 networks:
   genepinet:
 volumes:

@@ -8,7 +8,7 @@ This uses the [Happy Path setup](https://czi.atlassian.net/wiki/spaces/SI/pages/
 1. [install pre-commit](https://pre-commit.com/#install). `pip install pre-commit` or `brew install pre-commit`
 1. Run `pre-commit install` to install all the git pre-commit hooks
 1. From the root of this repository, run `make local-init` to build and run the dev environment. The first build takes awhile, but subsequent runs will use cached artifacts.
-1. Visit [http://backend.genepinet.local:3000](http://backend.genepinet.local:3000) to view the backend, and [http://frontend.genepinet.local:8000](http://frontend.genepinet.local:8000) for the frontend.
+1. Visit [http://backend.genepinet.localdev:3000](http://backend.genepinet.localdev:3000) to view the backend, and [http://frontend.genepinet.localdev:8000](http://frontend.genepinet.localdev:8000) for the frontend.
 1. `make local-dbconsole` starts a connection with the local postgresql db.
 1. **Open the source code and start editing!**
    - Modify code in the `src/frontend` directory, save your changes and the browser will update in real time.

@@ -21,4 +21,4 @@ class DockerComposeConfig(config.Config):
 
     @property
     def AUTH0_CALLBACK_URL(self) -> str:
-        return "http://backend.genepinet.local:3000/callback"
+        return "http://backend.genepinet.localdev:3000/callback"

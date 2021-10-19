@@ -9,7 +9,7 @@ In the project directory, you can run:
 ### `npm start`
 
 Runs the app in the development mode.\
-Open [http://backend.genepinet.local:3000](http://backend.genepinet.local:3000)
+Open [http://backend.genepinet.localdev:3000](http://backend.genepinet.localdev:3000)
 to view it in the browser.
 
 The page will reload if you make edits.\
