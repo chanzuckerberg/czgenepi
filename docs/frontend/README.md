@@ -152,9 +152,9 @@ const render = () => {
 };
 ```
 
-In order to see code hidden behind a feature flag, simply add a query parameter to the url in your address bar. For example, http://frontend.genepinet.local:8000/data/samples becomes http://frontend.genepinet.local:8000/data/samples?mayasFlag=true. Please note, the value _must_ be set to `true` in the query param to turn the feature flag on.
+In order to see code hidden behind a feature flag, simply add a query parameter to the url in your address bar. For example, http://frontend.genepinet.localdev:8000/data/samples becomes http://frontend.genepinet.localdev:8000/data/samples?mayasFlag=true. Please note, the value _must_ be set to `true` in the query param to turn the feature flag on.
 
-The feature flag will persist in local storage after it is set. That means *the feature flag will remain ON until you turn it off or clear your cookies, even if you do not modify url in the future*. As a result, please remember to clear your feature flags by periodically removing cookies, or by manually unsetting previously activated flags. For example, http://frontend.genepinet.local:8000/data/samples becomes http://frontend.genepinet.local:8000/data/samples?mayasFlag=false.
+The feature flag will persist in local storage after it is set. That means *the feature flag will remain ON until you turn it off or clear your cookies, even if you do not modify url in the future*. As a result, please remember to clear your feature flags by periodically removing cookies, or by manually unsetting previously activated flags. For example, http://frontend.genepinet.localdev:8000/data/samples becomes http://frontend.genepinet.localdev:8000/data/samples?mayasFlag=false.
 
 ## Gotchas
 

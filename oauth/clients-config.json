@@ -5,10 +5,10 @@
     "Description": "Client for client credentials flow",
     "AllowedGrantTypes": ["authorization_code", "urn:ietf:params:oauth:grant-type:device_code"],
     "RedirectUris": [
-      "https://backend.genepinet.local:3000/callback",
-      "http://backend.genepinet.local:3000/callback",
-      "http://backend.genepinet.local:3000/v2/auth/callback",
-      "https://backend.genepinet.local:3000/v2/auth/callback"
+      "https://backend.genepinet.localdev:3000/callback",
+      "http://backend.genepinet.localdev:3000/callback",
+      "http://backend.genepinet.localdev:3000/v2/auth/callback",
+      "https://backend.genepinet.localdev:3000/v2/auth/callback"
     ],
     "AllowedScopes": ["openid", "profile", "email", "offline_access", "device_code"],
     "AllowAccessTokensViaBrowser": true,

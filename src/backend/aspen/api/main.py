@@ -18,7 +18,7 @@ def get_allowed_origins() -> List[str]:
 
     if deployment not in ["staging", "prod"]:
         allowed_origins.extend(
-            [r"http://.*\.genepinet\.local:\d+", r"^http://localhost:\d+"]
+            [r"http://.*\.genepinet\.localdev:\d+", r"^http://localhost:\d+"]
         )
     if frontend_url:
         allowed_origins.append(frontend_url)

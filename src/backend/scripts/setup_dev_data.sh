@@ -4,18 +4,18 @@ export AWS_DEFAULT_REGION=us-west-2
 export AWS_ACCESS_KEY_ID=nonce
 export AWS_SECRET_ACCESS_KEY=nonce
 
-export FRONTEND_URL=http://frontend.genepinet.local:8000
-export BACKEND_URL=http://backend.genepinet.local:3000
+export FRONTEND_URL=http://frontend.genepinet.localdev:8000
+export BACKEND_URL=http://backend.genepinet.localdev:3000
 
 # NOTE: This script is intended to run INSIDE the dockerized dev environment!
 # If you need to run it directly on your laptop for some reason, change
 # localstack below to localhost
-export LOCALSTACK_URL=http://localstack.genepinet.local:4566
+export LOCALSTACK_URL=http://localstack.genepinet.localdev:4566
 
 # How the backend can reach the OIDC idp
-export OIDC_INTERNAL_URL=http://oidc.genepinet.local
+export OIDC_INTERNAL_URL=http://oidc.genepinet.localdev
 # How a web browser can reach the OIDC idp
-export OIDC_BROWSER_URL=https://oidc.genepinet.local:8443
+export OIDC_BROWSER_URL=https://oidc.genepinet.localdev:8443
 
 echo "Creating secretsmanager secrets"
 local_aws="aws --endpoint-url=${LOCALSTACK_URL}"
@@ -24,7 +24,7 @@ ${local_aws} secretsmanager update-secret --secret-id aspen-config --secret-stri
   "AUTH0_CLIENT_ID": "local-client-id",
   "AUTH0_CALLBACK_URL": "'"${BACKEND_URL}"'/callback",
   "AUTH0_CLIENT_SECRET": "local-client-secret",
-  "AUTH0_DOMAIN": "oidc.genepinet.local:8443",
+  "AUTH0_DOMAIN": "oidc.genepinet.localdev:8443",
   "AUTH0_BASE_URL": "'"${OIDC_INTERNAL_URL}"'",
   "AUTH0_USERINFO_URL": "connect/userinfo",
   "AUTH0_ACCESS_TOKEN_URL": "'"${OIDC_INTERNAL_URL}"'/connect/token",
@@ -33,7 +33,7 @@ ${local_aws} secretsmanager update-secret --secret-id aspen-config --secret-stri
   "FLASK_SECRET": "DevelopmentKey",
   "DB_rw_username": "user_rw",
   "DB_rw_password": "password_rw",
-  "DB_address": "database.genepinet.local",
+  "DB_address": "database.genepinet.localdev",
   "S3_external_auspice_bucket": "aspen-external-auspice-data"
 }' || true
 

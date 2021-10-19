@@ -156,7 +156,7 @@ class CliConfig:
         "staging": "https://api.staging.genepi.czi.technology",
         "prod": "https://api.aspen.cziscience.com",
         "rdev": "https://{stack}-backend.dev.genepi.czi.technology",
-        "local": "http://backend.genepinet.local:3000",
+        "local": "http://backend.genepinet.localdev:3000",
     }
     default_oauth_api = {
         "device_auth_url": "{auth_url}/oauth/device/code",
@@ -179,7 +179,7 @@ class CliConfig:
             "oauth_api_config": default_oauth_api,
         },
         "local": {
-            "auth_url": "https://oidc.genepinet.local:8443",
+            "auth_url": "https://oidc.genepinet.localdev:8443",
             "client_id": "local-client-id",
             "verify": False,
             "oauth_api_config": {

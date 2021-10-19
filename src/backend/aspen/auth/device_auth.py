@@ -44,7 +44,7 @@ def validate_auth_header(auth_header, domain, client_id):
     id_token = parts[1]
 
     # TODO, this should probably be a part of aspen config.
-    if "genepinet.local" in domain:
+    if "genepinet.localdev" in domain:
         jwks_url = f"https://{domain}/.well-known/openid-configuration/jwks"
         issuer = f"https://{domain}"
         # Adapted from https://github.com/auth0/auth0-python#id-token-validation
