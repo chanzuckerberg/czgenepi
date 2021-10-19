@@ -13,7 +13,7 @@ type TimeoutType = ReturnType<typeof setTimeout> | undefined;
 
 const TIME_MODAL_SHOWN = 5000; // 5 seconds
 
-const generateUsherLink = (remoteFile, treeType) => {
+const generateUsherLink = (remoteFile: string, treeType: string) => {
   const USHER_URL =
     "https://genome.ucsc.edu/cgi-bin/hgPhyloPlace?db=wuhCor1&remoteFile=";
   const USHER_TREE_TYPE_QUERY = "&phyloPlaceTree=";
