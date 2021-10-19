@@ -99,6 +99,9 @@ def _format_created_date(sample: Sample) -> str:
 
 
 def _format_sequencing_date(sample: Sample) -> str:
+    if sample.czb_failed_genome_recovery:
+        # Unclear from Product standpoint if there would have been a sequencing date?
+        return api_utils.format_date(None)
     # Using `get_uploaded_entity` may be unnecessary since it conditionally pulls from
     # sequencing_reads_collection as well, but that model isn't used right now.
     sequenced_entity = sample.get_uploaded_entity()

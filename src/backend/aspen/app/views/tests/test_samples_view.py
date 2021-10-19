@@ -54,6 +54,9 @@ def test_samples_view(
                 "upload_date": api_utils.format_date(
                     uploaded_pathogen_genome.upload_date
                 ),
+                "sequencing_date": api_utils.format_date(
+                    uploaded_pathogen_genome.sequencing_date
+                ),
                 "lineage": {
                     "lineage": uploaded_pathogen_genome.pangolin_lineage,
                     "probability": uploaded_pathogen_genome.pangolin_probability,
@@ -106,6 +109,9 @@ def test_samples_view_gisaid_rejected(
                 "upload_date": api_utils.format_date(
                     uploaded_pathogen_genome.upload_date
                 ),
+                "sequencing_date": api_utils.format_date(
+                    uploaded_pathogen_genome.sequencing_date
+                ),
                 "lineage": {
                     "lineage": uploaded_pathogen_genome.pangolin_lineage,
                     "probability": uploaded_pathogen_genome.pangolin_probability,
@@ -152,6 +158,9 @@ def test_samples_view_gisaid_no_info(
                 "upload_date": api_utils.format_date(
                     uploaded_pathogen_genome.upload_date
                 ),
+                "sequencing_date": api_utils.format_date(
+                    uploaded_pathogen_genome.sequencing_date
+                ),
                 "lineage": {
                     "lineage": uploaded_pathogen_genome.pangolin_lineage,
                     "probability": uploaded_pathogen_genome.pangolin_probability,
@@ -191,6 +200,9 @@ def test_samples_view_gisaid_not_eligible(
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
                 "upload_date": api_utils.format_date(None),
+                # Unclear from Product standpoint what should happen with sequencing_date
+                # when failed genome recovery...
+                "sequencing_date": api_utils.format_date(None),
                 "lineage": {
                     "lineage": None,
                     "probability": None,
@@ -240,6 +252,9 @@ def test_samples_view_gisaid_submitted(
                 "public_identifier": sample.public_identifier,
                 "upload_date": api_utils.format_date(
                     uploaded_pathogen_genome.upload_date
+                ),
+                "sequencing_date": api_utils.format_date(
+                    uploaded_pathogen_genome.sequencing_date
                 ),
                 "lineage": {
                     "lineage": uploaded_pathogen_genome.pangolin_lineage,
@@ -391,6 +406,9 @@ def test_samples_view_cansee_metadata(
             },
             "public_identifier": sample.public_identifier,
             "upload_date": api_utils.format_date(uploaded_pathogen_genome.upload_date),
+            "sequencing_date": api_utils.format_date(
+                uploaded_pathogen_genome.sequencing_date
+            ),
             "lineage": {
                 "lineage": uploaded_pathogen_genome.pangolin_lineage,
                 "probability": uploaded_pathogen_genome.pangolin_probability,
@@ -446,6 +464,9 @@ def test_samples_view_cansee_all(
             "private_identifier": sample.private_identifier,
             "public_identifier": sample.public_identifier,
             "upload_date": api_utils.format_date(uploaded_pathogen_genome.upload_date),
+            "sequencing_date": api_utils.format_date(
+                uploaded_pathogen_genome.sequencing_date
+            ),
             "lineage": {
                 "lineage": uploaded_pathogen_genome.pangolin_lineage,
                 "probability": uploaded_pathogen_genome.pangolin_probability,
@@ -510,6 +531,9 @@ def test_samples_failed_accession(
                 "upload_date": api_utils.format_date(
                     uploaded_pathogen_genome.upload_date
                 ),
+                "sequencing_date": api_utils.format_date(
+                    uploaded_pathogen_genome.sequencing_date
+                ),
                 "lineage": {
                     "lineage": uploaded_pathogen_genome.pangolin_lineage,
                     "probability": uploaded_pathogen_genome.pangolin_probability,
@@ -573,6 +597,9 @@ def test_samples_multiple_accession(
                 "upload_date": api_utils.format_date(
                     uploaded_pathogen_genome.upload_date
                 ),
+                "sequencing_date": api_utils.format_date(
+                    uploaded_pathogen_genome.sequencing_date
+                ),
                 "lineage": {
                     "lineage": uploaded_pathogen_genome.pangolin_lineage,
                     "probability": uploaded_pathogen_genome.pangolin_probability,
@@ -624,6 +651,9 @@ def test_samples_view_no_pangolin(
                 "public_identifier": sample.public_identifier,
                 "upload_date": api_utils.format_date(
                     uploaded_pathogen_genome.upload_date
+                ),
+                "sequencing_date": api_utils.format_date(
+                    uploaded_pathogen_genome.sequencing_date
                 ),
                 "lineage": {
                     "lineage": None,
