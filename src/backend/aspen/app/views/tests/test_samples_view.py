@@ -200,8 +200,9 @@ def test_samples_view_gisaid_not_eligible(
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
                 "upload_date": api_utils.format_date(None),
-                # Unclear from Product standpoint what should happen with sequencing_date
-                # when failed genome recovery...
+                # In some cases, `sequencing_date` could actually still exist with a
+                # failed genome recovery, but for this test it's None because the sample
+                # has no underlying sequenced entity (no uploaded_pathogen_genome).
                 "sequencing_date": api_utils.format_date(None),
                 "lineage": {
                     "lineage": None,
