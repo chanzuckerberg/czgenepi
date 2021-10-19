@@ -12,9 +12,15 @@ interface Props {
 type TimeoutType = ReturnType<typeof setTimeout> | undefined;
 
 const TIME_MODAL_SHOWN = 5000; // 5 seconds
-const USHER_URL =
-  "https://genome.ucsc.edu/cgi-bin/hgPhyloPlace?db=wuhCor1&remoteFile=";
-const USHER_TREE_TYPE_QUERY = "&phyloPlaceTree=";
+
+const generateUsherLink = (remoteFile, treeType) => {
+  const USHER_URL =
+    "https://genome.ucsc.edu/cgi-bin/hgPhyloPlace?db=wuhCor1&remoteFile=";
+  const USHER_TREE_TYPE_QUERY = "&phyloPlaceTree=";
+  const encodedFileLink = encodeURIComponent(remoteFile);
+
+  return `${USHER_URL}${encodedFileLink}${USHER_TREE_TYPE_QUERY}${treeType}`;
+};
 
 const UsherPreparingModal = ({
   fastaUrl,
@@ -29,9 +35,7 @@ const UsherPreparingModal = ({
     if (!fastaUrl) return;
 
     const link = document.createElement("a");
-    link.href = `${USHER_URL}${encodeURIComponent(
-      fastaUrl
-    )}${USHER_TREE_TYPE_QUERY}${treeType}`;
+    link.href = generateUsherLink(fastaUrl, treeType);
     link.target = "_blank";
     link.rel = "noopener";
     link.click();
