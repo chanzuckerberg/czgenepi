@@ -7,4 +7,4 @@ router = APIRouter()
 
 @router.get("/", response_model=healthschema)
 async def get_health() -> healthschema:
-    return healthschema.parse_obj({"healthy": True})
+    return healthschema.parse_obj({"healthy": False})

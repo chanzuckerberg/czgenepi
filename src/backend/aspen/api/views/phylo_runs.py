@@ -38,6 +38,7 @@ from aspen.app.views.api_utils import (
 )
 
 from aspen.api.utils import get_matching_gisaid_ids
+from aspen.api.schemas.phylo_runs import PhyloRunRequestSchema, PhyloRunResponseSchema
 
 from typing import Iterable, MutableSequence
 
@@ -45,43 +46,11 @@ import logging
 logging.basicConfig()
 logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
-# schema
-from pydantic import BaseModel, ValidationError, validator, constr
-from typing import List
-
 # What kinds of ondemand nextstrain builds do we support?
 PHYLO_TREE_TYPES = {
     TreeType.NON_CONTEXTUALIZED.value: "non_contextualized.yaml",
     TreeType.TARGETED.value: "targeted.yaml",
 }
-
-class GroupResponseSchema(BaseModel):
-    class Config:
-        orm_mode = True
-    id: int
-    name: str
-
-class PhyloRunRequestSchema(BaseModel):
-    name: constr(min_length=1, max_length=128)
-    samples: List[str]
-    tree_type: str
-
-    @validator('tree_type')
-    def tree_type_must_be_supported(cls, value):
-        uppercase_tree_type = value.upper()
-        assert PHYLO_TREE_TYPES.get(uppercase_tree_type)
-        return uppercase_tree_type
-
-class PhyloRunResponseSchema(BaseModel):
-    class Config:
-        orm_mode = True
-    id: int
-    start_datetime: datetime.datetime
-    end_datetime: datetime.datetime = None
-    workflow_status: WorkflowStatusType
-    group: GroupResponseSchema
-    template_file_path: str
-    template_args: dict
 
 # route
 router = APIRouter()
