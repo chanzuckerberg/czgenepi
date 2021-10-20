@@ -1,5 +1,5 @@
 import { Button, ButtonProps } from "czifui";
-import React, { FC, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DEFAULT_FETCH_OPTIONS } from "src/common/api";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import ENV from "src/common/constants/ENV";
@@ -9,18 +9,39 @@ interface Props extends ButtonProps {
   treeId: number;
 }
 
-const ConfirmButton = (props: Props) => {
+const getTreeUrl = async (treeId: number) => {
+  const result = await fetch(
+    `${ENV.API_URL}/api/auspice/view/${treeId}`,
+    DEFAULT_FETCH_OPTIONS
+  );
+
+  const json = await result.json();
+  const encodedJsonUrl = encodeURIComponent(stripProtocol(json.url));
+
+  return "https://nextstrain.org/fetch/" + encodedJsonUrl;
+};
+
+const getButtonText = ({
+  isLoading,
+  hasError,
+}: {
+  isLoading: boolean;
+  hasError: boolean;
+}) => {
+  if (isLoading) return "Loading...";
+  if (hasError) return "Not available";
+  return "Confirm";
+};
+
+export const ConfirmButton = (props: Props): JSX.Element => {
   const { treeId, ...rest } = props;
 
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
-
   const [url, setUrl] = useState("");
-  useEffect(() => {
-    setIsLoading(true);
-    getUrl();
 
-    async function getUrl() {
+  useEffect(() => {
+    const getUrl = async () => {
       try {
         setUrl(await getTreeUrl(treeId));
         setIsLoading(false);
@@ -28,22 +49,13 @@ const ConfirmButton = (props: Props) => {
         setIsLoading(false);
         setHasError(true);
       }
-    }
+    };
+
+    setIsLoading(true);
+    getUrl();
   }, [treeId]);
 
-  function getText({
-    isLoading,
-    hasError,
-  }: {
-    isLoading: boolean;
-    hasError: boolean;
-  }) {
-    if (isLoading) return "Loading...";
-    if (hasError) return "Not available";
-    return "Confirm";
-  }
-
-  const Content = (
+  const ButtonContent = (
     <Button
       {...rest}
       color="primary"
@@ -52,38 +64,15 @@ const ConfirmButton = (props: Props) => {
       disabled={isLoading || hasError || !url}
       data-test-id="tree-link-button"
     >
-      {getText({ hasError, isLoading })}
+      {getButtonText({ hasError, isLoading })}
     </Button>
   );
 
   return url ? (
     <NewTabLink data-test-id="tree-link" href={url}>
-      {Content}
+      {ButtonContent}
     </NewTabLink>
   ) : (
-    Content
+    ButtonContent
   );
 };
-
-export const createConfirmButton = (treeId: number): FC => {
-  const TempConfirmButton = (props: ButtonProps) => (
-    <ConfirmButton {...props} treeId={treeId} />
-  );
-
-  TempConfirmButton.displayName = "TempConfirmButton";
-
-  return TempConfirmButton;
-};
-
-async function getTreeUrl(treeId: number) {
-  const result = await fetch(
-    `${ENV.API_URL}/api/auspice/view/${treeId}`,
-    DEFAULT_FETCH_OPTIONS
-  );
-
-  const json = await result.json();
-
-  const encodedJsonUrl = encodeURIComponent(stripProtocol(json.url));
-
-  return "https://nextstrain.org/fetch/" + encodedJsonUrl;
-}
