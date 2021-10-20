@@ -1,44 +1,32 @@
-import { Dialog } from "@material-ui/core";
-import { Button } from "czifui";
 import React from "react";
-import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
-import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
-import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
-import { ModalInfo } from "src/common/types/ui";
-import { Content, Header } from "./style";
+import { RedirectConfirmationModal } from "src/common/components/library/data_subview/components/RedirectConfirmationModal";
+import { NewTabLink } from "src/common/components/library/NewTabLink";
+import nextstrainLogo from "src/common/images/nextstrain.png";
 
 interface Props {
-  info: ModalInfo;
   open: boolean;
   onClose: () => void;
+  treeId: number;
 }
 
-const TreeVizModal = ({ info, open, onClose }: Props): JSX.Element => {
-  const { body, buttons, header } = info;
-  const { content } = buttons[1];
-
-  const ConfirmButton = buttons[0].Button;
+const TreeVizModal = ({ open, onClose, treeId }: Props): JSX.Element => {
+  const content = (
+    <>
+      By clicking “Continue” you agree to send a copy of your genomic data to
+      Nexstrain’s visualization service, and that you understand this may make
+      the data accessible to others. Nextstrain is a separate service from
+      Aspen. <NewTabLink href="https://nextstrain.org/">Learn More</NewTabLink>
+    </>
+  );
 
   return (
-    <Dialog
-      disableBackdropClick
-      disableEscapeKeyDown
-      open={open}
+    <RedirectConfirmationModal
+      content={content}
+      img={nextstrainLogo as string}
+      isOpen={open}
       onClose={onClose}
-    >
-      <DialogTitle narrow>
-        <Header>{header}</Header>
-      </DialogTitle>
-      <DialogContent narrow>
-        <Content data-test-id="modal-content">{body}</Content>
-      </DialogContent>
-      <DialogActions narrow>
-        {ConfirmButton && <ConfirmButton onClick={onClose} />}
-        <Button color="primary" variant="outlined" isRounded onClick={onClose}>
-          {content}
-        </Button>
-      </DialogActions>
-    </Dialog>
+      onConfirm={onClose}
+    />
   );
 };
 
