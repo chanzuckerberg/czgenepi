@@ -3,12 +3,13 @@ import ConfirmDialog from "src/components/ConfirmDialog";
 import { StyledHeader, StyledImg, StyledP } from "./style";
 
 interface Props {
-  content: string;
+  content: string | JSX.Element;
   footer?: string;
   img: string;
   isOpen: boolean;
   onClose(): void;
   onConfirm(): void;
+  customConfirmButton?: JSX.Element;
 }
 
 const RedirectConfirmationModal = ({
