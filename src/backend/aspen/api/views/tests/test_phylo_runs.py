@@ -1,12 +1,12 @@
+import pytest
+from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from aspen.test_infra.models.gisaid_metadata import gisaid_metadata_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
 from aspen.test_infra.models.usergroup import group_factory, user_factory
 from aspen.test_infra.models.workflow import aligned_gisaid_dump_factory
-
-import pytest
-from httpx import AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
@@ -15,8 +15,8 @@ pytestmark = pytest.mark.asyncio
 # Example:
 # async def test_users_me(http_client: AsyncClient, async_session: AsyncSession) -> None:
 async def test_create_phylo_run(
-        async_session: AsyncSession,
-        http_client: AsyncClient,
+    async_session: AsyncSession,
+    http_client: AsyncClient,
 ):
     """
     Test phylo tree creation, local-only samples.
@@ -49,8 +49,8 @@ async def test_create_phylo_run(
 
 
 async def test_create_phylo_run_with_gisaid_ids(
-        async_session: AsyncSession,
-        http_client: AsyncClient,
+    async_session: AsyncSession,
+    http_client: AsyncClient,
 ):
     """
     Test phylo tree creation that includes a reference to a GISAID sequence.
@@ -85,8 +85,8 @@ async def test_create_phylo_run_with_gisaid_ids(
 
 
 async def test_create_invalid_phylo_run_name(
-        async_session: AsyncSession,
-        http_client: AsyncClient,
+    async_session: AsyncSession,
+    http_client: AsyncClient,
 ):
     """
     Test a phylo tree run request with a bad tree name.
@@ -111,8 +111,8 @@ async def test_create_invalid_phylo_run_name(
 
 
 async def test_create_invalid_phylo_run_tree_type(
-        async_session: AsyncSession,
-        http_client: AsyncClient,
+    async_session: AsyncSession,
+    http_client: AsyncClient,
 ):
     """
     Test a phylo tree run request with a bad tree type.
@@ -137,8 +137,8 @@ async def test_create_invalid_phylo_run_tree_type(
 
 
 async def test_create_invalid_phylo_run_bad_sample_id(
-        async_session: AsyncSession,
-        http_client: AsyncClient,
+    async_session: AsyncSession,
+    http_client: AsyncClient,
 ):
     """
     Test a phylo tree run request with a bad sample id.
@@ -163,8 +163,8 @@ async def test_create_invalid_phylo_run_bad_sample_id(
 
 
 async def test_create_invalid_phylo_run_sample_cannot_see(
-        async_session: AsyncSession,
-        http_client: AsyncClient,
+    async_session: AsyncSession,
+    http_client: AsyncClient,
 ):
     """
     Test a phylo tree run request with a sample a group should not have access to.
@@ -197,8 +197,8 @@ async def test_create_invalid_phylo_run_sample_cannot_see(
 
 
 async def test_create_phylo_run_unauthorized_access_redirect(
-        async_session: AsyncSession,
-        http_client: AsyncClient,
+    async_session: AsyncSession,
+    http_client: AsyncClient,
 ):
     """
     Test a request from an outside, unauthorized source.

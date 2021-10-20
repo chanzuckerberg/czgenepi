@@ -1,5 +1,6 @@
-from aspen.api.schemas.base import BaseResponse
 from typing import List
+
+from aspen.api.schemas.base import BaseResponse
 
 
 class UserBase(BaseResponse):

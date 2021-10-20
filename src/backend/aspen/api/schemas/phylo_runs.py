@@ -1,12 +1,10 @@
-from aspen.api.schemas.base import BaseRequest, BaseResponse
 import datetime
-
-from pydantic import BaseModel, ValidationError, validator, constr, StrictStr
 from typing import List
-from aspen.database.models import (
-    WorkflowStatusType, 
-    TreeType,
-)
+
+from pydantic import constr, StrictStr, validator
+
+from aspen.api.schemas.base import BaseRequest, BaseResponse
+from aspen.database.models import TreeType, WorkflowStatusType
 
 # What kinds of ondemand nextstrain builds do we support?
 PHYLO_TREE_TYPES = {
@@ -14,12 +12,13 @@ PHYLO_TREE_TYPES = {
     TreeType.TARGETED.value: "targeted.yaml",
 }
 
+
 class PhyloRunRequestSchema(BaseRequest):
     name: constr(min_length=1, max_length=128, strict=True)
     samples: List[StrictStr]
     tree_type: StrictStr
 
-    @validator('tree_type')
+    @validator("tree_type")
     def tree_type_must_be_supported(cls, value):
         uppercase_tree_type = value.upper()
         assert PHYLO_TREE_TYPES.get(uppercase_tree_type)
@@ -29,12 +28,15 @@ class PhyloRunRequestSchema(BaseRequest):
 class GroupResponseSchema(BaseResponse):
     class Config:
         orm_mode = True
+
     id: int
     name: StrictStr
+
 
 class PhyloRunResponseSchema(BaseResponse):
     class Config:
         orm_mode = True
+
     id: int
     start_datetime: datetime.datetime
     end_datetime: datetime.datetime = None

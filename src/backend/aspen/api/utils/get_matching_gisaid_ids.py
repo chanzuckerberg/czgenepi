@@ -1,11 +1,14 @@
-from aspen.database.models import GisaidMetadata
 from typing import Iterable, Mapping, Set
-from fastapi import Depends
-from sqlalchemy.ext.asyncio import AsyncSession
 
 import sqlalchemy as sa
+from sqlalchemy.ext.asyncio import AsyncSession
 
-async def get_matching_gisaid_ids(sample_ids: Iterable[str], session: AsyncSession) -> Set[str]:
+from aspen.database.models import GisaidMetadata
+
+
+async def get_matching_gisaid_ids(
+    sample_ids: Iterable[str], session: AsyncSession
+) -> Set[str]:
     """
     Check if a list of identifiers exist as gisaid strain names,
     strip identifier (hCoV-19/) before proceeding with check against GisaidMetadata table
@@ -31,7 +34,9 @@ async def get_matching_gisaid_ids(sample_ids: Iterable[str], session: AsyncSessi
     gisaid_matches_query = sa.select(GisaidMetadata).filter(
         GisaidMetadata.strain.in_(stripped_mapping.keys())
     )
-    gisaid_matches: Iterable[GisaidMetadata] = await session.execute(gisaid_matches_query)
+    gisaid_matches: Iterable[GisaidMetadata] = await session.execute(
+        gisaid_matches_query
+    )
     for gisaid_match in gisaid_matches.scalars():
         # add back in originally submitted identifier (unstripped)
         gisaid_ids.add(stripped_mapping[gisaid_match.strain])

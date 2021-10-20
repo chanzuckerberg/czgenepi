@@ -10,8 +10,8 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.api.auth import get_auth_user, setup_userinfo
-from aspen.api.error import http_exceptions as ex
 from aspen.api.deps import get_db
+from aspen.api.error import http_exceptions as ex
 from aspen.api.main import get_app
 from aspen.database import connection as aspen_connection
 from aspen.database import schema

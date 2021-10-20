@@ -1,46 +1,36 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
-from starlette.requests import Request
 import datetime
-
-from boto3 import Session
+import json
+import os
+import re
+from typing import Iterable, MutableSequence
 
 import sentry_sdk
-import re
-import json
-
 import sqlalchemy as sa
+from boto3 import Session
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
+from starlette.requests import Request
 
 from aspen.api.deps import get_db
-from aspen.api.schemas.users import User as userschema
-
-from aspen.api.settings import get_settings
-import os
-
-from aspen.database.models import (
-    User,
-    Sample,
-    PathogenGenome,
-    TreeType,
-    AlignedGisaidDump,
-    Workflow,
-    PhyloRun,
-    WorkflowStatusType
-)
-
 from aspen.api.error import http_exceptions as ex
-
+from aspen.api.schemas.phylo_runs import PhyloRunRequestSchema, PhyloRunResponseSchema
+from aspen.api.settings import get_settings
+from aspen.api.utils import get_matching_gisaid_ids
 from aspen.app.views.api_utils import (
     authz_sample_filters,
     get_matching_gisaid_ids,
     get_missing_and_found_sample_ids,
 )
-
-from aspen.api.utils import get_matching_gisaid_ids
-from aspen.api.schemas.phylo_runs import PhyloRunRequestSchema, PhyloRunResponseSchema
-
-from typing import Iterable, MutableSequence
+from aspen.database.models import (
+    AlignedGisaidDump,
+    PathogenGenome,
+    PhyloRun,
+    Sample,
+    TreeType,
+    Workflow,
+    WorkflowStatusType,
+)
 
 # What kinds of ondemand nextstrain builds do we support?
 PHYLO_TREE_TYPES = {
@@ -51,8 +41,13 @@ PHYLO_TREE_TYPES = {
 # route
 router = APIRouter()
 
+
 @router.post("/")
-async def kick_off_phylo_run(phylo_run_request: PhyloRunRequestSchema, request: Request, db: AsyncSession = Depends(get_db)) -> PhyloRunResponseSchema:
+async def kick_off_phylo_run(
+    phylo_run_request: PhyloRunRequestSchema,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+) -> PhyloRunResponseSchema:
     user = request.state.auth_user
     # Note - sample run will be associated with users's primary group.
     #    (do we want admins to be able to start runs on behalf of other dph's ?)
@@ -61,16 +56,20 @@ async def kick_off_phylo_run(phylo_run_request: PhyloRunRequestSchema, request: 
     # validation happens in input schema
 
     sample_ids = phylo_run_request.samples
-    
+
     # Step 2 - prepare big sample query per the old db cli
     # all_samples: Iterable[Sample] = db.query(Sample).options(
     #     joinedload(Sample.uploaded_pathogen_genome, innerjoin=True),
     # )
-    all_samples_query: Iterable[Sample] = sa.select(Sample).options(joinedload(Sample.uploaded_pathogen_genome, innerjoin=True),)
+    all_samples_query: Iterable[Sample] = sa.select(Sample).options(
+        joinedload(Sample.uploaded_pathogen_genome, innerjoin=True),
+    )
 
     # Step 3 - Enforce AuthZ (check if user has permission to see private identifiers and scope down the search for matching ID's to groups that the user has read access to.)
     # user_visible_samples = authz_sample_filters(all_samples, sample_ids, user)
-    user_visible_sample_query = authz_sample_filters(all_samples_query, sample_ids, user)
+    user_visible_sample_query = authz_sample_filters(
+        all_samples_query, sample_ids, user
+    )
     user_visible_samples = await db.execute(user_visible_sample_query)
     user_visible_samples = user_visible_samples.unique().scalars().all()
 
@@ -187,6 +186,5 @@ async def kick_off_phylo_run(phylo_run_request: PhyloRunRequestSchema, request: 
         name=execution_name,
         input=json.dumps(sfn_input_json),
     )
-
 
     return PhyloRunResponseSchema.from_orm(workflow)
