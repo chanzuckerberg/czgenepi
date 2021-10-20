@@ -27,15 +27,18 @@ const UsherConfirmationModal = ({
     </>
   );
 
+  const footer =
+    "Your tree will open in a new tab. It may take a few minutes for UShER to prepare your placement.";
+
   return (
     <div>
       <RedirectConfirmationModal
         content={content}
-        footer="It may take a few minutes to process your samples."
         img={usherLogo as string}
         isOpen={isOpen}
         onClose={onClose}
         onConfirm={onConfirm}
+        footer={footer}
       />
     </div>
   );
