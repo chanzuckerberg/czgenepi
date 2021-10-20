@@ -13,9 +13,8 @@ interface Props {
 const TreeVizModal = ({ open, onClose, treeId }: Props): JSX.Element => {
   const content = (
     <>
-      By clicking “Continue” you agree to send a copy of your genomic data to
-      Nexstrain’s visualization service, and that you understand this may make
-      the data accessible to others. Nextstrain is a separate service from
+      By clicking “Continue” you agree to send a copy of your tree JSON to
+      Nextstrain’s visualization service. Nextstrain is a separate service from
       Aspen. <NewTabLink href="https://nextstrain.org/">Learn More</NewTabLink>
     </>
   );
