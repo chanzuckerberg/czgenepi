@@ -174,7 +174,7 @@ class Settings(BaseSettings):
 
     ####################################################################################
     # SSM Parameter properties
-    @lru_cache
+    # @lru_cache
     def _AWS_SSM_PARAMETER(self, parameter_suffix: str) -> Mapping[str, Any]:
         session = Session(region_name=self.AWS_REGION)
 
@@ -195,7 +195,7 @@ class Settings(BaseSettings):
             return json.loads(parameter)
 
     @cached_property
-    def AWS_NEXTSTRAIN_SFN_PARAMETER(self) -> Mapping[str, Any]:
+    def AWS_NEXTSTRAIN_SFN_PARAMETERS(self) -> Mapping[str, Any]:
         return self._AWS_SSM_PARAMETER("nextstrain-ondemand-sfn")
 
     ####################################################################################
