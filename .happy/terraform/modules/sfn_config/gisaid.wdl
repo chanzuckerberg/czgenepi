@@ -91,7 +91,7 @@ task IngestGISAID {
     gisaid_username=$(echo "${gisaid_credentials}" | jq -r .username)
     gisaid_password=$(echo "${gisaid_credentials}" | jq -r .password)
 
-    curl "~{gisaid_ndjson_url}" --user "${gisaid_username}:${gisaid_password}" | \
+    curl "~{gisaid_ndjson_url}" --http1.1 --user "${gisaid_username}:${gisaid_password}" | \
         bunzip2 | \
         zstdmt > sequences.fasta.zst
 
