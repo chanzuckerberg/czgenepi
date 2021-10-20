@@ -10,6 +10,7 @@ from boto3 import Session
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
+from sqlalchemy.orm.exc import NoResultFound
 from starlette.requests import Request
 
 from aspen.api.deps import get_db
@@ -65,7 +66,6 @@ async def kick_off_phylo_run(
     )
 
     # Step 3 - Enforce AuthZ (check if user has permission to see private identifiers and scope down the search for matching ID's to groups that the user has read access to.)
-    # user_visible_samples = authz_sample_filters(all_samples, sample_ids, user)
     user_visible_sample_query = authz_sample_filters(
         all_samples_query, sample_ids, user
     )
@@ -109,8 +109,9 @@ async def kick_off_phylo_run(
         .limit(1)
     )
     aligned_gisaid_dump = await db.execute(aligned_gisaid_dump_query)
-    aligned_gisaid_dump = aligned_gisaid_dump.scalars().first()
-    if not aligned_gisaid_dump:
+    try:
+        aligned_gisaid_dump = aligned_gisaid_dump.scalars().one()
+    except NoResultFound:
         sentry_sdk.capture_message(
             "No Aligned Gisaid Dump found! Cannot create PhyloRun!", "fatal"
         )
