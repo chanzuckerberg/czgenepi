@@ -42,10 +42,6 @@ from aspen.api.schemas.phylo_runs import PhyloRunRequestSchema, PhyloRunResponse
 
 from typing import Iterable, MutableSequence
 
-import logging
-logging.basicConfig()
-logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
-
 # What kinds of ondemand nextstrain builds do we support?
 PHYLO_TREE_TYPES = {
     TreeType.NON_CONTEXTUALIZED.value: "non_contextualized.yaml",

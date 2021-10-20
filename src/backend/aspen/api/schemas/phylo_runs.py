@@ -1,7 +1,7 @@
 from aspen.api.schemas.base import BaseRequest, BaseResponse
 import datetime
 
-from pydantic import BaseModel, ValidationError, validator, constr
+from pydantic import BaseModel, ValidationError, validator, constr, StrictStr
 from typing import List
 from aspen.database.models import (
     WorkflowStatusType, 
@@ -15,9 +15,9 @@ PHYLO_TREE_TYPES = {
 }
 
 class PhyloRunRequestSchema(BaseRequest):
-    name: constr(min_length=1, max_length=128)
-    samples: List[str]
-    tree_type: str
+    name: constr(min_length=1, max_length=128, strict=True)
+    samples: List[StrictStr]
+    tree_type: StrictStr
 
     @validator('tree_type')
     def tree_type_must_be_supported(cls, value):
@@ -30,7 +30,7 @@ class GroupResponseSchema(BaseResponse):
     class Config:
         orm_mode = True
     id: int
-    name: str
+    name: StrictStr
 
 class PhyloRunResponseSchema(BaseResponse):
     class Config:
@@ -40,5 +40,5 @@ class PhyloRunResponseSchema(BaseResponse):
     end_datetime: datetime.datetime = None
     workflow_status: WorkflowStatusType  # TODO maybe we can keep SqlAlchemy out of this
     group: GroupResponseSchema
-    template_file_path: str
+    template_file_path: StrictStr
     template_args: dict

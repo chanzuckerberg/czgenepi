@@ -32,7 +32,7 @@ async def get_matching_gisaid_ids(sample_ids: Iterable[str], session: AsyncSessi
         GisaidMetadata.strain.in_(stripped_mapping.keys())
     )
     gisaid_matches: Iterable[GisaidMetadata] = await session.execute(gisaid_matches_query)
-    for gisaid_match in gisaid_matches:
+    for gisaid_match in gisaid_matches.scalars():
         # add back in originally submitted identifier (unstripped)
         gisaid_ids.add(stripped_mapping[gisaid_match.strain])
 
