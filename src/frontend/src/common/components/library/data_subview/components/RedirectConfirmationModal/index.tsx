@@ -18,6 +18,7 @@ const RedirectConfirmationModal = ({
   isOpen,
   onClose,
   onConfirm,
+  ...props
 }: Props): JSX.Element => {
   const title = (
     <>
@@ -41,6 +42,7 @@ const RedirectConfirmationModal = ({
         title={title}
         content={formattedContent}
         footer={footer}
+        {...props}
       />
     </div>
   );

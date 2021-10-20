@@ -13,16 +13,24 @@ interface Props {
   title: string | JSX.Element;
   content: string | JSX.Element;
   footer?: string;
+  customConfirmButton?: JSX.Element;
 }
 
 export default function ConfirmDialog({
   open,
   onClose,
   onConfirm,
+  customConfirmButton,
   title,
   content,
   footer,
 }: Props): JSX.Element {
+  const confirmButton = customConfirmButton ?? (
+    <Button color="primary" variant="contained" isRounded>
+      Continue
+    </Button>
+  );
+
   return (
     <Dialog
       disableBackdropClick
@@ -37,14 +45,7 @@ export default function ConfirmDialog({
         <Content>{content}</Content>
       </DialogContent>
       <DialogActions narrow>
-        <Button
-          color="primary"
-          variant="contained"
-          isRounded
-          onClick={onConfirm}
-        >
-          Continue
-        </Button>
+        <div onClick={onConfirm}>{confirmButton}</div>
         <Button color="primary" variant="outlined" isRounded onClick={onClose}>
           Cancel
         </Button>

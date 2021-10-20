@@ -2,6 +2,7 @@ import React from "react";
 import { RedirectConfirmationModal } from "src/common/components/library/data_subview/components/RedirectConfirmationModal";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import nextstrainLogo from "src/common/images/nextstrain.png";
+import { ConfirmButton } from "src/common/utils/TreeModal/ConfirmButton";
 
 interface Props {
   open: boolean;
@@ -19,9 +20,12 @@ const TreeVizModal = ({ open, onClose, treeId }: Props): JSX.Element => {
     </>
   );
 
+  const confirmButton = <ConfirmButton treeId={treeId} />;
+
   return (
     <RedirectConfirmationModal
       content={content}
+      customConfirmButton={confirmButton}
       img={nextstrainLogo as string}
       isOpen={open}
       onClose={onClose}
