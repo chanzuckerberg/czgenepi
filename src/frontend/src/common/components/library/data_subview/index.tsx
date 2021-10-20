@@ -351,8 +351,8 @@ const DataSubview: FunctionComponent<Props> = ({
               {downloadButton}
               {downloadFailed && (
                 <AfterModalAlert
-                  alertClassName={"elevated"}
-                  alertSeverity={"error"}
+                  alertClassName="elevated"
+                  alertSeverity="error"
                   boldText={
                     "Something went wrong and we were unable to complete one or more of your downloads"
                   }
@@ -370,8 +370,8 @@ const DataSubview: FunctionComponent<Props> = ({
               )}
               {didCreateTreeFailed && (
                 <AfterModalAlert
-                  alertClassName={"elevated"}
-                  alertSeverity={"error"}
+                  alertClassName="elevated"
+                  alertSeverity="error"
                   boldText={
                     "Something went wrong and we were unable to start your tree build"
                   }
@@ -396,7 +396,7 @@ const DataSubview: FunctionComponent<Props> = ({
               >
                 <div>
                   <AfterModalAlert
-                    alertClassName={"elevated"}
+                    alertClassName="elevated"
                     alertSeverity={"info"}
                     lightText={
                       <CreateTreeModalDiv>
