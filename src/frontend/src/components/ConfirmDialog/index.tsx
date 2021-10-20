@@ -49,7 +49,7 @@ export default function ConfirmDialog({
           Cancel
         </Button>
       </DialogActions>
-      <StyledFooter>{footer}</StyledFooter>
+      <StyledFooter narrow>{footer}</StyledFooter>
     </Dialog>
   );
 }

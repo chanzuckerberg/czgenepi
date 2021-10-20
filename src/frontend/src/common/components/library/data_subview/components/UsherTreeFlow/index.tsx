@@ -1,13 +1,23 @@
 import React, { useEffect, useState } from "react";
+import { StyledNewTabLink } from "../../style";
+import { AfterModalAlert } from "../AfterModalAlert";
 import { UsherConfirmationModal } from "./components/UsherConfirmationModal";
 import { UsherPlacementModal } from "./components/UsherPlacementModal";
-import { UsherPreparingModal } from "./components/UsherPreparingModal";
 
 interface Props {
   checkedSamples: string[];
   failedSamples: string[];
   shouldStartUsherFlow: boolean;
 }
+
+const generateUsherLink = (remoteFile: string, treeType: string) => {
+  const USHER_URL =
+    "https://genome.ucsc.edu/cgi-bin/hgPhyloPlace?db=wuhCor1&remoteFile=";
+  const USHER_TREE_TYPE_QUERY = "&phyloPlaceTree=";
+  const encodedFileLink = encodeURIComponent(remoteFile);
+
+  return `${USHER_URL}${encodedFileLink}${USHER_TREE_TYPE_QUERY}${treeType}`;
+};
 
 const UsherTreeFlow = ({
   checkedSamples,
@@ -16,43 +26,46 @@ const UsherTreeFlow = ({
 }: Props): JSX.Element => {
   const [isPlacementOpen, setIsPlacementOpen] = useState<boolean>(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState<boolean>(false);
-  const [isPreparingOpen, setIsPreparingOpen] = useState<boolean>(false);
-  const [fastaUrl, setFastaUrl] = useState<string>("");
-  const [selectedTreeType, setSelectedTreeType] = useState<string>("");
+  const [isAlertShown, setIsAlertShown] = useState<boolean>(false);
+  const [usherLink, setUsherLink] = useState<string>("");
 
   useEffect(() => {
-    if (shouldStartUsherFlow) handlePlacementOpen();
+    if (shouldStartUsherFlow) setIsPlacementOpen(true);
   }, [shouldStartUsherFlow]);
 
-  const handlePlacementOpen = () => {
-    setIsPlacementOpen(true);
-  };
+  const openUsher = () => {
+    if (!usherLink) return;
 
-  const handlePlacementClose = () => {
-    setFastaUrl("");
-    setSelectedTreeType("");
-    setIsPlacementOpen(false);
+    const link = document.createElement("a");
+    link.href = usherLink;
+    link.target = "_blank";
+    link.rel = "noopener";
+    link.click();
+    link.remove();
   };
 
   const onLinkCreateSuccess = (url: string, treeType: string) => {
-    setFastaUrl(url);
+    const usherLink = generateUsherLink(url, treeType);
+    setUsherLink(usherLink);
     setIsConfirmOpen(true);
-    setSelectedTreeType(treeType);
   };
 
   const handleConfirmationClose = () => {
-    handlePlacementClose();
+    setIsPlacementOpen(false);
     setIsConfirmOpen(false);
+    setUsherLink("");
   };
 
   const handleConfirmationConfirm = () => {
+    openUsher();
     setIsConfirmOpen(false);
-    setIsPreparingOpen(true);
+    setIsPlacementOpen(false);
+    setIsAlertShown(true);
   };
 
-  const handlePreparingClose = () => {
-    handlePlacementClose();
-    setIsPreparingOpen(false);
+  const handleAlertClose = () => {
+    setIsAlertShown(false);
+    setUsherLink("");
   };
 
   return (
@@ -61,7 +74,7 @@ const UsherTreeFlow = ({
         sampleIds={checkedSamples}
         failedSamples={failedSamples}
         open={isPlacementOpen}
-        onClose={handlePlacementClose}
+        onClose={() => setIsPlacementOpen(false)}
         onLinkCreateSuccess={onLinkCreateSuccess}
       />
       <UsherConfirmationModal
@@ -69,12 +82,23 @@ const UsherTreeFlow = ({
         onClose={handleConfirmationClose}
         onConfirm={handleConfirmationConfirm}
       />
-      <UsherPreparingModal
-        fastaUrl={fastaUrl}
-        isOpen={isPreparingOpen}
-        onClose={handlePreparingClose}
-        treeType={selectedTreeType}
-      />
+      {isAlertShown && (
+        <AfterModalAlert
+          alertClassName="elevated"
+          alertSeverity="info"
+          lightText={
+            <>
+              Your samples were successfuly sent to UShER. It may take a few
+              minutes for your placement to load.{" "}
+              <StyledNewTabLink href={usherLink}>
+                View your placement
+              </StyledNewTabLink>
+              .
+            </>
+          }
+          handleDismiss={handleAlertClose}
+        />
+      )}
     </>
   );
 };

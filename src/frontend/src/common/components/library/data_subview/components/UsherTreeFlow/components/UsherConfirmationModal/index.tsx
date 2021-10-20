@@ -37,6 +37,9 @@ const UsherConfirmationModal = ({
     </div>
   );
 
+  const footer =
+    "Your tree will open in a new tab. It may take a few minutes for UShER to prepare your placement.";
+
   return (
     <div>
       <ConfirmDialog
@@ -45,7 +48,7 @@ const UsherConfirmationModal = ({
         onConfirm={onConfirm}
         title={title}
         content={content}
-        footer="It may take a few minutes to process your samples."
+        footer={footer}
       />
     </div>
   );

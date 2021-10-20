@@ -6,6 +6,7 @@ import {
   getColors,
   getSpacings,
 } from "czifui";
+import { narrow } from "src/common/components/library/Dialog/components/common";
 
 export const Title = styled.div`
   ${fontHeaderL}
@@ -25,6 +26,7 @@ export const Content = styled.div`
 
 export const StyledFooter = styled.div`
   ${fontBodyXxs}
+  ${narrow}
 
   ${(props) => {
     const colors = getColors(props);
