@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { UsherConfirmationModal } from "./components/UsherConfirmationModal";
 import { UsherPlacementModal } from "./components/UsherPlacementModal";
-import { UsherPreparingModal } from "./components/UsherPreparingModal";
 
 interface Props {
   checkedSamples: string[];
@@ -16,7 +15,6 @@ const UsherTreeFlow = ({
 }: Props): JSX.Element => {
   const [isPlacementOpen, setIsPlacementOpen] = useState<boolean>(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState<boolean>(false);
-  const [isPreparingOpen, setIsPreparingOpen] = useState<boolean>(false);
   const [fastaUrl, setFastaUrl] = useState<string>("");
   const [selectedTreeType, setSelectedTreeType] = useState<string>("");
 
@@ -47,12 +45,7 @@ const UsherTreeFlow = ({
 
   const handleConfirmationConfirm = () => {
     setIsConfirmOpen(false);
-    setIsPreparingOpen(true);
-  };
-
-  const handlePreparingClose = () => {
-    handlePlacementClose();
-    setIsPreparingOpen(false);
+    setIsPlacementOpen(false);
   };
 
   return (
@@ -65,14 +58,10 @@ const UsherTreeFlow = ({
         onLinkCreateSuccess={onLinkCreateSuccess}
       />
       <UsherConfirmationModal
+        fastaUrl={fastaUrl}
         isOpen={isConfirmOpen}
         onClose={handleConfirmationClose}
         onConfirm={handleConfirmationConfirm}
-      />
-      <UsherPreparingModal
-        fastaUrl={fastaUrl}
-        isOpen={isPreparingOpen}
-        onClose={handlePreparingClose}
         treeType={selectedTreeType}
       />
     </>
