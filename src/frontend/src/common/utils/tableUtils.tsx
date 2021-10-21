@@ -1,7 +1,3 @@
-import { memoize } from "lodash/fp";
-import { ModalInfo } from "../types/ui";
-import { createConfirmButton } from "./TreeModal/ConfirmButton";
-
 /* eslint-disable react/display-name */
 
 const UNDEFINED_TEXT = "---";
@@ -35,27 +31,5 @@ export function createTableHeaderRenderer(
       header,
       index,
     });
-  };
-}
-
-export const createTreeModalInfo = memoize(createTreeModalInfo_);
-
-function createTreeModalInfo_(treeId: number): ModalInfo {
-  return {
-    body:
-      "You are leaving Aspen and sending your data to a private " +
-      "visualization on Nextstrain, which is not controlled by Aspen.",
-    buttons: [
-      {
-        Button: createConfirmButton(treeId),
-      },
-      {
-        content: "Cancel",
-        link: "cancel",
-        type: "secondary",
-      },
-    ],
-    header:
-      "Please confirm you're ready to send your data to Nextstrain to see your tree.",
   };
 }

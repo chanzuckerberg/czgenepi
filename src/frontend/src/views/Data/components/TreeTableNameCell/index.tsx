@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import dataTableStyle from "src/common/components/library/data_table/index.module.scss";
 import { TREE_STATUS } from "src/common/constants/types";
 import TreeIcon from "src/common/icons/PhyloTree.svg";
-import { createTreeModalInfo } from "src/common/utils";
 import TreeVizModal from "../TreeVizModal";
 import { PhyloTreeStatusTag } from "./components/PhyloTreeStatusTag";
 import { CellWrapper, StyledOpenInNewIcon, StyledRowContent } from "./style";
@@ -31,11 +30,7 @@ const TreeTableNameCell = ({ value, item }: NameProps): JSX.Element => {
 
   return (
     <>
-      <TreeVizModal
-        open={open}
-        onClose={handleClose}
-        info={createTreeModalInfo(treeId)}
-      />
+      <TreeVizModal open={open} onClose={handleClose} treeId={treeId} />
       <StyledRowContent
         className={dataTableStyle.cell}
         onClick={handleClickOpen}
