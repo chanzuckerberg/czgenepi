@@ -1,6 +1,5 @@
 import { Menu, MenuItem } from "czifui";
 import React, { MouseEventHandler, useState } from "react";
-import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import { TooltipDescriptionText, TooltipHeaderText } from "../../style";
 import { IconButton } from "../IconButton";
 import { StyledTreeBuildDisabledImage, StyledTreeBuildImage } from "./style";
@@ -75,11 +74,9 @@ const TreeSelectionMenu = ({
         <MenuItem onClick={handleClickNS}>
           Nextstrain Phylogenetic Tree
         </MenuItem>
-        {usesFeatureFlag(FEATURE_FLAGS.usher) && (
-          <MenuItem onClick={handleClickUsher}>
-            UShER Phylogenetic Placement
-          </MenuItem>
-        )}
+        <MenuItem onClick={handleClickUsher}>
+          UShER Phylogenetic Placement
+        </MenuItem>
       </Menu>
     </>
   );
