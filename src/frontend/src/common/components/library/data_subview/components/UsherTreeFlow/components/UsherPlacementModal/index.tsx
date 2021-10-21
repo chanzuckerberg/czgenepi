@@ -1,3 +1,4 @@
+import { Dialog } from "@material-ui/core";
 import { DefaultMenuSelectOption, Dropdown, InputDropdown } from "czifui";
 import { cloneDeep, debounce } from "lodash";
 import React, { SyntheticEvent, useEffect, useState } from "react";
@@ -21,7 +22,6 @@ import {
   FlexWrapper,
   StyledButton,
   StyledCloseIcon,
-  StyledDialog,
   StyledDialogContent,
   StyledFieldTitleText,
   StyledInfoIcon,
@@ -174,7 +174,7 @@ export const UsherPlacementModal = ({
   );
 
   return (
-    <StyledDialog
+    <Dialog
       disableBackdropClick
       disableEnforceFocus
       disableEscapeKeyDown
@@ -294,6 +294,6 @@ export const UsherPlacementModal = ({
           </form>
         </Content>
       </StyledDialogContent>
-    </StyledDialog>
+    </Dialog>
   );
 };
