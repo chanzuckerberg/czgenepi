@@ -12,8 +12,6 @@ from aspen.test_infra.models.workflow import aligned_gisaid_dump_factory
 pytestmark = pytest.mark.asyncio
 
 
-# Example:
-# async def test_users_me(http_client: AsyncClient, async_session: AsyncSession) -> None:
 async def test_create_phylo_run(
     async_session: AsyncSession,
     http_client: AsyncClient,
@@ -213,11 +211,10 @@ async def test_create_phylo_run_unauthorized_access_redirect(
     async_session.add(gisaid_dump)
     await async_session.commit()
 
-    auth_headers = {}
     data = {
         "name": "test phylorun",
         "tree_type": "non_contextualized",
         "samples": [sample.public_identifier],
     }
-    res = await http_client.post("/v2/phylo_runs/", json=data, headers=auth_headers)
+    res = await http_client.post("/v2/phylo_runs/", json=data)
     assert res.status_code == 401

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from pydantic import BaseModel
 
@@ -7,11 +7,12 @@ class BaseRequest(BaseModel):
     pass
 
 
-def convert_datetime_to_iso_8601_with_z_suffix(dt: datetime) -> str:
-    return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+def convert_datetime_to_iso_8601(dt: datetime) -> str:
+    dt = dt.replace(tzinfo=timezone.utc)
+    return dt.isoformat(timespec="seconds")
 
 
 class BaseResponse(BaseModel):
     class Config:
         orm_mode = True
-        json_encoders = {datetime: convert_datetime_to_iso_8601_with_z_suffix}
+        json_encoders = {datetime: convert_datetime_to_iso_8601}

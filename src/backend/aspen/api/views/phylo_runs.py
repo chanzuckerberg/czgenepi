@@ -2,7 +2,7 @@ import datetime
 import json
 import os
 import re
-from typing import Iterable, MutableSequence
+from typing import MutableSequence
 
 import sentry_sdk
 import sqlalchemy as sa
@@ -61,7 +61,7 @@ async def kick_off_phylo_run(
     # all_samples: Iterable[Sample] = db.query(Sample).options(
     #     joinedload(Sample.uploaded_pathogen_genome, innerjoin=True),
     # )
-    all_samples_query: Iterable[Sample] = sa.select(Sample).options(
+    all_samples_query = sa.select(Sample).options(  # type: ignore
         joinedload(Sample.uploaded_pathogen_genome, innerjoin=True),
     )
 
@@ -102,11 +102,11 @@ async def kick_off_phylo_run(
         raise ex.BadRequestException("No sequences selected for run")
 
     # 4B - AlignedGisaidDump
-    aligned_gisaid_dump_query = (
-        sa.select(AlignedGisaidDump)
-        .join(AlignedGisaidDump.producing_workflow)
-        .order_by(Workflow.end_datetime.desc())
-        .limit(1)
+    aligned_gisaid_dump_query = (  # type: ignore
+        sa.select(AlignedGisaidDump)  # type: ignore
+        .join(AlignedGisaidDump.producing_workflow)  # type: ignore
+        .order_by(Workflow.end_datetime.desc())  # type: ignore
+        .limit(1)  # type: ignore
     )
     aligned_gisaid_dump = await db.execute(aligned_gisaid_dump_query)
     try:
@@ -181,7 +181,7 @@ async def kick_off_phylo_run(
     execution_name = f"{group.prefix}-ondemand-nextstrain-{str(start_datetime)}"
     execution_name = re.sub(r"[^0-9a-zA-Z-]", r"-", execution_name)
 
-    result = client.start_execution(
+    client.start_execution(
         stateMachineArn=sfn_params["StateMachineArn"],
         name=execution_name,
         input=json.dumps(sfn_input_json),

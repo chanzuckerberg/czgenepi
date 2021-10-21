@@ -31,13 +31,13 @@ async def get_matching_gisaid_ids(
     # first create a mapping of ids that were stripped (so we can return unstripped id later)
     stripped_mapping: Mapping[str, str] = {s.strip("hCoV-19/"): s for s in sample_ids}
 
-    gisaid_matches_query = sa.select(GisaidMetadata).filter(
+    gisaid_matches_query = sa.select(GisaidMetadata).filter(  # type: ignore
         GisaidMetadata.strain.in_(stripped_mapping.keys())
     )
-    gisaid_matches: Iterable[GisaidMetadata] = await session.execute(
-        gisaid_matches_query
-    )
-    for gisaid_match in gisaid_matches.scalars():
+    gisaid_matches: Iterable[GisaidMetadata] = (
+        await session.execute(gisaid_matches_query)
+    ).scalars()
+    for gisaid_match in gisaid_matches:
         # add back in originally submitted identifier (unstripped)
         gisaid_ids.add(stripped_mapping[gisaid_match.strain])
 
