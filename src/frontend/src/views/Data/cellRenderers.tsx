@@ -112,6 +112,19 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
       </RowContent>
     );
   },
+
+  sequencingDate: ({
+    value,
+    header,
+  }): JSX.Element => {
+    let displayValue = value;
+    if (value === "N/A") {
+      displayValue = '-';
+    }
+    // defaultCellRenderer only uses `value` and `header` but its input type asks
+    // for more than that, so just forcing typescript to be cool.
+    return defaultCellRenderer({value: displayValue, header} as CustomTableRenderProps);
+  },
 };
 
 export const SampleRenderer = createTableCellRenderer(
