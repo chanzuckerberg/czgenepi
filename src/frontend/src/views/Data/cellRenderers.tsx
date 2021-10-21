@@ -113,17 +113,19 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
     );
   },
 
-  sequencingDate: ({
-    value,
-    header,
-  }): JSX.Element => {
+  // Preferably, we would just use defaultCellRenderer for this column, but we want
+  // to intercept its value and change it out in some cases before rendering.
+  sequencingDate: ({ header, value }): JSX.Element => {
     let displayValue = value;
     if (value === "N/A") {
-      displayValue = '-';
+      displayValue = "-";
     }
     // defaultCellRenderer only uses `value` and `header` but its input type asks
     // for more than that, so just forcing typescript to be cool.
-    return defaultCellRenderer({value: displayValue, header} as CustomTableRenderProps);
+    return defaultCellRenderer({
+      header,
+      value: displayValue,
+    } as CustomTableRenderProps);
   },
 };
 
