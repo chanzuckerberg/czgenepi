@@ -99,6 +99,7 @@ def _format_created_date(sample: Sample) -> str:
 
 
 def _format_sequencing_date(sample: Sample) -> str:
+    sequencing_date: Optional[datetime.date]
     try:
         # Using `get_uploaded_entity` may be unnecessary since it can also pull from
         # sequencing_reads_collection, but that model isn't used right now.
