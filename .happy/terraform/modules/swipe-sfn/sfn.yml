@@ -21,7 +21,7 @@ States:
       JobName.$: $$.Execution.Name
       JobDefinition: &JobDefinition "${batch_job_definition_name}"
       Timeout: &RunBatchTimeout
-        AttemptDurationSeconds: 36000 # 10 hours
+        AttemptDurationSeconds: 54000 # 15 hours
       ContainerOverrides:
         Vcpus.$: $.RunSPOTVcpu
         Memory.$: $.RunSPOTMemory
