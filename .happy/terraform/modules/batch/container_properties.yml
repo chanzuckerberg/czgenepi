@@ -6,8 +6,6 @@
 # Strings of the form ${aws_region} are interpreted by Terraform as variables. Use $${aws_region} to escape if that is not the intent.
 
 image: "${batch_docker_image}"
-command:
-  - ""
 environment:
   - name: "AWS_DEFAULT_REGION"
     value: "${aws_region}"
