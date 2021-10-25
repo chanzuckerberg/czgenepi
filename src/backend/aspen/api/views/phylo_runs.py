@@ -38,7 +38,6 @@ PHYLO_TREE_TYPES = {
     TreeType.TARGETED.value: "targeted.yaml",
 }
 
-# route
 router = APIRouter()
 
 
