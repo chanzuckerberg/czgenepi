@@ -57,9 +57,6 @@ async def kick_off_phylo_run(
     sample_ids = phylo_run_request.samples
 
     # Step 2 - prepare big sample query per the old db cli
-    # all_samples: Iterable[Sample] = db.query(Sample).options(
-    #     joinedload(Sample.uploaded_pathogen_genome, innerjoin=True),
-    # )
     all_samples_query = sa.select(Sample).options(  # type: ignore
         joinedload(Sample.uploaded_pathogen_genome, innerjoin=True),
     )
