@@ -15,7 +15,11 @@ from starlette.requests import Request
 
 from aspen.api.deps import get_db
 from aspen.api.error import http_exceptions as ex
-from aspen.api.schemas.phylo_runs import PhyloRunRequestSchema, PhyloRunResponseSchema
+from aspen.api.schemas.phylo_runs import (
+    PHYLO_TREE_TYPES,
+    PhyloRunRequestSchema,
+    PhyloRunResponseSchema,
+)
 from aspen.api.settings import get_settings
 from aspen.api.utils import get_matching_gisaid_ids
 from aspen.app.views.api_utils import (
@@ -31,12 +35,6 @@ from aspen.database.models import (
     Workflow,
     WorkflowStatusType,
 )
-
-# What kinds of ondemand nextstrain builds do we support?
-PHYLO_TREE_TYPES = {
-    TreeType.NON_CONTEXTUALIZED.value: "non_contextualized.yaml",
-    TreeType.TARGETED.value: "targeted.yaml",
-}
 
 router = APIRouter()
 
