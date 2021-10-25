@@ -1,5 +1,5 @@
-from aspen.api.schemas.base import Base
+from aspen.api.schemas.base import BaseResponse
 
 
-class Health(Base):
+class Health(BaseResponse):
     healthy: bool = False

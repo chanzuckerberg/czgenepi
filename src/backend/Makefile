@@ -30,7 +30,7 @@ run-isort:
 	isort --profile black $(STYLE_CHECK_PYTHON_CODE_DIRECTORIES) --skip $(STYLE_CHECK_PYTHON_CODE_SKIPPED_DIRECTORIES) 
 
 run-autoflake:
-	autoflake -v -i --remove-all-unused-imports --remove-unused-variables -r $(TYPE_CHECK_BASE_PYTHON_CODE_DIRECTORIES)
+	autoflake -v -i --ignore-init-module-imports --remove-all-unused-imports --remove-unused-variables -r $(TYPE_CHECK_BASE_PYTHON_CODE_DIRECTORIES)
 
 
 ### TESTING #############################################

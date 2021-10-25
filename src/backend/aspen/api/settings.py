@@ -174,7 +174,7 @@ class Settings(BaseSettings):
 
     ####################################################################################
     # SSM Parameter properties
-    @lru_cache
+    # @lru_cache
     def _AWS_SSM_PARAMETER(self, parameter_suffix: str) -> Mapping[str, Any]:
         session = Session(region_name=self.AWS_REGION)
 
@@ -195,40 +195,40 @@ class Settings(BaseSettings):
             return json.loads(parameter)
 
     @cached_property
-    def AWS_NEXTSTRAIN_SFN_PARAMETER(self) -> Mapping[str, Any]:
+    def AWS_NEXTSTRAIN_SFN_PARAMETERS(self) -> Mapping[str, Any]:
         return self._AWS_SSM_PARAMETER("nextstrain-ondemand-sfn")
 
     ####################################################################################
     # SFN runtime input properties
     @cached_property
     def NEXTSTRAIN_DOCKER_IMAGE_ID(self) -> str:
-        return self.AWS_NEXTSTRAIN_SFN_PARAMETER["Input"]["Run"]["docker_image_id"]
+        return self.AWS_NEXTSTRAIN_SFN_PARAMETERS["Input"]["Run"]["docker_image_id"]
 
     ####################################################################################
     # SFN batch config properties
     @cached_property
     def NEXTSTRAIN_OUTPUT_PREFIX(self) -> str:
-        return self.AWS_NEXTSTRAIN_SFN_PARAMETER["OutputPrefix"]
+        return self.AWS_NEXTSTRAIN_SFN_PARAMETERS["OutputPrefix"]
 
     @cached_property
     def RUN_WDL_URI(self) -> str:
-        return self.AWS_NEXTSTRAIN_SFN_PARAMETER["RUN_WDL_URI"]
+        return self.AWS_NEXTSTRAIN_SFN_PARAMETERS["RUN_WDL_URI"]
 
     @cached_property
     def NEXTSTRAIN_EC2_MEMORY(self) -> str:
-        return self.AWS_NEXTSTRAIN_SFN_PARAMETER["RunEC2Memory"]
+        return self.AWS_NEXTSTRAIN_SFN_PARAMETERS["RunEC2Memory"]
 
     @cached_property
     def NEXTSTRAIN_EC2_VCPU(self) -> str:
-        return self.AWS_NEXTSTRAIN_SFN_PARAMETER["RunEC2Vcpu"]
+        return self.AWS_NEXTSTRAIN_SFN_PARAMETERS["RunEC2Vcpu"]
 
     @cached_property
     def NEXTSTRAIN_SPOT_MEMORY(self) -> str:
-        return self.AWS_NEXTSTRAIN_SFN_PARAMETER["RunSPOTMemory"]
+        return self.AWS_NEXTSTRAIN_SFN_PARAMETERS["RunSPOTMemory"]
 
     @cached_property
     def NEXTSTRAIN_SPOT_VCPU(self) -> str:
-        return self.AWS_NEXTSTRAIN_SFN_PARAMETER["RunSPOTVcpu"]
+        return self.AWS_NEXTSTRAIN_SFN_PARAMETERS["RunSPOTVcpu"]
 
     class Config:
         env_file = ".env"
