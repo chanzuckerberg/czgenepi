@@ -116,7 +116,7 @@ function handleFastaText(text: string, filename: string): ParseOutcome {
     }
 
     // Invalid name
-    if (iLine.includes(" ") || iLine.length > MAX_NAME_LENGTH) {
+    if (iLine.length > MAX_NAME_LENGTH) {
       errors = {
         ...errors,
         [ERROR_CODE.INVALID_NAME]: [
