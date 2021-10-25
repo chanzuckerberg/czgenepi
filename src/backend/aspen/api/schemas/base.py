@@ -8,7 +8,8 @@ class BaseRequest(BaseModel):
 
 
 def convert_datetime_to_iso_8601(dt: datetime) -> str:
-    dt = dt.replace(tzinfo=timezone.utc)
+    if not dt.tzinfo:
+        dt = dt.replace(tzinfo=timezone.utc)
     return dt.isoformat(timespec="seconds")
 
 
