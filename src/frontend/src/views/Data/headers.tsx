@@ -30,6 +30,11 @@ export const SAMPLE_HEADERS: Header[] = [
     text: "Collection Location",
   },
   {
+    key: "sequencingDate",
+    sortKey: ["sequencingDate"],
+    text: "Sequencing Date",
+  },
+  {
     key: "gisaid",
     sortKey: ["gisaid", "status"],
     text: "GISAID",

@@ -98,6 +98,7 @@ const SAMPLE_MAP = new Map<string, keyof Sample>([
   ["private_identifier", "privateId"],
   ["public_identifier", "publicId"],
   ["upload_date", "uploadDate"],
+  ["sequencing_date", "sequencingDate"],
   ["czb_failed_genome_recovery", "CZBFailedGenomeRecovery"],
 ]);
 
