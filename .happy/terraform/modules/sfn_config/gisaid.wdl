@@ -247,7 +247,7 @@ task AlignGISAID {
     mkdir /ncov/my_profiles/align_gisaid/
     cp /usr/src/app/aspen/workflows/align_gisaid/{builds.yaml,config.yaml} /ncov/my_profiles/align_gisaid/
     # run snakemake, if run fails export the logs from snakemake and ncov to s3 
-    (cd /ncov; snakemake --printshellcmds results/filtered_gisaid.fasta.xz --profile my_profiles/align_gisaid || {aws s3 cp /ncov/.snakemake/log/ "s3://${aspen_s3_db_bucket}/aligned_gisaid_dump/${build_id}/logs/snakemake/" --recursive; aws s3 cp /ncov/logs/ "s3://${aspen_s3_db_bucket}/aligned_gisaid_dump/${build_id}/logs/ncov/" --recursive;})
+    (cd /ncov; snakemake --printshellcmds results/filtered_gisaid.fasta.xz --profile my_profiles/align_gisaid || { aws s3 cp /ncov/.snakemake/log/ "s3://${aspen_s3_db_bucket}/aligned_gisaid_dump/${build_id}/logs/snakemake/" --recursive ; aws s3 cp /ncov/logs/ "s3://${aspen_s3_db_bucket}/aligned_gisaid_dump/${build_id}/logs/ncov/" --recursive ; })
 
     mv /ncov/.snakemake/log/*.snakemake.log /ncov/logs/filtered_gisaid.txt .
     unxz -k /ncov/results/sanitized_metadata_gisaid.tsv.xz  # make an unzipped version for ImportGISAID. The zipped version goes to S3
