@@ -14,7 +14,7 @@ PHYLO_TREE_TYPES = {
 
 
 class PhyloRunRequestSchema(BaseRequest):
-    # mpypy + pydantic is a work in progress: https://github.com/samuelcolvin/pydantic/issues/156
+    # mypy + pydantic is a work in progress: https://github.com/samuelcolvin/pydantic/issues/156
     name: constr(min_length=1, max_length=128, strict=True)  # type: ignore
     samples: List[StrictStr]
     tree_type: StrictStr
