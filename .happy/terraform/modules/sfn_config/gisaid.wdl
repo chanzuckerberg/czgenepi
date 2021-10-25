@@ -246,7 +246,7 @@ task AlignGISAID {
     aws s3 cp --no-progress "s3://${processed_gisaid_s3_bucket}/${processed_gisaid_metadata_s3_key}" /ncov/data/metadata.tsv
     mkdir /ncov/my_profiles/align_gisaid/
     cp /usr/src/app/aspen/workflows/align_gisaid/{builds.yaml,config.yaml} /ncov/my_profiles/align_gisaid/
-    (cd /ncov; snakemake --printshellcmds results/filtered_gisaid.fasta.xz --profile my_profiles/align_gisaid || aws s3 cp /ncov/.snakemake/log/ "s3://${aspen_s3_db_bucket}/aligned_gisaid_dump/${build_id}/" --recursive)  
+    (cd /ncov; snakemake --printshellcmds results/filtered_gisaid.fasta.xz --profile my_profiles/align_gisaid )|| {aws s3 cp /ncov/.snakemake/log/ "s3://${aspen_s3_db_bucket}/aligned_gisaid_dump/${build_id}/logs/snakemake/" --recursive; aws s3 cp /ncov/logs/ "s3://${aspen_s3_db_bucket}/aligned_gisaid_dump/${build_id}/logs/ncov/" --recursive;} 
 
     mv /ncov/.snakemake/log/*.snakemake.log /ncov/logs/filtered_gisaid.txt .
     unxz -k /ncov/results/sanitized_metadata_gisaid.tsv.xz  # make an unzipped version for ImportGISAID. The zipped version goes to S3
@@ -275,7 +275,8 @@ task AlignGISAID {
             --processed-gisaid-object-id "~{processed_gisaid_object_id}"            \
             --gisaid-s3-bucket "${aspen_s3_db_bucket}"                              \
             --gisaid-sequences-s3-key "${sequences_key}"                            \
-            --gisaid-metadata-s3-key "${metadata_key}" > entity_id
+            --gisaid-metadata-s3-key "${metadata_key}" > entity_id \ 
+            2> $ALIGN_GISAID_STD_ERR_FILE
     >>>
 
     output {
