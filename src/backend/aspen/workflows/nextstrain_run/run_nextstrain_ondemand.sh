@@ -60,7 +60,7 @@ aligned_gisaid_metadata_s3_key=$(echo "${aligned_gisaid_location}" | jq -r .meta
 aws s3 cp --no-progress "s3://${aligned_gisaid_s3_bucket}/${aligned_gisaid_sequences_s3_key}" ncov/results/
 aws s3 cp --no-progress "s3://${aligned_gisaid_s3_bucket}/${aligned_gisaid_metadata_s3_key}" ncov/results/
 
-(cd ncov && snakemake --printshellcmds auspice/ncov_aspen.json --profile my_profiles/aspen/ --resources=mem_mb=312320) || {aws s3 cp ncov/.snakemake/log/ "s3://${aspen_s3_db_bucket}/phylo_run/${build_date}/${S3_FILESTEM}/${WORKFLOW_ID}/logs/snakemake/" --recursive; aws s3 cp /ncov/logs/ "s3://${aspen_s3_db_bucket}/phylo_run/${build_date}/${S3_FILESTEM}/${WORKFLOW_ID}/logs/ncov/" --recursive;}
+(cd ncov && snakemake --printshellcmds auspice/ncov_aspen.json --profile my_profiles/aspen/ --resources=mem_mb=312320 || {aws s3 cp ncov/.snakemake/log/ "s3://${aspen_s3_db_bucket}/phylo_run/${build_date}/${S3_FILESTEM}/${WORKFLOW_ID}/logs/snakemake/" --recursive; aws s3 cp /ncov/logs/ "s3://${aspen_s3_db_bucket}/phylo_run/${build_date}/${S3_FILESTEM}/${WORKFLOW_ID}/logs/ncov/" --recursive;})
 
 # upload the tree to S3
 key="phylo_run/${build_date}/${S3_FILESTEM}/${WORKFLOW_ID}/ncov.json"
