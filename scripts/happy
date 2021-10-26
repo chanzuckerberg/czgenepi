@@ -535,9 +535,6 @@ class TFEWorkspace:
             state_version = self.tfc.state_versions.get_current(self.workspace_id, include=["outputs"])
         except exceptions.TFCHTTPNotFound:
             return {}
-        # terrasnek api lacks a way to append ?include=outputs to state_version requests,
-        # so we have to iterate through all outputs and get them individually
-        # TODO(mbarrien): Add code to Terrasnek
         outputs = (item.get("attributes") for item in state_version["included"] if item.get("type") == "state-version-outputs")
         self._outputs = {}
         for state_version_output in outputs:
