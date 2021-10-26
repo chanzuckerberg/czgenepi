@@ -4,7 +4,7 @@ import {
   ComplexFilter,
   fontCapsXxxs,
   getColors,
-  getSpacings,
+  getSpaces,
   InputDropdown,
   Props,
 } from "czifui";
@@ -22,7 +22,7 @@ export const StyledFilterPanel = styled("div", {
   ${(props: ExtraProps) => {
     const { isOpen } = props;
     const colors = getColors(props);
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       border-right: ${spacings?.xxxs}px ${colors?.gray[200]} solid;
       display: ${isOpen ? "block" : "none"};
@@ -40,7 +40,7 @@ export const StyledInputDropdown = styled(InputDropdown)`
 
 export const StyledFilterWrapper = styled.div`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       margin: ${spacings?.l}px 0;
 
@@ -53,7 +53,7 @@ export const StyledFilterWrapper = styled.div`
 
 export const StyledChip = styled(Chip)`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       margin: ${spacings?.xxs}px ${spacings?.xxs}px 0 0;
     `;
@@ -62,7 +62,7 @@ export const StyledChip = styled(Chip)`
 
 export const StyledComplexFilter = styled(ComplexFilter)`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       margin: ${spacings?.l}px 0;
       width: 200px;

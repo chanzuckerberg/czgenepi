@@ -15,7 +15,7 @@ import {
   getColors,
   getFontWeights,
   getIconSizes,
-  getSpacings,
+  getSpaces,
   Props,
   Tooltip,
 } from "czifui";
@@ -35,7 +35,7 @@ export const Title = styled.span`
   ${fontBodyS}
   ${(props) => {
     const colors = getColors(props);
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       color: ${colors?.gray[500]};
       margin-bottom: ${spacings?.l}px;
@@ -45,7 +45,7 @@ export const Title = styled.span`
 
 export const StyledDialogTitle = styled(DialogTitle)`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       padding-bottom: ${spacings?.l}px;
     `;
@@ -56,7 +56,7 @@ export const StyledTextField = styled(TextField)`
   color: black;
   padding: 0px;
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       padding-bottom: ${spacings?.s}px;
     `;
@@ -67,7 +67,7 @@ export const FieldTitle = styled.div`
   ${fontHeaderXs}
   color: black;
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       margin-bottom: ${spacings?.xxs}px;
     `;
@@ -78,7 +78,7 @@ export const StyledInstructions = styled(Instructions)`
   border-radius: 4px;
   color: black;
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       margin-bottom: ${spacings?.xs}px;
       padding: ${spacings?.l}px;
@@ -91,7 +91,7 @@ export const InstructionsSemiBold = styled.span`
   ${fontBodyXs}
   ${(props: Props) => {
     const fontWeights = getFontWeights(props);
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       font-weight: ${fontWeights?.semibold};
       margin-bottom: ${spacings?.xxxs};
@@ -108,7 +108,7 @@ export const StyledInstructionsButton = styled(Button)`
   ${fontCapsXxxs}
   padding-left: 0px;
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     const colors = getColors(props);
     return `
       margin-left: ${spacings?.m}px;
@@ -127,7 +127,7 @@ export const StyledRadio = styled(Radio)`
   width: 20px;
   ${(props) => {
     const colors = getColors(props);
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       margin-right: ${spacings?.s}px;
       color: ${colors?.gray[400]};
@@ -143,7 +143,7 @@ export const StyledRadio = styled(Radio)`
 
 export const TreeTypeSection = styled.div`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       margin-top: ${spacings?.s}px;
       margin-bottom: ${spacings?.s}px;
@@ -161,7 +161,7 @@ export const TreeNameTooLongAlert = styled.div`
   display: flex;
   align-items: center;
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       margin-top: ${spacings?.xxxs}px;
       margin-bottom: ${spacings?.xl}px;
@@ -173,7 +173,7 @@ export const CreateTreeInfo = styled.div`
   ${fontBodyXxs}
   ${(props) => {
     const colors = getColors(props);
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       color: ${colors?.gray[400]};
       margin-top: ${spacings?.l}px;
@@ -183,7 +183,7 @@ export const CreateTreeInfo = styled.div`
 
 export const StyledButton = styled(Button)`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     const colors = getColors(props);
     return `
       margin-top: ${spacings?.xxl}px;
@@ -196,7 +196,7 @@ export const StyledButton = styled(Button)`
 
 export const StyledTooltip = styled(Tooltip)`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       margin-left: ${spacings?.xxs}px;
     `;
@@ -231,7 +231,7 @@ export const StyledErrorOutlinedIcon = styled(ErrorOutlineIcon)`
   ${(props) => {
     const colors = getColors(props);
     const iconSizes = getIconSizes(props);
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       color: ${colors?.error[400]};
       margin-right: ${spacings?.xs}px;
@@ -249,7 +249,7 @@ export const StyledFormControlLabel = styled(FormControlLabel)`
   margin-right: 0px;
   ${(props) => {
     const colors = getColors(props);
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     const checked = props.checked;
     return `
       &:hover {

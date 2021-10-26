@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { fontHeaderXl, getColors, getSpacings } from "czifui";
+import { fontHeaderXl, getColors, getSpaces } from "czifui";
 import { P } from "src/common/styles/support/style";
 
 export const StyledHeader = styled.div`
@@ -10,7 +10,7 @@ export const StyledImg = styled("img")`
   height: 45px;
 
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
 
     return `
       margin-bottom: ${spacings?.l}px;

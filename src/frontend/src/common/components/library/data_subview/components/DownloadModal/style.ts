@@ -10,7 +10,7 @@ import {
   fontHeaderXl,
   getColors,
   getFontWeights,
-  getSpacings,
+  getSpaces,
 } from "czifui";
 
 export const Header = styled.div`
@@ -31,7 +31,7 @@ export const Title = styled.span`
   ${fontBodyM}
   ${(props) => {
     const colors = getColors(props);
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       color: ${colors?.gray[500]};
       margin-bottom: ${spacings?.l}px;
@@ -44,7 +44,7 @@ export const CheckBoxInfo = styled.div`
   position: inline-block;
   float: left;
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       margin-top: ${spacings?.l}px;
       margin-bottom: ${spacings?.l}px;
@@ -72,7 +72,7 @@ export const CheckBoxWrapper = styled.div`
   width: 500px;
   border-radius: 5px;
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     const colors = getColors(props);
     return `
       margin-bottom: ${spacings?.xxs}px;
@@ -97,7 +97,7 @@ export const DownloadType = styled.div`
 
 export const StyledButton = styled(Button)`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       margin-top: ${spacings?.xxl}px;
     `;
@@ -116,7 +116,7 @@ export const StyledIconButton = styled(IconButton)`
     background-color: transparent;
   }
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       padding-bottom: ${spacings?.l}px;
     `;

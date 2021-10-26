@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { Checkbox, fontHeaderXs, getColors, getSpacings, Props } from "czifui";
+import { Checkbox, fontHeaderXs, getColors, getSpaces, Props } from "czifui";
 
 export const TableRow = styled.div`
   display: flex;
@@ -33,7 +33,7 @@ export const RowContent = styled("div", {
   ${(props: ExtraProps) => {
     const { header } = props;
     const align = header?.align ?? "left";
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
 
     return `
       justify-content: ${align};
@@ -45,7 +45,7 @@ export const RowContent = styled("div", {
 
 export const icon = (props: Props): string => {
   const colors = getColors(props);
-  const spacings = getSpacings(props);
+  const spacings = getSpaces(props);
 
   return `
     margin: 0 ${spacings?.l}px;
@@ -72,7 +72,7 @@ export const HeaderCheckbox = styled(Checkbox)`
     }
   }
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     const colors = getColors(props);
 
     return `

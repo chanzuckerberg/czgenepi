@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import CloseIcon from "@material-ui/icons/Close";
-import { fontBodyS, getColors, getIconSizes, getSpacings } from "czifui";
+import { fontBodyS, getColors, getIconSizes, getSpaces } from "czifui";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import IconInfo from "src/common/icons/IconInfo.svg";
 
@@ -14,7 +14,7 @@ export const Container = styled.div`
   align-items: center;
   ${(props) => {
     const colors = getColors(props);
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       background-color: ${colors?.primary[400]};
       padding: ${spacings?.s}px ${spacings?.l}px;
@@ -27,7 +27,7 @@ export const StyledIconInfo = styled(IconInfo)`
   vertical-align: middle;
   ${(props) => {
     const iconSizes = getIconSizes(props);
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       width: ${iconSizes?.l.width}px;
       height: ${iconSizes?.l.height}px;
@@ -72,7 +72,7 @@ export const StyledCloseIcon = styled(CloseIcon)`
   ${(props) => {
     const colors = getColors(props);
     const iconSizes = getIconSizes(props);
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       width: ${iconSizes?.l.width}px;
       height: ${iconSizes?.l.height}px;

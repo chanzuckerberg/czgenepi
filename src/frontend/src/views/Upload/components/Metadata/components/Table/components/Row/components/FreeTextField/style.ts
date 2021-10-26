@@ -1,10 +1,10 @@
 import styled from "@emotion/styled";
 import TextField from "@material-ui/core/TextField";
-import { getSpacings, Props } from "czifui";
+import { getSpaces, Props } from "czifui";
 
 export const StyledTextField = styled(TextField)`
   ${(props: Props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
 
     return `
       width: ${(spacings?.l || 0) + 200}px;

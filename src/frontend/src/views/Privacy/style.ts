@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { fontBodyS, fontHeaderS, getColors, getSpacings } from "czifui";
+import { fontBodyS, fontHeaderS, getColors, getSpaces } from "czifui";
 
 export const Table = styled.table`
   margin: 25px 0px;
@@ -13,7 +13,7 @@ export const Table = styled.table`
     text-align: left;
 
     ${(props) => {
-      const spacings = getSpacings(props);
+      const spacings = getSpaces(props);
       const colors = getColors(props);
 
       return `

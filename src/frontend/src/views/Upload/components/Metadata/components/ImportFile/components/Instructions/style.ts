@@ -1,11 +1,11 @@
 import styled from "@emotion/styled";
-import { fontBodyXs, fontHeaderXs, getColors, getSpacings } from "czifui";
+import { fontBodyXs, fontHeaderXs, getColors, getSpaces } from "czifui";
 import DownloadTemplate from "../DownloadTemplate";
 
 export const Wrapper = styled.div`
   ${(props) => {
     const colors = getColors(props);
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
 
     return `
       background-color: ${colors?.gray[100]};
@@ -18,7 +18,7 @@ export const Title = styled.div`
   ${fontHeaderXs}
 
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
 
     return `
       margin-bottom: ${spacings?.xxs}px;

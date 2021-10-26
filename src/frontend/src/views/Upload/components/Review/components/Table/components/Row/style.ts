@@ -8,7 +8,7 @@ import { Lock } from "@material-ui/icons";
 import {
   fontHeaderS,
   getColors,
-  getSpacings,
+  getSpaces,
   Props as CzifuiProps,
 } from "czifui";
 
@@ -22,7 +22,7 @@ export const Id = styled.div`
   flex-direction: column;
 
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
 
     return `
       padding: ${spacings?.m}px 0 ${spacings?.m}px ${spacings?.s}px
@@ -48,7 +48,7 @@ export const StyledTableRow = styled(TableRow)`
 
 export const StyledTableCell = styled(TableCell)`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
 
     return `
       padding: ${spacings?.m}px 0;
@@ -58,7 +58,7 @@ export const StyledTableCell = styled(TableCell)`
 
 export const IsPrivateTableCell = styled(TableCell)`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     const colors = getColors(props);
 
     return `
@@ -78,7 +78,7 @@ export const IsPrivateContent = styled.div`
 
 export const StyledLock = styled(Lock)`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
 
     return `
       margin-right: ${spacings?.xs}px;

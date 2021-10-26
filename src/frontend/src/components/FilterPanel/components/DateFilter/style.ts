@@ -5,7 +5,7 @@ import {
   fontBodyXxxs,
   getColors,
   getFontWeights,
-  getSpacings,
+  getSpaces,
 } from "czifui";
 
 export const StyledDateRange = styled.div`
@@ -16,7 +16,7 @@ export const StyledDateRange = styled.div`
 export const StyledManualDate = styled.div`
   ${(props) => {
     const colors = getColors(props);
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       border-bottom: 1px solid ${colors?.gray[200]};
       padding-bottom: ${(spacings?.xxs ?? 0) + (spacings?.m ?? 0)}px;
@@ -31,7 +31,7 @@ export const StyledText = styled.span`
   ${fontBodyXs}
   ${(props) => {
     const fontWeights = getFontWeights(props);
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       font-weight: ${fontWeights?.semibold};
       margin: 0 ${spacings?.xs}px;
@@ -41,7 +41,7 @@ export const StyledText = styled.span`
 
 export const StyledButton = styled(Button)`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       margin-top: ${spacings?.xs}px;
     `;

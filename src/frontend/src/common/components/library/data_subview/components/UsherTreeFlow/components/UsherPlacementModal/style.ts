@@ -8,7 +8,7 @@ import {
   fontHeaderM,
   fontHeaderXs,
   getColors,
-  getSpacings,
+  getSpaces,
   InputDropdown,
   List,
   ListItem,
@@ -23,7 +23,7 @@ const INPUT_HEIGHT = "34px";
 
 export const StyledDialogContent = styled(DialogContent)`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       padding-bottom: ${spacings?.xxl}px;
     `;
@@ -37,7 +37,7 @@ export const StyledListItem = styled(ListItem)`
 
   ${(props) => {
     const colors = getColors(props);
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       color: ${colors?.gray[500]};
       margin-bottom: ${spacings?.xs}px;
@@ -51,7 +51,7 @@ export const StyledListItem = styled(ListItem)`
 
 export const StyledList = styled(List)`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       margin-bottom: ${spacings?.xl}px;
     `;
@@ -61,7 +61,7 @@ export const StyledList = styled(List)`
 export const StyledSectionHeader = styled.div`
   ${fontHeaderM}
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       color: black;
       margin-bottom: ${spacings?.m}px;
@@ -76,7 +76,7 @@ export const StyledFieldTitleText = styled.div`
   align-items: center;
 
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       margin-bottom: ${spacings?.xs}px;
     `;
@@ -85,7 +85,7 @@ export const StyledFieldTitleText = styled.div`
 
 export const StyledTextField = styled(TextField)`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       margin-bottom: ${spacings?.xl}px;
       width: 150px;
@@ -107,7 +107,7 @@ export const StyledSuggestionText = styled.div`
 
   ${(props) => {
     const colors = getColors(props);
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
 
     return `
       color: ${colors?.warning[600]};
@@ -140,7 +140,7 @@ export const StyledButton = styled(Button)`
 
 export const StyledInputDropdown = styled(InputDropdown)`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
 
     return `
       margin-bottom: ${spacings?.l}px;
@@ -156,7 +156,7 @@ export const StyledCloseIcon = styled(CloseIcon)`
 
   ${(props) => {
     const colors = getColors(props);
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
 
     return `
       color: ${colors?.gray[400]};

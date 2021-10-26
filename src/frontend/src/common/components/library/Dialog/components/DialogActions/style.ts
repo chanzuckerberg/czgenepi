@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import { DialogActions } from "@material-ui/core";
-import { getSpacings, Props } from "czifui";
+import { getSpaces, Props } from "czifui";
 import { narrow } from "../common";
 
 export interface ExtraProps extends Props {
@@ -16,7 +16,7 @@ export const StyledDialogActions = styled(DialogActions, {
   justify-content: flex-start;
 
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
 
     return `
       padding: 0 ${spacings?.xxl}px ${spacings?.xxl}px ${spacings?.xxl}px;

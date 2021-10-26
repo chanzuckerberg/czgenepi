@@ -4,13 +4,13 @@ import {
   fontBodyS,
   fontHeaderXxl,
   getColors,
-  getSpacings,
+  getSpaces,
   Props,
 } from "czifui";
 import Instructions from "src/components/Instructions";
 
 export function marginBottom(props: Props): string {
-  const spacings = getSpacings(props);
+  const spacings = getSpaces(props);
 
   return `
       margin-bottom: ${spacings?.xl}px;
@@ -23,7 +23,7 @@ export const Header = styled.div`
   align-items: center;
 
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     const colors = getColors(props);
 
     return `
@@ -37,7 +37,7 @@ export const Content = styled.div`
   flex: 2;
 
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
 
     return `
         margin: ${spacings?.xxl}px 125px ${spacings?.l}px 125px;
@@ -63,7 +63,7 @@ export const StyledInstructions = styled(Instructions)`
 
 export const ContinueButton = styled(Button)`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
 
     return `
       margin-right: ${spacings?.xs}px;

@@ -4,7 +4,7 @@ import {
   fontBodyXxs,
   fontHeaderL,
   getColors,
-  getSpacings,
+  getSpaces,
 } from "czifui";
 import { narrow } from "src/common/components/library/Dialog/components/common";
 
@@ -12,7 +12,7 @@ export const Title = styled.div`
   ${fontHeaderL}
 
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
 
     return `
       margin-bottom: ${spacings?.xxxs}px;
@@ -30,7 +30,7 @@ export const StyledFooter = styled.div`
 
   ${(props) => {
     const colors = getColors(props);
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       color: ${colors?.gray[500]};
       padding: 0 ${spacings?.xxl}px ${spacings?.xxl}px ${spacings?.xxl}px;

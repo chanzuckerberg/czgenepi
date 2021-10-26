@@ -1,12 +1,12 @@
 import styled from "@emotion/styled";
-import { Button, getColors, getSpacings } from "czifui";
+import { Button, getColors, getSpaces } from "czifui";
 
 export const UploadButton = styled(Button)`
   color: white;
   border: 1px solid white;
 
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     const colors = getColors(props);
 
     return `

@@ -4,7 +4,7 @@ import {
   fontCapsXxs,
   fontHeaderXl,
   getColors,
-  getSpacings,
+  getSpaces,
 } from "czifui";
 import FilePicker from "src/components/FilePicker";
 import { marginBottom } from "../common/style";
@@ -15,7 +15,7 @@ export const SemiBold = styled.span`
 
 export const StyledButton = styled(Button)`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       margin-right: ${spacings?.s}px;
     `;
@@ -24,7 +24,7 @@ export const StyledButton = styled(Button)`
 
 export const StyledFilePicker = styled(FilePicker)`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       margin-right: ${spacings?.m}px;
       margin-bottom: ${spacings?.s}px;
@@ -35,7 +35,7 @@ export const StyledFilePicker = styled(FilePicker)`
 
 export const StyledContainerLeft = styled.div`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       flex: 1;
       display: flex;
@@ -48,7 +48,7 @@ export const StyledContainerLeft = styled.div`
 
 export const StyledContainerSpaceBetween = styled.div`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       flex: 1;
       display: flex;
@@ -62,7 +62,7 @@ export const StyledContainerSpaceBetween = styled.div`
 export const StyledInstructionsButton = styled(Button)`
   ${fontCapsXxs}
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     const colors = getColors(props);
     return `
       margin-right: ${spacings?.s}px;
@@ -79,7 +79,7 @@ export const StyledInstructionsButton = styled(Button)`
 export const StyledRemoveAllButton = styled(Button)`
   ${fontCapsXxs}
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     const colors = getColors(props);
     return `
       margin-right: ${spacings?.s}px;
@@ -94,7 +94,7 @@ export const StyledRemoveAllButton = styled(Button)`
 
 export const StyledUploadCount = styled.span`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
     font-weight: 600;
     display: block;

@@ -1,6 +1,6 @@
 import { css } from "@emotion/css";
 import styled from "@emotion/styled";
-import { fontHeaderXxxs, getColors, getCorners, getSpacings } from "czifui";
+import { fontHeaderXxxs, getColors, getCorners, getSpaces } from "czifui";
 
 export const StyledDiv = styled.div`
   display: flex;
@@ -10,7 +10,7 @@ export const StyledDiv = styled.div`
   position: relative;
 
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
 
     return `
       margin: ${spacings?.s}px ${spacings?.l}px;

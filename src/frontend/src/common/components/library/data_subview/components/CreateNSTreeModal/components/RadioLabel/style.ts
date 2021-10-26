@@ -6,14 +6,14 @@ import {
   fontHeaderXs,
   getColors,
   getFontWeights,
-  getSpacings,
+  getSpaces,
 } from "czifui";
 import IconCheckSmall from "src/common/icons/IconCheckSmall.svg";
 import IconCloseSmall from "src/common/icons/IconCloseSmall.svg";
 
 export const Label = styled.div`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       margin-bottom: ${spacings?.xxxs}px;
     `;
@@ -24,7 +24,7 @@ export const LabelMain = styled.span`
   ${fontHeaderXs}
   color: black;
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       margin-top: ${spacings?.l}px;
       margin-right: ${spacings?.xxs}px;
@@ -37,7 +37,7 @@ export const LabelLight = styled.span`
   ${fontHeaderXs}
   ${(props) => {
     const fontWeights = getFontWeights(props);
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     const colors = getColors(props);
     return `
       font-weight: ${fontWeights?.regular};
@@ -56,7 +56,7 @@ export const StyledListItem = styled(ListItem)`
   padding: 0px;
   ${(props) => {
     const fontWeights = getFontWeights(props);
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       font-weight: ${fontWeights?.regular};
       padding-bottom: ${spacings?.xxxs}px;
@@ -71,7 +71,7 @@ export const SmallText = styled.span`
 export const StyledListItemIcon = styled(ListItemIcon)`
   min-width: 24px;
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       margin-top: ${spacings?.s}px;
     `;

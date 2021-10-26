@@ -1,11 +1,11 @@
 import styled from "@emotion/styled";
-import { fontBodyXs, getColors, getFontWeights, getSpacings } from "czifui";
+import { fontBodyXs, getColors, getFontWeights, getSpaces } from "czifui";
 import { NewTabLink } from "../../../NewTabLink";
 
 export const StyledDiv = styled.div`
   ${(props) => {
     const colors = getColors(props);
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
 
     return `
       margin-left: ${spacings?.l}px;
@@ -34,7 +34,7 @@ export const StyledSpan = styled.span`
   ${fontBodyXs}
   ${(props) => {
     const fontWeights = getFontWeights(props);
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
 
     return `
       font-weight: ${fontWeights?.semibold};

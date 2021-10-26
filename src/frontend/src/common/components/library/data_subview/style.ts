@@ -6,7 +6,7 @@ import {
   fontHeaderXs,
   getColors,
   getFontWeights,
-  getSpacings,
+  getSpaces,
 } from "czifui";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import DownloadImage from "src/common/icons/IconDownload.svg";
@@ -14,7 +14,7 @@ import DownloadImage from "src/common/icons/IconDownload.svg";
 export const StyledDiv = styled.div`
   ${fontHeaderXs}
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     const fontWeights = getFontWeights(props);
     return `
     margin-left: ${spacings?.m}px;
@@ -28,7 +28,7 @@ export const Divider = styled.div`
   height: 28px;
 
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     const colors = getColors(props);
     return `
     margin-left: ${spacings?.xl}px;
@@ -44,7 +44,7 @@ export const StyledButton = styled(Button)`
     background-color: transparent;
   }
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     const fontWeights = getFontWeights(props);
     return `
       font-weight: ${fontWeights?.semibold};

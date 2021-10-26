@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { getColors, getSpacings, Props } from "czifui";
+import { getColors, getSpaces, Props } from "czifui";
 import { RowContent } from "src/common/components/library/data_table/style";
 import OpenInNewIcon from "src/common/icons/OpenInNew.svg";
 import { icon } from "../../../../common/components/library/data_table/style";
@@ -17,7 +17,7 @@ export const StyledOpenInNewIcon = styled(OpenInNewIcon, {
   flex: 0 0 auto;
 
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
     return `
       margin: 0 0 0 ${spacings?.l}px;
     `;

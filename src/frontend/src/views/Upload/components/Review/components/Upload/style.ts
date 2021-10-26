@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { fontBodyS, fontHeaderXl, getColors, getSpacings } from "czifui";
+import { fontBodyS, fontHeaderXl, getColors, getSpaces } from "czifui";
 import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import UploadImage from "./Upload.svg";
@@ -19,7 +19,7 @@ export const ImageWrapper = styled.div`
   justify-content: center;
 
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
 
     return `
       margin-bottom: ${spacings?.xl}px;

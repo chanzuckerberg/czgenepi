@@ -1,12 +1,12 @@
 import styled from "@emotion/styled";
 import { TableCell, TableContainer, TableRow } from "@material-ui/core";
-import { fontBodyM, fontHeaderXs, getColors, getSpacings } from "czifui";
+import { fontBodyM, fontHeaderXs, getColors, getSpaces } from "czifui";
 
 export const Overflow = styled.div`
   overflow: auto;
 
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
 
     return `
       padding-bottom: ${spacings?.m}px;
@@ -21,7 +21,7 @@ export const StyledTableContainer = styled(TableContainer)`
 
 export const IdColumn = styled.div`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
 
     return `
       padding-left: ${spacings?.s}px;
@@ -34,7 +34,7 @@ export const StyledTableCell = styled(TableCell)`
 
   ${(props) => {
     const colors = getColors(props);
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
 
     return `
       color: ${colors?.gray[500]};
@@ -47,7 +47,7 @@ export const StyledTableCell = styled(TableCell)`
 export const IsPrivateTableCell = styled(StyledTableCell)`
   ${(props) => {
     const colors = getColors(props);
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
 
     return `
       padding: ${spacings?.l}px ${spacings?.l}px;
@@ -59,7 +59,7 @@ export const IsPrivateTableCell = styled(StyledTableCell)`
 
 export const SubmittedToGisaidTableCell = styled(StyledTableCell)`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
 
     return `
       padding: ${spacings?.l}px;

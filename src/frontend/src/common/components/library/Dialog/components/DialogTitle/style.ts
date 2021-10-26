@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import { DialogTitle } from "@material-ui/core";
-import { getSpacings, Props } from "czifui";
+import { getSpaces, Props } from "czifui";
 import { narrow } from "../common";
 
 export interface ExtraProps extends Props {
@@ -14,7 +14,7 @@ export const StyledDialogTitle = styled(DialogTitle, {
   shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
 })`
   ${(props: ExtraProps) => {
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
 
     return `
       padding: ${spacings?.xxl}px ${spacings?.xxl}px ${spacings?.xl}px ${spacings?.xxl}px;
@@ -25,7 +25,7 @@ export const StyledDialogTitle = styled(DialogTitle, {
 
   ${(props) => {
     const { narrow } = props;
-    const spacings = getSpacings(props);
+    const spacings = getSpaces(props);
 
     if (!narrow) return "";
 
