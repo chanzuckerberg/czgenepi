@@ -98,3 +98,22 @@ self-signed cert in for convenience.
 #### Configuring Pycharm with Docker Compose:
 
 Follow the instructions in [the wiki](https://czi.atlassian.net/wiki/spaces/SI/pages/1801100933/PyCharm+configuration+for+Happy+Path)
+
+
+#### Quickstart setup from scratch:
+
+* [Install docker](https://www.docker.com/products/docker-desktop)
+* [Install homebrew](https://docs.brew.sh/Installation)
+
+```
+brew install awscli jq
+brew tap chanzuckerberg/tap
+brew install aws-oidc
+mkdir -p ~/.aws  # Temp workaround for aws-oidc bug.
+touch ~/.aws/config  # Temp workaround for aws-oidc bug.
+aws-oidc configure --issuer-url https://czi-prod.okta.com --client-id aws-config --config-url https://aws-config-generation.staging.si.czi.technology # Just use the defaults
+git clone git@github.com:chanzuckerberg/aspen.git
+cd aspen
+/usr/bin/env/python3 -m pip install .happy/requirements.txt
+make local-init
+```

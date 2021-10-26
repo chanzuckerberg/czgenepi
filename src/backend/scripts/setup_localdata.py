@@ -3,13 +3,19 @@ from datetime import datetime
 from aspen.config.docker_compose import DockerComposeConfig
 from aspen.database.connection import get_db_uri, init_db
 from aspen.database.models import (
+    AlignedGisaidDump,
+    GisaidAlignmentWorkflow,
+    GisaidDumpWorkflow,
     Group,
+    ProcessedGisaidDump,
+    RawGisaidDump,
     RegionType,
     Sample,
     SequencingInstrumentType,
     SequencingProtocolType,
     SequencingReadsCollection,
     User,
+    WorkflowStatusType,
 )
 
 
@@ -48,7 +54,10 @@ def create_test_user(session, group):
 
 def create_sample(session, group, uploaded_by_user):
     sample = (
-        session.query(Sample).filter(Sample.submitting_group == group).one_or_none()
+        session.query(Sample)
+        .filter(Sample.submitting_group == group)
+        .order_by(Sample.id)
+        .first()
     )
     if sample:
         print("Sample already exists")
@@ -77,7 +86,7 @@ def create_sequencing_reads(session, sample):
     sequencing_reads = (
         session.query(SequencingReadsCollection)
         .filter(SequencingReadsCollection.sample == sample)
-        .one_or_none()
+        .first()
     )
     if sequencing_reads:
         print("Sequencing Reads already exists")
@@ -95,12 +104,65 @@ def create_sequencing_reads(session, sample):
     return sequencing_reads
 
 
+def create_gisaid(session):
+    aligned_workflow = session.query(AlignedGisaidDump).first()
+    if aligned_workflow:
+        print("Aligned Gisaid Dump already exists")
+        return
+    # Add raw gisaid dump
+    gisaid_s3_bucket = "gisaid_bucket"
+    suffix = datetime.now().isoformat()
+    raw_gisaid_dump = RawGisaidDump(
+        download_date=datetime.now(),
+        s3_bucket=gisaid_s3_bucket,
+        s3_key=f"raw_gisaid_dump-{suffix}",
+    )
+    session.add(raw_gisaid_dump)
+
+    # add transformed gisaid dump
+    processed_gisaid_dump = ProcessedGisaidDump(
+        s3_bucket=gisaid_s3_bucket,
+        sequences_s3_key=f"processed_sequences-{suffix}",
+        metadata_s3_key=f"processed_metadata-{suffix}",
+    )
+    processed_workflow = GisaidDumpWorkflow(
+        start_datetime=datetime.now(),
+        end_datetime=datetime.now(),
+        workflow_status=WorkflowStatusType.COMPLETED,
+        software_versions={},
+    )
+
+    processed_workflow.inputs.append(raw_gisaid_dump)
+    processed_workflow.outputs.append(processed_gisaid_dump)
+    session.add(processed_workflow)
+
+    # Add an aligned dump
+    aligned_gisaid_dump = AlignedGisaidDump(
+        s3_bucket=gisaid_s3_bucket,
+        sequences_s3_key=f"aligned_sequences-{suffix}",
+        metadata_s3_key=f"aligned_metadata-{suffix}",
+    )
+
+    # attach a workflow
+    aligned_workflow = GisaidAlignmentWorkflow(
+        start_datetime=datetime.now(),
+        end_datetime=datetime.now(),
+        workflow_status=WorkflowStatusType.COMPLETED,
+        software_versions={},
+    )
+
+    aligned_workflow.inputs.append(processed_gisaid_dump)
+    aligned_workflow.outputs.append(aligned_gisaid_dump)
+    session.add(aligned_workflow)
+
+
 def create_test_data(engine):
     session = engine.make_session()
     group = create_test_group(session)
     user = create_test_user(session, group)
     sample = create_sample(session, group, user)
     _ = create_sequencing_reads(session, sample)
+    _ = create_gisaid(session)
     session.commit()
 
 

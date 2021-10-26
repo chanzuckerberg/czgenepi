@@ -13,6 +13,12 @@ variable image_tag {
   description = "Please provide an image tag"
 }
 
+variable image_tags {
+  type        = string
+  description = "Override the default image tags (json-encoded map)"
+  default     = "{}"
+}
+
 variable priority {
   type        = number
   description = "Listener rule priority number within the given listener"
