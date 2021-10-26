@@ -134,7 +134,10 @@ function handleFastaText(text: string, filename: string): ParseOutcome {
     i = newIndex;
 
     if (sequence) {
-      const id = iLine.replace(">", "");
+      // The `>` indicates the ID. We toss it, along with any spaces between it and ID.
+      // Regex matches start of the line `>` and as many spaces as appear before ID
+      const REGEX_ID_PREAMBLE = /^> */;
+      const id = iLine.replace(REGEX_ID_PREAMBLE, "");
 
       result = {
         ...result,
