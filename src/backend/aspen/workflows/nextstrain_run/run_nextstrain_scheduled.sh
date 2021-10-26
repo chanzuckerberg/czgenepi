@@ -67,7 +67,7 @@ aws s3 cp --no-progress "s3://${aligned_gisaid_s3_bucket}/${aligned_gisaid_seque
 aws s3 cp --no-progress "s3://${aligned_gisaid_s3_bucket}/${aligned_gisaid_metadata_s3_key}" ncov/results/
 
 # run snakemake, if run fails export the logs from snakemake and ncov to s3 
-(cd ncov && snakemake --printshellcmds auspice/ncov_aspen.json --profile my_profiles/aspen/ --resources=mem_mb=312320 || { aws s3 cp ncov/.snakemake/log/ "s3://${aspen_s3_db_bucket}/phylo_run/${build_id}/logs/snakemake/" --recursive ; aws s3 cp ncov/logs/ "s3://${aspen_s3_db_bucket}/phylo_run/${build_id}/logs/ncov/" --recursive ; })
+(cd ncov && snakemake --printshellcmds auspice/ncov_aspen.json --profile my_profiles/aspen/ --resources=mem_mb=312320) || { aws s3 cp ncov/.snakemake/log/ "s3://${aspen_s3_db_bucket}/phylo_run/${build_id}/logs/snakemake/" --recursive ; aws s3 cp ncov/logs/ "s3://${aspen_s3_db_bucket}/phylo_run/${build_id}/logs/ncov/" --recursive ; }
 
 # upload the tree to S3
 key="phylo_run/${build_id}/${S3_FILESTEM}.json"
