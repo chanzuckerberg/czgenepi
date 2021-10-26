@@ -34,7 +34,7 @@ deployment = os.getenv("DEPLOYMENT_STAGE")
 # We should be able to allow this in all environments and only alert on prod.
 # Init as early as possible to catch more
 sentry_sdk.init(
-    dsn=aspen_config.SENTRY_URL,
+    dsn=aspen_config.SENTRY_BACKEND_DSN,
     integrations=[FlaskIntegration()],
     environment=deployment,
     # Set traces_sample_rate to 1.0 to capture 100%
