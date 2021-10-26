@@ -4,7 +4,7 @@ ENV FLASK_APP=aspen.main
 EXPOSE 3000
 
 # Utility
-RUN apt-get update && apt-get install -y vim procps wget make jq
+RUN apt-get update && apt-get install -y vim procps wget make jq nano
 
 # Orchestration. Supervisor is heavyweight but afaik nothing else supports sane child reaping and signal forwarding.
 RUN pip install --no-cache-dir supervisor
