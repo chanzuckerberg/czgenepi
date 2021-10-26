@@ -9,7 +9,7 @@ export enum API {
   PHYLO_TREES = "/api/phylo_trees",
   SAMPLES_CREATE = "/api/samples/create",
   SAMPLES_FASTA_DOWNLOAD = "/api/sequences",
-  CREATE_TREE = "/api/phylo_runs",
+  CREATE_TREE = "/v2/phylo_runs/",
   GET_FASTA_URL = "/api/sequences/getfastaurl",
   USHER_TREE_OPTIONS = "/api/usher/tree_options",
 }
@@ -98,6 +98,7 @@ const SAMPLE_MAP = new Map<string, keyof Sample>([
   ["private_identifier", "privateId"],
   ["public_identifier", "publicId"],
   ["upload_date", "uploadDate"],
+  ["sequencing_date", "sequencingDate"],
   ["czb_failed_genome_recovery", "CZBFailedGenomeRecovery"],
 ]);
 
