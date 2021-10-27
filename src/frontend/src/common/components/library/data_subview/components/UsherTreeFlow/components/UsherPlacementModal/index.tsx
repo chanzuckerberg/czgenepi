@@ -1,4 +1,4 @@
-import { Dialog } from "@material-ui/core";
+import { Dialog, TextField } from "@material-ui/core";
 import { DefaultMenuSelectOption, Dropdown, InputDropdown } from "czifui";
 import { cloneDeep, debounce } from "lodash";
 import React, { SyntheticEvent, useEffect, useState } from "react";
@@ -30,6 +30,7 @@ import {
   StyledListItem,
   StyledSectionHeader,
   StyledSuggestionText,
+  StyledSuggestionWrapper,
   StyledTextField,
   StyledWarningIcon,
 } from "./style";
@@ -265,20 +266,22 @@ export const UsherPlacementModal = ({
                   <StyledInfoIcon />
                 </StyledTooltip>
               </StyledFieldTitleText>
-              <StyledTextField
-                id="outlined-basic"
-                variant="outlined"
-                defaultValue={defaultNumSamples}
-                onChange={onNumSamplesChange}
-              />
-              {shouldShowWarning && (
-                <FlexWrapper>
-                  <StyledWarningIcon />
-                  <StyledSuggestionText>
-                    We recommend a value no lower than 50.
-                  </StyledSuggestionText>
-                </FlexWrapper>
-              )}
+              <StyledTextField>
+                <TextField
+                  id="outlined-basic"
+                  variant="outlined"
+                  defaultValue={defaultNumSamples}
+                  onChange={onNumSamplesChange}
+                />
+                {shouldShowWarning && (
+                  <StyledSuggestionWrapper>
+                    <StyledWarningIcon />
+                    <StyledSuggestionText>
+                      We recommend a value no lower than 50.
+                    </StyledSuggestionText>
+                  </StyledSuggestionWrapper>
+                )}
+              </StyledTextField>
               <FailedSampleAlert numFailedSamples={failedSamples?.length} />
             </div>
             <StyledButton
