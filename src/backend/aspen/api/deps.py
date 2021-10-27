@@ -14,7 +14,9 @@ def get_auth0_client(request: Request):
 
 
 def get_settings(request: Request):
-    # This parameter is added to the app when we instantiate it.
+    # We stashed our settings object in app.state when we loaded the app, and every
+    # request object has that app attached at request.app, so this dependency is just
+    # returning the settings object we created at startup.
     settings = request.app.state.aspen_settings
     return settings
 

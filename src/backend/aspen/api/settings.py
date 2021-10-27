@@ -9,6 +9,7 @@ from pydantic import BaseSettings
 
 
 def aws_secret_settings(settings) -> Dict[str, Any]:
+    """Loads settings from an aws secret whose value is JSON encoded."""
     session = Session(region_name=os.environ["AWS_REGION"])
     secret_name = os.environ.get("ASPEN_CONFIG_SECRET_NAME", "aspen-config")
     client = session.client(
@@ -23,8 +24,17 @@ def aws_secret_settings(settings) -> Dict[str, Any]:
         secret = get_secret_value_response["SecretString"]
     response: Dict = {}
     secrets = json.loads(secret)
+
+    # Pydantic will complain if we populate keys on the Settings object that it
+    # doesn't know about -- so if there are any keys in the AWS secret that
+    # don't have matching fields in our Settings class, our app will fail to start.
+    # So we're careful here to only load specific keys into our Settings object.
     keys = settings.__config__.aws_secret_keys
     response = {key: secrets[key] for key in keys if secrets.get(key)}
+
+    # Some of the keys in our AWS Secret don't match the names we're using in
+    # our Settings object. This maps the key name from the AWS secret to the
+    # key name in our Settings object.
     remap_keys = settings.__config__.aws_secrets_remap
     response.update(
         {val: secrets[key] for key, val in remap_keys.items() if secrets.get(key)}
@@ -33,6 +43,7 @@ def aws_secret_settings(settings) -> Dict[str, Any]:
 
 
 def aws_ssm_settings(settings) -> Dict[str, Any]:
+    """Fetch settings from AWS Systems Manager Parameter Store"""
     session = Session(region_name=os.environ["AWS_REGION"])
 
     dev_prefix = os.environ.get("REMOTE_DEV_PREFIX")
@@ -68,6 +79,11 @@ class Settings(BaseSettings):
     DB_MAX_OVERFLOW: int = 0
     DB_ECHO: bool = False
     DEBUG: bool = True
+
+    # Pydantic automatically tries to load settings with matching names from the environment if available, and then
+    # goes down its list of "magic-settings-getters" to find more data to populate this settings object with. For
+    # some of these settings we're relying on env vars, others get loaded from AWS Secrets, and others are loaded
+    # from AWS SSM parameter store.
 
     # Env vars usually read from env vars
     AWS_REGION: str
@@ -224,6 +240,9 @@ class Settings(BaseSettings):
             env_settings,
             file_secret_settings,
         ):
+            # Here we're telling pydantic to go ahead and load settings from
+            # its default loaders first, and then try reading them from the
+            # custom loaders we've defined at the top of this file.
             return (
                 init_settings,
                 env_settings,
