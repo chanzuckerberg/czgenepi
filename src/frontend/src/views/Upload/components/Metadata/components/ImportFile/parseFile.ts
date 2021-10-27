@@ -80,6 +80,23 @@ export function parseFile(file: File): Promise<ParseResult> {
   });
 }
 
+/**
+ * Creates the metadata for a sample from its corresponding row in file.
+ *
+ * This relies on first column implicitly being the "sample's position" in fasta upload.
+ * The TSV template has the first column header as simply being "" (empty string),
+ * but the value for that column in each data row of downloaded TSV template is either
+ * "example X" (for the example rows placed at top of template) or "1", "2", etc for the
+ * actual samples. I (Vince) couldn't find any documentation on this, but it seems to be
+ * the intent after doing some observation.
+ *
+ * Below, the way we determine if a given row is "real" data or a throw-away example row
+ * is by checking that first column and seeing if it's a number. If it's not a number, we
+ * assume that it's an example row (because "example A" etc will parse as NaN). This is kind
+ * of troubling, since the implicit first column is not actually one of the necessary pieces
+ * of metadata -- in theory it could be dropped entirely and the user would still be sending
+ * everything we need. But because the implementation relies on it, would take some work.
+ */
 function buildMetadata({ headers, row, warningMessages }: RowInfo) {
   const metadata = {} as ParsedMetadata;
 
@@ -88,6 +105,8 @@ function buildMetadata({ headers, row, warningMessages }: RowInfo) {
 
     // (thuang): If we detect the first column in a row is an example,
     // we skip parsing this row
+    // FIXME (Vince): Want to determine if it's a "real" data row some other way
+    // see the documentation above function for more background.
     if (!headers || (i === 0 && Number.isNaN(Number(value)))) {
       break;
     }
