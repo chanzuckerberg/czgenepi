@@ -1,7 +1,7 @@
 import json
 import os
 from functools import cached_property
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from boto3 import Session
 from botocore.exceptions import ClientError
@@ -112,9 +112,9 @@ class Settings(BaseSettings):
 
     # These are same-name'd keys in an AWS secret, so they get remapped when
     # we load the secrets, and then we use getter methods to handle special cases.
-    SECRET_AUTH0_AUTHORIZE_URL: str
-    SECRET_AUTH0_BASE_URL: str
-    SECRET_AUTH0_ACCESS_TOKEN_URL: str
+    SECRET_AUTH0_AUTHORIZE_URL: Optional[str] = None
+    SECRET_AUTH0_BASE_URL: Optional[str] = None
+    SECRET_AUTH0_ACCESS_TOKEN_URL: Optional[str] = None
 
     # Env vars usually pulled from AWS SSM Parameters
     AWS_NEXTSTRAIN_SFN_PARAMETERS: Dict
@@ -136,23 +136,23 @@ class Settings(BaseSettings):
 
     @cached_property
     def AUTH0_BASE_URL(self) -> str:
-        try:
+        if self.SECRET_AUTH0_BASE_URL:
             return self.SECRET_AUTH0_BASE_URL
-        except KeyError:
+        else:
             return f"https://{self.AUTH0_DOMAIN}"
 
     @cached_property
     def AUTH0_ACCESS_TOKEN_URL(self) -> str:
-        try:
+        if self.SECRET_AUTH0_ACCESS_TOKEN_URL:
             return self.SECRET_AUTH0_ACCESS_TOKEN_URL
-        except KeyError:
+        else:
             return f"{self.AUTH0_BASE_URL}/oauth/token"
 
     @cached_property
     def AUTH0_AUTHORIZE_URL(self) -> str:
-        try:
+        if self.SECRET_AUTH0_AUTHORIZE_URL:
             return self.SECRET_AUTH0_AUTHORIZE_URL
-        except KeyError:
+        else:
             return f"{self.AUTH0_BASE_URL}/authorize"
 
     ####################################################################################
