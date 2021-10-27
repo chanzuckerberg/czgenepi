@@ -86,15 +86,15 @@ export const StyledFieldTitleText = styled.div`
 `;
 
 export const StyledTextField = styled.div`
-  .MuiInputBase-root {
-    height: ${INPUT_HEIGHT};
-    width: 150px;
-  }
-
   ${(props) => {
     const spacings = getSpacings(props);
     return `
       margin-bottom: ${spacings?.xl}px;
+
+      .MuiInputBase-root {
+        height: ${INPUT_HEIGHT};
+        width: 150px;
+      }
     `;
   }}
 `;
