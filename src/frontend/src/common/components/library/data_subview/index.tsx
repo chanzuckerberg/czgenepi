@@ -353,11 +353,11 @@ const DataSubview: FunctionComponent<Props> = ({
               {viewName === VIEWNAME.TREES && <TreeCreateHelpLink />}
               {downloadButton}
               <Notification
-                autoDismiss
+                buttonOnClick={handleDismissDownloadErrorClick}
+                buttonText="DISMISS"
                 dismissDirection="right"
                 dismissed={!downloadFailed}
                 intent="error"
-                onClose={handleDismissDownloadErrorClick}
               >
                 <BoldText>
                   Something went wrong and we were unable to complete one or
@@ -366,11 +366,11 @@ const DataSubview: FunctionComponent<Props> = ({
                 {CONTACT_US}
               </Notification>
               <Notification
-                autoDismiss
+                buttonOnClick={handleDismissCreateTreeErrorClick}
+                buttonText="DISMISS"
                 dismissDirection="right"
                 dismissed={!didCreateTreeFailed}
                 intent="error"
-                onClose={handleDismissCreateTreeErrorClick}
               >
                 <BoldText>
                   Something went wrong and we were unable to start your tree
@@ -383,7 +383,6 @@ const DataSubview: FunctionComponent<Props> = ({
                 dismissDirection="right"
                 dismissed={!hasCreateTreeStarted}
                 intent="info"
-                onClose={handleCreateTreeStartedModalClose}
               >
                 <span>
                   Your tree is being created. It may take up to 12 hours to
