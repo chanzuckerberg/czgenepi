@@ -33,12 +33,13 @@ Both the frontend and backend services will automatically reload when their sour
 To update frontend changes:
 
 1. add dependency to [src/frontend/package.json](src/frontend/package.json) (or add a new scripts command)
+2. run `make local-update-frontend-deps` (updates package-lock.json)
 2. run `make local-sync`
 
 To update backend dependencies:
 
 1. add the dependency to [src/backend/Pipfile](src/backend/Pipfile)
-2. run `make local-update-deps` (updates Pipfile.lock and updates requirements)
+2. run `make local-update-backend-deps` (updates Pipfile.lock and updates requirements)
 3. run `make local-sync` (rebuilds and initializes containers with new dependency)
 
 ### Update Dev Data
