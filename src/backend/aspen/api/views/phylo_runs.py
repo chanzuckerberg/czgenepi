@@ -13,14 +13,14 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
 from starlette.requests import Request
 
-from aspen.api.deps import get_db
+from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.phylo_runs import (
     PHYLO_TREE_TYPES,
     PhyloRunRequestSchema,
     PhyloRunResponseSchema,
 )
-from aspen.api.settings import get_settings
+from aspen.api.settings import Settings
 from aspen.api.utils import get_matching_gisaid_ids
 from aspen.app.views.api_utils import (
     authz_sample_filters,
@@ -44,6 +44,7 @@ async def kick_off_phylo_run(
     phylo_run_request: PhyloRunRequestSchema,
     request: Request,
     db: AsyncSession = Depends(get_db),
+    settings: Settings = Depends(get_settings),
 ) -> PhyloRunResponseSchema:
     user = request.state.auth_user
     # Note - sample run will be associated with users's primary group.
@@ -143,7 +144,6 @@ async def kick_off_phylo_run(
 
     # Step 5 - Kick off the phylo run job.
     aws_region = os.environ.get("AWS_REGION")
-    settings = get_settings()
     sfn_params = settings.AWS_NEXTSTRAIN_SFN_PARAMETERS
     sfn_input_json = {
         "Input": {

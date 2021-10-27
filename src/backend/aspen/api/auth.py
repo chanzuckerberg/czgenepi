@@ -12,8 +12,8 @@ from sqlalchemy.orm.query import Query
 from starlette.requests import Request
 
 import aspen.api.error.http_exceptions as ex
-from aspen.api.deps import get_db
-from aspen.api.settings import get_settings
+from aspen.api.deps import get_db, get_settings
+from aspen.api.settings import Settings
 from aspen.auth.device_auth import validate_auth_header
 from aspen.database.models import Group, User
 
@@ -53,9 +53,10 @@ async def setup_userinfo(
 
 
 async def get_auth_user(
-    request: Request, session: AsyncSession = Depends(get_db)
+    request: Request,
+    session: AsyncSession = Depends(get_db),
+    settings: Settings = Depends(get_settings),
 ) -> User:
-    settings = get_settings()
     auth_header = request.headers.get("authorization")
     auth0_user_id = None
     if auth_header:

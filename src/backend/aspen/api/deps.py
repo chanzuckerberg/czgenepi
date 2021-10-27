@@ -1,15 +1,30 @@
 from typing import AsyncGenerator
 
+from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.requests import Request
 
-from aspen.api.settings import get_settings
+from aspen.api.settings import Settings
 from aspen.database.connection import init_async_db
 
 
-async def get_db(request: Request) -> AsyncGenerator[AsyncSession, None]:
+def get_auth0_client(request: Request):
+    # This parameter is added to the app when we instantiate it.
+    return request.app.state.auth0_client
+
+
+def get_settings(request: Request):
+    # We stashed our settings object in app.state when we loaded the app, and every
+    # request object has that app attached at request.app, so this dependency is just
+    # returning the settings object we created at startup.
+    settings = request.app.state.aspen_settings
+    return settings
+
+
+async def get_db(
+    request: Request, settings: Settings = Depends(get_settings)
+) -> AsyncGenerator[AsyncSession, None]:
     """Store db session in the context var and reset it"""
-    settings = get_settings()
     db = init_async_db(settings.DB_DSN)
     session = db.make_session()
     try:

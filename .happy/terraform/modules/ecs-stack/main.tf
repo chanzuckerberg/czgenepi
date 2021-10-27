@@ -10,7 +10,6 @@ locals {
   alb_key = var.require_okta ? "private_albs" : "public_albs"
 
   custom_stack_name     = var.stack_name
-  image_tag             = var.image_tag
   priority              = var.priority
   deployment_stage      = var.deployment_stage
   remote_dev_prefix     = var.stack_prefix
@@ -33,17 +32,16 @@ locals {
   aspen_data_bucket     = local.secret["s3_buckets"]["aspen_data"]["name"]
 
   # Web images
-  frontend_image_repo   = local.secret["ecrs"]["frontend"]["url"]
-  backend_image_repo    = local.secret["ecrs"]["backend"]["url"]
+  frontend_image   = join(":", [local.secret["ecrs"]["frontend"]["url"], lookup(var.image_tags, "frontend", var.image_tag)])
+  backend_image    = join(":", [local.secret["ecrs"]["backend"]["url"], lookup(var.image_tags, "backend", var.image_tag)])
 
   # Workflow images
-  pangolin_image_repo   = local.secret["ecrs"]["pangolin"]["url"]
-  nextstrain_image_repo = local.secret["ecrs"]["nextstrain"]["url"]
-  gisaid_image_repo     = local.secret["ecrs"]["gisaid"]["url"]
-  covidhub_import_image_repo  = local.secret["ecrs"]["covidhub-import"]["url"]
+  pangolin_image   = join(":", [local.secret["ecrs"]["pangolin"]["url"], lookup(var.image_tags, "pangolin", var.image_tag)])
+  nextstrain_image = join(":", [local.secret["ecrs"]["nextstrain"]["url"], lookup(var.image_tags, "nextstrain", var.image_tag)])
+  gisaid_image     = join(":", [local.secret["ecrs"]["gisaid"]["url"], lookup(var.image_tags, "gisaid", var.image_tag)])
 
   # This is the wdl executor image, doesn't change on update.
-  swipe_image_repo     = local.secret["ecrs"]["swipe"]["url"]
+  swipe_image     = join(":", [local.secret["ecrs"]["swipe"]["url"], "rev-7"]) # TODO - we probably don't want to hardcode this
 
   batch_role_arn             = local.secret["batch_queues"]["aspen"]["role_arn"]
   ec2_queue_arn              = local.secret["batch_envs"]["aspen"]["envs"]["EC2"]["queue_arn"]
@@ -98,7 +96,7 @@ module frontend_service {
   custom_stack_name     = local.custom_stack_name
   app_name              = "frontend"
   vpc                   = local.vpc_id
-  image                 = "${local.frontend_image_repo}:${local.image_tag}"
+  image                 = local.frontend_image
   cluster               = local.cluster
   desired_count         = 2
   listener              = local.frontend_listener_arn
@@ -123,7 +121,7 @@ module backend_service {
   custom_stack_name     = local.custom_stack_name
   app_name              = "backend"
   vpc                   = local.vpc_id
-  image                 = "${local.backend_image_repo}:${local.image_tag}"
+  image                 = local.backend_image
   cluster               = local.cluster
   desired_count         = 2
   listener              = local.backend_listener_arn
@@ -161,7 +159,7 @@ module swipe_sfn {
 module gisaid_sfn_config {
   source   = "../sfn_config"
   app_name = "gisaid-sfn"
-  image    = "${local.gisaid_image_repo}:${local.image_tag}"
+  image    = local.gisaid_image
   vcpus    = 32
   memory   = 420000
   wdl_path = "workflows/gisaid.wdl"
@@ -184,7 +182,7 @@ module gisaid_sfn_config {
 module pangolin_sfn_config {
   source   = "../sfn_config"
   app_name = "pangolin-sfn"
-  image    = "${local.pangolin_image_repo}:${local.image_tag}"
+  image    = local.pangolin_image
   memory   = 120000
   wdl_path = "workflows/pangolin.wdl"
   custom_stack_name     = local.custom_stack_name
@@ -205,7 +203,7 @@ module pangolin_sfn_config {
 module pangolin_ondemand_sfn_config {
   source   = "../sfn_config"
   app_name = "pangolin-ondemand-sfn"
-  image    = "${local.pangolin_image_repo}:${local.image_tag}"
+  image    = local.pangolin_image
   memory   = 120000
   wdl_path = "workflows/pangolin-ondemand.wdl"
   custom_stack_name     = local.custom_stack_name
@@ -225,7 +223,7 @@ module pangolin_ondemand_sfn_config {
 module nextstrain_template_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-sfn"
-  image    = "${local.nextstrain_image_repo}:${local.image_tag}"
+  image    = local.nextstrain_image
   vcpus    = 10
   memory   = 64000
   wdl_path = "workflows/nextstrain.wdl"
@@ -246,7 +244,7 @@ module nextstrain_template_sfn_config {
 module nextstrain_ondemand_template_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-ondemand-sfn"
-  image    = "${local.nextstrain_image_repo}:${local.image_tag}"
+  image    = local.nextstrain_image
   vcpus    = 10
   memory   = 64000
   wdl_path = "workflows/nextstrain-ondemand.wdl"
@@ -267,7 +265,7 @@ module nextstrain_ondemand_template_sfn_config {
 module migrate_db {
   source                = "../migration"
   stack_resource_prefix = local.stack_resource_prefix
-  image                 = "${local.backend_image_repo}:${local.image_tag}"
+  image                 = local.backend_image
   task_role_arn         = local.ecs_role_arn
   cmd                   = local.migration_cmd
   custom_stack_name     = local.custom_stack_name
@@ -280,7 +278,7 @@ module delete_db {
   count                 = var.delete_protected ? 0 : 1
   stack_resource_prefix = local.stack_resource_prefix
   source                = "../deletion"
-  image                 = "${local.backend_image_repo}:${local.image_tag}"
+  image                 = local.backend_image
   task_role_arn         = local.ecs_role_arn
   cmd                   = local.deletion_cmd
   custom_stack_name     = local.custom_stack_name
@@ -293,7 +291,7 @@ module swipe_batch {
   app_name              = "swipe"
   stack_resource_prefix = local.stack_resource_prefix
   batch_role_arn        = local.batch_role_arn
-  swipe_image            = "${local.swipe_image_repo}:rev-7" # FIXME rev shouldn't be hardcoded
+  swipe_image           = local.swipe_image
   custom_stack_name     = local.custom_stack_name
   remote_dev_prefix     = local.remote_dev_prefix
   deployment_stage      = local.deployment_stage
