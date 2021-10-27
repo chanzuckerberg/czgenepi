@@ -1,8 +1,8 @@
-import { Notification, NotificationProps } from "czifui";
+import { ExposedNotificationProps, Notification } from "czifui";
 import React from "react";
 import { StyledNotifContainer } from "./style";
 
-const Notifications = (props: NotificationProps): JSX.Element => {
+const Notifications = (props: ExposedNotificationProps): JSX.Element => {
   return (
     <StyledNotifContainer>
       <Notification {...props} />

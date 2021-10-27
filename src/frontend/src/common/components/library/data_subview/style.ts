@@ -55,11 +55,6 @@ export const StyledButton = styled(Button)`
   }}
 `;
 
-export const CreateTreeModalDiv = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
 export const StyledChip = styled(Chip)`
   ${(props) => {
     const colors = getColors(props);
