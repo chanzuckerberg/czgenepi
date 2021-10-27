@@ -104,7 +104,7 @@ Aspen customizes the default `czifui` theme, in order to have its unique brand i
 For example, throughout the code base, you will find patterns such as the following:
 
 ```ts
-import { fontBodyM, getColors, getSpacings } from "czifui";
+import { fontBodyM, getColors, getSpaces } from "czifui";
 
 export const Foo = styled.div`
   // This is the design system's font body medium mixin we import from czifui
@@ -118,13 +118,13 @@ export const Foo = styled.div`
   ${(props) => {
     // getColors() is a selector that picks out colors from the theme object
     const colors = getColors(props);
-    // getSpacings() is a selector that picks out spacings from the theme object
-    const spacings = getSpacings(props);
+    // getSpaces() is a selector that picks out spaces from the theme object
+    const spaces = getSpaces(props);
 
     return `
       background-color: ${colors?.gray[500]};
-      padding-bottom: ${spacings?.m}px;
-      margin-bottom: ${spacings?.xxl}px;
+      padding-bottom: ${spaces?.m}px;
+      margin-bottom: ${spaces?.xxl}px;
     `;
   }}
 `;

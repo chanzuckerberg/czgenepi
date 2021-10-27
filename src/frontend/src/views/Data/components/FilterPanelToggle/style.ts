@@ -54,7 +54,7 @@ export const StyledBadge = styled.div`
   }}
 `;
 
-// TODO (mlila): get these spacings from czifui
+// TODO (mlila): get these spaces from czifui
 export const tooltipStyles = css`
   margin: 0;
   padding: 8px 14px !important;
