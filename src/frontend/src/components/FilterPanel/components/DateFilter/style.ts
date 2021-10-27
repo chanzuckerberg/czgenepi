@@ -16,13 +16,13 @@ export const StyledDateRange = styled.div`
 export const StyledManualDate = styled.div`
   ${(props) => {
     const colors = getColors(props);
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
     return `
       border-bottom: 1px solid ${colors?.gray[200]};
-      padding-bottom: ${(spacings?.xxs ?? 0) + (spacings?.m ?? 0)}px;
-      padding-top: ${spacings?.m}px;
-      padding-right: ${spacings?.xxs}px;
-      padding-left: ${spacings?.xxs}px;
+      padding-bottom: ${(spaces?.xxs ?? 0) + (spaces?.m ?? 0)}px;
+      padding-top: ${spaces?.m}px;
+      padding-right: ${spaces?.xxs}px;
+      padding-left: ${spaces?.xxs}px;
     `;
   }}
 `;
@@ -31,19 +31,19 @@ export const StyledText = styled.span`
   ${fontBodyXs}
   ${(props) => {
     const fontWeights = getFontWeights(props);
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
     return `
       font-weight: ${fontWeights?.semibold};
-      margin: 0 ${spacings?.xs}px;
+      margin: 0 ${spaces?.xs}px;
     `;
   }}
 `;
 
 export const StyledButton = styled(Button)`
   ${(props) => {
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
     return `
-      margin-top: ${spacings?.xs}px;
+      margin-top: ${spaces?.xs}px;
     `;
   }}
 `;

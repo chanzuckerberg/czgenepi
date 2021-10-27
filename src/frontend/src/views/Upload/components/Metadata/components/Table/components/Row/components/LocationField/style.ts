@@ -4,11 +4,11 @@ import { fontBodyXxs, getColors, getSpaces } from "czifui";
 
 export const StyledTextField = styled(TextField)`
   ${(props) => {
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
 
     return `
-      min-width: ${(spacings?.l || 0) + 195}px;
-      padding-right: ${spacings?.l}px;
+      min-width: ${(spaces?.l || 0) + 195}px;
+      padding-right: ${spaces?.l}px;
       margin: 0;
     `;
   }}

@@ -13,11 +13,11 @@ export const Table = styled.table`
     text-align: left;
 
     ${(props) => {
-      const spacings = getSpaces(props);
+      const spaces = getSpaces(props);
       const colors = getColors(props);
 
       return `
-        padding: ${spacings?.m}px 15px;
+        padding: ${spaces?.m}px 15px;
         border: 1px solid ${colors?.gray[300]};
       `;
     }}

@@ -10,10 +10,10 @@ import {
 import Instructions from "src/components/Instructions";
 
 export function marginBottom(props: Props): string {
-  const spacings = getSpaces(props);
+  const spaces = getSpaces(props);
 
   return `
-      margin-bottom: ${spacings?.xl}px;
+      margin-bottom: ${spaces?.xl}px;
     `;
 }
 
@@ -23,11 +23,11 @@ export const Header = styled.div`
   align-items: center;
 
   ${(props) => {
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
     const colors = getColors(props);
 
     return `
-        padding: ${spacings?.xl}px 125px;
+        padding: ${spaces?.xl}px 125px;
         border-bottom: 5px solid ${colors?.gray[100]};
     `;
   }}
@@ -37,10 +37,10 @@ export const Content = styled.div`
   flex: 2;
 
   ${(props) => {
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
 
     return `
-        margin: ${spacings?.xxl}px 125px ${spacings?.l}px 125px;
+        margin: ${spaces?.xxl}px 125px ${spaces?.l}px 125px;
     `;
   }}
 `;
@@ -63,10 +63,10 @@ export const StyledInstructions = styled(Instructions)`
 
 export const ContinueButton = styled(Button)`
   ${(props) => {
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
 
     return `
-      margin-right: ${spacings?.xs}px;
+      margin-right: ${spaces?.xs}px;
     `;
   }}
 `;

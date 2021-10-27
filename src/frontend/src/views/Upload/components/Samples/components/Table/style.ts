@@ -11,9 +11,9 @@ import {
 export const Overflow = styled.div`
   overflow: auto;
   ${(props) => {
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
     return `
-      padding-bottom: ${spacings?.m}px;
+      padding-bottom: ${spaces?.m}px;
     `;
   }}
 `;
@@ -26,11 +26,11 @@ export const StyledTableCell = styled(TableCell)`
   ${fontBodyXs}
   ${(props) => {
     const colors = getColors(props);
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
     return `
-      padding: ${spacings?.m}px 0;
+      padding: ${spaces?.m}px 0;
       border-bottom: solid 1px ${colors?.gray[200]};
-      margin-right: ${spacings?.m}px;
+      margin-right: ${spaces?.m}px;
     `;
   }}
 `;
@@ -38,10 +38,10 @@ export const StyledTableCell = styled(TableCell)`
 export const StyledHeaderTableCell = styled(TableCell)`
   ${fontHeaderXs}
   ${(props) => {
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
     const colors = getColors(props);
     return `
-      padding: ${spacings?.m}px 0;
+      padding: ${spaces?.m}px 0;
       color: ${colors?.gray[400]};
       border-bottom: solid 2px ${colors?.gray[200]};
 
@@ -52,9 +52,9 @@ export const StyledHeaderTableCell = styled(TableCell)`
 export const StyledTableHead = styled(TableHead)`
   ${fontHeaderXs}
   ${(props) => {
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
     return `
-      padding: ${spacings?.m}px 0;
+      padding: ${spaces?.m}px 0;
     `;
   }}
 `;

@@ -4,9 +4,9 @@ import { getSpaces } from "czifui";
 export const StyledSpan = styled.span`
   display: flex;
   ${(props) => {
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
     return `
-      margin-left: ${spacings?.m}px;
+      margin-left: ${spaces?.m}px;
     `;
   }}
 `;

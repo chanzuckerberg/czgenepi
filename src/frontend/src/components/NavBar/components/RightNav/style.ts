@@ -6,11 +6,11 @@ export const UploadButton = styled(Button)`
   border: 1px solid white;
 
   ${(props) => {
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
     const colors = getColors(props);
 
     return `
-      margin-right: ${spacings?.xl}px;
+      margin-right: ${spaces?.xl}px;
 
       &:hover {
         color: black;

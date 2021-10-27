@@ -6,10 +6,10 @@ export const Logo = styled(LogoImage)`
   height: 25px;
 
   ${(props) => {
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
 
     return `
-      margin-right: ${spacings?.l}px;
+      margin-right: ${spaces?.l}px;
     `;
   }}
 `;

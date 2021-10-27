@@ -3,10 +3,10 @@ import { Chip, getSpaces } from "czifui";
 
 export const StyledChip = styled(Chip)`
   ${(props) => {
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
 
     return `
-      margin: 0 ${spacings?.xs}px;
+      margin: 0 ${spaces?.xs}px;
     `;
   }}
 `;

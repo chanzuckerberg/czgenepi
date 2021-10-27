@@ -14,10 +14,10 @@ export const StyledDialogTitle = styled(DialogTitle, {
   shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
 })`
   ${(props: ExtraProps) => {
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
 
     return `
-      padding: ${spacings?.xxl}px ${spacings?.xxl}px ${spacings?.xl}px ${spacings?.xxl}px;
+      padding: ${spaces?.xxl}px ${spaces?.xxl}px ${spaces?.xl}px ${spaces?.xxl}px;
     `;
   }}
 
@@ -25,12 +25,12 @@ export const StyledDialogTitle = styled(DialogTitle, {
 
   ${(props) => {
     const { narrow } = props;
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
 
     if (!narrow) return "";
 
     return `
-      padding-bottom: ${spacings?.s}px;
+      padding-bottom: ${spaces?.s}px;
     `;
   }}
 `;

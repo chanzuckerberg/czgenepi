@@ -40,10 +40,10 @@ export const UnderlinedRowContent = styled(RowContent)`
 
 export const StyledChip = styled(Chip)`
   ${(props) => {
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
 
     return `
-      margin-top: ${spacings?.xxs}px;
+      margin-top: ${spaces?.xxs}px;
     `;
   }}
 `;

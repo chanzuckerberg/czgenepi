@@ -14,10 +14,10 @@ export const StyledDialogContent = styled(DialogContent, {
   shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
 })`
   ${(props) => {
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
 
     return `
-      padding: 0 ${spacings?.xxl}px ${spacings?.xl}px ${spacings?.xxl}px;
+      padding: 0 ${spaces?.xxl}px ${spaces?.xl}px ${spaces?.xxl}px;
     `;
   }}
 

@@ -13,9 +13,9 @@ import IconCloseSmall from "src/common/icons/IconCloseSmall.svg";
 
 export const Label = styled.div`
   ${(props) => {
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
     return `
-      margin-bottom: ${spacings?.xxxs}px;
+      margin-bottom: ${spaces?.xxxs}px;
     `;
   }}
 `;
@@ -24,11 +24,11 @@ export const LabelMain = styled.span`
   ${fontHeaderXs}
   color: black;
   ${(props) => {
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
     return `
-      margin-top: ${spacings?.l}px;
-      margin-right: ${spacings?.xxs}px;
-      margin-bottom: ${spacings?.xxxs}px;
+      margin-top: ${spaces?.l}px;
+      margin-right: ${spaces?.xxs}px;
+      margin-bottom: ${spaces?.xxxs}px;
     `;
   }}
 `;
@@ -37,13 +37,13 @@ export const LabelLight = styled.span`
   ${fontHeaderXs}
   ${(props) => {
     const fontWeights = getFontWeights(props);
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
     const colors = getColors(props);
     return `
       font-weight: ${fontWeights?.regular};
-      margin-top: ${spacings?.l}px;
-      margin-right: ${spacings?.m}px;
-      margin-bottom: ${spacings?.xxxs}px;
+      margin-top: ${spaces?.l}px;
+      margin-right: ${spaces?.m}px;
+      margin-bottom: ${spaces?.xxxs}px;
       color: ${colors?.gray[500]};
     `;
   }}
@@ -56,10 +56,10 @@ export const StyledListItem = styled(ListItem)`
   padding: 0px;
   ${(props) => {
     const fontWeights = getFontWeights(props);
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
     return `
       font-weight: ${fontWeights?.regular};
-      padding-bottom: ${spacings?.xxxs}px;
+      padding-bottom: ${spaces?.xxxs}px;
     `;
   }}
 `;
@@ -71,9 +71,9 @@ export const SmallText = styled.span`
 export const StyledListItemIcon = styled(ListItemIcon)`
   min-width: 24px;
   ${(props) => {
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
     return `
-      margin-top: ${spacings?.s}px;
+      margin-top: ${spaces?.s}px;
     `;
   }}
 `;

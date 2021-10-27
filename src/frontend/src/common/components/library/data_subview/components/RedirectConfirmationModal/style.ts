@@ -10,10 +10,10 @@ export const StyledImg = styled("img")`
   height: 45px;
 
   ${(props) => {
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
 
     return `
-      margin-bottom: ${spacings?.l}px;
+      margin-bottom: ${spaces?.l}px;
     `;
   }}
 `;

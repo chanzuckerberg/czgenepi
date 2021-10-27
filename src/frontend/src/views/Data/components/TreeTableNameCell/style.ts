@@ -17,9 +17,9 @@ export const StyledOpenInNewIcon = styled(OpenInNewIcon, {
   flex: 0 0 auto;
 
   ${(props) => {
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
     return `
-      margin: 0 0 0 ${spacings?.l}px;
+      margin: 0 0 0 ${spaces?.l}px;
     `;
   }}
 

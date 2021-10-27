@@ -24,11 +24,11 @@ export const AlertInstructionsNotSemiBold = styled.span`
 export const StyledWarningIcon = styled(ErrorOutlineOutlinedIcon)`
   ${(props) => {
     const iconSizes = getIconSizes(props);
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
     return `
       height: ${iconSizes?.s.height}px;
       width: ${iconSizes?.s.width}px;
-      margin-top: ${spacings?.xxs}px;
+      margin-top: ${spaces?.xxs}px;
     `;
   }}
 `;

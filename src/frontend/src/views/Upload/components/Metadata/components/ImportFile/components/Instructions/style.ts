@@ -5,11 +5,11 @@ import DownloadTemplate from "../DownloadTemplate";
 export const Wrapper = styled.div`
   ${(props) => {
     const colors = getColors(props);
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
 
     return `
       background-color: ${colors?.gray[100]};
-      padding: ${spacings?.xl}px;
+      padding: ${spaces?.xl}px;
     `;
   }}
 `;
@@ -18,10 +18,10 @@ export const Title = styled.div`
   ${fontHeaderXs}
 
   ${(props) => {
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
 
     return `
-      margin-bottom: ${spacings?.xxs}px;
+      margin-bottom: ${spaces?.xxs}px;
     `;
   }}
 `;

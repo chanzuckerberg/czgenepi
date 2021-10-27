@@ -19,10 +19,10 @@ export const ImageWrapper = styled.div`
   justify-content: center;
 
   ${(props) => {
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
 
     return `
-      margin-bottom: ${spacings?.xl}px;
+      margin-bottom: ${spaces?.xl}px;
     `;
   }}
 `;

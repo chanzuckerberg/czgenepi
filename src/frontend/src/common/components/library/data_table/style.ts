@@ -33,22 +33,22 @@ export const RowContent = styled("div", {
   ${(props: ExtraProps) => {
     const { header } = props;
     const align = header?.align ?? "left";
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
 
     return `
       justify-content: ${align};
-      padding: ${spacings?.l}px 0;
-      margin-right: ${spacings?.m}px;
+      padding: ${spaces?.l}px 0;
+      margin-right: ${spaces?.m}px;
   `;
   }}
 `;
 
 export const icon = (props: Props): string => {
   const colors = getColors(props);
-  const spacings = getSpaces(props);
+  const spaces = getSpaces(props);
 
   return `
-    margin: 0 ${spacings?.l}px;
+    margin: 0 ${spaces?.l}px;
     fill: ${colors?.gray[500]};
   `;
 };
@@ -72,13 +72,13 @@ export const HeaderCheckbox = styled(Checkbox)`
     }
   }
   ${(props) => {
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
     const colors = getColors(props);
 
     return `
-      padding-right: ${spacings?.l}px;
-      padding-left: ${spacings?.m}px;
-      padding-bottom: ${spacings?.l}px;
+      padding-right: ${spaces?.l}px;
+      padding-left: ${spaces?.m}px;
+      padding-bottom: ${spaces?.l}px;
       &.MuiCheckbox-indeterminate {
         color: ${colors?.primary[500]};
       }

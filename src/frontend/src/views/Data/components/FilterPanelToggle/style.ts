@@ -10,10 +10,10 @@ export const StyledDiv = styled.div`
   position: relative;
 
   ${(props) => {
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
 
     return `
-      margin: ${spacings?.s}px ${spacings?.l}px;
+      margin: ${spaces?.s}px ${spaces?.l}px;
     `;
   }}
 

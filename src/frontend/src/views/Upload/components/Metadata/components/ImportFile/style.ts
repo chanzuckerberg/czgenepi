@@ -10,10 +10,10 @@ export const TitleWrapper = styled.div`
   align-items: center;
 
   ${(props) => {
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
 
     return `
-      margin-bottom: ${spacings?.s}px;
+      margin-bottom: ${spaces?.s}px;
     `;
   }}
 `;
@@ -23,20 +23,20 @@ export const IntroWrapper = styled.div`
   flex-direction: column;
 
   ${(props) => {
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
 
     return `
-      margin-bottom: ${spacings?.l}px;
+      margin-bottom: ${spaces?.l}px;
     `;
   }}
 `;
 
 export const Wrapper = styled.div`
   ${(props) => {
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
 
     return `
-      margin-bottom: ${spacings?.xxl}px;
+      margin-bottom: ${spaces?.xxl}px;
     `;
   }}
 `;

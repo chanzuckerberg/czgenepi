@@ -12,10 +12,10 @@ export const Title = styled.div`
   ${fontHeaderL}
 
   ${(props) => {
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
 
     return `
-      margin-bottom: ${spacings?.xxxs}px;
+      margin-bottom: ${spaces?.xxxs}px;
     `;
   }}
 `;
@@ -30,11 +30,11 @@ export const StyledFooter = styled.div`
 
   ${(props) => {
     const colors = getColors(props);
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
     return `
       color: ${colors?.gray[500]};
-      padding: 0 ${spacings?.xxl}px ${spacings?.xxl}px ${spacings?.xxl}px;
-      margin: -${(spacings?.s || 0) + (spacings?.xl || 0)}px 0 0 0;
+      padding: 0 ${spaces?.xxl}px ${spaces?.xxl}px ${spaces?.xxl}px;
+      margin: -${(spaces?.s || 0) + (spaces?.xl || 0)}px 0 0 0;
     `;
   }}
 `;

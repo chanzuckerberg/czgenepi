@@ -9,10 +9,10 @@ export const Details = styled.p`
   ${fontBodyS}
 
   ${(props) => {
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
 
     return `
-      margin-top: ${spacings?.xl}px;
+      margin-top: ${spaces?.xl}px;
     `;
   }}
 `;

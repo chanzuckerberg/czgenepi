@@ -21,10 +21,10 @@ export const Id = styled.div`
   flex-direction: column;
 
   ${(props) => {
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
 
     return `
-      padding: ${spacings?.m}px 0 ${spacings?.m}px ${spacings?.s}px
+      padding: ${spaces?.m}px 0 ${spaces?.m}px ${spaces?.s}px
     `;
   }}
 `;
@@ -47,21 +47,21 @@ export const StyledTableRow = styled(TableRow)`
 
 export const StyledTableCell = styled(TableCell)`
   ${(props) => {
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
 
     return `
-      padding: ${spacings?.m}px 0;
+      padding: ${spaces?.m}px 0;
     `;
   }}
 `;
 
 export const IsPrivateTableCell = styled(TableCell)`
   ${(props) => {
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
     const colors = getColors(props);
 
     return `
-      padding: ${spacings?.m}px 0;
+      padding: ${spaces?.m}px 0;
       border-left: solid 2px ${colors?.gray[200]};
       border-right: solid 2px ${colors?.gray[200]};
     `;
@@ -70,10 +70,10 @@ export const IsPrivateTableCell = styled(TableCell)`
 
 export const StyledDiv = styled.div`
   ${(props) => {
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
 
     return `
-      padding-right: ${spacings?.l}px;
+      padding-right: ${spaces?.l}px;
     `;
   }}
 `;

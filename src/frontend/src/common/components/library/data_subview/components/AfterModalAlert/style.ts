@@ -30,11 +30,11 @@ export const DismissButton = styled(Button)`
     background-color: transparent;
   }
   ${(props) => {
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
     const fontWeights = getFontWeights(props);
     return `
       font-weight: ${fontWeights?.semibold};
-      margin-top: ${spacings?.xl}px;
+      margin-top: ${spaces?.xl}px;
       margin-left: 0px;
       padding-left: 0px;
     `;

@@ -10,10 +10,10 @@ export const Label = styled.span`
   ${fontHeaderXs}
 
   ${(props) => {
-    const spacings = getSpaces(props);
+    const spaces = getSpaces(props);
 
     return `
-      margin-right: ${spacings?.m}px;
+      margin-right: ${spaces?.m}px;
     `;
   }}
 `;
