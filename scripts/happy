@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 import random
+from dateutil import tz
 from base64 import b64decode
 from contextlib import contextmanager
-from datetime import datetime
+from datetime import datetime, timedelta
 import io
 import json
 import os
@@ -249,7 +250,12 @@ class Stack:
         if not self.workspace:
             raise Exception(f"Could not find TFE workspace for stack {self.stack_name}")
 
-    def apply(self, wait):
+    def wait(self, stack_name, wait, orchestrator, services=None):
+        """Saves the variables and applies the workspace"""
+        self._ensure_workspace()
+        return self.workspace.wait(stack_name, orchestrator, services)
+
+    def apply(self, stack_name, wait, orchestrator, services=None):
         """Saves the variables and applies the workspace"""
         self._ensure_workspace()
         self.workspace.set_var(
@@ -270,7 +276,7 @@ class Stack:
 
         self.workspace.run_config_version(config_version_id)
         if wait:
-            return self.workspace.wait()
+            return self.workspace.wait(stack_name, orchestrator, services)
         return True
 
     def destroy(self):
@@ -468,16 +474,24 @@ class TFEWorkspace:
         self._outputs = None
         return True
 
-    def wait(self):
+    def wait(self, stack_name=None, orchestrator=None, services=None):
         RUN_DONE_STATUSES = {"applied", "discarded", "errored", "canceled", "force_canceled", "policy_soft_failed"}
         last_status = ""
+        status_start = time.time()
+        alert_after = 300 # How long to wait for an apply to complete before printing debug info
+        printed_alert = False
         while last_status not in RUN_DONE_STATUSES:
             if last_status:  # Skip sleep on first time
                 time.sleep(5)
             run = self.tfc.runs.show(self.latest_run_id)
             status = run["data"]["attributes"]["status"]
+            if not printed_alert and stack_name and status == "applying" and time.time() > status_start + alert_after:
+                print("This apply is taking an unusually long time. Are your containers crashing?")
+                orchestrator.get_events(stack_name, services)
+                printed_alert = True
             if status != last_status:
                 print(f"{datetime.now().strftime('%H:%M:%S')} - {status}")
+                status_start = time.time()
                 last_status = status
 
         if last_status != "applied":
@@ -535,7 +549,7 @@ class TFEWorkspace:
             state_version = self.tfc.state_versions.get_current(self.workspace_id, include=["outputs"])
         except exceptions.TFCHTTPNotFound:
             return {}
-        outputs = (item.get("attributes") for item in state_version["included"] if item.get("type") == "state-version-outputs")
+        outputs = (item.get("attributes") for item in state_version.get("included", {}) if item.get("type") == "state-version-outputs")
         self._outputs = {}
         for state_version_output in outputs:
             if not state_version_output["sensitive"]:
@@ -721,6 +735,44 @@ class Orchestrator:
             return_output=False,
             json_output=False,
         )
+
+    def get_events(self, stack, services=None):
+        """Get a list of recent events for a given ECS service to help debug problems"""
+        secrets = self.secrets
+        cluster_arn = secrets["cluster_arn"]
+        ecs_client = AwsSession.get_client(self.ctx, "ecs")
+        if not services:
+            return
+        output = ecs_client.describe_services(
+            cluster=cluster_arn,
+            services=[f"{stack}-{service}" for service in services]
+        )
+        for service in output["services"]:
+            incomplete = [deploy["rolloutState"] for deploy in service["deployments"] if deploy["rolloutState"] != "COMPLETED"]
+            if not incomplete:
+                continue
+            # If we've made it to this point, we have a deployment that isn't complete, and we should print an event log.
+            print(f"Incomplete deployment of service {service['serviceName']} / Current status {', '.join(incomplete)}:")
+            events = service["events"]
+            events.reverse() # These were in newest-first order, but terminal output should be newest-last
+            deregistered = 0
+            for event in events:
+                event_time = event["createdAt"]
+                if event_time < datetime.now().replace(tzinfo=tz.tzlocal()) - timedelta(seconds=600):
+                    continue
+                message = re.sub(r'^\(service ([^ ]+)\)', r"\1", event["message"])
+                message = re.sub(r'\(([^ ]+) .*?\)', r'\1', message)
+                message = re.sub(r':.*', '', message)
+                if "deregistered" in message:
+                    deregistered += 1
+                print(f'  {event_time:%H:%M} {message}')
+            # TODO -- this value really shouldn't be hardcoded, but it's a start.
+            if deregistered > 3:
+                print()
+                print("Many \"deregistered\" events - please check to see whether your service is crashing:")
+                service_name = service['serviceName'].replace(f"{stack}-", "", 1)
+                print(f"  ./scripts/happy --env {self.ctx.obj['config'].env} logs {stack} {service_name}")
+            return
 
     def run_task(self, taskdef_arn, wait=False, show_logs=True):
         """Run a one-off ECS task and optionally wait"""
@@ -944,7 +996,6 @@ def build_slice(ctx, slice_name, default_tag=None):
     stacktags = {slice_img: slice_tag for slice_img in build_images}
     return stacktags, default_tag
 
-
 @cli.command()
 @click.argument("stack_name")
 @click.option("--tag", help="Tag name for docker image. Leave empty to generate one automatically.", default=None)
@@ -956,7 +1007,10 @@ def build_slice(ctx, slice_name, default_tag=None):
 @click.pass_context
 def create(ctx, stack_name, tag, wait, force, skip_check_tag, slice_name, slice_default_tag):
     """Create a new stack with a given tag"""
+
     stackmgr = ctx.obj["stack_mgr"]
+    config = ctx.obj["config"]
+
     if stack_name in stackmgr.stacks:
         if force:
             print(f"Stack {stack_name} already exists")
@@ -970,7 +1024,7 @@ def create(ctx, stack_name, tag, wait, force, skip_check_tag, slice_name, slice_
         stacktags, tag = build_slice(ctx, slice_name, slice_default_tag)
 
     stack_meta = StackMeta(ctx, stack_name)
-    stack_meta.load({"happy/meta/configsecret": ctx.obj["config"].secret_arn})
+    stack_meta.load({"happy/meta/configsecret": config.secret_arn})
     if not tag:
         tag = generate_tag(ctx)
         ctx.invoke(push, tag=tag)
@@ -979,7 +1033,7 @@ def create(ctx, stack_name, tag, wait, force, skip_check_tag, slice_name, slice_
 
     stack = stackmgr.add(stack_name)
     stack._meta = stack_meta  # TODO(mbarrien): Hack!
-    success = stack.apply(wait)
+    success = stack.apply(stack_name, wait, ctx.obj["orchestrator"], services=config.services)
     if not success:
         raise CliError("Apply failed, skipping migrations")
     if should_auto_migrate(ctx):
@@ -1020,10 +1074,12 @@ def config_tarball(source_dir):
 def update(ctx, stack_name, tag, wait, skip_migrations, skip_check_tag, slice_name, slice_default_tag):
     """Update a dev stack tag version"""
     stackmgr = ctx.obj["stack_mgr"]
+    config = ctx.obj["config"]
     try:
         stack = stackmgr.stacks[stack_name]
     except KeyError:
         raise CliError(f"Stack {stack_name} does not exist")
+
     if tag and not skip_check_tag:
         check_images_exist(ctx, tag)
 
@@ -1039,9 +1095,9 @@ def update(ctx, stack_name, tag, wait, skip_migrations, skip_check_tag, slice_na
 
     stack_meta = stack.meta
     # Reset the configsecret if it has changed
-    stack_meta.load({"happy/meta/configsecret": ctx.obj["config"].secret_arn})
+    stack_meta.load({"happy/meta/configsecret": config.secret_arn})
     stack_meta.update(tag, stacktags, slice_name, stackmgr)
-    success = stack.apply(wait or not skip_migrations)
+    success = stack.apply(stack_name, wait or not skip_migrations, ctx.obj["orchestrator"], services=config.services)
     if not success:
         raise CliError("Apply failed, skipping migrations")
     if not skip_migrations and should_auto_migrate(ctx):
