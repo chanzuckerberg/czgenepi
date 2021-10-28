@@ -1173,7 +1173,7 @@ def test_validation_endpoint(
     data = {
         "sample_ids": [sample.public_identifier, f"hCoV-19/{gisaid_sample.strain}"],
     }
-    res = client.get("/api/samples/validate-ids", json=data)
+    res = client.post("/api/samples/validate-ids", json=data)
 
     assert res.status == "200 OK"
     response = res.json
@@ -1197,7 +1197,7 @@ def test_validation_endpoint_missing_identifier(
             "this_is_missing",
         ],
     }
-    res = client.get("/api/samples/validate-ids", json=data)
+    res = client.post("/api/samples/validate-ids", json=data)
 
     # request should not fail, should return list of samples that are missing from the DB
     assert res.status == "200 OK"
