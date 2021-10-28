@@ -2,30 +2,19 @@ import styled from "@emotion/styled";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Radio from "@material-ui/core/Radio";
 import TextField from "@material-ui/core/TextField";
-import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
 import InfoOutlinedIcon from "@material-ui/icons/InfoOutlined";
 import {
   Button,
   fontBodyS,
-  fontBodyXs,
   fontBodyXxs,
   fontBodyXxxs,
-  fontCapsXxxs,
   fontHeaderXs,
   getColors,
-  getFontWeights,
-  getIconSizes,
   getSpaces,
-  Props,
   Tooltip,
 } from "czifui";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
-import Instructions from "src/components/Instructions";
-
-const InstructionsCommon = `
-  color: black;
-`;
 
 export const StyledDialogContent = styled(DialogContent)`
   width: 600px;
@@ -70,53 +59,6 @@ export const FieldTitle = styled.div`
     const spaces = getSpaces(props);
     return `
       margin-bottom: ${spaces?.xxs}px;
-    `;
-  }}
-`;
-
-export const StyledInstructions = styled(Instructions)`
-  border-radius: 4px;
-  color: black;
-  ${(props) => {
-    const spaces = getSpaces(props);
-    return `
-      margin-bottom: ${spaces?.xs}px;
-      padding: ${spaces?.l}px;
-    `;
-  }}
-`;
-
-export const InstructionsSemiBold = styled.span`
-  ${InstructionsCommon}
-  ${fontBodyXs}
-  ${(props: Props) => {
-    const fontWeights = getFontWeights(props);
-    const spaces = getSpaces(props);
-    return `
-      font-weight: ${fontWeights?.semibold};
-      margin-bottom: ${spaces?.xxxs};
-    `;
-  }}
-`;
-
-export const InstructionsNotSemiBold = styled.span`
-  ${InstructionsCommon}
-  ${fontBodyXs}
-`;
-
-export const StyledInstructionsButton = styled(Button)`
-  ${fontCapsXxxs}
-  padding-left: 0px;
-  ${(props) => {
-    const spaces = getSpaces(props);
-    const colors = getColors(props);
-    return `
-      margin-left: ${spaces?.m}px;
-      padding-top: ${spaces?.xxs}px;
-      &:hover {
-        background-color: transparent;
-        color: ${colors?.primary[500]};
-      }
     `;
   }}
 `;
@@ -187,9 +129,29 @@ export const StyledButton = styled(Button)`
     const colors = getColors(props);
     return `
       margin-top: ${spaces?.xxl}px;
+
       &:active {
         background-color: ${colors?.gray[400]};
       }
+    `;
+  }}
+`;
+
+const doNotForwardProps = ["size"];
+
+export const Separator = styled("div", {
+  shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
+})`
+  height: 0;
+
+  ${(props) => {
+    const { size } = props;
+    const colors = getColors(props);
+    const spaces = getSpaces(props);
+
+    return `
+      border-top: 1px solid ${colors?.gray[200]};
+      margin: ${spaces?.[size]}px 0;
     `;
   }}
 `;
@@ -223,20 +185,6 @@ export const TextFieldAlert = styled.div`
     const colors = getColors(props);
     return `
       color: ${colors?.error[400]};
-    `;
-  }}
-`;
-
-export const StyledErrorOutlinedIcon = styled(ErrorOutlineIcon)`
-  ${(props) => {
-    const colors = getColors(props);
-    const iconSizes = getIconSizes(props);
-    const spaces = getSpaces(props);
-    return `
-      color: ${colors?.error[400]};
-      margin-right: ${spaces?.xs}px;
-      height: ${iconSizes?.s.height}px;
-      width: ${iconSizes?.s.width}px;
     `;
   }}
 `;
