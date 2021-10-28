@@ -118,3 +118,19 @@ const TREE_MAP = new Map<string, keyof Tree>([
 ]);
 export const fetchTrees = (): Promise<TreeResponse> =>
   apiResponse<TreeResponse>(["phylo_trees"], [TREE_MAP], API.PHYLO_TREES);
+
+function fibonacci(n: number): Array<number> {
+  const sequence: Array<number> = [1]
+  let base: number = 0
+  if (n == 1) {
+    return sequence
+  } else if (n < 1) {
+    throw new Error
+  }
+  for (let i = 2; i <= n; i++) {
+    const ithNumber = base + sequence[-1]
+    base = sequence[-1]
+    sequence.push(ithNumber)
+  }
+  return sequence
+}
