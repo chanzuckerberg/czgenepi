@@ -3,6 +3,7 @@ import { gunzip, strFromU8, unzip } from "fflate";
 import {
   ERROR_CODE,
   ParseErrors,
+  ParseFastaSeqIDLineOutcome,
   ParseOutcome,
   ParseOutcomeWithFilenames,
   Samples,
@@ -10,6 +11,10 @@ import {
 } from "../common/types";
 
 const MAX_NAME_LENGTH = 120;
+// All the characters that we do NOT allow for sample name.
+// Effectively just a whitelist of characters, then negated to produce what's forbidden.
+// Allowed characters: all latin alphabet, all digits, ` ` (space), `.`, `_`, `/`, `-`
+const FORBIDDEN_NAME_CHARACTERS_REGEX = /[^a-zA-Z0-9 ._/-]/;
 
 export async function handleFiles(
   files: FileList
@@ -95,6 +100,21 @@ async function handleZip(file: Uint8Array): Promise<ParseOutcome> {
 }
 
 /**
+ * Parses Fasta line containing the sequence's ID, returns ID and if in error.
+ */
+function handleFastaSeqIdLine(seqIdLine: string): ParseFastaSeqIDLineOutcome {
+  let hasError = false;
+  // `>` indicates line has ID. We toss it, along with any spaces between it and ID.
+  // Regex matches start of the line `>` and as many spaces as appear before ID
+  const FASTA_SEQ_ID_PREAMBLE = /^> */;
+  const id = seqIdLine.replace(FASTA_SEQ_ID_PREAMBLE, "");
+  if (id.length > MAX_NAME_LENGTH || FORBIDDEN_NAME_CHARACTERS_REGEX.test(id)) {
+    hasError = true;
+  }
+  return { hasError, id };
+}
+
+/**
  * (thuang): Use two pointers to convert Fasta text into
  * a map with sample id as key and sequence as value in O(N)
  */
@@ -111,12 +131,14 @@ function handleFastaText(text: string, filename: string): ParseOutcome {
 
     // Not sample id
     if (!iLine.includes(">")) {
-      i++;
+      i++; // Since not a sample id, move to next line and abandon this one.
       continue;
     }
+    // We are working with a sample ID line
+    const { id, hasError } = handleFastaSeqIdLine(iLine);
 
     // Invalid name
-    if (iLine.length > MAX_NAME_LENGTH) {
+    if (hasError) {
       errors = {
         ...errors,
         [ERROR_CODE.INVALID_NAME]: [
@@ -125,20 +147,15 @@ function handleFastaText(text: string, filename: string): ParseOutcome {
         ],
       };
 
-      i++;
+      i++; // Since sample ID name not allowed, move to next and abandon this one
       continue;
     }
 
     const { newIndex, sequence } = aggregateSequence(i, lines);
-
+    // Next line read will happen at end of sequence we just aggregated.
     i = newIndex;
 
     if (sequence) {
-      // The `>` indicates the ID. We toss it, along with any spaces between it and ID.
-      // Regex matches start of the line `>` and as many spaces as appear before ID
-      const REGEX_ID_PREAMBLE = /^> */;
-      const id = iLine.replace(REGEX_ID_PREAMBLE, "");
-
       result = {
         ...result,
         [id]: sequence,
