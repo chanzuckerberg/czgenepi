@@ -187,9 +187,13 @@ export const CreateNSTreeModal = ({
                 />
               </RadioGroup>
             </TreeTypeSection>
-            <Separator size="l" />
-            <FieldTitle>Add Samples by ID (optional)</FieldTitle>
-            <Separator size="xl" />
+            {usesFeatureFlag(FEATURE_FLAGS.gisaidIngest) && (
+              <>
+                <Separator size="l" />
+                <FieldTitle>Add Samples by ID (optional)</FieldTitle>
+                <Separator size="xl" />
+              </>
+            )}
             <FailedSampleAlert numFailedSamples={failedSamples?.length} />
             {usesFeatureFlag(FEATURE_FLAGS.gisaidIngest) && (
               <Tooltip
