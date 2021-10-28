@@ -119,4 +119,3 @@ const TREE_MAP = new Map<string, keyof Tree>([
 ]);
 export const fetchTrees = (): Promise<TreeResponse> =>
   apiResponse<TreeResponse>(["phylo_trees"], [TREE_MAP], API.PHYLO_TREES);
-  

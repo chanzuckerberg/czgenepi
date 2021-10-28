@@ -22,35 +22,6 @@ repos:
         files: ^src/backend/
         exclude: ^src/backend/third-party/
         types: [file, python]
-  - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v7.11.0
-    hooks:
-      - id: eslint
-        additional_dependencies: 
-          - eslint@7.11.0
-          - eslint-config-prettier@8.3.0
-          - eslint-plugin-jest-playwright@0.2.1
-          - eslint-plugin-prettier@3.4.0
-          - eslint-plugin-sonarjs@0.6.0
-          - eslint-plugin-flowtype@5.2.0
-          - eslint-plugin-import@2.22.1
-          - eslint-plugin-jest@24.1.0
-          - eslint-plugin-jsx-a11y@6.3.1
-          - eslint-plugin-react@7.22.0
-          - eslint-plugin-react-hooks@4.2.0
-          - eslint-plugin-testing-library@3.9.2
-          - eslint-webpack-plugin@2.1.0
-          - babel-eslint@10.1.0
-          - '@typescript-eslint/parser@4.5.0'
-          - '@typescript-eslint/eslint-plugin@4.14.0'
-        args: [--fix, --config=./src/frontend/.eslintrc.js]
-        files: ^src/frontend/
-        exclude: |
-          (?x)^(
-                src/frontend/node_modules/|
-                src/frontend/build/
-            )$
-        types_or: [ts, tsx]
   - repo: local
     hooks:
       - id: stylelint
