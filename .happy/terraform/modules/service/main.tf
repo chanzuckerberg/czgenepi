@@ -7,7 +7,7 @@ resource aws_ecs_service service {
   cluster         = var.cluster
   desired_count   = var.desired_count
   task_definition = aws_ecs_task_definition.task_definition.id
-  launch_type     = "EC2"
+  launch_type     = "FARGATE"
   name            = "${var.custom_stack_name}-${var.app_name}"
   load_balancer {
     container_name   = "web"
@@ -25,15 +25,18 @@ resource aws_ecs_service service {
 
 resource aws_ecs_task_definition task_definition {
   family        = "${var.stack_resource_prefix}-${var.deployment_stage}-${var.custom_stack_name}-${var.app_name}"
+  memory = 4096
+  cpu = 2048
   network_mode  = "awsvpc"
   task_role_arn = var.task_role_arn
+  execution_role_arn = "arn:aws:iam::473004499091:role/testing-fargate-execution-role"
+  requires_compatibilities = [ "FARGATE" ]
   container_definitions = <<EOF
 [
   {
     "name": "web",
     "essential": true,
     "image": "${var.image}",
-    "memory": 4096,
     "environment": [
       {
         "name": "REMOTE_DEV_PREFIX",
@@ -76,6 +79,7 @@ resource aws_ecs_task_definition task_definition {
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
+        "awslogs-stream-prefix": "fargatetesting",
         "awslogs-group": "${aws_cloudwatch_log_group.cloud_watch_logs_group.id}",
         "awslogs-region": "${data.aws_region.current.name}"
       }
