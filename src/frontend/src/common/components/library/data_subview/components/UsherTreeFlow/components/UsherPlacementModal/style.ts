@@ -8,7 +8,7 @@ import {
   fontHeaderM,
   fontHeaderXs,
   getColors,
-  getSpacings,
+  getSpaces,
   InputDropdown,
   List,
   ListItem,
@@ -23,9 +23,9 @@ const INPUT_HEIGHT = "34px";
 
 export const StyledDialogContent = styled(DialogContent)`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
     return `
-      padding-bottom: ${spacings?.xxl}px;
+      padding-bottom: ${spaces?.xxl}px;
     `;
   }}
 `;
@@ -37,10 +37,10 @@ export const StyledListItem = styled(ListItem)`
 
   ${(props) => {
     const colors = getColors(props);
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
     return `
       color: ${colors?.gray[500]};
-      margin-bottom: ${spacings?.xs}px;
+      margin-bottom: ${spaces?.xs}px;
 
       &:last-of-type {
         margin-bottom: 0;
@@ -51,9 +51,9 @@ export const StyledListItem = styled(ListItem)`
 
 export const StyledList = styled(List)`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
     return `
-      margin-bottom: ${spacings?.xl}px;
+      margin-bottom: ${spaces?.xl}px;
     `;
   }}
 `;
@@ -61,10 +61,10 @@ export const StyledList = styled(List)`
 export const StyledSectionHeader = styled.div`
   ${fontHeaderM}
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
     return `
       color: black;
-      margin-bottom: ${spacings?.m}px;
+      margin-bottom: ${spaces?.m}px;
     `;
   }}
 `;
@@ -76,18 +76,18 @@ export const StyledFieldTitleText = styled.div`
   align-items: center;
 
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
     return `
-      margin-bottom: ${spacings?.xs}px;
+      margin-bottom: ${spaces?.xs}px;
     `;
   }}
 `;
 
 export const StyledTextField = styled(TextField)`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
     return `
-      margin-bottom: ${spacings?.xl}px;
+      margin-bottom: ${spaces?.xl}px;
       width: 150px;
 
       .MuiInputBase-root {
@@ -107,11 +107,11 @@ export const StyledSuggestionText = styled.div`
 
   ${(props) => {
     const colors = getColors(props);
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
 
     return `
       color: ${colors?.warning[600]};
-      margin-left: ${spacings?.s}px;
+      margin-left: ${spaces?.s}px;
     `;
   }}
 `;
@@ -140,10 +140,10 @@ export const StyledButton = styled(Button)`
 
 export const StyledInputDropdown = styled(InputDropdown)`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
 
     return `
-      margin-bottom: ${spacings?.l}px;
+      margin-bottom: ${spaces?.l}px;
       width: 100%;
       height: ${INPUT_HEIGHT};
     `;
@@ -156,12 +156,12 @@ export const StyledCloseIcon = styled(CloseIcon)`
 
   ${(props) => {
     const colors = getColors(props);
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
 
     return `
       color: ${colors?.gray[400]};
-      right: ${spacings?.xl}px;
-      top: ${spacings?.xl}px;
+      right: ${spaces?.xl}px;
+      top: ${spaces?.xl}px;
     `;
   }}
 `;

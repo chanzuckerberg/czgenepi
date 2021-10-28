@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { Alert, Button, fontBodyXs, getFontWeights, getSpacings } from "czifui";
+import { Alert, Button, fontBodyXs, getFontWeights, getSpaces } from "czifui";
 
 export const StyledAlert = styled(Alert)`
   position: absolute;
@@ -30,11 +30,11 @@ export const DismissButton = styled(Button)`
     background-color: transparent;
   }
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
     const fontWeights = getFontWeights(props);
     return `
       font-weight: ${fontWeights?.semibold};
-      margin-top: ${spacings?.xl}px;
+      margin-top: ${spaces?.xl}px;
       margin-left: 0px;
       padding-left: 0px;
     `;
