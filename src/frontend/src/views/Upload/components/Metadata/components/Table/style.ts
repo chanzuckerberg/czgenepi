@@ -1,16 +1,16 @@
 import styled from "@emotion/styled";
 import { TableCell, TableContainer, TableRow } from "@material-ui/core";
-import { fontBodyM, fontHeaderXs, getColors, getSpacings } from "czifui";
+import { fontBodyM, fontHeaderXs, getColors, getSpaces } from "czifui";
 
 export const Overflow = styled.div`
   overflow: auto;
 
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
 
     return `
-      padding-bottom: ${spacings?.m}px;
-      margin-bottom: ${spacings?.xxl}px;
+      padding-bottom: ${spaces?.m}px;
+      margin-bottom: ${spaces?.xxl}px;
     `;
   }}
 `;
@@ -21,10 +21,10 @@ export const StyledTableContainer = styled(TableContainer)`
 
 export const IdColumn = styled.div`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
 
     return `
-      padding-left: ${spacings?.s}px;
+      padding-left: ${spaces?.s}px;
     `;
   }}
 `;
@@ -34,11 +34,11 @@ export const StyledTableCell = styled(TableCell)`
 
   ${(props) => {
     const colors = getColors(props);
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
 
     return `
       color: ${colors?.gray[500]};
-      padding: ${spacings?.l}px ${spacings?.l}px ${spacings?.l}px 0;
+      padding: ${spaces?.l}px ${spaces?.l}px ${spaces?.l}px 0;
       border-bottom: solid 2px ${colors?.gray[200]};
     `;
   }}
@@ -47,10 +47,10 @@ export const StyledTableCell = styled(TableCell)`
 export const IsPrivateTableCell = styled(StyledTableCell)`
   ${(props) => {
     const colors = getColors(props);
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
 
     return `
-      padding: ${spacings?.l}px ${spacings?.l}px;
+      padding: ${spaces?.l}px ${spaces?.l}px;
       border-left: solid 2px ${colors?.gray[200]};
       border-right: solid 2px ${colors?.gray[200]};
     `;
@@ -59,10 +59,10 @@ export const IsPrivateTableCell = styled(StyledTableCell)`
 
 export const SubmittedToGisaidTableCell = styled(StyledTableCell)`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
 
     return `
-      padding: ${spacings?.l}px;
+      padding: ${spaces?.l}px;
     `;
   }}
 `;

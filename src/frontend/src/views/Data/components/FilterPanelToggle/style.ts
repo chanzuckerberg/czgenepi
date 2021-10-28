@@ -1,6 +1,6 @@
 import { css } from "@emotion/css";
 import styled from "@emotion/styled";
-import { fontHeaderXxxs, getColors, getCorners, getSpacings } from "czifui";
+import { fontHeaderXxxs, getColors, getCorners, getSpaces } from "czifui";
 
 export const StyledDiv = styled.div`
   display: flex;
@@ -10,10 +10,10 @@ export const StyledDiv = styled.div`
   position: relative;
 
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
 
     return `
-      margin: ${spacings?.s}px ${spacings?.l}px;
+      margin: ${spaces?.s}px ${spaces?.l}px;
     `;
   }}
 
@@ -54,7 +54,7 @@ export const StyledBadge = styled.div`
   }}
 `;
 
-// TODO (mlila): get these spacings from czifui
+// TODO (mlila): get these spaces from czifui
 export const tooltipStyles = css`
   margin: 0;
   padding: 8px 14px !important;

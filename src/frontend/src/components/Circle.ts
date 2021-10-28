@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { getColors, getCorners, getSpacings } from "czifui";
+import { getColors, getCorners, getSpaces } from "czifui";
 
 export const Circle = styled.div`
   display: flex;
@@ -14,12 +14,12 @@ export const Circle = styled.div`
   ${(props) => {
     const colors = getColors(props);
     const corners = getCorners(props);
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
 
     return `
       background-color: ${colors?.primary[400]};
       border-radius: ${corners?.l}px;
-      margin-bottom: ${spacings?.xs}px;
+      margin-bottom: ${spaces?.xs}px;
     `;
   }}
 `;

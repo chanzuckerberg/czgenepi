@@ -4,7 +4,7 @@ import {
   fontCapsXxs,
   fontHeaderXl,
   getColors,
-  getSpacings,
+  getSpaces,
 } from "czifui";
 import FilePicker from "src/components/FilePicker";
 import { marginBottom } from "../common/style";
@@ -15,46 +15,46 @@ export const SemiBold = styled.span`
 
 export const StyledButton = styled(Button)`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
     return `
-      margin-right: ${spacings?.s}px;
+      margin-right: ${spaces?.s}px;
     `;
   }}
 `;
 
 export const StyledFilePicker = styled(FilePicker)`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
     return `
-      margin-right: ${spacings?.m}px;
-      margin-bottom: ${spacings?.s}px;
-      margin-top: ${spacings?.xl}px;
+      margin-right: ${spaces?.m}px;
+      margin-bottom: ${spaces?.s}px;
+      margin-top: ${spaces?.xl}px;
     `;
   }}
 `;
 
 export const StyledContainerLeft = styled.div`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
     return `
       flex: 1;
       display: flex;
       align-items: center;
       justify-content: left;
-      margin-bottom: ${spacings?.xs};
+      margin-bottom: ${spaces?.xs};
   `;
   }}
 `;
 
 export const StyledContainerSpaceBetween = styled.div`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
     return `
       flex: 1;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: ${spacings?.m};
+      margin-bottom: ${spaces?.m};
     `;
   }}
 `;
@@ -62,12 +62,12 @@ export const StyledContainerSpaceBetween = styled.div`
 export const StyledInstructionsButton = styled(Button)`
   ${fontCapsXxs}
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
     const colors = getColors(props);
     return `
-      margin-right: ${spacings?.s}px;
-      margin-left: ${spacings?.m}px;
-      margin-top: ${spacings?.s}px;
+      margin-right: ${spaces?.s}px;
+      margin-left: ${spaces?.m}px;
+      margin-top: ${spaces?.s}px;
       &:hover {
         background-color: transparent;
         color: ${colors?.primary[500]};
@@ -79,11 +79,11 @@ export const StyledInstructionsButton = styled(Button)`
 export const StyledRemoveAllButton = styled(Button)`
   ${fontCapsXxs}
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
     const colors = getColors(props);
     return `
-      margin-right: ${spacings?.s}px;
-      margin-left: ${spacings?.s}px;
+      margin-right: ${spaces?.s}px;
+      margin-left: ${spaces?.s}px;
       &:hover {
         background-color: transparent;
         color: ${colors?.primary[500]};
@@ -94,12 +94,12 @@ export const StyledRemoveAllButton = styled(Button)`
 
 export const StyledUploadCount = styled.span`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
     return `
     font-weight: 600;
     display: block;
-    margin-bottom: ${spacings?.xl}px;
-    margin-top: ${spacings?.xl}px;
+    margin-bottom: ${spaces?.xl}px;
+    margin-top: ${spaces?.xl}px;
     `;
   }}
 `;

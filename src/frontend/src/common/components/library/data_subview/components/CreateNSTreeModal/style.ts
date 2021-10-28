@@ -15,7 +15,7 @@ import {
   getColors,
   getFontWeights,
   getIconSizes,
-  getSpacings,
+  getSpaces,
   Props,
   Tooltip,
 } from "czifui";
@@ -35,19 +35,19 @@ export const Title = styled.span`
   ${fontBodyS}
   ${(props) => {
     const colors = getColors(props);
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
     return `
       color: ${colors?.gray[500]};
-      margin-bottom: ${spacings?.l}px;
+      margin-bottom: ${spaces?.l}px;
     `;
   }}
 `;
 
 export const StyledDialogTitle = styled(DialogTitle)`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
     return `
-      padding-bottom: ${spacings?.l}px;
+      padding-bottom: ${spaces?.l}px;
     `;
   }}
 `;
@@ -56,9 +56,9 @@ export const StyledTextField = styled(TextField)`
   color: black;
   padding: 0px;
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
     return `
-      padding-bottom: ${spacings?.s}px;
+      padding-bottom: ${spaces?.s}px;
     `;
   }}
 `;
@@ -67,9 +67,9 @@ export const FieldTitle = styled.div`
   ${fontHeaderXs}
   color: black;
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
     return `
-      margin-bottom: ${spacings?.xxs}px;
+      margin-bottom: ${spaces?.xxs}px;
     `;
   }}
 `;
@@ -78,10 +78,10 @@ export const StyledInstructions = styled(Instructions)`
   border-radius: 4px;
   color: black;
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
     return `
-      margin-bottom: ${spacings?.xs}px;
-      padding: ${spacings?.l}px;
+      margin-bottom: ${spaces?.xs}px;
+      padding: ${spaces?.l}px;
     `;
   }}
 `;
@@ -91,10 +91,10 @@ export const InstructionsSemiBold = styled.span`
   ${fontBodyXs}
   ${(props: Props) => {
     const fontWeights = getFontWeights(props);
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
     return `
       font-weight: ${fontWeights?.semibold};
-      margin-bottom: ${spacings?.xxxs};
+      margin-bottom: ${spaces?.xxxs};
     `;
   }}
 `;
@@ -108,11 +108,11 @@ export const StyledInstructionsButton = styled(Button)`
   ${fontCapsXxxs}
   padding-left: 0px;
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
     const colors = getColors(props);
     return `
-      margin-left: ${spacings?.m}px;
-      padding-top: ${spacings?.xxs}px;
+      margin-left: ${spaces?.m}px;
+      padding-top: ${spaces?.xxs}px;
       &:hover {
         background-color: transparent;
         color: ${colors?.primary[500]};
@@ -127,9 +127,9 @@ export const StyledRadio = styled(Radio)`
   width: 20px;
   ${(props) => {
     const colors = getColors(props);
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
     return `
-      margin-right: ${spacings?.s}px;
+      margin-right: ${spaces?.s}px;
       color: ${colors?.gray[400]};
       &.Mui-checked {
         color: ${colors?.primary[500]};
@@ -143,10 +143,10 @@ export const StyledRadio = styled(Radio)`
 
 export const TreeTypeSection = styled.div`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
     return `
-      margin-top: ${spacings?.s}px;
-      margin-bottom: ${spacings?.s}px;
+      margin-top: ${spaces?.s}px;
+      margin-bottom: ${spaces?.s}px;
     `;
   }}
 `;
@@ -161,10 +161,10 @@ export const TreeNameTooLongAlert = styled.div`
   display: flex;
   align-items: center;
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
     return `
-      margin-top: ${spacings?.xxxs}px;
-      margin-bottom: ${spacings?.xl}px;
+      margin-top: ${spaces?.xxxs}px;
+      margin-bottom: ${spaces?.xl}px;
     `;
   }}
 `;
@@ -173,20 +173,20 @@ export const CreateTreeInfo = styled.div`
   ${fontBodyXxs}
   ${(props) => {
     const colors = getColors(props);
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
     return `
       color: ${colors?.gray[400]};
-      margin-top: ${spacings?.l}px;
+      margin-top: ${spaces?.l}px;
     `;
   }}
 `;
 
 export const StyledButton = styled(Button)`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
     const colors = getColors(props);
     return `
-      margin-top: ${spacings?.xxl}px;
+      margin-top: ${spaces?.xxl}px;
       &:active {
         background-color: ${colors?.gray[400]};
       }
@@ -196,9 +196,9 @@ export const StyledButton = styled(Button)`
 
 export const StyledTooltip = styled(Tooltip)`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
     return `
-      margin-left: ${spacings?.xxs}px;
+      margin-left: ${spaces?.xxs}px;
     `;
   }}
 `;
@@ -231,10 +231,10 @@ export const StyledErrorOutlinedIcon = styled(ErrorOutlineIcon)`
   ${(props) => {
     const colors = getColors(props);
     const iconSizes = getIconSizes(props);
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
     return `
       color: ${colors?.error[400]};
-      margin-right: ${spacings?.xs}px;
+      margin-right: ${spaces?.xs}px;
       height: ${iconSizes?.s.height}px;
       width: ${iconSizes?.s.width}px;
     `;
@@ -249,15 +249,15 @@ export const StyledFormControlLabel = styled(FormControlLabel)`
   margin-right: 0px;
   ${(props) => {
     const colors = getColors(props);
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
     const checked = props.checked;
     return `
       &:hover {
         background-color: ${colors?.gray[100]};
       }
       background-color: ${checked ? colors?.gray[100] : "transparent"};
-      margin-bottom: ${spacings?.s}px;
-      padding: ${spacings?.l}px;
+      margin-bottom: ${spaces?.s}px;
+      padding: ${spaces?.l}px;
     `;
   }}
 `;
