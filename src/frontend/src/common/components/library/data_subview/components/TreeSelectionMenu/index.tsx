@@ -5,15 +5,18 @@ import { IconButton } from "../IconButton";
 import { StyledTreeBuildDisabledImage, StyledTreeBuildImage } from "./style";
 
 interface Props {
-  isDisabled: boolean;
   handleCreateNSTreeOpen: () => void;
   handleCreateUsherTreeOpen: () => void;
+  // TODO (mlila): remove isMenuDisabled when gisaidIngest feature turned on
+  isMenuDisabled: boolean;
+  isUsherDisabled: boolean;
 }
 
 const TreeSelectionMenu = ({
-  isDisabled,
   handleCreateNSTreeOpen,
   handleCreateUsherTreeOpen,
+  isMenuDisabled,
+  isUsherDisabled,
 }: Props): JSX.Element => {
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 
@@ -50,7 +53,7 @@ const TreeSelectionMenu = ({
     <>
       <IconButton
         onClick={handleClick}
-        disabled={isDisabled}
+        disabled={isMenuDisabled}
         svgDisabled={<StyledTreeBuildDisabledImage />}
         svgEnabled={<StyledTreeBuildImage />}
         tooltipTextDisabled={TREE_BUILD_TOOLTIP_TEXT(true)}
@@ -74,7 +77,7 @@ const TreeSelectionMenu = ({
         <MenuItem onClick={handleClickNS}>
           Nextstrain Phylogenetic Tree
         </MenuItem>
-        <MenuItem onClick={handleClickUsher}>
+        <MenuItem onClick={handleClickUsher} disabled={isUsherDisabled}>
           UShER Phylogenetic Placement
         </MenuItem>
       </Menu>

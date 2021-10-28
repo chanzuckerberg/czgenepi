@@ -11,6 +11,7 @@ import { Input } from "semantic-ui-react";
 import { DataTable } from "src/common/components";
 import { VIEWNAME } from "src/common/constants/types";
 import { ROUTES } from "src/common/routes";
+import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import { AfterModalAlert } from "./components/AfterModalAlert";
 import { CreateNSTreeModal } from "./components/CreateNSTreeModal";
 import DownloadModal from "./components/DownloadModal";
@@ -143,7 +144,9 @@ const DataSubview: FunctionComponent<Props> = ({
   const [showCheckboxes, setShowCheckboxes] = useState<boolean>(false);
   const [isDownloadModalOpen, setDownloadModalOpen] = useState(false);
   const [isDownloadDisabled, setDownloadDisabled] = useState<boolean>(true);
-  const [isCreateTreeDisabled, setCreateTreeDisabled] = useState<boolean>(true);
+  const [isCreateTreeDisabled, setCreateTreeDisabled] = useState<boolean>(
+    !usesFeatureFlag(FEATURE_FLAGS.gisaidIngest)
+  );
   const [failedSamples, setFailedSamples] = useState<string[]>([]);
   const [downloadFailed, setDownloadFailed] = useState<boolean>(false);
   const [isNSCreateTreeModalOpen, setIsNSCreateTreeModalOpen] =
@@ -198,7 +201,9 @@ const DataSubview: FunctionComponent<Props> = ({
     const numberCheckedSamples = checkedSamples.length;
     if (numberCheckedSamples === 0) {
       setDownloadDisabled(true);
-      setCreateTreeDisabled(true);
+      if (!usesFeatureFlag(FEATURE_FLAGS.gisaidIngest)) {
+        setCreateTreeDisabled(true);
+      }
     } else {
       setDownloadDisabled(false);
       if (numberCheckedSamples > 2000) {
@@ -287,9 +292,11 @@ const DataSubview: FunctionComponent<Props> = ({
           <StyledDiv>Selected </StyledDiv>
           <Divider />
           <TreeSelectionMenu
-            isDisabled={isCreateTreeDisabled}
             handleCreateNSTreeOpen={handleCreateNSTreeOpen}
             handleCreateUsherTreeOpen={() => setShouldStartUsherFlow(true)}
+            // TODO (mlila): remove isMenuDisabled when gisaidIngest feature turned on
+            isMenuDisabled={isCreateTreeDisabled}
+            isUsherDisabled={usesFeatureFlag(FEATURE_FLAGS.gisaidIngest)}
           />
           <IconButton
             onClick={handleDownloadClickOpen}
