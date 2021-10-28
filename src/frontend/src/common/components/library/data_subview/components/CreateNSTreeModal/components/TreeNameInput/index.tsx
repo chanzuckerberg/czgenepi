@@ -16,18 +16,33 @@ import {
 
 interface Props {
   setTreeName(): void;
+  shouldReset?: boolean;
   treeName?: string;
 }
 
-const TreeNameInput = ({ setTreeName, treeName }: Props): JSX.Element => {
+const TreeNameInput = ({
+  setTreeName,
+  shouldReset,
+  treeName,
+}: Props): JSX.Element => {
   const [areInstructionsShown, setInstructionsShown] = useState<boolean>(false);
   const [isTreeNameTooLong, setTreeNameTooLong] = useState<boolean>(false);
 
+  // form closed or cleared
+  useEffect(() => {
+    if (shouldReset) {
+      setInstructionsShown(false);
+      setTreeNameTooLong(false);
+    }
+  }, [shouldReset]);
+
+  // show name errors
   useEffect(() => {
     const isNameTooLong = treeName?.length > 128;
     setTreeNameTooLong(isNameTooLong);
   }, [treeName]);
 
+  // toggle instructions
   const handleInstructionsClick = function () {
     setInstructionsShown((prevState: boolean) => !prevState);
   };

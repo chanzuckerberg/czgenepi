@@ -10,7 +10,7 @@ import {
   getSpaces,
   Props,
 } from "czifui";
-import Instructions from "src/components/CollapsibleInstructions/components/Instructions";
+import Instructions from "src/components/Instructions";
 
 export const StyledInstructions = styled(Instructions)`
   border-radius: 4px;

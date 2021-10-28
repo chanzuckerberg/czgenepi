@@ -52,16 +52,20 @@ export const CreateNSTreeModal = ({
 }: Props): JSX.Element => {
   const [treeName, setTreeName] = useState<string>("");
   const [isTreeBuildDisabled, setTreeBuildDisabled] = useState<boolean>(false);
+  const [shouldReset, setShouldReset] = useState<boolean>(false);
   const [treeType, setTreeType] = useState<TreeType>("TARGETED");
   // comment back in when ready to use validation endpoint
   // const [sampleIdsToValidate, setSampleIdsToValidate] = useState<string[]>([]);
   // const [missingSampleIdentifiers, setMissingSampleIdentifiers] = useState<string[]>([]);
 
+  useEffect(() => {
+    if (shouldReset) setShouldReset(false);
+  }, [shouldReset]);
+
   const clearState = function () {
+    setShouldReset(true);
     setTreeName("");
     setTreeType("TARGETED");
-    setInstructionsShown(false);
-    setTreeNameTooLong(false);
   };
 
   const handleClose = function () {
@@ -71,13 +75,9 @@ export const CreateNSTreeModal = ({
 
   useEffect(() => {
     const treeNameLength = treeName.length;
-    if (treeNameLength > 128) {
-      setTreeNameTooLong(true);
-      setTreeBuildDisabled(true);
-    } else if (treeNameLength === 0) {
+    if (treeNameLength > 128 || treeNameLength === 0) {
       setTreeBuildDisabled(true);
     } else {
-      setTreeNameTooLong(false);
       if (treeType === "TARGETED" || treeType === "NON_CONTEXTUALIZED") {
         setTreeBuildDisabled(false);
       } else {
