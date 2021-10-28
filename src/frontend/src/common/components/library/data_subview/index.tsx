@@ -10,6 +10,7 @@ import { Input } from "semantic-ui-react";
 import { DataTable } from "src/common/components";
 import { VIEWNAME } from "src/common/constants/types";
 import { ROUTES } from "src/common/routes";
+import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import Notification from "src/components/Notification";
 import { CreateNSTreeModal } from "./components/CreateNSTreeModal";
 import DownloadModal from "./components/DownloadModal";
@@ -141,8 +142,6 @@ const DataSubview: FunctionComponent<Props> = ({
   const [checkedSamples, setCheckedSamples] = useState<string[]>([]);
   const [showCheckboxes, setShowCheckboxes] = useState<boolean>(false);
   const [isDownloadModalOpen, setDownloadModalOpen] = useState(false);
-  const [isDownloadDisabled, setDownloadDisabled] = useState<boolean>(true);
-  const [isCreateTreeDisabled, setCreateTreeDisabled] = useState<boolean>(true);
   const [failedSamples, setFailedSamples] = useState<string[]>([]);
   const [downloadFailed, setDownloadFailed] = useState<boolean>(false);
   const [isNSCreateTreeModalOpen, setIsNSCreateTreeModalOpen] =
@@ -191,22 +190,6 @@ const DataSubview: FunctionComponent<Props> = ({
       setShowCheckboxes(true);
     }
   }, [viewName]);
-
-  useEffect(() => {
-    // disable sample download if no samples are selected
-    const numberCheckedSamples = checkedSamples.length;
-    if (numberCheckedSamples === 0) {
-      setDownloadDisabled(true);
-      setCreateTreeDisabled(true);
-    } else {
-      setDownloadDisabled(false);
-      if (numberCheckedSamples > 2000) {
-        setCreateTreeDisabled(true);
-      } else {
-        setCreateTreeDisabled(false);
-      }
-    }
-  }, [checkedSamples]);
 
   useEffect(() => {
     // if there is an error then close the modal.
@@ -281,6 +264,13 @@ const DataSubview: FunctionComponent<Props> = ({
     </span>
   );
 
+  const numCheckedSamples = checkedSamples?.length;
+  const hasCheckedSamples = numCheckedSamples > 0;
+  const hasTooManyCheckedSamples = numCheckedSamples > 2000;
+  const isTreeMenuActive =
+    (hasCheckedSamples && !hasTooManyCheckedSamples) ||
+    usesFeatureFlag(FEATURE_FLAGS.gisaidIngest);
+
   const render = (tableData?: TableItem[]) => {
     let downloadButton: JSX.Element | null = null;
     if (viewName === VIEWNAME.SAMPLES && tableData !== undefined) {
@@ -290,13 +280,17 @@ const DataSubview: FunctionComponent<Props> = ({
           <StyledDiv>Selected </StyledDiv>
           <Divider />
           <TreeSelectionMenu
-            isDisabled={isCreateTreeDisabled}
             handleCreateNSTreeOpen={handleCreateNSTreeOpen}
             handleCreateUsherTreeOpen={() => setShouldStartUsherFlow(true)}
+            // TODO (mlila): remove isMenuDisabled when gisaidIngest feature turned on
+            isMenuDisabled={!isTreeMenuActive}
+            isUsherDisabled={
+              usesFeatureFlag(FEATURE_FLAGS.gisaidIngest) && !hasCheckedSamples
+            }
           />
           <IconButton
             onClick={handleDownloadClickOpen}
-            disabled={isDownloadDisabled}
+            disabled={!hasCheckedSamples}
             svgDisabled={<StyledDownloadDisabledImage />}
             svgEnabled={<StyledDownloadImage />}
             tooltipTextDisabled={DOWNLOAD_TOOLTIP_TEXT_DISABLED}
