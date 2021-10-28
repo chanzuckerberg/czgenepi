@@ -1,20 +1,67 @@
+# Revs should probably match what is specified in the project dependencies
 repos:
   - repo: https://github.com/PyCQA/isort
-    rev: 5.7.0
+    rev: 5.9.3
     hooks:
       - id: isort
-        language_version: python3.7
+        args: [--profile=black]
+        files: ^src/backend/
+        exclude: ^src/backend/third-party/
+        types: [file, python]
   - repo: https://github.com/psf/black
-    rev: stable
+    rev: 21.9b0
     hooks:
       - id: black
-        language_version: python3.7
+        files: ^src/backend/
+        exclude: ^src/backend/third-party/
+        types: [file, python]
+  - repo: https://github.com/myint/autoflake
+    rev: v1.4
+    hooks:
+      - id: autoflake
+        files: ^src/backend/
+        exclude: ^src/backend/third-party/
+        types: [file, python]
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v7.11.0
+    hooks:
+      - id: eslint
+        additional_dependencies: 
+          - eslint-config-prettier
+          - eslint-plugin-jest-playwright
+          - eslint-plugin-prettier
+          - eslint-plugin-sonarjs
+          - eslint-plugin-flowtype
+          - eslint-plugin-import
+          - eslint-plugin-jest
+          - eslint-plugin-jsx-a11y
+          - eslint-plugin-react
+          - eslint-plugin-react-hooks
+          - eslint-plugin-testing-library
+          - eslint-webpack-plugin
+          - babel-eslint
+          - '@typescript-eslint/parser'
+          - '@typescript-eslint/eslint-plugin'
+        args: [--quiet, --fix, --config=./src/frontend/.eslintrc.js]
+        files: ^src/frontend/
+        exclude: |
+          (?x)^(
+                src/frontend/node_modules/|
+                src/frontend/build
+            )$
+        types_or: [ts, tsx]
   - repo: local
     hooks:
-    - id: prettier
-      name: prettier
-      language: system
-      types_or: [javascript,jsx,ts,tsx,markdown,html,scss,css,yaml]
-      files: ^src/frontend/src
-      entry: npx prettier --write
-
+      - id: stylelint
+        name: stylelint
+        entry: stylelint
+        language: node
+        additional_dependencies: ['stylelint', 'stylelint-config-recommended', 'stylelint-config-standard', 'stylelint-scss']
+        args: [--fix, --config=./src/frontend/.stylelintrc.json]
+        files: ^src/frontend/
+        exclude: |
+          (?x)^(
+                src/frontend/node_modules/|
+                src/frontend/build
+            )$
+        types_or: [javascript,jsx,ts,tsx,css,scss]
