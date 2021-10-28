@@ -33,12 +33,13 @@ Both the frontend and backend services will automatically reload when their sour
 To update frontend changes:
 
 1. add dependency to [src/frontend/package.json](src/frontend/package.json) (or add a new scripts command)
+2. run `make local-update-frontend-deps` (updates package-lock.json)
 2. run `make local-sync`
 
 To update backend dependencies:
 
 1. add the dependency to [src/backend/Pipfile](src/backend/Pipfile)
-2. run `make local-update-deps` (updates Pipfile.lock and updates requirements)
+2. run `make local-update-backend-deps` (updates Pipfile.lock and updates requirements)
 3. run `make local-sync` (rebuilds and initializes containers with new dependency)
 
 ### Update Dev Data
@@ -98,3 +99,22 @@ self-signed cert in for convenience.
 #### Configuring Pycharm with Docker Compose:
 
 Follow the instructions in [the wiki](https://czi.atlassian.net/wiki/spaces/SI/pages/1801100933/PyCharm+configuration+for+Happy+Path)
+
+
+#### Quickstart setup from scratch:
+
+* [Install docker](https://www.docker.com/products/docker-desktop)
+* [Install homebrew](https://docs.brew.sh/Installation)
+
+```
+brew install awscli jq
+brew tap chanzuckerberg/tap
+brew install aws-oidc
+mkdir -p ~/.aws  # Temp workaround for aws-oidc bug.
+touch ~/.aws/config  # Temp workaround for aws-oidc bug.
+aws-oidc configure --issuer-url https://czi-prod.okta.com --client-id aws-config --config-url https://aws-config-generation.staging.si.czi.technology # Just use the defaults
+git clone git@github.com:chanzuckerberg/aspen.git
+cd aspen
+/usr/bin/env/python3 -m pip install .happy/requirements.txt
+make local-init
+```

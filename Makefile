@@ -111,6 +111,8 @@ init-empty-db:
 .PHONY: local-init
 local-init: oauth/pkcs12/certificate.pfx .env.ecr local-ecr-login local-hostconfig ## Launch a new local dev env and populate it with test data.
 	docker-compose $(COMPOSE_OPTS) up -d database frontend backend localstack oidc utility
+	# Wait for psql to be up
+	while [ -z "$$(docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c 'select 1')" ]; do echo "waiting for db to start..."; sleep 1; done;
 	@docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c "alter user $(LOCAL_DB_ADMIN_USERNAME) with password '$(LOCAL_DB_ADMIN_PASSWORD)';"
 	docker-compose exec -T utility $(BACKEND_APP_ROOT)/scripts/setup_dev_data.sh
 	docker-compose exec -T utility alembic upgrade head
@@ -201,9 +203,13 @@ local-dbconsole: ## Connect to the local postgres database.
 local-dbconsole-profile: ## Connect to the local postgres database and profile queries.
 	docker-compose exec utility aspen-cli db --local interact --profile
 
-.PHONY: local-update-deps
-local-update-deps: ## Update poetry.lock to reflect pyproject.toml file changes.
+.PHONY: local-update-backend-deps
+local-update-backend-deps: ## Update poetry.lock to reflect pyproject.toml file changes.
 	docker-compose exec utility /opt/poetry/bin/poetry update
+
+.PHONY: local-update-frontend-deps
+local-update-frontend-deps: ## Update package-lock.json to reflect package.json file changes.
+	docker-compose exec frontend npm install
 
 ### ACCESSING CONTAINER MAKE COMMANDS ###################################################
 utility-%: ## Run make commands in the utility container (src/backend/Makefile)

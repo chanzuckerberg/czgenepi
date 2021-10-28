@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.api.auth import get_auth_user, setup_userinfo
 from aspen.api.deps import get_db
+from aspen.api.error import http_exceptions as ex
 from aspen.api.main import get_app
 from aspen.database import connection as aspen_connection
 from aspen.database import schema
@@ -102,7 +103,7 @@ async def override_get_auth_user(
 ) -> None:
     found_auth_user = await setup_userinfo(session, request.headers.get("user_id"))
     if not found_auth_user:
-        raise Exception("invalid user")
+        raise ex.UnauthorizedException("invalid user")
     request.state.auth_user = found_auth_user
 
 
