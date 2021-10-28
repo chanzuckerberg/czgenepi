@@ -1,11 +1,6 @@
-import { Alert } from "czifui";
 import React from "react";
 import { pluralize } from "src/common/utils/strUtils";
-import {
-  AlertInstructionsNotSemiBold,
-  AlertInstructionsSemiBold,
-  StyledWarningIcon,
-} from "./style";
+import { SemiBold, StyledCallout } from "./style";
 
 interface Props {
   numFailedSamples: number;
@@ -15,17 +10,15 @@ const FailedSampleAlert = ({ numFailedSamples }: Props): JSX.Element | null => {
   if (numFailedSamples <= 0) return null;
 
   return (
-    <Alert icon={<StyledWarningIcon />} severity="warning">
-      <AlertInstructionsSemiBold>
+    <StyledCallout intent="warning">
+      <SemiBold>
         {" "}
         {numFailedSamples} Selected {pluralize("Sample", numFailedSamples)}
         {" won't "}
         be included in your tree{" "}
-      </AlertInstructionsSemiBold>
-      <AlertInstructionsNotSemiBold>
-        because they failed genome recovery.
-      </AlertInstructionsNotSemiBold>
-    </Alert>
+      </SemiBold>
+      because they failed genome recovery.
+    </StyledCallout>
   );
 };
 

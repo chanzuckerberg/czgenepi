@@ -17,6 +17,10 @@ interface FlagsObj {
 
 // we can add more keys to each flag as needed
 export const FEATURE_FLAGS: FlagsObj = {
+  gisaidIngest: {
+    isDisabled: false,
+    key: "gisaidIngest",
+  },
   mayasFlag: {
     isDisabled: true,
     key: "mayasFlag",

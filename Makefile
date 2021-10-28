@@ -203,9 +203,13 @@ local-dbconsole: ## Connect to the local postgres database.
 local-dbconsole-profile: ## Connect to the local postgres database and profile queries.
 	docker-compose exec utility aspen-cli db --local interact --profile
 
-.PHONY: local-update-deps
-local-update-deps: ## Update poetry.lock to reflect pyproject.toml file changes.
+.PHONY: local-update-backend-deps
+local-update-backend-deps: ## Update poetry.lock to reflect pyproject.toml file changes.
 	docker-compose exec utility /opt/poetry/bin/poetry update
+
+.PHONY: local-update-frontend-deps
+local-update-frontend-deps: ## Update package-lock.json to reflect package.json file changes.
+	docker-compose exec frontend npm install
 
 ### ACCESSING CONTAINER MAKE COMMANDS ###################################################
 utility-%: ## Run make commands in the utility container (src/backend/Makefile)

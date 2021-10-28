@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
+import Notification from "src/components/Notification";
 import { StyledNewTabLink } from "../../style";
-import { AfterModalAlert } from "../AfterModalAlert";
 import { UsherConfirmationModal } from "./components/UsherConfirmationModal";
 import { UsherPlacementModal } from "./components/UsherPlacementModal";
 
@@ -83,21 +83,19 @@ const UsherTreeFlow = ({
         onConfirm={handleConfirmationConfirm}
       />
       {isAlertShown && (
-        <AfterModalAlert
-          alertClassName="elevated"
-          alertSeverity="info"
-          lightText={
-            <>
-              Your samples were successfuly sent to UShER. It may take a few
-              minutes for your placement to load.{" "}
-              <StyledNewTabLink href={usherLink}>
-                View your placement
-              </StyledNewTabLink>
-              .
-            </>
-          }
-          handleDismiss={handleAlertClose}
-        />
+        <Notification
+          buttonOnClick={handleAlertClose}
+          buttonText="DISMISS"
+          dismissDirection="right"
+          intent="info"
+        >
+          Your samples were successfuly sent to UShER. It may take a few minutes
+          for your placement to load.{" "}
+          <StyledNewTabLink href={usherLink}>
+            View your placement
+          </StyledNewTabLink>
+          .
+        </Notification>
       )}
     </>
   );

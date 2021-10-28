@@ -1,4 +1,3 @@
-import { Fade } from "@material-ui/core";
 import { escapeRegExp } from "lodash/fp";
 import NextLink from "next/link";
 import React, {
@@ -11,7 +10,8 @@ import { Input } from "semantic-ui-react";
 import { DataTable } from "src/common/components";
 import { VIEWNAME } from "src/common/constants/types";
 import { ROUTES } from "src/common/routes";
-import { AfterModalAlert } from "./components/AfterModalAlert";
+import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
+import Notification from "src/components/Notification";
 import { CreateNSTreeModal } from "./components/CreateNSTreeModal";
 import DownloadModal from "./components/DownloadModal";
 import { IconButton } from "./components/IconButton";
@@ -20,7 +20,7 @@ import { TreeSelectionMenu } from "./components/TreeSelectionMenu";
 import { UsherTreeFlow } from "./components/UsherTreeFlow";
 import style from "./index.module.scss";
 import {
-  CreateTreeModalDiv,
+  BoldText,
   Divider,
   DownloadWrapper,
   StyledButton,
@@ -142,8 +142,6 @@ const DataSubview: FunctionComponent<Props> = ({
   const [checkedSamples, setCheckedSamples] = useState<string[]>([]);
   const [showCheckboxes, setShowCheckboxes] = useState<boolean>(false);
   const [isDownloadModalOpen, setDownloadModalOpen] = useState(false);
-  const [isDownloadDisabled, setDownloadDisabled] = useState<boolean>(true);
-  const [isCreateTreeDisabled, setCreateTreeDisabled] = useState<boolean>(true);
   const [failedSamples, setFailedSamples] = useState<string[]>([]);
   const [downloadFailed, setDownloadFailed] = useState<boolean>(false);
   const [isNSCreateTreeModalOpen, setIsNSCreateTreeModalOpen] =
@@ -194,22 +192,6 @@ const DataSubview: FunctionComponent<Props> = ({
   }, [viewName]);
 
   useEffect(() => {
-    // disable sample download if no samples are selected
-    const numberCheckedSamples = checkedSamples.length;
-    if (numberCheckedSamples === 0) {
-      setDownloadDisabled(true);
-      setCreateTreeDisabled(true);
-    } else {
-      setDownloadDisabled(false);
-      if (numberCheckedSamples > 2000) {
-        setCreateTreeDisabled(true);
-      } else {
-        setCreateTreeDisabled(false);
-      }
-    }
-  }, [checkedSamples]);
-
-  useEffect(() => {
     // if there is an error then close the modal.
     if (downloadFailed) {
       setDownloadModalOpen(false);
@@ -233,12 +215,6 @@ const DataSubview: FunctionComponent<Props> = ({
   function handleCreateTreeStartedModalClose() {
     setCreateTreeStarted(false);
   }
-
-  useEffect(() => {
-    setTimeout(() => {
-      setCreateTreeStarted(false);
-    }, 12000);
-  }, [hasCreateTreeStarted]);
 
   const onChange = (
     _event: React.ChangeEvent<HTMLInputElement>,
@@ -278,6 +254,23 @@ const DataSubview: FunctionComponent<Props> = ({
     </div>
   );
 
+  const CONTACT_US = (
+    <span>
+      Please try again later or{" "}
+      <StyledNewTabLink href="mailto:aspenprivacy@chanzuckerberg.com">
+        contact us
+      </StyledNewTabLink>{" "}
+      for help.
+    </span>
+  );
+
+  const numCheckedSamples = checkedSamples?.length;
+  const hasCheckedSamples = numCheckedSamples > 0;
+  const hasTooManyCheckedSamples = numCheckedSamples > 2000;
+  const isTreeMenuActive =
+    (hasCheckedSamples && !hasTooManyCheckedSamples) ||
+    usesFeatureFlag(FEATURE_FLAGS.gisaidIngest);
+
   const render = (tableData?: TableItem[]) => {
     let downloadButton: JSX.Element | null = null;
     if (viewName === VIEWNAME.SAMPLES && tableData !== undefined) {
@@ -287,13 +280,17 @@ const DataSubview: FunctionComponent<Props> = ({
           <StyledDiv>Selected </StyledDiv>
           <Divider />
           <TreeSelectionMenu
-            isDisabled={isCreateTreeDisabled}
             handleCreateNSTreeOpen={handleCreateNSTreeOpen}
             handleCreateUsherTreeOpen={() => setShouldStartUsherFlow(true)}
+            // TODO (mlila): remove isMenuDisabled when gisaidIngest feature turned on
+            isMenuDisabled={!isTreeMenuActive}
+            isUsherDisabled={
+              usesFeatureFlag(FEATURE_FLAGS.gisaidIngest) && !hasCheckedSamples
+            }
           />
           <IconButton
             onClick={handleDownloadClickOpen}
-            disabled={isDownloadDisabled}
+            disabled={!hasCheckedSamples}
             svgDisabled={<StyledDownloadDisabledImage />}
             svgEnabled={<StyledDownloadImage />}
             tooltipTextDisabled={DOWNLOAD_TOOLTIP_TEXT_DISABLED}
@@ -349,75 +346,54 @@ const DataSubview: FunctionComponent<Props> = ({
             <div>
               {viewName === VIEWNAME.TREES && <TreeCreateHelpLink />}
               {downloadButton}
-              {downloadFailed && (
-                <AfterModalAlert
-                  alertClassName="elevated"
-                  alertSeverity="error"
-                  boldText={
-                    "Something went wrong and we were unable to complete one or more of your downloads"
-                  }
-                  lightText={
-                    <>
-                      Please try again later or{" "}
-                      <StyledNewTabLink href="mailto:aspenprivacy@chanzuckerberg.com">
-                        contact us
-                      </StyledNewTabLink>{" "}
-                      for help.
-                    </>
-                  }
-                  handleDismiss={handleDismissDownloadErrorClick}
-                />
-              )}
-              {didCreateTreeFailed && (
-                <AfterModalAlert
-                  alertClassName="elevated"
-                  alertSeverity="error"
-                  boldText={
-                    "Something went wrong and we were unable to start your tree build"
-                  }
-                  lightText={
-                    <>
-                      Please try again later or{" "}
-                      <StyledNewTabLink href="mailto:aspenprivacy@chanzuckerberg.com">
-                        contact us
-                      </StyledNewTabLink>{" "}
-                      for help.
-                    </>
-                  }
-                  handleDismiss={handleDismissCreateTreeErrorClick}
-                />
-              )}
-              <Fade
-                in={hasCreateTreeStarted}
-                appear={false}
-                enter={false}
-                timeout={1000}
-                unmountOnExit={true}
+              <Notification
+                buttonOnClick={handleDismissDownloadErrorClick}
+                buttonText="DISMISS"
+                dismissDirection="right"
+                dismissed={!downloadFailed}
+                intent="error"
               >
-                <div>
-                  <AfterModalAlert
-                    alertClassName="elevated"
-                    alertSeverity={"info"}
-                    lightText={
-                      <CreateTreeModalDiv>
-                        Your tree is being created. It may take up to 12 hours
-                        to process. To check your tree’s status, visit the
-                        Phylogenetic Tree page.
-                        <NextLink href={ROUTES.PHYLO_TREES} passHref>
-                          <a href="passRef">
-                            <StyledButton
-                              color="primary"
-                              onClick={handleCreateTreeStartedModalClose}
-                            >
-                              VIEW MY TREES
-                            </StyledButton>
-                          </a>
-                        </NextLink>
-                      </CreateTreeModalDiv>
-                    }
-                  />
-                </div>
-              </Fade>
+                <BoldText>
+                  Something went wrong and we were unable to complete one or
+                  more of your downloads
+                </BoldText>
+                {CONTACT_US}
+              </Notification>
+              <Notification
+                buttonOnClick={handleDismissCreateTreeErrorClick}
+                buttonText="DISMISS"
+                dismissDirection="right"
+                dismissed={!didCreateTreeFailed}
+                intent="error"
+              >
+                <BoldText>
+                  Something went wrong and we were unable to start your tree
+                  build
+                </BoldText>
+                {CONTACT_US}
+              </Notification>
+              <Notification
+                autoDismiss={12000}
+                dismissDirection="right"
+                dismissed={!hasCreateTreeStarted}
+                intent="info"
+              >
+                <span>
+                  Your tree is being created. It may take up to 12 hours to
+                  process. To check your tree’s status, visit the Phylogenetic
+                  Tree page.
+                </span>
+                <NextLink href={ROUTES.PHYLO_TREES} passHref>
+                  <a href="passRef">
+                    <StyledButton
+                      color="primary"
+                      onClick={handleCreateTreeStartedModalClose}
+                    >
+                      VIEW MY TREES
+                    </StyledButton>
+                  </a>
+                </NextLink>
+              </Notification>
             </div>
           </div>
           <div className={style.samplesTable}>

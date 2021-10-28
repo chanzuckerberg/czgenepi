@@ -24,6 +24,10 @@ interface SampleFastaDownloadPayload {
   };
 }
 
+interface ValidateSampleIdentifiersPayload {
+  sample_ids: string[];
+}
+
 export async function downloadSamplesFasta({
   sampleIds,
 }: {
@@ -37,6 +41,24 @@ export async function downloadSamplesFasta({
     body: JSON.stringify(payload),
   });
   if (response.ok) return await response.blob();
+
+  throw Error(`${response.statusText}: ${await response.text()}`);
+}
+
+export async function validateSampleIdentifiers({
+  sampleIdsToValidate,
+}: {
+  sampleIdsToValidate: string[];
+}): Promise<unknown> {
+  const payload: ValidateSampleIdentifiersPayload = {
+    sample_ids: sampleIdsToValidate,
+  };
+
+  const response = await fetch(API_URL + API.SAMPLES_VALIDATE_IDS, {
+    ...DEFAULT_POST_OPTIONS,
+    body: JSON.stringify(payload),
+  });
+  if (response.ok) return await response.json();
 
   throw Error(`${response.statusText}: ${await response.text()}`);
 }

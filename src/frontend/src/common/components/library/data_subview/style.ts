@@ -6,7 +6,7 @@ import {
   fontHeaderXs,
   getColors,
   getFontWeights,
-  getSpacings,
+  getSpaces,
 } from "czifui";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import DownloadImage from "src/common/icons/IconDownload.svg";
@@ -14,10 +14,10 @@ import DownloadImage from "src/common/icons/IconDownload.svg";
 export const StyledDiv = styled.div`
   ${fontHeaderXs}
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
     const fontWeights = getFontWeights(props);
     return `
-    margin-left: ${spacings?.m}px;
+    margin-left: ${spaces?.m}px;
     font-weight: ${fontWeights?.semibold};
     color: black;
     `;
@@ -28,10 +28,10 @@ export const Divider = styled.div`
   height: 28px;
 
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
     const colors = getColors(props);
     return `
-    margin-left: ${spacings?.xl}px;
+    margin-left: ${spaces?.xl}px;
     border-right: 1px solid ${colors?.gray[500]};
     `;
   }}
@@ -44,20 +44,15 @@ export const StyledButton = styled(Button)`
     background-color: transparent;
   }
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
     const fontWeights = getFontWeights(props);
     return `
       font-weight: ${fontWeights?.semibold};
-      margin-top: ${spacings?.xs}px;
+      margin-top: ${spaces?.xs}px;
       margin-left: 0px;
       padding-left: 0px;
     `;
   }}
-`;
-
-export const CreateTreeModalDiv = styled.div`
-  display: flex;
-  flex-direction: column;
 `;
 
 export const StyledChip = styled(Chip)`

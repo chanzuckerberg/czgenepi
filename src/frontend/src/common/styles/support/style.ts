@@ -8,7 +8,7 @@ import {
   fontHeaderXxl,
   getColors,
   getFontWeights,
-  getSpacings,
+  getSpaces,
 } from "czifui";
 
 export const NarrowContainer = styled.div`
@@ -82,11 +82,11 @@ export const IconButtonBubble = styled(Button)`
 
   ${(props) => {
     const colors = getColors(props);
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
     return `
       fill: ${colors?.gray[300]};
-      margin: ${spacings?.xxxs}px;
-      padding: ${spacings?.xs}px;
+      margin: ${spaces?.xxxs}px;
+      padding: ${spaces?.xs}px;
     `;
   }}
 `;

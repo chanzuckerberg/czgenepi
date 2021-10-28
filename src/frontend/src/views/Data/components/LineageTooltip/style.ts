@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { fontBodyXs, fontHeaderXs, getSpacings } from "czifui";
+import { fontBodyXs, fontHeaderXs, getSpaces } from "czifui";
 
 export const Wrapper = styled.div`
   display: flex;
@@ -10,10 +10,10 @@ export const Label = styled.span`
   ${fontHeaderXs}
 
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
 
     return `
-      margin-right: ${spacings?.m}px;
+      margin-right: ${spaces?.m}px;
     `;
   }}
 `;

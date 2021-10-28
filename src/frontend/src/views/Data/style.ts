@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { Chip, fontBodyXxs, getColors, getSpacings } from "czifui";
+import { Chip, fontBodyXxs, getColors, getSpaces } from "czifui";
 import { RowContent } from "src/common/components/library/data_table/style";
 import { PageContent } from "src/common/styles/mixins/global";
 
@@ -40,10 +40,10 @@ export const UnderlinedRowContent = styled(RowContent)`
 
 export const StyledChip = styled(Chip)`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
 
     return `
-      margin-top: ${spacings?.xxs}px;
+      margin-top: ${spaces?.xxs}px;
     `;
   }}
 `;

@@ -12,6 +12,7 @@ export enum API {
   CREATE_TREE = "/v2/phylo_runs/",
   GET_FASTA_URL = "/api/sequences/getfastaurl",
   USHER_TREE_OPTIONS = "/api/usher/tree_options",
+  SAMPLES_VALIDATE_IDS = "/api/samples/validate-ids",
 }
 
 export const DEFAULT_HEADERS_MUTATION_OPTIONS: RequestInit = {
