@@ -59,6 +59,9 @@ export const CreateNSTreeModal = ({
   const [isTreeBuildDisabled, setTreeBuildDisabled] = useState<boolean>(false);
   const [treeType, setTreeType] = useState<TreeType>("TARGETED");
   const [areInstructionsShown, setInstructionsShown] = useState<boolean>(false);
+  // comment back in when ready to use validation endpoint
+  // const [sampleIdsToValidate, setSampleIdsToValidate] = useState<string[]>([]);
+  // const [missingSampleIdentifiers, setMissingSampleIdentifiers] = useState<string[]>([]);
   useState<boolean>(false);
 
   const clearState = function () {
@@ -89,6 +92,20 @@ export const CreateNSTreeModal = ({
       }
     }
   }, [treeName, treeType]);
+
+  // Comment below back in when ready to use validation endpoint
+  // const validateSampleIdentifiersMutation = useMutation(
+  //   validateSampleIdentifiers,
+  //   {
+  //     onError: () => {
+  //       // placeholder
+  //     },
+  //     onSuccess: (data: any) => {
+  //       // set samples identifiers that were not found in the aspen database as missing
+  //       setMissingSampleIdentifiers(data["missing_sample_ids"]);
+  //     },
+  //   }
+  // );
 
   const mutation = useCreateTree({
     onError: () => {
@@ -231,6 +248,18 @@ export const CreateNSTreeModal = ({
           <CreateTreeInfo>
             Creating a new tree can take up to 12 hours.
           </CreateTreeInfo>
+          {/* 
+          Placeholder for when we add in actual id validation text box
+          <StyledButton
+            color="primary"
+            variant="contained"
+            isRounded
+            onClick={() => {
+              validateSampleIdentifiersMutation.mutate({ sampleIdsToValidate });
+            }}
+          >
+            test validate validateSampleIdentifiers
+          </StyledButton> */}
         </Content>
       </StyledDialogContent>
     </Dialog>

@@ -553,7 +553,7 @@ def update_sample_public_ids():
     return jsonify(success=True)
 
 
-@application.route("/api/samples/validate-ids")
+@application.route("/api/samples/validate-ids", methods=["POST"])
 @requires_auth
 def validate_ids():
     """
