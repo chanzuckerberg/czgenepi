@@ -1,6 +1,7 @@
+import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-import TextField from "@material-ui/core/TextField";
 import CloseIcon from "@material-ui/icons/Close";
+import ErrorOutlineOutlinedIcon from "@material-ui/icons/ErrorOutlineOutlined";
 import {
   Button,
   fontBodyXs,
@@ -8,6 +9,7 @@ import {
   fontHeaderM,
   fontHeaderXs,
   getColors,
+  getIconSizes,
   getSpaces,
   InputDropdown,
   List,
@@ -17,7 +19,6 @@ import {
   StyledDialogContent as DialogContent,
   StyledInfoOutlinedIcon as InfoIcon,
 } from "../../../CreateNSTreeModal/style";
-import { StyledWarningIcon as WarningIcon } from "../../../FailedSampleAlert/style";
 
 const INPUT_HEIGHT = "34px";
 
@@ -83,23 +84,30 @@ export const StyledFieldTitleText = styled.div`
   }}
 `;
 
-export const StyledTextField = styled(TextField)`
+export const StyledTextField = styled.div`
   ${(props) => {
     const spaces = getSpaces(props);
+
     return `
       margin-bottom: ${spaces?.xl}px;
-      width: 150px;
 
       .MuiInputBase-root {
         height: ${INPUT_HEIGHT};
+        width: 150px;
       }
     `;
   }}
 `;
 
+const flex = () => {
+  return css`
+    display: flex;
+    align-items: center;
+  `;
+};
+
 export const FlexWrapper = styled.div`
-  display: flex;
-  align-items: center;
+  ${flex}
 `;
 
 export const StyledSuggestionText = styled.div`
@@ -116,12 +124,25 @@ export const StyledSuggestionText = styled.div`
   }}
 `;
 
-export const StyledWarningIcon = styled(WarningIcon)`
+export const StyledSuggestionWrapper = styled.div`
+  ${flex}
+  ${(props) => {
+    const spaces = getSpaces(props);
+    return `
+      margin-top: ${spaces?.xxs}px;
+    `;
+  }}
+`;
+
+export const StyledWarningIcon = styled(ErrorOutlineOutlinedIcon)`
   ${(props) => {
     const colors = getColors(props);
+    const iconSizes = getIconSizes(props);
 
     return `
       color: ${colors?.warning[400]};
+      height: ${iconSizes?.s.height}px;
+      width: ${iconSizes?.s.width}px;
       margin-top: 0;
     `;
   }}
