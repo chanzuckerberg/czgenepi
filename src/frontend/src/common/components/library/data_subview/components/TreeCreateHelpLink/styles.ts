@@ -1,14 +1,14 @@
 import styled from "@emotion/styled";
-import { fontBodyXs, getColors, getFontWeights, getSpacings } from "czifui";
+import { fontBodyXs, getColors, getFontWeights, getSpaces } from "czifui";
 import { NewTabLink } from "../../../NewTabLink";
 
 export const StyledDiv = styled.div`
   ${(props) => {
     const colors = getColors(props);
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
 
     return `
-      margin-left: ${spacings?.l}px;
+      margin-left: ${spaces?.l}px;
 
       &:hover {
         path {
@@ -34,11 +34,11 @@ export const StyledSpan = styled.span`
   ${fontBodyXs}
   ${(props) => {
     const fontWeights = getFontWeights(props);
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
 
     return `
       font-weight: ${fontWeights?.semibold};
-      margin: 0 ${spacings?.xxs}px;
+      margin: 0 ${spaces?.xxs}px;
     `;
   }}
 `;

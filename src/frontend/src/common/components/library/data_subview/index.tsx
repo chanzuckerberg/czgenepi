@@ -1,4 +1,3 @@
-import { Fade } from "@material-ui/core";
 import { escapeRegExp } from "lodash/fp";
 import NextLink from "next/link";
 import React, {
@@ -12,7 +11,7 @@ import { DataTable } from "src/common/components";
 import { VIEWNAME } from "src/common/constants/types";
 import { ROUTES } from "src/common/routes";
 import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
-import { AfterModalAlert } from "./components/AfterModalAlert";
+import Notification from "src/components/Notification";
 import { CreateNSTreeModal } from "./components/CreateNSTreeModal";
 import DownloadModal from "./components/DownloadModal";
 import { IconButton } from "./components/IconButton";
@@ -21,7 +20,7 @@ import { TreeSelectionMenu } from "./components/TreeSelectionMenu";
 import { UsherTreeFlow } from "./components/UsherTreeFlow";
 import style from "./index.module.scss";
 import {
-  CreateTreeModalDiv,
+  BoldText,
   Divider,
   DownloadWrapper,
   StyledButton,
@@ -217,12 +216,6 @@ const DataSubview: FunctionComponent<Props> = ({
     setCreateTreeStarted(false);
   }
 
-  useEffect(() => {
-    setTimeout(() => {
-      setCreateTreeStarted(false);
-    }, 12000);
-  }, [hasCreateTreeStarted]);
-
   const onChange = (
     _event: React.ChangeEvent<HTMLInputElement>,
     fieldInput: InputOnChangeData
@@ -259,6 +252,16 @@ const DataSubview: FunctionComponent<Props> = ({
     <div>
       <TooltipHeaderText>Download</TooltipHeaderText>
     </div>
+  );
+
+  const CONTACT_US = (
+    <span>
+      Please try again later or{" "}
+      <StyledNewTabLink href="mailto:aspenprivacy@chanzuckerberg.com">
+        contact us
+      </StyledNewTabLink>{" "}
+      for help.
+    </span>
   );
 
   const numCheckedSamples = checkedSamples?.length;
@@ -343,75 +346,54 @@ const DataSubview: FunctionComponent<Props> = ({
             <div>
               {viewName === VIEWNAME.TREES && <TreeCreateHelpLink />}
               {downloadButton}
-              {downloadFailed && (
-                <AfterModalAlert
-                  alertClassName="elevated"
-                  alertSeverity="error"
-                  boldText={
-                    "Something went wrong and we were unable to complete one or more of your downloads"
-                  }
-                  lightText={
-                    <>
-                      Please try again later or{" "}
-                      <StyledNewTabLink href="mailto:aspenprivacy@chanzuckerberg.com">
-                        contact us
-                      </StyledNewTabLink>{" "}
-                      for help.
-                    </>
-                  }
-                  handleDismiss={handleDismissDownloadErrorClick}
-                />
-              )}
-              {didCreateTreeFailed && (
-                <AfterModalAlert
-                  alertClassName="elevated"
-                  alertSeverity="error"
-                  boldText={
-                    "Something went wrong and we were unable to start your tree build"
-                  }
-                  lightText={
-                    <>
-                      Please try again later or{" "}
-                      <StyledNewTabLink href="mailto:aspenprivacy@chanzuckerberg.com">
-                        contact us
-                      </StyledNewTabLink>{" "}
-                      for help.
-                    </>
-                  }
-                  handleDismiss={handleDismissCreateTreeErrorClick}
-                />
-              )}
-              <Fade
-                in={hasCreateTreeStarted}
-                appear={false}
-                enter={false}
-                timeout={1000}
-                unmountOnExit={true}
+              <Notification
+                buttonOnClick={handleDismissDownloadErrorClick}
+                buttonText="DISMISS"
+                dismissDirection="right"
+                dismissed={!downloadFailed}
+                intent="error"
               >
-                <div>
-                  <AfterModalAlert
-                    alertClassName="elevated"
-                    alertSeverity={"info"}
-                    lightText={
-                      <CreateTreeModalDiv>
-                        Your tree is being created. It may take up to 12 hours
-                        to process. To check your tree’s status, visit the
-                        Phylogenetic Tree page.
-                        <NextLink href={ROUTES.PHYLO_TREES} passHref>
-                          <a href="passRef">
-                            <StyledButton
-                              color="primary"
-                              onClick={handleCreateTreeStartedModalClose}
-                            >
-                              VIEW MY TREES
-                            </StyledButton>
-                          </a>
-                        </NextLink>
-                      </CreateTreeModalDiv>
-                    }
-                  />
-                </div>
-              </Fade>
+                <BoldText>
+                  Something went wrong and we were unable to complete one or
+                  more of your downloads
+                </BoldText>
+                {CONTACT_US}
+              </Notification>
+              <Notification
+                buttonOnClick={handleDismissCreateTreeErrorClick}
+                buttonText="DISMISS"
+                dismissDirection="right"
+                dismissed={!didCreateTreeFailed}
+                intent="error"
+              >
+                <BoldText>
+                  Something went wrong and we were unable to start your tree
+                  build
+                </BoldText>
+                {CONTACT_US}
+              </Notification>
+              <Notification
+                autoDismiss={12000}
+                dismissDirection="right"
+                dismissed={!hasCreateTreeStarted}
+                intent="info"
+              >
+                <span>
+                  Your tree is being created. It may take up to 12 hours to
+                  process. To check your tree’s status, visit the Phylogenetic
+                  Tree page.
+                </span>
+                <NextLink href={ROUTES.PHYLO_TREES} passHref>
+                  <a href="passRef">
+                    <StyledButton
+                      color="primary"
+                      onClick={handleCreateTreeStartedModalClose}
+                    >
+                      VIEW MY TREES
+                    </StyledButton>
+                  </a>
+                </NextLink>
+              </Notification>
             </div>
           </div>
           <div className={style.samplesTable}>

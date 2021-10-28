@@ -41,7 +41,7 @@ locals {
   gisaid_image     = join(":", [local.secret["ecrs"]["gisaid"]["url"], lookup(var.image_tags, "gisaid", var.image_tag)])
 
   # This is the wdl executor image, doesn't change on update.
-  swipe_image     = join(":", [local.secret["ecrs"]["swipe"]["url"], "rev-6"]) # TODO - we probably don't want to hardcode this
+  swipe_image     = join(":", [local.secret["ecrs"]["swipe"]["url"], "rev-7"]) # TODO - we probably don't want to hardcode this
 
   batch_role_arn             = local.secret["batch_queues"]["aspen"]["role_arn"]
   ec2_queue_arn              = local.secret["batch_envs"]["aspen"]["envs"]["EC2"]["queue_arn"]
@@ -194,6 +194,10 @@ module pangolin_sfn_config {
   sfn_arn               = module.swipe_sfn.step_function_arn
   schedule_expressions  = contains(["prod", "staging"], local.deployment_stage) ? ["cron(0 18,23 ? * MON-FRI *)"] : []
   event_role_arn        = local.event_role_arn
+  extra_args            =  {
+    aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
+    remote_dev_prefix        = local.remote_dev_prefix
+  }
 }
 
 module pangolin_ondemand_sfn_config {
@@ -210,6 +214,10 @@ module pangolin_ondemand_sfn_config {
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn.step_function_arn
   event_role_arn        = local.event_role_arn
+  extra_args            =  {
+    aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
+    remote_dev_prefix        = local.remote_dev_prefix
+  }
 }
 
 module nextstrain_template_sfn_config {

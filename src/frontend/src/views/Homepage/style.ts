@@ -7,7 +7,7 @@ import {
   fontHeaderXxl,
   getColors,
   getShadows,
-  getSpacings,
+  getSpaces,
 } from "czifui";
 import { PageContent } from "src/common/styles/mixins/global";
 import ConsensusGenomes from "./ConsensusGenomes.svg";
@@ -30,12 +30,12 @@ export const Card = styled.div`
 
   ${(props) => {
     const shadows = getShadows(props);
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
 
     return `
       height: 360px;
       width: 400px;
-      padding: ${spacings?.xxl}px ${spacings?.xl}px ${spacings?.xxl}px ${spacings?.xxl}px;
+      padding: ${spaces?.xxl}px ${spaces?.xl}px ${spaces?.xxl}px ${spaces?.xxl}px;
       box-shadow: ${shadows?.s};
     `;
   }}
@@ -67,10 +67,10 @@ export const Content = styled.div`
   ${fontBodyM}
 
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
 
     return `
-      margin-bottom: ${spacings?.xl}px;
+      margin-bottom: ${spaces?.xl}px;
     `;
   }}
 `;
@@ -129,9 +129,9 @@ export const FooterButtonContainer = styled.div`
 `;
 
 function marginBottom(props: { theme?: AppThemeOptions }) {
-  const spacings = getSpacings(props);
+  const spaces = getSpaces(props);
 
   return `
-      margin-bottom: ${spacings?.s}px;
+      margin-bottom: ${spaces?.s}px;
     `;
 }

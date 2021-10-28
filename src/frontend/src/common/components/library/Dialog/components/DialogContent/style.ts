@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import { DialogContent } from "@material-ui/core";
-import { getSpacings, Props } from "czifui";
+import { getSpaces, Props } from "czifui";
 import { narrow } from "../common";
 
 export interface ExtraProps extends Props {
@@ -14,10 +14,10 @@ export const StyledDialogContent = styled(DialogContent, {
   shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
 })`
   ${(props) => {
-    const spacings = getSpacings(props);
+    const spaces = getSpaces(props);
 
     return `
-      padding: 0 ${spacings?.xxl}px ${spacings?.xl}px ${spacings?.xxl}px;
+      padding: 0 ${spaces?.xxl}px ${spaces?.xl}px ${spaces?.xxl}px;
     `;
   }}
 
