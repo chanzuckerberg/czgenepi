@@ -1,12 +1,12 @@
 import { ExposedNotificationProps, Notification } from "czifui";
 import React from "react";
-import { StyledNotifContainer } from "./style";
+import { StyledNotificationContainer } from "./style";
 
 const Notifications = (props: ExposedNotificationProps): JSX.Element => {
   return (
-    <StyledNotifContainer>
+    <StyledNotificationContainer>
       <Notification {...props} />
-    </StyledNotifContainer>
+    </StyledNotificationContainer>
   );
 };
 

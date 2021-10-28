@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import { getSpaces } from "czifui";
 
-export const StyledNotifContainer = styled.div`
+export const StyledNotificationContainer = styled.div`
   position: fixed;
 
   ${(props) => {
