@@ -84,7 +84,6 @@ const TreeSelectionMenu = ({
           arrow
           disableHoverListener={!isUsherDisabled}
           placement="bottom"
-          sdsStyle="dark"
           title={USHER_DISABLED_TEXT}
         >
           <div>
