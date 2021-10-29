@@ -208,6 +208,7 @@ def getfastaurl():
     user = g.auth_user
     request_data = request.get_json()
     sample_ids = request_data["samples"]
+    downstream_consumer = request_data.get("downstream_consumer")
 
     s3_bucket = application.aspen_config.EXTERNAL_AUSPICE_BUCKET
     s3_resource = boto3.resource(
@@ -222,7 +223,7 @@ def getfastaurl():
         f"s3://{s3_bucket}/{s3_key}", "w", transport_params=dict(client=s3_client)
     )
     # Write selected samples to s3
-    streamer = FastaStreamer(user, sample_ids, g.db_session)
+    streamer = FastaStreamer(user, sample_ids, g.db_session, downstream_consumer)
     for line in streamer.stream():
         s3_write_fh.write(line)
     s3_write_fh.close()
