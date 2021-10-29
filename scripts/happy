@@ -704,17 +704,28 @@ class Orchestrator:
         containers = []
         for task in taskinfo:
             task_id = task["taskArn"].split("/")[-1]
-            tp.add_row([task_id, task["startedAt"].strftime("%m/%d %H:%M"), task["lastStatus"]])
-            containers.append(
-                {
-                    "host": task["containerInstanceArn"],
-                    "container": task["containers"][0]["runtimeId"],
-                    "arn": task["taskArn"],
-                }
-            )
+            started_at = "-"
+            if task.get("startedAt"):
+                started_at = task["startedAt"].strftime("%m/%d %H:%M")
+                containers.append(
+                    {
+                        "host": task.get("containerInstanceArn"),
+                        "container": task["containers"][0]["runtimeId"],
+                        "task_id": task_id,
+                        "arn": task["taskArn"],
+                        "launch_type": task["launchType"],
+                        "container_name": task["containers"][0]["name"],
+                    }
+                )
+            tp.add_row([task_id, started_at, task["lastStatus"]])
         tp.print()
         print()
         for container in containers:
+            if container['launch_type'] == 'FARGATE':
+                profile_name = self.ctx.obj["aws_profile"]
+                print(f"Connecting to {container['task_id']}:{container['container_name']}")
+                cmd = ["aws", "--profile", profile_name, "ecs", "execute-command", "--cluster", cluster_arn, "--container", container["container_name"], "--command", "/bin/bash", "--interactive", "--task", container["task_id"]]
+                os.execvp("aws", cmd)
             instance_info = ecs_client.describe_container_instances(
                 cluster=cluster_arn, containerInstances=[container["host"]]
             )
