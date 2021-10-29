@@ -33,10 +33,12 @@ interface CreateTreeType {
 // * very convoluted: https://stackoverflow.com/questions/44323441
 interface FastaURLPayloadType {
   samples: string[];
+  downstream_consumer?: string;
 }
 
 interface FastaRequestType {
   sampleIds: string[];
+  downstreamConsumer?: string;
 }
 
 export interface FastaResponseType {
@@ -73,11 +75,13 @@ export async function createTree({
 
 export async function getFastaURL({
   sampleIds,
-}: {
-  sampleIds: string[];
-}): Promise<FastaResponseType> {
+  downstreamConsumer,
+}: FastaRequestType): Promise<FastaResponseType> {
   const payload: FastaURLPayloadType = {
     samples: sampleIds,
+    // If specialty downstream consumer, set this to have FASTA generate accordingly
+    // If left as undefined, will be stripped out from payload during JSON.stringify
+    downstream_consumer: downstreamConsumer,
   };
   const response = await fetch(API_URL + API.GET_FASTA_URL, {
     ...DEFAULT_POST_OPTIONS,
