@@ -1,4 +1,0 @@
-export enum ENTITIES {
-  TREE_INFO = "TREE_INFO",
-  USER_INFO = "USER_INFO",
-}
