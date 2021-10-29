@@ -26,6 +26,7 @@ locals {
   security_groups       = local.secret["security_groups"]
   zone                  = local.secret["zone_id"]
   cluster               = local.secret["cluster_arn"]
+  ecs_execution_role    = lookup(local.secret, "ecs_execution_role", "")
 
   swipe_comms_bucket    = local.secret["s3_buckets"]["aspen_swipe_comms"]["name"]
   swipe_wdl_bucket      = local.secret["s3_buckets"]["aspen_swipe_wdl"]["name"]
@@ -93,6 +94,8 @@ module backend_dns {
 module frontend_service {
   source                = "../service"
   stack_resource_prefix = local.stack_resource_prefix
+  execution_role        = local.ecs_execution_role
+  use_fargate           = var.use_fargate
   custom_stack_name     = local.custom_stack_name
   app_name              = "frontend"
   vpc                   = local.vpc_id
@@ -118,6 +121,8 @@ module frontend_service {
 module backend_service {
   source                = "../service"
   stack_resource_prefix = local.stack_resource_prefix
+  execution_role        = local.ecs_execution_role
+  use_fargate           = var.use_fargate
   custom_stack_name     = local.custom_stack_name
   app_name              = "backend"
   vpc                   = local.vpc_id

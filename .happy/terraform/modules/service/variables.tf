@@ -115,3 +115,15 @@ variable wait_for_steady_state {
   description = "Whether Terraform should block until the service is in a steady state before exiting"
   default     = false
 }
+
+variable use_fargate {
+  type        = bool
+  description = "Whether to use EC2 or fargate for services"
+  default     = false
+}
+
+variable execution_role {
+  type        = string
+  description = "Execution role to use for fargate tasks - required for fargate services!"
+  default     = ""
+}

@@ -7,7 +7,7 @@ resource aws_ecs_service service {
   cluster         = var.cluster
   desired_count   = var.desired_count
   task_definition = aws_ecs_task_definition.task_definition.id
-  launch_type     = "FARGATE"
+  launch_type     = var.use_fargate ? "FARGATE" : "EC2"
   name            = "${var.custom_stack_name}-${var.app_name}"
   load_balancer {
     container_name   = "web"
@@ -20,7 +20,7 @@ resource aws_ecs_service service {
     assign_public_ip = false
   }
 
-  enable_execute_command = true
+  enable_execute_command = var.use_fargate ? true : false
   wait_for_steady_state = var.wait_for_steady_state
 }
 
@@ -30,9 +30,8 @@ resource aws_ecs_task_definition task_definition {
   cpu = 2048
   network_mode  = "awsvpc"
   task_role_arn = var.task_role_arn
-  execution_role_arn = "arn:aws:iam::473004499091:role/testing-fargate-execution-role"
-  requires_compatibilities = [ "FARGATE" ]
-  # aws --profile genepi-dev ecs execute-command --cluster happy-rdev --container web --command "/bin/bash" --interactive --task ef6260ed8aab49cf926667ab0c52c313
+  execution_role_arn = var.use_fargate ? var.execution_role : null
+  requires_compatibilities = var.use_fargate ? [ "FARGATE" ] : null
   container_definitions = <<EOF
 [
   {
