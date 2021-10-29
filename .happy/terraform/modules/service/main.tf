@@ -20,6 +20,7 @@ resource aws_ecs_service service {
     assign_public_ip = false
   }
 
+  enable_execute_command = true
   wait_for_steady_state = var.wait_for_steady_state
 }
 
@@ -31,6 +32,7 @@ resource aws_ecs_task_definition task_definition {
   task_role_arn = var.task_role_arn
   execution_role_arn = "arn:aws:iam::473004499091:role/testing-fargate-execution-role"
   requires_compatibilities = [ "FARGATE" ]
+  # aws --profile genepi-dev ecs execute-command --cluster happy-rdev --container web --command "/bin/bash" --interactive --task ef6260ed8aab49cf926667ab0c52c313
   container_definitions = <<EOF
 [
   {
@@ -79,7 +81,7 @@ resource aws_ecs_task_definition task_definition {
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
-        "awslogs-stream-prefix": "fargatetesting",
+        "awslogs-stream-prefix": "fargate",
         "awslogs-group": "${aws_cloudwatch_log_group.cloud_watch_logs_group.id}",
         "awslogs-region": "${data.aws_region.current.name}"
       }
