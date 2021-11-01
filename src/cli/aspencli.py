@@ -322,8 +322,11 @@ def download_samples(ctx, sample_ids):
 @click.pass_context
 def delete_samples(ctx, sample_ids):
     api_client = ctx.obj["api_client"]
+    userinfo = api_client.get("/v2/users/me")
+    user_group_id = userinfo.json()["group_id"]
+
     for sample in sample_ids:
-        resp = api_client.delete(f"/v2/samples/{sample}")
+        resp = api_client.delete(f"/v2/samples/{user_group_id}/{sample}")
         print(resp.headers)
         print(resp.text)
 

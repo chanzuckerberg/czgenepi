@@ -24,15 +24,13 @@ async def list_samples(
     return False
 
 
-async def get_owned_sample_by_id(db, sample_id, user):
-    # TODO - We don't prevent a collision between public & private identifiers at the moment!!!
+async def get_owned_sample_by_id(db, group_id, sample_id, user):
     query = sa.select(Sample).filter(
         sa.and_(
-            Sample.submitting_group == user.group,
-            sa.or_(
-                Sample.public_identifier == sample_id,
-                Sample.private_identifier == sample_id,
-            ),
+            Sample.submitting_group == user.group,  # This is an access control check!
+            Sample.submitting_group_id
+            == group_id,  # This makes sure we included the correct group ID in our path.
+            Sample.public_identifier == sample_id,
         )
     )
     results = await db.execute(query)
@@ -42,8 +40,9 @@ async def get_owned_sample_by_id(db, sample_id, user):
         raise ex.NotFoundException("sample not found")
 
 
-@router.delete("/{sample_id:path}")
+@router.delete("/{group_id}/{sample_id:path}")
 async def delete_sample(
+    group_id: int,
     sample_id: str,
     request: Request,
     db: AsyncSession = Depends(get_db),
@@ -51,7 +50,7 @@ async def delete_sample(
     user: User = Depends(get_auth_user),
 ) -> SampleDeleteResponse:
     # Make sure this sample exists and is delete-able by the current user.
-    sample = await get_owned_sample_by_id(db, sample_id, user)
+    sample = await get_owned_sample_by_id(db, group_id, sample_id, user)
     sample_db_id = sample.id
 
     await db.delete(sample)

@@ -48,18 +48,15 @@ async def test_delete_sample_success(
     async_session.add(group)
     await async_session.commit()
 
-    samples_to_delete = {
-        samples[0].public_identifier: samples[0].id,
-        samples[1].private_identifier: samples[1].id,
-    }
-    for identifier, sample_id in samples_to_delete.items():
+    for sample in [samples[0], samples[1]]:
         auth_headers = {"user_id": user.auth0_user_id}
         res = await http_client.delete(
-            f"/v2/samples/{identifier}", headers=auth_headers
+            f"/v2/samples/{sample.submitting_group_id}/{sample.public_identifier}",
+            headers=auth_headers,
         )
         assert res.status_code == 200
         response = res.json()
-        assert response["id"] == sample_id
+        assert response["id"] == sample.id
     # Make sure 0 and 1 were deleted and 3 is still there.
     rows = 0
     for sample in samples:
@@ -103,7 +100,8 @@ async def test_delete_sample_failures(
     # Request this sample as a user who shouldn't be able to delete it.
     auth_headers = {"user_id": user2.auth0_user_id}
     res = await http_client.delete(
-        f"/v2/samples/{sample.public_identifier}", headers=auth_headers
+        f"/v2/samples/{sample.submitting_group_id}/{sample.public_identifier}",
+        headers=auth_headers,
     )
     assert res.status_code == 404
     # Make sure our sample is still in the db.
