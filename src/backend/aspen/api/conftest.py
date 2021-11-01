@@ -105,6 +105,7 @@ async def override_get_auth_user(
     if not found_auth_user:
         raise ex.UnauthorizedException("invalid user")
     request.state.auth_user = found_auth_user
+    return found_auth_user
 
 
 @pytest.fixture()
