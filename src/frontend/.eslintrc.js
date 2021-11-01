@@ -49,7 +49,7 @@ module.exports = {
       "asc",
       {
         caseSensitive: true,
-        minKeys: 2,
+        minKeys: 5, // 4 keys or fewer means this rule does not kick in
         natural: false,
       },
     ],

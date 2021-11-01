@@ -121,7 +121,10 @@ export const UsherPlacementModal = ({
   const handleSubmit = (evt: SyntheticEvent) => {
     evt.preventDefault();
     sampleIds = sampleIds.filter((id) => !failedSamples.includes(id));
-    fastaFetch.mutate({ sampleIds });
+    fastaFetch.mutate({
+      sampleIds,
+      downstreamConsumer: "USHER", // Let backend know eventual destination for this fasta
+    });
     setIsLoading(true);
   };
 

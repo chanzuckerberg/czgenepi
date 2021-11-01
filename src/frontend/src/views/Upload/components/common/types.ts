@@ -20,6 +20,11 @@ export interface ParseOutcome {
   errors: ParseErrors;
 }
 
+export interface ParseFastaSeqIDLineOutcome {
+  hasError: boolean;
+  id: string;
+}
+
 export enum WARNING_CODE {
   /**
    * (thuang): We have detected conflicting info and auto-corrected something
