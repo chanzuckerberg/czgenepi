@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React from "react";
 import Slider from "react-slick";
 import Quote from "./components/Quote";
 import "slick-carousel/slick/slick.css";
@@ -22,14 +22,12 @@ export default function QuoteSlider(): JSX.Element {
         <QuoteSliderContainer>
             <Slider {...settings}>
                 <Quote 
-                    quoteText='We could see that our efforts, in terms of isolating the sick and quarantining exposed contacts, we could actually see that that was effective intervention. It was a headache to contain all those individuals from that superspreader event, but it worked. And this information was really useful to demonstrate to our director, to our health officers, that ... it showed the value in this 
-                    [sequencing] technology."'
-                    citation="—County Public Health Laboratory Director"
+                    quoteText='Obtaining adequate resources in this area is a constant challenge and we would not have been able to do this otherwise. For years, we’ve watched better-resourced regions, like LA and the Bay Area, quickly bring on technological advancements that further the field. It is wonderful to finally be able to be a part of this and, through our testing for surrounding counties, support the communities in our entire region."'
+                    citation="—County Public Health Lab Director"
                     />
                 <Quote 
-                    quoteText='We could see that our efforts, in terms of isolating the sick and quarantining exposed contacts, we could actually see that that was effective intervention. It was a headache to contain all those individuals from that superspreader event, but it worked. And this information was really useful to demonstrate to our director, to our health officers, that ... it showed the value in this 
-                    [sequencing] technology."'
-                    citation="—County Public Health Laboratory Director"
+                    quoteText='We could see that our efforts, in terms of isolating the sick and quarantining exposed contacts, we could actually see that that was effective intervention..It was a headache to contain all those individuals from that superspreader event, but it worked. And this information was really useful to demonstrate to our director, to our health officers ... it showed the value in this technology."'
+                    citation="—Communicable Disease Investigator"
                     />
             </Slider>
         </QuoteSliderContainer>

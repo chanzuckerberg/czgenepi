@@ -2,7 +2,7 @@ import React from "react";
 import Image from 'next/image';
 import HeroBackgroundSvg from "src/common/images/landingv2-hero-bg.svg";
 import EmailForm from "./components/HeroEmailForm";
-import NextstrainLogo from "src/common/images/Nextstrain-logo-crop.png";
+import NextstrainLogo from "src/common/images/Nextstrain-Logo-crop.png";
 import {
     Heading,
     HeroContainer,
@@ -10,9 +10,11 @@ import {
     HeroTextSection,
     HeroMaxWidthContainer,
     NextstrainContainer,
+    NextstrainLink,
     PartnershipText,
     Tagline
 } from "./style";
+import { ROUTES } from "src/common/routes";
 
 export default function Hero(): JSX.Element {
 
@@ -20,8 +22,8 @@ export default function Hero(): JSX.Element {
         <HeroContainer>
             <HeroMaxWidthContainer>
                 <HeroTextSection>
-                    <Heading>Harness the Power of Genomic Sequencing</Heading>
-                    <Tagline>Cras justo odio, dapibus ac facilisis in, egestas eget quam.</Tagline>
+                    <Heading>No-code phylogenetic analysis</Heading>
+                    <Tagline>An open source, free, no-code genomic epidemiology analysis platform for public health</Tagline>
                     <EmailForm />
                 </HeroTextSection>
                 <HeroImage>
@@ -29,7 +31,9 @@ export default function Hero(): JSX.Element {
                 </HeroImage>
                 <NextstrainContainer>
                     <PartnershipText>In partnership with</PartnershipText>
-                    <Image src={NextstrainLogo} alt="" />
+                    <NextstrainLink href={ROUTES.NEXTSTRAIN} target="_blank">
+                        <Image src={NextstrainLogo} alt="" />
+                    </NextstrainLink>
                 </NextstrainContainer>
             </HeroMaxWidthContainer>
         </HeroContainer>

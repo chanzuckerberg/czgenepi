@@ -11,14 +11,14 @@ export default function EmailForm(): JSX.Element {
 
     const [enteredEmail, setEnteredEmail] = useState("");
 
-    function submitEmail(e: React.FormEvent<HTMLInputElement>) {
+    function submitEmail(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
 
         let emailRegex = /^(([^<>()\]\\.,;:\s@"]+(\.[^<>()\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
         if (emailRegex.test(enteredEmail)) {
             window.open(
-                `https://airtable.com/shrBGT42xVBR6JAVv?prefill_Email=${enteredEmail}`, // <-- replace url with new airtable form
+                `https://airtable.com/shrblHnTRd9dtu6c0?prefill_Email=${enteredEmail}`, // <-- replace url with new airtable form
                 "_blank"
             );
         } else {
@@ -27,18 +27,18 @@ export default function EmailForm(): JSX.Element {
     }
 
     return (
-        <HeroEmailForm>
+        <HeroEmailForm
+            onSubmit={submitEmail}
+            >
                 <EmailInput
                     placeholder="Your email address"
                     value={enteredEmail}
-                    onChange={(e: React.FormEvent<HTMLInputElement>) => {
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         setEnteredEmail(e.target.value);
                     }}
                     />
                 <SubmitButton
-                    onClick={(e: React.FormEvent<HTMLInputElement>) => {
-                        submitEmail(e);
-                    }}
+                    type="submit"
                     >
                     Join the waitlist 
                     <SubmitIcon>

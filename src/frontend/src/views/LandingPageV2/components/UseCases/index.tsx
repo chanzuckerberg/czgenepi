@@ -1,6 +1,6 @@
 import React from "react";
 import Image from "next/image";
-import UseCasesImg from "src/common/images/landingv2-use-cases.png";
+import UseCasesImg from "src/common/images/landingv2-gen-epi-use-cases.png";
 import UseCasesImgMobile from "src/common/images/landingv2-use-cases-mobile.png";
 import UseCasesExample from "./components/UseCasesExample";
 import {
@@ -16,19 +16,17 @@ export default function UseCases(): JSX.Element {
     return (
         <UseCasesContainer>
             <UseCasesHeader>
-                Use cases/how it's used headline
+                Understand the Spread of Disease
             </UseCasesHeader>
             <UseCasesImage>
                 <Image src={UseCasesImg} />
             </UseCasesImage>
             <UseCasesExampleContainer>
                 <UseCasesExample 
-                    headline="Use case 1 headline" 
-                    copy="Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Nullam quis risus eget urna mollis ornare vel eu leo."
+                    headline="Outbreak Investigation" 
                     />
                 <UseCasesExample 
-                    headline="Use case 2 headline" 
-                    copy="Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Nullam quis risus eget urna mollis ornare vel eu leo."
+                    headline="Pathogen Surveillance" 
                     />
             </UseCasesExampleContainer>
             <UseCasesImageMobile>
