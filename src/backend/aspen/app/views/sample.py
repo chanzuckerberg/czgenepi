@@ -56,7 +56,7 @@ DEFAULT_DIVISION = "California"
 DEFAULT_COUNTRY = "USA"
 DEFAULT_ORGANISM = "Severe acute respiratory syndrome coronavirus 2"
 SAMPLE_KEY = "samples"
-GISIAD_REJECTION_TIME = datetime.timedelta(days=4)
+GISAID_REJECTION_TIME = datetime.timedelta(days=4)
 SAMPLES_POST_REQUIRED_FIELDS = [
     "private",
     "private_identifier",
@@ -149,7 +149,7 @@ def _format_gisaid_accession(
         date_since_submitted = (
             datetime.date.today() - gisaid_accession_workflow.start_datetime.date()
         )
-        if date_since_submitted < GISIAD_REJECTION_TIME:
+        if date_since_submitted < GISAID_REJECTION_TIME:
             return {"status": "Submitted", "gisaid_id": None}
         else:
             return {"status": "Rejected", "gisaid_id": None}
