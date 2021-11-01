@@ -1,14 +1,12 @@
-import datetime
-from typing import List, Union
+from pydantic import constr
 
-from pydantic import constr, StrictStr, validator
+from aspen.api.schemas.base import BaseRequest
 
-from aspen.api.schemas.base import BaseRequest, BaseResponse
-from aspen.database.models import Sample
 
 class SampleRequestSchema(BaseRequest):
     # mypy + pydantic is a work in progress: https://github.com/samuelcolvin/pydantic/issues/156
     name: constr(min_length=1, max_length=128, strict=True)  # type: ignore
+
 
 class SampleResponseSchema(BaseRequest):
     name: str

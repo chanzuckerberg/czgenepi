@@ -145,6 +145,11 @@ class ApiClient:
         url = f"{self.url}{path}"
         return requests.get(url, headers=headers, allow_redirects=False, **kwargs)
 
+    def delete(self, path, **kwargs):
+        headers = self.get_headers()
+        url = f"{self.url}{path}"
+        return requests.delete(url, headers=headers, allow_redirects=False, **kwargs)
+
     def post(self, path, **kwargs):
         headers = self.get_headers()
         url = f"{self.url}{path}"
