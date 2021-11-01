@@ -213,7 +213,7 @@ class UploadedPathogenGenome(PathogenGenome):
     sample_id = Column(Integer, ForeignKey(Sample.id), unique=True, nullable=False)
     sample = relationship(  # type: ignore
         Sample,
-        backref=backref("uploaded_pathogen_genome", uselist=False),
+        backref=backref("uploaded_pathogen_genome", uselist=False, cascade="delete"),
     )
 
     sequencing_depth = Column(Float)

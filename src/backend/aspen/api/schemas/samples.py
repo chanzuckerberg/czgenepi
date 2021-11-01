@@ -1,6 +1,6 @@
 from pydantic import constr
 
-from aspen.api.schemas.base import BaseRequest
+from aspen.api.schemas.base import BaseRequest, BaseResponse
 
 
 class SampleRequestSchema(BaseRequest):
@@ -8,5 +8,9 @@ class SampleRequestSchema(BaseRequest):
     name: constr(min_length=1, max_length=128, strict=True)  # type: ignore
 
 
-class SampleResponseSchema(BaseRequest):
+class SampleResponseSchema(BaseResponse):
     name: str
+
+
+class SampleDeleteResponse(BaseResponse):
+    id: int
