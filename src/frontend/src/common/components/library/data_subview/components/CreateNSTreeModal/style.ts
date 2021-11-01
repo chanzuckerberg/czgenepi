@@ -11,6 +11,7 @@ import {
   fontHeaderXs,
   getColors,
   getSpaces,
+  Props,
   Tooltip,
 } from "czifui";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
@@ -137,21 +138,25 @@ export const StyledButton = styled(Button)`
   }}
 `;
 
-const doNotForwardProps = ["size"];
+interface SeparatorProps extends Props {
+  marginSize: "l" | "xl";
+}
+
+const doNotForwardProps = ["marginSize"];
 
 export const Separator = styled("div", {
   shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
 })`
   height: 0;
 
-  ${(props) => {
-    const { size } = props;
+  ${(props: SeparatorProps) => {
+    const { marginSize } = props;
     const colors = getColors(props);
     const spaces = getSpaces(props);
 
     return `
       border-top: 1px solid ${colors?.gray[200]};
-      margin: ${spaces?.[size]}px 0;
+      margin: ${spaces?.[marginSize]}px 0;
     `;
   }}
 `;

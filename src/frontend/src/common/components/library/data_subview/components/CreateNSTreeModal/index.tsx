@@ -189,9 +189,9 @@ export const CreateNSTreeModal = ({
             </TreeTypeSection>
             {usesFeatureFlag(FEATURE_FLAGS.gisaidIngest) && (
               <>
-                <Separator size="l" />
+                <Separator marginSize="l" />
                 <FieldTitle>Add Samples by ID (optional)</FieldTitle>
-                <Separator size="xl" />
+                <Separator marginSize="xl" />
               </>
             )}
             <FailedSampleAlert numFailedSamples={failedSamples?.length} />

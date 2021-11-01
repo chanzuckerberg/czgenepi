@@ -15,7 +15,7 @@ import {
 } from "./style";
 
 interface Props {
-  setTreeName(): void;
+  setTreeName(name: string): void;
   shouldReset?: boolean;
   treeName?: string;
 }
@@ -38,7 +38,7 @@ const TreeNameInput = ({
 
   // show name errors
   useEffect(() => {
-    const isNameTooLong = treeName?.length > 128;
+    const isNameTooLong = (treeName?.length ?? 0) > 128;
     setTreeNameTooLong(isNameTooLong);
   }, [treeName]);
 
