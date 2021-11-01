@@ -80,11 +80,10 @@ class FastaStreamer:
         Certain downstream consumers (eg, UShER) restrict what characters can be
         used in the ID. Also handles any modifications that must be made to ID
         characters so they don't break the downstream consumer."""
+        output_id = identifier  # default, might get changed if specialty case
         if self.downstream_consumer == SpecialtyDownstreams.USHER.value:
-            output_ready_id = self._handle_usher_id(identifier)
-        else:
-            output_ready_id = identifier
-        return f">{output_ready_id}\n"
+            output_id = self._handle_usher_id(identifier)
+        return f">{output_id}\n"
 
     def _handle_usher_id(self, identifier) -> str:
         """Convert identifier into something that is UShER safe and roughly the same.
