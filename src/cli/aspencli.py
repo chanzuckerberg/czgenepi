@@ -300,7 +300,6 @@ def get_tree_sample_ids(ctx, tree_id):
     resp = api_client.get(f"/api/phylo_tree/sample_ids/{tree_id}")
     print(resp.text)
 
-
 @cli.group()
 def samples():
     pass
@@ -356,24 +355,11 @@ def update_public_ids(ctx, group_id, private_to_public_id_mapping_fh):
 
 
 @cli.group()
-def phylo_run():
+def phylo_runs():
     pass
 
-@phylo_run.command(name="start")
-@click.option("-n","--name", required=True, type=str)
-@click.option("-t","--type", "tree_type", required=True, type=click.Choice(["OVERVIEW", "TARGETED", "NON_CONTEXTUALIZED"], case_sensitive=False))
-@click.option("-h", "--show-headers", is_flag=True)
-@click.argument("sample_ids", nargs=-1)
-@click.pass_context
-def start_phylo_run(ctx, name, tree_type, sample_ids, show_headers):
-    api_client = ctx.obj["api_client"]
-    payload = { "name": name, "tree_type": tree_type, "samples": sample_ids }
-    resp = api_client.post("/api/phylo_runs", json=payload)
-    if show_headers:
-        print(resp.headers)
-    print(resp.text)
 
-@phylo_run.command(name="startv2")
+@phylo_runs.command(name="create")
 @click.option("-n","--name", required=True, type=str)
 @click.option("-t","--type", "tree_type", required=True, type=click.Choice(["OVERVIEW", "TARGETED", "NON_CONTEXTUALIZED"], case_sensitive=False))
 @click.option("-h", "--show-headers", is_flag=True)
@@ -387,6 +373,18 @@ def start_phylo_run_v2(ctx, name, tree_type, sample_ids, show_headers):
         print(resp.headers)
     print(resp.text)
     print(resp)
+
+
+@phylo_runs.command(name="delete")
+@click.argument("run_ids", nargs=-1)
+@click.pass_context
+def delete_runs(ctx, run_ids):
+    api_client = ctx.obj["api_client"]
+    for run_id in run_ids:
+        resp = api_client.delete(f"/v2/phylo_runs/{run_id}")
+        print(resp.headers)
+        print(resp.text)
+
 
 if __name__ == "__main__":
     cli()
