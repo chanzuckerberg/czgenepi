@@ -25,7 +25,7 @@ async def list_samples(
 
 
 async def get_owned_sample_by_public_id(db, group_id, public_id, user):
-    query = sa.select(Sample).filter(
+    query = sa.select(Sample).filter(  # type: ignore
         sa.and_(
             Sample.submitting_group == user.group,  # This is an access control check!
             Sample.submitting_group_id

@@ -61,10 +61,10 @@ async def test_delete_sample_success(
     rows = 0
     for sample in samples:
         res = await async_session.execute(
-            sa.select(Sample).filter(Sample.id == sample.id)
+            sa.select(Sample).filter(Sample.id == sample.id)  # type: ignore
         )
         try:
-            row = res.scalars().one()
+            row = res.scalars().one()  # type: ignore
         except NoResultFound:
             assert sample.id in [samples[0].id, samples[1].id]
             rows += 1
@@ -105,6 +105,6 @@ async def test_delete_sample_failures(
     )
     assert res.status_code == 404
     # Make sure our sample is still in the db.
-    res = await async_session.execute(sa.select(Sample).filter(Sample.id == sample.id))
-    found_sample = res.scalars().one()
+    res = await async_session.execute(sa.select(Sample).filter(Sample.id == sample.id))  # type: ignore
+    found_sample = res.scalars().one()  # type: ignore
     assert found_sample.id == sample.id

@@ -211,9 +211,11 @@ class UploadedPathogenGenome(PathogenGenome):
         Integer, ForeignKey(PathogenGenome.entity_id), primary_key=True
     )
     sample_id = Column(Integer, ForeignKey(Sample.id), unique=True, nullable=False)
+    # The default value of cascade is "save-update, merge", so if we want to enable "delete", we 
+    # need to include the other options as well to maintain backwards compatibility.
     sample = relationship(  # type: ignore
         Sample,
-        backref=backref("uploaded_pathogen_genome", uselist=False, cascade="delete"),
+        backref=backref("uploaded_pathogen_genome", uselist=False, cascade="delete, merge, save-update"),
     )
 
     sequencing_depth = Column(Float)
