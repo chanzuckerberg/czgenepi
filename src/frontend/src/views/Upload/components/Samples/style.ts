@@ -1,11 +1,5 @@
 import styled from "@emotion/styled";
-import {
-  Button,
-  fontCapsXxs,
-  fontHeaderXl,
-  getColors,
-  getSpaces,
-} from "czifui";
+import { Button, fontCapsXxs, getColors, getSpaces } from "czifui";
 import FilePicker from "src/components/FilePicker";
 import { marginBottom } from "../common/style";
 

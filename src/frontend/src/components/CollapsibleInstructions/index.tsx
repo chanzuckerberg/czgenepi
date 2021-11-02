@@ -1,7 +1,7 @@
 import { List, ListItem } from "czifui";
 import React, { useState } from "react";
-import { InstructionsProps } from "./components/Instructions";
 import {
+  CapsSizeType,
   HeaderWrapper,
   InstructionsTitle,
   InstructionsWrapper,
@@ -9,15 +9,15 @@ import {
   StyledInstructionsButton,
 } from "./style";
 
-interface Props extends InstructionsProps {
-  buttonSize?: SizeType;
+interface Props {
+  buttonSize?: CapsSizeType;
   header: string;
   headerSize?: SizeType;
   instructionListTitle?: string;
   items: React.ReactNode[];
   listPadding?: SizeType;
   ordered?: boolean;
-  shouldStartOpen: boolean;
+  shouldStartOpen?: boolean;
 }
 
 const CollapsibleInstructions = ({

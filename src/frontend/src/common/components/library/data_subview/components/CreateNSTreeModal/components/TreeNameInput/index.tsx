@@ -49,7 +49,6 @@ const TreeNameInput = ({
             Tree names must be no longer than 128 characters.
           </InstructionsNotSemiBold>,
         ]}
-        shouldStartOpen={false}
       />
       <StyledTextField
         fullWidth

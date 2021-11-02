@@ -6,9 +6,11 @@ import {
   fontHeaderXs,
   getColors,
   getSpaces,
+  Props,
 } from "czifui";
 
-export const SizeType = "xxxs" | "xxs" | "xs" | "s" | "m" | "l" | "xl" | "xxl";
+export type CapsSizeType = "xxxxs" | "xxxs" | "xxs";
+export type SizeType = "xxxs" | "xxs" | "xs" | "s" | "m" | "l" | "xl" | "xxl";
 interface HeaderProps extends Props {
   headerSize: SizeType;
 }
@@ -29,7 +31,7 @@ export const HeaderWrapper = styled("div", {
 `;
 
 interface InstructionsButtonProps extends Props {
-  buttonSize: SizeType;
+  buttonSize: CapsSizeType;
 }
 
 export const StyledInstructionsButton = styled(Button, {
