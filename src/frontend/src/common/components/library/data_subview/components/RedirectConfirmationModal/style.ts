@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
-import Image from 'next/image';
 import { fontHeaderXl, getColors, getSpaces } from "czifui";
+import Image from "next/image";
 import { P } from "src/common/styles/support/style";
 
 export const StyledHeader = styled.div`
