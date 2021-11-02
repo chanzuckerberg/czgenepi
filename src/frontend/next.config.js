@@ -13,7 +13,6 @@ const SCRIPT_SRC = ["'self'"];
 module.exports = withImages({
   distDir: ENV.BUILD_PATH,
   fileExtensions: ["jpg", "jpeg", "png", "gif", "ico", "webp", "jp2", "avif"],
-  future: { webpack5: true },
 
   async generateBuildId() {
     // Return null to allow next.js to fallback to default behavior
