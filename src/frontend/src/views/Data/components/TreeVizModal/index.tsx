@@ -25,7 +25,7 @@ const TreeVizModal = ({ open, onClose, treeId }: Props): JSX.Element => {
     <RedirectConfirmationModal
       content={content}
       customConfirmButton={confirmButton}
-      img={nextstrainLogo as string}
+      img={nextstrainLogo as unknown as string}
       isOpen={open}
       onClose={onClose}
       onConfirm={onClose}
