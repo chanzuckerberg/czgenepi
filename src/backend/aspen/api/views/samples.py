@@ -40,6 +40,9 @@ async def get_owned_sample_by_public_id(db, group_id, public_id, user):
         raise ex.NotFoundException("sample not found")
 
 
+# Since our public identifiers typically contain / characters, we need to
+# tell fastapi/starlette that it's ok to use the entire path suffix as our
+# resource ID, using the `:path` convertor: https://www.starlette.io/routing/
 @router.delete("/{group_id}/{public_id:path}")
 async def delete_sample(
     group_id: int,
