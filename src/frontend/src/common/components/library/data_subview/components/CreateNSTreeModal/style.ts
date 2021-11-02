@@ -138,6 +138,10 @@ export const StyledButton = styled(Button)`
   }}
 `;
 
+export const StyledButtonWrapper = styled.div`
+  width: fit-content;
+`;
+
 interface SeparatorProps extends Props {
   marginSize: "l" | "xl";
 }

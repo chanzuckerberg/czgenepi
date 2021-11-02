@@ -21,6 +21,7 @@ import {
   FieldTitle,
   Separator,
   StyledButton,
+  StyledButtonWrapper,
   StyledDialogContent,
   StyledDialogTitle,
   StyledFormControlLabel,
@@ -200,10 +201,9 @@ export const CreateNSTreeModal = ({
               <Tooltip
                 arrow
                 disableHoverListener={!isTreeBuildDisabled}
-                sdsStyle="dark"
                 title={NO_NAME_NO_SAMPLES}
               >
-                <div>
+                <StyledButtonWrapper>
                   <StyledButton
                     color="primary"
                     variant="contained"
@@ -214,7 +214,7 @@ export const CreateNSTreeModal = ({
                   >
                     Create Tree
                   </StyledButton>
-                </div>
+                </StyledButtonWrapper>
               </Tooltip>
             )}
             {!usesFeatureFlag(FEATURE_FLAGS.gisaidIngest) && (
