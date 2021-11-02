@@ -27,6 +27,7 @@ const UsherConfirmationModal = ({
     </>
   );
 
+  console.log("usher logo: ", usherLogo);
   const footer =
     "Your tree will open in a new tab. It may take a few minutes for UShER to prepare your placement.";
 
