@@ -3,25 +3,30 @@ import React, { useState } from "react";
 import { InstructionsProps } from "./components/Instructions";
 import {
   HeaderWrapper,
+  InstructionsTitle,
+  InstructionsWrapper,
+  SizeType,
   StyledInstructionsButton,
-  Title,
-  Wrapper,
 } from "./style";
 
 interface Props extends InstructionsProps {
-  className?: string;
+  buttonSize?: SizeType;
   header: string;
+  headerSize?: SizeType;
   instructionListTitle?: string;
   items: React.ReactNode[];
+  listPadding?: SizeType;
   ordered?: boolean;
   shouldStartOpen: boolean;
 }
 
 const CollapsibleInstructions = ({
-  className,
+  buttonSize = "xxxs",
   header,
+  headerSize = "xs",
   instructionListTitle,
   items,
+  listPadding = "l",
   ordered,
   shouldStartOpen = false,
 }: Props): JSX.Element => {
@@ -34,9 +39,10 @@ const CollapsibleInstructions = ({
 
   return (
     <>
-      <HeaderWrapper>
+      <HeaderWrapper headerSize={headerSize}>
         {header}
         <StyledInstructionsButton
+          buttonSize={buttonSize}
           color="primary"
           onClick={handleInstructionsClick}
         >
@@ -44,8 +50,10 @@ const CollapsibleInstructions = ({
         </StyledInstructionsButton>
       </HeaderWrapper>
       {shouldShowInstructions && (
-        <Wrapper className={className}>
-          {instructionListTitle && <Title>{instructionListTitle}</Title>}
+        <InstructionsWrapper listPadding={listPadding}>
+          {instructionListTitle && (
+            <InstructionsTitle>{instructionListTitle}</InstructionsTitle>
+          )}
           <List ordered={ordered}>
             {items.map((item, index) => {
               return (
@@ -55,7 +63,7 @@ const CollapsibleInstructions = ({
               );
             })}
           </List>
-        </Wrapper>
+        </InstructionsWrapper>
       )}
     </>
   );

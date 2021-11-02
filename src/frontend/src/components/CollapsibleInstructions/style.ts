@@ -1,23 +1,40 @@
 import styled from "@emotion/styled";
 import {
   Button,
-  fontCapsXxxs,
+  fontCaps,
+  fontHeader,
   fontHeaderXs,
   getColors,
   getSpaces,
 } from "czifui";
 
-export const HeaderWrapper = styled.div`
-  ${fontHeaderXs}
+export const SizeType = "xxxs" | "xxs" | "xs" | "s" | "m" | "l" | "xl" | "xxl";
+interface HeaderProps extends Props {
+  headerSize: SizeType;
+}
 
+const doNotForwardProps = ["buttonSize", "headerSize", "listPadding"];
+
+export const HeaderWrapper = styled("div", {
+  shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
+})`
   display: flex;
   align-items: center;
   color: black;
+
+  ${(props: HeaderProps) => {
+    const { headerSize } = props;
+    return fontHeader(headerSize);
+  }}
 `;
 
-export const StyledInstructionsButton = styled(Button)`
-  ${fontCapsXxxs}
+interface InstructionsButtonProps extends Props {
+  buttonSize: SizeType;
+}
 
+export const StyledInstructionsButton = styled(Button, {
+  shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
+})`
   ${(props) => {
     const spaces = getSpaces(props);
     const colors = getColors(props);
@@ -31,25 +48,37 @@ export const StyledInstructionsButton = styled(Button)`
       }
     `;
   }}
+  ${(props: InstructionsButtonProps) => {
+    const { buttonSize } = props;
+    if (!buttonSize) return;
+    return fontCaps(buttonSize);
+  }}
 `;
 
-export const Wrapper = styled.div`
+interface InstructionsWrapperProps extends Props {
+  listPadding: SizeType;
+}
+
+export const InstructionsWrapper = styled("div", {
+  shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
+})`
   border-radius: 4px;
   color: black;
 
-  ${(props) => {
+  ${(props: InstructionsWrapperProps) => {
+    const { listPadding } = props;
     const colors = getColors(props);
     const spaces = getSpaces(props);
 
     return `
       background-color: ${colors?.gray[100]};
       margin-bottom: ${spaces?.xs}px;
-      padding: ${spaces?.l}px;
+      padding: ${spaces?.[listPadding]}px;
     `;
   }}
 `;
 
-export const Title = styled.div`
+export const InstructionsTitle = styled.div`
   ${fontHeaderXs}
 
   ${(props) => {

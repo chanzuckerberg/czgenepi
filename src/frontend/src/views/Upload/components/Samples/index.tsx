@@ -5,12 +5,12 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { ROUTES } from "src/common/routes";
 import AlertAccordion from "src/components/AlertAccordion";
+import { CollapsibleInstructions } from "src/components/CollapsibleInstructions";
 import Progress from "../common/Progress";
 import {
   ButtonWrapper,
   Content,
   Header,
-  StyledInstructions,
   Subtitle,
   Title,
 } from "../common/style";
@@ -21,12 +21,9 @@ import {
   ContentWrapper,
   SemiBold,
   StyledButton,
-  StyledContainerLeft,
   StyledContainerSpaceBetween,
   StyledFilePicker,
-  StyledInstructionsButton,
   StyledRemoveAllButton,
-  StyledTitle,
   StyledUploadCount,
 } from "./style";
 import {
@@ -40,7 +37,6 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
   const [parseErrors, setParseErrors] = useState<ParseErrors | null>(null);
   const [sampleCount, setSampleCount] = useState(0);
   const [fileCount, setFileCount] = useState(0);
-  const [showInstructions, setShowInstructions] = useState(true);
   const [isLoadingFile, setIsLoadingFile] = useState(false);
   const [tooManySamples, setTooManySamples] = useState(false);
 
@@ -77,10 +73,6 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
     setParseErrors(null);
   };
 
-  const handleInstructionsClick = () => {
-    setShowInstructions(!showInstructions);
-  };
-
   return (
     <>
       <Head>
@@ -97,41 +89,35 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
         <Progress step="1" />
       </Header>
       <Content>
-        <StyledContainerLeft>
-          <StyledTitle>Select SARS-CoV-2 Consensus Genome Files</StyledTitle>
-          <StyledInstructionsButton
-            color="primary"
-            onClick={handleInstructionsClick}
-          >
-            {showInstructions ? "LESS" : "MORE"} INFO
-          </StyledInstructionsButton>
-        </StyledContainerLeft>
-        {showInstructions && (
-          <StyledInstructions
-            title="File instructions"
-            items={[
-              <span key="1">
-                <SemiBold>
-                  Do not include any PII in the Sample name or file name.
-                </SemiBold>{" "}
-                Your sample name should be the sample&apos;s Private ID.
-              </span>,
-              <span key="2">
-                Accepted file formats: fasta (.fa or .fasta), fasta.gz (.fa.gz),
-                fasta.zip
-              </span>,
-              <span key="3">
-                Sample names must be no longer than 120 characters and can only
-                contain letters from the English alphabet (A-Z, upper and lower
-                case), numbers (0-9), periods (.), hyphens (-), underscores (_),
-                spaces ( ), and forward slashes (/).
-              </span>,
-              <span key="4">
-                The maximum number of samples accommodated per upload is 500.
-              </span>,
-            ]}
-          />
-        )}
+        <CollapsibleInstructions
+          buttonSize="xxs"
+          header="Select SARS-CoV-2 Consensus Genome Files"
+          headerSize="xl"
+          instructionListTitle="File instructions"
+          listPadding="xl"
+          shouldStartOpen
+          items={[
+            <span key="1">
+              <SemiBold>
+                Do not include any PII in the Sample name or file name.
+              </SemiBold>{" "}
+              Your sample name should be the sample&apos;s Private ID.
+            </span>,
+            <span key="2">
+              Accepted file formats: fasta (.fa or .fasta), fasta.gz (.fa.gz),
+              fasta.zip
+            </span>,
+            <span key="3">
+              Sample names must be no longer than 120 characters and can only
+              contain letters from the English alphabet (A-Z, upper and lower
+              case), numbers (0-9), periods (.), hyphens (-), underscores (_),
+              spaces ( ), and forward slashes (/).
+            </span>,
+            <span key="4">
+              The maximum number of samples accommodated per upload is 500.
+            </span>,
+          ]}
+        />
         <ContentWrapper>
           <StyledFilePicker
             text={isLoadingFile ? "Loading..." : "Select Fasta Files"}
