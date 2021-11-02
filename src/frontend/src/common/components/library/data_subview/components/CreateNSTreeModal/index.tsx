@@ -13,6 +13,7 @@ import {
   RadioLabelNonContextualized,
   RadioLabelTargeted,
 } from "./components/RadioLabel";
+import { SampleIdInput } from "./components/SampleIdInput";
 import { TreeNameInput } from "./components/TreeNameInput";
 import {
   Content,
@@ -190,7 +191,7 @@ export const CreateNSTreeModal = ({
             {usesFeatureFlag(FEATURE_FLAGS.gisaidIngest) && (
               <>
                 <Separator marginSize="l" />
-                <FieldTitle>Add Samples by ID (optional)</FieldTitle>
+                <SampleIdInput />
                 <Separator marginSize="xl" />
               </>
             )}
