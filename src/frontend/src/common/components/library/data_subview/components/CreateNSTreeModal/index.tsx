@@ -1,7 +1,6 @@
 import { Dialog } from "@material-ui/core";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import CloseIcon from "@material-ui/icons/Close";
-import { Tooltip } from "czifui";
 import React, { SyntheticEvent, useEffect, useState } from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { useCreateTree } from "src/common/queries/trees";
@@ -9,6 +8,8 @@ import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import { pluralize } from "src/common/utils/strUtils";
 import { Header, StyledIconButton } from "../DownloadModal/style";
 import { FailedSampleAlert } from "../FailedSampleAlert";
+import { CreateTreeButton } from "./components/CreateTreeButton";
+import { StyledButton } from "./components/CreateTreeButton/style";
 import {
   RadioLabelNonContextualized,
   RadioLabelTargeted,
@@ -20,8 +21,6 @@ import {
   CreateTreeInfo,
   FieldTitle,
   Separator,
-  StyledButton,
-  StyledButtonWrapper,
   StyledDialogContent,
   StyledDialogTitle,
   StyledFormControlLabel,
@@ -82,7 +81,10 @@ export const CreateNSTreeModal = ({
     if (treeNameLength > 128 || treeNameLength === 0) {
       setTreeBuildDisabled(true);
     } else {
-      if (treeType === TreeTypes.Targeted || treeType === TreeTypes.NonContextualized) {
+      if (
+        treeType === TreeTypes.Targeted ||
+        treeType === TreeTypes.NonContextualized
+      ) {
         setTreeBuildDisabled(false);
       } else {
         setTreeBuildDisabled(true);
@@ -90,19 +92,8 @@ export const CreateNSTreeModal = ({
     }
   }, [treeName, treeType]);
 
-  // Comment below back in when ready to use validation endpoint
-  // const validateSampleIdentifiersMutation = useMutation(
-  //   validateSampleIdentifiers,
-  //   {
-  //     onError: () => {
-  //       // placeholder
-  //     },
-  //     onSuccess: (data: any) => {
-  //       // set samples identifiers that were not found in the aspen database as missing
-  //       setMissingSampleIdentifiers(data["missing_sample_ids"]);
-  //     },
-  //   }
-  // );
+  const treeNameLength = treeName.length;
+  const hasValidName = treeNameLength > 128 || treeNameLength === 0;
 
   const mutation = useCreateTree({
     onError: () => {
@@ -129,9 +120,6 @@ export const CreateNSTreeModal = ({
       </NewTabLink>
     </div>
   );
-
-  const NO_NAME_NO_SAMPLES =
-    "Your tree requires a Tree Name & at least 1 Sample or Sample ID.";
 
   return (
     <Dialog
@@ -176,7 +164,9 @@ export const CreateNSTreeModal = ({
                   checked={treeType === TreeTypes.Targeted}
                   control={<StyledRadio />}
                   label={
-                    <RadioLabelTargeted selected={treeType === TreeTypes.Targeted} />
+                    <RadioLabelTargeted
+                      selected={treeType === TreeTypes.Targeted}
+                    />
                   }
                 />
                 <StyledFormControlLabel
@@ -200,24 +190,12 @@ export const CreateNSTreeModal = ({
             )}
             <FailedSampleAlert numFailedSamples={failedSamples?.length} />
             {usesFeatureFlag(FEATURE_FLAGS.gisaidIngest) && (
-              <Tooltip
-                arrow
-                disableHoverListener={!isTreeBuildDisabled}
-                title={NO_NAME_NO_SAMPLES}
-              >
-                <StyledButtonWrapper>
-                  <StyledButton
-                    color="primary"
-                    variant="contained"
-                    isRounded
-                    disabled={isTreeBuildDisabled}
-                    type="submit"
-                    value="Submit"
-                  >
-                    Create Tree
-                  </StyledButton>
-                </StyledButtonWrapper>
-              </Tooltip>
+              <CreateTreeButton
+                hasValidName={hasValidName}
+                hasSamples={sampleIds.length > 0}
+                isInEditMode={false}
+                isValidTreeType={Object.values(TreeTypes).includes(treeType)}
+              />
             )}
             {!usesFeatureFlag(FEATURE_FLAGS.gisaidIngest) && (
               <StyledButton
@@ -235,18 +213,6 @@ export const CreateNSTreeModal = ({
           <CreateTreeInfo>
             Creating a new tree can take up to 12 hours.
           </CreateTreeInfo>
-          {/*
-          Placeholder for when we add in actual id validation text box
-          <StyledButton
-            color="primary"
-            variant="contained"
-            isRounded
-            onClick={() => {
-              validateSampleIdentifiersMutation.mutate({ sampleIdsToValidate });
-            }}
-          >
-            test validate validateSampleIdentifiers
-          </StyledButton> */}
         </Content>
       </StyledDialogContent>
     </Dialog>
