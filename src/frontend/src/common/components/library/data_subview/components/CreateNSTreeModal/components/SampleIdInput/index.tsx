@@ -5,7 +5,7 @@ import { useMutation } from "react-query";
 import { validateSampleIdentifiers } from "src/common/queries/samples";
 import { pluralize } from "src/common/utils/strUtils";
 import { InputInstructions } from "./components/InputInstructions";
-import { StyledTextArea } from "./style";
+import { StyledLabel, StyledLoadingAnimation, StyledTextArea } from "./style";
 
 const SampleIdInput = (): JSX.Element => {
   const [inputValue, setInputValue] = useState<string>("");
@@ -78,8 +78,14 @@ const SampleIdInput = (): JSX.Element => {
           sdsStyle="square"
           sdsType="primary"
         >
-          {/* TODO (mlila): add loading spinner */}
-          {isValidating ? "Adding" : "Add"}
+          {isValidating ? (
+            <StyledLabel>
+              <StyledLoadingAnimation />
+              Adding
+            </StyledLabel>
+          ) : (
+            "Add"
+          )}
         </Button>
       )}
       {!isInEditMode && (
