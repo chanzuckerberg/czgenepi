@@ -1,11 +1,9 @@
 import styled from "@emotion/styled";
-import { getFontWeights } from "czifui";
+import { TextField } from "@material-ui/core";
 
-export const SemiBold = styled.span`
-  ${(props) => {
-    const fontWeights = getFontWeights(props);
-    return `
-      font-weight: ${fontWeights?.semibold};
-    `;
-  }}
+export const StyledTextArea = styled(TextField)`
+  textarea {
+    color: black;
+    resize: both;
+  }
 `;
