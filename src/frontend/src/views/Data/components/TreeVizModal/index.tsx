@@ -29,6 +29,7 @@ const TreeVizModal = ({ open, onClose, treeId }: Props): JSX.Element => {
       isOpen={open}
       onClose={onClose}
       onConfirm={onClose}
+      logoWidth={180}
     />
   );
 };

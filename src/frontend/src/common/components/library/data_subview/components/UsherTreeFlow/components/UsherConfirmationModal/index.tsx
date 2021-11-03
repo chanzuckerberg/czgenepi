@@ -39,6 +39,7 @@ const UsherConfirmationModal = ({
         onClose={onClose}
         onConfirm={onConfirm}
         footer={footer}
+        logoWidth={115}
       />
     </div>
   );
