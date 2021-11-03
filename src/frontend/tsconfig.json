@@ -30,7 +30,8 @@
       "jest-playwright-preset",
       "expect-playwright",
       "jest"
-    ]
+    ],
+    "incremental": true
   },
   "exclude": [
     "node_modules",
@@ -42,6 +43,6 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "src/common/constants/ENV.js",
-  ],
+    "src/common/constants/ENV.js"
+  ]
 }
