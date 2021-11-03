@@ -16,7 +16,7 @@ builds:
     location: {location}
     region: North America
     subsampling_scheme: group_plus_context
-    title: '{location}, {division} and related contextual samples'
+    title: '{location}, {division} and related contextual samples. Targeted tree.'
 
 ## custom rules
 custom_rules:
