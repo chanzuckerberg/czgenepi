@@ -190,6 +190,7 @@ export const CreateNSTreeModal = ({
             )}
             <FailedSampleAlert numFailedSamples={failedSamples?.length} />
             {usesFeatureFlag(FEATURE_FLAGS.gisaidIngest) && (
+              // TODO (mlila): ensure all of these props are accurate (state managed from input)
               <CreateTreeButton
                 hasValidName={hasValidName}
                 hasSamples={sampleIds.length > 0}
