@@ -42,7 +42,11 @@ interface Props {
   handleSetCreateTreeStarted: () => void;
 }
 
-export type TreeType = "TARGETED" | "NON_CONTEXTUALIZED";
+const TreeTypes = {
+  Targeted: "TARGETED",
+  NonContextualized: "NON_CONTEXTUALIZED",
+};
+type TreeType = typeof TreeTypes[keyof typeof TreeTypes];
 
 export const CreateNSTreeModal = ({
   sampleIds,
@@ -55,10 +59,7 @@ export const CreateNSTreeModal = ({
   const [treeName, setTreeName] = useState<string>("");
   const [isTreeBuildDisabled, setTreeBuildDisabled] = useState<boolean>(false);
   const [shouldReset, setShouldReset] = useState<boolean>(false);
-  const [treeType, setTreeType] = useState<TreeType>("TARGETED");
-  // comment back in when ready to use validation endpoint
-  // const [sampleIdsToValidate, setSampleIdsToValidate] = useState<string[]>([]);
-  // const [missingSampleIdentifiers, setMissingSampleIdentifiers] = useState<string[]>([]);
+  const [treeType, setTreeType] = useState<TreeType>(TreeTypes.Targeted);
 
   useEffect(() => {
     if (shouldReset) setShouldReset(false);
@@ -67,7 +68,7 @@ export const CreateNSTreeModal = ({
   const clearState = function () {
     setShouldReset(true);
     setTreeName("");
-    setTreeType("TARGETED");
+    setTreeType(TreeTypes.Targeted);
   };
 
   const handleClose = function () {
@@ -76,11 +77,12 @@ export const CreateNSTreeModal = ({
   };
 
   useEffect(() => {
+    // TODO (mlila): remove with gisaidIngest feature (handled in CreateTreeButtom component)
     const treeNameLength = treeName.length;
     if (treeNameLength > 128 || treeNameLength === 0) {
       setTreeBuildDisabled(true);
     } else {
-      if (treeType === "TARGETED" || treeType === "NON_CONTEXTUALIZED") {
+      if (treeType === TreeTypes.Targeted || treeType === TreeTypes.NonContextualized) {
         setTreeBuildDisabled(false);
       } else {
         setTreeBuildDisabled(true);
@@ -170,20 +172,20 @@ export const CreateNSTreeModal = ({
                 onChange={(e) => setTreeType(e.target.value as TreeType)}
               >
                 <StyledFormControlLabel
-                  value="TARGETED"
-                  checked={treeType === "TARGETED"}
+                  value={TreeTypes.Targeted}
+                  checked={treeType === TreeTypes.Targeted}
                   control={<StyledRadio />}
                   label={
-                    <RadioLabelTargeted selected={treeType === "TARGETED"} />
+                    <RadioLabelTargeted selected={treeType === TreeTypes.Targeted} />
                   }
                 />
                 <StyledFormControlLabel
-                  value="NON_CONTEXTUALIZED"
-                  checked={treeType === "NON_CONTEXTUALIZED"}
+                  value={TreeTypes.NonContextualized}
+                  checked={treeType === TreeTypes.NonContextualized}
                   control={<StyledRadio />}
                   label={
                     <RadioLabelNonContextualized
-                      selected={treeType === "NON_CONTEXTUALIZED"}
+                      selected={treeType === TreeTypes.NonContextualized}
                     />
                   }
                 />
