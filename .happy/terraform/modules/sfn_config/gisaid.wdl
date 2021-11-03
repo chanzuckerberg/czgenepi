@@ -70,6 +70,7 @@ task IngestGISAID {
     start_time=$(date +%s)
     build_id=$(date +%Y%m%d-%H%M)
 
+
     aws configure set region ~{aws_region}
 
     export ASPEN_CONFIG_SECRET_NAME=~{aspen_config_secret_name}
@@ -227,6 +228,10 @@ task AlignGISAID {
     # fetch aspen config
     aspen_config="$(aws secretsmanager get-secret-value --secret-id ~{aspen_config_secret_name} --query SecretString --output text)"
     aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$aspen_config")"
+
+    # echo important output locations for easier debugging
+    echo ASPEN S3 BUCKET $aspen_s3_db_bucket
+    echo BUILD ID $build_id
 
     # get the bucket/key from the object id
     processed_gisaid_location=$(python3 /usr/src/app/aspen/workflows/align_gisaid/lookup_processed_gisaid_object.py --processed-gisaid-object-id "~{processed_gisaid_object_id}")
