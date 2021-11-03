@@ -21,7 +21,7 @@ const CreateTreeButton = ({
   const SAMPLES_ARE_IN_EDIT =
     "Finish adding Sample IDs before creating your tree.";
 
-  let tooltipTitle;
+  let tooltipTitle = "";
 
   if (!hasValidName && !hasSamples) tooltipTitle = NO_NAME_NO_SAMPLES;
   else if (!hasSamples) tooltipTitle = NO_SAMPLES;
@@ -33,7 +33,7 @@ const CreateTreeButton = ({
   return (
     <Tooltip
       arrow
-      disableHoverListener={!isTreeBuildDisabled}
+      disableHoverListener={!isTreeBuildDisabled || !tooltipTitle}
       title={tooltipTitle}
     >
       <StyledButtonWrapper>
