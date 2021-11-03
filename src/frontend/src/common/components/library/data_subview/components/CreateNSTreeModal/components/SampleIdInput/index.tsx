@@ -28,6 +28,9 @@ const SampleIdInput = (): JSX.Element => {
       onError: () => {
         setValidating(false);
         setShowAddButton(false);
+        setMissingSampleIds([]);
+        setFoundSampleIds([]);
+        setIdsInFlight([]);
       },
       onSuccess: (data: any) => {
         // set samples identifiers that were not found in the aspen
