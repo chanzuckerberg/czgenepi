@@ -12,7 +12,7 @@ export const StyledTextArea = styled(TextField)`
 
 export const StyledLabel = styled.div`
   display: flex;
-  align-items: : center;
+  align-items: center;
 `;
 
 export const StyledLoadingAnimation = styled(LoadingAnimation)`
