@@ -1,25 +1,35 @@
-from typing import Set
+import datetime
+from typing import NamedTuple, Optional
 
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import selectinload
 from starlette.requests import Request
 
 from aspen.api.auth import get_auth_user
 from aspen.api.deps import get_db, get_settings
 from aspen.api.schemas.samples import SamplesResponseSchema
 from aspen.api.settings import Settings
-from aspen.api.utils import authz_samples_cansee, format_date, format_sample_lineage
+from aspen.api.utils import (
+    authz_samples_cansee,
+    determine_gisaid_status,
+    format_date,
+    format_sample_lineage,
+)
 from aspen.database.models import (
     DataType,
     Entity,
+    GisaidAccession,
     GisaidAccessionWorkflow,
     Sample,
+    UploadedPathogenGenome,
     User,
 )
 
 router = APIRouter()
+
+GISAID_REJECTION_TIME = datetime.timedelta(days=4)
 
 
 @router.get("/")
@@ -29,11 +39,7 @@ async def list_samples(
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_auth_user),
 ) -> SamplesResponseSchema:
-    cansee_groups_metadata: Set[int] = {
-        cansee.owner_group_id
-        for cansee in user.group.can_see
-        if cansee.data_type == DataType.METADATA
-    }
+
     cansee_groups_private_identifiers: Set[int] = {
         cansee.owner_group_id
         for cansee in user.group.can_see
@@ -42,57 +48,97 @@ async def list_samples(
 
     # load the samples.
     all_samples_query = sa.select(Sample).options(
-        joinedload(Sample.uploaded_pathogen_genome, innerjoin=True)
+        selectinload(Sample.uploaded_pathogen_genome)
     )
-
     user_visible_samples_query = authz_samples_cansee(all_samples_query, None, user)
     user_visible_samples = await db.execute(user_visible_samples_query)
     user_visible_samples: List[Sample] = user_visible_samples.unique().scalars().all()
 
-    samples_with_genomes_ids: MutableSequence[int] = list()
+    # Map gisaid accession workflows to samples.
+    # This should all go away when we change how GISAID ISL's are retrieved for samples.
+    SampleGisaidTuple = NamedTuple(
+        "SampleGisaidTuple",
+        [
+            ("sample", Sample),
+            ("uploaded_pathogen_genome", Optional[UploadedPathogenGenome]),
+            ("gisaid_accession_workflow", Optional[GisaidAccessionWorkflow]),
+            ("gisaid_accession", Optional[GisaidAccession]),
+        ],
+    )
+    sample_gisaid_table_map: Dict[int, SampleGisaidTuple] = dict()
+    genome_id_to_sample_id: Dict[int, int] = dict()
     for sample in user_visible_samples:
         if sample.uploaded_pathogen_genome is not None:
-            samples_with_genomes_ids.append(sample.uploaded_pathogen_genome.entity_id)
+            sample_gisaid_table_map[sample.id] = SampleGisaidTuple(
+                sample, sample.uploaded_pathogen_genome, None, None
+            )
+            genome_id_to_sample_id[
+                sample.uploaded_pathogen_genome.entity_id
+            ] = sample.id
+        else:
+            sample_gisaid_table_map[sample.id] = SampleGisaidTuple(
+                sample, None, None, None
+            )
 
-    # load the gisaid_accessioning workflows.
-    gisaid_accession_workflows_query = sa.select(GisaidAccessionWorkflow)
-    # gisaid_accession_workflows: Sequence[GisaidAccessionWorkflow] = (
-    #     g.db_session.query(GisaidAccessionWorkflow)
-    #     .join(GisaidAccessionWorkflow.inputs)
-    #     .filter(Entity.id.in_(samples_with_genomes_ids))
-    #     .options(
-    #         joinedload(GisaidAccessionWorkflow.inputs),
-    #         joinedload(GisaidAccessionWorkflow.outputs.of_type(GisaidAccession)),
-    #     )
-    #     .all()
-    # )
-    # entity_id_to_gisaid_accession_workflow_map: defaultdict[
-    #     int, list[GisaidAccessionWorkflow]
-    # ] = defaultdict(list)
-    # for gisaid_accession_workflow in gisaid_accession_workflows:
-    #     for workflow_input in gisaid_accession_workflow.inputs:
-    #         if isinstance(workflow_input, (UploadedPathogenGenome)):
-    #             entity_id_to_gisaid_accession_workflow_map[
-    #                 workflow_input.entity_id
-    #             ].append(gisaid_accession_workflow)
-    # for (
-    #     gisaid_accession_workflow_list
-    # ) in entity_id_to_gisaid_accession_workflow_map.values():
-    #     # sort by success, date.
-    #     gisaid_accession_workflow_list.sort(
-    #         key=lambda gisaid_accession_workflow: (
-    #             1
-    #             if gisaid_accession_workflow.workflow_status
-    #             == WorkflowStatusType.COMPLETED
-    #             else 0,
-    #             gisaid_accession_workflow.start_datetime,
-    #         ),
-    #         reverse=True,
-    #     )
+    gisaid_accession_workflows_inputs_query = (
+        sa.select(GisaidAccessionWorkflow)
+        .join(GisaidAccessionWorkflow.inputs)
+        .filter(Entity.id.in_(genome_id_to_sample_id.keys()))
+        .options(
+            selectinload(GisaidAccessionWorkflow.inputs),
+        )
+    )
+    gisaid_accession_workflows_with_inputs = await db.execute(
+        gisaid_accession_workflows_inputs_query
+    )
+    gisaid_accession_workflows_with_inputs: List[
+        GisaidAccessionWorkflow
+    ] = gisaid_accession_workflows_with_inputs.scalars().all()
+
+    # get around circular references
+    gisaid_accesssions_query = (
+        sa.select(GisaidAccession)
+        .join(GisaidAccessionWorkflow)
+        .filter(
+            Entity.producing_workflow_id.in_(
+                [
+                    workflow.workflow_id
+                    for workflow in gisaid_accession_workflows_with_inputs
+                ]
+            )
+        )
+    )
+    gisaid_accessions = await db.execute(gisaid_accesssions_query)
+    gisaid_accessions = gisaid_accessions.scalars().all()
+
+    workflow_to_accession_map: Dict[int, GisaidAccession] = dict()
+    for accession in gisaid_accessions:
+        workflow_to_accession_map[accession.producing_workflow_id] = accession
+
+    for gisaid_accession_workflow in gisaid_accession_workflows_with_inputs:
+        # A GisaidAccessionWorkflow is only ever going to have one input,
+        # a single UploadedPathogenGenome. The only way to create the former
+        # is through a method on the latter, and no other inputs are passed.
+        # The relationship is effectively one-to-one, despite the current db
+        # schema that technically allows for a many-to-many relationship.
+        # This is the same for its relationship outputs.
+        genome_id = gisaid_accession_workflow.inputs[0].entity_id
+        sample_id = genome_id_to_sample_id[genome_id]
+        origin_tuple = sample_gisaid_table_map[sample_id]
+        gisaid_accession = workflow_to_accession_map.get(
+            gisaid_accession_workflow.workflow_id, None
+        )
+        sample_gisaid_table_map[sample_id] = SampleGisaidTuple(
+            origin_tuple.sample,
+            origin_tuple.uploaded_pathogen_genome,
+            gisaid_accession_workflow,
+            gisaid_accession,
+        )
 
     # filter for only information we need in sample table view
     results: MutableSequence[Mapping[str, Any]] = list()
-    for sample in user_visible_samples:
+    for sample_gisaid_tuple in sample_gisaid_table_map.values():
+        sample = sample_gisaid_tuple.sample
         returned_sample_data = {
             "public_identifier": sample.public_identifier,
             "upload_date": (
@@ -107,9 +153,12 @@ async def list_samples(
                 else format_date(None)
             ),
             "collection_location": sample.location,
-            # "gisaid": _format_gisaid_accession(
-            #     sample, entity_id_to_gisaid_accession_workflow_map
-            # ),
+            "gisaid": determine_gisaid_status(
+                sample,
+                sample_gisaid_tuple.gisaid_accession_workflow,
+                sample_gisaid_tuple.gisaid_accession,
+                GISAID_REJECTION_TIME,
+            ),
             "czb_failed_genome_recovery": sample.czb_failed_genome_recovery,
             "lineage": format_sample_lineage(sample),
             "private": sample.private,
@@ -123,7 +172,6 @@ async def list_samples(
             returned_sample_data["private_identifier"] = sample.private_identifier
 
         results.append(returned_sample_data)
-
     return SamplesResponseSchema.parse_obj({"samples": results})
 
 

@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 from pydantic import constr
 
@@ -11,7 +11,7 @@ class SampleGisaidResponseSchema(BaseResponse):
 
 
 class SampleLineageResponseSchema(BaseResponse):
-    last_updated: str = "N/A"
+    last_updated: Optional[str]
     lineage: Optional[str]
     probability: Optional[str]
     version: Optional[str]
@@ -26,7 +26,7 @@ class SampleResponseSchema(BaseResponse):
     collection_date: str
     collection_location: str
     czb_failed_genome_recovery: bool
-    # gisaid: SampleGisaidResponseSchema
+    gisaid: SampleGisaidResponseSchema
     lineage: SampleLineageResponseSchema
     private: bool
     private_identifier: str
