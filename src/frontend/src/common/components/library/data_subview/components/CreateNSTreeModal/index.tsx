@@ -93,7 +93,7 @@ export const CreateNSTreeModal = ({
   }, [treeName, treeType]);
 
   const treeNameLength = treeName.length;
-  const hasValidName = treeNameLength > 128 || treeNameLength === 0;
+  const hasValidName = treeNameLength > 0 && treeNameLength <= 128;
 
   const mutation = useCreateTree({
     onError: () => {
