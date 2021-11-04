@@ -1,26 +1,29 @@
 import { Button } from "czifui";
 import { compact, filter } from "lodash";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useMutation } from "react-query";
 import { validateSampleIdentifiers } from "src/common/queries/samples";
 import { pluralize } from "src/common/utils/strUtils";
 import { InputInstructions } from "./components/InputInstructions";
 import { StyledLabel, StyledLoadingAnimation, StyledTextArea } from "./style";
 
-const SampleIdInput = (): JSX.Element => {
+interface Props {
+  handleInputValidation(found: string[], missing: string[]): void;
+}
+
+const SampleIdInput = ({ handleInputValidation }: Props): JSX.Element => {
   const [inputValue, setInputValue] = useState<string>("");
   const [isInEditMode, setInEditMode] = useState<boolean>(true);
   const [isValidating, setValidating] = useState<boolean>(false);
   const [shouldShowAddButton, setShowAddButton] = useState<boolean>(false);
   const [idsInFlight, setIdsInFlight] = useState<string[]>([]);
   const [foundSampleIds, setFoundSampleIds] = useState<string[]>([]);
-  // @ts-expect-error: this piece of state will be used when warning is implemented
-  const [missingSampleIds, setMissingSampleIds] = useState<string[]>([]);
+  const [shouldValidate, setShouldValidate] = useState<boolean>(false);
 
-  const parseInputIds = () => {
+  const parseInputIds = useCallback(() => {
     const tokens = inputValue.split(/[\n\t,]/g);
     return compact(tokens);
-  };
+  }, [inputValue]);
 
   const validateSampleIdentifiersMutation = useMutation(
     validateSampleIdentifiers,
@@ -28,33 +31,47 @@ const SampleIdInput = (): JSX.Element => {
       onError: () => {
         setValidating(false);
         setShowAddButton(false);
-        setMissingSampleIds([]);
         setFoundSampleIds([]);
         setIdsInFlight([]);
+        handleInputValidation([]);
       },
       onSuccess: (data: any) => {
-        // set samples identifiers that were not found in the aspen
-        // database as missing
         setValidating(false);
         setShowAddButton(false);
 
         const missingIds = data["missing_sample_ids"];
         const foundIds = filter(idsInFlight, (id) => !missingIds.includes(id));
 
-        setMissingSampleIds(missingIds);
-        setFoundSampleIds(foundIds);
         setIdsInFlight([]);
+        setFoundSampleIds(foundIds);
+        handleInputValidation(foundIds, missingIds);
       },
     }
   );
 
-  const validateIds = () => {
-    setValidating(true);
-    setInEditMode(false);
+  useEffect(() => {
+    if (shouldValidate) {
+      setShouldValidate(false);
+      setValidating(true);
+      setInEditMode(false);
 
+      if (idsInFlight.length > 0) {
+        validateSampleIdentifiersMutation.mutate({
+          sampleIdsToValidate: idsInFlight,
+        });
+      }
+    }
+  }, [idsInFlight, shouldValidate, validateSampleIdentifiersMutation]);
+
+  const validateIds = () => {
     const sampleIdsToValidate = parseInputIds();
     setIdsInFlight(sampleIdsToValidate);
-    validateSampleIdentifiersMutation.mutate({ sampleIdsToValidate });
+    setShouldValidate(true);
+  };
+
+  const onClickEdit = () => {
+    setInEditMode(true);
+    setShowAddButton(true);
   };
 
   return (
@@ -93,11 +110,7 @@ const SampleIdInput = (): JSX.Element => {
           {foundSampleIds.length} {pluralize("Sample", foundSampleIds.length)}{" "}
           Added
           {!isValidating && (
-            <Button
-              sdsStyle="minimal"
-              sdsType="primary"
-              onClick={() => setInEditMode(true)}
-            >
+            <Button sdsStyle="minimal" sdsType="primary" onClick={onClickEdit}>
               Edit
             </Button>
           )}

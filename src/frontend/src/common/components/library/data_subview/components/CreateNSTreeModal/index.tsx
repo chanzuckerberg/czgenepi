@@ -59,6 +59,10 @@ export const CreateNSTreeModal = ({
   const [isTreeBuildDisabled, setTreeBuildDisabled] = useState<boolean>(false);
   const [shouldReset, setShouldReset] = useState<boolean>(false);
   const [treeType, setTreeType] = useState<TreeType>(TreeTypes.Targeted);
+  const [missingInputSamples, setMissingInputSamples] = useState<string[]>([]);
+  const [validatedInputSamples, setValidatedInputSamples] = useState<string[]>(
+    []
+  );
 
   useEffect(() => {
     if (shouldReset) setShouldReset(false);
@@ -73,6 +77,14 @@ export const CreateNSTreeModal = ({
   const handleClose = function () {
     clearState();
     onClose();
+  };
+
+  const handleInputValidation = (
+    foundSamples: string[],
+    missingSamples: string[]
+  ) => {
+    setValidatedInputSamples(foundSamples);
+    setMissingInputSamples(missingSamples);
   };
 
   useEffect(() => {
@@ -106,12 +118,6 @@ export const CreateNSTreeModal = ({
     },
   });
 
-  const handleSubmit = (evt: SyntheticEvent) => {
-    evt.preventDefault();
-    sampleIds = sampleIds.filter((id) => !failedSamples.includes(id));
-    mutation.mutate({ sampleIds, treeName, treeType });
-  };
-
   const TREE_TYPE_TOOLTIP_TEXT = (
     <div>
       Select the Tree Type best suited for the question you are trying to anwer.{" "}
@@ -120,6 +126,21 @@ export const CreateNSTreeModal = ({
       </NewTabLink>
     </div>
   );
+
+  const allPossibleSamples = sampleIds.concat(validatedInputSamples);
+  const allFailedOrMissingSamples = failedSamples.concat(missingInputSamples);
+  const allValidSamplesForTreeCreation = allPossibleSamples.filter(
+    (id) => !allFailedOrMissingSamples.includes(id)
+  );
+
+  const handleSubmit = (evt: SyntheticEvent) => {
+    evt.preventDefault();
+    mutation.mutate({
+      sampleIds: allValidSamplesForTreeCreation,
+      treeName,
+      treeType,
+    });
+  };
 
   return (
     <Dialog
@@ -136,7 +157,8 @@ export const CreateNSTreeModal = ({
         </StyledIconButton>
         <Header>Create New Phylogenetic Tree</Header>
         <Title>
-          {sampleIds.length} {pluralize("Sample", sampleIds.length)} Total
+          {allValidSamplesForTreeCreation.length}{" "}
+          {pluralize("Sample", allValidSamplesForTreeCreation.length)} Total
         </Title>
       </StyledDialogTitle>
       <StyledDialogContent>
@@ -184,16 +206,18 @@ export const CreateNSTreeModal = ({
             {usesFeatureFlag(FEATURE_FLAGS.gisaidIngest) && (
               <>
                 <Separator marginSize="l" />
-                <SampleIdInput />
+                <SampleIdInput handleInputValidation={handleInputValidation} />
                 <Separator marginSize="xl" />
               </>
             )}
-            <FailedSampleAlert numFailedSamples={failedSamples?.length} />
+            <FailedSampleAlert
+              numFailedSamples={allFailedOrMissingSamples?.length}
+            />
             {usesFeatureFlag(FEATURE_FLAGS.gisaidIngest) && (
               // TODO (mlila): ensure all of these props are accurate (state managed from input)
               <CreateTreeButton
                 hasValidName={hasValidName}
-                hasSamples={sampleIds.length > 0}
+                hasSamples={allValidSamplesForTreeCreation.length > 0}
                 isInEditMode={false}
                 isValidTreeType={Object.values(TreeTypes).includes(treeType)}
               />
