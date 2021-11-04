@@ -4,7 +4,6 @@ import Radio from "@material-ui/core/Radio";
 import TextField from "@material-ui/core/TextField";
 import InfoOutlinedIcon from "@material-ui/icons/InfoOutlined";
 import {
-  Button,
   fontBodyS,
   fontBodyXxs,
   fontBodyXxxs,
@@ -120,20 +119,6 @@ export const CreateTreeInfo = styled.div`
     return `
       color: ${colors?.gray[400]};
       margin-top: ${spaces?.l}px;
-    `;
-  }}
-`;
-
-export const StyledButton = styled(Button)`
-  ${(props) => {
-    const spaces = getSpaces(props);
-    const colors = getColors(props);
-    return `
-      margin-top: ${spaces?.xxl}px;
-
-      &:active {
-        background-color: ${colors?.gray[400]};
-      }
     `;
   }}
 `;

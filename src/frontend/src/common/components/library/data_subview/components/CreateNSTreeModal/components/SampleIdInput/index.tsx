@@ -1,36 +1,109 @@
-import React from "react";
-import { NewTabLink } from "src/common/components/library/NewTabLink";
-import { CollapsibleInstructions } from "src/components/CollapsibleInstructions";
-import { SemiBold } from "./style";
+import { Button } from "czifui";
+import { compact, filter } from "lodash";
+import React, { useState } from "react";
+import { useMutation } from "react-query";
+import { validateSampleIdentifiers } from "src/common/queries/samples";
+import { pluralize } from "src/common/utils/strUtils";
+import { InputInstructions } from "./components/InputInstructions";
+import { StyledLabel, StyledLoadingAnimation, StyledTextArea } from "./style";
 
 const SampleIdInput = (): JSX.Element => {
+  const [inputValue, setInputValue] = useState<string>("");
+  const [isInEditMode, setInEditMode] = useState<boolean>(true);
+  const [isValidating, setValidating] = useState<boolean>(false);
+  const [shouldShowAddButton, setShowAddButton] = useState<boolean>(false);
+  const [idsInFlight, setIdsInFlight] = useState<string[]>([]);
+  const [foundSampleIds, setFoundSampleIds] = useState<string[]>([]);
+  // @ts-expect-error: this piece of state will be used when warning is implemented
+  const [missingSampleIds, setMissingSampleIds] = useState<string[]>([]);
+
+  const parseInputIds = () => {
+    const tokens = inputValue.split(/[\n\t,]/g);
+    return compact(tokens);
+  };
+
+  const validateSampleIdentifiersMutation = useMutation(
+    validateSampleIdentifiers,
+    {
+      onError: () => {
+        setValidating(false);
+        setShowAddButton(false);
+        setMissingSampleIds([]);
+        setFoundSampleIds([]);
+        setIdsInFlight([]);
+      },
+      onSuccess: (data: any) => {
+        // set samples identifiers that were not found in the aspen
+        // database as missing
+        setValidating(false);
+        setShowAddButton(false);
+
+        const missingIds = data["missing_sample_ids"];
+        const foundIds = filter(idsInFlight, (id) => !missingIds.includes(id));
+
+        setMissingSampleIds(missingIds);
+        setFoundSampleIds(foundIds);
+        setIdsInFlight([]);
+      },
+    }
+  );
+
+  const validateIds = () => {
+    setValidating(true);
+    setInEditMode(false);
+
+    const sampleIdsToValidate = parseInputIds();
+    setIdsInFlight(sampleIdsToValidate);
+    validateSampleIdentifiersMutation.mutate({ sampleIdsToValidate });
+  };
+
   return (
-    <CollapsibleInstructions
-      header="Add Samples by ID (optional)"
-      items={[
-        <div key={0}>
-          Add <SemiBold>GISAID IDs</SemiBold> (e.g. USA/CA-CZB-0000/2021 or
-          hCoV-19/USA/CA-CZB-0000/2021), <SemiBold>Aspen Public IDs</SemiBold>,
-          or <SemiBold>Aspen Private IDs</SemiBold> below to include samples in
-          your tree.
-        </div>,
-        <div key={1}>
-          IDs must be separated by tabs, commas, or enter one ID per row.
-        </div>,
-        <div key={2}>
-          Depending on the Tree Type, add up to 2000 samples.{" "}
-          <NewTabLink href="https://docs.google.com/document/d/1_iQgwl3hn_pjlZLX-n0alUbbhgSPZvpW_0620Hk_kB4">
-            Learn More
-          </NewTabLink>
-        </div>,
-        <div key={3}>
-          <SemiBold>
-            As with samples uploaded directly to Aspen, sequences added by ID do
-            not undergo any QC before being added to your tree.
-          </SemiBold>
-        </div>,
-      ]}
-    />
+    <>
+      <InputInstructions />
+      <StyledTextArea
+        disabled={!isInEditMode}
+        onChange={(e) => setInputValue(e?.target?.value)}
+        onFocus={() => setShowAddButton(true)}
+        fullWidth
+        multiline
+        variant="outlined"
+        rows={3}
+        size="small"
+        value={inputValue}
+      />
+      {shouldShowAddButton && (
+        <Button
+          disabled={isValidating}
+          onClick={validateIds}
+          sdsStyle="square"
+          sdsType="primary"
+        >
+          {isValidating ? (
+            <StyledLabel>
+              <StyledLoadingAnimation />
+              Adding
+            </StyledLabel>
+          ) : (
+            "Add"
+          )}
+        </Button>
+      )}
+      {!isInEditMode && (
+        <div>
+          {foundSampleIds.length} {pluralize("Sample", foundSampleIds.length)}{" "}
+          Added
+          {!isValidating && (
+            <Button
+              sdsStyle="minimal"
+              sdsType="primary"
+              onClick={() => setInEditMode(true)}
+            >
+              Edit
+            </Button>
+          )}
+        </div>
+      )}
+    </>
   );
 };
 
