@@ -18,7 +18,10 @@ const getTreeUrl = async (treeId: number) => {
   const json = await result.json();
   const encodedJsonUrl = encodeURIComponent(stripProtocol(json.url));
 
-  return "https://nextstrain.org/fetch/" + encodedJsonUrl.replace("%2f", "/").replace("%2F", "/");
+  return (
+    "https://nextstrain.org/fetch/" +
+    encodedJsonUrl.replace("%2f", "/").replace("%2F", "/")
+  );
 };
 
 const getButtonText = ({
