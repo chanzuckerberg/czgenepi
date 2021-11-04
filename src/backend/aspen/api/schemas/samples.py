@@ -23,8 +23,8 @@ class SampleLineageResponseSchema(BaseResponse):
 
 
 class SampleGroupResponseSchema(BaseResponse):
-    group_id: int
-    group_name: str
+    id: int
+    name: str
 
 
 class SampleResponseSchema(BaseResponse):
@@ -36,9 +36,9 @@ class SampleResponseSchema(BaseResponse):
     private: bool
     private_identifier: str
     public_identifier: str
-    sequencing_date: str = "N/A"
+    sequencing_date: Optional[str]
     submitting_group: SampleGroupResponseSchema
-    upload_date: str
+    upload_date: Optional[str]
 
 
 class SamplesResponseSchema(BaseResponse):

@@ -161,8 +161,8 @@ async def list_samples(
             "czb_failed_genome_recovery": sample.czb_failed_genome_recovery,
             "lineage": format_sample_lineage(sample),
             "submitting_group": {
-                "group_id": sample.submitting_group_id,
-                "group_name": sample.submitting_group.name,
+                "id": sample.submitting_group_id,
+                "name": sample.submitting_group.name,
             },
             "private": sample.private,
         }
