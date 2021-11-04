@@ -3,10 +3,11 @@
 @import "src/common/styles/typography";
 
 .button {
-    @include font-caps-common;
-    color: $primary;
+  @include font-caps-common;
+  color: $primary;
 
-    &:hover, &:active {
-        color: $primary-darkest;
-    }
+  &:hover,
+  &:active {
+    color: $primary-darkest;
+  }
 }

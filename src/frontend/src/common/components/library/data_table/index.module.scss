@@ -47,7 +47,7 @@
 // we override padding. Headers with checkboxes should use above `.header` class
 // AND this class together. Because it comes second, it overrides, but everything
 // else continues to work as usual.
-.headerWithCheckbox{
+.headerWithCheckbox {
   padding: 0;
 }
 
