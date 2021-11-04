@@ -1,5 +1,5 @@
 import datetime
-from typing import NamedTuple, Optional
+from typing import Any, Dict, List, Mapping, MutableSequence, NamedTuple, Optional, Set
 
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends
@@ -52,8 +52,10 @@ async def list_samples(
         selectinload(Sample.submitting_group),
     )
     user_visible_samples_query = authz_samples_cansee(all_samples_query, None, user)
-    user_visible_samples = await db.execute(user_visible_samples_query)
-    user_visible_samples: List[Sample] = user_visible_samples.unique().scalars().all()
+    user_visible_samples_result = await db.execute(user_visible_samples_query)
+    user_visible_samples: List[Sample] = (
+        user_visible_samples_result.unique().scalars().all()
+    )
 
     # Map gisaid accession workflows to samples.
     # This should all go away when we change how GISAID ISL's are retrieved for samples.
@@ -66,18 +68,18 @@ async def list_samples(
             ("gisaid_accession", Optional[GisaidAccession]),
         ],
     )
-    sample_gisaid_table_map: Dict[int, SampleGisaidTuple] = dict()
+    sample_gisaid_tuple_map: Dict[int, SampleGisaidTuple] = dict()
     genome_id_to_sample_id: Dict[int, int] = dict()
     for sample in user_visible_samples:
         if sample.uploaded_pathogen_genome is not None:
-            sample_gisaid_table_map[sample.id] = SampleGisaidTuple(
+            sample_gisaid_tuple_map[sample.id] = SampleGisaidTuple(
                 sample, sample.uploaded_pathogen_genome, None, None
             )
             genome_id_to_sample_id[
                 sample.uploaded_pathogen_genome.entity_id
             ] = sample.id
         else:
-            sample_gisaid_table_map[sample.id] = SampleGisaidTuple(
+            sample_gisaid_tuple_map[sample.id] = SampleGisaidTuple(
                 sample, None, None, None
             )
 
@@ -89,12 +91,12 @@ async def list_samples(
             selectinload(GisaidAccessionWorkflow.inputs),
         )
     )
-    gisaid_accession_workflows_with_inputs = await db.execute(
+    gisaid_accession_workflows_with_inputs_response = await db.execute(
         gisaid_accession_workflows_inputs_query
     )
     gisaid_accession_workflows_with_inputs: List[
         GisaidAccessionWorkflow
-    ] = gisaid_accession_workflows_with_inputs.scalars().all()
+    ] = gisaid_accession_workflows_with_inputs_response.scalars().all()
 
     # get around circular references
     gisaid_accesssions_query = (
@@ -125,11 +127,11 @@ async def list_samples(
         # This is the same for its relationship outputs.
         genome_id = gisaid_accession_workflow.inputs[0].entity_id
         sample_id = genome_id_to_sample_id[genome_id]
-        origin_tuple = sample_gisaid_table_map[sample_id]
+        origin_tuple = sample_gisaid_tuple_map[sample_id]
         gisaid_accession = workflow_to_accession_map.get(
             gisaid_accession_workflow.workflow_id, None
         )
-        sample_gisaid_table_map[sample_id] = SampleGisaidTuple(
+        sample_gisaid_tuple_map[sample_id] = SampleGisaidTuple(
             origin_tuple.sample,
             origin_tuple.uploaded_pathogen_genome,
             gisaid_accession_workflow,
@@ -138,7 +140,7 @@ async def list_samples(
 
     # populate sample object according to response schema
     results: MutableSequence[Mapping[str, Any]] = list()
-    for sample_gisaid_tuple in sample_gisaid_table_map.values():
+    for sample_gisaid_tuple in sample_gisaid_tuple_map.values():
         sample = sample_gisaid_tuple.sample
         returned_sample_data = {
             "public_identifier": sample.public_identifier,

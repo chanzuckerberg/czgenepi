@@ -12,8 +12,8 @@ from aspen.database.models import (
 
 def determine_gisaid_status(
     sample: Sample,
-    gisaid_accession_workflow: GisaidAccessionWorkflow,
-    gisaid_accession: GisaidAccession,
+    gisaid_accession_workflow: Optional[GisaidAccessionWorkflow],
+    gisaid_accession: Optional[GisaidAccession],
     rejection_time: datetime.timedelta,
 ) -> Mapping[str, Optional[str]]:
     if sample.czb_failed_genome_recovery:
@@ -39,7 +39,7 @@ def determine_gisaid_status(
     date_since_submitted = (
         datetime.date.today() - gisaid_accession_workflow.start_datetime.date()
     )
-    if date_since_submitted < GISAID_REJECTION_TIME:
+    if date_since_submitted < rejection_time:
         return {"status": "Submitted", "gisaid_id": None}
     else:
         return {"status": "Rejected", "gisaid_id": None}
