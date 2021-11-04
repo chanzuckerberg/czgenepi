@@ -25,14 +25,14 @@ const RedirectConfirmationModal = ({
   onClose,
   onConfirm,
   logoWidth,
-  logoHeight,
+  logoHeight = 45,
   ...props
 }: Props): JSX.Element => {
   const title = (
     <>
       <Image // using next image for png files, see https://nextjs.org/docs/basic-features/image-optimization#image-sizing
         src={img}
-        height={logoHeight || 45} // 45 px
+        height={logoHeight} // 45 px
         width={logoWidth}
         layout={"intrinsic"} // Scale down to fit width of container, up to image size
       />
