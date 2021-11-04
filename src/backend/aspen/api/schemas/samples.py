@@ -5,6 +5,11 @@ from pydantic import constr
 from aspen.api.schemas.base import BaseRequest, BaseResponse
 
 
+class SampleRequestSchema(BaseRequest):
+    # mypy + pydantic is a work in progress: https://github.com/samuelcolvin/pydantic/issues/156
+    name: constr(min_length=1, max_length=128, strict=True)  # type: ignore
+
+
 class SampleGisaidResponseSchema(BaseResponse):
     gisaid_id: Optional[str]
     status: str
@@ -17,9 +22,9 @@ class SampleLineageResponseSchema(BaseResponse):
     version: Optional[str]
 
 
-class SampleRequestSchema(BaseRequest):
-    # mypy + pydantic is a work in progress: https://github.com/samuelcolvin/pydantic/issues/156
-    name: constr(min_length=1, max_length=128, strict=True)  # type: ignore
+class SampleGroupResponseSchema(BaseResponse):
+    group_id: int
+    group_name: str
 
 
 class SampleResponseSchema(BaseResponse):
@@ -32,6 +37,7 @@ class SampleResponseSchema(BaseResponse):
     private_identifier: str
     public_identifier: str
     sequencing_date: str = "N/A"
+    submitting_group: SampleGroupResponseSchema
     upload_date: str
 
 

@@ -48,7 +48,8 @@ async def list_samples(
 
     # load the samples.
     all_samples_query = sa.select(Sample).options(
-        selectinload(Sample.uploaded_pathogen_genome)
+        selectinload(Sample.uploaded_pathogen_genome),
+        selectinload(Sample.submitting_group),
     )
     user_visible_samples_query = authz_samples_cansee(all_samples_query, None, user)
     user_visible_samples = await db.execute(user_visible_samples_query)
@@ -135,7 +136,7 @@ async def list_samples(
             gisaid_accession,
         )
 
-    # filter for only information we need in sample table view
+    # populate sample object according to response schema
     results: MutableSequence[Mapping[str, Any]] = list()
     for sample_gisaid_tuple in sample_gisaid_table_map.values():
         sample = sample_gisaid_tuple.sample
@@ -161,6 +162,10 @@ async def list_samples(
             ),
             "czb_failed_genome_recovery": sample.czb_failed_genome_recovery,
             "lineage": format_sample_lineage(sample),
+            "submitting_group": {
+                "group_id": sample.submitting_group_id,
+                "group_name": sample.submitting_group.name,
+            },
             "private": sample.private,
         }
 
