@@ -16,7 +16,7 @@ builds:
     location: {location}
     region: North America
     subsampling_scheme: group_only
-    title: '{location}, {division} samples'
+    title: '{location}, {division} samples, non-contextualized tree'
 
 ## custom rules
 custom_rules:

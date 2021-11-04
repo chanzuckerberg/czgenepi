@@ -1,9 +1,11 @@
 import { Dialog } from "@material-ui/core";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import CloseIcon from "@material-ui/icons/Close";
+import { Tooltip } from "czifui";
 import React, { SyntheticEvent, useEffect, useState } from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { useCreateTree } from "src/common/queries/trees";
+import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import { pluralize } from "src/common/utils/strUtils";
 import { Header, StyledIconButton } from "../DownloadModal/style";
 import { FailedSampleAlert } from "../FailedSampleAlert";
@@ -11,33 +13,28 @@ import {
   RadioLabelNonContextualized,
   RadioLabelTargeted,
 } from "./components/RadioLabel";
+import { SampleIdInput } from "./components/SampleIdInput";
+import { TreeNameInput } from "./components/TreeNameInput";
 import {
   Content,
   CreateTreeInfo,
   FieldTitle,
-  InstructionsNotSemiBold,
-  InstructionsSemiBold,
+  Separator,
   StyledButton,
   StyledDialogContent,
   StyledDialogTitle,
-  StyledErrorOutlinedIcon,
   StyledFormControlLabel,
   StyledInfoOutlinedIcon,
-  StyledInstructions,
-  StyledInstructionsButton,
   StyledRadio,
-  StyledTextField,
   StyledTooltip,
-  TextFieldAlert,
   Title,
   TreeNameInfoWrapper,
-  TreeNameTooLongAlert,
   TreeTypeSection,
 } from "./style";
 
 interface Props {
   sampleIds: string[];
-  failedSamples: any[];
+  failedSamples: string[];
   open: boolean;
   onClose: () => void;
   handleCreateTreeFailed: () => void;
@@ -55,20 +52,21 @@ export const CreateNSTreeModal = ({
   handleSetCreateTreeStarted,
 }: Props): JSX.Element => {
   const [treeName, setTreeName] = useState<string>("");
-  const [isTreeNameTooLong, setTreeNameTooLong] = useState<boolean>(false);
   const [isTreeBuildDisabled, setTreeBuildDisabled] = useState<boolean>(false);
+  const [shouldReset, setShouldReset] = useState<boolean>(false);
   const [treeType, setTreeType] = useState<TreeType>("TARGETED");
-  const [areInstructionsShown, setInstructionsShown] = useState<boolean>(false);
   // comment back in when ready to use validation endpoint
   // const [sampleIdsToValidate, setSampleIdsToValidate] = useState<string[]>([]);
   // const [missingSampleIdentifiers, setMissingSampleIdentifiers] = useState<string[]>([]);
-  useState<boolean>(false);
+
+  useEffect(() => {
+    if (shouldReset) setShouldReset(false);
+  }, [shouldReset]);
 
   const clearState = function () {
+    setShouldReset(true);
     setTreeName("");
     setTreeType("TARGETED");
-    setInstructionsShown(false);
-    setTreeNameTooLong(false);
   };
 
   const handleClose = function () {
@@ -78,13 +76,9 @@ export const CreateNSTreeModal = ({
 
   useEffect(() => {
     const treeNameLength = treeName.length;
-    if (treeNameLength > 128) {
-      setTreeNameTooLong(true);
-      setTreeBuildDisabled(true);
-    } else if (treeNameLength === 0) {
+    if (treeNameLength > 128 || treeNameLength === 0) {
       setTreeBuildDisabled(true);
     } else {
-      setTreeNameTooLong(false);
       if (treeType === "TARGETED" || treeType === "NON_CONTEXTUALIZED") {
         setTreeBuildDisabled(false);
       } else {
@@ -118,15 +112,12 @@ export const CreateNSTreeModal = ({
     },
   });
 
-  const handleInstructionsClick = function () {
-    setInstructionsShown((prevState: boolean) => !prevState);
-  };
-
   const handleSubmit = (evt: SyntheticEvent) => {
     evt.preventDefault();
     sampleIds = sampleIds.filter((id) => !failedSamples.includes(id));
     mutation.mutate({ sampleIds, treeName, treeType });
   };
+
   const TREE_TYPE_TOOLTIP_TEXT = (
     <div>
       Select the Tree Type best suited for the question you are trying to anwer.{" "}
@@ -135,6 +126,9 @@ export const CreateNSTreeModal = ({
       </NewTabLink>
     </div>
   );
+
+  const NO_NAME_NO_SAMPLES =
+    "Your tree requires a Tree Name & at least 1 Sample or Sample ID.";
 
   return (
     <Dialog
@@ -151,52 +145,13 @@ export const CreateNSTreeModal = ({
         </StyledIconButton>
         <Header>Create New Phylogenetic Tree</Header>
         <Title>
-          {sampleIds.length} {pluralize("Sample", sampleIds.length)} Selected
+          {sampleIds.length} {pluralize("Sample", sampleIds.length)} Total
         </Title>
       </StyledDialogTitle>
       <StyledDialogContent>
         <Content data-test-id="modal-content">
           <form onSubmit={handleSubmit}>
-            <div>
-              <TreeNameInfoWrapper>
-                <FieldTitle>Tree Name</FieldTitle>
-                <StyledInstructionsButton
-                  color="primary"
-                  onClick={handleInstructionsClick}
-                >
-                  {areInstructionsShown ? "LESS" : "MORE"} INFO
-                </StyledInstructionsButton>
-              </TreeNameInfoWrapper>
-              {areInstructionsShown && (
-                <StyledInstructions
-                  items={[
-                    <InstructionsSemiBold key="1">
-                      Do not include any PII in your Tree name.
-                    </InstructionsSemiBold>,
-                    <InstructionsNotSemiBold key="2">
-                      Tree names must be no longer than 128 characters.
-                    </InstructionsNotSemiBold>,
-                  ]}
-                />
-              )}
-              <StyledTextField
-                fullWidth
-                error={isTreeNameTooLong}
-                id="outlined-basic"
-                variant="outlined"
-                value={treeName}
-                size="small"
-                onChange={(e) => setTreeName(e.target.value)}
-              />
-              {isTreeNameTooLong && (
-                <TreeNameTooLongAlert>
-                  <StyledErrorOutlinedIcon />
-                  <TextFieldAlert>
-                    Name exceeds the 128 character limit.
-                  </TextFieldAlert>
-                </TreeNameTooLongAlert>
-              )}
-            </div>
+            <TreeNameInput setTreeName={setTreeName} treeName={treeName} />
             <TreeTypeSection>
               <TreeNameInfoWrapper>
                 <FieldTitle>Tree Type: </FieldTitle>
@@ -233,22 +188,52 @@ export const CreateNSTreeModal = ({
                 />
               </RadioGroup>
             </TreeTypeSection>
+            {usesFeatureFlag(FEATURE_FLAGS.gisaidIngest) && (
+              <>
+                <Separator marginSize="l" />
+                <SampleIdInput />
+                <Separator marginSize="xl" />
+              </>
+            )}
             <FailedSampleAlert numFailedSamples={failedSamples?.length} />
-            <StyledButton
-              color="primary"
-              variant="contained"
-              isRounded
-              disabled={isTreeBuildDisabled}
-              type="submit"
-              value="Submit"
-            >
-              Create Tree
-            </StyledButton>
+            {usesFeatureFlag(FEATURE_FLAGS.gisaidIngest) && (
+              <Tooltip
+                arrow
+                disableHoverListener={!isTreeBuildDisabled}
+                sdsStyle="dark"
+                title={NO_NAME_NO_SAMPLES}
+              >
+                <div>
+                  <StyledButton
+                    color="primary"
+                    variant="contained"
+                    isRounded
+                    disabled={isTreeBuildDisabled}
+                    type="submit"
+                    value="Submit"
+                  >
+                    Create Tree
+                  </StyledButton>
+                </div>
+              </Tooltip>
+            )}
+            {!usesFeatureFlag(FEATURE_FLAGS.gisaidIngest) && (
+              <StyledButton
+                color="primary"
+                variant="contained"
+                isRounded
+                disabled={isTreeBuildDisabled}
+                type="submit"
+                value="Submit"
+              >
+                Create Tree
+              </StyledButton>
+            )}
           </form>
           <CreateTreeInfo>
             Creating a new tree can take up to 12 hours.
           </CreateTreeInfo>
-          {/* 
+          {/*
           Placeholder for when we add in actual id validation text box
           <StyledButton
             color="primary"
