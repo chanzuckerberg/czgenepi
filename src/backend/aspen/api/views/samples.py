@@ -47,7 +47,7 @@ async def list_samples(
     }
 
     # load the samples.
-    all_samples_query = sa.select(Sample).options(
+    all_samples_query = sa.select(Sample).options(  # type: ignore
         selectinload(Sample.uploaded_pathogen_genome),
         selectinload(Sample.submitting_group),
     )
@@ -84,8 +84,8 @@ async def list_samples(
             )
 
     gisaid_accession_workflows_inputs_query = (
-        sa.select(GisaidAccessionWorkflow)
-        .join(GisaidAccessionWorkflow.inputs)
+        sa.select(GisaidAccessionWorkflow)  # type: ignore
+        .join(GisaidAccessionWorkflow.inputs)  # type: ignore
         .filter(Entity.id.in_(genome_id_to_sample_id.keys()))
         .options(
             selectinload(GisaidAccessionWorkflow.inputs),
@@ -99,16 +99,16 @@ async def list_samples(
     ] = gisaid_accession_workflows_with_inputs_response.scalars().all()
 
     # get around circular references
-    gisaid_accessions_query = sa.select(GisaidAccession).filter(
-        GisaidAccession.producing_workflow_id.in_(
+    gisaid_accessions_query = sa.select(GisaidAccession).filter(  # type: ignore
+        GisaidAccession.producing_workflow_id.in_(  # type: ignore
             [
                 workflow.workflow_id
                 for workflow in gisaid_accession_workflows_with_inputs
             ]
         )
     )
-    gisaid_accessions = await db.execute(gisaid_accessions_query)
-    gisaid_accessions = gisaid_accessions.scalars().all()
+    gisaid_accessions_result = await db.execute(gisaid_accessions_query)
+    gisaid_accessions = gisaid_accessions_result.scalars().all()
 
     workflow_to_accession_map: Dict[int, GisaidAccession] = dict()
     for accession in gisaid_accessions:
