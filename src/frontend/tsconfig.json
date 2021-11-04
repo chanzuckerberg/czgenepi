@@ -26,13 +26,12 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "esnext",
-    "tsBuildInfoFile": "/tmp/tsbuildinfo",
     "types": [
       "jest-playwright-preset",
       "expect-playwright",
       "jest"
     ],
-    "incremental": true
+    "incremental": false,
   },
   "exclude": [
     "node_modules",
