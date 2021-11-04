@@ -93,7 +93,8 @@ task IngestGISAID {
     gisaid_password=$(echo "${gisaid_credentials}" | jq -r .password)
 
     wget "~{gisaid_ndjson_url}" --user "${gisaid_username}" --password "${gisaid_password}" --continue --tries=2 -O gisaid_dump.fasta.bz2
-    bunzip2 gisaid_dump.fasta.bz2 | zstdmt > sequences.fasta.zst
+    bunzip2 gisaid_dump.fasta.bz2 
+    zstdmt gisaid_dump.fasta -o sequences.fasta.zst
 
     aws s3 cp sequences.fasta.zst "s3://${aspen_s3_db_bucket}/${sequences_key}"
 
