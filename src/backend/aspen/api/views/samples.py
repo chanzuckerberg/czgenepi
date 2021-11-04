@@ -99,19 +99,15 @@ async def list_samples(
     ] = gisaid_accession_workflows_with_inputs_response.scalars().all()
 
     # get around circular references
-    gisaid_accesssions_query = (
-        sa.select(GisaidAccession)
-        .join(GisaidAccessionWorkflow)
-        .filter(
-            Entity.producing_workflow_id.in_(
-                [
-                    workflow.workflow_id
-                    for workflow in gisaid_accession_workflows_with_inputs
-                ]
-            )
+    gisaid_accessions_query = sa.select(GisaidAccession).filter(
+        GisaidAccession.producing_workflow_id.in_(
+            [
+                workflow.workflow_id
+                for workflow in gisaid_accession_workflows_with_inputs
+            ]
         )
     )
-    gisaid_accessions = await db.execute(gisaid_accesssions_query)
+    gisaid_accessions = await db.execute(gisaid_accessions_query)
     gisaid_accessions = gisaid_accessions.scalars().all()
 
     workflow_to_accession_map: Dict[int, GisaidAccession] = dict()
