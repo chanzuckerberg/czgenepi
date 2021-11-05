@@ -74,6 +74,8 @@ export const CreateNSTreeModal = ({
     setShouldReset(true);
     setTreeName("");
     setTreeType(TreeTypes.Targeted);
+    setMissingInputSamples([]);
+    setValidatedInputSamples([]);
   };
 
   const handleClose = function () {
@@ -221,9 +223,7 @@ export const CreateNSTreeModal = ({
               </>
             )}
             <MissingSampleAlert missingSamples={missingInputSamples} />
-            <FailedSampleAlert
-              numFailedSamples={allFailedOrMissingSamples?.length}
-            />
+            <FailedSampleAlert numFailedSamples={failedSamples?.length} />
             {usesFeatureFlag(FEATURE_FLAGS.gisaidIngest) && (
               <CreateTreeButton
                 hasValidName={hasValidName}
