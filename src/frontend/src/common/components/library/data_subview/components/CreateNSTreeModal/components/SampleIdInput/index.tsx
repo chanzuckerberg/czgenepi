@@ -10,11 +10,13 @@ import { StyledLabel, StyledLoadingAnimation, StyledTextArea } from "./style";
 interface Props {
   handleInputModeChange(isEditing: boolean): void;
   handleInputValidation(found: string[], missing: string[]): void;
+  shouldReset?: boolean;
 }
 
 const SampleIdInput = ({
   handleInputModeChange,
   handleInputValidation,
+  shouldReset,
 }: Props): JSX.Element => {
   const [inputValue, setInputValue] = useState<string>("");
   const [isInEditMode, setInEditMode] = useState<boolean>(true);
@@ -23,6 +25,12 @@ const SampleIdInput = ({
   const [idsInFlight, setIdsInFlight] = useState<string[]>([]);
   const [foundSampleIds, setFoundSampleIds] = useState<string[]>([]);
   const [shouldValidate, setShouldValidate] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (shouldReset) {
+      setInputValue("");
+    }
+  }, [shouldReset]);
 
   const parseInputIds = useCallback(() => {
     const tokens = inputValue.split(/[\n\t,]/g);
