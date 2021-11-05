@@ -108,6 +108,7 @@ export const Footer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  background: green;
 `;
 
 export const FooterButtonContainer = styled.div`

@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import Slider from "react-slick";
 import Quote from "./components/Quote";
 import "slick-carousel/slick/slick.css";
@@ -22,12 +22,14 @@ export default function QuoteSlider(): JSX.Element {
         <QuoteSliderContainer>
             <Slider {...settings}>
                 <Quote 
-                    quoteText="I'm a quote!" 
-                    citation="—I'm an author."
+                    quoteText='We could see that our efforts, in terms of isolating the sick and quarantining exposed contacts, we could actually see that that was effective intervention. It was a headache to contain all those individuals from that superspreader event, but it worked. And this information was really useful to demonstrate to our director, to our health officers, that ... it showed the value in this 
+                    [sequencing] technology."'
+                    citation="—County Public Health Laboratory Director"
                     />
                 <Quote 
-                    quoteText="I'm another quote!" 
-                    citation="—I'm another author."
+                    quoteText='We could see that our efforts, in terms of isolating the sick and quarantining exposed contacts, we could actually see that that was effective intervention. It was a headache to contain all those individuals from that superspreader event, but it worked. And this information was really useful to demonstrate to our director, to our health officers, that ... it showed the value in this 
+                    [sequencing] technology."'
+                    citation="—County Public Health Laboratory Director"
                     />
             </Slider>
         </QuoteSliderContainer>
