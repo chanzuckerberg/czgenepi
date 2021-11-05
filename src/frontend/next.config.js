@@ -1,4 +1,3 @@
-const withImages = require("next-images");
 
 const nodeEnv = require(__dirname + "/src/common/constants/nodeEnv.js");
 const ENV = require(__dirname + "/src/common/constants/ENV.js");
@@ -10,10 +9,9 @@ const isProdBuild = ENV.NODE_ENV === nodeEnv.PRODUCTION;
 
 const SCRIPT_SRC = ["'self'"];
 
-module.exports = withImages({
+module.exports = ({
   distDir: ENV.BUILD_PATH,
   fileExtensions: ["jpg", "jpeg", "png", "gif", "ico", "webp", "jp2", "avif"],
-  future: { webpack5: true },
 
   async generateBuildId() {
     // Return null to allow next.js to fallback to default behavior

@@ -4,16 +4,10 @@ import { P } from "src/common/styles/support/style";
 
 export const StyledHeader = styled.div`
   ${fontHeaderXl}
-`;
-
-export const StyledImg = styled("img")`
-  height: 45px;
-
   ${(props) => {
     const spaces = getSpaces(props);
-
     return `
-      margin-bottom: ${spaces?.l}px;
+      margin-top: ${spaces?.l}px;
     `;
   }}
 `;
