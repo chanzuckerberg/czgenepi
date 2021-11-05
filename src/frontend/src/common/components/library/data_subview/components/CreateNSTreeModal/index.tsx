@@ -57,6 +57,7 @@ export const CreateNSTreeModal = ({
 }: Props): JSX.Element => {
   const [treeName, setTreeName] = useState<string>("");
   const [isTreeBuildDisabled, setTreeBuildDisabled] = useState<boolean>(false);
+  const [isInputInEditMode, setIsInputInEditMode] = useState<boolean>(false);
   const [shouldReset, setShouldReset] = useState<boolean>(false);
   const [treeType, setTreeType] = useState<TreeType>(TreeTypes.Targeted);
   const [missingInputSamples, setMissingInputSamples] = useState<string[]>([]);
@@ -77,6 +78,10 @@ export const CreateNSTreeModal = ({
   const handleClose = function () {
     clearState();
     onClose();
+  };
+
+  const handleInputModeChange = (isEditing: boolean) => {
+    setIsInputInEditMode(isEditing);
   };
 
   const handleInputValidation = (
@@ -206,7 +211,11 @@ export const CreateNSTreeModal = ({
             {usesFeatureFlag(FEATURE_FLAGS.gisaidIngest) && (
               <>
                 <Separator marginSize="l" />
-                <SampleIdInput handleInputValidation={handleInputValidation} />
+                <SampleIdInput
+                  handleInputModeChange={handleInputModeChange}
+                  handleInputValidation={handleInputValidation}
+                  shouldReset={shouldReset}
+                />
                 <Separator marginSize="xl" />
               </>
             )}
@@ -214,11 +223,10 @@ export const CreateNSTreeModal = ({
               numFailedSamples={allFailedOrMissingSamples?.length}
             />
             {usesFeatureFlag(FEATURE_FLAGS.gisaidIngest) && (
-              // TODO (mlila): ensure all of these props are accurate (state managed from input)
               <CreateTreeButton
                 hasValidName={hasValidName}
                 hasSamples={allValidSamplesForTreeCreation.length > 0}
-                isInEditMode={false}
+                isInEditMode={isInputInEditMode}
                 isValidTreeType={Object.values(TreeTypes).includes(treeType)}
               />
             )}

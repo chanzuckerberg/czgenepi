@@ -8,10 +8,14 @@ import { InputInstructions } from "./components/InputInstructions";
 import { StyledLabel, StyledLoadingAnimation, StyledTextArea } from "./style";
 
 interface Props {
+  handleInputModeChange(isEditing: boolean): void;
   handleInputValidation(found: string[], missing: string[]): void;
 }
 
-const SampleIdInput = ({ handleInputValidation }: Props): JSX.Element => {
+const SampleIdInput = ({
+  handleInputModeChange,
+  handleInputValidation,
+}: Props): JSX.Element => {
   const [inputValue, setInputValue] = useState<string>("");
   const [isInEditMode, setInEditMode] = useState<boolean>(true);
   const [isValidating, setValidating] = useState<boolean>(false);
@@ -54,6 +58,7 @@ const SampleIdInput = ({ handleInputValidation }: Props): JSX.Element => {
       setShouldValidate(false);
       setValidating(true);
       setInEditMode(false);
+      handleInputModeChange(false);
 
       if (idsInFlight.length > 0) {
         validateSampleIdentifiersMutation.mutate({
@@ -71,6 +76,7 @@ const SampleIdInput = ({ handleInputValidation }: Props): JSX.Element => {
 
   const onClickEdit = () => {
     setInEditMode(true);
+    handleInputModeChange(true);
     setShowAddButton(true);
   };
 
