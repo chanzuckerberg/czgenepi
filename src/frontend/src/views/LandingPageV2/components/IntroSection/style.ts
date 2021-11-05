@@ -11,6 +11,27 @@ export const IntroContainer = styled.div`
     @media (max-width: 768px) {
         flex-direction: column;
     }
+<<<<<<< HEAD
+=======
+`;
+
+export const IntroCTAButton = styled.a`
+    display: inline-block;
+    background: white;
+    color: #7A41CE;
+    border: 1px solid #7A41CE;
+    border-radius: 24px;
+    padding: 7px 14px 6px;
+    font-size: 13px;
+    line-height: 20px;
+    letter-spacing: 0.3px;
+    text-align: center;
+
+    &:hover {
+        color: white;
+        background: #7A41CE;
+    }
+>>>>>>> d76dee8 (header, footer, email form logic, updates to responsive styling)
 `;
 
 export const IntroDescription = styled.p`
@@ -19,11 +40,14 @@ export const IntroDescription = styled.p`
     line-height: 26px;
     letter-spacing: 0.3px;
     margin-bottom: 30px;
+<<<<<<< HEAD
 
     @media (max-width: 1200px) {
         font-size: 14px;
         line-height: 24px;
     }
+=======
+>>>>>>> d76dee8 (header, footer, email form logic, updates to responsive styling)
 `;
 
 export const IntroHeading = styled.h2`
@@ -32,6 +56,7 @@ export const IntroHeading = styled.h2`
     line-height: 44px;
     letter-spacing: 0.3px;
     margin-bottom: 30px;
+<<<<<<< HEAD
 
     @media (max-width: 1200px) {
         font-size: 26px;
@@ -42,6 +67,8 @@ export const IntroHeading = styled.h2`
         font-size: 18px;
         line-height: 24px;
     }
+=======
+>>>>>>> d76dee8 (header, footer, email form logic, updates to responsive styling)
 `;
 
 export const IntroImage = styled.div`
@@ -64,10 +91,13 @@ export const IntroTextContainer = styled.div`
     margin-top: 70px;
     margin-left: 78px;
 
+<<<<<<< HEAD
     @media (max-width: 1200px) {
         width: 100%;
     }
 
+=======
+>>>>>>> d76dee8 (header, footer, email form logic, updates to responsive styling)
     @media (max-width: 768px) {
         width: 100%;
         margin: 0 auto;

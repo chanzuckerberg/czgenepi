@@ -30,6 +30,7 @@ export const EmailInput = styled.input`
         color: #545454;
     }
 
+<<<<<<< HEAD
     @media (max-width: 1200px) {
         font-size: 13px;
         line-height: 21px;
@@ -37,6 +38,12 @@ export const EmailInput = styled.input`
 
     @media (max-width: 768px) {
         border-radius: 999px;
+=======
+    @media (max-width: 768px) {
+        border-radius: 999px;
+        font-size: 13px;
+        line-height: 21px;
+>>>>>>> d76dee8 (header, footer, email form logic, updates to responsive styling)
         margin-bottom: 7px;
         width: 100%;
         padding: 13px;
@@ -57,6 +64,7 @@ export const SubmitButton = styled.button`
     line-height: 26px;
     letter-spacing: 0.3px;
 
+<<<<<<< HEAD
     @media (max-width: 1200px) {
         font-size: 13px;
         line-height: 21px;
@@ -64,6 +72,12 @@ export const SubmitButton = styled.button`
 
     @media (max-width: 768px) {
         border-radius: 999px;
+=======
+    @media (max-width: 768px) {
+        border-radius: 999px;
+        font-size: 13px;
+        line-height: 21px;
+>>>>>>> d76dee8 (header, footer, email form logic, updates to responsive styling)
         width: 100%;
     }
 `;

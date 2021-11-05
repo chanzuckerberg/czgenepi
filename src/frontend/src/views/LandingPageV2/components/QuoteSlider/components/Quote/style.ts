@@ -19,6 +19,7 @@ export const QuoteContainer = styled.div`
     padding-top: 80px;
     position: relative;
 
+<<<<<<< HEAD
     @media (max-width: 1200px) {
         max-width: 600px;
     }
@@ -27,11 +28,17 @@ export const QuoteContainer = styled.div`
         padding-left: 20px;
         padding-right: 20px;
         padding-top: 30px;
+=======
+    @media (max-width: 768px) {
+        padding-left: 10%;
+        padding-right: 10%;
+>>>>>>> d76dee8 (header, footer, email form logic, updates to responsive styling)
     }
 `;
 
 export const QuoteIcon = styled.span`
     position: absolute;
+<<<<<<< HEAD
     top: 15%;
     left: -8%;
     z-index: 2;
@@ -43,6 +50,11 @@ export const QuoteIcon = styled.span`
         align-self: flex-start;
         padding-bottom: 30px;
     }
+=======
+    top: 20%;
+    left: -8%;
+    z-index: 2;
+>>>>>>> d76dee8 (header, footer, email form logic, updates to responsive styling)
 `;
 
 export const QuoteText = styled.p`

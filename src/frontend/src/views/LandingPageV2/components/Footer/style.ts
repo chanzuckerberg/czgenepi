@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 
-export const CZBiohubLogo = styled.div`
+export const CZBiohubLogo = styled.a`
     max-width: 120px;
     padding-left: 20px;
 `;
@@ -26,7 +26,7 @@ export const CZLogoContainer = styled.div`
     }
 `;
 
-export const CZILogo = styled.div`
+export const CZILogo = styled.a`
     margin-left: 32px;
     border-right: 1px solid #767676;
     padding-right: 20px;
@@ -83,7 +83,7 @@ export const FooterContainer = styled.div`
     }
 `;
 
-export const FooterLogoContainer = styled.div`
+export const FooterLogoContainer = styled.a`
     width: 100%;
     max-width: 130px;
 `;

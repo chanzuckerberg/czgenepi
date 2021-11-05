@@ -10,13 +10,14 @@ import {
     PartnersSectionContainer,
     UsherLogo
 } from "./style";
+import { ROUTES } from "src/common/routes";
 
 export default function IntroSection(): JSX.Element {
 
     return (
         <PartnersSectionContainer>
             <PartnerLink
-                href="/"
+                href={ROUTES.USHER}
                 target="_blank"
                 >
                 <UsherLogo>
@@ -24,7 +25,7 @@ export default function IntroSection(): JSX.Element {
                 </UsherLogo>
             </PartnerLink>
             <PartnerLink
-                href="/"
+                href={ROUTES.PANGOLIN}
                 target="_blank"
                 >
                 <PangolinLogo>
@@ -32,7 +33,7 @@ export default function IntroSection(): JSX.Element {
                 </PangolinLogo>
             </PartnerLink>
             <PartnerLink
-                href="/"
+                href={ROUTES.NEXTSTRAIN}
                 target="_blank"
                 >
                 <NextstrainLogo>
