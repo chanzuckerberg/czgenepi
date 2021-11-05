@@ -45,7 +45,7 @@ const SampleIdInput = ({
         setShowAddButton(false);
         setFoundSampleIds([]);
         setIdsInFlight([]);
-        handleInputValidation([]);
+        handleInputValidation([], []);
       },
       onSuccess: (data: any) => {
         setValidating(false);
