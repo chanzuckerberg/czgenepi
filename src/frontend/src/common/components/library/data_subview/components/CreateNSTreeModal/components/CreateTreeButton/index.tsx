@@ -17,6 +17,7 @@ const CreateTreeButton = ({
 }: Props): JSX.Element => {
   const NO_NAME_NO_SAMPLES =
     "Your tree requires a Tree Name & at least 1 Sample or Sample ID.";
+  const NO_NAME = "Your tree requires a Tree Name.";
   const NO_SAMPLES = "Your tree requires at least 1 Sample or Sample ID.";
   const SAMPLES_ARE_IN_EDIT =
     "Finish adding Sample IDs before creating your tree.";
@@ -24,6 +25,7 @@ const CreateTreeButton = ({
   let tooltipTitle = "";
 
   if (!hasValidName && !hasSamples) tooltipTitle = NO_NAME_NO_SAMPLES;
+  else if (!hasValidName) tooltipTitle = NO_NAME;
   else if (!hasSamples) tooltipTitle = NO_SAMPLES;
   else if (isInEditMode) tooltipTitle = SAMPLES_ARE_IN_EDIT;
 
