@@ -7,15 +7,33 @@ export const Citation = styled.span`
     line-height: 20px;
     letter-spacing: 0.3px;
     color: #FFF;
+    align-self: flex-end;
 `;
 
 export const QuoteContainer = styled.div`
-    padding: 100px;
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 720px;
+    margin: 0 auto;
+    padding-top: 80px;
+    position: relative;
+
+    @media (max-width: 768px) {
+        padding-left: 10%;
+        padding-right: 10%;
+    }
+`;
+
+export const QuoteIcon = styled.span`
+    position: absolute;
+    top: 20%;
+    left: -8%;
+    z-index: 2;
 `;
 
 export const QuoteText = styled.p`
-    text-align: center;
+    text-align: left;
     font-size: 22px;
     font-weight: 600;
     line-height: 30px;
