@@ -5,26 +5,59 @@ export const Heading = styled.h1`
     font-size: 42px;
     font-weight: 600;
     line-height: 58px;
-    margin-bottom: 0;
+    margin: 20px 0 0 0;
+
+    @media (max-width: 768px) {
+        font-size: 24px;
+        line-height: 34px;
+    }
 `;
 
 export const HeroContainer = styled.div`
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: radial-gradient(23.02% 98.87% at 9.45% 171.77%, #F91DC8 0%, rgba(249, 29, 200, 0) 100%), radial-gradient(45.62% 195.95% at 8.84% 187.62%, #511CC1 0%, rgba(81, 28, 193, 0) 100%), #000000;
-    position: relative;
+    background: #000000;
     width: 100%;
-    height: auto;
-    max-height: 600px;
 `;
 
-export const HeroText = styled.div`
+export const HeroTextSection = styled.div`
     display: flex;
     flex-direction: column;
-    max-width: 452px;
     letter-spacing: 0.3px;
+    max-width: 500px;
+`;
+
+export const HeroMaxWidthContainer = styled.div`
+    display: flex;
+    max-width: 1440px;
+    width: 100%;
+    margin: 0 auto;
+    justify-content: center;
+
+    @media (max-width: 768px) {
+        flex-direction: column-reverse;
+    }
+`;
+
+export const HeroImage = styled.div`
+    width: 50%;
+    margin-top: -120px;
+
+    & svg:nth-of-type(2) {
+        display: none;
+    }
+
+    @media (max-width: 768px) {
+        width: 100%;
+        
+        & svg:nth-of-type(1) {
+            display: none;
+        }
+
+        & svg:nth-of-type(2) {
+            display: block;
+            width: 100%;
+        }
+    }
+
 `;
 
 export const Tagline = styled.p`
@@ -35,8 +68,9 @@ export const Tagline = styled.p`
     letter-spacing: 0.3px;
     margin-bottom: 0;
     margin-top: 22px;
-`;
 
-export const HeroImage = styled.div`
-    margin-left: 60px
+    @media (max-width: 768px) {
+        font-size: 14px;
+        line-height: 23px;
+    }
 `;

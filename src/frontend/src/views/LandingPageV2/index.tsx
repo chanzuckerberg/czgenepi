@@ -1,7 +1,9 @@
 import { Button } from "czifui";
+import Footer from "./components/Footer";
 import Head from "next/head";
 import Hero from "./components/Hero";
 import IntroSection from "./components/IntroSection";
+import PartnersSection from "./components/PartnersSection";
 import QuoteSlider from "./components/QuoteSlider";
 import UseCases from "./components/UseCases";
 import { useRouter } from "next/router";
@@ -12,7 +14,6 @@ import { ROUTES } from "src/common/routes";
 import { useUserInfo } from "../../common/queries/auth";
 import {
   Container,
-  Footer,
   FooterButtonContainer
 } from "./style";
 
@@ -47,19 +48,8 @@ export default function Homepage(): JSX.Element {
         <IntroSection />
         <UseCases />
         <QuoteSlider />
-        <Footer data-test-id="footer">
-          <FooterButtonContainer>
-            <a href={ROUTES.CONTACT_US_EMAIL} target="_blank" rel="noopener">
-              Contact
-            </a>
-            <a href={ROUTES.TERMS} target="_blank" rel="noopener">
-              Terms
-            </a>
-            <a href={ROUTES.PRIVACY} target="_blank" rel="noopener">
-              Privacy
-            </a>
-          </FooterButtonContainer>
-        </Footer>
+        <PartnersSection />
+        <Footer />
       </Container>
     </>
   );
