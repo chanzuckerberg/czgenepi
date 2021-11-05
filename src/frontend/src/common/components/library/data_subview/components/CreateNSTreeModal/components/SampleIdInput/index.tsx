@@ -74,7 +74,12 @@ const SampleIdInput = ({
         });
       }
     }
-  }, [idsInFlight, shouldValidate, validateSampleIdentifiersMutation]);
+  }, [
+    handleInputModeChange,
+    idsInFlight,
+    shouldValidate,
+    validateSampleIdentifiersMutation,
+  ]);
 
   const validateIds = () => {
     const sampleIdsToValidate = parseInputIds();

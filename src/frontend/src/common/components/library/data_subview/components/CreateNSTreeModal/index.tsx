@@ -10,6 +10,7 @@ import { Header, StyledIconButton } from "../DownloadModal/style";
 import { FailedSampleAlert } from "../FailedSampleAlert";
 import { CreateTreeButton } from "./components/CreateTreeButton";
 import { StyledButton } from "./components/CreateTreeButton/style";
+import { MissingSampleAlert } from "./components/MissingSampleAlert";
 import {
   RadioLabelNonContextualized,
   RadioLabelTargeted,
@@ -219,6 +220,7 @@ export const CreateNSTreeModal = ({
                 <Separator marginSize="xl" />
               </>
             )}
+            <MissingSampleAlert missingSamples={missingInputSamples} />
             <FailedSampleAlert
               numFailedSamples={allFailedOrMissingSamples?.length}
             />
