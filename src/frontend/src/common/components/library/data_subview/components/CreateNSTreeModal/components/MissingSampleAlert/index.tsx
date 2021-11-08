@@ -33,7 +33,7 @@ const MissingSampleAlert = ({ missingSamples }: Props): JSX.Element | null => {
       <Collapse in={areMissingIdsShown}>
         <List>
           {missingSamples.map((sample) => {
-            return <ListItem key={sample}>{sample}</ListItem>
+            return <ListItem key={sample}>{sample}</ListItem>;
           })}
         </List>
       </Collapse>

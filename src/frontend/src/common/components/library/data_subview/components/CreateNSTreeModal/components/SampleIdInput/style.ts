@@ -6,10 +6,11 @@ import {
   getCorners,
   getIconSizes,
   getSpaces,
+  Props,
 } from "czifui";
 import LoadingAnimation from "src/common/icons/IconLoadingAnimated.svg";
 
-const inputPadding = (props) => {
+const inputPadding = (props: Props) => {
   const spaces = getSpaces(props);
   return `
     .MuiInputBase-root {
@@ -18,8 +19,8 @@ const inputPadding = (props) => {
   `;
 };
 
+// TODO (mlila): input doesn't displace button
 export const StyledTextArea = styled(TextField)`
-  // TODO (mlila): input doesn't displace button
   ${fontBodyXs}
   ${inputPadding}
   height: 70px;
@@ -37,6 +38,7 @@ export const DisabledStyledTextArea = styled(TextField)`
   ${(props) => {
     const colors = getColors(props);
     const corners = getCorners(props);
+    const spaces = getSpaces(props);
 
     return `
       background-color: ${colors?.gray[100]};
