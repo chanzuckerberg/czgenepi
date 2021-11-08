@@ -18,7 +18,7 @@ async def test_delete_sample_success(
     http_client: AsyncClient,
 ):
     """
-    Test successful sample deletion by public & private ID
+    Test successful sample deletion by ID
     """
     group = group_factory()
     user = user_factory(group)
@@ -51,7 +51,7 @@ async def test_delete_sample_success(
     for sample in [samples[0], samples[1]]:
         auth_headers = {"user_id": user.auth0_user_id}
         res = await http_client.delete(
-            f"/v2/samples/{sample.submitting_group_id}/{sample.public_identifier}",
+            f"/v2/samples/{sample.submitting_group_id}/{sample.id}",
             headers=auth_headers,
         )
         assert res.status_code == 200
@@ -100,7 +100,7 @@ async def test_delete_sample_failures(
     # Request this sample as a user who shouldn't be able to delete it.
     auth_headers = {"user_id": user2.auth0_user_id}
     res = await http_client.delete(
-        f"/v2/samples/{sample.submitting_group_id}/{sample.public_identifier}",
+        f"/v2/samples/{sample.submitting_group_id}/{sample.id}",
         headers=auth_headers,
     )
     assert res.status_code == 404
