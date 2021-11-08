@@ -70,6 +70,7 @@ task IngestGISAID {
     start_time=$(date +%s)
     build_id=$(date +%Y%m%d-%H%M)
 
+
     aws configure set region ~{aws_region}
 
     export ASPEN_CONFIG_SECRET_NAME=~{aspen_config_secret_name}
@@ -91,9 +92,10 @@ task IngestGISAID {
     gisaid_username=$(echo "${gisaid_credentials}" | jq -r .username)
     gisaid_password=$(echo "${gisaid_credentials}" | jq -r .password)
 
-    curl "~{gisaid_ndjson_url}" --user "${gisaid_username}:${gisaid_password}" | \
-        bunzip2 | \
-        zstdmt > sequences.fasta.zst
+    wget "~{gisaid_ndjson_url}" --user "${gisaid_username}" --password "${gisaid_password}" --continue --tries=2 -O gisaid_dump.fasta.bz2
+    bunzip2 gisaid_dump.fasta.bz2 
+    zstdmt gisaid_dump.fasta -o sequences.fasta.zst
+    rm gisaid_dump.fasta
 
     aws s3 cp sequences.fasta.zst "s3://${aspen_s3_db_bucket}/${sequences_key}"
 
