@@ -97,6 +97,7 @@ const SampleIdInput = ({
     <>
       <InputInstructions />
       <StyledTextArea
+        // TODO (mlila): should be replaced with sds InputText when available
         disabled={!isInEditMode}
         onChange={(e) => setInputValue(e?.target?.value)}
         onFocus={() => setShowAddButton(true)}

@@ -1,13 +1,10 @@
 import styled from "@emotion/styled";
-import { Button, getColors, getSpaces } from "czifui";
+import { Button, getColors } from "czifui";
 
 export const StyledButton = styled(Button)`
   ${(props) => {
-    const spaces = getSpaces(props);
     const colors = getColors(props);
     return `
-      margin-top: ${spaces?.xxl}px;
-
       &:active {
         background-color: ${colors?.gray[400]};
       }
