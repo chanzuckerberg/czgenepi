@@ -9,7 +9,7 @@ import sqlalchemy as sa
 from boto3 import Session
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import aliased, joinedload
+from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
 from starlette.requests import Request
 
@@ -188,7 +188,6 @@ async def kick_off_phylo_run(
 
 
 async def get_editable_phylorun_by_id(db, run_id, user):
-    aliased(PhyloRun)
     query = (
         sa.select(PhyloRun)
         .filter(
