@@ -1,4 +1,5 @@
 import { Collapse } from "@material-ui/core";
+import { List, ListItem } from "czifui";
 import React, { useState } from "react";
 import { pluralize } from "src/common/utils/strUtils";
 import { SemiBold, StyledCallout } from "../../../FailedSampleAlert/style";
@@ -30,7 +31,11 @@ const MissingSampleAlert = ({ missingSamples }: Props): JSX.Element | null => {
         {areMissingIdsShown ? <StyledArrowUpIcon /> : <StyledArrowDownIcon />}
       </div>
       <Collapse in={areMissingIdsShown}>
-        <div>{missingSamples}</div>
+        <List>
+          {missingSamples.map((sample) => {
+            return <ListItem key={sample}>{sample}</ListItem>
+          })}
+        </List>
       </Collapse>
     </StyledCallout>
   );
