@@ -79,17 +79,15 @@ const SampleIdInput = ({
   );
 
   useEffect(() => {
-    if (shouldValidate) {
+    if (shouldValidate && idsInFlight.length > 0) {
       setShouldValidate(false);
       setValidating(true);
       setInEditMode(false);
       setInputDisplayValue(idsInFlight.join("\n"));
 
-      if (idsInFlight.length > 0) {
-        validateSampleIdentifiersMutation.mutate({
-          sampleIdsToValidate: idsInFlight,
-        });
-      }
+      validateSampleIdentifiersMutation.mutate({
+        sampleIdsToValidate: idsInFlight,
+      });
     }
   }, [idsInFlight, shouldValidate, validateSampleIdentifiersMutation]);
 
