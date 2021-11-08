@@ -25,13 +25,11 @@ async def list_samples(
 
 
 async def get_owned_sample_by_id(
-    db: AsyncSession, group_id: int, sample_id: int, user: User
+    db: AsyncSession, sample_id: int, user: User
 ) -> Sample:
     query = sa.select(Sample).filter(  # type: ignore
         sa.and_(
             Sample.submitting_group == user.group,  # This is an access control check!
-            Sample.submitting_group_id
-            == group_id,  # This makes sure we included the correct group ID in our path.
             Sample.id == sample_id,
         )
     )
@@ -42,9 +40,8 @@ async def get_owned_sample_by_id(
         raise ex.NotFoundException("sample not found")
 
 
-@router.delete("/{group_id}/{sample_id}")
+@router.delete("/{sample_id}")
 async def delete_sample(
-    group_id: int,
     sample_id: int,
     request: Request,
     db: AsyncSession = Depends(get_db),
@@ -52,7 +49,7 @@ async def delete_sample(
     user: User = Depends(get_auth_user),
 ) -> SampleDeleteResponse:
     # Make sure this sample exists and is delete-able by the current user.
-    sample = await get_owned_sample_by_id(db, group_id, sample_id, user)
+    sample = await get_owned_sample_by_id(db, sample_id, user)
     sample_db_id = sample.id
 
     await db.delete(sample)
