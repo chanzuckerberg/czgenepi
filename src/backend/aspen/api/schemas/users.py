@@ -4,6 +4,7 @@ from aspen.api.schemas.base import BaseResponse
 
 
 class UserBase(BaseResponse):
+    group_id: int
     agreed_to_tos: bool = False
 
 

@@ -317,6 +317,17 @@ def download_samples(ctx, sample_ids):
     print(resp.text)
 
 
+@samples.command(name="delete")
+@click.argument("sample_ids", nargs=-1)
+@click.pass_context
+def delete_samples(ctx, sample_ids):
+    api_client = ctx.obj["api_client"]
+    for sample in sample_ids:
+        resp = api_client.delete(f"/v2/samples/{sample}")
+        print(resp.headers)
+        print(resp.text)
+
+
 @samples.command(name="update_public_ids")
 @click.option("group_id", "--group-id", type=int, required=True)
 @click.option(

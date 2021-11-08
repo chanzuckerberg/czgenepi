@@ -16,6 +16,7 @@ from aspen.api.main import get_app
 from aspen.database import connection as aspen_connection
 from aspen.database import schema
 from aspen.database.connection import init_async_db
+from aspen.database.models import User
 
 USERNAME = "user_rw"
 PASSWORD = "password_rw"
@@ -100,11 +101,12 @@ async def override_get_db(
 
 async def override_get_auth_user(
     request: Request, session: AsyncSession = Depends(get_db)
-) -> None:
+) -> User:
     found_auth_user = await setup_userinfo(session, request.headers.get("user_id"))
     if not found_auth_user:
         raise ex.UnauthorizedException("invalid user")
     request.state.auth_user = found_auth_user
+    return found_auth_user
 
 
 @pytest.fixture()
