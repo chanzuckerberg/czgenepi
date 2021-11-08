@@ -26,11 +26,24 @@ const SampleIdInput = ({
   const [foundSampleIds, setFoundSampleIds] = useState<string[]>([]);
   const [shouldValidate, setShouldValidate] = useState<boolean>(false);
 
+  // clear the input
   useEffect(() => {
     if (shouldReset) {
       setInputValue("");
+      setInputDisplayValue("");
+      setInEditMode(true);
+      setValidating(false);
+      setShowAddButton(false);
+      setIdsInFlight([]);
+      setFoundSampleIds([]);
+      setShouldValidate(false);
     }
   }, [shouldReset]);
+
+  // whenever we change the input mode, let the parent know
+  useEffect(() => {
+    handleInputModeChange(isInEditMode);
+  }, [handleInputModeChange, isInEditMode]);
 
   const parseInputIds = useCallback(() => {
     const tokens = inputValue.split(/[\n\t,]/g);
@@ -47,6 +60,8 @@ const SampleIdInput = ({
         setFoundSampleIds([]);
         setIdsInFlight([]);
         handleInputValidation([], []);
+        setInputDisplayValue("");
+        setInEditMode(true);
       },
       onSuccess: (data: any) => {
         setValidating(false);
@@ -75,12 +90,7 @@ const SampleIdInput = ({
         });
       }
     }
-  }, [
-    handleInputModeChange,
-    idsInFlight,
-    shouldValidate,
-    validateSampleIdentifiersMutation,
-  ]);
+  }, [idsInFlight, shouldValidate, validateSampleIdentifiersMutation]);
 
   const validateIds = () => {
     const sampleIdsToValidate = parseInputIds();
@@ -90,7 +100,6 @@ const SampleIdInput = ({
 
   const onClickEdit = () => {
     setInEditMode(true);
-    handleInputModeChange(true);
     setShowAddButton(true);
   };
 
