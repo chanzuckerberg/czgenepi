@@ -19,6 +19,7 @@ const SampleIdInput = ({
   shouldReset,
 }: Props): JSX.Element => {
   const [inputValue, setInputValue] = useState<string>("");
+  const [inputDisplayValue, setInputDisplayValue] = useState<string>("");
   const [isInEditMode, setInEditMode] = useState<boolean>(true);
   const [isValidating, setValidating] = useState<boolean>(false);
   const [shouldShowAddButton, setShowAddButton] = useState<boolean>(false);
@@ -82,7 +83,7 @@ const SampleIdInput = ({
       setShouldValidate(false);
       setValidating(true);
       setInEditMode(false);
-      handleInputModeChange(false);
+      setInputDisplayValue(idsInFlight.join("\n"));
 
       if (idsInFlight.length > 0) {
         validateSampleIdentifiersMutation.mutate({
@@ -116,7 +117,7 @@ const SampleIdInput = ({
         variant="outlined"
         rows={3}
         size="small"
-        value={inputValue}
+        value={isInEditMode ? inputValue : inputDisplayValue}
       />
       {shouldShowAddButton && (
         <Button
