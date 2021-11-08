@@ -18,6 +18,8 @@ const SampleIdInput = ({
   handleInputValidation,
   shouldReset,
 }: Props): JSX.Element => {
+  const [hasEverFocusedInput, setHasEverFocusedInput] =
+    useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>("");
   const [inputDisplayValue, setInputDisplayValue] = useState<string>("");
   const [isInEditMode, setInEditMode] = useState<boolean>(true);
@@ -41,10 +43,14 @@ const SampleIdInput = ({
     }
   }, [shouldReset]);
 
-  // whenever we change the input mode, let the parent know
+  // whenever we change the input mode, let the parent know. This controls
+  // disabling the create button and tooltip associated with edit mode.
+  // if they never clicked into the input, don't force them to add something
+  // and save before moving forward
   useEffect(() => {
-    handleInputModeChange(isInEditMode);
-  }, [handleInputModeChange, isInEditMode]);
+    const mode = hasEverFocusedInput ? isInEditMode : false;
+    handleInputModeChange(mode);
+  }, [handleInputModeChange, hasEverFocusedInput, isInEditMode]);
 
   const parseInputIds = useCallback(() => {
     const tokens = inputValue.split(/[\n\t,]/g);
@@ -79,7 +85,7 @@ const SampleIdInput = ({
   );
 
   useEffect(() => {
-    if (shouldValidate && idsInFlight.length > 0) {
+    if (shouldValidate) {
       setShouldValidate(false);
       setValidating(true);
       setInEditMode(false);
@@ -109,7 +115,10 @@ const SampleIdInput = ({
         // TODO (mlila): should be replaced with sds InputText when available
         disabled={!isInEditMode}
         onChange={(e) => setInputValue(e?.target?.value)}
-        onFocus={() => setShowAddButton(true)}
+        onFocus={() => {
+          setShowAddButton(true);
+          setHasEverFocusedInput(true);
+        }}
         fullWidth
         multiline
         variant="outlined"
