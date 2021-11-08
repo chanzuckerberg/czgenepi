@@ -34,7 +34,8 @@ const SampleIdInput = ({
 
   const parseInputIds = useCallback(() => {
     const tokens = inputValue.split(/[\n\t,]/g);
-    return compact(tokens);
+    const trimmedTokens = tokens.map((t) => t.trim());
+    return compact(trimmedTokens);
   }, [inputValue]);
 
   const validateSampleIdentifiersMutation = useMutation(
