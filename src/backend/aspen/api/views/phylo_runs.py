@@ -187,7 +187,7 @@ async def kick_off_phylo_run(
     return PhyloRunResponseSchema.from_orm(workflow)
 
 
-async def get_editable_phylorun_by_id(db, run_id, user):
+async def get_editable_phylo_run_by_id(db, run_id, user):
     query = (
         sa.select(PhyloRun)
         .filter(
@@ -226,7 +226,7 @@ async def delete_run(
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_auth_user),
 ) -> bool:
-    item = await get_editable_phylorun_by_id(db, item_id, user)
+    item = await get_editable_phylo_run_by_id(db, item_id, user)
     item_db_id = item.id
 
     for output in item.outputs:
