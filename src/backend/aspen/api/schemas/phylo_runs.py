@@ -45,3 +45,7 @@ class PhyloRunResponseSchema(BaseResponse):
     group: GroupResponseSchema
     template_file_path: StrictStr
     template_args: dict
+
+
+class PhyloRunDeleteResponse(BaseResponse):
+    id: int
