@@ -1,6 +1,5 @@
 import {
   describeIfDeployed,
-  DOWNLOAD_TSV_LINK,
   login,
   tryUntil,
 } from "tests/features/utils/helpers";
@@ -26,8 +25,6 @@ describe("Data", () => {
       await expect(page).toHaveSelector(getText("Collection Location"));
       await expect(page).toHaveSelector(getText("Lineage"));
       await expect(page).toHaveSelector(getText("GISAID"));
-
-      await expect(page).toHaveSelector(getTestID(DOWNLOAD_TSV_LINK));
 
       await expect(page).toHaveSelector(getTestID("table-row"));
       await expect(page).toHaveSelector(getTestID("sample-status"));
@@ -58,15 +55,6 @@ describe("Data", () => {
       await tryUntil(() =>
         expect(page).toHaveSelectorCount(getTestID("table-row"), 1)
       );
-    });
-
-    it("downloads TSV", async () => {
-      await setupSamplesPage();
-
-      expect(page).toHaveSelector(getTestID(DOWNLOAD_TSV_LINK));
-      const downloadLink = await page.$(getTestID(DOWNLOAD_TSV_LINK));
-
-      expect(await downloadLink?.getAttribute("href")).toBeTruthy();
     });
 
     it("sorts by column header", async () => {
@@ -121,7 +109,7 @@ async function setupTreesPage() {
 
   await page.click(getText("Phylogenetic Trees"));
 
-  const COLUMN_COUNT = 3;
+  const COLUMN_COUNT = 4;
 
   await tryUntil(() =>
     expect(page).toHaveSelectorCount(getTestID("header-cell"), COLUMN_COUNT)

@@ -2,8 +2,6 @@ import ENV from "src/common/constants/ENV";
 import nodeEnv from "src/common/constants/nodeEnv";
 import { getTestID, getText } from "./selectors";
 
-export const DOWNLOAD_TSV_LINK = "download-tsv-link";
-
 export const TIMEOUT_MS = 5 * 1000;
 
 export async function goToPage(
@@ -32,7 +30,7 @@ export async function login(): Promise<void> {
       page.click('[value="login"], [type="submit"]'),
     ]);
 
-    await expect(page).toHaveSelector(getTestID(DOWNLOAD_TSV_LINK));
+    await expect(page).toHaveSelector(getTestID("header-row"));
   }
 }
 

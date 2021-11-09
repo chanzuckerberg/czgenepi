@@ -153,6 +153,31 @@ jobs:
           docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/aspen-frontend:branch-trunk -t ${{ secrets.ECR_REPO }}/aspen-frontend:latest src/frontend
           make local-init
           make backend-test
+  e2e-test:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Configure AWS prod Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-duration-seconds: 900
+      - name: Login to ECR
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ secrets.ECR_REPO }}
+      - uses: actions/checkout@v2
+      - name: Test Python
+        run: |
+          echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
+          # Build backend image
+          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/aspen-backend:branch-trunk -t ${{ secrets.ECR_REPO }}/aspen-backend:latest src/backend
+          # Build frontend
+          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/aspen-frontend:branch-trunk -t ${{ secrets.ECR_REPO }}/aspen-frontend:latest src/frontend
+          make local-init
+          make frontend-e2e
   build-push-images:
     if: github.ref == 'refs/heads/trunk'
     runs-on: ubuntu-20.04
