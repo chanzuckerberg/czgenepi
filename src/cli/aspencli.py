@@ -331,6 +331,7 @@ def delete_samples(ctx, sample_ids):
 @samples.command(name="update_public_ids")
 @click.option("group_id", "--group-id", type=int, required=True)
 @click.option("is_gisaid_isl", "--is-gisaid-isl", is_flag=True)
+# csv file should have headers private_identifier and public_identifier
 @click.option(
     "private_to_public_id_mapping_fh",
     "--private-to-public-id-mapping",

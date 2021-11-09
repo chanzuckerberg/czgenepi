@@ -517,7 +517,7 @@ def update_sample_public_ids():
     request_private_ids: list[str] = private_to_public.keys()
     request_public_ids: list[str] = private_to_public.values()
 
-    # check to see if public_identifier are gisaid isl accessions
+    # check to see if public_identifiers are gisaid isl accessions
     public_ids_are_gisaid_isl: str = request_data.get("public_ids_are_gisaid_isl")
 
     group_id: int = request_data["group_id"]
@@ -546,9 +546,22 @@ def update_sample_public_ids():
             joinedload(Sample.uploaded_pathogen_genome),
         )
         for s in samples_to_update:
-            # first accession 'gisaid_public_identifier', the second accession returned is the one that we want to update
-            accession = s.uploaded_pathogen_genome.accessions()[1]
-            accession.public_identifier = private_to_public[s.private_identifier]
+            isl_number = private_to_public[s.private_identifier]
+            accessions = s.uploaded_pathogen_genome.accessions()
+
+            # if the accessions length == 1 that means that currently no isl number exists on the uploaded_pathogen_genome
+            if not len(accessions) == 1:
+                # first accession public_identifier is 'gisaid_public_identifier', the second accession returned is the one that we want to update
+                accessions[1].public_identifier = isl_number
+            else:
+                # create a new accession if DNE
+                s.uploaded_pathogen_genome.add_accession(
+                    repository_type=PublicRepositoryType.GISAID,
+                    public_identifier=isl_number,
+                    workflow_start_datetime=datetime.datetime.now(),
+                    workflow_end_datetime=datetime.datetime.now(),
+                )
+
         return jsonify(success=True)
 
     else:
