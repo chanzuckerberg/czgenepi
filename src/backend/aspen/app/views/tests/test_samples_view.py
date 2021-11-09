@@ -1219,9 +1219,7 @@ def test_update_sample_new_gisaid_isl(
         sample = sample_factory(
             group, user, private_identifier=priv, public_identifier=f"{pub}_public"
         )
-        uploaded_pathogen_genome_factory(
-            sample, sequence="ATGCAAAAAA"
-        )
+        uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
         session.add(sample)
 
     session.commit()
