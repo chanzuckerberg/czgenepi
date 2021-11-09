@@ -27,6 +27,11 @@ class SampleGroupResponseSchema(BaseResponse):
     name: str
 
 
+class SampleUserResponseSchema(BaseResponse):
+    id: int
+    name: str
+
+
 class SampleResponseSchema(BaseResponse):
     collection_date: str
     collection_location: str
@@ -38,6 +43,7 @@ class SampleResponseSchema(BaseResponse):
     public_identifier: str
     sequencing_date: Optional[str]
     submitting_group: SampleGroupResponseSchema
+    uploaded_by: SampleUserResponseSchema
     upload_date: Optional[str]
 
 
