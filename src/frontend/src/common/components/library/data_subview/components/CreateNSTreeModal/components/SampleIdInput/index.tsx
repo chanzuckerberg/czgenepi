@@ -125,6 +125,7 @@ const SampleIdInput = ({
         rows={3}
         size="small"
         value={isInEditMode ? inputValue : inputDisplayValue}
+        placeholder="e.g. USA/CA-CZB-0000/2021, USA/CA-CDPH-000000/2021"
       />
       {shouldShowAddButton && (
         <Button

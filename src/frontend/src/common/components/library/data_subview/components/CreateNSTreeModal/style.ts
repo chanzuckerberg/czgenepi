@@ -95,7 +95,6 @@ export const TreeTypeSection = styled.div`
     const spaces = getSpaces(props);
     return `
       margin-top: ${spaces?.s}px;
-      margin-bottom: ${spaces?.s}px;
     `;
   }}
 `;

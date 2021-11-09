@@ -1,9 +1,17 @@
 import { Collapse } from "@material-ui/core";
-import { List, ListItem } from "czifui";
 import React, { useState } from "react";
 import { pluralize } from "src/common/utils/strUtils";
-import { SemiBold, StyledCallout } from "../../../FailedSampleAlert/style";
-import { StyledArrowDownIcon, StyledArrowUpIcon } from "./style";
+import { SemiBold } from "../../../FailedSampleAlert/style";
+import {
+  ColumnFlexContainer,
+  RowFlexContainer,
+  StaticSizeDiv,
+  StyledArrowDownIcon,
+  StyledArrowUpIcon,
+  StyledCallout,
+  StyledList,
+  StyledListItem,
+} from "./style";
 
 interface Props {
   missingSamples: string[];
@@ -21,22 +29,26 @@ const MissingSampleAlert = ({ missingSamples }: Props): JSX.Element | null => {
 
   return (
     <StyledCallout intent="warning" onClick={toggleCollapse}>
-      <div>
-        <SemiBold>
-          {numMissingSamples} Sample {pluralize("ID", numMissingSamples)}{" "}
-          couldn’t be found
-        </SemiBold>{" "}
-        and may not appear on your tree. Please double check and correct any
-        errors.
+      <RowFlexContainer>
+        <ColumnFlexContainer>
+          <StaticSizeDiv>
+            <SemiBold>
+              {numMissingSamples} Sample {pluralize("ID", numMissingSamples)}{" "}
+              couldn’t be found
+            </SemiBold>{" "}
+            and may not appear on your tree. Please double check and correct any
+            errors.
+          </StaticSizeDiv>
+          <Collapse in={areMissingIdsShown}>
+            <StyledList>
+              {missingSamples.map((sample) => {
+                return <StyledListItem key={sample}>{sample}</StyledListItem>;
+              })}
+            </StyledList>
+          </Collapse>
+        </ColumnFlexContainer>
         {areMissingIdsShown ? <StyledArrowUpIcon /> : <StyledArrowDownIcon />}
-      </div>
-      <Collapse in={areMissingIdsShown}>
-        <List>
-          {missingSamples.map((sample) => {
-            return <ListItem key={sample}>{sample}</ListItem>;
-          })}
-        </List>
-      </Collapse>
+      </RowFlexContainer>
     </StyledCallout>
   );
 };
