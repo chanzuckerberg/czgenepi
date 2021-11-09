@@ -18,6 +18,13 @@ import DialogTitle from "src/common/components/library/Dialog/components/DialogT
 
 export const StyledDialogContent = styled(DialogContent)`
   width: 600px;
+
+  ${(props) => {
+    const spaces = getSpaces(props);
+    return `
+      padding-bottom: ${spaces?.xxl}px;
+    `;
+  }}
 `;
 
 export const Title = styled.span`

@@ -18,7 +18,10 @@ const SampleIdInput = ({
   handleInputValidation,
   shouldReset,
 }: Props): JSX.Element => {
+  const [hasEverFocusedInput, setHasEverFocusedInput] =
+    useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>("");
+  const [inputDisplayValue, setInputDisplayValue] = useState<string>("");
   const [isInEditMode, setInEditMode] = useState<boolean>(true);
   const [isValidating, setValidating] = useState<boolean>(false);
   const [shouldShowAddButton, setShowAddButton] = useState<boolean>(false);
@@ -26,15 +29,33 @@ const SampleIdInput = ({
   const [foundSampleIds, setFoundSampleIds] = useState<string[]>([]);
   const [shouldValidate, setShouldValidate] = useState<boolean>(false);
 
+  // clear the input
   useEffect(() => {
     if (shouldReset) {
       setInputValue("");
+      setInputDisplayValue("");
+      setInEditMode(true);
+      setValidating(false);
+      setShowAddButton(false);
+      setIdsInFlight([]);
+      setFoundSampleIds([]);
+      setShouldValidate(false);
     }
   }, [shouldReset]);
 
+  // whenever we change the input mode, let the parent know. This controls
+  // disabling the create button and tooltip associated with edit mode.
+  // if they never clicked into the input, don't force them to add something
+  // and save before moving forward
+  useEffect(() => {
+    const mode = hasEverFocusedInput ? isInEditMode : false;
+    handleInputModeChange(mode);
+  }, [handleInputModeChange, hasEverFocusedInput, isInEditMode]);
+
   const parseInputIds = useCallback(() => {
     const tokens = inputValue.split(/[\n\t,]/g);
-    return compact(tokens);
+    const trimmedTokens = tokens.map((t) => t.trim());
+    return compact(trimmedTokens);
   }, [inputValue]);
 
   const validateSampleIdentifiersMutation = useMutation(
@@ -46,6 +67,8 @@ const SampleIdInput = ({
         setFoundSampleIds([]);
         setIdsInFlight([]);
         handleInputValidation([], []);
+        setInputDisplayValue("");
+        setInEditMode(true);
       },
       onSuccess: (data: any) => {
         setValidating(false);
@@ -66,13 +89,11 @@ const SampleIdInput = ({
       setShouldValidate(false);
       setValidating(true);
       setInEditMode(false);
-      handleInputModeChange(false);
+      setInputDisplayValue(idsInFlight.join("\n"));
 
-      if (idsInFlight.length > 0) {
-        validateSampleIdentifiersMutation.mutate({
-          sampleIdsToValidate: idsInFlight,
-        });
-      }
+      validateSampleIdentifiersMutation.mutate({
+        sampleIdsToValidate: idsInFlight,
+      });
     }
   }, [idsInFlight, shouldValidate, validateSampleIdentifiersMutation]);
 
@@ -84,7 +105,6 @@ const SampleIdInput = ({
 
   const onClickEdit = () => {
     setInEditMode(true);
-    handleInputModeChange(true);
     setShowAddButton(true);
   };
 
@@ -92,15 +112,19 @@ const SampleIdInput = ({
     <>
       <InputInstructions />
       <StyledTextArea
+        // TODO (mlila): should be replaced with sds InputText when available
         disabled={!isInEditMode}
         onChange={(e) => setInputValue(e?.target?.value)}
-        onFocus={() => setShowAddButton(true)}
+        onFocus={() => {
+          setShowAddButton(true);
+          setHasEverFocusedInput(true);
+        }}
         fullWidth
         multiline
         variant="outlined"
         rows={3}
         size="small"
-        value={inputValue}
+        value={isInEditMode ? inputValue : inputDisplayValue}
       />
       {shouldShowAddButton && (
         <Button

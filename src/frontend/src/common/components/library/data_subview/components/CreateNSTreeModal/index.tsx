@@ -10,6 +10,7 @@ import { Header, StyledIconButton } from "../DownloadModal/style";
 import { FailedSampleAlert } from "../FailedSampleAlert";
 import { CreateTreeButton } from "./components/CreateTreeButton";
 import { StyledButton } from "./components/CreateTreeButton/style";
+import { MissingSampleAlert } from "./components/MissingSampleAlert";
 import {
   RadioLabelNonContextualized,
   RadioLabelTargeted,
@@ -73,6 +74,8 @@ export const CreateNSTreeModal = ({
     setShouldReset(true);
     setTreeName("");
     setTreeType(TreeTypes.Targeted);
+    setMissingInputSamples([]);
+    setValidatedInputSamples([]);
   };
 
   const handleClose = function () {
@@ -219,9 +222,8 @@ export const CreateNSTreeModal = ({
                 <Separator marginSize="xl" />
               </>
             )}
-            <FailedSampleAlert
-              numFailedSamples={allFailedOrMissingSamples?.length}
-            />
+            <MissingSampleAlert missingSamples={missingInputSamples} />
+            <FailedSampleAlert numFailedSamples={failedSamples?.length} />
             {usesFeatureFlag(FEATURE_FLAGS.gisaidIngest) && (
               <CreateTreeButton
                 hasValidName={hasValidName}

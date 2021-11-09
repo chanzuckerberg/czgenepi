@@ -1,13 +1,51 @@
 import styled from "@emotion/styled";
 import { TextField } from "@material-ui/core";
-import { getColors, getIconSizes, getSpaces } from "czifui";
+import {
+  fontBodyXs,
+  getColors,
+  getCorners,
+  getIconSizes,
+  getSpaces,
+  Props,
+} from "czifui";
 import LoadingAnimation from "src/common/icons/IconLoadingAnimated.svg";
 
+const inputPadding = (props: Props) => {
+  const spaces = getSpaces(props);
+  return `
+    .MuiInputBase-root {
+      padding: ${spaces?.s}px ${spaces?.l}px;
+    }
+  `;
+};
+
+// TODO (mlila): input doesn't displace button
 export const StyledTextArea = styled(TextField)`
+  ${fontBodyXs}
+  ${inputPadding}
+  height: 70px;
+
   textarea {
-    color: black;
     resize: both;
   }
+`;
+
+export const DisabledStyledTextArea = styled(TextField)`
+  ${fontBodyXs}
+  ${inputPadding}
+  height: 90px;
+
+  ${(props) => {
+    const colors = getColors(props);
+    const corners = getCorners(props);
+    const spaces = getSpaces(props);
+
+    return `
+      background-color: ${colors?.gray[100]};
+      border-radius: ${corners?.m}px;
+      margin: ${spaces?.xxxs}px 0;
+    `;
+  }}
 `;
 
 export const StyledLabel = styled.div`
