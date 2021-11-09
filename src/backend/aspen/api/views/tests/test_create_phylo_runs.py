@@ -43,6 +43,8 @@ async def test_create_phylo_run(
     assert "targeted.yaml" in response["template_file_path"]
     assert response["workflow_status"] == "STARTED"
     assert response["group"]["name"] == group.name
+    assert response["user"]["name"] == user.name
+    assert response["user"]["id"] == user.id
     assert "id" in response
 
 
