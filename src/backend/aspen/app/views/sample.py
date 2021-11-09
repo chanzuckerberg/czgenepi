@@ -517,6 +517,9 @@ def update_sample_public_ids():
     request_private_ids: list[str] = private_to_public.keys()
     request_public_ids: list[str] = private_to_public.values()
 
+    # check to see if public_identifier are gisaid isl accessions
+    public_ids_are_gisaid_isl: str = request_data.get("public_ids_are_gisaid_isl")
+
     group_id: int = request_data["group_id"]
 
     # check that all private_identifiers exist
@@ -531,31 +534,39 @@ def update_sample_public_ids():
             f"Private Identifiers {missing_private_identifiers} not found in DB",
         )
 
-    # check that public_identifiers don't already exist
-    existing_public_ids: list[str] = api_utils.get_existing_public_ids(
-        request_public_ids, g.db_session, group_id=group_id
-    )
-    if existing_public_ids:
-        raise ex.BadRequestException(
-            f"Public Identifiers {existing_public_ids} are already in the database",
+    samples_to_update = g.db_session.query(Sample).filter(
+        and_(
+            Sample.submitting_group_id == group_id,
+            Sample.private_identifier.in_(private_to_public.keys()),
         )
+    )
 
-    samples_to_update = (
-        g.db_session.query(Sample)
-        .filter(
-            and_(
-                Sample.submitting_group_id == group_id,
-                Sample.private_identifier.in_(private_to_public.keys()),
+    if public_ids_are_gisaid_isl:
+        samples_to_update = samples_to_update.options(
+            joinedload(Sample.uploaded_pathogen_genome),
+        )
+        for s in samples_to_update:
+            # first accession 'gisaid_public_identifier', the second accession returned is the one that we want to update
+            accession = s.uploaded_pathogen_genome.accessions()[1]
+            accession.public_identifier = private_to_public[s.private_identifier]
+        return jsonify(success=True)
+
+    else:
+        # check that public_identifiers don't already exist
+        existing_public_ids: list[str] = api_utils.get_existing_public_ids(
+            request_public_ids, g.db_session, group_id=group_id
+        )
+        if existing_public_ids:
+            raise ex.BadRequestException(
+                f"Public Identifiers {existing_public_ids} are already in the database",
             )
-        )
-        .all()
-    )
-    for s in samples_to_update:
-        s.public_identifier = private_to_public[s.private_identifier]
-        g.db_session.add(s)
 
-    g.db_session.commit()
-    return jsonify(success=True)
+        for s in samples_to_update.all():
+            s.public_identifier = private_to_public[s.private_identifier]
+            g.db_session.add(s)
+
+        g.db_session.commit()
+        return jsonify(success=True)
 
 
 @application.route("/api/samples/validate-ids", methods=["POST"])

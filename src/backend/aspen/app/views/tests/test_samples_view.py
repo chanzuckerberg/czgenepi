@@ -17,6 +17,7 @@ from aspen.database.models import (
     UploadedPathogenGenome,
 )
 from aspen.test_infra.models.accession_workflow import AccessionWorkflowDirective
+from aspen.test_infra.models.gisaid_accession import gisaid_accession_factory
 from aspen.test_infra.models.gisaid_metadata import gisaid_metadata_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
@@ -1140,6 +1141,62 @@ def test_update_sample_public_ids_not_system_admin(
         res.get_data()
         == b'{"error":"user making update request must be a system admin"}\n'
     )
+
+
+def test_update_sample_gisaid_isl(
+    session,
+    app,
+    client,
+):
+    group = group_factory()
+    user = user_factory(group, system_admin=True)
+    session.add(group)
+
+    private_to_public = dict(
+        zip(
+            ["private1", "private2", "private3"],
+            ["isl_1", "isl_2", "isl_3"],
+        )
+    )
+
+    for priv, pub in private_to_public.items():
+        sample = sample_factory(
+            group, user, private_identifier=priv, public_identifier=f"{pub}_public"
+        )
+        uploaded_pathogen_genome = uploaded_pathogen_genome_factory(
+            sample, sequence="ATGCAAAAAA"
+        )
+        gisaid_accession_factory(uploaded_pathogen_genome, f"{pub}_old")
+        session.add(sample)
+
+    session.commit()
+
+    with client.session_transaction() as sess:
+        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
+
+    data = {
+        "group_id": group.id,
+        "id_mapping": private_to_public,
+        "public_ids_are_gisaid_isl": True,
+    }
+
+    res = client.post(
+        "/api/samples/update/publicids", json=data, content_type="application/json"
+    )
+
+    assert res.status == "200 OK"
+
+    # assert samples have been updated:
+    s = (
+        session.query(Sample)
+        .options(joinedload(Sample.uploaded_pathogen_genome))
+        .filter(Sample.private_identifier.in_(private_to_public.keys()))
+        .all()
+    )
+    for r in s:
+        accessions = r.uploaded_pathogen_genome.accessions()
+        # first accession 'gisaid_public_identifier', the second accession returned is the one that we want to update
+    assert accessions[1].public_identifier == private_to_public[r.private_identifier]
 
 
 def setup_validation_data(session: Session, client: FlaskClient):
