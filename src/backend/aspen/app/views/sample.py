@@ -561,25 +561,25 @@ def update_sample_public_ids():
                     workflow_start_datetime=datetime.datetime.now(),
                     workflow_end_datetime=datetime.datetime.now(),
                 )
-
-        return jsonify(success=True)
-
-    else:
-        # check that public_identifiers don't already exist
-        existing_public_ids: list[str] = api_utils.get_existing_public_ids(
-            request_public_ids, g.db_session, group_id=group_id
-        )
-        if existing_public_ids:
-            raise ex.BadRequestException(
-                f"Public Identifiers {existing_public_ids} are already in the database",
-            )
-
-        for s in samples_to_update.all():
-            s.public_identifier = private_to_public[s.private_identifier]
-            g.db_session.add(s)
-
+                g.db_session.add(s)
         g.db_session.commit()
         return jsonify(success=True)
+
+    # check that public_identifiers don't already exist
+    existing_public_ids: list[str] = api_utils.get_existing_public_ids(
+        request_public_ids, g.db_session, group_id=group_id
+    )
+    if existing_public_ids:
+        raise ex.BadRequestException(
+            f"Public Identifiers {existing_public_ids} are already in the database",
+        )
+
+    for s in samples_to_update.all():
+        s.public_identifier = private_to_public[s.private_identifier]
+        g.db_session.add(s)
+
+    g.db_session.commit()
+    return jsonify(success=True)
 
 
 @application.route("/api/samples/validate-ids", methods=["POST"])
