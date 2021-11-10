@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { getFontWeights, getSpaces } from "czifui";
+import { fontBodyXs, getFontWeights, getSpaces } from "czifui";
 
 export const SemiBold = styled.span`
   ${(props) => {
@@ -11,6 +11,10 @@ export const SemiBold = styled.span`
 `;
 
 export const StyledWrapper = styled.div`
+  .MuiListItem-root {
+    ${fontBodyXs}
+  }
+
   ${(props) => {
     const spaces = getSpaces(props);
     return `

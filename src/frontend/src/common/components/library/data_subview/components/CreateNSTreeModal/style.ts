@@ -1,7 +1,5 @@
 import styled from "@emotion/styled";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Radio from "@material-ui/core/Radio";
-import TextField from "@material-ui/core/TextField";
+import { Dialog, FormControlLabel, Radio, TextField } from "@material-ui/core";
 import InfoOutlinedIcon from "@material-ui/icons/InfoOutlined";
 import {
   fontBodyS,
@@ -16,13 +14,30 @@ import {
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 
+export const StyledDialog = styled(Dialog)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .MuiDialog-container {
+    max-height: 85%;
+  }
+`;
+
 export const StyledDialogContent = styled(DialogContent)`
+  ${fontBodyS}
+
   width: 600px;
+  padding-bottom: 0;
+  overflow-y: auto;
+  div:last-child {
+    margin-bottom: 0;
+  }
 
   ${(props) => {
-    const spaces = getSpaces(props);
+    const colors = getColors(props);
     return `
-      padding-bottom: ${spaces?.xxl}px;
+      color: ${colors?.gray[500]};
     `;
   }}
 `;
@@ -40,6 +55,8 @@ export const Title = styled.span`
 `;
 
 export const StyledDialogTitle = styled(DialogTitle)`
+  flex: 0 0 auto;
+
   ${(props) => {
     const spaces = getSpaces(props);
     return `
@@ -206,12 +223,15 @@ export const StyledFormControlLabel = styled(FormControlLabel)`
   }}
 `;
 
-export const Content = styled.div`
-  ${fontBodyS}
+export const StyledFooter = styled.div`
+  flex: 0 0 auto;
+
   ${(props) => {
-    const colors = getColors(props);
+    const spaces = getSpaces(props);
     return `
-      color: ${colors?.gray[500]};
+      margin-bottom: ${spaces?.xxl}px;
+      margin-left: ${spaces?.xxl}px;
+      margin-top: ${spaces?.xl}px;
     `;
   }}
 `;

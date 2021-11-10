@@ -1,4 +1,3 @@
-import { Dialog } from "@material-ui/core";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import CloseIcon from "@material-ui/icons/Close";
 import React, { SyntheticEvent, useEffect, useState } from "react";
@@ -18,12 +17,13 @@ import {
 import { SampleIdInput } from "./components/SampleIdInput";
 import { TreeNameInput } from "./components/TreeNameInput";
 import {
-  Content,
   CreateTreeInfo,
   FieldTitle,
   Separator,
+  StyledDialog,
   StyledDialogContent,
   StyledDialogTitle,
+  StyledFooter,
   StyledFormControlLabel,
   StyledInfoOutlinedIcon,
   StyledRadio,
@@ -151,7 +151,7 @@ export const CreateNSTreeModal = ({
   };
 
   return (
-    <Dialog
+    <StyledDialog
       disableBackdropClick
       disableEscapeKeyDown
       open={open}
@@ -169,87 +169,87 @@ export const CreateNSTreeModal = ({
           {pluralize("Sample", allValidSamplesForTreeCreation.length)} Total
         </Title>
       </StyledDialogTitle>
-      <StyledDialogContent>
-        <Content data-test-id="modal-content">
-          <form onSubmit={handleSubmit}>
-            <TreeNameInput setTreeName={setTreeName} treeName={treeName} />
-            <TreeTypeSection>
-              <TreeNameInfoWrapper>
-                <FieldTitle>Tree Type: </FieldTitle>
-                <StyledTooltip
-                  arrow
-                  leaveDelay={1000}
-                  title={TREE_TYPE_TOOLTIP_TEXT}
-                  placement="top"
-                >
-                  <StyledInfoOutlinedIcon />
-                </StyledTooltip>
-              </TreeNameInfoWrapper>
-              <RadioGroup
-                value={treeType}
-                onChange={(e) => setTreeType(e.target.value as TreeType)}
-              >
-                <StyledFormControlLabel
-                  value={TreeTypes.Targeted}
-                  checked={treeType === TreeTypes.Targeted}
-                  control={<StyledRadio />}
-                  label={
-                    <RadioLabelTargeted
-                      selected={treeType === TreeTypes.Targeted}
-                    />
-                  }
+      <StyledDialogContent data-test-id="modal-content">
+        <TreeNameInput setTreeName={setTreeName} treeName={treeName} />
+        <TreeTypeSection>
+          <TreeNameInfoWrapper>
+            <FieldTitle>Tree Type: </FieldTitle>
+            <StyledTooltip
+              arrow
+              leaveDelay={1000}
+              title={TREE_TYPE_TOOLTIP_TEXT}
+              placement="top"
+            >
+              <StyledInfoOutlinedIcon />
+            </StyledTooltip>
+          </TreeNameInfoWrapper>
+          <RadioGroup
+            value={treeType}
+            onChange={(e) => setTreeType(e.target.value as TreeType)}
+          >
+            <StyledFormControlLabel
+              value={TreeTypes.Targeted}
+              checked={treeType === TreeTypes.Targeted}
+              control={<StyledRadio />}
+              label={
+                <RadioLabelTargeted
+                  selected={treeType === TreeTypes.Targeted}
                 />
-                <StyledFormControlLabel
-                  value={TreeTypes.NonContextualized}
-                  checked={treeType === TreeTypes.NonContextualized}
-                  control={<StyledRadio />}
-                  label={
-                    <RadioLabelNonContextualized
-                      selected={treeType === TreeTypes.NonContextualized}
-                    />
-                  }
+              }
+            />
+            <StyledFormControlLabel
+              value={TreeTypes.NonContextualized}
+              checked={treeType === TreeTypes.NonContextualized}
+              control={<StyledRadio />}
+              label={
+                <RadioLabelNonContextualized
+                  selected={treeType === TreeTypes.NonContextualized}
                 />
-              </RadioGroup>
-            </TreeTypeSection>
-            {usesFeatureFlag(FEATURE_FLAGS.gisaidIngest) && (
-              <>
-                <Separator marginSize="l" />
-                <SampleIdInput
-                  handleInputModeChange={handleInputModeChange}
-                  handleInputValidation={handleInputValidation}
-                  shouldReset={shouldReset}
-                />
-                <Separator marginSize="xl" />
-              </>
-            )}
-            <MissingSampleAlert missingSamples={missingInputSamples} />
-            <FailedSampleAlert numFailedSamples={failedSamples?.length} />
-            {usesFeatureFlag(FEATURE_FLAGS.gisaidIngest) && (
-              <CreateTreeButton
-                hasValidName={hasValidName}
-                hasSamples={allValidSamplesForTreeCreation.length > 0}
-                isInEditMode={isInputInEditMode}
-                isValidTreeType={Object.values(TreeTypes).includes(treeType)}
-              />
-            )}
-            {!usesFeatureFlag(FEATURE_FLAGS.gisaidIngest) && (
-              <StyledButton
-                color="primary"
-                variant="contained"
-                isRounded
-                disabled={isTreeBuildDisabled}
-                type="submit"
-                value="Submit"
-              >
-                Create Tree
-              </StyledButton>
-            )}
-          </form>
-          <CreateTreeInfo>
-            Creating a new tree can take up to 12 hours.
-          </CreateTreeInfo>
-        </Content>
+              }
+            />
+          </RadioGroup>
+        </TreeTypeSection>
+        {usesFeatureFlag(FEATURE_FLAGS.gisaidIngest) && (
+          <>
+            <Separator marginSize="l" />
+            <SampleIdInput
+              handleInputModeChange={handleInputModeChange}
+              handleInputValidation={handleInputValidation}
+              shouldReset={shouldReset}
+            />
+            <Separator marginSize="xl" />
+          </>
+        )}
+        <MissingSampleAlert missingSamples={missingInputSamples} />
+        <FailedSampleAlert numFailedSamples={failedSamples?.length} />
       </StyledDialogContent>
-    </Dialog>
+      <StyledFooter>
+        {usesFeatureFlag(FEATURE_FLAGS.gisaidIngest) && (
+          <CreateTreeButton
+            hasValidName={hasValidName}
+            hasSamples={allValidSamplesForTreeCreation.length > 0}
+            isInEditMode={isInputInEditMode}
+            isValidTreeType={Object.values(TreeTypes).includes(treeType)}
+            onClick={handleSubmit}
+          />
+        )}
+        {!usesFeatureFlag(FEATURE_FLAGS.gisaidIngest) && (
+          <StyledButton
+            color="primary"
+            variant="contained"
+            isRounded
+            disabled={isTreeBuildDisabled}
+            type="submit"
+            value="Submit"
+            onClick={handleSubmit}
+          >
+            Create Tree
+          </StyledButton>
+        )}
+        <CreateTreeInfo>
+          Creating a new tree can take up to 12 hours.
+        </CreateTreeInfo>
+      </StyledFooter>
+    </StyledDialog>
   );
 };

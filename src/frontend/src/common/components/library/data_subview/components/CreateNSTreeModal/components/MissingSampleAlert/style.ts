@@ -26,7 +26,7 @@ export const RowFlexContainer = styled.div`
   height: 100%;
 
   .MuiCollapse-root {
-    overflow-y: scroll;
+    overflow-y: auto;
   }
 `;
 
@@ -42,7 +42,7 @@ export const StaticSizeDiv = styled.div`
 export const StyledList = styled.ul`
   padding: 0;
 
-  li:nth-child(odd) {
+  li:nth-of-type(odd) {
     ${(props) => {
       const colors = getColors(props);
       return `

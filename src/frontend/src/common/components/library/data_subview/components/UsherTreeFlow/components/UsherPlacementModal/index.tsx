@@ -23,6 +23,7 @@ import {
   StyledButton,
   StyledCloseIcon,
   StyledDialogContent,
+  StyledFailedSampleAlert,
   StyledFieldTitleText,
   StyledInfoIcon,
   StyledInputDropdown,
@@ -285,7 +286,9 @@ export const UsherPlacementModal = ({
                   </StyledSuggestionWrapper>
                 )}
               </StyledTextField>
-              <FailedSampleAlert numFailedSamples={failedSamples?.length} />
+              <FailedSampleAlert
+                numFailedSamples={failedSamples?.length}
+              />
             </div>
             <StyledButton
               color="primary"

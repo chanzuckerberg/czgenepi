@@ -1,11 +1,17 @@
-import { Button } from "czifui";
 import { compact, filter } from "lodash";
 import React, { useCallback, useEffect, useState } from "react";
 import { useMutation } from "react-query";
 import { validateSampleIdentifiers } from "src/common/queries/samples";
 import { pluralize } from "src/common/utils/strUtils";
 import { InputInstructions } from "./components/InputInstructions";
-import { StyledLabel, StyledLoadingAnimation, StyledTextArea } from "./style";
+import {
+  FlexContainer,
+  StyledAddButton,
+  StyledEditButton,
+  StyledLoadingAnimation,
+  StyledSampleCount,
+  StyledTextArea,
+} from "./style";
 
 interface Props {
   handleInputModeChange(isEditing: boolean): void;
@@ -122,38 +128,43 @@ const SampleIdInput = ({
         fullWidth
         multiline
         variant="outlined"
-        rows={3}
-        size="small"
+        rows={!isInEditMode ? 4 : 3}
         value={isInEditMode ? inputValue : inputDisplayValue}
         placeholder="e.g. USA/CA-CZB-0000/2021, USA/CA-CDPH-000000/2021"
       />
       {shouldShowAddButton && (
-        <Button
+        <StyledAddButton
           disabled={isValidating}
           onClick={validateIds}
           sdsStyle="square"
           sdsType="primary"
         >
           {isValidating ? (
-            <StyledLabel>
+            <FlexContainer>
               <StyledLoadingAnimation />
               Adding
-            </StyledLabel>
+            </FlexContainer>
           ) : (
             "Add"
           )}
-        </Button>
+        </StyledAddButton>
       )}
       {!isInEditMode && (
-        <div>
-          {foundSampleIds.length} {pluralize("Sample", foundSampleIds.length)}{" "}
-          Added
+        <FlexContainer>
+          <StyledSampleCount>
+            {foundSampleIds.length} {pluralize("Sample", foundSampleIds.length)}{" "}
+            Added
+          </StyledSampleCount>
           {!isValidating && (
-            <Button sdsStyle="minimal" sdsType="primary" onClick={onClickEdit}>
+            <StyledEditButton
+              sdsStyle="minimal"
+              sdsType="primary"
+              onClick={onClickEdit}
+            >
               Edit
-            </Button>
+            </StyledEditButton>
           )}
-        </div>
+        </FlexContainer>
       )}
     </>
   );
