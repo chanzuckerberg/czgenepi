@@ -48,7 +48,7 @@ def uploaded_pathogen_genome_factory(
     pangolin_last_updated=datetime.datetime.now(),
     sequencing_depth=0.1,
     upload_date=datetime.datetime.now(),
-    add_accessions=True
+    add_accessions=True,
 ):
 
     uploaded_pathogen_genome = UploadedPathogenGenome(
@@ -67,13 +67,15 @@ def uploaded_pathogen_genome_factory(
 
     if add_accessions:
         accessions: Sequence[AccessionWorkflowDirective] = (
-                                                               AccessionWorkflowDirective(
-                                                                   PublicRepositoryType.GISAID,
-                                                                   datetime.datetime.now(),
-                                                                   datetime.datetime.now(),
-                                                                   "gisaid_public_identifier",
-                                                               ),
-                                                           ),
+            (
+                AccessionWorkflowDirective(
+                    PublicRepositoryType.GISAID,
+                    datetime.datetime.now(),
+                    datetime.datetime.now(),
+                    "gisaid_public_identifier",
+                ),
+            ),
+        )
         for accession_workflow_directive in accessions:
             if accession_workflow_directive.end_datetime is None:
                 public_repository_metadata: PublicRepositoryTypeMetadata = (
