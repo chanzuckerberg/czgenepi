@@ -152,10 +152,13 @@ export const StyledWarningIcon = styled(ErrorOutlineOutlinedIcon)`
 export const StyledButton = styled(Button)`
   ${(props) => {
     const colors = getColors(props);
+    const spaces = getSpaces(props);
     return `
       &:active {
         background-color: ${colors?.gray[400]};
       }
+
+      margin-top: ${spaces?.xl}px;
     `;
   }}
 `;
