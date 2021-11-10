@@ -1,5 +1,5 @@
 import { Tooltip } from "czifui";
-import React from "react";
+import React, { MouseEventHandler } from "react";
 import { StyledButton, StyledButtonWrapper } from "./style";
 
 interface Props {
@@ -7,7 +7,7 @@ interface Props {
   hasValidName: boolean;
   isInEditMode: boolean;
   isValidTreeType: boolean;
-  onClick(e): void;
+  onClick: MouseEventHandler;
 }
 
 const CreateTreeButton = ({

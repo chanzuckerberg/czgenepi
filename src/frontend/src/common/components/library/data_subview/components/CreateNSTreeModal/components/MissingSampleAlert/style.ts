@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { fontBodyXs, getColors, getIconSizes, getSpaces, ListItem, Props } from "czifui";
+import { fontBodyXs, getIconSizes, getSpaces, Props } from "czifui";
 import ArrowDownIcon from "src/common/icons/IconArrowDownSmall.svg";
 import ArrowUpIcon from "src/common/icons/IconArrowUpSmall.svg";
 import { StyledCallout as Callout } from "../../../FailedSampleAlert/style";
@@ -42,13 +42,9 @@ export const StaticSizeDiv = styled.div`
 export const StyledList = styled.ul`
   padding: 0;
 
+  /* TODO (mlila): this should be exported from SDS */
   li:nth-of-type(odd) {
-    ${(props) => {
-      const colors = getColors(props);
-      return `
-        background-color: #F4EEE4;
-      `;
-    }}
+    background-color: #f4eee4;
   }
 `;
 

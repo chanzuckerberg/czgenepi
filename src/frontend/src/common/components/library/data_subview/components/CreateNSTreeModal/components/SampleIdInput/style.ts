@@ -20,6 +20,10 @@ const inputPadding = (props: Props) => {
   `;
 };
 
+interface ExtraProps extends Props {
+  disabled?: boolean;
+}
+
 export const StyledTextArea = styled(TextField)`
   ${inputPadding}
 
@@ -32,7 +36,7 @@ export const StyledTextArea = styled(TextField)`
     resize: both;
   }
 
-  ${(props: Props) => {
+  ${(props: ExtraProps) => {
     const { disabled } = props;
 
     if (disabled) {

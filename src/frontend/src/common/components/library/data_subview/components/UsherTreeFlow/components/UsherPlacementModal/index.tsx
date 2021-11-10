@@ -10,7 +10,6 @@ import {
 } from "src/common/queries/trees";
 import { pluralize } from "src/common/utils/strUtils";
 import {
-  Content,
   StyledDialogTitle,
   StyledTooltip,
   Title,
@@ -19,11 +18,11 @@ import {
 import { Header } from "../../../DownloadModal/style";
 import { FailedSampleAlert } from "../../../FailedSampleAlert";
 import {
+  Content,
   FlexWrapper,
   StyledButton,
   StyledCloseIcon,
   StyledDialogContent,
-  StyledFailedSampleAlert,
   StyledFieldTitleText,
   StyledInfoIcon,
   StyledInputDropdown,
@@ -286,9 +285,7 @@ export const UsherPlacementModal = ({
                   </StyledSuggestionWrapper>
                 )}
               </StyledTextField>
-              <FailedSampleAlert
-                numFailedSamples={failedSamples?.length}
-              />
+              <FailedSampleAlert numFailedSamples={failedSamples?.length} />
             </div>
             <StyledButton
               color="primary"

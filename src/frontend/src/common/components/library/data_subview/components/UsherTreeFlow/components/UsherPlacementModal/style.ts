@@ -4,6 +4,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import ErrorOutlineOutlinedIcon from "@material-ui/icons/ErrorOutlineOutlined";
 import {
   Button,
+  fontBodyS,
   fontBodyXs,
   fontBodyXxxs,
   fontHeaderM,
@@ -189,4 +190,14 @@ export const StyledCloseIcon = styled(CloseIcon)`
 
 export const StyledInfoIcon = styled(InfoIcon)`
   margin-top: 3px;
+`;
+
+export const Content = styled.div`
+  ${fontBodyS}
+  ${(props) => {
+    const colors = getColors(props);
+    return `
+      color: ${colors?.gray[500]};
+    `;
+  }}
 `;
