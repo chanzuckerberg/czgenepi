@@ -549,10 +549,10 @@ def update_sample_public_ids():
             isl_number = private_to_public[s.private_identifier]
             accessions = s.uploaded_pathogen_genome.accessions()
 
-            # if the accessions length == 1 that means that currently no isl number exists on the uploaded_pathogen_genome
-            if not len(accessions) == 1:
-                # first accession public_identifier is 'gisaid_public_identifier', the second accession returned is the one that we want to update
-                accessions[1].public_identifier = isl_number
+            if accessions:
+                for accession in accessions:
+                    if isinstance(accession, GisaidAccession):
+                        accession.public_identifier = isl_number
             else:
                 # create a new accession if DNE
                 s.uploaded_pathogen_genome.add_accession(

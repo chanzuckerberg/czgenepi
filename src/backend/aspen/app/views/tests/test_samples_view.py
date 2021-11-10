@@ -1164,7 +1164,7 @@ def test_update_sample_gisaid_isl(
             group, user, private_identifier=priv, public_identifier=f"{pub}_public"
         )
         uploaded_pathogen_genome = uploaded_pathogen_genome_factory(
-            sample, sequence="ATGCAAAAAA"
+            sample, sequence="ATGCAAAAAA", add_accessions=False
         )
         gisaid_accession_factory(uploaded_pathogen_genome, f"{pub}_old")
         session.add(sample)
@@ -1195,8 +1195,8 @@ def test_update_sample_gisaid_isl(
     )
     for r in s:
         accessions = r.uploaded_pathogen_genome.accessions()
-        # first accession 'gisaid_public_identifier', the second accession returned is the one that we want to update
-    assert accessions[1].public_identifier == private_to_public[r.private_identifier]
+        for a in accessions:
+            assert a.public_identifier == private_to_public[r.private_identifier]
 
 
 def test_update_sample_new_gisaid_isl(
@@ -1219,7 +1219,7 @@ def test_update_sample_new_gisaid_isl(
         sample = sample_factory(
             group, user, private_identifier=priv, public_identifier=f"{pub}_public"
         )
-        uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
+        uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA", add_accessions=False)
         session.add(sample)
 
     session.commit()
@@ -1248,8 +1248,8 @@ def test_update_sample_new_gisaid_isl(
     )
     for r in s:
         accessions = r.uploaded_pathogen_genome.accessions()
-        # first accession 'gisaid_public_identifier', the second accession returned is the one that we want to update
-    assert accessions[1].public_identifier == private_to_public[r.private_identifier]
+        for a in accessions:
+            assert a.public_identifier == private_to_public[r.private_identifier]
 
 
 def setup_validation_data(session: Session, client: FlaskClient):
