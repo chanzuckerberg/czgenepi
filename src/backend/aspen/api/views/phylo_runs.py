@@ -2,14 +2,16 @@ import datetime
 import json
 import os
 import re
-from typing import MutableSequence
+from typing import MutableSequence, Iterable, Set, Mapping, Any, Optional
 
 import sentry_sdk
 import sqlalchemy as sa
 from boto3 import Session
+from datetime import timedelta
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
+from sqlalchemy import or_, and_
+from sqlalchemy.orm import joinedload, aliased
 from sqlalchemy.orm.exc import NoResultFound
 from starlette.requests import Request
 
@@ -19,16 +21,20 @@ from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.phylo_runs import (
     PHYLO_TREE_TYPES,
     PhyloRunDeleteResponse,
-    PhyloRunRequestSchema,
-    PhyloRunResponseSchema,
+    PhyloRunRequest,
+    PhyloRunResponse,
+    PhyloRunsListResponse,
 )
 from aspen.api.settings import Settings
 from aspen.api.utils import get_matching_gisaid_ids
 from aspen.app.views.api_utils import (
+    authz_phylo_tree_filters,
     authz_sample_filters,
     get_missing_and_found_sample_ids,
 )
 from aspen.database.models import (
+    PhyloTree,
+    DataType,
     AlignedGisaidDump,
     PathogenGenome,
     PhyloRun,
@@ -44,12 +50,12 @@ router = APIRouter()
 
 @router.post("/")
 async def kick_off_phylo_run(
-    phylo_run_request: PhyloRunRequestSchema,
+    phylo_run_request: PhyloRunRequest,
     request: Request,
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
-    user: User = Depends(get_auth_user),
-) -> PhyloRunResponseSchema:
+) -> PhyloRunResponse:
+    user = request.state.auth_user
     # Note - sample run will be associated with users's primary group.
     #    (do we want admins to be able to start runs on behalf of other dph's ?)
     group = user.group
@@ -138,7 +144,6 @@ async def kick_off_phylo_run(
         name=phylo_run_request.name,
         gisaid_ids=list(gisaid_ids),
         tree_type=TreeType(phylo_run_request.tree_type),
-        user=user,
     )
     workflow.inputs = list(pathogen_genomes)
     workflow.inputs.append(aligned_gisaid_dump)
@@ -185,7 +190,7 @@ async def kick_off_phylo_run(
         input=json.dumps(sfn_input_json),
     )
 
-    return PhyloRunResponseSchema.from_orm(workflow)
+    return PhyloRunResponse.from_orm(workflow)
 
 
 async def get_editable_phylo_run_by_id(db, run_id, user):
@@ -208,6 +213,28 @@ async def get_editable_phylo_run_by_id(db, run_id, user):
         raise ex.BadRequestException("Can't modify an in-progress phylo run")
     return run
 
+def humanize_tree_name(s3_key: str):
+    json_filename = s3_key.split("/")[-1]
+    basename = re.sub(r".json", "", json_filename)
+    title_case = basename.replace("_", " ").title()
+    if "Ancestors" in title_case:
+        title_case = title_case.replace("Ancestors", "Contextual")
+    if " Public" in title_case:
+        title_case = title_case.replace(" Public", "")
+    if " Private" in title_case:
+        title_case = title_case.replace(" Private", "")
+    return title_case
+
+def generate_tree_name_from_template(phylo_run: PhyloRun) -> str:
+    # template_args should be transparently deserialized into a python dict.
+    # but if something is wrong with the data in the column (i.e. the json is
+    # double escaped), it will be a string instead.
+    location = phylo_run.group.location  # safe default
+    if isinstance(phylo_run.template_args, Mapping):
+        template_args = phylo_run.template_args
+        location = template_args.get("location", location)
+    return f"{location} Tree {format_date(phylo_run.start_datetime)}"
+
 
 @router.get("/")
 async def list_runs(
@@ -215,8 +242,60 @@ async def list_runs(
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_auth_user),
-) -> bool:
-    return False
+) -> PhyloRunsListResponse:
+    cansee_owner_group_ids: Set[int] = {
+        cansee.owner_group_id
+        for cansee in user.group.can_see
+        if cansee.data_type == DataType.TREES
+    }
+    phylo_run_alias = aliased(PhyloRun)
+    phylo_runs_query = (sa.select(phylo_run_alias)  # type: ignore
+        .options(
+            joinedload(phylo_run_alias.outputs.of_type(PhyloTree)),
+            joinedload(phylo_run_alias.user),
+        )
+        .filter(
+            or_(
+                user.system_admin,
+                phylo_run_alias.group_id == user.group.id,
+                phylo_run_alias.group_id.in_(cansee_owner_group_ids),
+            )
+        )
+    )
+    phylo_run_results = await db.execute(phylo_runs_query)
+    phylo_runs: Iterable[PhyloRun] = phylo_run_results.unique().scalars().all()
+
+    # filter for only information we need in sample table view
+    results: List[PhyloRunResponse] = []
+    for phylo_run in phylo_runs:
+        phylo_tree: Optional[PhyloTree] = None
+        #result: Mapping[str, Any] = {
+        #    "started_date": phylo_run.start_datetime,
+        #    "completed_date": phylo_run.end_datetime,
+        #    "status": phylo_run.workflow_status.value,
+        #    "workflow_id": phylo_run.workflow_id,
+        #    "tree_type": phylo_run.tree_type.value,
+        #}
+        #for output in phylo_run.outputs:
+        #    if isinstance(output, PhyloTree):
+        #        phylo_tree = output
+        #        result = result | {
+        #            "phylo_tree_id": phylo_tree.entity_id,
+        #            "name": phylo_tree.name or humanize_tree_name(phylo_tree.s3_key),
+        #        }
+        #if not phylo_tree:
+        #    result = result | {
+        #        "phylo_tree_id": None,
+        #        "name": phylo_run.name or generate_tree_name_from_template(phylo_run),
+        #    }
+        #    if phylo_run.start_datetime and phylo_run.start_datetime < (
+        #        datetime.now() - timedelta(hours=12)
+        #    ):
+        #        result["status"] = "FAILED"
+        results.append(PhyloRunResponse.from_orm(phylo_run))
+
+    # TODO this is busted for sure.
+    return PhyloRunsListResponse(results)
 
 
 @router.delete("/{item_id}")

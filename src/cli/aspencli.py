@@ -385,6 +385,14 @@ def delete_runs(ctx, run_ids):
         print(resp.headers)
         print(resp.text)
 
+@phylo_runs.command(name="list")
+@click.pass_context
+def list_runs(ctx):
+    api_client = ctx.obj["api_client"]
+    resp = api_client.get(f"/v2/phylo_runs/")
+    print(resp.headers)
+    print(resp.text)
+
 
 if __name__ == "__main__":
     cli()

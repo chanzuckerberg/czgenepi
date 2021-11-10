@@ -13,7 +13,7 @@ PHYLO_TREE_TYPES = {
 }
 
 
-class PhyloRunRequestSchema(BaseRequest):
+class PhyloRunRequest(BaseRequest):
     # mypy + pydantic is a work in progress: https://github.com/samuelcolvin/pydantic/issues/156
     name: constr(min_length=1, max_length=128, strict=True)  # type: ignore
     samples: List[StrictStr]
@@ -26,7 +26,7 @@ class PhyloRunRequestSchema(BaseRequest):
         return uppercase_tree_type
 
 
-class GroupResponseSchema(BaseResponse):
+class GroupResponse(BaseResponse):
     class Config:
         orm_mode = True
 
@@ -34,24 +34,37 @@ class GroupResponseSchema(BaseResponse):
     name: StrictStr
 
 
-class UserResponseSchema(BaseResponse):
+class UserResponse(BaseResponse):
     id: int
     name: str
 
+class TreeResponse(BaseResponse):
+    id: int
 
-class PhyloRunResponseSchema(BaseResponse):
+
+class PhyloRunResponse(BaseResponse):
     class Config:
         orm_mode = True
+
+    #@validator('phylo_tree', pre=True, whole=True)
+    #def validate_something(cls, v):
+    #    for output in phylo_run.outputs:
+    #        if isinstance(output, PhyloTree):
+    #            return output
 
     id: int
     start_datetime: datetime.datetime
     end_datetime: Union[datetime.datetime, None] = None
     workflow_status: WorkflowStatusType  # TODO maybe we can keep SqlAlchemy out of this
-    group: GroupResponseSchema
-    template_file_path: StrictStr
+    #group: GroupResponse
+    template_file_path: Union[None, StrictStr]
     template_args: dict
-    user: Union[UserResponseSchema, None] = None
+    #user: Union[UserResponse, None] = None
+    #phylo_tree: Union[TreeResponse, None] = None
 
 
 class PhyloRunDeleteResponse(BaseResponse):
     id: int
+
+class PhyloRunsListResponse(BaseResponse):
+    phylo_runs: List[PhyloRunResponse]
