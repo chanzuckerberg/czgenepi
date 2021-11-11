@@ -386,11 +386,13 @@ def delete_runs(ctx, run_ids):
         print(resp.text)
 
 @phylo_runs.command(name="list")
+@click.option("--print-headers", is_flag=True, default=False)
 @click.pass_context
-def list_runs(ctx):
+def list_runs(ctx, print_headers):
     api_client = ctx.obj["api_client"]
     resp = api_client.get(f"/v2/phylo_runs/")
-    print(resp.headers)
+    if print_headers:
+        print(resp.headers)
     print(resp.text)
 
 

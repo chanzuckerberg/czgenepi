@@ -2,16 +2,15 @@ import datetime
 import json
 import os
 import re
-from typing import MutableSequence, Iterable, Set, Mapping, Any, Optional
+from typing import Iterable, MutableSequence, Set
 
 import sentry_sdk
 import sqlalchemy as sa
 from boto3 import Session
-from datetime import timedelta
 from fastapi import APIRouter, Depends
+from sqlalchemy import or_
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import or_, and_
-from sqlalchemy.orm import joinedload, aliased
+from sqlalchemy.orm import aliased, joinedload
 from sqlalchemy.orm.exc import NoResultFound
 from starlette.requests import Request
 
@@ -28,16 +27,15 @@ from aspen.api.schemas.phylo_runs import (
 from aspen.api.settings import Settings
 from aspen.api.utils import get_matching_gisaid_ids
 from aspen.app.views.api_utils import (
-    authz_phylo_tree_filters,
     authz_sample_filters,
     get_missing_and_found_sample_ids,
 )
 from aspen.database.models import (
-    PhyloTree,
-    DataType,
     AlignedGisaidDump,
+    DataType,
     PathogenGenome,
     PhyloRun,
+    PhyloTree,
     Sample,
     TreeType,
     User,
@@ -213,28 +211,6 @@ async def get_editable_phylo_run_by_id(db, run_id, user):
         raise ex.BadRequestException("Can't modify an in-progress phylo run")
     return run
 
-def humanize_tree_name(s3_key: str):
-    json_filename = s3_key.split("/")[-1]
-    basename = re.sub(r".json", "", json_filename)
-    title_case = basename.replace("_", " ").title()
-    if "Ancestors" in title_case:
-        title_case = title_case.replace("Ancestors", "Contextual")
-    if " Public" in title_case:
-        title_case = title_case.replace(" Public", "")
-    if " Private" in title_case:
-        title_case = title_case.replace(" Private", "")
-    return title_case
-
-def generate_tree_name_from_template(phylo_run: PhyloRun) -> str:
-    # template_args should be transparently deserialized into a python dict.
-    # but if something is wrong with the data in the column (i.e. the json is
-    # double escaped), it will be a string instead.
-    location = phylo_run.group.location  # safe default
-    if isinstance(phylo_run.template_args, Mapping):
-        template_args = phylo_run.template_args
-        location = template_args.get("location", location)
-    return f"{location} Tree {format_date(phylo_run.start_datetime)}"
-
 
 @router.get("/")
 async def list_runs(
@@ -249,10 +225,12 @@ async def list_runs(
         if cansee.data_type == DataType.TREES
     }
     phylo_run_alias = aliased(PhyloRun)
-    phylo_runs_query = (sa.select(phylo_run_alias)  # type: ignore
+    phylo_runs_query = (
+        sa.select(phylo_run_alias)  # type: ignore
         .options(
             joinedload(phylo_run_alias.outputs.of_type(PhyloTree)),
-            joinedload(phylo_run_alias.user),
+            joinedload(phylo_run_alias.user),  # For Pydantic serialization
+            joinedload(phylo_run_alias.group),  # For Pydantic serialization
         )
         .filter(
             or_(
@@ -268,34 +246,9 @@ async def list_runs(
     # filter for only information we need in sample table view
     results: List[PhyloRunResponse] = []
     for phylo_run in phylo_runs:
-        phylo_tree: Optional[PhyloTree] = None
-        #result: Mapping[str, Any] = {
-        #    "started_date": phylo_run.start_datetime,
-        #    "completed_date": phylo_run.end_datetime,
-        #    "status": phylo_run.workflow_status.value,
-        #    "workflow_id": phylo_run.workflow_id,
-        #    "tree_type": phylo_run.tree_type.value,
-        #}
-        #for output in phylo_run.outputs:
-        #    if isinstance(output, PhyloTree):
-        #        phylo_tree = output
-        #        result = result | {
-        #            "phylo_tree_id": phylo_tree.entity_id,
-        #            "name": phylo_tree.name or humanize_tree_name(phylo_tree.s3_key),
-        #        }
-        #if not phylo_tree:
-        #    result = result | {
-        #        "phylo_tree_id": None,
-        #        "name": phylo_run.name or generate_tree_name_from_template(phylo_run),
-        #    }
-        #    if phylo_run.start_datetime and phylo_run.start_datetime < (
-        #        datetime.now() - timedelta(hours=12)
-        #    ):
-        #        result["status"] = "FAILED"
         results.append(PhyloRunResponse.from_orm(phylo_run))
 
-    # TODO this is busted for sure.
-    return PhyloRunsListResponse(results)
+    return PhyloRunsListResponse(phylo_runs=results)
 
 
 @router.delete("/{item_id}")
