@@ -1,5 +1,5 @@
 import { compact, filter } from "lodash";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { ChangeEvent, useCallback, useEffect, useState } from "react";
 import { useMutation } from "react-query";
 import { validateSampleIdentifiers } from "src/common/queries/samples";
 import { pluralize } from "src/common/utils/strUtils";
@@ -24,8 +24,7 @@ const SampleIdInput = ({
   handleInputValidation,
   shouldReset,
 }: Props): JSX.Element => {
-  const [hasEverFocusedInput, setHasEverFocusedInput] =
-    useState<boolean>(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>("");
   const [inputDisplayValue, setInputDisplayValue] = useState<string>("");
   const [isInEditMode, setInEditMode] = useState<boolean>(true);
@@ -38,6 +37,7 @@ const SampleIdInput = ({
   // clear the input
   useEffect(() => {
     if (shouldReset) {
+      setHasUnsavedChanges(false);
       setInputValue("");
       setInputDisplayValue("");
       setInEditMode(true);
@@ -54,9 +54,9 @@ const SampleIdInput = ({
   // if they never clicked into the input, don't force them to add something
   // and save before moving forward
   useEffect(() => {
-    const mode = hasEverFocusedInput ? isInEditMode : false;
-    handleInputModeChange(mode);
-  }, [handleInputModeChange, hasEverFocusedInput, isInEditMode]);
+    const shouldShowEditingTooltip = hasUnsavedChanges && isInEditMode;
+    handleInputModeChange(shouldShowEditingTooltip);
+  }, [handleInputModeChange, hasUnsavedChanges, isInEditMode]);
 
   const parseInputIds = useCallback(() => {
     const tokens = inputValue.split(/[\n\t,]/g);
@@ -79,6 +79,7 @@ const SampleIdInput = ({
       onSuccess: (data: any) => {
         setValidating(false);
         setShowAddButton(false);
+        setHasUnsavedChanges(false);
 
         const missingIds = data["missing_sample_ids"];
         const foundIds = filter(idsInFlight, (id) => !missingIds.includes(id));
@@ -114,17 +115,27 @@ const SampleIdInput = ({
     setShowAddButton(true);
   };
 
+  const onInputBlur = () => {
+    if (!hasUnsavedChanges) {
+      setShowAddButton(false);
+    }
+  };
+
+  const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e?.target?.value;
+    setInputValue(value);
+    setHasUnsavedChanges(!!value);
+  };
+
   return (
     <>
       <InputInstructions />
       <StyledTextArea
         // TODO (mlila): should be replaced with sds InputText when available
         disabled={!isInEditMode}
-        onChange={(e) => setInputValue(e?.target?.value)}
-        onFocus={() => {
-          setShowAddButton(true);
-          setHasEverFocusedInput(true);
-        }}
+        onChange={onInputChange}
+        onFocus={() => setShowAddButton(true)}
+        onBlur={onInputBlur}
         fullWidth
         multiline
         variant="outlined"
