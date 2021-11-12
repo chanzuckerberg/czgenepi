@@ -44,9 +44,6 @@ if [ ! -e ncov/data/sequences_aspen.fasta ]; then
     cp ncov/data/references_metadata.tsv ncov/data/metadata_aspen.tsv;
 fi;
 
-# If this is a contextual build, disable crowding penalty
-if grep -q group_plus_context ncov/my_profiles/aspen/builds.yaml; then patch ncov/workflow/snakemake_rules/main_workflow.smk < /usr/src/app/aspen/workflows/nextstrain_run/patches/local_ncov_settings.patch; fi
-
 aligned_gisaid_s3_bucket=$(echo "${aligned_gisaid_location}" | jq -r .bucket)
 aligned_gisaid_sequences_s3_key=$(echo "${aligned_gisaid_location}" | jq -r .sequences_key)
 aligned_gisaid_metadata_s3_key=$(echo "${aligned_gisaid_location}" | jq -r .metadata_key)
