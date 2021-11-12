@@ -42,6 +42,9 @@ class UserResponse(BaseResponse):
 
 
 class TreeResponse(BaseResponse):
+    # A root validator gets us access to all fields in a model, so if
+    # we need to generate a field as a composite of other fields, this
+    # is how we do it.
     @root_validator(pre=False)
     def _set_fields(cls, values: dict) -> dict:
         if values["name"]:
@@ -58,8 +61,11 @@ class TreeResponse(BaseResponse):
         if " Private" in title_case:
             title_case = title_case.replace(" Private", "")
         values["name"] = title_case
-        # TODO, see if we can eliminiate this field.
+
+        # TODO, we need to include this field in the response model so we can interact
+        # with it in this method, but ideally we don't want to return it at all.
         values["s3_key"] = None
+
         return values
 
     id: int
@@ -72,19 +78,16 @@ class PhyloRunResponse(BaseResponse):
         orm_mode = True
         allow_population_by_field_name = True
 
+    # Return the first phylo tree output. We only expect one, and for this to
+    # work right, this *depends on our query filtering out other output types!*
     @validator("outputs", pre=True)
     def resolve_tree(cls, v):
-        # Return the first phylo tree output. We only expect one,
-        # but this *depends on our query filtering out other output types!*
         for output in v:
             return output
 
-    @validator("tree_type", pre=True)
-    def resolve_tree_type(cls, v):
-        return v.value
-
-    @validator("workflow_status", pre=True)
-    def resolve_workflow_status(cls, v):
+    # Workarounds for our SQLAlchemy enums
+    @validator("tree_type", "workflow_status", pre=True)
+    def resolve_enums(cls, v):
         return v.value
 
     @root_validator(pre=False)
@@ -119,6 +122,8 @@ class PhyloRunResponse(BaseResponse):
     template_file_path: Union[None, StrictStr]
     tree_type: Union[None, str]
     user: Union[UserResponse, None] = None
+
+    # This lets us remap phlo_run.outputs to phylo_run.phylo_tree using the validator above
     outputs: Union[TreeResponse, None] = Field(alias="phylo_tree")
 
 
