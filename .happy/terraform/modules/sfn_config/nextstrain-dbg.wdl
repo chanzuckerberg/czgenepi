@@ -71,12 +71,12 @@ task nextstrain_workflow {
                       --tree-type "~{tree_type}"
     )
 
-    # set up ncov
+    # set up ncov. keep the fetch command in case want to overwrite the version in Docker image
     mkdir -p ncov/my_profiles/aspen ncov/results
-    (cd ncov &&
-     git init &&
-     git fetch --depth 1 git://github.com/nextstrain/ncov.git df90b457f48ef3d7500927656536cacb16c9a83f &&
-     git checkout FETCH_HEAD
+#    (cd ncov &&
+#     git init &&
+#     git fetch --depth 1 git://github.com/nextstrain/ncov.git df90b457f48ef3d7500927656536cacb16c9a83f &&
+#     git checkout FETCH_HEAD
     )
     ncov_git_rev=$(cd ncov && git rev-parse HEAD)
 
