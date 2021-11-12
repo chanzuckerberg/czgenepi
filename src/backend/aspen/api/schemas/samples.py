@@ -49,3 +49,7 @@ class SampleResponseSchema(BaseResponse):
 
 class SamplesResponseSchema(BaseResponse):
     samples: List[SampleResponseSchema]
+
+
+class SampleDeleteResponse(BaseResponse):
+    id: int

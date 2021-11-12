@@ -13,10 +13,12 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
 from starlette.requests import Request
 
+from aspen.api.auth import get_auth_user
 from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.phylo_runs import (
     PHYLO_TREE_TYPES,
+    PhyloRunDeleteResponse,
     PhyloRunRequestSchema,
     PhyloRunResponseSchema,
 )
@@ -32,6 +34,7 @@ from aspen.database.models import (
     PhyloRun,
     Sample,
     TreeType,
+    User,
     Workflow,
     WorkflowStatusType,
 )
@@ -182,3 +185,52 @@ async def kick_off_phylo_run(
     )
 
     return PhyloRunResponseSchema.from_orm(workflow)
+
+
+async def get_editable_phylo_run_by_id(db, run_id, user):
+    query = (
+        sa.select(PhyloRun)
+        .filter(
+            sa.and_(
+                PhyloRun.group == user.group,  # This is an access control check!
+                PhyloRun.id == run_id,
+            )
+        )
+        .options(joinedload(PhyloRun.outputs))
+    )
+    results = await db.execute(query)
+    try:
+        run = results.scalars().unique().one()
+    except NoResultFound:
+        raise ex.NotFoundException("phylo run not found")
+    if run.workflow_status == WorkflowStatusType.STARTED:
+        raise ex.BadRequestException("Can't modify an in-progress phylo run")
+    return run
+
+
+@router.get("/")
+async def list_runs(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    user: User = Depends(get_auth_user),
+) -> bool:
+    return False
+
+
+@router.delete("/{item_id}")
+async def delete_run(
+    item_id: int,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    user: User = Depends(get_auth_user),
+) -> bool:
+    item = await get_editable_phylo_run_by_id(db, item_id, user)
+    item_db_id = item.id
+
+    for output in item.outputs:
+        await db.delete(output)
+    await db.delete(item)
+    await db.commit()
+    return PhyloRunDeleteResponse(id=item_db_id)

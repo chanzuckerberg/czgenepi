@@ -1,6 +1,7 @@
+import Image from "next/image";
 import React from "react";
 import ConfirmDialog from "src/components/ConfirmDialog";
-import { StyledHeader, StyledImg, StyledP } from "./style";
+import { StyledHeader, StyledP } from "./style";
 
 interface Props {
   content: string | JSX.Element;
@@ -9,6 +10,10 @@ interface Props {
   isOpen: boolean;
   onClose(): void;
   onConfirm(): void;
+  // logoWidth and logoHeight needed for next image to resize image properly
+  // note that the number value refers to pixels (ex 45 -> 45px)
+  logoWidth: number;
+  logoHeight?: number; // optional, defaults to 45 since both modals have shared image height
   customConfirmButton?: JSX.Element;
 }
 
@@ -19,11 +24,18 @@ const RedirectConfirmationModal = ({
   isOpen,
   onClose,
   onConfirm,
+  logoWidth,
+  logoHeight = 45, // 45 px
   ...props
 }: Props): JSX.Element => {
   const title = (
     <>
-      <StyledImg src={img} />
+      <Image // using next image for png files, see https://nextjs.org/docs/basic-features/image-optimization#image-sizing
+        src={img}
+        height={logoHeight}
+        width={logoWidth}
+        layout={"intrinsic"} // Scale down to fit width of container, up to image size
+      />
       <StyledHeader>You are now leaving Aspen.</StyledHeader>
     </>
   );

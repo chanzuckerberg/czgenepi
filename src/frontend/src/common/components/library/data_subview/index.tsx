@@ -381,7 +381,7 @@ const DataSubview: FunctionComponent<Props> = ({
                 <span>
                   Your tree is being created. It may take up to 12 hours to
                   process. To check your tree’s status, visit the Phylogenetic
-                  Tree page.
+                  Tree tab.
                 </span>
                 <NextLink href={ROUTES.PHYLO_TREES} passHref>
                   <a href="passRef">

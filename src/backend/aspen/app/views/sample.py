@@ -517,6 +517,9 @@ def update_sample_public_ids():
     request_private_ids: list[str] = private_to_public.keys()
     request_public_ids: list[str] = private_to_public.values()
 
+    # check to see if public_identifiers are gisaid isl accessions
+    public_ids_are_gisaid_isl: str = request_data.get("public_ids_are_gisaid_isl")
+
     group_id: int = request_data["group_id"]
 
     # check that all private_identifiers exist
@@ -531,6 +534,37 @@ def update_sample_public_ids():
             f"Private Identifiers {missing_private_identifiers} not found in DB",
         )
 
+    samples_to_update = g.db_session.query(Sample).filter(
+        and_(
+            Sample.submitting_group_id == group_id,
+            Sample.private_identifier.in_(private_to_public.keys()),
+        )
+    )
+
+    if public_ids_are_gisaid_isl:
+        samples_to_update = samples_to_update.options(
+            joinedload(Sample.uploaded_pathogen_genome),
+        )
+        for s in samples_to_update:
+            isl_number = private_to_public[s.private_identifier]
+            accessions = s.uploaded_pathogen_genome.accessions()
+
+            if accessions:
+                for accession in accessions:
+                    if isinstance(accession, GisaidAccession):
+                        accession.public_identifier = isl_number
+            else:
+                # create a new accession if DNE
+                s.uploaded_pathogen_genome.add_accession(
+                    repository_type=PublicRepositoryType.GISAID,
+                    public_identifier=isl_number,
+                    workflow_start_datetime=datetime.datetime.now(),
+                    workflow_end_datetime=datetime.datetime.now(),
+                )
+                g.db_session.add(s)
+        g.db_session.commit()
+        return jsonify(success=True)
+
     # check that public_identifiers don't already exist
     existing_public_ids: list[str] = api_utils.get_existing_public_ids(
         request_public_ids, g.db_session, group_id=group_id
@@ -540,17 +574,7 @@ def update_sample_public_ids():
             f"Public Identifiers {existing_public_ids} are already in the database",
         )
 
-    samples_to_update = (
-        g.db_session.query(Sample)
-        .filter(
-            and_(
-                Sample.submitting_group_id == group_id,
-                Sample.private_identifier.in_(private_to_public.keys()),
-            )
-        )
-        .all()
-    )
-    for s in samples_to_update:
+    for s in samples_to_update.all():
         s.public_identifier = private_to_public[s.private_identifier]
         g.db_session.add(s)
 

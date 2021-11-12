@@ -1,36 +1,160 @@
-import React from "react";
-import { NewTabLink } from "src/common/components/library/NewTabLink";
-import { CollapsibleInstructions } from "src/components/CollapsibleInstructions";
-import { SemiBold } from "./style";
+import { Button } from "czifui";
+import { compact, filter } from "lodash";
+import React, { useCallback, useEffect, useState } from "react";
+import { useMutation } from "react-query";
+import { validateSampleIdentifiers } from "src/common/queries/samples";
+import { pluralize } from "src/common/utils/strUtils";
+import { InputInstructions } from "./components/InputInstructions";
+import { StyledLabel, StyledLoadingAnimation, StyledTextArea } from "./style";
 
-const SampleIdInput = (): JSX.Element => {
+interface Props {
+  handleInputModeChange(isEditing: boolean): void;
+  handleInputValidation(found: string[], missing: string[]): void;
+  shouldReset?: boolean;
+}
+
+const SampleIdInput = ({
+  handleInputModeChange,
+  handleInputValidation,
+  shouldReset,
+}: Props): JSX.Element => {
+  const [hasEverFocusedInput, setHasEverFocusedInput] =
+    useState<boolean>(false);
+  const [inputValue, setInputValue] = useState<string>("");
+  const [inputDisplayValue, setInputDisplayValue] = useState<string>("");
+  const [isInEditMode, setInEditMode] = useState<boolean>(true);
+  const [isValidating, setValidating] = useState<boolean>(false);
+  const [shouldShowAddButton, setShowAddButton] = useState<boolean>(false);
+  const [idsInFlight, setIdsInFlight] = useState<string[]>([]);
+  const [foundSampleIds, setFoundSampleIds] = useState<string[]>([]);
+  const [shouldValidate, setShouldValidate] = useState<boolean>(false);
+
+  // clear the input
+  useEffect(() => {
+    if (shouldReset) {
+      setInputValue("");
+      setInputDisplayValue("");
+      setInEditMode(true);
+      setValidating(false);
+      setShowAddButton(false);
+      setIdsInFlight([]);
+      setFoundSampleIds([]);
+      setShouldValidate(false);
+    }
+  }, [shouldReset]);
+
+  // whenever we change the input mode, let the parent know. This controls
+  // disabling the create button and tooltip associated with edit mode.
+  // if they never clicked into the input, don't force them to add something
+  // and save before moving forward
+  useEffect(() => {
+    const mode = hasEverFocusedInput ? isInEditMode : false;
+    handleInputModeChange(mode);
+  }, [handleInputModeChange, hasEverFocusedInput, isInEditMode]);
+
+  const parseInputIds = useCallback(() => {
+    const tokens = inputValue.split(/[\n\t,]/g);
+    const trimmedTokens = tokens.map((t) => t.trim());
+    return compact(trimmedTokens);
+  }, [inputValue]);
+
+  const validateSampleIdentifiersMutation = useMutation(
+    validateSampleIdentifiers,
+    {
+      onError: () => {
+        setValidating(false);
+        setShowAddButton(false);
+        setFoundSampleIds([]);
+        setIdsInFlight([]);
+        handleInputValidation([], []);
+        setInputDisplayValue("");
+        setInEditMode(true);
+      },
+      onSuccess: (data: any) => {
+        setValidating(false);
+        setShowAddButton(false);
+
+        const missingIds = data["missing_sample_ids"];
+        const foundIds = filter(idsInFlight, (id) => !missingIds.includes(id));
+
+        setIdsInFlight([]);
+        setFoundSampleIds(foundIds);
+        handleInputValidation(foundIds, missingIds);
+      },
+    }
+  );
+
+  useEffect(() => {
+    if (shouldValidate) {
+      setShouldValidate(false);
+      setValidating(true);
+      setInEditMode(false);
+      setInputDisplayValue(idsInFlight.join("\n"));
+
+      validateSampleIdentifiersMutation.mutate({
+        sampleIdsToValidate: idsInFlight,
+      });
+    }
+  }, [idsInFlight, shouldValidate, validateSampleIdentifiersMutation]);
+
+  const validateIds = () => {
+    const sampleIdsToValidate = parseInputIds();
+    setIdsInFlight(sampleIdsToValidate);
+    setShouldValidate(true);
+  };
+
+  const onClickEdit = () => {
+    setInEditMode(true);
+    setShowAddButton(true);
+  };
+
   return (
-    <CollapsibleInstructions
-      header="Add Samples by ID (optional)"
-      items={[
-        <div key={0}>
-          Add <SemiBold>GISAID IDs</SemiBold> (e.g. USA/CA-CZB-0000/2021 or
-          hCoV-19/USA/CA-CZB-0000/2021), <SemiBold>Aspen Public IDs</SemiBold>,
-          or <SemiBold>Aspen Private IDs</SemiBold> below to include samples in
-          your tree.
-        </div>,
-        <div key={1}>
-          IDs must be separated by tabs, commas, or enter one ID per row.
-        </div>,
-        <div key={2}>
-          Depending on the Tree Type, add up to 2000 samples.{" "}
-          <NewTabLink href="https://docs.google.com/document/d/1_iQgwl3hn_pjlZLX-n0alUbbhgSPZvpW_0620Hk_kB4">
-            Learn More
-          </NewTabLink>
-        </div>,
-        <div key={3}>
-          <SemiBold>
-            As with samples uploaded directly to Aspen, sequences added by ID do
-            not undergo any QC before being added to your tree.
-          </SemiBold>
-        </div>,
-      ]}
-    />
+    <>
+      <InputInstructions />
+      <StyledTextArea
+        // TODO (mlila): should be replaced with sds InputText when available
+        disabled={!isInEditMode}
+        onChange={(e) => setInputValue(e?.target?.value)}
+        onFocus={() => {
+          setShowAddButton(true);
+          setHasEverFocusedInput(true);
+        }}
+        fullWidth
+        multiline
+        variant="outlined"
+        rows={3}
+        size="small"
+        value={isInEditMode ? inputValue : inputDisplayValue}
+      />
+      {shouldShowAddButton && (
+        <Button
+          disabled={isValidating}
+          onClick={validateIds}
+          sdsStyle="square"
+          sdsType="primary"
+        >
+          {isValidating ? (
+            <StyledLabel>
+              <StyledLoadingAnimation />
+              Adding
+            </StyledLabel>
+          ) : (
+            "Add"
+          )}
+        </Button>
+      )}
+      {!isInEditMode && (
+        <div>
+          {foundSampleIds.length} {pluralize("Sample", foundSampleIds.length)}{" "}
+          Added
+          {!isValidating && (
+            <Button sdsStyle="minimal" sdsType="primary" onClick={onClickEdit}>
+              Edit
+            </Button>
+          )}
+        </div>
+      )}
+    </>
   );
 };
 

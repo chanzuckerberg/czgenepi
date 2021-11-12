@@ -34,11 +34,12 @@ const UsherConfirmationModal = ({
     <div>
       <RedirectConfirmationModal
         content={content}
-        img={usherLogo as string}
+        img={usherLogo as unknown as string}
         isOpen={isOpen}
         onClose={onClose}
         onConfirm={onConfirm}
         footer={footer}
+        logoWidth={115}
       />
     </div>
   );
