@@ -20,7 +20,7 @@ export const StyledDialog = styled(Dialog)`
   justify-content: center;
 
   .MuiDialog-container {
-    max-height: 85%;
+    max-height: 100vh;
   }
 `;
 
@@ -30,7 +30,7 @@ export const StyledDialogContent = styled(DialogContent)`
   width: 600px;
   padding-bottom: 0;
   overflow-y: auto;
-  div:last-child {
+  & > div:last-child {
     margin-bottom: 0;
   }
 

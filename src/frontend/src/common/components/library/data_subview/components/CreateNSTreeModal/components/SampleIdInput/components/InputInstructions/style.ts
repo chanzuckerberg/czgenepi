@@ -11,7 +11,7 @@ export const SemiBold = styled.span`
 `;
 
 export const StyledWrapper = styled.div`
-  .MuiListItem-root {
+  .MuiListItem-root div {
     ${fontBodyXs}
   }
 

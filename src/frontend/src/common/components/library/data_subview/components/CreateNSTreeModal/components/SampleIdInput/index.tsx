@@ -32,6 +32,7 @@ const SampleIdInput = ({
   const [shouldShowAddButton, setShowAddButton] = useState<boolean>(false);
   const [idsInFlight, setIdsInFlight] = useState<string[]>([]);
   const [foundSampleIds, setFoundSampleIds] = useState<string[]>([]);
+  const [missingSampleIds, setMissingSampleIds] = useState<string[]>([]);
   const [shouldValidate, setShouldValidate] = useState<boolean>(false);
 
   // clear the input
@@ -45,6 +46,7 @@ const SampleIdInput = ({
       setShowAddButton(false);
       setIdsInFlight([]);
       setFoundSampleIds([]);
+      setMissingSampleIds([]);
       setShouldValidate(false);
     }
   }, [shouldReset]);
@@ -71,6 +73,7 @@ const SampleIdInput = ({
         setValidating(false);
         setShowAddButton(false);
         setFoundSampleIds([]);
+        setMissingSampleIds([]);
         setIdsInFlight([]);
         handleInputValidation([], []);
         setInputDisplayValue("");
@@ -86,6 +89,7 @@ const SampleIdInput = ({
 
         setIdsInFlight([]);
         setFoundSampleIds(foundIds);
+        setMissingSampleIds(missingIds);
         handleInputValidation(foundIds, missingIds);
       },
     }
@@ -127,6 +131,8 @@ const SampleIdInput = ({
     setHasUnsavedChanges(!!value);
   };
 
+  const numParsedSamples = foundSampleIds.length + missingSampleIds.length;
+
   return (
     <>
       <InputInstructions />
@@ -163,8 +169,7 @@ const SampleIdInput = ({
       {!isInEditMode && (
         <FlexContainer>
           <StyledSampleCount>
-            {foundSampleIds.length} {pluralize("Sample", foundSampleIds.length)}{" "}
-            Added
+            {numParsedSamples} {pluralize("Sample", numParsedSamples)} Added
           </StyledSampleCount>
           {!isValidating && (
             <StyledEditButton

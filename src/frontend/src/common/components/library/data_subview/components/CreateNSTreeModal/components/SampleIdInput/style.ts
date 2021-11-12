@@ -33,7 +33,12 @@ export const StyledTextArea = styled(TextField)`
 
   textarea {
     ${fontBodyXs}
-    resize: both;
+    resize: vertical;
+    scrollbar-color: transparent unset;
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
   }
 
   ${(props: ExtraProps) => {
@@ -51,6 +56,10 @@ export const StyledTextArea = styled(TextField)`
 
         .MuiInputBase-root {
           height: 90px;
+        }
+
+        fieldset {
+          border: none;
         }
 
         textarea {

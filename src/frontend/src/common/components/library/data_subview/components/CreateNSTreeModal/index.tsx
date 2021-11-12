@@ -1,5 +1,6 @@
 import RadioGroup from "@material-ui/core/RadioGroup";
 import CloseIcon from "@material-ui/icons/Close";
+import { uniq } from "lodash";
 import React, { SyntheticEvent, useEffect, useState } from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { useCreateTree } from "src/common/queries/trees";
@@ -135,10 +136,14 @@ export const CreateNSTreeModal = ({
     </div>
   );
 
-  const allPossibleSamples = sampleIds.concat(validatedInputSamples);
+  const allPossibleTreeSamples = sampleIds.concat(validatedInputSamples);
   const allFailedOrMissingSamples = failedSamples.concat(missingInputSamples);
-  const allValidSamplesForTreeCreation = allPossibleSamples.filter(
+  const allValidSamplesForTreeCreation = allPossibleTreeSamples.filter(
     (id) => !allFailedOrMissingSamples.includes(id)
+  );
+
+  const allSamplesRequestedTableAndInput = uniq(
+    allPossibleTreeSamples.concat(allFailedOrMissingSamples)
   );
 
   const handleSubmit = (evt: SyntheticEvent) => {
@@ -165,7 +170,7 @@ export const CreateNSTreeModal = ({
         </StyledIconButton>
         <Header>Create New Phylogenetic Tree</Header>
         <Title>
-          {allValidSamplesForTreeCreation.length}{" "}
+          {allSamplesRequestedTableAndInput.length}{" "}
           {pluralize("Sample", allValidSamplesForTreeCreation.length)} Total
         </Title>
       </StyledDialogTitle>
