@@ -40,6 +40,9 @@ RUN mkdir /ncov && \
     git fetch origin 28b48c86f3b967b961663477e97227f416c53da4 && \
     git reset --hard FETCH_HEAD
 
+ADD aspen/workflows/nextstrain_run/patches/crowding_penalty.patch /tmp/
+RUN patch /ncov/workflow/snakemake_rules/main_workflow.smk < /tmp/crowding_penalty.patch
+
 WORKDIR /usr/src/app
 
 # Poetry: install app
