@@ -77,7 +77,7 @@ task nextstrain_workflow {
 #     git init &&
 #     git fetch --depth 1 git://github.com/nextstrain/ncov.git df90b457f48ef3d7500927656536cacb16c9a83f &&
 #     git checkout FETCH_HEAD
-    )
+#    )
     ncov_git_rev=$(cd ncov && git rev-parse HEAD)
 
     cp /usr/src/app/aspen/workflows/nextstrain_run/nextstrain_profile/* ncov/my_profiles/aspen/
