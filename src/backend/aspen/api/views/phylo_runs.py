@@ -2,7 +2,7 @@ import datetime
 import json
 import os
 import re
-from typing import Iterable, MutableSequence, Set
+from typing import Iterable, List, MutableSequence, Set
 
 import sentry_sdk
 import sqlalchemy as sa
@@ -143,7 +143,7 @@ async def kick_off_phylo_run(
         gisaid_ids=list(gisaid_ids),
         tree_type=TreeType(phylo_run_request.tree_type),
         user=user,
-        outputs=[], # Make our response schema happy.
+        outputs=[],  # Make our response schema happy.
     )
     workflow.inputs = list(pathogen_genomes)
     workflow.inputs.append(aligned_gisaid_dump)

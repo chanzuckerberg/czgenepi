@@ -117,7 +117,6 @@ class PhyloRunResponse(BaseResponse):
     name: Union[str, None]
     group: GroupResponse
     template_file_path: Union[None, StrictStr]
-    template_args: dict
     tree_type: Union[None, str]
     user: Union[UserResponse, None] = None
     outputs: Union[TreeResponse, None] = Field(alias="phylo_tree")
