@@ -163,6 +163,7 @@ task TransformGISAID {
     sed -i -e 's/Southern San Joaquin Valley\tNorth America\/USA\/California\//Southern San Joaquin Valley\tNorth America\/USA\/California\/Tulare County/' \
     -e 's/Orange County CA/Orange County/' \
     -e 's/Monterey County CA/Monterey County/' \
+    -e '/Illinois\/Chicago\tNorth America/d' \
     /ncov-ingest/source-data/gisaid_geoLocationRules.tsv
 
     # decompress the gisaid dataset and transform it.
