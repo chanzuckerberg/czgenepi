@@ -52,8 +52,8 @@ async def kick_off_phylo_run(
     request: Request,
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    user: User = Depends(get_auth_user),
 ) -> PhyloRunResponse:
-    user = request.state.auth_user
     # Note - sample run will be associated with users's primary group.
     #    (do we want admins to be able to start runs on behalf of other dph's ?)
     group = user.group
@@ -142,6 +142,8 @@ async def kick_off_phylo_run(
         name=phylo_run_request.name,
         gisaid_ids=list(gisaid_ids),
         tree_type=TreeType(phylo_run_request.tree_type),
+        user=user,
+        outputs=[], # Make our response schema happy.
     )
     workflow.inputs = list(pathogen_genomes)
     workflow.inputs.append(aligned_gisaid_dump)
