@@ -104,7 +104,6 @@ async def check_results(http_client, user: User, trees: Collection[PhyloTree]):
 
 async def test_phylo_tree_view(
     async_session,
-    app,
     http_client,
     n_samples=5,
     n_trees=3,
@@ -121,7 +120,6 @@ async def test_phylo_tree_view(
 
 async def test_in_progress_and_failed_trees(
     async_session,
-    app,
     http_client,
     n_samples=5,
     n_trees=3,
@@ -170,7 +168,6 @@ async def test_in_progress_and_failed_trees(
 
 async def test_phylo_trees_can_see(
     async_session,
-    app,
     http_client,
     n_samples=5,
     n_trees=3,
@@ -189,7 +186,6 @@ async def test_phylo_trees_can_see(
 
 async def test_phylo_trees_no_can_see(
     async_session,
-    app,
     http_client,
     n_samples=5,
     n_trees=3,
@@ -211,7 +207,6 @@ async def test_phylo_trees_no_can_see(
 
 async def test_phylo_trees_admin(
     async_session,
-    app,
     http_client,
     n_samples=5,
     n_trees=3,
