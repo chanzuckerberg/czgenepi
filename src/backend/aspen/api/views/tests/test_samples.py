@@ -24,7 +24,7 @@ from aspen.test_infra.models.usergroup import group_factory, user_factory
 pytestmark = pytest.mark.asyncio
 
 
-## test LIST samples ##
+# test LIST samples #
 
 
 async def test_samples_view(
@@ -40,7 +40,7 @@ async def test_samples_view(
 
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.get(
-        f"/v2/samples/",
+        "/v2/samples/",
         headers=auth_headers,
     )
     response = res.json()
@@ -106,7 +106,7 @@ async def test_samples_view_gisaid_rejected(
 
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.get(
-        f"/v2/samples/",
+        "/v2/samples/",
         headers=auth_headers,
     )
     response = res.json()
@@ -161,7 +161,7 @@ async def test_samples_view_gisaid_no_info(
 
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.get(
-        f"/v2/samples/",
+        "/v2/samples/",
         headers=auth_headers,
     )
     response = res.json()
@@ -211,7 +211,7 @@ async def test_samples_view_gisaid_not_eligible(
 
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.get(
-        f"/v2/samples/",
+        "/v2/samples/",
         headers=auth_headers,
     )
     response = res.json()
@@ -270,7 +270,7 @@ async def test_samples_view_gisaid_submitted(
 
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.get(
-        f"/v2/samples/",
+        "/v2/samples/",
         headers=auth_headers,
     )
     response = res.json()
@@ -351,7 +351,7 @@ async def _test_samples_view_cansee(
 
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.get(
-        f"/v2/samples/",
+        "/v2/samples/",
         headers=auth_headers,
     )
     response = res.json()
@@ -533,7 +533,7 @@ async def test_samples_failed_accession(
 
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.get(
-        f"/v2/samples/",
+        "/v2/samples/",
         headers=auth_headers,
     )
     response = res.json()
@@ -604,7 +604,7 @@ async def test_samples_multiple_accession(
 
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.get(
-        f"/v2/samples/",
+        "/v2/samples/",
         headers=auth_headers,
     )
     response = res.json()
@@ -662,7 +662,7 @@ async def test_samples_view_no_pangolin(
 
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.get(
-        f"/v2/samples/",
+        "/v2/samples/",
         headers=auth_headers,
     )
     response = res.json()
@@ -702,7 +702,7 @@ async def test_samples_view_no_pangolin(
     assert response == expected
 
 
-## test DELETE samples ##
+# test DELETE samples #
 
 
 async def test_delete_sample_success(
