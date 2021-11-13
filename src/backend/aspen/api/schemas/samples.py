@@ -18,7 +18,7 @@ class SampleGisaidResponseSchema(BaseResponse):
 class SampleLineageResponseSchema(BaseResponse):
     last_updated: Optional[str]
     lineage: Optional[str]
-    probability: Optional[str]
+    probability: Optional[float]
     version: Optional[str]
 
 
@@ -39,7 +39,7 @@ class SampleResponseSchema(BaseResponse):
     gisaid: SampleGisaidResponseSchema
     lineage: SampleLineageResponseSchema
     private: bool
-    private_identifier: str
+    private_identifier: Optional[str]
     public_identifier: str
     sequencing_date: Optional[str]
     submitting_group: SampleGroupResponseSchema
