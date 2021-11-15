@@ -110,6 +110,7 @@ init-empty-db:
 
 .PHONY: local-init
 local-init: oauth/pkcs12/certificate.pfx .env.ecr local-ecr-login local-hostconfig ## Launch a new local dev env and populate it with test data.
+	docker-compose $(COMPOSE_OPTS) pull database
 	docker-compose $(COMPOSE_OPTS) up -d database frontend backend localstack oidc utility
 	# Wait for psql to be up
 	while [ -z "$$(docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c 'select 1')" ]; do echo "waiting for db to start..."; sleep 1; done;

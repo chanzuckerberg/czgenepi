@@ -72,6 +72,7 @@ def phylo_trees():
         )
         .options(
             joinedload(phylo_run_alias.outputs.of_type(PhyloTree)),
+            joinedload(phylo_run_alias.user),
         )
         .filter(
             or_(
@@ -93,7 +94,10 @@ def phylo_trees():
             "workflow_id": phylo_run.workflow_id,
             "pathogen_genome_count": 0,  # TODO: do we still need this?,
             "tree_type": phylo_run.tree_type.value,
+            "user": {},
         }
+        if phylo_run.user:
+            result["user"] = {"id": phylo_run.user.id, "name": phylo_run.user.name}
         for output in phylo_run.outputs:
             if isinstance(output, PhyloTree):
                 phylo_tree = output

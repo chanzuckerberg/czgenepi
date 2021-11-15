@@ -34,6 +34,11 @@ class GroupResponseSchema(BaseResponse):
     name: StrictStr
 
 
+class UserResponseSchema(BaseResponse):
+    id: int
+    name: str
+
+
 class PhyloRunResponseSchema(BaseResponse):
     class Config:
         orm_mode = True
@@ -45,6 +50,7 @@ class PhyloRunResponseSchema(BaseResponse):
     group: GroupResponseSchema
     template_file_path: StrictStr
     template_args: dict
+    user: Union[UserResponseSchema, None] = None
 
 
 class PhyloRunDeleteResponse(BaseResponse):

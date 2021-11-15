@@ -2,12 +2,13 @@ import enum
 from typing import Mapping, MutableSequence, Union
 
 import enumtables
-from sqlalchemy import Column, DateTime, ForeignKey, JSON, Table
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, JSON, Table
+from sqlalchemy.orm import backref, relationship
 
 from aspen.database.models.base import base, idbase
 from aspen.database.models.entity import _WORKFLOW_TABLENAME, Entity
 from aspen.database.models.enum import Enum
+from aspen.database.models.usergroup import User
 
 
 class WorkflowType(enum.Enum):
@@ -100,6 +101,12 @@ class Workflow(idbase):  # type: ignore
         uselist=True,
     )
     outputs: MutableSequence[Entity]
+    user_id = Column(
+        Integer,
+        ForeignKey(User.id),
+        nullable=True,
+    )
+    user = relationship(User, backref=backref("workflows", uselist=True))  # type: ignore
 
 
 class SoftwareNames(str, enum.Enum):
