@@ -34,6 +34,8 @@ files:
 refine:
   keep_polytomies: True
   clock_filter_iqd: 3
+crowding:
+  crowding_penalty: 0
 
 ## Subsampling schemas
 subsampling:

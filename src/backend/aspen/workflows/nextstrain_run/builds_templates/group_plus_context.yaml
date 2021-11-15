@@ -29,7 +29,8 @@ files:
 ## Parameters
 refine:
   keep_polytomies: True
-
+crowding:
+  crowding_penalty: 0.1
 
 ## Subsampling schemas
 subsampling:

@@ -17,6 +17,7 @@ RUN apt-get -qq update && apt-get -qq -y install \
     patch \
     locales \
     zstd \
+    nano \
     && locale-gen en_US.UTF-8
 
 # Install poetry
@@ -36,8 +37,11 @@ RUN mkdir /ncov && \
     cd /ncov && \
     git init && \
     git remote add origin https://github.com/nextstrain/ncov.git && \
-    git fetch origin master && \
+    git fetch origin 6691370325e5980d4f6073f7672759711c305a05 && \
     git reset --hard FETCH_HEAD
+
+ADD aspen/workflows/nextstrain_run/patches/crowding_penalty.patch /tmp/
+RUN patch /ncov/workflow/snakemake_rules/main_workflow.smk < /tmp/crowding_penalty.patch
 
 WORKDIR /usr/src/app
 
