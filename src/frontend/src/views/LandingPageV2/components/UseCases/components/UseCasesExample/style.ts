@@ -13,13 +13,19 @@ export const UseCasesExampleHeadline = styled.h3`
     letter-spacing: 0.3px;
     color: #000000;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 68765c5 (next 12 build/image fixes. responsiveness updates for Footer and Use Cases sections. NavBarV2 bug fixes.)
 
     @media (max-width: 1200px) {
         font-size: 18px;
         line-height: 24px;
     }
+<<<<<<< HEAD
 =======
 >>>>>>> d76dee8 (header, footer, email form logic, updates to responsive styling)
+=======
+>>>>>>> 68765c5 (next 12 build/image fixes. responsiveness updates for Footer and Use Cases sections. NavBarV2 bug fixes.)
 `;
 
 export const UseCasesExampleCopy = styled.p`
@@ -29,11 +35,17 @@ export const UseCasesExampleCopy = styled.p`
     letter-spacing: 0.3px;
     color: #545454;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 68765c5 (next 12 build/image fixes. responsiveness updates for Footer and Use Cases sections. NavBarV2 bug fixes.)
 
     @media (max-width: 1200px) {
         font-size: 14px;
         line-height: 24px;
     }
+<<<<<<< HEAD
 =======
 >>>>>>> d76dee8 (header, footer, email form logic, updates to responsive styling)
+=======
+>>>>>>> 68765c5 (next 12 build/image fixes. responsiveness updates for Footer and Use Cases sections. NavBarV2 bug fixes.)
 `;

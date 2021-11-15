@@ -28,7 +28,10 @@ export const UseCasesHeader = styled.h2`
     position: absolute;
     width: 100%;
     top: 10%;
+<<<<<<< HEAD
     z-index: 2;
+=======
+>>>>>>> 68765c5 (next 12 build/image fixes. responsiveness updates for Footer and Use Cases sections. NavBarV2 bug fixes.)
 
     @media (max-width: 1200px) {
         font-size: 26px;
