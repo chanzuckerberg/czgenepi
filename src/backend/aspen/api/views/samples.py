@@ -135,7 +135,7 @@ async def list_samples(
             gisaid_accession,
         )
 
-    # populate sample object according to response schema
+    # populate sample object using pydantic response schema
     results: MutableSequence[Mapping[str, Any]] = list()
     for sample_gisaid_tuple in sample_gisaid_tuple_map.values():
         sample = sample_gisaid_tuple.sample
@@ -145,13 +145,12 @@ async def list_samples(
             sample_gisaid_tuple.gisaid_accession,
             GISAID_REJECTION_TIME,
         )
-        sample.show_private_identifier = False
-        # if (
-        #     sample.submitting_group_id == user.group_id
-        #     or sample.submitting_group_id in cansee_groups_private_identifiers
-        #     or user.system_admin
-        # ):
-        #     sample.show_private_identifier = True
+        if (
+            sample.submitting_group_id == user.group_id
+            or sample.submitting_group_id in cansee_groups_private_identifiers
+            or user.system_admin
+        ):
+            sample.show_private_identifier = True
 
         returned_sample_data = SampleResponseSchema.from_orm(sample)
         results.append(returned_sample_data)

@@ -1,5 +1,4 @@
 import datetime
-import logging
 from typing import Any, List, Optional
 
 from pydantic import constr, root_validator
@@ -7,8 +6,6 @@ from pydantic.utils import GetterDict
 
 from aspen.api.schemas.base import BaseRequest, BaseResponse
 from aspen.api.utils import format_sample_lineage
-
-logging.basicConfig(level=logging.INFO)
 
 
 class SampleRequestSchema(BaseRequest):
@@ -59,14 +56,13 @@ class SampleGetterDict(GetterDict):
                 else None
             ),
             "lineage": format_sample_lineage(self._obj),
-            "private_identifier": None
-            # "private_identifier": (
-            #     self._obj.private_identifier
-            #     if self._obj.show_private_identifier
-            #     else None
-            # )
+            "private_identifier": (
+                self._obj.private_identifier
+                if self._obj.show_private_identifier
+                else None
+            ),
         }
-        if indirect_attributes.get(key, None):
+        if key in indirect_attributes:
             return indirect_attributes[key]
         return default_response
 
