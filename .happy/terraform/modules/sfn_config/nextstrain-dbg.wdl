@@ -72,31 +72,38 @@ task nextstrain_workflow {
     )
 
     # set up ncov. keep the fetch command in case want to overwrite the version in Docker image
-    mkdir -p ncov/my_profiles/aspen ncov/results
-#    (cd ncov &&
+    mkdir -p /ncov/my_profiles/aspen /ncov/results
+#    (cd /ncov &&
 #     git init &&
 #     git fetch --depth 1 git://github.com/nextstrain/ncov.git df90b457f48ef3d7500927656536cacb16c9a83f &&
 #     git checkout FETCH_HEAD
 #    )
-    ncov_git_rev=$(cd ncov && git rev-parse HEAD)
+    ncov_git_rev=$(cd /ncov && git rev-parse HEAD)
 
-    cp /usr/src/app/aspen/workflows/nextstrain_run/nextstrain_profile/* ncov/my_profiles/aspen/
+    cp /usr/src/app/aspen/workflows/nextstrain_run/nextstrain_profile/* /ncov/my_profiles/aspen/
 
     # dump the sequences, metadata, and builds.yaml for a run out to disk.
     aligned_gisaid_location=$(
         python3 /usr/src/app/aspen/workflows/nextstrain_run/export.py \
-               --phylo-run-id "${workflow_id}"                        \
-               --sequences ncov/data/sequences_aspen.fasta            \
-               --metadata ncov/data/metadata_aspen.tsv                \
-               --builds-file ncov/my_profiles/aspen/builds.yaml       \
+               --phylo-run-id "${WORKFLOW_ID}"                        \
+               --county-sequences /ncov/data/sequences_aspen.fasta     \
+               --county-metadata /ncov/data/metadata_aspen.tsv         \
+               --selected /ncov/data/include.txt                       \
+               --builds-file /ncov/my_profiles/aspen/builds.yaml       \
     )
+    # If we don't have any county samples, copy the reference genomes to to our county file
+    if [ ! -e /ncov/data/sequences_aspen.fasta ]; then
+        cp /ncov/data/references_sequences.fasta /ncov/data/sequences_aspen.fasta;
+        cp /ncov/data/references_metadata.tsv /ncov/data/metadata_aspen.tsv;
+    fi;
+
     aligned_gisaid_s3_bucket=$(echo "${aligned_gisaid_location}" | jq -r .bucket)
     aligned_gisaid_sequences_s3_key=$(echo "${aligned_gisaid_location}" | jq -r .sequences_key)
     aligned_gisaid_metadata_s3_key=$(echo "${aligned_gisaid_location}" | jq -r .metadata_key)
 
     # fetch the gisaid dataset
-    aws s3 cp --no-progress "s3://${aligned_gisaid_s3_bucket}/${aligned_gisaid_sequences_s3_key}" ncov/results/
-    aws s3 cp --no-progress "s3://${aligned_gisaid_s3_bucket}/${aligned_gisaid_metadata_s3_key}" ncov/results/
+    aws s3 cp --no-progress "s3://${aligned_gisaid_s3_bucket}/${aligned_gisaid_sequences_s3_key}" /ncov/results/
+    aws s3 cp --no-progress "s3://${aligned_gisaid_s3_bucket}/${aligned_gisaid_metadata_s3_key}" /ncov/results/
 
     >&2 echo "You should exec into the docker container and run \"snakemake --printshellcmds auspice/ncov_aspen.json --profile my_profiles/aspen/  --resources=mem_mb=312320\" in the ncov subdirectory"
     >&2 echo "When you are done with the docker container, run \"touch /done\"."
