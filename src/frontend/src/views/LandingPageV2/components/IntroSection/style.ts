@@ -31,7 +31,17 @@ export const IntroCTAButton = styled.a`
         color: white;
         background: #7A41CE;
     }
+<<<<<<< HEAD
 >>>>>>> d76dee8 (header, footer, email form logic, updates to responsive styling)
+=======
+
+    @media (max-width: 768px) {
+        display: block;
+        width: 100%;
+        max-width: 280px;
+        margin: 0 auto;
+    }
+>>>>>>> e8db3a0 (Footer nextstrain section removed and link styles updated. Intro section responsiveness improvements. Hero responsiveness improvements.)
 `;
 
 export const IntroDescription = styled.p`
@@ -41,13 +51,19 @@ export const IntroDescription = styled.p`
     letter-spacing: 0.3px;
     margin-bottom: 30px;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e8db3a0 (Footer nextstrain section removed and link styles updated. Intro section responsiveness improvements. Hero responsiveness improvements.)
 
     @media (max-width: 1200px) {
         font-size: 14px;
         line-height: 24px;
     }
+<<<<<<< HEAD
 =======
 >>>>>>> d76dee8 (header, footer, email form logic, updates to responsive styling)
+=======
+>>>>>>> e8db3a0 (Footer nextstrain section removed and link styles updated. Intro section responsiveness improvements. Hero responsiveness improvements.)
 `;
 
 export const IntroHeading = styled.h2`
@@ -57,6 +73,9 @@ export const IntroHeading = styled.h2`
     letter-spacing: 0.3px;
     margin-bottom: 30px;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e8db3a0 (Footer nextstrain section removed and link styles updated. Intro section responsiveness improvements. Hero responsiveness improvements.)
 
     @media (max-width: 1200px) {
         font-size: 26px;
@@ -67,8 +86,11 @@ export const IntroHeading = styled.h2`
         font-size: 18px;
         line-height: 24px;
     }
+<<<<<<< HEAD
 =======
 >>>>>>> d76dee8 (header, footer, email form logic, updates to responsive styling)
+=======
+>>>>>>> e8db3a0 (Footer nextstrain section removed and link styles updated. Intro section responsiveness improvements. Hero responsiveness improvements.)
 `;
 
 export const IntroImage = styled.div`
@@ -81,7 +103,11 @@ export const IntroImage = styled.div`
     }
 
     @media (max-width: 768px) {
+<<<<<<< HEAD
         margin-top: -120px;
+=======
+        margin-top: -160px;
+>>>>>>> e8db3a0 (Footer nextstrain section removed and link styles updated. Intro section responsiveness improvements. Hero responsiveness improvements.)
     }
 `;
 
@@ -92,12 +118,18 @@ export const IntroTextContainer = styled.div`
     margin-left: 78px;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e8db3a0 (Footer nextstrain section removed and link styles updated. Intro section responsiveness improvements. Hero responsiveness improvements.)
     @media (max-width: 1200px) {
         width: 100%;
     }
 
+<<<<<<< HEAD
 =======
 >>>>>>> d76dee8 (header, footer, email form logic, updates to responsive styling)
+=======
+>>>>>>> e8db3a0 (Footer nextstrain section removed and link styles updated. Intro section responsiveness improvements. Hero responsiveness improvements.)
     @media (max-width: 768px) {
         width: 100%;
         margin: 0 auto;

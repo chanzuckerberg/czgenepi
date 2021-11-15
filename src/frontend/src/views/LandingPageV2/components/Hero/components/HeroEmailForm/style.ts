@@ -31,6 +31,7 @@ export const EmailInput = styled.input`
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     @media (max-width: 1200px) {
         font-size: 13px;
         line-height: 21px;
@@ -44,6 +45,15 @@ export const EmailInput = styled.input`
         font-size: 13px;
         line-height: 21px;
 >>>>>>> d76dee8 (header, footer, email form logic, updates to responsive styling)
+=======
+    @media (max-width: 1200px) {
+        font-size: 13px;
+        line-height: 21px;
+    }
+
+    @media (max-width: 768px) {
+        border-radius: 999px;
+>>>>>>> e8db3a0 (Footer nextstrain section removed and link styles updated. Intro section responsiveness improvements. Hero responsiveness improvements.)
         margin-bottom: 7px;
         width: 100%;
         padding: 13px;
@@ -65,6 +75,7 @@ export const SubmitButton = styled.button`
     letter-spacing: 0.3px;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     @media (max-width: 1200px) {
         font-size: 13px;
         line-height: 21px;
@@ -78,6 +89,15 @@ export const SubmitButton = styled.button`
         font-size: 13px;
         line-height: 21px;
 >>>>>>> d76dee8 (header, footer, email form logic, updates to responsive styling)
+=======
+    @media (max-width: 1200px) {
+        font-size: 13px;
+        line-height: 21px;
+    }
+
+    @media (max-width: 768px) {
+        border-radius: 999px;
+>>>>>>> e8db3a0 (Footer nextstrain section removed and link styles updated. Intro section responsiveness improvements. Hero responsiveness improvements.)
         width: 100%;
     }
 `;
