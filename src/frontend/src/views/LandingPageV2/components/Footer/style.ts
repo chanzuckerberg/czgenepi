@@ -5,7 +5,7 @@ export const CZContainer = styled.div`
     align-items: center;
     margin-left: 55px;
 
-    @media (max-width: 768px) {
+    @media (max-width: 992px) {
         flex-direction: column;
         margin: 0 auto;
 
@@ -42,7 +42,7 @@ export const FooterBottomContainer = styled.div`
     align-items: center;
     justify-content: space-between;
 
-    @media (max-width: 1200px) {
+    @media (max-width: 768px) {
         flex-direction: column-reverse;
     }
 `;
@@ -57,7 +57,7 @@ export const FooterBottomLinks = styled.div`
 export const FooterBottomSeparator = styled.div`
     display: none;
 
-    @media (max-width: 1200px) {
+    @media (max-width: 768px) {
         display: block;
         width: 100%;
         margin: 23px auto;
@@ -98,7 +98,7 @@ export const FooterPartnerships = styled.div`
     line-height: 24px;
     letter-spacing: 0.3px;
 
-    @media (max-width: 1200px) {
+    @media (max-width: 768px) {
         flex-direction: column;
     }
 `;
@@ -127,12 +127,16 @@ export const FooterTopLinks = styled.div`
     }
 
     a {
-        background: #262525;
-        border-radius: 24px;
-        padding: 7px 14px;
-        width: 100%;
-        max-width: 280px;
-        text-align: center;
+
+        @media (max-width: 768px) {
+            background: #262525;
+            border-radius: 24px;
+            padding: 7px 14px;
+            width: 100%;
+            max-width: 280px;
+            text-align: center;
+        }
+
     }
 
     a + a {
@@ -141,26 +145,6 @@ export const FooterTopLinks = styled.div`
         @media (max-width: 768px) {
             margin-left: 0;
             margin-top: 11px;
-        }
-    }
-`;
-
-export const NextstrainContainer = styled.div`
-    display: flex;
-    align-items: center;
-
-    & img {
-        max-width: 140px;
-        margin-left: 18px;
-    }
-
-    @media (max-width: 1200px) {
-        flex-direction: column;
-        margin-bottom: 26px;
-
-
-        span {
-            margin-bottom: 26px;
         }
     }
 `;
