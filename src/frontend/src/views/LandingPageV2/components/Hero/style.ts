@@ -7,15 +7,23 @@ export const Heading = styled.h1`
     line-height: 58px;
     margin: 20px 0 0 0;
 
+    @media (max-width: 1200px) {
+        font-size: 26px;
+        line-height: 34px;
+    }
+
     @media (max-width: 768px) {
         font-size: 24px;
-        line-height: 34px;
     }
 `;
 
 export const HeroContainer = styled.div`
     background: #000000;
     width: 100%;
+
+    @media (max-width: 768px) {
+        min-height: 710px;
+    }
 `;
 
 export const HeroTextSection = styled.div`
@@ -23,6 +31,18 @@ export const HeroTextSection = styled.div`
     flex-direction: column;
     letter-spacing: 0.3px;
     max-width: 500px;
+    position: absolute;
+    left: 120px;
+    padding-top: 25px;
+
+    @media (max-width: 768px) {
+        position: relative;
+        left: 0;
+        margin: 0 auto;
+        width: 100%;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
 `;
 
 export const HeroMaxWidthContainer = styled.div`
@@ -39,8 +59,8 @@ export const HeroMaxWidthContainer = styled.div`
 `;
 
 export const HeroImage = styled.div`
-    width: 50%;
     margin-top: -120px;
+    margin-left: auto;
 
     & svg:nth-of-type(2) {
         display: none;
@@ -76,6 +96,10 @@ export const NextstrainContainer = styled.div`
         letter-spacing: 0.3px;
         font-style: italic;
     }
+
+    @media (max-width: 768px) {
+        display: none;
+    }
 `;
 
 export const Tagline = styled.p`
@@ -87,8 +111,8 @@ export const Tagline = styled.p`
     margin-bottom: 0;
     margin-top: 22px;
 
-    @media (max-width: 768px) {
+    @media (max-width: 1200px) {
         font-size: 14px;
-        line-height: 23px;
+        line-height: 24px;
     }
 `;
