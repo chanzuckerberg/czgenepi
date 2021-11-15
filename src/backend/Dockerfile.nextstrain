@@ -37,7 +37,7 @@ RUN mkdir /ncov && \
     cd /ncov && \
     git init && \
     git remote add origin https://github.com/nextstrain/ncov.git && \
-    git fetch origin 28b48c86f3b967b961663477e97227f416c53da4 && \
+    git fetch origin 6691370325e5980d4f6073f7672759711c305a05 && \
     git reset --hard FETCH_HEAD
 
 ADD aspen/workflows/nextstrain_run/patches/crowding_penalty.patch /tmp/
