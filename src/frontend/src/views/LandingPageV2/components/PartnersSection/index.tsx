@@ -15,19 +15,19 @@ export default function IntroSection(): JSX.Element {
                 href="/"
                 target="_blank"
                 >
-                <img src={UsherLogo} style={{width: "107px", height: "62px"}} />
+                <img src={UsherLogo.src} style={{width: "107px", height: "62px"}} />
             </PartnerLink>
             <PartnerLink
                 href="/"
                 target="_blank"
                 >
-                <img src={PangolinLogo} style={{width: "171px", height: "50px"}} />
+                <img src={PangolinLogo.src} style={{width: "171px", height: "50px"}} />
             </PartnerLink>
             <PartnerLink
                 href="/"
                 target="_blank"
                 >
-                <img src={NextstrainLogo} style={{width: "196px", height: "56px"}} />
+                <img src={NextstrainLogo.src} style={{width: "196px", height: "56px"}} />
             </PartnerLink>
         </PartnersSectionContainer>
     );

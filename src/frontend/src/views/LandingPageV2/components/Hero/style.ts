@@ -31,6 +31,7 @@ export const HeroMaxWidthContainer = styled.div`
     width: 100%;
     margin: 0 auto;
     justify-content: center;
+    position: relative;
 
     @media (max-width: 768px) {
         flex-direction: column-reverse;
@@ -58,6 +59,23 @@ export const HeroImage = styled.div`
         }
     }
 
+`;
+
+export const NextstrainContainer = styled.div`
+    position: absolute;
+    right: 80px;
+    bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    width: 140px;
+
+    span {
+        color: white;
+        font-size: 11px;
+        line-height: 24px;
+        letter-spacing: 0.3px;
+        font-style: italic;
+    }
 `;
 
 export const Tagline = styled.p`

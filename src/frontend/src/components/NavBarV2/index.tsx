@@ -17,7 +17,7 @@ import {
     TextLink
 } from "./style";
 
-export default function Footer(): JSX.Element {
+export default function NavBarV2(): JSX.Element {
 
     const [menuOpen, setMenuOpen] = useState(false);
 
@@ -29,7 +29,7 @@ export default function Footer(): JSX.Element {
         <HeaderContainer>
             <HeaderMaxWidthContainer>
                 <HeaderTopContainer>
-                    <HeaderLogoContainer>
+                    <HeaderLogoContainer href="/">
                         <HeaderLogo />
                     </HeaderLogoContainer>
                     <HeaderTopLinks>

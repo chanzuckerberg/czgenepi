@@ -17,7 +17,7 @@ export default function UseCases(): JSX.Element {
             <UseCasesHeader>
                 Use cases/how it's used headline
             </UseCasesHeader>
-            <UseCasesImage src={UseCasesImg} />
+            <UseCasesImage src={UseCasesImg.src} />
             <UseCasesExampleContainer>
                 <UseCasesExample 
                     headline="Use case 1 headline" 
@@ -28,7 +28,7 @@ export default function UseCases(): JSX.Element {
                     copy="Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Nullam quis risus eget urna mollis ornare vel eu leo."
                     />
             </UseCasesExampleContainer>
-            <UseCasesImageMobile src={UseCasesImgMobile} />
+            <UseCasesImageMobile src={UseCasesImgMobile.src} />
         </UseCasesContainer>
     );
 }
