@@ -19,17 +19,30 @@ export const QuoteContainer = styled.div`
     padding-top: 80px;
     position: relative;
 
+    @media (max-width: 1200px) {
+        max-width: 600px;
+    }
+
     @media (max-width: 768px) {
-        padding-left: 10%;
-        padding-right: 10%;
+        padding-left: 20px;
+        padding-right: 20px;
+        padding-top: 30px;
     }
 `;
 
 export const QuoteIcon = styled.span`
     position: absolute;
-    top: 20%;
+    top: 15%;
     left: -8%;
     z-index: 2;
+
+    @media (max-width: 768px) {
+        position: relative;
+        left: 0;
+        top: 0;
+        align-self: flex-start;
+        padding-bottom: 30px;
+    }
 `;
 
 export const QuoteText = styled.p`
@@ -39,4 +52,9 @@ export const QuoteText = styled.p`
     line-height: 30px;
     letter-spacing: 0.3px;
     color: #FFF;
+
+    @media (max-width: 768px) {
+        font-size: 16px;
+        line-height: 22px;
+    }
 `;
