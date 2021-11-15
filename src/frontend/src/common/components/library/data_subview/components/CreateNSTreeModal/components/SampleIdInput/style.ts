@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import { TextField } from "@material-ui/core";
 import {
+  Button,
   fontBodyXs,
   getColors,
   getCorners,
@@ -19,36 +20,58 @@ const inputPadding = (props: Props) => {
   `;
 };
 
-// TODO (mlila): input doesn't displace button
+interface ExtraProps extends Props {
+  disabled?: boolean;
+}
+
 export const StyledTextArea = styled(TextField)`
-  ${fontBodyXs}
   ${inputPadding}
-  height: 70px;
+
+  .MuiInputBase-root {
+    min-height: 70px;
+  }
 
   textarea {
-    resize: both;
+    ${fontBodyXs}
+    resize: vertical;
+    scrollbar-color: transparent unset;
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
   }
-`;
 
-export const DisabledStyledTextArea = styled(TextField)`
-  ${fontBodyXs}
-  ${inputPadding}
-  height: 90px;
+  ${(props: ExtraProps) => {
+    const { disabled } = props;
 
-  ${(props) => {
-    const colors = getColors(props);
-    const corners = getCorners(props);
-    const spaces = getSpaces(props);
+    if (disabled) {
+      const colors = getColors(props);
+      const corners = getCorners(props);
+      const spaces = getSpaces(props);
 
-    return `
-      background-color: ${colors?.gray[100]};
-      border-radius: ${corners?.m}px;
-      margin: ${spaces?.xxxs}px 0;
-    `;
+      return `
+        background-color: ${colors?.gray[100]};
+        border-radius: ${corners?.m}px;
+        margin: ${spaces?.xxxs}px 0;
+
+        .MuiInputBase-root {
+          height: 90px;
+        }
+
+        fieldset {
+          border: none;
+        }
+
+        textarea {
+          color: black;
+          resize: none;
+        }
+      `;
+    }
   }}
 `;
 
-export const StyledLabel = styled.div`
+export const FlexContainer = styled.div`
   display: flex;
   align-items: center;
 `;
@@ -65,6 +88,37 @@ export const StyledLoadingAnimation = styled(LoadingAnimation)`
       }
       height: ${iconSizes?.l.height}px;
       width: ${iconSizes?.l.width}px;
+      margin-right: ${spaces?.m}px;
+    `;
+  }}
+`;
+
+export const StyledAddButton = styled(Button)`
+  ${(props) => {
+    const spaces = getSpaces(props);
+    return `
+      margin-top: ${spaces?.m}px;
+    `;
+  }}
+`;
+
+export const StyledEditButton = styled(Button)`
+  padding: 0;
+  min-width: 0;
+
+  span {
+    margin: 0;
+  }
+`;
+
+export const StyledSampleCount = styled.span`
+  ${fontBodyXs}
+  ${(props) => {
+    const colors = getColors(props);
+    const spaces = getSpaces(props);
+
+    return `
+      color: ${colors?.gray[500]};
       margin-right: ${spaces?.m}px;
     `;
   }}

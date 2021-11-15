@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { Callout, getFontWeights, getSpaces } from "czifui";
+import { Callout, getFontWeights } from "czifui";
 
 export const SemiBold = styled.span`
   ${(props) => {
@@ -12,11 +12,4 @@ export const SemiBold = styled.span`
 
 export const StyledCallout = styled(Callout)`
   width: 100%;
-
-  ${(props) => {
-    const spaces = getSpaces(props);
-    return `
-      margin: ${spaces?.xl}px 0;
-    `;
-  }}
 `;

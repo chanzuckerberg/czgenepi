@@ -10,7 +10,6 @@ import {
 } from "src/common/queries/trees";
 import { pluralize } from "src/common/utils/strUtils";
 import {
-  Content,
   StyledDialogTitle,
   StyledTooltip,
   Title,
@@ -19,6 +18,7 @@ import {
 import { Header } from "../../../DownloadModal/style";
 import { FailedSampleAlert } from "../../../FailedSampleAlert";
 import {
+  Content,
   FlexWrapper,
   StyledButton,
   StyledCloseIcon,

@@ -21,7 +21,7 @@ export const HeaderWrapper = styled("div", {
   shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
 })`
   display: flex;
-  align-items: center;
+  align-items: baseline;
   color: black;
 
   ${(props: HeaderProps) => {
@@ -38,12 +38,9 @@ export const StyledInstructionsButton = styled(Button, {
   shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
 })`
   ${(props) => {
-    const spaces = getSpaces(props);
     const colors = getColors(props);
 
     return `
-      margin-left: ${spaces?.xxxs}px;
-      margin-top: ${spaces?.xxxs}px;
       &:hover {
         background-color: transparent;
         color: ${colors?.primary[500]};

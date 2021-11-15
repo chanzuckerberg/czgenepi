@@ -1,5 +1,5 @@
 import { Tooltip } from "czifui";
-import React from "react";
+import React, { MouseEventHandler } from "react";
 import { StyledButton, StyledButtonWrapper } from "./style";
 
 interface Props {
@@ -7,6 +7,7 @@ interface Props {
   hasValidName: boolean;
   isInEditMode: boolean;
   isValidTreeType: boolean;
+  onClick: MouseEventHandler;
 }
 
 const CreateTreeButton = ({
@@ -14,6 +15,7 @@ const CreateTreeButton = ({
   hasValidName,
   isInEditMode,
   isValidTreeType,
+  onClick,
 }: Props): JSX.Element => {
   const NO_NAME_NO_SAMPLES =
     "Your tree requires a Tree Name & at least 1 Sample or Sample ID.";
@@ -36,6 +38,7 @@ const CreateTreeButton = ({
     <Tooltip
       arrow
       disableHoverListener={!isTreeBuildDisabled || !tooltipTitle}
+      placement="top"
       title={tooltipTitle}
     >
       <StyledButtonWrapper>
@@ -46,6 +49,7 @@ const CreateTreeButton = ({
           disabled={isTreeBuildDisabled}
           type="submit"
           value="Submit"
+          onClick={onClick}
         >
           Create Tree
         </StyledButton>
