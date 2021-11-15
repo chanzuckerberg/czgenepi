@@ -43,13 +43,13 @@ export default function Footer(): JSX.Element {
                 <FooterPartnerships>
                     <NextstrainContainer>
                         <span>Powered by:</span>
-                        <img src={NextstrainLogo} alt="" />
+                        <img src={NextstrainLogo.src} alt="" />
                     </NextstrainContainer>
                     <CZContainer>
                         <span>In partnership with:</span>
                         <CZLogoContainer>
-                            <img src={CZILogo} alt="" />
-                            <img src={BiohubLogo} alt="" />
+                            <img src={CZILogo.src} alt="" />
+                            <img src={BiohubLogo.src} alt="" />
                         </CZLogoContainer>
                     </CZContainer>
                 </FooterPartnerships>
