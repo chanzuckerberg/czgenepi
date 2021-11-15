@@ -85,10 +85,9 @@ task nextstrain_workflow {
     # dump the sequences, metadata, and builds.yaml for a run out to disk.
     aligned_gisaid_location=$(
         python3 /usr/src/app/aspen/workflows/nextstrain_run/export.py \
-               --phylo-run-id "${WORKFLOW_ID}"                        \
-               --county-sequences /ncov/data/sequences_aspen.fasta     \
-               --county-metadata /ncov/data/metadata_aspen.tsv         \
-               --selected /ncov/data/include.txt                       \
+               --phylo-run-id "${workflow_id}"                        \
+               --sequences /ncov/data/sequences_aspen.fasta            \
+               --metadata /ncov/data/metadata_aspen.tsv                \
                --builds-file /ncov/my_profiles/aspen/builds.yaml       \
     )
     # If we don't have any county samples, copy the reference genomes to to our county file
