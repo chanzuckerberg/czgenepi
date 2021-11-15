@@ -27,12 +27,19 @@ export const UseCasesHeader = styled.h2`
     letter-spacing: 0.3px;
     position: absolute;
     width: 100%;
+    top: 10%;
+
+    @media (max-width: 1200px) {
+        font-size: 26px;
+        line-height: 34px;
+        top: 7%;
+    }
 
     @media (max-width: 768px) {
         position: relative;
         font-size: 18px;
         line-height: 24px;
-        margin-bottom: 18px;
+        top: -10px;
     }
 `;
 

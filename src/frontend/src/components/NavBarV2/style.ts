@@ -20,6 +20,8 @@ export const ButtonLink = styled.a`
 `;
 
 export const HeaderTopLinks = styled.div`
+    position: relative;
+    z-index: 2;
 
     @media (max-width: 768px) {
         display: none;
@@ -39,9 +41,11 @@ export const HeaderContainer = styled.div`
     }
 `;
 
-export const HeaderLogoContainer = styled.div`
+export const HeaderLogoContainer = styled.a`
     width: 100%;
     max-width: 164px;
+    position: relative;
+    z-index: 2;
 
     @media (max-width: 768px) {
         max-width: 100px;
@@ -99,6 +103,8 @@ export const MobileNavSeparator = styled.div`
 
 export const MobileNavToggle = styled.div`
     display: none;
+    position: relative;
+    z-index: 2;
 
     @media (max-width: 768px) {
         display: inline-block;

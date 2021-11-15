@@ -42,7 +42,7 @@ export const FooterBottomContainer = styled.div`
     align-items: center;
     justify-content: space-between;
 
-    @media (max-width: 768px) {
+    @media (max-width: 1200px) {
         flex-direction: column-reverse;
     }
 `;
@@ -57,7 +57,7 @@ export const FooterBottomLinks = styled.div`
 export const FooterBottomSeparator = styled.div`
     display: none;
 
-    @media (max-width: 768px) {
+    @media (max-width: 1200px) {
         display: block;
         width: 100%;
         margin: 23px auto;
@@ -98,7 +98,7 @@ export const FooterPartnerships = styled.div`
     line-height: 24px;
     letter-spacing: 0.3px;
 
-    @media (max-width: 768px) {
+    @media (max-width: 1200px) {
         flex-direction: column;
     }
 `;
@@ -154,7 +154,7 @@ export const NextstrainContainer = styled.div`
         margin-left: 18px;
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: 1200px) {
         flex-direction: column;
         margin-bottom: 26px;
 
