@@ -90,12 +90,6 @@ task nextstrain_workflow {
                --metadata /ncov/data/metadata_aspen.tsv                \
                --builds-file /ncov/my_profiles/aspen/builds.yaml       \
     )
-    # If we don't have any county samples, copy the reference genomes to to our county file
-    if [ ! -e /ncov/data/sequences_aspen.fasta ]; then
-        cp /ncov/data/references_sequences.fasta /ncov/data/sequences_aspen.fasta;
-        cp /ncov/data/references_metadata.tsv /ncov/data/metadata_aspen.tsv;
-    fi;
-
     aligned_gisaid_s3_bucket=$(echo "${aligned_gisaid_location}" | jq -r .bucket)
     aligned_gisaid_sequences_s3_key=$(echo "${aligned_gisaid_location}" | jq -r .sequences_key)
     aligned_gisaid_metadata_s3_key=$(echo "${aligned_gisaid_location}" | jq -r .metadata_key)
