@@ -1,8 +1,14 @@
-from typing import List, Optional
+import datetime
+import logging
+from typing import Any, List, Optional
 
-from pydantic import constr
+from pydantic import constr, root_validator
+from pydantic.utils import GetterDict
 
 from aspen.api.schemas.base import BaseRequest, BaseResponse
+from aspen.api.utils import format_sample_lineage
+
+logging.basicConfig(level=logging.INFO)
 
 
 class SampleRequestSchema(BaseRequest):
@@ -23,28 +29,65 @@ class SampleLineageResponseSchema(BaseResponse):
 
 
 class SampleGroupResponseSchema(BaseResponse):
+    class Config:
+        orm_mode = True
+
     id: int
     name: str
 
 
 class SampleUserResponseSchema(BaseResponse):
+    class Config:
+        orm_mode = True
+
     id: int
     name: str
 
 
+class SampleGetterDict(GetterDict):
+    def get(self, key: Any, default: Any = None) -> Any:
+        default_response = getattr(self._obj, key, default)
+        indirect_attributes = {
+            "sequencing_date": (
+                self._obj.uploaded_pathogen_genome.sequencing_date
+                if self._obj.uploaded_pathogen_genome
+                else None
+            ),
+            "upload_date": (
+                self._obj.uploaded_pathogen_genome.upload_date
+                if self._obj.uploaded_pathogen_genome
+                else None
+            ),
+            "lineage": format_sample_lineage(self._obj),
+            "private_identifier": None
+            # "private_identifier": (
+            #     self._obj.private_identifier
+            #     if self._obj.show_private_identifier
+            #     else None
+            # )
+        }
+        if indirect_attributes.get(key, None):
+            return indirect_attributes[key]
+        return default_response
+
+
 class SampleResponseSchema(BaseResponse):
-    collection_date: str
-    collection_location: str
+    class Config:
+        orm_mode = True
+        getter_dict = SampleGetterDict
+
+    collection_date: datetime.date
+    location: Optional[str]
     czb_failed_genome_recovery: bool
     gisaid: SampleGisaidResponseSchema
     lineage: SampleLineageResponseSchema
     private: bool
     private_identifier: Optional[str]
     public_identifier: str
-    sequencing_date: Optional[str]
+    sequencing_date: Optional[datetime.datetime]
     submitting_group: SampleGroupResponseSchema
     uploaded_by: SampleUserResponseSchema
-    upload_date: Optional[str]
+    upload_date: Optional[datetime.datetime]
 
 
 class SamplesResponseSchema(BaseResponse):

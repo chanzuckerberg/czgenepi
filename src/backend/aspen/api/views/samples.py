@@ -11,7 +11,11 @@ from starlette.requests import Request
 from aspen.api.auth import get_auth_user
 from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
-from aspen.api.schemas.samples import SampleDeleteResponse, SamplesResponseSchema
+from aspen.api.schemas.samples import (
+    SampleDeleteResponse,
+    SampleResponseSchema,
+    SamplesResponseSchema,
+)
 from aspen.api.settings import Settings
 from aspen.api.utils import (
     authz_samples_cansee,
@@ -118,12 +122,6 @@ async def list_samples(
         workflow_to_accession_map[accession.producing_workflow_id] = accession
 
     for gisaid_accession_workflow in gisaid_accession_workflows_with_inputs:
-        # A GisaidAccessionWorkflow is only ever going to have one input,
-        # a single UploadedPathogenGenome. The only way to create the former
-        # is through a method on the latter, and no other inputs are passed.
-        # The relationship is effectively one-to-one, despite the current db
-        # schema that technically allows for a many-to-many relationship.
-        # This is the same for its relationship outputs.
         genome_id = gisaid_accession_workflow.inputs[0].entity_id
         sample_id = genome_id_to_sample_id[genome_id]
         origin_tuple = sample_gisaid_tuple_map[sample_id]
@@ -141,46 +139,21 @@ async def list_samples(
     results: MutableSequence[Mapping[str, Any]] = list()
     for sample_gisaid_tuple in sample_gisaid_tuple_map.values():
         sample = sample_gisaid_tuple.sample
-        returned_sample_data = {
-            "public_identifier": sample.public_identifier,
-            "upload_date": (
-                format_date(sample.uploaded_pathogen_genome.upload_date)
-                if sample.uploaded_pathogen_genome
-                else format_date(None)
-            ),
-            "collection_date": format_date(sample.collection_date),
-            "sequencing_date": (
-                format_date(sample.uploaded_pathogen_genome.sequencing_date)
-                if sample.uploaded_pathogen_genome
-                else format_date(None)
-            ),
-            "collection_location": sample.location,
-            "gisaid": determine_gisaid_status(
-                sample,
-                sample_gisaid_tuple.gisaid_accession_workflow,
-                sample_gisaid_tuple.gisaid_accession,
-                GISAID_REJECTION_TIME,
-            ),
-            "czb_failed_genome_recovery": sample.czb_failed_genome_recovery,
-            "lineage": format_sample_lineage(sample),
-            "submitting_group": {
-                "id": sample.submitting_group_id,
-                "name": sample.submitting_group.name,
-            },
-            "uploaded_by": {
-                "id": sample.uploaded_by_id,
-                "name": sample.uploaded_by.name,
-            },
-            "private": sample.private,
-        }
+        sample.gisaid = determine_gisaid_status(
+            sample,
+            sample_gisaid_tuple.gisaid_accession_workflow,
+            sample_gisaid_tuple.gisaid_accession,
+            GISAID_REJECTION_TIME,
+        )
+        sample.show_private_identifier = False
+        # if (
+        #     sample.submitting_group_id == user.group_id
+        #     or sample.submitting_group_id in cansee_groups_private_identifiers
+        #     or user.system_admin
+        # ):
+        #     sample.show_private_identifier = True
 
-        if (
-            sample.submitting_group_id == user.group_id
-            or sample.submitting_group_id in cansee_groups_private_identifiers
-            or user.system_admin
-        ):
-            returned_sample_data["private_identifier"] = sample.private_identifier
-
+        returned_sample_data = SampleResponseSchema.from_orm(sample)
         results.append(returned_sample_data)
     return SamplesResponseSchema.parse_obj({"samples": results})
 
