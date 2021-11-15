@@ -127,7 +127,6 @@ class PhyloRunResponse(BaseResponse):
     outputs: Union[TreeResponse, None] = Field(alias="phylo_tree")
 
 
-
 class PhyloRunDeleteResponse(BaseResponse):
     id: int
 
