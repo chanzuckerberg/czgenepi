@@ -48,6 +48,33 @@ async def test_create_phylo_run(
     assert "id" in response
 
 
+async def test_create_phylo_run_with_failed_sample(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+):
+    """
+    Test phylo tree creation, with a sample that failed genome recovery
+    """
+    group = group_factory()
+    user = user_factory(group)
+    sample = sample_factory(group, user)
+    sample.czb_failed_genome_recovery = True
+    gisaid_dump = aligned_gisaid_dump_factory()
+    uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
+    async_session.add(group)
+    async_session.add(gisaid_dump)
+    await async_session.commit()
+
+    auth_headers = {"user_id": user.auth0_user_id}
+    data = {
+        "name": "test phylorun",
+        "tree_type": "targeted",
+        "samples": [sample.public_identifier],
+    }
+    res = await http_client.post("/v2/phylo_runs/", json=data, headers=auth_headers)
+    assert res.status_code == 400
+
+
 async def test_create_phylo_run_with_gisaid_ids(
     async_session: AsyncSession,
     http_client: AsyncClient,
