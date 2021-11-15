@@ -2,7 +2,6 @@ import React from "react";
 import BiohubLogo from "src/common/images/cz-biohub-logo.png";
 import CZILogo from "src/common/images/czi-logo.png";
 import FooterLogo from "src/common/images/logo.svg";
-import NextstrainLogo from "src/common/images/Nextstrain-logo-crop.png";
 import {
     CZContainer,
     CZLogoContainer,
@@ -13,8 +12,7 @@ import {
     FooterLogoContainer,
     FooterPartnerships,
     FooterTopContainer,
-    FooterTopLinks,
-    NextstrainContainer
+    FooterTopLinks
 } from "./style";
 
 export default function Footer(): JSX.Element {
@@ -41,10 +39,6 @@ export default function Footer(): JSX.Element {
                 </FooterBottomLinks>
                 <FooterBottomSeparator />
                 <FooterPartnerships>
-                    <NextstrainContainer>
-                        <span>Powered by:</span>
-                        <img src={NextstrainLogo.src} alt="" />
-                    </NextstrainContainer>
                     <CZContainer>
                         <span>In partnership with:</span>
                         <CZLogoContainer>

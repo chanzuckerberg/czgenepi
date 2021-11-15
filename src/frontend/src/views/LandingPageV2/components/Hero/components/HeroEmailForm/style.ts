@@ -30,10 +30,13 @@ export const EmailInput = styled.input`
         color: #545454;
     }
 
-    @media (max-width: 768px) {
-        border-radius: 999px;
+    @media (max-width: 1200px) {
         font-size: 13px;
         line-height: 21px;
+    }
+
+    @media (max-width: 768px) {
+        border-radius: 999px;
         margin-bottom: 7px;
         width: 100%;
         padding: 13px;
@@ -46,7 +49,7 @@ export const SubmitButton = styled.button`
     border-radius: 0 999px 999px 0;
     outline: none;
     border: none;
-    background: #7A41CE;
+    background: #5D18C2;
     padding: 13px 38px;
     cursor: pointer;
     font-size: 16px;
@@ -54,10 +57,13 @@ export const SubmitButton = styled.button`
     line-height: 26px;
     letter-spacing: 0.3px;
 
-    @media (max-width: 768px) {
-        border-radius: 999px;
+    @media (max-width: 1200px) {
         font-size: 13px;
         line-height: 21px;
+    }
+
+    @media (max-width: 768px) {
+        border-radius: 999px;
         width: 100%;
     }
 `;
