@@ -20,10 +20,6 @@ export const Heading = styled.h1`
 export const HeroContainer = styled.div`
     background: #000000;
     width: 100%;
-
-    @media (max-width: 768px) {
-        min-height: 710px;
-    }
 `;
 
 export const HeroTextSection = styled.div`
@@ -42,6 +38,7 @@ export const HeroTextSection = styled.div`
         width: 100%;
         padding-left: 20px;
         padding-right: 20px;
+        margin-bottom: 200px;
     }
 `;
 
@@ -62,21 +59,9 @@ export const HeroImage = styled.div`
     margin-top: -120px;
     margin-left: auto;
 
-    & svg:nth-of-type(2) {
-        display: none;
-    }
-
     @media (max-width: 768px) {
         width: 100%;
-        
-        & svg:nth-of-type(1) {
-            display: none;
-        }
-
-        & svg:nth-of-type(2) {
-            display: block;
-            width: 100%;
-        }
+        height: auto;
     }
 
 `;
