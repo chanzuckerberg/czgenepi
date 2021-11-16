@@ -1,5 +1,12 @@
 import styled from "@emotion/styled";
 
+export const Bar = styled.div`
+    width: 17px;
+    height: 1px;
+    background-color: #FFFFFF;
+    margin: 5px 0;
+`;
+
 export const ButtonLink = styled.a`
     display: inline-block;
     margin: 0 8px;
@@ -109,15 +116,6 @@ export const MobileNavToggle = styled.div`
     @media (max-width: 768px) {
         display: inline-block;
         cursor: pointer;
-    }
-
-    .bar1,
-    .bar2,
-    .bar3 {
-        width: 17px;
-        height: 1px;
-        background-color: #FFFFFF;
-        margin: 5px 0;
     }
 `;
 

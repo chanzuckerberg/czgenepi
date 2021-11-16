@@ -1,4 +1,5 @@
 import React from "react";
+import Image from 'next/image';
 import HeroBackgroundSvg from "src/common/images/landingv2-hero-bg.svg";
 import EmailForm from "./components/HeroEmailForm";
 import NextstrainLogo from "src/common/images/Nextstrain-logo-crop.png";
@@ -9,6 +10,7 @@ import {
     HeroTextSection,
     HeroMaxWidthContainer,
     NextstrainContainer,
+    PartnershipText,
     Tagline
 } from "./style";
 
@@ -26,8 +28,8 @@ export default function Hero(): JSX.Element {
                     <HeroBackgroundSvg />
                 </HeroImage>
                 <NextstrainContainer>
-                    <span>In partnership with</span>
-                    <img src={NextstrainLogo.src} alt="" />
+                    <PartnershipText>In partnership with</PartnershipText>
+                    <Image src={NextstrainLogo} alt="" />
                 </NextstrainContainer>
             </HeroMaxWidthContainer>
         </HeroContainer>

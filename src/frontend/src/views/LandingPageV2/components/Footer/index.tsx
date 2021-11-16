@@ -1,18 +1,25 @@
 import React, { useEffect } from "react";
-import BiohubLogo from "src/common/images/cz-biohub-logo.png";
-import CZILogo from "src/common/images/czi-logo.png";
+import Image from 'next/image';
+import BiohubLogoImg from "src/common/images/cz-biohub-logo.png";
+import CZILogoImg from "src/common/images/czi-logo.png";
 import FooterLogo from "src/common/images/logo.svg";
 import {
+    CZBiohubLogo,
     CZContainer,
+    CZILogo,
     CZLogoContainer,
     FooterBottomContainer,
+    FooterBottomLink,
+    FooterBottomLinkDivider,
     FooterBottomLinks,
     FooterBottomSeparator,
     FooterContainer,
     FooterLogoContainer,
     FooterPartnerships,
     FooterTopContainer,
-    FooterTopLinks
+    FooterTopLink,
+    FooterTopLinks,
+    Span
 } from "./style";
 
 export default function Footer(): JSX.Element {
@@ -34,26 +41,30 @@ export default function Footer(): JSX.Element {
                     <FooterLogo />
                 </FooterLogoContainer>
                 <FooterTopLinks>
-                    <a href="/">Github</a>
-                    <a href="/">Careers</a>
-                    <a href="/">Resources</a>
+                    <FooterTopLink href="/">Github</FooterTopLink>
+                    <FooterTopLink href="/">Careers</FooterTopLink>
+                    <FooterTopLink href="/">Resources</FooterTopLink>
                 </FooterTopLinks>
             </FooterTopContainer>
             <FooterBottomContainer>
                 <FooterBottomLinks>
-                    <a href="/">Privacy</a>
-                    <span>|</span>
-                    <a href="/">Terms</a>
-                    <span>|</span>
-                    <a href="/">Contact us</a>
+                    <FooterBottomLink href="/">Privacy</FooterBottomLink>
+                    <FooterBottomLinkDivider>|</FooterBottomLinkDivider>
+                    <FooterBottomLink href="/">Terms</FooterBottomLink>
+                    <FooterBottomLinkDivider>|</FooterBottomLinkDivider>
+                    <FooterBottomLink href="/">Contact us</FooterBottomLink>
                 </FooterBottomLinks>
                 <FooterBottomSeparator />
                 <FooterPartnerships>
                     <CZContainer>
-                        <span>In partnership with:</span>
+                        <Span>In partnership with:</Span>
                         <CZLogoContainer>
-                            <img src={CZILogo.src} alt="" />
-                            <img src={BiohubLogo.src} alt="" />
+                            <CZILogo>
+                                <Image src={CZILogoImg} alt="" />
+                            </CZILogo>
+                            <CZBiohubLogo>
+                                <Image src={BiohubLogoImg} alt="" />
+                            </CZBiohubLogo>
                         </CZLogoContainer>
                     </CZContainer>
                 </FooterPartnerships>

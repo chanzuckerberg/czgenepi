@@ -10,7 +10,8 @@ import React, { useEffect, useState } from "react";
 import { ROUTES } from "src/common/routes";
 import { useUserInfo } from "../../common/queries/auth";
 import {
-  Container
+  Container,
+  LoadingText
 } from "./style";
 
 export default function Homepage(): JSX.Element {
@@ -31,7 +32,7 @@ export default function Homepage(): JSX.Element {
   });
 
   if (isLoading || isRedirecting) {
-    return <div>Loading...</div>;
+    return <LoadingText>Loading...</LoadingText>;
   }
 
   return (

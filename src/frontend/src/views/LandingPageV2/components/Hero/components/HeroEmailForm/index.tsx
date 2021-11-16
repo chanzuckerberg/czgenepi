@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import FormSubmitArrow from "src/common/images/form-submit-arrow.svg";
 import {
     HeroEmailForm,
     EmailInput,
@@ -10,7 +11,7 @@ export default function EmailForm(): JSX.Element {
 
     const [enteredEmail, setEnteredEmail] = useState("");
 
-    function submitEmail(e) {
+    function submitEmail(e: React.FormEvent<HTMLInputElement>) {
         e.preventDefault();
 
         let emailRegex = /^(([^<>()\]\\.,;:\s@"]+(\.[^<>()\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -30,20 +31,18 @@ export default function EmailForm(): JSX.Element {
                 <EmailInput
                     placeholder="Your email address"
                     value={enteredEmail}
-                    onChange={e => {
+                    onChange={(e: React.FormEvent<HTMLInputElement>) => {
                         setEnteredEmail(e.target.value);
                     }}
                     />
                 <SubmitButton
-                    onClick={e => {
+                    onClick={(e: React.FormEvent<HTMLInputElement>) => {
                         submitEmail(e);
                     }}
                     >
                     Join the waitlist 
                     <SubmitIcon>
-                        <svg width="7" height="10" viewBox="0 0 7 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M1.05707 1.12671L5.08221 5.15186L1.05707 9.177" stroke="white" stroke-width="1.4231"/>
-                        </svg>
+                        <FormSubmitArrow />
                     </SubmitIcon>
                 </SubmitButton>
         </HeroEmailForm>

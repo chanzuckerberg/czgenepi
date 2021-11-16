@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import ComputerImg from "src/common/images/landingv2-computer.png";
 import {
     IntroContainer,
@@ -14,7 +15,7 @@ export default function IntroSection(): JSX.Element {
     return (
         <IntroContainer>
             <IntroImage>
-                <img style={{maxWidth: "797px", width: "100%", height: "auto"}} src={ComputerImg.src} alt="" />
+                <Image style={{maxWidth: "797px", width: "100%", height: "auto"}} src={ComputerImg} alt="" />
             </IntroImage>
             <IntroTextContainer>
                 <IntroHeading>

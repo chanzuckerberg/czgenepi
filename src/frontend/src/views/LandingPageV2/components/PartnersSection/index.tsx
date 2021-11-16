@@ -1,10 +1,14 @@
 import React from "react";
-import UsherLogo from "src/common/images/usher-logo.png";
-import PangolinLogo from "src/common/images/pangolin-logo.png";
-import NextstrainLogo from "src/common/images/nextstrain-logo-full.png";
+import Image from "next/image";
+import UsherLogoImg from "src/common/images/usher-logo.png";
+import PangolinLogoImg from "src/common/images/pangolin-logo.png";
+import NextstrainLogoImg from "src/common/images/nextstrain-logo-full.png";
 import {
+    NextstrainLogo,
+    PangolinLogo,
     PartnerLink,
-    PartnersSectionContainer
+    PartnersSectionContainer,
+    UsherLogo
 } from "./style";
 
 export default function IntroSection(): JSX.Element {
@@ -15,19 +19,25 @@ export default function IntroSection(): JSX.Element {
                 href="/"
                 target="_blank"
                 >
-                <img src={UsherLogo.src} style={{width: "107px", height: "62px"}} />
+                <UsherLogo>
+                    <Image src={UsherLogoImg} />
+                </UsherLogo>
             </PartnerLink>
             <PartnerLink
                 href="/"
                 target="_blank"
                 >
-                <img src={PangolinLogo.src} style={{width: "171px", height: "50px"}} />
+                <PangolinLogo>
+                    <Image src={PangolinLogoImg} />
+                </PangolinLogo>
             </PartnerLink>
             <PartnerLink
                 href="/"
                 target="_blank"
                 >
-                <img src={NextstrainLogo.src} style={{width: "196px", height: "56px"}} />
+                <NextstrainLogo>
+                    <Image src={NextstrainLogoImg} />
+                </NextstrainLogo>
             </PartnerLink>
         </PartnersSectionContainer>
     );

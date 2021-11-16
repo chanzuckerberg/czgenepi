@@ -1,5 +1,10 @@
 import styled from "@emotion/styled";
 
+export const CZBiohubLogo = styled.div`
+    max-width: 120px;
+    padding-left: 20px;
+`;
+
 export const CZContainer = styled.div`
     display: flex;
     align-items: center;
@@ -16,25 +21,16 @@ export const CZContainer = styled.div`
 `;
 
 export const CZLogoContainer = styled.div`
-    display: flex;
-    align-items: center;
-
-    & img {
-
-        &:first-of-type {
-            margin-left: 32px;
-            border-right: 1px solid #767676;
-            padding-right: 20px;
-            max-height: 37px; 
-
-        }
-
-        &:nth-of-type(2) {
-            max-height: 15px;
-            padding-left: 20px;
-        }
+        display: flex;
+        align-items: center;
     }
-    
+`;
+
+export const CZILogo = styled.div`
+    margin-left: 32px;
+    border-right: 1px solid #767676;
+    padding-right: 20px;
+    max-width: 100px;
 `;
 
 export const FooterBottomContainer = styled.div`
@@ -47,11 +43,14 @@ export const FooterBottomContainer = styled.div`
     }
 `;
 
-export const FooterBottomLinks = styled.div`
+export const FooterBottomLink = styled.a`
+`;
 
-    & span {
-        margin: 0 7px;
-    }
+export const FooterBottomLinkDivider = styled.span`
+    margin: 0 7px;
+`;
+
+export const FooterBottomLinks = styled.div`
 `;
 
 export const FooterBottomSeparator = styled.div`
@@ -116,6 +115,18 @@ export const FooterTopContainer = styled.div`
     }
 `;
 
+export const FooterTopLink = styled.a`
+
+    @media (max-width: 768px) {
+        background: #262525;
+        border-radius: 24px;
+        padding: 7px 14px;
+        width: 100%;
+        max-width: 280px;
+        text-align: center;
+    }
+`;
+
 export const FooterTopLinks = styled.div`
 
     @media (max-width: 768px) {
@@ -124,19 +135,6 @@ export const FooterTopLinks = styled.div`
         align-items: center;
         width: 100%;
         margin-top: 28px;
-    }
-
-    a {
-
-        @media (max-width: 768px) {
-            background: #262525;
-            border-radius: 24px;
-            padding: 7px 14px;
-            width: 100%;
-            max-width: 280px;
-            text-align: center;
-        }
-
     }
 
     a + a {
@@ -148,3 +146,5 @@ export const FooterTopLinks = styled.div`
         }
     }
 `;
+
+export const Span = styled.span``;

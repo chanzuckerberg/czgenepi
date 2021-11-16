@@ -74,17 +74,17 @@ export const NextstrainContainer = styled.div`
     flex-direction: column;
     width: 140px;
 
-    span {
-        color: white;
-        font-size: 11px;
-        line-height: 24px;
-        letter-spacing: 0.3px;
-        font-style: italic;
-    }
-
     @media (max-width: 768px) {
         display: none;
     }
+`;
+
+export const PartnershipText = styled.span`
+    color: white;
+    font-size: 11px;
+    line-height: 24px;
+    letter-spacing: 0.3px;
+    font-style: italic;
 `;
 
 export const Tagline = styled.p`

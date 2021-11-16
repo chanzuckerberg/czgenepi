@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import UseCasesImg from "src/common/images/landingv2-use-cases.png";
 import UseCasesImgMobile from "src/common/images/landingv2-use-cases-mobile.png";
 import UseCasesExample from "./components/UseCasesExample";
@@ -17,7 +18,9 @@ export default function UseCases(): JSX.Element {
             <UseCasesHeader>
                 Use cases/how it's used headline
             </UseCasesHeader>
-            <UseCasesImage src={UseCasesImg.src} />
+            <UseCasesImage>
+                <Image src={UseCasesImg} />
+            </UseCasesImage>
             <UseCasesExampleContainer>
                 <UseCasesExample 
                     headline="Use case 1 headline" 
@@ -28,7 +31,9 @@ export default function UseCases(): JSX.Element {
                     copy="Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Nullam quis risus eget urna mollis ornare vel eu leo."
                     />
             </UseCasesExampleContainer>
-            <UseCasesImageMobile src={UseCasesImgMobile.src} />
+            <UseCasesImageMobile>
+                <Image src={UseCasesImgMobile} />
+            </UseCasesImageMobile>
         </UseCasesContainer>
     );
 }
