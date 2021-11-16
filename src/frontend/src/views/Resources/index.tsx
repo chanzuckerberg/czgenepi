@@ -108,7 +108,7 @@ export default function Resources(): JSX.Element {
                 <NewTabLink href="https://www.youtube.com/watch?v=HVorizRS4wk">
                   Week 7
                 </NewTabLink>{" "}
-                - In today's seminar we talked about phylogenetic nomenclature
+                - In todays seminar we talked about phylogenetic nomenclature
                 systems (why we use them and types of systems). We finished off
                 with a more detailed discussion of how the Pango nomenclature
                 system for SARS-CoV-2.
@@ -118,7 +118,7 @@ export default function Resources(): JSX.Element {
                   Week 8
                 </NewTabLink>{" "}
                 - This week we tackled the tricky subject of sampling design.
-                While we don't (yet) have formal frameworks for estimating
+                While we don&apos;t (yet) have formal frameworks for estimating
                 sample size in genomic epidemiology, today we discussed study
                 design, and specifically how to think about sample selection for
                 different types of genomic epidemiological questions/studies.
@@ -127,10 +127,10 @@ export default function Resources(): JSX.Element {
                 <NewTabLink href="https://www.youtube.com/watch?v=a8bp0iHCttA">
                   Week 9
                 </NewTabLink>{" "}
-                - In this week's seminar I introduced "phylodynamic" analysis -
-                a particular area of genomic epidemiology where we infer changes
-                in pathogen population size from the shapes of coalescent
-                phylogenetic trees.
+                - In this week&apos;s seminar I introduced
+                &quot;phylodynamic&quot; analysis - a particular area of genomic
+                epidemiology where we infer changes in pathogen population size
+                from the shapes of coalescent phylogenetic trees.
               </span>,
               <span key={9}>
                 <NewTabLink href="https://www.youtube.com/watch?v=cLLV2VpgXCU">
@@ -139,10 +139,10 @@ export default function Resources(): JSX.Element {
                 - This week I gave a demo of Aspen, the new piece of software
                 that CZI is developing for managing genomic data, that
                 eventually will allow folks to build Nextstrain trees
-                independently with a GUI interface. Since that capability isn't
-                active quite yet, I also discussed phylogenetic placements in
-                UShER and Nextclade, and how to pull relevant data out of Aspen
-                to use in those phylogenetic placements.
+                independently with a GUI interface. Since that capability
+                isn&apos;t active quite yet, I also discussed phylogenetic
+                placements in UShER and Nextclade, and how to pull relevant data
+                out of Aspen to use in those phylogenetic placements.
               </span>,
               <span key={10}>
                 <NewTabLink href="https://www.youtube.com/watch?v=lFJ_2G4u8w4">
@@ -150,8 +150,8 @@ export default function Resources(): JSX.Element {
                 </NewTabLink>{" "}
                 - This week Dr. Sidney Bell joined us to discuss antigenic
                 evolution of viruses - that is, how viral surface proteins can
-                change how they "look" to our immune systems, and in some cases
-                eventually escape our immunity.
+                change how they &quot;look&quot; to our immune systems, and in
+                some cases eventually escape our immunity.
               </span>,
               <span key={10}>
                 <NewTabLink href="https://www.youtube.com/watch?v=lFJ_2G4u8w4">
