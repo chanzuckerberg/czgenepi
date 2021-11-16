@@ -23,3 +23,13 @@ export const UploadButton = styled(Button)`
     `;
   }}
 `;
+
+export const ResourcesLink = styled.div`
+ ${(props) => {
+    const spaces = getSpaces(props);
+
+    return `
+      margin-right: ${spaces?.xxl}px;
+    `;
+  }}
+`;

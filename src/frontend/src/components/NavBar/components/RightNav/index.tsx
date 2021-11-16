@@ -7,7 +7,7 @@ import { API } from "../../../../common/api";
 import { ROUTES } from "../../../../common/routes";
 import style from "../../index.module.scss";
 import UserMenu from "./components/UserMenu";
-import { UploadButton } from "./style";
+import { UploadButton, ResourcesLink } from "./style";
 
 export default function RightNav(): JSX.Element {
   const { data } = useUserInfo();
@@ -19,6 +19,11 @@ export default function RightNav(): JSX.Element {
       <div className={cx(style.item, style.link)}>Sign In</div>
     </a>
   );
+  const genEpiResourcesLink = (
+    <a href={ROUTES.RESOURCES} data-test-id="navbar-sign-in-link">
+    <ResourcesLink className={cx(style.item, style.link)}>Gen Epi Resources</ResourcesLink>
+    </a>
+  )
 
   function IsLoggedIn(): JSX.Element {
     if (user) {
@@ -36,7 +41,12 @@ export default function RightNav(): JSX.Element {
         </>
       );
     } else {
-      return signInLink;
+      return (
+        <>
+          {genEpiResourcesLink}
+          {signInLink}
+        </>
+      );
     }
   }
 
