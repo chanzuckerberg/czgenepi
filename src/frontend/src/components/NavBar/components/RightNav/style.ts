@@ -25,7 +25,7 @@ export const UploadButton = styled(Button)`
 `;
 
 export const ResourcesLink = styled.div`
- ${(props) => {
+  ${(props) => {
     const spaces = getSpaces(props);
 
     return `
