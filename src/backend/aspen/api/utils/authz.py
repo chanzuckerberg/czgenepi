@@ -24,13 +24,13 @@ def authz_samples_cansee(
     cansee_groups: Set[int] = {
         cansee.owner_group_id
         for cansee in user.group.can_see
-        if cansee.data_type == DataType.SEQUENCES
+        if cansee.data_type == DataType.METADATA
     }
     # add the user's own group
     cansee_groups.add(user.group_id)
 
     # Which groups can this user query private identifiers for?
-    # NOTE - this asssumes PRIVATE_IDENTIFIERS permission is a superset of SEQUENCES
+    # NOTE - this asssumes PRIVATE_IDENTIFIERS permission is a superset of METADATA
     cansee_groups_private_identifiers: Set[int] = {
         cansee.owner_group_id
         for cansee in user.group.can_see

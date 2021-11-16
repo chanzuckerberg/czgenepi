@@ -1,7 +1,6 @@
 import datetime
 from typing import Any, Mapping, Optional
 
-from aspen.api.utils import format_date
 from aspen.database.models import (
     GisaidAccession,
     GisaidAccessionWorkflow,
@@ -53,7 +52,7 @@ def format_sample_lineage(sample: Sample) -> dict[str, Any]:
             "lineage": pathogen_genome.pangolin_lineage,
             "probability": pathogen_genome.pangolin_probability,
             "version": pathogen_genome.pangolin_version,
-            "last_updated": format_date(pathogen_genome.pangolin_last_updated),
+            "last_updated": pathogen_genome.pangolin_last_updated,
         }
     else:
         lineage = {

@@ -17,12 +17,7 @@ from aspen.api.schemas.samples import (
     SamplesResponseSchema,
 )
 from aspen.api.settings import Settings
-from aspen.api.utils import (
-    authz_samples_cansee,
-    determine_gisaid_status,
-    format_date,
-    format_sample_lineage,
-)
+from aspen.api.utils import authz_samples_cansee, determine_gisaid_status
 from aspen.database.models import (
     DataType,
     Entity,
@@ -145,6 +140,7 @@ async def list_samples(
             sample_gisaid_tuple.gisaid_accession,
             GISAID_REJECTION_TIME,
         )
+        sample.show_private_identifier = False
         if (
             sample.submitting_group_id == user.group_id
             or sample.submitting_group_id in cansee_groups_private_identifiers

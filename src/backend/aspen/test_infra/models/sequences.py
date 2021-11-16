@@ -47,6 +47,7 @@ def uploaded_pathogen_genome_factory(
     pangolin_version="2021-04-23",
     pangolin_last_updated=datetime.datetime.now(),
     sequencing_depth=0.1,
+    sequencing_date=datetime.date.today(),
     upload_date=datetime.datetime.now(),
     accessions: Sequence[AccessionWorkflowDirective] = (
         AccessionWorkflowDirective(
@@ -68,6 +69,7 @@ def uploaded_pathogen_genome_factory(
         pangolin_version=pangolin_version,
         pangolin_last_updated=pangolin_last_updated,
         sequencing_depth=sequencing_depth,
+        sequencing_date=sequencing_date,
         upload_date=upload_date,
     )
     for accession_workflow_directive in accessions:

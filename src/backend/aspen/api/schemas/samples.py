@@ -1,7 +1,7 @@
 import datetime
 from typing import Any, List, Optional
 
-from pydantic import constr, root_validator
+from pydantic import constr, Field
 from pydantic.utils import GetterDict
 
 from aspen.api.schemas.base import BaseRequest, BaseResponse
@@ -19,7 +19,7 @@ class SampleGisaidResponseSchema(BaseResponse):
 
 
 class SampleLineageResponseSchema(BaseResponse):
-    last_updated: Optional[str]
+    last_updated: Optional[datetime.datetime]
     lineage: Optional[str]
     probability: Optional[float]
     version: Optional[str]
@@ -71,16 +71,17 @@ class SampleResponseSchema(BaseResponse):
     class Config:
         orm_mode = True
         getter_dict = SampleGetterDict
+        allow_population_by_field_name = True
 
     collection_date: datetime.date
-    location: Optional[str]
+    location: Optional[str] = Field(alias="collection_location")
     czb_failed_genome_recovery: bool
     gisaid: SampleGisaidResponseSchema
     lineage: SampleLineageResponseSchema
     private: bool
     private_identifier: Optional[str]
     public_identifier: str
-    sequencing_date: Optional[datetime.datetime]
+    sequencing_date: Optional[datetime.date]
     submitting_group: SampleGroupResponseSchema
     uploaded_by: SampleUserResponseSchema
     upload_date: Optional[datetime.datetime]

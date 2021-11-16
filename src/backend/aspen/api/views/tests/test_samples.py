@@ -7,7 +7,7 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.exc import NoResultFound
 
-from aspen.api.utils import format_date
+from aspen.api.schemas.base import convert_datetime_to_iso_8601
 from aspen.database.models import (
     CanSee,
     DataType,
@@ -47,7 +47,7 @@ async def test_samples_view(
     expected = {
         "samples": [
             {
-                "collection_date": format_date(sample.collection_date),
+                "collection_date": str(sample.collection_date),
                 "collection_location": sample.location,
                 "czb_failed_genome_recovery": False,
                 "gisaid": {
@@ -58,15 +58,15 @@ async def test_samples_view(
                 },
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
-                "upload_date": format_date(uploaded_pathogen_genome.upload_date),
-                "sequencing_date": format_date(
-                    uploaded_pathogen_genome.sequencing_date
+                "upload_date": convert_datetime_to_iso_8601(
+                    uploaded_pathogen_genome.upload_date
                 ),
+                "sequencing_date": str(uploaded_pathogen_genome.sequencing_date),
                 "lineage": {
                     "lineage": uploaded_pathogen_genome.pangolin_lineage,
                     "probability": uploaded_pathogen_genome.pangolin_probability,
                     "version": uploaded_pathogen_genome.pangolin_version,
-                    "last_updated": format_date(
+                    "last_updated": convert_datetime_to_iso_8601(
                         uploaded_pathogen_genome.pangolin_last_updated
                     ),
                 },
@@ -113,21 +113,21 @@ async def test_samples_view_gisaid_rejected(
     expected = {
         "samples": [
             {
-                "collection_date": format_date(sample.collection_date),
+                "collection_date": str(sample.collection_date),
                 "collection_location": sample.location,
                 "czb_failed_genome_recovery": False,
                 "gisaid": {"status": "Rejected", "gisaid_id": None},
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
-                "upload_date": format_date(uploaded_pathogen_genome.upload_date),
-                "sequencing_date": format_date(
-                    uploaded_pathogen_genome.sequencing_date
+                "upload_date": convert_datetime_to_iso_8601(
+                    uploaded_pathogen_genome.upload_date
                 ),
+                "sequencing_date": str(uploaded_pathogen_genome.sequencing_date),
                 "lineage": {
                     "lineage": uploaded_pathogen_genome.pangolin_lineage,
                     "probability": uploaded_pathogen_genome.pangolin_probability,
                     "version": uploaded_pathogen_genome.pangolin_version,
-                    "last_updated": format_date(
+                    "last_updated": convert_datetime_to_iso_8601(
                         uploaded_pathogen_genome.pangolin_last_updated
                     ),
                 },
@@ -169,21 +169,21 @@ async def test_samples_view_gisaid_no_info(
     expected = {
         "samples": [
             {
-                "collection_date": format_date(sample.collection_date),
+                "collection_date": str(sample.collection_date),
                 "collection_location": sample.location,
                 "czb_failed_genome_recovery": False,
                 "gisaid": {"status": "Not Yet Submitted", "gisaid_id": None},
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
-                "upload_date": format_date(uploaded_pathogen_genome.upload_date),
-                "sequencing_date": format_date(
-                    uploaded_pathogen_genome.sequencing_date
+                "upload_date": convert_datetime_to_iso_8601(
+                    uploaded_pathogen_genome.upload_date
                 ),
+                "sequencing_date": str(uploaded_pathogen_genome.sequencing_date),
                 "lineage": {
                     "lineage": uploaded_pathogen_genome.pangolin_lineage,
                     "probability": uploaded_pathogen_genome.pangolin_probability,
                     "version": uploaded_pathogen_genome.pangolin_version,
-                    "last_updated": format_date(
+                    "last_updated": convert_datetime_to_iso_8601(
                         uploaded_pathogen_genome.pangolin_last_updated
                     ),
                 },
@@ -218,17 +218,17 @@ async def test_samples_view_gisaid_not_eligible(
     expected = {
         "samples": [
             {
-                "collection_date": format_date(sample.collection_date),
+                "collection_date": str(sample.collection_date),
                 "collection_location": sample.location,
                 "czb_failed_genome_recovery": True,
                 "gisaid": {"status": "Not Eligible", "gisaid_id": None},
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
-                "upload_date": format_date(None),
+                "upload_date": None,
                 # In some cases, `sequencing_date` could actually still exist with a
                 # failed genome recovery, but for this test it's None because the sample
                 # has no underlying sequenced entity (no uploaded_pathogen_genome).
-                "sequencing_date": format_date(None),
+                "sequencing_date": None,
                 "lineage": {
                     "lineage": None,
                     "probability": None,
@@ -277,21 +277,21 @@ async def test_samples_view_gisaid_submitted(
     expected = {
         "samples": [
             {
-                "collection_date": format_date(sample.collection_date),
+                "collection_date": str(sample.collection_date),
                 "collection_location": sample.location,
                 "czb_failed_genome_recovery": False,
                 "gisaid": {"status": "Submitted", "gisaid_id": None},
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
-                "upload_date": format_date(uploaded_pathogen_genome.upload_date),
-                "sequencing_date": format_date(
-                    uploaded_pathogen_genome.sequencing_date
+                "upload_date": convert_datetime_to_iso_8601(
+                    uploaded_pathogen_genome.upload_date
                 ),
+                "sequencing_date": str(uploaded_pathogen_genome.sequencing_date),
                 "lineage": {
                     "lineage": uploaded_pathogen_genome.pangolin_lineage,
                     "probability": uploaded_pathogen_genome.pangolin_probability,
                     "version": uploaded_pathogen_genome.pangolin_version,
-                    "last_updated": format_date(
+                    "last_updated": convert_datetime_to_iso_8601(
                         uploaded_pathogen_genome.pangolin_last_updated
                     ),
                 },
@@ -408,49 +408,52 @@ async def test_samples_view_cansee_trees(
     assert response["samples"] == []
 
 
-# async def test_samples_view_cansee_sequences(
-#     async_session: AsyncSession,
-#     http_client: AsyncClient,
-# ):
-#     _, _, response = await _test_samples_view_cansee(
-#         async_session,
-#         http_client,
-#         cansee_datatypes=(DataType.SEQUENCES,),
-#     )
-#     assert response["samples"] == []
+async def test_samples_view_cansee_sequences(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+):
+    _, _, response = await _test_samples_view_cansee(
+        async_session,
+        http_client,
+        cansee_datatypes=(DataType.SEQUENCES,),
+    )
+    assert response["samples"] == []
 
 
-# async def test_samples_view_cansee_metadata(
-#     async_session: AsyncSession,
-#     http_client: AsyncClient,
-# ):
-#     sample, uploaded_pathogen_genome, response = await _test_samples_view_cansee(
-#         async_session,
-#         http_client,
-#         cansee_datatypes=(DataType.METADATA,),
-#     )
+async def test_samples_view_cansee_metadata(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+):
+    sample, uploaded_pathogen_genome, response = await _test_samples_view_cansee(
+        async_session,
+        http_client,
+        cansee_datatypes=(DataType.METADATA,),
+    )
 
-#     # no private identifier in the output.
-#     samples = response["samples"]
-#     assert len(samples) == 1
-#     assert isinstance(samples[0].get("public_identifier", None), str)
-#     assert samples[0].get("private_identifier", None) is None
+    # no private identifier in the output.
+    samples = response["samples"]
+    assert len(samples) == 1
+    assert isinstance(samples[0].get("public_identifier", None), str)
+    assert samples[0].get("private_identifier", None) is None
 
 
-# async def test_samples_view_cansee_private_identifiers(
-#     async_session: AsyncSession,
-#     http_client: AsyncClient,
-# ):
-#     """This state really makes no sense because why would you be able to see private
-#     identifiers but not metadata??  But we'll ensure it still does the right thing."""
-#     _, _, response = await _test_samples_view_cansee(
-#         async_session,
-#         http_client,
-#         cansee_datatypes=(DataType.PRIVATE_IDENTIFIERS,),
-#     )
+async def test_samples_view_cansee_private_identifiers(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+):
+    """This state really makes no sense because why would you be able to see private
+    identifiers but not metadata??  But we'll ensure it still does the right thing."""
+    _, _, response = await _test_samples_view_cansee(
+        async_session,
+        http_client,
+        cansee_datatypes=(DataType.PRIVATE_IDENTIFIERS,),
+    )
 
-#     # no private identifier in the output.
-#     assert response["samples"] == []
+    # no private identifier in the output.
+    samples = response["samples"]
+    assert len(samples) == 1
+    assert isinstance(samples[0].get("public_identifier", None), str)
+    assert isinstance(samples[0].get("private_identifier", None), str)
 
 
 async def test_samples_view_cansee_all(
@@ -467,7 +470,7 @@ async def test_samples_view_cansee_all(
     # yes private identifier in the output.
     assert response["samples"] == [
         {
-            "collection_date": format_date(sample.collection_date),
+            "collection_date": str(sample.collection_date),
             "collection_location": sample.location,
             "czb_failed_genome_recovery": False,
             "gisaid": {
@@ -476,13 +479,15 @@ async def test_samples_view_cansee_all(
             },
             "private_identifier": sample.private_identifier,
             "public_identifier": sample.public_identifier,
-            "upload_date": format_date(uploaded_pathogen_genome.upload_date),
-            "sequencing_date": format_date(uploaded_pathogen_genome.sequencing_date),
+            "upload_date": convert_datetime_to_iso_8601(
+                uploaded_pathogen_genome.upload_date
+            ),
+            "sequencing_date": str(uploaded_pathogen_genome.sequencing_date),
             "lineage": {
                 "lineage": uploaded_pathogen_genome.pangolin_lineage,
                 "probability": uploaded_pathogen_genome.pangolin_probability,
                 "version": uploaded_pathogen_genome.pangolin_version,
-                "last_updated": format_date(
+                "last_updated": convert_datetime_to_iso_8601(
                     uploaded_pathogen_genome.pangolin_last_updated
                 ),
             },
@@ -540,7 +545,7 @@ async def test_samples_failed_accession(
     expected = {
         "samples": [
             {
-                "collection_date": format_date(sample.collection_date),
+                "collection_date": str(sample.collection_date),
                 "collection_location": sample.location,
                 "czb_failed_genome_recovery": False,
                 "gisaid": {
@@ -549,15 +554,15 @@ async def test_samples_failed_accession(
                 },
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
-                "upload_date": format_date(uploaded_pathogen_genome.upload_date),
-                "sequencing_date": format_date(
-                    uploaded_pathogen_genome.sequencing_date
+                "upload_date": convert_datetime_to_iso_8601(
+                    uploaded_pathogen_genome.upload_date
                 ),
+                "sequencing_date": str(uploaded_pathogen_genome.sequencing_date),
                 "lineage": {
                     "lineage": uploaded_pathogen_genome.pangolin_lineage,
                     "probability": uploaded_pathogen_genome.pangolin_probability,
                     "version": uploaded_pathogen_genome.pangolin_version,
-                    "last_updated": format_date(
+                    "last_updated": convert_datetime_to_iso_8601(
                         uploaded_pathogen_genome.pangolin_last_updated
                     ),
                 },
@@ -611,7 +616,7 @@ async def test_samples_multiple_accession(
     expected = {
         "samples": [
             {
-                "collection_date": format_date(sample.collection_date),
+                "collection_date": str(sample.collection_date),
                 "collection_location": sample.location,
                 "czb_failed_genome_recovery": False,
                 "gisaid": {
@@ -620,15 +625,15 @@ async def test_samples_multiple_accession(
                 },
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
-                "upload_date": format_date(uploaded_pathogen_genome.upload_date),
-                "sequencing_date": format_date(
-                    uploaded_pathogen_genome.sequencing_date
+                "upload_date": convert_datetime_to_iso_8601(
+                    uploaded_pathogen_genome.upload_date
                 ),
+                "sequencing_date": str(uploaded_pathogen_genome.sequencing_date),
                 "lineage": {
                     "lineage": uploaded_pathogen_genome.pangolin_lineage,
                     "probability": uploaded_pathogen_genome.pangolin_probability,
                     "version": uploaded_pathogen_genome.pangolin_version,
-                    "last_updated": format_date(
+                    "last_updated": convert_datetime_to_iso_8601(
                         uploaded_pathogen_genome.pangolin_last_updated
                     ),
                 },
@@ -669,7 +674,7 @@ async def test_samples_view_no_pangolin(
     expected = {
         "samples": [
             {
-                "collection_date": format_date(sample.collection_date),
+                "collection_date": str(sample.collection_date),
                 "collection_location": sample.location,
                 "czb_failed_genome_recovery": False,
                 "gisaid": {
@@ -680,10 +685,10 @@ async def test_samples_view_no_pangolin(
                 },
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
-                "upload_date": format_date(uploaded_pathogen_genome.upload_date),
-                "sequencing_date": format_date(
-                    uploaded_pathogen_genome.sequencing_date
+                "upload_date": convert_datetime_to_iso_8601(
+                    uploaded_pathogen_genome.upload_date
                 ),
+                "sequencing_date": str(uploaded_pathogen_genome.sequencing_date),
                 "lineage": {
                     "lineage": None,
                     "probability": None,
