@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime
 
 from aspen.database.models import RegionType, Sample
 
@@ -21,7 +21,7 @@ def sample_factory(
     private=False,
 ) -> Sample:
     original_submission = original_submission or {}
-    collection_date = collection_date or datetime.now()
+    collection_date = collection_date or datetime.date.today()
     return Sample(
         submitting_group=submitting_group,
         uploaded_by=uploaded_by,
