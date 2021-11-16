@@ -47,6 +47,7 @@ async def test_samples_view(
     expected = {
         "samples": [
             {
+                "id": sample.id,
                 "collection_date": str(sample.collection_date),
                 "collection_location": sample.location,
                 "czb_failed_genome_recovery": False,
@@ -113,6 +114,7 @@ async def test_samples_view_gisaid_rejected(
     expected = {
         "samples": [
             {
+                "id": sample.id,
                 "collection_date": str(sample.collection_date),
                 "collection_location": sample.location,
                 "czb_failed_genome_recovery": False,
@@ -169,6 +171,7 @@ async def test_samples_view_gisaid_no_info(
     expected = {
         "samples": [
             {
+                "id": sample.id,
                 "collection_date": str(sample.collection_date),
                 "collection_location": sample.location,
                 "czb_failed_genome_recovery": False,
@@ -218,6 +221,7 @@ async def test_samples_view_gisaid_not_eligible(
     expected = {
         "samples": [
             {
+                "id": sample.id,
                 "collection_date": str(sample.collection_date),
                 "collection_location": sample.location,
                 "czb_failed_genome_recovery": True,
@@ -277,6 +281,7 @@ async def test_samples_view_gisaid_submitted(
     expected = {
         "samples": [
             {
+                "id": sample.id,
                 "collection_date": str(sample.collection_date),
                 "collection_location": sample.location,
                 "czb_failed_genome_recovery": False,
@@ -449,7 +454,7 @@ async def test_samples_view_cansee_private_identifiers(
         cansee_datatypes=(DataType.PRIVATE_IDENTIFIERS,),
     )
 
-    # no private identifier in the output.
+    # yes private identifier in the output.
     samples = response["samples"]
     assert len(samples) == 1
     assert isinstance(samples[0].get("public_identifier", None), str)
@@ -470,6 +475,7 @@ async def test_samples_view_cansee_all(
     # yes private identifier in the output.
     assert response["samples"] == [
         {
+            "id": sample.id,
             "collection_date": str(sample.collection_date),
             "collection_location": sample.location,
             "czb_failed_genome_recovery": False,
@@ -545,6 +551,7 @@ async def test_samples_failed_accession(
     expected = {
         "samples": [
             {
+                "id": sample.id,
                 "collection_date": str(sample.collection_date),
                 "collection_location": sample.location,
                 "czb_failed_genome_recovery": False,
@@ -616,6 +623,7 @@ async def test_samples_multiple_accession(
     expected = {
         "samples": [
             {
+                "id": sample.id,
                 "collection_date": str(sample.collection_date),
                 "collection_location": sample.location,
                 "czb_failed_genome_recovery": False,
@@ -674,6 +682,7 @@ async def test_samples_view_no_pangolin(
     expected = {
         "samples": [
             {
+                "id": sample.id,
                 "collection_date": str(sample.collection_date),
                 "collection_location": sample.location,
                 "czb_failed_genome_recovery": False,

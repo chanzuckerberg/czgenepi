@@ -73,6 +73,7 @@ class SampleResponseSchema(BaseResponse):
         getter_dict = SampleGetterDict
         allow_population_by_field_name = True
 
+    id: int
     collection_date: datetime.date
     location: Optional[str] = Field(alias="collection_location")
     czb_failed_genome_recovery: bool
