@@ -1,4 +1,3 @@
-import { Button } from "czifui";
 import Footer from "./components/Footer";
 import Head from "next/head";
 import Hero from "./components/Hero";
@@ -8,13 +7,10 @@ import QuoteSlider from "./components/QuoteSlider";
 import UseCases from "./components/UseCases";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import { API } from "src/common/api";
-import ENV from "src/common/constants/ENV";
 import { ROUTES } from "src/common/routes";
 import { useUserInfo } from "../../common/queries/auth";
 import {
-  Container,
-  FooterButtonContainer
+  Container
 } from "./style";
 
 export default function Homepage(): JSX.Element {

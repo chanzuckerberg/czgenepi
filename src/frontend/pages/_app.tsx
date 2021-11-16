@@ -11,7 +11,6 @@ import { theme } from "src/common/styles/theme";
 import { setFeatureFlagsFromQueryParams } from "src/common/utils/featureFlags";
 import NavBarV2 from "src/components/NavBarV2";
 import AcknowledgePolicyChanges from "src/components/AcknowledgePolicyChanges";
-import NavBar from "src/components/NavBar";
 
 const queryClient = new QueryClient();
 setFeatureFlagsFromQueryParams();
