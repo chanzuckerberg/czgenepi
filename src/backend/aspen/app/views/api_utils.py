@@ -296,7 +296,10 @@ def get_matching_gisaid_ids(sample_ids: Iterable[str], session: Session) -> Set[
     # (Gisaid data is prepped by Nextstrain which strips off this prefix)
 
     # first create a mapping of ids that were stripped (so we can return unstripped id later)
-    stripped_mapping: Mapping[str, str] = {s.strip("hCoV-19/"): s for s in sample_ids}
+    stripped_mapping: Mapping[str, str] = {
+        (s.replace("hCoV-19/", "") if s.startswith("hCoV-19/") else s): s
+        for s in sample_ids
+    }
 
     gisaid_matches: Iterable[GisaidMetadata] = session.query(GisaidMetadata).filter(
         GisaidMetadata.strain.in_(stripped_mapping.keys())

@@ -1020,7 +1020,10 @@ def test_update_sample_public_ids(
 
     for priv, pub in private_to_public.items():
         sample = sample_factory(
-            group, user, private_identifier=priv, public_identifier=pub.strip("_update")
+            group,
+            user,
+            private_identifier=priv,
+            public_identifier=pub.replace("_update", ""),
         )
         session.add(sample)
 

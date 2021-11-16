@@ -381,6 +381,19 @@ def start_phylo_run_v2(ctx, name, tree_type, sample_ids, show_headers):
     print(resp.text)
     print(resp)
 
+@samples.command(name="validate-ids")
+@click.option("-h", "--show-headers", is_flag=True)
+@click.argument("sample_ids", nargs=-1)
+@click.pass_context
+def validate_sample_ids(ctx, sample_ids, show_headers):
+    api_client = ctx.obj["api_client"]
+    payload = { "sample_ids": sample_ids }
+    resp = api_client.post("/api/samples/validate-ids", json=payload)
+    if show_headers:
+        print(resp.headers)
+    print(resp.text)
+    print(resp)
+
 
 @phylo_runs.command(name="delete")
 @click.argument("run_ids", nargs=-1)
