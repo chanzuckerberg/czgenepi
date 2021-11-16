@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
 
+<<<<<<< HEAD
 export const Bar = styled.div`
     width: 17px;
     height: 1px;
@@ -7,6 +8,8 @@ export const Bar = styled.div`
     margin: 5px 0;
 `;
 
+=======
+>>>>>>> c0bde5b2973f3ee8dd3886096dc80abf42e0efd0
 export const ButtonLink = styled.a`
     display: inline-block;
     margin: 0 8px;
@@ -117,6 +120,18 @@ export const MobileNavToggle = styled.div`
         display: inline-block;
         cursor: pointer;
     }
+<<<<<<< HEAD
+=======
+
+    .bar1,
+    .bar2,
+    .bar3 {
+        width: 17px;
+        height: 1px;
+        background-color: #FFFFFF;
+        margin: 5px 0;
+    }
+>>>>>>> c0bde5b2973f3ee8dd3886096dc80abf42e0efd0
 `;
 
 export const MobileNavTray = styled.div`
