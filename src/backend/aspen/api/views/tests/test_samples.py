@@ -1,4 +1,5 @@
 import datetime
+import json
 from typing import Any, Optional, Sequence, Tuple
 
 import pytest
@@ -800,6 +801,7 @@ async def test_delete_sample_failures(
     user2 = user_factory(
         group2, email="test_user@othergroup.org", auth0_user_id="other_test_auth0_id"
     )
+    sample2 = sample_factory(group2, user2)  # A sample that user2 *can* delete
     async_session.add(group2)
     await async_session.commit()
 
@@ -814,3 +816,23 @@ async def test_delete_sample_failures(
     res = await async_session.execute(sa.select(Sample).filter(Sample.id == sample.id))  # type: ignore
     found_sample = res.scalars().one()  # type: ignore
     assert found_sample.id == sample.id
+
+    # Test that our multi-delete endpoint fails if any samples are denied
+    # We're using .request() because httpx is opinionated:
+    # https://www.python-httpx.org/compatibility/#request-body-on-http-methods
+    res = await http_client.request(
+        method="DELETE",
+        url="/v2/samples/",
+        content=json.dumps({"ids": [sample.id, sample2.id]}),
+        headers=auth_headers,
+    )
+    assert res.status_code == 404
+
+    # Test that our multi-delete endpoint succeeds if we only specify an owned sample
+    res = await http_client.request(
+        method="DELETE",
+        url="/v2/samples/",
+        content=json.dumps({"ids": [sample2.id]}),
+        headers=auth_headers,
+    )
+    assert res.status_code == 202

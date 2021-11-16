@@ -88,8 +88,16 @@ class SampleResponseSchema(BaseResponse):
     upload_date: Optional[datetime.datetime]
 
 
+class SampleBulkDeleteRequest(BaseRequest):
+    ids: List[int]
+
+
 class SamplesResponseSchema(BaseResponse):
     samples: List[SampleResponseSchema]
+
+
+class SampleBulkDeleteResponse(BaseResponse):
+    ids: List[int]
 
 
 class SampleDeleteResponse(BaseResponse):
