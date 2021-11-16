@@ -2,14 +2,15 @@ import datetime
 import json
 import os
 import re
-from typing import MutableSequence
+from typing import Iterable, List, MutableSequence, Set
 
 import sentry_sdk
 import sqlalchemy as sa
 from boto3 import Session
 from fastapi import APIRouter, Depends
+from sqlalchemy import or_
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import aliased, joinedload
 from sqlalchemy.orm.exc import NoResultFound
 from starlette.requests import Request
 
@@ -19,8 +20,9 @@ from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.phylo_runs import (
     PHYLO_TREE_TYPES,
     PhyloRunDeleteResponse,
-    PhyloRunRequestSchema,
-    PhyloRunResponseSchema,
+    PhyloRunRequest,
+    PhyloRunResponse,
+    PhyloRunsListResponse,
 )
 from aspen.api.settings import Settings
 from aspen.api.utils import get_matching_gisaid_ids
@@ -30,8 +32,10 @@ from aspen.app.views.api_utils import (
 )
 from aspen.database.models import (
     AlignedGisaidDump,
+    DataType,
     PathogenGenome,
     PhyloRun,
+    PhyloTree,
     Sample,
     TreeType,
     User,
@@ -44,12 +48,12 @@ router = APIRouter()
 
 @router.post("/")
 async def kick_off_phylo_run(
-    phylo_run_request: PhyloRunRequestSchema,
+    phylo_run_request: PhyloRunRequest,
     request: Request,
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_auth_user),
-) -> PhyloRunResponseSchema:
+) -> PhyloRunResponse:
     # Note - sample run will be associated with users's primary group.
     #    (do we want admins to be able to start runs on behalf of other dph's ?)
     group = user.group
@@ -139,6 +143,7 @@ async def kick_off_phylo_run(
         gisaid_ids=list(gisaid_ids),
         tree_type=TreeType(phylo_run_request.tree_type),
         user=user,
+        outputs=[],  # Make our response schema happy.
     )
     workflow.inputs = list(pathogen_genomes)
     workflow.inputs.append(aligned_gisaid_dump)
@@ -185,7 +190,7 @@ async def kick_off_phylo_run(
         input=json.dumps(sfn_input_json),
     )
 
-    return PhyloRunResponseSchema.from_orm(workflow)
+    return PhyloRunResponse.from_orm(workflow)
 
 
 async def get_editable_phylo_run_by_id(db, run_id, user):
@@ -215,8 +220,37 @@ async def list_runs(
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_auth_user),
-) -> bool:
-    return False
+) -> PhyloRunsListResponse:
+    cansee_owner_group_ids: Set[int] = {
+        cansee.owner_group_id
+        for cansee in user.group.can_see
+        if cansee.data_type == DataType.TREES
+    }
+    phylo_run_alias = aliased(PhyloRun)
+    phylo_runs_query = (
+        sa.select(phylo_run_alias)  # type: ignore
+        .options(
+            joinedload(phylo_run_alias.outputs.of_type(PhyloTree)),
+            joinedload(phylo_run_alias.user),  # For Pydantic serialization
+            joinedload(phylo_run_alias.group),  # For Pydantic serialization
+        )
+        .filter(
+            or_(
+                user.system_admin,
+                phylo_run_alias.group_id == user.group.id,
+                phylo_run_alias.group_id.in_(cansee_owner_group_ids),
+            )
+        )
+    )
+    phylo_run_results = await db.execute(phylo_runs_query)
+    phylo_runs: Iterable[PhyloRun] = phylo_run_results.unique().scalars().all()
+
+    # filter for only information we need in sample table view
+    results: List[PhyloRunResponse] = []
+    for phylo_run in phylo_runs:
+        results.append(PhyloRunResponse.from_orm(phylo_run))
+
+    return PhyloRunsListResponse(phylo_runs=results)
 
 
 @router.delete("/{item_id}")
