@@ -69,7 +69,7 @@ def create_public_ids(
     """
 
     group: Group = db_session.query(Group).filter(Group.id == group_id).one()
-    next_id: Union[int, None] = db_session.query(func.max(Sample.id)).scalar()
+    next_id: Optional[int] = db_session.query(func.max(Sample.id)).scalar()
 
     # catch if no max
     if not next_id:

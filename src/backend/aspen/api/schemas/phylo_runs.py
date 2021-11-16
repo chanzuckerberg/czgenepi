@@ -1,6 +1,6 @@
 import datetime
 import re
-from typing import Dict, List, Union
+from typing import Dict, List, Optional
 
 from pydantic import constr, Field, root_validator, StrictStr, validator
 
@@ -69,8 +69,8 @@ class TreeResponse(BaseResponse):
         return values
 
     id: int
-    name: Union[None, str] = None
-    s3_key: Union[None, str] = None
+    name: Optional[str]
+    s3_key: Optional[str]
 
 
 class PhyloRunResponse(BaseResponse):
@@ -114,17 +114,17 @@ class PhyloRunResponse(BaseResponse):
 
     id: int
     start_datetime: datetime.datetime
-    end_datetime: Union[datetime.datetime, None] = None
+    end_datetime: Optional[datetime.datetime]
     workflow_status: str
     template_args: Dict
-    name: Union[str, None]
+    name: Optional[str]
     group: GroupResponse
-    template_file_path: Union[None, StrictStr]
-    tree_type: Union[None, str]
-    user: Union[UserResponse, None] = None
+    template_file_path: Optional[StrictStr]
+    tree_type: Optional[str]
+    user: Optional[UserResponse]
 
     # This lets us remap phlo_run.outputs to phylo_run.phylo_tree using the validator above
-    outputs: Union[TreeResponse, None] = Field(alias="phylo_tree")
+    outputs: Optional[TreeResponse] = Field(alias="phylo_tree")
 
 
 class PhyloRunDeleteResponse(BaseResponse):

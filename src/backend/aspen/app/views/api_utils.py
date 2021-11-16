@@ -47,9 +47,7 @@ def format_datetime(dt: Optional[datetime.datetime], format="%Y-%m-%d %I:%M%p") 
         return "N/A"
 
 
-def format_sequencing_date(
-    dt: str, format="%Y-%m-%d"
-) -> Union[None, datetime.datetime]:
+def format_sequencing_date(dt: str, format="%Y-%m-%d") -> Optional[datetime.datetime]:
     if dt == "":
         return None
     return datetime.datetime.strptime(dt, format)
@@ -92,8 +90,8 @@ def get_existing_public_ids(
 def check_duplicate_samples(
     data: Mapping,
     session: Session,
-    group_id: Union[None, int] = None,
-) -> Union[None, Mapping[str, list[str]]]:
+    group_id: Optional[int] = None,
+) -> Optional[Mapping[str, list[str]]]:
     """
     Checks incoming `data` for duplicate private/public IDs of pre-existing IDs.
 
@@ -121,7 +119,7 @@ def check_duplicate_samples(
 
 def check_duplicate_data_in_request(
     data: Mapping,
-) -> Union[None, Mapping[str, list[str]]]:
+) -> Optional[Mapping[str, list[str]]]:
     private_ids, public_ids = get_all_identifiers_in_request(data)
     private_id_counts = [id for id, count in Counter(private_ids).items() if count > 1]
     public_id_counts = [
