@@ -5,7 +5,7 @@ import { StyledListItem } from "./style";
 interface Props {
   items: React.ReactNode[];
   ordered?: boolean;
-  listItemsShiftedLeft?: "s" | "m" | "l" | "xl"; // this prob will be used in styling for adding margin left
+  listItemsShiftedLeft?: "s" | "m" | "l" | "xl"; // this prop will be used in styling for adding margin left
 }
 
 const List = ({ items, ordered, listItemsShiftedLeft }: Props): JSX.Element => {

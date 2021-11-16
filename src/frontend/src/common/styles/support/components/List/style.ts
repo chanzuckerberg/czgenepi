@@ -2,7 +2,7 @@ import styled from "@emotion/styled";
 import { getSpaces, ListItem, Props } from "czifui";
 
 interface ListItemProps extends Props {
-  // this prop is used for indenting list items
+  // this prop is used for indenting list items (undefined means list items will be indented 0px)
   listItemsShiftedLeft: "xs" | "s" | "m" | "l" | "xl" | undefined;
 }
 
