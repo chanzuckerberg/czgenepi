@@ -3,7 +3,7 @@ import { jsonToType } from "src/common/utils";
 
 export enum API {
   USER_INFO = "/api/usergroup",
-  SAMPLES = "/v2/samples/",
+  SAMPLES = "/api/samples",
   LOG_IN = "/login",
   LOG_OUT = "/logout",
   PHYLO_TREES = "/api/phylo_trees",
