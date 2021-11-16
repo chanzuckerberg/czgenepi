@@ -5,7 +5,7 @@ import {
     UseCasesExampleCopy
 } from "./style";
 
-export default function UseCasesExample(props): JSX.Element {
+export default function UseCasesExample(props: { headline: string; copy: string; }): JSX.Element {
 
     return (
         <UseCasesExampleContainer>

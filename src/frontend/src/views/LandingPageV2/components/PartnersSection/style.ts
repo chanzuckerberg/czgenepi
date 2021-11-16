@@ -1,5 +1,13 @@
 import styled from "@emotion/styled";
 
+export const NextstrainLogo = styled.div`
+    max-width: 196px;
+`;
+
+export const PangolinLogo = styled.div`
+    max-width: 171px;
+`;
+
 export const PartnerLink = styled.a`
     display: flex;
     justify-content:center;
@@ -33,4 +41,8 @@ export const PartnersSectionContainer = styled.div`
     @media (max-width: 768px) {
         flex-direction: column;
     }
+`;
+
+export const UsherLogo = styled.div`
+    max-width: 107px;
 `;

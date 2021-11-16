@@ -136,3 +136,5 @@ function marginBottom(props: { theme?: AppThemeOptions }) {
       margin-bottom: ${spaces?.s}px;
     `;
 }
+
+export const LoadingText = styled.div``;

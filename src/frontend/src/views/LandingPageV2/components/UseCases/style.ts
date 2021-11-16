@@ -43,7 +43,7 @@ export const UseCasesHeader = styled.h2`
     }
 `;
 
-export const UseCasesImage = styled.img`
+export const UseCasesImage = styled.div`
     width: 100%;
     height: auto;
 
@@ -52,7 +52,7 @@ export const UseCasesImage = styled.img`
     }
 `;
 
-export const UseCasesImageMobile = styled.img`
+export const UseCasesImageMobile = styled.div`
 
     display: none;
 
