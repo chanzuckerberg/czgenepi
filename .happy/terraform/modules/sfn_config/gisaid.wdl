@@ -240,8 +240,9 @@ task AlignGISAID {
 
     start_time=$(date +%s)
     build_id=$(date +%Y%m%d-%H%M)
-
-    git clone --depth 1 git://github.com/nextstrain/ncov /ncov
+    
+    # We're pinning to a specific git hash in the Dockerfile so we're not cloning this here.
+    # git clone --depth 1 git://github.com/nextstrain/ncov /ncov
     ncov_git_rev=$(git -C /ncov rev-parse HEAD)
 
     # fetch the gisaid dataset
