@@ -67,13 +67,8 @@ export const ButtonLink = styled.a`
 `;
 
 export const HeaderTopLinks = styled.div`
-<<<<<<< HEAD
   position: relative;
   z-index: 2;
-=======
-    position: relative;
-    z-index: 2;
->>>>>>> 68765c5 (next 12 build/image fixes. responsiveness updates for Footer and Use Cases sections. NavBarV2 bug fixes.)
 
   @media (max-width: 768px) {
     display: none;
@@ -94,17 +89,10 @@ export const HeaderContainer = styled.div`
 `;
 
 export const HeaderLogoContainer = styled.a`
-<<<<<<< HEAD
   width: 100%;
   max-width: 164px;
   position: relative;
   z-index: 2;
-=======
-    width: 100%;
-    max-width: 164px;
-    position: relative;
-    z-index: 2;
->>>>>>> 68765c5 (next 12 build/image fixes. responsiveness updates for Footer and Use Cases sections. NavBarV2 bug fixes.)
 
   @media (max-width: 768px) {
     max-width: 100px;
@@ -160,15 +148,9 @@ export const MobileNavSeparator = styled.div`
 `;
 
 export const MobileNavToggle = styled.div`
-<<<<<<< HEAD
   display: none;
   position: relative;
   z-index: 2;
-=======
-    display: none;
-    position: relative;
-    z-index: 2;
->>>>>>> 68765c5 (next 12 build/image fixes. responsiveness updates for Footer and Use Cases sections. NavBarV2 bug fixes.)
 
   @media (max-width: 768px) {
     display: inline-block;
