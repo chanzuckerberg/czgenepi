@@ -1,13 +1,8 @@
 import React, { useState } from "react";
-<<<<<<< HEAD
 import CloseIcon from "src/common/images/close-icon.svg";
 import HeaderLogo from "src/common/images/logo.svg";
 import {
     Bar,
-=======
-import HeaderLogo from "src/common/images/logo.svg";
-import {
->>>>>>> c0bde5b2973f3ee8dd3886096dc80abf42e0efd0
     ButtonLink,
     HeaderContainer,
     HeaderLogoContainer,
