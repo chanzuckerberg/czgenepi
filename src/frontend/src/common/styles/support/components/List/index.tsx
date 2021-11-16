@@ -1,4 +1,4 @@
-import { List as RawList, ListItem } from "czifui";
+import { List as RawList } from "czifui";
 import React from "react";
 import { StyledListItem } from "./style";
 

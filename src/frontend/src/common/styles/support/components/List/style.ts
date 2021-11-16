@@ -1,13 +1,10 @@
 import styled from "@emotion/styled";
-import { getSpaces } from "czifui";
-import { ListItem, Props } from "czifui";
-
-
+import { getSpaces, ListItem, Props } from "czifui";
 
 interface ListItemProps extends Props {
   // this prop is used for indenting list items
   listItemsShiftedLeft: "xs" | "s" | "m" | "l" | "xl" | undefined;
-};
+}
 
 const doNotForwardProps = ["listItemsShiftedLeft"];
 
