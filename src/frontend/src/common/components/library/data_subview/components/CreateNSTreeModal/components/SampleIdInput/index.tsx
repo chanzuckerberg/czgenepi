@@ -1,7 +1,9 @@
 import { compact, filter } from "lodash";
 import React, { ChangeEvent, useCallback, useEffect, useState } from "react";
-import { useMutation } from "react-query";
-import { validateSampleIdentifiers } from "src/common/queries/samples";
+import {
+  SampleValidationResponseType,
+  useValidateSampleIds,
+} from "src/common/queries/samples";
 import { pluralize } from "src/common/utils/strUtils";
 import { InputInstructions } from "./components/InputInstructions";
 import {
@@ -67,34 +69,31 @@ const SampleIdInput = ({
     return compact(trimmedTokens);
   }, [inputValue]);
 
-  const validateSampleIdentifiersMutation = useMutation(
-    validateSampleIdentifiers,
-    {
-      onError: () => {
-        setValidating(false);
-        setShowAddButton(false);
-        setFoundSampleIds([]);
-        setMissingSampleIds([]);
-        setIdsInFlight([]);
-        handleInputValidation([], []);
-        setInputDisplayValue("");
-        setInEditMode(true);
-      },
-      onSuccess: (data: any) => {
-        setValidating(false);
-        setShowAddButton(false);
-        setHasUnsavedChanges(false);
+  const validateSampleIdentifiersMutation = useValidateSampleIds({
+    onError: () => {
+      setValidating(false);
+      setShowAddButton(false);
+      setFoundSampleIds([]);
+      setMissingSampleIds([]);
+      setIdsInFlight([]);
+      handleInputValidation([], []);
+      setInputDisplayValue("");
+      setInEditMode(true);
+    },
+    onSuccess: (data: SampleValidationResponseType) => {
+      setValidating(false);
+      setShowAddButton(false);
+      setHasUnsavedChanges(false);
 
-        const missingIds = data["missing_sample_ids"];
-        const foundIds = filter(idsInFlight, (id) => !missingIds.includes(id));
+      const missingIds = data["missing_sample_ids"];
+      const foundIds = filter(idsInFlight, (id) => !missingIds.includes(id));
 
-        setIdsInFlight([]);
-        setFoundSampleIds(foundIds);
-        setMissingSampleIds(missingIds);
-        handleInputValidation(foundIds, missingIds);
-      },
-    }
-  );
+      setIdsInFlight([]);
+      setFoundSampleIds(foundIds);
+      setMissingSampleIds(missingIds);
+      handleInputValidation(foundIds, missingIds);
+    },
+  });
 
   useEffect(() => {
     if (shouldValidate) {
