@@ -2,6 +2,7 @@ import styled from "@emotion/styled";
 import { fontBodyXs, getIconSizes, getSpaces, Props } from "czifui";
 import ArrowDownIcon from "src/common/icons/IconArrowDownSmall.svg";
 import ArrowUpIcon from "src/common/icons/IconArrowUpSmall.svg";
+import { transparentScrollbars } from "src/common/styles/support/style";
 import { StyledCallout as Callout } from "../../../FailedSampleAlert/style";
 
 const smallIcon = (props: Props) => {
@@ -33,6 +34,9 @@ export const RowFlexContainer = styled.div`
 export const ColumnFlexContainer = styled.div`
   display: flex;
   flex-direction: column;
+  .MuiCollapse-root {
+    ${transparentScrollbars}
+  }
 `;
 
 export const StaticSizeDiv = styled.div`

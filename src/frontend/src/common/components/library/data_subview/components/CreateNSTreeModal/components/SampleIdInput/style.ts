@@ -10,6 +10,7 @@ import {
   Props,
 } from "czifui";
 import LoadingAnimation from "src/common/icons/IconLoadingAnimated.svg";
+import { transparentScrollbars } from "src/common/styles/support/style";
 
 const inputPadding = (props: Props) => {
   const spaces = getSpaces(props);
@@ -33,12 +34,8 @@ export const StyledTextArea = styled(TextField)`
 
   textarea {
     ${fontBodyXs}
+    ${transparentScrollbars}
     resize: vertical;
-    scrollbar-color: transparent unset;
-
-    &::-webkit-scrollbar-track {
-      background: transparent;
-    }
   }
 
   ${(props: ExtraProps) => {
