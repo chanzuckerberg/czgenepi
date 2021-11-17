@@ -1,5 +1,5 @@
 import logging
-from typing import Union
+from typing import Optional
 
 import sentry_sdk
 import sqlalchemy as sa
@@ -26,9 +26,7 @@ def get_usergroup_query(session: AsyncSession, auth0_user_id: str) -> Query:
     )
 
 
-async def setup_userinfo(
-    session: AsyncSession, auth0_user_id: str
-) -> Union[User, None]:
+async def setup_userinfo(session: AsyncSession, auth0_user_id: str) -> Optional[User]:
     sentry_sdk.set_user(
         {
             "requested_user_id": auth0_user_id,
