@@ -12,6 +12,7 @@ import {
   P,
   Title,
 } from "src/common/styles/support/style";
+import { StyledNewTabLink } from "./style";
 
 export default function Resources(): JSX.Element {
   function Intro() {
@@ -46,17 +47,17 @@ export default function Resources(): JSX.Element {
             marginLeft={"m"}
             items={[
               <span key={0}>
-                <NewTabLink href="https://www.youtube.com/watch?v=Bt3JNKfU5qk">
+                <StyledNewTabLink href="https://www.youtube.com/watch?v=Bt3JNKfU5qk">
                   Week 1
-                </NewTabLink>{" "}
+                </StyledNewTabLink>{" "}
                 - Today we discussed the overlapping timescales of pathogen
                 evolution and infectious disease transmission, and how to build
                 phylogenetic trees that visualize genetic divergence.
               </span>,
               <span key={1}>
-                <NewTabLink href="https://www.youtube.com/watch?v=zAtgJjoy6-w">
+                <StyledNewTabLink href="https://www.youtube.com/watch?v=zAtgJjoy6-w">
                   Week 2
-                </NewTabLink>{" "}
+                </StyledNewTabLink>{" "}
                 - During this seminar we discussed measuring divergence over
                 time in order to estimate the average rate of evolution of a
                 pathogen. We also discussed how to use that rate to make
@@ -64,9 +65,9 @@ export default function Resources(): JSX.Element {
                 time.
               </span>,
               <span key={2}>
-                <NewTabLink href="https://www.youtube.com/watch?v=jYpjzP22HcM">
+                <StyledNewTabLink href="https://www.youtube.com/watch?v=jYpjzP22HcM">
                   Week 3
-                </NewTabLink>{" "}
+                </StyledNewTabLink>{" "}
                 - This week we discussed phylogeography, the technique in
                 genomic epidemiology of inferring spatial migration patterns of
                 a pathogen across the tree. We discussed the inferential
@@ -74,18 +75,18 @@ export default function Resources(): JSX.Element {
                 cautious about.
               </span>,
               <span key={3}>
-                <NewTabLink href="https://www.youtube.com/watch?v=qllORYfM_z8">
+                <StyledNewTabLink href="https://www.youtube.com/watch?v=qllORYfM_z8">
                   Week 4
-                </NewTabLink>
+                </StyledNewTabLink>{" "}
                 - In this seminar we discuss Nextstrain, especially how
                 pipelines are specified in Nextstrain Augur, and different ways
                 to navigate the genomic data visualization in Nextstrain
                 Auspice.
               </span>,
               <span key={4}>
-                <NewTabLink href="https://www.youtube.com/watch?v=eeYgWdRbPPo">
+                <StyledNewTabLink href="https://www.youtube.com/watch?v=eeYgWdRbPPo">
                   Week 5
-                </NewTabLink>{" "}
+                </StyledNewTabLink>{" "}
                 - This week we discussed consensus genome quality control,
                 including different quality metrics, the impact of different
                 quality issues on downstream analyses, and how to look at BAM
@@ -93,9 +94,9 @@ export default function Resources(): JSX.Element {
                 genome.
               </span>,
               <span key={5}>
-                <NewTabLink href="https://www.youtube.com/watch?v=GJMTNwDKibI">
+                <StyledNewTabLink href="https://www.youtube.com/watch?v=GJMTNwDKibI">
                   Week 6
-                </NewTabLink>{" "}
+                </StyledNewTabLink>{" "}
                 - This week we talked all about data types and data
                 organization. We discussed how using data models helps to
                 organize genomic surveillance metadata and specifically
@@ -107,18 +108,18 @@ export default function Resources(): JSX.Element {
                 calls in BAM files.
               </span>,
               <span key={6}>
-                <NewTabLink href="https://www.youtube.com/watch?v=HVorizRS4wk">
+                <StyledNewTabLink href="https://www.youtube.com/watch?v=HVorizRS4wk">
                   Week 7
-                </NewTabLink>{" "}
+                </StyledNewTabLink>{" "}
                 - In today&apos;s seminar we talked about phylogenetic
                 nomenclature systems (why we use them and types of systems). We
                 finished off with a more detailed discussion of the Pango
                 nomenclature system for SARS-CoV-2.
               </span>,
               <span key={7}>
-                <NewTabLink href="https://www.youtube.com/watch?v=ycM50nC5wXk">
+                <StyledNewTabLink href="https://www.youtube.com/watch?v=ycM50nC5wXk">
                   Week 8
-                </NewTabLink>{" "}
+                </StyledNewTabLink>{" "}
                 - This week we tackled the tricky subject of sampling design.
                 While we don&apos;t (yet) have formal frameworks for estimating
                 sample size in genomic epidemiology, today we discussed study
@@ -126,18 +127,18 @@ export default function Resources(): JSX.Element {
                 different types of genomic epidemiological questions/studies.
               </span>,
               <span key={8}>
-                <NewTabLink href="https://www.youtube.com/watch?v=a8bp0iHCttA">
+                <StyledNewTabLink href="https://www.youtube.com/watch?v=a8bp0iHCttA">
                   Week 9
-                </NewTabLink>{" "}
+                </StyledNewTabLink>{" "}
                 - In this week&apos;s seminar I introduced
                 &quot;phylodynamic&quot; analysis - a particular area of genomic
                 epidemiology where we infer changes in pathogen population size
                 from the shapes of coalescent phylogenetic trees.
               </span>,
               <span key={9}>
-                <NewTabLink href="https://www.youtube.com/watch?v=cLLV2VpgXCU">
+                <StyledNewTabLink href="https://www.youtube.com/watch?v=cLLV2VpgXCU">
                   Week 10
-                </NewTabLink>{" "}
+                </StyledNewTabLink>{" "}
                 - This week I gave a demo of Aspen, the new piece of software
                 that CZI is developing for managing genomic data, that
                 eventually will allows folks to build Nextstrain trees
@@ -148,51 +149,51 @@ export default function Resources(): JSX.Element {
                 recording of this video, Aspen has added this capability.]
               </span>,
               <span key={10}>
-                <NewTabLink href="https://www.youtube.com/watch?v=lFJ_2G4u8w4">
+                <StyledNewTabLink href="https://www.youtube.com/watch?v=lFJ_2G4u8w4">
                   Week 11
-                </NewTabLink>{" "}
+                </StyledNewTabLink>{" "}
                 - This week Dr. Sidney Bell joined us to discuss antigenic
                 evolution of viruses - that is, how viral surface proteins can
                 change how they &quot;look&quot; to our immune systems, and in
                 some cases eventually escape our immunity.
               </span>,
               <span key={10}>
-                <NewTabLink href="https://www.youtube.com/watch?v=7nyq5Mc_pOo">
+                <StyledNewTabLink href="https://www.youtube.com/watch?v=7nyq5Mc_pOo">
                   Week 12
-                </NewTabLink>{" "}
+                </StyledNewTabLink>{" "}
                 - This week I compared and contrasted phylogenetic placements
                 versus phylogenetic trees, and described the different
                 situations when I prefer one over the other.
               </span>,
               <span key={11}>
-                <NewTabLink href="https://www.youtube.com/watch?v=0ms0FYmpfDc">
+                <StyledNewTabLink href="https://www.youtube.com/watch?v=0ms0FYmpfDc">
                   Week 13
-                </NewTabLink>{" "}
+                </StyledNewTabLink>{" "}
                 - This week we branched out from SARS-CoV-2, and I gave some
                 examples of how you can use genomic epidemiology to investigate
                 the epidemiology of TB.
               </span>,
               <span key={12}>
-                <NewTabLink href="https://www.youtube.com/watch?v=pk-ap-1Uicc">
+                <StyledNewTabLink href="https://www.youtube.com/watch?v=pk-ap-1Uicc">
                   Week 14
-                </NewTabLink>{" "}
+                </StyledNewTabLink>{" "}
                 - This week the focus was on practical applications of genomic
                 epidemiology, and I walked through some case studies showing
                 different ways in which genomic epidemiology has supported epi
                 investigations in California.
               </span>,
               <span key={13}>
-                <NewTabLink href="https://www.youtube.com/watch?v=4uE2lEpGo2k">
+                <StyledNewTabLink href="https://www.youtube.com/watch?v=4uE2lEpGo2k">
                   Week 15
-                </NewTabLink>{" "}
+                </StyledNewTabLink>{" "}
                 - This week was another short break from SARS-CoV-2, and we
                 turned our attention towards genomic epidemiology of a different
                 viral pathogen - Mumps virus.
               </span>,
               <span key={14}>
-                <NewTabLink href="https://www.youtube.com/watch?v=RbK6Bv4-fnc">
+                <StyledNewTabLink href="https://www.youtube.com/watch?v=RbK6Bv4-fnc">
                   Aspen Tutorial!
-                </NewTabLink>{" "}
+                </StyledNewTabLink>{" "}
                 - This tutorial introduces self-serve tree building in Aspen,
                 and discusses what the different tree types are useful for.
               </span>,
