@@ -43,7 +43,7 @@ export default function Resources(): JSX.Element {
         <H3>Seminar Recordings</H3>
         <div>
           <List
-            listItemsShiftedLeft={"m"}
+            marginLeft={"m"}
             items={[
               <span key={0}>
                 <NewTabLink href="https://www.youtube.com/watch?v=Bt3JNKfU5qk">
@@ -156,7 +156,7 @@ export default function Resources(): JSX.Element {
                 some cases eventually escape our immunity.
               </span>,
               <span key={10}>
-                <NewTabLink href="https://www.youtube.com/watch?v=lFJ_2G4u8w4">
+                <NewTabLink href="https://www.youtube.com/watch?v=7nyq5Mc_pOo">
                   Week 12
                 </NewTabLink>{" "}
                 - This week I compared and contrasted phylogenetic placements
@@ -164,7 +164,7 @@ export default function Resources(): JSX.Element {
                 situations when I prefer one over the other.
               </span>,
               <span key={11}>
-                <NewTabLink href="https://www.youtube.com/watch?v=lFJ_2G4u8w4">
+                <NewTabLink href="https://www.youtube.com/watch?v=0ms0FYmpfDc">
                   Week 13
                 </NewTabLink>{" "}
                 - This week we branched out from SARS-CoV-2, and I gave some
@@ -172,7 +172,7 @@ export default function Resources(): JSX.Element {
                 the epidemiology of TB.
               </span>,
               <span key={12}>
-                <NewTabLink href="https://www.youtube.com/watch?v=lFJ_2G4u8w4">
+                <NewTabLink href="https://www.youtube.com/watch?v=pk-ap-1Uicc">
                   Week 14
                 </NewTabLink>{" "}
                 - This week the focus was on practical applications of genomic
@@ -181,7 +181,7 @@ export default function Resources(): JSX.Element {
                 investigations in California.
               </span>,
               <span key={13}>
-                <NewTabLink href="https://www.youtube.com/watch?v=lFJ_2G4u8w4">
+                <NewTabLink href="https://www.youtube.com/watch?v=4uE2lEpGo2k">
                   Week 15
                 </NewTabLink>{" "}
                 - This week was another short break from SARS-CoV-2, and we
@@ -189,7 +189,7 @@ export default function Resources(): JSX.Element {
                 viral pathogen - Mumps virus.
               </span>,
               <span key={14}>
-                <NewTabLink href="https://www.youtube.com/watch?v=lFJ_2G4u8w4">
+                <NewTabLink href="https://www.youtube.com/watch?v=RbK6Bv4-fnc">
                   Aspen Tutorial!
                 </NewTabLink>{" "}
                 - This tutorial introduces self-serve tree building in Aspen,
