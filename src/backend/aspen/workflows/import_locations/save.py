@@ -1,75 +1,35 @@
-import csv
-import datetime
-import io
-import re
-import uuid
-from typing import Dict, List, Optional
-
-import arrow
 import click
-import sqlalchemy as sa
-from sqlalchemy import Column, MetaData, Table
-from sqlalchemy.schema import CreateTable, DropTable
 
-from aspen.api.settings import get_settings
+from aspen.config.config import Config
 from aspen.database.connection import (
     get_db_uri,
     init_db,
     session_scope,
     SqlAlchemyInterface,
 )
-from aspen.database.models import Location
 
 
 @click.command("save")
-@click.option("location_fh", "--location-data", type=click.File("r"), required=True)
 @click.option("--test", type=bool, is_flag=True)
-async def cli(
-    metadata_fh: io.TextIOBase,
+def cli(
     test: bool,
 ):
     if test:
         print("Success!")
         return
-    data = csv.DictReader(metadata_fh, delimiter="\t")
 
-    settings = get_settings()
-    interface: SqlAlchemyInterface = init_async_db(settings.DB_DSN)
-    fields_to_import = [
-        "region",
-        "country",
-        "division",
-        "location",
-    ]
-    num_rows = 0
+    interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
     with session_scope(interface) as session:
+        # Insert all locations from gisaid_metadata
+        insert_rows_from_gisaid = "INSERT INTO aspen.locations (region, country, division, location) SELECT DISTINCT region, country, division, location FROM aspen.gisaid_metadata ON CONFLICT (region, country, division, location) DO NOTHING"
+        # Make sure we have equivalent rows for region/country/division but with null locations
+        insert_rows_with_null_locations = "INSERT INTO aspen.locations (region, country, division) SELECT DISTINCT region, country, division FROM aspen.locations EXCEPT SELECT DISTINCT region, country, division FROM aspen.locations WHERE location IS NULL"
+        session.execute(insert_rows_from_gisaid)
+        session.execute(insert_rows_with_null_locations)
 
-        dest_table = Location.__table__
-        temp_table = create_temp_table(session, dest_table)
-
-        objects: List[Dict[str, Optional[str]]] = []
-        # We need to only insert new rows, and we can't swap out a temp table
-        # Since we want our ID's to be consistent.
-        for row in data:
-           query = (sa.select(Location)
-                    .filter(sa.and_(
-                        # TODO -- how does SA handle nulls here? Will it treat these as `= ""` or `is null` ?
-                        Location.region == row.region,
-                        Location.country == row.country,
-                        Location.division == row.division,
-                        Location.location == row.location,
-                        )))
-            res = await db.execute(query)
-            try:
-                # Try to find an existing location with the data in this row
-                match = res.scalars.one()
-            except:
-                # If it doesn't find a match, insert a new row
-                new_row = Location(region=row.region, country=row.country, division=row.division, location=row.location)
-                session.add(new_row
         session.commit()
 
-        print(f"Successfully imported {num_rows}")
+        print(f"Successfully imported locations!")
 
 
 if __name__ == "__main__":
