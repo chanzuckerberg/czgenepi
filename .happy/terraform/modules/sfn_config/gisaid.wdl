@@ -36,15 +36,6 @@ workflow LoadGISAID {
         processed_gisaid_object_id = TransformGISAID.entity_id,
     }
 
-    call ImportLocations {
-        input:
-        docker_image_id = docker_image_id,
-        aws_region = aws_region,
-        aspen_config_secret_name = aspen_config_secret_name,
-        remote_dev_prefix = remote_dev_prefix,
-        gisaid_metadata = TransformGISAID.entity_id,
-    }
-
     call ImportGISAID {
         input:
         docker_image_id = docker_image_id,
@@ -52,6 +43,15 @@ workflow LoadGISAID {
         aspen_config_secret_name = aspen_config_secret_name,
         remote_dev_prefix = remote_dev_prefix,
         gisaid_metadata = AlignGISAID.gisaid_metadata,
+    }
+
+    call ImportLocations {
+        input:
+        docker_image_id = docker_image_id,
+        aws_region = aws_region,
+        aspen_config_secret_name = aspen_config_secret_name,
+        remote_dev_prefix = remote_dev_prefix,
+        gisaid_import_complete = ImportGISAID.gisaid_import_complete,
     }
 
     output {
@@ -325,7 +325,12 @@ task ImportGISAID {
     export PYTHONUNBUFFERED=true
     python3 /usr/src/app/aspen/workflows/import_gisaid/save.py       \
             --metadata-file ~{gisaid_metadata} 1>&2
+    echo done > gisaid_import_complete
     >>>
+
+    output {
+        String gisaid_import_complete = read_string("gisaid_import_complete")
+    }
 
     runtime {
         docker: docker_image_id
@@ -338,6 +343,7 @@ task ImportLocations {
         String aws_region
         String aspen_config_secret_name
         String remote_dev_prefix
+        String gisaid_import_complete
         File gisaid_metadata
     }
 
