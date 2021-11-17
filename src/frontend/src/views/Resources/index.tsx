@@ -14,20 +14,22 @@ import {
 } from "src/common/styles/support/style";
 
 export default function Resources(): JSX.Element {
-  const renderIntro = () => (
-    <Title>
-      <H1>Gen Epi Resources</H1>
-    </Title>
-  );
+  function Intro() {
+    return (
+      <Title>
+        <H1>Gen Epi Resources</H1>
+      </Title>
+    );
+  }
 
-  const renderGenomicEpiSeries = () => {
+  function GenomicEpiSeries() {
     return (
       <>
         <H2>Genomic Epidemiology Seminar Series</H2>
         <P>
           <B>
-            Seminars occur every second Thursday from 11am to 12pm PST over
-            Zoom.
+            Seminars occur every second Thursday from 11am to 12pm Pacific time
+            over Zoom.
           </B>
           If you would like to be added to the calendar invitation, please email
           Alli Black at{" "}
@@ -68,7 +70,7 @@ export default function Resources(): JSX.Element {
                 - This week we discussed phylogeography, the technique in
                 genomic epidemiology of inferring spatial migration patterns of
                 a pathogen across the tree. We discussed the inferential
-                procedure that allows this, as well caveats and things to be
+                procedure that allows this, as well as caveats and things to be
                 cautious about.
               </span>,
               <span key={3}>
@@ -108,10 +110,10 @@ export default function Resources(): JSX.Element {
                 <NewTabLink href="https://www.youtube.com/watch?v=HVorizRS4wk">
                   Week 7
                 </NewTabLink>{" "}
-                - In todays seminar we talked about phylogenetic nomenclature
-                systems (why we use them and types of systems). We finished off
-                with a more detailed discussion of how the Pango nomenclature
-                system for SARS-CoV-2.
+                - In today&apos;s seminar we talked about phylogenetic
+                nomenclature systems (why we use them and types of systems). We
+                finished off with a more detailed discussion of how the Pango
+                nomenclature system for SARS-CoV-2.
               </span>,
               <span key={7}>
                 <NewTabLink href="https://www.youtube.com/watch?v=ycM50nC5wXk">
@@ -175,7 +177,7 @@ export default function Resources(): JSX.Element {
                 </NewTabLink>{" "}
                 - This week the focus was on practical applications of genomic
                 epidemiology, and I walked through some case studies showing
-                different ways in which genomic epidemiology had supported epi
+                different ways in which genomic epidemiology has supported epi
                 investigations in California.
               </span>,
               <span key={13}>
@@ -198,9 +200,9 @@ export default function Resources(): JSX.Element {
         </div>
       </>
     );
-  };
+  }
 
-  const renderQuestions = () => {
+  function Questions() {
     return (
       <>
         <H3>Questions?</H3>
@@ -210,7 +212,7 @@ export default function Resources(): JSX.Element {
         </P>
       </>
     );
-  };
+  }
 
   return (
     <>
@@ -218,9 +220,9 @@ export default function Resources(): JSX.Element {
         <title>Aspen | Resources</title>
       </Head>
       <NarrowContainer>
-        {renderIntro()}
-        {renderGenomicEpiSeries()}
-        {renderQuestions()}
+        <Intro />
+        <GenomicEpiSeries />
+        <Questions />
         <div style={{ height: "50px" }} />
       </NarrowContainer>
     </>
