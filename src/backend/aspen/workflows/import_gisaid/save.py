@@ -64,7 +64,9 @@ def cli(
         "strain",
         "pango_lineage",
         "GISAID_clade",
+        "gisaid_epi_isl",
         "region",
+        "country",
         "division",
         "location",
     ]
