@@ -1,8 +1,7 @@
-# SCC runs are enabled for both prod and staging.  All other runs are only enabled for prod.
 locals {
   nextstrain_sfn_memory = 64000
   nextstrain_sfn_vcpus = 10
-  nextstrain_cron_schedule = local.deployment_stage == "prod" ? ["cron(0 5 ? * MON-SAT *)"] : []
+  nextstrain_cron_schedule = local.deployment_stage == "prod" ? ["cron(0 5 ? * MON *)"] : []
 }
 
 module nextstrain_scc_contextual_sfn_config {
