@@ -304,6 +304,13 @@ def get_tree_sample_ids(ctx, tree_id):
 def samples():
     pass
 
+@samples.command(name="list")
+@click.pass_context
+def list_samples(ctx):
+    api_client = ctx.obj["api_client"]
+    resp = api_client.get("/v2/samples/")
+    print(resp.text)
+
 
 @samples.command(name="download")
 @click.argument("sample_ids", nargs=-1)
