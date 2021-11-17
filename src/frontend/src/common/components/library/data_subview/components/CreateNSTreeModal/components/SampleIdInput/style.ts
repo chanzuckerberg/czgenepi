@@ -76,6 +76,11 @@ export const FlexContainer = styled.div`
   align-items: center;
 `;
 
+export const BaselineFlexContainer = styled.div`
+  display: flex;
+  align-items: baseline;
+`;
+
 export const StyledLoadingAnimation = styled(LoadingAnimation)`
   ${(props) => {
     const colors = getColors(props);

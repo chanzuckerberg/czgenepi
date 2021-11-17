@@ -5,6 +5,7 @@ import { validateSampleIdentifiers } from "src/common/queries/samples";
 import { pluralize } from "src/common/utils/strUtils";
 import { InputInstructions } from "./components/InputInstructions";
 import {
+  BaselineFlexContainer,
   FlexContainer,
   StyledAddButton,
   StyledEditButton,
@@ -167,7 +168,7 @@ const SampleIdInput = ({
         </StyledAddButton>
       )}
       {!isInEditMode && (
-        <FlexContainer>
+        <BaselineFlexContainer>
           <StyledSampleCount>
             {numParsedSamples} {pluralize("Sample", numParsedSamples)} Added
           </StyledSampleCount>
@@ -180,7 +181,7 @@ const SampleIdInput = ({
               Edit
             </StyledEditButton>
           )}
-        </FlexContainer>
+        </BaselineFlexContainer>
       )}
     </>
   );
