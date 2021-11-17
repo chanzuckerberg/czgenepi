@@ -5,12 +5,11 @@ import Head from "next/head";
 import React, { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import "semantic-ui-css/semantic.min.css";
-
 import style from "src/App.module.scss";
 import { theme } from "src/common/styles/theme";
 import { setFeatureFlagsFromQueryParams } from "src/common/utils/featureFlags";
-import NavBarV2 from "src/components/NavBarV2";
 import AcknowledgePolicyChanges from "src/components/AcknowledgePolicyChanges";
+import NavBarV2 from "src/components/NavBarV2";
 
 const queryClient = new QueryClient();
 setFeatureFlagsFromQueryParams();
