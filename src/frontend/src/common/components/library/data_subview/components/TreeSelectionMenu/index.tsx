@@ -1,7 +1,7 @@
 import { Menu, MenuItem, Tooltip } from "czifui";
 import React, { MouseEventHandler, useState } from "react";
+import { IconButtonBubble } from "src/common/styles/support/style";
 import { TooltipHeaderText } from "../../style";
-import { IconButton } from "../IconButton";
 import { StyledTreeBuildImage } from "./style";
 
 interface Props {
@@ -46,11 +46,11 @@ const TreeSelectionMenu = ({
 
   return (
     <>
-      <IconButton
-        onClick={handleClick}
-        svgEnabled={<StyledTreeBuildImage />}
-        tooltipTextEnabled={TREE_BUILD_TOOLTIP_TEXT}
-      />
+      <Tooltip arrow inverted title={TREE_BUILD_TOOLTIP_TEXT} placement="top">
+        <IconButtonBubble onClick={handleClick}>
+          <StyledTreeBuildImage />
+        </IconButtonBubble>
+      </Tooltip>
       <Menu
         anchorEl={anchorEl}
         anchorOrigin={{
