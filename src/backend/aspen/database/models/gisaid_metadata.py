@@ -12,9 +12,11 @@ class GisaidMetadata(base, DictMixin):  # type: ignore
     strain = Column(String, primary_key=True)
     pango_lineage = Column(String, nullable=True)
     gisaid_clade = Column(String, nullable=True)
+    gisaid_epi_isl = Column(String, nullable=True)
     date = Column(DateTime, nullable=True)
     region = Column(
         String, nullable=True
     )  # Can be a value outside our RegionTable enum
+    country = Column(String, nullable=True)
     division = Column(String, nullable=True)
     location = Column(String, nullable=True)

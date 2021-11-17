@@ -165,6 +165,8 @@ services:
         - HAPPY_COMMIT
         - HAPPY_BRANCH
     command: ["true"]
+    volumes:
+      - ./src/backend:/usr/src/app
     environment:
       - AWS_REGION=us-west-2
       - BOTO_ENDPOINT_URL=http://localstack.genepinet.localdev:4566
