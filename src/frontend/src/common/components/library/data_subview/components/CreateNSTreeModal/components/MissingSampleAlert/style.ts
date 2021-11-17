@@ -34,6 +34,7 @@ export const RowFlexContainer = styled.div`
 export const ColumnFlexContainer = styled.div`
   display: flex;
   flex-direction: column;
+  flex: 1 1 auto;
   .MuiCollapse-root {
     ${transparentScrollbars}
   }
@@ -67,4 +68,7 @@ export const StyledListItem = styled.li`
 
 export const StyledCallout = styled(Callout)`
   max-height: 250px;
+  .MuiAlert-message {
+    width: 100%;
+  }
 `;
