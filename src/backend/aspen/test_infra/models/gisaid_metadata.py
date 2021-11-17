@@ -4,7 +4,7 @@ from aspen.database.models import GisaidMetadata
 
 
 def gisaid_metadata_factory(
-    strain="gisaid_identifier",
+    strain="gisaid_identifier/hCoV-19",
     pango_lineage="B.1.617.2",
     gisaid_clade="T",  # T for test
     date=None,
