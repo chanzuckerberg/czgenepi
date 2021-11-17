@@ -28,6 +28,8 @@ const SampleIdInput = ({
   shouldReset,
 }: Props): JSX.Element => {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false);
+  const [hasEverSubmittedSampleIds, setHasEverSubmittedSampleIds] =
+    useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>("");
   const [inputDisplayValue, setInputDisplayValue] = useState<string>("");
   const [isInEditMode, setInEditMode] = useState<boolean>(true);
@@ -42,6 +44,7 @@ const SampleIdInput = ({
   useEffect(() => {
     if (shouldReset) {
       setHasUnsavedChanges(false);
+      setHasEverSubmittedSampleIds(false);
       setInputValue("");
       setInputDisplayValue("");
       setInEditMode(true);
@@ -97,6 +100,7 @@ const SampleIdInput = ({
 
   useEffect(() => {
     if (shouldValidate) {
+      setHasEverSubmittedSampleIds(true);
       setShouldValidate(false);
       setValidating(true);
       setInEditMode(false);
@@ -120,7 +124,7 @@ const SampleIdInput = ({
   };
 
   const onInputBlur = () => {
-    if (!hasUnsavedChanges) {
+    if (!hasUnsavedChanges && !hasEverSubmittedSampleIds) {
       setShowAddButton(false);
     }
   };
