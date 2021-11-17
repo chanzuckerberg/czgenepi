@@ -11,7 +11,7 @@ export const METADATA_KEYS_TO_HEADERS: Record<keyof ParsedMetadata, string> = {
   collectionLocation: "Collection Location",
   islAccessionNumber: "ISL Accession # (optional)",
   keepPrivate: "Sample is Private",
-  publicId: "Sample Public ID",
+  publicId: "GISAID ID (Public ID)",
   sampleId: "Sample Private ID",
   sequencingDate: "Sequencing Date (optional)",
   submittedToGisaid: "Previously Submitted to GISAID?",
