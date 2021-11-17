@@ -33,7 +33,7 @@ class GroupResponse(BaseResponse):
 
     id: int
     name: StrictStr
-    location: StrictStr
+    location: Optional[StrictStr]
 
 
 class UserResponse(BaseResponse):
