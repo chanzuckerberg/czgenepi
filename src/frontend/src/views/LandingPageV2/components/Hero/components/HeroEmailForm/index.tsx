@@ -11,7 +11,7 @@ export default function EmailForm(): JSX.Element {
 
     const [enteredEmail, setEnteredEmail] = useState("");
 
-    function submitEmail(e: React.FormEvent<HTMLInputElement>) {
+    function submitEmail(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
 
         let emailRegex = /^(([^<>()\]\\.,;:\s@"]+(\.[^<>()\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -27,18 +27,18 @@ export default function EmailForm(): JSX.Element {
     }
 
     return (
-        <HeroEmailForm>
+        <HeroEmailForm
+            onSubmit={submitEmail}
+            >
                 <EmailInput
                     placeholder="Your email address"
                     value={enteredEmail}
-                    onChange={(e: React.FormEvent<HTMLInputElement>) => {
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         setEnteredEmail(e.target.value);
                     }}
                     />
                 <SubmitButton
-                    onClick={(e: React.FormEvent<HTMLInputElement>) => {
-                        submitEmail(e);
-                    }}
+                    type="submit"
                     >
                     Join the waitlist 
                     <SubmitIcon>

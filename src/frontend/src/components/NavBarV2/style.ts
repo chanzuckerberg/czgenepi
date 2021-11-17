@@ -3,7 +3,7 @@ import styled from "@emotion/styled";
 export const Bar = styled.div`
     width: 17px;
     height: 1px;
-    background-color: #FFFFFF;
+    background-color: #ffffff;
     margin: 5px 0;
 `;
 
@@ -11,7 +11,7 @@ export const ButtonLink = styled.a`
     display: inline-block;
     margin: 0 8px;
     padding: 7px 14px 6px 14px;
-    border: 1px solid #FFFFFF;
+    border: 1px solid #ffffff;
     border-radius: 24px;
     width: 140px;
     text-align: center;
@@ -21,7 +21,7 @@ export const ButtonLink = styled.a`
     letter-spacing: 0.3px;
 
     &:hover {
-        background: #FFFFFF;
+        background: #ffffff;
         color: #000000;
     }
 `;
@@ -105,7 +105,7 @@ export const MobileNavLinkContainer = styled.div`
 export const MobileNavSeparator = styled.div`
     width: 60px;
     height: 1px;
-    background-color: #CCCCCC;
+    background-color: #cccccc;
 `;
 
 export const MobileNavToggle = styled.div`
@@ -126,7 +126,7 @@ export const MobileNavTray = styled.div`
     position: fixed;
     right: 0;
     top: 0;
-    background-color: #FFFFFF;
+    background-color: #ffffff;
     z-index: 10;
     transition: all 0.4s;
 `;

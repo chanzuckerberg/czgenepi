@@ -15,7 +15,7 @@ export default function IntroSection(): JSX.Element {
     return (
         <IntroContainer>
             <IntroImage>
-                <Image style={{maxWidth: "797px", width: "100%", height: "auto"}} src={ComputerImg} alt="" />
+                <Image src={ComputerImg} alt="" />
             </IntroImage>
             <IntroTextContainer>
                 <IntroHeading>

@@ -47,7 +47,7 @@ export default function NavBarV2(): JSX.Element {
                         <Bar></Bar>
                         <Bar></Bar>
                     </MobileNavToggle>
-                    <MobileNavTray style={menuOpen ? { width: "100%" } : { width: "0" }} >
+                    <MobileNavTray style={menuOpen ? { width: "100%" } : { width: "0" }}>
                         <MobileNavCloseContainer>
                             <MobileNavClose
                                 onClick={toggleMobileNav}
