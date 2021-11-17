@@ -112,7 +112,7 @@ export default function Resources(): JSX.Element {
                 </NewTabLink>{" "}
                 - In today&apos;s seminar we talked about phylogenetic
                 nomenclature systems (why we use them and types of systems). We
-                finished off with a more detailed discussion of how the Pango
+                finished off with a more detailed discussion of the Pango
                 nomenclature system for SARS-CoV-2.
               </span>,
               <span key={7}>
@@ -140,11 +140,12 @@ export default function Resources(): JSX.Element {
                 </NewTabLink>{" "}
                 - This week I gave a demo of Aspen, the new piece of software
                 that CZI is developing for managing genomic data, that
-                eventually will allow folks to build Nextstrain trees
+                eventually will allows folks to build Nextstrain trees
                 independently with a GUI interface. Since that capability
                 isn&apos;t active quite yet, I also discussed phylogenetic
                 placements in UShER and Nextclade, and how to pull relevant data
-                out of Aspen to use in those phylogenetic placements.
+                out of Aspen to use in those phylogenetic placements. [Since the
+                recording of this video, Aspen has added this capability.]
               </span>,
               <span key={10}>
                 <NewTabLink href="https://www.youtube.com/watch?v=lFJ_2G4u8w4">
