@@ -2,7 +2,7 @@ import React from "react";
 import Image from 'next/image';
 import HeroBackgroundSvg from "src/common/images/landingv2-hero-bg.svg";
 import EmailForm from "./components/HeroEmailForm";
-import NextstrainLogo from "src/common/images/Nextstrain-logo-crop.png";
+import NextstrainLogo from "src/common/images/Nextstrain-Logo-crop.png";
 import {
     Heading,
     HeroContainer,
