@@ -20,7 +20,7 @@ export default function RightNav(): JSX.Element {
     </a>
   );
   const genEpiResourcesLink = (
-    <a href={ROUTES.RESOURCES} data-test-id="navbar-sign-in-link">
+    <a href={ROUTES.RESOURCES}>
       <ResourcesLink className={cx(style.item, style.link)}>
         Gen Epi Resources
       </ResourcesLink>
