@@ -835,4 +835,4 @@ async def test_delete_sample_failures(
         content=json.dumps({"ids": [sample2.id]}),
         headers=auth_headers,
     )
-    assert res.status_code == 202
+    assert res.status_code == 200
