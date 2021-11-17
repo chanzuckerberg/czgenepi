@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Mapping, MutableSequence, NamedTuple, Option
 
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncResult, AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlalchemy.orm.exc import NoResultFound
 from starlette.requests import Request
@@ -12,6 +12,8 @@ from aspen.api.auth import get_auth_user
 from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.samples import (
+    SampleBulkDeleteRequest,
+    SampleBulkDeleteResponse,
     SampleDeleteResponse,
     SampleResponseSchema,
     SamplesResponseSchema,
@@ -153,20 +155,40 @@ async def list_samples(
     return SamplesResponseSchema.parse_obj({"samples": results})
 
 
-async def get_owned_sample_by_id(
-    db: AsyncSession, sample_id: int, user: User
-) -> Sample:
+async def get_owned_samples_by_ids(
+    db: AsyncSession, sample_ids: List[int], user: User
+) -> AsyncResult:
     query = sa.select(Sample).filter(  # type: ignore
         sa.and_(
             Sample.submitting_group == user.group,  # This is an access control check!
-            Sample.id == sample_id,
+            Sample.id.in_(sample_ids),
         )
     )
     results = await db.execute(query)
-    try:
-        return results.scalars().one()
-    except NoResultFound:
-        raise ex.NotFoundException("sample not found")
+    return results.scalars()
+
+
+@router.delete("/")
+async def delete_samples(
+    sample_info: SampleBulkDeleteRequest,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    user: User = Depends(get_auth_user),
+) -> SampleDeleteResponse:
+    # Make sure this sample exists and is delete-able by the current user.
+    samples_res = await get_owned_samples_by_ids(db, sample_info.ids, user)
+    samples = samples_res.all()
+    if len(samples) != len(sample_info.ids):
+        raise ex.NotFoundException("samples not found")
+
+    db_ids = []
+    for sample in samples:
+        db_ids.append(sample.id)
+        await db.delete(sample)
+
+    await db.commit()
+    return SampleBulkDeleteResponse(ids=db_ids)
 
 
 @router.delete("/{sample_id}")
@@ -178,9 +200,13 @@ async def delete_sample(
     user: User = Depends(get_auth_user),
 ) -> SampleDeleteResponse:
     # Make sure this sample exists and is delete-able by the current user.
-    sample = await get_owned_sample_by_id(db, sample_id, user)
-    sample_db_id = sample.id
+    sample_db_res = await get_owned_samples_by_ids(db, [sample_id], user)
+    try:
+        sample = sample_db_res.one()
+    except NoResultFound:
+        raise ex.NotFoundException("sample not found")
 
+    sample_db_id = sample.id
     await db.delete(sample)
     await db.commit()
     return SampleDeleteResponse(id=sample_db_id)

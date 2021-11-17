@@ -321,10 +321,14 @@ def download_samples(ctx, sample_ids):
 @click.pass_context
 def delete_samples(ctx, sample_ids):
     api_client = ctx.obj["api_client"]
-    for sample in sample_ids:
-        resp = api_client.delete(f"/v2/samples/{sample}")
+    if len(sample_ids) == 1:
+        resp = api_client.delete(f"/v2/samples/{sample_ids[0]}")
         print(resp.headers)
         print(resp.text)
+        return
+    resp = api_client.delete(f"/v2/samples/", json={"ids": sample_ids})
+    print(resp.headers)
+    print(resp.text)
 
 
 @samples.command(name="update_public_ids")
