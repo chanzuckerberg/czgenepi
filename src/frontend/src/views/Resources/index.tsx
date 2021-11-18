@@ -207,7 +207,7 @@ export default function Resources(): JSX.Element {
   function Questions() {
     return (
       <>
-        <H3>Questions?</H3>
+        <H2>Questions?</H2>
         <P>
           <NewTabLink href={ROUTES.FAQ}>Check out our FAQ</NewTabLink> for
           general questions about Aspen, privacy, and more.
