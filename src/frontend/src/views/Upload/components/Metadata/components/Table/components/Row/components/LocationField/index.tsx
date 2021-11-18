@@ -55,12 +55,12 @@ export default function LocationField({
       }
     >
       <MenuItem value="" disabled>
-        Select County
+        Select Location
       </MenuItem>
       {locations.map((location) => {
         return (
           <MenuItem key={location.id} value={location.id}>
-            {`${location.division}, ${location.location}`}
+            {`${location.region}/${location.country}/${location.division}/${location.location}`}
             {null}
           </MenuItem>
         );

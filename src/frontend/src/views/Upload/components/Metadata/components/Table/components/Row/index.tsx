@@ -1,6 +1,6 @@
 import deepEqual from "deep-equal";
 import { useFormik } from "formik";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { noop } from "src/common/constants/empty";
 import {
   DATE_ERROR_MESSAGE,
@@ -9,7 +9,6 @@ import {
 import { Metadata } from "src/views/Upload/components/common/types";
 import * as yup from "yup";
 import FreeTextField from "./components/FreeTextField";
-import LocationField from "./components/LocationField";
 import ToggleField from "./components/ToggleField";
 import UploadDateField from "./components/UploadDateField";
 import {
@@ -19,6 +18,7 @@ import {
   StyledTableCell,
   StyledTableRow,
 } from "./style";
+import { Dropdown } from "czifui";
 
 const validationSchema = yup.object({
   collectionDate: yup
@@ -71,6 +71,8 @@ export default React.memo(function Row({
   });
 
   const { values, isValid, validateForm, setTouched } = formik;
+  const [selectedLocation, setSelectedLocation] =
+    useState<string>("Select Location");
 
   useEffect(() => {
     if (!isTouched) return;
@@ -96,6 +98,15 @@ export default React.memo(function Row({
     }
   }, [values]);
 
+  const location_options = locations.map((location) => {
+    return {
+      color: "#000",
+      description: "",
+      name: `${location.region}/${location.country}/${location.division}/${location.location}`,
+      id: location.id,
+    };
+  });
+
   return (
     <StyledTableRow component="div">
       <StyledTableCell component="div">
@@ -112,6 +123,18 @@ export default React.memo(function Row({
         </StyledDiv>
       </StyledTableCell>
       <StyledTableCell component="div">
+        <Dropdown
+          label={selectedLocation}
+          onChange={(e) => {
+            if (e != null) {
+              setSelectedLocation(e.name);
+            }
+          }}
+          options={location_options}
+          search={true}
+        />
+      </StyledTableCell>
+      {/*      <StyledTableCell component="div">
         <LocationField
           isFirstRow={isFirstRow}
           applyToAllColumn={applyToAllColumn}
@@ -119,7 +142,7 @@ export default React.memo(function Row({
           fieldKey="collectionLocation"
           locations={locations}
         />
-      </StyledTableCell>
+      </StyledTableCell>*/}
       <StyledTableCell component="div">
         <StyledDiv>
           <UploadDateField
