@@ -3,7 +3,6 @@ import Image from "next/image";
 import ComputerImg from "src/common/images/landingv2-computer.png";
 import {
     IntroContainer,
-    IntroCTAButton,
     IntroDescription,
     IntroHeading,
     IntroImage,
@@ -19,14 +18,11 @@ export default function IntroSection(): JSX.Element {
             </IntroImage>
             <IntroTextContainer>
                 <IntroHeading>
-                    Manage, analyze, and share your pathogen data for genomic epidemiology
+                    Translate pathogen data into public health insights
                 </IntroHeading>
                 <IntroDescription>
-                    Maecenas sed diam eget risus varius blandit sit amet non magna. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+                    Aspen helps local departments of public health identify the most effective interventions to stop the spread of disease. The secure, cloud-based platform streamlines the analysis of pathogen genomic data and generates phylogenetic trees with a single click—no need to install software or write code. These analyses help public health laboratorians, epidemiologists and public health officers track outbreaks and variants, and gain an overall picture of how pathogens are spreading in their community.
                 </IntroDescription>
-                <IntroCTAButton href="/">
-                    See It in Action
-                </IntroCTAButton>
             </IntroTextContainer>
         </IntroContainer>
     );

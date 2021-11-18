@@ -13,31 +13,6 @@ export const IntroContainer = styled.div`
     }
 `;
 
-export const IntroCTAButton = styled.a`
-    display: inline-block;
-    background: white;
-    color: #7A41CE;
-    border: 1px solid #7A41CE;
-    border-radius: 24px;
-    padding: 7px 14px 6px;
-    font-size: 13px;
-    line-height: 20px;
-    letter-spacing: 0.3px;
-    text-align: center;
-
-    &:hover {
-        color: white;
-        background: #7A41CE;
-    }
-
-    @media (max-width: 768px) {
-        display: block;
-        width: 100%;
-        max-width: 280px;
-        margin: 0 auto;
-    }
-`;
-
 export const IntroDescription = styled.p`
     font-size: 16px;
     font-weight: 400;

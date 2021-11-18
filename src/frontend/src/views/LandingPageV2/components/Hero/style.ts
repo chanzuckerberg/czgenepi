@@ -73,10 +73,14 @@ export const NextstrainContainer = styled.div`
     display: flex;
     flex-direction: column;
     width: 140px;
+    cursor: pointer;
 
     @media (max-width: 768px) {
         display: none;
     }
+`;
+
+export const NextstrainLink = styled.a`
 `;
 
 export const PartnershipText = styled.span`

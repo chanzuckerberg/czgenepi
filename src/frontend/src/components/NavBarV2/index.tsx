@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import CloseIcon from "src/common/images/close-icon.svg";
 import HeaderLogo from "src/common/images/logo.svg";
+import { ROUTES } from "src/common/routes";
 import {
   Bar,
   ButtonLink,
@@ -30,13 +31,15 @@ export default function NavBarV2(): JSX.Element {
     <HeaderContainer>
       <HeaderMaxWidthContainer>
         <HeaderTopContainer>
-          <HeaderLogoContainer href="/">
+          <HeaderLogoContainer href={ROUTES.LANDINGV2}>
             <HeaderLogo />
           </HeaderLogoContainer>
           <HeaderTopLinks>
-            <TextLink href="/">Resources</TextLink>
-            <ButtonLink href="/">Request Access</ButtonLink>
-            <ButtonLink href="/">Sign in</ButtonLink>
+            <TextLink href={ROUTES.RESOURCES} target="_blank">
+              Resources
+            </TextLink>
+            <ButtonLink href={ROUTES.LANDINGV2}>Request Access</ButtonLink>
+            <ButtonLink href={ROUTES.LANDINGV2}>Sign in</ButtonLink>
           </HeaderTopLinks>
           <MobileNavToggle
             onClick={toggleMobileNav}
@@ -57,7 +60,7 @@ export default function NavBarV2(): JSX.Element {
             </MobileNavCloseContainer>
             <MobileNavLinkContainer>
               <MobileNavLink
-                href="/"
+                href={ROUTES.GITHUB}
                 style={menuOpen ? { opacity: "1" } : { opacity: "0" }}
                 target="_blank"
                 rel="noreferrer"
@@ -66,7 +69,7 @@ export default function NavBarV2(): JSX.Element {
                 Github
               </MobileNavLink>
               <MobileNavLink
-                href="/"
+                href={ROUTES.CAREERS}
                 style={menuOpen ? { opacity: "1" } : { opacity: "0" }}
                 target="_blank"
                 rel="noreferrer"
@@ -75,7 +78,7 @@ export default function NavBarV2(): JSX.Element {
                 Careers
               </MobileNavLink>
               <MobileNavLink
-                href="/"
+                href={ROUTES.RESOURCES}
                 style={menuOpen ? { opacity: "1" } : { opacity: "0" }}
                 target="_blank"
                 rel="noreferrer"
@@ -87,7 +90,7 @@ export default function NavBarV2(): JSX.Element {
                 style={menuOpen ? { opacity: "1" } : { opacity: "0" }}
               ></MobileNavSeparator>
               <MobileNavLink
-                href="/"
+                href={ROUTES.LANDINGV2}
                 style={menuOpen ? { opacity: "1" } : { opacity: "0" }}
                 target="_blank"
                 rel="noreferrer"
@@ -96,7 +99,7 @@ export default function NavBarV2(): JSX.Element {
                 Sign In
               </MobileNavLink>
               <MobileNavLink
-                href="/"
+                href={ROUTES.LANDINGV2}
                 style={menuOpen ? { opacity: "1" } : { opacity: "0" }}
                 target="_blank"
                 rel="noreferrer"

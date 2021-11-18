@@ -28,6 +28,7 @@ export const UseCasesHeader = styled.h2`
     position: absolute;
     width: 100%;
     top: 10%;
+    z-index: 2;
 
     @media (max-width: 1200px) {
         font-size: 26px;
@@ -46,6 +47,7 @@ export const UseCasesHeader = styled.h2`
 export const UseCasesImage = styled.div`
     width: 100%;
     height: auto;
+    z-index: 1;
 
     @media (max-width: 768px) {
         display: none;

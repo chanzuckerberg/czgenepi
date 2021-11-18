@@ -21,6 +21,7 @@ import {
     FooterTopLinks,
     Span
 } from "./style";
+import { ROUTES } from "src/common/routes";
 
 export default function Footer(): JSX.Element {
 
@@ -37,32 +38,32 @@ export default function Footer(): JSX.Element {
     return (
         <FooterContainer>
             <FooterTopContainer>
-                <FooterLogoContainer>
+                <FooterLogoContainer href={ROUTES.LANDINGV2}>
                     <FooterLogo />
                 </FooterLogoContainer>
                 <FooterTopLinks>
-                    <FooterTopLink href="/">Github</FooterTopLink>
-                    <FooterTopLink href="/">Careers</FooterTopLink>
-                    <FooterTopLink href="/">Resources</FooterTopLink>
+                    <FooterTopLink href={ROUTES.GITHUB} target="_blank">Github</FooterTopLink>
+                    <FooterTopLink href={ROUTES.CAREERS} target="_blank">Careers</FooterTopLink>
+                    <FooterTopLink href={ROUTES.RESOURCES} target="_blank">Resources</FooterTopLink>
                 </FooterTopLinks>
             </FooterTopContainer>
             <FooterBottomContainer>
                 <FooterBottomLinks>
-                    <FooterBottomLink href="/">Privacy</FooterBottomLink>
+                    <FooterBottomLink href={ROUTES.PRIVACY} target="_blank">Privacy</FooterBottomLink>
                     <FooterBottomLinkDivider>|</FooterBottomLinkDivider>
-                    <FooterBottomLink href="/">Terms</FooterBottomLink>
+                    <FooterBottomLink href={ROUTES.TERMS} target="_blank">Terms</FooterBottomLink>
                     <FooterBottomLinkDivider>|</FooterBottomLinkDivider>
-                    <FooterBottomLink href="/">Contact us</FooterBottomLink>
+                    <FooterBottomLink href={ROUTES.CONTACT_US_EMAIL}>Contact us</FooterBottomLink>
                 </FooterBottomLinks>
                 <FooterBottomSeparator />
                 <FooterPartnerships>
                     <CZContainer>
                         <Span>In partnership with:</Span>
                         <CZLogoContainer>
-                            <CZILogo>
+                            <CZILogo href={ROUTES.CZI} target="_blank">
                                 <Image src={CZILogoImg} alt="" />
                             </CZILogo>
-                            <CZBiohubLogo>
+                            <CZBiohubLogo href={ROUTES.BIOHUB} target="_blank">
                                 <Image src={BiohubLogoImg} alt="" />
                             </CZBiohubLogo>
                         </CZLogoContainer>
