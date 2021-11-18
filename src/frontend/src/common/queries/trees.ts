@@ -14,6 +14,7 @@ import {
 } from "../api";
 import { API_URL } from "../constants/ENV";
 import { ENTITIES } from "./entities";
+import { MutationCallbacks } from "./types";
 
 // * these two types should stay in sync. There is technically a way to do it in TS, but it is
 // * very convoluted: https://stackoverflow.com/questions/44323441
@@ -101,10 +102,6 @@ export async function getUsherOptions(): Promise<unknown> {
   throw Error(`${response.statusText}: ${await response.text()}`);
 }
 
-interface MutationCallbacks<T> {
-  onError: () => void;
-  onSuccess: (data: T) => void;
-}
 type FastaFetchCallbacks = MutationCallbacks<FastaResponseType>;
 type CreateTreeCallbacks = MutationCallbacks<void>;
 

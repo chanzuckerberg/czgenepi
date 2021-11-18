@@ -90,3 +90,12 @@ export const IconButtonBubble = styled(Button)`
     `;
   }}
 `;
+
+export const transparentScrollbars = (): string => {
+  return `
+    scrollbar-color: transparent unset;
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+  `;
+};

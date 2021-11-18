@@ -1,3 +1,4 @@
+import { useMutation, UseMutationResult } from "react-query";
 import { METADATA_KEYS_TO_API_KEYS } from "src/views/Upload/components/common/constants";
 import {
   SampleIdToMetadata,
@@ -5,6 +6,7 @@ import {
 } from "src/views/Upload/components/common/types";
 import { API, DEFAULT_POST_OPTIONS } from "../api";
 import { API_URL } from "../constants/ENV";
+import { MutationCallbacks } from "./types";
 
 interface SamplePayload {
   sample: {
@@ -47,9 +49,7 @@ export async function downloadSamplesFasta({
 
 export async function validateSampleIdentifiers({
   sampleIdsToValidate,
-}: {
-  sampleIdsToValidate: string[];
-}): Promise<unknown> {
+}: SampleValidationRequestType): Promise<SampleValidationResponseType> {
   const payload: ValidateSampleIdentifiersPayload = {
     sample_ids: sampleIdsToValidate,
   };
@@ -61,6 +61,28 @@ export async function validateSampleIdentifiers({
   if (response.ok) return await response.json();
 
   throw Error(`${response.statusText}: ${await response.text()}`);
+}
+
+interface SampleValidationRequestType {
+  sampleIdsToValidate: string[];
+}
+
+export interface SampleValidationResponseType {
+  missing_sample_ids: string[];
+}
+
+type SampleValidationCallbacks =
+  MutationCallbacks<SampleValidationResponseType>;
+
+export function useValidateSampleIds(
+  callbacks: SampleValidationCallbacks
+): UseMutationResult<
+  SampleValidationResponseType,
+  unknown,
+  SampleValidationRequestType,
+  unknown
+> {
+  return useMutation(validateSampleIdentifiers, callbacks);
 }
 
 export async function createSamples({

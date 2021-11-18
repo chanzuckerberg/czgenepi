@@ -1,10 +1,13 @@
 import { compact, filter } from "lodash";
 import React, { ChangeEvent, useCallback, useEffect, useState } from "react";
-import { useMutation } from "react-query";
-import { validateSampleIdentifiers } from "src/common/queries/samples";
+import {
+  SampleValidationResponseType,
+  useValidateSampleIds,
+} from "src/common/queries/samples";
 import { pluralize } from "src/common/utils/strUtils";
 import { InputInstructions } from "./components/InputInstructions";
 import {
+  BaselineFlexContainer,
   FlexContainer,
   StyledAddButton,
   StyledEditButton,
@@ -25,6 +28,8 @@ const SampleIdInput = ({
   shouldReset,
 }: Props): JSX.Element => {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false);
+  const [hasEverSubmittedSampleIds, setHasEverSubmittedSampleIds] =
+    useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>("");
   const [inputDisplayValue, setInputDisplayValue] = useState<string>("");
   const [isInEditMode, setInEditMode] = useState<boolean>(true);
@@ -39,6 +44,7 @@ const SampleIdInput = ({
   useEffect(() => {
     if (shouldReset) {
       setHasUnsavedChanges(false);
+      setHasEverSubmittedSampleIds(false);
       setInputValue("");
       setInputDisplayValue("");
       setInEditMode(true);
@@ -66,37 +72,37 @@ const SampleIdInput = ({
     return compact(trimmedTokens);
   }, [inputValue]);
 
-  const validateSampleIdentifiersMutation = useMutation(
-    validateSampleIdentifiers,
-    {
-      onError: () => {
-        setValidating(false);
-        setShowAddButton(false);
-        setFoundSampleIds([]);
-        setMissingSampleIds([]);
-        setIdsInFlight([]);
-        handleInputValidation([], []);
-        setInputDisplayValue("");
-        setInEditMode(true);
-      },
-      onSuccess: (data: any) => {
-        setValidating(false);
-        setShowAddButton(false);
-        setHasUnsavedChanges(false);
+  // TODO (mlila): we don't actually surface this error to the user anywhere, but in the
+  // TODO          future we probably should if this happens with any frequency.
+  const validateSampleIdentifiersMutation = useValidateSampleIds({
+    onError: () => {
+      setValidating(false);
+      setShowAddButton(false);
+      setFoundSampleIds([]);
+      setMissingSampleIds([]);
+      setIdsInFlight([]);
+      handleInputValidation([], []);
+      setInputDisplayValue("");
+      setInEditMode(true);
+    },
+    onSuccess: (data: SampleValidationResponseType) => {
+      setValidating(false);
+      setShowAddButton(false);
+      setHasUnsavedChanges(false);
 
-        const missingIds = data["missing_sample_ids"];
-        const foundIds = filter(idsInFlight, (id) => !missingIds.includes(id));
+      const missingIds = data["missing_sample_ids"];
+      const foundIds = filter(idsInFlight, (id) => !missingIds.includes(id));
 
-        setIdsInFlight([]);
-        setFoundSampleIds(foundIds);
-        setMissingSampleIds(missingIds);
-        handleInputValidation(foundIds, missingIds);
-      },
-    }
-  );
+      setIdsInFlight([]);
+      setFoundSampleIds(foundIds);
+      setMissingSampleIds(missingIds);
+      handleInputValidation(foundIds, missingIds);
+    },
+  });
 
   useEffect(() => {
     if (shouldValidate) {
+      setHasEverSubmittedSampleIds(true);
       setShouldValidate(false);
       setValidating(true);
       setInEditMode(false);
@@ -120,7 +126,7 @@ const SampleIdInput = ({
   };
 
   const onInputBlur = () => {
-    if (!hasUnsavedChanges) {
+    if (!hasUnsavedChanges && !hasEverSubmittedSampleIds) {
       setShowAddButton(false);
     }
   };
@@ -167,7 +173,7 @@ const SampleIdInput = ({
         </StyledAddButton>
       )}
       {!isInEditMode && (
-        <FlexContainer>
+        <BaselineFlexContainer>
           <StyledSampleCount>
             {numParsedSamples} {pluralize("Sample", numParsedSamples)} Added
           </StyledSampleCount>
@@ -180,7 +186,7 @@ const SampleIdInput = ({
               Edit
             </StyledEditButton>
           )}
-        </FlexContainer>
+        </BaselineFlexContainer>
       )}
     </>
   );
