@@ -16,6 +16,7 @@ interface Props {
   formik: FormikContextType<Metadata>;
   applyToAllColumn: (fieldKey: keyof Metadata, value: unknown) => void;
   isFirstRow: boolean;
+  locations: Location[];
 }
 
 export default function LocationField({
@@ -23,6 +24,7 @@ export default function LocationField({
   formik,
   applyToAllColumn,
   isFirstRow,
+  locations,
 }: Props): JSX.Element {
   const { handleChange, handleBlur, values, touched, errors } = formik;
 
@@ -55,14 +57,11 @@ export default function LocationField({
       <MenuItem value="" disabled>
         Select County
       </MenuItem>
-      {COUNTIES.map((county) => {
+      {locations.map((location) => {
         return (
-          <MenuItem key={county} value={county}>
-            {county}
-            {(county === "California" && (
-              <MenuSubtext>County not specified</MenuSubtext>
-            )) ||
-              null}
+          <MenuItem key={location.id} value={location.id}>
+            {`${location.division}, ${location.location}`}
+            {null}
           </MenuItem>
         );
       })}

@@ -26,6 +26,7 @@ interface Props {
   setIsValid: React.Dispatch<React.SetStateAction<boolean>>;
   hasImportedFile: boolean;
   autocorrectWarnings: SampleIdToWarningMessages;
+  locations: Location[];
 }
 
 export default function Table({
@@ -34,6 +35,7 @@ export default function Table({
   setIsValid,
   hasImportedFile,
   autocorrectWarnings,
+  locations,
 }: Props): JSX.Element {
   const [isTouched, setIsTouched] = useState(hasImportedFile);
   const [isReadyToRenderTable, setIsReadyToTenderTable] = useState(false);
@@ -175,6 +177,7 @@ export default function Table({
                         applyToAllColumn={applyToAllColumn}
                         handleRowValidation={handleRowValidation}
                         warnings={autocorrectWarnings[sampleId]}
+                        locations={locations}
                       />
                     );
                   }

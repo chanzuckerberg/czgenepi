@@ -1,7 +1,7 @@
 import { Button } from "czifui";
 import Head from "next/head";
 import NextLink from "next/link";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { ROUTES } from "src/common/routes";
@@ -27,6 +27,7 @@ import {
   SampleIdToWarningMessages,
 } from "./components/ImportFile/parseFile";
 import Table from "./components/Table";
+import { getLocations, LocationsResponse } from "src/common/queries/locations";
 
 export const EMPTY_METADATA: IMetadata = {
   collectionDate: "",
@@ -47,6 +48,16 @@ export default function Metadata({
   const [hasImportedFile, setHasImportedFile] = useState(false);
   const [autocorrectWarnings, setAutocorrectWarnings] =
     useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
+  const [locations, setLocations] = useState<Location[]>([]);
+
+  const loadLocations = async () => {
+    const result: LocationsResponse = await getLocations();
+    setLocations(result.locations);
+  };
+
+  useEffect(() => {
+    loadLocations();
+  }, []);
 
   function handleMetadata(result: ParseResult) {
     const { data: sampleIdToMetadata, warningMessages } = result;
@@ -106,6 +117,7 @@ export default function Metadata({
           metadata={metadata}
           setMetadata={setMetadata}
           autocorrectWarnings={autocorrectWarnings}
+          locations={locations}
         />
 
         <ButtonWrapper>

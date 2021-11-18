@@ -49,6 +49,7 @@ interface Props {
   handleRowValidation: (id: string, isValid: boolean) => void;
   isTouched: boolean;
   warnings?: Set<keyof Metadata>;
+  locations: Location[];
 }
 
 export default React.memo(function Row({
@@ -60,6 +61,7 @@ export default React.memo(function Row({
   handleRowValidation,
   isTouched,
   warnings = new Set(),
+  locations,
 }: Props): JSX.Element {
   const formik = useFormik({
     enableReinitialize: true,
@@ -115,6 +117,7 @@ export default React.memo(function Row({
           applyToAllColumn={applyToAllColumn}
           formik={formik}
           fieldKey="collectionLocation"
+          locations={locations}
         />
       </StyledTableCell>
       <StyledTableCell component="div">
