@@ -125,6 +125,27 @@ export default function Table({
     false
   );
 
+  const locationOptions: LocationOption[] = locations.map((location) => {
+    let stringName = "";
+    const orderedKeys = ["region", "country", "division", "location"];
+    orderedKeys.every((key) => {
+      if (!!location[key]) {
+        if (key != "region") {
+          stringName += "/";
+        }
+        stringName += `${location[key]}`;
+        return true;
+      } else {
+        return false;
+      }
+    });
+    return {
+      name: stringName,
+      description: "",
+      id: location.id,
+    };
+  });
+
   return (
     <Overflow>
       <form autoComplete="off">
@@ -177,7 +198,7 @@ export default function Table({
                         applyToAllColumn={applyToAllColumn}
                         handleRowValidation={handleRowValidation}
                         warnings={autocorrectWarnings[sampleId]}
-                        locations={locations}
+                        locationOptions={locationOptions}
                       />
                     );
                   }

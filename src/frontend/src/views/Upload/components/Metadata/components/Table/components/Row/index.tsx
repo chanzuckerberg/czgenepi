@@ -1,6 +1,8 @@
+import { escapeRegExp } from "lodash/fp";
 import deepEqual from "deep-equal";
 import { useFormik } from "formik";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useReducer } from "react";
+import AsyncSelect from "react-select/async";
 import { noop } from "src/common/constants/empty";
 import {
   DATE_ERROR_MESSAGE,
@@ -49,7 +51,19 @@ interface Props {
   handleRowValidation: (id: string, isValid: boolean) => void;
   isTouched: boolean;
   warnings?: Set<keyof Metadata>;
-  locations: Location[];
+  locationOptions: LocationOption[];
+}
+
+interface LocationSearchState {
+  searching: boolean;
+  results?: LocationOption[];
+}
+
+function locationSearchReducer(
+  state: LocationSearchState,
+  action: LocationSearchState
+): LocationSearchState {
+  return { ...state, ...action };
 }
 
 export default React.memo(function Row({
@@ -61,7 +75,7 @@ export default React.memo(function Row({
   handleRowValidation,
   isTouched,
   warnings = new Set(),
-  locations,
+  locationOptions,
 }: Props): JSX.Element {
   const formik = useFormik({
     enableReinitialize: true,
@@ -71,8 +85,14 @@ export default React.memo(function Row({
   });
 
   const { values, isValid, validateForm, setTouched } = formik;
-  const [selectedLocation, setSelectedLocation] =
-    useState<string>("Select Location");
+  const [locationSearchInput, setLocationSearchInput] = useState<string>("");
+  const [selectedLocation, setLocation] = useState<
+    LocationOption | undefined
+  >();
+  const [state, dispatch] = useReducer(locationSearchReducer, {
+    results: [],
+    searching: false,
+  });
 
   useEffect(() => {
     if (!isTouched) return;
@@ -98,14 +118,26 @@ export default React.memo(function Row({
     }
   }, [values]);
 
-  const location_options = locations.map((location) => {
-    return {
-      color: "#000",
-      description: "",
-      name: `${location.region}/${location.country}/${location.division}/${location.location}`,
-      id: location.id,
-    };
-  });
+  const searcher = (query: string): void => {
+    if (query.length < 2) {
+      dispatch({ results: [] });
+    }
+    dispatch({ searching: true });
+
+    const regex = new RegExp(escapeRegExp(query), "i");
+    const filteredLocationOptions = locationOptions.filter((option) =>
+      regex.test(option.name)
+    );
+    dispatch({
+      results: filteredLocationOptions.slice(0, 20),
+      searching: false,
+    });
+  };
+
+  const handleSearchInputChange = (event: React.SyntheticEvent) => {
+    const query = event?.target?.value ?? "";
+    searcher(query);
+  };
 
   return (
     <StyledTableRow component="div">
@@ -124,14 +156,16 @@ export default React.memo(function Row({
       </StyledTableCell>
       <StyledTableCell component="div">
         <Dropdown
-          label={selectedLocation}
+          label={selectedLocation?.name || "Select Location"}
           onChange={(e) => {
-            if (e != null) {
-              setSelectedLocation(e.name);
+            if (!!e) {
+              console.log(e);
+              setLocation(e);
             }
           }}
-          options={location_options}
+          options={state.results}
           search={true}
+          MenuSelectProps={{ onInputChange: handleSearchInputChange }}
         />
       </StyledTableCell>
       {/*      <StyledTableCell component="div">
