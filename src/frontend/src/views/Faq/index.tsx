@@ -1,8 +1,9 @@
+import { List, ListItem } from "czifui";
 import Head from "next/head";
 import React from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { ROUTES } from "src/common/routes";
-import List from "src/common/styles/support/components/List";
+// import List from "src/common/styles/support/components/List";
 import {
   B,
   H1,
@@ -175,13 +176,21 @@ export default function Faq(): JSX.Element {
       </P>
 
       <P>A summary of key things to know: </P>
-      <List
-        items={[
+      <List>
+        <ListItem>
           <span key={0}>
             You <B>always</B> own and control the data you upload.
-          </span>,
-          `Only other members of your group can see your data. CDPH can see samples, but not your private, internal identifiers. `,
-          `New sequences will be automatically submitted to GISAID two weeks after upload, unless marked "private."`,
+          </span>
+        </ListItem>
+        <ListItem>
+          Only other members of your group can see your data. CDPH can see
+          samples, but not your private, internal identifiers.
+        </ListItem>
+        <ListItem>
+          New sequences will be automatically submitted to GISAID two weeks
+          after upload, unless marked &quot;private.&quot;
+        </ListItem>
+        <ListItem>
           <span key={1}>
             You can mark a sample as &quot;private&quot; anytime during the
             first two weeks after upload. &quot;Private&quot; samples are not
@@ -191,11 +200,16 @@ export default function Faq(): JSX.Element {
               email
             </NewTabLink>{" "}
             to mark samples as &quot;private.&quot;)
-          </span>,
-          `Aspen does not support protected health information.`,
-          `We utilize industry standard best practices in information security to protect your data.`,
-        ]}
-      />
+          </span>
+        </ListItem>
+        <ListItem>
+          Aspen does not support protected health information.
+        </ListItem>
+        <ListItem>
+          We utilize industry standard best practices in information security to
+          protect your data.
+        </ListItem>
+      </List>
 
       <H3>Who else can see my sample data?</H3>
 
@@ -215,12 +229,20 @@ export default function Faq(): JSX.Element {
         For new samples that you do not choose to mark &quot;private,&quot; we
         share this data in two ways:
       </P>
-      <List
-        items={[
-          `After two weeks, we will automatically submit the sample to GISAID on your behalf. This upload includes the pathogen genome; collection date; sequencing lab (i.e., your group); and location (as always, at the county level or above). `,
-          `Consistent with the prior COVID Tracker program’s policies, the California Department of Public Health (CDPH) will be able to see non-private samples, but with your internal, private identifiers redacted.`,
-        ]}
-      />
+      <List>
+        <ListItem>
+          After two weeks, we will automatically submit the sample to GISAID on
+          your behalf. This upload includes the pathogen genome; collection
+          date; sequencing lab (i.e., your group); and location (as always, at
+          the county level or above).
+        </ListItem>
+        <ListItem>
+          Consistent with the prior COVID Tracker program’s policies, the
+          California Department of Public Health (CDPH) will be able to see
+          non-private samples, but with your internal, private identifiers
+          redacted.
+        </ListItem>
+      </List>
 
       <P>
         We are also working on new features to give you granular control over
@@ -233,12 +255,15 @@ export default function Faq(): JSX.Element {
         We rely on service providers to help us provide and improve Aspen,
         specifically:
       </P>
-      <List
-        items={[
-          `Our technology partner, Chan Zuckerberg Initiative, LLC, who helps us operate and secure our technical infrastructure`,
-          `Amazon Web Services, which hosts our database and pipelines.`,
-        ]}
-      />
+      <List>
+        <ListItem>
+          Our technology partner, Chan Zuckerberg Initiative, LLC, who helps us
+          operate and secure our technical infrastructure
+        </ListItem>
+        <ListItem>
+          Amazon Web Services, which hosts our database and pipelines.
+        </ListItem>
+      </List>
       <P>
         In our work with any service provider, we always prioritize the security
         of your data and preventing unauthorized access (e.g., by encrypting
