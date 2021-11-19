@@ -1,9 +1,9 @@
-import { ListItemLabel } from "czifui";
+import { List, ListItem, ListItemLabel } from "czifui";
 import Head from "next/head";
 import React from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { ROUTES } from "src/common/routes";
-import List from "src/common/styles/support/components/List";
+// import List from "src/common/styles/support/components/List";
 import {
   B,
   H1,
@@ -96,12 +96,27 @@ const PrivacyPolicy = (): JSX.Element => {
       </P>
 
       <H3>Key Things to Know</H3>
-      <List
-        items={[
-          "Aspen is a free and open-source tool.",
-          "You always own the data you upload. You decide how you want your data to be shared, and you can delete your data from Aspen at any time.",
-          "You’re using Aspen in your professional capacity, which means any pathogen sample data you upload, and any data that we generate on the basis of this, are visible to other members (Users) in your Group. This data is only available to anyone outside of your organization when it is shared by you, or by your Group. Other organizations that you share your data with can see your samples, but not your private, internal identifiers.",
-          "Human genetic data with uploaded data is processed only so we can filter out and permanently delete it. We do not keep this non-pathogen genomic data and it’s not necessary to operate the tool.",
+      <List>
+        <ListItem>Aspen is a free and open-source tool.</ListItem>
+        <ListItem>
+          You always own the data you upload. You decide how you want your data
+          to be shared, and you can delete your data from Aspen at any time.
+        </ListItem>
+        <ListItem>
+          You’re using Aspen in your professional capacity, which means any
+          pathogen sample data you upload, and any data that we generate on the
+          basis of this, are visible to other members (Users) in your Group.
+          This data is only available to anyone outside of your organization
+          when it is shared by you, or by your Group. Other organizations that
+          you share your data with can see your samples, but not your private,
+          internal identifiers.
+        </ListItem>
+        <ListItem>
+          Human genetic data with uploaded data is processed only so we can
+          filter out and permanently delete it. We do not keep this non-pathogen
+          genomic data and it’s not necessary to operate the tool.
+        </ListItem>
+        <ListItem>
           <span key="0">
             Similarly, Aspen{" "}
             <B>
@@ -117,9 +132,9 @@ const PrivacyPolicy = (): JSX.Element => {
             for the purposes of providing analyses for you, enabling you to link
             back to your epidemiological data (outside of Aspen), and optionally
             submitting to public repositories.
-          </span>,
-        ]}
-      ></List>
+          </span>
+        </ListItem>
+      </List>
     </>
   );
 
@@ -367,8 +382,8 @@ const PrivacyPolicy = (): JSX.Element => {
         Upload Data includes Raw Sequence Data, Pathogen Consensus Genomes, and
         Sample Metadata.
       </P>
-      <List
-        items={[
+      <List>
+        <ListItem>
           <span key="0">
             <ListItemLabel>Raw Sequence Data:</ListItemLabel> &quot;Raw Sequence
             Data&quot; is genomic sequence data, including both host and
@@ -380,14 +395,18 @@ const PrivacyPolicy = (): JSX.Element => {
             Data will be permanently deleted from our backend after 90 days. We
             encourage Users to submit raw reads to the Sequencing Read Archive
             for long-term storage.
-          </span>,
+          </span>
+        </ListItem>
+        <ListItem>
           <span key="1">
             <ListItemLabel>Pathogen Consensus Genomes:</ListItemLabel>{" "}
             &quot;Pathogen Consensus Genomes&quot; are genetic sequences of
             pathogens, such as SARS-CoV-2, mapped to pathogen-specific reference
             genomes. These may either be uploaded directly to Aspen or generated
             by Aspen from uploaded Raw Sequence Data (see below).
-          </span>,
+          </span>
+        </ListItem>
+        <ListItem>
           <span key="2">
             <ListItemLabel>Sample Metadata:</ListItemLabel> &quot;Sample
             Metadata&quot; includes information related to the Raw Sequence
@@ -396,9 +415,9 @@ const PrivacyPolicy = (): JSX.Element => {
             Users <u>should not</u> include personally-identifying information
             or protected health information regarding the individual to whom the
             Raw Sequence Data relates.
-          </span>,
-        ]}
-      />
+          </span>
+        </ListItem>
+      </List>
       <P>
         If you are able to find data in Aspen or any Sample Metadata that you
         believe is identifying, please let us know at{" "}
@@ -411,14 +430,26 @@ const PrivacyPolicy = (): JSX.Element => {
         <UnderLineHeader>How We Use Upload Data</UnderLineHeader>
       </P>
       <P>Upload Data is used for the following purposes:</P>
-      <List
-        items={[
-          `To provide Users and their Groups with a &quot;Pathogen Consensus Genome.&quot; The Pathogen Consensus Genome  is provided on a per-Raw Sequence basis.`,
-          `To provide Users and their Groups with analytical outputs that help identify variation and relationship between samples, such as phylogenetic trees.`,
-          `To improve the way Aspen processes Pathogen Consensus Genomes and Users’ ability to use Aspen to create useful analytical outputs.`,
-          `To troubleshoot in the event you reach out to us with a specific issue related to your Upload Data.`,
-        ]}
-      />
+      <List>
+        <ListItem>
+          To provide Users and their Groups with a &quot;Pathogen Consensus
+          Genome.&quot; The Pathogen Consensus Genome is provided on a per-Raw
+          Sequence basis.
+        </ListItem>
+        <ListItem>
+          To provide Users and their Groups with analytical outputs that help
+          identify variation and relationship between samples, such as
+          phylogenetic trees.
+        </ListItem>
+        <ListItem>
+          To improve the way Aspen processes Pathogen Consensus Genomes and
+          Users’ ability to use Aspen to create useful analytical outputs.
+        </ListItem>
+        <ListItem>
+          To troubleshoot in the event you reach out to us with a specific issue
+          related to your Upload Data.
+        </ListItem>
+      </List>
       <P>
         We do not own Upload Data and will never sell it. As mentioned above,
         your Upload Data <B>will</B> be visible within your Group.
@@ -540,15 +571,17 @@ const PrivacyPolicy = (): JSX.Element => {
 
       <UnderLineHeader>What We Collect</UnderLineHeader>
 
-      <List
-        items={[
+      <List>
+        <ListItem>
           <span key="0">
             <ListItemLabel>User Data.</ListItemLabel>
             User Data is any information we collect from a User about that User
             (&quot;User Data&quot;). It may include information necessary to
             create or access your account such as your name, email, Group name
             and contact email, and login credentials.
-          </span>,
+          </span>
+        </ListItem>
+        <ListItem>
           <span key="1">
             <ListItemLabel>Analytics</ListItemLabel>
             When Users visit or use our Service, we may automatically collect
@@ -565,9 +598,9 @@ const PrivacyPolicy = (): JSX.Element => {
             data that is not able to be aggregated and de-identified will not be
             shared beyond the Aspen team and will be stored for no longer than
             is necessary.
-          </span>,
-        ]}
-      />
+          </span>
+        </ListItem>
+      </List>
       <P>
         <UnderLineHeader>How We Use That Data</UnderLineHeader>
       </P>
@@ -575,15 +608,22 @@ const PrivacyPolicy = (): JSX.Element => {
         User Data will be used to operate, secure, and improve the Services.
         This means the following purposes:
       </P>
-      <List
-        items={[
-          `To create a profile for Users, and verify Users’ identity so you can log in to and use Aspen.`,
-          `To provide you with notices about your account and updates about Aspen.`,
-          `To respond to your inquiries and requests.`,
-          `To analyze broadly how Users are using Aspen so we can optimize and improve it.`,
-          `To protect the security and integrity of Aspen.`,
-        ]}
-      />
+      <List>
+        <ListItem>
+          To create a profile for Users, and verify Users’ identity so you can
+          log in to and use Aspen.
+        </ListItem>
+        <ListItem>
+          To provide you with notices about your account and updates about
+          Aspen.
+        </ListItem>
+        <ListItem>To respond to your inquiries and requests.</ListItem>
+        <ListItem>
+          To analyze broadly how Users are using Aspen so we can optimize and
+          improve it.
+        </ListItem>
+        <ListItem>To protect the security and integrity of Aspen.</ListItem>
+      </List>
       <P>
         <UnderLineHeader>
           What is our legal basis for using Personal Data in User Data?
@@ -690,8 +730,8 @@ const PrivacyPolicy = (): JSX.Element => {
       <P>
         We retain your personal data only as long as is reasonably necessary:
       </P>
-      <List
-        items={[
+      <List>
+        <ListItem>
           <span key="0">
             We retain Pathogen Consensus Genomes, Sample Metadata and analytical
             outputs until Users delete them from Aspen. Users may delete their
@@ -700,8 +740,16 @@ const PrivacyPolicy = (): JSX.Element => {
               helloaspen@chanzuckerberg.com
             </NewTabLink>
             .
-          </span>,
-          `We store Raw Sequence Data (ex: fastq files) for 90 days following upload. If no abnormalities are found in the resulting Pathogen Consensus Genome, we discard this data. We encourage submission to NCBI’s Sequence Read Archive (SRA) repository for long-term storage and sharing.`,
+          </span>
+        </ListItem>
+        <ListItem>
+          We store Raw Sequence Data (ex: fastq files) for 90 days following
+          upload. If no abnormalities are found in the resulting Pathogen
+          Consensus Genome, we discard this data. We encourage submission to
+          NCBI’s Sequence Read Archive (SRA) repository for long-term storage
+          and sharing.
+        </ListItem>
+        <ListItem>
           <span key="1">
             User Data is retained until Users delete their Aspen account because
             this data is required to manage the service. Users may submit
@@ -711,9 +759,9 @@ const PrivacyPolicy = (): JSX.Element => {
             </NewTabLink>
             . We will delete personal data within 60 days following the closure
             of your account.
-          </span>,
-        ]}
-      />
+          </span>
+        </ListItem>
+      </List>
       <P>
         Please note that we do not control, and so cannot delete Pathogen
         Consensus Genomes and analytical outputs that have been shared outside
@@ -728,11 +776,24 @@ const PrivacyPolicy = (): JSX.Element => {
         <Number>7.</Number>Choices About Your Data
       </H2>
       <P>Users have the following choices:</P>
-      <List
-        items={[
-          `Users are able to request the deletion of User Data that constitutes their personal data, or Upload Data that they submitted to Aspen. Users may also request the deletion from Aspen of the Pathogen Consensus Genomes created by Aspen on the basis of their Upload Data.`,
-          `Users have full control over any analytical outputs created by any member of their organization group on the basis of the Pathogen Consensus Genome.`,
-          `Users are able to access and download analytical results relating to Upload Data submitted by a member of their organization group within Aspen.`,
+      <List>
+        <ListItem>
+          `Users are able to request the deletion of User Data that constitutes
+          their personal data, or Upload Data that they submitted to Aspen.
+          Users may also request the deletion from Aspen of the Pathogen
+          Consensus Genomes created by Aspen on the basis of their Upload Data.
+        </ListItem>
+        <ListItem>
+          Users have full control over any analytical outputs created by any
+          member of their organization group on the basis of the Pathogen
+          Consensus Genome.
+        </ListItem>
+        <ListItem>
+          Users are able to access and download analytical results relating to
+          Upload Data submitted by a member of their organization group within
+          Aspen.
+        </ListItem>
+        <ListItem>
           <span key="0">
             If you have any questions about our processing of any data, please
             contact us at{" "}
@@ -740,9 +801,9 @@ const PrivacyPolicy = (): JSX.Element => {
               aspenprivacy@chanzuckerberg.com
             </NewTabLink>
             .
-          </span>,
-        ]}
-      />
+          </span>
+        </ListItem>
+      </List>
     </>
   );
 
