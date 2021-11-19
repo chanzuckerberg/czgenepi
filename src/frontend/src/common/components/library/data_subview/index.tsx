@@ -265,6 +265,7 @@ const DataSubview: FunctionComponent<Props> = ({
 
   const numCheckedSamples = checkedSamples?.length;
   const hasCheckedSamples = numCheckedSamples > 0;
+  const hasTooManySamples = numCheckedSamples > 2000;
 
   const render = (tableData?: TableItem[]) => {
     let downloadButton: JSX.Element | null = null;
@@ -277,6 +278,7 @@ const DataSubview: FunctionComponent<Props> = ({
           <TreeSelectionMenu
             handleCreateNSTreeOpen={handleCreateNSTreeOpen}
             handleCreateUsherTreeOpen={() => setShouldStartUsherFlow(true)}
+            isMenuDisabled={hasTooManySamples}
             isUsherDisabled={!hasCheckedSamples}
           />
           <IconButton
