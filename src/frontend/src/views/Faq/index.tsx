@@ -3,7 +3,6 @@ import Head from "next/head";
 import React from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { ROUTES } from "src/common/routes";
-// import List from "src/common/styles/support/components/List";
 import {
   B,
   H1,
