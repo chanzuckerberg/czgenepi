@@ -4,12 +4,10 @@ import { uniq } from "lodash";
 import React, { SyntheticEvent, useEffect, useState } from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { useCreateTree } from "src/common/queries/trees";
-import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import { pluralize } from "src/common/utils/strUtils";
 import { Header, StyledIconButton } from "../DownloadModal/style";
 import { FailedSampleAlert } from "../FailedSampleAlert";
 import { CreateTreeButton } from "./components/CreateTreeButton";
-import { StyledButton } from "./components/CreateTreeButton/style";
 import { MissingSampleAlert } from "./components/MissingSampleAlert";
 import {
   RadioLabelNonContextualized,
@@ -58,7 +56,6 @@ export const CreateNSTreeModal = ({
   handleSetCreateTreeStarted,
 }: Props): JSX.Element => {
   const [treeName, setTreeName] = useState<string>("");
-  const [isTreeBuildDisabled, setTreeBuildDisabled] = useState<boolean>(false);
   const [isInputInEditMode, setIsInputInEditMode] = useState<boolean>(false);
   const [shouldReset, setShouldReset] = useState<boolean>(false);
   const [treeType, setTreeType] = useState<TreeType>(TreeTypes.Targeted);
@@ -95,23 +92,6 @@ export const CreateNSTreeModal = ({
     setValidatedInputSamples(foundSamples);
     setMissingInputSamples(missingSamples);
   };
-
-  useEffect(() => {
-    // TODO (mlila): remove with gisaidIngest feature (handled in CreateTreeButtom component)
-    const treeNameLength = treeName.length;
-    if (treeNameLength > 128 || treeNameLength === 0) {
-      setTreeBuildDisabled(true);
-    } else {
-      if (
-        treeType === TreeTypes.Targeted ||
-        treeType === TreeTypes.NonContextualized
-      ) {
-        setTreeBuildDisabled(false);
-      } else {
-        setTreeBuildDisabled(true);
-      }
-    }
-  }, [treeName, treeType]);
 
   const treeNameLength = treeName.length;
   const hasValidName = treeNameLength > 0 && treeNameLength <= 128;
@@ -214,43 +194,24 @@ export const CreateNSTreeModal = ({
             />
           </RadioGroup>
         </TreeTypeSection>
-        {usesFeatureFlag(FEATURE_FLAGS.gisaidIngest) && (
-          <>
-            <Separator marginSize="l" />
-            <SampleIdInput
-              handleInputModeChange={handleInputModeChange}
-              handleInputValidation={handleInputValidation}
-              shouldReset={shouldReset}
-            />
-            <Separator marginSize="xl" />
-          </>
-        )}
+        <Separator marginSize="l" />
+        <SampleIdInput
+          handleInputModeChange={handleInputModeChange}
+          handleInputValidation={handleInputValidation}
+          shouldReset={shouldReset}
+        />
+        <Separator marginSize="xl" />
         <MissingSampleAlert missingSamples={missingInputSamples} />
         <FailedSampleAlert numFailedSamples={failedSamples?.length} />
       </StyledDialogContent>
       <StyledFooter>
-        {usesFeatureFlag(FEATURE_FLAGS.gisaidIngest) && (
-          <CreateTreeButton
-            hasValidName={hasValidName}
-            hasSamples={allValidSamplesForTreeCreation.length > 0}
-            isInEditMode={isInputInEditMode}
-            isValidTreeType={Object.values(TreeTypes).includes(treeType)}
-            onClick={handleSubmit}
-          />
-        )}
-        {!usesFeatureFlag(FEATURE_FLAGS.gisaidIngest) && (
-          <StyledButton
-            color="primary"
-            variant="contained"
-            isRounded
-            disabled={isTreeBuildDisabled}
-            type="submit"
-            value="Submit"
-            onClick={handleSubmit}
-          >
-            Create Tree
-          </StyledButton>
-        )}
+        <CreateTreeButton
+          hasValidName={hasValidName}
+          hasSamples={allValidSamplesForTreeCreation.length > 0}
+          isInEditMode={isInputInEditMode}
+          isValidTreeType={Object.values(TreeTypes).includes(treeType)}
+          onClick={handleSubmit}
+        />
         <CreateTreeInfo>
           Creating a new tree can take up to 12 hours.
         </CreateTreeInfo>

@@ -7,7 +7,6 @@ import { StyledTreeBuildDisabledImage, StyledTreeBuildImage } from "./style";
 interface Props {
   handleCreateNSTreeOpen: () => void;
   handleCreateUsherTreeOpen: () => void;
-  // TODO (mlila): remove isMenuDisabled when gisaidIngest feature turned on
   isMenuDisabled: boolean;
   isUsherDisabled: boolean;
 }
