@@ -26,7 +26,7 @@ interface Props {
   setIsValid: React.Dispatch<React.SetStateAction<boolean>>;
   hasImportedFile: boolean;
   autocorrectWarnings: SampleIdToWarningMessages;
-  locations: Location[];
+  locations: GisaidLocation[];
 }
 
 export default function Table({
@@ -125,7 +125,7 @@ export default function Table({
     false
   );
 
-  const locationOptions: LocationOption[] = locations.map((location) => {
+  const locationOptions: GisaidLocationOption[] = locations.map((location) => {
     let stringName = "";
     const orderedKeys = ["region", "country", "division", "location"];
     orderedKeys.every((key) => {

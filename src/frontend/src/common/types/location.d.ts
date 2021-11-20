@@ -1,4 +1,4 @@
-interface Location {
+interface GisaidLocation {
   [index: string]: string | number;
   region: string;
   country: string;
@@ -7,7 +7,7 @@ interface Location {
   id: number;
 }
 
-interface LocationOption {
+interface GisaidLocationOption {
   [index: string]: string | number;
   name: string;
   description: string;

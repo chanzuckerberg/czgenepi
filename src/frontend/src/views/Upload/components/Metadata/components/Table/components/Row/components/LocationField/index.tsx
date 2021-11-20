@@ -3,8 +3,9 @@ import { FormikContextType } from "formik";
 import React from "react";
 import { Metadata } from "src/views/Upload/components/common/types";
 import ApplyToAllColumn from "../common/ApplyToAllColumn";
-import { COUNTIES } from "./COUNTIES";
-import { MenuSubtext, StyledTextField } from "./style";
+// import { COUNTIES } from "./COUNTIES";
+// import { MenuSubtext, StyledTextField } from "./style";
+import { StyledTextField } from "./style";
 
 const SELECT_PROPS = {
   displayEmpty: true,
@@ -16,7 +17,7 @@ interface Props {
   formik: FormikContextType<Metadata>;
   applyToAllColumn: (fieldKey: keyof Metadata, value: unknown) => void;
   isFirstRow: boolean;
-  locations: Location[];
+  locations: GisaidLocation[];
 }
 
 export default function LocationField({

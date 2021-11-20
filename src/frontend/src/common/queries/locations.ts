@@ -2,7 +2,7 @@ import { API, DEFAULT_FETCH_OPTIONS } from "../api";
 import { API_URL } from "../constants/ENV";
 
 export interface LocationsResponse {
-  locations: Location[];
+  locations: GisaidLocation[];
 }
 
 export async function getLocations(): Promise<LocationsResponse> {

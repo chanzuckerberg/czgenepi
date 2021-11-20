@@ -2,7 +2,6 @@ import { escapeRegExp } from "lodash/fp";
 import deepEqual from "deep-equal";
 import { useFormik } from "formik";
 import React, { useEffect, useState, useReducer } from "react";
-import AsyncSelect from "react-select/async";
 import { noop } from "src/common/constants/empty";
 import {
   DATE_ERROR_MESSAGE,
@@ -51,17 +50,17 @@ interface Props {
   handleRowValidation: (id: string, isValid: boolean) => void;
   isTouched: boolean;
   warnings?: Set<keyof Metadata>;
-  locationOptions: LocationOption[];
+  locationOptions: GisaidLocationOption[];
 }
 
 interface LocationSearchState {
-  searching: boolean;
-  results?: LocationOption[];
+  searching?: boolean;
+  results: GisaidLocationOption[];
 }
 
 function locationSearchReducer(
   state: LocationSearchState,
-  action: LocationSearchState
+  action: LocationSearchState | Partial<LocationSearchState>
 ): LocationSearchState {
   return { ...state, ...action };
 }
@@ -85,9 +84,8 @@ export default React.memo(function Row({
   });
 
   const { values, isValid, validateForm, setTouched } = formik;
-  const [locationSearchInput, setLocationSearchInput] = useState<string>("");
   const [selectedLocation, setLocation] = useState<
-    LocationOption | undefined
+    GisaidLocationOption | undefined
   >();
   const [state, dispatch] = useReducer(locationSearchReducer, {
     results: [],
@@ -134,7 +132,9 @@ export default React.memo(function Row({
     });
   };
 
-  const handleSearchInputChange = (event: React.SyntheticEvent) => {
+  const handleSearchInputChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const query = event?.target?.value ?? "";
     searcher(query);
   };
@@ -160,7 +160,7 @@ export default React.memo(function Row({
           onChange={(e) => {
             if (!!e) {
               console.log(e);
-              setLocation(e);
+              setLocation(e as GisaidLocationOption);
             }
           }}
           options={state.results}

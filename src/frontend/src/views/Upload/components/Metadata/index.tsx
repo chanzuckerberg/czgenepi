@@ -48,7 +48,7 @@ export default function Metadata({
   const [hasImportedFile, setHasImportedFile] = useState(false);
   const [autocorrectWarnings, setAutocorrectWarnings] =
     useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
-  const [locations, setLocations] = useState<Location[]>([]);
+  const [locations, setLocations] = useState<GisaidLocation[]>([]);
 
   const loadLocations = async () => {
     const result: LocationsResponse = await getLocations();
