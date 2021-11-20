@@ -44,8 +44,8 @@ export default function Resources(): JSX.Element {
         <H3>Seminar Recordings</H3>
         <div>
           <StyledList>
-            <ListItem key={0}>
-              <span>
+            <ListItem>
+              <span key={0}>
                 <StyledNewTabLink href="https://www.youtube.com/watch?v=Bt3JNKfU5qk">
                   Week 1
                 </StyledNewTabLink>{" "}
@@ -54,8 +54,8 @@ export default function Resources(): JSX.Element {
                 phylogenetic trees that visualize genetic divergence.
               </span>
             </ListItem>
-            <ListItem key={1}>
-              <span>
+            <ListItem>
+              <span key={1}>
                 <StyledNewTabLink href="https://www.youtube.com/watch?v=zAtgJjoy6-w">
                   Week 2
                 </StyledNewTabLink>{" "}
@@ -66,8 +66,8 @@ export default function Resources(): JSX.Element {
                 time.
               </span>
             </ListItem>
-            <ListItem key={2}>
-              <span>
+            <ListItem>
+              <span key={2}>
                 <StyledNewTabLink href="https://www.youtube.com/watch?v=jYpjzP22HcM">
                   Week 3
                 </StyledNewTabLink>{" "}
@@ -78,8 +78,8 @@ export default function Resources(): JSX.Element {
                 cautious about.
               </span>
             </ListItem>
-            <ListItem key={3}>
-              <span>
+            <ListItem>
+              <span key={3}>
                 <StyledNewTabLink href="https://www.youtube.com/watch?v=qllORYfM_z8">
                   Week 4
                 </StyledNewTabLink>{" "}
@@ -89,8 +89,8 @@ export default function Resources(): JSX.Element {
                 Auspice.
               </span>
             </ListItem>
-            <ListItem key={4}>
-              <span>
+            <ListItem>
+              <span key={4}>
                 <StyledNewTabLink href="https://www.youtube.com/watch?v=eeYgWdRbPPo">
                   Week 5
                 </StyledNewTabLink>{" "}
@@ -101,8 +101,8 @@ export default function Resources(): JSX.Element {
                 genome.
               </span>
             </ListItem>
-            <ListItem key={5}>
-              <span>
+            <ListItem>
+              <span key={5}>
                 <StyledNewTabLink href="https://www.youtube.com/watch?v=GJMTNwDKibI">
                   Week 6
                 </StyledNewTabLink>{" "}
@@ -117,8 +117,8 @@ export default function Resources(): JSX.Element {
                 calls in BAM files.
               </span>
             </ListItem>
-            <ListItem key={6}>
-              <span>
+            <ListItem>
+              <span key={6}>
                 <StyledNewTabLink href="https://www.youtube.com/watch?v=HVorizRS4wk">
                   Week 7
                 </StyledNewTabLink>{" "}
@@ -128,8 +128,8 @@ export default function Resources(): JSX.Element {
                 nomenclature system for SARS-CoV-2.
               </span>
             </ListItem>
-            <ListItem key={7}>
-              <span>
+            <ListItem>
+              <span key={7}>
                 <StyledNewTabLink href="https://www.youtube.com/watch?v=ycM50nC5wXk">
                   Week 8
                 </StyledNewTabLink>{" "}
@@ -140,8 +140,8 @@ export default function Resources(): JSX.Element {
                 different types of genomic epidemiological questions/studies.
               </span>
             </ListItem>
-            <ListItem key={8}>
-              <span>
+            <ListItem>
+              <span key={8}>
                 <StyledNewTabLink href="https://www.youtube.com/watch?v=a8bp0iHCttA">
                   Week 9
                 </StyledNewTabLink>{" "}
@@ -151,8 +151,8 @@ export default function Resources(): JSX.Element {
                 from the shapes of coalescent phylogenetic trees.
               </span>
             </ListItem>
-            <ListItem key={9}>
-              <span>
+            <ListItem>
+              <span key={9}>
                 <StyledNewTabLink href="https://www.youtube.com/watch?v=cLLV2VpgXCU">
                   Week 10
                 </StyledNewTabLink>{" "}
@@ -166,8 +166,8 @@ export default function Resources(): JSX.Element {
                 recording of this video, Aspen has added this capability.]
               </span>
             </ListItem>
-            <ListItem key={10}>
-              <span>
+            <ListItem>
+              <span key={10}>
                 <StyledNewTabLink href="https://www.youtube.com/watch?v=lFJ_2G4u8w4">
                   Week 11
                 </StyledNewTabLink>{" "}
@@ -177,8 +177,8 @@ export default function Resources(): JSX.Element {
                 some cases eventually escape our immunity.
               </span>
             </ListItem>
-            <ListItem key={11}>
-              <span>
+            <ListItem>
+              <span key={11}>
                 <StyledNewTabLink href="https://www.youtube.com/watch?v=7nyq5Mc_pOo">
                   Week 12
                 </StyledNewTabLink>{" "}
@@ -187,8 +187,8 @@ export default function Resources(): JSX.Element {
                 situations when I prefer one over the other.
               </span>
             </ListItem>
-            <ListItem key={12}>
-              <span>
+            <ListItem>
+              <span key={12}>
                 <StyledNewTabLink href="https://www.youtube.com/watch?v=0ms0FYmpfDc">
                   Week 13
                 </StyledNewTabLink>{" "}
@@ -197,8 +197,8 @@ export default function Resources(): JSX.Element {
                 the epidemiology of TB.
               </span>
             </ListItem>
-            <ListItem key={13}>
-              <span>
+            <ListItem>
+              <span key={13}>
                 <StyledNewTabLink href="https://www.youtube.com/watch?v=pk-ap-1Uicc">
                   Week 14
                 </StyledNewTabLink>{" "}
@@ -208,8 +208,8 @@ export default function Resources(): JSX.Element {
                 investigations in California.
               </span>
             </ListItem>
-            <ListItem key={14}>
-              <span>
+            <ListItem>
+              <span key={14}>
                 <StyledNewTabLink href="https://www.youtube.com/watch?v=4uE2lEpGo2k">
                   Week 15
                 </StyledNewTabLink>{" "}
@@ -218,8 +218,8 @@ export default function Resources(): JSX.Element {
                 viral pathogen - Mumps virus.
               </span>
             </ListItem>
-            <ListItem key={15}>
-              <span>
+            <ListItem>
+              <span key={15}>
                 <StyledNewTabLink href="https://www.youtube.com/watch?v=RbK6Bv4-fnc">
                   Aspen Tutorial!
                 </StyledNewTabLink>{" "}
