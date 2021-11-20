@@ -1,8 +1,7 @@
-import { ListItemLabel } from "czifui";
+import { List, ListItem, ListItemLabel } from "czifui";
 import Head from "next/head";
 import React from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
-import List from "src/common/styles/support/components/List";
 import {
   B,
   H1,
@@ -70,18 +69,24 @@ export default function Terms(): JSX.Element {
     return (
       <>
         <H3>Summary of Key Things to Know</H3>
-        <List
-          items={[
+        <List>
+          <ListItem>
             <span key="0">
               Aspen is a tool that helps you infer how pathogens are moving
               through a population and how cases are related to one another.
-            </span>,
+            </span>
+          </ListItem>
+          <ListItem>
             <span key="1">
               Aspen is offered by the Chan Zuckerberg Initiative Foundation
               (CZIF), in close collaboration with the Chan Zuckerberg Biohub
               (CZB) and the Chan Zuckerberg Initiative, LLC (CZI LLC).
-            </span>,
-            <span key="2">Aspen is a free and open-source tool.</span>,
+            </span>
+          </ListItem>
+          <ListItem>
+            <span key="2">Aspen is a free and open-source tool.</span>
+          </ListItem>
+          <ListItem>
             <span key="3">
               In order to use Aspen, you must be acting in your professional
               capacity. This means a couple things: (1) your use of Aspen may be
@@ -90,12 +95,16 @@ export default function Terms(): JSX.Element {
               organization (3) your Upload Data, and analytical results may be
               shared with third parties in accordance with your organization’s
               policies.
-            </span>,
+            </span>
+          </ListItem>
+          <ListItem>
             <span key="4">
               Samples marked &quot;private&quot; will never be shared with 3rd
               parties unless you choose to mark them &quot;public&quot; later
               on.
-            </span>,
+            </span>
+          </ListItem>
+          <ListItem>
             <span key="5">
               The outputs (ex: analytical outputs, such as phylogenetic trees)
               you create with Aspen are <B>not</B> personally identifiable. You
@@ -108,10 +117,15 @@ export default function Terms(): JSX.Element {
               </NewTabLink>{" "}
               like name, address, dates, telephone numbers, e-mail addresses, or
               medical record numbers from data you upload to Aspen.
-            </span>,
-            `Aspen does not provide medical advice. The output from Aspen does not constitute and should not be relied upon to provide medical advice, diagnosis or treatment. It is intended for research, educational, or informational purposes only.`,
-          ]}
-        />
+            </span>
+          </ListItem>
+          <ListItem>
+            Aspen does not provide medical advice. The output from Aspen does
+            not constitute and should not be relied upon to provide medical
+            advice, diagnosis or treatment. It is intended for research,
+            educational, or informational purposes only.
+          </ListItem>
+        </List>
       </>
     );
   };
@@ -121,8 +135,8 @@ export default function Terms(): JSX.Element {
       <H2>
         <Number>1.</Number>Upload Data and Analytical Outputs you create
       </H2>
-      <List
-        items={[
+      <List>
+        <ListItem>
           <span key="0">
             <ListItemLabel>No personally identifying data.</ListItemLabel>
             The data you upload to Aspen consists of Raw Sequence Data, Pathogen
@@ -135,7 +149,9 @@ export default function Terms(): JSX.Element {
             </NewTabLink>{" "}
             like name, address, symptom onset dates or case interview dates,
             telephone numbers, e-mail addresses, or medical record numbers.
-          </span>,
+          </span>
+        </ListItem>
+        <ListItem>
           <span key="1">
             <ListItemLabel>Compliance with laws.</ListItemLabel>
             By uploading data to Aspen, you represent and warrant to us that (A)
@@ -147,7 +163,9 @@ export default function Terms(): JSX.Element {
             GA4GH). Please note that we filter out human sequence data as part
             of processing Raw Sequence Data as such information is not necessary
             for providing Aspen.
-          </span>,
+          </span>
+        </ListItem>
+        <ListItem>
           <span key="2">
             <ListItemLabel>Our rights and your rights.</ListItemLabel>
             We need some basic rights to use your Upload data in order to offer
@@ -161,7 +179,9 @@ export default function Terms(): JSX.Element {
             <NewTabLink href="mailto:helloaspen@chanzuckerberg.com">
               helloaspen@chanzuckerberg.com
             </NewTabLink>{" "}
-          </span>,
+          </span>
+        </ListItem>
+        <ListItem>
           <span key="3">
             <ListItemLabel>
               Sharing pathogen genomes and analytical outputs.
@@ -170,8 +190,8 @@ export default function Terms(): JSX.Element {
             analytical outputs from them (ex: phylogenetic trees) that allow you
             to better understand the relationship between different pathogen
             genomes.
-            <List
-              items={[
+            <List>
+              <ListItem>
                 <span key="0">
                   <ListItemLabel>Within your organization:</ListItemLabel>
                   The pathogen genomes created from your Samples and the
@@ -185,12 +205,12 @@ export default function Terms(): JSX.Element {
                   Samples marked &quot;private&quot; will never be shared with
                   any 3rd parties unless you choose to mark them
                   &quot;public&quot; later on.
-                </span>,
-              ]}
-            />
-          </span>,
-        ]}
-      />
+                </span>
+              </ListItem>
+            </List>
+          </span>
+        </ListItem>
+      </List>
     </>
   );
 
@@ -199,12 +219,21 @@ export default function Terms(): JSX.Element {
       <H2>
         <Number>2.</Number>Authorization To Use Aspen
       </H2>
-      <List
-        items={[
-          `You are using Aspen in your professional capacity as a User from your organization. This means that in addition to Aspen’s Terms and Privacy Policy, your organization’s policies also likely apply to your and your colleagues’ use of Aspen. Please see your organization for questions related to their policies.`,
-          `Aspen may not be used to provide medical or other services to any third party (for instance, to inform or provide disease diagnoses). Aspen is not intended to diagnose, treat, cure, or prevent any disease and is not a substitute for medical advice.`,
-        ]}
-      />
+      <List>
+        <ListItem>
+          You are using Aspen in your professional capacity as a User from your
+          organization. This means that in addition to Aspen’s Terms and Privacy
+          Policy, your organization’s policies also likely apply to your and
+          your colleagues’ use of Aspen. Please see your organization for
+          questions related to their policies.
+        </ListItem>
+        <ListItem>
+          Aspen may not be used to provide medical or other services to any
+          third party (for instance, to inform or provide disease diagnoses).
+          Aspen is not intended to diagnose, treat, cure, or prevent any disease
+          and is not a substitute for medical advice.
+        </ListItem>
+      </List>
     </>
   );
 
@@ -213,17 +242,26 @@ export default function Terms(): JSX.Element {
       <H2>
         <Number>3.</Number>Limitations On Use
       </H2>
-      <List
-        items={[
-          `You shall not otherwise access or use, or attempt to access or use, Aspen to take any action that could harm us, Aspen or its Users, or any third party, or use Aspen in any manner that violates applicable law or infringes or otherwise violates third party rights.`,
+      <List>
+        <ListItem>
+          You shall not otherwise access or use, or attempt to access or use,
+          Aspen to take any action that could harm us, Aspen or its Users, or
+          any third party, or use Aspen in any manner that violates applicable
+          law or infringes or otherwise violates third party rights.
+        </ListItem>
+        <ListItem>
           <span key="0">
             You represent and warrant that you are a natural person over the age
             of 16 and that you are acting in your professional capacity as
             authorized by your organization to enter into these Terms.
-          </span>,
-          `We may restrict or terminate your access to Aspen at any time, including for breach of these Terms. If this happens, we will attempt to provide you notice through the contact information we have for you.`,
-        ]}
-      />
+          </span>
+        </ListItem>
+        <ListItem>
+          We may restrict or terminate your access to Aspen at any time,
+          including for breach of these Terms. If this happens, we will attempt
+          to provide you notice through the contact information we have for you.
+        </ListItem>
+      </List>
     </>
   );
 
@@ -232,31 +270,35 @@ export default function Terms(): JSX.Element {
       <H2>
         <Number>4.</Number>Changes To Aspen Or These Terms
       </H2>
-      <List
-        items={[
+      <List>
+        <ListItem>
           <span key="0">
             <ListItemLabel>Changes to Aspen.</ListItemLabel>Aspen is a free
             tool. We can’t promise Aspen will always be up and offered as it is
             today, but if we are making material changes to its features or that
             impact its availability, we will give you a chance to download
             and/or delete your data so you can take it off of Aspen.
-          </span>,
+          </span>
+        </ListItem>
+        <ListItem>
           <span key="1">
             <ListItemLabel>Changes to these Terms.</ListItemLabel>
             We may update these Terms from time to time and will notify you of
             material changes to the Terms, prior to their becoming effective. If
             you do not agree to the updated Terms, your remedy will be to close
             your Account prior to the effective date of those changes.
-          </span>,
+          </span>
+        </ListItem>
+        <ListItem>
           <span key="2">
             <ListItemLabel>Closing Your Account.</ListItemLabel>You can close
             your Account at any time. Just contact us at{" "}
             <NewTabLink href="mailto:aspenprivacy@chanzuckerberg.com">
               aspenprivacy@chanzuckerberg.com
             </NewTabLink>
-          </span>,
-        ]}
-      />
+          </span>
+        </ListItem>
+      </List>
     </>
   );
 
@@ -265,8 +307,8 @@ export default function Terms(): JSX.Element {
       <H2>
         <Number>5.</Number>Disclaimers.
       </H2>
-      <List
-        items={[
+      <List>
+        <ListItem>
           <span key="0">
             We and our service providers do not review or correct any data
             uploaded into Aspen. If you would like to report any issue with
@@ -277,17 +319,21 @@ export default function Terms(): JSX.Element {
             . Aspen is not intended as a storage service, so please back up your
             Upload Data using a secure service of your choice, such as the
             NCBI’s Sequence Read Archive (SRA) repository.
-          </span>,
+          </span>
+        </ListItem>
+        <ListItem>
           <span key="1">
             <P>TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW:</P>
-            <List
-              items={[
+            <List>
+              <ListItem>
                 <span key="0">
                   YOUR ACCESS AND USE ASPEN AT YOUR SOLE RISK AND AGREE THAT WE
                   AND OUR SERVICE PROVIDERS WILL NOT BE RESPONSIBLE FOR ANY
                   ACTIONS YOU TAKE BASED ON ASPEN OR FOR ANY INACCURATE DATA OR
                   OUTPUTS OF ASPEN.
-                </span>,
+                </span>
+              </ListItem>
+              <ListItem>
                 <span key="1">
                   ASPEN IS PROVIDED &quot;AS IS&quot; WITH ALL FAULTS, AND WE
                   AND OUR SERVICE PROVIDERS HEREBY DISCLAIM ALL REPRESENTATIONS
@@ -299,7 +345,9 @@ export default function Terms(): JSX.Element {
                   ASPEN IS NOT INTENDED TO BE USED AND SHOULD NOT BE USED AS A
                   MEDICAL DEVICE OR FOR PURPOSES OF MEDICAL DIAGNOSIS OR
                   TREATMENT.
-                </span>,
+                </span>
+              </ListItem>
+              <ListItem>
                 <span key="2">
                   FOR CLARITY AND WITHOUT LIMITING THE FOREGOING, WE AND OUR
                   SERVICE PROVIDERS DO NOT MAKE ANY GUARANTEES (I) REGARDING THE
@@ -310,12 +358,12 @@ export default function Terms(): JSX.Element {
                   ANY PERSON OR ENTITY, OR ANY REGULATORY APPROVALS OR
                   REQUIREMENTS. WITHOUT LIMITATION, YOU ACKNOWLEDGE THAT ASPEN
                   IS NOT A BUSINESS ASSOCIATE FOR PURPOSES OF HIPAA.
-                </span>,
-              ]}
-            />
-          </span>,
-        ]}
-      />
+                </span>
+              </ListItem>
+            </List>
+          </span>
+        </ListItem>
+      </List>
     </>
   );
 
@@ -324,8 +372,8 @@ export default function Terms(): JSX.Element {
       <H2>
         <Number>6.</Number>Limitation Of Liability
       </H2>
-      <List
-        items={[
+      <List>
+        <ListItem>
           <span key="0">
             TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, CZIF AND
             AFFILIATES (INCLUDING WITHOUT LIMITATION CHAN ZUCKERBERG INITIATIVE,
@@ -341,9 +389,9 @@ export default function Terms(): JSX.Element {
             APPLICABLE LAW, IN NO EVENT WILL THE PROTECTED PARTIES’ AGGREGATE
             LIABILITY ARISING OUT OF OR RELATING TO THESE TERMS OR THE SERVICE
             EXCEED USD <B>$100</B>.
-          </span>,
-        ]}
-      />
+          </span>
+        </ListItem>
+      </List>
     </>
   );
 
@@ -352,12 +400,29 @@ export default function Terms(): JSX.Element {
       <H2>
         <Number>7.</Number>Indemnification
       </H2>
-      <List
-        items={[
-          `You shall indemnify, defend and hold the Protected Parties harmless from and against, and shall pay all damages, costs, fees and expenses (including reasonable attorneys’ fees and expenses) relating to, any third party (including government entity) claim, action, suit or other proceeding (a &quot;Claim&quot;) to the extent arising from: (1) your gross negligence, willful misconduct or fraud; and/or (2) any misrepresentation you make regarding your permission to submit data to Aspen for your organization’s use.`,
-          `Indemnification is conditioned upon the Protected Parties giving you written notice of any such Claim, and giving you control of the defense and settlement of any such Claim, and cooperating with you in such defense. Notwithstanding anything to the contrary, (1) the Protected Parties may participate in defense of such Claim with its own counsel at its own expense and (2) you may not settle any Claim without CZIF’s prior written consent, which will not be unreasonably withheld, unless it unconditionally releases the Protected Parties of all liability, obligation, and fault.`,
-        ]}
-      />
+      <List>
+        <ListItem>
+          You shall indemnify, defend and hold the Protected Parties harmless
+          from and against, and shall pay all damages, costs, fees and expenses
+          (including reasonable attorneys’ fees and expenses) relating to, any
+          third party (including government entity) claim, action, suit or other
+          proceeding (a &quot;Claim&quot;) to the extent arising from: (1) your
+          gross negligence, willful misconduct or fraud; and/or (2) any
+          misrepresentation you make regarding your permission to submit data to
+          Aspen for your organization’s use.
+        </ListItem>
+        <ListItem>
+          Indemnification is conditioned upon the Protected Parties giving you
+          written notice of any such Claim, and giving you control of the
+          defense and settlement of any such Claim, and cooperating with you in
+          such defense. Notwithstanding anything to the contrary, (1) the
+          Protected Parties may participate in defense of such Claim with its
+          own counsel at its own expense and (2) you may not settle any Claim
+          without CZIF’s prior written consent, which will not be unreasonably
+          withheld, unless it unconditionally releases the Protected Parties of
+          all liability, obligation, and fault.
+        </ListItem>
+      </List>
     </>
   );
 
@@ -366,8 +431,8 @@ export default function Terms(): JSX.Element {
       <H2>
         <Number>8.</Number> Arbitration
       </H2>
-      <List
-        items={[
+      <List>
+        <ListItem>
           <span key="0">
             <ListItemLabel>Final and Binding Arbitration.</ListItemLabel>
             We endeavor and trust that we will have a productive relationship
@@ -376,7 +441,9 @@ export default function Terms(): JSX.Element {
             TO WAIVE OUR RESPECTIVE RIGHTS TO RESOLUTION OF DISPUTES IN A COURT
             OF LAW BY A JUDGE OR JURY AND AGREE TO RESOLVE ANY DISPUTE BY
             ARBITRATION, WHICH WILL BE FINAL AND BINDING, AS SET FORTH BELOW.
-          </span>,
+          </span>
+        </ListItem>
+        <ListItem>
           <span key="1">
             <ListItemLabel>Dispute Resolution.</ListItemLabel>
             In the unlikely event we have a dispute arising out of or related to
@@ -387,7 +454,9 @@ export default function Terms(): JSX.Element {
             of CZIF shall (in good faith) meet and attempt to resolve the
             Dispute through non-binding mediation with a mutually agreed upon
             mediator within thirty (30) additional days.
-          </span>,
+          </span>
+        </ListItem>
+        <ListItem>
           <span key="2">
             <ListItemLabel>Mutual Agreement to Arbitrate.</ListItemLabel>
             If the Dispute is not resolved within such time period, the Dispute
@@ -406,9 +475,9 @@ export default function Terms(): JSX.Element {
             of the arbitration, which will be final and binding. Judgment on any
             award rendered in any such arbitration may be entered in any court
             having jurisdiction in San Mateo County, California.
-          </span>,
-        ]}
-      />
+          </span>
+        </ListItem>
+      </List>
     </>
   );
 
@@ -417,11 +486,21 @@ export default function Terms(): JSX.Element {
       <H2>
         <Number>9.</Number>Choice of Law and Venue
       </H2>
-      <List
-        items={[
-          `This Agreement and any Disputes will be governed, controlled, and interpreted by and under the laws of the State of California, without giving effect to any conflicts of laws principles that require the application of the law of a different state. Notwithstanding the foregoing, to the extent such laws are inconsistent with the Federal Arbitration Act, the Federal Arbitration Act will govern. Any dispute that is not subject to arbitration (e.g., if arbitration is deemed unenforceable or inapplicable) shall be, and any judgement on any arbitration award may be, brought in the U.S. District Court for the Northern District of California or a state court located in San Mateo County, California.`,
-        ]}
-      />
+      <List>
+        <ListItem>
+          This Agreement and any Disputes will be governed, controlled, and
+          interpreted by and under the laws of the State of California, without
+          giving effect to any conflicts of laws principles that require the
+          application of the law of a different state. Notwithstanding the
+          foregoing, to the extent such laws are inconsistent with the Federal
+          Arbitration Act, the Federal Arbitration Act will govern. Any dispute
+          that is not subject to arbitration (e.g., if arbitration is deemed
+          unenforceable or inapplicable) shall be, and any judgement on any
+          arbitration award may be, brought in the U.S. District Court for the
+          Northern District of California or a state court located in San Mateo
+          County, California.
+        </ListItem>
+      </List>
     </>
   );
 
@@ -430,14 +509,32 @@ export default function Terms(): JSX.Element {
       <H2>
         <Number>10.</Number>General Terms
       </H2>
-      <List
-        items={[
-          `If any provision in these Terms is held invalid or unenforceable, the other provisions will remain enforceable, and the invalid or unenforceable provision will be modified to a valid and enforceable provision that most accurately reflects the parties intentions.`,
-          `Any waiver or failure to enforce any of these Terms on one occasion will not be deemed a waiver of any other provision or of that provision on any other occasion.`,
-          `You may not assign or transfer any rights or obligations under these Terms without our consent. However, you agree that we may assign these Terms in connection with a reorganization, or to a successor or assign that agrees to assume our obligations under these Terms (and Privacy Policy) without your consent.`,
-          `Entire Agreement. These Terms (along with the Privacy Notice) constitute the entire agreement between you and us regarding Aspen. If you wish to modify these Terms, any amendment must be provided to us in writing and signed by our authorized representative.`,
-        ]}
-      />
+      <List>
+        <ListItem>
+          If any provision in these Terms is held invalid or unenforceable, the
+          other provisions will remain enforceable, and the invalid or
+          unenforceable provision will be modified to a valid and enforceable
+          provision that most accurately reflects the parties intentions.
+        </ListItem>
+        <ListItem>
+          Any waiver or failure to enforce any of these Terms on one occasion
+          will not be deemed a waiver of any other provision or of that
+          provision on any other occasion.
+        </ListItem>
+        <ListItem>
+          You may not assign or transfer any rights or obligations under these
+          Terms without our consent. However, you agree that we may assign these
+          Terms in connection with a reorganization, or to a successor or assign
+          that agrees to assume our obligations under these Terms (and Privacy
+          Policy) without your consent.
+        </ListItem>
+        <ListItem>
+          Entire Agreement. These Terms (along with the Privacy Notice)
+          constitute the entire agreement between you and us regarding Aspen. If
+          you wish to modify these Terms, any amendment must be provided to us
+          in writing and signed by our authorized representative.
+        </ListItem>
+      </List>
     </>
   );
 
@@ -446,8 +543,8 @@ export default function Terms(): JSX.Element {
       <H2>
         <Number>11.</Number> How to Contact Us
       </H2>
-      <List
-        items={[
+      <List>
+        <ListItem>
           <span key="0">
             If you have any questions, comments, or concerns with Terms, you may
             contact us at{" "}
@@ -455,7 +552,9 @@ export default function Terms(): JSX.Element {
               aspenprivacy@chanzuckerberg.com
             </NewTabLink>
             .
-          </span>,
+          </span>
+        </ListItem>
+        <ListItem>
           <P key="1">
             Notice under these Terms must be in writing and deemed to have been
             given on the date delivered by a nationally recognized express mail
@@ -478,9 +577,9 @@ export default function Terms(): JSX.Element {
             </NewTabLink>{" "}
             (email does not constitute notice)
             <br />
-          </P>,
-        ]}
-      />
+          </P>
+        </ListItem>
+      </List>
       <div style={{ height: "50px" }} />
     </>
   );
