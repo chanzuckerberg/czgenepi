@@ -254,7 +254,6 @@ export default function Resources(): JSX.Element {
         <Intro />
         <GenomicEpiSeries />
         <Questions />
-        <div style={{ height: "50px" }} />
       </NarrowContainer>
     </>
   );

@@ -296,7 +296,6 @@ export default function Faq(): JSX.Element {
         {renderHowToUseAspen()}
         {renderCOVIDTrackerProgram()}
         {renderPrivacyAndDataSharing()}
-        <div style={{ height: "50px" }} />
       </NarrowContainer>
     </>
   );

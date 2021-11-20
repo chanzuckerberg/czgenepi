@@ -14,6 +14,7 @@ import {
 export const NarrowContainer = styled.div`
   max-width: 800px;
   margin: 90px auto;
+  padding-bottom: 50px;
 `;
 
 export const B = styled.b`
