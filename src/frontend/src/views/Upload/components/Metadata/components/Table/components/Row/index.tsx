@@ -119,6 +119,7 @@ export default React.memo(function Row({
   const searcher = (query: string): void => {
     if (query.length < 2) {
       dispatch({ results: [] });
+      return;
     }
     dispatch({ searching: true });
 
@@ -126,8 +127,20 @@ export default React.memo(function Row({
     const filteredLocationOptions = locationOptions.filter((option) =>
       regex.test(option.name)
     );
+    // alphabetical sort
+    // this ensure partial locations (i.e. region, country and divison
+    // but no location) end up on top.
+    const sortedLocationOptions = filteredLocationOptions.sort((a, b) => {
+      if (a.name < b.name) {
+        return -1;
+      }
+      if (a.name > b.name) {
+        return 1;
+      }
+      return 0;
+    });
     dispatch({
-      results: filteredLocationOptions.slice(0, 20),
+      results: sortedLocationOptions.slice(0, 100),
       searching: false,
     });
   };
