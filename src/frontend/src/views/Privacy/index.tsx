@@ -846,7 +846,6 @@ const PrivacyPolicy = (): JSX.Element => {
         We may update this Privacy Policy from time to time and will provide you
         with notice of material updates before they become effective.
       </P>
-      <div style={{ height: "50px" }} />
     </>
   );
 
