@@ -8,7 +8,7 @@ module stack {
   image_tags          = jsondecode(var.image_tags)
   priority            = var.priority
   stack_name          = var.stack_name
-  deployment_stage    = "rdev"
+  deployment_stage    = "dev"
   delete_protected    = false
   require_okta        = true
   stack_prefix        = "/${var.stack_name}"

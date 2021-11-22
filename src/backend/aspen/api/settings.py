@@ -11,7 +11,7 @@ from pydantic import BaseSettings
 def aws_secret_settings(settings) -> Dict[str, Any]:
     """Loads settings from an aws secret whose value is JSON encoded."""
     session = Session(region_name=os.environ["AWS_REGION"])
-    secret_name = os.environ.get("ASPEN_CONFIG_SECRET_NAME", "aspen-config")
+    secret_name = os.environ.get("GENEPI_CONFIG_SECRET_NAME", "genepi-config")
     client = session.client(
         service_name="secretsmanager",
         endpoint_url=os.environ.get("BOTO_ENDPOINT_URL"),

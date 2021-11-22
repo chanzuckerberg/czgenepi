@@ -19,8 +19,8 @@ export OIDC_BROWSER_URL=https://oidc.genepinet.localdev:8443
 
 echo "Creating secretsmanager secrets"
 local_aws="aws --endpoint-url=${LOCALSTACK_URL}"
-${local_aws} secretsmanager create-secret --name aspen-config &> /dev/null || true
-${local_aws} secretsmanager update-secret --secret-id aspen-config --secret-string '{
+${local_aws} secretsmanager create-secret --name genepi-config &> /dev/null || true
+${local_aws} secretsmanager update-secret --secret-id genepi-config --secret-string '{
   "AUTH0_CLIENT_ID": "local-client-id",
   "AUTH0_CALLBACK_URL": "'"${BACKEND_URL}"'/callback",
   "AUTH0_CLIENT_SECRET": "local-client-secret",
@@ -63,7 +63,7 @@ ${local_aws} ssm delete-parameter --name /aspen/local/localstack/nextstrain-onde
 ${local_aws} ssm put-parameter --name /aspen/local/localstack/nextstrain-ondemand-sfn --value '{
   "Input":{
     "Run":{
-      "aspen_config_secret_name":"aspen-config",
+      "genepi_config_secret_name":"genepi-config",
       "aws_region":"us-west-2",
       "docker_image_id":"aspen-nextstrain",
       "remote_dev_prefix":""}

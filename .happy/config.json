@@ -2,7 +2,7 @@
     "config_version": "v1",
     "terraform_version": "0.13.5",
     "default_env": "rdev",
-    "app": "aspen",
+    "app": "genepi",
     "default_compose_env": ".env.ecr",
     "slice_default_tag": "branch-trunk",
     "services": ["frontend", "backend"],
@@ -32,7 +32,7 @@
     "environments": {
         "rdev": {
             "aws_profile": "genepi-dev",
-            "secret_arn": "happy/env-rdev-config",
+            "secret_arn": "happy/env-dev-config",
             "terraform_directory": ".happy/terraform/envs/rdev",
             "log_group_prefix": "/aspen/rdev"
         },

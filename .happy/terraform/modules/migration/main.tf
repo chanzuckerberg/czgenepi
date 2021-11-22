@@ -35,8 +35,8 @@ resource aws_ecs_task_definition task_definition {
         "value": "${var.deployment_stage}"
       },
       {
-        "name": "ASPEN_CONFIG_SECRET_NAME",
-        "value": "${var.deployment_stage}/aspen-config"
+        "name": "GENEPI_CONFIG_SECRET_NAME",
+        "value": "${var.deployment_stage}/genepi-config"
       }
     ],
     "logConfiguration": {
