@@ -71,23 +71,23 @@ export default function Terms(): JSX.Element {
         <H3>Summary of Key Things to Know</H3>
         <List>
           <ListItem>
-            <span key="0">
+            <span>
               Aspen is a tool that helps you infer how pathogens are moving
               through a population and how cases are related to one another.
             </span>
           </ListItem>
           <ListItem>
-            <span key="1">
+            <span>
               Aspen is offered by the Chan Zuckerberg Initiative Foundation
               (CZIF), in close collaboration with the Chan Zuckerberg Biohub
               (CZB) and the Chan Zuckerberg Initiative, LLC (CZI LLC).
             </span>
           </ListItem>
           <ListItem>
-            <span key="2">Aspen is a free and open-source tool.</span>
+            <span>Aspen is a free and open-source tool.</span>
           </ListItem>
           <ListItem>
-            <span key="3">
+            <span>
               In order to use Aspen, you must be acting in your professional
               capacity. This means a couple things: (1) your use of Aspen may be
               subject to your organization’s policies and (2) upon sign-up,
@@ -98,14 +98,14 @@ export default function Terms(): JSX.Element {
             </span>
           </ListItem>
           <ListItem>
-            <span key="4">
+            <span>
               Samples marked &quot;private&quot; will never be shared with 3rd
               parties unless you choose to mark them &quot;public&quot; later
               on.
             </span>
           </ListItem>
           <ListItem>
-            <span key="5">
+            <span>
               The outputs (ex: analytical outputs, such as phylogenetic trees)
               you create with Aspen are <B>not</B> personally identifiable. You
               must also ensure that the data you upload to Aspen (Raw Sequence
@@ -137,7 +137,7 @@ export default function Terms(): JSX.Element {
       </H2>
       <List>
         <ListItem>
-          <span key="0">
+          <span>
             <ListItemLabel>No personally identifying data.</ListItemLabel>
             The data you upload to Aspen consists of Raw Sequence Data, Pathogen
             Consensus Genomes, and Sample Metadata (ex: date collected and
@@ -152,7 +152,7 @@ export default function Terms(): JSX.Element {
           </span>
         </ListItem>
         <ListItem>
-          <span key="1">
+          <span>
             <ListItemLabel>Compliance with laws.</ListItemLabel>
             By uploading data to Aspen, you represent and warrant to us that (A)
             you have all consents, permissions, and authorizations necessary for
@@ -166,7 +166,7 @@ export default function Terms(): JSX.Element {
           </span>
         </ListItem>
         <ListItem>
-          <span key="2">
+          <span>
             <ListItemLabel>Our rights and your rights.</ListItemLabel>
             We need some basic rights to use your Upload data in order to offer
             Aspen’s services to you. Specifically, you grant to us a license to
@@ -182,7 +182,7 @@ export default function Terms(): JSX.Element {
           </span>
         </ListItem>
         <ListItem>
-          <span key="3">
+          <span>
             <ListItemLabel>
               Sharing pathogen genomes and analytical outputs.
             </ListItemLabel>
@@ -192,7 +192,7 @@ export default function Terms(): JSX.Element {
             genomes.
             <List>
               <ListItem>
-                <span key="0">
+                <span>
                   <ListItemLabel>Within your organization:</ListItemLabel>
                   The pathogen genomes created from your Samples and the
                   analytical outputs you create using Aspen are visible to other
@@ -250,7 +250,7 @@ export default function Terms(): JSX.Element {
           law or infringes or otherwise violates third party rights.
         </ListItem>
         <ListItem>
-          <span key="0">
+          <span>
             You represent and warrant that you are a natural person over the age
             of 16 and that you are acting in your professional capacity as
             authorized by your organization to enter into these Terms.
@@ -272,7 +272,7 @@ export default function Terms(): JSX.Element {
       </H2>
       <List>
         <ListItem>
-          <span key="0">
+          <span>
             <ListItemLabel>Changes to Aspen.</ListItemLabel>Aspen is a free
             tool. We can’t promise Aspen will always be up and offered as it is
             today, but if we are making material changes to its features or that
@@ -281,7 +281,7 @@ export default function Terms(): JSX.Element {
           </span>
         </ListItem>
         <ListItem>
-          <span key="1">
+          <span>
             <ListItemLabel>Changes to these Terms.</ListItemLabel>
             We may update these Terms from time to time and will notify you of
             material changes to the Terms, prior to their becoming effective. If
@@ -290,7 +290,7 @@ export default function Terms(): JSX.Element {
           </span>
         </ListItem>
         <ListItem>
-          <span key="2">
+          <span>
             <ListItemLabel>Closing Your Account.</ListItemLabel>You can close
             your Account at any time. Just contact us at{" "}
             <NewTabLink href="mailto:aspenprivacy@chanzuckerberg.com">
@@ -309,7 +309,7 @@ export default function Terms(): JSX.Element {
       </H2>
       <List>
         <ListItem>
-          <span key="0">
+          <span>
             We and our service providers do not review or correct any data
             uploaded into Aspen. If you would like to report any issue with
             Aspen please contact us at{" "}
@@ -322,11 +322,11 @@ export default function Terms(): JSX.Element {
           </span>
         </ListItem>
         <ListItem>
-          <span key="1">
+          <span>
             <P>TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW:</P>
             <List>
               <ListItem>
-                <span key="0">
+                <span>
                   YOUR ACCESS AND USE ASPEN AT YOUR SOLE RISK AND AGREE THAT WE
                   AND OUR SERVICE PROVIDERS WILL NOT BE RESPONSIBLE FOR ANY
                   ACTIONS YOU TAKE BASED ON ASPEN OR FOR ANY INACCURATE DATA OR
@@ -334,7 +334,7 @@ export default function Terms(): JSX.Element {
                 </span>
               </ListItem>
               <ListItem>
-                <span key="1">
+                <span>
                   ASPEN IS PROVIDED &quot;AS IS&quot; WITH ALL FAULTS, AND WE
                   AND OUR SERVICE PROVIDERS HEREBY DISCLAIM ALL REPRESENTATIONS
                   AND WARRANTIES, EXPRESS, STATUTORY, OR IMPLIED (INCLUDING,
@@ -348,7 +348,7 @@ export default function Terms(): JSX.Element {
                 </span>
               </ListItem>
               <ListItem>
-                <span key="2">
+                <span>
                   FOR CLARITY AND WITHOUT LIMITING THE FOREGOING, WE AND OUR
                   SERVICE PROVIDERS DO NOT MAKE ANY GUARANTEES (I) REGARDING THE
                   ACCURACY, COMPLETENESS, TIMELINESS, SECURITY, AVAILABILITY OR
@@ -374,7 +374,7 @@ export default function Terms(): JSX.Element {
       </H2>
       <List>
         <ListItem>
-          <span key="0">
+          <span>
             TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, CZIF AND
             AFFILIATES (INCLUDING WITHOUT LIMITATION CHAN ZUCKERBERG INITIATIVE,
             LLC; AND THE CHAN ZUCKERBERG BIOHUB COLLECTIVELY, THE{" "}
@@ -433,7 +433,7 @@ export default function Terms(): JSX.Element {
       </H2>
       <List>
         <ListItem>
-          <span key="0">
+          <span>
             <ListItemLabel>Final and Binding Arbitration.</ListItemLabel>
             We endeavor and trust that we will have a productive relationship
             but in the unlikely event we have a dispute that we can’t resolve
@@ -444,7 +444,7 @@ export default function Terms(): JSX.Element {
           </span>
         </ListItem>
         <ListItem>
-          <span key="1">
+          <span>
             <ListItemLabel>Dispute Resolution.</ListItemLabel>
             In the unlikely event we have a dispute arising out of or related to
             the use of Aspen (&quot;Dispute&quot;) that we can’t resolve between
@@ -457,7 +457,7 @@ export default function Terms(): JSX.Element {
           </span>
         </ListItem>
         <ListItem>
-          <span key="2">
+          <span>
             <ListItemLabel>Mutual Agreement to Arbitrate.</ListItemLabel>
             If the Dispute is not resolved within such time period, the Dispute
             shall be resolved per the following arbitration terms. As the
@@ -545,7 +545,7 @@ export default function Terms(): JSX.Element {
       </H2>
       <List>
         <ListItem>
-          <span key="0">
+          <span>
             If you have any questions, comments, or concerns with Terms, you may
             contact us at{" "}
             <NewTabLink href="mailto:aspenprivacy@chanzuckerberg.com">
@@ -555,7 +555,7 @@ export default function Terms(): JSX.Element {
           </span>
         </ListItem>
         <ListItem>
-          <P key="1">
+          <P>
             Notice under these Terms must be in writing and deemed to have been
             given on the date delivered by a nationally recognized express mail
             service, such as Federal Express, or by certified and registered

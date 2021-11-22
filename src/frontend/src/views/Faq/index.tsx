@@ -177,7 +177,7 @@ export default function Faq(): JSX.Element {
       <P>A summary of key things to know: </P>
       <List>
         <ListItem>
-          <span key={0}>
+          <span>
             You <B>always</B> own and control the data you upload.
           </span>
         </ListItem>
@@ -190,7 +190,7 @@ export default function Faq(): JSX.Element {
           after upload, unless marked &quot;private.&quot;
         </ListItem>
         <ListItem>
-          <span key={1}>
+          <span>
             You can mark a sample as &quot;private&quot; anytime during the
             first two weeks after upload. &quot;Private&quot; samples are not
             shared with CDPH or GISAID, but are visible to your group. (For now,

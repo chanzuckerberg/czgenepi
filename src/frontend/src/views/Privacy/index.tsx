@@ -116,7 +116,7 @@ const PrivacyPolicy = (): JSX.Element => {
           genomic data and it’s not necessary to operate the tool.
         </ListItem>
         <ListItem>
-          <span key="0">
+          <span>
             Similarly, Aspen{" "}
             <B>
               does not contain any personally identifying metadata or
@@ -383,7 +383,7 @@ const PrivacyPolicy = (): JSX.Element => {
       </P>
       <List>
         <ListItem>
-          <span key="0">
+          <span>
             <ListItemLabel>Raw Sequence Data:</ListItemLabel> &quot;Raw Sequence
             Data&quot; is genomic sequence data, including both host and
             pathogenic data. As part of the process of processing this data
@@ -397,7 +397,7 @@ const PrivacyPolicy = (): JSX.Element => {
           </span>
         </ListItem>
         <ListItem>
-          <span key="1">
+          <span>
             <ListItemLabel>Pathogen Consensus Genomes:</ListItemLabel>{" "}
             &quot;Pathogen Consensus Genomes&quot; are genetic sequences of
             pathogens, such as SARS-CoV-2, mapped to pathogen-specific reference
@@ -406,7 +406,7 @@ const PrivacyPolicy = (): JSX.Element => {
           </span>
         </ListItem>
         <ListItem>
-          <span key="2">
+          <span>
             <ListItemLabel>Sample Metadata:</ListItemLabel> &quot;Sample
             Metadata&quot; includes information related to the Raw Sequence
             Data, such as the upload date, location, originating lab or purpose
@@ -572,7 +572,7 @@ const PrivacyPolicy = (): JSX.Element => {
 
       <List>
         <ListItem>
-          <span key="0">
+          <span>
             <ListItemLabel>User Data.</ListItemLabel>
             User Data is any information we collect from a User about that User
             (&quot;User Data&quot;). It may include information necessary to
@@ -581,7 +581,7 @@ const PrivacyPolicy = (): JSX.Element => {
           </span>
         </ListItem>
         <ListItem>
-          <span key="1">
+          <span>
             <ListItemLabel>Analytics</ListItemLabel>
             When Users visit or use our Service, we may automatically collect
             some information so that we can understand the way in which our tool
@@ -730,7 +730,7 @@ const PrivacyPolicy = (): JSX.Element => {
         We retain your personal data only as long as is reasonably necessary:
       </P>
       <List>
-        <ListItem key="0">
+        <ListItem>
           <span>
             We retain Pathogen Consensus Genomes, Sample Metadata and analytical
             outputs until Users delete them from Aspen. Users may delete their
@@ -741,15 +741,15 @@ const PrivacyPolicy = (): JSX.Element => {
             .
           </span>
         </ListItem>
-        <ListItem key="1"> 
+        <ListItem>
           We store Raw Sequence Data (ex: fastq files) for 90 days following
           upload. If no abnormalities are found in the resulting Pathogen
           Consensus Genome, we discard this data. We encourage submission to
           NCBI’s Sequence Read Archive (SRA) repository for long-term storage
           and sharing.
         </ListItem>
-        <ListItem key="2">
-          <span >
+        <ListItem>
+          <span>
             User Data is retained until Users delete their Aspen account because
             this data is required to manage the service. Users may submit
             account deletion requests by emailing{" "}
@@ -793,7 +793,7 @@ const PrivacyPolicy = (): JSX.Element => {
           Aspen.
         </ListItem>
         <ListItem>
-          <span key="0">
+          <span>
             If you have any questions about our processing of any data, please
             contact us at{" "}
             <NewTabLink href="mailto:aspenprivacy@chanzuckerberg.com">
