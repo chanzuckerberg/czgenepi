@@ -580,7 +580,6 @@ export default function Terms(): JSX.Element {
           </P>
         </ListItem>
       </List>
-      <div style={{ height: "50px" }} />
     </>
   );
 
