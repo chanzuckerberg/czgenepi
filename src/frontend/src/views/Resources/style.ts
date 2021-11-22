@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { getColors, getFontWeights } from "czifui";
+import { getColors, getFontWeights, getSpaces, List } from "czifui";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 
 export const StyledNewTabLink = styled(NewTabLink)`
@@ -12,6 +12,16 @@ export const StyledNewTabLink = styled(NewTabLink)`
       &:hover {
         color: ${colors?.primary[500]};
       }
+    `;
+  }}
+`;
+
+export const StyledList = styled(List)`
+  ${(props) => {
+    const spaces = getSpaces(props);
+
+    return `
+      margin-left: ${spaces?.m}px;
     `;
   }}
 `;

@@ -1,8 +1,8 @@
+import { ListItem } from "czifui";
 import Head from "next/head";
 import React from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { ROUTES } from "src/common/routes";
-import List from "src/common/styles/support/components/List";
 import {
   B,
   H1,
@@ -12,7 +12,7 @@ import {
   P,
   Title,
 } from "src/common/styles/support/style";
-import { StyledNewTabLink } from "./style";
+import { StyledList, StyledNewTabLink } from "./style";
 
 export default function Resources(): JSX.Element {
   function Intro() {
@@ -43,18 +43,19 @@ export default function Resources(): JSX.Element {
         </P>
         <H3>Seminar Recordings</H3>
         <div>
-          <List
-            marginLeft={"m"}
-            items={[
-              <span key={0}>
+          <StyledList>
+            <ListItem>
+              <span>
                 <StyledNewTabLink href="https://www.youtube.com/watch?v=Bt3JNKfU5qk">
                   Week 1
                 </StyledNewTabLink>{" "}
                 - Today we discussed the overlapping timescales of pathogen
                 evolution and infectious disease transmission, and how to build
                 phylogenetic trees that visualize genetic divergence.
-              </span>,
-              <span key={1}>
+              </span>
+            </ListItem>
+            <ListItem>
+              <span>
                 <StyledNewTabLink href="https://www.youtube.com/watch?v=zAtgJjoy6-w">
                   Week 2
                 </StyledNewTabLink>{" "}
@@ -63,8 +64,10 @@ export default function Resources(): JSX.Element {
                 pathogen. We also discussed how to use that rate to make
                 phylogenetic trees with branch lengths in units of calendar
                 time.
-              </span>,
-              <span key={2}>
+              </span>
+            </ListItem>
+            <ListItem>
+              <span>
                 <StyledNewTabLink href="https://www.youtube.com/watch?v=jYpjzP22HcM">
                   Week 3
                 </StyledNewTabLink>{" "}
@@ -73,8 +76,10 @@ export default function Resources(): JSX.Element {
                 a pathogen across the tree. We discussed the inferential
                 procedure that allows this, as well as caveats and things to be
                 cautious about.
-              </span>,
-              <span key={3}>
+              </span>
+            </ListItem>
+            <ListItem>
+              <span>
                 <StyledNewTabLink href="https://www.youtube.com/watch?v=qllORYfM_z8">
                   Week 4
                 </StyledNewTabLink>{" "}
@@ -82,8 +87,10 @@ export default function Resources(): JSX.Element {
                 pipelines are specified in Nextstrain Augur, and different ways
                 to navigate the genomic data visualization in Nextstrain
                 Auspice.
-              </span>,
-              <span key={4}>
+              </span>
+            </ListItem>
+            <ListItem>
+              <span>
                 <StyledNewTabLink href="https://www.youtube.com/watch?v=eeYgWdRbPPo">
                   Week 5
                 </StyledNewTabLink>{" "}
@@ -92,8 +99,10 @@ export default function Resources(): JSX.Element {
                 quality issues on downstream analyses, and how to look at BAM
                 files to assess support for different sites in the consensus
                 genome.
-              </span>,
-              <span key={5}>
+              </span>
+            </ListItem>
+            <ListItem>
+              <span>
                 <StyledNewTabLink href="https://www.youtube.com/watch?v=GJMTNwDKibI">
                   Week 6
                 </StyledNewTabLink>{" "}
@@ -106,8 +115,10 @@ export default function Resources(): JSX.Element {
                 repositories each can be submitted to. She finished the talk off
                 with a discussion of handling GISAID rejections and looking at
                 calls in BAM files.
-              </span>,
-              <span key={6}>
+              </span>
+            </ListItem>
+            <ListItem>
+              <span>
                 <StyledNewTabLink href="https://www.youtube.com/watch?v=HVorizRS4wk">
                   Week 7
                 </StyledNewTabLink>{" "}
@@ -115,8 +126,10 @@ export default function Resources(): JSX.Element {
                 nomenclature systems (why we use them and types of systems). We
                 finished off with a more detailed discussion of the Pango
                 nomenclature system for SARS-CoV-2.
-              </span>,
-              <span key={7}>
+              </span>
+            </ListItem>
+            <ListItem>
+              <span>
                 <StyledNewTabLink href="https://www.youtube.com/watch?v=ycM50nC5wXk">
                   Week 8
                 </StyledNewTabLink>{" "}
@@ -125,8 +138,10 @@ export default function Resources(): JSX.Element {
                 sample size in genomic epidemiology, today we discussed study
                 design, and specifically how to think about sample selection for
                 different types of genomic epidemiological questions/studies.
-              </span>,
-              <span key={8}>
+              </span>
+            </ListItem>
+            <ListItem>
+              <span>
                 <StyledNewTabLink href="https://www.youtube.com/watch?v=a8bp0iHCttA">
                   Week 9
                 </StyledNewTabLink>{" "}
@@ -134,8 +149,10 @@ export default function Resources(): JSX.Element {
                 &quot;phylodynamic&quot; analysis - a particular area of genomic
                 epidemiology where we infer changes in pathogen population size
                 from the shapes of coalescent phylogenetic trees.
-              </span>,
-              <span key={9}>
+              </span>
+            </ListItem>
+            <ListItem>
+              <span>
                 <StyledNewTabLink href="https://www.youtube.com/watch?v=cLLV2VpgXCU">
                   Week 10
                 </StyledNewTabLink>{" "}
@@ -147,8 +164,10 @@ export default function Resources(): JSX.Element {
                 placements in UShER and Nextclade, and how to pull relevant data
                 out of Aspen to use in those phylogenetic placements. [Since the
                 recording of this video, Aspen has added this capability.]
-              </span>,
-              <span key={10}>
+              </span>
+            </ListItem>
+            <ListItem>
+              <span>
                 <StyledNewTabLink href="https://www.youtube.com/watch?v=lFJ_2G4u8w4">
                   Week 11
                 </StyledNewTabLink>{" "}
@@ -156,24 +175,30 @@ export default function Resources(): JSX.Element {
                 evolution of viruses - that is, how viral surface proteins can
                 change how they &quot;look&quot; to our immune systems, and in
                 some cases eventually escape our immunity.
-              </span>,
-              <span key={10}>
+              </span>
+            </ListItem>
+            <ListItem>
+              <span>
                 <StyledNewTabLink href="https://www.youtube.com/watch?v=7nyq5Mc_pOo">
                   Week 12
                 </StyledNewTabLink>{" "}
                 - This week I compared and contrasted phylogenetic placements
                 versus phylogenetic trees, and described the different
                 situations when I prefer one over the other.
-              </span>,
-              <span key={11}>
+              </span>
+            </ListItem>
+            <ListItem>
+              <span>
                 <StyledNewTabLink href="https://www.youtube.com/watch?v=0ms0FYmpfDc">
                   Week 13
                 </StyledNewTabLink>{" "}
                 - This week we branched out from SARS-CoV-2, and I gave some
                 examples of how you can use genomic epidemiology to investigate
                 the epidemiology of TB.
-              </span>,
-              <span key={12}>
+              </span>
+            </ListItem>
+            <ListItem>
+              <span>
                 <StyledNewTabLink href="https://www.youtube.com/watch?v=pk-ap-1Uicc">
                   Week 14
                 </StyledNewTabLink>{" "}
@@ -181,24 +206,28 @@ export default function Resources(): JSX.Element {
                 epidemiology, and I walked through some case studies showing
                 different ways in which genomic epidemiology has supported epi
                 investigations in California.
-              </span>,
-              <span key={13}>
+              </span>
+            </ListItem>
+            <ListItem>
+              <span>
                 <StyledNewTabLink href="https://www.youtube.com/watch?v=4uE2lEpGo2k">
                   Week 15
                 </StyledNewTabLink>{" "}
                 - This week was another short break from SARS-CoV-2, and we
                 turned our attention towards genomic epidemiology of a different
                 viral pathogen - Mumps virus.
-              </span>,
-              <span key={14}>
+              </span>
+            </ListItem>
+            <ListItem>
+              <span>
                 <StyledNewTabLink href="https://www.youtube.com/watch?v=RbK6Bv4-fnc">
                   Aspen Tutorial!
                 </StyledNewTabLink>{" "}
                 - This tutorial introduces self-serve tree building in Aspen,
                 and discusses what the different tree types are useful for.
-              </span>,
-            ]}
-          />
+              </span>
+            </ListItem>
+          </StyledList>
         </div>
       </>
     );
@@ -225,7 +254,6 @@ export default function Resources(): JSX.Element {
         <Intro />
         <GenomicEpiSeries />
         <Questions />
-        <div style={{ height: "50px" }} />
       </NarrowContainer>
     </>
   );
