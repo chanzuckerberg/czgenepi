@@ -13,7 +13,7 @@ import {
 
 export const NarrowContainer = styled.div`
   max-width: 800px;
-  margin: 90px auto;
+  margin: 90px auto 0;
   padding-bottom: 50px;
 `;
 
