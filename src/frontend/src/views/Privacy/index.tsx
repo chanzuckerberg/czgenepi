@@ -730,8 +730,8 @@ const PrivacyPolicy = (): JSX.Element => {
         We retain your personal data only as long as is reasonably necessary:
       </P>
       <List>
-        <ListItem>
-          <span key="0">
+        <ListItem key="0">
+          <span>
             We retain Pathogen Consensus Genomes, Sample Metadata and analytical
             outputs until Users delete them from Aspen. Users may delete their
             data by contacting us at{" "}
@@ -741,15 +741,15 @@ const PrivacyPolicy = (): JSX.Element => {
             .
           </span>
         </ListItem>
-        <ListItem>
+        <ListItem key="1"> 
           We store Raw Sequence Data (ex: fastq files) for 90 days following
           upload. If no abnormalities are found in the resulting Pathogen
           Consensus Genome, we discard this data. We encourage submission to
           NCBI’s Sequence Read Archive (SRA) repository for long-term storage
           and sharing.
         </ListItem>
-        <ListItem>
-          <span key="1">
+        <ListItem key="2">
+          <span >
             User Data is retained until Users delete their Aspen account because
             this data is required to manage the service. Users may submit
             account deletion requests by emailing{" "}

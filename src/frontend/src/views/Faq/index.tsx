@@ -230,12 +230,6 @@ export default function Faq(): JSX.Element {
       </P>
       <List>
         <ListItem>
-          After two weeks, we will automatically submit the sample to GISAID on
-          your behalf. This upload includes the pathogen genome; collection
-          date; sequencing lab (i.e., your group); and location (as always, at
-          the county level or above).
-        </ListItem>
-        <ListItem>
           Consistent with the prior COVID Tracker program’s policies, the
           California Department of Public Health (CDPH) will be able to see
           non-private samples, but with your internal, private identifiers
