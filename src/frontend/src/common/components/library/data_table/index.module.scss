@@ -13,34 +13,6 @@
   display: flex;
   padding: 0 $space-l;
   border-bottom: 3px solid $gray-lightest !important;
-
-  .headerMetaCell {
-    display: flex;
-    width: 100%;
-    flex-direction: row;
-    align-items: baseline;
-
-    svg {
-      fill: $black;
-      width: $icon-xs;
-    }
-  }
-
-  .headerCell {
-    padding-bottom: $space-m;
-  }
-
-  .headerCellContent {
-    @include font-header-s;
-
-    color: $gray-dark;
-    margin-right: $space-xxs;
-
-    &:hover {
-      color: $black;
-      cursor: default;
-    }
-  }
 }
 
 // Checkboxes in a header need to match alignment of row checkboxes below, so

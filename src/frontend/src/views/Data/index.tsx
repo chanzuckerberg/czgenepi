@@ -15,7 +15,6 @@ import { VIEWNAME } from "../../common/constants/types";
 import { ROUTES } from "../../common/routes";
 import { SampleRenderer, TreeRenderer } from "./cellRenderers";
 import { FilterPanelToggle } from "./components/FilterPanelToggle";
-import { SampleHeader, TreeHeader } from "./headerRenderer";
 import { SAMPLE_HEADERS, SAMPLE_SUBHEADERS, TREE_HEADERS } from "./headers";
 import style from "./index.module.scss";
 import { Container, FlexContainer } from "./style";
@@ -70,7 +69,6 @@ const Data: FunctionComponent = () => {
     {
       data: samples,
       defaultSortKey: ["uploadDate"],
-      headerRenderer: SampleHeader,
       headers: SAMPLE_HEADERS,
       isDataLoading,
       renderer: SampleRenderer,
@@ -81,7 +79,6 @@ const Data: FunctionComponent = () => {
     {
       data: trees,
       defaultSortKey: ["startedDate"],
-      headerRenderer: TreeHeader,
       headers: TREE_HEADERS,
       isDataLoading,
       renderer: TreeRenderer,
@@ -200,7 +197,6 @@ const Data: FunctionComponent = () => {
           defaultSortKey={category.defaultSortKey}
           headers={category.headers}
           subheaders={category.subheaders}
-          headerRenderer={category.headerRenderer}
           renderer={category.renderer}
           viewName={viewName}
           dataFilterFunc={viewName === "Samples" ? dataFilterFunc : undefined}

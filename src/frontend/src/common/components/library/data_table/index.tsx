@@ -10,18 +10,11 @@ import React, {
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import { noop } from "src/common/constants/empty";
-import SortArrowDownIcon from "src/common/icons/IconArrowDownSmall.svg";
-import SortArrowUpIcon from "src/common/icons/IconArrowUpSmall.svg";
 import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import { EmptyState } from "../data_subview/components/EmptyState";
+import { TableHeader } from "./components/TableHeader";
 import style from "./index.module.scss";
-import {
-  HeaderCheckbox,
-  RowCheckbox,
-  RowContent,
-  TableHeader,
-  TableRow,
-} from "./style";
+import { HeaderCheckbox, RowCheckbox, RowContent, TableRow } from "./style";
 
 interface Props {
   data?: TableItem[];
@@ -34,7 +27,6 @@ interface Props {
   setFailedSamples(samples: string[]): void;
   showCheckboxes: boolean;
   renderer?: CustomRenderer;
-  headerRenderer?: HeaderRenderer;
 }
 
 // (thuang): If item height changes, we need to update this value!
@@ -56,16 +48,6 @@ export function defaultCellRenderer({
         {displayData}
       </div>
     </RowContent>
-  );
-}
-
-export function defaultHeaderRenderer({
-  header,
-}: HeaderRendererProps): JSX.Element {
-  return (
-    <div key={header.key} className={style.headerCell}>
-      <div className={style.headerCellContent}>{header.text}</div>
-    </div>
   );
 }
 
@@ -146,7 +128,6 @@ export const DataTable: FunctionComponent<Props> = ({
   data,
   headers,
   defaultSortKey,
-  headerRenderer = defaultHeaderRenderer,
   renderer = defaultCellRenderer,
   isLoading,
   checkedSamples,
@@ -241,29 +222,17 @@ export const DataTable: FunctionComponent<Props> = ({
   };
 
   // render functions
-  const headerRow = headers.map((header: Header, index) => {
-    const headerJSX = headerRenderer({ header, index });
-    const { align, key, sortKey } = header;
-    let sortIndicator: JSX.Element | null = null;
-    if (isEqual(sortKey, state.sortKey)) {
-      sortIndicator = <SortArrowDownIcon />;
-      if (state.ascending) {
-        sortIndicator = <SortArrowUpIcon />;
-      }
-    }
+  const headerRow = headers.map((header: Header) => {
+    const { sortKey } = header;
+
     return (
       <TableHeader
-        onClick={() => handleSortClick(sortKey)}
+        header={header}
         key={sortKey.join("-")}
-        className={style.headerMetaCell}
-        data-test-id="header-cell"
-        align={align}
-        // * Tree name column should be slightly wider than the rest to accommodate status tags
-        wide={key === "name"}
-      >
-        {headerJSX}
-        {sortIndicator}
-      </TableHeader>
+        onClick={() => handleSortClick(sortKey)}
+        doesSortOnThisCol={isEqual(sortKey, state.sortKey)}
+        isSortedAscending={state.ascending}
+      />
     );
   });
 
@@ -342,7 +311,7 @@ export const DataTable: FunctionComponent<Props> = ({
 
     const headerStyleClass = classNames(
       style.header, // All headers use this class
-      { [style.headerWithCheckbox]: showCheckboxes } // If checkbox, addl class to tweak it
+      { [style.headerWithCheckbox]: showCheckboxes } // If checkbox, add class to tweak it
     );
 
     return (

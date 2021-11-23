@@ -30,7 +30,3 @@ type CustomRenderer = ({
 }: CustomTableRenderProps) => JSX.Element;
 
 type CellRenderer = ({ value, item, index }: CellRendererProps) => JSX.Element;
-
-type HeaderRendererProps = Omit<CustomTableRenderProps, "item", "value">;
-
-type HeaderRenderer = ({ header, idex }: HeaderRendererProps) => JSX.Element;
