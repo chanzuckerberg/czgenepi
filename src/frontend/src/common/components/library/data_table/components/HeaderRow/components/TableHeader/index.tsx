@@ -10,7 +10,6 @@ interface Props {
   header: Header;
   isSortedAscending: boolean;
   onClick(): void;
-  shouldArrowPointUp: boolean;
 }
 
 const TableHeader = ({
@@ -21,7 +20,7 @@ const TableHeader = ({
 }: Props): JSX.Element => {
   const { align, key, text, tooltip } = header;
 
-  let tooltipTitle = "";
+  let tooltipTitle: JSX.Element | string = "";
 
   if (tooltip) {
     const { boldText, regularText, link } = tooltip;

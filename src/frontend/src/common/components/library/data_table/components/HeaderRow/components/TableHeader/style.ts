@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { fontHeaderS, getColors, getIconSizes, getSpaces } from "czifui";
+import { fontHeaderS, getColors, getIconSizes, getSpaces, Props } from "czifui";
 
 interface AlignProps extends Props {
   align?: string;

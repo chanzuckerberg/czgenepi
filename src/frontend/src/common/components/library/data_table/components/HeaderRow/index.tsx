@@ -5,13 +5,13 @@ import { HeaderCheckbox, StyledHeaderRow } from "./style";
 
 interface Props {
   handleHeaderCheckboxClick(): void;
-  handleSortClick(key: string): void;
+  handleSortClick(key: string[]): void;
   headers: Header[];
   isHeaderChecked: boolean;
   isHeaderIndeterminant: boolean;
   isSortedAscending: boolean;
   shouldShowCheckboxes: boolean;
-  sortColKey: string;
+  sortColKey: string[];
 }
 
 const HeaderRow = ({

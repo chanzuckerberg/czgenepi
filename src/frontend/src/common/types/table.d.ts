@@ -1,9 +1,16 @@
 interface Header {
-  [index: string]: string | number | string[];
   text: string;
   key: string | number;
   sortKey: string[];
   align?: string;
+  tooltip?: {
+    boldText: string;
+    regularText: string;
+    link?: {
+      linkText: string;
+      href: string;
+    };
+  };
 }
 
 interface SubHeader extends Header {

@@ -1,5 +1,9 @@
 import styled from "@emotion/styled";
-import { Checkbox, getColors, getSpaces } from "czifui";
+import { Checkbox, getColors, getSpaces, Props } from "czifui";
+
+interface ExtraProps extends Props {
+  shouldShowCheckboxes?: boolean;
+}
 
 const doNotForwardProps = ["shouldShowCheckboxes"];
 
@@ -8,7 +12,7 @@ export const StyledHeaderRow = styled("div", {
 })`
   display: flex;
 
-  ${(props) => {
+  ${(props: ExtraProps) => {
     const { shouldShowCheckboxes } = props;
 
     const colors = getColors(props);
