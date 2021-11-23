@@ -95,6 +95,8 @@ module frontend_service {
   stack_resource_prefix = local.stack_resource_prefix
   execution_role        = local.ecs_execution_role
   use_fargate           = var.use_fargate
+  memory                = 8192
+  cpu                   = 4096
   custom_stack_name     = local.custom_stack_name
   app_name              = "frontend"
   vpc                   = local.vpc_id

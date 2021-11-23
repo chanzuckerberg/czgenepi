@@ -26,8 +26,8 @@ resource aws_ecs_service service {
 
 resource aws_ecs_task_definition task_definition {
   family        = "${var.stack_resource_prefix}-${var.deployment_stage}-${var.custom_stack_name}-${var.app_name}"
-  memory = 4096
-  cpu = 2048
+  memory = var.memory
+  cpu = var.cpu
   network_mode  = "awsvpc"
   task_role_arn = var.task_role_arn
   execution_role_arn = var.use_fargate ? var.execution_role : null
