@@ -26,7 +26,7 @@ interface Props {
   setIsValid: React.Dispatch<React.SetStateAction<boolean>>;
   hasImportedFile: boolean;
   autocorrectWarnings: SampleIdToWarningMessages;
-  locations: GisaidLocation[];
+  locationOptions: GisaidLocationOption[];
 }
 
 export default function Table({
@@ -35,7 +35,7 @@ export default function Table({
   setIsValid,
   hasImportedFile,
   autocorrectWarnings,
-  locations,
+  locationOptions,
 }: Props): JSX.Element {
   const [isTouched, setIsTouched] = useState(hasImportedFile);
   const [isReadyToRenderTable, setIsReadyToTenderTable] = useState(false);
@@ -124,27 +124,6 @@ export default function Table({
     },
     false
   );
-
-  const locationOptions: GisaidLocationOption[] = locations.map((location) => {
-    let stringName = "";
-    const orderedKeys = ["region", "country", "division", "location"];
-    orderedKeys.every((key) => {
-      if (!!location[key]) {
-        if (key != "region") {
-          stringName += "/";
-        }
-        stringName += `${location[key]}`;
-        return true;
-      } else {
-        return false;
-      }
-    });
-    return {
-      name: stringName,
-      description: "",
-      id: location.id,
-    };
-  });
 
   return (
     <Overflow>

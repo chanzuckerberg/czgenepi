@@ -14,6 +14,16 @@ export const StyledTextField = styled(TextField)`
   }}
 `;
 
+export const StyledDiv = styled.div`
+  ${(props) => {
+    const spaces = getSpaces(props);
+
+    return `
+      padding-right: ${spaces?.l}px;
+    `;
+  }}
+`;
+
 export const MenuSubtext = styled.div`
   ${fontBodyXxs}
 

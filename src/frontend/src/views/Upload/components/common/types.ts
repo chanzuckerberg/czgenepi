@@ -58,6 +58,7 @@ export interface ErrorCode {
 export interface Metadata {
   collectionDate?: string;
   collectionLocation?: string;
+  collectionLocationID?: number;
   islAccessionNumber?: string;
   keepPrivate?: boolean;
   publicId?: string;

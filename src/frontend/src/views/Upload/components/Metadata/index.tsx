@@ -32,6 +32,7 @@ import { getLocations, LocationsResponse } from "src/common/queries/locations";
 export const EMPTY_METADATA: IMetadata = {
   collectionDate: "",
   collectionLocation: "",
+  collectionLocationID: undefined,
   islAccessionNumber: "",
   keepPrivate: false,
   publicId: "",
@@ -79,6 +80,27 @@ export default function Metadata({
     setHasImportedFile(true);
   }
 
+  const locationOptions: GisaidLocationOption[] = locations.map((location) => {
+    let stringName = "";
+    const orderedKeys = ["region", "country", "division", "location"];
+    orderedKeys.every((key) => {
+      if (!!location[key]) {
+        if (key != "region") {
+          stringName += "/";
+        }
+        stringName += `${location[key]}`;
+        return true;
+      } else {
+        return false;
+      }
+    });
+    return {
+      name: stringName,
+      description: "",
+      id: location.id,
+    };
+  });
+
   return (
     <>
       <Head>
@@ -117,7 +139,7 @@ export default function Metadata({
           metadata={metadata}
           setMetadata={setMetadata}
           autocorrectWarnings={autocorrectWarnings}
-          locations={locations}
+          locationOptions={locationOptions}
         />
 
         <ButtonWrapper>

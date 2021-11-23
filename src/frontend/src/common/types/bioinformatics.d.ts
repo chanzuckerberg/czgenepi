@@ -28,6 +28,7 @@ interface Sample extends BioinformaticsType {
   uploadDate: string;
   collectionDate: string;
   collectionLocation: string;
+  collectionLocationID: number;
   sequencingDate: string;
   gisaid: GISAID;
   CZBFailedGenomeRecovery: boolean;

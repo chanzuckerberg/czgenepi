@@ -12,6 +12,7 @@ import * as yup from "yup";
 import FreeTextField from "./components/FreeTextField";
 import ToggleField from "./components/ToggleField";
 import UploadDateField from "./components/UploadDateField";
+import LocationField from "./components/LocationField";
 import {
   Id,
   IsPrivateTableCell,
@@ -53,18 +54,6 @@ interface Props {
   locationOptions: GisaidLocationOption[];
 }
 
-interface LocationSearchState {
-  searching?: boolean;
-  results: GisaidLocationOption[];
-}
-
-function locationSearchReducer(
-  state: LocationSearchState,
-  action: LocationSearchState | Partial<LocationSearchState>
-): LocationSearchState {
-  return { ...state, ...action };
-}
-
 export default React.memo(function Row({
   id,
   metadata,
@@ -84,13 +73,6 @@ export default React.memo(function Row({
   });
 
   const { values, isValid, validateForm, setTouched } = formik;
-  const [selectedLocation, setLocation] = useState<
-    GisaidLocationOption | undefined
-  >();
-  const [state, dispatch] = useReducer(locationSearchReducer, {
-    results: [],
-    searching: false,
-  });
 
   useEffect(() => {
     if (!isTouched) return;
@@ -116,42 +98,6 @@ export default React.memo(function Row({
     }
   }, [values]);
 
-  const searcher = (query: string): void => {
-    if (query.length < 2) {
-      dispatch({ results: [] });
-      return;
-    }
-    dispatch({ searching: true });
-
-    const regex = new RegExp(escapeRegExp(query), "i");
-    const filteredLocationOptions = locationOptions.filter((option) =>
-      regex.test(option.name)
-    );
-    // alphabetical sort
-    // this ensure partial locations (i.e. region, country and divison
-    // but no location) end up on top.
-    const sortedLocationOptions = filteredLocationOptions.sort((a, b) => {
-      if (a.name < b.name) {
-        return -1;
-      }
-      if (a.name > b.name) {
-        return 1;
-      }
-      return 0;
-    });
-    dispatch({
-      results: sortedLocationOptions.slice(0, 100),
-      searching: false,
-    });
-  };
-
-  const handleSearchInputChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const query = event?.target?.value ?? "";
-    searcher(query);
-  };
-
   return (
     <StyledTableRow component="div">
       <StyledTableCell component="div">
@@ -168,28 +114,14 @@ export default React.memo(function Row({
         </StyledDiv>
       </StyledTableCell>
       <StyledTableCell component="div">
-        <Dropdown
-          label={selectedLocation?.name || "Select Location"}
-          onChange={(e) => {
-            if (!!e) {
-              console.log(e);
-              setLocation(e as GisaidLocationOption);
-            }
-          }}
-          options={state.results}
-          search={true}
-          MenuSelectProps={{ onInputChange: handleSearchInputChange }}
-        />
-      </StyledTableCell>
-      {/*      <StyledTableCell component="div">
         <LocationField
           isFirstRow={isFirstRow}
           applyToAllColumn={applyToAllColumn}
           formik={formik}
-          fieldKey="collectionLocation"
-          locations={locations}
+          fieldKey="collectionLocationID"
+          locationOptions={locationOptions}
         />
-      </StyledTableCell>*/}
+      </StyledTableCell>
       <StyledTableCell component="div">
         <StyledDiv>
           <UploadDateField
