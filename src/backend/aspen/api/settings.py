@@ -58,7 +58,7 @@ def aws_ssm_settings(settings) -> Dict[str, Any]:
 
     response: Dict[str, Any] = {}
     for param, key_name in parameters.items():
-        parameter_path = f"/aspen/{deployment_stage}{stack_prefix}/{param}"
+        parameter_path = f"/genepi/{deployment_stage}{stack_prefix}/{param}"
         try:
             get_parameter = client.get_parameter(Name=parameter_path)
         except ClientError as e:

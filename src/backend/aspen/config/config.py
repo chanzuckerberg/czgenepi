@@ -252,7 +252,7 @@ class Config(object):
 
         deployment_stage = os.environ.get("DEPLOYMENT_STAGE")
         parameter_name = (
-            f"/aspen/{deployment_stage}{self.STACK_PREFIX}/{parameter_suffix}"
+            f"/genepi/{deployment_stage}{self.STACK_PREFIX}/{parameter_suffix}"
         )
         client = session.client(
             service_name="ssm", endpoint_url=os.environ.get("BOTO_ENDPOINT_URL")
