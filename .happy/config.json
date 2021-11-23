@@ -33,8 +33,8 @@
         "rdev": {
             "aws_profile": "genepi-dev",
             "secret_arn": "happy/env-dev-config",
-            "terraform_directory": ".happy/terraform/envs/rdev",
-            "log_group_prefix": "/aspen/rdev"
+            "terraform_directory": ".happy/terraform/envs/dev",
+            "log_group_prefix": "/genepi/dev"
         },
         "staging": {
             "aws_profile": "genepi-dev",
