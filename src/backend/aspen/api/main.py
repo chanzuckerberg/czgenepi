@@ -19,7 +19,7 @@ def get_allowed_origins() -> List[str]:
     deployment = os.getenv("DEPLOYMENT_STAGE")
     frontend_url = os.getenv("FRONTEND_URL")
 
-    if deployment not in ["staging", "prod"]:
+    if deployment not in ["gestaging", "geprod", "staging", "prod"]:
         allowed_origins.extend(
             [r"http://.*\.genepinet\.localdev:\d+", r"^http://localhost:\d+"]
         )
