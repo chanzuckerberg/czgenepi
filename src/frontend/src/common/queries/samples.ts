@@ -11,6 +11,7 @@ interface SamplePayload {
     private_identifier?: string;
     collection_date?: string;
     location?: string;
+    location_id?: number;
     private?: boolean;
   };
   pathogen_genome: {
@@ -82,6 +83,7 @@ export async function createSamples({
     const {
       collectionDate,
       collectionLocation,
+      collectionLocationID,
       keepPrivate,
       sequencingDate,
       islAccessionNumber,
@@ -97,6 +99,7 @@ export async function createSamples({
       sample: {
         [METADATA_KEYS_TO_API_KEYS.collectionDate]: collectionDate,
         [METADATA_KEYS_TO_API_KEYS.collectionLocation]: collectionLocation,
+        [METADATA_KEYS_TO_API_KEYS.collectionLocationID]: collectionLocationID,
         [METADATA_KEYS_TO_API_KEYS.keepPrivate]: keepPrivate,
         [METADATA_KEYS_TO_API_KEYS.publicId]: publicId,
         private_identifier: sampleId,
