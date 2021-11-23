@@ -53,10 +53,14 @@ export default function Homepage(): JSX.Element {
           <Card>
             <Content>
               <Left>
-                <Title>Welcome to Aspen!</Title>
+                <Title>
+                  Welcome
+                  <br />
+                  to CZ GEN EPI!
+                </Title>
                 <Main>
-                  Aspen is a new tool that helps you manage, analyze, and share
-                  your pathogen data for genomic epidemiology.
+                  CZ GEN EPI is a new tool that helps you manage, analyze, and
+                  share your pathogen data for genomic epidemiology.
                 </Main>
                 <Details>
                   This is also where you’ll receive all of your sequencing
