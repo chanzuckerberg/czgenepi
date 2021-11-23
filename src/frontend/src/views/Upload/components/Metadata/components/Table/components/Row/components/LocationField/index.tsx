@@ -9,6 +9,7 @@ import { StyledDiv } from "./style";
 
 interface Props {
   fieldKey: keyof Metadata;
+  accessoryKey: keyof Metadata;
   formik: FormikContextType<Metadata>;
   applyToAllColumn: (fieldKey: keyof Metadata, value: unknown) => void;
   isFirstRow: boolean;
@@ -29,6 +30,7 @@ function locationSearchReducer(
 
 export default function LocationField({
   fieldKey,
+  accessoryKey,
   formik,
   applyToAllColumn,
   isFirstRow,
@@ -95,13 +97,14 @@ export default function LocationField({
     if (!!e) {
       const newLocation = e as GisaidLocationOption;
       setFieldValue(fieldKey, newLocation.id);
+      setFieldValue(accessoryKey, newLocation.name);
     }
   };
 
   return (
     <StyledDiv onBlur={handleBlur}>
       <Dropdown
-        label={selectedLocation?.name || "Select Location"}
+        label={selectedLocation?.name || "Search For Location"}
         value={selectedLocation}
         onChange={handleLocationChange}
         options={state.results}
@@ -120,47 +123,4 @@ export default function LocationField({
       </FormHelperText>
     </StyledDiv>
   );
-
-  // return (
-  //   <StyledTextField
-  //     select
-  //     SelectProps={SELECT_PROPS}
-  //     name={fieldKey}
-  //     value={value}
-  //     margin="dense"
-  //     variant="outlined"
-  //     onChange={handleChange}
-  //     onBlur={handleBlur}
-  //     error={Boolean(errorMessage)}
-  //     helperText={
-  //       errorMessage ||
-  //       (isFirstRow && value && (
-  //         <ApplyToAllColumn
-  //           fieldKey={fieldKey}
-  //           value={value}
-  //           handleClick={applyToAllColumn}
-  //         />
-  //       ))
-  //     }
-  //   >
-  //     <MenuItem value="" disabled>
-  //       Select County
-  //     </MenuItem>
-  //     {COUNTIES.map((county) => {
-  //       return (
-  //         <MenuItem key={county} value={county}>
-  //           {county}
-  //           {(county === "California" && (
-  //             <MenuSubtext>County not specified</MenuSubtext>
-  //           )) ||
-  //             null}
-  //         </MenuItem>
-  //       );
-  //     })}
-  //   </StyledTextField>
-  // );
 }
-
-// function renderValue(value: unknown): React.ReactNode {
-//   return <>{value}</>;
-// }

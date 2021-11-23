@@ -1,7 +1,6 @@
-import { escapeRegExp } from "lodash/fp";
 import deepEqual from "deep-equal";
 import { useFormik } from "formik";
-import React, { useEffect, useState, useReducer } from "react";
+import React, { useEffect } from "react";
 import { noop } from "src/common/constants/empty";
 import {
   DATE_ERROR_MESSAGE,
@@ -20,7 +19,6 @@ import {
   StyledTableCell,
   StyledTableRow,
 } from "./style";
-import { Dropdown } from "czifui";
 
 const validationSchema = yup.object({
   collectionDate: yup
@@ -30,6 +28,7 @@ const validationSchema = yup.object({
     .max(10, DATE_ERROR_MESSAGE)
     .required("Required"),
   collectionLocation: yup.string().required("Required"),
+  collectionLocationID: yup.number().required("Required"),
   publicId: yup.string().when("submittedToGisaid", {
     is: true,
     then: yup.string().required("Required"),
@@ -119,6 +118,7 @@ export default React.memo(function Row({
           applyToAllColumn={applyToAllColumn}
           formik={formik}
           fieldKey="collectionLocationID"
+          accessoryKey="collectionLocation"
           locationOptions={locationOptions}
         />
       </StyledTableCell>

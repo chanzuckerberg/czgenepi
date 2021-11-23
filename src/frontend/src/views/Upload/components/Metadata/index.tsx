@@ -31,7 +31,6 @@ import { getLocations, LocationsResponse } from "src/common/queries/locations";
 
 export const EMPTY_METADATA: IMetadata = {
   collectionDate: "",
-  collectionLocation: "",
   collectionLocationID: undefined,
   islAccessionNumber: "",
   keepPrivate: false,
