@@ -38,11 +38,11 @@
         },
         "staging": {
             "aws_profile": "genepi-dev",
-            "secret_arn": "happy/env-staging-config",
+            "secret_arn": "happy/env-gestaging-config",
             "terraform_directory": ".happy/terraform/envs/staging",
             "delete_protected": true,
             "auto_run_migrations": true,
-            "log_group_prefix": "/aspen/staging"
+            "log_group_prefix": "/aspen/gestaging"
         },
         "prod": {
             "aws_profile": "genepi-prod",
