@@ -9,9 +9,9 @@ import {
 import { Metadata } from "src/views/Upload/components/common/types";
 import * as yup from "yup";
 import FreeTextField from "./components/FreeTextField";
+import LocationField from "./components/LocationField";
 import ToggleField from "./components/ToggleField";
 import UploadDateField from "./components/UploadDateField";
-import LocationField from "./components/LocationField";
 import {
   Id,
   IsPrivateTableCell,

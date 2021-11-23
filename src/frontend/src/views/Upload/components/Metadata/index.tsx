@@ -1,9 +1,10 @@
 import { Button } from "czifui";
 import Head from "next/head";
 import NextLink from "next/link";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
+import { getLocations, LocationsResponse } from "src/common/queries/locations";
 import { ROUTES } from "src/common/routes";
 import {
   Metadata as IMetadata,
@@ -27,7 +28,6 @@ import {
   SampleIdToWarningMessages,
 } from "./components/ImportFile/parseFile";
 import Table from "./components/Table";
-import { getLocations, LocationsResponse } from "src/common/queries/locations";
 
 export const EMPTY_METADATA: IMetadata = {
   collectionDate: "",
@@ -83,7 +83,7 @@ export default function Metadata({
     let stringName = "";
     const orderedKeys = ["region", "country", "division", "location"];
     orderedKeys.every((key) => {
-      if (!!location[key]) {
+      if (location[key]) {
         if (key != "region") {
           stringName += "/";
         }

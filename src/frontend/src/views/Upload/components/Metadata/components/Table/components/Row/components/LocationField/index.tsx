@@ -1,8 +1,8 @@
-import { escapeRegExp } from "lodash/fp";
-import { Dropdown, DefaultMenuSelectOption } from "czifui";
-import { FormikContextType } from "formik";
 import FormHelperText from "@material-ui/core/FormHelperText";
-import React, { useState, useReducer, useEffect } from "react";
+import { DefaultMenuSelectOption, Dropdown } from "czifui";
+import { FormikContextType } from "formik";
+import { escapeRegExp } from "lodash/fp";
+import React, { useEffect, useReducer, useState } from "react";
 import { Metadata } from "src/views/Upload/components/common/types";
 import ApplyToAllColumn from "../common/ApplyToAllColumn";
 import { StyledDiv } from "./style";
@@ -94,7 +94,7 @@ export default function LocationField({
   };
 
   const handleLocationChange = (e: DefaultMenuSelectOption | null) => {
-    if (!!e) {
+    if (e) {
       const newLocation = e as GisaidLocationOption;
       setFieldValue(fieldKey, newLocation.id);
       setFieldValue(accessoryKey, newLocation.name);

@@ -9,6 +9,7 @@ export type ParsedMetadata = Record<
 export const METADATA_KEYS_TO_HEADERS: Record<keyof ParsedMetadata, string> = {
   collectionDate: "Collection Date",
   collectionLocation: "Collection Location",
+  collectionLocationID: "",
   islAccessionNumber: "ISL Accession # (optional)",
   keepPrivate: "Sample is Private",
   publicId: "Sample Public ID",
@@ -24,6 +25,7 @@ export const HEADERS_TO_METADATA_KEYS = invert(
 export const METADATA_KEYS_TO_API_KEYS: Record<keyof ParsedMetadata, string> = {
   collectionDate: "collection_date",
   collectionLocation: "location",
+  collectionLocationID: "location_id",
   islAccessionNumber: "isl_access_number",
   keepPrivate: "private",
   publicId: "public_identifier",
