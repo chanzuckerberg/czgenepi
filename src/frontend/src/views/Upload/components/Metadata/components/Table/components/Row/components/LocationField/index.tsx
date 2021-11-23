@@ -1,6 +1,7 @@
 import { escapeRegExp } from "lodash/fp";
 import { Dropdown, DefaultMenuSelectOption } from "czifui";
 import { FormikContextType } from "formik";
+import FormHelperText from "@material-ui/core/FormHelperText";
 import React, { useState, useReducer, useEffect } from "react";
 import { Metadata } from "src/views/Upload/components/common/types";
 import ApplyToAllColumn from "../common/ApplyToAllColumn";
@@ -33,11 +34,11 @@ export default function LocationField({
   isFirstRow,
   locationOptions,
 }: Props): JSX.Element {
-  const { handleBlur, setFieldValue, values } = formik;
+  const { handleBlur, setFieldValue, values, touched, errors } = formik;
 
-  // const errorMessage = touched[fieldKey] && errors[fieldKey];
+  const errorMessage = touched[fieldKey] && errors[fieldKey];
 
-  const formikIDValue = values[fieldKey] || null;
+  const value = values[fieldKey] || null;
 
   const [selectedLocation, setLocation] = useState<
     GisaidLocationOption | undefined
@@ -49,7 +50,7 @@ export default function LocationField({
 
   useEffect(() => {
     const locationForID = locationOptions.find(
-      (location) => location.id == formikIDValue
+      (location) => location.id == value
     );
     setLocation(locationForID);
   });
@@ -107,6 +108,16 @@ export default function LocationField({
         search={true}
         MenuSelectProps={{ onInputChange: handleSearchInputChange }}
       />
+      <FormHelperText>
+        {errorMessage ||
+          (isFirstRow && value && (
+            <ApplyToAllColumn
+              fieldKey={fieldKey}
+              value={value}
+              handleClick={applyToAllColumn}
+            />
+          ))}
+      </FormHelperText>
     </StyledDiv>
   );
 
