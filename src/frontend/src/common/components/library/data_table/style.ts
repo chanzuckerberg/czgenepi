@@ -62,26 +62,3 @@ export const RowCheckbox = styled(Checkbox)`
     }
   }
 `;
-
-export const HeaderCheckbox = styled(Checkbox)`
-  padding: 0;
-  &:hover {
-    background-color: transparent;
-    &.Mui-checked {
-      background-color: transparent;
-    }
-  }
-  ${(props) => {
-    const spaces = getSpaces(props);
-    const colors = getColors(props);
-
-    return `
-      padding-right: ${spaces?.l}px;
-      padding-left: ${spaces?.m}px;
-      padding-bottom: ${spaces?.l}px;
-      &.MuiCheckbox-indeterminate {
-        color: ${colors?.primary[500]};
-      }
-    `;
-  }}
-`;

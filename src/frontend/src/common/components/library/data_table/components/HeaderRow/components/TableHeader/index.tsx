@@ -7,7 +7,7 @@ import { StyledHeaderCellContent, StyledTableHeader } from "./style";
 
 interface Props {
   doesSortOnThisCol: boolean;
-  header: any; // TODO (mlila): better props
+  header: Header;
   isSortedAscending: boolean;
   onClick(): void;
   shouldArrowPointUp: boolean;
