@@ -17,7 +17,7 @@ export const TreeTypeTooltip = ({ children, value }: Props): JSX.Element => {
     case "Overview":
       content = `Best for viewing an overall picture of viral diversity within
       your jurisdiction, including genetically similar samples from outside of
-      your jurisdiction. Overview trees are automatically built by Aspen every Monday.`;
+      your jurisdiction. Overview trees are automatically built by CZ GEN EPI every Monday.`;
       break;
     case "Non-Contextualized":
       content =

@@ -15,7 +15,8 @@ const TreeVizModal = ({ open, onClose, treeId }: Props): JSX.Element => {
     <>
       By clicking “Continue” you agree to send a copy of your tree JSON to
       Nextstrain’s visualization service. Nextstrain is a separate service from
-      Aspen. <NewTabLink href="https://nextstrain.org/">Learn More</NewTabLink>
+      CZ GEN EPI.{" "}
+      <NewTabLink href="https://nextstrain.org/">Learn More</NewTabLink>
     </>
   );
 
