@@ -41,6 +41,7 @@ from aspen.database.models import (
     Entity,
     GisaidAccession,
     GisaidAccessionWorkflow,
+    Location,
     PublicRepositoryType,
     Sample,
     UploadedPathogenGenome,
@@ -62,6 +63,7 @@ SAMPLES_POST_REQUIRED_FIELDS = [
     "private_identifier",
     "collection_date",
     "location",
+    "location_id",
     # following fields from PathogenGenome
     "sequence",
 ]
@@ -431,13 +433,9 @@ def create_sample():
                 "uploaded_by": user,
                 "sample_collected_by": user.group.name,
                 "sample_collector_contact_address": user.group.address,
-                "division": DEFAULT_DIVISION,
-                "country": DEFAULT_COUNTRY,
-                "region": RegionType.NORTH_AMERICA,
                 "organism": DEFAULT_ORGANISM,
                 "private_identifier": data["sample"]["private_identifier"],
                 "collection_date": data["sample"]["collection_date"],
-                "location": data["sample"]["location"],
                 "private": data["sample"]["private"],
                 "public_identifier": public_identifier,
             }
@@ -446,6 +444,23 @@ def create_sample():
                 sample_args["authors"] = [
                     user.group.name,
                 ]
+
+            valid_location: Optional[Location] = (
+                g.db_session.query(Location)
+                .filter(Location.id == data["sample"]["location_id"])
+                .one_or_none()
+            )
+            if valid_location:
+                sample_args["location_id"] = valid_location.id
+                sample_args["region"] = RegionType(valid_location.region)
+                sample_args["country"] = valid_location.country
+                sample_args["division"] = valid_location.division
+                sample_args["location"] = valid_location.location or ""
+            else:
+                sample_args["region"] = RegionType.NORTH_AMERICA
+                sample_args["country"] = DEFAULT_COUNTRY
+                sample_args["division"] = DEFAULT_DIVISION
+                sample_args["location"] = data["sample"]["location"]
 
             sequence = data["pathogen_genome"]["sequence"]
             if not check_valid_sequence(sequence):
