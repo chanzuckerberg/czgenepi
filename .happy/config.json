@@ -42,7 +42,7 @@
             "terraform_directory": ".happy/terraform/envs/staging",
             "delete_protected": true,
             "auto_run_migrations": true,
-            "log_group_prefix": "/aspen/gestaging"
+            "log_group_prefix": "/genepi/gestaging"
         },
         "prod": {
             "aws_profile": "genepi-prod",

@@ -78,7 +78,7 @@ class Settings(BaseSettings):
     DB_POOL_SIZE: int = 5
     DB_MAX_OVERFLOW: int = 0
     DB_ECHO: bool = False
-    DEBUG: bool = True
+    DEBUG: bool = False
 
     # Pydantic automatically tries to load settings with matching names from the environment if available, and then
     # goes down its list of "magic-settings-getters" to find more data to populate this settings object with. For
