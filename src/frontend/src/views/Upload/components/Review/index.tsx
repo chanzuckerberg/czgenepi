@@ -1,7 +1,7 @@
 import { Button, Checkbox } from "czifui";
-import Head from "next/head";
 import NextLink from "next/link";
 import React, { useState } from "react";
+import { HeadAppTitle } from "src/common/components";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { useUserInfo } from "src/common/queries/auth";
@@ -43,9 +43,7 @@ export default function Review({
 
   return (
     <>
-      <Head>
-        <title>Aspen | Upload Review</title>
-      </Head>
+      <HeadAppTitle subTitle="Upload Review" />
       <Header>
         <div>
           <Title>Review</Title>

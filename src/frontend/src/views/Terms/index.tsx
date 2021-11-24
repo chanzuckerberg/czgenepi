@@ -1,6 +1,6 @@
 import { List, ListItem, ListItemLabel } from "czifui";
-import Head from "next/head";
 import React from "react";
+import { HeadAppTitle } from "src/common/components";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import {
   B,
@@ -590,9 +590,7 @@ export default function Terms(): JSX.Element {
 
   return (
     <>
-      <Head>
-        <title>Aspen | Terms of Service</title>
-      </Head>
+      <HeadAppTitle subTitle="Terms of Service" />
       <NarrowContainer>
         {renderIntro()}
         {renderSummaryOfKeyThingsToKnow()}

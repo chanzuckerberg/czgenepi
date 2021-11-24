@@ -1,7 +1,7 @@
 import { Button } from "czifui";
-import Head from "next/head";
 import NextLink from "next/link";
 import React, { useState } from "react";
+import { HeadAppTitle } from "src/common/components";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { ROUTES } from "src/common/routes";
@@ -70,9 +70,7 @@ export default function Metadata({
 
   return (
     <>
-      <Head>
-        <title>Aspen | Metadata and Sharing</title>
-      </Head>
+      <HeadAppTitle subTitle="Metadata and Sharing" />
       <Header>
         <div>
           <Title>Metadata and Sharing</Title>
