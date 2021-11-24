@@ -18,35 +18,37 @@ export default function Terms(): JSX.Element {
   const renderIntro = () => (
     <>
       <Title>
-        <H1>Aspen Terms of Use</H1>
-        <H4>Last Updated: September 30, 2021. </H4>
+        <H1>Chan Zuckerberg GEN EPI (formerly Aspen) Terms of Use</H1>
+        <H4>Last Updated: December 6, 2021</H4>
       </Title>
       <P>
-        Please read these Terms of Use (&quot;Terms&quot;) before using Aspen
-        (&quot;Services&quot; or &quot;Aspen&quot;). These Terms are entered
-        into between the Chan Zuckerberg Initiative Foundation, a 501(c)(3)
-        nonprofit private foundation, (&quot;CZIF&quot;, &quot;we&quot;,
-        &quot;us&quot; or &quot;our&quot;) and you (&quot;User&quot; or
-        &quot;you&quot;) and govern your and your organization’s use of Aspen.
+        Please read these Terms of Use (&quot;Terms&quot;) before using Chan
+        Zuckerberg GEN EPI (&quot;Services&quot; or &quot;CZ GEN EPI&quot;).
+        These Terms are entered into between the Chan Zuckerberg Initiative
+        Foundation, a 501(c)(3) nonprofit private foundation, (&quot;CZIF&quot;,
+        &quot;we&quot;, &quot;us&quot; or &quot;our&quot;) and you
+        (&quot;User&quot; or &quot;you&quot;) and govern your and your
+        organization’s use of CZ GEN EPI.
       </P>
       <P>
-        Aspen is a tool that helps you infer how pathogens are moving through a
-        population and how cases are related to one another. Aspen comprises our
-        Genomic Epidemiology portal, any associated online services or platforms
-        that link to or refer to these Terms, and any databases or data
-        accessible through the portal, associated services or platforms.
+        CZ GEN EPI is a tool that helps you infer how pathogens are moving
+        through a population and how cases are related to one another. CZ GEN
+        EPI comprises our Genomic Epidemiology portal, any associated online
+        services or platforms that link to or refer to these Terms, and any
+        databases or data accessible through the portal, associated services or
+        platforms.
       </P>
       <P>
-        Aspen is offered by the Chan Zuckerberg Initiative Foundation
+        CZ GEN EPI is offered by the Chan Zuckerberg Initiative Foundation
         (&quot;CZIF&quot;), in close collaboration with the Chan Zuckerberg
         Biohub (&quot;CZB&quot;) and the Chan Zuckerberg Initiative, LLC
         (&quot;CZI LLC&quot;).
       </P>
       <P>
         Please carefully read these terms and indicate your acceptance by
-        registering for Aspen. If you do not agree to these Terms, do not
-        register for an account to use Aspen. For more information about our
-        privacy practices, please see the &quot;Privacy Notice&quot;).
+        registering for CZ GEN EPI. If you do not agree to these Terms, do not
+        register for an account to use CZ GEN EPI. For more information about
+        our privacy practices, please see the &quot;Privacy Notice&quot;).
       </P>
       <P>
         <B>
@@ -72,29 +74,29 @@ export default function Terms(): JSX.Element {
         <List>
           <ListItem>
             <span>
-              Aspen is a tool that helps you infer how pathogens are moving
+              CZ GEN EPI is a tool that helps you infer how pathogens are moving
               through a population and how cases are related to one another.
             </span>
           </ListItem>
           <ListItem>
             <span>
-              Aspen is offered by the Chan Zuckerberg Initiative Foundation
+              CZ GEN EPI is offered by the Chan Zuckerberg Initiative Foundation
               (CZIF), in close collaboration with the Chan Zuckerberg Biohub
               (CZB) and the Chan Zuckerberg Initiative, LLC (CZI LLC).
             </span>
           </ListItem>
           <ListItem>
-            <span>Aspen is a free and open-source tool.</span>
+            <span>CZ GEN EPI is a free and open-source tool.</span>
           </ListItem>
           <ListItem>
             <span>
-              In order to use Aspen, you must be acting in your professional
-              capacity. This means a couple things: (1) your use of Aspen may be
-              subject to your organization’s policies and (2) upon sign-up,
-              you’ll be placed into a group with other users from your
-              organization (3) your Upload Data, and analytical results may be
-              shared with third parties in accordance with your organization’s
-              policies.
+              In order to use CZ GEN EPI, you must be acting in your
+              professional capacity. This means a couple things: (1) your use of
+              CZ GEN EPI may be subject to your organization’s policies and (2)
+              upon sign-up, you’ll be placed into a group with other users from
+              your organization (3) your Upload Data, and analytical results may
+              be shared with third parties in accordance with your
+              organization’s policies.
             </span>
           </ListItem>
           <ListItem>
@@ -107,22 +109,22 @@ export default function Terms(): JSX.Element {
           <ListItem>
             <span>
               The outputs (ex: analytical outputs, such as phylogenetic trees)
-              you create with Aspen are <B>not</B> personally identifiable. You
-              must also ensure that the data you upload to Aspen (Raw Sequence
-              Data, Pathogen Consensus Genomes, and Sample Metadata) are
-              similarly <B>not</B> personally identifiable. This means removing
-              all{" "}
+              you create with CZ GEN EPI are <B>not</B> personally identifiable.
+              You must also ensure that the data you upload to CZ GEN EPI (Raw
+              Sequence Data, Pathogen Consensus Genomes, and Sample Metadata)
+              are similarly <B>not</B> personally identifiable. This means
+              removing all{" "}
               <NewTabLink href="https://docs.google.com/document/d/1sboOmbafvMh3VYjK1-3MAUt0I13UUJfkQseq8ANLPl8/edit">
                 direct identifiers
               </NewTabLink>{" "}
               like name, address, dates, telephone numbers, e-mail addresses, or
-              medical record numbers from data you upload to Aspen.
+              medical record numbers from data you upload to CZ GEN EPI.
             </span>
           </ListItem>
           <ListItem>
-            Aspen does not provide medical advice. The output from Aspen does
-            not constitute and should not be relied upon to provide medical
-            advice, diagnosis or treatment. It is intended for research,
+            CZ GEN EPI does not provide medical advice. The output from CZ GEN
+            EPI does not constitute and should not be relied upon to provide
+            medical advice, diagnosis or treatment. It is intended for research,
             educational, or informational purposes only.
           </ListItem>
         </List>
@@ -139,10 +141,10 @@ export default function Terms(): JSX.Element {
         <ListItem>
           <span>
             <ListItemLabel>No personally identifying data.</ListItemLabel>
-            The data you upload to Aspen consists of Raw Sequence Data, Pathogen
-            Consensus Genomes, and Sample Metadata (ex: date collected and
-            county-level location data). You should <B>not</B> be uploading any
-            information that would allow identification of any specific
+            The data you upload to CZ GEN EPI consists of Raw Sequence Data,
+            Pathogen Consensus Genomes, and Sample Metadata (ex: date collected
+            and county-level location data). You should <B>not</B> be uploading
+            any information that would allow identification of any specific
             individuals to which the Samples may relate, such as{" "}
             <NewTabLink href="https://docs.google.com/document/d/1sboOmbafvMh3VYjK1-3MAUt0I13UUJfkQseq8ANLPl8/edit">
               direct identifiers
@@ -154,28 +156,28 @@ export default function Terms(): JSX.Element {
         <ListItem>
           <span>
             <ListItemLabel>Compliance with laws.</ListItemLabel>
-            By uploading data to Aspen, you represent and warrant to us that (A)
-            you have all consents, permissions, and authorizations necessary for
-            uploading the data to Aspen and (B) that your uploading this data to
-            Aspen complies with applicable laws, rules, and regulations,
-            including the Nagoya Protocol and relevant export laws and industry
-            guidelines and ethical standards that apply to you (e.g. CIOMS or
-            GA4GH). Please note that we filter out human sequence data as part
-            of processing Raw Sequence Data as such information is not necessary
-            for providing Aspen.
+            By uploading data to CZ GEN EPI, you represent and warrant to us
+            that (A) you have all consents, permissions, and authorizations
+            necessary for uploading the data to CZ GEN EPI and (B) that your
+            uploading this data to CZ GEN EPI complies with applicable laws,
+            rules, and regulations, including the Nagoya Protocol and relevant
+            export laws and industry guidelines and ethical standards that apply
+            to you (e.g. CIOMS or GA4GH). Please note that we filter out human
+            sequence data as part of processing Raw Sequence Data as such
+            information is not necessary for providing CZ GEN EPI.
           </span>
         </ListItem>
         <ListItem>
           <span>
             <ListItemLabel>Our rights and your rights.</ListItemLabel>
             We need some basic rights to use your Upload data in order to offer
-            Aspen’s services to you. Specifically, you grant to us a license to
-            use (ex: store your data in the Aspen database), reproduce (ex:
-            backing up the Aspen database), distribute, display, and create
-            derivative works (ex: produce phylogenetic trees per your requests)
-            from Upload data in connection with offering and improving Aspen.
-            You can request deletion of your Upload Data from Aspen by emailing
-            us at{" "}
+            CZ GEN EPI’s services to you. Specifically, you grant to us a
+            license to use (ex: store your data in the CZ GEN EPI database),
+            reproduce (ex: backing up the CZ GEN EPI database), distribute,
+            display, and create derivative works (ex: produce phylogenetic trees
+            per your requests) from Upload data in connection with offering and
+            improving CZ GEN EPI. You can request deletion of your Upload Data
+            from CZ GEN EPI by emailing us at{" "}
             <NewTabLink href="mailto:helloaspen@chanzuckerberg.com">
               helloaspen@chanzuckerberg.com
             </NewTabLink>{" "}
@@ -186,24 +188,24 @@ export default function Terms(): JSX.Element {
             <ListItemLabel>
               Sharing pathogen genomes and analytical outputs.
             </ListItemLabel>
-            Aspen gives you tools to analyze pathogen genomes and create further
-            analytical outputs from them (ex: phylogenetic trees) that allow you
-            to better understand the relationship between different pathogen
-            genomes.
+            CZ GEN EPI gives you tools to analyze pathogen genomes and create
+            further analytical outputs from them (ex: phylogenetic trees) that
+            allow you to better understand the relationship between different
+            pathogen genomes.
             <List>
               <ListItem>
                 <span>
                   <ListItemLabel>Within your organization:</ListItemLabel>
                   The pathogen genomes created from your Samples and the
-                  analytical outputs you create using Aspen are visible to other
-                  Users at your organization (ex: your DPH). You, along with
-                  other members of your Group, control whether you permit us to
-                  share this information with Users outside your organization.
-                  In certain circumstances, we may also share your data with
-                  third party entities, through the Aspen tool, in line with
-                  your organization’s policies or in line with applicable law.
-                  Samples marked &quot;private&quot; will never be shared with
-                  any 3rd parties unless you choose to mark them
+                  analytical outputs you create using CZ GEN EPI are visible to
+                  other Users at your organization (ex: your DPH). You, along
+                  with other members of your Group, control whether you permit
+                  us to share this information with Users outside your
+                  organization. In certain circumstances, we may also share your
+                  data with third party entities, through the CZ GEN EPI tool,
+                  in line with your organization’s policies or in line with
+                  applicable law. Samples marked &quot;private&quot; will never
+                  be shared with any 3rd parties unless you choose to mark them
                   &quot;public&quot; later on.
                 </span>
               </ListItem>
@@ -217,21 +219,21 @@ export default function Terms(): JSX.Element {
   const renderAuthorizationToUseAspen = () => (
     <>
       <H2>
-        <Number>2.</Number>Authorization To Use Aspen
+        <Number>2.</Number>Authorization To Use CZ GEN EPI
       </H2>
       <List>
         <ListItem>
-          You are using Aspen in your professional capacity as a User from your
-          organization. This means that in addition to Aspen’s Terms and Privacy
-          Policy, your organization’s policies also likely apply to your and
-          your colleagues’ use of Aspen. Please see your organization for
-          questions related to their policies.
+          You are using CZ GEN EPI in your professional capacity as a User from
+          your organization. This means that in addition to CZ GEN EPI’s Terms
+          and Privacy Policy, your organization’s policies also likely apply to
+          your and your colleagues’ use of CZ GEN EPI. Please see your
+          organization for questions related to their policies.
         </ListItem>
         <ListItem>
-          Aspen may not be used to provide medical or other services to any
-          third party (for instance, to inform or provide disease diagnoses).
-          Aspen is not intended to diagnose, treat, cure, or prevent any disease
-          and is not a substitute for medical advice.
+          CZ GEN EPI may not be used to provide medical or other services to any
+          third party (for instance, to inform or provide disease diagnoses). CZ
+          GEN EPI is not intended to diagnose, treat, cure, or prevent any
+          disease and is not a substitute for medical advice.
         </ListItem>
       </List>
     </>
@@ -244,10 +246,11 @@ export default function Terms(): JSX.Element {
       </H2>
       <List>
         <ListItem>
-          You shall not otherwise access or use, or attempt to access or use,
-          Aspen to take any action that could harm us, Aspen or its Users, or
-          any third party, or use Aspen in any manner that violates applicable
-          law or infringes or otherwise violates third party rights.
+          You shall not otherwise access or use, or attempt to access or use, CZ
+          GEN EPI to take any action that could harm us, CZ GEN EPI or its
+          Users, or any third party, or use CZ GEN EPI in any manner that
+          violates applicable law or infringes or otherwise violates third party
+          rights.
         </ListItem>
         <ListItem>
           <span>
@@ -257,7 +260,7 @@ export default function Terms(): JSX.Element {
           </span>
         </ListItem>
         <ListItem>
-          We may restrict or terminate your access to Aspen at any time,
+          We may restrict or terminate your access to CZ GEN EPI at any time,
           including for breach of these Terms. If this happens, we will attempt
           to provide you notice through the contact information we have for you.
         </ListItem>
@@ -268,16 +271,17 @@ export default function Terms(): JSX.Element {
   const renderChangesToAspenOrTerms = () => (
     <>
       <H2>
-        <Number>4.</Number>Changes To Aspen Or These Terms
+        <Number>4.</Number>Changes To CZ GEN EPI Or These Terms
       </H2>
       <List>
         <ListItem>
           <span>
-            <ListItemLabel>Changes to Aspen.</ListItemLabel>Aspen is a free
-            tool. We can’t promise Aspen will always be up and offered as it is
-            today, but if we are making material changes to its features or that
-            impact its availability, we will give you a chance to download
-            and/or delete your data so you can take it off of Aspen.
+            <ListItemLabel>Changes to CZ GEN EPI.</ListItemLabel>CZ GEN EPI is a
+            free tool. We can’t promise CZ GEN EPI will always be up and offered
+            as it is today, but if we are making material changes to its
+            features or that impact its availability, we will give you a chance
+            to download and/or delete your data so you can take it off of CZ GEN
+            EPI.
           </span>
         </ListItem>
         <ListItem>
@@ -311,13 +315,13 @@ export default function Terms(): JSX.Element {
         <ListItem>
           <span>
             We and our service providers do not review or correct any data
-            uploaded into Aspen. If you would like to report any issue with
-            Aspen please contact us at{" "}
+            uploaded into CZ GEN EPI. If you would like to report any issue with
+            CZ GEN EPI please contact us at{" "}
             <NewTabLink href="mailto:aspensecurity@chanzuckerberg.com">
               aspensecurity@chanzuckerberg.com
             </NewTabLink>
-            . Aspen is not intended as a storage service, so please back up your
-            Upload Data using a secure service of your choice, such as the
+            . CZ GEN EPI is not intended as a storage service, so please back up
+            your Upload Data using a secure service of your choice, such as the
             NCBI’s Sequence Read Archive (SRA) repository.
           </span>
         </ListItem>
@@ -327,23 +331,23 @@ export default function Terms(): JSX.Element {
             <List>
               <ListItem>
                 <span>
-                  YOUR ACCESS AND USE ASPEN AT YOUR SOLE RISK AND AGREE THAT WE
-                  AND OUR SERVICE PROVIDERS WILL NOT BE RESPONSIBLE FOR ANY
-                  ACTIONS YOU TAKE BASED ON ASPEN OR FOR ANY INACCURATE DATA OR
-                  OUTPUTS OF ASPEN.
+                  YOUR ACCESS AND USE CZ GEN EPI AT YOUR SOLE RISK AND AGREE
+                  THAT WE AND OUR SERVICE PROVIDERS WILL NOT BE RESPONSIBLE FOR
+                  ANY ACTIONS YOU TAKE BASED ON CZ GEN EPI OR FOR ANY INACCURATE
+                  DATA OR OUTPUTS OF CZ GEN EPI.
                 </span>
               </ListItem>
               <ListItem>
                 <span>
-                  ASPEN IS PROVIDED &quot;AS IS&quot; WITH ALL FAULTS, AND WE
-                  AND OUR SERVICE PROVIDERS HEREBY DISCLAIM ALL REPRESENTATIONS
-                  AND WARRANTIES, EXPRESS, STATUTORY, OR IMPLIED (INCLUDING,
-                  WITHOUT LIMITATION, IMPLIED WARRANTIES OF TITLE,
+                  CZ GEN EPI IS PROVIDED &quot;AS IS&quot; WITH ALL FAULTS, AND
+                  WE AND OUR SERVICE PROVIDERS HEREBY DISCLAIM ALL
+                  REPRESENTATIONS AND WARRANTIES, EXPRESS, STATUTORY, OR IMPLIED
+                  (INCLUDING, WITHOUT LIMITATION, IMPLIED WARRANTIES OF TITLE,
                   NON-INFRINGEMENT, MERCHANTABILITY, FITNESS FOR A PARTICULAR
                   PURPOSE, AND ALL WARRANTIES ARISING FROM THE COURSE OF
-                  DEALING, USAGE, OR TRADE PRACTICE) WITH RESPECT TO ASPEN.
-                  ASPEN IS NOT INTENDED TO BE USED AND SHOULD NOT BE USED AS A
-                  MEDICAL DEVICE OR FOR PURPOSES OF MEDICAL DIAGNOSIS OR
+                  DEALING, USAGE, OR TRADE PRACTICE) WITH RESPECT TO CZ GEN EPI.
+                  CZ GEN EPI IS NOT INTENDED TO BE USED AND SHOULD NOT BE USED
+                  AS A MEDICAL DEVICE OR FOR PURPOSES OF MEDICAL DIAGNOSIS OR
                   TREATMENT.
                 </span>
               </ListItem>
@@ -352,12 +356,13 @@ export default function Terms(): JSX.Element {
                   FOR CLARITY AND WITHOUT LIMITING THE FOREGOING, WE AND OUR
                   SERVICE PROVIDERS DO NOT MAKE ANY GUARANTEES (I) REGARDING THE
                   ACCURACY, COMPLETENESS, TIMELINESS, SECURITY, AVAILABILITY OR
-                  INTEGRITY OF ASPEN, (II) THAT ASPEN WILL BE UNINTERRUPTED OR
-                  OPERATE IN COMBINATION WITH ANY SOFTWARE, SERVICE, SYSTEM OR
-                  OTHER DATA, OR (III) THAT ASPEN WILL MEET ANY REQUIREMENTS OF
-                  ANY PERSON OR ENTITY, OR ANY REGULATORY APPROVALS OR
-                  REQUIREMENTS. WITHOUT LIMITATION, YOU ACKNOWLEDGE THAT ASPEN
-                  IS NOT A BUSINESS ASSOCIATE FOR PURPOSES OF HIPAA.
+                  INTEGRITY OF CZ GEN EPI, (II) THAT CZ GEN EPI WILL BE
+                  UNINTERRUPTED OR OPERATE IN COMBINATION WITH ANY SOFTWARE,
+                  SERVICE, SYSTEM OR OTHER DATA, OR (III) THAT CZ GEN EPI WILL
+                  MEET ANY REQUIREMENTS OF ANY PERSON OR ENTITY, OR ANY
+                  REGULATORY APPROVALS OR REQUIREMENTS. WITHOUT LIMITATION, YOU
+                  ACKNOWLEDGE THAT CZ GEN EPI IS NOT A BUSINESS ASSOCIATE FOR
+                  PURPOSES OF HIPAA.
                 </span>
               </ListItem>
             </List>
@@ -409,7 +414,7 @@ export default function Terms(): JSX.Element {
           proceeding (a &quot;Claim&quot;) to the extent arising from: (1) your
           gross negligence, willful misconduct or fraud; and/or (2) any
           misrepresentation you make regarding your permission to submit data to
-          Aspen for your organization’s use.
+          CZ GEN EPI for your organization’s use.
         </ListItem>
         <ListItem>
           Indemnification is conditioned upon the Protected Parties giving you
@@ -447,13 +452,13 @@ export default function Terms(): JSX.Element {
           <span>
             <ListItemLabel>Dispute Resolution.</ListItemLabel>
             In the unlikely event we have a dispute arising out of or related to
-            the use of Aspen (&quot;Dispute&quot;) that we can’t resolve between
-            us, you and we agree that we shall (in good faith) meet and attempt
-            to resolve the Dispute within thirty (30) days. If the Dispute is
-            not resolved during such time period, then you and a representative
-            of CZIF shall (in good faith) meet and attempt to resolve the
-            Dispute through non-binding mediation with a mutually agreed upon
-            mediator within thirty (30) additional days.
+            the use of CZ GEN EPI (&quot;Dispute&quot;) that we can’t resolve
+            between us, you and we agree that we shall (in good faith) meet and
+            attempt to resolve the Dispute within thirty (30) days. If the
+            Dispute is not resolved during such time period, then you and a
+            representative of CZIF shall (in good faith) meet and attempt to
+            resolve the Dispute through non-binding mediation with a mutually
+            agreed upon mediator within thirty (30) additional days.
           </span>
         </ListItem>
         <ListItem>
@@ -530,9 +535,9 @@ export default function Terms(): JSX.Element {
         </ListItem>
         <ListItem>
           Entire Agreement. These Terms (along with the Privacy Notice)
-          constitute the entire agreement between you and us regarding Aspen. If
-          you wish to modify these Terms, any amendment must be provided to us
-          in writing and signed by our authorized representative.
+          constitute the entire agreement between you and us regarding CZ GEN
+          EPI. If you wish to modify these Terms, any amendment must be provided
+          to us in writing and signed by our authorized representative.
         </ListItem>
       </List>
     </>
