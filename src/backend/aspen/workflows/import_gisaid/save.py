@@ -3,7 +3,7 @@ import datetime
 import io
 import re
 import uuid
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 import arrow
 import click
@@ -76,14 +76,14 @@ def cli(
         dest_table = GisaidMetadata.__table__
         temp_table = create_temp_table(session, dest_table)
 
-        objects: List[Dict[str, Optional[str]]] = []
+        objects: List[Dict[str, Union[Optional[str], Optional[datetime.datetime]]]] = []
         # We insert into a temporary table and then swap table contents with gisaid_metadata
         for row in data:
             num_rows += 1
             # add this row to the db
-            metadata_fields: Dict[str, Optional[str]] = {
-                field.lower(): row[field] for field in fields_to_import
-            }
+            metadata_fields: Dict[
+                str, Union[Optional[str], Optional[datetime.datetime]]
+            ] = {field.lower(): row[field] for field in fields_to_import}
             if num_rows % 20000 == 0:
                 session.execute(temp_table.insert(), objects)
                 print(f"{datetime.datetime.now()} - {num_rows} inserted")

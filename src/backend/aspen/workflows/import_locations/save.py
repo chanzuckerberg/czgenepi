@@ -29,7 +29,7 @@ def cli(
 
         session.commit()
 
-        print(f"Successfully imported locations!")
+        print("Successfully imported locations!")
 
 
 if __name__ == "__main__":
