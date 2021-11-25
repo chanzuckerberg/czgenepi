@@ -55,7 +55,7 @@ export default function LocationField({
       (location) => location.id == value
     );
     setLocation(locationForID);
-  });
+  }, [locationOptions, value]);
 
   const searcher = (query: string): void => {
     if (query.length < 2) {
