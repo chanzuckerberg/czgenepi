@@ -7,7 +7,7 @@ import { API } from "../../../../common/api";
 import { ROUTES } from "../../../../common/routes";
 import style from "../../index.module.scss";
 import UserMenu from "./components/UserMenu";
-import { UploadButton } from "./style";
+import { ResourcesLink, UploadButton } from "./style";
 
 export default function RightNav(): JSX.Element {
   const { data } = useUserInfo();
@@ -17,6 +17,13 @@ export default function RightNav(): JSX.Element {
   const signInLink = (
     <a href={ENV.API_URL + API.LOG_IN} data-test-id="navbar-sign-in-link">
       <div className={cx(style.item, style.link)}>Sign In</div>
+    </a>
+  );
+  const genEpiResourcesLink = (
+    <a href={ROUTES.RESOURCES}>
+      <ResourcesLink className={cx(style.item, style.link)}>
+        Gen Epi Resources
+      </ResourcesLink>
     </a>
   );
 
@@ -36,7 +43,12 @@ export default function RightNav(): JSX.Element {
         </>
       );
     } else {
-      return signInLink;
+      return (
+        <>
+          {genEpiResourcesLink}
+          {signInLink}
+        </>
+      );
     }
   }
 

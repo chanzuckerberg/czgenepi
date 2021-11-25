@@ -13,7 +13,8 @@ import {
 
 export const NarrowContainer = styled.div`
   max-width: 800px;
-  margin: 90px auto;
+  margin: 90px auto 0;
+  padding-bottom: 50px;
 `;
 
 export const B = styled.b`
@@ -90,3 +91,12 @@ export const IconButtonBubble = styled(Button)`
     `;
   }}
 `;
+
+export const transparentScrollbars = (): string => {
+  return `
+    scrollbar-color: transparent unset;
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+  `;
+};

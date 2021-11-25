@@ -10,7 +10,6 @@ import { Input } from "semantic-ui-react";
 import { DataTable } from "src/common/components";
 import { VIEWNAME } from "src/common/constants/types";
 import { ROUTES } from "src/common/routes";
-import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import Notification from "src/components/Notification";
 import { CreateNSTreeModal } from "./components/CreateNSTreeModal";
 import DownloadModal from "./components/DownloadModal";
@@ -41,7 +40,6 @@ interface Props {
   subheaders: Record<string, SubHeader[]>;
   isLoading: boolean;
   renderer?: CustomRenderer;
-  headerRenderer?: CustomRenderer;
   viewName: VIEWNAME;
   dataFilterFunc?: (data: TableItem[]) => TableItem[];
 }
@@ -129,7 +127,6 @@ const DataSubview: FunctionComponent<Props> = ({
   subheaders,
   isLoading,
   renderer,
-  headerRenderer,
   viewName,
   dataFilterFunc,
 }: Props) => {
@@ -266,10 +263,7 @@ const DataSubview: FunctionComponent<Props> = ({
 
   const numCheckedSamples = checkedSamples?.length;
   const hasCheckedSamples = numCheckedSamples > 0;
-  const hasTooManyCheckedSamples = numCheckedSamples > 2000;
-  const isTreeMenuActive =
-    (hasCheckedSamples && !hasTooManyCheckedSamples) ||
-    usesFeatureFlag(FEATURE_FLAGS.gisaidIngest);
+  const hasTooManySamples = numCheckedSamples > 2000;
 
   const render = (tableData?: TableItem[]) => {
     let downloadButton: JSX.Element | null = null;
@@ -282,11 +276,8 @@ const DataSubview: FunctionComponent<Props> = ({
           <TreeSelectionMenu
             handleCreateNSTreeOpen={handleCreateNSTreeOpen}
             handleCreateUsherTreeOpen={() => setShouldStartUsherFlow(true)}
-            // TODO (mlila): remove isMenuDisabled when gisaidIngest feature turned on
-            isMenuDisabled={!isTreeMenuActive}
-            isUsherDisabled={
-              usesFeatureFlag(FEATURE_FLAGS.gisaidIngest) && !hasCheckedSamples
-            }
+            isMenuDisabled={hasTooManySamples}
+            isUsherDisabled={!hasCheckedSamples}
           />
           <IconButton
             onClick={handleDownloadClickOpen}
@@ -411,7 +402,6 @@ const DataSubview: FunctionComponent<Props> = ({
               }
               defaultSortKey={defaultSortKey}
               headers={headers}
-              headerRenderer={headerRenderer}
               renderer={renderer}
             />
           </div>

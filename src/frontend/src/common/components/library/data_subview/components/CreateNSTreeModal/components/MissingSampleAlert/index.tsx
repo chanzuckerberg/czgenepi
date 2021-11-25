@@ -36,8 +36,7 @@ const MissingSampleAlert = ({ missingSamples }: Props): JSX.Element | null => {
               {numMissingSamples} Sample {pluralize("ID", numMissingSamples)}{" "}
               couldn’t be found
             </SemiBold>{" "}
-            and may not appear on your tree. Please double check and correct any
-            errors.
+            and will not appear on your tree.
           </StaticSizeDiv>
           <Collapse in={areMissingIdsShown}>
             <StyledList>

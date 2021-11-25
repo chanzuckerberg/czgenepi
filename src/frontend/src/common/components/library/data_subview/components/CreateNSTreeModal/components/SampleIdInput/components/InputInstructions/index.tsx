@@ -16,7 +16,7 @@ const InputInstructions = (): JSX.Element => {
             in your tree.
           </div>,
           <div key={1}>
-            IDs must be separated by tabs, commas, or enter one ID per row.
+            IDs must be separated by tabs, commas, or new lines.
           </div>,
           <div key={2}>
             Depending on the Tree Type, add up to 2000 samples.{" "}

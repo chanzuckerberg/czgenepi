@@ -13,6 +13,7 @@ import {
 } from "czifui";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
+import { transparentScrollbars } from "src/common/styles/support/style";
 
 export const StyledDialog = styled(Dialog)`
   display: flex;
@@ -26,6 +27,7 @@ export const StyledDialog = styled(Dialog)`
 
 export const StyledDialogContent = styled(DialogContent)`
   ${fontBodyS}
+  ${transparentScrollbars}
 
   width: 600px;
   padding-bottom: 0;
