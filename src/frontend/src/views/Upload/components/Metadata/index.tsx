@@ -28,9 +28,11 @@ import {
   SampleIdToWarningMessages,
 } from "./components/ImportFile/parseFile";
 import Table from "./components/Table";
+import { distance } from "fastest-levenshtein";
 
 export const EMPTY_METADATA: IMetadata = {
   collectionDate: "",
+  collectionLocation: undefined,
   collectionLocationID: undefined,
   islAccessionNumber: "",
   keepPrivate: false,
@@ -38,6 +40,23 @@ export const EMPTY_METADATA: IMetadata = {
   sequencingDate: "",
   submittedToGisaid: false,
 };
+
+function stringifyLocation(location: GisaidLocation): string {
+  let stringName = "";
+  const orderedKeys = ["region", "country", "division", "location"];
+  orderedKeys.every((key) => {
+    if (location[key]) {
+      if (key != "region") {
+        stringName += "/";
+      }
+      stringName += `${location[key]}`;
+      return true;
+    } else {
+      return false;
+    }
+  });
+  return stringName;
+}
 
 export default function Metadata({
   samples,
@@ -49,26 +68,80 @@ export default function Metadata({
   const [autocorrectWarnings, setAutocorrectWarnings] =
     useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
   const [locations, setLocations] = useState<GisaidLocation[]>([]);
+  const [locationOptions, setLocationOptions] = useState<
+    GisaidLocationOption[]
+  >([]);
 
   const loadLocations = async () => {
     const result: LocationsResponse = await getLocations();
+    console.log(
+      `${result.locations.length.toLocaleString()} locations loaded.`
+    );
     setLocations(result.locations);
   };
 
   useEffect(() => {
     loadLocations();
-  }, []);
+  }, [samples]);
+
+  useEffect(() => {
+    const locationsToOptions: GisaidLocationOption[] = locations.map(
+      (location) => {
+        let stringName = stringifyLocation(location);
+        return {
+          name: stringName,
+          description: "",
+          id: location.id,
+        };
+      }
+    );
+    setLocationOptions(locationsToOptions);
+  }, [locations]);
 
   function handleMetadata(result: ParseResult) {
     const { data: sampleIdToMetadata, warningMessages } = result;
-
     if (!samples) return;
 
     const newMetadata: SampleIdToMetadata = {};
 
     // (thuang): Only extract metadata for existing samples
     for (const sampleId of Object.keys(samples)) {
+      // get parsed metadata
       newMetadata[sampleId] = sampleIdToMetadata[sampleId] || EMPTY_METADATA;
+      // try and match parsed collection location to a gisaid location
+      const collectionLocation = newMetadata[sampleId]?.collectionLocation;
+      if (collectionLocation) {
+        // compare levenshtein distances between location strings
+        // for this implementation, we are comparing against the
+        // Location.location - the narrowest scope (i.e. city/county level)
+        // I would like to bias the final results towards a user's group's
+        // location, but that will take some API modification.
+        const scoredLocations: [GisaidLocation, number][] = locations.map(
+          (location) => {
+            if (location.location) {
+              return [
+                location,
+                distance(location.location, collectionLocation),
+              ];
+            }
+            return [location, 99];
+          }
+        );
+        const candidateLocation = scoredLocations.reduce(
+          ([prevLocation, prevScore], [currLocation, currScore]) => {
+            if (currScore < prevScore) {
+              return [currLocation, currScore];
+            }
+            return [prevLocation, prevScore];
+          }
+        );
+        newMetadata[sampleId].collectionLocationID = candidateLocation[0].id;
+        console.log(
+          `Matched location for ${collectionLocation}: ${stringifyLocation(
+            candidateLocation[0]
+          )}`
+        );
+      }
     }
 
     setMetadata(newMetadata);
@@ -78,27 +151,6 @@ export default function Metadata({
     );
     setHasImportedFile(true);
   }
-
-  const locationOptions: GisaidLocationOption[] = locations.map((location) => {
-    let stringName = "";
-    const orderedKeys = ["region", "country", "division", "location"];
-    orderedKeys.every((key) => {
-      if (location[key]) {
-        if (key != "region") {
-          stringName += "/";
-        }
-        stringName += `${location[key]}`;
-        return true;
-      } else {
-        return false;
-      }
-    });
-    return {
-      name: stringName,
-      description: "",
-      id: location.id,
-    };
-  });
 
   return (
     <>
