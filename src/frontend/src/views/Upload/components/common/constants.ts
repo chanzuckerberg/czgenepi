@@ -6,7 +6,10 @@ export type ParsedMetadata = Record<
   string | boolean | undefined
 >;
 
-export const METADATA_KEYS_TO_HEADERS: Record<string, string> = {
+export const METADATA_KEYS_TO_HEADERS: Record<
+  Exclude<keyof ParsedMetadata, "collectionLocationID">,
+  string
+> = {
   collectionDate: "Collection Date",
   collectionLocation: "Collection Location",
   islAccessionNumber: "ISL Accession # (optional)",
@@ -19,7 +22,7 @@ export const METADATA_KEYS_TO_HEADERS: Record<string, string> = {
 
 export const HEADERS_TO_METADATA_KEYS = invert(
   METADATA_KEYS_TO_HEADERS
-) as Record<string, string>;
+) as Record<string, Exclude<keyof ParsedMetadata, "collectionLocationID">>;
 
 export const METADATA_KEYS_TO_API_KEYS: Record<keyof ParsedMetadata, string> = {
   collectionDate: "collection_date",

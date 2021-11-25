@@ -1,4 +1,5 @@
 import { Button } from "czifui";
+import { distance } from "fastest-levenshtein";
 import Head from "next/head";
 import NextLink from "next/link";
 import React, { useEffect, useState } from "react";
@@ -28,7 +29,6 @@ import {
   SampleIdToWarningMessages,
 } from "./components/ImportFile/parseFile";
 import Table from "./components/Table";
-import { distance } from "fastest-levenshtein";
 
 export const EMPTY_METADATA: IMetadata = {
   collectionDate: "",
@@ -74,9 +74,6 @@ export default function Metadata({
 
   const loadLocations = async () => {
     const result: LocationsResponse = await getLocations();
-    console.log(
-      `${result.locations.length.toLocaleString()} locations loaded.`
-    );
     setLocations(result.locations);
   };
 
@@ -87,7 +84,7 @@ export default function Metadata({
   useEffect(() => {
     const locationsToOptions: GisaidLocationOption[] = locations.map(
       (location) => {
-        let stringName = stringifyLocation(location);
+        const stringName = stringifyLocation(location);
         return {
           name: stringName,
           description: "",
@@ -136,11 +133,6 @@ export default function Metadata({
           }
         );
         newMetadata[sampleId].collectionLocationID = candidateLocation[0].id;
-        console.log(
-          `Matched location for ${collectionLocation}: ${stringifyLocation(
-            candidateLocation[0]
-          )}`
-        );
       }
     }
 
