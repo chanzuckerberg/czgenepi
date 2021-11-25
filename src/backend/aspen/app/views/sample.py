@@ -63,7 +63,6 @@ SAMPLES_POST_REQUIRED_FIELDS = [
     "private_identifier",
     "collection_date",
     "location",
-    "location_id",
     # following fields from PathogenGenome
     "sequence",
 ]
@@ -74,6 +73,7 @@ SAMPLES_POST_OPTIONAL_FIELDS = [
     "sample_collector_contact_email",
     "sample_collector_contact_address",
     "authors",
+    "location_id",
     "division",
     "country",
     "region",
@@ -447,7 +447,7 @@ def create_sample():
 
             valid_location: Optional[Location] = (
                 g.db_session.query(Location)
-                .filter(Location.id == data["sample"]["location_id"])
+                .filter(Location.id == data["sample"].get("location_id", None))
                 .one_or_none()
             )
             if valid_location:
