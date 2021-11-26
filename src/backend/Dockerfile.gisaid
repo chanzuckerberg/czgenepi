@@ -57,7 +57,7 @@ RUN mkdir /ncov && \
     cd /ncov && \
     git init && \
     git remote add origin https://github.com/nextstrain/ncov.git && \
-    git fetch origin 6691370325e5980d4f6073f7672759711c305a05 && \
+    git fetch origin dc8c7d03774c1ed99dc8a2509494bb5dc9f05bbf && \
     git reset --hard FETCH_HEAD
 
 # Poetry: install app
