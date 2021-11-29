@@ -46,11 +46,11 @@
         },
         "prod": {
             "aws_profile": "genepi-prod",
-            "secret_arn": "happy/env-prod-config",
+            "secret_arn": "happy/env-geprod-config",
             "terraform_directory": ".happy/terraform/envs/prod",
             "delete_protected": true,
             "auto_run_migrations": true,
-            "log_group_prefix": "/aspen/prod"
+            "log_group_prefix": "/genepi/geprod"
         }
     },
     "tasks": {
