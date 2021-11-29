@@ -57,7 +57,7 @@ export default function LocationField({
     setLocation(locationForID);
   }, [locationOptions, value]);
 
-  const searcher = (query: string): void => {
+  const searcher = async (query: string): Promise<void> => {
     if (query.length < 2) {
       dispatch({ results: [] });
       return;
