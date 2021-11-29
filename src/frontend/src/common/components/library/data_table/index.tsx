@@ -1,4 +1,3 @@
-import classNames from "classnames";
 import { get, isEqual } from "lodash/fp";
 import React, {
   Fragment,
@@ -10,18 +9,11 @@ import React, {
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import { noop } from "src/common/constants/empty";
-import SortArrowDownIcon from "src/common/icons/IconArrowDownSmall.svg";
-import SortArrowUpIcon from "src/common/icons/IconArrowUpSmall.svg";
 import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import { EmptyState } from "../data_subview/components/EmptyState";
+import { HeaderRow } from "./components/HeaderRow";
 import style from "./index.module.scss";
-import {
-  HeaderCheckbox,
-  RowCheckbox,
-  RowContent,
-  TableHeader,
-  TableRow,
-} from "./style";
+import { RowCheckbox, RowContent, TableRow } from "./style";
 
 interface Props {
   data?: TableItem[];
@@ -34,7 +26,6 @@ interface Props {
   setFailedSamples(samples: string[]): void;
   showCheckboxes: boolean;
   renderer?: CustomRenderer;
-  headerRenderer?: HeaderRenderer;
 }
 
 // (thuang): If item height changes, we need to update this value!
@@ -56,16 +47,6 @@ export function defaultCellRenderer({
         {displayData}
       </div>
     </RowContent>
-  );
-}
-
-export function defaultHeaderRenderer({
-  header,
-}: HeaderRendererProps): JSX.Element {
-  return (
-    <div key={header.key} className={style.headerCell}>
-      <div className={style.headerCellContent}>{header.text}</div>
-    </div>
   );
 }
 
@@ -146,7 +127,6 @@ export const DataTable: FunctionComponent<Props> = ({
   data,
   headers,
   defaultSortKey,
-  headerRenderer = defaultHeaderRenderer,
   renderer = defaultCellRenderer,
   isLoading,
   checkedSamples,
@@ -185,10 +165,12 @@ export const DataTable: FunctionComponent<Props> = ({
     }
   }, [data, checkedSamples, setHeaderIndeterminant, setIsHeaderChecked]);
 
-  function handleHeaderCheckboxClick(
-    newPublicIds: string[],
-    newFailedIds: string[]
-  ) {
+  function handleHeaderCheckboxClick() {
+    if (!data) return;
+
+    const newPublicIds = extractPublicIdsFromData(data, checkedSamples, false);
+    const newFailedIds = extractPublicIdsFromDataWFailedGenomeRecovery(data);
+
     if (isHeaderIndeterminant || isHeaderChecked) {
       // remove samples in current data selection when selecting checkbox when indeterminate
       const newCheckedSamples = checkedSamples.filter(
@@ -241,32 +223,6 @@ export const DataTable: FunctionComponent<Props> = ({
   };
 
   // render functions
-  const headerRow = headers.map((header: Header, index) => {
-    const headerJSX = headerRenderer({ header, index });
-    const { align, key, sortKey } = header;
-    let sortIndicator: JSX.Element | null = null;
-    if (isEqual(sortKey, state.sortKey)) {
-      sortIndicator = <SortArrowDownIcon />;
-      if (state.ascending) {
-        sortIndicator = <SortArrowUpIcon />;
-      }
-    }
-    return (
-      <TableHeader
-        onClick={() => handleSortClick(sortKey)}
-        key={sortKey.join("-")}
-        className={style.headerMetaCell}
-        data-test-id="header-cell"
-        align={align}
-        // * Tree name column should be slightly wider than the rest to accommodate status tags
-        wide={key === "name"}
-      >
-        {headerJSX}
-        {sortIndicator}
-      </TableHeader>
-    );
-  });
-
   const sampleRow = (item: TableItem): React.ReactNode => {
     return headers.map((header, index) => {
       const value = item[header.key];
@@ -277,31 +233,6 @@ export const DataTable: FunctionComponent<Props> = ({
         </Fragment>
       );
     });
-  };
-
-  const headerCheckbox = (): React.ReactNode => {
-    function handleClick() {
-      if (data) {
-        const publicIds = extractPublicIdsFromData(data, checkedSamples, false);
-        const failedSamples =
-          extractPublicIdsFromDataWFailedGenomeRecovery(data);
-        handleHeaderCheckboxClick(publicIds, failedSamples);
-      }
-    }
-
-    return (
-      <HeaderCheckbox
-        checked={isHeaderChecked}
-        onClick={handleClick}
-        stage={
-          isHeaderIndeterminant
-            ? "indeterminate"
-            : isHeaderChecked
-            ? "checked"
-            : "unchecked"
-        }
-      />
-    );
   };
 
   const rowCheckbox = (item: TableItem): React.ReactNode => {
@@ -340,17 +271,18 @@ export const DataTable: FunctionComponent<Props> = ({
       );
     }
 
-    const headerStyleClass = classNames(
-      style.header, // All headers use this class
-      { [style.headerWithCheckbox]: showCheckboxes } // If checkbox, addl class to tweak it
-    );
-
     return (
       <div className={style.container}>
-        <div className={headerStyleClass} data-test-id="header-row">
-          {showCheckboxes && headerCheckbox()}
-          {headerRow}
-        </div>
+        <HeaderRow
+          handleHeaderCheckboxClick={handleHeaderCheckboxClick}
+          handleSortClick={handleSortClick}
+          headers={headers}
+          isHeaderChecked={isHeaderChecked}
+          isHeaderIndeterminant={isHeaderIndeterminant}
+          isSortedAscending={state.ascending}
+          shouldShowCheckboxes={showCheckboxes}
+          sortColKey={state.sortKey}
+        />
         <div className={style.tableContent}>
           <AutoSizer>
             {({ height, width }) => {

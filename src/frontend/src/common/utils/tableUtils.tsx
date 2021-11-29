@@ -19,17 +19,3 @@ export function createTableCellRenderer(
     });
   };
 }
-
-export function createTableHeaderRenderer(
-  customRenderers: Record<string, HeaderRenderer>,
-  defaultRenderer: HeaderRenderer
-): CustomRenderer {
-  return ({ header, index }: CustomTableRenderProps): JSX.Element => {
-    const renderer = customRenderers[header.key] || defaultRenderer;
-
-    return renderer({
-      header,
-      index,
-    });
-  };
-}
