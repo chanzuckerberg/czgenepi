@@ -6,7 +6,10 @@ import {
   DATE_ERROR_MESSAGE,
   DATE_REGEX,
 } from "src/components/DateField/constants";
-import { Metadata } from "src/views/Upload/components/common/types";
+import {
+  Metadata,
+  NamedGisaidLocation,
+} from "src/views/Upload/components/common/types";
 import * as yup from "yup";
 import FreeTextField from "./components/FreeTextField";
 import LocationField from "./components/LocationField";
@@ -27,8 +30,16 @@ const validationSchema = yup.object({
     .min(10, DATE_ERROR_MESSAGE)
     .max(10, DATE_ERROR_MESSAGE)
     .required("Required"),
-  collectionLocation: yup.string().required("Required"),
-  collectionLocationID: yup.number().required("Required"),
+  collectionLocation: yup
+    .object({
+      id: yup.number().required(),
+      // region: yup.string(),
+      // country: yup.string(),
+      // division: yup.string(),
+      // location: yup.string(),
+      // name: yup.string(),
+    })
+    .required("Required"),
   publicId: yup.string().when("submittedToGisaid", {
     is: true,
     then: yup.string().required("Required"),
@@ -50,7 +61,7 @@ interface Props {
   handleRowValidation: (id: string, isValid: boolean) => void;
   isTouched: boolean;
   warnings?: Set<keyof Metadata>;
-  locationOptions: GisaidLocationOption[];
+  locations: NamedGisaidLocation[];
 }
 
 export default React.memo(function Row({
@@ -62,7 +73,7 @@ export default React.memo(function Row({
   handleRowValidation,
   isTouched,
   warnings = new Set(),
-  locationOptions,
+  locations,
 }: Props): JSX.Element {
   const formik = useFormik({
     enableReinitialize: true,
@@ -117,9 +128,8 @@ export default React.memo(function Row({
           isFirstRow={isFirstRow}
           applyToAllColumn={applyToAllColumn}
           formik={formik}
-          fieldKey="collectionLocationID"
-          accessoryKey="collectionLocation"
-          locationOptions={locationOptions}
+          fieldKey="collectionLocation"
+          locations={locations}
         />
       </StyledTableCell>
       <StyledTableCell component="div">

@@ -6,7 +6,11 @@ import {
   METADATA_KEYS_TO_HEADERS,
   SAMPLE_COUNT,
 } from "../../../common/constants";
-import { Metadata, Props as CommonProps } from "../../../common/types";
+import {
+  Metadata,
+  NamedGisaidLocation,
+  Props as CommonProps,
+} from "../../../common/types";
 import { SampleIdToWarningMessages } from "../ImportFile/parseFile";
 import Row from "./components/Row";
 import {
@@ -26,7 +30,7 @@ interface Props {
   setIsValid: React.Dispatch<React.SetStateAction<boolean>>;
   hasImportedFile: boolean;
   autocorrectWarnings: SampleIdToWarningMessages;
-  locationOptions: GisaidLocationOption[];
+  locations: NamedGisaidLocation[];
 }
 
 export default function Table({
@@ -35,7 +39,7 @@ export default function Table({
   setIsValid,
   hasImportedFile,
   autocorrectWarnings,
-  locationOptions,
+  locations,
 }: Props): JSX.Element {
   const [isTouched, setIsTouched] = useState(hasImportedFile);
   const [isReadyToRenderTable, setIsReadyToTenderTable] = useState(false);
@@ -177,7 +181,7 @@ export default function Table({
                         applyToAllColumn={applyToAllColumn}
                         handleRowValidation={handleRowValidation}
                         warnings={autocorrectWarnings[sampleId]}
-                        locationOptions={locationOptions}
+                        locations={locations}
                       />
                     );
                   }

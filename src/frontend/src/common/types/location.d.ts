@@ -1,5 +1,4 @@
 interface GisaidLocation {
-  [index: string]: string | number;
   region: string;
   country: string;
   division: string;
@@ -7,9 +6,6 @@ interface GisaidLocation {
   id: number;
 }
 
-interface GisaidLocationOption {
-  [index: string]: string | number;
+interface NamedGisaidLocation extends GisaidLocation {
   name: string;
-  description: string;
-  id: number;
 }

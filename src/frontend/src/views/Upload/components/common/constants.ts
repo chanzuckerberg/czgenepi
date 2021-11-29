@@ -7,11 +7,11 @@ export type ParsedMetadata = Record<
 >;
 
 export const METADATA_KEYS_TO_HEADERS: Record<
-  Exclude<keyof ParsedMetadata, "collectionLocationID">,
+  Exclude<keyof ParsedMetadata, "collectionLocation">,
   string
 > = {
   collectionDate: "Collection Date",
-  collectionLocation: "Collection Location",
+  locationString: "Collection Location",
   islAccessionNumber: "ISL Accession # (optional)",
   keepPrivate: "Sample is Private",
   publicId: "GISAID ID (Public ID)",
@@ -22,12 +22,12 @@ export const METADATA_KEYS_TO_HEADERS: Record<
 
 export const HEADERS_TO_METADATA_KEYS = invert(
   METADATA_KEYS_TO_HEADERS
-) as Record<string, Exclude<keyof ParsedMetadata, "collectionLocationID">>;
+) as Record<string, Exclude<keyof ParsedMetadata, "collectionLocation">>;
 
 export const METADATA_KEYS_TO_API_KEYS: Record<keyof ParsedMetadata, string> = {
   collectionDate: "collection_date",
-  collectionLocation: "location",
-  collectionLocationID: "location_id",
+  locationString: "location",
+  collectionLocation: "location_id",
   islAccessionNumber: "isl_access_number",
   keepPrivate: "private",
   publicId: "public_identifier",

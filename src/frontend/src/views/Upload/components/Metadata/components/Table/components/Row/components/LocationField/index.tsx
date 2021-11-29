@@ -2,23 +2,25 @@ import FormHelperText from "@material-ui/core/FormHelperText";
 import { DefaultMenuSelectOption, Dropdown } from "czifui";
 import { FormikContextType } from "formik";
 import { escapeRegExp } from "lodash/fp";
-import React, { useEffect, useReducer, useState } from "react";
-import { Metadata } from "src/views/Upload/components/common/types";
+import React, { useReducer } from "react";
+import {
+  Metadata,
+  NamedGisaidLocation,
+} from "src/views/Upload/components/common/types";
 import ApplyToAllColumn from "../common/ApplyToAllColumn";
 import { StyledDiv } from "./style";
 
 interface Props {
   fieldKey: keyof Metadata;
-  accessoryKey: keyof Metadata;
   formik: FormikContextType<Metadata>;
   applyToAllColumn: (fieldKey: keyof Metadata, value: unknown) => void;
   isFirstRow: boolean;
-  locationOptions: GisaidLocationOption[];
+  locations: NamedGisaidLocation[];
 }
 
 interface LocationSearchState {
   searching?: boolean;
-  results: GisaidLocationOption[];
+  results: NamedGisaidLocation[];
 }
 
 function locationSearchReducer(
@@ -30,32 +32,24 @@ function locationSearchReducer(
 
 export default function LocationField({
   fieldKey,
-  accessoryKey,
   formik,
   applyToAllColumn,
   isFirstRow,
-  locationOptions,
+  locations,
 }: Props): JSX.Element {
   const { handleBlur, setFieldValue, values, touched, errors } = formik;
 
   const errorMessage = touched[fieldKey] && errors[fieldKey];
 
-  const value = values[fieldKey] || null;
+  let value: NamedGisaidLocation | null = null;
+  if (values[fieldKey]) {
+    value = values[fieldKey] as NamedGisaidLocation;
+  }
 
-  const [selectedLocation, setLocation] = useState<
-    GisaidLocationOption | undefined
-  >();
   const [state, dispatch] = useReducer(locationSearchReducer, {
     results: [],
     searching: false,
   });
-
-  useEffect(() => {
-    const locationForID = locationOptions.find(
-      (location) => location.id == value
-    );
-    setLocation(locationForID);
-  }, [locationOptions, value]);
 
   const searcher = async (query: string): Promise<void> => {
     if (query.length < 2) {
@@ -65,8 +59,8 @@ export default function LocationField({
     dispatch({ searching: true });
 
     const regex = new RegExp(escapeRegExp(query), "i");
-    const filteredLocationOptions = locationOptions.filter((option) =>
-      regex.test(option.name)
+    const filteredLocationOptions = locations.filter((location) =>
+      regex.test(location.name)
     );
     // alphabetical sort
     // this ensures partial locations (i.e. region, country and divison
@@ -95,17 +89,16 @@ export default function LocationField({
 
   const handleLocationChange = (e: DefaultMenuSelectOption | null) => {
     if (e) {
-      const newLocation = e as GisaidLocationOption;
-      setFieldValue(fieldKey, newLocation.id);
-      setFieldValue(accessoryKey, newLocation.name);
+      const newLocation = e as NamedGisaidLocation;
+      setFieldValue(fieldKey, newLocation);
     }
   };
 
   return (
     <StyledDiv onBlur={handleBlur}>
       <Dropdown
-        label={selectedLocation?.name || "Search For Location"}
-        value={selectedLocation}
+        label={value?.name || "Search For Location"}
+        value={value}
         onChange={handleLocationChange}
         options={state.results}
         search={true}

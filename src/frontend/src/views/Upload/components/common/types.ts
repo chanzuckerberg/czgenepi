@@ -6,6 +6,10 @@ export interface Sample {
   filename: string;
 }
 
+export interface NamedGisaidLocation extends GisaidLocation {
+  name: string;
+}
+
 export type Samples = Record<string, Sample>;
 
 export type ParseErrors = Record<string, string[]>;
@@ -57,8 +61,8 @@ export interface ErrorCode {
 
 export interface Metadata {
   collectionDate?: string;
-  collectionLocation?: string;
-  collectionLocationID?: number;
+  locationString?: string;
+  collectionLocation?: GisaidLocation;
   islAccessionNumber?: string;
   keepPrivate?: boolean;
   publicId?: string;

@@ -11,6 +11,7 @@ import {
   Metadata as IMetadata,
   Props,
   SampleIdToMetadata,
+  NamedGisaidLocation,
   WARNING_CODE,
 } from "src/views/Upload/components/common/types";
 import Progress from "../common/Progress";
@@ -32,8 +33,8 @@ import Table from "./components/Table";
 
 export const EMPTY_METADATA: IMetadata = {
   collectionDate: "",
+  locationString: "",
   collectionLocation: undefined,
-  collectionLocationID: undefined,
   islAccessionNumber: "",
   keepPrivate: false,
   publicId: "",
@@ -43,7 +44,12 @@ export const EMPTY_METADATA: IMetadata = {
 
 function stringifyLocation(location: GisaidLocation): string {
   let stringName = "";
-  const orderedKeys = ["region", "country", "division", "location"];
+  const orderedKeys: Array<keyof GisaidLocation> = [
+    "region",
+    "country",
+    "division",
+    "location",
+  ];
   orderedKeys.every((key) => {
     if (location[key]) {
       if (key != "region") {
@@ -58,6 +64,36 @@ function stringifyLocation(location: GisaidLocation): string {
   return stringName;
 }
 
+function findLocationFromString(
+  locationString: string,
+  locations: Record<number, GisaidLocation>
+): GisaidLocation {
+  // compare levenshtein distances between location strings
+  // for this implementation, we are comparing against the
+  // Location.location - the narrowest scope (i.e. city/county level)
+  // I would like to bias the final results towards a user's group's
+  // location, but that will take some API modification.
+  const scoredLocations: [GisaidLocation, number][] = Object.values(
+    locations
+  ).map((location) => {
+    if (location.location) {
+      return [location, distance(location.location, locationString)];
+    }
+    return [location, 99];
+  });
+  const candidateLocation = scoredLocations.reduce(
+    ([prevLocation, prevScore], [currLocation, currScore]) => {
+      if (currScore < prevScore) {
+        return [currLocation, currScore];
+      }
+      return [prevLocation, prevScore];
+    }
+  );
+  console.log(`Found match for ${locationString}:`);
+  console.log(candidateLocation[0]);
+  return candidateLocation[0];
+}
+
 export default function Metadata({
   samples,
   metadata,
@@ -67,33 +103,25 @@ export default function Metadata({
   const [hasImportedFile, setHasImportedFile] = useState(false);
   const [autocorrectWarnings, setAutocorrectWarnings] =
     useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
-  const [locations, setLocations] = useState<GisaidLocation[]>([]);
-  const [locationOptions, setLocationOptions] = useState<
-    GisaidLocationOption[]
-  >([]);
+  const [locations, setLocations] = useState<NamedGisaidLocation[]>([]);
 
   const loadLocations = async () => {
     const result: LocationsResponse = await getLocations();
-    setLocations(result.locations);
+    const namedLocations: NamedGisaidLocation[] = result.locations.map(
+      (location) => {
+        const namedLocation = {
+          name: stringifyLocation(location),
+          ...location,
+        };
+        return namedLocation;
+      }
+    );
+    setLocations(namedLocations);
   };
 
   useEffect(() => {
     loadLocations();
   }, [samples]);
-
-  useEffect(() => {
-    const locationsToOptions: GisaidLocationOption[] = locations.map(
-      (location) => {
-        const stringName = stringifyLocation(location);
-        return {
-          name: stringName,
-          description: "",
-          id: location.id,
-        };
-      }
-    );
-    setLocationOptions(locationsToOptions);
-  }, [locations]);
 
   function handleMetadata(result: ParseResult) {
     const { data: sampleIdToMetadata, warningMessages } = result;
@@ -106,33 +134,12 @@ export default function Metadata({
       // get parsed metadata
       newMetadata[sampleId] = sampleIdToMetadata[sampleId] || EMPTY_METADATA;
       // try and match parsed collection location to a gisaid location
-      const collectionLocation = newMetadata[sampleId]?.collectionLocation;
-      if (collectionLocation) {
-        // compare levenshtein distances between location strings
-        // for this implementation, we are comparing against the
-        // Location.location - the narrowest scope (i.e. city/county level)
-        // I would like to bias the final results towards a user's group's
-        // location, but that will take some API modification.
-        const scoredLocations: [GisaidLocation, number][] = locations.map(
-          (location) => {
-            if (location.location) {
-              return [
-                location,
-                distance(location.location, collectionLocation),
-              ];
-            }
-            return [location, 99];
-          }
+      const locationString = newMetadata[sampleId]?.locationString;
+      if (locationString) {
+        newMetadata[sampleId].collectionLocation = findLocationFromString(
+          locationString,
+          locations
         );
-        const candidateLocation = scoredLocations.reduce(
-          ([prevLocation, prevScore], [currLocation, currScore]) => {
-            if (currScore < prevScore) {
-              return [currLocation, currScore];
-            }
-            return [prevLocation, prevScore];
-          }
-        );
-        newMetadata[sampleId].collectionLocationID = candidateLocation[0].id;
       }
     }
 
@@ -182,7 +189,7 @@ export default function Metadata({
           metadata={metadata}
           setMetadata={setMetadata}
           autocorrectWarnings={autocorrectWarnings}
-          locationOptions={locationOptions}
+          locations={locations}
         />
 
         <ButtonWrapper>
