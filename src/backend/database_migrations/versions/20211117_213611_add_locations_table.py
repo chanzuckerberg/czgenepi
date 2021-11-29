@@ -15,19 +15,6 @@ depends_on = None
 
 
 def upgrade():
-    # TODO LIST:
-    # X 1. Update gisaid import script to also populate the country field in the gisaid_metadata table
-    # X 2. Find the list of supported nextstrain/gisaid locations and put *that* in the db instead of
-    # X    just the list of existing sample locations from gisaid
-    # 2a. Update the gisaid import job to keep this list up to date in the db.
-    # 4. Update Orange County and Rickettsial lab samples to point to a real location
-    # 5. Fix the test samples for the admin group
-    # 6. Update all the existing sample rows in the DB to match a real location
-    # 7. Create an API endpoint to return a list of locations
-    # 8. Update upload form to be searchable textbox for location api endpoint
-    # 9. Update upload form (or upload backend endpoint????) to find the appropriate location id to associate with a sample
-    # --- AFTER the above is deployed ---
-    # 10. remove sample, division, location fields from samples table, make sure the backend is 100% using associated location info.
 
     op.create_table(
         "locations",

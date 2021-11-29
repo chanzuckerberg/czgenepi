@@ -1,12 +1,5 @@
 #!/bin/bash
 
-# WDL inputs available through environmental vars:
-# AWS_REGION
-# ASPEN_CONFIG_SECRET_NAME
-# REMOTE_DEV_PREFIX (if set)
-# WORKFLOW_ID
-# S3_FILESTEM
-
 set -Eeuxo pipefail
 shopt -s inherit_errexit
 
