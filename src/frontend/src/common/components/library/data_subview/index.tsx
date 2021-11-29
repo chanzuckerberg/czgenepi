@@ -40,7 +40,6 @@ interface Props {
   subheaders: Record<string, SubHeader[]>;
   isLoading: boolean;
   renderer?: CustomRenderer;
-  headerRenderer?: CustomRenderer;
   viewName: VIEWNAME;
   dataFilterFunc?: (data: TableItem[]) => TableItem[];
 }
@@ -128,7 +127,6 @@ const DataSubview: FunctionComponent<Props> = ({
   subheaders,
   isLoading,
   renderer,
-  headerRenderer,
   viewName,
   dataFilterFunc,
 }: Props) => {
@@ -404,7 +402,6 @@ const DataSubview: FunctionComponent<Props> = ({
               }
               defaultSortKey={defaultSortKey}
               headers={headers}
-              headerRenderer={headerRenderer}
               renderer={renderer}
             />
           </div>
