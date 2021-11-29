@@ -3,8 +3,14 @@
   "name": "aspen",
   "icons": [
     {
+      "src": "favicon.ico",
+      "sizes": "38x38",
+      "type": "image/x-icon"
+    },
+    {
       "src": "CZGenEpiMonogramBlack.svg",
-      "sizes": "38x38"
+      "sizes": "38x38",
+      "type": "image/svg+xml"
     }
   ],
   "start_url": ".",
