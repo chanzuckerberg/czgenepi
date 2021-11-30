@@ -273,6 +273,7 @@ module migrate_db {
   stack_resource_prefix = local.stack_resource_prefix
   image                 = local.backend_image
   task_role_arn         = local.ecs_role_arn
+  execution_role        = local.ecs_execution_role
   cmd                   = local.migration_cmd
   custom_stack_name     = local.custom_stack_name
   remote_dev_prefix     = local.remote_dev_prefix
@@ -286,6 +287,7 @@ module delete_db {
   source                = "../deletion"
   image                 = local.backend_image
   task_role_arn         = local.ecs_role_arn
+  execution_role        = local.ecs_execution_role
   cmd                   = local.deletion_cmd
   custom_stack_name     = local.custom_stack_name
   remote_dev_prefix     = local.remote_dev_prefix

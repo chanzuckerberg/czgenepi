@@ -785,7 +785,7 @@ class Orchestrator:
                 print(f"  ./scripts/happy --env {self.ctx.obj['config'].env} logs {stack} {service_name}")
             return
 
-    def run_task(self, taskdef_arn, wait=False, show_logs=True):
+    def run_task(self, taskdef_arn, launch_type, wait=False, show_logs=True):
         """Run a one-off ECS task and optionally wait"""
         secrets = self.secrets
         cluster_arn = secrets["cluster_arn"]
@@ -795,6 +795,7 @@ class Orchestrator:
         ecs_client = AwsSession.get_client(self.ctx, "ecs")
         output = ecs_client.run_task(
             cluster=cluster_arn,
+            launchType=launch_type,
             taskDefinition=taskdef_arn,
             networkConfiguration={
                 "awsvpcConfiguration": {
@@ -928,6 +929,11 @@ def run_tasks(ctx, stack, task_type, wait=False, show_logs=True):
     config = ctx.obj["config"]
     orchestrator = ctx.obj["orchestrator"]
     task_outputs = config.tasks.get(task_type, [])
+    launch_type = "EC2"
+    try:
+        launch_type = config.task_launch_type.upper()
+    except KeyError:
+        pass
     if not task_outputs:
         print(f"Found no tasks for {task_type}")
     try:
@@ -935,7 +941,7 @@ def run_tasks(ctx, stack, task_type, wait=False, show_logs=True):
     except KeyError as exc:
         raise CliError(f"Stack {stack.stack_name} is missing output field '{exc.args[0]}' for task {task_type}")
     for task in tasks:
-        orchestrator.run_task(task, wait=wait, show_logs=show_logs)
+        orchestrator.run_task(task, launch_type, wait=wait, show_logs=show_logs)
 
 def check_images_exist(ctx, tag):
     """Make sure all of our service images actually exist if we're trying to deploy via tag"""

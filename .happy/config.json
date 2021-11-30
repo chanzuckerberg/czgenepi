@@ -34,7 +34,8 @@
             "aws_profile": "genepi-dev",
             "secret_arn": "happy/env-dev-config",
             "terraform_directory": ".happy/terraform/envs/dev",
-            "log_group_prefix": "/genepi/dev"
+            "log_group_prefix": "/genepi/dev",
+	    "task_launch_type": "fargate"
         },
         "staging": {
             "aws_profile": "genepi-dev",
@@ -42,7 +43,8 @@
             "terraform_directory": ".happy/terraform/envs/staging",
             "delete_protected": true,
             "auto_run_migrations": true,
-            "log_group_prefix": "/genepi/gestaging"
+            "log_group_prefix": "/genepi/gestaging",
+	    "task_launch_type": "fargate"
         },
         "prod": {
             "aws_profile": "genepi-prod",
@@ -50,7 +52,8 @@
             "terraform_directory": ".happy/terraform/envs/prod",
             "delete_protected": true,
             "auto_run_migrations": true,
-            "log_group_prefix": "/genepi/geprod"
+            "log_group_prefix": "/genepi/geprod",
+	    "task_launch_type": "fargate"
         }
     },
     "tasks": {
