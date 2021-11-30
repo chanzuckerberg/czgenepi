@@ -159,7 +159,7 @@ class ApiClient:
 class CliConfig:
     api_urls = {
         "staging": "https://api.staging.czgenepi.org",
-        "prod": "https://api.aspen.cziscience.com",
+        "prod": "https://api.czgenepi.org",
         "rdev": "https://{stack}-backend.dev.czgenepi.org",
         "local": "http://backend.genepinet.localdev:3000",
     }
