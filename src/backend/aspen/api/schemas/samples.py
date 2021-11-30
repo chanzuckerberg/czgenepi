@@ -1,7 +1,7 @@
 import datetime
 from typing import Any, List, Optional
 
-from pydantic import constr, Field
+from pydantic import constr
 from pydantic.utils import GetterDict
 
 from aspen.api.schemas.base import BaseRequest, BaseResponse
