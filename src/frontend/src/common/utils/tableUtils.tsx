@@ -1,6 +1,6 @@
 /* eslint-disable react/display-name */
 
-const UNDEFINED_TEXT = "---";
+const UNDEFINED_TEXT = "-";
 
 export function createTableCellRenderer(
   customRenderers: Record<string, CellRenderer>,
