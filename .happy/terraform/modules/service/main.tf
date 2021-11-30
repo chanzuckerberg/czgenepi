@@ -7,7 +7,7 @@ resource aws_ecs_service service {
   cluster         = var.cluster
   desired_count   = var.desired_count
   task_definition = aws_ecs_task_definition.task_definition.id
-  launch_type     = var.use_fargate ? "FARGATE" : "EC2"
+  launch_type     = "FARGATE"
   name            = "${var.custom_stack_name}-${var.app_name}"
   load_balancer {
     container_name   = "web"
@@ -20,7 +20,7 @@ resource aws_ecs_service service {
     assign_public_ip = false
   }
 
-  enable_execute_command = var.use_fargate ? true : false
+  enable_execute_command = true
   wait_for_steady_state = var.wait_for_steady_state
 }
 
@@ -30,8 +30,8 @@ resource aws_ecs_task_definition task_definition {
   cpu = var.cpu
   network_mode  = "awsvpc"
   task_role_arn = var.task_role_arn
-  execution_role_arn = var.use_fargate ? var.execution_role : null
-  requires_compatibilities = var.use_fargate ? [ "FARGATE" ] : null
+  execution_role_arn = var.execution_role
+  requires_compatibilities = [ "FARGATE" ]
   container_definitions = <<EOF
 [
   {

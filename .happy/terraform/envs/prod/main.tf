@@ -15,7 +15,6 @@ module stack {
   frontend_url        = "https://czgenepi.org"
   backend_url         = "https://api.czgenepi.org"
   stack_prefix        = ""
-  use_fargate         = true
 
   wait_for_steady_state = var.wait_for_steady_state
 }

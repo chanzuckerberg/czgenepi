@@ -87,9 +87,3 @@ variable sql_import_file {
   description = "Path to SQL file to import (for remote dev)"
   default     = ""
 }
-
-variable use_fargate {
-  type        = bool
-  description = "Whether to use EC2 or fargate for ECS services"
-  default     = false
-}

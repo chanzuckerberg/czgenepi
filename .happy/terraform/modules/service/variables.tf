@@ -128,12 +128,6 @@ variable wait_for_steady_state {
   default     = false
 }
 
-variable use_fargate {
-  type        = bool
-  description = "Whether to use EC2 or fargate for services"
-  default     = false
-}
-
 variable execution_role {
   type        = string
   description = "Execution role to use for fargate tasks - required for fargate services!"
