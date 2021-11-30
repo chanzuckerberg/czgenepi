@@ -79,10 +79,10 @@ task IngestGISAID {
     fi
 
     # These are set by the Dockerfile and the Happy CLI
-    genepi_workflow_rev=$COMMIT_SHA
-    genepi_creation_rev=$COMMIT_SHA
+    aspen_workflow_rev=$COMMIT_SHA
+    aspen_creation_rev=$COMMIT_SHA
 
-    # fetch aspen config
+    # fetch genepi config
     genepi_config="$(aws secretsmanager get-secret-value --secret-id ~{genepi_config_secret_name} --query SecretString --output text)"
     aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$genepi_config")"
     sequences_key="raw_gisaid_dump/${build_id}/gisaid.ndjson.zst"

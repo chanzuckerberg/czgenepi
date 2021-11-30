@@ -59,7 +59,7 @@ task nextstrain_workflow {
 
     aws configure set region ~{aws_region}
 
-    # fetch aspen config
+    # fetch genepi config
     genepi_config="$(aws secretsmanager get-secret-value --secret-id ~{genepi_config_secret_name} --query SecretString --output text)"
     aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$genepi_config")"
 
