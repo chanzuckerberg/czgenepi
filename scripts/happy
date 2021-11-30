@@ -842,8 +842,12 @@ class Orchestrator:
         print("getting taskdef info")
         result = ecs_client.describe_task_definition(taskDefinition=taskdef_arn)
         taskdef = result["taskDefinition"]
-        container = taskdef["containerDefinitions"][0]
-        log_group = container["logConfiguration"]["options"]["awslogs-group"]
+        container_def = taskdef["containerDefinitions"][0]
+        log_group = container_def["logConfiguration"]["options"]["awslogs-group"]
+        if launch_type == "FARGATE":
+            log_prefix = container_def["logConfiguration"]["options"]["awslogs-stream-prefix"]
+            task_id = container["taskArn"].split("/")[-1]
+            log_stream = f"{log_prefix}/{container_def['name']}/{task_id}"
         print("Log Events:")
         logs_client = AwsSession.get_client(self.ctx, "logs")
         result = logs_client.get_log_events(logGroupName=log_group, logStreamName=log_stream)
