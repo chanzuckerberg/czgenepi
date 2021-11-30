@@ -1,8 +1,12 @@
 import React, { useState } from "react";
+import Exclamation from "src/common/icons/IconExclamation.svg";
 import CloseIcon from "src/common/images/close-icon.svg";
 import HeaderLogo from "src/common/images/logo.svg";
 import { ROUTES } from "src/common/routes";
 import {
+  AnnouncementBanner,
+  AnnouncementText,
+  AnnouncementTextBold,
   Bar,
   ButtonLink,
   HeaderContainer,
@@ -29,6 +33,14 @@ export default function NavBarV2(): JSX.Element {
 
   return (
     <HeaderContainer>
+      <AnnouncementBanner>
+        <AnnouncementText>
+          <Exclamation />
+          <AnnouncementTextBold>Looking for Aspen?</AnnouncementTextBold>
+          &nbsp;You&apos;re in the right spot. As of December, our new name is
+          CZ GEN EPI.
+        </AnnouncementText>
+      </AnnouncementBanner>
       <HeaderMaxWidthContainer>
         <HeaderTopContainer>
           <HeaderLogoContainer href={ROUTES.LANDINGV2}>
