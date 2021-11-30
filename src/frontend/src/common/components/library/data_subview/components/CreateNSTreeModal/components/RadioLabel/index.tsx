@@ -45,8 +45,8 @@ export const RadioLabelTargeted = ({ selected }: Props): JSX.Element => {
             <ListItemText>
               <SmallText>
                 Useful for seeing relationships between your selected samples,
-                other samples you have uploaded to Aspen, and publicly-available
-                samples on GISAID.
+                other samples you have uploaded to CZ GEN EPI, and
+                publicly-available samples on GISAID.
               </SmallText>
             </ListItemText>
           </StyledListItem>

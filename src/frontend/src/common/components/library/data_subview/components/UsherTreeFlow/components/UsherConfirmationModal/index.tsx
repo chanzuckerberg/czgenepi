@@ -18,8 +18,8 @@ const UsherConfirmationModal = ({
     <>
       By clicking “Continue” you agree to send a copy of your genomic data to
       UCSC’s UShER visualization service, and that you understand this may make
-      the data accessible to others. UShER is a separate service from Aspen.
-      Your data will be subject to their{" "}
+      the data accessible to others. UShER is a separate service from CZ GEN
+      EPI. Your data will be subject to their{" "}
       <NewTabLink href="https://genome.ucsc.edu/conditions.html">
         Conditions of Use
       </NewTabLink>

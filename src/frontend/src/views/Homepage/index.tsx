@@ -1,8 +1,8 @@
 import { Button } from "czifui";
-import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { API } from "src/common/api";
+import { HeadAppTitle } from "src/common/components";
 import ENV from "src/common/constants/ENV";
 import { ROUTES } from "src/common/routes";
 import { useUserInfo } from "../../common/queries/auth";
@@ -45,9 +45,7 @@ export default function Homepage(): JSX.Element {
 
   return (
     <>
-      <Head>
-        <title>Aspen</title>
-      </Head>
+      <HeadAppTitle />
       <Container>
         <CardContainer>
           <Card>
