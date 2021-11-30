@@ -5,7 +5,6 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 from aspen.api.settings import Settings
-from aspen.config.config import Config
 from aspen.database.connection import init_async_db
 from aspen.database.models import GisaidMetadata, Location
 
@@ -36,7 +35,7 @@ async def save():
         # Make sure we have equivalent rows for region/country/division but with null locations
         except_select = (
             sa.select(Location.region, Location.country, Location.division)
-            .where(Location.location == None)
+            .where(Location.location is None)
             .distinct()
         )
         null_locations_select = (
