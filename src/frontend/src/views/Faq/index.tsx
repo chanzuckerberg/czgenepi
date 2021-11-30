@@ -29,7 +29,7 @@ export default function Faq(): JSX.Element {
         <P>
           Navigate to{" "}
           <NewTabLink href={ROUTES.HOMEPAGE}>czgenepi.org</NewTabLink> and click
-          on the “Sign In” button in the center of the page. You should be
+          on the “Sign In” button in the upper right hand corner. You should be
           redirected to a login screen where you can enter your email address
           and password.{" "}
           <B>
@@ -43,40 +43,33 @@ export default function Faq(): JSX.Element {
 
         <H3>How do I upload samples?</H3>
         <P>
-          Until we conclude SARS-CoV-2 genomic sequencing-as-a-service in June
-          2021, we will continue to upload any consensus genomes created at the
-          Biohub directly to CZ GEN EPI.
-        </P>
-        <P>
-          If you are generating your own SARS-CoV-2 consensus genomes, please
-          continue to upload these to GISAID. We will pull new genomes uploaded
-          to GISAID once per day. After we pull from GISAID, you should see your
-          genomes in CZ GEN EPI within 1 day.
-        </P>
-        <P>
-          In June, we will be adding the ability for you to upload consensus
-          genomes directly to CZ GEN EPI, making the entire process of getting
-          your data into CZ GEN EPI smoother and faster. Stay tuned for this
-          update!
+          Once logged in, click &quot;Upload&quot; in the top right corner of
+          the screen. We&apos;ll guide you through each step of the process of
+          preparing your genomes and metadata for upload. We also pull genomes
+          uploaded to GISAID once per day, if your genomes are on GISAID, they
+          can be included for tree building without being uploaded to CZ GEN
+          EPI.
         </P>
 
         <H3>How do I generate trees?</H3>
         <P>
-          Every night, CZ GEN EPI will generate a new Nextstrain build with all
-          of your samples. You can find these new phylogenetic trees by clicking
-          on the “Phylogenetic Trees” tab. The trees are sorted by “Upload Date”
-          so your newest builds will be at the top of the list. For now, these
-          builds will automatically include all of the samples your DPH has
-          uploaded to CZ GEN EPI. In the very near future, you will have the
-          ability to kick off your own tree builds, allowing you to select only
-          the set of samples you are interested in.
+          Check out our{" "}
+          <NewTabLink href="https://docs.google.com/document/d/1_iQgwl3hn_pjlZLX-n0alUbbhgSPZvpW_0620Hk_kB4/edit">
+            Tree Building Guide
+          </NewTabLink>{" "}
+          for complete information on the different tree types within Aspen and
+          how to build them depending on your use case.
         </P>
 
         <H3>How do I securely overlay my PHI / PII metadata?</H3>
         <P>
           For each tree in the “Phylogenetic Trees” tab of CZ GEN EPI, you can
           download a TSV template that can be used to collect any other metadata
-          that you would like to visualize alongside your genomic data.
+          that you would like to visualize alongside your genomic data. Click on
+          the “Download” button in the row of the tree that you are interested
+          in and choose the file called “Private IDs (.tsv)”. This will download
+          a TSV file where each row is a sample in the tree. You can add
+          additional columns to add custom metadata.
         </P>
         <P>
           Once completed, you can drag and drop this TSV file onto your tree
@@ -132,17 +125,10 @@ export default function Faq(): JSX.Element {
       <H3>Where can I find links to the COVID Tracker Seminar Series?</H3>
       <P>
         You can find links to recordings of all previous seminars at{" "}
-        <NewTabLink href="https://covidtracker.czbiohub.org/resources">
-          https://covidtracker.czbiohub.org/resources
+        <NewTabLink href={ROUTES.RESOURCES}>
+          https://czgenepi.org/resources
         </NewTabLink>
-        . If you would like to be added to the calendar invitation for any
-        future seminars please email{" "}
-        <NewTabLink href="mailto:ablack@contractor.chanzuckerberg.com">
-          Alli Black
-        </NewTabLink>
-        .
       </P>
-
       <H3>
         Where can I find aggregate statistics on genomes sequenced by the
         Biohub?
@@ -181,31 +167,20 @@ export default function Faq(): JSX.Element {
           </span>
         </ListItem>
         <ListItem>
-          Only other members of your group can see your data. CDPH can see
-          samples, but not your private, internal identifiers.
+          Only other members of your group can see your data. Other
+          organizations that you share your data with can see your samples, but
+          not your private, internal identifiers.
         </ListItem>
         <ListItem>
-          New sequences will be automatically submitted to GISAID two weeks
-          after upload, unless marked &quot;private.&quot;
+          You can mark a sample as “private” anytime. &quot;Private&quot;
+          samples are not shared with other organizations, but are visible to
+          your group. CZ GEN EPI does not contain any personally identifiable
+          information or protected health information.
         </ListItem>
         <ListItem>
-          <span>
-            You can mark a sample as &quot;private&quot; anytime during the
-            first two weeks after upload. &quot;Private&quot; samples are not
-            shared with CDPH or GISAID, but are visible to your group. (For now,
-            please send us a quick{" "}
-            <NewTabLink href="mailto:helloaspen@chanzuckerberg.com">
-              email
-            </NewTabLink>{" "}
-            to mark samples as &quot;private.&quot;)
-          </span>
-        </ListItem>
-        <ListItem>
-          CZ GEN EPI does not support protected health information.
-        </ListItem>
-        <ListItem>
-          We utilize industry standard best practices in information security to
-          protect your data.
+          We utilize industry standard best practices in information security,
+          such as encrypting your data at rest and in transit, to ensure the
+          security of your data.
         </ListItem>
       </List>
 
@@ -218,28 +193,32 @@ export default function Faq(): JSX.Element {
         seamless communication and reporting.
       </P>
       <P>
-        When you upload new samples (or send a new sample to CZBiohub for
-        sequencing), you can choose to mark it as &quot;Private.&quot; These
-        samples will still be visible to other members of your group, but will
-        never be shared beyond your group.
-      </P>
-      <P>
-        For new samples that you do not choose to mark &quot;private,&quot; we
-        share this data in two ways:
+        When you upload new samples, you can choose to mark them as
+        &quot;Private.&quot; These samples will still be visible to other
+        members of your group, but will never be shared beyond your group.
       </P>
       <List>
         <ListItem>
-          Consistent with the prior COVID Tracker program’s policies, the
-          California Department of Public Health (CDPH) will be able to see
-          non-private samples, but with your internal, private identifiers
-          redacted.
+          <span>
+            We may also share your Pathogen Consensus Genomes and/or analytical
+            outputs with third parties in accordance with the provisions of your
+            organization’s policies and/or as required by law. For example,
+            certain users in California currently allow the California
+            Department of Public Health (&quot;CDPH&quot;) to access data from
+            their Group. Where such access is allowed by Groups, the third party
+            can access this data through their own CZ GEN EPI accounts, and may
+            have similar permissions as members of the uploading Group.{" "}
+            <B>
+              However, they will not have access to your private, internal
+              identifiers.
+            </B>
+          </span>
+        </ListItem>
+        <ListItem>
+          We are also working on new features to give you more granular control
+          over how you share data with other groups
         </ListItem>
       </List>
-
-      <P>
-        We are also working on new features to give you granular control over
-        how you share data with other groups (e.g., CDPH, or other local DPHs).
-      </P>
 
       <H3>Which service providers do you use?</H3>
 
@@ -265,10 +244,6 @@ export default function Faq(): JSX.Element {
         are only permitted to use your data to provide the relevant services
         that we rely on in order to offer CZ GEN EPI to you.
       </P>
-
-      <H3>How do I share my data with CDPH?</H3>
-
-      <P>Please see “Who else can see my sample data” above.</P>
 
       <H3>How do I access pathogen genomic data stored in Terra?</H3>
 
