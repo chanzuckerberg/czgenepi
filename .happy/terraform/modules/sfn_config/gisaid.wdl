@@ -357,7 +357,7 @@ task ImportLocations {
     fi
 
     export PYTHONUNBUFFERED=true
-    /usr/src/app/aspen/workflows/import_locations/import_locations.sh 1>&2
+    python3 /usr/src/app/aspen/workflows/import_locations/save.py 1>&2
     >>>
 
     runtime {

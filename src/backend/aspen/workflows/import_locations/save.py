@@ -2,7 +2,7 @@ import asyncio
 
 import click
 import sqlalchemy as sa
-import sqlalchemy.dialects.postgresql as postgresql
+from sqlalchemy.dialects import postgresql
 
 from aspen.api.settings import Settings
 from aspen.config.config import Config
