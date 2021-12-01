@@ -1,5 +1,5 @@
 export const formatTZDate = (d: string): string => {
-  if (!d || d === "-") return d;
+  if (!d || d.startsWith("-")) return d;
 
   const date = new Date(d);
   const offset = date.getTimezoneOffset();
