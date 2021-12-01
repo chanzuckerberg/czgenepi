@@ -23,6 +23,7 @@ from flask import g, jsonify, make_response, request, Response, stream_with_cont
 from marshmallow.exceptions import ValidationError
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import joinedload
+from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.query import Query
 
 from aspen import aws
