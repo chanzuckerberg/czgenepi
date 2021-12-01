@@ -3,14 +3,17 @@ data aws_region current {}
 resource aws_ecs_task_definition task_definition {
   family        = "${var.stack_resource_prefix}-${var.deployment_stage}-${var.custom_stack_name}-deletion"
   network_mode  = "awsvpc"
+  cpu    = 2048
+  memory = 4096
   task_role_arn = var.task_role_arn
+  execution_role_arn = var.execution_role
+  requires_compatibilities = [ "FARGATE" ]
   container_definitions = <<EOF
 [
   {
     "name": "deletedb",
     "essential": true,
     "image": "${var.image}",
-    "memory": 512,
     "environment": [
       {
         "name": "AWS_REGION",
@@ -29,13 +32,14 @@ resource aws_ecs_task_definition task_definition {
         "value": "${var.deployment_stage}"
       },
       {
-        "name": "ASPEN_CONFIG_SECRET_NAME",
-        "value": "${var.deployment_stage}/aspen-config"
+        "name": "GENEPI_CONFIG_SECRET_NAME",
+        "value": "${var.deployment_stage}/genepi-config"
       }
     ],
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
+        "awslogs-stream-prefix": "fargate",
         "awslogs-group": "${aws_cloudwatch_log_group.cloud_watch_logs_group.id}",
         "awslogs-region": "${data.aws_region.current.name}"
       }

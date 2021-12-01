@@ -19,8 +19,8 @@ export OIDC_BROWSER_URL=https://oidc.genepinet.localdev:8443
 
 echo "Creating secretsmanager secrets"
 local_aws="aws --endpoint-url=${LOCALSTACK_URL}"
-${local_aws} secretsmanager create-secret --name aspen-config &> /dev/null || true
-${local_aws} secretsmanager update-secret --secret-id aspen-config --secret-string '{
+${local_aws} secretsmanager create-secret --name genepi-config &> /dev/null || true
+${local_aws} secretsmanager update-secret --secret-id genepi-config --secret-string '{
   "AUTH0_CLIENT_ID": "local-client-id",
   "AUTH0_CALLBACK_URL": "'"${BACKEND_URL}"'/callback",
   "AUTH0_CLIENT_SECRET": "local-client-secret",
@@ -34,7 +34,7 @@ ${local_aws} secretsmanager update-secret --secret-id aspen-config --secret-stri
   "DB_rw_username": "user_rw",
   "DB_rw_password": "password_rw",
   "DB_address": "database.genepinet.localdev",
-  "S3_external_auspice_bucket": "aspen-external-auspice-data"
+  "S3_external_auspice_bucket": "genepi-external-auspice-data"
 }' || true
 
 echo "Creating IAM role"
@@ -59,29 +59,29 @@ echo "Creating SSM Parameters"
 # Delete any previous values so we have updated values when we run this script
 # Otherwise updating these is more painful since the only other script that cleans them
 # is make local-clean, which is overkill
-${local_aws} ssm delete-parameter --name /aspen/local/localstack/nextstrain-ondemand-sfn
-${local_aws} ssm put-parameter --name /aspen/local/localstack/nextstrain-ondemand-sfn --value '{
+${local_aws} ssm delete-parameter --name /genepi/local/localstack/nextstrain-ondemand-sfn
+${local_aws} ssm put-parameter --name /genepi/local/localstack/nextstrain-ondemand-sfn --value '{
   "Input":{
     "Run":{
-      "aspen_config_secret_name":"aspen-config",
+      "genepi_config_secret_name":"genepi-config",
       "aws_region":"us-west-2",
-      "docker_image_id":"aspen-nextstrain",
+      "docker_image_id":"genepi-nextstrain",
       "remote_dev_prefix":""}
     },
-  "OutputPrefix":"s3://aspen-batch/nextstrain-ondemand-sfn/results",
-  "RUN_WDL_URI":"s3://aspen-batch/nextstrain-ondemand.wdl-v0.0.1.wdl",
+  "OutputPrefix":"s3://genepi-batch/nextstrain-ondemand-sfn/results",
+  "RUN_WDL_URI":"s3://genepi-batch/nextstrain-ondemand.wdl-v0.0.1.wdl",
   "RunEC2Memory":64000,
   "RunEC2Vcpu":10,
   "RunSPOTMemory":64000,
   "RunSPOTVcpu":10,
   "StateMachineArn":'${LOCAL_SFN_ARN}'
 }'
-${local_aws} ssm delete-parameter --name /aspen/local/localstack/pangolin-ondemand-sfn
-${local_aws} ssm put-parameter --name /aspen/local/localstack/pangolin-ondemand-sfn --value '{
+${local_aws} ssm delete-parameter --name /genepi/local/localstack/pangolin-ondemand-sfn
+${local_aws} ssm put-parameter --name /genepi/local/localstack/pangolin-ondemand-sfn --value '{
   "Input":{
     "Run":{
       "aws_region":"us-west-2",
-      "docker_image_id":"aspen-pangolin"}
+      "docker_image_id":"genepi-pangolin"}
     },
   "OutputPrefix":"s3://aspen-batch/pangolin-ondemand-sfn/results",
   "RUN_WDL_URI":"s3://aspen-batch/pangolin-ondemand.wdl-v0.0.1.wdl",
@@ -93,8 +93,8 @@ ${local_aws} ssm put-parameter --name /aspen/local/localstack/pangolin-ondemand-
 }'
 
 echo "Creating s3 buckets"
-${local_aws} s3api head-bucket --bucket aspen-external-auspice-data || ${local_aws} s3 mb s3://aspen-external-auspice-data
-${local_aws} s3api head-bucket --bucket aspen-batch || ${local_aws} s3 mb s3://aspen-batch
+${local_aws} s3api head-bucket --bucket genepi-external-auspice-data || ${local_aws} s3 mb s3://genepi-external-auspice-data
+${local_aws} s3api head-bucket --bucket genepi-batch || ${local_aws} s3 mb s3://genepi-batch
 echo
 echo "Dev env is up and running!"
 echo "  Frontend: ${FRONTEND_URL}"

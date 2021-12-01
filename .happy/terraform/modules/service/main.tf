@@ -7,7 +7,7 @@ resource aws_ecs_service service {
   cluster         = var.cluster
   desired_count   = var.desired_count
   task_definition = aws_ecs_task_definition.task_definition.id
-  launch_type     = "EC2"
+  launch_type     = "FARGATE"
   name            = "${var.custom_stack_name}-${var.app_name}"
   load_balancer {
     container_name   = "web"
@@ -20,28 +20,32 @@ resource aws_ecs_service service {
     assign_public_ip = false
   }
 
+  enable_execute_command = true
   wait_for_steady_state = var.wait_for_steady_state
 }
 
 resource aws_ecs_task_definition task_definition {
   family        = "${var.stack_resource_prefix}-${var.deployment_stage}-${var.custom_stack_name}-${var.app_name}"
+  memory = var.memory
+  cpu = var.cpu
   network_mode  = "awsvpc"
   task_role_arn = var.task_role_arn
+  execution_role_arn = var.execution_role
+  requires_compatibilities = [ "FARGATE" ]
   container_definitions = <<EOF
 [
   {
     "name": "web",
     "essential": true,
     "image": "${var.image}",
-    "memory": 4096,
     "environment": [
       {
         "name": "REMOTE_DEV_PREFIX",
         "value": "${var.remote_dev_prefix}"
       },
       {
-        "name": "ASPEN_CONFIG_SECRET_NAME",
-        "value": "${var.deployment_stage}/aspen-config"
+        "name": "GENEPI_CONFIG_SECRET_NAME",
+        "value": "${var.deployment_stage}/genepi-config"
       },
       {
         "name": "DEPLOYMENT_STAGE",
@@ -76,6 +80,7 @@ resource aws_ecs_task_definition task_definition {
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
+        "awslogs-stream-prefix": "fargate",
         "awslogs-group": "${aws_cloudwatch_log_group.cloud_watch_logs_group.id}",
         "awslogs-region": "${data.aws_region.current.name}"
       }
