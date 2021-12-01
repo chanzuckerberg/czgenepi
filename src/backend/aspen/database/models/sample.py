@@ -183,12 +183,15 @@ class Sample(idbase, DictMixin):  # type: ignore
         },
     )
 
-    # location
+    # new location data
     location_id = Column(
         Integer,
         ForeignKey(Location.id),
         nullable=True,
     )
+    collection_location = relationship("Location")
+
+    # old location data
     location = Column(String, nullable=False)
     division = Column(
         String,
