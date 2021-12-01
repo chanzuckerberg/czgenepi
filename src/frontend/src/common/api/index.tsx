@@ -13,6 +13,7 @@ export enum API {
   GET_FASTA_URL = "/api/sequences/getfastaurl",
   USHER_TREE_OPTIONS = "/api/usher/tree_options",
   SAMPLES_VALIDATE_IDS = "/api/samples/validate-ids",
+  LOCATIONS = "/v2/locations/",
 }
 
 export const DEFAULT_HEADERS_MUTATION_OPTIONS: RequestInit = {

@@ -31,7 +31,9 @@ export default React.memo(function Row({ id, metadata }: Props): JSX.Element {
         <Id>{id}</Id>
       </StyledTableCell>
       <StyledTableCell component="div">{collectionDate}</StyledTableCell>
-      <StyledTableCell component="div">{collectionLocation}</StyledTableCell>
+      <StyledTableCell component="div">
+        {collectionLocation?.name}
+      </StyledTableCell>
       <StyledTableCell component="div">
         {sequencingDate || "--"}
       </StyledTableCell>

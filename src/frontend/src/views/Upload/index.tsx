@@ -7,7 +7,8 @@ import {
   SampleIdToMetadata,
   Samples as ISamples,
 } from "./components/common/types";
-import Metadata, { EMPTY_METADATA } from "./components/Metadata";
+import { EMPTY_METADATA } from "./components/common/constants";
+import Metadata from "./components/Metadata";
 import Review from "./components/Review";
 import Samples from "./components/Samples";
 import { StyledPageContent } from "./style";

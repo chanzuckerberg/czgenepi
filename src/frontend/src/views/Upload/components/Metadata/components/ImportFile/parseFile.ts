@@ -2,17 +2,19 @@ import Papa from "papaparse";
 import {
   HEADERS_TO_METADATA_KEYS,
   METADATA_KEYS_TO_HEADERS,
-  ParsedMetadata,
+  EMPTY_PARSED_METADATA,
 } from "../../../common/constants";
 import {
   ERROR_CODE,
-  Metadata,
-  SampleIdToMetadata,
+  SampleIdToParsedMetadata,
   WARNING_CODE,
+  ParsedMetadata,
 } from "../../../common/types";
-import { COUNTIES } from "../Table/components/Row/components/LocationField/COUNTIES";
 
-export type SampleIdToWarningMessages = Record<string, Set<keyof Metadata>>;
+export type SampleIdToWarningMessages = Record<
+  string,
+  Set<keyof ParsedMetadata>
+>;
 
 export interface RowInfo {
   row: string[];
@@ -23,7 +25,7 @@ export interface RowInfo {
 }
 
 export interface ParseResult {
-  data: SampleIdToMetadata;
+  data: SampleIdToParsedMetadata;
   errorMessages: Map<ERROR_CODE, Set<string>>;
   filename: string;
   warningMessages: Map<WARNING_CODE, SampleIdToWarningMessages>;
@@ -35,7 +37,7 @@ export function parseFile(file: File): Promise<ParseResult> {
       complete: ({ data: rows }: Papa.ParseResult<string[]>) => {
         let headers = null;
 
-        const sampleIdToMetadata: Record<string, Metadata> = {};
+        const sampleIdToMetadata: Record<string, ParsedMetadata> = {};
         const errorMessages = new Map<ERROR_CODE, Set<string>>();
         const warningMessages = new Map<
           WARNING_CODE,
@@ -63,7 +65,7 @@ export function parseFile(file: File): Promise<ParseResult> {
           if (sampleId) {
             delete metadata.sampleId;
 
-            sampleIdToMetadata[String(sampleId)] = metadata as Metadata;
+            sampleIdToMetadata[String(sampleId)] = metadata as ParsedMetadata;
           }
         }
 
@@ -98,7 +100,7 @@ export function parseFile(file: File): Promise<ParseResult> {
  * everything we need. But because the implementation relies on it, would take some work.
  */
 function buildMetadata({ headers, row, warningMessages }: RowInfo) {
-  const metadata = {} as ParsedMetadata;
+  let metadata: ParsedMetadata = {};
 
   for (let i = 0; i < row.length; i++) {
     const value = row[i];
@@ -114,7 +116,10 @@ function buildMetadata({ headers, row, warningMessages }: RowInfo) {
     const key = HEADERS_TO_METADATA_KEYS[headers[i]];
 
     if (key) {
-      metadata[key] = convertValue(key, value);
+      metadata = {
+        ...metadata,
+        [key]: convertValue(key, value),
+      };
     }
   }
 
@@ -133,7 +138,7 @@ function autocorrect(
     const sampleIdToCorrectedKeys =
       warningMessages.get(WARNING_CODE.AUTO_CORRECT) || {};
 
-    const correctedKeys = new Set<keyof Metadata>();
+    const correctedKeys = new Set<keyof ParsedMetadata>();
 
     if (!metadata.submittedToGisaid) {
       metadata.submittedToGisaid = true;
@@ -152,20 +157,10 @@ function autocorrect(
     warningMessages.set(WARNING_CODE.AUTO_CORRECT, sampleIdToCorrectedKeys);
   }
 
-  /**
-   * (thuang): Reset county to "" if value is not on the list `COUNTIES`
-   */
-  if (
-    metadata.collectionLocation &&
-    !COUNTIES.includes(metadata.collectionLocation as string)
-  ) {
-    metadata.collectionLocation = "";
-  }
-
   return metadata;
 }
 
-function convertValue(key: string, value: string) {
+function convertValue(key: string, value: string): string | boolean {
   if (key === "keepPrivate" || key === "submittedToGisaid") {
     if (value.toUpperCase() === "YES") return true;
     return false;
