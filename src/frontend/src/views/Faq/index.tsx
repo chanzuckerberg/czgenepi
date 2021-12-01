@@ -16,7 +16,7 @@ import {
 export default function Faq(): JSX.Element {
   const renderIntro = () => (
     <Title>
-      <H1>Chan Zuckerberg GEN EPI (formerly Aspen) FAQs</H1>
+      <H1>Chan Zuckerberg GEN EPI (formerly CZ Gen Epi) FAQs</H1>
     </Title>
   );
 
@@ -34,7 +34,7 @@ export default function Faq(): JSX.Element {
           and password.{" "}
           <B>
             Note: you can login to CZ GEN EPI using the same credentials that
-            you used to login to Aspen and to the COVID Tracker app.
+            you used to login to CZ Gen Epi and to the COVID Tracker app.
           </B>{" "}
           If you forget your password, click the “Forgot password?” link on the
           login screen. You will receive an email with instructions for
@@ -57,8 +57,8 @@ export default function Faq(): JSX.Element {
           <NewTabLink href="https://docs.google.com/document/d/1_iQgwl3hn_pjlZLX-n0alUbbhgSPZvpW_0620Hk_kB4/edit">
             Tree Building Guide
           </NewTabLink>{" "}
-          for complete information on the different tree types within Aspen and
-          how to build them depending on your use case.
+          for complete information on the different tree types within CZ Gen Epi
+          and how to build them depending on your use case.
         </P>
 
         <H3>How do I securely overlay my PHI / PII metadata?</H3>

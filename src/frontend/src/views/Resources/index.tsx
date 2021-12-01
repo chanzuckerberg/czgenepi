@@ -156,14 +156,15 @@ export default function Resources(): JSX.Element {
                 <StyledNewTabLink href="https://www.youtube.com/watch?v=cLLV2VpgXCU">
                   Week 10
                 </StyledNewTabLink>{" "}
-                - This week I gave a demo of Aspen, the new piece of software
-                that CZI is developing for managing genomic data, that
+                - This week I gave a demo of CZ Gen Epi, the new piece of
+                software that CZI is developing for managing genomic data, that
                 eventually will allows folks to build Nextstrain trees
                 independently with a GUI interface. Since that capability
                 isn&apos;t active quite yet, I also discussed phylogenetic
                 placements in UShER and Nextclade, and how to pull relevant data
-                out of Aspen to use in those phylogenetic placements. [Since the
-                recording of this video, Aspen has added this capability.]
+                out of CZ Gen Epi to use in those phylogenetic placements.
+                [Since the recording of this video, CZ Gen Epi has added this
+                capability.]
               </span>
             </ListItem>
             <ListItem>
@@ -221,10 +222,10 @@ export default function Resources(): JSX.Element {
             <ListItem>
               <span>
                 <StyledNewTabLink href="https://www.youtube.com/watch?v=RbK6Bv4-fnc">
-                  Aspen Tutorial!
+                  CZ Gen Epi Tutorial!
                 </StyledNewTabLink>{" "}
-                - This tutorial introduces self-serve tree building in Aspen,
-                and discusses what the different tree types are useful for.
+                - This tutorial introduces self-serve tree building in CZ Gen
+                Epi, and discusses what the different tree types are useful for.
               </span>
             </ListItem>
           </StyledList>
@@ -239,7 +240,7 @@ export default function Resources(): JSX.Element {
         <H2>Questions?</H2>
         <P>
           <NewTabLink href={ROUTES.FAQ}>Check out our FAQ</NewTabLink> for
-          general questions about Aspen, privacy, and more.
+          general questions about CZ Gen Epi, privacy, and more.
         </P>
       </>
     );
