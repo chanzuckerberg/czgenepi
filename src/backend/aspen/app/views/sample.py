@@ -459,7 +459,7 @@ def create_sample():
                     sentry_sdk.capture_message(
                         f"No valid location for id {location_id}"
                     )
-                    raise ex.ServerException("Invalid location id for sample")
+                    raise ex.BadRequestException("Invalid location id for sample")
 
             if valid_location:
                 sample_args["location_id"] = valid_location.id
