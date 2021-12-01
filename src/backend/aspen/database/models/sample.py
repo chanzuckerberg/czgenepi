@@ -189,7 +189,7 @@ class Sample(idbase, DictMixin):  # type: ignore
         ForeignKey(Location.id),
         nullable=True,
     )
-    collection_location = relationship("Location")
+    collection_location = relationship("Location")  # type: ignore
 
     # old location data
     location = Column(String, nullable=False)
