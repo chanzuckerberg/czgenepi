@@ -1,4 +1,4 @@
-export const formatTZDate = (d: Date): string => {
+export const formatTZDate = (d: string): string => {
   if (!d || d === "-") return d;
 
   const date = new Date(d);
