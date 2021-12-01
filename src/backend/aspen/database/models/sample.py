@@ -23,6 +23,7 @@ from sqlalchemy.orm import backref, relationship, Session
 
 from aspen.database.models.base import base, idbase
 from aspen.database.models.enum import Enum
+from aspen.database.models.locations import Location
 from aspen.database.models.mixins import DictMixin
 from aspen.database.models.usergroup import Group, User
 
@@ -182,7 +183,15 @@ class Sample(idbase, DictMixin):  # type: ignore
         },
     )
 
-    # location
+    # new location data
+    location_id = Column(
+        Integer,
+        ForeignKey(Location.id),
+        nullable=True,
+    )
+    collection_location = relationship("Location")  # type: ignore
+
+    # old location data
     location = Column(String, nullable=False)
     division = Column(
         String,

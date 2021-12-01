@@ -301,6 +301,17 @@ def get_tree_sample_ids(ctx, tree_id):
     print(resp.text)
 
 @cli.group()
+def locations():
+    pass
+
+@locations.command(name="list")
+@click.pass_context
+def list_locations(ctx):
+    api_client = ctx.obj["api_client"]
+    resp = api_client.get("/v2/locations/")
+    print(resp.text)
+
+@cli.group()
 def samples():
     pass
 

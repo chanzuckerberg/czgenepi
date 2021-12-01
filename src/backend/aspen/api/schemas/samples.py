@@ -1,7 +1,7 @@
 import datetime
 from typing import Any, List, Optional
 
-from pydantic import constr, Field
+from pydantic import constr
 from pydantic.utils import GetterDict
 
 from aspen.api.schemas.base import BaseRequest, BaseResponse
@@ -61,6 +61,11 @@ class SampleGetterDict(GetterDict):
                 if self._obj.show_private_identifier
                 else None
             ),
+            "collection_location": (
+                self._obj.location
+                if self._obj.location != "" and self._obj.location != "NaN"
+                else self._obj.division
+            ),
         }
         if key in indirect_attributes:
             return indirect_attributes[key]
@@ -75,7 +80,7 @@ class SampleResponseSchema(BaseResponse):
 
     id: int
     collection_date: datetime.date
-    location: Optional[str] = Field(alias="collection_location")
+    collection_location: str
     czb_failed_genome_recovery: bool
     gisaid: SampleGisaidResponseSchema
     lineage: SampleLineageResponseSchema
