@@ -445,11 +445,21 @@ def create_sample():
                     user.group.name,
                 ]
 
-            valid_location: Optional[Location] = (
-                g.db_session.query(Location)
-                .filter(Location.id == data["sample"].get("location_id", None))
-                .one_or_none()
-            )
+            location_id = data["sample"].get("location_id", None)
+            valid_location: Optional[Location] = None
+            if location_id:
+                try:
+                    valid_location = (
+                        g.db_session.query(Location)
+                        .filter(Location.id == location_id)
+                        .one()
+                    )
+                except NoResultFound:
+                    sentry_sdk.capture_message(
+                        f"No valid location for id {location_id}"
+                    )
+                    raise ex.ServerException("Invalid location id for sample")
+
             if valid_location:
                 sample_args["location_id"] = valid_location.id
                 sample_args["region"] = RegionType(valid_location.region)
