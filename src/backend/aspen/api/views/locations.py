@@ -21,7 +21,7 @@ async def list_locations(
 ) -> LocationListResponse:
 
     # load the locations.
-    all_samples_query = sa.select(Location)  # type: ignore
+    all_locations_query = sa.select(Location)  # type: ignore
     result = await db.execute(all_samples_query)
     response = []
     for row in result.scalars():
