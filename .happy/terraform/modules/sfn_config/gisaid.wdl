@@ -344,7 +344,6 @@ task ImportLocations {
         String aspen_config_secret_name
         String remote_dev_prefix
         String gisaid_import_complete
-        File gisaid_metadata
     }
 
     command <<<
