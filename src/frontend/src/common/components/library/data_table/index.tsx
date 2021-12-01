@@ -60,8 +60,29 @@ function sortData(
   ascending: boolean
 ): TableItem[] {
   return data.sort((a, b): number => {
-    const order = defaultSorting(a, b, sortKey);
-    return ascending ? order : order * -1;
+    let order = 0;
+    // Keep failed samples at the bottom of the table
+    if (sortKey[0] === "uploadDate") {
+      const uploadDateAIsNull = a["uploadDate"] === null;
+      const uploadDateBIsNull = b["uploadDate"] === null;
+      if (uploadDateAIsNull && uploadDateBIsNull) {
+        order = 0;
+      } else if (uploadDateAIsNull && !uploadDateBIsNull) {
+        order = -1;
+      } else if (uploadDateBIsNull && !uploadDateAIsNull) {
+        order = 1;
+      } else {
+        order = defaultSorting(a, b, sortKey);
+      }
+    } else {
+      order = defaultSorting(a, b, sortKey);
+    }
+
+    if (!ascending) {
+      return order * -1;
+    } else {
+      return order;
+    }
   });
 }
 
