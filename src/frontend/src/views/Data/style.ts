@@ -43,7 +43,7 @@ export const StyledChip = styled(Chip)`
     const spaces = getSpaces(props);
 
     return `
-      margin-top: ${spaces?.xxs}px;
+      margin-left: ${spaces?.xs}px;
     `;
   }}
 `;
@@ -70,4 +70,23 @@ export const PrivacyIcon = styled.span`
 
 export const FlexContainer = styled.div`
   display: flex;
+`;
+
+export const CenteredFlexContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+export const StyledUploaderName = styled.span`
+  ${fontBodyXxs}
+
+  ${(props) => {
+    const colors = getColors(props);
+    const spaces = getSpaces(props);
+
+    return `
+      color: ${colors?.gray[500]};
+      margin-top: ${spaces?.xxxs}px;
+    `;
+  }}
 `;
