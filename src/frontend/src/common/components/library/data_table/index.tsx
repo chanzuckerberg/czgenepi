@@ -60,28 +60,8 @@ function sortData(
   ascending: boolean
 ): TableItem[] {
   return data.sort((a, b): number => {
-    let order = 0;
-    if (sortKey[0] === "uploadDate") {
-      const uploadDateAIsNA = a["uploadDate"] === "N/A";
-      const uploadDateBIsNA = b["uploadDate"] === "N/A";
-      if (uploadDateAIsNA && uploadDateBIsNA) {
-        order = 0;
-      } else if (uploadDateAIsNA && !uploadDateBIsNA) {
-        order = -1;
-      } else if (uploadDateBIsNA && !uploadDateAIsNA) {
-        order = 1;
-      } else {
-        order = defaultSorting(a, b, sortKey);
-      }
-    } else {
-      order = defaultSorting(a, b, sortKey);
-    }
-
-    if (!ascending) {
-      return order * -1;
-    } else {
-      return order;
-    }
+    const order = defaultSorting(a, b, sortKey);
+    return ascending ? order : order * -1;
   });
 }
 
