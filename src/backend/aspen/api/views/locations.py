@@ -22,7 +22,7 @@ async def list_locations(
 
     # load the locations.
     all_locations_query = sa.select(Location)  # type: ignore
-    result = await db.execute(all_samples_query)
+    result = await db.execute(all_locations_query)
     response = []
     for row in result.scalars():
         response.append(LocationResponse.from_orm(row))
