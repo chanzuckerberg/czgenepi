@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import ENV from "src/common/constants/ENV";
 import Exclamation from "src/common/icons/IconExclamation.svg";
 import CloseIcon from "src/common/images/close-icon.svg";
 import HeaderLogo from "src/common/images/gen-epi-logo.svg";
@@ -24,6 +25,8 @@ import {
   TextLink,
 } from "./style";
 
+const { API_URL } = ENV;
+
 export default function NavBarV2(): JSX.Element {
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -43,7 +46,7 @@ export default function NavBarV2(): JSX.Element {
       </AnnouncementBanner>
       <HeaderMaxWidthContainer>
         <HeaderTopContainer>
-          <HeaderLogoContainer href={ROUTES.LANDINGV2}>
+          <HeaderLogoContainer href={ROUTES.HOMEPAGE}>
             <HeaderLogo />
           </HeaderLogoContainer>
           <HeaderTopLinks>
@@ -51,7 +54,7 @@ export default function NavBarV2(): JSX.Element {
               Resources
             </TextLink>
             <ButtonLink href={ROUTES.REQUEST_ACCESS}>Request Access</ButtonLink>
-            <ButtonLink href={ROUTES.LOGIN}>Sign in</ButtonLink>
+            <ButtonLink href={API_URL + ROUTES.LOGIN}>Sign in</ButtonLink>
           </HeaderTopLinks>
           <MobileNavToggle
             onClick={toggleMobileNav}
@@ -102,7 +105,7 @@ export default function NavBarV2(): JSX.Element {
                 style={menuOpen ? { opacity: "1" } : { opacity: "0" }}
               ></MobileNavSeparator>
               <MobileNavLink
-                href={ROUTES.LOGIN}
+                href={API_URL + ROUTES.LOGIN}
                 style={menuOpen ? { opacity: "1" } : { opacity: "0" }}
                 target="_blank"
                 rel="noreferrer"
