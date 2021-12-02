@@ -8,17 +8,6 @@ export const UseCasesContainer = styled.div`
     position: relative;
 `;
 
-export const UseCasesExampleContainer = styled.div`
-    display: flex;
-    justify-content: space-evenly;
-    width: 100%;
-    margin-top: -9%;
-
-    @media (max-width: 768px) {
-        display: none;
-    }
-`;
-
 export const UseCasesHeader = styled.h2`
     text-align: center;
     font-size: 32px;

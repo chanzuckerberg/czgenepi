@@ -1,11 +1,9 @@
 import React from "react";
 import Image from "next/image";
-import UseCasesImg from "src/common/images/landingv2-gen-epi-use-cases.png";
-import UseCasesImgMobile from "src/common/images/landingv2-use-cases-mobile.png";
-import UseCasesExample from "./components/UseCasesExample";
+import UseCasesImg from "src/common/images/gen-epi-chart-desktop.png";
+import UseCasesImgMobile from "src/common/images/gen-epi-chart-mobile.png";
 import {
     UseCasesContainer,
-    UseCasesExampleContainer,
     UseCasesHeader,
     UseCasesImage,
     UseCasesImageMobile
@@ -21,14 +19,6 @@ export default function UseCases(): JSX.Element {
             <UseCasesImage>
                 <Image src={UseCasesImg} />
             </UseCasesImage>
-            <UseCasesExampleContainer>
-                <UseCasesExample 
-                    headline="Outbreak Investigation" 
-                    />
-                <UseCasesExample 
-                    headline="Pathogen Surveillance" 
-                    />
-            </UseCasesExampleContainer>
             <UseCasesImageMobile>
                 <Image src={UseCasesImgMobile} />
             </UseCasesImageMobile>
