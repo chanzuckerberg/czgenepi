@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   database:
-    image: "${DOCKER_REPO}aspen-devdb:latest"
+    image: "${DOCKER_REPO}genepi-devdb:latest"
     ports:
       - "5432:5432"
     environment:
@@ -15,11 +15,11 @@ services:
         aliases:
           - database.genepinet.localdev
   frontend:
-    image: "${DOCKER_REPO}aspen-frontend"
+    image: "${DOCKER_REPO}genepi-frontend"
     build:
       context: src/frontend
       cache_from:
-        - "${DOCKER_REPO}aspen-frontend:branch-trunk"
+        - "${DOCKER_REPO}genepi-frontend:branch-trunk"
       args:
         - BUILDKIT_INLINE_CACHE=1
         - HAPPY_COMMIT
@@ -41,11 +41,11 @@ services:
         aliases:
           - frontend.genepinet.localdev
   backend:
-    image: "${DOCKER_REPO}aspen-backend"
+    image: "${DOCKER_REPO}genepi-backend"
     build:
       context: src/backend
       cache_from:
-        - "${DOCKER_REPO}aspen-backend:branch-trunk"
+        - "${DOCKER_REPO}genepi-backend:branch-trunk"
       args:
         - BUILDKIT_INLINE_CACHE=1
     restart: always
@@ -81,11 +81,11 @@ services:
         aliases:
           - backend.genepinet.localdev
   utility:
-    image: "${DOCKER_REPO}aspen-backend"
+    image: "${DOCKER_REPO}genepi-backend"
     build:
       context: src/backend
       cache_from:
-        - "${DOCKER_REPO}aspen-backend:branch-trunk"
+        - "${DOCKER_REPO}genepi-backend:branch-trunk"
       args:
         - BUILDKIT_INLINE_CACHE=1
     restart: always
@@ -154,12 +154,12 @@ services:
         aliases:
           - oidc.genepinet.localdev
   gisaid:
-    image: "${DOCKER_REPO}aspen-gisaid"
+    image: "${DOCKER_REPO}genepi-gisaid"
     build:
       context: src/backend/
       dockerfile: Dockerfile.gisaid
       cache_from:
-        - "${DOCKER_REPO}aspen-gisaid:branch-trunk"
+        - "${DOCKER_REPO}genepi-gisaid:branch-trunk"
       args:
         - BUILDKIT_INLINE_CACHE=1
         - HAPPY_COMMIT
@@ -178,12 +178,12 @@ services:
         aliases:
           - gisaid.genepinet.localdev
   pangolin:
-    image: "${DOCKER_REPO}aspen-pangolin"
+    image: "${DOCKER_REPO}genepi-pangolin"
     build:
       context: src/backend
       dockerfile: Dockerfile.pangolin
       cache_from:
-        - "${DOCKER_REPO}aspen-pangolin:branch-trunk"
+        - "${DOCKER_REPO}genepi-pangolin:branch-trunk"
       args:
         - BUILDKIT_INLINE_CACHE=1
     environment:
@@ -198,12 +198,12 @@ services:
         aliases:
           - pangolin.genepinet.localdev
   nextstrain:
-    image: "${DOCKER_REPO}aspen-nextstrain"
+    image: "${DOCKER_REPO}genepi-nextstrain"
     build:
       context: src/backend
       dockerfile: Dockerfile.nextstrain
       cache_from:
-        - "${DOCKER_REPO}aspen-nextstrain:branch-trunk"
+        - "${DOCKER_REPO}genepi-nextstrain:branch-trunk"
       args:
         - BUILDKIT_INLINE_CACHE=1
     environment:

@@ -1,11 +1,11 @@
 import cx from "classnames";
 import { compact, uniq } from "lodash";
-import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { FunctionComponent, useEffect, useState } from "react";
 import { Menu } from "semantic-ui-react";
 import { fetchSamples } from "src/common/api";
+import { HeadAppTitle } from "src/common/components";
 import { useProtectedRoute } from "src/common/queries/auth";
 import { useTreeInfo } from "src/common/queries/trees";
 import { FilterPanel } from "src/components/FilterPanel";
@@ -20,7 +20,8 @@ import style from "./index.module.scss";
 import { Container, FlexContainer } from "./style";
 import { TREE_TRANSFORMS } from "./transforms";
 
-const TITLE: Record<string, string> = {
+// For use in the `<head>` title of page
+const PAGE_SUBTITLES: Record<string, string> = {
   [ROUTES.DATA_SAMPLES]: "Samples",
   [ROUTES.PHYLO_TREES]: "Phylogenetic Trees",
 };
@@ -141,7 +142,7 @@ const Data: FunctionComponent = () => {
     );
   });
 
-  const title = TITLE[router.asPath];
+  const subTitle = PAGE_SUBTITLES[router.asPath];
 
   const category =
     dataCategories.find((category) => category.to === router.asPath) ||
@@ -162,9 +163,7 @@ const Data: FunctionComponent = () => {
 
   return (
     <Container className={style.dataRoot}>
-      <Head>
-        <title>Aspen {title && " | " + title}</title>
-      </Head>
+      <HeadAppTitle subTitle={subTitle} />
 
       <FlexContainer
         className={style.navigation}

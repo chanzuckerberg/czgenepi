@@ -157,8 +157,8 @@ async def kick_off_phylo_run(
     sfn_input_json = {
         "Input": {
             "Run": {
-                "aspen_config_secret_name": os.environ.get(
-                    "ASPEN_CONFIG_SECRET_NAME", "aspen-config"
+                "genepi_config_secret_name": os.environ.get(
+                    "GENEPI_CONFIG_SECRET_NAME", "genepi-config"
                 ),
                 "aws_region": aws_region,
                 "docker_image_id": sfn_params["Input"]["Run"]["docker_image_id"],

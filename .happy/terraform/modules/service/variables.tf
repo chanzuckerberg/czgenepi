@@ -3,6 +3,18 @@ variable stack_resource_prefix {
   description = "Prefix for account-level resources"
 }
 
+variable cpu {
+  type        = number
+  description = "CPU shares (1cpu=1024) per task"
+  default     = 2048
+}
+
+variable memory {
+  type        = number
+  description = "Memory in megabytes per task"
+  default     = 4096
+}
+
 variable vpc {
   type        = string
   description = "The VPC that the ECS cluster is deployed to"
@@ -114,4 +126,10 @@ variable wait_for_steady_state {
   type        = bool
   description = "Whether Terraform should block until the service is in a steady state before exiting"
   default     = false
+}
+
+variable execution_role {
+  type        = string
+  description = "Execution role to use for fargate tasks - required for fargate services!"
+  default     = ""
 }

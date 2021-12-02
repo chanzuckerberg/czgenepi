@@ -704,17 +704,28 @@ class Orchestrator:
         containers = []
         for task in taskinfo:
             task_id = task["taskArn"].split("/")[-1]
-            tp.add_row([task_id, task["startedAt"].strftime("%m/%d %H:%M"), task["lastStatus"]])
-            containers.append(
-                {
-                    "host": task["containerInstanceArn"],
-                    "container": task["containers"][0]["runtimeId"],
-                    "arn": task["taskArn"],
-                }
-            )
+            started_at = "-"
+            if task.get("startedAt"):
+                started_at = task["startedAt"].strftime("%m/%d %H:%M")
+                containers.append(
+                    {
+                        "host": task.get("containerInstanceArn"),
+                        "container": task["containers"][0]["runtimeId"],
+                        "task_id": task_id,
+                        "arn": task["taskArn"],
+                        "launch_type": task["launchType"],
+                        "container_name": task["containers"][0]["name"],
+                    }
+                )
+            tp.add_row([task_id, started_at, task["lastStatus"]])
         tp.print()
         print()
         for container in containers:
+            if container['launch_type'] == 'FARGATE':
+                profile_name = self.ctx.obj["aws_profile"]
+                print(f"Connecting to {container['task_id']}:{container['container_name']}")
+                cmd = ["aws", "--profile", profile_name, "ecs", "execute-command", "--cluster", cluster_arn, "--container", container["container_name"], "--command", "/bin/bash", "--interactive", "--task", container["task_id"]]
+                os.execvp("aws", cmd)
             instance_info = ecs_client.describe_container_instances(
                 cluster=cluster_arn, containerInstances=[container["host"]]
             )
@@ -774,7 +785,7 @@ class Orchestrator:
                 print(f"  ./scripts/happy --env {self.ctx.obj['config'].env} logs {stack} {service_name}")
             return
 
-    def run_task(self, taskdef_arn, wait=False, show_logs=True):
+    def run_task(self, taskdef_arn, launch_type, wait=False, show_logs=True):
         """Run a one-off ECS task and optionally wait"""
         secrets = self.secrets
         cluster_arn = secrets["cluster_arn"]
@@ -784,6 +795,7 @@ class Orchestrator:
         ecs_client = AwsSession.get_client(self.ctx, "ecs")
         output = ecs_client.run_task(
             cluster=cluster_arn,
+            launchType=launch_type,
             taskDefinition=taskdef_arn,
             networkConfiguration={
                 "awsvpcConfiguration": {
@@ -830,8 +842,12 @@ class Orchestrator:
         print("getting taskdef info")
         result = ecs_client.describe_task_definition(taskDefinition=taskdef_arn)
         taskdef = result["taskDefinition"]
-        container = taskdef["containerDefinitions"][0]
-        log_group = container["logConfiguration"]["options"]["awslogs-group"]
+        container_def = taskdef["containerDefinitions"][0]
+        log_group = container_def["logConfiguration"]["options"]["awslogs-group"]
+        if launch_type == "FARGATE":
+            log_prefix = container_def["logConfiguration"]["options"]["awslogs-stream-prefix"]
+            task_id = container["taskArn"].split("/")[-1]
+            log_stream = f"{log_prefix}/{container_def['name']}/{task_id}"
         print("Log Events:")
         logs_client = AwsSession.get_client(self.ctx, "logs")
         result = logs_client.get_log_events(logGroupName=log_group, logStreamName=log_stream)
@@ -917,6 +933,11 @@ def run_tasks(ctx, stack, task_type, wait=False, show_logs=True):
     config = ctx.obj["config"]
     orchestrator = ctx.obj["orchestrator"]
     task_outputs = config.tasks.get(task_type, [])
+    launch_type = "EC2"
+    try:
+        launch_type = config.task_launch_type.upper()
+    except KeyError:
+        pass
     if not task_outputs:
         print(f"Found no tasks for {task_type}")
     try:
@@ -924,7 +945,7 @@ def run_tasks(ctx, stack, task_type, wait=False, show_logs=True):
     except KeyError as exc:
         raise CliError(f"Stack {stack.stack_name} is missing output field '{exc.args[0]}' for task {task_type}")
     for task in tasks:
-        orchestrator.run_task(task, wait=wait, show_logs=show_logs)
+        orchestrator.run_task(task, launch_type, wait=wait, show_logs=show_logs)
 
 def check_images_exist(ctx, tag):
     """Make sure all of our service images actually exist if we're trying to deploy via tag"""

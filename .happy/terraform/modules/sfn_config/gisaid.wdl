@@ -2,9 +2,9 @@ version 1.1
 
 workflow LoadGISAID {
     input {
-        String docker_image_id = "aspen-gisaid"
+        String docker_image_id = "genepi-gisaid"
         String aws_region = "us-west-2"
-        String aspen_config_secret_name
+        String genepi_config_secret_name
         String remote_dev_prefix = ""
         String gisaid_ndjson_url = "https://www.epicov.org/epi3/3p/exp3/export/export.json.bz2"
     }
@@ -13,7 +13,7 @@ workflow LoadGISAID {
         input:
         docker_image_id = docker_image_id,
         aws_region = aws_region,
-        aspen_config_secret_name = aspen_config_secret_name,
+        genepi_config_secret_name = genepi_config_secret_name,
         remote_dev_prefix = remote_dev_prefix,
         gisaid_ndjson_url = gisaid_ndjson_url
     }
@@ -22,7 +22,7 @@ workflow LoadGISAID {
         input:
         docker_image_id = docker_image_id,
         aws_region = aws_region,
-        aspen_config_secret_name = aspen_config_secret_name,
+        genepi_config_secret_name = genepi_config_secret_name,
         remote_dev_prefix = remote_dev_prefix,
         raw_gisaid_object_id = IngestGISAID.entity_id,
     }
@@ -31,7 +31,7 @@ workflow LoadGISAID {
         input:
         docker_image_id = docker_image_id,
         aws_region = aws_region,
-        aspen_config_secret_name = aspen_config_secret_name,
+        genepi_config_secret_name = genepi_config_secret_name,
         remote_dev_prefix = remote_dev_prefix,
         processed_gisaid_object_id = TransformGISAID.entity_id,
     }
@@ -40,7 +40,7 @@ workflow LoadGISAID {
         input:
         docker_image_id = docker_image_id,
         aws_region = aws_region,
-        aspen_config_secret_name = aspen_config_secret_name,
+        genepi_config_secret_name = genepi_config_secret_name,
         remote_dev_prefix = remote_dev_prefix,
         gisaid_metadata = AlignGISAID.gisaid_metadata,
     }
@@ -67,7 +67,7 @@ task IngestGISAID {
     input {
         String docker_image_id
         String aws_region
-        String aspen_config_secret_name
+        String genepi_config_secret_name
         String remote_dev_prefix
         String gisaid_ndjson_url
     }
@@ -82,7 +82,7 @@ task IngestGISAID {
 
     aws configure set region ~{aws_region}
 
-    export ASPEN_CONFIG_SECRET_NAME=~{aspen_config_secret_name}
+    export GENEPI_CONFIG_SECRET_NAME=~{genepi_config_secret_name}
     if [ "~{remote_dev_prefix}" != "" ]; then
         export REMOTE_DEV_PREFIX="~{remote_dev_prefix}"
     fi
@@ -91,9 +91,9 @@ task IngestGISAID {
     aspen_workflow_rev=$COMMIT_SHA
     aspen_creation_rev=$COMMIT_SHA
 
-    # fetch aspen config
-    aspen_config="$(aws secretsmanager get-secret-value --secret-id ~{aspen_config_secret_name} --query SecretString --output text)"
-    aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$aspen_config")"
+    # fetch genepi config
+    genepi_config="$(aws secretsmanager get-secret-value --secret-id ~{genepi_config_secret_name} --query SecretString --output text)"
+    aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$genepi_config")"
     sequences_key="raw_gisaid_dump/${build_id}/gisaid.ndjson.zst"
 
     # fetch the gisaid dataset and transform it.
@@ -133,7 +133,7 @@ task TransformGISAID {
     input {
         String docker_image_id
         String aws_region
-        String aspen_config_secret_name
+        String genepi_config_secret_name
         String remote_dev_prefix
         String raw_gisaid_object_id
     }
@@ -147,7 +147,7 @@ task TransformGISAID {
 
     aws configure set region ~{aws_region}
 
-    export ASPEN_CONFIG_SECRET_NAME=~{aspen_config_secret_name}
+    export GENEPI_CONFIG_SECRET_NAME=~{genepi_config_secret_name}
     if [ "~{remote_dev_prefix}" != "" ]; then
         export REMOTE_DEV_PREFIX="~{remote_dev_prefix}"
     fi
@@ -157,8 +157,8 @@ task TransformGISAID {
     aspen_creation_rev=$COMMIT_SHA
 
     # fetch aspen config
-    aspen_config="$(aws secretsmanager get-secret-value --secret-id ~{aspen_config_secret_name} --query SecretString --output text)"
-    aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$aspen_config")"
+    genepi_config="$(aws secretsmanager get-secret-value --secret-id ~{genepi_config_secret_name} --query SecretString --output text)"
+    aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$genepi_config")"
 
     # get the bucket/key from the object id
     raw_gisaid_location=$(python3 /usr/src/app/aspen/workflows/transform_gisaid/lookup_raw_gisaid_object.py --raw-gisaid-object-id "~{raw_gisaid_object_id}")
@@ -218,7 +218,7 @@ task AlignGISAID {
     input {
         String docker_image_id
         String aws_region
-        String aspen_config_secret_name
+        String genepi_config_secret_name
         String remote_dev_prefix
         String processed_gisaid_object_id
     }
@@ -232,14 +232,14 @@ task AlignGISAID {
 
     aws configure set region ~{aws_region}
 
-    export ASPEN_CONFIG_SECRET_NAME=~{aspen_config_secret_name}
+    export GENEPI_CONFIG_SECRET_NAME=~{genepi_config_secret_name}
     if [ "~{remote_dev_prefix}" != "" ]; then
         export REMOTE_DEV_PREFIX="~{remote_dev_prefix}"
     fi
 
     # fetch aspen config
-    aspen_config="$(aws secretsmanager get-secret-value --secret-id ~{aspen_config_secret_name} --query SecretString --output text)"
-    aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$aspen_config")"
+    genepi_config="$(aws secretsmanager get-secret-value --secret-id ~{genepi_config_secret_name} --query SecretString --output text)"
+    aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$genepi_config")"
 
     # get the bucket/key from the object id
     processed_gisaid_location=$(python3 /usr/src/app/aspen/workflows/align_gisaid/lookup_processed_gisaid_object.py --processed-gisaid-object-id "~{processed_gisaid_object_id}")
@@ -308,7 +308,7 @@ task ImportGISAID {
     input {
         String docker_image_id
         String aws_region
-        String aspen_config_secret_name
+        String genepi_config_secret_name
         String remote_dev_prefix
         File gisaid_metadata
     }
@@ -317,7 +317,7 @@ task ImportGISAID {
     set -Eeuo pipefail
     aws configure set region ~{aws_region}
 
-    export ASPEN_CONFIG_SECRET_NAME=~{aspen_config_secret_name}
+    export GENEPI_CONFIG_SECRET_NAME=~{genepi_config_secret_name}
     if [ "~{remote_dev_prefix}" != "" ]; then
         export REMOTE_DEV_PREFIX="~{remote_dev_prefix}"
     fi

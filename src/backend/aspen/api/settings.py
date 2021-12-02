@@ -11,7 +11,7 @@ from pydantic import BaseSettings
 def aws_secret_settings(settings) -> Dict[str, Any]:
     """Loads settings from an aws secret whose value is JSON encoded."""
     session = Session(region_name=os.environ["AWS_REGION"])
-    secret_name = os.environ.get("ASPEN_CONFIG_SECRET_NAME", "aspen-config")
+    secret_name = os.environ.get("GENEPI_CONFIG_SECRET_NAME", "genepi-config")
     client = session.client(
         service_name="secretsmanager",
         endpoint_url=os.environ.get("BOTO_ENDPOINT_URL"),
@@ -58,7 +58,7 @@ def aws_ssm_settings(settings) -> Dict[str, Any]:
 
     response: Dict[str, Any] = {}
     for param, key_name in parameters.items():
-        parameter_path = f"/aspen/{deployment_stage}{stack_prefix}/{param}"
+        parameter_path = f"/genepi/{deployment_stage}{stack_prefix}/{param}"
         try:
             get_parameter = client.get_parameter(Name=parameter_path)
         except ClientError as e:
@@ -78,7 +78,7 @@ class Settings(BaseSettings):
     DB_POOL_SIZE: int = 5
     DB_MAX_OVERFLOW: int = 0
     DB_ECHO: bool = False
-    DEBUG: bool = True
+    DEBUG: bool = False
 
     # Pydantic automatically tries to load settings with matching names from the environment if available, and then
     # goes down its list of "magic-settings-getters" to find more data to populate this settings object with. For
