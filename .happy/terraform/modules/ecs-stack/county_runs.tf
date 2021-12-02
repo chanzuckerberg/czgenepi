@@ -4,6 +4,36 @@ locals {
   nextstrain_cron_schedule = local.deployment_stage == "prod" ? ["cron(0 5 ? * MON *)"] : []
 }
 
+module nextstrain_chicago_contextual_sfn_config {
+  source   = "../sfn_config"
+  app_name = "nextstrain-chicago-contextual-sfn"
+  image    = local.nextstrain_image
+  vcpus    = local.nextstrain_sfn_vcpus
+  memory   = local.nextstrain_sfn_memory
+  wdl_path = "workflows/nextstrain.wdl"
+  custom_stack_name     = local.custom_stack_name
+  deployment_stage      = local.deployment_stage
+  remote_dev_prefix     = local.remote_dev_prefix
+  stack_resource_prefix = local.stack_resource_prefix
+  swipe_comms_bucket    = local.swipe_comms_bucket
+  swipe_wdl_bucket      = local.swipe_wdl_bucket
+  sfn_arn               = module.swipe_sfn.step_function_arn
+  schedule_expressions  = local.nextstrain_cron_schedule
+  event_role_arn        = local.event_role_arn
+  extra_args            =  {
+    aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
+    remote_dev_prefix        = local.remote_dev_prefix
+    group_name               = "Chicago Department of Public Health"
+    s3_filestem              = "Chicago Contextual"
+    template_filename        = "group_plus_context.yaml"
+    template_args            = {
+      division = "Illinois"
+      location = "Chicago"
+    }
+    tree_type                = "OVERVIEW"
+  }
+}
+
 module nextstrain_scc_contextual_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-scc-contextual-sfn"

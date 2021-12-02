@@ -22,6 +22,7 @@ from aspen.database.models.host_filtering import (  # noqa: F401
     FilterRead,
     HostFilteredSequencingReadsCollection,
 )
+from aspen.database.models.locations import Location  # noqa: F401
 from aspen.database.models.phylo_tree import (  # noqa: F401
     PhyloRun,
     PhyloTree,

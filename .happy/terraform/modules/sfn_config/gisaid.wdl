@@ -45,6 +45,15 @@ workflow LoadGISAID {
         gisaid_metadata = AlignGISAID.gisaid_metadata,
     }
 
+    call ImportLocations {
+        input:
+        docker_image_id = docker_image_id,
+        aws_region = aws_region,
+        aspen_config_secret_name = aspen_config_secret_name,
+        remote_dev_prefix = remote_dev_prefix,
+        gisaid_import_complete = ImportGISAID.gisaid_import_complete,
+    }
+
     output {
         Array[File] snakemake_logs = AlignGISAID.snakemake_logs
         File align_log = AlignGISAID.align_log
@@ -316,6 +325,38 @@ task ImportGISAID {
     export PYTHONUNBUFFERED=true
     python3 /usr/src/app/aspen/workflows/import_gisaid/save.py       \
             --metadata-file ~{gisaid_metadata} 1>&2
+    echo done > gisaid_import_complete
+    >>>
+
+    output {
+        String gisaid_import_complete = read_string("gisaid_import_complete")
+    }
+
+    runtime {
+        docker: docker_image_id
+    }
+}
+
+task ImportLocations {
+    input {
+        String docker_image_id
+        String aws_region
+        String aspen_config_secret_name
+        String remote_dev_prefix
+        String gisaid_import_complete
+    }
+
+    command <<<
+    set -Eeuo pipefail
+    aws configure set region ~{aws_region}
+
+    export ASPEN_CONFIG_SECRET_NAME=~{aspen_config_secret_name}
+    if [ "~{remote_dev_prefix}" != "" ]; then
+        export REMOTE_DEV_PREFIX="~{remote_dev_prefix}"
+    fi
+
+    export PYTHONUNBUFFERED=true
+    python3 /usr/src/app/aspen/workflows/import_locations/save.py 1>&2
     >>>
 
     runtime {

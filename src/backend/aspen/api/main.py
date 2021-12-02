@@ -11,7 +11,7 @@ from aspen.api.auth import get_auth_user
 from aspen.api.error.http_exceptions import AspenException, exception_handler
 from aspen.api.middleware.session import SessionMiddleware
 from aspen.api.settings import Settings
-from aspen.api.views import auth, health, phylo_runs, samples, users
+from aspen.api.views import auth, health, locations, phylo_runs, samples, users
 
 
 def get_allowed_origins() -> List[str]:
@@ -84,6 +84,11 @@ def get_app() -> FastAPI:
     _app.include_router(
         samples.router,
         prefix="/v2/samples",
+        dependencies=[Depends(get_auth_user)],
+    )
+    _app.include_router(
+        locations.router,
+        prefix="/v2/locations",
         dependencies=[Depends(get_auth_user)],
     )
 
