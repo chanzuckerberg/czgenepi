@@ -43,7 +43,7 @@ export default function NavBarV2(): JSX.Element {
       </AnnouncementBanner>
       <HeaderMaxWidthContainer>
         <HeaderTopContainer>
-          <HeaderLogoContainer href={ROUTES.LANDINGV2}>
+          <HeaderLogoContainer href={ROUTES.HOMEPAGE}>
             <HeaderLogo />
           </HeaderLogoContainer>
           <HeaderTopLinks>

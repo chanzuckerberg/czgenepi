@@ -38,7 +38,7 @@ export default function Footer(): JSX.Element {
     return (
         <FooterContainer>
             <FooterTopContainer>
-                <FooterLogoContainer href={ROUTES.LANDINGV2}>
+                <FooterLogoContainer href={ROUTES.HOMEPAGE}>
                     <FooterLogo />
                 </FooterLogoContainer>
                 <FooterTopLinks>
