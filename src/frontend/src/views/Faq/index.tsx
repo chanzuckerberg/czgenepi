@@ -16,11 +16,11 @@ import {
 export default function Faq(): JSX.Element {
   const renderIntro = () => (
     <Title>
-      <H1>Chan Zuckerberg GEN EPI (formerly CZ Gen Epi) FAQs</H1>
+      <H1>Chan Zuckerberg GEN EPI (formerly Aspen) FAQs</H1>
     </Title>
   );
 
-  const renderHowToUseAspen = () => {
+  const renderHowToUseCZGenEpi = () => {
     return (
       <>
         <H2>How to use CZ GEN EPI</H2>
@@ -34,7 +34,7 @@ export default function Faq(): JSX.Element {
           and password.{" "}
           <B>
             Note: you can login to CZ GEN EPI using the same credentials that
-            you used to login to CZ Gen Epi and to the COVID Tracker app.
+            you used to login to Aspen and to the COVID Tracker app.
           </B>{" "}
           If you forget your password, click the “Forgot password?” link on the
           login screen. You will receive an email with instructions for
@@ -259,7 +259,7 @@ export default function Faq(): JSX.Element {
       <HeadAppTitle subTitle="FAQ" />
       <NarrowContainer>
         {renderIntro()}
-        {renderHowToUseAspen()}
+        {renderHowToUseCZGenEpi()}
         {renderCOVIDTrackerProgram()}
         {renderPrivacyAndDataSharing()}
       </NarrowContainer>

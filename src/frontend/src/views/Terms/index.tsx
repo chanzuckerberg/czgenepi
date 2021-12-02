@@ -18,7 +18,7 @@ export default function Terms(): JSX.Element {
   const renderIntro = () => (
     <>
       <Title>
-        <H1>Chan Zuckerberg GEN EPI (formerly Aspen) Terms of Use</H1>
+        <H1>Chan Zuckerberg GEN EPI (formerly CZ Gen Epi) Terms of Use</H1>
         <H4>Last Updated: December 6, 2021</H4>
       </Title>
       <P>

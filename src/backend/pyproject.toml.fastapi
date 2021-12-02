@@ -2,7 +2,7 @@
 name = "aspen"
 version = "0.1.0"
 description = ""
-authors = ["Aspen Team <info@chanzuckerberg.com>"]
+authors = ["CZ Gen Epi Team <info@chanzuckerberg.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
