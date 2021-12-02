@@ -13,18 +13,13 @@ import { DataSubview } from "../../common/components";
 import { EMPTY_OBJECT } from "../../common/constants/empty";
 import { VIEWNAME } from "../../common/constants/types";
 import { ROUTES } from "../../common/routes";
+import { PAGE_TITLES } from "../../common/titles";
 import { SampleRenderer, TreeRenderer } from "./cellRenderers";
 import { FilterPanelToggle } from "./components/FilterPanelToggle";
 import { SAMPLE_HEADERS, SAMPLE_SUBHEADERS, TREE_HEADERS } from "./headers";
 import style from "./index.module.scss";
 import { Container, FlexContainer } from "./style";
 import { TREE_TRANSFORMS } from "./transforms";
-
-// For use in the `<head>` title of page
-const PAGE_SUBTITLES: Record<string, string> = {
-  [ROUTES.DATA_SAMPLES]: "Samples",
-  [ROUTES.PHYLO_TREES]: "Phylogenetic Trees",
-};
 
 const Data: FunctionComponent = () => {
   useProtectedRoute();
@@ -142,7 +137,7 @@ const Data: FunctionComponent = () => {
     );
   });
 
-  const subTitle = PAGE_SUBTITLES[router.asPath];
+  const subTitle = PAGE_TITLES[router.asPath];
 
   const category =
     dataCategories.find((category) => category.to === router.asPath) ||
