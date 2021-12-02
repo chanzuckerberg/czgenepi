@@ -1,6 +1,6 @@
 import React from "react";
 import Image from "next/image";
-import UseCasesImg from "src/common/images/landingv2-use-cases.png";
+import UseCasesImg from "src/common/images/landingv2-gen-epi-use-cases.png";
 import UseCasesImgMobile from "src/common/images/landingv2-use-cases-mobile.png";
 import UseCasesExample from "./components/UseCasesExample";
 import {

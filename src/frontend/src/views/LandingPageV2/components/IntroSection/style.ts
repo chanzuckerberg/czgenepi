@@ -45,7 +45,7 @@ export const IntroHeading = styled.h2`
 `;
 
 export const IntroImage = styled.div`
-    margin-top: -130px;
+    margin-top: -90px;
     z-index: 4;
     height: auto;
 
@@ -54,7 +54,7 @@ export const IntroImage = styled.div`
     }
 
     @media (max-width: 768px) {
-        margin-top: -160px;
+        margin-top: -120px;
     }
 `;
 

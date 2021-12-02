@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Exclamation from "src/common/icons/IconExclamation.svg";
 import CloseIcon from "src/common/images/close-icon.svg";
-import HeaderLogo from "src/common/images/logo.svg";
+import HeaderLogo from "src/common/images/gen-epi-logo.svg";
 import { ROUTES } from "src/common/routes";
 import {
   AnnouncementBanner,
@@ -50,8 +50,8 @@ export default function NavBarV2(): JSX.Element {
             <TextLink href={ROUTES.RESOURCES} target="_blank">
               Resources
             </TextLink>
-            <ButtonLink href={ROUTES.LANDINGV2}>Request Access</ButtonLink>
-            <ButtonLink href={ROUTES.LANDINGV2}>Sign in</ButtonLink>
+            <ButtonLink href={ROUTES.REQUEST_ACCESS}>Request Access</ButtonLink>
+            <ButtonLink href={ROUTES.LOGIN}>Sign in</ButtonLink>
           </HeaderTopLinks>
           <MobileNavToggle
             onClick={toggleMobileNav}
@@ -102,7 +102,7 @@ export default function NavBarV2(): JSX.Element {
                 style={menuOpen ? { opacity: "1" } : { opacity: "0" }}
               ></MobileNavSeparator>
               <MobileNavLink
-                href={ROUTES.LANDINGV2}
+                href={ROUTES.LOGIN}
                 style={menuOpen ? { opacity: "1" } : { opacity: "0" }}
                 target="_blank"
                 rel="noreferrer"
@@ -111,7 +111,7 @@ export default function NavBarV2(): JSX.Element {
                 Sign In
               </MobileNavLink>
               <MobileNavLink
-                href={ROUTES.LANDINGV2}
+                href={ROUTES.REQUEST_ACCESS}
                 style={menuOpen ? { opacity: "1" } : { opacity: "0" }}
                 target="_blank"
                 rel="noreferrer"
