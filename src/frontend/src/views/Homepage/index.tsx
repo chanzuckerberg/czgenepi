@@ -5,8 +5,8 @@ import { API } from "src/common/api";
 import { HeadAppTitle } from "src/common/components";
 import ENV from "src/common/constants/ENV";
 import { ROUTES } from "src/common/routes";
-import { PAGE_TITLES } from "../../common/titles";
 import { useUserInfo } from "../../common/queries/auth";
+import { PAGE_TITLES } from "../../common/titles";
 import {
   ButtonContainer,
   Card,
