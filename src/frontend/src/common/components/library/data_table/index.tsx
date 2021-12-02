@@ -33,7 +33,7 @@ const ITEM_HEIGHT_PX = 60;
 
 const LOADING_STATE_ROW_COUNT = 10;
 
-const UNDEFINED_TEXT = "-";
+export const UNDEFINED_TEXT = "-";
 
 export function defaultCellRenderer({
   value,

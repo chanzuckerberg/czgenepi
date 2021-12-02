@@ -1,6 +1,5 @@
 /* eslint-disable react/display-name */
-
-const UNDEFINED_TEXT = "-";
+import { UNDEFINED_TEXT } from "../components/library/data_table";
 
 export function createTableCellRenderer(
   customRenderers: Record<string, CellRenderer>,
