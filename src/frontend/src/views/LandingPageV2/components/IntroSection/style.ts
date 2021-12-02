@@ -4,12 +4,16 @@ export const IntroContainer = styled.div`
     display: flex;
     justify-content: center;
     width: 100%;
-    padding: 0 22px;
     max-width: 1440px;
     margin: 0 auto;
 
+    @media (max-width: 1440px) {
+        padding: 0 22px 0 0;
+    }
+    
     @media (max-width: 768px) {
         flex-direction: column;
+        padding: 0 22px;
     }
 `;
 
