@@ -1,5 +1,5 @@
 import { Menu, MenuItem } from "czifui";
-import React, { useState } from "react";
+import React, { MouseEventHandler, useState } from "react";
 import { TooltipDescriptionText, TooltipHeaderText } from "../../style";
 import { IconButton } from "../IconButton";
 import { StyledMoreActionsIcon, StyledText, StyledTrashIcon } from "./style";
