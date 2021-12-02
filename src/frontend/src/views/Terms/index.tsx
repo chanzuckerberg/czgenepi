@@ -18,7 +18,7 @@ export default function Terms(): JSX.Element {
   const renderIntro = () => (
     <>
       <Title>
-        <H1>Chan Zuckerberg GEN EPI (formerly CZ Gen Epi) Terms of Use</H1>
+        <H1>Chan Zuckerberg GEN EPI (formerly Aspen) Terms of Use</H1>
         <H4>Last Updated: December 6, 2021</H4>
       </Title>
       <P>
@@ -216,7 +216,7 @@ export default function Terms(): JSX.Element {
     </>
   );
 
-  const renderAuthorizationToUseAspen = () => (
+  const renderAuthorizationToUseCZGenEpi = () => (
     <>
       <H2>
         <Number>2.</Number>Authorization To Use CZ GEN EPI
@@ -268,7 +268,7 @@ export default function Terms(): JSX.Element {
     </>
   );
 
-  const renderChangesToAspenOrTerms = () => (
+  const renderChangesToCZGenEpiOrTerms = () => (
     <>
       <H2>
         <Number>4.</Number>Changes To CZ GEN EPI Or These Terms
@@ -595,9 +595,9 @@ export default function Terms(): JSX.Element {
         {renderIntro()}
         {renderSummaryOfKeyThingsToKnow()}
         {renderUploadAndReportDataTerms()}
-        {renderAuthorizationToUseAspen()}
+        {renderAuthorizationToUseCZGenEpi()}
         {renderLimitationsOnUse()}
-        {renderChangesToAspenOrTerms()}
+        {renderChangesToCZGenEpiOrTerms()}
         {renderDisclaimerTerms()}
         {renderLimitationLiability()}
         {renderIndemnification()}
