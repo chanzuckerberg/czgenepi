@@ -20,7 +20,7 @@ export default function Faq(): JSX.Element {
     </Title>
   );
 
-  const renderHowToUseAspen = () => {
+  const renderHowToUseCZGenEpi = () => {
     return (
       <>
         <H2>How to use CZ GEN EPI</H2>
@@ -57,8 +57,8 @@ export default function Faq(): JSX.Element {
           <NewTabLink href="https://docs.google.com/document/d/1_iQgwl3hn_pjlZLX-n0alUbbhgSPZvpW_0620Hk_kB4/edit">
             Tree Building Guide
           </NewTabLink>{" "}
-          for complete information on the different tree types within Aspen and
-          how to build them depending on your use case.
+          for complete information on the different tree types within CZ Gen Epi
+          and how to build them depending on your use case.
         </P>
 
         <H3>How do I securely overlay my PHI / PII metadata?</H3>
@@ -259,7 +259,7 @@ export default function Faq(): JSX.Element {
       <HeadAppTitle subTitle="FAQ" />
       <NarrowContainer>
         {renderIntro()}
-        {renderHowToUseAspen()}
+        {renderHowToUseCZGenEpi()}
         {renderCOVIDTrackerProgram()}
         {renderPrivacyAndDataSharing()}
       </NarrowContainer>

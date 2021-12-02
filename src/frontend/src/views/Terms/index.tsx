@@ -216,7 +216,7 @@ export default function Terms(): JSX.Element {
     </>
   );
 
-  const renderAuthorizationToUseAspen = () => (
+  const renderAuthorizationToUseCZGenEpi = () => (
     <>
       <H2>
         <Number>2.</Number>Authorization To Use CZ GEN EPI
@@ -268,7 +268,7 @@ export default function Terms(): JSX.Element {
     </>
   );
 
-  const renderChangesToAspenOrTerms = () => (
+  const renderChangesToCZGenEpiOrTerms = () => (
     <>
       <H2>
         <Number>4.</Number>Changes To CZ GEN EPI Or These Terms
@@ -595,9 +595,9 @@ export default function Terms(): JSX.Element {
         {renderIntro()}
         {renderSummaryOfKeyThingsToKnow()}
         {renderUploadAndReportDataTerms()}
-        {renderAuthorizationToUseAspen()}
+        {renderAuthorizationToUseCZGenEpi()}
         {renderLimitationsOnUse()}
-        {renderChangesToAspenOrTerms()}
+        {renderChangesToCZGenEpiOrTerms()}
         {renderDisclaimerTerms()}
         {renderLimitationLiability()}
         {renderIndemnification()}
