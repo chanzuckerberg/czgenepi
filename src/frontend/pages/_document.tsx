@@ -43,19 +43,34 @@ export default class MyDocument extends Document {
           <meta name="theme-color" content={theme.palette.primary.main} />
           <link rel="preconnect" href="https://fonts.gstatic.com" />
 
-	  {/* Social media / SEO headers */}
-	  <meta name="description" content="CZ GEN EPI is a free, open-source, no-code genomic epidemiology analysis platform for local public health departments to discover, track and stop outbreaks." />
+          {/* Social media / SEO headers */}
+          <meta
+            name="description"
+            content="CZ GEN EPI is a free, open-source, no-code genomic epidemiology analysis platform for local public health departments to discover, track and stop outbreaks."
+          />
           <meta property="og:type" content="website" />
           <meta property="og:title" content="Chan Zuckerberg GEN EPI" />
           <meta property="og:url" content="https://czgenepi.org/" />
-          <meta property="og:description" content="A genomic epidemiology analysis platform for public health departments to discover, track and stop outbreaks" />
-          <meta property="og:image" content="https://czgenepi.org/cz-gen-epi-meta.png" />
+          <meta
+            property="og:description"
+            content="A genomic epidemiology analysis platform for public health departments to discover, track and stop outbreaks"
+          />
+          <meta
+            property="og:image"
+            content="https://czgenepi.org/cz-gen-epi-meta.png"
+          />
           <meta property="og:image:width" content="1200" />
           <meta property="og:image:height" content="630" />
           <meta name="twitter:card" content="summary_large_image" />
           <meta name="twitter:title" content="Chan Zuckerberg GEN EPI" />
-          <meta name="twitter:description" content="A genomic epidemiology analysis platform for public health departments to discover, track and stop outbreaks" />
-          <meta name="twitter:image" content="https://czgenepi.org/cz-gen-epi-meta.png" />
+          <meta
+            name="twitter:description"
+            content="A genomic epidemiology analysis platform for public health departments to discover, track and stop outbreaks"
+          />
+          <meta
+            name="twitter:image"
+            content="https://czgenepi.org/cz-gen-epi-meta.png"
+          />
 
           {/* TODO Make this load async to fix render blocking */}
           <link
