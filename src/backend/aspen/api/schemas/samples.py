@@ -43,7 +43,6 @@ class SampleUserResponseSchema(BaseResponse):
 
 class SampleGetterDict(GetterDict):
     def get(self, key: Any, default: Any = None) -> Any:
-        default_response = getattr(self._obj, key, default)
         indirect_attributes = {
             "sequencing_date": (
                 self._obj.uploaded_pathogen_genome.sequencing_date
@@ -69,6 +68,7 @@ class SampleGetterDict(GetterDict):
         }
         if key in indirect_attributes:
             return indirect_attributes[key]
+        default_response = getattr(self._obj, key, default)
         return default_response
 
 
