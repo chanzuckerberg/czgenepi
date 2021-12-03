@@ -3,7 +3,7 @@ import FormSubmitArrow from "src/common/images/form-submit-arrow.svg";
 import { EmailInput, HeroEmailForm, SubmitButton, SubmitIcon } from "./style";
 
 export default function EmailForm(): JSX.Element {
-  const [enteredEmail, setEnteredEmail] = useState("");
+  const [enteredEmail, setEnteredEmail] = useState<string>("");
 
   function submitEmail(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
