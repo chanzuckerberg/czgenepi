@@ -116,6 +116,7 @@ export const SAMPLE_SUBHEADERS: Record<string, SubHeader[]> = {
 
 export const TREE_HEADERS: Header[] = [
   {
+    align: "left",
     key: "name",
     sortKey: ["name"],
     text: "Tree Name",
@@ -126,7 +127,6 @@ export const TREE_HEADERS: Header[] = [
     },
   },
   {
-    align: "center",
     key: "startedDate",
     sortKey: ["startedDate"],
     // using startedDate instead of creationDate,
@@ -138,7 +138,6 @@ export const TREE_HEADERS: Header[] = [
     },
   },
   {
-    align: "center",
     key: "treeType",
     sortKey: ["treeType"],
     text: "Tree Type",

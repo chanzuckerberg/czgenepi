@@ -26,9 +26,17 @@ interface Sample extends BioinformaticsType {
   privateId: string;
   publicId: string;
   uploadDate: string;
+  uploadedBy: {
+    id: number;
+    name: string;
+  };
   collectionDate: string;
   collectionLocation: string;
   sequencingDate: string;
+  submittingGroup: {
+    id: number;
+    name: string;
+  };
   gisaid: GISAID;
   CZBFailedGenomeRecovery: boolean;
   lineage: Lineage;

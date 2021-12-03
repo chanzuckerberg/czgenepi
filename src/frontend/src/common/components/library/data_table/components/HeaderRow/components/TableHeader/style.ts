@@ -9,7 +9,7 @@ interface AlignProps extends Props {
 export const StyledTableHeader = styled("div")`
   ${(props: AlignProps) => {
     const { align, wide } = props;
-    const justify = align ?? "left";
+    const justify = align ?? "center";
 
     const iconSizes = getIconSizes(props);
     const spaces = getSpaces(props);

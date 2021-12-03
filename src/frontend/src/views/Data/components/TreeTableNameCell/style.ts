@@ -39,6 +39,7 @@ export const StyledRowContent = styled(RowContent, {
   shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
 })`
   flex: 2 0 40%;
+  justify-content: left;
 
   ${(props: ExtraProps) => {
     const { disabled } = props;

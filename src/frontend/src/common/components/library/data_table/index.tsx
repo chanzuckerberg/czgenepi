@@ -33,7 +33,7 @@ const ITEM_HEIGHT_PX = 60;
 
 const LOADING_STATE_ROW_COUNT = 10;
 
-const UNDEFINED_TEXT = "---";
+export const UNDEFINED_TEXT = "-";
 
 export function defaultCellRenderer({
   value,
@@ -61,14 +61,18 @@ function sortData(
 ): TableItem[] {
   return data.sort((a, b): number => {
     let order = 0;
+    // Typically, DPH doesn't want to interact with failed samples.
+    // As a result, we make extar efforts to keep failed samples at
+    // the bottom of the table. For samples that have failed, we set
+    // the upload date to null. Hence the special sort case here.
     if (sortKey[0] === "uploadDate") {
-      const uploadDateAIsNA = a["uploadDate"] === "N/A";
-      const uploadDateBIsNA = b["uploadDate"] === "N/A";
-      if (uploadDateAIsNA && uploadDateBIsNA) {
+      const uploadDateAIsNull = a["uploadDate"] === null;
+      const uploadDateBIsNull = b["uploadDate"] === null;
+      if (uploadDateAIsNull && uploadDateBIsNull) {
         order = 0;
-      } else if (uploadDateAIsNA && !uploadDateBIsNA) {
+      } else if (uploadDateAIsNull && !uploadDateBIsNull) {
         order = -1;
-      } else if (uploadDateBIsNA && !uploadDateAIsNA) {
+      } else if (uploadDateBIsNull && !uploadDateAIsNull) {
         order = 1;
       } else {
         order = defaultSorting(a, b, sortKey);
