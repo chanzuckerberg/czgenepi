@@ -2,7 +2,6 @@ import Papa from "papaparse";
 import {
   HEADERS_TO_METADATA_KEYS,
   METADATA_KEYS_TO_HEADERS,
-  EMPTY_PARSED_METADATA,
 } from "../../../common/constants";
 import {
   ERROR_CODE,

@@ -34,16 +34,6 @@ export const METADATA_KEYS_TO_API_KEYS: Record<keyof Metadata, string> = {
   submittedToGisaid: "submitted_to_gisaid",
 };
 
-export const EMPTY_PARSED_METADATA: ParsedMetadata = {
-  collectionDate: "",
-  locationString: "",
-  islAccessionNumber: "",
-  keepPrivate: false,
-  publicId: "",
-  sequencingDate: "",
-  submittedToGisaid: false,
-};
-
 export const EMPTY_METADATA: Metadata = {
   collectionDate: "",
   collectionLocation: undefined,

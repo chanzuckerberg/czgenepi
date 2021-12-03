@@ -8,6 +8,7 @@ import {
 } from "src/components/DateField/constants";
 import {
   Metadata,
+  ParsedMetadata,
   NamedGisaidLocation,
 } from "src/views/Upload/components/common/types";
 import * as yup from "yup";
@@ -55,7 +56,7 @@ interface Props {
   isFirstRow: boolean;
   handleRowValidation: (id: string, isValid: boolean) => void;
   isTouched: boolean;
-  warnings?: Set<keyof Metadata>;
+  warnings?: Set<keyof ParsedMetadata>;
   locations: NamedGisaidLocation[];
 }
 
