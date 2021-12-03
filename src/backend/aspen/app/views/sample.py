@@ -63,7 +63,7 @@ SAMPLES_POST_REQUIRED_FIELDS = [
     "private",
     "private_identifier",
     "collection_date",
-    "location_id",
+    "location",
     # following fields from PathogenGenome
     "sequence",
 ]
@@ -74,7 +74,7 @@ SAMPLES_POST_OPTIONAL_FIELDS = [
     "sample_collector_contact_email",
     "sample_collector_contact_address",
     "authors",
-    "location",
+    "location_id",
     "division",
     "country",
     "region",
