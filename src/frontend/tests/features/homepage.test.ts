@@ -8,7 +8,7 @@ describe("Homepage", () => {
     await expect(page).toHaveSelector(getTestID("navbar"));
     await expect(page).toHaveSelector(getTestID("navbar-sign-in-link"));
     await expect(page).toHaveSelector(getTestID("logo"));
-    await expect(page).toHaveSelector(getText("Welcome to Aspen!"));
+    await expect(page).toHaveSelector(getText("Welcome to CZ Gen Epi!"));
     await expect(page).toHaveSelector(getTestID("footer"));
   });
 });

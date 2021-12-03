@@ -6,6 +6,7 @@ import { HeadAppTitle } from "src/common/components";
 import ENV from "src/common/constants/ENV";
 import { ROUTES } from "src/common/routes";
 import { useUserInfo } from "../../common/queries/auth";
+import { PAGE_TITLES } from "../../common/titles";
 import {
   ButtonContainer,
   Card,
@@ -26,6 +27,7 @@ export default function Homepage(): JSX.Element {
   const { data: userInfo, isLoading } = useUserInfo();
   const [isRedirecting, setIsRedirecting] = useState(false);
   const router = useRouter();
+  const subTitle = PAGE_TITLES[router.asPath];
 
   /**
    * (thuang): `useEffect` only runs in the browser,
@@ -45,7 +47,7 @@ export default function Homepage(): JSX.Element {
 
   return (
     <>
-      <HeadAppTitle />
+      <HeadAppTitle subTitle={subTitle} />
       <Container>
         <CardContainer>
           <Card>
