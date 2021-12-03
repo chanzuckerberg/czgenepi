@@ -1,18 +1,15 @@
-import Footer from "./components/Footer";
 import Head from "next/head";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import { ROUTES } from "src/common/routes";
+import { useUserInfo } from "../../common/queries/auth";
+import Footer from "./components/Footer";
 import Hero from "./components/Hero";
 import IntroSection from "./components/IntroSection";
 import PartnersSection from "./components/PartnersSection";
 import QuoteSlider from "./components/QuoteSlider";
 import UseCases from "./components/UseCases";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-import { ROUTES } from "src/common/routes";
-import { useUserInfo } from "../../common/queries/auth";
-import {
-  Container,
-  LoadingText
-} from "./style";
+import { Container, LoadingText } from "./style";
 
 export default function Homepage(): JSX.Element {
   const { data: userInfo, isLoading } = useUserInfo();

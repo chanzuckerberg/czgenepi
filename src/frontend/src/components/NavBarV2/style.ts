@@ -69,6 +69,9 @@ export const ButtonLink = styled.a`
 export const HeaderTopLinks = styled.div`
   position: relative;
   z-index: 2;
+  span {
+    font-size: 14px;
+  }
 
   @media (max-width: 768px) {
     display: none;
@@ -90,12 +93,15 @@ export const HeaderContainer = styled.div`
 
 export const HeaderLogoContainer = styled.a`
   width: 100%;
-  max-width: 164px;
+  max-width: fit-content;
   position: relative;
   z-index: 2;
+  display: flex;
+  align-items: center;
 
   @media (max-width: 768px) {
-    max-width: 100px;
+    flex-direction: column;
+    align-items: flex-start;
   }
 `;
 
@@ -168,6 +174,17 @@ export const MobileNavTray = styled.div`
   background-color: #ffffff;
   z-index: 10;
   transition: all 0.4s;
+`;
+
+export const OrgSplash = styled.span`
+  font-size: 16px;
+  font-weight: bold;
+
+  @media (min-width: 769px) {
+    margin-left: 1em;
+    padding-left: 1em;
+    border-left: 1px solid white;
+  }
 `;
 
 export const TextLink = styled.a`
