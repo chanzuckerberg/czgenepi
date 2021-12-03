@@ -19,7 +19,7 @@ export const HeroEmailForm = styled.form`
   }
 
   @-moz-document url-prefix() {
-      filter: initial;
+    filter: initial;
   }
 `;
 
