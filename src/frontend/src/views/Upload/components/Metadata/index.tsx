@@ -7,13 +7,13 @@ import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { getLocations, LocationsResponse } from "src/common/queries/locations";
 import { ROUTES } from "src/common/routes";
+import { EMPTY_METADATA } from "src/views/Upload/components/common/constants";
 import {
+  NamedGisaidLocation,
   Props,
   SampleIdToMetadata,
-  NamedGisaidLocation,
   WARNING_CODE,
 } from "src/views/Upload/components/common/types";
-import { EMPTY_METADATA } from "src/views/Upload/components/common/constants";
 import Progress from "../common/Progress";
 import {
   ButtonWrapper,
@@ -96,11 +96,10 @@ export default function Metadata({
     const result: LocationsResponse = await getLocations();
     const namedLocations: NamedGisaidLocation[] = result.locations.map(
       (location) => {
-        const namedLocation = {
+        return {
           name: stringifyLocation(location),
           ...location,
         };
-        return namedLocation;
       }
     );
     setLocations(namedLocations);

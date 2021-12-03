@@ -2,12 +2,12 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { ROUTES } from "src/common/routes";
 import { useProtectedRoute } from "../../common/queries/auth";
+import { EMPTY_METADATA } from "./components/common/constants";
 import {
   Props,
   SampleIdToMetadata,
   Samples as ISamples,
 } from "./components/common/types";
-import { EMPTY_METADATA } from "./components/common/constants";
 import Metadata from "./components/Metadata";
 import Review from "./components/Review";
 import Samples from "./components/Samples";

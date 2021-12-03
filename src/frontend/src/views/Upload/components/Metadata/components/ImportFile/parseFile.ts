@@ -5,9 +5,9 @@ import {
 } from "../../../common/constants";
 import {
   ERROR_CODE,
+  ParsedMetadata,
   SampleIdToParsedMetadata,
   WARNING_CODE,
-  ParsedMetadata,
 } from "../../../common/types";
 
 export type SampleIdToWarningMessages = Record<

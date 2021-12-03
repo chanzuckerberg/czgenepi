@@ -8,8 +8,8 @@ import {
 } from "src/components/DateField/constants";
 import {
   Metadata,
-  ParsedMetadata,
   NamedGisaidLocation,
+  ParsedMetadata,
 } from "src/views/Upload/components/common/types";
 import * as yup from "yup";
 import FreeTextField from "./components/FreeTextField";

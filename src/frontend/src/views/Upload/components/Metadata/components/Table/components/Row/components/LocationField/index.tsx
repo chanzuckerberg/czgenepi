@@ -44,7 +44,7 @@ export default function LocationField({
     state: AutocompleteState
   ): NamedGisaidLocation[] => {
     const query = state.inputValue;
-    let results: NamedGisaidLocation[] = [];
+    const results: NamedGisaidLocation[] = [];
     if (value) {
       results.push(value);
     }
