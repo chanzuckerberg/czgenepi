@@ -59,15 +59,9 @@ export default function LocationField({
     // alphabetical sort
     // this ensures partial locations (i.e. region, country and divison
     // but no location) end up on top.
-    const sortedLocationOptions = filteredLocationOptions.sort((a, b) => {
-      if (a.name < b.name) {
-        return -1;
-      }
-      if (a.name > b.name) {
-        return 1;
-      }
-      return 0;
-    });
+    const sortedLocationOptions = filteredLocationOptions.sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
     return results.concat(sortedLocationOptions.slice(0, 99));
   };
 
