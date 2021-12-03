@@ -35,17 +35,6 @@ export default function Footer(): JSX.Element {
     };
   }, []);
 
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src =
-      "//app.pageproofer.com/embed/f3b4690e-1382-5daa-a36d-03117a611c6d";
-    script.async = true;
-    document.body.appendChild(script);
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
-
   return (
     <FooterContainer>
       <FooterTopContainer>

@@ -7,12 +7,12 @@ import { QuoteSliderContainer } from "./style";
 
 export default function QuoteSlider(): JSX.Element {
   const settings = {
+    arrows: false,
     dots: true,
     infinite: true,
-    speed: 800,
-    slidesToShow: 1,
     slidesToScroll: 1,
-    arrows: false,
+    slidesToShow: 1,
+    speed: 800,
   };
 
   return (
