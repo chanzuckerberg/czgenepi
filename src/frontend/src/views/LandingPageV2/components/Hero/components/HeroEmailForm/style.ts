@@ -17,6 +17,10 @@ export const HeroEmailForm = styled.form`
     flex-direction: column;
     align-items: center;
   }
+
+  @-moz-document url-prefix() {
+      filter: initial;
+  }
 `;
 
 export const EmailInput = styled.input`
