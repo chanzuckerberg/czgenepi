@@ -21,9 +21,8 @@ export const CZContainer = styled.div`
 `;
 
 export const CZLogoContainer = styled.div`
-        display: flex;
-        align-items: center;
-    }
+  display: flex;
+  align-items: center;
 `;
 
 export const CZILogo = styled.a`

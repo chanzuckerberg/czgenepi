@@ -31,7 +31,7 @@
       "expect-playwright",
       "jest"
     ],
-    "incremental": false,
+    "incremental": false
   },
   "exclude": [
     "node_modules",
