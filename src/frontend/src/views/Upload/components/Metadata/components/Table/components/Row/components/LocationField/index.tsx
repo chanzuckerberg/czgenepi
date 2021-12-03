@@ -85,7 +85,7 @@ export default function LocationField({
         value={value}
         onChange={handleLocationChange}
         options={locations}
-        search={true}
+        search
         MenuSelectProps={{
           filterOptions: filter,
         }}

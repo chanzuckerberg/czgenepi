@@ -33,11 +33,6 @@ const validationSchema = yup.object({
   collectionLocation: yup
     .object({
       id: yup.number().required(),
-      // region: yup.string(),
-      // country: yup.string(),
-      // division: yup.string(),
-      // location: yup.string(),
-      // name: yup.string(),
     })
     .required("Required"),
   publicId: yup.string().when("submittedToGisaid", {
