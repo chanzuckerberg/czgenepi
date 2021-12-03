@@ -9,6 +9,10 @@ export const HeroEmailForm = styled.form`
     border-radius: 999px;
     display: flex;
 
+    @-moz-document url-prefix() {
+        filter: initial;
+    }
+
     @media (max-width: 768px) {
       flex-direction: column;
       align-items: center;
