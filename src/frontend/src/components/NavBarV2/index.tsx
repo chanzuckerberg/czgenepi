@@ -28,8 +28,6 @@ import {
   TextLink,
 } from "./style";
 
-const { API_URL } = ENV;
-
 export default function NavBarV2(): JSX.Element {
   const [menuOpen, setMenuOpen] = useState(false);
 
