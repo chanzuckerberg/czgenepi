@@ -123,7 +123,7 @@ export const FooterButtonContainer = styled.div`
 
     return `
       &> a {
-        color: ${colors?.gray[600]}
+        color: ${colors?.gray[600]};
       }
     `;
   }}
