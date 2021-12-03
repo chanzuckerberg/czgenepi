@@ -6,7 +6,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import { formatTZDate } from "src/common/utils/timeUtils";
+import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { DATE_REGEX } from "../DateField/constants";
 import { CollectionDateFilter } from "./components/CollectionDateFilter";
 import { GenomeRecoveryFilter } from "./components/GenomeRecoveryFilter";
@@ -84,7 +84,7 @@ const DATA_FILTER_INIT = {
       end: undefined,
       start: undefined,
     },
-    transform: (d: Sample) => formatTZDate(d.uploadDate),
+    transform: (d: Sample) => datetimeWithTzToLocalDate(d.uploadDate),
     type: TypeFilterType.Date,
   },
 };

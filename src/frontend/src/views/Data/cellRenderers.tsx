@@ -9,7 +9,7 @@ import { RowContent } from "src/common/components/library/data_table/style";
 import { TREE_STATUS } from "src/common/constants/types";
 import SampleIcon from "src/common/icons/Sample.svg";
 import { createTableCellRenderer, stringGuard } from "src/common/utils";
-import { formatTZDate } from "src/common/utils/timeUtils";
+import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import TreeTableDownloadMenu from "src/components/TreeTableDownloadMenu";
 import { Lineage, LineageTooltip } from "./components/LineageTooltip";
 import TreeTableNameCell from "./components/TreeTableNameCell";
@@ -137,7 +137,7 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
   },
 
   uploadDate: ({ value }): JSX.Element => {
-    return <RowContent>{formatTZDate(value)}</RowContent>;
+    return <RowContent>{datetimeWithTzToLocalDate(value)}</RowContent>;
   },
 };
 

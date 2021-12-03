@@ -61,7 +61,10 @@ function sortData(
 ): TableItem[] {
   return data.sort((a, b): number => {
     let order = 0;
-    // Keep failed samples at the bottom of the table
+    // Typically, DPH doesn't want to interact with failed samples.
+    // As a result, we make extar efforts to keep failed samples at
+    // the bottom of the table. For samples that have failed, we set
+    // the upload date to null. Hence the special sort case here.
     if (sortKey[0] === "uploadDate") {
       const uploadDateAIsNull = a["uploadDate"] === null;
       const uploadDateBIsNull = b["uploadDate"] === null;
