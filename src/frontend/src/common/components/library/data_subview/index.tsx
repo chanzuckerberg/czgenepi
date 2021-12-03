@@ -10,10 +10,12 @@ import { Input } from "semantic-ui-react";
 import { DataTable } from "src/common/components";
 import { VIEWNAME } from "src/common/constants/types";
 import { ROUTES } from "src/common/routes";
+import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import Notification from "src/components/Notification";
 import { CreateNSTreeModal } from "./components/CreateNSTreeModal";
 import DownloadModal from "./components/DownloadModal";
 import { IconButton } from "./components/IconButton";
+import { MoreActionsMenu } from "./components/MoreActionMenu";
 import { TreeCreateHelpLink } from "./components/TreeCreateHelpLink";
 import { TreeSelectionMenu } from "./components/TreeSelectionMenu";
 import { UsherTreeFlow } from "./components/UsherTreeFlow";
@@ -266,9 +268,9 @@ const DataSubview: FunctionComponent<Props> = ({
   const hasTooManySamples = numCheckedSamples > 2000;
 
   const render = (tableData?: TableItem[]) => {
-    let downloadButton: JSX.Element | null = null;
+    let sampleActions: JSX.Element | null = null;
     if (viewName === VIEWNAME.SAMPLES && tableData !== undefined) {
-      downloadButton = (
+      sampleActions = (
         <DownloadWrapper>
           <StyledChip isRounded label={checkedSamples.length} status="info" />
           <StyledDiv>Selected </StyledDiv>
@@ -287,6 +289,9 @@ const DataSubview: FunctionComponent<Props> = ({
             tooltipTextDisabled={DOWNLOAD_TOOLTIP_TEXT_DISABLED}
             tooltipTextEnabled={DOWNLOAD_TOOLTIP_TEXT_ENABLED}
           />
+          {usesFeatureFlag(FEATURE_FLAGS.crudV0) && (
+            <MoreActionsMenu disabled={!hasCheckedSamples} />
+          )}
         </DownloadWrapper>
       );
     }
@@ -336,7 +341,7 @@ const DataSubview: FunctionComponent<Props> = ({
             </div>
             <div>
               {viewName === VIEWNAME.TREES && <TreeCreateHelpLink />}
-              {downloadButton}
+              {sampleActions}
               <Notification
                 buttonOnClick={handleDismissDownloadErrorClick}
                 buttonText="DISMISS"
