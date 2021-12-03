@@ -9,17 +9,20 @@ import { RowContent } from "src/common/components/library/data_table/style";
 import { TREE_STATUS } from "src/common/constants/types";
 import SampleIcon from "src/common/icons/Sample.svg";
 import { createTableCellRenderer, stringGuard } from "src/common/utils";
+import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import TreeTableDownloadMenu from "src/components/TreeTableDownloadMenu";
 import { Lineage, LineageTooltip } from "./components/LineageTooltip";
 import TreeTableNameCell from "./components/TreeTableNameCell";
 import { TreeTypeTooltip } from "./components/TreeTypeTooltip";
 import style from "./index.module.scss";
 import {
+  CenteredFlexContainer,
   GISAIDCell,
   PrivacyIcon,
   PrivateIdValueWrapper,
   SampleIconWrapper,
   StyledChip,
+  StyledUploaderName,
   Subtext,
   UnderlinedCell,
   UnderlinedRowContent,
@@ -81,10 +84,12 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
     value: string;
     item: Sample;
   }): JSX.Element => {
-    const { CZBFailedGenomeRecovery, private: isPrivate } = item;
+    const { CZBFailedGenomeRecovery, private: isPrivate, uploadedBy } = item;
     const label = CZBFailedGenomeRecovery
       ? LABEL_STATUS.error
       : LABEL_STATUS.success;
+
+    const { name } = uploadedBy ?? {};
 
     return (
       <RowContent>
@@ -100,32 +105,24 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
             </PrivacyIcon>
           </SampleIconWrapper>
           <PrivateIdValueWrapper>
-            {value}
-            <StyledChip
-              data-test-id="sample-status"
-              size="small"
-              label={label.label}
-              status={label.status}
-            />
+            <CenteredFlexContainer>
+              <span>{value}</span>
+              <StyledChip
+                data-test-id="sample-status"
+                size="small"
+                label={label.label}
+                status={label.status}
+              />
+            </CenteredFlexContainer>
+            <StyledUploaderName>{name}</StyledUploaderName>
           </PrivateIdValueWrapper>
         </div>
       </RowContent>
     );
   },
 
-  // Preferably, we would just use defaultCellRenderer for this column, but we want
-  // to intercept its value and change it out in some cases before rendering.
-  sequencingDate: ({ header, value }): JSX.Element => {
-    let displayValue = value;
-    if (value === "N/A") {
-      displayValue = "-";
-    }
-    // defaultCellRenderer only uses `value` and `header` but its input type asks
-    // for more than that, so just forcing typescript to be cool.
-    return defaultCellRenderer({
-      header,
-      value: displayValue,
-    } as CustomTableRenderProps);
+  uploadDate: ({ value }): JSX.Element => {
+    return <RowContent>{datetimeWithTzToLocalDate(value)}</RowContent>;
   },
 };
 

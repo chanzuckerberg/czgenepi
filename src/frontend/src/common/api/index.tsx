@@ -3,7 +3,7 @@ import { jsonToType } from "src/common/utils";
 
 export enum API {
   USER_INFO = "/api/usergroup",
-  SAMPLES = "/api/samples",
+  SAMPLES = "/v2/samples/",
   LOG_IN = "/login",
   LOG_OUT = "/logout",
   PHYLO_TREES = "/api/phylo_trees",
@@ -99,7 +99,9 @@ const SAMPLE_MAP = new Map<string, keyof Sample>([
   ["private_identifier", "privateId"],
   ["public_identifier", "publicId"],
   ["upload_date", "uploadDate"],
+  ["uploaded_by", "uploadedBy"],
   ["sequencing_date", "sequencingDate"],
+  ["submitting_group", "submittingGroup"],
   ["czb_failed_genome_recovery", "CZBFailedGenomeRecovery"],
 ]);
 
