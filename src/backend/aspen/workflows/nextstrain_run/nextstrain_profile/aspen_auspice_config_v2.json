@@ -5,6 +5,11 @@
     {"name": "Chan Zuckerberg Initiative",
      "url": "https://chanzuckerberg.com"}
   ],
+  "data_provenance": [
+    {
+      "name": "GISAID"
+    }
+  ],
   "colorings": [
     {
       "key": "emerging_lineage",
