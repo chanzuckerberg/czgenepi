@@ -11,7 +11,7 @@ builds:
     country: USA
     division: {division}
     location: {location}
-    region: North America
+    region: global
     subsampling_scheme: group_plus_context
     title: '{location}, {division} and related contextual samples for overview'
 
