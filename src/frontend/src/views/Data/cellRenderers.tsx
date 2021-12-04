@@ -9,6 +9,7 @@ import { RowContent } from "src/common/components/library/data_table/style";
 import { TREE_STATUS } from "src/common/constants/types";
 import SampleIcon from "src/common/icons/Sample.svg";
 import { createTableCellRenderer, stringGuard } from "src/common/utils";
+import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import TreeTableDownloadMenu from "src/components/TreeTableDownloadMenu";
 import { Lineage, LineageTooltip } from "./components/LineageTooltip";
@@ -114,7 +115,9 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
                 status={label.status}
               />
             </CenteredFlexContainer>
-            <StyledUploaderName>{name}</StyledUploaderName>
+            {usesFeatureFlag(FEATURE_FLAGS.crudV0) && (
+              <StyledUploaderName>{name}</StyledUploaderName>
+            )}
           </PrivateIdValueWrapper>
         </div>
       </RowContent>
