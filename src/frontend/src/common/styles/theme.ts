@@ -1,4 +1,4 @@
-import { createMuiTheme } from "@material-ui/core/styles";
+import { createTheme } from "@material-ui/core/styles";
 import { defaultAppTheme, makeThemeOptions } from "czifui";
 
 const primaryColors = {
@@ -22,4 +22,4 @@ const appTheme = { ...defaultAppTheme };
 appTheme.colors.primary = primaryColors;
 appTheme.colors.info = infoColors;
 
-export const theme = createMuiTheme(makeThemeOptions(appTheme));
+export const theme = createTheme(makeThemeOptions(appTheme));
