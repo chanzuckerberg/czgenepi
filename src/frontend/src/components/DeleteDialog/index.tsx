@@ -1,8 +1,10 @@
 import React from "react";
-import ConfirmDialog from "src/components/ConfirmDialog";
+import ConfirmDialog, {
+  ConfirmDialogProps,
+} from "src/components/ConfirmDialog";
 import { StyledButton, StyledSpan } from "./style";
 
-interface Props extends ConfirmDialogProps {
+interface Props extends Omit<ConfirmDialogProps, "onConfirm"> {
   onDelete(): void;
 }
 
@@ -23,10 +25,10 @@ const DeleteDialog = ({
 
   return (
     <ConfirmDialog
+      {...props}
       customConfirmButton={deleteButton}
       onConfirm={onDelete}
       title={styledTitle}
-      {...props}
     />
   );
 };
