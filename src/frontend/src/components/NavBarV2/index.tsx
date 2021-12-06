@@ -93,7 +93,7 @@ export default function NavBarV2(): JSX.Element {
             <Exclamation />
             <AnnouncementTextBold>Looking for Aspen?</AnnouncementTextBold>
             &nbsp;You&apos;re in the right spot. As of December, our new name is
-            CZ GEN EPI.
+            Chan Zuckerberg GEN EPI.
           </AnnouncementText>
         </AnnouncementBanner>
       )}
