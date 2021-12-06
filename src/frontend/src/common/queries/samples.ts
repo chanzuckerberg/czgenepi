@@ -137,3 +137,51 @@ export async function createSamples({
 
   throw Error(`${response.statusText}: ${await response.text()}`);
 }
+
+// * Proceed with caution, you are entering the DANGER ZONE!
+// * Code below this line is destructive!
+interface DeleteSamplesPayload {
+  ids: string[];
+}
+
+export async function deleteSamples({
+  samplesToDelete,
+}: SampleDeleteRequestType): Promise<SampleDeleteResponseType> {
+  const payload: DeleteSamplesPayload = {
+    ids: samplesToDelete,
+  };
+
+  const response = await fetch(API_URL + API.SAMPLES, {
+    ...DEFAULT_DELETE_OPTIONS,
+    body: JSON.stringify(payload),
+  });
+
+  if (response.ok) {
+    const tmp = await response.json();
+    console.log(tmp);
+    return tmp;
+  }
+
+  throw Error(`${response.statusText}: ${await response.text()}`);
+}
+
+interface SampleDeleteRequestType {
+  samplesToDelete: string[];
+}
+
+export interface SampleDeleteResponseType {
+  missing_sample_ids: string[];
+}
+
+type SampleDeleteCallbacks = MutationCallbacks<SampleDeleteResponseType>;
+
+export function useDeleteSamples(
+  callbacks: SampleDeleteCallbacks
+): UseMutationResult<
+  SampleDeleteResponseType,
+  unknown,
+  SampleDeleteRequestType,
+  unknown
+> {
+  return useMutation(deleteSamples, callbacks);
+}

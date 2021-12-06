@@ -1,5 +1,5 @@
 import React from "react";
-import { noop } from "src/common/constants/empty";
+import { useDeleteSamples } from "src/common/queries/samples";
 import { pluralize } from "src/common/utils/strUtils";
 import { DeleteDialog } from "src/components/DeleteDialog";
 
@@ -29,7 +29,7 @@ const DeleteSamplesConfirmationModal = ({
     <DeleteDialog
       open={open}
       onClose={onClose}
-      onDelete={noop}
+      onDelete={onDelete}
       title={title}
       content={content}
     />
