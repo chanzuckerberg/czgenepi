@@ -1,4 +1,5 @@
 import React from "react";
+import { noop } from "src/common/constants/empty";
 import { useDeleteSamples } from "src/common/queries/samples";
 import { pluralize } from "src/common/utils/strUtils";
 import { DeleteDialog } from "src/components/DeleteDialog";
@@ -14,6 +15,22 @@ const DeleteSamplesConfirmationModal = ({
   onClose,
   open,
 }: Props): JSX.Element | null => {
+  // TODO (mlila): update these callbacks to display notifications
+  // TODO          as part of #173849
+  const deleteSampleMutation = useDeleteSamples({
+    onSuccess: noop,
+    onError: noop,
+  });
+
+  const onDelete = () => {
+    deleteSampleMutation.mutate({
+      // TODO (mlila): this should be an array of db unique ids
+      // TODO          this requires a refactor
+      samplesToDelete: checkedSamples,
+    });
+    onClose();
+  };
+
   if (!open) return null;
 
   const numSamples = checkedSamples.length;

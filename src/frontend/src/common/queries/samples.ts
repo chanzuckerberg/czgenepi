@@ -156,11 +156,7 @@ export async function deleteSamples({
     body: JSON.stringify(payload),
   });
 
-  if (response.ok) {
-    const tmp = await response.json();
-    console.log(tmp);
-    return tmp;
-  }
+  if (response.ok) return await response.json();
 
   throw Error(`${response.statusText}: ${await response.text()}`);
 }
