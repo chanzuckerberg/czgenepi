@@ -4,7 +4,7 @@ import {
   SampleIdToMetadata,
   Samples,
 } from "src/views/Upload/components/common/types";
-import { API, DEFAULT_POST_OPTIONS } from "../api";
+import { API, DEFAULT_DELETE_OPTIONS, DEFAULT_POST_OPTIONS } from "../api";
 import { API_URL } from "../constants/ENV";
 import { MutationCallbacks } from "./types";
 
