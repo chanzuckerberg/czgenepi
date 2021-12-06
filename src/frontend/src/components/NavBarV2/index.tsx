@@ -87,14 +87,16 @@ export default function NavBarV2(): JSX.Element {
 
   return (
     <HeaderContainer>
-      <AnnouncementBanner>
-        <AnnouncementText>
-          <Exclamation />
-          <AnnouncementTextBold>Looking for Aspen?</AnnouncementTextBold>
-          &nbsp;You&apos;re in the right spot. As of December, our new name is
-          CZ GEN EPI.
-        </AnnouncementText>
-      </AnnouncementBanner>
+      {!user && (
+        <AnnouncementBanner>
+          <AnnouncementText>
+            <Exclamation />
+            <AnnouncementTextBold>Looking for Aspen?</AnnouncementTextBold>
+            &nbsp;You&apos;re in the right spot. As of December, our new name is
+            Chan Zuckerberg GEN EPI.
+          </AnnouncementText>
+        </AnnouncementBanner>
+      )}
       <HeaderMaxWidthContainer>
         <HeaderTopContainer>
           <HeaderLogoContainer href={data ? ROUTES.DATA : ROUTES.HOMEPAGE}>
