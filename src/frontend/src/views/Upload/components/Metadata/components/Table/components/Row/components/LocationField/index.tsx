@@ -23,6 +23,8 @@ interface AutocompleteState {
   inputValue: string;
 }
 
+type ScienceDesignStage = "default" | "userInput" | undefined;
+
 export default function LocationField({
   fieldKey,
   formik,
@@ -72,6 +74,11 @@ export default function LocationField({
     }
   };
 
+  let sdsStage: ScienceDesignStage = "default";
+  if (value) {
+    sdsStage = "userInput";
+  }
+
   return (
     <StyledDiv onBlur={handleBlur}>
       <Dropdown
@@ -82,8 +89,9 @@ export default function LocationField({
         search
         MenuSelectProps={{
           filterOptions: filter,
+          sdsStage: "userInput",
         }}
-        InputDropdownProps={{ sdsStyle: "square", sdsStage: "default" }}
+        InputDropdownProps={{ sdsStyle: "square", sdsStage: sdsStage }}
       />
       <FormHelperText>
         {errorMessage ||

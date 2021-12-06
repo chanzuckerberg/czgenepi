@@ -107,7 +107,7 @@ export default function Metadata({
 
   useEffect(() => {
     loadLocations();
-  }, [samples]);
+  }, []);
 
   function handleMetadata(result: ParseResult) {
     const { data: sampleIdToParsedMetadata, warningMessages } = result;
