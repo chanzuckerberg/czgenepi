@@ -55,6 +55,7 @@ const MoreActionsMenu = ({ disabled }: Props): JSX.Element => {
         keepMounted
         open={Boolean(anchorEl)}
         onClose={handleClose}
+        getContentAnchorEl={null}
       >
         <MenuItem>
           <StyledTrashIcon />

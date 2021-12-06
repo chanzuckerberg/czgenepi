@@ -21,7 +21,7 @@ export const StyledDialogActions = styled(DialogActions, {
     return `
       padding: 0 ${spaces?.xxl}px ${spaces?.xxl}px ${spaces?.xxl}px;
 
-      &.MuiDialogActions-spacing > :not(:first-child) {
+      &.MuiDialogActions-spacing > :not(:first-of-type) {
         margin-left: ${spaces?.m}px;
       }
     `;
