@@ -28,7 +28,7 @@ import {
   TextLink,
 } from "./style";
 
-export default function NavBarV2(): JSX.Element {
+export default function NavBarLanding(): JSX.Element {
   const [menuOpen, setMenuOpen] = useState(false);
 
   function toggleMobileNav() {
@@ -41,7 +41,7 @@ export default function NavBarV2(): JSX.Element {
 
   const group = data?.group;
 
-  const orgElements = <React.Fragment>{group?.name}</React.Fragment>;
+  const orgElements = <div>{group?.name}</div>;
 
   function hasOrg(): JSX.Element | null {
     if (group === undefined) {
