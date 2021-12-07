@@ -98,7 +98,9 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
       : LABEL_STATUS.success;
 
     const displayName =
-      submittingGroup?.name === CZ_BIOHUB_GROUP ? "CZ Biohub" : uploadedBy.name;
+      submittingGroup?.name === CZ_BIOHUB_GROUP
+        ? "CZ Biohub"
+        : uploadedBy?.name;
 
     return (
       <RowContent>
