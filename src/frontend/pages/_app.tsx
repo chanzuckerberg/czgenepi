@@ -9,13 +9,12 @@ import style from "src/App.module.scss";
 import { theme } from "src/common/styles/theme";
 import { setFeatureFlagsFromQueryParams } from "src/common/utils/featureFlags";
 import AcknowledgePolicyChanges from "src/components/AcknowledgePolicyChanges";
-import { useUserInfo } from "src/common/queries/auth";
-import NavBarLanding from "src/components/NavBarV2";
 import NavBarLoggedIn from "src/components/NavBar";
+import NavBarLanding from "src/components/NavBarV2";
+import {useUserInfo} from "src/common/queries/auth";
 
 const queryClient = new QueryClient();
 setFeatureFlagsFromQueryParams();
-
 
 function Nav(): JSX.Element {
   // TODO: replace this with common nav
@@ -28,7 +27,6 @@ function Nav(): JSX.Element {
     return <NavBarLanding />;
   }
 }
-
 
 const App = ({ Component, pageProps }: AppProps): JSX.Element => {
   // (thuang): MUI related SSR setup
