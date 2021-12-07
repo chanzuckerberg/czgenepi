@@ -33,8 +33,8 @@ import {
 } from "./style";
 
 interface Props {
-  sampleIds: string[];
-  failedSamples: string[];
+  checkedSampleIds: string[];
+  failedSampleIds: string[];
   open: boolean;
   onClose: () => void;
   handleCreateTreeFailed: () => void;
@@ -48,8 +48,8 @@ const TreeTypes = {
 type TreeType = typeof TreeTypes[keyof typeof TreeTypes];
 
 export const CreateNSTreeModal = ({
-  sampleIds,
-  failedSamples,
+  checkedSampleIds,
+  failedSampleIds,
   open,
   onClose,
   handleCreateTreeFailed,
@@ -116,8 +116,8 @@ export const CreateNSTreeModal = ({
     </div>
   );
 
-  const allPossibleTreeSamples = sampleIds.concat(validatedInputSamples);
-  const allFailedOrMissingSamples = failedSamples.concat(missingInputSamples);
+  const allPossibleTreeSamples = checkedSampleIds.concat(validatedInputSamples);
+  const allFailedOrMissingSamples = failedSampleIds.concat(missingInputSamples);
   const allValidSamplesForTreeCreation = allPossibleTreeSamples.filter(
     (id) => !allFailedOrMissingSamples.includes(id)
   );
@@ -202,7 +202,7 @@ export const CreateNSTreeModal = ({
         />
         <Separator marginSize="xl" />
         <MissingSampleAlert missingSamples={missingInputSamples} />
-        <FailedSampleAlert numFailedSamples={failedSamples?.length} />
+        <FailedSampleAlert numFailedSamples={failedSampleIds?.length} />
       </StyledDialogContent>
       <StyledFooter>
         <CreateTreeButton

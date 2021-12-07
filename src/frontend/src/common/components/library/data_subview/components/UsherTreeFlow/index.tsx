@@ -5,8 +5,8 @@ import { UsherConfirmationModal } from "./components/UsherConfirmationModal";
 import { UsherPlacementModal } from "./components/UsherPlacementModal";
 
 interface Props {
-  checkedSamples: string[];
-  failedSamples: string[];
+  checkedSampleIds: string[];
+  failedSampleIds: string[];
   shouldStartUsherFlow: boolean;
 }
 
@@ -20,8 +20,8 @@ const generateUsherLink = (remoteFile: string, treeType: string) => {
 };
 
 const UsherTreeFlow = ({
-  checkedSamples,
-  failedSamples,
+  checkedSampleIds,
+  failedSampleIds,
   shouldStartUsherFlow,
 }: Props): JSX.Element => {
   const [isPlacementOpen, setIsPlacementOpen] = useState<boolean>(false);
@@ -71,8 +71,8 @@ const UsherTreeFlow = ({
   return (
     <>
       <UsherPlacementModal
-        sampleIds={checkedSamples}
-        failedSamples={failedSamples}
+        sampleIds={checkedSampleIds}
+        failedSampleIds={failedSampleIds}
         open={isPlacementOpen}
         onClose={() => setIsPlacementOpen(false)}
         onLinkCreateSuccess={onLinkCreateSuccess}

@@ -1,5 +1,5 @@
 import cx from "classnames";
-import { compact, uniq } from "lodash";
+import { compact, map, uniq } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { FunctionComponent, useEffect, useState } from "react";
@@ -7,6 +7,7 @@ import { Menu } from "semantic-ui-react";
 import { fetchSamples } from "src/common/api";
 import { HeadAppTitle } from "src/common/components";
 import { useProtectedRoute } from "src/common/queries/auth";
+import { useSampleInfo } from "src/common/queries/samples";
 import { useTreeInfo } from "src/common/queries/trees";
 import { FilterPanel } from "src/components/FilterPanel";
 import { DataSubview } from "../../common/components";
@@ -26,11 +27,11 @@ const TITLE: Record<string, string> = {
   [ROUTES.PHYLO_TREES]: "Phylogenetic Trees",
 };
 
-interface SampleMapType {
+export interface SampleMapType {
   [key: string]: Sample;
 }
 
-interface TreeMapType {
+export interface TreeMapType {
   [key: string]: Tree;
 }
 
@@ -38,10 +39,11 @@ const mapObjectArrayToIdDict = (
   arr: Sample[] | Tree[],
   keyString: string
 ): SampleMapType | TreeMapType => {
-  return arr.map((obj) => {
+  const keyValuePairs = arr.map((obj) => {
     const id = obj[keyString];
     return [id, obj];
   });
+  return Object.fromEntries(keyValuePairs);
 };
 
 const Data: FunctionComponent = () => {
@@ -116,8 +118,9 @@ const Data: FunctionComponent = () => {
       return;
     }
 
-    const transformedData = category.data.map(
-      ([key, datum]: [key: string, datum: BioinformaticsData]) => {
+    const transformedData = map(
+      category.data,
+      (datum: BioinformaticsData, key: string) => {
         const transformedDatum = Object.assign({}, datum);
 
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- Asserted above
@@ -177,8 +180,8 @@ const Data: FunctionComponent = () => {
   // * to reference the parent's props (?). Passing in only the lineages, or
   // * incomplete options causes the component to break
   const sampleArr =
-    viewName === "Samples" ? (category.data as SampleMapType) : [];
-  const lineages = uniq(compact(sampleArr?.map((d) => d.lineage?.lineage)))
+    viewName === "Samples" ? (category.data as SampleMapType) : {};
+  const lineages = uniq(compact(map(sampleArr, (d) => d.lineage?.lineage)))
     .sort()
     .map((l) => {
       return { name: l as string };
