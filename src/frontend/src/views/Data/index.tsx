@@ -48,10 +48,10 @@ const Data: FunctionComponent = () => {
       if (isTreeInfoLoading || isSampleInfoLoading) return;
       setIsDataLoading(false);
 
-      const apiSamples = sampleData?.samples;
+      const apiSamples = sampleData?.samples ?? [];
       setSamples(apiSamples);
 
-      const apiTrees = treeData?.phylo_trees;
+      const apiTrees = treeData?.phylo_trees ?? [];
       setTrees(apiTrees);
     };
 
