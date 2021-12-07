@@ -13,13 +13,12 @@ import AcknowledgePolicyChanges from "src/components/AcknowledgePolicyChanges";
 import NavBarLoggedIn from "src/components/NavBar";
 import NavBarLanding from "src/components/NavBarV2";
 
-
 const queryClient = new QueryClient();
 setFeatureFlagsFromQueryParams();
 
 function Nav(): JSX.Element {
   // TODO: replace this with common nav
-  // this is a workaround while we figure out what the specs are of logged in vs. landing page navbar 
+  // this is a workaround while we figure out what the specs are of logged in vs. landing page navbar
   const { data } = useUserInfo();
   const user = data?.user;
   if (user) {
