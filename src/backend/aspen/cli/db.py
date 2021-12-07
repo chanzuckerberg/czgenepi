@@ -3,7 +3,7 @@ import io
 import json
 import os
 import subprocess
-from typing import Iterable, MutableSequence, Optional, Sequence, Type
+from typing import Iterable, Sequence, Type
 
 import boto3
 import click
@@ -11,7 +11,6 @@ from IPython.terminal.embed import InteractiveShellEmbed
 from sqlalchemy import and_
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import joinedload
-from sqlalchemy.sql import expression
 from sqlalchemy_utils import create_database, database_exists, drop_database
 
 from aspen.cli.toplevel import cli
@@ -28,12 +27,9 @@ from aspen.database.models import (
     AlignedGisaidDump,
     CanSee,
     DataType,
-    Entity,
     Group,
-    PathogenGenome,
     PhyloRun,
     Sample,
-    SequencingReadsCollection,
     TreeType,
     UploadedPathogenGenome,
     Workflow,

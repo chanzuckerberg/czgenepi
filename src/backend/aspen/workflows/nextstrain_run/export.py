@@ -63,7 +63,9 @@ METADATA_CSV_FIELDS = [
 @click.command("save")
 @click.option("--phylo-run-id", type=int, required=True)
 @click.option("sequences_fh", "--sequences", type=click.File("w"), required=False)
-@click.option("selected_fh", "--selected", type=click.File("w", lazy=False), required=True)
+@click.option(
+    "selected_fh", "--selected", type=click.File("w", lazy=False), required=True
+)
 @click.option("metadata_fh", "--metadata", type=click.File("w"), required=True)
 @click.option("builds_file_fh", "--builds-file", type=click.File("w"), required=True)
 @click.option("--test", type=bool, is_flag=True)
