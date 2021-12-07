@@ -35,7 +35,7 @@ export default function Homepage(): JSX.Element {
   return (
     <>
       <Head>
-        <title>CZ GEN EPI Landing Page V2</title>
+        <title>CZ GEN EPI</title>
       </Head>
       <Container>
         <Hero />
