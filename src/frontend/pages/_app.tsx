@@ -51,7 +51,7 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
           content="minimum-scale=1, initial-scale=1, width=device-width"
         />
       </Head>
-      <QueryClientProvider client={queryClient} contextSharing={true}>
+      <QueryClientProvider client={queryClient}>
         <StylesProvider injectFirst>
           <ThemeProvider theme={theme}>
             <EmotionThemeProvider theme={theme}>
