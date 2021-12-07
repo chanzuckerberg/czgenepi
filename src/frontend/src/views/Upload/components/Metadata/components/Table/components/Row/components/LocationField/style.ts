@@ -1,27 +1,26 @@
 import styled from "@emotion/styled";
-import TextField from "@material-ui/core/TextField";
-import { fontBodyXxs, getColors, getSpaces } from "czifui";
+import { Dropdown, getBorders, getSpaces } from "czifui";
 
-export const StyledTextField = styled(TextField)`
+export const StyledDiv = styled.div`
   ${(props) => {
     const spaces = getSpaces(props);
 
     return `
-      min-width: ${(spaces?.l || 0) + 195}px;
       padding-right: ${spaces?.l}px;
-      margin: 0;
     `;
   }}
 `;
 
-export const MenuSubtext = styled.div`
-  ${fontBodyXxs}
-
+export const StyledDropdown = styled(Dropdown)`
   ${(props) => {
-    const colors = getColors(props);
+    const spaces = getSpaces(props);
+    const borders = getBorders(props);
 
     return `
-      color: ${colors?.gray[500]};
+      padding-right: ${spaces?.l}px;
+      &:hover { 
+        border: ${borders?.gray[500]}
+      }
     `;
   }}
 `;

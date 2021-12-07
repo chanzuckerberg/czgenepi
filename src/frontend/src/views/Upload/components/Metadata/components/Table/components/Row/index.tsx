@@ -6,7 +6,11 @@ import {
   DATE_ERROR_MESSAGE,
   DATE_REGEX,
 } from "src/components/DateField/constants";
-import { Metadata } from "src/views/Upload/components/common/types";
+import {
+  Metadata,
+  NamedGisaidLocation,
+  ParsedMetadata,
+} from "src/views/Upload/components/common/types";
 import * as yup from "yup";
 import FreeTextField from "./components/FreeTextField";
 import LocationField from "./components/LocationField";
@@ -27,7 +31,11 @@ const validationSchema = yup.object({
     .min(10, DATE_ERROR_MESSAGE)
     .max(10, DATE_ERROR_MESSAGE)
     .required("Required"),
-  collectionLocation: yup.string().required("Required"),
+  collectionLocation: yup
+    .object({
+      id: yup.number().required(),
+    })
+    .required("Required"),
   publicId: yup.string().when("submittedToGisaid", {
     is: true,
     then: yup.string().required("Required"),
@@ -48,7 +56,8 @@ interface Props {
   isFirstRow: boolean;
   handleRowValidation: (id: string, isValid: boolean) => void;
   isTouched: boolean;
-  warnings?: Set<keyof Metadata>;
+  warnings?: Set<keyof ParsedMetadata>;
+  locations: NamedGisaidLocation[];
 }
 
 export default React.memo(function Row({
@@ -60,6 +69,7 @@ export default React.memo(function Row({
   handleRowValidation,
   isTouched,
   warnings = new Set(),
+  locations,
 }: Props): JSX.Element {
   const formik = useFormik({
     enableReinitialize: true,
@@ -115,6 +125,7 @@ export default React.memo(function Row({
           applyToAllColumn={applyToAllColumn}
           formik={formik}
           fieldKey="collectionLocation"
+          locations={locations}
         />
       </StyledTableCell>
       <StyledTableCell component="div">
