@@ -110,7 +110,7 @@ def export_run_config(
             inp for inp in phylo_run.inputs if isinstance(inp, AlignedGisaidDump)
         ][0]
 
-        num_sequences: int = write_sequences_files(
+        num_sequences = write_sequences_files(
             session, county_samples, sequences_fh, metadata_fh
         )
 

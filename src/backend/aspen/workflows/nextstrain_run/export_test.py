@@ -1,5 +1,5 @@
 import json
-from typing import Iterable
+from typing import Any, Dict, Iterable
 
 import click
 from sqlalchemy.orm import joinedload
@@ -39,8 +39,8 @@ def cli(
         "targeted": TreeType.TARGETED,
         "non_contextualized": TreeType.NON_CONTEXTUALIZED,
     }
-    tree_type = tree_types[tree_type]
-    template_args = {}
+    build_type = tree_types[tree_type]
+    template_args: Dict[str, Any] = {}
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
 
     sequences_fh = open("sequences.fasta", "w")
@@ -57,7 +57,7 @@ def cli(
         num_sequences = write_sequences_files(
             session, pathogen_genomes, sequences_fh, metadata_fh
         )
-        if tree_type != TreeType.OVERVIEW:
+        if build_type != TreeType.OVERVIEW:
             gisaid_ids = generate_test_gisaid_ids(gisaid)
             num_included_samples = write_includes_file(
                 session, gisaid_ids, pathogen_genomes[:selected], selected_fh
@@ -69,7 +69,7 @@ def cli(
             "num_included_samples": num_included_samples,
         }
         group = session.query(Group).first()
-        builder = builder_factory(tree_type, group, template_args, **context)
+        builder = builder_factory(build_type, group, template_args, **context)
         builder.write_file(builds_file_fh)
 
         print("Wrote output files!")
