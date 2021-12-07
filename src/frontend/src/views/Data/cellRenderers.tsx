@@ -29,6 +29,8 @@ import {
   UnderlinedRowContent,
 } from "./style";
 
+const CZ_BIOHUB_GROUP = "CZI";
+
 const LABEL_STATUS: Record<
   string,
   { label: string; status: NonNullable<ChipProps["status"]> }
@@ -85,12 +87,18 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
     value: string;
     item: Sample;
   }): JSX.Element => {
-    const { CZBFailedGenomeRecovery, private: isPrivate, uploadedBy } = item;
+    const {
+      CZBFailedGenomeRecovery,
+      private: isPrivate,
+      submittingGroup,
+      uploadedBy,
+    } = item;
     const label = CZBFailedGenomeRecovery
       ? LABEL_STATUS.error
       : LABEL_STATUS.success;
 
-    const { name } = uploadedBy ?? {};
+    const displayName =
+      submittingGroup?.name === CZ_BIOHUB_GROUP ? "CZ Biohub" : uploadedBy.name;
 
     return (
       <RowContent>
@@ -116,7 +124,7 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
               />
             </CenteredFlexContainer>
             {usesFeatureFlag(FEATURE_FLAGS.crudV0) && (
-              <StyledUploaderName>{name}</StyledUploaderName>
+              <StyledUploaderName>{displayName}</StyledUploaderName>
             )}
           </PrivateIdValueWrapper>
         </div>
