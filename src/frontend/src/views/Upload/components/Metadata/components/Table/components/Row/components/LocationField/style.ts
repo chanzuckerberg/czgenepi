@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { getSpaces, getBorders, Dropdown } from "czifui";
+import { Dropdown, getBorders, getSpaces } from "czifui";
 
 export const StyledDiv = styled.div`
   ${(props) => {
