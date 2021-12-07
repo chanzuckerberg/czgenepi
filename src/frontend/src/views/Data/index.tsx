@@ -40,7 +40,7 @@ const Data: FunctionComponent = () => {
   const sampleResponse = useSampleInfo();
   const treeResponse = useTreeInfo();
   const { data: sampleData, isLoading: isSampleInfoLoading } = sampleResponse;
-  const { data: treeData, isTreeInfoLoading } = treeResponse;
+  const { data: treeData, isLoading: isTreeInfoLoading } = treeResponse;
 
   useEffect(() => {
     const setBioinformaticsData = async () => {
