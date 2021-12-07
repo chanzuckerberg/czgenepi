@@ -28,7 +28,7 @@ import {
   TextLink,
 } from "./style";
 
-export default function NavBarV2(): JSX.Element {
+export default function NavBarLanding(): JSX.Element {
   const [menuOpen, setMenuOpen] = useState(false);
 
   function toggleMobileNav() {

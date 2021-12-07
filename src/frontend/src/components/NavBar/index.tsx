@@ -10,7 +10,7 @@ import { Logo, LogoAnchor } from "./style";
 // (thuang): Please make sure this value is in sync with what we have in css
 export const NAV_BAR_HEIGHT_PX = 50;
 
-const NavBar = (): JSX.Element => {
+const NavBarLoggedIn = (): JSX.Element => {
   const { data } = useUserInfo();
 
   const group = data?.group;
@@ -52,4 +52,4 @@ const NavBar = (): JSX.Element => {
   );
 };
 
-export default NavBar;
+export default NavBarLoggedIn;
