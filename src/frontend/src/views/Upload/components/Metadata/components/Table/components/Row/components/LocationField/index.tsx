@@ -1,5 +1,5 @@
 import FormHelperText from "@material-ui/core/FormHelperText";
-import { DefaultMenuSelectOption, Dropdown } from "czifui";
+import { DefaultMenuSelectOption } from "czifui";
 import { FormikContextType } from "formik";
 import { escapeRegExp } from "lodash/fp";
 import React from "react";
@@ -8,7 +8,7 @@ import {
   NamedGisaidLocation,
 } from "src/views/Upload/components/common/types";
 import ApplyToAllColumn from "../common/ApplyToAllColumn";
-import { StyledDiv } from "./style";
+import { StyledDiv, StyledDropdown } from "./style";
 
 interface Props {
   fieldKey: keyof Metadata;
@@ -67,7 +67,11 @@ export default function LocationField({
     return results.concat(sortedLocationOptions.slice(0, 99));
   };
 
-  const handleLocationChange = (e: DefaultMenuSelectOption | null) => {
+  const handleLocationChange = (
+    e: DefaultMenuSelectOption | DefaultMenuSelectOption[] | null
+  ) => {
+    // we don't allow multiple select in the dropdown, so e will always be a
+    // single DefaultMenuSelectOption
     if (e) {
       const newLocation = e as NamedGisaidLocation;
       setFieldValue(fieldKey, newLocation);
@@ -81,7 +85,7 @@ export default function LocationField({
 
   return (
     <StyledDiv onBlur={handleBlur}>
-      <Dropdown
+      <StyledDropdown
         label={value?.name || "Search For Location"}
         value={value}
         onChange={handleLocationChange}
