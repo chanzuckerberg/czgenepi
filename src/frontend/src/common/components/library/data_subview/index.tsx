@@ -187,7 +187,7 @@ const DataSubview: FunctionComponent<Props> = ({
 
   useEffect(() => {
     searcher(searchQuery);
-  }, [data]);
+  }, [dataValues]);
 
   useEffect(() => {
     // Only show checkboxes on the sample datatable
