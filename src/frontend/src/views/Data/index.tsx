@@ -21,11 +21,34 @@ import style from "./index.module.scss";
 import { Container, FlexContainer } from "./style";
 import { TREE_TRANSFORMS } from "./transforms";
 
+const TITLE: Record<string, string> = {
+  [ROUTES.DATA_SAMPLES]: "Samples",
+  [ROUTES.PHYLO_TREES]: "Phylogenetic Trees",
+};
+
+interface SampleMapType {
+  [key: string]: Sample;
+}
+
+interface TreeMapType {
+  [key: string]: Tree;
+}
+
+const mapObjectArrayToIdDict = (
+  arr: Sample[] | Tree[],
+  keyString: string
+): SampleMapType | TreeMapType => {
+  return arr.map((obj) => {
+    const id = obj[keyString];
+    return [id, obj];
+  });
+};
+
 const Data: FunctionComponent = () => {
   useProtectedRoute();
 
-  const [samples, setSamples] = useState<Sample[] | undefined>();
-  const [trees, setTrees] = useState<Tree[] | undefined>();
+  const [samples, setSamples] = useState<SampleMapType | undefined>();
+  const [trees, setTrees] = useState<TreeMapType | undefined>();
   const [isDataLoading, setIsDataLoading] = useState(false);
   const [shouldShowFilters, setShouldShowFilters] = useState<boolean>(true);
   const [dataFilterFunc, setDataFilterFunc] = useState<any>();
@@ -44,10 +67,12 @@ const Data: FunctionComponent = () => {
       setIsDataLoading(false);
 
       const apiSamples = sampleResponse["samples"];
-      const apiTrees = data?.phylo_trees;
+      const sampleMap = mapObjectArrayToIdDict(apiSamples, "publicId");
+      setSamples(sampleMap);
 
-      setSamples(apiSamples);
-      setTrees(apiTrees);
+      const apiTrees = data?.phylo_trees;
+      const treeMap = mapObjectArrayToIdDict(apiTrees, "id");
+      setTrees(treeMap);
     };
 
     setBioinformaticsData();
@@ -91,19 +116,21 @@ const Data: FunctionComponent = () => {
       return;
     }
 
-    const transformedData = category.data.map((datum: BioinformaticsData) => {
-      const transformedDatum = Object.assign({}, datum);
+    const transformedData = category.data.map(
+      ([key, datum]: [key: string, datum: BioinformaticsData]) => {
+        const transformedDatum = Object.assign({}, datum);
 
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- Asserted above
-      category.transforms!.forEach((transform) => {
-        const methodInputs = transform.inputs.map((key) => datum[key]);
-        transformedDatum[transform.key] = transform.method(methodInputs);
-      });
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- Asserted above
+        category.transforms!.forEach((transform) => {
+          const methodInputs = transform.inputs.map((key) => datum[key]);
+          transformedDatum[transform.key] = transform.method(methodInputs);
+        });
 
-      return transformedDatum;
-    });
+        return [key, transformedDatum];
+      }
+    );
 
-    category.data = transformedData as BioinformaticsDataArray;
+    category.data = Object.fromEntries(transformedData);
   });
 
   const dataJSX: Record<string, Array<JSX.Element>> = {
@@ -149,7 +176,8 @@ const Data: FunctionComponent = () => {
   // * using the data, but LineageFilter renders a child compnent that seems
   // * to reference the parent's props (?). Passing in only the lineages, or
   // * incomplete options causes the component to break
-  const sampleArr = viewName === "Samples" ? (category.data as Sample[]) : [];
+  const sampleArr =
+    viewName === "Samples" ? (category.data as SampleMapType) : [];
   const lineages = uniq(compact(sampleArr?.map((d) => d.lineage?.lineage)))
     .sort()
     .map((l) => {
