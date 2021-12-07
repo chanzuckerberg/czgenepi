@@ -130,7 +130,8 @@ const DownloadModal = ({
         </StyledIconButton>
         <Header>Select Download</Header>
         <Title>
-          {checkedSampleIds.length} {pluralize("Sample", checkedSampleIds.length)} Selected
+          {checkedSampleIds.length}{" "}
+          {pluralize("Sample", checkedSampleIds.length)} Selected
         </Title>
       </DialogTitle>
       <DialogContent>

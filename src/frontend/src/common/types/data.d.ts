@@ -1,3 +1,11 @@
+interface SampleMapType {
+  [key: string]: Sample;
+}
+
+interface TreeMapType {
+  [key: string]: Tree;
+}
+
 interface Transform {
   key: string;
   inputs: string[];
@@ -5,7 +13,7 @@ interface Transform {
 }
 
 interface DataCategory {
-  data: BioinformaticsDataArray | undefined;
+  data: SampleMapType | TreeMapType;
   defaultSortKey: string[];
   headers: Header[];
   isDataLoading: boolean;

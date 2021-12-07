@@ -172,7 +172,11 @@ export const DataTable: FunctionComponent<Props> = ({
   function handleHeaderCheckboxClick() {
     if (!data) return;
 
-    const newPublicIds = extractPublicIdsFromData(data, checkedSampleIds, false);
+    const newPublicIds = extractPublicIdsFromData(
+      data,
+      checkedSampleIds,
+      false
+    );
     const newFailedIds = extractPublicIdsFromDataWFailedGenomeRecovery(data);
 
     if (isHeaderIndeterminant || isHeaderChecked) {
@@ -240,7 +244,9 @@ export const DataTable: FunctionComponent<Props> = ({
   };
 
   const rowCheckbox = (item: TableItem): React.ReactNode => {
-    const checked: boolean = checkedSampleIds.includes(item?.publicId);
+    const checked: boolean = checkedSampleIds.includes(
+      item?.publicId as string
+    );
     const handleClick = function handleClick() {
       handleRowCheckboxClick(
         String(item.publicId),

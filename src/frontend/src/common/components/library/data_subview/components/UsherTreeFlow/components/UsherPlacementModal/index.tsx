@@ -36,8 +36,8 @@ import {
 } from "./style";
 
 interface Props {
-  sampleIds: string[];
-  failedSamples: string[];
+  checkedSampleIds: string[];
+  failedSampleIds: string[];
   open: boolean;
   onClose: () => void;
   onLinkCreateSuccess(url: string, treeType: string): void;
@@ -61,8 +61,8 @@ const getDefaultNumSamplesPerSubtree = (numSelected: number): number => {
 };
 
 export const UsherPlacementModal = ({
-  failedSamples,
-  sampleIds,
+  failedSampleIds,
+  checkedSampleIds,
   onClose,
   onLinkCreateSuccess,
   open,
@@ -76,7 +76,9 @@ export const UsherPlacementModal = ({
   const [shouldShowWarning, setShouldShowWarning] = useState<boolean>(false);
   const [treeType, setTreeType] = useState<string>("");
 
-  const defaultNumSamples = getDefaultNumSamplesPerSubtree(sampleIds?.length);
+  const defaultNumSamples = getDefaultNumSamplesPerSubtree(
+    checkedSampleIds?.length
+  );
 
   useEffect(() => {
     const fetchUsherOpts = async () => {
@@ -101,10 +103,11 @@ export const UsherPlacementModal = ({
   }, []);
 
   useEffect(() => {
-    const hasValidSamplesSelected = sampleIds?.length > failedSamples?.length;
+    const hasValidSamplesSelected =
+      checkedSampleIds?.length > failedSampleIds?.length;
     const shouldDisable = !hasValidSamplesSelected || isLoading;
     setUsherDisabled(shouldDisable);
-  }, [sampleIds, failedSamples, isLoading]);
+  }, [checkedSampleIds, failedSampleIds, isLoading]);
 
   const fastaFetch = useFastaFetch({
     onError: () => {
@@ -120,9 +123,11 @@ export const UsherPlacementModal = ({
 
   const handleSubmit = (evt: SyntheticEvent) => {
     evt.preventDefault();
-    sampleIds = sampleIds.filter((id) => !failedSamples.includes(id));
+    checkedSampleIds = checkedSampleIds.filter(
+      (id) => !failedSampleIds.includes(id)
+    );
     fastaFetch.mutate({
-      sampleIds,
+      sampleIds: checkedSampleIds,
       downstreamConsumer: "USHER", // Let backend know eventual destination for this fasta
     });
     setIsLoading(true);
@@ -201,7 +206,8 @@ export const UsherPlacementModal = ({
           </StyledTooltip>
         </FlexWrapper>
         <Title>
-          {sampleIds.length} {pluralize("Sample", sampleIds.length)} Selected
+          {checkedSampleIds.length}{" "}
+          {pluralize("Sample", checkedSampleIds.length)} Selected
         </Title>
       </StyledDialogTitle>
       <StyledDialogContent>
@@ -285,7 +291,7 @@ export const UsherPlacementModal = ({
                   </StyledSuggestionWrapper>
                 )}
               </StyledTextField>
-              <FailedSampleAlert numFailedSamples={failedSamples?.length} />
+              <FailedSampleAlert numFailedSamples={failedSampleIds?.length} />
             </div>
             <StyledButton
               color="primary"

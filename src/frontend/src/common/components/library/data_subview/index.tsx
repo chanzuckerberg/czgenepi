@@ -1,4 +1,4 @@
-import { compact, escapeRegExp, filter } from "lodash";
+import { escapeRegExp, filter } from "lodash";
 import NextLink from "next/link";
 import React, {
   FunctionComponent,
@@ -12,7 +12,6 @@ import { VIEWNAME } from "src/common/constants/types";
 import { ROUTES } from "src/common/routes";
 import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import Notification from "src/components/Notification";
-import { SampleMapType, TreeMapType } from "src/views/Data";
 import { CreateNSTreeModal } from "./components/CreateNSTreeModal";
 import DownloadModal from "./components/DownloadModal";
 import { IconButton } from "./components/IconButton";
@@ -302,8 +301,6 @@ const DataSubview: FunctionComponent<Props> = ({
         </DownloadWrapper>
       );
     }
-
-    const checkedSamples = compact(checkedSampleIds.map((id) => data[id]));
 
     return (
       <>

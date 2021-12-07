@@ -7,7 +7,6 @@ import { Menu } from "semantic-ui-react";
 import { fetchSamples } from "src/common/api";
 import { HeadAppTitle } from "src/common/components";
 import { useProtectedRoute } from "src/common/queries/auth";
-import { useSampleInfo } from "src/common/queries/samples";
 import { useTreeInfo } from "src/common/queries/trees";
 import { FilterPanel } from "src/components/FilterPanel";
 import { DataSubview } from "../../common/components";
@@ -27,14 +26,6 @@ const TITLE: Record<string, string> = {
   [ROUTES.PHYLO_TREES]: "Phylogenetic Trees",
 };
 
-export interface SampleMapType {
-  [key: string]: Sample;
-}
-
-export interface TreeMapType {
-  [key: string]: Tree;
-}
-
 const mapObjectArrayToIdDict = (
   arr: Sample[] | Tree[],
   keyString: string
@@ -49,8 +40,8 @@ const mapObjectArrayToIdDict = (
 const Data: FunctionComponent = () => {
   useProtectedRoute();
 
-  const [samples, setSamples] = useState<SampleMapType | undefined>();
-  const [trees, setTrees] = useState<TreeMapType | undefined>();
+  const [samples, setSamples] = useState<SampleMapType>({});
+  const [trees, setTrees] = useState<TreeMapType>({});
   const [isDataLoading, setIsDataLoading] = useState(false);
   const [shouldShowFilters, setShouldShowFilters] = useState<boolean>(true);
   const [dataFilterFunc, setDataFilterFunc] = useState<any>();
@@ -69,11 +60,14 @@ const Data: FunctionComponent = () => {
       setIsDataLoading(false);
 
       const apiSamples = sampleResponse["samples"];
-      const sampleMap = mapObjectArrayToIdDict(apiSamples, "publicId");
+      const sampleMap = mapObjectArrayToIdDict(
+        apiSamples,
+        "publicId"
+      ) as SampleMapType;
       setSamples(sampleMap);
 
-      const apiTrees = data?.phylo_trees;
-      const treeMap = mapObjectArrayToIdDict(apiTrees, "id");
+      const apiTrees = data?.phylo_trees ?? [];
+      const treeMap = mapObjectArrayToIdDict(apiTrees, "id") as TreeMapType;
       setTrees(treeMap);
     };
 
@@ -125,7 +119,9 @@ const Data: FunctionComponent = () => {
 
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- Asserted above
         category.transforms!.forEach((transform) => {
-          const methodInputs = transform.inputs.map((key) => datum[key]);
+          const methodInputs = transform.inputs.map(
+            (key: string) => datum[key]
+          );
           transformedDatum[transform.key] = transform.method(methodInputs);
         });
 

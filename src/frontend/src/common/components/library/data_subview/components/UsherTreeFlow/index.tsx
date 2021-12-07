@@ -71,7 +71,7 @@ const UsherTreeFlow = ({
   return (
     <>
       <UsherPlacementModal
-        sampleIds={checkedSampleIds}
+        checkedSampleIds={checkedSampleIds}
         failedSampleIds={failedSampleIds}
         open={isPlacementOpen}
         onClose={() => setIsPlacementOpen(false)}
