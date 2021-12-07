@@ -6,6 +6,10 @@ export interface Sample {
   filename: string;
 }
 
+export interface NamedGisaidLocation extends GisaidLocation {
+  name: string;
+}
+
 export type Samples = Record<string, Sample>;
 
 export type ParseErrors = Record<string, string[]>;
@@ -55,14 +59,24 @@ export interface ErrorCode {
   filename: string;
 }
 
-export interface Metadata {
+interface CommonMetadata {
+  sampleId?: string;
   collectionDate?: string;
-  collectionLocation?: string;
   islAccessionNumber?: string;
   keepPrivate?: boolean;
   publicId?: string;
   sequencingDate?: string;
   submittedToGisaid?: boolean;
+}
+
+// used by the app
+export interface Metadata extends CommonMetadata {
+  collectionLocation?: NamedGisaidLocation;
+}
+
+// parsed from the TSV
+export interface ParsedMetadata extends CommonMetadata {
+  locationString?: string;
 }
 
 export interface Props {
@@ -74,3 +88,4 @@ export interface Props {
 }
 
 export type SampleIdToMetadata = Record<string, Metadata>;
+export type SampleIdToParsedMetadata = Record<string, ParsedMetadata>;
