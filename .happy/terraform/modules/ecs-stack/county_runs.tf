@@ -1,7 +1,7 @@
 locals {
   nextstrain_sfn_memory = 64000
   nextstrain_sfn_vcpus = 10
-  nextstrain_cron_schedule = local.deployment_stage == "prod" ? ["cron(0 5 ? * MON-SAT *)"] : []
+  nextstrain_cron_schedule = local.deployment_stage == "geprod" ? ["cron(0 5 ? * MON-SAT *)"] : []
 }
 
 module nextstrain_chicago_contextual_sfn_config {
