@@ -49,6 +49,7 @@ aligned_gisaid_location=$(
            --phylo-run-id "${workflow_id}"                        \
            --sequences /ncov/data/sequences_aspen.fasta            \
            --metadata /ncov/data/metadata_aspen.tsv                \
+           --selected /ncov/data/include.txt                       \
            --builds-file /ncov/my_profiles/aspen/builds.yaml       \
 )
 aligned_gisaid_s3_bucket=$(echo "${aligned_gisaid_location}" | jq -r .bucket)
