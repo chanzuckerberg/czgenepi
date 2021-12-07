@@ -6,12 +6,13 @@ import React, { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import "semantic-ui-css/semantic.min.css";
 import style from "src/App.module.scss";
+import { useUserInfo } from "src/common/queries/auth";
 import { theme } from "src/common/styles/theme";
 import { setFeatureFlagsFromQueryParams } from "src/common/utils/featureFlags";
 import AcknowledgePolicyChanges from "src/components/AcknowledgePolicyChanges";
 import NavBarLoggedIn from "src/components/NavBar";
 import NavBarLanding from "src/components/NavBarV2";
-import {useUserInfo} from "src/common/queries/auth";
+
 
 const queryClient = new QueryClient();
 setFeatureFlagsFromQueryParams();
