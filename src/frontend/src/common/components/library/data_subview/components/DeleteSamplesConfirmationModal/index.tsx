@@ -39,6 +39,7 @@ const DeleteSamplesConfirmationModal = ({
     numSamples
   )}?`;
 
+  // TODO (mlila): add callout when samplesToDelete.length !== checkedSamples.length
   const content =
     "Deleted samples will be removed from Aspen. If these samples were included in previously generated trees, they will be shown with their public IDs only. You will not be able to undo this action.";
 

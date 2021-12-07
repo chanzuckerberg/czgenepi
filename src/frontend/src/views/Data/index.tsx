@@ -55,27 +55,28 @@ const Data: FunctionComponent = () => {
 
   const router = useRouter();
 
+  const sampleResponse = useSampleInfo();
   const treeResponse = useTreeInfo();
-  const { data, isLoading } = treeResponse;
+  const { data: sampleData, isLoading: isSampleInfoLoading } = sampleResponse;
+  const { data: treeData, isTreeInfoLoading } = treeResponse;
 
   useEffect(() => {
     const setBioinformaticsData = async () => {
       setIsDataLoading(true);
-      if (isLoading) return;
-      const sampleResponse = await fetchSamples();
+      if (isTreeInfoLoading || isSampleInfoLoading) return;
       setIsDataLoading(false);
 
-      const apiSamples = sampleResponse["samples"];
+      const apiSamples = sampleData?.samples;
       const sampleMap = mapObjectArrayToIdDict(apiSamples, "publicId");
       setSamples(sampleMap);
 
-      const apiTrees = data?.phylo_trees;
+      const apiTrees = treeData?.phylo_trees;
       const treeMap = mapObjectArrayToIdDict(apiTrees, "id");
       setTrees(treeMap);
     };
 
     setBioinformaticsData();
-  }, [isLoading, data]);
+  }, [isTreeInfoLoading, isSampleInfoLoading, treeData, sampleData]);
 
   useEffect(() => {
     if (router.asPath === ROUTES.DATA) {
