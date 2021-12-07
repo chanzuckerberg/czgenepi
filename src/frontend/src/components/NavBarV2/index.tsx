@@ -41,7 +41,7 @@ export default function NavBarLanding(): JSX.Element {
 
   const group = data?.group;
 
-  const orgElements = <div>{group?.name}</div>;
+  const orgElements = <React.Fragment>{group?.name}</React.Fragment>;
 
   function hasOrg(): JSX.Element | null {
     if (group === undefined) {
