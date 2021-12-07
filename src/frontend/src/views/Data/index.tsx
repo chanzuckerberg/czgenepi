@@ -5,8 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { FunctionComponent, useEffect, useState } from "react";
 import { Menu } from "semantic-ui-react";
-import { fetchSamples } from "src/common/api";
 import { useProtectedRoute } from "src/common/queries/auth";
+import { useSampleInfo } from "src/common/queries/samples";
 import { useTreeInfo } from "src/common/queries/trees";
 import { FilterPanel } from "src/components/FilterPanel";
 import { DataSubview } from "../../common/components";
@@ -37,25 +37,26 @@ const Data: FunctionComponent = () => {
 
   const router = useRouter();
 
+  const sampleResponse = useSampleInfo();
   const treeResponse = useTreeInfo();
-  const { data, isLoading } = treeResponse;
+  const { data: sampleData, isLoading: isSampleInfoLoading } = sampleResponse;
+  const { data: treeData, isTreeInfoLoading } = treeResponse;
 
   useEffect(() => {
     const setBioinformaticsData = async () => {
       setIsDataLoading(true);
-      if (isLoading) return;
-      const sampleResponse = await fetchSamples();
+      if (isTreeInfoLoading || isSampleInfoLoading) return;
       setIsDataLoading(false);
 
-      const apiSamples = sampleResponse["samples"];
-      const apiTrees = data?.phylo_trees;
-
+      const apiSamples = sampleData?.samples;
       setSamples(apiSamples);
+
+      const apiTrees = treeData?.phylo_trees;
       setTrees(apiTrees);
     };
 
     setBioinformaticsData();
-  }, [isLoading, data]);
+  }, [isTreeInfoLoading, isSampleInfoLoading, treeData, sampleData]);
 
   useEffect(() => {
     if (router.asPath === ROUTES.DATA) {
