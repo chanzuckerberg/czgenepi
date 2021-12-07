@@ -6,7 +6,7 @@ import DialogContent from "src/common/components/library/Dialog/components/Dialo
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import { Content, StyledFooter, Title } from "./style";
 
-interface Props {
+export interface ConfirmDialogProps {
   open: boolean;
   onClose: () => void;
   onConfirm: () => void;
@@ -24,7 +24,7 @@ export default function ConfirmDialog({
   title,
   content,
   footer,
-}: Props): JSX.Element {
+}: ConfirmDialogProps): JSX.Element {
   const confirmButton = customConfirmButton ?? (
     <Button color="primary" variant="contained" isRounded>
       Continue
@@ -50,7 +50,7 @@ export default function ConfirmDialog({
           Cancel
         </Button>
       </DialogActions>
-      <StyledFooter narrow>{footer}</StyledFooter>
+      {footer && <StyledFooter narrow>{footer}</StyledFooter>}
     </Dialog>
   );
 }

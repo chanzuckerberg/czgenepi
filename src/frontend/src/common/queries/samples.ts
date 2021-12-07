@@ -4,7 +4,7 @@ import {
   SampleIdToMetadata,
   Samples,
 } from "src/views/Upload/components/common/types";
-import { API, DEFAULT_POST_OPTIONS } from "../api";
+import { API, DEFAULT_DELETE_OPTIONS, DEFAULT_POST_OPTIONS } from "../api";
 import { API_URL } from "../constants/ENV";
 import { MutationCallbacks } from "./types";
 
@@ -141,4 +141,48 @@ export async function createSamples({
   if (response.ok) return await response.json();
 
   throw Error(`${response.statusText}: ${await response.text()}`);
+}
+
+// * Proceed with caution, you are entering the DANGER ZONE!
+// * Code below this line is destructive!
+interface DeleteSamplesPayload {
+  ids: string[];
+}
+
+export async function deleteSamples({
+  samplesToDelete,
+}: SampleDeleteRequestType): Promise<SampleDeleteResponseType> {
+  const payload: DeleteSamplesPayload = {
+    ids: samplesToDelete,
+  };
+
+  const response = await fetch(API_URL + API.SAMPLES, {
+    ...DEFAULT_DELETE_OPTIONS,
+    body: JSON.stringify(payload),
+  });
+
+  if (response.ok) return await response.json();
+
+  throw Error(`${response.statusText}: ${await response.text()}`);
+}
+
+interface SampleDeleteRequestType {
+  samplesToDelete: string[];
+}
+
+export interface SampleDeleteResponseType {
+  missing_sample_ids: string[];
+}
+
+type SampleDeleteCallbacks = MutationCallbacks<SampleDeleteResponseType>;
+
+export function useDeleteSamples(
+  callbacks: SampleDeleteCallbacks
+): UseMutationResult<
+  SampleDeleteResponseType,
+  unknown,
+  SampleDeleteRequestType,
+  unknown
+> {
+  return useMutation(deleteSamples, callbacks);
 }
