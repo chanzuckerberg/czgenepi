@@ -1,4 +1,4 @@
-import { escapeRegExp, filter } from "lodash";
+import { compact, escapeRegExp, filter } from "lodash";
 import NextLink from "next/link";
 import React, {
   FunctionComponent,
@@ -300,6 +300,10 @@ const DataSubview: FunctionComponent<Props> = ({
         </DownloadWrapper>
       );
     }
+
+    const checkedSamples = compact(
+      checkedSampleIds.map((id) => data?.[id]) as Sample[]
+    );
 
     return (
       <>

@@ -22,6 +22,7 @@ enum TREE_STATUS {
 }
 
 interface Sample extends BioinformaticsType {
+  id: number;
   type: "Sample";
   privateId: string;
   publicId: string;

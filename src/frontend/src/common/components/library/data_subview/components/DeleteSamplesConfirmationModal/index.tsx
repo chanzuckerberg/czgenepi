@@ -1,20 +1,29 @@
 import React from "react";
 import { noop } from "src/common/constants/empty";
+import { useUserInfo } from "src/common/queries/auth";
 import { useDeleteSamples } from "src/common/queries/samples";
 import { pluralize } from "src/common/utils/strUtils";
 import { DeleteDialog } from "src/components/DeleteDialog";
 
 interface Props {
-  checkedSamples: string[];
+  checkedSamples: Sample[];
   onClose(): void;
   open: boolean;
 }
 
+// TODO need to cleared checkedsamples state in parent or else the checked sample counter is wrong
 const DeleteSamplesConfirmationModal = ({
   checkedSamples,
   onClose,
   open,
 }: Props): JSX.Element | null => {
+  const { data } = useUserInfo();
+  const { group: userGroup } = data ?? {};
+
+  const samplesToDelete = checkedSamples
+    .filter((sample) => sample.submittingGroup?.name === userGroup?.name)
+    .map((sample) => sample.id);
+
   // TODO (mlila): update these callbacks to display notifications
   // TODO          as part of #173849
   const deleteSampleMutation = useDeleteSamples({
@@ -24,9 +33,7 @@ const DeleteSamplesConfirmationModal = ({
 
   const onDelete = () => {
     deleteSampleMutation.mutate({
-      // TODO (mlila): this should be an array of db unique ids
-      // TODO          this requires a refactor
-      samplesToDelete: checkedSamples,
+      samplesToDelete,
     });
     onClose();
   };

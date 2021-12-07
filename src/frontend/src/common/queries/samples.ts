@@ -186,7 +186,7 @@ export function useSampleInfo(): UseQueryResult<SampleResponse, unknown> {
  * delete samples
  */
 interface DeleteSamplesPayload {
-  ids: string[];
+  ids: number[];
 }
 
 export async function deleteSamples({
@@ -207,7 +207,7 @@ export async function deleteSamples({
 }
 
 interface SampleDeleteRequestType {
-  samplesToDelete: string[];
+  samplesToDelete: number[];
 }
 
 export interface SampleDeleteResponseType {
