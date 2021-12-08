@@ -18,12 +18,16 @@ def save():
 
     with session_scope(interface) as session:
         # Insert all locations from gisaid_metadata
-        gisaid_locations_select = sa.select(
-            GisaidMetadata.region,
-            GisaidMetadata.country,
-            GisaidMetadata.division,
-            GisaidMetadata.location,
-        ).distinct()
+        gisaid_locations_select = (
+            sa.select(
+                GisaidMetadata.region,
+                GisaidMetadata.country,
+                GisaidMetadata.division,
+                GisaidMetadata.location,
+            )
+            .where(GisaidMetadata.location != "")
+            .distinct()
+        )
         gisaid_locations_insert = (
             postgresql.insert(Location.__table__)
             .from_select(
@@ -35,21 +39,42 @@ def save():
         )
         session.execute(gisaid_locations_insert)
 
-        # Make sure we have equivalent rows for region/country/division but with null locations
-        except_select = (
+        # Insert an entry with a null location for every distinct Region/Country/Division combination
+        existing_null_location_select = (
             sa.select(Location.region, Location.country, Location.division)
-            .where(Location.location is None)
+            .where(Location.location == None)
             .distinct()
         )
-        null_locations_select = (
-            sa.select(Location.region, Location.country, Location.division)
-            .distinct()
-            .except_(except_select)
+        existing_null_locations = session.execute(existing_null_location_select).all()
+
+        gisaid_null_locations_select = sa.select(
+            GisaidMetadata.region,
+            GisaidMetadata.country,
+            GisaidMetadata.division,
+        ).distinct()
+        gisaid_null_locations = session.execute(gisaid_null_locations_select).all()
+
+        new_null_locations = {
+            region_country_division_tuple
+            for region_country_division_tuple in gisaid_null_locations
+            if region_country_division_tuple not in existing_null_locations
+        }
+        new_null_location_values = list(
+            map(
+                lambda location: {
+                    "region": location[0],
+                    "country": location[1],
+                    "division": location[2],
+                    "location": None,
+                },
+                new_null_locations,
+            )
         )
-        null_locations_insert = Location.__table__.insert().from_select(
-            ["region", "country", "division"], null_locations_select
-        )
-        session.execute(null_locations_insert)
+        if len(new_null_location_values) > 0:
+            new_null_locations_insert = Location.__table__.insert().values(
+                new_null_location_values
+            )
+            session.execute(new_null_locations_insert)
 
         session.commit()
 
