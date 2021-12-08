@@ -276,7 +276,7 @@ module nextstrain_orange_contextual_sfn_config {
 
 module nextstrain_san_bernardino_contextual_sfn_config {
   source   = "../sfn_config"
-  app_name = "nextstrain-san-bernardino-contextual-sfn"
+  app_name = "nextstrain-san-bernardino-contextual"
   image    = local.nextstrain_image
   vcpus    = local.nextstrain_sfn_vcpus
   memory   = local.nextstrain_sfn_memory
@@ -366,7 +366,7 @@ module nextstrain_san_joaquin_contextual_sfn_config {
 
 module nextstrain_san_luis_obispo_contextual_sfn_config {
   source   = "../sfn_config"
-  app_name = "nextstrain-san-luis-obispo-contextual-sfn"
+  app_name = "nextstrain-san-luis-obispo-contextual"
   image    = local.nextstrain_image
   vcpus    = local.nextstrain_sfn_vcpus
   memory   = local.nextstrain_sfn_memory
@@ -396,7 +396,7 @@ module nextstrain_san_luis_obispo_contextual_sfn_config {
 
 module nextstrain_san_francisco_contextual_sfn_config {
   source   = "../sfn_config"
-  app_name = "nextstrain-san-francisco-contextual-sfn"
+  app_name = "nextstrain-san-francisco-contextual"
   image    = local.nextstrain_image
   vcpus    = local.nextstrain_sfn_vcpus
   memory   = local.nextstrain_sfn_memory
