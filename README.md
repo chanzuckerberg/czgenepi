@@ -1,4 +1,4 @@
-# ASPEN
+# CZ GEN EPI (formerly Aspen)
 
 This repository contains the code for the Genomic Epidemiology project.
 
