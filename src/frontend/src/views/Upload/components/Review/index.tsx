@@ -1,7 +1,7 @@
 import { Button, Checkbox } from "czifui";
-import Head from "next/head";
 import NextLink from "next/link";
 import React, { useState } from "react";
+import { HeadAppTitle } from "src/common/components";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { useUserInfo } from "src/common/queries/auth";
@@ -43,9 +43,7 @@ export default function Review({
 
   return (
     <>
-      <Head>
-        <title>Aspen | Upload Review</title>
-      </Head>
+      <HeadAppTitle subTitle="Upload Review" />
       <Header>
         <div>
           <Title>Review</Title>
@@ -84,13 +82,14 @@ export default function Review({
               stage={isConsentChecked ? "checked" : "unchecked"}
             />
             <span>
-              I agree that the data I am uploading to Aspen has been lawfully
-              collected and that I have all the necessary consents, permissions,
-              and authorizations needed to collect, share and export data as
-              outlined in the <NewTabLink href={ROUTES.TERMS}>Terms</NewTabLink>{" "}
-              and <NewTabLink href={ROUTES.PRIVACY}>Privacy Policy</NewTabLink>.
-              I have reviewed the data that I am uploading and can confirm that
-              I am not uploading any personally identifiable information.
+              I agree that the data I am uploading to CZ GEN EPI has been
+              lawfully collected and that I have all the necessary consents,
+              permissions, and authorizations needed to collect, share and
+              export data as outlined in the{" "}
+              <NewTabLink href={ROUTES.TERMS}>Terms</NewTabLink> and{" "}
+              <NewTabLink href={ROUTES.PRIVACY}>Privacy Policy</NewTabLink>. I
+              have reviewed the data that I am uploading and can confirm that I
+              am not uploading any personally identifiable information.
             </span>
           </CheckboxText>
         </CheckboxWrapper>

@@ -1,8 +1,8 @@
 import { Close } from "@material-ui/icons";
 import { Button } from "czifui";
-import Head from "next/head";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import { HeadAppTitle } from "src/common/components";
 import { ROUTES } from "src/common/routes";
 import AlertAccordion from "src/components/AlertAccordion";
 import { CollapsibleInstructions } from "src/components/CollapsibleInstructions";
@@ -75,9 +75,7 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
 
   return (
     <>
-      <Head>
-        <title>Aspen | Upload Sample</title>
-      </Head>
+      <HeadAppTitle subTitle="Upload Samples" />
       <Header>
         <div>
           <Title>Upload Samples</Title>
