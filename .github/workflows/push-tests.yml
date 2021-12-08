@@ -58,7 +58,7 @@ jobs:
         run: |
           echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
           # Build frontend image
-          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/aspen-frontend:branch-trunk -t ${{ secrets.ECR_REPO }}/aspen-frontend:latest src/frontend
+          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/genepi-frontend:branch-trunk -t ${{ secrets.ECR_REPO }}/genepi-frontend:latest src/frontend
           make frontend-check-style
   ts-test:
     runs-on: ubuntu-20.04
@@ -80,7 +80,7 @@ jobs:
         run: |
           echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
           # Build frontend
-          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/aspen-frontend:branch-trunk -t ${{ secrets.ECR_REPO }}/aspen-frontend:latest src/frontend
+          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/genepi-frontend:branch-trunk -t ${{ secrets.ECR_REPO }}/genepi-frontend:latest src/frontend
           make frontend-tests
   ts-test-build:
     runs-on: ubuntu-20.04
@@ -104,7 +104,7 @@ jobs:
           mkdir src/frontend/build
           chmod -R a+w src/frontend/build
           # Build frontend
-          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/aspen-frontend:branch-trunk -t ${{ secrets.ECR_REPO }}/aspen-frontend:latest src/frontend
+          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/genepi-frontend:branch-trunk -t ${{ secrets.ECR_REPO }}/genepi-frontend:latest src/frontend
           make frontend-test-build
   py-lint:
     runs-on: ubuntu-20.04
@@ -126,7 +126,7 @@ jobs:
         run: |
           echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
           # Build backend
-          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/aspen-backend:branch-trunk -t ${{ secrets.ECR_REPO }}/aspen-backend:latest src/backend
+          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/genepi-backend:branch-trunk -t ${{ secrets.ECR_REPO }}/genepi-backend:latest src/backend
           make backend-check-style
   py-test:
     runs-on: ubuntu-20.04
@@ -148,9 +148,9 @@ jobs:
         run: |
           echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
           # Build backend image
-          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/aspen-backend:branch-trunk -t ${{ secrets.ECR_REPO }}/aspen-backend:latest src/backend
+          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/genepi-backend:branch-trunk -t ${{ secrets.ECR_REPO }}/genepi-backend:latest src/backend
           # Build frontend
-          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/aspen-frontend:branch-trunk -t ${{ secrets.ECR_REPO }}/aspen-frontend:latest src/frontend
+          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/genepi-frontend:branch-trunk -t ${{ secrets.ECR_REPO }}/genepi-frontend:latest src/frontend
           make local-init
           make backend-test
   build-push-images:
@@ -168,19 +168,19 @@ jobs:
         image:
           - dockerfile: src/backend/Dockerfile.gisaid
             context: ./src/backend/
-            name: aspen-gisaid
+            name: genepi-gisaid
           - dockerfile: src/backend/Dockerfile.nextstrain
             context: ./src/backend/
-            name: aspen-nextstrain
+            name: genepi-nextstrain
           - dockerfile: src/backend/Dockerfile.pangolin
             context: ./src/backend/
-            name: aspen-pangolin
+            name: genepi-pangolin
           - dockerfile: src/backend/Dockerfile
             context: ./src/backend/
-            name: aspen-backend
+            name: genepi-backend
           - dockerfile: src/frontend/Dockerfile
             context: ./src/frontend/
-            name: aspen-frontend
+            name: genepi-frontend
     steps:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
