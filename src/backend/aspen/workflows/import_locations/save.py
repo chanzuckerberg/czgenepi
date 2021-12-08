@@ -40,9 +40,11 @@ def save():
         session.execute(gisaid_locations_insert)
 
         # Insert an entry with a null location for every distinct Region/Country/Division combination
+        # Doing a double-equals comparison is critical for the statement to compile to the intended SQL,
+        # so we tell flake8 to ignore rule E711
         existing_null_location_select = (
             sa.select(Location.region, Location.country, Location.division)
-            .where(Location.location == None)
+            .where(Location.location == None)  # noqa: E711
             .distinct()
         )
         existing_null_locations = set(
