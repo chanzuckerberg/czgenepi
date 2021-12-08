@@ -34,7 +34,7 @@ rm-pycache: ## remove all __pycache__ files (run if encountering issues with pyc
 remote-pgconsole: # Get a psql console on a remote db (from OSX only!)
 	export ENV=$${ENV:=rdev}; \
 	export AWS_PROFILE=$(shell [ $(ENV) = prod ] && echo $(AWS_PROD_PROFILE) || echo $(AWS_DEV_PROFILE)); \
-	export HAPPY_ENV=$(shell [ $(ENV) != dev ] && echo ge$(ENV) || echo $(ENV)); \
+	export HAPPY_ENV=$(shell [ $(ENV) != rdev ] && echo ge$(ENV) || echo dev); \
 	export config=$$(aws secretsmanager get-secret-value --secret-id $${HAPPY_ENV}/genepi-config | jq -r .SecretString ); \
 	export DB_URI=$$(jq -r '"postgresql://\(.DB_admin_username):\(.DB_admin_password)@127.0.0.1:5556/$(DB)"' <<< $$config); \
 	echo Connecting to $$(jq -r .DB_address <<< $$config)/$(DB) via $$(jq -r .bastion_host <<< $$config); \
@@ -44,7 +44,7 @@ remote-pgconsole: # Get a psql console on a remote db (from OSX only!)
 remote-dbconsole: .env.ecr # Get a python console on a remote db (from OSX only!)
 	export ENV=$${ENV:=rdev}; \
 	export AWS_PROFILE=$(shell [ $(ENV) = prod ] && echo $(AWS_PROD_PROFILE) || echo $(AWS_DEV_PROFILE)); \
-	export HAPPY_ENV=$(shell [ $(ENV) != dev ] && echo ge$(ENV) || echo $(ENV)); \
+	export HAPPY_ENV=$(shell [ $(ENV) != rdev ] && echo ge$(ENV) || echo dev); \
 	export config=$$(aws secretsmanager get-secret-value --secret-id $${HAPPY_ENV}/genepi-config | jq -r .SecretString ); \
 	export OSX_IP=$$(ipconfig getifaddr en0 || ipconfig getifaddr en1); \
 	export DB_URI=$$(jq -r '"postgresql://\(.DB_admin_username):\(.DB_admin_password)@'$${OSX_IP}':5555/$(DB)"' <<< $$config); \
@@ -128,12 +128,12 @@ check-images: ## Spot-check the gisaid image
 	docker-compose $(COMPOSE_OPTS) run --no-deps --rm nextstrain /usr/src/app/aspen/workflows/test-nextstrain.sh
 	docker-compose $(COMPOSE_OPTS) run --no-deps --rm pangolin /usr/src/app/aspen/workflows/test-pangolin.sh
 
-.PHONY: imagecheck-aspen-%
-imagecheck-aspen-%: ## Spot-check backend/batch images
-	docker run --rm $(IMAGE) /usr/src/app/aspen/workflows/test-$(subst imagecheck-aspen-,,$@).sh
+.PHONY: imagecheck-genepi-%
+imagecheck-genepi-%: ## Spot-check backend/batch images
+	docker run --rm $(IMAGE) /usr/src/app/aspen/workflows/test-$(subst imagecheck-genepi-,,$@).sh
 
-.PHONY: imagecheck-aspen-frontend
-imagecheck-aspen-frontend: ## Spot-check frontend image
+.PHONY: imagecheck-genepi-frontend
+imagecheck-genepi-frontend: ## Spot-check frontend image
 	true
 
 .PHONY: backend-debugger
@@ -224,19 +224,6 @@ backend-%: .env.ecr ## Run make commands in the backend container (src/backend/M
 frontend-%: .env.ecr ## Run make commands in the frontend container (src/frontend/Makefile)
 	docker-compose $(COMPOSE_OPTS) run -e CI=true --no-deps --rm frontend make $(subst frontend-,,$@)
 
-### DOCKER FOR WORKFLOWS ###################################################
-
-build-docker: export ASPEN_DOCKER_IMAGE_VERSION=$(shell date +%Y%m%d_%H%M)
-build-docker:
-	docker pull nextstrain/base
-	docker build --no-cache -t cziaspen/batch:latest --build-arg ASPEN_DOCKER_IMAGE_VERSION=$${ASPEN_DOCKER_IMAGE_VERSION} docker/aspen-batch
-	docker tag cziaspen/batch:latest cziaspen/batch:$${ASPEN_DOCKER_IMAGE_VERSION}
-	@echo "Please push the tags cziaspen/batch:latest and cziaspen/batch:$${ASPEN_DOCKER_IMAGE_VERSION} when done, i.e.,"
-	@echo "  docker push cziaspen/batch:latest"
-	@echo "  docker push cziaspen/batch:$${ASPEN_DOCKER_IMAGE_VERSION}"
-	@echo ""
-	@echo "If you wish to clean up some of your old aspen docker images, run:"
-	@echo "  docker image rm \$\$$(docker image ls -q cziaspen/batch -f 'before=cziaspen/batch:latest')"
 
 ### WDL ###################################################
 .PHONY: wdl-lint
