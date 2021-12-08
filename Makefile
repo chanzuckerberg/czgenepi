@@ -128,12 +128,12 @@ check-images: ## Spot-check the gisaid image
 	docker-compose $(COMPOSE_OPTS) run --no-deps --rm nextstrain /usr/src/app/aspen/workflows/test-nextstrain.sh
 	docker-compose $(COMPOSE_OPTS) run --no-deps --rm pangolin /usr/src/app/aspen/workflows/test-pangolin.sh
 
-.PHONY: imagecheck-aspen-%
-imagecheck-aspen-%: ## Spot-check backend/batch images
-	docker run --rm $(IMAGE) /usr/src/app/aspen/workflows/test-$(subst imagecheck-aspen-,,$@).sh
+.PHONY: imagecheck-genepi-%
+imagecheck-genepi-%: ## Spot-check backend/batch images
+	docker run --rm $(IMAGE) /usr/src/app/aspen/workflows/test-$(subst imagecheck-genepi-,,$@).sh
 
-.PHONY: imagecheck-aspen-frontend
-imagecheck-aspen-frontend: ## Spot-check frontend image
+.PHONY: imagecheck-genepi-frontend
+imagecheck-genepi-frontend: ## Spot-check frontend image
 	true
 
 .PHONY: backend-debugger
@@ -224,19 +224,6 @@ backend-%: .env.ecr ## Run make commands in the backend container (src/backend/M
 frontend-%: .env.ecr ## Run make commands in the frontend container (src/frontend/Makefile)
 	docker-compose $(COMPOSE_OPTS) run -e CI=true --no-deps --rm frontend make $(subst frontend-,,$@)
 
-### DOCKER FOR WORKFLOWS ###################################################
-
-build-docker: export ASPEN_DOCKER_IMAGE_VERSION=$(shell date +%Y%m%d_%H%M)
-build-docker:
-	docker pull nextstrain/base
-	docker build --no-cache -t cziaspen/batch:latest --build-arg ASPEN_DOCKER_IMAGE_VERSION=$${ASPEN_DOCKER_IMAGE_VERSION} docker/aspen-batch
-	docker tag cziaspen/batch:latest cziaspen/batch:$${ASPEN_DOCKER_IMAGE_VERSION}
-	@echo "Please push the tags cziaspen/batch:latest and cziaspen/batch:$${ASPEN_DOCKER_IMAGE_VERSION} when done, i.e.,"
-	@echo "  docker push cziaspen/batch:latest"
-	@echo "  docker push cziaspen/batch:$${ASPEN_DOCKER_IMAGE_VERSION}"
-	@echo ""
-	@echo "If you wish to clean up some of your old aspen docker images, run:"
-	@echo "  docker image rm \$\$$(docker image ls -q cziaspen/batch -f 'before=cziaspen/batch:latest')"
 
 ### WDL ###################################################
 .PHONY: wdl-lint
