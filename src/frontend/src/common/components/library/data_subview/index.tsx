@@ -137,7 +137,6 @@ const DataSubview: FunctionComponent<Props> = ({
     searching: false,
   });
 
-  const [dataValues, setDataValues] = useState<Sample[] | Tree[]>();
   const [checkedSampleIds, setCheckedSampleIds] = useState<string[]>([]);
   const [showCheckboxes, setShowCheckboxes] = useState<boolean>(false);
   const [isDownloadModalOpen, setDownloadModalOpen] = useState(false);
@@ -176,17 +175,12 @@ const DataSubview: FunctionComponent<Props> = ({
   };
 
   useEffect(() => {
-    if (!data) return;
-    setDataValues(Object.values(data));
-  }, [data]);
-
-  useEffect(() => {
     if (shouldStartUsherFlow) setShouldStartUsherFlow(false);
   }, [shouldStartUsherFlow]);
 
   useEffect(() => {
     searcher(searchQuery);
-  }, [dataValues]);
+  }, [data]);
 
   useEffect(() => {
     // Only show checkboxes on the sample datatable
@@ -234,7 +228,7 @@ const DataSubview: FunctionComponent<Props> = ({
     if (data === undefined) {
       return;
     } else if (query.length === 0) {
-      dispatch({ results: dataValues });
+      dispatch({ results: Object.values(data) });
       return;
     }
 
@@ -424,8 +418,9 @@ const DataSubview: FunctionComponent<Props> = ({
     let tableData;
 
     if (data) {
-      dispatch({ results: dataValues });
-      tableData = dataValues;
+      const values = Object.values(data);
+      dispatch({ results: values });
+      tableData = values;
     }
 
     return render(tableData);
