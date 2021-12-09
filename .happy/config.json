@@ -2,7 +2,7 @@
     "config_version": "v1",
     "terraform_version": "0.13.5",
     "default_env": "rdev",
-    "app": "aspen",
+    "app": "genepi",
     "default_compose_env": ".env.ecr",
     "slice_default_tag": "branch-trunk",
     "services": ["frontend", "backend"],
@@ -32,25 +32,28 @@
     "environments": {
         "rdev": {
             "aws_profile": "genepi-dev",
-            "secret_arn": "happy/env-rdev-config",
-            "terraform_directory": ".happy/terraform/envs/rdev",
-            "log_group_prefix": "/aspen/rdev"
+            "secret_arn": "happy/env-dev-config",
+            "terraform_directory": ".happy/terraform/envs/dev",
+            "log_group_prefix": "/genepi/dev",
+            "task_launch_type": "fargate"
         },
         "staging": {
             "aws_profile": "genepi-dev",
-            "secret_arn": "happy/env-staging-config",
+            "secret_arn": "happy/env-gestaging-config",
             "terraform_directory": ".happy/terraform/envs/staging",
             "delete_protected": true,
             "auto_run_migrations": true,
-            "log_group_prefix": "/aspen/staging"
+            "log_group_prefix": "/genepi/gestaging",
+            "task_launch_type": "fargate"
         },
         "prod": {
             "aws_profile": "genepi-prod",
-            "secret_arn": "happy/env-prod-config",
+            "secret_arn": "happy/env-geprod-config",
             "terraform_directory": ".happy/terraform/envs/prod",
             "delete_protected": true,
             "auto_run_migrations": true,
-            "log_group_prefix": "/aspen/prod"
+            "log_group_prefix": "/genepi/geprod",
+            "task_launch_type": "fargate"
         }
     },
     "tasks": {

@@ -1,10 +1,10 @@
 import cx from "classnames";
 import { compact, uniq } from "lodash";
-import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { FunctionComponent, useEffect, useState } from "react";
 import { Menu } from "semantic-ui-react";
+import { HeadAppTitle } from "src/common/components";
 import { useProtectedRoute } from "src/common/queries/auth";
 import { useSampleInfo } from "src/common/queries/samples";
 import { useTreeInfo } from "src/common/queries/trees";
@@ -13,17 +13,13 @@ import { DataSubview } from "../../common/components";
 import { EMPTY_OBJECT } from "../../common/constants/empty";
 import { VIEWNAME } from "../../common/constants/types";
 import { ROUTES } from "../../common/routes";
+import { PAGE_TITLES } from "../../common/titles";
 import { SampleRenderer, TreeRenderer } from "./cellRenderers";
 import { FilterPanelToggle } from "./components/FilterPanelToggle";
 import { SAMPLE_HEADERS, SAMPLE_SUBHEADERS, TREE_HEADERS } from "./headers";
 import style from "./index.module.scss";
 import { Container, FlexContainer } from "./style";
 import { TREE_TRANSFORMS } from "./transforms";
-
-const TITLE: Record<string, string> = {
-  [ROUTES.DATA_SAMPLES]: "Samples",
-  [ROUTES.PHYLO_TREES]: "Phylogenetic Trees",
-};
 
 interface SampleMapType {
   [key: string]: Sample;
@@ -162,7 +158,7 @@ const Data: FunctionComponent = () => {
     );
   });
 
-  const title = TITLE[router.asPath];
+  const subTitle = PAGE_TITLES[router.asPath];
 
   const category =
     dataCategories.find((category) => category.to === router.asPath) ||
@@ -184,9 +180,7 @@ const Data: FunctionComponent = () => {
 
   return (
     <Container className={style.dataRoot}>
-      <Head>
-        <title>Aspen {title && " | " + title}</title>
-      </Head>
+      <HeadAppTitle subTitle={subTitle} />
 
       <FlexContainer
         className={style.navigation}

@@ -44,7 +44,7 @@ jobs:
         env:
           TFE_TOKEN: ${{ secrets.TFE_TOKEN }}
         run: |
-          ./scripts/happy --profile="" --env ${{ github.event.deployment.environment }} update ${{ github.event.deployment.environment }}stack --tag ${{ github.event.deployment.payload.tag }}
+          ./scripts/happy --profile="" --env ${{ github.event.deployment.environment }} update ge${{ github.event.deployment.environment }}stack --tag ${{ github.event.deployment.payload.tag }}
       - name: Run integration tests
         env:
           TFE_TOKEN: ${{ secrets.TFE_TOKEN }}

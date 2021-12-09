@@ -2,7 +2,7 @@
 
 ## Intro
 
-Aspen frontend application is built with the following stack. If you are unfamiliar with any of them, please feel free to check out their documentations in the links below, or reach out to CZI Slack channels **#org-tech-frontend** and **#help-frontend** for help!
+CZ Gen Epi frontend application is built with the following stack. If you are unfamiliar with any of them, please feel free to check out their documentations in the links below, or reach out to CZI Slack channels **#org-tech-frontend** and **#help-frontend** for help!
 
 1. [TypeScript](https://www.typescriptlang.org/)
 1. [React](https://reactjs.org/)
@@ -71,7 +71,7 @@ As you can see, a component is typically made of other components and/or sub-com
 
 ## Data Fetching
 
-Aspen uses [React Query](https://react-query.tanstack.com/) and Web API [Fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) to make API call lifecycle and manage fetched server data. If you want to learn more about React Query and why it's awesome, please check out their [overview](https://react-query.tanstack.com/overview)!
+CZ Gen Epi uses [React Query](https://react-query.tanstack.com/) and Web API [Fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) to make API call lifecycle and manage fetched server data. If you want to learn more about React Query and why it's awesome, please check out their [overview](https://react-query.tanstack.com/overview)!
 
 We put all API queries inside `./common/queries`, and depends on the server data type, we further split the code into different files, such as `auth.ts` and `samples.ts`
 
@@ -81,13 +81,13 @@ For POST example, find function `createSamples()` in `./src/common/queries/sampl
 
 ## Design System + Component Library ([czifui](https://github.com/chanzuckerberg/sci-components))
 
-Aspen uses Science Initiative Design System as the building blocks for composing UI, and `czifui` is the component library counterpart of the design system.
+CZ Gen Epi uses Science Initiative Design System as the building blocks for composing UI, and `czifui` is the component library counterpart of the design system.
 
 For referencing the design system, please check [Figma](https://www.figma.com/file/EaRifXLFs54XTjO1Mlszkg/Science-Design-System-Reference) and use the left panel to find different types of components (Bases, Genes, DNA, and Chromosomes) ![image](https://user-images.githubusercontent.com/6309723/123888574-a53aec00-d908-11eb-96b3-e32381e30c9a.png)
 
 ## Styling
 
-Aspen uses [Emotion](https://emotion.sh/), [Material UI](https://material-ui.com/), and Science Initiative component library ([czifui](https://github.com/chanzuckerberg/sci-components)) as the styling solution. This is because `czifui` also uses Emotion and Material UI, so sharing the same stack not only saves us bundle size, but also allows us to use the same styling strategies between the app and the library (less context switching and more code examples), as well as having an easier time to extract components from Aspen to the library
+CZ Gen Epi uses [Emotion](https://emotion.sh/), [Material UI](https://material-ui.com/), and Science Initiative component library ([czifui](https://github.com/chanzuckerberg/sci-components)) as the styling solution. This is because `czifui` also uses Emotion and Material UI, so sharing the same stack not only saves us bundle size, but also allows us to use the same styling strategies between the app and the library (less context switching and more code examples), as well as having an easier time to extract components from CZ Gen Epi to the library
 
 Regarding Emotion, we mainly use the `styled()` approach to style components, since this is the recommended way to style components by Material UI (and MUI also uses Emotion)
 
@@ -99,7 +99,7 @@ NOTE: The app still has deprecated CSS Module and scss usage that needs to be re
 
 ### Theming
 
-Aspen customizes the default `czifui` theme, in order to have its unique brand identity. As a result, when styling the components in Aspen we need to use the custom theme object when writing CSS rules.
+CZ Gen Epi customizes the default `czifui` theme, in order to have its unique brand identity. As a result, when styling the components in CZ Gen Epi we need to use the custom theme object when writing CSS rules.
 
 For example, throughout the code base, you will find patterns such as the following:
 
@@ -131,7 +131,7 @@ export const Foo = styled.div`
 ```
 
 ## Feature Flags
-The front end of Aspen has a feature flag system that aids in developing features without creating huge, long running feature branches. This allows us to:
+The front end of CZ Gen Epi has a feature flag system that aids in developing features without creating huge, long running feature branches. This allows us to:
 1. Develop multiple features in parallel with full visibility.
 2. Develop front end features without showing our WIP dust to users.
 3. Allow internal stakeholders to optionally view/hide WIP during development by modifying the app url.
@@ -158,16 +158,16 @@ The feature flag will persist in local storage after it is set. That means *the 
 
 ## Gotchas
 
-1. Aspen runs the whole stack in different Docker containers (via the `make local-*` commands), including the Frontend.
+1. CZ Gen Epi runs the whole stack in different Docker containers (via the `make local-*` commands), including the Frontend.
 
    However, there are times the FE container and `npm` packages can be out of sync. When it happens, you will experience different runtime errors in the app that **indirectly** suggests the FE container's `node_modules/` directory is out of sync, such as unable to find modules, library does not exist, etc.. When it happens, I typically use the following steps to troubleshoot:
 
-   1. In Aspen root directory (not FE root), run `docker-compose exec frontend /bin/bash` to SSH into the FE container
+   1. In CZ Gen Epi root directory (not FE root), run `docker-compose exec frontend /bin/bash` to SSH into the FE container
 
    1. In the FE container terminal, run `ls node_modules` to check the package of interest exists AND has the expected version in the module folder's `package.json`. If not, do the next step
 
    1. In another FE container terminal, run `npm i`. This will tell the FE container to use the latest `package.json` to update its `node_modules` and `package-lock.json`, so now the FE container should have the correct dependencies. **However**, running `npm i` in the FE container has an unwanted side effect of reverting `package-lock.json` to NPM lock version 1, when we want to use version 2. Thus, please make sure to do the next step
 
-   1. **Important**: In yet another terminal, go to your local Aspen's FE directory `aspen/src/frontend/` and run `npm i`. This will update `package-lock.json` again to use lock version 2!
+   1. **Important**: In yet another terminal, go to your local CZ Gen Epi's FE directory `aspen/src/frontend/` and run `npm i`. This will update `package-lock.json` again to use lock version 2!
 
    1. At this point, your app should be working without any runtime error. And if you still have problems, please reach out to CZI Slack channels **#org-tech-frontend** and **#help-frontend** for help!

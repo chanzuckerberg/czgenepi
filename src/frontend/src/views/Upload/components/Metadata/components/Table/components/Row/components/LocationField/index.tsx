@@ -1,75 +1,112 @@
-import { MenuItem } from "czifui";
+import FormHelperText from "@material-ui/core/FormHelperText";
+import { DefaultMenuSelectOption } from "czifui";
 import { FormikContextType } from "formik";
+import { escapeRegExp } from "lodash/fp";
 import React from "react";
-import { Metadata } from "src/views/Upload/components/common/types";
+import {
+  Metadata,
+  NamedGisaidLocation,
+} from "src/views/Upload/components/common/types";
 import ApplyToAllColumn from "../common/ApplyToAllColumn";
-import { COUNTIES } from "./COUNTIES";
-import { MenuSubtext, StyledTextField } from "./style";
-
-const SELECT_PROPS = {
-  displayEmpty: true,
-  renderValue,
-};
+import { StyledDiv, StyledDropdown } from "./style";
 
 interface Props {
   fieldKey: keyof Metadata;
   formik: FormikContextType<Metadata>;
   applyToAllColumn: (fieldKey: keyof Metadata, value: unknown) => void;
   isFirstRow: boolean;
+  locations: NamedGisaidLocation[];
 }
+
+interface AutocompleteState {
+  getOptionLabel: (option: NamedGisaidLocation) => string;
+  inputValue: string;
+}
+
+type ScienceDesignStage = "default" | "userInput" | undefined;
 
 export default function LocationField({
   fieldKey,
   formik,
   applyToAllColumn,
   isFirstRow,
+  locations,
 }: Props): JSX.Element {
-  const { handleChange, handleBlur, values, touched, errors } = formik;
+  const { handleBlur, setFieldValue, values, touched, errors } = formik;
+
+  let value: NamedGisaidLocation | undefined = undefined;
+  if (values[fieldKey]) {
+    value = values[fieldKey] as NamedGisaidLocation;
+  }
 
   const errorMessage = touched[fieldKey] && errors[fieldKey];
 
-  const value = values[fieldKey] || "";
+  const filter = (
+    options: NamedGisaidLocation[],
+    state: AutocompleteState
+  ): NamedGisaidLocation[] => {
+    const query = state.inputValue;
+    const results: NamedGisaidLocation[] = [];
+    if (value) {
+      results.push(value);
+    }
+    if (query.length < 3) {
+      return results;
+    }
+
+    const regex = new RegExp(escapeRegExp(query), "i");
+    const filteredLocationOptions = options.filter((location) =>
+      regex.test(location.name)
+    );
+    // alphabetical sort
+    // this ensures partial locations (i.e. region, country and divison
+    // but no location) end up on top.
+    const sortedLocationOptions = filteredLocationOptions.sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
+    return results.concat(sortedLocationOptions.slice(0, 99));
+  };
+
+  const handleLocationChange = (
+    e: DefaultMenuSelectOption | DefaultMenuSelectOption[] | null
+  ) => {
+    // we don't allow multiple select in the dropdown, so e will always be a
+    // single DefaultMenuSelectOption
+    if (e) {
+      const newLocation = e as NamedGisaidLocation;
+      setFieldValue(fieldKey, newLocation);
+    }
+  };
+
+  let sdsStage: ScienceDesignStage = "default";
+  if (value) {
+    sdsStage = "userInput";
+  }
 
   return (
-    <StyledTextField
-      select
-      SelectProps={SELECT_PROPS}
-      name={fieldKey}
-      value={value}
-      margin="dense"
-      variant="outlined"
-      onChange={handleChange}
-      onBlur={handleBlur}
-      error={Boolean(errorMessage)}
-      helperText={
-        errorMessage ||
-        (isFirstRow && value && (
-          <ApplyToAllColumn
-            fieldKey={fieldKey}
-            value={value}
-            handleClick={applyToAllColumn}
-          />
-        ))
-      }
-    >
-      <MenuItem value="" disabled>
-        Select County
-      </MenuItem>
-      {COUNTIES.map((county) => {
-        return (
-          <MenuItem key={county} value={county}>
-            {county}
-            {(county === "California" && (
-              <MenuSubtext>County not specified</MenuSubtext>
-            )) ||
-              null}
-          </MenuItem>
-        );
-      })}
-    </StyledTextField>
+    <StyledDiv onBlur={handleBlur}>
+      <StyledDropdown
+        label={value?.name || "Search For Location"}
+        value={value}
+        onChange={handleLocationChange}
+        options={locations}
+        search
+        MenuSelectProps={{
+          filterOptions: filter,
+          sdsStage: "userInput",
+        }}
+        InputDropdownProps={{ sdsStyle: "square", sdsStage: sdsStage }}
+      />
+      <FormHelperText>
+        {errorMessage ||
+          (isFirstRow && value && (
+            <ApplyToAllColumn
+              fieldKey={fieldKey}
+              value={value}
+              handleClick={applyToAllColumn}
+            />
+          ))}
+      </FormHelperText>
+    </StyledDiv>
   );
-}
-
-function renderValue(value: unknown): React.ReactNode {
-  return <>{value}</>;
 }

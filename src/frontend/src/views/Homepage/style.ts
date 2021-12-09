@@ -33,7 +33,7 @@ export const Card = styled.div`
     const spaces = getSpaces(props);
 
     return `
-      height: 360px;
+      height: 390px;
       width: 400px;
       padding: ${spaces?.xxl}px ${spaces?.xl}px ${spaces?.xxl}px ${spaces?.xxl}px;
       box-shadow: ${shadows?.s};
