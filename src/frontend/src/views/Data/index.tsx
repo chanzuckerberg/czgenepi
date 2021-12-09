@@ -30,13 +30,34 @@ const TITLE: Record<string, string> = {
 // that make up the array. Effective for quickly looking up objects by id, for example.
 const reduceObjectArrayToLookupDict = (
   arr: Sample[] | Tree[],
-  keyString: string
+  keyedOn: string
 ): SampleMapType | TreeMapType => {
   const keyValuePairs = arr.map((obj) => {
-    const id = obj[keyString];
+    const id = obj[keyedOn];
     return [id, obj];
   });
   return Object.fromEntries(keyValuePairs);
+};
+
+// run data through transforms
+const transformData = (data, keyedOn, transforms) => {
+  if (!transforms || !data) {
+    return;
+  }
+
+  const transformedData = data.map((datum: BioinformaticsData) => {
+    const transformedDatum = Object.assign({}, datum);
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- Asserted above
+    transforms!.forEach((transform) => {
+      const methodInputs = transform.inputs.map((key: string) => datum[key]);
+      transformedDatum[transform.key] = transform.method(methodInputs);
+    });
+
+    return transformedDatum;
+  });
+
+  return reduceObjectArrayToLookupDict(transformedData, keyedOn);
 };
 
 const Data: FunctionComponent = () => {
@@ -62,16 +83,18 @@ const Data: FunctionComponent = () => {
       setIsDataLoading(false);
 
       const apiSamples = sampleResponse["samples"];
-      const sampleMap = reduceObjectArrayToLookupDict(
+      const sampleMap = transformData(
         apiSamples,
-        "publicId"
+        "publicId",
+        []
       ) as SampleMapType;
       setSamples(sampleMap);
 
       const apiTrees = data?.phylo_trees ?? [];
-      const treeMap = reduceObjectArrayToLookupDict(
+      const treeMap = transformData(
         apiTrees,
-        "id"
+        "id",
+        TREE_TRANSFORMS
       ) as TreeMapType;
       setTrees(treeMap);
     };
@@ -107,35 +130,8 @@ const Data: FunctionComponent = () => {
       subheaders: EMPTY_OBJECT,
       text: VIEWNAME.TREES,
       to: ROUTES.PHYLO_TREES,
-      transforms: TREE_TRANSFORMS,
     },
   ];
-
-  // run data through transforms
-  dataCategories.forEach((category) => {
-    if (!category.transforms || !category.data) {
-      return;
-    }
-
-    const transformedData = map(
-      category.data,
-      (datum: BioinformaticsData, key: string) => {
-        const transformedDatum = Object.assign({}, datum);
-
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- Asserted above
-        category.transforms!.forEach((transform) => {
-          const methodInputs = transform.inputs.map(
-            (key: string) => datum[key]
-          );
-          transformedDatum[transform.key] = transform.method(methodInputs);
-        });
-
-        return [key, transformedDatum];
-      }
-    );
-
-    category.data = Object.fromEntries(transformedData);
-  });
 
   const dataJSX: Record<string, Array<JSX.Element>> = {
     menuItems: [],
