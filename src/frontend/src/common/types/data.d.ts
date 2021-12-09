@@ -1,11 +1,3 @@
-interface SampleMapType {
-  [key: string]: Sample;
-}
-
-interface TreeMapType {
-  [key: string]: Tree;
-}
-
 interface Transform {
   key: string;
   inputs: string[];

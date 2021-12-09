@@ -36,7 +36,7 @@ import {
 } from "./style";
 
 interface Props {
-  data?: SampleMapType | TreeMapType;
+  data?: BioinformaticsMap;
   defaultSortKey: string[];
   headers: Header[];
   subheaders: Record<string, SubHeader[]>;

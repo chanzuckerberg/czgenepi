@@ -21,17 +21,12 @@ import style from "./index.module.scss";
 import { Container, FlexContainer } from "./style";
 import { TREE_TRANSFORMS } from "./transforms";
 
-const TITLE: Record<string, string> = {
-  [ROUTES.DATA_SAMPLES]: "Samples",
-  [ROUTES.PHYLO_TREES]: "Phylogenetic Trees",
-};
-
 // reduces an array of objects to a mapping between the keyString arg and the objects
 // that make up the array. Effective for quickly looking up objects by id, for example.
 const reduceObjectArrayToLookupDict = (
-  arr: Sample[] | Tree[],
+  arr: BioinformaticsDataArray,
   keyedOn: string
-): SampleMapType | TreeMapType => {
+): BioinformaticsMap => {
   const keyValuePairs = arr.map((obj) => {
     const id = obj[keyedOn];
     return [id, obj];
@@ -40,9 +35,13 @@ const reduceObjectArrayToLookupDict = (
 };
 
 // run data through transforms
-const transformData = (data, keyedOn, transforms) => {
+const transformData = (
+  data: BioinformaticsDataArray,
+  keyedOn: string,
+  transforms: Transform[]
+): BioinformaticsMap => {
   if (!transforms || !data) {
-    return;
+    return reduceObjectArrayToLookupDict(data, keyedOn);
   }
 
   const transformedData = data.map((datum: BioinformaticsData) => {
@@ -55,7 +54,7 @@ const transformData = (data, keyedOn, transforms) => {
     });
 
     return transformedDatum;
-  });
+  }) as BioinformaticsDataArray;
 
   return reduceObjectArrayToLookupDict(transformedData, keyedOn);
 };
@@ -63,8 +62,8 @@ const transformData = (data, keyedOn, transforms) => {
 const Data: FunctionComponent = () => {
   useProtectedRoute();
 
-  const [samples, setSamples] = useState<SampleMapType>({});
-  const [trees, setTrees] = useState<TreeMapType>({});
+  const [samples, setSamples] = useState<BioinformaticsMap>({});
+  const [trees, setTrees] = useState<BioinformaticsMap>({});
   const [isDataLoading, setIsDataLoading] = useState(false);
   const [shouldShowFilters, setShouldShowFilters] = useState<boolean>(true);
   const [dataFilterFunc, setDataFilterFunc] = useState<any>();
@@ -83,19 +82,11 @@ const Data: FunctionComponent = () => {
       setIsDataLoading(false);
 
       const apiSamples = sampleResponse["samples"];
-      const sampleMap = transformData(
-        apiSamples,
-        "publicId",
-        []
-      ) as SampleMapType;
+      const sampleMap = transformData(apiSamples, "publicId", []);
       setSamples(sampleMap);
 
       const apiTrees = data?.phylo_trees ?? [];
-      const treeMap = transformData(
-        apiTrees,
-        "id",
-        TREE_TRANSFORMS
-      ) as TreeMapType;
+      const treeMap = transformData(apiTrees, "id", TREE_TRANSFORMS);
       setTrees(treeMap);
     };
 
@@ -176,8 +167,7 @@ const Data: FunctionComponent = () => {
   // * using the data, but LineageFilter renders a child compnent that seems
   // * to reference the parent's props (?). Passing in only the lineages, or
   // * incomplete options causes the component to break
-  const sampleArr =
-    viewName === "Samples" ? (category.data as SampleMapType) : {};
+  const sampleArr = viewName === "Samples" ? (samples as SampleMap) : {};
   const lineages = uniq(compact(map(sampleArr, (d) => d.lineage?.lineage)))
     .sort()
     .map((l) => {

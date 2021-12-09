@@ -123,7 +123,7 @@ export const UsherPlacementModal = ({
 
   const handleSubmit = (evt: SyntheticEvent) => {
     evt.preventDefault();
-    sampleIdsToSubmit = checkedSampleIds.filter(
+    const sampleIdsToSubmit = checkedSampleIds.filter(
       (id) => !failedSampleIds.includes(id)
     );
     fastaFetch.mutate({
