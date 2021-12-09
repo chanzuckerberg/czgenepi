@@ -85,11 +85,10 @@ function tsvDataMap(
     text: "Genome Recovery",
   };
   if (tableData) {
-    const filteredTableData = [...tableData];
-    const filteredTableDataForReals = filteredTableData.filter((entry) =>
+    const filteredTableData = tableData.filter((entry) =>
       checkedSampleIds.includes(String(entry["publicId"]))
     );
-    const tsvData = filteredTableDataForReals.map((entry) => {
+    const tsvData = filteredTableData.map((entry) => {
       return headersDownload.flatMap((header) => {
         if (
           typeof entry[header.key] === "object" &&

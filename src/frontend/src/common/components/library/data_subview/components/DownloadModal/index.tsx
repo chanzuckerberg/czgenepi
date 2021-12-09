@@ -1,6 +1,7 @@
 import { Dialog } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import { Alert, Tooltip } from "czifui";
+import { isEqual } from "lodash";
 import React, { useCallback, useEffect, useState } from "react";
 import { CSVLink } from "react-csv";
 import { useMutation } from "react-query";
@@ -71,7 +72,7 @@ const DownloadModal = ({
   }, [tsvData]);
 
   useEffect(() => {
-    if (JSON.stringify(checkedSampleIds) === JSON.stringify(failedSampleIds)) {
+    if (isEqual(checkedSampleIds, failedSampleIds)) {
       setFastaDisabled(true);
     } else {
       setFastaDisabled(false);

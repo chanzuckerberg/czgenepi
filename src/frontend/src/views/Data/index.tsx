@@ -26,7 +26,9 @@ const TITLE: Record<string, string> = {
   [ROUTES.PHYLO_TREES]: "Phylogenetic Trees",
 };
 
-const mapObjectArrayToIdDict = (
+// reduces an array of objects to a mapping between the keyString arg and the objects
+// that make up the array. Effective for quickly looking up objects by id, for example.
+const reduceObjectArrayToLookupDict = (
   arr: Sample[] | Tree[],
   keyString: string
 ): SampleMapType | TreeMapType => {
@@ -60,14 +62,17 @@ const Data: FunctionComponent = () => {
       setIsDataLoading(false);
 
       const apiSamples = sampleResponse["samples"];
-      const sampleMap = mapObjectArrayToIdDict(
+      const sampleMap = reduceObjectArrayToLookupDict(
         apiSamples,
         "publicId"
       ) as SampleMapType;
       setSamples(sampleMap);
 
       const apiTrees = data?.phylo_trees ?? [];
-      const treeMap = mapObjectArrayToIdDict(apiTrees, "id") as TreeMapType;
+      const treeMap = reduceObjectArrayToLookupDict(
+        apiTrees,
+        "id"
+      ) as TreeMapType;
       setTrees(treeMap);
     };
 
