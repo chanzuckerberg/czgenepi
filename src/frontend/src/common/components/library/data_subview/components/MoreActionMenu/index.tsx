@@ -6,9 +6,13 @@ import { StyledMoreActionsIcon, StyledText, StyledTrashIcon } from "./style";
 
 interface Props {
   disabled: boolean;
+  onDeleteSelected(): void;
 }
 
-const MoreActionsMenu = ({ disabled }: Props): JSX.Element => {
+const MoreActionsMenu = ({
+  disabled,
+  onDeleteSelected,
+}: Props): JSX.Element => {
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 
   const TOOLTIP_TEXT_DISABLED = (
@@ -30,6 +34,11 @@ const MoreActionsMenu = ({ disabled }: Props): JSX.Element => {
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleDeleteSamples = () => {
+    onDeleteSelected();
+    handleClose();
   };
 
   return (
@@ -55,8 +64,9 @@ const MoreActionsMenu = ({ disabled }: Props): JSX.Element => {
         keepMounted
         open={Boolean(anchorEl)}
         onClose={handleClose}
+        getContentAnchorEl={null}
       >
-        <MenuItem>
+        <MenuItem onClick={handleDeleteSamples}>
           <StyledTrashIcon />
           <StyledText>Delete Samples</StyledText>
         </MenuItem>

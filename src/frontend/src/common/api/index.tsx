@@ -37,6 +37,12 @@ export const DEFAULT_POST_OPTIONS: RequestInit = {
   ...DEFAULT_HEADERS_MUTATION_OPTIONS,
 };
 
+export const DEFAULT_DELETE_OPTIONS: RequestInit = {
+  credentials: "include",
+  method: "DELETE",
+  ...DEFAULT_HEADERS_MUTATION_OPTIONS,
+};
+
 /** Generic functions to interface with the backend API **/
 
 const API_KEY_TO_TYPE: Record<string, string> = {
