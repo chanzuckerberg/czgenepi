@@ -3,6 +3,7 @@ import {
   UseMutationResult,
   useQuery,
   useQueryClient,
+  UseQueryResult,
 } from "react-query";
 import { METADATA_KEYS_TO_API_KEYS } from "src/views/Upload/components/common/constants";
 import {
@@ -17,7 +18,7 @@ import {
   SampleResponse,
 } from "../api";
 import { API_URL } from "../constants/ENV";
-import { USE_SAMPLE_INFO } from "./entities";
+import { ENTITIES } from "./entities";
 import { MutationCallbacks } from "./types";
 
 /**
@@ -162,6 +163,12 @@ export async function createSamples({
 /**
  * sample cache
  */
+
+export const USE_SAMPLE_INFO = {
+  entities: [ENTITIES.SAMPLE_INFO],
+  id: "sampleInfo",
+};
+
 export function useSampleInfo(): UseQueryResult<SampleResponse, unknown> {
   return useQuery([USE_SAMPLE_INFO], fetchSamples, {
     retry: false,
@@ -200,7 +207,7 @@ interface SampleDeleteRequestType {
 }
 
 export interface SampleDeleteResponseType {
-  missing_sample_ids: string[];
+  ids: string[];
 }
 
 type SampleDeleteCallbacks = MutationCallbacks<SampleDeleteResponseType>;
@@ -215,11 +222,12 @@ export function useDeleteSamples({
   unknown
 > {
   const queryClient = useQueryClient();
+  // TODO (mlila): pick less confusing name choices for callbacks/params
   return useMutation(deleteSamples, {
     onError,
-    onSuccess: async () => {
+    onSuccess: async (data) => {
       await queryClient.invalidateQueries([USE_SAMPLE_INFO]);
-      onSuccess();
+      onSuccess(data);
     },
   });
 }

@@ -5,8 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { FunctionComponent, useEffect, useState } from "react";
 import { Menu } from "semantic-ui-react";
-import { fetchSamples } from "src/common/api";
 import { useProtectedRoute } from "src/common/queries/auth";
+import { useSampleInfo } from "src/common/queries/samples";
 import { useTreeInfo } from "src/common/queries/trees";
 import { FilterPanel } from "src/components/FilterPanel";
 import { DataSubview } from "../../common/components";
@@ -58,7 +58,7 @@ const Data: FunctionComponent = () => {
   const sampleResponse = useSampleInfo();
   const treeResponse = useTreeInfo();
   const { data: sampleData, isLoading: isSampleInfoLoading } = sampleResponse;
-  const { data: treeData, isTreeInfoLoading } = treeResponse;
+  const { data: treeData, isLoading: isTreeInfoLoading } = treeResponse;
 
   useEffect(() => {
     const setBioinformaticsData = async () => {
@@ -66,13 +66,11 @@ const Data: FunctionComponent = () => {
       if (isTreeInfoLoading || isSampleInfoLoading) return;
       setIsDataLoading(false);
 
-      const apiSamples = sampleData?.samples;
-      const sampleMap = mapObjectArrayToIdDict(apiSamples, "publicId");
-      setSamples(sampleMap);
+      const apiSamples = sampleData?.samples ?? [];
+      setSamples(apiSamples);
 
-      const apiTrees = treeData?.phylo_trees;
-      const treeMap = mapObjectArrayToIdDict(apiTrees, "id");
-      setTrees(treeMap);
+      const apiTrees = treeData?.phylo_trees ?? [];
+      setTrees(apiTrees);
     };
 
     setBioinformaticsData();
