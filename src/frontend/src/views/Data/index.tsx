@@ -21,29 +21,9 @@ import style from "./index.module.scss";
 import { Container, FlexContainer } from "./style";
 import { TREE_TRANSFORMS } from "./transforms";
 
-interface SampleMapType {
-  [key: string]: Sample;
-}
-
-interface TreeMapType {
-  [key: string]: Tree;
-}
-
-const mapObjectArrayToIdDict = (
-  arr: Sample[] | Tree[],
-  keyString: string
-): SampleMapType | TreeMapType => {
-  return arr.map((obj) => {
-    const id = obj[keyString];
-    return [id, obj];
-  });
-};
-
 const Data: FunctionComponent = () => {
   useProtectedRoute();
 
-  const [samples, setSamples] = useState<SampleMapType | undefined>();
-  const [trees, setTrees] = useState<TreeMapType | undefined>();
   const [isDataLoading, setIsDataLoading] = useState(false);
   const [shouldShowFilters, setShouldShowFilters] = useState<boolean>(true);
   const [dataFilterFunc, setDataFilterFunc] = useState<any>();
@@ -61,12 +41,6 @@ const Data: FunctionComponent = () => {
       setIsDataLoading(true);
       if (isTreeInfoLoading || isSampleInfoLoading) return;
       setIsDataLoading(false);
-
-      const apiSamples = sampleData?.samples ?? [];
-      setSamples(apiSamples);
-
-      const apiTrees = treeData?.phylo_trees ?? [];
-      setTrees(apiTrees);
     };
 
     setBioinformaticsData();
@@ -82,7 +56,7 @@ const Data: FunctionComponent = () => {
   // each category with its respective variable.
   const dataCategories: DataCategory[] = [
     {
-      data: samples,
+      data: sampleData?.samples ?? [],
       defaultSortKey: ["uploadDate"],
       headers: SAMPLE_HEADERS,
       isDataLoading,
@@ -92,7 +66,7 @@ const Data: FunctionComponent = () => {
       to: ROUTES.DATA_SAMPLES,
     },
     {
-      data: trees,
+      data: treeData?.phylo_trees ?? [],
       defaultSortKey: ["startedDate"],
       headers: TREE_HEADERS,
       isDataLoading,
