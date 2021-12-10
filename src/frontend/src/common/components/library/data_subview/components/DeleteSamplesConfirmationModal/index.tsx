@@ -13,7 +13,6 @@ interface Props {
   open: boolean;
 }
 
-// TODO need to cleared checkedsamples state in parent or else the checked sample counter is wrong
 const DeleteSamplesConfirmationModal = ({
   checkedSamples,
   onClose,

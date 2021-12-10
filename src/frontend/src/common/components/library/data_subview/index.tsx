@@ -217,6 +217,11 @@ const DataSubview: FunctionComponent<Props> = ({
     setCreateTreeStarted(false);
   }
 
+  const handleDeleteSampleModalClose = () => {
+    setDeleteConfirmationOpen(false);
+    setCheckedSampleIds([]);
+  };
+
   const onChange = (
     _event: React.ChangeEvent<HTMLInputElement>,
     fieldInput: InputOnChangeData
@@ -337,7 +342,7 @@ const DataSubview: FunctionComponent<Props> = ({
             />
             <DeleteSamplesConfirmationModal
               checkedSamples={checkedSamples}
-              onClose={() => setDeleteConfirmationOpen(false)}
+              onClose={handleDeleteSampleModalClose}
               open={isDeleteConfirmationOpen}
             />
           </>
