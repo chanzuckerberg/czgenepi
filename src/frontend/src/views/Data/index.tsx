@@ -2,7 +2,7 @@ import cx from "classnames";
 import { compact, map, uniq } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { FunctionComponent, useEffect, useState } from "react";
+import React, { FunctionComponent, useEffect, useMemo, useState } from "react";
 import { Menu } from "semantic-ui-react";
 import { HeadAppTitle } from "src/common/components";
 import { useProtectedRoute } from "src/common/queries/auth";
@@ -62,8 +62,6 @@ const transformData = (
 const Data: FunctionComponent = () => {
   useProtectedRoute();
 
-  const [samples, setSamples] = useState<BioinformaticsMap | undefined>();
-  const [trees, setTrees] = useState<BioinformaticsMap | undefined>();
   const [isDataLoading, setIsDataLoading] = useState(false);
   const [shouldShowFilters, setShouldShowFilters] = useState<boolean>(true);
   const [dataFilterFunc, setDataFilterFunc] = useState<any>();
@@ -77,24 +75,18 @@ const Data: FunctionComponent = () => {
   const { data: treeData, isLoading: isTreeInfoLoading } = treeResponse;
 
   useEffect(() => {
-    const setBioinformaticsData = async () => {
-      setIsDataLoading(true);
-      if (isTreeInfoLoading || isSampleInfoLoading) return;
-      setIsDataLoading(false);
+    setIsDataLoading(true);
+    if (isTreeInfoLoading || isSampleInfoLoading) return;
+    setIsDataLoading(false);
+  }, [isTreeInfoLoading, isSampleInfoLoading]);
 
-      const samples = transformData(sampleData?.samples ?? [], "publicId");
-      setSamples(samples);
-
-      const trees = transformData(
-        treeData?.phylo_trees ?? [],
-        "id",
-        TREE_TRANSFORMS
-      );
-      setTrees(trees);
-    };
-
-    setBioinformaticsData();
-  }, [isTreeInfoLoading, isSampleInfoLoading, sampleData, treeData]);
+  const { samples, trees } = useMemo(
+    () => ({
+      samples: transformData(sampleData?.samples ?? [], "publicId"),
+      trees: transformData(treeData?.phylo_trees ?? [], "id", TREE_TRANSFORMS),
+    }),
+    [sampleData, treeData]
+  );
 
   useEffect(() => {
     if (router.asPath === ROUTES.DATA) {
