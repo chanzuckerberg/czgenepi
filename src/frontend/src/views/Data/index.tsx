@@ -2,11 +2,11 @@ import cx from "classnames";
 import { compact, map, uniq } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { FunctionComponent, useEffect, useState } from "react";
+import React, { FunctionComponent, useEffect, useMemo, useState } from "react";
 import { Menu } from "semantic-ui-react";
-import { fetchSamples } from "src/common/api";
 import { HeadAppTitle } from "src/common/components";
 import { useProtectedRoute } from "src/common/queries/auth";
+import { useSampleInfo } from "src/common/queries/samples";
 import { useTreeInfo } from "src/common/queries/trees";
 import { FilterPanel } from "src/components/FilterPanel";
 import { DataSubview } from "../../common/components";
@@ -38,7 +38,7 @@ const reduceObjectArrayToLookupDict = (
 const transformData = (
   data: BioinformaticsDataArray,
   keyedOn: string,
-  transforms: Transform[]
+  transforms?: Transform[]
 ): BioinformaticsMap => {
   if (!transforms || !data) {
     return reduceObjectArrayToLookupDict(data, keyedOn);
@@ -62,8 +62,6 @@ const transformData = (
 const Data: FunctionComponent = () => {
   useProtectedRoute();
 
-  const [samples, setSamples] = useState<BioinformaticsMap>({});
-  const [trees, setTrees] = useState<BioinformaticsMap>({});
   const [isDataLoading, setIsDataLoading] = useState(false);
   const [shouldShowFilters, setShouldShowFilters] = useState<boolean>(true);
   const [dataFilterFunc, setDataFilterFunc] = useState<any>();
@@ -71,27 +69,24 @@ const Data: FunctionComponent = () => {
 
   const router = useRouter();
 
+  const sampleResponse = useSampleInfo();
   const treeResponse = useTreeInfo();
-  const { data, isLoading } = treeResponse;
+  const { data: sampleData, isLoading: isSampleInfoLoading } = sampleResponse;
+  const { data: treeData, isLoading: isTreeInfoLoading } = treeResponse;
 
   useEffect(() => {
-    const setBioinformaticsData = async () => {
-      setIsDataLoading(true);
-      if (isLoading) return;
-      const sampleResponse = await fetchSamples();
-      setIsDataLoading(false);
+    setIsDataLoading(true);
+    if (isTreeInfoLoading || isSampleInfoLoading) return;
+    setIsDataLoading(false);
+  }, [isTreeInfoLoading, isSampleInfoLoading]);
 
-      const apiSamples = sampleResponse["samples"];
-      const sampleMap = transformData(apiSamples, "publicId", []);
-      setSamples(sampleMap);
-
-      const apiTrees = data?.phylo_trees ?? [];
-      const treeMap = transformData(apiTrees, "id", TREE_TRANSFORMS);
-      setTrees(treeMap);
-    };
-
-    setBioinformaticsData();
-  }, [isLoading, data]);
+  const { samples, trees } = useMemo(
+    () => ({
+      samples: transformData(sampleData?.samples ?? [], "publicId"),
+      trees: transformData(treeData?.phylo_trees ?? [], "id", TREE_TRANSFORMS),
+    }),
+    [sampleData, treeData]
+  );
 
   useEffect(() => {
     if (router.asPath === ROUTES.DATA) {

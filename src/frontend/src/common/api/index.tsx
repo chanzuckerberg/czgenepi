@@ -97,7 +97,7 @@ export async function apiResponse<T extends APIResponse>(
 
 /** Calls to specific API endpoints **/
 
-interface SampleResponse extends APIResponse {
+export interface SampleResponse extends APIResponse {
   samples: Sample[];
 }
 const SAMPLE_MAP = new Map<string, keyof Sample>([

@@ -1,34 +1,33 @@
-import { useMutation, UseMutationResult } from "react-query";
+import {
+  useMutation,
+  UseMutationResult,
+  useQuery,
+  useQueryClient,
+  UseQueryResult,
+} from "react-query";
 import { METADATA_KEYS_TO_API_KEYS } from "src/views/Upload/components/common/constants";
 import {
   SampleIdToMetadata,
   Samples,
 } from "src/views/Upload/components/common/types";
-import { API, DEFAULT_DELETE_OPTIONS, DEFAULT_POST_OPTIONS } from "../api";
+import {
+  API,
+  DEFAULT_DELETE_OPTIONS,
+  DEFAULT_POST_OPTIONS,
+  fetchSamples,
+  SampleResponse,
+} from "../api";
 import { API_URL } from "../constants/ENV";
+import { ENTITIES } from "./entities";
 import { MutationCallbacks } from "./types";
 
-interface SamplePayload {
-  sample: {
-    private_identifier?: string;
-    collection_date?: string;
-    location?: string;
-    location_id?: number;
-    private?: boolean;
-  };
-  pathogen_genome: {
-    sequence: string;
-  };
-}
-
+/**
+ * Download fasta file for samples
+ */
 interface SampleFastaDownloadPayload {
   requested_sequences: {
     sample_ids: string[];
   };
-}
-
-interface ValidateSampleIdentifiersPayload {
-  sample_ids: string[];
 }
 
 export async function downloadSamplesFasta({
@@ -46,6 +45,13 @@ export async function downloadSamplesFasta({
   if (response.ok) return await response.blob();
 
   throw Error(`${response.statusText}: ${await response.text()}`);
+}
+
+/**
+ * validate sample ids for addition to trees
+ */
+interface ValidateSampleIdentifiersPayload {
+  sample_ids: string[];
 }
 
 export async function validateSampleIdentifiers({
@@ -84,6 +90,21 @@ export function useValidateSampleIds(
   unknown
 > {
   return useMutation(validateSampleIdentifiers, callbacks);
+}
+
+/**
+ * create new samples
+ */
+interface SamplePayload {
+  sample: {
+    private_identifier?: string;
+    collection_date?: string;
+    location?: string;
+    private?: boolean;
+  };
+  pathogen_genome: {
+    sequence: string;
+  };
 }
 
 export async function createSamples({
@@ -143,8 +164,27 @@ export async function createSamples({
   throw Error(`${response.statusText}: ${await response.text()}`);
 }
 
+/**
+ * sample cache
+ */
+
+export const USE_SAMPLE_INFO = {
+  entities: [ENTITIES.SAMPLE_INFO],
+  id: "sampleInfo",
+};
+
+export function useSampleInfo(): UseQueryResult<SampleResponse, unknown> {
+  return useQuery([USE_SAMPLE_INFO], fetchSamples, {
+    retry: false,
+  });
+}
+
 // * Proceed with caution, you are entering the DANGER ZONE!
 // * Code below this line is destructive!
+
+/**
+ * delete samples
+ */
 interface DeleteSamplesPayload {
   ids: string[];
 }
@@ -171,18 +211,27 @@ interface SampleDeleteRequestType {
 }
 
 export interface SampleDeleteResponseType {
-  missing_sample_ids: string[];
+  ids: string[];
 }
 
 type SampleDeleteCallbacks = MutationCallbacks<SampleDeleteResponseType>;
 
-export function useDeleteSamples(
-  callbacks: SampleDeleteCallbacks
-): UseMutationResult<
+export function useDeleteSamples({
+  onError,
+  onSuccess,
+}: SampleDeleteCallbacks): UseMutationResult<
   SampleDeleteResponseType,
   unknown,
   SampleDeleteRequestType,
   unknown
 > {
-  return useMutation(deleteSamples, callbacks);
+  const queryClient = useQueryClient();
+  // TODO (mlila): pick less confusing name choices for callbacks/params
+  return useMutation(deleteSamples, {
+    onError,
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries([USE_SAMPLE_INFO]);
+      onSuccess(data);
+    },
+  });
 }
