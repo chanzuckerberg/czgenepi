@@ -306,6 +306,7 @@ const DataSubview: FunctionComponent<Props> = ({
       );
     }
 
+    // convert array of sample ids into a list of sample objects
     const checkedSamples = compact(
       checkedSampleIds.map((id) => data?.[id]) as Sample[]
     );
