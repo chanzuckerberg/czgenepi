@@ -26,7 +26,8 @@ class OverviewBuilder(BaseNextstrainConfigBuilder):
     crowding_penalty = 0.1
 
     def update_subsampling(self, config, subsampling):
-        pass
+        if self.group.name == "Chicago Department of Public Health":
+            subsampling["group"]["query"] = "--query \"((location == '{location}') & (division == '{division}')) | submitting_lab == 'RIPHL at Rush University Medical Center'\""
 
 
 class NonContextualizedBuilder(BaseNextstrainConfigBuilder):
