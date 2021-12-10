@@ -19,17 +19,17 @@ locals {
   deletion_cmd          = ["make", "remote-db-drop"]
   backend_cmd           = []
   frontend_cmd          = ["npm", "run", "serve"]
-  data_load_path        = length(var.sql_import_file) > 0 ? "${local.secret["s3_buckets"]["aspen"]["name"]}/${var.sql_import_file}" : ""
+  data_load_path        = length(var.sql_import_file) > 0 ? "${local.secret["s3_buckets"]["genepi"]["name"]}/${var.sql_import_file}" : ""
 
   vpc_id                = local.secret["vpc_id"]
   subnets               = local.secret["private_subnets"]
   security_groups       = local.secret["security_groups"]
   zone                  = local.secret["zone_id"]
   cluster               = local.secret["cluster_arn"]
+  ecs_execution_role    = lookup(local.secret, "ecs_execution_role", "")
 
-  swipe_comms_bucket    = local.secret["s3_buckets"]["aspen_swipe_comms"]["name"]
-  swipe_wdl_bucket      = local.secret["s3_buckets"]["aspen_swipe_wdl"]["name"]
-  aspen_data_bucket     = local.secret["s3_buckets"]["aspen_data"]["name"]
+  swipe_comms_bucket    = local.secret["s3_buckets"]["genepi_swipe_comms"]["name"]
+  swipe_wdl_bucket      = local.secret["s3_buckets"]["genepi_swipe_wdl"]["name"]
 
   # Web images
   frontend_image   = join(":", [local.secret["ecrs"]["frontend"]["url"], lookup(var.image_tags, "frontend", var.image_tag)])
@@ -43,9 +43,9 @@ locals {
   # This is the wdl executor image, doesn't change on update.
   swipe_image     = join(":", [local.secret["ecrs"]["swipe"]["url"], "rev-7"]) # TODO - we probably don't want to hardcode this
 
-  batch_role_arn             = local.secret["batch_queues"]["aspen"]["role_arn"]
-  ec2_queue_arn              = local.secret["batch_envs"]["aspen"]["envs"]["EC2"]["queue_arn"]
-  spot_queue_arn             = local.secret["batch_envs"]["aspen"]["envs"]["SPOT"]["queue_arn"]
+  batch_role_arn             = local.secret["batch_queues"]["genepi"]["role_arn"]
+  ec2_queue_arn              = local.secret["batch_envs"]["genepi"]["envs"]["EC2"]["queue_arn"]
+  spot_queue_arn             = local.secret["batch_envs"]["genepi"]["envs"]["SPOT"]["queue_arn"]
   external_dns               = local.secret["external_zone_name"]
   internal_dns               = local.secret["internal_zone_name"]
 
@@ -63,7 +63,7 @@ locals {
   frontend_url = try(join("", ["https://", module.frontend_dns[0].dns_prefix, ".", local.external_dns]), var.frontend_url)
   backend_url  = try(join("", ["https://", module.backend_dns[0].dns_prefix, ".", local.external_dns]), var.backend_url)
 
-  stack_resource_prefix = "aspen"
+  stack_resource_prefix = "genepi"
 
   state_change_sns_topic_arn = local.secret["sns_topics"]["state_change"]
 }
@@ -93,6 +93,9 @@ module backend_dns {
 module frontend_service {
   source                = "../service"
   stack_resource_prefix = local.stack_resource_prefix
+  execution_role        = local.ecs_execution_role
+  memory                = 8192
+  cpu                   = 4096
   custom_stack_name     = local.custom_stack_name
   app_name              = "frontend"
   vpc                   = local.vpc_id
@@ -118,6 +121,7 @@ module frontend_service {
 module backend_service {
   source                = "../service"
   stack_resource_prefix = local.stack_resource_prefix
+  execution_role        = local.ecs_execution_role
   custom_stack_name     = local.custom_stack_name
   app_name              = "backend"
   vpc                   = local.vpc_id
@@ -170,10 +174,10 @@ module gisaid_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn.step_function_arn
-  schedule_expressions  = contains(["prod", "staging"], local.deployment_stage) ? ["cron(0 3 ? * MON-FRI *)"] : []
+  schedule_expressions  = contains(["geprod", "gestaging"], local.deployment_stage) ? ["cron(0 3 ? * MON-FRI *)"] : []
   event_role_arn        = local.event_role_arn
   extra_args            =  {
-    aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
+    genepi_config_secret_name = "${local.deployment_stage}/genepi-config"
     remote_dev_prefix = local.remote_dev_prefix
     # We'll use the wdl default values for ndjson_cache_key and gisaid_ndjson_url
   }
@@ -192,10 +196,10 @@ module pangolin_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn.step_function_arn
-  schedule_expressions  = contains(["prod", "staging"], local.deployment_stage) ? ["cron(0 18,23 ? * MON-FRI *)"] : []
+  schedule_expressions  = contains(["geprod", "gestaging"], local.deployment_stage) ? ["cron(0 18,23 ? * MON-FRI *)"] : []
   event_role_arn        = local.event_role_arn
   extra_args            =  {
-    aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
+    genepi_config_secret_name = "${local.deployment_stage}/genepi-config"
     remote_dev_prefix        = local.remote_dev_prefix
   }
 }
@@ -215,7 +219,7 @@ module pangolin_ondemand_sfn_config {
   sfn_arn               = module.swipe_sfn.step_function_arn
   event_role_arn        = local.event_role_arn
   extra_args            =  {
-    aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
+    genepi_config_secret_name = "${local.deployment_stage}/genepi-config"
     remote_dev_prefix        = local.remote_dev_prefix
   }
 }
@@ -236,7 +240,7 @@ module nextstrain_template_sfn_config {
   sfn_arn               = module.swipe_sfn.step_function_arn
   event_role_arn        = local.event_role_arn
    extra_args            =  {
-    aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
+    genepi_config_secret_name = "${local.deployment_stage}/genepi-config"
     remote_dev_prefix        = local.remote_dev_prefix
   }
 }
@@ -257,7 +261,7 @@ module nextstrain_ondemand_template_sfn_config {
   sfn_arn               = module.swipe_sfn.step_function_arn
   event_role_arn        = local.event_role_arn
    extra_args            =  {
-    aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
+    genepi_config_secret_name = "${local.deployment_stage}/genepi-config"
     remote_dev_prefix        = local.remote_dev_prefix
   }
 }
@@ -267,6 +271,7 @@ module migrate_db {
   stack_resource_prefix = local.stack_resource_prefix
   image                 = local.backend_image
   task_role_arn         = local.ecs_role_arn
+  execution_role        = local.ecs_execution_role
   cmd                   = local.migration_cmd
   custom_stack_name     = local.custom_stack_name
   remote_dev_prefix     = local.remote_dev_prefix
@@ -280,6 +285,7 @@ module delete_db {
   source                = "../deletion"
   image                 = local.backend_image
   task_role_arn         = local.ecs_role_arn
+  execution_role        = local.ecs_execution_role
   cmd                   = local.deletion_cmd
   custom_stack_name     = local.custom_stack_name
   remote_dev_prefix     = local.remote_dev_prefix

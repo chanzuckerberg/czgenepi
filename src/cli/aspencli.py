@@ -158,9 +158,9 @@ class ApiClient:
 
 class CliConfig:
     api_urls = {
-        "staging": "https://api.staging.genepi.czi.technology",
-        "prod": "https://api.aspen.cziscience.com",
-        "rdev": "https://{stack}-backend.dev.genepi.czi.technology",
+        "staging": "https://api.staging.czgenepi.org",
+        "prod": "https://api.czgenepi.org",
+        "rdev": "https://{stack}-backend.dev.czgenepi.org",
         "local": "http://backend.genepinet.localdev:3000",
     }
     default_oauth_api = {

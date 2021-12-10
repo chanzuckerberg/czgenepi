@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import { getSpaces } from "czifui";
-import LogoImage from "src/common/images/logo.svg";
+import LogoImage from "src/common/images/logo_complete_white.svg";
 
 export const Logo = styled(LogoImage)`
   height: 25px;

@@ -353,8 +353,8 @@ def _kick_off_pangolin(group_prefix: str, sample_ids: Sequence[str]):
                 "docker_image_id": sfn_params["Input"]["Run"]["docker_image_id"],
                 "samples": sample_ids,
                 "remote_dev_prefix": os.getenv("REMOTE_DEV_PREFIX"),
-                "aspen_config_secret_name": os.environ.get(
-                    "ASPEN_CONFIG_SECRET_NAME", "aspen-config"
+                "genepi_config_secret_name": os.environ.get(
+                    "GENEPI_CONFIG_SECRET_NAME", "genepi-config"
                 ),
             },
         },

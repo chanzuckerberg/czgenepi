@@ -1,11 +1,11 @@
 import cx from "classnames";
-import { compact, uniq } from "lodash";
-import Head from "next/head";
+import { compact, map, uniq } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { FunctionComponent, useEffect, useState } from "react";
 import { Menu } from "semantic-ui-react";
 import { fetchSamples } from "src/common/api";
+import { HeadAppTitle } from "src/common/components";
 import { useProtectedRoute } from "src/common/queries/auth";
 import { useTreeInfo } from "src/common/queries/trees";
 import { FilterPanel } from "src/components/FilterPanel";
@@ -13,6 +13,7 @@ import { DataSubview } from "../../common/components";
 import { EMPTY_OBJECT } from "../../common/constants/empty";
 import { VIEWNAME } from "../../common/constants/types";
 import { ROUTES } from "../../common/routes";
+import { PAGE_TITLES } from "../../common/titles";
 import { SampleRenderer, TreeRenderer } from "./cellRenderers";
 import { FilterPanelToggle } from "./components/FilterPanelToggle";
 import { SAMPLE_HEADERS, SAMPLE_SUBHEADERS, TREE_HEADERS } from "./headers";
@@ -20,16 +21,49 @@ import style from "./index.module.scss";
 import { Container, FlexContainer } from "./style";
 import { TREE_TRANSFORMS } from "./transforms";
 
-const TITLE: Record<string, string> = {
-  [ROUTES.DATA_SAMPLES]: "Samples",
-  [ROUTES.PHYLO_TREES]: "Phylogenetic Trees",
+// reduces an array of objects to a mapping between the keyString arg and the objects
+// that make up the array. Effective for quickly looking up objects by id, for example.
+const reduceObjectArrayToLookupDict = (
+  arr: BioinformaticsDataArray,
+  keyedOn: string
+): BioinformaticsMap => {
+  const keyValuePairs = arr.map((obj) => {
+    const id = obj[keyedOn];
+    return [id, obj];
+  });
+  return Object.fromEntries(keyValuePairs);
+};
+
+// run data through transforms
+const transformData = (
+  data: BioinformaticsDataArray,
+  keyedOn: string,
+  transforms: Transform[]
+): BioinformaticsMap => {
+  if (!transforms || !data) {
+    return reduceObjectArrayToLookupDict(data, keyedOn);
+  }
+
+  const transformedData = data.map((datum: BioinformaticsData) => {
+    const transformedDatum = Object.assign({}, datum);
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- Asserted above
+    transforms!.forEach((transform) => {
+      const methodInputs = transform.inputs.map((key: string) => datum[key]);
+      transformedDatum[transform.key] = transform.method(methodInputs);
+    });
+
+    return transformedDatum;
+  }) as BioinformaticsDataArray;
+
+  return reduceObjectArrayToLookupDict(transformedData, keyedOn);
 };
 
 const Data: FunctionComponent = () => {
   useProtectedRoute();
 
-  const [samples, setSamples] = useState<Sample[] | undefined>();
-  const [trees, setTrees] = useState<Tree[] | undefined>();
+  const [samples, setSamples] = useState<BioinformaticsMap>({});
+  const [trees, setTrees] = useState<BioinformaticsMap>({});
   const [isDataLoading, setIsDataLoading] = useState(false);
   const [shouldShowFilters, setShouldShowFilters] = useState<boolean>(true);
   const [dataFilterFunc, setDataFilterFunc] = useState<any>();
@@ -48,10 +82,12 @@ const Data: FunctionComponent = () => {
       setIsDataLoading(false);
 
       const apiSamples = sampleResponse["samples"];
-      const apiTrees = data?.phylo_trees;
+      const sampleMap = transformData(apiSamples, "publicId", []);
+      setSamples(sampleMap);
 
-      setSamples(apiSamples);
-      setTrees(apiTrees);
+      const apiTrees = data?.phylo_trees ?? [];
+      const treeMap = transformData(apiTrees, "id", TREE_TRANSFORMS);
+      setTrees(treeMap);
     };
 
     setBioinformaticsData();
@@ -85,30 +121,8 @@ const Data: FunctionComponent = () => {
       subheaders: EMPTY_OBJECT,
       text: VIEWNAME.TREES,
       to: ROUTES.PHYLO_TREES,
-      transforms: TREE_TRANSFORMS,
     },
   ];
-
-  // run data through transforms
-  dataCategories.forEach((category) => {
-    if (!category.transforms || !category.data) {
-      return;
-    }
-
-    const transformedData = category.data.map((datum: BioinformaticsData) => {
-      const transformedDatum = Object.assign({}, datum);
-
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- Asserted above
-      category.transforms!.forEach((transform) => {
-        const methodInputs = transform.inputs.map((key) => datum[key]);
-        transformedDatum[transform.key] = transform.method(methodInputs);
-      });
-
-      return transformedDatum;
-    });
-
-    category.data = transformedData as BioinformaticsDataArray;
-  });
 
   const dataJSX: Record<string, Array<JSX.Element>> = {
     menuItems: [],
@@ -141,7 +155,7 @@ const Data: FunctionComponent = () => {
     );
   });
 
-  const title = TITLE[router.asPath];
+  const subTitle = PAGE_TITLES[router.asPath];
 
   const category =
     dataCategories.find((category) => category.to === router.asPath) ||
@@ -153,8 +167,8 @@ const Data: FunctionComponent = () => {
   // * using the data, but LineageFilter renders a child compnent that seems
   // * to reference the parent's props (?). Passing in only the lineages, or
   // * incomplete options causes the component to break
-  const sampleArr = viewName === "Samples" ? (category.data as Sample[]) : [];
-  const lineages = uniq(compact(sampleArr?.map((d) => d.lineage?.lineage)))
+  const sampleMap = viewName === "Samples" ? (samples as SampleMap) : {};
+  const lineages = uniq(compact(map(sampleMap, (d) => d.lineage?.lineage)))
     .sort()
     .map((l) => {
       return { name: l as string };
@@ -162,9 +176,7 @@ const Data: FunctionComponent = () => {
 
   return (
     <Container className={style.dataRoot}>
-      <Head>
-        <title>Aspen {title && " | " + title}</title>
-      </Head>
+      <HeadAppTitle subTitle={subTitle} />
 
       <FlexContainer
         className={style.navigation}

@@ -2,7 +2,7 @@
 
 # WDL inputs available through environmental vars:
 # AWS_REGION
-# ASPEN_CONFIG_SECRET_NAME
+# GENEPI_CONFIG_SECRET_NAME
 # REMOTE_DEV_PREFIX (if set)
 # S3_FILESTEM
 # GROUP_NAME
@@ -22,8 +22,8 @@ build_id=$(date +%Y%m%d-%H%M)
 aws configure set region $AWS_REGION
 
 # fetch aspen config
-aspen_config="$(aws secretsmanager get-secret-value --secret-id $ASPEN_CONFIG_SECRET_NAME --query SecretString --output text)"
-aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$aspen_config")"
+genepi_config="$(aws secretsmanager get-secret-value --secret-id $GENEPI_CONFIG_SECRET_NAME --query SecretString --output text)"
+aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$genepi_config")"
 
 # Recover template args
 TEMPLATE_ARGS=$(jq -c . < "${TEMPLATE_ARGS_FILE}")

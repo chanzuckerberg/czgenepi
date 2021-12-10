@@ -11,8 +11,9 @@ const InputInstructions = (): JSX.Element => {
         items={[
           <div key={0}>
             Add <SemiBold>GISAID IDs</SemiBold> (e.g. USA/CA-CZB-0000/2021 or
-            hCoV-19/USA/CA-CZB-0000/2021), <SemiBold>Aspen Public IDs</SemiBold>
-            , or <SemiBold>Aspen Private IDs</SemiBold> below to include samples
+            hCoV-19/USA/CA-CZB-0000/2021),{" "}
+            <SemiBold>CZ GEN EPI Public IDs</SemiBold>, or{" "}
+            <SemiBold>CZ GEN EPI Private IDs</SemiBold> below to include samples
             in your tree.
           </div>,
           <div key={1}>
@@ -26,8 +27,8 @@ const InputInstructions = (): JSX.Element => {
           </div>,
           <div key={3}>
             <SemiBold>
-              As with samples uploaded directly to Aspen, sequences added by ID
-              do not undergo any QC before being added to your tree.
+              As with samples uploaded directly to CZ GEN EPI, sequences added
+              by ID do not undergo any QC before being added to your tree.
             </SemiBold>
           </div>,
         ]}

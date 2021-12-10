@@ -1,9 +1,9 @@
 import { Dialog } from "@material-ui/core";
 import { Button, List, ListItem, ListSubheader } from "czifui";
-import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { API } from "src/common/api";
+import { HeadAppTitle } from "src/common/components";
 import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
@@ -74,9 +74,7 @@ export default function AgreeTerms(): JSX.Element | null {
   // Okay, user needs to agree to ToS before they can use the app. Show them page.
   return (
     <>
-      <Head>
-        <title>Aspen | Agree Terms of Service</title>
-      </Head>
+      <HeadAppTitle subTitle="Agree Terms of Service" />
       <PageContent>
         <Dialog open>
           <DialogTitle>
@@ -105,8 +103,8 @@ export default function AgreeTerms(): JSX.Element | null {
                 organizations, but are visible to your group.
               </ListItem>
               <ListItem fontSize="s">
-                Aspen does not contain any personally identifiable information
-                or protected health information.
+                CZ GEN EPI does not contain any personally identifiable
+                information or protected health information.
               </ListItem>
               <ListItem fontSize="s">
                 We utilize industry standard best practices in information

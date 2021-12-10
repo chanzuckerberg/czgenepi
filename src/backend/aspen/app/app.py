@@ -58,7 +58,7 @@ def handle_bad_request(err):
 allowed_origins = []
 frontend_url = os.getenv("FRONTEND_URL")
 
-if deployment not in ["staging", "prod"]:
+if deployment not in ["gestaging", "geprod", "staging", "prod"]:
     allowed_origins.extend(
         [r"http://.*\.genepinet\.localdev:\d+", r"^http://localhost:\d+"]
     )

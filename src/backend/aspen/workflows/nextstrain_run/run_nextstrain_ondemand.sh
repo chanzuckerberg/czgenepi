@@ -2,7 +2,7 @@
 
 # WDL inputs available through environmental vars:
 # AWS_REGION
-# ASPEN_CONFIG_SECRET_NAME
+# GENEPI_CONFIG_SECRET_NAME
 # REMOTE_DEV_PREFIX (if set)
 # WORKFLOW_ID
 # S3_FILESTEM
@@ -19,8 +19,8 @@ build_date=$(date +%Y%m%d)
 aws configure set region $AWS_REGION
 
 # fetch aspen config
-aspen_config="$(aws secretsmanager get-secret-value --secret-id $ASPEN_CONFIG_SECRET_NAME --query SecretString --output text)"
-aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$aspen_config")"
+genepi_config="$(aws secretsmanager get-secret-value --secret-id $GENEPI_CONFIG_SECRET_NAME --query SecretString --output text)"
+aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$genepi_config")"
 
 # set up ncov
 mkdir -p /ncov/my_profiles/aspen /ncov/results

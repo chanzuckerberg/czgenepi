@@ -1,6 +1,6 @@
-# ASPEN
+# CZ GEN EPI (formerly Aspen)
 
-This repository contains the code for the gen-epi project.
+This repository contains the code for the Genomic Epidemiology project.
 
 ## Setting up a development environment
 
