@@ -38,7 +38,7 @@ const reduceObjectArrayToLookupDict = (
 const transformData = (
   data: BioinformaticsDataArray,
   keyedOn: string,
-  transforms: Transform[]
+  transforms?: Transform[]
 ): BioinformaticsMap => {
   if (!transforms || !data) {
     return reduceObjectArrayToLookupDict(data, keyedOn);
@@ -62,6 +62,8 @@ const transformData = (
 const Data: FunctionComponent = () => {
   useProtectedRoute();
 
+  const [samples, setSamples] = useState<BioinformaticsMap | undefined>();
+  const [trees, setTrees] = useState<BioinformaticsMap | undefined>();
   const [isDataLoading, setIsDataLoading] = useState(false);
   const [shouldShowFilters, setShouldShowFilters] = useState<boolean>(true);
   const [dataFilterFunc, setDataFilterFunc] = useState<any>();
@@ -71,26 +73,36 @@ const Data: FunctionComponent = () => {
 
   const sampleResponse = useSampleInfo();
   const treeResponse = useTreeInfo();
-  const { data: sampleData, isLoading: isSampleInfoLoading } = sampleResponse;
-  const { data: treeData, isLoading: isTreeInfoLoading } = treeResponse;
 
   useEffect(() => {
     const setBioinformaticsData = async () => {
+      const { data: sampleData, isLoading: isSampleInfoLoading } =
+        sampleResponse;
+      const { data: treeData, isLoading: isTreeInfoLoading } = treeResponse;
+
       setIsDataLoading(true);
       if (isTreeInfoLoading || isSampleInfoLoading) return;
       setIsDataLoading(false);
+
+      const samples = transformData(sampleData?.samples ?? [], "publicId");
+      setSamples(samples);
+
+      const trees = transformData(
+        treeData?.phylo_trees ?? [],
+        "id",
+        TREE_TRANSFORMS
+      );
+      setTrees(trees);
     };
 
     setBioinformaticsData();
-  }, [isTreeInfoLoading, isSampleInfoLoading, treeData, sampleData]);
+  }, [treeResponse, sampleResponse]);
 
   useEffect(() => {
     if (router.asPath === ROUTES.DATA) {
       router.push(ROUTES.DATA_SAMPLES);
     }
   }, [router]);
-
-  const samples = sampleData?.samples ?? [];
 
   // this constant is inside the component so we can associate
   // each category with its respective variable.
@@ -106,7 +118,7 @@ const Data: FunctionComponent = () => {
       to: ROUTES.DATA_SAMPLES,
     },
     {
-      data: treeData?.phylo_trees ?? [],
+      data: trees,
       defaultSortKey: ["startedDate"],
       headers: TREE_HEADERS,
       isDataLoading,
