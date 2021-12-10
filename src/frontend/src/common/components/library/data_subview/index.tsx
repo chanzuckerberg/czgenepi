@@ -1,4 +1,4 @@
-import { escapeRegExp } from "lodash/fp";
+import { escapeRegExp, filter } from "lodash";
 import NextLink from "next/link";
 import React, {
   FunctionComponent,
@@ -37,7 +37,7 @@ import {
 } from "./style";
 
 interface Props {
-  data?: TableItem[];
+  data?: BioinformaticsMap;
   defaultSortKey: string[];
   headers: Header[];
   subheaders: Record<string, SubHeader[]>;
@@ -74,7 +74,7 @@ function searchReducer(state: SearchState, action: SearchState): SearchState {
 }
 
 function tsvDataMap(
-  checkedSamples: string[],
+  checkedSampleIds: string[],
   tableData: TableItem[] | undefined,
   headers: Header[],
   subheaders: Record<string, SubHeader[]>
@@ -86,11 +86,10 @@ function tsvDataMap(
     text: "Genome Recovery",
   };
   if (tableData) {
-    const filteredTableData = [...tableData];
-    const filteredTableDataForReals = filteredTableData.filter((entry) =>
-      checkedSamples.includes(String(entry["publicId"]))
+    const filteredTableData = tableData.filter((entry) =>
+      checkedSampleIds.includes(String(entry["publicId"]))
     );
-    const tsvData = filteredTableDataForReals.map((entry) => {
+    const tsvData = filteredTableData.map((entry) => {
       return headersDownload.flatMap((header) => {
         if (
           typeof entry[header.key] === "object" &&
@@ -135,14 +134,14 @@ const DataSubview: FunctionComponent<Props> = ({
 }: Props) => {
   // we are modifying state using hooks, so we need a reducer
   const [state, dispatch] = useReducer(searchReducer, {
-    results: data,
+    results: Object.values(data ?? {}),
     searching: false,
   });
 
-  const [checkedSamples, setCheckedSamples] = useState<string[]>([]);
+  const [checkedSampleIds, setCheckedSampleIds] = useState<string[]>([]);
   const [showCheckboxes, setShowCheckboxes] = useState<boolean>(false);
   const [isDownloadModalOpen, setDownloadModalOpen] = useState(false);
-  const [failedSamples, setFailedSamples] = useState<string[]>([]);
+  const [failedSampleIds, setFailedSampleIds] = useState<string[]>([]);
   const [downloadFailed, setDownloadFailed] = useState<boolean>(false);
   const [isNSCreateTreeModalOpen, setIsNSCreateTreeModalOpen] =
     useState<boolean>(false);
@@ -232,14 +231,14 @@ const DataSubview: FunctionComponent<Props> = ({
     if (data === undefined) {
       return;
     } else if (query.length === 0) {
-      dispatch({ results: data });
+      dispatch({ results: Object.values(data) });
       return;
     }
 
     dispatch({ searching: true });
 
     const regex = new RegExp(escapeRegExp(query), "i");
-    const filteredData = data.filter((item) => recursiveTest(item, regex));
+    const filteredData = filter(data, (item) => recursiveTest(item, regex));
     dispatch({ results: filteredData, searching: false });
   };
 
@@ -266,7 +265,7 @@ const DataSubview: FunctionComponent<Props> = ({
     </span>
   );
 
-  const numCheckedSamples = checkedSamples?.length;
+  const numCheckedSamples = checkedSampleIds?.length;
   const hasCheckedSamples = numCheckedSamples > 0;
   const hasTooManySamples = numCheckedSamples > 2000;
 
@@ -275,7 +274,7 @@ const DataSubview: FunctionComponent<Props> = ({
     if (viewName === VIEWNAME.SAMPLES && tableData !== undefined) {
       sampleActions = (
         <DownloadWrapper>
-          <StyledChip isRounded label={checkedSamples.length} status="info" />
+          <StyledChip isRounded label={checkedSampleIds.length} status="info" />
           <StyledDiv>Selected </StyledDiv>
           <Divider />
           <TreeSelectionMenu
@@ -307,11 +306,11 @@ const DataSubview: FunctionComponent<Props> = ({
         {tableData !== undefined && viewName === VIEWNAME.SAMPLES && (
           <>
             <DownloadModal
-              sampleIds={checkedSamples}
-              failedSamples={failedSamples}
+              checkedSampleIds={checkedSampleIds}
+              failedSampleIds={failedSampleIds}
               setDownloadFailed={setDownloadFailed}
               tsvData={tsvDataMap(
-                checkedSamples,
+                checkedSampleIds,
                 tableData,
                 headers,
                 subheaders
@@ -320,20 +319,20 @@ const DataSubview: FunctionComponent<Props> = ({
               onClose={handleDownloadClose}
             />
             <CreateNSTreeModal
-              sampleIds={checkedSamples}
-              failedSamples={failedSamples}
+              checkedSampleIds={checkedSampleIds}
+              failedSampleIds={failedSampleIds}
               open={isNSCreateTreeModalOpen}
               onClose={handleCreateTreeClose}
               handleCreateTreeFailed={handleCreateTreeFailed}
               handleSetCreateTreeStarted={handleSetCreateTreeStarted}
             />
             <UsherTreeFlow
-              checkedSamples={checkedSamples}
-              failedSamples={failedSamples}
+              checkedSampleIds={checkedSampleIds}
+              failedSampleIds={failedSampleIds}
               shouldStartUsherFlow={shouldStartUsherFlow}
             />
             <DeleteSamplesConfirmationModal
-              checkedSamples={checkedSamples}
+              checkedSamples={checkedSampleIds}
               onClose={() => setDeleteConfirmationOpen(false)}
               open={isDeleteConfirmationOpen}
             />
@@ -406,10 +405,10 @@ const DataSubview: FunctionComponent<Props> = ({
           <div className={style.samplesTable}>
             <DataTable
               isLoading={isLoading}
-              checkedSamples={checkedSamples}
-              setCheckedSamples={setCheckedSamples}
-              failedSamples={failedSamples}
-              setFailedSamples={setFailedSamples}
+              checkedSampleIds={checkedSampleIds}
+              setCheckedSampleIds={setCheckedSampleIds}
+              failedSampleIds={failedSampleIds}
+              setFailedSampleIds={setFailedSampleIds}
               showCheckboxes={showCheckboxes}
               data={
                 dataFilterFunc && tableData
@@ -430,8 +429,9 @@ const DataSubview: FunctionComponent<Props> = ({
     let tableData;
 
     if (data) {
-      dispatch({ results: data });
-      tableData = data;
+      const values = Object.values(data);
+      dispatch({ results: values });
+      tableData = values;
     }
 
     return render(tableData);

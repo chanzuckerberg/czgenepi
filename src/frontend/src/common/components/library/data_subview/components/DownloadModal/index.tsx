@@ -1,6 +1,7 @@
 import { Dialog } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import { Alert, Tooltip } from "czifui";
+import { isEqual } from "lodash";
 import React, { useCallback, useEffect, useState } from "react";
 import { CSVLink } from "react-csv";
 import { useMutation } from "react-query";
@@ -27,8 +28,8 @@ import {
 } from "./style";
 
 interface Props {
-  sampleIds: string[];
-  failedSamples: any[];
+  checkedSampleIds: string[];
+  failedSampleIds: string[];
   tsvData: [string[], string[][]] | undefined;
   open: boolean;
   onClose: () => void;
@@ -36,8 +37,8 @@ interface Props {
 }
 
 const DownloadModal = ({
-  sampleIds,
-  failedSamples,
+  checkedSampleIds,
+  failedSampleIds,
   tsvData,
   open,
   onClose,
@@ -71,12 +72,12 @@ const DownloadModal = ({
   }, [tsvData]);
 
   useEffect(() => {
-    if (JSON.stringify(sampleIds) === JSON.stringify(failedSamples)) {
+    if (isEqual(checkedSampleIds, failedSampleIds)) {
       setFastaDisabled(true);
     } else {
       setFastaDisabled(false);
     }
-  }, [sampleIds, failedSamples, setFastaDisabled]);
+  }, [checkedSampleIds, failedSampleIds, setFastaDisabled]);
 
   const handleMetadataClick = function () {
     setMetadataSelected(!isMetadataSelected);
@@ -130,7 +131,8 @@ const DownloadModal = ({
         </StyledIconButton>
         <Header>Select Download</Header>
         <Title>
-          {sampleIds.length} {pluralize("Sample", sampleIds.length)} Selected
+          {checkedSampleIds.length}{" "}
+          {pluralize("Sample", checkedSampleIds.length)} Selected
         </Title>
       </DialogTitle>
       <DialogContent>
@@ -184,12 +186,12 @@ const DownloadModal = ({
               </CheckBoxInfo>
             </CheckBoxWrapper>
           </Container>
-          {failedSamples.length > 0 &&
+          {failedSampleIds.length > 0 &&
             !isFastaDisabled && ( //ignore alert if fasta is already disabled
               <Alert severity="warning">
                 <DownloadType>
-                  {failedSamples.length}
-                  {pluralize("sample", failedSamples.length)}
+                  {failedSampleIds.length}
+                  {pluralize("sample", failedSampleIds.length)}
                   will not be included in your Consensus Genome download
                 </DownloadType>
                 <DownloadTypeInfo>
@@ -260,7 +262,7 @@ const DownloadModal = ({
             variant="contained"
             isRounded
             onClick={() => {
-              mutation.mutate({ sampleIds });
+              mutation.mutate({ sampleIds: checkedSampleIds });
             }}
             disabled={false}
           >
@@ -277,7 +279,7 @@ const DownloadModal = ({
           variant="contained"
           isRounded
           onClick={() => {
-            mutation.mutate({ sampleIds });
+            mutation.mutate({ sampleIds: checkedSampleIds });
           }}
           disabled={false}
         >
@@ -293,7 +295,7 @@ const DownloadModal = ({
           variant="contained"
           isRounded
           onClick={() => {
-            mutation.mutate({ sampleIds });
+            mutation.mutate({ sampleIds: checkedSampleIds });
           }}
           disabled={true}
         >
