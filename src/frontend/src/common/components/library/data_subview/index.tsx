@@ -142,7 +142,6 @@ const DataSubview: FunctionComponent<Props> = ({
   const [showCheckboxes, setShowCheckboxes] = useState<boolean>(false);
   const [isDownloadModalOpen, setDownloadModalOpen] = useState(false);
   const [failedSampleIds, setFailedSampleIds] = useState<string[]>([]);
-  const [downloadFailed, setDownloadFailed] = useState<boolean>(false);
   const [isNSCreateTreeModalOpen, setIsNSCreateTreeModalOpen] =
     useState<boolean>(false);
   const [hasCreateTreeStarted, setCreateTreeStarted] = useState<boolean>(false);
@@ -193,21 +192,10 @@ const DataSubview: FunctionComponent<Props> = ({
   }, [viewName]);
 
   useEffect(() => {
-    // if there is an error then close the modal.
-    if (downloadFailed) {
-      setDownloadModalOpen(false);
-    }
-  }, [downloadFailed]);
-
-  useEffect(() => {
     if (didCreateTreeFailed) {
       setIsNSCreateTreeModalOpen(false);
     }
   }, [didCreateTreeFailed]);
-
-  function handleDismissDownloadErrorClick() {
-    setDownloadFailed(false);
-  }
 
   function handleDismissCreateTreeErrorClick() {
     setCreateTreeFailed(false);
@@ -318,7 +306,6 @@ const DataSubview: FunctionComponent<Props> = ({
             <DownloadModal
               checkedSampleIds={checkedSampleIds}
               failedSampleIds={failedSampleIds}
-              setDownloadFailed={setDownloadFailed}
               tsvData={tsvDataMap(
                 checkedSampleIds,
                 tableData,
@@ -362,19 +349,6 @@ const DataSubview: FunctionComponent<Props> = ({
             <div>
               {viewName === VIEWNAME.TREES && <TreeCreateHelpLink />}
               {sampleActions}
-              <Notification
-                buttonOnClick={handleDismissDownloadErrorClick}
-                buttonText="DISMISS"
-                dismissDirection="right"
-                dismissed={!downloadFailed}
-                intent="error"
-              >
-                <BoldText>
-                  Something went wrong and we were unable to complete one or
-                  more of your downloads
-                </BoldText>
-                {CONTACT_US}
-              </Notification>
               <Notification
                 buttonOnClick={handleDismissCreateTreeErrorClick}
                 buttonText="DISMISS"
