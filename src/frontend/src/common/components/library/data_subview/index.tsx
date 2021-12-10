@@ -336,7 +336,7 @@ const DataSubview: FunctionComponent<Props> = ({
               shouldStartUsherFlow={shouldStartUsherFlow}
             />
             <DeleteSamplesConfirmationModal
-              checkedSamples={checkedSampleIds}
+              checkedSamples={checkedSamples}
               onClose={() => setDeleteConfirmationOpen(false)}
               open={isDeleteConfirmationOpen}
             />
