@@ -1,11 +1,14 @@
 import React from "react";
 import { noop } from "src/common/constants/empty";
+import { useUserInfo } from "src/common/queries/auth";
 import { useDeleteSamples } from "src/common/queries/samples";
+import { B } from "src/common/styles/support/style";
 import { pluralize } from "src/common/utils/strUtils";
 import { DeleteDialog } from "src/components/DeleteDialog";
+import { StyledCallout } from "./style";
 
 interface Props {
-  checkedSamples: string[];
+  checkedSamples: Sample[];
   onClose(): void;
   open: boolean;
 }
@@ -15,6 +18,13 @@ const DeleteSamplesConfirmationModal = ({
   onClose,
   open,
 }: Props): JSX.Element | null => {
+  const { data } = useUserInfo();
+  const { group: userGroup } = data ?? {};
+
+  const samplesToDelete = checkedSamples
+    .filter((sample) => sample.submittingGroup?.name === userGroup?.name)
+    .map((sample) => sample.id);
+
   // TODO (mlila): update these callbacks to display notifications
   // TODO          as part of #173849
   const deleteSampleMutation = useDeleteSamples({
@@ -24,9 +34,7 @@ const DeleteSamplesConfirmationModal = ({
 
   const onDelete = () => {
     deleteSampleMutation.mutate({
-      // TODO (mlila): this should be an array of db unique ids
-      // TODO          this requires a refactor
-      samplesToDelete: checkedSamples,
+      samplesToDelete,
     });
     onClose();
   };
@@ -39,8 +47,25 @@ const DeleteSamplesConfirmationModal = ({
     numSamples
   )}?`;
 
-  const content =
-    "Deleted samples will be removed from Aspen. If these samples were included in previously generated trees, they will be shown with their public IDs only. You will not be able to undo this action.";
+  const numSamplesCantDelete = checkedSamples.length - samplesToDelete.length;
+  const content = (
+    <div>
+      <span>
+        Deleted samples will be removed from Aspen. If these samples were
+        included in previously generated trees, they will be shown with their
+        public IDs only. You will not be able to undo this action.
+      </span>
+      {numSamplesCantDelete > 0 && (
+        <StyledCallout intent="warning">
+          <B>
+            {numSamplesCantDelete} Selected{" "}
+            {pluralize("Sample", numSamplesCantDelete)} can’t be deleted
+          </B>{" "}
+          because they are managed by another jurisdiction.
+        </StyledCallout>
+      )}
+    </div>
+  );
 
   return (
     <DeleteDialog

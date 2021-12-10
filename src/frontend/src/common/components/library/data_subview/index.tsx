@@ -1,4 +1,4 @@
-import { escapeRegExp, filter } from "lodash";
+import { compact, escapeRegExp, filter } from "lodash";
 import NextLink from "next/link";
 import React, {
   FunctionComponent,
@@ -217,6 +217,11 @@ const DataSubview: FunctionComponent<Props> = ({
     setCreateTreeStarted(false);
   }
 
+  const handleDeleteSampleModalClose = () => {
+    setDeleteConfirmationOpen(false);
+    setCheckedSampleIds([]);
+  };
+
   const onChange = (
     _event: React.ChangeEvent<HTMLInputElement>,
     fieldInput: InputOnChangeData
@@ -301,6 +306,11 @@ const DataSubview: FunctionComponent<Props> = ({
       );
     }
 
+    // convert array of sample ids into a list of sample objects
+    const checkedSamples = compact(
+      checkedSampleIds.map((id) => data?.[id]) as Sample[]
+    );
+
     return (
       <>
         {tableData !== undefined && viewName === VIEWNAME.SAMPLES && (
@@ -332,8 +342,8 @@ const DataSubview: FunctionComponent<Props> = ({
               shouldStartUsherFlow={shouldStartUsherFlow}
             />
             <DeleteSamplesConfirmationModal
-              checkedSamples={checkedSampleIds}
-              onClose={() => setDeleteConfirmationOpen(false)}
+              checkedSamples={checkedSamples}
+              onClose={handleDeleteSampleModalClose}
               open={isDeleteConfirmationOpen}
             />
           </>
