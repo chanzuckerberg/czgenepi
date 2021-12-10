@@ -73,13 +73,11 @@ const Data: FunctionComponent = () => {
 
   const sampleResponse = useSampleInfo();
   const treeResponse = useTreeInfo();
+  const { data: sampleData, isLoading: isSampleInfoLoading } = sampleResponse;
+  const { data: treeData, isLoading: isTreeInfoLoading } = treeResponse;
 
   useEffect(() => {
     const setBioinformaticsData = async () => {
-      const { data: sampleData, isLoading: isSampleInfoLoading } =
-        sampleResponse;
-      const { data: treeData, isLoading: isTreeInfoLoading } = treeResponse;
-
       setIsDataLoading(true);
       if (isTreeInfoLoading || isSampleInfoLoading) return;
       setIsDataLoading(false);
@@ -96,7 +94,7 @@ const Data: FunctionComponent = () => {
     };
 
     setBioinformaticsData();
-  }, [treeResponse, sampleResponse]);
+  }, [isTreeInfoLoading, isSampleInfoLoading, sampleData, treeData]);
 
   useEffect(() => {
     if (router.asPath === ROUTES.DATA) {
