@@ -13,6 +13,7 @@ import { ROUTES } from "src/common/routes";
 import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import Notification from "src/components/Notification";
 import { CreateNSTreeModal } from "./components/CreateNSTreeModal";
+import { DeleteSamplesConfirmationModal } from "./components/DeleteSamplesConfirmationModal";
 import DownloadModal from "./components/DownloadModal";
 import { IconButton } from "./components/IconButton";
 import { MoreActionsMenu } from "./components/MoreActionMenu";
@@ -147,6 +148,8 @@ const DataSubview: FunctionComponent<Props> = ({
   const [hasCreateTreeStarted, setCreateTreeStarted] = useState<boolean>(false);
   const [didCreateTreeFailed, setCreateTreeFailed] = useState<boolean>(false);
   const [shouldStartUsherFlow, setShouldStartUsherFlow] =
+    useState<boolean>(false);
+  const [isDeleteConfirmationOpen, setDeleteConfirmationOpen] =
     useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
 
@@ -289,7 +292,10 @@ const DataSubview: FunctionComponent<Props> = ({
             tooltipTextEnabled={DOWNLOAD_TOOLTIP_TEXT_ENABLED}
           />
           {usesFeatureFlag(FEATURE_FLAGS.crudV0) && (
-            <MoreActionsMenu disabled={!hasCheckedSamples} />
+            <MoreActionsMenu
+              disabled={!hasCheckedSamples}
+              onDeleteSelected={() => setDeleteConfirmationOpen(true)}
+            />
           )}
         </DownloadWrapper>
       );
@@ -324,6 +330,11 @@ const DataSubview: FunctionComponent<Props> = ({
               checkedSampleIds={checkedSampleIds}
               failedSampleIds={failedSampleIds}
               shouldStartUsherFlow={shouldStartUsherFlow}
+            />
+            <DeleteSamplesConfirmationModal
+              checkedSamples={checkedSamples}
+              onClose={() => setDeleteConfirmationOpen(false)}
+              open={isDeleteConfirmationOpen}
             />
           </>
         )}
