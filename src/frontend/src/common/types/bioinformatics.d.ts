@@ -56,4 +56,14 @@ interface Tree extends BioinformaticsType {
 }
 
 type BioinformaticsData = Sample | Tree;
-type BioinformaticsDataArray = Array<Sample | Tree>;
+type BioinformaticsDataArray = Array<Sample> | Array<Tree>;
+
+interface SampleMap {
+  [key: string]: Sample;
+}
+
+interface TreeMap {
+  [key: string]: Tree;
+}
+
+type BioinformaticsMap = SampleMap | TreeMap;

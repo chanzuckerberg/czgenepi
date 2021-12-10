@@ -21,11 +21,11 @@ module nextstrain_chicago_contextual_sfn_config {
   schedule_expressions  = local.nextstrain_cron_schedule
   event_role_arn        = local.event_role_arn
   extra_args            =  {
-    aspen_config_secret_name = "${local.deployment_stage}/aspen-config"
+    genepi_config_secret_name = "${local.deployment_stage}/genepi-config"
     remote_dev_prefix        = local.remote_dev_prefix
     group_name               = "Chicago Department of Public Health"
     s3_filestem              = "Chicago Contextual"
-    template_filename        = "group_plus_context.yaml"
+    template_filename        = "group_plus_context_Chicago.yaml"
     template_args            = {
       division = "Illinois"
       location = "Chicago"

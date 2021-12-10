@@ -5,7 +5,7 @@ interface Transform {
 }
 
 interface DataCategory {
-  data: BioinformaticsDataArray | undefined;
+  data: SampleMapType | TreeMapType;
   defaultSortKey: string[];
   headers: Header[];
   isDataLoading: boolean;
