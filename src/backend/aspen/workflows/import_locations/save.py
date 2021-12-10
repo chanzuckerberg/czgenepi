@@ -1,6 +1,12 @@
+# flake8: noqa: E711
+# Doing a double-equals comparison to None is critical for the statements
+# that use it to compile to the intended SQL, which is why tell flake8 to
+# ignore rule E711 at the top of this file
+
 import click
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
+from sqlalchemy.sql.expression import and_
 
 from aspen.config.config import Config
 from aspen.database.connection import (
@@ -25,7 +31,7 @@ def save():
                 GisaidMetadata.division,
                 GisaidMetadata.location,
             )
-            .where(GisaidMetadata.location != "")
+            .where(and_(GisaidMetadata.location != "", GisaidMetadata.location != None))
             .distinct()
         )
         gisaid_locations_insert = (
@@ -40,11 +46,9 @@ def save():
         session.execute(gisaid_locations_insert)
 
         # Insert an entry with a null location for every distinct Region/Country/Division combination
-        # Doing a double-equals comparison is critical for the statement to compile to the intended SQL,
-        # so we tell flake8 to ignore rule E711
         existing_null_location_select = (
             sa.select(Location.region, Location.country, Location.division)
-            .where(Location.location == None)  # noqa: E711
+            .where(Location.location == None)
             .distinct()
         )
         existing_null_locations = set(
