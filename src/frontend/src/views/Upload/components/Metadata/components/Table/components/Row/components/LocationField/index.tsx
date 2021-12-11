@@ -39,7 +39,27 @@ export default function LocationField({
     value = values[fieldKey] as NamedGisaidLocation;
   }
 
-  const errorMessage = touched[fieldKey] && errors[fieldKey];
+  /**
+   * TODO REMOVE in near term
+   * HOTFIX somewhat hacky code
+   * Will reevaluate in a few days
+   *
+   * Issue is that because collectionLocation is now an object rather than a
+   * simple string, the `errors[fieldKey]` results in an object rather than a simple
+   * string. When that gets injected into React, boooom.
+   * We avoid by checking for existence of an error object for the fieldKey, then
+   * just use a hardcoded error message.
+   *
+   * This should only be an issue for TSV upload, since it's impossible to choose an
+   * unrecognized location during interaction with the dropdown.
+   */
+  // Original line below
+  // const errorMessage = touched[fieldKey] && errors[fieldKey];
+  const hasErrorInLocation = touched[fieldKey] && errors[fieldKey];
+  const errorMessage = hasErrorInLocation ? "Location was not recognized." : undefined;
+  /**
+   * END HOTFIX
+   */
 
   const filter = (
     options: NamedGisaidLocation[],
