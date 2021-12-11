@@ -31,10 +31,10 @@ const DeleteSamplesConfirmationModal = ({
     .map((sample) => sample.id);
 
   const deleteSampleMutation = useDeleteSamples({
-    onError: () => {
+    componentOnError: () => {
       setShouldShowErrorNotification(true);
     },
-    onSuccess: () => {
+    componentOnSuccess: () => {
       setShouldShowSuccessNotification(true);
     },
   });

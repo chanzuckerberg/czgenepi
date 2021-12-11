@@ -75,7 +75,7 @@ const SampleIdInput = ({
   // TODO (mlila): we don't actually surface this error to the user anywhere, but in the
   // TODO          future we probably should if this happens with any frequency.
   const validateSampleIdentifiersMutation = useValidateSampleIds({
-    onError: () => {
+    componentOnError: () => {
       setValidating(false);
       setShowAddButton(false);
       setFoundSampleIds([]);
@@ -85,7 +85,7 @@ const SampleIdInput = ({
       setInputDisplayValue("");
       setInEditMode(true);
     },
-    onSuccess: (data: SampleValidationResponseType) => {
+    componentOnSuccess: (data: SampleValidationResponseType) => {
       setValidating(false);
       setShowAddButton(false);
       setHasUnsavedChanges(false);

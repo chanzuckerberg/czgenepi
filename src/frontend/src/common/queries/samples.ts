@@ -217,8 +217,8 @@ export interface SampleDeleteResponseType {
 type SampleDeleteCallbacks = MutationCallbacks<SampleDeleteResponseType>;
 
 export function useDeleteSamples({
-  onError,
-  onSuccess,
+  componentOnError,
+  componentOnSuccess,
 }: SampleDeleteCallbacks): UseMutationResult<
   SampleDeleteResponseType,
   unknown,
@@ -228,10 +228,10 @@ export function useDeleteSamples({
   const queryClient = useQueryClient();
   // TODO (mlila): pick less confusing name choices for callbacks/params
   return useMutation(deleteSamples, {
-    onError,
+    onError: componentOnError,
     onSuccess: async (data) => {
       await queryClient.invalidateQueries([USE_SAMPLE_INFO]);
-      onSuccess(data);
+      componentOnSuccess(data);
     },
   });
 }

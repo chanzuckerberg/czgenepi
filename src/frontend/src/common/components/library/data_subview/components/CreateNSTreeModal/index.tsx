@@ -107,11 +107,11 @@ export const CreateNSTreeModal = ({
   const hasValidName = treeNameLength > 0 && treeNameLength <= 128;
 
   const mutation = useCreateTree({
-    onError: () => {
+    componentOnError: () => {
       setShouldShowErrorNotification(true);
       handleClose();
     },
-    onSuccess: () => {
+    componentOnSuccess: () => {
       setShouldShowTreeCreatedNotification(true);
       handleClose();
     },

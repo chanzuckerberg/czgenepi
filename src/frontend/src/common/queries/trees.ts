@@ -112,8 +112,8 @@ export function useFastaFetch(
 }
 
 export function useCreateTree({
-  onError,
-  onSuccess,
+  componentOnError,
+  componentOnSuccess,
 }: CreateTreeCallbacks): UseMutationResult<
   unknown,
   unknown,
@@ -123,10 +123,10 @@ export function useCreateTree({
   const queryClient = useQueryClient();
 
   return useMutation(createTree, {
-    onError,
+    onError: componentOnError,
     onSuccess: async () => {
       await queryClient.invalidateQueries([USE_TREE_INFO]);
-      onSuccess();
+      componentOnSuccess();
     },
   });
 }
