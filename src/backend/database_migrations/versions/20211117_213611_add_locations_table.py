@@ -43,8 +43,6 @@ def upgrade():
         source_schema="aspen",
         referent_schema="aspen",
     )
-    conn = op.get_bind()
-    conn.execute(set_locations_sql)
 
 
 def downgrade():
