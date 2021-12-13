@@ -1,11 +1,10 @@
-import React from "react";
-import { noop } from "src/common/constants/empty";
+import React, { useState } from "react";
 import { useUserInfo } from "src/common/queries/auth";
 import { useDeleteSamples } from "src/common/queries/samples";
 import { B } from "src/common/styles/support/style";
 import { pluralize } from "src/common/utils/strUtils";
 import { DeleteDialog } from "src/components/DeleteDialog";
-import { Notification } from "src/components/Notification";
+import Notification from "src/components/Notification";
 import { StyledCallout } from "./style";
 
 interface Props {

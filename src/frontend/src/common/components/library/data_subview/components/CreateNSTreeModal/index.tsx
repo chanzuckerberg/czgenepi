@@ -43,8 +43,6 @@ interface Props {
   failedSampleIds: string[];
   open: boolean;
   onClose: () => void;
-  handleCreateTreeFailed: () => void;
-  handleSetCreateTreeStarted: () => void;
 }
 
 const TreeTypes = {

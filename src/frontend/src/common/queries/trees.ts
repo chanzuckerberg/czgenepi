@@ -105,10 +105,19 @@ export async function getUsherOptions(): Promise<unknown> {
 type FastaFetchCallbacks = MutationCallbacks<FastaResponseType>;
 type CreateTreeCallbacks = MutationCallbacks<void>;
 
-export function useFastaFetch(
-  callbacks: FastaFetchCallbacks
-): UseMutationResult<FastaResponseType, unknown, FastaRequestType, unknown> {
-  return useMutation(getFastaURL, callbacks);
+export function useFastaFetch({
+  componentOnError,
+  componentOnSuccess,
+}: FastaFetchCallbacks): UseMutationResult<
+  FastaResponseType,
+  unknown,
+  FastaRequestType,
+  unknown
+> {
+  return useMutation(getFastaURL, {
+    onError: componentOnError,
+    onSuccess: componentOnSuccess,
+  });
 }
 
 export function useCreateTree({

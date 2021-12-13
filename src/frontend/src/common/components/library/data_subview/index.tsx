@@ -138,7 +138,6 @@ const DataSubview: FunctionComponent<Props> = ({
   const [failedSampleIds, setFailedSampleIds] = useState<string[]>([]);
   const [isNSCreateTreeModalOpen, setIsNSCreateTreeModalOpen] =
     useState<boolean>(false);
-  const [didCreateTreeFailed, setCreateTreeFailed] = useState<boolean>(false);
   const [shouldStartUsherFlow, setShouldStartUsherFlow] =
     useState<boolean>(false);
   const [isDeleteConfirmationOpen, setDeleteConfirmationOpen] =

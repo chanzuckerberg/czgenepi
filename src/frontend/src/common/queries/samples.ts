@@ -81,15 +81,19 @@ export interface SampleValidationResponseType {
 type SampleValidationCallbacks =
   MutationCallbacks<SampleValidationResponseType>;
 
-export function useValidateSampleIds(
-  callbacks: SampleValidationCallbacks
-): UseMutationResult<
+export function useValidateSampleIds({
+  componentOnError,
+  componentOnSuccess,
+}: SampleValidationCallbacks): UseMutationResult<
   SampleValidationResponseType,
   unknown,
   SampleValidationRequestType,
   unknown
 > {
-  return useMutation(validateSampleIdentifiers, callbacks);
+  return useMutation(validateSampleIdentifiers, {
+    onError: componentOnError,
+    onSuccess: componentOnSuccess,
+  });
 }
 
 /**

@@ -96,11 +96,11 @@ const DownloadModal = ({
   };
 
   const mutation = useMutation(downloadSamplesFasta, {
-    componentOnError: () => {
+    onError: () => {
       setShouldShowError(true);
       handleCloseModal();
     },
-    componentOnSuccess: (data: any) => {
+    onSuccess: (data: any) => {
       const link = document.createElement("a");
       link.href = window.URL.createObjectURL(data);
       link.download = fastaDownloadName;
