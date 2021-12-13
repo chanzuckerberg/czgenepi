@@ -30,8 +30,6 @@ TEMPLATE_ARGS=$(jq -c . < "${TEMPLATE_ARGS_FILE}")
 
 workflow_id=$(aspen-cli db create-phylo-run                                                                           \
                   --group-name "${GROUP_NAME}"                                                                               \
-                  --all-group-sequences                                                                                      \
-                  --builds-template-file "/usr/src/app/aspen/workflows/nextstrain_run/builds_templates/${TEMPLATE_FILENAME}" \
                   --builds-template-args "${TEMPLATE_ARGS}"                                                                  \
                   --tree-type "${TREE_TYPE}"
 )
@@ -51,11 +49,17 @@ aligned_gisaid_location=$(
            --phylo-run-id "${workflow_id}"                        \
            --sequences /ncov/data/sequences_aspen.fasta            \
            --metadata /ncov/data/metadata_aspen.tsv                \
+           --selected /ncov/data/include.txt                       \
            --builds-file /ncov/my_profiles/aspen/builds.yaml       \
 )
+
+# Persist the build config we generated.
+aws s3 cp /ncov/my_profiles/aspen/builds.yaml "s3://${aspen_s3_db_bucket}/phylo_run/${build_date}/${S3_FILESTEM}/${WORKFLOW_ID}/builds.yaml"
+
 aligned_gisaid_s3_bucket=$(echo "${aligned_gisaid_location}" | jq -r .bucket)
 aligned_gisaid_sequences_s3_key=$(echo "${aligned_gisaid_location}" | jq -r .sequences_key)
 aligned_gisaid_metadata_s3_key=$(echo "${aligned_gisaid_location}" | jq -r .metadata_key)
+
 
 # fetch the gisaid dataset
 aws s3 cp --no-progress "s3://${aligned_gisaid_s3_bucket}/${aligned_gisaid_sequences_s3_key}" /ncov/results/

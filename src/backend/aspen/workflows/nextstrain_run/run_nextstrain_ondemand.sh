@@ -33,11 +33,15 @@ cp /usr/src/app/aspen/workflows/nextstrain_run/nextstrain_profile/* /ncov/my_pro
 aligned_gisaid_location=$(
     python3 /usr/src/app/aspen/workflows/nextstrain_run/export.py \
            --phylo-run-id "${WORKFLOW_ID}"                        \
-           --county-sequences /ncov/data/sequences_aspen.fasta     \
-           --county-metadata /ncov/data/metadata_aspen.tsv         \
+           --sequences /ncov/data/sequences_aspen.fasta     \
+           --metadata /ncov/data/metadata_aspen.tsv         \
            --selected /ncov/data/include.txt                       \
            --builds-file /ncov/my_profiles/aspen/builds.yaml       \
 )
+
+# Persist the build config we generated.
+aws s3 cp /ncov/my_profiles/aspen/builds.yaml "s3://${aspen_s3_db_bucket}/phylo_run/${build_date}/${S3_FILESTEM}/${WORKFLOW_ID}/builds.yaml"
+
 # If we don't have any county samples, copy the reference genomes to to our county file
 if [ ! -e /ncov/data/sequences_aspen.fasta ]; then
     cp /ncov/data/references_sequences.fasta /ncov/data/sequences_aspen.fasta;

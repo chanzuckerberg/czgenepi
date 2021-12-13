@@ -25,7 +25,7 @@ module nextstrain_chicago_contextual_sfn_config {
     remote_dev_prefix        = local.remote_dev_prefix
     group_name               = "Chicago Department of Public Health"
     s3_filestem              = "Chicago Contextual"
-    template_filename        = "group_plus_context_Chicago.yaml"
+    template_filename        = "group_plus_context.yaml"
     template_args            = {
       division = "Illinois"
       location = "Chicago"
