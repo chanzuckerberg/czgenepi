@@ -56,7 +56,9 @@ export default function LocationField({
   // Original line below
   // const errorMessage = touched[fieldKey] && errors[fieldKey];
   const hasErrorInLocation = touched[fieldKey] && errors[fieldKey];
-  const errorMessage = hasErrorInLocation ? "Location was not recognized." : undefined;
+  const errorMessage = hasErrorInLocation
+    ? "Location was not recognized."
+    : undefined;
   /**
    * END HOTFIX
    */
