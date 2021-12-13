@@ -73,29 +73,35 @@ const DeleteSamplesConfirmationModal = ({
     </div>
   );
 
+  const numSamplesToDelete = samplesToDelete.length;
+
   return (
     <>
-      <Notification
-        autoDismiss
-        buttonOnClick={() => setShouldShowSuccessNotification(false)}
-        buttonText="DISMISS"
-        dismissDirection="right"
-        dismissed={!shouldShowSuccessNotification}
-        intent="info"
-      >
-        {samplesToDelete.length} {samplesToDelete.length === 1 ? "has" : "have"}{" "}
-        been deleted.
-      </Notification>
-      <Notification
-        autoDismiss
-        buttonOnClick={() => setShouldShowErrorNotification(false)}
-        buttonText="DISMISS"
-        dismissDirection="right"
-        dismissed={!shouldShowErrorNotification}
-        intent="error"
-      >
-        We were unable to delete the selected samples. Please try again later.
-      </Notification>
+      {!open && (
+        <>
+          <Notification
+            autoDismiss
+            buttonOnClick={() => setShouldShowSuccessNotification(false)}
+            buttonText="DISMISS"
+            dismissDirection="right"
+            dismissed={!shouldShowSuccessNotification}
+            intent="info"
+          >
+            {numSamplesToDelete} {pluralize("sample", numSamplesToDelete)}{" "}
+            {numSamplesToDelete === 1 ? "has" : "have"} been deleted.
+          </Notification>
+          <Notification
+            autoDismiss
+            buttonOnClick={() => setShouldShowErrorNotification(false)}
+            buttonText="DISMISS"
+            dismissDirection="right"
+            dismissed={!shouldShowErrorNotification}
+            intent="error"
+          >
+            We were unable to delete the selected samples. Please try again later.
+          </Notification>
+        </>
+      )}
       <DeleteDialog
         open={open}
         onClose={onClose}
