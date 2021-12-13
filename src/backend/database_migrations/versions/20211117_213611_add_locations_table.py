@@ -44,13 +44,6 @@ def upgrade():
         referent_schema="aspen",
     )
     conn = op.get_bind()
-    insert_locations_sql = sa.sql.text(
-        "INSERT INTO aspen.locations (region, division, location, country) select distinct region, division, location, country from aspen.gisaid_metadata"
-    )
-    conn.execute(insert_locations_sql)
-    set_locations_sql = sa.sql.text(
-        "UPDATE aspen.samples SET location_id = locations.id FROM aspen.locations WHERE samples.location = locations.location and samples.division = locations.division and samples.region = locations.region and samples.country = locations.country"
-    )
     conn.execute(set_locations_sql)
 
 
