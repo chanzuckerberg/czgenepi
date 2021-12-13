@@ -27,7 +27,9 @@ class OverviewBuilder(BaseNextstrainConfigBuilder):
 
     def update_subsampling(self, config, subsampling):
         if self.group.name == "Chicago Department of Public Health":
-            subsampling["group"]["query"] = "--query \"((location == '{location}') & (division == '{division}')) | submitting_lab == 'RIPHL at Rush University Medical Center'\""
+            subsampling["group"][
+                "query"
+            ] = "--query \"((location == '{location}') & (division == '{division}')) | submitting_lab == 'RIPHL at Rush University Medical Center'\""
 
 
 class NonContextualizedBuilder(BaseNextstrainConfigBuilder):

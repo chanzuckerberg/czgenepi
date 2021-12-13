@@ -17,7 +17,7 @@ def create_test_data(
     num_county_samples,  # Total # of samples to associate with a group
     num_selected_samples,  # How many of those samples are workflow inputs
     num_gisaid_samples,  # How many gisaid samples to add to a workflow
-    group_name = None, # Override group name
+    group_name=None,  # Override group name
 ):
     if not group_name:
         group_name = f"testgroup-{tree_type.value}"
@@ -101,7 +101,10 @@ def test_overview_config(mocker, session, postgres_database):
 
     # Just some placeholder sanity-checks
     assert subsampling_scheme["group"]["max_sequences"] == 2000
-    assert subsampling_scheme["group"]["query"] == "--query \"(location == '{location}') & (division == '{division}')\""
+    assert (
+        subsampling_scheme["group"]["query"]
+        == "--query \"(location == '{location}') & (division == '{division}')\""
+    )
     assert len(selected.splitlines()) == 0  # No selected sequences
     assert len(metadata.splitlines()) == 11  # 10 samples + 1 header line
     assert len(sequences.splitlines()) == 20  # 10 county samples, @2 lines each
@@ -112,18 +115,24 @@ def test_overview_config_chicago(mocker, session, postgres_database):
     mock_remote_db_uri(mocker, postgres_database.as_uri())
 
     tree_type = TreeType.OVERVIEW
-    phylo_run = create_test_data(session, tree_type, 10, 0, 0, group_name="Chicago Department of Public Health")
+    phylo_run = create_test_data(
+        session, tree_type, 10, 0, 0, group_name="Chicago Department of Public Health"
+    )
     sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
 
     phylo_run.group
     subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
 
     # Make sure our query got updated properly
-    assert subsampling_scheme["group"]["query"] == "--query \"((location == '{location}') & (division == '{division}')) | submitting_lab == 'RIPHL at Rush University Medical Center'\""
+    assert (
+        subsampling_scheme["group"]["query"]
+        == "--query \"((location == '{location}') & (division == '{division}')) | submitting_lab == 'RIPHL at Rush University Medical Center'\""
+    )
     assert subsampling_scheme["group"]["max_sequences"] == 2000
     assert len(selected.splitlines()) == 0  # No selected sequences
     assert len(metadata.splitlines()) == 11  # 10 samples + 1 header line
     assert len(sequences.splitlines()) == 20  # 10 county samples, @2 lines each
+
 
 # Make sure that configs specific to a Non-Contextualized tree are working.
 def test_non_contextualized_config(mocker, session, postgres_database):
