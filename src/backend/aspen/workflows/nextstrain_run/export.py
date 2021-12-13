@@ -1,7 +1,6 @@
 import csv
 import io
 import json
-from pathlib import Path
 from typing import Any, Iterable, List, Mapping, MutableMapping, Set, Tuple
 
 import click
@@ -19,13 +18,17 @@ from aspen.database.models import (
     AlignedGisaidDump,
     Entity,
     EntityType,
+    Group,
     PathogenGenome,
     PhyloRun,
     PublicRepositoryType,
     Sample,
+    TreeType,
     UploadedPathogenGenome,
 )
 from aspen.database.models.workflow import Workflow
+from aspen.workflows.nextstrain_run.build_config import builder_factory
+from aspen.workflows.nextstrain_run.builder_base import BaseNextstrainConfigBuilder
 
 METADATA_CSV_FIELDS = [
     "strain",
@@ -60,15 +63,11 @@ METADATA_CSV_FIELDS = [
 @click.command("save")
 @click.option("--phylo-run-id", type=int, required=True)
 @click.option("sequences_fh", "--sequences", type=click.File("w"), required=False)
-@click.option("selected_fh", "--selected", type=click.File("w"), required=False)
-@click.option("metadata_fh", "--metadata", type=click.File("w"), required=False)
+@click.option(
+    "selected_fh", "--selected", type=click.File("w", lazy=False), required=True
+)
+@click.option("metadata_fh", "--metadata", type=click.File("w"), required=True)
 @click.option("builds_file_fh", "--builds-file", type=click.File("w"), required=True)
-@click.option(
-    "county_sequences_fh", "--county-sequences", type=click.File("w"), required=False
-)
-@click.option(
-    "county_metadata_fh", "--county-metadata", type=click.File("w"), required=False
-)
 @click.option("--test", type=bool, is_flag=True)
 def cli(
     phylo_run_id: int,
@@ -76,95 +75,112 @@ def cli(
     selected_fh: io.TextIOBase,
     metadata_fh: io.TextIOBase,
     builds_file_fh: io.TextIOBase,
-    county_sequences_fh: io.TextIOBase,
-    county_metadata_fh: io.TextIOBase,
     test: bool,
 ):
     if test:
         print("Success!")
         return
+    aligned_gisaid_dump = export_run_config(
+        phylo_run_id, sequences_fh, selected_fh, metadata_fh, builds_file_fh
+    )
+    print(json.dumps(aligned_gisaid_dump))
+
+
+def export_run_config(
+    phylo_run_id: int,
+    sequences_fh: io.TextIOBase,
+    selected_fh: io.TextIOBase,
+    metadata_fh: io.TextIOBase,
+    builds_file_fh: io.TextIOBase,
+):
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
 
+    num_sequences: int = 0
+    num_included_samples: int = 0
+
     with session_scope(interface) as session:
-        # this allows us to load the secondary tables of a polymorphic type.  In this
-        # case, we want to load the inputs of a phylo run, provided the input is of type
-        # `PathogenGenome` and `AlignedGisaidDump`.
-        phylo_run_inputs = with_polymorphic(
-            Entity,
-            [PathogenGenome, AlignedGisaidDump],
-            flat=True,
-        )
-        phylo_run: PhyloRun = (
-            session.query(PhyloRun)
-            .filter(PhyloRun.workflow_id == phylo_run_id)
-            .options(
-                joinedload(PhyloRun.inputs.of_type(phylo_run_inputs)).undefer(
-                    phylo_run_inputs.PathogenGenome.sequence
-                )
-            )
-            .one()
-        )
+        phylo_run = get_phylo_run(session, phylo_run_id)
+        group: Group = phylo_run.group
 
-        # If we're writing a file for all county-wide samples, generate it here.
-        if county_sequences_fh:
-            # Get all samples for the group
-            group = phylo_run.group
-            all_samples: Iterable[Sample] = (
-                session.query(Sample)
-                .filter(Sample.submitting_group_id == group.id)
-                .options(
-                    joinedload(Sample.uploaded_pathogen_genome, innerjoin=True).undefer(
-                        PathogenGenome.sequence
-                    )
-                )
-            )
-            pathogen_genomes = [
-                sample.uploaded_pathogen_genome for sample in all_samples
-            ]
-            # Write all those samples to the sequences/metadata files
-            write_sequences_files(
-                session, pathogen_genomes, county_sequences_fh, county_metadata_fh
-            )
+        # Fetch all of a group's samples.
+        county_samples: List[PathogenGenome] = get_county_samples(session, group)
 
-        # Populate builds.yaml file with values from the phylo_run template_args
-        # and write them to the filesystem
-        aspen_root = Path(__file__).parent.parent.parent.parent.parent
-        with (aspen_root / phylo_run.template_file_path).open("r") as build_template_fh:
-            build_template = build_template_fh.read()
-        template_args = (
-            phylo_run.template_args
-            if isinstance(phylo_run.template_args, Mapping)
-            else {}
-        )
-        builds_file_fh.write(build_template.format(**template_args))
-
-        # get all the children that are pathogen genomes
-        pathogen_genomes = [
-            inp for inp in phylo_run.inputs if isinstance(inp, PathogenGenome)
-        ]
         # get the aligned gisaid run info.
-        aligned_gisaid = [
+        aligned_gisaid: AlignedGisaidDump = [
             inp for inp in phylo_run.inputs if isinstance(inp, AlignedGisaidDump)
         ][0]
 
-        if sequences_fh:
-            write_sequences_files(session, pathogen_genomes, sequences_fh, metadata_fh)
-        if selected_fh:
-            write_includes_file(session, phylo_run, pathogen_genomes, selected_fh)
-
-        print(
-            json.dumps(
-                {
-                    "bucket": aligned_gisaid.s3_bucket,
-                    "metadata_key": aligned_gisaid.metadata_s3_key,
-                    "sequences_key": aligned_gisaid.sequences_s3_key,
-                }
-            )
+        num_sequences = write_sequences_files(
+            session, county_samples, sequences_fh, metadata_fh
         )
 
+        # Write includes.txt file(s) for targeted/non_contextualized builds.
+        if phylo_run.tree_type != TreeType.OVERVIEW:
+            selected_samples: List[PathogenGenome] = [
+                inp for inp in phylo_run.inputs if isinstance(inp, PathogenGenome)
+            ]
+            num_included_samples = write_includes_file(
+                session, phylo_run.gisaid_ids, selected_samples, selected_fh
+            )
 
-def write_includes_file(session, phylo_run, pathogen_genomes, selected_fh):
+        # Give the nexstrain config builder some info to make decisions
+        context = {
+            "num_sequences": num_sequences,
+            "num_included_samples": num_included_samples,
+        }
+        builder: BaseNextstrainConfigBuilder = builder_factory(
+            phylo_run.tree_type, group, phylo_run.template_args, **context
+        )
+        builder.write_file(builds_file_fh)
+
+        return {
+            "bucket": aligned_gisaid.s3_bucket,
+            "metadata_key": aligned_gisaid.metadata_s3_key,
+            "sequences_key": aligned_gisaid.sequences_s3_key,
+        }
+
+
+def get_county_samples(session, group: Group):
+    # Get all samples for the group
+    all_samples: Iterable[Sample] = (
+        session.query(Sample)
+        .filter(Sample.submitting_group_id == group.id)
+        .options(
+            joinedload(Sample.uploaded_pathogen_genome, innerjoin=True).undefer(
+                PathogenGenome.sequence
+            )
+        )
+    )
+    pathogen_genomes = [sample.uploaded_pathogen_genome for sample in all_samples]
+    return pathogen_genomes
+
+
+def get_phylo_run(session, phylo_run_id):
+    # this allows us to load the secondary tables of a polymorphic type.  In this
+    # case, we want to load the inputs of a phylo run, provided the input is of type
+    # `PathogenGenome` and `AlignedGisaidDump`.
+    phylo_run_inputs = with_polymorphic(
+        Entity,
+        [PathogenGenome, AlignedGisaidDump],
+        flat=True,
+    )
+    phylo_run: PhyloRun = (
+        session.query(PhyloRun)
+        .filter(PhyloRun.workflow_id == phylo_run_id)
+        .options(
+            joinedload(PhyloRun.group),
+            joinedload(PhyloRun.inputs.of_type(phylo_run_inputs)).undefer(
+                phylo_run_inputs.PathogenGenome.sequence
+            ),
+        )
+        .one()
+    )
+    return phylo_run
+
+
+def write_includes_file(session, gisaid_ids, pathogen_genomes, selected_fh):
     # Create a list of the inputted pathogen genomes that are uploaded pathogen genomes
+    num_includes = 0
     sample_ids: List[int] = [
         pathogen_genome.sample_id
         for pathogen_genome in pathogen_genomes
@@ -178,12 +194,16 @@ def write_includes_file(session, phylo_run, pathogen_genomes, selected_fh):
         if public_identifier.lower().startswith("hcov-19"):
             public_identifier = public_identifier[8:]
         selected_fh.write(f"{public_identifier}\n")
-    for gisaid_id in phylo_run.gisaid_ids:
+        num_includes += 1
+    for gisaid_id in gisaid_ids:
         selected_fh.write(f"{gisaid_id}\n")
+        num_includes += 1
+    return num_includes
 
 
 def write_sequences_files(session, pathogen_genomes, sequences_fh, metadata_fh):
     # Create a list of the inputted pathogen genomes that are uploaded pathogen genomes
+    num_sequences = 0
     uploaded_pathogen_genomes = {
         pathogen_genome
         for pathogen_genome in pathogen_genomes
@@ -290,6 +310,8 @@ def write_sequences_files(session, pathogen_genomes, sequences_fh, metadata_fh):
         sequences_fh.write(f">{sample.public_identifier}\n")
         sequences_fh.write(sequence)
         sequences_fh.write("\n")
+        num_sequences += 1
+    return num_sequences
 
 
 if __name__ == "__main__":
