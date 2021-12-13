@@ -98,7 +98,8 @@ const DeleteSamplesConfirmationModal = ({
             dismissed={!shouldShowErrorNotification}
             intent="error"
           >
-            We were unable to delete the selected samples. Please try again later.
+            We were unable to delete the selected samples. Please try again
+            later.
           </Notification>
         </>
       )}
