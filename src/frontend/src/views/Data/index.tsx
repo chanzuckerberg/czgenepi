@@ -142,7 +142,9 @@ const Data: FunctionComponent = () => {
               >
                 {category.text}
               </div>
-              <div className={style.count}>{category.data?.length}</div>
+              <div className={style.count}>
+                {Object.keys(category.data).length}
+              </div>
             </div>
           </Menu.Item>
         </a>
