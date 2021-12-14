@@ -1,6 +1,7 @@
 import csv
 import io
 import json
+import re
 from typing import Any, Iterable, List, Mapping, MutableMapping, Set, Tuple
 
 import click
@@ -191,12 +192,11 @@ def write_includes_file(session, gisaid_ids, pathogen_genomes, selected_fh):
     sample_query = session.query(Sample).filter(Sample.id.in_(sample_ids))
     for sample in sample_query:
         public_identifier = sample.public_identifier
-        if public_identifier.lower().startswith("hcov-19"):
-            public_identifier = public_identifier[8:]
+        # remove leading hcov-19/ preceding characters, ignore case
+        public_identifier = re.sub(r'^hcov-19\/', "", public_identifier, flags=re.I)
         selected_fh.write(f"{public_identifier}\n")
         num_includes += 1
     for gisaid_id in gisaid_ids:
-        # remove leading hcov-19/ preceding characters, ignore case
         gisaid_id = re.sub(r'^hcov-19\/', "", gisaid_id, flags=re.I)
         selected_fh.write(f"{gisaid_id}\n")
         num_includes += 1
