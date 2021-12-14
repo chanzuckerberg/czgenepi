@@ -196,8 +196,8 @@ def write_includes_file(session, gisaid_ids, pathogen_genomes, selected_fh):
         selected_fh.write(f"{public_identifier}\n")
         num_includes += 1
     for gisaid_id in gisaid_ids:
-        if gisaid_id.lower().startswith("hcov-19"):
-            gisaid_id = gisaid_id[8:]
+        # remove leading hcov-19/ preceding characters, ignore case
+        gisaid_id = re.sub(r'^hcov-19\/', "", gisaid_id, flags=re.I)
         selected_fh.write(f"{gisaid_id}\n")
         num_includes += 1
     return num_includes
