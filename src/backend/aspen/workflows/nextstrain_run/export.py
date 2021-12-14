@@ -193,11 +193,11 @@ def write_includes_file(session, gisaid_ids, pathogen_genomes, selected_fh):
     for sample in sample_query:
         public_identifier = sample.public_identifier
         # remove leading hcov-19/ preceding characters, ignore case
-        public_identifier = re.sub(r'^hcov-19\/', "", public_identifier, flags=re.I)
+        public_identifier = re.sub(r"^hcov-19\/", "", public_identifier, flags=re.I)
         selected_fh.write(f"{public_identifier}\n")
         num_includes += 1
     for gisaid_id in gisaid_ids:
-        gisaid_id = re.sub(r'^hcov-19\/', "", gisaid_id, flags=re.I)
+        gisaid_id = re.sub(r"^hcov-19\/", "", gisaid_id, flags=re.I)
         selected_fh.write(f"{gisaid_id}\n")
         num_includes += 1
     return num_includes
