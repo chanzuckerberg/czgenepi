@@ -17,62 +17,15 @@ depends_on = None
 def upgrade():
     conn = op.get_bind()
 
-    old_sample_locations_stmt = sa.sql.text(
-        "SELECT DISTINCT region, country, division, location FROM aspen.samples"
+    set_full_locations_stmt = sa.sql.text(
+        "UPDATE aspen.samples as s SET location_id = (SELECT id FROM aspen.locations as l WHERE l.region = s.region AND l.country = s.country AND l.division = s.division and l.location = s.location)"
     )
-    old_sample_location_rows = conn.execute(old_sample_locations_stmt).all()
-    old_sample_locations = list(
-        map(
-            lambda row: {
-                "region": row[0],
-                "country": row[1],
-                "division": row[2],
-                "location": row[3],
-            },
-            old_sample_location_rows,
-        )
-    )
+    conn.execute(set_full_locations_stmt)
 
-    get_new_location_stmt = sa.sql.text(
-        "SELECT id FROM aspen.locations WHERE region=:region AND country=:country AND division=:division AND location=:location"
+    set_broader_locations_stmt = sa.sql.text(
+        "UPDATE aspen.samples as s SET location_id = (SELECT id FROM aspen.locations as l WHERE l.region = s.region AND l.country = s.country AND l.division = s.division and l.location is NULL) WHERE s.location IN ('California', 'NaN', '', NULL)"
     )
-    get_broad_location_stmt = sa.sql.text(
-        "SELECT id FROM aspen.locations WHERE region=:region AND country=:country AND division=:division AND location IS NULL"
-    )
-    set_location_id_stmt = sa.sql.text(
-        "UPDATE aspen.samples SET location_id=:location_id WHERE region=:region AND country=:country AND division=:division AND location=:location"
-    )
-
-    for loc in old_sample_locations:
-        new_location_result = conn.execute(
-            get_new_location_stmt.bindparams(
-                region=loc["region"],
-                country=loc["country"],
-                division=loc["division"],
-                location=loc["location"],
-            )
-        )
-        new_location_id = new_location_result.scalars().one_or_none()
-        if not new_location_id:
-            broader_location_result = conn.execute(
-                get_broad_location_stmt.bindparams(
-                    region=loc["region"],
-                    country=loc["country"],
-                    division=loc["division"],
-                )
-            )
-            broader_location_id = broader_location_result.scalars().one_or_none()
-            if broader_location_id:
-                new_location_id = broader_location_id
-        conn.execute(
-            set_location_id_stmt.bindparams(
-                location_id=new_location_id,
-                region=loc["region"],
-                country=loc["country"],
-                division=loc["division"],
-                location=loc["location"],
-            )
-        )
+    conn.execute(set_broader_locations_stmt)
 
     with op.batch_alter_table("samples") as batch_op:
         batch_op.drop_column("region")
