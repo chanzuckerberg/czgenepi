@@ -114,7 +114,7 @@ def export_run_config(
             session, county_samples, sequences_fh, metadata_fh
         )
 
-        # Write includes.txt file(s) for targeted/non_contextualized builds.
+        # Write include.txt file(s) for targeted/non_contextualized builds.
         if phylo_run.tree_type != TreeType.OVERVIEW:
             selected_samples: List[PathogenGenome] = [
                 inp for inp in phylo_run.inputs if isinstance(inp, PathogenGenome)
