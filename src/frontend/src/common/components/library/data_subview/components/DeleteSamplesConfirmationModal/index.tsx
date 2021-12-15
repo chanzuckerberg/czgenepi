@@ -22,6 +22,7 @@ const DeleteSamplesConfirmationModal = ({
     useState<boolean>(false);
   const [shouldShowSuccessNotification, setShouldShowSuccessNotification] =
     useState<boolean>(false);
+  const [numDeletedSamples, setNumDeletedSamples] = useState<number>(0);
   const { data } = useUserInfo();
   const { group: userGroup } = data ?? {};
 
@@ -39,13 +40,12 @@ const DeleteSamplesConfirmationModal = ({
   });
 
   const onDelete = () => {
+    setNumDeletedSamples(samplesToDelete.length);
     deleteSampleMutation.mutate({
       samplesToDelete,
     });
     onClose();
   };
-
-  if (!open) return null;
 
   const numSamples = checkedSamples.length;
   const title = `Are you sure you want to delete ${numSamples} ${pluralize(
@@ -73,8 +73,6 @@ const DeleteSamplesConfirmationModal = ({
     </div>
   );
 
-  const numSamplesToDelete = samplesToDelete.length;
-
   return (
     <>
       {!open && (
@@ -87,8 +85,8 @@ const DeleteSamplesConfirmationModal = ({
             dismissed={!shouldShowSuccessNotification}
             intent="info"
           >
-            {numSamplesToDelete} {pluralize("sample", numSamplesToDelete)}{" "}
-            {numSamplesToDelete === 1 ? "has" : "have"} been deleted.
+            {numDeletedSamples} {pluralize("sample", numDeletedSamples)}{" "}
+            {numDeletedSamples === 1 ? "has" : "have"} been deleted.
           </Notification>
           <Notification
             autoDismiss
