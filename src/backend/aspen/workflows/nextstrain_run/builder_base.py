@@ -29,17 +29,19 @@ class BaseNextstrainConfigBuilder:
 
     def update_build(self, config):
         build = config["builds"]["aspen"]
-        # TODO - We'll add region/country info to groups soon, but it's not there yet.
-        # region = self.group.region
-        # country = self.group.country
-        # build["region"] = region
-        # build["title"] = build["title"].format(division=division, location=location, country=country, region=region)
-        country = "USA"
-        division = self.group.division
-        location = self.group.location
-        build["country"] = country
-        build["division"] = division
-        build["location"] = location
+        if group.default_tree_location:
+            location = group.default_tree_location
+            location_args = {
+                "region": location.region,
+                "division": location.division,
+                "country": location.country,
+                "location": location.location,
+            }
+        build["title"] = build["title"].format(**location_args)
+
+        build["country"] = location_args["country"]
+        build["division"] = location_args["division"]
+        build["location"] = location_args["location"]
 
         # NOTE: <BuilderClass>.subsampling_scheme is used in 3 places:
         #   - Its lowercase'd name is used to find a markdown file with an "about this tree" description

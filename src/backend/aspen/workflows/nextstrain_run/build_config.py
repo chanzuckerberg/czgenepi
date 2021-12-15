@@ -52,7 +52,7 @@ class TargetedBuilder(BaseNextstrainConfigBuilder):
           subsampling : the subsampling scheme for *this build type only* (ex: mega_template["subsampling"]["TARGETED"])
           self.subsampling_scheme : the value a few lines above
           self.crowding_penalty : the value a few lines above
-          self.group : information about the group that this run is for (ex: self.group.name or self.group.division)
+          self.group : information about the group that this run is for (ex: self.group.name or self.group.default_tree_location)
           config.num_sequences : the number of aspen samples written to our fasta input file
           config.num_included_samples : the number of samples in include.txt (aspen + gisaid samples) for on-demand runs only
 
