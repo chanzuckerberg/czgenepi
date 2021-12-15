@@ -1,10 +1,10 @@
-import React from "react";
-import { noop } from "src/common/constants/empty";
+import React, { useState } from "react";
 import { useUserInfo } from "src/common/queries/auth";
 import { useDeleteSamples } from "src/common/queries/samples";
 import { B } from "src/common/styles/support/style";
 import { pluralize } from "src/common/utils/strUtils";
 import { DeleteDialog } from "src/components/DeleteDialog";
+import Notification from "src/components/Notification";
 import { StyledCallout } from "./style";
 
 interface Props {
@@ -18,6 +18,11 @@ const DeleteSamplesConfirmationModal = ({
   onClose,
   open,
 }: Props): JSX.Element | null => {
+  const [shouldShowErrorNotification, setShouldShowErrorNotification] =
+    useState<boolean>(false);
+  const [shouldShowSuccessNotification, setShouldShowSuccessNotification] =
+    useState<boolean>(false);
+  const [numDeletedSamples, setNumDeletedSamples] = useState<number>(0);
   const { data } = useUserInfo();
   const { group: userGroup } = data ?? {};
 
@@ -25,21 +30,22 @@ const DeleteSamplesConfirmationModal = ({
     .filter((sample) => sample.submittingGroup?.name === userGroup?.name)
     .map((sample) => sample.id);
 
-  // TODO (mlila): update these callbacks to display notifications
-  // TODO          as part of #173849
   const deleteSampleMutation = useDeleteSamples({
-    onSuccess: noop,
-    onError: noop,
+    componentOnError: () => {
+      setShouldShowErrorNotification(true);
+    },
+    componentOnSuccess: () => {
+      setShouldShowSuccessNotification(true);
+    },
   });
 
   const onDelete = () => {
+    setNumDeletedSamples(samplesToDelete.length);
     deleteSampleMutation.mutate({
       samplesToDelete,
     });
     onClose();
   };
-
-  if (!open) return null;
 
   const numSamples = checkedSamples.length;
   const title = `Are you sure you want to delete ${numSamples} ${pluralize(
@@ -68,13 +74,41 @@ const DeleteSamplesConfirmationModal = ({
   );
 
   return (
-    <DeleteDialog
-      open={open}
-      onClose={onClose}
-      onDelete={onDelete}
-      title={title}
-      content={content}
-    />
+    <>
+      {!open && (
+        <>
+          <Notification
+            autoDismiss
+            buttonOnClick={() => setShouldShowSuccessNotification(false)}
+            buttonText="DISMISS"
+            dismissDirection="right"
+            dismissed={!shouldShowSuccessNotification}
+            intent="info"
+          >
+            {numDeletedSamples} {pluralize("sample", numDeletedSamples)}{" "}
+            {numDeletedSamples === 1 ? "has" : "have"} been deleted.
+          </Notification>
+          <Notification
+            autoDismiss
+            buttonOnClick={() => setShouldShowErrorNotification(false)}
+            buttonText="DISMISS"
+            dismissDirection="right"
+            dismissed={!shouldShowErrorNotification}
+            intent="error"
+          >
+            We were unable to delete the selected samples. Please try again
+            later.
+          </Notification>
+        </>
+      )}
+      <DeleteDialog
+        open={open}
+        onClose={onClose}
+        onDelete={onDelete}
+        title={title}
+        content={content}
+      />
+    </>
   );
 };
 

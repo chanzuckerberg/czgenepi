@@ -1,4 +1,4 @@
 export interface MutationCallbacks<T> {
-  onError: () => void;
-  onSuccess: (data: T) => void;
+  componentOnError: () => void;
+  componentOnSuccess: (data: T) => void;
 }

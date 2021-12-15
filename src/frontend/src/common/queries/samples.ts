@@ -81,15 +81,19 @@ export interface SampleValidationResponseType {
 type SampleValidationCallbacks =
   MutationCallbacks<SampleValidationResponseType>;
 
-export function useValidateSampleIds(
-  callbacks: SampleValidationCallbacks
-): UseMutationResult<
+export function useValidateSampleIds({
+  componentOnError,
+  componentOnSuccess,
+}: SampleValidationCallbacks): UseMutationResult<
   SampleValidationResponseType,
   unknown,
   SampleValidationRequestType,
   unknown
 > {
-  return useMutation(validateSampleIdentifiers, callbacks);
+  return useMutation(validateSampleIdentifiers, {
+    onError: componentOnError,
+    onSuccess: componentOnSuccess,
+  });
 }
 
 /**
@@ -217,8 +221,8 @@ export interface SampleDeleteResponseType {
 type SampleDeleteCallbacks = MutationCallbacks<SampleDeleteResponseType>;
 
 export function useDeleteSamples({
-  onError,
-  onSuccess,
+  componentOnError,
+  componentOnSuccess,
 }: SampleDeleteCallbacks): UseMutationResult<
   SampleDeleteResponseType,
   unknown,
@@ -228,10 +232,10 @@ export function useDeleteSamples({
   const queryClient = useQueryClient();
   // TODO (mlila): pick less confusing name choices for callbacks/params
   return useMutation(deleteSamples, {
-    onError,
+    onError: componentOnError,
     onSuccess: async (data) => {
       await queryClient.invalidateQueries([USE_SAMPLE_INFO]);
-      onSuccess(data);
+      componentOnSuccess(data);
     },
   });
 }
