@@ -73,6 +73,7 @@ def phylo_trees():
         .options(
             joinedload(phylo_run_alias.outputs.of_type(PhyloTree)),
             joinedload(phylo_run_alias.user),
+            joinedload(phylo_run_alias.group),
         )
         .filter(
             or_(
@@ -95,6 +96,10 @@ def phylo_trees():
             "pathogen_genome_count": 0,  # TODO: do we still need this?,
             "tree_type": phylo_run.tree_type.value,
             "user": {},
+            "group": {
+                "id": phylo_run.group.id,
+                "name": phylo_run.group.name,
+            },
         }
         if phylo_run.user:
             result["user"] = {"id": phylo_run.user.id, "name": phylo_run.user.name}

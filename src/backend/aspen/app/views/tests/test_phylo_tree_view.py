@@ -103,6 +103,8 @@ def check_results(client, user: User, trees: Collection[PhyloTree]):
             raise ValueError(f"Could not find {tree} in results")
 
         assert result_tree["pathogen_genome_count"] == 0
+        assert result_tree["group"]["id"] is not None
+        assert result_tree["group"]["name"] is not None
 
 
 def test_phylo_tree_view(
