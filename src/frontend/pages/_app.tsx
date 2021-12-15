@@ -16,15 +16,20 @@ import NavBarLanding from "src/components/NavBarV2";
 const queryClient = new QueryClient();
 setFeatureFlagsFromQueryParams();
 
-function Nav(): JSX.Element {
+function Nav(): JSX.Element | null {
   // TODO: replace this with common nav
   // this is a workaround while we figure out what the specs are of logged in vs. landing page navbar
-  const { data } = useUserInfo();
-  const user = data?.user;
-  if (user) {
-    return <NavBarLoggedIn />;
+  const { data: userInfo, isLoading: isLoadingUserInfo } = useUserInfo();
+  const user = userInfo?.user;
+  if (!isLoadingUserInfo) {
+    if (user) {
+      return <NavBarLoggedIn />;
+    } else {
+      return <NavBarLanding />;
+    }
   } else {
-    return <NavBarLanding />;
+    // don't display until we resolve request for userInfo
+    return null;
   }
 }
 
