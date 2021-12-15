@@ -3,19 +3,24 @@
 import { Lock, Public } from "@material-ui/icons";
 import { ChipProps, Tooltip } from "czifui";
 import React from "react";
-import { defaultCellRenderer } from "src/common/components/library/data_table";
+import {
+  defaultCellRenderer,
+  defaultTreeCellRenderer,
+} from "src/common/components/library/data_table";
 import dataTableStyle from "src/common/components/library/data_table/index.module.scss";
-import { RowContent } from "src/common/components/library/data_table/style";
-import { TREE_STATUS } from "src/common/constants/types";
+import {
+  RowContent,
+  TreeRowContent,
+} from "src/common/components/library/data_table/style";
 import SampleIcon from "src/common/icons/Sample.svg";
-import { createTableCellRenderer, stringGuard } from "src/common/utils";
+import { createTableCellRenderer } from "src/common/utils";
 import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
-import TreeTableDownloadMenu from "src/components/TreeTableDownloadMenu";
+import { CZ_BIOHUB_GROUP } from "src/views/Data/constants";
 import { Lineage, LineageTooltip } from "./components/LineageTooltip";
+import { TreeActionMenu } from "./components/TreeActionMenu";
 import TreeTableNameCell from "./components/TreeTableNameCell";
 import { TreeTypeTooltip } from "./components/TreeTypeTooltip";
-import style from "./index.module.scss";
 import {
   CenteredFlexContainer,
   GISAIDCell,
@@ -150,25 +155,23 @@ const TREE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
   startedDate: ({ value, header }): JSX.Element => {
     const dateNoTime = value.split(" ")[0];
     return (
-      <RowContent header={header}>
-        <div className={style.cell} data-test-id={`row-${header.key}`}>
-          {dateNoTime}
-        </div>
-      </RowContent>
+      <TreeRowContent header={header}>
+        <div data-test-id={`row-${header.key}`}>{dateNoTime}</div>
+      </TreeRowContent>
     );
   },
   treeType: ({ value, header }: CustomTableRenderProps): JSX.Element => (
     <TreeTypeTooltip value={value as string}>
-      <UnderlinedRowContent header={header}>
+      <TreeRowContent>
         <UnderlinedCell data-test-id={`row-${header.key}`}>
           {value}
         </UnderlinedCell>
-      </UnderlinedRowContent>
+      </TreeRowContent>
     </TreeTypeTooltip>
   ),
 };
 
 export const TreeRenderer = createTableCellRenderer(
   TREE_CUSTOM_RENDERERS,
-  defaultCellRenderer
+  defaultTreeCellRenderer
 );

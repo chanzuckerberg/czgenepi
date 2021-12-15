@@ -116,7 +116,6 @@ export const SAMPLE_SUBHEADERS: Record<string, SubHeader[]> = {
 
 export const TREE_HEADERS: Header[] = [
   {
-    align: "left",
     key: "name",
     sortKey: ["name"],
     text: "Tree Name",

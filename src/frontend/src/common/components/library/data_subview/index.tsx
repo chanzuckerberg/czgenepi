@@ -139,7 +139,6 @@ const DataSubview: FunctionComponent<Props> = ({
   });
 
   const [checkedSampleIds, setCheckedSampleIds] = useState<string[]>([]);
-  const [showCheckboxes, setShowCheckboxes] = useState<boolean>(false);
   const [isDownloadModalOpen, setDownloadModalOpen] = useState(false);
   const [failedSampleIds, setFailedSampleIds] = useState<string[]>([]);
   const [downloadFailed, setDownloadFailed] = useState<boolean>(false);
@@ -184,13 +183,6 @@ const DataSubview: FunctionComponent<Props> = ({
   useEffect(() => {
     searcher(searchQuery);
   }, [data]);
-
-  useEffect(() => {
-    // Only show checkboxes on the sample datatable
-    if (viewName === VIEWNAME.SAMPLES) {
-      setShowCheckboxes(true);
-    }
-  }, [viewName]);
 
   useEffect(() => {
     // if there is an error then close the modal.
@@ -419,7 +411,7 @@ const DataSubview: FunctionComponent<Props> = ({
               setCheckedSampleIds={setCheckedSampleIds}
               failedSampleIds={failedSampleIds}
               setFailedSampleIds={setFailedSampleIds}
-              showCheckboxes={showCheckboxes}
+              viewName={viewName}
               data={
                 dataFilterFunc && tableData
                   ? dataFilterFunc(tableData)

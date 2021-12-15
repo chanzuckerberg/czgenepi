@@ -10,7 +10,7 @@ interface Props {
   isHeaderChecked: boolean;
   isHeaderIndeterminant: boolean;
   isSortedAscending: boolean;
-  shouldShowCheckboxes: boolean;
+  isSampleTable: boolean;
   sortColKey: string[];
 }
 
@@ -21,14 +21,14 @@ const HeaderRow = ({
   isHeaderChecked,
   isHeaderIndeterminant,
   isSortedAscending,
-  shouldShowCheckboxes,
+  isSampleTable,
   sortColKey,
 }: Props): JSX.Element => (
   <StyledHeaderRow
     data-test-id="header-row"
-    shouldShowCheckboxes={shouldShowCheckboxes}
+    shouldShowCheckboxes={isSampleTable}
   >
-    {shouldShowCheckboxes && (
+    {isSampleTable && (
       <HeaderCheckbox
         checked={isHeaderChecked}
         onClick={handleHeaderCheckboxClick}
@@ -51,6 +51,7 @@ const HeaderRow = ({
           onClick={() => handleSortClick(sortKey)}
           doesSortOnThisCol={isEqual(sortKey, sortColKey)}
           isSortedAscending={isSortedAscending}
+          isSampleTable={isSampleTable}
         />
       );
     })}
