@@ -54,7 +54,7 @@ class TargetedBuilder(BaseNextstrainConfigBuilder):
           self.crowding_penalty : the value a few lines above
           self.group : information about the group that this run is for (ex: self.group.name or self.group.division)
           config.num_sequences : the number of aspen samples written to our fasta input file
-          config.num_included_samples : the number of samples in includes.txt (aspen + gisaid samples) for on-demand runs only
+          config.num_included_samples : the number of samples in include.txt (aspen + gisaid samples) for on-demand runs only
 
         EXAMPLES SECTION:
           Delete a group from a subsampling scheme:

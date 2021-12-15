@@ -14,13 +14,20 @@ df 1>&2
 cat /proc/meminfo 1>&2
 
 start_time=$(date +%s)
-build_date=$(date +%Y%m%d)
 
 aws configure set region $AWS_REGION
 
+if [ ! -z "${BOTO_ENDPOINT_URL}" ]; then
+  export aws="aws --endpoint-url ${BOTO_ENDPOINT_URL}"
+else
+  export aws="aws"
+fi
+
 # fetch aspen config
-genepi_config="$(aws secretsmanager get-secret-value --secret-id $GENEPI_CONFIG_SECRET_NAME --query SecretString --output text)"
+genepi_config="$($aws secretsmanager get-secret-value --secret-id $GENEPI_CONFIG_SECRET_NAME --query SecretString --output text)"
 aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$genepi_config")"
+key_prefix="phylo_run/${S3_FILESTEM}/${WORKFLOW_ID}"
+s3_prefix="s3://${aspen_s3_db_bucket}/${key_prefix}"
 
 # set up ncov
 mkdir -p /ncov/my_profiles/aspen /ncov/results
@@ -39,8 +46,9 @@ aligned_gisaid_location=$(
            --builds-file /ncov/my_profiles/aspen/builds.yaml       \
 )
 
+
 # Persist the build config we generated.
-aws s3 cp /ncov/my_profiles/aspen/builds.yaml "s3://${aspen_s3_db_bucket}/phylo_run/${build_date}/${S3_FILESTEM}/${WORKFLOW_ID}/builds.yaml"
+$aws s3 cp /ncov/my_profiles/aspen/builds.yaml "${s3_prefix}/builds.yaml"
 
 # If we don't have any county samples, copy the reference genomes to to our county file
 if [ ! -e /ncov/data/sequences_aspen.fasta ]; then
@@ -52,16 +60,17 @@ aligned_gisaid_s3_bucket=$(echo "${aligned_gisaid_location}" | jq -r .bucket)
 aligned_gisaid_sequences_s3_key=$(echo "${aligned_gisaid_location}" | jq -r .sequences_key)
 aligned_gisaid_metadata_s3_key=$(echo "${aligned_gisaid_location}" | jq -r .metadata_key)
 
+
 # fetch the gisaid dataset
-aws s3 cp --no-progress "s3://${aligned_gisaid_s3_bucket}/${aligned_gisaid_sequences_s3_key}" /ncov/results/
-aws s3 cp --no-progress "s3://${aligned_gisaid_s3_bucket}/${aligned_gisaid_metadata_s3_key}" /ncov/results/
+$aws s3 cp --no-progress "s3://${aligned_gisaid_s3_bucket}/${aligned_gisaid_sequences_s3_key}" /ncov/results/
+$aws s3 cp --no-progress "s3://${aligned_gisaid_s3_bucket}/${aligned_gisaid_metadata_s3_key}" /ncov/results/
 
 # run snakemake, if run fails export the logs from snakemake and ncov to s3 
-(cd /ncov && snakemake --printshellcmds auspice/ncov_aspen.json --profile my_profiles/aspen/ --resources=mem_mb=312320) || { aws s3 cp /ncov/.snakemake/log/ "s3://${aspen_s3_db_bucket}/phylo_run/${build_date}/${S3_FILESTEM}/${WORKFLOW_ID}/logs/snakemake/" --recursive ; aws s3 cp /ncov/logs/ "s3://${aspen_s3_db_bucket}/phylo_run/${build_date}/${S3_FILESTEM}/${WORKFLOW_ID}/logs/ncov/" --recursive ; }
+(cd /ncov && snakemake --printshellcmds auspice/ncov_aspen.json --profile my_profiles/aspen/ --resources=mem_mb=312320) || { $aws s3 cp /ncov/.snakemake/log/ "${s3_prefix}/logs/snakemake/" --recursive ; $aws s3 cp /ncov/logs/ "${s3_prefix}/logs/ncov/" --recursive ; }
 
 # upload the tree to S3
-key="phylo_run/${build_date}/${S3_FILESTEM}/${WORKFLOW_ID}/ncov.json"
-aws s3 cp /ncov/auspice/ncov_aspen.json "s3://${aspen_s3_db_bucket}/${key}"
+key="${key_prefix}/ncov_aspen.json"
+$aws s3 cp /ncov/auspice/ncov_aspen.json "s3://${aspen_s3_db_bucket}/${key}"
 
 # update aspen
 aspen_workflow_rev=WHATEVER
