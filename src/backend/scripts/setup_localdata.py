@@ -108,9 +108,9 @@ def create_sequencing_reads(session, sample):
 
 def create_gisaid(session):
     aligned_workflow = session.query(AlignedGisaidDump).first()
-    #if aligned_workflow:
-    #    print("Aligned Gisaid Dump already exists")
-    #    return
+    if aligned_workflow:
+        print("Aligned Gisaid Dump already exists")
+        return
     # Add raw gisaid dump
     gisaid_s3_bucket = "genepi-gisaid-data"
     s3_resource = boto3.resource(
