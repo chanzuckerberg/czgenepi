@@ -29,8 +29,6 @@ import {
   UnderlinedRowContent,
 } from "./style";
 
-const CZ_BIOHUB_GROUP = "CZI";
-
 const LABEL_STATUS: Record<
   string,
   { label: string; status: NonNullable<ChipProps["status"]> }
