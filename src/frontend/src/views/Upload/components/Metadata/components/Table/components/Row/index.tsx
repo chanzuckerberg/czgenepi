@@ -6,6 +6,7 @@ import {
   DATE_ERROR_MESSAGE,
   DATE_REGEX,
 } from "src/components/DateField/constants";
+import { EMPTY_METADATA } from "src/views/Upload/components/common/constants";
 import {
   Metadata,
   NamedGisaidLocation,
@@ -51,11 +52,11 @@ const validationSchema = yup.object({
 interface Props {
   id: string;
   metadata: Metadata;
+  importedFileMetadata?: Metadata;
   handleMetadata: (id: string, sampleMetadata: Metadata) => void;
   applyToAllColumn: (fieldKey: keyof Metadata, value: unknown) => void;
   isFirstRow: boolean;
   handleRowValidation: (id: string, isValid: boolean) => void;
-  isTouched: boolean;
   warnings?: Set<keyof ParsedMetadata>;
   locations: NamedGisaidLocation[];
 }
@@ -63,34 +64,35 @@ interface Props {
 export default React.memo(function Row({
   id,
   metadata,
+  importedFileMetadata,
   handleMetadata,
   applyToAllColumn,
   isFirstRow,
   handleRowValidation,
-  isTouched,
   warnings = new Set(),
   locations,
 }: Props): JSX.Element {
   const formik = useFormik({
     enableReinitialize: true,
-    initialValues: metadata,
+    // If new file import comes in, form resets and uses that as starting point
+    initialValues: importedFileMetadata || EMPTY_METADATA,
     onSubmit: noop,
     validationSchema,
   });
 
   const { values, isValid, validateForm, setTouched } = formik;
 
+  // If user has uploaded a file of metadata, consider all fields touched for
+  // purposes of displaying validation warnings to them ("Required", etc)
   useEffect(() => {
-    if (!isTouched) return;
+    if (!importedFileMetadata) return;
 
-    const newTouched: Record<string, boolean> = {};
-
-    for (const fieldKey of Object.keys(values)) {
-      newTouched[fieldKey] = true;
-    }
-
-    setTouched(newTouched, true);
-  }, [isTouched, setTouched, values]);
+    const touchedFields: Record<string, boolean> = {};
+    Object.keys(values).forEach((fieldKey) => {
+      touchedFields[fieldKey] = true;
+    });
+    setTouched(touchedFields, true);
+  }, [importedFileMetadata, setTouched, values]);
 
   useEffect(() => {
     handleRowValidation(id, isValid);

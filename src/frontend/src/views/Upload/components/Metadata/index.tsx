@@ -87,7 +87,8 @@ export default function Metadata({
   setMetadata,
 }: Props): JSX.Element {
   const [isValid, setIsValid] = useState(false);
-  const [hasImportedFile, setHasImportedFile] = useState(false);
+  const [importedFileMetadata, setImportedFileMetadata] =
+    useState<SampleIdToMetadata | null>(null);
   const [autocorrectWarnings, setAutocorrectWarnings] =
     useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
   const [locations, setLocations] = useState<NamedGisaidLocation[]>([]);
@@ -109,11 +110,13 @@ export default function Metadata({
     loadLocations();
   }, []);
 
-  function handleMetadata(result: ParseResult) {
+  function handleMetadataFileUpload(result: ParseResult) {
     const { data: sampleIdToParsedMetadata, warningMessages } = result;
+    // If they're on the page but somehow have no samples (eg, refreshing on
+    // Metadata page), short-circuit and do nothing to avoid any weirdness.
     if (!samples) return;
 
-    const newMetadata: SampleIdToMetadata = {};
+    const uploadedMetadata: SampleIdToMetadata = {};
 
     // (thuang): Only extract metadata for existing samples
     for (const sampleId of Object.keys(samples)) {
@@ -125,19 +128,21 @@ export default function Metadata({
       if (locationString.length > 2) {
         collectionLocation = findLocationFromString(locationString, locations);
       }
-      newMetadata[sampleId] = {
+      uploadedMetadata[sampleId] = {
         ...EMPTY_METADATA,
         ...parsedMetadata,
         collectionLocation,
       };
     }
 
-    setMetadata(newMetadata);
+    setMetadata(uploadedMetadata); // Set overarching metadata for samples
+    // Additionally, track what the file's data was. Use this to blanket
+    // (re-)initialize all the input fields to what was uploaded.
+    setImportedFileMetadata(uploadedMetadata);
 
     setAutocorrectWarnings(
       warningMessages.get(WARNING_CODE.AUTO_CORRECT) || EMPTY_OBJECT
     );
-    setHasImportedFile(true);
   }
 
   return (
@@ -168,12 +173,15 @@ export default function Metadata({
           ]}
         />
 
-        <ImportFile samples={samples} handleMetadata={handleMetadata} />
+        <ImportFile
+          samples={samples}
+          handleMetadata={handleMetadataFileUpload}
+        />
 
         <Table
-          hasImportedFile={hasImportedFile}
           setIsValid={setIsValid}
           metadata={metadata}
+          importedFileMetadata={importedFileMetadata}
           setMetadata={setMetadata}
           autocorrectWarnings={autocorrectWarnings}
           locations={locations}
