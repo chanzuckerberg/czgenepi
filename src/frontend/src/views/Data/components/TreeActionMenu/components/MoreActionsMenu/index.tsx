@@ -1,7 +1,9 @@
 import { Menu, MenuItem, Tooltip } from "czifui";
 import React, { MouseEventHandler, useState } from "react";
+import { noop } from "src/common/constants/empty";
 import { TREE_STATUS } from "src/common/constants/types";
 import MoreActionsIcon from "src/common/icons/IconDotsHorizontal3Large.svg";
+import { useDeleteTrees } from "src/common/queries/trees";
 import { StyledIcon } from "../../style";
 import { StyledText, StyledTrashIcon } from "./style";
 
@@ -12,7 +14,7 @@ interface Props {
 const MoreActionsMenu = ({ item }: Props): JSX.Element => {
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 
-  const { status } = item;
+  const { id, status } = item;
   //TODO: also disable if cdph viewing
   const isDisabled = status === TREE_STATUS.Started;
 
@@ -24,8 +26,16 @@ const MoreActionsMenu = ({ item }: Props): JSX.Element => {
     setAnchorEl(null);
   };
 
+  const deleteTreeMutation = useDeleteTrees({
+    componentOnSuccess: noop,
+    componentOnError: noop,
+  });
+
   // TODO (mlila): add callback here when adding delete functionality
   const handleDeleteTrees = () => {
+    deleteTreeMutation.mutate({
+      treeIdToDelete: id,
+    });
     handleClose();
   };
 
@@ -62,7 +72,7 @@ const MoreActionsMenu = ({ item }: Props): JSX.Element => {
       >
         <MenuItem onClick={handleDeleteTrees}>
           <StyledTrashIcon />
-          <StyledText>Delete Trees</StyledText>
+          <StyledText>Delete Tree</StyledText>
         </MenuItem>
       </Menu>
     </>

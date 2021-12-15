@@ -7,6 +7,7 @@ import {
 } from "react-query";
 import {
   API,
+  DEFAULT_DELETE_OPTIONS,
   DEFAULT_FETCH_OPTIONS,
   DEFAULT_POST_OPTIONS,
   fetchTrees,
@@ -151,3 +152,45 @@ export function useTreeInfo(): UseQueryResult<TreeResponse, unknown> {
 /**
  * delete trees
  */
+
+type TreeDeleteCallbacks = MutationCallbacks<TreeDeleteResponseType>;
+interface TreeDeleteRequestType {
+  treeToDelete: number;
+}
+
+interface TreeDeleteResponseType {
+  id: string;
+}
+
+export async function deleteTrees({
+  treeIdToDelete,
+}: TreeDeleteRequestType): Promise<TreeDeleteResponseType> {
+  const response = await fetch(
+    API_URL + API.PHYLO_TREES + "/" + treeIdToDelete,
+    {
+      ...DEFAULT_DELETE_OPTIONS,
+    }
+  );
+
+  if (response.ok) await response.json();
+  throw Error(`${response.statusText}: ${await response.text()}`);
+}
+
+export function useDeleteTrees({
+  componentOnError,
+  componentOnSuccess,
+}: TreeDeleteCallbacks): UseMutationResult<
+  TreeDeleteResponseType,
+  unknown,
+  TreeDeleteRequestType,
+  unknown
+> {
+  const queryClient = useQueryClient();
+  return useMutation(deleteTrees, {
+    onError: componentOnError,
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries([USE_TREE_INFO]);
+      componentOnSuccess(data);
+    },
+  });
+}
