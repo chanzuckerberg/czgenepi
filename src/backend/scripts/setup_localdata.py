@@ -1,4 +1,6 @@
 from datetime import datetime
+import boto3
+import os
 
 from aspen.config.docker_compose import DockerComposeConfig
 from aspen.database.connection import get_db_uri, init_db
@@ -106,24 +108,39 @@ def create_sequencing_reads(session, sample):
 
 def create_gisaid(session):
     aligned_workflow = session.query(AlignedGisaidDump).first()
-    if aligned_workflow:
-        print("Aligned Gisaid Dump already exists")
-        return
+    #if aligned_workflow:
+    #    print("Aligned Gisaid Dump already exists")
+    #    return
     # Add raw gisaid dump
-    gisaid_s3_bucket = "gisaid_bucket"
+    gisaid_s3_bucket = "genepi-gisaid-data"
+    s3_resource = boto3.resource(
+        "s3",
+        endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None,
+        config=boto3.session.Config(signature_version="s3v4"),
+    )
     suffix = datetime.now().isoformat()
+    raw_s3_key=f"raw_gisaid_dump-{suffix}"
+    processed_sequences_s3_key=f"processed_sequences-{suffix}"
+    processed_metadata_s3_key=f"processed_metadata-{suffix}"
+    aligned_sequences_s3_key=f"aligned_sequences-{suffix}"
+    aligned_metadata_s3_key=f"aligned_metadata-{suffix}"
     raw_gisaid_dump = RawGisaidDump(
         download_date=datetime.now(),
         s3_bucket=gisaid_s3_bucket,
-        s3_key=f"raw_gisaid_dump-{suffix}",
+        s3_key=raw_s3_key,
     )
     session.add(raw_gisaid_dump)
+    s3_resource.Bucket(gisaid_s3_bucket).Object(raw_s3_key).put(Body="")
+    s3_resource.Bucket(gisaid_s3_bucket).Object(processed_sequences_s3_key).put(Body="")
+    s3_resource.Bucket(gisaid_s3_bucket).Object(processed_metadata_s3_key).put(Body="")
+    s3_resource.Bucket(gisaid_s3_bucket).Object(aligned_sequences_s3_key).put(Body="")
+    s3_resource.Bucket(gisaid_s3_bucket).Object(aligned_metadata_s3_key).put(Body="")
 
     # add transformed gisaid dump
     processed_gisaid_dump = ProcessedGisaidDump(
         s3_bucket=gisaid_s3_bucket,
-        sequences_s3_key=f"processed_sequences-{suffix}",
-        metadata_s3_key=f"processed_metadata-{suffix}",
+        sequences_s3_key=processed_sequences_s3_key,
+        metadata_s3_key=processed_metadata_s3_key,
     )
     processed_workflow = GisaidDumpWorkflow(
         start_datetime=datetime.now(),
@@ -139,8 +156,8 @@ def create_gisaid(session):
     # Add an aligned dump
     aligned_gisaid_dump = AlignedGisaidDump(
         s3_bucket=gisaid_s3_bucket,
-        sequences_s3_key=f"aligned_sequences-{suffix}",
-        metadata_s3_key=f"aligned_metadata-{suffix}",
+        sequences_s3_key=aligned_sequences_s3_key,
+        metadata_s3_key=aligned_metadata_s3_key,
     )
 
     # attach a workflow

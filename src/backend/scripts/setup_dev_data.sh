@@ -96,6 +96,7 @@ ${local_aws} ssm put-parameter --name /genepi/local/localstack/pangolin-ondemand
 echo "Creating s3 buckets"
 ${local_aws} s3api head-bucket --bucket genepi-external-auspice-data || ${local_aws} s3 mb s3://genepi-external-auspice-data
 ${local_aws} s3api head-bucket --bucket genepi-db-data || ${local_aws} s3 mb s3://genepi-db-data
+${local_aws} s3api head-bucket --bucket genepi-gisaid-data || ${local_aws} s3 mb s3://genepi-gisaid-data
 ${local_aws} s3api head-bucket --bucket genepi-batch || ${local_aws} s3 mb s3://genepi-batch
 echo
 echo "Dev env is up and running!"
