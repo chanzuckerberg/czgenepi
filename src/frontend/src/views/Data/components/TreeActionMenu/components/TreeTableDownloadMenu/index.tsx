@@ -25,7 +25,9 @@ const TreeTableDownloadMenu = ({ item, value }: Props): JSX.Element => {
   const jsonLink = stringGuard(value);
   const tsvDownloadLink = stringGuard(item["accessionsLink"]);
   const disabled = item?.status !== TREE_STATUS.Completed;
-  // TODO (mlila): open sds bug -- tooltips should not display without content
+  // TODO (mlila): This is necessary due to an sds bug -- MUI tooltips should not display
+  // TODO          without content, but that functionality was accidentally removed here.
+  // TODO          https://app.shortcut.com/sci-design-system/story/176947
   const MenuItemTooltip = ({
     children,
   }: {

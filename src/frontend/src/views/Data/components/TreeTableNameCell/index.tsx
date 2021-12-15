@@ -35,6 +35,7 @@ const TreeTableNameCell = ({ value, item }: Props): JSX.Element => {
 
   const { user } = item;
   // TODO (mlila): update name to include auto builds
+  // TODO          this requires backend changes.
   // const displayName =
   //   user?.group === CZ_BIOHUB_GROUP ? "CZ Biohub" : user?.name;
   const displayName = user?.name;
