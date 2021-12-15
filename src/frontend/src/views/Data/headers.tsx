@@ -152,8 +152,8 @@ export const TREE_HEADERS: Header[] = [
     },
   },
   {
-    key: "downloadLink",
-    sortKey: ["downloadLink"],
+    key: "actionMenu",
+    sortKey: ["actionMenu"],
     text: "",
   },
 ];

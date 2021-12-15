@@ -143,19 +143,8 @@ export const SampleRenderer = createTableCellRenderer(
 );
 
 const TREE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
-  downloadLink: ({ value, item }): JSX.Element => {
-    const jsonDownloadLink = stringGuard(value);
-    const tsvDownloadLink = stringGuard(item["accessionsLink"]);
-    const shouldAllowDownload = item?.status === TREE_STATUS.Completed;
-    return (
-      <RowContent>
-        <TreeTableDownloadMenu
-          jsonLink={jsonDownloadLink}
-          accessionsLink={tsvDownloadLink}
-          shouldAllowDownload={shouldAllowDownload}
-        />
-      </RowContent>
-    );
+  actionMenu: ({ value, item }): JSX.Element => {
+    return <TreeActionMenu item={item} value={value} />;
   },
   name: TreeTableNameCell,
   startedDate: ({ value, header }): JSX.Element => {
