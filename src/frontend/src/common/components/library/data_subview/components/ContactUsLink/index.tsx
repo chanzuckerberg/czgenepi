@@ -4,7 +4,7 @@ import { StyledNewTabLink } from "./style";
 const ContactUsLink = (): JSX.Element => (
   <span>
     Please try again later or{" "}
-    <StyledNewTabLink href="mailto:aspenprivacy@chanzuckerberg.com">
+    <StyledNewTabLink href="mailto:helloaspen@chanzuckerberg.com">
       contact us
     </StyledNewTabLink>{" "}
     for help.
