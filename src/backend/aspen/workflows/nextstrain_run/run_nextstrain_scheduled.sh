@@ -54,7 +54,7 @@ aligned_gisaid_location=$(
 )
 
 # Persist the build config we generated.
-aws s3 cp /ncov/my_profiles/aspen/builds.yaml "s3://${aspen_s3_db_bucket}/phylo_run/${build_id}/builds.yaml"
+aws s3 cp /ncov/my_profiles/aspen/builds.yaml "s3://${aspen_s3_db_bucket}/phylo_run/${build_id}/${S3_FILESTEM}_builds.yaml"
 
 aligned_gisaid_s3_bucket=$(echo "${aligned_gisaid_location}" | jq -r .bucket)
 aligned_gisaid_sequences_s3_key=$(echo "${aligned_gisaid_location}" | jq -r .sequences_key)
