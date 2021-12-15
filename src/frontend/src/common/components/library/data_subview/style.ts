@@ -9,7 +9,7 @@ import {
   getSpaces,
 } from "czifui";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
-import DownloadImage from "src/common/icons/IconDownload.svg";
+import DownloadImage from "src/common/icons/IconDownloadLarge.svg";
 
 export const StyledDiv = styled.div`
   ${fontHeaderXs}
