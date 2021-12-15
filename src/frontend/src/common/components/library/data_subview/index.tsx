@@ -1,5 +1,4 @@
 import { compact, escapeRegExp, filter } from "lodash";
-import NextLink from "next/link";
 import React, {
   FunctionComponent,
   useEffect,
@@ -9,9 +8,7 @@ import React, {
 import { Input } from "semantic-ui-react";
 import { DataTable } from "src/common/components";
 import { VIEWNAME } from "src/common/constants/types";
-import { ROUTES } from "src/common/routes";
 import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
-import Notification from "src/components/Notification";
 import { CreateNSTreeModal } from "./components/CreateNSTreeModal";
 import { DeleteSamplesConfirmationModal } from "./components/DeleteSamplesConfirmationModal";
 import DownloadModal from "./components/DownloadModal";
@@ -22,16 +19,13 @@ import { TreeSelectionMenu } from "./components/TreeSelectionMenu";
 import { UsherTreeFlow } from "./components/UsherTreeFlow";
 import style from "./index.module.scss";
 import {
-  BoldText,
   Divider,
   DownloadWrapper,
-  StyledButton,
   StyledChip,
   StyledDiv,
   StyledDownloadDisabledImage,
   StyledDownloadImage,
   StyledFlexChildDiv,
-  StyledNewTabLink,
   TooltipDescriptionText,
   TooltipHeaderText,
 } from "./style";
@@ -142,11 +136,8 @@ const DataSubview: FunctionComponent<Props> = ({
   const [showCheckboxes, setShowCheckboxes] = useState<boolean>(false);
   const [isDownloadModalOpen, setDownloadModalOpen] = useState(false);
   const [failedSampleIds, setFailedSampleIds] = useState<string[]>([]);
-  const [downloadFailed, setDownloadFailed] = useState<boolean>(false);
   const [isNSCreateTreeModalOpen, setIsNSCreateTreeModalOpen] =
     useState<boolean>(false);
-  const [hasCreateTreeStarted, setCreateTreeStarted] = useState<boolean>(false);
-  const [didCreateTreeFailed, setCreateTreeFailed] = useState<boolean>(false);
   const [shouldStartUsherFlow, setShouldStartUsherFlow] =
     useState<boolean>(false);
   const [isDeleteConfirmationOpen, setDeleteConfirmationOpen] =
@@ -163,14 +154,6 @@ const DataSubview: FunctionComponent<Props> = ({
 
   const handleCreateTreeClose = () => {
     setIsNSCreateTreeModalOpen(false);
-  };
-
-  const handleCreateTreeFailed = () => {
-    setCreateTreeFailed(true);
-  };
-
-  const handleSetCreateTreeStarted = () => {
-    setCreateTreeStarted(true);
   };
 
   const handleDownloadClose = () => {
@@ -191,31 +174,6 @@ const DataSubview: FunctionComponent<Props> = ({
       setShowCheckboxes(true);
     }
   }, [viewName]);
-
-  useEffect(() => {
-    // if there is an error then close the modal.
-    if (downloadFailed) {
-      setDownloadModalOpen(false);
-    }
-  }, [downloadFailed]);
-
-  useEffect(() => {
-    if (didCreateTreeFailed) {
-      setIsNSCreateTreeModalOpen(false);
-    }
-  }, [didCreateTreeFailed]);
-
-  function handleDismissDownloadErrorClick() {
-    setDownloadFailed(false);
-  }
-
-  function handleDismissCreateTreeErrorClick() {
-    setCreateTreeFailed(false);
-  }
-
-  function handleCreateTreeStartedModalClose() {
-    setCreateTreeStarted(false);
-  }
 
   const handleDeleteSampleModalClose = () => {
     setDeleteConfirmationOpen(false);
@@ -258,16 +216,6 @@ const DataSubview: FunctionComponent<Props> = ({
     <div>
       <TooltipHeaderText>Download</TooltipHeaderText>
     </div>
-  );
-
-  const CONTACT_US = (
-    <span>
-      Please try again later or{" "}
-      <StyledNewTabLink href="mailto:aspenprivacy@chanzuckerberg.com">
-        contact us
-      </StyledNewTabLink>{" "}
-      for help.
-    </span>
   );
 
   const numCheckedSamples = checkedSampleIds?.length;
@@ -318,7 +266,6 @@ const DataSubview: FunctionComponent<Props> = ({
             <DownloadModal
               checkedSampleIds={checkedSampleIds}
               failedSampleIds={failedSampleIds}
-              setDownloadFailed={setDownloadFailed}
               tsvData={tsvDataMap(
                 checkedSampleIds,
                 tableData,
@@ -333,8 +280,6 @@ const DataSubview: FunctionComponent<Props> = ({
               failedSampleIds={failedSampleIds}
               open={isNSCreateTreeModalOpen}
               onClose={handleCreateTreeClose}
-              handleCreateTreeFailed={handleCreateTreeFailed}
-              handleSetCreateTreeStarted={handleSetCreateTreeStarted}
             />
             <UsherTreeFlow
               checkedSampleIds={checkedSampleIds}
@@ -362,54 +307,6 @@ const DataSubview: FunctionComponent<Props> = ({
             <div>
               {viewName === VIEWNAME.TREES && <TreeCreateHelpLink />}
               {sampleActions}
-              <Notification
-                buttonOnClick={handleDismissDownloadErrorClick}
-                buttonText="DISMISS"
-                dismissDirection="right"
-                dismissed={!downloadFailed}
-                intent="error"
-              >
-                <BoldText>
-                  Something went wrong and we were unable to complete one or
-                  more of your downloads
-                </BoldText>
-                {CONTACT_US}
-              </Notification>
-              <Notification
-                buttonOnClick={handleDismissCreateTreeErrorClick}
-                buttonText="DISMISS"
-                dismissDirection="right"
-                dismissed={!didCreateTreeFailed}
-                intent="error"
-              >
-                <BoldText>
-                  Something went wrong and we were unable to start your tree
-                  build
-                </BoldText>
-                {CONTACT_US}
-              </Notification>
-              <Notification
-                autoDismiss={12000}
-                dismissDirection="right"
-                dismissed={!hasCreateTreeStarted}
-                intent="info"
-              >
-                <span>
-                  Your tree is being created. It may take up to 12 hours to
-                  process. To check your tree’s status, visit the Phylogenetic
-                  Tree tab.
-                </span>
-                <NextLink href={ROUTES.PHYLO_TREES} passHref>
-                  <a href="passRef">
-                    <StyledButton
-                      color="primary"
-                      onClick={handleCreateTreeStartedModalClose}
-                    >
-                      VIEW MY TREES
-                    </StyledButton>
-                  </a>
-                </NextLink>
-              </Notification>
             </div>
           </div>
           <div className={style.samplesTable}>
