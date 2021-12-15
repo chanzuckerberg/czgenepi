@@ -4,7 +4,7 @@ import { Lock, Public } from "@material-ui/icons";
 import { ChipProps, Tooltip } from "czifui";
 import React from "react";
 import {
-  defaultCellRenderer,
+  defaultSampleCellRenderer,
   defaultTreeCellRenderer,
 } from "src/common/components/library/data_table";
 import dataTableStyle from "src/common/components/library/data_table/index.module.scss";
@@ -144,7 +144,7 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
 
 export const SampleRenderer = createTableCellRenderer(
   SAMPLE_CUSTOM_RENDERERS,
-  defaultCellRenderer
+  defaultSampleCellRenderer
 );
 
 const TREE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {

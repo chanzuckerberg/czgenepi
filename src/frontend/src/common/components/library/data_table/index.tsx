@@ -36,7 +36,7 @@ const LOADING_STATE_ROW_COUNT = 10;
 
 export const UNDEFINED_TEXT = "-";
 
-export function defaultCellRenderer({
+export function defaultSampleCellRenderer({
   value,
   header,
 }: CustomTableRenderProps): JSX.Element {
@@ -147,7 +147,7 @@ export const DataTable: FunctionComponent<Props> = ({
   data,
   headers,
   defaultSortKey,
-  renderer = defaultCellRenderer,
+  renderer = defaultSampleCellRenderer,
   isLoading,
   checkedSampleIds,
   setCheckedSampleIds,
