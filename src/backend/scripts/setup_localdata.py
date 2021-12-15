@@ -1,6 +1,7 @@
-from datetime import datetime
-import boto3
 import os
+from datetime import datetime
+
+import boto3
 
 from aspen.config.docker_compose import DockerComposeConfig
 from aspen.database.connection import get_db_uri, init_db
@@ -119,11 +120,11 @@ def create_gisaid(session):
         config=boto3.session.Config(signature_version="s3v4"),
     )
     suffix = datetime.now().isoformat()
-    raw_s3_key=f"raw_gisaid_dump-{suffix}"
-    processed_sequences_s3_key=f"processed_sequences-{suffix}"
-    processed_metadata_s3_key=f"processed_metadata-{suffix}"
-    aligned_sequences_s3_key=f"aligned_sequences-{suffix}"
-    aligned_metadata_s3_key=f"aligned_metadata-{suffix}"
+    raw_s3_key = f"raw_gisaid_dump-{suffix}"
+    processed_sequences_s3_key = f"processed_sequences-{suffix}"
+    processed_metadata_s3_key = f"processed_metadata-{suffix}"
+    aligned_sequences_s3_key = f"aligned_sequences-{suffix}"
+    aligned_metadata_s3_key = f"aligned_metadata-{suffix}"
     raw_gisaid_dump = RawGisaidDump(
         download_date=datetime.now(),
         s3_bucket=gisaid_s3_bucket,
