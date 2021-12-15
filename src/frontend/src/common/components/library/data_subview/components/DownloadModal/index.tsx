@@ -140,7 +140,7 @@ const DownloadModal = ({
           <Container>
             <Tooltip
               arrow
-              inverted
+              sdsStyle="dark"
               title={FASTA_DISABLED_TOOLTIP_TEXT}
               disableHoverListener={!isFastaDisabled}
               placement="top"
