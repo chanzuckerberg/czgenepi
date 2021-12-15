@@ -19,7 +19,7 @@ start_time=$(date +%s)
 
 aws configure set region $AWS_REGION
 
-if [ ! -z "${BOTO_ENDPOINT_URL}" ]; then
+if [ -n "${BOTO_ENDPOINT_URL-}" ]; then
   export aws="aws --endpoint-url ${BOTO_ENDPOINT_URL}"
 else
   export aws="aws"
