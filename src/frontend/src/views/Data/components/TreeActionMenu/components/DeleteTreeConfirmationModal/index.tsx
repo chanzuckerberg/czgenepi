@@ -38,8 +38,8 @@ const DeleteTreeConfirmationModal = ({
 
   const content = (
     <div>
-      Deleted trees will be removed from Aspen. You will not be able to undo
-      this action.
+      Deleted trees will be removed from CZ GEN EPI. You will not be able to
+      undo this action.
     </div>
   );
 
