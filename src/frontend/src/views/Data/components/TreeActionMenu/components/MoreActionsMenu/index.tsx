@@ -8,7 +8,7 @@ import { DeleteTreeConfirmationModal } from "./components/DeleteTreeConfirmation
 import { StyledText, StyledTrashIcon } from "./style";
 
 interface Props {
-  item: TableItem;
+  item: Tree;
   userInfo: UserResponse;
 }
 
