@@ -6,7 +6,7 @@ import { DeleteDialog } from "src/components/DeleteDialog";
 interface Props {
   onClose(): void;
   open: boolean;
-  tree: TableItem;
+  tree: Tree;
 }
 
 const DeleteTreeConfirmationModal = ({
@@ -58,7 +58,7 @@ const DeleteTreeConfirmationModal = ({
         >
           Your tree has been deleted.
         </Notification>
-        )}
+      )}
       {!open && shouldShowErrorNotification && (
         <Notification
           autoDismiss

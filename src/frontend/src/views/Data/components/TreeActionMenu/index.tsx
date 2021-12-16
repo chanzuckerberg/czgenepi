@@ -7,7 +7,7 @@ import { StyledActionWrapper, StyledTreeActionMenu } from "./style";
 
 interface Props {
   value: string;
-  item: TableItem;
+  item: Tree;
   userInfo: UserResponse;
 }
 

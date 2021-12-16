@@ -155,7 +155,7 @@ export function useTreeInfo(): UseQueryResult<TreeResponse, unknown> {
 
 type TreeDeleteCallbacks = MutationCallbacks<TreeDeleteResponseType>;
 interface TreeDeleteRequestType {
-  treeToDelete: number;
+  treeIdToDelete: string;
 }
 
 interface TreeDeleteResponseType {
