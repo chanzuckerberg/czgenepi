@@ -57,7 +57,7 @@ const DeleteSamplesConfirmationModal = ({
   const content = (
     <div>
       <span>
-        Deleted samples will be removed from Aspen. If these samples were
+        Deleted samples will be removed from CZ GEN EPI. If these samples were
         included in previously generated trees, they will be shown with their
         public IDs only. You will not be able to undo this action.
       </span>
