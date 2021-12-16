@@ -29,7 +29,9 @@ class OverviewBuilder(BaseNextstrainConfigBuilder):
         if self.group.name == "Chicago Department of Public Health":
             subsampling["group"][
                 "query"
-            ] = "--query \"((location == '{location}') & (division == '{division}')) | submitting_lab == 'RIPHL at Rush University Medical Center'\""
+            ] = '''--query "((location == '{location}') & (division == '{division}')) | submitting_lab == 'RIPHL at Rush University Medical Center'"'''
+        # Update our sampling for state/country level builds if necessary
+        update_subsampling_for_location(self.group.default_tree_location, subsampling)
 
 
 class NonContextualizedBuilder(BaseNextstrainConfigBuilder):
@@ -86,3 +88,28 @@ class TargetedBuilder(BaseNextstrainConfigBuilder):
         subsampling["state"]["max_sequences"] = other_max_sequences
         subsampling["country"]["max_sequences"] = other_max_sequences
         subsampling["international"]["max_sequences"] = other_max_sequences
+
+        # Update our sampling for state/country level builds if necessary
+        update_subsampling_for_location(self.group.default_tree_location, subsampling)
+
+def update_subsampling_for_location(location, subsampling):
+    # If we don't have a division, this is a country-level build
+    if not location.division:
+        update_subsampling_for_country(subsampling)
+    # If we have a division but not a location, this is a state-level build
+    elif not location.location:
+        update_subsampling_for_division(subsampling)
+
+def update_subsampling_for_country(subsampling):
+    # State and country aren't useful
+    del subsampling["state"]
+    del subsampling["country"]
+    # Make our local group bigger
+    subsampling["group"]["max_sequences"] = 200
+    subsampling["group"]["query"] = '''--query "(country == '{country}')"'''
+
+def update_subsampling_for_state(subsampling):
+    # State isn't useful
+    del subsampling["state"]
+    # Update our local group query
+    subsampling["group"]["query"] = '''--query "(division == '{division}') & (country == '{country}')"'''

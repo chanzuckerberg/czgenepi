@@ -28,11 +28,15 @@ from aspen.workflows.nextstrain_run.export import (
 @click.option("--sequences", type=int, required=False, default=10)
 @click.option("--selected", type=int, required=False, default=10)
 @click.option("--gisaid", type=int, required=False, default=10)
+@click.option("--group-name", type=str, required=False, default=None)
+@click.option("--location-id", type=int, required=False, default=None)
 def cli(
     tree_type: str,
     sequences: int,
     selected: int,
     gisaid: int,
+    group_name: str,
+    location_id: int,
 ):
     tree_types = {
         "overview": TreeType.OVERVIEW,
@@ -68,7 +72,10 @@ def cli(
             "num_sequences": num_sequences,
             "num_included_samples": num_included_samples,
         }
-        group = session.query(Group).first()
+        if group_name:
+            group = session.query(Group).filter(Group.name == group_name).first()
+        else:
+            group = session.query(Group).first()
         builder = builder_factory(build_type, group, template_args, **context)
         builder.write_file(builds_file_fh)
 
