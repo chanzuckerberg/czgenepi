@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
 import { Checkbox, fontHeaderXs, getColors, getSpaces, Props } from "czifui";
+import { FixedSizeList } from "react-window";
 
 export const TableRow = styled.div`
   display: flex;
@@ -77,4 +78,18 @@ export const RowCheckbox = styled(Checkbox)`
       background-color: transparent;
     }
   }
+`;
+
+// Typically, fixed items are positioned relative to the viewport.
+// However, elements that have any transform applied to them will
+// create a viewport-like containing block, throwing off any fixed
+// position descendants.
+// https://www.w3.org/TR/css-transforms-1/
+// This prevents the data table from turning into a viewport-in-a-viewport,
+// essentially, which is required for notifications to be properly placed.
+// `will-change` is an experimental browser perf optimization tag.
+// It doesn't apply any actual styling. It's more of a heads up for the
+// browser on how elements might change in the future.
+export const StyledFixedSizeList = styled(FixedSizeList)`
+  will-change: auto !important;
 `;

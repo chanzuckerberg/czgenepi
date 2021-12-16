@@ -7,7 +7,7 @@ import React, {
   useState,
 } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
-import { FixedSizeList, ListChildComponentProps } from "react-window";
+import { ListChildComponentProps } from "react-window";
 import { noop } from "src/common/constants/empty";
 import { VIEWNAME } from "src/common/constants/types";
 import { useUserInfo } from "src/common/queries/auth";
@@ -15,7 +15,13 @@ import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import { EmptyState } from "../data_subview/components/EmptyState";
 import { HeaderRow } from "./components/HeaderRow";
 import style from "./index.module.scss";
-import { RowCheckbox, RowContent, TableRow, TreeRowContent } from "./style";
+import {
+  RowCheckbox,
+  RowContent,
+  StyledFixedSizeList,
+  TableRow,
+  TreeRowContent,
+} from "./style";
 
 interface Props {
   data?: TableItem[];
@@ -318,7 +324,7 @@ export const DataTable: FunctionComponent<Props> = ({
           <AutoSizer>
             {({ height, width }) => {
               return (
-                <FixedSizeList
+                <StyledFixedSizeList
                   height={height}
                   itemData={tableData}
                   itemCount={
@@ -328,7 +334,7 @@ export const DataTable: FunctionComponent<Props> = ({
                   width={width}
                 >
                   {renderRow}
-                </FixedSizeList>
+                </StyledFixedSizeList>
               );
             }}
           </AutoSizer>
