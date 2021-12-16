@@ -10,6 +10,7 @@ import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import { noop } from "src/common/constants/empty";
 import { VIEWNAME } from "src/common/constants/types";
+import { useUserInfo } from "src/common/queries/auth";
 import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import { EmptyState } from "../data_subview/components/EmptyState";
 import { HeaderRow } from "./components/HeaderRow";
@@ -246,6 +247,8 @@ export const DataTable: FunctionComponent<Props> = ({
     });
   };
 
+  const { data: userInfo } = useUserInfo();
+
   // render functions
   const sampleRow = (item: TableItem): React.ReactNode => {
     return headers.map((header, index) => {
@@ -253,7 +256,7 @@ export const DataTable: FunctionComponent<Props> = ({
 
       return (
         <Fragment key={`${item[indexingKey]}-${header.key}`}>
-          {renderer({ header, index, item, value })}
+          {renderer({ header, index, item, userInfo, value })}
         </Fragment>
       );
     });

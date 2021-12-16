@@ -27,6 +27,7 @@ interface CustomTableRenderProps {
   value?: JSONPrimitive | Record<string, JSONPrimitive>;
   item: TableItem;
   index: number;
+  userInfo?: UserResponse;
 }
 
 type CustomRenderer = ({
@@ -34,6 +35,12 @@ type CustomRenderer = ({
   value,
   item,
   index,
+  userInfo,
 }: CustomTableRenderProps) => JSX.Element;
 
-type CellRenderer = ({ value, item, index }: CellRendererProps) => JSX.Element;
+type CellRenderer = ({
+  value,
+  item,
+  index,
+  userInfo,
+}: CellRendererProps) => JSX.Element;

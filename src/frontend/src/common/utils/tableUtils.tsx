@@ -5,7 +5,7 @@ export function createTableCellRenderer(
   customRenderers: Record<string, CellRenderer>,
   defaultRenderer: CellRenderer
 ): CustomRenderer {
-  return ({ header, value, item, index }: CustomTableRenderProps) => {
+  return ({ header, value, item, index, userInfo }: CustomTableRenderProps) => {
     const unwrappedValue = value || UNDEFINED_TEXT;
 
     const renderer = customRenderers[header.key] || defaultRenderer;
@@ -14,6 +14,7 @@ export function createTableCellRenderer(
       header,
       index,
       item,
+      userInfo,
       value: unwrappedValue,
     });
   };
