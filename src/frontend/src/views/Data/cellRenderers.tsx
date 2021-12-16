@@ -137,6 +137,17 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
   uploadDate: ({ value }): JSX.Element => {
     return <RowContent>{datetimeWithTzToLocalDate(value)}</RowContent>;
   },
+
+  collectionLocation: ({ value }): JSX.Element => {
+    const location = value.location ?? value.division;
+    return (
+      <RowContent>
+        <div className={style.cell} data-test-id={`row-collectionLocation`}>
+          {location}
+        </div>
+      </RowContent>
+    );
+  },
 };
 
 export const SampleRenderer = createTableCellRenderer(
