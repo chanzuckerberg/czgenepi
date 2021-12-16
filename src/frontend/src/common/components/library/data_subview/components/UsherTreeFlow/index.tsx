@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Notification from "src/components/Notification";
-import { StyledNewTabLink } from "../../style";
 import { UsherConfirmationModal } from "./components/UsherConfirmationModal";
 import { UsherPlacementModal } from "./components/UsherPlacementModal";
+import { StyledNewTabLink } from "./style";
 
 interface Props {
   checkedSampleIds: string[];

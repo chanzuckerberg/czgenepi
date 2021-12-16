@@ -105,15 +105,24 @@ export async function getUsherOptions(): Promise<unknown> {
 type FastaFetchCallbacks = MutationCallbacks<FastaResponseType>;
 type CreateTreeCallbacks = MutationCallbacks<void>;
 
-export function useFastaFetch(
-  callbacks: FastaFetchCallbacks
-): UseMutationResult<FastaResponseType, unknown, FastaRequestType, unknown> {
-  return useMutation(getFastaURL, callbacks);
+export function useFastaFetch({
+  componentOnError,
+  componentOnSuccess,
+}: FastaFetchCallbacks): UseMutationResult<
+  FastaResponseType,
+  unknown,
+  FastaRequestType,
+  unknown
+> {
+  return useMutation(getFastaURL, {
+    onError: componentOnError,
+    onSuccess: componentOnSuccess,
+  });
 }
 
 export function useCreateTree({
-  onError,
-  onSuccess,
+  componentOnError,
+  componentOnSuccess,
 }: CreateTreeCallbacks): UseMutationResult<
   unknown,
   unknown,
@@ -123,10 +132,10 @@ export function useCreateTree({
   const queryClient = useQueryClient();
 
   return useMutation(createTree, {
-    onError,
+    onError: componentOnError,
     onSuccess: async () => {
       await queryClient.invalidateQueries([USE_TREE_INFO]);
-      onSuccess();
+      componentOnSuccess();
     },
   });
 }

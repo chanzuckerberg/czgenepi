@@ -110,11 +110,11 @@ export const UsherPlacementModal = ({
   }, [checkedSampleIds, failedSampleIds, isLoading]);
 
   const fastaFetch = useFastaFetch({
-    onError: () => {
+    componentOnError: () => {
       setIsLoading(false);
       onClose();
     },
-    onSuccess: (data: FastaResponseType) => {
+    componentOnSuccess: (data: FastaResponseType) => {
       const url = data?.url;
       if (url) onLinkCreateSuccess(data.url, treeType);
       setIsLoading(false);

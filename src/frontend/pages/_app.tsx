@@ -19,9 +19,8 @@ setFeatureFlagsFromQueryParams();
 function Nav(): JSX.Element {
   // TODO: replace this with common nav
   // this is a workaround while we figure out what the specs are of logged in vs. landing page navbar
-  const { data } = useUserInfo();
-  const user = data?.user;
-  if (user) {
+  const { data: userInfo } = useUserInfo();
+  if (userInfo) {
     return <NavBarLoggedIn />;
   } else {
     return <NavBarLanding />;

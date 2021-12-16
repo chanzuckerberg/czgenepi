@@ -1,14 +1,11 @@
 import styled from "@emotion/styled";
 import {
-  Button,
   Chip,
-  fontBodyXxs,
   fontHeaderXs,
   getColors,
   getFontWeights,
   getSpaces,
 } from "czifui";
-import { NewTabLink } from "src/common/components/library/NewTabLink";
 import DownloadImage from "src/common/icons/IconDownload.svg";
 
 export const StyledDiv = styled.div`
@@ -33,24 +30,6 @@ export const Divider = styled.div`
     return `
     margin-left: ${spaces?.xl}px;
     border-right: 1px solid ${colors?.gray[500]};
-    `;
-  }}
-`;
-
-export const StyledButton = styled(Button)`
-  ${fontBodyXxs}
-  color: black;
-  &:hover {
-    background-color: transparent;
-  }
-  ${(props) => {
-    const spaces = getSpaces(props);
-    const fontWeights = getFontWeights(props);
-    return `
-      font-weight: ${fontWeights?.semibold};
-      margin-top: ${spaces?.xs}px;
-      margin-left: 0px;
-      padding-left: 0px;
     `;
   }}
 `;
@@ -91,20 +70,6 @@ export const StyledDownloadDisabledImage = styled(DownloadImage)`
         fill: ${colors?.gray[300]};
     `;
   }}
-`;
-
-export const BoldText = styled.div`
-  ${(props) => {
-    const fontWeights = getFontWeights(props);
-    return `
-        font-weight: ${fontWeights?.semibold};
-      `;
-  }}
-`;
-
-export const StyledNewTabLink = styled(NewTabLink)`
-  color: black;
-  border-bottom: 1px dotted black;
 `;
 
 export const TooltipHeaderText = styled.div`
