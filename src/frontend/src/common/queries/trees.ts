@@ -49,7 +49,7 @@ async function createTree({
     samples: sampleIds,
     tree_type: treeType,
   };
-  const response = await fetch(API_URL + API.CREATE_TREE, {
+  const response = await fetch(API_URL + API.PHYLO_TREES_V2, {
     ...DEFAULT_POST_OPTIONS,
     body: JSON.stringify(payload),
   });
@@ -162,15 +162,12 @@ interface TreeDeleteResponseType {
   id: string;
 }
 
-export async function deleteTrees({
+export async function deleteTree({
   treeIdToDelete,
 }: TreeDeleteRequestType): Promise<TreeDeleteResponseType> {
-  const response = await fetch(
-    API_URL + API.PHYLO_TREES + "/" + treeIdToDelete,
-    {
-      ...DEFAULT_DELETE_OPTIONS,
-    }
-  );
+  const response = await fetch(API_URL + API.PHYLO_TREES_V2 + treeIdToDelete, {
+    ...DEFAULT_DELETE_OPTIONS,
+  });
 
   if (response.ok) await response.json();
   throw Error(`${response.statusText}: ${await response.text()}`);
