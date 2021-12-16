@@ -26,55 +26,56 @@ const MoreActionsMenu = ({ item }: Props): JSX.Element => {
     setAnchorEl(null);
   };
 
-  const deleteTreeMutation = useDeleteTrees({
-    componentOnSuccess: noop,
-    componentOnError: noop,
-  });
-
-  // TODO (mlila): add callback here when adding delete functionality
-  const handleDeleteTrees = () => {
-    deleteTreeMutation.mutate({
-      treeIdToDelete: id,
-    });
+  const handleOpenModal = () => {
+    setIsDeleteModalOpen(true);
     handleClose();
   };
+
+  const handleDeleteTree = () => {
+    setIsDeleteModalOpen(false);
+  };
+
+  const open = Boolean(anchorEl);
 
   return (
     <>
       <Tooltip
         arrow
         sdsStyle={isDisabled ? "light" : "dark"}
-        title={
-          isDisabled
-            ? "“More Actions” will be available after this tree is complete."
-            : "More Actions"
-        }
+        title={tooltipText}
         placement="top"
       >
         <StyledIcon onClick={handleClick} disabled={isDisabled}>
           <MoreActionsIcon />
         </StyledIcon>
       </Tooltip>
-      <Menu
-        anchorEl={anchorEl}
-        anchorOrigin={{
-          horizontal: "right",
-          vertical: "bottom",
-        }}
-        transformOrigin={{
-          horizontal: "right",
-          vertical: "top",
-        }}
-        keepMounted
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-        getContentAnchorEl={null}
-      >
-        <MenuItem onClick={handleDeleteTrees}>
-          <StyledTrashIcon />
-          <StyledText>Delete Tree</StyledText>
-        </MenuItem>
-      </Menu>
+      {open && (
+        <Menu
+          anchorEl={anchorEl}
+          anchorOrigin={{
+            horizontal: "right",
+            vertical: "bottom",
+          }}
+          transformOrigin={{
+            horizontal: "right",
+            vertical: "top",
+          }}
+          keepMounted
+          open={open}
+          onClose={handleClose}
+          getContentAnchorEl={null}
+        >
+          <MenuItem onClick={handleOpenModal}>
+            <StyledTrashIcon />
+            <StyledText>Delete Tree</StyledText>
+          </MenuItem>
+        </Menu>
+      )}
+      <DeleteTreeConfirmationModal
+        open={isDeleteModalOpen}
+        onClose={handleDeleteTree}
+        tree={item}
+      />
     </>
   );
 };

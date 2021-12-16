@@ -45,6 +45,8 @@ const TreeTableDownloadMenu = ({ item, value }: Props): JSX.Element => {
       <>{children}</>
     );
 
+  const open = Boolean(anchorEl);
+
   return (
     <>
       <Tooltip arrow sdsStyle="dark" title="Download" placement="top">
@@ -52,24 +54,26 @@ const TreeTableDownloadMenu = ({ item, value }: Props): JSX.Element => {
           <DownloadIcon />
         </StyledIcon>
       </Tooltip>
-      <Menu
-        anchorEl={anchorEl}
-        keepMounted
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-        getContentAnchorEl={null}
-      >
-        <NewTabLink href={jsonLink}>
-          <MenuItemTooltip>
-            <MenuItem disabled={disabled} onClick={handleClose}>
-              {"Tree file (.json)"}
-            </MenuItem>
-          </MenuItemTooltip>
-        </NewTabLink>
-        <NewTabLink href={tsvDownloadLink}>
-          <MenuItem onClick={handleClose}>{"Private IDs (.tsv)"}</MenuItem>
-        </NewTabLink>
-      </Menu>
+      {open && (
+        <Menu
+          anchorEl={anchorEl}
+          keepMounted
+          open={open}
+          onClose={handleClose}
+          getContentAnchorEl={null}
+        >
+          <NewTabLink href={jsonLink}>
+            <MenuItemTooltip>
+              <MenuItem disabled={disabled} onClick={handleClose}>
+                {"Tree file (.json)"}
+              </MenuItem>
+            </MenuItemTooltip>
+          </NewTabLink>
+          <NewTabLink href={tsvDownloadLink}>
+            <MenuItem onClick={handleClose}>{"Private IDs (.tsv)"}</MenuItem>
+          </NewTabLink>
+        </Menu>
+      )}
     </>
   );
 };
