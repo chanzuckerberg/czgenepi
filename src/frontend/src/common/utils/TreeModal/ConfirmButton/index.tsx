@@ -61,7 +61,7 @@ export const ConfirmButton = (props: Props): JSX.Element => {
   const ButtonContent = (
     <Button
       {...rest}
-      color="primary"
+      sdsType="primary"
       variant="contained"
       isRounded
       disabled={isLoading || hasError || !url}

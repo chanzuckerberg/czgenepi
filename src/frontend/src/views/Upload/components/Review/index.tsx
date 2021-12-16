@@ -59,14 +59,14 @@ export default function Review({
           <ContentTitle>Sample Info</ContentTitle>
           <NextLink href={ROUTES.UPLOAD_STEP1} passHref>
             <a href="passHref">
-              <Button color="primary" variant="text">
+              <Button sdsType="primary" variant="text">
                 Edit Samples
               </Button>
             </a>
           </NextLink>
           <NextLink href={ROUTES.UPLOAD_STEP2} passHref>
             <a href="passHref">
-              <Button color="primary" variant="text">
+              <Button sdsType="primary" variant="text">
                 Edit Metadata
               </Button>
             </a>

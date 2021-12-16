@@ -169,7 +169,7 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
           </Link>
           <Link href={ROUTES.DATA_SAMPLES} passHref>
             <a href="passHref">
-              <Button isRounded color="primary" variant="outlined">
+              <Button isRounded sdsType="primary" variant="outlined">
                 Cancel
               </Button>
             </a>
