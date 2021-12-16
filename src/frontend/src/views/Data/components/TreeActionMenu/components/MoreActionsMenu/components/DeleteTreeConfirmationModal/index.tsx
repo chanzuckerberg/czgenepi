@@ -19,7 +19,7 @@ const DeleteTreeConfirmationModal = ({
   const [shouldShowSuccessNotification, setShouldShowSuccessNotification] =
     useState<boolean>(false);
 
-  const { id, name } = tree;
+  const { workflowId, name } = tree;
 
   const deleteTreeMutation = useDeleteTree({
     onSuccess: () => {
@@ -32,7 +32,7 @@ const DeleteTreeConfirmationModal = ({
 
   const onDelete = () => {
     deleteTreeMutation.mutate({
-      treeIdToDelete: id,
+      treeIdToDelete: workflowId,
     });
     onClose();
   };
