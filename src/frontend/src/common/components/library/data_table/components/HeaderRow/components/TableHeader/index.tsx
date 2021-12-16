@@ -67,7 +67,7 @@ const TableHeader = ({
 
   return (
     <HeaderWrapper>
-      <Tooltip arrow title={tooltipTitle} placement="bottom">
+      <Tooltip arrow title={tooltipTitle} placement="bottom" leaveDelay={0}>
         <StyledHeaderCellContent>{text}</StyledHeaderCellContent>
       </Tooltip>
       {sortIndicator}
