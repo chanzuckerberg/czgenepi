@@ -1,22 +1,38 @@
 import { Menu, MenuItem, Tooltip } from "czifui";
 import React, { MouseEventHandler, useState } from "react";
-import { noop } from "src/common/constants/empty";
 import { TREE_STATUS } from "src/common/constants/types";
 import MoreActionsIcon from "src/common/icons/IconDotsHorizontal3Large.svg";
-import { useDeleteTrees } from "src/common/queries/trees";
+import { UserResponse } from "src/common/queries/auth";
 import { StyledIcon } from "../../style";
+import { DeleteTreeConfirmationModal } from "./components/DeleteTreeConfirmationModal";
 import { StyledText, StyledTrashIcon } from "./style";
 
 interface Props {
   item: TableItem;
+  userInfo: UserResponse;
 }
 
-const MoreActionsMenu = ({ item }: Props): JSX.Element => {
+const MoreActionsMenu = ({ item, userInfo }: Props): JSX.Element => {
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
 
-  const { id, status } = item;
-  //TODO: also disable if cdph viewing
-  const isDisabled = status === TREE_STATUS.Started;
+  const { group: userGroup } = userInfo;
+  const { group, status } = item;
+
+  const isAutoBuild = group?.name === "";
+  const isTreeInUserOrg = userGroup?.name === group?.name;
+  const canUserDeleteTree = isAutoBuild || isTreeInUserOrg;
+  const isDisabled = status === TREE_STATUS.Started || !canUserDeleteTree;
+
+  let tooltipText = "More Actions";
+
+  if (!isTreeInUserOrg) {
+    tooltipText =
+      "“More Actions” are only available for your organization’s trees.";
+  } else if (isDisabled) {
+    tooltipText =
+      "“More Actions” will be available after this tree is complete.";
+  }
 
   const handleClick: MouseEventHandler = (event) => {
     if (!isDisabled) setAnchorEl(event.currentTarget);

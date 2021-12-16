@@ -47,37 +47,39 @@ const DeleteTreeConfirmationModal = ({
 
   return (
     <>
-      {!open && (
-        <>
-          <Notification
-            autoDismiss
-            buttonOnClick={() => setShouldShowSuccessNotification(false)}
-            buttonText="DISMISS"
-            dismissDirection="right"
-            dismissed={!shouldShowSuccessNotification}
-            intent="info"
-          >
-            Your tree has been deleted.
-          </Notification>
-          <Notification
-            autoDismiss
-            buttonOnClick={() => setShouldShowErrorNotification(false)}
-            buttonText="DISMISS"
-            dismissDirection="right"
-            dismissed={!shouldShowErrorNotification}
-            intent="error"
-          >
-            We were unable to delete your tree. Please try again later.
-          </Notification>
-        </>
+      {!open && shouldShowSuccessNotification && (
+        <Notification
+          autoDismiss
+          buttonOnClick={() => setShouldShowSuccessNotification(false)}
+          buttonText="DISMISS"
+          dismissDirection="right"
+          dismissed={!shouldShowSuccessNotification}
+          intent="info"
+        >
+          Your tree has been deleted.
+        </Notification>
+        )}
+      {!open && shouldShowErrorNotification && (
+        <Notification
+          autoDismiss
+          buttonOnClick={() => setShouldShowErrorNotification(false)}
+          buttonText="DISMISS"
+          dismissDirection="right"
+          dismissed={!shouldShowErrorNotification}
+          intent="error"
+        >
+          We were unable to delete your tree. Please try again later.
+        </Notification>
       )}
-      <DeleteDialog
-        open={open}
-        onClose={onClose}
-        onDelete={onDelete}
-        title={title}
-        content={content}
-      />
+      {open && (
+        <DeleteDialog
+          open={open}
+          onClose={onClose}
+          onDelete={onDelete}
+          title={title}
+          content={content}
+        />
+      )}
     </>
   );
 };
