@@ -44,7 +44,7 @@ export const StyledFilterWrapper = styled.div`
     return `
       margin: ${spaces?.l}px 0;
 
-      &:first-child {
+      &:first-of-type {
         margin: 0;
       }
     `;

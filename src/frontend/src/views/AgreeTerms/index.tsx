@@ -133,7 +133,7 @@ export default function AgreeTerms(): JSX.Element | null {
           <DialogActions>
             <Button
               disabled={isUpdatingUserInfo}
-              color="primary"
+              sdsType="primary"
               variant="contained"
               isRounded
               autoFocus
@@ -144,7 +144,7 @@ export default function AgreeTerms(): JSX.Element | null {
             <a href={ENV.API_URL + API.LOG_OUT}>
               <Button
                 disabled={isUpdatingUserInfo}
-                color="primary"
+                sdsType="primary"
                 variant="outlined"
                 isRounded
               >

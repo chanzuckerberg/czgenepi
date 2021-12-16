@@ -87,11 +87,11 @@ export default function ImportFile({
       <IntroWrapper>
         <TitleWrapper>
           <Title>Import Data from a TSV file</Title>
-          <Button color="primary" onClick={handleInstructionsClick}>
+          <Button sdsType="primary" onClick={handleInstructionsClick}>
             {isInstructionsShown ? "HIDE" : "SHOW"} INSTRUCTIONS
           </Button>
           <DownloadTemplate headers={headers} rows={rows}>
-            <Button color="primary">Download Metadata Template (TSV)</Button>
+            <Button sdsType="primary">Download Metadata Template (TSV)</Button>
           </DownloadTemplate>
         </TitleWrapper>
 

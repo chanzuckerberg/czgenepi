@@ -18,7 +18,7 @@ export default function ApplyToAllColumn({
   };
 
   return (
-    <Button size="small" color="primary" variant="text" onClick={handleClick}>
+    <Button size="small" sdsType="primary" variant="text" onClick={handleClick}>
       APPLY TO ALL
     </Button>
   );
