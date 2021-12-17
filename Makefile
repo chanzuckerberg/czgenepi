@@ -135,6 +135,7 @@ prepare-new-db-snapshot:
 
 .PHONY: create_new_db_image
 create_new_db_image:
+	docker exec aspen_database_1 psql postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME) -c VACUUM FULL
 	docker commit aspen_database_1 temp_db_image
 	export AWS_ACCOUNT_ID=$$(aws sts get-caller-identity --profile $(AWS_DEV_PROFILE) | jq -r .Account); \
 	export DOCKER_REPO=$${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com; \
