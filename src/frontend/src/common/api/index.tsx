@@ -43,7 +43,25 @@ export const DEFAULT_DELETE_OPTIONS: RequestInit = {
   ...DEFAULT_HEADERS_MUTATION_OPTIONS,
 };
 
-/** Generic functions to interface with the backend API **/
+/**
+ * Generic functions to interface with the backend API
+ *
+ * First chunk of things -- `API_KEY_TO_TYPE`, `convert`, and `apiResponse` --
+ * are intended for "heavier" GETs to the backend that require some level
+ * of data conversion for the response we get. For example, the samples
+ * endpoint returns a bunch of stuff in snake_case, but we want camelCase,
+ * so in addition to fetching the data, it also handles all those conversions
+ * before returning the parsed response.
+ *
+ * The second chunk of things -- `makeBackendApiJsonCall` and associated
+ * convenience funcs -- are for less "heavy" calls and/or those that where
+ * the response is used more directly. They are a very thin wrapper around
+ * the browser `fetch` API. Mostly for convenience and standardization.
+ *
+ * There is not a clear line between when a request should be using one
+ * or the other. If you have a GET call that needs light parsing of the
+ * response, either would make sense, use your best judgment.
+ **/
 
 const API_KEY_TO_TYPE: Record<string, string> = {
   group: "Group",
@@ -60,9 +78,23 @@ function convert<U extends APIResponse, T extends U[keyof U]>(
   const converted = jsonToType<T>(entry, keyMap);
   // key should always be a string anyways. no funky business please.
   converted.type = API_KEY_TO_TYPE[String(key)];
+  // ^^^ FIXME (Vince) Does this get used anywhere? What was original purpose?
 
   return converted;
 }
+
+/**
+ * Make a GET request to backend API, parse results based on provided mapping.
+ *
+ * Args:
+ *   keys: array of top-level keys to extract from JSON response
+ *   mappings: array of next-level-down key mappings to convert with
+ *     NOTE -- keys and mappings need to be same length and matching orders
+ *   endpoint: backend route request is sent to
+ *
+ * Returns:
+ *   obj: top-level keys match arg `keys`, values converted via its mapping
+ */
 
 export async function apiResponse<T extends APIResponse>(
   keys: (keyof T)[],
@@ -93,6 +125,34 @@ export async function apiResponse<T extends APIResponse>(
   });
 
   return Object.fromEntries(convertedData);
+}
+
+/**
+ * Make request to backend that should receive a JSON response.
+ *
+ * This and the functions using it below exist mostly as a convenience method
+ * and to help keep our interactions with the backend API standardized.
+ *
+ * TODO make convenience helpers for each flavor of HTTP request and start
+ * using them to make API calls instead of individual but similar `fetch`
+ * calls forming the basis of our API calls. Eventually migrate moving existing
+ * queries to using the convenience helpers instead.
+ */
+export async function makeBackendApiJsonCall(
+  route: string,
+  fetchOptions: RequestInit
+): Promise<unknown> {
+  const response = await fetch(ENV.API_URL + route, {
+    ...fetchOptions,
+  });
+  if (response.ok) return await response.json();
+
+  throw Error(`${response.statusText}: ${await response.text()}`);
+}
+
+// GET convenience function
+export async function getBackendApiJson(route: string): Promise<unknown> {
+  return await makeBackendApiJsonCall(route, DEFAULT_FETCH_OPTIONS);
 }
 
 /** Calls to specific API endpoints **/
