@@ -50,7 +50,7 @@ export function defaultSampleCellRenderer({
   const displayData = value || UNDEFINED_TEXT;
 
   return (
-    <RowContent>
+    <RowContent header={header}>
       <div className={style.cell} data-test-id={`row-${header.key}`}>
         {displayData}
       </div>
