@@ -60,7 +60,7 @@ export default function FilePicker({
   return (
     <div className={className}>
       <Button
-        sdsType="primary"
+        color="primary"
         variant="contained"
         onClick={shouldConfirm ? openDialog : handleClick}
         disabled={isDisabled}

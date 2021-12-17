@@ -37,7 +37,7 @@ export const StyledTreeTableHeader = styled.div`
   justify-content: center;
   width: 150px;
 
-  &:first-of-type {
+  &:first-child {
     width: 100%;
     flex: 1 1 auto;
     justify-content: left;

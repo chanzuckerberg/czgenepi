@@ -192,7 +192,7 @@ export default function Metadata({
           </NextStepWrapper>
           <NextLink href={ROUTES.UPLOAD_STEP1} passHref>
             <a href="passHref">
-              <Button isRounded sdsType="primary" variant="outlined">
+              <Button isRounded color="primary" variant="outlined">
                 Back
               </Button>
             </a>
