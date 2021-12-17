@@ -3,7 +3,7 @@ import React, { MouseEventHandler, useState } from "react";
 import { TREE_STATUS } from "src/common/constants/types";
 import MoreActionsIcon from "src/common/icons/IconDotsHorizontal3Large.svg";
 import { UserResponse } from "src/common/queries/auth";
-import { StyledIcon } from "../../style";
+import { StyledIcon, StyledIconWrapper } from "../../style";
 import { DeleteTreeConfirmationModal } from "./components/DeleteTreeConfirmationModal";
 import { StyledText, StyledTrashIcon } from "./style";
 
@@ -61,9 +61,11 @@ const MoreActionsMenu = ({ item, userInfo }: Props): JSX.Element => {
         title={tooltipText}
         placement="top"
       >
-        <StyledIcon onClick={handleClick} disabled={isDisabled}>
-          <MoreActionsIcon />
-        </StyledIcon>
+        <StyledIconWrapper onClick={handleClick}>
+          <StyledIcon disabled={isDisabled}>
+            <MoreActionsIcon />
+          </StyledIcon>
+        </StyledIconWrapper>
       </Tooltip>
       {open && (
         <Menu
