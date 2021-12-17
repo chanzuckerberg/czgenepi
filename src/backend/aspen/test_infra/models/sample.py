@@ -1,21 +1,18 @@
 import datetime
 
-from aspen.database.models import RegionType, Sample
+from aspen.database.models import Location, RegionType, Sample
 
 
 def sample_factory(
     submitting_group,
     uploaded_by,
+    collection_location: Location,
     private_identifier="private_identifer",
     original_submission=None,
     public_identifier="public_identifier",
     collection_date=None,
     sample_collected_by="sample_collector",
     sample_collector_contact_address="sample_collector_address",
-    location="Santa Clara County",
-    division="California",
-    country="USA",
-    region=RegionType.NORTH_AMERICA,
     organism="SARS-CoV-2",
     czb_failed_genome_recovery=False,
     private=False,
@@ -31,10 +28,7 @@ def sample_factory(
         collection_date=collection_date,
         sample_collected_by=sample_collected_by,
         sample_collector_contact_address=sample_collector_contact_address,
-        location=location,
-        division=division,
-        country=country,
-        region=region,
+        collection_location=collection_location,
         organism=organism,
         czb_failed_genome_recovery=czb_failed_genome_recovery,
         private=private,
