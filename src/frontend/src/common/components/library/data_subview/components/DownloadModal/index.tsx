@@ -207,9 +207,9 @@ const DownloadModal = ({
               !isFastaDisabled && ( //ignore alert if fasta is already disabled
                 <Alert severity="warning">
                   <DownloadType>
-                    {failedSampleIds.length}
-                    {pluralize("sample", failedSampleIds.length)}
-                    will not be included in your Consensus Genome download
+                    {failedSampleIds.length}{" "}
+                    {pluralize("sample", failedSampleIds.length)} will not be
+                    included in your Consensus Genome download
                   </DownloadType>
                   <DownloadTypeInfo>
                     because they failed genome recovery. Failed samples will
