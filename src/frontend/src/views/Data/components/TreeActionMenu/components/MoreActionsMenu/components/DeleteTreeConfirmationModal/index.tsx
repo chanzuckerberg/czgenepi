@@ -40,8 +40,8 @@ const DeleteTreeConfirmationModal = ({
   const title = `Are you sure you want to delete “${name}”?`;
   const content = (
     <span>
-      Deleted trees will be removed from CZ GEN EPI. You will not be able to undo
-      this action.
+      Deleted trees will be removed from CZ GEN EPI. You will not be able to
+      undo this action.
     </span>
   );
 
