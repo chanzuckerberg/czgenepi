@@ -152,7 +152,7 @@ export const TREE_HEADERS: Header[] = [
   },
   {
     key: "actionMenu",
-    sortKey: ["actionMenu"],
+    sortKey: [],
     text: "",
   },
 ];

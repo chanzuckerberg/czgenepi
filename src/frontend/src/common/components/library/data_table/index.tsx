@@ -243,6 +243,9 @@ export const DataTable: FunctionComponent<Props> = ({
   const indexingKey = headers[0].key;
 
   const handleSortClick = (newSortKey: string[]) => {
+    // this column is not set up for sorting.
+    if (newSortKey.length < 1) return;
+
     let ascending = false;
     if (isEqual(newSortKey, state.sortKey)) {
       ascending = !state.ascending;
