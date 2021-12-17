@@ -26,7 +26,7 @@ export default function ConfirmDialog({
   footer,
 }: ConfirmDialogProps): JSX.Element {
   const confirmButton = customConfirmButton ?? (
-    <Button sdsType="primary" variant="contained" isRounded>
+    <Button color="primary" variant="contained" isRounded>
       Continue
     </Button>
   );
@@ -46,12 +46,7 @@ export default function ConfirmDialog({
       </DialogContent>
       <DialogActions narrow>
         <div onClick={onConfirm}>{confirmButton}</div>
-        <Button
-          sdsType="primary"
-          variant="outlined"
-          isRounded
-          onClick={onClose}
-        >
+        <Button color="primary" variant="outlined" isRounded onClick={onClose}>
           Cancel
         </Button>
       </DialogActions>
