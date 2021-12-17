@@ -272,6 +272,7 @@ def samples():
         .options(
             joinedload(Sample.uploaded_pathogen_genome),
             joinedload(Sample.sequencing_reads_collection),
+            joinedload(Sample.collection_location),
         )
         .all()
     )
@@ -323,7 +324,7 @@ def samples():
             "upload_date": _format_created_date(sample),
             "collection_date": api_utils.format_date(sample.collection_date),
             "sequencing_date": _format_sequencing_date(sample),
-            "collection_location": sample.location,
+            "collection_location": sample.collection_location,
             "gisaid": _format_gisaid_accession(
                 sample, entity_id_to_gisaid_accession_workflow_map
             ),
