@@ -191,33 +191,6 @@ class Sample(idbase, DictMixin):  # type: ignore
     )
     collection_location = relationship("Location")  # type: ignore
 
-    # old location data
-    location = Column(String, nullable=False)
-    division = Column(
-        String,
-        nullable=False,
-        info={
-            "schema_mappings": {
-                "PHA4GE": "geo_loc_name_state_province_region",
-            }
-        },
-    )
-    country = Column(
-        String,
-        nullable=False,
-        info={
-            "schema_mappings": {
-                "PHA4GE": "geo_loc_name_country",
-            }
-        },
-    )
-    region = Column(
-        Enum(RegionType),
-        ForeignKey(_RegionTypeTable.item_id),
-        nullable=False,
-        comment="This is the continent this sample was collected from.",
-    )
-
     organism = Column(
         String,
         nullable=False,
