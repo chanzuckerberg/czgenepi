@@ -22,10 +22,10 @@ const DeleteTreeConfirmationModal = ({
   const { workflowId, name } = tree;
 
   const deleteTreeMutation = useDeleteTree({
-    onSuccess: () => {
+    componentOnSuccess: () => {
       setShouldShowSuccessNotification(true);
     },
-    onError: () => {
+    componentOnError: () => {
       setShouldShowErrorNotification(true);
     },
   });

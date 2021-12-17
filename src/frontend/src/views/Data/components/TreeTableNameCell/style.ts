@@ -11,7 +11,7 @@ const doNotForwardProps = ["disabled"];
 export const StyledRowContent = styled(TreeRowContent, {
   shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
 })`
-  flex: 1 1 150px;
+  flex: 2 0 40%;
   justify-content: left;
 
   ${(props: ExtraProps) => {
@@ -34,15 +34,10 @@ export const CellWrapper = styled.div`
 export const StyledNameWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  flex-wrap: nowrap;
-  overflow: hidden;
 `;
 
 export const StyledTreeCreator = styled.div`
   ${fontBodyXxs}
-
-  white-space: nowrap;
-  text-overflow: ellipsis;
 
   ${(props) => {
     const colors = getColors(props);

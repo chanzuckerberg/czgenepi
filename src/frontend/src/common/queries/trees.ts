@@ -169,11 +169,11 @@ export async function deleteTree({
     ...DEFAULT_DELETE_OPTIONS,
   });
 
-  if (response.ok) await response.json();
+  if (response.ok) return await response.json();
   throw Error(`${response.statusText}: ${await response.text()}`);
 }
 
-export function useDeleteTrees({
+export function useDeleteTree({
   componentOnError,
   componentOnSuccess,
 }: TreeDeleteCallbacks): UseMutationResult<
@@ -183,7 +183,7 @@ export function useDeleteTrees({
   unknown
 > {
   const queryClient = useQueryClient();
-  return useMutation(deleteTrees, {
+  return useMutation(deleteTree, {
     onError: componentOnError,
     onSuccess: async (data) => {
       await queryClient.invalidateQueries([USE_TREE_INFO]);
