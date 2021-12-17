@@ -42,12 +42,12 @@ const HeaderRow = ({
       />
     )}
     {headers.map((header: Header) => {
-      const { sortKey } = header;
+      const { key, sortKey } = header;
 
       return (
         <TableHeader
           header={header}
-          key={sortKey.join("-")}
+          key={key}
           onClick={() => handleSortClick(sortKey)}
           doesSortOnThisCol={isEqual(sortKey, sortColKey)}
           isSortedAscending={isSortedAscending}
