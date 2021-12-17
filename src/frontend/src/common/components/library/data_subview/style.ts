@@ -6,7 +6,7 @@ import {
   getFontWeights,
   getSpaces,
 } from "czifui";
-import DownloadImage from "src/common/icons/IconDownload.svg";
+import DownloadImage from "src/common/icons/IconDownloadLarge.svg";
 
 export const StyledDiv = styled.div`
   ${fontHeaderXs}

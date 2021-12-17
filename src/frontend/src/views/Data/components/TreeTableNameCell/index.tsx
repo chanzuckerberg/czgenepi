@@ -2,16 +2,21 @@ import React, { useState } from "react";
 import dataTableStyle from "src/common/components/library/data_table/index.module.scss";
 import { TREE_STATUS } from "src/common/constants/types";
 import TreeIcon from "src/common/icons/PhyloTree.svg";
-import TreeVizModal from "../TreeVizModal";
+import NextstrainConfirmationModal from "../NextstrainConfirmationModal";
 import { PhyloTreeStatusTag } from "./components/PhyloTreeStatusTag";
-import { CellWrapper, StyledOpenInNewIcon, StyledRowContent } from "./style";
+import {
+  CellWrapper,
+  StyledNameWrapper,
+  StyledRowContent,
+  StyledTreeCreator,
+} from "./style";
 
-interface NameProps {
+interface Props {
   value: string;
   item: Tree;
 }
 
-const TreeTableNameCell = ({ value, item }: NameProps): JSX.Element => {
+const TreeTableNameCell = ({ value, item }: Props): JSX.Element => {
   const [open, setOpen] = useState(false);
   const status = item?.status;
   const isDisabled = status !== TREE_STATUS.Completed;
@@ -28,9 +33,20 @@ const TreeTableNameCell = ({ value, item }: NameProps): JSX.Element => {
   // that are in progress or failed
   const treeId = item.id as number;
 
+  const { user } = item;
+  // TODO (mlila): update name to include auto builds
+  // TODO          this requires backend changes.
+  // const displayName =
+  //   user?.group === CZ_BIOHUB_GROUP ? "CZ Biohub" : user?.name;
+  const displayName = user?.name;
+
   return (
     <>
-      <TreeVizModal open={open} onClose={handleClose} treeId={treeId} />
+      <NextstrainConfirmationModal
+        open={open}
+        onClose={handleClose}
+        treeId={treeId}
+      />
       <StyledRowContent
         className={dataTableStyle.cell}
         onClick={handleClickOpen}
@@ -38,8 +54,10 @@ const TreeTableNameCell = ({ value, item }: NameProps): JSX.Element => {
       >
         <CellWrapper data-test-id="tree-name-cell">
           <TreeIcon className={dataTableStyle.icon} />
-          {value}
-          <StyledOpenInNewIcon disabled={isDisabled} />
+          <StyledNameWrapper>
+            <span>{value}</span>
+            <StyledTreeCreator>{displayName}</StyledTreeCreator>
+          </StyledNameWrapper>
           <PhyloTreeStatusTag treeStatus={status} />
         </CellWrapper>
       </StyledRowContent>

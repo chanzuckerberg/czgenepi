@@ -10,7 +10,11 @@ interface Props {
   treeId: number;
 }
 
-const TreeVizModal = ({ open, onClose, treeId }: Props): JSX.Element => {
+const NextstrainConfirmationModal = ({
+  open,
+  onClose,
+  treeId,
+}: Props): JSX.Element => {
   const content = (
     <>
       By clicking “Continue” you agree to send a copy of your tree JSON to
@@ -35,4 +39,4 @@ const TreeVizModal = ({ open, onClose, treeId }: Props): JSX.Element => {
   );
 };
 
-export default TreeVizModal;
+export default NextstrainConfirmationModal;

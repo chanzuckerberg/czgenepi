@@ -9,11 +9,12 @@ import React, {
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import { noop } from "src/common/constants/empty";
+import { VIEWNAME } from "src/common/constants/types";
 import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import { EmptyState } from "../data_subview/components/EmptyState";
 import { HeaderRow } from "./components/HeaderRow";
 import style from "./index.module.scss";
-import { RowCheckbox, RowContent, TableRow } from "./style";
+import { RowCheckbox, RowContent, TableRow, TreeRowContent } from "./style";
 
 interface Props {
   data?: TableItem[];
@@ -24,7 +25,7 @@ interface Props {
   setCheckedSampleIds(samples: string[]): void;
   failedSampleIds: string[];
   setFailedSampleIds(samples: string[]): void;
-  showCheckboxes: boolean;
+  viewName: VIEWNAME;
   renderer?: CustomRenderer;
 }
 
@@ -35,18 +36,33 @@ const LOADING_STATE_ROW_COUNT = 10;
 
 export const UNDEFINED_TEXT = "-";
 
-export function defaultCellRenderer({
+export function defaultSampleCellRenderer({
   value,
   header,
 }: CustomTableRenderProps): JSX.Element {
   const displayData = value || UNDEFINED_TEXT;
 
   return (
-    <RowContent header={header}>
+    <RowContent>
       <div className={style.cell} data-test-id={`row-${header.key}`}>
         {displayData}
       </div>
     </RowContent>
+  );
+}
+
+export function defaultTreeCellRenderer({
+  value,
+  header,
+}: CustomTableRenderProps): JSX.Element {
+  const displayData = value || UNDEFINED_TEXT;
+
+  return (
+    <TreeRowContent>
+      <div className={style.cell} data-test-id={`row-${header.key}`}>
+        {displayData}
+      </div>
+    </TreeRowContent>
   );
 }
 
@@ -131,13 +147,13 @@ export const DataTable: FunctionComponent<Props> = ({
   data,
   headers,
   defaultSortKey,
-  renderer = defaultCellRenderer,
+  renderer = defaultSampleCellRenderer,
   isLoading,
   checkedSampleIds,
   setCheckedSampleIds,
   failedSampleIds,
   setFailedSampleIds,
-  showCheckboxes,
+  viewName,
 }: Props) => {
   const [isHeaderChecked, setIsHeaderChecked] = useState<boolean>(false);
   const [isHeaderIndeterminant, setHeaderIndeterminant] =
@@ -262,6 +278,8 @@ export const DataTable: FunctionComponent<Props> = ({
     );
   };
 
+  const isSampleTable = viewName === VIEWNAME.SAMPLES;
+
   const render = (tableData: TableItem[]) => {
     if (usesFeatureFlag(FEATURE_FLAGS.mayasFlag)) {
       return <div>FEATURE FLAG IN USE...</div>;
@@ -271,7 +289,7 @@ export const DataTable: FunctionComponent<Props> = ({
       const item = tableData[props.index];
       return (
         <TableRow style={props.style} data-test-id="table-row">
-          {showCheckboxes && rowCheckbox(item)}
+          {isSampleTable && rowCheckbox(item)}
           {item ? (
             sampleRow(item)
           ) : (
@@ -290,7 +308,7 @@ export const DataTable: FunctionComponent<Props> = ({
           isHeaderChecked={isHeaderChecked}
           isHeaderIndeterminant={isHeaderIndeterminant}
           isSortedAscending={state.ascending}
-          shouldShowCheckboxes={showCheckboxes}
+          isSampleTable={isSampleTable}
           sortColKey={state.sortKey}
         />
         <div className={style.tableContent}>

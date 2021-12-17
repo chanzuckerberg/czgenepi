@@ -54,6 +54,10 @@ interface Tree extends BioinformaticsType {
   workflowId: string;
   status: TREE_STATUS;
   downloadLink?: string;
+  user?: {
+    name: string;
+    id: number;
+  };
 }
 
 type BioinformaticsData = Sample | Tree;
