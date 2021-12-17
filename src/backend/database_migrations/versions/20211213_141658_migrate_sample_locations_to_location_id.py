@@ -27,9 +27,9 @@ def upgrade():
     )
     conn.execute(set_broader_locations_stmt)
 
-    with op.batch_alter_table("samples") as batch_op:
+    with op.batch_alter_table("samples", schema="aspen") as batch_op:
         batch_op.drop_column("region")
-        batch_op.drop_column("column")
+        batch_op.drop_column("country")
         batch_op.drop_column("division")
         batch_op.drop_column("location")
 
