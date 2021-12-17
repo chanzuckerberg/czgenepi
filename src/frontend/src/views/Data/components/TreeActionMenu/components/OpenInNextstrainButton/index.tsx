@@ -1,7 +1,7 @@
 import { Tooltip } from "czifui";
 import React, { useState } from "react";
 import { TREE_STATUS } from "src/common/constants/types";
-import OpenInNewIcon from "src/common/icons/OpenInNew.svg";
+import OpenInNewIcon from "src/common/icons/IconOpenSmall.svg";
 import NextstrainConfirmationModal from "../../../NextstrainConfirmationModal";
 import { StyledIcon } from "../../style";
 

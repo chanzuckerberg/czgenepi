@@ -4,7 +4,7 @@ import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { TREE_STATUS } from "src/common/constants/types";
 import DownloadIcon from "src/common/icons/IconDownloadSmall.svg";
 import { stringGuard } from "src/common/utils";
-import { StyledIcon } from "../../style";
+import { StyledIcon, StyledIconWrapper } from "../../style";
 
 interface Props {
   item: TableItem;
@@ -50,13 +50,23 @@ const TreeTableDownloadMenu = ({ item, value }: Props): JSX.Element => {
   return (
     <>
       <Tooltip arrow sdsStyle="dark" title="Download" placement="top">
-        <StyledIcon onClick={handleClick}>
-          <DownloadIcon />
-        </StyledIcon>
+        <StyledIconWrapper onClick={handleClick}>
+          <StyledIcon>
+            <DownloadIcon />
+          </StyledIcon>
+        </StyledIconWrapper>
       </Tooltip>
       {open && (
         <Menu
           anchorEl={anchorEl}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "right",
+          }}
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
           keepMounted
           open={open}
           onClose={handleClose}

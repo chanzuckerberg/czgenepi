@@ -7,6 +7,17 @@ export interface ExtraProps extends Props {
 
 const doNotForwardProps = ["disabled"];
 
+// This wrapper appropriately places a gap between the top of the menu
+// and the icon that it is anchored to
+export const StyledIconWrapper = styled.div`
+  ${(props) => {
+    const spaces = getSpaces(props);
+    return `
+      padding: ${spaces?.xs}px 0;
+    `;
+  }}
+`;
+
 // TODO (mlila): replace all instances of this with an sds Icon when complete
 export const StyledIcon = styled("div", {
   shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
