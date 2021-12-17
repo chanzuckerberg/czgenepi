@@ -6,7 +6,6 @@ export const StyledCallout = styled(Callout)`
     const spaces = getSpaces(props);
     return `
       margin-top: ${spaces?.l}px;
-      margin-bottom: ${spaces?.xl}px;
       max-width: 100%;
     `;
   }}
