@@ -92,6 +92,7 @@ class TargetedBuilder(BaseNextstrainConfigBuilder):
         # Update our sampling for state/country level builds if necessary
         update_subsampling_for_location(self.group.default_tree_location, subsampling)
 
+
 def update_subsampling_for_location(location, subsampling):
     # If we don't have a division, this is a country-level build
     if not location.division:
@@ -99,6 +100,7 @@ def update_subsampling_for_location(location, subsampling):
     # If we have a division but not a location, this is a state-level build
     elif not location.location:
         update_subsampling_for_division(subsampling)
+
 
 def update_subsampling_for_country(subsampling):
     # State and country aren't useful
@@ -108,8 +110,11 @@ def update_subsampling_for_country(subsampling):
     subsampling["group"]["max_sequences"] = 200
     subsampling["group"]["query"] = '''--query "(country == '{country}')"'''
 
+
 def update_subsampling_for_division(subsampling):
     # State isn't useful
     del subsampling["state"]
     # Update our local group query
-    subsampling["group"]["query"] = '''--query "(division == '{division}') & (country == '{country}')"'''
+    subsampling["group"][
+        "query"
+    ] = '''--query "(division == '{division}') & (country == '{country}')"'''

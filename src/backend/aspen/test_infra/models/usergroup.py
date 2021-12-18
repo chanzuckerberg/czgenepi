@@ -1,4 +1,4 @@
-from aspen.database.models import Group, User, Location
+from aspen.database.models import Group, Location, User
 
 
 def group_factory(
@@ -16,7 +16,9 @@ def group_factory(
         location = f"{name} city"
     if division == None:
         division = f"{name} state"
-    tree_loc = Location(region="North America", country="USA", location=location, division=division)
+    tree_loc = Location(
+        region="North America", country="USA", location=location, division=division
+    )
     return Group(
         name=name,
         address=address,

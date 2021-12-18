@@ -208,6 +208,7 @@ def generate_run(phylo_run_id):
         yaml.load(builds_file_fh.getvalue(), Loader=yaml.FullLoader),
     )
 
+
 # Make sure that state-level builds are working
 def test_overview_config_division(mocker, session, postgres_database):
     mock_remote_db_uri(mocker, postgres_database.as_uri())
@@ -221,7 +222,11 @@ def test_overview_config_division(mocker, session, postgres_database):
 
     # Make sure our query got updated properly
     assert "state" not in subsampling_scheme.keys()
-    assert subsampling_scheme["group"]["query"] == '''--query "(division == '{division}') & (country == '{country}')"'''
+    assert (
+        subsampling_scheme["group"]["query"]
+        == '''--query "(division == '{division}') & (country == '{country}')"'''
+    )
+
 
 # Make sure that country-level builds are working.
 def test_overview_config_country(mocker, session, postgres_database):
@@ -229,7 +234,14 @@ def test_overview_config_country(mocker, session, postgres_database):
 
     tree_type = TreeType.OVERVIEW
     phylo_run = create_test_data(
-        session, tree_type, 10, 0, 0, group_name="Group Without Location or Country", location="", division=""
+        session,
+        tree_type,
+        10,
+        0,
+        0,
+        group_name="Group Without Location or Country",
+        location="",
+        division="",
     )
     sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
     subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
@@ -238,4 +250,6 @@ def test_overview_config_country(mocker, session, postgres_database):
     assert "state" not in subsampling_scheme.keys()
     assert "country" not in subsampling_scheme.keys()
     assert subsampling_scheme["group"]["max_sequences"] == 200
-    assert subsampling_scheme["group"]["query"] == '''--query "(country == '{country}')"'''
+    assert (
+        subsampling_scheme["group"]["query"] == '''--query "(country == '{country}')"'''
+    )

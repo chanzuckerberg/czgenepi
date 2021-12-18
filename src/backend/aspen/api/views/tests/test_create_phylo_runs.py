@@ -37,7 +37,6 @@ async def test_create_phylo_run(
     res = await http_client.post("/v2/phylo_runs/", json=data, headers=auth_headers)
     assert res.status_code == 200
     response = res.json()
-    template_args = response["template_args"]
     assert response["template_args"] == {}
     assert response["workflow_status"] == "STARTED"
     assert response["group"]["name"] == group.name
@@ -100,7 +99,6 @@ async def test_create_phylo_run_with_gisaid_ids(
     res = await http_client.post("/v2/phylo_runs/", json=data, headers=auth_headers)
     assert res.status_code == 200
     response = res.json()
-    template_args = response["template_args"]
     assert response["template_args"] == {}
     assert response["workflow_status"] == "STARTED"
     assert response["group"]["name"] == group.name
