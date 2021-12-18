@@ -108,7 +108,7 @@ def update_subsampling_for_country(subsampling):
     subsampling["group"]["max_sequences"] = 200
     subsampling["group"]["query"] = '''--query "(country == '{country}')"'''
 
-def update_subsampling_for_state(subsampling):
+def update_subsampling_for_division(subsampling):
     # State isn't useful
     del subsampling["state"]
     # Update our local group query

@@ -6,13 +6,16 @@ def group_factory(
     address="123 Main St",
     prefix=None,
     location=None,
-    division="West",
+    division=None,
 ) -> Group:
     # shortcut so we don't need to specify prefix
     if not prefix:
         prefix = name
-    if not location:
+    # Note - the None checks are to allow explicitly empty location/division strings
+    if location == None:
         location = f"{name} city"
+    if division == None:
+        division = f"{name} state"
     tree_loc = Location(region="North America", country="USA", location=location, division=division)
     return Group(
         name=name,

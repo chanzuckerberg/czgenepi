@@ -18,10 +18,12 @@ def create_test_data(
     num_selected_samples,  # How many of those samples are workflow inputs
     num_gisaid_samples,  # How many gisaid samples to add to a workflow
     group_name=None,  # Override group name
+    location=None,  # Override group location
+    division=None,  # Override group division
 ):
-    if not group_name:
+    if group_name:
         group_name = f"testgroup-{tree_type.value}"
-    group: Group = group_factory(name=group_name)
+    group: Group = group_factory(name=group_name, division=division, location=location)
     uploaded_by_user: User = user_factory(
         group, email=f"{tree_type.value}@dh.org", auth0_user_id=tree_type.value
     )
@@ -96,7 +98,6 @@ def test_overview_config(mocker, session, postgres_database):
     phylo_run = create_test_data(session, tree_type, 10, 0, 0)
     sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
 
-    phylo_run.group
     subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
 
     # Just some placeholder sanity-checks
@@ -120,7 +121,6 @@ def test_overview_config_chicago(mocker, session, postgres_database):
     )
     sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
 
-    phylo_run.group
     subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
 
     # Make sure our query got updated properly
@@ -180,7 +180,6 @@ def test_targeted_config_large(mocker, session, postgres_database):
     phylo_run = create_test_data(session, tree_type, 200, 110, 10)
     sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
 
-    phylo_run.group
     subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
 
     # Just some placeholder sanity-checks
@@ -208,3 +207,35 @@ def generate_run(phylo_run_id):
         metadata_fh.getvalue(),
         yaml.load(builds_file_fh.getvalue(), Loader=yaml.FullLoader),
     )
+
+# Make sure that state-level builds are working
+def test_overview_config_division(mocker, session, postgres_database):
+    mock_remote_db_uri(mocker, postgres_database.as_uri())
+
+    tree_type = TreeType.OVERVIEW
+    phylo_run = create_test_data(
+        session, tree_type, 10, 0, 0, group_name="Group Without Location", location=""
+    )
+    sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
+    subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
+
+    # Make sure our query got updated properly
+    assert "state" not in subsampling_scheme.keys()
+    assert subsampling_scheme["group"]["query"] == '''--query "(division == '{division}') & (country == '{country}')"'''
+
+# Make sure that country-level builds are working.
+def test_overview_config_country(mocker, session, postgres_database):
+    mock_remote_db_uri(mocker, postgres_database.as_uri())
+
+    tree_type = TreeType.OVERVIEW
+    phylo_run = create_test_data(
+        session, tree_type, 10, 0, 0, group_name="Group Without Location or Country", location="", division=""
+    )
+    sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
+    subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
+
+    # Make sure our query got updated properly
+    assert "state" not in subsampling_scheme.keys()
+    assert "country" not in subsampling_scheme.keys()
+    assert subsampling_scheme["group"]["max_sequences"] == 200
+    assert subsampling_scheme["group"]["query"] == '''--query "(country == '{country}')"'''
