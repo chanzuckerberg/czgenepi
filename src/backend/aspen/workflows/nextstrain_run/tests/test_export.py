@@ -78,10 +78,10 @@ def test_build_config(mocker, session, postgres_database):
         build = nextstrain_config["builds"]["aspen"]
         assert build["subsampling_scheme"] == tree_type.value
         assert build["title"].startswith(tree_type.value.title())
-        assert phylo_run.group.location in build["title"]
-        assert phylo_run.group.division in build["title"]
-        assert build["division"] == phylo_run.group.division
-        assert build["location"] == phylo_run.group.location
+        assert phylo_run.group.default_tree_location.location in build["title"]
+        assert phylo_run.group.default_tree_location.division in build["title"]
+        assert build["division"] == phylo_run.group.default_tree_location.division
+        assert build["location"] == phylo_run.group.default_tree_location.location
         assert tree_type.value.lower() in nextstrain_config["files"]["description"]
         assert nextstrain_config["files"]["description"].endswith(".md")
         assert len(sequences.splitlines()) == 20  # 10 county samples @2 lines each
