@@ -9,7 +9,6 @@ workflow nextstrain {
         String remote_dev_prefix = ""
         String group_name
         String s3_filestem
-        String template_filename
         Map[String, String] template_args
         String tree_type
     }
@@ -22,7 +21,6 @@ workflow nextstrain {
         remote_dev_prefix = remote_dev_prefix,
         group_name = group_name,
         s3_filestem = s3_filestem,
-        template_filename = template_filename,
         template_args = template_args,
         tree_type = tree_type
     }
@@ -37,7 +35,6 @@ task nextstrain_workflow {
         String remote_dev_prefix
         String group_name
         String s3_filestem
-        String template_filename
         Map[String, String] template_args
         String tree_type
     }
@@ -66,7 +63,6 @@ task nextstrain_workflow {
     workflow_id=$(aspen-cli db create-phylo-run                                                                                  \
                       --group-name "~{group_name}"                                                                               \
                       --all-group-sequences                                                                                      \
-                      --builds-template-file /usr/src/app/aspen/workflows/nextstrain_run/builds_templates/~{template_filename}   \
                       --builds-template-args '~{template_args}'  \
                       --tree-type "~{tree_type}"
     )

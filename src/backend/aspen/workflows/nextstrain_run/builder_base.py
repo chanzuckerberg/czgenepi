@@ -43,19 +43,13 @@ class BaseNextstrainConfigBuilder:
             else:
                 del build[field]
 
-        build["title"] = build["title"].format(location=", ".join(location_values))
 
         # NOTE: <BuilderClass>.subsampling_scheme is used in 3 places:
         #   - Its lowercase'd name is used to find a markdown file with an "about this tree" description
         #   - It refers to a subsampling_scheme key in the mega nextstrain template
         #   - It's title-case'd and included in the tree title as human-readable text
         build["subsampling_scheme"] = self.subsampling_scheme
-        build["title"] = build["title"].format(
-            tree_type=self.subsampling_scheme.title(),
-            division=division,
-            location=location,
-            country=country,
-        )
+        build["title"] = build["title"].format(tree_type=self.subsampling_scheme.title(), location=", ".join(location_values))
         config["files"]["description"] = config["files"]["description"].format(
             tree_type=self.subsampling_scheme.lower()
         )

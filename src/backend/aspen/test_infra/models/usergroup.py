@@ -1,22 +1,26 @@
-from aspen.database.models import Group, User
+from aspen.database.models import Group, User, Location
 
 
 def group_factory(
     name="groupname",
     address="123 Main St",
     prefix=None,
-    location="Metropolis",
+    location=None,
     division="West",
 ) -> Group:
     # shortcut so we don't need to specify prefix
     if not prefix:
         prefix = name
+    if not location:
+        location = f"{name} city"
+    tree_loc = Location(region="North America", country="USA", location=location, division=division)
     return Group(
         name=name,
         address=address,
         prefix=prefix,
         location=location,
         division=division,
+        default_tree_location=tree_loc,
     )
 
 

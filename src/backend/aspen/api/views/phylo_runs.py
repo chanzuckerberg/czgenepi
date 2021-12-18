@@ -120,16 +120,6 @@ async def kick_off_phylo_run(
         raise ex.ServerException("No gisaid dump for run")
 
     # 4C build our PhyloRun object
-    template_path_prefix = (
-        "/usr/src/app/aspen/workflows/nextstrain_run/builds_templates"
-    )
-    builds_template_file = (
-        f"{template_path_prefix}/{PHYLO_TREE_TYPES[phylo_run_request.tree_type]}"
-    )
-    builds_template_args = {
-        "division": group.division,
-        "location": group.location,
-    }
     start_datetime = datetime.datetime.now()
 
     workflow: PhyloRun = PhyloRun(
@@ -137,8 +127,7 @@ async def kick_off_phylo_run(
         workflow_status=WorkflowStatusType.STARTED,
         software_versions={},
         group=group,
-        template_file_path=builds_template_file,
-        template_args=builds_template_args,
+        template_args={},  # This field is currently unused, but we might reinstate it later.
         name=phylo_run_request.name,
         gisaid_ids=list(gisaid_ids),
         tree_type=TreeType(phylo_run_request.tree_type),
