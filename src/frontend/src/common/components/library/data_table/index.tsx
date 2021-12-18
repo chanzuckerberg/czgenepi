@@ -297,6 +297,9 @@ export const DataTable: FunctionComponent<Props> = ({
       return <div>FEATURE FLAG IN USE...</div>;
     }
 
+    // TODO (mlila): this is the source of constant rerendering in the table. Because the rows are
+    // TODO          rendered with a function instead of a react component, it generates a new node
+    // TODO          every time the parent rerenders, instead of only updating, eg, when props change
     function renderRow(props: ListChildComponentProps) {
       const item = tableData[props.index];
       return (
