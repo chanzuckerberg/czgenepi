@@ -1,12 +1,12 @@
-import { Notification } from "czifui";
 import React, { useState } from "react";
 import { useDeleteTree } from "src/common/queries/trees";
 import { DeleteDialog } from "src/components/DeleteDialog";
+import Notification from "src/components/Notification";
 
 interface Props {
   onClose(): void;
   open: boolean;
-  tree: Tree;
+  tree?: Tree;
 }
 
 const DeleteTreeConfirmationModal = ({
@@ -19,8 +19,6 @@ const DeleteTreeConfirmationModal = ({
   const [shouldShowSuccessNotification, setShouldShowSuccessNotification] =
     useState<boolean>(false);
 
-  const { workflowId, name } = tree;
-
   const deleteTreeMutation = useDeleteTree({
     componentOnSuccess: () => {
       setShouldShowSuccessNotification(true);
@@ -29,6 +27,10 @@ const DeleteTreeConfirmationModal = ({
       setShouldShowErrorNotification(true);
     },
   });
+
+  if (!tree) return null;
+
+  const { workflowId, name } = tree;
 
   const onDelete = () => {
     deleteTreeMutation.mutate({
@@ -47,7 +49,7 @@ const DeleteTreeConfirmationModal = ({
 
   return (
     <>
-      {!open && shouldShowSuccessNotification && (
+      {shouldShowSuccessNotification && (
         <Notification
           autoDismiss
           buttonOnClick={() => setShouldShowSuccessNotification(false)}
@@ -59,7 +61,7 @@ const DeleteTreeConfirmationModal = ({
           Your tree has been deleted.
         </Notification>
       )}
-      {!open && shouldShowErrorNotification && (
+      {shouldShowErrorNotification && (
         <Notification
           autoDismiss
           buttonOnClick={() => setShouldShowErrorNotification(false)}
@@ -71,15 +73,13 @@ const DeleteTreeConfirmationModal = ({
           We were unable to delete your tree. Please try again later.
         </Notification>
       )}
-      {open && (
-        <DeleteDialog
-          open={open}
-          onClose={onClose}
-          onDelete={onDelete}
-          title={title}
-          content={content}
-        />
-      )}
+      <DeleteDialog
+        open={open}
+        onClose={onClose}
+        onDelete={onDelete}
+        title={title}
+        content={content}
+      />
     </>
   );
 };

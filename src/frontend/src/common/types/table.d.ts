@@ -28,6 +28,7 @@ interface CustomTableRenderProps {
   item: TableItem;
   index: number;
   userInfo?: UserResponse;
+  onDeleteTreeModalOpen(t: Tree): void;
 }
 
 type CustomRenderer = ({
@@ -36,6 +37,7 @@ type CustomRenderer = ({
   item,
   index,
   userInfo,
+  onDeleteTreeModalOpen,
 }: CustomTableRenderProps) => JSX.Element;
 
 type CellRenderer = ({
@@ -43,4 +45,5 @@ type CellRenderer = ({
   item,
   index,
   userInfo,
+  onDeleteTreeModalOpen,
 }: CellRendererProps) => JSX.Element;

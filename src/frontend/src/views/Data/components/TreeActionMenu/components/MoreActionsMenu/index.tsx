@@ -4,17 +4,20 @@ import { TREE_STATUS } from "src/common/constants/types";
 import MoreActionsIcon from "src/common/icons/IconDotsHorizontal3Large.svg";
 import { UserResponse } from "src/common/queries/auth";
 import { StyledIcon, StyledIconWrapper } from "../../style";
-import { DeleteTreeConfirmationModal } from "./components/DeleteTreeConfirmationModal";
 import { StyledText, StyledTrashIcon } from "./style";
 
 interface Props {
   item: Tree;
+  onDeleteTreeModalOpen(t: Tree): void;
   userInfo: UserResponse;
 }
 
-const MoreActionsMenu = ({ item, userInfo }: Props): JSX.Element => {
+const MoreActionsMenu = ({
+  item,
+  onDeleteTreeModalOpen,
+  userInfo,
+}: Props): JSX.Element => {
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
 
   const { group: userGroup } = userInfo;
   const { group, status } = item;
@@ -40,15 +43,6 @@ const MoreActionsMenu = ({ item, userInfo }: Props): JSX.Element => {
 
   const handleClose = () => {
     setAnchorEl(null);
-  };
-
-  const handleOpenModal = () => {
-    setIsDeleteModalOpen(true);
-    handleClose();
-  };
-
-  const handleDeleteTree = () => {
-    setIsDeleteModalOpen(false);
   };
 
   const open = Boolean(anchorEl);
@@ -83,17 +77,12 @@ const MoreActionsMenu = ({ item, userInfo }: Props): JSX.Element => {
           onClose={handleClose}
           getContentAnchorEl={null}
         >
-          <MenuItem onClick={handleOpenModal}>
+          <MenuItem onClick={() => onDeleteTreeModalOpen(item)}>
             <StyledTrashIcon />
             <StyledText>Delete Tree</StyledText>
           </MenuItem>
         </Menu>
       )}
-      <DeleteTreeConfirmationModal
-        open={isDeleteModalOpen}
-        onClose={handleDeleteTree}
-        tree={item}
-      />
     </>
   );
 };

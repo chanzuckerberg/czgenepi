@@ -117,10 +117,19 @@ async function getFastaURL({
   throw Error(`${response.statusText}: ${await response.text()}`);
 }
 
-export function useFastaFetch(
-  callbacks: FastaFetchCallbacks
-): UseMutationResult<FastaResponseType, unknown, FastaRequestType, unknown> {
-  return useMutation(getFastaURL, callbacks);
+export function useFastaFetch({
+  componentOnError,
+  componentOnSuccess,
+}: FastaFetchCallbacks): UseMutationResult<
+  FastaResponseType,
+  unknown,
+  FastaRequestType,
+  unknown
+> {
+  return useMutation(getFastaURL, {
+    onError: componentOnError,
+    onSuccess: componentOnSuccess,
+  });
 }
 
 /* get options for usher tree placement */

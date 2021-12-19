@@ -34,6 +34,7 @@ interface Props {
   setFailedSampleIds(samples: string[]): void;
   viewName: VIEWNAME;
   renderer?: CustomRenderer;
+  handleDeleteTreeModalOpen(t: Tree): void;
 }
 
 // (thuang): If item height changes, we need to update this value!
@@ -161,6 +162,7 @@ export const DataTable: FunctionComponent<Props> = ({
   failedSampleIds,
   setFailedSampleIds,
   viewName,
+  handleDeleteTreeModalOpen,
 }: Props) => {
   const [isHeaderChecked, setIsHeaderChecked] = useState<boolean>(false);
   const [isHeaderIndeterminant, setHeaderIndeterminant] =
@@ -262,10 +264,21 @@ export const DataTable: FunctionComponent<Props> = ({
   const sampleRow = (item: TableItem): React.ReactNode => {
     return headers.map((header, index) => {
       const value = item[header.key];
+      // TODO-TR this can be removed when delete tree modal is moved
+      const onDeleteTreeModalOpen = isSampleTable
+        ? noop
+        : handleDeleteTreeModalOpen;
 
       return (
         <Fragment key={`${item[indexingKey]}-${header.key}`}>
-          {renderer({ header, index, item, userInfo, value })}
+          {renderer({
+            header,
+            index,
+            item,
+            onDeleteTreeModalOpen,
+            userInfo,
+            value,
+          })}
         </Fragment>
       );
     });
