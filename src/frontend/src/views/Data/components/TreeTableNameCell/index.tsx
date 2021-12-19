@@ -51,10 +51,11 @@ const TreeTableNameCell = ({ value, item }: Props): JSX.Element => {
         <CellWrapper data-test-id="tree-name-cell">
           <TreeIcon className={dataTableStyle.icon} />
           <StyledNameWrapper>
-            <span>{value}</span>
+            <span>
+              {value} <PhyloTreeStatusTag treeStatus={status} />
+            </span>
             <StyledTreeCreator>{displayName}</StyledTreeCreator>
           </StyledNameWrapper>
-          <PhyloTreeStatusTag treeStatus={status} />
         </CellWrapper>
       </StyledRowContent>
     </>
