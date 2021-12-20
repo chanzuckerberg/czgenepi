@@ -4,6 +4,7 @@ from botocore.client import ClientError
 
 from aspen.app.views.phylo_trees import _process_phylo_tree
 from aspen.database.models import CanSee, DataType
+from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.usergroup import group_factory, user_factory
@@ -36,28 +37,33 @@ def test_phylo_tree_rename(session, mock_s3_resource, test_data_dir):
     )
 
     user = user_factory(viewer_group)
+    location = location_factory("Santa Barbara County")
 
     local_sample = sample_factory(
         viewer_group,
         user,
+        location,
         private_identifier="private_identifier_1",
         public_identifier="public_identifier_1",
     )
     can_see_sample = sample_factory(
         can_see_group,
         user,
+        location,
         private_identifier="private_identifier_2",
         public_identifier="public_identifier_2",
     )
     wrong_can_see_sample = sample_factory(
         wrong_can_see_group,
         user,
+        location,
         private_identifier="private_identifer_3",
         public_identifier="public_identifier_3",
     )
     no_can_see_sample = sample_factory(
         no_can_see_group,
         user,
+        location,
         private_identifier="private_identifer_4",
         public_identifier="public_identifier_4",
     )
@@ -111,10 +117,12 @@ def test_phylo_tree_rename_admin(session, mock_s3_resource, test_data_dir):
     session.add_all([viewer_group, owner_group])
 
     user = user_factory(viewer_group)
+    location = location_factory("Santa Barbara County")
 
     renamed_sample = sample_factory(
         viewer_group,
         user,
+        location,
         private_identifier="private_identifier_1",
         public_identifier="public_identifier_1",
     )
