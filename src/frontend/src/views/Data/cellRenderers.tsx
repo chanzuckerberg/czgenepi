@@ -14,7 +14,6 @@ import {
 } from "src/common/components/library/data_table/style";
 import SampleIcon from "src/common/icons/Sample.svg";
 import { createTableCellRenderer } from "src/common/utils";
-import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { CZ_BIOHUB_GROUP } from "src/views/Data/constants";
 import { Lineage, LineageTooltip } from "./components/LineageTooltip";
@@ -128,9 +127,7 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
                 status={label.status}
               />
             </CenteredFlexContainer>
-            {usesFeatureFlag(FEATURE_FLAGS.crudV0) && (
-              <StyledUploaderName>{displayName}</StyledUploaderName>
-            )}
+            <StyledUploaderName>{displayName}</StyledUploaderName>
           </PrivateIdValueWrapper>
         </div>
       </RowContent>
