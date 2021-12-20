@@ -8,7 +8,6 @@ import React, {
 import { Input } from "semantic-ui-react";
 import { DataTable } from "src/common/components";
 import { VIEWNAME } from "src/common/constants/types";
-import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import { CreateNSTreeModal } from "./components/CreateNSTreeModal";
 import { DeleteSamplesConfirmationModal } from "./components/DeleteSamplesConfirmationModal";
 import { DeleteTreeConfirmationModal } from "./components/DeleteTreeConfirmationModal";
