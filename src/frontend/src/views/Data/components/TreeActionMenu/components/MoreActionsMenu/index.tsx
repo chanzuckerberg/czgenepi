@@ -2,19 +2,40 @@ import { Menu, MenuItem, Tooltip } from "czifui";
 import React, { MouseEventHandler, useState } from "react";
 import { TREE_STATUS } from "src/common/constants/types";
 import MoreActionsIcon from "src/common/icons/IconDotsHorizontal3Large.svg";
-import { StyledIcon } from "../../style";
+import { UserResponse } from "src/common/queries/auth";
+import { StyledIcon, StyledIconWrapper } from "../../style";
 import { StyledText, StyledTrashIcon } from "./style";
 
 interface Props {
-  item: TableItem;
+  item: Tree;
+  onDeleteTreeModalOpen(t: Tree): void;
+  userInfo: UserResponse;
 }
 
-const MoreActionsMenu = ({ item }: Props): JSX.Element => {
+const MoreActionsMenu = ({
+  item,
+  onDeleteTreeModalOpen,
+  userInfo,
+}: Props): JSX.Element => {
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 
-  const { status } = item;
-  //TODO: also disable if cdph viewing
-  const isDisabled = status === TREE_STATUS.Started;
+  const { group: userGroup } = userInfo;
+  const { group, status } = item;
+
+  const isAutoBuild = group?.name === "";
+  const isTreeInUserOrg = userGroup?.name === group?.name;
+  const canUserDeleteTree = isAutoBuild || isTreeInUserOrg;
+  const isDisabled = status === TREE_STATUS.Started || !canUserDeleteTree;
+
+  let tooltipText = "More Actions";
+
+  if (!isTreeInUserOrg) {
+    tooltipText =
+      "“More Actions” are only available for your organization’s trees.";
+  } else if (isDisabled) {
+    tooltipText =
+      "“More Actions” will be available after this tree is complete.";
+  }
 
   const handleClick: MouseEventHandler = (event) => {
     if (!isDisabled) setAnchorEl(event.currentTarget);
@@ -24,47 +45,44 @@ const MoreActionsMenu = ({ item }: Props): JSX.Element => {
     setAnchorEl(null);
   };
 
-  // TODO (mlila): add callback here when adding delete functionality
-  const handleDeleteTrees = () => {
-    handleClose();
-  };
+  const open = Boolean(anchorEl);
 
   return (
     <>
       <Tooltip
         arrow
         sdsStyle={isDisabled ? "light" : "dark"}
-        title={
-          isDisabled
-            ? "“More Actions” will be available after this tree is complete."
-            : "More Actions"
-        }
+        title={tooltipText}
         placement="top"
       >
-        <StyledIcon onClick={handleClick} disabled={isDisabled}>
-          <MoreActionsIcon />
-        </StyledIcon>
+        <StyledIconWrapper onClick={handleClick}>
+          <StyledIcon disabled={isDisabled}>
+            <MoreActionsIcon />
+          </StyledIcon>
+        </StyledIconWrapper>
       </Tooltip>
-      <Menu
-        anchorEl={anchorEl}
-        anchorOrigin={{
-          horizontal: "right",
-          vertical: "bottom",
-        }}
-        transformOrigin={{
-          horizontal: "right",
-          vertical: "top",
-        }}
-        keepMounted
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-        getContentAnchorEl={null}
-      >
-        <MenuItem onClick={handleDeleteTrees}>
-          <StyledTrashIcon />
-          <StyledText>Delete Trees</StyledText>
-        </MenuItem>
-      </Menu>
+      {open && (
+        <Menu
+          anchorEl={anchorEl}
+          anchorOrigin={{
+            horizontal: "right",
+            vertical: "bottom",
+          }}
+          transformOrigin={{
+            horizontal: "right",
+            vertical: "top",
+          }}
+          keepMounted
+          open={open}
+          onClose={handleClose}
+          getContentAnchorEl={null}
+        >
+          <MenuItem onClick={() => onDeleteTreeModalOpen(item)}>
+            <StyledTrashIcon />
+            <StyledText>Delete Tree</StyledText>
+          </MenuItem>
+        </Menu>
+      )}
     </>
   );
 };

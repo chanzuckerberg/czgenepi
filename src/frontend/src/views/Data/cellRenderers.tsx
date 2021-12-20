@@ -148,8 +148,20 @@ export const SampleRenderer = createTableCellRenderer(
 );
 
 const TREE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
-  actionMenu: ({ value, item }): JSX.Element => {
-    return <TreeActionMenu item={item} value={value} />;
+  actionMenu: ({
+    value,
+    item,
+    userInfo,
+    onDeleteTreeModalOpen,
+  }): JSX.Element => {
+    return (
+      <TreeActionMenu
+        item={item}
+        value={value}
+        userInfo={userInfo}
+        onDeleteTreeModalOpen={onDeleteTreeModalOpen}
+      />
+    );
   },
   name: TreeTableNameCell,
   startedDate: ({ value, header }): JSX.Element => {

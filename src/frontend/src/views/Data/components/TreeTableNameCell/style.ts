@@ -36,8 +36,9 @@ export const StyledNameWrapper = styled.div`
   flex-direction: column;
 `;
 
-export const StyledTreeCreator = styled.span`
+export const StyledTreeCreator = styled.div`
   ${fontBodyXxs}
+
   ${(props) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);

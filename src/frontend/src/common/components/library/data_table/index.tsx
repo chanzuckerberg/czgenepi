@@ -10,6 +10,7 @@ import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import { noop } from "src/common/constants/empty";
 import { VIEWNAME } from "src/common/constants/types";
+import { useUserInfo } from "src/common/queries/auth";
 import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import { EmptyState } from "../data_subview/components/EmptyState";
 import { HeaderRow } from "./components/HeaderRow";
@@ -27,10 +28,11 @@ interface Props {
   setFailedSampleIds(samples: string[]): void;
   viewName: VIEWNAME;
   renderer?: CustomRenderer;
+  handleDeleteTreeModalOpen(t: Tree): void;
 }
 
 // (thuang): If item height changes, we need to update this value!
-const ITEM_HEIGHT_PX = 60;
+const ITEM_HEIGHT_PX = 68;
 
 const LOADING_STATE_ROW_COUNT = 10;
 
@@ -43,7 +45,7 @@ export function defaultSampleCellRenderer({
   const displayData = value || UNDEFINED_TEXT;
 
   return (
-    <RowContent>
+    <RowContent header={header}>
       <div className={style.cell} data-test-id={`row-${header.key}`}>
         {displayData}
       </div>
@@ -154,6 +156,7 @@ export const DataTable: FunctionComponent<Props> = ({
   failedSampleIds,
   setFailedSampleIds,
   viewName,
+  handleDeleteTreeModalOpen,
 }: Props) => {
   const [isHeaderChecked, setIsHeaderChecked] = useState<boolean>(false);
   const [isHeaderIndeterminant, setHeaderIndeterminant] =
@@ -236,6 +239,9 @@ export const DataTable: FunctionComponent<Props> = ({
   const indexingKey = headers[0].key;
 
   const handleSortClick = (newSortKey: string[]) => {
+    // this column is not set up for sorting.
+    if (newSortKey.length < 1) return;
+
     let ascending = false;
     if (isEqual(newSortKey, state.sortKey)) {
       ascending = !state.ascending;
@@ -246,14 +252,27 @@ export const DataTable: FunctionComponent<Props> = ({
     });
   };
 
+  const { data: userInfo } = useUserInfo();
+
   // render functions
   const sampleRow = (item: TableItem): React.ReactNode => {
     return headers.map((header, index) => {
       const value = item[header.key];
+      // TODO-TR this can be removed when delete tree modal is moved
+      const onDeleteTreeModalOpen = isSampleTable
+        ? noop
+        : handleDeleteTreeModalOpen;
 
       return (
         <Fragment key={`${item[indexingKey]}-${header.key}`}>
-          {renderer({ header, index, item, value })}
+          {renderer({
+            header,
+            index,
+            item,
+            onDeleteTreeModalOpen,
+            userInfo,
+            value,
+          })}
         </Fragment>
       );
     });
@@ -285,6 +304,9 @@ export const DataTable: FunctionComponent<Props> = ({
       return <div>FEATURE FLAG IN USE...</div>;
     }
 
+    // TODO (mlila): this is the source of constant rerendering in the table. Because the rows are
+    // TODO          rendered with a function instead of a react component, it generates a new node
+    // TODO          every time the parent rerenders, instead of only updating, eg, when props change
     function renderRow(props: ListChildComponentProps) {
       const item = tableData[props.index];
       return (
