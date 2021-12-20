@@ -128,9 +128,7 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
                 status={label.status}
               />
             </CenteredFlexContainer>
-            {usesFeatureFlag(FEATURE_FLAGS.crudV0) && (
-              <StyledUploaderName>{displayName}</StyledUploaderName>
-            )}
+            <StyledUploaderName>{displayName}</StyledUploaderName>
           </PrivateIdValueWrapper>
         </div>
       </RowContent>

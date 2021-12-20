@@ -252,12 +252,10 @@ const DataSubview: FunctionComponent<Props> = ({
             tooltipTextDisabled={DOWNLOAD_TOOLTIP_TEXT_DISABLED}
             tooltipTextEnabled={DOWNLOAD_TOOLTIP_TEXT_ENABLED}
           />
-          {usesFeatureFlag(FEATURE_FLAGS.crudV0) && (
-            <MoreActionsMenu
-              disabled={!hasCheckedSamples}
-              onDeleteSelected={() => setDeleteSampleConfirmationOpen(true)}
-            />
-          )}
+          <MoreActionsMenu
+            disabled={!hasCheckedSamples}
+            onDeleteSelected={() => setDeleteSampleConfirmationOpen(true)}
+          />
         </DownloadWrapper>
       );
     }
