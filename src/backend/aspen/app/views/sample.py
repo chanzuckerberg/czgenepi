@@ -48,7 +48,7 @@ from aspen.database.models import (
     UploadedPathogenGenome,
     WorkflowStatusType,
 )
-from aspen.database.models.sample import create_public_ids, RegionType
+from aspen.database.models.sample import create_public_ids
 from aspen.database.models.usergroup import Group, User
 from aspen.error import http_exceptions as ex
 from aspen.error.recoverable import RecoverableError

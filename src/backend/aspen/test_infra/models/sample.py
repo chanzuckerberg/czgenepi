@@ -1,6 +1,6 @@
 import datetime
 
-from aspen.database.models import Location, RegionType, Sample
+from aspen.database.models import Location, Sample
 
 
 def sample_factory(

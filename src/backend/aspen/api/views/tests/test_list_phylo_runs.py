@@ -7,6 +7,7 @@ from aspen.database.models import (
     CanSee,
     DataType,
     Group,
+    Location,
     PhyloRun,
     PhyloTree,
     Sample,
@@ -14,6 +15,7 @@ from aspen.database.models import (
     User,
     WorkflowStatusType,
 )
+from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
@@ -23,11 +25,14 @@ from aspen.test_infra.models.usergroup import group_factory, user_factory
 pytestmark = pytest.mark.asyncio
 
 
-def make_sample_data(group: Group, user: User, n_samples: int) -> Collection[Sample]:
+def make_sample_data(
+    group: Group, user: User, location: Location, n_samples: int
+) -> Collection[Sample]:
     samples: Collection[Sample] = [
         sample_factory(
             group,
             user,
+            location,
             public_identifier=f"public_identifier_{ix}",
             private_identifier=f"private_identifier_{ix}",
         )
@@ -72,14 +77,14 @@ def make_runs_with_no_trees(group: Group) -> Collection[PhyloRun]:
 
 
 def make_all_test_data(
-    group: Group, user: User, n_samples: int, n_trees: int
+    group: Group, user: User, location: Location, n_samples: int, n_trees: int
 ) -> Tuple[
     Collection[Sample],
     Collection[UploadedPathogenGenome],
     Sequence[PhyloTree],
     Collection[PhyloRun],
 ]:
-    samples: Collection[Sample] = make_sample_data(group, user, n_samples)
+    samples: Collection[Sample] = make_sample_data(group, user, location, n_samples)
     uploaded_pathogen_genomes: Collection[
         UploadedPathogenGenome
     ] = make_uploaded_pathogen_genomes(samples)
@@ -110,7 +115,8 @@ async def test_phylo_tree_view(
 ):
     group: Group = group_factory()
     user: User = user_factory(group)
-    _, _, trees, _ = make_all_test_data(group, user, n_samples, n_trees)
+    location: Location = location_factory(location="Santa Barbara County")
+    _, _, trees, _ = make_all_test_data(group, user, location, n_samples, n_trees)
 
     async_session.add(group)
     await async_session.commit()
@@ -126,7 +132,10 @@ async def test_in_progress_and_failed_trees(
 ):
     group: Group = group_factory()
     user: User = user_factory(group)
-    _, _, _, treeless_runs = make_all_test_data(group, user, n_samples, n_trees)
+    location: Location = location_factory(location="Santa Barbara County")
+    _, _, _, treeless_runs = make_all_test_data(
+        group, user, location, n_samples, n_trees
+    )
 
     async_session.add(group)
     await async_session.commit()
@@ -175,7 +184,8 @@ async def test_phylo_trees_can_see(
     owner_group: Group = group_factory()
     viewer_group: Group = group_factory("CADPH")
     user: User = user_factory(viewer_group)
-    _, _, trees, _ = make_all_test_data(owner_group, user, n_samples, n_trees)
+    location: Location = location_factory(location="Santa Barbara County")
+    _, _, trees, _ = make_all_test_data(owner_group, user, location, n_samples, n_trees)
 
     CanSee(viewer_group=viewer_group, owner_group=owner_group, data_type=DataType.TREES)
     async_session.add_all((owner_group, viewer_group))
@@ -193,7 +203,8 @@ async def test_phylo_trees_no_can_see(
     owner_group: Group = group_factory()
     viewer_group: Group = group_factory("CADPH")
     user: User = user_factory(viewer_group)
-    _, _, trees, _ = make_all_test_data(owner_group, user, n_samples, n_trees)
+    location: Location = location_factory(location="Santa Barbara County")
+    _, _, trees, _ = make_all_test_data(owner_group, user, location, n_samples, n_trees)
 
     async_session.add_all((owner_group, viewer_group))
     await async_session.commit()
@@ -214,7 +225,8 @@ async def test_phylo_trees_admin(
     owner_group: Group = group_factory()
     viewer_group: Group = group_factory("admin")
     user: User = user_factory(viewer_group, system_admin=True)
-    _, _, trees, _ = make_all_test_data(owner_group, user, n_samples, n_trees)
+    location: Location = location_factory(location="Santa Barbara County")
+    _, _, trees, _ = make_all_test_data(owner_group, user, location, n_samples, n_trees)
 
     async_session.add_all((owner_group, viewer_group))
     await async_session.commit()
