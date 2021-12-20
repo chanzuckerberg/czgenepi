@@ -4,7 +4,7 @@ import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from aspen.database.models import Group, Location, PhyloTree, Sample, WorkflowStatusType
+from aspen.database.models import Group, PhyloTree, Sample, WorkflowStatusType
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
 from aspen.test_infra.models.sample import sample_factory
