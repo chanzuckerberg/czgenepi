@@ -34,7 +34,7 @@ refine:
   keep_polytomies: True
   clock_filter_iqd: 3
   
-crowding:
+priorities:
   crowding_penalty: {crowding_penalty_per_tree_type}
 
 ## Subsampling schemas
