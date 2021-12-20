@@ -11,7 +11,7 @@ from aspen.database.connection import (
     session_scope,
     SqlAlchemyInterface,
 )
-from aspen.database.models import Group, PathogenGenome, Sample, TreeType
+from aspen.database.models import Group, Location, PathogenGenome, Sample, TreeType
 from aspen.workflows.nextstrain_run.build_config import builder_factory
 from aspen.workflows.nextstrain_run.export import (
     write_includes_file,
@@ -25,18 +25,48 @@ from aspen.workflows.nextstrain_run.export import (
     type=click.Choice(["overview", "targeted", "non_contextualized"]),
     required=True,
 )
-@click.option("--sequences", type=int, required=False, default=10)
-@click.option("--selected", type=int, required=False, default=10)
-@click.option("--gisaid", type=int, required=False, default=10)
-@click.option("--group-name", type=str, required=False, default=None)
-@click.option("--location-id", type=int, required=False, default=None)
+@click.option(
+    "--sequences",
+    type=int,
+    required=False,
+    default=10,
+    help="How many overall group sequences in this build",
+)
+@click.option(
+    "--selected",
+    type=int,
+    required=False,
+    default=10,
+    help="How many of the overall group sequences should be selected in include.txt",
+)
+@click.option(
+    "--gisaid",
+    type=int,
+    required=False,
+    default=10,
+    help="How many GISAID ID's to include in the build",
+)
+@click.option(
+    "--group-name",
+    type=str,
+    required=False,
+    default=None,
+    help="Which existing group to use for this build?",
+)
+@click.option(
+    "--location",
+    type=str,
+    required=False,
+    default=None,
+    help="Location for tree build in region/country/div/loc format. Country example: 'North America/Mexico//'",
+)
 def cli(
     tree_type: str,
     sequences: int,
     selected: int,
     gisaid: int,
     group_name: str,
-    location_id: int,
+    location: int,
 ):
     tree_types = {
         "overview": TreeType.OVERVIEW,
@@ -76,11 +106,18 @@ def cli(
             group = session.query(Group).filter(Group.name == group_name).first()
         else:
             group = session.query(Group).first()
+        if location:
+            (region, country, div, loc) = location.split("/")
+            tree_location = Location(
+                region=region, country=country, division=div, location=loc
+            )
+            group.default_tree_location = tree_location
         builder = builder_factory(build_type, group, template_args, **context)
         builder.write_file(builds_file_fh)
 
         print("Wrote output files!")
         print(json.dumps(context))
+        session.rollback()  # Don't save any changes to the DB.
 
 
 def get_random_pathogen_genomes(session, max_genomes):

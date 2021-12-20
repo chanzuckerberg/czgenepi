@@ -12,9 +12,9 @@ def group_factory(
     if not prefix:
         prefix = name
     # Note - the None checks are to allow explicitly empty location/division strings
-    if location == None:
+    if location is None:
         location = f"{name} city"
-    if division == None:
+    if division is None:
         division = f"{name} state"
     tree_loc = Location(
         region="North America", country="USA", location=location, division=division
