@@ -48,7 +48,9 @@ class BaseNextstrainConfigBuilder:
         #   - It refers to a subsampling_scheme key in the mega nextstrain template
         #   - It's title-case'd and included in the tree title as human-readable text
         build["subsampling_scheme"] = self.subsampling_scheme
-        build["title"] = build["title"].format(
+        # Update the tree's title with build type & location.
+        title_template = '{tree_type} tree for samples collected in {location}'
+        build["title"] = title_template.format(
             tree_type=self.subsampling_scheme.title(),
             location=", ".join(location_values),
         )
