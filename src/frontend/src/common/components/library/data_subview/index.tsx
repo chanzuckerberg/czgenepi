@@ -8,9 +8,9 @@ import React, {
 import { Input } from "semantic-ui-react";
 import { DataTable } from "src/common/components";
 import { VIEWNAME } from "src/common/constants/types";
-import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import { CreateNSTreeModal } from "./components/CreateNSTreeModal";
 import { DeleteSamplesConfirmationModal } from "./components/DeleteSamplesConfirmationModal";
+import { DeleteTreeConfirmationModal } from "./components/DeleteTreeConfirmationModal";
 import DownloadModal from "./components/DownloadModal";
 import { IconButton } from "./components/IconButton";
 import { MoreActionsMenu } from "./components/MoreActionMenu";
@@ -133,16 +133,20 @@ const DataSubview: FunctionComponent<Props> = ({
   });
 
   const [checkedSampleIds, setCheckedSampleIds] = useState<string[]>([]);
-  const [showCheckboxes, setShowCheckboxes] = useState<boolean>(false);
   const [isDownloadModalOpen, setDownloadModalOpen] = useState(false);
   const [failedSampleIds, setFailedSampleIds] = useState<string[]>([]);
   const [isNSCreateTreeModalOpen, setIsNSCreateTreeModalOpen] =
     useState<boolean>(false);
   const [shouldStartUsherFlow, setShouldStartUsherFlow] =
     useState<boolean>(false);
-  const [isDeleteConfirmationOpen, setDeleteConfirmationOpen] =
+  const [isDeleteSampleConfirmationOpen, setDeleteSampleConfirmationOpen] =
     useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  // TODO (mlila): when table is refactored, this modal and related state should be moved closer
+  // TODO-TR          to the actions that cause the modal to open (search for TODO-TR)
+  const [isDeleteTreeConfirmationOpen, setDeleteTreeConfirmationOpen] =
+    useState<boolean>(false);
+  const [treeToDelete, setTreeToDelete] = useState<Tree>();
 
   const handleDownloadClickOpen = () => {
     setDownloadModalOpen(true);
@@ -168,16 +172,19 @@ const DataSubview: FunctionComponent<Props> = ({
     searcher(searchQuery);
   }, [data]);
 
-  useEffect(() => {
-    // Only show checkboxes on the sample datatable
-    if (viewName === VIEWNAME.SAMPLES) {
-      setShowCheckboxes(true);
-    }
-  }, [viewName]);
-
   const handleDeleteSampleModalClose = () => {
-    setDeleteConfirmationOpen(false);
+    setDeleteSampleConfirmationOpen(false);
     setCheckedSampleIds([]);
+  };
+
+  // TODO-TR
+  const handleDeleteTreeModalClose = () => {
+    setDeleteTreeConfirmationOpen(false);
+  };
+
+  const handleDeleteTreeModalOpen = (tree: Tree) => {
+    setTreeToDelete(tree);
+    setDeleteTreeConfirmationOpen(true);
   };
 
   const onChange = (
@@ -244,12 +251,10 @@ const DataSubview: FunctionComponent<Props> = ({
             tooltipTextDisabled={DOWNLOAD_TOOLTIP_TEXT_DISABLED}
             tooltipTextEnabled={DOWNLOAD_TOOLTIP_TEXT_ENABLED}
           />
-          {usesFeatureFlag(FEATURE_FLAGS.crudV0) && (
-            <MoreActionsMenu
-              disabled={!hasCheckedSamples}
-              onDeleteSelected={() => setDeleteConfirmationOpen(true)}
-            />
-          )}
+          <MoreActionsMenu
+            disabled={!hasCheckedSamples}
+            onDeleteSelected={() => setDeleteSampleConfirmationOpen(true)}
+          />
         </DownloadWrapper>
       );
     }
@@ -289,9 +294,16 @@ const DataSubview: FunctionComponent<Props> = ({
             <DeleteSamplesConfirmationModal
               checkedSamples={checkedSamples}
               onClose={handleDeleteSampleModalClose}
-              open={isDeleteConfirmationOpen}
+              open={isDeleteSampleConfirmationOpen}
             />
           </>
+        )}
+        {viewName === VIEWNAME.TREES && (
+          <DeleteTreeConfirmationModal
+            open={isDeleteTreeConfirmationOpen}
+            onClose={handleDeleteTreeModalClose}
+            tree={treeToDelete}
+          />
         )}
         <StyledFlexChildDiv className={style.samplesRoot}>
           <div className={style.searchBar}>
@@ -316,7 +328,7 @@ const DataSubview: FunctionComponent<Props> = ({
               setCheckedSampleIds={setCheckedSampleIds}
               failedSampleIds={failedSampleIds}
               setFailedSampleIds={setFailedSampleIds}
-              showCheckboxes={showCheckboxes}
+              viewName={viewName}
               data={
                 dataFilterFunc && tableData
                   ? dataFilterFunc(tableData)
@@ -325,6 +337,8 @@ const DataSubview: FunctionComponent<Props> = ({
               defaultSortKey={defaultSortKey}
               headers={headers}
               renderer={renderer}
+              // TODO-TR (mlila): handler can be removed when tree delete modal moved
+              handleDeleteTreeModalOpen={handleDeleteTreeModalOpen}
             />
           </div>
         </StyledFlexChildDiv>

@@ -3,12 +3,11 @@ import { fontHeaderS, getColors, getIconSizes, getSpaces, Props } from "czifui";
 
 interface AlignProps extends Props {
   align?: string;
-  wide?: boolean;
 }
 
-export const StyledTableHeader = styled("div")`
+export const StyledSampleTableHeader = styled("div")`
   ${(props: AlignProps) => {
-    const { align, wide } = props;
+    const { align } = props;
     const justify = align ?? "center";
 
     const iconSizes = getIconSizes(props);
@@ -22,10 +21,35 @@ export const StyledTableHeader = styled("div")`
       padding-bottom: ${spaces?.m}px;
       width: 100%;
 
-      &:first-of-type {
-        flex: ${wide ? "2 0 40%" : ""};
+      svg {
+        fill: black;
+        width: ${iconSizes?.xs.width}px;
       }
+  `;
+  }}
+`;
 
+export const StyledTreeTableHeader = styled.div`
+  display: flex;
+  flex: 0 0 auto;
+  align-items: baseline;
+  flex-direction: row;
+  justify-content: center;
+  width: 150px;
+
+  &:first-child {
+    width: 100%;
+    flex: 1 1 auto;
+    justify-content: left;
+  }
+
+  ${(props) => {
+    const iconSizes = getIconSizes(props);
+    const spaces = getSpaces(props);
+
+    return `
+      padding-bottom: ${spaces?.m}px;
+      margin: 0 ${spaces?.m}px;
       svg {
         fill: black;
         width: ${iconSizes?.xs.width}px;

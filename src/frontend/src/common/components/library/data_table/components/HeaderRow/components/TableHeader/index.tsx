@@ -1,15 +1,20 @@
 import { Tooltip } from "czifui";
-import React from "react";
+import React, { ReactNode } from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import SortArrowDownIcon from "src/common/icons/IconArrowDownSmall.svg";
 import SortArrowUpIcon from "src/common/icons/IconArrowUpSmall.svg";
-import { StyledHeaderCellContent, StyledTableHeader } from "./style";
+import {
+  StyledHeaderCellContent,
+  StyledSampleTableHeader,
+  StyledTreeTableHeader,
+} from "./style";
 
 interface Props {
   doesSortOnThisCol: boolean;
   header: Header;
   isSortedAscending: boolean;
   onClick(): void;
+  isSampleTable: boolean;
 }
 
 const TableHeader = ({
@@ -17,8 +22,9 @@ const TableHeader = ({
   header,
   isSortedAscending,
   onClick,
+  isSampleTable,
 }: Props): JSX.Element => {
-  const { align, key, text, tooltip } = header;
+  const { align, text, tooltip } = header;
 
   let tooltipTitle: JSX.Element | string = "";
 
@@ -44,19 +50,28 @@ const TableHeader = ({
     );
   }
 
+  const HeaderWrapper = ({ children }: { children: ReactNode }): JSX.Element =>
+    isSampleTable ? (
+      <StyledSampleTableHeader
+        align={align}
+        data-test-id="header-cell"
+        onClick={onClick}
+      >
+        {children}
+      </StyledSampleTableHeader>
+    ) : (
+      <StyledTreeTableHeader data-test-id="header-cell" onClick={onClick}>
+        {children}
+      </StyledTreeTableHeader>
+    );
+
   return (
-    <StyledTableHeader
-      align={align}
-      data-test-id="header-cell"
-      onClick={onClick}
-      // * Tree name column should be slightly wider than the rest to accommodate status tags
-      wide={key === "name"}
-    >
-      <Tooltip arrow title={tooltipTitle} placement="bottom">
+    <HeaderWrapper>
+      <Tooltip arrow title={tooltipTitle} placement="bottom" leaveDelay={0}>
         <StyledHeaderCellContent>{text}</StyledHeaderCellContent>
       </Tooltip>
       {sortIndicator}
-    </StyledTableHeader>
+    </HeaderWrapper>
   );
 };
 
