@@ -60,9 +60,8 @@ task nextstrain_workflow {
     genepi_config="$(aws secretsmanager get-secret-value --secret-id ~{genepi_config_secret_name} --query SecretString --output text)"
     aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$genepi_config")"
 
-    workflow_id=$(aspen-cli db create-phylo-run                                                                                  \
-                      --group-name "~{group_name}"                                                                               \
-                      --all-group-sequences                                                                                      \
+    workflow_id=$(aspen-cli db create-phylo-run                  \
+                      --group-name "~{group_name}"               \
                       --builds-template-args '~{template_args}'  \
                       --tree-type "~{tree_type}"
     )
@@ -82,9 +81,10 @@ task nextstrain_workflow {
     aligned_gisaid_location=$(
         python3 /usr/src/app/aspen/workflows/nextstrain_run/export.py \
                --phylo-run-id "${workflow_id}"                        \
-               --sequences /ncov/data/sequences_aspen.fasta            \
-               --metadata /ncov/data/metadata_aspen.tsv                \
-               --builds-file /ncov/my_profiles/aspen/builds.yaml       \
+               --sequences /ncov/data/sequences_aspen.fasta           \
+               --metadata /ncov/data/metadata_aspen.tsv               \
+               --selected /ncov/data/include.txt                      \
+               --builds-file /ncov/my_profiles/aspen/builds.yaml      \
     )
     aligned_gisaid_s3_bucket=$(echo "${aligned_gisaid_location}" | jq -r .bucket)
     aligned_gisaid_sequences_s3_key=$(echo "${aligned_gisaid_location}" | jq -r .sequences_key)
