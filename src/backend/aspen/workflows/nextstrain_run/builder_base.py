@@ -32,7 +32,7 @@ class BaseNextstrainConfigBuilder:
         build = config["builds"]["aspen"]
 
         location = self.group.default_tree_location
-        # Make a shortcut to decide whether this is a location vs divsision vs country level build
+        # Make a shortcut to decide whether this is a location vs division vs country level build
         if not location.division:
             self.tree_build_level = "country"
         elif not location.location:
