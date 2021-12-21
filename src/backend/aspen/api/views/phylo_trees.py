@@ -23,6 +23,7 @@ async def update_phylo_tree(
 ):
     phylo_run_alias = aliased(PhyloRun)
 
+    # use associated PhyloRun to check that user has permission to update PhyloTree
     phylo_runs_query: Select = (
         sa.select(phylo_run_alias)  # type: ignore
         .options(
@@ -31,11 +32,9 @@ async def update_phylo_tree(
         )
         .filter((PhyloTree.id == phylo_tree_request.id))
     )
-
     phylo_run_results: ChunkedIteratorResult = await db.execute(phylo_runs_query)
     phylo_run: PhyloRun = phylo_run_results.unique().scalars().one()
 
-    # check that user has permission to update PhyloTree name
     group: Group = user.group
     if phylo_run.group_id != group.id:
         if not user.system_admin:
