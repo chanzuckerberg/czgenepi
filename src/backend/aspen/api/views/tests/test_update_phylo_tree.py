@@ -72,7 +72,7 @@ async def test_update_phylo_tree_wrong_group(
         phylo_run,
         phylo_tree,
     ) = await make_shared_test_data(async_session)
-    group_that_did_not_make_tree = group_factory(name="i want to see trees")
+    group_that_did_not_make_tree = group_factory(name="i_want_to_see_trees")
     user_that_did_not_make_tree = user_factory(
         group_that_did_not_make_tree,
         name="trying_to_see",
@@ -91,5 +91,5 @@ async def test_update_phylo_tree_wrong_group(
     assert res.status_code == 400
     assert (
         res.content
-        == b'{"error":"User trying_to_see from group i want to see trees does not have pemission to update tree name"}'
+        == b'{"error":"User trying_to_see from group i_want_to_see_trees does not have permission to update tree name"}'
     )
