@@ -36,7 +36,7 @@ def create_test_group(session, group_name, prefix):
     print("Creating group")
     g = Group(
         name=group_name,
-        address="123 Example St, Redwood City CA"
+        address="123 Example St, Redwood City CA",
         prefix=prefix,
     )
     session.add(g)
