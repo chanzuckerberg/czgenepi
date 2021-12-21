@@ -23,7 +23,7 @@ async def make_shared_test_data(
         sample_factory(
             group,
             user,
-            private_identifier=f"private_identifer_{i}",
+            private_identifier=f"private_identifier_{i}",
             public_identifier=f"public_identifier_{i}",
         )
         for i in range(1, 3)
@@ -50,7 +50,7 @@ async def test_update_phylo_tree(
     )
     auth_headers = {"user_id": user.auth0_user_id}
     data = {"id": phylo_run.id, "name": "new_name"}
-    res = await http_client.put(f"/v2/phylo_trees/", json=data, headers=auth_headers)
+    res = await http_client.put("/v2/phylo_trees/", json=data, headers=auth_headers)
 
     assert res.status_code == 200
 
@@ -86,7 +86,7 @@ async def test_update_phylo_tree_wrong_group(
 
     auth_headers = {"user_id": user_that_did_not_make_tree.auth0_user_id}
     data = {"id": phylo_run.id, "name": "new_name"}
-    res = await http_client.put(f"/v2/phylo_trees/", json=data, headers=auth_headers)
+    res = await http_client.put("/v2/phylo_trees/", json=data, headers=auth_headers)
 
     assert res.status_code == 400
     assert (
