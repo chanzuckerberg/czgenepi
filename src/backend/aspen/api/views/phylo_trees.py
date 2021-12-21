@@ -1,23 +1,16 @@
-from typing import Iterable, List, MutableSequence, Set
-
-from fastapi import APIRouter, Depends
-from starlette.requests import Request
-from sqlalchemy.ext.asyncio import AsyncSession
 import sentry_sdk
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends
-from sqlalchemy import or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased, joinedload
-from sqlalchemy.orm.exc import NoResultFound
-from starlette.requests import Request
+from sqlalchemy.engine.result import ChunkedIteratorResult
+from sqlalchemy.sql.selectable import Select
 
 from aspen.api.auth import get_auth_user
-from aspen.api.deps import get_db, get_settings
+from aspen.api.deps import get_db
 from aspen.api.error import http_exceptions as ex
-from aspen.api.settings import Settings
-from aspen.database.models import PhyloTree, User, DataType, PhyloRun
-from aspen.api.schemas.phylo_trees import PhyloTreeRequest, PhyloTreeResponse
+from aspen.database.models import PhyloTree, User, PhyloRun
+from aspen.api.schemas.phylo_trees import PhyloTreeRequest, PhyloTreeResponse, Group
 
 router = APIRouter()
 
@@ -28,7 +21,8 @@ async def update_phylo_tree(
     user: User = Depends(get_auth_user),
 ):
     phylo_run_alias = aliased(PhyloRun)
-    phylo_runs_query = (
+
+    phylo_runs_query: Select = (
         sa.select(phylo_run_alias)  # type: ignore
         .options(
             joinedload(phylo_run_alias.outputs.of_type(PhyloTree)),
@@ -38,14 +32,15 @@ async def update_phylo_tree(
             (PhyloTree.id == phylo_tree_request.id)
         )
     )
-    phylo_run_results = await db.execute(phylo_runs_query)
+
+    phylo_run_results: ChunkedIteratorResult = await db.execute(phylo_runs_query)
     phylo_run: PhyloRun = phylo_run_results.unique().scalars().one()
 
     # check that user has permission to update PhyloTree name
-    group = user.group
+    group: Group = user.group
     if phylo_run.group_id != group.id:
         if not user.system_admin:
-            not_sufficient_permission_msg: str = f"User {user.name} from group {group.name} does not have pemission to update tree name"
+            not_sufficient_permission_msg: str = f"User {user.name} from group {group.name} does not have permission to update tree name"
             sentry_sdk.capture_message(
                 not_sufficient_permission_msg, "error"
             )
