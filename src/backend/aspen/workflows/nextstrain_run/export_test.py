@@ -66,7 +66,7 @@ def cli(
     selected: int,
     gisaid: int,
     group_name: str,
-    location: int,
+    location: str,
 ):
     tree_types = {
         "overview": TreeType.OVERVIEW,
@@ -106,6 +106,8 @@ def cli(
             group = session.query(Group).filter(Group.name == group_name).first()
         else:
             group = session.query(Group).first()
+        if not group:
+            raise Exception("No group found")
         if location:
             (region, country, div, loc) = location.split("/")
             tree_location = Location(
