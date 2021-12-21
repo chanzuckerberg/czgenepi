@@ -7,7 +7,6 @@ import enumtables  # noqa: F401
 import sqlalchemy as sa
 from alembic import op
 
-# revision identifiers, used by Alembic.
 revision = "20211214_003923"
 down_revision = "20211117_213611"
 branch_labels = None
