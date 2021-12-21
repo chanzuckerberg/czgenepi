@@ -138,21 +138,25 @@ export async function apiResponse<T extends APIResponse>(
  * calls forming the basis of our API calls. Eventually migrate moving existing
  * queries to using the convenience helpers instead.
  */
-export async function makeBackendApiJsonCall(
+export async function makeBackendApiJsonCall<T>(
   route: string,
-  fetchOptions: RequestInit
-): Promise<unknown> {
+  requestOptions: RequestInit
+): Promise<T> {
   const response = await fetch(ENV.API_URL + route, {
-    ...fetchOptions,
+    ...requestOptions,
   });
   if (response.ok) return await response.json();
 
   throw Error(`${response.statusText}: ${await response.text()}`);
 }
 
-// GET convenience function
-export async function getBackendApiJson(route: string): Promise<unknown> {
-  return await makeBackendApiJsonCall(route, DEFAULT_FETCH_OPTIONS);
+// GET convenience function -- DEFAULT_FETCH_OPTIONS if only `route`
+export async function getBackendApiJson<T>(
+  route: string,
+  additionalRequestOptions: RequestInit = {},
+  ): Promise<T> {
+  const requestOptions = {...DEFAULT_FETCH_OPTIONS, ...additionalRequestOptions};
+  return await makeBackendApiJsonCall(route, requestOptions);
 }
 
 /** Calls to specific API endpoints **/
