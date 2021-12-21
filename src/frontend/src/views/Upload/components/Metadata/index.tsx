@@ -30,7 +30,6 @@ import {
 } from "./components/ImportFile/parseFile";
 import Table from "./components/Table";
 
-
 function findLocationFromString(
   locationString: string,
   locations: NamedGisaidLocation[]
@@ -87,7 +86,10 @@ export default function Metadata({
       const locationString = parsedMetadata.locationString || "";
       let collectionLocation = undefined;
       if (locationString.length > 2) {
-        collectionLocation = findLocationFromString(locationString, namedLocations);
+        collectionLocation = findLocationFromString(
+          locationString,
+          namedLocations
+        );
       }
       uploadedMetadata[sampleId] = {
         ...EMPTY_METADATA,

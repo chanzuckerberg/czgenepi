@@ -1,11 +1,7 @@
-import {
-  useQuery,
-  UseQueryResult,
-} from "react-query";
-
+import { useQuery, UseQueryResult } from "react-query";
+import { stringifyGisaidLocation } from "src/common/utils/locationUtils";
 import { API, getBackendApiJson } from "../api";
 import { ENTITIES } from "./entities";
-import { stringifyGisaidLocation } from "src/common/utils/locationUtils";
 
 export interface LocationsResponse {
   locations: GisaidLocation[];
@@ -13,7 +9,7 @@ export interface LocationsResponse {
 
 const fetchLocations = (): Promise<LocationsResponse> => {
   return getBackendApiJson(API.LOCATIONS);
-}
+};
 
 const USE_LOCATIONS_INFO_QUERY_KEY = {
   entities: [ENTITIES.LOCATION_INFO],
@@ -38,7 +34,9 @@ interface NamedLocationsResponse {
   namedLocations: NamedGisaidLocation[];
 }
 
-const foldInNamesToLocations = (data: LocationsResponse): NamedLocationsResponse => {
+const foldInNamesToLocations = (
+  data: LocationsResponse
+): NamedLocationsResponse => {
   const { locations } = data;
   const foldInName = (location: GisaidLocation): NamedGisaidLocation => {
     return {
@@ -49,10 +47,13 @@ const foldInNamesToLocations = (data: LocationsResponse): NamedLocationsResponse
   return {
     namedLocations: locations.map(foldInName),
   };
-}
+};
 
 // Provides same underlying locations data, but also adds in `name` for each location.
-export function useNamedLocations(): UseQueryResult<NamedLocationsResponse, unknown> {
+export function useNamedLocations(): UseQueryResult<
+  NamedLocationsResponse,
+  unknown
+> {
   return useQuery([USE_LOCATIONS_INFO_QUERY_KEY], fetchLocations, {
     retry: false,
     // Using `select` allows it to share cache with other USE_LOCATIONS_INFO_QUERY_KEY,

@@ -153,9 +153,12 @@ export async function makeBackendApiJsonCall<T>(
 // GET convenience function -- DEFAULT_FETCH_OPTIONS if only `route`
 export async function getBackendApiJson<T>(
   route: string,
-  additionalRequestOptions: RequestInit = {},
-  ): Promise<T> {
-  const requestOptions = {...DEFAULT_FETCH_OPTIONS, ...additionalRequestOptions};
+  additionalRequestOptions: RequestInit = {}
+): Promise<T> {
+  const requestOptions = {
+    ...DEFAULT_FETCH_OPTIONS,
+    ...additionalRequestOptions,
+  };
   return await makeBackendApiJsonCall(route, requestOptions);
 }
 

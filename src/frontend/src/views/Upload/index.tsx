@@ -36,7 +36,8 @@ export default function Upload(): JSX.Element | null {
   // Right now the use of empty array prevents a hard crash, but user will be
   // confused because page will seem fine but location finding just won't work.
   const { data: namedLocationsData } = useNamedLocations();
-  const namedLocations = namedLocationsData?.namedLocations || [] as NamedGisaidLocation[];
+  const namedLocations =
+    namedLocationsData?.namedLocations || ([] as NamedGisaidLocation[]);
 
   const cancelPrompt = useNavigationPrompt();
 
