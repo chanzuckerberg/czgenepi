@@ -15,7 +15,7 @@ builds:
     division: {division}
     location: {location}
     subsampling_scheme: {tree_type}
-    title: Aspen Tree  # This gets replaced with a more specific title in builder_base.py
+    title: CZ Gen Epi Tree  # This gets replaced with a more specific title in builder_base.py
 
 ## custom rules
 custom_rules:
