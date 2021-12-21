@@ -55,7 +55,7 @@ async def test_update_phylo_tree(
     assert res.status_code == 200
 
     phylo_tree_updated_q = await async_session.execute(
-        sa.select(PhyloTree).filter(PhyloTree.id == phylo_tree.id)
+        sa.select(PhyloTree).filter(PhyloTree.id == phylo_tree.id)  # type: ignore
     )
     phylo_tree_result = phylo_tree_updated_q.scalars().one()
     assert phylo_tree_result.name == data["name"]

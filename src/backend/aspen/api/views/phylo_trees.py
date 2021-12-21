@@ -1,7 +1,6 @@
 import sentry_sdk
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends
-from sqlalchemy.engine.result import ChunkedIteratorResult
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased, joinedload
 from sqlalchemy.sql.selectable import Select
@@ -32,7 +31,7 @@ async def update_phylo_tree(
         )
         .filter((PhyloTree.id == phylo_tree_request.id))
     )
-    phylo_run_results: ChunkedIteratorResult = await db.execute(phylo_runs_query)
+    phylo_run_results = await db.execute(phylo_runs_query)
     phylo_run: PhyloRun = phylo_run_results.unique().scalars().one()
 
     group: Group = user.group
@@ -43,7 +42,7 @@ async def update_phylo_tree(
             raise ex.BadRequestException(not_sufficient_permission_msg)
 
     await db.execute(
-        sa.update(PhyloTree)
+        sa.update(PhyloTree)  # type: ignore
         .where(PhyloTree.id == phylo_tree_request.id)
         .values(name=phylo_tree_request.name)
     )
