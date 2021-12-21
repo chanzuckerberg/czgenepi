@@ -99,7 +99,7 @@ def create_sample(session, group, uploaded_by_user, suffix, is_failed=False):
     )
     upg: UploadedPathogenGenome = UploadedPathogenGenome(
         sample=sample,
-        sequence='ATTAAAGCCCCCAAGTC',
+        sequence="ATTAAAGCCCCCAAGTC",
         sequencing_date=datetime.now(),
         upload_date=datetime.now(),
     )
