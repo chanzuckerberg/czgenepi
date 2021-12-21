@@ -11,7 +11,15 @@ from aspen.api.auth import get_auth_user
 from aspen.api.error.http_exceptions import AspenException, exception_handler
 from aspen.api.middleware.session import SessionMiddleware
 from aspen.api.settings import Settings
-from aspen.api.views import auth, health, locations, phylo_runs, samples, users, phylo_trees
+from aspen.api.views import (
+    auth,
+    health,
+    locations,
+    phylo_runs,
+    phylo_trees,
+    samples,
+    users,
+)
 
 
 def get_allowed_origins() -> List[str]:
@@ -94,9 +102,8 @@ def get_app() -> FastAPI:
     _app.include_router(
         phylo_trees.router,
         prefix="/v2/phylo_trees",
-        dependencies=[Depends(get_auth_user)]
+        dependencies=[Depends(get_auth_user)],
     )
-
 
     _app.add_exception_handler(
         AspenException,
