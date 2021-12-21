@@ -17,6 +17,7 @@ class BaseNextstrainConfigBuilder:
         self.group = group
         self.template_args = template_args
         self.template = None
+        self.tree_build_level = "location"
         # Set self.num_county_sequences, self.num_sequences, etc.
         for k, v in kwargs.items():
             setattr(self, k, v)
@@ -31,6 +32,11 @@ class BaseNextstrainConfigBuilder:
         build = config["builds"]["aspen"]
 
         location = self.group.default_tree_location
+        # Make a shortcut to decide whether this is a location vs divsision vs country level build
+        if not location.division:
+            self.tree_build_level = "country"
+        elif not location.location:
+            self.tree_build_level = "division"
         # Fill out region/country/division/location fields if the group has them,
         # or remove those fields if they don't.
         location_fields = ["region", "country", "division", "location"]

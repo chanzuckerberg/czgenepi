@@ -7,9 +7,6 @@ from aspen.workflows.nextstrain_run.builder_base import BaseNextstrainConfigBuil
 def builder_factory(tree_type: TreeType, group, template_args, **kwargs):
     # This is basically a router -- We'll switch between which build types
     # based on a variety of input.
-
-    # TODO we probably don't want to specify a literal filename in our workflow run!
-    # This is just a bandaid for now until we fix the workflow input side of tree builds.
     mega_template = "/usr/src/app/aspen/workflows/nextstrain_run/builds_templates/mega_template.yaml"
 
     if tree_type == TreeType.TARGETED:
@@ -30,8 +27,16 @@ class OverviewBuilder(BaseNextstrainConfigBuilder):
             subsampling["group"][
                 "query"
             ] = '''--query "((location == '{location}') & (division == '{division}')) | submitting_lab == 'RIPHL at Rush University Medical Center'"'''
+
         # Update our sampling for state/country level builds if necessary
-        update_subsampling_for_location(self.group.default_tree_location, subsampling)
+        update_subsampling_for_location(self.tree_build_level, subsampling)
+
+        # Update country and international max sequences.
+        if self.tree_build_level == "country":
+            subsampling["international"]["max_sequences"] = 1000
+        if self.tree_build_level == "division":
+            subsampling["country"]["max_sequences"] = 800
+            subsampling["international"]["max_sequences"] = 200
 
 
 class NonContextualizedBuilder(BaseNextstrainConfigBuilder):
@@ -39,7 +44,15 @@ class NonContextualizedBuilder(BaseNextstrainConfigBuilder):
     crowding_penalty = 0.1
 
     def update_subsampling(self, config, subsampling):
-        pass
+        # Update our query to be division or country level.
+        if self.tree_build_level == "division":
+            subsampling["same_county"][
+                "query"
+            ] = '''--query "(division == '{division}')"'''
+        if self.tree_build_level == "country":
+            subsampling["same_county"][
+                "query"
+            ] = '''--query "(country == '{country}')"'''
 
 
 # Set max_sequences for targeted builds.
@@ -84,21 +97,30 @@ class TargetedBuilder(BaseNextstrainConfigBuilder):
 
         subsampling["closest"]["max_sequences"] = closest_max_sequences
 
-        subsampling["group"]["max_sequences"] = other_max_sequences
-        subsampling["state"]["max_sequences"] = other_max_sequences
+        subsampling["group"]["max_sequences"] = (
+            other_max_sequences * 2
+        )  # Temp mitigation for missing on-demand overview
+        subsampling["state"]["max_sequences"] = (
+            other_max_sequences * 2
+        )  # Temp mitigation for missing on-demand overview
         subsampling["country"]["max_sequences"] = other_max_sequences
         subsampling["international"]["max_sequences"] = other_max_sequences
 
         # Update our sampling for state/country level builds if necessary
-        update_subsampling_for_location(self.group.default_tree_location, subsampling)
+        update_subsampling_for_location(self.tree_build_level, subsampling)
+
+        # Increase int'l sequences for state/country builds.
+        if (
+            self.tree_build_level != "location"
+            and subsampling["international"]["max_sequences"] < 100
+        ):
+            subsampling["international"]["max_sequences"] = 100
 
 
-def update_subsampling_for_location(location, subsampling):
-    # If we don't have a division, this is a country-level build
-    if not location.division:
+def update_subsampling_for_location(tree_build_level, subsampling):
+    if tree_build_level == "country":
         update_subsampling_for_country(subsampling)
-    # If we have a division but not a location, this is a state-level build
-    elif not location.location:
+    if tree_build_level == "division":
         update_subsampling_for_division(subsampling)
 
 
@@ -106,8 +128,7 @@ def update_subsampling_for_country(subsampling):
     # State and country aren't useful
     del subsampling["state"]
     del subsampling["country"]
-    # Make our local group bigger
-    subsampling["group"]["max_sequences"] = 200
+    # Update our local group query
     subsampling["group"]["query"] = '''--query "(country == '{country}')"'''
 
 
@@ -115,6 +136,4 @@ def update_subsampling_for_division(subsampling):
     # State isn't useful
     del subsampling["state"]
     # Update our local group query
-    subsampling["group"][
-        "query"
-    ] = '''--query "(division == '{division}') & (country == '{country}')"'''
+    subsampling["group"]["query"] = '''--query "(division == '{division}')"'''
