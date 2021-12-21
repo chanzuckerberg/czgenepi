@@ -9,8 +9,8 @@ from sqlalchemy.sql.selectable import Select
 from aspen.api.auth import get_auth_user
 from aspen.api.deps import get_db
 from aspen.api.error import http_exceptions as ex
-from aspen.api.schemas.phylo_trees import Group, PhyloTreeRequest, PhyloTreeResponse
-from aspen.database.models import PhyloRun, PhyloTree, User
+from aspen.api.schemas.phylo_trees import PhyloTreeRequest, PhyloTreeResponse
+from aspen.database.models import Group, PhyloRun, PhyloTree, User
 
 router = APIRouter()
 
