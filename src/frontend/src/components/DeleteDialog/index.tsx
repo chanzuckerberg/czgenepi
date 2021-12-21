@@ -10,6 +10,7 @@ interface Props extends Omit<ConfirmDialogProps, "onConfirm"> {
 
 const DeleteDialog = ({
   onDelete,
+  open,
   title,
   ...props
 }: Props): JSX.Element | null => {
@@ -29,6 +30,7 @@ const DeleteDialog = ({
       customConfirmButton={deleteButton}
       onConfirm={onDelete}
       title={styledTitle}
+      open={open}
     />
   );
 };

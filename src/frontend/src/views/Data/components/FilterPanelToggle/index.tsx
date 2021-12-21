@@ -23,7 +23,7 @@ export const FilterPanelToggle: FC<Props> = ({
   return (
     <Tooltip
       arrow
-      inverted
+      sdsStyle="dark"
       enterDelay={1000}
       title="Filters"
       placement="bottom"

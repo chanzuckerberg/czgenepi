@@ -3,19 +3,23 @@
 import { Lock, Public } from "@material-ui/icons";
 import { ChipProps, Tooltip } from "czifui";
 import React from "react";
-import { defaultCellRenderer } from "src/common/components/library/data_table";
+import {
+  defaultSampleCellRenderer,
+  defaultTreeCellRenderer,
+} from "src/common/components/library/data_table";
 import dataTableStyle from "src/common/components/library/data_table/index.module.scss";
-import { RowContent } from "src/common/components/library/data_table/style";
-import { TREE_STATUS } from "src/common/constants/types";
+import {
+  RowContent,
+  TreeRowContent,
+} from "src/common/components/library/data_table/style";
 import SampleIcon from "src/common/icons/Sample.svg";
-import { createTableCellRenderer, stringGuard } from "src/common/utils";
-import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
+import { createTableCellRenderer } from "src/common/utils";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
-import TreeTableDownloadMenu from "src/components/TreeTableDownloadMenu";
+import { CZ_BIOHUB_GROUP } from "src/views/Data/constants";
 import { Lineage, LineageTooltip } from "./components/LineageTooltip";
+import { TreeActionMenu } from "./components/TreeActionMenu";
 import TreeTableNameCell from "./components/TreeTableNameCell";
 import { TreeTypeTooltip } from "./components/TreeTypeTooltip";
-import style from "./index.module.scss";
 import {
   CenteredFlexContainer,
   GISAIDCell,
@@ -28,8 +32,6 @@ import {
   UnderlinedCell,
   UnderlinedRowContent,
 } from "./style";
-
-const CZ_BIOHUB_GROUP = "CZI";
 
 const LABEL_STATUS: Record<
   string,
@@ -125,9 +127,7 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
                 status={label.status}
               />
             </CenteredFlexContainer>
-            {usesFeatureFlag(FEATURE_FLAGS.crudV0) && (
-              <StyledUploaderName>{displayName}</StyledUploaderName>
-            )}
+            <StyledUploaderName>{displayName}</StyledUploaderName>
           </PrivateIdValueWrapper>
         </div>
       </RowContent>
@@ -152,47 +152,46 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
 
 export const SampleRenderer = createTableCellRenderer(
   SAMPLE_CUSTOM_RENDERERS,
-  defaultCellRenderer
+  defaultSampleCellRenderer
 );
 
 const TREE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
-  downloadLink: ({ value, item }): JSX.Element => {
-    const jsonDownloadLink = stringGuard(value);
-    const tsvDownloadLink = stringGuard(item["accessionsLink"]);
-    const shouldAllowDownload = item?.status === TREE_STATUS.Completed;
+  actionMenu: ({
+    value,
+    item,
+    userInfo,
+    onDeleteTreeModalOpen,
+  }): JSX.Element => {
     return (
-      <RowContent>
-        <TreeTableDownloadMenu
-          jsonLink={jsonDownloadLink}
-          accessionsLink={tsvDownloadLink}
-          shouldAllowDownload={shouldAllowDownload}
-        />
-      </RowContent>
+      <TreeActionMenu
+        item={item}
+        value={value}
+        userInfo={userInfo}
+        onDeleteTreeModalOpen={onDeleteTreeModalOpen}
+      />
     );
   },
   name: TreeTableNameCell,
   startedDate: ({ value, header }): JSX.Element => {
     const dateNoTime = value.split(" ")[0];
     return (
-      <RowContent header={header}>
-        <div className={style.cell} data-test-id={`row-${header.key}`}>
-          {dateNoTime}
-        </div>
-      </RowContent>
+      <TreeRowContent header={header}>
+        <div data-test-id={`row-${header.key}`}>{dateNoTime}</div>
+      </TreeRowContent>
     );
   },
   treeType: ({ value, header }: CustomTableRenderProps): JSX.Element => (
     <TreeTypeTooltip value={value as string}>
-      <UnderlinedRowContent header={header}>
+      <TreeRowContent>
         <UnderlinedCell data-test-id={`row-${header.key}`}>
           {value}
         </UnderlinedCell>
-      </UnderlinedRowContent>
+      </TreeRowContent>
     </TreeTypeTooltip>
   ),
 };
 
 export const TreeRenderer = createTableCellRenderer(
   TREE_CUSTOM_RENDERERS,
-  defaultCellRenderer
+  defaultTreeCellRenderer
 );

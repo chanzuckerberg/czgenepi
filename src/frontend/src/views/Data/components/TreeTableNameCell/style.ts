@@ -1,8 +1,6 @@
 import styled from "@emotion/styled";
-import { getColors, getSpaces, Props } from "czifui";
-import { RowContent } from "src/common/components/library/data_table/style";
-import OpenInNewIcon from "src/common/icons/OpenInNew.svg";
-import { icon } from "../../../../common/components/library/data_table/style";
+import { fontBodyXxs, getColors, getSpaces, Props } from "czifui";
+import { TreeRowContent } from "src/common/components/library/data_table/style";
 
 export interface ExtraProps extends Props {
   disabled?: boolean;
@@ -10,32 +8,7 @@ export interface ExtraProps extends Props {
 
 const doNotForwardProps = ["disabled"];
 
-export const StyledOpenInNewIcon = styled(OpenInNewIcon, {
-  shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
-})`
-  ${icon}
-  flex: 0 0 auto;
-
-  ${(props) => {
-    const spaces = getSpaces(props);
-    return `
-      margin: 0 0 0 ${spaces?.l}px;
-    `;
-  }}
-
-  ${(props: ExtraProps) => {
-    const { disabled } = props;
-    const colors = getColors(props);
-
-    if (disabled) {
-      return `
-        fill: ${colors?.gray[200]};
-      `;
-    }
-  }}
-`;
-
-export const StyledRowContent = styled(RowContent, {
+export const StyledRowContent = styled(TreeRowContent, {
   shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
 })`
   flex: 2 0 40%;
@@ -43,24 +16,12 @@ export const StyledRowContent = styled(RowContent, {
 
   ${(props: ExtraProps) => {
     const { disabled } = props;
-    const colors = getColors(props);
 
     if (disabled) return;
 
     return `
+
       cursor: pointer;
-
-      :hover {
-        ${StyledOpenInNewIcon} {
-          fill: ${colors?.primary[400]};
-        }
-      }
-
-      :active {
-        ${StyledOpenInNewIcon} {
-          fill: ${colors?.primary[600]};
-        }
-      }
     `;
   }}
 `;
@@ -68,4 +29,23 @@ export const StyledRowContent = styled(RowContent, {
 export const CellWrapper = styled.div`
   display: flex;
   align-items: center;
+`;
+
+export const StyledNameWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+export const StyledTreeCreator = styled.div`
+  ${fontBodyXxs}
+
+  ${(props) => {
+    const colors = getColors(props);
+    const spaces = getSpaces(props);
+
+    return `
+      color: ${colors?.gray[500]};
+      margin-top: ${spaces?.xxxs}px;
+    `;
+  }}
 `;

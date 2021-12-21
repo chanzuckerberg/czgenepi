@@ -122,6 +122,30 @@ local-init: oauth/pkcs12/certificate.pfx .env.ecr local-ecr-login local-hostconf
 	docker-compose exec -T utility python scripts/setup_localdata.py
 	docker-compose exec -T utility pip install .
 
+.PHONY: prepare-new-db-snapshot
+prepare-new-db-snapshot:
+	docker-compose $(COMPOSE_OPTS) pull database
+	docker-compose $(COMPOSE_OPTS) up -d database
+	# Wait for psql to be up
+	while [ -z "$$(docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c 'select 1')" ]; do echo "waiting for db to start..."; sleep 1; done;
+	docker-compose exec -T utility alembic upgrade head
+	@echo
+	@echo "Ok, local db is prepared and ready to go -- make any additional changes you need to and then run:"
+	@echo "make create_new_db_image"
+
+.PHONY: create_new_db_image
+create_new_db_image:
+	docker exec aspen_database_1 psql postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME) -c VACUUM FULL
+	docker commit aspen_database_1 temp_db_image
+	export AWS_ACCOUNT_ID=$$(aws sts get-caller-identity --profile $(AWS_DEV_PROFILE) | jq -r .Account); \
+	export DOCKER_REPO=$${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com; \
+	export TAGGED_IMAGE="$${DOCKER_REPO}/genepi-devdb:build-$$(date +%F)"; \
+	echo docker build -t $${TAGGED_IMAGE} -f ./docker/Dockerfile.devdb ./docker; \
+	docker build -t $${TAGGED_IMAGE} -f ./docker/Dockerfile.devdb ./docker; \
+	docker rmi temp_db_image; \
+	echo "Tagged image is ready for testing/pushing:"; \
+	echo "  $${TAGGED_IMAGE}"
+
 .PHONY: check-images
 check-images: ## Spot-check the gisaid image
 	docker-compose $(COMPOSE_OPTS) run --no-deps --rm gisaid /usr/src/app/aspen/workflows/test-gisaid.sh
