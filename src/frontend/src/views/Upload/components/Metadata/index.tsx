@@ -1,11 +1,10 @@
 import { Button } from "czifui";
 import { distance } from "fastest-levenshtein";
 import NextLink from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { HeadAppTitle } from "src/common/components";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
-import { getLocations, LocationsResponse } from "src/common/queries/locations";
 import { ROUTES } from "src/common/routes";
 import { EMPTY_METADATA } from "src/views/Upload/components/common/constants";
 import {
@@ -31,27 +30,6 @@ import {
 } from "./components/ImportFile/parseFile";
 import Table from "./components/Table";
 
-function stringifyLocation(location: GisaidLocation): string {
-  let stringName = "";
-  const orderedKeys: Array<keyof GisaidLocation> = [
-    "region",
-    "country",
-    "division",
-    "location",
-  ];
-  orderedKeys.every((key) => {
-    if (location[key]) {
-      if (key != "region") {
-        stringName += "/";
-      }
-      stringName += `${location[key]}`;
-      return true;
-    } else {
-      return false;
-    }
-  });
-  return stringName;
-}
 
 function findLocationFromString(
   locationString: string,
@@ -83,6 +61,7 @@ function findLocationFromString(
 
 export default function Metadata({
   samples,
+  namedLocations,
   metadata,
   setMetadata,
 }: Props): JSX.Element {
@@ -91,24 +70,6 @@ export default function Metadata({
     useState<SampleIdToMetadata | null>(null);
   const [autocorrectWarnings, setAutocorrectWarnings] =
     useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
-  const [locations, setLocations] = useState<NamedGisaidLocation[]>([]);
-
-  const loadLocations = async () => {
-    const result: LocationsResponse = await getLocations();
-    const namedLocations: NamedGisaidLocation[] = result.locations.map(
-      (location) => {
-        return {
-          name: stringifyLocation(location),
-          ...location,
-        };
-      }
-    );
-    setLocations(namedLocations);
-  };
-
-  useEffect(() => {
-    loadLocations();
-  }, []);
 
   function handleMetadataFileUpload(result: ParseResult) {
     const { data: sampleIdToParsedMetadata, warningMessages } = result;
@@ -126,7 +87,7 @@ export default function Metadata({
       const locationString = parsedMetadata.locationString || "";
       let collectionLocation = undefined;
       if (locationString.length > 2) {
-        collectionLocation = findLocationFromString(locationString, locations);
+        collectionLocation = findLocationFromString(locationString, namedLocations);
       }
       uploadedMetadata[sampleId] = {
         ...EMPTY_METADATA,
@@ -184,7 +145,7 @@ export default function Metadata({
           importedFileMetadata={importedFileMetadata}
           setMetadata={setMetadata}
           autocorrectWarnings={autocorrectWarnings}
-          locations={locations}
+          locations={namedLocations}
         />
 
         <ButtonWrapper>

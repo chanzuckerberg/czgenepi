@@ -82,6 +82,7 @@ export interface ParsedMetadata extends CommonMetadata {
 export interface Props {
   samples: Samples | null;
   setSamples: React.Dispatch<React.SetStateAction<Samples | null>>;
+  namedLocations: NamedGisaidLocation[];
   metadata: SampleIdToMetadata | null;
   setMetadata: React.Dispatch<React.SetStateAction<SampleIdToMetadata | null>>;
   cancelPrompt: () => void;

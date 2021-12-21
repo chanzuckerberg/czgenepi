@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { ROUTES } from "src/common/routes";
 import { useProtectedRoute } from "../../common/queries/auth";
+import { useNamedLocations } from "../../common/queries/locations";
 import { EMPTY_METADATA } from "./components/common/constants";
 import {
   Props,
@@ -28,6 +29,14 @@ export default function Upload(): JSX.Element | null {
   const [metadata, setMetadata] = useState<SampleIdToMetadata | null>(null);
 
   const router = useRouter();
+
+  // To avoid possible race condition in Metadata upload where we need locations,
+  // we fetch locations info early in parent container, so ready by that step.
+  // FIXME (Vince): Need to put in place error handling if fetch fails.
+  // Right now the use of empty array prevents a hard crash, but user will be
+  // confused because page will seem fine but location finding just won't work.
+  const { data: namedLocationsData } = useNamedLocations();
+  const namedLocations = namedLocationsData?.namedLocations || [] as NamedGisaidLocation[];
 
   const cancelPrompt = useNavigationPrompt();
 
@@ -59,6 +68,7 @@ export default function Upload(): JSX.Element | null {
         <Component
           samples={samples}
           setSamples={setSamples}
+          namedLocations={namedLocations}
           metadata={metadata}
           setMetadata={setMetadata}
           cancelPrompt={cancelPrompt}

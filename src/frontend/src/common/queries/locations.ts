@@ -3,8 +3,7 @@ import {
   UseQueryResult,
 } from "react-query";
 
-import { API, DEFAULT_FETCH_OPTIONS, getBackendApiJson } from "../api";
-import { API_URL } from "../constants/ENV";
+import { API, getBackendApiJson } from "../api";
 import { ENTITIES } from "./entities";
 import { stringifyGisaidLocation } from "src/common/utils/locationUtils";
 
@@ -62,13 +61,4 @@ export function useNamedLocations(): UseQueryResult<NamedLocationsResponse, unkn
     // It's stable, avoid unnecessary re-fetches. More info in `useLocations`
     staleTime: ONE_HOUR,
   });
-}
-
-export async function getLocations(): Promise<LocationsResponse> {
-  const response = await fetch(API_URL + API.LOCATIONS, {
-    ...DEFAULT_FETCH_OPTIONS,
-  });
-  if (response.ok) return await response.json();
-
-  throw Error(`${response.statusText}: ${await response.text()}`);
 }
