@@ -3,6 +3,8 @@
 Create Date: 2021-12-13 14:16:58.933547
 
 """
+from functools import reduce
+
 import enumtables  # noqa: F401
 import sqlalchemy as sa
 from alembic import op
@@ -21,9 +23,15 @@ def upgrade():
 
     sample_columns = [column.key for column in Sample.__table__.columns]
     deprecated_columns = ["region", "country", "division", "location"]
-    for column in deprecated_columns:
-        if column not in sample_columns:
-            return
+    columns_present = reduce(
+        lambda count, column: count + 1 if column in sample_columns else count,
+        deprecated_columns,
+        0,
+    )
+    if not columns_present:
+        return
+    elif columns_present < len(deprecated_columns):
+        raise AssertionError("Unsupported database state.")
 
     set_full_locations_stmt = sa.sql.text(
         "UPDATE aspen.samples as s SET location_id = (SELECT id FROM aspen.locations as l WHERE l.region = s.region AND l.country = s.country AND l.division = s.division and l.location = s.location)"
