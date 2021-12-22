@@ -21,9 +21,7 @@ depends_on = None
 def upgrade():
     conn = op.get_bind()
 
-    samples_table = sa.schema.Table(
-        "samples", meta, autoload_with=op.migration_context.connection
-    )
+    samples_table = sa.schema.Table("samples", meta, autoload_with=conn)
     sample_columns = [column.key for column in samples_table.columns]
     deprecated_columns = ["region", "country", "division", "location"]
     columns_present = reduce(
