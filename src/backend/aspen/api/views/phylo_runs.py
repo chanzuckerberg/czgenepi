@@ -289,9 +289,9 @@ async def update_phylo_tree_and_run(
 
         # if there are any associated PhyloTrees update those names as well:
         if phylo_run.outputs:
-            # there should only be one phylotree associated with the phylorun
-            phylo_tree = phylo_run.outputs[0]
-            phylo_tree.name = phylo_run_update_request.name
+            for output in phylo_run.outputs:
+                if isinstance(output, PhyloTree):
+                    output.name = phylo_run_update_request.name
 
         await session.commit()
 
