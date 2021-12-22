@@ -55,9 +55,7 @@ class SampleGetterDict(GetterDict):
         ),
         "lineage": format_sample_lineage,
         "private_identifier": lambda obj: (
-            obj.private_identifier
-            if obj.show_private_identifier
-            else None
+            obj.private_identifier if obj.show_private_identifier else None
         ),
         "collection_location": lambda obj: (
             obj.location

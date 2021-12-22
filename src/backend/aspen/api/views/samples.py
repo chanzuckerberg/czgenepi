@@ -1,8 +1,11 @@
 import datetime
-from typing import Any, Dict, List, Mapping, MutableSequence, NamedTuple, Optional, Set
+import json
+from typing import Dict, List, NamedTuple, Optional, Set
 
+import orjson
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends
+from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncResult, AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlalchemy.orm.exc import NoResultFound
@@ -132,27 +135,37 @@ async def list_samples(
             gisaid_accession,
         )
 
-    # populate sample object using pydantic response schema
-    results: MutableSequence[Mapping[str, Any]] = list()
-    for sample_gisaid_tuple in sample_gisaid_tuple_map.values():
-        sample = sample_gisaid_tuple.sample
-        sample.gisaid = determine_gisaid_status(
-            sample,
-            sample_gisaid_tuple.gisaid_accession_workflow,
-            sample_gisaid_tuple.gisaid_accession,
-            GISAID_REJECTION_TIME,
-        )
-        sample.show_private_identifier = False
-        if (
-            sample.submitting_group_id == user.group_id
-            or sample.submitting_group_id in cansee_groups_private_identifiers
-            or user.system_admin
-        ):
-            sample.show_private_identifier = True
+    # return each sample row
+    def generate_row():
+        for sample_gisaid_tuple in sample_gisaid_tuple_map.values():
+            sample = sample_gisaid_tuple.sample
+            sample.gisaid = determine_gisaid_status(
+                sample,
+                sample_gisaid_tuple.gisaid_accession_workflow,
+                sample_gisaid_tuple.gisaid_accession,
+                GISAID_REJECTION_TIME,
+            )
+            sample.show_private_identifier = False
+            if (
+                sample.submitting_group_id == user.group_id
+                or sample.submitting_group_id in cansee_groups_private_identifiers
+                or user.system_admin
+            ):
+                sample.show_private_identifier = True
 
-        returned_sample_data = SampleResponseSchema.from_orm(sample)
-        results.append(returned_sample_data)
-    return SamplesResponseSchema.parse_obj({"samples": results})
+            yield SampleResponseSchema.from_orm(sample)
+
+    def _stream_json(list_key, item_generator):
+        first = True
+        yield "{" + json.dumps(list_key) + ":["
+        for item in item_generator():
+            if not first:
+                yield ","
+            first = False
+            yield orjson.dumps(item.dict())
+        yield "]}"
+
+    return StreamingResponse(_stream_json("samples", generate_row))
 
 
 async def get_owned_samples_by_ids(
