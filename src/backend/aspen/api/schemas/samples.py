@@ -106,12 +106,11 @@ class SampleDeleteResponse(BaseResponse):
 
 class UpdateSamplesBaseRequest(BaseRequest):
     id: int
-    collection_date: datetime.date
-    collection_location: str
-    gisaid: SampleGisaidResponseSchema
-    private: bool
+    collection_date: Optional[datetime.date]
+    collection_location: Optional[str]
+    private: Optional[bool]
     private_identifier: Optional[str]
-    public_identifier: str
+    public_identifier: Optional[str]
     sequencing_date: Optional[datetime.date]
 
 

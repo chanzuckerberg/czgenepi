@@ -933,3 +933,62 @@ async def test_delete_sample_failures(
         headers=auth_headers,
     )
     assert res.status_code == 200
+
+
+async def test_update_samples_success(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+):
+    """
+    Test successful sample deletion by ID
+    """
+    group = group_factory()
+    user = user_factory(group)
+    samples = [
+        sample_factory(
+            group,
+            user,
+            public_identifier="path/to/sample_id1",
+            private_identifier="i_dont_have_spaces1",
+        ),
+        sample_factory(
+            group,
+            user,
+            public_identifier="path/to/sample id2",
+            private_identifier="i have spaces2",
+        ),
+        sample_factory(
+            group,
+            user,
+            public_identifier="path/to/sample_id3",
+            private_identifier="i have spaces3",
+        ),
+    ]
+    for sample in samples:
+        upg = uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
+        async_session.add(upg)
+    async_session.add(group)
+    await async_session.commit()
+
+
+    auth_headers = {"user_id": user.auth0_user_id}
+    data = {"samples": [
+        {
+            "id": samples[0].id,
+            "private_identifier": "new_private_identifier",
+        },
+        {
+            "id": samples[1].id,
+            "public_identifier": "new_public_identifier"
+        }
+    ]
+    }
+    res = await http_client.put(
+        f"/v2/samples/",
+        data=data,
+        headers=auth_headers,
+    )
+    #assert res.status_code == 200
+    response = res.json()
+    print("stop ")
+

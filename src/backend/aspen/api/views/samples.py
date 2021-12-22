@@ -225,7 +225,8 @@ async def update_samples(
 
     # Make sure these samples exist and are delete-able by the current user.
     sample_db_res = await get_owned_samples_by_ids(db, [sample_id], user)
-
+    print("stop")
+    print("stop")
     # return error message if any samples sumitted for update are not editable by user
 
     # update fields
