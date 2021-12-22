@@ -44,15 +44,8 @@ class NonContextualizedBuilder(BaseNextstrainConfigBuilder):
     crowding_penalty = 0.1
 
     def update_subsampling(self, config, subsampling):
-        # Update our query to be division or country level.
-        if self.tree_build_level == "division":
-            subsampling["same_county"][
-                "query"
-            ] = '''--query "(division == '{division}')"'''
-        if self.tree_build_level == "country":
-            subsampling["same_county"][
-                "query"
-            ] = '''--query "(country == '{country}')"'''
+        # Update our sampling for state/country level builds if necessary
+        update_subsampling_for_location(self.tree_build_level, subsampling)
 
 
 # Set max_sequences for targeted builds.
@@ -126,14 +119,14 @@ def update_subsampling_for_location(tree_build_level, subsampling):
 
 def update_subsampling_for_country(subsampling):
     # State and country aren't useful
-    del subsampling["state"]
-    del subsampling["country"]
+    if subsampling["state"] exist, then del subsampling["state"]        # fake code. I cannot python...
+    if subsampling["country"] exist, then del subsampling["country"]    # fake code
     # Update our local group query
     subsampling["group"]["query"] = '''--query "(country == '{country}')"'''
 
 
 def update_subsampling_for_division(subsampling):
     # State isn't useful
-    del subsampling["state"]
+    if subsampling["state"] exist, del subsampling["state"]             # fake code
     # Update our local group query
-    subsampling["group"]["query"] = '''--query "(division == '{division}')"'''
+    subsampling["group"]["query"] = '''--query "(division == '{division}') & (country == '{country}')"'''    # added country in case of multiple Californias worldwide
