@@ -33,14 +33,13 @@ def create_test_data(
         email=f"{group_name}{tree_type.value}@dh.org",
         auth0_user_id=group_name,
     )
-    location_division = group.division if group.division != "" else "California"
     location: Optional[Location] = (
         session.query(Location)
         .filter(
             and_(
                 Location.region == "North America",
                 Location.country == "USA",
-                Location.division == location_division,
+                Location.division == group.division,
                 Location.location == group.location,
             )
         )
