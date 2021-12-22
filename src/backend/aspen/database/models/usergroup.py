@@ -7,6 +7,7 @@ from sqlalchemy import Boolean, Column, Date, ForeignKey, Integer, String
 from sqlalchemy.orm import backref, relationship
 
 from aspen.database.models.base import idbase
+from aspen.database.models.locations import Location
 from aspen.database.models.mixins import DictMixin
 
 if TYPE_CHECKING:
@@ -28,6 +29,14 @@ class Group(idbase, DictMixin):  # type: ignore
     )
     division = Column(String, nullable=True)
     location = Column(String, nullable=True)
+
+    # Default location context (int'l or division or location level)
+    default_tree_location_id = Column(
+        Integer,
+        ForeignKey(Location.id),
+        nullable=True,
+    )
+    default_tree_location = relationship("Location")  # type: ignore
 
     can_see: MutableSequence[CanSee]
     can_be_seen_by: MutableSequence[CanSee]

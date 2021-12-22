@@ -44,7 +44,6 @@ class PhyloRunResponseSchema(Schema):
     end_datetime = fields.DateTime()
     workflow_status = fields.Pluck(WorkflowStatusSchema, "name")
     group = fields.Nested(GroupResponseSchema, only=("id", "name"))
-    template_file_path = fields.String()
     template_args = fields.Nested(GroupResponseSchema, only=("division", "location"))
 
 

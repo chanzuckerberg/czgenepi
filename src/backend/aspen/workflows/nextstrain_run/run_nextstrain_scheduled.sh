@@ -6,7 +6,6 @@
 # REMOTE_DEV_PREFIX (if set)
 # S3_FILESTEM
 # GROUP_NAME
-# TEMPLATE_ARGS_FILE
 # TREE_TYPE
 
 set -Eeuxo pipefail

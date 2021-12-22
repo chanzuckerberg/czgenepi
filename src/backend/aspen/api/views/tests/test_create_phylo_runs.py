@@ -37,10 +37,7 @@ async def test_create_phylo_run(
     res = await http_client.post("/v2/phylo_runs/", json=data, headers=auth_headers)
     assert res.status_code == 200
     response = res.json()
-    template_args = response["template_args"]
-    assert template_args["division"] == group.division
-    assert template_args["location"] == group.location
-    assert "targeted.yaml" in response["template_file_path"]
+    assert response["template_args"] == {}
     assert response["workflow_status"] == "STARTED"
     assert response["group"]["name"] == group.name
     assert response["user"]["name"] == user.name
@@ -102,10 +99,7 @@ async def test_create_phylo_run_with_gisaid_ids(
     res = await http_client.post("/v2/phylo_runs/", json=data, headers=auth_headers)
     assert res.status_code == 200
     response = res.json()
-    template_args = response["template_args"]
-    assert template_args["division"] == group.division
-    assert template_args["location"] == group.location
-    assert "non_contextualized.yaml" in response["template_file_path"]
+    assert response["template_args"] == {}
     assert response["workflow_status"] == "STARTED"
     assert response["group"]["name"] == group.name
     assert "id" in response

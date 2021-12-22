@@ -17,6 +17,7 @@ class BaseNextstrainConfigBuilder:
         self.group = group
         self.template_args = template_args
         self.template = None
+        self.tree_build_level = "location"
         # Set self.num_county_sequences, self.num_sequences, etc.
         for k, v in kwargs.items():
             setattr(self, k, v)
@@ -29,28 +30,36 @@ class BaseNextstrainConfigBuilder:
 
     def update_build(self, config):
         build = config["builds"]["aspen"]
-        # TODO - We'll add region/country info to groups soon, but it's not there yet.
-        # region = self.group.region
-        # country = self.group.country
-        # build["region"] = region
-        # build["title"] = build["title"].format(division=division, location=location, country=country, region=region)
-        country = "USA"
-        division = self.group.division
-        location = self.group.location
-        build["country"] = country
-        build["division"] = division
-        build["location"] = location
+
+        location = self.group.default_tree_location
+        # Make a shortcut to decide whether this is a location vs division vs country level build
+        if not location.division:
+            self.tree_build_level = "country"
+        elif not location.location:
+            self.tree_build_level = "division"
+        # Fill out region/country/division/location fields if the group has them,
+        # or remove those fields if they don't.
+        location_fields = ["region", "country", "division", "location"]
+        location_values = []
+        for field in location_fields:
+            value = getattr(location, field)
+            if value:
+                build[field] = value
+                location_values.append(value)
+            else:
+                del build[field]
 
         # NOTE: <BuilderClass>.subsampling_scheme is used in 3 places:
         #   - Its lowercase'd name is used to find a markdown file with an "about this tree" description
         #   - It refers to a subsampling_scheme key in the mega nextstrain template
         #   - It's title-case'd and included in the tree title as human-readable text
         build["subsampling_scheme"] = self.subsampling_scheme
-        build["title"] = build["title"].format(
+
+        # Update the tree's title with build type & location.
+        title_template = "{tree_type} tree for samples collected in {location}"
+        build["title"] = title_template.format(
             tree_type=self.subsampling_scheme.title(),
-            division=division,
-            location=location,
-            country=country,
+            location=", ".join(location_values),
         )
         config["files"]["description"] = config["files"]["description"].format(
             tree_type=self.subsampling_scheme.lower()
@@ -65,7 +74,7 @@ class BaseNextstrainConfigBuilder:
         self.update_build(config)
         self.update_subsampling(config, config["subsampling"][self.subsampling_scheme])
 
-        # Remote unused subsampling schemes from our output file
+        # Remove unused subsampling schemes from our output file
         subsampling = config["subsampling"][self.subsampling_scheme]
         config["subsampling"] = {self.subsampling_scheme: subsampling}
 

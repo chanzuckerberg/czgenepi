@@ -18,12 +18,16 @@ def create_test_data(
     num_selected_samples,  # How many of those samples are workflow inputs
     num_gisaid_samples,  # How many gisaid samples to add to a workflow
     group_name=None,  # Override group name
+    location=None,  # Override group location
+    division=None,  # Override group division
 ):
-    if not group_name:
+    if group_name is None:
         group_name = f"testgroup-{tree_type.value}"
-    group: Group = group_factory(name=group_name)
+    group: Group = group_factory(name=group_name, division=division, location=location)
     uploaded_by_user: User = user_factory(
-        group, email=f"{tree_type.value}@dh.org", auth0_user_id=tree_type.value
+        group,
+        email=f"{group_name}{tree_type.value}@dh.org",
+        auth0_user_id=group_name,
     )
     session.add(group)
 
@@ -37,7 +41,8 @@ def create_test_data(
 
     selected_samples = pathogen_genomes[:num_selected_samples]
     gisaid_dump = aligned_gisaid_dump_factory(
-        sequences_s3_key=tree_type.value, metadata_s3_key=tree_type.value
+        sequences_s3_key=f"{group_name}{tree_type.value}",
+        metadata_s3_key=f"{group_name}{tree_type.value}",
     ).outputs[0]
 
     inputs = selected_samples + [gisaid_dump]
@@ -78,10 +83,10 @@ def test_build_config(mocker, session, postgres_database):
         build = nextstrain_config["builds"]["aspen"]
         assert build["subsampling_scheme"] == tree_type.value
         assert build["title"].startswith(tree_type.value.title())
-        assert phylo_run.group.location in build["title"]
-        assert phylo_run.group.division in build["title"]
-        assert build["division"] == phylo_run.group.division
-        assert build["location"] == phylo_run.group.location
+        assert phylo_run.group.default_tree_location.location in build["title"]
+        assert phylo_run.group.default_tree_location.division in build["title"]
+        assert build["division"] == phylo_run.group.default_tree_location.division
+        assert build["location"] == phylo_run.group.default_tree_location.location
         assert tree_type.value.lower() in nextstrain_config["files"]["description"]
         assert nextstrain_config["files"]["description"].endswith(".md")
         assert len(sequences.splitlines()) == 20  # 10 county samples @2 lines each
@@ -96,7 +101,6 @@ def test_overview_config(mocker, session, postgres_database):
     phylo_run = create_test_data(session, tree_type, 10, 0, 0)
     sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
 
-    phylo_run.group
     subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
 
     # Just some placeholder sanity-checks
@@ -120,7 +124,6 @@ def test_overview_config_chicago(mocker, session, postgres_database):
     )
     sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
 
-    phylo_run.group
     subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
 
     # Make sure our query got updated properly
@@ -145,10 +148,54 @@ def test_non_contextualized_config(mocker, session, postgres_database):
     subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
 
     # Just some placeholder sanity-checks
-    assert subsampling_scheme["same_county"]["max_sequences"] == 2000
+    assert subsampling_scheme["group"]["max_sequences"] == 2000
     assert len(selected.splitlines()) == 10  # 5 gisaid samples + 5 selected samples
     assert len(metadata.splitlines()) == 11  # 10 samples + 1 header line
     assert len(sequences.splitlines()) == 20  # 10 county samples, @2 lines each
+
+
+# Make sure that regionalized configs specific to a Non-Contextualized tree are working.
+def test_non_contextualized_regions(mocker, session, postgres_database):
+    mock_remote_db_uri(mocker, postgres_database.as_uri())
+
+    tree_type = TreeType.NON_CONTEXTUALIZED
+    state_phylo_run = create_test_data(
+        session, tree_type, 10, 5, 5, group_name="Group Without Location", location=""
+    )
+    country_phylo_run = create_test_data(
+        session,
+        tree_type,
+        10,
+        5,
+        5,
+        group_name="Group Without division",
+        location="",
+        division="",
+    )
+    for run_type, run in {
+        "state": state_phylo_run,
+        "country": country_phylo_run,
+    }.items():
+        sequences, selected, metadata, nextstrain_config = generate_run(run.id)
+
+        subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
+
+        if run_type == "state":
+            assert (
+                subsampling_scheme["group"]["query"]
+                == '''--query "(division == '{division}') & (country == '{country}')"'''
+            )
+        else:
+            assert (
+                subsampling_scheme["group"]["query"]
+                == '''--query "(country == '{country}')"'''
+            )
+
+        # Just some placeholder sanity-checks
+        assert subsampling_scheme["group"]["max_sequences"] == 2000
+        assert len(selected.splitlines()) == 10  # 5 gisaid samples + 5 selected samples
+        assert len(metadata.splitlines()) == 11  # 10 samples + 1 header line
+        assert len(sequences.splitlines()) == 20  # 10 county samples, @2 lines each
 
 
 # Make sure that configs specific to a Targeted build are working.
@@ -163,13 +210,62 @@ def test_targeted_config_simple(mocker, session, postgres_database):
 
     # Just some placeholder sanity-checks
     assert subsampling_scheme["closest"]["max_sequences"] == 100
-    assert subsampling_scheme["group"]["max_sequences"] == 25
-    assert subsampling_scheme["state"]["max_sequences"] == 25
+    assert subsampling_scheme["group"]["max_sequences"] == 50
+    assert subsampling_scheme["state"]["max_sequences"] == 50
     assert subsampling_scheme["country"]["max_sequences"] == 25
     assert subsampling_scheme["international"]["max_sequences"] == 25
     assert len(selected.splitlines()) == 10  # 5 gisaid samples + 5 selected samples
     assert len(metadata.splitlines()) == 11  # 10 samples + 1 header line
     assert len(sequences.splitlines()) == 20  # 10 county samples, @2 lines each
+
+
+# Make sure that configs specific to a Targeted build are working.
+def test_targeted_config_regions(mocker, session, postgres_database):
+    mock_remote_db_uri(mocker, postgres_database.as_uri())
+
+    tree_type = TreeType.TARGETED
+    state_phylo_run = create_test_data(
+        session, tree_type, 10, 5, 5, group_name="Group Without Location", location=""
+    )
+    country_phylo_run = create_test_data(
+        session,
+        tree_type,
+        10,
+        5,
+        5,
+        group_name="Group Without division",
+        location="",
+        division="",
+    )
+    for run_type, run in {
+        "state": state_phylo_run,
+        "country": country_phylo_run,
+    }.items():
+        sequences, selected, metadata, nextstrain_config = generate_run(run.id)
+
+        subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
+
+        if run_type == "state":
+            assert "state" not in subsampling_scheme.keys()
+            assert (
+                subsampling_scheme["group"]["query"]
+                == '''--query "(division == '{division}') & (country == '{country}')"'''
+            )
+        else:
+            assert "state" not in subsampling_scheme.keys()
+            assert "country" not in subsampling_scheme.keys()
+            assert (
+                subsampling_scheme["group"]["query"]
+                == '''--query "(country == '{country}')"'''
+            )
+
+        # Just some placeholder sanity-checks
+        assert subsampling_scheme["closest"]["max_sequences"] == 100
+        assert subsampling_scheme["group"]["max_sequences"] == 50
+        assert subsampling_scheme["international"]["max_sequences"] == 100
+        assert len(selected.splitlines()) == 10  # 5 gisaid samples + 5 selected samples
+        assert len(metadata.splitlines()) == 11  # 10 samples + 1 header line
+        assert len(sequences.splitlines()) == 20  # 10 county samples, @2 lines each
 
 
 # Make sure that configs specific to a Targeted build are working.
@@ -180,13 +276,12 @@ def test_targeted_config_large(mocker, session, postgres_database):
     phylo_run = create_test_data(session, tree_type, 200, 110, 10)
     sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
 
-    phylo_run.group
     subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
 
     # Just some placeholder sanity-checks
     assert subsampling_scheme["closest"]["max_sequences"] == 120
-    assert subsampling_scheme["group"]["max_sequences"] == 30
-    assert subsampling_scheme["state"]["max_sequences"] == 30
+    assert subsampling_scheme["group"]["max_sequences"] == 60
+    assert subsampling_scheme["state"]["max_sequences"] == 60
     assert subsampling_scheme["country"]["max_sequences"] == 30
     assert subsampling_scheme["international"]["max_sequences"] == 30
     assert len(selected.splitlines()) == 120  # 10 gisaid samples + 110 selected samples
@@ -207,4 +302,52 @@ def generate_run(phylo_run_id):
         selected_fh.getvalue(),
         metadata_fh.getvalue(),
         yaml.load(builds_file_fh.getvalue(), Loader=yaml.FullLoader),
+    )
+
+
+# Make sure that state-level builds are working
+def test_overview_config_division(mocker, session, postgres_database):
+    mock_remote_db_uri(mocker, postgres_database.as_uri())
+
+    tree_type = TreeType.OVERVIEW
+    phylo_run = create_test_data(
+        session, tree_type, 10, 0, 0, group_name="Group Without Location", location=""
+    )
+    sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
+    subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
+
+    # Make sure our query got updated properly
+    assert subsampling_scheme["country"]["max_sequences"] == 800
+    assert subsampling_scheme["international"]["max_sequences"] == 200
+    assert "state" not in subsampling_scheme.keys()
+    assert (
+        subsampling_scheme["group"]["query"]
+        == '''--query "(division == '{division}') & (country == '{country}')"'''
+    )
+
+
+# Make sure that country-level builds are working.
+def test_overview_config_country(mocker, session, postgres_database):
+    mock_remote_db_uri(mocker, postgres_database.as_uri())
+
+    tree_type = TreeType.OVERVIEW
+    phylo_run = create_test_data(
+        session,
+        tree_type,
+        10,
+        0,
+        0,
+        group_name="Group Without Location or Country",
+        location="",
+        division="",
+    )
+    sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
+    subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
+
+    # Make sure our query got updated properly
+    assert "state" not in subsampling_scheme.keys()
+    assert "country" not in subsampling_scheme.keys()
+    assert subsampling_scheme["international"]["max_sequences"] == 1000
+    assert (
+        subsampling_scheme["group"]["query"] == '''--query "(country == '{country}')"'''
     )
