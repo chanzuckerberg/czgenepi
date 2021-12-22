@@ -2,11 +2,13 @@ import styled from "@emotion/styled";
 import { Dialog, FormControlLabel, Radio, TextField } from "@material-ui/core";
 import InfoOutlinedIcon from "@material-ui/icons/InfoOutlined";
 import {
+  Button,
   fontBodyS,
   fontBodyXxs,
   fontBodyXxxs,
   fontHeaderXs,
   getColors,
+  getFontWeights,
   getSpaces,
   Props,
   Tooltip,
@@ -234,6 +236,24 @@ export const StyledFooter = styled.div`
       margin-bottom: ${spaces?.xxl}px;
       margin-left: ${spaces?.xxl}px;
       margin-top: ${spaces?.xl}px;
+    `;
+  }}
+`;
+
+export const StyledButton = styled(Button)`
+  ${fontBodyXxs}
+  color: black;
+  &:hover {
+    background-color: transparent;
+  }
+  ${(props) => {
+    const spaces = getSpaces(props);
+    const fontWeights = getFontWeights(props);
+    return `
+      font-weight: ${fontWeights?.semibold};
+      margin-top: ${spaces?.xs}px;
+      margin-left: 0px;
+      padding-left: 0px;
     `;
   }}
 `;

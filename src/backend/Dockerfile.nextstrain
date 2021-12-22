@@ -39,9 +39,11 @@ RUN mkdir /ncov && \
     git remote add origin https://github.com/nextstrain/ncov.git && \
     git fetch origin master && \
     git reset --hard FETCH_HEAD
+RUN mkdir -p /ncov/auspice
+RUN mkdir -p /ncov/logs
 
 ADD aspen/workflows/nextstrain_run/patches/crowding_penalty.patch /tmp/
-RUN patch /ncov/workflow/snakemake_rules/main_workflow.smk < /tmp/crowding_penalty.patch
+RUN (grep 'config\["priorities"\]\["crowding_penalty"\]' /ncov/workflow/snakemake_rules/main_workflow.smk || patch /ncov/workflow/snakemake_rules/main_workflow.smk < /tmp/crowding_penalty.patch)
 
 WORKDIR /usr/src/app
 

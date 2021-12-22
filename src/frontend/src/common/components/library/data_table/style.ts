@@ -43,6 +43,22 @@ export const RowContent = styled("div", {
   }}
 `;
 
+export const TreeRowContent = styled.div`
+  ${fontHeaderXs}
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 150px;
+
+  ${(props: ExtraProps) => {
+    const spaces = getSpaces(props);
+
+    return `
+      margin: 0 ${spaces?.m}px;
+    `;
+  }}
+`;
+
 export const icon = (props: Props): string => {
   const colors = getColors(props);
   const spaces = getSpaces(props);

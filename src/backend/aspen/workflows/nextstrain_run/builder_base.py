@@ -55,7 +55,7 @@ class BaseNextstrainConfigBuilder:
         config["files"]["description"] = config["files"]["description"].format(
             tree_type=self.subsampling_scheme.lower()
         )
-        config["crowding"]["crowding_penalty"] = self.crowding_penalty
+        config["priorities"]["crowding_penalty"] = self.crowding_penalty
 
     def update_subsampling(self, config):
         raise NotImplementedError()

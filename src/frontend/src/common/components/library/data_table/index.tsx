@@ -9,11 +9,13 @@ import React, {
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import { noop } from "src/common/constants/empty";
+import { VIEWNAME } from "src/common/constants/types";
+import { useUserInfo } from "src/common/queries/auth";
 import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import { EmptyState } from "../data_subview/components/EmptyState";
 import { HeaderRow } from "./components/HeaderRow";
 import style from "./index.module.scss";
-import { RowCheckbox, RowContent, TableRow } from "./style";
+import { RowCheckbox, RowContent, TableRow, TreeRowContent } from "./style";
 
 interface Props {
   data?: TableItem[];
@@ -24,18 +26,19 @@ interface Props {
   setCheckedSampleIds(samples: string[]): void;
   failedSampleIds: string[];
   setFailedSampleIds(samples: string[]): void;
-  showCheckboxes: boolean;
+  viewName: VIEWNAME;
   renderer?: CustomRenderer;
+  handleDeleteTreeModalOpen(t: Tree): void;
 }
 
 // (thuang): If item height changes, we need to update this value!
-const ITEM_HEIGHT_PX = 60;
+const ITEM_HEIGHT_PX = 68;
 
 const LOADING_STATE_ROW_COUNT = 10;
 
 export const UNDEFINED_TEXT = "-";
 
-export function defaultCellRenderer({
+export function defaultSampleCellRenderer({
   value,
   header,
 }: CustomTableRenderProps): JSX.Element {
@@ -47,6 +50,21 @@ export function defaultCellRenderer({
         {displayData}
       </div>
     </RowContent>
+  );
+}
+
+export function defaultTreeCellRenderer({
+  value,
+  header,
+}: CustomTableRenderProps): JSX.Element {
+  const displayData = value || UNDEFINED_TEXT;
+
+  return (
+    <TreeRowContent>
+      <div className={style.cell} data-test-id={`row-${header.key}`}>
+        {displayData}
+      </div>
+    </TreeRowContent>
   );
 }
 
@@ -131,13 +149,14 @@ export const DataTable: FunctionComponent<Props> = ({
   data,
   headers,
   defaultSortKey,
-  renderer = defaultCellRenderer,
+  renderer = defaultSampleCellRenderer,
   isLoading,
   checkedSampleIds,
   setCheckedSampleIds,
   failedSampleIds,
   setFailedSampleIds,
-  showCheckboxes,
+  viewName,
+  handleDeleteTreeModalOpen,
 }: Props) => {
   const [isHeaderChecked, setIsHeaderChecked] = useState<boolean>(false);
   const [isHeaderIndeterminant, setHeaderIndeterminant] =
@@ -220,6 +239,9 @@ export const DataTable: FunctionComponent<Props> = ({
   const indexingKey = headers[0].key;
 
   const handleSortClick = (newSortKey: string[]) => {
+    // this column is not set up for sorting.
+    if (newSortKey.length < 1) return;
+
     let ascending = false;
     if (isEqual(newSortKey, state.sortKey)) {
       ascending = !state.ascending;
@@ -230,14 +252,27 @@ export const DataTable: FunctionComponent<Props> = ({
     });
   };
 
+  const { data: userInfo } = useUserInfo();
+
   // render functions
   const sampleRow = (item: TableItem): React.ReactNode => {
     return headers.map((header, index) => {
       const value = item[header.key];
+      // TODO-TR this can be removed when delete tree modal is moved
+      const onDeleteTreeModalOpen = isSampleTable
+        ? noop
+        : handleDeleteTreeModalOpen;
 
       return (
         <Fragment key={`${item[indexingKey]}-${header.key}`}>
-          {renderer({ header, index, item, value })}
+          {renderer({
+            header,
+            index,
+            item,
+            onDeleteTreeModalOpen,
+            userInfo,
+            value,
+          })}
         </Fragment>
       );
     });
@@ -262,16 +297,21 @@ export const DataTable: FunctionComponent<Props> = ({
     );
   };
 
+  const isSampleTable = viewName === VIEWNAME.SAMPLES;
+
   const render = (tableData: TableItem[]) => {
     if (usesFeatureFlag(FEATURE_FLAGS.mayasFlag)) {
       return <div>FEATURE FLAG IN USE...</div>;
     }
 
+    // TODO (mlila): this is the source of constant rerendering in the table. Because the rows are
+    // TODO          rendered with a function instead of a react component, it generates a new node
+    // TODO          every time the parent rerenders, instead of only updating, eg, when props change
     function renderRow(props: ListChildComponentProps) {
       const item = tableData[props.index];
       return (
         <TableRow style={props.style} data-test-id="table-row">
-          {showCheckboxes && rowCheckbox(item)}
+          {isSampleTable && rowCheckbox(item)}
           {item ? (
             sampleRow(item)
           ) : (
@@ -290,7 +330,7 @@ export const DataTable: FunctionComponent<Props> = ({
           isHeaderChecked={isHeaderChecked}
           isHeaderIndeterminant={isHeaderIndeterminant}
           isSortedAscending={state.ascending}
-          shouldShowCheckboxes={showCheckboxes}
+          isSampleTable={isSampleTable}
           sortColKey={state.sortKey}
         />
         <div className={style.tableContent}>

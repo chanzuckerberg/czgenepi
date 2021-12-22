@@ -9,6 +9,7 @@ export const StyledNotificationContainer = styled.div`
     return `
       right: ${spaces?.l}px;
       top: ${spaces?.l}px;
+      z-index: 1300;
     `;
   }}
 `;

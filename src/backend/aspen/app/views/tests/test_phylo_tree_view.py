@@ -90,7 +90,7 @@ def make_all_test_data(
 def check_results(client, user: User, trees: Collection[PhyloTree]):
     with client.session_transaction() as sess:
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
-    results: Mapping[str, List[Mapping[str, Union[str, int]]]] = json.loads(
+    results: Mapping[str, List[Mapping[str, Union[str, int, Mapping]]]] = json.loads(
         client.get("/api/phylo_trees").get_data(as_text=True)
     )
 
@@ -103,6 +103,11 @@ def check_results(client, user: User, trees: Collection[PhyloTree]):
             raise ValueError(f"Could not find {tree} in results")
 
         assert result_tree["pathogen_genome_count"] == 0
+        assert isinstance(result_tree["group"], dict)
+        group: Mapping[str, Union[str, int]] = result_tree["group"]
+        assert "id" in group and "name" in group
+        assert type(group["id"]) == int
+        assert type(group["name"]) == str
 
 
 def test_phylo_tree_view(

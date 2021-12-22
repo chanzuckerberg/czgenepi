@@ -1,5 +1,4 @@
 import { compact, escapeRegExp, filter } from "lodash";
-import NextLink from "next/link";
 import React, {
   FunctionComponent,
   useEffect,
@@ -9,11 +8,9 @@ import React, {
 import { Input } from "semantic-ui-react";
 import { DataTable } from "src/common/components";
 import { VIEWNAME } from "src/common/constants/types";
-import { ROUTES } from "src/common/routes";
-import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
-import Notification from "src/components/Notification";
 import { CreateNSTreeModal } from "./components/CreateNSTreeModal";
 import { DeleteSamplesConfirmationModal } from "./components/DeleteSamplesConfirmationModal";
+import { DeleteTreeConfirmationModal } from "./components/DeleteTreeConfirmationModal";
 import DownloadModal from "./components/DownloadModal";
 import { IconButton } from "./components/IconButton";
 import { MoreActionsMenu } from "./components/MoreActionMenu";
@@ -22,16 +19,13 @@ import { TreeSelectionMenu } from "./components/TreeSelectionMenu";
 import { UsherTreeFlow } from "./components/UsherTreeFlow";
 import style from "./index.module.scss";
 import {
-  BoldText,
   Divider,
   DownloadWrapper,
-  StyledButton,
   StyledChip,
   StyledDiv,
   StyledDownloadDisabledImage,
   StyledDownloadImage,
   StyledFlexChildDiv,
-  StyledNewTabLink,
   TooltipDescriptionText,
   TooltipHeaderText,
 } from "./style";
@@ -139,19 +133,20 @@ const DataSubview: FunctionComponent<Props> = ({
   });
 
   const [checkedSampleIds, setCheckedSampleIds] = useState<string[]>([]);
-  const [showCheckboxes, setShowCheckboxes] = useState<boolean>(false);
   const [isDownloadModalOpen, setDownloadModalOpen] = useState(false);
   const [failedSampleIds, setFailedSampleIds] = useState<string[]>([]);
-  const [downloadFailed, setDownloadFailed] = useState<boolean>(false);
   const [isNSCreateTreeModalOpen, setIsNSCreateTreeModalOpen] =
     useState<boolean>(false);
-  const [hasCreateTreeStarted, setCreateTreeStarted] = useState<boolean>(false);
-  const [didCreateTreeFailed, setCreateTreeFailed] = useState<boolean>(false);
   const [shouldStartUsherFlow, setShouldStartUsherFlow] =
     useState<boolean>(false);
-  const [isDeleteConfirmationOpen, setDeleteConfirmationOpen] =
+  const [isDeleteSampleConfirmationOpen, setDeleteSampleConfirmationOpen] =
     useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  // TODO (mlila): when table is refactored, this modal and related state should be moved closer
+  // TODO-TR          to the actions that cause the modal to open (search for TODO-TR)
+  const [isDeleteTreeConfirmationOpen, setDeleteTreeConfirmationOpen] =
+    useState<boolean>(false);
+  const [treeToDelete, setTreeToDelete] = useState<Tree>();
 
   const handleDownloadClickOpen = () => {
     setDownloadModalOpen(true);
@@ -163,14 +158,6 @@ const DataSubview: FunctionComponent<Props> = ({
 
   const handleCreateTreeClose = () => {
     setIsNSCreateTreeModalOpen(false);
-  };
-
-  const handleCreateTreeFailed = () => {
-    setCreateTreeFailed(true);
-  };
-
-  const handleSetCreateTreeStarted = () => {
-    setCreateTreeStarted(true);
   };
 
   const handleDownloadClose = () => {
@@ -185,41 +172,19 @@ const DataSubview: FunctionComponent<Props> = ({
     searcher(searchQuery);
   }, [data]);
 
-  useEffect(() => {
-    // Only show checkboxes on the sample datatable
-    if (viewName === VIEWNAME.SAMPLES) {
-      setShowCheckboxes(true);
-    }
-  }, [viewName]);
-
-  useEffect(() => {
-    // if there is an error then close the modal.
-    if (downloadFailed) {
-      setDownloadModalOpen(false);
-    }
-  }, [downloadFailed]);
-
-  useEffect(() => {
-    if (didCreateTreeFailed) {
-      setIsNSCreateTreeModalOpen(false);
-    }
-  }, [didCreateTreeFailed]);
-
-  function handleDismissDownloadErrorClick() {
-    setDownloadFailed(false);
-  }
-
-  function handleDismissCreateTreeErrorClick() {
-    setCreateTreeFailed(false);
-  }
-
-  function handleCreateTreeStartedModalClose() {
-    setCreateTreeStarted(false);
-  }
-
   const handleDeleteSampleModalClose = () => {
-    setDeleteConfirmationOpen(false);
+    setDeleteSampleConfirmationOpen(false);
     setCheckedSampleIds([]);
+  };
+
+  // TODO-TR
+  const handleDeleteTreeModalClose = () => {
+    setDeleteTreeConfirmationOpen(false);
+  };
+
+  const handleDeleteTreeModalOpen = (tree: Tree) => {
+    setTreeToDelete(tree);
+    setDeleteTreeConfirmationOpen(true);
   };
 
   const onChange = (
@@ -260,16 +225,6 @@ const DataSubview: FunctionComponent<Props> = ({
     </div>
   );
 
-  const CONTACT_US = (
-    <span>
-      Please try again later or{" "}
-      <StyledNewTabLink href="mailto:aspenprivacy@chanzuckerberg.com">
-        contact us
-      </StyledNewTabLink>{" "}
-      for help.
-    </span>
-  );
-
   const numCheckedSamples = checkedSampleIds?.length;
   const hasCheckedSamples = numCheckedSamples > 0;
   const hasTooManySamples = numCheckedSamples > 2000;
@@ -296,12 +251,10 @@ const DataSubview: FunctionComponent<Props> = ({
             tooltipTextDisabled={DOWNLOAD_TOOLTIP_TEXT_DISABLED}
             tooltipTextEnabled={DOWNLOAD_TOOLTIP_TEXT_ENABLED}
           />
-          {usesFeatureFlag(FEATURE_FLAGS.crudV0) && (
-            <MoreActionsMenu
-              disabled={!hasCheckedSamples}
-              onDeleteSelected={() => setDeleteConfirmationOpen(true)}
-            />
-          )}
+          <MoreActionsMenu
+            disabled={!hasCheckedSamples}
+            onDeleteSelected={() => setDeleteSampleConfirmationOpen(true)}
+          />
         </DownloadWrapper>
       );
     }
@@ -318,7 +271,6 @@ const DataSubview: FunctionComponent<Props> = ({
             <DownloadModal
               checkedSampleIds={checkedSampleIds}
               failedSampleIds={failedSampleIds}
-              setDownloadFailed={setDownloadFailed}
               tsvData={tsvDataMap(
                 checkedSampleIds,
                 tableData,
@@ -333,8 +285,6 @@ const DataSubview: FunctionComponent<Props> = ({
               failedSampleIds={failedSampleIds}
               open={isNSCreateTreeModalOpen}
               onClose={handleCreateTreeClose}
-              handleCreateTreeFailed={handleCreateTreeFailed}
-              handleSetCreateTreeStarted={handleSetCreateTreeStarted}
             />
             <UsherTreeFlow
               checkedSampleIds={checkedSampleIds}
@@ -344,9 +294,16 @@ const DataSubview: FunctionComponent<Props> = ({
             <DeleteSamplesConfirmationModal
               checkedSamples={checkedSamples}
               onClose={handleDeleteSampleModalClose}
-              open={isDeleteConfirmationOpen}
+              open={isDeleteSampleConfirmationOpen}
             />
           </>
+        )}
+        {viewName === VIEWNAME.TREES && (
+          <DeleteTreeConfirmationModal
+            open={isDeleteTreeConfirmationOpen}
+            onClose={handleDeleteTreeModalClose}
+            tree={treeToDelete}
+          />
         )}
         <StyledFlexChildDiv className={style.samplesRoot}>
           <div className={style.searchBar}>
@@ -362,54 +319,6 @@ const DataSubview: FunctionComponent<Props> = ({
             <div>
               {viewName === VIEWNAME.TREES && <TreeCreateHelpLink />}
               {sampleActions}
-              <Notification
-                buttonOnClick={handleDismissDownloadErrorClick}
-                buttonText="DISMISS"
-                dismissDirection="right"
-                dismissed={!downloadFailed}
-                intent="error"
-              >
-                <BoldText>
-                  Something went wrong and we were unable to complete one or
-                  more of your downloads
-                </BoldText>
-                {CONTACT_US}
-              </Notification>
-              <Notification
-                buttonOnClick={handleDismissCreateTreeErrorClick}
-                buttonText="DISMISS"
-                dismissDirection="right"
-                dismissed={!didCreateTreeFailed}
-                intent="error"
-              >
-                <BoldText>
-                  Something went wrong and we were unable to start your tree
-                  build
-                </BoldText>
-                {CONTACT_US}
-              </Notification>
-              <Notification
-                autoDismiss={12000}
-                dismissDirection="right"
-                dismissed={!hasCreateTreeStarted}
-                intent="info"
-              >
-                <span>
-                  Your tree is being created. It may take up to 12 hours to
-                  process. To check your tree’s status, visit the Phylogenetic
-                  Tree tab.
-                </span>
-                <NextLink href={ROUTES.PHYLO_TREES} passHref>
-                  <a href="passRef">
-                    <StyledButton
-                      color="primary"
-                      onClick={handleCreateTreeStartedModalClose}
-                    >
-                      VIEW MY TREES
-                    </StyledButton>
-                  </a>
-                </NextLink>
-              </Notification>
             </div>
           </div>
           <div className={style.samplesTable}>
@@ -419,7 +328,7 @@ const DataSubview: FunctionComponent<Props> = ({
               setCheckedSampleIds={setCheckedSampleIds}
               failedSampleIds={failedSampleIds}
               setFailedSampleIds={setFailedSampleIds}
-              showCheckboxes={showCheckboxes}
+              viewName={viewName}
               data={
                 dataFilterFunc && tableData
                   ? dataFilterFunc(tableData)
@@ -428,6 +337,8 @@ const DataSubview: FunctionComponent<Props> = ({
               defaultSortKey={defaultSortKey}
               headers={headers}
               renderer={renderer}
+              // TODO-TR (mlila): handler can be removed when tree delete modal moved
+              handleDeleteTreeModalOpen={handleDeleteTreeModalOpen}
             />
           </div>
         </StyledFlexChildDiv>
