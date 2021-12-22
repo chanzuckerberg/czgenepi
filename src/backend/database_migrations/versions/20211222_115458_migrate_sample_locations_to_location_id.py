@@ -26,7 +26,9 @@ def upgrade():
         if column in sample_columns:
             columns_present += 1
     if columns_present == 0:
-        return
+        print("Sample table columns:")
+        print(sample_columns)
+        raise AssertionError("Deprecated columns not found")
     elif columns_present < len(deprecated_columns):
         raise AssertionError("Unsupported database state.")
 
