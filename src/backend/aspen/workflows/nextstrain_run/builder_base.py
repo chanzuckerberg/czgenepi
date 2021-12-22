@@ -74,7 +74,7 @@ class BaseNextstrainConfigBuilder:
         self.update_build(config)
         self.update_subsampling(config, config["subsampling"][self.subsampling_scheme])
 
-        # Remote unused subsampling schemes from our output file
+        # Remove unused subsampling schemes from our output file
         subsampling = config["subsampling"][self.subsampling_scheme]
         config["subsampling"] = {self.subsampling_scheme: subsampling}
 
