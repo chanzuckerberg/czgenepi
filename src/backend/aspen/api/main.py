@@ -16,7 +16,6 @@ from aspen.api.views import (
     health,
     locations,
     phylo_runs,
-    phylo_trees,
     samples,
     users,
 )
@@ -97,11 +96,6 @@ def get_app() -> FastAPI:
     _app.include_router(
         locations.router,
         prefix="/v2/locations",
-        dependencies=[Depends(get_auth_user)],
-    )
-    _app.include_router(
-        phylo_trees.router,
-        prefix="/v2/phylo_trees",
         dependencies=[Depends(get_auth_user)],
     )
 

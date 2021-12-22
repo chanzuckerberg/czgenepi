@@ -23,6 +23,8 @@ from aspen.api.schemas.phylo_runs import (
     PhyloRunRequest,
     PhyloRunResponse,
     PhyloRunsListResponse,
+    PhyloRunUpdateResponse,
+    PhyloRunUpdateRequest
 )
 from aspen.api.settings import Settings
 from aspen.api.utils import get_matching_gisaid_ids
@@ -269,3 +271,28 @@ async def delete_run(
     await db.delete(item)
     await db.commit()
     return PhyloRunDeleteResponse(id=item_db_id)
+
+
+@router.put("/{item_id}")
+async def update_phylo_tree_and_run(
+    item_id: int,
+    phylo_run_update_request: PhyloRunUpdateRequest,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_auth_user),
+):
+    # get phylo_run and check that user has permission to update PhyloRun/PhyloTree
+    phylo_run = await get_editable_phylo_run_by_id(db, item_id, user)
+
+    async with db as session:
+        # update phylorun name
+        phylo_run.name = phylo_run_update_request.name
+
+        # if there are any associated PhyloTrees update those names as well:
+        if phylo_run.outputs:
+            # there should only be one phylotree associated with the phylorun
+            phylo_tree = phylo_run.outputs[0]
+            phylo_tree.name = phylo_run_update_request.name
+
+        await session.commit()
+
+    return PhyloRunUpdateResponse(id=phylo_run.id)
