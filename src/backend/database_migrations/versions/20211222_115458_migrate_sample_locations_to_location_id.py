@@ -3,8 +3,6 @@
 Create Date: 2021-12-13 14:16:58.933547
 
 """
-from functools import reduce
-
 import enumtables  # noqa: F401
 import sqlalchemy as sa
 from alembic import op
@@ -23,11 +21,10 @@ def upgrade():
 
     sample_columns = [column.key for column in Sample.__table__.columns]
     deprecated_columns = ["region", "country", "division", "location"]
-    columns_present = reduce(
-        lambda count, column: count + 1 if column in sample_columns else count,
-        deprecated_columns,
-        0,
-    )
+    columns_present = 0
+    for column in deprecated_columns:
+        if column in sample_columns:
+            columns_present += 1
     if columns_present == 0:
         return
     elif columns_present < len(deprecated_columns):
