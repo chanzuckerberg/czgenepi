@@ -142,7 +142,10 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
     const location = value.location ?? value.division;
     return (
       <RowContent>
-        <div className={style.cell} data-test-id={`row-collectionLocation`}>
+        <div
+          className={dataTableStyle.cell}
+          data-test-id={`row-collectionLocation`}
+        >
           {location}
         </div>
       </RowContent>
