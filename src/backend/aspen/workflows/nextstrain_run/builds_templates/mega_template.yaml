@@ -129,7 +129,7 @@ subsampling:
     root:
       exclude: "--exclude-where 'root_ref!=yes'"
 
-    same_county:
+    group:
       group_by: "year month"
       max_sequences: 2000
       query: --query "(location == '{location}') & (division == '{division}')"
