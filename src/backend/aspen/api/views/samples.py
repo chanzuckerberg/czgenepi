@@ -5,6 +5,7 @@ from typing import Dict, List, NamedTuple, Optional, Set
 import orjson
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends
+from fastapi.encoders import jsonable_encoder
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncResult, AsyncSession
 from sqlalchemy.orm import selectinload
@@ -162,7 +163,7 @@ async def list_samples(
             if not first:
                 yield ","
             first = False
-            yield orjson.dumps(item.dict())
+            yield orjson.dumps(jsonable_encoder(item))
         yield "]}"
 
     return StreamingResponse(_stream_json("samples", generate_row))
