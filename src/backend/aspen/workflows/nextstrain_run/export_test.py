@@ -2,6 +2,7 @@ import json
 from typing import Any, Dict, Iterable
 
 import click
+import sqlalchemy as sa
 from sqlalchemy.orm import joinedload
 
 from aspen.config.config import Config
@@ -102,10 +103,10 @@ def cli(
             "num_sequences": num_sequences,
             "num_included_samples": num_included_samples,
         }
+        group_query = sa.select(Group)  # type: ignore
         if group_name:
-            group = session.query(Group).filter(Group.name == group_name).first()
-        else:
-            group = session.query(Group).first()
+            group_query = group_query.filter(Group.name == group_name)  # type: ignore
+        group = session.execute(group_query).scalars().first()
         if not group:
             raise Exception("No group found")
         if location:
@@ -124,7 +125,7 @@ def cli(
 
 def get_random_pathogen_genomes(session, max_genomes):
     all_samples: Iterable[Sample] = (
-        session.query(Sample)
+        sa.select(Sample)  # type: ignore
         .options(
             joinedload(Sample.uploaded_pathogen_genome, innerjoin=True).undefer(
                 PathogenGenome.sequence
@@ -132,7 +133,10 @@ def get_random_pathogen_genomes(session, max_genomes):
         )
         .limit(max_genomes)
     )
-    pathogen_genomes = [sample.uploaded_pathogen_genome for sample in all_samples]
+    pathogen_genomes = [
+        sample.uploaded_pathogen_genome
+        for sample in session.execute(all_samples).scalars()
+    ]
     return pathogen_genomes
 
 
