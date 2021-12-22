@@ -28,10 +28,10 @@ def upgrade():
         deprecated_columns,
         0,
     )
-    if not columns_present:
-        return
-    elif columns_present < len(deprecated_columns):
-        raise AssertionError("Unsupported database state.")
+    # if not columns_present:
+    #     return
+    # elif columns_present < len(deprecated_columns):
+    #     raise AssertionError("Unsupported database state.")
 
     set_full_locations_stmt = sa.sql.text(
         "UPDATE aspen.samples as s SET location_id = (SELECT id FROM aspen.locations as l WHERE l.region = s.region AND l.country = s.country AND l.division = s.division and l.location = s.location)"
