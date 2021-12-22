@@ -23,8 +23,8 @@ from aspen.api.schemas.phylo_runs import (
     PhyloRunRequest,
     PhyloRunResponse,
     PhyloRunsListResponse,
+    PhyloRunUpdateRequest,
     PhyloRunUpdateResponse,
-    PhyloRunUpdateRequest
 )
 from aspen.api.settings import Settings
 from aspen.api.utils import get_matching_gisaid_ids

@@ -138,5 +138,6 @@ class PhyloRunsListResponse(BaseResponse):
 class PhyloRunUpdateResponse(BaseResponse):
     id: int
 
+
 class PhyloRunUpdateRequest(BaseRequest):
     name: constr(min_length=1, max_length=128, strip_whitespace=True)  # type: ignore

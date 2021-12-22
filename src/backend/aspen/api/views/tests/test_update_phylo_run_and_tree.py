@@ -15,8 +15,7 @@ pytestmark = pytest.mark.asyncio
 
 
 async def make_shared_test_data(
-    async_session: AsyncSession,
-    no_trees: bool = False
+    async_session: AsyncSession, no_trees: bool = False
 ) -> Tuple[User, Group, List[Sample], PhyloRun, Union[PhyloTree, None]]:
     group = group_factory()
     user = user_factory(group)
@@ -40,7 +39,6 @@ async def make_shared_test_data(
     async_session.add_all(samples)
     async_session.add(phylo_run)
 
-
     await async_session.commit()
 
     return user, group, samples, phylo_run, phylo_tree
@@ -55,7 +53,9 @@ async def test_update_phylo_tree(
     )
     auth_headers = {"user_id": user.auth0_user_id}
     data = {"name": "new_name"}
-    res = await http_client.put(f"/v2/phylo_runs/{phylo_run.id}", json=data, headers=auth_headers)
+    res = await http_client.put(
+        f"/v2/phylo_runs/{phylo_run.id}", json=data, headers=auth_headers
+    )
 
     assert res.status_code == 200
 
@@ -78,12 +78,13 @@ async def test_update_phylo_run_no_trees(
     http_client: AsyncClient,
 ):
     user, group, samples, phylo_run, _ = await make_shared_test_data(
-        async_session,
-        no_trees=True
+        async_session, no_trees=True
     )
     auth_headers = {"user_id": user.auth0_user_id}
     data = {"name": "new_name"}
-    res = await http_client.put(f"/v2/phylo_runs/{phylo_run.id}", json=data, headers=auth_headers)
+    res = await http_client.put(
+        f"/v2/phylo_runs/{phylo_run.id}", json=data, headers=auth_headers
+    )
 
     assert res.status_code == 200
 
@@ -121,10 +122,9 @@ async def test_update_phylo_tree_wrong_group(
 
     auth_headers = {"user_id": user_that_did_not_make_tree.auth0_user_id}
     data = {"name": "new_name"}
-    res = await http_client.put(f"/v2/phylo_runs/{phylo_run.id}", json=data, headers=auth_headers)
+    res = await http_client.put(
+        f"/v2/phylo_runs/{phylo_run.id}", json=data, headers=auth_headers
+    )
 
     assert res.status_code == 404
-    assert (
-        res.content
-        == b'{"error":"phylo run not found"}'
-    )
+    assert res.content == b'{"error":"phylo run not found"}'
