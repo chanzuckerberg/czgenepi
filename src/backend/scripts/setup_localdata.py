@@ -16,7 +16,6 @@ from aspen.database.models import (
     PhyloTree,
     ProcessedGisaidDump,
     RawGisaidDump,
-    RegionType,
     Sample,
     SequencingInstrumentType,
     SequencingProtocolType,
@@ -66,7 +65,7 @@ def create_test_user(session, group, user_id, name):
 
 
 def create_location(session, region, country, division, location):
-    l = (
+    location = (
         session.query(Location)
         .filter(
             and_(
@@ -78,19 +77,19 @@ def create_location(session, region, country, division, location):
         )
         .one_or_none()
     )
-    if l:
+    if location:
         print("Location already exists")
-        return l
+        return location
     print("Creating location")
-    l = Location(
+    location = Location(
         region=region,
         country=country,
         division=division,
         location=location,
     )
-    session.add(l)
+    session.add(location)
     session.commit()
-    l = (
+    location = (
         session.query(Location)
         .filter(
             and_(
@@ -102,7 +101,7 @@ def create_location(session, region, country, division, location):
         )
         .one_or_none()
     )
-    return l
+    return location
 
 
 def create_sample(session, group, uploaded_by_user, location, suffix, is_failed=False):

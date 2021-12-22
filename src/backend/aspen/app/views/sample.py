@@ -329,7 +329,7 @@ def create_sample():
 
             location_id = data["sample"].get("location_id", None)
             if not location_id:
-                sentry_sdk.capture_message(f"No location_id submitted for sample")
+                sentry_sdk.capture_message("No location_id submitted for sample")
                 raise ex.BadRequestException("No location_id submitted for sample")
             valid_location: Optional[Location] = None
             try:

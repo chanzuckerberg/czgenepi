@@ -1,3 +1,5 @@
+from typing import Optional
+
 from aspen.database.models import Location
 
 

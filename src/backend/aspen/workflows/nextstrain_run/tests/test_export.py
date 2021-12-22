@@ -1,5 +1,5 @@
 from io import StringIO
-from typing import List
+from typing import List, Optional
 
 import yaml
 from sqlalchemy.sql.expression import and_
@@ -20,31 +20,34 @@ def create_test_data(
     num_selected_samples,  # How many of those samples are workflow inputs
     num_gisaid_samples,  # How many gisaid samples to add to a workflow
     group_name=None,  # Override group name
-    location=None,  # Override group location
-    division=None,  # Override group division
+    group_location=None,  # Override group location
+    group_division=None,  # Override group division
 ):
     if group_name is None:
         group_name = f"testgroup-{tree_type.value}"
-    group: Group = group_factory(name=group_name, division=division, location=location)
+    group: Group = group_factory(
+        name=group_name, division=group_division, location=group_location
+    )
     uploaded_by_user: User = user_factory(
         group,
         email=f"{group_name}{tree_type.value}@dh.org",
         auth0_user_id=group_name,
     )
-    location = (
+    location_division = group.division if group.division != "" else "California"
+    location: Optional[Location] = (
         session.query(Location)
         .filter(
             and_(
                 Location.region == "North America",
                 Location.country == "USA",
-                Location.division == group.division,
+                Location.division == location_division,
                 Location.location == group.location,
             )
         )
         .one_or_none()
     )
     if not location:
-        location: Location = location_factory(
+        location = location_factory(
             "North America", "USA", group.division, group.location
         )
     session.add(group)
@@ -178,7 +181,13 @@ def test_non_contextualized_regions(mocker, session, postgres_database):
 
     tree_type = TreeType.NON_CONTEXTUALIZED
     state_phylo_run = create_test_data(
-        session, tree_type, 10, 5, 5, group_name="Group Without Location", location=""
+        session,
+        tree_type,
+        10,
+        5,
+        5,
+        group_name="Group Without Location",
+        group_location="",
     )
     country_phylo_run = create_test_data(
         session,
@@ -187,8 +196,8 @@ def test_non_contextualized_regions(mocker, session, postgres_database):
         5,
         5,
         group_name="Group Without division",
-        location="",
-        division="",
+        group_location="",
+        group_division="",
     )
     for run_type, run in {
         "state": state_phylo_run,
@@ -243,7 +252,13 @@ def test_targeted_config_regions(mocker, session, postgres_database):
 
     tree_type = TreeType.TARGETED
     state_phylo_run = create_test_data(
-        session, tree_type, 10, 5, 5, group_name="Group Without Location", location=""
+        session,
+        tree_type,
+        10,
+        5,
+        5,
+        group_name="Group Without Location",
+        group_location="",
     )
     country_phylo_run = create_test_data(
         session,
@@ -252,8 +267,8 @@ def test_targeted_config_regions(mocker, session, postgres_database):
         5,
         5,
         group_name="Group Without division",
-        location="",
-        division="",
+        group_location="",
+        group_division="",
     )
     for run_type, run in {
         "state": state_phylo_run,
@@ -329,7 +344,13 @@ def test_overview_config_division(mocker, session, postgres_database):
 
     tree_type = TreeType.OVERVIEW
     phylo_run = create_test_data(
-        session, tree_type, 10, 0, 0, group_name="Group Without Location", location=""
+        session,
+        tree_type,
+        10,
+        0,
+        0,
+        group_name="Group Without Location",
+        group_location="",
     )
     sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
     subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
@@ -356,8 +377,8 @@ def test_overview_config_country(mocker, session, postgres_database):
         0,
         0,
         group_name="Group Without Location or Country",
-        location="",
-        division="",
+        group_location="",
+        group_division="",
     )
     sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
     subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
