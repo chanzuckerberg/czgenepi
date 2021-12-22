@@ -44,7 +44,9 @@ async def test_delete_phylo_run_matrix(
     group2 = group_factory(name="group2")
     user = user_factory(group, auth0_user_id="user1", email="user1")
     user2 = user_factory(group2, auth0_user_id="user2", email="user2")
-    location = location_factory(location="Santa Barbara County")
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     sample = sample_factory(group, user, location)
     gisaid_dump = aligned_gisaid_dump_factory()
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")

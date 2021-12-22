@@ -37,7 +37,9 @@ def test_phylo_tree_rename(session, mock_s3_resource, test_data_dir):
     )
 
     user = user_factory(viewer_group)
-    location = location_factory("Santa Barbara County")
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
 
     local_sample = sample_factory(
         viewer_group,
@@ -117,7 +119,9 @@ def test_phylo_tree_rename_admin(session, mock_s3_resource, test_data_dir):
     session.add_all([viewer_group, owner_group])
 
     user = user_factory(viewer_group)
-    location = location_factory("Santa Barbara County")
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
 
     renamed_sample = sample_factory(
         viewer_group,

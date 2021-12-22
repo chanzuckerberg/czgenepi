@@ -115,7 +115,9 @@ async def test_phylo_tree_view(
 ):
     group: Group = group_factory()
     user: User = user_factory(group)
-    location: Location = location_factory(location="Santa Barbara County")
+    location: Location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     _, _, trees, _ = make_all_test_data(group, user, location, n_samples, n_trees)
 
     async_session.add(group)
@@ -132,7 +134,9 @@ async def test_in_progress_and_failed_trees(
 ):
     group: Group = group_factory()
     user: User = user_factory(group)
-    location: Location = location_factory(location="Santa Barbara County")
+    location: Location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     _, _, _, treeless_runs = make_all_test_data(
         group, user, location, n_samples, n_trees
     )
@@ -184,7 +188,9 @@ async def test_phylo_trees_can_see(
     owner_group: Group = group_factory()
     viewer_group: Group = group_factory("CADPH")
     user: User = user_factory(viewer_group)
-    location: Location = location_factory(location="Santa Barbara County")
+    location: Location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     _, _, trees, _ = make_all_test_data(owner_group, user, location, n_samples, n_trees)
 
     CanSee(viewer_group=viewer_group, owner_group=owner_group, data_type=DataType.TREES)
@@ -203,7 +209,9 @@ async def test_phylo_trees_no_can_see(
     owner_group: Group = group_factory()
     viewer_group: Group = group_factory("CADPH")
     user: User = user_factory(viewer_group)
-    location: Location = location_factory(location="Santa Barbara County")
+    location: Location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     _, _, trees, _ = make_all_test_data(owner_group, user, location, n_samples, n_trees)
 
     async_session.add_all((owner_group, viewer_group))
@@ -225,7 +233,9 @@ async def test_phylo_trees_admin(
     owner_group: Group = group_factory()
     viewer_group: Group = group_factory("admin")
     user: User = user_factory(viewer_group, system_admin=True)
-    location: Location = location_factory(location="Santa Barbara County")
+    location: Location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     _, _, trees, _ = make_all_test_data(owner_group, user, location, n_samples, n_trees)
 
     async_session.add_all((owner_group, viewer_group))

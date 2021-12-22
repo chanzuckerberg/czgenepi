@@ -31,6 +31,7 @@ def make_sample_data(
         sample_factory(
             group,
             user,
+            location,
             public_identifier=f"public_identifier_{ix}",
             private_identifier=f"private_identifier_{ix}",
         )
@@ -82,7 +83,7 @@ def make_all_test_data(
     Sequence[PhyloTree],
     Collection[PhyloRun],
 ]:
-    samples: Collection[Sample] = make_sample_data(group, user, n_samples)
+    samples: Collection[Sample] = make_sample_data(group, user, location, n_samples)
     uploaded_pathogen_genomes: Collection[
         UploadedPathogenGenome
     ] = make_uploaded_pathogen_genomes(samples)
@@ -123,7 +124,9 @@ def test_phylo_tree_view(
 ):
     group: Group = group_factory()
     user: User = user_factory(group)
-    location: Location = location_factory("Santa Barbara County")
+    location: Location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     _, _, trees, _ = make_all_test_data(group, user, location, n_samples, n_trees)
 
     session.add(group)
@@ -141,7 +144,9 @@ def test_in_progress_and_failed_trees(
 ):
     group: Group = group_factory()
     user: User = user_factory(group)
-    location: Location = location_factory("Santa Barbara County")
+    location: Location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     _, _, _, treeless_runs = make_all_test_data(
         group, user, location, n_samples, n_trees
     )
@@ -197,7 +202,9 @@ def test_phylo_trees_can_see(
     owner_group: Group = group_factory()
     viewer_group: Group = group_factory("CADPH")
     user: User = user_factory(viewer_group)
-    location: Location = location_factory("Santa Barbara County")
+    location: Location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     _, _, trees, _ = make_all_test_data(owner_group, user, location, n_samples, n_trees)
 
     CanSee(viewer_group=viewer_group, owner_group=owner_group, data_type=DataType.TREES)
@@ -217,7 +224,9 @@ def test_phylo_trees_no_can_see(
     owner_group: Group = group_factory()
     viewer_group: Group = group_factory("CADPH")
     user: User = user_factory(viewer_group)
-    location: Location = location_factory("Santa Barbara County")
+    location: Location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     _, _, trees, _ = make_all_test_data(owner_group, user, location, n_samples, n_trees)
 
     session.add_all((owner_group, viewer_group))
@@ -240,7 +249,9 @@ def test_phylo_trees_admin(
     owner_group: Group = group_factory()
     viewer_group: Group = group_factory("admin")
     user: User = user_factory(viewer_group, system_admin=True)
-    location: Location = location_factory("Santa Barbara County")
+    location: Location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     _, _, trees, _ = make_all_test_data(owner_group, user, location, n_samples, n_trees)
 
     session.add_all((owner_group, viewer_group))
@@ -261,7 +272,9 @@ def test_phylo_tree_can_see(
     owner_group: Group = group_factory()
     viewer_group: Group = group_factory("CADPH")
     user: User = user_factory(viewer_group)
-    location: Location = location_factory("Santa Barbara County")
+    location: Location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     _, _, trees, _ = make_all_test_data(owner_group, user, location, n_samples, n_trees)
 
     phylo_tree = trees[0]  # we only have one
@@ -304,7 +317,9 @@ def test_phylo_tree_no_can_see(
     owner_group: Group = group_factory()
     viewer_group: Group = group_factory("CADPH")
     user: User = user_factory(viewer_group)
-    location: Location = location_factory("Santa Barbara County")
+    location: Location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     _, _, trees, _ = make_all_test_data(owner_group, user, location, n_samples, n_trees)
 
     phylo_tree = trees[0]  # we only have one
@@ -347,7 +362,9 @@ def test_phylo_tree_admin(
     owner_group: Group = group_factory()
     viewer_group: Group = group_factory("admin")
     user: User = user_factory(viewer_group, system_admin=True)
-    location: Location = location_factory("Santa Barbara County")
+    location: Location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     _, _, trees, _ = make_all_test_data(owner_group, user, location, n_samples, n_trees)
 
     phylo_tree = trees[0]  # we only have one

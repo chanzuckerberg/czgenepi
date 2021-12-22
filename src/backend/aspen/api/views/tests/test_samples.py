@@ -35,7 +35,9 @@ async def test_samples_view(
 ):
     group = group_factory()
     user = user_factory(group)
-    location = location_factory(location="Santa Barbara County")
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     sample = sample_factory(group, user, location, private=True)
     uploaded_pathogen_genome = uploaded_pathogen_genome_factory(sample)
     async_session.add(group)
@@ -98,7 +100,9 @@ async def test_samples_view_gisaid_rejected(
 ):
     group = group_factory()
     user = user_factory(group)
-    location = location_factory(location="Santa Barbara County")
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     sample = sample_factory(group, user, location)
     # Test no GISAID accession logic
     uploaded_pathogen_genome = uploaded_pathogen_genome_factory(
@@ -167,7 +171,9 @@ async def test_samples_view_gisaid_no_info(
 ):
     group = group_factory()
     user = user_factory(group)
-    location = location_factory(location="Santa Barbara County")
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     sample = sample_factory(group, user, location)
     # Test no GISAID accession logic
     uploaded_pathogen_genome = uploaded_pathogen_genome_factory(
@@ -231,7 +237,9 @@ async def test_samples_view_gisaid_not_eligible(
     group = group_factory()
     user = user_factory(group)
     # Mark the sample as failed
-    location = location_factory(location="Santa Barbara County")
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     sample = sample_factory(group, user, location, czb_failed_genome_recovery=True)
     async_session.add(group)
     await async_session.commit()
@@ -286,7 +294,9 @@ async def test_samples_view_gisaid_submitted(
 ):
     group = group_factory()
     user = user_factory(group)
-    location = location_factory(location="Santa Barbara County")
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     sample = sample_factory(group, user, location)
     # create a sample with a gisaid workflow but no accession yet
     uploaded_pathogen_genome = uploaded_pathogen_genome_factory(
@@ -360,7 +370,9 @@ async def _test_samples_view_cansee(
     owner_group = group_factory()
     viewer_group = group_factory(name="cdph")
     user = user_factory(viewer_group, **user_factory_kwargs)
-    location = location_factory(location="Santa Barbara County")
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     sample = sample_factory(owner_group, user, location)
     # create a private sample as well to make sure it doesn't get shown unless admin
     private_sample = sample_factory(
@@ -562,7 +574,9 @@ async def test_samples_failed_accession(
     view should return the successful accession ID."""
     group = group_factory()
     user = user_factory(group)
-    location = location_factory(location="Santa Barbara County")
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     sample = sample_factory(group, user, location)
     uploaded_pathogen_genome = uploaded_pathogen_genome_factory(
         sample,
@@ -644,7 +658,9 @@ async def test_samples_multiple_accession(
     return the latest accession ID."""
     group = group_factory()
     user = user_factory(group)
-    location = location_factory(location="Santa Barbara County")
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     sample = sample_factory(group, user, location)
     uploaded_pathogen_genome = uploaded_pathogen_genome_factory(
         sample,
@@ -721,7 +737,9 @@ async def test_samples_view_no_pangolin(
 ):
     group = group_factory()
     user = user_factory(group)
-    location = location_factory(location="Santa Barbara County")
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     sample = sample_factory(group, user, location)
     uploaded_pathogen_genome = uploaded_pathogen_genome_factory(
         sample,
@@ -794,7 +812,9 @@ async def test_delete_sample_success(
     """
     group = group_factory()
     user = user_factory(group)
-    location = location_factory(location="Santa Barbara County")
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     samples = [
         sample_factory(
             group,
@@ -860,7 +880,9 @@ async def test_delete_sample_failures(
     """
     group = group_factory()
     user = user_factory(group)
-    location = location_factory(location="Santa Barbara County")
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     sample = sample_factory(group, user, location)
     upg = uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     async_session.add(upg)
@@ -871,7 +893,9 @@ async def test_delete_sample_failures(
     user2 = user_factory(
         group2, email="test_user@othergroup.org", auth0_user_id="other_test_auth0_id"
     )
-    location2 = location_factory(location="San Francisco County")
+    location2 = location_factory(
+        "North America", "USA", "California", "San Francisco County"
+    )
     sample2 = sample_factory(
         group2, user2, location2
     )  # A sample that user2 *can* delete

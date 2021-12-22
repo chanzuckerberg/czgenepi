@@ -2,8 +2,10 @@ from io import StringIO
 from typing import List
 
 import yaml
+from sqlalchemy.sql.expression import and_
 
-from aspen.database.models import Group, TreeType, User, WorkflowStatusType
+from aspen.database.models import Group, Location, TreeType, User, WorkflowStatusType
+from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_multifactory
 from aspen.test_infra.models.usergroup import group_factory, user_factory
@@ -25,6 +27,22 @@ def create_test_data(
     uploaded_by_user: User = user_factory(
         group, email=f"{tree_type.value}@dh.org", auth0_user_id=tree_type.value
     )
+    location = (
+        session.query(Location)
+        .filter(
+            and_(
+                Location.region == "North America",
+                Location.country == "USA",
+                Location.division == group.division,
+                Location.location == group.location,
+            )
+        )
+        .one_or_none()
+    )
+    if not location:
+        location: Location = location_factory(
+            "North America", "USA", group.division, group.location
+        )
     session.add(group)
 
     gisaid_samples: List[str] = [
@@ -32,7 +50,7 @@ def create_test_data(
     ]
 
     pathogen_genomes = uploaded_pathogen_genome_multifactory(
-        group, uploaded_by_user, num_county_samples
+        group, uploaded_by_user, location, num_county_samples
     )
 
     selected_samples = pathogen_genomes[:num_selected_samples]

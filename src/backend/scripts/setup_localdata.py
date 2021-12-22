@@ -2,6 +2,7 @@ import os
 from datetime import datetime
 
 import boto3
+from sqlalchemy.sql.expression import and_
 
 from aspen.config.docker_compose import DockerComposeConfig
 from aspen.database.connection import get_db_uri, init_db
@@ -10,6 +11,7 @@ from aspen.database.models import (
     GisaidAlignmentWorkflow,
     GisaidDumpWorkflow,
     Group,
+    Location,
     PhyloRun,
     PhyloTree,
     ProcessedGisaidDump,
@@ -63,7 +65,47 @@ def create_test_user(session, group, user_id, name):
     return u
 
 
-def create_sample(session, group, uploaded_by_user, suffix, is_failed=False):
+def create_location(session, region, country, division, location):
+    l = (
+        session.query(Location)
+        .filter(
+            and_(
+                Location.region == region,
+                Location.country == country,
+                Location.division == division,
+                Location.location == location,
+            )
+        )
+        .one_or_none()
+    )
+    if l:
+        print("Location already exists")
+        return l
+    print("Creating location")
+    l = Location(
+        region=region,
+        country=country,
+        division=division,
+        location=location,
+    )
+    session.add(l)
+    session.commit()
+    l = (
+        session.query(Location)
+        .filter(
+            and_(
+                Location.region == region,
+                Location.country == country,
+                Location.division == division,
+                Location.location == location,
+            )
+        )
+        .one_or_none()
+    )
+    return l
+
+
+def create_sample(session, group, uploaded_by_user, location, suffix, is_failed=False):
     private_id = f"{group.prefix}-private_identifier_{suffix}"
     public_id = f"{group.prefix}-public_identifier_{suffix}"
     if is_failed:
@@ -91,10 +133,7 @@ def create_sample(session, group, uploaded_by_user, suffix, is_failed=False):
         czb_failed_genome_recovery=is_failed,
         sample_collected_by="sample_collector",
         sample_collector_contact_address="sample_collector_address",
-        location="Santa Clara County",
-        division="California",
-        country="USA",
-        region=RegionType.NORTH_AMERICA,
+        collection_location=location,
         organism="SARS-CoV-2",
     )
     upg: UploadedPathogenGenome = UploadedPathogenGenome(
@@ -289,12 +328,12 @@ def create_gisaid(session):
     session.add(aligned_workflow)
 
 
-def create_samples(session, group, user, num_successful, num_failures):
+def create_samples(session, group, user, location, num_successful, num_failures):
     for suffix in range(num_successful):
-        sample = create_sample(session, group, user, suffix)
+        sample = create_sample(session, group, user, location, suffix)
         _ = create_sequencing_reads(session, sample)
     for suffix in range(num_failures):
-        _ = create_sample(session, group, user, suffix, True)
+        _ = create_sample(session, group, user, location, suffix, True)
 
 
 def create_test_data(engine):
@@ -304,13 +343,17 @@ def create_test_data(engine):
     # Create db rows for our main test user
     group = create_test_group(session, "CZI", "CZI")
     user = create_test_user(session, group, "User1", "Test User")
-    create_samples(session, group, user, 10, 5)
+    location = create_location(
+        session, "North America", "USA", "California", "San Mateo County"
+    )
+    create_samples(session, group, user, location, 10, 5)
     create_test_trees(session, group, user)
 
     # Create db rows for another group
     group2 = create_test_group(session, "Timbuktu Dept of Public Health", "TBK")
     user2 = create_test_user(session, group2, "tbktu", "Timbuktu User")
-    create_samples(session, group2, user2, 10, 10)
+    location2 = create_location(session, "Africa", "Mali", "Timbuktu", None)
+    create_samples(session, group2, user2, location2, 10, 10)
     create_test_trees(session, group2, user2)
 
     session.commit()
