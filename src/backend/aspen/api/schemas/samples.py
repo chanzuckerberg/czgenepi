@@ -102,3 +102,22 @@ class SampleBulkDeleteResponse(BaseResponse):
 
 class SampleDeleteResponse(BaseResponse):
     id: int
+
+
+class UpdateSamplesBaseRequest(BaseRequest):
+    id: int
+    collection_date: datetime.date
+    collection_location: str
+    gisaid: SampleGisaidResponseSchema
+    private: bool
+    private_identifier: Optional[str]
+    public_identifier: str
+    sequencing_date: Optional[datetime.date]
+
+
+class UpdateSamplesRequest(BaseRequest):
+    samples: List[UpdateSamplesBaseRequest]
+
+
+class UpdateSamplesResponse(BaseResponse):
+    ids: List[int]

@@ -17,6 +17,8 @@ from aspen.api.schemas.samples import (
     SampleDeleteResponse,
     SampleResponseSchema,
     SamplesResponseSchema,
+    UpdateSamplesRequest,
+    UpdateSamplesResponse
 )
 from aspen.api.settings import Settings
 from aspen.api.utils import authz_samples_cansee, determine_gisaid_status
@@ -211,3 +213,21 @@ async def delete_sample(
     await db.delete(sample)
     await db.commit()
     return SampleDeleteResponse(id=sample_db_id)
+
+
+@router.put("/")
+async def update_samples(
+    update_samples_request: UpdateSamplesRequest,
+    db: AsyncSession = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    user: User = Depends(get_auth_user),
+) -> UpdateSamplesResponse:
+
+    # Make sure these samples exist and are delete-able by the current user.
+    sample_db_res = await get_owned_samples_by_ids(db, [sample_id], user)
+
+    # return error message if any samples sumitted for update are not editable by user
+
+    # update fields
+
+    # return response
