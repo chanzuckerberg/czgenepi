@@ -119,14 +119,19 @@ def update_subsampling_for_location(tree_build_level, subsampling):
 
 def update_subsampling_for_country(subsampling):
     # State and country aren't useful
-    if subsampling["state"] exist, then del subsampling["state"]        # fake code. I cannot python...
-    if subsampling["country"] exist, then del subsampling["country"]    # fake code
+    if "state" in subsampling:
+        del subsampling["state"]
+    if "country" in subsampling:
+        del subsampling["country"]
     # Update our local group query
     subsampling["group"]["query"] = '''--query "(country == '{country}')"'''
 
 
 def update_subsampling_for_division(subsampling):
     # State isn't useful
-    if subsampling["state"] exist, del subsampling["state"]             # fake code
+    if "state" in subsampling:
+        del subsampling["state"]
     # Update our local group query
-    subsampling["group"]["query"] = '''--query "(division == '{division}') & (country == '{country}')"'''    # added country in case of multiple Californias worldwide
+    subsampling["group"][
+        "query"
+    ] = '''--query "(division == '{division}') & (country == '{country}')"'''  # Keep the country filter in case of multiple divisions worldwide
