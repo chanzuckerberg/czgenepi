@@ -3,11 +3,13 @@
 Create Date: 2021-12-13 14:16:58.933547
 
 """
+from functools import reduce
+
 import enumtables  # noqa: F401
 import sqlalchemy as sa
 from alembic import op
 
-from aspen.database.models import Sample
+from aspen.database.models import meta, Sample
 
 # revision identifiers, used by Alembic.
 revision = "20211222_115458"
@@ -19,16 +21,18 @@ depends_on = None
 def upgrade():
     conn = op.get_bind()
 
-    sample_columns = [column.key for column in Sample.__table__.columns]
+    samples_table = sa.schema.Table(
+        "samples", meta, autoload_with=op.migration_context.connection
+    )
+    sample_columns = [column.key for column in samples_table.columns]
     deprecated_columns = ["region", "country", "division", "location"]
-    columns_present = 0
-    for column in deprecated_columns:
-        if column in sample_columns:
-            columns_present += 1
-    if columns_present == 0:
-        print("Sample table columns:")
-        print(sample_columns)
-        raise AssertionError("Deprecated columns not found")
+    columns_present = reduce(
+        lambda count, column: count + 1 if column in sample_columns else count,
+        deprecated_columns,
+        0,
+    )
+    if not columns_present:
+        return
     elif columns_present < len(deprecated_columns):
         raise AssertionError("Unsupported database state.")
 
