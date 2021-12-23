@@ -23,7 +23,7 @@ It is possible to interact with the local database in ipython:
 
 ```
 aspen% make local-dbconsole
-docker-compose exec utility aspen-cli db --local interact
+docker-compose exec backend aspen-cli db --local interact
 Python 3.9.1 (default, Feb  9 2021, 07:55:26)
 Type 'copyright', 'credits' or 'license' for more information
 IPython 7.21.0 -- An enhanced Interactive Python. Type '?' for help.
@@ -44,7 +44,7 @@ In [3]:
 
 ```
 aspen% make local-dbconsole-profile
-docker-compose exec utility aspen-cli db --local interact --profile
+docker-compose exec backend aspen-cli db --local interact --profile
 Python 3.9.1 (default, Feb  9 2021, 07:55:26)
 Type 'copyright', 'credits' or 'license' for more information
 IPython 7.21.0 -- An enhanced Interactive Python. Type '?' for help.
@@ -67,10 +67,10 @@ The module [`aspen.database.connection`](../../src/backend/aspen/database/connec
 ### Autogeneration of schema migration
 
 - after modifying/adding any database table/schema code run:
-  - `make utility-alembic-autogenerate MESSAGE="descriptive message"`
+  - `make backend-alembic-autogenerate MESSAGE="descriptive message"`
 - this will create a migration file under `src/backend/database_migrations`
   - make sure you look this file over and verify that alembic made the appropriate changes
-- run `make utility-alembic-upgrade-head`
+- run `make backend-alembic-upgrade-head`
   - this updates your local running database, make sure you use either `make pg-console` or `make db-console` to check that changes were applied appropriately!
 
 ## Updating python dependencies

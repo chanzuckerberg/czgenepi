@@ -65,6 +65,7 @@ services:
       - AWS_SECRET_ACCESS_KEY=dev_secret_access_key
       - FRONTEND_URL=http://frontend.genepinet.localdev:8000
       - AWS_REGION=us-west-2
+      - DB=docker
       - ENV=local
       - FLASK_APP=aspen.main
       - FLASK_DEBUG=1
@@ -80,33 +81,6 @@ services:
       genepinet:
         aliases:
           - backend.genepinet.localdev
-  utility:
-    image: "${DOCKER_REPO}genepi-backend"
-    build:
-      context: src/backend
-      cache_from:
-        - "${DOCKER_REPO}genepi-backend:branch-trunk"
-      args:
-        - BUILDKIT_INLINE_CACHE=1
-    restart: always
-    environment:
-      - PYTHONUNBUFFERED=1
-      - RESTART_ON_FAILURE=yes
-      - BOTO_ENDPOINT_URL=http://localstack.genepinet.localdev:4566
-      - AWS_ACCESS_KEY_ID=dev_access_key_id
-      - AWS_SECRET_ACCESS_KEY=dev_secret_access_key
-      - AWS_REGION=us-west-2
-      - ENV=local
-      - DB=docker
-      - PYTHONPATH=.
-    volumes:
-      - ./src/backend:/usr/src/app
-    entrypoint: []
-    command: ["sleep", "infinity"]
-    networks:
-      genepinet:
-        aliases:
-          - utility.genepinet.localdev
   localstack:
     image: localstack/localstack@sha256:7c6635493185d25165979995fb073fd789c72b6d8b17ef3a70b798d55576732f
     ports:
