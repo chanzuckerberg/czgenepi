@@ -37,6 +37,8 @@ def humanize_tree_name(s3_key: str):
     basename = re.sub(r".json", "", json_filename)
     if basename == "ncov_aspen":
         return s3_key.split("/")[1]  # Return the directory name.
+    if basename == "ncov_aspen_3m":
+        return s3_key.split("/")[1] + " recency-focused build"  # Name it differently from overview tree.
     title_case = basename.replace("_", " ").title()
     if "Ancestors" in title_case:
         title_case = title_case.replace("Ancestors", "Contextual")
