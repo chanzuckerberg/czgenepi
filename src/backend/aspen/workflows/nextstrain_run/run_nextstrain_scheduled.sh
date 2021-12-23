@@ -40,7 +40,8 @@ WORKFLOW_ID=$(aspen-cli db create-phylo-run                            \
 )
 echo "${WORKFLOW_ID}" >| "/tmp/workflow_id"
 
-key_prefix="phylo_run/${S3_FILESTEM}/${WORKFLOW_ID}"
+type_titlecase="$(tr '[:lower:]' '[:upper:]' <<< ${TREE_TYPE:0:1})$(tr '[:upper:]' '[:lower:]' <<< ${TREE_TYPE:1})"
+key_prefix="phylo_run/${S3_FILESTEM}/${type_titlecase}/${WORKFLOW_ID}"
 s3_prefix="s3://${aspen_s3_db_bucket}/${key_prefix}"
 
 # set up ncov
