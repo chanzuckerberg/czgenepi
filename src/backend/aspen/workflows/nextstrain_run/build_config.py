@@ -3,6 +3,7 @@ from math import ceil
 from aspen.database.models import TreeType
 from aspen.workflows.nextstrain_run.builder_base import BaseNextstrainConfigBuilder
 
+import datetime
 
 def builder_factory(tree_type: TreeType, group, template_args, **kwargs):
     # This is basically a router -- We'll switch between which build types
@@ -27,6 +28,14 @@ class OverviewBuilder(BaseNextstrainConfigBuilder):
             subsampling["group"][
                 "query"
             ] = '''--query "((location == '{location}') & (division == '{division}')) | submitting_lab == 'RIPHL at Rush University Medical Center'"'''
+
+        # only keep group samples within the past 3 months
+        today = datetime.date.today()
+        early_late_cutoff = today - datetime.timedelta(weeks=2)
+
+        subsampling["group"][
+                "min-date"
+            ] = f"--min-date {early_late_cutoff.strftime('%Y-%m-%d')}"
 
         # Update our sampling for state/country level builds if necessary
         update_subsampling_for_location(self.tree_build_level, subsampling)
