@@ -1,9 +1,9 @@
+import datetime
 from math import ceil
 
 from aspen.database.models import TreeType
 from aspen.workflows.nextstrain_run.builder_base import BaseNextstrainConfigBuilder
 
-import datetime
 
 def builder_factory(tree_type: TreeType, group, template_args, **kwargs):
     # This is basically a router -- We'll switch between which build types
@@ -34,8 +34,8 @@ class OverviewBuilder(BaseNextstrainConfigBuilder):
         early_late_cutoff = today - datetime.timedelta(weeks=12)
 
         subsampling["group"][
-                "min_date"
-            ] = f"--min-date {early_late_cutoff.strftime('%Y-%m-%d')}"
+            "min_date"
+        ] = f"--min-date {early_late_cutoff.strftime('%Y-%m-%d')}"
 
         # Update our sampling for state/country level builds if necessary
         update_subsampling_for_location(self.tree_build_level, subsampling)
