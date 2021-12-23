@@ -182,6 +182,12 @@ def add_can_see(
 
 @db.command("create-phylo-run")
 @click.option(
+    "--tree-name",
+    type=str,
+    required=False,
+    help="Name of tree being created",
+)
+@click.option(
     "--group-name",
     type=str,
     required=True,
@@ -215,6 +221,7 @@ def add_can_see(
 @click.pass_context
 def create_phylo_run(
     ctx,
+    tree_name: str,
     group_name: str,
     builds_template_args: str,
     git_refspec: str,
@@ -242,6 +249,8 @@ def create_phylo_run(
         )
         workflow.inputs = [aligned_gisaid_dump]
         workflow.template_args = json.loads(builds_template_args)
+        if tree_name:
+            workflow.name = tree_name
 
         session.add(workflow)
         session.flush()
