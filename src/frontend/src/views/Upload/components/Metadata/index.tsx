@@ -1,11 +1,12 @@
 import { Button } from "czifui";
 import { distance } from "fastest-levenshtein";
 import NextLink from "next/link";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { HeadAppTitle } from "src/common/components";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { ROUTES } from "src/common/routes";
+import { createStringToLocationFinder } from "src/common/utils/locationUtils";
 import { EMPTY_METADATA } from "src/views/Upload/components/common/constants";
 import {
   NamedGisaidLocation,
@@ -69,6 +70,11 @@ export default function Metadata({
     useState<SampleIdToMetadata | null>(null);
   const [autocorrectWarnings, setAutocorrectWarnings] =
     useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
+
+  // Used by file upload parser to convert location strings to Locations
+  const stringToLocationFinder = useMemo(() => {
+    return createStringToLocationFinder(namedLocations);
+  }, [namedLocations]);
 
   function handleMetadataFileUpload(result: ParseResult) {
     const { data: sampleIdToParsedMetadata, warningMessages } = result;
@@ -139,6 +145,7 @@ export default function Metadata({
         <ImportFile
           samples={samples}
           handleMetadata={handleMetadataFileUpload}
+          stringToLocationFinder={stringToLocationFinder}
         />
 
         <Table

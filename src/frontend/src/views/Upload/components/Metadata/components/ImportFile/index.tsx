@@ -2,6 +2,7 @@ import { Button } from "czifui";
 import React, { useEffect, useState } from "react";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import FilePicker from "src/components/FilePicker";
+import { StringToLocationFinder } from "src/common/utils/locationUtils";
 import {
   ERROR_CODE,
   Props as CommonProps,
@@ -20,11 +21,13 @@ import { IntroWrapper, Title, TitleWrapper, Wrapper } from "./style";
 interface Props {
   handleMetadata: (result: ParseResult) => void;
   samples: CommonProps["samples"];
+  stringToLocationFinder: StringToLocationFinder;
 }
 
 export default function ImportFile({
   handleMetadata,
   samples,
+  stringToLocationFinder,
 }: Props): JSX.Element {
   const [isInstructionsShown, setIsInstructionsShown] = useState(false);
   const [hasImportedFile, setHasImportedFile] = useState(false);
@@ -60,7 +63,7 @@ export default function ImportFile({
   const handleFiles = async (files: FileList | null) => {
     if (!files) return;
 
-    const result = await parseFile(files[0]);
+    const result = await parseFile(files[0], stringToLocationFinder);
 
     const { errorMessages, warningMessages, filename } = result;
 

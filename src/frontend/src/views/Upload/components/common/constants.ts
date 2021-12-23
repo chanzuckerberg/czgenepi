@@ -1,9 +1,11 @@
-import invert from "lodash/invert";
+import { invert, omitBy } from "lodash";
 import {
   Metadata,
   ParsedMetadata,
 } from "src/views/Upload/components/common/types";
 
+// Internal keys we use to represent to various kinds of metadata on a sample
+// and the user-visible name we give the info, seen as a header on column.
 export const METADATA_KEYS_TO_HEADERS: Record<keyof Metadata, string> = {
   collectionDate: "Collection Date",
   collectionLocation: "Collection Location",
@@ -15,13 +17,22 @@ export const METADATA_KEYS_TO_HEADERS: Record<keyof Metadata, string> = {
   submittedToGisaid: "Previously Submitted to GISAID?",
 };
 
-// When parsing Metadata TSV files, the "Collection Location" column is a string that we convert to
-// a GisaidLocation.
-export const HEADERS_TO_METADATA_KEYS = invert({
+// When parsing file upload of metadata, we use the flipped version of above.
+// Slightly different though, see comments inside.
+export const HEADERS_TO_METADATA_KEYS = invert(omitBy(
+  {
+  // Generally we use all the same, but now flipped to be Header name -> key
   ...METADATA_KEYS_TO_HEADERS,
-  collectionLocation: "UNUSED",
+  // However! We do not directly collect `collectionLocation` in file upload.
+  // That's actually an object internally, so can't parse. Mark as unused.
+  collectionLocation: "UNUSED", // Will get stripped entirely via `omitBy`
+  // Instead, we collect a canonical string that refers to the location.
+  // We still give same user-facing name, but internally used differently.
+  // This string will get converted later into a "real" collectionLocation.
   locationString: "Collection Location",
-}) as Record<string, keyof ParsedMetadata>;
+  },
+  val => val === "UNUSED", // Omits anything we marked as UNUSED above
+)) as Record<string, keyof ParsedMetadata>;
 
 export const METADATA_KEYS_TO_API_KEYS: Record<keyof Metadata, string> = {
   collectionDate: "collection_date",
