@@ -35,7 +35,7 @@ TEMPLATE_ARGS=$(jq -c . < "${TEMPLATE_ARGS_FILE}")
 WORKFLOW_ID=$(aspen-cli db create-phylo-run                            \
                   --group-name "${GROUP_NAME}"                         \
                   --builds-template-args "${TEMPLATE_ARGS}"            \
-                  --tree-name "${S3_FILESTEM} recency-focused build"   \
+                  --tree-name "${S3_FILESTEM} Recency-Focused Build"   \
                   --tree-type "${TREE_TYPE}"
 )
 echo "${WORKFLOW_ID}" >| "/tmp/workflow_id"
