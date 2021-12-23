@@ -34,7 +34,7 @@ class OverviewBuilder(BaseNextstrainConfigBuilder):
         early_late_cutoff = today - datetime.timedelta(weeks=12)
 
         subsampling["group"][
-                "min-date"
+                "min_date"
             ] = f"--min-date {early_late_cutoff.strftime('%Y-%m-%d')}"
 
         # Update our sampling for state/country level builds if necessary
