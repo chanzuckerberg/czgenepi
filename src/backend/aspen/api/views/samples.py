@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, Dict, List, Mapping, MutableSequence, NamedTuple, Optional, Set
+from typing import Dict, List, NamedTuple, Optional, Set
 
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends
@@ -133,7 +133,7 @@ async def list_samples(
         )
 
     # populate sample object using pydantic response schema
-    results: MutableSequence[Mapping[str, Any]] = list()
+    result = SamplesResponseSchema(samples=[])
     for sample_gisaid_tuple in sample_gisaid_tuple_map.values():
         sample = sample_gisaid_tuple.sample
         sample.gisaid = determine_gisaid_status(
@@ -150,9 +150,9 @@ async def list_samples(
         ):
             sample.show_private_identifier = True
 
-        returned_sample_data = SampleResponseSchema.from_orm(sample)
-        results.append(returned_sample_data)
-    return SamplesResponseSchema.parse_obj({"samples": results})
+        sampleinfo = SampleResponseSchema.from_orm(sample)
+        result.samples.append(sampleinfo)
+    return result
 
 
 async def get_owned_samples_by_ids(
