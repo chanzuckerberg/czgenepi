@@ -31,7 +31,7 @@ class OverviewBuilder(BaseNextstrainConfigBuilder):
 
         # only keep group samples within the past 3 months
         today = datetime.date.today()
-        early_late_cutoff = today - datetime.timedelta(weeks=2)
+        early_late_cutoff = today - datetime.timedelta(weeks=12)
 
         subsampling["group"][
                 "min-date"
