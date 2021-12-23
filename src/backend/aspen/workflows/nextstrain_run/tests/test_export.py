@@ -39,15 +39,18 @@ def create_test_data(
             and_(
                 Location.region == "North America",
                 Location.country == "USA",
-                Location.division == group.division,
-                Location.location == group.location,
+                Location.division == f"{group.division} Test Division",
+                Location.location == f"{group.location} Test City",
             )
         )
         .one_or_none()
     )
     if not location:
         location = location_factory(
-            "North America", "USA", group.division, group.location
+            "North America",
+            "USA",
+            f"{group.division} Test Division",
+            f"{group.location} Test City",
         )
     session.add(group)
 
