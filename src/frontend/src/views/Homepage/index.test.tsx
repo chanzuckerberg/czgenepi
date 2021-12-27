@@ -13,6 +13,7 @@ test("renders the Homepage", async () => {
   expect(screen.getByText("Loading...")).toBeInTheDocument();
 
   await waitFor(() => {
-    expect(screen.getByText(/Welcome to CZ Gen Epi/)).toBeInTheDocument();
+    expect(screen.getByText(/Welcome/i)).toBeInTheDocument();
+    expect(screen.getByText(/to CZ GEN EPI/i)).toBeInTheDocument();
   });
 });
