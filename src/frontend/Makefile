@@ -6,10 +6,11 @@ lint:
 	npm --prefix . run lint
 
 ### TESTING #################################################
-tests: # run ts test
+.PHONY: tests
+tests: # run ts unit test
 	npm --prefix . run tests
 
-e2e: # run ts test
+e2e: # run ts e2e test
 	npm --prefix . run e2e
 
 test-build:
