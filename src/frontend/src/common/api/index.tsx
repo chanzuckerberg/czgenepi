@@ -118,12 +118,10 @@ export interface TreeResponse extends APIResponse {
   phylo_runs: Tree[];
 }
 const TREE_MAP = new Map<string, keyof Tree>([
-  ["phylo_tree_id", "id"],
-  ["pathogen_genome_count", "pathogenGenomeCount"],
-  ["completed_date", "creationDate"],
+  ["end_datetime", "creationDate"],
   ["tree_type", "treeType"],
-  ["started_date", "startedDate"],
-  ["workflow_id", "workflowId"],
+  ["start_datetime", "startedDate"],
+  ["workflow_status", "status"],
 ]);
 export const fetchTrees = (): Promise<TreeResponse> =>
   apiResponse<TreeResponse>(["phylo_runs"], [TREE_MAP], API.PHYLO_TREES);
