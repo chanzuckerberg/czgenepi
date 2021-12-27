@@ -84,7 +84,7 @@ const Data: FunctionComponent = () => {
       samples: transformData(sampleData?.samples ?? [], "publicId"),
       // use workflowID as key (failed and started phylotrees do not have an associated PhyloTree ID since they are technically only PhyloRun objects)
       trees: transformData(
-        treeData?.phylo_trees ?? [],
+        treeData?.phylo_runs ?? [],
         "workflowId",
         TREE_TRANSFORMS
       ),
