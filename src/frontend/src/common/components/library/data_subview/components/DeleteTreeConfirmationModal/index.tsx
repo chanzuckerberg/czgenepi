@@ -30,11 +30,11 @@ const DeleteTreeConfirmationModal = ({
 
   if (!tree) return null;
 
-  const { workflowId, name } = tree;
+  const { id, name } = tree;
 
   const onDelete = () => {
     deleteTreeMutation.mutate({
-      treeIdToDelete: workflowId,
+      treeIdToDelete: id,
     });
     onClose();
   };
