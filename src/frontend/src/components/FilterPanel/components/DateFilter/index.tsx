@@ -8,6 +8,7 @@ import {
   DATE_REGEX,
 } from "src/components/DateField/constants";
 import * as yup from "yup";
+import { UpdateDateFilterType } from "../..";
 import {
   StyledChip,
   StyledFilterWrapper,
@@ -24,7 +25,7 @@ import {
 
 export type DateType = FormattedDateType | Date;
 
-const formatDate = (d: DateType) => {
+const formatDateForDisplay = (d: DateType) => {
   if (d === undefined) return d;
   if (typeof d === "string") return d;
 
@@ -43,7 +44,7 @@ interface Props {
   fieldKeyEnd: string;
   fieldKeyStart: string;
   inputLabel: string;
-  updateDateFilter: (start: FormattedDateType, end: FormattedDateType) => void;
+  updateDateFilter: UpdateDateFilterType;
   menuOptions: DateMenuOption[];
 }
 
@@ -104,13 +105,13 @@ export const DateFilter: FC<Props> = ({
   const errorMessageFieldKeyEnd = errors[fieldKeyEnd];
 
   // Use this over directly using `updateDateFilter` prop so we track filter changes.
-  const setDatesFromRange = (start: DateType, end: DateType) => {
-    const newStartDate = formatDate(start);
-    const newEndDate = formatDate(end);
+  const setDatesFromRange: UpdateDateFilterType = (start, end) => {
+    const newStartDate = formatDateForDisplay(start);
+    const newEndDate = formatDateForDisplay(end);
     setStartDate(newStartDate);
     setEndDate(newEndDate);
 
-    updateDateFilter(newStartDate, newEndDate);
+    updateDateFilter(start, end);
     handleClose();
   };
 
@@ -123,15 +124,17 @@ export const DateFilter: FC<Props> = ({
     // We assume start of interval is always guaranteed, but not necessarily end
     const start = new Date();
     start.setDate(start.getDate() - dateOption.numDaysStartOffset);
+    start.setHours(0, 0, 0);
     let end = undefined;
     if (dateOption.numDaysEndOffset) {
       end = new Date();
       end.setDate(end.getDate() - dateOption.numDaysEndOffset);
+      end.setHours(23, 59, 59);
     }
     setDatesFromRange(start, end);
   };
 
-  const setDatesFromFields = (start: DateType, end: DateType) => {
+  const setDatesFromFields: UpdateDateFilterType = (start, end) => {
     // Since using fields instead, clear out selected menu option
     setSelectedDateMenuOption(null);
     setDatesFromRange(start, end);
@@ -181,7 +184,11 @@ export const DateFilter: FC<Props> = ({
               color="primary"
               variant="contained"
               onClick={() => {
-                setDatesFromFields(values[fieldKeyStart], values[fieldKeyEnd]);
+                const startValue = values[fieldKeyStart];
+                const endValue = values[fieldKeyEnd];
+                const start = startValue ? new Date(startValue) : undefined;
+                const end = endValue ? new Date(endValue) : undefined;
+                return setDatesFromFields(start, end);
               }}
               disabled={isValidating || !isValid}
             >
