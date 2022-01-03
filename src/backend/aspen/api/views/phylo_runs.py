@@ -283,16 +283,16 @@ async def update_phylo_tree_and_run(
     # get phylo_run and check that user has permission to update PhyloRun/PhyloTree
     phylo_run = await get_editable_phylo_run_by_id(db, item_id, user)
 
-    async with db as session:
-        # update phylorun name
-        phylo_run.name = phylo_run_update_request.name
+    # update phylorun name
+    phylo_run.name = phylo_run_update_request.name
 
-        # if there are any associated PhyloTrees update those names as well:
-        if phylo_run.outputs:
-            for output in phylo_run.outputs:
-                if isinstance(output, PhyloTree):
-                    output.name = phylo_run_update_request.name
+    # if there are any associated PhyloTrees update those names as well:
+    if phylo_run.outputs:
+        for output in phylo_run.outputs:
+            if isinstance(output, PhyloTree):
+                output.name = phylo_run_update_request.name
 
-        await session.commit()
+    await db.commit()
 
-    return PhyloRunUpdateResponse(id=phylo_run.id)
+    # return PhyloRunUpdateResponse(id=phylo_run.id)
+    return PhyloRunResponse.from_orm(phylo_run)
