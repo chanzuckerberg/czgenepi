@@ -193,28 +193,34 @@ async def kick_off_phylo_run(
     return PhyloRunResponse.from_orm(workflow)
 
 
-async def get_editable_phylo_runs_by_id(db, user, run_id=None):
+async def get_editable_phylo_runs_by_id(db, user, run_id=None, all_viewable=False):
     # get list of all viewable phylo_runs viewable to user, otherwise returh phylo_run matching run_id if sufficient permissions
     cansee_owner_group_ids: Set[int] = {
         cansee.owner_group_id
         for cansee in user.group.can_see
         if cansee.data_type == DataType.TREES
     }
-    query = (
-        sa.select(PhyloRun)
-        .options(
-            joinedload(PhyloRun.outputs.of_type(PhyloTree)),
-            joinedload(PhyloRun.user),  # For Pydantic serialization
-            joinedload(PhyloRun.group),  # For Pydantic serialization
-        )
-        .filter(
+    query = sa.select(PhyloRun).options(
+        joinedload(PhyloRun.outputs.of_type(PhyloTree)),
+        joinedload(PhyloRun.user),  # For Pydantic serialization
+        joinedload(PhyloRun.group),  # For Pydantic serialization
+    )
+
+    # These are access control checks!
+    if all_viewable:
+        # this is for list view, return all runs that are viewable
+        query = query.filter(
             sa.or_(
                 PhyloRun.group == user.group,
                 user.system_admin,
                 PhyloRun.group_id.in_(cansee_owner_group_ids),
-            ),  # This is an access control check!
+            ),
         )
-    )
+    else:
+        # for update and delete views return only trees that are in the users group
+        query = query.filter(
+            PhyloRun.group == user.group,
+        )
 
     if run_id:
         query = query.filter(PhyloRun.id == run_id)
@@ -239,7 +245,9 @@ async def list_runs(
     user: User = Depends(get_auth_user),
 ) -> PhyloRunsListResponse:
 
-    phylo_runs: Iterable[PhyloRun] = await get_editable_phylo_runs_by_id(db, user)
+    phylo_runs: Iterable[PhyloRun] = await get_editable_phylo_runs_by_id(
+        db, user, all_viewable=True
+    )
 
     # filter for only information we need in sample table view
     results: List[PhyloRunResponse] = []
