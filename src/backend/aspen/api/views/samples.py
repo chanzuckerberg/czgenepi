@@ -54,6 +54,7 @@ async def list_samples(
         selectinload(Sample.uploaded_pathogen_genome),
         selectinload(Sample.submitting_group),
         selectinload(Sample.uploaded_by),
+        selectinload(Sample.collection_location),
     )
     user_visible_samples_query = authz_samples_cansee(all_samples_query, None, user)
     user_visible_samples_result = await db.execute(user_visible_samples_query)

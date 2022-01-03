@@ -1,9 +1,10 @@
 from sqlalchemy import Column, String, UniqueConstraint
 
 from aspen.database.models.base import idbase
+from aspen.database.models.mixins import BaseMixin
 
 
-class Location(idbase):  # type: ignore
+class Location(idbase, BaseMixin):  # type: ignore
     """List of supported DPH/Sample locations, imported from Gisaid"""
 
     __tablename__ = "locations"

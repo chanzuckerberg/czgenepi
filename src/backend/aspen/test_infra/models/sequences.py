@@ -98,12 +98,15 @@ def uploaded_pathogen_genome_factory(
     return uploaded_pathogen_genome
 
 
-def uploaded_pathogen_genome_multifactory(group, uploaded_by_user, num_genomes):
+def uploaded_pathogen_genome_multifactory(
+    group, uploaded_by_user, location, num_genomes
+):
     pathogen_genomes = []
     for i in range(num_genomes):
         sample: Sample = sample_factory(
             group,
             uploaded_by_user,
+            location,
             private_identifier=f"private_identifier_{i}",
             public_identifier=f"public_identifier_{i}",
         )
