@@ -28,6 +28,7 @@ def test_samples_create_view_pass_no_public_id(
     session.add(group)
     session.add(location)
     session.commit()
+    test_date = datetime.datetime.now()
     with client.session_transaction() as sess:
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
 
@@ -35,26 +36,26 @@ def test_samples_create_view_pass_no_public_id(
         {
             "sample": {
                 "private_identifier": "private",
-                "collection_date": api_utils.format_date(datetime.datetime.now()),
+                "collection_date": api_utils.format_date(test_date),
                 "location_id": location.id,
                 "private": True,
             },
             "pathogen_genome": {
                 "sequence": "AAAKAANTCG",
-                "sequencing_date": api_utils.format_date(datetime.datetime.now()),
+                "sequencing_date": api_utils.format_date(test_date),
                 "isl_access_number": "test_accession_number",
             },
         },
         {
             "sample": {
                 "private_identifier": "private2",
-                "collection_date": api_utils.format_date(datetime.datetime.now()),
+                "collection_date": api_utils.format_date(test_date),
                 "location_id": location.id,
                 "private": True,
             },
             "pathogen_genome": {
                 "sequence": "AACTGTNNNN",
-                "sequencing_date": api_utils.format_date(datetime.datetime.now()),
+                "sequencing_date": api_utils.format_date(test_date),
                 "isl_access_number": "test_accession_number2",
             },
         },
@@ -74,8 +75,8 @@ def test_samples_create_view_pass_no_public_id(
     # check that creating new public identifiers works
     public_ids = sorted([i.public_identifier for i in session.query(Sample).all()])
     assert [
-        "hCoV-19/USA/groupname-1/2021",
-        "hCoV-19/USA/groupname-2/2021",
+        f"hCoV-19/USA/groupname-1/{test_date.year}",
+        f"hCoV-19/USA/groupname-2/{test_date.year}",
     ] == public_ids
 
     sample_1 = (
@@ -103,6 +104,8 @@ def test_samples_create_view_pass_no_sequencing_date(
     session.add(group)
     session.add(location)
     session.commit()
+    test_date = datetime.datetime.now()
+
     with client.session_transaction() as sess:
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
 
@@ -111,7 +114,7 @@ def test_samples_create_view_pass_no_sequencing_date(
             "sample": {
                 "private_identifier": "private",
                 "public_identifier": "",
-                "collection_date": api_utils.format_date(datetime.datetime.now()),
+                "collection_date": api_utils.format_date(test_date),
                 "location_id": location.id,
                 "private": True,
             },
@@ -125,13 +128,13 @@ def test_samples_create_view_pass_no_sequencing_date(
             "sample": {
                 "private_identifier": "private2",
                 "public_identifier": "",
-                "collection_date": api_utils.format_date(datetime.datetime.now()),
+                "collection_date": api_utils.format_date(test_date),
                 "location_id": location.id,
                 "private": True,
             },
             "pathogen_genome": {
                 "sequence": "AACTKGTNNNN",
-                "sequencing_date": "2021-06-15",
+                "sequencing_date": test_date.strftime("%Y-%m-%d"),
                 "isl_access_number": "test_accession_number2",
             },
         },
@@ -151,8 +154,8 @@ def test_samples_create_view_pass_no_sequencing_date(
     # check that creating new public identifiers works
     public_ids = sorted([i.public_identifier for i in session.query(Sample).all()])
     assert [
-        "hCoV-19/USA/groupname-1/2021",
-        "hCoV-19/USA/groupname-2/2021",
+        f"hCoV-19/USA/groupname-1/{test_date}",
+        f"hCoV-19/USA/groupname-2/{test_date}",
     ] == public_ids
 
     sample_1 = (
@@ -180,6 +183,7 @@ def test_samples_create_view_invalid_sequence(
     session.add(group)
     session.add(location)
     session.commit()
+    test_date = datetime.datetime.now()
     with client.session_transaction() as sess:
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
 
