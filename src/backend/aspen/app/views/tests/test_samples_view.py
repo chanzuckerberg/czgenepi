@@ -3,10 +3,9 @@ import datetime
 from flask.testing import FlaskClient
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.session import Session
-from sqlalchemy.sql.expression import and_
 
 from aspen.app.views import api_utils
-from aspen.database.models import Location, Sample, UploadedPathogenGenome
+from aspen.database.models import Sample, UploadedPathogenGenome
 from aspen.test_infra.models.gisaid_accession import gisaid_accession_factory
 from aspen.test_infra.models.gisaid_metadata import gisaid_metadata_factory
 from aspen.test_infra.models.location import location_factory
@@ -183,7 +182,6 @@ def test_samples_create_view_invalid_sequence(
     session.add(group)
     session.add(location)
     session.commit()
-    test_date = datetime.datetime.now()
     with client.session_transaction() as sess:
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
 
