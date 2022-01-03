@@ -89,18 +89,6 @@ def create_location(session, region, country, division, location):
     )
     session.add(location)
     session.commit()
-    location = (
-        session.query(Location)
-        .filter(
-            and_(
-                Location.region == region,
-                Location.country == country,
-                Location.division == division,
-                Location.location == location,
-            )
-        )
-        .one_or_none()
-    )
     return location
 
 

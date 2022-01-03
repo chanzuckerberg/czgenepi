@@ -28,18 +28,6 @@ def test_samples_create_view_pass_no_public_id(
     session.add(group)
     session.add(location)
     session.commit()
-    location = (
-        session.query(Location)
-        .filter(
-            and_(
-                Location.region == "North America",
-                Location.country == "USA",
-                Location.division == "California",
-                Location.location == "Santa Barbara County",
-            )
-        )
-        .one()
-    )
     with client.session_transaction() as sess:
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
 
@@ -115,18 +103,6 @@ def test_samples_create_view_pass_no_sequencing_date(
     session.add(group)
     session.add(location)
     session.commit()
-    location = (
-        session.query(Location)
-        .filter(
-            and_(
-                Location.region == "North America",
-                Location.country == "USA",
-                Location.division == "California",
-                Location.location == "Santa Barbara County",
-            )
-        )
-        .one()
-    )
     with client.session_transaction() as sess:
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
 
@@ -204,18 +180,6 @@ def test_samples_create_view_invalid_sequence(
     session.add(group)
     session.add(location)
     session.commit()
-    location = (
-        session.query(Location)
-        .filter(
-            and_(
-                Location.region == "North America",
-                Location.country == "USA",
-                Location.division == "California",
-                Location.location == "Santa Barbara County",
-            )
-        )
-        .one()
-    )
     with client.session_transaction() as sess:
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
 
