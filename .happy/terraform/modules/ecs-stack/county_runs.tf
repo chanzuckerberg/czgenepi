@@ -18,7 +18,7 @@ module nextstrain_chicago_contextual_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = module.swipe_sfn.step_function_arn
-  schedule_expressions  = local.nextstrain_cron_schedule
+  schedule_expressions  = contains(["geprod", "gestaging"], local.deployment_stage) ? ["cron(0 5 ? * MON-SAT *)"] : []
   event_role_arn        = local.event_role_arn
   extra_args            =  {
     genepi_config_secret_name = "${local.deployment_stage}/genepi-config"
