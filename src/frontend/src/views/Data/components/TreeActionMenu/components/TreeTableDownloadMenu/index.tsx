@@ -8,10 +8,9 @@ import { StyledIcon, StyledIconWrapper } from "../../style";
 
 interface Props {
   item: TableItem;
-  value: string;
 }
 
-const TreeTableDownloadMenu = ({ item, value }: Props): JSX.Element => {
+const TreeTableDownloadMenu = ({ item }: Props): JSX.Element => {
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 
   const handleClick: MouseEventHandler = (event) => {
@@ -22,7 +21,7 @@ const TreeTableDownloadMenu = ({ item, value }: Props): JSX.Element => {
     setAnchorEl(null);
   };
 
-  const jsonLink = stringGuard(value);
+  const jsonLink = stringGuard(item["downloadLink"]);
   const tsvDownloadLink = stringGuard(item["accessionsLink"]);
   const disabled = item?.status !== TREE_STATUS.Completed;
   // TODO (mlila): This is necessary due to an sds bug -- MUI tooltips should not display
