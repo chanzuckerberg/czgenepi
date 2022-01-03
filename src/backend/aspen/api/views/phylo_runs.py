@@ -196,6 +196,7 @@ async def kick_off_phylo_run(
 
 
 async def get_editable_phylo_run_by_id(db, run_id, user):
+    # phylo_run_alias = aliased(PhyloRun)
     query = (
         sa.select(PhyloRun)
         .filter(
@@ -204,7 +205,11 @@ async def get_editable_phylo_run_by_id(db, run_id, user):
                 PhyloRun.id == run_id,
             )
         )
-        .options(joinedload(PhyloRun.outputs))
+        .options(
+            joinedload(PhyloRun.outputs.of_type(PhyloTree)),
+            joinedload(PhyloRun.user),  # For Pydantic serialization
+            joinedload(PhyloRun.group),  # For Pydantic serialization
+        )
     )
     results = await db.execute(query)
     try:

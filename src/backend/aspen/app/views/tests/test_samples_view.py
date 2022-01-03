@@ -679,6 +679,7 @@ def test_samples_create_view_pass_no_public_id(
     user = user_factory(group)
     session.add(group)
     session.commit()
+
     with client.session_transaction() as sess:
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
 
@@ -724,9 +725,10 @@ def test_samples_create_view_pass_no_public_id(
     assert len(uploaded_pathogen_genomes) == 2
     # check that creating new public identifiers works
     public_ids = sorted([i.public_identifier for i in session.query(Sample).all()])
+    current_year = datetime.datetime.now().year
     assert [
-        "hCoV-19/USA/groupname-1/2021",
-        "hCoV-19/USA/groupname-2/2021",
+        f"hCoV-19/USA/groupname-1/{current_year}",
+        f"hCoV-19/USA/groupname-2/{current_year}",
     ] == public_ids
 
     sample_1 = (
@@ -797,9 +799,10 @@ def test_samples_create_view_pass_no_sequencing_date(
     assert len(uploaded_pathogen_genomes) == 2
     # check that creating new public identifiers works
     public_ids = sorted([i.public_identifier for i in session.query(Sample).all()])
+    current_year = datetime.datetime.now().year
     assert [
-        "hCoV-19/USA/groupname-1/2021",
-        "hCoV-19/USA/groupname-2/2021",
+        f"hCoV-19/USA/groupname-1/{current_year}",
+        f"hCoV-19/USA/groupname-2/{current_year}",
     ] == public_ids
 
     sample_1 = (
