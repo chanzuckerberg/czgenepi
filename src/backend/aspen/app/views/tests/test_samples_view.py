@@ -153,8 +153,8 @@ def test_samples_create_view_pass_no_sequencing_date(
     # check that creating new public identifiers works
     public_ids = sorted([i.public_identifier for i in session.query(Sample).all()])
     assert [
-        f"hCoV-19/USA/groupname-1/{test_date}",
-        f"hCoV-19/USA/groupname-2/{test_date}",
+        f"hCoV-19/USA/groupname-1/{test_date.year}",
+        f"hCoV-19/USA/groupname-2/{test_date.year}",
     ] == public_ids
 
     sample_1 = (
