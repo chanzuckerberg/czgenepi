@@ -1,5 +1,4 @@
 from aspen.database.models import CanSee, DataType
-from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
@@ -11,13 +10,9 @@ def create_phylotree_with_inputs(session, owner_group):
     user = user_factory(
         owner_group, name=username, auth0_user_id=username, email=username
     )
-    location = location_factory(
-        "North America", "USA", "California", "Santa Barbara County"
-    )
     sample = sample_factory(
         owner_group,
         user,
-        location,
         public_identifier="public_identifier_1",
         private_identifier="private_identifier_1",
     )
@@ -39,10 +34,7 @@ def create_phylotree_with_inputs(session, owner_group):
 def create_phylotree(session):
     owner_group = group_factory()
     user = user_factory(owner_group)
-    location = location_factory(
-        "North America", "USA", "California", "Santa Barbara County"
-    )
-    sample = sample_factory(owner_group, user, location)
+    sample = sample_factory(owner_group, user)
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
 
     phylo_tree = phylotree_factory(

@@ -2,7 +2,6 @@ import datetime
 
 from aspen.database.models import CanSee, DataType, PublicRepositoryType
 from aspen.test_infra.models.accession_workflow import AccessionWorkflowDirective
-from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
 from aspen.test_infra.models.usergroup import group_factory, user_factory
@@ -18,10 +17,7 @@ def test_prepare_sequences_download(
     """
     group = group_factory()
     user = user_factory(group)
-    location = location_factory(
-        "North America", "USA", "California", "Santa Barbara County"
-    )
-    sample = sample_factory(group, user, location)
+    sample = sample_factory(group, user)
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     session.add(group)
     session.commit()
@@ -57,10 +53,7 @@ def test_prepare_sequences_download_no_access(
     owner_group = group_factory()
     viewer_group = group_factory(name="County")
     user = user_factory(viewer_group)
-    location = location_factory(
-        "North America", "USA", "California", "Santa Barbara County"
-    )
-    sample = sample_factory(owner_group, user, location)
+    sample = sample_factory(owner_group, user)
     uploaded_pathogen_genome_factory(sample)
 
     session.add_all((owner_group, viewer_group))
@@ -92,10 +85,7 @@ def test_prepare_sequences_download_no_private_id_access(
     owner_group = group_factory()
     viewer_group = group_factory(name="CDPH")
     user = user_factory(viewer_group)
-    location = location_factory(
-        "North America", "USA", "California", "Santa Barbara County"
-    )
-    sample = sample_factory(owner_group, user, location)
+    sample = sample_factory(owner_group, user)
     uploaded_pathogen_genome_factory(sample)
     # give the viewer group access to the sequences from the owner group
     CanSee(
@@ -145,9 +135,6 @@ def test_access_matrix(
         name="Owner User",
         auth0_user_id="owner1",
     )
-    location = location_factory(
-        "North America", "USA", "California", "Santa Barbara County"
-    )
     # give the viewer group access to the sequences from the owner group
     CanSee(
         viewer_group=viewer_group,
@@ -160,30 +147,17 @@ def test_access_matrix(
         data_type=DataType.PRIVATE_IDENTIFIERS,
     )
     sample1 = sample_factory(
-        owner_group1,
-        user,
-        location,
-        private_identifier="sample1",
-        public_identifier="pub1",
+        owner_group1, user, private_identifier="sample1", public_identifier="pub1"
     )
     sample2 = sample_factory(
-        owner_group2,
-        user,
-        location,
-        private_identifier="sample2",
-        public_identifier="pub2",
+        owner_group2, user, private_identifier="sample2", public_identifier="pub2"
     )
     sample3 = sample_factory(
-        viewer_group,
-        user,
-        location,
-        private_identifier="sample3",
-        public_identifier="pub3",
+        viewer_group, user, private_identifier="sample3", public_identifier="pub3"
     )
     sample4 = sample_factory(
         owner_group1,
         user,
-        location,
         private_identifier="sample4",
         public_identifier="pub4",
         private=True,
