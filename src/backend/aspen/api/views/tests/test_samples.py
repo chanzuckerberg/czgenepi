@@ -9,6 +9,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.exc import NoResultFound
 
 from aspen.api.schemas.base import convert_datetime_to_iso_8601
+from aspen.api.schemas.samples import (
+    UpdateSamplesRequest
+)
 from aspen.database.models import (
     CanSee,
     DataType,
@@ -972,23 +975,34 @@ async def test_update_samples_success(
 
 
     auth_headers = {"user_id": user.auth0_user_id}
-    data = {"samples": [
-        {
-            "id": samples[0].id,
-            "private_identifier": "new_private_identifier",
-        },
-        {
-            "id": samples[1].id,
-            "public_identifier": "new_public_identifier"
-        }
-    ]
-    }
+
+    data = UpdateSamplesRequest(samples=[
+            {
+                "id": samples[0].id,
+                "private_identifier": "new_private_identifier",
+
+            },
+            {
+                "id": samples[1].id,
+                "private_identifier": "new_public_identifier2",
+            },
+            {
+                "id": samples[2].id,
+                "private_identifier": "new_public_identifier3",
+            }
+        ],
+    ).dict()
+
     res = await http_client.put(
-        f"/v2/samples/",
-        data=data,
+        f"/v2/samples",
+        json=data,
         headers=auth_headers,
     )
-    #assert res.status_code == 200
-    response = res.json()
-    print("stop ")
+    assert res.status_code == 200
+
+    reorganized_data = {s["id"]: s for s in data["samples"]}
+    for s in samples:
+        q = await async_session.execute(sa.select(Sample).filter(Sample.id == s.id))
+        r = q.scalars().one()
+        assert r.private_identifier == reorganized_data[s.id]["private_identifier"]
 

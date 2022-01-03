@@ -223,12 +223,30 @@ async def update_samples(
     user: User = Depends(get_auth_user),
 ) -> UpdateSamplesResponse:
 
+    # reorganize request data to make it easier to update
+    reorganized_request_data = {
+        s.id : s
+        for s in update_samples_request.samples
+    }
+    sample_ids_to_update = reorganized_request_data.keys()
     # Make sure these samples exist and are delete-able by the current user.
-    sample_db_res = await get_owned_samples_by_ids(db, [sample_id], user)
-    print("stop")
-    print("stop")
-    # return error message if any samples sumitted for update are not editable by user
+    sample_db_res = await get_owned_samples_by_ids(db, sample_ids_to_update, user)
+    editable_samples = sample_db_res.all()
 
-    # update fields
+    # are there any samples that can't be updated?
+    uneditable_samples = [s for s in sample_ids_to_update if s not in [i.id for i in editable_samples]]
+    if uneditable_samples:
+        raise ex.NotFoundException("some samples cannot be updated")
 
-    # return response
+    # async with db as session:
+    for sample in editable_samples:
+        update_data = reorganized_request_data[sample.id]
+        for key, value in update_data:
+            if value:
+                setattr(sample, key, value)
+
+          db.add(sample)
+
+    await db.commit()
+
+    return UpdateSamplesResponse(ids=[i for i in sample_ids_to_update])
