@@ -8,9 +8,8 @@ import sentry_sdk
 import sqlalchemy as sa
 from boto3 import Session
 from fastapi import APIRouter, Depends
-from sqlalchemy import or_
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import aliased, joinedload
+from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
 from starlette.requests import Request
 
@@ -24,7 +23,6 @@ from aspen.api.schemas.phylo_runs import (
     PhyloRunResponse,
     PhyloRunsListResponse,
     PhyloRunUpdateRequest,
-    PhyloRunUpdateResponse,
 )
 from aspen.api.settings import Settings
 from aspen.api.utils import get_matching_gisaid_ids
@@ -195,30 +193,42 @@ async def kick_off_phylo_run(
     return PhyloRunResponse.from_orm(workflow)
 
 
-async def get_editable_phylo_run_by_id(db, run_id, user):
-    # phylo_run_alias = aliased(PhyloRun)
+async def get_editable_phylo_runs_by_id(db, user, run_id=None):
+    # get list of all viewable phylo_runs viewable to user, otherwise returh phylo_run matching run_id if sufficient permissions
+    cansee_owner_group_ids: Set[int] = {
+        cansee.owner_group_id
+        for cansee in user.group.can_see
+        if cansee.data_type == DataType.TREES
+    }
     query = (
         sa.select(PhyloRun)
-        .filter(
-            sa.and_(
-                PhyloRun.group == user.group,  # This is an access control check!
-                PhyloRun.id == run_id,
-            )
-        )
         .options(
             joinedload(PhyloRun.outputs.of_type(PhyloTree)),
             joinedload(PhyloRun.user),  # For Pydantic serialization
             joinedload(PhyloRun.group),  # For Pydantic serialization
         )
+        .filter(
+            sa.or_(
+                PhyloRun.group == user.group,
+                user.system_admin,
+                PhyloRun.group_id.in_(cansee_owner_group_ids),
+            ),  # This is an access control check!
+        )
     )
+
+    if run_id:
+        query = query.filter(PhyloRun.id == run_id)
+        results = await db.execute(query)
+        try:
+            run = results.scalars().unique().one()
+        except NoResultFound:
+            raise ex.NotFoundException("phylo run not found")
+        if run.workflow_status == WorkflowStatusType.STARTED:
+            raise ex.BadRequestException("Can't modify an in-progress phylo run")
+        return run
+
     results = await db.execute(query)
-    try:
-        run = results.scalars().unique().one()
-    except NoResultFound:
-        raise ex.NotFoundException("phylo run not found")
-    if run.workflow_status == WorkflowStatusType.STARTED:
-        raise ex.BadRequestException("Can't modify an in-progress phylo run")
-    return run
+    return results.unique().scalars().all()
 
 
 @router.get("/")
@@ -228,29 +238,8 @@ async def list_runs(
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_auth_user),
 ) -> PhyloRunsListResponse:
-    cansee_owner_group_ids: Set[int] = {
-        cansee.owner_group_id
-        for cansee in user.group.can_see
-        if cansee.data_type == DataType.TREES
-    }
-    phylo_run_alias = aliased(PhyloRun)
-    phylo_runs_query = (
-        sa.select(phylo_run_alias)  # type: ignore
-        .options(
-            joinedload(phylo_run_alias.outputs.of_type(PhyloTree)),
-            joinedload(phylo_run_alias.user),  # For Pydantic serialization
-            joinedload(phylo_run_alias.group),  # For Pydantic serialization
-        )
-        .filter(
-            or_(
-                user.system_admin,
-                phylo_run_alias.group_id == user.group.id,
-                phylo_run_alias.group_id.in_(cansee_owner_group_ids),
-            )
-        )
-    )
-    phylo_run_results = await db.execute(phylo_runs_query)
-    phylo_runs: Iterable[PhyloRun] = phylo_run_results.unique().scalars().all()
+
+    phylo_runs: Iterable[PhyloRun] = await get_editable_phylo_runs_by_id(db, user)
 
     # filter for only information we need in sample table view
     results: List[PhyloRunResponse] = []
@@ -268,7 +257,7 @@ async def delete_run(
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_auth_user),
 ) -> bool:
-    item = await get_editable_phylo_run_by_id(db, item_id, user)
+    item = await get_editable_phylo_runs_by_id(db, user, item_id)
     item_db_id = item.id
 
     for output in item.outputs:
@@ -286,7 +275,7 @@ async def update_phylo_tree_and_run(
     user: User = Depends(get_auth_user),
 ):
     # get phylo_run and check that user has permission to update PhyloRun/PhyloTree
-    phylo_run = await get_editable_phylo_run_by_id(db, item_id, user)
+    phylo_run = await get_editable_phylo_runs_by_id(db, user, item_id)
 
     # update phylorun name
     phylo_run.name = phylo_run_update_request.name
