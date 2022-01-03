@@ -48,19 +48,6 @@ const LABEL_STATUS: Record<
 };
 
 const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
-  collectionLocation: ({ value }): JSX.Element => {
-    const location = value.location ?? value.division;
-    return (
-      <RowContent>
-        <div
-          className={dataTableStyle.cell}
-          data-test-id={`row-collectionLocation`}
-        >
-          {location}
-        </div>
-      </RowContent>
-    );
-  },
   gisaid: ({ value }) => {
     const { gisaid_id, status } = value as Sample["gisaid"];
 

@@ -5,9 +5,9 @@ from aspen.api.schemas.base import BaseResponse
 
 class LocationResponse(BaseResponse):
     id: int
-    region: str
-    country: str
-    division: str
+    region: Optional[str]
+    country: Optional[str]
+    division: Optional[str]
     location: Optional[str]
 
 

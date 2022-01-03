@@ -1,11 +1,9 @@
 from io import StringIO
-from typing import List, Optional
+from typing import List
 
 import yaml
-from sqlalchemy.sql.expression import and_
 
-from aspen.database.models import Group, Location, TreeType, User, WorkflowStatusType
-from aspen.test_infra.models.location import location_factory
+from aspen.database.models import Group, TreeType, User, WorkflowStatusType
 from aspen.test_infra.models.phylo_tree import phylorun_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_multifactory
 from aspen.test_infra.models.usergroup import group_factory, user_factory
@@ -20,38 +18,17 @@ def create_test_data(
     num_selected_samples,  # How many of those samples are workflow inputs
     num_gisaid_samples,  # How many gisaid samples to add to a workflow
     group_name=None,  # Override group name
-    group_location=None,  # Override group location
-    group_division=None,  # Override group division
+    location=None,  # Override group location
+    division=None,  # Override group division
 ):
     if group_name is None:
         group_name = f"testgroup-{tree_type.value}"
-    group: Group = group_factory(
-        name=group_name, division=group_division, location=group_location
-    )
+    group: Group = group_factory(name=group_name, division=division, location=location)
     uploaded_by_user: User = user_factory(
         group,
         email=f"{group_name}{tree_type.value}@dh.org",
         auth0_user_id=group_name,
     )
-    location: Optional[Location] = (
-        session.query(Location)
-        .filter(
-            and_(
-                Location.region == "North America",
-                Location.country == "USA",
-                Location.division == f"{group.division} Test Division",
-                Location.location == f"{group.location} Test City",
-            )
-        )
-        .one_or_none()
-    )
-    if not location:
-        location = location_factory(
-            "North America",
-            "USA",
-            f"{group.division} Test Division",
-            f"{group.location} Test City",
-        )
     session.add(group)
 
     gisaid_samples: List[str] = [
@@ -59,7 +36,7 @@ def create_test_data(
     ]
 
     pathogen_genomes = uploaded_pathogen_genome_multifactory(
-        group, uploaded_by_user, location, num_county_samples
+        group, uploaded_by_user, num_county_samples
     )
 
     selected_samples = pathogen_genomes[:num_selected_samples]
@@ -183,13 +160,7 @@ def test_non_contextualized_regions(mocker, session, postgres_database):
 
     tree_type = TreeType.NON_CONTEXTUALIZED
     state_phylo_run = create_test_data(
-        session,
-        tree_type,
-        10,
-        5,
-        5,
-        group_name="Group Without Location",
-        group_location="",
+        session, tree_type, 10, 5, 5, group_name="Group Without Location", location=""
     )
     country_phylo_run = create_test_data(
         session,
@@ -198,8 +169,8 @@ def test_non_contextualized_regions(mocker, session, postgres_database):
         5,
         5,
         group_name="Group Without division",
-        group_location="",
-        group_division="",
+        location="",
+        division="",
     )
     for run_type, run in {
         "state": state_phylo_run,
@@ -254,13 +225,7 @@ def test_targeted_config_regions(mocker, session, postgres_database):
 
     tree_type = TreeType.TARGETED
     state_phylo_run = create_test_data(
-        session,
-        tree_type,
-        10,
-        5,
-        5,
-        group_name="Group Without Location",
-        group_location="",
+        session, tree_type, 10, 5, 5, group_name="Group Without Location", location=""
     )
     country_phylo_run = create_test_data(
         session,
@@ -269,8 +234,8 @@ def test_targeted_config_regions(mocker, session, postgres_database):
         5,
         5,
         group_name="Group Without division",
-        group_location="",
-        group_division="",
+        location="",
+        division="",
     )
     for run_type, run in {
         "state": state_phylo_run,
@@ -346,13 +311,7 @@ def test_overview_config_division(mocker, session, postgres_database):
 
     tree_type = TreeType.OVERVIEW
     phylo_run = create_test_data(
-        session,
-        tree_type,
-        10,
-        0,
-        0,
-        group_name="Group Without Location",
-        group_location="",
+        session, tree_type, 10, 0, 0, group_name="Group Without Location", location=""
     )
     sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
     subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
@@ -379,8 +338,8 @@ def test_overview_config_country(mocker, session, postgres_database):
         0,
         0,
         group_name="Group Without Location or Country",
-        group_location="",
-        group_division="",
+        location="",
+        division="",
     )
     sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
     subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]

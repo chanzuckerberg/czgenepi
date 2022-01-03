@@ -5,7 +5,6 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.database.models import Group, PhyloTree, Sample, WorkflowStatusType
-from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
@@ -44,10 +43,7 @@ async def test_delete_phylo_run_matrix(
     group2 = group_factory(name="group2")
     user = user_factory(group, auth0_user_id="user1", email="user1")
     user2 = user_factory(group2, auth0_user_id="user2", email="user2")
-    location = location_factory(
-        "North America", "USA", "California", "Santa Barbara County"
-    )
-    sample = sample_factory(group, user, location)
+    sample = sample_factory(group, user)
     gisaid_dump = aligned_gisaid_dump_factory()
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     async_session.add(group)
