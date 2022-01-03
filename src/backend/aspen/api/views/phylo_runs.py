@@ -288,5 +288,4 @@ async def update_phylo_tree_and_run(
 
     await db.commit()
 
-    # return PhyloRunUpdateResponse(id=phylo_run.id)
     return PhyloRunResponse.from_orm(phylo_run)
