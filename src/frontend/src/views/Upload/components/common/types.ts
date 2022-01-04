@@ -35,12 +35,14 @@ export enum WARNING_CODE {
    * for the user
    */
   AUTO_CORRECT,
+  // Metadata row in upload was missing required data for one or more fields
+  MISSING_DATA,
 }
 
 export enum ERROR_CODE {
   DEFAULT, // BAD FILE NAME
   INVALID_NAME,
-  MISSING_FIELD,
+  MISSING_FIELD, // Missing required column entirely: no header field found
   OVER_MAX_SAMPLES,
 }
 
