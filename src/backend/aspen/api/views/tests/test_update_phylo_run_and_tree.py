@@ -6,6 +6,7 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.database.models import Group, PhyloRun, PhyloTree, Sample, User
+from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.usergroup import group_factory, user_factory
@@ -19,10 +20,14 @@ async def make_shared_test_data(
 ) -> Tuple[User, Group, List[Sample], PhyloRun, Union[PhyloTree, None]]:
     group = group_factory()
     user = user_factory(group)
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     samples = [
         sample_factory(
             group,
             user,
+            location,
             private_identifier=f"private_identifier_{i}",
             public_identifier=f"public_identifier_{i}",
         )
