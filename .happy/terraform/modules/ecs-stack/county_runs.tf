@@ -6,7 +6,7 @@ locals {
 
 module nextstrain_chicago_contextual_sfn_config {
   source   = "../sfn_config"
-  app_name = "nextstrain-chicago-contextual-sfn"
+  app_name = "nextstrain-chi-contextual-sfn"
   image    = local.nextstrain_image
   vcpus    = local.nextstrain_sfn_vcpus
   memory   = local.nextstrain_sfn_memory
