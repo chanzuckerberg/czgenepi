@@ -947,22 +947,28 @@ async def test_update_samples_success(
     """
     group = group_factory()
     user = user_factory(group)
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     samples = [
         sample_factory(
             group,
             user,
+            location,
             public_identifier="path/to/sample_id1",
             private_identifier="i_dont_have_spaces1",
         ),
         sample_factory(
             group,
             user,
+            location,
             public_identifier="path/to/sample id2",
             private_identifier="i have spaces2",
         ),
         sample_factory(
             group,
             user,
+            location,
             public_identifier="path/to/sample_id3",
             private_identifier="i have spaces3",
         ),

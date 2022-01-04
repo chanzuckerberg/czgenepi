@@ -162,10 +162,9 @@ async def get_owned_samples_by_ids(
     db: AsyncSession, sample_ids: List[int], user: User
 ) -> AsyncResult:
     query = sa.select(Sample).options(
+        joinedload(Sample.uploaded_pathogen_genome),
         joinedload(Sample.submitting_group),
         joinedload(Sample.uploaded_by),
-        joinedload(Sample.uploaded_pathogen_genome),
-        joinedload(Sample.sequencing_reads_collection),
         joinedload(Sample.collection_location),
     ).filter(  # type: ignore
         sa.and_(
@@ -175,7 +174,6 @@ async def get_owned_samples_by_ids(
     )
     results = await db.execute(query)
     return results.scalars()
-
 
 @router.delete("/")
 async def delete_samples(
@@ -239,6 +237,19 @@ async def update_samples(
     sample_db_res = await get_owned_samples_by_ids(db, sample_ids_to_update, user)
     editable_samples = sample_db_res.all()
 
+    # # load the samples.
+    # all_samples_query = sa.select(Sample).options(  # type: ignore
+    #     selectinload(Sample.uploaded_pathogen_genome),
+    #     selectinload(Sample.submitting_group),
+    #     selectinload(Sample.uploaded_by),
+    #     selectinload(Sample.collection_location),
+    # )
+    # user_visible_samples_query = authz_samples_cansee(all_samples_query, None, user)
+    # user_visible_samples_result = await db.execute(user_visible_samples_query)
+    # editable_samples: List[Sample] = (
+    #     user_visible_samples_result.unique().scalars().all()
+    # )
+
     # are there any samples that can't be updated?
     uneditable_samples = [s for s in sample_ids_to_update if s not in [i.id for i in editable_samples]]
     if uneditable_samples:
@@ -250,7 +261,8 @@ async def update_samples(
         for key, value in update_data:
             if value:
                 setattr(sample, key, value)
-                db.add(sample)
+
+        db.add(sample)
 
     await db.commit()
 
