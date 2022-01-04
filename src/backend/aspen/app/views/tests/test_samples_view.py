@@ -73,6 +73,7 @@ def test_samples_create_view_pass_no_public_id(
     assert len(uploaded_pathogen_genomes) == 2
     # check that creating new public identifiers works
     public_ids = sorted([i.public_identifier for i in session.query(Sample).all()])
+    datetime.datetime.now().year
     assert [
         f"hCoV-19/USA/groupname-1/{test_date.year}",
         f"hCoV-19/USA/groupname-2/{test_date.year}",
@@ -152,6 +153,7 @@ def test_samples_create_view_pass_no_sequencing_date(
     assert len(uploaded_pathogen_genomes) == 2
     # check that creating new public identifiers works
     public_ids = sorted([i.public_identifier for i in session.query(Sample).all()])
+    datetime.datetime.now().year
     assert [
         f"hCoV-19/USA/groupname-1/{test_date.year}",
         f"hCoV-19/USA/groupname-2/{test_date.year}",
