@@ -15,7 +15,7 @@ builds:
     division: {division}
     location: {location}
     subsampling_scheme: {tree_type}
-    title: '{tree_type} tree for samples collected in {location}, {division}, {country}'  # not sure how this works w country-level builds
+    title: CZ Gen Epi Tree  # This gets replaced with a more specific title in builder_base.py
 
 ## custom rules
 custom_rules:
@@ -73,6 +73,12 @@ subsampling:
           type: "proximity"
           focus: "group"
 
+    international_serial_sampling:
+      group_by: "region year month"
+      seq_per_group: 2
+      query: --query "(country != '{country}')"
+
+
 
   TARGETED:
     root:
@@ -129,7 +135,7 @@ subsampling:
     root:
       exclude: "--exclude-where 'root_ref!=yes'"
 
-    same_county:
+    group:
       group_by: "year month"
       max_sequences: 2000
       query: --query "(location == '{location}') & (division == '{division}')"
