@@ -27,6 +27,8 @@ interface CustomTableRenderProps {
   value?: JSONPrimitive | Record<string, JSONPrimitive>;
   item: TableItem;
   index: number;
+  userInfo?: UserResponse;
+  onDeleteTreeModalOpen(t: Tree): void;
 }
 
 type CustomRenderer = ({
@@ -34,6 +36,14 @@ type CustomRenderer = ({
   value,
   item,
   index,
+  userInfo,
+  onDeleteTreeModalOpen,
 }: CustomTableRenderProps) => JSX.Element;
 
-type CellRenderer = ({ value, item, index }: CellRendererProps) => JSX.Element;
+type CellRenderer = ({
+  value,
+  item,
+  index,
+  userInfo,
+  onDeleteTreeModalOpen,
+}: CellRendererProps) => JSX.Element;

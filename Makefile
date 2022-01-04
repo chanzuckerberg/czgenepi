@@ -106,21 +106,44 @@ init-empty-db:
 	-docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c "CREATE USER $(LOCAL_DB_RW_USERNAME) WITH PASSWORD '$(LOCAL_DB_RW_PASSWORD)';"
 	-docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c "CREATE USER $(LOCAL_DB_RO_USERNAME) WITH PASSWORD '$(LOCAL_DB_RO_PASSWORD)';"
 	-docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c "GRANT ALL PRIVILEGES ON DATABASE $(LOCAL_DB_NAME) TO $(LOCAL_DB_RW_USERNAME);"
-	docker-compose exec -T utility aspen-cli db --local create
-	docker-compose exec -T utility alembic stamp head
+	docker-compose $(COMPOSE_OPTS) run sh -c 'aspen-cli db --local create; alembic stamp head'
 
 
 .PHONY: local-init
 local-init: oauth/pkcs12/certificate.pfx .env.ecr local-ecr-login local-hostconfig ## Launch a new local dev env and populate it with test data.
 	docker-compose $(COMPOSE_OPTS) pull database
-	docker-compose $(COMPOSE_OPTS) up -d database frontend backend localstack oidc utility
+	docker-compose $(COMPOSE_OPTS) up -d database frontend backend localstack oidc
 	# Wait for psql to be up
 	while [ -z "$$(docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c 'select 1')" ]; do echo "waiting for db to start..."; sleep 1; done;
 	@docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c "alter user $(LOCAL_DB_ADMIN_USERNAME) with password '$(LOCAL_DB_ADMIN_PASSWORD)';"
-	docker-compose exec -T utility $(BACKEND_APP_ROOT)/scripts/setup_dev_data.sh
-	docker-compose exec -T utility alembic upgrade head
-	docker-compose exec -T utility python scripts/setup_localdata.py
-	docker-compose exec -T utility pip install .
+	docker-compose exec -T backend $(BACKEND_APP_ROOT)/scripts/setup_dev_data.sh
+	docker-compose exec -T backend alembic upgrade head
+	docker-compose exec -T backend python scripts/setup_localdata.py
+	docker-compose exec -T backend pip install .
+
+.PHONY: prepare-new-db-snapshot
+prepare-new-db-snapshot:
+	docker-compose $(COMPOSE_OPTS) pull database
+	docker-compose $(COMPOSE_OPTS) up -d database
+	# Wait for psql to be up
+	while [ -z "$$(docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c 'select 1')" ]; do echo "waiting for db to start..."; sleep 1; done;
+	docker-compose exec -T backend alembic upgrade head
+	@echo
+	@echo "Ok, local db is prepared and ready to go -- make any additional changes you need to and then run:"
+	@echo "make create_new_db_image"
+
+.PHONY: create_new_db_image
+create_new_db_image:
+	docker exec aspen_database_1 psql postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME) -c VACUUM FULL
+	docker commit aspen_database_1 temp_db_image
+	export AWS_ACCOUNT_ID=$$(aws sts get-caller-identity --profile $(AWS_DEV_PROFILE) | jq -r .Account); \
+	export DOCKER_REPO=$${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com; \
+	export TAGGED_IMAGE="$${DOCKER_REPO}/genepi-devdb:build-$$(date +%F)"; \
+	echo docker build -t $${TAGGED_IMAGE} -f ./docker/Dockerfile.devdb ./docker; \
+	docker build -t $${TAGGED_IMAGE} -f ./docker/Dockerfile.devdb ./docker; \
+	docker rmi temp_db_image; \
+	echo "Tagged image is ready for testing/pushing:"; \
+	echo "  $${TAGGED_IMAGE}"
 
 .PHONY: check-images
 check-images: ## Spot-check the gisaid image
@@ -146,7 +169,7 @@ local-status: ## Show the status of the containers in the dev environment.
 
 .PHONY: local-rebuild
 local-rebuild: .env.ecr local-ecr-login ## Rebuild local dev without re-importing data
-	docker-compose $(COMPOSE_OPTS) build frontend backend utility
+	docker-compose $(COMPOSE_OPTS) build frontend backend
 	docker-compose $(COMPOSE_OPTS) up -d
 
 .PHONY: local-rebuild-workflows
@@ -183,6 +206,7 @@ local-clean: local-nohostconfig ## Remove everything related to the local dev en
 	-rm -rf ./oauth/pkcs12/server*
 	-rm -rf ./oauth/pkcs12/certificate*
 	docker-compose rm -sf
+	-docker rm -f aspen_utility_1
 	-docker volume rm aspen_localstack
 	-docker network rm aspen_genepinet
 
@@ -200,23 +224,23 @@ local-pgconsole: ## Connect to the local postgres database.
 
 .PHONY: local-dbconsole
 local-dbconsole: ## Connect to the local postgres database.
-	docker-compose exec utility aspen-cli db --local interact
+	docker-compose exec backend aspen-cli db --local interact
 
 .PHONY: local-dbconsole-profile
 local-dbconsole-profile: ## Connect to the local postgres database and profile queries.
-	docker-compose exec utility aspen-cli db --local interact --profile
+	docker-compose exec backend aspen-cli db --local interact --profile
 
 .PHONY: local-update-backend-deps
 local-update-backend-deps: ## Update poetry.lock to reflect pyproject.toml file changes.
-	docker-compose exec utility /opt/poetry/bin/poetry update
+	docker-compose exec backend /opt/poetry/bin/poetry update
 
 .PHONY: local-update-frontend-deps
 local-update-frontend-deps: ## Update package-lock.json to reflect package.json file changes.
 	docker-compose exec frontend npm install
 
 ### ACCESSING CONTAINER MAKE COMMANDS ###################################################
-utility-%: ## Run make commands in the utility container (src/backend/Makefile)
-	docker-compose exec utility make $(subst utility-,,$@) MESSAGE="$(MESSAGE)"
+utility-%: ## Run make commands in the backend container (src/backend/Makefile) DEPRECATED!!
+	docker-compose exec backend make $(subst utility-,,$@) MESSAGE="$(MESSAGE)"
 
 backend-%: .env.ecr ## Run make commands in the backend container (src/backend/Makefile)
 	docker-compose $(COMPOSE_OPTS) run --no-deps --rm backend make $(subst backend-,,$@)

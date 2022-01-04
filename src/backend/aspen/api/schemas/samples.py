@@ -5,6 +5,7 @@ from pydantic import constr
 from pydantic.utils import GetterDict
 
 from aspen.api.schemas.base import BaseRequest, BaseResponse
+from aspen.api.schemas.locations import LocationResponse
 from aspen.api.utils import format_sample_lineage
 
 
@@ -42,32 +43,26 @@ class SampleUserResponseSchema(BaseResponse):
 
 
 class SampleGetterDict(GetterDict):
+    indirect_attributes = {
+        "sequencing_date": lambda obj: (
+            obj.uploaded_pathogen_genome.sequencing_date
+            if obj.uploaded_pathogen_genome
+            else None
+        ),
+        "upload_date": lambda obj: (
+            obj.uploaded_pathogen_genome.upload_date
+            if obj.uploaded_pathogen_genome
+            else None
+        ),
+        "lineage": format_sample_lineage,
+        "private_identifier": lambda obj: (
+            obj.private_identifier if obj.show_private_identifier else None
+        ),
+    }
+
     def get(self, key: Any, default: Any = None) -> Any:
-        indirect_attributes = {
-            "sequencing_date": (
-                self._obj.uploaded_pathogen_genome.sequencing_date
-                if self._obj.uploaded_pathogen_genome
-                else None
-            ),
-            "upload_date": (
-                self._obj.uploaded_pathogen_genome.upload_date
-                if self._obj.uploaded_pathogen_genome
-                else None
-            ),
-            "lineage": format_sample_lineage(self._obj),
-            "private_identifier": (
-                self._obj.private_identifier
-                if self._obj.show_private_identifier
-                else None
-            ),
-            "collection_location": (
-                self._obj.location
-                if self._obj.location != "" and self._obj.location != "NaN"
-                else self._obj.division
-            ),
-        }
-        if key in indirect_attributes:
-            return indirect_attributes[key]
+        if key in self.indirect_attributes:
+            return self.indirect_attributes[key](self._obj)
         default_response = getattr(self._obj, key, default)
         return default_response
 
@@ -80,7 +75,7 @@ class SampleResponseSchema(BaseResponse):
 
     id: int
     collection_date: datetime.date
-    collection_location: str
+    collection_location: LocationResponse
     czb_failed_genome_recovery: bool
     gisaid: SampleGisaidResponseSchema
     lineage: SampleLineageResponseSchema

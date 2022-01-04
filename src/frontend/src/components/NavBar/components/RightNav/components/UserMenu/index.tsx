@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme: AppThemeOptions) => {
 });
 
 interface UserMenuProps {
-  user: string;
+  user: string | undefined;
 }
 
 const UserMenu = ({ user }: UserMenuProps): JSX.Element => {

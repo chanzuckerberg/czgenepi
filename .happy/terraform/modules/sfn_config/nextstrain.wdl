@@ -9,7 +9,6 @@ workflow nextstrain {
         String remote_dev_prefix = ""
         String group_name
         String s3_filestem
-        String template_filename
         Map[String, String] template_args
         String tree_type
     }
@@ -22,7 +21,6 @@ workflow nextstrain {
         remote_dev_prefix = remote_dev_prefix,
         group_name = group_name,
         s3_filestem = s3_filestem,
-        template_filename = template_filename,
         template_args = template_args,
         tree_type = tree_type
     }
@@ -37,7 +35,6 @@ task nextstrain_workflow {
         String remote_dev_prefix
         String group_name
         String s3_filestem
-        String template_filename
         Map[String, String] template_args
         String tree_type
     }
@@ -52,7 +49,6 @@ task nextstrain_workflow {
     fi
     export S3_FILESTEM="~{s3_filestem}"
     export GROUP_NAME="~{group_name}"
-    export TEMPLATE_FILENAME="~{template_filename}"
     # We aren't supposed to serialize Map inputs on the command line.
     export TEMPLATE_ARGS_FILE="~{write_json(template_args)}"
     export TREE_TYPE="~{tree_type}"

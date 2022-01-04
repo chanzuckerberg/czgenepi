@@ -4,6 +4,7 @@ from typing import List
 import sentry_sdk
 from authlib.integrations.starlette_client import OAuth
 from fastapi import Depends, FastAPI
+from fastapi.responses import ORJSONResponse
 from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 from starlette.middleware.cors import CORSMiddleware
 
@@ -35,6 +36,7 @@ def get_app() -> FastAPI:
         debug=settings.DEBUG,
         openapi_url="/v2/openapi.json",
         docs_url="/v2/docs",
+        default_response_class=ORJSONResponse,
     )
 
     # Add a global settings object to the app that we can use as a dependency

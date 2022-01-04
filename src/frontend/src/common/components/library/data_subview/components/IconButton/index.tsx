@@ -23,7 +23,7 @@ export const IconButton: FunctionComponent<Props> = ({
   return (
     <Tooltip
       arrow
-      inverted
+      sdsStyle="dark"
       title={disabled ? tooltipTextDisabled : tooltipTextEnabled}
       placement="top"
     >

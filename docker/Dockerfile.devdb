@@ -1,0 +1,10 @@
+# Grab postgres fileystem from our previous container
+FROM temp_db_image as dumper
+
+# Move the snapshot's postgres data to a clean postgres image.
+# This isn't strictly required (we could just use the dumper image directly),
+# but it prevents us from accumulating undocumented config changes
+# from continually building new images on top of old ones
+FROM postgres:13.1-alpine
+
+COPY --from=dumper /var/lib/postgresql/data /var/lib/postgresql/data

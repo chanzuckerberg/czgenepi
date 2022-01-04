@@ -7,6 +7,7 @@ import {
 } from "react-query";
 import {
   API,
+  DEFAULT_DELETE_OPTIONS,
   DEFAULT_FETCH_OPTIONS,
   DEFAULT_POST_OPTIONS,
   fetchTrees,
@@ -15,6 +16,8 @@ import {
 import { API_URL } from "../constants/ENV";
 import { ENTITIES } from "./entities";
 import { MutationCallbacks } from "./types";
+
+/* create trees */
 
 // * these two types should stay in sync. There is technically a way to do it in TS, but it is
 // * very convoluted: https://stackoverflow.com/questions/44323441
@@ -29,6 +32,53 @@ interface CreateTreeType {
   sampleIds: string[];
   treeType: string;
 }
+
+type CreateTreeCallbacks = MutationCallbacks<void>;
+
+async function createTree({
+  sampleIds,
+  treeName,
+  treeType,
+}: {
+  sampleIds: string[];
+  treeName: string;
+  treeType: string;
+}): Promise<unknown> {
+  const payload: CreateTreePayload = {
+    name: treeName,
+    samples: sampleIds,
+    tree_type: treeType,
+  };
+  const response = await fetch(API_URL + API.PHYLO_TREES_V2, {
+    ...DEFAULT_POST_OPTIONS,
+    body: JSON.stringify(payload),
+  });
+  if (response.ok) return await response.json();
+
+  throw Error(`${response.statusText}: ${await response.text()}`);
+}
+
+export function useCreateTree({
+  componentOnError,
+  componentOnSuccess,
+}: CreateTreeCallbacks): UseMutationResult<
+  unknown,
+  unknown,
+  CreateTreeType,
+  unknown
+> {
+  const queryClient = useQueryClient();
+
+  return useMutation(createTree, {
+    onError: componentOnError,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries([USE_TREE_INFO]);
+      componentOnSuccess();
+    },
+  });
+}
+
+/* generate tree url */
 
 // * these two types should stay in sync. There is technically a way to do it in TS, but it is
 // * very convoluted: https://stackoverflow.com/questions/44323441
@@ -46,35 +96,9 @@ export interface FastaResponseType {
   url: string;
 }
 
-export const USE_TREE_INFO = {
-  entities: [ENTITIES.TREE_INFO],
-  id: "treeInfo",
-};
+type FastaFetchCallbacks = MutationCallbacks<FastaResponseType>;
 
-export async function createTree({
-  sampleIds,
-  treeName,
-  treeType,
-}: {
-  sampleIds: string[];
-  treeName: string;
-  treeType: string;
-}): Promise<unknown> {
-  const payload: CreateTreePayload = {
-    name: treeName,
-    samples: sampleIds,
-    tree_type: treeType,
-  };
-  const response = await fetch(API_URL + API.CREATE_TREE, {
-    ...DEFAULT_POST_OPTIONS,
-    body: JSON.stringify(payload),
-  });
-  if (response.ok) return await response.json();
-
-  throw Error(`${response.statusText}: ${await response.text()}`);
-}
-
-export async function getFastaURL({
+async function getFastaURL({
   sampleIds,
   downstreamConsumer,
 }: FastaRequestType): Promise<FastaResponseType> {
@@ -93,6 +117,22 @@ export async function getFastaURL({
   throw Error(`${response.statusText}: ${await response.text()}`);
 }
 
+export function useFastaFetch({
+  componentOnError,
+  componentOnSuccess,
+}: FastaFetchCallbacks): UseMutationResult<
+  FastaResponseType,
+  unknown,
+  FastaRequestType,
+  unknown
+> {
+  return useMutation(getFastaURL, {
+    onError: componentOnError,
+    onSuccess: componentOnSuccess,
+  });
+}
+
+/* get options for usher tree placement */
 export async function getUsherOptions(): Promise<unknown> {
   const response = await fetch(API_URL + API.USHER_TREE_OPTIONS, {
     ...DEFAULT_FETCH_OPTIONS,
@@ -102,37 +142,61 @@ export async function getUsherOptions(): Promise<unknown> {
   throw Error(`${response.statusText}: ${await response.text()}`);
 }
 
-type FastaFetchCallbacks = MutationCallbacks<FastaResponseType>;
-type CreateTreeCallbacks = MutationCallbacks<void>;
-
-export function useFastaFetch(
-  callbacks: FastaFetchCallbacks
-): UseMutationResult<FastaResponseType, unknown, FastaRequestType, unknown> {
-  return useMutation(getFastaURL, callbacks);
-}
-
-export function useCreateTree({
-  onError,
-  onSuccess,
-}: CreateTreeCallbacks): UseMutationResult<
-  unknown,
-  unknown,
-  CreateTreeType,
-  unknown
-> {
-  const queryClient = useQueryClient();
-
-  return useMutation(createTree, {
-    onError,
-    onSuccess: async () => {
-      await queryClient.invalidateQueries([USE_TREE_INFO]);
-      onSuccess();
-    },
-  });
-}
+/* custom hook to automatically expire tree info when needed */
+/* such as when trees are deleted */
+export const USE_TREE_INFO = {
+  entities: [ENTITIES.TREE_INFO],
+  id: "treeInfo",
+};
 
 export function useTreeInfo(): UseQueryResult<TreeResponse, unknown> {
   return useQuery([USE_TREE_INFO], fetchTrees, {
     retry: false,
+  });
+}
+
+// * Proceed with caution, you are entering the DANGER ZONE!
+// * Code below this line is destructive!
+
+/**
+ * delete trees
+ */
+
+type TreeDeleteCallbacks = MutationCallbacks<TreeDeleteResponseType>;
+interface TreeDeleteRequestType {
+  treeIdToDelete: string;
+}
+
+interface TreeDeleteResponseType {
+  id: string;
+}
+
+export async function deleteTree({
+  treeIdToDelete,
+}: TreeDeleteRequestType): Promise<TreeDeleteResponseType> {
+  const response = await fetch(API_URL + API.PHYLO_TREES_V2 + treeIdToDelete, {
+    ...DEFAULT_DELETE_OPTIONS,
+  });
+
+  if (response.ok) return await response.json();
+  throw Error(`${response.statusText}: ${await response.text()}`);
+}
+
+export function useDeleteTree({
+  componentOnError,
+  componentOnSuccess,
+}: TreeDeleteCallbacks): UseMutationResult<
+  TreeDeleteResponseType,
+  unknown,
+  TreeDeleteRequestType,
+  unknown
+> {
+  const queryClient = useQueryClient();
+  return useMutation(deleteTree, {
+    onError: componentOnError,
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries([USE_TREE_INFO]);
+      componentOnSuccess(data);
+    },
   });
 }

@@ -5,7 +5,7 @@
          "benchmarks/priority_score_{build_name}_{focus}.txt"
      params:
 -        crowding = 0.1,
-+        crowding = config["crowding"]["crowding_penalty"],
++        crowding = config["priorities"]["crowding_penalty"],
          Nweight = 0.003
      conda: config["conda_environment"]
      shell:

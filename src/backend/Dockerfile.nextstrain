@@ -43,7 +43,7 @@ RUN mkdir -p /ncov/auspice
 RUN mkdir -p /ncov/logs
 
 ADD aspen/workflows/nextstrain_run/patches/crowding_penalty.patch /tmp/
-RUN patch /ncov/workflow/snakemake_rules/main_workflow.smk < /tmp/crowding_penalty.patch
+RUN (grep 'config\["priorities"\]\["crowding_penalty"\]' /ncov/workflow/snakemake_rules/main_workflow.smk || patch /ncov/workflow/snakemake_rules/main_workflow.smk < /tmp/crowding_penalty.patch)
 
 WORKDIR /usr/src/app
 

@@ -4,16 +4,7 @@ import os
 import re
 import threading
 from collections import defaultdict
-from typing import (
-    Any,
-    Iterable,
-    Mapping,
-    MutableSequence,
-    Optional,
-    Sequence,
-    Set,
-    Union,
-)
+from typing import Any, Iterable, Mapping, Optional, Sequence, Set, Union
 from uuid import uuid4
 
 import boto3
@@ -21,7 +12,7 @@ import sentry_sdk
 import smart_open
 from flask import g, jsonify, make_response, request, Response, stream_with_context
 from marshmallow.exceptions import ValidationError
-from sqlalchemy import and_, or_
+from sqlalchemy import and_
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.query import Query
@@ -38,8 +29,6 @@ from aspen.app.views.api_utils import (
 )
 from aspen.database.connection import session_scope
 from aspen.database.models import (
-    DataType,
-    Entity,
     GisaidAccession,
     GisaidAccessionWorkflow,
     Location,
@@ -48,7 +37,7 @@ from aspen.database.models import (
     UploadedPathogenGenome,
     WorkflowStatusType,
 )
-from aspen.database.models.sample import create_public_ids, RegionType
+from aspen.database.models.sample import create_public_ids
 from aspen.database.models.usergroup import Group, User
 from aspen.error import http_exceptions as ex
 from aspen.error.recoverable import RecoverableError
@@ -63,7 +52,7 @@ SAMPLES_POST_REQUIRED_FIELDS = [
     "private",
     "private_identifier",
     "collection_date",
-    "location",
+    "location_id",
     # following fields from PathogenGenome
     "sequence",
 ]
@@ -74,10 +63,6 @@ SAMPLES_POST_OPTIONAL_FIELDS = [
     "sample_collector_contact_email",
     "sample_collector_contact_address",
     "authors",
-    "location_id",
-    "division",
-    "country",
-    "region",
     "organism",
     "host",
     "purpose_of_sampling",
@@ -240,110 +225,6 @@ def getfastaurl():
     return jsonify({"url": presigned_url})
 
 
-@application.route("/api/samples", methods=["GET"])
-@requires_auth
-def samples():
-    user = g.auth_user
-
-    cansee_groups_metadata: Set[int] = {
-        cansee.owner_group_id
-        for cansee in user.group.can_see
-        if cansee.data_type == DataType.METADATA
-    }
-    cansee_groups_private_identifiers: Set[int] = {
-        cansee.owner_group_id
-        for cansee in user.group.can_see
-        if cansee.data_type == DataType.PRIVATE_IDENTIFIERS
-    }
-
-    # load the samples.
-    samples: Sequence[Sample] = (
-        g.db_session.query(Sample)
-        .filter(
-            or_(
-                Sample.submitting_group_id == user.group_id,
-                and_(
-                    Sample.submitting_group_id.in_(cansee_groups_metadata),
-                    ~Sample.private,
-                ),
-                user.system_admin,
-            )
-        )
-        .options(
-            joinedload(Sample.uploaded_pathogen_genome),
-            joinedload(Sample.sequencing_reads_collection),
-        )
-        .all()
-    )
-    sample_entity_ids: MutableSequence[int] = list()
-    for sample in samples:
-        if sample.uploaded_pathogen_genome is not None:
-            sample_entity_ids.append(sample.uploaded_pathogen_genome.entity_id)
-
-    # load the gisaid_accessioning workflows.
-    gisaid_accession_workflows: Sequence[GisaidAccessionWorkflow] = (
-        g.db_session.query(GisaidAccessionWorkflow)
-        .join(GisaidAccessionWorkflow.inputs)
-        .filter(Entity.id.in_(sample_entity_ids))
-        .options(
-            joinedload(GisaidAccessionWorkflow.inputs),
-            joinedload(GisaidAccessionWorkflow.outputs.of_type(GisaidAccession)),
-        )
-        .all()
-    )
-    entity_id_to_gisaid_accession_workflow_map: defaultdict[
-        int, list[GisaidAccessionWorkflow]
-    ] = defaultdict(list)
-    for gisaid_accession_workflow in gisaid_accession_workflows:
-        for workflow_input in gisaid_accession_workflow.inputs:
-            if isinstance(workflow_input, (UploadedPathogenGenome)):
-                entity_id_to_gisaid_accession_workflow_map[
-                    workflow_input.entity_id
-                ].append(gisaid_accession_workflow)
-    for (
-        gisaid_accession_workflow_list
-    ) in entity_id_to_gisaid_accession_workflow_map.values():
-        # sort by success, date.
-        gisaid_accession_workflow_list.sort(
-            key=lambda gisaid_accession_workflow: (
-                1
-                if gisaid_accession_workflow.workflow_status
-                == WorkflowStatusType.COMPLETED
-                else 0,
-                gisaid_accession_workflow.start_datetime,
-            ),
-            reverse=True,
-        )
-
-    # filter for only information we need in sample table view
-    results: MutableSequence[Mapping[str, Any]] = list()
-    for sample in samples:
-        returned_sample_data = {
-            "public_identifier": sample.public_identifier,
-            "upload_date": _format_created_date(sample),
-            "collection_date": api_utils.format_date(sample.collection_date),
-            "sequencing_date": _format_sequencing_date(sample),
-            "collection_location": sample.location,
-            "gisaid": _format_gisaid_accession(
-                sample, entity_id_to_gisaid_accession_workflow_map
-            ),
-            "czb_failed_genome_recovery": sample.czb_failed_genome_recovery,
-            "lineage": _format_lineage(sample),
-            "private": sample.private,
-        }
-
-        if (
-            sample.submitting_group_id == user.group_id
-            or sample.submitting_group_id in cansee_groups_private_identifiers
-            or user.system_admin
-        ):
-            returned_sample_data["private_identifier"] = sample.private_identifier
-
-        results.append(returned_sample_data)
-
-    return jsonify({SAMPLE_KEY: results})
-
-
 def _kick_off_pangolin(group_prefix: str, sample_ids: Sequence[str]):
     sfn_params = application.aspen_config.AWS_PANGOLIN_SFN_PARAMETERS
     sfn_input_json = {
@@ -447,31 +328,22 @@ def create_sample():
                 ]
 
             location_id = data["sample"].get("location_id", None)
+            if not location_id:
+                sentry_sdk.capture_message("No location_id submitted for sample")
+                raise ex.BadRequestException("No location_id submitted for sample")
             valid_location: Optional[Location] = None
-            if location_id:
-                try:
-                    valid_location = (
-                        g.db_session.query(Location)
-                        .filter(Location.id == location_id)
-                        .one()
-                    )
-                except NoResultFound:
-                    sentry_sdk.capture_message(
-                        f"No valid location for id {location_id}"
-                    )
-                    raise ex.BadRequestException("Invalid location id for sample")
+            try:
+                valid_location = (
+                    g.db_session.query(Location)
+                    .filter(Location.id == location_id)
+                    .one()
+                )
+            except NoResultFound:
+                sentry_sdk.capture_message(f"No valid location for id {location_id}")
+                raise ex.BadRequestException("Invalid location id for sample")
 
-            if valid_location:
-                sample_args["location_id"] = valid_location.id
-                sample_args["region"] = RegionType(valid_location.region)
-                sample_args["country"] = valid_location.country
-                sample_args["division"] = valid_location.division
-                sample_args["location"] = valid_location.location or ""
-            else:
-                sample_args["region"] = RegionType.NORTH_AMERICA
-                sample_args["country"] = DEFAULT_COUNTRY
-                sample_args["division"] = DEFAULT_DIVISION
-                sample_args["location"] = data["sample"]["location"]
+            sample_args["location_id"] = valid_location.id
+            sample_args["collection_location"] = valid_location
 
             sequence = data["pathogen_genome"]["sequence"]
             if not check_valid_sequence(sequence):
