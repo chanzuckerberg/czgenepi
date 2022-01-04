@@ -943,7 +943,7 @@ async def test_update_samples_success(
     http_client: AsyncClient,
 ):
     """
-    Test successful sample deletion by ID
+    Test successful sample update
     """
     group = group_factory()
     user = user_factory(group)

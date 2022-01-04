@@ -4,7 +4,7 @@ from typing import Dict, List, NamedTuple, Optional, Set
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncResult, AsyncSession
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import selectinload, joinedload
 from sqlalchemy.orm.exc import NoResultFound
 from starlette.requests import Request
 
@@ -161,7 +161,13 @@ async def list_samples(
 async def get_owned_samples_by_ids(
     db: AsyncSession, sample_ids: List[int], user: User
 ) -> AsyncResult:
-    query = sa.select(Sample).filter(  # type: ignore
+    query = sa.select(Sample).options(
+        joinedload(Sample.submitting_group),
+        joinedload(Sample.uploaded_by),
+        joinedload(Sample.uploaded_pathogen_genome),
+        joinedload(Sample.sequencing_reads_collection),
+        joinedload(Sample.collection_location),
+    ).filter(  # type: ignore
         sa.and_(
             Sample.submitting_group == user.group,  # This is an access control check!
             Sample.id.in_(sample_ids),
@@ -244,8 +250,7 @@ async def update_samples(
         for key, value in update_data:
             if value:
                 setattr(sample, key, value)
-
-          db.add(sample)
+                db.add(sample)
 
     await db.commit()
 
