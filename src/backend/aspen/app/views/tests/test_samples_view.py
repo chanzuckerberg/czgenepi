@@ -8,6 +8,7 @@ from aspen.app.views import api_utils
 from aspen.database.models import Sample, UploadedPathogenGenome
 from aspen.test_infra.models.gisaid_accession import gisaid_accession_factory
 from aspen.test_infra.models.gisaid_metadata import gisaid_metadata_factory
+from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
 from aspen.test_infra.models.usergroup import group_factory, user_factory
@@ -20,8 +21,13 @@ def test_samples_create_view_pass_no_public_id(
 ):
     group = group_factory()
     user = user_factory(group)
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     session.add(group)
+    session.add(location)
     session.commit()
+    test_date = datetime.datetime.now()
     with client.session_transaction() as sess:
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
 
@@ -29,26 +35,26 @@ def test_samples_create_view_pass_no_public_id(
         {
             "sample": {
                 "private_identifier": "private",
-                "collection_date": api_utils.format_date(datetime.datetime.now()),
-                "location": "Ventura County",
+                "collection_date": api_utils.format_date(test_date),
+                "location_id": location.id,
                 "private": True,
             },
             "pathogen_genome": {
                 "sequence": "AAAKAANTCG",
-                "sequencing_date": api_utils.format_date(datetime.datetime.now()),
+                "sequencing_date": api_utils.format_date(test_date),
                 "isl_access_number": "test_accession_number",
             },
         },
         {
             "sample": {
                 "private_identifier": "private2",
-                "collection_date": api_utils.format_date(datetime.datetime.now()),
-                "location": "Ventura County",
+                "collection_date": api_utils.format_date(test_date),
+                "location_id": location.id,
                 "private": True,
             },
             "pathogen_genome": {
                 "sequence": "AACTGTNNNN",
-                "sequencing_date": api_utils.format_date(datetime.datetime.now()),
+                "sequencing_date": api_utils.format_date(test_date),
                 "isl_access_number": "test_accession_number2",
             },
         },
@@ -68,8 +74,8 @@ def test_samples_create_view_pass_no_public_id(
     # check that creating new public identifiers works
     public_ids = sorted([i.public_identifier for i in session.query(Sample).all()])
     assert [
-        "hCoV-19/USA/groupname-1/2021",
-        "hCoV-19/USA/groupname-2/2021",
+        f"hCoV-19/USA/groupname-1/{test_date.year}",
+        f"hCoV-19/USA/groupname-2/{test_date.year}",
     ] == public_ids
 
     sample_1 = (
@@ -91,8 +97,14 @@ def test_samples_create_view_pass_no_sequencing_date(
 ):
     group = group_factory()
     user = user_factory(group)
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     session.add(group)
+    session.add(location)
     session.commit()
+    test_date = datetime.datetime.now()
+
     with client.session_transaction() as sess:
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
 
@@ -101,8 +113,8 @@ def test_samples_create_view_pass_no_sequencing_date(
             "sample": {
                 "private_identifier": "private",
                 "public_identifier": "",
-                "collection_date": api_utils.format_date(datetime.datetime.now()),
-                "location": "Ventura County",
+                "collection_date": api_utils.format_date(test_date),
+                "location_id": location.id,
                 "private": True,
             },
             "pathogen_genome": {
@@ -115,13 +127,13 @@ def test_samples_create_view_pass_no_sequencing_date(
             "sample": {
                 "private_identifier": "private2",
                 "public_identifier": "",
-                "collection_date": api_utils.format_date(datetime.datetime.now()),
-                "location": "Ventura County",
+                "collection_date": api_utils.format_date(test_date),
+                "location_id": location.id,
                 "private": True,
             },
             "pathogen_genome": {
                 "sequence": "AACTKGTNNNN",
-                "sequencing_date": "2021-06-15",
+                "sequencing_date": test_date.strftime("%Y-%m-%d"),
                 "isl_access_number": "test_accession_number2",
             },
         },
@@ -141,8 +153,8 @@ def test_samples_create_view_pass_no_sequencing_date(
     # check that creating new public identifiers works
     public_ids = sorted([i.public_identifier for i in session.query(Sample).all()])
     assert [
-        "hCoV-19/USA/groupname-1/2021",
-        "hCoV-19/USA/groupname-2/2021",
+        f"hCoV-19/USA/groupname-1/{test_date.year}",
+        f"hCoV-19/USA/groupname-2/{test_date.year}",
     ] == public_ids
 
     sample_1 = (
@@ -164,7 +176,11 @@ def test_samples_create_view_invalid_sequence(
 ):
     group = group_factory()
     user = user_factory(group)
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     session.add(group)
+    session.add(location)
     session.commit()
     with client.session_transaction() as sess:
         sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
@@ -175,7 +191,7 @@ def test_samples_create_view_invalid_sequence(
                 "private_identifier": "private",
                 "public_identifier": "",
                 "collection_date": api_utils.format_date(datetime.datetime.now()),
-                "location": "Ventura County",
+                "location_id": location.id,
                 "private": True,
             },
             "pathogen_genome": {
@@ -201,9 +217,12 @@ def test_samples_create_view_fail_duplicate_ids(
 ):
     group = group_factory()
     user = user_factory(group)
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     session.add(group)
     sample = sample_factory(
-        group, user, private_identifier="private", public_identifier="public"
+        group, user, location, private_identifier="private", public_identifier="public"
     )
     session.add(sample)
     session.commit()
@@ -255,9 +274,12 @@ def test_samples_create_view_fail_duplicate_ids_in_request_data(
 ):
     group = group_factory()
     user = user_factory(group)
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     session.add(group)
     sample = sample_factory(
-        group, user, private_identifier="private", public_identifier="public"
+        group, user, location, private_identifier="private", public_identifier="public"
     )
     session.add(sample)
     session.commit()
@@ -309,6 +331,9 @@ def test_samples_create_view_fail_missing_required_fields(
 ):
     group = group_factory()
     user = user_factory(group)
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     session.add(group)
     session.commit()
     with client.session_transaction() as sess:
@@ -329,7 +354,7 @@ def test_samples_create_view_fail_missing_required_fields(
             "sample": {
                 "private_identifier": "private2",
                 "collection_date": api_utils.format_date(datetime.datetime.now()),
-                "location": "Ventura County",
+                "location_id": location.id,
                 "private": True,
             },
             "pathogen_genome": {
@@ -341,7 +366,7 @@ def test_samples_create_view_fail_missing_required_fields(
     assert res.status == "400 BAD REQUEST"
     assert (
         res.get_data()
-        == b"{\"error\":\"Missing required fields ['private', 'location'] or encountered unexpected fields []\"}\n"
+        == b"{\"error\":\"Missing required fields ['private', 'location_id'] or encountered unexpected fields []\"}\n"
     )
 
 
@@ -352,6 +377,9 @@ def test_update_sample_public_ids(
 ):
     group = group_factory()
     user = user_factory(group, system_admin=True)
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     session.add(group)
 
     private_to_public = dict(
@@ -365,6 +393,7 @@ def test_update_sample_public_ids(
         sample = sample_factory(
             group,
             user,
+            location,
             private_identifier=priv,
             public_identifier=pub.replace("_update", ""),
         )
@@ -399,6 +428,9 @@ def test_update_sample_public_ids_duplicate_public_id(
 ):
     group = group_factory()
     user = user_factory(group, system_admin=True)
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     session.add(group)
     private_to_public = dict(
         zip(
@@ -409,7 +441,7 @@ def test_update_sample_public_ids_duplicate_public_id(
 
     for priv, pub in private_to_public.items():
         sample = sample_factory(
-            group, user, private_identifier=priv, public_identifier=pub
+            group, user, location, private_identifier=priv, public_identifier=pub
         )
         session.add(sample)
 
@@ -496,6 +528,9 @@ def test_update_sample_gisaid_isl(
 ):
     group = group_factory()
     user = user_factory(group, system_admin=True)
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     session.add(group)
 
     private_to_public = dict(
@@ -507,7 +542,11 @@ def test_update_sample_gisaid_isl(
 
     for priv, pub in private_to_public.items():
         sample = sample_factory(
-            group, user, private_identifier=priv, public_identifier=f"{pub}_public"
+            group,
+            user,
+            location,
+            private_identifier=priv,
+            public_identifier=f"{pub}_public",
         )
         uploaded_pathogen_genome = uploaded_pathogen_genome_factory(
             sample, sequence="ATGCAAAAAA", accessions=()
@@ -552,6 +591,9 @@ def test_update_sample_new_gisaid_isl(
 ):
     group = group_factory()
     user = user_factory(group, system_admin=True)
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
     session.add(group)
 
     private_to_public = dict(
@@ -563,7 +605,11 @@ def test_update_sample_new_gisaid_isl(
 
     for priv, pub in private_to_public.items():
         sample = sample_factory(
-            group, user, private_identifier=priv, public_identifier=f"{pub}_public"
+            group,
+            user,
+            location,
+            private_identifier=priv,
+            public_identifier=f"{pub}_public",
         )
         uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA", accessions=())
         session.add(sample)
@@ -601,7 +647,10 @@ def test_update_sample_new_gisaid_isl(
 def setup_validation_data(session: Session, client: FlaskClient):
     group = group_factory()
     user = user_factory(group)
-    sample = sample_factory(group, user)
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
+    sample = sample_factory(group, user, location)
     gisaid_sample = gisaid_metadata_factory()
     session.add(group)
     session.add(sample)

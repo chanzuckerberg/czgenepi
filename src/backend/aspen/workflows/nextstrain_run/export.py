@@ -219,7 +219,9 @@ def write_sequences_files(session, pathogen_genomes, sequences_fh, metadata_fh):
 
     sample_id_to_sample: Mapping[int, Sample] = {
         sample.id: sample
-        for sample in session.query(Sample).filter(Sample.id.in_(sample_ids))
+        for sample in session.query(Sample)
+        .filter(Sample.id.in_(sample_ids))
+        .options(joinedload(Sample.collection_location))
     }
     accession_input_alias = aliased(Entity)
     pathogen_genome_id_repository_type_to_accession_names: Mapping[
@@ -290,13 +292,13 @@ def write_sequences_files(session, pathogen_genomes, sequences_fh, metadata_fh):
             ),
             "date": sample.collection_date.strftime("%Y-%m-%d"),
             "date_submitted": upload_date,
-            "region": sample.region.value,
-            "country": sample.country,
-            "division": sample.division,
-            "location": sample.location,
-            "region_exposure": sample.region.value,
-            "country_exposure": sample.country,
-            "division_exposure": sample.division,
+            "region": sample.collection_location.region,
+            "country": sample.collection_location.country,
+            "division": sample.collection_location.division,
+            "location": sample.collection_location.location,
+            "region_exposure": sample.collection_location.region,
+            "country_exposure": sample.collection_location.country,
+            "division_exposure": sample.collection_location.division,
             "segment": "genome",
             "length": len(sequence),
             "host": "Human",
