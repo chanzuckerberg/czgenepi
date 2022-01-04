@@ -56,7 +56,10 @@ class BaseNextstrainConfigBuilder:
         build["subsampling_scheme"] = self.subsampling_scheme
 
         # Update the tree's title with build type & location.
-        title_template = "{tree_type} tree for samples collected in {location}"
+        if self.subsampling_scheme == "OVERVIEW":
+            title_template = "Contextualized tree for samples collected in {location} in the last 3 months"
+        else:
+            title_template = "{tree_type} tree for samples collected in {location}"
         build["title"] = title_template.format(
             tree_type=self.subsampling_scheme.title(),
             location=", ".join(location_values),
