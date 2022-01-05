@@ -147,10 +147,6 @@ export async function createSamples({
         [METADATA_KEYS_TO_API_KEYS.collectionLocation]: collectionLocation!.id,
         [METADATA_KEYS_TO_API_KEYS.keepPrivate]: keepPrivate,
         [METADATA_KEYS_TO_API_KEYS.publicId]: publicId,
-        // The "location" field here will be unused since we are passing a
-        // location_id, but is currently required. This must be removed
-        // when the old location data and methods are cleaned up.
-        location: collectionLocation!.name,
         private_identifier: sampleId,
       },
     };
