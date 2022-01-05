@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import click
 import csv
+import dateparser
 import requests
 import json
 import time
@@ -149,6 +150,11 @@ class ApiClient:
         headers = self.get_headers()
         url = f"{self.url}{path}"
         return requests.delete(url, headers=headers, allow_redirects=False, **kwargs)
+
+    def put(self, path, **kwargs):
+        headers = self.get_headers()
+        url = f"{self.url}{path}"
+        return requests.put(url, headers=headers, allow_redirects=False, **kwargs)
 
     def post(self, path, **kwargs):
         headers = self.get_headers()
@@ -349,6 +355,39 @@ def delete_samples(ctx, sample_ids):
     print(resp.text)
 
 
+@samples.command(name="update")
+@click.argument("sample_id")
+@click.option("--private-id", required=False, type=str, help="Update the sample private id")
+@click.option("--public-id", required=False, type=str, help="Update the sample public id")
+@click.option("--collection-date", required=False, type=str, help="Update the sample collection date")
+@click.option("--sequencing-date", required=False, type=str, help="Update the sample sequencing date")
+@click.option("--private", required=False, type=bool, help="Set whether the sample is private")
+@click.pass_context
+def update_samples(ctx, sample_id, private_id, public_id, collection_date, sequencing_date, private):
+    api_client = ctx.obj["api_client"]
+    if collection_date:
+        collection_date = dateparser.parse(collection_date).strftime('%Y-%m-%d')
+    if sequencing_date:
+        sequencing_date = dateparser.parse(sequencing_date).strftime('%Y-%m-%d')
+    all_fields = {
+        "id": sample_id,
+        "public_identifier": public_id,
+        "private_identifier": private_id,
+        "collection_date": collection_date,
+        "sequencing_date": sequencing_date,
+        "private": private,
+    }
+    # Remove None fields
+    sample = {k: v for k, v in all_fields.items() if v != None}
+    print(sample)
+    if public_id:
+        sample["public_identifier"] = public_id
+    if private_id:
+        sample["private_identifier"] = private_id
+    resp = api_client.put(f"/v2/samples/", json={"samples": [sample]})
+    print(resp.text)
+
+
 @samples.command(name="update_public_ids")
 @click.option("group_id", "--group-id", type=int, required=True)
 @click.option("is_gisaid_isl", "--is-gisaid-isl", is_flag=True)
@@ -402,6 +441,20 @@ def start_phylo_run_v2(ctx, name, tree_type, sample_ids, show_headers):
         print(resp.headers)
     print(resp.text)
     print(resp)
+
+@phylo_runs.command(name="update")
+@click.argument("run_id")
+@click.option("--name", required=False, type=str, help="Update the run name")
+@click.pass_context
+def update_phylorun(ctx, run_id, name):
+    api_client = ctx.obj["api_client"]
+    body = {
+        "name": name,
+    }
+    resp = api_client.put(f"/v2/phylo_runs/{run_id}", json=body)
+    print(resp.headers)
+    print(resp.text)
+
 
 @samples.command(name="validate-ids")
 @click.option("-h", "--show-headers", is_flag=True)

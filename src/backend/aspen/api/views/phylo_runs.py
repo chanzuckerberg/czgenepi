@@ -181,8 +181,8 @@ async def kick_off_phylo_run(
     return PhyloRunResponse.from_orm(workflow)
 
 
-async def get_editable_phylo_runs_by_id(db, user, run_id=None, all_viewable=False):
-    # get list of all viewable phylo_runs viewable to user, otherwise returh phylo_run matching run_id if sufficient permissions
+async def _get_accessible_phylo_runs(db, user, run_id=None, editable=False):
+    # get phylo_runs viewable or editable by a user, optionally filtered by id
     cansee_owner_group_ids: Set[int] = {
         cansee.owner_group_id
         for cansee in user.group.can_see
@@ -195,7 +195,12 @@ async def get_editable_phylo_runs_by_id(db, user, run_id=None, all_viewable=Fals
     )
 
     # These are access control checks!
-    if all_viewable:
+    if editable:
+        # for update and delete views return only trees that are in the users group
+        query = query.filter(
+            PhyloRun.group == user.group,
+        )
+    else:
         # this is for list view, return all runs that are viewable
         query = query.filter(
             sa.or_(
@@ -203,11 +208,6 @@ async def get_editable_phylo_runs_by_id(db, user, run_id=None, all_viewable=Fals
                 user.system_admin,
                 PhyloRun.group_id.in_(cansee_owner_group_ids),
             ),
-        )
-    else:
-        # for update and delete views return only trees that are in the users group
-        query = query.filter(
-            PhyloRun.group == user.group,
         )
 
     if run_id:
@@ -224,6 +224,12 @@ async def get_editable_phylo_runs_by_id(db, user, run_id=None, all_viewable=Fals
     results = await db.execute(query)
     return results.unique().scalars().all()
 
+async def get_editable_phylo_runs(db, user, run_id=None):
+    return await _get_accessible_phylo_runs(db, user, run_id, editable=True)
+
+async def get_readable_phylo_runs(db, user, run_id=None):
+    return await _get_accessible_phylo_runs(db, user, run_id, editable=True)
+
 
 @router.get("/")
 async def list_runs(
@@ -233,8 +239,8 @@ async def list_runs(
     user: User = Depends(get_auth_user),
 ) -> PhyloRunsListResponse:
 
-    phylo_runs: Iterable[PhyloRun] = await get_editable_phylo_runs_by_id(
-        db, user, all_viewable=True
+    phylo_runs: Iterable[PhyloRun] = await get_readable_phylo_runs(
+        db, user
     )
 
     # filter for only information we need in sample table view
@@ -253,7 +259,7 @@ async def delete_run(
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_auth_user),
 ) -> bool:
-    item = await get_editable_phylo_runs_by_id(db, user, item_id)
+    item = await get_editable_phylo_runs(db, user, item_id)
     item_db_id = item.id
 
     for output in item.outputs:
@@ -271,7 +277,7 @@ async def update_phylo_tree_and_run(
     user: User = Depends(get_auth_user),
 ):
     # get phylo_run and check that user has permission to update PhyloRun/PhyloTree
-    phylo_run = await get_editable_phylo_runs_by_id(db, user, item_id)
+    phylo_run = await get_editable_phylo_runs(db, user, item_id)
 
     # update phylorun name
     phylo_run.name = phylo_run_update_request.name
