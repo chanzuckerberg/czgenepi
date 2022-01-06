@@ -4,7 +4,7 @@ from typing import Dict, List, NamedTuple, Optional, Set
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncResult, AsyncSession
-from sqlalchemy.orm import selectinload, joinedload
+from sqlalchemy.orm import joinedload, selectinload
 from sqlalchemy.orm.exc import NoResultFound
 from starlette.requests import Request
 
@@ -17,7 +17,7 @@ from aspen.api.schemas.samples import (
     SampleDeleteResponse,
     SampleResponseSchema,
     SamplesResponseSchema,
-    UpdateSamplesRequest
+    UpdateSamplesRequest,
 )
 from aspen.api.settings import Settings
 from aspen.api.utils import authz_samples_cansee, determine_gisaid_status
@@ -160,19 +160,25 @@ async def list_samples(
 async def get_owned_samples_by_ids(
     db: AsyncSession, sample_ids: List[int], user: User
 ) -> AsyncResult:
-    query = sa.select(Sample).options(
-        joinedload(Sample.uploaded_pathogen_genome),
-        joinedload(Sample.submitting_group),
-        joinedload(Sample.uploaded_by),
-        joinedload(Sample.collection_location),
-    ).filter(  # type: ignore
-        sa.and_(
-            Sample.submitting_group == user.group,  # This is an access control check!
-            Sample.id.in_(sample_ids),
+    query = (
+        sa.select(Sample)
+        .options(
+            joinedload(Sample.uploaded_pathogen_genome),
+            joinedload(Sample.submitting_group),
+            joinedload(Sample.uploaded_by),
+            joinedload(Sample.collection_location),
+        )
+        .filter(  # type: ignore
+            sa.and_(
+                Sample.submitting_group
+                == user.group,  # This is an access control check!
+                Sample.id.in_(sample_ids),
+            )
         )
     )
     results = await db.execute(query)
     return results.scalars()
+
 
 @router.delete("/")
 async def delete_samples(
@@ -227,10 +233,7 @@ async def update_samples(
 ) -> SamplesResponseSchema:
 
     # reorganize request data to make it easier to update
-    reorganized_request_data = {
-        s.id : s
-        for s in update_samples_request.samples
-    }
+    reorganized_request_data = {s.id: s for s in update_samples_request.samples}
     sample_ids_to_update = reorganized_request_data.keys()
 
     # Make sure these samples exist and are delete-able by the current user.
@@ -238,7 +241,9 @@ async def update_samples(
     editable_samples = sample_db_res.all()
 
     # are there any samples that can't be updated?
-    uneditable_samples = [s for s in sample_ids_to_update if s not in [i.id for i in editable_samples]]
+    uneditable_samples = [
+        s for s in sample_ids_to_update if s not in [i.id for i in editable_samples]
+    ]
     if uneditable_samples:
         raise ex.NotFoundException("some samples cannot be updated")
 
@@ -250,7 +255,9 @@ async def update_samples(
                 setattr(sample, key, value)
         # Sequencing date is handled specially
         if update_data.sequencing_date:
-            sample.uploaded_pathogen_genome.sequencing_date = update_data.sequencing_date
+            sample.uploaded_pathogen_genome.sequencing_date = (
+                update_data.sequencing_date
+            )
         sample.show_private_identifier = True
         res.samples.append(SampleResponseSchema.from_orm(sample))
 

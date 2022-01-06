@@ -77,8 +77,8 @@ class SampleResponseSchema(BaseResponse):
     collection_date: datetime.date
     collection_location: LocationResponse
     czb_failed_genome_recovery: bool
-    gisaid: SampleGisaidResponseSchema
-    lineage: SampleLineageResponseSchema
+    gisaid: Optional[SampleGisaidResponseSchema]
+    lineage: Optional[SampleLineageResponseSchema]
     private: bool
     private_identifier: Optional[str]
     public_identifier: str
@@ -116,7 +116,3 @@ class UpdateSamplesBaseRequest(BaseRequest):
 
 class UpdateSamplesRequest(BaseRequest):
     samples: List[UpdateSamplesBaseRequest]
-
-
-class UpdateSamplesResponse(BaseResponse):
-    ids: List[int]

@@ -224,8 +224,10 @@ async def _get_accessible_phylo_runs(db, user, run_id=None, editable=False):
     results = await db.execute(query)
     return results.unique().scalars().all()
 
+
 async def get_editable_phylo_runs(db, user, run_id=None):
     return await _get_accessible_phylo_runs(db, user, run_id, editable=True)
+
 
 async def get_readable_phylo_runs(db, user, run_id=None):
     return await _get_accessible_phylo_runs(db, user, run_id, editable=True)
@@ -239,9 +241,7 @@ async def list_runs(
     user: User = Depends(get_auth_user),
 ) -> PhyloRunsListResponse:
 
-    phylo_runs: Iterable[PhyloRun] = await get_readable_phylo_runs(
-        db, user
-    )
+    phylo_runs: Iterable[PhyloRun] = await get_readable_phylo_runs(db, user)
 
     # filter for only information we need in sample table view
     results: List[PhyloRunResponse] = []

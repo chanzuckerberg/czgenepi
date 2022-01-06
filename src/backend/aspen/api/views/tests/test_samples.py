@@ -1,6 +1,6 @@
 import datetime
 import json
-from typing import Any, Optional, Sequence, Tuple
+from typing import Any, List, Optional, Sequence, Tuple
 
 import pytest
 import sqlalchemy as sa
@@ -9,15 +9,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.exc import NoResultFound
 
 from aspen.api.schemas.base import convert_datetime_to_iso_8601
-from aspen.api.schemas.samples import (
-    UpdateSamplesRequest
-)
+from aspen.api.schemas.samples import UpdateSamplesRequest
 from aspen.database.models import (
     CanSee,
     DataType,
+    Group,
     PublicRepositoryType,
     Sample,
     SequencingReadsCollection,
+    User,
 )
 from aspen.test_infra.models.accession_workflow import AccessionWorkflowDirective
 from aspen.test_infra.models.location import location_factory
@@ -938,13 +938,9 @@ async def test_delete_sample_failures(
     assert res.status_code == 200
 
 
-async def test_update_samples_success(
+async def make_test_samples(
     async_session: AsyncSession,
-    http_client: AsyncClient,
-):
-    """
-    Test successful sample update
-    """
+) -> Tuple[User, Group, List[Sample]]:
     group = group_factory()
     user = user_factory(group)
     location = location_factory(
@@ -978,37 +974,78 @@ async def test_update_samples_success(
         async_session.add(upg)
     async_session.add(group)
     await async_session.commit()
+    return user, group, samples
 
+
+async def test_update_samples_success(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+):
+    """
+    Test successful sample update
+    """
+    user, group, samples = await make_test_samples(async_session)
 
     auth_headers = {"user_id": user.auth0_user_id}
 
-    data = UpdateSamplesRequest(samples=[
+    data = UpdateSamplesRequest(
+        samples=[
             {
                 "id": samples[0].id,
                 "private_identifier": "new_private_identifier",
-
             },
             {
                 "id": samples[1].id,
                 "private_identifier": "new_public_identifier2",
+                "private": False,
             },
             {
                 "id": samples[2].id,
                 "private_identifier": "new_public_identifier3",
-            }
+            },
         ],
     ).dict()
+    keys_to_check = [
+        "private_identifier",
+        "public_identifier",
+        "collection_location",
+        "collection_date",
+        "private",
+    ]
+    reorganized_data = {}
+    # Make a copy of the original sample data
+    for sample in samples:
+        reorganized_data[sample.id] = {
+            key: getattr(sample, key) for key in keys_to_check
+        }
+    # For any fields that got updated in our API request, update those values.
+    for updated in data["samples"]:
+        reorganized_data[updated["id"]].update(
+            {
+                key: updated.get(key)
+                for key in keys_to_check
+                if updated.get(key) is not None
+            }
+        )
+
+    # Tell SqlAlchemy to forget about the samples in its identity map
+    # TODO FIXME- we shouldn't have to do this!
+    async_session.expire_all()
 
     res = await http_client.put(
         f"/v2/samples",
         json=data,
         headers=auth_headers,
     )
+    api_response = {row["id"]: row for row in res.json()["samples"]}
     assert res.status_code == 200
 
-    reorganized_data = {s["id"]: s for s in data["samples"]}
-    for s in samples:
-        q = await async_session.execute(sa.select(Sample).filter(Sample.id == s.id))
+    for sample_id, expected in reorganized_data.items():
+        q = await async_session.execute(
+            sa.select(Sample).filter(Sample.id == sample_id)
+        )
         r = q.scalars().one()
-        assert r.private_identifier == reorganized_data[s.id]["private_identifier"]
-
+        # Check that the DB and our API Request match
+        assert r.private_identifier == expected["private_identifier"]
+        # Check that the DB an dour API Response match.
+        assert r.private_identifier == api_response[sample_id]["private_identifier"]
