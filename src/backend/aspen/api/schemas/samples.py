@@ -107,7 +107,7 @@ class SampleDeleteResponse(BaseResponse):
 class UpdateSamplesBaseRequest(BaseRequest):
     id: int
     collection_date: Optional[datetime.date]
-    collection_location: Optional[str]
+    collection_location: Optional[int]
     private: Optional[bool]
     private_identifier: Optional[str]
     public_identifier: Optional[str]

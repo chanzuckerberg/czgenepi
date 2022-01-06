@@ -26,6 +26,7 @@ from aspen.database.models import (
     Entity,
     GisaidAccession,
     GisaidAccessionWorkflow,
+    Location,
     Sample,
     UploadedPathogenGenome,
     User,
@@ -251,8 +252,16 @@ async def update_samples(
     for sample in editable_samples:
         update_data = reorganized_request_data[sample.id]
         for key, value in update_data:
+            if key in ["collection_location", "sequencing_date"]:
+                continue
             if value != None:  # We need to be able to set private to False!
                 setattr(sample, key, value)
+        # Location id is handled specially
+        if update_data.collection_location:
+            loc = await db.get(Location, update_data.collection_location)
+            if not loc:
+                raise ex.BadRequestException("location is invalid")
+            sample.collection_location = loc
         # Sequencing date is handled specially
         if update_data.sequencing_date:
             sample.uploaded_pathogen_genome.sequencing_date = (

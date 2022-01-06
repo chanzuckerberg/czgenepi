@@ -362,8 +362,9 @@ def delete_samples(ctx, sample_ids):
 @click.option("--collection-date", required=False, type=str, help="Update the sample collection date")
 @click.option("--sequencing-date", required=False, type=str, help="Update the sample sequencing date")
 @click.option("--private", required=False, type=bool, help="Set whether the sample is private")
+@click.option("--location", required=False, type=int, help="Set the sample's collection location")
 @click.pass_context
-def update_samples(ctx, sample_id, private_id, public_id, collection_date, sequencing_date, private):
+def update_samples(ctx, sample_id, private_id, public_id, collection_date, sequencing_date, private, location):
     api_client = ctx.obj["api_client"]
     if collection_date:
         collection_date = dateparser.parse(collection_date).strftime('%Y-%m-%d')
@@ -375,6 +376,7 @@ def update_samples(ctx, sample_id, private_id, public_id, collection_date, seque
         "private_identifier": private_id,
         "collection_date": collection_date,
         "sequencing_date": sequencing_date,
+        "collection_location": location,
         "private": private,
     }
     # Remove None fields
