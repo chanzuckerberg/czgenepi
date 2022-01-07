@@ -46,21 +46,6 @@ export enum ERROR_CODE {
   OVER_MAX_SAMPLES,
 }
 
-export interface DEFAULT {
-  code: 1;
-  message: "test message";
-}
-
-export interface INVALID_NAME {
-  code: 2;
-  message: "test message invalid name";
-}
-
-export interface ErrorCode {
-  code: ERROR_CODE;
-  filename: string;
-}
-
 export interface Metadata {
   sampleId?: string;
   collectionDate?: string;
