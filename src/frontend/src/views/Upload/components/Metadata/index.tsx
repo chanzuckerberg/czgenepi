@@ -1,6 +1,6 @@
 import { Button } from "czifui";
 import NextLink from "next/link";
-import React, { useState, useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { HeadAppTitle } from "src/common/components";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
@@ -27,7 +27,6 @@ import {
   SampleIdToWarningMessages,
 } from "./components/ImportFile/parseFile";
 import Table from "./components/Table";
-
 
 export default function Metadata({
   samples,
@@ -56,23 +55,22 @@ export default function Metadata({
     // Filter out any metadata for samples they did not just upload
     // Note: Might be cleaner to do this filtering inside of file parse call,
     // but would require changing the way some of the warnings work currently.
-    const uploadedSamplesMetadata: SampleIdToMetadata = {};
+    const uploadedMetadata: SampleIdToMetadata = {};
     for (const sampleId of Object.keys(samples)) {
       if (sampleIdToUploadedMetadata[sampleId]) {
-        uploadedSamplesMetadata[sampleId] = sampleIdToUploadedMetadata[sampleId];
+        uploadedMetadata[sampleId] = sampleIdToUploadedMetadata[sampleId];
       }
     }
 
-    setMetadata(uploadedSamplesMetadata); // Set overarching metadata for samples
+    setMetadata(uploadedMetadata); // Set overarching metadata for samples
     // Additionally, track what the file's data was. Use this to blanket
     // (re-)initialize all the input fields to what was uploaded.
-    setImportedFileMetadata(uploadedSamplesMetadata);
+    setImportedFileMetadata(uploadedMetadata);
 
     setAutocorrectWarnings(
       warningMessages.get(WARNING_CODE.AUTO_CORRECT) || EMPTY_OBJECT
     );
   }
-
   return (
     <>
       <HeadAppTitle subTitle="Metadata and Sharing" />

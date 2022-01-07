@@ -56,12 +56,14 @@ type LocationFinderCache = Record<string, NamedGisaidLocation>;
 function findLocationFromString(
   locationString: string,
   locations: NamedGisaidLocation[],
-  locationFinderCache: LocationFinderCache | null = null,
+  locationFinderCache: LocationFinderCache | null = null
 ): NamedGisaidLocation | undefined {
   // Safety check -- Should not occur, but if app hasn't finished loading the
   // Locations data and this gets called, would blow up because we assume there
   // are some Locations below. Instead, fallback to `undefined` location.
-  if (locations.length === 0) { return undefined }
+  if (locations.length === 0) {
+    return undefined;
+  }
 
   // Only do cache interactions if one was provided
   if (locationFinderCache !== null && locationFinderCache[locationString]) {
@@ -69,23 +71,24 @@ function findLocationFromString(
   }
   const scoredLocations: [NamedGisaidLocation, number][] = locations.map(
     (location) => {
-    if (location.name === locationString) {
-      // Because matched to canonical name, supersede levenshtein distance
-      return [location, -1]; // -1 will be better than best possible of 0
+      if (location.name === locationString) {
+        // Because matched to canonical name, supersede levenshtein distance
+        return [location, -1]; // -1 will be better than best possible of 0
+      }
+      // Not all Locations have narrowest scope, skip if it's missing
+      if (location.location) {
+        return [location, distance(location.location, locationString)];
+      }
+      return [location, 99];
     }
-    // Not all Locations have narrowest scope, skip if it's missing
-    if (location.location) {
-      return [location, distance(location.location, locationString)];
-    }
-    return [location, 99];
-  });
+  );
   const candidateLocation = scoredLocations.reduce(
     ([prevLocation, prevScore], [currLocation, currScore]) => {
       if (currScore < prevScore) {
         return [currLocation, currScore];
       }
       return [prevLocation, prevScore];
-    },
+    }
   );
   const foundLocation = candidateLocation[0];
   // If using cache, add latest result in to make future searches faster
@@ -95,7 +98,9 @@ function findLocationFromString(
   return foundLocation;
 }
 
-export type StringToLocationFinder = (locationString: string) => NamedGisaidLocation | undefined;
+export type StringToLocationFinder = (
+  locationString: string
+) => NamedGisaidLocation | undefined;
 
 /**
  * Creates location finder func that will convert location strings to Location
@@ -112,15 +117,14 @@ export type StringToLocationFinder = (locationString: string) => NamedGisaidLoca
  * the user navigates to a different page, preventing it from getting stale.
  */
 export function createStringToLocationFinder(
-  locations: NamedGisaidLocation[],
+  locations: NamedGisaidLocation[]
 ): StringToLocationFinder {
   const locationFinderCache: LocationFinderCache = {};
-  const locationFinder = (locationString: string) => {
+  return (locationString: string) => {
     return findLocationFromString(
       locationString,
       locations,
-      locationFinderCache,
+      locationFinderCache
     );
   };
-  return locationFinder;
 }

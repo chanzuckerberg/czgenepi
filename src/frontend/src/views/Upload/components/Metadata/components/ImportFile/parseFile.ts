@@ -1,7 +1,8 @@
 import Papa from "papaparse";
+import { StringToLocationFinder } from "src/common/utils/locationUtils";
 import {
-  HEADERS_TO_METADATA_KEYS,
   EMPTY_METADATA,
+  HEADERS_TO_METADATA_KEYS,
 } from "../../../common/constants";
 import {
   ERROR_CODE,
@@ -9,7 +10,6 @@ import {
   SampleIdToMetadata,
   WARNING_CODE,
 } from "../../../common/types";
-import { StringToLocationFinder } from "src/common/utils/locationUtils";
 
 /**
  * (Vince) Regarding interfaces for Warnings/Errors:
@@ -29,10 +29,7 @@ import { StringToLocationFinder } from "src/common/utils/locationUtils";
  * wider scope. They are not tied to any specific sample, they are just the
  * messages that should be passed on to the user regarding the error category.
  */
-export type SampleIdToWarningMessages = Record<
-  string,
-  Set<keyof Metadata>
->;
+export type SampleIdToWarningMessages = Record<string, Set<keyof Metadata>>;
 type WarningMessages = Map<WARNING_CODE, SampleIdToWarningMessages>;
 type ErrorMessages = Map<ERROR_CODE, Set<string>>;
 
@@ -64,7 +61,9 @@ function convertHeaderToMetadataKey(headerName: string): string {
 // **after** PapaParse has parse-converted the header fields into keys.
 function getMissingHeaderFields(uploadedHeaders: string[]): Set<string> | null {
   const missingFields = new Set<string>();
-  for (const [headerField, metadataKey] of Object.entries(HEADERS_TO_METADATA_KEYS)) {
+  for (const [headerField, metadataKey] of Object.entries(
+    HEADERS_TO_METADATA_KEYS
+  )) {
     if (!uploadedHeaders.includes(metadataKey)) {
       missingFields.add(headerField);
     }
@@ -74,7 +73,7 @@ function getMissingHeaderFields(uploadedHeaders: string[]): Set<string> | null {
 
 // Helper -- Upload uses YES/NO to represent booleans for some columns
 function convertYesNoToBool(value: string): boolean {
-  return (value.toUpperCase() === "YES");
+  return value.toUpperCase() === "YES";
 }
 
 // We use the values of HEADERS_TO_METADATA_KEYS to future proof in case
@@ -146,8 +145,8 @@ function warnMissingMetadata(metadata: Metadata): Set<keyof Metadata> | null {
  */
 function parseRow(
   row: Record<string, string>,
-  stringToLocationFinder: StringToLocationFinder,
-  ): ParsedRow {
+  stringToLocationFinder: StringToLocationFinder
+): ParsedRow {
   const rowWarnings: ParsedRow["rowWarnings"] = new Map();
   // If row has no sampleId, we can't tie it to a sample, so we drop it.
   // VOODOO TODO also drop the specific cases of EXAMPLE rows
@@ -178,7 +177,7 @@ function parseRow(
           parsedCollectionLocation = stringToLocationFinder(originalValue);
         }
         rowMetadata.collectionLocation = parsedCollectionLocation;
-      } else if(key === "keepPrivate" || key === "submittedToGisaid" ) {
+      } else if (key === "keepPrivate" || key === "submittedToGisaid") {
         rowMetadata[key] = convertYesNoToBool(originalValue);
       } else {
         rowMetadata[key] = originalValue;
@@ -242,7 +241,10 @@ export function parseFile(
       // We parse the column headers to their corresponding metadata keys
       transformHeader: convertHeaderToMetadataKey,
       // Because file parsing is async, we need to use callback on `complete`
-      complete: ({data: rows, meta: papaParseMeta}: Papa.ParseResult<Record<string, string>>) => {
+      complete: ({
+        data: rows,
+        meta: papaParseMeta,
+      }: Papa.ParseResult<Record<string, string>>) => {
         const uploadedHeaders = papaParseMeta.fields as string[]; // available b/c `header: true`
 
         // Init -- Will modify these in place as we work through incoming rows.
@@ -259,10 +261,14 @@ export function parseFile(
         }
 
         rows.forEach((row) => {
-          const { rowMetadata, rowWarnings } = parseRow(row, stringToLocationFinder);
-          if (rowMetadata) { // If false-y, there was no parse result, skip it
+          const { rowMetadata, rowWarnings } = parseRow(
+            row,
+            stringToLocationFinder
+          );
+          // If false-y, there was no parse result, so we just skip those
+          if (rowMetadata) {
             // We can guarantee there is a sampleId because rowMetadata exists
-            // and parsing requires it, so `as string` is always true here
+            // and parsing requires it, so `as string` is always correct here
             const rowSampleId = rowMetadata.sampleId as string;
             sampleIdToMetadata[rowSampleId] = rowMetadata;
             // If row had warnings, fold them into the overall warnings.
@@ -272,7 +278,7 @@ export function parseFile(
               if (warnRecordForType === undefined) {
                 // Haven't encountered this warning type until now, do init
                 warnRecordForType = {};
-                warningMessages.set(warningType, warnRecordForType)
+                warningMessages.set(warningType, warnRecordForType);
               }
               warnRecordForType[rowSampleId] = warnStatements;
             });

@@ -1,8 +1,8 @@
 import { Button } from "czifui";
 import React, { useEffect, useState } from "react";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
-import FilePicker from "src/components/FilePicker";
 import { StringToLocationFinder } from "src/common/utils/locationUtils";
+import FilePicker from "src/components/FilePicker";
 import {
   ERROR_CODE,
   Props as CommonProps,

@@ -1,7 +1,5 @@
-import { invert, Dictionary } from "lodash";
-import {
-  Metadata,
-} from "src/views/Upload/components/common/types";
+import { Dictionary, invert } from "lodash";
+import { Metadata } from "src/views/Upload/components/common/types";
 
 // Internal keys we use to represent to various kinds of metadata on a sample
 // and the user-visible name we give the info, seen as a header on column.
@@ -20,7 +18,9 @@ export const METADATA_KEYS_TO_HEADERS: Record<keyof Metadata, string> = {
 // Note: there is a distinction between "real" `collectionLocation` internally
 // in app (it's an object) and user-submitted collectionLocation via metadata
 // upload (it's a string). The file parser will handle this conversion.
-export const HEADERS_TO_METADATA_KEYS = invert(METADATA_KEYS_TO_HEADERS) as Dictionary<keyof Metadata>;
+export const HEADERS_TO_METADATA_KEYS = invert(
+  METADATA_KEYS_TO_HEADERS
+) as Dictionary<keyof Metadata>;
 
 export const METADATA_KEYS_TO_API_KEYS: Record<keyof Metadata, string> = {
   collectionDate: "collection_date",
