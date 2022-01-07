@@ -11,20 +11,36 @@ import {
 } from "../../../common/types";
 import { StringToLocationFinder } from "src/common/utils/locationUtils";
 
-// NOTE VOODOO docme this is pretty badly tied to a certain kind of warning
-// Explain that this really is not as general as it sounds. I know, I wish
-// I could fix it, but lord this is taking forever.
-// Also, while we're at it, point out the same goes for error messages...
+/**
+ * (Vince) Regarding interfaces for Warnings/Errors:
+ * The naming below makes our warnings and errors sound very generalized, but
+ * they are not particularly general. The interface implementation is closely
+ * tied to the very few warning/errors we currently generate and the specific
+ * React component needs of displaying them to the user. If at some point we
+ * need a warning/error that won't fit into the below structure, feel free to
+ * completely re-write how these types work and strive to design it in a way
+ * that would make it easy to add new interfaces for future warnings/errors.
+ *
+ * WarningMessages are tied to a category (WARNING_CODE) of warning, then
+ * further broken into which sample has that kind of warning and a record
+ * of what keys within that sample triggered the warning.
+ *
+ * ErrorMessages are also tied to a category (ERROR_CODE) of error, but have a
+ * wider scope. They are not tied to any specific sample, they are just the
+ * messages that should be passed on to the user regarding the error category.
+ */
 export type SampleIdToWarningMessages = Record<
   string,
   Set<keyof Metadata>
 >;
+type WarningMessages = Map<WARNING_CODE, SampleIdToWarningMessages>;
+type ErrorMessages = Map<ERROR_CODE, Set<string>>;
 
 // End result of parsing upload. What goes back out to wider app to use.
 export interface ParseResult {
   data: SampleIdToMetadata;
-  errorMessages: Map<ERROR_CODE, Set<string>>;
-  warningMessages: Map<WARNING_CODE, SampleIdToWarningMessages>;
+  errorMessages: ErrorMessages;
+  warningMessages: WarningMessages;
   filename: string;
 }
 
@@ -115,7 +131,18 @@ function warnMissingMetadata(metadata: Metadata): Set<keyof Metadata> | null {
 }
 
 /**
- * VOODOO_TODO__DOC_ME
+ * Parses a single data row. If issues during parse, also reports warnings.
+ *
+ * Args:
+ *   - row: Data row /after/ ingestion by Papa.parse, not the raw text row.
+ *       Row needs to be brought in as an object with data matched to keys.
+ *   - stringToLocationFinder: Function that converts user-provided string of
+ *       a location to closest matching internally used Location object.
+ *   - VOODOO the filtering for extraneous IDs will have an arg.
+ *
+ * In some cases, the row can not or should not be parsed -- eg if malformed
+ * or data is considered extraneous -- in that case, returned object will have
+ * `rowMetadata` set to `null` to indicate to caller to ignore the row's info.
  */
 function parseRow(
   row: Record<string, string>,
@@ -177,12 +204,33 @@ function parseRow(
 }
 
 /**
- * VOODOO_TODO__DOC_ME
- * Notes
- * - Parses all row entries, doesn't care about filtering them here, caller should
- *    ^^ mostly true, but will be a lie once we filter out example rows
- *       also should mention how would be more elegant to pass samples down here,
- *       but would mess up warnings as implemented.
+ * Parses user-uploaded file of metadata into form useable by app.
+ *
+ * In addition to parsing out the data appropriately, records any warnings
+ * and errors that were encountered (eg, a field was missing, etc) so that
+ * those can be displayed to the user after pasing is complete.
+ *
+ * Generally, this parses all entries in file and makes no attempt fo filter
+ * the uploaded metadata down to the samples user user has previously uploaded.
+ * For example, if user uploaded only sample A, but then uploads metadata for
+ * both A and B, this function will parse out both A and B. Filtering that
+ * result down (in prior example, filtering to just A) is the responsibility
+ * of the caller.
+ *
+ * There is one exception to the above though: example rows. We do filter out
+ * any rows that match example rows we use in our metadata template. Basically,
+ * if it could possibly be "real" data, we do not filter it, but for example
+ * rows they left in from downloading our template, we do filter those.
+ *
+ * Note (Vince): It would probably be more elegant to perform the filtering
+ * entirely inside the parseFile. It would be easy to pass down the sampleIds
+ * to the parsing step, and filter out any metadata that does not match samples
+ * that were previously uploaded. However, that would break how some warnings
+ * currently work -- elsewhere, the Metadata components assume they'll be doing
+ * the filtering and generate/show warnings accordingly. It could be reworked,
+ * but I just don't have the time right now, so I'm leaving it alone. (That's
+ * also why the example rows must be filtered here -- matching what downstream
+ * consumers previously expected for how results will be structured.)
  */
 export function parseFile(
   file: File,
