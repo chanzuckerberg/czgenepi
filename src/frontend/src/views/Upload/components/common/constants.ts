@@ -1,7 +1,6 @@
-import { invert, omitBy } from "lodash";
+import { invert, Dictionary } from "lodash";
 import {
   Metadata,
-  ParsedMetadata,
 } from "src/views/Upload/components/common/types";
 
 // Internal keys we use to represent to various kinds of metadata on a sample
@@ -17,22 +16,11 @@ export const METADATA_KEYS_TO_HEADERS: Record<keyof Metadata, string> = {
   submittedToGisaid: "Previously Submitted to GISAID?",
 };
 
-// When parsing file upload of metadata, we use the flipped version of above.
-// Slightly different though, see comments inside.
-export const HEADERS_TO_METADATA_KEYS = invert(omitBy(
-  {
-  // Generally we use all the same, but now flipped to be Header name -> key
-  ...METADATA_KEYS_TO_HEADERS,
-  // However! We do not directly collect `collectionLocation` in file upload.
-  // That's actually an object internally, so can't parse. Mark as unused.
-  collectionLocation: "UNUSED", // Will get stripped entirely via `omitBy`
-  // Instead, we collect a canonical string that refers to the location.
-  // We still give same user-facing name, but internally used differently.
-  // This string will get converted later into a "real" collectionLocation.
-  locationString: "Collection Location",
-  },
-  val => val === "UNUSED", // Omits anything we marked as UNUSED above
-)) as Record<string, keyof ParsedMetadata>;
+// When parsing upload of metadata, we use a flipped version of above.
+// Note: there is a distinction between "real" `collectionLocation` internally
+// in app (it's an object) and user-submitted collectionLocation via metadata
+// upload (it's a string). The file parser will handle this conversion.
+export const HEADERS_TO_METADATA_KEYS = invert(METADATA_KEYS_TO_HEADERS) as Dictionary<keyof Metadata>;
 
 export const METADATA_KEYS_TO_API_KEYS: Record<keyof Metadata, string> = {
   collectionDate: "collection_date",

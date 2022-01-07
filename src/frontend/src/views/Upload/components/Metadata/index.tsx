@@ -1,5 +1,4 @@
 import { Button } from "czifui";
-import { distance } from "fastest-levenshtein";
 import NextLink from "next/link";
 import React, { useState, useMemo } from "react";
 import { HeadAppTitle } from "src/common/components";
@@ -7,9 +6,7 @@ import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { ROUTES } from "src/common/routes";
 import { createStringToLocationFinder } from "src/common/utils/locationUtils";
-import { EMPTY_METADATA } from "src/views/Upload/components/common/constants";
 import {
-  NamedGisaidLocation,
   Props,
   SampleIdToMetadata,
   WARNING_CODE,
@@ -31,33 +28,6 @@ import {
 } from "./components/ImportFile/parseFile";
 import Table from "./components/Table";
 
-function findLocationFromString(
-  locationString: string,
-  locations: NamedGisaidLocation[]
-): NamedGisaidLocation {
-  // compare levenshtein distances between location strings
-  // for this implementation, we are comparing against the
-  // Location.location - the narrowest scope (i.e. city/county level)
-  // I would like to bias the final results towards a user's group's
-  // location, but that will take some API modification.
-  const scoredLocations: [NamedGisaidLocation, number][] = Object.values(
-    locations
-  ).map((location) => {
-    if (location.location) {
-      return [location, distance(location.location, locationString)];
-    }
-    return [location, 99];
-  });
-  const candidateLocation = scoredLocations.reduce(
-    ([prevLocation, prevScore], [currLocation, currScore]) => {
-      if (currScore < prevScore) {
-        return [currLocation, currScore];
-      }
-      return [prevLocation, prevScore];
-    }
-  );
-  return candidateLocation[0];
-}
 
 export default function Metadata({
   samples,
@@ -77,37 +47,26 @@ export default function Metadata({
   }, [namedLocations]);
 
   function handleMetadataFileUpload(result: ParseResult) {
-    const { data: sampleIdToParsedMetadata, warningMessages } = result;
     // If they're on the page but somehow have no samples (eg, refreshing on
     // Metadata page), short-circuit and do nothing to avoid any weirdness.
     if (!samples) return;
 
-    const uploadedMetadata: SampleIdToMetadata = {};
+    const { data: sampleIdToUploadedMetadata, warningMessages } = result;
 
-    // (thuang): Only extract metadata for existing samples
+    // Filter out any metadata for samples they did not just upload
+    // Note: Might be cleaner to do this filtering inside of file parse call,
+    // but would require changing the way some of the warnings work currently.
+    const uploadedSamplesMetadata: SampleIdToMetadata = {};
     for (const sampleId of Object.keys(samples)) {
-      // get parsed metadata
-      const parsedMetadata = sampleIdToParsedMetadata[sampleId];
-      // try and match parsed collection location to a gisaid location
-      const locationString = parsedMetadata.locationString || "";
-      let collectionLocation = undefined;
-      if (locationString.length > 2) {
-        collectionLocation = findLocationFromString(
-          locationString,
-          namedLocations
-        );
+      if (sampleIdToUploadedMetadata[sampleId]) {
+        uploadedSamplesMetadata[sampleId] = sampleIdToUploadedMetadata[sampleId];
       }
-      uploadedMetadata[sampleId] = {
-        ...EMPTY_METADATA,
-        ...parsedMetadata,
-        collectionLocation,
-      };
     }
 
-    setMetadata(uploadedMetadata); // Set overarching metadata for samples
+    setMetadata(uploadedSamplesMetadata); // Set overarching metadata for samples
     // Additionally, track what the file's data was. Use this to blanket
     // (re-)initialize all the input fields to what was uploaded.
-    setImportedFileMetadata(uploadedMetadata);
+    setImportedFileMetadata(uploadedSamplesMetadata);
 
     setAutocorrectWarnings(
       warningMessages.get(WARNING_CODE.AUTO_CORRECT) || EMPTY_OBJECT

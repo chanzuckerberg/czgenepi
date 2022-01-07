@@ -10,7 +10,6 @@ import { EMPTY_METADATA } from "src/views/Upload/components/common/constants";
 import {
   Metadata,
   NamedGisaidLocation,
-  ParsedMetadata,
 } from "src/views/Upload/components/common/types";
 import * as yup from "yup";
 import FreeTextField from "./components/FreeTextField";
@@ -57,7 +56,7 @@ interface Props {
   applyToAllColumn: (fieldKey: keyof Metadata, value: unknown) => void;
   isFirstRow: boolean;
   handleRowValidation: (id: string, isValid: boolean) => void;
-  warnings?: Set<keyof ParsedMetadata>;
+  warnings?: Set<keyof Metadata>;
   locations: NamedGisaidLocation[];
 }
 
