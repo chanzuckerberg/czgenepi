@@ -6,6 +6,7 @@ import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { ROUTES } from "src/common/routes";
 import { createStringToLocationFinder } from "src/common/utils/locationUtils";
+import { EMPTY_METADATA } from "src/views/Upload/components/common/constants";
 import {
   Props,
   SampleIdToMetadata,
@@ -59,6 +60,14 @@ export default function Metadata({
     for (const sampleId of Object.keys(samples)) {
       if (sampleIdToUploadedMetadata[sampleId]) {
         uploadedMetadata[sampleId] = sampleIdToUploadedMetadata[sampleId];
+      } else {
+        // If they did provide metadata for a given sample, ensure that it has
+        // a sane default so it can be entered later and not dropped.
+        // FIXME (Vince): This winds up destroying any data the user might have
+        // previously entered for the sample via web form. It's not great, but
+        // it was pre-existing behavior and I don't have time to fix it right
+        //  now because it would involve restructuring how we default metadata
+        uploadedMetadata[sampleId] = { ...EMPTY_METADATA };
       }
     }
 

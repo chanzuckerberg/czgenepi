@@ -1,12 +1,11 @@
 import deepEqual from "deep-equal";
 import { useFormik } from "formik";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { noop } from "src/common/constants/empty";
 import {
   DATE_ERROR_MESSAGE,
   DATE_REGEX,
 } from "src/components/DateField/constants";
-import { EMPTY_METADATA } from "src/views/Upload/components/common/constants";
 import {
   Metadata,
   NamedGisaidLocation,
@@ -71,10 +70,47 @@ export default React.memo(function Row({
   warnings = new Set(),
   locations,
 }: Props): JSX.Element {
+  /**
+   * Below preps the metadata values form should initialize to.
+   *
+   * IMPORTANT NOTE: container-level `metadata` in parent somewhere above must
+   * initialize each sample's metadata object to being a valid Metadata type.
+   * (Currently done by initializing all to EMPTY_METADATA when samples change,
+   * but the important part is we need to be able to trust incoming `metadata`
+   * as starting off sane.)
+   *
+   * (Vince): I don't love this approach, but initialization currently must
+   * serve three purposes: 1) non-file-upload use, start off as empty data user
+   * can enter via web form; 2) if user leaves Metadata step then comes back,
+   * the form should start off as whatever it last looked like; 3) when file
+   * is uploaded, reset the form and use the values that were just uploaded.
+   * If we only cared about (1) and (2), we could just turn off formik's
+   * `enableReinitialize` so the initial values would be locked in once the
+   * form is created: this would work both for handling the very first
+   * interaction (because upstream inits metadata for us), and for re-visiting
+   * (because `metadata` would be last seen). But because we need formik's
+   * reinitialization so we can achieve (3), we need to keep the provided
+   * `initialValues` stable and only change them when uploaded data changes.
+   * So that's why it's memo-ized: prefer initializing on uploaded file data,
+   * and if it's not available, use the starting metadata, but keep the
+   * reference stable so we don't reinitalize out-of-turn. Then if any changes
+   * come in for imported data, switch to those and kick off a reinitialize.
+   *
+   * FIXME (Vince): This could be made more robust (and clearer) if we changed
+   * how metadata gets defaulted and also had a handler for emitting value
+   * changes to formik when the `importedFileMetadata` changes. But I'm low
+   * on time right now, and this change is fixing a bug we had where
+   * the initialValues were only tied to upstream `metadata`, causing the
+   * form to reset with every change, so "touched" couldn't be tracked.
+   */
+  const initialFormValues = useMemo(() => {
+    return importedFileMetadata || metadata;
+  }, [importedFileMetadata]);
+
   const formik = useFormik({
     enableReinitialize: true,
     // If new file import comes in, form resets and uses that as starting point
-    initialValues: importedFileMetadata || EMPTY_METADATA,
+    initialValues: initialFormValues,
     onSubmit: noop,
     validationSchema,
   });
