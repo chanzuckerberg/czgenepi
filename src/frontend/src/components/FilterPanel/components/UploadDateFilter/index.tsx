@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { FormattedDateType } from "src/components/DateField";
+import { UpdateDateFilterType } from "../..";
 import { DateFilter, DateMenuOption } from "../DateFilter";
 
 const MENU_OPTIONS_UPLOAD_DATE: DateMenuOption[] = [
@@ -19,10 +19,7 @@ const MENU_OPTIONS_UPLOAD_DATE: DateMenuOption[] = [
 ];
 
 interface Props {
-  updateUploadDateFilter: (
-    start: FormattedDateType,
-    end: FormattedDateType
-  ) => void;
+  updateUploadDateFilter: UpdateDateFilterType;
 }
 
 const UploadDateFilter: FC<Props> = ({ updateUploadDateFilter }) => {
