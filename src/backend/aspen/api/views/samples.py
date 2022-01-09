@@ -3,6 +3,7 @@ from typing import Dict, List, NamedTuple, Optional, Set
 
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncResult, AsyncSession
 from sqlalchemy.orm import joinedload, selectinload
 from sqlalchemy.orm.exc import NoResultFound
@@ -162,7 +163,7 @@ async def get_owned_samples_by_ids(
     db: AsyncSession, sample_ids: List[int], user: User
 ) -> AsyncResult:
     query = (
-        sa.select(Sample)
+        sa.select(Sample)  # type: ignore
         .options(
             joinedload(Sample.uploaded_pathogen_genome),
             joinedload(Sample.submitting_group),
@@ -235,7 +236,7 @@ async def update_samples(
 
     # reorganize request data to make it easier to update
     reorganized_request_data = {s.id: s for s in update_samples_request.samples}
-    sample_ids_to_update = reorganized_request_data.keys()
+    sample_ids_to_update = list(reorganized_request_data.keys())
 
     # Make sure these samples exist and are delete-able by the current user.
     sample_db_res = await get_owned_samples_by_ids(db, sample_ids_to_update, user)
@@ -247,6 +248,9 @@ async def update_samples(
     ]
     if uneditable_samples:
         raise ex.NotFoundException("some samples cannot be updated")
+    # Check that we don't have dupe public/private ID's
+    [sample.private_identifier for sample in editable_samples]
+    [sample.public_identifier for sample in editable_samples]
 
     res = SamplesResponseSchema(samples=[])
     for sample in editable_samples:
@@ -254,7 +258,7 @@ async def update_samples(
         for key, value in update_data:
             if key in ["collection_location", "sequencing_date"]:
                 continue
-            if value != None:  # We need to be able to set private to False!
+            if value is not None:  # We need to be able to set private to False!
                 setattr(sample, key, value)
         # Location id is handled specially
         if update_data.collection_location:
@@ -270,6 +274,13 @@ async def update_samples(
         sample.show_private_identifier = True
         res.samples.append(SampleResponseSchema.from_orm(sample))
 
-    await db.commit()
+    try:
+        await db.commit()
+    except IntegrityError:
+        # We're relying on Posgres' group+private_id and group+public_id uniqueness
+        # constraints to check whether we have duplicate identifiers.
+        raise ex.BadRequestException(
+            "All private and public identifiers must be unique"
+        )
 
     return res
