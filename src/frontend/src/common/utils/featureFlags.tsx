@@ -21,6 +21,10 @@ export const FEATURE_FLAGS: FlagsObj = {
     isDisabled: true,
     key: "mayasFlag",
   },
+  overviewTrees: {
+    isDisabled: false,
+    key: "overviewTrees",
+  },
 };
 
 const allowedKeys = Object.keys(FEATURE_FLAGS) as string[];
