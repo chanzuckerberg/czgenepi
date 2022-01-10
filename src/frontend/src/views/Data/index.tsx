@@ -82,7 +82,12 @@ const Data: FunctionComponent = () => {
   const { samples, trees } = useMemo(
     () => ({
       samples: transformData(sampleData?.samples ?? [], "publicId"),
-      trees: transformData(treeData?.phylo_runs ?? [], "id", TREE_TRANSFORMS),
+      // use workflowID as key (failed and started phylotrees do not have an associated PhyloTree ID since they are technically only PhyloRun objects)
+      trees: transformData(
+        treeData?.phylo_trees ?? [],
+        "workflowId",
+        TREE_TRANSFORMS
+      ),
     }),
     [sampleData, treeData]
   );
