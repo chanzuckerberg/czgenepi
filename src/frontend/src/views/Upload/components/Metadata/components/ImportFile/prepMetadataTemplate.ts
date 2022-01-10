@@ -18,7 +18,7 @@ const TEMPLATE_HEADERS = [
 ];
 
 // We also use this elsewhere: if we see one of these uploaded, filter it out.
-const EXAMPLE_SAMPLE_IDS = [
+export const EXAMPLE_SAMPLE_IDS = [
   "Example Sample A",
   "Example Sample B",
   "Example Sample C",

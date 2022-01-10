@@ -10,6 +10,7 @@ import {
   SampleIdToMetadata,
   WARNING_CODE,
 } from "../../../common/types";
+import { EXAMPLE_SAMPLE_IDS } from "./prepMetadataTemplate";
 
 /**
  * (Vince) Regarding interfaces for Warnings/Errors:
@@ -132,25 +133,27 @@ function warnMissingMetadata(metadata: Metadata): Set<keyof Metadata> | null {
 /**
  * Parses a single data row. If issues during parse, also reports warnings.
  *
+ * In some cases, the row can not or should not be parsed -- eg if malformed
+ * or data is considered extraneous -- in that case, returned object will have
+ * `rowMetadata` set to `null` to indicate to caller to ignore the row's info.
+ *
  * Args:
  *   - row: Data row /after/ ingestion by Papa.parse, not the raw text row.
  *       Row needs to be brought in as an object with data matched to keys.
  *   - stringToLocationFinder: Function that converts user-provided string of
  *       a location to closest matching internally used Location object.
- *   - VOODOO the filtering for extraneous IDs will have an arg.
- *
- * In some cases, the row can not or should not be parsed -- eg if malformed
- * or data is considered extraneous -- in that case, returned object will have
- * `rowMetadata` set to `null` to indicate to caller to ignore the row's info.
+ *   - ignoredSampleIds: Any IDs that, if encountered, mean row is ignored.
+ *       Mostly exists to filter out the metadata template's example rows.
  */
 function parseRow(
   row: Record<string, string>,
-  stringToLocationFinder: StringToLocationFinder
+  stringToLocationFinder: StringToLocationFinder,
+  ignoredSampleIds: Set<string>
 ): ParsedRow {
   const rowWarnings: ParsedRow["rowWarnings"] = new Map();
   // If row has no sampleId, we can't tie it to a sample, so we drop it.
-  // VOODOO TODO also drop the specific cases of EXAMPLE rows
-  if (!row.sampleId) {
+  // Some sampleIds (ie, ones for examples) also signal we should ignore row.
+  if (!row.sampleId || ignoredSampleIds.has(row.sampleId)) {
     return {
       rowMetadata: null, // Indicates to caller row had nothing to parse.
       rowWarnings,
@@ -260,10 +263,13 @@ export function parseFile(
           errorMessages.set(ERROR_CODE.MISSING_FIELD, missingHeaderFields);
         }
 
+        const IGNORED_SAMPLE_IDS = new Set(EXAMPLE_SAMPLE_IDS);
+
         rows.forEach((row) => {
           const { rowMetadata, rowWarnings } = parseRow(
             row,
-            stringToLocationFinder
+            stringToLocationFinder,
+            IGNORED_SAMPLE_IDS
           );
           // If false-y, there was no parse result, so we just skip those
           if (rowMetadata) {
