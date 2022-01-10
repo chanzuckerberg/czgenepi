@@ -104,7 +104,7 @@ export default React.memo(function Row({
    * form to reset with every change, so "touched" couldn't be tracked.
    */
   const initialFormValues = useMemo(() => {
-    return importedFileMetadata || metadata;
+    return importedFileMetadata || { ...metadata };
   }, [importedFileMetadata]);
 
   const formik = useFormik({

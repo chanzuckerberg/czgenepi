@@ -1,5 +1,5 @@
 import { Button } from "czifui";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { StringToLocationFinder } from "src/common/utils/locationUtils";
 import FilePicker from "src/components/FilePicker";
@@ -8,14 +8,13 @@ import {
   Props as CommonProps,
   WARNING_CODE,
 } from "src/views/Upload/components/common/types";
-import { METADATA_KEYS_TO_HEADERS } from "../../../common/constants";
 import Error from "./components/Alerts/Error";
 import Success from "./components/Alerts/Success";
 import Warning from "./components/Alerts/Warning";
 import DownloadTemplate from "./components/DownloadTemplate";
 import Instructions from "./components/Instructions";
-import { EXAMPLES } from "./constants";
 import { parseFile, ParseResult, SampleIdToWarningMessages } from "./parseFile";
+import { prepMetadataTemplate } from "./prepMetadataTemplate";
 import { IntroWrapper, Title, TitleWrapper, Wrapper } from "./style";
 
 interface Props {
@@ -60,6 +59,10 @@ export default function ImportFile({
     setIsInstructionsShown(!isInstructionsShown);
   };
 
+  const { templateHeaders, templateRows } = useMemo(() => {
+    return prepMetadataTemplate(Object.keys(samples || EMPTY_OBJECT));
+  }, [samples]);
+
   const handleFiles = async (files: FileList | null) => {
     if (!files) return;
 
@@ -83,8 +86,6 @@ export default function ImportFile({
     handleMetadata(result);
   };
 
-  const { headers, rows } = createTsv(samples);
-
   return (
     <Wrapper>
       <IntroWrapper>
@@ -93,12 +94,14 @@ export default function ImportFile({
           <Button color="primary" onClick={handleInstructionsClick}>
             {isInstructionsShown ? "HIDE" : "SHOW"} INSTRUCTIONS
           </Button>
-          <DownloadTemplate headers={headers} rows={rows}>
+          <DownloadTemplate headers={templateHeaders} rows={templateRows}>
             <Button color="primary">Download Metadata Template (TSV)</Button>
           </DownloadTemplate>
         </TitleWrapper>
 
-        {isInstructionsShown && <Instructions headers={headers} rows={rows} />}
+        {isInstructionsShown && (
+          <Instructions headers={templateHeaders} rows={templateRows} />
+        )}
       </IntroWrapper>
 
       <div>
@@ -137,42 +140,6 @@ export default function ImportFile({
       </RenderOrNull>
     </Wrapper>
   );
-}
-
-function createTsv(samples: CommonProps["samples"]): {
-  headers: string[];
-  rows: string[][];
-} {
-  const {
-    sampleId,
-    collectionDate,
-    collectionLocation,
-    sequencingDate,
-    keepPrivate,
-    submittedToGisaid,
-    publicId,
-    islAccessionNumber,
-  } = METADATA_KEYS_TO_HEADERS;
-
-  const rows = Object.keys(samples || EMPTY_OBJECT).map((sampleId, index) => [
-    String(index + 1),
-    sampleId,
-  ]);
-
-  return {
-    headers: [
-      "",
-      sampleId,
-      collectionDate,
-      collectionLocation,
-      sequencingDate,
-      keepPrivate,
-      submittedToGisaid,
-      publicId,
-      islAccessionNumber,
-    ],
-    rows: [...EXAMPLES, ...rows],
-  };
 }
 
 function RenderOrNull({
