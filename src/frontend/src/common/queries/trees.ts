@@ -49,7 +49,7 @@ async function createTree({
     samples: sampleIds,
     tree_type: treeType,
   };
-  const response = await fetch(API_URL + API.PHYLO_TREES, {
+  const response = await fetch(API_URL + API.PHYLO_TREES_V2, {
     ...DEFAULT_POST_OPTIONS,
     body: JSON.stringify(payload),
   });
@@ -164,7 +164,7 @@ export function useTreeInfo(): UseQueryResult<TreeResponse, unknown> {
 
 type TreeDeleteCallbacks = MutationCallbacks<TreeDeleteResponseType>;
 interface TreeDeleteRequestType {
-  treeIdToDelete: number;
+  treeIdToDelete: string;
 }
 
 interface TreeDeleteResponseType {
@@ -174,7 +174,7 @@ interface TreeDeleteResponseType {
 export async function deleteTree({
   treeIdToDelete,
 }: TreeDeleteRequestType): Promise<TreeDeleteResponseType> {
-  const response = await fetch(API_URL + API.PHYLO_TREES + treeIdToDelete, {
+  const response = await fetch(API_URL + API.PHYLO_TREES_V2 + treeIdToDelete, {
     ...DEFAULT_DELETE_OPTIONS,
   });
 
