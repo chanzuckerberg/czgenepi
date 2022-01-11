@@ -165,7 +165,7 @@ task TransformGISAID {
     raw_gisaid_s3_bucket=$(echo "${raw_gisaid_location}" | jq -r .bucket)
     raw_gisaid_s3_key=$(echo "${raw_gisaid_location}" | jq -r .key)
 
-    git clone --depth 1 git://github.com/nextstrain/ncov-ingest /ncov-ingest
+    git clone --depth 1 https://github.com/nextstrain/ncov-ingest /ncov-ingest
     ncov_ingest_git_rev=$(git -C /ncov-ingest rev-parse HEAD)
 
     # modify location rules from ncov-ingest. Southern San Joaquin Valley would be left blank in the default version
@@ -252,7 +252,7 @@ task AlignGISAID {
     build_id=$(date +%Y%m%d-%H%M)
     
     # We're pinning to a specific git hash in the Dockerfile so we're not cloning this here.
-    # git clone --depth 1 git://github.com/nextstrain/ncov /ncov
+    # git clone --depth 1 https://github.com/nextstrain/ncov /ncov
     ncov_git_rev=$(git -C /ncov rev-parse HEAD)
 
     # fetch the gisaid dataset
