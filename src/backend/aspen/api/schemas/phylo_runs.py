@@ -40,6 +40,7 @@ class UserResponse(BaseResponse):
     id: int
     name: str
 
+
 def humanize_tree_name(values):
     json_filename = values["s3_key"].split("/")[-1]
     basename = re.sub(r".json", "", json_filename)
