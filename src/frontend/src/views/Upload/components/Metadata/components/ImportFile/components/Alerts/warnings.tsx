@@ -46,9 +46,34 @@ export function WarningExtraneousEntry({
     "Sample",
     count
   )} in metadata file ${maybePluralize("was", count)} not used.`;
-  const message = `The following sample IDs in the metadata file do not match any sample IDs imported in the previous step: ${extraneousSampleIds.join(
-    ", "
-  )}`;
+  const message = `The following sample IDs in the metadata file do not match
+    any sample IDs imported in the previous step:
+    ${extraneousSampleIds.join(", ")}`;
+  return (
+    <AlertAccordion
+      title={title}
+      message={message}
+      severity={WARNING_SEVERITY}
+    />
+  );
+}
+
+/**
+ * WARNING_CODE.ABSENT_SAMPLE
+ */
+interface PropsAbsentSample {
+  absentSampleIds: string[];
+}
+export function WarningAbsentSample({ absentSampleIds }: PropsAbsentSample) {
+  const count = absentSampleIds.length;
+  // "X Samples were not found in metadata file."
+  const title = `${count} ${maybePluralize("Sample", count)} ${maybePluralize(
+    "was",
+    count
+  )} not found in metadata file.`;
+  const message = `The following sample IDs were imported in the previous step
+    but did not match any sample IDs in the metadata file:
+    ${absentSampleIds.join(", ")}`;
   return (
     <AlertAccordion
       title={title}

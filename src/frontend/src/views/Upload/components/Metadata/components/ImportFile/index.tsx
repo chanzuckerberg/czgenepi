@@ -11,6 +11,7 @@ import {
 import Error from "./components/Alerts/Error";
 import Success from "./components/Alerts/Success";
 import {
+  WarningAbsentSample,
   WarningAutoCorrect,
   WarningExtraneousEntry,
 } from "./components/Alerts/warnings";
@@ -38,20 +39,31 @@ export default function ImportFile({
   const [filename, setFilename] = useState("");
   const [parseResult, setParseResult] = useState<ParseResult | null>(null);
   const [extraneousSampleIds, setExtraneousSampleIds] = useState<string[]>([]);
+  const [absentSampleIds, setAbsentSampleIds] = useState<string[]>([]);
   // VOODOO next commit
   // const [missingData, setMissingData] = useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
 
-  // Determine sample IDs in metadata that weren't in previous sequence upload
+  // Determine mismatches between uploaded metadata IDs and previous step's IDs.
+  // `extraneousSampleIds` are what was in metadata, but not in sequence upload
+  // `absentSampleIds` were in sequence upload, but missing from metadata
   useEffect(() => {
     if (!parseResult) return;
 
     const { data } = parseResult;
     const parseResultSampleIds = Object.keys(data);
-    const sampleIds = new Set(Object.keys(samples || EMPTY_OBJECT));
+    const sampleIds = Object.keys(samples || EMPTY_OBJECT);
+
+    const sampleIdsSet = new Set(sampleIds);
     const extraneousSampleIds = parseResultSampleIds.filter((parseId) => {
-      return !sampleIds.has(parseId);
+      return !sampleIdsSet.has(parseId);
     });
     setExtraneousSampleIds(extraneousSampleIds);
+
+    const parseResultSampleIdsSet = new Set(parseResultSampleIds);
+    const absentSampleIds = sampleIds.filter((sampleId) => {
+      return !parseResultSampleIdsSet.has(sampleId);
+    });
+    setAbsentSampleIds(absentSampleIds);
   }, [parseResult, samples]);
 
   const handleInstructionsClick = () => {
@@ -138,6 +150,10 @@ export default function ImportFile({
 
       <RenderOrNull condition={extraneousSampleIds.length}>
         <WarningExtraneousEntry extraneousSampleIds={extraneousSampleIds} />
+      </RenderOrNull>
+
+      <RenderOrNull condition={absentSampleIds.length}>
+        <WarningAbsentSample absentSampleIds={absentSampleIds} />
       </RenderOrNull>
     </Wrapper>
   );

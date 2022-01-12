@@ -39,6 +39,8 @@ export enum WARNING_CODE {
   MISSING_DATA,
   // Metdata row in upload was not found in user's previously uploaded samples
   EXTRANEOUS_ENTRY,
+  // Sample ID appeared in user's sequence upload, but not in metadata upload
+  ABSENT_SAMPLE,
 }
 
 export enum ERROR_CODE {
