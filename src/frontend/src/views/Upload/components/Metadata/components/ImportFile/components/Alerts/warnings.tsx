@@ -1,6 +1,16 @@
 import React from "react";
 import AlertAccordion from "src/components/AlertAccordion";
+import { METADATA_KEYS_TO_HEADERS } from "src/views/Upload/components/common/constants";
+import { SampleIdToWarningMessages } from "../../parseFile";
 import { maybePluralize } from "./common/pluralize";
+import {
+  FullWidthAlertAccordion,
+  FullWidthContainer,
+  Table,
+  TbodyZebra,
+  Td,
+  Th,
+} from "./common/style";
 
 const WARNING_SEVERITY = "warning";
 
@@ -78,6 +88,65 @@ export function WarningAbsentSample({ absentSampleIds }: PropsAbsentSample) {
     <AlertAccordion
       title={title}
       message={message}
+      severity={WARNING_SEVERITY}
+    />
+  );
+}
+
+/**
+ * WARNING_CODE.MISSING_DATA
+ */
+interface PropsMissingData {
+  missingData: SampleIdToWarningMessages;
+}
+
+// Possibly worth generalizing this down the road and use in other Warnings
+// and Errors (there's some similar stuff in the Error components, but the
+// number of columns is only ever one over there).
+function MessageMissingData({ missingData }: PropsMissingData) {
+  const idsMissingData = Object.keys(missingData);
+  return (
+    <FullWidthContainer>
+      You can add the required data in the table below, or update your file and
+      re-import.
+      <Table>
+        <thead>
+          <tr>
+            <Th>Sample Private ID</Th>
+            <Th>Missing Data</Th>
+          </tr>
+        </thead>
+        <TbodyZebra>
+          {idsMissingData.map((sampleId) => {
+            const missingHeaders = Array.from(
+              missingData[sampleId],
+              (missingKey) => METADATA_KEYS_TO_HEADERS[missingKey]
+            );
+            const missingDescription = missingHeaders.join(", ");
+            return (
+              <tr key={sampleId}>
+                <Td>{sampleId}</Td>
+                <Td>{missingDescription}</Td>
+              </tr>
+            );
+          })}
+        </TbodyZebra>
+      </Table>
+    </FullWidthContainer>
+  );
+}
+
+export function WarningMissingData({ missingData }: PropsMissingData) {
+  const count = Object.keys(missingData).length;
+  // "X Samples were missing data in required fields."
+  const title = `${count} ${maybePluralize("Sample", count)} ${maybePluralize(
+    "was",
+    count
+  )} missing data in required fields.`;
+  return (
+    <FullWidthAlertAccordion
+      title={title}
+      message={<MessageMissingData missingData={missingData} />}
       severity={WARNING_SEVERITY}
     />
   );

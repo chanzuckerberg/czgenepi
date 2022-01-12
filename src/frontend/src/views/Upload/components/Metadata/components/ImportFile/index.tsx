@@ -1,4 +1,5 @@
 import { Button } from "czifui";
+import { isEmpty } from "lodash";
 import React, { useEffect, useMemo, useState } from "react";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { StringToLocationFinder } from "src/common/utils/locationUtils";
@@ -14,6 +15,7 @@ import {
   WarningAbsentSample,
   WarningAutoCorrect,
   WarningExtraneousEntry,
+  WarningMissingData,
 } from "./components/Alerts/warnings";
 import DownloadTemplate from "./components/DownloadTemplate";
 import Instructions from "./components/Instructions";
@@ -40,8 +42,8 @@ export default function ImportFile({
   const [parseResult, setParseResult] = useState<ParseResult | null>(null);
   const [extraneousSampleIds, setExtraneousSampleIds] = useState<string[]>([]);
   const [absentSampleIds, setAbsentSampleIds] = useState<string[]>([]);
-  // VOODOO next commit
-  // const [missingData, setMissingData] = useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
+  const [missingData, setMissingData] =
+    useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
 
   // Determine mismatches between uploaded metadata IDs and previous step's IDs.
   // `extraneousSampleIds` are what was in metadata, but not in sequence upload
@@ -93,8 +95,9 @@ export default function ImportFile({
     setAutocorrectCount(autocorrectCount);
     setFilename(filename);
     setParseResult(result);
-    // VOODOO next commit
-    // setMissingData(warningMessages.get(WARNING_CODE.MISSING_DATA) || EMPTY_OBJECT);
+    setMissingData(
+      warningMessages.get(WARNING_CODE.MISSING_DATA) || EMPTY_OBJECT
+    );
 
     handleMetadata(result);
   };
@@ -154,6 +157,10 @@ export default function ImportFile({
 
       <RenderOrNull condition={absentSampleIds.length}>
         <WarningAbsentSample absentSampleIds={absentSampleIds} />
+      </RenderOrNull>
+
+      <RenderOrNull condition={!isEmpty(missingData)}>
+        <WarningMissingData missingData={missingData} />
       </RenderOrNull>
     </Wrapper>
   );
