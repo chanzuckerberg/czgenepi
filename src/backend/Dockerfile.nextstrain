@@ -37,7 +37,7 @@ RUN mkdir /ncov && \
     cd /ncov && \
     git init && \
     git remote add origin https://github.com/nextstrain/ncov.git && \
-    git fetch origin master && \
+    git fetch origin 065eb54867a39a175ebce4181f43ddbd8c84b3b4 && \
     git reset --hard FETCH_HEAD
 RUN mkdir -p /ncov/auspice
 RUN mkdir -p /ncov/logs
