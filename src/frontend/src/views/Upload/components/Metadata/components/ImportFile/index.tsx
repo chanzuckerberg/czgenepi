@@ -10,7 +10,10 @@ import {
 } from "src/views/Upload/components/common/types";
 import Error from "./components/Alerts/Error";
 import Success from "./components/Alerts/Success";
-import Warning from "./components/Alerts/Warning";
+import {
+  WarningAutoCorrect,
+  WarningExtraneousEntry,
+} from "./components/Alerts/warnings";
 import DownloadTemplate from "./components/DownloadTemplate";
 import Instructions from "./components/Instructions";
 import { parseFile, ParseResult, SampleIdToWarningMessages } from "./parseFile";
@@ -34,25 +37,21 @@ export default function ImportFile({
   const [autocorrectCount, setAutocorrectCount] = useState<number>(0);
   const [filename, setFilename] = useState("");
   const [parseResult, setParseResult] = useState<ParseResult | null>(null);
-  const [unusedSampleIds, setUnusedSampleIds] = useState<string[]>([]);
+  const [extraneousSampleIds, setExtraneousSampleIds] = useState<string[]>([]);
+  // VOODOO next commit
+  // const [missingData, setMissingData] = useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
 
+  // Determine sample IDs in metadata that weren't in previous sequence upload
   useEffect(() => {
     if (!parseResult) return;
 
     const { data } = parseResult;
-
-    const parseResultSampleIds = new Set(Object.keys(data));
+    const parseResultSampleIds = Object.keys(data);
     const sampleIds = new Set(Object.keys(samples || EMPTY_OBJECT));
-
-    const unusedSampleIds = [];
-
-    for (const parseResultSampleId of parseResultSampleIds) {
-      if (sampleIds.has(parseResultSampleId)) continue;
-
-      unusedSampleIds.push(parseResultSampleId);
-    }
-
-    setUnusedSampleIds(unusedSampleIds);
+    const extraneousSampleIds = parseResultSampleIds.filter((parseId) => {
+      return !sampleIds.has(parseId);
+    });
+    setExtraneousSampleIds(extraneousSampleIds);
   }, [parseResult, samples]);
 
   const handleInstructionsClick = () => {
@@ -82,6 +81,8 @@ export default function ImportFile({
     setAutocorrectCount(autocorrectCount);
     setFilename(filename);
     setParseResult(result);
+    // VOODOO next commit
+    // setMissingData(warningMessages.get(WARNING_CODE.MISSING_DATA) || EMPTY_OBJECT);
 
     handleMetadata(result);
   };
@@ -121,7 +122,7 @@ export default function ImportFile({
       <RenderOrNull
         condition={
           hasImportedFile &&
-          !getIsParseResultCompletelyUnused(unusedSampleIds, parseResult)
+          !getIsParseResultCompletelyUnused(extraneousSampleIds, parseResult)
         }
       >
         <Success filename={filename} />
@@ -132,11 +133,11 @@ export default function ImportFile({
       </RenderOrNull>
 
       <RenderOrNull condition={autocorrectCount}>
-        <Warning sampleCount={autocorrectCount} />
+        <WarningAutoCorrect autocorrectedSamplesCount={autocorrectCount} />
       </RenderOrNull>
 
-      <RenderOrNull condition={unusedSampleIds.length}>
-        <Warning unusedSampleIds={unusedSampleIds} />
+      <RenderOrNull condition={extraneousSampleIds.length}>
+        <WarningExtraneousEntry extraneousSampleIds={extraneousSampleIds} />
       </RenderOrNull>
     </Wrapper>
   );
@@ -155,14 +156,14 @@ function RenderOrNull({
 }
 
 function getIsParseResultCompletelyUnused(
-  unusedSampleIds: string[],
+  extraneousSampleIds: string[],
   parseResult: ParseResult | null
 ) {
   if (!parseResult) return true;
 
   const { data } = parseResult;
 
-  return unusedSampleIds.length === Object.keys(data).length;
+  return extraneousSampleIds.length === Object.keys(data).length;
 }
 
 function getAutocorrectCount(

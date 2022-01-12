@@ -37,6 +37,8 @@ export enum WARNING_CODE {
   AUTO_CORRECT,
   // Metadata row in upload was missing required data for one or more fields
   MISSING_DATA,
+  // Metdata row in upload was not found in user's previously uploaded samples
+  EXTRANEOUS_ENTRY,
 }
 
 export enum ERROR_CODE {
