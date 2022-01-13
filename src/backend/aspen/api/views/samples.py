@@ -248,9 +248,6 @@ async def update_samples(
     ]
     if uneditable_samples:
         raise ex.NotFoundException("some samples cannot be updated")
-    # Check that we don't have dupe public/private ID's
-    [sample.private_identifier for sample in editable_samples]
-    [sample.public_identifier for sample in editable_samples]
 
     res = SamplesResponseSchema(samples=[])
     for sample in editable_samples:

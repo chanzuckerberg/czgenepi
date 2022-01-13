@@ -230,7 +230,7 @@ async def get_editable_phylo_runs(db, user, run_id=None):
 
 
 async def get_readable_phylo_runs(db, user, run_id=None):
-    return await _get_accessible_phylo_runs(db, user, run_id, editable=True)
+    return await _get_accessible_phylo_runs(db, user, run_id, editable=False)
 
 
 @router.get("/")
