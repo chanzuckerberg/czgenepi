@@ -83,8 +83,8 @@ export default function Faq(): JSX.Element {
           We’re also hard at work thinking of new ways to enable you to securely
           overlay PHI / PII directly in CZ GEN EPI. If you have ideas or
           requests, please let us know at{" "}
-          <NewTabLink href="mailto:helloaspen@chanzuckerberg.com">
-            helloaspen@chanzuckerberg.com
+          <NewTabLink href="mailto:hello@czgenepi.org">
+            hello@czgenepi.org
           </NewTabLink>
           !
         </P>
@@ -92,8 +92,8 @@ export default function Faq(): JSX.Element {
         <H3>How can I get support or make a feature request?</H3>
         <P>
           Our team is here to support you! Please reach out to us anytime at{" "}
-          <NewTabLink href="mailto:helloaspen@chanzuckerberg.com">
-            helloaspen@chanzuckerberg.com
+          <NewTabLink href="mailto:hello@czgenepi.org">
+            hello@czgenepi.org
           </NewTabLink>
           . We regularly monitor that inbox for support requests, bug reports,
           and feature requests. CZ GEN EPI is still in its early stages, and we
@@ -106,8 +106,8 @@ export default function Faq(): JSX.Element {
         <H3>How can I delete my data?</H3>
         <P>
           Please reach out to our team at{" "}
-          <NewTabLink href="mailto:helloaspen@chanzuckerberg.com">
-            helloaspen@chanzuckerberg.com
+          <NewTabLink href="mailto:hello@czgenepi.org">
+            hello@czgenepi.org
           </NewTabLink>{" "}
           with your deletion requests and we will handle it within 60 days. When
           we delete your data, we remove it from our database and any file
