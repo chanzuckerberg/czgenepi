@@ -178,8 +178,8 @@ export default function Terms(): JSX.Element {
             per your requests) from Upload data in connection with offering and
             improving CZ GEN EPI. You can request deletion of your Upload Data
             from CZ GEN EPI by emailing us at{" "}
-            <NewTabLink href="mailto:helloaspen@chanzuckerberg.com">
-              helloaspen@chanzuckerberg.com
+            <NewTabLink href="mailto:hello@czgenepi.org">
+              hello@czgenepi.org
             </NewTabLink>{" "}
           </span>
         </ListItem>
@@ -297,8 +297,8 @@ export default function Terms(): JSX.Element {
           <span>
             <ListItemLabel>Closing Your Account.</ListItemLabel>You can close
             your Account at any time. Just contact us at{" "}
-            <NewTabLink href="mailto:aspenprivacy@chanzuckerberg.com">
-              aspenprivacy@chanzuckerberg.com
+            <NewTabLink href="mailto:privacy@czgenepi.org">
+              privacy@czgenepi.org
             </NewTabLink>
           </span>
         </ListItem>
@@ -317,8 +317,8 @@ export default function Terms(): JSX.Element {
             We and our service providers do not review or correct any data
             uploaded into CZ GEN EPI. If you would like to report any issue with
             CZ GEN EPI please contact us at{" "}
-            <NewTabLink href="mailto:aspensecurity@chanzuckerberg.com">
-              aspensecurity@chanzuckerberg.com
+            <NewTabLink href="mailto:security@czgenepi.org">
+              security@czgenepi.org
             </NewTabLink>
             . CZ GEN EPI is not intended as a storage service, so please back up
             your Upload Data using a secure service of your choice, such as the
@@ -553,8 +553,8 @@ export default function Terms(): JSX.Element {
           <span>
             If you have any questions, comments, or concerns with Terms, you may
             contact us at{" "}
-            <NewTabLink href="mailto:aspenprivacy@chanzuckerberg.com">
-              aspenprivacy@chanzuckerberg.com
+            <NewTabLink href="mailto:privacy@czgenepi.org">
+              privacy@czgenepi.org
             </NewTabLink>
             .
           </span>

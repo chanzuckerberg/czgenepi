@@ -11,7 +11,7 @@ export enum ROUTES {
   PANGOLIN = "https://pangolin.cog-uk.io/",
   PRIVACY = "/privacy",
   REQUEST_ACCESS = "https://airtable.com/shrblHnTRd9dtu6c0",
-  CONTACT_US_EMAIL = "mailto:helloaspen@chanzuckerberg.com",
+  CONTACT_US_EMAIL = "mailto:hello@czgenepi.org",
   AGREE_TERMS = "/agreeTerms",
   FAQ = "/faq",
   DATA_SAMPLES = "/data/samples",

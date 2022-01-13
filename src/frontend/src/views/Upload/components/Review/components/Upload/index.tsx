@@ -129,7 +129,7 @@ export default function Upload({
           </AlertTitle>
           <div>
             You may retry or{" "}
-            <NewTabLink href="mailto:helloaspen@chanzuckerberg.com">
+            <NewTabLink href="mailto:hello@czgenepi.org">
               contact us
             </NewTabLink>{" "}
             for help.
