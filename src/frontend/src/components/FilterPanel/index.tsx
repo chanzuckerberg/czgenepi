@@ -6,15 +6,12 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
-import { DATE_REGEX } from "../DateField/constants";
 import { CollectionDateFilter } from "./components/CollectionDateFilter";
 import { GenomeRecoveryFilter } from "./components/GenomeRecoveryFilter";
 import { LineageFilter } from "./components/LineageFilter";
 import { UploadDateFilter } from "./components/UploadDateFilter";
 import { StyledFilterPanel } from "./style";
 
-type DateType = string | undefined;
 enum TypeFilterType {
   Date = "date",
   Single = "single",
@@ -34,10 +31,10 @@ interface Props {
 }
 
 interface FilterParamsType {
-  end?: DateType;
+  end?: Date;
   multiSelected?: string[];
   selected?: string | undefined;
-  start?: DateType;
+  start?: Date;
 }
 interface FilterType {
   key: string;
@@ -49,6 +46,11 @@ interface FilterType {
 interface FiltersType {
   [filterKey: string]: FilterType;
 }
+
+export type UpdateDateFilterType = (
+  start: Date | undefined,
+  end: Date | undefined
+) => void;
 
 // * (mlila): `key` should be the name of the column you are filtering on
 const DATA_FILTER_INIT = {
@@ -84,7 +86,7 @@ const DATA_FILTER_INIT = {
       end: undefined,
       start: undefined,
     },
-    transform: (d: Sample) => datetimeWithTzToLocalDate(d.uploadDate),
+    transform: (d: Sample) => d.uploadDate,
     type: TypeFilterType.Date,
   },
 };
@@ -102,11 +104,10 @@ const applyFilter = (data: TableItem[], dataFilter: FilterType) => {
 
       return filter(data, (d) => {
         const value = transform ? transform(d) : d;
+        const dateValue = new Date(value);
 
-        if (!DATE_REGEX.test(value)) return false;
-
-        const doesPassFilterCheckStart = !start || value >= start;
-        const doesPassFilterCheckEnd = !end || value <= end;
+        const doesPassFilterCheckStart = !start || dateValue >= start;
+        const doesPassFilterCheckEnd = !end || dateValue <= end;
 
         return doesPassFilterCheckStart && doesPassFilterCheckEnd;
       });
@@ -165,7 +166,9 @@ const FilterPanel: FC<Props> = ({
       forEach(keys, (k) => {
         const param = params[k];
         const isActive =
-          param && type === TypeFilterType.Multiple ? param.length > 0 : param;
+          param && type === TypeFilterType.Multiple
+            ? (param as string[]).length > 0
+            : param;
 
         if (isActive) {
           hasDefinedParam = true;
@@ -193,11 +196,11 @@ const FilterPanel: FC<Props> = ({
     setDataFilters(newFilters);
   };
 
-  const updateCollectionDateFilter = (start: DateType, end: DateType) => {
+  const updateCollectionDateFilter: UpdateDateFilterType = (start, end) => {
     updateDataFilter("collectionDate", { end, start });
   };
 
-  const updateUploadDateFilter = (start: DateType, end: DateType) => {
+  const updateUploadDateFilter: UpdateDateFilterType = (start, end) => {
     updateDataFilter("uploadDate", { end, start });
   };
 
