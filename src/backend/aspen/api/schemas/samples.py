@@ -77,8 +77,8 @@ class SampleResponseSchema(BaseResponse):
     collection_date: datetime.date
     collection_location: LocationResponse
     czb_failed_genome_recovery: bool
-    gisaid: SampleGisaidResponseSchema
-    lineage: SampleLineageResponseSchema
+    gisaid: Optional[SampleGisaidResponseSchema]
+    lineage: Optional[SampleLineageResponseSchema]
     private: bool
     private_identifier: Optional[str]
     public_identifier: str
@@ -102,3 +102,17 @@ class SampleBulkDeleteResponse(BaseResponse):
 
 class SampleDeleteResponse(BaseResponse):
     id: int
+
+
+class UpdateSamplesBaseRequest(BaseRequest):
+    id: int
+    collection_date: Optional[datetime.date]
+    collection_location: Optional[int]
+    private: Optional[bool]
+    private_identifier: Optional[constr(min_length=1, max_length=128, strict=True)]  # type: ignore
+    public_identifier: Optional[constr(min_length=1, max_length=128, strict=True)]  # type: ignore
+    sequencing_date: Optional[datetime.date]
+
+
+class UpdateSamplesRequest(BaseRequest):
+    samples: List[UpdateSamplesBaseRequest]

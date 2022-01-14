@@ -191,8 +191,8 @@ const PrivacyPolicy = (): JSX.Element => {
                 Users can request deletion of Raw Sequence Data, Sample
                 Metadata, Pathogen Consensus Genomes, analytical outputs, or
                 their CZ GEN EPI account data by contacting us at{" "}
-                <NewTabLink href="mailto:helloaspen@chanzuckerberg.com">
-                  helloaspen@chanzuckerberg.com
+                <NewTabLink href="mailto:hello@czgenepi.org">
+                  hello@czgenepi.org
                 </NewTabLink>{" "}
                 and we will fulfill the request within 60 days.
               </P>
@@ -331,8 +331,8 @@ const PrivacyPolicy = (): JSX.Element => {
             <td rowSpan={2}>
               Users can request deletion of their CZ GEN EPI account data by
               contacting us at{" "}
-              <NewTabLink href="mailto:helloaspen@chanzuckerberg.com">
-                helloaspen@chanzuckerberg.com
+              <NewTabLink href="mailto:hello@czgenepi.org">
+                hello@czgenepi.org
               </NewTabLink>{" "}
               and we will fulfill the request within 60 days.
             </td>
@@ -423,8 +423,8 @@ const PrivacyPolicy = (): JSX.Element => {
       <P>
         If you are able to find data in CZ GEN EPI or any Sample Metadata that
         you believe is identifying, please let us know at{" "}
-        <NewTabLink href="mailto:aspenprivacy@chanzuckerberg.com">
-          aspenprivacy@chanzuckerberg.com
+        <NewTabLink href="mailto:privacy@czgenepi.org">
+          privacy@czgenepi.org
         </NewTabLink>{" "}
         and we will address it.
       </P>
@@ -718,8 +718,8 @@ const PrivacyPolicy = (): JSX.Element => {
         Security takes ongoing work and we will continue to monitor and adjust
         our security measures as CZ GEN EPI develops. Please notify us
         immediately at{" "}
-        <NewTabLink href="mailto:aspensecurity@chanzuckerberg.com">
-          aspensecurity@chanzuckerberg.com
+        <NewTabLink href="mailto:security@czgenepi.org">
+          security@czgenepi.org
         </NewTabLink>{" "}
         if you suspect your account has been compromised or are aware of any
         other security issues relating to CZ GEN EPI.
@@ -741,8 +741,8 @@ const PrivacyPolicy = (): JSX.Element => {
             We retain Pathogen Consensus Genomes, Sample Metadata and analytical
             outputs until Users delete them from CZ GEN EPI. Users may delete
             their data by contacting us at{" "}
-            <NewTabLink href="mailto:helloaspen@chanzuckerberg.com">
-              helloaspen@chanzuckerberg.com
+            <NewTabLink href="mailto:hello@czgenepi.org">
+              hello@czgenepi.org
             </NewTabLink>
             .
           </span>
@@ -759,8 +759,8 @@ const PrivacyPolicy = (): JSX.Element => {
             User Data is retained until Users delete their CZ GEN EPI account
             because this data is required to manage the service. Users may
             submit account deletion requests by emailing{" "}
-            <NewTabLink href="mailto:helloaspen@chanzuckerberg.com">
-              helloaspen@chanzuckerberg.com
+            <NewTabLink href="mailto:hello@czgenepi.org">
+              hello@czgenepi.org
             </NewTabLink>
             . We will delete personal data within 60 days following the closure
             of your account.
@@ -803,8 +803,8 @@ const PrivacyPolicy = (): JSX.Element => {
           <span>
             If you have any questions about our processing of any data, please
             contact us at{" "}
-            <NewTabLink href="mailto:aspenprivacy@chanzuckerberg.com">
-              aspenprivacy@chanzuckerberg.com
+            <NewTabLink href="mailto:privacy@czgenepi.org">
+              privacy@czgenepi.org
             </NewTabLink>
             .
           </span>
@@ -837,8 +837,8 @@ const PrivacyPolicy = (): JSX.Element => {
       <P>
         If you have any questions, comments, or concerns with this Privacy
         Policy, you may contact us at{" "}
-        <NewTabLink href="mailto:aspenprivacy@chanzuckerberg.com">
-          aspenprivacy@chanzuckerberg.com
+        <NewTabLink href="mailto:privacy@czgenepi.org">
+          privacy@czgenepi.org
         </NewTabLink>
         .
       </P>
