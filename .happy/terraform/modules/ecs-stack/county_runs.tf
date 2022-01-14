@@ -17,7 +17,7 @@ module nextstrain_chicago_contextual_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = local.nextstrain_cron_schedule
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -43,7 +43,7 @@ module nextstrain_scc_contextual_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = local.nextstrain_cron_schedule
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -69,7 +69,7 @@ module nextstrain_alameda_contextual_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = local.nextstrain_cron_schedule
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -95,7 +95,7 @@ module nextstrain_contra_costa_contextual_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = local.nextstrain_cron_schedule
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -121,7 +121,7 @@ module nextstrain_fresno_contextual_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = local.nextstrain_cron_schedule
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -147,7 +147,7 @@ module nextstrain_humboldt_contextual_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = local.nextstrain_cron_schedule
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -173,7 +173,7 @@ module nextstrain_marin_contextual_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = contains(["geprod", "gestaging"], local.deployment_stage) ? ["cron(0 5 ? * MON-SAT *)"] : []
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -199,7 +199,7 @@ module nextstrain_monterey_contextual_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = local.nextstrain_cron_schedule
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -225,7 +225,7 @@ module nextstrain_orange_contextual_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = local.nextstrain_cron_schedule
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -251,7 +251,7 @@ module nextstrain_san_bernardino_contextual_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = local.nextstrain_cron_schedule
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -277,7 +277,7 @@ module nextstrain_del_norte_contextual_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = local.nextstrain_cron_schedule
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -303,7 +303,7 @@ module nextstrain_san_joaquin_contextual_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = local.nextstrain_cron_schedule
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -329,7 +329,7 @@ module nextstrain_san_luis_obispo_contextual_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = local.nextstrain_cron_schedule
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -355,7 +355,7 @@ module nextstrain_san_francisco_contextual_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = local.nextstrain_cron_schedule
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -382,7 +382,7 @@ module nextstrain_tulare_contextual_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = local.nextstrain_cron_schedule
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -408,7 +408,7 @@ module nextstrain_tuolumne_contextual_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = local.nextstrain_cron_schedule
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -434,7 +434,7 @@ module nextstrain_ventura_contextual_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = local.nextstrain_cron_schedule
   event_role_arn        = local.event_role_arn
   extra_args            =  {

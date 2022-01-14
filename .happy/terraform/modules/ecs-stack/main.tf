@@ -43,11 +43,12 @@ locals {
   # This is the wdl executor image, doesn't change on update.
   swipe_image     = join(":", [local.secret["ecrs"]["swipe"]["url"], "rev-7"]) # TODO - we probably don't want to hardcode this
 
-  batch_role_arn             = local.secret["batch_queues"]["genepi"]["role_arn"]
-  ec2_queue_arn              = local.secret["batch_envs"]["genepi"]["envs"]["EC2"]["queue_arn"]
-  spot_queue_arn             = local.secret["batch_envs"]["genepi"]["envs"]["SPOT"]["queue_arn"]
-  external_dns               = local.secret["external_zone_name"]
-  internal_dns               = local.secret["internal_zone_name"]
+  batch_role_arn = local.secret["batch_queues"]["genepi"]["role_arn"]
+  ec2_queue_arn  = local.secret["batch_envs"]["genepi"]["envs"]["EC2"]["queue_arn"]
+  spot_queue_arn = local.secret["batch_envs"]["genepi"]["envs"]["SPOT"]["queue_arn"]
+  swipe_sfn_arn  = local.secret["swipe_sfn_arns"]["genepi"]["default"]
+  external_dns   = local.secret["external_zone_name"]
+  internal_dns   = local.secret["internal_zone_name"]
 
   frontend_listener_arn = local.secret[local.alb_key]["frontend"]["listener_arn"]
   backend_listener_arn  = local.secret[local.alb_key]["backend"]["listener_arn"]
@@ -145,20 +146,6 @@ module backend_service {
   wait_for_steady_state = local.wait_for_steady_state
 }
 
-module swipe_sfn {
-  source                     = "../swipe-sfn"
-  app_name                   = "swipe-spot"
-  stack_resource_prefix      = local.stack_resource_prefix
-  remote_dev_prefix          = local.remote_dev_prefix
-  job_definition_name        = module.swipe_batch.batch_job_definition
-  ec2_queue_arn              = local.ec2_queue_arn
-  spot_queue_arn             = local.spot_queue_arn
-  state_change_sns_topic_arn = local.state_change_sns_topic_arn
-  role_arn                   = local.sfn_role_arn
-  custom_stack_name          = local.custom_stack_name
-  deployment_stage           = local.deployment_stage
-}
-
 # Write information on how to invoke the gisaid sfn to SSM.
 module gisaid_sfn_config {
   source   = "../sfn_config"
@@ -173,7 +160,7 @@ module gisaid_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = contains(["geprod", "gestaging"], local.deployment_stage) ? ["cron(0 1 ? * MON-FRI *)"] : []
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -195,7 +182,7 @@ module pangolin_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = contains(["geprod", "gestaging"], local.deployment_stage) ? ["cron(0 18,23 ? * MON-FRI *)"] : []
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -216,7 +203,7 @@ module pangolin_ondemand_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   event_role_arn        = local.event_role_arn
   extra_args            =  {
     genepi_config_secret_name = "${local.deployment_stage}/genepi-config"
@@ -237,7 +224,7 @@ module nextstrain_template_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   event_role_arn        = local.event_role_arn
    extra_args            =  {
     genepi_config_secret_name = "${local.deployment_stage}/genepi-config"
@@ -258,7 +245,7 @@ module nextstrain_ondemand_template_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   event_role_arn        = local.event_role_arn
    extra_args            =  {
     genepi_config_secret_name = "${local.deployment_stage}/genepi-config"
