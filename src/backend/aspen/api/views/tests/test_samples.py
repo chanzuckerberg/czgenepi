@@ -1,20 +1,24 @@
 import datetime
 import json
-from typing import Any, Optional, Sequence, Tuple
+from typing import Any, List, Optional, Sequence, Tuple
 
 import pytest
 import sqlalchemy as sa
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
 
 from aspen.api.schemas.base import convert_datetime_to_iso_8601
 from aspen.database.models import (
     CanSee,
     DataType,
+    Group,
+    Location,
     PublicRepositoryType,
     Sample,
     SequencingReadsCollection,
+    User,
 )
 from aspen.test_infra.models.accession_workflow import AccessionWorkflowDirective
 from aspen.test_infra.models.location import location_factory
@@ -933,3 +937,265 @@ async def test_delete_sample_failures(
         headers=auth_headers,
     )
     assert res.status_code == 200
+
+
+async def make_test_samples(
+    async_session: AsyncSession, suffix=None
+) -> Tuple[User, Group, List[Sample], Location]:
+    group = group_factory(name=f"testgroup{suffix}")
+    user = user_factory(
+        group, email=f"testemail{suffix}", auth0_user_id=f"testemail{suffix}"
+    )
+    location1 = location_factory(
+        "North America", "USA", "California", f"Santa Barbara County{suffix}"
+    )
+    location2 = location_factory(
+        "North America", "USA", "California", f"Santa Clara County{suffix}"
+    )
+    samples = [
+        sample_factory(
+            group,
+            user,
+            location1,
+            public_identifier="path/to/sample_id1",
+            private_identifier="i_dont_have_spaces1",
+        ),
+        sample_factory(
+            group,
+            user,
+            location1,
+            public_identifier="path/to/sample id2",
+            private_identifier="i have spaces2",
+        ),
+        sample_factory(
+            group,
+            user,
+            location1,
+            public_identifier="path/to/sample_id3",
+            private_identifier="i have spaces3",
+        ),
+    ]
+    for sample in samples:
+        upg = uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
+        async_session.add(upg)
+    async_session.add(group)
+    async_session.add(location2)
+    await async_session.commit()
+    return user, group, samples, location2
+
+
+async def test_update_samples_success(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+):
+    """
+    Test successful sample update
+    """
+    user, group, samples, newlocation = await make_test_samples(async_session)
+
+    auth_headers = {"user_id": user.auth0_user_id}
+
+    data = {
+        "samples": [
+            {
+                "id": samples[0].id,
+                "private_identifier": "new_private_identifier",
+            },
+            {
+                "id": samples[1].id,
+                "public_identifier": "new_public_identifier2",
+                "private_identifier": "new_private_identifier2",
+                "private": False,
+                "collection_location": newlocation.id,
+                "sequencing_date": "2021-10-10",
+                "collection_date": "2021-11-11",
+            },
+            {
+                "id": samples[2].id,
+                "private_identifier": "new_public_identifier3",
+            },
+        ]
+    }
+    keys_to_check = [
+        "private_identifier",
+        "public_identifier",
+        "collection_location",
+        "collection_date",
+        "sequencing_date",
+        "private",
+    ]
+    reorganized_data = {}
+    # Make a copy of the original sample data
+    for sample in samples:
+        sample_dict = {
+            key: getattr(sample, key)
+            for key in keys_to_check
+            if key not in ["sequencing_date"]
+        }
+        if sample.uploaded_pathogen_genome:
+            sample_dict[
+                "sequencing_date"
+            ] = sample.uploaded_pathogen_genome.sequencing_date
+        sample_dict["collection_location"] = sample.collection_location.id
+        reorganized_data[sample.id] = sample_dict
+    # For any fields that got updated in our API request, update those values.
+    for updated in data["samples"]:
+        reorganized_data[updated["id"]].update(
+            {
+                key: updated.get(key)
+                for key in keys_to_check
+                if updated.get(key) is not None
+            }
+        )
+
+    # Tell SqlAlchemy to forget about the samples in its identity map
+    # TODO FIXME- we shouldn't have to do this!
+    async_session.expire_all()
+
+    res = await http_client.put(
+        "/v2/samples",
+        json=data,
+        headers=auth_headers,
+    )
+    api_response = {row["id"]: row for row in res.json()["samples"]}
+    assert res.status_code == 200
+
+    sample_fields = [
+        "collection_date",
+        "private",
+        "private_identifier",
+        "public_identifier",
+    ]
+    location_fields = ["collection_location"]
+    genome_fields = ["sequencing_date"]
+    for sample_id, expected in reorganized_data.items():
+        q = await async_session.execute(
+            sa.select(Sample)  # type: ignore
+            .options(
+                joinedload(Sample.uploaded_pathogen_genome),
+                joinedload(Sample.collection_location),
+            )
+            .filter(Sample.id == sample_id)
+        )
+        r = q.scalars().one()
+        for field in sample_fields + location_fields + genome_fields:
+            api_response_value = api_response[sample_id][field]
+            request_field_value = expected[field]
+            # Handle location fields
+            if field in location_fields:
+                db_field_value = getattr(r, field).id
+                api_response_value = api_response_value["id"]
+            # Handle UploadedPathogenGenome fields
+            elif field in genome_fields:
+                db_field_value = getattr(r.uploaded_pathogen_genome, field)
+            else:
+                db_field_value = getattr(r, field)
+                print(expected)
+            if "date" in field:
+                db_field_value = str(db_field_value)
+                request_field_value = str(request_field_value)
+            # Check that the DB and our API Request match
+            assert db_field_value == request_field_value
+            # Check that the DB an dour API Response match.
+            assert db_field_value == api_response_value
+
+
+async def test_update_samples_access_denied(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+):
+    """
+    Test update failures
+    """
+    user, group, samples, newlocation = await make_test_samples(async_session)
+    user2, group2, samples2, newlocation2 = await make_test_samples(
+        async_session, suffix="2"
+    )
+
+    auth_headers = {"user_id": user.auth0_user_id}
+
+    data = {
+        "samples": [
+            {
+                "id": samples2[0].id,
+                "private_identifier": "new_private_identifier",
+            }
+        ]
+    }
+
+    res = await http_client.put(
+        "/v2/samples",
+        json=data,
+        headers=auth_headers,
+    )
+    assert res.status_code == 404
+
+
+async def test_update_samples_request_failures(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+):
+    """
+    Test update failures
+    """
+    user, group, samples, newlocation = await make_test_samples(async_session)
+
+    auth_headers = {"user_id": user.auth0_user_id}
+
+    bad_requests = [
+        [
+            {
+                "id": samples[0].id,
+                "collection_location": 9999,  # Use a location id that doesn't exist
+            },
+            400,
+        ],
+        [
+            {
+                "id": samples[0].id,
+                "sequencing_date": "kapow",  # date deserialization failure
+            },
+            422,
+        ],
+        [
+            {
+                "id": samples[0].id,
+                "private": "something",  # Bad boolean
+            },
+            422,
+        ],
+        [
+            {
+                "id": samples[0].id,
+                "public_identifier": "",  # Empty strings not allowed
+            },
+            422,
+        ],
+        [
+            {
+                "id": samples[0].id,
+                "public_identifier": samples[
+                    1
+                ].public_identifier,  # Trigger duplicate identifier error
+            },
+            400,
+        ],
+        [
+            {
+                "id": samples[0].id,
+                "private_identifier": samples[
+                    1
+                ].private_identifier,  # Trigger duplicate identifier error
+            },
+            400,
+        ],
+    ]
+    for request, response_code in bad_requests:
+        data = {"samples": [request]}
+
+        res = await http_client.put(
+            "/v2/samples",
+            json=data,
+            headers=auth_headers,
+        )
+        assert res.status_code == response_code
