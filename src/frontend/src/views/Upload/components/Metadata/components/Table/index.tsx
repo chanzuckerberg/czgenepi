@@ -26,7 +26,7 @@ import {
 
 interface Props {
   metadata: CommonProps["metadata"];
-  importedFileMetadata: CommonProps["metadata"] | null;
+  hasImportedMetadataFile: boolean;
   setMetadata: CommonProps["setMetadata"];
   setIsValid: React.Dispatch<React.SetStateAction<boolean>>;
   autocorrectWarnings: SampleIdToWarningMessages;
@@ -35,7 +35,7 @@ interface Props {
 
 export default function Table({
   metadata,
-  importedFileMetadata,
+  hasImportedMetadataFile,
   setMetadata,
   setIsValid,
   autocorrectWarnings,
@@ -169,7 +169,7 @@ export default function Table({
                         key={sampleId}
                         id={sampleId}
                         metadata={sampleMetadata}
-                        importedFileMetadata={importedFileMetadata?.[sampleId]}
+                        hasImportedMetadataFile={hasImportedMetadataFile}
                         handleMetadata={handleRowMetadata}
                         applyToAllColumn={applyToAllColumn}
                         handleRowValidation={handleRowValidation}

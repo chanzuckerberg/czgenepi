@@ -50,7 +50,7 @@ const validationSchema = yup.object({
 interface Props {
   id: string;
   metadata: Metadata;
-  importedFileMetadata?: Metadata;
+  hasImportedMetadataFile: boolean;
   handleMetadata: (id: string, sampleMetadata: Metadata) => void;
   applyToAllColumn: (fieldKey: keyof Metadata, value: unknown) => void;
   isFirstRow: boolean;
@@ -62,7 +62,7 @@ interface Props {
 export default React.memo(function Row({
   id,
   metadata,
-  importedFileMetadata,
+  hasImportedMetadataFile,
   handleMetadata,
   applyToAllColumn,
   isFirstRow,
@@ -73,73 +73,87 @@ export default React.memo(function Row({
   /**
    * Below preps the metadata values form should initialize to.
    *
+   * Initialization happens in one of two cases:
+   * 1) User is visiting Metadata step for first time, everything empty.
+   * 2) User is coming back to Metadata after having previously entered data,
+   * such as if they enter data, progress to Review, then come back.
+   *
+   * In both cases above, we initialize the form to start its values based on
+   * the upstream `metadata` **when the component mounts**. This handles both
+   * cases because for (1), the upstream metadata will start off empty because
+   * nothing has been entered yet, while for (2) it will start off as the info
+   * that's been entered so far since we are navigating back to Metadata and
+   * this component must re-mount and thus re-fetch metadata entered so far.
+   *
+   * We do it this way because if we instead rely on `enableReinitialize: true`
+   * to keep the values in sync with upstream metadata, the form will
+   * constantly churn as it gets re-inited, losing any info on `touched`, etc.
+   *
    * IMPORTANT NOTE: container-level `metadata` in parent somewhere above must
    * initialize each sample's metadata object to being a valid Metadata type.
    * (Currently done by initializing all to EMPTY_METADATA when samples change,
    * but the important part is we need to be able to trust incoming `metadata`
    * as starting off sane.)
-   *
-   * (Vince): I don't love this approach, but initialization currently must
-   * serve three purposes: 1) non-file-upload use, start off as empty data user
-   * can enter via web form; 2) if user leaves Metadata step then comes back,
-   * the form should start off as whatever it last looked like; 3) when file
-   * is uploaded, reset the form and use the values that were just uploaded.
-   * If we only cared about (1) and (2), we could just turn off formik's
-   * `enableReinitialize` so the initial values would be locked in once the
-   * form is created: this would work both for handling the very first
-   * interaction (because upstream inits metadata for us), and for re-visiting
-   * (because `metadata` would be last seen). But because we need formik's
-   * reinitialization so we can achieve (3), we need to keep the provided
-   * `initialValues` stable and only change them when uploaded data changes.
-   * So that's why it's memo-ized: prefer initializing on uploaded file data,
-   * and if it's not available, use the starting metadata, but keep the
-   * reference stable so we don't reinitalize out-of-turn. Then if any changes
-   * come in for imported data, switch to those and kick off a reinitialize.
-   *
-   * FIXME (Vince): This could be made more robust (and clearer) if we changed
-   * how metadata gets defaulted and also had a handler for emitting value
-   * changes to formik when the `importedFileMetadata` changes. But I'm low
-   * on time right now, and this change is fixing a bug we had where
-   * the initialValues were only tied to upstream `metadata`, causing the
-   * form to reset with every change, so "touched" couldn't be tracked.
    */
-  const initialFormValues = useMemo(() => {
-    return importedFileMetadata || { ...metadata };
-  }, [importedFileMetadata]);
+  // Init formik values based on metadata during mount. See above for why.
+  // In theory, shouldn't be necessary since Formik won't re-init when values
+  // change, but I (Vince) have seen some weirdness if Formik sees change.
+  const metadataOnMount = useMemo(() => metadata, []);
 
   const formik = useFormik({
-    enableReinitialize: true,
-    // If new file import comes in, form resets and uses that as starting point
-    initialValues: initialFormValues,
+    initialValues: metadataOnMount,
     onSubmit: noop,
     validationSchema,
   });
 
-  const { values, isValid, validateForm, setTouched } = formik;
+  const { values, isValid, setTouched, setValues } = formik;
 
   // If user has uploaded a file of metadata, consider all fields touched for
   // purposes of displaying validation warnings to them ("Required", etc)
   useEffect(() => {
-    if (!importedFileMetadata) return;
-
-    const touchedFields: Record<string, boolean> = {};
-    Object.keys(values).forEach((fieldKey) => {
-      touchedFields[fieldKey] = true;
-    });
-    setTouched(touchedFields, true);
-  }, [importedFileMetadata, setTouched, values]);
+    if (hasImportedMetadataFile) {
+      const touchedFields: Record<string, boolean> = {};
+      Object.keys(values).forEach((fieldKey) => {
+        touchedFields[fieldKey] = true;
+      });
+      setTouched(
+        touchedFields,
+        true // Explicitly trigger validation to run
+        // NOTE: Above might cause unnecessary re-renders. If need to squeeze
+        // out more performance, could set touched from EMPTY_METADATA instead
+        // and drop `values` from the dependency list so this would only ever
+        // fire once per mount.
+      );
+    }
+  }, [hasImportedMetadataFile, setTouched, values]);
 
   useEffect(() => {
     handleRowValidation(id, isValid);
   }, [isValid, handleRowValidation, id]);
 
+  /**
+   * If upstream value is changed, update metadata and vice-versa.
+   *
+   * The values in form are bi-directional with the `metadata` from upstream:
+   * if user edits a cell's value in table, the metadata is updated to reflect
+   * that change. However, the upstream metadata can also be changed in other
+   * ways (eg, uploading a file, clicking "Apply to All" for column) than
+   * directly editing a cell. In those cases, the upstream metadata changes,
+   * that passes down to the form level, and we update the form's values to
+   * keep it in sync.
+   */
+  // Form values change ==> Update the metadata
   useEffect(() => {
-    validateForm(values);
-
     if (!deepEqual(metadata, values)) {
       handleMetadata(id, values);
     }
   }, [values]);
+  // Metadata changes ==> Update the form values
+  useEffect(() => {
+    if (!deepEqual(metadata, values)) {
+      setValues(metadata);
+    }
+  }, [metadata]);
 
   return (
     <StyledTableRow component="div">

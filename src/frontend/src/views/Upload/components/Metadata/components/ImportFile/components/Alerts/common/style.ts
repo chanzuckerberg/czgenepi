@@ -42,7 +42,7 @@ export const Table = styled.table`
 `;
 
 export const TbodyZebra = styled.tbody`
-  tr:nth-child(odd) {
+  tr:nth-of-type(odd) {
     background-color: rgba(0, 0, 0, 0.04);
   }
 `;

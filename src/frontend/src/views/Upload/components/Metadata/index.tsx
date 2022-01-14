@@ -36,8 +36,8 @@ export default function Metadata({
   setMetadata,
 }: Props): JSX.Element {
   const [isValid, setIsValid] = useState(false);
-  const [importedFileMetadata, setImportedFileMetadata] =
-    useState<SampleIdToMetadata | null>(null);
+  const [hasImportedMetadataFile, setHasImportedMetadataFile] =
+    useState<boolean>(false);
   const [autocorrectWarnings, setAutocorrectWarnings] =
     useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
 
@@ -61,20 +61,18 @@ export default function Metadata({
       if (sampleIdToUploadedMetadata[sampleId]) {
         uploadedMetadata[sampleId] = sampleIdToUploadedMetadata[sampleId];
       } else {
-        // If they did provide metadata for a given sample, ensure that it has
-        // a sane default so it can be entered later and not dropped.
+        // If they did not provide metadata for a given sample, ensure that it
+        // has a sane default so it can be entered later and not dropped.
         // FIXME (Vince): This winds up destroying any data the user might have
         // previously entered for the sample via web form. It's not great, but
         // it was pre-existing behavior and I don't have time to fix it right
-        //  now because it would involve restructuring how we default metadata
+        // now because it would involve restructuring how we default metadata
         uploadedMetadata[sampleId] = { ...EMPTY_METADATA };
       }
     }
 
-    setMetadata(uploadedMetadata); // Set overarching metadata for samples
-    // Additionally, track what the file's data was. Use this to blanket
-    // (re-)initialize all the input fields to what was uploaded.
-    setImportedFileMetadata(uploadedMetadata);
+    setMetadata(uploadedMetadata);
+    setHasImportedMetadataFile(true);
 
     setAutocorrectWarnings(
       warningMessages.get(WARNING_CODE.AUTO_CORRECT) || EMPTY_OBJECT
@@ -117,7 +115,7 @@ export default function Metadata({
         <Table
           setIsValid={setIsValid}
           metadata={metadata}
-          importedFileMetadata={importedFileMetadata}
+          hasImportedMetadataFile={hasImportedMetadataFile}
           setMetadata={setMetadata}
           autocorrectWarnings={autocorrectWarnings}
           locations={namedLocations}

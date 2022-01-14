@@ -41,7 +41,7 @@ export default function Upload(): JSX.Element | null {
 
   const cancelPrompt = useNavigationPrompt();
 
-  // If user changes `samples`, prepare Metadata as empty for later entry.
+  // When user changes `samples`, prepare Metadata as empty for later entry.
   useEffect(() => {
     if (!samples) {
       return setMetadata(null);
