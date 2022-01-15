@@ -19,13 +19,13 @@ def upgrade():
 
     # Create a new bot group and add our bot user to it.
     create_group_sql = sa.sql.text(
-        "INSERT INTO aspen.groups (name, address, prefix, default_tree_location_id) SELECT 'Bot Users', 'Bot Users', 'bot', id FROM locations WHERE division = 'California' AND location = 'San Mateo County'"
+        "INSERT INTO aspen.groups (name, address, prefix, default_tree_location_id) SELECT 'Bot Users', 'Bot Users', 'bot', id FROM aspen.locations WHERE division = 'California' AND location = 'San Mateo County'"
     )
     conn.execute(create_group_sql)
 
     # There's a unique constraint on user.email, so we're not going to accidentally run into dupe users in the next query.
     create_user_sql = sa.sql.text(
-        "INSERT INTO aspen.users (name, email, auth0_user_id, group_admin, system_admin, group_id, agreed_to_tos) SELECT 'Automatic Build', 'hello@czgenepi.org', 'bot_user', 'f', 'f', id, 'f' FROM groups WHERE prefix = 'bot'"
+        "INSERT INTO aspen.users (name, email, auth0_user_id, group_admin, system_admin, group_id, agreed_to_tos) SELECT 'Automatic Build', 'hello@czgenepi.org', 'bot_user', 'f', 'f', id, 'f' FROM aspen.groups WHERE prefix = 'bot'"
     )
     conn.execute(create_user_sql)
 
@@ -35,7 +35,9 @@ def upgrade():
     #    - Tree name is null: All on-demand tree builds have the name field populated, and we only recently started populating this field for scheduled runs.
     #    OR:
     #    - The tree type is OVERVIEW. We don't currently support on-demand runs for OVERVIEW trees, so it's safe to update the user for overview runs with populated name fields.
-    update_trees_sql = sa.sql.text("UPDATE aspen.workflows SET user_id = ( SELECT id FROM users WHERE email = 'hello@czgenepi.org') WHERE id IN (SELECT pr.workflow_id FROM phylo_runs pr INNER JOIN workflows w ON pr.workflow_id = w.id WHERE w.user_id IS NULL AND (pr.name IS NULL OR pr.tree_type = 'OVERVIEW'))")
+    update_trees_sql = sa.sql.text(
+        "UPDATE aspen.workflows SET user_id = ( SELECT id FROM aspen.users WHERE email = 'hello@czgenepi.org') WHERE id IN (SELECT pr.workflow_id FROM aspen.phylo_runs pr INNER JOIN aspen.workflows w ON pr.workflow_id = w.id WHERE w.user_id IS NULL AND (pr.name IS NULL OR pr.tree_type = 'OVERVIEW'))"
+    )
     conn.execute(update_trees_sql)
 
 
