@@ -2,16 +2,21 @@ import datetime
 import re
 from typing import Dict, List, Optional
 
-from pydantic import constr, Field, root_validator, StrictStr, validator
+from pydantic import conint, constr, Field, root_validator, StrictStr, validator
 
 from aspen.api.schemas.base import BaseRequest, BaseResponse
 from aspen.database.models import TreeType
 
 # What kinds of ondemand nextstrain builds do we support?
-PHYLO_TREE_TYPES = {
-    TreeType.NON_CONTEXTUALIZED.value: "non_contextualized.yaml",
-    TreeType.TARGETED.value: "targeted.yaml",
-}
+PHYLO_TREE_TYPES = [
+    TreeType.OVERVIEW.value,
+    TreeType.NON_CONTEXTUALIZED.value,
+    TreeType.TARGETED.value,
+]
+
+
+class TemplateArgsRequest(BaseRequest):
+    group_sampling_weeks: Optional[conint(ge=1, le=52)]  # type: ignore
 
 
 class PhyloRunRequest(BaseRequest):
@@ -19,11 +24,12 @@ class PhyloRunRequest(BaseRequest):
     name: constr(min_length=1, max_length=128, strict=True)  # type: ignore
     samples: List[StrictStr]
     tree_type: StrictStr
+    template_args: Optional[TemplateArgsRequest]
 
     @validator("tree_type")
     def tree_type_must_be_supported(cls, value):
         uppercase_tree_type = value.upper()
-        assert PHYLO_TREE_TYPES.get(uppercase_tree_type)
+        assert uppercase_tree_type in PHYLO_TREE_TYPES
         return uppercase_tree_type
 
 

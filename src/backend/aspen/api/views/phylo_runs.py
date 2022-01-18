@@ -121,12 +121,20 @@ async def kick_off_phylo_run(
     # 4C build our PhyloRun object
     start_datetime = datetime.datetime.now()
 
+    template_args = {}
+    # Not all template_args keys are required, and we don't want to save empty fields.
+    if phylo_run_request.template_args:
+        template_args = {
+            k: v
+            for k, v in dict(phylo_run_request.template_args).items()
+            if v is not None
+        }
     workflow: PhyloRun = PhyloRun(
         start_datetime=start_datetime,
         workflow_status=WorkflowStatusType.STARTED,
         software_versions={},
         group=group,
-        template_args={},  # This field is currently unused, but we might reinstate it later.
+        template_args=template_args,
         name=phylo_run_request.name,
         gisaid_ids=list(gisaid_ids),
         tree_type=TreeType(phylo_run_request.tree_type),
