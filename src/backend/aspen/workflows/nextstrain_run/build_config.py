@@ -51,8 +51,8 @@ class OverviewBuilder(BaseNextstrainConfigBuilder):
             subsampling["international"]["max_sequences"] = 200
 
         # If there aren't any selected samples this is probably a scheduled run
-        # and we should, use the reference sequences
-        if config.num_included_samples == 0:
+        # and we should use the reference sequences
+        if self.num_included_samples == 0:
             del config["files"]["include"]
 
 
@@ -78,8 +78,8 @@ class TargetedBuilder(BaseNextstrainConfigBuilder):
           self.subsampling_scheme : the value a few lines above
           self.crowding_penalty : the value a few lines above
           self.group : information about the group that this run is for (ex: self.group.name or self.group.default_tree_location)
-          config.num_sequences : the number of aspen samples written to our fasta input file
-          config.num_included_samples : the number of samples in include.txt (aspen + gisaid samples) for on-demand runs only
+          self.num_sequences : the number of aspen samples written to our fasta input file
+          self.num_included_samples : the number of samples in include.txt (aspen + gisaid samples) for on-demand runs only
 
         EXAMPLES SECTION:
           Delete a group from a subsampling scheme:
