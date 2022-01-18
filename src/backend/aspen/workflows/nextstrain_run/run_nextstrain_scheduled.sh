@@ -61,10 +61,6 @@ aligned_gisaid_location=$(
            --builds-file /ncov/my_profiles/aspen/builds.yaml       \
 )
 
-# temporary fix for recency focused automatic build
-# even if the group has no samples in the past 3 months, the run will not fail
-sed -i '/include\.txt/d' /ncov/my_profiles/aspen/builds.yaml
-
 # Persist the build config we generated.
 $aws s3 cp /ncov/my_profiles/aspen/builds.yaml "${s3_prefix}/builds.yaml"
 
