@@ -339,7 +339,9 @@ def create_test_data(engine):
 
     # Create db rows for another group
     location2 = create_location(session, "Africa", "Mali", "Timbuktu", None)
-    group2 = create_test_group(session, "Timbuktu Dept of Public Health", "TBK", location2)
+    group2 = create_test_group(
+        session, "Timbuktu Dept of Public Health", "TBK", location2
+    )
     user2 = create_test_user(session, group2, "tbktu", "Timbuktu User")
     create_samples(session, group2, user2, location2, 10, 10)
     create_test_trees(session, group2, user2)
