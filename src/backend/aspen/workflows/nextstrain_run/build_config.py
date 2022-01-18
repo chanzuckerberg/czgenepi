@@ -29,9 +29,12 @@ class OverviewBuilder(BaseNextstrainConfigBuilder):
                 "query"
             ] = '''--query "((location == '{location}') & (division == '{division}')) | submitting_lab == 'RIPHL at Rush University Medical Center'"'''
 
+        # If we passed in a different time window, use it. Default to 12
+        cutoff_weeks = self.template_args.get("group_sampling_weeks", 12)
+
         # only keep group samples within the past 3 months
         today = datetime.date.today()
-        early_late_cutoff = today - datetime.timedelta(weeks=12)
+        early_late_cutoff = today - datetime.timedelta(weeks=cutoff_weeks)
 
         subsampling["group"][
             "min_date"
