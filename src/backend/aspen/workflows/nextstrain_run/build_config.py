@@ -50,6 +50,11 @@ class OverviewBuilder(BaseNextstrainConfigBuilder):
             subsampling["country"]["max_sequences"] = 800
             subsampling["international"]["max_sequences"] = 200
 
+        # If there aren't any selected samples this is probably a scheduled run
+        # and we should, use the reference sequences
+        if config.num_included_samples == 0:
+            del config["files"]["include"]
+
 
 class NonContextualizedBuilder(BaseNextstrainConfigBuilder):
     subsampling_scheme = "NON_CONTEXTUALIZED"
