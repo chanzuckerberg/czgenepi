@@ -1,28 +1,36 @@
 import ENV from "src/common/constants/ENV";
 import nodeEnv from "src/common/constants/nodeEnv";
 import { getTestID, getText } from "./selectors";
+import { test, expect } from '@playwright/test';
 
-export const DOWNLOAD_TSV_LINK = "download-tsv-link";
+export const TIMEOUT_MS = 30 * 1000;
 
-export const TIMEOUT_MS = 5 * 1000;
-
-export async function goToPage(
+export async function goToPage(page, 
   url: string = ENV.FRONTEND_URL as string
 ): Promise<void> {
   await page.goto(url);
 }
 
-export async function login(): Promise<void> {
+export async function screenshot(page, testInfo): Promise<void> {
+    // NOTE - this currently only supports one screenshot per test
+    // All screenshots get uploaded to s3 after a GHA run.
+    const filePath = '/tmp/screenshots/' + testInfo.titlePath + '.png'
+    await page.screenshot({ path: filePath, fullPage: true });
+}
+
+export async function login(page, testInfo): Promise<void> {
   expect(ENV.E2E_USERNAME).toBeDefined();
 
-  goToPage();
+  goToPage(page);
 
   try {
-    await expect(page).toHaveSelector(getTestID("nav-user-menu"), {
-      timeout: TIMEOUT_MS,
-    });
+    await expect(page.locator(getTestID("nav-user-menu"))).toBeVisible();
   } catch (error) {
-    await page.click(getText("Sign In"));
+    // NOTE -- Page content will be visible in GHA logs, and screenshots get uploaded
+    //         to s3 after a failed GHA run.
+    // console.log(await page.content());
+
+    await page.locator(getText("Sign in")).first().click();
 
     await page.fill('[name="Username"], [name="username"]', ENV.E2E_USERNAME);
     await page.fill('[name="Password"], [name="password"]', ENV.E2E_PASSWORD);
@@ -32,7 +40,6 @@ export async function login(): Promise<void> {
       page.click('[value="login"], [type="submit"]'),
     ]);
 
-    await expect(page).toHaveSelector(getTestID(DOWNLOAD_TSV_LINK));
   }
 }
 
@@ -70,5 +77,5 @@ export const describeIfDeployed = [
   nodeEnv.PRODUCTION,
   nodeEnv.STAGING,
 ].includes(ENV.DEPLOYMENT_STAGE)
-  ? describe
-  : describe.skip;
+  ? test.describe
+  : test.skip;

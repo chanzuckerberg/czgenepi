@@ -1,10 +1,11 @@
+import { test, expect } from '@playwright/test';
 import {
   describeIfDeployed,
-  DOWNLOAD_TSV_LINK,
   login,
   tryUntil,
-} from "tests/features/utils/helpers";
-import { getTestID, getText } from "tests/features/utils/selectors";
+  screenshot,
+} from "./utils/helpers";
+import { getTestID, getText } from "./utils/selectors";
 import { ROUTES } from "../../src/common/routes";
 
 // (thuang): Samples and Trees
@@ -13,88 +14,75 @@ const TAB_COUNT = 2;
 // (thuang): `data-test-id` is generated at runtime via `row-${header.key}`
 const ROW_PUBLIC_ID = "row-publicId";
 
-describe("Data", () => {
-  describe("Samples Page", () => {
-    it("renders the basic elements", async () => {
-      await setupSamplesPage();
+test.describe("Data", () => {
+  test.describe("Samples Page", () => {
+    test("renders the basic elements", async ({page}, testInfo) => {
+      await setupSamplesPage(page, testInfo);
 
-      await expect(page).toHaveSelector(getTestID("header-row"));
-      await expect(page).toHaveSelector(getText("Private ID"));
-      await expect(page).toHaveSelector(getText("Public ID"));
-      await expect(page).toHaveSelector(getText("Upload Date"));
-      await expect(page).toHaveSelector(getText("Collection Date"));
-      await expect(page).toHaveSelector(getText("Collection Location"));
-      await expect(page).toHaveSelector(getText("Lineage"));
-      await expect(page).toHaveSelector(getText("GISAID"));
+      await expect(page.locator(getTestID("header-row")).first()).not.toBeEmpty();
+      await expect(page.locator(getText("Private ID")).first()).not.toBeEmpty();
+      await expect(page.locator(getText("Public ID")).first()).not.toBeEmpty();
+      await expect(page.locator(getText("Upload Date")).first()).not.toBeEmpty();
+      await expect(page.locator(getText("Collection Date")).first()).not.toBeEmpty();
+      await expect(page.locator(getText("Collection Location")).first()).not.toBeEmpty();
+      await expect(page.locator(getText("Lineage")).first()).not.toBeEmpty();
+      await expect(page.locator(getText("GISAID")).first()).not.toBeEmpty();
 
-      await expect(page).toHaveSelector(getTestID(DOWNLOAD_TSV_LINK));
+      await expect(page.locator(getTestID("table-row")).first()).not.toBeEmpty();
+      await expect(page.locator(getTestID("sample-status")).first()).not.toBeEmpty();
 
-      await expect(page).toHaveSelector(getTestID("table-row"));
-      await expect(page).toHaveSelector(getTestID("sample-status"));
-
-      await expect(page).toHaveSelectorCount(
-        getTestID("data-menu-item"),
-        TAB_COUNT
-      );
+      await expect(page.locator(
+        getTestID("data-menu-item"))).toHaveCount(TAB_COUNT);
     });
 
-    test("search works", async () => {
-      await setupSamplesPage();
+    test("search works", async ({page}, testInfo) => {
+      await setupSamplesPage(page, testInfo);
+
+      const searchBoxWrapper = page.locator(getTestID("search"));
+      const searchBox = searchBoxWrapper.locator("input");
+      // TODO - search queries are *inclusive* so if we have a row in a table called
+      // "foo" and another called "foo_bar" a search for "foo" will display both rows.
+      // This shortcut is dependent on the data in our setup script but we should
+      // probably iterate over all visible rows to make sure they contain the search
+      // string instead.
+      await searchBox?.fill("_failed")
 
       const firstPublicIdElement = await page.$(getTestID(ROW_PUBLIC_ID));
-
       const firstPublicId = await firstPublicIdElement?.textContent();
-
-      const searchBoxWrapper = await page.$(getTestID("search"));
-
-      if (!searchBoxWrapper) {
-        throw Error("search box not found!");
-      }
-
-      const searchBox = await searchBoxWrapper.$("input");
 
       await searchBox?.fill(firstPublicId || "no id");
 
-      await tryUntil(() =>
-        expect(page).toHaveSelectorCount(getTestID("table-row"), 1)
-      );
+      console.log(firstPublicId);
+      await screenshot(page, testInfo);
+      await expect(page.locator(getTestID("table-row"))).toHaveCount(1)
     });
 
-    it("downloads TSV", async () => {
-      await setupSamplesPage();
+    test("sorts by column header", async ({page}, testInfo) => {
+      await setupSamplesPage(page, testInfo);
 
-      expect(page).toHaveSelector(getTestID(DOWNLOAD_TSV_LINK));
-      const downloadLink = await page.$(getTestID(DOWNLOAD_TSV_LINK));
+      const publicIds = await getAllPublicIds(page);
 
-      expect(await downloadLink?.getAttribute("href")).toBeTruthy();
-    });
+      await page.locator(getTestID("header-cell")).first().click();
 
-    it("sorts by column header", async () => {
-      await setupSamplesPage();
-
-      const publicIds = await getAllPublicIds();
-
-      await page.click(getTestID("header-cell"));
-
-      const sortedPublicIds = await getAllPublicIds();
+      const sortedPublicIds = await getAllPublicIds(page);
 
       expect(publicIds).not.toEqual(sortedPublicIds);
     });
   });
 
-  describe("Trees Page", () => {
-    it("renders the basic elements", async () => {
-      await setupTreesPage();
+  test.describe("Trees Page", () => {
+    test("renders the basic elements", async ({page}, testInfo) => {
+      await setupTreesPage(page, testInfo);
     });
 
     describeIfDeployed("Nextstrain link", () => {
-      it("generates the link", async () => {
-        await setupTreesPage();
+      test("generates the link", async ({page}, testInfo) => {
+        await setupTreesPage(page, testInfo);
 
         await page.click(getTestID("tree-name-cell"));
 
-        expect(page).toHaveSelector(getTestID("modal-content"));
-        expect(page).toHaveSelector(getTestID("tree-link-button"));
+        expect(page.locator(getTestID("modal-content"))).toBeVisible();
+        expect(page.locator(getTestID("tree-link-button"))).toBeVisible();
 
         const treeLink = await page.$(getTestID("tree-link"));
 
@@ -105,36 +93,33 @@ describe("Data", () => {
   });
 });
 
-async function setupSamplesPage() {
-  await login();
+async function setupSamplesPage(page, testInfo) {
+  await login(page, testInfo);
 
-  await expect(page).toHaveSelector(getTestID("loading-cell"));
-  await expect(page).toHaveSelector(getTestID(ROW_PUBLIC_ID));
+  await expect(page.locator(getTestID(ROW_PUBLIC_ID)).first()).not.toBeEmpty();
 
   expect(page.url()).toContain(ROUTES.DATA_SAMPLES);
 }
 
-async function setupTreesPage() {
-  await login();
+async function setupTreesPage(page, testInfo) {
+  await login(page, testInfo);
 
-  await expect(page).toHaveSelector(getTestID("data-menu-items"));
+  await expect(page.locator(getTestID("data-menu-items"))).toBeVisible();
 
-  await page.click(getText("Phylogenetic Trees"));
+  await page.locator(getText("Phylogenetic Trees")).click();
 
-  const COLUMN_COUNT = 3;
+  const COLUMN_COUNT = 4;
 
-  await tryUntil(() =>
-    expect(page).toHaveSelectorCount(getTestID("header-cell"), COLUMN_COUNT)
-  );
+  await expect(page.locator(getTestID("header-cell"))).toHaveCount(COLUMN_COUNT)
 
-  await expect(page).toHaveSelector(getTestID("header-row"));
-  await expect(page).toHaveSelector(getText("Tree Name"));
-  await expect(page).toHaveSelector(getText("Creation Date"));
+  await expect(page.locator(getTestID("header-row"))).toBeVisible();
+  await expect(page.locator(getText("Tree Name"))).toBeVisible();
+  await expect(page.locator(getText("Creation Date"))).toBeVisible();
 
   expect(page.url()).toContain(ROUTES.PHYLO_TREES);
 }
 
-async function getAllPublicIds() {
+async function getAllPublicIds(page) {
   const allPublicIdElements = await page.$$(getTestID(ROW_PUBLIC_ID));
 
   return Promise.all(
