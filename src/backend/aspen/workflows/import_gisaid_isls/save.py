@@ -5,8 +5,6 @@
 
 import click
 import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
-from sqlalchemy.sql.expression import and_
 
 from aspen.config.config import Config
 from aspen.database.connection import (

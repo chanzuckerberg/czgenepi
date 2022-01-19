@@ -14,14 +14,13 @@ from sqlalchemy import (
     String,
     UniqueConstraint,
 )
-from sqlalchemy.orm import relationship
 
 from aspen.database.models.base import base
 from aspen.database.models.entity import Entity, EntityType
 from aspen.database.models.workflow import Workflow, WorkflowStatusType, WorkflowType
 
 
-class Accessions(base):
+class Accessions(base):  # type: ignore
     """A collection of accessions for a single sample."""
 
     __tablename__ = "accessions"
