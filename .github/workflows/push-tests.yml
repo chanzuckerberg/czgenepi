@@ -173,9 +173,9 @@ jobs:
         run: |
           echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
           # Build backend image
-          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/aspen-backend:branch-trunk -t ${{ secrets.ECR_REPO }}/aspen-backend:latest src/backend
+          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/genepi-backend:branch-trunk -t ${{ secrets.ECR_REPO }}/genepi-backend:latest src/backend
           # Build frontend
-          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/aspen-frontend:branch-trunk -t ${{ secrets.ECR_REPO }}/aspen-frontend:latest src/frontend
+          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/genepi-frontend:branch-trunk -t ${{ secrets.ECR_REPO }}/genepi-frontend:latest src/frontend
           make local-init
           docker-compose exec frontend wget localhost:8000/
           make frontend-e2e
