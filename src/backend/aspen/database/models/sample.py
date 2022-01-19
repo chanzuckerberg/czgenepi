@@ -247,7 +247,7 @@ class Sample(idbase, DictMixin):  # type: ignore
         Accessions,
         backref=backref("samples", cascade="all, delete", uselist=False),
         uselist=False,
-    )
+    )  # type: ignore
 
     sequencing_reads_collection: Optional[SequencingReadsCollection]
     uploaded_pathogen_genome: Optional[UploadedPathogenGenome]
