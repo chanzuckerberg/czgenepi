@@ -1,4 +1,5 @@
 from io import StringIO
+import datetime
 from typing import List, Optional
 
 import yaml
@@ -22,6 +23,7 @@ def create_test_data(
     group_name=None,  # Override group name
     group_location=None,  # Override group location
     group_division=None,  # Override group division
+    template_args=None,  # Send template args
 ):
     if group_name is None:
         group_name = f"testgroup-{tree_type.value}"
@@ -70,12 +72,14 @@ def create_test_data(
 
     inputs = selected_samples + [gisaid_dump]
     session.add_all(inputs)
+    if template_args is None:
+        template_args = {}
     phylo_run = phylorun_factory(
         group,
         inputs=inputs,
         gisaid_ids=gisaid_samples,
         tree_type=tree_type,
-        template_args={},
+        template_args=template_args,
         workflow_status=WorkflowStatusType.STARTED,
     )
     session.add(phylo_run)
@@ -120,7 +124,7 @@ def test_build_config(mocker, session, postgres_database):
 
 
 # Make sure that configs specific to an Overview tree are working.
-def test_overview_config(mocker, session, postgres_database):
+def test_overview_config_scheduled(mocker, session, postgres_database):
     mock_remote_db_uri(mocker, postgres_database.as_uri())
 
     tree_type = TreeType.OVERVIEW
@@ -130,12 +134,39 @@ def test_overview_config(mocker, session, postgres_database):
     subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
 
     # Just some placeholder sanity-checks
+    assert "include" not in nextstrain_config["files"]
     assert subsampling_scheme["group"]["max_sequences"] == 2000
     assert (
         subsampling_scheme["group"]["query"]
         == "--query \"(location == '{location}') & (division == '{division}')\""
     )
+    cutoff_date = (datetime.date.today() - datetime.timedelta(weeks=12)).strftime("%Y-%m-%d")
+    assert subsampling_scheme["group"]["min_date"] == f"--min-date {cutoff_date}"
     assert len(selected.splitlines()) == 0  # No selected sequences
+    assert len(metadata.splitlines()) == 11  # 10 samples + 1 header line
+    assert len(sequences.splitlines()) == 20  # 10 county samples, @2 lines each
+
+
+# Make sure that configs specific to an Overview tree are working.
+def test_overview_config_ondemand(mocker, session, postgres_database):
+    mock_remote_db_uri(mocker, postgres_database.as_uri())
+
+    tree_type = TreeType.OVERVIEW
+    query = {"group_sampling_weeks": 5}
+    phylo_run = create_test_data(session, tree_type, 10, 5, 5, template_args=query)
+    sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
+
+    subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
+
+    cutoff_date = (datetime.date.today() - datetime.timedelta(weeks=5)).strftime("%Y-%m-%d")
+    assert nextstrain_config["files"]["include"] == "data/include.txt"
+    assert subsampling_scheme["group"]["min_date"] == f"--min-date {cutoff_date}"
+    assert subsampling_scheme["group"]["max_sequences"] == 2000
+    assert (
+        subsampling_scheme["group"]["query"]
+        == "--query \"(location == '{location}') & (division == '{division}')\""
+    )
+    assert len(selected.splitlines()) == 10  # 5 gisaid samples + 5 selected samples
     assert len(metadata.splitlines()) == 11  # 10 samples + 1 header line
     assert len(sequences.splitlines()) == 20  # 10 county samples, @2 lines each
 
