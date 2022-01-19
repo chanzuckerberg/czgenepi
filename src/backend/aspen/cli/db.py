@@ -32,6 +32,7 @@ from aspen.database.models import (
     Sample,
     TreeType,
     UploadedPathogenGenome,
+    User,
     Workflow,
     WorkflowStatusType,
 )
@@ -188,6 +189,12 @@ def add_can_see(
     help="Name of tree being created",
 )
 @click.option(
+    "--user",
+    type=str,
+    required=False,
+    help="Email address of the user to associate with the build",
+)
+@click.option(
     "--group-name",
     type=str,
     required=True,
@@ -222,6 +229,7 @@ def add_can_see(
 def create_phylo_run(
     ctx,
     tree_name: str,
+    user: str,
     group_name: str,
     builds_template_args: str,
     git_refspec: str,
@@ -251,6 +259,8 @@ def create_phylo_run(
         workflow.template_args = json.loads(builds_template_args)
         if tree_name:
             workflow.name = tree_name
+        if user:
+            workflow.user = session.query(User).filter(User.email == user).one()
 
         session.add(workflow)
         session.flush()

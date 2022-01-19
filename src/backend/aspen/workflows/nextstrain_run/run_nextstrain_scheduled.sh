@@ -36,6 +36,7 @@ WORKFLOW_ID=$(aspen-cli db create-phylo-run                                     
                   --group-name "${GROUP_NAME}"                                    \
                   --builds-template-args "${TEMPLATE_ARGS}"                       \
                   --tree-name "${S3_FILESTEM} Contextual Recency-Focused Build"   \
+                  --user hello@czgenepi.org                                       \
                   --tree-type "${TREE_TYPE}"
 )
 echo "${WORKFLOW_ID}" >| "/tmp/workflow_id"
