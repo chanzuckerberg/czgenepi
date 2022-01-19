@@ -242,6 +242,10 @@ class Sample(idbase, DictMixin):  # type: ignore
         ),
     )
 
+    accessions = relationship(
+        "Accessions", back_populates="samples", cascade="all, delete", uselist=False
+    )
+
     sequencing_reads_collection: Optional[SequencingReadsCollection]
     uploaded_pathogen_genome: Optional[UploadedPathogenGenome]
 

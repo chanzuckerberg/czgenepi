@@ -5,10 +5,41 @@ import enum
 from dataclasses import dataclass
 from typing import Optional, Type
 
-from sqlalchemy import Column, ForeignKey, Integer, String, UniqueConstraint
+from sqlalchemy import (
+    Column,
+    ForeignKey,
+    ForeignKeyConstraint,
+    Integer,
+    PrimaryKeyConstraint,
+    String,
+    UniqueConstraint,
+)
+from sqlalchemy.orm import relationship
 
+from aspen.database.models.base import base
 from aspen.database.models.entity import Entity, EntityType
 from aspen.database.models.workflow import Workflow, WorkflowStatusType, WorkflowType
+
+
+class Accessions(base):
+    """A collection of accessions for a single sample."""
+
+    __tablename__ = "accessions"
+    __table_args__ = (
+        PrimaryKeyConstraint("sample_id", name="pk_accessions_sample_id"),
+        ForeignKeyConstraint(
+            ["sample_id"],
+            ["aspen.samples.id"],
+            name="fk_accession_data_sample_id_samples",
+        ),
+    )
+
+    sample_id = Column(
+        Integer, ForeignKey(Sample.id, ondelete="CASCADE"), primary_key=True
+    )
+    sample = relationship("Sample", back_populates="accessions")
+
+    gisaid_isl = Column(String, nullable=True)
 
 
 class Accession(Entity):
