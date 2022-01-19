@@ -35,9 +35,8 @@ class Accessions(base):
     )
 
     sample_id = Column(
-        Integer, ForeignKey(Sample.id, ondelete="CASCADE"), primary_key=True
+        Integer, ForeignKey("samples.id", ondelete="CASCADE"), primary_key=True
     )
-    sample = relationship("Sample", back_populates="accessions")
 
     gisaid_isl = Column(String, nullable=True)
 

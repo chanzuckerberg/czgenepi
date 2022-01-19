@@ -21,6 +21,7 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import backref, relationship, Session
 
+from aspen.database.models.accessions import Accessions
 from aspen.database.models.base import base, idbase
 from aspen.database.models.locations import Location
 from aspen.database.models.mixins import DictMixin
@@ -243,7 +244,7 @@ class Sample(idbase, DictMixin):  # type: ignore
     )
 
     accessions = relationship(
-        "Accessions", back_populates="samples", cascade="all, delete", uselist=False
+        Accessions, backref=backref("samples", cascade="all, delete", uselist=False)
     )
 
     sequencing_reads_collection: Optional[SequencingReadsCollection]
