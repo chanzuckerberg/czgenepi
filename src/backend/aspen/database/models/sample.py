@@ -244,7 +244,9 @@ class Sample(idbase, DictMixin):  # type: ignore
     )
 
     accessions = relationship(
-        Accessions, backref=backref("samples", cascade="all, delete", uselist=False)
+        Accessions,
+        backref=backref("samples", cascade="all, delete", uselist=False),
+        uselist=False,
     )
 
     sequencing_reads_collection: Optional[SequencingReadsCollection]
