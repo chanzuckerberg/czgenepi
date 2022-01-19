@@ -24,7 +24,6 @@ from aspen.database.models import (
     PhyloRun,
     PublicRepositoryType,
     Sample,
-    TreeType,
     UploadedPathogenGenome,
 )
 from aspen.database.models.workflow import Workflow

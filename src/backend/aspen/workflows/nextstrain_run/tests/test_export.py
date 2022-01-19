@@ -1,5 +1,5 @@
-from io import StringIO
 import datetime
+from io import StringIO
 from typing import List, Optional
 
 import yaml
@@ -140,7 +140,9 @@ def test_overview_config_scheduled(mocker, session, postgres_database):
         subsampling_scheme["group"]["query"]
         == "--query \"(location == '{location}') & (division == '{division}')\""
     )
-    cutoff_date = (datetime.date.today() - datetime.timedelta(weeks=12)).strftime("%Y-%m-%d")
+    cutoff_date = (datetime.date.today() - datetime.timedelta(weeks=12)).strftime(
+        "%Y-%m-%d"
+    )
     assert subsampling_scheme["group"]["min_date"] == f"--min-date {cutoff_date}"
     assert len(selected.splitlines()) == 0  # No selected sequences
     assert len(metadata.splitlines()) == 11  # 10 samples + 1 header line
@@ -158,7 +160,9 @@ def test_overview_config_ondemand(mocker, session, postgres_database):
 
     subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
 
-    cutoff_date = (datetime.date.today() - datetime.timedelta(weeks=5)).strftime("%Y-%m-%d")
+    cutoff_date = (datetime.date.today() - datetime.timedelta(weeks=5)).strftime(
+        "%Y-%m-%d"
+    )
     assert nextstrain_config["files"]["include"] == "data/include.txt"
     assert subsampling_scheme["group"]["min_date"] == f"--min-date {cutoff_date}"
     assert subsampling_scheme["group"]["max_sequences"] == 2000
