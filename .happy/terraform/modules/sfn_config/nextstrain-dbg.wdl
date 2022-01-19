@@ -9,7 +9,7 @@ workflow nextstrain {
         String remote_dev_prefix = ""
         String group_name
         String s3_filestem
-        Map[String, String] template_args
+        String template_args
         String tree_type
     }
 
@@ -35,7 +35,7 @@ task nextstrain_workflow {
         String remote_dev_prefix
         String group_name
         String s3_filestem
-        Map[String, String] template_args
+        String template_args
         String tree_type
     }
 
