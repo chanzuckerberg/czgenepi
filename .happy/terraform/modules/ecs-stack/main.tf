@@ -46,7 +46,7 @@ locals {
   batch_role_arn = local.secret["batch_queues"]["genepi"]["role_arn"]
   ec2_queue_arn  = local.secret["batch_envs"]["genepi"]["envs"]["EC2"]["queue_arn"]
   spot_queue_arn = local.secret["batch_envs"]["genepi"]["envs"]["SPOT"]["queue_arn"]
-  swipe_sfn_arn  = "${local.secret["swipe_sfn_arns"]["genepi"]["default"]}-"
+  swipe_sfn_arn  = local.secret["swipe_sfn_arns"]["genepi"]["default"]
   external_dns   = local.secret["external_zone_name"]
   internal_dns   = local.secret["internal_zone_name"]
 
