@@ -35,6 +35,11 @@ def upgrade():
     )
     conn.execute(populate_accessions_sql)
 
+    update_accessions_sql = sa.sql.text(
+        "UPDATE aspen.accessions SET gisaid_isl = subquery.gisaid_epi_isl FROM (SELECT samples.id, gisaid_metadata.gisaid_epi_isl FROM aspen.samples INNER JOIN aspen.gisaid_metadata ON samples.public_identifier = gisaid_metadata.strain) AS subquery WHERE accessions.sample_id = subquery.id"
+    )
+    conn.execute(update_accessions_sql)
+
 
 def downgrade():
     pass
