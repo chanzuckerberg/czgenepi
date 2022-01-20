@@ -1,5 +1,4 @@
 import datetime
-import re
 from typing import Dict, List, Optional
 
 from pydantic import constr, Field, root_validator, StrictStr, validator
@@ -41,42 +40,9 @@ class UserResponse(BaseResponse):
     name: str
 
 
-def humanize_tree_name(values):
-    json_filename = values["s3_key"].split("/")[-1]
-    basename = re.sub(r".json", "", json_filename)
-    if basename == "ncov_aspen":
-        return values["s3_key"].split("/")[1]  # Return the directory name.
-    title_case = basename.replace("_", " ").title()
-    if "Ancestors" in title_case:
-        title_case = title_case.replace("Ancestors", "Contextual")
-    if " Public" in title_case:
-        title_case = title_case.replace(" Public", "")
-    if " Private" in title_case:
-        title_case = title_case.replace(" Private", "")
-    return title_case
-
-
 class TreeResponse(BaseResponse):
-    # A root validator gets us access to all fields in a model, so if
-    # we need to generate a field as a composite of other fields, this
-    # is how we do it.
-    @root_validator(pre=False)
-    def _set_fields(cls, values: dict) -> dict:
-        if values["name"]:
-            return values
-
-        # Generate a nice tree name if one doesn't exist
-        values["name"] = humanize_tree_name(values)
-
-        # TODO, we need to include this field in the response model so we can interact
-        # with it in this method, but ideally we don't want to return it at all.
-        values["s3_key"] = None
-
-        return values
-
     id: int
     name: Optional[str]
-    s3_key: Optional[str]
 
 
 class PhyloRunResponse(BaseResponse):
