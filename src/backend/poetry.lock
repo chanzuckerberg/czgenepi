@@ -1381,6 +1381,14 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "types-dateparser"
+version = "1.0.12"
+description = "Typing stubs for dateparser"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "types-pytz"
 version = "2021.1.2"
 description = "Typing stubs for pytz"
@@ -1545,7 +1553,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "767a5063cd9ab77bbfbf47307012704a480857720bfe37de575e076424e1dfd0"
+content-hash = "bfd151fbba10c74746f20d87f5b3d6982c15d01ec1e42431c1774df6a0df3558"
 
 [metadata.files]
 alembic = [
@@ -2405,6 +2413,10 @@ typed-ast = [
     {file = "typed_ast-1.4.3-cp39-cp39-win32.whl", hash = "sha256:209596a4ec71d990d71d5e0d312ac935d86930e6eecff6ccc7007fe54d703808"},
     {file = "typed_ast-1.4.3-cp39-cp39-win_amd64.whl", hash = "sha256:9c6d1a54552b5330bc657b7ef0eae25d00ba7ffe85d9ea8ae6540d2197a3788c"},
     {file = "typed_ast-1.4.3.tar.gz", hash = "sha256:fb1bbeac803adea29cedd70781399c99138358c26d05fcbd23c13016b7f5ec65"},
+]
+types-dateparser = [
+    {file = "types-dateparser-1.0.12.tar.gz", hash = "sha256:5c00e12a6cf819aee1d50147c4274f44eabeb765015718336946df31efb8f70c"},
+    {file = "types_dateparser-1.0.12-py3-none-any.whl", hash = "sha256:98c796a19d4a2638ebc761bfb2f65e4183d379a69f5dc0942fd08ffb67669b0f"},
 ]
 types-pytz = [
     {file = "types-pytz-2021.1.2.tar.gz", hash = "sha256:448828a06f2aaa840e57364d866c661645a045e532f817e4f10c8c3ab2b66651"},
