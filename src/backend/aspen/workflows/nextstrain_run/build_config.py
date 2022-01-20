@@ -1,5 +1,8 @@
-import datetime
+import json
+import re
 from math import ceil
+
+import dateparser
 
 from aspen.database.models import TreeType
 from aspen.workflows.nextstrain_run.builder_base import BaseNextstrainConfigBuilder
@@ -29,13 +32,8 @@ class OverviewBuilder(BaseNextstrainConfigBuilder):
                 "query"
             ] = '''--query "((location == '{location}') & (division == '{division}')) | submitting_lab == 'RIPHL at Rush University Medical Center'"'''
 
-        # only keep group samples within the past 3 months
-        today = datetime.date.today()
-        early_late_cutoff = today - datetime.timedelta(weeks=12)
-
-        subsampling["group"][
-            "min_date"
-        ] = f"--min-date {early_late_cutoff.strftime('%Y-%m-%d')}"
+        # Handle sampling date & pango lineage filters
+        apply_filters(config, subsampling, self.template_args)
 
         # Update our sampling for state/country level builds if necessary
         update_subsampling_for_location(self.tree_build_level, subsampling)
@@ -47,12 +45,20 @@ class OverviewBuilder(BaseNextstrainConfigBuilder):
             subsampling["country"]["max_sequences"] = 800
             subsampling["international"]["max_sequences"] = 200
 
+        # If there aren't any selected samples this is probably a scheduled run
+        # and we should use the reference sequences
+        if self.num_included_samples == 0:
+            del config["files"]["include"]
+
 
 class NonContextualizedBuilder(BaseNextstrainConfigBuilder):
     subsampling_scheme = "NON_CONTEXTUALIZED"
     crowding_penalty = 0.1
 
     def update_subsampling(self, config, subsampling):
+        # Handle sampling date & pango lineage filters
+        apply_filters(config, subsampling, self.template_args)
+
         # Update our sampling for state/country level builds if necessary
         update_subsampling_for_location(self.tree_build_level, subsampling)
 
@@ -70,8 +76,8 @@ class TargetedBuilder(BaseNextstrainConfigBuilder):
           self.subsampling_scheme : the value a few lines above
           self.crowding_penalty : the value a few lines above
           self.group : information about the group that this run is for (ex: self.group.name or self.group.default_tree_location)
-          config.num_sequences : the number of aspen samples written to our fasta input file
-          config.num_included_samples : the number of samples in include.txt (aspen + gisaid samples) for on-demand runs only
+          self.num_sequences : the number of aspen samples written to our fasta input file
+          self.num_included_samples : the number of samples in include.txt (aspen + gisaid samples) for on-demand runs only
 
         EXAMPLES SECTION:
           Delete a group from a subsampling scheme:
@@ -144,3 +150,27 @@ def update_subsampling_for_division(subsampling):
     subsampling["group"][
         "query"
     ] = '''--query "(division == '{division}') & (country == '{country}')"'''  # Keep the country filter in case of multiple divisions worldwide
+
+
+def apply_filters(config, subsampling, template_args):
+    filter_map = {"filter_start_date": "min_date", "filter_end_date": "max_date"}
+    for filter_name, yaml_key in filter_map.items():
+        value = template_args.get(filter_name)
+        if not value:
+            continue  # This filter isn't set, skip it.
+        # Support date expressions like "5 days ago" in our cron schedule.
+        value = dateparser.parse(value).strftime("%Y-%m-%d")
+        subsampling["group"][
+            yaml_key
+        ] = f"--{yaml_key.replace('_', '-')} {value}"  # ex: --max-date 2020-01-01
+
+    pango_lineages = template_args.get("filter_pango_lineages")
+    if pango_lineages:
+        # Techically pango_lineages should be a *python* encoded list, but we're
+        # cheating since json is interoperable as long as we remove bad characters
+        clean_values = [re.sub(r"[^0-9a-zA-Z.]", "", item) for item in pango_lineages]
+        config["builds"]["aspen"]["pango_lineage"] = json.dumps(clean_values)
+        # Remove the last " from our old query so we can inject more filters
+        old_query = subsampling["group"]["query"][:-1]
+        pango_query = " & (pango_lineage in {pango_lineage})"
+        subsampling["group"]["query"] = old_query + pango_query + '"'

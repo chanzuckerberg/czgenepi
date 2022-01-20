@@ -432,12 +432,16 @@ def phylo_runs():
 @phylo_runs.command(name="create")
 @click.option("-n","--name", required=True, type=str)
 @click.option("-t","--type", "tree_type", required=True, type=click.Choice(["OVERVIEW", "TARGETED", "NON_CONTEXTUALIZED"], case_sensitive=False))
+@click.option("-a","--template-args", "template_args", required=False, type=str)
 @click.option("-h", "--show-headers", is_flag=True)
 @click.argument("sample_ids", nargs=-1)
 @click.pass_context
-def start_phylo_run_v2(ctx, name, tree_type, sample_ids, show_headers):
+def start_phylo_run_v2(ctx, name, tree_type, template_args, sample_ids, show_headers):
     api_client = ctx.obj["api_client"]
     payload = { "name": name, "tree_type": tree_type, "samples": sample_ids }
+    if template_args:
+        payload["template_args"] = json.loads(template_args)
+    print(json.dumps(payload))
     resp = api_client.post("/v2/phylo_runs/", json=payload)
     if show_headers:
         print(resp.headers)

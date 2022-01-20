@@ -7,10 +7,17 @@ from aspen.api.schemas.base import BaseRequest, BaseResponse
 from aspen.database.models import TreeType
 
 # What kinds of ondemand nextstrain builds do we support?
-PHYLO_TREE_TYPES = {
-    TreeType.NON_CONTEXTUALIZED.value: "non_contextualized.yaml",
-    TreeType.TARGETED.value: "targeted.yaml",
-}
+PHYLO_TREE_TYPES = [
+    TreeType.OVERVIEW.value,
+    TreeType.NON_CONTEXTUALIZED.value,
+    TreeType.TARGETED.value,
+]
+
+
+class TemplateArgsRequest(BaseRequest):
+    filter_start_date: Optional[datetime.date]
+    filter_end_date: Optional[datetime.date]
+    filter_pango_lineages: Optional[List[constr(regex=r"^[0-9A-Z.]+$")]]  # type: ignore # noqa
 
 
 class PhyloRunRequest(BaseRequest):
@@ -18,11 +25,12 @@ class PhyloRunRequest(BaseRequest):
     name: constr(min_length=1, max_length=128, strict=True)  # type: ignore
     samples: List[StrictStr]
     tree_type: StrictStr
+    template_args: Optional[TemplateArgsRequest]
 
     @validator("tree_type")
     def tree_type_must_be_supported(cls, value):
         uppercase_tree_type = value.upper()
-        assert PHYLO_TREE_TYPES.get(uppercase_tree_type)
+        assert uppercase_tree_type in PHYLO_TREE_TYPES
         return uppercase_tree_type
 
 
