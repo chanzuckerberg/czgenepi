@@ -6,14 +6,7 @@ from dataclasses import dataclass
 from typing import Optional, Type
 
 import enumtables
-from sqlalchemy import (
-    Column,
-    ForeignKey,
-    Integer,
-    PrimaryKeyConstraint,
-    String,
-    UniqueConstraint,
-)
+from sqlalchemy import Column, ForeignKey, Integer, String, UniqueConstraint
 
 from aspen.database.models.base import base
 from aspen.database.models.entity import Entity, EntityType
