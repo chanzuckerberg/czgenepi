@@ -5,6 +5,8 @@
 
 import click
 import sqlalchemy as sa
+from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.sql.expression import literal_column
 
 from aspen.config.config import Config
 from aspen.database.connection import (
@@ -13,7 +15,7 @@ from aspen.database.connection import (
     session_scope,
     SqlAlchemyInterface,
 )
-from aspen.database.models import Accessions, GisaidMetadata, Sample
+from aspen.database.models import Accession, AccessionType, GisaidMetadata, Sample
 
 
 def save():
@@ -21,21 +23,33 @@ def save():
     interface: SqlAlchemyInterface = init_db(get_db_uri(config))
 
     with session_scope(interface) as session:
+        # Note: the syntax of the literal_column() is purposefully done so the resulting
+        # PostgreSQL expression will have single-quotes around it, since we are
+        # SELECTing on a string literal (this is done in order to give every row in this subquery
+        # the value 'GISAID_ISL' in the 'accession_type' column.)
         subquery = (
-            sa.select(Sample.id, GisaidMetadata.gisaid_epi_isl)
+            sa.select(
+                Sample.id,
+                literal_column(f"'{AccessionType.GISAID_ISL.value}'").label(
+                    "accession_type"
+                ),
+                GisaidMetadata.gisaid_epi_isl,
+            )
             .select_from(Sample)
             .join(GisaidMetadata, Sample.public_identifier == GisaidMetadata.strain)
             .subquery()
         )
 
-        update_accessions_stmt = (
-            sa.update(Accessions)
-            .values(gisaid_isl=subquery.c.gisaid_epi_isl)
-            .where(Accessions.sample_id == subquery.c.id)
-            .execution_options(synchronize_session=False)
+        insert_accessions_stmt = insert(Accession.__table__).from_select(
+            ["sample_id", "accession_type", "accession"], subquery
         )
 
-        result = session.execute(update_accessions_stmt)
+        do_update_stmt = insert_accessions_stmt.on_conflict_do_update(
+            constraint="uq_accessions_sample_id_accession_type",
+            set_=dict(accession=insert_accessions_stmt.excluded.accession),
+        )
+
+        result = session.execute(do_update_stmt)
 
         session.commit()
 
