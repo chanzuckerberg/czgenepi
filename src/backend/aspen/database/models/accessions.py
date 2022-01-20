@@ -9,7 +9,6 @@ import enumtables
 from sqlalchemy import (
     Column,
     ForeignKey,
-    ForeignKeyConstraint,
     Integer,
     PrimaryKeyConstraint,
     String,
