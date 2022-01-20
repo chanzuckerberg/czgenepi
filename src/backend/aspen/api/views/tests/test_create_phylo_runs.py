@@ -122,7 +122,7 @@ async def test_create_phylo_run_with_invalid_args(
         "template_args": {},
     }
     for args in requests:
-        request_body["template_args"] = args
+        request_body["template_args"] = args  # type: ignore
         res = await http_client.post(
             "/v2/phylo_runs/", json=request_body, headers=auth_headers
         )
