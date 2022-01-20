@@ -1,7 +1,7 @@
-import datetime
 from io import StringIO
 from typing import List, Optional
 
+import dateparser
 import yaml
 from sqlalchemy.sql.expression import and_
 
@@ -124,7 +124,7 @@ def test_build_config(mocker, session, postgres_database):
 
 
 # Make sure that configs specific to an Overview tree are working.
-def test_overview_config_scheduled(mocker, session, postgres_database):
+def test_overview_config_no_filters(mocker, session, postgres_database):
     mock_remote_db_uri(mocker, postgres_database.as_uri())
 
     tree_type = TreeType.OVERVIEW
@@ -140,10 +140,9 @@ def test_overview_config_scheduled(mocker, session, postgres_database):
         subsampling_scheme["group"]["query"]
         == "--query \"(location == '{location}') & (division == '{division}')\""
     )
-    cutoff_date = (datetime.date.today() - datetime.timedelta(weeks=12)).strftime(
-        "%Y-%m-%d"
-    )
-    assert subsampling_scheme["group"]["min_date"] == f"--min-date {cutoff_date}"
+    assert "min_date" not in subsampling_scheme["group"]
+    assert "max_date" not in subsampling_scheme["group"]
+    assert "pango_lineage" not in subsampling_scheme["group"]["query"]
     assert len(selected.splitlines()) == 0  # No selected sequences
     assert len(metadata.splitlines()) == 11  # 10 samples + 1 header line
     assert len(sequences.splitlines()) == 20  # 10 county samples, @2 lines each
@@ -154,21 +153,25 @@ def test_overview_config_ondemand(mocker, session, postgres_database):
     mock_remote_db_uri(mocker, postgres_database.as_uri())
 
     tree_type = TreeType.OVERVIEW
-    query = {"group_sampling_weeks": 5}
+    query = {
+        "filter_start_date": "2021-04-30",
+        "filter_end_date": "10 days ago",
+        "filter_pango_lineages": ["AY", "B.1.116"],
+    }
     phylo_run = create_test_data(session, tree_type, 10, 5, 5, template_args=query)
     sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
 
     subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
 
-    cutoff_date = (datetime.date.today() - datetime.timedelta(weeks=5)).strftime(
-        "%Y-%m-%d"
-    )
+    max_date = dateparser.parse("10 days ago").strftime("%Y-%m-%d")
     assert nextstrain_config["files"]["include"] == "data/include.txt"
-    assert subsampling_scheme["group"]["min_date"] == f"--min-date {cutoff_date}"
+    assert nextstrain_config["builds"]["aspen"]["pango_lineage"] == '["AY", "B.1.116"]'
+    assert subsampling_scheme["group"]["min_date"] == "--min-date 2021-04-30"
+    assert subsampling_scheme["group"]["max_date"] == f"--max-date {max_date}"
     assert subsampling_scheme["group"]["max_sequences"] == 2000
     assert (
         subsampling_scheme["group"]["query"]
-        == "--query \"(location == '{location}') & (division == '{division}')\""
+        == "--query \"(location == '{location}') & (division == '{division}') & (pango_lineage in {pango_lineage})\""
     )
     assert len(selected.splitlines()) == 10  # 5 gisaid samples + 5 selected samples
     assert len(metadata.splitlines()) == 11  # 10 samples + 1 header line

@@ -71,3 +71,6 @@ sqlalchemy-stubs = "^0.4"
 types-pytz = "^2021.1.2"
 types-requests = "^2.25.9"
 typing-extensions = "^3.10.0"
+
+[tool.pytest.ini_options]
+filterwarnings = ["ignore::pytz_deprecation_shim.PytzUsageWarning"]

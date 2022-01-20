@@ -2,7 +2,7 @@ import datetime
 import re
 from typing import Dict, List, Optional
 
-from pydantic import conint, constr, Field, root_validator, StrictStr, validator
+from pydantic import constr, Field, root_validator, StrictStr, validator
 
 from aspen.api.schemas.base import BaseRequest, BaseResponse
 from aspen.database.models import TreeType
@@ -16,7 +16,9 @@ PHYLO_TREE_TYPES = [
 
 
 class TemplateArgsRequest(BaseRequest):
-    group_sampling_weeks: Optional[conint(ge=1, le=52)]  # type: ignore
+    filter_start_date: Optional[datetime.date]
+    filter_end_date: Optional[datetime.date]
+    filter_pango_lineages: Optional[List[constr(regex=r"^[0-9A-Z.]+$")]]  # noqa
 
 
 class PhyloRunRequest(BaseRequest):

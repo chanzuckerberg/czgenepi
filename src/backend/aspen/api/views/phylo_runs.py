@@ -124,11 +124,12 @@ async def kick_off_phylo_run(
     template_args = {}
     # Not all template_args keys are required, and we don't want to save empty fields.
     if phylo_run_request.template_args:
-        template_args = {
-            k: v
-            for k, v in dict(phylo_run_request.template_args).items()
-            if v is not None
-        }
+        for k, v in dict(phylo_run_request.template_args).items():
+            if not v:
+                continue  # Skip this field
+            if "date" in k:
+                v = v.strftime("%Y-%m-%d")
+            template_args[k] = v
     workflow: PhyloRun = PhyloRun(
         start_datetime=start_datetime,
         workflow_status=WorkflowStatusType.STARTED,

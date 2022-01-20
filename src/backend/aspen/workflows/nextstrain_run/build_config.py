@@ -1,5 +1,8 @@
-import datetime
+import json
+import re
 from math import ceil
+
+import dateparser
 
 from aspen.database.models import TreeType
 from aspen.workflows.nextstrain_run.builder_base import BaseNextstrainConfigBuilder
@@ -29,16 +32,8 @@ class OverviewBuilder(BaseNextstrainConfigBuilder):
                 "query"
             ] = '''--query "((location == '{location}') & (division == '{division}')) | submitting_lab == 'RIPHL at Rush University Medical Center'"'''
 
-        # If we passed in a different time window, use it. Default to 12
-        cutoff_weeks = self.template_args.get("group_sampling_weeks", 12)
-
-        # only keep group samples within the past 3 months
-        today = datetime.date.today()
-        early_late_cutoff = today - datetime.timedelta(weeks=cutoff_weeks)
-
-        subsampling["group"][
-            "min_date"
-        ] = f"--min-date {early_late_cutoff.strftime('%Y-%m-%d')}"
+        # Handle sampling date & pango lineage filters
+        apply_filters(config, subsampling, self.template_args)
 
         # Update our sampling for state/country level builds if necessary
         update_subsampling_for_location(self.tree_build_level, subsampling)
@@ -61,6 +56,9 @@ class NonContextualizedBuilder(BaseNextstrainConfigBuilder):
     crowding_penalty = 0.1
 
     def update_subsampling(self, config, subsampling):
+        # Handle sampling date & pango lineage filters
+        apply_filters(config, subsampling, self.template_args)
+
         # Update our sampling for state/country level builds if necessary
         update_subsampling_for_location(self.tree_build_level, subsampling)
 
@@ -152,3 +150,27 @@ def update_subsampling_for_division(subsampling):
     subsampling["group"][
         "query"
     ] = '''--query "(division == '{division}') & (country == '{country}')"'''  # Keep the country filter in case of multiple divisions worldwide
+
+
+def apply_filters(config, subsampling, template_args):
+    filter_map = {"filter_start_date": "min_date", "filter_end_date": "max_date"}
+    for filter_name, yaml_key in filter_map.items():
+        value = template_args.get(filter_name)
+        if not value:
+            continue  # This filter isn't set, skip it.
+        # Support date expressions like "5 days ago" in our cron schedule.
+        value = dateparser.parse(value).strftime("%Y-%m-%d")
+        subsampling["group"][
+            yaml_key
+        ] = f"--{yaml_key.replace('_', '-')} {value}"  # ex: --max-date 2020-01-01
+
+    pango_lineages = template_args.get("filter_pango_lineages")
+    if pango_lineages:
+        # Techically pango_lineages should be a *python* encoded list, but we're
+        # cheating since json is interoperable as long as we remove bad characters
+        clean_values = [re.sub(r"[^0-9a-zA-Z.]", "", item) for item in pango_lineages]
+        config["builds"]["aspen"]["pango_lineage"] = json.dumps(clean_values)
+        # Remove the last " from our old query so we can inject more filters
+        old_query = subsampling["group"]["query"][:-1]
+        pango_query = " & (pango_lineage in {pango_lineage})"
+        subsampling["group"]["query"] = old_query + pango_query + '"'

@@ -2,7 +2,7 @@ locals {
   nextstrain_sfn_memory = 64000
   nextstrain_sfn_vcpus = 10
   nextstrain_cron_schedule = local.deployment_stage == "geprod" ? ["cron(0 5 ? * MON-SAT *)"] : []
-  default_template_args = jsonencode({"group_sampling_weeks": 12})
+  default_template_args = jsonencode({"filter_start_date": "12 weeks ago", "filter_end_date": "now"})
 }
 
 module nextstrain_chicago_contextual_sfn_config {
