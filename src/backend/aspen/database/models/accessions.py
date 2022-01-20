@@ -43,7 +43,7 @@ class Accession(base):  # type: ignore
         ForeignKeyConstraint(
             ["sample_id"],
             ["aspen.samples.id"],
-            name="fk_accession_data_sample_id_samples",
+            name="fk_accessions_sample_id_samples",
         ),
         ForeignKeyConstraint(
             ["accession_type"],
