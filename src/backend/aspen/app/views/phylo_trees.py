@@ -32,21 +32,6 @@ from aspen.phylo_tree.identifiers import rename_nodes_on_tree
 PHYLO_TREE_KEY = "phylo_trees"
 
 
-def humanize_tree_name(s3_key: str):
-    json_filename = s3_key.split("/")[-1]
-    basename = re.sub(r".json", "", json_filename)
-    if basename == "ncov_aspen":
-        return s3_key.split("/")[1]  # Return the directory name.
-    title_case = basename.replace("_", " ").title()
-    if "Ancestors" in title_case:
-        title_case = title_case.replace("Ancestors", "Contextual")
-    if " Public" in title_case:
-        title_case = title_case.replace(" Public", "")
-    if " Private" in title_case:
-        title_case = title_case.replace(" Private", "")
-    return title_case
-
-
 def generate_tree_name_from_template(phylo_run: PhyloRun) -> str:
     # template_args should be transparently deserialized into a python dict.
     # but if something is wrong with the data in the column (i.e. the json is
@@ -110,7 +95,7 @@ def phylo_trees():
                 phylo_tree = output
                 result = result | {
                     "phylo_tree_id": phylo_tree.entity_id,
-                    "name": phylo_tree.name or humanize_tree_name(phylo_tree.s3_key),
+                    "name": phylo_tree.name,
                 }
         if not phylo_tree:
             result = result | {

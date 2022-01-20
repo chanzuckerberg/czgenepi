@@ -2,6 +2,7 @@ locals {
   nextstrain_sfn_memory = 64000
   nextstrain_sfn_vcpus = 10
   nextstrain_cron_schedule = local.deployment_stage == "geprod" ? ["cron(0 5 ? * MON-SAT *)"] : []
+  default_template_args = jsonencode({"filter_start_date": "12 weeks ago", "filter_end_date": "now"})
 }
 
 module nextstrain_chicago_contextual_sfn_config {
@@ -17,7 +18,7 @@ module nextstrain_chicago_contextual_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = local.nextstrain_cron_schedule
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -25,7 +26,7 @@ module nextstrain_chicago_contextual_sfn_config {
     remote_dev_prefix        = local.remote_dev_prefix
     group_name               = "Chicago Department of Public Health"
     s3_filestem              = "Chicago"
-    template_args            = {}
+    template_args            = local.default_template_args
     tree_type                = "OVERVIEW"
   }
 }
@@ -43,7 +44,7 @@ module nextstrain_scc_contextual_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = local.nextstrain_cron_schedule
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -51,7 +52,7 @@ module nextstrain_scc_contextual_sfn_config {
     remote_dev_prefix        = local.remote_dev_prefix
     group_name               = "Santa Clara County Public Health"
     s3_filestem              = "Santa Clara"
-    template_args            = {}
+    template_args            = local.default_template_args
     tree_type                = "OVERVIEW"
   }
 }
@@ -69,7 +70,7 @@ module nextstrain_alameda_contextual_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = local.nextstrain_cron_schedule
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -77,7 +78,7 @@ module nextstrain_alameda_contextual_sfn_config {
     remote_dev_prefix        = local.remote_dev_prefix
     group_name               = "Alameda County Public Health Department"
     s3_filestem              = "Alameda"
-    template_args            = {}
+    template_args            = local.default_template_args
     tree_type                = "OVERVIEW"
   }
 }
@@ -95,7 +96,7 @@ module nextstrain_contra_costa_contextual_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = local.nextstrain_cron_schedule
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -103,7 +104,7 @@ module nextstrain_contra_costa_contextual_sfn_config {
     remote_dev_prefix        = local.remote_dev_prefix
     group_name               = "Contra Costa County Public Health Laboratories"
     s3_filestem              = "Contra Costa"
-    template_args            = {}
+    template_args            = local.default_template_args
     tree_type                = "OVERVIEW"
   }
 }
@@ -121,7 +122,7 @@ module nextstrain_fresno_contextual_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = local.nextstrain_cron_schedule
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -129,7 +130,7 @@ module nextstrain_fresno_contextual_sfn_config {
     remote_dev_prefix        = local.remote_dev_prefix
     group_name               = "Fresno County Public Health"
     s3_filestem              = "Fresno"
-    template_args            = {}
+    template_args            = local.default_template_args
     tree_type                = "OVERVIEW"
   }
 }
@@ -147,7 +148,7 @@ module nextstrain_humboldt_contextual_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = local.nextstrain_cron_schedule
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -155,7 +156,7 @@ module nextstrain_humboldt_contextual_sfn_config {
     remote_dev_prefix        = local.remote_dev_prefix
     group_name               = "Humboldt County Dept Human and Health Sevices-Public Health"
     s3_filestem              = "Humboldt"
-    template_args            = {}
+    template_args            = local.default_template_args
     tree_type                = "OVERVIEW"
   }
 }
@@ -173,7 +174,7 @@ module nextstrain_marin_contextual_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = contains(["geprod", "gestaging"], local.deployment_stage) ? ["cron(0 5 ? * MON-SAT *)"] : []
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -181,7 +182,7 @@ module nextstrain_marin_contextual_sfn_config {
     remote_dev_prefix        = local.remote_dev_prefix
     group_name               = "Marin County Department of Health & Human Services"
     s3_filestem              = "Marin"
-    template_args            = {}
+    template_args            = local.default_template_args
     tree_type                = "OVERVIEW"
   }
 }
@@ -199,7 +200,7 @@ module nextstrain_monterey_contextual_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = local.nextstrain_cron_schedule
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -207,7 +208,7 @@ module nextstrain_monterey_contextual_sfn_config {
     remote_dev_prefix        = local.remote_dev_prefix
     group_name               = "Monterey County Health Department"
     s3_filestem              = "Monterey"
-    template_args            = {}
+    template_args            = local.default_template_args
     tree_type                = "OVERVIEW"
   }
 }
@@ -225,7 +226,7 @@ module nextstrain_orange_contextual_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = local.nextstrain_cron_schedule
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -233,7 +234,7 @@ module nextstrain_orange_contextual_sfn_config {
     remote_dev_prefix        = local.remote_dev_prefix
     group_name               = "Orange County Public Health Laboratory"
     s3_filestem              = "Orange"
-    template_args            = {}
+    template_args            = local.default_template_args
     tree_type                = "OVERVIEW"
   }
 }
@@ -251,7 +252,7 @@ module nextstrain_san_bernardino_contextual_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = local.nextstrain_cron_schedule
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -259,7 +260,7 @@ module nextstrain_san_bernardino_contextual_sfn_config {
     remote_dev_prefix        = local.remote_dev_prefix
     group_name               = "San Bernardino County Public Health"
     s3_filestem              = "San Bernardino"
-    template_args            = {}
+    template_args            = local.default_template_args
     tree_type                = "OVERVIEW"
   }
 }
@@ -277,7 +278,7 @@ module nextstrain_del_norte_contextual_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = local.nextstrain_cron_schedule
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -285,7 +286,7 @@ module nextstrain_del_norte_contextual_sfn_config {
     remote_dev_prefix        = local.remote_dev_prefix
     group_name               = "Del Norte Public Health Laboratory"
     s3_filestem              = "Del Norte"
-    template_args            = {}
+    template_args            = local.default_template_args
     tree_type                = "OVERVIEW"
   }
 }
@@ -303,7 +304,7 @@ module nextstrain_san_joaquin_contextual_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = local.nextstrain_cron_schedule
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -311,7 +312,7 @@ module nextstrain_san_joaquin_contextual_sfn_config {
     remote_dev_prefix        = local.remote_dev_prefix
     group_name               = "San Joaquin County Public Health Services"
     s3_filestem              = "San Joaquin"
-    template_args            = {}
+    template_args            = local.default_template_args
     tree_type                = "OVERVIEW"
   }
 }
@@ -329,7 +330,7 @@ module nextstrain_san_luis_obispo_contextual_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = local.nextstrain_cron_schedule
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -337,7 +338,7 @@ module nextstrain_san_luis_obispo_contextual_sfn_config {
     remote_dev_prefix        = local.remote_dev_prefix
     group_name               = "San Luis Obispo County Health Agency, Public Health Laboratories"
     s3_filestem              = "San Luis Obispo"
-    template_args            = {}
+    template_args            = local.default_template_args
     tree_type                = "OVERVIEW"
   }
 }
@@ -355,7 +356,7 @@ module nextstrain_san_francisco_contextual_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = local.nextstrain_cron_schedule
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -363,7 +364,7 @@ module nextstrain_san_francisco_contextual_sfn_config {
     remote_dev_prefix        = local.remote_dev_prefix
     group_name               = "San Francisco Public Health Laboratory"
     s3_filestem              = "San Francisco"
-    template_args            = {}
+    template_args            = local.default_template_args
     tree_type                = "OVERVIEW"
   }
 }
@@ -382,7 +383,7 @@ module nextstrain_tulare_contextual_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = local.nextstrain_cron_schedule
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -390,7 +391,7 @@ module nextstrain_tulare_contextual_sfn_config {
     remote_dev_prefix        = local.remote_dev_prefix
     group_name               = "Tulare County Public Health Lab"
     s3_filestem              = "Tulare"
-    template_args            = {}
+    template_args            = local.default_template_args
     tree_type                = "OVERVIEW"
   }
 }
@@ -408,7 +409,7 @@ module nextstrain_tuolumne_contextual_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = local.nextstrain_cron_schedule
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -416,7 +417,7 @@ module nextstrain_tuolumne_contextual_sfn_config {
     remote_dev_prefix        = local.remote_dev_prefix
     group_name               = "Tuolumne County Public Health"
     s3_filestem              = "Tuolumne"
-    template_args            = {}
+    template_args            = local.default_template_args
     tree_type                = "OVERVIEW"
   }
 }
@@ -434,7 +435,7 @@ module nextstrain_ventura_contextual_sfn_config {
   stack_resource_prefix = local.stack_resource_prefix
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = module.swipe_sfn.step_function_arn
+  sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = local.nextstrain_cron_schedule
   event_role_arn        = local.event_role_arn
   extra_args            =  {
@@ -442,7 +443,7 @@ module nextstrain_ventura_contextual_sfn_config {
     remote_dev_prefix        = local.remote_dev_prefix
     group_name               = "Ventura County Public Health Laboratory"
     s3_filestem              = "Ventura"
-    template_args            = {}
+    template_args            = local.default_template_args
     tree_type                = "OVERVIEW"
   }
 }

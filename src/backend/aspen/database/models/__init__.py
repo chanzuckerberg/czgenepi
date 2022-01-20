@@ -1,6 +1,8 @@
 from sqlalchemy.orm import configure_mappers
 
 from aspen.database.models.accessions import (  # noqa: F401
+    Accession,
+    AccessionType,
     GisaidAccession,
     GisaidAccessionWorkflow,
     PublicRepositoryType,
