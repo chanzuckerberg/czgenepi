@@ -18,6 +18,7 @@ RUN apt-get -qq update && apt-get -qq -y install \
     locales \
     zstd \
     nano \
+    seqtk \
     && locale-gen en_US.UTF-8
 
 # Install poetry
@@ -37,13 +38,13 @@ RUN mkdir /ncov && \
     cd /ncov && \
     git init && \
     git remote add origin https://github.com/nextstrain/ncov.git && \
-    git fetch origin 065eb54867a39a175ebce4181f43ddbd8c84b3b4 && \
+    git fetch origin 96894a882a6226e6d20b333df84ddffa6ffd4c2b && \
     git reset --hard FETCH_HEAD
 RUN mkdir -p /ncov/auspice
 RUN mkdir -p /ncov/logs
 
-ADD aspen/workflows/nextstrain_run/patches/crowding_penalty.patch /tmp/
-RUN (grep 'config\["priorities"\]\["crowding_penalty"\]' /ncov/workflow/snakemake_rules/main_workflow.smk || patch /ncov/workflow/snakemake_rules/main_workflow.smk < /tmp/crowding_penalty.patch)
+ADD aspen/workflows/nextstrain_run/patches/seqtk.patch /tmp/
+RUN patch /ncov/workflow/snakemake_rules/main_workflow.smk < /tmp/seqtk.patch
 
 WORKDIR /usr/src/app
 
