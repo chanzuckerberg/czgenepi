@@ -38,7 +38,6 @@ class Accession(base):  # type: ignore
 
     __tablename__ = "accessions"
     __table_args__ = (
-        PrimaryKeyConstraint("sample_id", name="pk_accessions_sample_id"),
         UniqueConstraint(
             "sample_id",
             "accession_type",

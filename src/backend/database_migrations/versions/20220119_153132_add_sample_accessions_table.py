@@ -35,7 +35,6 @@ def upgrade():
         sa.Column("sample_id", sa.Integer(), nullable=False),
         sa.Column("accession_type", enumtables.enum_column.EnumType(), nullable=False),
         sa.Column("accession", sa.String(), nullable=False),
-        sa.PrimaryKeyConstraint("sample_id", name=op.f("pk_accessions_sample_id")),
         sa.ForeignKeyConstraint(
             ["sample_id"],
             ["aspen.samples.id"],
