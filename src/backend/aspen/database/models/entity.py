@@ -23,7 +23,7 @@ from aspen.database.models.enum import Enum
 
 if TYPE_CHECKING:
     from aspen.database.models.accessions import (
-        Accession,
+        AccessionBase,
         PublicRepositoryType,
         PublicRepositoryTypeMetadata,
     )
@@ -129,11 +129,11 @@ class Entity(idbase):  # type: ignore
 
         return results
 
-    def accessions(self) -> Sequence[Accession]:
-        from .accessions import Accession
+    def accessions(self) -> Sequence[AccessionBase]:
+        from .accessions import AccessionBase
 
-        results: MutableSequence[Accession] = list()
-        for workflow, accessions in self.get_children(Accession):
+        results: MutableSequence[AccessionBase] = list()
+        for workflow, accessions in self.get_children(AccessionBase):
             results.extend(accessions)
         return results
 
