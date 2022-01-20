@@ -40,16 +40,6 @@ class Accession(base):  # type: ignore
     __tablename__ = "accessions"
     __table_args__ = (
         PrimaryKeyConstraint("sample_id", name="pk_accessions_sample_id"),
-        ForeignKeyConstraint(
-            ["sample_id"],
-            ["aspen.samples.id"],
-            name="fk_accessions_sample_id_samples",
-        ),
-        ForeignKeyConstraint(
-            ["accession_type"],
-            ["aspen.accession_types.item_id"],
-            name="fk_accessions_accession_type_accession_types",
-        ),
         UniqueConstraint(
             "sample_id",
             "accession_type",
