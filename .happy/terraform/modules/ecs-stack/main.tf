@@ -46,7 +46,7 @@ locals {
   batch_role_arn = local.secret["batch_queues"]["genepi"]["role_arn"]
   ec2_queue_arn  = local.secret["batch_envs"]["genepi"]["envs"]["EC2"]["queue_arn"]
   spot_queue_arn = local.secret["batch_envs"]["genepi"]["envs"]["SPOT"]["queue_arn"]
-  swipe_sfn_arn  = local.secret["swipe_sfn_arns"]["genepi"]["default"]
+  swipe_sfn_arn  = local.deployment_stage == "prod" ? module.swipe_sfn[0].step_function_arn : local.secret["swipe_sfn_arns"]["genepi"]["default"]
   external_dns   = local.secret["external_zone_name"]
   internal_dns   = local.secret["internal_zone_name"]
 
@@ -144,6 +144,23 @@ module backend_service {
   health_check_path     = "/health"
 
   wait_for_steady_state = local.wait_for_steady_state
+}
+
+module swipe_sfn {
+  source                     = "../swipe-sfn"
+
+  count = local.deployment_stage == "prod" ? 1 : 0
+
+  app_name                   = "swipe-spot"
+  stack_resource_prefix      = local.stack_resource_prefix
+  remote_dev_prefix          = local.remote_dev_prefix
+  job_definition_name        = module.swipe_batch.batch_job_definition
+  ec2_queue_arn              = local.ec2_queue_arn
+  spot_queue_arn             = local.spot_queue_arn
+  state_change_sns_topic_arn = local.state_change_sns_topic_arn
+  role_arn                   = local.sfn_role_arn
+  custom_stack_name          = local.custom_stack_name
+  deployment_stage           = local.deployment_stage
 }
 
 # Write information on how to invoke the gisaid sfn to SSM.
