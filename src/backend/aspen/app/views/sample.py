@@ -3,7 +3,6 @@ import json
 import os
 import re
 import threading
-from collections import defaultdict
 from typing import Any, Iterable, Mapping, Optional, Sequence, Set, Union
 from uuid import uuid4
 
@@ -30,17 +29,14 @@ from aspen.app.views.api_utils import (
 from aspen.database.connection import session_scope
 from aspen.database.models import (
     GisaidAccession,
-    GisaidAccessionWorkflow,
     Location,
     PublicRepositoryType,
     Sample,
     UploadedPathogenGenome,
-    WorkflowStatusType,
 )
 from aspen.database.models.sample import create_public_ids
 from aspen.database.models.usergroup import Group, User
 from aspen.error import http_exceptions as ex
-from aspen.error.recoverable import RecoverableError
 from aspen.fileio.fasta_streamer import FastaStreamer
 
 DEFAULT_DIVISION = "California"

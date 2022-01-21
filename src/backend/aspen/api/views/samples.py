@@ -1,5 +1,5 @@
 import datetime
-from typing import Dict, List, NamedTuple, Optional, Set
+from typing import List, Set
 
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends
@@ -22,16 +22,7 @@ from aspen.api.schemas.samples import (
 )
 from aspen.api.settings import Settings
 from aspen.api.utils import authz_samples_cansee, determine_gisaid_status
-from aspen.database.models import (
-    DataType,
-    Entity,
-    GisaidAccession,
-    GisaidAccessionWorkflow,
-    Location,
-    Sample,
-    UploadedPathogenGenome,
-    User,
-)
+from aspen.database.models import DataType, Location, Sample, User
 
 router = APIRouter()
 

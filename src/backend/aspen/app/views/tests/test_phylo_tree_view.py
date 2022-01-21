@@ -43,9 +43,7 @@ def make_sample_data(
 def make_uploaded_pathogen_genomes(
     samples: Collection[Sample],
 ) -> Collection[UploadedPathogenGenome]:
-    return [
-        uploaded_pathogen_genome_factory(sample, accessions=()) for sample in samples
-    ]
+    return [uploaded_pathogen_genome_factory(sample) for sample in samples]
 
 
 def make_trees(

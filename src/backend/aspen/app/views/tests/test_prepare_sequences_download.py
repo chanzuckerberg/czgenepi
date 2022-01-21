@@ -1,6 +1,4 @@
-import datetime
-
-from aspen.database.models import CanSee, DataType, PublicRepositoryType
+from aspen.database.models import CanSee, DataType
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory

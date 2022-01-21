@@ -1,15 +1,11 @@
 import datetime
-from typing import Sequence
 
 from aspen.database.models import (
-    PublicRepositoryType,
-    PublicRepositoryTypeMetadata,
     Sample,
     SequencingInstrumentType,
     SequencingProtocolType,
     SequencingReadsCollection,
     UploadedPathogenGenome,
-    WorkflowStatusType,
 )
 from aspen.test_infra.models.sample import sample_factory
 

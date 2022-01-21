@@ -1,5 +1,3 @@
-import datetime
-
 from aspen.database.models import Accession, AccessionType
 
 

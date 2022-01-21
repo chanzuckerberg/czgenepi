@@ -1,5 +1,5 @@
 import datetime
-from typing import Dict
+from typing import Dict, List
 
 from aspen.database.models import Accession, AccessionType, Location, Sample
 from aspen.test_infra.models.gisaid_accession import gisaid_accession_factory

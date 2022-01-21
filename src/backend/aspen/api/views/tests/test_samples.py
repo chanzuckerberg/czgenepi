@@ -1,4 +1,3 @@
-import datetime
 import json
 from typing import Any, List, Optional, Sequence, Tuple
 
@@ -16,7 +15,6 @@ from aspen.database.models import (
     DataType,
     Group,
     Location,
-    PublicRepositoryType,
     Sample,
     SequencingReadsCollection,
     User,
