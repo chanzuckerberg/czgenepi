@@ -68,9 +68,7 @@ async def test_samples_view(
                 "czb_failed_genome_recovery": False,
                 "gisaid": {
                     "status": "Accepted",
-                    "gisaid_id": uploaded_pathogen_genome.accessions()[
-                        0
-                    ].public_identifier,
+                    "gisaid_id": sample.accessions[0].accession,
                 },
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
@@ -107,18 +105,10 @@ async def test_samples_view_gisaid_rejected(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    sample = sample_factory(group, user, location)
+    sample = sample_factory(group, user, location, accessions={})
     # Test no GISAID accession logic
     uploaded_pathogen_genome = uploaded_pathogen_genome_factory(
         sample,
-        accessions=(
-            AccessionWorkflowDirective(
-                PublicRepositoryType.GISAID,
-                datetime.datetime.now() - datetime.timedelta(days=5),
-                None,
-                None,
-            ),
-        ),
     )
     async_session.add(group)
     await async_session.commit()
@@ -142,7 +132,7 @@ async def test_samples_view_gisaid_rejected(
                     "location": location.location,
                 },
                 "czb_failed_genome_recovery": False,
-                "gisaid": {"status": "Rejected", "gisaid_id": None},
+                "gisaid": {"status": "Not Found", "gisaid_id": None},
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
                 "upload_date": convert_datetime_to_iso_8601(
