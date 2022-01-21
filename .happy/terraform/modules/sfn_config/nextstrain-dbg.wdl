@@ -61,12 +61,11 @@ task nextstrain_workflow {
     aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$genepi_config")"
 
     # Recover tempalte args
-    export TEMPLATE_ARGS_FILE="~{write_lines([template_args])}"
-    TEMPLATE_ARGS=$(jq -c . < "${TEMPLATE_ARGS_FILE}")
+    parsed_template_args=$(jq -c . < "~{write_lines([template_args])}")
 
     workflow_id=$(aspen-cli db create-phylo-run                  \
                       --group-name "~{group_name}"               \
-                      --builds-template-args "${TEMPLATE_ARGS}"  \
+                      --builds-template-args '~{parsed_template_args}'  \
                       --tree-type "~{tree_type}"
     )
 
