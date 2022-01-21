@@ -64,7 +64,6 @@ SAMPLES_POST_OPTIONAL_FIELDS = [
     # following fields from PathogenGenome
     "sequencing_date",
     "sequencing_depth",
-    "isl_access_number",
 ]
 
 
@@ -264,22 +263,6 @@ def create_sample():
                     data["pathogen_genome"]["sequencing_date"]
                 ),
             )
-            if data["pathogen_genome"]["isl_access_number"]:
-                uploaded_pathogen_genome.add_accession(
-                    repository_type=PublicRepositoryType.GISAID,
-                    public_identifier=data["pathogen_genome"]["isl_access_number"],
-                    workflow_start_datetime=datetime.datetime.now(),
-                    workflow_end_datetime=datetime.datetime.now(),
-                )
-            elif submitted_to_gisaid:
-                # in this scenario they've checked yes to previously submitted to GISAID but did
-                # not provide an isl-number, we mark it as UNKNOWN for now.
-                uploaded_pathogen_genome.add_accession(
-                    repository_type=PublicRepositoryType.GISAID,
-                    public_identifier=None,
-                    workflow_start_datetime=datetime.datetime.now(),
-                    workflow_end_datetime=datetime.datetime.now(),
-                )
 
             g.db_session.add(sample)
             g.db_session.add(uploaded_pathogen_genome)
