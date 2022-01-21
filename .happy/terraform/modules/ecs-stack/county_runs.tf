@@ -1,8 +1,34 @@
 locals {
   nextstrain_sfn_memory = 64000
   nextstrain_sfn_vcpus = 10
-  nextstrain_cron_schedule = local.deployment_stage == "geprod" ? ["cron(0 5 ? * MON-SAT *)"] : []
+  nextstrain_cron_schedule = local.deployment_stage == "geprod" ? ["cron(0 11 ? * MON-SAT *)"] : []
   default_template_args = jsonencode({"filter_start_date": "12 weeks ago", "filter_end_date": "now"})
+}
+
+module nextstrain_marin_contextual_sfn_config {
+  source   = "../sfn_config"
+  app_name = "nextstrain-marin-contextual-sfn"
+  image    = local.nextstrain_image
+  vcpus    = local.nextstrain_sfn_vcpus
+  memory   = local.nextstrain_sfn_memory
+  wdl_path = "workflows/nextstrain.wdl"
+  custom_stack_name     = local.custom_stack_name
+  deployment_stage      = local.deployment_stage
+  remote_dev_prefix     = local.remote_dev_prefix
+  stack_resource_prefix = local.stack_resource_prefix
+  swipe_comms_bucket    = local.swipe_comms_bucket
+  swipe_wdl_bucket      = local.swipe_wdl_bucket
+  sfn_arn               = local.swipe_sfn_arn
+  schedule_expressions  = contains(["geprod", "gestaging"], local.deployment_stage) ? ["cron(0 11 ? * MON-SAT *)"] : []
+  event_role_arn        = local.event_role_arn
+  extra_args            =  {
+    genepi_config_secret_name = "${local.deployment_stage}/genepi-config"
+    remote_dev_prefix        = local.remote_dev_prefix
+    group_name               = "Marin County Department of Health & Human Services"
+    s3_filestem              = "Marin"
+    template_args            = local.default_template_args
+    tree_type                = "OVERVIEW"
+  }
 }
 
 module nextstrain_chicago_contextual_sfn_config {
@@ -156,32 +182,6 @@ module nextstrain_humboldt_contextual_sfn_config {
     remote_dev_prefix        = local.remote_dev_prefix
     group_name               = "Humboldt County Dept Human and Health Sevices-Public Health"
     s3_filestem              = "Humboldt"
-    template_args            = local.default_template_args
-    tree_type                = "OVERVIEW"
-  }
-}
-
-module nextstrain_marin_contextual_sfn_config {
-  source   = "../sfn_config"
-  app_name = "nextstrain-marin-contextual-sfn"
-  image    = local.nextstrain_image
-  vcpus    = local.nextstrain_sfn_vcpus
-  memory   = local.nextstrain_sfn_memory
-  wdl_path = "workflows/nextstrain.wdl"
-  custom_stack_name     = local.custom_stack_name
-  deployment_stage      = local.deployment_stage
-  remote_dev_prefix     = local.remote_dev_prefix
-  stack_resource_prefix = local.stack_resource_prefix
-  swipe_comms_bucket    = local.swipe_comms_bucket
-  swipe_wdl_bucket      = local.swipe_wdl_bucket
-  sfn_arn               = local.swipe_sfn_arn
-  schedule_expressions  = contains(["geprod", "gestaging"], local.deployment_stage) ? ["cron(0 5 ? * MON-SAT *)"] : []
-  event_role_arn        = local.event_role_arn
-  extra_args            =  {
-    genepi_config_secret_name = "${local.deployment_stage}/genepi-config"
-    remote_dev_prefix        = local.remote_dev_prefix
-    group_name               = "Marin County Department of Health & Human Services"
-    s3_filestem              = "Marin"
     template_args            = local.default_template_args
     tree_type                = "OVERVIEW"
   }
@@ -368,7 +368,6 @@ module nextstrain_san_francisco_contextual_sfn_config {
     tree_type                = "OVERVIEW"
   }
 }
-
 
 module nextstrain_tulare_contextual_sfn_config {
   source   = "../sfn_config"
