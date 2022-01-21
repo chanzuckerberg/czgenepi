@@ -1,48 +1,28 @@
 import datetime
 from typing import Any, Mapping, Optional
 
-from aspen.database.models import (
-    GisaidAccession,
-    GisaidAccessionWorkflow,
-    Sample,
-    WorkflowStatusType,
-)
+from aspen.database.models import Accession, AccessionType, Sample
 
 
 def determine_gisaid_status(
     sample: Sample,
-    gisaid_accession_workflow: Optional[GisaidAccessionWorkflow],
-    gisaid_accession: Optional[GisaidAccession],
-    rejection_time: datetime.timedelta,
 ) -> Mapping[str, Optional[str]]:
     if sample.czb_failed_genome_recovery:
         return {"status": "Not Eligible", "gisaid_id": None}
 
-    if not gisaid_accession_workflow:
-        return {"status": "Not Yet Submitted", "gisaid_id": None}
+    gisaid_accession: Optional[Accession] = None
+    for accession in sample.accessions:
+        if accession.accession_type == AccessionType.GISAID_ISL:
+            gisaid_accession = accession
+            break
 
-    if (
-        gisaid_accession_workflow.workflow_status == WorkflowStatusType.COMPLETED
-        and gisaid_accession
-    ):
-        if not gisaid_accession.public_identifier:
-            return {
-                "status": "Submitted",
-                "gisaid_id": "Not Provided",
-            }
+    if gisaid_accession:
         return {
             "status": "Accepted",
-            "gisaid_id": gisaid_accession.public_identifier,
+            "gisaid_id": gisaid_accession.accession,
         }
 
-    date_since_submitted = (
-        datetime.date.today() - gisaid_accession_workflow.start_datetime.date()
-    )
-    if date_since_submitted < rejection_time:
-        return {"status": "Submitted", "gisaid_id": None}
-    else:
-        return {"status": "Rejected", "gisaid_id": None}
-    return {"status": "Not Yet Submitted", "gisaid_id": None}
+    return {"status": "Not Found", "gisaid_id": None}
 
 
 def format_sample_lineage(sample: Sample) -> dict[str, Any]:
