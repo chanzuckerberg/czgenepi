@@ -11,7 +11,6 @@ import sentry_sdk
 import smart_open
 from flask import g, jsonify, make_response, request, Response, stream_with_context
 from marshmallow.exceptions import ValidationError
-from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.query import Query
 
@@ -300,59 +299,6 @@ def create_sample():
     )
     pangolin_job.start()
 
-    return jsonify(success=True)
-
-
-@application.route("/api/samples/update/publicids", methods=["POST"])
-@requires_auth
-def update_sample_public_ids():
-    user: User = g.auth_user
-    request_data = request.get_json()
-
-    if not user.system_admin:
-        raise ex.BadRequestException(
-            "user making update request must be a system admin",
-        )
-
-    private_to_public: Mapping[str, str] = request_data["id_mapping"]
-    request_private_ids: list[str] = private_to_public.keys()
-    request_public_ids: list[str] = private_to_public.values()
-
-    group_id: int = request_data["group_id"]
-
-    # check that all private_identifiers exist
-    existing_private_ids: list[str] = api_utils.get_existing_private_ids(
-        request_private_ids, g.db_session, group_id=group_id
-    )
-    missing_private_identifiers = [
-        s for s in request_private_ids if s not in existing_private_ids
-    ]
-    if missing_private_identifiers:
-        raise ex.BadRequestException(
-            f"Private Identifiers {missing_private_identifiers} not found in DB",
-        )
-
-    samples_to_update = g.db_session.query(Sample).filter(
-        and_(
-            Sample.submitting_group_id == group_id,
-            Sample.private_identifier.in_(private_to_public.keys()),
-        )
-    )
-
-    # check that public_identifiers don't already exist
-    existing_public_ids: list[str] = api_utils.get_existing_public_ids(
-        request_public_ids, g.db_session, group_id=group_id
-    )
-    if existing_public_ids:
-        raise ex.BadRequestException(
-            f"Public Identifiers {existing_public_ids} are already in the database",
-        )
-
-    for s in samples_to_update.all():
-        s.public_identifier = private_to_public[s.private_identifier]
-        g.db_session.add(s)
-
-    g.db_session.commit()
     return jsonify(success=True)
 
 
