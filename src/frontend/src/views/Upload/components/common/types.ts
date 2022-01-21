@@ -62,7 +62,6 @@ export interface ErrorCode {
 interface CommonMetadata {
   sampleId?: string;
   collectionDate?: string;
-  islAccessionNumber?: string;
   keepPrivate?: boolean;
   publicId?: string;
   sequencingDate?: string;

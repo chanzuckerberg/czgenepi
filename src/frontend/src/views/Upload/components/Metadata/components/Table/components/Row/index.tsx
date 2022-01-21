@@ -161,13 +161,6 @@ export default React.memo(function Row({
           fieldKey="publicId"
         />
       </StyledTableCell>
-      <StyledTableCell component="div">
-        <FreeTextField
-          isShown={Boolean(values.submittedToGisaid)}
-          formik={formik}
-          fieldKey="islAccessionNumber"
-        />
-      </StyledTableCell>
     </StyledTableRow>
   );
 });

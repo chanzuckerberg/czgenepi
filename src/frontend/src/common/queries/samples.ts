@@ -132,7 +132,6 @@ export async function createSamples({
       collectionLocation,
       keepPrivate,
       sequencingDate,
-      islAccessionNumber,
       publicId,
     } = sampleMetadata;
 
@@ -140,7 +139,6 @@ export async function createSamples({
       pathogen_genome: {
         sequence,
         [METADATA_KEYS_TO_API_KEYS.sequencingDate]: sequencingDate,
-        [METADATA_KEYS_TO_API_KEYS.islAccessionNumber]: islAccessionNumber,
       },
       sample: {
         [METADATA_KEYS_TO_API_KEYS.collectionDate]: collectionDate,

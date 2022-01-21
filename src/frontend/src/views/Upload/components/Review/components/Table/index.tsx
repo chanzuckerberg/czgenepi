@@ -45,9 +45,6 @@ export default function Table({ metadata }: Props): JSX.Element {
                 <StyledTableCell component="div">
                   {METADATA_KEYS_TO_HEADERS.publicId}
                 </StyledTableCell>
-                <StyledTableCell component="div">
-                  {METADATA_KEYS_TO_HEADERS.islAccessionNumber}
-                </StyledTableCell>
               </StyledTableRow>
             </TableHead>
             {metadata && (
