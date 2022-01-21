@@ -24,7 +24,6 @@ from aspen.database.models import (
     PhyloRun,
     PublicRepositoryType,
     Sample,
-    TreeType,
     UploadedPathogenGenome,
 )
 from aspen.database.models.workflow import Workflow
@@ -115,14 +114,12 @@ def export_run_config(
             session, county_samples, sequences_fh, metadata_fh
         )
 
-        # Write include.txt file(s) for targeted/non_contextualized builds.
-        if phylo_run.tree_type != TreeType.OVERVIEW:
-            selected_samples: List[PathogenGenome] = [
-                inp for inp in phylo_run.inputs if isinstance(inp, PathogenGenome)
-            ]
-            num_included_samples = write_includes_file(
-                session, phylo_run.gisaid_ids, selected_samples, selected_fh
-            )
+        selected_samples: List[PathogenGenome] = [
+            inp for inp in phylo_run.inputs if isinstance(inp, PathogenGenome)
+        ]
+        num_included_samples = write_includes_file(
+            session, phylo_run.gisaid_ids, selected_samples, selected_fh
+        )
 
         # Give the nexstrain config builder some info to make decisions
         context = {

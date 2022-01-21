@@ -29,7 +29,7 @@ from aspen.database.models import (
 from aspen.database.models.workflow import SoftwareNames
 
 
-def create_test_group(session, group_name, prefix):
+def create_test_group(session, group_name, prefix, default_tree_location):
     g = session.query(Group).filter(Group.name == group_name).one_or_none()
     if g:
         print("Group already exists")
@@ -39,6 +39,7 @@ def create_test_group(session, group_name, prefix):
         name=group_name,
         address="123 Example St, Redwood City CA",
         prefix=prefix,
+        default_tree_location=default_tree_location,
     )
     session.add(g)
     session.commit()
@@ -328,18 +329,20 @@ def create_test_data(engine):
     _ = create_gisaid(session)
 
     # Create db rows for our main test user
-    group = create_test_group(session, "CZI", "CZI")
-    user = create_test_user(session, group, "User1", "Test User")
     location = create_location(
         session, "North America", "USA", "California", "San Mateo County"
     )
+    group = create_test_group(session, "CZI", "CZI", location)
+    user = create_test_user(session, group, "User1", "Test User")
     create_samples(session, group, user, location, 10, 5)
     create_test_trees(session, group, user)
 
     # Create db rows for another group
-    group2 = create_test_group(session, "Timbuktu Dept of Public Health", "TBK")
-    user2 = create_test_user(session, group2, "tbktu", "Timbuktu User")
     location2 = create_location(session, "Africa", "Mali", "Timbuktu", None)
+    group2 = create_test_group(
+        session, "Timbuktu Dept of Public Health", "TBK", location2
+    )
+    user2 = create_test_user(session, group2, "tbktu", "Timbuktu User")
     create_samples(session, group2, user2, location2, 10, 10)
     create_test_trees(session, group2, user2)
 
