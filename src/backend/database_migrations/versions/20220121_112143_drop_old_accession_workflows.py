@@ -23,25 +23,20 @@ def upgrade():
     op.drop_table("gisaid_accessions", schema="aspen")
     op.drop_table("gisaid_workflows", schema="aspen")
 
-    drop_gisaid_workflows_sql = sa.sql.text(
-        "DELETE FROM workflows WHERE workflow_type = 'GISAID_REPOSITORY_SUBMISSION'"
-    )
-    conn.execute(drop_gisaid_workflows_sql)
-
-    drop_genbank_workflows_sql = sa.sql.text(
-        "DELETE FROM workflows WHERE workflow_type = 'GENBANK_REPOSITORY_SUBMISSION'"
-    )
-    conn.execute(drop_genbank_workflows_sql)
-
     drop_gisaid_entities_sql = sa.sql.text(
-        "DELETE FROM entities WHERE entity_type = 'GISAID_REPOSITORY_SUBMISSION'"
+        "DELETE FROM aspen.entities WHERE entity_type IN ('GISAID_REPOSITORY_SUBMISSION', 'GENBANK_REPOSITORY_SUBMISSION')"
     )
     conn.execute(drop_gisaid_entities_sql)
 
-    drop_genbank_entities_sql = sa.sql.text(
-        "DELETE FROM entities WHERE entity_type = 'GENBANK_REPOSITORY_SUBMISSION'"
+    drop_gisaid_workflow_inputs_sql = sa.sql.text(
+        "DELETE FROM aspen.workflow_inputs WHERE workflow_id IN (SELECT id FROM aspen.workflows WHERE workflow_type IN ('GISAID_REPOSITORY_SUBMISSION', 'GENBANK_REPOSITORY_SUBMISSION'))"
     )
-    conn.execute(drop_genbank_entities_sql)
+    conn.execute(drop_gisaid_workflow_inputs_sql)
+
+    drop_gisaid_workflows_sql = sa.sql.text(
+        "DELETE FROM aspen.workflows WHERE workflow_type IN ('GISAID_REPOSITORY_SUBMISSION', 'GENBANK_REPOSITORY_SUBMISSION')"
+    )
+    conn.execute(drop_gisaid_workflows_sql)
 
     op.enum_delete(
         "workflow_types",
