@@ -148,7 +148,6 @@ function createTsv(samples: CommonProps["samples"]): {
     keepPrivate,
     submittedToGisaid,
     publicId,
-    islAccessionNumber,
   } = METADATA_KEYS_TO_HEADERS;
 
   const rows = Object.keys(samples || EMPTY_OBJECT).map((sampleId, index) => [
@@ -166,7 +165,6 @@ function createTsv(samples: CommonProps["samples"]): {
       keepPrivate,
       submittedToGisaid,
       publicId,
-      islAccessionNumber,
     ],
     rows: [...EXAMPLES, ...rows],
   };

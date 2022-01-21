@@ -25,12 +25,7 @@ from aspen.app.views.api_utils import (
     get_missing_and_found_sample_ids,
 )
 from aspen.database.connection import session_scope
-from aspen.database.models import (
-    Location,
-    PublicRepositoryType,
-    Sample,
-    UploadedPathogenGenome,
-)
+from aspen.database.models import Location, Sample, UploadedPathogenGenome
 from aspen.database.models.sample import create_public_ids
 from aspen.database.models.usergroup import Group, User
 from aspen.error import http_exceptions as ex
@@ -203,12 +198,10 @@ def create_sample():
             public_identifier = data["sample"].get("public_identifier")
             if public_identifier:
                 # if they provided a public_id they marked true to "submitted to gisaid"
-                submitted_to_gisaid = True
                 public_identifier = data["sample"]["public_identifier"]
             else:
                 # if they did not mark true to "submitted to gisaid generate a new public id for
                 # them
-                submitted_to_gisaid = False
                 public_identifier = public_ids.pop(0)
 
             sample_args: Mapping[str, Any] = {

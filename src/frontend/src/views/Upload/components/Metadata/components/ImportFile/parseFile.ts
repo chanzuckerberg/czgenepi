@@ -133,7 +133,7 @@ function autocorrect(
    * (thuang): Set `submittedToGisaid` to `true`, if related optional
    * fields are present
    */
-  if (metadata.publicId || metadata.islAccessionNumber) {
+  if (metadata.publicId) {
     const sampleIdToCorrectedKeys =
       warningMessages.get(WARNING_CODE.AUTO_CORRECT) || {};
 
