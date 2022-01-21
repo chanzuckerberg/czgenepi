@@ -1,7 +1,6 @@
 import datetime
 
 from aspen.database.models import CanSee, DataType, PublicRepositoryType
-from aspen.test_infra.models.accession_workflow import AccessionWorkflowDirective
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
@@ -189,28 +188,11 @@ def test_access_matrix(
         private=True,
     )
     sequences = {"sample1": "CAT", "sample2": "TAC", "sample3": "ATC", "sample4": "CCC"}
-    accessions = {
-        sequence_name: AccessionWorkflowDirective(
-            PublicRepositoryType.GISAID,
-            datetime.datetime.now(),
-            datetime.datetime.now(),
-            sequence_name,
-        )
-        for sequence_name in ["seq1", "seq2", "seq3", "seq4"]
-    }
 
-    uploaded_pathogen_genome_factory(
-        sample1, accessions=[accessions["seq1"]], sequence="CAT"
-    )
-    uploaded_pathogen_genome_factory(
-        sample2, accessions=[accessions["seq2"]], sequence="TAC"
-    )
-    uploaded_pathogen_genome_factory(
-        sample3, accessions=[accessions["seq3"]], sequence="ATC"
-    )
-    uploaded_pathogen_genome_factory(
-        sample4, accessions=[accessions["seq4"]], sequence="CCC"
-    )
+    uploaded_pathogen_genome_factory(sample1, sequence="CAT")
+    uploaded_pathogen_genome_factory(sample2, sequence="TAC")
+    uploaded_pathogen_genome_factory(sample3, sequence="ATC")
+    uploaded_pathogen_genome_factory(sample4, sequence="CCC")
 
     session.add_all((owner_group1, owner_group2, viewer_group, owner))
     session.commit()

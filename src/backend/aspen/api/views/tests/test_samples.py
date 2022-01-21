@@ -21,7 +21,6 @@ from aspen.database.models import (
     SequencingReadsCollection,
     User,
 )
-from aspen.test_infra.models.accession_workflow import AccessionWorkflowDirective
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
