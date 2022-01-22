@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import datetime
 import enum
 from typing import (
     Mapping,
@@ -22,11 +21,6 @@ from aspen.database.models.base import base, idbase
 from aspen.database.models.enum import Enum
 
 if TYPE_CHECKING:
-    from aspen.database.models.accessions import (
-        AccessionBase,
-        PublicRepositoryType,
-        PublicRepositoryTypeMetadata,
-    )
     from aspen.database.models.workflow import Workflow
 
 
@@ -43,8 +37,6 @@ class EntityType(enum.Enum):
     PROCESSED_GISAID_DUMP = "PROCESSED_GISAID_DUMP"
     ALIGNED_GISAID_DUMP = "ALIGNED_GISAID_DUMP"
     PHYLO_TREE = "PHYLO_TREE"
-    GISAID_REPOSITORY_SUBMISSION = "GISAID_REPOSITORY_SUBMISSION"
-    GENBANK_REPOSITORY_SUBMISSION = "GENBANK_REPOSITORY_SUBMISSION"
 
 
 # Create the enumeration table
@@ -128,27 +120,3 @@ class Entity(idbase):  # type: ignore
                 results.append(tup)
 
         return results
-
-    def accessions(self) -> Sequence[AccessionBase]:
-        from .accessions import AccessionBase
-
-        results: MutableSequence[AccessionBase] = list()
-        for workflow, accessions in self.get_children(AccessionBase):
-            results.extend(accessions)
-        return results
-
-    def add_accession(
-        self,
-        repository_type: PublicRepositoryType,
-        public_identifier: str,
-        workflow_start_datetime: datetime.datetime,
-        workflow_end_datetime: datetime.datetime,
-    ):
-        """Adds an accession to this object."""
-        public_repository_metadata: PublicRepositoryTypeMetadata = repository_type.value
-        public_repository_metadata.accession_cls.attach_to_entity(
-            self,
-            public_identifier,
-            workflow_start_datetime,
-            workflow_end_datetime,
-        )

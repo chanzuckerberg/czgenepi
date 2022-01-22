@@ -1,13 +1,6 @@
 from sqlalchemy.orm import configure_mappers
 
-from aspen.database.models.accessions import (  # noqa: F401
-    Accession,
-    AccessionType,
-    GisaidAccession,
-    GisaidAccessionWorkflow,
-    PublicRepositoryType,
-    PublicRepositoryTypeMetadata,
-)
+from aspen.database.models.accessions import Accession, AccessionType  # noqa: F401
 from aspen.database.models.align_read import AlignRead, Bam  # noqa: F401
 from aspen.database.models.base import meta  # noqa: F401
 from aspen.database.models.cansee import CanSee, DataType  # noqa: F401
