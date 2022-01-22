@@ -21,7 +21,6 @@ def upgrade():
     op.drop_table("genbank_accessions", schema="aspen")
     op.drop_table("gisaid_accession_workflows", schema="aspen")
     op.drop_table("gisaid_accessions", schema="aspen")
-    op.drop_table("gisaid_workflows", schema="aspen")
 
     drop_gisaid_entities_sql = sa.sql.text(
         "DELETE FROM aspen.entities WHERE entity_type IN ('GISAID_REPOSITORY_SUBMISSION', 'GENBANK_REPOSITORY_SUBMISSION')"
