@@ -35,31 +35,22 @@ export enum WARNING_CODE {
    * for the user
    */
   AUTO_CORRECT,
+  // Metadata row in upload was missing required data for one or more fields
+  MISSING_DATA,
+  // Metdata row in upload was not found in user's previously uploaded samples
+  EXTRANEOUS_ENTRY,
+  // Sample ID appeared in user's sequence upload, but not in metadata upload
+  ABSENT_SAMPLE,
 }
 
 export enum ERROR_CODE {
   DEFAULT, // BAD FILE NAME
   INVALID_NAME,
-  MISSING_FIELD,
+  MISSING_FIELD, // Missing required column entirely: no header field found
   OVER_MAX_SAMPLES,
 }
 
-export interface DEFAULT {
-  code: 1;
-  message: "test message";
-}
-
-export interface INVALID_NAME {
-  code: 2;
-  message: "test message invalid name";
-}
-
-export interface ErrorCode {
-  code: ERROR_CODE;
-  filename: string;
-}
-
-interface CommonMetadata {
+export interface Metadata {
   sampleId?: string;
   collectionDate?: string;
   islAccessionNumber?: string;
@@ -67,25 +58,16 @@ interface CommonMetadata {
   publicId?: string;
   sequencingDate?: string;
   submittedToGisaid?: boolean;
-}
-
-// used by the app
-export interface Metadata extends CommonMetadata {
   collectionLocation?: NamedGisaidLocation;
-}
-
-// parsed from the TSV
-export interface ParsedMetadata extends CommonMetadata {
-  locationString?: string;
 }
 
 export interface Props {
   samples: Samples | null;
   setSamples: React.Dispatch<React.SetStateAction<Samples | null>>;
+  namedLocations: NamedGisaidLocation[];
   metadata: SampleIdToMetadata | null;
   setMetadata: React.Dispatch<React.SetStateAction<SampleIdToMetadata | null>>;
   cancelPrompt: () => void;
 }
 
 export type SampleIdToMetadata = Record<string, Metadata>;
-export type SampleIdToParsedMetadata = Record<string, ParsedMetadata>;
