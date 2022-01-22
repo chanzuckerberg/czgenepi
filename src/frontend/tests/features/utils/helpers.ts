@@ -2,7 +2,7 @@ import ENV from "src/common/constants/ENV";
 import nodeEnv from "src/common/constants/nodeEnv";
 import { getTestID, getText } from "./selectors";
 
-export const TIMEOUT_MS = 5 * 1000;
+export const TIMEOUT_MS = 30 * 1000;
 
 export async function goToPage(
   url: string = ENV.FRONTEND_URL as string
