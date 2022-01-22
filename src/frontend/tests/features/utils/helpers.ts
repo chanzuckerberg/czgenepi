@@ -20,7 +20,7 @@ export async function login(): Promise<void> {
       timeout: TIMEOUT_MS,
     });
   } catch (error) {
-    await page.click(getText("Sign In"));
+    await page.click(getText("Sign in"));
 
     await page.fill('[name="Username"], [name="username"]', ENV.E2E_USERNAME);
     await page.fill('[name="Password"], [name="password"]', ENV.E2E_PASSWORD);
