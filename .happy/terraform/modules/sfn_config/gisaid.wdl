@@ -305,7 +305,7 @@ task AlignGISAID {
     output {
         Array[File] snakemake_logs = glob("*.snakemake.log")
         File gisaid_metadata = "metadata.tsv"
-        File align_log = "filtered_gisaid.txt"
+        File align_log = "align_gisaid.txt"
         String entity_id = read_string("entity_id")
     }
 
