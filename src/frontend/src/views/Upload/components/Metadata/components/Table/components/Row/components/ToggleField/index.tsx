@@ -19,6 +19,7 @@ export default function ToggleField({
 }: Props): JSX.Element {
   const { handleChange, handleBlur, values } = formik;
 
+  // Truthy `value` <--> Yes, On, Enabled, True, Affirmed, etc
   const value = values[fieldKey] ?? false;
 
   return (
@@ -36,7 +37,7 @@ export default function ToggleField({
             disabled={isDisabled}
           />
         }
-        label="Yes"
+        label={value ? "Yes" : "No"}
       />
       {isAutocorrected && (
         <FormHelperText margin="dense" variant="filled">

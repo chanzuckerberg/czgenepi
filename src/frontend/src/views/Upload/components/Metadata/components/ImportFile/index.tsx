@@ -1,30 +1,38 @@
 import { Button } from "czifui";
-import React, { useEffect, useState } from "react";
+import { isEmpty } from "lodash";
+import React, { useEffect, useMemo, useState } from "react";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
+import { StringToLocationFinder } from "src/common/utils/locationUtils";
 import FilePicker from "src/components/FilePicker";
 import {
   ERROR_CODE,
   Props as CommonProps,
   WARNING_CODE,
 } from "src/views/Upload/components/common/types";
-import { METADATA_KEYS_TO_HEADERS } from "../../../common/constants";
 import Error from "./components/Alerts/Error";
 import Success from "./components/Alerts/Success";
-import Warning from "./components/Alerts/Warning";
+import {
+  WarningAbsentSample,
+  WarningAutoCorrect,
+  WarningExtraneousEntry,
+  WarningMissingData,
+} from "./components/Alerts/warnings";
 import DownloadTemplate from "./components/DownloadTemplate";
 import Instructions from "./components/Instructions";
-import { EXAMPLES } from "./constants";
 import { parseFile, ParseResult, SampleIdToWarningMessages } from "./parseFile";
+import { prepMetadataTemplate } from "./prepMetadataTemplate";
 import { IntroWrapper, Title, TitleWrapper, Wrapper } from "./style";
 
 interface Props {
   handleMetadata: (result: ParseResult) => void;
   samples: CommonProps["samples"];
+  stringToLocationFinder: StringToLocationFinder;
 }
 
 export default function ImportFile({
   handleMetadata,
   samples,
+  stringToLocationFinder,
 }: Props): JSX.Element {
   const [isInstructionsShown, setIsInstructionsShown] = useState(false);
   const [hasImportedFile, setHasImportedFile] = useState(false);
@@ -32,35 +40,46 @@ export default function ImportFile({
   const [autocorrectCount, setAutocorrectCount] = useState<number>(0);
   const [filename, setFilename] = useState("");
   const [parseResult, setParseResult] = useState<ParseResult | null>(null);
-  const [unusedSampleIds, setUnusedSampleIds] = useState<string[]>([]);
+  const [extraneousSampleIds, setExtraneousSampleIds] = useState<string[]>([]);
+  const [absentSampleIds, setAbsentSampleIds] = useState<string[]>([]);
+  const [missingData, setMissingData] =
+    useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
 
+  // Determine mismatches between uploaded metadata IDs and previous step's IDs.
+  // `extraneousSampleIds` are what was in metadata, but not in sequence upload
+  // `absentSampleIds` were in sequence upload, but missing from metadata
   useEffect(() => {
     if (!parseResult) return;
 
     const { data } = parseResult;
+    const parseResultSampleIds = Object.keys(data);
+    const sampleIds = Object.keys(samples || EMPTY_OBJECT);
 
-    const parseResultSampleIds = new Set(Object.keys(data));
-    const sampleIds = new Set(Object.keys(samples || EMPTY_OBJECT));
+    const sampleIdsSet = new Set(sampleIds);
+    const extraneousSampleIds = parseResultSampleIds.filter((parseId) => {
+      return !sampleIdsSet.has(parseId);
+    });
+    setExtraneousSampleIds(extraneousSampleIds);
 
-    const unusedSampleIds = [];
-
-    for (const parseResultSampleId of parseResultSampleIds) {
-      if (sampleIds.has(parseResultSampleId)) continue;
-
-      unusedSampleIds.push(parseResultSampleId);
-    }
-
-    setUnusedSampleIds(unusedSampleIds);
+    const parseResultSampleIdsSet = new Set(parseResultSampleIds);
+    const absentSampleIds = sampleIds.filter((sampleId) => {
+      return !parseResultSampleIdsSet.has(sampleId);
+    });
+    setAbsentSampleIds(absentSampleIds);
   }, [parseResult, samples]);
 
   const handleInstructionsClick = () => {
     setIsInstructionsShown(!isInstructionsShown);
   };
 
+  const { templateHeaders, templateRows } = useMemo(() => {
+    return prepMetadataTemplate(Object.keys(samples || EMPTY_OBJECT));
+  }, [samples]);
+
   const handleFiles = async (files: FileList | null) => {
     if (!files) return;
 
-    const result = await parseFile(files[0]);
+    const result = await parseFile(files[0], stringToLocationFinder);
 
     const { errorMessages, warningMessages, filename } = result;
 
@@ -76,11 +95,12 @@ export default function ImportFile({
     setAutocorrectCount(autocorrectCount);
     setFilename(filename);
     setParseResult(result);
+    setMissingData(
+      warningMessages.get(WARNING_CODE.MISSING_DATA) || EMPTY_OBJECT
+    );
 
     handleMetadata(result);
   };
-
-  const { headers, rows } = createTsv(samples);
 
   return (
     <Wrapper>
@@ -90,12 +110,14 @@ export default function ImportFile({
           <Button color="primary" onClick={handleInstructionsClick}>
             {isInstructionsShown ? "HIDE" : "SHOW"} INSTRUCTIONS
           </Button>
-          <DownloadTemplate headers={headers} rows={rows}>
+          <DownloadTemplate headers={templateHeaders} rows={templateRows}>
             <Button color="primary">Download Metadata Template (TSV)</Button>
           </DownloadTemplate>
         </TitleWrapper>
 
-        {isInstructionsShown && <Instructions headers={headers} rows={rows} />}
+        {isInstructionsShown && (
+          <Instructions headers={templateHeaders} rows={templateRows} />
+        )}
       </IntroWrapper>
 
       <div>
@@ -115,7 +137,7 @@ export default function ImportFile({
       <RenderOrNull
         condition={
           hasImportedFile &&
-          !getIsParseResultCompletelyUnused(unusedSampleIds, parseResult)
+          !getIsParseResultCompletelyUnused(extraneousSampleIds, parseResult)
         }
       >
         <Success filename={filename} />
@@ -126,48 +148,22 @@ export default function ImportFile({
       </RenderOrNull>
 
       <RenderOrNull condition={autocorrectCount}>
-        <Warning sampleCount={autocorrectCount} />
+        <WarningAutoCorrect autocorrectedSamplesCount={autocorrectCount} />
       </RenderOrNull>
 
-      <RenderOrNull condition={unusedSampleIds.length}>
-        <Warning unusedSampleIds={unusedSampleIds} />
+      <RenderOrNull condition={extraneousSampleIds.length}>
+        <WarningExtraneousEntry extraneousSampleIds={extraneousSampleIds} />
+      </RenderOrNull>
+
+      <RenderOrNull condition={absentSampleIds.length}>
+        <WarningAbsentSample absentSampleIds={absentSampleIds} />
+      </RenderOrNull>
+
+      <RenderOrNull condition={!isEmpty(missingData)}>
+        <WarningMissingData missingData={missingData} />
       </RenderOrNull>
     </Wrapper>
   );
-}
-
-function createTsv(samples: CommonProps["samples"]): {
-  headers: string[];
-  rows: string[][];
-} {
-  const {
-    sampleId,
-    collectionDate,
-    collectionLocation,
-    sequencingDate,
-    keepPrivate,
-    submittedToGisaid,
-    publicId,
-  } = METADATA_KEYS_TO_HEADERS;
-
-  const rows = Object.keys(samples || EMPTY_OBJECT).map((sampleId, index) => [
-    String(index + 1),
-    sampleId,
-  ]);
-
-  return {
-    headers: [
-      "",
-      sampleId,
-      collectionDate,
-      collectionLocation,
-      sequencingDate,
-      keepPrivate,
-      submittedToGisaid,
-      publicId,
-    ],
-    rows: [...EXAMPLES, ...rows],
-  };
 }
 
 function RenderOrNull({
@@ -183,14 +179,14 @@ function RenderOrNull({
 }
 
 function getIsParseResultCompletelyUnused(
-  unusedSampleIds: string[],
+  extraneousSampleIds: string[],
   parseResult: ParseResult | null
 ) {
   if (!parseResult) return true;
 
   const { data } = parseResult;
 
-  return unusedSampleIds.length === Object.keys(data).length;
+  return extraneousSampleIds.length === Object.keys(data).length;
 }
 
 function getAutocorrectCount(

@@ -5,3 +5,7 @@ interface GisaidLocation {
   location: string;
   id: number;
 }
+
+interface NamedGisaidLocation extends GisaidLocation {
+  name: string;
+}

@@ -26,22 +26,21 @@ import {
 
 interface Props {
   metadata: CommonProps["metadata"];
+  hasImportedMetadataFile: boolean;
   setMetadata: CommonProps["setMetadata"];
   setIsValid: React.Dispatch<React.SetStateAction<boolean>>;
-  hasImportedFile: boolean;
   autocorrectWarnings: SampleIdToWarningMessages;
   locations: NamedGisaidLocation[];
 }
 
 export default function Table({
   metadata,
+  hasImportedMetadataFile,
   setMetadata,
   setIsValid,
-  hasImportedFile,
   autocorrectWarnings,
   locations,
 }: Props): JSX.Element {
-  const [isTouched, setIsTouched] = useState(hasImportedFile);
   const [isReadyToRenderTable, setIsReadyToTenderTable] = useState(false);
 
   const [rowValidation, setRowValidation] =
@@ -61,12 +60,6 @@ export default function Table({
 
     return () => clearTimeout(timeout);
   }, [metadata]);
-
-  useEffect(() => {
-    if (hasImportedFile) {
-      setIsTouched(true);
-    }
-  }, [hasImportedFile]);
 
   useEffect(() => {
     const isValid = Object.values(rowValidation).every((isValid) => isValid);
@@ -169,11 +162,11 @@ export default function Table({
                   ([sampleId, sampleMetadata], index) => {
                     return (
                       <Row
-                        isTouched={isTouched}
                         isFirstRow={index === 0}
                         key={sampleId}
                         id={sampleId}
                         metadata={sampleMetadata}
+                        hasImportedMetadataFile={hasImportedMetadataFile}
                         handleMetadata={handleRowMetadata}
                         applyToAllColumn={applyToAllColumn}
                         handleRowValidation={handleRowValidation}
