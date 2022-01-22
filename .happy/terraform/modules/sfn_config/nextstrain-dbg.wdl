@@ -60,12 +60,9 @@ task nextstrain_workflow {
     genepi_config="$(aws secretsmanager get-secret-value --secret-id ~{genepi_config_secret_name} --query SecretString --output text)"
     aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$genepi_config")"
 
-    # Recover tempalte args
-    parsed_template_args=$(jq -c . < "~{write_lines([template_args])}")
-
     workflow_id=$(aspen-cli db create-phylo-run                  \
                       --group-name "~{group_name}"               \
-                      --builds-template-args '~{parsed_template_args}'  \
+                      --builds-template-args '~{template_args}'  \
                       --tree-type "~{tree_type}"
     )
 
