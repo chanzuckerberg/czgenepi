@@ -270,16 +270,16 @@ task AlignGISAID {
     mkdir /ncov/my_profiles/align_gisaid/
     cp /usr/src/app/aspen/workflows/align_gisaid/{builds.yaml,config.yaml} /ncov/my_profiles/align_gisaid/
     # run snakemake, if run fails export the logs from snakemake and ncov to s3 
-    (cd /ncov && snakemake --printshellcmds results/filtered_gisaid.fasta.xz --profile my_profiles/align_gisaid) || { aws s3 cp /ncov/.snakemake/log/ "s3://${aspen_s3_db_bucket}/aligned_gisaid_dump/${build_id}/logs/snakemake/" --recursive ; aws s3 cp /ncov/logs/ "s3://${aspen_s3_db_bucket}/aligned_gisaid_dump/${build_id}/logs/ncov/" --recursive ; }
+    (cd /ncov && snakemake --printshellcmds results/aligned_gisaid.fasta.xz results/sanitized_metadata_gisaid.tsv.xz --profile my_profiles/align_gisaid) || { aws s3 cp /ncov/.snakemake/log/ "s3://${aspen_s3_db_bucket}/aligned_gisaid_dump/${build_id}/logs/snakemake/" --recursive ; aws s3 cp /ncov/logs/ "s3://${aspen_s3_db_bucket}/aligned_gisaid_dump/${build_id}/logs/ncov/" --recursive ; }
 
-    mv /ncov/.snakemake/log/*.snakemake.log /ncov/logs/filtered_gisaid.txt .
+    mv /ncov/.snakemake/log/*.snakemake.log /ncov/logs/align_gisaid.txt .
     unxz -k /ncov/results/sanitized_metadata_gisaid.tsv.xz  # make an unzipped version for ImportGISAID. The zipped version goes to S3
     mv /ncov/results/sanitized_metadata_gisaid.tsv metadata.tsv  # this is for wdl to pipe into ImportGISAID.
 
     # upload the files to S3
-    sequences_key="aligned_gisaid_dump/${build_id}/filtered_gisaid.fasta.xz"
+    sequences_key="aligned_gisaid_dump/${build_id}/aligned_gisaid.fasta.xz"
     metadata_key="aligned_gisaid_dump/${build_id}/sanitized_metadata_gisaid.tsv.xz"
-    aws s3 cp /ncov/results/filtered_gisaid.fasta.xz "s3://${aspen_s3_db_bucket}/${sequences_key}"
+    aws s3 cp /ncov/results/aligned_gisaid.fasta.xz "s3://${aspen_s3_db_bucket}/${sequences_key}"
     aws s3 cp /ncov/results/sanitized_metadata_gisaid.tsv.xz "s3://${aspen_s3_db_bucket}/${metadata_key}"
 
     # These are set by the Dockerfile and the Happy CLI
@@ -305,7 +305,7 @@ task AlignGISAID {
     output {
         Array[File] snakemake_logs = glob("*.snakemake.log")
         File gisaid_metadata = "metadata.tsv"
-        File align_log = "filtered_gisaid.txt"
+        File align_log = "align_gisaid.txt"
         String entity_id = read_string("entity_id")
     }
 
