@@ -1,0 +1,16 @@
+--- a/workflow/snakemake_rules/main_workflow.smk
++++ b/workflow/snakemake_rules/main_workflow.smk
+@@ -254,9 +254,10 @@ rule index_sequences:
+     conda: config["conda_environment"]
+     shell:
+         """
+-        augur index \
+-            --sequences {input.sequences} \
+-            --output {output.sequence_index} 2>&1 | tee {log}
++        unxz --stdout {input.sequences} \
++            | seqtk comp -u - \
++            | sed '1i strain\tlength\tA\tC\tG\tT\tmix2\tmix3\tN\tCpG\ttransversion\ttransition\tCpG_ts' \
++            | xz -c -2 > {output.sequence_index} 2>&1 | tee {log}
+         """
+ 
+ rule subsample:

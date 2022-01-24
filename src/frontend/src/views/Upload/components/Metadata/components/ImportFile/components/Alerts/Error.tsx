@@ -32,7 +32,7 @@ export default function Error({
       "sample",
       count
     )} to correct any errors before proceeding:`,
-    [ERROR_CODE.MISSING_FIELD]: "Import Failed, file missing required data.",
+    [ERROR_CODE.MISSING_FIELD]: "Import Failed, file missing required field.",
     [ERROR_CODE.OVER_MAX_SAMPLES]: "placeholder",
     [ERROR_CODE.DEFAULT]:
       "Something went wrong, please try again or contact us!",

@@ -1,15 +1,13 @@
 import { Button } from "czifui";
-import { distance } from "fastest-levenshtein";
 import NextLink from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { HeadAppTitle } from "src/common/components";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
-import { getLocations, LocationsResponse } from "src/common/queries/locations";
 import { ROUTES } from "src/common/routes";
+import { createStringToLocationFinder } from "src/common/utils/locationUtils";
 import { EMPTY_METADATA } from "src/views/Upload/components/common/constants";
 import {
-  NamedGisaidLocation,
   Props,
   SampleIdToMetadata,
   WARNING_CODE,
@@ -31,115 +29,55 @@ import {
 } from "./components/ImportFile/parseFile";
 import Table from "./components/Table";
 
-function stringifyLocation(location: GisaidLocation): string {
-  let stringName = "";
-  const orderedKeys: Array<keyof GisaidLocation> = [
-    "region",
-    "country",
-    "division",
-    "location",
-  ];
-  orderedKeys.every((key) => {
-    if (location[key]) {
-      if (key != "region") {
-        stringName += "/";
-      }
-      stringName += `${location[key]}`;
-      return true;
-    } else {
-      return false;
-    }
-  });
-  return stringName;
-}
-
-function findLocationFromString(
-  locationString: string,
-  locations: NamedGisaidLocation[]
-): NamedGisaidLocation {
-  // compare levenshtein distances between location strings
-  // for this implementation, we are comparing against the
-  // Location.location - the narrowest scope (i.e. city/county level)
-  // I would like to bias the final results towards a user's group's
-  // location, but that will take some API modification.
-  const scoredLocations: [NamedGisaidLocation, number][] = Object.values(
-    locations
-  ).map((location) => {
-    if (location.location) {
-      return [location, distance(location.location, locationString)];
-    }
-    return [location, 99];
-  });
-  const candidateLocation = scoredLocations.reduce(
-    ([prevLocation, prevScore], [currLocation, currScore]) => {
-      if (currScore < prevScore) {
-        return [currLocation, currScore];
-      }
-      return [prevLocation, prevScore];
-    }
-  );
-  return candidateLocation[0];
-}
-
 export default function Metadata({
   samples,
+  namedLocations,
   metadata,
   setMetadata,
 }: Props): JSX.Element {
   const [isValid, setIsValid] = useState(false);
-  const [hasImportedFile, setHasImportedFile] = useState(false);
+  const [hasImportedMetadataFile, setHasImportedMetadataFile] =
+    useState<boolean>(false);
   const [autocorrectWarnings, setAutocorrectWarnings] =
     useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
-  const [locations, setLocations] = useState<NamedGisaidLocation[]>([]);
 
-  const loadLocations = async () => {
-    const result: LocationsResponse = await getLocations();
-    const namedLocations: NamedGisaidLocation[] = result.locations.map(
-      (location) => {
-        return {
-          name: stringifyLocation(location),
-          ...location,
-        };
-      }
-    );
-    setLocations(namedLocations);
-  };
+  // Used by file upload parser to convert location strings to Locations
+  const stringToLocationFinder = useMemo(() => {
+    return createStringToLocationFinder(namedLocations);
+  }, [namedLocations]);
 
-  useEffect(() => {
-    loadLocations();
-  }, []);
-
-  function handleMetadata(result: ParseResult) {
-    const { data: sampleIdToParsedMetadata, warningMessages } = result;
+  function handleMetadataFileUpload(result: ParseResult) {
+    // If they're on the page but somehow have no samples (eg, refreshing on
+    // Metadata page), short-circuit and do nothing to avoid any weirdness.
     if (!samples) return;
 
-    const newMetadata: SampleIdToMetadata = {};
+    const { data: sampleIdToUploadedMetadata, warningMessages } = result;
 
-    // (thuang): Only extract metadata for existing samples
+    // Filter out any metadata for samples they did not just upload
+    // Note: Might be cleaner to do this filtering inside of file parse call,
+    // but would require changing the way some of the warnings work currently.
+    const uploadedMetadata: SampleIdToMetadata = {};
     for (const sampleId of Object.keys(samples)) {
-      // get parsed metadata
-      const parsedMetadata = sampleIdToParsedMetadata[sampleId];
-      // try and match parsed collection location to a gisaid location
-      const locationString = parsedMetadata.locationString || "";
-      let collectionLocation = undefined;
-      if (locationString.length > 2) {
-        collectionLocation = findLocationFromString(locationString, locations);
+      if (sampleIdToUploadedMetadata[sampleId]) {
+        uploadedMetadata[sampleId] = sampleIdToUploadedMetadata[sampleId];
+      } else {
+        // If they did not provide metadata for a given sample, ensure that it
+        // has a sane default so it can be entered later and not dropped.
+        // FIXME (Vince): This winds up destroying any data the user might have
+        // previously entered for the sample via web form. It's not great, but
+        // it was pre-existing behavior and I don't have time to fix it right
+        // now because it would involve restructuring how we default metadata
+        uploadedMetadata[sampleId] = { ...EMPTY_METADATA };
       }
-      newMetadata[sampleId] = {
-        ...EMPTY_METADATA,
-        ...parsedMetadata,
-        collectionLocation,
-      };
     }
 
-    setMetadata(newMetadata);
+    setMetadata(uploadedMetadata);
+    setHasImportedMetadataFile(true);
 
     setAutocorrectWarnings(
       warningMessages.get(WARNING_CODE.AUTO_CORRECT) || EMPTY_OBJECT
     );
-    setHasImportedFile(true);
   }
-
   return (
     <>
       <HeadAppTitle subTitle="Metadata and Sharing" />
@@ -168,15 +106,19 @@ export default function Metadata({
           ]}
         />
 
-        <ImportFile samples={samples} handleMetadata={handleMetadata} />
+        <ImportFile
+          samples={samples}
+          handleMetadata={handleMetadataFileUpload}
+          stringToLocationFinder={stringToLocationFinder}
+        />
 
         <Table
-          hasImportedFile={hasImportedFile}
           setIsValid={setIsValid}
           metadata={metadata}
+          hasImportedMetadataFile={hasImportedMetadataFile}
           setMetadata={setMetadata}
           autocorrectWarnings={autocorrectWarnings}
-          locations={locations}
+          locations={namedLocations}
         />
 
         <ButtonWrapper>
