@@ -245,6 +245,16 @@ utility-%: ## Run make commands in the backend container (src/backend/Makefile) 
 backend-%: .env.ecr ## Run make commands in the backend container (src/backend/Makefile)
 	docker-compose $(COMPOSE_OPTS) run --no-deps --rm backend make $(subst backend-,,$@)
 
+.PHONY: frontend-e2e-ci
+frontend-e2e-ci: .env.ecr ## Run e2e tests with s3 screenshot wrapper.
+	docker-compose $(COMPOSE_OPTS) run -e CI=true --no-deps frontend make e2e; \
+	exit_status=$$?; \
+	test_container=$$(docker ps -a | grep -i frontend_run | cut -d ' ' -f 1 | head -n 1); \
+	docker cp $${test_container}:/tmp/screenshots .; \
+	docker rm $${test_container}; \
+	aws --profile genepi-dev s3 cp --recursive ./screenshots $${S3_PREFIX}; \
+	exit $$exit_status
+
 frontend-%: .env.ecr ## Run make commands in the frontend container (src/frontend/Makefile)
 	docker-compose $(COMPOSE_OPTS) run -e CI=true --no-deps --rm frontend make $(subst frontend-,,$@)
 

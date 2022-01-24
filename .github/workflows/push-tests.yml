@@ -31,7 +31,7 @@ jobs:
         with:
           registry: ${{ secrets.ECR_REPO }}
       - uses: actions/checkout@v2
-      - name: Jest tests
+      - name: Playwright tests
         run: |
           echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
           # Build backend image
@@ -42,4 +42,5 @@ jobs:
           echo "Init complete - testing web service"
           # docker-compose exec -T frontend wget -T 10 --tries 20 localhost:8000/
           echo "Webserver up, running tests!"
-          make frontend-e2e
+          export S3_PREFIX=${{ secrets.CI_SCREENSHOT_PREFIX }}/${{ github.run_id }}/
+          make frontend-e2e-ci

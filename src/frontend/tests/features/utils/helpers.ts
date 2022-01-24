@@ -10,7 +10,7 @@ export async function goToPage(
   await page.goto(url);
 }
 
-export async function login(): Promise<void> {
+export async function login(testInfo): Promise<void> {
   expect(ENV.E2E_USERNAME).toBeDefined();
 
   goToPage();
@@ -20,6 +20,15 @@ export async function login(): Promise<void> {
       timeout: TIMEOUT_MS,
     });
   } catch (error) {
+    // 2. logging HTML string here
+    // DEBUG
+    // DEBUG
+    // DEBUG
+    console.log(await page.content());
+    // TODO this is horribly broken but we're going to try dropping jest-playwright asap.
+    const title = expect.getState().currentTestName
+    await page.screenshot({ path: '/tmp/screenshots/' + title + '/homepage.png', fullPage: true });
+
     await page.click(getText("Sign in"));
 
     await page.fill('[name="Username"], [name="username"]', ENV.E2E_USERNAME);

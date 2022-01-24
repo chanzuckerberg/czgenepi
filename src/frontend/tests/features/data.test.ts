@@ -14,7 +14,7 @@ const ROW_PUBLIC_ID = "row-publicId";
 
 describe("Data", () => {
   describe("Samples Page", () => {
-    it("renders the basic elements", async () => {
+    test("renders the basic elements", async () => {
       await setupSamplesPage();
 
       await expect(page).toHaveSelector(getTestID("header-row"));
@@ -57,7 +57,7 @@ describe("Data", () => {
       );
     });
 
-    it("sorts by column header", async () => {
+    test("sorts by column header", async () => {
       await setupSamplesPage();
 
       const publicIds = await getAllPublicIds();
@@ -71,12 +71,12 @@ describe("Data", () => {
   });
 
   describe("Trees Page", () => {
-    it("renders the basic elements", async () => {
+    test("renders the basic elements", async () => {
       await setupTreesPage();
     });
 
     describeIfDeployed("Nextstrain link", () => {
-      it("generates the link", async () => {
+      test("generates the link", async () => {
         await setupTreesPage();
 
         await page.click(getTestID("tree-name-cell"));
