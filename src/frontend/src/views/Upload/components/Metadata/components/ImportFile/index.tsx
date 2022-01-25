@@ -124,7 +124,7 @@ export default function ImportFile({
         <FilePicker
           handleFiles={handleFiles}
           text="Select Metadata File"
-          accept=".tsv"
+          accept=".tsv,.csv"
           shouldConfirm={hasImportedFile}
           confirmTitle="Are you sure you want to import new data?"
           confirmContent={
