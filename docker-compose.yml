@@ -3,6 +3,7 @@ version: "3.8"
 services:
   database:
     image: "${DOCKER_REPO}genepi-devdb:latest"
+    profiles: ["backend", "web", "all"]
     ports:
       - "5432:5432"
     environment:
@@ -16,6 +17,7 @@ services:
           - database.genepinet.localdev
   frontend:
     image: "${DOCKER_REPO}genepi-frontend"
+    profiles: ["web", "all"]
     build:
       context: src/frontend
       cache_from:
@@ -42,6 +44,7 @@ services:
           - frontend.genepinet.localdev
   backend:
     image: "${DOCKER_REPO}genepi-backend"
+    profiles: ["backend", "web", "all"]
     build:
       context: src/backend
       cache_from:
@@ -83,6 +86,7 @@ services:
           - backend.genepinet.localdev
   localstack:
     image: localstack/localstack@sha256:7c6635493185d25165979995fb073fd789c72b6d8b17ef3a70b798d55576732f
+    profiles: ["backend", "web", "all"]
     ports:
       - "4566:4566"
     environment:
@@ -101,6 +105,7 @@ services:
           - localstack.genepinet.localdev
   oidc:
     image: soluto/oidc-server-mock:0.3.0
+    profiles: ["backend", "web", "all"]
     ports:
       - "4011:80"
       - "8443:8443"
@@ -129,6 +134,7 @@ services:
           - oidc.genepinet.localdev
   gisaid:
     image: "${DOCKER_REPO}genepi-gisaid"
+    profiles: ["jobs", "all"]
     build:
       context: src/backend/
       dockerfile: Dockerfile.gisaid
@@ -153,6 +159,7 @@ services:
           - gisaid.genepinet.localdev
   pangolin:
     image: "${DOCKER_REPO}genepi-pangolin"
+    profiles: ["jobs", "all"]
     build:
       context: src/backend
       dockerfile: Dockerfile.pangolin
@@ -173,6 +180,7 @@ services:
           - pangolin.genepinet.localdev
   nextstrain:
     image: "${DOCKER_REPO}genepi-nextstrain"
+    profiles: ["jobs", "all"]
     build:
       context: src/backend
       dockerfile: Dockerfile.nextstrain

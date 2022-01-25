@@ -19,6 +19,7 @@ LOCAL_DB_RW_USERNAME = user_rw
 LOCAL_DB_RW_PASSWORD = password_rw
 LOCAL_DB_RO_USERNAME = user_ro
 LOCAL_DB_RO_PASSWORD = password_ro
+LOCALDEV_PROFILE ?= web
 
 
 ### HELPFUL #################################################
@@ -112,7 +113,7 @@ init-empty-db:
 .PHONY: local-init
 local-init: oauth/pkcs12/certificate.pfx .env.ecr local-ecr-login local-hostconfig ## Launch a new local dev env and populate it with test data.
 	docker-compose $(COMPOSE_OPTS) pull database
-	docker-compose $(COMPOSE_OPTS) up -d database frontend backend localstack oidc
+	docker-compose $(COMPOSE_OPTS) --profile $(LOCALDEV_PROFILE) up -d
 	# Wait for psql to be up
 	while [ -z "$$(docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c 'select 1')" ]; do echo "waiting for db to start..."; sleep 1; done;
 	@docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c "alter user $(LOCAL_DB_ADMIN_USERNAME) with password '$(LOCAL_DB_ADMIN_PASSWORD)';"
@@ -169,20 +170,20 @@ local-status: ## Show the status of the containers in the dev environment.
 
 .PHONY: local-rebuild
 local-rebuild: .env.ecr local-ecr-login ## Rebuild local dev without re-importing data
-	docker-compose $(COMPOSE_OPTS) build frontend backend
-	docker-compose $(COMPOSE_OPTS) up -d
+	docker-compose $(COMPOSE_OPTS) --profile $(LOCALDEV_PROFILE) build
+	docker-compose $(COMPOSE_OPTS) --profile $(LOCALDEV_PROFILE) up -d
 
 .PHONY: local-rebuild-workflows
 local-rebuild-workflows: .env.ecr local-ecr-login ## Rebuild batch containers
-	docker-compose $(COMPOSE_OPTS) build gisaid pangolin nextstrain
-	docker-compose $(COMPOSE_OPTS) up -d
+	docker-compose $(COMPOSE_OPTS) --profile all build
+	docker-compose $(COMPOSE_OPTS) --profile all up -d
 
 .PHONY: local-sync
 local-sync: local-rebuild local-init local-hostconfig ## Re-sync the local-environment state after modifying library deps or docker configs
 
 .PHONY: local-start
 local-start: .env.ecr ## Start a local dev environment that's been stopped.
-	docker-compose $(COMPOSE_OPTS) up -d
+	docker-compose $(COMPOSE_OPTS) --profile $(LOCALDEV_PROFILE) up -d
 
 .PHONY: local-stop
 local-stop: ## Stop the local dev environment.
