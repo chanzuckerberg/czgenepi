@@ -38,12 +38,18 @@ test.describe("Data", () => {
     test("search works", async ({page}, testInfo) => {
       await setupSamplesPage(page, testInfo);
 
-      const firstPublicIdElement = await page.$(getTestID(ROW_PUBLIC_ID));
-
-      const firstPublicId = await firstPublicIdElement?.textContent();
-
       const searchBoxWrapper = page.locator(getTestID("search"));
       const searchBox = searchBoxWrapper.locator("input");
+      // TODO - search queries are *inclusive* so if we have a row in a table called
+      // "foo" and another called "foo_bar" a search for "foo" will display both rows.
+      // This shortcut is dependent on the data in our setup script but we should
+      // probably iterate over all visible rows to make sure they contain the search
+      // string instead.
+      await searchBox?.fill("_failed")
+
+      const firstPublicIdElement = await page.$(getTestID(ROW_PUBLIC_ID));
+      const firstPublicId = await firstPublicIdElement?.textContent();
+
       await searchBox?.fill(firstPublicId || "no id");
 
       console.log(firstPublicId);
