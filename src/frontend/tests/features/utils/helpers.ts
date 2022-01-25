@@ -1,35 +1,36 @@
+import { expect, Page, test, TestInfo } from "@playwright/test";
 import ENV from "src/common/constants/ENV";
 import nodeEnv from "src/common/constants/nodeEnv";
 import { getTestID, getText } from "./selectors";
-import { test, expect } from '@playwright/test';
 
 export const TIMEOUT_MS = 30 * 1000;
 
-export async function goToPage(page, 
+export async function goToPage(
+  page: Page,
   url: string = ENV.FRONTEND_URL as string
 ): Promise<void> {
   await page.goto(url);
 }
 
-export async function screenshot(page, testInfo): Promise<void> {
-    // NOTE - this currently only supports one screenshot per test
-    // All screenshots get uploaded to s3 after a GHA run.
-    const filePath = '/tmp/screenshots/' + testInfo.titlePath + '.png'
-    await page.screenshot({ path: filePath, fullPage: true });
+export async function screenshot(
+  page: Page,
+  testInfo: TestInfo
+): Promise<void> {
+  // NOTE - this currently only supports one screenshot per test
+  // All screenshots get uploaded to s3 after a GHA run.
+  const filePath = "/tmp/screenshots/" + testInfo.titlePath + ".png";
+  await page.screenshot({ path: filePath, fullPage: true });
 }
 
-export async function login(page, testInfo): Promise<void> {
+export async function login(page: Page, testInfo: TestInfo): Promise<void> {
   expect(ENV.E2E_USERNAME).toBeDefined();
 
   goToPage(page);
 
   try {
     await expect(page.locator(getTestID("nav-user-menu"))).toBeVisible();
+    await screenshot(page, testInfo);
   } catch (error) {
-    // NOTE -- Page content will be visible in GHA logs, and screenshots get uploaded
-    //         to s3 after a failed GHA run.
-    // console.log(await page.content());
-
     await page.locator(getText("Sign in")).first().click();
 
     await page.fill('[name="Username"], [name="username"]', ENV.E2E_USERNAME);
@@ -39,37 +40,6 @@ export async function login(page, testInfo): Promise<void> {
       page.waitForNavigation(),
       page.click('[value="login"], [type="submit"]'),
     ]);
-
-  }
-}
-
-export async function tryUntil(
-  assert: () => void,
-  maxRetry = 50
-): Promise<void> {
-  const WAIT_FOR_MS = 200;
-
-  let retry = 0;
-
-  let savedError: Error = new Error();
-
-  while (retry < maxRetry) {
-    try {
-      await assert();
-
-      break;
-    } catch (error) {
-      if (error instanceof Error) {
-        retry += 1;
-        savedError = error;
-        await page.waitForTimeout(WAIT_FOR_MS);
-      }
-    }
-  }
-
-  if (retry === maxRetry) {
-    savedError.message += " tryUntil() failed";
-    throw savedError;
   }
 }
 

@@ -1,13 +1,11 @@
-import { test, expect } from '@playwright/test';
-import { getTestID, getText } from "./utils/selectors";
+import { expect, test } from "@playwright/test";
 import { goToPage } from "./utils/helpers";
+import { getTestID, getText } from "./utils/selectors";
 
 test.describe("Homepage", () => {
-  test("renders the expected elements", async ({page}, testInfo) => {
+  test("renders the expected elements", async ({ page }) => {
     await goToPage(page);
 
-    // Capture screenshot
-    // await page.screenshot({ path: '/tmp/screenshots/' + testInfo.titlePath + '/homepage.png', fullPage: true });
     await expect(page.locator(getTestID("navbar-landing"))).not.toBeEmpty();
     await expect(page.locator(getTestID("navbar-sign-in-link"))).toBeVisible();
     await expect(page.locator(getTestID("logo"))).toBeVisible();
