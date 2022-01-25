@@ -328,6 +328,12 @@ def create_test_data(engine):
     session = engine.make_session()
     _ = create_gisaid(session)
 
+    # Temporary fix for FE tests
+    user1 = session.query(User).filter(User.auth0_user_id == "User1").one_or_none()
+    if user1:
+        user1.agreed_to_tos = 1
+        session.add(user1)
+
     # Create db rows for our main test user
     location = create_location(
         session, "North America", "USA", "California", "San Mateo County"
