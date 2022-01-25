@@ -3,6 +3,7 @@ import {
   describeIfDeployed,
   login,
   tryUntil,
+  screenshot,
 } from "./utils/helpers";
 import { getTestID, getText } from "./utils/selectors";
 import { ROUTES } from "../../src/common/routes";
@@ -45,6 +46,8 @@ test.describe("Data", () => {
       const searchBox = searchBoxWrapper.locator("input");
       await searchBox?.fill(firstPublicId || "no id");
 
+      console.log(firstPublicId);
+      await screenshot(page, testInfo);
       await expect(page.locator(getTestID("table-row"))).toHaveCount(1)
     });
 

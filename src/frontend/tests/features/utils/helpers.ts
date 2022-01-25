@@ -11,6 +11,13 @@ export async function goToPage(page,
   await page.goto(url);
 }
 
+export async function screenshot(page, testInfo): Promise<void> {
+    // NOTE - this currently only supports one screenshot per test
+    // All screenshots get uploaded to s3 after a GHA run.
+    const filePath = '/tmp/screenshots/' + testInfo.titlePath + '.png'
+    await page.screenshot({ path: filePath, fullPage: true });
+}
+
 export async function login(page, testInfo): Promise<void> {
   expect(ENV.E2E_USERNAME).toBeDefined();
 
@@ -22,7 +29,6 @@ export async function login(page, testInfo): Promise<void> {
     // NOTE -- Page content will be visible in GHA logs, and screenshots get uploaded
     //         to s3 after a failed GHA run.
     // console.log(await page.content());
-    // await page.screenshot({ path: '/tmp/screenshots/' + testInfo.titlePath + '/homepage.png', fullPage: true });
 
     await page.locator(getText("Sign in")).first().click();
 
