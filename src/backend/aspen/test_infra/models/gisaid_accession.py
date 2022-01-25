@@ -1,12 +1,9 @@
-import datetime
-
-from aspen.database.models import PublicRepositoryType
+from aspen.database.models import Accession, AccessionType
 
 
-def gisaid_accession_factory(uploaded_pathogen_genome, isl_accession_number):
-    uploaded_pathogen_genome.add_accession(
-        repository_type=PublicRepositoryType.GISAID,
-        public_identifier=isl_accession_number,
-        workflow_start_datetime=datetime.datetime.now(),
-        workflow_end_datetime=datetime.datetime.now(),
+def gisaid_accession_factory(sample, isl_accession_number):
+    return Accession(
+        accession_type=AccessionType.GISAID_ISL,
+        accession=isl_accession_number,
+        sample_id=sample.id,
     )

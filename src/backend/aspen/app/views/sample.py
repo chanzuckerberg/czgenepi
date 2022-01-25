@@ -3,7 +3,6 @@ import json
 import os
 import re
 import threading
-from collections import defaultdict
 from typing import Any, Iterable, Mapping, Optional, Sequence, Set, Union
 from uuid import uuid4
 
@@ -12,8 +11,6 @@ import sentry_sdk
 import smart_open
 from flask import g, jsonify, make_response, request, Response, stream_with_context
 from marshmallow.exceptions import ValidationError
-from sqlalchemy import and_
-from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.query import Query
 
@@ -28,19 +25,10 @@ from aspen.app.views.api_utils import (
     get_missing_and_found_sample_ids,
 )
 from aspen.database.connection import session_scope
-from aspen.database.models import (
-    GisaidAccession,
-    GisaidAccessionWorkflow,
-    Location,
-    PublicRepositoryType,
-    Sample,
-    UploadedPathogenGenome,
-    WorkflowStatusType,
-)
+from aspen.database.models import Location, Sample, UploadedPathogenGenome
 from aspen.database.models.sample import create_public_ids
 from aspen.database.models.usergroup import Group, User
 from aspen.error import http_exceptions as ex
-from aspen.error.recoverable import RecoverableError
 from aspen.fileio.fasta_streamer import FastaStreamer
 
 DEFAULT_DIVISION = "California"
@@ -71,99 +59,7 @@ SAMPLES_POST_OPTIONAL_FIELDS = [
     # following fields from PathogenGenome
     "sequencing_date",
     "sequencing_depth",
-    "isl_access_number",
 ]
-
-
-def _format_created_date(sample: Sample) -> str:
-    if sample.sequencing_reads_collection is not None:
-        return api_utils.format_date(sample.sequencing_reads_collection.upload_date)
-    elif sample.uploaded_pathogen_genome is not None:
-        return api_utils.format_date(sample.uploaded_pathogen_genome.upload_date)
-    elif sample.czb_failed_genome_recovery:
-        return api_utils.format_datetime(None)
-    else:
-        return "not yet uploaded"
-
-
-def _format_sequencing_date(sample: Sample) -> str:
-    sequencing_date: Optional[datetime.date]
-    try:
-        # Using `get_uploaded_entity` may be unnecessary since it can also pull from
-        # sequencing_reads_collection, but that model isn't used right now.
-        sequenced_entity = sample.get_uploaded_entity()
-        sequencing_date = sequenced_entity.sequencing_date
-    except ValueError:
-        # No underlying entity, so no sequencing to associate
-        sequencing_date = None
-    return api_utils.format_date(sequencing_date)
-
-
-def _format_gisaid_accession(
-    sample: Sample,
-    entity_id_to_gisaid_accession_workflow_map: defaultdict[
-        int, list[GisaidAccessionWorkflow]
-    ],
-) -> Mapping[str, Optional[str]]:
-    if sample.czb_failed_genome_recovery:
-        # todo need to add the private option here for v3 a user uploads and flags a private sample
-        return {"status": "Not Eligible", "gisaid_id": None}
-
-    uploaded_entity = sample.get_uploaded_entity()
-    gisaid_accession_workflows = entity_id_to_gisaid_accession_workflow_map.get(
-        uploaded_entity.entity_id, []
-    )
-    for gisaid_accession_workflow in gisaid_accession_workflows:
-        if gisaid_accession_workflow.workflow_status == WorkflowStatusType.COMPLETED:
-            # hey there should be an output...
-            for output in gisaid_accession_workflow.outputs:
-                assert isinstance(output, GisaidAccession)
-                if not output.public_identifier:
-                    return {
-                        "status": "Submitted",
-                        "gisaid_id": "Not Provided",
-                    }
-                return {
-                    "status": "Accepted",
-                    "gisaid_id": output.public_identifier,
-                }
-            else:
-                raise RecoverableError(
-                    "Successful accession workflow for sample"
-                    f" {sample.public_identifier} does not seem to have an accession"
-                    " output."
-                )
-
-        date_since_submitted = (
-            datetime.date.today() - gisaid_accession_workflow.start_datetime.date()
-        )
-        if date_since_submitted < GISAID_REJECTION_TIME:
-            return {"status": "Submitted", "gisaid_id": None}
-        else:
-            return {"status": "Rejected", "gisaid_id": None}
-    return {"status": "Not Yet Submitted", "gisaid_id": None}
-
-
-def _format_lineage(sample: Sample) -> dict[str, Any]:
-    pathogen_genome = sample.uploaded_pathogen_genome
-    if pathogen_genome:
-        lineage = {
-            "lineage": pathogen_genome.pangolin_lineage,
-            "probability": pathogen_genome.pangolin_probability,
-            "version": pathogen_genome.pangolin_version,
-            "last_updated": api_utils.format_date(
-                pathogen_genome.pangolin_last_updated
-            ),
-        }
-    else:
-        lineage = {
-            "lineage": None,
-            "probability": None,
-            "version": None,
-            "last_updated": None,
-        }
-
-    return lineage
 
 
 @application.route("/api/sequences", methods=["POST"])
@@ -302,12 +198,10 @@ def create_sample():
             public_identifier = data["sample"].get("public_identifier")
             if public_identifier:
                 # if they provided a public_id they marked true to "submitted to gisaid"
-                submitted_to_gisaid = True
                 public_identifier = data["sample"]["public_identifier"]
             else:
                 # if they did not mark true to "submitted to gisaid generate a new public id for
                 # them
-                submitted_to_gisaid = False
                 public_identifier = public_ids.pop(0)
 
             sample_args: Mapping[str, Any] = {
@@ -362,22 +256,6 @@ def create_sample():
                     data["pathogen_genome"]["sequencing_date"]
                 ),
             )
-            if data["pathogen_genome"]["isl_access_number"]:
-                uploaded_pathogen_genome.add_accession(
-                    repository_type=PublicRepositoryType.GISAID,
-                    public_identifier=data["pathogen_genome"]["isl_access_number"],
-                    workflow_start_datetime=datetime.datetime.now(),
-                    workflow_end_datetime=datetime.datetime.now(),
-                )
-            elif submitted_to_gisaid:
-                # in this scenario they've checked yes to previously submitted to GISAID but did
-                # not provide an isl-number, we mark it as UNKNOWN for now.
-                uploaded_pathogen_genome.add_accession(
-                    repository_type=PublicRepositoryType.GISAID,
-                    public_identifier=None,
-                    workflow_start_datetime=datetime.datetime.now(),
-                    workflow_end_datetime=datetime.datetime.now(),
-                )
 
             g.db_session.add(sample)
             g.db_session.add(uploaded_pathogen_genome)
@@ -397,86 +275,6 @@ def create_sample():
     )
     pangolin_job.start()
 
-    return jsonify(success=True)
-
-
-@application.route("/api/samples/update/publicids", methods=["POST"])
-@requires_auth
-def update_sample_public_ids():
-    user: User = g.auth_user
-    request_data = request.get_json()
-
-    if not user.system_admin:
-        raise ex.BadRequestException(
-            "user making update request must be a system admin",
-        )
-
-    private_to_public: Mapping[str, str] = request_data["id_mapping"]
-    request_private_ids: list[str] = private_to_public.keys()
-    request_public_ids: list[str] = private_to_public.values()
-
-    # check to see if public_identifiers are gisaid isl accessions
-    public_ids_are_gisaid_isl: str = request_data.get("public_ids_are_gisaid_isl")
-
-    group_id: int = request_data["group_id"]
-
-    # check that all private_identifiers exist
-    existing_private_ids: list[str] = api_utils.get_existing_private_ids(
-        request_private_ids, g.db_session, group_id=group_id
-    )
-    missing_private_identifiers = [
-        s for s in request_private_ids if s not in existing_private_ids
-    ]
-    if missing_private_identifiers:
-        raise ex.BadRequestException(
-            f"Private Identifiers {missing_private_identifiers} not found in DB",
-        )
-
-    samples_to_update = g.db_session.query(Sample).filter(
-        and_(
-            Sample.submitting_group_id == group_id,
-            Sample.private_identifier.in_(private_to_public.keys()),
-        )
-    )
-
-    if public_ids_are_gisaid_isl:
-        samples_to_update = samples_to_update.options(
-            joinedload(Sample.uploaded_pathogen_genome),
-        )
-        for s in samples_to_update:
-            isl_number = private_to_public[s.private_identifier]
-            accessions = s.uploaded_pathogen_genome.accessions()
-
-            if accessions:
-                for accession in accessions:
-                    if isinstance(accession, GisaidAccession):
-                        accession.public_identifier = isl_number
-            else:
-                # create a new accession if DNE
-                s.uploaded_pathogen_genome.add_accession(
-                    repository_type=PublicRepositoryType.GISAID,
-                    public_identifier=isl_number,
-                    workflow_start_datetime=datetime.datetime.now(),
-                    workflow_end_datetime=datetime.datetime.now(),
-                )
-                g.db_session.add(s)
-        g.db_session.commit()
-        return jsonify(success=True)
-
-    # check that public_identifiers don't already exist
-    existing_public_ids: list[str] = api_utils.get_existing_public_ids(
-        request_public_ids, g.db_session, group_id=group_id
-    )
-    if existing_public_ids:
-        raise ex.BadRequestException(
-            f"Public Identifiers {existing_public_ids} are already in the database",
-        )
-
-    for s in samples_to_update.all():
-        s.public_identifier = private_to_public[s.private_identifier]
-        g.db_session.add(s)
-
-    g.db_session.commit()
     return jsonify(success=True)
 
 

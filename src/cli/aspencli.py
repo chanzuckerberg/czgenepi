@@ -390,40 +390,6 @@ def update_samples(ctx, sample_id, private_id, public_id, collection_date, seque
     print(resp.text)
 
 
-@samples.command(name="update_public_ids")
-@click.option("group_id", "--group-id", type=int, required=True)
-@click.option("is_gisaid_isl", "--is-gisaid-isl", is_flag=True)
-# csv file should have headers private_identifier and public_identifier
-@click.option(
-    "private_to_public_id_mapping_fh",
-    "--private-to-public-id-mapping",
-    type=click.File("r"),
-    required=True,
-)
-@click.pass_context
-def update_public_ids(ctx, group_id, is_gisaid_isl, private_to_public_id_mapping_fh):
-    api_client = ctx.obj["api_client"]
-
-    csvreader = csv.DictReader(private_to_public_id_mapping_fh)
-    private_to_public = {
-        row["private_identifier"].strip(): row["public_identifier"].strip()
-        for row in csvreader
-    }
-
-    payload = {
-        "group_id": group_id,
-        "id_mapping": private_to_public
-    }
-
-    # check if public_identifiers to be updated are gisaid isl accession numbers
-    if is_gisaid_isl:
-        payload["public_ids_are_gisaid_isl"] = True
-
-    resp = api_client.post("/api/samples/update/publicids", json=payload)
-    print(resp.headers)
-    print(resp.text)
-
-
 @cli.group()
 def phylo_runs():
     pass

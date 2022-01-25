@@ -6,7 +6,6 @@ import { Metadata } from "src/views/Upload/components/common/types";
 export const METADATA_KEYS_TO_HEADERS: Record<keyof Metadata, string> = {
   collectionDate: "Collection Date",
   collectionLocation: "Collection Location",
-  islAccessionNumber: "ISL Accession # (optional)",
   keepPrivate: "Sample is Private",
   publicId: "GISAID ID (Public ID)",
   sampleId: "Sample Private ID",
@@ -25,7 +24,6 @@ export const HEADERS_TO_METADATA_KEYS = invert(
 export const METADATA_KEYS_TO_API_KEYS: Record<keyof Metadata, string> = {
   collectionDate: "collection_date",
   collectionLocation: "location_id",
-  islAccessionNumber: "isl_access_number",
   keepPrivate: "private",
   publicId: "public_identifier",
   sampleId: "private_identifier",
@@ -36,7 +34,6 @@ export const METADATA_KEYS_TO_API_KEYS: Record<keyof Metadata, string> = {
 export const EMPTY_METADATA: Metadata = {
   collectionDate: "",
   collectionLocation: undefined,
-  islAccessionNumber: "",
   keepPrivate: false,
   publicId: "",
   sequencingDate: "",

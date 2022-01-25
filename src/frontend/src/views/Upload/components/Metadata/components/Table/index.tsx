@@ -152,9 +152,6 @@ export default function Table({
                     <StyledTableCell component="div">
                       {METADATA_KEYS_TO_HEADERS.publicId}
                     </StyledTableCell>
-                    <StyledTableCell component="div">
-                      {METADATA_KEYS_TO_HEADERS.islAccessionNumber}
-                    </StyledTableCell>
                   </>
                 )}
               </StyledTableRow>

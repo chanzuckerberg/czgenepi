@@ -1,6 +1,8 @@
 import datetime
+from typing import Dict, List
 
-from aspen.database.models import Location, Sample
+from aspen.database.models import Accession, AccessionType, Location, Sample
+from aspen.test_infra.models.gisaid_accession import gisaid_accession_factory
 
 
 def sample_factory(
@@ -16,10 +18,13 @@ def sample_factory(
     organism="SARS-CoV-2",
     czb_failed_genome_recovery=False,
     private=False,
+    accessions: Dict[AccessionType, str] = {
+        AccessionType.GISAID_ISL: "EPI_ISL_8675309",
+    },
 ) -> Sample:
     original_submission = original_submission or {}
     collection_date = collection_date or datetime.date.today()
-    return Sample(
+    sample = Sample(
         submitting_group=submitting_group,
         uploaded_by=uploaded_by,
         private_identifier=private_identifier,
@@ -33,3 +38,11 @@ def sample_factory(
         czb_failed_genome_recovery=czb_failed_genome_recovery,
         private=private,
     )
+    created_accessions: List[Accession] = []
+    for accession_type, identifier in accessions.items():
+        if accession_type == AccessionType.GISAID_ISL:
+            created_accessions.append(gisaid_accession_factory(sample, identifier))
+        else:
+            raise NotImplementedError
+    sample.accessions = created_accessions
+    return sample

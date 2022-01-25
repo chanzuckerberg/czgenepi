@@ -2,10 +2,9 @@ import csv
 import io
 import json
 import re
-from typing import Any, Iterable, List, Mapping, MutableMapping, Set, Tuple
+from typing import Any, Iterable, List, Mapping, MutableMapping, Optional, Set
 
 import click
-from sqlalchemy import and_
 from sqlalchemy.orm import aliased, joinedload, with_polymorphic
 
 from aspen.config.config import Config
@@ -16,17 +15,16 @@ from aspen.database.connection import (
     SqlAlchemyInterface,
 )
 from aspen.database.models import (
+    Accession,
+    AccessionType,
     AlignedGisaidDump,
     Entity,
-    EntityType,
     Group,
     PathogenGenome,
     PhyloRun,
-    PublicRepositoryType,
     Sample,
     UploadedPathogenGenome,
 )
-from aspen.database.models.workflow import Workflow
 from aspen.workflows.nextstrain_run.build_config import builder_factory
 from aspen.workflows.nextstrain_run.builder_base import BaseNextstrainConfigBuilder
 
@@ -220,32 +218,7 @@ def write_sequences_files(session, pathogen_genomes, sequences_fh, metadata_fh):
         .filter(Sample.id.in_(sample_ids))
         .options(joinedload(Sample.collection_location))
     }
-    accession_input_alias = aliased(Entity)
-    pathogen_genome_id_repository_type_to_accession_names: Mapping[
-        Tuple[int, PublicRepositoryType], str
-    ] = {
-        (
-            accession.get_parents(PathogenGenome)[0].entity_id,
-            PublicRepositoryType.from_entity_type(accession.entity_type),
-        ): accession.public_identifier
-        # We have overlap between aligned gisaid file & aspen data.
-        for accession in session.query(Entity)
-        .join(Entity.producing_workflow)
-        .join(accession_input_alias, Workflow.inputs)
-        .filter(
-            and_(
-                Entity.entity_type.in_(
-                    (
-                        EntityType.GISAID_REPOSITORY_SUBMISSION,
-                        EntityType.GENBANK_REPOSITORY_SUBMISSION,
-                    )
-                ),
-                accession_input_alias.id.in_(
-                    {pathogen_genome.entity_id for pathogen_genome in pathogen_genomes}
-                ),
-            )
-        )
-    }
+    aliased(Entity)
 
     aspen_samples: Set[str] = set()
     metadata_csv_fh = csv.DictWriter(metadata_fh, METADATA_CSV_FIELDS, delimiter="\t")
@@ -278,15 +251,19 @@ def write_sequences_files(session, pathogen_genomes, sequences_fh, metadata_fh):
                 "%Y-%m-%d"
             )
 
+        gisaid_accession: Optional[Accession] = None
+        genbank_accession: Optional[Accession] = None
+        for accession in sample.accessions:
+            if accession.accession_type == AccessionType.GISAID_ISL:
+                gisaid_accession = accession
+            elif accession.accession_type == AccessionType.GENBANK:
+                genbank_accession = accession
+
         aspen_metadata_row: MutableMapping[str, Any] = {
             "strain": sample.public_identifier,
             "virus": "ncov",
-            "gisaid_epi_isl": pathogen_genome_id_repository_type_to_accession_names.get(
-                (pathogen_genome.entity_id, PublicRepositoryType.GISAID), ""
-            ),
-            "genbank_accession": pathogen_genome_id_repository_type_to_accession_names.get(
-                (pathogen_genome.entity_id, PublicRepositoryType.GENBANK), ""
-            ),
+            "gisaid_epi_isl": gisaid_accession or "",
+            "genbank_accession": genbank_accession or "",
             "date": sample.collection_date.strftime("%Y-%m-%d"),
             "date_submitted": upload_date,
             "region": sample.collection_location.region,

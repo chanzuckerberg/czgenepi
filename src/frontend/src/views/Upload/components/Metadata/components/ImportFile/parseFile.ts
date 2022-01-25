@@ -85,8 +85,8 @@ const METADATA_KEYS_TO_EXTRACT = Object.values(HEADERS_TO_METADATA_KEYS);
 // If no corrections, returns null, otherwise returns which fields corrected.
 function autocorrectMetadata(metadata: Metadata): Set<keyof Metadata> | null {
   const correctedKeys = new Set<keyof Metadata>();
-  // If it has publicId or islAccessionNumber, it must be a public sample.
-  if (metadata.publicId || metadata.islAccessionNumber) {
+  // If it has publicId, it must be a public sample.
+  if (metadata.publicId) {
     // Ensure sample has been marked as public
     if (!metadata.submittedToGisaid) {
       metadata.submittedToGisaid = true;

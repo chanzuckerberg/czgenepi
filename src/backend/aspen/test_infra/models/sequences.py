@@ -1,17 +1,12 @@
 import datetime
-from typing import Sequence
 
 from aspen.database.models import (
-    PublicRepositoryType,
-    PublicRepositoryTypeMetadata,
     Sample,
     SequencingInstrumentType,
     SequencingProtocolType,
     SequencingReadsCollection,
     UploadedPathogenGenome,
-    WorkflowStatusType,
 )
-from aspen.test_infra.models.accession_workflow import AccessionWorkflowDirective
 from aspen.test_infra.models.sample import sample_factory
 
 
@@ -50,14 +45,6 @@ def uploaded_pathogen_genome_factory(
     sequencing_depth=0.1,
     sequencing_date=datetime.date.today(),
     upload_date=datetime.datetime.now(),
-    accessions: Sequence[AccessionWorkflowDirective] = (
-        AccessionWorkflowDirective(
-            PublicRepositoryType.GISAID,
-            datetime.datetime.now(),
-            datetime.datetime.now(),
-            "gisaid_public_identifier",
-        ),
-    ),
 ):
     uploaded_pathogen_genome = UploadedPathogenGenome(
         sample=sample,
@@ -73,27 +60,6 @@ def uploaded_pathogen_genome_factory(
         sequencing_date=sequencing_date,
         upload_date=upload_date,
     )
-    for accession_workflow_directive in accessions:
-        if accession_workflow_directive.end_datetime is None:
-            public_repository_metadata: PublicRepositoryTypeMetadata = (
-                accession_workflow_directive.repository_type.value
-            )
-            uploaded_pathogen_genome.consuming_workflows.append(
-                public_repository_metadata.accession_workflow_cls(
-                    software_versions={},
-                    workflow_status=WorkflowStatusType.FAILED,
-                    start_datetime=accession_workflow_directive.start_datetime,
-                )
-            )
-        else:
-            assert accession_workflow_directive.repository_type is not None
-            assert accession_workflow_directive.public_identifier is not None
-            uploaded_pathogen_genome.add_accession(
-                repository_type=accession_workflow_directive.repository_type,
-                public_identifier=accession_workflow_directive.public_identifier,
-                workflow_start_datetime=accession_workflow_directive.start_datetime,
-                workflow_end_datetime=accession_workflow_directive.end_datetime,
-            )
 
     return uploaded_pathogen_genome
 
@@ -112,7 +78,6 @@ def uploaded_pathogen_genome_multifactory(
         )
         pathogen_genome: UploadedPathogenGenome = uploaded_pathogen_genome_factory(
             sample,
-            accessions=(),
             pangolin_lineage=None,
             pangolin_probability=None,
             pangolin_version=None,

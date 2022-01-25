@@ -37,7 +37,6 @@ def create_test_data(session):
         samples.append(sample)
         pathogen_genome: UploadedPathogenGenome = uploaded_pathogen_genome_factory(
             sample,
-            accessions=(),
             pangolin_lineage=None,
             pangolin_probability=None,
             pangolin_version=None,

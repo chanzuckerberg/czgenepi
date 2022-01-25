@@ -53,7 +53,6 @@ export enum ERROR_CODE {
 export interface Metadata {
   sampleId?: string;
   collectionDate?: string;
-  islAccessionNumber?: string;
   keepPrivate?: boolean;
   publicId?: string;
   sequencingDate?: string;
