@@ -32,7 +32,7 @@ interface Sample extends BioinformaticsType {
     name: string;
   };
   collectionDate: string;
-  collectionLocation: string;
+  collectionLocation: GisaidLocation;
   sequencingDate: string;
   submittingGroup: {
     id: number;

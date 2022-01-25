@@ -112,6 +112,24 @@ export const SAMPLE_SUBHEADERS: Record<string, SubHeader[]> = {
       text: "Version",
     },
   ],
+  collectionLocation: [
+    {
+      key: "region",
+      text: "Region",
+    },
+    {
+      key: "country",
+      text: "Country",
+    },
+    {
+      key: "division",
+      text: "Division",
+    },
+    {
+      key: "location",
+      text: "Location",
+    },
+  ],
 };
 
 export const TREE_HEADERS: Header[] = [
