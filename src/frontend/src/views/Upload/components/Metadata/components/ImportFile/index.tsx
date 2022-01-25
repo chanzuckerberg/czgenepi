@@ -106,7 +106,7 @@ export default function ImportFile({
     <Wrapper>
       <IntroWrapper>
         <TitleWrapper>
-          <Title>Import Data from a TSV file</Title>
+          <Title>Import Data from a TSV or CSV file</Title>
           <Button color="primary" onClick={handleInstructionsClick}>
             {isInstructionsShown ? "HIDE" : "SHOW"} INSTRUCTIONS
           </Button>
@@ -124,7 +124,7 @@ export default function ImportFile({
         <FilePicker
           handleFiles={handleFiles}
           text="Select Metadata File"
-          accept=".tsv"
+          accept=".tsv,.csv"
           shouldConfirm={hasImportedFile}
           confirmTitle="Are you sure you want to import new data?"
           confirmContent={

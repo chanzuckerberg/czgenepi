@@ -64,7 +64,12 @@ export async function handleFile(
     return handleGz(file, filename);
   }
 
-  if (filename.includes(".fasta") || filename.includes(".fa")) {
+  if (
+    filename.includes(".fasta") ||
+    filename.includes(".fa") ||
+    filename.includes(".txt")
+  ) {
+    // FASTA is not a special file encoding, just a way to format a text file.
     return handleFastaText(await strFromU8(file), filename);
   }
 

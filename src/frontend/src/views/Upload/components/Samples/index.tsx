@@ -103,7 +103,7 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
             </span>,
             <span key="2">
               Accepted file formats: fasta (.fa or .fasta), fasta.gz (.fa.gz),
-              fasta.zip
+              fasta.zip, plain text (.txt)
             </span>,
             <span key="3">
               Sample names must be no longer than 120 characters and can only
@@ -118,10 +118,10 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
         />
         <ContentWrapper>
           <StyledFilePicker
-            text={isLoadingFile ? "Loading..." : "Select Fasta Files"}
+            text={isLoadingFile ? "Loading..." : "Select Sample Files"}
             multiple
             handleFiles={handleFileChange}
-            accept=".fasta,.fa,.gz,.zip"
+            accept=".fasta,.fa,.txt,.gz,.zip"
             isDisabled={isLoadingFile}
           />
           {parseErrors && (

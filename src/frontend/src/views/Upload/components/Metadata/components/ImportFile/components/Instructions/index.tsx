@@ -27,7 +27,7 @@ export default function Instructions({ headers, rows }: Props): JSX.Element {
           <StyleDownloadTemplate headers={headers} rows={rows}>
             TSV template
           </StyleDownloadTemplate>
-          , but you can use your own TSV file as well.
+          , but you can use your own TSV or CSV file as well.
         </ListItem>
         <ListItem ordered fontSize="xs">
           Make sure your column headers match our naming convention.
@@ -36,12 +36,12 @@ export default function Instructions({ headers, rows }: Props): JSX.Element {
           Make sure your metadata values are in the correct format.
         </ListItem>
         <ListItem ordered fontSize="xs">
-          Upload your TSV file by clicking on the “Select Metadata File” button
-          below and selecting from your file browser. Only one file can be
-          imported at a time.
+          Upload your TSV or CSV file by clicking on the “Select Metadata File”
+          button below and selecting from your file browser. Only one file can
+          be imported at a time.
         </ListItem>
         <ListItem ordered fontSize="xs">
-          The metadata from your TSV will be imported into the table fields
+          The metadata from your file will be imported into the table fields
           below. If there are errors, please make the necessary changes.
         </ListItem>
       </List>
