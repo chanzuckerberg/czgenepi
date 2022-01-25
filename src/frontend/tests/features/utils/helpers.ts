@@ -19,14 +19,10 @@ export async function login(page, testInfo): Promise<void> {
   try {
     await expect(page.locator(getTestID("nav-user-menu"))).toBeVisible();
   } catch (error) {
-    // 2. logging HTML string here
-    // DEBUG
-    // DEBUG
-    // DEBUG
-    //console.log(await page.content());
-    // TODO this is horribly broken but we're going to try dropping jest-playwright asap.
-    //const title = expect.getState().currentTestName
-    //await page.screenshot({ path: '/tmp/screenshots/' + title + '/homepage.png', fullPage: true });
+    // NOTE -- Page content will be visible in GHA logs, and screenshots get uploaded
+    //         to s3 after a failed GHA run.
+    // console.log(await page.content());
+    // await page.screenshot({ path: '/tmp/screenshots/' + testInfo.titlePath + '/homepage.png', fullPage: true });
 
     await page.locator(getText("Sign in")).first().click();
 

@@ -41,19 +41,11 @@ test.describe("Data", () => {
 
       const firstPublicId = await firstPublicIdElement?.textContent();
 
-      const searchBoxWrapper = await page.$(getTestID("search"));
-
-      if (!searchBoxWrapper) {
-        throw Error("search box not found!");
-      }
-
-      const searchBox = await searchBoxWrapper.$("input");
-
+      const searchBoxWrapper = page.locator(getTestID("search"));
+      const searchBox = searchBoxWrapper.locator("input");
       await searchBox?.fill(firstPublicId || "no id");
 
-      await tryUntil(() =>
-        expect(page.locator(getTestID("table-row")).count()).toBe(1)
-      );
+      await expect(page.locator(getTestID("table-row"))).toHaveCount(1)
     });
 
     test("sorts by column header", async ({page}, testInfo) => {
@@ -61,7 +53,7 @@ test.describe("Data", () => {
 
       const publicIds = await getAllPublicIds(page);
 
-      await page.locator(getTestID("header-cell")).click();
+      await page.locator(getTestID("header-cell")).first().click();
 
       const sortedPublicIds = await getAllPublicIds(page);
 
@@ -109,9 +101,7 @@ async function setupTreesPage(page, testInfo) {
 
   const COLUMN_COUNT = 4;
 
-  await tryUntil(() =>
-    expect(page.locator(getTestID("header-cell")).count()).toBe(COLUMN_COUNT)
-  );
+  await expect(page.locator(getTestID("header-cell"))).toHaveCount(COLUMN_COUNT)
 
   await expect(page.locator(getTestID("header-row"))).toBeVisible();
   await expect(page.locator(getText("Tree Name"))).toBeVisible();
