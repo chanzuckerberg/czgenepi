@@ -121,7 +121,7 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
             text={isLoadingFile ? "Loading..." : "Select Fasta Files"}
             multiple
             handleFiles={handleFileChange}
-            accept=".fasta,.fa,.gz,.zip"
+            accept=".fasta,.fa,.txt,.gz,.zip"
             isDisabled={isLoadingFile}
           />
           {parseErrors && (
