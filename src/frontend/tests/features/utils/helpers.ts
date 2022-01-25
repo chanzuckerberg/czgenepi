@@ -1,35 +1,34 @@
 import ENV from "src/common/constants/ENV";
 import nodeEnv from "src/common/constants/nodeEnv";
 import { getTestID, getText } from "./selectors";
+import { test, expect } from '@playwright/test';
 
 export const TIMEOUT_MS = 30 * 1000;
 
-export async function goToPage(
+export async function goToPage(page, 
   url: string = ENV.FRONTEND_URL as string
 ): Promise<void> {
   await page.goto(url);
 }
 
-export async function login(testInfo): Promise<void> {
+export async function login(page, testInfo): Promise<void> {
   expect(ENV.E2E_USERNAME).toBeDefined();
 
-  goToPage();
+  goToPage(page);
 
   try {
-    await expect(page).toHaveSelector(getTestID("nav-user-menu"), {
-      timeout: TIMEOUT_MS,
-    });
+    await expect(page.locator(getTestID("nav-user-menu"))).toBeVisible();
   } catch (error) {
     // 2. logging HTML string here
     // DEBUG
     // DEBUG
     // DEBUG
-    console.log(await page.content());
+    //console.log(await page.content());
     // TODO this is horribly broken but we're going to try dropping jest-playwright asap.
-    const title = expect.getState().currentTestName
-    await page.screenshot({ path: '/tmp/screenshots/' + title + '/homepage.png', fullPage: true });
+    //const title = expect.getState().currentTestName
+    //await page.screenshot({ path: '/tmp/screenshots/' + title + '/homepage.png', fullPage: true });
 
-    await page.click(getText("Sign in"));
+    await page.locator(getText("Sign in")).first().click();
 
     await page.fill('[name="Username"], [name="username"]', ENV.E2E_USERNAME);
     await page.fill('[name="Password"], [name="password"]', ENV.E2E_PASSWORD);
@@ -76,5 +75,5 @@ export const describeIfDeployed = [
   nodeEnv.PRODUCTION,
   nodeEnv.STAGING,
 ].includes(ENV.DEPLOYMENT_STAGE)
-  ? describe
-  : describe.skip;
+  ? test.describe
+  : test.skip;
