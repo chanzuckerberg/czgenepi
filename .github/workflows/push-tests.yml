@@ -149,8 +149,6 @@ jobs:
           echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
           # Build backend image
           docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/genepi-backend:branch-trunk -t ${{ secrets.ECR_REPO }}/genepi-backend:latest src/backend
-          # Build frontend
-          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/genepi-frontend:branch-trunk -t ${{ secrets.ECR_REPO }}/genepi-frontend:latest src/frontend
           make local-init LOCALDEV_PROFILE=backend
           make backend-test
   build-push-images:
