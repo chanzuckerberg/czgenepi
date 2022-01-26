@@ -82,11 +82,18 @@ export default function NavBarLanding(): JSX.Element {
         Sign In
       </MobileNavLink>
     );
-    SignInLink = <ButtonLink href={API_URL + ROUTES.LOGIN}>Sign in</ButtonLink>;
+    SignInLink = (
+      <ButtonLink
+        data-test-id="navbar-sign-in-link"
+        href={API_URL + ROUTES.LOGIN}
+      >
+        Sign in
+      </ButtonLink>
+    );
   }
 
   return (
-    <HeaderContainer>
+    <HeaderContainer data-test-id="navbar-landing">
       {!user && (
         <AnnouncementBanner>
           <AnnouncementText>
@@ -100,7 +107,7 @@ export default function NavBarLanding(): JSX.Element {
       <HeaderMaxWidthContainer>
         <HeaderTopContainer>
           <HeaderLogoContainer href={data ? ROUTES.DATA : ROUTES.HOMEPAGE}>
-            <HeaderLogo />
+            <HeaderLogo data-test-id="logo" />
             {orgSplash ? <OrgSplash>{orgSplash}</OrgSplash> : null}
           </HeaderLogoContainer>
           <HeaderTopLinks>

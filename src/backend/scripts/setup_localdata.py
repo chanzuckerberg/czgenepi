@@ -60,6 +60,7 @@ def create_test_user(session, group, user_id, name):
         group_admin=True,
         system_admin=True,
         group=group,
+        agreed_to_tos=True,  # TODO - FE tests need to be updated for agree modal!
     )
     session.add(u)
     return u

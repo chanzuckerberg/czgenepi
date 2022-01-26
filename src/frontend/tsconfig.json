@@ -27,9 +27,8 @@
     "strict": true,
     "target": "esnext",
     "types": [
-      "jest-playwright-preset",
-      "expect-playwright",
-      "jest"
+      "jest",
+      "playwright"
     ],
     "incremental": false
   },

@@ -1,14 +1,15 @@
-import { getTestID, getText } from "tests/features/utils/selectors";
+import { expect, test } from "@playwright/test";
 import { goToPage } from "./utils/helpers";
+import { getTestID, getText } from "./utils/selectors";
 
-describe("Homepage", () => {
-  it("renders the expected elements", async () => {
-    await goToPage();
+test.describe("Homepage", () => {
+  test("renders the expected elements", async ({ page }) => {
+    await goToPage(page);
 
-    await expect(page).toHaveSelector(getTestID("navbar"));
-    await expect(page).toHaveSelector(getTestID("navbar-sign-in-link"));
-    await expect(page).toHaveSelector(getTestID("logo"));
-    await expect(page).toHaveSelector(getText("Welcome to CZ Gen Epi!"));
-    await expect(page).toHaveSelector(getTestID("footer"));
+    await expect(page.locator(getTestID("navbar-landing"))).not.toBeEmpty();
+    await expect(page.locator(getTestID("navbar-sign-in-link"))).toBeVisible();
+    await expect(page.locator(getTestID("logo"))).toBeVisible();
+    await expect(page.locator(getText("phylogenetic analysis"))).toBeVisible();
+    await expect(page.locator(getTestID("landing-footer"))).toBeVisible();
   });
 });
