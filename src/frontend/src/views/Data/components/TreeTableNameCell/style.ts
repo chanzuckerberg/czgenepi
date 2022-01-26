@@ -1,7 +1,6 @@
 import styled from "@emotion/styled";
 import { fontBodyXxs, getColors, getSpaces, Props } from "czifui";
 import { TreeRowContent } from "src/common/components/library/data_table/style";
-
 export interface ExtraProps extends Props {
   disabled?: boolean;
 }
@@ -37,6 +36,9 @@ export const StyledNameWrapper = styled.div`
 `;
 
 export const StyledTreeCreator = styled.div`
+  display: flex;
+  align-items: center;
+  flex-direction: row;
   ${fontBodyXxs}
 
   ${(props) => {
