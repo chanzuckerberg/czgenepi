@@ -79,14 +79,12 @@ function tsvDataMap(
     sortKey: ["CZBFailedGenomeRecovery"],
     text: "Genome Recovery",
   });
-  console.log(headers);
   if (tableData) {
     const filteredTableData = tableData.filter((entry) =>
       checkedSampleIds.includes(String(entry["publicId"]))
     );
     const tsvData = filteredTableData.map((entry) => {
       return headersDownload.flatMap((header) => {
-        console.log("TSV Header:", header);
         if (
           typeof entry[header.key] === "object" &&
           Object.prototype.hasOwnProperty.call(subheaders, header.key)
