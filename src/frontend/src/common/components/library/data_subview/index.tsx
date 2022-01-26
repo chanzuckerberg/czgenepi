@@ -74,11 +74,11 @@ function tsvDataMap(
   subheaders: Record<string, SubHeader[]>
 ): [string[], string[][]] | undefined {
   const headersDownload = [...headers];
-  headersDownload[7] = {
+  headersDownload.push({
     key: "CZBFailedGenomeRecovery",
     sortKey: ["CZBFailedGenomeRecovery"],
     text: "Genome Recovery",
-  };
+  });
   if (tableData) {
     const filteredTableData = tableData.filter((entry) =>
       checkedSampleIds.includes(String(entry["publicId"]))
