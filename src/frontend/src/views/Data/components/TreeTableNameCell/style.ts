@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
-import { fontBodyXxs, getColors, getSpaces, Props } from "czifui";
+import { fontBodyXxs, getColors, getIconSizes, getSpaces, Props } from "czifui";
+import { StyledInfoOutlinedIcon as InfoIcon } from "src/common/components/library/data_subview/components/CreateNSTreeModal/style";
 import { TreeRowContent } from "src/common/components/library/data_table/style";
 
 export interface ExtraProps extends Props {
@@ -37,6 +38,9 @@ export const StyledNameWrapper = styled.div`
 `;
 
 export const StyledTreeCreator = styled.div`
+  display: flex;
+  align-items: center;
+  flex-direction: row;
   ${fontBodyXxs}
 
   ${(props) => {
@@ -48,4 +52,17 @@ export const StyledTreeCreator = styled.div`
       margin-top: ${spaces?.xxxs}px;
     `;
   }}
+`;
+
+const xSmallIcon = (props: Props) => {
+  const iconSizes = getIconSizes(props);
+  return `
+    flex: 0 0 auto;
+    height: ${iconSizes?.xs.height}px;
+    width: ${iconSizes?.xs.width}px;
+  `;
+};
+
+export const StyledInfoIcon = styled(InfoIcon)`
+  ${xSmallIcon}
 `;
