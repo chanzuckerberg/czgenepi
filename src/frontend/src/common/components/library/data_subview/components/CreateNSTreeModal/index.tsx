@@ -62,7 +62,7 @@ export const CreateNSTreeModal = ({
   const [treeName, setTreeName] = useState<string>("");
   const [isInputInEditMode, setIsInputInEditMode] = useState<boolean>(false);
   const [shouldReset, setShouldReset] = useState<boolean>(false);
-  const [treeType, setTreeType] = useState<TreeType>(TreeTypes.Targeted);
+  const [treeType, setTreeType] = useState<TreeType>();
   const [missingInputSamples, setMissingInputSamples] = useState<string[]>([]);
   const [shouldShowErrorNotification, setShouldShowErrorNotification] =
     useState<boolean>(false);
@@ -81,7 +81,6 @@ export const CreateNSTreeModal = ({
   const clearState = function () {
     setShouldReset(true);
     setTreeName("");
-    setTreeType(TreeTypes.Targeted);
     setMissingInputSamples([]);
     setValidatedInputSamples([]);
   };
