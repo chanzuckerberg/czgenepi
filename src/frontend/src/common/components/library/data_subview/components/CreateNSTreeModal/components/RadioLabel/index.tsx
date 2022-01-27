@@ -35,8 +35,9 @@ export const RadioLabelOverview = ({ selected }: Props): JSX.Element => {
             <ListItemText>
               <SmallText>
                 Best for seeing an overall picture of viral diversity within
-                your jurisdiction, in the context of genetically similar GISAID
-                samples from outside of your jurisdiction.
+                your jurisdiction in the past 12 weeks, in the context of
+                genetically similar GISAID samples from outside of your
+                jurisdiction.
               </SmallText>
             </ListItemText>
           </StyledListItem>
