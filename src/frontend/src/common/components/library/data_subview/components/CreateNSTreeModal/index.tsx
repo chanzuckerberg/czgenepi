@@ -16,6 +16,7 @@ import { CreateTreeButton } from "./components/CreateTreeButton";
 import { MissingSampleAlert } from "./components/MissingSampleAlert";
 import {
   RadioLabelNonContextualized,
+  RadioLabelOverview,
   RadioLabelTargeted,
 } from "./components/RadioLabel";
 import { SampleIdInput } from "./components/SampleIdInput";
@@ -48,6 +49,7 @@ interface Props {
 const TreeTypes = {
   Targeted: "TARGETED",
   NonContextualized: "NON_CONTEXTUALIZED",
+  Overview: "OVERVIEW",
 };
 type TreeType = typeof TreeTypes[keyof typeof TreeTypes];
 
@@ -216,6 +218,16 @@ export const CreateNSTreeModal = ({
               value={treeType}
               onChange={(e) => setTreeType(e.target.value as TreeType)}
             >
+              <StyledFormControlLabel
+                value={TreeTypes.Overview}
+                checked={treeType === TreeTypes.Overview}
+                control={<StyledRadio />}
+                label={
+                  <RadioLabelOverview
+                    selected={treeType === TreeTypes.Overview}
+                  />
+                }
+              />
               <StyledFormControlLabel
                 value={TreeTypes.Targeted}
                 checked={treeType === TreeTypes.Targeted}
