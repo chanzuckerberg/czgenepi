@@ -57,16 +57,6 @@ export const IsPrivateTableCell = styled(StyledTableCell)`
   }}
 `;
 
-export const SubmittedToGisaidTableCell = styled(StyledTableCell)`
-  ${(props) => {
-    const spaces = getSpaces(props);
-
-    return `
-      padding: ${spaces?.l}px;
-    `;
-  }}
-`;
-
 export const StyledTableRow = styled(TableRow)`
   .MuiTableCell-stickyHeader {
     background-color: white;

@@ -7,7 +7,7 @@ import { WarningWrapper, Wrapper } from "./style";
 interface Props {
   fieldKey: keyof Metadata;
   formik: FormikContextType<Metadata>;
-  isDisabled: boolean;
+  isDisabled?: boolean;
   isAutocorrected?: boolean;
 }
 

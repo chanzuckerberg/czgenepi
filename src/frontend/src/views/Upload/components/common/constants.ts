@@ -10,7 +10,6 @@ export const METADATA_KEYS_TO_HEADERS: Record<keyof Metadata, string> = {
   publicId: "GISAID ID (Public ID)",
   sampleId: "Sample Private ID",
   sequencingDate: "Sequencing Date (optional)",
-  submittedToGisaid: "Previously Submitted to GISAID?",
 };
 
 // When parsing upload of metadata, we use a flipped version of above.
@@ -28,7 +27,6 @@ export const METADATA_KEYS_TO_API_KEYS: Record<keyof Metadata, string> = {
   publicId: "public_identifier",
   sampleId: "private_identifier",
   sequencingDate: "sequencing_date",
-  submittedToGisaid: "submitted_to_gisaid",
 };
 
 export const EMPTY_METADATA: Metadata = {
@@ -37,7 +35,6 @@ export const EMPTY_METADATA: Metadata = {
   keepPrivate: false,
   publicId: "",
   sequencingDate: "",
-  submittedToGisaid: false,
 };
 
 // (thuang): The sample count that the page starts to lag

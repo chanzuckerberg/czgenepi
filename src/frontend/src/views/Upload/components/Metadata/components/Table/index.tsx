@@ -1,5 +1,4 @@
 import { Table as MuiTable, TableBody, TableHead } from "@material-ui/core";
-import { reduce } from "lodash";
 import React, { useCallback, useEffect, useState } from "react";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import {
@@ -21,7 +20,6 @@ import {
   StyledTableCell,
   StyledTableContainer,
   StyledTableRow,
-  SubmittedToGisaidTableCell,
 } from "./style";
 
 interface Props {
@@ -112,16 +110,6 @@ export default function Table({
     );
   }
 
-  const shouldShowGISAIDFields = reduce(
-    metadata,
-    (shouldShow, data) => {
-      if (shouldShow) return true;
-      if (data?.submittedToGisaid) return true;
-      return false;
-    },
-    false
-  );
-
   return (
     <Overflow>
       <form autoComplete="off">
@@ -144,16 +132,9 @@ export default function Table({
                 <IsPrivateTableCell align="center" component="div">
                   {METADATA_KEYS_TO_HEADERS.keepPrivate}
                 </IsPrivateTableCell>
-                <SubmittedToGisaidTableCell align="center" component="div">
-                  {METADATA_KEYS_TO_HEADERS.submittedToGisaid}
-                </SubmittedToGisaidTableCell>
-                {shouldShowGISAIDFields && (
-                  <>
-                    <StyledTableCell component="div">
-                      {METADATA_KEYS_TO_HEADERS.publicId}
-                    </StyledTableCell>
-                  </>
-                )}
+                <StyledTableCell component="div">
+                  {METADATA_KEYS_TO_HEADERS.publicId}
+                </StyledTableCell>
               </StyledTableRow>
             </TableHead>
             {metadata && (

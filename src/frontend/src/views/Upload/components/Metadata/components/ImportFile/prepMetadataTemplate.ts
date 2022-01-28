@@ -12,7 +12,6 @@ const TEMPLATE_HEADERS = [
   METADATA_KEYS_TO_HEADERS.collectionLocation,
   METADATA_KEYS_TO_HEADERS.sequencingDate,
   METADATA_KEYS_TO_HEADERS.keepPrivate,
-  METADATA_KEYS_TO_HEADERS.submittedToGisaid,
   METADATA_KEYS_TO_HEADERS.publicId,
 ];
 
@@ -31,7 +30,6 @@ const EXAMPLE_ROWS = [
     "North America/USA/California/Los Angeles County", // collectionLocation
     DATE_FORMAT, // sequencingDate -- not valid, here as explainer in template
     BOOLEAN_FORMAT, // keepPrivate -- not valid, here as explainer in template
-    BOOLEAN_FORMAT, // submittedToGisaid -- not valid, here as explainer
     "(if available) GISAID ID", // publicId -- here as explainer
   ],
   // Subsequent example rows are fully valid: honest-to-goodness examples.
@@ -41,7 +39,6 @@ const EXAMPLE_ROWS = [
     "San Francisco County", // collectionLocation
     "", // sequencingDate -- optional, showing that with blank use
     "No", // keepPrivate
-    "No", // submittedToGisaid
     "", // publicId -- optional, showing that with blank use
   ],
   [
@@ -50,7 +47,6 @@ const EXAMPLE_ROWS = [
     "North America/USA/California/San Francisco County", // collectionLocation
     "2021-10-21", // sequencingDate -- optional, showing that with blank use
     "No", // keepPrivate
-    "Yes", // submittedToGisaid
     "USA/CA-CZB-0001/2021", // publicId
   ],
 ];

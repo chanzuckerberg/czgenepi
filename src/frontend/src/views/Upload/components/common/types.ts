@@ -56,7 +56,6 @@ export interface Metadata {
   keepPrivate?: boolean;
   publicId?: string;
   sequencingDate?: string;
-  submittedToGisaid?: boolean;
   collectionLocation?: NamedGisaidLocation;
 }
 

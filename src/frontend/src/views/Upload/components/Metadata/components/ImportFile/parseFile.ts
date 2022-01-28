@@ -84,22 +84,8 @@ const METADATA_KEYS_TO_EXTRACT = Object.values(HEADERS_TO_METADATA_KEYS);
 // For a single metadata, if auto-corrections needed, corrects and mutates in-place.
 // If no corrections, returns null, otherwise returns which fields corrected.
 function autocorrectMetadata(metadata: Metadata): Set<keyof Metadata> | null {
-  const correctedKeys = new Set<keyof Metadata>();
-  // If it has publicId, it must be a public sample.
-  if (metadata.publicId) {
-    // Ensure sample has been marked as public
-    if (!metadata.submittedToGisaid) {
-      metadata.submittedToGisaid = true;
-      correctedKeys.add("submittedToGisaid");
-    }
-    // Ensure sample is not private, since it has been submitted publicly
-    if (metadata.keepPrivate) {
-      metadata.keepPrivate = false;
-      correctedKeys.add("keepPrivate");
-    }
-  }
-
-  return correctedKeys.size ? correctedKeys : null;
+  return null;
+  // VOODOO what do, keep it around? stub, what do?
 }
 
 /**
@@ -123,10 +109,6 @@ function warnMissingMetadata(metadata: Metadata): Set<keyof Metadata> | null {
       missingMetadata.add(keyRequiredMetadata);
     }
   });
-  // Additionally, if it's marked as public, then `publicId` is required
-  if (metadata.submittedToGisaid && !metadata.publicId) {
-    missingMetadata.add("publicId");
-  }
   return missingMetadata.size ? missingMetadata : null;
 }
 
@@ -180,7 +162,7 @@ function parseRow(
           parsedCollectionLocation = stringToLocationFinder(originalValue);
         }
         rowMetadata.collectionLocation = parsedCollectionLocation;
-      } else if (key === "keepPrivate" || key === "submittedToGisaid") {
+      } else if (key === "keepPrivate") {
         rowMetadata[key] = convertYesNoToBool(originalValue);
       } else {
         rowMetadata[key] = originalValue;

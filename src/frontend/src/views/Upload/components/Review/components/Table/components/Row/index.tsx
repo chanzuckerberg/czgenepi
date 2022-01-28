@@ -20,7 +20,6 @@ export default React.memo(function Row({ id, metadata }: Props): JSX.Element {
     collectionLocation,
     sequencingDate,
     keepPrivate,
-    submittedToGisaid,
     publicId,
   } = metadata;
 
@@ -46,9 +45,6 @@ export default React.memo(function Row({ id, metadata }: Props): JSX.Element {
           "Public"
         )}
       </IsPrivateTableCell>
-      <StyledTableCell align="center" component="div">
-        {submittedToGisaid ? "Yes" : "No"}
-      </StyledTableCell>
       <StyledTableCell component="div">{publicId || "--"}</StyledTableCell>
     </StyledTableRow>
   );

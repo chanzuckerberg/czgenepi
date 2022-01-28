@@ -39,9 +39,6 @@ export default function Table({ metadata }: Props): JSX.Element {
                 <IsPrivateTableCell align="center" component="div">
                   {METADATA_KEYS_TO_HEADERS.keepPrivate}
                 </IsPrivateTableCell>
-                <StyledTableCell align="center" component="div">
-                  {METADATA_KEYS_TO_HEADERS.submittedToGisaid}
-                </StyledTableCell>
                 <StyledTableCell component="div">
                   {METADATA_KEYS_TO_HEADERS.publicId}
                 </StyledTableCell>

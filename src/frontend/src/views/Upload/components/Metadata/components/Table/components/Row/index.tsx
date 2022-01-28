@@ -35,16 +35,11 @@ const validationSchema = yup.object({
       id: yup.number().required(),
     })
     .required("Required"),
-  publicId: yup.string().when("submittedToGisaid", {
-    is: true,
-    then: yup.string().required("Required"),
-  }),
   sequencingDate: yup
     .string()
     .matches(DATE_REGEX, DATE_ERROR_MESSAGE)
     .min(10, DATE_ERROR_MESSAGE)
     .max(10, DATE_ERROR_MESSAGE),
-  submittedToGisaid: yup.boolean(),
 });
 
 interface Props {
@@ -193,24 +188,11 @@ export default React.memo(function Row({
         <ToggleField
           formik={formik}
           fieldKey="keepPrivate"
-          isDisabled={Boolean(values.submittedToGisaid)}
           isAutocorrected={warnings.has("keepPrivate")}
         />
       </IsPrivateTableCell>
-      <StyledTableCell align="center" component="div">
-        <ToggleField
-          formik={formik}
-          fieldKey="submittedToGisaid"
-          isDisabled={Boolean(values.keepPrivate)}
-          isAutocorrected={warnings.has("submittedToGisaid")}
-        />
-      </StyledTableCell>
       <StyledTableCell component="div">
-        <FreeTextField
-          isShown={Boolean(values.submittedToGisaid)}
-          formik={formik}
-          fieldKey="publicId"
-        />
+        <FreeTextField formik={formik} fieldKey="publicId" />
       </StyledTableCell>
     </StyledTableRow>
   );
