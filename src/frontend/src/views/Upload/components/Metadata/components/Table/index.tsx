@@ -121,6 +121,9 @@ export default function Table({
                   <IdColumn>{METADATA_KEYS_TO_HEADERS.sampleId}</IdColumn>
                 </StyledTableCell>
                 <StyledTableCell component="div">
+                  {METADATA_KEYS_TO_HEADERS.publicId}
+                </StyledTableCell>
+                <StyledTableCell component="div">
                   {METADATA_KEYS_TO_HEADERS.collectionDate}
                 </StyledTableCell>
                 <StyledTableCell component="div">
@@ -132,9 +135,6 @@ export default function Table({
                 <IsPrivateTableCell align="center" component="div">
                   {METADATA_KEYS_TO_HEADERS.keepPrivate}
                 </IsPrivateTableCell>
-                <StyledTableCell component="div">
-                  {METADATA_KEYS_TO_HEADERS.publicId}
-                </StyledTableCell>
               </StyledTableRow>
             </TableHead>
             {metadata && (

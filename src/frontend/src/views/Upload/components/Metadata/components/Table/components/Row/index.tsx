@@ -156,6 +156,9 @@ export default React.memo(function Row({
         <Id>{id}</Id>
       </StyledTableCell>
       <StyledTableCell component="div">
+        <FreeTextField formik={formik} fieldKey="publicId" />
+      </StyledTableCell>
+      <StyledTableCell component="div">
         <StyledDiv>
           <UploadDateField
             isFirstRow={isFirstRow}
@@ -191,9 +194,6 @@ export default React.memo(function Row({
           isAutocorrected={warnings.has("keepPrivate")}
         />
       </IsPrivateTableCell>
-      <StyledTableCell component="div">
-        <FreeTextField formik={formik} fieldKey="publicId" />
-      </StyledTableCell>
     </StyledTableRow>
   );
 });

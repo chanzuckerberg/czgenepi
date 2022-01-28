@@ -52,7 +52,6 @@ export const IsPrivateTableCell = styled(StyledTableCell)`
     return `
       padding: ${spaces?.l}px ${spaces?.l}px;
       border-left: solid 2px ${colors?.gray[200]};
-      border-right: solid 2px ${colors?.gray[200]};
     `;
   }}
 `;
