@@ -7,9 +7,9 @@ export const METADATA_KEYS_TO_HEADERS: Record<keyof Metadata, string> = {
   collectionDate: "Collection Date",
   collectionLocation: "Collection Location",
   keepPrivate: "Sample is Private",
-  publicId: "GISAID ID (Public ID)",
+  publicId: "GISAID ID (Public ID) - Optional",
   sampleId: "Sample Private ID",
-  sequencingDate: "Sequencing Date (optional)",
+  sequencingDate: "Sequencing Date - Optional",
 };
 
 // When parsing upload of metadata, we use a flipped version of above.

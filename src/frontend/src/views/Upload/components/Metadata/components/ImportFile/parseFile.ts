@@ -83,7 +83,7 @@ const METADATA_KEYS_TO_EXTRACT = Object.values(HEADERS_TO_METADATA_KEYS);
 
 // For a single metadata, if auto-corrections needed, corrects and mutates in-place.
 // If no corrections, returns null, otherwise returns which fields corrected.
-function autocorrectMetadata(metadata: Metadata): Set<keyof Metadata> | null {
+function autocorrectMetadata(): Set<keyof Metadata> | null {
   return null;
   // VOODOO what do, keep it around? stub, what do?
 }
@@ -171,7 +171,7 @@ function parseRow(
   });
 
   // autocorrectMetadata mutates metadata in-place if corrections needed
-  const rowAutocorrectWarnings = autocorrectMetadata(rowMetadata);
+  const rowAutocorrectWarnings = autocorrectMetadata();
   if (rowAutocorrectWarnings) {
     rowWarnings.set(WARNING_CODE.AUTO_CORRECT, rowAutocorrectWarnings);
   }
