@@ -33,6 +33,10 @@ export enum WARNING_CODE {
   /**
    * (thuang): We have detected conflicting info and auto-corrected something
    * for the user
+   * (Vince -- Jan 28, 2022): Currently unused due to change in when we auto
+   * correct. While won't occur right now, there is an upcoming feature for
+   * providing notice when parsing uploaded collectionLocation, so leaving
+   * this warning type in for now.
    */
   AUTO_CORRECT,
   // Metadata row in upload was missing required data for one or more fields

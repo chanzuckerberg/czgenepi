@@ -16,6 +16,10 @@ const WARNING_SEVERITY = "warning";
 
 /**
  *  WARNING_CODE.AUTO_CORRECT
+ * (Vince -- Jan 28, 2022): Currently unused due to change in when we auto
+ * correct. While won't occur right now, there is an upcoming feature for
+ * providing notice when parsing uploaded collectionLocation, so leaving
+ * this warning component in for now, although will likely need revamp.
  */
 interface PropsAutoCorrect {
   autocorrectedSamplesCount: number;
