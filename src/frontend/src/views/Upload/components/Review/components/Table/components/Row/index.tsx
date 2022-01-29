@@ -28,6 +28,7 @@ export default React.memo(function Row({ id, metadata }: Props): JSX.Element {
       <StyledTableCell component="div">
         <Id>{id}</Id>
       </StyledTableCell>
+      <StyledTableCell component="div">{publicId || "--"}</StyledTableCell>
       <StyledTableCell component="div">{collectionDate}</StyledTableCell>
       <StyledTableCell component="div">
         {collectionLocation!.name}
@@ -45,7 +46,6 @@ export default React.memo(function Row({ id, metadata }: Props): JSX.Element {
           "Public"
         )}
       </IsPrivateTableCell>
-      <StyledTableCell component="div">{publicId || "--"}</StyledTableCell>
     </StyledTableRow>
   );
 });
