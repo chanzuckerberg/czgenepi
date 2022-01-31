@@ -88,12 +88,6 @@ const MoreActionsMenu = ({
             <StyledTrashIcon />
             <StyledText isWarning>Delete Tree</StyledText>
           </MenuItem>
-          {usesFeatureFlag(FEATURE_FLAGS.editTrees) && (
-            <MenuItem onClick={() => undefined}>
-              <StyledEditIcon />
-              <StyledText>Edit Tree</StyledText>
-            </MenuItem>
-          )}
         </Menu>
       )}
     </>
