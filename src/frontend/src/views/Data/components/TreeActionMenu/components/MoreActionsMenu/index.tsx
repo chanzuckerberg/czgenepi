@@ -78,16 +78,16 @@ const MoreActionsMenu = ({
           onClose={handleClose}
           getContentAnchorEl={null}
         >
+          {usesFeatureFlag(FEATURE_FLAGS.editTrees) && (
+            <MenuItem onClick={() => undefined}>
+              <StyledEditIcon />
+              <StyledText>Edit Tree Name</StyledText>
+            </MenuItem>
+          )}
           <MenuItem onClick={() => onDeleteTreeModalOpen(item)}>
             <StyledTrashIcon />
             <StyledText isRed>Delete Tree</StyledText>
           </MenuItem>
-          {usesFeatureFlag(FEATURE_FLAGS.editTrees) && (
-            <MenuItem onClick={() => undefined}>
-              <StyledEditIcon />
-              <StyledText>Edit Tree</StyledText>
-            </MenuItem>
-          )}
         </Menu>
       )}
     </>
