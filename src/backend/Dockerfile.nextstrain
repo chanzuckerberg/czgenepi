@@ -4,8 +4,8 @@
 FROM nextstrain/base
 ARG DEBIAN_FRONTEND=noninteractive
 
-LABEL maintainer = "Aspen"
-LABEL description = "Image for Aspen nextstrain workflow"
+LABEL maintainer = "CZ Gen Epi"
+LABEL description = "Image for CZ Gen Epi nextstrain workflow"
 
 RUN sed -i s/archive.ubuntu.com/us-west-2.ec2.archive.ubuntu.com/ /etc/apt/sources.list; \
     echo 'APT::Install-Recommends "false";' > /etc/apt/apt.conf.d/98idseq; \

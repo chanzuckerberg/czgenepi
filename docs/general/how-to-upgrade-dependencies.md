@@ -7,7 +7,7 @@ As a general rule please do not directly import the latest version of the downst
 
 If we run into a case where an immediate upstream dependency does not address the vulnerability in a timely manner (i.e. package `C` becomes abandonware), please file an issue noting the problem and start tracking the likely resolution (i.e. migrate to a new dependency, wait, safely ignore, etc.). Please bring the issue to attention for triage during the next issue refinement meeting.
 
-Please check the repos' Dependabot Alerts to ensure that all alerts have been addressed. Please do not clear the alerts unless they are either addressed (via a fully merged PR) or they are not relevant. This means that if one of our dependency packages is unable to be updated because of no available upgrade, leave the alert open so we know to update the package later once an update is available. The dependabot alerts can be found [here](https://github.com/chanzuckerberg/aspen/security/dependabot).
+Please check the repos' Dependabot Alerts to ensure that all alerts have been addressed. Please do not clear the alerts unless they are either addressed (via a fully merged PR) or they are not relevant. This means that if one of our dependency packages is unable to be updated because of no available upgrade, leave the alert open so we know to update the package later once an update is available. The dependabot alerts can be found [here](https://github.com/chanzuckerberg/czgenepi/security/dependabot).
 
 
 ### Upgrading CZ Gen Epi frontend
