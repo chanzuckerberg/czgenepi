@@ -73,7 +73,7 @@ export const CreateNSTreeModal = ({
   const [validatedInputSamples, setValidatedInputSamples] = useState<string[]>(
     []
   );
-  const [isValidTreeType, setValidTreeType] = useState<boolean>(false);
+  const [isValidTreeType, setIsValidTreeType] = useState<boolean>(false);
 
   useEffect(() => {
     if (shouldReset) setShouldReset(false);
@@ -81,9 +81,9 @@ export const CreateNSTreeModal = ({
 
   useEffect(() => {
     if (treeType !== undefined && Object.values(TreeTypes).includes(treeType)) {
-      setValidTreeType(true);
+      setIsValidTreeType(true);
     } else {
-      setValidTreeType(false);
+      setIsValidTreeType(false);
     }
   }, [treeType]);
 
@@ -91,7 +91,7 @@ export const CreateNSTreeModal = ({
     setShouldReset(true);
     setTreeName("");
     setTreeType(undefined);
-    setValidTreeType(false);
+    setIsValidTreeType(false);
     setMissingInputSamples([]);
     setValidatedInputSamples([]);
   };
