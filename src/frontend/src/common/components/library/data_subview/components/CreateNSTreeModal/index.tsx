@@ -16,6 +16,7 @@ import { CreateTreeButton } from "./components/CreateTreeButton";
 import { MissingSampleAlert } from "./components/MissingSampleAlert";
 import {
   RadioLabelNonContextualized,
+  RadioLabelOverview,
   RadioLabelTargeted,
 } from "./components/RadioLabel";
 import { SampleIdInput } from "./components/SampleIdInput";
@@ -48,6 +49,7 @@ interface Props {
 const TreeTypes = {
   Targeted: "TARGETED",
   NonContextualized: "NON_CONTEXTUALIZED",
+  Overview: "OVERVIEW",
 };
 type TreeType = typeof TreeTypes[keyof typeof TreeTypes];
 
@@ -60,7 +62,7 @@ export const CreateNSTreeModal = ({
   const [treeName, setTreeName] = useState<string>("");
   const [isInputInEditMode, setIsInputInEditMode] = useState<boolean>(false);
   const [shouldReset, setShouldReset] = useState<boolean>(false);
-  const [treeType, setTreeType] = useState<TreeType>(TreeTypes.Targeted);
+  const [treeType, setTreeType] = useState<TreeType | undefined>();
   const [missingInputSamples, setMissingInputSamples] = useState<string[]>([]);
   const [shouldShowErrorNotification, setShouldShowErrorNotification] =
     useState<boolean>(false);
@@ -71,15 +73,25 @@ export const CreateNSTreeModal = ({
   const [validatedInputSamples, setValidatedInputSamples] = useState<string[]>(
     []
   );
+  const [isValidTreeType, setIsValidTreeType] = useState<boolean>(false);
 
   useEffect(() => {
     if (shouldReset) setShouldReset(false);
   }, [shouldReset]);
 
+  useEffect(() => {
+    if (treeType !== undefined && Object.values(TreeTypes).includes(treeType)) {
+      setIsValidTreeType(true);
+    } else {
+      setIsValidTreeType(false);
+    }
+  }, [treeType]);
+
   const clearState = function () {
     setShouldReset(true);
     setTreeName("");
-    setTreeType(TreeTypes.Targeted);
+    setTreeType(undefined);
+    setIsValidTreeType(false);
     setMissingInputSamples([]);
     setValidatedInputSamples([]);
   };
@@ -217,6 +229,16 @@ export const CreateNSTreeModal = ({
               onChange={(e) => setTreeType(e.target.value as TreeType)}
             >
               <StyledFormControlLabel
+                value={TreeTypes.Overview}
+                checked={treeType === TreeTypes.Overview}
+                control={<StyledRadio />}
+                label={
+                  <RadioLabelOverview
+                    selected={treeType === TreeTypes.Overview}
+                  />
+                }
+              />
+              <StyledFormControlLabel
                 value={TreeTypes.Targeted}
                 checked={treeType === TreeTypes.Targeted}
                 control={<StyledRadio />}
@@ -253,7 +275,7 @@ export const CreateNSTreeModal = ({
             hasValidName={hasValidName}
             hasSamples={allValidSamplesForTreeCreation.length > 0}
             isInEditMode={isInputInEditMode}
-            isValidTreeType={Object.values(TreeTypes).includes(treeType)}
+            isValidTreeType={isValidTreeType}
             onClick={handleSubmit}
           />
           <CreateTreeInfo>

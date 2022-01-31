@@ -1,7 +1,6 @@
 import { Tooltip } from "czifui";
 import React from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
-import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 
 interface Props {
   children: React.ReactElement;
@@ -19,11 +18,6 @@ export const TreeTypeTooltip = ({ children, value }: Props): JSX.Element => {
       content = `Best for viewing an overall picture of viral diversity within
       your jurisdiction, including genetically similar samples from outside of
       your jurisdiction.`;
-
-      if (!usesFeatureFlag(FEATURE_FLAGS.overviewTrees)) {
-        content += ` Overview trees are automatically built by CZ GEN EPI every Monday.`;
-      }
-
       break;
     case "Non-Contextualized":
       content =
