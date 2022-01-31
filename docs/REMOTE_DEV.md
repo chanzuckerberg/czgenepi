@@ -34,7 +34,7 @@ If you forget which stacks you've created, just run `./scripts/happy list` at an
 If you need to reset your remote dev stack DB run `./scripts/happy migrate <your-stack-name> --reset`.
 
 ### Slices
-If you're only working on a subset of the Aspen application, there's no need to build and push all docker images to test your changes in remote-dev. Both `happy create` and `happy update` commands support a `--slice` option that uses the latest `trunk` build of all docker images except the ones you're working on. For example, if you're only making changes to the frontend/backend images, you don't care to build & push the gisaid image. The following command will create an rdev with your changes reflected in only the `frontend` and `backend` images:
+If you're only working on a subset of the CZ Gen Epi application, there's no need to build and push all docker images to test your changes in remote-dev. Both `happy create` and `happy update` commands support a `--slice` option that uses the latest `trunk` build of all docker images except the ones you're working on. For example, if you're only making changes to the frontend/backend images, you don't care to build & push the gisaid image. The following command will create an rdev with your changes reflected in only the `frontend` and `backend` images:
 
 ```
 ./scripts/happy create mynewrdev --slice fullstack
@@ -74,7 +74,7 @@ Options:
 ```
 
 ### Remote Dev Database management
-There are two commands in the Aspen CLI that exist specifically to enable management of remote dev environments: `aspen-cli db --remote setup` and `aspen-cli db --remote drop`. The `setup` command is responsible for creating a new database in our Aurora database, and importing a db snapshot into the new database. The `drop` command drops a database when a remote dev stack is deleted.
+There are two commands in the CZ Gen Epi CLI that exist specifically to enable management of remote dev environments: `aspen-cli db --remote setup` and `aspen-cli db --remote drop`. The `setup` command is responsible for creating a new database in our Aurora database, and importing a db snapshot into the new database. The `drop` command drops a database when a remote dev stack is deleted.
 
 ### GitHub Action Integration
 A new stack can also be deployed to remote development environment through GitHub Action integration. Pushing any branch prefixed with "rdev-" will trigger the GH Action workflow to create or update a dev stack, with the stack name equals the part of branch name following the prefix, e.g. pushing branch "rdev-my-dev-branch" will deploy the stack "my-dev-branch" in the remote dev enviroment. This is useful in situation where local connections is slow.
