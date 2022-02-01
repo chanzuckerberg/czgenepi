@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { fontHeaderL, getSpaces } from "czifui";
+import { fontCapsXxxxs, fontHeaderL, getColors, getSpaces } from "czifui";
 
 export const Title = styled.span`
   ${fontHeaderL}
@@ -37,6 +37,16 @@ export const Wrapper = styled.div`
 
     return `
       margin-bottom: ${spaces?.xxl}px;
+    `;
+  }}
+`;
+
+export const StyledUpdatedDate = styled.span`
+  ${fontCapsXxxxs}
+  ${(props) => {
+    const colors = getColors(props);
+    return `
+      color: ${colors?.gray[500]};
     `;
   }}
 `;

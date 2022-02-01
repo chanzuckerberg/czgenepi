@@ -1,9 +1,9 @@
 import React from "react";
+import { B } from "src/common/styles/support/style";
 import AlertAccordion from "src/components/AlertAccordion";
 import { ERROR_CODE } from "src/views/Upload/components/common/types";
 import { maybePluralize } from "./common/pluralize";
 import { Td, Th } from "./common/style";
-import { B } from "src/common/styles/support/style";
 
 interface Props {
   names?: string[];
@@ -59,8 +59,8 @@ function MissingFieldMessage({ names }: MessageProps) {
   return (
     <div>
       We were unable to find all of the required fields in your import file.
-      Please check that your data fields match
-      our <B>current metadata template</B> and try again.
+      Please check that your data fields match our{" "}
+      <B>current metadata template above</B> and try again.
       <table>
         <thead>
           <tr>

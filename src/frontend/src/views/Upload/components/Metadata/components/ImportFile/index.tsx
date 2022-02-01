@@ -20,8 +20,17 @@ import {
 import DownloadTemplate from "./components/DownloadTemplate";
 import Instructions from "./components/Instructions";
 import { parseFile, ParseResult, SampleIdToWarningMessages } from "./parseFile";
-import { prepMetadataTemplate } from "./prepMetadataTemplate";
-import { IntroWrapper, Title, TitleWrapper, Wrapper } from "./style";
+import {
+  prepMetadataTemplate,
+  TEMPLATE_UPDATED_DATE,
+} from "./prepMetadataTemplate";
+import {
+  IntroWrapper,
+  StyledUpdatedDate,
+  Title,
+  TitleWrapper,
+  Wrapper,
+} from "./style";
 
 interface Props {
   handleMetadata: (result: ParseResult) => void;
@@ -112,6 +121,9 @@ export default function ImportFile({
           </Button>
           <DownloadTemplate headers={templateHeaders} rows={templateRows}>
             <Button color="primary">Download Metadata Template (TSV)</Button>
+            <StyledUpdatedDate>
+              Updated {TEMPLATE_UPDATED_DATE}
+            </StyledUpdatedDate>
           </DownloadTemplate>
         </TitleWrapper>
 
