@@ -4,7 +4,6 @@ import { List } from "czifui";
 import React from "react";
 import {
   Label,
-  LabelLight,
   LabelMain,
   SmallText,
   StyledIconCheckSmall,
@@ -17,16 +16,15 @@ interface Props {
   selected: boolean;
 }
 
-export const RadioLabelTargeted = ({ selected }: Props): JSX.Element => {
+export const RadioLabelOverview = ({ selected }: Props): JSX.Element => {
   return (
     <div>
       <Label>
-        <LabelMain>Targeted </LabelMain>
-        <LabelLight>— Recommended</LabelLight>
+        <LabelMain>Overview </LabelMain>
       </Label>
       <SmallText>
-        Includes additional publicly-available samples on GISAID from your
-        jurisdiction and other regions.
+        Includes samples from both within and outside of your jurisdiction, at a
+        ratio of roughly 2:1.
       </SmallText>
       {selected && (
         <List>
@@ -35,7 +33,12 @@ export const RadioLabelTargeted = ({ selected }: Props): JSX.Element => {
               <StyledIconCheckSmall />
             </StyledListItemIcon>
             <ListItemText>
-              <SmallText>Best for local outbreak investigation.</SmallText>
+              <SmallText>
+                Best for seeing an overall picture of viral diversity within
+                your jurisdiction in the past 12 weeks, in the context of
+                genetically similar GISAID samples from outside of your
+                jurisdiction.
+              </SmallText>
             </ListItemText>
           </StyledListItem>
           <StyledListItem button={false as any}>
@@ -44,9 +47,59 @@ export const RadioLabelTargeted = ({ selected }: Props): JSX.Element => {
             </StyledListItemIcon>
             <ListItemText>
               <SmallText>
-                Useful for seeing relationships between your selected samples,
-                other samples you have uploaded to CZ GEN EPI, and
-                publicly-available samples on GISAID.
+                Good for identifying possible local outbreaks.
+              </SmallText>
+            </ListItemText>
+          </StyledListItem>
+          <StyledListItem button={false as any}>
+            <StyledListItemIcon>
+              <StyledIconCheckSmall />
+            </StyledListItemIcon>
+            <ListItemText>
+              <SmallText>
+                Good for creating the same tree type as the CZ GEN EPI automatic
+                build, while ensuring that all selected samples will be included
+                in the tree.
+              </SmallText>
+            </ListItemText>
+          </StyledListItem>
+        </List>
+      )}
+    </div>
+  );
+};
+
+export const RadioLabelTargeted = ({ selected }: Props): JSX.Element => {
+  return (
+    <div>
+      <Label>
+        <LabelMain>Targeted </LabelMain>
+      </Label>
+      <SmallText>
+        Includes selected samples and samples that are closely related to the
+        selected samples, at a ratio of roughly 2:1.
+      </SmallText>
+      {selected && (
+        <List>
+          <StyledListItem button={false as any}>
+            <StyledListItemIcon>
+              <StyledIconCheckSmall />
+            </StyledListItemIcon>
+            <ListItemText>
+              <SmallText>
+                Best for investigating an identified outbreak.
+              </SmallText>
+            </ListItemText>
+          </StyledListItem>
+          <StyledListItem button={false as any}>
+            <StyledListItemIcon>
+              <StyledIconCheckSmall />
+            </StyledListItemIcon>
+            <ListItemText>
+              <SmallText>
+                Good for identifying samples most closely related to the
+                selected samples among all samples in GISAID and your CZ GEN EPI
+                samples.
               </SmallText>
             </ListItemText>
           </StyledListItem>
@@ -65,8 +118,8 @@ export const RadioLabelNonContextualized = ({
         <LabelMain>Non-Contextualized </LabelMain>
       </Label>
       <SmallText>
-        Includes additional publicly-available samples on GISAID from your
-        jurisdiction only.
+        Includes samples from only your jurisdiction from both CZ GEN EPI and
+        GISAID.
       </SmallText>
       {selected && (
         <List>
@@ -86,7 +139,7 @@ export const RadioLabelNonContextualized = ({
             </StyledListItemIcon>
             <ListItemText>
               <SmallText>
-                Useful for seeing viral diversity in your jurisdiction that may
+                Good for seeing viral diversity in your jurisdiction that may
                 not be captured by your own sampling effort.
               </SmallText>
             </ListItemText>

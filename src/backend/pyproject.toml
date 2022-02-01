@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "aspen"
 version = "0.1.0"
-description = "ASPEN.  Covid Tracking 2.0"
+description = "CZ Gen Epi. Covid Tracking 2.0"
 authors = ["CZ Gen Epi Team <info@chanzuckerberg.com>"]
 
 [tool.poetry.scripts]
