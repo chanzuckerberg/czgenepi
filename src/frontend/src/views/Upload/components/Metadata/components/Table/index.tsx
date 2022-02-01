@@ -60,9 +60,14 @@ export default function Table({
   }, [metadata]);
 
   useEffect(() => {
-    const isValid = Object.values(rowValidation).every((isValid) => isValid);
-
-    setIsValid(isValid);
+    if (metadata === null) {
+      setIsValid(false);
+    } else {
+      const isValid = Object.keys(metadata).every(
+        (sampleId) => rowValidation[sampleId]
+      );
+      setIsValid(isValid);
+    }
   }, [rowValidation, setIsValid]);
 
   const handleRowValidation_ = (id: string, isValid: boolean) => {
