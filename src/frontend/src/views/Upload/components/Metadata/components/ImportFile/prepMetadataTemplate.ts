@@ -4,7 +4,7 @@
 import { METADATA_KEYS_TO_HEADERS } from "../../../common/constants";
 
 // Should change below whenever there are material changes to TSV download
-export const TEMPLATE_UPDATED_DATE = "2022-02-01"; // YYYY-MM-DD
+export const TEMPLATE_UPDATED_DATE = "2022-02-03"; // YYYY-MM-DD
 
 const DATE_FORMAT = "YYYY-MM-DD";
 const BOOLEAN_FORMAT = "Yes/No";
