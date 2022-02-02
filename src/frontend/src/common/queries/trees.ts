@@ -212,24 +212,26 @@ interface EditTreePayloadType {
 }
 
 interface TreeEditRequestType {
-  treeIdToDelete: string;
+  treeIdToEdit: string;
+  newTreeName: string;
 }
 
 interface TreeEditResponseType {
   id: string;
 }
 
+type TreeEditCallbacks = MutationCallbacks<TreeEditResponseType>;
+
 export async function editTree({
   treeIdToEdit,
   newTreeName
-  
 }: TreeEditRequestType): Promise<TreeEditResponseType> {
   const payload: EditTreePayloadType = {
-    name: newTreeName
+    name: newTreeName,
   };
   const response = await fetch(API_URL + API.PHYLO_TREES_V2 + treeIdToEdit, {
     ...DEFAULT_PUT_OPTIONS,
-    body: JSON.stringify(payload)
+    body: JSON.stringify(payload),
   });
 
   if (response.ok) return await response.json();
