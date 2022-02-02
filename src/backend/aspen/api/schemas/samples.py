@@ -116,3 +116,11 @@ class UpdateSamplesBaseRequest(BaseRequest):
 
 class UpdateSamplesRequest(BaseRequest):
     samples: List[UpdateSamplesBaseRequest]
+
+
+class ValidateIDsRequestSchema(BaseRequest):
+    sample_ids: List[str]
+
+
+class ValidateIDsResponseSchema(BaseResponse):
+    missing_sample_ids: List[str]

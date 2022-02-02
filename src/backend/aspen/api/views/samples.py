@@ -1,5 +1,5 @@
 import datetime
-from typing import List, Set
+from typing import Iterable, List, Set
 
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends
@@ -7,6 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncResult, AsyncSession
 from sqlalchemy.orm import joinedload, selectinload
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm.query import Query
 from starlette.requests import Request
 
 from aspen.api.auth import get_auth_user
@@ -19,9 +20,16 @@ from aspen.api.schemas.samples import (
     SampleResponseSchema,
     SamplesResponseSchema,
     UpdateSamplesRequest,
+    ValidateIDsRequestSchema,
+    ValidateIDsResponseSchema,
 )
 from aspen.api.settings import Settings
-from aspen.api.utils import authz_samples_cansee, determine_gisaid_status
+from aspen.api.utils import (
+    authz_samples_cansee,
+    determine_gisaid_status,
+    get_matching_gisaid_ids,
+    get_missing_and_found_sample_ids,
+)
 from aspen.database.models import DataType, Location, Sample, User
 
 router = APIRouter()
@@ -198,3 +206,43 @@ async def update_samples(
         )
 
     return res
+
+
+@router.post("/validate_ids/")
+async def validate_ids(
+    request_data: ValidateIDsRequestSchema,
+    db: AsyncSession = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    user: User = Depends(get_auth_user),
+) -> ValidateIDsResponseSchema:
+
+    """
+    take in a list of identifiers and checks if all idenitifiers exist as either Sample public or private identifiers, or GisaidMetadata strain names
+
+    returns a response with list of missing identifiers if any, otherwise will return an empty list
+    """
+
+    sample_ids: Iterable[str] = request_data.sample_ids
+
+    all_samples_query: Query = sa.select(Sample)
+
+    # get all samples from request that the user has permission to use and scope down the search for matching ID's to groups that the user has read access to.
+    user_visible_samples_query = authz_samples_cansee(
+        all_samples_query, sample_ids, user
+    )
+    user_visible_samples_res = await (db.execute(user_visible_samples_query))
+    user_visible_samples = user_visible_samples_res.scalars().all()
+
+    # Are there any sample ID's that don't match sample table public and private identifiers
+    missing_sample_ids: Set[str]
+    missing_sample_ids, _ = get_missing_and_found_sample_ids(
+        sample_ids, user_visible_samples
+    )
+
+    # See if these missing_sample_ids match any Gisaid identifiers
+    gisaid_ids: Set[str] = await get_matching_gisaid_ids(db, missing_sample_ids)
+
+    # Do we have any samples that are not aspen private or public identifiers or gisaid identifiers?
+    missing_sample_ids: Set[str] = missing_sample_ids - gisaid_ids
+
+    return ValidateIDsResponseSchema(missing_sample_ids=missing_sample_ids)
