@@ -19,9 +19,8 @@ async def get_tree_versions(
     request: Request, db: AsyncSession = Depends(get_db)
 ) -> treeversions:
     options = await db.execute(
-        sa.select(UsherOption).order_by(UsherOption.priority.asc())
+        sa.select(UsherOption).order_by(UsherOption.priority.asc())  # type: ignore
     )
-    # return treeversions.from_orm(options.scalars().all())
     return treeversions(
         usher_options=parse_obj_as(List[UsherTreeVersion], options.scalars().all())
     )
