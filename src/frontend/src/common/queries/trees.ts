@@ -10,6 +10,7 @@ import {
   DEFAULT_DELETE_OPTIONS,
   DEFAULT_FETCH_OPTIONS,
   DEFAULT_POST_OPTIONS,
+  DEFAULT_PUT_OPTIONS,
   fetchTrees,
   TreeResponse,
 } from "../api";
@@ -24,13 +25,13 @@ import { MutationCallbacks } from "./types";
 interface CreateTreePayload {
   name: string;
   samples: string[];
-  tree_type: string | undefined;
+  tree_type: string | undefined; // treeType can be undefined when user first opens the NSTreeCreate modal
 }
 
 interface CreateTreeType {
   treeName: string;
   sampleIds: string[];
-  treeType: string | undefined; // treeType can be undefined when user first opens the NSTreeCreate modal
+  treeType: string | undefined; 
 }
 
 type CreateTreeCallbacks = MutationCallbacks<void>;
@@ -95,6 +96,7 @@ interface FastaRequestType {
 export interface FastaResponseType {
   url: string;
 }
+
 
 type FastaFetchCallbacks = MutationCallbacks<FastaResponseType>;
 
@@ -193,6 +195,58 @@ export function useDeleteTree({
 > {
   const queryClient = useQueryClient();
   return useMutation(deleteTree, {
+    onError: componentOnError,
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries([USE_TREE_INFO]);
+      componentOnSuccess(data);
+    },
+  });
+}
+
+/**
+ * edit trees
+ */
+
+interface EditTreePayloadType {
+  name: string;
+}
+
+interface TreeEditRequestType {
+  treeIdToDelete: string;
+}
+
+interface TreeEditResponseType {
+  id: string;
+}
+
+export async function editTree({
+  treeIdToEdit,
+  newTreeName
+  
+}: TreeEditRequestType): Promise<TreeEditResponseType> {
+  const payload: EditTreePayloadType = {
+    name: newTreeName
+  };
+  const response = await fetch(API_URL + API.PHYLO_TREES_V2 + treeIdToEdit, {
+    ...DEFAULT_PUT_OPTIONS,
+    body: JSON.stringify(payload)
+  });
+
+  if (response.ok) return await response.json();
+  throw Error(`${response.statusText}: ${await response.text()}`);
+}
+
+export function useEditTree({
+  componentOnError,
+  componentOnSuccess,
+}: TreeEditCallbacks): UseMutationResult<
+  TreeEditResponseType,
+  unknown,
+  TreeEditRequestType,
+  unknown
+> {
+  const queryClient = useQueryClient();
+  return useMutation(editTree, {
     onError: componentOnError,
     onSuccess: async (data) => {
       await queryClient.invalidateQueries([USE_TREE_INFO]);

@@ -11,6 +11,7 @@ import { VIEWNAME } from "src/common/constants/types";
 import { CreateNSTreeModal } from "./components/CreateNSTreeModal";
 import { DeleteSamplesConfirmationModal } from "./components/DeleteSamplesConfirmationModal";
 import { DeleteTreeConfirmationModal } from "./components/DeleteTreeConfirmationModal";
+import { EditTreeConfirmationModal } from "./components/EditTreeConfirmationModal";
 import DownloadModal from "./components/DownloadModal";
 import { IconButton } from "./components/IconButton";
 import { MoreActionsMenu } from "./components/MoreActionMenu";

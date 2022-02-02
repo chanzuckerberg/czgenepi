@@ -10,12 +10,14 @@ import { StyledEditIcon, StyledText, StyledTrashIcon } from "./style";
 interface Props {
   item: Tree;
   onDeleteTreeModalOpen(t: Tree): void;
+  onEditTreeModalOpen(t: Tree): void;
   userInfo: UserResponse;
 }
 
 const MoreActionsMenu = ({
   item,
   onDeleteTreeModalOpen,
+  onEditTreeModalOpen,
   userInfo,
 }: Props): JSX.Element => {
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
