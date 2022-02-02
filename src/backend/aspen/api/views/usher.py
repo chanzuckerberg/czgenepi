@@ -14,7 +14,7 @@ from aspen.database.models.usher import UsherOption
 router = APIRouter()
 
 
-@router.get("/tree_versions", response_model=treeversions)
+@router.get("/tree_versions/", response_model=treeversions)
 async def get_tree_versions(
     request: Request, db: AsyncSession = Depends(get_db)
 ) -> treeversions:
