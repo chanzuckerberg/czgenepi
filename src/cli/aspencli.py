@@ -1,19 +1,18 @@
 #!/usr/bin/env python3
-import click
 import csv
-import dateparser
-import requests
 import json
-import time
 import os.path
-from urllib.parse import urlparse, quote
+import time
 import webbrowser
+from urllib.parse import quote, urlparse
+
+import click
+import dateparser
 import keyring
+import requests
 from auth0.v3.authentication.token_verifier import (
-    TokenVerifier,
-    JwksFetcher,
-    AsymmetricSignatureVerifier,
-)
+    AsymmetricSignatureVerifier, JwksFetcher, TokenVerifier)
+
 
 class InsecureJwksFetcher(JwksFetcher):
     def _fetch_jwks(self, force=False):
@@ -36,6 +35,7 @@ class InsecureJwksFetcher(JwksFetcher):
             self._cache_date = time.time()
         return self._cache_value
 
+
 class TokenHandler:
     def __init__(self, client_id, auth_url, keyring, oauth_api_config, verify=True):
         parsed_url = urlparse(auth_url)
@@ -46,7 +46,9 @@ class TokenHandler:
         self.verify = verify
         self.waiting_status_code = oauth_api_config["waiting_status_code"]
         self.poll_url = oauth_api_config["poll_url"].format(auth_url=self.auth_url)
-        self.device_auth_url = oauth_api_config["device_auth_url"].format(auth_url=self.auth_url)
+        self.device_auth_url = oauth_api_config["device_auth_url"].format(
+            auth_url=self.auth_url
+        )
         self.jwks_url = oauth_api_config["jwks_url"].format(auth_url=self.auth_url)
         self.client_secret = oauth_api_config["client_secret"]
         if self.verify:
@@ -103,7 +105,7 @@ class TokenHandler:
             f"    {device_info['verification_uri_complete']}\n"
             "Click confirm to continue"
         )
-        webbrowser.open_new_tab(device_info['verification_uri_complete'])
+        webbrowser.open_new_tab(device_info["verification_uri_complete"])
         poll_payload = {
             "client_id": self.client_id,
             "device_code": device_info["device_code"],
@@ -199,8 +201,8 @@ class CliConfig:
                 "poll_url": "{auth_url}/connect/token",
                 "client_secret": "local-client-secret",
                 "jwks_url": "{auth_url}/.well-known/openid-configuration/jwks",
-            }
-        }
+            },
+        },
     }
 
     def __init__(self, env, api=None, stack=None):
@@ -265,8 +267,17 @@ def get_link(ctx, sample_ids):
     print(resp.text)
     resp_info = resp.json()
     s3_url = resp_info["url"]
-    print(f"https://genome.ucsc.edu/cgi-bin/hgPhyloPlace?db=wuhCor1&remoteFile={quote(s3_url)}")
+    print(
+        f"https://genome.ucsc.edu/cgi-bin/hgPhyloPlace?db=wuhCor1&remoteFile={quote(s3_url)}"
+    )
 
+
+@usher.command(name="get-tree-versions")
+@click.pass_context
+def get_tree_versions(ctx):
+    api_client = ctx.obj["api_client"]
+    resp = api_client.get("/v2/usher/tree_versions")
+    print(resp.text)
 
 
 @cli.group()
@@ -294,9 +305,11 @@ def get_userinfo(ctx):
     resp = api_client.get("/api/usergroup")
     print(resp.text)
 
+
 @cli.group()
 def phylo_trees():
     pass
+
 
 @phylo_trees.command(name="get-sample-ids")
 @click.argument("tree_id")
@@ -306,9 +319,11 @@ def get_tree_sample_ids(ctx, tree_id):
     resp = api_client.get(f"/api/phylo_tree/sample_ids/{tree_id}")
     print(resp.text)
 
+
 @cli.group()
 def locations():
     pass
+
 
 @locations.command(name="list")
 @click.pass_context
@@ -317,9 +332,11 @@ def list_locations(ctx):
     resp = api_client.get("/v2/locations/")
     print(resp.text)
 
+
 @cli.group()
 def samples():
     pass
+
 
 @samples.command(name="list")
 @click.pass_context
@@ -357,19 +374,46 @@ def delete_samples(ctx, sample_ids):
 
 @samples.command(name="update")
 @click.argument("sample_id")
-@click.option("--private-id", required=False, type=str, help="Update the sample private id")
-@click.option("--public-id", required=False, type=str, help="Update the sample public id")
-@click.option("--collection-date", required=False, type=str, help="Update the sample collection date")
-@click.option("--sequencing-date", required=False, type=str, help="Update the sample sequencing date")
-@click.option("--private", required=False, type=bool, help="Set whether the sample is private")
-@click.option("--location", required=False, type=int, help="Set the sample's collection location")
+@click.option(
+    "--private-id", required=False, type=str, help="Update the sample private id"
+)
+@click.option(
+    "--public-id", required=False, type=str, help="Update the sample public id"
+)
+@click.option(
+    "--collection-date",
+    required=False,
+    type=str,
+    help="Update the sample collection date",
+)
+@click.option(
+    "--sequencing-date",
+    required=False,
+    type=str,
+    help="Update the sample sequencing date",
+)
+@click.option(
+    "--private", required=False, type=bool, help="Set whether the sample is private"
+)
+@click.option(
+    "--location", required=False, type=int, help="Set the sample's collection location"
+)
 @click.pass_context
-def update_samples(ctx, sample_id, private_id, public_id, collection_date, sequencing_date, private, location):
+def update_samples(
+    ctx,
+    sample_id,
+    private_id,
+    public_id,
+    collection_date,
+    sequencing_date,
+    private,
+    location,
+):
     api_client = ctx.obj["api_client"]
     if collection_date:
-        collection_date = dateparser.parse(collection_date).strftime('%Y-%m-%d')
+        collection_date = dateparser.parse(collection_date).strftime("%Y-%m-%d")
     if sequencing_date:
-        sequencing_date = dateparser.parse(sequencing_date).strftime('%Y-%m-%d')
+        sequencing_date = dateparser.parse(sequencing_date).strftime("%Y-%m-%d")
     all_fields = {
         "id": sample_id,
         "public_identifier": public_id,
@@ -396,15 +440,23 @@ def phylo_runs():
 
 
 @phylo_runs.command(name="create")
-@click.option("-n","--name", required=True, type=str)
-@click.option("-t","--type", "tree_type", required=True, type=click.Choice(["OVERVIEW", "TARGETED", "NON_CONTEXTUALIZED"], case_sensitive=False))
-@click.option("-a","--template-args", "template_args", required=False, type=str)
+@click.option("-n", "--name", required=True, type=str)
+@click.option(
+    "-t",
+    "--type",
+    "tree_type",
+    required=True,
+    type=click.Choice(
+        ["OVERVIEW", "TARGETED", "NON_CONTEXTUALIZED"], case_sensitive=False
+    ),
+)
+@click.option("-a", "--template-args", "template_args", required=False, type=str)
 @click.option("-h", "--show-headers", is_flag=True)
 @click.argument("sample_ids", nargs=-1)
 @click.pass_context
 def start_phylo_run_v2(ctx, name, tree_type, template_args, sample_ids, show_headers):
     api_client = ctx.obj["api_client"]
-    payload = { "name": name, "tree_type": tree_type, "samples": sample_ids }
+    payload = {"name": name, "tree_type": tree_type, "samples": sample_ids}
     if template_args:
         payload["template_args"] = json.loads(template_args)
     print(json.dumps(payload))
@@ -413,6 +465,7 @@ def start_phylo_run_v2(ctx, name, tree_type, template_args, sample_ids, show_hea
         print(resp.headers)
     print(resp.text)
     print(resp)
+
 
 @phylo_runs.command(name="update")
 @click.argument("run_id")
@@ -434,7 +487,7 @@ def update_phylorun(ctx, run_id, name):
 @click.pass_context
 def validate_sample_ids(ctx, sample_ids, show_headers):
     api_client = ctx.obj["api_client"]
-    payload = { "sample_ids": sample_ids }
+    payload = {"sample_ids": sample_ids}
     resp = api_client.post("/api/samples/validate-ids", json=payload)
     if show_headers:
         print(resp.headers)
@@ -451,6 +504,7 @@ def delete_runs(ctx, run_ids):
         resp = api_client.delete(f"/v2/phylo_runs/{run_id}")
         print(resp.headers)
         print(resp.text)
+
 
 @phylo_runs.command(name="list")
 @click.option("--print-headers", is_flag=True, default=False)
