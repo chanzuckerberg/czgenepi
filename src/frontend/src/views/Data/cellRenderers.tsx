@@ -163,6 +163,7 @@ const TREE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
     item,
     userInfo,
     onDeleteTreeModalOpen,
+    onEditTreeModalOpen,
   }): JSX.Element => {
     return (
       <TreeActionMenu
@@ -170,6 +171,7 @@ const TREE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
         value={value}
         userInfo={userInfo}
         onDeleteTreeModalOpen={onDeleteTreeModalOpen}
+        onEditTreeModalOpen={onEditTreeModalOpen}
       />
     );
   },

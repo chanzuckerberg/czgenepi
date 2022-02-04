@@ -148,6 +148,9 @@ const DataSubview: FunctionComponent<Props> = ({
   const [isDeleteTreeConfirmationOpen, setDeleteTreeConfirmationOpen] =
     useState<boolean>(false);
   const [treeToDelete, setTreeToDelete] = useState<Tree>();
+  const [isEditTreeConfirmationOpen, setEditTreeConfirmationOpen] =
+  useState<boolean>(false);
+const [treeToEdit, setTreeToEdit] = useState<Tree>();
 
   const handleDownloadClickOpen = () => {
     setDownloadModalOpen(true);
@@ -183,9 +186,18 @@ const DataSubview: FunctionComponent<Props> = ({
     setDeleteTreeConfirmationOpen(false);
   };
 
+  const handleEditTreeModalClose = () => {
+    setEditTreeConfirmationOpen(false);
+  };
+
   const handleDeleteTreeModalOpen = (tree: Tree) => {
     setTreeToDelete(tree);
     setDeleteTreeConfirmationOpen(true);
+  };
+
+  const handleEditTreeModalOpen = (tree: Tree) => {
+    setTreeToEdit(tree);
+    setEditTreeConfirmationOpen(true);
   };
 
   const onChange = (
@@ -300,11 +312,18 @@ const DataSubview: FunctionComponent<Props> = ({
           </>
         )}
         {viewName === VIEWNAME.TREES && (
+          <>
           <DeleteTreeConfirmationModal
             open={isDeleteTreeConfirmationOpen}
             onClose={handleDeleteTreeModalClose}
             tree={treeToDelete}
           />
+          <EditTreeConfirmationModal
+          open={isEditTreeConfirmationOpen}
+          onClose={handleEditTreeModalClose}
+          tree={treeToEdit}
+          />
+        </>
         )}
         <StyledFlexChildDiv className={style.samplesRoot}>
           <div className={style.searchBar}>
@@ -340,6 +359,7 @@ const DataSubview: FunctionComponent<Props> = ({
               renderer={renderer}
               // TODO-TR (mlila): handler can be removed when tree delete modal moved
               handleDeleteTreeModalOpen={handleDeleteTreeModalOpen}
+              handleEditTreeModalOpen={handleEditTreeModalOpen}
             />
           </div>
         </StyledFlexChildDiv>

@@ -29,6 +29,7 @@ interface Props {
   viewName: VIEWNAME;
   renderer?: CustomRenderer;
   handleDeleteTreeModalOpen(t: Tree): void;
+  handleEditTreeModalOpen(t: Tree): void;
 }
 
 // (thuang): If item height changes, we need to update this value!
@@ -157,6 +158,7 @@ export const DataTable: FunctionComponent<Props> = ({
   setFailedSampleIds,
   viewName,
   handleDeleteTreeModalOpen,
+  handleEditTreeModalOpen,
 }: Props) => {
   const [isHeaderChecked, setIsHeaderChecked] = useState<boolean>(false);
   const [isHeaderIndeterminant, setHeaderIndeterminant] =
@@ -263,6 +265,10 @@ export const DataTable: FunctionComponent<Props> = ({
         ? noop
         : handleDeleteTreeModalOpen;
 
+        const onEditTreeModalOpen = isSampleTable
+        ? noop
+        : handleEditTreeModalOpen;
+
       return (
         <Fragment key={`${item[indexingKey]}-${header.key}`}>
           {renderer({
@@ -270,6 +276,7 @@ export const DataTable: FunctionComponent<Props> = ({
             index,
             item,
             onDeleteTreeModalOpen,
+            onEditTreeModalOpen,
             userInfo,
             value,
           })}
