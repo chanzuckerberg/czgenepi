@@ -21,7 +21,7 @@ from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.auspice import GenerateAuspiceMagicLinkResponse
 from aspen.api.settings import Settings
-from aspen.api.utils import get_matching_gisaid_ids
+from aspen.api.utils import authz_phylo_tree_filters, get_matching_gisaid_ids
 from aspen.app.views.api_utils import (
     authz_sample_filters,
     get_missing_and_found_sample_ids,
@@ -40,6 +40,23 @@ from aspen.database.models import (
 )
 
 router = APIRouter()
+
+
+async def _verify_phylo_tree_access(
+    db: AsyncSession, user: User, phylo_tree_id: int
+) -> bool:
+    tree_query = sa.select(PhyloTree).join(PhyloRun)
+    authz_tree_query = authz_phylo_tree_filters(tree_query, user, set([phylo_tree_id]))
+    authz_tree_query_result = await db.execute(authz_tree_query)
+    phylo_tree: PhyloTree
+    try:
+        phylo_tree = authz_tree_query_result.one()
+    except sa.exc.NoResultFound:  # type: ignore
+        raise ex.BadRequestException(
+            f"PhyloTree with id {phylo_tree_id} not viewable by user with id: {user.id}"
+        )
+    return True
+
 
 # def _process_phylo_tree(db: AsyncSession, user: User, phylo_tree_id: int) -> dict:
 #     """Retrieves a phylo tree and renames the nodes on the tree for a given user."""
@@ -98,61 +115,18 @@ router = APIRouter()
 #     return json_data
 
 
-async def _get_accessible_phylo_runs(db, user, run_id=None, editable=False):
-    # get phylo_runs viewable or editable by a user, optionally filtered by id
-    cansee_owner_group_ids: Set[int] = {
-        cansee.owner_group_id
-        for cansee in user.group.can_see
-        if cansee.data_type == DataType.TREES
-    }
-    query = sa.select(PhyloRun).options(
-        joinedload(PhyloRun.outputs.of_type(PhyloTree)),
-        joinedload(PhyloRun.user),  # For Pydantic serialization
-        joinedload(PhyloRun.group),  # For Pydantic serialization
-    )
-
-    # These are access control checks!
-    if editable:
-        # for update and delete views return only trees that are in the users group
-        query = query.filter(
-            PhyloRun.group == user.group,
-        )
-    else:
-        # this is for list view, return all runs that are viewable
-        query = query.filter(
-            sa.or_(
-                PhyloRun.group == user.group,
-                user.system_admin,
-                PhyloRun.group_id.in_(cansee_owner_group_ids),
-            ),
-        )
-
-    if run_id:
-        query = query.filter(PhyloRun.id == run_id)
-        results = await db.execute(query)
-        try:
-            run = results.scalars().unique().one()
-        except NoResultFound:
-            raise ex.NotFoundException("phylo run not found")
-        if run.workflow_status == WorkflowStatusType.STARTED:
-            raise ex.BadRequestException("Can't modify an in-progress phylo run")
-        return run
-
-    results = await db.execute(query)
-    return results.unique().scalars().all()
-
-
+# TODO: Convert to POST request
 @router.get("/generate/{phylo_tree_id}")
-def generate_auspice_string(
+async def generate_auspice_string(
     phylo_tree_id: int,
     request: Request,
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_auth_user),
 ):
-    phylo_run = _get_accessible_phylo_runs(db, user, run_id=phylo_tree_id)
-    if not phylo_run:
-        raise Ex.NotFoundException("No phylo run found for auspice request")
+    phylo_run_db_response = await _verify_phylo_tree_access(db, user, phylo_tree_id)
+    if not phylo_run_db_response:
+        raise Ex.BadRequestException("No phylo run found for auspice request")
 
     expiry_time = datetime.now(timezone.utc) + timedelta(hours=1)
     payload = {"tree_id": phylo_tree_id, "expiry": expiry_time.isoformat()}
@@ -172,9 +146,9 @@ def generate_auspice_string(
     )
 
 
-@router.get("/access/{magic_string}")
+@router.get("/access/{magic_link}")
 def auspice_view(
-    magic_string: str,
+    magic_link: str,
     request: Request,
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
