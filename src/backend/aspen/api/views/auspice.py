@@ -58,6 +58,10 @@ async def _verify_phylo_tree_access(
     return True
 
 
+async def _get_phylo_tree_json(db: AsyncSession, phylo_tree_id: int) -> str:
+    pass
+
+
 # def _process_phylo_tree(db: AsyncSession, user: User, phylo_tree_id: int) -> dict:
 #     """Retrieves a phylo tree and renames the nodes on the tree for a given user."""
 #     tree_query: Query = (
@@ -154,4 +158,28 @@ def auspice_view(
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_auth_user),
 ):
-    pass
+    # First, verify the MAC tag.
+    payload_message, payload_mac_tag = magic_link.split(".")
+    encoded_payload_message = payload_message.encode("utf8")
+
+    mac_key = urlsafe_b64decode(settings.AUSPICE_MAC_KEY)
+    digest_maker = hmac.new(mac_key, encoded_payload_message, hashlib.sha3_512)
+    correct_mac_tag = digest_maker.hexdigest()
+
+    authenticated = hmac.compare_digest(payload_mac_tag, correct_mac_tag)
+    if not authenticated:
+        raise Ex.BadRequestException(
+            "Unauthenticated attempt to access an auspice magic link"
+        )
+
+    # Then decode the payload.
+    decoded_payload_message = urlsafe_b64decode(encoded_payload_message).decode("utf8")
+    recovered_payload = json.loads(decoded_payload_message)
+
+    # Test the expiry
+    expiry_time = datetime.fromisoformat(recovered_payload["expiry"])
+    if expiry_time <= datetime.now(timezone.utc):
+        raise Ex.BadRequestException("Expired auspice view magic link")
+
+    # Return the tree
+    return "AUTHENTIC MAGIC LINK!"
