@@ -99,6 +99,12 @@ export default React.memo(function Row({
     initialValues: metadataOnMount,
     onSubmit: noop,
     validationSchema,
+    // Formik defaults to considering the form valid when it inits, but ours is
+    // not valid at start. We need to explicitly set an error that is true when
+    // it loads so it does not prematurely consider the form valid.
+    // Could also do this via `validateOnMount`, but validate call is somewhat
+    // heavy so when we mount 100+ Rows at once it can lock things up.
+    initialErrors: { collectionDate: "Required" },
   });
 
   const { values, isValid, setTouched, setValues } = formik;
