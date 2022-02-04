@@ -20,7 +20,9 @@ export OIDC_BROWSER_URL=https://oidc.genepinet.localdev:8443
 echo "Creating secretsmanager secrets"
 local_aws="aws --endpoint-url=${LOCALSTACK_URL}"
 ${local_aws} secretsmanager create-secret --name genepi-config &> /dev/null || true
+# AUSPICE_MAC_KEY is just the result of urlsafe_b64encode(b'auspice-mac-key')
 ${local_aws} secretsmanager update-secret --secret-id genepi-config --secret-string '{
+  "AUSPICE_MAC_KEY": "YXVzcGljZS1tYWMta2V5",
   "AUTH0_CLIENT_ID": "local-client-id",
   "AUTH0_CALLBACK_URL": "'"${BACKEND_URL}"'/callback",
   "AUTH0_CLIENT_SECRET": "local-client-secret",
