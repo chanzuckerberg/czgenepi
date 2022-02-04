@@ -6,7 +6,7 @@ import { maybePluralize } from "./common/pluralize";
 import { Td, Th } from "./common/style";
 
 interface Props {
-  names?: string[];
+  names?: string[] | null;
   errorCode?: ERROR_CODE;
 }
 

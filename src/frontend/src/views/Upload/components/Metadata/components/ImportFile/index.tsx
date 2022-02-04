@@ -45,7 +45,7 @@ export default function ImportFile({
 }: Props): JSX.Element {
   const [isInstructionsShown, setIsInstructionsShown] = useState(false);
   const [hasImportedFile, setHasImportedFile] = useState(false);
-  const [missingFields, setMissingFields] = useState<string[]>([]);
+  const [missingFields, setMissingFields] = useState<string[] | null>(null);
   const [autocorrectCount, setAutocorrectCount] = useState<number>(0);
   const [filename, setFilename] = useState("");
   const [parseResult, setParseResult] = useState<ParseResult | null>(null);
@@ -58,7 +58,11 @@ export default function ImportFile({
   // `extraneousSampleIds` are what was in metadata, but not in sequence upload
   // `absentSampleIds` were in sequence upload, but missing from metadata
   useEffect(() => {
+    // If no file uploaded yet, do nothing.
     if (!parseResult) return;
+    // If file was missing any col header fields, we parsed no data from it
+    // and only display that error to the user to force them to fix problems.
+    if (getMissingFields(parseResult)) return;
 
     const { data } = parseResult;
     const parseResultSampleIds = Object.keys(data);
@@ -90,12 +94,8 @@ export default function ImportFile({
 
     const result = await parseFile(files[0], stringToLocationFinder);
 
-    const { errorMessages, warningMessages, filename } = result;
-
-    const missingFields = Array.from(
-      errorMessages.get(ERROR_CODE.MISSING_FIELD) || []
-    );
-
+    const { warningMessages, filename } = result;
+    const missingFields = getMissingFields(result);
     const autocorrectCount =
       getAutocorrectCount(warningMessages.get(WARNING_CODE.AUTO_CORRECT)) || 0;
 
@@ -155,7 +155,7 @@ export default function ImportFile({
         <Success filename={filename} />
       </RenderOrNull>
 
-      <RenderOrNull condition={missingFields.length}>
+      <RenderOrNull condition={missingFields}>
         <Error errorCode={ERROR_CODE.MISSING_FIELD} names={missingFields} />
       </RenderOrNull>
 
@@ -205,4 +205,11 @@ function getAutocorrectCount(
   sampleIdToWarningMessages: SampleIdToWarningMessages = {}
 ) {
   return Object.keys(sampleIdToWarningMessages).length;
+}
+
+// Returns array of all missing column header fields, or if none missing, null.
+function getMissingFields(parseResult: ParseResult): string[] | null {
+  const { errorMessages } = parseResult;
+  const missingFieldsErr = errorMessages.get(ERROR_CODE.MISSING_FIELD);
+  return missingFieldsErr ? Array.from(missingFieldsErr) : null;
 }

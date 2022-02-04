@@ -181,6 +181,10 @@ function parseRow(
  * and errors that were encountered (eg, a field was missing, etc) so that
  * those can be displayed to the user after pasing is complete.
  *
+ * In the case of some errors -- eg, missing column headers -- we consider it
+ * so egregious we do not load any data from the file. User just gets an
+ * error message telling them they need to fix it before we allow loading.
+ *
  * Generally, this parses all entries in file and makes no attempt fo filter
  * the uploaded metadata down to the samples user user has previously uploaded.
  * For example, if user uploaded only sample A, but then uploads metadata for
@@ -230,35 +234,35 @@ export function parseFile(
         const missingHeaderFields = getMissingHeaderFields(uploadedHeaders);
         if (missingHeaderFields) {
           errorMessages.set(ERROR_CODE.MISSING_FIELD, missingHeaderFields);
+        } else {
+          // We only ingest file's data if user had all expected fields.
+          const IGNORED_SAMPLE_IDS = new Set(EXAMPLE_SAMPLE_IDS);
+          rows.forEach((row) => {
+            const { rowMetadata, rowWarnings } = parseRow(
+              row,
+              stringToLocationFinder,
+              IGNORED_SAMPLE_IDS
+            );
+            // If false-y, there was no parse result, so we just skip those
+            if (rowMetadata) {
+              // We can guarantee there's a sampleId because rowMetadata exists
+              // and parsing requires it, so `as string` is always correct here
+              const rowSampleId = rowMetadata.sampleId as string;
+              sampleIdToMetadata[rowSampleId] = rowMetadata;
+              // If row had warnings, fold them into the overall warnings.
+              // If row had no warnings, forEach is a no-op since no entries.
+              rowWarnings.forEach((warnStatements, warningType) => {
+                let warnRecordForType = warningMessages.get(warningType);
+                if (warnRecordForType === undefined) {
+                  // Haven't encountered this warning type until now, do init
+                  warnRecordForType = {};
+                  warningMessages.set(warningType, warnRecordForType);
+                }
+                warnRecordForType[rowSampleId] = warnStatements;
+              });
+            }
+          });
         }
-
-        const IGNORED_SAMPLE_IDS = new Set(EXAMPLE_SAMPLE_IDS);
-
-        rows.forEach((row) => {
-          const { rowMetadata, rowWarnings } = parseRow(
-            row,
-            stringToLocationFinder,
-            IGNORED_SAMPLE_IDS
-          );
-          // If false-y, there was no parse result, so we just skip those
-          if (rowMetadata) {
-            // We can guarantee there is a sampleId because rowMetadata exists
-            // and parsing requires it, so `as string` is always correct here
-            const rowSampleId = rowMetadata.sampleId as string;
-            sampleIdToMetadata[rowSampleId] = rowMetadata;
-            // If row had warnings, fold them into the overall warnings.
-            // If row had no warnings, forEach is a no-op since no entries.
-            rowWarnings.forEach((warnStatements, warningType) => {
-              let warnRecordForType = warningMessages.get(warningType);
-              if (warnRecordForType === undefined) {
-                // Haven't encountered this warning type until now, do init
-                warnRecordForType = {};
-                warningMessages.set(warningType, warnRecordForType);
-              }
-              warnRecordForType[rowSampleId] = warnStatements;
-            });
-          }
-        });
 
         resolve({
           data: sampleIdToMetadata,
