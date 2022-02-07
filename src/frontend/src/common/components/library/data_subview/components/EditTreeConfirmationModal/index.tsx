@@ -51,7 +51,11 @@ export const EditTreeConfirmationModal = ({
   const title = "Edit Tree Name";
   const content = (
     <>
-    <TreeNameInput setTreeName={setNewTreeName} treeName={newTreeName} />
+      <TreeNameInput
+        setTreeName={setNewTreeName}
+        treeName={newTreeName}
+        withCollapsibleInstructions={false}
+      />
     </>
   );
 

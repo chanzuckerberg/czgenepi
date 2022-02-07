@@ -1,5 +1,5 @@
 import { List, ListItem } from "czifui";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   CapsSizeType,
   HeaderWrapper,
@@ -18,9 +18,10 @@ interface Props {
   listPadding?: SizeType;
   ordered?: boolean;
   shouldStartOpen?: boolean;
+  isCollapsible?: boolean;
 }
 
-const CollapsibleInstructions = ({
+const Instructions = ({
   buttonSize = "xxxs",
   header,
   headerSize = "xs",
@@ -29,6 +30,7 @@ const CollapsibleInstructions = ({
   listPadding = "l",
   ordered,
   shouldStartOpen = false,
+  isCollapsible = true,
 }: Props): JSX.Element => {
   const [shouldShowInstructions, setShowInstructions] =
     useState(shouldStartOpen);
@@ -37,17 +39,23 @@ const CollapsibleInstructions = ({
     setShowInstructions(!shouldShowInstructions);
   };
 
+  const CollapsibleInstructionsButton = (
+    <StyledInstructionsButton
+      buttonSize={buttonSize}
+      color="primary"
+      onClick={handleInstructionsClick}
+    >
+      {shouldShowInstructions ? "LESS" : "MORE"} INFO
+    </StyledInstructionsButton>
+  );
+
+  console.log("should show instructions: ", shouldStartOpen);
+
   return (
     <>
       <HeaderWrapper headerSize={headerSize}>
         {header}
-        <StyledInstructionsButton
-          buttonSize={buttonSize}
-          color="primary"
-          onClick={handleInstructionsClick}
-        >
-          {shouldShowInstructions ? "LESS" : "MORE"} INFO
-        </StyledInstructionsButton>
+        {isCollapsible && CollapsibleInstructionsButton}
       </HeaderWrapper>
       {shouldShowInstructions && (
         <InstructionsWrapper listPadding={listPadding}>
@@ -69,4 +77,4 @@ const CollapsibleInstructions = ({
   );
 };
 
-export { CollapsibleInstructions };
+export { Instructions };

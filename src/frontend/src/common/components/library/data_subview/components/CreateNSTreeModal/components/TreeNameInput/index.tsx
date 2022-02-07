@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { CollapsibleInstructions } from "src/components/CollapsibleInstructions";
+import { Instructions } from "src/components/CollapsibleInstructions";
 import {
   StyledTextField,
   TextFieldAlert,
@@ -15,12 +15,14 @@ interface Props {
   setTreeName(name: string): void;
   shouldReset?: boolean;
   treeName?: string;
+  withCollapsibleInstructions?: boolean; // in edit tree modal we want instructions to always show
 }
 
 const TreeNameInput = ({
   setTreeName,
   shouldReset,
   treeName,
+  withCollapsibleInstructions=true,
 }: Props): JSX.Element => {
   const [isTreeNameTooLong, setTreeNameTooLong] = useState<boolean>(false);
 
@@ -39,7 +41,7 @@ const TreeNameInput = ({
 
   return (
     <div>
-      <CollapsibleInstructions
+      <Instructions
         header="Tree Name"
         items={[
           <InstructionsSemiBold key="1">
@@ -49,6 +51,8 @@ const TreeNameInput = ({
             Tree names must be no longer than 128 characters.
           </InstructionsNotSemiBold>,
         ]}
+        isCollapsible={withCollapsibleInstructions ? true : false}
+        shouldStartOpen={withCollapsibleInstructions ? false : true}
       />
       <StyledTextField
         fullWidth
