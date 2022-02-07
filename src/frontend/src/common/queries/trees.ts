@@ -24,13 +24,13 @@ import { MutationCallbacks } from "./types";
 interface CreateTreePayload {
   name: string;
   samples: string[];
-  tree_type: string;
+  tree_type: string | undefined;
 }
 
 interface CreateTreeType {
   treeName: string;
   sampleIds: string[];
-  treeType: string;
+  treeType: string | undefined; // treeType can be undefined when user first opens the NSTreeCreate modal
 }
 
 type CreateTreeCallbacks = MutationCallbacks<void>;
@@ -42,7 +42,7 @@ async function createTree({
 }: {
   sampleIds: string[];
   treeName: string;
-  treeType: string;
+  treeType: string | undefined;
 }): Promise<unknown> {
   const payload: CreateTreePayload = {
     name: treeName,
