@@ -121,10 +121,8 @@ export default function ImportFile({
           </Button>
           <DownloadTemplate headers={templateHeaders} rows={templateRows}>
             <Button color="primary">Download Metadata Template (TSV)</Button>
-            <StyledUpdatedDate>
-              Updated {TEMPLATE_UPDATED_DATE}
-            </StyledUpdatedDate>
           </DownloadTemplate>
+          <StyledUpdatedDate>Updated {TEMPLATE_UPDATED_DATE}</StyledUpdatedDate>
         </TitleWrapper>
 
         {isInstructionsShown && (

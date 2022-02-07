@@ -41,7 +41,7 @@ export const Wrapper = styled.div`
   }}
 `;
 
-export const StyledUpdatedDate = styled.span`
+export const StyledUpdatedDate = styled.p`
   ${fontCapsXxxxs}
   ${(props) => {
     const colors = getColors(props);
