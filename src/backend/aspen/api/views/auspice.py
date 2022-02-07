@@ -5,14 +5,14 @@ import os
 import re
 from base64 import urlsafe_b64decode, urlsafe_b64encode
 from datetime import datetime, timedelta, timezone
-from typing import Iterable, List, MutableSequence, Set
+from typing import Iterable, List, Mapping, MutableSequence, Optional, Set, Tuple
 
+import boto3
 import sentry_sdk
 import sqlalchemy as sa
-from boto3 import Session
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, selectinload
 from sqlalchemy.orm.exc import NoResultFound
 from starlette.requests import Request
 
@@ -29,6 +29,7 @@ from aspen.app.views.api_utils import (
 from aspen.database.models import (
     AlignedGisaidDump,
     DataType,
+    Group,
     PathogenGenome,
     PhyloRun,
     PhyloTree,
@@ -42,84 +43,92 @@ from aspen.database.models import (
 router = APIRouter()
 
 
+def _rename_nodes_on_tree(
+    tree: list,
+    name_map: Mapping[str, str],
+    save_key: Optional[str] = None,
+) -> None:
+    """Given a tree, a mapping of identifiers to their replacements, rename the nodes on
+    the tree.  If `save_key` is provided, then the original identifier is saved using
+    that as the key."""
+    for node in tree:
+        name = node["name"]
+        renamed_value = name_map.get(name, None)
+        if renamed_value is not None:
+            # we found the replacement value! first, save the old value if the caller
+            # requested.
+            if save_key is not None:
+                node[save_key] = name
+            node["name"] = renamed_value
+        if "children" in node:
+            rename_nodes_on_tree(node["children"], name_map, save_key)
+    return tree
+
+
 async def _verify_phylo_tree_access(
-    db: AsyncSession, user: User, phylo_tree_id: int
-) -> bool:
+    db: AsyncSession, user: User, phylo_tree_id: int, load_samples: bool = False
+) -> Tuple[bool, Optional[PhyloTree]]:
     tree_query = sa.select(PhyloTree).join(PhyloRun)
+    if load_samples:
+        tree_query = tree_query.options(selectinload(PhyloTree.constituent_samples))
     authz_tree_query = authz_phylo_tree_filters(tree_query, user, set([phylo_tree_id]))
     authz_tree_query_result = await db.execute(authz_tree_query)
     phylo_tree: PhyloTree
     try:
-        phylo_tree = authz_tree_query_result.one()
+        phylo_tree = authz_tree_query_result.scalars().unique().one()
     except sa.exc.NoResultFound:  # type: ignore
-        raise ex.BadRequestException(
-            f"PhyloTree with id {phylo_tree_id} not viewable by user with id: {user.id}"
-        )
-    return True
+        return False, None
+    return True, phylo_tree
 
 
-async def _get_phylo_tree_json(db: AsyncSession, phylo_tree_id: int) -> str:
-    pass
+def _sample_filter(sample: Sample, can_see_pi_group_ids: Set[int], system_admin: bool):
+    if system_admin:
+        return True
+    return sample.submitting_group_id in can_see_pi_group_ids
 
 
-# def _process_phylo_tree(db: AsyncSession, user: User, phylo_tree_id: int) -> dict:
-#     """Retrieves a phylo tree and renames the nodes on the tree for a given user."""
-#     tree_query: Query = (
-#         db_session.query(PhyloTree)
-#         .join(PhyloRun)
-#         .options(joinedload(PhyloTree.constituent_samples))
-#     )
-#     tree_query = authz_phylo_tree_filters(tree_query, {phylo_tree_id}, user)
-#     phylo_tree: PhyloTree
-#     try:
-#         phylo_tree = tree_query.one()
-#     except sqlalchemy.exc.NoResultFound:  # type: ignore
-#         raise ex.BadRequestException(
-#             f"PhyloTree with id {phylo_tree_id} not viewable by user with id: {user.id}"
-#         )
+async def _get_and_filter_phylo_tree(
+    db: AsyncSession, user: User, phylo_tree_id: int
+) -> dict:
+    authorized, phylo_tree = await _verify_phylo_tree_access(
+        db, user, phylo_tree_id, load_samples=True
+    )
+    if not authorized:
+        raise ex.BadRequestException("No phylo run found for auspice request")
 
-#     sample_filter: Callable[[Sample], bool]
-#     if user.system_admin:
+    can_see_pi_group_ids: Set[int] = {user.group_id}
+    can_see_pi_group_ids.update(
+        {
+            can_see.owner_group_id
+            for can_see in user.group.can_see
+            if can_see.data_type == DataType.PRIVATE_IDENTIFIERS
+        }
+    )
 
-#         def sample_filter(_: Sample):
-#             return True
+    identifier_map: Mapping[str, str] = {
+        sample.public_identifier.replace("hCoV-19/", ""): sample.private_identifier
+        for sample in phylo_tree.constituent_samples
+        if sample_filter(sample, can_see_pi_group_ids, user.system_admin)
+    }
 
-#     else:
-#         can_see_group_ids_pi: Set[int] = {user.group_id}
-#         can_see_group_ids_pi.update(
-#             {
-#                 can_see.owner_group_id
-#                 for can_see in user.group.can_see
-#                 if can_see.data_type == DataType.PRIVATE_IDENTIFIERS
-#             }
-#         )
+    s3 = boto3.resource(
+        "s3",
+        endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None,
+        config=boto3.session.Config(signature_version="s3v4"),
+    )
 
-#         def sample_filter(sample: Sample):
-#             return sample.submitting_group_id in can_see_group_ids_pi
+    data = (
+        s3.Bucket(phylo_tree.s3_bucket).Object(phylo_tree.s3_key).get()["Body"].read()
+    )
+    json_data = json.loads(data)
 
-#     identifier_map: Mapping[str, str] = {
-#         sample.public_identifier.replace("hCoV-19/", ""): sample.private_identifier
-#         for sample in phylo_tree.constituent_samples
-#         if sample_filter(sample)
-#     }
+    json_data = _rename_nodes_on_tree([json_data["tree"]], identifier_map, "GISAID_ID")
 
-#     s3 = boto3.resource(
-#         "s3",
-#         endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None,
-#         config=boto3.session.Config(signature_version="s3v4"),
-#     )
-
-#     data = (
-#         s3.Bucket(phylo_tree.s3_bucket).Object(phylo_tree.s3_key).get()["Body"].read()
-#     )
-#     json_data = json.loads(data)
-
-#     rename_nodes_on_tree([json_data["tree"]], identifier_map, "GISAID_ID")
-
-#     return json_data
+    return json_data
 
 
 # TODO: Convert to POST request
+# TODO: Copy tree json to new, temp location with unviewable samples filtered out
 @router.get("/generate/{phylo_tree_id}")
 async def generate_auspice_string(
     phylo_tree_id: int,
@@ -128,12 +137,20 @@ async def generate_auspice_string(
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_auth_user),
 ):
-    phylo_run_db_response = await _verify_phylo_tree_access(db, user, phylo_tree_id)
-    if not phylo_run_db_response:
-        raise Ex.BadRequestException("No phylo run found for auspice request")
+    authorized_tree_access, _phylo_tree = await _verify_phylo_tree_access(
+        db, user, phylo_tree_id
+    )
+    if not authorized_tree_access:
+        raise ex.BadRequestException(
+            "No phylo run found for user to generate auspice request"
+        )
 
     expiry_time = datetime.now(timezone.utc) + timedelta(hours=1)
-    payload = {"tree_id": phylo_tree_id, "expiry": expiry_time.isoformat()}
+    payload = {
+        "tree_id": phylo_tree_id,
+        "user_id": user.id,
+        "expiry": expiry_time.isoformat(),
+    }
 
     # encode before hashing
     bytes_payload = json.dumps(payload).encode("utf8")
@@ -151,12 +168,11 @@ async def generate_auspice_string(
 
 
 @router.get("/access/{magic_link}")
-def auspice_view(
+async def auspice_view(
     magic_link: str,
     request: Request,
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
-    user: User = Depends(get_auth_user),
 ):
     # First, verify the MAC tag.
     payload_message, payload_mac_tag = magic_link.split(".")
@@ -168,7 +184,7 @@ def auspice_view(
 
     authenticated = hmac.compare_digest(payload_mac_tag, correct_mac_tag)
     if not authenticated:
-        raise Ex.BadRequestException(
+        raise ex.BadRequestException(
             "Unauthenticated attempt to access an auspice magic link"
         )
 
@@ -181,5 +197,24 @@ def auspice_view(
     if expiry_time <= datetime.now(timezone.utc):
         raise Ex.BadRequestException("Expired auspice view magic link")
 
+    # Recover user
+    user: Optional[User] = None
+    user_id = recovered_payload["user_id"]
+    user_query = (
+        sa.select(User)
+        .where(User.id == user_id)
+        .options(selectinload(User.group).selectinload(Group.can_see))
+    )
+
+    result = await db.execute(user_query)
+    try:
+        user = result.scalars().one()
+    except sa.exc.NoResultFound:
+        raise ex.BadRequestException("Nonexistent user in auspice magic link")
+
+    # Load tree
+    phylo_tree_id = recovered_payload["tree_id"]
+    tree_json = await _get_and_filter_phylo_tree(db, user, phylo_tree_id)
+
     # Return the tree
-    return "AUTHENTIC MAGIC LINK!"
+    return tree_json
