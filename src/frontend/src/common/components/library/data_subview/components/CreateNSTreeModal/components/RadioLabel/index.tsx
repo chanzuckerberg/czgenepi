@@ -77,7 +77,7 @@ export const RadioLabelTargeted = ({ selected }: Props): JSX.Element => {
       </Label>
       <SmallText>
         Includes selected samples and samples that are closely related to the
-        selected samples, at a ratio of roughly 2:1.
+        selected samples, at a ratio of roughly 1:2.
       </SmallText>
       {selected && (
         <List>
