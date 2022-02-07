@@ -55,6 +55,7 @@ export const EditTreeConfirmationModal = ({
         setTreeName={setNewTreeName}
         treeName={newTreeName}
         withCollapsibleInstructions={false}
+        textInputLabel={"Tree Name: "}
       />
     </>
   );
@@ -105,9 +106,6 @@ export const EditTreeConfirmationModal = ({
         </DialogContent>
         <DialogActions narrow>
           <div onClick={onEdit}>{confirmButton}</div>
-          <Button color="primary" variant="outlined" isRounded onClick={onClose}>
-            Cancel
-          </Button>
         </DialogActions>
       </Dialog>
     </>

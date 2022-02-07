@@ -16,12 +16,16 @@ interface Props {
   shouldReset?: boolean;
   treeName?: string;
   withCollapsibleInstructions?: boolean; // in edit tree modal we want instructions to always show
+  instructionHeader?: string;
+  textInputLabel?: string;
 }
 
 const TreeNameInput = ({
   setTreeName,
   shouldReset,
   treeName,
+  instructionHeader,
+  textInputLabel,
   withCollapsibleInstructions=true,
 }: Props): JSX.Element => {
   const [isTreeNameTooLong, setTreeNameTooLong] = useState<boolean>(false);
@@ -42,7 +46,7 @@ const TreeNameInput = ({
   return (
     <div>
       <Instructions
-        header="Tree Name"
+        header={instructionHeader ? instructionHeader : ""}
         items={[
           <InstructionsSemiBold key="1">
             Do not include any PII in your Tree name.
@@ -51,9 +55,15 @@ const TreeNameInput = ({
             Tree names must be no longer than 128 characters.
           </InstructionsNotSemiBold>,
         ]}
+        // in create Tree Dialog the instructions are collapsible and start closed
+        // in edit Tree Dialog the instructions are not collapsible, and therefor should start open
+        instructionListTitle={"Instructions"}
         isCollapsible={withCollapsibleInstructions ? true : false}
         shouldStartOpen={withCollapsibleInstructions ? false : true}
       />
+      {textInputLabel && (
+      <span>{textInputLabel}</span>
+      )}
       <StyledTextField
         fullWidth
         error={isTreeNameTooLong}
