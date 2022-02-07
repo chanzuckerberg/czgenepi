@@ -3,27 +3,19 @@ import json
 import os
 import re
 import threading
-from typing import Any, Iterable, Mapping, Optional, Sequence, Set, Union
+from typing import Any, Mapping, Optional, Sequence, Union
 from uuid import uuid4
 
 import boto3
 import sentry_sdk
 import smart_open
-from flask import g, jsonify, make_response, request, Response, stream_with_context
-from marshmallow.exceptions import ValidationError
+from flask import g, jsonify, request, Response, stream_with_context
 from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy.orm.query import Query
 
 from aspen import aws
 from aspen.app.app import application, requires_auth
-from aspen.app.serializers import ValidateIDsRequestSchema, ValidateIDsResponseSchema
 from aspen.app.views import api_utils
-from aspen.app.views.api_utils import (
-    authz_sample_filters,
-    check_valid_sequence,
-    get_matching_gisaid_ids,
-    get_missing_and_found_sample_ids,
-)
+from aspen.app.views.api_utils import check_valid_sequence
 from aspen.database.connection import session_scope
 from aspen.database.models import Location, Sample, UploadedPathogenGenome
 from aspen.database.models.sample import create_public_ids
