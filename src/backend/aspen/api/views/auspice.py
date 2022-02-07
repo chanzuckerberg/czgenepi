@@ -2,18 +2,15 @@ import hashlib
 import hmac
 import json
 import os
-import re
 from base64 import urlsafe_b64decode, urlsafe_b64encode
 from datetime import datetime, timedelta, timezone
-from typing import Iterable, List, Mapping, MutableSequence, Optional, Set, Tuple
+from typing import Mapping, Optional, Set, Tuple
 
 import boto3
-import sentry_sdk
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload, selectinload
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm import selectinload
 from starlette.requests import Request
 
 from aspen.api.auth import get_auth_user
@@ -21,24 +18,8 @@ from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.auspice import GenerateAuspiceMagicLinkResponse
 from aspen.api.settings import Settings
-from aspen.api.utils import authz_phylo_tree_filters, get_matching_gisaid_ids
-from aspen.app.views.api_utils import (
-    authz_sample_filters,
-    get_missing_and_found_sample_ids,
-)
-from aspen.database.models import (
-    AlignedGisaidDump,
-    DataType,
-    Group,
-    PathogenGenome,
-    PhyloRun,
-    PhyloTree,
-    Sample,
-    TreeType,
-    User,
-    Workflow,
-    WorkflowStatusType,
-)
+from aspen.api.utils import authz_phylo_tree_filters
+from aspen.database.models import DataType, Group, PhyloRun, PhyloTree, Sample, User
 
 router = APIRouter()
 
@@ -47,7 +28,7 @@ def _rename_nodes_on_tree(
     tree: list,
     name_map: Mapping[str, str],
     save_key: Optional[str] = None,
-) -> None:
+) -> list:
     """Given a tree, a mapping of identifiers to their replacements, rename the nodes on
     the tree.  If `save_key` is provided, then the original identifier is saved using
     that as the key."""
@@ -61,7 +42,7 @@ def _rename_nodes_on_tree(
                 node[save_key] = name
             node["name"] = renamed_value
         if "children" in node:
-            rename_nodes_on_tree(node["children"], name_map, save_key)
+            _rename_nodes_on_tree(node["children"], name_map, save_key)
     return tree
 
 
@@ -90,11 +71,12 @@ def _sample_filter(sample: Sample, can_see_pi_group_ids: Set[int], system_admin:
 async def _get_and_filter_phylo_tree(
     db: AsyncSession, user: User, phylo_tree_id: int
 ) -> dict:
-    authorized, phylo_tree = await _verify_phylo_tree_access(
+    authorized, phylo_tree_result = await _verify_phylo_tree_access(
         db, user, phylo_tree_id, load_samples=True
     )
-    if not authorized:
+    if not authorized or not phylo_tree_result:
         raise ex.BadRequestException("No phylo run found for auspice request")
+    phylo_tree: PhyloTree = phylo_tree_result
 
     can_see_pi_group_ids: Set[int] = {user.group_id}
     can_see_pi_group_ids.update(
@@ -108,7 +90,7 @@ async def _get_and_filter_phylo_tree(
     identifier_map: Mapping[str, str] = {
         sample.public_identifier.replace("hCoV-19/", ""): sample.private_identifier
         for sample in phylo_tree.constituent_samples
-        if sample_filter(sample, can_see_pi_group_ids, user.system_admin)
+        if _sample_filter(sample, can_see_pi_group_ids, user.system_admin)
     }
 
     s3 = boto3.resource(
@@ -195,20 +177,18 @@ async def auspice_view(
     # Test the expiry
     expiry_time = datetime.fromisoformat(recovered_payload["expiry"])
     if expiry_time <= datetime.now(timezone.utc):
-        raise Ex.BadRequestException("Expired auspice view magic link")
+        raise ex.BadRequestException("Expired auspice view magic link")
 
     # Recover user
-    user: Optional[User] = None
     user_id = recovered_payload["user_id"]
     user_query = (
         sa.select(User)
         .where(User.id == user_id)
         .options(selectinload(User.group).selectinload(Group.can_see))
     )
-
     result = await db.execute(user_query)
     try:
-        user = result.scalars().one()
+        user: User = result.scalars().one()
     except sa.exc.NoResultFound:
         raise ex.BadRequestException("Nonexistent user in auspice magic link")
 
