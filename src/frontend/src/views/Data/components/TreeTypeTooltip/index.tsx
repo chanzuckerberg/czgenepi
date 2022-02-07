@@ -1,7 +1,6 @@
 import { Tooltip } from "czifui";
 import React from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
-import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 
 interface Props {
   children: React.ReactElement;
