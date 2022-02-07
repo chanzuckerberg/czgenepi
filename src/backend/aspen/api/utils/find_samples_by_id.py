@@ -64,7 +64,7 @@ async def get_matching_gisaid_ids(
         for s in sample_ids
     }
 
-    gisaid_query: Iterable[GisaidMetadata] = sa.select(GisaidMetadata).filter(
+    gisaid_query: Iterable[GisaidMetadata] = sa.select(GisaidMetadata).filter(  # type: ignore
         GisaidMetadata.strain.in_(stripped_mapping.keys())
     )
     gisaid_matches = await db.execute(gisaid_query)

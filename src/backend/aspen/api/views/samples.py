@@ -1,5 +1,5 @@
 import datetime
-from typing import Iterable, List, Set
+from typing import List, Set
 
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends
@@ -7,7 +7,6 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncResult, AsyncSession
 from sqlalchemy.orm import joinedload, selectinload
 from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy.orm.query import Query
 from starlette.requests import Request
 
 from aspen.api.auth import get_auth_user
@@ -222,11 +221,12 @@ async def validate_ids(
     returns a response with list of missing identifiers if any, otherwise will return an empty list
     """
 
-    sample_ids: Iterable[str] = request_data.sample_ids
+    sample_ids: Set[str] = {item for item in request_data.sample_ids}
 
-    all_samples_query: Query = sa.select(Sample)
+    all_samples_query = sa.select(Sample).options()  # type: ignore
 
-    # get all samples from request that the user has permission to use and scope down the search for matching ID's to groups that the user has read access to.
+    # get all samples from request that the user has permission to use and scope down
+    # the search for matching ID's to groups that the user has read access to.
     user_visible_samples_query = authz_samples_cansee(
         all_samples_query, sample_ids, user
     )
@@ -234,7 +234,6 @@ async def validate_ids(
     user_visible_samples = user_visible_samples_res.scalars().all()
 
     # Are there any sample ID's that don't match sample table public and private identifiers
-    missing_sample_ids: Set[str]
     missing_sample_ids, _ = get_missing_and_found_sample_ids(
         sample_ids, user_visible_samples
     )
@@ -243,6 +242,6 @@ async def validate_ids(
     gisaid_ids: Set[str] = await get_matching_gisaid_ids(db, missing_sample_ids)
 
     # Do we have any samples that are not aspen private or public identifiers or gisaid identifiers?
-    missing_sample_ids: Set[str] = missing_sample_ids - gisaid_ids
+    missing_sample_ids -= gisaid_ids
 
     return ValidateIDsResponseSchema(missing_sample_ids=missing_sample_ids)
