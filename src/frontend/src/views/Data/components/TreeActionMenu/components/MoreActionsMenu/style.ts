@@ -4,20 +4,20 @@ import EditIcon from "src/common/icons/IconEditSmall.svg";
 import TrashIcon from "src/common/icons/IconTrashCanSmall.svg";
 
 interface ExtraProps extends Props {
-  isRed?: boolean;
+  isWarning?: boolean;
 }
 
-const doNotForwardProps = ["isRed"];
+const doNotForwardProps = ["isWarning"];
 
 export const StyledText = styled("span", {
   shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
 })`
   ${(props: ExtraProps) => {
-    const { isRed } = props;
+    const { isWarning } = props;
     const colors = getColors(props);
 
     return `
-      color: ${isRed ? colors?.error[600] : "black"};
+      color: ${isWarning ? colors?.error[600] : ""};
     `;
   }}
 `;
