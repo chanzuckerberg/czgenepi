@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Instructions } from "src/components/CollapsibleInstructions";
+import { CollapsibleInstructions } from "src/components/CollapsibleInstructions";
+import Instructions from "src/components/Instructions";
 import {
   StyledTextField,
   TextFieldAlert,
@@ -9,6 +10,7 @@ import {
   InstructionsNotSemiBold,
   InstructionsSemiBold,
   StyledErrorOutlinedIcon,
+  TextInputLabelTitle,
 } from "./style";
 
 interface Props {
@@ -26,7 +28,7 @@ const TreeNameInput = ({
   treeName,
   instructionHeader,
   textInputLabel,
-  withCollapsibleInstructions=true,
+  withCollapsibleInstructions = true,
 }: Props): JSX.Element => {
   const [isTreeNameTooLong, setTreeNameTooLong] = useState<boolean>(false);
 
@@ -43,26 +45,33 @@ const TreeNameInput = ({
     setTreeNameTooLong(isNameTooLong);
   }, [treeName]);
 
+  const header = instructionHeader ? instructionHeader : "";
+  const items = [
+    <InstructionsSemiBold key="1">
+      Do not include any PII in your Tree name.
+    </InstructionsSemiBold>,
+    <InstructionsNotSemiBold key="2">
+      Tree names must be no longer than 128 characters.
+    </InstructionsNotSemiBold>,
+  ];
+
+  const instructions = withCollapsibleInstructions ? (
+    // in create Tree Dialog the instructions are collapsible and start closed
+    // in edit Tree Dialog the instructions are not collapsible, and therefor should start open
+    <CollapsibleInstructions
+      header={header}
+      items={items}
+      instructionListTitle={"Instructions"}
+    />
+  ) : (
+    <Instructions items={items} title={"Instructions"} />
+  );
+
   return (
     <div>
-      <Instructions
-        header={instructionHeader ? instructionHeader : ""}
-        items={[
-          <InstructionsSemiBold key="1">
-            Do not include any PII in your Tree name.
-          </InstructionsSemiBold>,
-          <InstructionsNotSemiBold key="2">
-            Tree names must be no longer than 128 characters.
-          </InstructionsNotSemiBold>,
-        ]}
-        // in create Tree Dialog the instructions are collapsible and start closed
-        // in edit Tree Dialog the instructions are not collapsible, and therefor should start open
-        instructionListTitle={"Instructions"}
-        isCollapsible={withCollapsibleInstructions ? true : false}
-        shouldStartOpen={withCollapsibleInstructions ? false : true}
-      />
+      {instructions}
       {textInputLabel && (
-      <span>{textInputLabel}</span>
+        <TextInputLabelTitle>{textInputLabel}</TextInputLabelTitle>
       )}
       <StyledTextField
         fullWidth

@@ -31,7 +31,7 @@ interface CreateTreePayload {
 interface CreateTreeType {
   treeName: string;
   sampleIds: string[];
-  treeType: string | undefined; 
+  treeType: string | undefined;
 }
 
 type CreateTreeCallbacks = MutationCallbacks<void>;
@@ -96,7 +96,6 @@ interface FastaRequestType {
 export interface FastaResponseType {
   url: string;
 }
-
 
 type FastaFetchCallbacks = MutationCallbacks<FastaResponseType>;
 
@@ -224,7 +223,7 @@ type TreeEditCallbacks = MutationCallbacks<TreeEditResponseType>;
 
 export async function editTree({
   treeIdToEdit,
-  newTreeName
+  newTreeName,
 }: TreeEditRequestType): Promise<TreeEditResponseType> {
   const payload: EditTreePayloadType = {
     name: newTreeName,

@@ -211,7 +211,11 @@ export const CreateNSTreeModal = ({
           </Title>
         </StyledDialogTitle>
         <StyledDialogContent data-test-id="modal-content">
-          <TreeNameInput setTreeName={setTreeName} treeName={treeName} instructionHeader={"Tree Name: "}/>
+          <TreeNameInput
+            setTreeName={setTreeName}
+            treeName={treeName}
+            instructionHeader={"Tree Name: "}
+          />
           <TreeTypeSection>
             <TreeNameInfoWrapper>
               <FieldTitle>Tree Type: </FieldTitle>

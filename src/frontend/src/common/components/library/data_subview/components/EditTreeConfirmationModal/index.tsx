@@ -1,13 +1,14 @@
 import { Dialog } from "@material-ui/core";
+import { Button } from "czifui";
 import React, { useState } from "react";
-import { useEditTree } from "src/common/queries/trees";
-import Notification from "src/components/Notification";
+import { TreeNameInput } from "src/common/components/library/data_subview/components/CreateNSTreeModal/components/TreeNameInput";
 import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
-import { Button } from "czifui";
-import { Content, StyledFooter, Title } from "src/components/ConfirmDialog/style";
-import { TreeNameInput } from "src/common/components/library/data_subview/components/CreateNSTreeModal/components/TreeNameInput";
+import { useEditTree } from "src/common/queries/trees";
+import { Content } from "src/components/ConfirmDialog/style";
+import Notification from "src/components/Notification";
+import { Title } from "./style";
 
 interface Props {
   onClose(): void;
@@ -37,13 +38,12 @@ export const EditTreeConfirmationModal = ({
 
   if (!tree) return null;
 
-  const { workflowId, name } = tree;
+  const { workflowId } = tree;
 
   const onEdit = () => {
     editTreeMutation.mutate({
       treeIdToEdit: workflowId,
       newTreeName: newTreeName,
-
     });
     onClose();
   };

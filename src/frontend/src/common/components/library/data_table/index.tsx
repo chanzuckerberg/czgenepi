@@ -265,7 +265,7 @@ export const DataTable: FunctionComponent<Props> = ({
         ? noop
         : handleDeleteTreeModalOpen;
 
-        const onEditTreeModalOpen = isSampleTable
+      const onEditTreeModalOpen = isSampleTable
         ? noop
         : handleEditTreeModalOpen;
 

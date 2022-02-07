@@ -11,8 +11,8 @@ import { VIEWNAME } from "src/common/constants/types";
 import { CreateNSTreeModal } from "./components/CreateNSTreeModal";
 import { DeleteSamplesConfirmationModal } from "./components/DeleteSamplesConfirmationModal";
 import { DeleteTreeConfirmationModal } from "./components/DeleteTreeConfirmationModal";
-import { EditTreeConfirmationModal } from "./components/EditTreeConfirmationModal";
 import DownloadModal from "./components/DownloadModal";
+import { EditTreeConfirmationModal } from "./components/EditTreeConfirmationModal";
 import { IconButton } from "./components/IconButton";
 import { MoreActionsMenu } from "./components/MoreActionMenu";
 import { TreeCreateHelpLink } from "./components/TreeCreateHelpLink";
@@ -149,8 +149,8 @@ const DataSubview: FunctionComponent<Props> = ({
     useState<boolean>(false);
   const [treeToDelete, setTreeToDelete] = useState<Tree>();
   const [isEditTreeConfirmationOpen, setEditTreeConfirmationOpen] =
-  useState<boolean>(false);
-const [treeToEdit, setTreeToEdit] = useState<Tree>();
+    useState<boolean>(false);
+  const [treeToEdit, setTreeToEdit] = useState<Tree>();
 
   const handleDownloadClickOpen = () => {
     setDownloadModalOpen(true);
@@ -313,17 +313,17 @@ const [treeToEdit, setTreeToEdit] = useState<Tree>();
         )}
         {viewName === VIEWNAME.TREES && (
           <>
-          <DeleteTreeConfirmationModal
-            open={isDeleteTreeConfirmationOpen}
-            onClose={handleDeleteTreeModalClose}
-            tree={treeToDelete}
-          />
-          <EditTreeConfirmationModal
-          open={isEditTreeConfirmationOpen}
-          onClose={handleEditTreeModalClose}
-          tree={treeToEdit}
-          />
-        </>
+            <DeleteTreeConfirmationModal
+              open={isDeleteTreeConfirmationOpen}
+              onClose={handleDeleteTreeModalClose}
+              tree={treeToDelete}
+            />
+            <EditTreeConfirmationModal
+              open={isEditTreeConfirmationOpen}
+              onClose={handleEditTreeModalClose}
+              tree={treeToEdit}
+            />
+          </>
         )}
         <StyledFlexChildDiv className={style.samplesRoot}>
           <div className={style.searchBar}>

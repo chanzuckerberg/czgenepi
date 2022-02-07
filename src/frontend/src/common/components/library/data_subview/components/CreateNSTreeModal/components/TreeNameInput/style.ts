@@ -2,6 +2,7 @@ import styled from "@emotion/styled";
 import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
 import {
   fontBodyXs,
+  fontHeaderM,
   getColors,
   getFontWeights,
   getIconSizes,
@@ -37,6 +38,19 @@ export const StyledErrorOutlinedIcon = styled(ErrorOutlineIcon)`
       margin-right: ${spaces?.xs}px;
       height: ${iconSizes?.s.height}px;
       width: ${iconSizes?.s.width}px;
+    `;
+  }}
+`;
+
+export const TextInputLabelTitle = styled.div`
+  ${fontHeaderM}
+
+  ${(props) => {
+    const spaces = getSpaces(props);
+
+    return `
+      margin-top: ${spaces?.xl}px;
+      margin-bottom: ${spaces?.s}px;
     `;
   }}
 `;
