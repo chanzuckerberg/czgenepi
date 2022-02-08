@@ -4,14 +4,7 @@ import { METADATA_KEYS_TO_HEADERS } from "src/views/Upload/components/common/con
 import { SampleIdToWarningMessages } from "../../parseFile";
 import { maybePluralize } from "./common/pluralize";
 import { SimpleZebraTable } from "./common/ProblemTable";
-import {
-  FullWidthAlertAccordion,
-  FullWidthContainer,
-  Table,
-  TbodyZebra,
-  Td,
-  Th,
-} from "./common/style";
+import { FullWidthAlertAccordion } from "./common/style";
 
 const WARNING_SEVERITY = "warning";
 
@@ -56,7 +49,7 @@ function MessageExtraneousEntry({ extraneousSampleIds }: PropsExtraneousEntry) {
   const tablePreamble =
     "The following sample IDs in the metadata file " +
     "do not match any sample IDs imported in the previous step.";
-  const columnHeaders = ["Sample Private ID"];
+  const columnHeaders = [METADATA_KEYS_TO_HEADERS.sampleId];
   const rows = extraneousSampleIds.map((sampleId) => [sampleId]);
   return (
     <SimpleZebraTable
@@ -96,7 +89,7 @@ function MessageAbsentSample({ absentSampleIds }: PropsAbsentSample) {
   const tablePreamble =
     "The following sample IDs were imported in the " +
     "previous step but did not match any sample IDs in the metadata file.";
-  const columnHeaders = ["Sample Private ID"];
+  const columnHeaders = [METADATA_KEYS_TO_HEADERS.sampleId];
   const rows = absentSampleIds.map((sampleId) => [sampleId]);
   return (
     <SimpleZebraTable
@@ -128,43 +121,28 @@ export function WarningAbsentSample({ absentSampleIds }: PropsAbsentSample) {
 interface PropsMissingData {
   missingData: SampleIdToWarningMessages;
 }
-
-// Possibly worth generalizing this down the road and use in other Warnings
-// and Errors (there's some similar stuff in the Error components, but the
-// number of columns is only ever one over there).
 function MessageMissingData({ missingData }: PropsMissingData) {
+  const tablePreamble =
+    "You can add the required data in the table below, " +
+    "or update your file and re-import.";
+  const columnHeaders = [METADATA_KEYS_TO_HEADERS.sampleId, "Missing Data"];
   const idsMissingData = Object.keys(missingData);
+  const rows = idsMissingData.map((sampleId) => {
+    const missingHeaders = Array.from(
+      missingData[sampleId],
+      (missingKey) => METADATA_KEYS_TO_HEADERS[missingKey]
+    );
+    const missingDataDescription = missingHeaders.join(", ");
+    return [sampleId, missingDataDescription];
+  });
   return (
-    <FullWidthContainer>
-      You can add the required data in the table below, or update your file and
-      re-import.
-      <Table>
-        <thead>
-          <tr>
-            <Th>Sample Private ID</Th>
-            <Th>Missing Data</Th>
-          </tr>
-        </thead>
-        <TbodyZebra>
-          {idsMissingData.map((sampleId) => {
-            const missingHeaders = Array.from(
-              missingData[sampleId],
-              (missingKey) => METADATA_KEYS_TO_HEADERS[missingKey]
-            );
-            const missingDescription = missingHeaders.join(", ");
-            return (
-              <tr key={sampleId}>
-                <Td>{sampleId}</Td>
-                <Td>{missingDescription}</Td>
-              </tr>
-            );
-          })}
-        </TbodyZebra>
-      </Table>
-    </FullWidthContainer>
+    <SimpleZebraTable
+      tablePreamble={tablePreamble}
+      columnHeaders={columnHeaders}
+      rows={rows}
+    />
   );
 }
-
 export function WarningMissingData({ missingData }: PropsMissingData) {
   const count = Object.keys(missingData).length;
   // "X Samples were missing data in required fields."
