@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  FullWidthContainer,
-  Table,
-  TbodyZebra,
-  Td,
-  Th,
-} from "./style";
-
+import { FullWidthContainer, Table, TbodyZebra, Td, Th } from "./style";
 
 interface Props {
   tablePreamble?: React.ReactNode | string;
@@ -61,9 +54,7 @@ export function SimpleZebraTable({
           {rows.map((row) => (
             <tr key={row[0]}>
               {row.map((entry) => (
-                <Td key={entry}>
-                  {entry}
-                </Td>
+                <Td key={entry}>{entry}</Td>
               ))}
             </tr>
           ))}

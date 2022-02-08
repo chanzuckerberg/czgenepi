@@ -3,6 +3,7 @@ import { B } from "src/common/styles/support/style";
 import AlertAccordion from "src/components/AlertAccordion";
 import { ERROR_CODE } from "src/views/Upload/components/common/types";
 import { maybePluralize } from "./common/pluralize";
+import { SimpleZebraTable } from "./common/ProblemTable";
 import { Td, Th } from "./common/style";
 
 interface Props {
@@ -56,24 +57,25 @@ interface MessageProps {
 }
 
 function MissingFieldMessage({ names }: MessageProps) {
-  return (
+  const tablePreamble = (
     <div>
       We were unable to find all of the required fields in your import file.
       Please check that your data fields match our{" "}
       <B>current metadata template above</B> and try again.
-      <table>
-        <thead>
-          <tr>
-            <Th>Missing Data Fields</Th>
-          </tr>
-        </thead>
-        <tbody>
-          {names.map((name) => (
-            <Row key={name} name={name} />
-          ))}
-        </tbody>
-      </table>
     </div>
+  );
+  const columnHeaders = ["Missing Data Fields"];
+  const rows = names.map((name) => [name]);
+  // CSS styling note: Because this table is part of a message in the standard
+  // `AlertAccordion`, it won't have the same full-width styling as tables
+  // in warnings. To do that, we'd need to de-generalize Errors so this one can
+  // use `FullWidthAlertAccordion` for itself.
+  return (
+    <SimpleZebraTable
+      tablePreamble={tablePreamble}
+      columnHeaders={columnHeaders}
+      rows={rows}
+    />
   );
 }
 

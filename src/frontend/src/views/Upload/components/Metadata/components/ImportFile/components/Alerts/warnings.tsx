@@ -3,6 +3,7 @@ import AlertAccordion from "src/components/AlertAccordion";
 import { METADATA_KEYS_TO_HEADERS } from "src/views/Upload/components/common/constants";
 import { SampleIdToWarningMessages } from "../../parseFile";
 import { maybePluralize } from "./common/pluralize";
+import { SimpleZebraTable } from "./common/ProblemTable";
 import {
   FullWidthAlertAccordion,
   FullWidthContainer,
@@ -51,6 +52,20 @@ export function WarningAutoCorrect({
 interface PropsExtraneousEntry {
   extraneousSampleIds: string[];
 }
+function MessageExtraneousEntry({ extraneousSampleIds }: PropsExtraneousEntry) {
+  const tablePreamble =
+    "The following sample IDs in the metadata file " +
+    "do not match any sample IDs imported in the previous step.";
+  const columnHeaders = ["Sample Private ID"];
+  const rows = extraneousSampleIds.map((sampleId) => [sampleId]);
+  return (
+    <SimpleZebraTable
+      tablePreamble={tablePreamble}
+      columnHeaders={columnHeaders}
+      rows={rows}
+    />
+  );
+}
 export function WarningExtraneousEntry({
   extraneousSampleIds,
 }: PropsExtraneousEntry) {
@@ -60,13 +75,12 @@ export function WarningExtraneousEntry({
     "Sample",
     count
   )} in metadata file ${maybePluralize("was", count)} not used.`;
-  const message = `The following sample IDs in the metadata file do not match
-    any sample IDs imported in the previous step:
-    ${extraneousSampleIds.join(", ")}`;
   return (
-    <AlertAccordion
+    <FullWidthAlertAccordion
       title={title}
-      message={message}
+      message={
+        <MessageExtraneousEntry extraneousSampleIds={extraneousSampleIds} />
+      }
       severity={WARNING_SEVERITY}
     />
   );
@@ -78,6 +92,20 @@ export function WarningExtraneousEntry({
 interface PropsAbsentSample {
   absentSampleIds: string[];
 }
+function MessageAbsentSample({ absentSampleIds }: PropsAbsentSample) {
+  const tablePreamble =
+    "The following sample IDs were imported in the " +
+    "previous step but did not match any sample IDs in the metadata file.";
+  const columnHeaders = ["Sample Private ID"];
+  const rows = absentSampleIds.map((sampleId) => [sampleId]);
+  return (
+    <SimpleZebraTable
+      tablePreamble={tablePreamble}
+      columnHeaders={columnHeaders}
+      rows={rows}
+    />
+  );
+}
 export function WarningAbsentSample({ absentSampleIds }: PropsAbsentSample) {
   const count = absentSampleIds.length;
   // "X Samples were not found in metadata file."
@@ -85,13 +113,10 @@ export function WarningAbsentSample({ absentSampleIds }: PropsAbsentSample) {
     "was",
     count
   )} not found in metadata file.`;
-  const message = `The following sample IDs were imported in the previous step
-    but did not match any sample IDs in the metadata file:
-    ${absentSampleIds.join(", ")}`;
   return (
-    <AlertAccordion
+    <FullWidthAlertAccordion
       title={title}
-      message={message}
+      message={<MessageAbsentSample absentSampleIds={absentSampleIds} />}
       severity={WARNING_SEVERITY}
     />
   );
