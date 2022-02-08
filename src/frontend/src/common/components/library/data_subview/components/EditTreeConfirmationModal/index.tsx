@@ -77,7 +77,7 @@ export const EditTreeConfirmationModal = ({
           dismissed={!shouldShowSuccessNotification}
           intent="info"
         >
-          Your tree has been deleted.
+          Tree name was successfully updated.
         </Notification>
       )}
       {shouldShowErrorNotification && (
@@ -89,7 +89,7 @@ export const EditTreeConfirmationModal = ({
           dismissed={!shouldShowErrorNotification}
           intent="error"
         >
-          We were unable to delete your tree. Please try again later.
+          Something went wrong and we were unable to update your tree name. Please try again later.
         </Notification>
       )}
       <Dialog
