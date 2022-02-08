@@ -1,5 +1,12 @@
 import React from "react";
-import { FullWidthContainer, Table, TbodyZebra, Td, Th } from "./style";
+import {
+  CappedHeightScrollableContainer,
+  FullWidthContainer,
+  Table,
+  TbodyZebra,
+  Td,
+  Th,
+} from "./style";
 
 interface Props {
   tablePreamble?: React.ReactNode | string;
@@ -20,6 +27,7 @@ interface Props {
  * design for the expanded message showing everything going wrong.
  * If we continue to use this design elsewhere in the app, we should extract this
  * component to somewhere higher up in app and share it around generally.
+ * The capped height aspect might be a difficulty for generalizing though.
  *
  * IMPORTANT NOTE:
  * Every row array in the `rows` array-of-arrays should be the **same length**
@@ -34,7 +42,7 @@ interface Props {
  * within a row, each entry should be unique and each column header should be
  * unique as well. For its current usage, this will always be true.
  */
-export function SimpleZebraTable({
+export function ProblemTable({
   tablePreamble,
   columnHeaders,
   rows,
@@ -42,24 +50,26 @@ export function SimpleZebraTable({
   return (
     <FullWidthContainer>
       {tablePreamble || null}
-      <Table>
-        <thead>
-          <tr>
-            {columnHeaders.map((header) => (
-              <Th key={header}>{header}</Th>
-            ))}
-          </tr>
-        </thead>
-        <TbodyZebra>
-          {rows.map((row) => (
-            <tr key={row[0]}>
-              {row.map((entry) => (
-                <Td key={entry}>{entry}</Td>
+      <CappedHeightScrollableContainer>
+        <Table>
+          <thead>
+            <tr>
+              {columnHeaders.map((header) => (
+                <Th key={header}>{header}</Th>
               ))}
             </tr>
-          ))}
-        </TbodyZebra>
-      </Table>
+          </thead>
+          <TbodyZebra>
+            {rows.map((row) => (
+              <tr key={row[0]}>
+                {row.map((entry) => (
+                  <Td key={entry}>{entry}</Td>
+                ))}
+              </tr>
+            ))}
+          </TbodyZebra>
+        </Table>
+      </CappedHeightScrollableContainer>
     </FullWidthContainer>
   );
 }

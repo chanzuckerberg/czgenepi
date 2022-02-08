@@ -3,7 +3,7 @@ import { B } from "src/common/styles/support/style";
 import AlertAccordion from "src/components/AlertAccordion";
 import { ERROR_CODE } from "src/views/Upload/components/common/types";
 import { maybePluralize } from "./common/pluralize";
-import { SimpleZebraTable } from "./common/ProblemTable";
+import { ProblemTable } from "./common/ProblemTable";
 import { Td, Th } from "./common/style";
 
 interface Props {
@@ -71,7 +71,7 @@ function MissingFieldMessage({ names }: MessageProps) {
   // in warnings. To do that, we'd need to de-generalize Errors so this one can
   // use `FullWidthAlertAccordion` for itself.
   return (
-    <SimpleZebraTable
+    <ProblemTable
       tablePreamble={tablePreamble}
       columnHeaders={columnHeaders}
       rows={rows}

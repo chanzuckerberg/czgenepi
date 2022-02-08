@@ -3,7 +3,7 @@ import AlertAccordion from "src/components/AlertAccordion";
 import { METADATA_KEYS_TO_HEADERS } from "src/views/Upload/components/common/constants";
 import { SampleIdToWarningMessages } from "../../parseFile";
 import { maybePluralize } from "./common/pluralize";
-import { SimpleZebraTable } from "./common/ProblemTable";
+import { ProblemTable } from "./common/ProblemTable";
 import { FullWidthAlertAccordion } from "./common/style";
 
 const WARNING_SEVERITY = "warning";
@@ -52,7 +52,7 @@ function MessageExtraneousEntry({ extraneousSampleIds }: PropsExtraneousEntry) {
   const columnHeaders = [METADATA_KEYS_TO_HEADERS.sampleId];
   const rows = extraneousSampleIds.map((sampleId) => [sampleId]);
   return (
-    <SimpleZebraTable
+    <ProblemTable
       tablePreamble={tablePreamble}
       columnHeaders={columnHeaders}
       rows={rows}
@@ -92,7 +92,7 @@ function MessageAbsentSample({ absentSampleIds }: PropsAbsentSample) {
   const columnHeaders = [METADATA_KEYS_TO_HEADERS.sampleId];
   const rows = absentSampleIds.map((sampleId) => [sampleId]);
   return (
-    <SimpleZebraTable
+    <ProblemTable
       tablePreamble={tablePreamble}
       columnHeaders={columnHeaders}
       rows={rows}
@@ -136,7 +136,7 @@ function MessageMissingData({ missingData }: PropsMissingData) {
     return [sampleId, missingDataDescription];
   });
   return (
-    <SimpleZebraTable
+    <ProblemTable
       tablePreamble={tablePreamble}
       columnHeaders={columnHeaders}
       rows={rows}
