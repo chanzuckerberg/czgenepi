@@ -1,27 +1,23 @@
 import { Button, ButtonProps } from "czifui";
 import React, { useEffect, useState } from "react";
-import { DEFAULT_FETCH_OPTIONS } from "src/common/api";
+import { DEFAULT_POST_OPTIONS } from "src/common/api";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import ENV from "src/common/constants/ENV";
-import { stripProtocol } from "../../urlUtils";
 
 interface Props extends ButtonProps {
   treeId: number;
 }
 
 const getTreeUrl = async (treeId: number) => {
-  const result = await fetch(
-    `${ENV.API_URL}/api/auspice/view/${treeId}`,
-    DEFAULT_FETCH_OPTIONS
-  );
+  const requestData = { tree_id: treeId };
+  const result = await fetch(`${ENV.API_URL}/v2/auspice/generate`, {
+    body: JSON.stringify(requestData),
+    ...DEFAULT_POST_OPTIONS,
+  });
 
   const json = await result.json();
-  const encodedJsonUrl = encodeURIComponent(stripProtocol(json.url));
 
-  return (
-    "https://nextstrain.org/fetch/" +
-    encodedJsonUrl.replace("%2f", "/").replace("%2F", "/")
-  );
+  return "https://nextstrain.org/fetch/" + json.url;
 };
 
 const getButtonText = ({

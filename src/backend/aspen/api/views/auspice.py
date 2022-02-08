@@ -16,7 +16,10 @@ from starlette.requests import Request
 from aspen.api.auth import get_auth_user
 from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
-from aspen.api.schemas.auspice import GenerateAuspiceMagicLinkResponse
+from aspen.api.schemas.auspice import (
+    GenerateAuspiceMagicLinkRequest,
+    GenerateAuspiceMagicLinkResponse,
+)
 from aspen.api.settings import Settings
 from aspen.api.utils import authz_phylo_tree_filters
 from aspen.database.models import DataType, Group, PhyloRun, PhyloTree, Sample, User
@@ -110,15 +113,16 @@ async def _get_and_filter_phylo_tree(
 
 
 # TODO: Convert to POST request
-# TODO: Copy tree json to new, temp location with unviewable samples filtered out
-@router.get("/generate/{phylo_tree_id}")
+@router.post("/generate")
 async def generate_auspice_string(
-    phylo_tree_id: int,
     request: Request,
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_auth_user),
 ):
+    request_body = await request.json()
+    validated_body = GenerateAuspiceMagicLinkRequest.parse_obj(request_body)
+    phylo_tree_id = request_body["tree_id"]
     authorized_tree_access, _phylo_tree = await _verify_phylo_tree_access(
         db, user, phylo_tree_id
     )
