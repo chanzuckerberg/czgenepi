@@ -3,8 +3,9 @@ import React, { MouseEventHandler, useState } from "react";
 import { TREE_STATUS } from "src/common/constants/types";
 import MoreActionsIcon from "src/common/icons/IconDotsHorizontal3Large.svg";
 import { UserResponse } from "src/common/queries/auth";
+import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import { StyledIcon, StyledIconWrapper } from "../../style";
-import { StyledText, StyledTrashIcon } from "./style";
+import { StyledEditIcon, StyledText, StyledTrashIcon } from "./style";
 
 interface Props {
   item: Tree;
@@ -77,9 +78,15 @@ const MoreActionsMenu = ({
           onClose={handleClose}
           getContentAnchorEl={null}
         >
+          {usesFeatureFlag(FEATURE_FLAGS.editTrees) && (
+            <MenuItem onClick={() => undefined}>
+              <StyledEditIcon />
+              <StyledText>Edit Tree Name</StyledText>
+            </MenuItem>
+          )}
           <MenuItem onClick={() => onDeleteTreeModalOpen(item)}>
             <StyledTrashIcon />
-            <StyledText>Delete Tree</StyledText>
+            <StyledText isWarning>Delete Tree</StyledText>
           </MenuItem>
         </Menu>
       )}
