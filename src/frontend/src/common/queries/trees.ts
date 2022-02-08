@@ -11,6 +11,7 @@ import {
   DEFAULT_FETCH_OPTIONS,
   DEFAULT_POST_OPTIONS,
   DEFAULT_PUT_OPTIONS,
+  DEFAULT_HEADERS_MUTATION_OPTIONS,
   fetchTrees,
   TreeResponse,
 } from "../api";
@@ -225,11 +226,13 @@ export async function editTree({
   treeIdToEdit,
   newTreeName,
 }: TreeEditRequestType): Promise<TreeEditResponseType> {
+
   const payload: EditTreePayloadType = {
     name: newTreeName,
   };
   const response = await fetch(API_URL + API.PHYLO_TREES_V2 + treeIdToEdit, {
     ...DEFAULT_PUT_OPTIONS,
+    ...DEFAULT_HEADERS_MUTATION_OPTIONS,
     body: JSON.stringify(payload),
   });
 
