@@ -20,6 +20,7 @@ interface Props {
   withCollapsibleInstructions?: boolean; // in edit tree modal we want instructions to always show
   instructionHeader?: string;
   textInputLabel?: string;
+  isTextInputMultiLine?: boolean;
 }
 
 const TreeNameInput = ({
@@ -29,6 +30,7 @@ const TreeNameInput = ({
   instructionHeader,
   textInputLabel,
   withCollapsibleInstructions = true,
+  isTextInputMultiLine=false,
 }: Props): JSX.Element => {
   const [isTreeNameTooLong, setTreeNameTooLong] = useState<boolean>(false);
 
@@ -81,6 +83,8 @@ const TreeNameInput = ({
         value={treeName}
         size="small"
         onChange={(e) => setTreeName(e.target.value)}
+        multiline = {isTextInputMultiLine ? true : false}
+        maxRows={3}
       />
       {isTreeNameTooLong && (
         <TreeNameTooLongAlert>

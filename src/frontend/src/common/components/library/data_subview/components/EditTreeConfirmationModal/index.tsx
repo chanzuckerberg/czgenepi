@@ -1,6 +1,6 @@
 import { Dialog } from "@material-ui/core";
 import { Button } from "czifui";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TreeNameInput } from "src/common/components/library/data_subview/components/CreateNSTreeModal/components/TreeNameInput";
 import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
@@ -9,6 +9,9 @@ import { useEditTree } from "src/common/queries/trees";
 import { Content } from "src/components/ConfirmDialog/style";
 import Notification from "src/components/Notification";
 import { Title } from "./style";
+import ConfirmDialog, {
+  ConfirmDialogProps,
+} from "src/components/ConfirmDialog";
 
 interface Props {
   onClose(): void;
@@ -25,7 +28,14 @@ export const EditTreeConfirmationModal = ({
     useState<boolean>(false);
   const [shouldShowSuccessNotification, setShouldShowSuccessNotification] =
     useState<boolean>(false);
-  const [newTreeName, setNewTreeName] = useState<string>("");
+  const [newTreeName, setNewTreeName] = useState<string | undefined>();
+
+  const treeNameLength = newTreeName ? newTreeName.length : 0;
+  const hasValidName = treeNameLength > 0 && treeNameLength <= 128;
+
+  useEffect(() => {
+    setNewTreeName(tree?.name);
+  })
 
   const editTreeMutation = useEditTree({
     componentOnSuccess: () => {
@@ -56,12 +66,13 @@ export const EditTreeConfirmationModal = ({
         treeName={newTreeName}
         withCollapsibleInstructions={false}
         textInputLabel={"Tree Name: "}
+        isTextInputMultiLine={true}
       />
     </>
   );
 
   const confirmButton = (
-    <Button color="primary" variant="contained" isRounded>
+    <Button color="primary" variant="contained" disabled={!hasValidName} isRounded >
       Update
     </Button>
   );
