@@ -47,8 +47,6 @@ const TreeNameInput = ({
     setTreeNameTooLong(isNameTooLong);
   }, [treeName]);
 
-  console.log("tree name: ", treeName);
-
   const header = instructionHeader ? instructionHeader : "";
   const items = [
     <InstructionsSemiBold key="1">
@@ -62,11 +60,7 @@ const TreeNameInput = ({
   const instructions = withCollapsibleInstructions ? (
     // in create Tree Dialog the instructions are collapsible and start closed
     // in edit Tree Dialog the instructions are not collapsible, and therefor should start open
-    <CollapsibleInstructions
-      header={header}
-      items={items}
-      instructionListTitle={"Instructions"}
-    />
+    <CollapsibleInstructions header={header} items={items} />
   ) : (
     <Instructions items={items} title={"Instructions"} />
   );

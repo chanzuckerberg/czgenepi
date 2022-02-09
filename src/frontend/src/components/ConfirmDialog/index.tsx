@@ -1,10 +1,18 @@
+import CloseIcon from "@material-ui/icons/Close";
 import { Button } from "czifui";
 import React from "react";
 import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import Dialog from "src/components/Dialog";
-import { Content, StyledFooter, Title } from "./style";
+import {
+  Content,
+  StyledDiv,
+  StyledFooter,
+  StyledIconButton,
+  Title,
+} from "./style";
+// import { StyledIconButton } from "src/common/components/library/data_subview/components/DownloadModal/style";
 
 export interface ConfirmDialogProps {
   open: boolean;
@@ -14,6 +22,8 @@ export interface ConfirmDialogProps {
   content: string | JSX.Element;
   footer?: string;
   customConfirmButton?: JSX.Element;
+  withCloseIcon?: boolean;
+  disableBackdropClick?: boolean;
 }
 
 export default function ConfirmDialog({
@@ -21,9 +31,11 @@ export default function ConfirmDialog({
   onClose,
   onConfirm,
   customConfirmButton,
+  disableBackdropClick = true,
   title,
   content,
   footer,
+  withCloseIcon = false,
 }: ConfirmDialogProps): JSX.Element {
   const confirmButton = customConfirmButton ?? (
     <Button color="primary" variant="contained" isRounded>
@@ -33,22 +45,36 @@ export default function ConfirmDialog({
 
   return (
     <Dialog
+      disableBackdropClick={disableBackdropClick}
       disableEscapeKeyDown
-      disableBackdropClick
       open={open}
       onClose={onClose}
     >
       <DialogTitle narrow>
-        <Title>{title}</Title>
+        <StyledDiv>
+          {withCloseIcon && (
+            <StyledIconButton onClick={onClose}>
+              <CloseIcon />
+            </StyledIconButton>
+          )}
+          <Title>{title}</Title>
+        </StyledDiv>
       </DialogTitle>
       <DialogContent narrow>
         <Content>{content}</Content>
       </DialogContent>
       <DialogActions narrow>
         <div onClick={onConfirm}>{confirmButton}</div>
-        <Button color="primary" variant="outlined" isRounded onClick={onClose}>
-          Cancel
-        </Button>
+        {!withCloseIcon && ( // if we have close icon we don't also need a cancel button
+          <Button
+            color="primary"
+            variant="outlined"
+            isRounded
+            onClick={onClose}
+          >
+            Cancel
+          </Button>
+        )}
       </DialogActions>
       {footer && <StyledFooter narrow>{footer}</StyledFooter>}
     </Dialog>
