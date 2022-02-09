@@ -9,7 +9,6 @@ from typing import Mapping, Optional, Set, Tuple
 import boto3
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends
-from sqlalchemy.exc import NoResultFound  # type: ignore
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from starlette.requests import Request
@@ -193,7 +192,7 @@ async def auspice_view(
     result = await db.execute(user_query)
     try:
         user: User = result.scalars().one()
-    except NoResultFound:
+    except sa.exc.NoResultFound:  # type: ignore
         raise ex.BadRequestException("Nonexistent user in auspice magic link")
 
     # Load tree
