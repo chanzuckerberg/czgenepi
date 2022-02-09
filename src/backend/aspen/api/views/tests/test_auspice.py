@@ -116,9 +116,6 @@ async def test_unauth_user_auspice_link_generation(
     res = await http_client.post(
         "/v2/auspice/generate", json=request_body, headers=auth_headers
     )
-
-    res.json()
-
     assert res.status_code == 400
 
 
