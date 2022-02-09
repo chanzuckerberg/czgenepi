@@ -30,7 +30,7 @@ const TreeNameInput = ({
   instructionHeader,
   textInputLabel,
   withCollapsibleInstructions = true,
-  isTextInputMultiLine=false,
+  isTextInputMultiLine = false,
 }: Props): JSX.Element => {
   const [isTreeNameTooLong, setTreeNameTooLong] = useState<boolean>(false);
 
@@ -46,6 +46,8 @@ const TreeNameInput = ({
     const isNameTooLong = (treeName?.length ?? 0) > 128;
     setTreeNameTooLong(isNameTooLong);
   }, [treeName]);
+
+  console.log("tree name: ", treeName);
 
   const header = instructionHeader ? instructionHeader : "";
   const items = [
@@ -83,8 +85,8 @@ const TreeNameInput = ({
         value={treeName}
         size="small"
         onChange={(e) => setTreeName(e.target.value)}
-        multiline = {isTextInputMultiLine ? true : false}
-        maxRows={3}
+        multiline={isTextInputMultiLine ? true : false}
+        maxRows={isTextInputMultiLine ? 3 : undefined}
       />
       {isTreeNameTooLong && (
         <TreeNameTooLongAlert>

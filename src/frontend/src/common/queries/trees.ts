@@ -9,9 +9,9 @@ import {
   API,
   DEFAULT_DELETE_OPTIONS,
   DEFAULT_FETCH_OPTIONS,
+  DEFAULT_HEADERS_MUTATION_OPTIONS,
   DEFAULT_POST_OPTIONS,
   DEFAULT_PUT_OPTIONS,
-  DEFAULT_HEADERS_MUTATION_OPTIONS,
   fetchTrees,
   TreeResponse,
 } from "../api";
@@ -226,7 +226,6 @@ export async function editTree({
   treeIdToEdit,
   newTreeName,
 }: TreeEditRequestType): Promise<TreeEditResponseType> {
-
   const payload: EditTreePayloadType = {
     name: newTreeName,
   };
