@@ -28,25 +28,24 @@ router = APIRouter()
 
 
 def _rename_nodes_on_tree(
-    tree: list,
+    node: dict,
     name_map: Mapping[str, str],
     save_key: Optional[str] = None,
-) -> list:
+) -> dict:
     """Given a tree, a mapping of identifiers to their replacements, rename the nodes on
     the tree.  If `save_key` is provided, then the original identifier is saved using
     that as the key."""
-    for node in tree:
-        name = node["name"]
-        renamed_value = name_map.get(name, None)
-        if renamed_value is not None:
-            # we found the replacement value! first, save the old value if the caller
-            # requested.
-            if save_key is not None:
-                node[save_key] = name
-            node["name"] = renamed_value
-        if "children" in node:
-            _rename_nodes_on_tree(node["children"], name_map, save_key)
-    return tree
+    name = node["name"]
+    renamed_value = name_map.get(name, None)
+    if renamed_value is not None:
+        # we found the replacement value! first, save the old value if the caller
+        # requested.
+        if save_key is not None:
+            node[save_key] = name
+        node["name"] = renamed_value
+    for child in node.get("children", []):
+        _rename_nodes_on_tree(child, name_map, save_key)
+    return node
 
 
 async def _verify_phylo_tree_access(
@@ -107,12 +106,14 @@ async def _get_and_filter_phylo_tree(
     )
     json_data = json.loads(data)
 
-    json_data = _rename_nodes_on_tree([json_data["tree"]], identifier_map, "GISAID_ID")
+    # we pass in the root node of the tree to the recursive naming function.
+    json_data["tree"] = _rename_nodes_on_tree(
+        json_data["tree"], identifier_map, "GISAID_ID"
+    )
 
     return json_data
 
 
-# TODO: Convert to POST request
 @router.post("/generate")
 async def generate_auspice_string(
     request: Request,
@@ -122,7 +123,7 @@ async def generate_auspice_string(
 ):
     request_body = await request.json()
     validated_body = GenerateAuspiceMagicLinkRequest.parse_obj(request_body)
-    phylo_tree_id = request_body["tree_id"]
+    phylo_tree_id = validated_body.tree_id
     authorized_tree_access, _phylo_tree = await _verify_phylo_tree_access(
         db, user, phylo_tree_id
     )
@@ -146,10 +147,8 @@ async def generate_auspice_string(
     digest_maker = hmac.new(mac_key, message, hashlib.sha3_512)
     mac_tag = digest_maker.hexdigest()
 
-    return GenerateAuspiceMagicLinkResponse.parse_obj(
-        {
-            "url": f'{request.url.netloc}/v2/auspice/access/{message.decode("utf8")}.{mac_tag}'
-        }
+    return GenerateAuspiceMagicLinkResponse(
+        url=f'{request.url.netloc}/v2/auspice/access/{message.decode("utf8")}.{mac_tag}'
     )
 
 
