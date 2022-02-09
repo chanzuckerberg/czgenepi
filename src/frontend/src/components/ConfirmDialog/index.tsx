@@ -12,7 +12,6 @@ import {
   StyledIconButton,
   Title,
 } from "./style";
-// import { StyledIconButton } from "src/common/components/library/data_subview/components/DownloadModal/style";
 
 export interface ConfirmDialogProps {
   open: boolean;

@@ -17,7 +17,7 @@ interface Props {
   setTreeName(name: string): void;
   shouldReset?: boolean;
   treeName?: string;
-  withCollapsibleInstructions?: boolean; // in edit tree modal we want instructions to always show
+  withCollapsibleInstructions?: boolean;
   instructionHeader?: string;
   textInputLabel?: string;
   isTextInputMultiLine?: boolean;
@@ -59,7 +59,7 @@ const TreeNameInput = ({
 
   const instructions = withCollapsibleInstructions ? (
     // in create Tree Dialog the instructions are collapsible and start closed
-    // in edit Tree Dialog the instructions are not collapsible, and therefor should start open
+    // in edit Tree Dialog the instructions are not collapsible, and therefore should start open
     <CollapsibleInstructions header={header} items={items} />
   ) : (
     <Instructions items={items} title={"Instructions"} />
