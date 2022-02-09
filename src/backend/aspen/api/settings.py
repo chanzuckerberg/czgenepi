@@ -109,6 +109,7 @@ class Settings(BaseSettings):
     AUTH0_CLIENT_KWARGS: Dict[str, Any] = {
         "scope": "openid profile email",
     }
+    AUSPICE_MAC_KEY: str
 
     # These are same-name'd keys in an AWS secret, so they get remapped when
     # we load the secrets, and then we use getter methods to handle special cases.
@@ -230,6 +231,7 @@ class Settings(BaseSettings):
             "AUTH0_MANAGEMENT_CLIENT_SECRET",
             "AUTH0_DOMAIN",
             "AUTH0_CLIENT_KWARGS",
+            "AUSPICE_MAC_KEY",
         ]
         aws_ssm_params = {"nextstrain-ondemand-sfn": "AWS_NEXTSTRAIN_SFN_PARAMETERS"}
 
