@@ -9,6 +9,7 @@ from typing import Mapping, Optional, Set, Tuple
 import boto3
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends
+from sqlalchemy.exc import NoResultFound  # type: ignore
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from starlette.requests import Request
@@ -51,10 +52,10 @@ def _rename_nodes_on_tree(
 async def _verify_phylo_tree_access(
     db: AsyncSession, user: User, phylo_tree_id: int, load_samples: bool = False
 ) -> Tuple[bool, Optional[PhyloTree]]:
-    tree_query = sa.select(PhyloTree).join(PhyloRun)
+    tree_query = sa.select(PhyloTree).join(PhyloRun)  # type: ignore
     if load_samples:
-        tree_query = tree_query.options(selectinload(PhyloTree.constituent_samples))
-    authz_tree_query = authz_phylo_tree_filters(tree_query, user, set([phylo_tree_id]))
+        tree_query = tree_query.options(selectinload(PhyloTree.constituent_samples))  # type: ignore
+    authz_tree_query = authz_phylo_tree_filters(tree_query, user, set([phylo_tree_id]))  # type: ignore
     authz_tree_query_result = await db.execute(authz_tree_query)
     phylo_tree: PhyloTree
     try:
@@ -185,14 +186,14 @@ async def auspice_view(
     # Recover user
     user_id = recovered_payload["user_id"]
     user_query = (
-        sa.select(User)
+        sa.select(User)  # type: ignore
         .where(User.id == user_id)
         .options(selectinload(User.group).selectinload(Group.can_see))
     )
     result = await db.execute(user_query)
     try:
         user: User = result.scalars().one()
-    except sa.exc.NoResultFound:
+    except NoResultFound:
         raise ex.BadRequestException("Nonexistent user in auspice magic link")
 
     # Load tree
