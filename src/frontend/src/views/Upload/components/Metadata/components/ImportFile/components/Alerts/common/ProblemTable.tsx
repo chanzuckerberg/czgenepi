@@ -23,7 +23,7 @@ interface Props {
  * it's just a simple table for when we don't need a complex data view.
  *
  * Currently just intended for use in Metadata warnings and errors because
- * all those components -- when showing issues via a table -- share this design
+ * all those components -- when showing issues via a table -- share this
  * design for the expanded message showing everything going wrong.
  * If we continue to use this design elsewhere in the app, we should extract this
  * component to somewhere higher up in app and share it around generally.
