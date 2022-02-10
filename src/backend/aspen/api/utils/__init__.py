@@ -1,4 +1,7 @@
-from aspen.api.utils.authz import authz_samples_cansee  # noqa: F401
+from aspen.api.utils.authz import (  # noqa: F401
+    authz_phylo_tree_filters,
+    authz_samples_cansee,
+)
 from aspen.api.utils.find_samples_by_id import (  # noqa: F401
     get_matching_gisaid_ids,
     get_missing_and_found_sample_ids,
