@@ -1,9 +1,9 @@
 import { Button } from "czifui";
 import React, { useState } from "react";
-import { TreeNameInput } from "src/common/components/library/data_subview/components/CreateNSTreeModal/components/TreeNameInput";
 import { useEditTree } from "src/common/queries/trees";
 import { EditDialog } from "src/components/EditDialog";
 import Notification from "src/components/Notification";
+import { TreeNameInput } from "src/components/TreeNameInput";
 
 interface Props {
   onClose(): void;
@@ -72,6 +72,7 @@ export const EditTreeConfirmationModal = ({
       variant="contained"
       disabled={!hasValidName}
       isRounded
+      onClick={onEdit}
     >
       Update
     </Button>

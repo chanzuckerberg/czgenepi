@@ -23,6 +23,7 @@ export interface ConfirmDialogProps {
   customConfirmButton?: JSX.Element;
   withCloseIcon?: boolean;
   disableBackdropClick?: boolean;
+  isConfirmButtonClickable?: boolean;
 }
 
 export default function ConfirmDialog({
@@ -35,11 +36,18 @@ export default function ConfirmDialog({
   content,
   footer,
   withCloseIcon = false,
+  isConfirmButtonClickable = true,
 }: ConfirmDialogProps): JSX.Element {
   const confirmButton = customConfirmButton ?? (
     <Button color="primary" variant="contained" isRounded>
       Continue
     </Button>
+  );
+
+  const confirmButtonwithDiv = isConfirmButtonClickable ? (
+    <div onClick={onConfirm}>{confirmButton}</div>
+  ) : (
+    <div>{confirmButton}</div>
   );
 
   return (
@@ -63,7 +71,7 @@ export default function ConfirmDialog({
         <Content>{content}</Content>
       </DialogContent>
       <DialogActions narrow>
-        <div onClick={onConfirm}>{confirmButton}</div>
+        {confirmButtonwithDiv}
         {!withCloseIcon && ( // if we have close icon we don't also need a cancel button
           <Button
             color="primary"

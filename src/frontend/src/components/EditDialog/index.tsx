@@ -26,6 +26,7 @@ const EditDialog = ({
       open={open}
       withCloseIcon={true}
       disableBackdropClick={false}
+      isConfirmButtonClickable={false}
     />
   );
 };

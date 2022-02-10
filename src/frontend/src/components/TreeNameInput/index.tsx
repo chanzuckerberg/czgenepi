@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { CollapsibleInstructions } from "src/components/CollapsibleInstructions";
-import Instructions from "src/components/Instructions";
 import {
   StyledTextField,
   TextFieldAlert,
   TreeNameTooLongAlert,
-} from "../../style";
+} from "src/common/components/library/data_subview/components/CreateNSTreeModal/style";
+import { CollapsibleInstructions } from "src/components/CollapsibleInstructions";
+import Instructions from "src/components/Instructions";
 import {
   InstructionsNotSemiBold,
   InstructionsSemiBold,
