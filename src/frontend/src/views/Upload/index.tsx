@@ -3,12 +3,12 @@ import React, { useEffect, useState } from "react";
 import { ROUTES } from "src/common/routes";
 import { useProtectedRoute } from "../../common/queries/auth";
 import { useNamedLocations } from "../../common/queries/locations";
-import { EMPTY_METADATA } from "./components/common/constants";
 import {
   Props,
   SampleIdToMetadata,
   Samples as ISamples,
 } from "./components/common/types";
+import { initSampleMetadata } from "./components/common/utils";
 import Metadata from "./components/Metadata";
 import Review from "./components/Review";
 import Samples from "./components/Samples";
@@ -41,18 +41,16 @@ export default function Upload(): JSX.Element | null {
 
   const cancelPrompt = useNavigationPrompt();
 
-  // When user changes `samples`, prepare Metadata as empty for later entry.
+  // When user changes `samples`, prepare Metadata for later data entry.
   useEffect(() => {
     if (!samples) {
       return setMetadata(null);
     }
 
     const newMetadata: SampleIdToMetadata = {};
-
     for (const sampleId of Object.keys(samples)) {
-      newMetadata[sampleId] = { ...EMPTY_METADATA };
+      newMetadata[sampleId] = initSampleMetadata(sampleId);
     }
-
     setMetadata(newMetadata);
   }, [samples]);
 

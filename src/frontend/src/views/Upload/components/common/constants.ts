@@ -7,8 +7,9 @@ export const METADATA_KEYS_TO_HEADERS: Record<keyof Metadata, string> = {
   collectionDate: "Collection Date",
   collectionLocation: "Collection Location",
   keepPrivate: "Sample is Private",
+  privateId: "Private ID",
   publicId: "GISAID ID (Public ID) - Optional",
-  sampleId: "Sample Private ID",
+  sampleId: "Sample Name (from FASTA)",
   sequencingDate: "Sequencing Date - Optional",
 };
 
@@ -33,7 +34,9 @@ export const EMPTY_METADATA: Metadata = {
   collectionDate: "",
   collectionLocation: undefined,
   keepPrivate: false,
+  privateId: "",
   publicId: "",
+  sampleId: "",
   sequencingDate: "",
 };
 
