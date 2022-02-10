@@ -32,7 +32,7 @@ def get_missing_and_found_sample_ids(
         found_sample_ids.add(sample.private_identifier)
         found_sample_ids.add(sample.public_identifier)
 
-    # These are the sample ID's that don't match the aspen db
+    # These are the sample ID's that don't match the CZ GEN EPI db
     missing_sample_ids = set(sample_ids) - found_sample_ids
     return missing_sample_ids, found_sample_ids
 
