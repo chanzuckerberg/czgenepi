@@ -16,7 +16,7 @@ def get_missing_and_found_sample_ids(
     Parameters:
         sample_ids Iterable[str]: A list of identifiers (usually submitted by a user)
                                   that need to be checked if they exist as either public
-                                  or private identifiers in the aspen database Sample table
+                                  or private identifiers in the CZ GEN EPI database Sample table
         all_samples (Query): Query consisting of all samples that a user has been allowed access to see.
 
     Returns:
