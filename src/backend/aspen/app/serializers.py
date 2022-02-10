@@ -45,10 +45,3 @@ class PhyloRunResponseSchema(Schema):
     workflow_status = fields.Pluck(WorkflowStatusSchema, "name")
     group = fields.Nested(GroupResponseSchema, only=("id", "name"))
     template_args = fields.Nested(GroupResponseSchema, only=("division", "location"))
-
-
-class UsherOptionResponseSchema(Schema):
-    id = fields.Int()
-    description = fields.String()
-    value = fields.String()
-    priority = fields.Int()
