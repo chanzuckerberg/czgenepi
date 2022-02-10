@@ -272,6 +272,14 @@ def get_link(ctx, sample_ids):
     )
 
 
+@usher.command(name="get-tree-versions")
+@click.pass_context
+def get_tree_versions(ctx):
+    api_client = ctx.obj["api_client"]
+    resp = api_client.get("/v2/usher/tree_versions/")
+    print(resp.text)
+
+
 @cli.group()
 def user():
     pass
