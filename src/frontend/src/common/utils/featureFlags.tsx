@@ -25,7 +25,7 @@ export const FEATURE_FLAGS: FlagsObj = {
     isDisabled: false,
     key: "editTrees",
   },
-  editSamples:{
+  editSamples: {
     isDisabled: false,
     key: "editSamples",
   },
