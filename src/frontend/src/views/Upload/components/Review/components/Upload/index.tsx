@@ -46,10 +46,13 @@ export default function Upload({
   return (
     <>
       <Dialog
-        disableBackdropClick
         disableEscapeKeyDown
         open={isOpen}
-        onClose={handleClose}
+        onClose={(_event, reason) => {
+          if (reason !== "backdropClick") {
+            handleClose();
+          }
+        }}
       >
         <StyledDialogContent>
           <ImageWrapper>{getImage()}</ImageWrapper>

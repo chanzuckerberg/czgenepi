@@ -184,11 +184,14 @@ export const UsherPlacementModal = ({
 
   return (
     <Dialog
-      disableBackdropClick
       disableEnforceFocus
       disableEscapeKeyDown
       open={open}
-      onClose={onClose}
+      onClose={(_event, reason) => {
+        if (reason !== "backdropClick") {
+          onClose();
+        }
+      }}
       fullWidth
       maxWidth={"sm"}
     >

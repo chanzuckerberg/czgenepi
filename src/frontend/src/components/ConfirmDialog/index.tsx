@@ -33,10 +33,13 @@ export default function ConfirmDialog({
 
   return (
     <Dialog
-      disableBackdropClick
       disableEscapeKeyDown
       open={open}
-      onClose={onClose}
+      onClose={(_event, reason) => {
+        if (reason !== "backdropClick") {
+          onClose();
+        }
+      }}
     >
       <DialogTitle narrow>
         <Title>{title}</Title>
