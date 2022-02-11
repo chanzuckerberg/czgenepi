@@ -12,7 +12,7 @@ import {
   Number,
   P,
   Title,
-} from "src/common/styles/support/style";
+} from "src/common/styles/basicStyle";
 
 export default function Terms(): JSX.Element {
   const renderIntro = () => (

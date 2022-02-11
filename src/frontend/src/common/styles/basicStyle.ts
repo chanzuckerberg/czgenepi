@@ -1,6 +1,6 @@
+// includes shared styles for basic html elements
 import styled from "@emotion/styled";
 import {
-  Button,
   fontBodyS,
   fontBodyXxs,
   fontHeaderM,
@@ -8,7 +8,6 @@ import {
   fontHeaderXxl,
   getColors,
   getFontWeights,
-  getSpaces,
 } from "czifui";
 
 export const NarrowContainer = styled.div`
@@ -74,22 +73,6 @@ export const P = styled.p`
 
 export const Title = styled.div`
   margin-bottom: 50px;
-`;
-
-export const IconButtonBubble = styled(Button)`
-  border-radius: 50%;
-  flex: 0 0 0;
-  min-width: unset;
-
-  ${(props) => {
-    const colors = getColors(props);
-    const spaces = getSpaces(props);
-    return `
-      fill: ${colors?.gray[300]};
-      margin: ${spaces?.xxxs}px;
-      padding: ${spaces?.xs}px;
-    `;
-  }}
 `;
 
 export const transparentScrollbars = (): string => {
