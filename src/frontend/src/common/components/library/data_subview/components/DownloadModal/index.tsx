@@ -137,10 +137,8 @@ const DownloadModal = ({
         <ContactUsLink />
       </Notification>
       <Dialog
-        // disableBackdropClick
         disableEscapeKeyDown
         open={open}
-        // onClose={handleCloseModal}
         onClose={(_event, reason) => {
           if (reason !== "backdropClick") {
             handleCloseModal();
