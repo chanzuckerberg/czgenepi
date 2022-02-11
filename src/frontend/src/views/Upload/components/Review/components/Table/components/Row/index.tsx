@@ -16,6 +16,7 @@ interface Props {
 
 export default React.memo(function Row({ id, metadata }: Props): JSX.Element {
   const {
+    privateId,
     collectionDate,
     collectionLocation,
     sequencingDate,
@@ -28,6 +29,7 @@ export default React.memo(function Row({ id, metadata }: Props): JSX.Element {
       <StyledTableCell component="div">
         <Id>{id}</Id>
       </StyledTableCell>
+      <StyledTableCell component="div">{privateId}</StyledTableCell>
       <StyledTableCell component="div">{publicId || "--"}</StyledTableCell>
       <StyledTableCell component="div">{collectionDate}</StyledTableCell>
       <StyledTableCell component="div">
