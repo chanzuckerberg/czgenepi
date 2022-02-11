@@ -6,7 +6,6 @@ import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { ROUTES } from "src/common/routes";
 import { createStringToLocationFinder } from "src/common/utils/locationUtils";
-import { EMPTY_METADATA } from "src/views/Upload/components/common/constants";
 import {
   Props,
   SampleIdToMetadata,
@@ -22,6 +21,7 @@ import {
   Subtitle,
   Title,
 } from "../common/style";
+import { initSampleMetadata } from "../common/utils";
 import ImportFile from "./components/ImportFile";
 import {
   ParseResult,
@@ -67,7 +67,7 @@ export default function Metadata({
         // previously entered for the sample via web form. It's not great, but
         // it was pre-existing behavior and I don't have time to fix it right
         // now because it would involve restructuring how we default metadata
-        uploadedMetadata[sampleId] = { ...EMPTY_METADATA };
+        uploadedMetadata[sampleId] = initSampleMetadata(sampleId);
       }
     }
 

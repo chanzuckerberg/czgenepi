@@ -94,6 +94,7 @@ const METADATA_KEYS_TO_EXTRACT = Object.values(HEADERS_TO_METADATA_KEYS);
 function warnMissingMetadata(metadata: Metadata): Set<keyof Metadata> | null {
   const missingMetadata = new Set<keyof Metadata>();
   const ALWAYS_REQUIRED: Array<keyof Metadata> = [
+    "privateId",
     "collectionDate",
     "collectionLocation",
   ];

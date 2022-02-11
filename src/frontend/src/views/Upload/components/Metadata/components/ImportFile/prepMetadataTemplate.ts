@@ -12,6 +12,7 @@ const BOOLEAN_FORMAT = "Yes/No";
 const TEMPLATE_HEADERS = [
   // If position for sampleId changes, update `prepMetadataTemplate` func!
   METADATA_KEYS_TO_HEADERS.sampleId,
+  METADATA_KEYS_TO_HEADERS.privateId,
   METADATA_KEYS_TO_HEADERS.publicId,
   METADATA_KEYS_TO_HEADERS.collectionDate,
   METADATA_KEYS_TO_HEADERS.collectionLocation,
@@ -30,6 +31,7 @@ const EXAMPLE_ROWS = [
   // Very first example row helps explain usage, but not fully valid.
   [
     EXAMPLE_SAMPLE_IDS[0], // sampleId
+    "Private sample name", // privateId
     "(if available) GISAID ID", // publicId -- here as explainer
     DATE_FORMAT, // collectionDate -- not valid, here as explainer in template
     "North America/USA/California/Los Angeles County", // collectionLocation
@@ -39,6 +41,7 @@ const EXAMPLE_ROWS = [
   // Subsequent example rows are fully valid: honest-to-goodness examples.
   [
     EXAMPLE_SAMPLE_IDS[1], // sampleId
+    "sample-bravo", // privateId
     "", // publicId -- optional, showing that with blank use
     "2021-04-12", // collectionDate
     "San Francisco County", // collectionLocation
@@ -47,6 +50,7 @@ const EXAMPLE_ROWS = [
   ],
   [
     EXAMPLE_SAMPLE_IDS[2], // sampleId
+    "sample-charlie", // privateId
     "USA/CA-CZB-0001/2021", // publicId
     "2021-10-20", // collectionDate
     "North America/USA/California/San Francisco County", // collectionLocation

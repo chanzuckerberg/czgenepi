@@ -162,6 +162,9 @@ export default React.memo(function Row({
         <Id>{id}</Id>
       </StyledTableCell>
       <StyledTableCell component="div">
+        <FreeTextField formik={formik} fieldKey="privateId" />
+      </StyledTableCell>
+      <StyledTableCell component="div">
         <FreeTextField formik={formik} fieldKey="publicId" />
       </StyledTableCell>
       <StyledTableCell component="div">
