@@ -47,9 +47,14 @@
       "type": "categorical"
     },
     {
-      "key": "country_exposure",
-      "title": "Country of exposure",
-      "type": "categorical"
+      "key": "reversion_mutations",
+      "title": "Reversion mutations",
+      "type": "continuous"
+    },
+    {
+      "key": "potential_contaminants",
+      "title": "Potential contaminants",
+      "type": "continuous"
     },
     {
       "key": "author",
