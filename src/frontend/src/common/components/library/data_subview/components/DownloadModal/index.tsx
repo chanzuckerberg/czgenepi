@@ -1,4 +1,3 @@
-import { Dialog } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import { Alert, Tooltip } from "czifui";
 import { isEqual } from "lodash";
@@ -12,6 +11,7 @@ import { useUserInfo } from "src/common/queries/auth";
 import { downloadSamplesFasta } from "src/common/queries/samples";
 import { B } from "src/common/styles/support/style";
 import { pluralize } from "src/common/utils/strUtils";
+import DialogNoDepreciation from "src/components/DialogNoDepreciation";
 import Notification from "src/components/Notification";
 import { TooltipDescriptionText, TooltipHeaderText } from "../../style";
 import { ContactUsLink } from "../ContactUsLink";
@@ -136,14 +136,11 @@ const DownloadModal = ({
         </B>{" "}
         <ContactUsLink />
       </Notification>
-      <Dialog
+      <DialogNoDepreciation
         disableEscapeKeyDown
+        disableBackdropClick
         open={open}
-        onClose={(_event, reason) => {
-          if (reason !== "backdropClick") {
-            handleCloseModal();
-          }
-        }}
+        onClose={handleCloseModal}
       >
         <DialogTitle>
           <StyledIconButton onClick={handleCloseModal}>
@@ -224,7 +221,7 @@ const DownloadModal = ({
           </Content>
         </DialogContent>
         <DialogActions></DialogActions>
-      </Dialog>
+      </DialogNoDepreciation>
     </>
   );
 

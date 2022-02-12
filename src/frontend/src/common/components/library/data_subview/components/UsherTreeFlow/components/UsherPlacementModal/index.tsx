@@ -1,4 +1,4 @@
-import { Dialog, TextField } from "@material-ui/core";
+import { TextField } from "@material-ui/core";
 import { DefaultMenuSelectOption, Dropdown, InputDropdown } from "czifui";
 import { cloneDeep, debounce } from "lodash";
 import React, { SyntheticEvent, useEffect, useState } from "react";
@@ -9,6 +9,7 @@ import {
   useFastaFetch,
 } from "src/common/queries/trees";
 import { pluralize } from "src/common/utils/strUtils";
+import DialogNoDepreciation from "src/components/DialogNoDepreciation";
 import {
   StyledDialogTitle,
   StyledTooltip,
@@ -183,15 +184,11 @@ export const UsherPlacementModal = ({
   );
 
   return (
-    <Dialog
+    <DialogNoDepreciation
       disableEnforceFocus
       disableEscapeKeyDown
       open={open}
-      onClose={(_event, reason) => {
-        if (reason !== "backdropClick") {
-          onClose();
-        }
-      }}
+      onClose={onClose}
       fullWidth
       maxWidth={"sm"}
     >
@@ -309,6 +306,6 @@ export const UsherPlacementModal = ({
           </form>
         </Content>
       </StyledDialogContent>
-    </Dialog>
+    </DialogNoDepreciation>
   );
 };
