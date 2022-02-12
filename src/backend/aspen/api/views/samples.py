@@ -10,7 +10,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from starlette.requests import Request
 
 from aspen.api.auth import get_auth_user
-from aspen.api.deps import get_db, get_settings, get_splitio
+from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.samples import (
     SampleBulkDeleteRequest,
@@ -30,7 +30,6 @@ from aspen.api.utils import (
     get_missing_and_found_sample_ids,
 )
 from aspen.database.models import DataType, Location, Sample, User
-from aspen.util.split import SplitClient
 
 router = APIRouter()
 
@@ -42,7 +41,6 @@ async def list_samples(
     request: Request,
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
-    splitio: SplitClient = Depends(get_splitio),
     user: User = Depends(get_auth_user),
 ) -> SamplesResponseSchema:
 
