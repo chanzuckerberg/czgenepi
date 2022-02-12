@@ -101,6 +101,7 @@ class Settings(BaseSettings):
     DB_address: str
     AUTH0_USERINFO_URL: str = "userinfo"
     FLASK_SECRET: str
+    SPLIT_BACKEND_KEY: str = "localhost"
     AUTH0_CLIENT_ID: str
     AUTH0_CLIENT_SECRET: str
     AUTH0_MANAGEMENT_CLIENT_ID: str = ""
@@ -225,6 +226,7 @@ class Settings(BaseSettings):
             "DB_address",
             "AUTH0_USERINFO_URL",
             "FLASK_SECRET",
+            "SPLIT_BACKEND_KEY",
             "AUTH0_CLIENT_ID",
             "AUTH0_CLIENT_SECRET",
             "AUTH0_MANAGEMENT_CLIENT_ID",

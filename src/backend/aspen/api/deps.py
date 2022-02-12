@@ -6,6 +6,7 @@ from starlette.requests import Request
 
 from aspen.api.settings import Settings
 from aspen.database.connection import init_async_db
+from aspen.util.split import SplitClient
 
 
 def get_auth0_client(request: Request):
@@ -19,6 +20,12 @@ def get_settings(request: Request):
     # returning the settings object we created at startup.
     settings = request.app.state.aspen_settings
     return settings
+
+
+def get_splitio(request: Request) -> SplitClient:
+    # We stashed this at startup the same way we did for settings.
+    splitio = request.app.state.splitio
+    return splitio
 
 
 async def get_db(

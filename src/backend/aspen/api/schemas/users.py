@@ -1,16 +1,24 @@
-from typing import List
+from typing import List, Optional
 
 from aspen.api.schemas.base import BaseResponse
 
 
-class UserBase(BaseResponse):
-    group_id: int
+class GroupResponse(BaseResponse):
+    id: int
+    name: str
+
+
+class UserBaseResponse(BaseResponse):
+    id: int
+    name: str
+    group: GroupResponse
     agreed_to_tos: bool = False
+    acknowledged_policy_version: Optional[str] = None
 
 
-class User(UserBase):
+class UserResponse(UserBaseResponse):
     pass
 
 
-class Users(BaseResponse):
-    items: List[User]
+class UsersResponse(BaseResponse):
+    items: List[UserResponse]

@@ -1,0 +1,14 @@
+# - feature_name:
+#     treatment: "treatment_applied_to_this_entry"
+#     keys: "single_key_or_list"
+#     config: "{\"desc\" : \"this applies only to ON treatment\"}"
+
+- default_sample_sort:
+    treatment: "on"
+    keys: "CZI"
+- default_sample_sort:
+    treatment: "off"
+- some_other_feature:
+    treatment: "off"
+- my_feature:
+    treatment: "off"

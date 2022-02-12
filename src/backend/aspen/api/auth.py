@@ -70,12 +70,12 @@ async def get_auth_user(
     # Redirect to Login page
     if not auth0_user_id:
         # TODO - redirect to login.
-        raise Exception("No Userid Found!")
+        raise ex.UnauthenticatedException("Login failure")
     found_auth_user = await setup_userinfo(session, auth0_user_id)
     if not found_auth_user:
         # login attempt from user not in DB
         # TODO - redirect to login.
-        raise Exception("No Userid Found!")
+        raise ex.UnauthenticatedException("Login failure")
     # There's a starlette-context module that allows us to manage
     # per-request data without depending on having a request object
     # available. For now we seem to have `request` when we need it,
