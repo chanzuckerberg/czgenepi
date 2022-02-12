@@ -32,6 +32,7 @@ services:
       PORT: 8000
       BUILD_PATH: build
       API_URL: http://backend.genepinet.localdev:3000
+      SPLIT_FRONTEND_KEY: ${SPLIT_FRONTEND_KEY}
       CHOKIDAR_USEPOLLING: "true"
     ports:
       - "8000:8000"

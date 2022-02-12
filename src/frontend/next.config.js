@@ -29,6 +29,10 @@ module.exports = ({
               connectSrc: [
                 "'self'",
                 "sentry.prod.si.czi.technology",
+                "auth.split.io",
+                "sdk.split.io",
+                "events.split.io",
+                "streaming.split.io",
                 ENV.API_URL,
               ],
               defaultSrc: ["'self'"],
