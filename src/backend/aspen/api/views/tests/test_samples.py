@@ -19,6 +19,7 @@ from aspen.database.models import (
     SequencingReadsCollection,
     User,
 )
+from aspen.test_infra.models.gisaid_metadata import gisaid_metadata_factory
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
@@ -958,3 +959,72 @@ async def test_update_samples_request_failures(
             headers=auth_headers,
         )
         assert res.status_code == response_code
+
+
+async def setup_validation_data(async_session: AsyncSession):
+    group = group_factory()
+    user = user_factory(group)
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
+    sample = sample_factory(group, user, location)
+    gisaid_sample = gisaid_metadata_factory()
+    async_session.add(group)
+    async_session.add(sample)
+    async_session.add(gisaid_sample)
+    await async_session.commit()
+
+    return user, sample, gisaid_sample
+
+
+async def test_validation_endpoint(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+):
+    """
+    Test that validation endpoint is correctly identifying identifiers that are in the DB, and that samples are properly stripped of hCoV-19/ prefix
+    """
+
+    user, sample, gisaid_sample = await setup_validation_data(async_session)
+
+    # add hCoV-19/ as prefix to gisaid identifier to check that stripping of prefix is being done correctly
+    data = {
+        "sample_ids": [sample.public_identifier, f"hCoV-19/{gisaid_sample.strain}"],
+    }
+    auth_headers = {"user_id": user.auth0_user_id}
+    res = await http_client.post(
+        "/v2/samples/validate_ids/",
+        json=data,
+        headers=auth_headers,
+    )
+
+    assert res.status_code == 200
+    response = res.json()
+    assert response["missing_sample_ids"] == []
+
+
+async def test_validation_endpoint_missing_identifier(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+):
+    """
+    Test that validation endpoint is correctly identifying identifiers that are not aspen public or private ids or gisaid ids
+    """
+
+    user, sample, gisaid_sample = await setup_validation_data(async_session)
+    data = {
+        "sample_ids": [
+            sample.public_identifier,
+            gisaid_sample.strain,
+            "this_is_missing",
+        ],
+    }
+    auth_headers = {"user_id": user.auth0_user_id}
+    res = await http_client.post(
+        "/v2/samples/validate_ids/", json=data, headers=auth_headers
+    )
+
+    # request should not fail, should return list of samples that are missing from the DB
+    assert res.status_code == 200
+    response = res.json()
+    assert response["missing_sample_ids"] == ["this_is_missing"]

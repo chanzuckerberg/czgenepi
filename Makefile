@@ -3,7 +3,7 @@ SHELL := /bin/bash
 ### DOCKER ENVIRONMENTAL VARS #################################################
 export DOCKER_BUILDKIT:=1
 export COMPOSE_DOCKER_CLI_BUILD:=1
-export COMPOSE_OPTS:=--env-file .env.ecr
+export docker_compose:=docker-compose --env-file .env.ecr
 export AWS_DEV_PROFILE=genepi-dev
 export AWS_PROD_PROFILE=genepi-prod
 export BACKEND_APP_ROOT=/usr/src/app
@@ -51,7 +51,7 @@ remote-dbconsole: .env.ecr # Get a python console on a remote db (from OSX only!
 	export DB_URI=$$(jq -r '"postgresql://\(.DB_admin_username):\(.DB_admin_password)@'$${OSX_IP}':5555/$(DB)"' <<< $$config); \
 	echo Connecting to $$(jq -r .DB_address <<< $$config)/$(DB) via $$(jq -r .bastion_host <<< $$config); \
 	ssh -f -o ExitOnForwardFailure=yes -L $${OSX_IP}:5555:$$(jq -r .DB_address <<< $$config):5432 $$(jq -r .bastion_host <<< $$config) sleep 20; \
-	docker-compose $(COMPOSE_OPTS) run -e DB_URI backend sh -c 'pip install . && aspen-cli db --remote interact --connect'
+	$(docker_compose) run -e DB_URI backend sh -c 'pip install . && aspen-cli db --remote interact --connect'
 
 ### DOCKER LOCAL DEV #########################################
 .PHONY: local-hostconfig
@@ -99,36 +99,36 @@ local-ecr-login:
 
 .PHONY: init-empty-db
 init-empty-db:
-	docker-compose stop database
-	docker-compose rm database
-	docker-compose $(COMPOSE_OPTS) -f docker-compose.yml -f docker-compose-emptydb.yml up -d
+	$(docker_compose) stop database
+	$(docker_compose) rm database
+	$(docker_compose) -f docker-compose.yml -f docker-compose-emptydb.yml up -d
 	sleep 10 # hack, let postgres start up cleanly.
-	-docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c "ALTER USER $(LOCAL_DB_ADMIN_USERNAME) WITH PASSWORD '$(LOCAL_DB_ADMIN_PASSWORD)';"
-	-docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c "CREATE USER $(LOCAL_DB_RW_USERNAME) WITH PASSWORD '$(LOCAL_DB_RW_PASSWORD)';"
-	-docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c "CREATE USER $(LOCAL_DB_RO_USERNAME) WITH PASSWORD '$(LOCAL_DB_RO_PASSWORD)';"
-	-docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c "GRANT ALL PRIVILEGES ON DATABASE $(LOCAL_DB_NAME) TO $(LOCAL_DB_RW_USERNAME);"
-	docker-compose $(COMPOSE_OPTS) run sh -c 'aspen-cli db --local create; alembic stamp head'
+	-$(docker_compose) exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c "ALTER USER $(LOCAL_DB_ADMIN_USERNAME) WITH PASSWORD '$(LOCAL_DB_ADMIN_PASSWORD)';"
+	-$(docker_compose) exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c "CREATE USER $(LOCAL_DB_RW_USERNAME) WITH PASSWORD '$(LOCAL_DB_RW_PASSWORD)';"
+	-$(docker_compose) exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c "CREATE USER $(LOCAL_DB_RO_USERNAME) WITH PASSWORD '$(LOCAL_DB_RO_PASSWORD)';"
+	-$(docker_compose) exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c "GRANT ALL PRIVILEGES ON DATABASE $(LOCAL_DB_NAME) TO $(LOCAL_DB_RW_USERNAME);"
+	$(docker_compose) run sh -c 'aspen-cli db --local create; alembic stamp head'
 
 
 .PHONY: local-init
 local-init: oauth/pkcs12/certificate.pfx .env.ecr local-ecr-login local-hostconfig ## Launch a new local dev env and populate it with test data.
-	docker-compose $(COMPOSE_OPTS) pull database
-	docker-compose $(COMPOSE_OPTS) --profile $(LOCALDEV_PROFILE) up -d
+	$(docker_compose) pull database
+	$(docker_compose) --profile $(LOCALDEV_PROFILE) up -d
 	# Wait for psql to be up
-	while [ -z "$$(docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c 'select 1')" ]; do echo "waiting for db to start..."; sleep 1; done;
-	@docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c "alter user $(LOCAL_DB_ADMIN_USERNAME) with password '$(LOCAL_DB_ADMIN_PASSWORD)';"
-	docker-compose exec -T backend $(BACKEND_APP_ROOT)/scripts/setup_dev_data.sh
-	docker-compose exec -T backend alembic upgrade head
-	docker-compose exec -T backend python scripts/setup_localdata.py
-	docker-compose exec -T backend pip install .
+	while [ -z "$$($(docker_compose) exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c 'select 1')" ]; do echo "waiting for db to start..."; sleep 1; done;
+	@$(docker_compose) exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c "alter user $(LOCAL_DB_ADMIN_USERNAME) with password '$(LOCAL_DB_ADMIN_PASSWORD)';"
+	$(docker_compose) exec -T backend $(BACKEND_APP_ROOT)/scripts/setup_dev_data.sh
+	$(docker_compose) exec -T backend alembic upgrade head
+	$(docker_compose) exec -T backend python scripts/setup_localdata.py
+	$(docker_compose) exec -T backend pip install .
 
 .PHONY: prepare-new-db-snapshot
 prepare-new-db-snapshot:
-	docker-compose $(COMPOSE_OPTS) pull database
-	docker-compose $(COMPOSE_OPTS) up -d database
+	$(docker_compose) pull database
+	$(docker_compose) up -d database
 	# Wait for psql to be up
-	while [ -z "$$(docker-compose exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c 'select 1')" ]; do echo "waiting for db to start..."; sleep 1; done;
-	docker-compose exec -T backend alembic upgrade head
+	while [ -z "$$($(docker_compose) exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c 'select 1')" ]; do echo "waiting for db to start..."; sleep 1; done;
+	$(docker_compose) exec -T backend alembic upgrade head
 	@echo
 	@echo "Ok, local db is prepared and ready to go -- make any additional changes you need to and then run:"
 	@echo "make create_new_db_image"
@@ -148,9 +148,9 @@ create_new_db_image:
 
 .PHONY: check-images
 check-images: ## Spot-check the gisaid image
-	docker-compose $(COMPOSE_OPTS) run --no-deps --rm gisaid /usr/src/app/aspen/workflows/test-gisaid.sh
-	docker-compose $(COMPOSE_OPTS) run --no-deps --rm nextstrain /usr/src/app/aspen/workflows/test-nextstrain.sh
-	docker-compose $(COMPOSE_OPTS) run --no-deps --rm pangolin /usr/src/app/aspen/workflows/test-pangolin.sh
+	$(docker_compose) run --no-deps --rm gisaid /usr/src/app/aspen/workflows/test-gisaid.sh
+	$(docker_compose) run --no-deps --rm nextstrain /usr/src/app/aspen/workflows/test-nextstrain.sh
+	$(docker_compose) run --no-deps --rm pangolin /usr/src/app/aspen/workflows/test-pangolin.sh
 
 .PHONY: imagecheck-genepi-%
 imagecheck-genepi-%: ## Spot-check backend/batch images
@@ -162,7 +162,7 @@ imagecheck-genepi-frontend: ## Spot-check frontend image
 
 .PHONY: backend-debugger
 backend-debugger: ## Attach to the backend service (useful for pdb)
-	docker attach $$(docker-compose ps | grep backend | cut -d ' ' -f 1 | head -n 1)
+	docker attach $$($(docker_compose) ps | grep backend | cut -d ' ' -f 1 | head -n 1)
 
 .PHONY: local-status
 local-status: ## Show the status of the containers in the dev environment.
@@ -170,24 +170,24 @@ local-status: ## Show the status of the containers in the dev environment.
 
 .PHONY: local-rebuild
 local-rebuild: .env.ecr local-ecr-login ## Rebuild local dev without re-importing data
-	docker-compose $(COMPOSE_OPTS) --profile $(LOCALDEV_PROFILE) build
-	docker-compose $(COMPOSE_OPTS) --profile $(LOCALDEV_PROFILE) up -d
+	$(docker_compose) --profile $(LOCALDEV_PROFILE) build
+	$(docker_compose) --profile $(LOCALDEV_PROFILE) up -d
 
 .PHONY: local-rebuild-workflows
 local-rebuild-workflows: .env.ecr local-ecr-login ## Rebuild batch containers
-	docker-compose $(COMPOSE_OPTS) --profile all build
-	docker-compose $(COMPOSE_OPTS) --profile all up -d
+	$(docker_compose) --profile all build
+	$(docker_compose) --profile all up -d
 
 .PHONY: local-sync
 local-sync: local-rebuild local-init local-hostconfig ## Re-sync the local-environment state after modifying library deps or docker configs
 
 .PHONY: local-start
 local-start: .env.ecr ## Start a local dev environment that's been stopped.
-	docker-compose $(COMPOSE_OPTS) --profile $(LOCALDEV_PROFILE) up -d
+	$(docker_compose) --profile $(LOCALDEV_PROFILE) up -d
 
 .PHONY: local-stop
 local-stop: ## Stop the local dev environment.
-	docker-compose stop
+	$(docker_compose) stop
 
 .PHONY: local-clean
 local-clean: local-nohostconfig ## Remove everything related to the local dev environment (including db data!)
@@ -206,49 +206,49 @@ local-clean: local-nohostconfig ## Remove everything related to the local dev en
 	fi;
 	-rm -rf ./oauth/pkcs12/server*
 	-rm -rf ./oauth/pkcs12/certificate*
-	docker-compose rm -sf
+	$(docker_compose) rm -sf
 	-docker rm -f aspen_utility_1
 	-docker volume rm aspen_localstack
 	-docker network rm aspen_genepinet
 
 .PHONY: local-logs
 local-logs: ## Tail the logs of the dev env containers. ex: make local-logs CONTAINER=backend
-	docker-compose logs -f $(CONTAINER)
+	$(docker_compose) logs -f $(CONTAINER)
 
 .PHONY: local-shell
 local-shell: ## Open a command shell in one of the dev containers. ex: make local-shell CONTAINER=frontend
-	docker-compose exec $(CONTAINER) bash
+	$(docker_compose) exec $(CONTAINER) bash
 
 .PHONY: local-pgconsole
 local-pgconsole: ## Connect to the local postgres database.
-	docker-compose exec database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)?options=--search_path%3d$(DB_SEARCH_PATH)"
+	$(docker_compose) exec database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)?options=--search_path%3d$(DB_SEARCH_PATH)"
 
 .PHONY: local-dbconsole
 local-dbconsole: ## Connect to the local postgres database.
-	docker-compose exec backend aspen-cli db --local interact
+	$(docker_compose) exec backend aspen-cli db --local interact
 
 .PHONY: local-dbconsole-profile
 local-dbconsole-profile: ## Connect to the local postgres database and profile queries.
-	docker-compose exec backend aspen-cli db --local interact --profile
+	$(docker_compose) exec backend aspen-cli db --local interact --profile
 
 .PHONY: local-update-backend-deps
 local-update-backend-deps: ## Update poetry.lock to reflect pyproject.toml file changes.
-	docker-compose exec backend /opt/poetry/bin/poetry update
+	$(docker_compose) exec backend /opt/poetry/bin/poetry update
 
 .PHONY: local-update-frontend-deps
 local-update-frontend-deps: ## Update package-lock.json to reflect package.json file changes.
-	docker-compose exec frontend npm install
+	$(docker_compose) exec frontend npm install
 
 ### ACCESSING CONTAINER MAKE COMMANDS ###################################################
 utility-%: ## Run make commands in the backend container (src/backend/Makefile) DEPRECATED!!
-	docker-compose exec backend make $(subst utility-,,$@) MESSAGE="$(MESSAGE)"
+	$(docker_compose) exec backend make $(subst utility-,,$@) MESSAGE="$(MESSAGE)"
 
 backend-%: .env.ecr ## Run make commands in the backend container (src/backend/Makefile)
-	docker-compose $(COMPOSE_OPTS) run --no-deps --rm backend make $(subst backend-,,$@)
+	$(docker_compose) run --no-deps --rm backend make $(subst backend-,,$@)
 
 .PHONY: frontend-e2e-ci
 frontend-e2e-ci: .env.ecr ## Run e2e tests with s3 screenshot wrapper.
-	docker-compose $(COMPOSE_OPTS) run -e CI=true --no-deps frontend make e2e; \
+	$(docker_compose) run -e CI=true --no-deps frontend make e2e; \
 	exit_status=$$?; \
 	test_container=$$(docker ps -a | grep -i frontend_run | cut -d ' ' -f 1 | head -n 1); \
 	docker cp $${test_container}:/tmp/screenshots .; \
@@ -257,7 +257,7 @@ frontend-e2e-ci: .env.ecr ## Run e2e tests with s3 screenshot wrapper.
 	exit $$exit_status
 
 frontend-%: .env.ecr ## Run make commands in the frontend container (src/frontend/Makefile)
-	docker-compose $(COMPOSE_OPTS) run -e CI=true --no-deps --rm frontend make $(subst frontend-,,$@)
+	$(docker_compose) run -e CI=true --no-deps --rm frontend make $(subst frontend-,,$@)
 
 
 ### WDL ###################################################

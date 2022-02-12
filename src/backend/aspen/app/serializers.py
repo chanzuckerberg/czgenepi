@@ -9,14 +9,6 @@ PHYLO_TREE_TYPES = {
 }
 
 
-class ValidateIDsRequestSchema(Schema):
-    sample_ids = fields.List(fields.String(), required=True)
-
-
-class ValidateIDsResponseSchema(Schema):
-    missing_sample_ids = fields.List(fields.String(), required=True)
-
-
 class PhyloRunRequestSchema(Schema):
     name = fields.String(required=True, validate=validate.Length(min=1, max=128))
     samples = fields.List(fields.String(), required=True)

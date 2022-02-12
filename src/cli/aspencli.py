@@ -488,7 +488,7 @@ def update_phylorun(ctx, run_id, name):
 def validate_sample_ids(ctx, sample_ids, show_headers):
     api_client = ctx.obj["api_client"]
     payload = {"sample_ids": sample_ids}
-    resp = api_client.post("/api/samples/validate-ids", json=payload)
+    resp = api_client.post("/v2/samples/validate_ids/", json=payload)
     if show_headers:
         print(resp.headers)
     print(resp.text)

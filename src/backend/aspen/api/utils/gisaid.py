@@ -7,7 +7,7 @@ from aspen.database.models import GisaidMetadata
 
 
 async def get_matching_gisaid_ids(
-    sample_ids: Iterable[str], session: AsyncSession
+    session: AsyncSession, sample_ids: Iterable[str]
 ) -> Set[str]:
     """
     Check if a list of identifiers exist as gisaid strain names,
