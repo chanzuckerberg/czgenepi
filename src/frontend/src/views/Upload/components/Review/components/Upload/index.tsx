@@ -1,4 +1,3 @@
-import { Dialog } from "@material-ui/core";
 import { AlertTitle } from "@material-ui/lab";
 import { Alert, Button } from "czifui";
 import NextLink from "next/link";
@@ -7,6 +6,7 @@ import { useMutation } from "react-query";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { createSamples } from "src/common/queries/samples";
 import { ROUTES } from "src/common/routes";
+import DialogNoDepreciation from "src/components/DialogNoDepreciation";
 import { ContinueButton } from "../../../common/style";
 import { SampleIdToMetadata, Samples } from "../../../common/types";
 import {
@@ -45,14 +45,11 @@ export default function Upload({
 
   return (
     <>
-      <Dialog
+      <DialogNoDepreciation
+        disableBackdropClick
         disableEscapeKeyDown
         open={isOpen}
-        onClose={(_event, reason) => {
-          if (reason !== "backdropClick") {
-            handleClose();
-          }
-        }}
+        onClose={handleClose}
       >
         <StyledDialogContent>
           <ImageWrapper>{getImage()}</ImageWrapper>
@@ -86,7 +83,7 @@ export default function Upload({
             </NextLink>
           )}
         </StyledDialogActions>
-      </Dialog>
+      </DialogNoDepreciation>
 
       <ContinueButton
         disabled={isDisabled}

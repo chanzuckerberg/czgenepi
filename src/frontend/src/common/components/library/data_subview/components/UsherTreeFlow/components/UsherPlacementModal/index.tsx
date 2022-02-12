@@ -185,6 +185,7 @@ export const UsherPlacementModal = ({
 
   return (
     <DialogNoDepreciation
+      disableBackdropClick
       disableEnforceFocus
       disableEscapeKeyDown
       open={open}
