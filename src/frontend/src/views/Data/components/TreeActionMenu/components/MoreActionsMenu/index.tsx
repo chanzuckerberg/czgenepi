@@ -27,7 +27,7 @@ const MoreActionsMenu = ({
   const isAutoBuild = group?.name === "";
   const isTreeInUserOrg = userGroup?.name === group?.name;
   const canUserDeleteTree = isAutoBuild || isTreeInUserOrg;
-  // Fix this to allow users to edit/delete FAILED runs once phylotrees V2 endpoint has been updated to better reflect tree status
+  // FIXME: allow users to edit/delete FAILED runs once phylotrees V2 endpoint has been updated to better reflect tree status
   const isDisabled = status !== TREE_STATUS.Completed || !canUserDeleteTree;
 
   let tooltipText = "More Actions";
