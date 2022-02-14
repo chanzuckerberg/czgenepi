@@ -21,14 +21,17 @@ export const HEADERS_TO_METADATA_KEYS = invert(
   METADATA_KEYS_TO_HEADERS
 ) as Dictionary<keyof Metadata>;
 
-export const METADATA_KEYS_TO_API_KEYS: Record<keyof Metadata, string> = {
-  collectionDate: "collection_date",
-  collectionLocation: "location_id",
-  keepPrivate: "private",
-  publicId: "public_identifier",
-  sampleId: "private_identifier",
-  sequencingDate: "sequencing_date",
-};
+// We don't send all metadata keys to API. sampleId is not persisted.
+type KEYS_SENT_TO_API = Omit<Metadata, "sampleId">;
+export const METADATA_KEYS_TO_API_KEYS: Record<keyof KEYS_SENT_TO_API, string> =
+  {
+    collectionDate: "collection_date",
+    collectionLocation: "location_id",
+    keepPrivate: "private",
+    privateId: "private_identifier",
+    publicId: "public_identifier",
+    sequencingDate: "sequencing_date",
+  };
 
 export const EMPTY_METADATA: Metadata = {
   collectionDate: "",
