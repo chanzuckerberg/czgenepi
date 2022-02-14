@@ -6,7 +6,7 @@ import { useMutation } from "react-query";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { createSamples } from "src/common/queries/samples";
 import { ROUTES } from "src/common/routes";
-import DialogNoDepreciation from "src/components/DialogNoDepreciation";
+import Dialog from "src/components/Dialog";
 import { ContinueButton } from "../../../common/style";
 import { SampleIdToMetadata, Samples } from "../../../common/types";
 import {
@@ -45,7 +45,7 @@ export default function Upload({
 
   return (
     <>
-      <DialogNoDepreciation
+      <Dialog
         disableBackdropClick
         disableEscapeKeyDown
         open={isOpen}
@@ -83,7 +83,7 @@ export default function Upload({
             </NextLink>
           )}
         </StyledDialogActions>
-      </DialogNoDepreciation>
+      </Dialog>
 
       <ContinueButton
         disabled={isDisabled}

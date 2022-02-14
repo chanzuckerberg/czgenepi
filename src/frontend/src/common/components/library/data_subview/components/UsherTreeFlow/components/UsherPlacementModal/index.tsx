@@ -9,7 +9,7 @@ import {
   useFastaFetch,
 } from "src/common/queries/trees";
 import { pluralize } from "src/common/utils/strUtils";
-import DialogNoDepreciation from "src/components/DialogNoDepreciation";
+import Dialog from "src/components/Dialog";
 import {
   StyledDialogTitle,
   StyledTooltip,
@@ -184,7 +184,7 @@ export const UsherPlacementModal = ({
   );
 
   return (
-    <DialogNoDepreciation
+    <Dialog
       disableBackdropClick
       disableEnforceFocus
       disableEscapeKeyDown
@@ -307,6 +307,6 @@ export const UsherPlacementModal = ({
           </form>
         </Content>
       </StyledDialogContent>
-    </DialogNoDepreciation>
+    </Dialog>
   );
 };

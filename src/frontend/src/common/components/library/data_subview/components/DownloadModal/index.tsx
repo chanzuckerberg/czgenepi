@@ -11,7 +11,7 @@ import { useUserInfo } from "src/common/queries/auth";
 import { downloadSamplesFasta } from "src/common/queries/samples";
 import { B } from "src/common/styles/support/style";
 import { pluralize } from "src/common/utils/strUtils";
-import DialogNoDepreciation from "src/components/DialogNoDepreciation";
+import Dialog from "src/components/Dialog";
 import Notification from "src/components/Notification";
 import { TooltipDescriptionText, TooltipHeaderText } from "../../style";
 import { ContactUsLink } from "../ContactUsLink";
@@ -136,7 +136,7 @@ const DownloadModal = ({
         </B>{" "}
         <ContactUsLink />
       </Notification>
-      <DialogNoDepreciation
+      <Dialog
         disableEscapeKeyDown
         disableBackdropClick
         open={open}
@@ -221,7 +221,7 @@ const DownloadModal = ({
           </Content>
         </DialogContent>
         <DialogActions></DialogActions>
-      </DialogNoDepreciation>
+      </Dialog>
     </>
   );
 

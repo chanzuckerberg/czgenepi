@@ -1,4 +1,7 @@
-import { Dialog, DialogProps as MuiDialogProps } from "@material-ui/core";
+import {
+  Dialog as MuiDialog,
+  DialogProps as MuiDialogProps,
+} from "@material-ui/core";
 import React from "react";
 
 interface Props extends MuiDialogProps {
@@ -6,8 +9,9 @@ interface Props extends MuiDialogProps {
   onClose(): void;
 }
 
-// This component wraps Dialog and handles the backdropClick prop which is now depreciated
-export default function DialogNoDepreciation({
+// This component wraps Dialog and handles `Failed prop type: The prop disableBackdropClick of ForwardRef(Dialog) is deprecated`
+
+export default function Dialog({
   disableBackdropClick = false,
   onClose,
   ...props
@@ -19,5 +23,5 @@ export default function DialogNoDepreciation({
     onClose();
   };
 
-  return <Dialog onClose={handleClose} {...props} />;
+  return <MuiDialog onClose={handleClose} {...props} />;
 }
