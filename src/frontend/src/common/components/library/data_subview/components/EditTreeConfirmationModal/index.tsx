@@ -34,16 +34,24 @@ export const EditTreeConfirmationModal = ({
     if (tree) {
       setNewTreeName(tree.name);
     }
-  }, [tree, setNewTreeName]);
+
+    // when we have a new tree name that also means that we should reset
+    // shouldShow notifications to false since the component is now focused on editing a new tree
+    setShouldShowSuccessNotification(false);
+    setShouldShowSuccessNotification(false);
+  }, [
+    tree,
+    setNewTreeName,
+    setShouldShowSuccessNotification,
+    setShouldShowSuccessNotification,
+  ]);
 
   const editTreeMutation = useEditTree({
     componentOnSuccess: () => {
       setShouldShowSuccessNotification(true);
-      setNewTreeName("");
     },
     componentOnError: () => {
       setShouldShowErrorNotification(true);
-      setNewTreeName("");
     },
   });
 
