@@ -59,6 +59,9 @@ class HappyConfig:
             raise CliError(error)
 
     def __getattr__(self, field):
+        print(f'Field: {field}')
+        if field == "default_compose_env":
+            return self._data["default_compose_env_file"]
         if field == "ecrs":
             return self.ctx.obj["secret_mgr"].secrets["ecrs"]
         if field in self._data:
