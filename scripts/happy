@@ -59,7 +59,6 @@ class HappyConfig:
             raise CliError(error)
 
     def __getattr__(self, field):
-        print(f'Field: {field}')
         if field == "default_compose_env":
             return self._data["default_compose_env_file"]
         if field == "ecrs":
