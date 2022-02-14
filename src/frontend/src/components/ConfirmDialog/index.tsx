@@ -12,11 +12,13 @@ import {
   StyledIconButton,
   Title,
 } from "./style";
+import BaseDialog from "src/components/BaseActionDialog";
 
 export interface ConfirmDialogProps {
+  // interactiveDialogProps
   open: boolean;
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm: () => void; // onAction
   title: string | JSX.Element;
   content: string | JSX.Element;
   footer?: string;
@@ -35,55 +37,34 @@ export default function ConfirmDialog({
   title,
   content,
   footer,
-  withCloseIcon = false,
-  isConfirmButtonClickable = true,
 }: ConfirmDialogProps): JSX.Element {
-  const confirmButton = customConfirmButton ?? (
-    <Button color="primary" variant="contained" isRounded>
-      Continue
+
+  const confirmButton = (
+    <div onClick={onConfirm}>
+      {customConfirmButton ?? (
+        <Button color="primary" variant="contained" isRounded>
+          Continue
+        </Button>
+      )}
+    </div>
+  );
+
+  const cancelButton = (
+    <Button color="primary" variant="outlined" isRounded onClick={onClose}>
+      Cancel
     </Button>
   );
 
-  const confirmButtonwithDiv = isConfirmButtonClickable ? (
-    <div onClick={onConfirm}>{confirmButton}</div>
-  ) : (
-    <div>{confirmButton}</div>
-  );
-
   return (
-    <Dialog
+    <BaseDialog
       disableBackdropClick={disableBackdropClick}
-      disableEscapeKeyDown
       open={open}
       onClose={onClose}
-    >
-      <DialogTitle narrow>
-        <StyledDiv>
-          {withCloseIcon && (
-            <StyledIconButton onClick={onClose}>
-              <CloseIcon />
-            </StyledIconButton>
-          )}
-          <Title>{title}</Title>
-        </StyledDiv>
-      </DialogTitle>
-      <DialogContent narrow>
-        <Content>{content}</Content>
-      </DialogContent>
-      <DialogActions narrow>
-        {confirmButtonwithDiv}
-        {!withCloseIcon && ( // if we have close icon we don't also need a cancel button
-          <Button
-            color="primary"
-            variant="outlined"
-            isRounded
-            onClick={onClose}
-          >
-            Cancel
-          </Button>
-        )}
-      </DialogActions>
-      {footer && <StyledFooter narrow>{footer}</StyledFooter>}
-    </Dialog>
+      title={title}
+      content={content}
+      actionButton={confirmButton}
+      cancelButton={cancelButton}
+      footer={footer}
+    />
   );
 }

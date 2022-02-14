@@ -1,12 +1,8 @@
 import React from "react";
-import ConfirmDialog, {
-  ConfirmDialogProps,
-} from "src/components/ConfirmDialog";
+import BaseDialog from "src/components/BaseActionDialog";
 import { StyledSpan } from "src/components/DeleteDialog/style";
 
-interface Props extends Omit<ConfirmDialogProps, "onConfirm"> {
-  onEdit(): void;
-}
+
 
 const EditDialog = ({
   onEdit,

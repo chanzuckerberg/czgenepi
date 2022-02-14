@@ -2,7 +2,7 @@ import React from "react";
 import ConfirmDialog, {
   ConfirmDialogProps,
 } from "src/components/ConfirmDialog";
-import { StyledButton, StyledSpan } from "./style";
+import { StyledSpan, StyledButton } from "src/components/DeleteDialog/style";
 
 interface Props extends Omit<ConfirmDialogProps, "onConfirm"> {
   onDelete(): void;
@@ -16,13 +16,13 @@ const DeleteDialog = ({
 }: Props): JSX.Element | null => {
   if (!open) return null;
 
-  const styledTitle = <StyledSpan>{title}</StyledSpan>;
-
   const deleteButton = (
     <StyledButton color="primary" variant="contained" isRounded>
       Delete
     </StyledButton>
   );
+
+  const styledTitle = <StyledSpan>{title}</StyledSpan>;
 
   return (
     <ConfirmDialog

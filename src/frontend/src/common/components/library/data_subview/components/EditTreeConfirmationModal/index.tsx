@@ -1,9 +1,14 @@
 import { Button } from "czifui";
+import CloseIcon from "@material-ui/icons/Close";
 import React, { useEffect, useState } from "react";
 import { useEditTree } from "src/common/queries/trees";
-import { EditDialog } from "src/components/EditDialog";
 import Notification from "src/components/Notification";
 import { TreeNameInput } from "src/components/TreeNameInput";
+import { StyledSpan } from "src/components/DeleteDialog/style";
+import BaseDialog from "src/components/BaseActionDialog";
+import {
+  StyledIconButton,
+} from "src/components/ConfirmDialog/style";
 
 interface Props {
   onClose(): void;
@@ -60,7 +65,8 @@ export const EditTreeConfirmationModal = ({
     onClose();
   };
 
-  const title = "Edit Tree Name";
+  const title = <StyledSpan>Edit Tree Name</StyledSpan>;
+
   const content = (
     <>
       <TreeNameInput
@@ -83,6 +89,12 @@ export const EditTreeConfirmationModal = ({
     >
       Update
     </Button>
+  );
+
+  const closeIcon = (
+    <StyledIconButton onClick={onClose}>
+      <CloseIcon />
+    </StyledIconButton>
   );
 
   return (
@@ -112,13 +124,14 @@ export const EditTreeConfirmationModal = ({
           Please try again later.
         </Notification>
       )}
-      <EditDialog
+      <BaseDialog
         open={open}
         onClose={handleClose}
-        onEdit={onEdit}
         title={title}
         content={content}
-        customConfirmButton={confirmButton}
+        actionButton={confirmButton}
+        withCloseIcon={true}
+        closeIcon={closeIcon}
       />
     </>
   );

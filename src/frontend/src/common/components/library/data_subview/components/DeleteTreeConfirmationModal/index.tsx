@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useDeleteTree } from "src/common/queries/trees";
 import { DeleteDialog } from "src/components/DeleteDialog";
+import { StyledSpan, StyledButton } from "src/components/DeleteDialog/style";
 import Notification from "src/components/Notification";
 
 interface Props {
@@ -47,6 +48,12 @@ const DeleteTreeConfirmationModal = ({
     </span>
   );
 
+  const deleteButton = (
+    <StyledButton color="primary" variant="contained" isRounded>
+      Delete
+    </StyledButton>
+  );
+
   return (
     <>
       {shouldShowSuccessNotification && (
@@ -75,10 +82,11 @@ const DeleteTreeConfirmationModal = ({
       )}
       <DeleteDialog
         open={open}
-        onClose={onClose}
         onDelete={onDelete}
+        onClose={onClose}
         title={title}
         content={content}
+        customConfirmButton={deleteButton}
       />
     </>
   );
