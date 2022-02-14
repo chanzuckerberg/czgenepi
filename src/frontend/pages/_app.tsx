@@ -1,6 +1,7 @@
 import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
 import { StylesProvider, ThemeProvider } from "@material-ui/core/styles";
-import { SplitFactory, SplitIO } from "@splitsoftware/splitio-react";
+//import SplitIO from '@splitsoftware/splitio/types/splitio';
+import { SplitFactory } from "@splitsoftware/splitio-react";
 import { AppProps } from "next/app";
 import Head from "next/head";
 import React, { useEffect, useState } from "react";
