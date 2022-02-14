@@ -1,15 +1,9 @@
 import { Dialog } from "@material-ui/core";
-
 import React from "react";
 import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
-import {
-  Content,
-  StyledDiv,
-  StyledFooter,
-  Title,
-} from "../ConfirmDialog/style";
+import { Content, StyledDiv, StyledFooter, Title } from "./style";
 
 export interface BaseDialogProps {
   open: boolean;
@@ -36,7 +30,6 @@ export default function BaseDialog({
   actionButton,
   closeIcon = false,
 }: BaseDialogProps): JSX.Element {
-
   return (
     <Dialog
       disableBackdropClick={disableBackdropClick}
@@ -55,7 +48,6 @@ export default function BaseDialog({
       </DialogContent>
       <DialogActions narrow>
         {actionButton}
-        {/* if we have close icon we don't also need a cancel button */}
         {cancelButton}
       </DialogActions>
       {footer && <StyledFooter narrow>{footer}</StyledFooter>}

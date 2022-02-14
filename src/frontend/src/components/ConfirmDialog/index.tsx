@@ -1,24 +1,11 @@
-import CloseIcon from "@material-ui/icons/Close";
 import { Button } from "czifui";
 import React from "react";
-import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
-import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
-import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
-import Dialog from "src/components/Dialog";
-import {
-  Content,
-  StyledDiv,
-  StyledFooter,
-  StyledIconButton,
-  Title,
-} from "./style";
 import BaseDialog from "src/components/BaseActionDialog";
 
 export interface ConfirmDialogProps {
-  // interactiveDialogProps
   open: boolean;
   onClose: () => void;
-  onConfirm: () => void; // onAction
+  onConfirm: () => void;
   title: string | JSX.Element;
   content: string | JSX.Element;
   footer?: string;
@@ -38,7 +25,6 @@ export default function ConfirmDialog({
   content,
   footer,
 }: ConfirmDialogProps): JSX.Element {
-
   const confirmButton = (
     <div onClick={onConfirm}>
       {customConfirmButton ?? (

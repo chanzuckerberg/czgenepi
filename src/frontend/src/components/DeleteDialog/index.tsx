@@ -2,7 +2,7 @@ import React from "react";
 import ConfirmDialog, {
   ConfirmDialogProps,
 } from "src/components/ConfirmDialog";
-import { StyledSpan, StyledButton } from "src/components/DeleteDialog/style";
+import { StyledButton, StyledSpan } from "./style";
 
 interface Props extends Omit<ConfirmDialogProps, "onConfirm"> {
   onDelete(): void;
