@@ -1,5 +1,5 @@
 import { Button } from "czifui";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useEditTree } from "src/common/queries/trees";
 import { EditDialog } from "src/components/EditDialog";
 import Notification from "src/components/Notification";
@@ -25,6 +25,14 @@ export const EditTreeConfirmationModal = ({
   const treeNameLength = newTreeName ? newTreeName.length : 0;
   const hasValidName = treeNameLength > 0 && treeNameLength <= 128;
 
+  useEffect(() => {
+    // this makes sure that the newTreeName defaults to the current tree name,
+    //  and that the component remounts when we edit a new tree
+    if (tree) {
+      setNewTreeName(tree.name);
+    }
+  }, [tree, setNewTreeName]);
+
   const editTreeMutation = useEditTree({
     componentOnSuccess: () => {
       setShouldShowSuccessNotification(true);
@@ -38,7 +46,6 @@ export const EditTreeConfirmationModal = ({
 
   const handleClose = function () {
     onClose();
-    setNewTreeName("");
   };
 
   if (!tree) return null;
