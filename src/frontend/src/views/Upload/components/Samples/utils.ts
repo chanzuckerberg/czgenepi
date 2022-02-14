@@ -1,6 +1,10 @@
 import deepmerge from "deepmerge";
 import { gunzip, strFromU8, unzip } from "fflate";
 import {
+  FORBIDDEN_NAME_CHARACTERS_REGEX,
+  MAX_NAME_LENGTH,
+} from "../common/constants";
+import {
   ERROR_CODE,
   ParseErrors,
   ParseFastaSeqIDLineOutcome,
@@ -9,12 +13,6 @@ import {
   Samples,
   Sequences,
 } from "../common/types";
-
-const MAX_NAME_LENGTH = 120;
-// All the characters that we do NOT allow for sample name.
-// Effectively just a whitelist of characters, then negated to produce what's forbidden.
-// Allowed characters: all latin alphabet, all digits, ` ` (space), `.`, `_`, `/`, `-`
-const FORBIDDEN_NAME_CHARACTERS_REGEX = /[^a-zA-Z0-9 ._/-]/;
 
 export async function handleFiles(
   files: FileList
