@@ -1192,7 +1192,10 @@ def list_command(ctx):
         status = info.status
         tag = info.meta.imagetag
         if info.meta.imagetags:
-            tag = ", ".join(set(info.meta.imagetags.values()) | {tag})
+            tags = {}
+            if isinstance(info.meta.imagetags, str):
+                tags = json.loads(info.meta.imagetags)
+            tag = ", ".join(set(tags.values()) | {tag})
         tp.add_row([name, info.meta.owner, tag, status, url])
     tp.print()
 
