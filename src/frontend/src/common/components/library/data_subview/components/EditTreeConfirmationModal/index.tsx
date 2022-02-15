@@ -25,12 +25,12 @@ export const EditTreeConfirmationModal = ({
     useState<boolean>(false);
   const [newTreeName, setNewTreeName] = useState<string>("");
 
-  const treeNameLength = newTreeName ? newTreeName.length : 0;
+  const treeNameLength = newTreeName.length;
   const hasValidName = treeNameLength > 0 && treeNameLength <= 128;
 
   useEffect(() => {
     // this makes sure that the newTreeName defaults to the current tree name,
-    //  and that the component remounts when we edit a new tree
+    //  and that the newTreeName state variable resets when we edit a new tree
     if (tree) {
       setNewTreeName(tree.name);
     }

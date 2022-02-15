@@ -48,12 +48,6 @@ const DeleteTreeConfirmationModal = ({
     </span>
   );
 
-  const deleteButton = (
-    <StyledButton color="primary" variant="contained" isRounded>
-      Delete
-    </StyledButton>
-  );
-
   return (
     <>
       {shouldShowSuccessNotification && (
@@ -86,7 +80,6 @@ const DeleteTreeConfirmationModal = ({
         onClose={onClose}
         title={title}
         content={content}
-        customConfirmButton={deleteButton}
       />
     </>
   );
