@@ -1,4 +1,4 @@
-import { Dialog } from "@material-ui/core";
+import Dialog from "src/components/Dialog";
 import React from "react";
 import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
