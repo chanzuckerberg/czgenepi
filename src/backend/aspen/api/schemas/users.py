@@ -16,6 +16,11 @@ class UserBaseResponse(BaseResponse):
     acknowledged_policy_version: Optional[str] = None
 
 
+# Only expose split id to the user it belongs to.
+class UserMeResponse(UserBaseResponse):
+    split_id: str
+
+
 class UserResponse(UserBaseResponse):
     pass
 

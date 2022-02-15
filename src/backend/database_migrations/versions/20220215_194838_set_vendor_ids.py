@@ -30,6 +30,13 @@ def upgrade():
         ),'');
     """
     )
+    op.alter_column(
+        "users",
+        "split_id",
+        existing_type=sa.VARCHAR(),
+        nullable=True,
+        schema="aspen",
+    )
 
 
 def downgrade():
