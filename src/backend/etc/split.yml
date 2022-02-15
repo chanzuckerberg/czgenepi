@@ -1,14 +1,13 @@
+# docs: https://help.split.io/hc/en-us/articles/360020359652-Python-SDK#localhost-mode
+#
+# FORMAT:
 # - feature_name:
 #     treatment: "treatment_applied_to_this_entry"
 #     keys: "single_key_or_list"
 #     config: "{\"desc\" : \"this applies only to ON treatment\"}"
 
-- default_sample_sort:
+- test_feature:
     treatment: "on"
-    keys: "CZI"
-- default_sample_sort:
-    treatment: "off"
-- some_other_feature:
-    treatment: "off"
-- my_feature:
+    keys: ["split_id_1", "split_id_2"]
+- test_feature:
     treatment: "off"
