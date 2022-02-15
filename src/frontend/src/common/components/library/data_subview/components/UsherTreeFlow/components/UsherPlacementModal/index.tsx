@@ -1,4 +1,4 @@
-import { Dialog, TextField } from "@material-ui/core";
+import { TextField } from "@material-ui/core";
 import { DefaultMenuSelectOption, Dropdown, InputDropdown } from "czifui";
 import { cloneDeep, debounce } from "lodash";
 import React, { SyntheticEvent, useEffect, useState } from "react";
@@ -9,6 +9,7 @@ import {
   useFastaFetch,
 } from "src/common/queries/trees";
 import { pluralize } from "src/common/utils/strUtils";
+import Dialog from "src/components/Dialog";
 import {
   StyledDialogTitle,
   StyledTooltip,

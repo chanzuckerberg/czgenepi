@@ -5,6 +5,7 @@
 
 import click
 import sqlalchemy as sa
+from sqlalchemy import func
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.sql.expression import literal_column
 
@@ -36,7 +37,11 @@ def save():
                 GisaidMetadata.gisaid_epi_isl,
             )
             .select_from(Sample)
-            .join(GisaidMetadata, Sample.public_identifier == GisaidMetadata.strain)
+            .join(
+                GisaidMetadata,
+                func.regexp_replace(Sample.public_identifier, "^hcov-19/", "", "i")
+                == GisaidMetadata.strain,
+            )
             .subquery()
         )
 

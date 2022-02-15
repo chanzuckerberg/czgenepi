@@ -59,6 +59,8 @@ class HappyConfig:
             raise CliError(error)
 
     def __getattr__(self, field):
+        if field == "default_compose_env":
+            return self._data["default_compose_env_file"]
         if field == "ecrs":
             return self.ctx.obj["secret_mgr"].secrets["ecrs"]
         if field in self._data:
@@ -1192,7 +1194,10 @@ def list_command(ctx):
         status = info.status
         tag = info.meta.imagetag
         if info.meta.imagetags:
-            tag = ", ".join(set(info.meta.imagetags.values()) | {tag})
+            tags = {}
+            if isinstance(info.meta.imagetags, str):
+                tags = json.loads(info.meta.imagetags)
+            tag = ", ".join(set(tags.values()) | {tag})
         tp.add_row([name, info.meta.owner, tag, status, url])
     tp.print()
 
@@ -1279,8 +1284,8 @@ def push(ctx, images, tag, extra_tag, compose_env):
     builder_config = {}
     if compose_env:
         builder_config["env"] = compose_env
-    elif os.path.isfile(config.default_compose_env):
-        builder_config["env"] = config.default_compose_env
+    elif os.path.isfile(config.default_compose_env_file):
+        builder_config["env"] = config.default_compose_env_file
     builder_config["ecr_repo"] = first_registry  # TODO this is a leak in our abstraction, need to fix.
     builder = ArtifactBuilder(builder_config)
     artifacts = builder.build(images)
