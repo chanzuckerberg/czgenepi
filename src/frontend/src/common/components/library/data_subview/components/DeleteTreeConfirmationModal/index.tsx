@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useDeleteTree } from "src/common/queries/trees";
 import { DeleteDialog } from "src/components/DeleteDialog";
-import { StyledButton } from "src/components/DeleteDialog/style";
 import Notification from "src/components/Notification";
 
 interface Props {
