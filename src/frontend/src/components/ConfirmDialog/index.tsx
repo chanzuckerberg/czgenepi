@@ -1,6 +1,6 @@
 import { Button } from "czifui";
 import React from "react";
-import BaseDialog from "src/components/BaseActionDialog";
+import BaseDialog from "src/components/BaseDialog";
 
 export interface ConfirmDialogProps {
   open: boolean;
