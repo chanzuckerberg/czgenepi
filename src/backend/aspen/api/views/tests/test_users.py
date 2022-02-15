@@ -25,4 +25,7 @@ async def test_users_me(http_client: AsyncClient, async_session: AsyncSession) -
         "acknowledged_policy_version": None,
         "agreed_to_tos": True,
     }
-    assert response.json() == expected
+    resp_data = response.json()
+    for key in expected:
+        assert resp_data[key] == expected[key]
+    assert len(resp_data["split_id"]) == 20

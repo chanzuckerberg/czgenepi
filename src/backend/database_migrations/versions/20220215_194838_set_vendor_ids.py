@@ -26,7 +26,7 @@ def upgrade():
     op.execute(
         """
         UPDATE aspen.users set split_id = array_to_string(array(
-          select substr('abcdefghijklmnopqrstuvwxyz0123456789',((random()*(36-1)+1)::integer),1) from generate_series(1,20) where users.id = users.id 
+          select substr('abcdefghijklmnopqrstuvwxyz0123456789',((random()*(36-1)+1)::integer),1) from generate_series(1,20) where users.id = users.id
         ),'');
     """
     )
