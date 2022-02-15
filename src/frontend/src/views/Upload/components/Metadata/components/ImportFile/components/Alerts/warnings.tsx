@@ -158,3 +158,44 @@ export function WarningMissingData({ missingData }: PropsMissingData) {
     />
   );
 }
+
+/**
+ * WARNING_CODE.BAD_FORMAT_DATA
+ */
+interface PropsBadFormatData {
+  badFormatData: SampleIdToWarningMessages;
+}
+function MessageBadFormatData({ badFormatData }: PropsBadFormatData) {
+  const tablePreamble =
+    "You can add the required data in the table below, " +
+    "or update your file and re-import.";
+  const columnHeaders = [
+    METADATA_KEYS_TO_HEADERS.sampleId,
+    "Data with Invalid Formatting",
+  ];
+  const idsBadFormatData = Object.keys(badFormatData);
+  const rows = idsBadFormatData.map((sampleId) => {
+    const badFormatHeaders = Array.from(
+      badFormatData[sampleId],
+      (badFormatKey) => METADATA_KEYS_TO_HEADERS[badFormatKey]
+    );
+    const badFormatDescription = badFormatHeaders.join(", ");
+    return [sampleId, badFormatDescription];
+  });
+  return (
+    <ProblemTable
+      tablePreamble={tablePreamble}
+      columnHeaders={columnHeaders}
+      rows={rows}
+    />
+  );
+}
+export function WarningBadFormatData({ badFormatData }: PropsBadFormatData) {
+  return (
+    <FullWidthAlertAccordion
+      title="Some of your data is not formatted correctly."
+      message={<MessageBadFormatData badFormatData={badFormatData} />}
+      severity={WARNING_SEVERITY}
+    />
+  );
+}
