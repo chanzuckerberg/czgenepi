@@ -1,8 +1,11 @@
 import Papa from "papaparse";
 import { StringToLocationFinder } from "src/common/utils/locationUtils";
+import { DATE_REGEX } from "src/components/DateField/constants";
 import {
   EMPTY_METADATA,
+  FORBIDDEN_NAME_CHARACTERS_REGEX,
   HEADERS_TO_METADATA_KEYS,
+  MAX_NAME_LENGTH,
 } from "../../../common/constants";
 import {
   ERROR_CODE,
@@ -107,6 +110,39 @@ function warnMissingMetadata(metadata: Metadata): Set<keyof Metadata> | null {
 }
 
 /**
+ * Warn about metadata that is improperly formatted. If none, return null.
+ *
+ * Note that we only warn about bad formatting when the data is present.
+ * If the data is simply missing / empty string, that's handled elsewhere.
+ *
+ * Sadly, like the above warnMissingMetadata, this function is partially
+ * duplicating the `yup` `validationSchema` for a Row's Metadata elsewhere
+ * in the app. But there's no great way to abstract that out, so here we are.
+ */
+function warnBadFormatMetadata(metadata: Metadata): Set<keyof Metadata> | null {
+  const badFormatMetadata = new Set<keyof Metadata>();
+
+  const { privateId } = metadata;
+  if (
+    privateId &&
+    (privateId.length > MAX_NAME_LENGTH ||
+      FORBIDDEN_NAME_CHARACTERS_REGEX.test(privateId))
+  ) {
+    badFormatMetadata.add("privateId");
+  }
+
+  const DATE_FIELDS = ["collectionDate", "sequencingDate"] as const;
+  DATE_FIELDS.forEach((dateKey) => {
+    const dateField = metadata[dateKey];
+    if (dateField && !DATE_REGEX.test(dateField)) {
+      badFormatMetadata.add(dateKey);
+    }
+  });
+
+  return badFormatMetadata.size ? badFormatMetadata : null;
+}
+
+/**
  * Parses a single data row. If issues during parse, also reports warnings.
  *
  * In some cases, the row can not or should not be parsed -- eg if malformed
@@ -167,6 +203,10 @@ function parseRow(
   const rowMissingMetadataWarnings = warnMissingMetadata(rowMetadata);
   if (rowMissingMetadataWarnings) {
     rowWarnings.set(WARNING_CODE.MISSING_DATA, rowMissingMetadataWarnings);
+  }
+  const rowBadFormatWarnings = warnBadFormatMetadata(rowMetadata);
+  if (rowBadFormatWarnings) {
+    rowWarnings.set(WARNING_CODE.BAD_FORMAT_DATA, rowBadFormatWarnings);
   }
 
   return {
