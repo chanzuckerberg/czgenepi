@@ -4,11 +4,25 @@ import {
   fontBodyXs,
   fontHeaderM,
   getColors,
+  getCorners,
   getFontWeights,
   getIconSizes,
   getSpaces,
   Props,
 } from "czifui";
+import Instructions from "src/components/Instructions";
+
+export const StyledInstructions = styled(Instructions)`
+  ${(props) => {
+    const corners = getCorners(props);
+    const spaces = getSpaces(props);
+
+    return `
+      border-radius: ${corners?.m}px;
+      padding:${spaces?.l}px;
+    `;
+  }}
+`;
 
 export const InstructionsSemiBold = styled.span`
   color: black;

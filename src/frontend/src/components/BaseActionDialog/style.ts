@@ -43,6 +43,13 @@ export const StyledFooter = styled.div`
 export const StyledDiv = styled.div`
   display: flex;
   flex-direction: column;
+  ${(props) => {
+    const spaces = getSpaces(props);
+    return `
+      padding: ${spaces?.l}px;
+      padding-bottom: 0px;
+    `;
+  }}
 `;
 
 export const StyledIconButton = styled(IconButton)`

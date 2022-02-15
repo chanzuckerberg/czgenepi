@@ -4,9 +4,9 @@ import React, { useEffect, useState } from "react";
 import { useEditTree } from "src/common/queries/trees";
 import BaseDialog from "src/components/BaseActionDialog";
 import { StyledIconButton } from "src/components/BaseActionDialog/style";
-import { StyledSpan } from "src/components/DeleteDialog/style";
 import Notification from "src/components/Notification";
 import { TreeNameInput } from "src/components/TreeNameInput";
+import { StyledTitle } from "./style";
 
 interface Props {
   onClose(): void;
@@ -71,7 +71,7 @@ export const EditTreeConfirmationModal = ({
     onClose();
   };
 
-  const title = <StyledSpan>Edit Tree Name</StyledSpan>;
+  const title = <StyledTitle>Edit Tree Name</StyledTitle>;
 
   const content = (
     <>

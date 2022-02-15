@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import { fontHeaderXl, getSpaces } from "czifui";
 
-export const Title = styled.div`
+export const StyledTitle = styled.div`
   ${fontHeaderXl}
 
   ${(props) => {

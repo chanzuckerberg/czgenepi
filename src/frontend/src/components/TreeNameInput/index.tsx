@@ -5,11 +5,11 @@ import {
   TreeNameTooLongAlert,
 } from "src/common/components/library/data_subview/components/CreateNSTreeModal/style";
 import { CollapsibleInstructions } from "src/components/CollapsibleInstructions";
-import Instructions from "src/components/Instructions";
 import {
   InstructionsNotSemiBold,
   InstructionsSemiBold,
   StyledErrorOutlinedIcon,
+  StyledInstructions,
   TextInputLabelTitle,
 } from "./style";
 
@@ -62,7 +62,7 @@ const TreeNameInput = ({
     // in edit Tree Dialog the instructions are not collapsible, and therefore should start open
     <CollapsibleInstructions header={header} items={items} />
   ) : (
-    <Instructions items={items} title={"Instructions"} />
+    <StyledInstructions items={items} title={"Instructions"} />
   );
 
   return (
