@@ -24,11 +24,8 @@ from aspen.api.schemas.phylo_runs import (
     PhyloRunUpdateRequest,
 )
 from aspen.api.settings import Settings
-from aspen.api.utils import get_matching_gisaid_ids
-from aspen.app.views.api_utils import (
-    authz_sample_filters,
-    get_missing_and_found_sample_ids,
-)
+from aspen.api.utils import get_matching_gisaid_ids, get_missing_and_found_sample_ids
+from aspen.app.views.api_utils import authz_sample_filters
 from aspen.database.models import (
     AlignedGisaidDump,
     DataType,
@@ -79,7 +76,7 @@ async def kick_off_phylo_run(
     )
 
     # See if these missing_sample_ids match any Gisaid IDs
-    gisaid_ids = await get_matching_gisaid_ids(missing_sample_ids, db)
+    gisaid_ids = await get_matching_gisaid_ids(db, missing_sample_ids)
 
     # Do we have any samples that are not aspen private or public identifiers or gisaid identifiers?
     missing_sample_ids = missing_sample_ids - gisaid_ids

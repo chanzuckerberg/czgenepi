@@ -11,7 +11,7 @@ import {
   NarrowContainer,
   P,
   Title,
-} from "src/common/styles/support/style";
+} from "src/common/styles/basicStyle";
 
 export default function Faq(): JSX.Element {
   const renderIntro = () => (

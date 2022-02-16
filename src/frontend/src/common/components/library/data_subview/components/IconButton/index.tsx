@@ -1,6 +1,6 @@
 import { Tooltip } from "czifui";
 import React, { FunctionComponent, MouseEventHandler } from "react";
-import { IconButtonBubble } from "src/common/styles/support/style";
+import { IconButtonBubble } from "src/common/styles/iconStyle";
 import { StyledSpan } from "./style";
 
 interface Props {

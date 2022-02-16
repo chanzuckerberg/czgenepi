@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { Dialog, FormControlLabel, Radio, TextField } from "@material-ui/core";
+import { FormControlLabel, Radio, TextField } from "@material-ui/core";
 import InfoOutlinedIcon from "@material-ui/icons/InfoOutlined";
 import {
   Button,
@@ -15,7 +15,8 @@ import {
 } from "czifui";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
-import { transparentScrollbars } from "src/common/styles/support/style";
+import { transparentScrollbars } from "src/common/styles/basicStyle";
+import Dialog from "src/components/Dialog";
 
 export const StyledDialog = styled(Dialog)`
   display: flex;

@@ -6,7 +6,7 @@ import React, { SyntheticEvent, useEffect, useState } from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { useCreateTree } from "src/common/queries/trees";
 import { ROUTES } from "src/common/routes";
-import { B } from "src/common/styles/support/style";
+import { B } from "src/common/styles/basicStyle";
 import { pluralize } from "src/common/utils/strUtils";
 import Notification from "src/components/Notification";
 import { ContactUsLink } from "../ContactUsLink";
@@ -193,12 +193,12 @@ export const CreateNSTreeModal = ({
         </NextLink>
       </Notification>
       <StyledDialog
-        disableBackdropClick
         disableEscapeKeyDown
+        disableBackdropClick
         open={open}
-        onClose={handleClose}
         fullWidth={true}
         maxWidth={"sm"}
+        onClose={handleClose}
       >
         <StyledDialogTitle>
           <StyledIconButton onClick={handleClose}>

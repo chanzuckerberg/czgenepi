@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import { fontHeaderXl, getColors, getSpaces } from "czifui";
-import { P } from "src/common/styles/support/style";
+import { P } from "src/common/styles/basicStyle";
 
 export const StyledHeader = styled.div`
   ${fontHeaderXl}
