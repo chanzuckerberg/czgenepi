@@ -11,7 +11,7 @@ import {
   NarrowContainer,
   P,
   Title,
-} from "src/common/styles/support/style";
+} from "src/common/styles/basicStyle";
 import { StyledList, StyledNewTabLink } from "./style";
 
 export default function Resources(): JSX.Element {
