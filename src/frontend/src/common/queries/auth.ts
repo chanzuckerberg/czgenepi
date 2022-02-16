@@ -11,7 +11,6 @@ import ENV from "src/common/constants/ENV";
 import {
   API,
   apiResponse,
-  DEFAULT_HEADERS_MUTATION_OPTIONS,
   DEFAULT_PUT_OPTIONS,
 } from "../api";
 import { ROUTES } from "../routes";
@@ -49,7 +48,6 @@ export const fetchUserInfo = (): Promise<UserResponse> => {
 const updateUserInfo = (user: Partial<User>): Promise<Response> => {
   return fetch(API_URL + API.USER_INFO, {
     ...DEFAULT_PUT_OPTIONS,
-    ...DEFAULT_HEADERS_MUTATION_OPTIONS,
     body: JSON.stringify(user),
   });
 };
