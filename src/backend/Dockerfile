@@ -57,4 +57,5 @@ COPY --from=build \
 ENV PYTHONPATH=.
 
 COPY . .
+RUN cd aspen && /opt/poetry/bin/poetry install
 CMD ["/usr/local/bin/supervisord", "-c", "/usr/src/app/etc/supervisord.conf"]
