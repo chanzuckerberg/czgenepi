@@ -6,6 +6,7 @@ import { StyledText } from "src/views/Data/components/TreeActionMenu/components/
 import { TooltipDescriptionText, TooltipHeaderText } from "../../style";
 import { IconButton } from "../IconButton";
 import { StyledMoreActionsIcon } from "./style";
+import { noop } from "src/common/constants/empty";
 
 interface Props {
   disabled: boolean;
@@ -70,7 +71,7 @@ const MoreActionsMenu = ({
         getContentAnchorEl={null}
       >
         {usesFeatureFlag(FEATURE_FLAGS.editSamples) && (
-          <MenuItem onClick={() => undefined}>
+          <MenuItem onClick={noop}>
             <StyledEditIcon />
             <StyledText>Edit Samples</StyledText>
           </MenuItem>
