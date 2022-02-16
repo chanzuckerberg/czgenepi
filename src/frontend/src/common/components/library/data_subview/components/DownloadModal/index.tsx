@@ -1,4 +1,3 @@
-import { Dialog } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import { Alert, Tooltip } from "czifui";
 import { isEqual } from "lodash";
@@ -10,8 +9,9 @@ import DialogContent from "src/common/components/library/Dialog/components/Dialo
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import { useUserInfo } from "src/common/queries/auth";
 import { downloadSamplesFasta } from "src/common/queries/samples";
-import { B } from "src/common/styles/support/style";
+import { B } from "src/common/styles/basicStyle";
 import { pluralize } from "src/common/utils/strUtils";
+import Dialog from "src/components/Dialog";
 import Notification from "src/components/Notification";
 import { TooltipDescriptionText, TooltipHeaderText } from "../../style";
 import { ContactUsLink } from "../ContactUsLink";
@@ -137,8 +137,8 @@ const DownloadModal = ({
         <ContactUsLink />
       </Notification>
       <Dialog
-        disableBackdropClick
         disableEscapeKeyDown
+        disableBackdropClick
         open={open}
         onClose={handleCloseModal}
       >

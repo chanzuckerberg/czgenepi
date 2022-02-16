@@ -11,8 +11,8 @@ export enum API {
   SAMPLES_FASTA_DOWNLOAD = "/api/sequences",
   PHYLO_TREES_V2 = "/v2/phylo_runs/", // TODO (mlila): convert entire frontend to use new endpoint
   GET_FASTA_URL = "/api/sequences/getfastaurl",
-  USHER_TREE_OPTIONS = "/api/usher/tree_options",
-  SAMPLES_VALIDATE_IDS = "/api/samples/validate-ids",
+  USHER_TREE_OPTIONS = "/v2/usher/tree_versions/",
+  SAMPLES_VALIDATE_IDS = "/v2/samples/validate_ids/",
   LOCATIONS = "/v2/locations/",
 }
 

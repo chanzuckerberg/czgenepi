@@ -3,27 +3,19 @@ import json
 import os
 import re
 import threading
-from typing import Any, Iterable, Mapping, Optional, Sequence, Set, Union
+from typing import Any, Mapping, Optional, Sequence, Union
 from uuid import uuid4
 
 import boto3
 import sentry_sdk
 import smart_open
-from flask import g, jsonify, make_response, request, Response, stream_with_context
-from marshmallow.exceptions import ValidationError
+from flask import g, jsonify, request, Response, stream_with_context
 from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy.orm.query import Query
 
 from aspen import aws
 from aspen.app.app import application, requires_auth
-from aspen.app.serializers import ValidateIDsRequestSchema, ValidateIDsResponseSchema
 from aspen.app.views import api_utils
-from aspen.app.views.api_utils import (
-    authz_sample_filters,
-    check_valid_sequence,
-    get_matching_gisaid_ids,
-    get_missing_and_found_sample_ids,
-)
+from aspen.app.views.api_utils import check_valid_sequence
 from aspen.database.connection import session_scope
 from aspen.database.models import Location, Sample, UploadedPathogenGenome
 from aspen.database.models.sample import create_public_ids
@@ -276,51 +268,3 @@ def create_sample():
     pangolin_job.start()
 
     return jsonify(success=True)
-
-
-@application.route("/api/samples/validate-ids", methods=["POST"])
-@requires_auth
-def validate_ids():
-    """
-    take in a list of identifiers and checks if all idenitifiers exist as either Sample public or private identifiers, or GisaidMetadata strain names
-
-    returns a response with list of missing identifiers if any, otherwise will return an empty list
-    """
-
-    user = g.auth_user
-
-    validator = ValidateIDsRequestSchema()
-    request_json = request.get_json()
-
-    try:
-        request_data = validator.load(request_json)
-    except ValidationError as verr:
-        sentry_sdk.capture_message("Invalid API request to /api/validate/ids", "info")
-        raise ex.BadRequestException(str(verr))
-
-    sample_ids: Iterable[str] = request_data["sample_ids"]
-
-    all_samples: Iterable[Sample] = g.db_session.query(Sample)
-
-    # get all samples from request that the user has permission to use and scope down the search for matching ID's to groups that the user has read access to.
-    user_visible_samples: Query = authz_sample_filters(all_samples, sample_ids, user)
-
-    # Are there any sample ID's that don't match sample table public and private identifiers
-    missing_sample_ids: Set[str]
-    missing_sample_ids, _ = get_missing_and_found_sample_ids(
-        sample_ids, user_visible_samples
-    )
-
-    # See if these missing_sample_ids match any Gisaid identifiers
-    gisaid_ids: Set[str] = get_matching_gisaid_ids(missing_sample_ids, g.db_session)
-
-    # Do we have any samples that are not aspen private or public identifiers or gisaid identifiers?
-    missing_sample_ids: Set[str] = missing_sample_ids - gisaid_ids
-
-    responseschema = ValidateIDsResponseSchema()
-
-    response = make_response(
-        responseschema.dumps({"missing_sample_ids": missing_sample_ids}), 200
-    )
-    response.headers["Content-Type"] = "application/json"
-    return response

@@ -10,7 +10,7 @@ import {
   Props,
 } from "czifui";
 import LoadingAnimation from "src/common/icons/IconLoadingAnimated.svg";
-import { transparentScrollbars } from "src/common/styles/support/style";
+import { transparentScrollbars } from "src/common/styles/basicStyle";
 
 const inputPadding = (props: Props) => {
   const spaces = getSpaces(props);

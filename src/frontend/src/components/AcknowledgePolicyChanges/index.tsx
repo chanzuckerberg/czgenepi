@@ -17,7 +17,7 @@ import {
   useUserInfo,
 } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
-import { B } from "src/common/styles/support/style";
+import { B } from "src/common/styles/basicStyle";
 import {
   Container,
   DummyCenteringSpacer,

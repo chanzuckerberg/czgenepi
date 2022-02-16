@@ -13,7 +13,7 @@ import {
   Number,
   P,
   Title,
-} from "src/common/styles/support/style";
+} from "src/common/styles/basicStyle";
 import { PageContent } from "../../common/styles/mixins/global";
 import {
   ContentRow,
