@@ -8,11 +8,7 @@ import {
   UseQueryResult,
 } from "react-query";
 import ENV from "src/common/constants/ENV";
-import {
-  API,
-  apiResponse,
-  DEFAULT_PUT_OPTIONS,
-} from "../api";
+import { API, apiResponse, DEFAULT_PUT_OPTIONS } from "../api";
 import { ROUTES } from "../routes";
 import { ENTITIES } from "./entities";
 
