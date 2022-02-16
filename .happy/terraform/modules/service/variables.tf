@@ -134,6 +134,6 @@ variable "execution_role" {
   default     = ""
 }
 variable "extra_env_vars" {
-  description = "some stuff"
+  description = "Additional env vars for this service"
   default     = {}
 }
