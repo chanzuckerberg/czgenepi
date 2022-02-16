@@ -1,6 +1,5 @@
 import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
 import { StylesProvider, ThemeProvider } from "@material-ui/core/styles";
-//import SplitIO from '@splitsoftware/splitio/types/splitio';
 import { SplitFactory } from "@splitsoftware/splitio-react";
 import { AppProps } from "next/app";
 import Head from "next/head";
@@ -35,7 +34,8 @@ interface Props {
 }
 const SplitInitializer = ({ children }: Props): JSX.Element | null => {
   const { data: userData, isLoading: isLoadingUserInfo } = useUserData();
-  const [splitConfig, setSplitConfig] = useState(null);
+  const [splitConfig, setSplitConfig] =
+    useState<SplitIO.IBrowserSettings | null>(null);
 
   useEffect(() => {
     // Don't do any work until we've fetched userData
@@ -45,7 +45,7 @@ const SplitInitializer = ({ children }: Props): JSX.Element | null => {
     const splitConf: SplitIO.IBrowserSettings = {
       core: {
         authorizationKey: ENV.SPLIT_FRONTEND_KEY,
-        key: userData?.id || "anonymous",
+        key: userData?.split_id || "anonymous",
       },
     };
     setSplitConfig(splitConf);
