@@ -1,7 +1,5 @@
 import styled from "@emotion/styled";
-import { getColors, getIconSizes, getSpaces, Props } from "czifui";
-import EditIcon from "src/common/icons/IconEditSmall.svg";
-import TrashIcon from "src/common/icons/IconTrashCanSmall.svg";
+import { getColors, Props } from "czifui";
 
 interface ExtraProps extends Props {
   isWarning?: boolean;
@@ -18,34 +16,6 @@ export const StyledText = styled("span", {
 
     return `
       color: ${isWarning ? colors?.error[600] : ""};
-    `;
-  }}
-`;
-
-export const StyledTrashIcon = styled(TrashIcon)`
-  ${(props) => {
-    const colors = getColors(props);
-    const iconSizes = getIconSizes(props);
-    const spaces = getSpaces(props);
-
-    return `
-      fill: ${colors?.error[400]};
-      height: ${iconSizes?.xs.height}px;
-      width: ${iconSizes?.xs.width}px;
-      margin-right: ${spaces?.m}px;
-    `;
-  }}
-`;
-
-export const StyledEditIcon = styled(EditIcon)`
-  fill: black;
-  ${(props) => {
-    const iconSizes = getIconSizes(props);
-    const spaces = getSpaces(props);
-    return `
-      height: ${iconSizes?.xs.height}px;
-      width: ${iconSizes?.xs.width}px;
-      margin-right: ${spaces?.m}px;
     `;
   }}
 `;
