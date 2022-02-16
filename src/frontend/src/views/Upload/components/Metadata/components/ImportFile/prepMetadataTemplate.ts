@@ -38,12 +38,13 @@ const EXAMPLE_ROWS = [
     DATE_FORMAT, // sequencingDate -- not valid, here as explainer in template
     BOOLEAN_FORMAT, // keepPrivate -- not valid, here as explainer in template
   ],
-  // Subsequent example rows are fully valid: honest-to-goodness examples.
+  // Subsequent example rows are mostly valid: honest-to-goodness examples...
+  // ... except for the dates. This is to avoid Excel auto "correct".
   [
     EXAMPLE_SAMPLE_IDS[1], // sampleId
     "sample-bravo", // privateId
     "", // publicId -- optional, showing that with blank use
-    "2021-04-12", // collectionDate
+    DATE_FORMAT, // collectionDate
     "San Francisco County", // collectionLocation
     "", // sequencingDate -- optional, showing that with blank use
     "No", // keepPrivate
@@ -52,9 +53,9 @@ const EXAMPLE_ROWS = [
     EXAMPLE_SAMPLE_IDS[2], // sampleId
     "sample-charlie", // privateId
     "USA/CA-CZB-0001/2021", // publicId
-    "2021-10-20", // collectionDate
+    DATE_FORMAT, // collectionDate
     "North America/USA/California/San Francisco County", // collectionLocation
-    "2021-10-21", // sequencingDate -- optional, showing that with blank use
+    DATE_FORMAT, // sequencingDate
     "No", // keepPrivate
   ],
 ];
