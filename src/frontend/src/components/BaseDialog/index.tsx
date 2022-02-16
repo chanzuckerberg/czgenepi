@@ -37,11 +37,9 @@ export default function BaseDialog({
       open={open}
       onClose={onClose}
     >
-      <StyledDiv>
-          {closeIcon} 
-      </StyledDiv>
+      <StyledDiv>{closeIcon}</StyledDiv>
       <DialogTitle narrow>
-      <Title>{title}</Title>
+        <Title>{title}</Title>
       </DialogTitle>
       <DialogContent narrow>
         <Content>{content}</Content>
