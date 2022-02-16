@@ -1,6 +1,9 @@
 import React from "react";
 import AlertAccordion from "src/components/AlertAccordion";
-import { METADATA_KEYS_TO_HEADERS } from "src/views/Upload/components/common/constants";
+import {
+  METADATA_KEYS_TO_HEADERS,
+  OPTIONAL_HEADER_MARKER,
+} from "src/views/Upload/components/common/constants";
 import { SampleIdToWarningMessages } from "../../parseFile";
 import { maybePluralize } from "./common/pluralize";
 import { ProblemTable } from "./common/ProblemTable";
@@ -175,11 +178,15 @@ function MessageBadFormatData({ badFormatData }: PropsBadFormatData) {
   ];
   const idsBadFormatData = Object.keys(badFormatData);
   const rows = idsBadFormatData.map((sampleId) => {
-    const badFormatHeaders = Array.from(
+    const badFormatRawHeaders = Array.from(
       badFormatData[sampleId],
       (badFormatKey) => METADATA_KEYS_TO_HEADERS[badFormatKey]
     );
-    const badFormatDescription = badFormatHeaders.join(", ");
+    // Some headers say "optional" in them: we don't put that in description
+    const badFormatPrettyHeaders = badFormatRawHeaders.map((header) => {
+      return header.replace(OPTIONAL_HEADER_MARKER, "");
+    });
+    const badFormatDescription = badFormatPrettyHeaders.join(", ");
     return [sampleId, badFormatDescription];
   });
   return (
@@ -191,9 +198,12 @@ function MessageBadFormatData({ badFormatData }: PropsBadFormatData) {
   );
 }
 export function WarningBadFormatData({ badFormatData }: PropsBadFormatData) {
+  const title =
+    "Some of your data is not formatted correctly. " +
+    "Please update before proceeding.";
   return (
     <FullWidthAlertAccordion
-      title="Some of your data is not formatted correctly."
+      title={title}
       message={<MessageBadFormatData badFormatData={badFormatData} />}
       severity={WARNING_SEVERITY}
     />

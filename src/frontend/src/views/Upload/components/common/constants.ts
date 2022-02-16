@@ -1,6 +1,9 @@
 import { Dictionary, invert } from "lodash";
 import { Metadata } from "src/views/Upload/components/common/types";
 
+// Some columns are for optional data. Below string is added to end of the
+// header describing what data is in column to indicate it is optional.
+export const OPTIONAL_HEADER_MARKER = " - Optional";
 // Internal keys we use to represent to various kinds of metadata on a sample
 // and the user-visible name we give the info, seen as a header on column.
 export const METADATA_KEYS_TO_HEADERS: Record<keyof Metadata, string> = {
@@ -8,9 +11,9 @@ export const METADATA_KEYS_TO_HEADERS: Record<keyof Metadata, string> = {
   collectionLocation: "Collection Location",
   keepPrivate: "Sample is Private",
   privateId: "Private ID",
-  publicId: "GISAID ID (Public ID) - Optional",
+  publicId: "GISAID ID (Public ID)" + OPTIONAL_HEADER_MARKER,
   sampleId: "Sample Name (from FASTA)",
-  sequencingDate: "Sequencing Date - Optional",
+  sequencingDate: "Sequencing Date" + OPTIONAL_HEADER_MARKER,
 };
 
 // When parsing upload of metadata, we use a flipped version of above.
