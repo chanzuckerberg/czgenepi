@@ -14,7 +14,6 @@ import {
   API,
   DEFAULT_DELETE_OPTIONS,
   DEFAULT_POST_OPTIONS,
-  DEFAULT_PUT_OPTIONS,
   fetchSamples,
   putBackendApiJson,
   SampleResponse,
@@ -236,12 +235,11 @@ export function useDeleteSamples({
   });
 }
 
-
 /**
  * edit samples
  */
 
- interface SamplesEditPayloadType {
+interface SamplesEditPayloadType {
   id: number;
   private_identifier?: string;
   public_identifier?: string;
@@ -256,7 +254,7 @@ interface SamplesEditRequestType {
 }
 
 interface GisaidResponseType {
-  gisaid_id: string
+  gisaid_id: string;
   status: string;
 }
 
@@ -315,4 +313,4 @@ export function useEditSamples({
       componentOnSuccess(data);
     },
   });
-};
+}
