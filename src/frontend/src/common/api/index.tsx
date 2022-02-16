@@ -29,6 +29,7 @@ export const DEFAULT_FETCH_OPTIONS: RequestInit = {
 export const DEFAULT_PUT_OPTIONS: RequestInit = {
   credentials: "include",
   method: "PUT",
+  ...DEFAULT_HEADERS_MUTATION_OPTIONS
 };
 
 export const DEFAULT_POST_OPTIONS: RequestInit = {

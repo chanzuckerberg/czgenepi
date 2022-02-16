@@ -14,6 +14,7 @@ import {
   API,
   DEFAULT_DELETE_OPTIONS,
   DEFAULT_POST_OPTIONS,
+  DEFAULT_PUT_OPTIONS,
   fetchSamples,
   SampleResponse,
 } from "../api";
@@ -233,3 +234,93 @@ export function useDeleteSamples({
     },
   });
 }
+
+
+/**
+ * edit samples
+ */
+
+ interface SamplesEditPayloadType {
+  id: number;
+  private_identifier?: string;
+  public_identifier?: string;
+  private?: boolean;
+  collection_location?: string;
+  sequencing_date?: string;
+  collection_date?: string;
+}
+
+interface SamplesEditRequestType {
+  samples: SamplesEditPayloadType[];
+}
+
+interface GisaidResponseType {
+  gisaid_id: string
+  status: string;
+}
+
+interface LineageResponseType {
+  last_updated: string;
+  lineage: string;
+  probability: number;
+  version: string;
+}
+interface SubmittingGroupResponseType {
+  id: number;
+  name: string;
+}
+interface SampleUserResponeType {
+  id: number;
+  name: string;
+}
+interface SamplesEditResponseType {
+  id: string;
+  collection_date: string;
+  collection_location: string;
+  czb_failed_genome_recovery: boolean;
+  gisaid: GisaidResponseType;
+  lineage: LineageResponseType;
+  private: boolean;
+  private_identifier: string;
+  public_identifier: string;
+  sequencing_date: string;
+  submitting_group: SubmittingGroupResponseType;
+  updloaded_by: SampleUserResponeType;
+  upload_date: string;
+}
+
+type SamplesEditCallbacks = MutationCallbacks<SamplesEditResponseType[]>;
+
+export async function editSamples({
+  samples,
+}: SamplesEditRequestType): Promise<SamplesEditResponseType[]> {
+  const payload: SamplesEditPayloadType[] = {
+    ...samples,
+  };
+  const response = await fetch(API_URL + API.SAMPLES, {
+    ...DEFAULT_PUT_OPTIONS,
+    body: JSON.stringify(payload),
+  });
+
+  if (response.ok) return await response.json();
+  throw Error(`${response.statusText}: ${await response.text()}`);
+}
+
+export function useEditSamples({
+  componentOnError,
+  componentOnSuccess,
+}: SamplesEditCallbacks): UseMutationResult<
+  SamplesEditResponseType[],
+  unknown,
+  SamplesEditRequestType,
+  unknown
+> {
+  const queryClient = useQueryClient();
+  return useMutation(editSamples, {
+    onError: componentOnError,
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries([USE_SAMPLE_INFO]);
+      componentOnSuccess(data);
+    },
+  });
+};
