@@ -294,12 +294,9 @@ type SamplesEditCallbacks = MutationCallbacks<SamplesEditResponseType[]>;
 export async function editSamples({
   samples,
 }: SamplesEditRequestType): Promise<SamplesEditResponseType[]> {
-  const payload: SamplesEditPayloadType[] = {
-    ...samples,
-  };
   const response = await fetch(API_URL + API.SAMPLES, {
     ...DEFAULT_PUT_OPTIONS,
-    body: JSON.stringify(payload),
+    body: JSON.stringify({ samples }),
   });
 
   if (response.ok) return await response.json();
