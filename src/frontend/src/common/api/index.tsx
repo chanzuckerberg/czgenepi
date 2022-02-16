@@ -1,5 +1,7 @@
 import ENV from "src/common/constants/ENV";
 import { jsonToType } from "src/common/utils";
+import {SamplesEditRequestType} from "src/common/queries/samples";
+
 
 export enum API {
   USER_INFO = "/api/usergroup",
@@ -159,6 +161,19 @@ export async function getBackendApiJson<T>(
   const requestOptions = {
     ...DEFAULT_FETCH_OPTIONS,
     ...additionalRequestOptions,
+  };
+  return await makeBackendApiJsonCall(route, requestOptions);
+}
+
+export async function putBackendApiJson<T>(
+  route: string,
+  requestBody: SamplesEditRequestType,
+  additionalRequestOptions: RequestInit = {},
+): Promise<T> {
+  const requestOptions = {
+    ...DEFAULT_PUT_OPTIONS,
+    ...additionalRequestOptions,
+    body: requestBody,
   };
   return await makeBackendApiJsonCall(route, requestOptions);
 }

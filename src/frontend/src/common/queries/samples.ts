@@ -16,6 +16,7 @@ import {
   DEFAULT_POST_OPTIONS,
   DEFAULT_PUT_OPTIONS,
   fetchSamples,
+  putBackendApiJson,
   SampleResponse,
 } from "../api";
 import { API_URL } from "../constants/ENV";
@@ -294,13 +295,7 @@ type SamplesEditCallbacks = MutationCallbacks<SamplesEditResponseType[]>;
 export async function editSamples({
   samples,
 }: SamplesEditRequestType): Promise<SamplesEditResponseType[]> {
-  const response = await fetch(API_URL + API.SAMPLES, {
-    ...DEFAULT_PUT_OPTIONS,
-    body: JSON.stringify({ samples }),
-  });
-
-  if (response.ok) return await response.json();
-  throw Error(`${response.statusText}: ${await response.text()}`);
+  return putBackendApiJson(API.SAMPLES, JSON.stringify({ samples }));
 }
 
 export function useEditSamples({
