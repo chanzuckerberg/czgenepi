@@ -27,8 +27,12 @@ async def exception_handler(request: Request, exc: AspenException) -> JSONRespon
     return exc.make_response()
 
 
-class UnauthorizedException(AspenException):
+class UnauthenticatedException(AspenException):
     status_code = 401
+
+
+class UnauthorizedException(AspenException):
+    status_code = 403
 
 
 class BadRequestException(AspenException):

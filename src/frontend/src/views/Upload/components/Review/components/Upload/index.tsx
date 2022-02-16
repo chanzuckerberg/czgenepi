@@ -1,4 +1,3 @@
-import { Dialog } from "@material-ui/core";
 import { AlertTitle } from "@material-ui/lab";
 import { Alert, Button } from "czifui";
 import NextLink from "next/link";
@@ -7,6 +6,7 @@ import { useMutation } from "react-query";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { createSamples } from "src/common/queries/samples";
 import { ROUTES } from "src/common/routes";
+import Dialog from "src/components/Dialog";
 import { ContinueButton } from "../../../common/style";
 import { SampleIdToMetadata, Samples } from "../../../common/types";
 import {

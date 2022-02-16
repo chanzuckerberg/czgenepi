@@ -193,12 +193,12 @@ export const CreateNSTreeModal = ({
         </NextLink>
       </Notification>
       <StyledDialog
-        disableBackdropClick
         disableEscapeKeyDown
+        disableBackdropClick
         open={open}
-        onClose={handleClose}
         fullWidth={true}
         maxWidth={"sm"}
+        onClose={handleClose}
       >
         <StyledDialogTitle>
           <StyledIconButton onClick={handleClose}>

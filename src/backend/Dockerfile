@@ -1,3 +1,18 @@
+FROM python:3.9.1-slim AS build
+ENV FLASK_APP=aspen.main
+RUN apt-get update && apt-get install -y vim build-essential libdigest-sha-perl wget
+ENV POETRY_HOME /opt/poetry/
+RUN apt install -y libdigest-sha-perl
+RUN wget https://raw.githubusercontent.com/python-poetry/poetry/1.1.10/get-poetry.py && \
+    echo "e973b3badb95a916bfe250c22eeb7253130fd87312afa326eb02b8bdcea8f4a7  get-poetry.py" > get-poetry.py.sha256 && \
+    shasum -a 256 -c get-poetry.py.sha256 && \
+    python get-poetry.py && \
+    rm get-poetry*
+COPY pyproject.toml poetry.lock environment.yaml ./
+COPY third-party ./third-party
+RUN /opt/poetry/bin/poetry config virtualenvs.create false && \
+    /opt/poetry/bin/poetry install
+
 # Separate base image so that we can use it to update the Pipfile.lock and requirements.txt file
 FROM python:3.9.1-slim AS base
 ENV FLASK_APP=aspen.main
@@ -24,10 +39,23 @@ WORKDIR /usr/src/app
 
 COPY pyproject.toml poetry.lock environment.yaml ./
 COPY third-party ./third-party
-RUN /opt/poetry/bin/poetry config virtualenvs.create false && \
-    /opt/poetry/bin/poetry install
+RUN /opt/poetry/bin/poetry config virtualenvs.create false
+# Copy poetry deps from the build image
+COPY --from=build /usr/local/lib/python3.9/site-packages /usr/local/lib/python3.9/site-packages
+COPY --from=build \
+     /usr/local/bin/gunicorn \
+     /usr/local/bin/aws \
+     /usr/local/bin/alembic \
+     /usr/local/bin/autoflake \
+     /usr/local/bin/flake8 \
+     /usr/local/bin/black \
+     /usr/local/bin/isort \
+     /usr/local/bin/mypy \
+     /usr/local/bin/pytest \
+     /usr/local/bin/
+
 ENV PYTHONPATH=.
 
 COPY . .
-RUN /opt/poetry/bin/poetry install
+RUN cd aspen && /opt/poetry/bin/poetry install
 CMD ["/usr/local/bin/supervisord", "-c", "/usr/src/app/etc/supervisord.conf"]

@@ -1,9 +1,9 @@
-import { Dialog } from "@material-ui/core";
 import { Button } from "czifui";
 import React from "react";
 import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
+import Dialog from "src/components/Dialog";
 import { Content, StyledFooter, Title } from "./style";
 
 export interface ConfirmDialogProps {
@@ -33,8 +33,8 @@ export default function ConfirmDialog({
 
   return (
     <Dialog
-      disableBackdropClick
       disableEscapeKeyDown
+      disableBackdropClick
       open={open}
       onClose={onClose}
     >
