@@ -1,9 +1,23 @@
 # This is a service managed by ECS attached to the environment's load balancer
 #
+locals {
+  default_env_vars = {
+    "REMOTE_DEV_PREFIX" : "${var.remote_dev_prefix}",
+    "GENEPI_CONFIG_SECRET_NAME" : "${var.deployment_stage}/genepi-config",
+    "DEPLOYMENT_STAGE" : "${var.deployment_stage}",
+    "AWS_REGION" : "${data.aws_region.current.name}",
+    "FRONTEND_URL" : "${var.frontend_url}",
+    "API_URL" : "${var.api_url}",
+    "FLASK_ENV" : "production",
+    "AWS_DEFAULT_REGION" : "${data.aws_region.current.name}",
+  }
+  env_vars = [for k, v in merge(local.default_env_vars, var.extra_env_vars) : { "name" : k, "value" : v }]
+}
 
-data aws_region current {}
 
-resource aws_ecs_service service {
+data "aws_region" "current" {}
+
+resource "aws_ecs_service" "service" {
   cluster         = var.cluster
   desired_count   = var.desired_count
   task_definition = aws_ecs_task_definition.task_definition.id
@@ -21,82 +35,47 @@ resource aws_ecs_service service {
   }
 
   enable_execute_command = true
-  wait_for_steady_state = var.wait_for_steady_state
+  wait_for_steady_state  = var.wait_for_steady_state
 }
 
-resource aws_ecs_task_definition task_definition {
-  family        = "${var.stack_resource_prefix}-${var.deployment_stage}-${var.custom_stack_name}-${var.app_name}"
-  memory = var.memory
-  cpu = var.cpu
-  network_mode  = "awsvpc"
-  task_role_arn = var.task_role_arn
-  execution_role_arn = var.execution_role
-  requires_compatibilities = [ "FARGATE" ]
-  container_definitions = <<EOF
-[
-  {
-    "name": "web",
-    "essential": true,
-    "image": "${var.image}",
-    "environment": [
-      {
-        "name": "REMOTE_DEV_PREFIX",
-        "value": "${var.remote_dev_prefix}"
+resource "aws_ecs_task_definition" "task_definition" {
+  family                   = "${var.stack_resource_prefix}-${var.deployment_stage}-${var.custom_stack_name}-${var.app_name}"
+  memory                   = var.memory
+  cpu                      = var.cpu
+  network_mode             = "awsvpc"
+  task_role_arn            = var.task_role_arn
+  execution_role_arn       = var.execution_role
+  requires_compatibilities = ["FARGATE"]
+  container_definitions = jsonencode([
+    {
+      "name" : "web",
+      "essential" : true,
+      "image" : var.image,
+      "environment" : local.env_vars,
+      "portMappings" : [
+        {
+          "containerPort" : var.service_port
+        }
+      ],
+      "logConfiguration" : {
+        "logDriver" : "awslogs",
+        "options" : {
+          "awslogs-stream-prefix" : "fargate",
+          "awslogs-group" : "${aws_cloudwatch_log_group.cloud_watch_logs_group.id}",
+          "awslogs-region" : "${data.aws_region.current.name}"
+        }
       },
-      {
-        "name": "GENEPI_CONFIG_SECRET_NAME",
-        "value": "${var.deployment_stage}/genepi-config"
-      },
-      {
-        "name": "DEPLOYMENT_STAGE",
-        "value": "${var.deployment_stage}"
-      },
-      {
-        "name": "AWS_REGION",
-        "value": "${data.aws_region.current.name}"
-      },
-      {
-        "name": "FRONTEND_URL",
-        "value": "${var.frontend_url}"
-      },
-      {
-        "name": "API_URL",
-        "value": "${var.api_url}"
-      },
-      {
-        "name": "FLASK_ENV",
-        "value": "production"
-      },
-      {
-        "name": "AWS_DEFAULT_REGION",
-        "value": "${data.aws_region.current.name}"
-      }
-    ],
-    "portMappings": [
-      {
-        "containerPort": ${var.service_port}
-      }
-    ],
-    "logConfiguration": {
-      "logDriver": "awslogs",
-      "options": {
-        "awslogs-stream-prefix": "fargate",
-        "awslogs-group": "${aws_cloudwatch_log_group.cloud_watch_logs_group.id}",
-        "awslogs-region": "${data.aws_region.current.name}"
-      }
-    },
-    "command": ${jsonencode((length(var.cmd) == 0) ? null : var.cmd)}
-  }
-]
-EOF
+      "command" : (length(var.cmd) == 0) ? null : var.cmd,
+    }
+  ])
 }
 
-resource aws_cloudwatch_log_group cloud_watch_logs_group {
+resource "aws_cloudwatch_log_group" "cloud_watch_logs_group" {
   retention_in_days = 365
   name              = "/${var.stack_resource_prefix}/${var.deployment_stage}/${var.custom_stack_name}/${var.app_name}"
 }
 
-resource aws_lb_target_group target_group {
+resource "aws_lb_target_group" "target_group" {
   vpc_id               = var.vpc
   port                 = var.service_port
   protocol             = "HTTP"
@@ -113,7 +92,7 @@ resource aws_lb_target_group target_group {
   }
 }
 
-resource aws_lb_listener_rule listener_rule {
+resource "aws_lb_listener_rule" "listener_rule" {
   listener_arn = var.listener
   priority     = var.priority
   # Dev stacks need to match on hostnames
