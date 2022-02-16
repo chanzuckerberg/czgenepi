@@ -1,5 +1,5 @@
 import React from "react";
-import { B } from "src/common/styles/support/style";
+import { B } from "src/common/styles/basicStyle";
 import AlertAccordion from "src/components/AlertAccordion";
 import { ERROR_CODE } from "src/views/Upload/components/common/types";
 import { maybePluralize } from "./common/pluralize";
