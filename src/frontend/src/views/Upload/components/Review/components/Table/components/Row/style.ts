@@ -51,7 +51,7 @@ export const StyledTableCell = styled(TableCell)`
     const spaces = getSpaces(props);
 
     return `
-      padding: ${spaces?.m}px 0;
+      padding: ${spaces?.m}px;
     `;
   }}
 `;
@@ -62,7 +62,7 @@ export const IsPrivateTableCell = styled(TableCell)`
     const colors = getColors(props);
 
     return `
-      padding: ${spaces?.m}px 0;
+      padding: ${spaces?.m}px;
       border-left: solid 2px ${colors?.gray[200]};
       border-right: solid 2px ${colors?.gray[200]};
     `;
