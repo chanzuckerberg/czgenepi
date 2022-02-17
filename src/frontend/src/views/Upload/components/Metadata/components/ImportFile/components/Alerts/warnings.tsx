@@ -1,4 +1,5 @@
 import React from "react";
+import { B } from "src/common/styles/basicStyle";
 import AlertAccordion from "src/components/AlertAccordion";
 import {
   METADATA_KEYS_TO_HEADERS,
@@ -169,9 +170,27 @@ interface PropsBadFormatData {
   badFormatData: SampleIdToWarningMessages;
 }
 function MessageBadFormatData({ badFormatData }: PropsBadFormatData) {
-  const tablePreamble =
-    "You can add the required data in the table below, " +
-    "or update your file and re-import.";
+  const tablePreamble = (
+    <>
+      <p>
+        You can change the invalid data in the table below, or update your file
+        and re-import.
+      </p>
+      <p>
+        <B>Formatting requirements:</B>
+      </p>
+      <ul>
+        <li>
+          Private IDs must be no longer than 120 characters and can only contain
+          letters from the English alphabet (A-Z, upper and lower case), numbers
+          (0-9), periods (.), hyphens (-), underscores (_), spaces ( ), and
+          forward slashes (/).
+        </li>
+        <li>Dates must be in the format of YYYY-MM-DD.</li>
+      </ul>
+    </>
+  );
+
   const columnHeaders = [
     METADATA_KEYS_TO_HEADERS.sampleId,
     "Data with Invalid Formatting",
