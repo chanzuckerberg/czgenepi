@@ -2,10 +2,18 @@ from io import StringIO
 from typing import List, Optional
 
 import dateparser
+import sqlalchemy as sa
 import yaml
 from sqlalchemy.sql.expression import and_
 
-from aspen.database.models import Group, Location, TreeType, User, WorkflowStatusType
+from aspen.database.models import (
+    Group,
+    Location,
+    PhyloRun,
+    TreeType,
+    User,
+    WorkflowStatusType,
+)
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_multifactory
@@ -344,6 +352,31 @@ def test_targeted_config_regions(mocker, session, postgres_database):
         assert len(sequences.splitlines()) == 20  # 10 county samples, @2 lines each
 
 
+# Test that we can reset status to STARTED on export.
+def test_reset_status(mocker, session, postgres_database):
+    mock_remote_db_uri(mocker, postgres_database.as_uri())
+
+    test_table = [
+        {"should_reset": False, "result_status": WorkflowStatusType.FAILED},
+        {"should_reset": True, "result_status": WorkflowStatusType.STARTED},
+    ]
+    tree_type = TreeType.TARGETED
+    phylo_run = create_test_data(session, tree_type, 200, 110, 10)
+    for test in test_table:
+        phylo_run.workflow_status = WorkflowStatusType.FAILED
+        session.commit()
+        sequences, selected, metadata, nextstrain_config = generate_run(
+            phylo_run.id, test["should_reset"]
+        )
+        session.expire_all()
+        run = (
+            session.execute(sa.select(PhyloRun).where(PhyloRun.id == phylo_run.id))
+            .scalars()
+            .one()
+        )
+        assert run.workflow_status == test["result_status"]
+
+
 # Make sure that configs specific to a Targeted build are working.
 def test_targeted_config_large(mocker, session, postgres_database):
     mock_remote_db_uri(mocker, postgres_database.as_uri())
@@ -365,13 +398,18 @@ def test_targeted_config_large(mocker, session, postgres_database):
     assert len(sequences.splitlines()) == 400  # 200 county samples, @2 lines each
 
 
-def generate_run(phylo_run_id):
+def generate_run(phylo_run_id, reset_status=False):
     sequences_fh = StringIO()
     selected_fh = StringIO()
     metadata_fh = StringIO()
     builds_file_fh = StringIO()
     export_run_config(
-        phylo_run_id, sequences_fh, selected_fh, metadata_fh, builds_file_fh
+        phylo_run_id,
+        sequences_fh,
+        selected_fh,
+        metadata_fh,
+        builds_file_fh,
+        reset_status,
     )
     return (
         sequences_fh.getvalue(),

@@ -25,6 +25,7 @@ from aspen.database.models import (
     Sample,
     UploadedPathogenGenome,
 )
+from aspen.database.models.workflow import WorkflowStatusType
 from aspen.workflows.nextstrain_run.build_config import builder_factory
 from aspen.workflows.nextstrain_run.builder_base import BaseNextstrainConfigBuilder
 
@@ -66,6 +67,12 @@ METADATA_CSV_FIELDS = [
 )
 @click.option("metadata_fh", "--metadata", type=click.File("w"), required=True)
 @click.option("builds_file_fh", "--builds-file", type=click.File("w"), required=True)
+@click.option(
+    "--reset-status",
+    type=bool,
+    is_flag=True,
+    help="Should the status of this workflow be set to 'STARTED'?",
+)
 @click.option("--test", type=bool, is_flag=True)
 def cli(
     phylo_run_id: int,
@@ -73,13 +80,19 @@ def cli(
     selected_fh: io.TextIOBase,
     metadata_fh: io.TextIOBase,
     builds_file_fh: io.TextIOBase,
+    reset_status: bool,
     test: bool,
 ):
     if test:
         print("Success!")
         return
     aligned_gisaid_dump = export_run_config(
-        phylo_run_id, sequences_fh, selected_fh, metadata_fh, builds_file_fh
+        phylo_run_id,
+        sequences_fh,
+        selected_fh,
+        metadata_fh,
+        builds_file_fh,
+        reset_status,
     )
     print(json.dumps(aligned_gisaid_dump))
 
@@ -90,6 +103,7 @@ def export_run_config(
     selected_fh: io.TextIOBase,
     metadata_fh: io.TextIOBase,
     builds_file_fh: io.TextIOBase,
+    reset_status: bool = False,
 ):
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
 
@@ -98,6 +112,10 @@ def export_run_config(
 
     with session_scope(interface) as session:
         phylo_run = get_phylo_run(session, phylo_run_id)
+
+        if reset_status:
+            phylo_run.workflow_status = WorkflowStatusType.STARTED
+            session.commit()
         group: Group = phylo_run.group
 
         # Fetch all of a group's samples.

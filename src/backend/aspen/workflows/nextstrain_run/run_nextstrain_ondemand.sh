@@ -44,6 +44,7 @@ aligned_gisaid_location=$(
            --metadata /ncov/data/metadata_aspen.tsv         \
            --selected /ncov/data/include.txt                       \
            --builds-file /ncov/my_profiles/aspen/builds.yaml       \
+           --reset-status \
 )
 
 
