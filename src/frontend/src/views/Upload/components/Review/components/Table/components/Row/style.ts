@@ -47,6 +47,9 @@ export const StyledTableRow = styled(TableRow)`
 `;
 
 export const StyledTableCell = styled(TableCell)`
+  max-width: 300px;
+  word-break: break-word;
+  min-width: 150px;
   ${(props) => {
     const spaces = getSpaces(props);
 
@@ -57,6 +60,7 @@ export const StyledTableCell = styled(TableCell)`
 `;
 
 export const IsPrivateTableCell = styled(TableCell)`
+  min-width: 100px;
   ${(props) => {
     const spaces = getSpaces(props);
     const colors = getColors(props);
