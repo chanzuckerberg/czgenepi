@@ -6,7 +6,7 @@ data aws_secretsmanager_secret_version config {
 }
 
 data aws_secretsmanager_secret_version app_secret {
-  secret_id = local.genepi_config_secret_name
+  secret_id = local.app_secret_name
 }
 
 locals {
