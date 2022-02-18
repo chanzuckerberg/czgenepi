@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import random
+import string
 from collections.abc import MutableSequence
 from typing import TYPE_CHECKING
 
@@ -45,6 +47,11 @@ class Group(idbase, DictMixin):  # type: ignore
         return f"Group <{self.name}>"
 
 
+def generate_split_id(length=20):
+    possible_characters = string.ascii_lowercase + string.digits
+    return "".join(random.choice(possible_characters) for _ in range(length))
+
+
 class User(idbase, DictMixin):  # type: ignore
     """A user."""
 
@@ -59,6 +66,7 @@ class User(idbase, DictMixin):  # type: ignore
     # Date of policies (any of Privacy Policy, Terms of Service, etc, etc) the user
     # has last acknowledged. Used to display notification to user when policies change.
     acknowledged_policy_version = Column(Date, nullable=True, default=None)
+    split_id = Column(String, nullable=False, default=generate_split_id)
 
     group_id = Column(Integer, ForeignKey(Group.id), nullable=False)
     group = relationship(Group, backref=backref("users", uselist=True))  # type: ignore

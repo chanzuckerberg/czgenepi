@@ -22,6 +22,7 @@ from aspen.api.views import (
     users,
     usher,
 )
+from aspen.util.split import SplitClient
 
 
 def get_allowed_origins() -> List[str]:
@@ -50,6 +51,12 @@ def get_app() -> FastAPI:
 
     # Add a global settings object to the app that we can use as a dependency
     _app.state.aspen_settings = settings
+
+    # Set up Split.io feature flagging
+    splitio = SplitClient(settings)
+
+    # Add a global splitio object to the app that we can use as a dependency
+    _app.state.splitio = splitio
 
     # Add a global oauth client to the app that we can use as a dependency
     oauth = OAuth()

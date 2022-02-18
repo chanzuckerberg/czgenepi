@@ -12,6 +12,7 @@ export function createTableCellRenderer(
     index,
     userInfo,
     onDeleteTreeModalOpen,
+    onEditTreeModalOpen,
   }: CustomTableRenderProps) => {
     const unwrappedValue = value || UNDEFINED_TEXT;
 
@@ -22,6 +23,7 @@ export function createTableCellRenderer(
       index,
       item,
       onDeleteTreeModalOpen,
+      onEditTreeModalOpen,
       userInfo,
       value: unwrappedValue,
     });

@@ -24,6 +24,7 @@ interface Props {
   item: Tree;
   userInfo: UserResponse;
   onDeleteTreeModalOpen(t: Tree): void;
+  onEditTreeModalOpen(t: Tree): void;
 }
 
 const TreeActionMenu = ({
@@ -31,6 +32,7 @@ const TreeActionMenu = ({
   // value,
   item,
   onDeleteTreeModalOpen,
+  onEditTreeModalOpen,
   userInfo,
 }: Props): JSX.Element => (
   <StyledTreeActionMenu>
@@ -44,6 +46,7 @@ const TreeActionMenu = ({
       <MoreActionsMenu
         item={item}
         onDeleteTreeModalOpen={onDeleteTreeModalOpen}
+        onEditTreeModalOpen={onEditTreeModalOpen}
         userInfo={userInfo}
       />
     </StyledActionWrapper>

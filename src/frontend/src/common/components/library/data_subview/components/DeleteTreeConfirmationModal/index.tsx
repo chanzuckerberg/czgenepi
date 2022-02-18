@@ -75,8 +75,8 @@ const DeleteTreeConfirmationModal = ({
       )}
       <DeleteDialog
         open={open}
-        onClose={onClose}
         onDelete={onDelete}
+        onClose={onClose}
         title={title}
         content={content}
       />

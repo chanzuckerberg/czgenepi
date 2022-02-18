@@ -15,6 +15,7 @@ import {
   DEFAULT_DELETE_OPTIONS,
   DEFAULT_POST_OPTIONS,
   fetchSamples,
+  putBackendApiJson,
   SampleResponse,
 } from "../api";
 import { API_URL } from "../constants/ENV";
@@ -226,6 +227,86 @@ export function useDeleteSamples({
   const queryClient = useQueryClient();
   // TODO (mlila): pick less confusing name choices for callbacks/params
   return useMutation(deleteSamples, {
+    onError: componentOnError,
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries([USE_SAMPLE_INFO]);
+      componentOnSuccess(data);
+    },
+  });
+}
+
+/**
+ * edit samples
+ */
+
+interface SamplesEditPayloadType {
+  id: number;
+  private_identifier?: string;
+  public_identifier?: string;
+  private?: boolean;
+  collection_location?: string;
+  sequencing_date?: string;
+  collection_date?: string;
+}
+
+interface SamplesEditRequestType {
+  samples: SamplesEditPayloadType[];
+}
+
+interface GisaidResponseType {
+  gisaid_id: string;
+  status: string;
+}
+
+interface LineageResponseType {
+  last_updated: string;
+  lineage: string;
+  probability: number;
+  version: string;
+}
+interface SubmittingGroupResponseType {
+  id: number;
+  name: string;
+}
+interface SampleUserResponeType {
+  id: number;
+  name: string;
+}
+interface SamplesEditResponseType {
+  id: string;
+  collection_date: string;
+  collection_location: string;
+  czb_failed_genome_recovery: boolean;
+  gisaid: GisaidResponseType;
+  lineage: LineageResponseType;
+  private: boolean;
+  private_identifier: string;
+  public_identifier: string;
+  sequencing_date: string;
+  submitting_group: SubmittingGroupResponseType;
+  updloaded_by: SampleUserResponeType;
+  upload_date: string;
+}
+
+type SamplesEditCallbacks = MutationCallbacks<SamplesEditResponseType[]>;
+
+export async function editSamples({
+  samples,
+}: SamplesEditRequestType): Promise<SamplesEditResponseType[]> {
+  return putBackendApiJson(API.SAMPLES, JSON.stringify({ samples }));
+}
+
+export function useEditSamples({
+  componentOnError,
+  componentOnSuccess,
+}: SamplesEditCallbacks): UseMutationResult<
+  SamplesEditResponseType[],
+  unknown,
+  SamplesEditRequestType,
+  unknown
+> {
+  const queryClient = useQueryClient();
+  return useMutation(editSamples, {
     onError: componentOnError,
     onSuccess: async (data) => {
       await queryClient.invalidateQueries([USE_SAMPLE_INFO]);

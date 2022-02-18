@@ -16,13 +16,13 @@ const DeleteDialog = ({
 }: Props): JSX.Element | null => {
   if (!open) return null;
 
-  const styledTitle = <StyledSpan>{title}</StyledSpan>;
-
   const deleteButton = (
     <StyledButton color="primary" variant="contained" isRounded>
       Delete
     </StyledButton>
   );
+
+  const styledTitle = <StyledSpan>{title}</StyledSpan>;
 
   return (
     <ConfirmDialog
