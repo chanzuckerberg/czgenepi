@@ -3,9 +3,10 @@ import React, { MouseEventHandler, useState } from "react";
 import { TREE_STATUS } from "src/common/constants/types";
 import MoreActionsIcon from "src/common/icons/IconDotsHorizontal3Large.svg";
 import { UserResponse } from "src/common/queries/auth";
+import { StyledEditIcon, StyledTrashIcon } from "src/common/styles/iconStyle";
 import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import { StyledIcon, StyledIconWrapper } from "../../style";
-import { StyledEditIcon, StyledText, StyledTrashIcon } from "./style";
+import { StyledText } from "./style";
 
 interface Props {
   item: Tree;
