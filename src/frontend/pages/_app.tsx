@@ -1,19 +1,18 @@
 import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
 import { StylesProvider, ThemeProvider } from "@material-ui/core/styles";
-import { SplitFactory } from "@splitsoftware/splitio-react";
 import { AppProps } from "next/app";
 import Head from "next/head";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import "semantic-ui-css/semantic.min.css";
 import style from "src/App.module.scss";
-import ENV from "src/common/constants/ENV";
-import { useUserData, useUserInfo } from "src/common/queries/auth";
+import { useUserInfo } from "src/common/queries/auth";
 import { theme } from "src/common/styles/theme";
 import { setFeatureFlagsFromQueryParams } from "src/common/utils/featureFlags";
 import AcknowledgePolicyChanges from "src/components/AcknowledgePolicyChanges";
 import NavBarLoggedIn from "src/components/NavBar";
 import NavBarLanding from "src/components/NavBarV2";
+import SplitInitializer from "src/components/Split";
 
 const queryClient = new QueryClient();
 setFeatureFlagsFromQueryParams();
@@ -28,36 +27,6 @@ function Nav(): JSX.Element {
     return <NavBarLanding />;
   }
 }
-
-interface Props {
-  children: React.ReactElement;
-}
-const SplitInitializer = ({ children }: Props): JSX.Element | null => {
-  const { data: userData, isLoading: isLoadingUserInfo } = useUserData();
-  const [splitConfig, setSplitConfig] =
-    useState<SplitIO.IBrowserSettings | null>(null);
-
-  useEffect(() => {
-    // Don't do any work until we've fetched userData
-    if (isLoadingUserInfo) {
-      return;
-    }
-    const splitConf: SplitIO.IBrowserSettings = {
-      core: {
-        authorizationKey: ENV.SPLIT_FRONTEND_KEY,
-        key: userData?.split_id || "anonymous",
-      },
-    };
-    setSplitConfig(splitConf);
-  }, [isLoadingUserInfo, userData]);
-
-  if (!splitConfig) {
-    // If we haven't fetched a userinfo response yet, don't enable split.
-    return <>{children}</>;
-  }
-
-  return <SplitFactory config={splitConfig}>{children}</SplitFactory>;
-};
 
 const App = ({ Component, pageProps }: AppProps): JSX.Element => {
   // (thuang): MUI related SSR setup

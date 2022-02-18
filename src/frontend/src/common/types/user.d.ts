@@ -7,6 +7,7 @@ interface Group {
   name: string;
 }
 
+// TODO, remove this when we're done with converting to fastapi.
 interface User {
   [index: string]: JSONPrimitive;
   type: "User";
