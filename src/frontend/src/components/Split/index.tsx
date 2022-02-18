@@ -7,6 +7,17 @@ interface Props {
   children: React.ReactElement;
 }
 
+/* To use the split client to fetch the value of a feature flag:
+ *
+ * import { useTreatments } from '@splitsoftware/splitio-react';
+ * const MyComponent = (): JSX.Element => {
+ *    const flag = useTreatments(["my_flag_name"]);
+ *    return (
+ *       <div>{flag.my_flag_name.treatment}</div>
+ *    )
+ *  }
+ */
+
 const SplitInitializer = ({ children }: Props): JSX.Element | null => {
   const { data: userData, isLoading: isLoadingUserInfo } = useUserData();
   const [splitConfig, setSplitConfig] =
