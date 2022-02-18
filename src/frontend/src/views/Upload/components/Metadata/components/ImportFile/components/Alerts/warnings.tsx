@@ -1,6 +1,10 @@
 import React from "react";
+import { B } from "src/common/styles/basicStyle";
 import AlertAccordion from "src/components/AlertAccordion";
-import { METADATA_KEYS_TO_HEADERS } from "src/views/Upload/components/common/constants";
+import {
+  METADATA_KEYS_TO_HEADERS,
+  OPTIONAL_HEADER_MARKER,
+} from "src/views/Upload/components/common/constants";
 import { SampleIdToWarningMessages } from "../../parseFile";
 import { maybePluralize } from "./common/pluralize";
 import { ProblemTable } from "./common/ProblemTable";
@@ -154,6 +158,72 @@ export function WarningMissingData({ missingData }: PropsMissingData) {
     <FullWidthAlertAccordion
       title={title}
       message={<MessageMissingData missingData={missingData} />}
+      severity={WARNING_SEVERITY}
+    />
+  );
+}
+
+/**
+ * WARNING_CODE.BAD_FORMAT_DATA
+ */
+interface PropsBadFormatData {
+  badFormatData: SampleIdToWarningMessages;
+}
+function MessageBadFormatData({ badFormatData }: PropsBadFormatData) {
+  const tablePreamble = (
+    <>
+      <p>
+        You can change the invalid data in the table below, or update your file
+        and re-import.
+      </p>
+      <p>
+        <B>Formatting requirements:</B>
+      </p>
+      <ul>
+        <li>
+          Private IDs must be no longer than 120 characters and can only contain
+          letters from the English alphabet (A-Z, upper and lower case), numbers
+          (0-9), periods (.), hyphens (-), underscores (_), spaces ( ), and
+          forward slashes (/).
+        </li>
+        <li>Dates must be in the format of YYYY-MM-DD.</li>
+      </ul>
+    </>
+  );
+
+  const columnHeaders = [
+    METADATA_KEYS_TO_HEADERS.sampleId,
+    "Data with Invalid Formatting",
+  ];
+  const idsBadFormatData = Object.keys(badFormatData);
+  const rows = idsBadFormatData.map((sampleId) => {
+    const badFormatRawHeaders = Array.from(
+      badFormatData[sampleId],
+      (badFormatKey) => METADATA_KEYS_TO_HEADERS[badFormatKey]
+    );
+    // Some headers say "optional" in them: we don't put that in description
+    const badFormatPrettyHeaders = badFormatRawHeaders.map((header) => {
+      return header.replace(OPTIONAL_HEADER_MARKER, "");
+    });
+    const badFormatDescription = badFormatPrettyHeaders.join(", ");
+    return [sampleId, badFormatDescription];
+  });
+  return (
+    <ProblemTable
+      tablePreamble={tablePreamble}
+      columnHeaders={columnHeaders}
+      rows={rows}
+    />
+  );
+}
+export function WarningBadFormatData({ badFormatData }: PropsBadFormatData) {
+  const title =
+    "Some of your data is not formatted correctly. " +
+    "Please update before proceeding.";
+  return (
+    <FullWidthAlertAccordion
+      title={title}
+      message={<MessageBadFormatData badFormatData={badFormatData} />}
       severity={WARNING_SEVERITY}
     />
   );

@@ -28,6 +28,9 @@ export default function Table({ metadata }: Props): JSX.Element {
                   <IdColumn>{METADATA_KEYS_TO_HEADERS.sampleId}</IdColumn>
                 </StyledTableCell>
                 <StyledTableCell component="div">
+                  {METADATA_KEYS_TO_HEADERS.privateId}
+                </StyledTableCell>
+                <StyledTableCell component="div">
                   {METADATA_KEYS_TO_HEADERS.publicId}
                 </StyledTableCell>
                 <StyledTableCell component="div">

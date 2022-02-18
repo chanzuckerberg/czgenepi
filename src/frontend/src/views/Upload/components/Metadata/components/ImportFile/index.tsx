@@ -14,6 +14,7 @@ import Success from "./components/Alerts/Success";
 import {
   WarningAbsentSample,
   WarningAutoCorrect,
+  WarningBadFormatData,
   WarningExtraneousEntry,
   WarningMissingData,
 } from "./components/Alerts/warnings";
@@ -52,6 +53,8 @@ export default function ImportFile({
   const [extraneousSampleIds, setExtraneousSampleIds] = useState<string[]>([]);
   const [absentSampleIds, setAbsentSampleIds] = useState<string[]>([]);
   const [missingData, setMissingData] =
+    useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
+  const [badFormatData, setBadFormatData] =
     useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
 
   // Determine mismatches between uploaded metadata IDs and previous step's IDs.
@@ -106,6 +109,9 @@ export default function ImportFile({
     setParseResult(result);
     setMissingData(
       warningMessages.get(WARNING_CODE.MISSING_DATA) || EMPTY_OBJECT
+    );
+    setBadFormatData(
+      warningMessages.get(WARNING_CODE.BAD_FORMAT_DATA) || EMPTY_OBJECT
     );
 
     handleMetadata(result);
@@ -171,6 +177,10 @@ export default function ImportFile({
 
       <RenderOrNull condition={!isEmpty(missingData)}>
         <WarningMissingData missingData={missingData} />
+      </RenderOrNull>
+
+      <RenderOrNull condition={!isEmpty(badFormatData)}>
+        <WarningBadFormatData badFormatData={badFormatData} />
       </RenderOrNull>
     </Wrapper>
   );

@@ -1,13 +1,33 @@
 import styled from "@emotion/styled";
-import { fontBodyXs, fontHeaderS, fontHeaderXs, getSpaces } from "czifui";
+import {
+  fontBodyXs,
+  fontHeaderS,
+  fontHeaderXs,
+  getColors,
+  getSpaces,
+} from "czifui";
 import AlertAccordion from "src/components/AlertAccordion";
 
 export const Th = styled.th`
   ${fontHeaderXs}
+  ${(props) => {
+    const spaces = getSpaces(props);
+    const colors = getColors(props);
+    return `
+      padding: ${spaces?.m}px;
+      border-bottom: ${spaces?.xxxs}px solid ${colors?.gray[200]};
+    `;
+  }}
 `;
 
 export const Td = styled.td`
   ${fontBodyXs}
+  ${(props) => {
+    const spaces = getSpaces(props);
+    return `
+      padding: ${spaces?.m}px;
+    `;
+  }}
 `;
 
 export const Title = styled.span`

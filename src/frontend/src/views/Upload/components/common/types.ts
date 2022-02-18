@@ -45,6 +45,8 @@ export enum WARNING_CODE {
   EXTRANEOUS_ENTRY,
   // Sample ID appeared in user's sequence upload, but not in metadata upload
   ABSENT_SAMPLE,
+  // A piece of data is present, but improperly formatted
+  BAD_FORMAT_DATA,
 }
 
 export enum ERROR_CODE {
@@ -55,7 +57,10 @@ export enum ERROR_CODE {
 }
 
 export interface Metadata {
+  // `sampleId`, unlike all others, should not be user-editable in Metadata
+  // step. Instead, it IDs the sample that this metadata is tied to.
   sampleId?: string;
+  privateId?: string;
   collectionDate?: string;
   keepPrivate?: boolean;
   publicId?: string;

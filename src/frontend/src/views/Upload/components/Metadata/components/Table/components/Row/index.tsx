@@ -7,6 +7,10 @@ import {
   DATE_REGEX,
 } from "src/components/DateField/constants";
 import {
+  MAX_NAME_LENGTH,
+  VALID_NAME_REGEX,
+} from "src/views/Upload/components/common/constants";
+import {
   Metadata,
   NamedGisaidLocation,
 } from "src/views/Upload/components/common/types";
@@ -40,6 +44,11 @@ const validationSchema = yup.object({
     .matches(DATE_REGEX, DATE_ERROR_MESSAGE)
     .min(10, DATE_ERROR_MESSAGE)
     .max(10, DATE_ERROR_MESSAGE),
+  privateId: yup
+    .string()
+    .required("Required")
+    .matches(VALID_NAME_REGEX, "Invalid character(s)")
+    .max(MAX_NAME_LENGTH, "Too long"),
 });
 
 interface Props {
@@ -160,6 +169,9 @@ export default React.memo(function Row({
     <StyledTableRow component="div">
       <StyledTableCell component="div">
         <Id>{id}</Id>
+      </StyledTableCell>
+      <StyledTableCell component="div">
+        <FreeTextField formik={formik} fieldKey="privateId" />
       </StyledTableCell>
       <StyledTableCell component="div">
         <FreeTextField formik={formik} fieldKey="publicId" />

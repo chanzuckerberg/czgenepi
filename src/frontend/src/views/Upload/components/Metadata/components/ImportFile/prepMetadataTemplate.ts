@@ -4,7 +4,7 @@
 import { METADATA_KEYS_TO_HEADERS } from "../../../common/constants";
 
 // Should change below whenever there are material changes to TSV download
-export const TEMPLATE_UPDATED_DATE = "2022-02-08"; // YYYY-MM-DD
+export const TEMPLATE_UPDATED_DATE = "2022-02-22"; // YYYY-MM-DD
 
 const DATE_FORMAT = "YYYY-MM-DD";
 const BOOLEAN_FORMAT = "Yes/No";
@@ -12,6 +12,7 @@ const BOOLEAN_FORMAT = "Yes/No";
 const TEMPLATE_HEADERS = [
   // If position for sampleId changes, update `prepMetadataTemplate` func!
   METADATA_KEYS_TO_HEADERS.sampleId,
+  METADATA_KEYS_TO_HEADERS.privateId,
   METADATA_KEYS_TO_HEADERS.publicId,
   METADATA_KEYS_TO_HEADERS.collectionDate,
   METADATA_KEYS_TO_HEADERS.collectionLocation,
@@ -30,27 +31,31 @@ const EXAMPLE_ROWS = [
   // Very first example row helps explain usage, but not fully valid.
   [
     EXAMPLE_SAMPLE_IDS[0], // sampleId
+    "Private sample name", // privateId
     "(if available) GISAID ID", // publicId -- here as explainer
     DATE_FORMAT, // collectionDate -- not valid, here as explainer in template
     "North America/USA/California/Los Angeles County", // collectionLocation
     DATE_FORMAT, // sequencingDate -- not valid, here as explainer in template
     BOOLEAN_FORMAT, // keepPrivate -- not valid, here as explainer in template
   ],
-  // Subsequent example rows are fully valid: honest-to-goodness examples.
+  // Subsequent example rows are mostly valid, honest-to-goodness examples...
+  // ... except for the dates. This is to avoid Excel auto "correct".
   [
     EXAMPLE_SAMPLE_IDS[1], // sampleId
+    "id101", // privateId
     "", // publicId -- optional, showing that with blank use
-    "2021-04-12", // collectionDate
+    DATE_FORMAT, // collectionDate
     "San Francisco County", // collectionLocation
     "", // sequencingDate -- optional, showing that with blank use
     "No", // keepPrivate
   ],
   [
     EXAMPLE_SAMPLE_IDS[2], // sampleId
+    "id102", // privateId
     "USA/CA-CZB-0001/2021", // publicId
-    "2021-10-20", // collectionDate
+    DATE_FORMAT, // collectionDate
     "North America/USA/California/San Francisco County", // collectionLocation
-    "2021-10-21", // sequencingDate -- optional, showing that with blank use
+    DATE_FORMAT, // sequencingDate
     "No", // keepPrivate
   ],
 ];
