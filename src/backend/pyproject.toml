@@ -55,6 +55,7 @@ types-PyYAML = "^6.0.1"
 orjson = "^3.6.5"
 dateparser = "^1.1.0"
 types-dateparser = "^1.0.12"
+splitio-client = {version = "9.1.0", extras = ["cpphash"]}
 
 [tool.poetry.dev-dependencies]
 alembic = "^1.7.3"

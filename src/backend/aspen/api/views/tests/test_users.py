@@ -18,4 +18,14 @@ async def test_users_me(http_client: AsyncClient, async_session: AsyncSession) -
         "/v2/users/me", headers={"user_id": user.auth0_user_id}
     )
     assert response.status_code == 200
-    assert response.json() == {"agreed_to_tos": True, "group_id": 1}
+    expected = {
+        "id": 1,
+        "name": "test",
+        "group": {"id": 1, "name": "groupname"},
+        "acknowledged_policy_version": None,
+        "agreed_to_tos": True,
+    }
+    resp_data = response.json()
+    for key in expected:
+        assert resp_data[key] == expected[key]
+    assert len(resp_data["split_id"]) == 20

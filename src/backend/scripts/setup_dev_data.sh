@@ -33,6 +33,7 @@ ${local_aws} secretsmanager update-secret --secret-id genepi-config --secret-str
   "AUTH0_AUTHORIZE_URL": "'"${OIDC_BROWSER_URL}"'/connect/authorize",
   "AUTH0_CLIENT_KWARGS": {"scope": "openid profile email offline_access"},
   "FLASK_SECRET": "DevelopmentKey",
+  "SPLIT_BACKEND_KEY": "localhost",
   "DB_rw_username": "user_rw",
   "DB_rw_password": "password_rw",
   "DB_address": "database.genepinet.localdev",
