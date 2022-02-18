@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import IconButton from "@material-ui/core/IconButton";
 import {
   fontBodyS,
   fontBodyXxs,
@@ -37,4 +38,24 @@ export const StyledFooter = styled.div`
       margin: -${(spaces?.s || 0) + (spaces?.xl || 0)}px 0 0 0;
     `;
   }}
+`;
+
+export const StyledDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+  ${(props) => {
+    const spaces = getSpaces(props);
+    return `
+      padding: ${spaces?.l}px;
+      padding-bottom: 0px;
+    `;
+  }}
+`;
+
+export const StyledIconButton = styled(IconButton)`
+  align-self: flex-end;
+  padding: 0;
+  &:hover {
+    background-color: transparent;
+  }
 `;

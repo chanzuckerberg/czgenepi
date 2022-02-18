@@ -9,6 +9,7 @@ import { ROUTES } from "src/common/routes";
 import { B } from "src/common/styles/basicStyle";
 import { pluralize } from "src/common/utils/strUtils";
 import Notification from "src/components/Notification";
+import { TreeNameInput } from "src/components/TreeNameInput";
 import { ContactUsLink } from "../ContactUsLink";
 import { Header, StyledIconButton } from "../DownloadModal/style";
 import { FailedSampleAlert } from "../FailedSampleAlert";
@@ -20,7 +21,6 @@ import {
   RadioLabelTargeted,
 } from "./components/RadioLabel";
 import { SampleIdInput } from "./components/SampleIdInput";
-import { TreeNameInput } from "./components/TreeNameInput";
 import {
   CreateTreeInfo,
   FieldTitle,
@@ -211,7 +211,11 @@ export const CreateNSTreeModal = ({
           </Title>
         </StyledDialogTitle>
         <StyledDialogContent data-test-id="modal-content">
-          <TreeNameInput setTreeName={setTreeName} treeName={treeName} />
+          <TreeNameInput
+            setTreeName={setTreeName}
+            treeName={treeName}
+            instructionHeader={"Tree Name: "}
+          />
           <TreeTypeSection>
             <TreeNameInfoWrapper>
               <FieldTitle>Tree Type: </FieldTitle>
