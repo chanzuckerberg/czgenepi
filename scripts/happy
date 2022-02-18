@@ -886,11 +886,6 @@ class ArtifactBuilder:
 
     def build(self, artifacts=None):
         env = self.get_env()
-        compose_args = self.get_compose_args()
-        cmd = ["docker-compose"] + compose_args + ["build"]
-        if artifacts:
-            cmd += artifacts
-        subprocess.check_call(cmd, env=env)
 
         images = {}
         for service_name, service in self.get_compose_services().items():
@@ -898,6 +893,13 @@ class ArtifactBuilder:
                 if artifacts and service_name not in artifacts:
                     continue
                 images[service_name] = service["image"]
+
+        compose_args = self.get_compose_args()
+        cmd = ["docker-compose"] + compose_args + ["build"] + list(images.keys())
+        if artifacts:
+            cmd += artifacts
+        subprocess.check_call(cmd, env=env)
+
         return images
 
     def get_compose_args(self):
