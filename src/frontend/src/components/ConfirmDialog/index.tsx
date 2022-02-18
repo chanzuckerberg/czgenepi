@@ -1,10 +1,6 @@
 import { Button } from "czifui";
 import React from "react";
-import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
-import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
-import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
-import Dialog from "src/components/Dialog";
-import { Content, StyledFooter, Title } from "./style";
+import BaseDialog from "src/components/BaseDialog";
 
 export interface ConfirmDialogProps {
   open: boolean;
@@ -14,6 +10,9 @@ export interface ConfirmDialogProps {
   content: string | JSX.Element;
   footer?: string;
   customConfirmButton?: JSX.Element;
+  withCloseIcon?: boolean;
+  disableBackdropClick?: boolean;
+  isConfirmButtonClickable?: boolean;
 }
 
 export default function ConfirmDialog({
@@ -21,36 +20,37 @@ export default function ConfirmDialog({
   onClose,
   onConfirm,
   customConfirmButton,
+  disableBackdropClick = true,
   title,
   content,
   footer,
 }: ConfirmDialogProps): JSX.Element {
-  const confirmButton = customConfirmButton ?? (
-    <Button color="primary" variant="contained" isRounded>
-      Continue
+  const confirmButton = (
+    <div onClick={onConfirm}>
+      {customConfirmButton ?? (
+        <Button color="primary" variant="contained" isRounded>
+          Continue
+        </Button>
+      )}
+    </div>
+  );
+
+  const cancelButton = (
+    <Button color="primary" variant="outlined" isRounded onClick={onClose}>
+      Cancel
     </Button>
   );
 
   return (
-    <Dialog
-      disableEscapeKeyDown
-      disableBackdropClick
+    <BaseDialog
+      disableBackdropClick={disableBackdropClick}
       open={open}
       onClose={onClose}
-    >
-      <DialogTitle narrow>
-        <Title>{title}</Title>
-      </DialogTitle>
-      <DialogContent narrow>
-        <Content>{content}</Content>
-      </DialogContent>
-      <DialogActions narrow>
-        <div onClick={onConfirm}>{confirmButton}</div>
-        <Button color="primary" variant="outlined" isRounded onClick={onClose}>
-          Cancel
-        </Button>
-      </DialogActions>
-      {footer && <StyledFooter narrow>{footer}</StyledFooter>}
-    </Dialog>
+      title={title}
+      content={content}
+      actionButton={confirmButton}
+      cancelButton={cancelButton}
+      footer={footer}
+    />
   );
 }

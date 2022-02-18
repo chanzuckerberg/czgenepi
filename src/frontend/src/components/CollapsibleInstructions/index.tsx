@@ -37,17 +37,21 @@ const CollapsibleInstructions = ({
     setShowInstructions(!shouldShowInstructions);
   };
 
+  const CollapsibleInstructionsButton = (
+    <StyledInstructionsButton
+      buttonSize={buttonSize}
+      color="primary"
+      onClick={handleInstructionsClick}
+    >
+      {shouldShowInstructions ? "LESS" : "MORE"} INFO
+    </StyledInstructionsButton>
+  );
+
   return (
     <>
       <HeaderWrapper headerSize={headerSize}>
         {header}
-        <StyledInstructionsButton
-          buttonSize={buttonSize}
-          color="primary"
-          onClick={handleInstructionsClick}
-        >
-          {shouldShowInstructions ? "LESS" : "MORE"} INFO
-        </StyledInstructionsButton>
+        {CollapsibleInstructionsButton}
       </HeaderWrapper>
       {shouldShowInstructions && (
         <InstructionsWrapper listPadding={listPadding}>

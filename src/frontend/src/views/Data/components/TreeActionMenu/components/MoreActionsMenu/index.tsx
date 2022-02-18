@@ -3,19 +3,22 @@ import React, { MouseEventHandler, useState } from "react";
 import { TREE_STATUS } from "src/common/constants/types";
 import MoreActionsIcon from "src/common/icons/IconDotsHorizontal3Large.svg";
 import { UserResponse } from "src/common/queries/auth";
+import { StyledEditIcon, StyledTrashIcon } from "src/common/styles/iconStyle";
 import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import { StyledIcon, StyledIconWrapper } from "../../style";
-import { StyledEditIcon, StyledText, StyledTrashIcon } from "./style";
+import { StyledText } from "./style";
 
 interface Props {
   item: Tree;
   onDeleteTreeModalOpen(t: Tree): void;
+  onEditTreeModalOpen(t: Tree): void;
   userInfo: UserResponse;
 }
 
 const MoreActionsMenu = ({
   item,
   onDeleteTreeModalOpen,
+  onEditTreeModalOpen,
   userInfo,
 }: Props): JSX.Element => {
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
@@ -26,7 +29,8 @@ const MoreActionsMenu = ({
   const isAutoBuild = group?.name === "";
   const isTreeInUserOrg = userGroup?.name === group?.name;
   const canUserDeleteTree = isAutoBuild || isTreeInUserOrg;
-  const isDisabled = status === TREE_STATUS.Started || !canUserDeleteTree;
+  // FIXME: allow users to edit/delete FAILED runs once phylotrees V2 endpoint has been updated to better reflect tree status
+  const isDisabled = status !== TREE_STATUS.Completed || !canUserDeleteTree;
 
   let tooltipText = "More Actions";
 
@@ -79,7 +83,7 @@ const MoreActionsMenu = ({
           getContentAnchorEl={null}
         >
           {usesFeatureFlag(FEATURE_FLAGS.editTrees) && (
-            <MenuItem onClick={() => undefined}>
+            <MenuItem onClick={() => onEditTreeModalOpen(item)}>
               <StyledEditIcon />
               <StyledText>Edit Tree Name</StyledText>
             </MenuItem>

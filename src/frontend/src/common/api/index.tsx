@@ -30,6 +30,7 @@ export const DEFAULT_FETCH_OPTIONS: RequestInit = {
 export const DEFAULT_PUT_OPTIONS: RequestInit = {
   credentials: "include",
   method: "PUT",
+  ...DEFAULT_HEADERS_MUTATION_OPTIONS,
 };
 
 export const DEFAULT_POST_OPTIONS: RequestInit = {
@@ -159,6 +160,19 @@ export async function getBackendApiJson<T>(
   const requestOptions = {
     ...DEFAULT_FETCH_OPTIONS,
     ...additionalRequestOptions,
+  };
+  return await makeBackendApiJsonCall(route, requestOptions);
+}
+
+export async function putBackendApiJson<T>(
+  route: string,
+  requestBody: string,
+  additionalRequestOptions: RequestInit = {}
+): Promise<T> {
+  const requestOptions = {
+    ...DEFAULT_PUT_OPTIONS,
+    ...additionalRequestOptions,
+    body: requestBody,
   };
   return await makeBackendApiJsonCall(route, requestOptions);
 }
