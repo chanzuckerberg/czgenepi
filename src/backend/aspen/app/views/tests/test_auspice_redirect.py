@@ -125,7 +125,7 @@ def test_auspice_redirect_view(session, app, client, mock_s3_resource, test_data
             "name": "private_identifier_1",
             "GISAID_ID": "public_identifier_1",
             "children": [
-                {"name": "private_identifier_2", "GISAID_ID": "public_identifier_2"},
+                {"name": "public_identifier_2"},
                 {"name": "public_identifier_3"},
                 {
                     "name": "public_identifier_4",

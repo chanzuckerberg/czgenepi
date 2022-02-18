@@ -62,7 +62,6 @@ def create_phylotree_with_inputs(mock_s3_resource, session, owner_group):
     phylo_tree = phylotree_factory(
         phylo_run,
         samples,
-        key=str(uuid.uuid4()),
     )
     upload_s3_file(mock_s3_resource, phylo_tree, samples, gisaid_samples)
 
@@ -93,7 +92,6 @@ def create_phylotree(mock_s3_resource, session, sample_as_input=False):
     phylo_tree = phylotree_factory(
         phylorun_factory(owner_group, inputs=run_inputs),
         samples,
-        key=str(uuid.uuid4()),
     )
     upload_s3_file(mock_s3_resource, phylo_tree, samples)
 

@@ -1,4 +1,5 @@
 import datetime
+import uuid
 from typing import Any, Iterable, Mapping, Union
 
 from aspen.database.models import PhyloRun, PhyloTree, TreeType, WorkflowStatusType
@@ -59,8 +60,10 @@ def phylotree_factory(
     phylorun: PhyloRun,
     constituent_samples,
     bucket="test-bucket",
-    key="test-key",
+    key=None,
 ) -> PhyloTree:
+    if not key:
+        key = uuid.uuid4().hex
     return PhyloTree(
         s3_bucket=bucket,
         s3_key=key,
