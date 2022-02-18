@@ -250,3 +250,43 @@ def test_tree_metadata_replaces_all_ids(
     )
     file_contents = str(res.data, encoding="UTF-8")
     assert file_contents == expected_data
+
+
+def test_public_tree_metadata_replaces_all_ids(
+    mock_s3_resource,
+    session,
+    app,
+    client,
+):
+    """
+    Test a regular tsv download for public identifiers
+    """
+    user, tree, samples = create_phylotree(mock_s3_resource, session, True)
+
+    extra_sample = sample_factory(
+        user.group,
+        user,
+        samples[0].collection_location,
+        public_identifier=str(uuid.uuid4()),
+        private_identifier=str(uuid.uuid4()),
+    )
+    uploaded_pathogen_genome_factory(extra_sample, sequence="GGGATGCAAAAAA")
+    # Write an extra sample to our s3 file. This sample isn't part of the
+    # list of "inputs" into the phylo_run job, but it *should still have
+    # its public identifiers converted to private ids!!!*
+    upload_s3_file(mock_s3_resource, tree, samples + [extra_sample])
+    session.commit()
+    session.flush()
+
+    with client.session_transaction() as sess:
+        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
+    res = client.get(f"/api/phylo_tree/sample_ids/{tree.id}?id_style=public")
+    assert res.status == "200 OK"
+    expected_data = (
+        "Sample Identifier\tSelected\r\n"
+        f"root_identifier_1	no\r\n"
+        f"{samples[0].public_identifier}	yes\r\n"
+        f"{extra_sample.public_identifier}	no\r\n"
+    )
+    file_contents = str(res.data, encoding="UTF-8")
+    assert file_contents == expected_data
