@@ -50,19 +50,9 @@ export const IsPrivateTableCell = styled(StyledTableCell)`
     const spaces = getSpaces(props);
 
     return `
+      min-width: 100px;
       padding: ${spaces?.l}px ${spaces?.l}px;
       border-left: solid 2px ${colors?.gray[200]};
-      border-right: solid 2px ${colors?.gray[200]};
-    `;
-  }}
-`;
-
-export const SubmittedToGisaidTableCell = styled(StyledTableCell)`
-  ${(props) => {
-    const spaces = getSpaces(props);
-
-    return `
-      padding: ${spaces?.l}px;
     `;
   }}
 `;

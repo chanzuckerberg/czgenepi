@@ -47,22 +47,26 @@ export const StyledTableRow = styled(TableRow)`
 `;
 
 export const StyledTableCell = styled(TableCell)`
+  max-width: 300px;
+  word-break: break-word;
+  min-width: 150px;
   ${(props) => {
     const spaces = getSpaces(props);
 
     return `
-      padding: ${spaces?.m}px 0;
+      padding: ${spaces?.m}px;
     `;
   }}
 `;
 
 export const IsPrivateTableCell = styled(TableCell)`
+  min-width: 100px;
   ${(props) => {
     const spaces = getSpaces(props);
     const colors = getColors(props);
 
     return `
-      padding: ${spaces?.m}px 0;
+      padding: ${spaces?.m}px;
       border-left: solid 2px ${colors?.gray[200]};
       border-right: solid 2px ${colors?.gray[200]};
     `;

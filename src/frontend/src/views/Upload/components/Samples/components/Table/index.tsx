@@ -48,7 +48,7 @@ export default function Table({ samples }: Props): JSX.Element {
           <StyledTableHead {...({ component: "div" } as unknown)}>
             <TableRow component="div">
               <StyledHeaderTableCell component="div">
-                Sample Private ID
+                Sample Name (from FASTA)
               </StyledHeaderTableCell>
               <StyledHeaderTableCell align="left" component="div">
                 File Name

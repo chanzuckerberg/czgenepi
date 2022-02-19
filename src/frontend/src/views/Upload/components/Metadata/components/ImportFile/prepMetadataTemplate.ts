@@ -3,17 +3,21 @@
  */
 import { METADATA_KEYS_TO_HEADERS } from "../../../common/constants";
 
+// Should change below whenever there are material changes to TSV download
+export const TEMPLATE_UPDATED_DATE = "2022-02-22"; // YYYY-MM-DD
+
 const DATE_FORMAT = "YYYY-MM-DD";
 const BOOLEAN_FORMAT = "Yes/No";
 
 const TEMPLATE_HEADERS = [
-  METADATA_KEYS_TO_HEADERS.sampleId, // If index position changes, update func!
+  // If position for sampleId changes, update `prepMetadataTemplate` func!
+  METADATA_KEYS_TO_HEADERS.sampleId,
+  METADATA_KEYS_TO_HEADERS.privateId,
+  METADATA_KEYS_TO_HEADERS.publicId,
   METADATA_KEYS_TO_HEADERS.collectionDate,
   METADATA_KEYS_TO_HEADERS.collectionLocation,
   METADATA_KEYS_TO_HEADERS.sequencingDate,
   METADATA_KEYS_TO_HEADERS.keepPrivate,
-  METADATA_KEYS_TO_HEADERS.submittedToGisaid,
-  METADATA_KEYS_TO_HEADERS.publicId,
 ];
 
 // We also use this elsewhere: if we see one of these uploaded, filter it out.
@@ -27,31 +31,32 @@ const EXAMPLE_ROWS = [
   // Very first example row helps explain usage, but not fully valid.
   [
     EXAMPLE_SAMPLE_IDS[0], // sampleId
+    "Private sample name", // privateId
+    "(if available) GISAID ID", // publicId -- here as explainer
     DATE_FORMAT, // collectionDate -- not valid, here as explainer in template
     "North America/USA/California/Los Angeles County", // collectionLocation
     DATE_FORMAT, // sequencingDate -- not valid, here as explainer in template
     BOOLEAN_FORMAT, // keepPrivate -- not valid, here as explainer in template
-    BOOLEAN_FORMAT, // submittedToGisaid -- not valid, here as explainer
-    "(if available) GISAID ID", // publicId -- here as explainer
   ],
-  // Subsequent example rows are fully valid: honest-to-goodness examples.
+  // Subsequent example rows are mostly valid, honest-to-goodness examples...
+  // ... except for the dates. This is to avoid Excel auto "correct".
   [
     EXAMPLE_SAMPLE_IDS[1], // sampleId
-    "2021-04-12", // collectionDate
+    "id101", // privateId
+    "", // publicId -- optional, showing that with blank use
+    DATE_FORMAT, // collectionDate
     "San Francisco County", // collectionLocation
     "", // sequencingDate -- optional, showing that with blank use
     "No", // keepPrivate
-    "No", // submittedToGisaid
-    "", // publicId -- optional, showing that with blank use
   ],
   [
     EXAMPLE_SAMPLE_IDS[2], // sampleId
-    "2021-10-20", // collectionDate
-    "North America/USA/California/San Francisco County", // collectionLocation
-    "2021-10-21", // sequencingDate -- optional, showing that with blank use
-    "No", // keepPrivate
-    "Yes", // submittedToGisaid
+    "id102", // privateId
     "USA/CA-CZB-0001/2021", // publicId
+    DATE_FORMAT, // collectionDate
+    "North America/USA/California/San Francisco County", // collectionLocation
+    DATE_FORMAT, // sequencingDate
+    "No", // keepPrivate
   ],
 ];
 

@@ -1,8 +1,11 @@
 import Papa from "papaparse";
 import { StringToLocationFinder } from "src/common/utils/locationUtils";
+import { DATE_REGEX } from "src/components/DateField/constants";
 import {
   EMPTY_METADATA,
+  FORBIDDEN_NAME_CHARACTERS_REGEX,
   HEADERS_TO_METADATA_KEYS,
+  MAX_NAME_LENGTH,
 } from "../../../common/constants";
 import {
   ERROR_CODE,
@@ -81,27 +84,6 @@ function convertYesNoToBool(value: string): boolean {
 // it drifts from flipped METADATA_KEYS_TO_HEADERS due to later changes.
 const METADATA_KEYS_TO_EXTRACT = Object.values(HEADERS_TO_METADATA_KEYS);
 
-// For a single metadata, if auto-corrections needed, corrects and mutates in-place.
-// If no corrections, returns null, otherwise returns which fields corrected.
-function autocorrectMetadata(metadata: Metadata): Set<keyof Metadata> | null {
-  const correctedKeys = new Set<keyof Metadata>();
-  // If it has publicId, it must be a public sample.
-  if (metadata.publicId) {
-    // Ensure sample has been marked as public
-    if (!metadata.submittedToGisaid) {
-      metadata.submittedToGisaid = true;
-      correctedKeys.add("submittedToGisaid");
-    }
-    // Ensure sample is not private, since it has been submitted publicly
-    if (metadata.keepPrivate) {
-      metadata.keepPrivate = false;
-      correctedKeys.add("keepPrivate");
-    }
-  }
-
-  return correctedKeys.size ? correctedKeys : null;
-}
-
 /**
  * Produce warnings for missing required metadata. If none, return null.
  *
@@ -115,6 +97,7 @@ function autocorrectMetadata(metadata: Metadata): Set<keyof Metadata> | null {
 function warnMissingMetadata(metadata: Metadata): Set<keyof Metadata> | null {
   const missingMetadata = new Set<keyof Metadata>();
   const ALWAYS_REQUIRED: Array<keyof Metadata> = [
+    "privateId",
     "collectionDate",
     "collectionLocation",
   ];
@@ -123,11 +106,40 @@ function warnMissingMetadata(metadata: Metadata): Set<keyof Metadata> | null {
       missingMetadata.add(keyRequiredMetadata);
     }
   });
-  // Additionally, if it's marked as public, then `publicId` is required
-  if (metadata.submittedToGisaid && !metadata.publicId) {
-    missingMetadata.add("publicId");
-  }
   return missingMetadata.size ? missingMetadata : null;
+}
+
+/**
+ * Warn about metadata that is improperly formatted. If none, return null.
+ *
+ * Note that we only warn about bad formatting when the data is present.
+ * If the data is simply missing / empty string, that's handled elsewhere.
+ *
+ * Sadly, like the above warnMissingMetadata, this function is partially
+ * duplicating the `yup` `validationSchema` for a Row's Metadata elsewhere
+ * in the app. But there's no great way to abstract that out, so here we are.
+ */
+function warnBadFormatMetadata(metadata: Metadata): Set<keyof Metadata> | null {
+  const badFormatMetadata = new Set<keyof Metadata>();
+
+  const { privateId } = metadata;
+  if (
+    privateId &&
+    (privateId.length > MAX_NAME_LENGTH ||
+      FORBIDDEN_NAME_CHARACTERS_REGEX.test(privateId))
+  ) {
+    badFormatMetadata.add("privateId");
+  }
+
+  const DATE_FIELDS = ["collectionDate", "sequencingDate"] as const;
+  DATE_FIELDS.forEach((dateKey) => {
+    const dateField = metadata[dateKey];
+    if (dateField && !DATE_REGEX.test(dateField)) {
+      badFormatMetadata.add(dateKey);
+    }
+  });
+
+  return badFormatMetadata.size ? badFormatMetadata : null;
 }
 
 /**
@@ -180,7 +192,7 @@ function parseRow(
           parsedCollectionLocation = stringToLocationFinder(originalValue);
         }
         rowMetadata.collectionLocation = parsedCollectionLocation;
-      } else if (key === "keepPrivate" || key === "submittedToGisaid") {
+      } else if (key === "keepPrivate") {
         rowMetadata[key] = convertYesNoToBool(originalValue);
       } else {
         rowMetadata[key] = originalValue;
@@ -188,15 +200,13 @@ function parseRow(
     }
   });
 
-  // autocorrectMetadata mutates metadata in-place if corrections needed
-  const rowAutocorrectWarnings = autocorrectMetadata(rowMetadata);
-  if (rowAutocorrectWarnings) {
-    rowWarnings.set(WARNING_CODE.AUTO_CORRECT, rowAutocorrectWarnings);
-  }
-
   const rowMissingMetadataWarnings = warnMissingMetadata(rowMetadata);
   if (rowMissingMetadataWarnings) {
     rowWarnings.set(WARNING_CODE.MISSING_DATA, rowMissingMetadataWarnings);
+  }
+  const rowBadFormatWarnings = warnBadFormatMetadata(rowMetadata);
+  if (rowBadFormatWarnings) {
+    rowWarnings.set(WARNING_CODE.BAD_FORMAT_DATA, rowBadFormatWarnings);
   }
 
   return {
@@ -211,6 +221,10 @@ function parseRow(
  * In addition to parsing out the data appropriately, records any warnings
  * and errors that were encountered (eg, a field was missing, etc) so that
  * those can be displayed to the user after pasing is complete.
+ *
+ * In the case of some errors -- eg, missing column headers -- we consider it
+ * so egregious we do not load any data from the file. User just gets an
+ * error message telling them they need to fix it before we allow loading.
  *
  * Generally, this parses all entries in file and makes no attempt fo filter
  * the uploaded metadata down to the samples user user has previously uploaded.
@@ -261,35 +275,35 @@ export function parseFile(
         const missingHeaderFields = getMissingHeaderFields(uploadedHeaders);
         if (missingHeaderFields) {
           errorMessages.set(ERROR_CODE.MISSING_FIELD, missingHeaderFields);
+        } else {
+          // We only ingest file's data if user had all expected fields.
+          const IGNORED_SAMPLE_IDS = new Set(EXAMPLE_SAMPLE_IDS);
+          rows.forEach((row) => {
+            const { rowMetadata, rowWarnings } = parseRow(
+              row,
+              stringToLocationFinder,
+              IGNORED_SAMPLE_IDS
+            );
+            // If false-y, there was no parse result, so we just skip those
+            if (rowMetadata) {
+              // We can guarantee there's a sampleId because rowMetadata exists
+              // and parsing requires it, so `as string` is always correct here
+              const rowSampleId = rowMetadata.sampleId as string;
+              sampleIdToMetadata[rowSampleId] = rowMetadata;
+              // If row had warnings, fold them into the overall warnings.
+              // If row had no warnings, forEach is a no-op since no entries.
+              rowWarnings.forEach((warnStatements, warningType) => {
+                let warnRecordForType = warningMessages.get(warningType);
+                if (warnRecordForType === undefined) {
+                  // Haven't encountered this warning type until now, do init
+                  warnRecordForType = {};
+                  warningMessages.set(warningType, warnRecordForType);
+                }
+                warnRecordForType[rowSampleId] = warnStatements;
+              });
+            }
+          });
         }
-
-        const IGNORED_SAMPLE_IDS = new Set(EXAMPLE_SAMPLE_IDS);
-
-        rows.forEach((row) => {
-          const { rowMetadata, rowWarnings } = parseRow(
-            row,
-            stringToLocationFinder,
-            IGNORED_SAMPLE_IDS
-          );
-          // If false-y, there was no parse result, so we just skip those
-          if (rowMetadata) {
-            // We can guarantee there is a sampleId because rowMetadata exists
-            // and parsing requires it, so `as string` is always correct here
-            const rowSampleId = rowMetadata.sampleId as string;
-            sampleIdToMetadata[rowSampleId] = rowMetadata;
-            // If row had warnings, fold them into the overall warnings.
-            // If row had no warnings, forEach is a no-op since no entries.
-            rowWarnings.forEach((warnStatements, warningType) => {
-              let warnRecordForType = warningMessages.get(warningType);
-              if (warnRecordForType === undefined) {
-                // Haven't encountered this warning type until now, do init
-                warnRecordForType = {};
-                warningMessages.set(warningType, warnRecordForType);
-              }
-              warnRecordForType[rowSampleId] = warnStatements;
-            });
-          }
-        });
 
         resolve({
           data: sampleIdToMetadata,

@@ -14,14 +14,24 @@ import Success from "./components/Alerts/Success";
 import {
   WarningAbsentSample,
   WarningAutoCorrect,
+  WarningBadFormatData,
   WarningExtraneousEntry,
   WarningMissingData,
 } from "./components/Alerts/warnings";
 import DownloadTemplate from "./components/DownloadTemplate";
 import Instructions from "./components/Instructions";
 import { parseFile, ParseResult, SampleIdToWarningMessages } from "./parseFile";
-import { prepMetadataTemplate } from "./prepMetadataTemplate";
-import { IntroWrapper, Title, TitleWrapper, Wrapper } from "./style";
+import {
+  prepMetadataTemplate,
+  TEMPLATE_UPDATED_DATE,
+} from "./prepMetadataTemplate";
+import {
+  IntroWrapper,
+  StyledUpdatedDate,
+  Title,
+  TitleWrapper,
+  Wrapper,
+} from "./style";
 
 interface Props {
   handleMetadata: (result: ParseResult) => void;
@@ -36,7 +46,7 @@ export default function ImportFile({
 }: Props): JSX.Element {
   const [isInstructionsShown, setIsInstructionsShown] = useState(false);
   const [hasImportedFile, setHasImportedFile] = useState(false);
-  const [missingFields, setMissingFields] = useState<string[]>([]);
+  const [missingFields, setMissingFields] = useState<string[] | null>(null);
   const [autocorrectCount, setAutocorrectCount] = useState<number>(0);
   const [filename, setFilename] = useState("");
   const [parseResult, setParseResult] = useState<ParseResult | null>(null);
@@ -44,12 +54,18 @@ export default function ImportFile({
   const [absentSampleIds, setAbsentSampleIds] = useState<string[]>([]);
   const [missingData, setMissingData] =
     useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
+  const [badFormatData, setBadFormatData] =
+    useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
 
   // Determine mismatches between uploaded metadata IDs and previous step's IDs.
   // `extraneousSampleIds` are what was in metadata, but not in sequence upload
   // `absentSampleIds` were in sequence upload, but missing from metadata
   useEffect(() => {
+    // If no file uploaded yet, do nothing.
     if (!parseResult) return;
+    // If file was missing any col header fields, we parsed no data from it
+    // and only display that error to the user to force them to fix problems.
+    if (getMissingFields(parseResult)) return;
 
     const { data } = parseResult;
     const parseResultSampleIds = Object.keys(data);
@@ -81,12 +97,8 @@ export default function ImportFile({
 
     const result = await parseFile(files[0], stringToLocationFinder);
 
-    const { errorMessages, warningMessages, filename } = result;
-
-    const missingFields = Array.from(
-      errorMessages.get(ERROR_CODE.MISSING_FIELD) || []
-    );
-
+    const { warningMessages, filename } = result;
+    const missingFields = getMissingFields(result);
     const autocorrectCount =
       getAutocorrectCount(warningMessages.get(WARNING_CODE.AUTO_CORRECT)) || 0;
 
@@ -97,6 +109,9 @@ export default function ImportFile({
     setParseResult(result);
     setMissingData(
       warningMessages.get(WARNING_CODE.MISSING_DATA) || EMPTY_OBJECT
+    );
+    setBadFormatData(
+      warningMessages.get(WARNING_CODE.BAD_FORMAT_DATA) || EMPTY_OBJECT
     );
 
     handleMetadata(result);
@@ -113,6 +128,7 @@ export default function ImportFile({
           <DownloadTemplate headers={templateHeaders} rows={templateRows}>
             <Button color="primary">Download Metadata Template (TSV)</Button>
           </DownloadTemplate>
+          <StyledUpdatedDate>Updated {TEMPLATE_UPDATED_DATE}</StyledUpdatedDate>
         </TitleWrapper>
 
         {isInstructionsShown && (
@@ -143,7 +159,7 @@ export default function ImportFile({
         <Success filename={filename} />
       </RenderOrNull>
 
-      <RenderOrNull condition={missingFields.length}>
+      <RenderOrNull condition={missingFields}>
         <Error errorCode={ERROR_CODE.MISSING_FIELD} names={missingFields} />
       </RenderOrNull>
 
@@ -161,6 +177,10 @@ export default function ImportFile({
 
       <RenderOrNull condition={!isEmpty(missingData)}>
         <WarningMissingData missingData={missingData} />
+      </RenderOrNull>
+
+      <RenderOrNull condition={!isEmpty(badFormatData)}>
+        <WarningBadFormatData badFormatData={badFormatData} />
       </RenderOrNull>
     </Wrapper>
   );
@@ -193,4 +213,11 @@ function getAutocorrectCount(
   sampleIdToWarningMessages: SampleIdToWarningMessages = {}
 ) {
   return Object.keys(sampleIdToWarningMessages).length;
+}
+
+// Returns array of all missing column header fields, or if none missing, null.
+function getMissingFields(parseResult: ParseResult): string[] | null {
+  const { errorMessages } = parseResult;
+  const missingFieldsErr = errorMessages.get(ERROR_CODE.MISSING_FIELD);
+  return missingFieldsErr ? Array.from(missingFieldsErr) : null;
 }

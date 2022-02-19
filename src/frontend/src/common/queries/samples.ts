@@ -133,6 +133,7 @@ export async function createSamples({
       collectionLocation,
       keepPrivate,
       sequencingDate,
+      privateId,
       publicId,
     } = sampleMetadata;
 
@@ -145,8 +146,8 @@ export async function createSamples({
         [METADATA_KEYS_TO_API_KEYS.collectionDate]: collectionDate,
         [METADATA_KEYS_TO_API_KEYS.collectionLocation]: collectionLocation!.id,
         [METADATA_KEYS_TO_API_KEYS.keepPrivate]: keepPrivate,
+        [METADATA_KEYS_TO_API_KEYS.privateId]: privateId,
         [METADATA_KEYS_TO_API_KEYS.publicId]: publicId,
-        private_identifier: sampleId,
       },
     };
 

@@ -1,5 +1,4 @@
 import { Table as MuiTable, TableBody, TableHead } from "@material-ui/core";
-import { reduce } from "lodash";
 import React, { useCallback, useEffect, useState } from "react";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import {
@@ -21,7 +20,6 @@ import {
   StyledTableCell,
   StyledTableContainer,
   StyledTableRow,
-  SubmittedToGisaidTableCell,
 } from "./style";
 
 interface Props {
@@ -62,9 +60,14 @@ export default function Table({
   }, [metadata]);
 
   useEffect(() => {
-    const isValid = Object.values(rowValidation).every((isValid) => isValid);
-
-    setIsValid(isValid);
+    if (metadata === null) {
+      setIsValid(false);
+    } else {
+      const isValid = Object.keys(metadata).every(
+        (sampleId) => rowValidation[sampleId]
+      );
+      setIsValid(isValid);
+    }
   }, [rowValidation, setIsValid]);
 
   const handleRowValidation_ = (id: string, isValid: boolean) => {
@@ -112,16 +115,6 @@ export default function Table({
     );
   }
 
-  const shouldShowGISAIDFields = reduce(
-    metadata,
-    (shouldShow, data) => {
-      if (shouldShow) return true;
-      if (data?.submittedToGisaid) return true;
-      return false;
-    },
-    false
-  );
-
   return (
     <Overflow>
       <form autoComplete="off">
@@ -131,6 +124,12 @@ export default function Table({
               <StyledTableRow {...({ component: "div" } as unknown)}>
                 <StyledTableCell component="div">
                   <IdColumn>{METADATA_KEYS_TO_HEADERS.sampleId}</IdColumn>
+                </StyledTableCell>
+                <StyledTableCell component="div">
+                  {METADATA_KEYS_TO_HEADERS.privateId}
+                </StyledTableCell>
+                <StyledTableCell component="div">
+                  {METADATA_KEYS_TO_HEADERS.publicId}
                 </StyledTableCell>
                 <StyledTableCell component="div">
                   {METADATA_KEYS_TO_HEADERS.collectionDate}
@@ -144,16 +143,6 @@ export default function Table({
                 <IsPrivateTableCell align="center" component="div">
                   {METADATA_KEYS_TO_HEADERS.keepPrivate}
                 </IsPrivateTableCell>
-                <SubmittedToGisaidTableCell align="center" component="div">
-                  {METADATA_KEYS_TO_HEADERS.submittedToGisaid}
-                </SubmittedToGisaidTableCell>
-                {shouldShowGISAIDFields && (
-                  <>
-                    <StyledTableCell component="div">
-                      {METADATA_KEYS_TO_HEADERS.publicId}
-                    </StyledTableCell>
-                  </>
-                )}
               </StyledTableRow>
             </TableHead>
             {metadata && (

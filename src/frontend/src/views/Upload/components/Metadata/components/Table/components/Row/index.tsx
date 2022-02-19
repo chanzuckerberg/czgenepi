@@ -7,6 +7,10 @@ import {
   DATE_REGEX,
 } from "src/components/DateField/constants";
 import {
+  MAX_NAME_LENGTH,
+  VALID_NAME_REGEX,
+} from "src/views/Upload/components/common/constants";
+import {
   Metadata,
   NamedGisaidLocation,
 } from "src/views/Upload/components/common/types";
@@ -35,16 +39,16 @@ const validationSchema = yup.object({
       id: yup.number().required(),
     })
     .required("Required"),
-  publicId: yup.string().when("submittedToGisaid", {
-    is: true,
-    then: yup.string().required("Required"),
-  }),
   sequencingDate: yup
     .string()
     .matches(DATE_REGEX, DATE_ERROR_MESSAGE)
     .min(10, DATE_ERROR_MESSAGE)
     .max(10, DATE_ERROR_MESSAGE),
-  submittedToGisaid: yup.boolean(),
+  privateId: yup
+    .string()
+    .required("Required")
+    .matches(VALID_NAME_REGEX, "Invalid character(s)")
+    .max(MAX_NAME_LENGTH, "Too long"),
 });
 
 interface Props {
@@ -104,6 +108,12 @@ export default React.memo(function Row({
     initialValues: metadataOnMount,
     onSubmit: noop,
     validationSchema,
+    // Formik defaults to considering the form valid when it inits, but ours is
+    // not valid at start. We need to explicitly set an error that is true when
+    // it loads so it does not prematurely consider the form valid.
+    // Could also do this via `validateOnMount`, but validate call is somewhat
+    // heavy so when we mount 100+ Rows at once it can lock things up.
+    initialErrors: { collectionDate: "Required" },
   });
 
   const { values, isValid, setTouched, setValues } = formik;
@@ -161,6 +171,12 @@ export default React.memo(function Row({
         <Id>{id}</Id>
       </StyledTableCell>
       <StyledTableCell component="div">
+        <FreeTextField formik={formik} fieldKey="privateId" />
+      </StyledTableCell>
+      <StyledTableCell component="div">
+        <FreeTextField formik={formik} fieldKey="publicId" />
+      </StyledTableCell>
+      <StyledTableCell component="div">
         <StyledDiv>
           <UploadDateField
             isFirstRow={isFirstRow}
@@ -193,25 +209,9 @@ export default React.memo(function Row({
         <ToggleField
           formik={formik}
           fieldKey="keepPrivate"
-          isDisabled={Boolean(values.submittedToGisaid)}
           isAutocorrected={warnings.has("keepPrivate")}
         />
       </IsPrivateTableCell>
-      <StyledTableCell align="center" component="div">
-        <ToggleField
-          formik={formik}
-          fieldKey="submittedToGisaid"
-          isDisabled={Boolean(values.keepPrivate)}
-          isAutocorrected={warnings.has("submittedToGisaid")}
-        />
-      </StyledTableCell>
-      <StyledTableCell component="div">
-        <FreeTextField
-          isShown={Boolean(values.submittedToGisaid)}
-          formik={formik}
-          fieldKey="publicId"
-        />
-      </StyledTableCell>
     </StyledTableRow>
   );
 });

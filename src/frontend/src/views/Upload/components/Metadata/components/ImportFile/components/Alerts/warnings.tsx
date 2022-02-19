@@ -1,21 +1,23 @@
 import React from "react";
+import { B } from "src/common/styles/basicStyle";
 import AlertAccordion from "src/components/AlertAccordion";
-import { METADATA_KEYS_TO_HEADERS } from "src/views/Upload/components/common/constants";
+import {
+  METADATA_KEYS_TO_HEADERS,
+  OPTIONAL_HEADER_MARKER,
+} from "src/views/Upload/components/common/constants";
 import { SampleIdToWarningMessages } from "../../parseFile";
 import { maybePluralize } from "./common/pluralize";
-import {
-  FullWidthAlertAccordion,
-  FullWidthContainer,
-  Table,
-  TbodyZebra,
-  Td,
-  Th,
-} from "./common/style";
+import { ProblemTable } from "./common/ProblemTable";
+import { FullWidthAlertAccordion } from "./common/style";
 
 const WARNING_SEVERITY = "warning";
 
 /**
  *  WARNING_CODE.AUTO_CORRECT
+ * (Vince -- Jan 28, 2022): Currently unused due to change in when we auto
+ * correct. While won't occur right now, there is an upcoming feature for
+ * providing notice when parsing uploaded collectionLocation, so leaving
+ * this warning component in for now, although will likely need revamp.
  */
 interface PropsAutoCorrect {
   autocorrectedSamplesCount: number;
@@ -47,6 +49,20 @@ export function WarningAutoCorrect({
 interface PropsExtraneousEntry {
   extraneousSampleIds: string[];
 }
+function MessageExtraneousEntry({ extraneousSampleIds }: PropsExtraneousEntry) {
+  const tablePreamble =
+    "The following sample IDs in the metadata file " +
+    "do not match any sample IDs imported in the previous step.";
+  const columnHeaders = [METADATA_KEYS_TO_HEADERS.sampleId];
+  const rows = extraneousSampleIds.map((sampleId) => [sampleId]);
+  return (
+    <ProblemTable
+      tablePreamble={tablePreamble}
+      columnHeaders={columnHeaders}
+      rows={rows}
+    />
+  );
+}
 export function WarningExtraneousEntry({
   extraneousSampleIds,
 }: PropsExtraneousEntry) {
@@ -56,13 +72,12 @@ export function WarningExtraneousEntry({
     "Sample",
     count
   )} in metadata file ${maybePluralize("was", count)} not used.`;
-  const message = `The following sample IDs in the metadata file do not match
-    any sample IDs imported in the previous step:
-    ${extraneousSampleIds.join(", ")}`;
   return (
-    <AlertAccordion
+    <FullWidthAlertAccordion
       title={title}
-      message={message}
+      message={
+        <MessageExtraneousEntry extraneousSampleIds={extraneousSampleIds} />
+      }
       severity={WARNING_SEVERITY}
     />
   );
@@ -74,6 +89,20 @@ export function WarningExtraneousEntry({
 interface PropsAbsentSample {
   absentSampleIds: string[];
 }
+function MessageAbsentSample({ absentSampleIds }: PropsAbsentSample) {
+  const tablePreamble =
+    "The following sample IDs were imported in the " +
+    "previous step but did not match any sample IDs in the metadata file.";
+  const columnHeaders = [METADATA_KEYS_TO_HEADERS.sampleId];
+  const rows = absentSampleIds.map((sampleId) => [sampleId]);
+  return (
+    <ProblemTable
+      tablePreamble={tablePreamble}
+      columnHeaders={columnHeaders}
+      rows={rows}
+    />
+  );
+}
 export function WarningAbsentSample({ absentSampleIds }: PropsAbsentSample) {
   const count = absentSampleIds.length;
   // "X Samples were not found in metadata file."
@@ -81,13 +110,10 @@ export function WarningAbsentSample({ absentSampleIds }: PropsAbsentSample) {
     "was",
     count
   )} not found in metadata file.`;
-  const message = `The following sample IDs were imported in the previous step
-    but did not match any sample IDs in the metadata file:
-    ${absentSampleIds.join(", ")}`;
   return (
-    <AlertAccordion
+    <FullWidthAlertAccordion
       title={title}
-      message={message}
+      message={<MessageAbsentSample absentSampleIds={absentSampleIds} />}
       severity={WARNING_SEVERITY}
     />
   );
@@ -99,43 +125,28 @@ export function WarningAbsentSample({ absentSampleIds }: PropsAbsentSample) {
 interface PropsMissingData {
   missingData: SampleIdToWarningMessages;
 }
-
-// Possibly worth generalizing this down the road and use in other Warnings
-// and Errors (there's some similar stuff in the Error components, but the
-// number of columns is only ever one over there).
 function MessageMissingData({ missingData }: PropsMissingData) {
+  const tablePreamble =
+    "You can add the required data in the table below, " +
+    "or update your file and re-import.";
+  const columnHeaders = [METADATA_KEYS_TO_HEADERS.sampleId, "Missing Data"];
   const idsMissingData = Object.keys(missingData);
+  const rows = idsMissingData.map((sampleId) => {
+    const missingHeaders = Array.from(
+      missingData[sampleId],
+      (missingKey) => METADATA_KEYS_TO_HEADERS[missingKey]
+    );
+    const missingDataDescription = missingHeaders.join(", ");
+    return [sampleId, missingDataDescription];
+  });
   return (
-    <FullWidthContainer>
-      You can add the required data in the table below, or update your file and
-      re-import.
-      <Table>
-        <thead>
-          <tr>
-            <Th>Sample Private ID</Th>
-            <Th>Missing Data</Th>
-          </tr>
-        </thead>
-        <TbodyZebra>
-          {idsMissingData.map((sampleId) => {
-            const missingHeaders = Array.from(
-              missingData[sampleId],
-              (missingKey) => METADATA_KEYS_TO_HEADERS[missingKey]
-            );
-            const missingDescription = missingHeaders.join(", ");
-            return (
-              <tr key={sampleId}>
-                <Td>{sampleId}</Td>
-                <Td>{missingDescription}</Td>
-              </tr>
-            );
-          })}
-        </TbodyZebra>
-      </Table>
-    </FullWidthContainer>
+    <ProblemTable
+      tablePreamble={tablePreamble}
+      columnHeaders={columnHeaders}
+      rows={rows}
+    />
   );
 }
-
 export function WarningMissingData({ missingData }: PropsMissingData) {
   const count = Object.keys(missingData).length;
   // "X Samples were missing data in required fields."
@@ -147,6 +158,72 @@ export function WarningMissingData({ missingData }: PropsMissingData) {
     <FullWidthAlertAccordion
       title={title}
       message={<MessageMissingData missingData={missingData} />}
+      severity={WARNING_SEVERITY}
+    />
+  );
+}
+
+/**
+ * WARNING_CODE.BAD_FORMAT_DATA
+ */
+interface PropsBadFormatData {
+  badFormatData: SampleIdToWarningMessages;
+}
+function MessageBadFormatData({ badFormatData }: PropsBadFormatData) {
+  const tablePreamble = (
+    <>
+      <p>
+        You can change the invalid data in the table below, or update your file
+        and re-import.
+      </p>
+      <p>
+        <B>Formatting requirements:</B>
+      </p>
+      <ul>
+        <li>
+          Private IDs must be no longer than 120 characters and can only contain
+          letters from the English alphabet (A-Z, upper and lower case), numbers
+          (0-9), periods (.), hyphens (-), underscores (_), spaces ( ), and
+          forward slashes (/).
+        </li>
+        <li>Dates must be in the format of YYYY-MM-DD.</li>
+      </ul>
+    </>
+  );
+
+  const columnHeaders = [
+    METADATA_KEYS_TO_HEADERS.sampleId,
+    "Data with Invalid Formatting",
+  ];
+  const idsBadFormatData = Object.keys(badFormatData);
+  const rows = idsBadFormatData.map((sampleId) => {
+    const badFormatRawHeaders = Array.from(
+      badFormatData[sampleId],
+      (badFormatKey) => METADATA_KEYS_TO_HEADERS[badFormatKey]
+    );
+    // Some headers say "optional" in them: we don't put that in description
+    const badFormatPrettyHeaders = badFormatRawHeaders.map((header) => {
+      return header.replace(OPTIONAL_HEADER_MARKER, "");
+    });
+    const badFormatDescription = badFormatPrettyHeaders.join(", ");
+    return [sampleId, badFormatDescription];
+  });
+  return (
+    <ProblemTable
+      tablePreamble={tablePreamble}
+      columnHeaders={columnHeaders}
+      rows={rows}
+    />
+  );
+}
+export function WarningBadFormatData({ badFormatData }: PropsBadFormatData) {
+  const title =
+    "Some of your data is not formatted correctly. " +
+    "Please update before proceeding.";
+  return (
+    <FullWidthAlertAccordion
+      title={title}
+      message={<MessageBadFormatData badFormatData={badFormatData} />}
       severity={WARNING_SEVERITY}
     />
   );

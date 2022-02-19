@@ -16,11 +16,11 @@ interface Props {
 
 export default React.memo(function Row({ id, metadata }: Props): JSX.Element {
   const {
+    privateId,
     collectionDate,
     collectionLocation,
     sequencingDate,
     keepPrivate,
-    submittedToGisaid,
     publicId,
   } = metadata;
 
@@ -29,6 +29,8 @@ export default React.memo(function Row({ id, metadata }: Props): JSX.Element {
       <StyledTableCell component="div">
         <Id>{id}</Id>
       </StyledTableCell>
+      <StyledTableCell component="div">{privateId}</StyledTableCell>
+      <StyledTableCell component="div">{publicId || "--"}</StyledTableCell>
       <StyledTableCell component="div">{collectionDate}</StyledTableCell>
       <StyledTableCell component="div">
         {collectionLocation!.name}
@@ -46,10 +48,6 @@ export default React.memo(function Row({ id, metadata }: Props): JSX.Element {
           "Public"
         )}
       </IsPrivateTableCell>
-      <StyledTableCell align="center" component="div">
-        {submittedToGisaid ? "Yes" : "No"}
-      </StyledTableCell>
-      <StyledTableCell component="div">{publicId || "--"}</StyledTableCell>
     </StyledTableRow>
   );
 });
