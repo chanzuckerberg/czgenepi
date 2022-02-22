@@ -11,4 +11,5 @@ module.exports = {
   HEADFUL: process.env.HEADFUL || false,
   HEADLESS: process.env.HEADLESS || true,
   NODE_ENV: process.env.NODE_ENV || "development",
+  SPLIT_FRONTEND_KEY: process.env.SPLIT_FRONTEND_KEY || "localhost",
 };

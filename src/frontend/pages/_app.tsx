@@ -12,6 +12,7 @@ import { setFeatureFlagsFromQueryParams } from "src/common/utils/featureFlags";
 import AcknowledgePolicyChanges from "src/components/AcknowledgePolicyChanges";
 import NavBarLoggedIn from "src/components/NavBar";
 import NavBarLanding from "src/components/NavBarV2";
+import SplitInitializer from "src/components/Split";
 
 const queryClient = new QueryClient();
 setFeatureFlagsFromQueryParams();
@@ -30,7 +31,6 @@ function Nav(): JSX.Element {
 const App = ({ Component, pageProps }: AppProps): JSX.Element => {
   // (thuang): MUI related SSR setup
   // https://material-ui.com/guides/server-rendering/
-
   useEffect(() => {
     // Remove the server-side injected CSS
     const jssStyles = document.querySelector("#jss-server-side");
@@ -49,17 +49,19 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
         />
       </Head>
       <QueryClientProvider client={queryClient}>
-        <StylesProvider injectFirst>
-          <ThemeProvider theme={theme}>
-            <EmotionThemeProvider theme={theme}>
-              <div className={style.app}>
-                <Nav />
-                <AcknowledgePolicyChanges />
-                <Component {...pageProps} />
-              </div>
-            </EmotionThemeProvider>
-          </ThemeProvider>
-        </StylesProvider>
+        <SplitInitializer>
+          <StylesProvider injectFirst>
+            <ThemeProvider theme={theme}>
+              <EmotionThemeProvider theme={theme}>
+                <div className={style.app}>
+                  <Nav />
+                  <AcknowledgePolicyChanges />
+                  <Component {...pageProps} />
+                </div>
+              </EmotionThemeProvider>
+            </ThemeProvider>
+          </StylesProvider>
+        </SplitInitializer>
       </QueryClientProvider>
     </>
   );

@@ -5,9 +5,16 @@ data aws_secretsmanager_secret_version config {
   secret_id = var.happy_config_secret
 }
 
+data aws_secretsmanager_secret_version app_secret {
+  secret_id = local.app_secret_name
+}
+
 locals {
   secret = jsondecode(data.aws_secretsmanager_secret_version.config.secret_string)
+  app_secret = jsondecode(data.aws_secretsmanager_secret_version.app_secret.secret_string)
   alb_key = var.require_okta ? "private_albs" : "public_albs"
+
+  app_secret_name = "${local.deployment_stage}/genepi-config"
 
   custom_stack_name     = var.stack_name
   priority              = var.priority
@@ -115,6 +122,7 @@ module frontend_service {
   api_url               = local.backend_url
   frontend_url          = local.frontend_url
   remote_dev_prefix     = local.remote_dev_prefix
+  extra_env_vars        = {"SPLIT_FRONTEND_KEY": local.app_secret["SPLIT_FRONTEND_KEY"]}
 
   wait_for_steady_state = local.wait_for_steady_state
 }
@@ -181,7 +189,7 @@ module gisaid_sfn_config {
   schedule_expressions  = contains(["geprod", "gestaging"], local.deployment_stage) ? ["cron(0 1 ? * MON-FRI *)"] : []
   event_role_arn        = local.event_role_arn
   extra_args            =  {
-    genepi_config_secret_name = "${local.deployment_stage}/genepi-config"
+    genepi_config_secret_name = local.app_secret_name
     remote_dev_prefix = local.remote_dev_prefix
     # We'll use the wdl default values for ndjson_cache_key and gisaid_ndjson_url
   }
@@ -203,7 +211,7 @@ module pangolin_sfn_config {
   schedule_expressions  = contains(["geprod", "gestaging"], local.deployment_stage) ? ["cron(0 18,23 ? * MON-FRI *)"] : []
   event_role_arn        = local.event_role_arn
   extra_args            =  {
-    genepi_config_secret_name = "${local.deployment_stage}/genepi-config"
+    genepi_config_secret_name = local.app_secret_name
     remote_dev_prefix        = local.remote_dev_prefix
   }
 }
@@ -223,7 +231,7 @@ module pangolin_ondemand_sfn_config {
   sfn_arn               = local.swipe_sfn_arn
   event_role_arn        = local.event_role_arn
   extra_args            =  {
-    genepi_config_secret_name = "${local.deployment_stage}/genepi-config"
+    genepi_config_secret_name = local.app_secret_name
     remote_dev_prefix        = local.remote_dev_prefix
   }
 }
@@ -244,7 +252,7 @@ module nextstrain_template_sfn_config {
   sfn_arn               = local.swipe_sfn_arn
   event_role_arn        = local.event_role_arn
    extra_args            =  {
-    genepi_config_secret_name = "${local.deployment_stage}/genepi-config"
+    genepi_config_secret_name = local.app_secret_name
     remote_dev_prefix        = local.remote_dev_prefix
   }
 }
@@ -265,7 +273,7 @@ module nextstrain_ondemand_template_sfn_config {
   sfn_arn               = local.swipe_sfn_arn
   event_role_arn        = local.event_role_arn
    extra_args            =  {
-    genepi_config_secret_name = "${local.deployment_stage}/genepi-config"
+    genepi_config_secret_name = local.app_secret_name
     remote_dev_prefix        = local.remote_dev_prefix
   }
 }

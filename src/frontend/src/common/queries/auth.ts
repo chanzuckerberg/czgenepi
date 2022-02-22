@@ -8,7 +8,12 @@ import {
   UseQueryResult,
 } from "react-query";
 import ENV from "src/common/constants/ENV";
-import { API, apiResponse, DEFAULT_PUT_OPTIONS } from "../api";
+import {
+  API,
+  apiResponse,
+  DEFAULT_PUT_OPTIONS,
+  getBackendApiJson,
+} from "../api";
 import { ROUTES } from "../routes";
 import { ENTITIES } from "./entities";
 
@@ -17,6 +22,11 @@ const { API_URL } = ENV;
 export const USE_USER_INFO = {
   entities: [ENTITIES.USER_INFO],
   id: "userInfo",
+};
+
+export const USE_USERDATA = {
+  entities: [ENTITIES.USERDATA],
+  id: "userData",
 };
 
 export interface UserResponse extends APIResponse {
@@ -32,6 +42,10 @@ const USER_MAP = new Map<string, keyof User>([
   ["agreed_to_tos", "agreedToTos"],
   ["acknowledged_policy_version", "acknowledgedPolicyVersion"],
 ]);
+
+const fetchUserData = (): Promise<V2User> => {
+  return getBackendApiJson(API.USERDATA);
+};
 
 export const fetchUserInfo = (): Promise<UserResponse> => {
   return apiResponse<UserResponse>(
@@ -65,6 +79,12 @@ export function useUpdateUserInfo(): UseMutationResult<
 
 export function useUserInfo(): UseQueryResult<UserResponse, unknown> {
   return useQuery([USE_USER_INFO], fetchUserInfo, {
+    retry: false,
+  });
+}
+
+export function useUserData(): UseQueryResult<UserResponse, unknown> {
+  return useQuery([USE_USERDATA], fetchUserData, {
     retry: false,
   });
 }
