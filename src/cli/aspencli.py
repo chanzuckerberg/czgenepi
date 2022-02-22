@@ -311,12 +311,33 @@ def phylo_trees():
     pass
 
 
+@phylo_trees.command(name="download")
+@click.argument("tree_id")
+@click.option("--public-ids/--private-ids", is_flag=True, default=False)
+@click.pass_context
+def download_tree(ctx, tree_id, public_ids):
+    api_client = ctx.obj["api_client"]
+    params = {}
+    if public_ids:
+        params["id_style"] = "public"
+    else:
+        params["id_style"] = "private"
+    resp = api_client.get(f"/api/phylo_tree/{tree_id}", params=params)
+    print(resp.text)
+
+
 @phylo_trees.command(name="get-sample-ids")
 @click.argument("tree_id")
+@click.option("--public-ids/--private-ids", is_flag=True, default=False)
 @click.pass_context
-def get_tree_sample_ids(ctx, tree_id):
+def get_tree_sample_ids(ctx, tree_id, public_ids):
     api_client = ctx.obj["api_client"]
-    resp = api_client.get(f"/api/phylo_tree/sample_ids/{tree_id}")
+    params = {}
+    if public_ids:
+        params["id_style"] = "public"
+    else:
+        params["id_style"] = "private"
+    resp = api_client.get(f"/api/phylo_tree/sample_ids/{tree_id}", params=params)
     print(resp.text)
 
 

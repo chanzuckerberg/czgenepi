@@ -54,7 +54,6 @@ def make_trees(
         phylotree_factory(
             phylorun_factory(group),
             random.sample(samples, k=random.randint(0, len(samples))),  # type: ignore
-            key=f"key_{ix}",
         )  # type: ignore
         for ix in range(n_trees)
     ]
