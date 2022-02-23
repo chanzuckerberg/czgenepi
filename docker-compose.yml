@@ -3,21 +3,21 @@ version: "3.8"
 services:
   database:
     image: "${DOCKER_REPO}genepi-devdb:latest"
-    profiles: ["backend", "web", "all"]
+    profiles: [ "backend", "web", "all" ]
     ports:
       - "5432:5432"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password_postgres
       - POSTGRES_DB=aspen_db
-    command: ["postgres"]
+    command: [ "postgres" ]
     networks:
       genepinet:
         aliases:
           - database.genepinet.localdev
   frontend:
     image: "${DOCKER_REPO}genepi-frontend"
-    profiles: ["web", "all"]
+    profiles: [ "frontend", "web", "all" ]
     build:
       context: src/frontend
       cache_from:
@@ -45,7 +45,7 @@ services:
           - frontend.genepinet.localdev
   backend:
     image: "${DOCKER_REPO}genepi-backend"
-    profiles: ["backend", "web", "all"]
+    profiles: [ "backend", "web", "all" ]
     build:
       context: src/backend
       cache_from:
@@ -80,14 +80,19 @@ services:
       - ./src/backend:/usr/src/app
     entrypoint: []
     # NOTE -- Using relative paths for entrypoints/commands breaks pycharm debugging
-    command: ["/usr/local/bin/supervisord", "-c", "/usr/src/app/etc/supervisord.conf"]
+    command:
+      [
+        "/usr/local/bin/supervisord",
+        "-c",
+        "/usr/src/app/etc/supervisord.conf"
+      ]
     networks:
       genepinet:
         aliases:
           - backend.genepinet.localdev
   localstack:
     image: localstack/localstack@sha256:7c6635493185d25165979995fb073fd789c72b6d8b17ef3a70b798d55576732f
-    profiles: ["backend", "web", "all"]
+    profiles: [ "backend", "web", "all" ]
     ports:
       - "4566:4566"
     environment:
@@ -106,7 +111,7 @@ services:
           - localstack.genepinet.localdev
   oidc:
     image: soluto/oidc-server-mock:0.3.0
-    profiles: ["backend", "web", "all"]
+    profiles: [ "backend", "web", "all" ]
     ports:
       - "4011:80"
       - "8443:8443"
@@ -135,7 +140,7 @@ services:
           - oidc.genepinet.localdev
   gisaid:
     image: "${DOCKER_REPO}genepi-gisaid"
-    profiles: ["jobs", "all"]
+    profiles: [ "gisaid", "jobs", "all" ]
     build:
       context: src/backend/
       dockerfile: Dockerfile.gisaid
@@ -145,7 +150,7 @@ services:
         - BUILDKIT_INLINE_CACHE=1
         - HAPPY_COMMIT
         - HAPPY_BRANCH
-    command: ["true"]
+    command: [ "true" ]
     volumes:
       - ./src/backend:/usr/src/app
     environment:
@@ -160,7 +165,7 @@ services:
           - gisaid.genepinet.localdev
   pangolin:
     image: "${DOCKER_REPO}genepi-pangolin"
-    profiles: ["jobs", "all"]
+    profiles: [ "pangolin", "jobs", "all" ]
     build:
       context: src/backend
       dockerfile: Dockerfile.pangolin
@@ -173,7 +178,7 @@ services:
       - BOTO_ENDPOINT_URL=http://localstack.genepinet.localdev:4566
       - AWS_ACCESS_KEY_ID=dev_access_key_id
       - AWS_SECRET_ACCESS_KEY=dev_secret_access_key
-    command: ["true"]
+    command: [ "true" ]
     restart: "no"
     networks:
       genepinet:
@@ -181,7 +186,7 @@ services:
           - pangolin.genepinet.localdev
   nextstrain:
     image: "${DOCKER_REPO}genepi-nextstrain"
-    profiles: ["jobs", "all"]
+    profiles: [ "nextstrain", "jobs", "all" ]
     build:
       context: src/backend
       dockerfile: Dockerfile.nextstrain
@@ -194,7 +199,7 @@ services:
       - BOTO_ENDPOINT_URL=http://localstack.genepinet.localdev:4566
       - AWS_ACCESS_KEY_ID=dev_access_key_id
       - AWS_SECRET_ACCESS_KEY=dev_secret_access_key
-    command: ["true"]
+    command: [ "true" ]
     restart: "no"
     networks:
       genepinet:
