@@ -27,7 +27,7 @@
                 "frontend",
                 "backend"
             ],
-            "profile": "fullstack"
+            "profile": "web"
         },
         "batch": {
             "build_images": [
