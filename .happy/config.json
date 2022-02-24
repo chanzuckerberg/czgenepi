@@ -5,29 +5,56 @@
     "app": "genepi",
     "default_compose_env_file": ".env.ecr",
     "slice_default_tag": "branch-trunk",
-    "services": ["frontend", "backend"],
+    "services": [
+        "frontend",
+        "backend"
+    ],
     "slices": {
-      "frontend": {
-        "build_images": ["frontend"]
-      },
-      "backend": {
-        "build_images": ["backend"]
-      },
-      "fullstack": {
-        "build_images": ["frontend", "backend"]
-      },
-      "batch": {
-        "build_images": ["nextstrain", "pangolin", "gisaid"]
-      },
-      "nextstrain": {
-        "build_images": ["nextstrain"]
-      },
-      "pangolin": {
-        "build_images": ["pangolin"]
-      },
-      "gisaid": {
-        "build_images": ["gisaid"]
-      }
+        "frontend": {
+            "build_images": [
+                "frontend"
+            ],
+            "profile": "frontend"
+        },
+        "backend": {
+            "build_images": [
+                "backend"
+            ],
+            "profile": "backend"
+        },
+        "fullstack": {
+            "build_images": [
+                "frontend",
+                "backend"
+            ],
+            "profile": "web"
+        },
+        "batch": {
+            "build_images": [
+                "nextstrain",
+                "pangolin",
+                "gisaid"
+            ],
+            "profile": "jobs"
+        },
+        "nextstrain": {
+            "build_images": [
+                "nextstrain"
+            ],
+            "profile": "nextstrain"
+        },
+        "pangolin": {
+            "build_images": [
+                "pangolin"
+            ],
+            "profile": "pangolin"
+        },
+        "gisaid": {
+            "build_images": [
+                "gisaid"
+            ],
+            "profile": "gisaid"
+        }
     },
     "environments": {
         "rdev": {
@@ -57,7 +84,11 @@
         }
     },
     "tasks": {
-        "migrate": ["migrate_db_task_definition_arn"],
-        "delete": ["delete_db_task_definition_arn"]
+        "migrate": [
+            "migrate_db_task_definition_arn"
+        ],
+        "delete": [
+            "delete_db_task_definition_arn"
+        ]
     }
 }
