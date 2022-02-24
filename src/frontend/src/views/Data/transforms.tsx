@@ -5,13 +5,24 @@ const { API_URL } = ENV;
 export const TREE_TRANSFORMS: Transform[] = [
   {
     inputs: ["id"],
-    key: "downloadLink",
+    key: "downloadLinkIdStylePrivateIdentifiers",
     method: (inputs: number[]): string | undefined => {
       const id = inputs[0];
       if (typeof id !== "number") {
         return undefined;
       }
       return `${API_URL}/api/phylo_tree/${id}`;
+    },
+  },
+  {
+    inputs: ["id"],
+    key: "downloadLinkIdStylePublicIdentifiers",
+    method: (inputs: number[]): string | undefined => {
+      const id = inputs[0];
+      if (typeof id !== "number") {
+        return undefined;
+      }
+      return `${API_URL}/api/phylo_tree/${id}?id_style=public`;
     },
   },
   {
