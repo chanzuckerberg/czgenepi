@@ -62,7 +62,8 @@
             "secret_arn": "happy/env-dev-config",
             "terraform_directory": ".happy/terraform/envs/dev",
             "log_group_prefix": "/genepi/dev",
-            "task_launch_type": "fargate"
+            "task_launch_type": "fargate",
+            "auto_run_migrations": true
         },
         "staging": {
             "aws_profile": "genepi-dev",
