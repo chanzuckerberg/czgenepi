@@ -94,7 +94,7 @@ def cli(
        to update this rule to look like this:
        North America/USA/New York/Middletown    North America/USA/New York/Orange County
 
-    3. Add a few custom mappings of our own.
+    4. Add a few custom mappings of our own.
     """
     update_locations(input_fh, output_fh)
 
@@ -141,9 +141,11 @@ def update_locations(input_fh: io.TextIOBase, output_fh: io.TextIOBase):
     # Remap destinations and write our output file.
     for row in outputs:
         source, dest = row
+        # The destination location was marked for translation in the loop above,
+        # rewrite it to a location supported by CZGENEPI
         if dest in translate_destinations:
             dest = translate_destinations[dest]
-        # This row isn't in our skip list, write it back to our output file.
+        # Write our updated translation to the output file.
         output_fh.write(f"{source}\t{dest}\n")
 
 
