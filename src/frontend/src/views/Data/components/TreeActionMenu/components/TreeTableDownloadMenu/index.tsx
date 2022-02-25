@@ -21,7 +21,12 @@ const TreeTableDownloadMenu = ({ item }: Props): JSX.Element => {
     setAnchorEl(null);
   };
 
-  const jsonLink = stringGuard(item["downloadLink"]);
+  const jsonLinkIdStylePrivateIdentifiers = stringGuard(
+    item["downloadLinkIdStylePrivateIdentifiers"]
+  );
+  const jsonLinkIdStylePublicIdentifiers = stringGuard(
+    item["downloadLinkIdStylePublicIdentifiers"]
+  );
   const tsvDownloadLink = stringGuard(item["accessionsLink"]);
   const disabled = item?.status !== TREE_STATUS.Completed;
   // TODO (mlila): This is necessary due to an sds bug -- MUI tooltips should not display
@@ -71,10 +76,17 @@ const TreeTableDownloadMenu = ({ item }: Props): JSX.Element => {
           onClose={handleClose}
           getContentAnchorEl={null}
         >
-          <NewTabLink href={jsonLink}>
+          <NewTabLink href={jsonLinkIdStylePrivateIdentifiers}>
             <MenuItemTooltip>
               <MenuItem disabled={disabled} onClick={handleClose}>
-                {"Tree file (.json)"}
+                {"Tree file with Private IDs (.json)"}
+              </MenuItem>
+            </MenuItemTooltip>
+          </NewTabLink>
+          <NewTabLink href={jsonLinkIdStylePublicIdentifiers}>
+            <MenuItemTooltip>
+              <MenuItem disabled={disabled} onClick={handleClose}>
+                {"Tree file with Public IDs (.json)"}
               </MenuItem>
             </MenuItemTooltip>
           </NewTabLink>
