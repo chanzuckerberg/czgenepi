@@ -64,25 +64,28 @@ def cli(
     """
     This utility rearranges Nextstrain's GISAID -> Nextstrain locations mapping file
     to instead be a GISAID -> CZ GEN EPI locations mapping file. Some of the locations
-    in our database don't follow the Nextstrain location conventions and changes to
-    Nextstrain's translations have broken our tree builds in the past.
+    in our database don't follow the Nextstrain location conventions and upstream
+    changes to Nextstrain's translations have broken our tree builds in the past.
 
     This translation file is tab-delimited with one source and destination mapping per line:
     old_location\tnew_location
 
     There are 4 main changes we make to the file:
-    1. Remove any translations *from* a location in use by CZ GEN EPI entirely so
-       upstream Nextstrain changes can't break them in the future.
+    1. There are a few localities we work with that don't want their location rolled
+       into a larger area (ex: city into county). Remove these localities from the
+       output file.
+
+    2. Remove any rules that translate a location in use by CZ GEN EPI into some other
+       name.
 
        For example, Nexstrain may have a rule like this:
        North America/USA/New York/Orange County    North America/USA/New York/Orange County NY
 
-       If we have a group that's using the "New York/Orange County" location, their
-       CZ GEN EPI samples will be displayed on a tree with a different location name
-       than the GISAID samples - and worse, any location queries in our tree build
-       configurations won't match the GISAID samples properly.
+       If we have a group that's using the "New York/Orange County" location, we want
+       to make sure their samples (and any GISAID samples from Orange County) are
+       displayed on a tree with the same location name.
 
-    2. For any translations *to* a location that were skipped in #1 above, we need to
+    3. For any translations *to* a location that were skipped in #2 above, we need to
        change the new location so it matches the value in use by CZ GEN EPI. For example,
        Nextstrain often rolls up several smaller locations into a larger one like this:
        North America/USA/New York/Middletown    North America/USA/New York/Orange County NY
@@ -103,7 +106,7 @@ def update_locations(input_fh: io.TextIOBase, output_fh: io.TextIOBase):
         remap_translations = get_excluded_locations(session)
 
     # Where we stash output rows. The file is ~3MB so memory isn't an issue
-    output_map = []
+    outputs = []
 
     # Keep track of which rules we've removed so we can remap any
     # destinations as necessary.
@@ -123,10 +126,10 @@ def update_locations(input_fh: io.TextIOBase, output_fh: io.TextIOBase):
         if source in remap_translations:
             translate_destinations[dest] = source
             continue
-        output_map.append([source, dest])
+        outputs.append([source, dest])
 
     # Add some extra translation rules to our file
-    output_map.extend(
+    outputs.extend(
         [
             [
                 "North America/USA/California/Southern San Joaquin Valley",
@@ -137,7 +140,7 @@ def update_locations(input_fh: io.TextIOBase, output_fh: io.TextIOBase):
 
     print(translate_destinations)
     # Remap destinations and write our output file.
-    for row in output_map:
+    for row in outputs:
         source, dest = row
         if dest in translate_destinations:
             dest = translate_destinations[dest]
