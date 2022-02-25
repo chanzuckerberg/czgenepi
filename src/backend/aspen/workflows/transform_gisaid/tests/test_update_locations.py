@@ -1,13 +1,12 @@
 from io import StringIO
-from typing import List, Optional
+from typing import Optional
 
-import sqlalchemy as sa
 from sqlalchemy.sql.expression import and_
 
 from aspen.database.models import Group, Location, User
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.sample import sample_factory
-from aspen.test_infra.models.usergroup import group_factory, user_factory
+from aspen.test_infra.models.usergroup import user_factory
 from aspen.workflows.transform_gisaid.update_locations import update_locations
 
 

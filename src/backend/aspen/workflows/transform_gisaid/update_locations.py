@@ -138,7 +138,6 @@ def update_locations(input_fh: io.TextIOBase, output_fh: io.TextIOBase):
         ]
     )
 
-    print(translate_destinations)
     # Remap destinations and write our output file.
     for row in outputs:
         source, dest = row
