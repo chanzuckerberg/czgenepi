@@ -21,10 +21,6 @@ export const FEATURE_FLAGS: FlagsObj = {
     isDisabled: true,
     key: "mayasFlag",
   },
-  editTrees: {
-    isDisabled: false,
-    key: "editTrees",
-  },
   editSamples: {
     isDisabled: false,
     key: "editSamples",

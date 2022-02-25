@@ -19,7 +19,7 @@ export const StyledInstructions = styled(Instructions)`
 
     return `
       border-radius: ${corners?.m}px;
-      padding:${spaces?.l}px;
+      padding:${spaces?.l}px ${spaces?.l}px ${spaces?.s}px ${spaces?.l}px;
     `;
   }}
 `;

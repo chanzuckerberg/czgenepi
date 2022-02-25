@@ -4,7 +4,6 @@ import { TREE_STATUS } from "src/common/constants/types";
 import MoreActionsIcon from "src/common/icons/IconDotsHorizontal3Large.svg";
 import { UserResponse } from "src/common/queries/auth";
 import { StyledEditIcon, StyledTrashIcon } from "src/common/styles/iconStyle";
-import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import { StyledIcon, StyledIconWrapper } from "../../style";
 import { StyledText } from "./style";
 
@@ -82,12 +81,10 @@ const MoreActionsMenu = ({
           onClose={handleClose}
           getContentAnchorEl={null}
         >
-          {usesFeatureFlag(FEATURE_FLAGS.editTrees) && (
-            <MenuItem onClick={() => onEditTreeModalOpen(item)}>
-              <StyledEditIcon />
-              <StyledText>Edit Tree Name</StyledText>
-            </MenuItem>
-          )}
+          <MenuItem onClick={() => onEditTreeModalOpen(item)}>
+            <StyledEditIcon />
+            <StyledText>Edit Tree Name</StyledText>
+          </MenuItem>
           <MenuItem onClick={() => onDeleteTreeModalOpen(item)}>
             <StyledTrashIcon />
             <StyledText isWarning>Delete Tree</StyledText>

@@ -3,10 +3,9 @@ import { Button } from "czifui";
 import React, { useEffect, useState } from "react";
 import { useEditTree } from "src/common/queries/trees";
 import BaseDialog from "src/components/BaseDialog";
-import { StyledIconButton } from "src/components/BaseDialog/style";
 import Notification from "src/components/Notification";
 import { TreeNameInput } from "src/components/TreeNameInput";
-import { StyledTitle } from "./style";
+import { StyledDiv, StyledIconButton, StyledTitle } from "./style";
 
 interface Props {
   onClose(): void;
@@ -31,7 +30,7 @@ export const EditTreeConfirmationModal = ({
   useEffect(() => {
     // this makes sure that the newTreeName defaults to the current tree name,
     //  and that the newTreeName state variable resets when we edit a new tree
-    if (tree) {
+    if (tree && tree.name) {
       setNewTreeName(tree.name);
     }
 
@@ -74,7 +73,7 @@ export const EditTreeConfirmationModal = ({
   const title = <StyledTitle>Edit Tree Name</StyledTitle>;
 
   const content = (
-    <>
+    <StyledDiv>
       <TreeNameInput
         setTreeName={setNewTreeName}
         treeName={newTreeName}
@@ -82,7 +81,7 @@ export const EditTreeConfirmationModal = ({
         textInputLabel={"Tree Name: "}
         isTextInputMultiLine={true}
       />
-    </>
+    </StyledDiv>
   );
 
   const confirmButton = (
@@ -110,7 +109,7 @@ export const EditTreeConfirmationModal = ({
           autoDismiss
           buttonOnClick={() => setShouldShowSuccessNotification(false)}
           buttonText="DISMISS"
-          dismissDirection="right"
+          dismissDirection="left"
           dismissed={!shouldShowSuccessNotification}
           intent="info"
         >
@@ -122,7 +121,7 @@ export const EditTreeConfirmationModal = ({
           autoDismiss
           buttonOnClick={() => setShouldShowErrorNotification(false)}
           buttonText="DISMISS"
-          dismissDirection="right"
+          dismissDirection="left"
           dismissed={!shouldShowErrorNotification}
           intent="error"
         >
