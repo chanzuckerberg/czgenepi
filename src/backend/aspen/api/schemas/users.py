@@ -1,5 +1,5 @@
-from typing import List, Optional
 import datetime
+from typing import List, Optional
 
 from aspen.api.schemas.base import BaseResponse
 
