@@ -52,7 +52,7 @@ def get_excluded_locations(session):
 )
 @click.option(
     "output_fh",
-    "--input",
+    "--output",
     type=click.File("w", lazy=False),
     default="/ncov-ingest/source-data/out.tsv",
     required=True,
