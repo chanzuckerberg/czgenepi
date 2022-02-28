@@ -1,3 +1,4 @@
+import datetime
 from typing import List, Optional
 
 from aspen.api.schemas.base import BaseResponse
@@ -13,7 +14,7 @@ class UserBaseResponse(BaseResponse):
     name: str
     group: GroupResponse
     agreed_to_tos: bool = False
-    acknowledged_policy_version: Optional[str] = None
+    acknowledged_policy_version: Optional[datetime.date] = None
 
 
 # Only expose split id to the user it belongs to.
