@@ -3,7 +3,8 @@ name: Push Remote Dev
 on:
   push:
     branches:
-      - 'rdev-*'
+      # TODO: revert
+      - "edu*"
 
 env:
   # Force using BuildKit instead of normal Docker, required so that metadata
@@ -42,12 +43,13 @@ jobs:
           aws-region: us-west-2
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-duration-seconds: 900
-      - name: Login to ECR
-        uses: docker/login-action@v1
+      - name: Build And Push
+        uses: chanzuckerberg/github-actions/docker-build-push@docker-build-push-v1.0.0
         with:
+          dockerfile: ${{ matrix.image.dockerfile }}
+          context: ${{ matrix.image.context }}
+          name: ${{ matrix.image.name }}
           registry: ${{ secrets.ECR_REPO }}
-      - uses: actions/checkout@v2
-      - run: docker buildx build --build-arg HAPPY_COMMIT=${GITHUB_SHA} --build-arg HAPPY_BRANCH=${GITHUB_REF} --cache-from ${{ secrets.ECR_REPO }}/${{ matrix.image.name }}:branch-${GITHUB_REF##*/}  --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/${{ matrix.image.name }}:branch-trunk --cache-to=type=inline,mode=max -t ${{ secrets.ECR_REPO }}/${{ matrix.image.name }}:sha-${GITHUB_SHA:0:8}  -t ${{ secrets.ECR_REPO }}/${{ matrix.image.name }}:branch-${GITHUB_REF##*/} -f ${{ matrix.image.dockerfile }} --push ${{ matrix.image.context }}
 
   create-update-rdev:
     runs-on: ubuntu-20.04
