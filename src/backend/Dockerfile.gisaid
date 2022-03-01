@@ -56,8 +56,8 @@ RUN pip3 install nextstrain-cli csv-diff s3fs[boto3] aiobotocore[awscli,boto3] e
 RUN mkdir /ncov && \
     cd /ncov && \
     git init && \
-    git remote add origin https://github.com/nextstrain/ncov.git && \
-    git fetch origin 44223bcd5249e53eb9a67fb2cc9f2efef77ff530 && \
+    git remote add origin https://github.com/chanzuckerberg/ncov.git && \
+    git fetch origin master && \
     git reset --hard FETCH_HEAD
 
 # Poetry: install app

@@ -38,14 +38,11 @@ RUN pip3 install nextstrain-cli csv-diff s3fs[boto3] aiobotocore[awscli,boto3] e
 RUN mkdir /ncov && \
     cd /ncov && \
     git init && \
-    git remote add origin https://github.com/nextstrain/ncov.git && \
-    git fetch origin 44223bcd5249e53eb9a67fb2cc9f2efef77ff530 && \
+    git remote add origin https://github.com/chanzuckerberg/ncov.git && \
+    git fetch origin master && \
     git reset --hard FETCH_HEAD
 RUN mkdir -p /ncov/auspice
 RUN mkdir -p /ncov/logs
-
-ADD aspen/workflows/nextstrain_run/patches/seqtk.patch /tmp/
-RUN patch /ncov/workflow/snakemake_rules/main_workflow.smk < /tmp/seqtk.patch
 
 WORKDIR /usr/src/app
 
