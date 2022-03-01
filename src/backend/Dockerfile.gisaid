@@ -57,7 +57,7 @@ RUN mkdir /ncov && \
     cd /ncov && \
     git init && \
     git remote add origin https://github.com/chanzuckerberg/ncov.git && \
-    git fetch origin master && \
+    git fetch origin czgenepi && \
     git reset --hard FETCH_HEAD
 
 # Poetry: install app
