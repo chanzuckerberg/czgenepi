@@ -1,10 +1,10 @@
 name: Push Remote Dev
 
 on:
-  push:
-    branches:
-      # TODO: revert
-      - "edu*"
+  pull_request:
+    # TODO: revert
+    # branches:
+    # - "edu*"
 
 env:
   # Force using BuildKit instead of normal Docker, required so that metadata
