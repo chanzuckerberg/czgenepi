@@ -32,9 +32,8 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.event.deployment.sha }}
-      - name: Install happy dependencies
-        run: |
-          pip install -r .happy/requirements.txt
+      - name: Install happy
+        uses: chanzuckerberg/github-actions/install-happy@install-happy-v1.1.0
       - uses: avakar/set-deployment-status@v1
         with:
           state: in_progress
@@ -44,7 +43,7 @@ jobs:
         env:
           TFE_TOKEN: ${{ secrets.TFE_TOKEN }}
         run: |
-          ./scripts/happy --profile="" --env ${{ github.event.deployment.environment }} update ge${{ github.event.deployment.environment }}stack --tag ${{ github.event.deployment.payload.tag }}
+          happy --profile="" --env ${{ github.event.deployment.environment }} update ge${{ github.event.deployment.environment }}stack --tag ${{ github.event.deployment.payload.tag }}
       - name: Run integration tests
         env:
           TFE_TOKEN: ${{ secrets.TFE_TOKEN }}
