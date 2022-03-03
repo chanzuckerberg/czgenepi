@@ -44,7 +44,7 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-duration-seconds: 900
       - name: Build And Push
-        uses: chanzuckerberg/github-actions/docker-build-push@docker-build-push-v1.0.0
+        uses: chanzuckerberg/github-actions/docker-build-push@2add4c8cb44daf01b5423c97bbe988a579f0b2a8
         with:
           dockerfile: ${{ matrix.image.dockerfile }}
           context: ${{ matrix.image.context }}
