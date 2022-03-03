@@ -29,14 +29,14 @@ def format_sample_lineage(sample: Sample) -> dict[str, Any]:
     if pathogen_genome:
         lineage = {
             "lineage": pathogen_genome.pangolin_lineage,
-            "probability": pathogen_genome.pangolin_probability,
+            "confidence": pathogen_genome.pangolin_probability,
             "version": pathogen_genome.pangolin_version,
             "last_updated": pathogen_genome.pangolin_last_updated,
         }
     else:
         lineage = {
             "lineage": None,
-            "probability": None,
+            "confidence": None,
             "version": None,
             "last_updated": None,
         }

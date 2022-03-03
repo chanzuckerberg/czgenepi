@@ -262,7 +262,7 @@ interface GisaidResponseType {
 interface LineageResponseType {
   last_updated: string;
   lineage: string;
-  probability: number;
+  confidence: number;
   version: string;
 }
 interface SubmittingGroupResponseType {
