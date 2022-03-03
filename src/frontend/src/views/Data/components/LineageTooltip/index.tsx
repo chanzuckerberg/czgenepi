@@ -4,7 +4,7 @@ import { Label, Text, Wrapper } from "./style";
 export interface Lineage {
   last_updated: string;
   lineage: string;
-  probability: string;
+  confidence: string;
   version: string;
 }
 
@@ -14,7 +14,7 @@ interface Props {
 
 const DISPLAY_ORDER: Array<keyof Lineage> = [
   "lineage",
-  "probability",
+  "confidence",
   "version",
   "last_updated",
 ];
@@ -23,7 +23,10 @@ export const LineageTooltip = ({ lineage }: Props): JSX.Element => {
   return (
     <>
       {DISPLAY_ORDER.map((key) => {
-        const value = lineage[key];
+        let value = lineage[key];
+        if (key === "confidence") {
+          value = `${value}%`;
+        }
         return <Row key={key} label={key as keyof Lineage} text={value} />;
       })}
     </>
@@ -33,7 +36,7 @@ export const LineageTooltip = ({ lineage }: Props): JSX.Element => {
 const KEY_TO_LABELS = {
   last_updated: "Last Updated",
   lineage: "Lineage",
-  probability: "Probability",
+  confidence: "Confidence",
   version: "PangoLEARN Version",
 };
 
