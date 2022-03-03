@@ -12,7 +12,7 @@ const checkExpirationDate = (path: string) => {
   if (expirationDate < now) throw Error("security.txt files need updating");
 };
 
-test("ensure second security.txt file has not expired", () => {
+test("ensure security.txt file has not expired", () => {
   expect(() =>
     checkExpirationDate("public/.well-known/security.txt")
   ).not.toThrow();
