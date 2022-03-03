@@ -3,7 +3,7 @@ SHELL := /bin/bash
 ### DOCKER ENVIRONMENTAL VARS #################################################
 export DOCKER_BUILDKIT:=1
 export COMPOSE_DOCKER_CLI_BUILD:=1
-export docker_compose:=docker-compose --env-file .env.ecr
+export docker_compose:=docker compose --env-file .env.ecr
 export AWS_DEV_PROFILE=genepi-dev
 export AWS_PROD_PROFILE=genepi-prod
 export BACKEND_APP_ROOT=/usr/src/app
@@ -101,7 +101,7 @@ local-ecr-login:
 init-empty-db:
 	$(docker_compose) stop database
 	$(docker_compose) rm database
-	$(docker_compose) -f docker-compose.yml -f docker-compose-emptydb.yml up -d
+	$(docker_compose) --profile $(LOCALDEV_PROFILE) -f docker-compose.yml -f docker-compose-emptydb.yml up -d
 	sleep 10 # hack, let postgres start up cleanly.
 	-$(docker_compose) exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c "ALTER USER $(LOCAL_DB_ADMIN_USERNAME) WITH PASSWORD '$(LOCAL_DB_ADMIN_PASSWORD)';"
 	-$(docker_compose) exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c "CREATE USER $(LOCAL_DB_RW_USERNAME) WITH PASSWORD '$(LOCAL_DB_RW_PASSWORD)';"
@@ -187,7 +187,7 @@ local-start: .env.ecr ## Start a local dev environment that's been stopped.
 
 .PHONY: local-stop
 local-stop: ## Stop the local dev environment.
-	$(docker_compose) stop
+	$(docker_compose) --profile '*' stop
 
 .PHONY: local-clean
 local-clean: local-nohostconfig ## Remove everything related to the local dev environment (including db data!)

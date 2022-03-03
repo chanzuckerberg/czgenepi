@@ -18,4 +18,5 @@ export const LogoAnchor = styled.a`
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 100%;
 `;
