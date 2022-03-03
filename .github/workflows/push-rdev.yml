@@ -1,7 +1,7 @@
 name: Push Remote Dev
 
 on:
-  pull_request:
+  push:
     # TODO: revert
     # branches:
     # - "edu*"
