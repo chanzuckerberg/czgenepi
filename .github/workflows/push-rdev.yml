@@ -70,8 +70,8 @@ jobs:
         uses: actions/github-script@0.9.0
         with:
           script: |
-            const prefix = "refs/heads/rdev-"
-            const ref = context.ref
+            const prefix = "rdev-"
+            const ref = context.ref_name
             if (!ref.startswith(prefix)) {
               core.error(`ref ${ref} did not start with ${prefix}`)
               return
