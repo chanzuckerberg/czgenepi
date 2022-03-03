@@ -77,7 +77,7 @@ async def test_samples_view(
                 "sequencing_date": str(uploaded_pathogen_genome.sequencing_date),
                 "lineage": {
                     "lineage": uploaded_pathogen_genome.pangolin_lineage,
-                    "probability": uploaded_pathogen_genome.pangolin_probability,
+                    "confidence": uploaded_pathogen_genome.pangolin_probability,
                     "version": uploaded_pathogen_genome.pangolin_version,
                     "last_updated": convert_datetime_to_iso_8601(
                         uploaded_pathogen_genome.pangolin_last_updated
@@ -140,7 +140,7 @@ async def test_samples_view_gisaid_rejected(
                 "sequencing_date": str(uploaded_pathogen_genome.sequencing_date),
                 "lineage": {
                     "lineage": uploaded_pathogen_genome.pangolin_lineage,
-                    "probability": uploaded_pathogen_genome.pangolin_probability,
+                    "confidence": uploaded_pathogen_genome.pangolin_probability,
                     "version": uploaded_pathogen_genome.pangolin_version,
                     "last_updated": convert_datetime_to_iso_8601(
                         uploaded_pathogen_genome.pangolin_last_updated
@@ -205,7 +205,7 @@ async def test_samples_view_gisaid_no_info(
                 "sequencing_date": str(uploaded_pathogen_genome.sequencing_date),
                 "lineage": {
                     "lineage": uploaded_pathogen_genome.pangolin_lineage,
-                    "probability": uploaded_pathogen_genome.pangolin_probability,
+                    "confidence": uploaded_pathogen_genome.pangolin_probability,
                     "version": uploaded_pathogen_genome.pangolin_version,
                     "last_updated": convert_datetime_to_iso_8601(
                         uploaded_pathogen_genome.pangolin_last_updated
@@ -265,7 +265,7 @@ async def test_samples_view_gisaid_not_eligible(
                 "sequencing_date": None,
                 "lineage": {
                     "lineage": None,
-                    "probability": None,
+                    "confidence": None,
                     "version": None,
                     "last_updated": None,
                 },
@@ -462,7 +462,7 @@ async def test_samples_view_cansee_all(
             "sequencing_date": str(uploaded_pathogen_genome.sequencing_date),
             "lineage": {
                 "lineage": uploaded_pathogen_genome.pangolin_lineage,
-                "probability": uploaded_pathogen_genome.pangolin_probability,
+                "confidence": uploaded_pathogen_genome.pangolin_probability,
                 "version": uploaded_pathogen_genome.pangolin_version,
                 "last_updated": convert_datetime_to_iso_8601(
                     uploaded_pathogen_genome.pangolin_last_updated
@@ -531,7 +531,7 @@ async def test_samples_view_no_pangolin(
                 "sequencing_date": str(uploaded_pathogen_genome.sequencing_date),
                 "lineage": {
                     "lineage": None,
-                    "probability": None,
+                    "confidence": None,
                     "version": None,
                     "last_updated": None,
                 },
