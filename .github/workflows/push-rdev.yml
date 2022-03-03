@@ -44,7 +44,7 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-duration-seconds: 900
       - name: Build And Push
-        uses: chanzuckerberg/github-actions/docker-build-push@a829d534071674ba67f0c24fddc2124be6ee4e2c
+        uses: chanzuckerberg/github-actions/docker-build-push@46ea1e9a5d629dac7bdfc720cc8c59352f2da880
         with:
           dockerfile: ${{ matrix.image.dockerfile }}
           context: ${{ matrix.image.context }}
@@ -64,18 +64,22 @@ jobs:
           aws-region: us-west-2
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-duration-seconds: 900
-      - uses: actions/checkout@v2
-      - name: Install happy
-        uses: chanzuckerberg/github-actions/install-happy@install-happy-v1.1.0
-      - name: Create update rdev
-        env:
-          TFE_TOKEN: ${{ secrets.TFE_TOKEN }}
+      - name: Get Stack Name
+        id: stack-name
         run: |
-          RDEV_NAME=${GITHUB_REF#refs/heads/rdev-}
-          if $(happy --profile="" list | grep -q $RDEV_NAME); then
-            echo "Updating stack $RDEV_NAME"
-            happy --profile=""  update --tag sha-${GITHUB_SHA:0:8} $RDEV_NAME
-          else
-            echo "Creating stack $RDEV_NAME"
-            happy --profile="" create  --tag sha-${GITHUB_SHA:0:8} $RDEV_NAME
-          fi
+        uses: actions/github-script@0.9.0
+        with:
+          script: |
+            const prefix = "refs/heads/rdev-"
+            const ref = context.ref
+            if (!ref.startswith(prefix)) {
+              core.error(`ref ${ref} did not start with ${prefix}`)
+              return
+            }
+            const stackName = ref.slice(length(prefix))
+            core.setOutput('stack-name', stackName)
+      - name: Create or update rdev
+        uses: chanzuckerberg/github-actions/deploy-happy-stack@46ea1e9a5d629dac7bdfc720cc8c59352f2da880
+        with:
+          tfe-token: ${{ secrets.TFE_TOKEN }}
+          stack-name: ${{ steps.stack-name.stack-name }}
