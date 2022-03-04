@@ -1,16 +1,14 @@
 import { Button } from "czifui";
 import CloseIcon from "@material-ui/icons/Close";
 import { pluralize } from "src/common/utils/strUtils";
-import React, { useState } from "react";
+import React from "react";
 import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import { noop } from "src/common/constants/empty";
-import { useUserInfo } from "src/common/queries/auth";
 import { Content, Title } from "src/components/BaseDialog/style";
 import { CollapsibleInstructions } from "src/components/CollapsibleInstructions";
 import Dialog from "src/components/Dialog";
-import Notification from "src/components/Notification";
 import { NewTabLink } from "../../../NewTabLink";
 import {
   InstructionsNotSemiBold,
@@ -34,40 +32,10 @@ const EditSamplesConfirmationModal = ({
   onClose,
   open,
 }: Props): JSX.Element | null => {
-  const [shouldShowErrorNotification, setShouldShowErrorNotification] =
-    useState<boolean>(false);
-  const [shouldShowSuccessNotification, setShouldShowSuccessNotification] =
-    useState<boolean>(false);
-  // const [numEditedSamples, setNumEditedSamples] = useState<number>(0);
-
-  const { data } = useUserInfo();
-  const { group: userGroup } = data ?? {};
-
-  const samplesToEdit = checkedSamples
-    .filter((sample) => sample.submittingGroup?.name === userGroup?.name)
-    .map((sample) => sample.id);
-
-  // const editSampleMutation = useEditSamples({
-  //   componentOnError: () => {
-  //     setShouldShowErrorNotification(true);
-  //   },
-  //   componentOnSuccess: () => {
-  //     setShouldShowSuccessNotification(true);
-  //   },
-  // });
-
-  // const onEdit = () => {
-  //   setNumEditedSamples(samplesToEdit.length);
-  //   editSampleMutation.mutate({
-  //     samplesToEdit,
-  //   });
-  //   onClose();
-  // };
 
   const numSamples = checkedSamples.length;
   const title = `Edit Sample Metadata`;
 
-  // const numSamplesCantEdit = checkedSamples.length - samplesToEdit.length;
   const HREF = "https://docs.google.com/document/d/1QxNcDip31DA40SRIOmdV1I_ZC7rWDz5YQGk26Mr2kfA/edit";
   const instructionItems = [
     <InstructionsSemiBold key="1">
@@ -101,18 +69,6 @@ const EditSamplesConfirmationModal = ({
     </InstructionsNotSemiBold>,
   ];
 
-  const confirmButton = (
-    <Button
-      disabled={true}
-      color="primary"
-      variant="contained"
-      isRounded
-      onClick={noop}
-    >
-      Continue
-    </Button>
-  );
-
   const closeIcon = (
     <StyledIconButton onClick={onClose}>
       <CloseIcon />
@@ -121,26 +77,6 @@ const EditSamplesConfirmationModal = ({
 
   return (
     <>
-      {!open && (
-        <>
-          <Notification
-            autoDismiss
-            buttonOnClick={() => setShouldShowSuccessNotification(false)}
-            buttonText="DISMISS"
-            dismissDirection="right"
-            dismissed={!shouldShowSuccessNotification}
-            intent="info"
-          ></Notification>
-          <Notification
-            autoDismiss
-            buttonOnClick={() => setShouldShowErrorNotification(false)}
-            buttonText="DISMISS"
-            dismissDirection="right"
-            dismissed={!shouldShowErrorNotification}
-            intent="error"
-          ></Notification>
-        </>
-      )}
       <Dialog
         disableBackdropClick={true}
         disableEscapeKeyDown={false}
@@ -170,7 +106,6 @@ const EditSamplesConfirmationModal = ({
             />
           </Content>
         </DialogContent>
-        <DialogActions narrow>{confirmButton}</DialogActions>
       </Dialog>
     </>
   );
