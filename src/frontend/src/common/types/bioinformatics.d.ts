@@ -11,7 +11,7 @@ interface GISAID {
 interface Lineage {
   last_updated: unknown;
   lineage: unknown;
-  probability: unknown;
+  confidencde: unknown;
   version: unknown;
 }
 

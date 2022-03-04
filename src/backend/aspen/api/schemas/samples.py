@@ -22,7 +22,7 @@ class SampleGisaidResponseSchema(BaseResponse):
 class SampleLineageResponseSchema(BaseResponse):
     last_updated: Optional[datetime.datetime]
     lineage: Optional[str]
-    probability: Optional[float]
+    confidence: Optional[float]
     version: Optional[str]
 
 
