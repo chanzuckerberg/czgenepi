@@ -17,7 +17,7 @@ interface Props {
   instructionListTitle?: string;
   items: React.ReactNode[];
   secondInstructionListTitle?: string;
-  secondSetItems: React.ReactNode[];
+  secondSetItems?: React.ReactNode[];
   listPadding?: SizeType;
   ordered?: boolean;
   shouldStartOpen?: boolean;
@@ -61,7 +61,9 @@ const CollapsibleInstructions = ({
       {shouldShowInstructions && (
         <InstructionsWrapper listPadding={listPadding}>
           {instructionListTitle && (
-            <InstructionsTitle headerSize={headerSize}>{instructionListTitle}</InstructionsTitle>
+            <InstructionsTitle headerSize={headerSize}>
+              {instructionListTitle}
+            </InstructionsTitle>
           )}
           <List ordered={ordered}>
             {items.map((item, index) => {
@@ -73,7 +75,9 @@ const CollapsibleInstructions = ({
             })}
           </List>
           {secondInstructionListTitle && (
-            <SecondInstructionsTitle headerSize={headerSize}>{secondInstructionListTitle}</SecondInstructionsTitle>
+            <SecondInstructionsTitle headerSize={headerSize}>
+              {secondInstructionListTitle}
+            </SecondInstructionsTitle>
           )}
           {secondSetItems && (
             <List ordered={ordered}>

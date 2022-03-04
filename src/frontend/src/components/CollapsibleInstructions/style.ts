@@ -106,4 +106,3 @@ export const InstructionsWrapper = styled("div", {
     `;
   }}
 `;
-

@@ -1,19 +1,6 @@
-import CloseIcon from "@material-ui/icons/Close";
-import IconButton from "@material-ui/core/IconButton";
 import styled from "@emotion/styled";
-import {
-  Button,
-  fontCaps,
-  fontHeader,
-  fontBodyS,
-  fontBodyXs,
-  fontHeaderXs,
-  getColors,
-  getSpaces,
-  Props,
-} from "czifui";
-
-
+import IconButton from "@material-ui/core/IconButton";
+import { fontBodyS, fontBodyXs, getColors, getSpaces } from "czifui";
 
 export const StyledIconButton = styled(IconButton)`
   display: flex;
