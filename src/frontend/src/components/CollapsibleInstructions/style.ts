@@ -30,6 +30,34 @@ export const HeaderWrapper = styled("div", {
   }}
 `;
 
+export const InstructionsTitle = styled("div", {
+  shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
+})`
+
+  ${(props: HeaderProps) => {
+    const { headerSize } = props;
+    const spaces = getSpaces(props);
+    return `
+      ${fontHeader(headerSize)}
+      margin-bottom: ${spaces?.xxs}px;
+    `;
+  }}
+`;
+
+export const SecondInstructionsTitle = styled("div", {
+  shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
+})`
+  ${(props: HeaderProps) => {
+    const { headerSize } = props;
+    const spaces = getSpaces(props);
+    return `
+    ${fontHeader(headerSize)}
+      margin-bottom: ${spaces?.xxs}px;
+      margin-top: ${spaces?.l}px;
+    `;
+  }}
+`;
+
 interface InstructionsButtonProps extends Props {
   buttonSize: CapsSizeType;
 }
@@ -77,13 +105,3 @@ export const InstructionsWrapper = styled("div", {
   }}
 `;
 
-export const InstructionsTitle = styled.div`
-  ${fontHeaderXs}
-
-  ${(props) => {
-    const spaces = getSpaces(props);
-    return `
-      margin-bottom: ${spaces?.xxs}px;
-    `;
-  }}
-`;

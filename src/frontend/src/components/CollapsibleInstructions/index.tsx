@@ -5,6 +5,7 @@ import {
   HeaderWrapper,
   InstructionsTitle,
   InstructionsWrapper,
+  SecondInstructionsTitle,
   SizeType,
   StyledInstructionsButton,
 } from "./style";
@@ -15,6 +16,8 @@ interface Props {
   headerSize?: SizeType;
   instructionListTitle?: string;
   items: React.ReactNode[];
+  secondInstructionListTitle?: string;
+  secondSetItems: React.ReactNode[];
   listPadding?: SizeType;
   ordered?: boolean;
   shouldStartOpen?: boolean;
@@ -26,6 +29,8 @@ const CollapsibleInstructions = ({
   headerSize = "xs",
   instructionListTitle,
   items,
+  secondInstructionListTitle,
+  secondSetItems,
   listPadding = "l",
   ordered,
   shouldStartOpen = false,
@@ -56,7 +61,7 @@ const CollapsibleInstructions = ({
       {shouldShowInstructions && (
         <InstructionsWrapper listPadding={listPadding}>
           {instructionListTitle && (
-            <InstructionsTitle>{instructionListTitle}</InstructionsTitle>
+            <InstructionsTitle headerSize={headerSize}>{instructionListTitle}</InstructionsTitle>
           )}
           <List ordered={ordered}>
             {items.map((item, index) => {
@@ -67,6 +72,20 @@ const CollapsibleInstructions = ({
               );
             })}
           </List>
+          {secondInstructionListTitle && (
+            <SecondInstructionsTitle headerSize={headerSize}>{secondInstructionListTitle}</SecondInstructionsTitle>
+          )}
+          {secondSetItems && (
+            <List ordered={ordered}>
+              {secondSetItems.map((item, index) => {
+                return (
+                  <ListItem fontSize="s" key={index} ordered={ordered}>
+                    {item}
+                  </ListItem>
+                );
+              })}
+            </List>
+          )}
         </InstructionsWrapper>
       )}
     </>

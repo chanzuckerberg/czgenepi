@@ -1,8 +1,6 @@
 import { Menu, MenuItem } from "czifui";
 import React, { MouseEventHandler, useState } from "react";
-import { noop } from "src/common/constants/empty";
 import { StyledEditIcon, StyledTrashIcon } from "src/common/styles/iconStyle";
-import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import { StyledText } from "src/views/Data/components/TreeActionMenu/components/MoreActionsMenu/style";
 import { TooltipDescriptionText, TooltipHeaderText } from "../../style";
 import { IconButton } from "../IconButton";
@@ -11,11 +9,13 @@ import { StyledMoreActionsIcon } from "./style";
 interface Props {
   disabled: boolean;
   onDeleteSelected(): void;
+  onEditSelected(): void;
 }
 
 const MoreActionsMenu = ({
   disabled,
   onDeleteSelected,
+  onEditSelected,
 }: Props): JSX.Element => {
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 
@@ -45,6 +45,11 @@ const MoreActionsMenu = ({
     handleClose();
   };
 
+  const handleEditSamples = () => {
+    onEditSelected();
+    handleClose();
+  };
+
   return (
     <>
       <IconButton
@@ -70,12 +75,12 @@ const MoreActionsMenu = ({
         onClose={handleClose}
         getContentAnchorEl={null}
       >
-        {usesFeatureFlag(FEATURE_FLAGS.editSamples) && (
-          <MenuItem onClick={noop}>
-            <StyledEditIcon />
-            <StyledText>Edit Samples</StyledText>
-          </MenuItem>
-        )}
+        {/* {usesFeatureFlag(FEATURE_FLAGS.editSamples) && ( */}
+        <MenuItem onClick={handleEditSamples}>
+          <StyledEditIcon />
+          <StyledText>Edit Samples</StyledText>
+        </MenuItem>
+        {/* )} */}
         <MenuItem onClick={handleDeleteSamples}>
           <StyledTrashIcon />
           <StyledText isWarning>Delete Samples</StyledText>
