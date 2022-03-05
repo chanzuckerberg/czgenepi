@@ -189,7 +189,6 @@ const DataSubview: FunctionComponent<Props> = ({
     setCheckedSampleIds([]);
   };
 
-  setEditSampleConfirmationOpen;
 
   // TODO-TR
   const handleDeleteTreeModalClose = () => {
