@@ -83,7 +83,7 @@ const EditSamplesConfirmationModal = ({
         disableEscapeKeyDown={false}
         open={open}
         onClose={onClose}
-        maxWidth={"lg"}
+        maxWidth="lg"
         fullWidth={true}
       >
         <DialogTitle>
