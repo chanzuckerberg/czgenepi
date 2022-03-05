@@ -84,7 +84,7 @@ const EditSamplesConfirmationModal = ({
         open={open}
         onClose={onClose}
         maxWidth="lg"
-        fullWidth={true}
+        fullWidth
       >
         <DialogTitle>
           <StyledDiv>{closeIcon}</StyledDiv>
