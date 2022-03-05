@@ -35,8 +35,8 @@ export const InstructionsTitle = styled("div", {
   ${(props) => {
     const spaces = getSpaces(props);
     return `
-    margin-bottom: ${spaces?.xxs}px;
-  `;
+      margin-bottom: ${spaces?.xxs}px;
+    `;
   }}
   ${(props: HeaderProps) => {
     const { headerSize } = props;
