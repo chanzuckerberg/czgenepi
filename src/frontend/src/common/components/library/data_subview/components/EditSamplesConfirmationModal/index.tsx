@@ -79,7 +79,7 @@ const EditSamplesConfirmationModal = ({
   return (
     <>
       <Dialog
-        disableBackdropClick={true}
+        disableBackdropClick
         disableEscapeKeyDown={false}
         open={open}
         onClose={onClose}
