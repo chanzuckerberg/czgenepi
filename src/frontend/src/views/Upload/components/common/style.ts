@@ -1,15 +1,15 @@
 import styled from "@emotion/styled";
 import {
   Button,
+  CommonThemeProps,
   fontBodyS,
   fontHeaderXxl,
   getColors,
   getSpaces,
-  Props,
 } from "czifui";
 import Instructions from "src/components/Instructions";
 
-export function marginBottom(props: Props): string {
+export function marginBottom(props: CommonThemeProps): string {
   const spaces = getSpaces(props);
 
   return `

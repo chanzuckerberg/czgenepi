@@ -1,6 +1,6 @@
-import { Props } from "czifui";
+import { CommonThemeProps } from "czifui";
 
-export interface ExtraProps extends Props {
+export interface ExtraProps extends CommonThemeProps {
   narrow?: boolean;
 }
 

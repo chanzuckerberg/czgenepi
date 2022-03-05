@@ -1,8 +1,8 @@
 import styled from "@emotion/styled";
-import { getColors, getIconSizes, Props } from "czifui";
+import { CommonThemeProps, getColors, getIconSizes } from "czifui";
 import MoreActionsIcon from "src/common/icons/IconDotsHorizontal3Large.svg";
 
-interface ExtraProps extends Props {
+interface ExtraProps extends CommonThemeProps {
   disabled?: boolean;
 }
 

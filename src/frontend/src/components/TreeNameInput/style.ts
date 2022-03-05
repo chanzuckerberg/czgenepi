@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
 import {
+  CommonThemeProps,
   fontBodyXs,
   fontHeaderM,
   getColors,
@@ -8,7 +9,6 @@ import {
   getFontWeights,
   getIconSizes,
   getSpaces,
-  Props,
 } from "czifui";
 import Instructions from "src/components/Instructions";
 
@@ -27,7 +27,7 @@ export const StyledInstructions = styled(Instructions)`
 export const InstructionsSemiBold = styled.span`
   color: black;
   ${fontBodyXs}
-  ${(props: Props) => {
+  ${(props: CommonThemeProps) => {
     const fontWeights = getFontWeights(props);
     const spaces = getSpaces(props);
     return `

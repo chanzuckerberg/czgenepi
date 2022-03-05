@@ -1,7 +1,13 @@
 import styled from "@emotion/styled";
-import { fontHeaderS, getColors, getIconSizes, getSpaces, Props } from "czifui";
+import {
+  CommonThemeProps,
+  fontHeaderS,
+  getColors,
+  getIconSizes,
+  getSpaces,
+} from "czifui";
 
-interface AlignProps extends Props {
+interface AlignProps extends CommonThemeProps {
   align?: string;
 }
 
