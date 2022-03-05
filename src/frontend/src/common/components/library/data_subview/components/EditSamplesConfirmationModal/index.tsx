@@ -30,7 +30,7 @@ const EditSamplesConfirmationModal = ({
   open,
 }: Props): JSX.Element | null => {
   const numSamples = checkedSamples.length;
-  const title = `Edit Sample Metadata`;
+  const title = "Edit Sample Metadata";
 
   const HREF =
     "https://docs.google.com/document/d/1QxNcDip31DA40SRIOmdV1I_ZC7rWDz5YQGk26Mr2kfA/edit";
