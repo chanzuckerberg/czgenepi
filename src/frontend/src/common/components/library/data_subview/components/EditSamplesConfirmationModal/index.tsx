@@ -101,8 +101,8 @@ const EditSamplesConfirmationModal = ({
               headerSize="m"
               instructionListTitle="Importing Files"
               items={instructionItems}
-              shouldStartOpen={true}
-              secondInstructionListTitle={"File Requirements"}
+              shouldStartOpen
+              secondInstructionListTitle="File Requirements"
               secondSetItems={secondSetInstructionItems}
             />
           </Content>
