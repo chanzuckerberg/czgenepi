@@ -10,7 +10,7 @@ const centeredFlex = () => {
 
 export const GisaidLogo = styled.div`
   ${centeredFlex}
-  max-width: 157px;
+  max-width: 140px;
 `;
 
 export const NextstrainLogo = styled.div`
