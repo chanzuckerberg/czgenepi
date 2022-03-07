@@ -67,7 +67,6 @@ jobs:
           role-duration-seconds: 900
       - name: Get Stack Name
         id: stack-name
-        run: |
         uses: actions/github-script@0.9.0
         with:
           script: |
