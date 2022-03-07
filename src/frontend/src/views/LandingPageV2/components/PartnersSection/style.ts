@@ -1,17 +1,30 @@
 import styled from "@emotion/styled";
 
+const centeredFlex = () => {
+  return `
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  `;
+};
+
+export const GisaidLogo = styled.div`
+  ${centeredFlex}
+  max-width: 157px;
+`;
+
 export const NextstrainLogo = styled.div`
+  ${centeredFlex}
   max-width: 196px;
 `;
 
 export const PangolinLogo = styled.div`
+  ${centeredFlex}
   max-width: 171px;
 `;
 
 export const PartnerLink = styled.a`
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  ${centeredFlex}
   width: 100%;
   max-width: 242px;
   height: 118px;
@@ -20,7 +33,7 @@ export const PartnerLink = styled.a`
   cursor: pointer;
 
   &:nth-of-type(2) {
-    margin: 0 45px;
+    margin-left: 45px;
 
     @media (max-width: 768px) {
       margin: 45px 0;
@@ -32,17 +45,22 @@ export const PartnerLink = styled.a`
   }
 `;
 
-export const PartnersSectionContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 67px 22px;
+export const PartnerLinkRow = styled.div`
+  ${centeredFlex}
+  margin-bottom: 45px;
+  width: 100%;
 
   @media (max-width: 768px) {
     flex-direction: column;
+    margin-bottom: 0;
   }
 `;
 
+export const PartnersSectionContainer = styled.div`
+  padding: 67px 0;
+`;
+
 export const UsherLogo = styled.div`
+  ${centeredFlex}
   max-width: 107px;
 `;
