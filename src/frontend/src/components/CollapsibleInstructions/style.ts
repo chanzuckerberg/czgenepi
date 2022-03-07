@@ -50,9 +50,9 @@ export const SecondInstructionsTitle = styled("div", {
   ${(props) => {
     const spaces = getSpaces(props);
     return `
-    margin-bottom: ${spaces?.xxs}px;
-    margin-top: ${spaces?.l}px;
-  `;
+      margin-bottom: ${spaces?.xxs}px;
+      margin-top: ${spaces?.l}px;
+    `;
   }}
   ${(props: HeaderProps) => {
     const { headerSize } = props;
