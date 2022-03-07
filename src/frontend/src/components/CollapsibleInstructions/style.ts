@@ -13,8 +13,16 @@ export type SizeType = "xxxs" | "xxs" | "xs" | "s" | "m" | "l" | "xl" | "xxl";
 interface HeaderProps extends Props {
   headerSize: SizeType;
 }
+interface InstructionTitleProps extends HeaderProps {
+  marginBottom?: SizeType;
+}
 
 const doNotForwardProps = ["buttonSize", "headerSize", "listPadding"];
+
+const headerSize = (props: HeaderProps) => {
+  const { headerSize } = props;
+  return fontHeader(headerSize);
+};
 
 export const HeaderWrapper = styled("div", {
   shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
@@ -23,41 +31,35 @@ export const HeaderWrapper = styled("div", {
   align-items: baseline;
   color: black;
 
-  ${(props: HeaderProps) => {
-    const { headerSize } = props;
-    return fontHeader(headerSize);
-  }}
+  ${headerSize}
 `;
+
+const marginBottomInstructionsTitle = (props: InstructionTitleProps) => {
+  const { marginBottom } = props;
+  const spaces = getSpaces(props);
+  return `
+    margin-bottom: ${spaces && marginBottom && spaces[marginBottom]}px;
+  `;
+};
 
 export const InstructionsTitle = styled("div", {
   shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
 })`
-  ${(props) => {
-    const spaces = getSpaces(props);
-    return `
-      margin-bottom: ${spaces?.xxs}px;
-    `;
-  }}
-  ${(props: HeaderProps) => {
-    const { headerSize } = props;
-    return fontHeader(headerSize);
-  }}
+  ${marginBottomInstructionsTitle}
+  ${headerSize}
 `;
 
 export const SecondInstructionsTitle = styled("div", {
   shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
 })`
+  ${marginBottomInstructionsTitle}
   ${(props) => {
     const spaces = getSpaces(props);
     return `
-      margin-bottom: ${spaces?.xxs}px;
       margin-top: ${spaces?.l}px;
     `;
   }}
-  ${(props: HeaderProps) => {
-    const { headerSize } = props;
-    return fontHeader(headerSize);
-  }}
+  ${headerSize}
 `;
 
 interface InstructionsButtonProps extends Props {

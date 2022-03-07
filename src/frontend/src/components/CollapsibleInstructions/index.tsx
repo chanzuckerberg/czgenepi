@@ -21,6 +21,7 @@ interface Props {
   listPadding?: SizeType;
   ordered?: boolean;
   shouldStartOpen?: boolean;
+  InstructionsTitleMarginBottom?: SizeType;
 }
 
 const CollapsibleInstructions = ({
@@ -30,6 +31,7 @@ const CollapsibleInstructions = ({
   instructionListTitle,
   items,
   secondInstructionListTitle,
+  InstructionsTitleMarginBottom,
   secondSetItems,
   listPadding = "l",
   ordered,
@@ -61,7 +63,10 @@ const CollapsibleInstructions = ({
       {shouldShowInstructions && (
         <InstructionsWrapper listPadding={listPadding}>
           {instructionListTitle && (
-            <InstructionsTitle headerSize={headerSize}>
+            <InstructionsTitle
+              headerSize={headerSize}
+              marginBottom={InstructionsTitleMarginBottom}
+            >
               {instructionListTitle}
             </InstructionsTitle>
           )}
@@ -75,7 +80,10 @@ const CollapsibleInstructions = ({
             })}
           </List>
           {secondInstructionListTitle && (
-            <SecondInstructionsTitle headerSize={headerSize}>
+            <SecondInstructionsTitle
+              headerSize={headerSize}
+              marginBottom={InstructionsTitleMarginBottom}
+            >
               {secondInstructionListTitle}
             </SecondInstructionsTitle>
           )}

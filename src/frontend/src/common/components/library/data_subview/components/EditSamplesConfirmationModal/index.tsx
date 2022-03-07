@@ -104,6 +104,7 @@ const EditSamplesConfirmationModal = ({
               shouldStartOpen
               secondInstructionListTitle="File Requirements"
               secondSetItems={secondSetInstructionItems}
+              InstructionsTitleMarginBottom={"xxs"}
             />
           </Content>
         </DialogContent>
