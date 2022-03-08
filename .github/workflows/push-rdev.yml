@@ -78,6 +78,7 @@ jobs:
               return
             }
             const stackName = ref.slice(prefix.length)
+            console.log(`stackName: ${stackName}`)
             core.setOutput('stack-name', stackName)
       - name: Create or update rdev
         uses: chanzuckerberg/github-actions/.github/actions/deploy-happy-stack@acffbf5a0071c84c2296a1b6940024ea78e72b36
