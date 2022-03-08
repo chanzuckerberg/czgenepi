@@ -118,7 +118,7 @@ export default function LocationField({
           sdsStage: "userInput",
         }}
         InputDropdownProps={{ sdsStyle: "square", sdsStage: sdsStage }}
-        PopperComponent={(props) => (
+        PopperComponent={(props: any) => (
           <DropdownPopper placement="bottom-start" {...props} />
         )}
       />
