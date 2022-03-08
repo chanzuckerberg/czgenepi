@@ -15,8 +15,41 @@ import {
 } from "czifui";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
+import NextstrainLogoImg from "src/common/images/nextstrain-inline.svg";
 import { transparentScrollbars } from "src/common/styles/basicStyle";
 import Dialog from "src/components/Dialog";
+
+export const Attribution = styled.div`
+  ${fontBodyS}
+
+  display: flex;
+  align-items: center;
+
+  ${(props) => {
+    const colors = getColors(props);
+
+    return `
+      color: ${colors?.gray[600]};
+    `;
+  }}
+`;
+
+export const NextstrainLogo = styled(NextstrainLogoImg)`
+  width: 90px;
+`;
+
+export const ImageSizer = styled.div`
+  display: flex;
+  width: 42px;
+
+  ${(props) => {
+    const spaces = getSpaces(props);
+
+    return `
+      margin-top: ${spaces?.xxxs}px;
+    `;
+  }}
+`;
 
 export const StyledDialog = styled(Dialog)`
   display: flex;
