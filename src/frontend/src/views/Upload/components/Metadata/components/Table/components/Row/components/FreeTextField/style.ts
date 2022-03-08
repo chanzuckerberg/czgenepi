@@ -1,9 +1,9 @@
 import styled from "@emotion/styled";
 import TextField from "@material-ui/core/TextField";
-import { getSpaces, Props } from "czifui";
+import { CommonThemeProps, getSpaces } from "czifui";
 
 export const StyledTextField = styled(TextField)`
-  ${(props: Props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `

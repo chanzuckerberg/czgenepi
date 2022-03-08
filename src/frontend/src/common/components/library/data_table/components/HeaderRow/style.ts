@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
-import { Checkbox, getColors, getSpaces, Props } from "czifui";
+import { Checkbox, CommonThemeProps, getColors, getSpaces } from "czifui";
 
-interface ExtraProps extends Props {
+interface ExtraProps extends CommonThemeProps {
   shouldShowCheckboxes?: boolean;
 }
 

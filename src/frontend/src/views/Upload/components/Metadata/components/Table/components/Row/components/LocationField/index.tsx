@@ -1,5 +1,5 @@
 import FormHelperText from "@material-ui/core/FormHelperText";
-import { DefaultMenuSelectOption } from "czifui";
+import { DefaultMenuSelectOption, DropdownPopper } from "czifui";
 import { FormikContextType } from "formik";
 import { escapeRegExp } from "lodash/fp";
 import React from "react";
@@ -118,6 +118,9 @@ export default function LocationField({
           sdsStage: "userInput",
         }}
         InputDropdownProps={{ sdsStyle: "square", sdsStage: sdsStage }}
+        PopperComponent={(props: any) => (
+          <DropdownPopper placement="bottom-start" {...props} />
+        )}
       />
       <FormHelperText>
         {errorMessage ||

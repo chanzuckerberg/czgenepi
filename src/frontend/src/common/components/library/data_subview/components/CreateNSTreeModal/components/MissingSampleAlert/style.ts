@@ -1,11 +1,11 @@
 import styled from "@emotion/styled";
-import { fontBodyXs, getIconSizes, getSpaces, Props } from "czifui";
+import { CommonThemeProps, fontBodyXs, getIconSizes, getSpaces } from "czifui";
 import ArrowDownIcon from "src/common/icons/IconArrowDownSmall.svg";
 import ArrowUpIcon from "src/common/icons/IconArrowUpSmall.svg";
 import { transparentScrollbars } from "src/common/styles/basicStyle";
 import { StyledCallout as Callout } from "../../../FailedSampleAlert/style";
 
-const smallIcon = (props: Props) => {
+const smallIcon = (props: CommonThemeProps) => {
   const iconSizes = getIconSizes(props);
   return `
     flex: 0 0 auto;
