@@ -3,6 +3,7 @@ import { FormControlLabel, Radio, TextField } from "@material-ui/core";
 import InfoOutlinedIcon from "@material-ui/icons/InfoOutlined";
 import {
   Button,
+  CommonThemeProps,
   fontBodyS,
   fontBodyXxs,
   fontBodyXxxs,
@@ -10,7 +11,6 @@ import {
   getColors,
   getFontWeights,
   getSpaces,
-  Props,
   Tooltip,
 } from "czifui";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
@@ -151,7 +151,7 @@ export const CreateTreeInfo = styled.div`
   }}
 `;
 
-interface SeparatorProps extends Props {
+interface SeparatorProps extends CommonThemeProps {
   marginSize: "l" | "xl";
 }
 

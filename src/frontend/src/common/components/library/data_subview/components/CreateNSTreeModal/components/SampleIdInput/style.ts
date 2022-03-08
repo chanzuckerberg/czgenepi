@@ -2,17 +2,17 @@ import styled from "@emotion/styled";
 import { TextField } from "@material-ui/core";
 import {
   Button,
+  CommonThemeProps,
   fontBodyXs,
   getColors,
   getCorners,
   getIconSizes,
   getSpaces,
-  Props,
 } from "czifui";
 import LoadingAnimation from "src/common/icons/IconLoadingAnimated.svg";
 import { transparentScrollbars } from "src/common/styles/basicStyle";
 
-const inputPadding = (props: Props) => {
+const inputPadding = (props: CommonThemeProps) => {
   const spaces = getSpaces(props);
   return `
     .MuiInputBase-root {
@@ -21,7 +21,7 @@ const inputPadding = (props: Props) => {
   `;
 };
 
-interface ExtraProps extends Props {
+interface ExtraProps extends CommonThemeProps {
   disabled?: boolean;
 }
 

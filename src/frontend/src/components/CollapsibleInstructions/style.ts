@@ -1,17 +1,17 @@
 import styled from "@emotion/styled";
 import {
   Button,
+  CommonThemeProps,
   fontCaps,
   fontHeader,
   fontHeaderXs,
   getColors,
   getSpaces,
-  Props,
 } from "czifui";
 
 export type CapsSizeType = "xxxxs" | "xxxs" | "xxs";
 export type SizeType = "xxxs" | "xxs" | "xs" | "s" | "m" | "l" | "xl" | "xxl";
-interface HeaderProps extends Props {
+interface HeaderProps extends CommonThemeProps {
   headerSize: SizeType;
 }
 
@@ -30,7 +30,7 @@ export const HeaderWrapper = styled("div", {
   }}
 `;
 
-interface InstructionsButtonProps extends Props {
+interface InstructionsButtonProps extends CommonThemeProps {
   buttonSize: CapsSizeType;
 }
 
@@ -54,7 +54,7 @@ export const StyledInstructionsButton = styled(Button, {
   }}
 `;
 
-interface InstructionsWrapperProps extends Props {
+interface InstructionsWrapperProps extends CommonThemeProps {
   listPadding: SizeType;
 }
 

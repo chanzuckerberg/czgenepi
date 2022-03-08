@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
-import { getColors, getIconSizes, getSpaces, Props } from "czifui";
+import { CommonThemeProps, getColors, getIconSizes, getSpaces } from "czifui";
 
-export interface ExtraProps extends Props {
+export interface ExtraProps extends CommonThemeProps {
   disabled?: boolean;
 }
 

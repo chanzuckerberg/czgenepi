@@ -4,12 +4,7 @@ import {
   TableRow,
   TableRowProps as MuiTableRowProps,
 } from "@material-ui/core";
-import {
-  fontHeaderS,
-  getColors,
-  getSpaces,
-  Props as CzifuiProps,
-} from "czifui";
+import { CommonThemeProps, fontHeaderS, getColors, getSpaces } from "czifui";
 
 export const Id = styled.div`
   ${fontHeaderS}
@@ -29,7 +24,7 @@ export const Id = styled.div`
   }}
 `;
 
-interface TableRowProps extends MuiTableRowProps, CzifuiProps {
+interface TableRowProps extends MuiTableRowProps, CommonThemeProps {
   component: "div";
 }
 

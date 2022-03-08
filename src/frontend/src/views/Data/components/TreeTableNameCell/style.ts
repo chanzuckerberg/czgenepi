@@ -1,9 +1,15 @@
 import styled from "@emotion/styled";
-import { fontBodyXxs, getColors, getIconSizes, getSpaces, Props } from "czifui";
+import {
+  CommonThemeProps,
+  fontBodyXxs,
+  getColors,
+  getIconSizes,
+  getSpaces,
+} from "czifui";
 import { StyledInfoOutlinedIcon as InfoIcon } from "src/common/components/library/data_subview/components/CreateNSTreeModal/style";
 import { TreeRowContent } from "src/common/components/library/data_table/style";
 
-export interface ExtraProps extends Props {
+export interface ExtraProps extends CommonThemeProps {
   disabled?: boolean;
 }
 
@@ -54,7 +60,7 @@ export const StyledTreeCreator = styled.div`
   }}
 `;
 
-const xSmallIcon = (props: Props) => {
+const xSmallIcon = (props: CommonThemeProps) => {
   const iconSizes = getIconSizes(props);
   return `
     flex: 0 0 auto;
