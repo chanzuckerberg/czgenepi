@@ -45,7 +45,7 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-duration-seconds: 900
       - name: Build And Push
-        uses: chanzuckerberg/github-actions/.github/actions/docker-build-push@a9d5b0b1c7b2f880edb1afd4572635ce27b78442
+        uses: chanzuckerberg/github-actions/.github/actions/docker-build-push@a668493617347bd4c0217972d6474aae073a49bb
         with:
           dockerfile: ${{ matrix.image.dockerfile }}
           context: ${{ matrix.image.context }}
@@ -80,7 +80,9 @@ jobs:
             const stackName = ref.slice(length(prefix))
             core.setOutput('stack-name', stackName)
       - name: Create or update rdev
-        uses: chanzuckerberg/github-actions/.github/actions/deploy-happy-stack@a9d5b0b1c7b2f880edb1afd4572635ce27b78442
+        uses: chanzuckerberg/github-actions/.github/actions/deploy-happy-stack@a668493617347bd4c0217972d6474aae073a49bb
         with:
           tfe-token: ${{ secrets.TFE_TOKEN }}
           stack-name: ${{ steps.stack-name.stack-name }}
+# context.payload.pull_request.base.ref
+# context.payload.pull_request.head.ref
