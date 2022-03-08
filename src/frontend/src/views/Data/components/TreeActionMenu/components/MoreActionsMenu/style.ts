@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
-import { getColors, Props } from "czifui";
+import { CommonThemeProps, getColors } from "czifui";
 
-interface ExtraProps extends Props {
+interface ExtraProps extends CommonThemeProps {
   isWarning?: boolean;
 }
 
