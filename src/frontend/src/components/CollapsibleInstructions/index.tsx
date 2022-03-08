@@ -2,13 +2,13 @@ import { List, ListItem } from "czifui";
 import React, { useState } from "react";
 import {
   CapsSizeType,
+  FontBodySizeType,
   HeaderWrapper,
   InstructionsTitle,
   InstructionsWrapper,
   SecondInstructionsTitle,
   SizeType,
   StyledInstructionsButton,
-  FontBodySizeType
 } from "./style";
 
 interface Props {
@@ -33,7 +33,7 @@ const CollapsibleInstructions = ({
   instructionListTitle,
   items,
   secondInstructionListTitle,
-  InstructionsTitleMarginBottom,
+  InstructionsTitleMarginBottom = "xxs",
   secondSetItems,
   listPadding = "l",
   listItemFontSize = "s",
@@ -57,6 +57,20 @@ const CollapsibleInstructions = ({
     </StyledInstructionsButton>
   );
 
+  const listItems = (items: React.ReactNode[]): JSX.Element => {
+    return (
+      <List ordered={ordered}>
+        {items.map((item, index) => {
+          return (
+            <ListItem fontSize={listItemFontSize} key={index} ordered={ordered}>
+              {item}
+            </ListItem>
+          );
+        })}
+      </List>
+    );
+  };
+
   return (
     <>
       <HeaderWrapper headerSize={headerSize}>
@@ -73,19 +87,7 @@ const CollapsibleInstructions = ({
               {instructionListTitle}
             </InstructionsTitle>
           )}
-          <List ordered={ordered}>
-            {items.map((item, index) => {
-              return (
-                <ListItem
-                  fontSize={listItemFontSize}
-                  key={index}
-                  ordered={ordered}
-                >
-                  {item}
-                </ListItem>
-              );
-            })}
-          </List>
+          {listItems(items)}
           {secondInstructionListTitle && (
             <SecondInstructionsTitle
               headerSize={headerSize}
@@ -94,21 +96,7 @@ const CollapsibleInstructions = ({
               {secondInstructionListTitle}
             </SecondInstructionsTitle>
           )}
-          {secondSetItems && (
-            <List ordered={ordered}>
-              {secondSetItems.map((item, index) => {
-                return (
-                  <ListItem
-                    fontSize={listItemFontSize}
-                    key={index}
-                    ordered={ordered}
-                  >
-                    {item}
-                  </ListItem>
-                );
-              })}
-            </List>
-          )}
+          {secondSetItems && listItems(secondSetItems)}
         </InstructionsWrapper>
       )}
     </>

@@ -10,7 +10,14 @@ import {
 
 export type CapsSizeType = "xxxxs" | "xxxs" | "xxs";
 // font size used for list items
-export type FontBodySizeType = "s" | "xs" | "xxxs" | "xxs" | "m" | "l" | undefined;
+export type FontBodySizeType =
+  | "s"
+  | "xs"
+  | "xxxs"
+  | "xxs"
+  | "m"
+  | "l"
+  | undefined;
 export type SizeType = "xxxs" | "xxs" | "xs" | "s" | "m" | "l" | "xl" | "xxl";
 interface HeaderProps extends Props {
   headerSize: SizeType;
