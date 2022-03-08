@@ -8,6 +8,7 @@ import {
   SecondInstructionsTitle,
   SizeType,
   StyledInstructionsButton,
+  FontBodySizeType
 } from "./style";
 
 interface Props {
@@ -22,6 +23,7 @@ interface Props {
   ordered?: boolean;
   shouldStartOpen?: boolean;
   InstructionsTitleMarginBottom?: SizeType;
+  listItemFontSize?: FontBodySizeType;
 }
 
 const CollapsibleInstructions = ({
@@ -34,6 +36,7 @@ const CollapsibleInstructions = ({
   InstructionsTitleMarginBottom,
   secondSetItems,
   listPadding = "l",
+  listItemFontSize = "s",
   ordered,
   shouldStartOpen = false,
 }: Props): JSX.Element => {
@@ -73,7 +76,11 @@ const CollapsibleInstructions = ({
           <List ordered={ordered}>
             {items.map((item, index) => {
               return (
-                <ListItem fontSize="s" key={index} ordered={ordered}>
+                <ListItem
+                  fontSize={listItemFontSize}
+                  key={index}
+                  ordered={ordered}
+                >
                   {item}
                 </ListItem>
               );
@@ -91,7 +98,11 @@ const CollapsibleInstructions = ({
             <List ordered={ordered}>
               {secondSetItems.map((item, index) => {
                 return (
-                  <ListItem fontSize="s" key={index} ordered={ordered}>
+                  <ListItem
+                    fontSize={listItemFontSize}
+                    key={index}
+                    ordered={ordered}
+                  >
                     {item}
                   </ListItem>
                 );

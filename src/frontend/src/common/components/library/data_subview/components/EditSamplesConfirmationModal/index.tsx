@@ -98,13 +98,14 @@ const EditSamplesConfirmationModal = ({
           <Content>
             <CollapsibleInstructions
               header="Import Data from TSV or CSV File"
-              headerSize="m"
+              headerSize="s"
               instructionListTitle="Importing Files"
               items={instructionItems}
               shouldStartOpen
               secondInstructionListTitle="File Requirements"
               secondSetItems={secondSetInstructionItems}
-              InstructionsTitleMarginBottom={"xxs"}
+              InstructionsTitleMarginBottom="xxs"
+              listItemFontSize="xs"
             />
           </Content>
         </DialogContent>
