@@ -67,11 +67,12 @@ jobs:
           role-duration-seconds: 900
       - name: Get Stack Name
         id: stack-name
-        uses: actions/github-script@0.9.0
+        uses: actions/github-script@v6
         with:
           script: |
             const prefix = "rdev-"
             const ref = context.ref_name
+            console.log(`our context ${context}`)
             if (!ref.startswith(prefix)) {
               core.error(`ref ${ref} did not start with ${prefix}`)
               return
