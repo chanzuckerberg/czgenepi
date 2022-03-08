@@ -72,8 +72,8 @@ jobs:
           script: |
             const prefix = "rdev-"
             const ref = context.ref_name
-            console.log(`our context ${context}`)
-            if (!ref.startswith(prefix)) {
+            console.log(`our context ${JSON.stringify(context)}, ref: ${ref}`)
+            if (!ref.startsWith(prefix)) {
               core.error(`ref ${ref} did not start with ${prefix}`)
               return
             }
