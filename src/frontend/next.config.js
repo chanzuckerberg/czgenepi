@@ -62,6 +62,16 @@ module.exports = ({
     ];
   },
 
+  async redirects() {
+    return [
+      {
+        source: "/security.txt",
+        destination: "/.well-known/security.txt",
+        permanent: true,
+      },
+    ];
+  },
+
   webpack(config) {
     config.module.rules.push({
       test: /\.svg$/,

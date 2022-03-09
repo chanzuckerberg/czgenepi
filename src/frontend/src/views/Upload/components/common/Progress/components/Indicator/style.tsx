@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { fontHeaderXxs, getColors, Props } from "czifui";
+import { CommonThemeProps, fontHeaderXxs, getColors } from "czifui";
 import { Circle } from "src/components/Circle";
 import { Status } from "../common";
 
@@ -23,7 +23,7 @@ export const Text = styled.span`
   }}
 `;
 
-interface CircleProps extends Props {
+interface CircleProps extends CommonThemeProps {
   status: Status;
 }
 

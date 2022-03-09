@@ -4,6 +4,7 @@ export enum ROUTES {
   CAREERS = "https://chanzuckerberg.com/careers/career-opportunities/?initiative=science",
   CZI = "https://chanzuckerberg.com/",
   DATA = "/data",
+  GISAID = "https://www.gisaid.org/",
   GITHUB = "https://github.com/chanzuckerberg/czgenepi/",
   LOGIN = "/login",
   NEXTSTRAIN = "https://nextstrain.org/",

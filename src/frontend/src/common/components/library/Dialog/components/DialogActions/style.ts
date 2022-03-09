@@ -1,9 +1,9 @@
 import styled from "@emotion/styled";
 import { DialogActions } from "@material-ui/core";
-import { getSpaces, Props } from "czifui";
+import { CommonThemeProps, getSpaces } from "czifui";
 import { narrow } from "../common";
 
-export interface ExtraProps extends Props {
+export interface ExtraProps extends CommonThemeProps {
   narrow?: boolean;
 }
 

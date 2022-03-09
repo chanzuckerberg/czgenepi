@@ -67,14 +67,13 @@ task nextstrain_workflow {
     )
 
     # set up ncov. keep the fetch command in case want to overwrite the version in Docker image
-    (rm -r /ncov
-     mkdir /ncov
-     cd /ncov &&
-     git init &&
-     git fetch --depth 1 https://github.com/nextstrain/ncov.git 44223bcd5249e53eb9a67fb2cc9f2efef77ff530 &&
-     git checkout FETCH_HEAD
-     patch workflow/snakemake_rules/main_workflow.smk < /usr/src/app/aspen/workflows/nextstrain_run/patches/seqtk.patch
-    )
+#    (rm -r /ncov
+#     mkdir /ncov
+#     cd /ncov &&
+#     git init &&
+#     git fetch --depth 1 https://github.com/chanzuckerberg/ncov.git danrlu/move_to_fork &&
+#     git checkout FETCH_HEAD
+#    )
     ncov_git_rev=$(cd /ncov && git rev-parse HEAD)
 
     mkdir -p /ncov/my_profiles/aspen /ncov/results

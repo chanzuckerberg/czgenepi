@@ -18,7 +18,7 @@ export const StyledDropdown = styled(Dropdown)`
 
     return `
       padding-right: ${spaces?.l}px;
-      &:hover { 
+      &:hover {
         border: ${borders?.gray[500]}
       }
     `;

@@ -1,15 +1,15 @@
 import styled from "@emotion/styled";
 import {
   Chip,
+  CommonThemeProps,
   ComplexFilter,
   fontCapsXxxs,
   getColors,
   getSpaces,
   InputDropdown,
-  Props,
 } from "czifui";
 
-export interface ExtraProps extends Props {
+export interface ExtraProps extends CommonThemeProps {
   isOpen?: boolean;
 }
 

@@ -40,9 +40,9 @@ const NavBarLoggedIn = (): JSX.Element => {
         <Link href={route} passHref>
           <LogoAnchor href="passHref">
             <Logo data-test-id="logo" />
+            {orgSplash}
           </LogoAnchor>
         </Link>
-        {orgSplash}
       </div>
 
       <div className={style.right}>

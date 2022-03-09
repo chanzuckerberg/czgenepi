@@ -6,12 +6,7 @@ import {
   TableRow,
   TableRowProps as MuiTableRowProps,
 } from "@material-ui/core";
-import {
-  fontBodyXs,
-  fontHeaderXs,
-  getColors,
-  Props as CzifuiProps,
-} from "czifui";
+import { CommonThemeProps, fontBodyXs, fontHeaderXs, getColors } from "czifui";
 
 export const Overflow = styled.div`
   overflow: auto;
@@ -38,7 +33,7 @@ export const StyledTableHead = styled(TableHead)`
   ${fontHeaderXs}
 `;
 
-interface TableRowProps extends MuiTableRowProps, CzifuiProps {
+interface TableRowProps extends MuiTableRowProps, CommonThemeProps {
   component: "div";
 }
 

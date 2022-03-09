@@ -1,5 +1,11 @@
 import styled from "@emotion/styled";
-import { Checkbox, fontHeaderXs, getColors, getSpaces, Props } from "czifui";
+import {
+  Checkbox,
+  CommonThemeProps,
+  fontHeaderXs,
+  getColors,
+  getSpaces,
+} from "czifui";
 
 export const TableRow = styled.div`
   display: flex;
@@ -16,7 +22,7 @@ export const TableRow = styled.div`
   }}
 `;
 
-export interface ExtraProps extends Props {
+export interface ExtraProps extends CommonThemeProps {
   header?: Header;
 }
 
@@ -59,7 +65,7 @@ export const TreeRowContent = styled.div`
   }}
 `;
 
-export const icon = (props: Props): string => {
+export const icon = (props: CommonThemeProps): string => {
   const colors = getColors(props);
   const spaces = getSpaces(props);
 
