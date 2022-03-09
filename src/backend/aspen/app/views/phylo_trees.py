@@ -213,21 +213,6 @@ def _get_selected_samples(db_session, phylo_tree_id):
     return selected_samples
 
 
-@application.route("/api/phylo_tree/<int:phylo_tree_id>", methods=["GET"])
-@requires_auth
-def phylo_tree(phylo_tree_id: int):
-    phylo_tree_data = _process_phylo_tree(
-        g.db_session, phylo_tree_id, g.auth_user, request.args.get("id_style")
-    )
-    response = make_response(phylo_tree_data)
-    response.headers["Content-Type"] = "application/json"
-    response.headers[
-        "Content-Disposition"
-    ] = f"attachment; filename={phylo_tree_id}.json"
-
-    return response
-
-
 def _extract_accessions(accessions_list: list, node: dict):
     node_attributes = node.get("node_attrs", {})
     if "external_accession" in node_attributes:

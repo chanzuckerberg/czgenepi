@@ -8,6 +8,7 @@ import sentry_sdk
 import sqlalchemy as sa
 from boto3 import Session
 from fastapi import APIRouter, Depends
+from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
@@ -24,7 +25,11 @@ from aspen.api.schemas.phylo_runs import (
     PhyloRunUpdateRequest,
 )
 from aspen.api.settings import Settings
-from aspen.api.utils import get_matching_gisaid_ids, get_missing_and_found_sample_ids
+from aspen.api.utils import (
+    get_matching_gisaid_ids,
+    get_missing_and_found_sample_ids,
+    process_phylo_tree,
+)
 from aspen.app.views.api_utils import authz_sample_filters
 from aspen.database.models import (
     AlignedGisaidDump,
@@ -297,3 +302,24 @@ async def update_phylo_tree_and_run(
     await db.commit()
 
     return PhyloRunResponse.from_orm(phylo_run)
+
+
+@router.get("/{item_id}")
+async def get_single_phylo_tree(
+    item_id: int,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    user: User = Depends(get_auth_user),
+):
+    print("Phylo tree:", item_id)
+    phylo_tree_data = await process_phylo_tree(
+        db, user, item_id, request.query_params.get("id_style")
+    )
+    headers = {
+        "Content-Type": "application/json",
+        "Content-Disposition": f"attachment; filename={item_id}.json",
+    }
+    return JSONResponse(content=phylo_tree_data, headers=headers)
+
+    return response
