@@ -4,18 +4,34 @@ import {
   CommonThemeProps,
   fontCaps,
   fontHeader,
-  fontHeaderXs,
   getColors,
   getSpaces,
 } from "czifui";
 
 export type CapsSizeType = "xxxxs" | "xxxs" | "xxs";
+// font size used for list items
+export type FontBodySizeType =
+  | "s"
+  | "xs"
+  | "xxxs"
+  | "xxs"
+  | "m"
+  | "l"
+  | undefined;
 export type SizeType = "xxxs" | "xxs" | "xs" | "s" | "m" | "l" | "xl" | "xxl";
 interface HeaderProps extends CommonThemeProps {
   headerSize: SizeType;
 }
+interface InstructionTitleProps extends HeaderProps {
+  marginBottom?: SizeType;
+}
 
 const doNotForwardProps = ["buttonSize", "headerSize", "listPadding"];
+
+const headerSize = (props: HeaderProps) => {
+  const { headerSize } = props;
+  return fontHeader(headerSize);
+};
 
 export const HeaderWrapper = styled("div", {
   shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
@@ -24,10 +40,35 @@ export const HeaderWrapper = styled("div", {
   align-items: baseline;
   color: black;
 
-  ${(props: HeaderProps) => {
-    const { headerSize } = props;
-    return fontHeader(headerSize);
+  ${headerSize}
+`;
+
+const marginBottomInstructionsTitle = (props: InstructionTitleProps) => {
+  const { marginBottom } = props;
+  const spaces = getSpaces(props);
+  return `
+    margin-bottom: ${spaces && marginBottom && spaces[marginBottom]}px;
+  `;
+};
+
+export const InstructionsTitle = styled("div", {
+  shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
+})`
+  ${marginBottomInstructionsTitle}
+  ${headerSize}
+`;
+
+export const SecondInstructionsTitle = styled("div", {
+  shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
+})`
+  ${marginBottomInstructionsTitle}
+  ${(props) => {
+    const spaces = getSpaces(props);
+    return `
+      margin-top: ${spaces?.l}px;
+    `;
   }}
+  ${headerSize}
 `;
 
 interface InstructionsButtonProps extends CommonThemeProps {
@@ -73,17 +114,6 @@ export const InstructionsWrapper = styled("div", {
       background-color: ${colors?.gray[100]};
       margin-bottom: ${spaces?.xs}px;
       padding: ${spaces?.[listPadding]}px;
-    `;
-  }}
-`;
-
-export const InstructionsTitle = styled.div`
-  ${fontHeaderXs}
-
-  ${(props) => {
-    const spaces = getSpaces(props);
-    return `
-      margin-bottom: ${spaces?.xxs}px;
     `;
   }}
 `;
