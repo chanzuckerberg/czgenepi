@@ -2,6 +2,7 @@
 import ListItemText from "@material-ui/core/ListItemText";
 import { List } from "czifui";
 import React from "react";
+import { SampleFiltering } from "../SampleFiltering";
 import {
   Label,
   LabelMain,
@@ -16,6 +17,9 @@ interface Props {
   selected: boolean;
 }
 
+// VOODOO TODO use feature flag here
+const isSampleFilteringEnabled = true;
+
 export const RadioLabelOverview = ({ selected }: Props): JSX.Element => {
   return (
     <div>
@@ -27,43 +31,46 @@ export const RadioLabelOverview = ({ selected }: Props): JSX.Element => {
         ratio of roughly 2:1.
       </SmallText>
       {selected && (
-        <List>
-          <StyledListItem button={false as any}>
-            <StyledListItemIcon>
-              <StyledIconCheckSmall />
-            </StyledListItemIcon>
-            <ListItemText>
-              <SmallText>
-                Best for seeing an overall picture of viral diversity within
-                your jurisdiction in the past 12 weeks, in the context of
-                genetically similar GISAID samples from outside of your
-                jurisdiction.
-              </SmallText>
-            </ListItemText>
-          </StyledListItem>
-          <StyledListItem button={false as any}>
-            <StyledListItemIcon>
-              <StyledIconCheckSmall />
-            </StyledListItemIcon>
-            <ListItemText>
-              <SmallText>
-                Good for identifying possible local outbreaks.
-              </SmallText>
-            </ListItemText>
-          </StyledListItem>
-          <StyledListItem button={false as any}>
-            <StyledListItemIcon>
-              <StyledIconCheckSmall />
-            </StyledListItemIcon>
-            <ListItemText>
-              <SmallText>
-                Good for creating the same tree type as the CZ GEN EPI automatic
-                build, while ensuring that all selected samples will be included
-                in the tree.
-              </SmallText>
-            </ListItemText>
-          </StyledListItem>
-        </List>
+        <>
+          <List>
+            <StyledListItem button={false as any}>
+              <StyledListItemIcon>
+                <StyledIconCheckSmall />
+              </StyledListItemIcon>
+              <ListItemText>
+                <SmallText>
+                  Best for seeing an overall picture of viral diversity within
+                  your jurisdiction in the past 12 weeks, in the context of
+                  genetically similar GISAID samples from outside of your
+                  jurisdiction.
+                </SmallText>
+              </ListItemText>
+            </StyledListItem>
+            <StyledListItem button={false as any}>
+              <StyledListItemIcon>
+                <StyledIconCheckSmall />
+              </StyledListItemIcon>
+              <ListItemText>
+                <SmallText>
+                  Good for identifying possible local outbreaks.
+                </SmallText>
+              </ListItemText>
+            </StyledListItem>
+            <StyledListItem button={false as any}>
+              <StyledListItemIcon>
+                <StyledIconCheckSmall />
+              </StyledListItemIcon>
+              <ListItemText>
+                <SmallText>
+                  Good for creating the same tree type as the CZ GEN EPI
+                  automatic build, while ensuring that all selected samples will
+                  be included in the tree.
+                </SmallText>
+              </ListItemText>
+            </StyledListItem>
+          </List>
+          {isSampleFilteringEnabled && <SampleFiltering />}
+        </>
       )}
     </div>
   );
@@ -122,41 +129,44 @@ export const RadioLabelNonContextualized = ({
         GISAID.
       </SmallText>
       {selected && (
-        <List>
-          <StyledListItem button={false as any}>
-            <StyledListItemIcon>
-              <StyledIconCheckSmall />
-            </StyledListItemIcon>
-            <ListItemText>
-              <SmallText>
-                Best for uncovering sampling bias in your own sampling effort.
-              </SmallText>
-            </ListItemText>
-          </StyledListItem>
-          <StyledListItem button={false as any}>
-            <StyledListItemIcon>
-              <StyledIconCheckSmall />
-            </StyledListItemIcon>
-            <ListItemText>
-              <SmallText>
-                Good for seeing viral diversity in your jurisdiction that may
-                not be captured by your own sampling effort.
-              </SmallText>
-            </ListItemText>
-          </StyledListItem>
-          <StyledListItem button={false as any}>
-            <StyledListItemIcon>
-              <StyledIconXSmall />
-            </StyledListItemIcon>
-            <ListItemText>
-              <SmallText>
-                Not recommended for epidemiological interpretation due to lack
-                of visibility into viral diversity outside of your jurisdiction
-                and omission of closely-related samples.
-              </SmallText>
-            </ListItemText>
-          </StyledListItem>
-        </List>
+        <>
+          <List>
+            <StyledListItem button={false as any}>
+              <StyledListItemIcon>
+                <StyledIconCheckSmall />
+              </StyledListItemIcon>
+              <ListItemText>
+                <SmallText>
+                  Best for uncovering sampling bias in your own sampling effort.
+                </SmallText>
+              </ListItemText>
+            </StyledListItem>
+            <StyledListItem button={false as any}>
+              <StyledListItemIcon>
+                <StyledIconCheckSmall />
+              </StyledListItemIcon>
+              <ListItemText>
+                <SmallText>
+                  Good for seeing viral diversity in your jurisdiction that may
+                  not be captured by your own sampling effort.
+                </SmallText>
+              </ListItemText>
+            </StyledListItem>
+            <StyledListItem button={false as any}>
+              <StyledListItemIcon>
+                <StyledIconXSmall />
+              </StyledListItemIcon>
+              <ListItemText>
+                <SmallText>
+                  Not recommended for epidemiological interpretation due to lack
+                  of visibility into viral diversity outside of your
+                  jurisdiction and omission of closely-related samples.
+                </SmallText>
+              </ListItemText>
+            </StyledListItem>
+          </List>
+          {isSampleFilteringEnabled && <SampleFiltering />}
+        </>
       )}
     </div>
   );
