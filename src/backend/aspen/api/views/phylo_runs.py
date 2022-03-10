@@ -8,7 +8,6 @@ import sentry_sdk
 import sqlalchemy as sa
 from boto3 import Session
 from fastapi import APIRouter, Depends
-from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
@@ -25,11 +24,7 @@ from aspen.api.schemas.phylo_runs import (
     PhyloRunUpdateRequest,
 )
 from aspen.api.settings import Settings
-from aspen.api.utils import (
-    get_matching_gisaid_ids,
-    get_missing_and_found_sample_ids,
-    process_phylo_tree,
-)
+from aspen.api.utils import get_matching_gisaid_ids, get_missing_and_found_sample_ids
 from aspen.app.views.api_utils import authz_sample_filters
 from aspen.database.models import (
     AlignedGisaidDump,
