@@ -16,7 +16,7 @@ from typing import (
 
 import boto3
 import sqlalchemy as sa
-from flask import g, jsonify, make_response, request
+from flask import g, jsonify, request
 from sqlalchemy import or_
 from sqlalchemy.orm import aliased, contains_eager, joinedload, Query, Session
 

@@ -33,20 +33,24 @@ def _rename_nodes_on_tree(
     return node
 
 
-async def verify_phylo_tree_access(
+async def verify_and_access_phylo_tree(
     db: AsyncSession, user: User, phylo_tree_id: int, load_samples: bool = False
-) -> Tuple[bool, Optional[PhyloTree]]:
+) -> Tuple[bool, Optional[PhyloTree], Optional[PhyloRun]]:
     tree_query = sa.select(PhyloTree).join(PhyloRun)  # type: ignore
     if load_samples:
         tree_query = tree_query.options(selectinload(PhyloTree.constituent_samples))  # type: ignore
     authz_tree_query = authz_phylo_tree_filters(tree_query, user, set([phylo_tree_id]))  # type: ignore
     authz_tree_query_result = await db.execute(authz_tree_query)
-    phylo_tree: PhyloTree
+    phylo_tree: Optional[PhyloTree]
     try:
         phylo_tree = authz_tree_query_result.scalars().unique().one()
     except sa.exc.NoResultFound:  # type: ignore
-        return False, None
-    return True, phylo_tree
+        return False, None, None
+    run_query = sa.select(PhyloRun).join(PhyloTree).filter(PhyloTree.entity_id == phylo_tree.entity_id).options(selectinload(PhyloRun.group))  # type: ignore
+    run_query_result = await db.execute(run_query)
+    phylo_run: Optional[PhyloRun]
+    phylo_run = run_query_result.scalars().unique().one()
+    return True, phylo_tree, phylo_run
 
 
 def _sample_filter(sample: Sample, can_see_pi_group_ids: Set[int], system_admin: bool):
@@ -58,12 +62,15 @@ def _sample_filter(sample: Sample, can_see_pi_group_ids: Set[int], system_admin:
 async def process_phylo_tree(
     db: AsyncSession, user: User, phylo_tree_id: int, id_style: Optional[str] = None
 ) -> dict:
-    authorized, phylo_tree_result = await verify_phylo_tree_access(
-        db, user, phylo_tree_id, load_samples=True
-    )
+    (
+        authorized,
+        phylo_tree_result,
+        phylo_run_result,
+    ) = await verify_and_access_phylo_tree(db, user, phylo_tree_id, load_samples=True)
     if not authorized or not phylo_tree_result:
         raise ex.BadRequestException("No phylo run found for auspice request")
     phylo_tree: PhyloTree = phylo_tree_result
+    phylo_run: PhyloRun = phylo_run_result
 
     s3 = boto3.resource(
         "s3",
@@ -93,15 +100,13 @@ async def process_phylo_tree(
     # read access to, then load a map of ALL public:private identifiers for that
     # group so we can translate public ID's to private ID's on the tree.
     identifier_map: Dict[str, str] = {}
-    tree_owner_group = phylo_tree.producing_workflow.group
-    if user.system_admin or tree_owner_group.id in can_see_group_ids_pi:
-        all_translatable_samples = (
-            db_session.execute(
-                sa.select(Sample).where(Sample.submitting_group == tree_owner_group)  # type: ignore
-            )
-            .scalars()
-            .all()
-        )
+    tree_owner_group = phylo_run.group
+    if user.system_admin or tree_owner_group.id in can_see_pi_group_ids:
+        all_translatable_samples = [
+            sample
+            for sample in phylo_tree.constituent_samples
+            if sample.submitting_group_id == tree_owner_group.id
+        ]
         for sample in all_translatable_samples:
             public_id = sample.public_identifier.replace("hCoV-19/", "")
             identifier_map[public_id] = sample.private_identifier

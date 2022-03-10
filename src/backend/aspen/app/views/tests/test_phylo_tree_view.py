@@ -2,8 +2,6 @@ import json
 import random
 from typing import Collection, List, Mapping, Sequence, Tuple, Union
 
-from botocore.client import ClientError
-
 from aspen.app.views.phylo_trees import PHYLO_TREE_KEY
 from aspen.database.models import (
     CanSee,

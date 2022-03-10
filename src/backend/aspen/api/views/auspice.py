@@ -18,7 +18,7 @@ from aspen.api.schemas.auspice import (
     GenerateAuspiceMagicLinkResponse,
 )
 from aspen.api.settings import Settings
-from aspen.api.utils import process_phylo_tree, verify_phylo_tree_access
+from aspen.api.utils import process_phylo_tree, verify_and_access_phylo_tree
 from aspen.database.models import Group, User
 
 router = APIRouter()
@@ -34,9 +34,11 @@ async def generate_auspice_string(
     request_body = await request.json()
     validated_body = GenerateAuspiceMagicLinkRequest.parse_obj(request_body)
     phylo_tree_id = validated_body.tree_id
-    authorized_tree_access, _phylo_tree = await verify_phylo_tree_access(
-        db, user, phylo_tree_id
-    )
+    (
+        authorized_tree_access,
+        _phylo_tree,
+        _phylo_run,
+    ) = await verify_and_access_phylo_tree(db, user, phylo_tree_id)
     if not authorized_tree_access:
         raise ex.BadRequestException(
             "No phylo run found for user to generate auspice request"

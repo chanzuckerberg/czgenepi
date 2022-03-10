@@ -1,6 +1,4 @@
 import json
-import re
-from base64 import urlsafe_b64decode, urlsafe_b64encode
 
 import boto3
 import pytest
@@ -9,7 +7,6 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.api.views.tests.test_update_phylo_run_and_tree import make_shared_test_data
-from aspen.test_infra.models.usergroup import group_factory, user_factory
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
@@ -44,16 +41,29 @@ async def test_phylo_tree_can_see(
         "version": "1.3.3.7",
     }
     test_json = json.dumps(test_tree)
-
     mock_s3_resource.Bucket(phylo_tree.s3_bucket).Object(phylo_tree.s3_key).put(
         Body=test_json
     )
+
+    expected_tree = {
+        "meta": {},
+        "tree": {
+            "branch_attrs": {"labels": {"clade": "42"}, "mutations": {}},
+            "children": [
+                {"GISAID_ID": "public_identifier_1", "name": "private_identifier_1"},
+                {"GISAID_ID": "public_identifier_2", "name": "private_identifier_2"},
+            ],
+            "name": "ROOT",
+        },
+        "version": "1.3.3.7",
+    }
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     result = await http_client.get(
         f"/v2/phylo_runs/{phylo_tree.id}", headers=auth_headers
     )
-    assert result == json.loads(test_json)
+    returned_tree = result.json()
+    assert returned_tree == expected_tree
 
 
 # def test_phylo_tree_no_can_see(
