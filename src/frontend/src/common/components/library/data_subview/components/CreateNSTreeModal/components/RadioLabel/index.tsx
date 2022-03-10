@@ -1,7 +1,9 @@
 // eslint-disable @typescript-eslint/explicit-member-accessibility
 import ListItemText from "@material-ui/core/ListItemText";
+import { useTreatments } from "@splitsoftware/splitio-react";
 import { List } from "czifui";
 import React from "react";
+import { FEATURE_FLAGS, isFlagOn } from "src/components/Split";
 import { SampleFiltering } from "../SampleFiltering";
 import {
   Label,
@@ -17,10 +19,13 @@ interface Props {
   selected: boolean;
 }
 
-// VOODOO TODO use feature flag here
-const isSampleFilteringEnabled = true;
-
 export const RadioLabelOverview = ({ selected }: Props): JSX.Element => {
+  const flag = useTreatments([FEATURE_FLAGS.sample_filtering_tree_creation]);
+  const isSampleFilteringEnabled = isFlagOn(
+    flag,
+    FEATURE_FLAGS.sample_filtering_tree_creation
+  );
+
   return (
     <div>
       <Label>
@@ -119,6 +124,12 @@ export const RadioLabelTargeted = ({ selected }: Props): JSX.Element => {
 export const RadioLabelNonContextualized = ({
   selected,
 }: Props): JSX.Element => {
+  const flag = useTreatments([FEATURE_FLAGS.sample_filtering_tree_creation]);
+  const isSampleFilteringEnabled = isFlagOn(
+    flag,
+    FEATURE_FLAGS.sample_filtering_tree_creation
+  );
+
   return (
     <div>
       <Label>

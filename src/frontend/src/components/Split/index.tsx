@@ -2,7 +2,8 @@
  * Everything surrounding the use of Split.io / feature flags lives here.
  *
  * For a detailed guide on working with feature flags in Split, see the wiki:
- *   LINK_GOES_HERE_VOODOO
+ *   "GenEpi -- Feature Flags (Split.io) -- HowTo"
+ *   https://czi.atlassian.net/l/c/oPCs7jYG
  *
  * A "simple" flag -- one we treat as a boolean of "on" or "off" -- should be
  * set to use the treatment value of "on" (true; feature is enabled) or "off"
@@ -24,6 +25,7 @@
  *        import { FEATURE_FLAGS } from <<This file right here>>;
  *        const flag = useTreatments([FEATURE_FLAGS.my_flag_name]);
  *   3) If the flag is just a simple "on"/"off" type flag, helper to get bool
+ *        << ... in addition what's in (2) above ... >>>
  *        import { isFlagOn } from <<This file right here>>;
  *        const isMyFlagOn = isFlagOn(flag, FEATURE_FLAGS.my_flag_name);
  */
@@ -33,9 +35,17 @@ import React, { useEffect, useState } from "react";
 import ENV from "src/common/constants/ENV";
 import { useUserData } from "src/common/queries/auth";
 
+/**
+ * Canonical listing of all Split feature flags FE needs to know about.
+ *
+ * If you modify the feature flags while doing dev work, you will need to
+ * /reload/ your browser. Do not just depend on the soft [Fast Refresh]
+ * functionality of our dev server because the feature flags are injected
+ * into the Split config, and that is only rebuilt with a real refresh.
+ */
 export enum FEATURE_FLAGS {
   // my_flag_name = "my_flag_name", (<-- format example)
-  default_sample_sort = "default_sample_sort",
+  sample_filtering_tree_creation = "sample_filtering_tree_creation",
 }
 
 // Keyword to tell Split client it's running in local-only mode.
@@ -89,6 +99,10 @@ interface Props {
  * which tells it to read from its internal `features` object instead of
  * trying to talk to Split servers for feature flags.
  *   https://help.split.io/hc/en-us/articles/360020448791-JavaScript-SDK#localhost-mode
+ *
+ * If you modify how the config works while doing dev work, you will need to
+ * /reload/ your browser. Do not just depend on the soft [Fast Refresh]
+ * functionality of our dev server because the config won't be rebuilt.
  */
 const SplitInitializer = ({ children }: Props): JSX.Element | null => {
   const { data: userData, isLoading: isLoadingUserInfo } = useUserData();
@@ -107,7 +121,7 @@ const SplitInitializer = ({ children }: Props): JSX.Element | null => {
         key: userData?.split_id || "anonymous",
       },
     };
-    if (ENV.SPLIT_FRONTEND_KEY === SPLIT_LOCALHOST_ONLY_MODE) {
+    if (splitConf.core.authorizationKey === SPLIT_LOCALHOST_ONLY_MODE) {
       // Split is only running locally, not talking to its servers.
       // To ease dev experience, we mock flags, setting them all to "on"
       // NOTE: Below just sets /all/ current flags to treatment of "on".
