@@ -21,3 +21,10 @@ jest.mock("next/router", () => ({
     };
   },
 }));
+
+jest.mock("next/image", () => ({
+  __esModule: true,
+  default: () => {
+    return "next.js image stub";
+  },
+}));
