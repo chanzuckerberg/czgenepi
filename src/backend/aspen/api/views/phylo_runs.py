@@ -320,5 +320,3 @@ async def get_single_phylo_tree(
         "Content-Disposition": f"attachment; filename={item_id}.json",
     }
     return JSONResponse(content=phylo_tree_data, headers=headers)
-
-    return response

@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Mapping, Optional, Set, Tuple
+from typing import Dict, Mapping, Optional, Set, Tuple
 
 import boto3
 import sqlalchemy as sa
@@ -71,6 +71,8 @@ async def process_phylo_tree(
         raise ex.BadRequestException(
             f"PhyloTree with id {phylo_tree_id} not viewable by user with id: {user.id}"
         )
+    if not phylo_run_result:
+        raise ex.ServerException(f"No phylo run found for phylo tree {phylo_tree_id}")
     phylo_tree: PhyloTree = phylo_tree_result
     phylo_run: PhyloRun = phylo_run_result
 

@@ -1,5 +1,6 @@
 import json
 from copy import deepcopy
+from typing import Dict
 
 import boto3
 import pytest
@@ -9,13 +10,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.api.views.tests.test_list_phylo_runs import make_all_test_data
 from aspen.api.views.tests.test_update_phylo_run_and_tree import make_shared_test_data
+from aspen.database.models import Group, Location, User
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.usergroup import group_factory, user_factory
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
 
-TEST_TREE = {
+TEST_TREE: Dict = {
     "meta": {},
     "tree": {
         "branch_attrs": {"labels": {"clade": "42"}, "mutations": {}},
@@ -28,7 +30,7 @@ TEST_TREE = {
     "version": "1.3.3.7",
 }
 
-ID_MAPPED_TREE = {
+ID_MAPPED_TREE: Dict = {
     "meta": {},
     "tree": {
         "branch_attrs": {"labels": {"clade": "42"}, "mutations": {}},
@@ -140,13 +142,13 @@ async def test_phylo_tree_admin(
     await async_session.commit()
 
     # make_all_test_data() randomly selects samples for trees, so we have to make sure we are expecting the right json
-    matching_tree_json = deepcopy(TEST_TREE)
+    matching_tree_json: Dict = deepcopy(TEST_TREE)
     uploaded_children = [
         {"name": sample.public_identifier} for sample in phylo_tree.constituent_samples
     ]
     matching_tree_json["tree"]["children"] = uploaded_children
 
-    matching_mapped_json = deepcopy(ID_MAPPED_TREE)
+    matching_mapped_json: Dict = deepcopy(ID_MAPPED_TREE)
     expected_children = [
         {"GISAID_ID": sample.public_identifier, "name": sample.private_identifier}
         for sample in phylo_tree.constituent_samples
