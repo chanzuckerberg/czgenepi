@@ -61,6 +61,7 @@ async def test_valid_auspice_link_access(
             ],
             "name": "ROOT",
         },
+        "version": "1.3.3.7",
     }
     test_json = json.dumps(test_tree)
 
