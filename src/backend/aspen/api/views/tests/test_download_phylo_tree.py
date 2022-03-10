@@ -67,7 +67,7 @@ async def test_phylo_tree_can_see(
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     result = await http_client.get(
-        f"/v2/phylo_runs/{phylo_tree.entity_id}", headers=auth_headers
+        f"/v2/phylo_trees/{phylo_tree.entity_id}", headers=auth_headers
     )
     returned_tree = result.json()
     assert returned_tree == ID_MAPPED_TREE
@@ -96,7 +96,7 @@ async def test_phylo_tree_id_style_public(
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     result = await http_client.get(
-        f"/v2/phylo_runs/{phylo_tree.entity_id}?id_style=public", headers=auth_headers
+        f"/v2/phylo_trees/{phylo_tree.entity_id}?id_style=public", headers=auth_headers
     )
     returned_tree = result.json()
     assert returned_tree == TEST_TREE
@@ -143,7 +143,7 @@ async def test_phylo_tree_no_can_see(
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     result = await http_client.get(
-        f"/v2/phylo_runs/{phylo_tree.entity_id}", headers=auth_headers
+        f"/v2/phylo_trees/{phylo_tree.entity_id}", headers=auth_headers
     )
     assert result.json() == expected_response
 
@@ -199,6 +199,6 @@ async def test_phylo_tree_admin(
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     result = await http_client.get(
-        f"/v2/phylo_runs/{phylo_tree.entity_id}", headers=auth_headers
+        f"/v2/phylo_trees/{phylo_tree.entity_id}", headers=auth_headers
     )
     assert result.json() == matching_mapped_json
