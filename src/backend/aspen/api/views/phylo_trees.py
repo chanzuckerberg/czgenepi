@@ -12,7 +12,7 @@ from aspen.database.models import User
 router = APIRouter()
 
 
-@router.get("/{item_id}")
+@router.get("/{item_id}/download")
 async def get_single_phylo_tree(
     item_id: int,
     request: Request,

@@ -11,7 +11,7 @@ export const TREE_TRANSFORMS: Transform[] = [
       if (typeof id !== "number") {
         return undefined;
       }
-      return `${API_URL}/v2/phylo_trees/${id}`;
+      return `${API_URL}/v2/phylo_trees/${id}/download`;
     },
   },
   {
@@ -22,7 +22,7 @@ export const TREE_TRANSFORMS: Transform[] = [
       if (typeof id !== "number") {
         return undefined;
       }
-      return `${API_URL}/v2/phylo_trees/${id}?id_style=public`;
+      return `${API_URL}/v2/phylo_trees/${id}/download?id_style=public`;
     },
   },
   {
