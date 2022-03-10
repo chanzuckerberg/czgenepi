@@ -68,7 +68,9 @@ async def process_phylo_tree(
         phylo_run_result,
     ) = await verify_and_access_phylo_tree(db, user, phylo_tree_id, load_samples=True)
     if not authorized or not phylo_tree_result:
-        raise ex.BadRequestException("No phylo run found for auspice request")
+        raise ex.BadRequestException(
+            f"PhyloTree with id {phylo_tree_id} not viewable by user with id: {user.id}"
+        )
     phylo_tree: PhyloTree = phylo_tree_result
     phylo_run: PhyloRun = phylo_run_result
 
@@ -101,16 +103,18 @@ async def process_phylo_tree(
     # group so we can translate public ID's to private ID's on the tree.
     identifier_map: Dict[str, str] = {}
     tree_owner_group = phylo_run.group
-    if user.system_admin or tree_owner_group.id in can_see_pi_group_ids:
+    all_translatable_samples: list[Sample] = []
+    if user.system_admin:
+        all_translatable_samples = [sample for sample in phylo_tree.constituent_samples]
+    elif tree_owner_group.id in can_see_pi_group_ids:
         all_translatable_samples = [
             sample
             for sample in phylo_tree.constituent_samples
             if sample.submitting_group_id == tree_owner_group.id
         ]
-        for sample in all_translatable_samples:
-            public_id = sample.public_identifier.replace("hCoV-19/", "")
-            identifier_map[public_id] = sample.private_identifier
-
+    for sample in all_translatable_samples:
+        public_id = sample.public_identifier.replace("hCoV-19/", "")
+        identifier_map[public_id] = sample.private_identifier
     # we pass in the root node of the tree to the recursive naming function.
     json_data["tree"] = _rename_nodes_on_tree(
         json_data["tree"], identifier_map, "GISAID_ID"

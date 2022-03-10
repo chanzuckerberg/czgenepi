@@ -312,7 +312,6 @@ async def get_single_phylo_tree(
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_auth_user),
 ):
-    print("Phylo tree:", item_id)
     phylo_tree_data = await process_phylo_tree(
         db, user, item_id, request.query_params.get("id_style")
     )
