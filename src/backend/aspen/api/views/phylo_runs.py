@@ -302,21 +302,3 @@ async def update_phylo_tree_and_run(
     await db.commit()
 
     return PhyloRunResponse.from_orm(phylo_run)
-
-
-@router.get("/{item_id}")
-async def get_single_phylo_tree(
-    item_id: int,
-    request: Request,
-    db: AsyncSession = Depends(get_db),
-    settings: Settings = Depends(get_settings),
-    user: User = Depends(get_auth_user),
-):
-    phylo_tree_data = await process_phylo_tree(
-        db, user, item_id, request.query_params.get("id_style")
-    )
-    headers = {
-        "Content-Type": "application/json",
-        "Content-Disposition": f"attachment; filename={item_id}.json",
-    }
-    return JSONResponse(content=phylo_tree_data, headers=headers)
