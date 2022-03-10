@@ -73,6 +73,35 @@ async def test_phylo_tree_can_see(
     assert returned_tree == ID_MAPPED_TREE
 
 
+async def test_phylo_tree_id_style_public(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+    mock_s3_resource: boto3.resource,
+):
+    user, group, samples, phylo_run, phylo_tree = await make_shared_test_data(
+        async_session
+    )
+
+    # Create the bucket if it doesn't exist in localstack.
+    try:
+        mock_s3_resource.meta.client.head_bucket(Bucket=phylo_tree.s3_bucket)
+    except ClientError:
+        # The bucket does not exist or you have no access.
+        mock_s3_resource.create_bucket(Bucket=phylo_tree.s3_bucket)
+
+    test_json = json.dumps(TEST_TREE)
+    mock_s3_resource.Bucket(phylo_tree.s3_bucket).Object(phylo_tree.s3_key).put(
+        Body=test_json
+    )
+
+    auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
+    result = await http_client.get(
+        f"/v2/phylo_runs/{phylo_tree.entity_id}?id_style=public", headers=auth_headers
+    )
+    returned_tree = result.json()
+    assert returned_tree == TEST_TREE
+
+
 async def test_phylo_tree_no_can_see(
     async_session: AsyncSession,
     http_client: AsyncClient,
