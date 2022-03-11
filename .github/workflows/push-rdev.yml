@@ -74,7 +74,7 @@ jobs:
               core.setFailed(`ref ${ref} did not start with ${prefix}`)
               return
             }
-            // Must be compatible with DNS charset, replace not allowed with '-'
+            // Must be compatible with DNS charset, replace chars not allowed with '-'
             const stackName = ref.slice(prefix.length).replaceAll(/[^a-zA-Z0-9/-]+/g, "-")
             console.log(`stackName: ${stackName}`)
             core.setOutput('stack-name', stackName)
