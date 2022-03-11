@@ -39,8 +39,11 @@ export const StyledInstructionsButton = styled(Button, {
 })`
   ${(props) => {
     const colors = getColors(props);
+    const spaces = getSpaces(props);
 
     return `
+      padding: ${spaces?.xs}px ${spaces?.s}px;
+
       &:hover {
         background-color: transparent;
         color: ${colors?.primary[500]};

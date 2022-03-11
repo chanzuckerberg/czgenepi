@@ -40,7 +40,8 @@ const CollapsibleInstructions = ({
   const CollapsibleInstructionsButton = (
     <StyledInstructionsButton
       buttonSize={buttonSize}
-      color="primary"
+      sdsType="primary"
+      sdsStyle="minimal"
       onClick={handleInstructionsClick}
     >
       {shouldShowInstructions ? "LESS" : "MORE"} INFO

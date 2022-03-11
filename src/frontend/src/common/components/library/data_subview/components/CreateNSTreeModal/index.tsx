@@ -184,7 +184,8 @@ export const CreateNSTreeModal = ({
         <NextLink href={ROUTES.PHYLO_TREES} passHref>
           <a href="passRef">
             <StyledButton
-              color="primary"
+              sdsType="primary"
+              sdsStyle="minimal"
               onClick={() => setShouldShowTreeCreatedNotification(false)}
             >
               VIEW MY TREES

@@ -17,7 +17,7 @@ const DeleteDialog = ({
   if (!open) return null;
 
   const deleteButton = (
-    <StyledButton color="primary" variant="contained" isRounded>
+    <StyledButton sdsType="primary" sdsStyle="rounded">
       Delete
     </StyledButton>
   );

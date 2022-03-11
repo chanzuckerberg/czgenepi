@@ -75,7 +75,7 @@ export default function Homepage(): JSX.Element {
 
             <ButtonContainer>
               <a href={ENV.API_URL + API.LOG_IN}>
-                <Button isRounded color="primary" variant="contained">
+                <Button sdsType="primary" sdsStyle="rounded">
                   Sign in
                 </Button>
               </a>

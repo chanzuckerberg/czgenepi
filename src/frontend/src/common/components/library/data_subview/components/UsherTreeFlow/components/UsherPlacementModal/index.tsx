@@ -295,9 +295,8 @@ export const UsherPlacementModal = ({
               <FailedSampleAlert numFailedSamples={failedSampleIds?.length} />
             </div>
             <StyledButton
-              color="primary"
-              variant="contained"
-              isRounded
+              sdsType="primary"
+              sdsStyle="rounded"
               disabled={isUsherDisabled}
               type="submit"
               value="Submit"
