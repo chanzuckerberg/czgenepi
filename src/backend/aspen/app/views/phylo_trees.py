@@ -15,7 +15,7 @@ from typing import (
 
 import boto3
 import sqlalchemy as sa
-from flask import g, jsonify, make_response, request
+from flask import g, jsonify, request
 from sqlalchemy import or_
 from sqlalchemy.orm import aliased, contains_eager, joinedload, Query, Session
 
@@ -210,21 +210,6 @@ def _get_selected_samples(db_session, phylo_tree_id):
         selected_samples.add(sample.public_identifier.replace("hCoV-19/", ""))
         selected_samples.add(sample.private_identifier)
     return selected_samples
-
-
-@application.route("/api/phylo_tree/<int:phylo_tree_id>", methods=["GET"])
-@requires_auth
-def phylo_tree(phylo_tree_id: int):
-    phylo_tree_data = _process_phylo_tree(
-        g.db_session, phylo_tree_id, g.auth_user, request.args.get("id_style")
-    )
-    response = make_response(phylo_tree_data)
-    response.headers["Content-Type"] = "application/json"
-    response.headers[
-        "Content-Disposition"
-    ] = f"attachment; filename={phylo_tree_id}.json"
-
-    return response
 
 
 def _extract_accessions(accessions_list: list, node: dict):
