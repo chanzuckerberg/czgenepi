@@ -1,8 +1,15 @@
 import datetime
-from typing import List, Set
+import json
+import os
+import re
+import threading
+from typing import Any, List, Mapping, Optional, Sequence, Set, Union
 
+import sentry_sdk
 import sqlalchemy as sa
+from boto3 import Session
 from fastapi import APIRouter, Depends
+from sqlalchemy import func, text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncResult, AsyncSession
 from sqlalchemy.orm import joinedload, selectinload
@@ -13,6 +20,8 @@ from aspen.api.auth import get_auth_user
 from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.samples import (
+    CreateSampleRequest,
+    CreateSamplesResponse,
     SampleBulkDeleteRequest,
     SampleBulkDeleteResponse,
     SampleDeleteResponse,
@@ -25,11 +34,19 @@ from aspen.api.schemas.samples import (
 from aspen.api.settings import Settings
 from aspen.api.utils import (
     authz_samples_cansee,
+    check_duplicate_samples,
+    check_duplicate_samples_in_request,
     determine_gisaid_status,
     get_matching_gisaid_ids,
     get_missing_and_found_sample_ids,
 )
-from aspen.database.models import DataType, Location, Sample, User
+from aspen.database.models import (
+    DataType,
+    Location,
+    Sample,
+    UploadedPathogenGenome,
+    User,
+)
 
 router = APIRouter()
 
@@ -245,3 +262,115 @@ async def validate_ids(
     missing_sample_ids -= gisaid_ids
 
     return ValidateIDsResponseSchema(missing_sample_ids=missing_sample_ids)
+
+
+# TODO this should be a general swipe calling library instead of lame copy-pasta.
+def _kick_off_pangolin(group_prefix: str, sample_ids: Sequence[str], settings):
+    sfn_params = settings.AWS_PANGOLIN_SFN_PARAMETERS
+    sfn_input_json = {
+        "Input": {
+            "Run": {
+                "aws_region": settings.AWS_REGION,
+                "docker_image_id": sfn_params["Input"]["Run"]["docker_image_id"],
+                "samples": sample_ids,
+                "remote_dev_prefix": settings.REMOTE_DEV_PREFIX,
+                "genepi_config_secret_name": settings.GENEPI_CONFIG_SECRET_NAME,
+            },
+        },
+        "OutputPrefix": f"{sfn_params['OutputPrefix']}",
+        "RUN_WDL_URI": sfn_params["RUN_WDL_URI"],
+        "RunEC2Memory": sfn_params["RunEC2Memory"],
+        "RunEC2Vcpu": sfn_params["RunEC2Vcpu"],
+        "RunSPOTMemory": sfn_params["RunSPOTMemory"],
+        "RunSPOTVcpu": sfn_params["RunSPOTVcpu"],
+    }
+
+    session = Session(region_name=settings.AWS_REGION)
+    client = session.client(
+        service_name="stepfunctions",
+        endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None,
+    )
+
+    execution_name = f"{group_prefix}-ondemand-pangolin-{str(datetime.datetime.now())}"
+    execution_name = re.sub(r"[^0-9a-zA-Z-]", r"-", execution_name)
+
+    client.start_execution(
+        stateMachineArn=sfn_params["StateMachineArn"],
+        name=execution_name,
+        input=json.dumps(sfn_input_json),
+    )
+
+
+@router.post("/")
+async def create_samples(
+    create_samples_request: List[CreateSampleRequest],
+    db: AsyncSession = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    user: User = Depends(get_auth_user),
+) -> CreateSamplesResponse:
+
+    duplicates_in_request: Union[
+        None, Mapping[str, list[str]]
+    ] = check_duplicate_samples_in_request(create_samples_request)
+    if duplicates_in_request:
+        raise ex.BadRequestException(
+            f"Error processing data, either duplicate private_identifiers: {duplicates_in_request['duplicate_private_ids']} or duplicate public identifiers: {duplicates_in_request['duplicate_public_ids']} exist in the upload files, please rename duplicates before proceeding with upload.",
+        )
+
+    already_exists: Union[
+        None, Mapping[str, list[str]]
+    ] = await check_duplicate_samples(create_samples_request, db, user.group_id)
+    if already_exists:
+        raise ex.BadRequestException(
+            f"Error inserting data, private_identifiers {already_exists['existing_private_ids']} or public_identifiers: {already_exists['existing_public_ids']} already exist in our database, please remove these samples before proceeding with upload.",
+        )
+
+    pangolin_sample_ids = []
+    for row in create_samples_request:
+        sample_input = row.sample
+        pathogen_genome_input = row.pathogen_genome
+
+        valid_location: Optional[Location] = await Location.get_by_id(
+            db, sample_input.location_id
+        )
+        if not valid_location:
+            sentry_sdk.capture_message(
+                f"No valid location for id {sample_input.location_id}"
+            )
+            raise ex.BadRequestException("Invalid location id for sample")
+
+        sample_args: Mapping[str, Any] = {
+            "submitting_group": user.group,
+            "uploaded_by": user,
+            "sample_collected_by": user.group.name,
+            "sample_collector_contact_address": user.group.address,
+            "organism": sample_input.organism,
+            "private_identifier": sample_input.private_identifier,
+            "collection_date": sample_input.collection_date,
+            "private": sample_input.private,
+            "public_identifier": sample_input.public_identifier,
+            "authors": sample_input.authors or [user.group.name],
+            "collection_location": valid_location,
+        }
+
+        sample: Sample = Sample(**sample_args)
+        sample.generate_public_identifier()
+        uploaded_pathogen_genome: UploadedPathogenGenome = UploadedPathogenGenome(
+            sample=sample,
+            sequence=pathogen_genome_input.sequence,
+            sequencing_date=pathogen_genome_input.sequencing_date,
+        )
+
+        db.add(sample)
+        db.add(uploaded_pathogen_genome)
+        pangolin_sample_ids.append(sample.public_identifier)
+
+    #  Run as a separate thread, so any errors here won't affect sample uploads
+    pangolin_job = threading.Thread(
+        target=_kick_off_pangolin,
+        args=(user.group.prefix, pangolin_sample_ids, settings),
+    )
+    pangolin_job.start()
+    await db.commit()
+
+    return CreateSamplesResponse(success=True)

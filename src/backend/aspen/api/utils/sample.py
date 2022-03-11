@@ -1,6 +1,93 @@
-from typing import Any, Mapping, Optional
+from typing import Any, Mapping, Optional, Tuple
+import sqlalchemy as sa
+from collections import Counter
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.database.models import Accession, AccessionType, Sample
+
+
+def get_all_identifiers_in_request(data: Mapping) -> Tuple[list[str], list[str]]:
+    private_ids: list = []
+    public_ids: list = []
+
+    for d in data:
+        private_ids.append(d.sample.private_identifier)
+        if d.sample.public_identifier:
+            public_ids.append(d.sample.public_identifier)
+
+    return private_ids, public_ids
+
+
+async def get_existing_private_ids(
+    private_ids: list[str], session: AsyncSession, group_id=None
+) -> list[str]:
+    samples = sa.select(Sample).filter(Sample.private_identifier.in_(private_ids))
+
+    if group_id is not None:
+        samples = samples.filter(Sample.submitting_group_id == group_id)
+
+    res = await session.execute(samples)
+    return [i.private_identifier for i in res.scalars().all()]
+
+
+async def get_existing_public_ids(
+    public_ids: list[str], session: AsyncSession, group_id=None
+) -> list[str]:
+    samples = sa.select(Sample).filter(Sample.public_identifier.in_(public_ids))
+
+    if group_id is not None:
+        samples = samples.filter(Sample.submitting_group_id == group_id)
+
+    res = await session.execute(samples)
+    return [i.public_identifier for i in res.scalars().all()]
+
+
+async def check_duplicate_samples(
+    data: Mapping,
+    session: AsyncSession,
+    group_id: Optional[int] = None,
+) -> Optional[Mapping[str, list[str]]]:
+    """
+    Checks incoming `data` for duplicate private/public IDs of pre-existing IDs.
+
+    If called with a `group_id` arg, limits to only searching for duplicates within
+    the given group. If no group given, searches globally for duplicate IDs and will
+    match against any ID in any group that is already existing.
+    """
+    private_ids, public_ids = get_all_identifiers_in_request(data)
+
+    existing_private_ids: list[str] = await get_existing_private_ids(
+        private_ids, session, group_id
+    )
+    existing_public_ids: list[str] = await get_existing_public_ids(
+        public_ids, session, group_id
+    )
+
+    if existing_private_ids or existing_public_ids:
+        return {
+            "existing_private_ids": existing_private_ids,
+            "existing_public_ids": existing_public_ids,
+        }
+
+    return None
+
+
+def check_duplicate_samples_in_request(
+    data: Mapping,
+) -> Optional[Mapping[str, list[str]]]:
+    private_ids, public_ids = get_all_identifiers_in_request(data)
+    private_id_counts = [id for id, count in Counter(private_ids).items() if count > 1]
+    public_id_counts = [
+        id for id, count in Counter(public_ids).items() if count > 1 and id != ""
+    ]
+
+    if private_id_counts or public_id_counts:
+        return {
+            "duplicate_private_ids": private_id_counts,
+            "duplicate_public_ids": public_id_counts,
+        }
+
+    return None
 
 
 def determine_gisaid_status(

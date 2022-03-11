@@ -55,7 +55,7 @@ def test_samples_create_view_pass_no_public_id(
             },
         },
     ]
-    res = client.post("/api/samples/create", json=data, content_type="application/json")
+    res = client.post("/v2/samples/", json=data, content_type="application/json")
     assert res.status == "200 OK"
     session.close()
     session.begin()
