@@ -1,7 +1,6 @@
 import json
 import os
 import re
-import uuid
 from datetime import datetime, timedelta
 from typing import (
     Any,
@@ -16,7 +15,7 @@ from typing import (
 
 import boto3
 import sqlalchemy as sa
-from flask import g, jsonify, make_response, request
+from flask import g, jsonify, request
 from sqlalchemy import or_
 from sqlalchemy.orm import aliased, contains_eager, joinedload, Query, Session
 
@@ -213,21 +212,6 @@ def _get_selected_samples(db_session, phylo_tree_id):
     return selected_samples
 
 
-@application.route("/api/phylo_tree/<int:phylo_tree_id>", methods=["GET"])
-@requires_auth
-def phylo_tree(phylo_tree_id: int):
-    phylo_tree_data = _process_phylo_tree(
-        g.db_session, phylo_tree_id, g.auth_user, request.args.get("id_style")
-    )
-    response = make_response(phylo_tree_data)
-    response.headers["Content-Type"] = "application/json"
-    response.headers[
-        "Content-Disposition"
-    ] = f"attachment; filename={phylo_tree_id}.json"
-
-    return response
-
-
 def _extract_accessions(accessions_list: list, node: dict):
     node_attributes = node.get("node_attrs", {})
     if "external_accession" in node_attributes:
@@ -254,29 +238,3 @@ def tree_sample_ids(phylo_tree_id: int):
     filename: str = f"{phylo_tree_id}_sample_ids.tsv"
     streamer = MetadataTSVStreamer(filename, accessions, selected_samples)
     return streamer.get_response()
-
-
-@application.route("/api/auspice/view/<int:phylo_tree_id>", methods=["GET"])
-@requires_auth
-def auspice_view(phylo_tree_id: int):
-    phylo_tree_data = _process_phylo_tree(
-        g.db_session, phylo_tree_id, g.auth_user, request.args.get("id_style")
-    )
-
-    s3_resource = boto3.resource(
-        "s3",
-        endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None,
-        config=boto3.session.Config(signature_version="s3v4"),
-    )
-    s3_bucket = application.aspen_config.EXTERNAL_AUSPICE_BUCKET
-    s3_key = str(uuid.uuid4())
-    s3_resource.Bucket(s3_bucket).Object(s3_key).put(Body=json.dumps(phylo_tree_data))
-    s3_client = s3_resource.meta.client
-
-    presigned_url = s3_client.generate_presigned_url(
-        "get_object",
-        Params={"Bucket": s3_bucket, "Key": s3_key},
-        ExpiresIn=3600,
-    )
-
-    return jsonify({"url": presigned_url})
