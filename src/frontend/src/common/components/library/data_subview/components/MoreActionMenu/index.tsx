@@ -50,8 +50,7 @@ const MoreActionsMenu = ({
       <IconButton
         onClick={handleClick}
         disabled={disabled}
-        svgDisabled={<StyledMoreActionsIcon disabled />}
-        svgEnabled={<StyledMoreActionsIcon />}
+        sdsIcon="dotsHorizontal"
         tooltipTextDisabled={TOOLTIP_TEXT_DISABLED}
         tooltipTextEnabled={TOOLTIP_TEXT_ENABLED}
       />

@@ -24,8 +24,6 @@ import {
   DownloadWrapper,
   StyledChip,
   StyledDiv,
-  StyledDownloadDisabledImage,
-  StyledDownloadImage,
   StyledFlexChildDiv,
   TooltipDescriptionText,
   TooltipHeaderText,
@@ -259,8 +257,7 @@ const DataSubview: FunctionComponent<Props> = ({
           <IconButton
             onClick={handleDownloadClickOpen}
             disabled={!hasCheckedSamples}
-            svgDisabled={<StyledDownloadDisabledImage />}
-            svgEnabled={<StyledDownloadImage />}
+            sdsIcon="download"
             tooltipTextDisabled={DOWNLOAD_TOOLTIP_TEXT_DISABLED}
             tooltipTextEnabled={DOWNLOAD_TOOLTIP_TEXT_ENABLED}
           />

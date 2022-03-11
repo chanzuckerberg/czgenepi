@@ -1,13 +1,11 @@
-import { Tooltip } from "czifui";
-import React, { FunctionComponent, MouseEventHandler } from "react";
-import { IconButtonBubble } from "src/common/styles/iconStyle";
+import { Icon, IconButton as LibIconButton, Tooltip } from "czifui";
+import React, { FunctionComponent, MouseEventHandler, useState } from "react";
 import { StyledSpan } from "./style";
 
 interface Props {
   onClick: MouseEventHandler;
   disabled: boolean;
-  svgEnabled: JSX.Element;
-  svgDisabled: JSX.Element;
+  sdsIcon: string;
   tooltipTextEnabled: JSX.Element;
   tooltipTextDisabled: JSX.Element;
 }
@@ -15,11 +13,16 @@ interface Props {
 export const IconButton: FunctionComponent<Props> = ({
   onClick,
   disabled,
-  svgEnabled,
-  svgDisabled,
+  sdsIcon,
   tooltipTextEnabled,
   tooltipTextDisabled,
 }: Props) => {
+  const [active, setActive] = useState<boolean>(false);
+  const handleClick = () => {
+    setActive(!active);
+    onClick();
+  };
+
   return (
     <Tooltip
       arrow
@@ -28,9 +31,14 @@ export const IconButton: FunctionComponent<Props> = ({
       placement="top"
     >
       <StyledSpan>
-        <IconButtonBubble onClick={onClick} disabled={disabled}>
-          {disabled ? svgDisabled : svgEnabled}
-        </IconButtonBubble>
+        <LibIconButton
+          onClick={handleClick}
+          disabled={disabled}
+          sdsSize="large"
+          sdsType="primary"
+        >
+          <Icon sdsIcon={sdsIcon} sdsSize="xl" sdsType="iconButton" />
+        </LibIconButton>
       </StyledSpan>
     </Tooltip>
   );
