@@ -9,7 +9,6 @@ import sentry_sdk
 import sqlalchemy as sa
 from boto3 import Session
 from fastapi import APIRouter, Depends
-from sqlalchemy import func, text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncResult, AsyncSession
 from sqlalchemy.orm import joinedload, selectinload

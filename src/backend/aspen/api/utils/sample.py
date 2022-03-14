@@ -1,6 +1,7 @@
-from typing import Any, Mapping, Optional, Tuple
-import sqlalchemy as sa
 from collections import Counter
+from typing import Any, Mapping, Optional, Tuple
+
+import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.database.models import Accession, AccessionType, Sample

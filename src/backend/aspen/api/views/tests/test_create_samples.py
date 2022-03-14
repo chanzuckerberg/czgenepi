@@ -1,31 +1,14 @@
-import json
-from aspen.app.views import api_utils
 import datetime
-from typing import Any, List, Optional, Sequence, Tuple
 
 import pytest
 import sqlalchemy as sa
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
-from sqlalchemy.orm.exc import NoResultFound
 
-from aspen.api.schemas.base import convert_datetime_to_iso_8601
-from aspen.database.models import (
-    UploadedPathogenGenome,
-    Accession,
-    CanSee,
-    DataType,
-    Group,
-    Location,
-    Sample,
-    SequencingReadsCollection,
-    User,
-)
-from aspen.test_infra.models.gisaid_metadata import gisaid_metadata_factory
+from aspen.app.views import api_utils
+from aspen.database.models import Sample, UploadedPathogenGenome
 from aspen.test_infra.models.location import location_factory
-from aspen.test_infra.models.sample import sample_factory
-from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
 from aspen.test_infra.models.usergroup import group_factory, user_factory
 
 # All test coroutines will be treated as marked.
@@ -33,6 +16,7 @@ pytestmark = pytest.mark.asyncio
 
 
 # test CREATE samples #
+
 
 async def test_samples_create_view_pass_no_public_id(
     async_session: AsyncSession,
@@ -84,9 +68,9 @@ async def test_samples_create_view_pass_no_public_id(
     await async_session.close()
     async_session.begin()
 
-    samp_res = await async_session.execute(sa.select(Sample).filter(
-        Sample.private_identifier.in_(["private", "private2"])
-    ))
+    samp_res = await async_session.execute(
+        sa.select(Sample).filter(Sample.private_identifier.in_(["private", "private2"]))
+    )
     samples = samp_res.scalars().all()
     upg_res = await async_session.execute(sa.select(UploadedPathogenGenome))
     uploaded_pathogen_genomes = upg_res.scalars().all()
@@ -112,4 +96,3 @@ async def test_samples_create_view_pass_no_public_id(
     assert sample_1.uploaded_pathogen_genome.num_mixed == 1
     assert sample_1.uploaded_pathogen_genome.num_unambiguous_sites == 8
     assert sample_1.uploaded_pathogen_genome.num_missing_alleles == 1
-

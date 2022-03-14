@@ -5,9 +5,7 @@ from datetime import datetime
 from typing import List, Optional, TYPE_CHECKING, Union
 
 import enumtables
-from sqlalchemy.dialects import postgresql
 from sqlalchemy import (
-    select,
     Boolean,
     Column,
     Date,
@@ -18,7 +16,6 @@ from sqlalchemy import (
     sql,
     String,
     text,
-    Sequence,
     UniqueConstraint,
 )
 from sqlalchemy.dialects.postgresql import JSONB
@@ -88,7 +85,6 @@ def create_public_ids(
         ids.append(f"hCoV-19/{country}/{group_prefix}{next_id}/{current_year}")
         next_id += 1
     return ids
-
 
 
 class Sample(idbase, DictMixin):  # type: ignore
@@ -270,7 +266,7 @@ class Sample(idbase, DictMixin):  # type: ignore
         self.public_identifier = func.concat(
             f"hCoV-19/{country}/{group_prefix}-",
             text("currval('aspen.samples_id_seq')"),
-            f"/{current_year}"
+            f"/{current_year}",
         )
 
     def get_uploaded_entity(
