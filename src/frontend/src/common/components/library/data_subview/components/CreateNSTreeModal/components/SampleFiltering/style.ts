@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
-import { fontHeaderXs, fontHeaderXxs, getSpaces, InputDropdown } from "czifui";
+import { fontHeaderXs, getColors, getSpaces, InputDropdown } from "czifui";
+import { NewTabLink } from "src/common/components/library/NewTabLink";
 
 export const StyledContainer = styled.div`
   ${(props) => {
@@ -38,8 +39,21 @@ export const StyledFilterGroup = styled.div`
 `;
 
 export const StyledFilterGroupName = styled.p`
-  ${fontHeaderXxs}
+  ${fontHeaderXs}
   color: black;
+`;
+
+export const StyledNewTabLink = styled(NewTabLink)`
+  ${(props) => {
+    const colors = getColors(props);
+
+    return `
+      &:hover {
+        color: ${colors?.primary[600]};
+        text-decoration: none;
+      }
+    `;
+  }}
 `;
 
 export const StyledInputDropdown = styled(InputDropdown)`

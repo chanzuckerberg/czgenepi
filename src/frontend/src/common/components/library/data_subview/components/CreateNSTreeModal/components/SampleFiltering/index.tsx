@@ -1,5 +1,4 @@
 import React from "react";
-import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { noop } from "src/common/constants/empty";
 import { StyledInfoOutlinedIcon, StyledTooltip } from "../../style";
 import {
@@ -9,15 +8,16 @@ import {
   StyledFilterGroupName,
   StyledFiltersSection,
   StyledInputDropdown,
+  StyledNewTabLink,
 } from "./style";
 
 const SAMPLE_FILTERING_TOOLTIP_TEXT = (
   <div>
     Samples already selected on the sample table or included by ID in the box
     below will still be force-included on your tree.{" "}
-    <NewTabLink href="https://docs.google.com/document/d/1NhDW42YZQ7DMhPhUOIBWp04n51FO8GItCZPaw7hRtQk/edit?usp=sharing">
+    <StyledNewTabLink href="https://docs.google.com/document/d/1NhDW42YZQ7DMhPhUOIBWp04n51FO8GItCZPaw7hRtQk/edit?usp=sharing">
       Learn More
-    </NewTabLink>
+    </StyledNewTabLink>
   </div>
 );
 
