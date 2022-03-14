@@ -20,15 +20,14 @@ from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.samples import (
     CreateSampleRequest,
-    CreateSamplesResponse,
     SampleBulkDeleteRequest,
     SampleBulkDeleteResponse,
     SampleDeleteResponse,
-    SampleResponseSchema,
-    SamplesResponseSchema,
+    SampleResponse,
+    SamplesResponse,
     UpdateSamplesRequest,
-    ValidateIDsRequestSchema,
-    ValidateIDsResponseSchema,
+    ValidateIDsRequest,
+    ValidateIDsResponse,
 )
 from aspen.api.settings import Settings
 from aspen.api.utils import (
@@ -58,7 +57,7 @@ async def list_samples(
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_auth_user),
-) -> SamplesResponseSchema:
+) -> SamplesResponse:
 
     cansee_groups_private_identifiers: Set[int] = {
         cansee.owner_group_id
@@ -81,7 +80,7 @@ async def list_samples(
     )
 
     # populate sample object using pydantic response schema
-    result = SamplesResponseSchema(samples=[])
+    result = SamplesResponse(samples=[])
     for sample in user_visible_samples:
         sample.gisaid = determine_gisaid_status(
             sample,
@@ -94,7 +93,7 @@ async def list_samples(
         ):
             sample.show_private_identifier = True
 
-        sampleinfo = SampleResponseSchema.from_orm(sample)
+        sampleinfo = SampleResponse.from_orm(sample)
         result.samples.append(sampleinfo)
     return result
 
@@ -172,7 +171,7 @@ async def update_samples(
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_auth_user),
-) -> SamplesResponseSchema:
+) -> SamplesResponse:
 
     # reorganize request data to make it easier to update
     reorganized_request_data = {s.id: s for s in update_samples_request.samples}
@@ -189,7 +188,7 @@ async def update_samples(
     if uneditable_samples:
         raise ex.NotFoundException("some samples cannot be updated")
 
-    res = SamplesResponseSchema(samples=[])
+    res = SamplesResponse(samples=[])
     for sample in editable_samples:
         update_data = reorganized_request_data[sample.id]
         for key, value in update_data:
@@ -209,7 +208,7 @@ async def update_samples(
                 update_data.sequencing_date
             )
         sample.show_private_identifier = True
-        res.samples.append(SampleResponseSchema.from_orm(sample))
+        res.samples.append(SampleResponse.from_orm(sample))
 
     try:
         await db.commit()
@@ -225,11 +224,11 @@ async def update_samples(
 
 @router.post("/validate_ids/")
 async def validate_ids(
-    request_data: ValidateIDsRequestSchema,
+    request_data: ValidateIDsRequest,
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_auth_user),
-) -> ValidateIDsResponseSchema:
+) -> ValidateIDsResponse:
 
     """
     take in a list of identifiers and checks if all idenitifiers exist as either Sample public or private identifiers, or GisaidMetadata strain names
@@ -260,7 +259,7 @@ async def validate_ids(
     # Do we have any samples that are not aspen private or public identifiers or gisaid identifiers?
     missing_sample_ids -= gisaid_ids
 
-    return ValidateIDsResponseSchema(missing_sample_ids=missing_sample_ids)
+    return ValidateIDsResponse(missing_sample_ids=missing_sample_ids)
 
 
 # TODO this should be a general swipe calling library instead of lame copy-pasta.
@@ -306,7 +305,7 @@ async def create_samples(
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_auth_user),
-) -> CreateSamplesResponse:
+) -> SamplesResponse:
 
     duplicates_in_request: Union[
         None, Mapping[str, list[str]]
@@ -324,7 +323,7 @@ async def create_samples(
             f"Error inserting data, private_identifiers {already_exists['existing_private_ids']} or public_identifiers: {already_exists['existing_public_ids']} already exist in our database, please remove these samples before proceeding with upload.",
         )
 
-    pangolin_sample_ids = []
+    created_samples = []
     for row in create_samples_request:
         sample_input = row.sample
         pathogen_genome_input = row.pathogen_genome
@@ -362,14 +361,44 @@ async def create_samples(
 
         db.add(sample)
         db.add(uploaded_pathogen_genome)
-        pangolin_sample_ids.append(sample.public_identifier)
+        created_samples.append(sample)
 
-    #  Run as a separate thread, so any errors here won't affect sample uploads
+    # Write all of our rows to the DB inside our transaction
+    await db.flush()
+
+    # Read the samples back from the DB with all fields populated.
+    new_samples_query = (
+        sa.select(Sample)
+        .options(  # type: ignore
+            selectinload(Sample.uploaded_pathogen_genome),
+            selectinload(Sample.submitting_group),
+            selectinload(Sample.uploaded_by),
+            selectinload(Sample.collection_location),
+            selectinload(Sample.accessions),
+        )
+        .filter(Sample.id.in_([sample.id for sample in created_samples]))
+        .execution_options(populate_existing=True)
+    )
+    res = await db.execute(new_samples_query)
+
+    pangolin_sample_ids = []
+    result = SamplesResponse(samples=[])
+    for sample in res.unique().scalars().all():
+        pangolin_sample_ids.append(sample.public_identifier)
+        sample.gisaid = determine_gisaid_status(
+            sample,
+        )
+        sample.show_private_identifier = True
+        sampleinfo = SampleResponse.from_orm(sample)
+        result.samples.append(sampleinfo)
+
+    await db.commit()
+
+    # Run as a separate thread, so any errors here won't affect sample uploads
     pangolin_job = threading.Thread(
         target=_kick_off_pangolin,
         args=(user.group.prefix, pangolin_sample_ids, settings),
     )
     pangolin_job.start()
-    await db.commit()
 
-    return CreateSamplesResponse(success=True)
+    return result
