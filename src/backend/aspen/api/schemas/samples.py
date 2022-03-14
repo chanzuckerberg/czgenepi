@@ -130,7 +130,7 @@ class CreateSamplePathogenGenomeRequest(BaseRequest):
     # following fields from PathogenGenome
     sequencing_date: Optional[datetime.date]
     sequencing_depth: Optional[float]
-    sequence: constr(min_length=10, strict=True, regex=r"^[WSKMYRVHDBNZNATCGUwskmyrvhdbnznatcgu-]+$")  # type: ignore
+    sequence: constr(min_length=1000, strict=True, regex=r"^[WSKMYRVHDBNZNATCGUwskmyrvhdbnznatcgu-]+$")  # type: ignore
 
 
 class CreateSamplesBaseRequest(BaseRequest):
