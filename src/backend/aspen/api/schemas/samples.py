@@ -1,7 +1,7 @@
 import datetime
 from typing import Any, List, Optional
 
-from pydantic import constr
+from pydantic import constr, validator
 from pydantic.utils import GetterDict
 
 from aspen.api.schemas.base import BaseRequest, BaseResponse
@@ -127,6 +127,14 @@ class ValidateIDsResponse(BaseResponse):
 
 
 class CreateSamplePathogenGenomeRequest(BaseRequest):
+    # For legacy reasons, we need to support empty strings as if they were None/Empty
+    # https://github.com/samuelcolvin/pydantic/discussions/2687
+    @validator("sequencing_date", pre=True)
+    def empty_str_to_none(cls, v):
+        if v == "":
+            return None
+        return v
+
     # following fields from PathogenGenome
     sequencing_date: Optional[datetime.date]
     sequencing_depth: Optional[float]

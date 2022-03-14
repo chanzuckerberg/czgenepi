@@ -130,7 +130,7 @@ async def test_samples_create_view_pass_no_sequencing_date(
             },
             "pathogen_genome": {
                 "sequence": VALID_SEQUENCE + "NM",
-                "sequencing_date": None,
+                "sequencing_date": "",
             },
         },
         {
