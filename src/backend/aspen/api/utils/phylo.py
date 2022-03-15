@@ -1,5 +1,6 @@
 import json
 import os
+import re
 from typing import Dict, Mapping, Optional, Set, Tuple
 
 import boto3
@@ -106,20 +107,35 @@ async def process_phylo_tree(
     identifier_map: Dict[str, str] = {}
     tree_owner_group = phylo_run.group
     all_translatable_samples: list[Sample] = []
-    if user.system_admin:
-        all_translatable_samples = [sample for sample in phylo_tree.constituent_samples]
-    elif tree_owner_group.id in can_see_pi_group_ids:
-        all_translatable_samples = [
-            sample
-            for sample in phylo_tree.constituent_samples
-            if sample.submitting_group_id == tree_owner_group.id
-        ]
-    for sample in all_translatable_samples:
-        public_id = sample.public_identifier.replace("hCoV-19/", "")
-        identifier_map[public_id] = sample.private_identifier
+    if user.system_admin or tree_owner_group.id in can_see_pi_group_ids:
+        all_translatable_samples_query = sa.select(Sample).where(
+            Sample.submitting_group == tree_owner_group
+        )  # type ignore
+        all_translatable_samples_result = await db.execute(
+            all_translatable_samples_query
+        )
+        all_translatable_samples = all_translatable_samples_result.scalars().all()
+        for sample in all_translatable_samples:
+            public_id = sample.public_identifier.replace("hCoV-19/", "")
+            identifier_map[public_id] = sample.private_identifier
+
     # we pass in the root node of the tree to the recursive naming function.
     json_data["tree"] = _rename_nodes_on_tree(
         json_data["tree"], identifier_map, "GISAID_ID"
     )
 
     return json_data
+
+
+def extract_accessions(accessions_list: list, node: dict):
+    node_attributes = node.get("node_attrs", {})
+    if "external_accession" in node_attributes:
+        accessions_list.append(node_attributes["external_accession"]["value"])
+    if "name" in node:
+        # NODE_ is some sort of generic name and not useful
+        if not re.match("NODE_", node["name"]):
+            accessions_list.append(node["name"])
+    if "children" in node:
+        for child in node["children"]:
+            extract_accessions(accessions_list, child)
+    return accessions_list
