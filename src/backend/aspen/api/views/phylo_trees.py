@@ -68,7 +68,7 @@ async def _get_selected_samples(db: AsyncSession, phylo_tree_id: int):
     return selected_samples
 
 
-@router.get("/{item_id}/metadata")
+@router.get("/{item_id}/sample_ids")
 async def get_tree_metadata(
     item_id: int,
     request: Request,

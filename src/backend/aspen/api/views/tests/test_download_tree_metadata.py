@@ -128,7 +128,7 @@ async def test_tree_metadata_download(
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     res = await http_client.get(
-        f"/v2/phylo_trees/{phylo_tree.entity_id}/metadata", headers=auth_headers
+        f"/v2/phylo_trees/{phylo_tree.entity_id}/sample_ids", headers=auth_headers
     )
     expected_filename = f"{phylo_tree.id}_sample_ids.tsv"
     expected_document = "Sample Identifier\tSelected\r\n" "root_identifier_1	no\r\n"
@@ -219,7 +219,7 @@ async def test_private_id_matrix(
         user = case["user"]
         auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
         res = await http_client.get(
-            f"/v2/phylo_trees/{phylo_tree.entity_id}/metadata", headers=auth_headers
+            f"/v2/phylo_trees/{phylo_tree.entity_id}/sample_ids", headers=auth_headers
         )
         assert res.status_code == case["expected_status"]
         file_contents = str(res.content, encoding="UTF-8")
@@ -257,7 +257,7 @@ async def test_tree_metadata_replaces_all_ids(
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     res = await http_client.get(
-        f"/v2/phylo_trees/{phylo_tree.entity_id}/metadata", headers=auth_headers
+        f"/v2/phylo_trees/{phylo_tree.entity_id}/sample_ids", headers=auth_headers
     )
     assert res.status_code == 200
     expected_data = (
@@ -311,7 +311,7 @@ async def test_public_tree_metadata_replaces_all_ids(
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     res = await http_client.get(
-        f"/v2/phylo_trees/{phylo_tree.entity_id}/metadata?id_style=public",
+        f"/v2/phylo_trees/{phylo_tree.entity_id}/sample_ids?id_style=public",
         headers=auth_headers,
     )
     assert res.status_code == 200
