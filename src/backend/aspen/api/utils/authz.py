@@ -6,7 +6,7 @@ from sqlalchemy.sql.expression import and_, or_
 from aspen.database.models import DataType, PhyloRun, PhyloTree, Sample, User
 
 
-def authz_samples_cansee(
+async def authz_samples_cansee(
     query: Query, sample_ids: Optional[Set[str]], user: User
 ) -> Query:
     # No filters for system admins
@@ -66,6 +66,7 @@ def authz_samples_cansee(
 
 # TODO, this is incredibly similar to sample authz filters. Generalize these!
 def authz_phylo_tree_filters(query: Query, user: User, tree_ids: Set[int]) -> Query:
+
     # No filters for system admins
     if user.system_admin:
         query = query.filter(

@@ -76,7 +76,6 @@ async def get_tree_metadata(
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_auth_user),
 ):
-    print("User:", user)
     phylo_tree_data = await process_phylo_tree(
         db, user, item_id, request.query_params.get("id_style")
     )
