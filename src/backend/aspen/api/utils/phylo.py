@@ -108,9 +108,9 @@ async def process_phylo_tree(
     tree_owner_group = phylo_run.group
     all_translatable_samples: list[Sample] = []
     if user.system_admin or tree_owner_group.id in can_see_pi_group_ids:
-        all_translatable_samples_query = sa.select(Sample).where(
+        all_translatable_samples_query = sa.select(Sample).where(  # type: ignore
             Sample.submitting_group == tree_owner_group
-        )  # type ignore
+        )
         all_translatable_samples_result = await db.execute(
             all_translatable_samples_query
         )

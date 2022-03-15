@@ -45,10 +45,10 @@ async def _get_selected_samples(db: AsyncSession, phylo_tree_id: int):
     # ref: https://github.com/sqlalchemy/sqlalchemy/discussions/6972
     entity_alias = aliased(UploadedPathogenGenome, flat=True)
     phylo_tree_query = (
-        sa.select(PhyloTree)
-        .join(PhyloRun, PhyloTree.producing_workflow.of_type(PhyloRun))
-        .outerjoin(entity_alias, PhyloRun.inputs.of_type(entity_alias))
-        .outerjoin(Sample)
+        sa.select(PhyloTree)  # type: ignore
+        .join(PhyloRun, PhyloTree.producing_workflow.of_type(PhyloRun))  # type: ignore
+        .outerjoin(entity_alias, PhyloRun.inputs.of_type(entity_alias))  # type: ignore
+        .outerjoin(Sample)  # type: ignore
         .filter(PhyloTree.entity_id == phylo_tree_id)
         .options(
             contains_eager(PhyloTree.producing_workflow.of_type(PhyloRun))
