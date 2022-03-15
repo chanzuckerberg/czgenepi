@@ -1,4 +1,4 @@
-from typing import Mapping, Optional, Set
+from typing import Set
 
 
 def get_names_from_tree(tree) -> Set[str]:

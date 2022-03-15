@@ -31,15 +31,18 @@ def upload_s3_file(
         # The bucket does not exist or you have no access.
         mock_s3_resource.create_bucket(Bucket=phylo_tree.s3_bucket)
 
+    tree_children = [{"name": sample.public_identifier} for sample in samples]
+    if gisaid_samples:
+        for gisaid_sample in gisaid_samples:
+            tree_children.append({"name": gisaid_sample})
+
     body = {
         "tree": {
             "name": "root_identifier_1",
-            "children": [{"name": sample.public_identifier} for sample in samples],
+            "children": tree_children,
         }
     }
-    if gisaid_samples:
-        for gisaid_sample in gisaid_samples:
-            body["tree"]["children"].append({"name": gisaid_sample})
+
     test_json = json.dumps(body)
 
     mock_s3_resource.Bucket(phylo_tree.s3_bucket).Object(phylo_tree.s3_key).put(
