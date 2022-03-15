@@ -368,7 +368,7 @@ async def create_samples(
 
     # Read the samples back from the DB with all fields populated.
     new_samples_query = (
-        sa.select(Sample)
+        sa.select(Sample)  # type: ignore
         .options(  # type: ignore
             selectinload(Sample.uploaded_pathogen_genome),
             selectinload(Sample.submitting_group),

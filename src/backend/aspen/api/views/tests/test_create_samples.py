@@ -8,6 +8,7 @@ from sqlalchemy.orm import joinedload
 
 from aspen.app.views import api_utils
 from aspen.database.models import Sample, UploadedPathogenGenome
+from aspen.test_infra.models.gisaid_metadata import gisaid_metadata_factory
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.usergroup import group_factory, user_factory
@@ -76,16 +77,16 @@ async def test_samples_create_view_pass_no_public_id(
     async_session.begin()
 
     samp_res = await async_session.execute(
-        sa.select(Sample).filter(Sample.private_identifier.in_(["private", "private2"]))
+        sa.select(Sample).filter(Sample.private_identifier.in_(["private", "private2"]))  # type: ignore
     )
     samples = samp_res.scalars().all()
-    upg_res = await async_session.execute(sa.select(UploadedPathogenGenome))
+    upg_res = await async_session.execute(sa.select(UploadedPathogenGenome))  # type: ignore
     uploaded_pathogen_genomes = upg_res.scalars().all()
 
     assert len(samples) == 2
     assert len(uploaded_pathogen_genomes) == 2
     # check that creating new public identifiers works
-    sample_res = await async_session.execute(sa.select(Sample))
+    sample_res = await async_session.execute(sa.select(Sample))  # type: ignore
     public_ids = sorted([i.public_identifier for i in sample_res.scalars().all()])
     datetime.datetime.now().year
     assert [
@@ -94,7 +95,7 @@ async def test_samples_create_view_pass_no_public_id(
     ] == public_ids
 
     sample_1_q = await async_session.execute(
-        sa.select(Sample)
+        sa.select(Sample)  # type: ignore
         .options(joinedload(Sample.uploaded_pathogen_genome))
         .filter(Sample.private_identifier == "private")
     )
@@ -157,11 +158,11 @@ async def test_samples_create_view_pass_no_sequencing_date(
     await async_session.commit()
 
     res = await async_session.execute(
-        sa.select(Sample).filter(Sample.private_identifier.in_(["private", "private2"]))
+        sa.select(Sample).filter(Sample.private_identifier.in_(["private", "private2"]))  # type: ignore
     )
-    samples = res.scalars().all()
+    samples = res.scalars().all()  # type: ignore
     uploaded_pathogen_genomes = (
-        (await async_session.execute(sa.select(UploadedPathogenGenome))).scalars().all()
+        (await async_session.execute(sa.select(UploadedPathogenGenome))).scalars().all()  # type: ignore
     )
 
     assert len(samples) == 2
@@ -170,7 +171,7 @@ async def test_samples_create_view_pass_no_sequencing_date(
     public_ids = sorted(
         [
             i.public_identifier
-            for i in (await async_session.execute(sa.select(Sample))).scalars().all()
+            for i in (await async_session.execute(sa.select(Sample))).scalars().all()  # type: ignore
         ]
     )
     datetime.datetime.now().year
@@ -182,8 +183,8 @@ async def test_samples_create_view_pass_no_sequencing_date(
     sample_1 = (
         (
             await async_session.execute(
-                sa.select(Sample)
-                .options(joinedload(Sample.uploaded_pathogen_genome))
+                sa.select(Sample)  # type: ignore
+                .options(joinedload(Sample.uploaded_pathogen_genome))  # type: ignore
                 .filter(Sample.private_identifier == "private")
             )
         )

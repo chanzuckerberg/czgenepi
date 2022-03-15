@@ -8,6 +8,8 @@ from aspen.api.schemas.base import BaseRequest, BaseResponse
 from aspen.api.schemas.locations import LocationResponse
 from aspen.api.utils import format_sample_lineage
 
+SEQUENCE_VALIDATION_REGEX = (r"^[WSKMYRVHDBNZNATCGUwskmyrvhdbnznatcgu-]+$",)
+
 
 class SampleRequest(BaseRequest):
     # mypy + pydantic is a work in progress: https://github.com/samuelcolvin/pydantic/issues/156
@@ -138,7 +140,11 @@ class CreateSamplePathogenGenomeRequest(BaseRequest):
     # following fields from PathogenGenome
     sequencing_date: Optional[datetime.date]
     sequencing_depth: Optional[float]
-    sequence: constr(min_length=1000, strict=True, regex=r"^[WSKMYRVHDBNZNATCGUwskmyrvhdbnznatcgu-]+$")  # type: ignore
+    sequence: constr(  # type: ignore
+        min_length=1000,
+        strict=True,
+        regex=SEQUENCE_VALIDATION_REGEX,
+    )  # type: ignore
 
 
 class CreateSamplesBaseRequest(BaseRequest):
@@ -153,7 +159,6 @@ class CreateSamplesBaseRequest(BaseRequest):
     sample_collector_contact_email: Optional[str]
     sample_collector_contact_address: Optional[str]
     authors: Optional[str]
-    organism: Optional[str]
     host: Optional[str]
     purpose_of_sampling: Optional[str]
     specimen_processing: Optional[str]

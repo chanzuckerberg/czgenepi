@@ -1,13 +1,16 @@
 from collections import Counter
-from typing import Any, Mapping, Optional, Tuple
+from typing import Any, Dict, List, Mapping, Optional, Tuple
 
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from aspen.api.schemas.samples import CreateSampleRequest
 from aspen.database.models import Accession, AccessionType, Sample
 
 
-def get_all_identifiers_in_request(data: Mapping) -> Tuple[list[str], list[str]]:
+def get_all_identifiers_in_request(
+    data: List[CreateSampleRequest],
+) -> Tuple[list[str], list[str]]:
     private_ids: list = []
     public_ids: list = []
 
@@ -22,7 +25,7 @@ def get_all_identifiers_in_request(data: Mapping) -> Tuple[list[str], list[str]]
 async def get_existing_private_ids(
     private_ids: list[str], session: AsyncSession, group_id=None
 ) -> list[str]:
-    samples = sa.select(Sample).filter(Sample.private_identifier.in_(private_ids))
+    samples = sa.select(Sample).filter(Sample.private_identifier.in_(private_ids))  # type: ignore
 
     if group_id is not None:
         samples = samples.filter(Sample.submitting_group_id == group_id)
@@ -34,7 +37,7 @@ async def get_existing_private_ids(
 async def get_existing_public_ids(
     public_ids: list[str], session: AsyncSession, group_id=None
 ) -> list[str]:
-    samples = sa.select(Sample).filter(Sample.public_identifier.in_(public_ids))
+    samples = sa.select(Sample).filter(Sample.public_identifier.in_(public_ids))  # type: ignore
 
     if group_id is not None:
         samples = samples.filter(Sample.submitting_group_id == group_id)
@@ -44,7 +47,7 @@ async def get_existing_public_ids(
 
 
 async def check_duplicate_samples(
-    data: Mapping,
+    data: List[CreateSampleRequest],
     session: AsyncSession,
     group_id: Optional[int] = None,
 ) -> Optional[Mapping[str, list[str]]]:
@@ -74,7 +77,7 @@ async def check_duplicate_samples(
 
 
 def check_duplicate_samples_in_request(
-    data: Mapping,
+    data: List[CreateSampleRequest],
 ) -> Optional[Mapping[str, list[str]]]:
     private_ids, public_ids = get_all_identifiers_in_request(data)
     private_id_counts = [id for id, count in Counter(private_ids).items() if count > 1]
@@ -112,7 +115,7 @@ def determine_gisaid_status(
     return {"status": "Not Found", "gisaid_id": None}
 
 
-def format_sample_lineage(sample: Sample) -> dict[str, Any]:
+def format_sample_lineage(sample: Sample) -> Dict[str, Any]:
     pathogen_genome = sample.uploaded_pathogen_genome
     if pathogen_genome:
         lineage = {
