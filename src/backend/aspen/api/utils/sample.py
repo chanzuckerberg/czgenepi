@@ -1,15 +1,17 @@
 from collections import Counter
-from typing import Any, Dict, List, Mapping, Optional, Tuple
+from typing import Any, Dict, List, Mapping, Optional, Tuple, TYPE_CHECKING
 
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from aspen.api.schemas.samples import CreateSampleRequest
 from aspen.database.models import Accession, AccessionType, Sample
+
+if TYPE_CHECKING:
+    from aspen.api.schemas.samples import CreateSampleRequest
 
 
 def get_all_identifiers_in_request(
-    data: List[CreateSampleRequest],
+    data: List["CreateSampleRequest"],
 ) -> Tuple[list[str], list[str]]:
     private_ids: list = []
     public_ids: list = []
@@ -47,7 +49,7 @@ async def get_existing_public_ids(
 
 
 async def check_duplicate_samples(
-    data: List[CreateSampleRequest],
+    data: List["CreateSampleRequest"],
     session: AsyncSession,
     group_id: Optional[int] = None,
 ) -> Optional[Mapping[str, list[str]]]:
@@ -77,7 +79,7 @@ async def check_duplicate_samples(
 
 
 def check_duplicate_samples_in_request(
-    data: List[CreateSampleRequest],
+    data: List["CreateSampleRequest"],
 ) -> Optional[Mapping[str, list[str]]]:
     private_ids, public_ids = get_all_identifiers_in_request(data)
     private_id_counts = [id for id, count in Counter(private_ids).items() if count > 1]

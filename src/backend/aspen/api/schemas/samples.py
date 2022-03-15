@@ -8,7 +8,7 @@ from aspen.api.schemas.base import BaseRequest, BaseResponse
 from aspen.api.schemas.locations import LocationResponse
 from aspen.api.utils import format_sample_lineage
 
-SEQUENCE_VALIDATION_REGEX = (r"^[WSKMYRVHDBNZNATCGUwskmyrvhdbnznatcgu-]+$",)
+SEQUENCE_VALIDATION_REGEX = r"^[WSKMYRVHDBNZNATCGUwskmyrvhdbnznatcgu-]+$"
 
 
 class SampleRequest(BaseRequest):
