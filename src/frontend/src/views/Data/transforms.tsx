@@ -33,7 +33,7 @@ export const TREE_TRANSFORMS: Transform[] = [
       if (typeof id !== "number") {
         return undefined;
       }
-      return `${API_URL}/api/phylo_tree/sample_ids/${id}`;
+      return `${API_URL}/v2/phylo_trees/${id}/sample_ids`;
     },
   },
   {
