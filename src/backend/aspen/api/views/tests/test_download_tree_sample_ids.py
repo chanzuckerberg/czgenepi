@@ -269,16 +269,6 @@ async def test_tree_metadata_replaces_all_ids(
         f"{samples[0].private_identifier}	yes\r\n"
         f"{extra_sample.private_identifier}	no\r\n"
     )
-    print(
-        "Public identifiers:",
-        samples[0].public_identifier,
-        extra_sample.public_identifier,
-    )
-    print(
-        "Private identifiers:",
-        samples[0].private_identifier,
-        extra_sample.private_identifier,
-    )
     file_contents = str(res.content, encoding="UTF-8")
     assert file_contents == expected_data
 
@@ -323,16 +313,6 @@ async def test_public_tree_metadata_replaces_all_ids(
         f"root_identifier_1	no\r\n"
         f"{samples[0].public_identifier}	yes\r\n"
         f"{extra_sample.public_identifier}	no\r\n"
-    )
-    print(
-        "Public identifiers:",
-        samples[0].public_identifier,
-        extra_sample.public_identifier,
-    )
-    print(
-        "Private identifiers:",
-        samples[0].private_identifier,
-        extra_sample.private_identifier,
     )
     file_contents = str(res.content, encoding="UTF-8")
     assert file_contents == expected_data
