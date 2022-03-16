@@ -69,6 +69,7 @@ jobs:
         with:
           script: |
             const prefix = "rdev-"
+            console.log(context)
             const ref = context.payload.pull_request.head.ref
             if (!ref.startsWith(prefix)) {
               core.setFailed(`ref ${ref} did not start with ${prefix}`)
