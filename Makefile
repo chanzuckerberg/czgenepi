@@ -240,10 +240,10 @@ local-update-frontend-deps: ## Update package-lock.json to reflect package.json 
 	$(docker_compose) exec frontend npm install
 
 ### ACCESSING CONTAINER MAKE COMMANDS ###################################################
-utility-%: ## Run make commands in the backend container (src/backend/Makefile) DEPRECATED!!
+utility-%: ## Run make commands in the CURRENT running backend container. See src/backend/Makefile
 	$(docker_compose) exec backend make $(subst utility-,,$@) MESSAGE="$(MESSAGE)"
 
-backend-%: .env.ecr ## Run make commands in the backend container (src/backend/Makefile)
+backend-%: .env.ecr  ## Run make commands in a NEW backend container. See src/backend/Makefile
 	$(docker_compose) run --no-deps --rm backend make $(subst backend-,,$@)
 
 .PHONY: frontend-e2e-ci
