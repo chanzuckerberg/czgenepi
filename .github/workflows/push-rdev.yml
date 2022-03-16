@@ -72,7 +72,7 @@ jobs:
         with:
           script: |
             const prefix = "rdev-";
-            const ref = "${{ steps.refs.headRef }}";
+            const ref = "${{ steps.refs.outputs.headRef }}";
             if (!ref.startsWith(prefix)) {
               core.setFailed(`ref ${ref} did not start with ${prefix}`)
               return
