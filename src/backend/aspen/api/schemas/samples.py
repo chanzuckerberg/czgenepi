@@ -153,7 +153,6 @@ class CreateSamplesBaseRequest(BaseRequest):
     collection_date: datetime.date
     location_id: int
     organism: str = "Severe acute respiratory syndrome coronavirus 2"
-    original_submission: Optional[str]  # TODO THIS IS AN ARBITRARY JSON BLOB
     public_identifier: Optional[str]
     sample_collected_by: Optional[str]
     sample_collector_contact_email: Optional[str]
