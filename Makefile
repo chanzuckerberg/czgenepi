@@ -57,13 +57,13 @@ remote-dbconsole: .env.ecr # Get a python console on a remote db (from OSX only!
 .PHONY: local-hostconfig
 local-hostconfig:
 	if [ "$$(uname -s)" == "Darwin" ]; then \
-	  sudo happy hosts install; \
+	  sudo ./scripts/happy hosts install; \
 	fi
 
 .PHONY: local-nohostconfig
 local-nohostconfig:
 	if [ "$$(uname -s)" == "Darwin" ]; then \
-	  sudo happy hosts uninstall; \
+	  sudo ./scripts/happy hosts uninstall; \
 	fi
 
 oauth/pkcs12/certificate.pfx:
