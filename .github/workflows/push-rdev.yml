@@ -43,7 +43,7 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-duration-seconds: 900
       - name: Build And Push
-        uses: chanzuckerberg/github-actions/.github/actions/docker-build-push@93afc9d2e54f5a91247a9ead446de5ddafec771e
+        uses: chanzuckerberg/github-actions/.github/actions/docker-build-push@c258c7d4cc4a5a0d68d5143d0be8bbea300c05e0
         with:
           dockerfile: ${{ matrix.image.dockerfile }}
           context: ${{ matrix.image.context }}
@@ -65,7 +65,7 @@ jobs:
           role-duration-seconds: 900
       - name: Calculate Branch and Base Names
         id: refs
-        uses: chanzuckerberg/github-actions/.github/actions/get-github-ref-names@93afc9d2e54f5a91247a9ead446de5ddafec771e
+        uses: chanzuckerberg/github-actions/.github/actions/get-github-ref-names@c258c7d4cc4a5a0d68d5143d0be8bbea300c05e0
       - name: Get Stack Name
         id: stack-name
         uses: actions/github-script@v6
