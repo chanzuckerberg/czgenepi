@@ -43,7 +43,7 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-duration-seconds: 900
       - name: Build And Push
-        uses: chanzuckerberg/github-actions/.github/actions/docker-build-push@714251942af29e3f6be1e90b6c10784f5dabd19b
+        uses: chanzuckerberg/github-actions/.github/actions/docker-build-push@845411f799000d4dde9116a9e78888b0c0ef8239
         with:
           dockerfile: ${{ matrix.image.dockerfile }}
           context: ${{ matrix.image.context }}
@@ -63,14 +63,16 @@ jobs:
           aws-region: us-west-2
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-duration-seconds: 900
+      - name: Calculate Branch and Base Names
+        id: refs
+        uses: chanzuckerberg/github-actions/.github/actions/get-github-ref-names@845411f799000d4dde9116a9e78888b0c0ef8239
       - name: Get Stack Name
         id: stack-name
         uses: actions/github-script@v6
         with:
           script: |
-            const prefix = "rdev-"
-            console.log(context)
-            const ref = context.payload.pull_request.head.ref
+            const prefix = "rdev-";
+            const ref = "${{ steps.refs.head_ref }}";
             if (!ref.startsWith(prefix)) {
               core.setFailed(`ref ${ref} did not start with ${prefix}`)
               return
