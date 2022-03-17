@@ -22,4 +22,4 @@ wget -O $filename $CANONICAL_LINEAGES_LOCATION
 # TODO aws s3 cp etc etc
 
 # Parse lineages file and load into DB
-python3 ./import.py $filename
+python3 ./import.py --lineages-file $filename

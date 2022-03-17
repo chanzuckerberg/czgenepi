@@ -1,6 +1,20 @@
+import io
+import re
+import uuid
 from typing import Optional
 
 import click
+from sqlalchemy import Column, MetaData, Table
+from sqlalchemy.schema import CreateTable, DropTable
+
+from aspen.config.config import Config
+from aspen.database.connection import (
+    get_db_uri,
+    init_db,
+    session_scope,
+    SqlAlchemyInterface,
+)
+from aspen.database.models import PangoLineages
 
 
 def extract_lineage_from_line(line: str, exclude_withdrawn=True) -> Optional[str]:
@@ -55,46 +69,129 @@ def safety_check_first_line(first_line: str) -> None:
     return None
 
 
-def get_lineages(lineage_notes_filename: str) -> list[str]:
-    """DOCME"""
-    with open(lineage_notes_filename) as f:
-        # First line is header, no lineage data, but we use as a safety check.
-        first_line = next(f)
-        safety_check_first_line(first_line)
-        # Now we parse remainder of lines from file and extract lineages
-        return [
-            extract_lineage_from_line(line)
-            for line in f
-            # Not all lines should have a lineage extracted, see function
-            if extract_lineage_from_line(line)
-        ]
+def get_lineages(lineage_notes_file: io.TextIOBase) -> list[str]:
+    """Extracts all current Pango lineages from lineage_notes file.
+
+    Talking to Pangolin folks, they said the best canonical listing of all
+    current lineages is to use their (manually updated) lineage_notes.txt
+    https://github.com/cov-lineages/pango-designation/issues/456
+
+    This function takes that file and parses out list of lineages.
+    """
+    # First line is header, no lineage data, but we use as a safety check.
+    first_line = next(lineage_notes_file)
+    safety_check_first_line(first_line)
+    # Now we parse remainder of lines from file and extract lineages
+    return [
+        lineage
+        for line in lineage_notes_file
+        if (lineage := extract_lineage_from_line(line)) is not None
+    ]
+
+
+def create_temp_table(session, source_table):
+    """Creates a new table that is structured same as source.
+    Intended to be temporary, should drop by end of this script.
+    copy-pasta from import_gisaid/save.py"""
+    metadata = MetaData()
+    suffix = re.sub("-", "", str(uuid.uuid1()))
+    table_name = f"{source_table.name}_{suffix}"
+    cols = []
+    for col in source_table.columns:
+        cols.append(
+            Column(
+                col.name, col.type, primary_key=col.primary_key, nullable=col.nullable
+            )
+        )
+
+    table_object = Table(table_name, metadata, *cols)
+    session.execute(CreateTable(table_object))
+    return table_object
+
+
+def mv_table_contents(session, source_table, dest_table):
+    """Deletes contents of dest, copies in contents from source to dest.
+    copy-pasta from import_gisaid/save.py"""
+    cols = [col.name for col in dest_table.columns]
+    session.execute(dest_table.delete())
+    session.execute(dest_table.insert().from_select(cols, source_table.select()))
+
+
+def drop_table(session, table_obj):
+    """Drops table. Intended to be used on temporary table only.
+    copy-pasta from import_gisaid/save.py"""
+    session.execute(DropTable(table_obj))
+
+
+def load_lineages_data(lineages: list[str]) -> None:
+    """Loads all the lineages into DB.
+
+    Approach to this is basically duplicating what's in
+        backend/aspen/workflows/import_gisaid/save.py
+    Idea is to load all the data into a temp table with same structure,
+    then once all loaded, drop the rows from "real" table, move the new data
+    over from the temp table, and finally drop the temp table to wrap up.
+
+    Original GISAID import deals with a lot more data, so that has some
+    performance-specific bits that are not included in this version.
+    """
+    LINEAGE_COL_NAME = "lineage"
+
+    interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
+    with session_scope(interface) as session:
+
+        dest_table = PangoLineages.__table__
+        temp_table = create_temp_table(session, dest_table)
+
+        # Load data into temp_table
+        lineage_objects = [{LINEAGE_COL_NAME: lineage} for lineage in lineages]
+        session.execute(temp_table.insert(), lineage_objects)
+
+        # Replace previous data with new data from temp_table
+        mv_table_contents(session, temp_table, dest_table)
+        drop_table(session, temp_table)
+
+        # Final sanity check before we commit
+        count_db_lineages = session.query(dest_table).count()
+        print(f"Imported {count_db_lineages} lineage rows")
+        if len(lineages) != count_db_lineages:
+            raise RuntimeError("Something went wrong loading DB. Abort!")
+            # This exception will bubble up, end session, cause rollback.
+
+        session.commit()
 
 
 @click.command()
 @click.option(
+    "pango_lineages_file",
+    "--lineages-file",
+    type=click.File("r"),
+    required=True,
+    help="Pango lineages file to parse and import.",
+)
+@click.option(
     "--parse-without-import",
     type=bool,
     is_flag=True,
-    help="Parse lineages file, but print results instead of writing to DB.",
+    help="Parse lineages file, but only print results instead of write to DB.",
 )
-@click.argument(
-    "pango_lineages_filename",
-    required=True,
-)
-def cli(parse_without_import: bool, pango_lineages_filename: str):
-    """
-    Parse provided lineage_notes from Pangolin, load into DB.
-
-    PANGO_LINEAGES_FILENAME: Needs to be in same directory as this script.
-    """
-    lineages = get_lineages(pango_lineages_filename)
+def cli(
+    pango_lineages_file: io.TextIOBase,
+    parse_without_import: bool,
+):
+    """Parse provided lineage_notes from Pangolin, load into DB."""
+    print("Parsing lineages data from file...")
+    lineages = get_lineages(pango_lineages_file)
     print(f"Found {len(lineages)} lineages in file")
+
     if parse_without_import:
         print("Printing lineages, but NOT importing to DB")
         print(lineages)
-        return  # End here to avoid doing import
-    # TODO
-    print("Let's do this, boss!")
+        return  # End here to avoid importing to DB
+
+    print("Loading Pango lineages to DB...")
+    load_lineages_data(lineages)
+    print("Loading Pango lineages complete!")
 
 
 if __name__ == "__main__":
