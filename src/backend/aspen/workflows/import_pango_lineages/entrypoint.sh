@@ -23,8 +23,8 @@ wget -O $filename $CANONICAL_LINEAGES_LOCATION
 
 # We upload copy to S3 for record keeping, but unused otherwise
 echo "Uploading a backup copy to S3"
-lineages_key = "pangolin_lineages/${filename}"
-s3_destination = "s3://${ASPEN_S3_DB_BUCKET}/${lineages_key}"
+lineages_key="pangolin_lineages/${filename}"
+s3_destination="s3://${ASPEN_S3_DB_BUCKET}/${lineages_key}"
 aws s3 cp $filename $s3_destination
 
 # Parse lineages file and load into DB
