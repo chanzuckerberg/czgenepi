@@ -150,7 +150,7 @@ export const DateFilter: FC<Props> = ({
     <StyledFilterWrapper>
       <StyledInputDropdown
         sdsStyle="minimal"
-        sdsType="primary"
+        sdsType="singleSelect"
         label={inputLabel}
         // @ts-expect-error remove line when inputdropdown types fixed in sds
         onClick={handleClick}
