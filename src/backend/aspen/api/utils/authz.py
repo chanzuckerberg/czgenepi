@@ -66,6 +66,7 @@ def authz_samples_cansee(
 
 # TODO, this is incredibly similar to sample authz filters. Generalize these!
 def authz_phylo_tree_filters(query: Query, user: User, tree_ids: Set[int]) -> Query:
+
     # No filters for system admins
     if user.system_admin:
         query = query.filter(

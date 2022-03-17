@@ -1,17 +1,29 @@
 import json
 import uuid
 
+import boto3
+import pytest
 from botocore.client import ClientError
+from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from aspen.database.models import CanSee, DataType
+from aspen.database.models import CanSee, DataType, Group, PhyloTree, Sample
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
 from aspen.test_infra.models.usergroup import group_factory, user_factory
 
+# All test coroutines will be treated as marked.
+pytestmark = pytest.mark.asyncio
 
-def upload_s3_file(mock_s3_resource, phylo_tree, samples, gisaid_samples=None):
+
+def upload_s3_file(
+    mock_s3_resource: boto3.resource,
+    phylo_tree: PhyloTree,
+    samples: list[Sample],
+    gisaid_samples=None,
+):
     # Create the bucket if it doesn't exist in localstack.
     try:
         mock_s3_resource.meta.client.head_bucket(Bucket=phylo_tree.s3_bucket)
@@ -19,15 +31,18 @@ def upload_s3_file(mock_s3_resource, phylo_tree, samples, gisaid_samples=None):
         # The bucket does not exist or you have no access.
         mock_s3_resource.create_bucket(Bucket=phylo_tree.s3_bucket)
 
+    tree_children = [{"name": sample.public_identifier} for sample in samples]
+    if gisaid_samples:
+        for gisaid_sample in gisaid_samples:
+            tree_children.append({"name": gisaid_sample})
+
     body = {
         "tree": {
             "name": "root_identifier_1",
-            "children": [{"name": sample.public_identifier} for sample in samples],
+            "children": tree_children,
         }
     }
-    if gisaid_samples:
-        for gisaid_sample in gisaid_samples:
-            body["tree"]["children"].append({"name": gisaid_sample})
+
     test_json = json.dumps(body)
 
     mock_s3_resource.Bucket(phylo_tree.s3_bucket).Object(phylo_tree.s3_key).put(
@@ -35,7 +50,9 @@ def upload_s3_file(mock_s3_resource, phylo_tree, samples, gisaid_samples=None):
     )
 
 
-def create_phylotree_with_inputs(mock_s3_resource, session, owner_group):
+async def create_phylotree_with_inputs(
+    mock_s3_resource: boto3.resource, async_session: AsyncSession, owner_group: Group
+):
     username = "owner"
     user = user_factory(
         owner_group, name=username, auth0_user_id=username, email=username
@@ -65,12 +82,14 @@ def create_phylotree_with_inputs(mock_s3_resource, session, owner_group):
     )
     upload_s3_file(mock_s3_resource, phylo_tree, samples, gisaid_samples)
 
-    session.add_all([phylo_tree])
-    session.commit()
+    async_session.add_all([phylo_tree])
+    await async_session.commit()
     return phylo_tree, phylo_run, samples
 
 
-def create_phylotree(mock_s3_resource, session, sample_as_input=False):
+async def create_phylotree(
+    mock_s3_resource: boto3.resource, async_session: AsyncSession, sample_as_input=False
+):
     owner_group = group_factory()
     user = user_factory(owner_group)
     location = location_factory(
@@ -95,32 +114,32 @@ def create_phylotree(mock_s3_resource, session, sample_as_input=False):
     )
     upload_s3_file(mock_s3_resource, phylo_tree, samples)
 
-    session.add_all([phylo_tree, owner_group, owner_group])
-    session.commit()
+    async_session.add_all([phylo_tree, owner_group, owner_group])
+    await async_session.commit()
     return user, phylo_tree, samples
 
 
-def test_tree_metadata_download(
-    mock_s3_resource,
-    session,
-    app,
-    client,
+async def test_tree_metadata_download(
+    mock_s3_resource: boto3.resource,
+    async_session: AsyncSession,
+    http_client: AsyncClient,
 ):
     """
     Test a regular tsv download for a sample submitted by the user's group
     """
-    user, tree, samples = create_phylotree(mock_s3_resource, session)
+    user, phylo_tree, samples = await create_phylotree(mock_s3_resource, async_session)
 
-    with client.session_transaction() as sess:
-        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
-    res = client.get(f"/api/phylo_tree/sample_ids/{tree.id}")
-    expected_filename = f"{tree.id}_sample_ids.tsv"
+    auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
+    res = await http_client.get(
+        f"/v2/phylo_trees/{phylo_tree.entity_id}/sample_ids", headers=auth_headers
+    )
+    expected_filename = f"{phylo_tree.id}_sample_ids.tsv"
     expected_document = "Sample Identifier\tSelected\r\n" "root_identifier_1	no\r\n"
     for sample in samples:
         expected_document += f"{sample.private_identifier}	no\r\n"
-    file_contents = str(res.data, encoding="UTF-8")
+    file_contents = str(res.content, encoding="UTF-8")
     assert file_contents == expected_document
-    assert res.status == "200 OK"
+    assert res.status_code == 200
     assert res.headers["Content-Type"] == "text/tsv"
     assert (
         res.headers["Content-Disposition"]
@@ -128,16 +147,15 @@ def test_tree_metadata_download(
     )
 
 
-def create_unique_user(group, username):
+def create_unique_user(group: Group, username: str):
     user = user_factory(group, name=username, auth0_user_id=username, email=username)
     return user
 
 
-def test_private_id_matrix(
-    mock_s3_resource,
-    session,
-    app,
-    client,
+async def test_private_id_matrix(
+    mock_s3_resource: boto3.resource,
+    async_session: AsyncSession,
+    http_client: AsyncClient,
 ):
     """
     Test that we use public ids in the fasta file if the requester only has access to the
@@ -150,8 +168,8 @@ def test_private_id_matrix(
     viewer_user = create_unique_user(viewer_group, "viewer")
     private_ids_user = create_unique_user(private_ids_group, "private_ids")
     noaccess_user = create_unique_user(noaccess_group, "noaccess")
-    phylo_tree, phylo_run, samples = create_phylotree_with_inputs(
-        mock_s3_resource, session, owner_group
+    phylo_tree, phylo_run, samples = await create_phylotree_with_inputs(
+        mock_s3_resource, async_session, owner_group
     )
     # give the viewer group access to trees from the owner group
     CanSee(
@@ -170,18 +188,18 @@ def test_private_id_matrix(
         owner_group=owner_group,
         data_type=DataType.TREES,
     )
-    session.add_all([noaccess_user, viewer_user, private_ids_user, phylo_tree])
-    session.commit()
+    async_session.add_all([noaccess_user, viewer_user, private_ids_user, phylo_tree])
+    await async_session.commit()
 
     matrix = [
         {
             "user": noaccess_user,
-            "expected_status": "400 BAD REQUEST",
-            "expected_data": f'{{"error":"PhyloTree with id {phylo_tree.id} not viewable by user with id: {noaccess_user.id}"}}\n',
+            "expected_status": 400,
+            "expected_data": f'{{"error":"PhyloTree with id {phylo_tree.id} not viewable by user with id: {noaccess_user.id}"}}',
         },
         {
             "user": viewer_user,
-            "expected_status": "200 OK",
+            "expected_status": 200,
             "expected_data": (
                 "Sample Identifier\tSelected\r\n"
                 f"root_identifier_1	no\r\n"
@@ -191,7 +209,7 @@ def test_private_id_matrix(
         },
         {
             "user": private_ids_user,
-            "expected_status": "200 OK",
+            "expected_status": 200,
             "expected_data": (
                 "Sample Identifier\tSelected\r\n"
                 f"root_identifier_1	no\r\n"
@@ -202,24 +220,26 @@ def test_private_id_matrix(
     ]
     for case in matrix:
         user = case["user"]
-        with client.session_transaction() as sess:
-            sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
-        res = client.get(f"/api/phylo_tree/sample_ids/{phylo_tree.id}")
-        assert res.status == case["expected_status"]
-        file_contents = str(res.data, encoding="UTF-8")
+        auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
+        res = await http_client.get(
+            f"/v2/phylo_trees/{phylo_tree.entity_id}/sample_ids", headers=auth_headers
+        )
+        assert res.status_code == case["expected_status"]
+        file_contents = str(res.content, encoding="UTF-8")
         assert file_contents == case["expected_data"]
 
 
-def test_tree_metadata_replaces_all_ids(
-    mock_s3_resource,
-    session,
-    app,
-    client,
+async def test_tree_metadata_replaces_all_ids(
+    mock_s3_resource: boto3.resource,
+    async_session: AsyncSession,
+    http_client: AsyncClient,
 ):
     """
     Test a regular tsv download for a sample submitted by the user's group
     """
-    user, tree, samples = create_phylotree(mock_s3_resource, session, True)
+    user, phylo_tree, samples = await create_phylotree(
+        mock_s3_resource, async_session, True
+    )
 
     extra_sample = sample_factory(
         user.group,
@@ -232,34 +252,38 @@ def test_tree_metadata_replaces_all_ids(
     # Write an extra sample to our s3 file. This sample isn't part of the
     # list of "inputs" into the phylo_run job, but it *should still have
     # its public identifiers converted to private ids!!!*
-    upload_s3_file(mock_s3_resource, tree, samples + [extra_sample])
-    session.commit()
-    session.flush()
+    upload_s3_file(mock_s3_resource, phylo_tree, samples + [extra_sample])
 
-    with client.session_transaction() as sess:
-        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
-    res = client.get(f"/api/phylo_tree/sample_ids/{tree.id}")
-    assert res.status == "200 OK"
+    async_session.add(extra_sample)
+    await async_session.commit()
+    await async_session.flush()
+
+    auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
+    res = await http_client.get(
+        f"/v2/phylo_trees/{phylo_tree.entity_id}/sample_ids", headers=auth_headers
+    )
+    assert res.status_code == 200
     expected_data = (
         "Sample Identifier\tSelected\r\n"
         f"root_identifier_1	no\r\n"
         f"{samples[0].private_identifier}	yes\r\n"
         f"{extra_sample.private_identifier}	no\r\n"
     )
-    file_contents = str(res.data, encoding="UTF-8")
+    file_contents = str(res.content, encoding="UTF-8")
     assert file_contents == expected_data
 
 
-def test_public_tree_metadata_replaces_all_ids(
-    mock_s3_resource,
-    session,
-    app,
-    client,
+async def test_public_tree_metadata_replaces_all_ids(
+    mock_s3_resource: boto3.resource,
+    async_session: AsyncSession,
+    http_client: AsyncClient,
 ):
     """
     Test a regular tsv download for public identifiers
     """
-    user, tree, samples = create_phylotree(mock_s3_resource, session, True)
+    user, phylo_tree, samples = await create_phylotree(
+        mock_s3_resource, async_session, True
+    )
 
     extra_sample = sample_factory(
         user.group,
@@ -272,19 +296,23 @@ def test_public_tree_metadata_replaces_all_ids(
     # Write an extra sample to our s3 file. This sample isn't part of the
     # list of "inputs" into the phylo_run job, but it *should still have
     # its public identifiers converted to private ids!!!*
-    upload_s3_file(mock_s3_resource, tree, samples + [extra_sample])
-    session.commit()
-    session.flush()
+    upload_s3_file(mock_s3_resource, phylo_tree, samples + [extra_sample])
 
-    with client.session_transaction() as sess:
-        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
-    res = client.get(f"/api/phylo_tree/sample_ids/{tree.id}?id_style=public")
-    assert res.status == "200 OK"
+    async_session.add(extra_sample)
+    await async_session.commit()
+    await async_session.flush()
+
+    auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
+    res = await http_client.get(
+        f"/v2/phylo_trees/{phylo_tree.entity_id}/sample_ids?id_style=public",
+        headers=auth_headers,
+    )
+    assert res.status_code == 200
     expected_data = (
         "Sample Identifier\tSelected\r\n"
         f"root_identifier_1	no\r\n"
         f"{samples[0].public_identifier}	yes\r\n"
         f"{extra_sample.public_identifier}	no\r\n"
     )
-    file_contents = str(res.data, encoding="UTF-8")
+    file_contents = str(res.content, encoding="UTF-8")
     assert file_contents == expected_data
