@@ -125,7 +125,6 @@ export default function Metadata({
           <NextStepWrapper isValid={isValid}>
             <ContinueButton
               disabled={!isValid}
-              isRounded
               sdsType="primary"
               sdsStyle="rounded"
             >

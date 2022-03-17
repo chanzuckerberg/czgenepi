@@ -6,7 +6,6 @@ import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import { StyledText } from "src/views/Data/components/TreeActionMenu/components/MoreActionsMenu/style";
 import { TooltipDescriptionText, TooltipHeaderText } from "../../style";
 import { IconButton } from "../IconButton";
-import { StyledMoreActionsIcon } from "./style";
 
 interface Props {
   disabled: boolean;

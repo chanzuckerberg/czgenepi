@@ -1,3 +1,4 @@
+import type { IconNameToSizes } from "czifui";
 import { Icon, IconButton as LibIconButton, Tooltip } from "czifui";
 import React, { FunctionComponent, MouseEventHandler, useState } from "react";
 import { StyledSpan } from "./style";
@@ -5,7 +6,7 @@ import { StyledSpan } from "./style";
 interface Props {
   onClick: MouseEventHandler;
   disabled: boolean;
-  sdsIcon: string;
+  sdsIcon: keyof IconNameToSizes;
   tooltipTextEnabled: JSX.Element;
   tooltipTextDisabled: JSX.Element;
 }
@@ -18,9 +19,9 @@ export const IconButton: FunctionComponent<Props> = ({
   tooltipTextDisabled,
 }: Props) => {
   const [active, setActive] = useState<boolean>(false);
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
     setActive(!active);
-    onClick();
+    onClick(e);
   };
 
   return (
