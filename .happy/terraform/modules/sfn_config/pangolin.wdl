@@ -17,6 +17,7 @@ workflow pangolin {
     # }
 
     call pango_lineages_loading {
+        input:
         docker_image_id = docker_image_id,
         genepi_config_secret_name = genepi_config_secret_name,
         remote_dev_prefix = remote_dev_prefix,
