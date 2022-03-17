@@ -1,9 +1,11 @@
 import RadioGroup from "@material-ui/core/RadioGroup";
 import CloseIcon from "@material-ui/icons/Close";
 import { uniq } from "lodash";
+import Image from "next/image";
 import NextLink from "next/link";
 import React, { SyntheticEvent, useEffect, useState } from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
+import GisaidLogo from "src/common/images/gisaid-logo-full.png";
 import { useCreateTree } from "src/common/queries/trees";
 import { ROUTES } from "src/common/routes";
 import { B } from "src/common/styles/basicStyle";
@@ -22,8 +24,11 @@ import {
 } from "./components/RadioLabel";
 import { SampleIdInput } from "./components/SampleIdInput";
 import {
+  Attribution,
   CreateTreeInfo,
   FieldTitle,
+  ImageSizer,
+  NextstrainLogo,
   Separator,
   StyledButton,
   StyledDialog,
@@ -212,6 +217,15 @@ export const CreateNSTreeModal = ({
           </Title>
         </StyledDialogTitle>
         <StyledDialogContent data-test-id="modal-content">
+          <Attribution>
+            Built in partnership with <NextstrainLogo />, enabled by data
+            from&nbsp;
+            <ImageSizer>
+              <Image src={GisaidLogo} />
+            </ImageSizer>
+            .
+          </Attribution>
+          <Separator marginSize="xl" />
           <TreeNameInput
             setTreeName={setTreeName}
             treeName={treeName}

@@ -1,16 +1,38 @@
 import json
 
+import boto3
+import pytest
 from botocore.client import ClientError
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from aspen.app.views.phylo_trees import _process_phylo_tree
+from aspen.api.utils import process_phylo_tree
 from aspen.database.models import CanSee, DataType
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.usergroup import group_factory, user_factory
 
+# All test coroutines will be treated as marked.
+pytestmark = pytest.mark.asyncio
 
-def test_phylo_tree_rename(session, mock_s3_resource, test_data_dir):
+TEST_TREE = {
+    "tree": {
+        "name": "public_identifier_1",
+        "children": [
+            {"name": "public_identifier_2"},
+            {"name": "public_identifier_3"},
+            {
+                "name": "public_identifier_4",
+                "children": [{"name": "public_identifier_5"}],
+            },
+        ],
+    }
+}
+
+
+async def test_phylo_tree_rename(
+    async_session: AsyncSession, mock_s3_resource: boto3.resource
+):
     """Create a set of samples belonging to different groups with different levels of
     can-see relationships.  Rename the nodes according to the can-see rules, and verify
     that the nodes are renamed correctly."""
@@ -32,11 +54,11 @@ def test_phylo_tree_rename(session, mock_s3_resource, test_data_dir):
             data_type=DataType.SEQUENCES,
         )
     )
-    session.add_all(
+    user = user_factory(viewer_group)
+    async_session.add_all(
         [viewer_group, can_see_group, wrong_can_see_group, no_can_see_group]
     )
 
-    user = user_factory(viewer_group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
@@ -85,18 +107,17 @@ def test_phylo_tree_rename(session, mock_s3_resource, test_data_dir):
         # The bucket does not exist or you have no access.
         mock_s3_resource.create_bucket(Bucket=phylo_tree.s3_bucket)
 
-    json_test_file = test_data_dir / "ncov_aspen.json"
-    with json_test_file.open() as fh:
-        test_json = json.dumps(json.load(fh))
+    test_json = json.dumps(TEST_TREE)
 
     mock_s3_resource.Bucket(phylo_tree.s3_bucket).Object(phylo_tree.s3_key).put(
         Body=test_json
     )
 
     # this is mandatory because we use an id to reference the tree.
-    session.commit()
+    async_session.add(phylo_tree)
+    await async_session.commit()
 
-    tree = _process_phylo_tree(session, phylo_tree.entity_id, user)
+    tree = await process_phylo_tree(async_session, user, phylo_tree.entity_id)
 
     assert tree == {
         "tree": {
@@ -114,14 +135,17 @@ def test_phylo_tree_rename(session, mock_s3_resource, test_data_dir):
     }
 
 
-def test_phylo_tree_rename_admin(session, mock_s3_resource, test_data_dir):
+async def test_phylo_tree_rename_admin(
+    async_session: AsyncSession, mock_s3_resource: boto3.resource
+):
     """Create a set of samples belonging to a different group, but visible because the
     viewer is an admin.  Verify that the nodes are renamed correctly."""
     viewer_group = group_factory()
     owner_group = group_factory("no_can_see")
-    session.add_all([viewer_group, owner_group])
-
     user = user_factory(viewer_group)
+    viewer_group.can_see = []
+    async_session.add_all([viewer_group, owner_group])
+
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
@@ -146,18 +170,17 @@ def test_phylo_tree_rename_admin(session, mock_s3_resource, test_data_dir):
         # The bucket does not exist or you have no access.
         mock_s3_resource.create_bucket(Bucket=phylo_tree.s3_bucket)
 
-    json_test_file = test_data_dir / "ncov_aspen.json"
-    with json_test_file.open() as fh:
-        test_json = json.dumps(json.load(fh))
+    test_json = json.dumps(TEST_TREE)
 
     mock_s3_resource.Bucket(phylo_tree.s3_bucket).Object(phylo_tree.s3_key).put(
         Body=test_json
     )
 
     # this is mandatory because we use an id to reference the tree.
-    session.commit()
+    async_session.add(phylo_tree)
+    await async_session.commit()
 
-    tree = _process_phylo_tree(session, phylo_tree.entity_id, user)
+    tree = await process_phylo_tree(async_session, user, phylo_tree.entity_id)
 
     assert tree == {
         "tree": {

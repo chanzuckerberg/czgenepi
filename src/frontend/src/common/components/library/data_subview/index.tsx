@@ -12,6 +12,7 @@ import { CreateNSTreeModal } from "./components/CreateNSTreeModal";
 import { DeleteSamplesConfirmationModal } from "./components/DeleteSamplesConfirmationModal";
 import { DeleteTreeConfirmationModal } from "./components/DeleteTreeConfirmationModal";
 import DownloadModal from "./components/DownloadModal";
+import { EditSamplesConfirmationModal } from "./components/EditSamplesConfirmationModal";
 import { EditTreeConfirmationModal } from "./components/EditTreeConfirmationModal";
 import { IconButton } from "./components/IconButton";
 import { MoreActionsMenu } from "./components/MoreActionMenu";
@@ -140,6 +141,8 @@ const DataSubview: FunctionComponent<Props> = ({
     useState<boolean>(false);
   const [isDeleteSampleConfirmationOpen, setDeleteSampleConfirmationOpen] =
     useState<boolean>(false);
+  const [isEditSampleConfirmationOpen, setEditSampleConfirmationOpen] =
+    useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
   // TODO (mlila): when table is refactored, this modal and related state should be moved closer
   // TODO-TR          to the actions that cause the modal to open (search for TODO-TR)
@@ -176,6 +179,11 @@ const DataSubview: FunctionComponent<Props> = ({
 
   const handleDeleteSampleModalClose = () => {
     setDeleteSampleConfirmationOpen(false);
+    setCheckedSampleIds([]);
+  };
+
+  const handleEditSampleModalClose = () => {
+    setEditSampleConfirmationOpen(false);
     setCheckedSampleIds([]);
   };
 
@@ -264,6 +272,7 @@ const DataSubview: FunctionComponent<Props> = ({
           <MoreActionsMenu
             disabled={!hasCheckedSamples}
             onDeleteSelected={() => setDeleteSampleConfirmationOpen(true)}
+            onEditSelected={() => setEditSampleConfirmationOpen(true)}
           />
         </DownloadWrapper>
       );
@@ -305,6 +314,11 @@ const DataSubview: FunctionComponent<Props> = ({
               checkedSamples={checkedSamples}
               onClose={handleDeleteSampleModalClose}
               open={isDeleteSampleConfirmationOpen}
+            />
+            <EditSamplesConfirmationModal
+              checkedSamples={checkedSamples}
+              onClose={handleEditSampleModalClose}
+              open={isEditSampleConfirmationOpen}
             />
           </>
         )}

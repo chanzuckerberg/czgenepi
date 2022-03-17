@@ -16,10 +16,10 @@ pytestmark = pytest.mark.asyncio
 
 
 async def make_shared_test_data(
-    async_session: AsyncSession, no_trees: bool = False
+    async_session: AsyncSession, no_trees: bool = False, system_admin=False
 ) -> Tuple[User, Group, List[Sample], PhyloRun, Union[PhyloTree, None]]:
     group = group_factory()
-    user = user_factory(group)
+    user = user_factory(group, system_admin=system_admin)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )

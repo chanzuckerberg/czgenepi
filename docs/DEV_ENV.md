@@ -111,8 +111,8 @@ brew install aws-oidc
 mkdir -p ~/.aws  # Temp workaround for aws-oidc bug.
 touch ~/.aws/config  # Temp workaround for aws-oidc bug.
 aws-oidc configure --issuer-url https://czi-prod.okta.com --client-id aws-config --config-url https://aws-config-generation.staging.si.czi.technology # Just use the defaults
-git clone git@github.com:chanzuckerberg/aspen.git
-cd aspen
-/usr/bin/env/python3 -m pip install .happy/requirements.txt
+git clone git@github.com:chanzuckerberg/czgenepi.git
+cd czgenepi
+/usr/bin/env/python3 -m pip install .happy/requirements.txt # You may need to use `sudo` here if you're using osx system python instead of homebrew python
 make local-init
 ```
