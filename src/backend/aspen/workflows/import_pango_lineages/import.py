@@ -1,11 +1,7 @@
 import io
-import re
-import uuid
 from typing import Optional
 
 import click
-from sqlalchemy import Column, MetaData, Table
-from sqlalchemy.schema import CreateTable, DropTable
 
 from aspen.config.config import Config
 from aspen.database.connection import (
@@ -15,6 +11,11 @@ from aspen.database.connection import (
     SqlAlchemyInterface,
 )
 from aspen.database.models import PangoLineages
+from aspen.workflows.shared_utils.database import (
+    create_temp_table,
+    drop_temp_table,
+    mv_table_contents,
+)
 
 
 def extract_lineage_from_line(line: str, exclude_withdrawn=True) -> Optional[str]:
@@ -89,40 +90,6 @@ def get_lineages(lineage_notes_file: io.TextIOBase) -> list[str]:
     ]
 
 
-def create_temp_table(session, source_table):
-    """Creates a new table that is structured same as source.
-    Intended to be temporary, should drop by end of this script.
-    copy-pasta from import_gisaid/save.py"""
-    metadata = MetaData()
-    suffix = re.sub("-", "", str(uuid.uuid1()))
-    table_name = f"{source_table.name}_{suffix}"
-    cols = []
-    for col in source_table.columns:
-        cols.append(
-            Column(
-                col.name, col.type, primary_key=col.primary_key, nullable=col.nullable
-            )
-        )
-
-    table_object = Table(table_name, metadata, *cols)
-    session.execute(CreateTable(table_object))
-    return table_object
-
-
-def mv_table_contents(session, source_table, dest_table):
-    """Deletes contents of dest, copies in contents from source to dest.
-    copy-pasta from import_gisaid/save.py"""
-    cols = [col.name for col in dest_table.columns]
-    session.execute(dest_table.delete())
-    session.execute(dest_table.insert().from_select(cols, source_table.select()))
-
-
-def drop_table(session, table_obj):
-    """Drops table. Intended to be used on temporary table only.
-    copy-pasta from import_gisaid/save.py"""
-    session.execute(DropTable(table_obj))
-
-
 def load_lineages_data(lineages: list[str]) -> None:
     """Loads all the lineages into DB.
 
@@ -149,7 +116,7 @@ def load_lineages_data(lineages: list[str]) -> None:
 
         # Replace previous data with new data from temp_table
         mv_table_contents(session, temp_table, dest_table)
-        drop_table(session, temp_table)
+        drop_temp_table(session, temp_table)
 
         # Final sanity check before we commit
         count_db_lineages = session.query(dest_table).count()
@@ -175,11 +142,22 @@ def load_lineages_data(lineages: list[str]) -> None:
     is_flag=True,
     help="Parse lineages file, but only print results instead of write to DB.",
 )
+@click.option(
+    "--test",
+    type=bool,
+    is_flag=True,
+    help="Run very basic smoke test.",
+)
 def cli(
     pango_lineages_file: io.TextIOBase,
     parse_without_import: bool,
+    test: bool,
 ):
     """Parse provided lineage_notes from Pangolin, load into DB."""
+    if test:
+        print("Success!")
+        return  # Do nothing other than basic smoke test
+
     print("Parsing lineages data from file...")
     lineages = get_lineages(pango_lineages_file)
     print(f"Found {len(lineages)} lineages in file")
