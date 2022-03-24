@@ -229,6 +229,8 @@ class Settings(BaseSettings):
             "SPLIT_BACKEND_KEY",
             "AUTH0_CLIENT_ID",
             "AUTH0_CLIENT_SECRET",
+            "CZID_CLIENT_ID",
+            "CZID_CLIENT_SECRET",
             "AUTH0_MANAGEMENT_CLIENT_ID",
             "AUTH0_MANAGEMENT_CLIENT_SECRET",
             "AUTH0_DOMAIN",

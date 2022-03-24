@@ -15,6 +15,7 @@ from aspen.api.settings import Settings
 from aspen.api.views import (
     auspice,
     auth,
+    czid_auth,
     health,
     locations,
     phylo_runs,
@@ -95,6 +96,7 @@ def get_app() -> FastAPI:
     )
     _app.include_router(health.router, prefix="/v2/health")
     _app.include_router(auth.router, prefix="/v2/auth")
+    _app.include_router(czid_auth.router, prefix="/v2/czid_auth")
     _app.include_router(
         usher.router, prefix="/v2/usher", dependencies=[Depends(get_auth_user)]
     )
