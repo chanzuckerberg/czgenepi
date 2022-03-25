@@ -58,13 +58,21 @@ async def get_auth_user(
     auth_header = request.headers.get("authorization")
     auth0_user_id = None
     if auth_header:
+        payload = None
+        try:
+            payload = validate_auth_header(
+                auth_header, settings.AUTH0_DOMAIN, settings.CZID_CLIENT_ID
+            )
+        except TokenValidationError as err:
+            logging.warn(f"Token validation error for CZID: {err}")
         try:
             payload = validate_auth_header(
                 auth_header, settings.AUTH0_DOMAIN, settings.AUTH0_CLIENT_ID
             )
-            auth0_user_id = payload["sub"]
         except TokenValidationError as err:
-            logging.warn(f"Token validation error: {err}")
+            logging.warn(f"Token validation error for CZGE: {err}")
+        if payload:
+            auth0_user_id = payload["sub"]
     elif "profile" in request.session:
         auth0_user_id = request.session["profile"].get("user_id")
     # Redirect to Login page
