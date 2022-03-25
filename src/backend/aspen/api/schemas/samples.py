@@ -79,10 +79,10 @@ class SampleResponse(BaseResponse):
     collection_date: datetime.date
     collection_location: LocationResponse
     czb_failed_genome_recovery: bool
-    gisaid: Optional[SampleGisaidResponseSchema]
-    lineage: Optional[SampleLineageResponseSchema]
-    created_at: Optional[datetime.date]
-    created_by: Optional[str]
+    gisaid: Optional[SampleGisaidResponse]
+    lineage: Optional[SampleLineageResponse]
+    imported_at: Optional[datetime.date]
+    imported_by: Optional[str]
     private: bool
     private_identifier: Optional[str]
     public_identifier: str
@@ -154,6 +154,7 @@ class CreateSamplesBaseRequest(BaseRequest):
     private_identifier: str
     collection_date: datetime.date
     location_id: int
+    imported_by: Optional[str]
     organism: str = "Severe acute respiratory syndrome coronavirus 2"
     public_identifier: Optional[str]
     sample_collected_by: Optional[str]

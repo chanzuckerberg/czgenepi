@@ -350,6 +350,9 @@ async def create_samples(
             "authors": sample_input.authors or [user.group.name],
             "collection_location": valid_location,
         }
+        if sample_input.imported_by:
+            sample_args["imported_at"] = datetime.datetime.now()
+            sample_args["imported_by"] = sample_input.imported_by
 
         sample: Sample = Sample(**sample_args)
         sample.generate_public_identifier()
