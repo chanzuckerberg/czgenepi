@@ -2,7 +2,8 @@ import ENV from "src/common/constants/ENV";
 
 const { API_URL } = ENV;
 
-export const TREE_TRANSFORMS: Transform[] = [
+// TODO (mlila): ensure these transforms al still work
+export const WORKFLOW_TRANSFORMS: Transform[] = [
   {
     inputs: ["id"],
     key: "downloadLinkIdStylePrivateIdentifiers",

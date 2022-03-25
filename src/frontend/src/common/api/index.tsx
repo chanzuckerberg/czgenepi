@@ -7,10 +7,11 @@ export enum API {
   SAMPLES = "/v2/samples/",
   LOG_IN = "/login",
   LOG_OUT = "/logout",
-  PHYLO_TREES = "/api/phylo_trees",
+  PHYLO_WORKFLOWS = "/v2/phylo_runs/",
+  // TODO (mlila): check and write tests for every instance of PHYLO_TREES before removal
+  PHYLO_TREES = "/api/phylo_trees", // TODO (mlila): remove
   SAMPLES_CREATE = "/api/samples/create",
   SAMPLES_FASTA_DOWNLOAD = "/api/sequences",
-  PHYLO_TREES_V2 = "/v2/phylo_runs/", // TODO (mlila): convert entire frontend to use new endpoint
   GET_FASTA_URL = "/api/sequences/getfastaurl",
   USHER_TREE_OPTIONS = "/v2/usher/tree_versions/",
   SAMPLES_VALIDATE_IDS = "/v2/samples/validate_ids/",
@@ -197,16 +198,19 @@ const SAMPLE_MAP = new Map<string, keyof Sample>([
 export const fetchSamples = (): Promise<SampleResponse> =>
   apiResponse<SampleResponse>(["samples"], [SAMPLE_MAP], API.SAMPLES);
 
-export interface TreeResponse extends APIResponse {
-  phylo_trees: Tree[];
+export interface WorkflowResponse extends APIResponse {
+  phylo_trees: Workflow[];
 }
-const TREE_MAP = new Map<string, keyof Tree>([
-  ["phylo_tree_id", "id"],
-  ["pathogen_genome_count", "pathogenGenomeCount"],
-  ["completed_date", "creationDate"],
+const WORKFLOW_MAP = new Map<string, keyof Workflow>([
   ["tree_type", "treeType"],
   ["started_date", "startedDate"],
   ["workflow_id", "workflowId"],
+  ["start_datetime", "startedDate"],
+  ["workflow_status", "status"],
 ]);
-export const fetchTrees = (): Promise<TreeResponse> =>
-  apiResponse<TreeResponse>(["phylo_trees"], [TREE_MAP], API.PHYLO_TREES);
+export const fetchWorkflows = (): Promise<WorkflowResponse> =>
+  apiResponse<WorkflowResponse>(
+    ["phylo_runs"],
+    [WORKFLOW_MAP],
+    API.PHYLO_WORKFLOWS
+  );
