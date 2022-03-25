@@ -455,6 +455,69 @@ def update_samples(
     print(resp.text)
 
 
+@samples.command(name="create")
+@click.option("--private-id", required=True, type=str, help="Sample private id")
+@click.option("--public-id", required=False, type=str, help="Sample public id")
+@click.option(
+    "--collection-date",
+    required=False,
+    type=str,
+    help="Sample collection date",
+)
+@click.option(
+    "--sequencing-date",
+    required=False,
+    type=str,
+    help="Sample sequencing date",
+)
+@click.option(
+    "--sequence",
+    required=True,
+    type=str,
+    help="Sample sequence",
+)
+@click.option(
+    "--private", default=False, type=bool, help="Set whether the sample is private"
+)
+@click.option(
+    "--location", required=True, type=int, help="Set the sample's collection location"
+)
+@click.pass_context
+def create_samples(
+    ctx,
+    private_id,
+    public_id,
+    collection_date,
+    sequencing_date,
+    sequence,
+    private,
+    location,
+):
+    api_client = ctx.obj["api_client"]
+    if collection_date:
+        collection_date = dateparser.parse(collection_date).strftime("%Y-%m-%d")
+    if sequencing_date:
+        sequencing_date = dateparser.parse(sequencing_date).strftime("%Y-%m-%d")
+    sample = {
+        "pathogen_genome": {
+            "sequence": sequence,
+            "sequencing_date": sequencing_date,
+        },
+        "sample": {
+            "public_identifier": public_id,
+            "private_identifier": private_id,
+            "collection_date": collection_date,
+            "location_id": location,
+            "private": private,
+        },
+    }
+    # Remove None fields
+    print(sample)
+    body = [sample]
+    resp = api_client.post("/v2/samples/", json=body)
+    print(resp.text)
+
+
 @cli.group()
 def phylo_runs():
     pass
