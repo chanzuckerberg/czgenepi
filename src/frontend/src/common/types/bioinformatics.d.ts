@@ -44,7 +44,7 @@ interface Sample extends BioinformaticsType {
   private?: boolean;
 }
 
-interface Tree extends BioinformaticsType {
+interface Workflow extends BioinformaticsType {
   type: "Tree";
   id?: number;
   name: string;
@@ -63,17 +63,21 @@ interface Tree extends BioinformaticsType {
     name: string;
     id: number;
   };
+  phyloTree?: {
+    name: string;
+    id: number;
+  };
 }
 
-type BioinformaticsData = Sample | Tree;
-type BioinformaticsDataArray = Array<Sample> | Array<Tree>;
+type BioinformaticsData = Sample | Workflow;
+type BioinformaticsDataArray = Array<Sample> | Array<Workflow>;
 
 interface SampleMap {
   [key: string]: Sample;
 }
 
-interface TreeMap {
-  [key: string]: Tree;
+interface WorkflowMap {
+  [key: string]: Workflow;
 }
 
-type BioinformaticsMap = SampleMap | TreeMap;
+type BioinformaticsMap = SampleMap | WorkflowMap;
