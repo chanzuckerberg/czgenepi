@@ -58,7 +58,8 @@ class TokenHandler:
             self.sv._fetcher = InsecureJwksFetcher(self.jwks_url)
 
     def get_id_token(self):
-        creds = self.load_creds()
+        # creds = self.load_creds()
+        creds = None
         if not creds:
             self.device_login()
             creds = self.load_creds()
@@ -89,7 +90,11 @@ class TokenHandler:
     def device_login(self):
         headers = {"content-type": "application/x-www-form-urlencoded"}
         json_headers = {"content-type": "application/json"}
-        payload = {"client_id": self.client_id, "scope": "openid profile email"}
+        payload = {
+            "client_id": self.client_id,
+            "scope": "openid profile email",
+            "audience": "https://api.staging.czgenepi.org/",
+        }
         if self.client_secret:
             payload["client_secret"] = self.client_secret
         auth_resp = requests.post(
@@ -109,7 +114,7 @@ class TokenHandler:
         poll_payload = {
             "client_id": self.client_id,
             "device_code": device_info["device_code"],
-            "audience": self.client_id,
+            "audience": "https://api.staging.czgenepi.org/",
             "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
         }
         if self.client_secret:
@@ -127,6 +132,7 @@ class TokenHandler:
                 continue
             if res.status_code != 200:
                 raise Exception(f"Invalid response: {res.text}")
+            print(res.json())
             self.write_creds(res.json())
             return
 
