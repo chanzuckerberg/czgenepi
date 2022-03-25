@@ -202,10 +202,11 @@ export interface WorkflowResponse extends APIResponse {
   phylo_trees: Workflow[];
 }
 const WORKFLOW_MAP = new Map<string, keyof Workflow>([
-  ["tree_type", "treeType"],
-  ["started_date", "startedDate"],
-  ["workflow_id", "workflowId"],
+  ["end_datetime", "endDate"],
+  ["phylo_tree", "phyloTree"],
   ["start_datetime", "startedDate"],
+  ["tree_type", "treeType"],
+  ["workflow_id", "workflowId"],
   ["workflow_status", "status"],
 ]);
 export const fetchWorkflows = (): Promise<WorkflowResponse> =>

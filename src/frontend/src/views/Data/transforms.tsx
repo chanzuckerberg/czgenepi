@@ -2,13 +2,14 @@ import ENV from "src/common/constants/ENV";
 
 const { API_URL } = ENV;
 
-// TODO (mlila): ensure these transforms al still work
+//* (mlila): below, we want to use the tree id to generate the urls in question.
+//* because the links can only be generated for workflows with a tree
 export const WORKFLOW_TRANSFORMS: Transform[] = [
   {
-    inputs: ["id"],
+    inputs: ["phyloTree"],
     key: "downloadLinkIdStylePrivateIdentifiers",
     method: (inputs: number[]): string | undefined => {
-      const id = inputs[0];
+      const id = inputs[0]?.id;
       if (typeof id !== "number") {
         return undefined;
       }
@@ -16,10 +17,10 @@ export const WORKFLOW_TRANSFORMS: Transform[] = [
     },
   },
   {
-    inputs: ["id"],
+    inputs: ["phyloTree"],
     key: "downloadLinkIdStylePublicIdentifiers",
     method: (inputs: number[]): string | undefined => {
-      const id = inputs[0];
+      const id = inputs[0]?.id;
       if (typeof id !== "number") {
         return undefined;
       }
@@ -27,10 +28,10 @@ export const WORKFLOW_TRANSFORMS: Transform[] = [
     },
   },
   {
-    inputs: ["id"],
+    inputs: ["phyloTree"],
     key: "accessionsLink",
     method: (inputs: number[]): string | undefined => {
-      const id = inputs[0];
+      const id = inputs[0]?.id;
       if (typeof id !== "number") {
         return undefined;
       }
