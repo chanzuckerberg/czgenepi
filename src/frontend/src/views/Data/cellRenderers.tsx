@@ -41,6 +41,10 @@ const LABEL_STATUS: Record<
     label: "failed",
     status: "error",
   },
+  imported: {
+    label: "imported",
+    status: "info",
+  },
   success: {
     label: "complete",
     status: "success",
@@ -104,13 +108,19 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
   }): JSX.Element => {
     const {
       CZBFailedGenomeRecovery,
+      importedAt,
+      importedBy,
       private: isPrivate,
       submittingGroup,
       uploadedBy,
     } = item;
-    const label = CZBFailedGenomeRecovery
-      ? LABEL_STATUS.error
-      : LABEL_STATUS.success;
+
+    const wasSampleImported = Boolean(importedAt || importedBy);
+    const didSampleFailRecovery = CZBFailedGenomeRecovery;
+
+    let label = LABEL_STATUS.success;
+    if (wasSampleImported) label = LABEL_STATUS.imported;
+    if (didSampleFailRecovery) label = LABEL_STATUS.error;
 
     const displayName =
       submittingGroup?.name === CZ_BIOHUB_GROUP

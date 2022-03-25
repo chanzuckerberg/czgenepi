@@ -185,6 +185,8 @@ export interface SampleResponse extends APIResponse {
 const SAMPLE_MAP = new Map<string, keyof Sample>([
   ["collection_date", "collectionDate"],
   ["collection_location", "collectionLocation"],
+  ["imported_at", "importedAt"],
+  ["imported_by", "importedBy"],
   ["private_identifier", "privateId"],
   ["public_identifier", "publicId"],
   ["upload_date", "uploadDate"],

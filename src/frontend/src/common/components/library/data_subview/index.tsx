@@ -1,4 +1,4 @@
-import { compact, escapeRegExp, filter } from "lodash";
+import { compact, countBy, escapeRegExp, filter } from "lodash";
 import React, {
   FunctionComponent,
   useEffect,
@@ -15,6 +15,7 @@ import DownloadModal from "./components/DownloadModal";
 import { EditSamplesConfirmationModal } from "./components/EditSamplesConfirmationModal";
 import { EditTreeConfirmationModal } from "./components/EditTreeConfirmationModal";
 import { IconButton } from "./components/IconButton";
+import { ImportNotification } from "./components/ImportNotification";
 import { MoreActionsMenu } from "./components/MoreActionMenu";
 import { TreeCreateHelpLink } from "./components/TreeCreateHelpLink";
 import { TreeSelectionMenu } from "./components/TreeSelectionMenu";
@@ -286,10 +287,24 @@ const DataSubview: FunctionComponent<Props> = ({
       checkedSampleIds.map((id) => data?.[id]) as Sample[]
     );
 
+    const now = new Date();
+    const oneMinuteAgo = now.setMinutes(now.getMinutes() - 1);
+    const numImportedSamples =
+      countBy(tableData, (sample) => {
+        const { importedAt } = sample;
+
+        // this is a heurstic we'll use to show the sample import notification for now
+        if (importedAt && importedAt > oneMinuteAgo) return "count";
+      }).count ?? 0;
+
     return (
       <>
         {tableData !== undefined && viewName === VIEWNAME.SAMPLES && (
           <>
+            <ImportNotification
+              importedFrom="CZ ID"
+              numImportedSamples={numImportedSamples}
+            />
             <DownloadModal
               checkedSampleIds={checkedSampleIds}
               failedSampleIds={failedSampleIds}
