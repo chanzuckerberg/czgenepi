@@ -23,6 +23,8 @@ ${local_aws} secretsmanager create-secret --name genepi-config &> /dev/null || t
 # AUSPICE_MAC_KEY is just the result of urlsafe_b64encode(b'auspice-mac-key')
 ${local_aws} secretsmanager update-secret --secret-id genepi-config --secret-string '{
   "AUSPICE_MAC_KEY": "YXVzcGljZS1tYWMta2V5",
+  "CZID_CLIENT_ID": "local-client-id",
+  "CZID_CLIENT_SECRET": "local-client-secret",
   "AUTH0_CLIENT_ID": "local-client-id",
   "AUTH0_CALLBACK_URL": "'"${BACKEND_URL}"'/callback",
   "AUTH0_CLIENT_SECRET": "local-client-secret",
