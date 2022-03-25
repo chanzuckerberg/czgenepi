@@ -287,18 +287,23 @@ const DataSubview: FunctionComponent<Props> = ({
       checkedSampleIds.map((id) => data?.[id]) as Sample[]
     );
 
-    const now = new Date();
-    const oneMinuteAgo = now.setMinutes(now.getMinutes() - 1);
+    // milliseconds in a minute
+    const oneMinuteMS = 60000;
+    const oneMinuteAgo = new Date(Date.now() - oneMinuteMS);
+
     const numImportedSamples =
-      countBy(tableData, (sample) => {
-        const { importedAt } = sample;
-        if (!importedAt) return;
+      // don't need to count imported samples if we're looking at tree view
+      viewName === VIEWNAME.SAMPLES
+        ? countBy(tableData, (sample: Sample) => {
+            const { importedAt } = sample;
+            if (!importedAt) return;
 
-        const date = new Date(importedAt);
+            const importTime = new Date(importedAt);
 
-        // this is a heurstic we'll use to show the sample import notification for now
-        if (date > oneMinuteAgo) return "count";
-      }).count ?? 0;
+            // this is a heurstic we'll use to show the sample import notification for now
+            if (importTime > oneMinuteAgo) return "count";
+          }).count ?? 0
+        : 0;
 
     return (
       <>

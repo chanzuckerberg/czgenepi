@@ -42,6 +42,8 @@ interface Sample extends BioinformaticsType {
   CZBFailedGenomeRecovery: boolean;
   lineage: Lineage;
   private?: boolean;
+  importedBy?: string;
+  importedAt?: string;
 }
 
 interface Tree extends BioinformaticsType {
