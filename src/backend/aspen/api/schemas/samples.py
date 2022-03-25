@@ -79,6 +79,8 @@ class SampleResponseSchema(BaseResponse):
     czb_failed_genome_recovery: bool
     gisaid: Optional[SampleGisaidResponseSchema]
     lineage: Optional[SampleLineageResponseSchema]
+    created_at: Optional[datetime.date]
+    created_by: Optional[str]
     private: bool
     private_identifier: Optional[str]
     public_identifier: str
