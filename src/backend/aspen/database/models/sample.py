@@ -255,6 +255,22 @@ class Sample(idbase, DictMixin):  # type: ignore
     sequencing_reads_collection: Optional[SequencingReadsCollection]
     uploaded_pathogen_genome: Optional[UploadedPathogenGenome]
 
+    def generate_public_identifier(self):
+        # If we don't have an explicit public identifier, generate one from
+        # our current model context
+        if self.public_identifier:
+            return
+
+        country = self.collection_location.country
+        group_prefix = self.submitting_group.prefix
+        current_year: str = datetime.today().strftime("%Y")
+
+        self.public_identifier = func.concat(
+            f"hCoV-19/{country}/{group_prefix}-",
+            text("currval('aspen.samples_id_seq')"),
+            f"/{current_year}",
+        )
+
     def get_uploaded_entity(
         self,
     ) -> Union[SequencingReadsCollection, UploadedPathogenGenome]:
