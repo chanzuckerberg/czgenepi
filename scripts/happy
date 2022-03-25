@@ -1,27 +1,27 @@
 #!/usr/bin/env python3
-import random
-from dateutil import tz
-from base64 import b64decode
-from contextlib import contextmanager
-from datetime import datetime, timedelta
 import io
 import json
 import os
+import random
 import re
-from string import Template
 import subprocess
 import tarfile
 import tempfile
 import time
+from base64 import b64decode
+from contextlib import contextmanager
+from datetime import datetime, timedelta
+from string import Template
 from urllib.parse import urlparse
 
 import boto3
-from botocore.exceptions import WaiterError
-from botocore.config import Config
 import click
-from terrasnek.api import TFC
-from terrasnek import exceptions
 import yaml
+from botocore.config import Config
+from botocore.exceptions import WaiterError
+from dateutil import tz
+from terrasnek import exceptions
+from terrasnek.api import TFC
 
 
 class CliError(Exception):
@@ -30,7 +30,9 @@ class CliError(Exception):
 
 
 class HappyConfig:
-    def __init__(self, config_file=".happy/config.json", env=None, substitutions=None, ctx=None):
+    def __init__(
+        self, config_file=".happy/config.json", env=None, substitutions=None, ctx=None
+    ):
         self.ctx = ctx
         with open(config_file) as f:
             self._data = json.load(f)
@@ -38,7 +40,9 @@ class HappyConfig:
         self.set_env()
         try:
             if self.config_version != "v1":
-                raise CliError(f'Config file {config_file} has invalid version number. Only version "v1" supported.')
+                raise CliError(
+                    f'Config file {config_file} has invalid version number. Only version "v1" supported.'
+                )
         except KeyError:
             raise CliError(f"Config file {config_file} missing config_version field.")
 
@@ -234,12 +238,16 @@ class Stack:
             tags = {"happy/meta/owner": "UNKNOWN", "happy/meta/imagetag": "UNKNOWN"}
             if self.workspace:  # Non existent workspace has no meta data
                 try:
-                    meta_var = self.workspace.vars.get("terraform", {}).get("happymeta_")
+                    meta_var = self.workspace.vars.get("terraform", {}).get(
+                        "happymeta_"
+                    )
                 except exceptions.TFCHTTPNotFound:
                     meta_var = None
                 if meta_var:
                     if meta_var["attributes"]["sensitive"]:
-                        raise Exception(f"Invalid meta var for stack {self.stack_name}, must not be sensitive")
+                        raise Exception(
+                            f"Invalid meta var for stack {self.stack_name}, must not be sensitive"
+                        )
                     tags = json.loads(meta_var["attributes"]["value"])
                 else:
                     print(f"No happymeta_ variable for stack {self.stack_name}")
@@ -328,7 +336,9 @@ class StackMgr:
         stack_names.remove(stack_name)
 
         param_client = AwsSession.get_client(self.ctx, "ssm")
-        param_client.put_parameter(Name=self.write_path, Value=json.dumps(sorted(stack_names)), Overwrite=True)
+        param_client.put_parameter(
+            Name=self.write_path, Value=json.dumps(sorted(stack_names)), Overwrite=True
+        )
         self._resync(wait=False)
         del self._stacks[stack_name]
 
@@ -338,7 +348,9 @@ class StackMgr:
         stack_names.add(stack_name)
 
         param_client = AwsSession.get_client(self.ctx, "ssm")
-        param_client.put_parameter(Name=self.write_path, Value=json.dumps(sorted(stack_names)), Overwrite=True)
+        param_client.put_parameter(
+            Name=self.write_path, Value=json.dumps(sorted(stack_names)), Overwrite=True
+        )
         success = self._resync()
         if not success:
             raise Exception("Error invoking Terraform to create stack")
@@ -393,14 +405,18 @@ class AwsSession:
     @classmethod
     def get_config(cls, ctx):
         if not cls.config:
-            cls.config = Config(region_name="us-west-2", retries={"max_attempts": 2, "mode": "standard"})
+            cls.config = Config(
+                region_name="us-west-2", retries={"max_attempts": 2, "mode": "standard"}
+            )
         return cls.config
 
     @classmethod
     def get_client(cls, ctx, client_type):
         if not cls.clients.get(client_type):
             session = cls.get_session(ctx)
-            cls.clients[client_type] = session.client(client_type, config=cls.get_config(ctx))
+            cls.clients[client_type] = session.client(
+                client_type, config=cls.get_config(ctx)
+            )
         return cls.clients[client_type]
 
 
@@ -437,11 +453,15 @@ class TFEWorkspace:
     @property
     def latest_config_version_id(self):
         if self.latest_run:
-            return self.latest_run["data"]["relationships"]["configuration-version"]["data"]["id"]
+            return self.latest_run["data"]["relationships"]["configuration-version"][
+                "data"
+            ]["id"]
         return None
 
     def run(self, is_destroy=False):
-        return self.run_config_version(self.latest_config_version_id, is_destroy=is_destroy)
+        return self.run_config_version(
+            self.latest_config_version_id, is_destroy=is_destroy
+        )
 
     def run_config_version(self, config_version_id, is_destroy=False):
         print(f"Running {'DESTROY ' if is_destroy else ''}workspace {self.name}")
@@ -477,18 +497,34 @@ class TFEWorkspace:
         return True
 
     def wait(self, stack_name=None, orchestrator=None, services=None):
-        RUN_DONE_STATUSES = {"applied", "discarded", "errored", "canceled", "force_canceled", "policy_soft_failed"}
+        RUN_DONE_STATUSES = {
+            "applied",
+            "discarded",
+            "errored",
+            "canceled",
+            "force_canceled",
+            "policy_soft_failed",
+        }
         last_status = ""
         status_start = time.time()
-        alert_after = 300 # How long to wait for an apply to complete before printing debug info
+        alert_after = (
+            300  # How long to wait for an apply to complete before printing debug info
+        )
         printed_alert = False
         while last_status not in RUN_DONE_STATUSES:
             if last_status:  # Skip sleep on first time
                 time.sleep(5)
             run = self.tfc.runs.show(self.latest_run_id)
             status = run["data"]["attributes"]["status"]
-            if not printed_alert and stack_name and status == "applying" and time.time() > status_start + alert_after:
-                print("This apply is taking an unusually long time. Are your containers crashing?")
+            if (
+                not printed_alert
+                and stack_name
+                and status == "applying"
+                and time.time() > status_start + alert_after
+            ):
+                print(
+                    "This apply is taking an unusually long time. Are your containers crashing?"
+                )
                 orchestrator.get_events(stack_name, services)
                 printed_alert = True
             if status != last_status:
@@ -515,11 +551,15 @@ class TFEWorkspace:
             self._vars = {}
             for workspace_var in workspace_vars["data"]:
                 attributes = workspace_var["attributes"]
-                self._vars.setdefault(attributes["category"], {})[attributes["key"]] = workspace_var
+                self._vars.setdefault(attributes["category"], {})[
+                    attributes["key"]
+                ] = workspace_var
         return self._vars
 
     def set_var(self, key, value, description, sensitive=True):
-        category = "terraform"  # Hard-coded, not allowing setting environment vars directly
+        category = (
+            "terraform"  # Hard-coded, not allowing setting environment vars directly
+        )
         var_data = {
             "data": {
                 "type": "vars",
@@ -533,7 +573,9 @@ class TFEWorkspace:
             },
         }
         if category in self.vars and key in self.vars[category]:
-            self.tfc.workspace_vars.update(self.workspace_id, self.vars[category][key]["id"], var_data)
+            self.tfc.workspace_vars.update(
+                self.workspace_id, self.vars[category][key]["id"], var_data
+            )
         else:
             self.tfc.workspace_vars.create(self.workspace_id, var_data)
 
@@ -548,10 +590,16 @@ class TFEWorkspace:
         if self._outputs:
             return self._outputs
         try:
-            state_version = self.tfc.state_versions.get_current(self.workspace_id, include=["outputs"])
+            state_version = self.tfc.state_versions.get_current(
+                self.workspace_id, include=["outputs"]
+            )
         except exceptions.TFCHTTPNotFound:
             return {}
-        outputs = (item.get("attributes") for item in state_version.get("included", {}) if item.get("type") == "state-version-outputs")
+        outputs = (
+            item.get("attributes")
+            for item in state_version.get("included", {})
+            if item.get("type") == "state-version-outputs"
+        )
         self._outputs = {}
         for state_version_output in outputs:
             if not state_version_output["sensitive"]:
@@ -563,7 +611,13 @@ class TFEWorkspace:
     def upload_version(self, filename):
         # Not using auto-queue-runs, will explicitly create later
         config_version = self.tfc.config_versions.create(
-            self.workspace_id, {"data": {"type": "configuration-versions", "attributes": {"auto-queue-runs": False}}}
+            self.workspace_id,
+            {
+                "data": {
+                    "type": "configuration-versions",
+                    "attributes": {"auto-queue-runs": False},
+                }
+            },
         )
 
         config_version_id = config_version["data"]["id"]
@@ -572,7 +626,9 @@ class TFEWorkspace:
         return config_version_id
 
     def cancel_run(self):
-        self.tfc.runs.force_cancel(self.latest_run_id, {"comment": "Force cancelled by happy cli"})
+        self.tfc.runs.force_cancel(
+            self.latest_run_id, {"comment": "Force cancelled by happy cli"}
+        )
 
 
 class TfeApi:
@@ -646,7 +702,9 @@ class SecretMgr:
             return self._secrets
         config = self.ctx.obj["config"]
         secrets_client = AwsSession.get_client(self.ctx, "secretsmanager")
-        secrets = secrets_client.get_secret_value(SecretId=config.secret_arn)["SecretString"]
+        secrets = secrets_client.get_secret_value(SecretId=config.secret_arn)[
+            "SecretString"
+        ]
         self._secrets = json.loads(secrets)
         return self._secrets
 
@@ -699,7 +757,9 @@ class Orchestrator:
         service_name = f"{stack_name}-{service}"
 
         ecs_client = AwsSession.get_client(self.ctx, "ecs")
-        tasks = ecs_client.list_tasks(cluster=cluster_arn, serviceName=service_name)["taskArns"]
+        tasks = ecs_client.list_tasks(cluster=cluster_arn, serviceName=service_name)[
+            "taskArns"
+        ]
         print("Found tasks: ")
         taskinfo = ecs_client.describe_tasks(cluster=cluster_arn, tasks=tasks)["tasks"]
         tp = TablePrinter(["Task ID", "Started", "Status"])
@@ -723,10 +783,27 @@ class Orchestrator:
         tp.print()
         print()
         for container in containers:
-            if container['launch_type'] == 'FARGATE':
+            if container["launch_type"] == "FARGATE":
                 profile_name = self.ctx.obj["aws_profile"]
-                print(f"Connecting to {container['task_id']}:{container['container_name']}")
-                cmd = ["aws", "--profile", profile_name, "ecs", "execute-command", "--cluster", cluster_arn, "--container", container["container_name"], "--command", "/bin/bash", "--interactive", "--task", container["task_id"]]
+                print(
+                    f"Connecting to {container['task_id']}:{container['container_name']}"
+                )
+                cmd = [
+                    "aws",
+                    "--profile",
+                    profile_name,
+                    "ecs",
+                    "execute-command",
+                    "--cluster",
+                    cluster_arn,
+                    "--container",
+                    container["container_name"],
+                    "--command",
+                    "/bin/bash",
+                    "--interactive",
+                    "--task",
+                    container["task_id"],
+                ]
                 os.execvp("aws", cmd)
             instance_info = ecs_client.describe_container_instances(
                 cluster=cluster_arn, containerInstances=[container["host"]]
@@ -736,7 +813,20 @@ class Orchestrator:
             hostinfo = ec2_client.describe_instances(InstanceIds=[ec2_instance])
             ip = hostinfo["Reservations"][0]["Instances"][0]["PrivateIpAddress"]
             print(f"Connecting to {container['arn']}")
-            os.execvp("ssh", ["ssh", "-t", ip, "sudo", "docker", "exec", "-ti", container["container"], "/bin/bash"])
+            os.execvp(
+                "ssh",
+                [
+                    "ssh",
+                    "-t",
+                    ip,
+                    "sudo",
+                    "docker",
+                    "exec",
+                    "-ti",
+                    container["container"],
+                    "/bin/bash",
+                ],
+            )
 
     def logs(self, stack_name, service, since):
         config = self.ctx.obj["config"]
@@ -744,7 +834,14 @@ class Orchestrator:
         log_prefix = config.log_group_prefix
         run_aws_cmd(
             self.ctx,
-            ["logs", "tail", "--since", since, "--follow", f"{log_prefix}/{stack_name}/{service}"],
+            [
+                "logs",
+                "tail",
+                "--since",
+                since,
+                "--follow",
+                f"{log_prefix}/{stack_name}/{service}",
+            ],
             return_output=False,
             json_output=False,
         )
@@ -757,34 +854,45 @@ class Orchestrator:
         if not services:
             return
         output = ecs_client.describe_services(
-            cluster=cluster_arn,
-            services=[f"{stack}-{service}" for service in services]
+            cluster=cluster_arn, services=[f"{stack}-{service}" for service in services]
         )
         for service in output["services"]:
-            incomplete = [deploy["rolloutState"] for deploy in service["deployments"] if deploy["rolloutState"] != "COMPLETED"]
+            incomplete = [
+                deploy["rolloutState"]
+                for deploy in service["deployments"]
+                if deploy["rolloutState"] != "COMPLETED"
+            ]
             if not incomplete:
                 continue
             # If we've made it to this point, we have a deployment that isn't complete, and we should print an event log.
-            print(f"Incomplete deployment of service {service['serviceName']} / Current status {', '.join(incomplete)}:")
+            print(
+                f"Incomplete deployment of service {service['serviceName']} / Current status {', '.join(incomplete)}:"
+            )
             events = service["events"]
-            events.reverse() # These were in newest-first order, but terminal output should be newest-last
+            events.reverse()  # These were in newest-first order, but terminal output should be newest-last
             deregistered = 0
             for event in events:
                 event_time = event["createdAt"]
-                if event_time < datetime.now().replace(tzinfo=tz.tzlocal()) - timedelta(seconds=600):
+                if event_time < datetime.now().replace(tzinfo=tz.tzlocal()) - timedelta(
+                    seconds=600
+                ):
                     continue
-                message = re.sub(r'^\(service ([^ ]+)\)', r"\1", event["message"])
-                message = re.sub(r'\(([^ ]+) .*?\)', r'\1', message)
-                message = re.sub(r':.*', '', message)
+                message = re.sub(r"^\(service ([^ ]+)\)", r"\1", event["message"])
+                message = re.sub(r"\(([^ ]+) .*?\)", r"\1", message)
+                message = re.sub(r":.*", "", message)
                 if "deregistered" in message:
                     deregistered += 1
-                print(f'  {event_time:%H:%M} {message}')
+                print(f"  {event_time:%H:%M} {message}")
             # TODO -- this value really shouldn't be hardcoded, but it's a start.
             if deregistered > 3:
                 print()
-                print("Many \"deregistered\" events - please check to see whether your service is crashing:")
-                service_name = service['serviceName'].replace(f"{stack}-", "", 1)
-                print(f"  ./scripts/happy --env {self.ctx.obj['config'].env} logs {stack} {service_name}")
+                print(
+                    'Many "deregistered" events - please check to see whether your service is crashing:'
+                )
+                service_name = service["serviceName"].replace(f"{stack}-", "", 1)
+                print(
+                    f"  ./scripts/happy --env {self.ctx.obj['config'].env} logs {stack} {service_name}"
+                )
             return
 
     def run_task(self, taskdef_arn, launch_type, wait=False, show_logs=True):
@@ -818,7 +926,9 @@ class Orchestrator:
             waiter.wait(cluster=cluster_arn, tasks=[task_info["taskArn"]])
         except WaiterError:
             print("Task failed!")
-        result = ecs_client.describe_tasks(cluster=cluster_arn, tasks=[task_info["taskArn"]])
+        result = ecs_client.describe_tasks(
+            cluster=cluster_arn, tasks=[task_info["taskArn"]]
+        )
         container = result["tasks"][0]["containers"][0]
         status = container["lastStatus"]
         if status != "RUNNING":
@@ -832,7 +942,9 @@ class Orchestrator:
             waiter = ecs_client.get_waiter("tasks_stopped")
             waiter.wait(cluster=cluster_arn, tasks=[task_info["taskArn"]])
             print(f"Task {task_info['taskArn']} stopped")
-        result = ecs_client.describe_tasks(cluster=cluster_arn, tasks=[task_info["taskArn"]])
+        result = ecs_client.describe_tasks(
+            cluster=cluster_arn, tasks=[task_info["taskArn"]]
+        )
         container = result["tasks"][0]["containers"][0]
         log_stream = container["runtimeId"]
         if "reason" in container:
@@ -847,12 +959,16 @@ class Orchestrator:
         container_def = taskdef["containerDefinitions"][0]
         log_group = container_def["logConfiguration"]["options"]["awslogs-group"]
         if launch_type == "FARGATE":
-            log_prefix = container_def["logConfiguration"]["options"]["awslogs-stream-prefix"]
+            log_prefix = container_def["logConfiguration"]["options"][
+                "awslogs-stream-prefix"
+            ]
             task_id = container["taskArn"].split("/")[-1]
             log_stream = f"{log_prefix}/{container_def['name']}/{task_id}"
         print("Log Events:")
         logs_client = AwsSession.get_client(self.ctx, "logs")
-        result = logs_client.get_log_events(logGroupName=log_group, logStreamName=log_stream)
+        result = logs_client.get_log_events(
+            logGroupName=log_group, logStreamName=log_stream
+        )
         logs = result["events"]
         for log in logs:
             print(log)
@@ -872,7 +988,10 @@ class ArtifactBuilder:
     DEFAULT_CONFIG = {"compose_file": "docker-compose.yml", "env": None}
 
     def __init__(self, config={}):
-        self.config = {**self.DEFAULT_CONFIG, **config}  # Replace defaults with the input
+        self.config = {
+            **self.DEFAULT_CONFIG,
+            **config,
+        }  # Replace defaults with the input
 
     def get_env(self):
         env = dict(os.environ)  # Make a copy of the current environment
@@ -880,8 +999,12 @@ class ArtifactBuilder:
         env["BUILDKIT_INLINE_CACHE"] = "1"
         env["COMPOSE_DOCKER_CLI_BUILD"] = "1"
         env["DOCKER_REPO"] = f"{self.config['ecr_repo']}/"
-        env["HAPPY_COMMIT"] = subprocess_output_with_default(["git", "rev-parse", "--verify", "HEAD"])
-        env["HAPPY_BRANCH"] = subprocess_output_with_default(["git", "branch", "--show-current"])
+        env["HAPPY_COMMIT"] = subprocess_output_with_default(
+            ["git", "rev-parse", "--verify", "HEAD"]
+        )
+        env["HAPPY_BRANCH"] = subprocess_output_with_default(
+            ["git", "branch", "--show-current"]
+        )
         return env
 
     def build(self, artifacts=None):
@@ -923,13 +1046,23 @@ class ArtifactBuilder:
                 continue
             image = images[artifact_id]
             for current_tag in tags:
-                subprocess.check_call(["docker", "tag", f"{image}:latest", f"{registry['url']}:{current_tag}"], env=env)
+                subprocess.check_call(
+                    [
+                        "docker",
+                        "tag",
+                        f"{image}:latest",
+                        f"{registry['url']}:{current_tag}",
+                    ],
+                    env=env,
+                )
         print(f"Pushing images...{images}")
         for artifact_id, registry in ecrs.items():
             if images and artifact_id not in images:
                 continue
             for current_tag in tags:
-                subprocess.check_call(["docker", "push", f"{registry['url']}:{current_tag}"], env=env)
+                subprocess.check_call(
+                    ["docker", "push", f"{registry['url']}:{current_tag}"], env=env
+                )
 
 
 def run_tasks(ctx, stack, task_type, wait=False, show_logs=True):
@@ -947,9 +1080,12 @@ def run_tasks(ctx, stack, task_type, wait=False, show_logs=True):
     try:
         tasks = [stack.outputs[task_output] for task_output in task_outputs]
     except KeyError as exc:
-        raise CliError(f"Stack {stack.stack_name} is missing output field '{exc.args[0]}' for task {task_type}")
+        raise CliError(
+            f"Stack {stack.stack_name} is missing output field '{exc.args[0]}' for task {task_type}"
+        )
     for task in tasks:
         orchestrator.run_task(task, launch_type, wait=wait, show_logs=show_logs)
+
 
 def check_images_exist(ctx, tag):
     """Make sure all of our service images actually exist if we're trying to deploy via tag"""
@@ -966,16 +1102,25 @@ def check_images_exist(ctx, tag):
         repo_name = "/".join(repository["url"].split("/")[1:])
 
         manifest = ecr_client.batch_get_image(
-            registryId=registry_id, repositoryName=repo_name, imageIds=[{"imageTag": tag}]
+            registryId=registry_id,
+            repositoryName=repo_name,
+            imageIds=[{"imageTag": tag}],
         )
         if manifest and manifest["images"]:
             continue
-        raise CliError(f"Tag {tag} doesn't exist for {repository['url']}! Please use a valid tag")
+        raise CliError(
+            f"Tag {tag} doesn't exist for {repository['url']}! Please use a valid tag"
+        )
 
 
 @cli.command()
 @click.argument("stack_name")
-@click.option("--reset", is_flag=True, default=False, help="Drop and recreate the dev db from the latest snapshot")
+@click.option(
+    "--reset",
+    is_flag=True,
+    default=False,
+    help="Drop and recreate the dev db from the latest snapshot",
+)
 @click.pass_context
 def migrate(ctx, stack_name, reset):
     """Run DB migration task for given stack"""
@@ -1006,6 +1151,7 @@ def logs(ctx, stack_name, service, since):
     orchestrator = ctx.obj["orchestrator"]
     orchestrator.logs(stack_name, service, since)
 
+
 def build_slice(ctx, slice_name, default_tag=None):
     config = ctx.obj["config"]
     if slice_name not in config.slices:
@@ -1021,16 +1167,40 @@ def build_slice(ctx, slice_name, default_tag=None):
     stacktags = {slice_img: slice_tag for slice_img in build_images}
     return stacktags, default_tag
 
+
 @cli.command()
 @click.argument("stack_name")
-@click.option("--tag", help="Tag name for docker image. Leave empty to generate one automatically.", default=None)
-@click.option("--wait/--no-wait", is_flag=True, default=True, help="wait for this to complete")
-@click.option("--force", is_flag=True, default=False, help="Ignore already-exists errors")
-@click.option("--skip-check-tag", is_flag=True, default=False, help="Skip checking that the specified tag exists (requires --tag)")
-@click.option("--slice", "-s", "slice_name", help="If you only need to test a slice of the app, specify it here")
-@click.option("--slice-default-tag", help="For stacks using slices, override the default tag for any images that aren't being built & pushed by the slice")
+@click.option(
+    "--tag",
+    help="Tag name for docker image. Leave empty to generate one automatically.",
+    default=None,
+)
+@click.option(
+    "--wait/--no-wait", is_flag=True, default=True, help="wait for this to complete"
+)
+@click.option(
+    "--force", is_flag=True, default=False, help="Ignore already-exists errors"
+)
+@click.option(
+    "--skip-check-tag",
+    is_flag=True,
+    default=False,
+    help="Skip checking that the specified tag exists (requires --tag)",
+)
+@click.option(
+    "--slice",
+    "-s",
+    "slice_name",
+    help="If you only need to test a slice of the app, specify it here",
+)
+@click.option(
+    "--slice-default-tag",
+    help="For stacks using slices, override the default tag for any images that aren't being built & pushed by the slice",
+)
 @click.pass_context
-def create(ctx, stack_name, tag, wait, force, skip_check_tag, slice_name, slice_default_tag):
+def create(
+    ctx, stack_name, tag, wait, force, skip_check_tag, slice_name, slice_default_tag
+):
     """Create a new stack with a given tag"""
 
     stackmgr = ctx.obj["stack_mgr"]
@@ -1058,12 +1228,15 @@ def create(ctx, stack_name, tag, wait, force, skip_check_tag, slice_name, slice_
 
     stack = stackmgr.add(stack_name)
     stack._meta = stack_meta  # TODO(mbarrien): Hack!
-    success = stack.apply(stack_name, wait, ctx.obj["orchestrator"], services=config.services)
+    success = stack.apply(
+        stack_name, wait, ctx.obj["orchestrator"], services=config.services
+    )
     if not success:
         raise CliError("Apply failed, skipping migrations")
     if should_auto_migrate(ctx):
         ctx.invoke(migrate, stack_name=stack_name)
     stack.print_outputs()
+
 
 def should_auto_migrate(ctx):
     # Make sure this environment allows automatically running migrations on update
@@ -1073,6 +1246,7 @@ def should_auto_migrate(ctx):
     except KeyError:
         # The default behavior is to auto-migrate on update.
         return True
+
 
 @contextmanager
 def config_tarball(source_dir):
@@ -1089,14 +1263,47 @@ def config_tarball(source_dir):
 
 @cli.command()
 @click.argument("stack_name")
-@click.option("--tag", help="Tag name for docker image. Leave empty to generate one automatically.", default=None)
-@click.option("--wait/--no-wait", is_flag=True, default=True, help="wait for this to complete")
-@click.option("--skip-migrations/--do-migrations", is_flag=True, default=False, help="Skip running migrations")
-@click.option("--skip-check-tag", is_flag=True, default=False, help="Skip checking that the specified tag exists (requires --tag)")
+@click.option(
+    "--tag",
+    help="Tag name for docker image. Leave empty to generate one automatically.",
+    default=None,
+)
+@click.option(
+    "--wait/--no-wait", is_flag=True, default=True, help="wait for this to complete"
+)
+@click.option(
+    "--skip-migrations/--do-migrations",
+    is_flag=True,
+    default=False,
+    help="Skip running migrations",
+)
+@click.option(
+    "--skip-check-tag",
+    is_flag=True,
+    default=False,
+    help="Skip checking that the specified tag exists (requires --tag)",
+)
 @click.pass_context
-@click.option("--slice", "-s", "slice_name", help="If you only need to test a slice of the app, specify it here")
-@click.option("--slice-default-tag", help="For stacks using slices, override the default tag for any images that aren't being built & pushed by the slice")
-def update(ctx, stack_name, tag, wait, skip_migrations, skip_check_tag, slice_name, slice_default_tag):
+@click.option(
+    "--slice",
+    "-s",
+    "slice_name",
+    help="If you only need to test a slice of the app, specify it here",
+)
+@click.option(
+    "--slice-default-tag",
+    help="For stacks using slices, override the default tag for any images that aren't being built & pushed by the slice",
+)
+def update(
+    ctx,
+    stack_name,
+    tag,
+    wait,
+    skip_migrations,
+    skip_check_tag,
+    slice_name,
+    slice_default_tag,
+):
     """Update a dev stack tag version"""
     stackmgr = ctx.obj["stack_mgr"]
     config = ctx.obj["config"]
@@ -1111,7 +1318,7 @@ def update(ctx, stack_name, tag, wait, skip_migrations, skip_check_tag, slice_na
     print(f"updating {stack_name}")
 
     stacktags = {}
-    if slice_name:
+    if slice_name and not tag:
         stacktags, tag = build_slice(ctx, slice_name, slice_default_tag)
 
     if not tag:
@@ -1122,7 +1329,12 @@ def update(ctx, stack_name, tag, wait, skip_migrations, skip_check_tag, slice_na
     # Reset the configsecret if it has changed
     stack_meta.load({"happy/meta/configsecret": config.secret_arn})
     stack_meta.update(tag, stacktags, slice_name, stackmgr)
-    success = stack.apply(stack_name, wait or not skip_migrations, ctx.obj["orchestrator"], services=config.services)
+    success = stack.apply(
+        stack_name,
+        wait or not skip_migrations,
+        ctx.obj["orchestrator"],
+        services=config.services,
+    )
     if not success:
         raise CliError("Apply failed, skipping migrations")
     if not skip_migrations and should_auto_migrate(ctx):
@@ -1132,7 +1344,9 @@ def update(ctx, stack_name, tag, wait, skip_migrations, skip_check_tag, slice_na
 
 @cli.command()
 @click.argument("stack_name")
-@click.option("--wait/--no-wait", is_flag=True, default=True, help="wait for this to complete")
+@click.option(
+    "--wait/--no-wait", is_flag=True, default=True, help="wait for this to complete"
+)
 @click.pass_context
 def cancelupdate(ctx, stack_name, wait):
     """Cancel a dev stack update"""
@@ -1212,7 +1426,12 @@ def list_command(ctx):
     default=None,
     required=True,
 )
-@click.option("--dest-tag", help="Extra tags to apply and push to the docker repo.", multiple=True, required=True)
+@click.option(
+    "--dest-tag",
+    help="Extra tags to apply and push to the docker repo.",
+    multiple=True,
+    required=True,
+)
 @click.pass_context
 def addtags(ctx, images, source_tag, dest_tag):
     """Add additional tags to already-pushed images in the ECR repo"""
@@ -1233,16 +1452,22 @@ def addtags(ctx, images, source_tag, dest_tag):
         repo_name = "/".join(repository["url"].split("/")[1:])
 
         manifest = ecr_client.batch_get_image(
-            registryId=registry_id, repositoryName=repo_name, imageIds=[{"imageTag": source_tag}]
+            registryId=registry_id,
+            repositoryName=repo_name,
+            imageIds=[{"imageTag": source_tag}],
         )
         manifest = manifest["images"][0]["imageManifest"]
         for tag in dest_tag:
             try:
                 ecr_client.put_image(
-                    registryId=registry_id, repositoryName=repo_name, imageManifest=manifest, imageTag=tag
+                    registryId=registry_id,
+                    repositoryName=repo_name,
+                    imageManifest=manifest,
+                    imageTag=tag,
                 )
             except ecr_client.exceptions.ImageAlreadyExistsException:
                 print(f"tag {tag} already exists, skipping.")
+
 
 def get_ecr_repo(config):
     # Assumption: All the ECR registries are within the same AWS account as the one configured
@@ -1259,10 +1484,18 @@ def get_ecr_repo(config):
 @cli.command()
 @click.argument("images", nargs=-1, default=None)
 @click.option(
-    "--tag", help="Tag name for existing docker image. Leave empty to generate one automatically.", default=None
+    "--tag",
+    help="Tag name for existing docker image. Leave empty to generate one automatically.",
+    default=None,
 )
-@click.option("--extra-tag", help="Extra tags to apply and push to the docker repo.", multiple=True)
-@click.option("--compose-env", help="Environment file to pass to docker compose", default=None)
+@click.option(
+    "--extra-tag",
+    help="Extra tags to apply and push to the docker repo.",
+    multiple=True,
+)
+@click.option(
+    "--compose-env", help="Environment file to pass to docker compose", default=None
+)
 @click.pass_context
 def push(ctx, images, tag, extra_tag, compose_env):
     """Build and push docker images to ECR. Optionally filter by service name"""
@@ -1277,7 +1510,10 @@ def push(ctx, images, tag, extra_tag, compose_env):
     auth = ecr_client.get_authorization_token()["authorizationData"][0]
     auth_token = b64decode(auth["authorizationToken"]).decode()
     pwd = auth_token.split(":")[1].encode()
-    cmd = subprocess.run(["docker", "login", "--username", "AWS", "--password-stdin", first_registry], input=pwd)
+    cmd = subprocess.run(
+        ["docker", "login", "--username", "AWS", "--password-stdin", first_registry],
+        input=pwd,
+    )
     print("login done!")
 
     if not tag:
@@ -1288,7 +1524,9 @@ def push(ctx, images, tag, extra_tag, compose_env):
         builder_config["env"] = compose_env
     elif os.path.isfile(config.default_compose_env_file):
         builder_config["env"] = config.default_compose_env_file
-    builder_config["ecr_repo"] = first_registry  # TODO this is a leak in our abstraction, need to fix.
+    builder_config[
+        "ecr_repo"
+    ] = first_registry  # TODO this is a leak in our abstraction, need to fix.
     builder = ArtifactBuilder(builder_config)
     artifacts = builder.build(images)
     print("Build complete")
@@ -1311,12 +1549,14 @@ def watch(ctx, stack_name):
     stack.watch()
     stack.print_outputs()
 
+
 @cli.group()
 def hosts():
     "Commands to manage system hostsfile"
     pass
 
-class HostnameManager():
+
+class HostnameManager:
     def __init__(self, filename):
         self.filename = filename
 
@@ -1376,12 +1616,9 @@ class HostnameManager():
         lines.append(borders[1])
         return lines
 
+
 @hosts.command()
-@click.option(
-    "--hostsfile",
-    default="/etc/hosts",
-    help="Path to system hosts file"
-)
+@click.option("--hostsfile", default="/etc/hosts", help="Path to system hosts file")
 def install(hostsfile):
     "Install compose DNS entries"
     hostmgr = HostnameManager(hostsfile)
@@ -1391,12 +1628,9 @@ def install(hostsfile):
     config = hostmgr.cleanup_config(borders, config)
     hostmgr.update_config(config, hostmgr.generate_config(borders, containers))
 
+
 @hosts.command()
-@click.option(
-    "--hostsfile",
-    default="/etc/hosts",
-    help="Path to system hosts file"
-)
+@click.option("--hostsfile", default="/etc/hosts", help="Path to system hosts file")
 def uninstall(hostsfile):
     "Remove compose DNS entries"
     hostmgr = HostnameManager(hostsfile)
@@ -1404,6 +1638,7 @@ def uninstall(hostsfile):
     borders = hostmgr.get_file_borders()
     config = hostmgr.cleanup_config(borders, config)
     hostmgr.update_config(config, [])
+
 
 if __name__ == "__main__":
     obj = {}

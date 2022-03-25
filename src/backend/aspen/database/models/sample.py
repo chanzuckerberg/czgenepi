@@ -9,6 +9,7 @@ from sqlalchemy import (
     Boolean,
     Column,
     Date,
+    DateTime,
     ForeignKey,
     func,
     Integer,
@@ -135,7 +136,8 @@ class Sample(idbase, DictMixin):  # type: ignore
         nullable=False,
         comment="This is the public identifier we assign to this sample.",
     )
-
+    imported_at = Column(DateTime, nullable=True)
+    imported_by = Column(String, nullable=True)
     sample_collected_by = Column(
         String,
         nullable=False,
