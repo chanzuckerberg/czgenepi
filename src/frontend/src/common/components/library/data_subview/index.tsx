@@ -292,9 +292,12 @@ const DataSubview: FunctionComponent<Props> = ({
     const numImportedSamples =
       countBy(tableData, (sample) => {
         const { importedAt } = sample;
+        if (!importedAt) return;
+
+        const date = new Date(importedAt);
 
         // this is a heurstic we'll use to show the sample import notification for now
-        if (importedAt && importedAt > oneMinuteAgo) return "count";
+        if (date > oneMinuteAgo) return "count";
       }).count ?? 0;
 
     return (
