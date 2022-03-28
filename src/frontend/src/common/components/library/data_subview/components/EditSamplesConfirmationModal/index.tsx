@@ -1,7 +1,9 @@
 import CloseIcon from "@material-ui/icons/Close";
-import React from "react";
+import { Button } from "czifui";
+import React, { useMemo } from "react";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
+import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { pluralize } from "src/common/utils/strUtils";
 import { Content, Title } from "src/components/BaseDialog/style";
 import { CollapsibleInstructions } from "src/components/CollapsibleInstructions";
@@ -10,6 +12,8 @@ import {
   InstructionsNotSemiBold,
   InstructionsSemiBold,
 } from "src/components/TreeNameInput/style";
+import { SampleEditTsvTemplateDownload } from "src/views/Upload/components/Metadata/components/ImportFile/components/DownloadTemplate";
+import { prepEditMetadataTemplate } from "src/views/Upload/components/Metadata/components/ImportFile/prepMetadataTemplate";
 import { NewTabLink } from "../../../NewTabLink";
 import {
   StyledDiv,
@@ -76,6 +80,18 @@ const EditSamplesConfirmationModal = ({
     </StyledIconButton>
   );
 
+  const { templateInstructionRows, templateHeaders, templateRows } =
+    useMemo(() => {
+      const collectionLocation = checkedSamples[0]?.collectionLocation;
+      const currentPrivateIdentifiers = checkedSamples.map(
+        (checkedSample) => checkedSample.privateId
+      );
+      return prepEditMetadataTemplate(
+        currentPrivateIdentifiers || EMPTY_OBJECT,
+        collectionLocation
+      );
+    }, [checkedSamples]);
+
   return (
     <>
       <Dialog
@@ -95,6 +111,13 @@ const EditSamplesConfirmationModal = ({
           </StyledSubTitle>
         </DialogTitle>
         <DialogContent>
+          <SampleEditTsvTemplateDownload
+            headers={templateHeaders}
+            rows={templateRows}
+            instructions={templateInstructionRows}
+          >
+            <Button color="primary">Download Metadata Template (TSV)</Button>
+          </SampleEditTsvTemplateDownload>
           <Content>
             <CollapsibleInstructions
               header="Import Data from TSV or CSV File"

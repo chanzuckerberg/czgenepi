@@ -1,19 +1,38 @@
 import { Dictionary, invert } from "lodash";
-import { Metadata } from "src/views/Upload/components/common/types";
+import {
+  Metadata,
+  SampleEditTsvMetadata,
+} from "src/views/Upload/components/common/types";
 
 // Some columns are for optional data. Below string is added to end of the
 // header describing what data is in column to indicate it is optional.
 export const OPTIONAL_HEADER_MARKER = " - Optional";
+
 // Internal keys we use to represent to various kinds of metadata on a sample
 // and the user-visible name we give the info, seen as a header on column.
-export const METADATA_KEYS_TO_HEADERS: Record<keyof Metadata, string> = {
+const BASE_METADATA_HEADERS = {
+  // Headers that are shared between upload and edit sample metadata tsvs
   collectionDate: "Collection Date",
   collectionLocation: "Collection Location",
   keepPrivate: "Sample is Private",
+  sequencingDate: "Sequencing Date" + OPTIONAL_HEADER_MARKER,
+};
+
+export const METADATA_KEYS_TO_HEADERS: Record<keyof Metadata, string> = {
+  ...BASE_METADATA_HEADERS,
   privateId: "Private ID",
   publicId: "GISAID ID (Public ID)" + OPTIONAL_HEADER_MARKER,
   sampleId: "Sample Name (from FASTA)",
-  sequencingDate: "Sequencing Date" + OPTIONAL_HEADER_MARKER,
+};
+
+export const SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS: Record<
+  keyof SampleEditTsvMetadata,
+  string
+> = {
+  ...BASE_METADATA_HEADERS,
+  currentPrivateID: "Current Private ID",
+  newPrivateID: "New Private ID" + OPTIONAL_HEADER_MARKER,
+  publicId: "Public ID (GISAID ID)",
 };
 
 // When parsing upload of metadata, we use a flipped version of above.
@@ -36,6 +55,19 @@ export const METADATA_KEYS_TO_API_KEYS: Record<keyof KEYS_SENT_TO_API, string> =
     sequencingDate: "sequencing_date",
   };
 
+export const SAMPLE_EDIT_METADATA_KEYS_TO_API_KEYS: Record<
+  keyof SampleEditTsvMetadata,
+  string
+> = {
+  collectionDate: "collection_date",
+  collectionLocation: "location_id",
+  currentPrivateID: "current_private_id",
+  keepPrivate: "private",
+  newPrivateID: "new_private_id",
+  publicId: "public_id",
+  sequencingDate: "sequencing_date",
+};
+
 export const EMPTY_METADATA: Metadata = {
   collectionDate: "",
   collectionLocation: undefined,
@@ -43,6 +75,16 @@ export const EMPTY_METADATA: Metadata = {
   privateId: "",
   publicId: "",
   sampleId: "",
+  sequencingDate: "",
+};
+
+export const EMPTY_SAMPLE_EDIT_TSV: SampleEditTsvMetadata = {
+  collectionDate: "",
+  collectionLocation: undefined,
+  currentPrivateID: "",
+  keepPrivate: false,
+  newPrivateID: "",
+  publicId: "",
   sequencingDate: "",
 };
 

@@ -18,7 +18,7 @@ import {
   WarningExtraneousEntry,
   WarningMissingData,
 } from "./components/Alerts/warnings";
-import DownloadTemplate from "./components/DownloadTemplate";
+import { DownloadTemplate } from "./components/DownloadTemplate";
 import Instructions from "./components/Instructions";
 import { parseFile, ParseResult, SampleIdToWarningMessages } from "./parseFile";
 import {

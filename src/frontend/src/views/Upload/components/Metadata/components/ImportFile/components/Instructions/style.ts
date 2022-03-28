@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import { fontBodyXs, fontHeaderXs, getColors, getSpaces } from "czifui";
-import DownloadTemplate from "../DownloadTemplate";
+import { DownloadTemplate } from "../DownloadTemplate";
 
 export const Wrapper = styled.div`
   ${(props) => {

@@ -10,12 +10,12 @@ interface Props {
   className?: string;
 }
 
-export default function DownloadTemplate({
+const DownloadTemplate = ({
   children,
   rows,
   headers,
   className,
-}: Props): JSX.Element {
+}: Props): JSX.Element => {
   return (
     <CSVLink
       className={className}
@@ -28,4 +28,29 @@ export default function DownloadTemplate({
       {children}
     </CSVLink>
   );
+};
+
+interface SampleEditTsvProps extends Props {
+  instructions: string[][];
 }
+
+const SampleEditTsvTemplateDownload = ({
+  children,
+  rows,
+  headers,
+  instructions,
+  className,
+}: SampleEditTsvProps): JSX.Element => {
+  return (
+    <CSVLink
+      className={className}
+      filename="metadata_template.tsv"
+      separator={TSV_SEPARATOR}
+      data={[...instructions, [...headers], ...rows]}
+    >
+      {children}
+    </CSVLink>
+  );
+};
+
+export { DownloadTemplate, SampleEditTsvTemplateDownload };

@@ -68,6 +68,13 @@ export interface Metadata {
   collectionLocation?: NamedGisaidLocation;
 }
 
+export interface SampleEditTsvMetadata
+  extends Omit<Metadata, "sampleId" | "privateId"> {
+  // `extra tsv fields needed for CRUD
+  currentPrivateID?: string;
+  newPrivateID?: string;
+}
+
 export interface Props {
   samples: Samples | null;
   setSamples: React.Dispatch<React.SetStateAction<Samples | null>>;

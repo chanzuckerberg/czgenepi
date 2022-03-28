@@ -1,8 +1,10 @@
 /**
  * Generate info for downloadable Metadata Template.
  */
-import { METADATA_KEYS_TO_HEADERS } from "../../../common/constants";
-
+import {
+  METADATA_KEYS_TO_HEADERS,
+  SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS,
+} from "../../../common/constants";
 // Should change below whenever there are material changes to TSV download
 export const TEMPLATE_UPDATED_DATE = "2022-02-22"; // YYYY-MM-DD
 
@@ -20,11 +22,27 @@ const TEMPLATE_HEADERS = [
   METADATA_KEYS_TO_HEADERS.keepPrivate,
 ];
 
+const TEMPLATE_HEADERS_EDIT = [
+  SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.currentPrivateID,
+  SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.newPrivateID,
+  SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.publicId,
+  SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.collectionDate,
+  SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.collectionLocation,
+  SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.sequencingDate,
+  SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.keepPrivate,
+];
+
 // We also use this elsewhere: if we see one of these uploaded, filter it out.
 export const EXAMPLE_SAMPLE_IDS = [
   "Example Sample A",
   "Example Sample B",
   "Example Sample C",
+];
+
+export const EXAMPLE_CURRENT_PRIVATE_IDENTIFIERS = [
+  "example private ID A",
+  "example private ID B",
+  "example private ID C",
 ];
 
 const EXAMPLE_ROWS = [
@@ -60,6 +78,67 @@ const EXAMPLE_ROWS = [
   ],
 ];
 
+const SAMPLE_EDIT_INSTRUCTIONS = [
+  ["# Only fill out columns or cells you want to update the content"],
+  ["# Empty cells will not change what is currently in CZ GEN EPI database"],
+  ["# Fill cells with 'Delete' if you want to remove the existing content"],
+  ["# Save in .tsv .csv or .txt format"],
+];
+
+function getEditExampleRows(collectionLocation?: GisaidLocation): string[][] {
+  // return example rows with the countys collectionLocation
+  const exampleCollectionLocation = collectionLocation
+    ? `${collectionLocation.region}/${collectionLocation.country}/${collectionLocation.division}/${collectionLocation.location}`
+    : "North America/USA/Californa/Humbolt County";
+
+  return [
+    [
+      EXAMPLE_CURRENT_PRIVATE_IDENTIFIERS[0], // currentPrivateID
+      "X3421876", // newPrivateID
+      "hCoV-19/USA/demo-17806/2021", // publicId
+      DATE_FORMAT, // collectionDate,
+      exampleCollectionLocation, //collectionLocation
+      DATE_FORMAT, // sequencingDate
+      BOOLEAN_FORMAT, // keepPrivate
+    ],
+    [
+      EXAMPLE_CURRENT_PRIVATE_IDENTIFIERS[1],
+      "SOP292344X", // newPrivateID
+      "hCoV-19/USA/demo-17807/2021", // publicId
+      DATE_FORMAT, // collectionDate,
+      exampleCollectionLocation, //collectionLocation
+      DATE_FORMAT, // sequencingDate
+      BOOLEAN_FORMAT, // keepPrivate
+    ],
+    [
+      EXAMPLE_CURRENT_PRIVATE_IDENTIFIERS[2],
+      "T2348ACT", // newPrivateID
+      "hCoV-19/USA/demo-17808/2021", // publicId
+      DATE_FORMAT, // collectionDate,
+      exampleCollectionLocation, //collectionLocation
+      "Delete", // sequencingDate
+      BOOLEAN_FORMAT, // keepPrivate
+    ],
+  ];
+}
+
+function getEmptyDataRows(_metadataKeysToHeaders: string[]): string[] {
+  // provide rows in template that are just empty rows for user to fill in with data.
+  return new Array(_metadataKeysToHeaders.length).fill("");
+}
+
+function getDataRows(
+  sampleIds: string[],
+  EMPTY_DATA_ROW: string[]
+): string[][] {
+  return sampleIds.map((sampleId) => {
+    const sample_data_row = [...EMPTY_DATA_ROW];
+    // We rely on sampleId position being at `0` index.
+    sample_data_row[0] = sampleId; // this is the current private_id
+    return sample_data_row;
+  });
+}
+
 /**
  * Generates info to create downloadable metadata template TSV (or CSV).
  *
@@ -67,8 +146,8 @@ const EXAMPLE_ROWS = [
  * their data for uploading it, along with some example rows to help explain
  * what's going on and what the finished thing will look like.
  * Additionally, we put in rows that match the user's previously uploaded
- * sample IDs as a guidepost, but the real purpose of the template is to
- * show the user what the structure they need to conform to.
+ * sample IDs (or in the sample edit case the already existing Private Identifier) as a guidepost,
+ *  but the real purpose of the template is to show the user what the structure they need to conform to.
  *
  * TODO (Vince): The final example row should have its `collectionLocation` set
  * to be the same as user's location. It should use the fully-qualified version
@@ -83,16 +162,28 @@ export function prepMetadataTemplate(sampleIds: string[]): {
   templateRows: string[][];
 } {
   // Most rows in template are just empty rows for user to fill in with data.
-  const EMPTY_DATA_ROW: string[] = new Array(TEMPLATE_HEADERS.length).fill("");
-  // The only thing we insert to each data row is the sample's ID.
-  const data_rows = sampleIds.map((sampleId) => {
-    const sample_data_row = [...EMPTY_DATA_ROW];
-    // We rely on sampleId position being at `0` index.
-    sample_data_row[0] = sampleId;
-    return sample_data_row;
-  });
+  const EMPTY_DATA_ROW = getEmptyDataRows(TEMPLATE_HEADERS);
+  const data_rows = getDataRows(sampleIds, EMPTY_DATA_ROW);
   return {
     templateHeaders: TEMPLATE_HEADERS,
     templateRows: [...EXAMPLE_ROWS, ...data_rows],
+  };
+}
+
+export function prepEditMetadataTemplate(
+  sampleIds: string[],
+  collectionLocation?: GisaidLocation
+): {
+  templateInstructionRows: string[][];
+  templateHeaders: string[];
+  templateRows: string[][];
+} {
+  const EMPTY_DATA_ROW = getEmptyDataRows(TEMPLATE_HEADERS_EDIT);
+  const data_rows = getDataRows(sampleIds, EMPTY_DATA_ROW);
+  const EXAMPLE_ROWS_EDIT = getEditExampleRows(collectionLocation);
+  return {
+    templateInstructionRows: SAMPLE_EDIT_INSTRUCTIONS,
+    templateHeaders: TEMPLATE_HEADERS_EDIT,
+    templateRows: [...EXAMPLE_ROWS_EDIT, ...data_rows],
   };
 }
