@@ -120,7 +120,7 @@ local-init: oauth/pkcs12/certificate.pfx .env.ecr local-ecr-login local-hostconf
 	$(docker_compose) exec -T backend $(BACKEND_APP_ROOT)/scripts/setup_dev_data.sh
 	$(docker_compose) exec -T backend alembic upgrade head
 	$(docker_compose) exec -T backend python scripts/setup_localdata.py
-	$(docker_compose) exec -T backend sh -c 'cd aspen && pip install .'
+	$(docker_compose) exec -T backend pip install ./aspen
 
 .PHONY: prepare-new-db-snapshot
 prepare-new-db-snapshot:
@@ -240,10 +240,10 @@ local-update-frontend-deps: ## Update package-lock.json to reflect package.json 
 	$(docker_compose) exec frontend npm install
 
 ### ACCESSING CONTAINER MAKE COMMANDS ###################################################
-utility-%: ## Run make commands in the backend container (src/backend/Makefile) DEPRECATED!!
+utility-%: ## Run make commands in the CURRENT running backend container. See src/backend/Makefile
 	$(docker_compose) exec backend make $(subst utility-,,$@) MESSAGE="$(MESSAGE)"
 
-backend-%: .env.ecr ## Run make commands in the backend container (src/backend/Makefile)
+backend-%: .env.ecr  ## Run make commands in a NEW backend container. See src/backend/Makefile
 	$(docker_compose) run --no-deps --rm backend make $(subst backend-,,$@)
 
 .PHONY: frontend-e2e-ci

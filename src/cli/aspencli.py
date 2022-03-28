@@ -299,6 +299,39 @@ def me(ctx):
     print(resp.text)
 
 
+@user.command(name="create")
+@click.argument("email")
+@click.option("--name", required=True, type=str, help="The user's name.")
+@click.option("--group_id", required=True, type=str, help="The id of the group to create the user in.")
+@click.option("--auth0_user_id", required=True, type=str, help="The auth0 identifier attached to the user's auth0 account.")
+@click.option("--group_admin", is_flag=True, default=False)
+@click.option("--system_admin", is_flag=True, default=False)
+@click.pass_context
+def create(
+    ctx,
+    email,
+    name,
+    group_id,
+    auth0_user_id,
+    group_admin,
+    system_admin,
+):
+    api_client = ctx.obj["api_client"]
+    user = {
+        "name": name,
+        "email": email,
+        "group_id": group_id,
+        "group_admin": group_admin,
+        "system_admin": system_admin,
+    }
+    if auth0_user_id:
+        user["auth0_user_id"] = auth0_user_id
+    # Remove None fields
+    print(user)
+    resp = api_client.post("/api/usergroup", json=user)
+    print(resp.text)
+
+
 @cli.group()
 def userinfo():
     pass
