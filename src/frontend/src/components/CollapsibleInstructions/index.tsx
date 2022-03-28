@@ -2,6 +2,7 @@ import { List, ListItem } from "czifui";
 import React, { useState } from "react";
 import {
   CapsSizeType,
+  Divider,
   FontBodySizeType,
   HeaderWrapper,
   InstructionsTitle,
@@ -13,6 +14,7 @@ import {
 
 interface Props {
   buttonSize?: CapsSizeType;
+  downloadTSVOption?: JSX.Element;
   header: string;
   headerSize?: SizeType;
   instructionListTitle?: string;
@@ -28,6 +30,7 @@ interface Props {
 
 const CollapsibleInstructions = ({
   buttonSize = "xxxs",
+  downloadTSVOption,
   header,
   headerSize = "xs",
   instructionListTitle,
@@ -48,13 +51,21 @@ const CollapsibleInstructions = ({
   };
 
   const CollapsibleInstructionsButton = (
-    <StyledInstructionsButton
-      buttonSize={buttonSize}
-      color="primary"
-      onClick={handleInstructionsClick}
-    >
-      {shouldShowInstructions ? "LESS" : "MORE"} INFO
-    </StyledInstructionsButton>
+    <>
+      <StyledInstructionsButton
+        buttonSize={buttonSize}
+        color="primary"
+        onClick={handleInstructionsClick}
+      >
+        {shouldShowInstructions ? "LESS" : "MORE"} INFO
+      </StyledInstructionsButton>
+      {downloadTSVOption && (
+        <>
+          <Divider>|</Divider>
+          {downloadTSVOption}
+        </>
+      )}
+    </>
   );
 
   const listItems = (items: React.ReactNode[]): JSX.Element => {

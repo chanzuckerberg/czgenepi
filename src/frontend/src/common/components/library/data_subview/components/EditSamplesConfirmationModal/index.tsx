@@ -1,5 +1,4 @@
 import CloseIcon from "@material-ui/icons/Close";
-import { Button } from "czifui";
 import React, { useMemo } from "react";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
@@ -16,6 +15,7 @@ import { SampleEditTsvTemplateDownload } from "src/views/Upload/components/Metad
 import { prepEditMetadataTemplate } from "src/views/Upload/components/Metadata/components/ImportFile/prepMetadataTemplate";
 import { NewTabLink } from "../../../NewTabLink";
 import {
+  StyledButton,
   StyledDiv,
   StyledIconButton,
   StyledPreTitle,
@@ -92,6 +92,18 @@ const EditSamplesConfirmationModal = ({
       );
     }, [checkedSamples]);
 
+  const downloadTSVButton = (
+    <SampleEditTsvTemplateDownload
+      headers={templateHeaders}
+      rows={templateRows}
+      instructions={templateInstructionRows}
+    >
+      <StyledButton color="primary">
+        Download Metadata Template (TSV)
+      </StyledButton>
+    </SampleEditTsvTemplateDownload>
+  );
+
   return (
     <>
       <Dialog
@@ -111,15 +123,9 @@ const EditSamplesConfirmationModal = ({
           </StyledSubTitle>
         </DialogTitle>
         <DialogContent>
-          <SampleEditTsvTemplateDownload
-            headers={templateHeaders}
-            rows={templateRows}
-            instructions={templateInstructionRows}
-          >
-            <Button color="primary">Download Metadata Template (TSV)</Button>
-          </SampleEditTsvTemplateDownload>
           <Content>
             <CollapsibleInstructions
+              downloadTSVOption={downloadTSVButton}
               header="Import Data from TSV or CSV File"
               headerSize="s"
               instructionListTitle="Importing Files"

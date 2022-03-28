@@ -117,3 +117,12 @@ export const InstructionsWrapper = styled("div", {
     `;
   }}
 `;
+
+export const Divider = styled.span`
+  ${(props) => {
+    const colors = getColors(props);
+    return `
+      color: ${colors?.gray[400]}
+    `;
+  }}
+`;
