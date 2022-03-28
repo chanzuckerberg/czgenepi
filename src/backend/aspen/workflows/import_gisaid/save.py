@@ -1,14 +1,10 @@
 import csv
 import datetime
 import io
-import re
-import uuid
 from typing import Dict, List, Optional, Union
 
 import arrow
 import click
-from sqlalchemy import Column, MetaData, Table
-from sqlalchemy.schema import CreateTable, DropTable
 
 from aspen.config.config import Config
 from aspen.database.connection import (
@@ -18,33 +14,11 @@ from aspen.database.connection import (
     SqlAlchemyInterface,
 )
 from aspen.database.models import GisaidMetadata
-
-
-def create_temp_table(session, source_table):
-    metadata = MetaData()
-    suffix = re.sub("-", "", str(uuid.uuid1()))
-    table_name = f"{source_table.name}_{suffix}"
-    cols = []
-    for col in source_table.columns:
-        cols.append(
-            Column(
-                col.name, col.type, primary_key=col.primary_key, nullable=col.nullable
-            )
-        )
-
-    table_object = Table(table_name, metadata, *cols)
-    session.execute(CreateTable(table_object))
-    return table_object
-
-
-def mv_table_contents(session, source_table, dest_table):
-    cols = [col.name for col in dest_table.columns]
-    session.execute(dest_table.delete())
-    session.execute(dest_table.insert().from_select(cols, source_table.select()))
-
-
-def drop_temp_table(session, table_obj):
-    session.execute(DropTable(table_obj))
+from aspen.workflows.shared_utils.database import (
+    create_temp_table,
+    drop_temp_table,
+    mv_table_contents,
+)
 
 
 @click.command("save")
