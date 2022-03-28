@@ -120,7 +120,7 @@ local-init: oauth/pkcs12/certificate.pfx .env.ecr local-ecr-login local-hostconf
 	$(docker_compose) exec -T backend $(BACKEND_APP_ROOT)/scripts/setup_dev_data.sh
 	$(docker_compose) exec -T backend alembic upgrade head
 	$(docker_compose) exec -T backend python scripts/setup_localdata.py
-	$(docker_compose) exec -T backend pip install .
+	$(docker_compose) exec -T backend pip install ./aspen
 
 .PHONY: prepare-new-db-snapshot
 prepare-new-db-snapshot:
