@@ -100,3 +100,7 @@ Example endpoint call to update public_ids based on private to public id mapping
 * `python src/cli/aspencli.py --env <local|staging|prod|rdev> samples update_public_ids --group-id 1 --private-to-public-id-mapping ~/Downloads/test_rename_public_identifiers.csv`
 
   * if using rdev also specify the stack name with `--stack <stack-name>` flag
+
+## REMOVE this section
+I am just here to be a tiny git commit to ensure no weirdness in making a PR
+which will then allow kicking off some GitHub jobs revolving around testing.
