@@ -1,7 +1,7 @@
 # This is a batch job
 #
 
-data aws_region current {}
+data "aws_region" "current" {}
 
 locals {
   container_properties = yamldecode(templatefile("${path.module}/container_properties.yml", {
@@ -19,14 +19,14 @@ locals {
 }
 
 
-resource aws_batch_job_definition batch_job_def {
+resource "aws_batch_job_definition" "batch_job_def" {
   type = "container"
   name = "${var.stack_resource_prefix}-${var.deployment_stage}-${var.custom_stack_name}-${var.app_name}"
 
   container_properties = jsonencode(local.container_properties)
 }
 
-resource aws_cloudwatch_log_group cloud_watch_logs_group {
+resource "aws_cloudwatch_log_group" "cloud_watch_logs_group" {
   retention_in_days = 365
   name              = "/${var.stack_resource_prefix}/${var.deployment_stage}/${var.custom_stack_name}/${var.app_name}"
 }

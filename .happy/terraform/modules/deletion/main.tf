@@ -1,14 +1,14 @@
-data aws_region current {}
+data "aws_region" "current" {}
 
-resource aws_ecs_task_definition task_definition {
-  family        = "${var.stack_resource_prefix}-${var.deployment_stage}-${var.custom_stack_name}-deletion"
-  network_mode  = "awsvpc"
-  cpu    = 2048
-  memory = 4096
-  task_role_arn = var.task_role_arn
-  execution_role_arn = var.execution_role
-  requires_compatibilities = [ "FARGATE" ]
-  container_definitions = <<EOF
+resource "aws_ecs_task_definition" "task_definition" {
+  family                   = "${var.stack_resource_prefix}-${var.deployment_stage}-${var.custom_stack_name}-deletion"
+  network_mode             = "awsvpc"
+  cpu                      = 2048
+  memory                   = 4096
+  task_role_arn            = var.task_role_arn
+  execution_role_arn       = var.execution_role
+  requires_compatibilities = ["FARGATE"]
+  container_definitions    = <<EOF
 [
   {
     "name": "deletedb",
@@ -50,7 +50,7 @@ resource aws_ecs_task_definition task_definition {
 EOF
 }
 
-resource aws_cloudwatch_log_group cloud_watch_logs_group {
+resource "aws_cloudwatch_log_group" "cloud_watch_logs_group" {
   retention_in_days = 365
   name              = "/${var.stack_resource_prefix}/${var.deployment_stage}/${var.custom_stack_name}/deletion"
 }

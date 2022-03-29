@@ -1,18 +1,18 @@
 # This deploys an Aspen stack.
 #
 
-data aws_secretsmanager_secret_version config {
+data "aws_secretsmanager_secret_version" "config" {
   secret_id = var.happy_config_secret
 }
 
-data aws_secretsmanager_secret_version app_secret {
+data "aws_secretsmanager_secret_version" "app_secret" {
   secret_id = local.app_secret_name
 }
 
 locals {
-  secret = jsondecode(data.aws_secretsmanager_secret_version.config.secret_string)
+  secret     = jsondecode(data.aws_secretsmanager_secret_version.config.secret_string)
   app_secret = jsondecode(data.aws_secretsmanager_secret_version.app_secret.secret_string)
-  alb_key = var.require_okta ? "private_albs" : "public_albs"
+  alb_key    = var.require_okta ? "private_albs" : "public_albs"
 
   app_secret_name = "${local.deployment_stage}/genepi-config"
 
@@ -22,25 +22,25 @@ locals {
   remote_dev_prefix     = var.stack_prefix
   wait_for_steady_state = var.wait_for_steady_state
 
-  migration_cmd         = ["make", "remote-db-migrations"]
-  deletion_cmd          = ["make", "remote-db-drop"]
-  backend_cmd           = []
-  frontend_cmd          = ["npm", "run", "serve"]
-  data_load_path        = length(var.sql_import_file) > 0 ? "${local.secret["s3_buckets"]["genepi"]["name"]}/${var.sql_import_file}" : ""
+  migration_cmd  = ["make", "remote-db-migrations"]
+  deletion_cmd   = ["make", "remote-db-drop"]
+  backend_cmd    = []
+  frontend_cmd   = ["npm", "run", "serve"]
+  data_load_path = length(var.sql_import_file) > 0 ? "${local.secret["s3_buckets"]["genepi"]["name"]}/${var.sql_import_file}" : ""
 
-  vpc_id                = local.secret["vpc_id"]
-  subnets               = local.secret["private_subnets"]
-  security_groups       = local.secret["security_groups"]
-  zone                  = local.secret["zone_id"]
-  cluster               = local.secret["cluster_arn"]
-  ecs_execution_role    = lookup(local.secret, "ecs_execution_role", "")
+  vpc_id             = local.secret["vpc_id"]
+  subnets            = local.secret["private_subnets"]
+  security_groups    = local.secret["security_groups"]
+  zone               = local.secret["zone_id"]
+  cluster            = local.secret["cluster_arn"]
+  ecs_execution_role = lookup(local.secret, "ecs_execution_role", "")
 
-  swipe_comms_bucket    = local.secret["s3_buckets"]["genepi_swipe_comms"]["name"]
-  swipe_wdl_bucket      = local.secret["s3_buckets"]["genepi_swipe_wdl"]["name"]
+  swipe_comms_bucket = local.secret["s3_buckets"]["genepi_swipe_comms"]["name"]
+  swipe_wdl_bucket   = local.secret["s3_buckets"]["genepi_swipe_wdl"]["name"]
 
   # Web images
-  frontend_image   = join(":", [local.secret["ecrs"]["frontend"]["url"], lookup(var.image_tags, "frontend", var.image_tag)])
-  backend_image    = join(":", [local.secret["ecrs"]["backend"]["url"], lookup(var.image_tags, "backend", var.image_tag)])
+  frontend_image = join(":", [local.secret["ecrs"]["frontend"]["url"], lookup(var.image_tags, "frontend", var.image_tag)])
+  backend_image  = join(":", [local.secret["ecrs"]["backend"]["url"], lookup(var.image_tags, "backend", var.image_tag)])
 
   # Workflow images
   pangolin_image   = join(":", [local.secret["ecrs"]["pangolin"]["url"], lookup(var.image_tags, "pangolin", var.image_tag)])
@@ -48,7 +48,7 @@ locals {
   gisaid_image     = join(":", [local.secret["ecrs"]["gisaid"]["url"], lookup(var.image_tags, "gisaid", var.image_tag)])
 
   # This is the wdl executor image, doesn't change on update.
-  swipe_image     = join(":", [local.secret["ecrs"]["swipe"]["url"], "rev-7"]) # TODO - we probably don't want to hardcode this
+  swipe_image = join(":", [local.secret["ecrs"]["swipe"]["url"], "rev-7"]) # TODO - we probably don't want to hardcode this
 
   batch_role_arn = local.secret["batch_queues"]["genepi"]["role_arn"]
   ec2_queue_arn  = local.secret["batch_envs"]["genepi"]["envs"]["EC2"]["queue_arn"]
@@ -64,9 +64,9 @@ locals {
   frontend_alb_dns      = local.secret[local.alb_key]["frontend"]["dns_name"]
   backend_alb_dns       = local.secret[local.alb_key]["backend"]["dns_name"]
 
-  ecs_role_arn          = local.secret["service_roles"]["ecs_role"]
-  event_role_arn        = local.secret["service_roles"]["event_role"]
-  sfn_role_arn          = local.secret["service_roles"]["sfn_nextstrain"]
+  ecs_role_arn   = local.secret["service_roles"]["ecs_role"]
+  event_role_arn = local.secret["service_roles"]["event_role"]
+  sfn_role_arn   = local.secret["service_roles"]["sfn_nextstrain"]
 
   frontend_url = try(join("", ["https://", module.frontend_dns[0].dns_prefix, ".", local.external_dns]), var.frontend_url)
   backend_url  = try(join("", ["https://", module.backend_dns[0].dns_prefix, ".", local.external_dns]), var.backend_url)
@@ -76,7 +76,7 @@ locals {
   state_change_sns_topic_arn = local.secret["sns_topics"]["state_change"]
 }
 
-module frontend_dns {
+module "frontend_dns" {
   count                 = var.require_okta ? 1 : 0
   stack_resource_prefix = local.stack_resource_prefix
   source                = "../dns"
@@ -87,7 +87,7 @@ module frontend_dns {
   zone                  = local.internal_dns
 }
 
-module backend_dns {
+module "backend_dns" {
   count                 = var.require_okta ? 1 : 0
   stack_resource_prefix = local.stack_resource_prefix
   source                = "../dns"
@@ -98,7 +98,7 @@ module backend_dns {
   zone                  = local.internal_dns
 }
 
-module frontend_service {
+module "frontend_service" {
   source                = "../service"
   stack_resource_prefix = local.stack_resource_prefix
   execution_role        = local.ecs_execution_role
@@ -122,12 +122,12 @@ module frontend_service {
   api_url               = local.backend_url
   frontend_url          = local.frontend_url
   remote_dev_prefix     = local.remote_dev_prefix
-  extra_env_vars        = {"SPLIT_FRONTEND_KEY": local.app_secret["SPLIT_FRONTEND_KEY"]}
+  extra_env_vars        = { "SPLIT_FRONTEND_KEY" : local.app_secret["SPLIT_FRONTEND_KEY"] }
 
   wait_for_steady_state = local.wait_for_steady_state
 }
 
-module backend_service {
+module "backend_service" {
   source                = "../service"
   stack_resource_prefix = local.stack_resource_prefix
   execution_role        = local.ecs_execution_role
@@ -154,8 +154,8 @@ module backend_service {
   wait_for_steady_state = local.wait_for_steady_state
 }
 
-module swipe_sfn {
-  source                     = "../swipe-sfn"
+module "swipe_sfn" {
+  source = "../swipe-sfn"
 
   count = local.deployment_stage == "prod" ? 1 : 0
 
@@ -172,13 +172,13 @@ module swipe_sfn {
 }
 
 # Write information on how to invoke the gisaid sfn to SSM.
-module gisaid_sfn_config {
-  source   = "../sfn_config"
-  app_name = "gisaid-sfn"
-  image    = local.gisaid_image
-  vcpus    = 32
-  memory   = 420000
-  wdl_path = "workflows/gisaid.wdl"
+module "gisaid_sfn_config" {
+  source                = "../sfn_config"
+  app_name              = "gisaid-sfn"
+  image                 = local.gisaid_image
+  vcpus                 = 32
+  memory                = 420000
+  wdl_path              = "workflows/gisaid.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
   remote_dev_prefix     = local.remote_dev_prefix
@@ -188,19 +188,19 @@ module gisaid_sfn_config {
   sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = contains(["geprod", "gestaging"], local.deployment_stage) ? ["cron(0 1 ? * MON-FRI *)"] : []
   event_role_arn        = local.event_role_arn
-  extra_args            =  {
+  extra_args = {
     genepi_config_secret_name = local.app_secret_name
-    remote_dev_prefix = local.remote_dev_prefix
+    remote_dev_prefix         = local.remote_dev_prefix
     # We'll use the wdl default values for ndjson_cache_key and gisaid_ndjson_url
   }
 }
 
-module pangolin_sfn_config {
-  source   = "../sfn_config"
-  app_name = "pangolin-sfn"
-  image    = local.pangolin_image
-  memory   = 120000
-  wdl_path = "workflows/pangolin.wdl"
+module "pangolin_sfn_config" {
+  source                = "../sfn_config"
+  app_name              = "pangolin-sfn"
+  image                 = local.pangolin_image
+  memory                = 120000
+  wdl_path              = "workflows/pangolin.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
   remote_dev_prefix     = local.remote_dev_prefix
@@ -210,18 +210,18 @@ module pangolin_sfn_config {
   sfn_arn               = local.swipe_sfn_arn
   schedule_expressions  = contains(["geprod", "gestaging"], local.deployment_stage) ? ["cron(0 18,23 ? * MON-FRI *)"] : []
   event_role_arn        = local.event_role_arn
-  extra_args            =  {
+  extra_args = {
     genepi_config_secret_name = local.app_secret_name
-    remote_dev_prefix        = local.remote_dev_prefix
+    remote_dev_prefix         = local.remote_dev_prefix
   }
 }
 
-module pangolin_ondemand_sfn_config {
-  source   = "../sfn_config"
-  app_name = "pangolin-ondemand-sfn"
-  image    = local.pangolin_image
-  memory   = 120000
-  wdl_path = "workflows/pangolin-ondemand.wdl"
+module "pangolin_ondemand_sfn_config" {
+  source                = "../sfn_config"
+  app_name              = "pangolin-ondemand-sfn"
+  image                 = local.pangolin_image
+  memory                = 120000
+  wdl_path              = "workflows/pangolin-ondemand.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
   remote_dev_prefix     = local.remote_dev_prefix
@@ -230,19 +230,19 @@ module pangolin_ondemand_sfn_config {
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = local.swipe_sfn_arn
   event_role_arn        = local.event_role_arn
-  extra_args            =  {
+  extra_args = {
     genepi_config_secret_name = local.app_secret_name
-    remote_dev_prefix        = local.remote_dev_prefix
+    remote_dev_prefix         = local.remote_dev_prefix
   }
 }
 
-module nextstrain_template_sfn_config {
-  source   = "../sfn_config"
-  app_name = "nextstrain-sfn"
-  image    = local.nextstrain_image
-  vcpus    = 10
-  memory   = 64000
-  wdl_path = "workflows/nextstrain.wdl"
+module "nextstrain_template_sfn_config" {
+  source                = "../sfn_config"
+  app_name              = "nextstrain-sfn"
+  image                 = local.nextstrain_image
+  vcpus                 = 10
+  memory                = 64000
+  wdl_path              = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
   remote_dev_prefix     = local.remote_dev_prefix
@@ -251,19 +251,19 @@ module nextstrain_template_sfn_config {
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = local.swipe_sfn_arn
   event_role_arn        = local.event_role_arn
-   extra_args            =  {
+  extra_args = {
     genepi_config_secret_name = local.app_secret_name
-    remote_dev_prefix        = local.remote_dev_prefix
+    remote_dev_prefix         = local.remote_dev_prefix
   }
 }
 
-module nextstrain_ondemand_template_sfn_config {
-  source   = "../sfn_config"
-  app_name = "nextstrain-ondemand-sfn"
-  image    = local.nextstrain_image
-  vcpus    = 10
-  memory   = 64000
-  wdl_path = "workflows/nextstrain-ondemand.wdl"
+module "nextstrain_ondemand_template_sfn_config" {
+  source                = "../sfn_config"
+  app_name              = "nextstrain-ondemand-sfn"
+  image                 = local.nextstrain_image
+  vcpus                 = 10
+  memory                = 64000
+  wdl_path              = "workflows/nextstrain-ondemand.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
   remote_dev_prefix     = local.remote_dev_prefix
@@ -272,13 +272,13 @@ module nextstrain_ondemand_template_sfn_config {
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = local.swipe_sfn_arn
   event_role_arn        = local.event_role_arn
-   extra_args            =  {
+  extra_args = {
     genepi_config_secret_name = local.app_secret_name
-    remote_dev_prefix        = local.remote_dev_prefix
+    remote_dev_prefix         = local.remote_dev_prefix
   }
 }
 
-module migrate_db {
+module "migrate_db" {
   source                = "../migration"
   stack_resource_prefix = local.stack_resource_prefix
   image                 = local.backend_image
@@ -291,7 +291,7 @@ module migrate_db {
   data_load_path        = local.data_load_path
 }
 
-module delete_db {
+module "delete_db" {
   count                 = var.delete_protected ? 0 : 1
   stack_resource_prefix = local.stack_resource_prefix
   source                = "../deletion"
@@ -304,7 +304,7 @@ module delete_db {
   deployment_stage      = local.deployment_stage
 }
 
-module swipe_batch {
+module "swipe_batch" {
   source                = "../batch"
   app_name              = "swipe"
   stack_resource_prefix = local.stack_resource_prefix

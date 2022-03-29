@@ -1,50 +1,50 @@
-variable app_name {
+variable "app_name" {
   type        = string
   description = "Application name"
 }
 
-variable stack_resource_prefix {
+variable "stack_resource_prefix" {
   type        = string
   description = "Prefix for account-level resources"
 }
 
-variable remote_dev_prefix {
+variable "remote_dev_prefix" {
   type        = string
   description = "Remote Dev namespace (db schema prefix)"
   default     = ""
 }
 
-variable job_definition_name {
+variable "job_definition_name" {
   type        = string
   description = "Name of the batch job definition"
 }
 
-variable ec2_queue_arn {
+variable "ec2_queue_arn" {
   type        = string
   description = "ARN of the batch job queue"
 }
 
-variable spot_queue_arn {
+variable "spot_queue_arn" {
   type        = string
   description = "ARN of the batch job queue"
 }
 
-variable state_change_sns_topic_arn {
+variable "state_change_sns_topic_arn" {
   type        = string
   description = "ARN of the SNS topic to notify of Step Function state changes"
 }
 
-variable role_arn {
+variable "role_arn" {
   type        = string
   description = "ARN for the role assumed by tasks"
 }
 
-variable custom_stack_name {
+variable "custom_stack_name" {
   type        = string
   description = "Please provide the stack name"
 }
 
-variable deployment_stage {
+variable "deployment_stage" {
   type        = string
   description = "The name of the deployment stage of the Application"
   default     = "dev"
