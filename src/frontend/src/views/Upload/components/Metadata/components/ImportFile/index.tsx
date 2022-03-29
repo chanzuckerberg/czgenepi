@@ -3,6 +3,11 @@ import { isEmpty } from "lodash";
 import React, { useEffect, useMemo, useState } from "react";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { StringToLocationFinder } from "src/common/utils/locationUtils";
+import { SampleUploadDownloadTemplate } from "src/components/DownloadMetadataTemplate";
+import {
+  prepUploadMetadataTemplate,
+  TEMPLATE_UPDATED_DATE,
+} from "src/components/DownloadMetadataTemplate/prepMetadataTemplate";
 import FilePicker from "src/components/FilePicker";
 import {
   ERROR_CODE,
@@ -18,13 +23,8 @@ import {
   WarningExtraneousEntry,
   WarningMissingData,
 } from "./components/Alerts/warnings";
-import { SampleUploadDownloadTemplate } from "./components/DownloadTemplate";
 import Instructions from "./components/Instructions";
 import { parseFile, ParseResult, SampleIdToWarningMessages } from "./parseFile";
-import {
-  prepMetadataTemplate,
-  TEMPLATE_UPDATED_DATE,
-} from "./prepMetadataTemplate";
 import {
   IntroWrapper,
   StyledUpdatedDate,
@@ -89,7 +89,7 @@ export default function ImportFile({
   };
 
   const { templateHeaders, templateRows } = useMemo(() => {
-    return prepMetadataTemplate(Object.keys(samples || EMPTY_OBJECT));
+    return prepUploadMetadataTemplate(Object.keys(samples || EMPTY_OBJECT));
   }, [samples]);
 
   const handleFiles = async (files: FileList | null) => {
@@ -125,7 +125,10 @@ export default function ImportFile({
           <Button color="primary" onClick={handleInstructionsClick}>
             {isInstructionsShown ? "HIDE" : "SHOW"} INSTRUCTIONS
           </Button>
-          <SampleUploadDownloadTemplate headers={templateHeaders} rows={templateRows}>
+          <SampleUploadDownloadTemplate
+            headers={templateHeaders}
+            rows={templateRows}
+          >
             <Button color="primary">Download Metadata Template (TSV)</Button>
           </SampleUploadDownloadTemplate>
           <StyledUpdatedDate>Updated {TEMPLATE_UPDATED_DATE}</StyledUpdatedDate>

@@ -1,6 +1,8 @@
 import Papa from "papaparse";
 import { StringToLocationFinder } from "src/common/utils/locationUtils";
 import { DATE_REGEX } from "src/components/DateField/constants";
+import { SampleUploadTsvMetadata } from "src/components/DownloadMetadataTemplate/common/types";
+import { EXAMPLE_SAMPLE_IDS } from "src/components/DownloadMetadataTemplate/prepMetadataTemplate";
 import {
   EMPTY_METADATA,
   FORBIDDEN_NAME_CHARACTERS_REGEX,
@@ -9,11 +11,9 @@ import {
 } from "../../../common/constants";
 import {
   ERROR_CODE,
-  Metadata,
   SampleIdToMetadata,
   WARNING_CODE,
 } from "../../../common/types";
-import { EXAMPLE_SAMPLE_IDS } from "./prepMetadataTemplate";
 
 /**
  * (Vince) Regarding interfaces for Warnings/Errors:
@@ -33,7 +33,10 @@ import { EXAMPLE_SAMPLE_IDS } from "./prepMetadataTemplate";
  * wider scope. They are not tied to any specific sample, they are just the
  * messages that should be passed on to the user regarding the error category.
  */
-export type SampleIdToWarningMessages = Record<string, Set<keyof Metadata>>;
+export type SampleIdToWarningMessages = Record<
+  string,
+  Set<keyof SampleUploadTsvMetadata>
+>;
 type WarningMessages = Map<WARNING_CODE, SampleIdToWarningMessages>;
 type ErrorMessages = Map<ERROR_CODE, Set<string>>;
 
@@ -47,9 +50,9 @@ export interface ParseResult {
 
 // Result of parsing a single (non-header) row from uploaded metadata file
 interface ParsedRow {
-  rowMetadata: Metadata | null; // null if row can't be parsed
+  rowMetadata: SampleUploadTsvMetadata | null; // null if row can't be parsed
   // Below is an empty map if row has no warnings during parse
-  rowWarnings: Map<WARNING_CODE, Set<keyof Metadata>>;
+  rowWarnings: Map<WARNING_CODE, Set<keyof SampleUploadTsvMetadata>>;
   // Note that we don't currently have any breaking errors at row parse level
 }
 
@@ -94,9 +97,11 @@ const METADATA_KEYS_TO_EXTRACT = Object.values(HEADERS_TO_METADATA_KEYS);
  *  https://stackoverflow.com/q/64440400
  * So we're just duplicating that aspect here.
  */
-function warnMissingMetadata(metadata: Metadata): Set<keyof Metadata> | null {
-  const missingMetadata = new Set<keyof Metadata>();
-  const ALWAYS_REQUIRED: Array<keyof Metadata> = [
+function warnMissingMetadata(
+  metadata: SampleUploadTsvMetadata
+): Set<keyof SampleUploadTsvMetadata> | null {
+  const missingMetadata = new Set<keyof SampleUploadTsvMetadata>();
+  const ALWAYS_REQUIRED: Array<keyof SampleUploadTsvMetadata> = [
     "privateId",
     "collectionDate",
     "collectionLocation",
@@ -119,8 +124,10 @@ function warnMissingMetadata(metadata: Metadata): Set<keyof Metadata> | null {
  * duplicating the `yup` `validationSchema` for a Row's Metadata elsewhere
  * in the app. But there's no great way to abstract that out, so here we are.
  */
-function warnBadFormatMetadata(metadata: Metadata): Set<keyof Metadata> | null {
-  const badFormatMetadata = new Set<keyof Metadata>();
+function warnBadFormatMetadata(
+  metadata: SampleUploadTsvMetadata
+): Set<keyof SampleUploadTsvMetadata> | null {
+  const badFormatMetadata = new Set<keyof SampleUploadTsvMetadata>();
 
   const { privateId } = metadata;
   if (
@@ -172,7 +179,7 @@ function parseRow(
     };
   }
 
-  const rowMetadata: Metadata = {
+  const rowMetadata: SampleUploadTsvMetadata = {
     // Ensure that rowMetadata will be sane even if row has no values
     ...EMPTY_METADATA,
   };

@@ -7,12 +7,12 @@ import { pluralize } from "src/common/utils/strUtils";
 import { Content, Title } from "src/components/BaseDialog/style";
 import { CollapsibleInstructions } from "src/components/CollapsibleInstructions";
 import Dialog from "src/components/Dialog";
+import { SampleEditTsvTemplateDownload } from "src/components/DownloadMetadataTemplate";
+import { prepEditMetadataTemplate } from "src/components/DownloadMetadataTemplate/prepMetadataTemplate";
 import {
   InstructionsNotSemiBold,
   InstructionsSemiBold,
 } from "src/components/TreeNameInput/style";
-import { SampleEditTsvTemplateDownload } from "src/views/Upload/components/Metadata/components/ImportFile/components/DownloadTemplate";
-import { prepEditMetadataTemplate } from "src/views/Upload/components/Metadata/components/ImportFile/prepMetadataTemplate";
 import { NewTabLink } from "../../../NewTabLink";
 import {
   StyledButton,
@@ -98,9 +98,7 @@ const EditSamplesConfirmationModal = ({
       rows={templateRows}
       instructions={templateInstructionRows}
     >
-      <StyledButton color="primary">
-        Download Metadata Template (TSV)
-      </StyledButton>
+      <StyledButton>Download Metadata Template (TSV)</StyledButton>
     </SampleEditTsvTemplateDownload>
   );
 

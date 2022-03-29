@@ -1,10 +1,10 @@
 /**
- * Generate info for downloadable Metadata Template.
+ * Generate info for downloadable Sample Upload and Edit Metadata Templates.
  */
 import {
-  METADATA_KEYS_TO_HEADERS,
   SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS,
-} from "../../../common/constants";
+  SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS,
+} from "./common/constants";
 // Should change below whenever there are material changes to TSV download
 export const TEMPLATE_UPDATED_DATE = "2022-02-22"; // YYYY-MM-DD
 
@@ -13,13 +13,13 @@ const BOOLEAN_FORMAT = "Yes/No";
 
 const TEMPLATE_HEADERS = [
   // If position for sampleId changes, update `prepMetadataTemplate` func!
-  METADATA_KEYS_TO_HEADERS.sampleId,
-  METADATA_KEYS_TO_HEADERS.privateId,
-  METADATA_KEYS_TO_HEADERS.publicId,
-  METADATA_KEYS_TO_HEADERS.collectionDate,
-  METADATA_KEYS_TO_HEADERS.collectionLocation,
-  METADATA_KEYS_TO_HEADERS.sequencingDate,
-  METADATA_KEYS_TO_HEADERS.keepPrivate,
+  SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sampleId,
+  SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.privateId,
+  SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.publicId,
+  SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.collectionDate,
+  SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.collectionLocation,
+  SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sequencingDate,
+  SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.keepPrivate,
 ];
 
 const TEMPLATE_HEADERS_EDIT = [
@@ -157,7 +157,7 @@ function getDataRows(
  * of the time, users will just be able to copy that final example downward for
  * all their data rows since most samples will be their location.
  */
-export function prepMetadataTemplate(sampleIds: string[]): {
+export function prepUploadMetadataTemplate(sampleIds: string[]): {
   templateHeaders: string[];
   templateRows: string[][];
 } {
