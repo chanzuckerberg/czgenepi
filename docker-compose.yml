@@ -4,6 +4,7 @@ services:
   database:
     image: "${DOCKER_REPO}genepi-devdb:latest"
     profiles: [ "backend", "web", "all" ]
+    platform: linux/amd64
     ports:
       - "5432:5432"
     environment:
@@ -18,6 +19,7 @@ services:
   frontend:
     image: "${DOCKER_REPO}genepi-frontend"
     profiles: [ "frontend", "web", "all" ]
+    platform: linux/amd64
     build:
       context: src/frontend
       cache_from:
@@ -46,6 +48,7 @@ services:
   backend:
     image: "${DOCKER_REPO}genepi-backend"
     profiles: [ "backend", "web", "all" ]
+    platform: linux/amd64
     build:
       context: src/backend
       cache_from:
@@ -93,6 +96,7 @@ services:
   localstack:
     image: localstack/localstack@sha256:7c6635493185d25165979995fb073fd789c72b6d8b17ef3a70b798d55576732f
     profiles: [ "backend", "web", "all" ]
+    platform: linux/amd64
     ports:
       - "4566:4566"
     environment:
@@ -112,6 +116,7 @@ services:
   oidc:
     image: soluto/oidc-server-mock:0.3.0
     profiles: [ "backend", "web", "all" ]
+    platform: linux/amd64
     ports:
       - "4011:80"
       - "8443:8443"
@@ -141,6 +146,7 @@ services:
   gisaid:
     image: "${DOCKER_REPO}genepi-gisaid"
     profiles: [ "gisaid", "jobs", "all" ]
+    platform: linux/amd64
     build:
       context: src/backend/
       dockerfile: Dockerfile.gisaid
@@ -166,6 +172,7 @@ services:
   pangolin:
     image: "${DOCKER_REPO}genepi-pangolin"
     profiles: [ "pangolin", "jobs", "all" ]
+    platform: linux/amd64
     build:
       context: src/backend
       dockerfile: Dockerfile.pangolin
@@ -187,6 +194,7 @@ services:
   nextstrain:
     image: "${DOCKER_REPO}genepi-nextstrain"
     profiles: [ "nextstrain", "jobs", "all" ]
+    platform: linux/amd64
     build:
       context: src/backend
       dockerfile: Dockerfile.nextstrain
