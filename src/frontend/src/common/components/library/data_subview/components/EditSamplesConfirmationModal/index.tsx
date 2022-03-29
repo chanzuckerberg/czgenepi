@@ -2,7 +2,6 @@ import CloseIcon from "@material-ui/icons/Close";
 import React, { useMemo } from "react";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
-import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { pluralize } from "src/common/utils/strUtils";
 import { Content, Title } from "src/components/BaseDialog/style";
 import { CollapsibleInstructions } from "src/components/CollapsibleInstructions";
@@ -82,12 +81,13 @@ const EditSamplesConfirmationModal = ({
 
   const { templateInstructionRows, templateHeaders, templateRows } =
     useMemo(() => {
+      // take the first collection location to populate Collection Location example rows of the sample edit tsv
       const collectionLocation = checkedSamples[0]?.collectionLocation;
       const currentPrivateIdentifiers = checkedSamples.map(
         (checkedSample) => checkedSample.privateId
       );
       return prepEditMetadataTemplate(
-        currentPrivateIdentifiers || EMPTY_OBJECT,
+        currentPrivateIdentifiers,
         collectionLocation
       );
     }, [checkedSamples]);
