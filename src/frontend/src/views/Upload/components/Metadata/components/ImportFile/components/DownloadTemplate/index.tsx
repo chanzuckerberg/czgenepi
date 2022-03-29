@@ -10,7 +10,7 @@ interface Props {
   className?: string;
 }
 
-const DownloadTemplate = ({
+const SampleUploadDownloadTemplate = ({
   children,
   rows,
   headers,
@@ -53,4 +53,4 @@ const SampleEditTsvTemplateDownload = ({
   );
 };
 
-export { DownloadTemplate, SampleEditTsvTemplateDownload };
+export { SampleUploadDownloadTemplate, SampleEditTsvTemplateDownload };

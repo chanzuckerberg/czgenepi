@@ -18,7 +18,7 @@ import {
   WarningExtraneousEntry,
   WarningMissingData,
 } from "./components/Alerts/warnings";
-import { DownloadTemplate } from "./components/DownloadTemplate";
+import { SampleUploadDownloadTemplate } from "./components/DownloadTemplate";
 import Instructions from "./components/Instructions";
 import { parseFile, ParseResult, SampleIdToWarningMessages } from "./parseFile";
 import {
@@ -125,9 +125,9 @@ export default function ImportFile({
           <Button color="primary" onClick={handleInstructionsClick}>
             {isInstructionsShown ? "HIDE" : "SHOW"} INSTRUCTIONS
           </Button>
-          <DownloadTemplate headers={templateHeaders} rows={templateRows}>
+          <SampleUploadDownloadTemplate headers={templateHeaders} rows={templateRows}>
             <Button color="primary">Download Metadata Template (TSV)</Button>
-          </DownloadTemplate>
+          </SampleUploadDownloadTemplate>
           <StyledUpdatedDate>Updated {TEMPLATE_UPDATED_DATE}</StyledUpdatedDate>
         </TitleWrapper>
 
