@@ -5,7 +5,7 @@ import {
   SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS,
   SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS,
 } from "./common/constants";
-// Should change below whenever there are material changes to TSV download
+// Should change below whenever there are material changes to upload TSV download
 export const TEMPLATE_UPDATED_DATE = "2022-02-22"; // YYYY-MM-DD
 
 const DATE_FORMAT = "YYYY-MM-DD";
