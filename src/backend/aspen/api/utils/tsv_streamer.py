@@ -1,7 +1,7 @@
 import csv
 from typing import Any, Iterable, Mapping
 
-from flask import Response, stream_with_context
+from fastapi.responses import StreamingResponse
 
 
 class SimpleStringWriter:
@@ -26,7 +26,7 @@ class TSVStreamer:
 
     def get_response(self):
         generator = self.stream()
-        resp = Response(generator, mimetype="application/binary")
+        resp = StreamingResponse(generator, media_type="application/binary")
         resp.headers["Content-Disposition"] = f"attachment; filename={self.filename}"
         resp.headers["Content-Type"] = "text/tsv"
         return resp
@@ -34,7 +34,6 @@ class TSVStreamer:
     def writerow(self):
         raise NotImplementedError("Must override writerow")
 
-    @stream_with_context
     def stream(self):
         stringfh = SimpleStringWriter()
         csvwriter = csv.DictWriter(stringfh, self.fields, delimiter="\t")
