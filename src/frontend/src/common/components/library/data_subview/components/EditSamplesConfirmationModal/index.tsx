@@ -98,7 +98,9 @@ const EditSamplesConfirmationModal = ({
       rows={templateRows}
       instructions={templateInstructionRows}
     >
-      <StyledButton>Download Metadata Template (TSV)</StyledButton>
+      <StyledButton sdsType="secondary">
+        Download Metadata Template (TSV)
+      </StyledButton>
     </SampleEditTsvTemplateDownload>
   );
 
@@ -123,7 +125,7 @@ const EditSamplesConfirmationModal = ({
         <DialogContent>
           <Content>
             <CollapsibleInstructions
-              downloadTSVOption={downloadTSVButton}
+              additionalHeaderLink={downloadTSVButton}
               header="Import Data from TSV or CSV File"
               headerSize="s"
               instructionListTitle="Importing Files"
