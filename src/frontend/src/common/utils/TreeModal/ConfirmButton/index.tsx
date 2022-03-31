@@ -57,9 +57,8 @@ export const ConfirmButton = (props: Props): JSX.Element => {
   const ButtonContent = (
     <Button
       {...rest}
-      color="primary"
-      variant="contained"
-      isRounded
+      sdsType="primary"
+      sdsStyle="rounded"
       disabled={isLoading || hasError || !url}
       data-test-id="tree-link-button"
     >
