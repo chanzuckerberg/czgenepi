@@ -3,7 +3,6 @@
 import asyncio
 
 import sqlalchemy as sa
-from oso import Oso
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_oso import async_authorized_sessionmaker, register_models
 
@@ -11,6 +10,7 @@ from aspen.api.settings import Settings
 from aspen.database.connection import init_async_db
 from aspen.database.models import Group, Sample, User
 from aspen.database.models.base import idbase
+from oso import Oso
 
 
 async def do_stuff():
@@ -36,8 +36,8 @@ async def do_stuff():
     for sample in samples:
         print(sample)
 
-    # await authsess.close()
-    # await session.close()
+    await asess.close()
+    await session.close()
     await db.engine.dispose()
 
 
