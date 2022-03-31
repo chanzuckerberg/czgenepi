@@ -1,6 +1,15 @@
+FROM rust:1.59-slim-buster AS rust
+# Install our own branch of oso with python async support merged in.
+RUN apt-get update && apt-get install -y wget unzip jq make
+RUN wget https://github.com/chanzuckerberg/oso/archive/oso-async.zip -O oso.zip && \
+    unzip oso.zip && \
+    mv oso-oso-async oso && \
+    cd oso && \
+    make rust-build
+
 FROM python:3.9.1-slim AS build
 ENV FLASK_APP=aspen.main
-RUN apt-get update && apt-get install -y vim build-essential libdigest-sha-perl wget
+RUN apt-get update && apt-get install -y vim build-essential libdigest-sha-perl wget curl
 ENV POETRY_HOME /opt/poetry/
 RUN apt install -y libdigest-sha-perl
 RUN wget https://raw.githubusercontent.com/python-poetry/poetry/1.1.10/get-poetry.py && \
@@ -10,8 +19,10 @@ RUN wget https://raw.githubusercontent.com/python-poetry/poetry/1.1.10/get-poetr
     rm get-poetry*
 COPY pyproject.toml poetry.lock environment.yaml ./
 COPY third-party ./third-party
-RUN /opt/poetry/bin/poetry config virtualenvs.create false && \
-    /opt/poetry/bin/poetry install
+COPY --from=rust /oso ./oso
+RUN cd oso && make python-build python-sqlalchemy-build
+#RUN /opt/poetry/bin/poetry config virtualenvs.create false && \
+#    /opt/poetry/bin/poetry install
 
 # Separate base image so that we can use it to update the Pipfile.lock and requirements.txt file
 FROM python:3.9.1-slim AS base
@@ -19,7 +30,7 @@ ENV FLASK_APP=aspen.main
 EXPOSE 3000
 
 # Utility
-RUN apt-get update && apt-get install -y vim procps wget make jq nano
+RUN apt-get update && apt-get install -y vim procps wget make jq nano unzip
 
 # Orchestration. Supervisor is heavyweight but afaik nothing else supports sane child reaping and signal forwarding.
 RUN pip install --no-cache-dir supervisor
@@ -57,5 +68,6 @@ COPY --from=build \
 ENV PYTHONPATH=.
 
 COPY . .
-RUN cd aspen && /opt/poetry/bin/poetry install
+RUN cd aspen && \
+    /opt/poetry/bin/poetry install
 CMD ["/usr/local/bin/supervisord", "-c", "/usr/src/app/etc/supervisord.conf"]
