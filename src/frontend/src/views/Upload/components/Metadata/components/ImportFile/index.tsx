@@ -129,7 +129,10 @@ export default function ImportFile({
           >
             {isInstructionsShown ? "HIDE" : "SHOW"} INSTRUCTIONS
           </StyledButton>
-          <SampleUploadDownloadTemplate headers={templateHeaders} rows={templateRows}>
+          <SampleUploadDownloadTemplate
+            headers={templateHeaders}
+            rows={templateRows}
+          >
             <StyledButton sdsType="secondary" sdsStyle="minimal">
               Download Metadata Template (TSV)
             </StyledButton>
