@@ -125,16 +125,15 @@ export default function Metadata({
           <NextStepWrapper isValid={isValid}>
             <ContinueButton
               disabled={!isValid}
-              isRounded
-              color="primary"
-              variant="contained"
+              sdsType="primary"
+              sdsStyle="rounded"
             >
               Continue
             </ContinueButton>
           </NextStepWrapper>
           <NextLink href={ROUTES.UPLOAD_STEP1} passHref>
             <a href="passHref">
-              <Button isRounded color="primary" variant="outlined">
+              <Button sdsType="secondary" sdsStyle="rounded">
                 Back
               </Button>
             </a>

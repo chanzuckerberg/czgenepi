@@ -1,6 +1,6 @@
-import { Button } from "czifui";
 import React from "react";
 import { Metadata } from "src/views/Upload/components/common/types";
+import { StyledButton } from "./style";
 
 interface Props {
   fieldKey: keyof Metadata;
@@ -18,8 +18,8 @@ export default function ApplyToAllColumn({
   };
 
   return (
-    <Button size="small" color="primary" variant="text" onClick={handleClick}>
+    <StyledButton sdsType="secondary" sdsStyle="minimal" onClick={handleClick}>
       APPLY TO ALL
-    </Button>
+    </StyledButton>
   );
 }

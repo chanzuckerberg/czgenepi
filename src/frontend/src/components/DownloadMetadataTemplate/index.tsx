@@ -46,7 +46,7 @@ const SampleEditTsvTemplateDownload = ({
       className={className}
       filename="metadata_template.tsv"
       separator={TSV_SEPARATOR}
-      data={[...instructions, [...headers], ...rows]}
+      data={[...instructions, headers, ...rows]}
     >
       {children}
     </CSVLink>

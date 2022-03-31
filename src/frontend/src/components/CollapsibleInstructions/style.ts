@@ -80,8 +80,11 @@ export const StyledInstructionsButton = styled(Button, {
 })`
   ${(props) => {
     const colors = getColors(props);
+    const spaces = getSpaces(props);
 
     return `
+      padding: ${spaces?.xs}px ${spaces?.s}px;
+
       &:hover {
         background-color: transparent;
         color: ${colors?.primary[500]};
@@ -122,7 +125,7 @@ export const Divider = styled.span`
   ${(props) => {
     const colors = getColors(props);
     return `
-      color: ${colors?.gray[400]}
+      color: ${colors?.gray[400]};
     `;
   }}
 `;
