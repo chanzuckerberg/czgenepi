@@ -8,13 +8,12 @@ from typing import TYPE_CHECKING
 from sqlalchemy import Boolean, Column, Date, ForeignKey, Integer, String
 from sqlalchemy.orm import backref, relationship
 
-from aspen.database.models.base import idbase
+from aspen.database.models.base import idbase, base
 from aspen.database.models.locations import Location
 from aspen.database.models.mixins import DictMixin
 
 if TYPE_CHECKING:
     from aspen.database.models.cansee import CanSee
-
 
 class Group(idbase, DictMixin):  # type: ignore
     """A group of users, generally a department of public health."""
@@ -73,3 +72,21 @@ class User(idbase, DictMixin):  # type: ignore
 
     def __repr__(self):
         return f"User <{self.name}>"
+
+
+class Role(idbase):
+    """Possible roles"""
+    __tablename__ = "roles"
+    name = Column(String, unique=True, nullable=False)
+
+
+class UserRole(base):
+    """Possible roles"""
+    __tablename__ = "user_roles"
+    role_id = Column(Integer, ForeignKey(Role.id), nullable=False)
+    role = relationship(Role, backref=backref("user_roles", uselist=True))  # type: ignore
+    group_id = Column(Integer, ForeignKey(Group.id), nullable=False, primary_key=True)
+    group = relationship(Group, backref=backref("user_roles", uselist=True))  # type: ignore
+    user_id = Column(Integer, ForeignKey(User.id), nullable=False, primary_key=True)
+    user = relationship(User, backref=backref("user_roles", uselist=True))  # type: ignore
+
