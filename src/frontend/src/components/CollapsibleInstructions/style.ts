@@ -122,7 +122,7 @@ export const Divider = styled.span`
   ${(props) => {
     const colors = getColors(props);
     return `
-      color: ${colors?.gray[400]}
+      color: ${colors?.gray[400]};
     `;
   }}
 `;
