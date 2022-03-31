@@ -150,6 +150,7 @@ export const DateFilter: FC<Props> = ({
     <StyledFilterWrapper>
       <StyledInputDropdown
         sdsStyle="minimal"
+        sdsType="singleSelect"
         label={inputLabel}
         // @ts-expect-error remove line when inputdropdown types fixed in sds
         onClick={handleClick}
@@ -181,8 +182,8 @@ export const DateFilter: FC<Props> = ({
           </ErrorMessageHolder>
           {(values[fieldKeyStart] || values[fieldKeyEnd]) && (
             <StyledButton
-              color="primary"
-              variant="contained"
+              sdsType="primary"
+              sdsStyle="square"
               onClick={() => {
                 const startValue = values[fieldKeyStart];
                 const endValue = values[fieldKeyEnd];

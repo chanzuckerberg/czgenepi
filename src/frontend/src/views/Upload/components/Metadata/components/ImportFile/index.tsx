@@ -1,4 +1,3 @@
-import { Button } from "czifui";
 import { isEmpty } from "lodash";
 import React, { useEffect, useMemo, useState } from "react";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
@@ -27,6 +26,7 @@ import Instructions from "./components/Instructions";
 import { parseFile, ParseResult, SampleIdToWarningMessages } from "./parseFile";
 import {
   IntroWrapper,
+  StyledButton,
   StyledUpdatedDate,
   Title,
   TitleWrapper,
@@ -122,14 +122,17 @@ export default function ImportFile({
       <IntroWrapper>
         <TitleWrapper>
           <Title>Import Data from a TSV or CSV file</Title>
-          <Button color="primary" onClick={handleInstructionsClick}>
-            {isInstructionsShown ? "HIDE" : "SHOW"} INSTRUCTIONS
-          </Button>
-          <SampleUploadDownloadTemplate
-            headers={templateHeaders}
-            rows={templateRows}
+          <StyledButton
+            sdsType="secondary"
+            sdsStyle="minimal"
+            onClick={handleInstructionsClick}
           >
-            <Button color="primary">Download Metadata Template (TSV)</Button>
+            {isInstructionsShown ? "HIDE" : "SHOW"} INSTRUCTIONS
+          </StyledButton>
+          <SampleUploadDownloadTemplate headers={templateHeaders} rows={templateRows}>
+            <StyledButton sdsType="secondary" sdsStyle="minimal">
+              Download Metadata Template (TSV)
+            </StyledButton>
           </SampleUploadDownloadTemplate>
           <StyledUpdatedDate>Updated {TEMPLATE_UPDATED_DATE}</StyledUpdatedDate>
         </TitleWrapper>

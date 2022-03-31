@@ -2,7 +2,6 @@ import { Menu, MenuItem, Tooltip } from "czifui";
 import React, { MouseEventHandler, useState } from "react";
 import { TooltipDescriptionText, TooltipHeaderText } from "../../style";
 import { IconButton } from "../IconButton";
-import { StyledTreeBuildDisabledImage, StyledTreeBuildImage } from "./style";
 
 interface Props {
   handleCreateNSTreeOpen: () => void;
@@ -56,8 +55,7 @@ const TreeSelectionMenu = ({
       <IconButton
         onClick={handleClick}
         disabled={isMenuDisabled}
-        svgDisabled={<StyledTreeBuildDisabledImage />}
-        svgEnabled={<StyledTreeBuildImage />}
+        sdsIcon="treeHorizontal"
         tooltipTextDisabled={TREE_BUILD_TOOLTIP_TEXT(true)}
         tooltipTextEnabled={TREE_BUILD_TOOLTIP_TEXT(false)}
       />

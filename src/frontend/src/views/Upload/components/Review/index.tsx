@@ -23,6 +23,7 @@ import {
   CheckboxWrapper,
   ContentTitle,
   ContentTitleWrapper,
+  StyledButton,
 } from "./style";
 
 export default function Review({
@@ -59,16 +60,16 @@ export default function Review({
           <ContentTitle>Sample Info</ContentTitle>
           <NextLink href={ROUTES.UPLOAD_STEP1} passHref>
             <a href="passHref">
-              <Button color="primary" variant="text">
+              <StyledButton sdsType="secondary" sdsStyle="minimal">
                 Edit Samples
-              </Button>
+              </StyledButton>
             </a>
           </NextLink>
           <NextLink href={ROUTES.UPLOAD_STEP2} passHref>
             <a href="passHref">
-              <Button color="primary" variant="text">
+              <StyledButton sdsType="secondary" sdsStyle="minimal">
                 Edit Metadata
-              </Button>
+              </StyledButton>
             </a>
           </NextLink>
         </ContentTitleWrapper>
@@ -103,7 +104,7 @@ export default function Review({
           />
           <NextLink href={ROUTES.UPLOAD_STEP2} passHref>
             <a href="passHref">
-              <Button isRounded color="primary" variant="outlined">
+              <Button sdsType="secondary" sdsStyle="rounded">
                 Back
               </Button>
             </a>
