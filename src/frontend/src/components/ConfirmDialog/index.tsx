@@ -28,7 +28,7 @@ export default function ConfirmDialog({
   const confirmButton = (
     <div onClick={onConfirm}>
       {customConfirmButton ?? (
-        <Button color="primary" variant="contained" isRounded>
+        <Button sdsType="primary" sdsStyle="rounded">
           Continue
         </Button>
       )}
@@ -36,7 +36,7 @@ export default function ConfirmDialog({
   );
 
   const cancelButton = (
-    <Button color="primary" variant="outlined" isRounded onClick={onClose}>
+    <Button sdsType="secondary" sdsStyle="rounded" onClick={onClose}>
       Cancel
     </Button>
   );

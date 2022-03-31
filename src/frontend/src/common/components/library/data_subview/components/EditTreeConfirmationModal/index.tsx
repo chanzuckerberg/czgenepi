@@ -1,5 +1,4 @@
-import CloseIcon from "@material-ui/icons/Close";
-import { Button } from "czifui";
+import { Button, Icon } from "czifui";
 import React, { useEffect, useState } from "react";
 import { useEditTree } from "src/common/queries/trees";
 import BaseDialog from "src/components/BaseDialog";
@@ -86,10 +85,9 @@ export const EditTreeConfirmationModal = ({
 
   const confirmButton = (
     <Button
-      color="primary"
-      variant="contained"
+      sdsType="primary"
+      sdsStyle="rounded"
       disabled={!hasValidName}
-      isRounded
       onClick={onEdit}
     >
       Update
@@ -97,8 +95,8 @@ export const EditTreeConfirmationModal = ({
   );
 
   const closeIcon = (
-    <StyledIconButton onClick={onClose}>
-      <CloseIcon />
+    <StyledIconButton onClick={onClose} sdsType="tertiary" sdsSize="small">
+      <Icon sdsIcon="xMark" sdsSize="s" sdsType="iconButton" />
     </StyledIconButton>
   );
 

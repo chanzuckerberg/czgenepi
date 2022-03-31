@@ -1,4 +1,3 @@
-import { Button } from "czifui";
 import { isEmpty } from "lodash";
 import React, { useEffect, useMemo, useState } from "react";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
@@ -27,6 +26,7 @@ import {
 } from "./prepMetadataTemplate";
 import {
   IntroWrapper,
+  StyledButton,
   StyledUpdatedDate,
   Title,
   TitleWrapper,
@@ -122,11 +122,17 @@ export default function ImportFile({
       <IntroWrapper>
         <TitleWrapper>
           <Title>Import Data from a TSV or CSV file</Title>
-          <Button color="primary" onClick={handleInstructionsClick}>
+          <StyledButton
+            sdsType="secondary"
+            sdsStyle="minimal"
+            onClick={handleInstructionsClick}
+          >
             {isInstructionsShown ? "HIDE" : "SHOW"} INSTRUCTIONS
-          </Button>
+          </StyledButton>
           <DownloadTemplate headers={templateHeaders} rows={templateRows}>
-            <Button color="primary">Download Metadata Template (TSV)</Button>
+            <StyledButton sdsType="secondary" sdsStyle="minimal">
+              Download Metadata Template (TSV)
+            </StyledButton>
           </DownloadTemplate>
           <StyledUpdatedDate>Updated {TEMPLATE_UPDATED_DATE}</StyledUpdatedDate>
         </TitleWrapper>

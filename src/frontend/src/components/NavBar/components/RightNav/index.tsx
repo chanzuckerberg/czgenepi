@@ -15,7 +15,7 @@ export default function RightNav(): JSX.Element {
       <>
         <Link href={ROUTES.UPLOAD_STEP1} passHref>
           <a href="passHref">
-            <UploadButton isRounded variant="outlined">
+            <UploadButton sdsType="secondary" sdsStyle="rounded">
               Upload
             </UploadButton>
           </a>

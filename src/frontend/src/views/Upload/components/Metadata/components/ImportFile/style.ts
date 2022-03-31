@@ -1,5 +1,13 @@
 import styled from "@emotion/styled";
-import { fontCapsXxxxs, fontHeaderL, getColors, getSpaces } from "czifui";
+import {
+  Button,
+  fontBodyXs,
+  fontCapsXxxxs,
+  fontHeaderL,
+  getColors,
+  getFontWeights,
+  getSpaces,
+} from "czifui";
 
 export const Title = styled.span`
   ${fontHeaderL}
@@ -47,6 +55,26 @@ export const StyledUpdatedDate = styled.p`
     const colors = getColors(props);
     return `
       color: ${colors?.gray[500]};
+    `;
+  }}
+`;
+
+export const StyledButton = styled(Button)`
+  ${fontBodyXs}
+  ${(props) => {
+    const colors = getColors(props);
+    const fontWeights = getFontWeights(props);
+    const spaces = getSpaces(props);
+
+    return `
+      color: ${colors?.primary[400]};
+      font-weight: ${fontWeights?.semibold};
+      padding: ${spaces?.xs}px ${spaces?.s}px;
+
+      &:hover, &:focus {
+        background-color: ${colors?.primary[200]};
+        color: ${colors?.primary[400]};
+      }
     `;
   }}
 `;
