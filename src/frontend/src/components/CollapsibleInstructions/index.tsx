@@ -14,7 +14,7 @@ import {
 
 interface Props {
   buttonSize?: CapsSizeType;
-  downloadTSVOption?: JSX.Element;
+  additionalHeaderLink?: JSX.Element;
   header: string;
   headerSize?: SizeType;
   instructionListTitle?: string;
@@ -30,7 +30,7 @@ interface Props {
 
 const CollapsibleInstructions = ({
   buttonSize = "xxxs",
-  downloadTSVOption,
+  additionalHeaderLink,
   header,
   headerSize = "xs",
   instructionListTitle,
@@ -59,10 +59,10 @@ const CollapsibleInstructions = ({
       >
         {shouldShowInstructions ? "LESS" : "MORE"} INFO
       </StyledInstructionsButton>
-      {downloadTSVOption && (
+      {additionalHeaderLink && (
         <>
           <Divider>|</Divider>
-          {downloadTSVOption}
+          {additionalHeaderLink}
         </>
       )}
     </>

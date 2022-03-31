@@ -79,7 +79,7 @@ const EXAMPLE_ROWS = [
 ];
 
 const SAMPLE_EDIT_INSTRUCTIONS = [
-  ["# Only fill out columns or cells you want to update the content"],
+  ["# Only fill out columns or cells where you want to update the content"],
   ["# Empty cells will not change what is currently in CZ GEN EPI database"],
   ["# Fill cells with 'Delete' if you want to remove the existing content"],
   ["# Save in .tsv .csv or .txt format"],
