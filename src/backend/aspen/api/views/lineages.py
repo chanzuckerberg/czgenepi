@@ -9,7 +9,7 @@ from aspen.database.models import PangoLineage
 router = APIRouter()
 
 
-@router.get("/", response_model=PangoLineagesResponse)
+@router.get("/pango", response_model=PangoLineagesResponse)
 async def list_pango_lineages(db: AsyncSession = Depends(get_db)):
     """Gets all the Pango lineages.
 
@@ -21,4 +21,5 @@ async def list_pango_lineages(db: AsyncSession = Depends(get_db)):
     """
     all_lineages_query = sa.select(PangoLineage.lineage)  # type: ignore
     result = await db.execute(all_lineages_query)
-    return {"all_pango_lineages": result.scalars().all()}
+    all_lineages = result.scalars().all()
+    return {"lineages": all_lineages}

@@ -16,8 +16,8 @@ from aspen.api.views import (
     auspice,
     auth,
     health,
+    lineages,
     locations,
-    pango_lineages,
     phylo_runs,
     phylo_trees,
     samples,
@@ -100,8 +100,8 @@ def get_app() -> FastAPI:
         usher.router, prefix="/v2/usher", dependencies=[Depends(get_auth_user)]
     )
     _app.include_router(
-        pango_lineages.router,
-        prefix="/v2/pango_lineages",
+        lineages.router,
+        prefix="/v2/lineages",
         dependencies=[Depends(get_auth_user)],
     )
     _app.include_router(
