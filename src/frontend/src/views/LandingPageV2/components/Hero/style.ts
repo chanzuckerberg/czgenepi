@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import { fontBodyM } from "czifui";
 
 export const G = styled.g``;
 
@@ -232,11 +233,9 @@ export const PartnershipText = styled.span`
 `;
 
 export const Tagline = styled.p`
+  ${fontBodyM}
+
   color: white;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 26px;
-  letter-spacing: 0.3px;
   margin-bottom: 0;
   margin-top: 22px;
 

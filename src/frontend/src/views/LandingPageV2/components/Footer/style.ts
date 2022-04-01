@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import { getColors, getSpaces } from "czifui";
 
 export const CZBiohubLogo = styled.a`
   max-width: 120px;
@@ -26,8 +27,13 @@ export const CZLogoContainer = styled.div`
 `;
 
 export const CZILogo = styled.a`
+  ${(props) => {
+    const colors = getColors(props);
+    return `
+      border-right: 1px solid ${colors?.gray[500]};
+    `;
+  }}
   margin-left: 32px;
-  border-right: 1px solid #767676;
   padding-right: 20px;
   max-width: 100px;
 `;
@@ -53,14 +59,30 @@ export const FooterBottomLinks = styled.div``;
 export const FooterBottomSeparator = styled.div`
   display: none;
 
-  @media (max-width: 768px) {
-    display: block;
-    width: 100%;
-    margin: 23px auto;
-    height: 1px;
-    background: #545454;
-  }
+  ${(props) => {
+    const colors = getColors(props);
+    const spaces = getSpaces(props);
+
+    return `
+      @media (max-width: 768px) {
+        display: block;
+        width: 100%;
+        margin: ${spaces?.l}px auto;
+        height: 1px;
+        background: ${colors?.gray[600]};
+      }
+    `;
+  }}
 `;
+
+const footerText = () => {
+  return `
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 24px;
+    letter-spacing: 0.3px;
+  `;
+};
 
 export const FooterContainer = styled.div`
   background: black;
@@ -73,10 +95,7 @@ export const FooterContainer = styled.div`
 
   & a {
     color: white;
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 24px;
-    letter-spacing: 0.3px;
+    ${footerText}
   }
 `;
 
@@ -86,13 +105,11 @@ export const FooterLogoContainer = styled.a`
 `;
 
 export const FooterPartnerships = styled.div`
+  ${footerText}
+
   display: flex;
   align-items: center;
-  font-size: 14px;
-  font-weight: 400;
   font-style: italic;
-  line-height: 24px;
-  letter-spacing: 0.3px;
 
   @media (max-width: 768px) {
     flex-direction: column;
