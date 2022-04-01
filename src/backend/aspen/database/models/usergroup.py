@@ -80,13 +80,14 @@ class Role(idbase):
     name = Column(String, unique=True, nullable=False)
 
 
-class UserRole(base):
+class GroupRole(base):
     """Possible roles"""
     __tablename__ = "user_roles"
     role_id = Column(Integer, ForeignKey(Role.id), nullable=False)
-    role = relationship(Role, backref=backref("user_roles", uselist=True))  # type: ignore
+    role = relationship(Role, backref=backref("group_roles", uselist=True))  # type: ignore
     group_id = Column(Integer, ForeignKey(Group.id), nullable=False, primary_key=True)
     group = relationship(Group, backref=backref("user_roles", uselist=True))  # type: ignore
     user_id = Column(Integer, ForeignKey(User.id), nullable=False, primary_key=True)
-    user = relationship(User, backref=backref("user_roles", uselist=True))  # type: ignore
+    user = relationship(User, backref=backref("group_roles", uselist=True))  # type: ignore
+    name = Column(String, nullable=False)
 
