@@ -103,7 +103,7 @@ def get_app() -> FastAPI:
         pango_lineages.router,
         prefix="/v2/pango_lineages",
         dependencies=[Depends(get_auth_user)],
-        )
+    )
     _app.include_router(
         phylo_runs.router,
         prefix="/v2/phylo_runs",
