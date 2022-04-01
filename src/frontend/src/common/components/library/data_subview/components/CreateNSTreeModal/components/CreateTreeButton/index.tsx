@@ -43,9 +43,8 @@ const CreateTreeButton = ({
     >
       <StyledButtonWrapper>
         <StyledButton
-          color="primary"
-          variant="contained"
-          isRounded
+          sdsType="primary"
+          sdsStyle="rounded"
           disabled={isTreeBuildDisabled}
           type="submit"
           value="Submit"

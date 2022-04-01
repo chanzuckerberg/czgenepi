@@ -1,6 +1,6 @@
 import CloseIcon from "@material-ui/icons/Close";
 import { Alert, Tooltip } from "czifui";
-import { isEqual } from "lodash";
+import { isEqual, noop } from "lodash";
 import React, { useCallback, useEffect, useState } from "react";
 import { CSVLink } from "react-csv";
 import { useMutation } from "react-query";
@@ -95,7 +95,7 @@ const DownloadModal = ({
     onClose();
   };
 
-  const mutation = useMutation(downloadSamplesFasta, {
+  const fastaDownloadMutation = useMutation(downloadSamplesFasta, {
     onError: () => {
       setShouldShowError(true);
       handleCloseModal();
@@ -244,87 +244,40 @@ const DownloadModal = ({
   function getDownloadButton(): JSX.Element | undefined {
     // button will have different functionality depending on download type selected
 
-    if (isMetadataSelected && !isFastaSelected) {
-      return (
-        <CSVLink
-          data={tsvRows}
-          headers={tsvHeaders}
-          filename={metadataDownloadName}
-          separator={separator}
-          data-test-id="download-tsv-link"
-        >
-          <StyledButton
-            color="primary"
-            variant="contained"
-            isRounded
-            disabled={false}
-            onClick={handleCloseModal}
-          >
-            {getDownloadButtonText()}
-          </StyledButton>
-        </CSVLink>
-      );
-    }
+    const isButtonDisabled = !isFastaSelected && !isMetadataSelected;
+    const downloadFasta = () => {
+      fastaDownloadMutation.mutate({ sampleIds: checkedSampleIds });
+    };
+    const onClick = isFastaSelected ? downloadFasta : noop;
 
-    if (isMetadataSelected && isFastaSelected) {
-      return (
-        <CSVLink
-          data={tsvRows}
-          headers={tsvHeaders}
-          filename={metadataDownloadName}
-          separator={separator}
-          data-test-id="download-tsv-link"
-        >
-          <StyledButton
-            color="primary"
-            variant="contained"
-            isRounded
-            onClick={() => {
-              mutation.mutate({ sampleIds: checkedSampleIds });
-            }}
-            disabled={false}
-          >
-            {getDownloadButtonText()}
-          </StyledButton>
-        </CSVLink>
-      );
-    }
+    const downloadButton = (
+      <StyledButton
+        sdsType="primary"
+        sdsStyle="rounded"
+        disabled={isButtonDisabled}
+        onClick={onClick}
+      >
+        {getDownloadButtonText()}
+      </StyledButton>
+    );
 
-    if (isFastaSelected && !isMetadataSelected) {
-      return (
-        <StyledButton
-          color="primary"
-          variant="contained"
-          isRounded
-          onClick={() => {
-            mutation.mutate({ sampleIds: checkedSampleIds });
-          }}
-          disabled={false}
-        >
-          {getDownloadButtonText()}
-        </StyledButton>
-      );
-    }
+    if (!isMetadataSelected) return downloadButton;
 
-    if (!isFastaSelected && !isMetadataSelected) {
-      return (
-        <StyledButton
-          color="primary"
-          variant="contained"
-          isRounded
-          onClick={() => {
-            mutation.mutate({ sampleIds: checkedSampleIds });
-          }}
-          disabled={true}
-        >
-          {getDownloadButtonText()}
-        </StyledButton>
-      );
-    }
+    return (
+      <CSVLink
+        data={tsvRows}
+        headers={tsvHeaders}
+        filename={metadataDownloadName}
+        separator={separator}
+        data-test-id="download-tsv-link"
+      >
+        {downloadButton}
+      </CSVLink>
+    );
   }
 
   function getDownloadButtonText() {
-    if (mutation.isLoading) {
+    if (fastaDownloadMutation.isLoading) {
       return "Loading";
     } else {
       return "Download";

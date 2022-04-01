@@ -5,7 +5,6 @@ import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import { StyledText } from "src/views/Data/components/TreeActionMenu/components/MoreActionsMenu/style";
 import { TooltipDescriptionText, TooltipHeaderText } from "../../style";
 import { IconButton } from "../IconButton";
-import { StyledMoreActionsIcon } from "./style";
 
 interface Props {
   disabled: boolean;
@@ -56,8 +55,7 @@ const MoreActionsMenu = ({
       <IconButton
         onClick={handleClick}
         disabled={disabled}
-        svgDisabled={<StyledMoreActionsIcon disabled />}
-        svgEnabled={<StyledMoreActionsIcon />}
+        sdsIcon="dotsHorizontal"
         tooltipTextDisabled={TOOLTIP_TEXT_DISABLED}
         tooltipTextEnabled={TOOLTIP_TEXT_ENABLED}
       />

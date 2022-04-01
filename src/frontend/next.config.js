@@ -1,4 +1,3 @@
-
 const nodeEnv = require(__dirname + "/src/common/constants/nodeEnv.js");
 const ENV = require(__dirname + "/src/common/constants/ENV.js");
 const webpack = require("webpack");
@@ -9,7 +8,7 @@ const isProdBuild = ENV.NODE_ENV === nodeEnv.PRODUCTION;
 
 const SCRIPT_SRC = ["'self'"];
 
-module.exports = ({
+module.exports = {
   distDir: ENV.BUILD_PATH,
   fileExtensions: ["jpg", "jpeg", "png", "gif", "ico", "webp", "jp2", "avif"],
 
@@ -73,13 +72,40 @@ module.exports = ({
   },
 
   webpack(config) {
+    // use the default svgr config to load most svg
     config.module.rules.push({
       test: /\.svg$/,
+      exclude: /landingv2-hero\.svg$/,
       use: ["@svgr/webpack"],
+    });
+
+    // except for the hero image, which requires specific config
+    // to enable the animation aspect to work
+    config.module.rules.push({
+      test: /landingv2-hero\.svg$/,
+      use: [
+        {
+          loader: "@svgr/webpack",
+          options: {
+            svgoConfig: {
+              plugins: [
+                {
+                  prefixIds: {
+                    prefix: false,
+                  },
+                  removeHiddenElems: {
+                    opacity0: false,
+                  },
+                },
+              ],
+            },
+          },
+        },
+      ],
     });
 
     config.plugins.push(new webpack.EnvironmentPlugin(ENV));
 
     return config;
   },
-});
+};

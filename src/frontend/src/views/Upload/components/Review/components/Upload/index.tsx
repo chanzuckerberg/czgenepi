@@ -60,9 +60,8 @@ export default function Upload({
           <PrimaryButtonWrapper>
             <Button
               disabled={isLoading}
-              color="primary"
-              variant="contained"
-              isRounded
+              sdsType="primary"
+              sdsStyle="rounded"
               onClick={handlePrimaryButtonClick}
             >
               {getPrimaryButtonText()}
@@ -72,9 +71,8 @@ export default function Upload({
             <NextLink href={ROUTES.DATA_SAMPLES} passHref>
               <a href="passRef">
                 <Button
-                  color="primary"
-                  variant="outlined"
-                  isRounded
+                  sdsType="secondary"
+                  sdsStyle="rounded"
                   onClick={handleClose}
                 >
                   Cancel
@@ -87,9 +85,8 @@ export default function Upload({
 
       <ContinueButton
         disabled={isDisabled}
-        isRounded
-        color="primary"
-        variant="contained"
+        sdsType="primary"
+        sdsStyle="rounded"
         onClick={handleUploadClick}
       >
         Start Upload

@@ -1,6 +1,5 @@
 import styled from "@emotion/styled";
-import IconButton from "@material-ui/core/IconButton";
-import { fontHeaderXl, getSpaces } from "czifui";
+import { fontHeaderXl, getSpaces, IconButton } from "czifui";
 
 export const StyledTitle = styled.div`
   ${fontHeaderXl}
@@ -19,7 +18,4 @@ export const StyledIconButton = styled(IconButton)`
   display: flex;
   align-self: flex-end;
   padding: 0;
-  &:hover {
-    background-color: transparent;
-  }
 `;
