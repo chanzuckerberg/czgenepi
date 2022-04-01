@@ -17,3 +17,6 @@ class PangoLineages(idbase):  # type: ignore
     __tablename__ = "pango_lineages"
 
     lineage = Column(String, nullable=False, unique=True)
+
+    def __repr__(self):
+        return f"Pango Lineage <{self.lineage}>"
