@@ -1,10 +1,8 @@
 import { Table as MuiTable, TableBody, TableHead } from "@material-ui/core";
 import React, { useCallback, useEffect, useState } from "react";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
-import {
-  METADATA_KEYS_TO_HEADERS,
-  SAMPLE_COUNT,
-} from "../../../common/constants";
+import { SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS } from "src/components/DownloadMetadataTemplate/common/constants";
+import { SAMPLE_COUNT } from "../../../common/constants";
 import {
   Metadata,
   NamedGisaidLocation,
@@ -123,25 +121,27 @@ export default function Table({
             <TableHead component="div">
               <StyledTableRow {...({ component: "div" } as unknown)}>
                 <StyledTableCell component="div">
-                  <IdColumn>{METADATA_KEYS_TO_HEADERS.sampleId}</IdColumn>
+                  <IdColumn>
+                    {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sampleId}
+                  </IdColumn>
                 </StyledTableCell>
                 <StyledTableCell component="div">
-                  {METADATA_KEYS_TO_HEADERS.privateId}
+                  {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.privateId}
                 </StyledTableCell>
                 <StyledTableCell component="div">
-                  {METADATA_KEYS_TO_HEADERS.publicId}
+                  {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.publicId}
                 </StyledTableCell>
                 <StyledTableCell component="div">
-                  {METADATA_KEYS_TO_HEADERS.collectionDate}
+                  {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.collectionDate}
                 </StyledTableCell>
                 <StyledTableCell component="div">
-                  {METADATA_KEYS_TO_HEADERS.collectionLocation}
+                  {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.collectionLocation}
                 </StyledTableCell>
                 <StyledTableCell component="div">
-                  {METADATA_KEYS_TO_HEADERS.sequencingDate}
+                  {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sequencingDate}
                 </StyledTableCell>
                 <IsPrivateTableCell align="center" component="div">
-                  {METADATA_KEYS_TO_HEADERS.keepPrivate}
+                  {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.keepPrivate}
                 </IsPrivateTableCell>
               </StyledTableRow>
             </TableHead>

@@ -1,17 +1,20 @@
 import CloseIcon from "@material-ui/icons/Close";
-import React from "react";
+import React, { useMemo } from "react";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import { pluralize } from "src/common/utils/strUtils";
 import { Content, Title } from "src/components/BaseDialog/style";
 import { CollapsibleInstructions } from "src/components/CollapsibleInstructions";
 import Dialog from "src/components/Dialog";
+import { SampleEditTsvTemplateDownload } from "src/components/DownloadMetadataTemplate";
+import { prepEditMetadataTemplate } from "src/components/DownloadMetadataTemplate/prepMetadataTemplate";
 import {
   InstructionsNotSemiBold,
   InstructionsSemiBold,
 } from "src/components/TreeNameInput/style";
 import { NewTabLink } from "../../../NewTabLink";
 import {
+  StyledButton,
   StyledDiv,
   StyledIconButton,
   StyledPreTitle,
@@ -76,6 +79,31 @@ const EditSamplesConfirmationModal = ({
     </StyledIconButton>
   );
 
+  const { templateInstructionRows, templateHeaders, templateRows } =
+    useMemo(() => {
+      // take the first collection location to populate Collection Location example rows of the sample edit tsv
+      const collectionLocation = checkedSamples[0]?.collectionLocation;
+      const currentPrivateIdentifiers = checkedSamples.map(
+        (checkedSample) => checkedSample.privateId
+      );
+      return prepEditMetadataTemplate(
+        currentPrivateIdentifiers,
+        collectionLocation
+      );
+    }, [checkedSamples]);
+
+  const downloadTSVButton = (
+    <SampleEditTsvTemplateDownload
+      headers={templateHeaders}
+      rows={templateRows}
+      instructions={templateInstructionRows}
+    >
+      <StyledButton sdsType="secondary">
+        Download Metadata Template (TSV)
+      </StyledButton>
+    </SampleEditTsvTemplateDownload>
+  );
+
   return (
     <>
       <Dialog
@@ -97,6 +125,7 @@ const EditSamplesConfirmationModal = ({
         <DialogContent>
           <Content>
             <CollapsibleInstructions
+              additionalHeaderLink={downloadTSVButton}
               header="Import Data from TSV or CSV File"
               headerSize="s"
               instructionListTitle="Importing Files"

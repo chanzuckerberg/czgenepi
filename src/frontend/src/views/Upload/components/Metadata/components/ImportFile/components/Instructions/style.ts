@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import { fontBodyXs, fontHeaderXs, getColors, getSpaces } from "czifui";
-import DownloadTemplate from "../DownloadTemplate";
+import { SampleUploadDownloadTemplate } from "src/components/DownloadMetadataTemplate";
 
 export const Wrapper = styled.div`
   ${(props) => {
@@ -32,7 +32,7 @@ export const ReImportDataItem = styled.p`
   margin-bottom: 0;
 `;
 
-export const StyleDownloadTemplate = styled(DownloadTemplate)`
+export const StyleDownloadTemplate = styled(SampleUploadDownloadTemplate)`
   ${(props) => {
     const colors = getColors(props);
 

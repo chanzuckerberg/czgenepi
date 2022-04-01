@@ -1,6 +1,13 @@
 import styled from "@emotion/styled";
 import IconButton from "@material-ui/core/IconButton";
-import { fontBodyS, fontBodyXs, getColors, getSpaces } from "czifui";
+import {
+  Button,
+  fontBodyS,
+  fontBodyXs,
+  fontBodyXxs,
+  getColors,
+  getSpaces,
+} from "czifui";
 
 export const StyledIconButton = styled(IconButton)`
   display: flex;
@@ -39,6 +46,21 @@ export const StyledSubTitle = styled.span`
     return `
       color: ${colors?.gray[600]};
       margin-bottom: ${spaces?.xl}px;
+    `;
+  }}
+`;
+
+export const StyledButton = styled(Button)`
+  ${fontBodyXxs}
+  ${(props) => {
+    const colors = getColors(props);
+    const spaces = getSpaces(props);
+    return `
+      padding-bottom: ${spaces?.s}px;
+      color: ${colors?.primary[500]};
+      &:hover {
+        background-color: transparent;
+      }
     `;
   }}
 `;
