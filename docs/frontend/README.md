@@ -17,15 +17,15 @@ CZ Gen Epi frontend application is built with the following stack. If you are un
 
 Given the app is built with [Next.js](https://nextjs.org/), we structure the app following the building blocks required by Next.js. Below you will find a few directories that are important to be familiar with:
 
-1. `frontend/public` - static assets that we need to expose directly through `https://aspen.cziscience.com/*` live here. For example, <https://aspen.cziscience.com/robots.txt>
+1. `frontend/public` - static assets that we need to expose directly through `https://czgenepi.org/*` live here. For example, <https://czgenepi.org/robots.txt>
 
 1. `frontend/pages` - All route based pages need their corresponding page files in this folder, this is because Next.js uses a file-system based router.
 
    For examples:
 
-   1. `./pages/index.tsx` maps to Homepage route: <https://aspen.cziscience.com/>
-   1. `./pages/terms.tsx` maps to Terms of Service route: <https://aspen.cziscience.com/terms>
-   1. `./pages/upload/[[...params]].tsx` maps to **any** Upload route: <https://aspen.cziscience.com/upload/1>, <https://aspen.cziscience.com/upload/2>, <https://aspen.cziscience.com/upload/3>, etc.. Notice that we use double bracket filename here, since this file is a dynamic route page that catches all of its sub-routes. (Learn more about Next.js' dynamic routes [here](https://nextjs.org/docs/routing/dynamic-routes#optional-catch-all-routes))
+   1. `./pages/index.tsx` maps to Homepage route: <https://czgenepi.org/>
+   1. `./pages/terms.tsx` maps to Terms of Service route: <https://czgenepi.org/terms>
+   1. `./pages/upload/[[...params]].tsx` maps to **any** Upload route: <https://czgenepi.org/upload/1>, <https://czgenepi.org/upload/2>, <https://czgenepi.org/upload/3>, etc.. Notice that we use double bracket filename here, since this file is a dynamic route page that catches all of its sub-routes. (Learn more about Next.js' dynamic routes [here](https://nextjs.org/docs/routing/dynamic-routes#optional-catch-all-routes))
    1. `./pages/_document.tsx` is used to customize our app's `<html>` and `<body>` tags. In our case, we need to add Material UI's server side rendering code here.
       1. [Material UI server rendering](https://material-ui.com/guides/server-rendering/)
       1. [Material UI server rendering + Next.js example repo](https://github.com/mui-org/material-ui/tree/master/examples/nextjs)
