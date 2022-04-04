@@ -7,7 +7,7 @@ export enum API {
   SAMPLES = "/v2/samples/",
   LOG_IN = "/login",
   LOG_OUT = "/logout",
-  PHYLO_WORKFLOWS = "/v2/phylo_runs/",
+  PHYLO_RUNS = "/v2/phylo_runs/",
   // TODO (mlila): check and write tests for every instance of PHYLO_TREES before removal
   PHYLO_TREES = "/api/phylo_trees", // TODO (mlila): remove
   SAMPLES_CREATE = "/v2/samples/",
@@ -198,10 +198,10 @@ const SAMPLE_MAP = new Map<string, keyof Sample>([
 export const fetchSamples = (): Promise<SampleResponse> =>
   apiResponse<SampleResponse>(["samples"], [SAMPLE_MAP], API.SAMPLES);
 
-export interface WorkflowResponse extends APIResponse {
-  phylo_trees: Workflow[];
+export interface PhyloRunResponse extends APIResponse {
+  phylo_trees: PhyloRun[];
 }
-const WORKFLOW_MAP = new Map<string, keyof Workflow>([
+const PHYLO_RUN_MAP = new Map<string, keyof PhyloRun>([
   ["end_datetime", "endDate"],
   ["phylo_tree", "phyloTree"],
   ["start_datetime", "startedDate"],
@@ -209,9 +209,9 @@ const WORKFLOW_MAP = new Map<string, keyof Workflow>([
   ["workflow_id", "workflowId"],
   ["workflow_status", "status"],
 ]);
-export const fetchWorkflows = (): Promise<WorkflowResponse> =>
-  apiResponse<WorkflowResponse>(
+export const fetchPhyloRuns = (): Promise<PhyloRunResponse> =>
+  apiResponse<PhyloRunResponse>(
     ["phylo_runs"],
-    [WORKFLOW_MAP],
-    API.PHYLO_WORKFLOWS
+    [PHYLO_RUN_MAP],
+    API.PHYLO_RUNS
   );

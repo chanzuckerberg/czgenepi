@@ -44,7 +44,7 @@ interface Sample extends BioinformaticsType {
   private?: boolean;
 }
 
-interface Workflow extends BioinformaticsType {
+interface PhyloRun extends BioinformaticsType {
   type: "Tree";
   id?: number;
   name: string;
@@ -69,15 +69,15 @@ interface Workflow extends BioinformaticsType {
   };
 }
 
-type BioinformaticsData = Sample | Workflow;
-type BioinformaticsDataArray = Array<Sample> | Array<Workflow>;
+type BioinformaticsData = Sample | PhyloRun;
+type BioinformaticsDataArray = Array<Sample> | Array<PhyloRun>;
 
 interface SampleMap {
   [key: string]: Sample;
 }
 
-interface WorkflowMap {
-  [key: string]: Workflow;
+interface PhyloRunMap {
+  [key: string]: PhyloRun;
 }
 
-type BioinformaticsMap = SampleMap | WorkflowMap;
+type BioinformaticsMap = SampleMap | PhyloRunMap;

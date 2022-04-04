@@ -12,8 +12,8 @@ import {
   DEFAULT_HEADERS_MUTATION_OPTIONS,
   DEFAULT_POST_OPTIONS,
   DEFAULT_PUT_OPTIONS,
-  fetchWorkflows,
-  WorkflowResponse,
+  fetchPhyloRuns,
+  PhyloRunResponse,
 } from "../api";
 import { API_URL } from "../constants/ENV";
 import { ENTITIES } from "./entities";
@@ -51,7 +51,7 @@ async function createTree({
     samples: sampleIds,
     tree_type: treeType,
   };
-  const response = await fetch(API_URL + API.PHYLO_WORKFLOWS, {
+  const response = await fetch(API_URL + API.PHYLO_RUNS, {
     ...DEFAULT_POST_OPTIONS,
     body: JSON.stringify(payload),
   });
@@ -74,7 +74,7 @@ export function useCreateTree({
   return useMutation(createTree, {
     onError: componentOnError,
     onSuccess: async () => {
-      await queryClient.invalidateQueries([USE_WORKFLOW_INFO]);
+      await queryClient.invalidateQueries([USE_PHYLO_RUN_INFO]);
       componentOnSuccess();
     },
   });
@@ -146,13 +146,13 @@ export async function getUsherOptions(): Promise<unknown> {
 
 /* custom hook to automatically expire tree info when needed */
 /* such as when trees are deleted */
-export const USE_WORKFLOW_INFO = {
-  entities: [ENTITIES.WORKFLOW_INFO],
+export const USE_PHYLO_RUN_INFO = {
+  entities: [ENTITIES.PHYLO_RUN_INFO],
   id: "workflowInfo",
 };
 
-export function useWorkflowInfo(): UseQueryResult<WorkflowResponse, unknown> {
-  return useQuery([USE_WORKFLOW_INFO], fetchWorkflows, {
+export function usePhyloRunInfo(): UseQueryResult<PhyloRunResponse, unknown> {
+  return useQuery([USE_PHYLO_RUN_INFO], fetchPhyloRuns, {
     retry: false,
   });
 }
@@ -176,7 +176,7 @@ interface TreeDeleteResponseType {
 export async function deleteTree({
   treeIdToDelete,
 }: TreeDeleteRequestType): Promise<TreeDeleteResponseType> {
-  const response = await fetch(API_URL + API.PHYLO_WORKFLOWS + treeIdToDelete, {
+  const response = await fetch(API_URL + API.PHYLO_RUNS + treeIdToDelete, {
     ...DEFAULT_DELETE_OPTIONS,
   });
 
@@ -197,7 +197,7 @@ export function useDeleteTree({
   return useMutation(deleteTree, {
     onError: componentOnError,
     onSuccess: async (data) => {
-      await queryClient.invalidateQueries([USE_WORKFLOW_INFO]);
+      await queryClient.invalidateQueries([USE_PHYLO_RUN_INFO]);
       componentOnSuccess(data);
     },
   });
@@ -229,7 +229,7 @@ export async function editTree({
   const payload: EditTreePayloadType = {
     name: newTreeName,
   };
-  const response = await fetch(API_URL + API.PHYLO_WORKFLOWS + treeIdToEdit, {
+  const response = await fetch(API_URL + API.PHYLO_RUNS + treeIdToEdit, {
     ...DEFAULT_PUT_OPTIONS,
     ...DEFAULT_HEADERS_MUTATION_OPTIONS,
     body: JSON.stringify(payload),
@@ -252,7 +252,7 @@ export function useEditTree({
   return useMutation(editTree, {
     onError: componentOnError,
     onSuccess: async (data) => {
-      await queryClient.invalidateQueries([USE_WORKFLOW_INFO]);
+      await queryClient.invalidateQueries([USE_PHYLO_RUN_INFO]);
       componentOnSuccess(data);
     },
   });

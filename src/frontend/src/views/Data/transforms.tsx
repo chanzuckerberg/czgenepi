@@ -4,7 +4,7 @@ const { API_URL } = ENV;
 
 //* (mlila): below, we want to use the tree id to generate the urls in question.
 //* because the links can only be generated for workflows with a tree
-export const WORKFLOW_TRANSFORMS: Transform[] = [
+export const PHYLO_RUN_TRANSFORMS: Transform[] = [
   {
     inputs: ["phyloTree"],
     key: "downloadLinkIdStylePrivateIdentifiers",
