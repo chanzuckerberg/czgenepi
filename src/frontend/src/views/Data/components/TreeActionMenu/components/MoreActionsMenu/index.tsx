@@ -8,9 +8,9 @@ import { StyledIcon, StyledIconWrapper } from "../../style";
 import { StyledText } from "./style";
 
 interface Props {
-  item: Tree;
-  onDeleteTreeModalOpen(t: Tree): void;
-  onEditTreeModalOpen(t: Tree): void;
+  item: PhyloRun;
+  onDeleteTreeModalOpen(t: PhyloRun): void;
+  onEditTreeModalOpen(t: PhyloRun): void;
   userInfo: UserResponse;
 }
 

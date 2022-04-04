@@ -73,8 +73,6 @@ const Data: FunctionComponent = () => {
   const { data: sampleData, isLoading: isSampleInfoLoading } = sampleResponse;
   const { data: phyloRunData, isLoading: isTreeInfoLoading } = PhyloRunResponse;
 
-  console.log(workflowData);
-
   useEffect(() => {
     setIsDataLoading(true);
     if (isTreeInfoLoading || isSampleInfoLoading) return;

@@ -21,10 +21,10 @@ interface Props {
   // interface. Instead, we just don't pull the `value` from the passed props
   // because it's not actually useful to us for this component.
   value: string;
-  item: Tree;
+  item: PhyloRun;
   userInfo: UserResponse;
-  onDeleteTreeModalOpen(t: Tree): void;
-  onEditTreeModalOpen(t: Tree): void;
+  onDeleteTreeModalOpen(t: PhyloRun): void;
+  onEditTreeModalOpen(t: PhyloRun): void;
 }
 
 const TreeActionMenu = ({

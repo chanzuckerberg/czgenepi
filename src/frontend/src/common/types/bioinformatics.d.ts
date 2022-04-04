@@ -44,6 +44,11 @@ interface Sample extends BioinformaticsType {
   private?: boolean;
 }
 
+/**
+ * A phylo run actually differs from a phylo tree.
+ * A run is generated any time we make an attempt to make a tree, but not all runs have trees
+ * associated with them (for example, while a run is in progress, or when a run has failed).
+ */
 interface PhyloRun extends BioinformaticsType {
   type: "Tree";
   id?: number;

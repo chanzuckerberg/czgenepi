@@ -3,7 +3,7 @@ import ENV from "src/common/constants/ENV";
 const { API_URL } = ENV;
 
 //* (mlila): below, we want to use the tree id to generate the urls in question.
-//* because the links can only be generated for workflows with a tree
+//* Links can only be generated for workflows with a tree
 export const PHYLO_RUN_TRANSFORMS: Transform[] = [
   {
     inputs: ["phyloTree"],

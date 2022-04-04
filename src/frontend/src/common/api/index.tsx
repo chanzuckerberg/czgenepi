@@ -8,8 +8,6 @@ export enum API {
   LOG_IN = "/login",
   LOG_OUT = "/logout",
   PHYLO_RUNS = "/v2/phylo_runs/",
-  // TODO (mlila): check and write tests for every instance of PHYLO_TREES before removal
-  PHYLO_TREES = "/api/phylo_trees", // TODO (mlila): remove
   SAMPLES_CREATE = "/v2/samples/",
   SAMPLES_FASTA_DOWNLOAD = "/api/sequences",
   GET_FASTA_URL = "/api/sequences/getfastaurl",
