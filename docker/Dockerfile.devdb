@@ -7,4 +7,4 @@ FROM temp_db_image as dumper
 # from continually building new images on top of old ones
 FROM postgres:13.1-alpine
 
-COPY --from=dumper /var/lib/postgresql/data /var/lib/postgresql/data
+COPY --from=dumper /var/lib/czge/data /var/lib/czge/data

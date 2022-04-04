@@ -20,7 +20,7 @@ LOCAL_DB_RW_PASSWORD = password_rw
 LOCAL_DB_RO_USERNAME = user_ro
 LOCAL_DB_RO_PASSWORD = password_ro
 LOCALDEV_PROFILE ?= web
-
+LOCAL_DB_CONN_STRING = postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)
 
 ### HELPFUL #################################################
 help: ## display help for this makefile
@@ -103,10 +103,10 @@ init-empty-db:
 	$(docker_compose) rm database
 	$(docker_compose) --profile $(LOCALDEV_PROFILE) -f docker-compose.yml -f docker-compose-emptydb.yml up -d
 	sleep 10 # hack, let postgres start up cleanly.
-	-$(docker_compose) exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c "ALTER USER $(LOCAL_DB_ADMIN_USERNAME) WITH PASSWORD '$(LOCAL_DB_ADMIN_PASSWORD)';"
-	-$(docker_compose) exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c "CREATE USER $(LOCAL_DB_RW_USERNAME) WITH PASSWORD '$(LOCAL_DB_RW_PASSWORD)';"
-	-$(docker_compose) exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c "CREATE USER $(LOCAL_DB_RO_USERNAME) WITH PASSWORD '$(LOCAL_DB_RO_PASSWORD)';"
-	-$(docker_compose) exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c "GRANT ALL PRIVILEGES ON DATABASE $(LOCAL_DB_NAME) TO $(LOCAL_DB_RW_USERNAME);"
+	-$(docker_compose) exec -T database psql $(LOCAL_DB_CONN_STRING) -c "ALTER USER $(LOCAL_DB_ADMIN_USERNAME) WITH PASSWORD '$(LOCAL_DB_ADMIN_PASSWORD)';"
+	-$(docker_compose) exec -T database psql $(LOCAL_DB_CONN_STRING) -c "CREATE USER $(LOCAL_DB_RW_USERNAME) WITH PASSWORD '$(LOCAL_DB_RW_PASSWORD)';"
+	-$(docker_compose) exec -T database psql $(LOCAL_DB_CONN_STRING) -c "CREATE USER $(LOCAL_DB_RO_USERNAME) WITH PASSWORD '$(LOCAL_DB_RO_PASSWORD)';"
+	-$(docker_compose) exec -T database psql $(LOCAL_DB_CONN_STRING) -c "GRANT ALL PRIVILEGES ON DATABASE $(LOCAL_DB_NAME) TO $(LOCAL_DB_RW_USERNAME);"
 	$(docker_compose) run sh -c 'aspen-cli db --local create; alembic stamp head'
 
 
@@ -115,33 +115,35 @@ local-init: oauth/pkcs12/certificate.pfx .env.ecr local-ecr-login local-hostconf
 	$(docker_compose) pull database
 	$(docker_compose) --profile $(LOCALDEV_PROFILE) up -d
 	# Wait for psql to be up
-	while [ -z "$$($(docker_compose) exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c 'select 1')" ]; do echo "waiting for db to start..."; sleep 1; done;
-	@$(docker_compose) exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c "alter user $(LOCAL_DB_ADMIN_USERNAME) with password '$(LOCAL_DB_ADMIN_PASSWORD)';"
+	while [ -z "$$($(docker_compose) exec -T database psql $(LOCAL_DB_CONN_STRING) -c 'select 1')" ]; do echo "waiting for db to start..."; sleep 1; done;
+	@$(docker_compose) exec -T database psql $(LOCAL_DB_CONN_STRING) -c "alter user $(LOCAL_DB_ADMIN_USERNAME) with password '$(LOCAL_DB_ADMIN_PASSWORD)';"
 	$(docker_compose) exec -T backend $(BACKEND_APP_ROOT)/scripts/setup_dev_data.sh
 	$(docker_compose) exec -T backend alembic upgrade head
 	$(docker_compose) exec -T backend python scripts/setup_localdata.py
 	$(docker_compose) exec -T backend pip install ./aspen
 
+# Assumes you've already run `make local-init` to configure localstack resources!
 .PHONY: prepare-new-db-snapshot
-prepare-new-db-snapshot:
+prepare-new-db-snapshot: local-start
+	$(docker_compose) rm -f database # Wipe out the additional dev rows that `make local-init` adds
 	$(docker_compose) pull database
 	$(docker_compose) up -d database
 	# Wait for psql to be up
-	while [ -z "$$($(docker_compose) exec -T database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)" -c 'select 1')" ]; do echo "waiting for db to start..."; sleep 1; done;
+	while [ -z "$$($(docker_compose) exec -T database psql $(LOCAL_DB_CONN_STRING) -c 'select 1')" ]; do echo "waiting for db to start..."; sleep 1; done;
 	$(docker_compose) exec -T backend alembic upgrade head
 	@echo
 	@echo "Ok, local db is prepared and ready to go -- make any additional changes you need to and then run:"
 	@echo "make create_new_db_image"
 
 .PHONY: create_new_db_image
-create_new_db_image:
-	docker exec aspen_database_1 psql postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME) -c VACUUM FULL
-	docker commit aspen_database_1 temp_db_image
+create-new-db-image:
+	docker compose exec database psql $(LOCAL_DB_CONN_STRING) -c VACUUM FULL
+	docker commit czgenepi-database-1 temp_db_image
 	export AWS_ACCOUNT_ID=$$(aws sts get-caller-identity --profile $(AWS_DEV_PROFILE) | jq -r .Account); \
 	export DOCKER_REPO=$${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com; \
 	export TAGGED_IMAGE="$${DOCKER_REPO}/genepi-devdb:build-$$(date +%F)"; \
-	echo docker build -t $${TAGGED_IMAGE} -f ./docker/Dockerfile.devdb ./docker; \
-	docker build -t $${TAGGED_IMAGE} -f ./docker/Dockerfile.devdb ./docker; \
+	echo dockerx build --platform linux/amd64 -t $${TAGGED_IMAGE} -f ./docker/Dockerfile.devdb ./docker; \
+	docker buildx build --platform linux/amd64 -t $${TAGGED_IMAGE} -f ./docker/Dockerfile.devdb ./docker && \
 	docker rmi temp_db_image; \
 	echo "Tagged image is ready for testing/pushing:"; \
 	echo "  $${TAGGED_IMAGE}"
@@ -221,7 +223,7 @@ local-shell: ## Open a command shell in one of the dev containers. ex: make loca
 
 .PHONY: local-pgconsole
 local-pgconsole: ## Connect to the local postgres database.
-	$(docker_compose) exec database psql "postgresql://$(LOCAL_DB_ADMIN_USERNAME):$(LOCAL_DB_ADMIN_PASSWORD)@$(LOCAL_DB_SERVER)/$(LOCAL_DB_NAME)?options=--search_path%3d$(DB_SEARCH_PATH)"
+	$(docker_compose) exec database psql "$(LOCAL_DB_CONN_STRING)?options=--search_path%3d$(DB_SEARCH_PATH)"
 
 .PHONY: local-dbconsole
 local-dbconsole: ## Connect to the local postgres database.

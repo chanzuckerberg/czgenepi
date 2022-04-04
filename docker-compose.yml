@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   database:
-    image: "${DOCKER_REPO}genepi-devdb:latest"
+    image: "${DOCKER_REPO}genepi-devdb:czge-2022-04-04"
     profiles: [ "backend", "web", "all" ]
     platform: linux/amd64
     ports:
@@ -11,6 +11,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password_postgres
       - POSTGRES_DB=aspen_db
+      - PGDATA=/var/lib/czge/data # Avoid using the pgsql image's default volume.
     command: [ "postgres" ]
     networks:
       genepinet:
