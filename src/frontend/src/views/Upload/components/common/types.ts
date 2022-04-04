@@ -67,7 +67,6 @@ export interface Metadata {
   sequencingDate?: string;
   collectionLocation?: NamedGisaidLocation;
 }
-
 export interface Props {
   samples: Samples | null;
   setSamples: React.Dispatch<React.SetStateAction<Samples | null>>;

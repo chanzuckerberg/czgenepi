@@ -10,7 +10,7 @@ export enum API {
   PHYLO_WORKFLOWS = "/v2/phylo_runs/",
   // TODO (mlila): check and write tests for every instance of PHYLO_TREES before removal
   PHYLO_TREES = "/api/phylo_trees", // TODO (mlila): remove
-  SAMPLES_CREATE = "/api/samples/create",
+  SAMPLES_CREATE = "/v2/samples/",
   SAMPLES_FASTA_DOWNLOAD = "/api/sequences",
   GET_FASTA_URL = "/api/sequences/getfastaurl",
   USHER_TREE_OPTIONS = "/v2/usher/tree_versions/",

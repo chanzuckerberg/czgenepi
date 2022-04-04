@@ -63,6 +63,23 @@ echo "Creating SSM Parameters"
 # Delete any previous values so we have updated values when we run this script
 # Otherwise updating these is more painful since the only other script that cleans them
 # is make local-clean, which is overkill
+${local_aws} ssm delete-parameter --name /genepi/local/localstack/pangolin-ondemand-sfn
+${local_aws} ssm put-parameter --name /genepi/local/localstack/pangolin-ondemand-sfn --value '{
+  "Input":{
+    "Run":{
+      "genepi_config_secret_name":"genepi-config",
+      "aws_region":"us-west-2",
+      "docker_image_id":"genepi-pangolin",
+      "remote_dev_prefix":""}
+    },
+  "OutputPrefix":"s3://genepi-batch/pangolin-ondemand-sfn/results",
+  "RUN_WDL_URI":"s3://genepi-batch/pangolin-ondemand.wdl-v0.0.1.wdl",
+  "RunEC2Memory":64000,
+  "RunEC2Vcpu":10,
+  "RunSPOTMemory":64000,
+  "RunSPOTVcpu":10,
+  "StateMachineArn":'${LOCAL_SFN_ARN}'
+}'
 ${local_aws} ssm delete-parameter --name /genepi/local/localstack/nextstrain-ondemand-sfn
 ${local_aws} ssm put-parameter --name /genepi/local/localstack/nextstrain-ondemand-sfn --value '{
   "Input":{

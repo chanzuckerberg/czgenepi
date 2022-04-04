@@ -293,6 +293,39 @@ def me(ctx):
     print(resp.text)
 
 
+@user.command(name="create")
+@click.argument("email")
+@click.option("--name", required=True, type=str, help="The user's name.")
+@click.option("--group_id", required=True, type=str, help="The id of the group to create the user in.")
+@click.option("--auth0_user_id", required=True, type=str, help="The auth0 identifier attached to the user's auth0 account.")
+@click.option("--group_admin", is_flag=True, default=False)
+@click.option("--system_admin", is_flag=True, default=False)
+@click.pass_context
+def create(
+    ctx,
+    email,
+    name,
+    group_id,
+    auth0_user_id,
+    group_admin,
+    system_admin,
+):
+    api_client = ctx.obj["api_client"]
+    user = {
+        "name": name,
+        "email": email,
+        "group_id": group_id,
+        "group_admin": group_admin,
+        "system_admin": system_admin,
+    }
+    if auth0_user_id:
+        user["auth0_user_id"] = auth0_user_id
+    # Remove None fields
+    print(user)
+    resp = api_client.post("/api/usergroup", json=user)
+    print(resp.text)
+
+
 @cli.group()
 def userinfo():
     pass
@@ -351,6 +384,19 @@ def locations():
 def list_locations(ctx):
     api_client = ctx.obj["api_client"]
     resp = api_client.get("/v2/locations/")
+    print(resp.text)
+
+
+@cli.group()
+def lineages():
+    pass
+
+
+@lineages.command(name="list-pango")
+@click.pass_context
+def list_all_pango_lineages(ctx):
+    api_client = ctx.obj["api_client"]
+    resp = api_client.get("/v2/lineages/pango")
     print(resp.text)
 
 
@@ -452,6 +498,69 @@ def update_samples(
     if private_id:
         sample["private_identifier"] = private_id
     resp = api_client.put(f"/v2/samples/", json={"samples": [sample]})
+    print(resp.text)
+
+
+@samples.command(name="create")
+@click.option("--private-id", required=True, type=str, help="Sample private id")
+@click.option("--public-id", required=False, type=str, help="Sample public id")
+@click.option(
+    "--collection-date",
+    required=False,
+    type=str,
+    help="Sample collection date",
+)
+@click.option(
+    "--sequencing-date",
+    required=False,
+    type=str,
+    help="Sample sequencing date",
+)
+@click.option(
+    "--sequence",
+    required=True,
+    type=str,
+    help="Sample sequence",
+)
+@click.option(
+    "--private", default=False, type=bool, help="Set whether the sample is private"
+)
+@click.option(
+    "--location", required=True, type=int, help="Set the sample's collection location"
+)
+@click.pass_context
+def create_samples(
+    ctx,
+    private_id,
+    public_id,
+    collection_date,
+    sequencing_date,
+    sequence,
+    private,
+    location,
+):
+    api_client = ctx.obj["api_client"]
+    if collection_date:
+        collection_date = dateparser.parse(collection_date).strftime("%Y-%m-%d")
+    if sequencing_date:
+        sequencing_date = dateparser.parse(sequencing_date).strftime("%Y-%m-%d")
+    sample = {
+        "pathogen_genome": {
+            "sequence": sequence,
+            "sequencing_date": sequencing_date,
+        },
+        "sample": {
+            "public_identifier": public_id,
+            "private_identifier": private_id,
+            "collection_date": collection_date,
+            "location_id": location,
+            "private": private,
+        },
+    }
+    # Remove None fields
+    print(sample)
+    body = [sample]
+    resp = api_client.post("/v2/samples/", json=body)
     print(resp.text)
 
 

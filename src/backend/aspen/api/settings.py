@@ -91,6 +91,7 @@ class Settings(BaseSettings):
     API_URL: str
     REMOTE_DEV_PREFIX: str = ""
     DEPLOYMENT_STAGE: str = ""
+    GENEPI_CONFIG_SECRET_NAME: str = "genepi-config"
 
     # Env vars usually pulled from AWS Secrets Manager
     SENTRY_BACKEND_DSN: str = ""
@@ -120,6 +121,7 @@ class Settings(BaseSettings):
 
     # Env vars usually pulled from AWS SSM Parameters
     AWS_NEXTSTRAIN_SFN_PARAMETERS: Dict
+    AWS_PANGOLIN_SFN_PARAMETERS: Dict
 
     ####################################################################################
     # Stack name
@@ -235,7 +237,10 @@ class Settings(BaseSettings):
             "AUTH0_CLIENT_KWARGS",
             "AUSPICE_MAC_KEY",
         ]
-        aws_ssm_params = {"nextstrain-ondemand-sfn": "AWS_NEXTSTRAIN_SFN_PARAMETERS"}
+        aws_ssm_params = {
+            "nextstrain-ondemand-sfn": "AWS_NEXTSTRAIN_SFN_PARAMETERS",
+            "pangolin-ondemand-sfn": "AWS_PANGOLIN_SFN_PARAMETERS",
+        }
 
         @classmethod
         def customise_sources(

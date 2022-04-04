@@ -2,9 +2,9 @@ import React from "react";
 import { B } from "src/common/styles/basicStyle";
 import AlertAccordion from "src/components/AlertAccordion";
 import {
-  METADATA_KEYS_TO_HEADERS,
   OPTIONAL_HEADER_MARKER,
-} from "src/views/Upload/components/common/constants";
+  SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS,
+} from "src/components/DownloadMetadataTemplate/common/constants";
 import { SampleIdToWarningMessages } from "../../parseFile";
 import { maybePluralize } from "./common/pluralize";
 import { ProblemTable } from "./common/ProblemTable";
@@ -53,7 +53,7 @@ function MessageExtraneousEntry({ extraneousSampleIds }: PropsExtraneousEntry) {
   const tablePreamble =
     "The following sample IDs in the metadata file " +
     "do not match any sample IDs imported in the previous step.";
-  const columnHeaders = [METADATA_KEYS_TO_HEADERS.sampleId];
+  const columnHeaders = [SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sampleId];
   const rows = extraneousSampleIds.map((sampleId) => [sampleId]);
   return (
     <ProblemTable
@@ -93,7 +93,7 @@ function MessageAbsentSample({ absentSampleIds }: PropsAbsentSample) {
   const tablePreamble =
     "The following sample IDs were imported in the " +
     "previous step but did not match any sample IDs in the metadata file.";
-  const columnHeaders = [METADATA_KEYS_TO_HEADERS.sampleId];
+  const columnHeaders = [SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sampleId];
   const rows = absentSampleIds.map((sampleId) => [sampleId]);
   return (
     <ProblemTable
@@ -129,12 +129,15 @@ function MessageMissingData({ missingData }: PropsMissingData) {
   const tablePreamble =
     "You can add the required data in the table below, " +
     "or update your file and re-import.";
-  const columnHeaders = [METADATA_KEYS_TO_HEADERS.sampleId, "Missing Data"];
+  const columnHeaders = [
+    SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sampleId,
+    "Missing Data",
+  ];
   const idsMissingData = Object.keys(missingData);
   const rows = idsMissingData.map((sampleId) => {
     const missingHeaders = Array.from(
       missingData[sampleId],
-      (missingKey) => METADATA_KEYS_TO_HEADERS[missingKey]
+      (missingKey) => SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[missingKey]
     );
     const missingDataDescription = missingHeaders.join(", ");
     return [sampleId, missingDataDescription];
@@ -192,14 +195,14 @@ function MessageBadFormatData({ badFormatData }: PropsBadFormatData) {
   );
 
   const columnHeaders = [
-    METADATA_KEYS_TO_HEADERS.sampleId,
+    SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sampleId,
     "Data with Invalid Formatting",
   ];
   const idsBadFormatData = Object.keys(badFormatData);
   const rows = idsBadFormatData.map((sampleId) => {
     const badFormatRawHeaders = Array.from(
       badFormatData[sampleId],
-      (badFormatKey) => METADATA_KEYS_TO_HEADERS[badFormatKey]
+      (badFormatKey) => SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[badFormatKey]
     );
     // Some headers say "optional" in them: we don't put that in description
     const badFormatPrettyHeaders = badFormatRawHeaders.map((header) => {
