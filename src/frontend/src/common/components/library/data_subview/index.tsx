@@ -151,7 +151,7 @@ const DataSubview: FunctionComponent<Props> = ({
   const [phyloRunToDelete, setPhyloRunToDelete] = useState<PhyloRun>();
   const [isEditTreeConfirmationOpen, setEditTreeConfirmationOpen] =
     useState<boolean>(false);
-  const [treeToEdit, setTreeToEdit] = useState<Tree>();
+  const [phyloRunToEdit, setPhyloRunToEdit] = useState<PhyloRun>();
 
   const handleDownloadClickOpen = () => {
     setDownloadModalOpen(true);
@@ -196,13 +196,13 @@ const DataSubview: FunctionComponent<Props> = ({
     setEditTreeConfirmationOpen(false);
   };
 
-  const handleDeleteTreeModalOpen = (tree: PhyloRun) => {
-    setPhyloRunToDelete(tree);
+  const handleDeleteTreeModalOpen = (phyloRun: PhyloRun) => {
+    setPhyloRunToDelete(phyloRun);
     setDeleteTreeConfirmationOpen(true);
   };
 
-  const handleEditTreeModalOpen = (tree: PhyloRun) => {
-    setTreeToEdit(tree);
+  const handleEditTreeModalOpen = (phyloRun: PhyloRun) => {
+    setPhyloRunToEdit(phyloRun);
     setEditTreeConfirmationOpen(true);
   };
 
@@ -327,12 +327,12 @@ const DataSubview: FunctionComponent<Props> = ({
             <DeleteTreeConfirmationModal
               open={isDeleteTreeConfirmationOpen}
               onClose={handleDeleteTreeModalClose}
-              tree={phyloRunToDelete}
+              phyloRun={phyloRunToDelete}
             />
             <EditTreeConfirmationModal
               open={isEditTreeConfirmationOpen}
               onClose={handleEditTreeModalClose}
-              tree={treeToEdit}
+              phyloRun={phyloRunToEdit}
             />
           </>
         )}

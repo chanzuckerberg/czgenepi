@@ -1,25 +1,25 @@
 import React, { useState } from "react";
-import { useDeleteTree } from "src/common/queries/trees";
+import { useDeletePhyloRun } from "src/common/queries/phyloRuns";
 import { DeleteDialog } from "src/components/DeleteDialog";
 import Notification from "src/components/Notification";
 
 interface Props {
   onClose(): void;
   open: boolean;
-  tree?: Tree;
+  phyloRun?: PhyloRun;
 }
 
 const DeleteTreeConfirmationModal = ({
   onClose,
   open,
-  tree,
+  phyloRun,
 }: Props): JSX.Element | null => {
   const [shouldShowErrorNotification, setShouldShowErrorNotification] =
     useState<boolean>(false);
   const [shouldShowSuccessNotification, setShouldShowSuccessNotification] =
     useState<boolean>(false);
 
-  const deleteTreeMutation = useDeleteTree({
+  const deletePhyloRunMutation = useDeletePhyloRun({
     componentOnSuccess: () => {
       setShouldShowSuccessNotification(true);
     },
@@ -28,13 +28,13 @@ const DeleteTreeConfirmationModal = ({
     },
   });
 
-  if (!tree) return null;
+  if (!phyloRun) return null;
 
-  const { workflowId, name } = tree;
+  const { id, name } = phyloRun;
 
   const onDelete = () => {
-    deleteTreeMutation.mutate({
-      treeIdToDelete: workflowId,
+    deletePhyloRunMutation.mutate({
+      phyloRunIdToDelete: id,
     });
     onClose();
   };
