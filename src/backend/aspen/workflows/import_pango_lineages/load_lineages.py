@@ -10,7 +10,7 @@ from aspen.database.connection import (
     session_scope,
     SqlAlchemyInterface,
 )
-from aspen.database.models import PangoLineages
+from aspen.database.models import PangoLineage
 from aspen.workflows.shared_utils.database import (
     create_temp_table,
     drop_temp_table,
@@ -107,7 +107,7 @@ def load_lineages_data(lineages: list[str]) -> None:
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
     with session_scope(interface) as session:
 
-        dest_table = PangoLineages.__table__
+        dest_table = PangoLineage.__table__
         temp_table = create_temp_table(session, dest_table)
 
         # Load data into temp_table

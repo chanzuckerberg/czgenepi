@@ -388,6 +388,19 @@ def list_locations(ctx):
 
 
 @cli.group()
+def lineages():
+    pass
+
+
+@lineages.command(name="list-pango")
+@click.pass_context
+def list_all_pango_lineages(ctx):
+    api_client = ctx.obj["api_client"]
+    resp = api_client.get("/v2/lineages/pango")
+    print(resp.text)
+
+
+@cli.group()
 def samples():
     pass
 
