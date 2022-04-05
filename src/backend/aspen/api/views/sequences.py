@@ -67,8 +67,8 @@ async def getfastaurl(
         f"s3://{s3_bucket}/{s3_key}", "w", transport_params=dict(client=s3_client)
     )
     # Write selected samples to s3
-    streamer = FastaStreamer(user, sample_ids, downstream_consumer)
-    async for line in streamer.stream(db):
+    streamer = FastaStreamer(db, user, sample_ids, downstream_consumer)
+    async for line in streamer.stream():
         s3_write_fh.write(line)
     s3_write_fh.close()
 
