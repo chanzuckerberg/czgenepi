@@ -6,6 +6,7 @@ from pathlib import Path
 import sqlalchemy as sa
 from oso import Oso
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 from sqlalchemy_oso import async_authorized_sessionmaker, register_models
 
 from aspen.api.settings import Settings
@@ -67,6 +68,24 @@ async def get_phylo_trees(oso, user, engine):
     await asess.close()
 
 
+async def select_related_run(session):
+    rows = (
+        (
+            await session.execute(
+                sa.select(PhyloTree).filter(PhyloTree.entity_id == 1645)
+                # .options(joinedload(PhyloTree.phylo_run))
+            )
+        )
+        .scalars()
+        .all()
+    )
+    print()
+    print("====")
+    for row in rows:
+        print(row.phylo_run.workflow_id)
+    return
+
+
 async def do_stuff():
     oso = Oso()
     register_models(oso, idbase)
@@ -79,8 +98,9 @@ async def do_stuff():
     user = (await session.execute(sa.select(User).where(User.id == 36))).scalars().one()
     print(user)
 
-    await get_samples(oso, user, db.engine)
-    await get_phylo_runs(oso, user, db.engine)
+    # await select_related_run(session)
+    # await get_samples(oso, user, db.engine)
+    # await get_phylo_runs(oso, user, db.engine)
     await get_phylo_trees(oso, user, db.engine)
 
     await session.close()

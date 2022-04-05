@@ -25,7 +25,7 @@ def upgrade():
     )
     op.create_unique_constraint("uq_roles_name", "roles", ["name"], schema="aspen")
     op.create_table(
-        "user_roles",
+        "group_roles",
         sa.Column(
             "role_id",
             sa.INTEGER(),
