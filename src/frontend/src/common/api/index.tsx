@@ -9,7 +9,7 @@ export enum API {
   LOG_OUT = "/logout",
   PHYLO_TREES = "/api/phylo_trees",
   SAMPLES_CREATE = "/v2/samples/",
-  SAMPLES_FASTA_DOWNLOAD = "/api/sequences",
+  SAMPLES_FASTA_DOWNLOAD = "/v2/sequences/",
   PHYLO_TREES_V2 = "/v2/phylo_runs/", // TODO (mlila): convert entire frontend to use new endpoint
   GET_FASTA_URL = "/api/sequences/getfastaurl",
   USHER_TREE_OPTIONS = "/v2/usher/tree_versions/",

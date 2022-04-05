@@ -17,4 +17,5 @@ from aspen.api.utils.sample import (  # noqa: F401
     determine_gisaid_status,
     format_sample_lineage,
 )
+from aspen.api.utils.fasta_streamer import FastaStreamer  # noqa: F401
 from aspen.api.utils.tsv_streamer import MetadataTSVStreamer  # noqa: F401
