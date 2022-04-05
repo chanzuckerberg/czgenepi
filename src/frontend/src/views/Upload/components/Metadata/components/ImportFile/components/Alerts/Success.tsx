@@ -1,5 +1,5 @@
 import { AlertTitle } from "@material-ui/lab";
-import { Alert } from "czifui";
+import { Alert, Icon } from "czifui";
 import React from "react";
 import { Title } from "./common/style";
 
@@ -9,7 +9,10 @@ interface Props {
 
 export default function Success({ filename }: Props): JSX.Element {
   return (
-    <Alert severity="success">
+    <Alert
+      severity="info"
+      icon={<Icon sdsIcon="checkCircle" sdsSize="l" sdsType="iconButton" />}
+    >
       <AlertTitle>
         <Title>{`${filename}`}</Title> loaded.
       </AlertTitle>

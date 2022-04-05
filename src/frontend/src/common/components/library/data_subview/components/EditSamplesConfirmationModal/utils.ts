@@ -1,7 +1,10 @@
 import { pick } from "lodash";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { stringifyGisaidLocation } from "src/common/utils/locationUtils";
-import { SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS } from "src/components/WebformTable/common/constants";
+import {
+  EMPTY_METADATA,
+  SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS,
+} from "src/components/WebformTable/common/constants";
 import {
   Metadata,
   SampleEditMetadataWebform,
@@ -16,7 +19,7 @@ export function structureInitialMetadata(
     item,
     Object.keys(SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS)
   );
-  if (i.collectionLocation) {
+  if (i.collectionLocation && typeof i.collectionLocation !== "string") {
     i.collectionLocation.name = stringifyGisaidLocation(i.collectionLocation);
   }
   return i;
@@ -64,4 +67,12 @@ export function setApplyAllValueToPrevMetadata(
     };
   }
   return newMetadata;
+}
+
+export function initSampleMetadata(
+  sampleId: string
+): SampleEditMetadataWebform {
+  const metadata = { ...EMPTY_METADATA };
+  metadata.privateId = sampleId;
+  return metadata;
 }

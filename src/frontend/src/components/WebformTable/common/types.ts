@@ -46,7 +46,7 @@ export interface Metadata {
   keepPrivate?: boolean;
   publicId?: string;
   sequencingDate?: string;
-  collectionLocation?: NamedGisaidLocation;
+  collectionLocation?: NamedGisaidLocation | string;
 }
 
 export type SampleIdToMetadata = Record<string, Metadata>;
