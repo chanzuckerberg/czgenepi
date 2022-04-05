@@ -60,6 +60,7 @@ resource PhyloRun {
   "write" if "writer";
 
   "writer" if "owner" on "parent";
+  "reader" if "owner" on "parent";
   "reader" if "member" on "parent";
 }
 
@@ -71,17 +72,12 @@ resource PhyloTree {
     "read",
     "write",
   ];
-  #relations = { parent: PhyloRun };
 
   "read" if "member";
   "read" if "owner";
   "write" if "owner";
-
-  #"writer" if "writer" on "parent";
-  #"reader" if "reader" on "parent";
 }
 
-#has_relation(phylo_run: PhyloRun, "parent", phylo_tree: PhyloTree) if phylo_tree.producing_workflow = phylo_run;
 
 has_role(user: User, name: String, phylo_tree: PhyloTree) if
     role in user.group_roles and

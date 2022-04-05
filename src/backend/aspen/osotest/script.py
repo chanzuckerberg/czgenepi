@@ -99,8 +99,8 @@ async def do_stuff():
     print(user)
 
     # await select_related_run(session)
-    # await get_samples(oso, user, db.engine)
-    # await get_phylo_runs(oso, user, db.engine)
+    await get_samples(oso, user, db.engine)
+    await get_phylo_runs(oso, user, db.engine)
     await get_phylo_trees(oso, user, db.engine)
 
     await session.close()
