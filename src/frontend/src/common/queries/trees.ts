@@ -7,6 +7,7 @@ import {
   DEFAULT_PUT_OPTIONS,
 } from "../api";
 import { API_URL } from "../constants/ENV";
+import { USE_PHYLO_RUN_INFO } from "./phyloRuns";
 import { MutationCallbacks } from "./types";
 
 /* create trees */
@@ -143,12 +144,12 @@ interface EditTreePayloadType {
 }
 
 interface TreeEditRequestType {
-  treeIdToEdit: string;
+  treeIdToEdit: number;
   newTreeName: string;
 }
 
 interface TreeEditResponseType {
-  id: string;
+  id: number;
 }
 
 type TreeEditCallbacks = MutationCallbacks<TreeEditResponseType>;

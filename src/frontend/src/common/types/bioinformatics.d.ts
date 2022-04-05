@@ -44,6 +44,11 @@ interface Sample extends BioinformaticsType {
   private?: boolean;
 }
 
+interface Tree {
+  name: string;
+  id: number;
+}
+
 /**
  * A phylo run actually differs from a phylo tree.
  * A run is generated any time we make an attempt to make a tree, but not all runs have trees
@@ -68,10 +73,7 @@ interface PhyloRun extends BioinformaticsType {
     name: string;
     id: number;
   };
-  phyloTree?: {
-    name: string;
-    id: number;
-  };
+  phyloTree?: Tree;
 }
 
 type BioinformaticsData = Sample | PhyloRun;

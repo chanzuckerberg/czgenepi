@@ -1,4 +1,5 @@
 import ENV from "src/common/constants/ENV";
+import type { TreeType } from "src/common/constants/types";
 
 const { API_URL } = ENV;
 
@@ -8,7 +9,7 @@ export const PHYLO_RUN_TRANSFORMS: Transform[] = [
   {
     inputs: ["phyloTree"],
     key: "downloadLinkIdStylePrivateIdentifiers",
-    method: (inputs: number[]): string | undefined => {
+    method: (inputs: Tree[]): string | undefined => {
       const id = inputs[0]?.id;
       if (typeof id !== "number") {
         return undefined;
@@ -19,7 +20,7 @@ export const PHYLO_RUN_TRANSFORMS: Transform[] = [
   {
     inputs: ["phyloTree"],
     key: "downloadLinkIdStylePublicIdentifiers",
-    method: (inputs: number[]): string | undefined => {
+    method: (inputs: Tree[]): string | undefined => {
       const id = inputs[0]?.id;
       if (typeof id !== "number") {
         return undefined;
@@ -30,7 +31,7 @@ export const PHYLO_RUN_TRANSFORMS: Transform[] = [
   {
     inputs: ["phyloTree"],
     key: "accessionsLink",
-    method: (inputs: number[]): string | undefined => {
+    method: (inputs: Tree[]): string | undefined => {
       const id = inputs[0]?.id;
       if (typeof id !== "number") {
         return undefined;
@@ -41,7 +42,7 @@ export const PHYLO_RUN_TRANSFORMS: Transform[] = [
   {
     inputs: ["treeType"],
     key: "treeType",
-    method: (inputs: string[]): string | undefined => {
+    method: (inputs: TreeType[]): string | undefined => {
       const tree_type = inputs[0];
       if (
         typeof tree_type !== "string" ||

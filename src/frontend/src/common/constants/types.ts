@@ -8,3 +8,11 @@ export enum TREE_STATUS {
   Failed = "FAILED",
   Started = "STARTED",
 }
+
+export const TreeTypes = {
+  Targeted: "TARGETED",
+  NonContextualized: "NON_CONTEXTUALIZED",
+  Overview: "OVERVIEW",
+};
+
+export type TreeType = typeof TreeTypes[keyof typeof TreeTypes];

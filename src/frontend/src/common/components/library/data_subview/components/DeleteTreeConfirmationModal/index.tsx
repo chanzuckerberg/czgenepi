@@ -33,6 +33,8 @@ const DeleteTreeConfirmationModal = ({
   const { id, name } = phyloRun;
 
   const onDelete = () => {
+    if (!id) return;
+
     deletePhyloRunMutation.mutate({
       phyloRunIdToDelete: id,
     });

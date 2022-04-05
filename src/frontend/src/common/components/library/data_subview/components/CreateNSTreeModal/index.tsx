@@ -5,6 +5,8 @@ import Image from "next/image";
 import NextLink from "next/link";
 import React, { SyntheticEvent, useEffect, useState } from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
+import type { TreeType } from "src/common/constants/types";
+import { TreeTypes } from "src/common/constants/types";
 import GisaidLogo from "src/common/images/gisaid-logo-full.png";
 import { useCreateTree } from "src/common/queries/trees";
 import { ROUTES } from "src/common/routes";
@@ -50,13 +52,6 @@ interface Props {
   open: boolean;
   onClose: () => void;
 }
-
-const TreeTypes = {
-  Targeted: "TARGETED",
-  NonContextualized: "NON_CONTEXTUALIZED",
-  Overview: "OVERVIEW",
-};
-type TreeType = typeof TreeTypes[keyof typeof TreeTypes];
 
 export const CreateNSTreeModal = ({
   checkedSampleIds,

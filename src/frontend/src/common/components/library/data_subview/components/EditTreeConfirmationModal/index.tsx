@@ -63,6 +63,8 @@ export const EditTreeConfirmationModal = ({
   const { id } = phyloRun;
 
   const onEdit = () => {
+    if (!id) return;
+
     editTreeMutation.mutate({
       treeIdToEdit: id,
       newTreeName: newTreeName,

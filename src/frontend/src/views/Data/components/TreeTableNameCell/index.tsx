@@ -20,9 +20,10 @@ interface Props {
 
 const TreeTableNameCell = ({ value, item }: Props): JSX.Element => {
   const [open, setOpen] = useState(false);
-  const { id: phyloRunId, status, user } = item;
+  const { phyloTree, status, user } = item;
+  const treeId = phyloTree?.id;
   const userName = user?.name;
-  const isDisabled = status !== TREE_STATUS.Completed;
+  const isDisabled = status !== TREE_STATUS.Completed || !treeId;
 
   const handleClickOpen = () => {
     if (!isDisabled) setOpen(true);
@@ -38,11 +39,13 @@ const TreeTableNameCell = ({ value, item }: Props): JSX.Element => {
 
   return (
     <>
-      <NextstrainConfirmationModal
-        open={open}
-        onClose={handleClose}
-        phyloRunId={phyloRunId}
-      />
+      {treeId && (
+        <NextstrainConfirmationModal
+          open={open}
+          onClose={handleClose}
+          treeId={treeId}
+        />
+      )}
       <StyledRowContent
         className={dataTableStyle.cell}
         onClick={handleClickOpen}
