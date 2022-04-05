@@ -3,10 +3,8 @@ import { DefaultMenuSelectOption, DropdownPopper } from "czifui";
 import { FormikContextType } from "formik";
 import { escapeRegExp } from "lodash/fp";
 import React from "react";
-import {
-  Metadata,
-  NamedGisaidLocation,
-} from "src/views/Upload/components/common/types";
+import { Metadata } from "src/components/WebformTable/common/types";
+import { NamedGisaidLocation } from "src/views/Upload/components/common/types";
 import ApplyToAllColumn from "../common/ApplyToAllColumn";
 import { StyledDiv, StyledDropdown } from "./style";
 
@@ -38,7 +36,6 @@ export default function LocationField({
   if (values[fieldKey]) {
     value = values[fieldKey] as NamedGisaidLocation;
   }
-
   /**
    * TODO REMOVE in near term
    * HOTFIX somewhat hacky code

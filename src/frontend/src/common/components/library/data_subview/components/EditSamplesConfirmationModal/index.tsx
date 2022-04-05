@@ -1,7 +1,11 @@
 import CloseIcon from "@material-ui/icons/Close";
-import React, { useMemo } from "react";
+import { pick } from "lodash";
+import React, { useMemo, useState } from "react";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
+import { NewTabLink } from "src/common/components/library/NewTabLink";
+import { useNamedLocations } from "src/common/queries/locations";
+import { stringifyGisaidLocation } from "src/common/utils/locationUtils";
 import { pluralize } from "src/common/utils/strUtils";
 import { Content, Title } from "src/components/BaseDialog/style";
 import { CollapsibleInstructions } from "src/components/CollapsibleInstructions";
@@ -12,7 +16,13 @@ import {
   InstructionsNotSemiBold,
   InstructionsSemiBold,
 } from "src/components/TreeNameInput/style";
-import { NewTabLink } from "../../../NewTabLink";
+import { WebformTable } from "src/components/WebformTable";
+import { SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS } from "src/components/WebformTable/common/constants";
+import {
+  SampleEditMetadataWebform,
+  SampleIdToEditMetadataWebform,
+} from "src/components/WebformTable/common/types";
+import { ContinueButton } from "src/views/Upload/components/common/style";
 import {
   StyledButton,
   StyledDiv,
@@ -32,6 +42,33 @@ const EditSamplesConfirmationModal = ({
   onClose,
   open,
 }: Props): JSX.Element | null => {
+  const [isValid, setIsValid] = useState(false);
+  const [metadata, setMetadata] =
+    useState<SampleIdToEditMetadataWebform | null>(null);
+
+  const { data: namedLocationsData } = useNamedLocations();
+  const namedLocations: NamedGisaidLocation[] =
+    namedLocationsData?.namedLocations ?? [];
+
+  function structureInitialMetadata(item: Sample): SampleEditMetadataWebform {
+    const i: SampleEditMetadataWebform = pick(
+      item,
+      Object.keys(SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS)
+    );
+    if (i.collectionLocation) {
+      i.collectionLocation.name = stringifyGisaidLocation(i.collectionLocation);
+    }
+    return i;
+  }
+
+  useMemo(() => {
+    const structuredMetadata: SampleIdToEditMetadataWebform = {};
+    checkedSamples.forEach((item) => {
+      structuredMetadata[item.privateId] = structureInitialMetadata(item);
+    });
+    setMetadata(structuredMetadata);
+  }, [checkedSamples]);
+
   const numSamples = checkedSamples.length;
   const title = "Edit Sample Metadata";
 
@@ -108,6 +145,9 @@ const EditSamplesConfirmationModal = ({
     <>
       <Dialog
         disableBackdropClick
+        // Dialogs and modals automatically focus themselves if some other element tries to steal the focus while they are open
+        // We need this prop to allow the collectionLocation DropdownPopper component to work properly
+        disableEnforceFocus
         disableEscapeKeyDown={false}
         open={open}
         onClose={onClose}
@@ -136,6 +176,20 @@ const EditSamplesConfirmationModal = ({
               InstructionsTitleMarginBottom="xxs"
               listItemFontSize="xs"
             />
+            <WebformTable
+              setIsValid={setIsValid}
+              metadata={metadata}
+              setMetadata={setMetadata}
+              locations={namedLocations}
+              webformTableType="EDIT"
+            />
+            <ContinueButton
+              disabled={!isValid}
+              sdsType="primary"
+              sdsStyle="rounded"
+            >
+              Continue
+            </ContinueButton>
           </Content>
         </DialogContent>
       </Dialog>
