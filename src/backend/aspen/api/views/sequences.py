@@ -32,8 +32,8 @@ async def prepare_sequences_download(
 
     async def stream_samples():
         sample_ids = request.sample_ids
-        streamer = FastaStreamer(user, sample_ids)
-        async for line in streamer.stream(db):
+        streamer = FastaStreamer(db, user, sample_ids)
+        async for line in streamer.stream():
             yield line
 
     # Detach all ORM objects (makes them read-only!) from the DB session for our generator.
