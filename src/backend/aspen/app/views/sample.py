@@ -3,10 +3,9 @@ from uuid import uuid4
 
 import boto3
 import smart_open
-from flask import g, jsonify, request, Response, stream_with_context
+from flask import g, jsonify, request
 
 from aspen.app.app import application, requires_auth
-from aspen.database.connection import session_scope
 from aspen.fileio.fasta_streamer import FastaStreamer
 
 

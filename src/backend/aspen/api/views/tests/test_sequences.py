@@ -1,8 +1,10 @@
+from typing import TypedDict
+
 import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from aspen.database.models import CanSee, DataType
+from aspen.database.models import CanSee, DataType, Sample
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
@@ -56,7 +58,12 @@ async def test_prepare_sequences_download_no_access(
     owner_group = group_factory()
     viewer_group = group_factory(name="County")
     viewer = user_factory(viewer_group)
-    owner = user_factory(owner_group, name="Owner", auth0_user_id="owner_id", email="owner@ownergroup.org")
+    owner = user_factory(
+        owner_group,
+        name="Owner",
+        auth0_user_id="owner_id",
+        email="owner@ownergroup.org",
+    )
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
@@ -192,9 +199,7 @@ async def test_access_matrix(
 
     # Make sure sample owners can see their own (shared & private) samples.
     owner_headers = {"name": owner.name, "user_id": owner.auth0_user_id}
-    data = {
-        "sample_ids": [sample1.public_identifier, sample4.public_identifier]
-    }
+    data = {"sample_ids": [sample1.public_identifier, sample4.public_identifier]}
     res = await http_client.post("/v2/sequences/", headers=owner_headers, json=data)
 
     assert res.status_code == 200
@@ -206,25 +211,38 @@ async def test_access_matrix(
 
     user_headers = {"name": user.name, "user_id": user.auth0_user_id}
 
-    matrix = [
+    samples_public_ids: list[str] = [
+        sample1.public_identifier,
+        sample2.public_identifier,
+        sample3.public_identifier,
+        sample4.public_identifier,
+    ]
+    samples_private_ids: list[str] = [
+        sample1.private_identifier,
+        sample2.private_identifier,
+        sample3.private_identifier,
+        sample4.private_identifier,
+    ]
+
+    class SequenceTestCase(TypedDict):
+        samples: list[str]
+        expected_public: list[Sample]
+        expected_private: list[Sample]
+        not_expected: list[Sample]
+
+    matrix: list[SequenceTestCase] = [
         {
-            "samples": [
-                sample1.public_identifier,
-                sample2.public_identifier,
-                sample3.public_identifier,
-                sample4.public_identifier,
+            "samples": samples_public_ids,
+            "expected_public": [
+                sample1,
             ],
-            "expected_public": [sample1],
-            "expected_private": [sample3],
+            "expected_private": [
+                sample3,
+            ],
             "not_expected": [sample2, sample4],
         },
         {
-            "samples": [
-                sample1.private_identifier,
-                sample2.private_identifier,
-                sample3.private_identifier,
-                sample4.private_identifier,
-            ],
+            "samples": samples_private_ids,
             "expected_public": [],
             "expected_private": [sample2, sample3],
             "not_expected": [sample1, sample4],

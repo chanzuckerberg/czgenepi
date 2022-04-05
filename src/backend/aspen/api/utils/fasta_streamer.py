@@ -1,6 +1,6 @@
 import re
 from enum import Enum
-from typing import Iterator, Optional, Set
+from typing import AsyncGenerator, Optional, Set
 
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -37,12 +37,14 @@ class FastaStreamer:
             ),
         )
         # Enforce AuthZ
-        self.authz_samples_query = authz_samples_cansee(all_samples_query, sample_ids, user)
+        self.authz_samples_query = authz_samples_cansee(
+            all_samples_query, sample_ids, user
+        )
         # Stream results
         # Certain consumers have different requirements on fasta
         self.downstream_consumer = downstream_consumer
 
-    async def stream(self, db: AsyncSession) -> Iterator[str]:
+    async def stream(self, db: AsyncSession) -> AsyncGenerator[str, None]:
         all_samples = await db.stream(self.authz_samples_query)
         async for sample in all_samples.scalars():
             if sample.uploaded_pathogen_genome:
