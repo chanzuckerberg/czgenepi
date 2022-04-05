@@ -20,10 +20,12 @@ class SpecialtyDownstreams(Enum):
 class FastaStreamer:
     def __init__(
         self,
+        db: AsyncSession,
         user: User,
         sample_ids: Set[str],
         downstream_consumer: Optional[str] = None,
     ):
+        self.db = db
         self.user = user
         self.cansee_groups_private_identifiers: Set[int] = {
             cansee.owner_group_id
@@ -44,8 +46,8 @@ class FastaStreamer:
         # Certain consumers have different requirements on fasta
         self.downstream_consumer = downstream_consumer
 
-    async def stream(self, db: AsyncSession) -> AsyncGenerator[str, None]:
-        all_samples = await db.stream(self.authz_samples_query)
+    async def stream(self) -> AsyncGenerator[str, None]:
+        all_samples = await self.db.stream(self.authz_samples_query)
         async for sample in all_samples.scalars():
             if sample.uploaded_pathogen_genome:
                 pathogen_genome: UploadedPathogenGenome = (
