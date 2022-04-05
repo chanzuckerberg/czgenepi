@@ -1,9 +1,12 @@
+import pytest
+from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from aspen.database.models import CanSee, DataType
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
 from aspen.test_infra.models.usergroup import group_factory, user_factory
-
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
@@ -23,33 +26,28 @@ async def test_prepare_sequences_download(
     )
     sample = sample_factory(group, user, location)
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
-    session.add(group)
-    await session.commit()
+    async_session.add(group)
+    await async_session.commit()
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     data = {
         "sample_ids": [sample.public_identifier],
     }
-    res = await http_client.get(
-        "/v2/samples/",
-        headers=auth_headers,
-        json=data
-    )
-    assert res.status == "200 OK"
+    res = await http_client.post("/v2/sequences/", headers=auth_headers, json=data)
+    assert res.status_code == 200
     expected_filename = f"{user.group.name}_sample_sequences.fasta"
     assert (
         res.headers["Content-Disposition"]
         == f"attachment; filename={expected_filename}"
     )
-    file_contents = str(res.data, encoding="UTF-8")
+    file_contents = str(res.content, encoding="UTF-8")
     assert "ATGCAAAAAA" in file_contents
     assert sample.private_identifier in file_contents
 
 
-def test_prepare_sequences_download_no_access(
-    session,
-    app,
-    client,
+async def test_prepare_sequences_download_no_access(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
 ):
     """
     Test that we throw an error if the user requests a sequence they don't have access to
@@ -57,34 +55,30 @@ def test_prepare_sequences_download_no_access(
     # create a sample for one group and another viewer group
     owner_group = group_factory()
     viewer_group = group_factory(name="County")
-    user = user_factory(viewer_group)
+    viewer = user_factory(viewer_group)
+    owner = user_factory(owner_group, name="Owner", auth0_user_id="owner_id", email="owner@ownergroup.org")
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    sample = sample_factory(owner_group, user, location)
+    sample = sample_factory(owner_group, owner, location)
     uploaded_pathogen_genome_factory(sample)
 
-    session.add_all((owner_group, viewer_group))
-    session.commit()
+    async_session.add_all((owner_group, viewer_group))
+    await async_session.commit()
 
     # try and access the sample with the user from the group that does not have access
-    with client.session_transaction() as sess:
-        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
+    auth_headers = {"name": viewer.name, "user_id": viewer.auth0_user_id}
     data = {
-        "requested_sequences": {
-            "sample_ids": [sample.private_identifier],
-        }
+        "sample_ids": [sample.public_identifier],
     }
+    res = await http_client.post("/v2/sequences/", headers=auth_headers, json=data)
+    assert res.status_code == 200
+    assert res.content == b""
 
-    res = client.post("/api/sequences", json=data)
-    assert res.status == "200 OK"
-    assert res.get_data() == b""
 
-
-def test_prepare_sequences_download_no_private_id_access(
-    session,
-    app,
-    client,
+async def test_prepare_sequences_download_no_private_id_access(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
 ):
     """
     Test that we use public ids in the fasta file if the requester only has access to the samples
@@ -97,40 +91,37 @@ def test_prepare_sequences_download_no_private_id_access(
         "North America", "USA", "California", "Santa Barbara County"
     )
     sample = sample_factory(owner_group, user, location)
-    uploaded_pathogen_genome_factory(sample)
+    uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     # give the viewer group access to the sequences from the owner group
     CanSee(
         viewer_group=viewer_group,
         owner_group=owner_group,
-        data_type=DataType.SEQUENCES,
+        data_type=DataType.METADATA,
     )
-    session.add_all((owner_group, viewer_group))
-    session.commit()
+    async_session.add_all((owner_group, viewer_group, user, sample))
+    await async_session.commit()
 
-    with client.session_transaction() as sess:
-        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
+    auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     data = {
-        "requested_sequences": {
-            "sample_ids": [sample.public_identifier],
-        }
+        "sample_ids": [sample.public_identifier],
     }
-    res = client.post("/api/sequences", json=data)
-    assert res.status == "200 OK"
+    res = await http_client.post("/v2/sequences/", headers=auth_headers, json=data)
+
+    assert res.status_code == 200
     expected_filename = f"{user.group.name}_sample_sequences.fasta"
     assert (
         res.headers["Content-Disposition"]
         == f"attachment; filename={expected_filename}"
     )
-    file_contents = str(res.data, encoding="UTF-8")
+    file_contents = str(res.content, encoding="UTF-8")
 
     # Assert that the public id was used
     assert sample.public_identifier in file_contents
 
 
-def test_access_matrix(
-    session,
-    app,
-    client,
+async def test_access_matrix(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
 ):
     """
     Test that we use public ids in the fasta file if the requester only has access to the samples
@@ -153,7 +144,7 @@ def test_access_matrix(
     CanSee(
         viewer_group=viewer_group,
         owner_group=owner_group1,
-        data_type=DataType.SEQUENCES,
+        data_type=DataType.METADATA,
     )
     CanSee(
         viewer_group=viewer_group,
@@ -196,26 +187,24 @@ def test_access_matrix(
     uploaded_pathogen_genome_factory(sample3, sequence="ATC")
     uploaded_pathogen_genome_factory(sample4, sequence="CCC")
 
-    session.add_all((owner_group1, owner_group2, viewer_group, owner))
-    session.commit()
+    async_session.add_all((owner_group1, owner_group2, viewer_group, owner))
+    await async_session.commit()
 
     # Make sure sample owners can see their own (shared & private) samples.
-    with client.session_transaction() as sess:
-        sess["profile"] = {"name": owner.name, "user_id": owner.auth0_user_id}
+    owner_headers = {"name": owner.name, "user_id": owner.auth0_user_id}
     data = {
-        "requested_sequences": {
-            "sample_ids": [sample1.public_identifier, sample4.public_identifier]
-        }
+        "sample_ids": [sample1.public_identifier, sample4.public_identifier]
     }
-    res = client.post("/api/sequences", json=data)
-    file_contents = str(res.data, encoding="UTF-8")
+    res = await http_client.post("/v2/sequences/", headers=owner_headers, json=data)
+
+    assert res.status_code == 200
+    file_contents = str(res.content, encoding="UTF-8")
 
     # Assert that we get the correct public, private id's and sequences.
     assert f">{sample1.private_identifier}" in file_contents
     assert f">{sample4.private_identifier}" in file_contents
 
-    with client.session_transaction() as sess:
-        sess["profile"] = {"name": user.name, "user_id": user.auth0_user_id}
+    user_headers = {"name": user.name, "user_id": user.auth0_user_id}
 
     matrix = [
         {
@@ -243,18 +232,17 @@ def test_access_matrix(
     ]
     for case in matrix:
         data = {
-            "requested_sequences": {
-                "sample_ids": case["samples"],
-            }
+            "sample_ids": case["samples"],
         }
-        res = client.post("/api/sequences", json=data)
-        assert res.status == "200 OK"
+        res = await http_client.post("/v2/sequences/", headers=user_headers, json=data)
+
+        assert res.status_code == 200
         expected_filename = f"{user.group.name}_sample_sequences.fasta"
         assert (
             res.headers["Content-Disposition"]
             == f"attachment; filename={expected_filename}"
         )
-        file_contents = str(res.data, encoding="UTF-8")
+        file_contents = str(res.content, encoding="UTF-8")
 
         # Assert that we get the correct public, private id's and sequences.
         for sample in case["expected_public"]:

@@ -21,6 +21,7 @@ from aspen.api.views import (
     phylo_runs,
     phylo_trees,
     samples,
+    sequences,
     users,
     usher,
 )
@@ -125,6 +126,11 @@ def get_app() -> FastAPI:
         dependencies=[Depends(get_auth_user)],
     )
     _app.include_router(auspice.router, prefix="/v2/auspice")
+    _app.include_router(
+        sequences.router,
+        prefix="/v2/sequences",
+        dependencies=[Depends(get_auth_user)],
+    )
 
     _app.add_exception_handler(
         AspenException,

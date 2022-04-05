@@ -3,8 +3,8 @@ from enum import Enum
 from typing import Iterator, Optional, Set
 
 import sqlalchemy as sa
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
-from sqlalchemy.ext.asyncio import AsyncResult, AsyncSession
 
 from aspen.api.utils import authz_samples_cansee
 from aspen.database.models import DataType, Sample, UploadedPathogenGenome
@@ -22,7 +22,6 @@ class FastaStreamer:
         self,
         user: User,
         sample_ids: Set[str],
-        db: AsyncSession,
         downstream_consumer: Optional[str] = None,
     ):
         self.user = user
@@ -32,23 +31,20 @@ class FastaStreamer:
             if cansee.data_type == DataType.PRIVATE_IDENTIFIERS
         }
         # query for samples
-        all_samples_query = (
-            sa.select(Sample)
-            .options(
-                joinedload(Sample.uploaded_pathogen_genome, innerjoin=True).undefer(
-                    UploadedPathogenGenome.sequence
-                ),
-            )
+        all_samples_query = sa.select(Sample).options(  # type: ignore
+            joinedload(Sample.uploaded_pathogen_genome, innerjoin=True).undefer(  # type: ignore
+                UploadedPathogenGenome.sequence
+            ),
         )
         # Enforce AuthZ
-        authz_samples_query = authz_sample_filters(self.all_samples, sample_ids, user)
+        self.authz_samples_query = authz_samples_cansee(all_samples_query, sample_ids, user)
         # Stream results
-        self.all_samples = db.stream_scalars(authz_samples_query)
         # Certain consumers have different requirements on fasta
         self.downstream_consumer = downstream_consumer
 
-    def stream(self) -> Iterator[str]:
-        for sample in self.all_samples:
+    async def stream(self, db: AsyncSession) -> Iterator[str]:
+        all_samples = await db.stream(self.authz_samples_query)
+        async for sample in all_samples.scalars():
             if sample.uploaded_pathogen_genome:
                 pathogen_genome: UploadedPathogenGenome = (
                     sample.uploaded_pathogen_genome
