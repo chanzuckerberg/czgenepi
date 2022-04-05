@@ -44,6 +44,8 @@ async def prepare_sequences_download(
     return resp
 
 
+# Writes sample sequence(s) to a FASTA file and uploads it to S3,
+# returning a signed url to the S3 object.
 @router.post("/getfastaurl")
 async def getfastaurl(
     request: FastaURLRequest,
