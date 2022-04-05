@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import { getColors } from "czifui";
 
 const centeredFlex = () => {
   return `
@@ -28,8 +29,6 @@ export const PartnerLink = styled.a`
   width: 100%;
   max-width: 242px;
   height: 118px;
-  border: 1px solid #d3d3d3;
-  outline: 5px solid transparent;
   cursor: pointer;
 
   &:nth-of-type(2) {
@@ -40,9 +39,16 @@ export const PartnerLink = styled.a`
     }
   }
 
-  &:hover {
-    border: 2px solid #535353;
-  }
+  ${(props) => {
+    const colors = getColors(props);
+    return `
+      border: 1px solid ${colors?.gray[300]};
+
+      &:hover {
+        border: 2px solid ${colors?.gray[600]};
+      }
+    `;
+  }}
 `;
 
 export const PartnerLinkRow = styled.div`
