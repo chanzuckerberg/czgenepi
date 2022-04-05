@@ -56,7 +56,26 @@ const SAMPLE_EDIT_METADATA_KEYS_TO_EXTRACT = Object.values(
   HEADERS_TO_SAMPLE_EDIT_METADATA_KEYS
 );
 
+<<<<<<< HEAD
 function warnBadFormatMetadata(
+=======
+// function warnMissingMetadataEdit(
+//   metadata: SampleEditTsvMetadata
+// ): Set<keyof SampleEditTsvMetadata> | null {
+//   const missingMetadata = new Set<keyof SampleEditTsvMetadata>();
+//   const ALWAYS_REQUIRED: Array<keyof SampleEditTsvMetadata> = [
+//     "currentPrivateID",
+//   ];
+//   ALWAYS_REQUIRED.forEach((keyRequiredMetadata) => {
+//     if (!metadata[keyRequiredMetadata]) {
+//       missingMetadata.add(keyRequiredMetadata);
+//     }
+//   });
+//   return missingMetadata.size ? missingMetadata : null;
+// }
+
+function warnBadFormatMetadataEdit(
+>>>>>>> 5b598541 (allow user to import tsv data for sample edit)
   metadata: SampleEditMetadataWebform
 ): Set<keyof SampleEditMetadataWebform> | null {
   const badFormatMetadata = new Set<keyof SampleEditMetadataWebform>();
@@ -96,7 +115,11 @@ function warnBadFormatMetadata(
  *   - ignoredSampleIds: Any IDs that, if encountered, mean row is ignored.
  *       Mostly exists to filter out the metadata template's example rows.
  */
+<<<<<<< HEAD
 function parseRow(
+=======
+function parseRowEdit(
+>>>>>>> 5b598541 (allow user to import tsv data for sample edit)
   row: Record<string, string>,
   stringToLocationFinder: StringToLocationFinder,
   ignoredSampleIds: Set<string>
@@ -119,8 +142,16 @@ function parseRow(
   SAMPLE_EDIT_METADATA_KEYS_TO_EXTRACT.forEach((key) => {
     inferMetadata(row, key, rowMetadata, stringToLocationFinder);
   });
+<<<<<<< HEAD
 
   const rowBadFormatWarnings = warnBadFormatMetadata(rowMetadata);
+=======
+  // const rowMissingMetadataWarnings = warnMissingMetadataEdit(rowMetadata);
+  // if (rowMissingMetadataWarnings) {
+  //   rowWarnings.set(WARNING_CODE.MISSING_DATA, rowMissingMetadataWarnings);
+  // }
+  const rowBadFormatWarnings = warnBadFormatMetadataEdit(rowMetadata);
+>>>>>>> 5b598541 (allow user to import tsv data for sample edit)
   if (rowBadFormatWarnings) {
     rowWarnings.set(WARNING_CODE.BAD_FORMAT_DATA, rowBadFormatWarnings);
   }

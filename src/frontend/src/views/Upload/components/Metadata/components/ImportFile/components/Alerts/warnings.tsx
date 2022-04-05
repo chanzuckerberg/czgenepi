@@ -1,3 +1,4 @@
+import { AlertProps } from "czifui";
 import React from "react";
 import { B } from "src/common/styles/basicStyle";
 import { pluralize } from "src/common/utils/strUtils";
@@ -10,7 +11,7 @@ import {
 import { SampleIdToWarningMessages } from "../../parseFile";
 import { ProblemTable } from "./common/ProblemTable";
 
-const WARNING_SEVERITY = "warning";
+const WARNING_SEVERITY: AlertProps["severity"] = "warning";
 
 /**
  *  WARNING_CODE.AUTO_CORRECT
@@ -109,22 +110,39 @@ export function WarningExtraneousEntrySampleEdit({
 }: PropsExtraneousEntry): JSX.Element {
   const count = extraneousSampleIds.length;
   // "X Samples in metadata file were not used."
+<<<<<<< HEAD
   const title = `${count} ${pluralize(
     "Sample",
     count
   )} in metadata file ${pluralize(
+=======
+  const title = `${count} ${maybePluralize(
+    "Sample",
+    count
+  )} in metadata file ${maybePluralize(
+>>>>>>> 5b598541 (allow user to import tsv data for sample edit)
     "was",
     count
   )} couldn't be matched and weren't imported.`;
   return (
+<<<<<<< HEAD
     <AlertAccordion
       title={title}
       collapseContent={
+=======
+    <FullWidthAlertAccordion
+      title={title}
+      message={
+>>>>>>> 5b598541 (allow user to import tsv data for sample edit)
         <MessageExtraneousEntrySampleEdit
           extraneousSampleIds={extraneousSampleIds}
         />
       }
+<<<<<<< HEAD
       intent={WARNING_SEVERITY}
+=======
+      severity={WARNING_SEVERITY}
+>>>>>>> 5b598541 (allow user to import tsv data for sample edit)
     />
   );
 }
