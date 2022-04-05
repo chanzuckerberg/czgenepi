@@ -7,4 +7,6 @@ FROM temp_db_image as dumper
 # from continually building new images on top of old ones
 FROM postgres:13.1-alpine
 
+# This path needs to be the same as the path in the PGDATA environment
+# variable in docker-compose.yml
 COPY --from=dumper /var/lib/czge/data /var/lib/czge/data

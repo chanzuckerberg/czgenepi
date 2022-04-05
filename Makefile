@@ -135,7 +135,7 @@ prepare-new-db-snapshot: local-start
 	@echo "Ok, local db is prepared and ready to go -- make any additional changes you need to and then run:"
 	@echo "make create_new_db_image"
 
-.PHONY: create_new_db_image
+.PHONY: create-new-db-image
 create-new-db-image:
 	docker compose exec database psql $(LOCAL_DB_CONN_STRING) -c VACUUM FULL
 	docker commit czgenepi-database-1 temp_db_image
