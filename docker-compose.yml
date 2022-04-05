@@ -11,6 +11,12 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password_postgres
       - POSTGRES_DB=aspen_db
+      # The postgres image declares a mounted volume at /var/lib/postgresql/data
+      # by default, which means that the data in that directory is difficult to
+      # snapshot and export. Here, we're telling Postgres to use this (non-mounted)
+      # directory as its storage location instead so it works with our db snapshot
+      # workflow.
+      - PGDATA=/var/lib/czge/data
     command: [ "postgres" ]
     networks:
       genepinet:
