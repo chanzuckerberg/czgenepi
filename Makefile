@@ -51,7 +51,7 @@ remote-dbconsole: .env.ecr # Get a python console on a remote db (from OSX only!
 	export DB_URI=$$(jq -r '"postgresql://\(.DB_admin_username):\(.DB_admin_password)@'$${OSX_IP}':5555/$(DB)"' <<< $$config); \
 	echo Connecting to $$(jq -r .DB_address <<< $$config)/$(DB) via $$(jq -r .bastion_host <<< $$config); \
 	ssh -f -o ExitOnForwardFailure=yes -L $${OSX_IP}:5555:$$(jq -r .DB_address <<< $$config):5432 $$(jq -r .bastion_host <<< $$config) sleep 20; \
-	$(docker_compose) run -e DB_URI backend sh -c 'pip install . && aspen-cli db --remote interact --connect'
+	$(docker_compose) run -e DB_URI backend sh -c 'aspen-cli db --remote interact --connect'
 
 ### DOCKER LOCAL DEV #########################################
 .PHONY: local-hostconfig
@@ -120,7 +120,6 @@ local-init: oauth/pkcs12/certificate.pfx .env.ecr local-ecr-login local-hostconf
 	$(docker_compose) exec -T backend $(BACKEND_APP_ROOT)/scripts/setup_dev_data.sh
 	$(docker_compose) exec -T backend alembic upgrade head
 	$(docker_compose) exec -T backend python scripts/setup_localdata.py
-	$(docker_compose) exec -T backend pip install ./aspen
 
 # Assumes you've already run `make local-init` to configure localstack resources!
 .PHONY: prepare-new-db-snapshot
