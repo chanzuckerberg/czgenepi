@@ -43,7 +43,7 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-duration-seconds: 900
       - name: Build And Push
-        uses: chanzuckerberg/github-actions/.github/actions/docker-build-push@8cabeed0a22623f5dfe885ab684260e12e24c85c
+        uses: chanzuckerberg/github-actions/.github/actions/docker-build-push@a05256fff3dc524ac26a8c4ca0fc6ab081f0110c
         with:
           dockerfile: ${{ matrix.image.dockerfile }}
           context: ${{ matrix.image.context }}
@@ -65,7 +65,7 @@ jobs:
           role-duration-seconds: 900
       - name: Calculate Branch and Base Names
         id: refs
-        uses: chanzuckerberg/github-actions/.github/actions/get-github-ref-names@8cabeed0a22623f5dfe885ab684260e12e24c85c
+        uses: chanzuckerberg/github-actions/.github/actions/get-github-ref-names@a05256fff3dc524ac26a8c4ca0fc6ab081f0110c
       - name: Get Stack Name
         id: stack-name
         uses: actions/github-script@v6
@@ -82,7 +82,7 @@ jobs:
             console.log(`stackName: ${stackName}`)
             core.setOutput('stack-name', stackName)
       - name: Create or update rdev
-        uses: chanzuckerberg/github-actions/.github/actions/deploy-happy-stack@8cabeed0a22623f5dfe885ab684260e12e24c85c
+        uses: chanzuckerberg/github-actions/.github/actions/deploy-happy-stack@a05256fff3dc524ac26a8c4ca0fc6ab081f0110c
         with:
           tfe-token: ${{ secrets.TFE_TOKEN }}
           stack-name: ${{ steps.stack-name.outputs.stack-name }}
