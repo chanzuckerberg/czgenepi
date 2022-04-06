@@ -3,15 +3,17 @@ from uuid import uuid4
 
 import boto3
 import smart_open
-
-
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.api.auth import get_auth_user
 from aspen.api.deps import get_db, get_settings
-from aspen.api.schemas.sequences import SequenceRequest, FastaURLRequest, FastaURLResponse
+from aspen.api.schemas.sequences import (
+    FastaURLRequest,
+    FastaURLResponse,
+    SequenceRequest,
+)
 from aspen.api.settings import Settings
 from aspen.api.utils import FastaStreamer
 from aspen.database.models import User
