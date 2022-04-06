@@ -24,7 +24,7 @@ def get_probability(row: dict) -> Optional[int]:
     """
     if row["ambiguity_score"]:
         return round(float(row["ambiguity_score"]) * 100)
-    elif "Assigned using designation hash" in row["note"]:
+    elif "Assigned using designation hash" in row["note"] or "Assigned from designation hash" in row["note"]:
         return 100
     else:
         return None
