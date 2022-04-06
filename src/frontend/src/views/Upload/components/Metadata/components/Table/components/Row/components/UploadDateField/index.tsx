@@ -1,13 +1,16 @@
 import { FormikContextType } from "formik";
 import React from "react";
 import DateField from "src/components/DateField";
-import { Metadata } from "src/views/Upload/components/common/types";
+import { SampleUploadTsvMetadata } from "src/components/DownloadMetadataTemplate/common/types";
 import ApplyToAllColumn from "../common/ApplyToAllColumn";
 
 interface Props {
-  fieldKey: keyof Metadata;
-  formik: FormikContextType<Metadata>;
-  applyToAllColumn: (fieldKey: keyof Metadata, value: unknown) => void;
+  fieldKey: keyof SampleUploadTsvMetadata;
+  formik: FormikContextType<SampleUploadTsvMetadata>;
+  applyToAllColumn: (
+    fieldKey: keyof SampleUploadTsvMetadata,
+    value: unknown
+  ) => void;
   isFirstRow: boolean;
 }
 

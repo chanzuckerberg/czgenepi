@@ -1,9 +1,10 @@
 import styled from "@emotion/styled";
 import { Button, getColors, getSpaces } from "czifui";
 
+const whiteBorder = "border: 1px solid white;";
 export const UploadButton = styled(Button)`
   color: white;
-  border: 1px solid white;
+  ${whiteBorder}
 
   ${(props) => {
     const spaces = getSpaces(props);
@@ -13,6 +14,7 @@ export const UploadButton = styled(Button)`
       margin-right: ${spaces?.xl}px;
 
       &:hover {
+        ${whiteBorder}
         color: black;
         background-color: white;
       }

@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import { getSpaces } from "czifui";
 
 export const IntroContainer = styled.div`
   display: flex;
@@ -7,14 +8,20 @@ export const IntroContainer = styled.div`
   max-width: 1440px;
   margin: 0 auto;
 
-  @media (max-width: 1440px) {
-    padding: 0 22px 0 0;
-  }
+  ${(props) => {
+    const spaces = getSpaces(props);
 
-  @media (max-width: 768px) {
-    flex-direction: column;
-    padding: 0 22px;
-  }
+    return `
+      @media (max-width: 1440px) {
+        padding: 0 ${spaces?.l}px 0 0;
+      }
+
+      @media (max-width: 768px) {
+        flex-direction: column;
+        padding: 0 ${spaces?.l}px;
+      }
+    `;
+  }}
 `;
 
 export const IntroDescription = styled.p`

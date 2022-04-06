@@ -140,8 +140,8 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
                   selected for upload
                 </StyledUploadCount>
                 <StyledRemoveAllButton
-                  color="primary"
-                  variant="text"
+                  sdsType="primary"
+                  sdsStyle="minimal"
                   onClick={handleRemoveAllClick}
                   startIcon={<Close />}
                 >
@@ -158,9 +158,8 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
           <Link href={ROUTES.UPLOAD_STEP2} passHref>
             <a href="passHref">
               <StyledButton
-                isRounded
-                color="primary"
-                variant="contained"
+                sdsType="primary"
+                sdsStyle="rounded"
                 disabled={!hasSamples(samples) || tooManySamples}
               >
                 Continue
@@ -169,7 +168,7 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
           </Link>
           <Link href={ROUTES.DATA_SAMPLES} passHref>
             <a href="passHref">
-              <Button isRounded color="primary" variant="outlined">
+              <Button sdsType="secondary" sdsStyle="rounded">
                 Cancel
               </Button>
             </a>

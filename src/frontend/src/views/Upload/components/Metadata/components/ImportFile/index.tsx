@@ -1,8 +1,12 @@
-import { Button } from "czifui";
 import { isEmpty } from "lodash";
 import React, { useEffect, useMemo, useState } from "react";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { StringToLocationFinder } from "src/common/utils/locationUtils";
+import { SampleUploadDownloadTemplate } from "src/components/DownloadMetadataTemplate";
+import {
+  prepUploadMetadataTemplate,
+  TEMPLATE_UPDATED_DATE,
+} from "src/components/DownloadMetadataTemplate/prepMetadataTemplate";
 import FilePicker from "src/components/FilePicker";
 import {
   ERROR_CODE,
@@ -18,15 +22,11 @@ import {
   WarningExtraneousEntry,
   WarningMissingData,
 } from "./components/Alerts/warnings";
-import DownloadTemplate from "./components/DownloadTemplate";
 import Instructions from "./components/Instructions";
 import { parseFile, ParseResult, SampleIdToWarningMessages } from "./parseFile";
 import {
-  prepMetadataTemplate,
-  TEMPLATE_UPDATED_DATE,
-} from "./prepMetadataTemplate";
-import {
   IntroWrapper,
+  StyledButton,
   StyledUpdatedDate,
   Title,
   TitleWrapper,
@@ -89,7 +89,7 @@ export default function ImportFile({
   };
 
   const { templateHeaders, templateRows } = useMemo(() => {
-    return prepMetadataTemplate(Object.keys(samples || EMPTY_OBJECT));
+    return prepUploadMetadataTemplate(Object.keys(samples || EMPTY_OBJECT));
   }, [samples]);
 
   const handleFiles = async (files: FileList | null) => {
@@ -122,12 +122,21 @@ export default function ImportFile({
       <IntroWrapper>
         <TitleWrapper>
           <Title>Import Data from a TSV or CSV file</Title>
-          <Button color="primary" onClick={handleInstructionsClick}>
+          <StyledButton
+            sdsType="secondary"
+            sdsStyle="minimal"
+            onClick={handleInstructionsClick}
+          >
             {isInstructionsShown ? "HIDE" : "SHOW"} INSTRUCTIONS
-          </Button>
-          <DownloadTemplate headers={templateHeaders} rows={templateRows}>
-            <Button color="primary">Download Metadata Template (TSV)</Button>
-          </DownloadTemplate>
+          </StyledButton>
+          <SampleUploadDownloadTemplate
+            headers={templateHeaders}
+            rows={templateRows}
+          >
+            <StyledButton sdsType="secondary" sdsStyle="minimal">
+              Download Metadata Template (TSV)
+            </StyledButton>
+          </SampleUploadDownloadTemplate>
           <StyledUpdatedDate>Updated {TEMPLATE_UPDATED_DATE}</StyledUpdatedDate>
         </TitleWrapper>
 

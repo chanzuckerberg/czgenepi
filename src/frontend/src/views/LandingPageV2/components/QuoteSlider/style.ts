@@ -1,9 +1,17 @@
 import styled from "@emotion/styled";
+import { getColors } from "czifui";
 
 export const QuoteSliderContainer = styled.div`
   padding-bottom: 100px;
   text-align: center;
-  background: #511cc1;
+
+  ${(props) => {
+    const colors = getColors(props);
+
+    return `
+      background: ${colors?.primary[400]};
+    `;
+  }}
 
   & .slick-dots {
     bottom: -22%;

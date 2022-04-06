@@ -6,7 +6,6 @@ import {
   getFontWeights,
   getSpaces,
 } from "czifui";
-import DownloadImage from "src/common/icons/IconDownloadLarge.svg";
 
 export const StyledDiv = styled.div`
   ${fontHeaderXs}
@@ -48,28 +47,6 @@ export const StyledChip = styled(Chip)`
 export const DownloadWrapper = styled.div`
   align-items: center;
   display: flex;
-`;
-
-export const StyledDownloadImage = styled(DownloadImage)`
-  width: 32px;
-  height: 32px;
-  ${(props) => {
-    const colors = getColors(props);
-    return `
-      fill: ${colors?.primary[400]};
-    `;
-  }}
-`;
-
-export const StyledDownloadDisabledImage = styled(DownloadImage)`
-  width: 32px;
-  height: 32px;
-  ${(props) => {
-    const colors = getColors(props);
-    return `
-        fill: ${colors?.gray[300]};
-    `;
-  }}
 `;
 
 export const TooltipHeaderText = styled.div`
