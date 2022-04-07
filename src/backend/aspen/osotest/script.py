@@ -6,20 +6,11 @@ from pathlib import Path
 import sqlalchemy as sa
 from oso import Oso
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
 from sqlalchemy_oso import async_authorized_sessionmaker, register_models
 
 from aspen.api.settings import Settings
 from aspen.database.connection import init_async_db
-from aspen.database.models import (
-    Group,
-    GroupRole,
-    PhyloRun,
-    PhyloTree,
-    Role,
-    Sample,
-    User,
-)
+from aspen.database.models import PhyloRun, PhyloTree, Sample, User
 from aspen.database.models.base import base, idbase
 
 
