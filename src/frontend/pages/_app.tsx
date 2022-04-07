@@ -2,11 +2,12 @@ import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
 import { StylesProvider, ThemeProvider } from "@material-ui/core/styles";
 import { AppProps } from "next/app";
 import Head from "next/head";
+import { useRouter } from "next/router";
 import React, { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import "semantic-ui-css/semantic.min.css";
 import style from "src/App.module.scss";
-import { useUserInfo } from "src/common/queries/auth";
+import { ROUTES } from "src/common/routes";
 import { theme } from "src/common/styles/theme";
 import { setFeatureFlagsFromQueryParams } from "src/common/utils/featureFlags";
 import AcknowledgePolicyChanges from "src/components/AcknowledgePolicyChanges";
@@ -18,14 +19,12 @@ const queryClient = new QueryClient();
 setFeatureFlagsFromQueryParams();
 
 function Nav(): JSX.Element {
-  // TODO: replace this with common nav
-  // this is a workaround while we figure out what the specs are of logged in vs. landing page navbar
-  const { data: userInfo } = useUserInfo();
-  if (userInfo) {
-    return <NavBarLoggedIn />;
-  } else {
-    return <NavBarLanding />;
-  }
+  const router = useRouter();
+  return router.asPath === ROUTES.HOMEPAGE ? (
+    <NavBarLanding />
+  ) : (
+    <NavBarLoggedIn />
+  );
 }
 
 const App = ({ Component, pageProps }: AppProps): JSX.Element => {
