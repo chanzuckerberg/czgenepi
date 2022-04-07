@@ -24,66 +24,60 @@ from aspen.database.models.base import base, idbase
 
 
 async def get_samples(oso, user, engine):
+    permission = "write"
+    print()
+    print(f"Samples {permission}")
+    print("====")
     authsess = async_authorized_sessionmaker(
         bind=engine,
         get_oso=lambda: oso,
         get_user=lambda: user,
-        get_checked_permissions=lambda: {Sample: "write"},
+        get_checked_permissions=lambda: {Sample: permission},
         class_=AsyncSession,
     )
     asess = authsess()
     rows = (await asess.execute(sa.select(Sample))).scalars().all()
     for row in rows:
-        print(row.private_identifier)
+        print(row.id, row.private_identifier)
     await asess.close()
 
 
 async def get_phylo_runs(oso, user, engine):
+    permission = "read"
+    print()
+    print(f"Phylo Runs {permission}")
+    print("====")
     authsess = async_authorized_sessionmaker(
         bind=engine,
         get_oso=lambda: oso,
         get_user=lambda: user,
-        get_checked_permissions=lambda: {PhyloRun: "read"},
+        get_checked_permissions=lambda: {PhyloRun: permission},
         class_=AsyncSession,
     )
     asess = authsess()
     rows = (await asess.execute(sa.select(PhyloRun))).scalars().all()
     for row in rows:
-        print(row.name, row.group_id)
+        print(row.id, row.name, row.group_id)
     await asess.close()
 
 
 async def get_phylo_trees(oso, user, engine):
+    permission = "read"
+    print()
+    print(f"Phylo Trees {permission}")
+    print("====")
     authsess = async_authorized_sessionmaker(
         bind=engine,
         get_oso=lambda: oso,
         get_user=lambda: user,
-        get_checked_permissions=lambda: {PhyloTree: "read"},
+        get_checked_permissions=lambda: {PhyloTree: permission},
         class_=AsyncSession,
     )
     asess = authsess()
     rows = (await asess.execute(sa.select(PhyloTree))).scalars().all()
     for row in rows:
-        print(row.name)
+        print(row.id, row.name)
     await asess.close()
-
-
-async def select_related_run(session):
-    rows = (
-        (
-            await session.execute(
-                sa.select(PhyloTree).filter(PhyloTree.entity_id == 1645)
-                # .options(joinedload(PhyloTree.phylo_run))
-            )
-        )
-        .scalars()
-        .all()
-    )
-    print()
-    print("====")
-    for row in rows:
-        print(row.phylo_run.workflow_id)
-    return
 
 
 async def do_stuff():
@@ -98,7 +92,6 @@ async def do_stuff():
     user = (await session.execute(sa.select(User).where(User.id == 36))).scalars().one()
     print(user)
 
-    # await select_related_run(session)
     await get_samples(oso, user, db.engine)
     await get_phylo_runs(oso, user, db.engine)
     await get_phylo_trees(oso, user, db.engine)
