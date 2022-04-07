@@ -1,45 +1,5 @@
 import styled from "@emotion/styled";
 
-export const AnnouncementBanner = styled.div`
-  background: #511cc1;
-  color: white;
-  text-align: center;
-  font-size: 14px;
-  letter-spacing: 0.3px;
-  position: relative;
-  z-index: 2;
-
-  @media (max-width: 768px) {
-    font-size: 12px;
-    padding: 14px;
-  }
-`;
-
-export const AnnouncementText = styled.p`
-  padding: 14px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  @media (max-width: 768px) {
-    display: inline;
-    padding: initial;
-  }
-
-  svg {
-    margin-right: 10px;
-
-    @media (max-width: 768px) {
-      width: 14px;
-      transform: translateY(7px);
-    }
-  }
-`;
-
-export const AnnouncementTextBold = styled.span`
-  font-weight: 600;
-`;
-
 export const Bar = styled.div`
   width: 17px;
   height: 1px;
