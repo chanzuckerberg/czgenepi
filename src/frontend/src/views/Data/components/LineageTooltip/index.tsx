@@ -37,7 +37,7 @@ const KEY_TO_LABELS = {
   last_updated: "Last Updated",
   lineage: "Lineage",
   confidence: "Confidence",
-  version: "PangoLEARN Version",
+  version: "Version",
 };
 
 function Row({ label, text }: { label: keyof Lineage; text: string }) {
