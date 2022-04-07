@@ -1,15 +1,11 @@
 import React, { useState } from "react";
 import ENV from "src/common/constants/ENV";
-import Exclamation from "src/common/icons/IconExclamation.svg";
 import CloseIcon from "src/common/images/close-icon.svg";
 import HeaderLogo from "src/common/images/gen-epi-logo.svg";
 import { useUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
 import UserMenu from "./components/UserMenu";
 import {
-  AnnouncementBanner,
-  AnnouncementText,
-  AnnouncementTextBold,
   Bar,
   ButtonLink,
   HeaderContainer,
@@ -94,16 +90,6 @@ export default function NavBarLanding(): JSX.Element {
 
   return (
     <HeaderContainer data-test-id="navbar-landing">
-      {!user && (
-        <AnnouncementBanner>
-          <AnnouncementText>
-            <Exclamation />
-            <AnnouncementTextBold>Looking for Aspen?</AnnouncementTextBold>
-            &nbsp;You&apos;re in the right spot. As of December, our new name is
-            Chan Zuckerberg GEN EPI.
-          </AnnouncementText>
-        </AnnouncementBanner>
-      )}
       <HeaderMaxWidthContainer>
         <HeaderTopContainer>
           <HeaderLogoContainer href={data ? ROUTES.DATA : ROUTES.HOMEPAGE}>

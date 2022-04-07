@@ -10,7 +10,6 @@ import style from "src/App.module.scss";
 import { ROUTES } from "src/common/routes";
 import { theme } from "src/common/styles/theme";
 import { setFeatureFlagsFromQueryParams } from "src/common/utils/featureFlags";
-import AcknowledgePolicyChanges from "src/components/AcknowledgePolicyChanges";
 import NavBarLoggedIn from "src/components/NavBar";
 import NavBarLanding from "src/components/NavBarV2";
 import SplitInitializer from "src/components/Split";
@@ -54,7 +53,6 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
               <EmotionThemeProvider theme={theme}>
                 <div className={style.app}>
                   <Nav />
-                  <AcknowledgePolicyChanges />
                   <Component {...pageProps} />
                 </div>
               </EmotionThemeProvider>
