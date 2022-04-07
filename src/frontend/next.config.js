@@ -90,12 +90,15 @@ module.exports = {
             svgoConfig: {
               plugins: [
                 {
-                  prefixIds: {
-                    prefix: false,
-                  },
-                  removeHiddenElems: {
-                    opacity0: false,
-                  },
+                  name: 'preset-default',
+                  params: {
+                    prefixIds: {
+                      prefix: false,
+                    },
+                    removeHiddenElems: {
+                      opacity0: false,
+                    },
+                  }
                 },
               ],
             },
