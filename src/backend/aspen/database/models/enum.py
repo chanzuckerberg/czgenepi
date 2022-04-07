@@ -11,7 +11,6 @@ if TYPE_CHECKING:
         def __init__(self, enum: Type[T]) -> None:
             ...
 
-
 else:
     from enumtables import EnumType as Enum  # noqa: F401
 
