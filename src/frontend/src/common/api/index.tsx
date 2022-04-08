@@ -15,6 +15,7 @@ export enum API {
   USHER_TREE_OPTIONS = "/v2/usher/tree_versions/",
   SAMPLES_VALIDATE_IDS = "/v2/samples/validate_ids/",
   LOCATIONS = "/v2/locations/",
+  PANGO_LINEAGES = "/v2/lineages/pango",
 }
 
 export const DEFAULT_HEADERS_MUTATION_OPTIONS: RequestInit = {
