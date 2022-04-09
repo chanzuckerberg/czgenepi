@@ -18,8 +18,34 @@ interface Props {
   setSelectedLineages: (lineages: string[]) => void;
 }
 
+// We present a pseudo-option to the user to enable choosing "All" lineages,
+// but internally this means no lineages were chosen to filter down to.
+const ALL_LINEAGES_KEYWORD = "All";
+
 function makeDropdownOption(name: string): DefaultMenuSelectOption {
   return {name: name};
+}
+// Generate only once because we need to reference same object throughout.
+const ALL_LINEAGES_CHOICE = makeDropdownOption(ALL_LINEAGES_KEYWORD);
+
+/**
+ * VOODOO_TODO__DOC_ME
+ * - Could be optimized for speed, being lazy about includes
+ *  (as oppposed to `set` and a O(1) check)
+ * - We depend on original sorting of availableLineages, maintaining it
+ *   in selected choices floated to top as well.
+ */
+function generateLineageDropdownOptions(
+  selectedLineages: string[],
+  availableLineages: string[],
+): DefaultMenuSelectOption[] {
+  const sortedSelection = availableLineages.filter(lineage => selectedLineages.includes(lineage));
+  const remainingAvailable = availableLineages.filter(lineage => !selectedLineages.includes(lineage));
+  return [
+    ALL_LINEAGES_CHOICE,
+    ...sortedSelection.map(makeDropdownOption),
+    ...remainingAvailable.map(makeDropdownOption),
+  ];
 }
 
 const SAMPLE_FILTERING_TOOLTIP_TEXT = (
