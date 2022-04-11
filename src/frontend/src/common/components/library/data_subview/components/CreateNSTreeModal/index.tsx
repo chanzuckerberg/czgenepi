@@ -207,6 +207,7 @@ export const CreateNSTreeModal = ({
       <StyledDialog
         disableEscapeKeyDown
         disableBackdropClick
+        disableEnforceFocus
         open={open}
         fullWidth={true}
         maxWidth={"sm"}

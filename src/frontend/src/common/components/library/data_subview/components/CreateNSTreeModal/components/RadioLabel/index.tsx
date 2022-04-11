@@ -98,7 +98,9 @@ export const RadioLabelOverview = ({
   );
 };
 
-export const RadioLabelTargeted = ({ selected }: BaseTreeChoiceProps): JSX.Element => {
+export const RadioLabelTargeted = ({
+  selected,
+}: BaseTreeChoiceProps): JSX.Element => {
   return (
     <div>
       <Label>
