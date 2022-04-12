@@ -1,5 +1,11 @@
 import styled from "@emotion/styled";
-import { fontHeaderXs, getColors, getSpaces, InputDropdown } from "czifui";
+import {
+  Dropdown,
+  fontHeaderXs,
+  getColors,
+  getSpaces,
+  InputDropdown,
+} from "czifui";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 
 export const StyledContainer = styled.div`
@@ -59,3 +65,7 @@ export const StyledNewTabLink = styled(NewTabLink)`
 export const StyledInputDropdown = styled(InputDropdown)`
   width: 200px;
 `;
+
+export const StyledDropdown = styled(Dropdown)`
+  width: 200px;
+` as typeof Dropdown; // assert b/c `styled` causes an interface hiccup;

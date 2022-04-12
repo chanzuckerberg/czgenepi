@@ -1,10 +1,13 @@
-import { DefaultMenuSelectOption, Dropdown } from "czifui";
+import { FilterOptionsState } from "@material-ui/lab";
+import { createFilterOptions } from "@material-ui/lab/Autocomplete";
+import { DefaultMenuSelectOption } from "czifui";
 import { isEqual } from "lodash";
 import React from "react";
 import { noop } from "src/common/constants/empty";
 import { StyledInfoOutlinedIcon, StyledTooltip } from "../../style";
 import {
   StyledContainer,
+  StyledDropdown,
   StyledExplainerTitle,
   StyledFilterGroup,
   StyledFilterGroupName,
@@ -19,6 +22,16 @@ interface Props {
   setSelectedLineages: (lineages: string[]) => void;
 }
 
+// We present a pseudo-option to the user to enable choosing "All" lineages,
+// but internally this means no lineages were chosen to filter down to.
+const ALL_LINEAGES_KEYWORD = "All";
+
+function makeDropdownOption(name: string): DefaultMenuSelectOption {
+  return { name: name };
+}
+// Generate only once because we need to reference same object throughout.
+const ALL_LINEAGES_CHOICE = makeDropdownOption(ALL_LINEAGES_KEYWORD);
+
 /**
  * `Dropdown` defaults to checking if option is selected (`value`) by equality.
  * However, because we dynamically generate our option objects as selection
@@ -32,20 +45,39 @@ const getOptionSelected = (
 ) => {
   return option.name === value.name;
 };
-// `Dropdown` doesn't directly do the check, it's done by its child MenuSelect
-const MenuSelectProps = {
-  getOptionSelected,
-};
+/**
+ * The lineages Dropdown has a couple special requirements for filtering when
+ * user searches with the Dropdown open.
+ * - "All" option must always be present and always comes first.
+ * - If we allow all of the possible options to match, the Dropdown slows to
+ *   a crawl because it's rendering 1000+ options at once. We could fix with
+ *   virtualizing, but we can also just limit to showing first 100 results.
+ */
+function filterLineageOptions(
+  options: DefaultMenuSelectOption[],
+  state: FilterOptionsState<DefaultMenuSelectOption>
+): DefaultMenuSelectOption[] {
+  // If nothing searched for yet, show no options other than "All"
+  if (state.inputValue.length === 0) {
+    return [ALL_LINEAGES_CHOICE];
+  }
 
-// We present a pseudo-option to the user to enable choosing "All" lineages,
-// but internally this means no lineages were chosen to filter down to.
-const ALL_LINEAGES_KEYWORD = "All";
-
-function makeDropdownOption(name: string): DefaultMenuSelectOption {
-  return { name: name };
+  // MUI has a nice set of defaults for its basic Autocomplete filter
+  const baseFilter = createFilterOptions<DefaultMenuSelectOption>();
+  const baseFilteredResults = baseFilter(options, state);
+  // We conditionally add the "All" choice if not already in results.
+  let addlPrependResults: DefaultMenuSelectOption[] = [];
+  if (!baseFilteredResults.includes(ALL_LINEAGES_CHOICE)) {
+    addlPrependResults = [ALL_LINEAGES_CHOICE];
+  }
+  // Cap the actual search results returned to keep render speed sane.
+  return [...addlPrependResults, ...baseFilteredResults.slice(0, 99)];
 }
-// Generate only once because we need to reference same object throughout.
-const ALL_LINEAGES_CHOICE = makeDropdownOption(ALL_LINEAGES_KEYWORD);
+// `Dropdown` doesn't directly handle above, it's done by its child MenuSelect
+const lineageMenuSelectProps = {
+  getOptionSelected,
+  filterOptions: filterLineageOptions,
+};
 
 // Label of lineages dropdown varies based on number lineages selected.
 function getLineageDropdownLabel(selectedLineages: string[]): string {
@@ -111,6 +143,12 @@ const SAMPLE_FILTERING_TOOLTIP_TEXT = (
     </StyledNewTabLink>
   </div>
 );
+
+// Styling for the InputDropdown child of general Dropdown component
+const InputDropdownProps = {
+  sdsStage: "userInput",
+  sdsStyle: "square",
+} as const;
 
 /**
  * Provides filtering of samples that are automatically added to trees.
@@ -242,14 +280,15 @@ export function SampleFiltering({
       <StyledFiltersSection>
         <StyledFilterGroup>
           <StyledFilterGroupName>Lineage</StyledFilterGroupName>
-          <Dropdown
+          <StyledDropdown
             label={lineageDropdownLabel}
             onChange={handleLineageDropdownChange}
             options={lineageDropdownOptions}
             value={lineageDropdownValue}
             multiple
             search
-            MenuSelectProps={MenuSelectProps}
+            MenuSelectProps={lineageMenuSelectProps}
+            InputDropdownProps={InputDropdownProps}
           />
         </StyledFilterGroup>
         <StyledFilterGroup>
