@@ -28,7 +28,7 @@ cd /usr/src/app/aspen/workflows/pangolin
 
 # call pangolin on the exported sequences
 lineage_report="lineage_report.csv"
-pangolin $sequences_output --outfile "$lineage_report"
+pangolin --threads 16 $sequences_output --outfile "$lineage_report"
 
 last_updated=$(date +'%m-%d-%Y')
 # save the pangolin results back to the db:
