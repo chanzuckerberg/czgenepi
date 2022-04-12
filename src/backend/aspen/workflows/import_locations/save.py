@@ -90,7 +90,7 @@ def save():
             session.execute(existing_country_level_loc_select).all()
         )
 
-        country_level_loc_select = sa.select(Location.region, Location.country).distinct()
+        country_level_loc_select = sa.select(GisaidMetadata.region, GisaidMetadata.country).distinct()
         country_level_locations = set(session.execute(country_level_loc_select).all())
 
         new_country_level_locations = country_level_locations - existing_country_level_locs
