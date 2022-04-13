@@ -177,7 +177,7 @@ const TREE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
   },
   name: TreeTableNameCell,
   startedDate: ({ value, header }): JSX.Element => {
-    const dateNoTime = value.split(" ")[0];
+    const dateNoTime = datetimeWithTzToLocalDate(value.split(" ")[0]);
     return (
       <TreeRowContent header={header}>
         <div data-test-id={`row-${header.key}`}>{dateNoTime}</div>

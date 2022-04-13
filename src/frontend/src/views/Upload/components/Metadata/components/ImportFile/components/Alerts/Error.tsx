@@ -1,7 +1,7 @@
 import React from "react";
 import { B } from "src/common/styles/basicStyle";
 import AlertAccordion from "src/components/AlertAccordion";
-import { ERROR_CODE } from "src/views/Upload/components/common/types";
+import { ERROR_CODE } from "src/components/WebformTable/common/types";
 import { maybePluralize } from "./common/pluralize";
 import { ProblemTable } from "./common/ProblemTable";
 import { Td, Th } from "./common/style";

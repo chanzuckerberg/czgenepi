@@ -4,16 +4,16 @@ import { DATE_REGEX } from "src/components/DateField/constants";
 import { SampleUploadTsvMetadata } from "src/components/DownloadMetadataTemplate/common/types";
 import { EXAMPLE_SAMPLE_IDS } from "src/components/DownloadMetadataTemplate/prepMetadataTemplate";
 import {
+  ERROR_CODE,
+  SampleIdToMetadata,
+  WARNING_CODE,
+} from "src/components/WebformTable/common/types";
+import {
   EMPTY_METADATA,
   FORBIDDEN_NAME_CHARACTERS_REGEX,
   HEADERS_TO_METADATA_KEYS,
   MAX_NAME_LENGTH,
 } from "../../../common/constants";
-import {
-  ERROR_CODE,
-  SampleIdToMetadata,
-  WARNING_CODE,
-} from "../../../common/types";
 
 /**
  * (Vince) Regarding interfaces for Warnings/Errors:

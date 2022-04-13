@@ -1,6 +1,7 @@
 import { Table as MuiTable, TableBody, TableRow } from "@material-ui/core";
 import React from "react";
-import { ERROR_CODE, ParseErrors } from "../../../common/types";
+import { ERROR_CODE } from "src/components/WebformTable/common/types";
+import { ParseErrors } from "../../../common/types";
 import {
   Overflow,
   StyledHeaderTableCell,

@@ -1,5 +1,5 @@
+import { Metadata } from "src/components/WebformTable/common/types";
 import { EMPTY_METADATA } from "./constants";
-import { Metadata } from "./types";
 
 /**
  * Initializes a new metadata object for a sample that user later fills in.

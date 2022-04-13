@@ -44,7 +44,17 @@ interface Sample extends BioinformaticsType {
   private?: boolean;
 }
 
-interface Tree extends BioinformaticsType {
+interface Tree {
+  name: string;
+  id: number;
+}
+
+/**
+ * A phylo run actually differs from a phylo tree.
+ * A run is generated any time we make an attempt to make a tree, but not all runs have trees
+ * associated with them (for example, while a run is in progress, or when a run has failed).
+ */
+interface PhyloRun extends BioinformaticsType {
   type: "Tree";
   id?: number;
   name: string;
@@ -63,17 +73,18 @@ interface Tree extends BioinformaticsType {
     name: string;
     id: number;
   };
+  phyloTree?: Tree;
 }
 
-type BioinformaticsData = Sample | Tree;
-type BioinformaticsDataArray = Array<Sample> | Array<Tree>;
+type BioinformaticsData = Sample | PhyloRun;
+type BioinformaticsDataArray = Array<Sample> | Array<PhyloRun>;
 
 interface SampleMap {
   [key: string]: Sample;
 }
 
-interface TreeMap {
-  [key: string]: Tree;
+interface PhyloRunMap {
+  [key: string]: PhyloRun;
 }
 
-type BioinformaticsMap = SampleMap | TreeMap;
+type BioinformaticsMap = SampleMap | PhyloRunMap;

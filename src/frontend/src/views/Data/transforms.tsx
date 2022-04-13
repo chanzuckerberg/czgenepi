@@ -1,13 +1,16 @@
 import ENV from "src/common/constants/ENV";
+import type { TreeType } from "src/common/constants/types";
 
 const { API_URL } = ENV;
 
-export const TREE_TRANSFORMS: Transform[] = [
+//* (mlila): below, we want to use the tree id to generate the urls in question.
+//* Links can only be generated for workflows with a tree
+export const PHYLO_RUN_TRANSFORMS: Transform[] = [
   {
-    inputs: ["id"],
+    inputs: ["phyloTree"],
     key: "downloadLinkIdStylePrivateIdentifiers",
-    method: (inputs: number[]): string | undefined => {
-      const id = inputs[0];
+    method: (inputs: Tree[]): string | undefined => {
+      const id = inputs[0]?.id;
       if (typeof id !== "number") {
         return undefined;
       }
@@ -15,10 +18,10 @@ export const TREE_TRANSFORMS: Transform[] = [
     },
   },
   {
-    inputs: ["id"],
+    inputs: ["phyloTree"],
     key: "downloadLinkIdStylePublicIdentifiers",
-    method: (inputs: number[]): string | undefined => {
-      const id = inputs[0];
+    method: (inputs: Tree[]): string | undefined => {
+      const id = inputs[0]?.id;
       if (typeof id !== "number") {
         return undefined;
       }
@@ -26,10 +29,10 @@ export const TREE_TRANSFORMS: Transform[] = [
     },
   },
   {
-    inputs: ["id"],
+    inputs: ["phyloTree"],
     key: "accessionsLink",
-    method: (inputs: number[]): string | undefined => {
-      const id = inputs[0];
+    method: (inputs: Tree[]): string | undefined => {
+      const id = inputs[0]?.id;
       if (typeof id !== "number") {
         return undefined;
       }
@@ -39,7 +42,7 @@ export const TREE_TRANSFORMS: Transform[] = [
   {
     inputs: ["treeType"],
     key: "treeType",
-    method: (inputs: string[]): string | undefined => {
+    method: (inputs: TreeType[]): string | undefined => {
       const tree_type = inputs[0];
       if (
         typeof tree_type !== "string" ||

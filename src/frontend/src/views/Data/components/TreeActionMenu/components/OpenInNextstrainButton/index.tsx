@@ -6,13 +6,14 @@ import NextstrainConfirmationModal from "../../../NextstrainConfirmationModal";
 import { StyledIcon } from "../../style";
 
 interface Props {
-  item: TableItem;
+  item: PhyloRun;
 }
 
 const OpenInNextstrainButton = ({ item }: Props): JSX.Element => {
   const [open, setOpen] = useState(false);
-  const { id, status } = item;
-  const isDisabled = status !== TREE_STATUS.Completed;
+  const { status, phyloTree } = item;
+  const treeId = phyloTree?.id;
+  const isDisabled = status !== TREE_STATUS.Completed || !treeId;
 
   const handleClickOpen = () => {
     if (!isDisabled) setOpen(true);
@@ -38,11 +39,13 @@ const OpenInNextstrainButton = ({ item }: Props): JSX.Element => {
           <OpenInNewIcon />
         </StyledIcon>
       </Tooltip>
-      <NextstrainConfirmationModal
-        open={open}
-        onClose={handleClose}
-        treeId={id as number}
-      />
+      {treeId && (
+        <NextstrainConfirmationModal
+          open={open}
+          onClose={handleClose}
+          treeId={treeId as number}
+        />
+      )}
     </>
   );
 };
