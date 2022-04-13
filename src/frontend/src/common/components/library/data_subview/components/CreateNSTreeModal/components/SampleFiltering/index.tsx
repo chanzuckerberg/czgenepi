@@ -229,17 +229,22 @@ export function SampleFiltering({
 
     // When beginning selection process, had nothing selected / "All" selected
     if (selectedLineages.length === 0) {
-      // Only value "chosen" was All or nothing at all, so this is a no-op
-      if (
-        isEqual(newSelectedLineages, [ALL_LINEAGES_KEYWORD]) ||
-        newSelectedLineages.length === 0
-      ) {
+      // Only value "chosen" was All so this is a no-op
+      if (isEqual(newSelectedLineages, [ALL_LINEAGES_KEYWORD])) {
         return; // short-circuit to avoid infinite render loop
       }
-      // Made a meaningful choice, so need to drop "All"
-      emittedSelection = newSelectedLineages.filter(
-        (lineage) => lineage !== ALL_LINEAGES_KEYWORD
-      );
+      if (newSelectedLineages.length === 0) {
+        // Mild HACK -- this means no choices, so effectively "All". Would
+        // want a no-op, BUT if we do nothing the internal Dropdown state
+        // drifts and "All" is visually deselected. So we emit a selection
+        // to force refresh the internal state and keep visuals good.
+        emittedSelection = [];
+      } else {
+        // Made a meaningful choice, so need to drop "All"
+        emittedSelection = newSelectedLineages.filter(
+          (lineage) => lineage !== ALL_LINEAGES_KEYWORD
+        );
+      }
     } else {
       // When beginning selection process, had actual lineages chosen
       // Opened and closed dropdown, but didn't change selection, so a no-op

@@ -70,8 +70,16 @@ export const StyledInputDropdown = styled(InputDropdown)`
 
 const DROPDOWN_WIDTH = "200px";
 
+// High specificity label styling is to beat out czifui coloring.
+// Might be possible to do by passing a `styled` InputDropdownComponent
+// to Dropdown, but might also not be. I think the czifui coloring we are
+// trying to beat here might be a bug though, so I think this is the better
+// way for now. I (Vince) will write up an issue April 14, 2022.
 export const StyledDropdown = styled(Dropdown)`
   width: ${DROPDOWN_WIDTH};
+  .MuiButton-label > span {
+    color: black;
+  }
 ` as typeof Dropdown; // assert b/c `styled` causes an interface hiccup;
 
 // DropdownPopper (for use with Dropdown's PopperComponent prop) needs to
