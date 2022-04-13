@@ -6,14 +6,12 @@ import {
   DATE_ERROR_MESSAGE,
   DATE_REGEX,
 } from "src/components/DateField/constants";
+import { Metadata } from "src/components/WebformTable/common/types";
 import {
   MAX_NAME_LENGTH,
   VALID_NAME_REGEX,
 } from "src/views/Upload/components/common/constants";
-import {
-  Metadata,
-  NamedGisaidLocation,
-} from "src/views/Upload/components/common/types";
+import { NamedGisaidLocation } from "src/views/Upload/components/common/types";
 import * as yup from "yup";
 import FreeTextField from "./components/FreeTextField";
 import LocationField from "./components/LocationField";
@@ -54,13 +52,15 @@ const validationSchema = yup.object({
 interface Props {
   id: string;
   metadata: Metadata;
-  hasImportedMetadataFile: boolean;
+  // TODO (phoenix): once sample edit has import option remove this as optional
+  hasImportedMetadataFile?: boolean;
   handleMetadata: (id: string, sampleMetadata: Metadata) => void;
   applyToAllColumn: (fieldKey: keyof Metadata, value: unknown) => void;
   isFirstRow: boolean;
   handleRowValidation: (id: string, isValid: boolean) => void;
   warnings?: Set<keyof Metadata>;
   locations: NamedGisaidLocation[];
+  shouldSkipIdColumn?: boolean;
 }
 
 export default React.memo(function Row({
@@ -73,6 +73,7 @@ export default React.memo(function Row({
   handleRowValidation,
   warnings = new Set(),
   locations,
+  shouldSkipIdColumn,
 }: Props): JSX.Element {
   /**
    * Below preps the metadata values form should initialize to.
@@ -85,8 +86,9 @@ export default React.memo(function Row({
    * In both cases above, we initialize the form to start its values based on
    * the upstream `metadata` **when the component mounts**. This handles both
    * cases because for (1), the upstream metadata will start off empty because
-   * nothing has been entered yet, while for (2) it will start off as the info
-   * that's been entered so far since we are navigating back to Metadata and
+   * nothing has been entered yet (in the case of sample upload), while for (2)
+   * it will start off as the info that's been entered so far since we are
+   * navigating back so far since we are navigating back to Metadata and
    * this component must re-mount and thus re-fetch metadata entered so far.
    *
    * We do it this way because if we instead rely on `enableReinitialize: true`
@@ -167,9 +169,11 @@ export default React.memo(function Row({
 
   return (
     <StyledTableRow component="div">
-      <StyledTableCell component="div">
-        <Id>{id}</Id>
-      </StyledTableCell>
+      {!shouldSkipIdColumn && (
+        <StyledTableCell component="div">
+          <Id>{id}</Id>
+        </StyledTableCell>
+      )}
       <StyledTableCell component="div">
         <FreeTextField formik={formik} fieldKey="privateId" />
       </StyledTableCell>

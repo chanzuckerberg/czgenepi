@@ -10,9 +10,9 @@ import {
 import FilePicker from "src/components/FilePicker";
 import {
   ERROR_CODE,
-  Props as CommonProps,
   WARNING_CODE,
-} from "src/views/Upload/components/common/types";
+} from "src/components/WebformTable/common/types";
+import { Props as CommonProps } from "src/views/Upload/components/common/types";
 import Error from "./components/Alerts/Error";
 import Success from "./components/Alerts/Success";
 import {
