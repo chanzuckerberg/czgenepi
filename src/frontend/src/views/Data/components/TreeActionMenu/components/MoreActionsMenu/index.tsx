@@ -8,9 +8,9 @@ import { StyledIcon, StyledIconWrapper } from "../../style";
 import { StyledText } from "./style";
 
 interface Props {
-  item: Tree;
-  onDeleteTreeModalOpen(t: Tree): void;
-  onEditTreeModalOpen(t: Tree): void;
+  item: PhyloRun;
+  onDeleteTreeModalOpen(t: PhyloRun): void;
+  onEditTreeModalOpen(t: PhyloRun): void;
   userInfo: UserResponse;
 }
 
@@ -29,7 +29,7 @@ const MoreActionsMenu = ({
   const isTreeInUserOrg = userGroup?.name === group?.name;
   const canUserDeleteTree = isAutoBuild || isTreeInUserOrg;
   // FIXME: allow users to edit/delete FAILED runs once phylotrees V2 endpoint has been updated to better reflect tree status
-  const isDisabled = status !== TREE_STATUS.Completed || !canUserDeleteTree;
+  const isDisabled = status === TREE_STATUS.Started || !canUserDeleteTree;
 
   let tooltipText = "More Actions";
 

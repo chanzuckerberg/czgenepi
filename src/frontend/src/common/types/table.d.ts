@@ -28,8 +28,8 @@ interface CustomTableRenderProps {
   item: TableItem;
   index: number;
   userInfo?: UserResponse;
-  onDeleteTreeModalOpen(t: Tree): void;
-  onEditTreeModalOpen(t: Tree): void;
+  onDeleteTreeModalOpen(t: PhyloRun): void;
+  onEditTreeModalOpen(t: PhyloRun): void;
 }
 
 type CustomRenderer = ({

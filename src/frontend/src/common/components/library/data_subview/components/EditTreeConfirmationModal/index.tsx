@@ -9,13 +9,13 @@ import { StyledDiv, StyledIconButton, StyledTitle } from "./style";
 interface Props {
   onClose(): void;
   open: boolean;
-  tree?: Tree;
+  phyloRun?: PhyloRun;
 }
 
 export const EditTreeConfirmationModal = ({
   onClose,
   open,
-  tree,
+  phyloRun,
 }: Props): JSX.Element | null => {
   const [shouldShowErrorNotification, setShouldShowErrorNotification] =
     useState<boolean>(false);
@@ -28,9 +28,10 @@ export const EditTreeConfirmationModal = ({
 
   useEffect(() => {
     // this makes sure that the newTreeName defaults to the current tree name,
-    //  and that the newTreeName state variable resets when we edit a new tree
-    if (tree && tree.name) {
-      setNewTreeName(tree.name);
+    // and that the newTreeName state variable resets when we edit a new tree
+    const name = phyloRun?.name;
+    if (name) {
+      setNewTreeName(name);
     }
 
     // when we have a new tree name that also means that we should reset
@@ -38,7 +39,7 @@ export const EditTreeConfirmationModal = ({
     setShouldShowSuccessNotification(false);
     setShouldShowErrorNotification(false);
   }, [
-    tree,
+    phyloRun,
     setNewTreeName,
     setShouldShowSuccessNotification,
     setShouldShowErrorNotification,
@@ -57,13 +58,15 @@ export const EditTreeConfirmationModal = ({
     onClose();
   };
 
-  if (!tree) return null;
+  if (!phyloRun) return null;
 
-  const { workflowId } = tree;
+  const { id } = phyloRun;
 
   const onEdit = () => {
+    if (!id) return;
+
     editTreeMutation.mutate({
-      treeIdToEdit: workflowId,
+      treeIdToEdit: id,
       newTreeName: newTreeName,
     });
     onClose();
