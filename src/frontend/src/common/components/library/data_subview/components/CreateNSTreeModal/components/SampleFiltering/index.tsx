@@ -8,6 +8,7 @@ import { StyledInfoOutlinedIcon, StyledTooltip } from "../../style";
 import {
   StyledContainer,
   StyledDropdown,
+  StyledDropdownPopper,
   StyledExplainerTitle,
   StyledFilterGroup,
   StyledFilterGroupName,
@@ -57,12 +58,7 @@ function filterLineageOptions(
   options: DefaultMenuSelectOption[],
   state: FilterOptionsState<DefaultMenuSelectOption>
 ): DefaultMenuSelectOption[] {
-  // If nothing searched for yet, show no options other than "All"
-  if (state.inputValue.length === 0) {
-    return [ALL_LINEAGES_CHOICE];
-  }
-
-  // MUI has a nice set of defaults for its basic Autocomplete filter
+  // MUI has a nice set of defaults for its Autocomplete filter, we use those
   const baseFilter = createFilterOptions<DefaultMenuSelectOption>();
   const baseFilteredResults = baseFilter(options, state);
   // We conditionally add the "All" choice if not already in results.
@@ -289,6 +285,7 @@ export function SampleFiltering({
             search
             MenuSelectProps={lineageMenuSelectProps}
             InputDropdownProps={InputDropdownProps}
+            PopperComponent={StyledDropdownPopper}
           />
         </StyledFilterGroup>
         <StyledFilterGroup>
