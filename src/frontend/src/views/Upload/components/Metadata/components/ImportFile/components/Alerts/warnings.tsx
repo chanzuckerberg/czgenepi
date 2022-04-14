@@ -114,7 +114,9 @@ export function WarningAbsentSample({
   return (
     <AlertAccordion
       title={title}
-      collapseContent={<MessageAbsentSample absentSampleIds={absentSampleIds} />}
+      collapseContent={
+        <MessageAbsentSample absentSampleIds={absentSampleIds} />
+      }
       intent={WARNING_SEVERITY}
     />
   );

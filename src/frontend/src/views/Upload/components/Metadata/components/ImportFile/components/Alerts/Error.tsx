@@ -19,6 +19,7 @@ const ERROR_CODE_TO_MESSAGE: Record<
   [ERROR_CODE.MISSING_FIELD]: MissingFieldMessage,
   [ERROR_CODE.OVER_MAX_SAMPLES]: "placeholder",
   [ERROR_CODE.DEFAULT]: DefaultMessage,
+  [ERROR_CODE.DUPLICATE_IDS]: "placeholder",
 };
 
 export default function Error({
@@ -38,6 +39,7 @@ export default function Error({
     [ERROR_CODE.OVER_MAX_SAMPLES]: "placeholder",
     [ERROR_CODE.DEFAULT]:
       "Something went wrong, please try again or contact us!",
+    [ERROR_CODE.DUPLICATE_IDS]: "placeholder",
   };
 
   const title = errorCodeToTitle[errorCode];
