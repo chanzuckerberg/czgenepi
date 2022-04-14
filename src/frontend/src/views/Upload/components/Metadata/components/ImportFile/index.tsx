@@ -159,52 +159,36 @@ export default function ImportFile({
         />
       </div>
 
-      <RenderOrNull
-        condition={
-          hasImportedFile &&
-          !getIsParseResultCompletelyUnused(extraneousSampleIds, parseResult)
-        }
-      >
-        <Success filename={filename} />
-      </RenderOrNull>
+      {hasImportedFile &&
+        !getIsParseResultCompletelyUnused(extraneousSampleIds, parseResult) && (
+          <Success filename={filename} />
+        )}
 
-      <RenderOrNull condition={missingFields}>
+      {missingFields && (
         <Error errorCode={ERROR_CODE.MISSING_FIELD} names={missingFields} />
-      </RenderOrNull>
+      )}
 
-      <RenderOrNull condition={autocorrectCount}>
+      {autocorrectCount && (
         <WarningAutoCorrect autocorrectedSamplesCount={autocorrectCount} />
-      </RenderOrNull>
+      )}
 
-      <RenderOrNull condition={extraneousSampleIds.length}>
+      {extraneousSampleIds.length && (
         <WarningExtraneousEntry extraneousSampleIds={extraneousSampleIds} />
-      </RenderOrNull>
+      )}
 
-      <RenderOrNull condition={absentSampleIds.length}>
+      {absentSampleIds.length && (
         <WarningAbsentSample absentSampleIds={absentSampleIds} />
-      </RenderOrNull>
+      )}
 
-      <RenderOrNull condition={!isEmpty(missingData)}>
+      {!isEmpty(missingData) && (
         <WarningMissingData missingData={missingData} />
-      </RenderOrNull>
+      )}
 
-      <RenderOrNull condition={!isEmpty(badFormatData)}>
+      {!isEmpty(badFormatData) && (
         <WarningBadFormatData badFormatData={badFormatData} />
-      </RenderOrNull>
+      )}
     </Wrapper>
   );
-}
-
-function RenderOrNull({
-  condition,
-  children,
-}: {
-  condition: unknown;
-  children: React.ReactNode;
-}): JSX.Element | null {
-  if (!condition) return null;
-
-  return <>{children}</>;
 }
 
 function getIsParseResultCompletelyUnused(
