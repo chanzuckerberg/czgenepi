@@ -46,8 +46,8 @@ export default function Error({
   return (
     <AlertAccordion
       title={title}
-      message={<Message names={names} />}
-      severity="error"
+      collapseContent={<Message names={names} />}
+      intent="error"
     />
   );
 }

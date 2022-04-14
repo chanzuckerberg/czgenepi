@@ -8,7 +8,6 @@ import {
 } from "src/components/DownloadMetadataTemplate/common/constants";
 import { SampleIdToWarningMessages } from "../../parseFile";
 import { ProblemTable } from "./common/ProblemTable";
-import { FullWidthAlertAccordion } from "./common/style";
 
 const WARNING_SEVERITY = "warning";
 
@@ -37,8 +36,8 @@ export function WarningAutoCorrect({
   return (
     <AlertAccordion
       title={title}
-      message={message}
-      severity={WARNING_SEVERITY}
+      collapseContent={message}
+      intent={WARNING_SEVERITY}
     />
   );
 }
@@ -73,12 +72,12 @@ export function WarningExtraneousEntry({
     count
   )} in metadata file ${pluralize("was", count)} not used.`;
   return (
-    <FullWidthAlertAccordion
+    <AlertAccordion
       title={title}
-      message={
+      collapseContent={
         <MessageExtraneousEntry extraneousSampleIds={extraneousSampleIds} />
       }
-      severity={WARNING_SEVERITY}
+      intent={WARNING_SEVERITY}
     />
   );
 }
@@ -113,10 +112,10 @@ export function WarningAbsentSample({
     count
   )} not found in metadata file.`;
   return (
-    <FullWidthAlertAccordion
+    <AlertAccordion
       title={title}
-      message={<MessageAbsentSample absentSampleIds={absentSampleIds} />}
-      severity={WARNING_SEVERITY}
+      collapseContent={<MessageAbsentSample absentSampleIds={absentSampleIds} />}
+      intent={WARNING_SEVERITY}
     />
   );
 }
@@ -162,10 +161,10 @@ export function WarningMissingData({
     count
   )} missing data in required fields.`;
   return (
-    <FullWidthAlertAccordion
+    <AlertAccordion
       title={title}
-      message={<MessageMissingData missingData={missingData} />}
-      severity={WARNING_SEVERITY}
+      collapseContent={<MessageMissingData missingData={missingData} />}
+      intent={WARNING_SEVERITY}
     />
   );
 }
@@ -230,10 +229,10 @@ export function WarningBadFormatData({
     "Some of your data is not formatted correctly. " +
     "Please update before proceeding.";
   return (
-    <FullWidthAlertAccordion
+    <AlertAccordion
       title={title}
-      message={<MessageBadFormatData badFormatData={badFormatData} />}
-      severity={WARNING_SEVERITY}
+      collapseContent={<MessageBadFormatData badFormatData={badFormatData} />}
+      intent={WARNING_SEVERITY}
     />
   );
 }

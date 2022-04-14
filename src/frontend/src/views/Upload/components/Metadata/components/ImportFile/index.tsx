@@ -168,15 +168,15 @@ export default function ImportFile({
         <Error errorCode={ERROR_CODE.MISSING_FIELD} names={missingFields} />
       )}
 
-      {autocorrectCount && (
+      {autocorrectCount > 0 && (
         <WarningAutoCorrect autocorrectedSamplesCount={autocorrectCount} />
       )}
 
-      {extraneousSampleIds.length && (
+      {extraneousSampleIds.length > 0 && (
         <WarningExtraneousEntry extraneousSampleIds={extraneousSampleIds} />
       )}
 
-      {absentSampleIds.length && (
+      {absentSampleIds.length > 0 && (
         <WarningAbsentSample absentSampleIds={absentSampleIds} />
       )}
 
