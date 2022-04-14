@@ -24,7 +24,7 @@ interface PropsAutoCorrect {
 }
 export function WarningAutoCorrect({
   autocorrectedSamplesCount,
-}: PropsAutoCorrect) {
+}: PropsAutoCorrect): JSX.Element {
   // "X samples were updated."
   const title = `${autocorrectedSamplesCount} ${pluralize(
     "Sample",
@@ -103,7 +103,9 @@ function MessageAbsentSample({ absentSampleIds }: PropsAbsentSample) {
     />
   );
 }
-export function WarningAbsentSample({ absentSampleIds }: PropsAbsentSample) {
+export function WarningAbsentSample({
+  absentSampleIds,
+}: PropsAbsentSample): JSX.Element {
   const count = absentSampleIds.length;
   // "X Samples were not found in metadata file."
   const title = `${count} ${pluralize("Sample", count)} ${pluralize(
@@ -221,7 +223,9 @@ function MessageBadFormatData({ badFormatData }: PropsBadFormatData) {
     />
   );
 }
-export function WarningBadFormatData({ badFormatData }: PropsBadFormatData) {
+export function WarningBadFormatData({
+  badFormatData,
+}: PropsBadFormatData): JSX.Element {
   const title =
     "Some of your data is not formatted correctly. " +
     "Please update before proceeding.";
