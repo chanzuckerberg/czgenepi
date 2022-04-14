@@ -1,7 +1,7 @@
 locals {
   nextstrain_sfn_memory = 64000
   nextstrain_sfn_vcpus = 10
-  nextstrain_cron_schedule = local.deployment_stage == "geprod" ? ["cron(0 11 ? * MON-SAT *)"] : []
+  nextstrain_cron_schedule = local.deployment_stage == "geprod" ? ["cron(0 3 ? * MON-SAT *)"] : []
   default_template_args = jsonencode({"filter_start_date": "12 weeks ago", "filter_end_date": "now"})
 }
 
@@ -19,7 +19,7 @@ module nextstrain_marin_contextual_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = local.swipe_sfn_arn
-  schedule_expressions  = contains(["geprod", "gestaging"], local.deployment_stage) ? ["cron(0 11 ? * MON-SAT *)"] : []
+  schedule_expressions  = contains(["geprod", "gestaging"], local.deployment_stage) ? ["cron(0 3 ? * MON-SAT *)"] : []
   event_role_arn        = local.event_role_arn
   extra_args            =  {
     genepi_config_secret_name = "${local.deployment_stage}/genepi-config"
