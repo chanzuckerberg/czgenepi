@@ -1,12 +1,12 @@
 import React from "react";
 import { B } from "src/common/styles/basicStyle";
+import { pluralize } from "src/common/utils/strUtils";
 import AlertAccordion from "src/components/AlertAccordion";
 import {
   OPTIONAL_HEADER_MARKER,
   SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS,
 } from "src/components/DownloadMetadataTemplate/common/constants";
 import { SampleIdToWarningMessages } from "../../parseFile";
-import { maybePluralize } from "./common/pluralize";
 import { ProblemTable } from "./common/ProblemTable";
 import { FullWidthAlertAccordion } from "./common/style";
 
@@ -26,10 +26,10 @@ export function WarningAutoCorrect({
   autocorrectedSamplesCount,
 }: PropsAutoCorrect) {
   // "X samples were updated."
-  const title = `${autocorrectedSamplesCount} ${maybePluralize(
+  const title = `${autocorrectedSamplesCount} ${pluralize(
     "Sample",
     autocorrectedSamplesCount
-  )} ${maybePluralize("was", autocorrectedSamplesCount)} updated.`;
+  )} ${pluralize("was", autocorrectedSamplesCount)} updated.`;
   const message =
     "We encountered contradictory data in your upload that we have " +
     "automatically resolved. Please review the alerts below and correct " +
@@ -65,13 +65,13 @@ function MessageExtraneousEntry({ extraneousSampleIds }: PropsExtraneousEntry) {
 }
 export function WarningExtraneousEntry({
   extraneousSampleIds,
-}: PropsExtraneousEntry) {
+}: PropsExtraneousEntry): JSX.Element {
   const count = extraneousSampleIds.length;
   // "X Samples in metadata file were not used."
-  const title = `${count} ${maybePluralize(
+  const title = `${count} ${pluralize(
     "Sample",
     count
-  )} in metadata file ${maybePluralize("was", count)} not used.`;
+  )} in metadata file ${pluralize("was", count)} not used.`;
   return (
     <FullWidthAlertAccordion
       title={title}
@@ -106,7 +106,7 @@ function MessageAbsentSample({ absentSampleIds }: PropsAbsentSample) {
 export function WarningAbsentSample({ absentSampleIds }: PropsAbsentSample) {
   const count = absentSampleIds.length;
   // "X Samples were not found in metadata file."
-  const title = `${count} ${maybePluralize("Sample", count)} ${maybePluralize(
+  const title = `${count} ${pluralize("Sample", count)} ${pluralize(
     "was",
     count
   )} not found in metadata file.`;
@@ -150,10 +150,12 @@ function MessageMissingData({ missingData }: PropsMissingData) {
     />
   );
 }
-export function WarningMissingData({ missingData }: PropsMissingData) {
+export function WarningMissingData({
+  missingData,
+}: PropsMissingData): JSX.Element {
   const count = Object.keys(missingData).length;
   // "X Samples were missing data in required fields."
-  const title = `${count} ${maybePluralize("Sample", count)} ${maybePluralize(
+  const title = `${count} ${pluralize("Sample", count)} ${pluralize(
     "was",
     count
   )} missing data in required fields.`;

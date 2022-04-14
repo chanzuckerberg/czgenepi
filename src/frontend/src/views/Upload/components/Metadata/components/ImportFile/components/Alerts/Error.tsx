@@ -1,8 +1,8 @@
 import React from "react";
 import { B } from "src/common/styles/basicStyle";
+import { pluralize } from "src/common/utils/strUtils";
 import AlertAccordion from "src/components/AlertAccordion";
 import { ERROR_CODE } from "src/components/WebformTable/common/types";
-import { maybePluralize } from "./common/pluralize";
 import { ProblemTable } from "./common/ProblemTable";
 import { Td, Th } from "./common/style";
 
@@ -30,7 +30,7 @@ export default function Error({
   const count = names.length;
 
   const errorCodeToTitle = {
-    [ERROR_CODE.INVALID_NAME]: `Please double check the following ${maybePluralize(
+    [ERROR_CODE.INVALID_NAME]: `Please double check the following ${pluralize(
       "sample",
       count
     )} to correct any errors before proceeding:`,
