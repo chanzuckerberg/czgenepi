@@ -11,6 +11,7 @@ import {
   SmallText,
   StyledIconCheckSmall,
   StyledIconXSmall,
+  StyledList,
   StyledListItem,
   StyledListItemIcon,
 } from "./style";
@@ -35,10 +36,11 @@ export const RadioLabelOverview = ({ selected }: Props): JSX.Element => {
         Includes samples from both within and outside of your jurisdiction, at a
         ratio of roughly 2:1.
       </SmallText>
-      {selected && (
+      {/* TODO (mlila): remove these when isSampleFilteringEnabled turned on */}
+      {selected && !isSampleFilteringEnabled && (
         <>
-          <List>
-            <StyledListItem button={false as any}>
+          <ul>
+            <StyledListItem>
               <StyledListItemIcon>
                 <StyledIconCheckSmall />
               </StyledListItemIcon>
@@ -51,7 +53,7 @@ export const RadioLabelOverview = ({ selected }: Props): JSX.Element => {
                 </SmallText>
               </ListItemText>
             </StyledListItem>
-            <StyledListItem button={false as any}>
+            <StyledListItem>
               <StyledListItemIcon>
                 <StyledIconCheckSmall />
               </StyledListItemIcon>
@@ -61,7 +63,7 @@ export const RadioLabelOverview = ({ selected }: Props): JSX.Element => {
                 </SmallText>
               </ListItemText>
             </StyledListItem>
-            <StyledListItem button={false as any}>
+            <StyledListItem>
               <StyledListItemIcon>
                 <StyledIconCheckSmall />
               </StyledListItemIcon>
@@ -73,7 +75,46 @@ export const RadioLabelOverview = ({ selected }: Props): JSX.Element => {
                 </SmallText>
               </ListItemText>
             </StyledListItem>
-          </List>
+          </ul>
+        </>
+      )}
+      {selected && isSampleFilteringEnabled && (
+        <>
+          <StyledList>
+            <StyledListItem>
+              <StyledListItemIcon>
+                <StyledIconCheckSmall />
+              </StyledListItemIcon>
+              <ListItemText>
+                <SmallText>
+                  Best for generating a summary tree of samples from your
+                  jurisdiction, in the context of genetically similar GISAID
+                  samples from outside of your jurisdiction.
+                </SmallText>
+              </ListItemText>
+            </StyledListItem>
+            <StyledListItem>
+              <StyledListItemIcon>
+                <StyledIconCheckSmall />
+              </StyledListItemIcon>
+              <ListItemText>
+                <SmallText>
+                  Good for identifying possible local outbreaks.
+                </SmallText>
+              </ListItemText>
+            </StyledListItem>
+            <StyledListItem>
+              <StyledListItemIcon>
+                <StyledIconCheckSmall />
+              </StyledListItemIcon>
+              <ListItemText>
+                <SmallText>
+                  Good for specifying lineage or collection date range to
+                  customize samples from your jurisdiction.
+                </SmallText>
+              </ListItemText>
+            </StyledListItem>
+          </StyledList>
           {isSampleFilteringEnabled && <SampleFiltering />}
         </>
       )}
@@ -93,7 +134,7 @@ export const RadioLabelTargeted = ({ selected }: Props): JSX.Element => {
       </SmallText>
       {selected && (
         <List>
-          <StyledListItem button={false as any}>
+          <StyledListItem>
             <StyledListItemIcon>
               <StyledIconCheckSmall />
             </StyledListItemIcon>
@@ -103,7 +144,7 @@ export const RadioLabelTargeted = ({ selected }: Props): JSX.Element => {
               </SmallText>
             </ListItemText>
           </StyledListItem>
-          <StyledListItem button={false as any}>
+          <StyledListItem>
             <StyledListItemIcon>
               <StyledIconCheckSmall />
             </StyledListItemIcon>
@@ -142,7 +183,7 @@ export const RadioLabelNonContextualized = ({
       {selected && (
         <>
           <List>
-            <StyledListItem button={false as any}>
+            <StyledListItem>
               <StyledListItemIcon>
                 <StyledIconCheckSmall />
               </StyledListItemIcon>
@@ -152,7 +193,7 @@ export const RadioLabelNonContextualized = ({
                 </SmallText>
               </ListItemText>
             </StyledListItem>
-            <StyledListItem button={false as any}>
+            <StyledListItem>
               <StyledListItemIcon>
                 <StyledIconCheckSmall />
               </StyledListItemIcon>
@@ -163,7 +204,7 @@ export const RadioLabelNonContextualized = ({
                 </SmallText>
               </ListItemText>
             </StyledListItem>
-            <StyledListItem button={false as any}>
+            <StyledListItem>
               <StyledListItemIcon>
                 <StyledIconXSmall />
               </StyledListItemIcon>
