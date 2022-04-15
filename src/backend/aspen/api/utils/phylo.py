@@ -12,6 +12,25 @@ from aspen.api.error import http_exceptions as ex
 from aspen.api.utils import authz_phylo_tree_filters
 from aspen.database.models import DataType, PhyloRun, PhyloTree, Sample, User
 
+NEXTSTRAIN_COLOR_SCALE = [
+    "#571EA2",
+    "#4334BF",
+    "#3F55CE",
+    "#4376CD",
+    "#4C91C0",
+    "#59A4A9",
+    "#6AB18F",
+    "#7FB975",
+    "#97BD5F",
+    "#AFBD4F",
+    "#C7B944",
+    "#D9AD3D",
+    "#E49838",
+    "#E67932",
+    "#E1512A",
+    "#DB2823",
+]
+
 
 def _rename_nodes_on_tree(
     node: dict,
@@ -58,6 +77,54 @@ def _sample_filter(sample: Sample, can_see_pi_group_ids: Set[int], system_admin:
     if system_admin:
         return True
     return sample.submitting_group_id in can_see_pi_group_ids
+
+
+# set which countries will be given color labels in the nextstrain viewer
+def _set_countries(tree_json: dict, phylo_run: PhyloRun):
+    # information stored in tree_json["meta"]["colorings"], which is an
+    # array of objects. we grab the index of the one for "country"
+    country_defines_index = None
+    for index, category in enumerate(tree_json["meta"]["colorings"]):
+        if category["key"] == "country":
+            country_defines_index = index
+
+    # Next we grab the tree's country and the nearest 15 countries
+    tree_location = phylo_run.group.default_tree_location
+    # this is where the geolocation query would go, until then hardcode it
+    # assuming United States (USA)
+    countries = [
+        tree_location.country,
+        "Canada",
+        "Mexico",
+        "Cuba",
+        "Guatemala",
+        "Belize",
+        "Honduras",
+        "El Salvador",
+        "Haiti",
+        "Dominican Republic",
+        "Jamaica",
+        "Bahamas",
+        "Bermuda",
+        "Nicaragua",
+        "Costa Rica",
+        "Panama",
+    ]
+    colorings_entry = zip(countries, NEXTSTRAIN_COLOR_SCALE)
+
+    if country_defines_index:
+        tree_json["meta"]["colorings"][country_defines_index]["scale"] = colorings_entry
+    else:
+        tree_json["meta"]["colorings"].push(
+            {
+                "key": "country",
+                "title": "Country",
+                "type": "categorical",
+                "scale": colorings_entry,
+            }
+        )
+
+    return tree_json
 
 
 async def process_phylo_tree(
@@ -123,6 +190,9 @@ async def process_phylo_tree(
     json_data["tree"] = _rename_nodes_on_tree(
         json_data["tree"], identifier_map, "GISAID_ID"
     )
+
+    # set country labeling/colors
+    json_data = _set_countries(json_data, phylo_run)
 
     return json_data
 
