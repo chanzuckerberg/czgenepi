@@ -1,14 +1,13 @@
 import React from "react";
 import { B } from "src/common/styles/basicStyle";
+import { pluralize } from "src/common/utils/strUtils";
 import AlertAccordion from "src/components/AlertAccordion";
 import {
   OPTIONAL_HEADER_MARKER,
   SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS,
 } from "src/components/DownloadMetadataTemplate/common/constants";
 import { SampleIdToWarningMessages } from "../../parseFile";
-import { maybePluralize } from "./common/pluralize";
 import { ProblemTable } from "./common/ProblemTable";
-import { FullWidthAlertAccordion } from "./common/style";
 
 const WARNING_SEVERITY = "warning";
 
@@ -24,12 +23,12 @@ interface PropsAutoCorrect {
 }
 export function WarningAutoCorrect({
   autocorrectedSamplesCount,
-}: PropsAutoCorrect) {
+}: PropsAutoCorrect): JSX.Element {
   // "X samples were updated."
-  const title = `${autocorrectedSamplesCount} ${maybePluralize(
+  const title = `${autocorrectedSamplesCount} ${pluralize(
     "Sample",
     autocorrectedSamplesCount
-  )} ${maybePluralize("was", autocorrectedSamplesCount)} updated.`;
+  )} ${pluralize("was", autocorrectedSamplesCount)} updated.`;
   const message =
     "We encountered contradictory data in your upload that we have " +
     "automatically resolved. Please review the alerts below and correct " +
@@ -37,8 +36,8 @@ export function WarningAutoCorrect({
   return (
     <AlertAccordion
       title={title}
-      message={message}
-      severity={WARNING_SEVERITY}
+      collapseContent={message}
+      intent={WARNING_SEVERITY}
     />
   );
 }
@@ -65,20 +64,20 @@ function MessageExtraneousEntry({ extraneousSampleIds }: PropsExtraneousEntry) {
 }
 export function WarningExtraneousEntry({
   extraneousSampleIds,
-}: PropsExtraneousEntry) {
+}: PropsExtraneousEntry): JSX.Element {
   const count = extraneousSampleIds.length;
   // "X Samples in metadata file were not used."
-  const title = `${count} ${maybePluralize(
+  const title = `${count} ${pluralize(
     "Sample",
     count
-  )} in metadata file ${maybePluralize("was", count)} not used.`;
+  )} in metadata file ${pluralize("was", count)} not used.`;
   return (
-    <FullWidthAlertAccordion
+    <AlertAccordion
       title={title}
-      message={
+      collapseContent={
         <MessageExtraneousEntry extraneousSampleIds={extraneousSampleIds} />
       }
-      severity={WARNING_SEVERITY}
+      intent={WARNING_SEVERITY}
     />
   );
 }
@@ -103,18 +102,22 @@ function MessageAbsentSample({ absentSampleIds }: PropsAbsentSample) {
     />
   );
 }
-export function WarningAbsentSample({ absentSampleIds }: PropsAbsentSample) {
+export function WarningAbsentSample({
+  absentSampleIds,
+}: PropsAbsentSample): JSX.Element {
   const count = absentSampleIds.length;
   // "X Samples were not found in metadata file."
-  const title = `${count} ${maybePluralize("Sample", count)} ${maybePluralize(
+  const title = `${count} ${pluralize("Sample", count)} ${pluralize(
     "was",
     count
   )} not found in metadata file.`;
   return (
-    <FullWidthAlertAccordion
+    <AlertAccordion
       title={title}
-      message={<MessageAbsentSample absentSampleIds={absentSampleIds} />}
-      severity={WARNING_SEVERITY}
+      collapseContent={
+        <MessageAbsentSample absentSampleIds={absentSampleIds} />
+      }
+      intent={WARNING_SEVERITY}
     />
   );
 }
@@ -150,18 +153,20 @@ function MessageMissingData({ missingData }: PropsMissingData) {
     />
   );
 }
-export function WarningMissingData({ missingData }: PropsMissingData) {
+export function WarningMissingData({
+  missingData,
+}: PropsMissingData): JSX.Element {
   const count = Object.keys(missingData).length;
   // "X Samples were missing data in required fields."
-  const title = `${count} ${maybePluralize("Sample", count)} ${maybePluralize(
+  const title = `${count} ${pluralize("Sample", count)} ${pluralize(
     "was",
     count
   )} missing data in required fields.`;
   return (
-    <FullWidthAlertAccordion
+    <AlertAccordion
       title={title}
-      message={<MessageMissingData missingData={missingData} />}
-      severity={WARNING_SEVERITY}
+      collapseContent={<MessageMissingData missingData={missingData} />}
+      intent={WARNING_SEVERITY}
     />
   );
 }
@@ -219,15 +224,17 @@ function MessageBadFormatData({ badFormatData }: PropsBadFormatData) {
     />
   );
 }
-export function WarningBadFormatData({ badFormatData }: PropsBadFormatData) {
+export function WarningBadFormatData({
+  badFormatData,
+}: PropsBadFormatData): JSX.Element {
   const title =
     "Some of your data is not formatted correctly. " +
     "Please update before proceeding.";
   return (
-    <FullWidthAlertAccordion
+    <AlertAccordion
       title={title}
-      message={<MessageBadFormatData badFormatData={badFormatData} />}
-      severity={WARNING_SEVERITY}
+      collapseContent={<MessageBadFormatData badFormatData={badFormatData} />}
+      intent={WARNING_SEVERITY}
     />
   );
 }

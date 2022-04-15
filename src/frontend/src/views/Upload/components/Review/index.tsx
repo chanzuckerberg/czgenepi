@@ -6,6 +6,7 @@ import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { useUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
+import { pluralize } from "src/common/utils/strUtils";
 import Progress from "../common/Progress";
 import {
   ButtonWrapper,
@@ -15,7 +16,6 @@ import {
   Title,
 } from "../common/style";
 import { Props } from "../common/types";
-import { maybePluralize } from "../Metadata/components/ImportFile/components/Alerts/common/pluralize";
 import Table from "./components/Table";
 import Upload from "./components/Upload";
 import {
@@ -49,7 +49,7 @@ export default function Review({
         <div>
           <Title>Review</Title>
           <Subtitle>
-            Uploading {numOfSamples} {maybePluralize("Sample", numOfSamples)} to{" "}
+            Uploading {numOfSamples} {pluralize("Sample", numOfSamples)} to{" "}
             {group?.name}
           </Subtitle>
         </div>

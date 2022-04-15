@@ -1,53 +1,9 @@
 import styled from "@emotion/styled";
-import { CommonThemeProps, fontBodyXs, getIconSizes, getSpaces } from "czifui";
-import ArrowDownIcon from "src/common/icons/IconArrowDownSmall.svg";
-import ArrowUpIcon from "src/common/icons/IconArrowUpSmall.svg";
-import { transparentScrollbars } from "src/common/styles/basicStyle";
-import { StyledCallout as Callout } from "../../../FailedSampleAlert/style";
-
-const smallIcon = (props: CommonThemeProps) => {
-  const iconSizes = getIconSizes(props);
-  return `
-    flex: 0 0 auto;
-    height: ${iconSizes?.s.height}px;
-    width: ${iconSizes?.s.width}px;
-  `;
-};
-
-export const StyledArrowDownIcon = styled(ArrowDownIcon)`
-  ${smallIcon}
-`;
-
-export const StyledArrowUpIcon = styled(ArrowUpIcon)`
-  ${smallIcon}
-`;
-
-export const RowFlexContainer = styled.div`
-  display: flex;
-  height: 100%;
-
-  .MuiCollapse-root {
-    overflow-y: auto;
-  }
-`;
-
-export const ColumnFlexContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 auto;
-  .MuiCollapse-root {
-    ${transparentScrollbars}
-  }
-`;
-
-export const StaticSizeDiv = styled.div`
-  flex: 0 0 auto;
-`;
+import { fontBodyXs, getFontWeights, getSpaces } from "czifui";
 
 export const StyledList = styled.ul`
   padding: 0;
 
-  /* TODO (mlila): this should be exported from SDS */
   li:nth-of-type(odd) {
     background-color: #f4eee4;
   }
@@ -66,9 +22,11 @@ export const StyledListItem = styled.li`
   }}
 `;
 
-export const StyledCallout = styled(Callout)`
-  max-height: 250px;
-  .MuiAlert-message {
-    width: 100%;
-  }
+export const SemiBold = styled.span`
+  ${(props) => {
+    const fontWeights = getFontWeights(props);
+    return `
+      font-weight: ${fontWeights?.semibold};
+    `;
+  }}
 `;

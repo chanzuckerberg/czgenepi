@@ -24,10 +24,15 @@ export enum WARNING_CODE {
   ABSENT_SAMPLE,
   // A piece of data is present, but improperly formatted
   BAD_FORMAT_DATA,
+  // A column is present that isn't in our template
+  UNKNOWN_DATA_FIELDS,
+  // No exact location match found, so we choose the closest one we can find for them
+  BAD_LOCATION_FORMAT,
 }
 
 export enum ERROR_CODE {
   DEFAULT, // BAD FILE NAME
+  DUPLICATE_IDS,
   INVALID_NAME,
   MISSING_FIELD, // Missing required column entirely: no header field found
   OVER_MAX_SAMPLES,
