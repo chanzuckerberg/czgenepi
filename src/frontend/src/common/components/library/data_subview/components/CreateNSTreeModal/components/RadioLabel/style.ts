@@ -1,5 +1,4 @@
 import styled from "@emotion/styled";
-import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import {
   fontBodyXxs,
@@ -49,7 +48,7 @@ export const LabelLight = styled.span`
   }}
 `;
 
-export const StyledListItem = styled(ListItem)`
+export const StyledListItem = styled.li`
   color: black;
   display: flex;
   align-items: flex-start;

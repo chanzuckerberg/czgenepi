@@ -37,21 +37,20 @@ export const RadioLabelOverview = ({ selected }: Props): JSX.Element => {
       </SmallText>
       {selected && (
         <>
-          <List>
-            <StyledListItem button={false as any}>
+          <ul>
+            <StyledListItem>
               <StyledListItemIcon>
                 <StyledIconCheckSmall />
               </StyledListItemIcon>
               <ListItemText>
                 <SmallText>
-                  Best for seeing an overall picture of viral diversity within
-                  your jurisdiction in the past 12 weeks, in the context of
-                  genetically similar GISAID samples from outside of your
-                  jurisdiction.
+                  Best for generating a summary tree of samples from your
+                  jurisdiction, in the context of genetically similar GISAID
+                  samples from outside of your jurisdiction.
                 </SmallText>
               </ListItemText>
             </StyledListItem>
-            <StyledListItem button={false as any}>
+            <StyledListItem>
               <StyledListItemIcon>
                 <StyledIconCheckSmall />
               </StyledListItemIcon>
@@ -61,19 +60,18 @@ export const RadioLabelOverview = ({ selected }: Props): JSX.Element => {
                 </SmallText>
               </ListItemText>
             </StyledListItem>
-            <StyledListItem button={false as any}>
+            <StyledListItem>
               <StyledListItemIcon>
                 <StyledIconCheckSmall />
               </StyledListItemIcon>
               <ListItemText>
                 <SmallText>
-                  Good for creating the same tree type as the CZ GEN EPI
-                  automatic build, while ensuring that all selected samples will
-                  be included in the tree.
+                  Good for specifying lineage or collection date range to
+                  customize samples from your jurisdiction.
                 </SmallText>
               </ListItemText>
             </StyledListItem>
-          </List>
+          </ul>
           {isSampleFilteringEnabled && <SampleFiltering />}
         </>
       )}
@@ -93,7 +91,7 @@ export const RadioLabelTargeted = ({ selected }: Props): JSX.Element => {
       </SmallText>
       {selected && (
         <List>
-          <StyledListItem button={false as any}>
+          <StyledListItem>
             <StyledListItemIcon>
               <StyledIconCheckSmall />
             </StyledListItemIcon>
@@ -103,7 +101,7 @@ export const RadioLabelTargeted = ({ selected }: Props): JSX.Element => {
               </SmallText>
             </ListItemText>
           </StyledListItem>
-          <StyledListItem button={false as any}>
+          <StyledListItem>
             <StyledListItemIcon>
               <StyledIconCheckSmall />
             </StyledListItemIcon>
@@ -142,7 +140,7 @@ export const RadioLabelNonContextualized = ({
       {selected && (
         <>
           <List>
-            <StyledListItem button={false as any}>
+            <StyledListItem>
               <StyledListItemIcon>
                 <StyledIconCheckSmall />
               </StyledListItemIcon>
@@ -152,7 +150,7 @@ export const RadioLabelNonContextualized = ({
                 </SmallText>
               </ListItemText>
             </StyledListItem>
-            <StyledListItem button={false as any}>
+            <StyledListItem>
               <StyledListItemIcon>
                 <StyledIconCheckSmall />
               </StyledListItemIcon>
@@ -163,7 +161,7 @@ export const RadioLabelNonContextualized = ({
                 </SmallText>
               </ListItemText>
             </StyledListItem>
-            <StyledListItem button={false as any}>
+            <StyledListItem>
               <StyledListItemIcon>
                 <StyledIconXSmall />
               </StyledListItemIcon>
