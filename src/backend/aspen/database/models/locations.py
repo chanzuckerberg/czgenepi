@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, UniqueConstraint
+from sqlalchemy import Column, String, UniqueConstraint, Float
 
 from aspen.database.models.base import idbase
 from aspen.database.models.mixins import BaseMixin
@@ -18,3 +18,5 @@ class Location(idbase, BaseMixin):  # type: ignore
     country = Column(String, nullable=True)
     division = Column(String, nullable=True)
     location = Column(String, nullable=True)
+    latitude = Column(Float, nullable=True)
+    longitude = Column(Float, nullable=True)
