@@ -48,6 +48,11 @@ export const LabelLight = styled.span`
   }}
 `;
 
+export const StyledList = styled.ul`
+  padding: 0;
+  margin: 0;
+`;
+
 export const StyledListItem = styled.li`
   color: black;
   display: flex;

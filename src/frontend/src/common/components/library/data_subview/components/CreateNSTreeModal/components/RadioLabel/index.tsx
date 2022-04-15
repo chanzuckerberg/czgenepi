@@ -11,6 +11,7 @@ import {
   SmallText,
   StyledIconCheckSmall,
   StyledIconXSmall,
+  StyledList,
   StyledListItem,
   StyledListItemIcon,
 } from "./style";
@@ -37,7 +38,7 @@ export const RadioLabelOverview = ({ selected }: Props): JSX.Element => {
       </SmallText>
       {selected && (
         <>
-          <ul>
+          <StyledList>
             <StyledListItem>
               <StyledListItemIcon>
                 <StyledIconCheckSmall />
@@ -71,7 +72,7 @@ export const RadioLabelOverview = ({ selected }: Props): JSX.Element => {
                 </SmallText>
               </ListItemText>
             </StyledListItem>
-          </ul>
+          </StyledList>
           {isSampleFilteringEnabled && <SampleFiltering />}
         </>
       )}
