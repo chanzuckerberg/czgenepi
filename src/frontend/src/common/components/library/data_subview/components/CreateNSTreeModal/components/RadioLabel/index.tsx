@@ -36,7 +36,49 @@ export const RadioLabelOverview = ({ selected }: Props): JSX.Element => {
         Includes samples from both within and outside of your jurisdiction, at a
         ratio of roughly 2:1.
       </SmallText>
-      {selected && (
+      {/* TODO (mlila): remove these when isSampleFilteringEnabled turned on */}
+      {selected && !isSampleFilteringEnabled && (
+        <>
+          <ul>
+            <StyledListItem>
+              <StyledListItemIcon>
+                <StyledIconCheckSmall />
+              </StyledListItemIcon>
+              <ListItemText>
+                <SmallText>
+                  Best for seeing an overall picture of viral diversity within
+                  your jurisdiction in the past 12 weeks, in the context of
+                  genetically similar GISAID samples from outside of your
+                  jurisdiction.
+                </SmallText>
+              </ListItemText>
+            </StyledListItem>
+            <StyledListItem>
+              <StyledListItemIcon>
+                <StyledIconCheckSmall />
+              </StyledListItemIcon>
+              <ListItemText>
+                <SmallText>
+                  Good for identifying possible local outbreaks.
+                </SmallText>
+              </ListItemText>
+            </StyledListItem>
+            <StyledListItem>
+              <StyledListItemIcon>
+                <StyledIconCheckSmall />
+              </StyledListItemIcon>
+              <ListItemText>
+                <SmallText>
+                  Good for creating the same tree type as the CZ GEN EPI
+                  automatic build, while ensuring that all selected samples will
+                  be included in the tree.
+                </SmallText>
+              </ListItemText>
+            </StyledListItem>
+          </ul>
+        </>
+      )}
+      {selected && isSampleFilteringEnabled && (
         <>
           <StyledList>
             <StyledListItem>
