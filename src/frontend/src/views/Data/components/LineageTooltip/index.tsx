@@ -4,7 +4,9 @@ import { Label, Text, Wrapper } from "./style";
 export interface Lineage {
   last_updated: string;
   lineage: string;
-  confidence: string;
+  qc_status: string;
+  scorpio_call: string;
+  scorpio_support: string;
   version: string;
 }
 
@@ -14,18 +16,21 @@ interface Props {
 
 const DISPLAY_ORDER: Array<keyof Lineage> = [
   "lineage",
-  "confidence",
+  "qc_status",
   "version",
   "last_updated",
+  "scorpio_call",
+  "scorpio_support",
 ];
 
 export const LineageTooltip = ({ lineage }: Props): JSX.Element => {
+  console.log(lineage); //eslint-disable-line
   return (
     <>
       {DISPLAY_ORDER.map((key) => {
         let value = lineage[key];
-        if (key === "confidence") {
-          value = `${value}%`;
+        if (key === "last_updated") {
+          value = `${value.slice(0, 10)}`;
         }
         return <Row key={key} label={key as keyof Lineage} text={value} />;
       })}
@@ -36,7 +41,9 @@ export const LineageTooltip = ({ lineage }: Props): JSX.Element => {
 const KEY_TO_LABELS = {
   last_updated: "Last Updated",
   lineage: "Lineage",
-  confidence: "Confidence",
+  qc_status: "QC Status",
+  scorpio_call: "Scorpio Call",
+  scorpio_support: "Scorpio Support",
   version: "Version",
 };
 
