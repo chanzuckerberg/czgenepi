@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, UniqueConstraint, Float
+from sqlalchemy import Column, Float, String, UniqueConstraint
 
 from aspen.database.models.base import idbase
 from aspen.database.models.mixins import BaseMixin

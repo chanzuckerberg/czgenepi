@@ -5,12 +5,22 @@ from typing import Dict, Mapping, Optional, Set, Tuple
 
 import boto3
 import sqlalchemy as sa
+from sqlalchemy import asc
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
+from sqlalchemy.sql.expression import and_
 
 from aspen.api.error import http_exceptions as ex
 from aspen.api.utils import authz_phylo_tree_filters
-from aspen.database.models import DataType, PhyloRun, PhyloTree, Sample, User, Group
+from aspen.database.models import (
+    DataType,
+    Group,
+    Location,
+    PhyloRun,
+    PhyloTree,
+    Sample,
+    User,
+)
 
 NEXTSTRAIN_COLOR_SCALE = [
     "#571EA2",
@@ -80,7 +90,7 @@ def _sample_filter(sample: Sample, can_see_pi_group_ids: Set[int], system_admin:
 
 
 # set which countries will be given color labels in the nextstrain viewer
-def _set_countries(tree_json: dict, phylo_run: PhyloRun):
+def _set_countries(db: AsyncSession, tree_json: dict, phylo_run: PhyloRun):
     # information stored in tree_json["meta"]["colorings"], which is an
     # array of objects. we grab the index of the one for "country"
     country_defines_index = None
@@ -92,24 +102,63 @@ def _set_countries(tree_json: dict, phylo_run: PhyloRun):
     tree_location = phylo_run.group.default_tree_location
     # this is where the geolocation query would go, until then hardcode it
     # assuming United States (USA)
-    countries = [
-        tree_location.country,
-        "Canada",
-        "Mexico",
-        "Cuba",
-        "Guatemala",
-        "Belize",
-        "Honduras",
-        "El Salvador",
-        "Haiti",
-        "Dominican Republic",
-        "Jamaica",
-        "Bahamas",
-        "Bermuda",
-        "Nicaragua",
-        "Costa Rica",
-        "Panama",
-    ]
+    # countries = [
+    #     tree_location.country,
+    #     "Canada",
+    #     "Mexico",
+    #     "Cuba",
+    #     "Guatemala",
+    #     "Belize",
+    #     "Honduras",
+    #     "El Salvador",
+    #     "Haiti",
+    #     "Dominican Republic",
+    #     "Jamaica",
+    #     "Bahamas",
+    #     "Bermuda",
+    #     "Nicaragua",
+    #     "Costa Rica",
+    #     "Panama",
+    # ]
+    origin_subq = (
+        sa.select(Location.country, Location.latitude, Location.longitude)
+        .where(
+            and_(
+                Location.division == None,
+                Location.location == None,
+                Location.country == tree_location.country,
+            )
+        )
+        .subquery()
+        .lateral()
+    )  # noqa: E711
+    countries_subq = (
+        sa.select(Location.country, Location.latitude, Location.longitude)
+        .where(
+            and_(
+                Location.division == None,
+                Location.location == None,
+                Location.country != tree_location.country,
+            )
+        )
+        .subquery()
+    )  # noqa: E711
+    neighbors_query = (
+        sa.select(
+            countries_subq.c.country,
+            sa.func.earth_distance(
+                sa.func.ll_to_earth(
+                    countries_subq.c.latitude, countries_subq.c.longitude
+                ),
+                sa.func.ll_to_earth(origin_subq.c.latitude, origin_subq.c.longitude),
+            ).label("distance"),
+        )
+        .order_by(asc("distance"))
+        .limit(15)
+    )
+
+    await db.execute(neighbors_query)
+
     colorings_entry = list(zip(countries, NEXTSTRAIN_COLOR_SCALE))
 
     if country_defines_index:
