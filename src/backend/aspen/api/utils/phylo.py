@@ -10,7 +10,7 @@ from sqlalchemy.orm import selectinload
 
 from aspen.api.error import http_exceptions as ex
 from aspen.api.utils import authz_phylo_tree_filters
-from aspen.database.models import DataType, PhyloRun, PhyloTree, Sample, User
+from aspen.database.models import DataType, PhyloRun, PhyloTree, Sample, User, Group
 
 NEXTSTRAIN_COLOR_SCALE = [
     "#571EA2",
@@ -66,7 +66,7 @@ async def verify_and_access_phylo_tree(
         phylo_tree = authz_tree_query_result.scalars().unique().one()
     except sa.exc.NoResultFound:  # type: ignore
         return False, None, None
-    run_query = sa.select(PhyloRun).join(PhyloTree).filter(PhyloTree.entity_id == phylo_tree.entity_id).options(selectinload(PhyloRun.group))  # type: ignore
+    run_query = sa.select(PhyloRun).join(PhyloTree).filter(PhyloTree.entity_id == phylo_tree.entity_id).options(selectinload(PhyloRun.group).joinedload(Group.location))  # type: ignore
     run_query_result = await db.execute(run_query)
     phylo_run: Optional[PhyloRun]
     phylo_run = run_query_result.scalars().unique().one()
