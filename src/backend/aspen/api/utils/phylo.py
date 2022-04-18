@@ -90,7 +90,7 @@ def _sample_filter(sample: Sample, can_see_pi_group_ids: Set[int], system_admin:
 
 
 # set which countries will be given color labels in the nextstrain viewer
-def _set_countries(db: AsyncSession, tree_json: dict, phylo_run: PhyloRun):
+async def _set_countries(db: AsyncSession, tree_json: dict, phylo_run: PhyloRun):
     # information stored in tree_json["meta"]["colorings"], which is an
     # array of objects. we grab the index of the one for "country"
     country_defines_index = None
