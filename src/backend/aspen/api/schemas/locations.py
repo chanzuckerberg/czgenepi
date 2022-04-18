@@ -7,7 +7,7 @@ class LocationResponse(BaseResponse):
     id: int
     region: str
     country: str
-    division: str
+    division: Optional[str]
     location: Optional[str]
 
 
