@@ -6,11 +6,11 @@ import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { ROUTES } from "src/common/routes";
 import { createStringToLocationFinder } from "src/common/utils/locationUtils";
+import { WebformTable } from "src/components/WebformTable";
 import {
-  Props,
   SampleIdToMetadata,
   WARNING_CODE,
-} from "src/views/Upload/components/common/types";
+} from "src/components/WebformTable/common/types";
 import Progress from "../common/Progress";
 import {
   ButtonWrapper,
@@ -21,13 +21,13 @@ import {
   Subtitle,
   Title,
 } from "../common/style";
+import { Props } from "../common/types";
 import { initSampleMetadata } from "../common/utils";
 import ImportFile from "./components/ImportFile";
 import {
   ParseResult,
   SampleIdToWarningMessages,
 } from "./components/ImportFile/parseFile";
-import Table from "./components/Table";
 
 export default function Metadata({
   samples,
@@ -112,13 +112,14 @@ export default function Metadata({
           stringToLocationFinder={stringToLocationFinder}
         />
 
-        <Table
+        <WebformTable
           setIsValid={setIsValid}
           metadata={metadata}
           hasImportedMetadataFile={hasImportedMetadataFile}
           setMetadata={setMetadata}
           autocorrectWarnings={autocorrectWarnings}
           locations={namedLocations}
+          webformTableType="UPLOAD"
         />
 
         <ButtonWrapper>

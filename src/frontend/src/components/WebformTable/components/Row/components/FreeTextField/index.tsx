@@ -1,6 +1,6 @@
 import { FormikContextType } from "formik";
 import React from "react";
-import { Metadata } from "src/views/Upload/components/common/types";
+import { Metadata } from "src/components/WebformTable/common/types";
 import { StyledTextField } from "./style";
 
 interface Props {

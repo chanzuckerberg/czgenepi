@@ -1,7 +1,7 @@
 import { FormControlLabel, FormHelperText, Switch } from "@material-ui/core";
 import { FormikContextType } from "formik";
 import React from "react";
-import { Metadata } from "src/views/Upload/components/common/types";
+import { Metadata } from "src/components/WebformTable/common/types";
 import { WarningWrapper, Wrapper } from "./style";
 
 interface Props {

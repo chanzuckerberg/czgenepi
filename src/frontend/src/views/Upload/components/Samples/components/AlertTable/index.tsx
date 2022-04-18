@@ -1,6 +1,7 @@
 import { Table as MuiTable, TableBody, TableRow } from "@material-ui/core";
 import React from "react";
-import { ERROR_CODE, ParseErrors } from "../../../common/types";
+import { ERROR_CODE } from "src/components/WebformTable/common/types";
+import { ParseErrors } from "../../../common/types";
 import {
   Overflow,
   StyledHeaderTableCell,
@@ -18,6 +19,7 @@ const ERROR_CODE_MESSAGES: Record<ERROR_CODE, string> = {
   [ERROR_CODE.MISSING_FIELD]: "placeholder",
   [ERROR_CODE.OVER_MAX_SAMPLES]:
     "This file contains more than 500 samples, which exceeds the maximum for each upload process. Please limit the samples to 500 or less",
+  [ERROR_CODE.DUPLICATE_IDS]: "placeholder",
 };
 
 interface Props {

@@ -1,8 +1,8 @@
 import React from "react";
 import { B } from "src/common/styles/basicStyle";
+import { pluralize } from "src/common/utils/strUtils";
 import AlertAccordion from "src/components/AlertAccordion";
-import { ERROR_CODE } from "src/views/Upload/components/common/types";
-import { maybePluralize } from "./common/pluralize";
+import { ERROR_CODE } from "src/components/WebformTable/common/types";
 import { ProblemTable } from "./common/ProblemTable";
 import { Td, Th } from "./common/style";
 
@@ -19,6 +19,7 @@ const ERROR_CODE_TO_MESSAGE: Record<
   [ERROR_CODE.MISSING_FIELD]: MissingFieldMessage,
   [ERROR_CODE.OVER_MAX_SAMPLES]: "placeholder",
   [ERROR_CODE.DEFAULT]: DefaultMessage,
+  [ERROR_CODE.DUPLICATE_IDS]: "placeholder",
 };
 
 export default function Error({
@@ -30,7 +31,7 @@ export default function Error({
   const count = names.length;
 
   const errorCodeToTitle = {
-    [ERROR_CODE.INVALID_NAME]: `Please double check the following ${maybePluralize(
+    [ERROR_CODE.INVALID_NAME]: `Please double check the following ${pluralize(
       "sample",
       count
     )} to correct any errors before proceeding:`,
@@ -38,6 +39,7 @@ export default function Error({
     [ERROR_CODE.OVER_MAX_SAMPLES]: "placeholder",
     [ERROR_CODE.DEFAULT]:
       "Something went wrong, please try again or contact us!",
+    [ERROR_CODE.DUPLICATE_IDS]: "placeholder",
   };
 
   const title = errorCodeToTitle[errorCode];
@@ -46,8 +48,8 @@ export default function Error({
   return (
     <AlertAccordion
       title={title}
-      message={<Message names={names} />}
-      severity="error"
+      collapseContent={<Message names={names} />}
+      intent="error"
     />
   );
 }

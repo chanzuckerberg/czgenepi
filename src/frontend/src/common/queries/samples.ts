@@ -5,11 +5,9 @@ import {
   useQueryClient,
   UseQueryResult,
 } from "react-query";
+import { SampleIdToMetadata } from "src/components/WebformTable/common/types";
 import { METADATA_KEYS_TO_API_KEYS } from "src/views/Upload/components/common/constants";
-import {
-  SampleIdToMetadata,
-  Samples,
-} from "src/views/Upload/components/common/types";
+import { Samples } from "src/views/Upload/components/common/types";
 import {
   API,
   DEFAULT_DELETE_OPTIONS,
