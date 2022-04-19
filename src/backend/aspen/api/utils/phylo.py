@@ -22,6 +22,7 @@ from aspen.database.models import (
     User,
 )
 
+# 16 colors
 NEXTSTRAIN_COLOR_SCALE = [
     "#571EA2",
     "#4334BF",
@@ -90,6 +91,7 @@ def _sample_filter(sample: Sample, can_see_pi_group_ids: Set[int], system_admin:
 
 
 # set which countries will be given color labels in the nextstrain viewer
+# noqa: E711 is vital for the SQL query to compile correctly.
 async def _set_countries(db: AsyncSession, tree_json: dict, phylo_run: PhyloRun):
     # information stored in tree_json["meta"]["colorings"], which is an
     # array of objects. we grab the index of the one for "country"
@@ -100,49 +102,30 @@ async def _set_countries(db: AsyncSession, tree_json: dict, phylo_run: PhyloRun)
 
     # Next we grab the tree's country and the nearest 15 countries
     tree_location = phylo_run.group.default_tree_location
-    # this is where the geolocation query would go, until then hardcode it
-    # assuming United States (USA)
-    # countries = [
-    #     tree_location.country,
-    #     "Canada",
-    #     "Mexico",
-    #     "Cuba",
-    #     "Guatemala",
-    #     "Belize",
-    #     "Honduras",
-    #     "El Salvador",
-    #     "Haiti",
-    #     "Dominican Republic",
-    #     "Jamaica",
-    #     "Bahamas",
-    #     "Bermuda",
-    #     "Nicaragua",
-    #     "Costa Rica",
-    #     "Panama",
-    # ]
+    countries = [tree_location.country]
     origin_subq = (
         sa.select(Location.country, Location.latitude, Location.longitude)
         .where(
             and_(
-                Location.division == None,
-                Location.location == None,
+                Location.division == None,  # noqa: E711
+                Location.location == None,  # noqa: E711
                 Location.country == tree_location.country,
             )
         )
         .subquery()
         .lateral()
-    )  # noqa: E711
+    )
     countries_subq = (
         sa.select(Location.country, Location.latitude, Location.longitude)
         .where(
             and_(
-                Location.division == None,
-                Location.location == None,
+                Location.division == None,  # noqa: E711
+                Location.location == None,  # noqa: E711
                 Location.country != tree_location.country,
             )
         )
         .subquery()
-    )  # noqa: E711
+    )
     neighbors_query = (
         sa.select(
             countries_subq.c.country,
@@ -157,7 +140,8 @@ async def _set_countries(db: AsyncSession, tree_json: dict, phylo_run: PhyloRun)
         .limit(15)
     )
 
-    await db.execute(neighbors_query)
+    neighbors = await db.execute(neighbors_query)
+    countries.extend([row["country"] for row in neighbors])
 
     colorings_entry = list(zip(countries, NEXTSTRAIN_COLOR_SCALE))
 
