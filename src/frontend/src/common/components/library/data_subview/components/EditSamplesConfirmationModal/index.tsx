@@ -23,6 +23,7 @@ import {
   SampleIdToEditMetadataWebform,
 } from "src/components/WebformTable/common/types";
 import { ContinueButton } from "src/views/Upload/components/common/style";
+import { ErrorsAndWarnings } from "./components/ErrorsAndWarnings";
 import {
   StyledButton,
   StyledDiv,
@@ -176,6 +177,7 @@ const EditSamplesConfirmationModal = ({
               InstructionsTitleMarginBottom="xxs"
               listItemFontSize="xs"
             />
+            <ErrorsAndWarnings />
             <WebformTable
               setIsValid={setIsValid}
               metadata={metadata}
