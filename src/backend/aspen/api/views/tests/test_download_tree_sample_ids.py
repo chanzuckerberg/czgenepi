@@ -43,7 +43,7 @@ def upload_s3_file(
         "tree": {
             "name": "root_identifier_1",
             "children": tree_children,
-        }
+        },
     }
 
     test_json = json.dumps(body)
