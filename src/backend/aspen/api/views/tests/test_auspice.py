@@ -52,7 +52,9 @@ async def test_valid_auspice_link_access(
         mock_s3_resource.create_bucket(Bucket=phylo_tree.s3_bucket)
 
     test_tree = {
-        "meta": {},
+        "meta": {
+            "colorings": [],
+        },
         "tree": {
             "branch_attrs": {"labels": {"clade": "42"}, "mutations": {}},
             "children": [

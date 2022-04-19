@@ -18,7 +18,9 @@ from aspen.test_infra.models.usergroup import group_factory, user_factory
 pytestmark = pytest.mark.asyncio
 
 TEST_TREE: Dict = {
-    "meta": {},
+    "meta": {
+        "colorings": [],
+    },
     "tree": {
         "branch_attrs": {"labels": {"clade": "42"}, "mutations": {}},
         "children": [
@@ -31,7 +33,9 @@ TEST_TREE: Dict = {
 }
 
 ID_MAPPED_TREE: Dict = {
-    "meta": {},
+    "meta": {
+        "colorings": [],
+    },
     "tree": {
         "branch_attrs": {"labels": {"clade": "42"}, "mutations": {}},
         "children": [

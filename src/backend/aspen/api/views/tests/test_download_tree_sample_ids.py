@@ -37,6 +37,9 @@ def upload_s3_file(
             tree_children.append({"name": gisaid_sample})
 
     body = {
+        "meta": {
+            "colorings": [],
+        },
         "tree": {
             "name": "root_identifier_1",
             "children": tree_children,

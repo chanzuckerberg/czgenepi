@@ -16,6 +16,9 @@ from aspen.test_infra.models.usergroup import group_factory, user_factory
 pytestmark = pytest.mark.asyncio
 
 TEST_TREE = {
+    "meta": {
+        "colorings": [],
+    },
     "tree": {
         "name": "public_identifier_1",
         "children": [
@@ -119,7 +122,7 @@ async def test_phylo_tree_rename(
 
     tree = await process_phylo_tree(async_session, user, phylo_tree.entity_id)
 
-    assert tree == {
+    assert tree["tree"] == {
         "tree": {
             "name": "private_identifier_1",
             "GISAID_ID": "public_identifier_1",
@@ -182,8 +185,7 @@ async def test_phylo_tree_rename_admin(
 
     tree = await process_phylo_tree(async_session, user, phylo_tree.entity_id)
 
-    assert tree == {
-        "tree": {
+    assert tree["tree"] = {
             "name": "private_identifier_1",
             "GISAID_ID": "public_identifier_1",
             "children": [
@@ -195,4 +197,3 @@ async def test_phylo_tree_rename_admin(
                 },
             ],
         }
-    }
