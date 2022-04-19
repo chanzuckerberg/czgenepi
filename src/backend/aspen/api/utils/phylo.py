@@ -142,7 +142,7 @@ async def _set_countries(db: AsyncSession, tree_json: dict, phylo_run: PhyloRun)
         .limit(15)
     )
 
-    # SQLAlchemy doesn't seem to fully understand a Postgres LATERAL join,
+    # SQLAlchemy doesn't seem to fully understand the way we use a LATERAL join here,
     # so issues a warning that we will have a cartesian product unless
     # we use a join (but this does not happen)
     with warnings.catch_warnings():

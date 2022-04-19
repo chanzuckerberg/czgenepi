@@ -9,7 +9,7 @@ export AWS_PROD_PROFILE=genepi-prod
 export BACKEND_APP_ROOT=/usr/src/app
 
 ### DATABASE VARIABLES #################################################
-DB_SEARCH_PATH=aspen
+DB_SEARCH_PATH=aspen,public
 LOCAL_DB_NAME = aspen_db
 LOCAL_DB_SERVER = localhost:5432
 # This has to be "postgres" to ease moving snapshots from RDS.

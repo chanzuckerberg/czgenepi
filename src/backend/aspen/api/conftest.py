@@ -62,12 +62,13 @@ async def async_db() -> AsyncGenerator[AsyncPostgresDatabase, None]:
         f"postgresql+asyncpg://postgres:password_postgres@database:5432/{database_name}"
     )
     test_admin_interface = aspen_connection.init_async_db(test_admin_uri)
-    async with test_admin_interface.make_session() as test_admin_session:
-        for extension in extensions:
-            await test_admin_session.execute(
-                f"CREATE EXTENSION IF NOT EXISTS {extension} WITH SCHEMA public"
-            )
-        await test_admin_session.commit()
+    test_admin_session = test_admin_interface.make_session()
+    for extension in extensions:
+        await test_admin_session.execute(
+            f"CREATE EXTENSION IF NOT EXISTS {extension} WITH SCHEMA public"
+        )
+    await test_admin_session.commit()  # type: ignore
+    await test_admin_session.close()  # type: ignore
 
     postgres_test_db = AsyncPostgresDatabase(database_name=database_name, port=5432)
 
