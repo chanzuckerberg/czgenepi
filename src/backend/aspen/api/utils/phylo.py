@@ -225,7 +225,7 @@ async def process_phylo_tree(
     )
 
     # set country labeling/colors
-    json_data = _set_countries(db, json_data, phylo_run)
+    json_data = await _set_countries(db, json_data, phylo_run)
 
     return json_data
 
