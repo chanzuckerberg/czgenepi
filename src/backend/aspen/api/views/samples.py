@@ -231,7 +231,7 @@ async def validate_ids(
 ) -> ValidateIDsResponse:
 
     """
-    take in a list of identifiers and checks if all idenitifiers exist as either Sample public or private identifiers, or GisaidMetadata strain names
+    take in a list of identifiers and checks if all identifiers exist as either Sample public or private identifiers, or GisaidMetadata strain names
 
     returns a response with list of missing identifiers if any, otherwise will return an empty list
     """
