@@ -1,3 +1,4 @@
+import re
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
@@ -61,9 +62,13 @@ async def _get_selected_samples(db: AsyncSession, phylo_tree_id: int):
 
     phylo_run = phylo_tree.producing_workflow
     selected_samples = set(phylo_run.gisaid_ids)
+    prefix_regex = re.compile("^hcov-19/", re.IGNORECASE)
+    selected_samples = selected_samples.union(
+        set(prefix_regex.sub("", item) for item in phylo_run.gisaid_ids)
+    )
     for uploaded_pathogen_genome in phylo_run.inputs:
         sample = uploaded_pathogen_genome.sample
-        selected_samples.add(sample.public_identifier.replace("hCoV-19/", ""))
+        selected_samples.add(prefix_regex.sub("", sample.public_identifier))
         selected_samples.add(sample.private_identifier)
     return selected_samples
 
