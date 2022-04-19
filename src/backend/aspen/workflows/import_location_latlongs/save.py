@@ -5,7 +5,7 @@
 
 import csv
 import io
-from typing import Optional
+from typing import Dict, Optional
 
 import click
 import requests
@@ -23,7 +23,7 @@ from aspen.database.models import Location
 
 def load_latlongs(fh: io.TextIOBase):
     reader = csv.reader(fh, delimiter="\t")
-    res = {}
+    res: Dict[str, Dict] = {}
     for row in reader:
         try:
             level, location, lat, lon = row
