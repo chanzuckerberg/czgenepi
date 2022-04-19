@@ -7,7 +7,6 @@ from typing import AsyncGenerator
 import pytest
 from fastapi import Depends, FastAPI, Request
 from httpx import AsyncClient
-import sqlalchemy
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.api.auth import get_auth_user, setup_userinfo
@@ -59,11 +58,15 @@ async def async_db() -> AsyncGenerator[AsyncPostgresDatabase, None]:
     # Install extensions we use to the test database.
     ext_query = await admin_session.execute("SELECT extname FROM pg_extension")
     extensions = [row["extname"] for row in ext_query]
-    test_admin_uri = f"postgresql+asyncpg://postgres:password_postgres@database:5432/{database_name}"
+    test_admin_uri = (
+        f"postgresql+asyncpg://postgres:password_postgres@database:5432/{database_name}"
+    )
     test_admin_interface = aspen_connection.init_async_db(test_admin_uri)
     async with test_admin_interface.make_session() as test_admin_session:
         for extension in extensions:
-            await test_admin_session.execute(f"CREATE EXTENSION IF NOT EXISTS {extension} WITH SCHEMA public")
+            await test_admin_session.execute(
+                f"CREATE EXTENSION IF NOT EXISTS {extension} WITH SCHEMA public"
+            )
         await test_admin_session.commit()
 
     postgres_test_db = AsyncPostgresDatabase(database_name=database_name, port=5432)

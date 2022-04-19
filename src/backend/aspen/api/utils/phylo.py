@@ -1,11 +1,13 @@
 import json
 import os
 import re
+import warnings
 from typing import Dict, Mapping, Optional, Set, Tuple
 
 import boto3
 import sqlalchemy as sa
 from sqlalchemy import asc
+from sqlalchemy.exc import SAWarning
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlalchemy.sql.expression import and_
@@ -140,15 +142,20 @@ async def _set_countries(db: AsyncSession, tree_json: dict, phylo_run: PhyloRun)
         .limit(15)
     )
 
-    neighbors = await db.execute(neighbors_query)
-    countries.extend([row["country"] for row in neighbors])
+    # SQLAlchemy doesn't seem to fully understand a Postgres LATERAL join,
+    # so issues a warning that we will have a cartesian product unless
+    # we use a join (but this does not happen)
+    with warnings.catch_warnings():
+        warnings.filterwarnings(action="ignore", category=SAWarning)
+        neighbors = await db.execute(neighbors_query)
+        countries.extend([row["country"] for row in neighbors])
 
     colorings_entry = list(zip(countries, NEXTSTRAIN_COLOR_SCALE))
 
     if country_defines_index:
         tree_json["meta"]["colorings"][country_defines_index]["scale"] = colorings_entry
     else:
-        tree_json["meta"]["colorings"].push(
+        tree_json["meta"]["colorings"].append(
             {
                 "key": "country",
                 "title": "Country",
