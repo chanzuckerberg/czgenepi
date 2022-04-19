@@ -104,7 +104,7 @@ async def _set_countries(db: AsyncSession, tree_json: dict, phylo_run: PhyloRun)
     tree_location = phylo_run.group.default_tree_location
     countries = [tree_location.country]
     origin_subq = (
-        sa.select(Location.country, Location.latitude, Location.longitude)
+        sa.select(Location.country, Location.latitude, Location.longitude)  # type: ignore
         .where(
             and_(
                 Location.division == None,  # noqa: E711
@@ -116,7 +116,7 @@ async def _set_countries(db: AsyncSession, tree_json: dict, phylo_run: PhyloRun)
         .lateral()
     )
     countries_subq = (
-        sa.select(Location.country, Location.latitude, Location.longitude)
+        sa.select(Location.country, Location.latitude, Location.longitude)  # type: ignore
         .where(
             and_(
                 Location.division == None,  # noqa: E711
@@ -225,7 +225,7 @@ async def process_phylo_tree(
     )
 
     # set country labeling/colors
-    json_data = _set_countries(json_data, phylo_run)
+    json_data = _set_countries(db, json_data, phylo_run)
 
     return json_data
 
