@@ -123,18 +123,16 @@ async def test_phylo_tree_rename(
     tree = await process_phylo_tree(async_session, user, phylo_tree.entity_id)
 
     assert tree["tree"] == {
-        "tree": {
-            "name": "private_identifier_1",
-            "GISAID_ID": "public_identifier_1",
-            "children": [
-                {"name": "public_identifier_2"},
-                {"name": "public_identifier_3"},
-                {
-                    "name": "public_identifier_4",
-                    "children": [{"name": "public_identifier_5"}],
-                },
-            ],
-        }
+        "name": "private_identifier_1",
+        "GISAID_ID": "public_identifier_1",
+        "children": [
+            {"name": "public_identifier_2"},
+            {"name": "public_identifier_3"},
+            {
+                "name": "public_identifier_4",
+                "children": [{"name": "public_identifier_5"}],
+            },
+        ],
     }
 
 

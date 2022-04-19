@@ -19,7 +19,14 @@ pytestmark = pytest.mark.asyncio
 
 TEST_TREE: Dict = {
     "meta": {
-        "colorings": [],
+        "colorings": [
+            {
+                "key": "country",
+                "scale": [["USA", "#571EA2"]],
+                "title": "Country",
+                "type": "categorical",
+            }
+        ],
     },
     "tree": {
         "branch_attrs": {"labels": {"clade": "42"}, "mutations": {}},
@@ -34,7 +41,14 @@ TEST_TREE: Dict = {
 
 ID_MAPPED_TREE: Dict = {
     "meta": {
-        "colorings": [],
+        "colorings": [
+            {
+                "key": "country",
+                "scale": [["USA", "#571EA2"]],
+                "title": "Country",
+                "type": "categorical",
+            }
+        ],
     },
     "tree": {
         "branch_attrs": {"labels": {"clade": "42"}, "mutations": {}},
