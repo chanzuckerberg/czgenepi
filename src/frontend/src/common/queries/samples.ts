@@ -257,12 +257,6 @@ interface GisaidResponseType {
   status: string;
 }
 
-interface LineageResponseType {
-  last_updated: string;
-  lineage: string;
-  confidence: number;
-  version: string;
-}
 interface SubmittingGroupResponseType {
   id: number;
   name: string;
@@ -277,7 +271,7 @@ interface SamplesEditResponseType {
   collection_location: string;
   czb_failed_genome_recovery: boolean;
   gisaid: GisaidResponseType;
-  lineage: LineageResponseType;
+  lineage: Lineage;
   private: boolean;
   private_identifier: string;
   public_identifier: string;

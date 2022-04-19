@@ -1,15 +1,6 @@
 import React from "react";
 import { Label, Text, Wrapper } from "./style";
 
-export interface Lineage {
-  last_updated: string;
-  lineage: string;
-  qc_status: string;
-  scorpio_call: string;
-  scorpio_support: string;
-  version: string;
-}
-
 interface Props {
   lineage: Lineage;
 }
@@ -24,7 +15,6 @@ const DISPLAY_ORDER: Array<keyof Lineage> = [
 ];
 
 export const LineageTooltip = ({ lineage }: Props): JSX.Element => {
-  console.log(lineage); //eslint-disable-line
   return (
     <>
       {DISPLAY_ORDER.map((key) => {
