@@ -37,8 +37,6 @@ class BaseNextstrainConfigBuilder:
             self.tree_build_level = "country"
         elif not location.location:
             self.tree_build_level = "division"
-        # The region field for tree build needs to be 'global' to avoid country names being converted to region
-        build["region"] = "global"
         # Fill out country/division/location fields if the group has them,
         # or remove those fields if they don't.
         location_fields = ["country", "division", "location"]
