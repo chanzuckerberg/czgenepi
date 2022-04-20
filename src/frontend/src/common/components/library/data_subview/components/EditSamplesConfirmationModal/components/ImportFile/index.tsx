@@ -3,14 +3,10 @@ import React, { useEffect, useMemo, useState } from "react";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { createStringToLocationFinder } from "src/common/utils/locationUtils";
 import FilePicker from "src/components/FilePicker";
-<<<<<<< HEAD
 import ImportFileWarnings, {
   getAutocorrectCount,
   getMissingFields,
 } from "src/components/ImportFileWarnings";
-=======
-import ImportFileWarnings from "src/components/ImportFileWarnings";
->>>>>>> 5b598541 (allow user to import tsv data for sample edit)
 import { WebformTableTypeOptions as MetadataUploadTypeOption } from "src/components/WebformTable";
 import { SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS } from "src/components/WebformTable/common/constants";
 import {
@@ -27,8 +23,12 @@ import {
 import {
   getAutocorrectCount,
   getMissingFields,
+<<<<<<< HEAD
 } from "src/views/Upload/components/Metadata/components/ImportFile";
 >>>>>>> 5b598541 (allow user to import tsv data for sample edit)
+=======
+} from "src/components/ImportFileWarnings";
+>>>>>>> cb8cc772 (wip)
 import { getMetadataEntryOrEmpty } from "../../utils";
 import {
   parseFileEdit,
@@ -72,11 +72,7 @@ export default function ImportFile({
     if (!parseResult) return;
     // If file was missing any col header fields, we parsed no data from it
     // and only display that error to the user to force them to fix problems.
-<<<<<<< HEAD
     if (missingFields) return;
-=======
-    if (getMissingFields(parseResult)) return;
->>>>>>> 5b598541 (allow user to import tsv data for sample edit)
 
     const { data } = parseResult;
     const parseResultSampleIds = Object.keys(data);
@@ -87,11 +83,7 @@ export default function ImportFile({
       return !sampleIdsSet.has(parseId);
     });
     setExtraneousSampleIds(extraneousSampleIds);
-<<<<<<< HEAD
   }, [parseResult, metadata, missingFields]);
-=======
-  }, [parseResult, metadata]);
->>>>>>> 5b598541 (allow user to import tsv data for sample edit)
 
   // Used by file upload parser to convert location strings to Locations
   const stringToLocationFinder = useMemo(() => {
@@ -122,19 +114,12 @@ export default function ImportFile({
     handleMetadataFileUpload(result);
   };
 
-<<<<<<< HEAD
   // we need to decide if a user wants to delete a sample (if they provide a delete keyword in the cell)
   // if no delete keyword is detected, return the existing value, else return "".
   function passOrDeleteEntry(
     value: string | boolean | NamedGisaidLocation
   ): string | boolean | NamedGisaidLocation | undefined {
     if (value && value.toString().toLowerCase() === "delete") {
-=======
-  function inferDeleteEntries(
-    value: string | boolean | NamedGisaidLocation
-  ): string | boolean | NamedGisaidLocation | undefined {
-    if (value && value.toString().toLowerCase() == "delete") {
->>>>>>> 5b598541 (allow user to import tsv data for sample edit)
       return "";
     }
     return value;
@@ -155,17 +140,13 @@ export default function ImportFile({
     for (const sampleId of Object.keys(metadata)) {
       // get current metadata and changed metadata entry for a sampleId
       const existingMetadataEntry = metadata[sampleId];
-<<<<<<< HEAD
+
       const existingChangedMetadataEntry = getMetadataEntryOrEmpty(
-=======
-      const exitingChangedMetadataEntry = getMetadataEntryOrEmpty(
->>>>>>> 5b598541 (allow user to import tsv data for sample edit)
         changedMetadata,
         sampleId
       );
 
       if (existingMetadataEntry) {
-<<<<<<< HEAD
         const uploadedMetadataEntry = getMetadataEntryOrEmpty(
           sampleIdToUploadedMetadata,
           sampleId
@@ -197,38 +178,6 @@ export default function ImportFile({
           ...existingChangedMetadataEntry,
           ...pick(uploadedMetadataEntry, uploadedFieldsWithData),
         };
-=======
-        const uploadedMetadataEntry = sampleIdToUploadedMetadata[sampleId];
-
-        if (uploadedMetadataEntry) {
-          // get metadata entries from upload that are not empty (means user wants to import new data)
-          const uploadedFieldsWithData: string[] = [];
-          Object.keys(uploadedMetadataEntry).forEach(function (item) {
-            if (
-              uploadedMetadataEntry[item as keyof SampleEditMetadataWebform] !=
-              ""
-            )
-              uploadedFieldsWithData.push(item);
-          });
-
-          // check if any entries need to be deleted/ cleared
-          for (const [key, value] of Object.entries(uploadedMetadataEntry)) {
-            (uploadedMetadataEntry[key as keyof SampleEditMetadataWebform] as
-              | string
-              | boolean
-              | NamedGisaidLocation
-              | undefined) = inferDeleteEntries(value);
-          }
-          uploadedMetadata[sampleId] = {
-            ...existingMetadataEntry,
-            ...pick(uploadedMetadataEntry, uploadedFieldsWithData),
-          };
-          changedMetadataUpdated[sampleId] = {
-            ...exitingChangedMetadataEntry,
-            ...pick(uploadedMetadataEntry, uploadedFieldsWithData),
-          };
-        }
->>>>>>> 5b598541 (allow user to import tsv data for sample edit)
       }
     }
 

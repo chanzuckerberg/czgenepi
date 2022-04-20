@@ -1,12 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
-<<<<<<< HEAD
-import { ParseResult as ParseResultEdit } from "src/common/components/library/data_subview/components/EditSamplesConfirmationModal/components/ImportFile/parseFile";
-=======
 import {
   ParseResult as ParseResultEdit,
   SampleIdToWarningMessages as SampleIdToWarningMessagesEdit,
 } from "src/common/components/library/data_subview/components/EditSamplesConfirmationModal/components/ImportFile/parseFile";
->>>>>>> 5b598541 (allow user to import tsv data for sample edit)
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { StringToLocationFinder } from "src/common/utils/locationUtils";
 import { SampleUploadDownloadTemplate } from "src/components/DownloadMetadataTemplate";
@@ -17,6 +13,7 @@ import {
 } from "src/components/DownloadMetadataTemplate/prepMetadataTemplate";
 import FilePicker from "src/components/FilePicker";
 <<<<<<< HEAD
+<<<<<<< HEAD
 import ImportFileWarnings, {
   getAutocorrectCount,
   getMissingFields,
@@ -25,6 +22,9 @@ import { WebformTableTypeOptions as MetadataUploadTypeOption } from "src/compone
 import { WARNING_CODE } from "src/components/WebformTable/common/types";
 =======
 import ImportFileWarnings from "src/components/ImportFileWarnings";
+=======
+import ImportFileWarnings, { getAutocorrectCount, getMissingFields } from "src/components/ImportFileWarnings";
+>>>>>>> cb8cc772 (wip)
 import { WebformTableTypeOptions as MetadataUploadTypeOption } from "src/components/WebformTable";
 import {
   ERROR_CODE,

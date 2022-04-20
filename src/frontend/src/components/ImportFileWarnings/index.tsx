@@ -48,12 +48,13 @@ export default function ImportFileWarnings({
   filename,
   missingFields,
   autocorrectCount,
-  absentSampleIds = [],
+  absentSampleIds=[],
   missingData,
   badFormatData,
   IdColumnNameForWarnings,
   metadataUploadType,
 }: ImportFileWarningsProps): JSX.Element {
+
   return (
     <>
       {hasImportedFile &&
@@ -94,11 +95,31 @@ export default function ImportFileWarnings({
       {!isEmpty(missingData) && (
         <WarningMissingData missingData={missingData} />
       )}
-      {/* TODO: condense ErrorsAndWarnings and ImportFileWarnings */}
-      <ErrorsAndWarnings />
+     {(metadataUploadType == MetadataUploadTypeOption.Edit && extraneousSampleIds.length > 0)  && (
+          <WarningExtraneousEntrySampleEdit
+            extraneousSampleIds={extraneousSampleIds}
+          />
+      )}
+      {(metadataUploadType == MetadataUploadTypeOption.Upload && extraneousSampleIds.length > 0) && (
+          <WarningExtraneousEntry extraneousSampleIds={extraneousSampleIds} />
+      )}
+
+      {extraneousSampleIds.length > 0 && (
+        <WarningExtraneousEntry extraneousSampleIds={extraneousSampleIds} />
+      )}
+
+      {(absentSampleIds.length) > 0 && (
+        <WarningAbsentSample absentSampleIds={absentSampleIds} />
+      )}
+
+      {!isEmpty(missingData) && (
+        <WarningMissingData missingData={missingData} />
+      )}
+
+      {!isEmpty(badFormatData) && (
+        <WarningBadFormatData badFormatData={badFormatData} IdColumnNameForWarnings={IdColumnNameForWarnings}/>
+      )}
     </>
-  );
-}
 
 function getIsParseResultCompletelyUnused(
   extraneousSampleIds: string[],
