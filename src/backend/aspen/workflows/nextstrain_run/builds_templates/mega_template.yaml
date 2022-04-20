@@ -11,6 +11,7 @@ inputs:
 
 builds:
   aspen:
+    region: global
     country: {country}
     division: {division}
     location: {location}
