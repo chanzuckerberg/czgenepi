@@ -92,7 +92,9 @@ def _sample_filter(sample: Sample, can_see_pi_group_ids: Set[int], system_admin:
 
 def _collect_countries(node: dict) -> Set[str]:
     countries = set()
-    countries.add(node["node_attrs"]["country"]["value"])
+    node_country = node.get("node_attrs", {}).get("country", {}).get("value", None)
+    if node_country:
+        countries.add(node_country)
     for child in node.get("children", []):
         countries |= _collect_countries(child)
     return countries
@@ -120,8 +122,8 @@ async def _set_countries(
     origin_location = aliased(Location)
 
     sorting_query = (
-        sa.select(
-            Location.country,
+        sa.select(  # type: ignore
+            Location.country,  # type: ignore
             sa.func.earth_distance(
                 sa.func.ll_to_earth(Location.latitude, Location.longitude),
                 sa.func.ll_to_earth(
@@ -129,9 +131,9 @@ async def _set_countries(
                 ),
             ).label("distance"),
         )
-        .select_from(origin_location)
+        .select_from(origin_location)  # type: ignore
         .join(
-            Location,
+            Location,  # type: ignore
             and_(
                 Location.division == None,  # noqa: E711
                 Location.location == None,  # noqa: E711
@@ -153,7 +155,7 @@ async def _set_countries(
 
     colorings_entry = list(zip(countries, NEXTSTRAIN_COLOR_SCALE))
 
-    if country_defines_index:
+    if country_defines_index is not None:
         tree_json["meta"]["colorings"][country_defines_index]["scale"] = colorings_entry
     else:
         tree_json["meta"]["colorings"].append(
@@ -234,7 +236,6 @@ async def process_phylo_tree(
 
     # set country labeling/colors
     json_data = await _set_countries(db, json_data, phylo_run)
-
     return json_data
 
 
