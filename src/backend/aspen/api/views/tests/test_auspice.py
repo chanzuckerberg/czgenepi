@@ -9,6 +9,7 @@ from botocore.client import ClientError
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from aspen.api.views.tests.data.phylo_tree import TEST_TREE
 from aspen.api.views.tests.test_update_phylo_run_and_tree import make_shared_test_data
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.usergroup import group_factory, user_factory
@@ -38,6 +39,9 @@ test_country_data = [
     ),
     Point("North America", "Costa Rica", 10.0378999710083, -83.81875610351562),
     Point("Asia", "Japan", 35.685359954833984, 139.7530975341797),
+    Point("Asia", "China", 33.39433288574219, 104.6898422241211),
+    Point("Europe", "France", 46.22760009765625, 2.21370005607605),
+    Point("Europe", "Germany", 51.16569900512695, 10.451499938964844),
 ]
 
 
@@ -77,21 +81,7 @@ async def test_valid_auspice_link_access(
         # The bucket does not exist or you have no access.
         mock_s3_resource.create_bucket(Bucket=phylo_tree.s3_bucket)
 
-    test_tree = {
-        "meta": {
-            "colorings": [],
-        },
-        "tree": {
-            "branch_attrs": {"labels": {"clade": "42"}, "mutations": {}},
-            "children": [
-                {"name": "public_identifier_1"},
-                {"name": "public_identifier_2"},
-            ],
-            "name": "ROOT",
-        },
-        "version": "1.3.3.7",
-    }
-    test_json = json.dumps(test_tree)
+    test_json = json.dumps(TEST_TREE)
 
     mock_s3_resource.Bucket(phylo_tree.s3_bucket).Object(phylo_tree.s3_key).put(
         Body=test_json
@@ -217,22 +207,7 @@ async def test_country_color_labeling(
         # The bucket does not exist or you have no access.
         mock_s3_resource.create_bucket(Bucket=phylo_tree.s3_bucket)
 
-    test_tree = {
-        "meta": {
-            "colorings": [],
-        },
-        "tree": {
-            "branch_attrs": {"labels": {"clade": "42"}, "mutations": {}},
-            "children": [
-                {"name": "public_identifier_1"},
-                {"name": "public_identifier_2"},
-            ],
-            "name": "ROOT",
-        },
-        "version": "1.3.3.7",
-    }
-    test_json = json.dumps(test_tree)
-
+    test_json = json.dumps(TEST_TREE)
     mock_s3_resource.Bucket(phylo_tree.s3_bucket).Object(phylo_tree.s3_key).put(
         Body=test_json
     )
@@ -260,12 +235,18 @@ async def test_country_color_labeling(
             country_colorings = category
     assert country_colorings is not None
 
-    test_country_names = [point.country for point in test_country_data]
+    print(country_colorings["scale"])
+
+    test_country_names = ["USA", "Mexico", "Canada", "France", "Germany", "China"]
 
     assert "scale" in country_colorings
-    assert len(country_colorings["scale"]) == 16
 
+    unique_countries = set()
     for country, hex_color in country_colorings["scale"]:
-        assert country in test_country_names
-        assert country != "Japan"
         assert re.search(r"^#(?:[0-9a-fA-F]{3}){1,2}$", hex_color) is not None
+        unique_countries.add(country)
+
+    assert len(unique_countries) == len(country_colorings["scale"])
+    for entry in test_country_names:
+        assert entry in unique_countries
+    assert "Japan" not in unique_countries

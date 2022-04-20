@@ -1,15 +1,13 @@
 import json
 import os
 import re
-import warnings
 from typing import Dict, Mapping, Optional, Set, Tuple
 
 import boto3
 import sqlalchemy as sa
 from sqlalchemy import asc
-from sqlalchemy.exc import SAWarning
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import aliased, selectinload
 from sqlalchemy.sql.expression import and_
 
 from aspen.api.error import http_exceptions as ex
@@ -92,9 +90,19 @@ def _sample_filter(sample: Sample, can_see_pi_group_ids: Set[int], system_admin:
     return sample.submitting_group_id in can_see_pi_group_ids
 
 
+def _collect_countries(node: dict) -> Set[str]:
+    countries = set()
+    countries.add(node["node_attrs"]["country"]["value"])
+    for child in node.get("children", []):
+        countries |= _collect_countries(child)
+    return countries
+
+
 # set which countries will be given color labels in the nextstrain viewer
 # noqa: E711 is vital for the SQL query to compile correctly.
-async def _set_countries(db: AsyncSession, tree_json: dict, phylo_run: PhyloRun):
+async def _set_countries(
+    db: AsyncSession, tree_json: dict, phylo_run: PhyloRun
+) -> dict:
     # information stored in tree_json["meta"]["colorings"], which is an
     # array of objects. we grab the index of the one for "country"
     country_defines_index = None
@@ -102,53 +110,46 @@ async def _set_countries(db: AsyncSession, tree_json: dict, phylo_run: PhyloRun)
         if category["key"] == "country":
             country_defines_index = index
 
-    # Next we grab the tree's country and the nearest 15 countries
+    # We want to make sure we include countries in the tree
+    defined_countries: Set[str] = _collect_countries(tree_json["tree"])
+
     tree_location = phylo_run.group.default_tree_location
     countries = [tree_location.country]
-    origin_subq = (
-        sa.select(Location.country, Location.latitude, Location.longitude)  # type: ignore
-        .where(
-            and_(
-                Location.division == None,  # noqa: E711
-                Location.location == None,  # noqa: E711
-                Location.country == tree_location.country,
-            )
-        )
-        .subquery()
-        .lateral()
-    )
-    countries_subq = (
-        sa.select(Location.country, Location.latitude, Location.longitude)  # type: ignore
-        .where(
-            and_(
-                Location.division == None,  # noqa: E711
-                Location.location == None,  # noqa: E711
-                Location.country != tree_location.country,
-            )
-        )
-        .subquery()
-    )
-    neighbors_query = (
+    defined_countries -= set(countries)
+
+    origin_location = aliased(Location)
+
+    sorting_query = (
         sa.select(
-            countries_subq.c.country,
+            Location.country,
             sa.func.earth_distance(
+                sa.func.ll_to_earth(Location.latitude, Location.longitude),
                 sa.func.ll_to_earth(
-                    countries_subq.c.latitude, countries_subq.c.longitude
+                    origin_location.latitude, origin_location.longitude
                 ),
-                sa.func.ll_to_earth(origin_subq.c.latitude, origin_subq.c.longitude),
             ).label("distance"),
+        )
+        .select_from(origin_location)
+        .join(
+            Location,
+            and_(
+                Location.division == None,  # noqa: E711
+                Location.location == None,  # noqa: E711
+                Location.country.in_(defined_countries),
+            ),
+        )
+        .where(
+            and_(
+                origin_location.country == tree_location.country,
+                origin_location.division == None,  # noqa: E711
+                origin_location.location == None,  # noqa: E711
+            )
         )
         .order_by(asc("distance"))
         .limit(15)
     )
-
-    # SQLAlchemy doesn't seem to fully understand the way we use a LATERAL join here,
-    # so issues a warning that we will have a cartesian product unless
-    # we use a join (but this does not happen)
-    with warnings.catch_warnings():
-        warnings.filterwarnings(action="ignore", category=SAWarning)
-        neighbors = await db.execute(neighbors_query)
-        countries.extend([row["country"] for row in neighbors])
+    sorted_countries = await db.execute(sorting_query)
+    countries.extend(row["country"] for row in sorted_countries)
 
     colorings_entry = list(zip(countries, NEXTSTRAIN_COLOR_SCALE))
 
