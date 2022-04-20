@@ -12,7 +12,7 @@ import {
   TEMPLATE_UPDATED_DATE,
 } from "src/components/DownloadMetadataTemplate/prepMetadataTemplate";
 import FilePicker from "src/components/FilePicker";
-import ImportFileWarnings from "src/components/ImportFileWarnings";
+import ImportFileWarnings, { getAutocorrectCount, getMissingFields } from "src/components/ImportFileWarnings";
 import { WebformTableTypeOptions as MetadataUploadTypeOption } from "src/components/WebformTable";
 import {
   ERROR_CODE,
@@ -161,35 +161,6 @@ export default function ImportFile({
         />
       </div>
 
-      {/* {hasImportedFile &&
-        !getIsParseResultCompletelyUnused(extraneousSampleIds, parseResult) && (
-          <Success filename={filename} />
-        )}
-
-      {missingFields && (
-        <Error errorCode={ERROR_CODE.MISSING_FIELD} names={missingFields} />
-      )}
-
-      {autocorrectCount > 0 && (
-        <WarningAutoCorrect autocorrectedSamplesCount={autocorrectCount} />
-      )}
-
-      {extraneousSampleIds.length > 0 && (
-        <WarningExtraneousEntry extraneousSampleIds={extraneousSampleIds} />
-      )}
-
-      {absentSampleIds.length > 0 && (
-        <WarningAbsentSample absentSampleIds={absentSampleIds} />
-      )}
-
-      {!isEmpty(missingData) && (
-        <WarningMissingData missingData={missingData} />
-      )}
-
-      {!isEmpty(badFormatData) && (
-        <WarningBadFormatData badFormatData={badFormatData} />
-      )} */}
-
       <ImportFileWarnings
         hasImportedFile={hasImportedFile}
         extraneousSampleIds={extraneousSampleIds}
@@ -207,35 +178,4 @@ export default function ImportFile({
       />
     </Wrapper>
   );
-}
-
-function getIsParseResultCompletelyUnused(
-  extraneousSampleIds: string[],
-  parseResult: ParseResult | null
-) {
-  if (!parseResult) return true;
-
-  const { data } = parseResult;
-
-  return extraneousSampleIds.length === Object.keys(data).length;
-}
-
-function getAutocorrectCount(
-  sampleIdToWarningMessages: SampleIdToWarningMessages = {}
-) {
-export function getAutocorrectCount(
-  sampleIdToWarningMessages:
-    | SampleIdToWarningMessagesUpload
-    | SampleIdToWarningMessagesEdit = {}
-): number {
-  return Object.keys(sampleIdToWarningMessages).length;
-}
-
-// Returns array of all missing column header fields, or if none missing, null.
-export function getMissingFields(
-  parseResult: ParseResultUpload | ParseResultEdit
-): string[] | null {
-  const { errorMessages } = parseResult;
-  const missingFieldsErr = errorMessages.get(ERROR_CODE.MISSING_FIELD);
-  return missingFieldsErr ? Array.from(missingFieldsErr) : null;
 }

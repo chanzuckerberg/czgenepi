@@ -18,7 +18,7 @@ import {
 import {
   getAutocorrectCount,
   getMissingFields,
-} from "src/views/Upload/components/Metadata/components/ImportFile";
+} from "src/components/ImportFileWarnings";
 import { getMetadataEntryOrEmpty } from "../../utils";
 import {
   parseFileEdit,
