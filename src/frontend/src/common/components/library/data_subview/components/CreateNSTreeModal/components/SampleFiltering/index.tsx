@@ -102,7 +102,7 @@ function getLineageDropdownValue(
  * into something Dropdown can display. Second, it handles moving up selected
  * lineages to the top of the list to be displayed above unchosen lineages.
  * Third, it ensures that the "All" choice -- reset back to having no selected
- * lineages -- is always available and ad the top of the list.
+ * lineages -- is always available and at the top of the list.
  *
  * Notes:
  * - Could be optimized for speed somewhat, everything is just based around
@@ -205,7 +205,7 @@ export function SampleFiltering({
    * So in addition to needing to handle this side-effect logic, we also have
    * to avoid infinite render loops due to the side-effect setting a new
    * `selectedLineages` upstream, which then goes down into the Dropdown, which
-   * then kicks off the onChange (b/c its controlled), which can then trigger
+   * then kicks off the onChange (b/c it's controlled), which can then trigger
    * another new side-effect handling and spiral into an infinite loop...
    *
    * If this winds up being refactored into something better, that would be
@@ -217,7 +217,7 @@ export function SampleFiltering({
   ): void {
     // No selection at all means empty all lineage choices.
     // (Vince) Poked around: I don't think Dropdown emits this in our case?
-    // But interface for the component says its there, so defensive code here.
+    // But interface for the component says it's there, so defensive code here.
     if (newSelectedOptions === null) {
       setSelectedLineages([]);
       return;
