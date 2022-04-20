@@ -296,8 +296,18 @@ def me(ctx):
 @user.command(name="create")
 @click.argument("email")
 @click.option("--name", required=True, type=str, help="The user's name.")
-@click.option("--group_id", required=True, type=str, help="The id of the group to create the user in.")
-@click.option("--auth0_user_id", required=True, type=str, help="The auth0 identifier attached to the user's auth0 account.")
+@click.option(
+    "--group_id",
+    required=True,
+    type=str,
+    help="The id of the group to create the user in.",
+)
+@click.option(
+    "--auth0_user_id",
+    required=True,
+    type=str,
+    help="The auth0 identifier attached to the user's auth0 account.",
+)
 @click.option("--group_admin", is_flag=True, default=False)
 @click.option("--system_admin", is_flag=True, default=False)
 @click.pass_context
@@ -355,7 +365,7 @@ def download_tree(ctx, tree_id, public_ids):
         params["id_style"] = "public"
     else:
         params["id_style"] = "private"
-    resp = api_client.get(f"/api/phylo_tree/{tree_id}", params=params)
+    resp = api_client.get(f"/v2/phylo_trees/{tree_id}/download", params=params)
     print(resp.text)
 
 
