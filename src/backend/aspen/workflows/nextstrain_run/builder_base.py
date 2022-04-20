@@ -37,9 +37,9 @@ class BaseNextstrainConfigBuilder:
             self.tree_build_level = "country"
         elif not location.location:
             self.tree_build_level = "division"
-        # Fill out region/country/division/location fields if the group has them,
+        # Fill out country/division/location fields if the group has them,
         # or remove those fields if they don't.
-        location_fields = ["region", "country", "division", "location"]
+        location_fields = ["country", "division", "location"]
         location_values = []
         for field in location_fields:
             value = getattr(location, field)
