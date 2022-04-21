@@ -122,7 +122,6 @@ services:
   oidc:
     image: soluto/oidc-server-mock:0.3.0
     profiles: [ "backend", "web", "all" ]
-    platform: linux/amd64
     ports:
       - "4011:80"
       - "8443:8443"
@@ -210,9 +209,15 @@ services:
         - BUILDKIT_INLINE_CACHE=1
     environment:
       - AWS_REGION=us-west-2
-      - BOTO_ENDPOINT_URL=http://localstack.genepinet.localdev:4566
       - AWS_ACCESS_KEY_ID=dev_access_key_id
       - AWS_SECRET_ACCESS_KEY=dev_secret_access_key
+      - FLASK_ENV=development
+      - PYTHONUNBUFFERED=1
+      - BOTO_ENDPOINT_URL=http://localstack.genepinet.localdev:4566
+      - DB=docker
+      - ENV=local
+      - DEPLOYMENT_STAGE=local
+      - PYTHONPATH=.
     command: [ "true" ]
     restart: "no"
     networks:

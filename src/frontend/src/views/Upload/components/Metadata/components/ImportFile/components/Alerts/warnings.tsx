@@ -224,6 +224,7 @@ function MessageBadFormatData({ badFormatData }: PropsBadFormatData) {
     />
   );
 }
+
 export function WarningBadFormatData({
   badFormatData,
 }: PropsBadFormatData): JSX.Element {

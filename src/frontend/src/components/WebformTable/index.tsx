@@ -22,18 +22,23 @@ interface Props {
   metadata: CommonProps["metadata"];
   hasImportedMetadataFile?: boolean;
   setMetadata: CommonProps["setMetadata"];
+  // TODO: update value type to be something other than unknown
+  applyToAllColumn(fieldKey: keyof Metadata, value: unknown): void;
   setIsValid: React.Dispatch<React.SetStateAction<boolean>>;
+  handleRowMetadata(id: string, sampleMetadata: Metadata): void;
   autocorrectWarnings?: SampleIdToWarningMessages;
   locations: NamedGisaidLocation[];
   webformTableType: string;
 }
 
 export function WebformTable({
+  applyToAllColumn,
   metadata,
   hasImportedMetadataFile,
   setMetadata,
   setIsValid,
   autocorrectWarnings,
+  handleRowMetadata,
   locations,
   webformTableType,
 }: Props): JSX.Element {
@@ -77,33 +82,6 @@ export function WebformTable({
   const handleRowValidation = useCallback(handleRowValidation_, [
     rowValidation,
   ]);
-
-  const handleRowMetadata_ = (id: string, sampleMetadata: Metadata) => {
-    setMetadata((prevMetadata) => {
-      return { ...prevMetadata, [id]: sampleMetadata };
-    });
-  };
-
-  const handleRowMetadata = useCallback(handleRowMetadata_, [setMetadata]);
-
-  const applyToAllColumn_ = (fieldKey: keyof Metadata, value: unknown) => {
-    setMetadata((prevMetadata) => {
-      const newMetadata: CommonProps["metadata"] = {};
-
-      for (const [sampleId, sampleMetadata] of Object.entries(
-        prevMetadata || EMPTY_OBJECT
-      )) {
-        newMetadata[sampleId] = {
-          ...(sampleMetadata as Record<string, unknown>),
-          [fieldKey]: value,
-        };
-      }
-
-      return newMetadata;
-    });
-  };
-
-  const applyToAllColumn = useCallback(applyToAllColumn_, [setMetadata]);
 
   if (!isReadyToRenderTable) {
     return (

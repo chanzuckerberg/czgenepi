@@ -4,7 +4,12 @@ import { DefaultMenuSelectOption } from "czifui";
 import { isEqual } from "lodash";
 import React from "react";
 import { noop } from "src/common/constants/empty";
+import {
+  MENU_OPTIONS_COLLECTION_DATE,
+  MENU_OPTION_ALL_TIME,
+} from "src/components/DateFilterMenu/constants";
 import { StyledInfoOutlinedIcon, StyledTooltip } from "../../style";
+import { CollectionDateFilter } from "./components/CollectionDateFilter";
 import {
   StyledContainer,
   StyledDropdown,
@@ -13,7 +18,6 @@ import {
   StyledFilterGroup,
   StyledFilterGroupName,
   StyledFiltersSection,
-  StyledInputDropdown,
   StyledNewTabLink,
 } from "./style";
 
@@ -146,6 +150,12 @@ const InputDropdownProps = {
   sdsStyle: "square",
 } as const;
 
+// DropdownPopper (for use with Dropdown's PopperComponent prop) needs to
+// have a `placement` prop to set where it anchors against Dropdown opener.
+const BottomPlacementDropdownPopper = (props: any) => {
+  return <StyledDropdownPopper placement="bottom-start" {...props} />;
+};
+
 /**
  * Provides filtering of samples that are automatically added to trees.
  *
@@ -172,7 +182,7 @@ export function SampleFiltering({
   availableLineages,
   selectedLineages,
   setSelectedLineages,
-}: Props) {
+}: Props): JSX.Element {
   const lineageDropdownOptions = generateLineageDropdownOptions(
     selectedLineages,
     availableLineages
@@ -290,17 +300,19 @@ export function SampleFiltering({
             search
             MenuSelectProps={lineageMenuSelectProps}
             InputDropdownProps={InputDropdownProps}
-            PopperComponent={StyledDropdownPopper}
+            PopperComponent={BottomPlacementDropdownPopper}
           />
         </StyledFilterGroup>
         <StyledFilterGroup>
           <StyledFilterGroupName>Collection Date</StyledFilterGroupName>
-          <StyledInputDropdown
-            disabled={false}
-            label="Dummy placeholder"
-            onClick={noop}
-            sdsStage="userInput"
-            sdsStyle="square"
+          <CollectionDateFilter
+            fieldKeyEnd="collectionDateEnd"
+            fieldKeyStart="collectionDateStart"
+            updateDateFilter={noop}
+            menuOptions={[
+              ...MENU_OPTIONS_COLLECTION_DATE,
+              MENU_OPTION_ALL_TIME,
+            ]}
           />
         </StyledFilterGroup>
       </StyledFiltersSection>
