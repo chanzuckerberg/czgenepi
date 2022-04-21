@@ -39,5 +39,5 @@ export const MENU_OPTIONS_COLLECTION_DATE: DateMenuOption[] = [
 ];
 
 export const MENU_OPTION_ALL_TIME: DateMenuOption = {
-  name: "All time",
+  name: "All Time",
 };
