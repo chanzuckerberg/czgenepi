@@ -154,14 +154,13 @@ async def _set_countries(
     sorted_country_names = [row["country"] for row in sorted_countries]
 
     # Add the countries we found location data for
-    # If we still have fewer than 16, add whatever is left from the set we collected 
+    # If we still have fewer than 16, add whatever is left from the set we collected
     # in the tree, even if we don't have spatial data on them.
     countries.extend(sorted_country_names)
     if len(countries) < 16:
         defined_countries -= set(sorted_country_names)
         remaining_countries_in_tree = list(defined_countries)
-        countries.extend(remaining_countries_in_tree[:16-len(countries)])
-
+        countries.extend(remaining_countries_in_tree[: 16 - len(countries)])
 
     colorings_entry = list(zip(countries, NEXTSTRAIN_COLOR_SCALE))
 
