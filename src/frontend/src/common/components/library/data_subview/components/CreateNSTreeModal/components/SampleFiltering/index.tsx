@@ -171,12 +171,6 @@ const BottomPlacementDropdownPopper = (props: any) => {
  * use of only one kind of lineage: Pango lineages. Using the generic term is
  * mostly for ease, but we might need to approach breaking out by type if we
  * start to support others eventually (like WHO greek letters, etc).
- *
- * TODO Vincent -- Mar 9, 2022
- * Below `StyledInputDropdown` components are /very/ much placeholders.
- * Looked over czifui for a bit, and I couldn't find an easy way to match
- * our designs to what's current available. Those are just there to get
- * a version of this out the door, nothing longterm at all there.
  */
 export function SampleFiltering({
   availableLineages,
