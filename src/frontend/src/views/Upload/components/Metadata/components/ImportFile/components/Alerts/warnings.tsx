@@ -11,7 +11,7 @@ import {
 import { SampleIdToWarningMessages } from "../../parseFile";
 import { ProblemTable } from "./common/ProblemTable";
 
-const WARNING_SEVERITY: AlertProps["severity"] = "warning";
+const WARNING_SEVERITY = "warning";
 
 /**
  *  WARNING_CODE.AUTO_CORRECT
@@ -110,22 +110,22 @@ export function WarningExtraneousEntrySampleEdit({
 }: PropsExtraneousEntry): JSX.Element {
   const count = extraneousSampleIds.length;
   // "X Samples in metadata file were not used."
-  const title = `${count} ${maybePluralize(
+  const title = `${count} ${pluralize(
     "Sample",
     count
-  )} in metadata file ${maybePluralize(
+  )} in metadata file ${pluralize(
     "was",
     count
   )} couldn't be matched and weren't imported.`;
   return (
-    <FullWidthAlertAccordion
+    <AlertAccordion
       title={title}
-      message={
+      collapseContent={
         <MessageExtraneousEntrySampleEdit
           extraneousSampleIds={extraneousSampleIds}
         />
       }
-      severity={WARNING_SEVERITY}
+      intent={WARNING_SEVERITY}
     />
   );
 }
