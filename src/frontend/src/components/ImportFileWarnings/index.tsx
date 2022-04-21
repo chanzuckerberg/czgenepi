@@ -9,9 +9,9 @@ import { ERROR_CODE } from "src/components/WebformTable/common/types";
 import Error from "src/views/Upload/components/Metadata/components/ImportFile/components/Alerts/Error";
 import Success from "src/views/Upload/components/Metadata/components/ImportFile/components/Alerts/Success";
 import {
+  ErrorBadFormatData,
   WarningAbsentSample,
   WarningAutoCorrect,
-  ErrorBadFormatData,
   WarningExtraneousEntry,
   WarningExtraneousEntrySampleEdit,
   WarningMissingData,
@@ -94,6 +94,7 @@ export default function ImportFileWarnings({
       {!isEmpty(missingData) && (
         <WarningMissingData missingData={missingData} />
       )}
+      <ErrorsAndWarnings />
     </>
   );
 }
