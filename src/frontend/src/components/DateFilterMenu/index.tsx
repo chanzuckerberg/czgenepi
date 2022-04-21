@@ -1,7 +1,7 @@
 import { Menu, MenuItem } from "czifui";
 import { useFormik } from "formik";
 import { noop } from "lodash";
-import React, { FC, useEffect, useMemo, useState } from "react";
+import React, { FC, useMemo } from "react";
 import DateField from "src/components/DateField";
 import {
   DATE_ERROR_MESSAGE,
@@ -33,9 +33,8 @@ interface Props {
   onClose(): void;
   onStartDateChange(date: FormattedDateType): void;
   onEndDateChange(date: FormattedDateType): void;
-  onDateLabelChange(label: string | null): void;
-  shouldClearFilter: boolean;
-  setShouldClearFilter(s: boolean): void;
+  selectedDateMenuOption: DateMenuOption | null;
+  setSelectedDateMenuOption(o: DateMenuOption | null): void;
 }
 
 export const DateFilterMenu: FC<Props> = ({
@@ -47,21 +46,9 @@ export const DateFilterMenu: FC<Props> = ({
   onClose,
   onStartDateChange,
   onEndDateChange,
-  onDateLabelChange,
-  shouldClearFilter,
-  setShouldClearFilter,
+  selectedDateMenuOption,
+  setSelectedDateMenuOption,
 }) => {
-  // What menu option is chosen. If none chosen, `null`.
-  const [selectedDateMenuOption, setSelectedDateMenuOption] =
-    useState<DateMenuOption | null>(null);
-
-  useEffect(() => {
-    if (shouldClearFilter) {
-      setSelectedDateMenuOption(null);
-      setShouldClearFilter(false);
-    }
-  }, [shouldClearFilter, setShouldClearFilter]);
-
   const validationSchema = useMemo(
     () =>
       yup.object({
@@ -109,7 +96,6 @@ export const DateFilterMenu: FC<Props> = ({
 
   const setDatesFromMenuOption = (dateOption: DateMenuOption) => {
     setSelectedDateMenuOption(dateOption);
-    onDateLabelChange(dateOption.name);
     // Selecting a menu option clears out anything entered in the fields.
     setFieldValue(fieldKeyStart, undefined);
     setFieldValue(fieldKeyEnd, undefined);
@@ -131,7 +117,6 @@ export const DateFilterMenu: FC<Props> = ({
     // Since using fields instead, clear out selected menu option
     setSelectedDateMenuOption(null);
     setDatesFromRange(start, end);
-    onDateLabelChange(null);
   };
 
   //TODO when it's available, use sds component for single select on preset date ranges
