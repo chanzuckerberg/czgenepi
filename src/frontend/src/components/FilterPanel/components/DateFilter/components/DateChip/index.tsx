@@ -1,5 +1,5 @@
 import React from "react";
-import { StyledChip } from "../../../../style";
+import { StyledChip } from "./style";
 
 interface DateChipProps {
   startDate?: DateType;

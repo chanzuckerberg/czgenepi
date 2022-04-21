@@ -1,11 +1,5 @@
 import styled from "@emotion/styled";
-import {
-  Chip,
-  CommonThemeProps,
-  ComplexFilter,
-  getColors,
-  getSpaces,
-} from "czifui";
+import { CommonThemeProps, ComplexFilter, getColors, getSpaces } from "czifui";
 
 export interface ExtraProps extends CommonThemeProps {
   isOpen?: boolean;
@@ -26,15 +20,6 @@ export const StyledFilterPanel = styled("div", {
       display: ${isOpen ? "block" : "none"};
       padding: ${spaces?.xl}px;
       width: 240px;
-    `;
-  }}
-`;
-
-export const StyledChip = styled(Chip)`
-  ${(props) => {
-    const spaces = getSpaces(props);
-    return `
-      margin: ${spaces?.xxs}px ${spaces?.xxs}px 0 0;
     `;
   }}
 `;
