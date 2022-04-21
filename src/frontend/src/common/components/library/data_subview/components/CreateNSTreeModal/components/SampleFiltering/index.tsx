@@ -1,6 +1,11 @@
 import React from "react";
 import { noop } from "src/common/constants/empty";
+import {
+  MENU_OPTIONS_COLLECTION_DATE,
+  MENU_OPTION_ALL_TIME,
+} from "src/components/DateFilterMenu/constants";
 import { StyledInfoOutlinedIcon, StyledTooltip } from "../../style";
+import { CollectionDateFilter } from "./components/CollectionDateFilter";
 import {
   StyledContainer,
   StyledExplainerTitle,
@@ -37,7 +42,7 @@ const SAMPLE_FILTERING_TOOLTIP_TEXT = (
  * our designs to what's current available. Those are just there to get
  * a version of this out the door, nothing longterm at all there.
  */
-export function SampleFiltering() {
+export function SampleFiltering(): JSX.Element {
   return (
     <StyledContainer>
       <StyledExplainerTitle>
@@ -65,12 +70,14 @@ export function SampleFiltering() {
         </StyledFilterGroup>
         <StyledFilterGroup>
           <StyledFilterGroupName>Collection Date</StyledFilterGroupName>
-          <StyledInputDropdown
-            disabled={false}
-            label="Dummy placeholder"
-            onClick={noop}
-            sdsStage="userInput"
-            sdsStyle="square"
+          <CollectionDateFilter
+            fieldKeyEnd="collectionDateEnd"
+            fieldKeyStart="collectionDateStart"
+            updateDateFilter={noop}
+            menuOptions={[
+              ...MENU_OPTIONS_COLLECTION_DATE,
+              MENU_OPTION_ALL_TIME,
+            ]}
           />
         </StyledFilterGroup>
       </StyledFiltersSection>

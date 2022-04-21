@@ -96,14 +96,18 @@ export const DateFilterMenu: FC<Props> = ({
 
   const setDatesFromMenuOption = (dateOption: DateMenuOption) => {
     setSelectedDateMenuOption(dateOption);
+
     // Selecting a menu option clears out anything entered in the fields.
     setFieldValue(fieldKeyStart, undefined);
     setFieldValue(fieldKeyEnd, undefined);
 
-    // We assume start of interval is always guaranteed, but not necessarily end
-    const start = new Date();
-    start.setDate(start.getDate() - dateOption.numDaysStartOffset);
-    start.setHours(0, 0, 0);
+    let start = undefined;
+    if (dateOption.numDaysStartOffset) {
+      start = new Date();
+      start.setDate(start.getDate() - dateOption.numDaysStartOffset);
+      start.setHours(0, 0, 0);
+    }
+
     let end = undefined;
     if (dateOption.numDaysEndOffset) {
       end = new Date();
