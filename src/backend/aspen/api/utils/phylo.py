@@ -24,22 +24,22 @@ from aspen.database.models import (
 
 # 16 colors
 NEXTSTRAIN_COLOR_SCALE = [
-    "#571EA2",
-    "#4334BF",
-    "#3F55CE",
-    "#4376CD",
-    "#4C91C0",
-    "#59A4A9",
-    "#6AB18F",
-    "#7FB975",
-    "#97BD5F",
-    "#AFBD4F",
-    "#C7B944",
-    "#D9AD3D",
-    "#E49838",
-    "#E67932",
-    "#E1512A",
-    "#DB2823",
+    "#277F8E",
+    "#084A9F",
+    "#4187E0",
+    "#B2D3FD",
+    "#DFC6FF",
+    "#9069C2",
+    "#440278",
+    "#BD3232",
+    "#ED5151",
+    "#FF9999",
+    "#FF8A24",
+    "#FFDABA",
+    "#A76738",
+    "#FDE725",
+    "#A0DA39",
+    "#4AB569",
 ]
 
 
