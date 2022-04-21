@@ -99,16 +99,13 @@ export default function ImportFileWarnings({
           <WarningExtraneousEntrySampleEdit
             extraneousSampleIds={extraneousSampleIds}
           />
-      )}
-      {(metadataUploadType == MetadataUploadTypeOption.Upload && extraneousSampleIds.length > 0) && (
+        )}
+      {metadataUploadType == MetadataUploadTypeOption.Upload &&
+        extraneousSampleIds.length > 0 && (
           <WarningExtraneousEntry extraneousSampleIds={extraneousSampleIds} />
       )}
 
-      {extraneousSampleIds.length > 0 && (
-        <WarningExtraneousEntry extraneousSampleIds={extraneousSampleIds} />
-      )}
-
-      {(absentSampleIds.length) > 0 && (
+      {absentSampleIds.length > 0 && (
         <WarningAbsentSample absentSampleIds={absentSampleIds} />
       )}
 
@@ -117,7 +114,10 @@ export default function ImportFileWarnings({
       )}
 
       {!isEmpty(badFormatData) && (
-        <WarningBadFormatData badFormatData={badFormatData} IdColumnNameForWarnings={IdColumnNameForWarnings}/>
+        <WarningBadFormatData
+          badFormatData={badFormatData}
+          IdColumnNameForWarnings={IdColumnNameForWarnings}
+        />
       )}
     </>
 
