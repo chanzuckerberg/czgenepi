@@ -23,6 +23,7 @@ import {
 } from "src/components/WebformTable/common/types";
 import { ContinueButton } from "src/views/Upload/components/common/style";
 import { NamedGisaidLocation } from "src/views/Upload/components/common/types";
+import { ErrorsAndWarnings } from "./components/ErrorsAndWarnings";
 import {
   StyledButton,
   StyledDiv,
@@ -265,6 +266,7 @@ const EditSamplesConfirmationModal = ({
               InstructionsTitleMarginBottom="xxs"
               listItemFontSize="xs"
             />
+            <ErrorsAndWarnings />
             <WebformTable
               setIsValid={setIsValid}
               metadata={metadata}
