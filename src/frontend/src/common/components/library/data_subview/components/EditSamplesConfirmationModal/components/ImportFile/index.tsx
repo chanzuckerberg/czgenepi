@@ -18,17 +18,10 @@ import {
   NamedGisaidLocation,
   Props as CommonProps,
 } from "src/views/Upload/components/common/types";
-<<<<<<< HEAD
-=======
 import {
   getAutocorrectCount,
   getMissingFields,
-<<<<<<< HEAD
-} from "src/views/Upload/components/Metadata/components/ImportFile";
->>>>>>> 5b598541 (allow user to import tsv data for sample edit)
-=======
 } from "src/components/ImportFileWarnings";
->>>>>>> cb8cc772 (wip)
 import { getMetadataEntryOrEmpty } from "../../utils";
 import {
   parseFileEdit,

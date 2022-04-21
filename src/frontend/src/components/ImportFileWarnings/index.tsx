@@ -48,13 +48,12 @@ export default function ImportFileWarnings({
   filename,
   missingFields,
   autocorrectCount,
-  absentSampleIds=[],
+  absentSampleIds = [],
   missingData,
   badFormatData,
   IdColumnNameForWarnings,
   metadataUploadType,
 }: ImportFileWarningsProps): JSX.Element {
-
   return (
     <>
       {hasImportedFile &&
