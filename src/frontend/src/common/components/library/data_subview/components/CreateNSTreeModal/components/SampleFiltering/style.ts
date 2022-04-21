@@ -41,6 +41,12 @@ export const StyledFilterGroup = styled.div`
 export const StyledFilterGroupName = styled.p`
   ${fontHeaderXs}
   color: black;
+  ${(props) => {
+    const spaces = getSpaces(props);
+    return `
+      margin-bottom: ${spaces?.xxs}px;
+    `;
+  }}
 `;
 
 export const StyledNewTabLink = styled(NewTabLink)`

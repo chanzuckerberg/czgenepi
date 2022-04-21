@@ -1,22 +1,6 @@
 import React, { FC } from "react";
-import { UpdateDateFilterType } from "../..";
-import { DateFilter, DateMenuOption } from "../DateFilter";
-
-const MENU_OPTIONS_UPLOAD_DATE: DateMenuOption[] = [
-  {
-    name: "Today",
-    numDaysStartOffset: 0,
-  },
-  {
-    name: "Yesterday",
-    numDaysEndOffset: 1,
-    numDaysStartOffset: 1,
-  },
-  {
-    name: "Last 7 Days",
-    numDaysStartOffset: 7,
-  },
-];
+import { MENU_OPTIONS_UPLOAD_DATE } from "src/components/DateFilterMenu/constants";
+import { DateFilter } from "../DateFilter";
 
 interface Props {
   updateUploadDateFilter: UpdateDateFilterType;

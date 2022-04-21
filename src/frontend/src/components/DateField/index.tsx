@@ -9,8 +9,6 @@ const INPUT_PROPS = {
   minLength: DATE_LENGTH,
 };
 
-export type FormattedDateType = string | undefined;
-
 interface Props {
   fieldKey: string;
   formik: FormikContextType<any>;

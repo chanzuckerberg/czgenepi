@@ -47,11 +47,6 @@ interface FiltersType {
   [filterKey: string]: FilterType;
 }
 
-export type UpdateDateFilterType = (
-  start: Date | undefined,
-  end: Date | undefined
-) => void;
-
 // * (mlila): `key` should be the name of the column you are filtering on
 const DATA_FILTER_INIT = {
   CZBFailedGenomeRecovery: {
