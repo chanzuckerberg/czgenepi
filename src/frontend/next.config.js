@@ -8,9 +8,28 @@ const isProdBuild = ENV.NODE_ENV === nodeEnv.PRODUCTION;
 
 const SCRIPT_SRC = ["'self'"];
 
+function transformImports() {
+  const materialUIPackages = ["core", "icons", "lab", "styles"];
+
+  const transform = {};
+
+  for (const package of materialUIPackages) {
+    transform["@material-ui/" + package] = {
+      preventFullImport: true,
+      transform: `@material-ui/${package}/` + "{{member}}",
+    };
+  }
+
+  return transform;
+}
+
 module.exports = {
   distDir: ENV.BUILD_PATH,
   fileExtensions: ["jpg", "jpeg", "png", "gif", "ico", "webp", "jp2", "avif"],
+  experimental: {
+      modularizeImports: transformImports(),
+      emotion: true
+  },
 
   async generateBuildId() {
     // Return null to allow next.js to fallback to default behavior
