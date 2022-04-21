@@ -36,7 +36,7 @@ NEXTSTRAIN_COLOR_SCALE = [
     "#FF9999",
     "#FF8A24",
     "#FFDABA",
-    "#FCFFA4",
+    "#A76738",
     "#FDE725",
     "#A0DA39",
     "#4AB569",
