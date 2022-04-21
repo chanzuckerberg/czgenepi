@@ -277,7 +277,7 @@ function MessageBadFormatData({
   );
 }
 
-export function WarningBadFormatData({
+export function ErrorBadFormatData({
   badFormatData,
   IdColumnNameForWarnings,
 }: PropsBadFormatData): JSX.Element {

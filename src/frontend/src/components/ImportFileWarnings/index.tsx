@@ -11,7 +11,7 @@ import Success from "src/views/Upload/components/Metadata/components/ImportFile/
 import {
   WarningAbsentSample,
   WarningAutoCorrect,
-  WarningBadFormatData,
+  ErrorBadFormatData,
   WarningExtraneousEntry,
   WarningExtraneousEntrySampleEdit,
   WarningMissingData,
@@ -65,6 +65,13 @@ export default function ImportFileWarnings({
         <Error errorCode={ERROR_CODE.MISSING_FIELD} names={missingFields} />
       )}
 
+      {!isEmpty(badFormatData) && (
+        <ErrorBadFormatData
+          badFormatData={badFormatData}
+          IdColumnNameForWarnings={IdColumnNameForWarnings}
+        />
+      )}
+
       {autocorrectCount > 0 && (
         <WarningAutoCorrect autocorrectedSamplesCount={autocorrectCount} />
       )}
@@ -86,13 +93,6 @@ export default function ImportFileWarnings({
 
       {!isEmpty(missingData) && (
         <WarningMissingData missingData={missingData} />
-      )}
-
-      {!isEmpty(badFormatData) && (
-        <WarningBadFormatData
-          badFormatData={badFormatData}
-          IdColumnNameForWarnings={IdColumnNameForWarnings}
-        />
       )}
     </>
   );
