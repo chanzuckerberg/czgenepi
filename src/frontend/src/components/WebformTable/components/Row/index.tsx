@@ -86,18 +86,8 @@ export default React.memo(function Row({
    * In both cases above, we initialize the form to start its values based on
    * the upstream `metadata` **when the component mounts**. This handles both
    * cases because for (1), the upstream metadata will start off empty because
-<<<<<<< HEAD
-<<<<<<< HEAD
    * nothing has been entered yet (in the case of sample upload), while for (2)
    * it will start off as the info that's been entered so far since we are
-=======
-   * nothing has been entered yet (in the case of sample upload), while for (2) 
-   * it will start off as the info that's been entered so far since we are 
->>>>>>> a560f7b1 (fixing collection location name population)
-=======
-   * nothing has been entered yet (in the case of sample upload), while for (2)
-   * it will start off as the info that's been entered so far since we are
->>>>>>> b6e6a9ff (more linting)
    * navigating back so far since we are navigating back to Metadata and
    * this component must re-mount and thus re-fetch metadata entered so far.
    *

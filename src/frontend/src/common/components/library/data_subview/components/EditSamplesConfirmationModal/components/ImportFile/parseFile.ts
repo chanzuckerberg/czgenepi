@@ -56,22 +56,7 @@ const SAMPLE_EDIT_METADATA_KEYS_TO_EXTRACT = Object.values(
   HEADERS_TO_SAMPLE_EDIT_METADATA_KEYS
 );
 
-// function warnMissingMetadataEdit(
-//   metadata: SampleEditTsvMetadata
-// ): Set<keyof SampleEditTsvMetadata> | null {
-//   const missingMetadata = new Set<keyof SampleEditTsvMetadata>();
-//   const ALWAYS_REQUIRED: Array<keyof SampleEditTsvMetadata> = [
-//     "currentPrivateID",
-//   ];
-//   ALWAYS_REQUIRED.forEach((keyRequiredMetadata) => {
-//     if (!metadata[keyRequiredMetadata]) {
-//       missingMetadata.add(keyRequiredMetadata);
-//     }
-//   });
-//   return missingMetadata.size ? missingMetadata : null;
-// }
-
-function warnBadFormatMetadataEdit(
+function warnBadFormatMetadata(
   metadata: SampleEditMetadataWebform
 ): Set<keyof SampleEditMetadataWebform> | null {
   const badFormatMetadata = new Set<keyof SampleEditMetadataWebform>();
@@ -111,7 +96,7 @@ function warnBadFormatMetadataEdit(
  *   - ignoredSampleIds: Any IDs that, if encountered, mean row is ignored.
  *       Mostly exists to filter out the metadata template's example rows.
  */
-function parseRowEdit(
+function parseRow(
   row: Record<string, string>,
   stringToLocationFinder: StringToLocationFinder,
   ignoredSampleIds: Set<string>
@@ -134,11 +119,8 @@ function parseRowEdit(
   SAMPLE_EDIT_METADATA_KEYS_TO_EXTRACT.forEach((key) => {
     inferMetadata(row, key, rowMetadata, stringToLocationFinder);
   });
-  // const rowMissingMetadataWarnings = warnMissingMetadataEdit(rowMetadata);
-  // if (rowMissingMetadataWarnings) {
-  //   rowWarnings.set(WARNING_CODE.MISSING_DATA, rowMissingMetadataWarnings);
-  // }
-  const rowBadFormatWarnings = warnBadFormatMetadataEdit(rowMetadata);
+
+  const rowBadFormatWarnings = warnBadFormatMetadata(rowMetadata);
   if (rowBadFormatWarnings) {
     rowWarnings.set(WARNING_CODE.BAD_FORMAT_DATA, rowBadFormatWarnings);
   }
@@ -183,7 +165,7 @@ function parseRowEdit(
  * consumers previously expected for how results will be structured.)
  */
 
-function convertHeaderToEditSampleMetadataKey(headerName: string): string {
+function convertHeaderToMetadataKey(headerName: string): string {
   return HEADERS_TO_SAMPLE_EDIT_METADATA_KEYS[headerName] || headerName;
 }
 
@@ -196,7 +178,7 @@ export function parseFileEdit(
       header: true, // Imported file starts with a header row
       // We parse the column headers to their corresponding metadata keys
       comments: "#",
-      transformHeader: convertHeaderToEditSampleMetadataKey,
+      transformHeader: convertHeaderToMetadataKey,
       // Because file parsing is async, we need to use callback on `complete`
       complete: ({
         data: rows,
@@ -222,7 +204,7 @@ export function parseFileEdit(
             EXAMPLE_CURRENT_PRIVATE_IDENTIFIERS
           );
           rows.forEach((row) => {
-            const { rowMetadata, rowWarnings } = parseRowEdit(
+            const { rowMetadata, rowWarnings } = parseRow(
               row,
               stringToLocationFinder,
               IGNORED_SAMPLE_IDS

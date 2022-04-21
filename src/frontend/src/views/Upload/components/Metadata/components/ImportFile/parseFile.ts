@@ -76,8 +76,6 @@ export function getMissingHeaderFields(
     keyof SampleEditTsvMetadata | keyof SampleUploadTsvMetadata
   >
 ): Set<string> | null {
-  // console.log("uploadedHeaders: ", uploadedHeaders);
-  // console.log("metadataKey: ", headersToMetadataKeys);
   const missingFields = new Set<string>();
   for (const [headerField, metadataKey] of Object.entries(
     headersToMetadataKeys

@@ -95,6 +95,7 @@ export default function ImportFileWarnings({
       {!isEmpty(missingData) && (
         <WarningMissingData missingData={missingData} />
       )}
+      {/* TODO: condense ErrorsAndWarnings and ImportFileWarnings */}
       <ErrorsAndWarnings />
     </>
   );
