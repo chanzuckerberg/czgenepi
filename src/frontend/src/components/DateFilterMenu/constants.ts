@@ -1,5 +1,3 @@
-import { DateMenuOption } from "src/components/DateFilterMenu";
-
 export const MENU_OPTIONS_UPLOAD_DATE: DateMenuOption[] = [
   {
     name: "Today",

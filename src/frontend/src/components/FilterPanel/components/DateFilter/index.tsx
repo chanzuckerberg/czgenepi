@@ -15,8 +15,8 @@ const DateFilter = ({ inputLabel, ...props }: Props): JSX.Element => {
   // `startDate` and `endDate` represent the active filter dates. Update on filter change.
   const [startDate, setStartDate] = useState<FormattedDateType>();
   const [endDate, setEndDate] = useState<FormattedDateType>();
-  const [dateLabel, setDateLabel] = useState<string>("");
-  const [anchorEl, setAnchorEl] = useState<HTMLElement>();
+  const [dateLabel, setDateLabel] = useState<string | null>(null);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | undefined>();
   const [shouldClearFilter, setShouldClearFilter] = useState<boolean>(false);
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = (event) => {

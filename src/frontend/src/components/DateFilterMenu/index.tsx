@@ -2,13 +2,12 @@ import { Menu, MenuItem } from "czifui";
 import { useFormik } from "formik";
 import { noop } from "lodash";
 import React, { FC, useEffect, useMemo, useState } from "react";
-import DateField, { FormattedDateType } from "src/components/DateField";
+import DateField from "src/components/DateField";
 import {
   DATE_ERROR_MESSAGE,
   DATE_REGEX,
 } from "src/components/DateField/constants";
 import * as yup from "yup";
-import { UpdateDateFilterType } from "../FilterPanel";
 import {
   ErrorMessageHolder,
   StyledButton,
@@ -18,8 +17,6 @@ import {
   StyledText,
 } from "./style";
 
-export type DateType = FormattedDateType | Date;
-
 const formatDateForDisplay = (d: DateType) => {
   if (d === undefined) return d;
   if (typeof d === "string") return d;
@@ -27,16 +24,8 @@ const formatDateForDisplay = (d: DateType) => {
   return d.toISOString().substring(0, 10);
 };
 
-export interface DateMenuOption {
-  name: string; // Must be UNIQUE because we assume can be used as key/id
-  // For both `numDays...` it's relative to now() when option is chosen.
-  // Assume start is guaranteed, but end cap is not.
-  numDaysEndOffset?: number; // How far back end of date interval is
-  numDaysStartOffset: number; // How far back start of date interval is
-}
-
 interface Props {
-  anchorEl: HTMLElement | null;
+  anchorEl?: HTMLElement;
   fieldKeyEnd: string;
   fieldKeyStart: string;
   updateDateFilter: UpdateDateFilterType;
@@ -44,7 +33,7 @@ interface Props {
   onClose(): void;
   onStartDateChange(date: FormattedDateType): void;
   onEndDateChange(date: FormattedDateType): void;
-  onDateLabelChange(label: string): void;
+  onDateLabelChange(label: string | null): void;
   shouldClearFilter: boolean;
   setShouldClearFilter(s: boolean): void;
 }
@@ -142,7 +131,7 @@ export const DateFilterMenu: FC<Props> = ({
     // Since using fields instead, clear out selected menu option
     setSelectedDateMenuOption(null);
     setDatesFromRange(start, end);
-    onDateLabelChange(undefined);
+    onDateLabelChange(null);
   };
 
   //TODO when it's available, use sds component for single select on preset date ranges
