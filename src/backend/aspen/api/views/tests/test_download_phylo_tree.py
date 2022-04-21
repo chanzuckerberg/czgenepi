@@ -55,7 +55,7 @@ async def test_phylo_tree_can_see(
         f"/v2/phylo_trees/{phylo_tree.entity_id}/download", headers=auth_headers
     )
     returned_tree = result.json()
-    assert returned_tree == matching_mapped_json
+    assert returned_tree["tree"] == matching_mapped_json["tree"]
 
 
 async def test_phylo_tree_id_style_public(
@@ -180,4 +180,4 @@ async def test_phylo_tree_admin(
     result = await http_client.get(
         f"/v2/phylo_trees/{phylo_tree.entity_id}/download", headers=auth_headers
     )
-    assert result.json() == matching_mapped_json
+    assert result.json()["tree"] == matching_mapped_json["tree"]
