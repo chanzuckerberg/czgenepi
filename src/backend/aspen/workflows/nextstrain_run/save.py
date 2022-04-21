@@ -14,17 +14,10 @@ from aspen.database.connection import (
     SqlAlchemyInterface,
 )
 from aspen.database.models import (
-    AlignRead,
-    Bam,
-    CallConsensus,
-    CalledPathogenGenome,
-    FilterRead,
-    HostFilteredSequencingReadsCollection,
     PathogenGenome,
     PhyloRun,
     PhyloTree,
     Sample,
-    SequencingReadsCollection,
     UploadedPathogenGenome,
 )
 from aspen.database.models.workflow import SoftwareNames, WorkflowStatusType
@@ -67,34 +60,7 @@ def cli(
             .options(
                 joinedload(PhyloRun.inputs.of_type(UploadedPathogenGenome))
                 # load the sample that this uploaded pathogen genome was associated with
-                .subqueryload(UploadedPathogenGenome.sample),
-                joinedload(PhyloRun.inputs.of_type(CalledPathogenGenome))
-                # load the workflows that generated the consensus calls.
-                .subqueryload(
-                    CalledPathogenGenome.producing_workflow.of_type(CallConsensus)
-                )
-                # load the BAMs that generated the called pathogen genomes.
-                .subqueryload(CallConsensus.inputs.of_type(Bam))
-                # load the workflows that generated the consensus calls.
-                .subqueryload(Bam.producing_workflow.of_type(AlignRead))
-                # load the host-filtered sequencing reads that generated the called
-                # pathogen genomes.
-                .subqueryload(
-                    AlignRead.inputs.of_type(HostFilteredSequencingReadsCollection)
-                )
-                # load the workflows that generated the host-filtered sequencing
-                # reads.
-                .subqueryload(
-                    HostFilteredSequencingReadsCollection.producing_workflow.of_type(
-                        FilterRead
-                    )
-                )
-                # load the sequencing reads that generated the host-filtered
-                # sequencing reads.
-                .subqueryload(FilterRead.inputs.of_type(SequencingReadsCollection))
-                # load the samples that the sequencing reads collection was associated
-                # with.
-                .subqueryload(SequencingReadsCollection.sample),
+                ,
             )
             .one()
         )
@@ -115,13 +81,6 @@ def cli(
             for pathogen_genome in pathogen_genomes
             if isinstance(pathogen_genome, UploadedPathogenGenome)
         }
-        sequencing_reads_collections: Set[SequencingReadsCollection] = {
-            pathogen_genome.get_parents(HostFilteredSequencingReadsCollection)[
-                0
-            ].get_parents(SequencingReadsCollection)[0]
-            for pathogen_genome in pathogen_genomes
-            if isinstance(pathogen_genome, CalledPathogenGenome)
-        }
 
         included_samples: MutableSequence[Sample] = list()
         for uploaded_pathogen_genome in uploaded_pathogen_genomes:
@@ -132,12 +91,6 @@ def cli(
                 in all_public_identifiers
             ):
                 included_samples.append(uploaded_pathogen_genome.sample)
-        for sequencing_reads_collection in sequencing_reads_collections:
-            if (
-                sequencing_reads_collection.sample.public_identifier
-                in all_public_identifiers
-            ):
-                included_samples.append(sequencing_reads_collection.sample)
 
         # create an output
         phylo_tree = PhyloTree(

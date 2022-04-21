@@ -260,11 +260,7 @@ def write_sequences_files(session, pathogen_genomes, sequences_fh, metadata_fh):
         sequence = sequence.strip("Nn")
 
         upload_date = None
-        if sample.sequencing_reads_collection is not None:
-            upload_date = sample.sequencing_reads_collection.upload_date.strftime(
-                "%Y-%m-%d"
-            )
-        elif sample.uploaded_pathogen_genome is not None:
+        if sample.uploaded_pathogen_genome is not None:
             upload_date = sample.uploaded_pathogen_genome.upload_date.strftime(
                 "%Y-%m-%d"
             )

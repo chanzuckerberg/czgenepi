@@ -16,7 +16,7 @@ from aspen.database.models import (
     Group,
     Location,
     Sample,
-    SequencingReadsCollection,
+    UploadedPathogenGenome,
     User,
 )
 from aspen.test_infra.models.gisaid_metadata import gisaid_metadata_factory
@@ -287,7 +287,7 @@ async def _test_samples_view_cansee(
     http_client: AsyncClient,
     cansee_datatypes: Sequence[DataType],
     user_factory_kwargs: Optional[dict] = None,
-) -> Tuple[Sample, SequencingReadsCollection, Any]:
+) -> Tuple[Sample, UploadedPathogenGenome, Any]:
     user_factory_kwargs = user_factory_kwargs or {}
     owner_group = group_factory()
     viewer_group = group_factory(name="cdph")

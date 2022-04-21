@@ -1,35 +1,7 @@
 import datetime
 
-from aspen.database.models import (
-    Sample,
-    SequencingInstrumentType,
-    SequencingProtocolType,
-    SequencingReadsCollection,
-    UploadedPathogenGenome,
-)
+from aspen.database.models import Sample, UploadedPathogenGenome
 from aspen.test_infra.models.sample import sample_factory
-
-
-def sequencing_read_factory(
-    sample: Sample,
-    sequencing_instrument=SequencingInstrumentType.ILLUMINA_GENOME_ANALYZER_IIX,
-    sequencing_protocol=SequencingProtocolType.ARTIC_V3,
-    sequencing_date=None,
-    s3_bucket="bucket",
-    s3_key="key",
-    consuming_workflows=[],
-) -> SequencingReadsCollection:
-    sequencing_date = sequencing_date or datetime.datetime.now()
-    sequencing_reads = SequencingReadsCollection(
-        sample=sample,
-        sequencing_instrument=sequencing_instrument,
-        sequencing_protocol=sequencing_protocol,
-        sequencing_date=sequencing_date,
-        s3_bucket=s3_bucket,
-        s3_key=s3_key,
-        consuming_workflows=consuming_workflows,
-    )
-    return sequencing_reads
 
 
 def uploaded_pathogen_genome_factory(
