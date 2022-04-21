@@ -1,8 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import {
-  ParseResult as ParseResultEdit,
-  SampleIdToWarningMessages as SampleIdToWarningMessagesEdit,
-} from "src/common/components/library/data_subview/components/EditSamplesConfirmationModal/components/ImportFile/parseFile";
+import { ParseResult as ParseResultEdit } from "src/common/components/library/data_subview/components/EditSamplesConfirmationModal/components/ImportFile/parseFile";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { StringToLocationFinder } from "src/common/utils/locationUtils";
 import { SampleUploadDownloadTemplate } from "src/components/DownloadMetadataTemplate";
@@ -12,12 +9,12 @@ import {
   TEMPLATE_UPDATED_DATE,
 } from "src/components/DownloadMetadataTemplate/prepMetadataTemplate";
 import FilePicker from "src/components/FilePicker";
-import ImportFileWarnings, { getAutocorrectCount, getMissingFields } from "src/components/ImportFileWarnings";
+import ImportFileWarnings, {
+  getAutocorrectCount,
+  getMissingFields,
+} from "src/components/ImportFileWarnings";
 import { WebformTableTypeOptions as MetadataUploadTypeOption } from "src/components/WebformTable";
-import {
-  ERROR_CODE,
-  WARNING_CODE,
-} from "src/components/WebformTable/common/types";
+import { WARNING_CODE } from "src/components/WebformTable/common/types";
 import { Props as CommonProps } from "src/views/Upload/components/common/types";
 import Instructions from "./components/Instructions";
 import {

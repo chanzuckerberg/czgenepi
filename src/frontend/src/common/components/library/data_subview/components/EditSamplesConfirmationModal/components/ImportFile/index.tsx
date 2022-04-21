@@ -3,7 +3,10 @@ import React, { useEffect, useMemo, useState } from "react";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { createStringToLocationFinder } from "src/common/utils/locationUtils";
 import FilePicker from "src/components/FilePicker";
-import ImportFileWarnings from "src/components/ImportFileWarnings";
+import ImportFileWarnings, {
+  getAutocorrectCount,
+  getMissingFields,
+} from "src/components/ImportFileWarnings";
 import { WebformTableTypeOptions as MetadataUploadTypeOption } from "src/components/WebformTable";
 import { SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS } from "src/components/WebformTable/common/constants";
 import {
@@ -15,10 +18,6 @@ import {
   NamedGisaidLocation,
   Props as CommonProps,
 } from "src/views/Upload/components/common/types";
-import {
-  getAutocorrectCount,
-  getMissingFields,
-} from "src/components/ImportFileWarnings";
 import { getMetadataEntryOrEmpty } from "../../utils";
 import {
   parseFileEdit,
