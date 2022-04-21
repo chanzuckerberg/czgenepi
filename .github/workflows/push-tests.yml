@@ -128,6 +128,8 @@ jobs:
           # Build backend
           docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/genepi-backend:branch-trunk -t ${{ secrets.ECR_REPO }}/genepi-backend:latest src/backend
           make backend-check-style
+# Test has been flaky for a couple months (~April 2022). Commenting out until we have
+# some test engineering support to suss out the issue and clean things up.
 #  e2e-test:
 #    runs-on: ubuntu-20.04
 #    steps:
