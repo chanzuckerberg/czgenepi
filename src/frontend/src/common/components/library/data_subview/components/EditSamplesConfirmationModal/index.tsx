@@ -23,19 +23,14 @@ import {
 } from "src/components/WebformTable/common/types";
 import { ContinueButton } from "src/views/Upload/components/common/style";
 import { NamedGisaidLocation } from "src/views/Upload/components/common/types";
-<<<<<<< HEAD
 import { SampleIdToWarningMessages } from "src/views/Upload/components/Metadata/components/ImportFile/parseFile";
 import { ErrorsAndWarnings } from "./components/ErrorsAndWarnings";
 import ImportFile from "./components/ImportFile";
-=======
-<<<<<<< HEAD
 import { ErrorsAndWarnings } from "./components/ErrorsAndWarnings";
 import ImportFile from "./components/ImportFile";
-=======
 import { SampleIdToWarningMessages } from "src/views/Upload/components/Metadata/components/ImportFile/parseFile";
+import { ErrorsAndWarnings } from "./components/ErrorsAndWarnings";
 import ImportFile from "./components/ImportFile";
->>>>>>> 869143af (allow user to import tsv data for sample edit)
->>>>>>> 5b598541 (allow user to import tsv data for sample edit)
 import {
   StyledButton,
   StyledDiv,
