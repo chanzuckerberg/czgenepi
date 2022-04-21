@@ -56,7 +56,6 @@ const DateFilter = ({
         onClick={handleClick}
       />
       <DateFilterMenu
-        {...props}
         anchorEl={anchorEl}
         onClose={handleClose}
         onStartDateChange={setStartDate}
@@ -64,6 +63,7 @@ const DateFilter = ({
         selectedDateMenuOption={selectedDateMenuOption}
         setSelectedDateMenuOption={setSelectedDateMenuOption}
         updateDateFilter={updateDateFilter}
+        {...props}
       />
       <DateChip dateLabel={dateLabel} deleteDateFilterFunc={deleteDateFilter} />
     </StyledFilterWrapper>
