@@ -12,7 +12,7 @@ const InputInstructions = (): JSX.Element => {
     FEATURE_FLAGS.sample_filtering_tree_creation
   );
 
-  if (isSampleFilteringEnabled) {
+  if (!isSampleFilteringEnabled) {
     return (
       <StyledWrapper>
         <CollapsibleInstructions
@@ -69,6 +69,10 @@ const InputInstructions = (): JSX.Element => {
           </div>,
           <div key={2}>
             IDs must be separated by tabs, commas, or enter one ID per row.
+          </div>,
+          <div key={3}>
+            Adding more than 2000 samples will increase the tree building run
+            time.
           </div>,
         ]}
       />

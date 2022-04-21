@@ -1,19 +1,16 @@
 import React, { useState } from "react";
 import { getDateRangeLabel } from "src/common/utils/dateUtils";
-import { DateFilterMenu } from "src/components/DateFilterMenu";
-import { DateChip } from "./components/DateChip";
-import { StyledFilterWrapper, StyledInputDropdown } from "./style";
+import { MENU_OPTION_ALL_TIME } from "src/components/DateFilterMenu/constants";
+import { StyledDateFilterMenu, StyledInputDropdown } from "./style";
 
 interface Props {
   fieldKeyEnd: string;
   fieldKeyStart: string;
-  inputLabel: string;
-  updateDateFilter: UpdateDateFilterType;
   menuOptions: DateMenuOption[];
+  updateDateFilter: UpdateDateFilterType;
 }
 
-const DateFilter = ({
-  inputLabel,
+const CollectionDateFilter = ({
   updateDateFilter,
   ...props
 }: Props): JSX.Element => {
@@ -23,7 +20,7 @@ const DateFilter = ({
   const [anchorEl, setAnchorEl] = useState<HTMLElement | undefined>();
   // What menu option is chosen. If none chosen, `null`.
   const [selectedDateMenuOption, setSelectedDateMenuOption] =
-    useState<DateMenuOption | null>(null);
+    useState<DateMenuOption | null>(MENU_OPTION_ALL_TIME);
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = (event) => {
     setAnchorEl(event.currentTarget);
@@ -33,13 +30,6 @@ const DateFilter = ({
     setAnchorEl(undefined);
   };
 
-  const deleteDateFilter = () => {
-    setStartDate(undefined);
-    setEndDate(undefined);
-    setSelectedDateMenuOption(null);
-    updateDateFilter(undefined, undefined);
-  };
-
   const dateLabel = getDateRangeLabel({
     currentLabel: selectedDateMenuOption?.name,
     startDate,
@@ -47,15 +37,16 @@ const DateFilter = ({
   });
 
   return (
-    <StyledFilterWrapper>
+    <>
       <StyledInputDropdown
-        sdsStyle="minimal"
+        sdsStyle="square"
         sdsType="singleSelect"
-        label={inputLabel}
+        label={dateLabel}
         // @ts-expect-error remove line when inputdropdown types fixed in sds
         onClick={handleClick}
       />
-      <DateFilterMenu
+      <StyledDateFilterMenu
+        {...props}
         anchorEl={anchorEl}
         onClose={handleClose}
         onStartDateChange={setStartDate}
@@ -63,11 +54,9 @@ const DateFilter = ({
         selectedDateMenuOption={selectedDateMenuOption}
         setSelectedDateMenuOption={setSelectedDateMenuOption}
         updateDateFilter={updateDateFilter}
-        {...props}
       />
-      <DateChip dateLabel={dateLabel} deleteDateFilterFunc={deleteDateFilter} />
-    </StyledFilterWrapper>
+    </>
   );
 };
 
-export { DateFilter };
+export { CollectionDateFilter };

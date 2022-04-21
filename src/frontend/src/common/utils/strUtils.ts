@@ -1,4 +1,5 @@
 const WORDS_TO_PLURALIZE: Record<string, string> = {
+  has: "have",
   was: "were",
 };
 
