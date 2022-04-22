@@ -184,7 +184,7 @@ export function parseFileEdit(
         data: rows,
         meta: papaParseMeta,
       }: Papa.ParseResult<Record<string, string>>) => {
-        const uploadedHeaders = papaParseMeta.fields as string[]; // available b/c `header: true`
+        const uploadedHeaders: string[] = papaParseMeta.fields; // available b/c `header: true`
         // Init -- Will modify these in place as we work through incoming rows.
         const sampleIdToMetadata: SampleIdToEditMetadataWebform = {};
         const errorMessages = new Map<ERROR_CODE, Set<string>>();
