@@ -127,7 +127,7 @@ export default function ImportFile({
     for (const sampleId of Object.keys(metadata)) {
       // get current metadata and changed metadata entry for a sampleId
       const existingMetadataEntry = metadata[sampleId];
-      const exitingChangedMetadataEntry = getMetadataEntryOrEmpty(
+      const existingChangedMetadataEntry = getMetadataEntryOrEmpty(
         changedMetadata,
         sampleId
       );
