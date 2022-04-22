@@ -216,7 +216,7 @@ export function parseFileEdit(
               // need the a type to transition us (MergedSampleEditTsvWebformMetadata)
               const rowMetadataNew: MergedSampleEditTsvWebformMetadata =
                 rowMetadata;
-              const rowPrivateID = rowMetadataNew.currentPrivateID as string;
+              const rowPrivateID: string = rowMetadataNew.currentPrivateID;
 
               rowMetadataNew.privateId = rowMetadataNew["newPrivateID"];
               sampleIdToMetadata[rowPrivateID] = pick(
