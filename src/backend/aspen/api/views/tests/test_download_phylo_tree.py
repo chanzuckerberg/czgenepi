@@ -8,8 +8,13 @@ from botocore.client import ClientError
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from aspen.api.views.tests.data.phylo_tree_data import TEST_TREE
 from aspen.api.views.tests.test_list_phylo_runs import make_all_test_data
 from aspen.api.views.tests.test_update_phylo_run_and_tree import make_shared_test_data
+from aspen.api.views.tests.utils.phylo_tree_utils import (
+    align_json_with_model,
+    create_id_mapped_tree,
+)
 from aspen.database.models import Group, Location, User
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.usergroup import group_factory, user_factory
@@ -17,31 +22,7 @@ from aspen.test_infra.models.usergroup import group_factory, user_factory
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
 
-TEST_TREE: Dict = {
-    "meta": {},
-    "tree": {
-        "branch_attrs": {"labels": {"clade": "42"}, "mutations": {}},
-        "children": [
-            {"name": "public_identifier_1"},
-            {"name": "public_identifier_2"},
-        ],
-        "name": "ROOT",
-    },
-    "version": "1.3.3.7",
-}
-
-ID_MAPPED_TREE: Dict = {
-    "meta": {},
-    "tree": {
-        "branch_attrs": {"labels": {"clade": "42"}, "mutations": {}},
-        "children": [
-            {"GISAID_ID": "public_identifier_1", "name": "private_identifier_1"},
-            {"GISAID_ID": "public_identifier_2", "name": "private_identifier_2"},
-        ],
-        "name": "ROOT",
-    },
-    "version": "1.3.3.7",
-}
+ID_MAPPED_TREE: Dict = create_id_mapped_tree(TEST_TREE)
 
 
 async def test_phylo_tree_can_see(
@@ -60,9 +41,13 @@ async def test_phylo_tree_can_see(
         # The bucket does not exist or you have no access.
         mock_s3_resource.create_bucket(Bucket=phylo_tree.s3_bucket)
 
-    test_json = json.dumps(TEST_TREE)
+    matching_tree_json: Dict = align_json_with_model(deepcopy(TEST_TREE), phylo_tree)
+    test_json = json.dumps(matching_tree_json)
     mock_s3_resource.Bucket(phylo_tree.s3_bucket).Object(phylo_tree.s3_key).put(
         Body=test_json
+    )
+    matching_mapped_json: Dict = create_id_mapped_tree(
+        align_json_with_model(deepcopy(TEST_TREE), phylo_tree)
     )
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
@@ -70,7 +55,7 @@ async def test_phylo_tree_can_see(
         f"/v2/phylo_trees/{phylo_tree.entity_id}/download", headers=auth_headers
     )
     returned_tree = result.json()
-    assert returned_tree == ID_MAPPED_TREE
+    assert returned_tree["tree"] == matching_mapped_json["tree"]
 
 
 async def test_phylo_tree_id_style_public(
@@ -172,18 +157,11 @@ async def test_phylo_tree_admin(
     await async_session.commit()
 
     # make_all_test_data() randomly selects samples for trees, so we have to make sure we are expecting the right json
-    matching_tree_json: Dict = deepcopy(TEST_TREE)
-    uploaded_children = [
-        {"name": sample.public_identifier} for sample in phylo_tree.constituent_samples
-    ]
-    matching_tree_json["tree"]["children"] = uploaded_children
+    matching_tree_json: Dict = align_json_with_model(deepcopy(TEST_TREE), phylo_tree)
 
-    matching_mapped_json: Dict = deepcopy(ID_MAPPED_TREE)
-    expected_children = [
-        {"GISAID_ID": sample.public_identifier, "name": sample.private_identifier}
-        for sample in phylo_tree.constituent_samples
-    ]
-    matching_mapped_json["tree"]["children"] = expected_children
+    matching_mapped_json: Dict = create_id_mapped_tree(
+        align_json_with_model(deepcopy(TEST_TREE), phylo_tree)
+    )
 
     # Create the bucket if it doesn't exist in localstack.
     try:
@@ -202,4 +180,4 @@ async def test_phylo_tree_admin(
     result = await http_client.get(
         f"/v2/phylo_trees/{phylo_tree.entity_id}/download", headers=auth_headers
     )
-    assert result.json() == matching_mapped_json
+    assert result.json()["tree"] == matching_mapped_json["tree"]
