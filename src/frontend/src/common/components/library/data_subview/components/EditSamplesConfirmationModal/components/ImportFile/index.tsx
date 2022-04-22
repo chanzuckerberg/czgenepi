@@ -159,7 +159,7 @@ export default function ImportFile({
             ...pick(uploadedMetadataEntry, uploadedFieldsWithData),
           };
           changedMetadataUpdated[sampleId] = {
-            ...exitingChangedMetadataEntry,
+            ...existingChangedMetadataEntry,
             ...pick(uploadedMetadataEntry, uploadedFieldsWithData),
           };
         }
