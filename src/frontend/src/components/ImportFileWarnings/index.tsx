@@ -9,6 +9,9 @@ import { WebformTableTypeOptions as MetadataUploadTypeOption } from "src/compone
 import { ERROR_CODE } from "src/components/WebformTable/common/types";
 import Error from "src/views/Upload/components/Metadata/components/ImportFile/components/Alerts/Error";
 import Success from "src/views/Upload/components/Metadata/components/ImportFile/components/Alerts/Success";
+import { DuplicateIdsError } from "./components/DuplicateIdsError";
+import { BadLocationFormatProps, badLocationFormatSamples, WarningBadLocationFormat } from "./components/WarningBadLocationFormat";
+import { WarningUnknownDataFields } from "./components/WarningUnknownDataFields";
 import {
   ErrorBadFormatData,
   WarningAbsentSample,
@@ -32,6 +35,11 @@ interface ImportFileWarningsProps {
   missingFields: string[] | null;
   autocorrectCount: number;
   absentSampleIds?: string[]; // absentsampleIds are only used for Upload Tsv flow
+  // TODO: make these not optional when errors are added to sample Upload flow
+  duplicatePrivateIds?: string[];
+  duplicatePublicIds?: string[];
+  badLocationFormatSamples?: badLocationFormatSamples;
+  hasUnknownDataFields?: boolean;
   missingData: SampleIdToWarningMessagesUpload | SampleIdToWarningMessagesEdit;
   badFormatData:
     | SampleIdToWarningMessagesUpload
@@ -50,6 +58,10 @@ export default function ImportFileWarnings({
   missingFields,
   autocorrectCount,
   absentSampleIds = [],
+  duplicatePrivateIds,
+  duplicatePublicIds,
+  badLocationFormatSamples,
+  hasUnknownDataFields,
   missingData,
   badFormatData,
   IdColumnNameForWarnings,
@@ -95,30 +107,17 @@ export default function ImportFileWarnings({
       {!isEmpty(missingData) && (
         <WarningMissingData missingData={missingData} />
       )}
-     {(metadataUploadType == MetadataUploadTypeOption.Edit && extraneousSampleIds.length > 0)  && (
-          <WarningExtraneousEntrySampleEdit
-            extraneousSampleIds={extraneousSampleIds}
-          />
-        )}
-      {metadataUploadType == MetadataUploadTypeOption.Upload &&
-        extraneousSampleIds.length > 0 && (
-          <WarningExtraneousEntry extraneousSampleIds={extraneousSampleIds} />
-      )}
 
-      {absentSampleIds.length > 0 && (
-        <WarningAbsentSample absentSampleIds={absentSampleIds} />
-      )}
-
-      {!isEmpty(missingData) && (
-        <WarningMissingData missingData={missingData} />
-      )}
-
-      {!isEmpty(badFormatData) && (
-        <WarningBadFormatData
-          badFormatData={badFormatData}
-          IdColumnNameForWarnings={IdColumnNameForWarnings}
+      {(duplicatePublicIds || duplicatePrivateIds) && (
+        <DuplicateIdsError
+          duplicatePrivateIds={duplicatePrivateIds}
+          duplicatePublicIds={duplicatePublicIds}
         />
       )}
+      {badLocationFormatSamples && (
+        <WarningBadLocationFormat badSamples={badLocationFormatSamples} />
+      )}
+      {hasUnknownDataFields && <WarningUnknownDataFields />}
     </>
 
 function getIsParseResultCompletelyUnused(

@@ -59,6 +59,8 @@ export default function ImportFile({
     useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
   const [badFormatData, setBadFormatData] =
     useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
+  const [duplicaPrivateIds, setDuplicatePrivateIds] = useState<string[]>([]);
+  const [duplicaPublicIds, setDuplicatePublicIds] = useState<string[]>([]);
 
   useEffect(() => {
     // If no file uploaded yet, do nothing.
@@ -103,7 +105,6 @@ export default function ImportFile({
     setBadFormatData(
       warningMessages.get(WARNING_CODE.BAD_FORMAT_DATA) || EMPTY_OBJECT
     );
-
     handleMetadataFileUpload(result);
   };
 
@@ -125,9 +126,7 @@ export default function ImportFile({
 
     const { data: sampleIdToUploadedMetadata, warningMessages } = result;
 
-    // Filter out any metadata for samples they did not just upload
-    // Note: Might be cleaner to do this filtering inside of file parse call,
-    // but would require changing the way some of the warnings work currently.
+
     const uploadedMetadata: SampleIdToEditMetadataWebform = {};
     const changedMetadataUpdated: SampleIdToEditMetadataWebform = {};
     for (const sampleId of Object.keys(metadata)) {
