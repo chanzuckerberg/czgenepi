@@ -293,7 +293,7 @@ export function ErrorBadFormatData({
           IdColumnNameForWarnings={IdColumnNameForWarnings}
         />
       }
-      intent={"error"}
+      intent="error"
     />
   );
 }
