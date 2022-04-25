@@ -4,6 +4,7 @@ import { pluralize } from "src/common/utils/strUtils";
 import AlertAccordion from "src/components/AlertAccordion";
 import {
   OPTIONAL_HEADER_MARKER,
+  SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS,
   SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS,
 } from "src/components/DownloadMetadataTemplate/common/constants";
 import { SampleIdToWarningMessages } from "../../parseFile";
@@ -43,7 +44,7 @@ export function WarningAutoCorrect({
 }
 
 /**
- * WARNING_CODE.EXTRANEOUS_ENTRY
+ * WARNING_CODE.EXTRANEOUS_ENTRY (SAMPLE UPLOAD)
  */
 interface PropsExtraneousEntry {
   extraneousSampleIds: string[];
@@ -76,6 +77,52 @@ export function WarningExtraneousEntry({
       title={title}
       collapseContent={
         <MessageExtraneousEntry extraneousSampleIds={extraneousSampleIds} />
+      }
+      intent={WARNING_SEVERITY}
+    />
+  );
+}
+
+/**
+ * WARNING_CODE.EXTRANEOUS_ENTRY (SAMPLE EDIT)
+ * (mostly similar to the above implementation, wording is different enough to have it's own component)
+ */
+function MessageExtraneousEntrySampleEdit({
+  extraneousSampleIds,
+}: PropsExtraneousEntry) {
+  const tablePreamble =
+    "The following IDs in your file’s “Current Private ID” column did not match any selected " +
+    "samples, and weren’t imported. Please double check and correct any errors. ";
+  const columnHeaders = [SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.currentPrivateID];
+  const rows = extraneousSampleIds.map((sampleId) => [sampleId]);
+  return (
+    <ProblemTable
+      tablePreamble={tablePreamble}
+      columnHeaders={columnHeaders}
+      rows={rows}
+    />
+  );
+}
+
+export function WarningExtraneousEntrySampleEdit({
+  extraneousSampleIds,
+}: PropsExtraneousEntry): JSX.Element {
+  const count = extraneousSampleIds.length;
+  // "X Samples in metadata file were not used."
+  const title = `${count} ${pluralize(
+    "Sample",
+    count
+  )} in metadata file ${pluralize(
+    "was",
+    count
+  )} couldn't be matched and weren't imported.`;
+  return (
+    <AlertAccordion
+      title={title}
+      collapseContent={
+        <MessageExtraneousEntrySampleEdit
+          extraneousSampleIds={extraneousSampleIds}
+        />
       }
       intent={WARNING_SEVERITY}
     />
@@ -174,33 +221,38 @@ export function WarningMissingData({
 /**
  * WARNING_CODE.BAD_FORMAT_DATA
  */
+const BadFormatDataTablePreamble = (
+  <>
+    <p>
+      You can change the invalid data in the table below, or update your file
+      and re-import.
+    </p>
+    <p>
+      <B>Formatting requirements:</B>
+    </p>
+    <ul>
+      <li>
+        Private IDs must be no longer than 120 characters and can only contain
+        letters from the English alphabet (A-Z, upper and lower case), numbers
+        (0-9), periods (.), hyphens (-), underscores (_), spaces ( ), and
+        forward slashes (/).
+      </li>
+      <li>Dates must be in the format of YYYY-MM-DD.</li>
+    </ul>
+  </>
+);
+
 interface PropsBadFormatData {
   badFormatData: SampleIdToWarningMessages;
+  IdColumnNameForWarnings: string;
 }
-function MessageBadFormatData({ badFormatData }: PropsBadFormatData) {
-  const tablePreamble = (
-    <>
-      <p>
-        You can change the invalid data in the table below, or update your file
-        and re-import.
-      </p>
-      <p>
-        <B>Formatting requirements:</B>
-      </p>
-      <ul>
-        <li>
-          Private IDs must be no longer than 120 characters and can only contain
-          letters from the English alphabet (A-Z, upper and lower case), numbers
-          (0-9), periods (.), hyphens (-), underscores (_), spaces ( ), and
-          forward slashes (/).
-        </li>
-        <li>Dates must be in the format of YYYY-MM-DD.</li>
-      </ul>
-    </>
-  );
-
+function MessageBadFormatData({
+  badFormatData,
+  IdColumnNameForWarnings,
+}: PropsBadFormatData) {
+  const tablePreamble = BadFormatDataTablePreamble;
   const columnHeaders = [
-    SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sampleId,
+    IdColumnNameForWarnings,
     "Data with Invalid Formatting",
   ];
   const idsBadFormatData = Object.keys(badFormatData);
@@ -225,8 +277,9 @@ function MessageBadFormatData({ badFormatData }: PropsBadFormatData) {
   );
 }
 
-export function WarningBadFormatData({
+export function ErrorBadFormatData({
   badFormatData,
+  IdColumnNameForWarnings,
 }: PropsBadFormatData): JSX.Element {
   const title =
     "Some of your data is not formatted correctly. " +
@@ -234,8 +287,13 @@ export function WarningBadFormatData({
   return (
     <AlertAccordion
       title={title}
-      collapseContent={<MessageBadFormatData badFormatData={badFormatData} />}
-      intent={WARNING_SEVERITY}
+      collapseContent={
+        <MessageBadFormatData
+          badFormatData={badFormatData}
+          IdColumnNameForWarnings={IdColumnNameForWarnings}
+        />
+      }
+      intent="error"
     />
   );
 }

@@ -13,12 +13,14 @@ interface Props {
   collapseContent: React.ReactNode;
   intent: "info" | "error" | "success" | "warning";
   title: React.ReactNode;
+  icon?: React.ReactNode;
 }
 
 export default function AlertAccordion({
   collapseContent,
   intent,
   title,
+  icon,
 }: Props): JSX.Element {
   const [isCollapseOpen, setCollapseOpen] = useState<boolean>(false);
 
@@ -27,7 +29,7 @@ export default function AlertAccordion({
   };
 
   return (
-    <StyledCallout intent={intent} onClick={toggleCollapse}>
+    <StyledCallout intent={intent} onClick={toggleCollapse} icon={icon}>
       <RowFlexContainer>
         <ColumnFlexContainer>
           <StaticSizeDiv>{title}</StaticSizeDiv>

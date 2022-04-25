@@ -23,7 +23,9 @@ import {
 } from "src/components/WebformTable/common/types";
 import { ContinueButton } from "src/views/Upload/components/common/style";
 import { NamedGisaidLocation } from "src/views/Upload/components/common/types";
+import { SampleIdToWarningMessages } from "src/views/Upload/components/Metadata/components/ImportFile/parseFile";
 import { ErrorsAndWarnings } from "./components/ErrorsAndWarnings";
+import ImportFile from "./components/ImportFile";
 import {
   StyledButton,
   StyledDiv,
@@ -54,11 +56,16 @@ const EditSamplesConfirmationModal = ({
     useState<SampleIdToEditMetadataWebform | null>(null);
   const [isContinueButtonActive, setIsContinueButtonActive] =
     useState<boolean>(false);
+
   const [changedMetadata, setChangedMetadata] =
     useState<SampleIdToEditMetadataWebform | null>(null);
   const { data: namedLocationsData } = useNamedLocations();
   const namedLocations: NamedGisaidLocation[] =
     namedLocationsData?.namedLocations ?? [];
+  const [hasImportedMetadataFile, setHasImportedMetadataFile] =
+    useState<boolean>(false);
+  const [autocorrectWarnings, setAutocorrectWarnings] =
+    useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
 
   useEffect(() => {
     // continue button should only be active if the user has metadata
@@ -267,10 +274,22 @@ const EditSamplesConfirmationModal = ({
               listItemFontSize="xs"
             />
             <ErrorsAndWarnings />
+            <ImportFile
+              metadata={metadata}
+              changedMetadata={changedMetadata}
+              namedLocations={namedLocations}
+              setMetadata={setMetadata}
+              setChangedMetadata={setChangedMetadata}
+              hasImportedMetadataFile={hasImportedMetadataFile}
+              setHasImportedMetadataFile={setHasImportedMetadataFile}
+              setAutocorrectWarnings={setAutocorrectWarnings}
+            />
             <WebformTable
               setIsValid={setIsValid}
               metadata={metadata}
+              hasImportedMetadataFile={hasImportedMetadataFile}
               setMetadata={setMetadata}
+              autocorrectWarnings={autocorrectWarnings}
               locations={namedLocations}
               applyToAllColumn={applyToAllColumn}
               handleRowMetadata={handleRowMetadata}
