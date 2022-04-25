@@ -61,7 +61,7 @@ export default function ImportFile({
     if (!parseResult) return;
     // If file was missing any col header fields, we parsed no data from it
     // and only display that error to the user to force them to fix problems.
-    if (getMissingFields(parseResult)) return;
+    if (missingFields) return;
 
     const { data } = parseResult;
     const parseResultSampleIds = Object.keys(data);
@@ -72,7 +72,7 @@ export default function ImportFile({
       return !sampleIdsSet.has(parseId);
     });
     setExtraneousSampleIds(extraneousSampleIds);
-  }, [parseResult, metadata]);
+  }, [parseResult, metadata, missingFields]);
 
   // Used by file upload parser to convert location strings to Locations
   const stringToLocationFinder = useMemo(() => {
@@ -103,10 +103,12 @@ export default function ImportFile({
     handleMetadataFileUpload(result);
   };
 
-  function inferDeleteEntries(
+  // we need to decide if a user wants to delete a sample (if they provide a delete keyword in the cell)
+  // if no delete keyword is detected, return the existing value, else return "".
+  function passOrDeleteEntry(
     value: string | boolean | NamedGisaidLocation
   ): string | boolean | NamedGisaidLocation | undefined {
-    if (value && value.toString().toLowerCase() == "delete") {
+    if (value && value.toString().toLowerCase() === "delete") {
       return "";
     }
     return value;
@@ -133,36 +135,37 @@ export default function ImportFile({
       );
 
       if (existingMetadataEntry) {
-        const uploadedMetadataEntry = sampleIdToUploadedMetadata[sampleId];
+        const uploadedMetadataEntry = getMetadataEntryOrEmpty(
+          sampleIdToUploadedMetadata,
+          sampleId
+        );
 
-        if (uploadedMetadataEntry) {
-          // get metadata entries from upload that are not empty (means user wants to import new data)
-          const uploadedFieldsWithData: string[] = [];
-          Object.keys(uploadedMetadataEntry).forEach(function (item) {
-            if (
-              uploadedMetadataEntry[item as keyof SampleEditMetadataWebform] !=
-              ""
-            )
-              uploadedFieldsWithData.push(item);
-          });
+        // get metadata entries from upload that are not empty (means user wants to import new data)
+        const uploadedFieldsWithData: string[] = [];
+        // TODO: replace with a filter call instead
+        Object.keys(uploadedMetadataEntry).forEach(function (item) {
+          if (
+            uploadedMetadataEntry[item as keyof SampleEditMetadataWebform] != ""
+          )
+            uploadedFieldsWithData.push(item);
+        });
 
-          // check if any entries need to be deleted/ cleared
-          for (const [key, value] of Object.entries(uploadedMetadataEntry)) {
-            (uploadedMetadataEntry[key as keyof SampleEditMetadataWebform] as
-              | string
-              | boolean
-              | NamedGisaidLocation
-              | undefined) = inferDeleteEntries(value);
-          }
-          uploadedMetadata[sampleId] = {
-            ...existingMetadataEntry,
-            ...pick(uploadedMetadataEntry, uploadedFieldsWithData),
-          };
-          changedMetadataUpdated[sampleId] = {
-            ...existingChangedMetadataEntry,
-            ...pick(uploadedMetadataEntry, uploadedFieldsWithData),
-          };
+        // check if any entries need to be deleted/ cleared
+        for (const [key, value] of Object.entries(uploadedMetadataEntry)) {
+          (uploadedMetadataEntry[key as keyof SampleEditMetadataWebform] as
+            | string
+            | boolean
+            | NamedGisaidLocation
+            | undefined) = passOrDeleteEntry(value);
         }
+        uploadedMetadata[sampleId] = {
+          ...existingMetadataEntry,
+          ...pick(uploadedMetadataEntry, uploadedFieldsWithData),
+        };
+        changedMetadataUpdated[sampleId] = {
+          ...existingChangedMetadataEntry,
+          ...pick(uploadedMetadataEntry, uploadedFieldsWithData),
+        };
       }
     }
 

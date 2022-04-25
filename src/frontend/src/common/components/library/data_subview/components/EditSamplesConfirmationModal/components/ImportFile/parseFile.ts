@@ -184,7 +184,7 @@ export function parseFileEdit(
         data: rows,
         meta: papaParseMeta,
       }: Papa.ParseResult<Record<string, string>>) => {
-        const uploadedHeaders: string[] = papaParseMeta.fields; // available b/c `header: true`
+        const uploadedHeaders: string[] = papaParseMeta.fields || []; // available b/c `header: true`
         // Init -- Will modify these in place as we work through incoming rows.
         const sampleIdToMetadata: SampleIdToEditMetadataWebform = {};
         const errorMessages = new Map<ERROR_CODE, Set<string>>();
@@ -216,7 +216,8 @@ export function parseFileEdit(
               // need the a type to transition us (MergedSampleEditTsvWebformMetadata)
               const rowMetadataNew: MergedSampleEditTsvWebformMetadata =
                 rowMetadata;
-              const rowPrivateID: string = rowMetadataNew.currentPrivateID;
+              const rowPrivateID: string =
+                rowMetadataNew.currentPrivateID || "";
 
               rowMetadataNew.privateId = rowMetadataNew["newPrivateID"];
               sampleIdToMetadata[rowPrivateID] = pick(
