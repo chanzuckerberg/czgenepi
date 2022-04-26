@@ -58,8 +58,9 @@ def cli(
             session.query(PhyloRun)
             .filter(PhyloRun.workflow_id == phylo_run_id)
             .options(
-                # load the sample that this uploaded pathogen genome was associated with
                 joinedload(PhyloRun.inputs.of_type(UploadedPathogenGenome))
+                # load the sample that this uploaded pathogen genome was associated with
+                .subqueryload(UploadedPathogenGenome.sample)
             )
             .one()
         )

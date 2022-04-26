@@ -8,23 +8,6 @@ from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.usergroup import group_factory, user_factory
 
 
-def test_sequencing_reads(session):
-    group = group_factory()
-    uploaded_by_user = user_factory(group)
-    location = location_factory(
-        "North America", "USA", "California", "Santa Barbara County"
-    )
-    sample = sample_factory(group, uploaded_by_user, location)
-
-    session.add_all(
-        (
-            group,
-            sample,
-        )
-    )
-    session.flush()
-
-
 def test_uploaded_pathogen_genome(session):
     group = group_factory()
     uploaded_by_user = user_factory(group)

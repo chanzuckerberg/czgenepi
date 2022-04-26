@@ -247,10 +247,3 @@ class Sample(idbase, DictMixin):  # type: ignore
             text("currval('aspen.samples_id_seq')"),
             f"/{current_year}",
         )
-
-    def get_uploaded_entity(
-        self,
-    ) -> Union[UploadedPathogenGenome]:
-        if self.uploaded_pathogen_genome is not None:
-            return self.uploaded_pathogen_genome
-        raise ValueError("Sample has no uploaded pathogen genome.")
