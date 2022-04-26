@@ -90,6 +90,7 @@ function getDuplicateIds(
 
   for (const [key, value] of Object.entries(idCounts)) {
     if (value.length > 1 && key !== "") {
+      // duplicates don't count for '' (as that means user does not want to change these values)
       dups.add(key);
     }
   }
