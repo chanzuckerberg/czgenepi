@@ -16,7 +16,7 @@ import SampleIcon from "src/common/icons/Sample.svg";
 import { createTableCellRenderer } from "src/common/utils";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { CZ_BIOHUB_GROUP } from "src/views/Data/constants";
-import { Lineage, LineageTooltip } from "./components/LineageTooltip";
+import { LineageTooltip } from "./components/LineageTooltip";
 import { TreeActionMenu } from "./components/TreeActionMenu";
 import TreeTableNameCell from "./components/TreeTableNameCell";
 import { TreeTypeTooltip } from "./components/TreeTypeTooltip";
@@ -86,12 +86,13 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
       </Component>
     );
 
-    return hasLineage ? (
-      <Tooltip title={<LineageTooltip lineage={value as Lineage} />}>
+    return (
+      <Tooltip
+        title={<LineageTooltip lineage={value as Lineage} />}
+        width="wide"
+      >
         {Content}
       </Tooltip>
-    ) : (
-      Content
     );
   },
 
