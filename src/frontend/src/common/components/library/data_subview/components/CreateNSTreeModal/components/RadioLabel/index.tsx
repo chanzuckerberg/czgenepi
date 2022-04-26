@@ -24,6 +24,10 @@ interface TreeChoiceWithFilteringProps extends BaseTreeChoiceProps {
   availableLineages: string[];
   selectedLineages: string[];
   setSelectedLineages: (lineages: string[]) => void;
+  startDate: FormattedDateType;
+  endDate: FormattedDateType;
+  setStartDate(d: FormattedDateType): void;
+  setEndDate(d: FormattedDateType): void;
 }
 
 export const RadioLabelOverview = ({

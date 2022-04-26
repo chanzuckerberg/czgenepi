@@ -25,6 +25,10 @@ interface Props {
   availableLineages: string[];
   selectedLineages: string[];
   setSelectedLineages: (lineages: string[]) => void;
+  startDate: FormattedDateType;
+  endDate: FormattedDateType;
+  setStartDate(d: FormattedDateType): void;
+  setEndDate(d: FormattedDateType): void;
 }
 
 // We present a pseudo-option to the user to enable choosing "All" lineages,

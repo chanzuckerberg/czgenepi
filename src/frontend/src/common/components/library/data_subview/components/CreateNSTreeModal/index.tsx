@@ -102,6 +102,9 @@ export const CreateNSTreeModal = ({
     setIsValidTreeType(false);
     setMissingInputSamples([]);
     setValidatedInputSamples([]);
+    setStartDate(undefined);
+    setEndDate(undefined);
+    setSelectedLineages([]);
   };
 
   const handleClose = function () {
@@ -156,11 +159,6 @@ export const CreateNSTreeModal = ({
 
   const handleSubmit = (evt: SyntheticEvent) => {
     evt.preventDefault();
-
-    // clear state so it doesn't persist if they make another tree
-    setStartDate(null);
-    setEndDate(null);
-    setSelectedLineages([]);
 
     mutation.mutate({
       sampleIds: allValidSamplesForTreeCreation,

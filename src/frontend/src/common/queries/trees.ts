@@ -18,12 +18,22 @@ interface CreateTreePayload {
   name: string;
   samples: string[];
   tree_type: string | undefined; // treeType can be undefined when user first opens the NSTreeCreate modal
+  template_args?: {
+    filter_start_date?: string;
+    filter_end_date?: string;
+    filter_pango_lineages?: string[];
+  };
 }
 
 interface CreateTreeType {
   treeName: string;
   sampleIds: string[];
   treeType: string | undefined;
+  filters: {
+    startDate?: FormattedDateType;
+    endDate?: FormattedDateType;
+    lineages?: string[];
+  };
 }
 
 type CreateTreeCallbacks = MutationCallbacks<void>;
@@ -33,16 +43,7 @@ async function createTree({
   treeName,
   treeType,
   filters,
-}: {
-  sampleIds: string[];
-  treeName: string;
-  treeType: string | undefined;
-  filters: {
-    startDate?: any;
-    endDate?: any;
-    lineages?: any;
-  };
-}): Promise<unknown> {
+}: CreateTreeType): Promise<unknown> {
   const { startDate, endDate, lineages } = filters;
   const payload: CreateTreePayload = {
     name: treeName,

@@ -8,6 +8,10 @@ interface Props {
   fieldKeyStart: string;
   menuOptions: DateMenuOption[];
   updateDateFilter: UpdateDateFilterType;
+  startDate: FormattedDateType;
+  endDate: FormattedDateType;
+  setStartDate(d: FormattedDateType): void;
+  setEndDate(d: FormattedDateType): void;
 }
 
 const CollectionDateFilter = ({
