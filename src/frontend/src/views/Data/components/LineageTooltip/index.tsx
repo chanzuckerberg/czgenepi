@@ -20,7 +20,7 @@ export const LineageTooltip = ({ lineage }: Props): JSX.Element => {
       {DISPLAY_ORDER.map((key) => {
         let value = lineage[key];
         if (key === "last_updated") {
-          value = `${value.slice(0, 10)}`;
+          value = `${value?.slice(0, 10)}`;
         }
         return <Row key={key} label={key as keyof Lineage} text={value} />;
       })}

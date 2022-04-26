@@ -86,12 +86,13 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
       </Component>
     );
 
-    return hasLineage ? (
-      <Tooltip title={<LineageTooltip lineage={value as Lineage} />}>
+    return (
+      <Tooltip
+        title={<LineageTooltip lineage={value as Lineage} />}
+        width="wide"
+      >
         {Content}
       </Tooltip>
-    ) : (
-      Content
     );
   },
 
