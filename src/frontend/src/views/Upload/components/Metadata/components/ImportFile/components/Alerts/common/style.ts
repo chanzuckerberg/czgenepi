@@ -1,32 +1,27 @@
 import styled from "@emotion/styled";
 import {
+  CommonThemeProps,
   fontBodyXs,
   fontHeaderS,
   fontHeaderXs,
-  getColors,
   getSpaces,
 } from "czifui";
 
+const mPadding = (props: CommonThemeProps) => {
+  const spaces = getSpaces(props);
+  return `
+    padding: ${spaces?.m}px;
+  `;
+};
+
 export const Th = styled.th`
   ${fontHeaderXs}
-  ${(props) => {
-    const spaces = getSpaces(props);
-    const colors = getColors(props);
-    return `
-      padding: ${spaces?.m}px;
-      border-bottom: ${spaces?.xxxs}px solid ${colors?.gray[200]};
-    `;
-  }}
+  ${mPadding}
 `;
 
 export const Td = styled.td`
   ${fontBodyXs}
-  ${(props) => {
-    const spaces = getSpaces(props);
-    return `
-      padding: ${spaces?.m}px;
-    `;
-  }}
+  ${mPadding}
 `;
 
 export const Title = styled.span`

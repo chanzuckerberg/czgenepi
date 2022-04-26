@@ -1,6 +1,17 @@
 from __future__ import annotations
 
-from sqlalchemy import Column, Date, DateTime, Float, ForeignKey, func, Integer, String
+from sqlalchemy import (
+    Column,
+    Date,
+    DateTime,
+    Float,
+    ForeignKey,
+    func,
+    Integer,
+    String,
+    text,
+)
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import backref, deferred, relationship
 
 from aspen.database.models.entity import Entity, EntityType
@@ -51,6 +62,14 @@ class PathogenGenome(Entity):
             "Number of sites with an ambiguous allele, e.g. M, K, Y, etc.,"
             " indicating support for 2 or more alleles in the reads."
         ),
+    )
+
+    # Store a map of the fields in this pango output file
+    pangolin_output = Column(
+        JSONB,
+        nullable=True,
+        default=text("'{}'::jsonb"),
+        server_default=text("'{}'::jsonb"),
     )
 
     pangolin_lineage = Column(String, nullable=True)

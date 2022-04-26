@@ -16,11 +16,22 @@ import {
   StyledListItemIcon,
 } from "./style";
 
-interface Props {
+interface BaseTreeChoiceProps {
   selected: boolean;
 }
 
-export const RadioLabelOverview = ({ selected }: Props): JSX.Element => {
+interface TreeChoiceWithFilteringProps extends BaseTreeChoiceProps {
+  availableLineages: string[];
+  selectedLineages: string[];
+  setSelectedLineages: (lineages: string[]) => void;
+}
+
+export const RadioLabelOverview = ({
+  selected,
+  availableLineages,
+  selectedLineages,
+  setSelectedLineages,
+}: TreeChoiceWithFilteringProps): JSX.Element => {
   const flag = useTreatments([FEATURE_FLAGS.sample_filtering_tree_creation]);
   const isSampleFilteringEnabled = isFlagOn(
     flag,
@@ -115,14 +126,20 @@ export const RadioLabelOverview = ({ selected }: Props): JSX.Element => {
               </ListItemText>
             </StyledListItem>
           </StyledList>
-          {isSampleFilteringEnabled && <SampleFiltering />}
+          <SampleFiltering
+            availableLineages={availableLineages}
+            selectedLineages={selectedLineages}
+            setSelectedLineages={setSelectedLineages}
+          />
         </>
       )}
     </div>
   );
 };
 
-export const RadioLabelTargeted = ({ selected }: Props): JSX.Element => {
+export const RadioLabelTargeted = ({
+  selected,
+}: BaseTreeChoiceProps): JSX.Element => {
   return (
     <div>
       <Label>
@@ -164,7 +181,10 @@ export const RadioLabelTargeted = ({ selected }: Props): JSX.Element => {
 
 export const RadioLabelNonContextualized = ({
   selected,
-}: Props): JSX.Element => {
+  availableLineages,
+  selectedLineages,
+  setSelectedLineages,
+}: TreeChoiceWithFilteringProps): JSX.Element => {
   const flag = useTreatments([FEATURE_FLAGS.sample_filtering_tree_creation]);
   const isSampleFilteringEnabled = isFlagOn(
     flag,
@@ -217,7 +237,13 @@ export const RadioLabelNonContextualized = ({
               </ListItemText>
             </StyledListItem>
           </List>
-          {isSampleFilteringEnabled && <SampleFiltering />}
+          {isSampleFilteringEnabled && (
+            <SampleFiltering
+              availableLineages={availableLineages}
+              selectedLineages={selectedLineages}
+              setSelectedLineages={setSelectedLineages}
+            />
+          )}
         </>
       )}
     </div>

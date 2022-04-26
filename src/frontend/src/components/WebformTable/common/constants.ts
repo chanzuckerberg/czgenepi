@@ -12,3 +12,12 @@ export const SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS: Record<
   privateId: "Private ID",
   publicId: "GISAID ID (Public ID)" + OPTIONAL_HEADER_MARKER,
 };
+
+export const EMPTY_METADATA: SampleEditMetadataWebform = {
+  collectionDate: "",
+  collectionLocation: undefined,
+  keepPrivate: false,
+  privateId: "",
+  publicId: "",
+  sequencingDate: "",
+};
