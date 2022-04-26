@@ -85,10 +85,10 @@ function getDuplicateIds(
   rows: Record<string, string>[],
   identifierColumnName: string
 ) {
-  const t = groupBy(rows, identifierColumnName);
+  const idCounts = groupBy(rows, identifierColumnName);
   const dups = new Set<string>();
 
-  for (const [key, value] of Object.entries(t)) {
+  for (const [key, value] of Object.entries(idCounts)) {
     if (value.length > 1) {
       dups.add(key);
     }
