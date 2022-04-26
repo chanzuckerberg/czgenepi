@@ -70,11 +70,9 @@ function convertHeaderToMetadataKey(headerName: string): string {
 // specified for the metadata keys. If nothing missing, returns null.
 // Note: the signature here is a little surprising. It's the metadata keys
 // **after** PapaParse has parse-converted the header fields into keys.
-export function getMissingHeaderFields(
+function getMissingHeaderFields(
   uploadedHeaders: string[],
-  headersToMetadataKeys: Dictionary<
-    keyof SampleEditTsvMetadata | keyof SampleUploadTsvMetadata
-  >
+  headersToMetadataKeys: Dictionary<keyof SampleUploadTsvMetadata>
 ): Set<string> | null {
   const missingFields = new Set<string>();
   for (const [headerField, metadataKey] of Object.entries(
