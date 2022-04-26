@@ -119,7 +119,7 @@ def determine_gisaid_status(
 
 def format_sample_lineage(sample: Sample) -> Dict[str, Any]:
     pathogen_genome = sample.uploaded_pathogen_genome
-    lineage = {
+    lineage: Dict[str, Any] = {
         "lineage": None,
         "confidence": None,
         "version": None,
@@ -134,9 +134,9 @@ def format_sample_lineage(sample: Sample) -> Dict[str, Any]:
         lineage["last_updated"] = pathogen_genome.pangolin_last_updated
 
         # Support looking at pango csv output.
-        pango_output = pathogen_genome.pangolin_output
+        pango_output: Dict[str, Any] = pathogen_genome.pangolin_output  # type: ignore
         lineage["scorpio_call"] = pango_output.get("scorpio_call")
         if pango_output.get("scorpio_support"):
-            lineage["scorpio_support"] = float(pango_output.get("scorpio_support"))
+            lineage["scorpio_support"] = float(pango_output.get("scorpio_support"))  # type: ignore
 
     return lineage
