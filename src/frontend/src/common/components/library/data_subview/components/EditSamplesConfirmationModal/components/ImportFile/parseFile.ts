@@ -1,4 +1,4 @@
-import { pick } from "lodash";
+import { groupBy, pick } from "lodash";
 import Papa from "papaparse";
 import { HEADERS_TO_SAMPLE_EDIT_METADATA_KEYS } from "src/common/components/library/data_subview/components/EditSamplesConfirmationModal/components/common/constants";
 import { StringToLocationFinder } from "src/common/utils/locationUtils";
@@ -31,7 +31,7 @@ export type SampleIdToWarningMessages = Record<
 >;
 
 type WarningMessages = Map<WARNING_CODE, SampleIdToWarningMessages>;
-type ErrorMessages = Map<ERROR_CODE, Set<string>>;
+type ErrorMessages = Map<ERROR_CODE, Set<string> | null>;
 
 export interface ParseResult {
   data: SampleIdToEditMetadataWebform;
@@ -79,6 +79,21 @@ function warnBadFormatMetadata(
   });
 
   return badFormatMetadata.size ? badFormatMetadata : null;
+}
+
+function getDuplicateIds(
+  rows: Record<string, string>[],
+  identifierColumnName: string
+) {
+  const t = groupBy(rows, identifierColumnName);
+  const dups = new Set<string>();
+
+  for (const [key, value] of Object.entries(t)) {
+    if (value.length > 1) {
+      dups.add(key);
+    }
+  }
+  return dups;
 }
 
 /**
@@ -188,7 +203,7 @@ export function parseFileEdit(
         const uploadedHeaders: string[] = papaParseMeta.fields || []; // available b/c `header: true`
         // Init -- Will modify these in place as we work through incoming rows.
         const sampleIdToMetadata: SampleIdToEditMetadataWebform = {};
-        const errorMessages = new Map<ERROR_CODE, Set<string>>();
+        const errorMessages = new Map<ERROR_CODE, Set<string> | null>();
         const warningMessages = new Map<
           WARNING_CODE,
           SampleIdToWarningMessages
@@ -197,8 +212,19 @@ export function parseFileEdit(
           uploadedHeaders,
           HEADERS_TO_SAMPLE_EDIT_METADATA_KEYS
         );
-        if (missingHeaderFields) {
+        const duplicatePublicIds = getDuplicateIds(rows, "publicId");
+        const duplicatePrivateIds = getDuplicateIds(rows, "newPrivateID");
+
+        if (missingHeaderFields || duplicatePublicIds || duplicatePrivateIds) {
           errorMessages.set(ERROR_CODE.MISSING_FIELD, missingHeaderFields);
+          errorMessages.set(
+            ERROR_CODE.DUPLICATE_PUBLIC_IDS,
+            duplicatePublicIds
+          );
+          errorMessages.set(
+            ERROR_CODE.DUPLICATE_PRIVATE_IDS,
+            duplicatePrivateIds
+          );
         } else {
           // We only ingest file's data if user had all expected fields.
           const IGNORED_SAMPLE_IDS = new Set(

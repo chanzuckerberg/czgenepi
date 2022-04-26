@@ -24,12 +24,6 @@ import {
 import { ContinueButton } from "src/views/Upload/components/common/style";
 import { NamedGisaidLocation } from "src/views/Upload/components/common/types";
 import { SampleIdToWarningMessages } from "src/views/Upload/components/Metadata/components/ImportFile/parseFile";
-import { ErrorsAndWarnings } from "./components/ErrorsAndWarnings";
-import ImportFile from "./components/ImportFile";
-import { ErrorsAndWarnings } from "./components/ErrorsAndWarnings";
-import ImportFile from "./components/ImportFile";
-import { SampleIdToWarningMessages } from "src/views/Upload/components/Metadata/components/ImportFile/parseFile";
-import { ErrorsAndWarnings } from "./components/ErrorsAndWarnings";
 import ImportFile from "./components/ImportFile";
 import {
   StyledButton,
@@ -278,7 +272,6 @@ const EditSamplesConfirmationModal = ({
               InstructionsTitleMarginBottom="xxs"
               listItemFontSize="xs"
             />
-            <ErrorsAndWarnings />
             <ImportFile
               metadata={metadata}
               changedMetadata={changedMetadata}

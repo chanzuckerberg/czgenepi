@@ -35,6 +35,8 @@ export enum ERROR_CODE {
   INVALID_NAME,
   MISSING_FIELD, // Missing required column entirely: no header field found
   OVER_MAX_SAMPLES,
+  DUPLICATE_PRIVATE_IDS, // Duplicate Private IDs were found in tsv upload
+  DUPLICATE_PUBLIC_IDS, // Duplicate Public IDs were found in tsv upload
 }
 
 export interface Metadata {

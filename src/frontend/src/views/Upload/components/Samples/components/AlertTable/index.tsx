@@ -19,6 +19,8 @@ const ERROR_CODE_MESSAGES: Record<ERROR_CODE, string> = {
   [ERROR_CODE.MISSING_FIELD]: "placeholder",
   [ERROR_CODE.OVER_MAX_SAMPLES]:
     "This file contains more than 500 samples, which exceeds the maximum for each upload process. Please limit the samples to 500 or less",
+  [ERROR_CODE.DUPLICATE_PUBLIC_IDS]: "placeholder",
+  [ERROR_CODE.DUPLICATE_PRIVATE_IDS]: "placeholder",
 };
 
 interface Props {

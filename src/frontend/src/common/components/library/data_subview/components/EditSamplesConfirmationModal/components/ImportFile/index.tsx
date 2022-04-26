@@ -5,6 +5,8 @@ import { createStringToLocationFinder } from "src/common/utils/locationUtils";
 import FilePicker from "src/components/FilePicker";
 import ImportFileWarnings, {
   getAutocorrectCount,
+  getDuplicatePrivateIds,
+  getDuplicatePublicIds,
   getMissingFields,
 } from "src/components/ImportFileWarnings";
 import { WebformTableTypeOptions as MetadataUploadTypeOption } from "src/components/WebformTable";
@@ -18,10 +20,6 @@ import {
   NamedGisaidLocation,
   Props as CommonProps,
 } from "src/views/Upload/components/common/types";
-import {
-  getAutocorrectCount,
-  getMissingFields,
-} from "src/components/ImportFileWarnings";
 import { getMetadataEntryOrEmpty } from "../../utils";
 import {
   parseFileEdit,
@@ -59,8 +57,12 @@ export default function ImportFile({
     useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
   const [badFormatData, setBadFormatData] =
     useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
-  const [duplicaPrivateIds, setDuplicatePrivateIds] = useState<string[]>([]);
-  const [duplicaPublicIds, setDuplicatePublicIds] = useState<string[]>([]);
+  const [duplicatePrivateIds, setDuplicatePrivateIds] = useState<
+    string[] | null
+  >(null);
+  const [duplicatePublicIds, setDuplicatePublicIds] = useState<string[] | null>(
+    null
+  );
 
   useEffect(() => {
     // If no file uploaded yet, do nothing.
@@ -92,10 +94,14 @@ export default function ImportFile({
 
     const { warningMessages, filename } = result;
     const missingFields = getMissingFields(result);
+    const duplicatePrivateIds = getDuplicatePrivateIds(result);
+    const duplicatePublicIds = getDuplicatePublicIds(result);
     const autocorrectCount =
       getAutocorrectCount(warningMessages.get(WARNING_CODE.AUTO_CORRECT)) || 0;
     setHasImportedMetadataFile(true);
     setMissingFields(missingFields);
+    setDuplicatePrivateIds(duplicatePrivateIds);
+    setDuplicatePublicIds(duplicatePublicIds);
     setAutocorrectCount(autocorrectCount);
     setFilename(filename);
     setParseResult(result);
@@ -125,7 +131,6 @@ export default function ImportFile({
     if (!metadata) return;
 
     const { data: sampleIdToUploadedMetadata, warningMessages } = result;
-
 
     const uploadedMetadata: SampleIdToEditMetadataWebform = {};
     const changedMetadataUpdated: SampleIdToEditMetadataWebform = {};
@@ -203,6 +208,8 @@ export default function ImportFile({
         missingFields={missingFields}
         autocorrectCount={autocorrectCount}
         missingData={missingData}
+        duplicatePrivateIds={duplicatePrivateIds}
+        duplicatePublicIds={duplicatePublicIds}
         badFormatData={badFormatData}
         IdColumnNameForWarnings={
           SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS.privateId

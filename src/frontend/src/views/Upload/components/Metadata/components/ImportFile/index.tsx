@@ -15,13 +15,6 @@ import ImportFileWarnings, {
 } from "src/components/ImportFileWarnings";
 import { WebformTableTypeOptions as MetadataUploadTypeOption } from "src/components/WebformTable";
 import { WARNING_CODE } from "src/components/WebformTable/common/types";
-import { WebformTableTypeOptions as MetadataUploadTypeOption } from "src/components/WebformTable";
-import {
-  ERROR_CODE,
-  WARNING_CODE,
-} from "src/components/WebformTable/common/types";
-import { WebformTableTypeOptions as MetadataUploadTypeOption } from "src/components/WebformTable";
-import { WARNING_CODE } from "src/components/WebformTable/common/types";
 import { Props as CommonProps } from "src/views/Upload/components/common/types";
 import Instructions from "./components/Instructions";
 import {
