@@ -68,7 +68,7 @@ export const StyledNewTabLink = styled(NewTabLink)`
   }}
 `;
 
-const DROPDOWN_WIDTH = "200px";
+const DROPDOWN_WIDTH = "209px";
 
 // High specificity label styling is to beat out czifui coloring.
 export const StyledDropdown = styled(Dropdown)`
@@ -76,6 +76,15 @@ export const StyledDropdown = styled(Dropdown)`
   .MuiButton-label > span {
     color: black;
   }
+
+  ${(props) => {
+    const colors = getColors(props);
+    return `
+      path {
+        fill: ${colors?.gray[500]};
+      }
+    `;
+  }}
 ` as typeof Dropdown; // assert b/c `styled` causes an interface hiccup;
 
 // The `min-width` property is necessary to cancel out a hardcoded czifui

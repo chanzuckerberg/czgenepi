@@ -25,6 +25,10 @@ interface Props {
   availableLineages: string[];
   selectedLineages: string[];
   setSelectedLineages: (lineages: string[]) => void;
+  startDate: FormattedDateType;
+  endDate: FormattedDateType;
+  setStartDate(d: FormattedDateType): void;
+  setEndDate(d: FormattedDateType): void;
 }
 
 // We present a pseudo-option to the user to enable choosing "All" lineages,
@@ -176,6 +180,10 @@ export function SampleFiltering({
   availableLineages,
   selectedLineages,
   setSelectedLineages,
+  startDate,
+  endDate,
+  setStartDate,
+  setEndDate,
 }: Props): JSX.Element {
   const lineageDropdownOptions = generateLineageDropdownOptions(
     selectedLineages,
@@ -307,6 +315,10 @@ export function SampleFiltering({
               ...MENU_OPTIONS_COLLECTION_DATE,
               MENU_OPTION_ALL_TIME,
             ]}
+            startDate={startDate}
+            endDate={endDate}
+            setStartDate={setStartDate}
+            setEndDate={setEndDate}
           />
         </StyledFilterGroup>
       </StyledFiltersSection>
