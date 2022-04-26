@@ -17,9 +17,7 @@ import {
   FORBIDDEN_NAME_CHARACTERS_REGEX,
   MAX_NAME_LENGTH,
 } from "src/views/Upload/components/common/constants";
-import {
-  inferMetadata,
-} from "src/views/Upload/components/Metadata/components/ImportFile/parseFile";
+import { inferMetadata } from "src/views/Upload/components/Metadata/components/ImportFile/parseFile";
 
 type MergedSampleEditTsvWebformMetadata = SampleEditTsvMetadata &
   SampleEditMetadataWebform;
@@ -218,7 +216,6 @@ export function parseFileEdit(
           WARNING_CODE,
           SampleIdToWarningMessages
         >();
-        console.log("uploadedHeaders", uploadedHeaders); // REMOVE
         const missingHeaderFields = getMissingHeaderFields(uploadedHeaders);
         const duplicatePublicIds = getDuplicateIds(rows, "publicId");
         const duplicatePrivateIds = getDuplicateIds(rows, "newPrivateID");
