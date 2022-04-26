@@ -151,7 +151,7 @@ export async function createSamples({
       },
       sample: {
         [METADATA_KEYS_TO_API_KEYS.collectionDate]: collectionDate,
-        [METADATA_KEYS_TO_API_KEYS.collectionLocation]: collectionLocationId,
+        [METADATA_KEYS_TO_API_KEYS.collectionLocation]: collectionLocationId(),
         [METADATA_KEYS_TO_API_KEYS.keepPrivate]: keepPrivate,
         [METADATA_KEYS_TO_API_KEYS.privateId]: privateId,
         [METADATA_KEYS_TO_API_KEYS.publicId]: publicId,
