@@ -20,6 +20,7 @@ export const LineageTooltip = ({ lineage }: Props): JSX.Element => {
       {DISPLAY_ORDER.map((key) => {
         let value = lineage[key];
         if (key === "last_updated") {
+          // remove the ugly timestamp and just show date
           value = `${value?.slice(0, 10)}`;
         }
         return <Row key={key} label={key as keyof Lineage} text={value} />;
