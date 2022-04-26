@@ -89,8 +89,10 @@ function getDuplicateIds(
   const dups = new Set<string>();
 
   for (const [key, value] of Object.entries(idCounts)) {
-    if (value.length > 1 && key !== "") {
-      // duplicates don't count for '' (as that means user does not want to change these values)
+    // duplicates don't count for '' (as that means user does not want to change these values)
+    // duplicates also do not count if undefined (this means a user deleted this non required column)
+    const keyIsAValue = key !== "" && key !== "undefined";
+    if (value.length > 1 && keyIsAValue) {
       dups.add(key);
     }
   }
