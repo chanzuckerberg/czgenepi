@@ -89,7 +89,7 @@ function getDuplicateIds(
   const dups = new Set<string>();
 
   for (const [key, value] of Object.entries(idCounts)) {
-    if (value.length > 1) {
+    if (value.length > 1 && key !== "") {
       dups.add(key);
     }
   }
@@ -215,18 +215,26 @@ export function parseFileEdit(
         const duplicatePublicIds = getDuplicateIds(rows, "publicId");
         const duplicatePrivateIds = getDuplicateIds(rows, "newPrivateID");
 
-        if (missingHeaderFields || duplicatePublicIds || duplicatePrivateIds) {
+        if (missingHeaderFields) {
           errorMessages.set(ERROR_CODE.MISSING_FIELD, missingHeaderFields);
+        }
+        if (duplicatePublicIds) {
           errorMessages.set(
             ERROR_CODE.DUPLICATE_PUBLIC_IDS,
             duplicatePublicIds
           );
+        }
+        if (duplicatePrivateIds) {
           errorMessages.set(
             ERROR_CODE.DUPLICATE_PRIVATE_IDS,
             duplicatePrivateIds
           );
-        } else {
-          // We only ingest file's data if user had all expected fields.
+        }
+        const uploadErrors =
+          !missingHeaderFields && !duplicatePrivateIds && !duplicatePublicIds;
+
+        if (!uploadErrors) {
+          // We only ingest file's data if user had all expected fields. and if there are no duplicate identifiers in the upload
           const IGNORED_SAMPLE_IDS = new Set(
             EXAMPLE_CURRENT_PRIVATE_IDENTIFIERS
           );
