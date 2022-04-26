@@ -39,6 +39,13 @@ export enum ERROR_CODE {
   DUPLICATE_PUBLIC_IDS, // Duplicate Public IDs were found in tsv upload
 }
 
+type excludedOptions =
+  | typeof ERROR_CODE.DUPLICATE_PUBLIC_IDS
+  | typeof ERROR_CODE.DUPLICATE_PRIVATE_IDS;
+
+// some errors have a custom implementation that is not shared between other base errors
+export type BASE_ERROR_CODE = Exclude<ERROR_CODE, excludedOptions>;
+
 export interface Metadata {
   // `sampleId`, unlike all others, should not be user-editable in Metadata
   // step. Instead, it IDs the sample that this metadata is tied to.

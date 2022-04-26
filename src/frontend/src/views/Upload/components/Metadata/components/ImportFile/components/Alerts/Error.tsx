@@ -2,25 +2,26 @@ import React from "react";
 import { B } from "src/common/styles/basicStyle";
 import { pluralize } from "src/common/utils/strUtils";
 import AlertAccordion from "src/components/AlertAccordion";
-import { ERROR_CODE } from "src/components/WebformTable/common/types";
+import {
+  BASE_ERROR_CODE,
+  ERROR_CODE,
+} from "src/components/WebformTable/common/types";
 import { ProblemTable } from "./common/ProblemTable";
 import { Td, Th } from "./common/style";
 
 interface Props {
   names?: string[] | null;
-  errorCode?: ERROR_CODE;
+  errorCode?: BASE_ERROR_CODE;
 }
 
 const ERROR_CODE_TO_MESSAGE: Record<
-  ERROR_CODE,
+  BASE_ERROR_CODE,
   ((props: MessageProps) => JSX.Element) | string
 > = {
   [ERROR_CODE.INVALID_NAME]: InvalidNameMessage,
   [ERROR_CODE.MISSING_FIELD]: MissingFieldMessage,
   [ERROR_CODE.OVER_MAX_SAMPLES]: "placeholder",
   [ERROR_CODE.DEFAULT]: DefaultMessage,
-  [ERROR_CODE.DUPLICATE_PRIVATE_IDS]: DefaultMessage,
-  [ERROR_CODE.DUPLICATE_PUBLIC_IDS]: DefaultMessage,
 };
 
 export default function Error({
@@ -45,8 +46,6 @@ export default function Error({
     [ERROR_CODE.DEFAULT]: (
       <B>Something went wrong, please try again or contact us!</B>
     ),
-    [ERROR_CODE.DUPLICATE_PRIVATE_IDS]: "placeholder",
-    [ERROR_CODE.DUPLICATE_PUBLIC_IDS]: "placeholder",
   };
 
   const title = errorCodeToTitle[errorCode];

@@ -1,6 +1,9 @@
 import { Table as MuiTable, TableBody, TableRow } from "@material-ui/core";
 import React from "react";
-import { ERROR_CODE } from "src/components/WebformTable/common/types";
+import {
+  BASE_ERROR_CODE,
+  ERROR_CODE,
+} from "src/components/WebformTable/common/types";
 import { ParseErrors } from "../../../common/types";
 import {
   Overflow,
@@ -11,7 +14,7 @@ import {
   StyledTableRow,
 } from "./style";
 
-const ERROR_CODE_MESSAGES: Record<ERROR_CODE, string> = {
+const ERROR_CODE_MESSAGES: Record<BASE_ERROR_CODE, string> = {
   [ERROR_CODE.DEFAULT]:
     "Something went wrong and we are unable to read this file. Please check the file or contact us for help.",
   [ERROR_CODE.INVALID_NAME]:
@@ -19,8 +22,6 @@ const ERROR_CODE_MESSAGES: Record<ERROR_CODE, string> = {
   [ERROR_CODE.MISSING_FIELD]: "placeholder",
   [ERROR_CODE.OVER_MAX_SAMPLES]:
     "This file contains more than 500 samples, which exceeds the maximum for each upload process. Please limit the samples to 500 or less",
-  [ERROR_CODE.DUPLICATE_PUBLIC_IDS]: "placeholder",
-  [ERROR_CODE.DUPLICATE_PRIVATE_IDS]: "placeholder",
 };
 
 interface Props {
@@ -49,7 +50,7 @@ export default function AlertTable({ parseErrors }: Props): JSX.Element {
                   {names.join(", ")}
                 </StyledTableCell>
                 <StyledTableCell align="left" component="div">
-                  {ERROR_CODE_MESSAGES[errorCode as unknown as ERROR_CODE]}
+                  {ERROR_CODE_MESSAGES[errorCode as unknown as BASE_ERROR_CODE]}
                 </StyledTableCell>
               </StyledTableRow>
             ))}
