@@ -32,7 +32,6 @@ export enum WARNING_CODE {
 
 export enum ERROR_CODE {
   DEFAULT, // BAD FILE NAME
-  DUPLICATE_IDS,
   INVALID_NAME,
   MISSING_FIELD, // Missing required column entirely: no header field found
   OVER_MAX_SAMPLES,
@@ -47,7 +46,7 @@ export interface Metadata {
   keepPrivate?: boolean;
   publicId?: string;
   sequencingDate?: string;
-  collectionLocation?: NamedGisaidLocation;
+  collectionLocation?: NamedGisaidLocation | string;
 }
 
 export type SampleIdToMetadata = Record<string, Metadata>;

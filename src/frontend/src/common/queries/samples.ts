@@ -135,6 +135,15 @@ export async function createSamples({
       publicId,
     } = sampleMetadata;
 
+    const collectionLocationId = () => {
+      // collection location will always be a NamedGisaidLocation at this stage,
+      // the only time collectionLocation will be a string is during tsv upload
+      // where collectionLocation can be "DELETE" (when a user wants to clear a value)
+      if (collectionLocation && typeof collectionLocation !== "string") {
+        return collectionLocation.id;
+      }
+    };
+
     const samplePayload = {
       pathogen_genome: {
         sequence,
@@ -142,7 +151,7 @@ export async function createSamples({
       },
       sample: {
         [METADATA_KEYS_TO_API_KEYS.collectionDate]: collectionDate,
-        [METADATA_KEYS_TO_API_KEYS.collectionLocation]: collectionLocation!.id,
+        [METADATA_KEYS_TO_API_KEYS.collectionLocation]: collectionLocationId(),
         [METADATA_KEYS_TO_API_KEYS.keepPrivate]: keepPrivate,
         [METADATA_KEYS_TO_API_KEYS.privateId]: privateId,
         [METADATA_KEYS_TO_API_KEYS.publicId]: publicId,

@@ -19,7 +19,6 @@ const ERROR_CODE_TO_MESSAGE: Record<
   [ERROR_CODE.MISSING_FIELD]: MissingFieldMessage,
   [ERROR_CODE.OVER_MAX_SAMPLES]: "placeholder",
   [ERROR_CODE.DEFAULT]: DefaultMessage,
-  [ERROR_CODE.DUPLICATE_IDS]: "placeholder",
 };
 
 export default function Error({
@@ -31,15 +30,19 @@ export default function Error({
   const count = names.length;
 
   const errorCodeToTitle = {
-    [ERROR_CODE.INVALID_NAME]: `Please double check the following ${pluralize(
-      "sample",
-      count
-    )} to correct any errors before proceeding:`,
-    [ERROR_CODE.MISSING_FIELD]: "Import Failed, file missing required field.",
+    [ERROR_CODE.INVALID_NAME]: (
+      <B>
+        Please double check the following {pluralize("sample", count)} to
+        correct any errors before proceeding:
+      </B>
+    ),
+    [ERROR_CODE.MISSING_FIELD]: (
+      <B>Import Failed, file missing required field.</B>
+    ),
     [ERROR_CODE.OVER_MAX_SAMPLES]: "placeholder",
-    [ERROR_CODE.DEFAULT]:
-      "Something went wrong, please try again or contact us!",
-    [ERROR_CODE.DUPLICATE_IDS]: "placeholder",
+    [ERROR_CODE.DEFAULT]: (
+      <B>Something went wrong, please try again or contact us!</B>
+    ),
   };
 
   const title = errorCodeToTitle[errorCode];

@@ -8,6 +8,7 @@ import { NewTabLink } from "src/common/components/library/NewTabLink";
 import type { TreeType } from "src/common/constants/types";
 import { TreeTypes } from "src/common/constants/types";
 import GisaidLogo from "src/common/images/gisaid-logo-full.png";
+import { useLineages } from "src/common/queries/lineages";
 import { useCreateTree } from "src/common/queries/trees";
 import { ROUTES } from "src/common/routes";
 import { B } from "src/common/styles/basicStyle";
@@ -74,6 +75,11 @@ export const CreateNSTreeModal = ({
     []
   );
   const [isValidTreeType, setIsValidTreeType] = useState<boolean>(false);
+
+  // Certain tree types can filter based on lineages
+  const { data: lineagesData } = useLineages();
+  const availableLineages: string[] = lineagesData?.lineages || [];
+  const [selectedLineages, setSelectedLineages] = useState<string[]>([]);
 
   useEffect(() => {
     if (shouldReset) setShouldReset(false);
@@ -196,6 +202,7 @@ export const CreateNSTreeModal = ({
       <StyledDialog
         disableEscapeKeyDown
         disableBackdropClick
+        disableEnforceFocus
         open={open}
         fullWidth={true}
         maxWidth={"sm"}
@@ -249,6 +256,9 @@ export const CreateNSTreeModal = ({
                 label={
                   <RadioLabelOverview
                     selected={treeType === TreeTypes.Overview}
+                    availableLineages={availableLineages}
+                    selectedLineages={selectedLineages}
+                    setSelectedLineages={setSelectedLineages}
                   />
                 }
               />
@@ -269,6 +279,9 @@ export const CreateNSTreeModal = ({
                 label={
                   <RadioLabelNonContextualized
                     selected={treeType === TreeTypes.NonContextualized}
+                    availableLineages={availableLineages}
+                    selectedLineages={selectedLineages}
+                    setSelectedLineages={setSelectedLineages}
                   />
                 }
               />

@@ -11,6 +11,7 @@ inputs:
 
 builds:
   aspen:
+    region: global
     country: {country}
     division: {division}
     location: {location}
@@ -30,6 +31,10 @@ files:
   auspice_config: "my_profiles/aspen/aspen_auspice_config_v2.json"   # this will work for all
 
 ## Parameters
+filter:
+  root_ref:
+    skip_diagnostics: True
+    
 refine:
   keep_polytomies: True
   clock_filter_iqd: 3
