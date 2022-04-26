@@ -28,6 +28,7 @@ class SampleLineageResponse(BaseResponse):
     version: Optional[str]
     scorpio_call: Optional[str]
     scorpio_support: Optional[float]
+    qc_status: Optional[str]
 
 
 class SampleGroupResponse(BaseResponse):

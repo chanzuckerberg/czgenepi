@@ -136,6 +136,7 @@ def format_sample_lineage(sample: Sample) -> Dict[str, Any]:
         # Support looking at pango csv output.
         pango_output: Dict[str, Any] = pathogen_genome.pangolin_output  # type: ignore
         lineage["scorpio_call"] = pango_output.get("scorpio_call")
+        lineage["qc_status"] = pango_output.get("qc_status")
         if pango_output.get("scorpio_support"):
             lineage["scorpio_support"] = float(pango_output.get("scorpio_support"))  # type: ignore
 
