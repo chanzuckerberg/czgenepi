@@ -65,7 +65,7 @@ jobs:
           role-duration-seconds: 900
       - name: Calculate Branch and Base Names
         id: refs
-        uses: chanzuckerberg/github-actions/.github/actions/get-github-ref-names@v1.1.0
+        uses: chanzuckerberg/github-actions/.github/actions/get-github-ref-names@v1.2.0
       - name: Get Stack Name
         id: stack-name
         uses: actions/github-script@v6
