@@ -119,19 +119,24 @@ def determine_gisaid_status(
 
 def format_sample_lineage(sample: Sample) -> Dict[str, Any]:
     pathogen_genome = sample.uploaded_pathogen_genome
+    lineage = {
+        "lineage": None,
+        "confidence": None,
+        "version": None,
+        "last_updated": None,
+        "scorpio_call": None,
+        "scorpio_support": None,
+    }
     if pathogen_genome:
-        lineage = {
-            "lineage": pathogen_genome.pangolin_lineage,
-            "confidence": pathogen_genome.pangolin_probability,
-            "version": pathogen_genome.pangolin_version,
-            "last_updated": pathogen_genome.pangolin_last_updated,
-        }
-    else:
-        lineage = {
-            "lineage": None,
-            "confidence": None,
-            "version": None,
-            "last_updated": None,
-        }
+        lineage["lineage"] = pathogen_genome.pangolin_lineage
+        lineage["confidence"] = pathogen_genome.pangolin_probability
+        lineage["version"] = pathogen_genome.pangolin_version
+        lineage["last_updated"] = pathogen_genome.pangolin_last_updated
+
+        # Support looking at pango csv output.
+        pango_output = pathogen_genome.pangolin_output
+        lineage["scorpio_call"] = pango_output.get("scorpio_call")
+        if pango_output.get("scorpio_support"):
+            lineage["scorpio_support"] = float(pango_output.get("scorpio_support"))
 
     return lineage

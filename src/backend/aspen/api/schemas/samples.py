@@ -26,6 +26,8 @@ class SampleLineageResponse(BaseResponse):
     lineage: Optional[str]
     confidence: Optional[float]
     version: Optional[str]
+    scorpio_call: Optional[str]
+    scorpio_support: Optional[float]
 
 
 class SampleGroupResponse(BaseResponse):

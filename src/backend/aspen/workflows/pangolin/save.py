@@ -48,6 +48,7 @@ def cli(pangolin_fh: io.TextIOBase, pangolin_last_updated: datetime):
                 "lineage": row["lineage"],
                 "probability": get_probability(row),
                 "version": row["version"],
+                "full_output": {k: v for k, v in row.items() if v and k != "taxon"},
             }
             for row in pango_csv
         }
@@ -67,6 +68,7 @@ def cli(pangolin_fh: io.TextIOBase, pangolin_last_updated: datetime):
             pathogen_genome.pangolin_lineage = pango_info["lineage"]  # type: ignore
             pathogen_genome.pangolin_probability = pango_info["probability"]  # type: ignore
             pathogen_genome.pangolin_version = pango_info["version"]  # type: ignore
+            pathogen_genome.pangolin_output = pango_info["full_output"]  # type: ignore
             session.commit()
 
 
