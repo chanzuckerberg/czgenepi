@@ -126,6 +126,7 @@ def format_sample_lineage(sample: Sample) -> Dict[str, Any]:
         "last_updated": None,
         "scorpio_call": None,
         "scorpio_support": None,
+        "qc_status": None,
     }
     if pathogen_genome:
         lineage["lineage"] = pathogen_genome.pangolin_lineage
