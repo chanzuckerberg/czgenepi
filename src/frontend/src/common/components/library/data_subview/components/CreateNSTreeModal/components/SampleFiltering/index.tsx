@@ -176,6 +176,10 @@ export function SampleFiltering({
   availableLineages,
   selectedLineages,
   setSelectedLineages,
+  startDate,
+  endDate,
+  setStartDate,
+  setEndDate,
 }: Props): JSX.Element {
   const lineageDropdownOptions = generateLineageDropdownOptions(
     selectedLineages,
@@ -307,6 +311,10 @@ export function SampleFiltering({
               ...MENU_OPTIONS_COLLECTION_DATE,
               MENU_OPTION_ALL_TIME,
             ]}
+            startDate={startDate}
+            endDate={endDate}
+            setStartDate={setStartDate}
+            setEndDate={setEndDate}
           />
         </StyledFilterGroup>
       </StyledFiltersSection>

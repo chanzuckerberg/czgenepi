@@ -76,10 +76,12 @@ export const CreateNSTreeModal = ({
   );
   const [isValidTreeType, setIsValidTreeType] = useState<boolean>(false);
 
-  // Certain tree types can filter based on lineages
+  // Certain tree types can filter based on lineages and date ranges
   const { data: lineagesData } = useLineages();
   const availableLineages: string[] = lineagesData?.lineages || [];
   const [selectedLineages, setSelectedLineages] = useState<string[]>([]);
+  const [startDate, setStartDate] = useState<FormattedDateType>();
+  const [endDate, setEndDate] = useState<FormattedDateType>();
 
   useEffect(() => {
     if (shouldReset) setShouldReset(false);
@@ -154,10 +156,21 @@ export const CreateNSTreeModal = ({
 
   const handleSubmit = (evt: SyntheticEvent) => {
     evt.preventDefault();
+
+    // clear state so it doesn't persist if they make another tree
+    setStartDate(null);
+    setEndDate(null);
+    setSelectedLineages([]);
+
     mutation.mutate({
       sampleIds: allValidSamplesForTreeCreation,
       treeName,
       treeType,
+      filters: {
+        startDate,
+        endDate,
+        lineages: selectedLineages,
+      },
     });
   };
 
@@ -259,6 +272,10 @@ export const CreateNSTreeModal = ({
                     availableLineages={availableLineages}
                     selectedLineages={selectedLineages}
                     setSelectedLineages={setSelectedLineages}
+                    startDate={startDate}
+                    endDate={endDate}
+                    setStartDate={setStartDate}
+                    setEndDate={setEndDate}
                   />
                 }
               />
@@ -282,6 +299,10 @@ export const CreateNSTreeModal = ({
                     availableLineages={availableLineages}
                     selectedLineages={selectedLineages}
                     setSelectedLineages={setSelectedLineages}
+                    startDate={startDate}
+                    endDate={endDate}
+                    setStartDate={setStartDate}
+                    setEndDate={setEndDate}
                   />
                 }
               />

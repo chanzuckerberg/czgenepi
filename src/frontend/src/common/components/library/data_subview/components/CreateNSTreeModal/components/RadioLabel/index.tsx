@@ -31,6 +31,10 @@ export const RadioLabelOverview = ({
   availableLineages,
   selectedLineages,
   setSelectedLineages,
+  startDate,
+  endDate,
+  setStartDate,
+  setEndDate,
 }: TreeChoiceWithFilteringProps): JSX.Element => {
   const flag = useTreatments([FEATURE_FLAGS.sample_filtering_tree_creation]);
   const isSampleFilteringEnabled = isFlagOn(
@@ -130,6 +134,10 @@ export const RadioLabelOverview = ({
             availableLineages={availableLineages}
             selectedLineages={selectedLineages}
             setSelectedLineages={setSelectedLineages}
+            startDate={startDate}
+            endDate={endDate}
+            setStartDate={setStartDate}
+            setEndDate={setEndDate}
           />
         </>
       )}
@@ -184,6 +192,10 @@ export const RadioLabelNonContextualized = ({
   availableLineages,
   selectedLineages,
   setSelectedLineages,
+  startDate,
+  endDate,
+  setStartDate,
+  setEndDate,
 }: TreeChoiceWithFilteringProps): JSX.Element => {
   const flag = useTreatments([FEATURE_FLAGS.sample_filtering_tree_creation]);
   const isSampleFilteringEnabled = isFlagOn(
@@ -242,6 +254,10 @@ export const RadioLabelNonContextualized = ({
               availableLineages={availableLineages}
               selectedLineages={selectedLineages}
               setSelectedLineages={setSelectedLineages}
+              startDate={startDate}
+              endDate={endDate}
+              setStartDate={setStartDate}
+              setEndDate={setEndDate}
             />
           )}
         </>

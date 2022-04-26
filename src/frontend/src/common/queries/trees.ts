@@ -32,16 +32,29 @@ async function createTree({
   sampleIds,
   treeName,
   treeType,
+  filters,
 }: {
   sampleIds: string[];
   treeName: string;
   treeType: string | undefined;
+  filters: {
+    startDate?: any;
+    endDate?: any;
+    lineages?: any;
+  };
 }): Promise<unknown> {
+  const { startDate, endDate, lineages } = filters;
   const payload: CreateTreePayload = {
     name: treeName,
     samples: sampleIds,
     tree_type: treeType,
+    template_args: {
+      filter_start_date: startDate,
+      filter_end_date: endDate,
+      filter_pango_lineages: lineages,
+    },
   };
+
   const response = await fetch(API_URL + API.PHYLO_RUNS, {
     ...DEFAULT_POST_OPTIONS,
     body: JSON.stringify(payload),

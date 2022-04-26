@@ -12,11 +12,12 @@ interface Props {
 
 const CollectionDateFilter = ({
   updateDateFilter,
+  startDate,
+  endDate,
+  setStartDate,
+  setEndDate,
   ...props
 }: Props): JSX.Element => {
-  // `startDate` and `endDate` represent the active filter dates. Update on filter change.
-  const [startDate, setStartDate] = useState<FormattedDateType>();
-  const [endDate, setEndDate] = useState<FormattedDateType>();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | undefined>();
   // What menu option is chosen. If none chosen, `null`.
   const [selectedDateMenuOption, setSelectedDateMenuOption] =
