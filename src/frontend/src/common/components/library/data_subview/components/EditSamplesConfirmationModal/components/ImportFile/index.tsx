@@ -5,6 +5,8 @@ import { createStringToLocationFinder } from "src/common/utils/locationUtils";
 import FilePicker from "src/components/FilePicker";
 import ImportFileWarnings, {
   getAutocorrectCount,
+  getDuplicatePrivateIds,
+  getDuplicatePublicIds,
   getMissingFields,
 } from "src/components/ImportFileWarnings";
 import { WebformTableTypeOptions as MetadataUploadTypeOption } from "src/components/WebformTable";
@@ -55,6 +57,12 @@ export default function ImportFile({
     useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
   const [badFormatData, setBadFormatData] =
     useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
+  const [duplicatePrivateIds, setDuplicatePrivateIds] = useState<
+    string[] | null
+  >(null);
+  const [duplicatePublicIds, setDuplicatePublicIds] = useState<string[] | null>(
+    null
+  );
 
   useEffect(() => {
     // If no file uploaded yet, do nothing.
@@ -86,10 +94,14 @@ export default function ImportFile({
 
     const { warningMessages, filename } = result;
     const missingFields = getMissingFields(result);
+    const duplicatePrivateIds = getDuplicatePrivateIds(result);
+    const duplicatePublicIds = getDuplicatePublicIds(result);
     const autocorrectCount =
       getAutocorrectCount(warningMessages.get(WARNING_CODE.AUTO_CORRECT)) || 0;
     setHasImportedMetadataFile(true);
     setMissingFields(missingFields);
+    setDuplicatePrivateIds(duplicatePrivateIds);
+    setDuplicatePublicIds(duplicatePublicIds);
     setAutocorrectCount(autocorrectCount);
     setFilename(filename);
     setParseResult(result);
@@ -99,7 +111,6 @@ export default function ImportFile({
     setBadFormatData(
       warningMessages.get(WARNING_CODE.BAD_FORMAT_DATA) || EMPTY_OBJECT
     );
-
     handleMetadataFileUpload(result);
   };
 
@@ -121,14 +132,12 @@ export default function ImportFile({
 
     const { data: sampleIdToUploadedMetadata, warningMessages } = result;
 
-    // Filter out any metadata for samples they did not just upload
-    // Note: Might be cleaner to do this filtering inside of file parse call,
-    // but would require changing the way some of the warnings work currently.
     const uploadedMetadata: SampleIdToEditMetadataWebform = {};
     const changedMetadataUpdated: SampleIdToEditMetadataWebform = {};
     for (const sampleId of Object.keys(metadata)) {
       // get current metadata and changed metadata entry for a sampleId
       const existingMetadataEntry = metadata[sampleId];
+
       const existingChangedMetadataEntry = getMetadataEntryOrEmpty(
         changedMetadata,
         sampleId
@@ -199,6 +208,8 @@ export default function ImportFile({
         missingFields={missingFields}
         autocorrectCount={autocorrectCount}
         missingData={missingData}
+        duplicatePrivateIds={duplicatePrivateIds}
+        duplicatePublicIds={duplicatePublicIds}
         badFormatData={badFormatData}
         IdColumnNameForWarnings={
           SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS.privateId

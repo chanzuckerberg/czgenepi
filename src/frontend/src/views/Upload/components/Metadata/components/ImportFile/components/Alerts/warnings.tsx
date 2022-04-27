@@ -109,6 +109,7 @@ export function WarningExtraneousEntrySampleEdit({
 }: PropsExtraneousEntry): JSX.Element {
   const count = extraneousSampleIds.length;
   // "X Samples in metadata file were not used."
+
   const title = `${count} ${pluralize(
     "Sample",
     count

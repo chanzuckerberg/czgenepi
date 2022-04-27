@@ -18,7 +18,7 @@ export async function handleFiles(
   files: FileList
 ): Promise<ParseOutcomeWithFilenames> {
   let finalResult: Samples = {};
-  let finalErrors = {} as ParseErrors;
+  let finalErrors: ParseErrors = {};
 
   for (const file of Array.from(files)) {
     const { result, errors } = await handleFile(

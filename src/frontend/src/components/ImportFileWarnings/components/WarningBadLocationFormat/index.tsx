@@ -8,12 +8,13 @@ import { ProblemTable } from "src/views/Upload/components/Metadata/components/Im
 /**
  * WARNING_CODE.BAD_LOCATION_FORMAT
  */
-interface BadLocationFormatProps {
-  badSamples: {
-    id: string;
-    originalValue: string;
-    updatedValue: string;
-  }[];
+export type badLocationFormatSamples = {
+  id: string;
+  originalValue: string;
+  updatedValue: string;
+}[];
+export interface BadLocationFormatProps {
+  badSamples: badLocationFormatSamples;
 }
 
 const MessageBadLocationFormat = ({ badSamples }: BadLocationFormatProps) => {

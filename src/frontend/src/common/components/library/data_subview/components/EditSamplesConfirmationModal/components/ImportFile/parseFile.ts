@@ -1,4 +1,4 @@
-import { pick } from "lodash";
+import { groupBy, pick } from "lodash";
 import Papa from "papaparse";
 import { HEADERS_TO_SAMPLE_EDIT_METADATA_KEYS } from "src/common/components/library/data_subview/components/EditSamplesConfirmationModal/components/common/constants";
 import { StringToLocationFinder } from "src/common/utils/locationUtils";
@@ -31,7 +31,7 @@ export type SampleIdToWarningMessages = Record<
 >;
 
 type WarningMessages = Map<WARNING_CODE, SampleIdToWarningMessages>;
-type ErrorMessages = Map<ERROR_CODE, Set<string>>;
+type ErrorMessages = Map<ERROR_CODE, Set<string> | null>;
 
 export interface ParseResult {
   data: SampleIdToEditMetadataWebform;
@@ -81,6 +81,24 @@ function warnBadFormatMetadata(
   return badFormatMetadata.size ? badFormatMetadata : null;
 }
 
+function getDuplicateIds(
+  rows: Record<string, string>[],
+  identifierColumnName: string
+) {
+  const idCounts = groupBy(rows, identifierColumnName);
+  const dups = new Set<string>();
+
+  for (const [key, value] of Object.entries(idCounts)) {
+    // duplicates don't count for '' (as that means user does not want to change these values)
+    // duplicates also do not count if undefined (this means a user deleted this non required column)
+    const keyIsAValue = key !== "" && key !== "undefined";
+    if (value.length > 1 && keyIsAValue) {
+      dups.add(key);
+    }
+  }
+  return dups;
+}
+
 /**
  * Parses a single data row. If issues during parse, also reports warnings.
  *
@@ -96,6 +114,7 @@ function warnBadFormatMetadata(
  *   - ignoredSampleIds: Any IDs that, if encountered, mean row is ignored.
  *       Mostly exists to filter out the metadata template's example rows.
  */
+
 function parseRow(
   row: Record<string, string>,
   stringToLocationFinder: StringToLocationFinder,
@@ -187,7 +206,7 @@ export function parseFileEdit(
         const uploadedHeaders: string[] = papaParseMeta.fields || []; // available b/c `header: true`
         // Init -- Will modify these in place as we work through incoming rows.
         const sampleIdToMetadata: SampleIdToEditMetadataWebform = {};
-        const errorMessages = new Map<ERROR_CODE, Set<string>>();
+        const errorMessages = new Map<ERROR_CODE, Set<string> | null>();
         const warningMessages = new Map<
           WARNING_CODE,
           SampleIdToWarningMessages
@@ -196,10 +215,29 @@ export function parseFileEdit(
           uploadedHeaders,
           HEADERS_TO_SAMPLE_EDIT_METADATA_KEYS
         );
+        const duplicatePublicIds = getDuplicateIds(rows, "publicId");
+        const duplicatePrivateIds = getDuplicateIds(rows, "newPrivateID");
+
         if (missingHeaderFields) {
           errorMessages.set(ERROR_CODE.MISSING_FIELD, missingHeaderFields);
-        } else {
-          // We only ingest file's data if user had all expected fields.
+        }
+        if (duplicatePublicIds) {
+          errorMessages.set(
+            ERROR_CODE.DUPLICATE_PUBLIC_IDS,
+            duplicatePublicIds
+          );
+        }
+        if (duplicatePrivateIds) {
+          errorMessages.set(
+            ERROR_CODE.DUPLICATE_PRIVATE_IDS,
+            duplicatePrivateIds
+          );
+        }
+        const uploadErrors =
+          !missingHeaderFields && !duplicatePrivateIds && !duplicatePublicIds;
+
+        if (!uploadErrors) {
+          // We only ingest file's data if user had all expected fields. and if there are no duplicate identifiers in the upload
           const IGNORED_SAMPLE_IDS = new Set(
             EXAMPLE_CURRENT_PRIVATE_IDENTIFIERS
           );

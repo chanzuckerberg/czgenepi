@@ -1,6 +1,5 @@
 import { isEmpty } from "lodash";
 import React from "react";
-import { ErrorsAndWarnings } from "src/common/components/library/data_subview/components/EditSamplesConfirmationModal/components/ErrorsAndWarnings";
 import {
   ParseResult as ParseResultEdit,
   SampleIdToWarningMessages as SampleIdToWarningMessagesEdit,
@@ -18,11 +17,16 @@ import {
   WarningMissingData,
 } from "src/views/Upload/components/Metadata/components/ImportFile/components/Alerts/warnings";
 import {
-  ParseResult,
   ParseResult as ParseResultUpload,
   SampleIdToWarningMessages,
   SampleIdToWarningMessages as SampleIdToWarningMessagesUpload,
 } from "src/views/Upload/components/Metadata/components/ImportFile/parseFile";
+import { DuplicateIdsError } from "./components/DuplicateIdsError";
+import {
+  badLocationFormatSamples,
+  WarningBadLocationFormat,
+} from "./components/WarningBadLocationFormat";
+import { WarningUnknownDataFields } from "./components/WarningUnknownDataFields";
 
 interface ImportFileWarningsProps {
   hasImportedFile: boolean;
@@ -32,6 +36,11 @@ interface ImportFileWarningsProps {
   missingFields: string[] | null;
   autocorrectCount: number;
   absentSampleIds?: string[]; // absentsampleIds are only used for Upload Tsv flow
+  // TODO: make these not optional when errors are added to sample Upload flow
+  duplicatePrivateIds?: string[] | null;
+  duplicatePublicIds?: string[] | null;
+  badLocationFormatSamples?: badLocationFormatSamples;
+  hasUnknownDataFields?: boolean;
   missingData: SampleIdToWarningMessagesUpload | SampleIdToWarningMessagesEdit;
   badFormatData:
     | SampleIdToWarningMessagesUpload
@@ -49,7 +58,11 @@ export default function ImportFileWarnings({
   filename,
   missingFields,
   autocorrectCount,
-  absentSampleIds = [],
+  absentSampleIds,
+  duplicatePrivateIds,
+  duplicatePublicIds,
+  badLocationFormatSamples,
+  hasUnknownDataFields,
   missingData,
   badFormatData,
   IdColumnNameForWarnings,
@@ -88,22 +101,31 @@ export default function ImportFileWarnings({
           <WarningExtraneousEntry extraneousSampleIds={extraneousSampleIds} />
         )}
 
-      {absentSampleIds.length > 0 && (
+      {absentSampleIds && !isEmpty(absentSampleIds) && (
         <WarningAbsentSample absentSampleIds={absentSampleIds} />
       )}
 
       {!isEmpty(missingData) && (
         <WarningMissingData missingData={missingData} />
       )}
-      {/* TODO: condense ErrorsAndWarnings and ImportFileWarnings */}
-      <ErrorsAndWarnings />
+
+      {(!isEmpty(duplicatePublicIds) || !isEmpty(duplicatePrivateIds)) && (
+        <DuplicateIdsError
+          duplicatePrivateIds={duplicatePrivateIds}
+          duplicatePublicIds={duplicatePublicIds}
+        />
+      )}
+      {badLocationFormatSamples && (
+        <WarningBadLocationFormat badSamples={badLocationFormatSamples} />
+      )}
+      {hasUnknownDataFields && <WarningUnknownDataFields />}
     </>
   );
 }
 
 function getIsParseResultCompletelyUnused(
   extraneousSampleIds: string[],
-  parseResult: ParseResult | null
+  parseResult: ParseResultUpload | ParseResultEdit | null
 ) {
   if (!parseResult) return true;
 
@@ -119,8 +141,26 @@ export function getAutocorrectCount(
 }
 
 // Returns array of all missing column header fields, or if none missing, null.
-export function getMissingFields(parseResult: ParseResult): string[] | null {
+export function getMissingFields(
+  parseResult: ParseResultUpload | ParseResultEdit
+): string[] | null {
   const { errorMessages } = parseResult;
   const missingFieldsErr = errorMessages.get(ERROR_CODE.MISSING_FIELD);
   return missingFieldsErr ? Array.from(missingFieldsErr) : null;
+}
+
+export function getDuplicatePublicIds(
+  parseResult: ParseResultUpload | ParseResultEdit
+): string[] | null {
+  const { errorMessages } = parseResult;
+  const dupPublicIds = errorMessages.get(ERROR_CODE.DUPLICATE_PUBLIC_IDS);
+  return dupPublicIds ? Array.from(dupPublicIds) : null;
+}
+
+export function getDuplicatePrivateIds(
+  parseResult: ParseResultUpload | ParseResultEdit
+): string[] | null {
+  const { errorMessages } = parseResult;
+  const dupPrivateIds = errorMessages.get(ERROR_CODE.DUPLICATE_PRIVATE_IDS);
+  return dupPrivateIds ? Array.from(dupPrivateIds) : null;
 }

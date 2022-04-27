@@ -5,14 +5,15 @@ import AlertAccordion from "src/components/AlertAccordion";
 import { StyledTable } from "./style";
 
 interface Props {
-  duplicatePrivateIds?: string[];
-  duplicatePublicIds?: string[];
+  duplicatePrivateIds?: string[] | null;
+  duplicatePublicIds?: string[] | null;
 }
 
 const DuplicateIdsMessage = ({
   duplicatePrivateIds = [],
   duplicatePublicIds = [],
 }: Props): JSX.Element | null => {
+  if (!duplicatePrivateIds || !duplicatePublicIds) return null;
   const hasDupPrivate = duplicatePrivateIds.length > 0;
   const hasDupPublic = duplicatePublicIds.length > 0;
 
@@ -45,7 +46,8 @@ const DuplicateIdsMessage = ({
 const DuplicateIdsError = ({
   duplicatePrivateIds = [],
   duplicatePublicIds = [],
-}: Props): JSX.Element => {
+}: Props): JSX.Element | null => {
+  if (!duplicatePrivateIds || !duplicatePublicIds) return null;
   const totalErrorCount =
     duplicatePrivateIds.length + duplicatePublicIds.length;
 
