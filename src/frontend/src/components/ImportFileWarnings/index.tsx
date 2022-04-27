@@ -142,7 +142,7 @@ function getIsParseResultCompletelyUnused(
 }
 
 export function getAutocorrectCount(
-  sampleIdToWarningMessages: SampleIdToWarningMessages | boolean = {}
+  sampleIdToWarningMessages: SampleIdToWarningMessages = {}
 ) {
   return Object.keys(sampleIdToWarningMessages).length;
 }
