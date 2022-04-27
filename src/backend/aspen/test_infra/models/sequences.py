@@ -45,6 +45,7 @@ def uploaded_pathogen_genome_factory(
     sequencing_depth=0.1,
     sequencing_date=datetime.date.today(),
     upload_date=datetime.datetime.now(),
+    pangolin_output={},
 ):
     uploaded_pathogen_genome = UploadedPathogenGenome(
         sample=sample,
@@ -59,6 +60,7 @@ def uploaded_pathogen_genome_factory(
         sequencing_depth=sequencing_depth,
         sequencing_date=sequencing_date,
         upload_date=upload_date,
+        pangolin_output=pangolin_output,
     )
 
     return uploaded_pathogen_genome

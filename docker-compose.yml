@@ -190,12 +190,20 @@ services:
       - BOTO_ENDPOINT_URL=http://localstack.genepinet.localdev:4566
       - AWS_ACCESS_KEY_ID=dev_access_key_id
       - AWS_SECRET_ACCESS_KEY=dev_secret_access_key
+      - FLASK_ENV=development
+      - PYTHONUNBUFFERED=1
+      - DB=docker
+      - ENV=local
+      - DEPLOYMENT_STAGE=local
+      - PYTHONPATH=.
     command: [ "true" ]
     restart: "no"
     networks:
       genepinet:
         aliases:
           - pangolin.genepinet.localdev
+    volumes:
+      - ./src/backend:/usr/src/app
   nextstrain:
     image: "${DOCKER_REPO}genepi-nextstrain"
     profiles: [ "nextstrain", "jobs", "all" ]

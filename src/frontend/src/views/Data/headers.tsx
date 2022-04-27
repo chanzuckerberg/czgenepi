@@ -100,8 +100,16 @@ export const SAMPLE_SUBHEADERS: Record<string, SubHeader[]> = {
       text: "Lineage",
     },
     {
-      key: "confidence",
-      text: "Confidence",
+      key: "qc_status",
+      text: "QC Status",
+    },
+    {
+      key: "scorpio_call",
+      text: "Scorpio Call",
+    },
+    {
+      key: "scorpio_support",
+      text: "Scorpio Support",
     },
     {
       key: "last_updated",

@@ -9,10 +9,12 @@ interface GISAID {
 }
 
 interface Lineage {
-  last_updated: unknown;
-  lineage: unknown;
-  confidencde: unknown;
-  version: unknown;
+  last_updated: string;
+  lineage: string;
+  qc_status: string;
+  scorpio_call: string;
+  scorpio_support: string;
+  version: string;
 }
 
 enum TREE_STATUS {

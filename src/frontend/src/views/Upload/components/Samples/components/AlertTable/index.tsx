@@ -1,4 +1,5 @@
 import { Table as MuiTable, TableBody, TableRow } from "@material-ui/core";
+import { map } from "lodash";
 import React from "react";
 import {
   BASE_ERROR_CODE,
@@ -44,13 +45,13 @@ export default function AlertTable({ parseErrors }: Props): JSX.Element {
             </TableRow>
           </StyledTableHead>
           <TableBody component="div">
-            {Object.entries(parseErrors).map(([errorCode, names]) => (
+            {map(parseErrors, (names: string[], errorCode: BASE_ERROR_CODE) => (
               <StyledTableRow key={errorCode} component="div">
                 <StyledTableCell scope="row" component="div">
                   {names.join(", ")}
                 </StyledTableCell>
                 <StyledTableCell align="left" component="div">
-                  {ERROR_CODE_MESSAGES[errorCode as unknown as BASE_ERROR_CODE]}
+                  {ERROR_CODE_MESSAGES[errorCode]}
                 </StyledTableCell>
               </StyledTableRow>
             ))}
