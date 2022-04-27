@@ -35,6 +35,7 @@ export interface ParseResult {
   errorMessages: ErrorMessages;
   warningMessages: WarningMessages;
   filename: string;
+  hasUnknownFields: boolean;
 }
 
 export type SampleEditIdToWarningMessages = Record<
@@ -214,8 +215,9 @@ export function parseFileEdit(
         const errorMessages = new Map<ERROR_CODE, Set<string> | null>();
         const warningMessages = new Map<
           WARNING_CODE,
-          SampleIdToWarningMessages | boolean
+          SampleIdToWarningMessages
         >();
+        let hasUnknownFields = false;
         const missingHeaderFields = getMissingHeaderFields(uploadedHeaders);
         const duplicatePublicIds = getDuplicateIds(rows, "publicId");
         const duplicatePrivateIds = getDuplicateIds(rows, "newPrivateID");
@@ -251,7 +253,7 @@ export function parseFileEdit(
             (x) => !expectedHeaders.includes(x)
           );
           if (!isEmpty(unknownFields)) {
-            warningMessages.set(WARNING_CODE.UNKNOWN_DATA_FIELDS, true);
+            hasUnknownFields = true;
           }
           rows.forEach((row) => {
             const { rowMetadata, rowWarnings } = parseRow(
@@ -291,8 +293,9 @@ export function parseFileEdit(
         resolve({
           data: sampleIdToMetadata,
           errorMessages,
-          warningMessages,
           filename: file.name,
+          hasUnknownFields,
+          warningMessages,
         });
       },
     });

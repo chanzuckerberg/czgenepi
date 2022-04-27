@@ -54,9 +54,7 @@ export default function ImportFile({
   const [parseResult, setParseResult] = useState<ParseResult | null>(null);
   const [extraneousSampleIds, setExtraneousSampleIds] = useState<string[]>([]);
   const [absentSampleIds, setAbsentSampleIds] = useState<string[]>([]);
-  const [hasUnknownDataFields, setUnknownDataFields] = useState<
-    boolean | SampleIdToWarningMessages
-  >(false);
+  const [hasUnknownDataFields, setUnknownDataFields] = useState<boolean>(false);
   const [missingData, setMissingData] =
     useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
   const [badFormatData, setBadFormatData] =
@@ -102,7 +100,7 @@ export default function ImportFile({
 
     const result = await parseFileEdit(files[0], stringToLocationFinder);
 
-    const { warningMessages, filename } = result;
+    const { warningMessages, filename, hasUnknownFields } = result;
     const missingFields = getMissingFields(result);
     const duplicatePrivateIds = getDuplicatePrivateIds(result);
     const duplicatePublicIds = getDuplicatePublicIds(result);
@@ -121,9 +119,7 @@ export default function ImportFile({
     setBadFormatData(
       warningMessages.get(WARNING_CODE.BAD_FORMAT_DATA) || EMPTY_OBJECT
     );
-    setUnknownDataFields(
-      warningMessages.get(WARNING_CODE.UNKNOWN_DATA_FIELDS) || false
-    );
+    setUnknownDataFields(hasUnknownFields);
     handleMetadataFileUpload(result);
   };
 
