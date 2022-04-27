@@ -41,7 +41,7 @@ interface ImportFileWarningsProps {
   duplicatePrivateIds?: string[] | null;
   duplicatePublicIds?: string[] | null;
   badLocationFormatSamples?: badLocationFormatSamples;
-  hasUnknownDataFields?: boolean;
+  hasUnknownDataFields?: boolean | SampleIdToWarningMessagesEdit;
   missingData: SampleIdToWarningMessagesUpload | SampleIdToWarningMessagesEdit;
   badFormatData:
     | SampleIdToWarningMessagesUpload
