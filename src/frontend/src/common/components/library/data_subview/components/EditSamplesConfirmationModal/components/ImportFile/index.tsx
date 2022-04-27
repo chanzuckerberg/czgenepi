@@ -53,6 +53,7 @@ export default function ImportFile({
   const [filename, setFilename] = useState("");
   const [parseResult, setParseResult] = useState<ParseResult | null>(null);
   const [extraneousSampleIds, setExtraneousSampleIds] = useState<string[]>([]);
+  const [absentSampleIds, setAbsentSampleIds] = useState<string[]>([]);
   const [missingData, setMissingData] =
     useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
   const [badFormatData, setBadFormatData] =
@@ -80,6 +81,12 @@ export default function ImportFile({
       return !sampleIdsSet.has(parseId);
     });
     setExtraneousSampleIds(extraneousSampleIds);
+
+    const parseResultSampleIdsSet = new Set(parseResultSampleIds);
+    const absentSampleIds = sampleIds.filter((sampleId) => {
+      return !parseResultSampleIdsSet.has(sampleId);
+    });
+    setAbsentSampleIds(absentSampleIds);
   }, [parseResult, metadata, missingFields]);
 
   // Used by file upload parser to convert location strings to Locations
@@ -207,6 +214,7 @@ export default function ImportFile({
         filename={filename}
         missingFields={missingFields}
         autocorrectCount={autocorrectCount}
+        absentSampleIds={absentSampleIds}
         missingData={missingData}
         duplicatePrivateIds={duplicatePrivateIds}
         duplicatePublicIds={duplicatePublicIds}
