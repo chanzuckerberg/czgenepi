@@ -37,11 +37,11 @@ function mapGroupData(obj: any): Group {
   };
 }
 
-export const fetchUserInfo = (): Promise<User> => {
+export const fetchUserInfo = (): Promise<RawUserRequest> => {
   return getBackendApiJson(API.USERDATA);
 };
 
-const updateUserInfo = (user: Partial<UpdateUser>): Promise<Response> => {
+const updateUserInfo = (user: Partial<RawUserRequest>): Promise<Response> => {
   return fetch(API_URL + API.USER_INFO, {
     ...DEFAULT_PUT_OPTIONS,
     body: JSON.stringify(user),
@@ -51,7 +51,7 @@ const updateUserInfo = (user: Partial<UpdateUser>): Promise<Response> => {
 export function useUpdateUserInfo(): UseMutationResult<
   Response,
   unknown,
-  Partial<UpdateUser>,
+  Partial<RawUserRequest>,
   unknown
 > {
   const queryClient = useQueryClient();
