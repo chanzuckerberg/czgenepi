@@ -41,12 +41,12 @@ export const CURRENT_POLICY_VERSION = "2021-09-30"; // NOTE: YYYY-MM-DD is criti
  *   - && They have previously agreed to Terms of Service
  *       ^^ Without this, we spam them with two, simultaneous requests for acknowledgment
  */
-const determineIfAcknowledgmentNeeded = (data: User | undefined): boolean => {
+const determineIfAcknowledgmentNeeded = (user: User | undefined): boolean => {
   // Don't display the banner until we've heard from backend about login status
-  if (!data) {
+  if (!user) {
     return false;
   }
-  const { agreedToTos, acknowledgedPolicyVersion } = data;
+  const { agreedToTos, acknowledgedPolicyVersion } = user;
   if (acknowledgedPolicyVersion === CURRENT_POLICY_VERSION || !agreedToTos) {
     return false;
   }
@@ -54,8 +54,8 @@ const determineIfAcknowledgmentNeeded = (data: User | undefined): boolean => {
 };
 
 const AcknowledgePolicyChanges = () => {
-  const { data } = useUserInfo();
-  const isAcknowledgmentNeeded = determineIfAcknowledgmentNeeded(data);
+  const { data: user } = useUserInfo();
+  const isAcknowledgmentNeeded = determineIfAcknowledgmentNeeded(user);
 
   const { mutate: updateUserInfo, isLoading: isUpdatingUserInfo } =
     useUpdateUserInfo();

@@ -20,7 +20,7 @@ export const USE_USER_INFO = {
 };
 
 const mapUserData = (obj: any): User => {
-  const res: User ={
+  return {
     acknowledgedPolicyVersion: obj.acknowledged_policy_version,
     agreedToTos: obj.agreed_to_tos,
     group: mapGroupData(obj.group),
@@ -28,22 +28,20 @@ const mapUserData = (obj: any): User => {
     name: obj.name,
     splitId: obj.split_id,
   };
-  return res;
 };
 
 function mapGroupData(obj: any): Group {
-  const res: Group = {
+  return {
     id: obj.id,
     name: obj.name,
   };
-  return res;
 }
 
 export const fetchUserInfo = (): Promise<User> => {
   return getBackendApiJson(API.USERDATA);
 };
 
-const updateUserInfo = (user: Partial<User>): Promise<Response> => {
+const updateUserInfo = (user: Partial<UpdateUser>): Promise<Response> => {
   return fetch(API_URL + API.USER_INFO, {
     ...DEFAULT_PUT_OPTIONS,
     body: JSON.stringify(user),
@@ -53,7 +51,7 @@ const updateUserInfo = (user: Partial<User>): Promise<Response> => {
 export function useUpdateUserInfo(): UseMutationResult<
   Response,
   unknown,
-  Partial<User>,
+  Partial<UpdateUser>,
   unknown
 > {
   const queryClient = useQueryClient();

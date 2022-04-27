@@ -11,3 +11,8 @@ interface User {
   acknowledgedPolicyVersion: string | null; // Date or null in DB. ISO 8601: "YYYY-MM-DD"
   splitId: string;
 }
+
+interface UpdateUser {
+  acknowledged_policy_version: string | null; // Date or null in DB. ISO 8601: "YYYY-MM-DD"
+  agreed_to_tos: boolean;
+}
