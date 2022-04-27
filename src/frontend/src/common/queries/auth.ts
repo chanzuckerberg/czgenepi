@@ -20,7 +20,7 @@ export const USE_USER_INFO = {
 };
 
 const mapUserData = (obj: any): User => {
-  return <User>{
+  const res: User ={
     acknowledgedPolicyVersion: obj.acknowledged_policy_version,
     agreedToTos: obj.agreed_to_tos,
     group: mapGroupData(obj.group),
@@ -28,13 +28,15 @@ const mapUserData = (obj: any): User => {
     name: obj.name,
     splitId: obj.split_id,
   };
+  return res;
 };
 
 function mapGroupData(obj: any): Group {
-  return <Group>{
+  const res: Group = {
     id: obj.id,
     name: obj.name,
   };
+  return res;
 }
 
 export const fetchUserInfo = (): Promise<User> => {
@@ -97,20 +99,20 @@ export function useProtectedRoute(): UseQueryResult<User, unknown> {
   const router = useRouter();
   const result = useUserInfo();
 
-  const { isLoading, data } = result;
+  const { isLoading, data: userInfo } = result;
 
   useEffect(() => {
     // Wait for the `useUserInfo` call to complete
     if (!isLoading) {
-      const agreedToTOS = data?.agreedToTos;
-      if (!data) {
+      const agreedToTOS = userInfo?.agreedToTos;
+      if (!userInfo) {
         // Lack of user data implicitly means user is not logged in.
         router.push(ROUTES.HOMEPAGE);
       } else if (!agreedToTOS && router.asPath !== ROUTES.AGREE_TERMS) {
         router.push(ROUTES.AGREE_TERMS);
       } // else case: User is logged in and has agreed to ToS. Leave them be.
     }
-  }, [isLoading, data, router]);
+  }, [isLoading, userInfo, router]);
 
   return result;
 }

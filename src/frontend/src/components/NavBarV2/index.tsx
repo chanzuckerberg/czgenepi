@@ -33,8 +33,7 @@ export default function NavBarLanding(): JSX.Element {
 
   const { API_URL } = ENV;
 
-  const { data } = useUserInfo();
-  const user = data;
+  const { data: user } = useUserInfo();
 
   const group = user?.group;
 
