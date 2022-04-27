@@ -17,10 +17,7 @@ import {
   FORBIDDEN_NAME_CHARACTERS_REGEX,
   MAX_NAME_LENGTH,
 } from "src/views/Upload/components/common/constants";
-import {
-  getMissingHeaderFields,
-  inferMetadata,
-} from "src/views/Upload/components/Metadata/components/ImportFile/parseFile";
+import { inferMetadata } from "src/views/Upload/components/Metadata/components/ImportFile/parseFile";
 
 type MergedSampleEditTsvWebformMetadata = SampleEditTsvMetadata &
   SampleEditMetadataWebform;
@@ -79,6 +76,14 @@ function warnBadFormatMetadata(
   });
 
   return badFormatMetadata.size ? badFormatMetadata : null;
+}
+
+function getMissingHeaderFields(uploadedHeaders: string[]): Set<string> | null {
+  const missingFields = new Set<string>();
+  if (!uploadedHeaders.includes("currentPrivateID")) {
+    missingFields.add("currentPrivateID");
+  }
+  return missingFields.size !== 0 ? missingFields : null;
 }
 
 function getDuplicateIds(
@@ -211,10 +216,7 @@ export function parseFileEdit(
           WARNING_CODE,
           SampleIdToWarningMessages
         >();
-        const missingHeaderFields = getMissingHeaderFields(
-          uploadedHeaders,
-          HEADERS_TO_SAMPLE_EDIT_METADATA_KEYS
-        );
+        const missingHeaderFields = getMissingHeaderFields(uploadedHeaders);
         const duplicatePublicIds = getDuplicateIds(rows, "publicId");
         const duplicatePrivateIds = getDuplicateIds(rows, "newPrivateID");
 
