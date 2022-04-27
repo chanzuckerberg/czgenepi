@@ -6,9 +6,7 @@ import UserMenu from "./components/UserMenu";
 import { UploadButton } from "./style";
 
 export default function RightNav(): JSX.Element {
-  const { data } = useUserInfo();
-
-  const user = data?.user;
+  const { user } = useUserInfo();
 
   function LoggedInNav(): JSX.Element {
     return (

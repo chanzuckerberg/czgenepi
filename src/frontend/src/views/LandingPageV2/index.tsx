@@ -12,7 +12,7 @@ import UseCases from "./components/UseCases";
 import { Container, LoadingText } from "./style";
 
 export default function Homepage(): JSX.Element {
-  const { data: userInfo, isLoading } = useUserInfo();
+  const { data: userData, isLoading } = useUserInfo();
   const [isRedirecting, setIsRedirecting] = useState(false);
   const router = useRouter();
 
@@ -21,7 +21,7 @@ export default function Homepage(): JSX.Element {
    * so we don't redirect on the server side
    */
   useEffect(() => {
-    if (!userInfo) return;
+    if (!userData) return;
 
     setIsRedirecting(true);
 

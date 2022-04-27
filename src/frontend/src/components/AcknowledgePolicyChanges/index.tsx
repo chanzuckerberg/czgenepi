@@ -11,11 +11,7 @@
  */
 
 import React from "react";
-import {
-  UserResponse,
-  useUpdateUserInfo,
-  useUserInfo,
-} from "src/common/queries/auth";
+import { useUpdateUserInfo, useUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
 import { B } from "src/common/styles/basicStyle";
 import {
@@ -45,14 +41,12 @@ export const CURRENT_POLICY_VERSION = "2021-09-30"; // NOTE: YYYY-MM-DD is criti
  *   - && They have previously agreed to Terms of Service
  *       ^^ Without this, we spam them with two, simultaneous requests for acknowledgment
  */
-const determineIfAcknowledgmentNeeded = (
-  data: UserResponse | undefined
-): boolean => {
+const determineIfAcknowledgmentNeeded = (data: User | undefined): boolean => {
   // Don't display the banner until we've heard from backend about login status
   if (!data) {
     return false;
   }
-  const { agreedToTos, acknowledgedPolicyVersion } = data.user;
+  const { agreedToTos, acknowledgedPolicyVersion } = data;
   if (acknowledgedPolicyVersion === CURRENT_POLICY_VERSION || !agreedToTos) {
     return false;
   }
