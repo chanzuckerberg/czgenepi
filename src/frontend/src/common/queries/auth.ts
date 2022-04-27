@@ -19,11 +19,6 @@ export const USE_USER_INFO = {
   id: "userInfo",
 };
 
-export const USE_USERDATA = {
-  entities: [ENTITIES.USERDATA],
-  id: "userData",
-};
-
 const mapUserData = (obj: any): User => {
   return <User>{
     acknowledgedPolicyVersion: obj.acknowledged_policy_version,

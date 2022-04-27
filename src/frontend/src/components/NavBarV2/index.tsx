@@ -34,8 +34,9 @@ export default function NavBarLanding(): JSX.Element {
   const { API_URL } = ENV;
 
   const { data } = useUserInfo();
+  const user = data;
 
-  const group = data?.group;
+  const group = user?.group;
 
   const orgElements = <React.Fragment>{group?.name}</React.Fragment>;
 
@@ -48,8 +49,6 @@ export default function NavBarLanding(): JSX.Element {
   }
 
   const orgSplash = hasOrg();
-
-  const user = data?.user;
 
   let MobileSignInLink;
   let SignInLink;
@@ -92,7 +91,7 @@ export default function NavBarLanding(): JSX.Element {
     <HeaderContainer data-test-id="navbar-landing">
       <HeaderMaxWidthContainer>
         <HeaderTopContainer>
-          <HeaderLogoContainer href={data ? ROUTES.DATA : ROUTES.HOMEPAGE}>
+          <HeaderLogoContainer href={user ? ROUTES.DATA : ROUTES.HOMEPAGE}>
             <HeaderLogo data-test-id="logo" />
             {orgSplash ? <OrgSplash>{orgSplash}</OrgSplash> : null}
           </HeaderLogoContainer>
