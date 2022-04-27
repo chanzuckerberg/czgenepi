@@ -1,4 +1,4 @@
-import { groupBy, pick } from "lodash";
+import { groupBy, isEmpty, pick } from "lodash";
 import Papa from "papaparse";
 import { HEADERS_TO_SAMPLE_EDIT_METADATA_KEYS } from "src/common/components/library/data_subview/components/EditSamplesConfirmationModal/components/common/constants";
 import { StringToLocationFinder } from "src/common/utils/locationUtils";
@@ -35,6 +35,7 @@ export interface ParseResult {
   errorMessages: ErrorMessages;
   warningMessages: WarningMessages;
   filename: string;
+  hasUnknownFields: boolean;
 }
 
 export type SampleEditIdToWarningMessages = Record<
@@ -216,6 +217,7 @@ export function parseFileEdit(
           WARNING_CODE,
           SampleIdToWarningMessages
         >();
+        let hasUnknownFields = false;
         const missingHeaderFields = getMissingHeaderFields(uploadedHeaders);
         const duplicatePublicIds = getDuplicateIds(rows, "publicId");
         const duplicatePrivateIds = getDuplicateIds(rows, "newPrivateID");
@@ -243,6 +245,16 @@ export function parseFileEdit(
           const IGNORED_SAMPLE_IDS = new Set(
             EXAMPLE_CURRENT_PRIVATE_IDENTIFIERS
           );
+          // find if any extraneous field data was added in the tsv
+          const expectedHeaders = Object.keys(
+            HEADERS_TO_SAMPLE_EDIT_METADATA_KEYS
+          );
+          const unknownFields = uploadedHeaders.filter(
+            (x) => !expectedHeaders.includes(x)
+          );
+          if (!isEmpty(unknownFields)) {
+            hasUnknownFields = true;
+          }
           rows.forEach((row) => {
             const { rowMetadata, rowWarnings } = parseRow(
               row,
@@ -281,8 +293,9 @@ export function parseFileEdit(
         resolve({
           data: sampleIdToMetadata,
           errorMessages,
-          warningMessages,
           filename: file.name,
+          hasUnknownFields,
+          warningMessages,
         });
       },
     });

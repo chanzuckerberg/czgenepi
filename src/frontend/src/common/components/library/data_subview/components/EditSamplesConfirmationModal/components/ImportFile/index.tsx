@@ -53,6 +53,8 @@ export default function ImportFile({
   const [filename, setFilename] = useState("");
   const [parseResult, setParseResult] = useState<ParseResult | null>(null);
   const [extraneousSampleIds, setExtraneousSampleIds] = useState<string[]>([]);
+  const [absentSampleIds, setAbsentSampleIds] = useState<string[]>([]);
+  const [hasUnknownDataFields, setUnknownDataFields] = useState<boolean>(false);
   const [missingData, setMissingData] =
     useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
   const [badFormatData, setBadFormatData] =
@@ -80,6 +82,12 @@ export default function ImportFile({
       return !sampleIdsSet.has(parseId);
     });
     setExtraneousSampleIds(extraneousSampleIds);
+
+    const parseResultSampleIdsSet = new Set(parseResultSampleIds);
+    const absentSampleIds = sampleIds.filter((sampleId) => {
+      return !parseResultSampleIdsSet.has(sampleId);
+    });
+    setAbsentSampleIds(absentSampleIds);
   }, [parseResult, metadata, missingFields]);
 
   // Used by file upload parser to convert location strings to Locations
@@ -92,7 +100,7 @@ export default function ImportFile({
 
     const result = await parseFileEdit(files[0], stringToLocationFinder);
 
-    const { warningMessages, filename } = result;
+    const { warningMessages, filename, hasUnknownFields } = result;
     const missingFields = getMissingFields(result);
     const duplicatePrivateIds = getDuplicatePrivateIds(result);
     const duplicatePublicIds = getDuplicatePublicIds(result);
@@ -111,6 +119,7 @@ export default function ImportFile({
     setBadFormatData(
       warningMessages.get(WARNING_CODE.BAD_FORMAT_DATA) || EMPTY_OBJECT
     );
+    setUnknownDataFields(hasUnknownFields);
     handleMetadataFileUpload(result);
   };
 
@@ -207,9 +216,11 @@ export default function ImportFile({
         filename={filename}
         missingFields={missingFields}
         autocorrectCount={autocorrectCount}
+        absentSampleIds={absentSampleIds}
         missingData={missingData}
         duplicatePrivateIds={duplicatePrivateIds}
         duplicatePublicIds={duplicatePublicIds}
+        hasUnknownDataFields={hasUnknownDataFields}
         badFormatData={badFormatData}
         IdColumnNameForWarnings={
           SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS.privateId
