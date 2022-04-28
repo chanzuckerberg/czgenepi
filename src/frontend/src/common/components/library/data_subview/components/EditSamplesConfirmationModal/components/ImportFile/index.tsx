@@ -17,6 +17,7 @@ import {
   WARNING_CODE,
 } from "src/components/WebformTable/common/types";
 import { NamedGisaidLocation } from "src/views/Upload/components/common/types";
+import { FileUploadProps } from "../../index";
 import { getMetadataEntryOrEmpty } from "../../utils";
 import {
   parseFileEdit,
@@ -29,7 +30,7 @@ interface Props {
   changedMetadata: SampleIdToEditMetadataWebform | null;
   namedLocations: NamedGisaidLocation[];
   hasImportedMetadataFile: boolean;
-  onMetadataFileUploaded(): void;
+  onMetadataFileUploaded(props: FileUploadProps): void;
 }
 
 export default function ImportFile({

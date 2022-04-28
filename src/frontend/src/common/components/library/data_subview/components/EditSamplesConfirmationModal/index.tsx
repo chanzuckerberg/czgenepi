@@ -46,20 +46,26 @@ interface Props {
   open: boolean;
 }
 
+type MetadataType = SampleIdToEditMetadataWebform | null;
+
+export interface FileUploadProps {
+  uploadedMetadata: MetadataType;
+  changedMetadataUpdated: MetadataType;
+  autocorrectWarnings: SampleIdToWarningMessages;
+}
+
 const EditSamplesConfirmationModal = ({
   checkedSamples,
   onClose,
   open,
 }: Props): JSX.Element | null => {
   const [isValid, setIsValid] = useState(false);
-  const [metadata, setMetadata] =
-    useState<SampleIdToEditMetadataWebform | null>(null);
+  const [metadata, setMetadata] = useState<MetadataType>(null);
   const [isContinueButtonActive, setIsContinueButtonActive] =
     useState<boolean>(false);
   const [isLoseProgessModalOpen, setLoseProgressModalOpen] =
     useState<boolean>(false);
-  const [changedMetadata, setChangedMetadata] =
-    useState<SampleIdToEditMetadataWebform | null>(null);
+  const [changedMetadata, setChangedMetadata] = useState<MetadataType>(null);
   const { data: namedLocationsData } = useNamedLocations();
   const namedLocations: NamedGisaidLocation[] =
     namedLocationsData?.namedLocations ?? [];
@@ -102,7 +108,7 @@ const EditSamplesConfirmationModal = ({
     uploadedMetadata,
     changedMetadataUpdated,
     autocorrectWarnings,
-  }) => {
+  }: FileUploadProps) => {
     setMetadata(uploadedMetadata);
     setChangedMetadata(changedMetadataUpdated);
     setHasImportedMetadataFile(true);
