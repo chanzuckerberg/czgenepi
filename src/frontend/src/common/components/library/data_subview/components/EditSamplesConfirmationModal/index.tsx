@@ -8,6 +8,7 @@ import { useNamedLocations } from "src/common/queries/locations";
 import { pluralize } from "src/common/utils/strUtils";
 import { Content, Title } from "src/components/BaseDialog/style";
 import { CollapsibleInstructions } from "src/components/CollapsibleInstructions";
+import ConfirmDialog from "src/components/ConfirmDialog";
 import Dialog from "src/components/Dialog";
 import { SampleEditTsvTemplateDownload } from "src/components/DownloadMetadataTemplate";
 import { prepEditMetadataTemplate } from "src/components/DownloadMetadataTemplate/prepMetadataTemplate";
@@ -55,7 +56,8 @@ const EditSamplesConfirmationModal = ({
     useState<SampleIdToEditMetadataWebform | null>(null);
   const [isContinueButtonActive, setIsContinueButtonActive] =
     useState<boolean>(false);
-
+  const [isLoseProgessModalOpen, setLoseProgressModalOpen] =
+    useState<boolean>(false);
   const [changedMetadata, setChangedMetadata] =
     useState<SampleIdToEditMetadataWebform | null>(null);
   const { data: namedLocationsData } = useNamedLocations();
@@ -82,9 +84,19 @@ const EditSamplesConfirmationModal = ({
   };
 
   const handleClose = function () {
+    setLoseProgressModalOpen(true);
+  };
+
+  const handleCloseAfterConfirmation = function () {
+    setLoseProgressModalOpen(true);
     clearState();
     onClose();
     setHasImportedMetadataFile(false);
+    setLoseProgressModalOpen(false);
+  };
+
+  const handleSaveProgressModalClose = function () {
+    setLoseProgressModalOpen(false);
   };
 
   const updateChangedMetadata = useCallback(
@@ -168,6 +180,9 @@ const EditSamplesConfirmationModal = ({
 
   const numSamples = checkedSamples.length;
   const title = "Edit Sample Metadata";
+
+  const loseProgressWarningModalTitle = "Leave sample editing?"
+  const loseProgressWarningModalMessage = "If you leave, your current edits will be canceled and your work will not be saved."
 
   const HREF =
     "https://docs.google.com/document/d/1QxNcDip31DA40SRIOmdV1I_ZC7rWDz5YQGk26Mr2kfA/edit";
@@ -261,6 +276,15 @@ const EditSamplesConfirmationModal = ({
         </DialogTitle>
         <DialogContent>
           <Content>
+            <ConfirmDialog
+              onConfirm={handleCloseAfterConfirmation}
+              open={isLoseProgessModalOpen}
+              onClose={handleSaveProgressModalClose}
+              cancelButtonText="Return To Edit"
+              continueButtonText="Leave"
+              title={loseProgressWarningModalTitle}
+              content={loseProgressWarningModalMessage}
+            />
             <CollapsibleInstructions
               additionalHeaderLink={downloadTSVButton}
               header="Import Data from TSV or CSV File"
