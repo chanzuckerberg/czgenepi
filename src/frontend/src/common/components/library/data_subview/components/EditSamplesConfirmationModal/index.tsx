@@ -88,7 +88,6 @@ const EditSamplesConfirmationModal = ({
   };
 
   const handleCloseAfterConfirmation = function () {
-    setLoseProgressModalOpen(true);
     clearState();
     onClose();
     setHasImportedMetadataFile(false);
