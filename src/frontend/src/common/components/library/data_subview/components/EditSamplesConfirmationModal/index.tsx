@@ -169,7 +169,6 @@ const EditSamplesConfirmationModal = ({
   }, [checkedSamples, metadata]);
 
   const numSamples = checkedSamples.length;
-  const title = "Edit Sample Metadata";
 
   const HREF =
     "https://docs.google.com/document/d/1QxNcDip31DA40SRIOmdV1I_ZC7rWDz5YQGk26Mr2kfA/edit";
@@ -208,12 +207,6 @@ const EditSamplesConfirmationModal = ({
       or Public Sample IDs.
     </InstructionsNotSemiBold>,
   ];
-
-  const closeIcon = (
-    <StyledIconButton onClick={handleClose}>
-      <CloseIcon />
-    </StyledIconButton>
-  );
 
   const { templateInstructionRows, templateHeaders, templateRows } =
     useMemo(() => {
@@ -254,9 +247,13 @@ const EditSamplesConfirmationModal = ({
         onClose={handleClose}
       >
         <DialogTitle>
-          <StyledDiv>{closeIcon}</StyledDiv>
+          <StyledDiv>
+            <StyledIconButton onClick={handleClose}>
+              <CloseIcon />
+            </StyledIconButton>
+          </StyledDiv>
           <StyledPreTitle>Step 1 of 2</StyledPreTitle>
-          <Title>{title}</Title>
+          <Title>Edit Sample Metadata</Title>
           <StyledSubTitle>
             {numSamples} {pluralize("Sample", numSamples)} Selected
           </StyledSubTitle>
