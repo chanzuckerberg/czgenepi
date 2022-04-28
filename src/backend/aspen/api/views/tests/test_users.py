@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 
 import pytest
 import sqlalchemy as sa
@@ -43,24 +43,36 @@ async def test_usergroup_view_put_pass(
     async_session.add(group)
     await async_session.commit()
     headers = {"user_id": user.auth0_user_id}
-    data = {"agreed_to_tos": True, "acknowledged_policy_version": "2022-06-22"}
-    res = await http_client.put("/v2/users/me", headers=headers, json=data)
-    assert res.status_code == 200
+    requests = [
+        {"agreed_to_tos": True, "acknowledged_policy_version": "2022-06-22"},
+        {"agreed_to_tos": False},
+        {"acknowledged_policy_version": "2020-07-22"},
+    ]
+    for req in requests:
+        res = await http_client.put("/v2/users/me", headers=headers, json=req)
+        assert res.status_code == 200
 
-    # start a new transaction
-    await async_session.close()
-    async_session.begin()
-    updated_user = (
-        (
-            await async_session.execute(
-                sa.select(User).filter(User.auth0_user_id == user.auth0_user_id)  # type: ignore
+        # start a new transaction
+        await async_session.close()
+        async_session.begin()
+        updated_user = (
+            (
+                await async_session.execute(
+                    sa.select(User).filter(User.auth0_user_id == user.auth0_user_id)  # type: ignore
+                )
             )
+            .scalars()
+            .one()
         )
-        .scalars()
-        .one()
-    )
-    assert updated_user.agreed_to_tos
-    assert updated_user.acknowledged_policy_version == datetime.date(2022, 6, 22)
+        if "agreed_to_tos" in req:
+            assert updated_user.agreed_to_tos == req["agreed_to_tos"]
+        if "acknowledged_policy_verison" in req:
+            assert (
+                updated_user.acknowledged_policy_version
+                == datetime.strptime(
+                    req["acknowledged_policy_version"], "%Y-%m-%d"
+                ).date()
+            )
 
 
 async def test_usergroup_view_put_fail(
@@ -73,7 +85,6 @@ async def test_usergroup_view_put_fail(
     headers = {"user_id": user.auth0_user_id}
     bad_requests = [
         {"agreed_to_tos": 11, "acknowledged_policy_version": "2022-06-22"},
-        {"auth0_user_id": "bob", "acknowledged_policy_version": "2022-06-22"},
         {"agreed_to_tos": True, "acknowledged_policy_version": "hello"},
     ]
     for req in bad_requests:

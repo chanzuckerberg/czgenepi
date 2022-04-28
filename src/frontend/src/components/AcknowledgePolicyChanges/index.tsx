@@ -61,10 +61,7 @@ const AcknowledgePolicyChanges = () => {
     useUpdateUserInfo();
 
   const handleClick = () => {
-    updateUserInfo({
-      acknowledged_policy_version: CURRENT_POLICY_VERSION,
-      agreed_to_tos: true,
-    });
+    updateUserInfo({ acknowledged_policy_version: CURRENT_POLICY_VERSION });
   };
 
   if (!isAcknowledgmentNeeded || isUpdatingUserInfo) {

@@ -22,7 +22,11 @@ async def update_user_info(
     db: AsyncSession = Depends(get_db),
     user=Depends(get_auth_user),
 ) -> UserMeResponse:
-    user.agreed_to_tos = user_update_request.agreed_to_tos
-    user.acknowledged_policy_version = user_update_request.acknowledged_policy_version
+    if user_update_request.agreed_to_tos is not None:
+        user.agreed_to_tos = user_update_request.agreed_to_tos
+    if user_update_request.acknowledged_policy_version is not None:
+        user.acknowledged_policy_version = (
+            user_update_request.acknowledged_policy_version
+        )
     await db.commit()
     return UserMeResponse.from_orm(user)
