@@ -25,6 +25,7 @@ import { ContinueButton } from "src/views/Upload/components/common/style";
 import { NamedGisaidLocation } from "src/views/Upload/components/common/types";
 import { SampleIdToWarningMessages } from "src/views/Upload/components/Metadata/components/ImportFile/parseFile";
 import ImportFile from "./components/ImportFile";
+import { LoseProgressModal } from "./components/LoseProgressModal";
 import {
   StyledButton,
   StyledDiv,
@@ -55,7 +56,8 @@ const EditSamplesConfirmationModal = ({
     useState<SampleIdToEditMetadataWebform | null>(null);
   const [isContinueButtonActive, setIsContinueButtonActive] =
     useState<boolean>(false);
-
+  const [isLoseProgessModalOpen, setLoseProgressModalOpen] =
+    useState<boolean>(false);
   const [changedMetadata, setChangedMetadata] =
     useState<SampleIdToEditMetadataWebform | null>(null);
   const { data: namedLocationsData } = useNamedLocations();
@@ -79,11 +81,12 @@ const EditSamplesConfirmationModal = ({
   const clearState = function () {
     setChangedMetadata(null);
     setMetadata(null);
+    setHasImportedMetadataFile(false);
+    setLoseProgressModalOpen(false);
   };
 
   const handleClose = function () {
-    clearState();
-    onClose();
+    setLoseProgressModalOpen(true);
   };
 
   const updateChangedMetadata = useCallback(
@@ -260,6 +263,12 @@ const EditSamplesConfirmationModal = ({
         </DialogTitle>
         <DialogContent>
           <Content>
+            <LoseProgressModal
+              isModalOpen={isLoseProgessModalOpen}
+              setIsModalOpen={setLoseProgressModalOpen}
+              onClose={onClose}
+              clearState={clearState}
+            />
             <CollapsibleInstructions
               additionalHeaderLink={downloadTSVButton}
               header="Import Data from TSV or CSV File"

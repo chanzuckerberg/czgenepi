@@ -3,6 +3,7 @@ import Papa from "papaparse";
 import { HEADERS_TO_SAMPLE_EDIT_METADATA_KEYS } from "src/common/components/library/data_subview/components/EditSamplesConfirmationModal/components/common/constants";
 import { StringToLocationFinder } from "src/common/utils/locationUtils";
 import { DATE_REGEX } from "src/components/DateField/constants";
+import { SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS } from "src/components/DownloadMetadataTemplate/common/constants";
 import { SampleEditTsvMetadata } from "src/components/DownloadMetadataTemplate/common/types";
 import { EXAMPLE_CURRENT_PRIVATE_IDENTIFIERS } from "src/components/DownloadMetadataTemplate/prepMetadataTemplate";
 import { SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS } from "src/components/WebformTable/common/constants";
@@ -247,10 +248,12 @@ export function parseFileEdit(
           );
           // find if any extraneous field data was added in the tsv
           const expectedHeaders = Object.keys(
-            HEADERS_TO_SAMPLE_EDIT_METADATA_KEYS
+            SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS
           );
           const unknownFields = uploadedHeaders.filter(
-            (x) => !expectedHeaders.includes(x)
+            // uploaded field header is allowed to be "" (that means a user deleted a non-required column which is not a blocker)
+            (uploadedHeader) =>
+              !expectedHeaders.includes(uploadedHeader) && uploadedHeader !== ""
           );
           if (!isEmpty(unknownFields)) {
             hasUnknownFields = true;
