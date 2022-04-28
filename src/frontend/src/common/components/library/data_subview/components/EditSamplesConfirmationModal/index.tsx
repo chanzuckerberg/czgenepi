@@ -98,6 +98,17 @@ const EditSamplesConfirmationModal = ({
     clearState();
   };
 
+  const handleMetadataFileUploaded = ({
+    uploadedMetadata,
+    changedMetadataUpdated,
+    autocorrectWarnings,
+  }) => {
+    setMetadata(uploadedMetadata);
+    setChangedMetadata(changedMetadataUpdated);
+    setHasImportedMetadataFile(true);
+    setAutocorrectWarnings(autocorrectWarnings);
+  };
+
   const updateChangedMetadata = useCallback(
     (id, sampleMetadata) => {
       // get all current metadata properties for a sample, if metadata is undefined return empty object
@@ -290,11 +301,8 @@ const EditSamplesConfirmationModal = ({
               metadata={metadata}
               changedMetadata={changedMetadata}
               namedLocations={namedLocations}
-              setMetadata={setMetadata}
-              setChangedMetadata={setChangedMetadata}
               hasImportedMetadataFile={hasImportedMetadataFile}
-              setHasImportedMetadataFile={setHasImportedMetadataFile}
-              setAutocorrectWarnings={setAutocorrectWarnings}
+              onMetadataFileUploaded={handleMetadataFileUploaded}
             />
             <WebformTable
               setIsValid={setIsValid}

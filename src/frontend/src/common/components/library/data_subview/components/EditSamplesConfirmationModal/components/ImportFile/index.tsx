@@ -16,10 +16,7 @@ import {
   SampleIdToEditMetadataWebform,
   WARNING_CODE,
 } from "src/components/WebformTable/common/types";
-import {
-  NamedGisaidLocation,
-  Props as CommonProps,
-} from "src/views/Upload/components/common/types";
+import { NamedGisaidLocation } from "src/views/Upload/components/common/types";
 import { getMetadataEntryOrEmpty } from "../../utils";
 import {
   parseFileEdit,
@@ -31,22 +28,16 @@ interface Props {
   metadata: SampleIdToEditMetadataWebform | null;
   changedMetadata: SampleIdToEditMetadataWebform | null;
   namedLocations: NamedGisaidLocation[];
-  setMetadata: CommonProps["setMetadata"];
   hasImportedMetadataFile: boolean;
-  setHasImportedMetadataFile(x: boolean): void;
-  setAutocorrectWarnings(x: SampleIdToWarningMessages): void;
-  setChangedMetadata: CommonProps["setMetadata"];
+  onMetadataFileUploaded(): void;
 }
 
 export default function ImportFile({
   metadata,
   namedLocations,
-  setMetadata,
-  setChangedMetadata,
   hasImportedMetadataFile,
-  setHasImportedMetadataFile,
-  setAutocorrectWarnings,
   changedMetadata,
+  onMetadataFileUploaded,
 }: Props): JSX.Element {
   const [missingFields, setMissingFields] = useState<string[] | null>(null);
   const [autocorrectCount, setAutocorrectCount] = useState<number>(0);
@@ -106,7 +97,6 @@ export default function ImportFile({
     const duplicatePublicIds = getDuplicatePublicIds(result);
     const autocorrectCount =
       getAutocorrectCount(warningMessages.get(WARNING_CODE.AUTO_CORRECT)) || 0;
-    setHasImportedMetadataFile(true);
     setMissingFields(missingFields);
     setDuplicatePrivateIds(duplicatePrivateIds);
     setDuplicatePublicIds(duplicatePublicIds);
@@ -187,13 +177,12 @@ export default function ImportFile({
       }
     }
 
-    setMetadata(uploadedMetadata);
-    setChangedMetadata(changedMetadataUpdated);
-    setHasImportedMetadataFile(true);
-
-    setAutocorrectWarnings(
-      warningMessages.get(WARNING_CODE.AUTO_CORRECT) || EMPTY_OBJECT
-    );
+    onMetadataFileUploaded({
+      uploadedMetadata,
+      changedMetadataUpdated,
+      autocorrectWarnings:
+        warningMessages.get(WARNING_CODE.AUTO_CORRECT) || EMPTY_OBJECT,
+    });
   }
 
   return (
