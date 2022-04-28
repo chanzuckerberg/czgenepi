@@ -33,9 +33,9 @@ export default function NavBarLanding(): JSX.Element {
 
   const { API_URL } = ENV;
 
-  const { data: user } = useUserInfo();
+  const { data: userInfo } = useUserInfo();
 
-  const group = user?.group;
+  const group = userInfo?.group;
 
   const orgElements = <React.Fragment>{group?.name}</React.Fragment>;
 
@@ -52,7 +52,7 @@ export default function NavBarLanding(): JSX.Element {
   let MobileSignInLink;
   let SignInLink;
 
-  if (user) {
+  if (userInfo) {
     MobileSignInLink = (
       <MobileNavLink
         href={ROUTES.UPLOAD_STEP1}
@@ -90,23 +90,23 @@ export default function NavBarLanding(): JSX.Element {
     <HeaderContainer data-test-id="navbar-landing">
       <HeaderMaxWidthContainer>
         <HeaderTopContainer>
-          <HeaderLogoContainer href={user ? ROUTES.DATA : ROUTES.HOMEPAGE}>
+          <HeaderLogoContainer href={userInfo ? ROUTES.DATA : ROUTES.HOMEPAGE}>
             <HeaderLogo data-test-id="logo" />
             {orgSplash ? <OrgSplash>{orgSplash}</OrgSplash> : null}
           </HeaderLogoContainer>
           <HeaderTopLinks>
-            {user ? null : (
+            {userInfo ? null : (
               <TextLink href={ROUTES.RESOURCES} target="_blank">
                 Resources
               </TextLink>
             )}
-            {user ? null : (
+            {userInfo ? null : (
               <ButtonLink href={ROUTES.REQUEST_ACCESS}>
                 Request Access
               </ButtonLink>
             )}
             {SignInLink}
-            {user ? <UserMenu user={user.name} /> : null}
+            {userInfo ? <UserMenu user={userInfo.name} /> : null}
           </HeaderTopLinks>
           <MobileNavToggle
             onClick={toggleMobileNav}
@@ -157,7 +157,7 @@ export default function NavBarLanding(): JSX.Element {
                 style={menuOpen ? { opacity: "1" } : { opacity: "0" }}
               ></MobileNavSeparator>
               {MobileSignInLink}
-              {user ? null : (
+              {userInfo ? null : (
                 <MobileNavLink
                   href={ROUTES.REQUEST_ACCESS}
                   style={menuOpen ? { opacity: "1" } : { opacity: "0" }}

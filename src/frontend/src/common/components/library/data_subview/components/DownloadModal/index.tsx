@@ -45,8 +45,8 @@ const DownloadModal = ({
   open,
   onClose,
 }: Props): JSX.Element => {
-  const { data } = useUserInfo();
-  const groupName = data?.group?.name.toLowerCase().replace(/ /g, "_"); // format group name for sequences download file
+  const { data: userInfo } = useUserInfo();
+  const groupName = userInfo?.group?.name.toLowerCase().replace(/ /g, "_"); // format group name for sequences download file
   const downloadDate = new Date();
   const separator = "\t";
   const fastaDownloadName = `${groupName}_sample_sequences_${downloadDate

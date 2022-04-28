@@ -54,8 +54,8 @@ const determineIfAcknowledgmentNeeded = (user: User | undefined): boolean => {
 };
 
 const AcknowledgePolicyChanges = () => {
-  const { data: user } = useUserInfo();
-  const isAcknowledgmentNeeded = determineIfAcknowledgmentNeeded(user);
+  const { data: userInfo } = useUserInfo();
+  const isAcknowledgmentNeeded = determineIfAcknowledgmentNeeded(userInfo);
 
   const { mutate: updateUserInfo, isLoading: isUpdatingUserInfo } =
     useUpdateUserInfo();
