@@ -156,11 +156,6 @@ function warnBadFormatMetadata(
   return badFormatMetadata.size ? badFormatMetadata : null;
 }
 
-interface inferredMetadataEntries {
-  inferredData: NamedGisaidLocation | string | boolean | undefined;
-  parsedLocationData: null;
-}
-
 export function inferMetadata(
   row: Record<string, string>,
   key: keyof (SampleUploadTsvMetadata & SampleEditTsvMetadata),
@@ -168,7 +163,7 @@ export function inferMetadata(
   stringToLocationFinder: {
     (locationString: string): NamedGisaidLocation | undefined;
   }
-): inferredMetadataEntries {
+): void {
   const originalValue: string | undefined = row[key];
   // Only overwrite sane defaults if a "real" value was pulled for key
   if (originalValue) {
@@ -181,17 +176,11 @@ export function inferMetadata(
       if (originalValue.length > 2) {
         parsedCollectionLocation = stringToLocationFinder(originalValue);
       }
-      return {
-        inferredData: parsedCollectionLocation,
-        parsedLocationData: null,
-      };
+      rowMetadata.collectionLocation = parsedCollectionLocation;
     } else if (key === "keepPrivate") {
-      return {
-        inferredData: convertYesNoToBool(originalValue),
-        parsedLocationData: null,
-      };
+      rowMetadata[key] = convertYesNoToBool(originalValue);
     } else {
-      return { inferredData: originalValue, parsedLocationData: null };
+      rowMetadata[key] = originalValue;
     }
   }
 }
