@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Dict, List
 
 import pytest
 import sqlalchemy as sa
@@ -43,7 +44,7 @@ async def test_usergroup_view_put_pass(
     async_session.add(group)
     await async_session.commit()
     headers = {"user_id": user.auth0_user_id}
-    requests = [
+    requests: List[Dict] = [
         {"agreed_to_tos": True, "acknowledged_policy_version": "2022-06-22"},
         {"agreed_to_tos": False},
         {"acknowledged_policy_version": "2020-07-22"},
