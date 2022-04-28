@@ -84,6 +84,7 @@ const EditSamplesConfirmationModal = ({
   const handleClose = function () {
     clearState();
     onClose();
+    setHasImportedMetadataFile(false);
   };
 
   const updateChangedMetadata = useCallback(
