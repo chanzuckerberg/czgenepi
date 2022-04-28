@@ -2,7 +2,6 @@ import { Menu, MenuItem, Tooltip } from "czifui";
 import React, { MouseEventHandler, useState } from "react";
 import { TREE_STATUS } from "src/common/constants/types";
 import MoreActionsIcon from "src/common/icons/IconDotsHorizontal3Large.svg";
-import { UserResponse } from "src/common/queries/auth";
 import { StyledEditIcon, StyledTrashIcon } from "src/common/styles/iconStyle";
 import { StyledIcon, StyledIconWrapper } from "../../style";
 import { StyledText } from "./style";
@@ -11,7 +10,7 @@ interface Props {
   item: PhyloRun;
   onDeleteTreeModalOpen(t: PhyloRun): void;
   onEditTreeModalOpen(t: PhyloRun): void;
-  userInfo: UserResponse;
+  userInfo: User;
 }
 
 const MoreActionsMenu = ({

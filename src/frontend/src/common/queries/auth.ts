@@ -8,12 +8,7 @@ import {
   UseQueryResult,
 } from "react-query";
 import ENV from "src/common/constants/ENV";
-import {
-  API,
-  apiResponse,
-  DEFAULT_PUT_OPTIONS,
-  getBackendApiJson,
-} from "../api";
+import { API, DEFAULT_PUT_OPTIONS, getBackendApiJson } from "../api";
 import { ROUTES } from "../routes";
 import { ENTITIES } from "./entities";
 
@@ -24,38 +19,43 @@ export const USE_USER_INFO = {
   id: "userInfo",
 };
 
-export const USE_USERDATA = {
-  entities: [ENTITIES.USERDATA],
-  id: "userData",
-};
-
-export interface UserResponse extends APIResponse {
-  group: Group;
-  user: User;
+interface RawGroupRequest {
+  id: number;
+  name: string;
 }
 
-const USER_MAP = new Map<string, keyof User>([
-  ["auth0_user_id", "auth0UserId"],
-  ["group_admin", "groupAdmin"],
-  ["system_admin", "systemAdmin"],
-  ["group_id", "groupId"],
-  ["agreed_to_tos", "agreedToTos"],
-  ["acknowledged_policy_version", "acknowledgedPolicyVersion"],
-]);
+interface RawUserRequest {
+  id: number;
+  name: string;
+  group: RawGroupRequest;
+  agreed_to_tos: boolean;
+  acknowledged_policy_version: string | null; // Date or null in DB. ISO 8601: "YYYY-MM-DD"
+  split_id: string;
+}
 
-const fetchUserData = (): Promise<V2User> => {
+const mapUserData = (obj: any): User => {
+  return {
+    acknowledgedPolicyVersion: obj.acknowledged_policy_version,
+    agreedToTos: obj.agreed_to_tos,
+    group: mapGroupData(obj.group),
+    id: obj.id,
+    name: obj.name,
+    splitId: obj.split_id,
+  };
+};
+
+function mapGroupData(obj: any): Group {
+  return {
+    id: obj.id,
+    name: obj.name,
+  };
+}
+
+export const fetchUserInfo = (): Promise<RawUserRequest> => {
   return getBackendApiJson(API.USERDATA);
 };
 
-export const fetchUserInfo = (): Promise<UserResponse> => {
-  return apiResponse<UserResponse>(
-    ["group", "user"],
-    [null, USER_MAP],
-    API.USER_INFO
-  );
-};
-
-const updateUserInfo = (user: Partial<User>): Promise<Response> => {
+const updateUserInfo = (user: Partial<RawUserRequest>): Promise<Response> => {
   return fetch(API_URL + API.USER_INFO, {
     ...DEFAULT_PUT_OPTIONS,
     body: JSON.stringify(user),
@@ -65,7 +65,7 @@ const updateUserInfo = (user: Partial<User>): Promise<Response> => {
 export function useUpdateUserInfo(): UseMutationResult<
   Response,
   unknown,
-  Partial<User>,
+  Partial<RawUserRequest>,
   unknown
 > {
   const queryClient = useQueryClient();
@@ -77,15 +77,10 @@ export function useUpdateUserInfo(): UseMutationResult<
   });
 }
 
-export function useUserInfo(): UseQueryResult<UserResponse, unknown> {
+export function useUserInfo(): UseQueryResult<User, unknown> {
   return useQuery([USE_USER_INFO], fetchUserInfo, {
     retry: false,
-  });
-}
-
-export function useUserData(): UseQueryResult<UserResponse, unknown> {
-  return useQuery([USE_USERDATA], fetchUserData, {
-    retry: false,
+    select: mapUserData,
   });
 }
 
@@ -112,24 +107,24 @@ export function useUserData(): UseQueryResult<UserResponse, unknown> {
  * It's only intended to redirect users to where they should be. It does not prevent
  * protected routes/components from firing and would be easy for an attacker to circumvent.
  */
-export function useProtectedRoute(): UseQueryResult<UserResponse, unknown> {
+export function useProtectedRoute(): UseQueryResult<User, unknown> {
   const router = useRouter();
   const result = useUserInfo();
 
-  const { isLoading, data } = result;
+  const { isLoading, data: userInfo } = result;
 
   useEffect(() => {
     // Wait for the `useUserInfo` call to complete
     if (!isLoading) {
-      const agreedToTOS = data?.user?.agreedToTos;
-      if (!data) {
+      const agreedToTOS = userInfo?.agreedToTos;
+      if (!userInfo) {
         // Lack of user data implicitly means user is not logged in.
         router.push(ROUTES.HOMEPAGE);
       } else if (!agreedToTOS && router.asPath !== ROUTES.AGREE_TERMS) {
         router.push(ROUTES.AGREE_TERMS);
       } // else case: User is logged in and has agreed to ToS. Leave them be.
     }
-  }, [isLoading, data, router]);
+  }, [isLoading, userInfo, router]);
 
   return result;
 }
