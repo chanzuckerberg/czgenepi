@@ -293,6 +293,30 @@ def me(ctx):
     print(resp.text)
 
 
+@user.command(name="update-me")
+@click.option(
+    "--agreed-to-tos",
+    required=True,
+    type=bool,
+    help="whether the user has agreed to the ToS",
+)
+@click.option(
+    "--ack-policy-version",
+    required=True,
+    type=str,
+    help="YYYY-MM-DD of the policy version the user agreed to",
+)
+@click.pass_context
+def update_me(ctx, agreed_to_tos, ack_policy_version):
+    api_client = ctx.obj["api_client"]
+    params = {
+        "agreed_to_tos": agreed_to_tos,
+        "acknowledged_policy_version": ack_policy_version,
+    }
+    resp = api_client.put("/v2/users/me", json=params)
+    print(resp.text)
+
+
 @user.command(name="create")
 @click.argument("email")
 @click.option("--name", required=True, type=str, help="The user's name.")
