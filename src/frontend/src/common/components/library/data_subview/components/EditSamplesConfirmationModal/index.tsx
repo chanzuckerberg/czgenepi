@@ -89,6 +89,15 @@ const EditSamplesConfirmationModal = ({
     setLoseProgressModalOpen(true);
   };
 
+  const handleCloseLoseProgressModal = () => {
+    setLoseProgressModalOpen(false);
+  };
+
+  const handleConfirmLoseProgressModal = () => {
+    onClose();
+    clearState();
+  };
+
   const updateChangedMetadata = useCallback(
     (id, sampleMetadata) => {
       // get all current metadata properties for a sample, if metadata is undefined return empty object
@@ -262,9 +271,8 @@ const EditSamplesConfirmationModal = ({
           <Content>
             <LoseProgressModal
               isModalOpen={isLoseProgessModalOpen}
-              setIsModalOpen={setLoseProgressModalOpen}
-              onClose={onClose}
-              clearState={clearState}
+              onClose={handleCloseLoseProgressModal}
+              onConfirm={handleConfirmLoseProgressModal}
             />
             <CollapsibleInstructions
               additionalHeaderLink={downloadTSVButton}
