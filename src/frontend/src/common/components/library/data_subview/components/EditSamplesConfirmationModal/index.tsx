@@ -24,6 +24,7 @@ import {
 import { ContinueButton } from "src/views/Upload/components/common/style";
 import { NamedGisaidLocation } from "src/views/Upload/components/common/types";
 import { SampleIdToWarningMessages } from "src/views/Upload/components/Metadata/components/ImportFile/parseFile";
+import { EditSamplesReviewDialog } from "./components/EditSamplesReviewDialog";
 import ImportFile from "./components/ImportFile";
 import { LoseProgressModal } from "./components/LoseProgressModal";
 import {
@@ -46,11 +47,17 @@ interface Props {
   open: boolean;
 }
 
+enum Steps {
+  EDIT = 1,
+  REVIEW = 2,
+}
+
 const EditSamplesConfirmationModal = ({
   checkedSamples,
   onClose,
   open,
 }: Props): JSX.Element | null => {
+  const [currentModalStep, setCurrentModalStep] = useState<Steps>(Steps.EDIT);
   const [isValid, setIsValid] = useState(false);
   const [metadata, setMetadata] =
     useState<SampleIdToEditMetadataWebform | null>(null);
@@ -242,6 +249,12 @@ const EditSamplesConfirmationModal = ({
 
   return (
     <>
+      <LoseProgressModal
+        isModalOpen={isLoseProgessModalOpen}
+        setIsModalOpen={setLoseProgressModalOpen}
+        onClose={onClose}
+        clearState={clearState}
+      />
       <Dialog
         disableBackdropClick
         // Dialogs and modals automatically focus themselves if some other element tries to steal the focus while they are open
@@ -255,7 +268,7 @@ const EditSamplesConfirmationModal = ({
       >
         <DialogTitle>
           <StyledDiv>{closeIcon}</StyledDiv>
-          <StyledPreTitle>Step 1 of 2</StyledPreTitle>
+          <StyledPreTitle>Step {currentModalStep} of 2</StyledPreTitle>
           <Title>{title}</Title>
           <StyledSubTitle>
             {numSamples} {pluralize("Sample", numSamples)} Selected
@@ -263,52 +276,52 @@ const EditSamplesConfirmationModal = ({
         </DialogTitle>
         <DialogContent>
           <Content>
-            <LoseProgressModal
-              isModalOpen={isLoseProgessModalOpen}
-              setIsModalOpen={setLoseProgressModalOpen}
-              onClose={onClose}
-              clearState={clearState}
-            />
-            <CollapsibleInstructions
-              additionalHeaderLink={downloadTSVButton}
-              header="Import Data from TSV or CSV File"
-              headerSize="s"
-              instructionListTitle="Importing Files"
-              items={instructionItems}
-              shouldStartOpen
-              secondInstructionListTitle="File Requirements"
-              secondSetItems={secondSetInstructionItems}
-              InstructionsTitleMarginBottom="xxs"
-              listItemFontSize="xs"
-            />
-            <ImportFile
-              metadata={metadata}
-              changedMetadata={changedMetadata}
-              namedLocations={namedLocations}
-              setMetadata={setMetadata}
-              setChangedMetadata={setChangedMetadata}
-              hasImportedMetadataFile={hasImportedMetadataFile}
-              setHasImportedMetadataFile={setHasImportedMetadataFile}
-              setAutocorrectWarnings={setAutocorrectWarnings}
-            />
-            <WebformTable
-              setIsValid={setIsValid}
-              metadata={metadata}
-              hasImportedMetadataFile={hasImportedMetadataFile}
-              setMetadata={setMetadata}
-              autocorrectWarnings={autocorrectWarnings}
-              locations={namedLocations}
-              applyToAllColumn={applyToAllColumn}
-              handleRowMetadata={handleRowMetadata}
-              webformTableType="EDIT"
-            />
-            <ContinueButton
-              disabled={!isContinueButtonActive}
-              sdsType="primary"
-              sdsStyle="rounded"
-            >
-              Continue
-            </ContinueButton>
+            {currentModalStep === Steps.EDIT && (
+              <>
+                <CollapsibleInstructions
+                  additionalHeaderLink={downloadTSVButton}
+                  header="Import Data from TSV or CSV File"
+                  headerSize="s"
+                  instructionListTitle="Importing Files"
+                  items={instructionItems}
+                  shouldStartOpen
+                  secondInstructionListTitle="File Requirements"
+                  secondSetItems={secondSetInstructionItems}
+                  InstructionsTitleMarginBottom="xxs"
+                  listItemFontSize="xs"
+                />
+                <ImportFile
+                  metadata={metadata}
+                  changedMetadata={changedMetadata}
+                  namedLocations={namedLocations}
+                  setMetadata={setMetadata}
+                  setChangedMetadata={setChangedMetadata}
+                  hasImportedMetadataFile={hasImportedMetadataFile}
+                  setHasImportedMetadataFile={setHasImportedMetadataFile}
+                  setAutocorrectWarnings={setAutocorrectWarnings}
+                />
+                <WebformTable
+                  setIsValid={setIsValid}
+                  metadata={metadata}
+                  hasImportedMetadataFile={hasImportedMetadataFile}
+                  setMetadata={setMetadata}
+                  autocorrectWarnings={autocorrectWarnings}
+                  locations={namedLocations}
+                  applyToAllColumn={applyToAllColumn}
+                  handleRowMetadata={handleRowMetadata}
+                  webformTableType="EDIT"
+                />
+                <ContinueButton
+                  disabled={!isContinueButtonActive}
+                  onClick={() => setCurrentModalStep(Steps.REVIEW)}
+                  sdsType="primary"
+                  sdsStyle="rounded"
+                >
+                  Continue
+                </ContinueButton>
+              </>
+            )}
+            {currentModalStep === Steps.REVIEW && <EditSamplesReviewDialog />}
           </Content>
         </DialogContent>
       </Dialog>
