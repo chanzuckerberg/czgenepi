@@ -181,8 +181,9 @@ const EditSamplesConfirmationModal = ({
   const numSamples = checkedSamples.length;
   const title = "Edit Sample Metadata";
 
-  const loseProgressWarningModalTitle = "Leave sample editing?"
-  const loseProgressWarningModalMessage = "If you leave, your current edits will be canceled and your work will not be saved."
+  const loseProgressWarningModalTitle = "Leave sample editing?";
+  const loseProgressWarningModalMessage =
+    "If you leave, your current edits will be canceled and your work will not be saved.";
 
   const HREF =
     "https://docs.google.com/document/d/1QxNcDip31DA40SRIOmdV1I_ZC7rWDz5YQGk26Mr2kfA/edit";

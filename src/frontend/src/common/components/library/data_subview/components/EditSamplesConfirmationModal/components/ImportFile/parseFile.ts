@@ -143,8 +143,7 @@ function parseRow(
   };
   // Only extract info we care about from the row. Set `rowMetadata` with it.
   SAMPLE_EDIT_METADATA_KEYS_TO_EXTRACT.forEach((key) => {
-    const parsedLocationData, inferredMetadata = inferMetadata(row, key, rowMetadata, stringToLocationFinder);
-    rowMetadata[key] = inferredMetadata;
+    inferMetadata(row, key, rowMetadata, stringToLocationFinder);
   });
 
   const rowBadFormatWarnings = warnBadFormatMetadata(rowMetadata);
