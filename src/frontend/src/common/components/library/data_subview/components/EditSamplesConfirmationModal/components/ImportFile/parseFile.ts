@@ -256,7 +256,6 @@ export function parseFileEdit(
             (uploadedHeader) =>
               !expectedHeaders.includes(uploadedHeader) && uploadedHeader !== ""
           );
-
           if (!isEmpty(unknownFields)) {
             hasUnknownFields = true;
           }
