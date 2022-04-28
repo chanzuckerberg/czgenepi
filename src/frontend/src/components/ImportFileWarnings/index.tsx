@@ -11,6 +11,7 @@ import Success from "src/views/Upload/components/Metadata/components/ImportFile/
 import {
   ErrorBadFormatData,
   WarningAbsentSample,
+  WarningAbsentSampleEdit,
   WarningAutoCorrect,
   WarningExtraneousEntry,
   WarningExtraneousEntrySampleEdit,
@@ -35,7 +36,7 @@ interface ImportFileWarningsProps {
   filename: string;
   missingFields: string[] | null;
   autocorrectCount: number;
-  absentSampleIds?: string[]; // absentsampleIds are only used for Upload Tsv flow
+  absentSampleIds: string[];
   // TODO: make these not optional when errors are added to sample Upload flow
   duplicatePrivateIds?: string[] | null;
   duplicatePublicIds?: string[] | null;
@@ -101,9 +102,15 @@ export default function ImportFileWarnings({
           <WarningExtraneousEntry extraneousSampleIds={extraneousSampleIds} />
         )}
 
-      {absentSampleIds && !isEmpty(absentSampleIds) && (
-        <WarningAbsentSample absentSampleIds={absentSampleIds} />
-      )}
+      {metadataUploadType == MetadataUploadTypeOption.Edit &&
+        !isEmpty(absentSampleIds) && (
+          <WarningAbsentSampleEdit absentSampleIds={absentSampleIds} />
+        )}
+
+      {metadataUploadType == MetadataUploadTypeOption.Upload &&
+        !isEmpty(absentSampleIds) && (
+          <WarningAbsentSample absentSampleIds={absentSampleIds} />
+        )}
 
       {!isEmpty(missingData) && (
         <WarningMissingData missingData={missingData} />

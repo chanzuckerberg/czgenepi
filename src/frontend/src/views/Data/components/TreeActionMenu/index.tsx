@@ -1,5 +1,4 @@
 import React from "react";
-import { UserResponse } from "src/common/queries/auth";
 import { MoreActionsMenu } from "./components/MoreActionsMenu";
 import { OpenInNextstrainButton } from "./components/OpenInNextstrainButton";
 import TreeTableDownloadMenu from "./components/TreeTableDownloadMenu";
@@ -22,7 +21,7 @@ interface Props {
   // because it's not actually useful to us for this component.
   value: string;
   item: PhyloRun;
-  userInfo: UserResponse;
+  userInfo: User;
   onDeleteTreeModalOpen(t: PhyloRun): void;
   onEditTreeModalOpen(t: PhyloRun): void;
 }

@@ -1,8 +1,9 @@
-import { groupBy, pick } from "lodash";
+import { groupBy, isEmpty, pick } from "lodash";
 import Papa from "papaparse";
 import { HEADERS_TO_SAMPLE_EDIT_METADATA_KEYS } from "src/common/components/library/data_subview/components/EditSamplesConfirmationModal/components/common/constants";
 import { StringToLocationFinder } from "src/common/utils/locationUtils";
 import { DATE_REGEX } from "src/components/DateField/constants";
+import { SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS } from "src/components/DownloadMetadataTemplate/common/constants";
 import { SampleEditTsvMetadata } from "src/components/DownloadMetadataTemplate/common/types";
 import { EXAMPLE_CURRENT_PRIVATE_IDENTIFIERS } from "src/components/DownloadMetadataTemplate/prepMetadataTemplate";
 import { SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS } from "src/components/WebformTable/common/constants";
@@ -35,6 +36,7 @@ export interface ParseResult {
   errorMessages: ErrorMessages;
   warningMessages: WarningMessages;
   filename: string;
+  hasUnknownFields: boolean;
 }
 
 export type SampleEditIdToWarningMessages = Record<
@@ -216,6 +218,7 @@ export function parseFileEdit(
           WARNING_CODE,
           SampleIdToWarningMessages
         >();
+        let hasUnknownFields = false;
         const missingHeaderFields = getMissingHeaderFields(uploadedHeaders);
         const duplicatePublicIds = getDuplicateIds(rows, "publicId");
         const duplicatePrivateIds = getDuplicateIds(rows, "newPrivateID");
@@ -243,6 +246,18 @@ export function parseFileEdit(
           const IGNORED_SAMPLE_IDS = new Set(
             EXAMPLE_CURRENT_PRIVATE_IDENTIFIERS
           );
+          // find if any extraneous field data was added in the tsv
+          const expectedHeaders = Object.keys(
+            SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS
+          );
+          const unknownFields = uploadedHeaders.filter(
+            // uploaded field header is allowed to be "" (that means a user deleted a non-required column which is not a blocker)
+            (uploadedHeader) =>
+              !expectedHeaders.includes(uploadedHeader) && uploadedHeader !== ""
+          );
+          if (!isEmpty(unknownFields)) {
+            hasUnknownFields = true;
+          }
           rows.forEach((row) => {
             const { rowMetadata, rowWarnings } = parseRow(
               row,
@@ -281,8 +296,9 @@ export function parseFileEdit(
         resolve({
           data: sampleIdToMetadata,
           errorMessages,
-          warningMessages,
           filename: file.name,
+          hasUnknownFields,
+          warningMessages,
         });
       },
     });
