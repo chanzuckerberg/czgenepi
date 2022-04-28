@@ -2,7 +2,6 @@ import ENV from "src/common/constants/ENV";
 import { jsonToType } from "src/common/utils";
 
 export enum API {
-  USER_INFO = "/api/usergroup",
   USERDATA = "/v2/users/me",
   SAMPLES = "/v2/samples/",
   LOG_IN = "/login",
