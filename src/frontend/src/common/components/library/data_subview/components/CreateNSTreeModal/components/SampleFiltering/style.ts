@@ -1,5 +1,11 @@
 import styled from "@emotion/styled";
-import { fontHeaderXs, getColors, getSpaces, InputDropdown } from "czifui";
+import {
+  Dropdown,
+  DropdownPopper,
+  fontHeaderXs,
+  getColors,
+  getSpaces,
+} from "czifui";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 
 export const StyledContainer = styled.div`
@@ -41,6 +47,12 @@ export const StyledFilterGroup = styled.div`
 export const StyledFilterGroupName = styled.p`
   ${fontHeaderXs}
   color: black;
+  ${(props) => {
+    const spaces = getSpaces(props);
+    return `
+      margin-bottom: ${spaces?.xxs}px;
+    `;
+  }}
 `;
 
 export const StyledNewTabLink = styled(NewTabLink)`
@@ -56,6 +68,34 @@ export const StyledNewTabLink = styled(NewTabLink)`
   }}
 `;
 
-export const StyledInputDropdown = styled(InputDropdown)`
-  width: 200px;
+const DROPDOWN_WIDTH = "209px";
+
+// High specificity label styling is to beat out czifui coloring.
+export const StyledDropdown = styled(Dropdown)`
+  width: ${DROPDOWN_WIDTH};
+  .MuiButton-label > span {
+    color: black;
+  }
+
+  ${(props) => {
+    const colors = getColors(props);
+    return `
+      path {
+        fill: ${colors?.gray[500]};
+      }
+    `;
+  }}
+` as typeof Dropdown; // assert b/c `styled` causes an interface hiccup;
+
+// The `min-width` property is necessary to cancel out a hardcoded czifui
+// value since we want to set a smaller `width` than that hardcoded number
+export const StyledDropdownPopper = styled(DropdownPopper)`
+  min-width: auto;
+  width: ${DROPDOWN_WIDTH};
+  ${(props) => {
+    const spaces = getSpaces(props);
+    return `
+      margin-top: ${spaces?.xs}px;
+    `;
+  }}
 `;

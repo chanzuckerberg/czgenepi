@@ -1,3 +1,10 @@
+const WORDS_TO_PLURALIZE: Record<string, string> = {
+  has: "have",
+  was: "were",
+};
+
 export const pluralize = (str: string, count: number): string => {
-  return count === 1 ? str : `${str}s`;
+  if (count === 1) return str;
+  if (WORDS_TO_PLURALIZE[str]) return WORDS_TO_PLURALIZE[str];
+  return `${str}s`;
 };

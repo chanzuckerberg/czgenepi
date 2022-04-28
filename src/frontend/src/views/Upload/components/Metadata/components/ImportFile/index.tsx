@@ -1,29 +1,27 @@
-import { isEmpty } from "lodash";
 import React, { useEffect, useMemo, useState } from "react";
+import { ParseResult as ParseResultEdit } from "src/common/components/library/data_subview/components/EditSamplesConfirmationModal/components/ImportFile/parseFile";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { StringToLocationFinder } from "src/common/utils/locationUtils";
 import { SampleUploadDownloadTemplate } from "src/components/DownloadMetadataTemplate";
+import { SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS } from "src/components/DownloadMetadataTemplate/common/constants";
 import {
   prepUploadMetadataTemplate,
   TEMPLATE_UPDATED_DATE,
 } from "src/components/DownloadMetadataTemplate/prepMetadataTemplate";
 import FilePicker from "src/components/FilePicker";
-import {
-  ERROR_CODE,
-  Props as CommonProps,
-  WARNING_CODE,
-} from "src/views/Upload/components/common/types";
-import Error from "./components/Alerts/Error";
-import Success from "./components/Alerts/Success";
-import {
-  WarningAbsentSample,
-  WarningAutoCorrect,
-  WarningBadFormatData,
-  WarningExtraneousEntry,
-  WarningMissingData,
-} from "./components/Alerts/warnings";
+import ImportFileWarnings, {
+  getAutocorrectCount,
+  getMissingFields,
+} from "src/components/ImportFileWarnings";
+import { WebformTableTypeOptions as MetadataUploadTypeOption } from "src/components/WebformTable";
+import { WARNING_CODE } from "src/components/WebformTable/common/types";
+import { Props as CommonProps } from "src/views/Upload/components/common/types";
 import Instructions from "./components/Instructions";
-import { parseFile, ParseResult, SampleIdToWarningMessages } from "./parseFile";
+import {
+  parseFile,
+  ParseResult as ParseResultUpload,
+  SampleIdToWarningMessages as SampleIdToWarningMessagesUpload,
+} from "./parseFile";
 import {
   IntroWrapper,
   StyledButton,
@@ -32,9 +30,8 @@ import {
   TitleWrapper,
   Wrapper,
 } from "./style";
-
 interface Props {
-  handleMetadata: (result: ParseResult) => void;
+  handleMetadata: (result: ParseResultUpload) => void;
   samples: CommonProps["samples"];
   stringToLocationFinder: StringToLocationFinder;
 }
@@ -49,13 +46,15 @@ export default function ImportFile({
   const [missingFields, setMissingFields] = useState<string[] | null>(null);
   const [autocorrectCount, setAutocorrectCount] = useState<number>(0);
   const [filename, setFilename] = useState("");
-  const [parseResult, setParseResult] = useState<ParseResult | null>(null);
+  const [parseResult, setParseResult] = useState<
+    ParseResultUpload | ParseResultEdit | null
+  >(null);
   const [extraneousSampleIds, setExtraneousSampleIds] = useState<string[]>([]);
   const [absentSampleIds, setAbsentSampleIds] = useState<string[]>([]);
   const [missingData, setMissingData] =
-    useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
+    useState<SampleIdToWarningMessagesUpload>(EMPTY_OBJECT);
   const [badFormatData, setBadFormatData] =
-    useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
+    useState<SampleIdToWarningMessagesUpload>(EMPTY_OBJECT);
 
   // Determine mismatches between uploaded metadata IDs and previous step's IDs.
   // `extraneousSampleIds` are what was in metadata, but not in sequence upload
@@ -159,74 +158,21 @@ export default function ImportFile({
         />
       </div>
 
-      <RenderOrNull
-        condition={
-          hasImportedFile &&
-          !getIsParseResultCompletelyUnused(extraneousSampleIds, parseResult)
+      <ImportFileWarnings
+        hasImportedFile={hasImportedFile}
+        extraneousSampleIds={extraneousSampleIds}
+        parseResult={parseResult}
+        filename={filename}
+        missingFields={missingFields}
+        autocorrectCount={autocorrectCount}
+        absentSampleIds={absentSampleIds}
+        missingData={missingData}
+        badFormatData={badFormatData}
+        IdColumnNameForWarnings={
+          SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sampleId
         }
-      >
-        <Success filename={filename} />
-      </RenderOrNull>
-
-      <RenderOrNull condition={missingFields}>
-        <Error errorCode={ERROR_CODE.MISSING_FIELD} names={missingFields} />
-      </RenderOrNull>
-
-      <RenderOrNull condition={autocorrectCount}>
-        <WarningAutoCorrect autocorrectedSamplesCount={autocorrectCount} />
-      </RenderOrNull>
-
-      <RenderOrNull condition={extraneousSampleIds.length}>
-        <WarningExtraneousEntry extraneousSampleIds={extraneousSampleIds} />
-      </RenderOrNull>
-
-      <RenderOrNull condition={absentSampleIds.length}>
-        <WarningAbsentSample absentSampleIds={absentSampleIds} />
-      </RenderOrNull>
-
-      <RenderOrNull condition={!isEmpty(missingData)}>
-        <WarningMissingData missingData={missingData} />
-      </RenderOrNull>
-
-      <RenderOrNull condition={!isEmpty(badFormatData)}>
-        <WarningBadFormatData badFormatData={badFormatData} />
-      </RenderOrNull>
+        metadataUploadType={MetadataUploadTypeOption.Upload}
+      />
     </Wrapper>
   );
-}
-
-function RenderOrNull({
-  condition,
-  children,
-}: {
-  condition: unknown;
-  children: React.ReactNode;
-}): JSX.Element | null {
-  if (!condition) return null;
-
-  return <>{children}</>;
-}
-
-function getIsParseResultCompletelyUnused(
-  extraneousSampleIds: string[],
-  parseResult: ParseResult | null
-) {
-  if (!parseResult) return true;
-
-  const { data } = parseResult;
-
-  return extraneousSampleIds.length === Object.keys(data).length;
-}
-
-function getAutocorrectCount(
-  sampleIdToWarningMessages: SampleIdToWarningMessages = {}
-) {
-  return Object.keys(sampleIdToWarningMessages).length;
-}
-
-// Returns array of all missing column header fields, or if none missing, null.
-function getMissingFields(parseResult: ParseResult): string[] | null {
-  const { errorMessages } = parseResult;
-  const missingFieldsErr = errorMessages.get(ERROR_CODE.MISSING_FIELD);
-  return missingFieldsErr ? Array.from(missingFieldsErr) : null;
 }

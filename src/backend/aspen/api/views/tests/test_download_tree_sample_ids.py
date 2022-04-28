@@ -31,16 +31,22 @@ def upload_s3_file(
         # The bucket does not exist or you have no access.
         mock_s3_resource.create_bucket(Bucket=phylo_tree.s3_bucket)
 
-    tree_children = [{"name": sample.public_identifier} for sample in samples]
+    tree_children = [
+        {"name": sample.public_identifier, "node_attrs": {"country": {"value": "USA"}}}
+        for sample in samples
+    ]
     if gisaid_samples:
         for gisaid_sample in gisaid_samples:
             tree_children.append({"name": gisaid_sample})
 
     body = {
+        "meta": {
+            "colorings": [],
+        },
         "tree": {
             "name": "root_identifier_1",
             "children": tree_children,
-        }
+        },
     }
 
     test_json = json.dumps(body)
@@ -69,18 +75,19 @@ async def create_phylotree_with_inputs(
     )
     input_entity = uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
 
-    gisaid_samples = ["gisaid_identifier"]
+    db_gisaid_samples = ["gisaid_identifier", "hCoV-19/gisaid_identifier2"]
     phylo_run = phylorun_factory(
         owner_group,
         inputs=[input_entity],
-        gisaid_ids=gisaid_samples,
+        gisaid_ids=db_gisaid_samples,
     )
     samples = [sample]
     phylo_tree = phylotree_factory(
         phylo_run,
         samples,
     )
-    upload_s3_file(mock_s3_resource, phylo_tree, samples, gisaid_samples)
+    tree_gisaid_samples = ["gisaid_identifier", "GISAID_identifier2"]
+    upload_s3_file(mock_s3_resource, phylo_tree, samples, tree_gisaid_samples)
 
     async_session.add_all([phylo_tree])
     await async_session.commit()
@@ -205,6 +212,7 @@ async def test_private_id_matrix(
                 f"root_identifier_1	no\r\n"
                 f"{samples[0].public_identifier}	yes\r\n"
                 f"gisaid_identifier	yes\r\n"
+                f"GISAID_identifier2	yes\r\n"
             ),
         },
         {
@@ -215,6 +223,7 @@ async def test_private_id_matrix(
                 f"root_identifier_1	no\r\n"
                 f"{samples[0].private_identifier}	yes\r\n"
                 f"gisaid_identifier	yes\r\n"
+                f"GISAID_identifier2	yes\r\n"
             ),
         },
     ]

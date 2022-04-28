@@ -1,15 +1,11 @@
 import React, { useState } from "react";
 import ENV from "src/common/constants/ENV";
-import Exclamation from "src/common/icons/IconExclamation.svg";
 import CloseIcon from "src/common/images/close-icon.svg";
 import HeaderLogo from "src/common/images/gen-epi-logo.svg";
 import { useUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
 import UserMenu from "./components/UserMenu";
 import {
-  AnnouncementBanner,
-  AnnouncementText,
-  AnnouncementTextBold,
   Bar,
   ButtonLink,
   HeaderContainer,
@@ -37,9 +33,9 @@ export default function NavBarLanding(): JSX.Element {
 
   const { API_URL } = ENV;
 
-  const { data } = useUserInfo();
+  const { data: userInfo } = useUserInfo();
 
-  const group = data?.group;
+  const group = userInfo?.group;
 
   const orgElements = <React.Fragment>{group?.name}</React.Fragment>;
 
@@ -53,12 +49,10 @@ export default function NavBarLanding(): JSX.Element {
 
   const orgSplash = hasOrg();
 
-  const user = data?.user;
-
   let MobileSignInLink;
   let SignInLink;
 
-  if (user) {
+  if (userInfo) {
     MobileSignInLink = (
       <MobileNavLink
         href={ROUTES.UPLOAD_STEP1}
@@ -94,35 +88,25 @@ export default function NavBarLanding(): JSX.Element {
 
   return (
     <HeaderContainer data-test-id="navbar-landing">
-      {!user && (
-        <AnnouncementBanner>
-          <AnnouncementText>
-            <Exclamation />
-            <AnnouncementTextBold>Looking for Aspen?</AnnouncementTextBold>
-            &nbsp;You&apos;re in the right spot. As of December, our new name is
-            Chan Zuckerberg GEN EPI.
-          </AnnouncementText>
-        </AnnouncementBanner>
-      )}
       <HeaderMaxWidthContainer>
         <HeaderTopContainer>
-          <HeaderLogoContainer href={data ? ROUTES.DATA : ROUTES.HOMEPAGE}>
+          <HeaderLogoContainer href={userInfo ? ROUTES.DATA : ROUTES.HOMEPAGE}>
             <HeaderLogo data-test-id="logo" />
             {orgSplash ? <OrgSplash>{orgSplash}</OrgSplash> : null}
           </HeaderLogoContainer>
           <HeaderTopLinks>
-            {user ? null : (
+            {userInfo ? null : (
               <TextLink href={ROUTES.RESOURCES} target="_blank">
                 Resources
               </TextLink>
             )}
-            {user ? null : (
+            {userInfo ? null : (
               <ButtonLink href={ROUTES.REQUEST_ACCESS}>
                 Request Access
               </ButtonLink>
             )}
             {SignInLink}
-            {user ? <UserMenu user={user.name} /> : null}
+            {userInfo ? <UserMenu user={userInfo.name} /> : null}
           </HeaderTopLinks>
           <MobileNavToggle
             onClick={toggleMobileNav}
@@ -173,7 +157,7 @@ export default function NavBarLanding(): JSX.Element {
                 style={menuOpen ? { opacity: "1" } : { opacity: "0" }}
               ></MobileNavSeparator>
               {MobileSignInLink}
-              {user ? null : (
+              {userInfo ? null : (
                 <MobileNavLink
                   href={ROUTES.REQUEST_ACCESS}
                   style={menuOpen ? { opacity: "1" } : { opacity: "0" }}

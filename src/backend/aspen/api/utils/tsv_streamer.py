@@ -50,11 +50,11 @@ class MetadataTSVStreamer(TSVStreamer):
 
     def __init__(self, filename: str, data: Iterable, selected: Iterable):
         super().__init__(filename, data)
-        self.selected = selected
+        self.selected = [item.lower() for item in selected]
 
     def generate_row(self, item):
         data: Mapping[str, Any] = {
             "Sample Identifier": item,
-            "Selected": "yes" if item in self.selected else "no",
+            "Selected": "yes" if item.lower() in self.selected else "no",
         }
         return data

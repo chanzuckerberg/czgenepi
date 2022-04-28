@@ -17,9 +17,6 @@ from aspen.database.models import (
     ProcessedGisaidDump,
     RawGisaidDump,
     Sample,
-    SequencingInstrumentType,
-    SequencingProtocolType,
-    SequencingReadsCollection,
     TreeType,
     UploadedPathogenGenome,
     User,
@@ -229,28 +226,6 @@ def create_test_trees(session, group, user):
         create_tree(session, run)
 
 
-def create_sequencing_reads(session, sample):
-    sequencing_reads = (
-        session.query(SequencingReadsCollection)
-        .filter(SequencingReadsCollection.sample == sample)
-        .first()
-    )
-    if sequencing_reads:
-        print("Sequencing Reads already exists")
-        return sequencing_reads
-    print("Creating Sequencing Reads")
-    sequencing_reads = SequencingReadsCollection(
-        sample=sample,
-        sequencing_instrument=SequencingInstrumentType.ILLUMINA_GENOME_ANALYZER_IIX,
-        sequencing_protocol=SequencingProtocolType.ARTIC_V3,
-        sequencing_date=datetime.now(),
-        s3_bucket="bucket",
-        s3_key=sample.private_identifier,
-    )
-    session.add(sequencing_reads)
-    return sequencing_reads
-
-
 def create_gisaid(session):
     aligned_workflow = session.query(AlignedGisaidDump).first()
     if aligned_workflow:
@@ -320,8 +295,7 @@ def create_gisaid(session):
 
 def create_samples(session, group, user, location, num_successful, num_failures):
     for suffix in range(num_successful):
-        sample = create_sample(session, group, user, location, suffix)
-        _ = create_sequencing_reads(session, sample)
+        _ = create_sample(session, group, user, location, suffix)
     for suffix in range(num_failures):
         _ = create_sample(session, group, user, location, suffix, True)
 

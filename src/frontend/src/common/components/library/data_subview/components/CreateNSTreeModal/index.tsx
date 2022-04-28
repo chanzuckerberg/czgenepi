@@ -5,7 +5,10 @@ import Image from "next/image";
 import NextLink from "next/link";
 import React, { SyntheticEvent, useEffect, useState } from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
+import type { TreeType } from "src/common/constants/types";
+import { TreeTypes } from "src/common/constants/types";
 import GisaidLogo from "src/common/images/gisaid-logo-full.png";
+import { useLineages } from "src/common/queries/lineages";
 import { useCreateTree } from "src/common/queries/trees";
 import { ROUTES } from "src/common/routes";
 import { B } from "src/common/styles/basicStyle";
@@ -51,13 +54,6 @@ interface Props {
   onClose: () => void;
 }
 
-const TreeTypes = {
-  Targeted: "TARGETED",
-  NonContextualized: "NON_CONTEXTUALIZED",
-  Overview: "OVERVIEW",
-};
-type TreeType = typeof TreeTypes[keyof typeof TreeTypes];
-
 export const CreateNSTreeModal = ({
   checkedSampleIds,
   failedSampleIds,
@@ -80,6 +76,13 @@ export const CreateNSTreeModal = ({
   );
   const [isValidTreeType, setIsValidTreeType] = useState<boolean>(false);
 
+  // Certain tree types can filter based on lineages and date ranges
+  const { data: lineagesData } = useLineages();
+  const availableLineages: string[] = lineagesData?.lineages || [];
+  const [selectedLineages, setSelectedLineages] = useState<string[]>([]);
+  const [startDate, setStartDate] = useState<FormattedDateType>();
+  const [endDate, setEndDate] = useState<FormattedDateType>();
+
   useEffect(() => {
     if (shouldReset) setShouldReset(false);
   }, [shouldReset]);
@@ -99,6 +102,9 @@ export const CreateNSTreeModal = ({
     setIsValidTreeType(false);
     setMissingInputSamples([]);
     setValidatedInputSamples([]);
+    setStartDate(undefined);
+    setEndDate(undefined);
+    setSelectedLineages([]);
   };
 
   const handleClose = function () {
@@ -153,10 +159,16 @@ export const CreateNSTreeModal = ({
 
   const handleSubmit = (evt: SyntheticEvent) => {
     evt.preventDefault();
+
     mutation.mutate({
       sampleIds: allValidSamplesForTreeCreation,
       treeName,
       treeType,
+      filters: {
+        startDate,
+        endDate,
+        lineages: selectedLineages,
+      },
     });
   };
 
@@ -201,6 +213,7 @@ export const CreateNSTreeModal = ({
       <StyledDialog
         disableEscapeKeyDown
         disableBackdropClick
+        disableEnforceFocus
         open={open}
         fullWidth={true}
         maxWidth={"sm"}
@@ -254,6 +267,13 @@ export const CreateNSTreeModal = ({
                 label={
                   <RadioLabelOverview
                     selected={treeType === TreeTypes.Overview}
+                    availableLineages={availableLineages}
+                    selectedLineages={selectedLineages}
+                    setSelectedLineages={setSelectedLineages}
+                    startDate={startDate}
+                    endDate={endDate}
+                    setStartDate={setStartDate}
+                    setEndDate={setEndDate}
                   />
                 }
               />
@@ -274,6 +294,13 @@ export const CreateNSTreeModal = ({
                 label={
                   <RadioLabelNonContextualized
                     selected={treeType === TreeTypes.NonContextualized}
+                    availableLineages={availableLineages}
+                    selectedLineages={selectedLineages}
+                    setSelectedLineages={setSelectedLineages}
+                    startDate={startDate}
+                    endDate={endDate}
+                    setStartDate={setStartDate}
+                    setEndDate={setEndDate}
                   />
                 }
               />

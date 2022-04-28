@@ -80,6 +80,41 @@ def save():
             )
             session.execute(new_null_locations_insert)
 
+        # Insert country-level locations
+        existing_country_level_loc_select = (
+            sa.select(Location.region, Location.country)
+            .where(and_(Location.division == None, Location.location == None))
+            .distinct()
+        )
+        existing_country_level_locs = set(
+            session.execute(existing_country_level_loc_select).all()
+        )
+
+        country_level_loc_select = sa.select(
+            GisaidMetadata.region, GisaidMetadata.country
+        ).distinct()
+        country_level_locations = set(session.execute(country_level_loc_select).all())
+
+        new_country_level_locations = (
+            country_level_locations - existing_country_level_locs
+        )
+        new_country_level_values = list(
+            map(
+                lambda region_country_tuple: {
+                    "region": region_country_tuple[0],
+                    "country": region_country_tuple[1],
+                    "division": None,
+                    "location": None,
+                },
+                new_country_level_locations,
+            )
+        )
+        if len(new_country_level_values) > 0:
+            new_country_level_locations_insert = Location.__table__.insert().values(
+                new_country_level_values
+            )
+            session.execute(new_country_level_locations_insert)
+
         session.commit()
 
     print("Successfully imported locations!")

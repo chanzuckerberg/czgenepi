@@ -1,46 +1,31 @@
 import styled from "@emotion/styled";
 import {
+  CommonThemeProps,
   fontBodyXs,
   fontHeaderS,
   fontHeaderXs,
-  getColors,
   getSpaces,
 } from "czifui";
-import AlertAccordion from "src/components/AlertAccordion";
+
+const mPadding = (props: CommonThemeProps) => {
+  const spaces = getSpaces(props);
+  return `
+    padding: ${spaces?.m}px;
+  `;
+};
 
 export const Th = styled.th`
   ${fontHeaderXs}
-  ${(props) => {
-    const spaces = getSpaces(props);
-    const colors = getColors(props);
-    return `
-      padding: ${spaces?.m}px;
-      border-bottom: ${spaces?.xxxs}px solid ${colors?.gray[200]};
-    `;
-  }}
+  ${mPadding}
 `;
 
 export const Td = styled.td`
   ${fontBodyXs}
-  ${(props) => {
-    const spaces = getSpaces(props);
-    return `
-      padding: ${spaces?.m}px;
-    `;
-  }}
+  ${mPadding}
 `;
 
 export const Title = styled.span`
   ${fontHeaderS}
-`;
-
-// To get the table to span the entire width of accordion, we must manipulate
-// MUI internal CSS to force its div that wraps content to use full width.
-// If this gets used regularly, might be better as prop on `AlertAccordion`.
-export const FullWidthAlertAccordion = styled(AlertAccordion)`
-  .MuiAlert-message {
-    width: 100%;
-  }
 `;
 
 export const FullWidthContainer = styled.div`

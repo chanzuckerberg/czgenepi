@@ -64,7 +64,6 @@ test.describe("Data", () => {
 
       await searchBox?.fill(firstPublicId || "no id");
 
-      console.log(firstPublicId);
       await screenshot(page, testInfo);
       await expect(page.locator(getTestID("table-row"))).toHaveCount(1);
     });

@@ -8,7 +8,10 @@ from botocore.client import ClientError
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from aspen.api.views.tests.data.location_data import TEST_COUNTRY_DATA
+from aspen.api.views.tests.data.phylo_tree_data import TEST_TREE
 from aspen.api.views.tests.test_update_phylo_run_and_tree import make_shared_test_data
+from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.usergroup import group_factory, user_factory
 
 # All test coroutines will be treated as marked.
@@ -51,19 +54,7 @@ async def test_valid_auspice_link_access(
         # The bucket does not exist or you have no access.
         mock_s3_resource.create_bucket(Bucket=phylo_tree.s3_bucket)
 
-    test_tree = {
-        "meta": {},
-        "tree": {
-            "branch_attrs": {"labels": {"clade": "42"}, "mutations": {}},
-            "children": [
-                {"name": "public_identifier_1"},
-                {"name": "public_identifier_2"},
-            ],
-            "name": "ROOT",
-        },
-        "version": "1.3.3.7",
-    }
-    test_json = json.dumps(test_tree)
+    test_json = json.dumps(TEST_TREE)
 
     mock_s3_resource.Bucket(phylo_tree.s3_bucket).Object(phylo_tree.s3_key).put(
         Body=test_json
@@ -159,3 +150,76 @@ async def test_tampered_magic_link(
     assert (
         res_json["error"] == "Unauthenticated attempt to access an auspice magic link"
     )
+
+
+# This tests assumes we are using a group in the USA,
+# and the test location data at the top of this file
+async def test_country_color_labeling(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+    mock_s3_resource: boto3.resource,
+):
+    user, group, samples, phylo_run, phylo_tree = await make_shared_test_data(
+        async_session
+    )
+
+    for point in TEST_COUNTRY_DATA:
+        country_entry = location_factory(
+            point.region,
+            point.country,
+            latitude=point.latitude,
+            longitude=point.longitude,
+        )
+        async_session.add(country_entry)
+    await async_session.commit()
+
+    # We need to create the bucket since this is all in Moto's 'virtual' AWS account
+    try:
+        mock_s3_resource.meta.client.head_bucket(Bucket=phylo_tree.s3_bucket)
+    except ClientError:
+        # The bucket does not exist or you have no access.
+        mock_s3_resource.create_bucket(Bucket=phylo_tree.s3_bucket)
+
+    test_json = json.dumps(TEST_TREE)
+    mock_s3_resource.Bucket(phylo_tree.s3_bucket).Object(phylo_tree.s3_key).put(
+        Body=test_json
+    )
+
+    auth_headers = {"user_id": user.auth0_user_id}
+    request_body = {"tree_id": phylo_tree.entity_id}
+    generate_res = await http_client.post(
+        "/v2/auspice/generate", json=request_body, headers=auth_headers
+    )
+
+    assert generate_res.status_code == 200
+    generate_response = generate_res.json()
+    magic_link = generate_response["url"]
+
+    access_res = await http_client.get(magic_link.removeprefix("test"))
+    assert access_res.status_code == 200
+    res_json = access_res.json()
+
+    assert "meta" in res_json
+    assert "colorings" in res_json["meta"]
+
+    country_colorings = None
+    for category in res_json["meta"]["colorings"]:
+        if category["key"] == "country":
+            country_colorings = category
+    assert country_colorings is not None
+
+    test_data_countries = [point.country for point in TEST_COUNTRY_DATA]
+    test_country_names = ["USA", "Mexico", "Canada", "France", "Germany", "China"]
+
+    assert "scale" in country_colorings
+
+    unique_countries = set()
+    for country, hex_color in country_colorings["scale"]:
+        assert country in test_data_countries
+        assert re.search(r"^#(?:[0-9a-fA-F]{3}){1,2}$", hex_color) is not None
+        unique_countries.add(country)
+
+    assert len(unique_countries) == len(country_colorings["scale"])
+    for entry in test_country_names:
+        assert entry in unique_countries
+    assert "Japan" not in unique_countries

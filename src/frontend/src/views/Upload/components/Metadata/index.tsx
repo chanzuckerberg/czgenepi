@@ -1,16 +1,18 @@
 import { Button } from "czifui";
 import NextLink from "next/link";
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { HeadAppTitle } from "src/common/components";
+import { setApplyAllValueToPrevMetadata } from "src/common/components/library/data_subview/components/EditSamplesConfirmationModal/utils";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { ROUTES } from "src/common/routes";
 import { createStringToLocationFinder } from "src/common/utils/locationUtils";
+import { WebformTable } from "src/components/WebformTable";
 import {
-  Props,
+  Metadata as MetadataType,
   SampleIdToMetadata,
   WARNING_CODE,
-} from "src/views/Upload/components/common/types";
+} from "src/components/WebformTable/common/types";
 import Progress from "../common/Progress";
 import {
   ButtonWrapper,
@@ -21,13 +23,13 @@ import {
   Subtitle,
   Title,
 } from "../common/style";
+import { Props } from "../common/types";
 import { initSampleMetadata } from "../common/utils";
 import ImportFile from "./components/ImportFile";
 import {
   ParseResult,
   SampleIdToWarningMessages,
 } from "./components/ImportFile/parseFile";
-import Table from "./components/Table";
 
 export default function Metadata({
   samples,
@@ -45,6 +47,23 @@ export default function Metadata({
   const stringToLocationFinder = useMemo(() => {
     return createStringToLocationFinder(namedLocations);
   }, [namedLocations]);
+
+  const handleRowMetadata_ = (id: string, sampleMetadata: MetadataType) => {
+    setMetadata((prevMetadata) => {
+      return { ...prevMetadata, [id]: sampleMetadata };
+    });
+  };
+
+  const handleRowMetadata = useCallback(handleRowMetadata_, [setMetadata]);
+
+  // TODO: update value type to be something other than unknown
+  const applyToAllColumn_ = (fieldKey: keyof MetadataType, value: unknown) => {
+    setMetadata((prevMetadata) => {
+      return setApplyAllValueToPrevMetadata(prevMetadata, fieldKey, value);
+    });
+  };
+
+  const applyToAllColumn = useCallback(applyToAllColumn_, [setMetadata]);
 
   function handleMetadataFileUpload(result: ParseResult) {
     // If they're on the page but somehow have no samples (eg, refreshing on
@@ -112,13 +131,16 @@ export default function Metadata({
           stringToLocationFinder={stringToLocationFinder}
         />
 
-        <Table
+        <WebformTable
           setIsValid={setIsValid}
           metadata={metadata}
           hasImportedMetadataFile={hasImportedMetadataFile}
           setMetadata={setMetadata}
           autocorrectWarnings={autocorrectWarnings}
           locations={namedLocations}
+          applyToAllColumn={applyToAllColumn}
+          handleRowMetadata={handleRowMetadata}
+          webformTableType="UPLOAD"
         />
 
         <ButtonWrapper>

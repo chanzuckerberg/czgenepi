@@ -1,20 +1,23 @@
+import { Dictionary } from "lodash";
 import Papa from "papaparse";
 import { StringToLocationFinder } from "src/common/utils/locationUtils";
 import { DATE_REGEX } from "src/components/DateField/constants";
-import { SampleUploadTsvMetadata } from "src/components/DownloadMetadataTemplate/common/types";
+import {
+  SampleEditTsvMetadata,
+  SampleUploadTsvMetadata,
+} from "src/components/DownloadMetadataTemplate/common/types";
 import { EXAMPLE_SAMPLE_IDS } from "src/components/DownloadMetadataTemplate/prepMetadataTemplate";
+import {
+  ERROR_CODE,
+  SampleIdToMetadata,
+  WARNING_CODE,
+} from "src/components/WebformTable/common/types";
 import {
   EMPTY_METADATA,
   FORBIDDEN_NAME_CHARACTERS_REGEX,
   HEADERS_TO_METADATA_KEYS,
   MAX_NAME_LENGTH,
 } from "../../../common/constants";
-import {
-  ERROR_CODE,
-  SampleIdToMetadata,
-  WARNING_CODE,
-} from "../../../common/types";
-
 /**
  * (Vince) Regarding interfaces for Warnings/Errors:
  * The naming below makes our warnings and errors sound very generalized, but
@@ -37,6 +40,7 @@ export type SampleIdToWarningMessages = Record<
   string,
   Set<keyof SampleUploadTsvMetadata>
 >;
+
 type WarningMessages = Map<WARNING_CODE, SampleIdToWarningMessages>;
 type ErrorMessages = Map<ERROR_CODE, Set<string>>;
 
@@ -66,10 +70,13 @@ function convertHeaderToMetadataKey(headerName: string): string {
 // specified for the metadata keys. If nothing missing, returns null.
 // Note: the signature here is a little surprising. It's the metadata keys
 // **after** PapaParse has parse-converted the header fields into keys.
-function getMissingHeaderFields(uploadedHeaders: string[]): Set<string> | null {
+function getMissingHeaderFields(
+  uploadedHeaders: string[],
+  headersToMetadataKeys: Dictionary<keyof SampleUploadTsvMetadata>
+): Set<string> | null {
   const missingFields = new Set<string>();
   for (const [headerField, metadataKey] of Object.entries(
-    HEADERS_TO_METADATA_KEYS
+    headersToMetadataKeys
   )) {
     if (!uploadedHeaders.includes(metadataKey)) {
       missingFields.add(headerField);
@@ -149,6 +156,35 @@ function warnBadFormatMetadata(
   return badFormatMetadata.size ? badFormatMetadata : null;
 }
 
+export function inferMetadata(
+  row: Record<string, string>,
+  key: keyof (SampleUploadTsvMetadata & SampleEditTsvMetadata),
+  rowMetadata: SampleUploadTsvMetadata & SampleEditTsvMetadata,
+  stringToLocationFinder: {
+    (locationString: string): NamedGisaidLocation | undefined;
+  }
+): void {
+  const originalValue: string | undefined = row[key];
+  // Only overwrite sane defaults if a "real" value was pulled for key
+  if (originalValue) {
+    // Depending on the key being extracted, we handle it differently.
+    if (key === "collectionLocation") {
+      // Incoming `collectionLocation` is a string, but the app uses objects
+      // to represent location, so we convert before folding it in.
+      let parsedCollectionLocation = undefined;
+      // If they didn't enter enough, ignore as typo, leave as undefined
+      if (originalValue.length > 2) {
+        parsedCollectionLocation = stringToLocationFinder(originalValue);
+      }
+      rowMetadata.collectionLocation = parsedCollectionLocation;
+    } else if (key === "keepPrivate") {
+      rowMetadata[key] = convertYesNoToBool(originalValue);
+    } else {
+      rowMetadata[key] = originalValue;
+    }
+  }
+}
+
 /**
  * Parses a single data row. If issues during parse, also reports warnings.
  *
@@ -186,27 +222,8 @@ function parseRow(
 
   // Only extract info we care about from the row. Set `rowMetadata` with it.
   METADATA_KEYS_TO_EXTRACT.forEach((key) => {
-    const originalValue: string | undefined = row[key];
-    // Only overwrite sane defaults if a "real" value was pulled for key
-    if (originalValue) {
-      // Depending on the key being extracted, we handle it differently.
-      if (key === "collectionLocation") {
-        // Incoming `collectionLocation` is a string, but the app uses objects
-        // to represent location, so we convert before folding it in.
-        let parsedCollectionLocation = undefined;
-        // If they didn't enter enough, ignore as typo, leave as undefined
-        if (originalValue.length > 2) {
-          parsedCollectionLocation = stringToLocationFinder(originalValue);
-        }
-        rowMetadata.collectionLocation = parsedCollectionLocation;
-      } else if (key === "keepPrivate") {
-        rowMetadata[key] = convertYesNoToBool(originalValue);
-      } else {
-        rowMetadata[key] = originalValue;
-      }
-    }
+    inferMetadata(row, key, rowMetadata, stringToLocationFinder);
   });
-
   const rowMissingMetadataWarnings = warnMissingMetadata(rowMetadata);
   if (rowMissingMetadataWarnings) {
     rowWarnings.set(WARNING_CODE.MISSING_DATA, rowMissingMetadataWarnings);
@@ -279,7 +296,10 @@ export function parseFile(
           SampleIdToWarningMessages
         >();
 
-        const missingHeaderFields = getMissingHeaderFields(uploadedHeaders);
+        const missingHeaderFields = getMissingHeaderFields(
+          uploadedHeaders,
+          HEADERS_TO_METADATA_KEYS
+        );
         if (missingHeaderFields) {
           errorMessages.set(ERROR_CODE.MISSING_FIELD, missingHeaderFields);
         } else {

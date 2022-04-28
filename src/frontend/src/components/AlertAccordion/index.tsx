@@ -1,45 +1,42 @@
-import { IconButton } from "@material-ui/core";
-import { ExpandMore } from "@material-ui/icons";
-import { AlertTitle } from "@material-ui/lab";
-import { AlertProps } from "czifui";
+import { Collapse } from "@material-ui/core";
 import React, { useState } from "react";
-import { StyledAlert, Title } from "./style";
+import {
+  ColumnFlexContainer,
+  RowFlexContainer,
+  StaticSizeDiv,
+  StyledArrowDownIcon,
+  StyledArrowUpIcon,
+  StyledCallout,
+} from "./style";
 
 interface Props {
-  title?: string;
-  message: React.ReactNode;
-  severity: AlertProps["severity"];
-  className?: string;
+  collapseContent: React.ReactNode;
+  intent: "info" | "error" | "success" | "warning";
+  title: React.ReactNode;
+  icon?: React.ReactNode;
 }
 
 export default function AlertAccordion({
+  collapseContent,
+  intent,
   title,
-  message,
-  severity,
-  className,
+  icon,
 }: Props): JSX.Element {
-  const [isShown, setIsShown] = useState(false);
+  const [isCollapseOpen, setCollapseOpen] = useState<boolean>(false);
 
-  function handleClick() {
-    setIsShown((prevState) => !prevState);
-  }
+  const toggleCollapse = () => {
+    setCollapseOpen(!isCollapseOpen);
+  };
 
   return (
-    <StyledAlert
-      className={className}
-      severity={severity}
-      action={
-        <IconButton aria-label="expand" color="inherit" onClick={handleClick}>
-          <ExpandMore fontSize="inherit" />
-        </IconButton>
-      }
-    >
-      {title && (
-        <AlertTitle>
-          <Title>{title}</Title>
-        </AlertTitle>
-      )}
-      {isShown && message}
-    </StyledAlert>
+    <StyledCallout intent={intent} onClick={toggleCollapse} icon={icon}>
+      <RowFlexContainer>
+        <ColumnFlexContainer>
+          <StaticSizeDiv>{title}</StaticSizeDiv>
+          <Collapse in={isCollapseOpen}>{collapseContent}</Collapse>
+        </ColumnFlexContainer>
+        {isCollapseOpen ? <StyledArrowUpIcon /> : <StyledArrowDownIcon />}
+      </RowFlexContainer>
+    </StyledCallout>
   );
 }

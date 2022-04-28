@@ -1,6 +1,11 @@
 import { Table as MuiTable, TableBody, TableRow } from "@material-ui/core";
+import { map } from "lodash";
 import React from "react";
-import { ERROR_CODE, ParseErrors } from "../../../common/types";
+import {
+  BASE_ERROR_CODE,
+  ERROR_CODE,
+} from "src/components/WebformTable/common/types";
+import { ParseErrors } from "../../../common/types";
 import {
   Overflow,
   StyledHeaderTableCell,
@@ -10,7 +15,7 @@ import {
   StyledTableRow,
 } from "./style";
 
-const ERROR_CODE_MESSAGES: Record<ERROR_CODE, string> = {
+const ERROR_CODE_MESSAGES: Record<BASE_ERROR_CODE, string> = {
   [ERROR_CODE.DEFAULT]:
     "Something went wrong and we are unable to read this file. Please check the file or contact us for help.",
   [ERROR_CODE.INVALID_NAME]:
@@ -40,13 +45,13 @@ export default function AlertTable({ parseErrors }: Props): JSX.Element {
             </TableRow>
           </StyledTableHead>
           <TableBody component="div">
-            {Object.entries(parseErrors).map(([errorCode, names]) => (
+            {map(parseErrors, (names: string[], errorCode: BASE_ERROR_CODE) => (
               <StyledTableRow key={errorCode} component="div">
                 <StyledTableCell scope="row" component="div">
                   {names.join(", ")}
                 </StyledTableCell>
                 <StyledTableCell align="left" component="div">
-                  {ERROR_CODE_MESSAGES[errorCode as unknown as ERROR_CODE]}
+                  {ERROR_CODE_MESSAGES[errorCode]}
                 </StyledTableCell>
               </StyledTableRow>
             ))}

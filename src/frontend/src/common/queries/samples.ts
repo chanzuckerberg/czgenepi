@@ -5,11 +5,9 @@ import {
   useQueryClient,
   UseQueryResult,
 } from "react-query";
+import { SampleIdToMetadata } from "src/components/WebformTable/common/types";
 import { METADATA_KEYS_TO_API_KEYS } from "src/views/Upload/components/common/constants";
-import {
-  SampleIdToMetadata,
-  Samples,
-} from "src/views/Upload/components/common/types";
+import { Samples } from "src/views/Upload/components/common/types";
 import {
   API,
   DEFAULT_DELETE_OPTIONS,
@@ -135,6 +133,15 @@ export async function createSamples({
       publicId,
     } = sampleMetadata;
 
+    const collectionLocationId = () => {
+      // collection location will always be a NamedGisaidLocation at this stage,
+      // the only time collectionLocation will be a string is during tsv upload
+      // where collectionLocation can be "DELETE" (when a user wants to clear a value)
+      if (collectionLocation && typeof collectionLocation !== "string") {
+        return collectionLocation.id;
+      }
+    };
+
     const samplePayload = {
       pathogen_genome: {
         sequence,
@@ -142,7 +149,7 @@ export async function createSamples({
       },
       sample: {
         [METADATA_KEYS_TO_API_KEYS.collectionDate]: collectionDate,
-        [METADATA_KEYS_TO_API_KEYS.collectionLocation]: collectionLocation!.id,
+        [METADATA_KEYS_TO_API_KEYS.collectionLocation]: collectionLocationId(),
         [METADATA_KEYS_TO_API_KEYS.keepPrivate]: keepPrivate,
         [METADATA_KEYS_TO_API_KEYS.privateId]: privateId,
         [METADATA_KEYS_TO_API_KEYS.publicId]: publicId,
@@ -257,12 +264,6 @@ interface GisaidResponseType {
   status: string;
 }
 
-interface LineageResponseType {
-  last_updated: string;
-  lineage: string;
-  confidence: number;
-  version: string;
-}
 interface SubmittingGroupResponseType {
   id: number;
   name: string;
@@ -277,7 +278,7 @@ interface SamplesEditResponseType {
   collection_location: string;
   czb_failed_genome_recovery: boolean;
   gisaid: GisaidResponseType;
-  lineage: LineageResponseType;
+  lineage: Lineage;
   private: boolean;
   private_identifier: string;
   public_identifier: string;

@@ -23,8 +23,8 @@ const DeleteSamplesConfirmationModal = ({
   const [shouldShowSuccessNotification, setShouldShowSuccessNotification] =
     useState<boolean>(false);
   const [numDeletedSamples, setNumDeletedSamples] = useState<number>(0);
-  const { data } = useUserInfo();
-  const { group: userGroup } = data ?? {};
+  const { data: userInfo } = useUserInfo();
+  const { group: userGroup } = userInfo ?? {};
 
   const samplesToDelete = checkedSamples
     .filter((sample) => sample.submittingGroup?.name === userGroup?.name)

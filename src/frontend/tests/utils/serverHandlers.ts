@@ -8,7 +8,7 @@ import ENV from "../../src/common/constants/ENV";
 import { userInfo } from "../fixtures/userInfo";
 
 export const handlers = [
-  rest.get(ENV.API_URL + API.USER_INFO, (req, res, context) => {
+  rest.get(ENV.API_URL + API.USERDATA, (req, res, context) => {
     if (!req.cookies.session) {
       return res(
         context.status(401),

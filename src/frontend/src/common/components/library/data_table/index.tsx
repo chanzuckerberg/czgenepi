@@ -28,8 +28,8 @@ interface Props {
   setFailedSampleIds(samples: string[]): void;
   viewName: VIEWNAME;
   renderer?: CustomRenderer;
-  handleDeleteTreeModalOpen(t: Tree): void;
-  handleEditTreeModalOpen(t: Tree): void;
+  handleDeleteTreeModalOpen(t: PhyloRun): void;
+  handleEditTreeModalOpen(t: PhyloRun): void;
 }
 
 // (thuang): If item height changes, we need to update this value!

@@ -126,9 +126,9 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
           />
           {parseErrors && (
             <AlertAccordion
-              severity="error"
+              intent="error"
               title="Some of your files or samples could not be imported."
-              message={<AlertTable parseErrors={parseErrors} />}
+              collapseContent={<AlertTable parseErrors={parseErrors} />}
             />
           )}
           {samples && (

@@ -148,10 +148,10 @@ const DataSubview: FunctionComponent<Props> = ({
   // TODO-TR          to the actions that cause the modal to open (search for TODO-TR)
   const [isDeleteTreeConfirmationOpen, setDeleteTreeConfirmationOpen] =
     useState<boolean>(false);
-  const [treeToDelete, setTreeToDelete] = useState<Tree>();
+  const [phyloRunToDelete, setPhyloRunToDelete] = useState<PhyloRun>();
   const [isEditTreeConfirmationOpen, setEditTreeConfirmationOpen] =
     useState<boolean>(false);
-  const [treeToEdit, setTreeToEdit] = useState<Tree>();
+  const [phyloRunToEdit, setPhyloRunToEdit] = useState<PhyloRun>();
 
   const handleDownloadClickOpen = () => {
     setDownloadModalOpen(true);
@@ -196,13 +196,13 @@ const DataSubview: FunctionComponent<Props> = ({
     setEditTreeConfirmationOpen(false);
   };
 
-  const handleDeleteTreeModalOpen = (tree: Tree) => {
-    setTreeToDelete(tree);
+  const handleDeleteTreeModalOpen = (phyloRun: PhyloRun) => {
+    setPhyloRunToDelete(phyloRun);
     setDeleteTreeConfirmationOpen(true);
   };
 
-  const handleEditTreeModalOpen = (tree: Tree) => {
-    setTreeToEdit(tree);
+  const handleEditTreeModalOpen = (phyloRun: PhyloRun) => {
+    setPhyloRunToEdit(phyloRun);
     setEditTreeConfirmationOpen(true);
   };
 
@@ -327,12 +327,12 @@ const DataSubview: FunctionComponent<Props> = ({
             <DeleteTreeConfirmationModal
               open={isDeleteTreeConfirmationOpen}
               onClose={handleDeleteTreeModalClose}
-              tree={treeToDelete}
+              phyloRun={phyloRunToDelete}
             />
             <EditTreeConfirmationModal
               open={isEditTreeConfirmationOpen}
               onClose={handleEditTreeModalClose}
-              tree={treeToEdit}
+              phyloRun={phyloRunToEdit}
             />
           </>
         )}

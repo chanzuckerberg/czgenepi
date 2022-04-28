@@ -7,7 +7,8 @@ export interface SampleUploadTsvMetadata {
   keepPrivate?: boolean;
   publicId?: string;
   sequencingDate?: string;
-  collectionLocation?: NamedGisaidLocation;
+  // collection location needs to accept string for when users want to add delete keyword to upload
+  collectionLocation?: NamedGisaidLocation | string;
 }
 
 export interface SampleEditTsvMetadata

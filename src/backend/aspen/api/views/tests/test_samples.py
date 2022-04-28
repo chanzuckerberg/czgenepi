@@ -16,7 +16,7 @@ from aspen.database.models import (
     Group,
     Location,
     Sample,
-    SequencingReadsCollection,
+    UploadedPathogenGenome,
     User,
 )
 from aspen.test_infra.models.gisaid_metadata import gisaid_metadata_factory
@@ -42,7 +42,14 @@ async def test_samples_view(
         "North America", "USA", "California", "Santa Barbara County"
     )
     sample = sample_factory(group, user, location, private=True)
-    uploaded_pathogen_genome = uploaded_pathogen_genome_factory(sample)
+    pangolin_output = {
+        "scorpio_call": "B.1.167",
+        "scorpio_support": "0.775",
+        "qc_status": "pass",
+    }
+    uploaded_pathogen_genome = uploaded_pathogen_genome_factory(
+        sample, pangolin_output=pangolin_output
+    )
     async_session.add(group)
     await async_session.commit()
 
@@ -82,6 +89,9 @@ async def test_samples_view(
                     "last_updated": convert_datetime_to_iso_8601(
                         uploaded_pathogen_genome.pangolin_last_updated
                     ),
+                    "scorpio_call": pangolin_output["scorpio_call"],
+                    "scorpio_support": float(pangolin_output["scorpio_support"]),
+                    "qc_status": pangolin_output["qc_status"],
                 },
                 "private": True,
                 "submitting_group": {
@@ -145,6 +155,9 @@ async def test_samples_view_gisaid_rejected(
                     "last_updated": convert_datetime_to_iso_8601(
                         uploaded_pathogen_genome.pangolin_last_updated
                     ),
+                    "scorpio_call": None,
+                    "scorpio_support": None,
+                    "qc_status": None,
                 },
                 "private": False,
                 "submitting_group": {
@@ -210,6 +223,9 @@ async def test_samples_view_gisaid_no_info(
                     "last_updated": convert_datetime_to_iso_8601(
                         uploaded_pathogen_genome.pangolin_last_updated
                     ),
+                    "scorpio_call": None,
+                    "scorpio_support": None,
+                    "qc_status": None,
                 },
                 "private": False,
                 "submitting_group": {
@@ -268,6 +284,9 @@ async def test_samples_view_gisaid_not_eligible(
                     "confidence": None,
                     "version": None,
                     "last_updated": None,
+                    "scorpio_call": None,
+                    "scorpio_support": None,
+                    "qc_status": None,
                 },
                 "private": False,
                 "submitting_group": {
@@ -287,7 +306,7 @@ async def _test_samples_view_cansee(
     http_client: AsyncClient,
     cansee_datatypes: Sequence[DataType],
     user_factory_kwargs: Optional[dict] = None,
-) -> Tuple[Sample, SequencingReadsCollection, Any]:
+) -> Tuple[Sample, UploadedPathogenGenome, Any]:
     user_factory_kwargs = user_factory_kwargs or {}
     owner_group = group_factory()
     viewer_group = group_factory(name="cdph")
@@ -467,6 +486,9 @@ async def test_samples_view_cansee_all(
                 "last_updated": convert_datetime_to_iso_8601(
                     uploaded_pathogen_genome.pangolin_last_updated
                 ),
+                "scorpio_call": None,
+                "scorpio_support": None,
+                "qc_status": None,
             },
             "private": False,
             "submitting_group": {
@@ -534,6 +556,9 @@ async def test_samples_view_no_pangolin(
                     "confidence": None,
                     "version": None,
                     "last_updated": None,
+                    "scorpio_call": None,
+                    "scorpio_support": None,
+                    "qc_status": None,
                 },
                 "private": False,
                 "submitting_group": {

@@ -1,11 +1,11 @@
 import deepmerge from "deepmerge";
 import { gunzip, strFromU8, unzip } from "fflate";
+import { ERROR_CODE } from "src/components/WebformTable/common/types";
 import {
   FORBIDDEN_NAME_CHARACTERS_REGEX,
   MAX_NAME_LENGTH,
 } from "../common/constants";
 import {
-  ERROR_CODE,
   ParseErrors,
   ParseFastaSeqIDLineOutcome,
   ParseOutcome,
@@ -18,7 +18,7 @@ export async function handleFiles(
   files: FileList
 ): Promise<ParseOutcomeWithFilenames> {
   let finalResult: Samples = {};
-  let finalErrors = {} as ParseErrors;
+  let finalErrors: ParseErrors = {};
 
   for (const file of Array.from(files)) {
     const { result, errors } = await handleFile(

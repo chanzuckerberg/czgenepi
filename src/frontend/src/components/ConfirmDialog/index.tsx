@@ -13,6 +13,8 @@ export interface ConfirmDialogProps {
   withCloseIcon?: boolean;
   disableBackdropClick?: boolean;
   isConfirmButtonClickable?: boolean;
+  cancelButtonText?: string;
+  continueButtonText?: string;
 }
 
 export default function ConfirmDialog({
@@ -24,12 +26,14 @@ export default function ConfirmDialog({
   title,
   content,
   footer,
+  cancelButtonText = "Cancel",
+  continueButtonText = "Continue",
 }: ConfirmDialogProps): JSX.Element {
   const confirmButton = (
     <div onClick={onConfirm}>
       {customConfirmButton ?? (
         <Button sdsType="primary" sdsStyle="rounded">
-          Continue
+          {continueButtonText}
         </Button>
       )}
     </div>
@@ -37,7 +41,7 @@ export default function ConfirmDialog({
 
   const cancelButton = (
     <Button sdsType="secondary" sdsStyle="rounded" onClick={onClose}>
-      Cancel
+      {cancelButtonText}
     </Button>
   );
 

@@ -2,19 +2,18 @@ import ENV from "src/common/constants/ENV";
 import { jsonToType } from "src/common/utils";
 
 export enum API {
-  USER_INFO = "/api/usergroup",
   USERDATA = "/v2/users/me",
   SAMPLES = "/v2/samples/",
   LOG_IN = "/login",
   LOG_OUT = "/logout",
-  PHYLO_TREES = "/api/phylo_trees",
+  PHYLO_RUNS = "/v2/phylo_runs/",
   SAMPLES_CREATE = "/v2/samples/",
   SAMPLES_FASTA_DOWNLOAD = "/v2/sequences/",
-  PHYLO_TREES_V2 = "/v2/phylo_runs/", // TODO (mlila): convert entire frontend to use new endpoint
   GET_FASTA_URL = "/api/sequences/getfastaurl",
   USHER_TREE_OPTIONS = "/v2/usher/tree_versions/",
   SAMPLES_VALIDATE_IDS = "/v2/samples/validate_ids/",
   LOCATIONS = "/v2/locations/",
+  PANGO_LINEAGES = "/v2/lineages/pango",
 }
 
 export const DEFAULT_HEADERS_MUTATION_OPTIONS: RequestInit = {
@@ -197,16 +196,20 @@ const SAMPLE_MAP = new Map<string, keyof Sample>([
 export const fetchSamples = (): Promise<SampleResponse> =>
   apiResponse<SampleResponse>(["samples"], [SAMPLE_MAP], API.SAMPLES);
 
-export interface TreeResponse extends APIResponse {
-  phylo_trees: Tree[];
+export interface PhyloRunResponse extends APIResponse {
+  phylo_trees: PhyloRun[];
 }
-const TREE_MAP = new Map<string, keyof Tree>([
-  ["phylo_tree_id", "id"],
-  ["pathogen_genome_count", "pathogenGenomeCount"],
-  ["completed_date", "creationDate"],
+const PHYLO_RUN_MAP = new Map<string, keyof PhyloRun>([
+  ["end_datetime", "endDate"],
+  ["phylo_tree", "phyloTree"],
+  ["start_datetime", "startedDate"],
   ["tree_type", "treeType"],
-  ["started_date", "startedDate"],
   ["workflow_id", "workflowId"],
+  ["workflow_status", "status"],
 ]);
-export const fetchTrees = (): Promise<TreeResponse> =>
-  apiResponse<TreeResponse>(["phylo_trees"], [TREE_MAP], API.PHYLO_TREES);
+export const fetchPhyloRuns = (): Promise<PhyloRunResponse> =>
+  apiResponse<PhyloRunResponse>(
+    ["phylo_runs"],
+    [PHYLO_RUN_MAP],
+    API.PHYLO_RUNS
+  );
