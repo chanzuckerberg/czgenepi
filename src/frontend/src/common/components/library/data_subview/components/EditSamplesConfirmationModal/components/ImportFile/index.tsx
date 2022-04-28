@@ -162,7 +162,8 @@ export default function ImportFile({
         const uploadedFieldsWithData: string[] = [];
         // TODO: replace with a filter call instead
         Object.keys(uploadedMetadataEntry).forEach(function (item) {
-          const uploadedEntry = uploadedMetadataEntry[item as keyof SampleEditMetadataWebform];
+          const uploadedEntry =
+            uploadedMetadataEntry[item as keyof SampleEditMetadataWebform];
           if (uploadedEntry !== "" && uploadedEntry !== undefined)
             uploadedFieldsWithData.push(item);
         });
