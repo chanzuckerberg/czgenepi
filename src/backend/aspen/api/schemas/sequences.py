@@ -1,4 +1,5 @@
 from aspen.api.schemas.base import BaseRequest, BaseResponse
+from typing import Optional
 
 
 class SequenceRequest(BaseRequest):
@@ -7,7 +8,7 @@ class SequenceRequest(BaseRequest):
 
 class FastaURLRequest(BaseRequest):
     samples: list[str]
-    downstream_consumer: str
+    downstream_consumer: Optional[str] = None
 
 
 class FastaURLResponse(BaseResponse):

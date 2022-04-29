@@ -262,9 +262,8 @@ def usher():
 @click.pass_context
 def get_link(ctx, sample_ids):
     api_client = ctx.obj["api_client"]
-    payload = {"samples": sample_ids}
+    payload = {"samples": sample_ids, "downstream_consumer": "USHER"}
     resp = api_client.post("/v2/sequences/getfastaurl", json=payload)
-    print(resp.text)
     resp_info = resp.json()
     s3_url = resp_info["url"]
     print(

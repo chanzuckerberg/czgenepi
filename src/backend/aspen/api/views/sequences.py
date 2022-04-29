@@ -54,8 +54,8 @@ async def getfastaurl(
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_auth_user),
 ):
-    sample_ids = FastaURLRequest.samples
-    downstream_consumer = FastaURLRequest.downstream_consumer
+    sample_ids = request.samples
+    downstream_consumer = request.downstream_consumer
 
     s3_bucket = settings.EXTERNAL_AUSPICE_BUCKET
     s3_resource = boto3.resource(
