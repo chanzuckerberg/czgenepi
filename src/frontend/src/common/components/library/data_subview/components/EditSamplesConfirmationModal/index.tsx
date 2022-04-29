@@ -147,6 +147,15 @@ const EditSamplesConfirmationModal = ({
     changedMetadata,
   ]);
 
+  function resetMetadataFromCheckedSamples() {
+    const structuredMetadata: SampleIdToEditMetadataWebform = {};
+    checkedSamples.forEach((item) => {
+      structuredMetadata[item.privateId] = structureInitialMetadata(item);
+    });
+    setChangedMetadata(null);
+    setMetadata(structuredMetadata);
+  }
+
   useMemo(() => {
     // this is a bit of a hack, currently the modal rerenders itself and the user
     // loses userinput if focus is taken away from the modal,
@@ -160,11 +169,7 @@ const EditSamplesConfirmationModal = ({
       JSON.stringify(currentPrivateIdentifiers) !=
       JSON.stringify(metadataPrivateIdentifiers)
     ) {
-      const structuredMetadata: SampleIdToEditMetadataWebform = {};
-      checkedSamples.forEach((item) => {
-        structuredMetadata[item.privateId] = structureInitialMetadata(item);
-      });
-      setMetadata(structuredMetadata);
+      resetMetadataFromCheckedSamples();
     }
   }, [checkedSamples, metadata]);
 
@@ -290,6 +295,7 @@ const EditSamplesConfirmationModal = ({
               hasImportedMetadataFile={hasImportedMetadataFile}
               setHasImportedMetadataFile={setHasImportedMetadataFile}
               setAutocorrectWarnings={setAutocorrectWarnings}
+              resetMetadataFromCheckedSamples={resetMetadataFromCheckedSamples}
             />
             <WebformTable
               setIsValid={setIsValid}

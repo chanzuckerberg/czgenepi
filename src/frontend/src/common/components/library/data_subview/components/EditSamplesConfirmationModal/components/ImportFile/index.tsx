@@ -36,6 +36,7 @@ interface Props {
   setHasImportedMetadataFile(x: boolean): void;
   setAutocorrectWarnings(x: SampleIdToWarningMessages): void;
   setChangedMetadata: CommonProps["setMetadata"];
+  resetMetadataFromCheckedSamples(): void;
 }
 
 export default function ImportFile({
@@ -47,6 +48,7 @@ export default function ImportFile({
   setHasImportedMetadataFile,
   setAutocorrectWarnings,
   changedMetadata,
+  resetMetadataFromCheckedSamples,
 }: Props): JSX.Element {
   const [missingFields, setMissingFields] = useState<string[] | null>(null);
   const [autocorrectCount, setAutocorrectCount] = useState<number>(0);
@@ -200,6 +202,7 @@ export default function ImportFile({
     <>
       <FilePicker
         handleFiles={handleFiles}
+        resetMetadataFromCheckedSamples={resetMetadataFromCheckedSamples}
         text="Select Metadata File"
         accept=".tsv,.csv"
         shouldConfirm={hasImportedMetadataFile}

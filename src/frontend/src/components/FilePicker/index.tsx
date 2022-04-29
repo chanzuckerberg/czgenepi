@@ -1,5 +1,6 @@
 import { Button } from "czifui";
 import React, { useRef, useState } from "react";
+import { noop } from "src/common/constants/empty";
 import ConfirmDialog from "../ConfirmDialog";
 import { HiddenInput } from "./style";
 
@@ -13,6 +14,8 @@ interface Props {
   confirmTitle?: string;
   confirmContent?: string;
   isDisabled?: boolean;
+  // This prop is used by the edit flow (clears metadata changes when a user imports a new tsv file)
+  resetMetadataFromCheckedSamples?: () => void;
 }
 
 export default function FilePicker({
@@ -25,6 +28,7 @@ export default function FilePicker({
   confirmTitle = "",
   confirmContent = "",
   isDisabled = false,
+  resetMetadataFromCheckedSamples = noop,
 }: Props): JSX.Element {
   const [isOpen, setIsOpen] = useState(false);
   const hiddenFileInput = useRef<HTMLInputElement>(null);
@@ -45,7 +49,7 @@ export default function FilePicker({
 
   function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     const files = (event.target as HTMLInputElement).files;
-
+    resetMetadataFromCheckedSamples();
     handleFiles(files);
   }
 
