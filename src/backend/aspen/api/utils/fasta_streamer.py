@@ -6,7 +6,7 @@ import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
-from aspen.api.utils import authz_samples_cansee
+from aspen.api.utils import authz_sample_filters
 from aspen.database.models import DataType, Sample, UploadedPathogenGenome
 from aspen.database.models.usergroup import User
 
@@ -39,7 +39,7 @@ class FastaStreamer:
             ),
         )
         # Enforce AuthZ
-        self.authz_samples_query = authz_samples_cansee(
+        self.authz_samples_query = authz_sample_filters(
             all_samples_query, sample_ids, user
         )
         # Stream results

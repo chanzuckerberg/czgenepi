@@ -1,5 +1,6 @@
 from aspen.api.utils.authz import (  # noqa: F401
     authz_phylo_tree_filters,
+    authz_sample_filters,
     authz_samples_cansee,
 )
 from aspen.api.utils.fasta_streamer import FastaStreamer  # noqa: F401
