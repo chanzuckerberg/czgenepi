@@ -2,6 +2,7 @@ import os
 from datetime import datetime
 
 import boto3
+import requests
 from sqlalchemy.sql.expression import and_
 
 from aspen.config.docker_compose import DockerComposeConfig
@@ -174,14 +175,14 @@ def create_run(session, group, user, tree_type, status, name=None):
 def create_tree(session, phylo_run):
     tree_type = phylo_run.tree_type
     group = phylo_run.group
-    s3_key = f"{group.name}/{tree_type.value}/{phylo_run.id}/ncov_auspice.json".lower()
+    s3_key = f"phylo_trees/{group.name}/{tree_type.value}/{phylo_run.id}/ncov_auspice.json".lower()
     tree = session.query(PhyloTree).filter(PhyloTree.s3_key == s3_key).first()
     if tree:
         print(f"tree {s3_key} already exists")
         return tree
     print(f"creating tree {s3_key}")
     phylo_tree = PhyloTree(
-        s3_bucket="test_bucket",
+        s3_bucket="genepi-db-data",
         s3_key=s3_key,
         constituent_samples=[],
         name=phylo_run.name,
@@ -300,6 +301,30 @@ def create_samples(session, group, user, location, num_successful, num_failures)
         _ = create_sample(session, group, user, location, suffix, True)
 
 
+def upload_tree_files(session):
+    document_body = None
+    s3_resource = boto3.resource(
+        "s3",
+        endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None,
+        config=boto3.session.Config(signature_version="s3v4"),
+    )
+    trees = session.query(PhyloTree)
+    for tree in trees:
+        s3file = s3_resource.Object(tree.s3_bucket, tree.s3_key)
+        try:
+            _ = s3file.content_length
+            continue
+        except:  # noqa
+            pass
+        if not document_body:
+            print("downloading defaul tree json")
+            document_body = requests.get(
+                "https://data.nextstrain.org/files/ncov/open/oceania/oceania.json"
+            ).content
+        print(f"uploading {tree.s3_bucket}/{tree.s3_key}")
+        s3file.put(Body=document_body)
+
+
 def create_test_data(engine):
     session = engine.make_session()
     _ = create_gisaid(session)
@@ -321,6 +346,8 @@ def create_test_data(engine):
     user2 = create_test_user(session, group2, "tbktu", "Timbuktu User")
     create_samples(session, group2, user2, location2, 10, 10)
     create_test_trees(session, group2, user2)
+
+    upload_tree_files(session)
 
     session.commit()
 
