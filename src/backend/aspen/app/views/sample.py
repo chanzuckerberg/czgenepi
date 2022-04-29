@@ -3,35 +3,10 @@ from uuid import uuid4
 
 import boto3
 import smart_open
-from flask import g, jsonify, request, Response, stream_with_context
+from flask import g, jsonify, request
 
 from aspen.app.app import application, requires_auth
-from aspen.database.connection import session_scope
 from aspen.fileio.fasta_streamer import FastaStreamer
-
-
-@application.route("/api/sequences", methods=["POST"])
-@requires_auth
-def prepare_sequences_download():
-    # stream output file
-    user = g.auth_user
-    fasta_filename = f"{user.group.name}_sample_sequences.fasta"
-    request_data = request.get_json()
-
-    @stream_with_context
-    def stream_samples():
-        with session_scope(application.DATABASE_INTERFACE) as db_session:
-            sample_ids = request_data["requested_sequences"]["sample_ids"]
-            streamer = FastaStreamer(user, sample_ids, db_session)
-            for line in streamer.stream():
-                yield line
-
-    # Detach all ORM objects (makes them read-only!) from the DB session for our generator.
-    g.db_session.expunge_all()
-    generator = stream_samples()
-    resp = Response(generator, mimetype="application/binary")
-    resp.headers["Content-Disposition"] = f"attachment; filename={fasta_filename}"
-    return resp
 
 
 @application.route("/api/sequences/getfastaurl", methods=["POST"])

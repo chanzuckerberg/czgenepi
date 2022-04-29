@@ -6,6 +6,55 @@ from sqlalchemy.sql.expression import and_, or_
 from aspen.database.models import DataType, PhyloRun, PhyloTree, Sample, User
 
 
+def authz_sample_filters(query: Query, sample_ids: Set[str], user: User) -> Query:
+    # No filters for system admins
+    if user.system_admin:
+        query = query.filter(
+            or_(
+                Sample.public_identifier.in_(sample_ids),
+                Sample.private_identifier.in_(sample_ids),
+            )
+        )
+        return query
+
+    # Which groups can this user query public identifiers for?
+    cansee_groups: Set[int] = {
+        cansee.owner_group_id
+        for cansee in user.group.can_see
+        if cansee.data_type == DataType.SEQUENCES
+    }
+    # add the user's own group
+    cansee_groups.add(user.group_id)
+
+    # Which groups can this user query private identifiers for?
+    # NOTE - this asssumes PRIVATE_IDENTIFIERS permission is a superset of SEQUENCES
+    cansee_groups_private_identifiers: Set[int] = {
+        cansee.owner_group_id
+        for cansee in user.group.can_see
+        if cansee.data_type == DataType.PRIVATE_IDENTIFIERS
+    }
+    # add the user's own group
+    cansee_groups_private_identifiers.add(user.group_id)
+
+    cansee_groups.add(user.group_id)
+    query = query.filter(
+        or_(
+            and_(
+                Sample.submitting_group_id.in_(cansee_groups),
+                Sample.public_identifier.in_(sample_ids),
+            ),
+            and_(
+                Sample.submitting_group_id.in_(cansee_groups_private_identifiers),
+                Sample.private_identifier.in_(sample_ids),
+            ),
+        )
+    )
+    query = query.filter(
+        and_(or_(~Sample.private, Sample.submitting_group_id == user.group_id))
+    )
+    return query
+
+
 def authz_samples_cansee(
     query: Query, sample_ids: Optional[Set[str]], user: User
 ) -> Query:
