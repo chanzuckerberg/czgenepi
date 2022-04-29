@@ -12,8 +12,8 @@ import { theme } from "src/common/styles/theme";
 import { setFeatureFlagsFromQueryParams } from "src/common/utils/featureFlags";
 import NavBarLoggedIn from "src/components/NavBar";
 import NavBarLanding from "src/components/NavBarV2";
-import SplitInitializer from "src/components/Split";
 import { SegmentInitializer } from "src/common/analytics/SegmentInitializer";
+import SplitInitializer from "src/components/Split";
 
 const queryClient = new QueryClient();
 setFeatureFlagsFromQueryParams();
