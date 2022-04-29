@@ -141,6 +141,9 @@ export default function ImportFile({
     // Metadata page), short-circuit and do nothing to avoid any weirdness.
     if (!metadata) return;
 
+    // clear all metadata before importing tsv file
+    resetMetadataFromCheckedSamples();
+
     const { data: sampleIdToUploadedMetadata, warningMessages } = result;
 
     const uploadedMetadata: SampleIdToEditMetadataWebform = {};
@@ -202,7 +205,6 @@ export default function ImportFile({
     <>
       <FilePicker
         handleFiles={handleFiles}
-        resetMetadataFromCheckedSamples={resetMetadataFromCheckedSamples}
         text="Select Metadata File"
         accept=".tsv,.csv"
         shouldConfirm={hasImportedMetadataFile}
