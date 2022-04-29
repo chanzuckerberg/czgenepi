@@ -122,7 +122,10 @@ module frontend_service {
   api_url               = local.backend_url
   frontend_url          = local.frontend_url
   remote_dev_prefix     = local.remote_dev_prefix
-  extra_env_vars        = {"SPLIT_FRONTEND_KEY": local.app_secret["SPLIT_FRONTEND_KEY"]}
+  extra_env_vars        = {
+    "SPLIT_FRONTEND_KEY": local.app_secret["SPLIT_FRONTEND_KEY"],
+    "SEGMENT_FRONTEND_KEY": local.app_secret["SEGMENT_FRONTEND_KEY"]
+    }
 
   wait_for_steady_state = local.wait_for_steady_state
 }

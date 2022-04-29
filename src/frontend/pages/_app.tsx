@@ -13,6 +13,7 @@ import { setFeatureFlagsFromQueryParams } from "src/common/utils/featureFlags";
 import NavBarLoggedIn from "src/components/NavBar";
 import NavBarLanding from "src/components/NavBarV2";
 import SplitInitializer from "src/components/Split";
+import { SegmentInitializer } from "src/common/analytics/SegmentInitializer";
 
 const queryClient = new QueryClient();
 setFeatureFlagsFromQueryParams();
@@ -46,6 +47,7 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
           content="minimum-scale=1, initial-scale=1, width=device-width"
         />
       </Head>
+      <SegmentInitializer />
       <QueryClientProvider client={queryClient}>
         <SplitInitializer>
           <StylesProvider injectFirst>
