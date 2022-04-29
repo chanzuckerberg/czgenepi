@@ -39,20 +39,26 @@ interface Props {
   open: boolean;
 }
 
+type MetadataType = SampleIdToEditMetadataWebform | null;
+
+export interface FileUploadProps {
+  uploadedMetadata: MetadataType;
+  changedMetadataUpdated: MetadataType;
+  autocorrectWarnings: SampleIdToWarningMessages;
+}
+
 const EditSamplesConfirmationModal = ({
   checkedSamples,
   onClose,
   open,
 }: Props): JSX.Element | null => {
   const [isValid, setIsValid] = useState(false);
-  const [metadata, setMetadata] =
-    useState<SampleIdToEditMetadataWebform | null>(null);
+  const [metadata, setMetadata] = useState<MetadataType>(null);
   const [isContinueButtonActive, setIsContinueButtonActive] =
     useState<boolean>(false);
   const [isLoseProgessModalOpen, setLoseProgressModalOpen] =
     useState<boolean>(false);
-  const [changedMetadata, setChangedMetadata] =
-    useState<SampleIdToEditMetadataWebform | null>(null);
+  const [changedMetadata, setChangedMetadata] = useState<MetadataType>(null);
   const { data: namedLocationsData } = useNamedLocations();
   const namedLocations: NamedGisaidLocation[] =
     namedLocationsData?.namedLocations ?? [];
@@ -80,6 +86,26 @@ const EditSamplesConfirmationModal = ({
 
   const handleClose = function () {
     setLoseProgressModalOpen(true);
+  };
+
+  const handleCloseLoseProgressModal = () => {
+    setLoseProgressModalOpen(false);
+  };
+
+  const handleConfirmLoseProgressModal = () => {
+    onClose();
+    clearState();
+  };
+
+  const handleMetadataFileUploaded = ({
+    uploadedMetadata,
+    changedMetadataUpdated,
+    autocorrectWarnings,
+  }: FileUploadProps) => {
+    setMetadata(uploadedMetadata);
+    setChangedMetadata(changedMetadataUpdated);
+    setHasImportedMetadataFile(true);
+    setAutocorrectWarnings(autocorrectWarnings);
   };
 
   const updateChangedMetadata = useCallback(
@@ -162,13 +188,6 @@ const EditSamplesConfirmationModal = ({
   }, [checkedSamples, metadata]);
 
   const numSamples = checkedSamples.length;
-  const title = "Edit Sample Metadata";
-
-  const closeIcon = (
-    <StyledIconButton onClick={handleClose}>
-      <CloseIcon />
-    </StyledIconButton>
-  );
 
   const { templateInstructionRows, templateHeaders, templateRows } =
     useMemo(() => {
@@ -197,9 +216,13 @@ const EditSamplesConfirmationModal = ({
         onClose={handleClose}
       >
         <DialogTitle>
-          <StyledDiv>{closeIcon}</StyledDiv>
+          <StyledDiv>
+            <StyledIconButton onClick={handleClose}>
+              <CloseIcon />
+            </StyledIconButton>
+          </StyledDiv>
           <StyledPreTitle>Step 1 of 2</StyledPreTitle>
-          <Title>{title}</Title>
+          <Title>Edit Sample Metadata</Title>
           <StyledSubTitle>
             {numSamples} {pluralize("Sample", numSamples)} Selected
           </StyledSubTitle>
@@ -208,9 +231,8 @@ const EditSamplesConfirmationModal = ({
           <Content>
             <LoseProgressModal
               isModalOpen={isLoseProgessModalOpen}
-              setIsModalOpen={setLoseProgressModalOpen}
-              onClose={onClose}
-              clearState={clearState}
+              onClose={handleCloseLoseProgressModal}
+              onConfirm={handleConfirmLoseProgressModal}
             />
             <EditSampleMetaDataInstructions
               templateInstructionRows={templateInstructionRows}
@@ -221,11 +243,8 @@ const EditSamplesConfirmationModal = ({
               metadata={metadata}
               changedMetadata={changedMetadata}
               namedLocations={namedLocations}
-              setMetadata={setMetadata}
-              setChangedMetadata={setChangedMetadata}
               hasImportedMetadataFile={hasImportedMetadataFile}
-              setHasImportedMetadataFile={setHasImportedMetadataFile}
-              setAutocorrectWarnings={setAutocorrectWarnings}
+              onMetadataFileUploaded={handleMetadataFileUploaded}
             />
             <WebformTable
               setIsValid={setIsValid}
