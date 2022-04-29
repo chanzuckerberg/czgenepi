@@ -1,5 +1,6 @@
-from aspen.api.schemas.base import BaseRequest, BaseResponse
 from typing import Optional
+
+from aspen.api.schemas.base import BaseRequest, BaseResponse
 
 
 class SequenceRequest(BaseRequest):
