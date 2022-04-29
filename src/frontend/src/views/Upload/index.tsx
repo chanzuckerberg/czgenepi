@@ -1,13 +1,10 @@
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { ROUTES } from "src/common/routes";
+import { SampleIdToMetadata } from "src/components/WebformTable/common/types";
 import { useProtectedRoute } from "../../common/queries/auth";
 import { useNamedLocations } from "../../common/queries/locations";
-import {
-  Props,
-  SampleIdToMetadata,
-  Samples as ISamples,
-} from "./components/common/types";
+import { Props, Samples as ISamples } from "./components/common/types";
 import { initSampleMetadata } from "./components/common/utils";
 import Metadata from "./components/Metadata";
 import Review from "./components/Review";

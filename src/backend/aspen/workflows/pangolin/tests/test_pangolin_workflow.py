@@ -102,6 +102,7 @@ def test_pangolin_save(mocker, session, postgres_database):
         save_cli,
         ["--pangolin-csv", pangolin_csv, "--pangolin-last-updated", "05-03-2021"],
     )
+
     assert result.exit_code == 0
 
     # start new transaction
@@ -109,9 +110,9 @@ def test_pangolin_save(mocker, session, postgres_database):
     session.begin()
 
     for pathogen_genome in session.query(UploadedPathogenGenome).all():
-        assert pathogen_genome.pangolin_lineage == "B.1.590"
+        assert pathogen_genome.pangolin_lineage == "B"
         assert pathogen_genome.pangolin_probability == 100.0
         assert pathogen_genome.pangolin_last_updated == datetime.strptime(
             "05-03-2021", "%m-%d-%Y"
         )
-        assert pathogen_genome.pangolin_version == "2021-04-23"
+        assert pathogen_genome.pangolin_version == "PANGO-v1.2.133"

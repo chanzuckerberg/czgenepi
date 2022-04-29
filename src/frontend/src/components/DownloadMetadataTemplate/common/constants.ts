@@ -6,7 +6,7 @@ export const OPTIONAL_HEADER_MARKER = " - Optional";
 
 // Internal keys we use to represent to various kinds of metadata on a sample
 // and the user-visible name we give the info, seen as a header on column.
-const BASE_METADATA_HEADERS = {
+export const BASE_METADATA_HEADERS = {
   // Headers that are shared between upload and edit sample metadata tsvs
   collectionDate: "Collection Date",
   collectionLocation: "Collection Location",

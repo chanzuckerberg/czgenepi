@@ -7,8 +7,9 @@ import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { createSamples } from "src/common/queries/samples";
 import { ROUTES } from "src/common/routes";
 import Dialog from "src/components/Dialog";
+import { SampleIdToMetadata } from "src/components/WebformTable/common/types";
 import { ContinueButton } from "../../../common/style";
-import { SampleIdToMetadata, Samples } from "../../../common/types";
+import { Samples } from "../../../common/types";
 import {
   ImageWrapper,
   StyledDialogActions,

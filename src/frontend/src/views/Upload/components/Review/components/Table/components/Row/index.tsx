@@ -1,5 +1,5 @@
 import React from "react";
-import { Metadata } from "src/views/Upload/components/common/types";
+import { Metadata } from "src/components/WebformTable/common/types";
 import {
   Id,
   IsPrivateContent,
@@ -24,6 +24,15 @@ export default React.memo(function Row({ id, metadata }: Props): JSX.Element {
     publicId,
   } = metadata;
 
+  const collectionLocationName = () => {
+    // collection location will always be a NamedGisaidLocation at this stage,
+    // the only time collectionLocation will be a string is during tsv upload
+    // where collectionLocation can be "DELETE" (when a user wants to clear a value)
+    if (collectionLocation && typeof collectionLocation !== "string") {
+      return collectionLocation.name;
+    }
+  };
+
   return (
     <StyledTableRow component="div">
       <StyledTableCell component="div">
@@ -33,7 +42,7 @@ export default React.memo(function Row({ id, metadata }: Props): JSX.Element {
       <StyledTableCell component="div">{publicId || "--"}</StyledTableCell>
       <StyledTableCell component="div">{collectionDate}</StyledTableCell>
       <StyledTableCell component="div">
-        {collectionLocation!.name}
+        {collectionLocationName()}
       </StyledTableCell>
       <StyledTableCell component="div">
         {sequencingDate || "--"}

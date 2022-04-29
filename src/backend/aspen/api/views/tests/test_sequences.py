@@ -103,7 +103,7 @@ async def test_prepare_sequences_download_no_private_id_access(
     CanSee(
         viewer_group=viewer_group,
         owner_group=owner_group,
-        data_type=DataType.METADATA,
+        data_type=DataType.SEQUENCES,
     )
     async_session.add_all((owner_group, viewer_group, user, sample))
     await async_session.commit()
@@ -151,7 +151,7 @@ async def test_access_matrix(
     CanSee(
         viewer_group=viewer_group,
         owner_group=owner_group1,
-        data_type=DataType.METADATA,
+        data_type=DataType.SEQUENCES,
     )
     CanSee(
         viewer_group=viewer_group,

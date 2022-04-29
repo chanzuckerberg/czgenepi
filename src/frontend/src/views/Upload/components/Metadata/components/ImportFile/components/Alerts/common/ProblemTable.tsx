@@ -42,7 +42,11 @@ interface Props {
  * within a row, each entry should be unique and each column header should be
  * unique as well. For its current usage, this will always be true.
  */
-export function ProblemTable({ tablePreamble, columnHeaders, rows }: Props) {
+export function ProblemTable({
+  tablePreamble,
+  columnHeaders,
+  rows,
+}: Props): JSX.Element {
   return (
     <FullWidthContainer>
       {tablePreamble || null}

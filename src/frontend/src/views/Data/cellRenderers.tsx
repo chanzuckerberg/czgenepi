@@ -16,7 +16,7 @@ import SampleIcon from "src/common/icons/Sample.svg";
 import { createTableCellRenderer } from "src/common/utils";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { CZ_BIOHUB_GROUP } from "src/views/Data/constants";
-import { Lineage, LineageTooltip } from "./components/LineageTooltip";
+import { LineageTooltip } from "./components/LineageTooltip";
 import { TreeActionMenu } from "./components/TreeActionMenu";
 import TreeTableNameCell from "./components/TreeTableNameCell";
 import { TreeTypeTooltip } from "./components/TreeTypeTooltip";
@@ -87,7 +87,10 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
     );
 
     return hasLineage ? (
-      <Tooltip title={<LineageTooltip lineage={value as Lineage} />}>
+      <Tooltip
+        title={<LineageTooltip lineage={value as Lineage} />}
+        width="wide"
+      >
         {Content}
       </Tooltip>
     ) : (
@@ -177,7 +180,7 @@ const TREE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
   },
   name: TreeTableNameCell,
   startedDate: ({ value, header }): JSX.Element => {
-    const dateNoTime = value.split(" ")[0];
+    const dateNoTime = datetimeWithTzToLocalDate(value.split(" ")[0]);
     return (
       <TreeRowContent header={header}>
         <div data-test-id={`row-${header.key}`}>{dateNoTime}</div>

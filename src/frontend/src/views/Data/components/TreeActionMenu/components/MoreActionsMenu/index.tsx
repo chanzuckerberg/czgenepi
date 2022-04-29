@@ -2,16 +2,15 @@ import { Menu, MenuItem, Tooltip } from "czifui";
 import React, { MouseEventHandler, useState } from "react";
 import { TREE_STATUS } from "src/common/constants/types";
 import MoreActionsIcon from "src/common/icons/IconDotsHorizontal3Large.svg";
-import { UserResponse } from "src/common/queries/auth";
 import { StyledEditIcon, StyledTrashIcon } from "src/common/styles/iconStyle";
 import { StyledIcon, StyledIconWrapper } from "../../style";
 import { StyledText } from "./style";
 
 interface Props {
-  item: Tree;
-  onDeleteTreeModalOpen(t: Tree): void;
-  onEditTreeModalOpen(t: Tree): void;
-  userInfo: UserResponse;
+  item: PhyloRun;
+  onDeleteTreeModalOpen(t: PhyloRun): void;
+  onEditTreeModalOpen(t: PhyloRun): void;
+  userInfo: User;
 }
 
 const MoreActionsMenu = ({
@@ -29,7 +28,7 @@ const MoreActionsMenu = ({
   const isTreeInUserOrg = userGroup?.name === group?.name;
   const canUserDeleteTree = isAutoBuild || isTreeInUserOrg;
   // FIXME: allow users to edit/delete FAILED runs once phylotrees V2 endpoint has been updated to better reflect tree status
-  const isDisabled = status !== TREE_STATUS.Completed || !canUserDeleteTree;
+  const isDisabled = status === TREE_STATUS.Started || !canUserDeleteTree;
 
   let tooltipText = "More Actions";
 

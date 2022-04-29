@@ -57,5 +57,6 @@ COPY --from=build \
 ENV PYTHONPATH=.
 
 COPY . .
+# By default, Poetry installs deps, dev deps, and the project package (aspen)
 RUN cd aspen && /opt/poetry/bin/poetry install
 CMD ["/usr/local/bin/supervisord", "-c", "/usr/src/app/etc/supervisord.conf"]

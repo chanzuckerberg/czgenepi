@@ -24,7 +24,10 @@ def get_probability(row: dict) -> Optional[int]:
     """
     if row["ambiguity_score"]:
         return round(float(row["ambiguity_score"]) * 100)
-    elif "Assigned using designation hash" in row["note"]:
+    elif (
+        "Assigned using designation hash" in row["note"]
+        or "Assigned from designation hash" in row["note"]
+    ):
         return 100
     else:
         return None
@@ -40,11 +43,14 @@ def cli(pangolin_fh: io.TextIOBase, pangolin_last_updated: datetime):
 
     with session_scope(interface) as session:
         pango_csv: csv.DictReader = csv.DictReader(pangolin_fh)
-        taxon_to_pango_info: Mapping[int, Mapping[str, Union[str, float, None]]] = {
+        taxon_to_pango_info: Mapping[
+            int, Mapping[str, Union[str, float, Mapping, None]]
+        ] = {
             int(row["taxon"]): {
                 "lineage": row["lineage"],
                 "probability": get_probability(row),
-                "version": row["pangoLEARN_version"],
+                "version": row["version"],
+                "full_output": {k: v for k, v in row.items() if v and k != "taxon"},
             }
             for row in pango_csv
         }
@@ -57,13 +63,14 @@ def cli(pangolin_fh: io.TextIOBase, pangolin_last_updated: datetime):
         }
 
         for entity_id, pathogen_genome in entity_id_to_pathogen_genome.items():
-            pango_info: Mapping[str, Union[str, float, None]] = taxon_to_pango_info[
-                entity_id
-            ]
+            pango_info: Mapping[
+                str, Union[str, float, None, Mapping]
+            ] = taxon_to_pango_info[entity_id]
             pathogen_genome.pangolin_last_updated = pangolin_last_updated
             pathogen_genome.pangolin_lineage = pango_info["lineage"]  # type: ignore
             pathogen_genome.pangolin_probability = pango_info["probability"]  # type: ignore
             pathogen_genome.pangolin_version = pango_info["version"]  # type: ignore
+            pathogen_genome.pangolin_output = pango_info["full_output"]  # type: ignore
             session.commit()
 
 

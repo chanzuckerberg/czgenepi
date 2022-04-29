@@ -6,8 +6,8 @@ import React, { FunctionComponent, useEffect, useMemo, useState } from "react";
 import { Menu } from "semantic-ui-react";
 import { HeadAppTitle } from "src/common/components";
 import { useProtectedRoute } from "src/common/queries/auth";
+import { usePhyloRunInfo } from "src/common/queries/phyloRuns";
 import { useSampleInfo } from "src/common/queries/samples";
-import { useTreeInfo } from "src/common/queries/trees";
 import { FilterPanel } from "src/components/FilterPanel";
 import { DataSubview } from "../../common/components";
 import { EMPTY_OBJECT } from "../../common/constants/empty";
@@ -19,7 +19,7 @@ import { FilterPanelToggle } from "./components/FilterPanelToggle";
 import { SAMPLE_HEADERS, SAMPLE_SUBHEADERS, TREE_HEADERS } from "./headers";
 import style from "./index.module.scss";
 import { Container, FlexContainer } from "./style";
-import { TREE_TRANSFORMS } from "./transforms";
+import { PHYLO_RUN_TRANSFORMS } from "./transforms";
 
 // reduces an array of objects to a mapping between the keyString arg and the objects
 // that make up the array. Effective for quickly looking up objects by id, for example.
@@ -69,9 +69,9 @@ const Data: FunctionComponent = () => {
   const router = useRouter();
 
   const sampleResponse = useSampleInfo();
-  const treeResponse = useTreeInfo();
+  const PhyloRunResponse = usePhyloRunInfo();
   const { data: sampleData, isLoading: isSampleInfoLoading } = sampleResponse;
-  const { data: treeData, isLoading: isTreeInfoLoading } = treeResponse;
+  const { data: phyloRunData, isLoading: isTreeInfoLoading } = PhyloRunResponse;
 
   useEffect(() => {
     setIsDataLoading(true);
@@ -79,17 +79,16 @@ const Data: FunctionComponent = () => {
     setIsDataLoading(false);
   }, [isTreeInfoLoading, isSampleInfoLoading]);
 
-  const { samples, trees } = useMemo(
+  const { samples, phyloRuns } = useMemo(
     () => ({
       samples: transformData(sampleData?.samples ?? [], "publicId"),
-      // use workflowID as key (failed and started phylotrees do not have an associated PhyloTree ID since they are technically only PhyloRun objects)
-      trees: transformData(
-        treeData?.phylo_trees ?? [],
-        "workflowId",
-        TREE_TRANSFORMS
+      phyloRuns: transformData(
+        phyloRunData?.phylo_runs ?? [],
+        "id",
+        PHYLO_RUN_TRANSFORMS
       ),
     }),
-    [sampleData, treeData]
+    [sampleData, phyloRunData]
   );
 
   useEffect(() => {
@@ -112,7 +111,7 @@ const Data: FunctionComponent = () => {
       to: ROUTES.DATA_SAMPLES,
     },
     {
-      data: trees,
+      data: phyloRuns,
       defaultSortKey: ["startedDate"],
       headers: TREE_HEADERS,
       isDataLoading,

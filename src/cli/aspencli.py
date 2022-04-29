@@ -293,11 +293,45 @@ def me(ctx):
     print(resp.text)
 
 
+@user.command(name="update-me")
+@click.option(
+    "--agreed-to-tos",
+    required=True,
+    type=bool,
+    help="whether the user has agreed to the ToS",
+)
+@click.option(
+    "--ack-policy-version",
+    required=True,
+    type=str,
+    help="YYYY-MM-DD of the policy version the user agreed to",
+)
+@click.pass_context
+def update_me(ctx, agreed_to_tos, ack_policy_version):
+    api_client = ctx.obj["api_client"]
+    params = {
+        "agreed_to_tos": agreed_to_tos,
+        "acknowledged_policy_version": ack_policy_version,
+    }
+    resp = api_client.put("/v2/users/me", json=params)
+    print(resp.text)
+
+
 @user.command(name="create")
 @click.argument("email")
 @click.option("--name", required=True, type=str, help="The user's name.")
-@click.option("--group_id", required=True, type=str, help="The id of the group to create the user in.")
-@click.option("--auth0_user_id", required=True, type=str, help="The auth0 identifier attached to the user's auth0 account.")
+@click.option(
+    "--group_id",
+    required=True,
+    type=str,
+    help="The id of the group to create the user in.",
+)
+@click.option(
+    "--auth0_user_id",
+    required=True,
+    type=str,
+    help="The auth0 identifier attached to the user's auth0 account.",
+)
 @click.option("--group_admin", is_flag=True, default=False)
 @click.option("--system_admin", is_flag=True, default=False)
 @click.pass_context
@@ -355,7 +389,7 @@ def download_tree(ctx, tree_id, public_ids):
         params["id_style"] = "public"
     else:
         params["id_style"] = "private"
-    resp = api_client.get(f"/api/phylo_tree/{tree_id}", params=params)
+    resp = api_client.get(f"/v2/phylo_trees/{tree_id}/download", params=params)
     print(resp.text)
 
 
@@ -370,7 +404,7 @@ def get_tree_sample_ids(ctx, tree_id, public_ids):
         params["id_style"] = "public"
     else:
         params["id_style"] = "private"
-    resp = api_client.get(f"/api/phylo_tree/sample_ids/{tree_id}", params=params)
+    resp = api_client.get(f"/v2/phylo_trees/{tree_id}/sample_ids", params=params)
     print(resp.text)
 
 

@@ -1,18 +1,21 @@
 import React from "react";
 import { B } from "src/common/styles/basicStyle";
+import { pluralize } from "src/common/utils/strUtils";
 import AlertAccordion from "src/components/AlertAccordion";
-import { ERROR_CODE } from "src/views/Upload/components/common/types";
-import { maybePluralize } from "./common/pluralize";
+import {
+  BASE_ERROR_CODE,
+  ERROR_CODE,
+} from "src/components/WebformTable/common/types";
 import { ProblemTable } from "./common/ProblemTable";
 import { Td, Th } from "./common/style";
 
 interface Props {
   names?: string[] | null;
-  errorCode?: ERROR_CODE;
+  errorCode?: BASE_ERROR_CODE;
 }
 
 const ERROR_CODE_TO_MESSAGE: Record<
-  ERROR_CODE,
+  BASE_ERROR_CODE,
   ((props: MessageProps) => JSX.Element) | string
 > = {
   [ERROR_CODE.INVALID_NAME]: InvalidNameMessage,
@@ -30,14 +33,19 @@ export default function Error({
   const count = names.length;
 
   const errorCodeToTitle = {
-    [ERROR_CODE.INVALID_NAME]: `Please double check the following ${maybePluralize(
-      "sample",
-      count
-    )} to correct any errors before proceeding:`,
-    [ERROR_CODE.MISSING_FIELD]: "Import Failed, file missing required field.",
+    [ERROR_CODE.INVALID_NAME]: (
+      <B>
+        Please double check the following {pluralize("sample", count)} to
+        correct any errors before proceeding:
+      </B>
+    ),
+    [ERROR_CODE.MISSING_FIELD]: (
+      <B>Import Failed, file missing required field.</B>
+    ),
     [ERROR_CODE.OVER_MAX_SAMPLES]: "placeholder",
-    [ERROR_CODE.DEFAULT]:
-      "Something went wrong, please try again or contact us!",
+    [ERROR_CODE.DEFAULT]: (
+      <B>Something went wrong, please try again or contact us!</B>
+    ),
   };
 
   const title = errorCodeToTitle[errorCode];
@@ -46,8 +54,8 @@ export default function Error({
   return (
     <AlertAccordion
       title={title}
-      message={<Message names={names} />}
-      severity="error"
+      collapseContent={<Message names={names} />}
+      intent="error"
     />
   );
 }
