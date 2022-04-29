@@ -20,7 +20,6 @@ async def prepare_sequences_download(
     user: User = Depends(get_auth_user),
 ):
     # stream output file
-    print("Request: ", request)
     fasta_filename = f"{user.group.name}_sample_sequences.fasta"
 
     async def stream_samples():
