@@ -27,7 +27,7 @@ interface CustomTableRenderProps {
   value?: JSONPrimitive | Record<string, JSONPrimitive>;
   item: TableItem;
   index: number;
-  userInfo?: UserResponse;
+  userInfo?: User;
   onDeleteTreeModalOpen(t: PhyloRun): void;
   onEditTreeModalOpen(t: PhyloRun): void;
 }

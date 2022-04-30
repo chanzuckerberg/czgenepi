@@ -31,10 +31,10 @@ export default function Review({
   metadata,
   cancelPrompt,
 }: Props): JSX.Element {
-  const { data } = useUserInfo();
+  const { data: userInfo } = useUserInfo();
   const [isConsentChecked, setIsConsentChecked] = useState(false);
 
-  const group = data?.group;
+  const group = userInfo?.group;
 
   const numOfSamples = Object.keys(samples || EMPTY_OBJECT).length;
 

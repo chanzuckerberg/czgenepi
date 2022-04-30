@@ -11,9 +11,9 @@ import { Logo, LogoAnchor } from "./style";
 export const NAV_BAR_HEIGHT_PX = 50;
 
 const NavBarLoggedIn = (): JSX.Element => {
-  const { data } = useUserInfo();
+  const { data: userInfo } = useUserInfo();
 
-  const group = data?.group;
+  const group = userInfo?.group;
 
   const orgElements = (
     <React.Fragment>
@@ -32,7 +32,7 @@ const NavBarLoggedIn = (): JSX.Element => {
 
   const orgSplash = hasOrg();
 
-  const route = data ? ROUTES.DATA : ROUTES.HOMEPAGE;
+  const route = userInfo ? ROUTES.DATA : ROUTES.HOMEPAGE;
 
   return (
     <div className={style.bar} data-test-id="navbar">
