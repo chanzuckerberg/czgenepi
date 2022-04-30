@@ -262,9 +262,8 @@ def usher():
 @click.pass_context
 def get_link(ctx, sample_ids):
     api_client = ctx.obj["api_client"]
-    payload = {"samples": sample_ids}
-    resp = api_client.post("/api/sequences/getfastaurl", json=payload)
-    print(resp.text)
+    payload = {"samples": sample_ids, "downstream_consumer": "USHER"}
+    resp = api_client.post("/v2/sequences/getfastaurl", json=payload)
     resp_info = resp.json()
     s3_url = resp_info["url"]
     print(
@@ -290,6 +289,30 @@ def user():
 def me(ctx):
     api_client = ctx.obj["api_client"]
     resp = api_client.get("/v2/users/me")
+    print(resp.text)
+
+
+@user.command(name="update-me")
+@click.option(
+    "--agreed-to-tos",
+    required=True,
+    type=bool,
+    help="whether the user has agreed to the ToS",
+)
+@click.option(
+    "--ack-policy-version",
+    required=True,
+    type=str,
+    help="YYYY-MM-DD of the policy version the user agreed to",
+)
+@click.pass_context
+def update_me(ctx, agreed_to_tos, ack_policy_version):
+    api_client = ctx.obj["api_client"]
+    params = {
+        "agreed_to_tos": agreed_to_tos,
+        "acknowledged_policy_version": ack_policy_version,
+    }
+    resp = api_client.put("/v2/users/me", json=params)
     print(resp.text)
 
 
@@ -429,7 +452,7 @@ def list_samples(ctx):
 def download_samples(ctx, sample_ids):
     api_client = ctx.obj["api_client"]
     payload = {"requested_sequences": {"sample_ids": sample_ids}}
-    resp = api_client.post("/api/sequences", json=payload)
+    resp = api_client.post("/v2/sequences", json=payload)
     print(resp.headers)
     print(resp.text)
 

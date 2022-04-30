@@ -38,7 +38,7 @@ export default function AgreeTerms(): JSX.Element | null {
     // Once we show, we no longer consider redirecting.
     // But before we show, we need to wait for userInfo to load.
     if (!isTosViewable && !isLoadingUserInfo) {
-      const agreedToTOS = userInfo?.user?.agreedToTos;
+      const agreedToTOS = userInfo?.agreedToTos;
       if (!userInfo) {
         // Lack of userInfo implicitly means user is not logged in.
         router.push(ROUTES.HOMEPAGE);

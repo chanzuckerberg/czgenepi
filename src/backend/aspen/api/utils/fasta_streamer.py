@@ -1,11 +1,12 @@
 import re
 from enum import Enum
-from typing import Iterator, Optional, Set
+from typing import AsyncGenerator, Optional, Set
 
-from sqlalchemy.orm import joinedload, Session
-from sqlalchemy.orm.query import Query
+import sqlalchemy as sa
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
-from aspen.app.views.api_utils import authz_sample_filters
+from aspen.api.utils import authz_sample_filters
 from aspen.database.models import DataType, Sample, UploadedPathogenGenome
 from aspen.database.models.usergroup import User
 
@@ -19,11 +20,12 @@ class SpecialtyDownstreams(Enum):
 class FastaStreamer:
     def __init__(
         self,
+        db: AsyncSession,
         user: User,
         sample_ids: Set[str],
-        db_session: Session,
         downstream_consumer: Optional[str] = None,
     ):
+        self.db = db
         self.user = user
         self.cansee_groups_private_identifiers: Set[int] = {
             cansee.owner_group_id
@@ -31,24 +33,22 @@ class FastaStreamer:
             if cansee.data_type == DataType.PRIVATE_IDENTIFIERS
         }
         # query for samples
-        self.all_samples: Query = (
-            db_session.query(Sample)
-            .yield_per(
-                5
-            )  # Streams a few DB rows at a time but our query must return one row per resolved object.
-            .options(
-                joinedload(Sample.uploaded_pathogen_genome, innerjoin=True).undefer(
-                    UploadedPathogenGenome.sequence
-                ),
-            )
+        all_samples_query = sa.select(Sample).options(  # type: ignore
+            joinedload(Sample.uploaded_pathogen_genome, innerjoin=True).undefer(  # type: ignore
+                UploadedPathogenGenome.sequence
+            ),
         )
         # Enforce AuthZ
-        self.all_samples = authz_sample_filters(self.all_samples, sample_ids, user)
+        self.authz_samples_query = authz_sample_filters(
+            all_samples_query, sample_ids, user
+        )
+        # Stream results
         # Certain consumers have different requirements on fasta
         self.downstream_consumer = downstream_consumer
 
-    def stream(self) -> Iterator[str]:
-        for sample in self.all_samples:
+    async def stream(self) -> AsyncGenerator[str, None]:
+        all_samples = await self.db.stream(self.authz_samples_query)
+        async for sample in all_samples.scalars():
             if sample.uploaded_pathogen_genome:
                 pathogen_genome: UploadedPathogenGenome = (
                     sample.uploaded_pathogen_genome

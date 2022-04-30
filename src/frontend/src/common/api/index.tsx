@@ -2,15 +2,14 @@ import ENV from "src/common/constants/ENV";
 import { jsonToType } from "src/common/utils";
 
 export enum API {
-  USER_INFO = "/api/usergroup",
   USERDATA = "/v2/users/me",
   SAMPLES = "/v2/samples/",
   LOG_IN = "/login",
   LOG_OUT = "/logout",
   PHYLO_RUNS = "/v2/phylo_runs/",
   SAMPLES_CREATE = "/v2/samples/",
-  SAMPLES_FASTA_DOWNLOAD = "/api/sequences",
-  GET_FASTA_URL = "/api/sequences/getfastaurl",
+  SAMPLES_FASTA_DOWNLOAD = "/v2/sequences/",
+  GET_FASTA_URL = "/v2/sequences/getfastaurl",
   USHER_TREE_OPTIONS = "/v2/usher/tree_versions/",
   SAMPLES_VALIDATE_IDS = "/v2/samples/validate_ids/",
   LOCATIONS = "/v2/locations/",

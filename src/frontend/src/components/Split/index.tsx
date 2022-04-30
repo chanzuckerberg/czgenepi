@@ -33,7 +33,7 @@ import { SplitFactory } from "@splitsoftware/splitio-react";
 import { TreatmentsWithConfig } from "@splitsoftware/splitio/types/splitio";
 import React, { useEffect, useState } from "react";
 import ENV from "src/common/constants/ENV";
-import { useUserData } from "src/common/queries/auth";
+import { useUserInfo } from "src/common/queries/auth";
 
 /**
  * Canonical listing of all Split feature flags FE needs to know about.
@@ -105,12 +105,12 @@ interface Props {
  * functionality of our dev server because the config won't be rebuilt.
  */
 const SplitInitializer = ({ children }: Props): JSX.Element | null => {
-  const { data: userData, isLoading: isLoadingUserInfo } = useUserData();
+  const { data: userInfo, isLoading: isLoadingUserInfo } = useUserInfo();
   const [splitConfig, setSplitConfig] =
     useState<SplitIO.IBrowserSettings | null>(null);
 
   useEffect(() => {
-    // Don't do any work until we've fetched userData
+    // Don't do any work until we've fetched userInfo
     if (isLoadingUserInfo) {
       return;
     }
@@ -118,7 +118,7 @@ const SplitInitializer = ({ children }: Props): JSX.Element | null => {
     const splitConf: SplitIO.IBrowserSettings = {
       core: {
         authorizationKey: ENV.SPLIT_FRONTEND_KEY,
-        key: userData?.split_id || "anonymous",
+        key: userInfo?.splitId || "anonymous",
       },
     };
     if (splitConf.core.authorizationKey === SPLIT_LOCALHOST_ONLY_MODE) {
@@ -132,7 +132,7 @@ const SplitInitializer = ({ children }: Props): JSX.Element | null => {
     }
 
     setSplitConfig(splitConf);
-  }, [isLoadingUserInfo, userData]);
+  }, [isLoadingUserInfo, userInfo]);
 
   if (!splitConfig) {
     // If we haven't fetched a userinfo response yet, don't enable split.
