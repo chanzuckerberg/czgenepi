@@ -45,6 +45,7 @@ const SampleEditTsvTemplateDownload = ({
     <CSVLink
       className={className}
       filename="metadata_template.tsv"
+      enclosingCharacter={""}
       separator={TSV_SEPARATOR}
       data={[...instructions, headers, ...rows]}
     >
