@@ -6,8 +6,8 @@ from collections.abc import MutableSequence
 from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, Column, Date, ForeignKey, Integer, String, text
-from sqlalchemy.orm import backref, relationship
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.orm import backref, relationship
 
 from aspen.database.models.base import idbase
 from aspen.database.models.locations import Location
@@ -40,7 +40,6 @@ class Group(idbase, DictMixin):  # type: ignore
         nullable=True,
     )
     default_tree_location = relationship("Location")  # type: ignore
-
 
     # Expected json structure:
     # { schedule_expression: list[int] }

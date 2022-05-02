@@ -4,6 +4,7 @@
 # AWS_REGION
 # GENEPI_CONFIG_SECRET_NAME
 # REMOTE_DEV_PREFIX (if set)
+# DEPLOYMENT_STAGE
 
 set -Eeuxo pipefail
 shopt -s inherit_errexit

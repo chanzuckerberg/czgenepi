@@ -7,6 +7,7 @@ workflow nextstrain {
         String aws_region = "us-west-2"
         String genepi_config_secret_name
         String remote_dev_prefix = ""
+        String deployment_stage
     }
 
     call nextstrain_workflow {
@@ -15,6 +16,7 @@ workflow nextstrain {
         aws_region = aws_region,
         genepi_config_secret_name = genepi_config_secret_name,
         remote_dev_prefix = remote_dev_prefix,
+        deployment_stage = deployment_stage
     }
 }
 
@@ -25,6 +27,7 @@ task nextstrain_workflow {
         String aws_region
         String genepi_config_secret_name
         String remote_dev_prefix
+        String deployment_stage
     }
 
     command <<<
@@ -35,6 +38,7 @@ task nextstrain_workflow {
     if [ "~{remote_dev_prefix}" != "" ]; then
         export REMOTE_DEV_PREFIX="~{remote_dev_prefix}"
     fi
+    export DEPLOYMENT_STAGE="~{deployment_stage}"
 
     # Just in case the run script bails out before defining these vars
     ncov_git_rev=""
