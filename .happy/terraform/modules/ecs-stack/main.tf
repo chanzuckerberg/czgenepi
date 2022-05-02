@@ -260,6 +260,28 @@ module nextstrain_template_sfn_config {
   }
 }
 
+module nextstrain_autorun_sfn_config {
+  source   = "../sfn_config"
+  app_name = "nextstrain-autorun-sfn"
+  image    = local.backend_image
+  vcpus    = 10
+  memory   = 64000
+  wdl_path = "workflows/nextstrain-autorun.wdl"
+  custom_stack_name     = local.custom_stack_name
+  deployment_stage      = local.deployment_stage
+  remote_dev_prefix     = local.remote_dev_prefix
+  stack_resource_prefix = local.stack_resource_prefix
+  swipe_comms_bucket    = local.swipe_comms_bucket
+  swipe_wdl_bucket      = local.swipe_wdl_bucket
+  sfn_arn               = local.swipe_sfn_arn
+  schedule_expressions  = local.deployment_stage == "geprod" ? ["cron(0 3 ? * MON-SAT *)"] : []
+  event_role_arn        = local.event_role_arn
+  extra_args            =  {
+    genepi_config_secret_name = local.app_secret_name
+    remote_dev_prefix = local.remote_dev_prefix
+  }
+}
+
 module nextstrain_ondemand_template_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-ondemand-sfn"

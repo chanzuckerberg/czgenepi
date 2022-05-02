@@ -7,7 +7,6 @@ workflow nextstrain {
         String aws_region = "us-west-2"
         String genepi_config_secret_name
         String remote_dev_prefix = ""
-        String template_args
     }
 
     call nextstrain_workflow {
@@ -27,7 +26,6 @@ task nextstrain_workflow {
         String aws_region
         String genepi_config_secret_name
         String remote_dev_prefix
-        String template_args
     }
 
     command <<<
@@ -38,9 +36,6 @@ task nextstrain_workflow {
     if [ "~{remote_dev_prefix}" != "" ]; then
         export REMOTE_DEV_PREFIX="~{remote_dev_prefix}"
     fi
-
-    # We aren't supposed to serialize Map inputs on the command line.
-    export TEMPLATE_ARGS_FILE="~{write_lines([template_args])}"
 
     # Just in case the run script bails out before defining these vars
     ncov_git_rev=""

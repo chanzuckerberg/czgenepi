@@ -30,9 +30,10 @@ EXCLUDED_GROUP_NAMES = [
 
 SCHEDULED_TREE_TYPE = "OVERVIEW"
 
+TEMPLATE_ARGS = {"filter_start_date": "12 weeks ago", "filter_end_date": "now"}
 
 def launch_scheduled_run(
-    aws_client: Client, settings: Settings, template_args: str, group: Group
+    aws_client: Client, settings: Settings, group: Group
 ):
     # use scheduled nextstrain wdl, fill in the required details
     settings.AWS_NEXTSTRAIN_SFN_PARAMETERS
@@ -47,7 +48,7 @@ def launch_scheduled_run(
                 "remote_dev_prefix": os.getenv("REMOTE_DEV_PREFIX"),
                 "group_name": group.name,
                 "s3_filestem": f"{group.location}/scheduled",
-                "template_args": template_args,
+                "template_args": json.dumps(TEMPLATE_ARGS),
                 "tree_type": SCHEDULED_TREE_TYPE,
             },
         },
@@ -71,16 +72,7 @@ def launch_scheduled_run(
 
 
 @click.command("launch_all")
-@click.option(
-    "--template-args",
-    type=str,
-    required=True,
-    help=(
-        "This should be a json dictionary that is used to generate the builds file,"
-        " using string interpolation."
-    ),
-)
-def launch_all(template_args: str):
+def launch_all():
     settings = Settings()  # no app state stashed
 
     aws_region = os.environ.get("AWS_REGION")
@@ -97,8 +89,8 @@ def launch_all(template_args: str):
             db.execute(all_groups_query).scalars().all()
         )
         for group in all_groups:
-            launch_scheduled_run(client, settings, template_args, group)
+            launch_scheduled_run(client, settings, group)
 
 
 if __name__ == "__main__":
-    print("Please run launch_all command with required --template-args argument.")
+    launch_all()

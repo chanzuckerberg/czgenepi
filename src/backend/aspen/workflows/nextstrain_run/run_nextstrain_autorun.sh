@@ -25,7 +25,4 @@ fi
 genepi_config="$($aws secretsmanager get-secret-value --secret-id $GENEPI_CONFIG_SECRET_NAME --query SecretString --output text)"
 aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$genepi_config")"
 
-# Recover template args
-TEMPLATE_ARGS=$(jq -c . < "${TEMPLATE_ARGS_FILE}")
-
 python3 /usr/src/app/aspen/workflows/nextstrain_run/autorun_scheduled.py launch_all --template-args "${TEMPLATE_ARGS}"
