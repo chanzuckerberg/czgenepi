@@ -3,6 +3,7 @@ import json
 import os
 import re
 from typing import Dict, MutableSequence
+from copy import deepcopy
 
 import click
 import sqlalchemy as sa
@@ -35,30 +36,15 @@ TEMPLATE_ARGS = {"filter_start_date": "12 weeks ago", "filter_end_date": "now"}
 
 
 def launch_scheduled_run(aws_client, sfn_params: Dict, group: Group):
-    # use scheduled nextstrain wdl, fill in the required details
-    sfn_input_json = {
-        "Input": {
-            "Run": {
-                "genepi_config_secret_name": os.environ.get(
-                    "GENEPI_CONFIG_SECRET_NAME", "genepi-config"
-                ),
-                "aws_region": os.environ.get("AWS_REGION"),
-                "docker_image_id": sfn_params["Input"]["Run"]["docker_image_id"],
-                "remote_dev_prefix": os.getenv("REMOTE_DEV_PREFIX"),
-                "group_name": group.name,
-                "s3_filestem": f"{group.location}/scheduled",
-                "template_args": json.dumps(TEMPLATE_ARGS),
-                "tree_type": SCHEDULED_TREE_TYPE,
-            },
-        },
-        "RUN_WDL_URI": sfn_params["RUN_WDL_URI"],
-        "RunEC2Memory": sfn_params["RunEC2Memory"],
-        "RunEC2Vcpu": sfn_params["RunEC2Vcpu"],
-        "RunSPOTMemory": sfn_params["RunSPOTMemory"],
-        "RunSPOTVcpu": sfn_params["RunSPOTVcpu"],
-    }
-
     start_datetime = datetime.datetime.now()
+
+    sfn_params["Input"]["Run"] |= {
+        "group_name": group.name,
+        "s3_filestem": f"{group.location}/scheduled",
+        "template_args": json.dumps(TEMPLATE_ARGS),
+        "tree_type": SCHEDULED_TREE_TYPE,
+    }
+    sfn_params["OutputPrefix"] = f'{sfn_params["OutputPrefix"]}/{group.name}/{start_datetime}'
 
     execution_name = f"{group.prefix}-scheduled-nextstrain-{str(start_datetime)}"
     execution_name = re.sub(r"[^0-9a-zA-Z-]", r"-", execution_name)
@@ -66,9 +52,9 @@ def launch_scheduled_run(aws_client, sfn_params: Dict, group: Group):
     aws_client.start_execution(
         stateMachineArn=sfn_params["StateMachineArn"],  # SWIPE ARN
         name=execution_name,
-        input=json.dumps(sfn_input_json),
+        input=json.dumps(sfn_params),
     )
-    print(f"{group.name}: ", sfn_input_json)
+    print(f"{group.name}: ", sfn_params)
 
 
 @click.command("launch_all")
@@ -112,7 +98,7 @@ def launch_all():
                 schedule_expression is None
                 or datetime.date.today().weekday() in schedule_expression
             ):
-                launch_scheduled_run(sfn_client, sfn_params, group)
+                launch_scheduled_run(sfn_client, deepcopy(sfn_params), group)
 
 
 if __name__ == "__main__":
