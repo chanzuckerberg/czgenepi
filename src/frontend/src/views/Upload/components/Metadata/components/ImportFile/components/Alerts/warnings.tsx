@@ -239,6 +239,39 @@ function MessageMissingData({ missingData }: PropsMissingData) {
     />
   );
 }
+
+interface PropsMissingDataEdit {
+  missingData: SampleEditIdToWarningMessages;
+}
+
+function MessageMissingDataEdit({ missingData }: PropsMissingData) {
+  const tablePreamble =
+    "You can add the required data in the table below, " +
+    "or update your file and re-import.";
+  const columnHeaders = [
+    SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sampleId,
+    "Missing Data",
+  ];
+  const idsMissingData = Object.keys(missingData);
+  const rows = idsMissingData.map((sampleId) => {
+    const missingHeaders = Array.from(
+      missingData[sampleId],
+      (missingKey) => SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS[missingKey]
+    );
+    const missingDataDescription = missingHeaders.join(", ");
+    return [sampleId, missingDataDescription];
+  });
+  // console.log("columnHeaders", columnHeaders); // REMOVE
+  // console.log("rows", rows); // REMOVE
+  return (
+    <ProblemTable
+      tablePreamble={tablePreamble}
+      columnHeaders={columnHeaders}
+      rows={rows}
+    />
+  );
+}
+
 export function WarningMissingData({
   missingData,
 }: PropsMissingData): JSX.Element {
@@ -252,6 +285,24 @@ export function WarningMissingData({
     <AlertAccordion
       title={title}
       collapseContent={<MessageMissingData missingData={missingData} />}
+      intent={WARNING_SEVERITY}
+    />
+  );
+}
+
+export function WarningMissingDataEdit({
+  missingData,
+}: PropsMissingDataEdit): JSX.Element {
+  const count = Object.keys(missingData).length;
+  // "X Samples were missing data in required fields."
+  const title = `${count} ${pluralize("Sample", count)} ${pluralize(
+    "was",
+    count
+  )} missing data in required fields.`;
+  return (
+    <AlertAccordion
+      title={title}
+      collapseContent={<MessageMissingDataEdit missingData={missingData} />}
       intent={WARNING_SEVERITY}
     />
   );

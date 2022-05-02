@@ -19,6 +19,7 @@ import {
 import { NamedGisaidLocation } from "src/views/Upload/components/common/types";
 import { FileUploadProps } from "../../index";
 import { getMetadataEntryOrEmpty } from "../../utils";
+import { warnMissingMetadata } from "src/views/Upload/components/Metadata/components/ImportFile/parseFile";
 import {
   parseFileEdit,
   ParseResult,
@@ -60,6 +61,7 @@ export default function ImportFile({
     null
   );
 
+
   useEffect(() => {
     // If no file uploaded yet, do nothing.
     if (!parseResult) return;
@@ -92,7 +94,15 @@ export default function ImportFile({
   const handleFiles = async (files: FileList | null) => {
     if (!files) return;
 
-    const result = await parseFileEdit(files[0], stringToLocationFinder);
+    // start
+    const sampleIds = Object.keys(metadata || EMPTY_OBJECT);
+    const sampleIdsSet = new Set(sampleIds);
+    // end
+    const result = await parseFileEdit(
+      files[0],
+      sampleIdsSet,
+      stringToLocationFinder
+    );
 
     const { warningMessages, filename, hasUnknownFields } = result;
     const missingFields = getMissingFields(result);
@@ -106,9 +116,6 @@ export default function ImportFile({
     setAutocorrectCount(autocorrectCount);
     setFilename(filename);
     setParseResult(result);
-    setMissingData(
-      warningMessages.get(WARNING_CODE.MISSING_DATA) || EMPTY_OBJECT
-    );
     setBadFormatData(
       warningMessages.get(WARNING_CODE.BAD_FORMAT_DATA) || EMPTY_OBJECT
     );
@@ -136,6 +143,7 @@ export default function ImportFile({
     resetMetadataFromCheckedSamples();
 
     const { data: sampleIdToUploadedMetadata, warningMessages } = result;
+    const missingData = {};
 
     const uploadedMetadata: SampleIdToEditMetadataWebform = {};
     const changedMetadataUpdated: SampleIdToEditMetadataWebform = {};
@@ -172,6 +180,15 @@ export default function ImportFile({
             | NamedGisaidLocation
             | undefined) = passOrDeleteEntry(value);
         }
+        setMissingData((prevMissingData) => {
+          const rowMissingMetadataWarnings = warnMissingMetadata(
+            uploadedMetadataEntry
+          );
+          return {
+            ...prevMissingData,
+            [sampleId]: rowMissingMetadataWarnings,
+          };
+        });
         uploadedMetadata[sampleId] = {
           ...existingMetadataEntry,
           ...pick(uploadedMetadataEntry, uploadedFieldsWithData),

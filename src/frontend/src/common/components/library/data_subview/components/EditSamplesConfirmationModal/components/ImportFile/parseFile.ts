@@ -19,6 +19,7 @@ import {
   MAX_NAME_LENGTH,
 } from "src/views/Upload/components/common/constants";
 import { inferMetadata } from "src/views/Upload/components/Metadata/components/ImportFile/parseFile";
+import { object } from "yup";
 
 type MergedSampleEditTsvWebformMetadata = SampleEditTsvMetadata &
   SampleEditMetadataWebform;
@@ -37,6 +38,7 @@ export interface ParseResult {
   warningMessages: WarningMessages;
   filename: string;
   hasUnknownFields: boolean;
+  // extraneousSampleIds: string[];
 }
 
 export type SampleEditIdToWarningMessages = Record<
@@ -106,6 +108,30 @@ function getDuplicateIds(
   return dups;
 }
 
+function filterExtraneousSampleIds(rows, editableSampleIds) {
+
+  const parseResultSampleIds = [];
+  for (const t in rows.entries) {
+    console.log("t", t); // REMOVE
+    // parseResultSampleIds.push(t.currentPrivateID)
+  }
+  const extraneousSamplesIds = parseResultSampleIds.filter((parseId) => {
+    return !editableSampleIds.has(parseId);
+  });
+  console.log("rows", rows); // REMOVE
+  const filteredRows = Object.entries(rows).reduce(
+    (acc, [key, val]) => {
+      if (editableSampleIds.has(key)) {
+        acc[key] = val;
+      }
+      return acc;
+    },
+    {}
+  );
+  // console.log("filteredRows", filteredRows); // REMOVE
+  // console.log("extraneousSamplesIds", extraneousSamplesIds); // REMOVE
+  return { extraneousSamplesIds, filteredRows };
+}
 /**
  * Parses a single data row. If issues during parse, also reports warnings.
  *
@@ -197,6 +223,7 @@ function convertHeaderToMetadataKey(headerName: string): string {
 
 export function parseFileEdit(
   file: File,
+  editableSampleIds: Set<string>,
   stringToLocationFinder: StringToLocationFinder
 ): Promise<ParseResult> {
   return new Promise((resolve) => {
@@ -222,6 +249,11 @@ export function parseFileEdit(
         const missingHeaderFields = getMissingHeaderFields(uploadedHeaders);
         const duplicatePublicIds = getDuplicateIds(rows, "publicId");
         const duplicatePrivateIds = getDuplicateIds(rows, "newPrivateID");
+        const { extraneousSamplesIds, filteredRows } =
+          filterExtraneousSampleIds(rows, editableSampleIds);
+
+        console.log("extraneousSamplesIds", extraneousSamplesIds); // REMOVE
+        console.log("filteredRows", filteredRows); // REMOVE
 
         if (missingHeaderFields) {
           errorMessages.set(ERROR_CODE.MISSING_FIELD, missingHeaderFields);
@@ -296,6 +328,7 @@ export function parseFileEdit(
         resolve({
           data: sampleIdToMetadata,
           errorMessages,
+          // extraneousSampleIds,
           filename: file.name,
           hasUnknownFields,
           warningMessages,
