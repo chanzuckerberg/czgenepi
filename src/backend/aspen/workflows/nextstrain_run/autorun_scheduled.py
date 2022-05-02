@@ -1,5 +1,6 @@
 import json
 import re
+import datetime
 from typing import MutableSequence
 
 import click
@@ -23,7 +24,8 @@ EXCLUDED_GROUP_NAMES = [
     "OneTrust Bot Sandbox",
     "admin",
     "DEMO ACCOUNT",
-    "CDPH",
+    "GENEPI ADMIN GROUP",
+    "External Demo Group",
 ]
 
 SCHEDULED_TREE_TYPE = "OVERVIEW"
@@ -55,6 +57,8 @@ def launch_scheduled_run(
         "RunSPOTMemory": settings.NEXTSTRAIN_SPOT_MEMORY,
         "RunSPOTVcpu": settings.NEXTSTRAIN_SPOT_VCPU,
     }
+
+    start_datetime = datetime.datetime.now()
 
     execution_name = f"{group.prefix}-scheduled-nextstrain-{str(start_datetime)}"
     execution_name = re.sub(r"[^0-9a-zA-Z-]", r"-", execution_name)
@@ -93,7 +97,7 @@ def launch_all(template_args: str):
             db.execute(all_groups_query).scalars().all()
         )
         for group in all_groups:
-            launch_scheduled_run(client, group)
+            launch_scheduled_run(client, settings, template_args, group)
 
 
 if __name__ == "__main__":
