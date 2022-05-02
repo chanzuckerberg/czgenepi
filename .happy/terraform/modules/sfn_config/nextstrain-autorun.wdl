@@ -15,7 +15,6 @@ workflow nextstrain {
         aws_region = aws_region,
         genepi_config_secret_name = genepi_config_secret_name,
         remote_dev_prefix = remote_dev_prefix,
-        template_args = template_args,
     }
 }
 
