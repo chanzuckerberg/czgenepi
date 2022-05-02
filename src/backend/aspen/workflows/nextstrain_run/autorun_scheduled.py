@@ -40,7 +40,7 @@ def launch_scheduled_run(aws_client, sfn_params: Dict, group: Group):
 
     sfn_params["Input"]["Run"] |= {
         "group_name": group.name,
-        "s3_filestem": f"{group.location}/scheduled",
+        "s3_filestem": f"{group.prefix}/scheduled",
         "template_args": json.dumps(TEMPLATE_ARGS),
         "tree_type": SCHEDULED_TREE_TYPE,
     }
