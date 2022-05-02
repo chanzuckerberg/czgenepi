@@ -3,10 +3,7 @@
 Create Date: 2022-05-02 17:19:09.910095
 
 """
-import enumtables  # noqa: F401
-import sqlalchemy as sa
 from alembic import op
-from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = "20220502_171903"
