@@ -2,8 +2,8 @@ import datetime
 import json
 import os
 import re
-from typing import Dict, MutableSequence
 from copy import deepcopy
+from typing import Dict, MutableSequence
 
 import click
 import sqlalchemy as sa
@@ -19,17 +19,6 @@ from aspen.database.connection import (
 )
 from aspen.database.models import Group
 
-EXCLUDED_GROUP_NAMES = [
-    "ASPEN ADMIN GROUP",
-    "Bot Users",
-    "CZI",
-    "OneTrust Bot Sandbox",
-    "admin",
-    "DEMO ACCOUNT",
-    "GENEPI ADMIN GROUP",
-    "External Demo Group",
-]
-
 SCHEDULED_TREE_TYPE = "OVERVIEW"
 
 TEMPLATE_ARGS = {"filter_start_date": "12 weeks ago", "filter_end_date": "now"}
@@ -44,7 +33,9 @@ def launch_scheduled_run(aws_client, sfn_params: Dict, group: Group):
         "template_args": json.dumps(TEMPLATE_ARGS),
         "tree_type": SCHEDULED_TREE_TYPE,
     }
-    sfn_params["OutputPrefix"] = f'{sfn_params["OutputPrefix"]}/{group.name}/{start_datetime}'
+    sfn_params[
+        "OutputPrefix"
+    ] = f'{sfn_params["OutputPrefix"]}/{group.name}/{start_datetime}'
 
     execution_name = f"{group.prefix}-scheduled-nextstrain-{str(start_datetime)}"
     execution_name = re.sub(r"[^0-9a-zA-Z-]", r"-", execution_name)
@@ -54,7 +45,6 @@ def launch_scheduled_run(aws_client, sfn_params: Dict, group: Group):
         name=execution_name,
         input=json.dumps(sfn_params),
     )
-    print(f"{group.name}: ", sfn_params)
 
 
 @click.command("launch_all")
@@ -85,13 +75,10 @@ def launch_all():
 
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
     with session_scope(interface) as db:
-        all_groups_query = sa.select(Group).filter(
-            Group.name.not_in(EXCLUDED_GROUP_NAMES)
-        )
+        all_groups_query = sa.select(Group)
         all_groups: MutableSequence[Group] = (
             db.execute(all_groups_query).scalars().all()
         )
-        print(all_groups)
         for group in all_groups:
             schedule_expression = group.tree_parameters.get("schedule_expression", None)
             if (

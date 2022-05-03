@@ -239,6 +239,7 @@ module pangolin_ondemand_sfn_config {
   }
 }
 
+# This is a template that controls all our scheduled runs
 module nextstrain_template_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-sfn"
