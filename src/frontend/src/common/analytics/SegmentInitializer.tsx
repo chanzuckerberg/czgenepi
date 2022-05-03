@@ -53,11 +53,17 @@ const INITIAL_SCRIPT_TYPE = "text/javascript"; // TEMPORARY for initial scan
  *      side for now). This means that, even if this code gets to Prod,
  *      no analytics will run right now on Prod.
  *
+ * TODO: Eventually use this component. Right now, this is unused until we're
+ * have additional processes in place to ensure we don't run analytics on
+ * users until they can allow/deny analytics (either by using OneTrust, or
+ * by putting it behind a feature flag that only internal dev team would have
+ * enabled, or both).
+ *
  * Usage note: Weirdly, even though this boils down to being a <script> tag,
  * Next.js does not like it to be present in a Next `Head` or `Html` component.
- * Instead, just put it anywhere in the "normal" flow of components. It's
- * already been placed somewhere it works, so this probably won't affect you,
- * but if you have to move it, beware this weirdness.
+ * Instead, just put it anywhere in the "normal" flow of components. A good
+ * place to put it is just under the `</Head>` in `_app.tsx`, but you could
+ * put it somewhere else as well.
  */
 export function SegmentInitializer() {
   const segmentWriteKey = ENV.SEGMENT_FRONTEND_KEY;
