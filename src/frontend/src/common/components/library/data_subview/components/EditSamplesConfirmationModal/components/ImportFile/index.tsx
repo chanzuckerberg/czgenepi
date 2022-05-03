@@ -73,12 +73,6 @@ export default function ImportFile({
     const parseResultSampleIds = Object.keys(data);
     const sampleIds = Object.keys(metadata || EMPTY_OBJECT);
 
-    const sampleIdsSet = new Set(sampleIds);
-    const extraneousSampleIds = parseResultSampleIds.filter((parseId) => {
-      return !sampleIdsSet.has(parseId);
-    });
-    setExtraneousSampleIds(extraneousSampleIds);
-
     const parseResultSampleIdsSet = new Set(parseResultSampleIds);
     const absentSampleIds = sampleIds.filter((sampleId) => {
       return !parseResultSampleIdsSet.has(sampleId);
@@ -104,12 +98,13 @@ export default function ImportFile({
       stringToLocationFinder
     );
 
-    const { warningMessages, filename, hasUnknownFields } = result;
+    const { warningMessages, filename, hasUnknownFields, extraneousSampleIds } = result;
     const missingFields = getMissingFields(result);
     const duplicatePrivateIds = getDuplicatePrivateIds(result);
     const duplicatePublicIds = getDuplicatePublicIds(result);
     const autocorrectCount =
       getAutocorrectCount(warningMessages.get(WARNING_CODE.AUTO_CORRECT)) || 0;
+    setExtraneousSampleIds(extraneousSampleIds);
     setMissingFields(missingFields);
     setDuplicatePrivateIds(duplicatePrivateIds);
     setDuplicatePublicIds(duplicatePublicIds);

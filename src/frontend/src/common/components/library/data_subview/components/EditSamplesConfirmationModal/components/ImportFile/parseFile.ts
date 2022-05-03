@@ -38,7 +38,7 @@ export interface ParseResult {
   warningMessages: WarningMessages;
   filename: string;
   hasUnknownFields: boolean;
-  // extraneousSampleIds: string[];
+  extraneousSampleIds: string[];
 }
 
 export type SampleEditIdToWarningMessages = Record<
@@ -108,29 +108,22 @@ function getDuplicateIds(
   return dups;
 }
 
-function filterExtraneousSampleIds(rows, editableSampleIds) {
+function filterExtraneousSampleIds(
+  rows: Record<string, string>[],
+  editableSampleIds: Set<string>
+) {
+  const extraneousUniqueSampleIds = new Set();
 
-  const parseResultSampleIds = [];
-  for (const t in rows.entries) {
-    console.log("t", t); // REMOVE
-    // parseResultSampleIds.push(t.currentPrivateID)
-  }
-  const extraneousSamplesIds = parseResultSampleIds.filter((parseId) => {
-    return !editableSampleIds.has(parseId);
+  const filteredRows = rows.filter((item) => {
+    const currentPID = item.currentPrivateID;
+    if (!editableSampleIds.has(currentPID)) {
+      extraneousUniqueSampleIds.add(currentPID);
+    } else {
+      return item;
+    }
   });
-  console.log("rows", rows); // REMOVE
-  const filteredRows = Object.entries(rows).reduce(
-    (acc, [key, val]) => {
-      if (editableSampleIds.has(key)) {
-        acc[key] = val;
-      }
-      return acc;
-    },
-    {}
-  );
-  // console.log("filteredRows", filteredRows); // REMOVE
-  // console.log("extraneousSamplesIds", extraneousSamplesIds); // REMOVE
-  return { extraneousSamplesIds, filteredRows };
+  const extraneousSampleIds = [...extraneousUniqueSampleIds];
+  return { extraneousSampleIds, filteredRows };
 }
 /**
  * Parses a single data row. If issues during parse, also reports warnings.
@@ -249,11 +242,10 @@ export function parseFileEdit(
         const missingHeaderFields = getMissingHeaderFields(uploadedHeaders);
         const duplicatePublicIds = getDuplicateIds(rows, "publicId");
         const duplicatePrivateIds = getDuplicateIds(rows, "newPrivateID");
-        const { extraneousSamplesIds, filteredRows } =
-          filterExtraneousSampleIds(rows, editableSampleIds);
-
-        console.log("extraneousSamplesIds", extraneousSamplesIds); // REMOVE
-        console.log("filteredRows", filteredRows); // REMOVE
+        const { extraneousSampleIds, filteredRows } = filterExtraneousSampleIds(
+          rows,
+          editableSampleIds
+        );
 
         if (missingHeaderFields) {
           errorMessages.set(ERROR_CODE.MISSING_FIELD, missingHeaderFields);
@@ -290,7 +282,7 @@ export function parseFileEdit(
           if (!isEmpty(unknownFields)) {
             hasUnknownFields = true;
           }
-          rows.forEach((row) => {
+          filteredRows.forEach((row) => {
             const { rowMetadata, rowWarnings } = parseRow(
               row,
               stringToLocationFinder,
@@ -328,7 +320,7 @@ export function parseFileEdit(
         resolve({
           data: sampleIdToMetadata,
           errorMessages,
-          // extraneousSampleIds,
+          extraneousSampleIds,
           filename: file.name,
           hasUnknownFields,
           warningMessages,
