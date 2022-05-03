@@ -122,7 +122,6 @@ class Settings(BaseSettings):
     # Env vars usually pulled from AWS SSM Parameters
     AWS_NEXTSTRAIN_SFN_PARAMETERS: Dict
     AWS_PANGOLIN_SFN_PARAMETERS: Dict
-    AWS_NEXTSTRAIN_SCHEDULED_SFN_PARAMETERS: Dict
 
     ####################################################################################
     # Stack name
@@ -194,14 +193,6 @@ class Settings(BaseSettings):
         return self.AWS_NEXTSTRAIN_SFN_PARAMETERS["RUN_WDL_URI"]
 
     @cached_property
-    def NEXTSTRAIN_SCHEDULED_RUN_WDL_URI(self) -> str:
-        return self.AWS_NEXTSTRAIN_SCHEDULED_SFN_PARAMETERS["RUN_WDL_URI"]
-
-    @cached_property
-    def NEXTSTRAIN_SCHEDULED_STATE_MACHINE_ARN(self) -> str:
-        return self.AWS_NEXTSTRAIN_SCHEDULED_SFN_PARAMETERS["StateMachineArn"]
-
-    @cached_property
     def NEXTSTRAIN_EC2_MEMORY(self) -> str:
         return self.AWS_NEXTSTRAIN_SFN_PARAMETERS["RunEC2Memory"]
 
@@ -249,7 +240,6 @@ class Settings(BaseSettings):
         aws_ssm_params = {
             "nextstrain-ondemand-sfn": "AWS_NEXTSTRAIN_SFN_PARAMETERS",
             "pangolin-ondemand-sfn": "AWS_PANGOLIN_SFN_PARAMETERS",
-            "nextstrain-sfn": "AWS_NEXTSTRAIN_SCHEDULED_SFN_PARAMETERS",
         }
 
         @classmethod
