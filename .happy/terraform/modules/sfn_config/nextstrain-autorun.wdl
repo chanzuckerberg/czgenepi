@@ -31,10 +31,13 @@ task nextstrain_workflow {
     }
 
     command <<<
-    set -Euxo pipefail
-    # setup
-    export AWS_REGION="~{aws_region}"
+    set -Euo pipefail
+    # secrets
+    echo "export GENEPI_CONFIG_SECRET_NAME"
     export GENEPI_CONFIG_SECRET_NAME="~{genepi_config_secret_name}"
+    # setup
+    set -x
+    export AWS_REGION="~{aws_region}"
     if [ "~{remote_dev_prefix}" != "" ]; then
         export REMOTE_DEV_PREFIX="~{remote_dev_prefix}"
     fi
