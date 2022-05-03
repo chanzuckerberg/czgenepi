@@ -3,7 +3,7 @@ version 1.1
 workflow nextstrain {
 
     input {
-        String docker_image_id = "genepi-nextstrain"
+        String docker_image_id = "genepi-backend"
         String aws_region = "us-west-2"
         String genepi_config_secret_name
         String remote_dev_prefix = ""
