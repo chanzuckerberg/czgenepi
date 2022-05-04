@@ -4,6 +4,7 @@ import os
 import re
 from typing import Iterable, List, MutableSequence, Set
 
+from aspen.api.authz import get_read_session
 import sentry_sdk
 import sqlalchemy as sa
 from boto3 import Session
@@ -188,12 +189,6 @@ async def kick_off_phylo_run(
 
 
 async def _get_accessible_phylo_runs(db, user, run_id=None, editable=False):
-    # get phylo_runs viewable or editable by a user, optionally filtered by id
-    cansee_owner_group_ids: Set[int] = {
-        cansee.owner_group_id
-        for cansee in user.group.can_see
-        if cansee.data_type == DataType.TREES
-    }
     query = sa.select(PhyloRun).options(
         joinedload(PhyloRun.outputs.of_type(PhyloTree)),
         joinedload(PhyloRun.user),  # For Pydantic serialization
@@ -205,15 +200,6 @@ async def _get_accessible_phylo_runs(db, user, run_id=None, editable=False):
         # for update and delete views return only trees that are in the users group
         query = query.filter(
             PhyloRun.group == user.group,
-        )
-    else:
-        # this is for list view, return all runs that are viewable
-        query = query.filter(
-            sa.or_(
-                PhyloRun.group == user.group,
-                user.system_admin,
-                PhyloRun.group_id.in_(cansee_owner_group_ids),
-            ),
         )
 
     if run_id:
@@ -243,15 +229,25 @@ async def get_readable_phylo_runs(db, user, run_id=None):
 async def list_runs(
     request: Request,
     db: AsyncSession = Depends(get_db),
+    oso: AsyncSession = Depends(get_read_session),
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_auth_user),
 ) -> PhyloRunsListResponse:
 
-    phylo_runs: Iterable[PhyloRun] = await get_readable_phylo_runs(db, user)
+    query = await oso.authorized_query(user, "read", PhyloRun)
+    query = query.options(
+        joinedload(PhyloRun.outputs.of_type(PhyloTree)),
+        joinedload(PhyloRun.user),  # For Pydantic serialization
+        joinedload(PhyloRun.group),  # For Pydantic serialization
+    )
+
+    qres = await db.execute(query)
+    phylo_runs: Iterable[PhyloRun] = qres.unique().scalars().all()
 
     # filter for only information we need in sample table view
     results: List[PhyloRunResponse] = []
     for phylo_run in phylo_runs:
+        print(phylo_run)
         results.append(PhyloRunResponse.from_orm(phylo_run))
 
     return PhyloRunsListResponse(phylo_runs=results)

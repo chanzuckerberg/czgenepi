@@ -9,7 +9,7 @@ from sqlalchemy import Boolean, Column, Date, ForeignKey, Integer, String, text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import backref, relationship
 
-from aspen.database.models.base import idbase
+from aspen.database.models.base import base, idbase
 from aspen.database.models.locations import Location
 from aspen.database.models.mixins import DictMixin
 
@@ -86,3 +86,22 @@ class User(idbase, DictMixin):  # type: ignore
 
     def __repr__(self):
         return f"User <{self.name}>"
+
+
+class Role(idbase):
+    """Possible roles"""
+
+    __tablename__ = "roles"
+    name = Column(String, unique=True, nullable=False)
+
+
+class GroupRole(base):
+    """Possible roles"""
+
+    __tablename__ = "group_roles"
+    role_id = Column(Integer, ForeignKey(Role.id), nullable=False)
+    role = relationship(Role, backref=backref("group_roles", uselist=True))  # type: ignore
+    group_id = Column(Integer, ForeignKey(Group.id), nullable=False, primary_key=True)
+    group = relationship(Group, backref=backref("user_roles", uselist=True))  # type: ignore
+    user_id = Column(Integer, ForeignKey(User.id), nullable=False, primary_key=True)
+    user = relationship(User, backref=backref("group_roles", uselist=True))  # type: ignore
