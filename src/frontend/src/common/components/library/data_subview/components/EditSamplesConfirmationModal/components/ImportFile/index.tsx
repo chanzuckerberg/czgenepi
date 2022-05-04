@@ -1,4 +1,4 @@
-import { pick } from "lodash";
+import { isEmpty, pick } from "lodash";
 import React, { useEffect, useMemo, useState } from "react";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { createStringToLocationFinder } from "src/common/utils/locationUtils";
@@ -25,6 +25,7 @@ import {
   ParseResult,
   SampleIdToWarningMessages,
 } from "./parseFile";
+import { SampleEditTsvMetadata } from "src/components/DownloadMetadataTemplate/common/types";
 
 interface Props {
   metadata: SampleIdToEditMetadataWebform | null;
@@ -175,15 +176,23 @@ export default function ImportFile({
             | NamedGisaidLocation
             | undefined) = passOrDeleteEntry(value);
         }
-        setMissingData((prevMissingData) => {
-          const rowMissingMetadataWarnings = warnMissingMetadata(
-            uploadedMetadataEntry
-          );
-          return {
-            ...prevMissingData,
-            [sampleId]: rowMissingMetadataWarnings,
-          };
-        });
+        const ALWAYS_REQUIRED: Array<keyof SampleEditTsvMetadata> = [
+          "newPrivateID",
+          "collectionDate",
+          "collectionLocation",
+        ];
+        if (!isEmpty(uploadedMetadataEntry)) {
+          setMissingData((prevMissingData) => {
+            const rowMissingMetadataWarnings = warnMissingMetadata(
+              uploadedMetadataEntry,
+              ALWAYS_REQUIRED
+            );
+            return {
+              ...prevMissingData,
+              [sampleId]: rowMissingMetadataWarnings,
+            };
+          });
+        }
         uploadedMetadata[sampleId] = {
           ...existingMetadataEntry,
           ...pick(uploadedMetadataEntry, uploadedFieldsWithData),

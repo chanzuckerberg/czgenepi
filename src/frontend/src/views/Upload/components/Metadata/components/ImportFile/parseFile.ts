@@ -105,14 +105,17 @@ const METADATA_KEYS_TO_EXTRACT = Object.values(HEADERS_TO_METADATA_KEYS);
  * So we're just duplicating that aspect here.
  */
 export function warnMissingMetadata(
-  metadata: SampleUploadTsvMetadata
+  metadata: SampleUploadTsvMetadata,
+  ALWAYS_REQUIRED:
+    | Array<keyof SampleUploadTsvMetadata>
+    | Array<keyof SampleEditTsvMetadata>
 ): Set<keyof SampleUploadTsvMetadata> | null {
   const missingMetadata = new Set<keyof SampleUploadTsvMetadata>();
-  const ALWAYS_REQUIRED: Array<keyof SampleUploadTsvMetadata> = [
-    "privateId",
-    "collectionDate",
-    "collectionLocation",
-  ];
+  // const ALWAYS_REQUIRED: Array<keyof SampleUploadTsvMetadata> = [
+  //   "privateId",
+  //   "collectionDate",
+  //   "collectionLocation",
+  // ];
   ALWAYS_REQUIRED.forEach((keyRequiredMetadata) => {
     if (!metadata[keyRequiredMetadata]) {
       missingMetadata.add(keyRequiredMetadata);
@@ -224,7 +227,15 @@ function parseRow(
   METADATA_KEYS_TO_EXTRACT.forEach((key) => {
     inferMetadata(row, key, rowMetadata, stringToLocationFinder);
   });
-  const rowMissingMetadataWarnings = warnMissingMetadata(rowMetadata);
+  const ALWAYS_REQUIRED: Array<keyof SampleUploadTsvMetadata> = [
+    "privateId",
+    "collectionDate",
+    "collectionLocation",
+  ];
+  const rowMissingMetadataWarnings = warnMissingMetadata(
+    rowMetadata,
+    ALWAYS_REQUIRED
+  );
   if (rowMissingMetadataWarnings) {
     rowWarnings.set(WARNING_CODE.MISSING_DATA, rowMissingMetadataWarnings);
   }

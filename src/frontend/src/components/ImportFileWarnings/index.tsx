@@ -70,7 +70,7 @@ export default function ImportFileWarnings({
   IdColumnNameForWarnings,
   metadataUploadType,
 }: ImportFileWarningsProps): JSX.Element {
-  // console.log("missingData", missingData); // REMOVE
+  console.log("missingData", missingData); // REMOVE
 
   return (
     <>
