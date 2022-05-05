@@ -1,4 +1,5 @@
 import React from "react";
+import { SampleEditIdToWarningMessages } from "src/common/components/library/data_subview/components/EditSamplesConfirmationModal/components/ImportFile/parseFile";
 import { B } from "src/common/styles/basicStyle";
 import { pluralize } from "src/common/utils/strUtils";
 import AlertAccordion from "src/components/AlertAccordion";
@@ -212,7 +213,7 @@ export function WarningAbsentSampleEdit({
  * WARNING_CODE.MISSING_DATA
  */
 interface PropsMissingData {
-  missingData: SampleIdToWarningMessages;
+  missingData: SampleIdToWarningMessages | SampleEditIdToWarningMessages;
 }
 function MessageMissingData({ missingData }: PropsMissingData) {
   const tablePreamble =
@@ -222,15 +223,7 @@ function MessageMissingData({ missingData }: PropsMissingData) {
     SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sampleId,
     "Missing Data",
   ];
-  const idsMissingData = Object.keys(missingData);
-  const rows = idsMissingData.map((sampleId) => {
-    const missingHeaders = Array.from(
-      missingData[sampleId],
-      (missingKey) => SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[missingKey]
-    );
-    const missingDataDescription = missingHeaders.join(", ");
-    return [sampleId, missingDataDescription];
-  });
+  const rows = getSampleIdsWithMissingData(missingData);
   return (
     <ProblemTable
       tablePreamble={tablePreamble}
@@ -240,8 +233,16 @@ function MessageMissingData({ missingData }: PropsMissingData) {
   );
 }
 
-interface PropsMissingDataEdit {
-  missingData: SampleEditIdToWarningMessages;
+function getSampleIdsWithMissingData(missingData: SampleIdToWarningMessages) {
+  const idsMissingData = Object.keys(missingData);
+  return idsMissingData.map((sampleId) => {
+    const missingHeaders = Array.from(
+      missingData[sampleId],
+      (missingKey) => SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[missingKey]
+    );
+    const missingDataDescription = missingHeaders.join(", ");
+    return [sampleId, missingDataDescription];
+  });
 }
 
 function MessageMissingDataEdit({ missingData }: PropsMissingData) {
@@ -252,15 +253,7 @@ function MessageMissingDataEdit({ missingData }: PropsMissingData) {
     "Sample " + SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.privateId,
     "Missing Data",
   ];
-  const idsMissingData = Object.keys(missingData);
-  const rows = idsMissingData.map((sampleId) => {
-    const missingHeaders = Array.from(
-      missingData[sampleId],
-      (missingKey) => SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[missingKey]
-    );
-    const missingDataDescription = missingHeaders.join(", ");
-    return [sampleId, missingDataDescription];
-  });
+  const rows = getSampleIdsWithMissingData(missingData);
   return (
     <ProblemTable
       tablePreamble={tablePreamble}
@@ -290,7 +283,7 @@ export function WarningMissingData({
 
 export function WarningMissingDataEdit({
   missingData,
-}: PropsMissingDataEdit): JSX.Element {
+}: PropsMissingData): JSX.Element {
   const count = Object.keys(missingData).length;
   // "X Samples were missing data in required fields."
   const title = `${count} ${pluralize("Sample", count)} ${pluralize(

@@ -19,7 +19,6 @@ import {
   MAX_NAME_LENGTH,
 } from "src/views/Upload/components/common/constants";
 import { inferMetadata } from "src/views/Upload/components/Metadata/components/ImportFile/parseFile";
-import { object } from "yup";
 
 type MergedSampleEditTsvWebformMetadata = SampleEditTsvMetadata &
   SampleEditMetadataWebform;
@@ -111,9 +110,9 @@ function getDuplicateIds(
 function filterExtraneousSampleIds(
   rows: Record<string, string>[],
   editableSampleIds: Set<string>,
-  exampleSampleIds: Set<string>,
+  exampleSampleIds: Set<string>
 ) {
-  const extraneousUniqueSampleIds = new Set();
+  const extraneousUniqueSampleIds = new Set<string>();
 
   const filteredRows = rows.filter((item) => {
     const currentPID = item.currentPrivateID;
@@ -126,9 +125,27 @@ function filterExtraneousSampleIds(
       return item;
     }
   });
-  const extraneousSampleIds = [...extraneousUniqueSampleIds];
+  const extraneousSampleIds: string[] = [...extraneousUniqueSampleIds];
   return { extraneousSampleIds, filteredRows };
 }
+
+export function warnMissingMetadata(
+  metadata: SampleEditMetadataWebform
+): Set<keyof SampleEditMetadataWebform> | null {
+  const missingMetadata = new Set<keyof SampleEditMetadataWebform>();
+  const ALWAYS_REQUIRED: Array<keyof SampleEditMetadataWebform> = [
+    "privateId",
+    "collectionDate",
+    "collectionLocation",
+  ];
+  ALWAYS_REQUIRED.forEach((keyRequiredMetadata) => {
+    if (!metadata[keyRequiredMetadata]) {
+      missingMetadata.add(keyRequiredMetadata);
+    }
+  });
+  return missingMetadata.size ? missingMetadata : null;
+}
+
 /**
  * Parses a single data row. If issues during parse, also reports warnings.
  *

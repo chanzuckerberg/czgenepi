@@ -19,13 +19,12 @@ import {
 import { NamedGisaidLocation } from "src/views/Upload/components/common/types";
 import { FileUploadProps } from "../../index";
 import { getMetadataEntryOrEmpty } from "../../utils";
-import { warnMissingMetadata } from "src/views/Upload/components/Metadata/components/ImportFile/parseFile";
 import {
   parseFileEdit,
   ParseResult,
   SampleIdToWarningMessages,
+  warnMissingMetadata,
 } from "./parseFile";
-import { SampleEditTsvMetadata } from "src/components/DownloadMetadataTemplate/common/types";
 
 interface Props {
   metadata: SampleIdToEditMetadataWebform | null;
@@ -78,18 +77,7 @@ export default function ImportFile({
       return !parseResultSampleIdsSet.has(sampleId);
     });
     setAbsentSampleIds(absentSampleIds);
-  }, [parseResult, metadata, missingFields]);
-
-  function clearState() {
-    console.log("in clear state"); // REMOVE
-    setExtraneousSampleIds([]);
-    setAbsentSampleIds([]);
-    setUnknownDataFields(false);
-    setMissingData(EMPTY_OBJECT);
-    setBadFormatData(EMPTY_OBJECT);
-    setDuplicatePrivateIds([]);
-    setDuplicatePublicIds([]);
-  }
+  }, [parseResult, missingFields]);
 
   // Used by file upload parser to convert location strings to Locations
   const stringToLocationFinder = useMemo(() => {
@@ -98,20 +86,17 @@ export default function ImportFile({
 
   const handleFiles = async (files: FileList | null) => {
     if (!files) return;
-    // clear old error messages before importing new tsv
-    clearState();
 
-    // start
     const sampleIds = Object.keys(metadata || EMPTY_OBJECT);
     const sampleIdsSet = new Set(sampleIds);
-    // end
     const result = await parseFileEdit(
       files[0],
       sampleIdsSet,
       stringToLocationFinder
     );
 
-    const { warningMessages, filename, hasUnknownFields, extraneousSampleIds } = result;
+    const { warningMessages, filename, hasUnknownFields, extraneousSampleIds } =
+      result;
     const missingFields = getMissingFields(result);
     const duplicatePrivateIds = getDuplicatePrivateIds(result);
     const duplicatePublicIds = getDuplicatePublicIds(result);
@@ -193,10 +178,14 @@ export default function ImportFile({
               ...existingMetadataEntry,
               ...pick(uploadedMetadataEntry, uploadedFieldsWithData),
             });
-            return {
-              ...prevMissingData,
-              [sampleId]: rowMissingMetadataWarnings,
-            };
+            if (rowMissingMetadataWarnings) {
+              return {
+                ...prevMissingData,
+                [sampleId]: rowMissingMetadataWarnings,
+              };
+            } else {
+              return { ...prevMissingData };
+            }
           });
         }
         uploadedMetadata[sampleId] = {
