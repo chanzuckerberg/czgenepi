@@ -102,6 +102,7 @@ const EditSamplesConfirmationModal = ({
     changedMetadataUpdated,
     autocorrectWarnings,
   }: FileUploadProps) => {
+    console.log("in handle Metadata file upload"); // REMOVE
     setMetadata(uploadedMetadata);
     setChangedMetadata(changedMetadataUpdated);
     setHasImportedMetadataFile(true);

@@ -154,8 +154,8 @@ function MessageAbsentSample({ absentSampleIds }: PropsAbsentSample) {
 
 function MessageAbsentSampleEdit({ absentSampleIds }: PropsAbsentSample) {
   const tablePreamble =
-    "The following IDs in your file’s “Current Private ID” column did not match any selected samples, and weren’t imported. Please double check and correct any errors. ";
-  const columnHeaders = [SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.currentPrivateID];
+    "We were unable to match the following selected samples with the “Current Private ID”s provided in your file. You can update them below, or update your file and re-import.";
+  const columnHeaders = ["Unmatched Private IDs: "];
   const rows = absentSampleIds.map((sampleId) => [sampleId]);
   return (
     <ProblemTable
@@ -171,10 +171,10 @@ export function WarningAbsentSample({
 }: PropsAbsentSample): JSX.Element {
   const count = absentSampleIds.length;
   // "X Samples were not found in metadata file."
-  const title = `${count} ${pluralize("Sample", count)} ${pluralize(
+  const title = `${count} selected ${pluralize("Sample", count)} ${pluralize(
     "was",
     count
-  )} not found in metadata file.`;
+  )} not found in metadata file, and have not been updated below`;
   return (
     <AlertAccordion
       title={title}
