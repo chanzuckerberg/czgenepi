@@ -163,6 +163,9 @@ export default function ImportFile({
           if (uploadedEntry !== "" && uploadedEntry !== undefined)
             uploadedFieldsWithData.push(item);
         });
+        const filledInUploadedMetadata = {
+          ...pick(uploadedMetadataEntry, uploadedFieldsWithData),
+        };
 
         // check if any entries need to be deleted/ cleared
         for (const [key, value] of Object.entries(uploadedMetadataEntry)) {
@@ -173,10 +176,11 @@ export default function ImportFile({
             | undefined) = passOrDeleteEntry(value);
         }
         if (!isEmpty(uploadedMetadataEntry)) {
+          // check if there is any missing data that the user needs to fill in before proceeding
           setMissingData((prevMissingData) => {
             const rowMissingMetadataWarnings = warnMissingMetadata({
               ...existingMetadataEntry,
-              ...pick(uploadedMetadataEntry, uploadedFieldsWithData),
+              ...filledInUploadedMetadata,
             });
             if (rowMissingMetadataWarnings) {
               return {
@@ -190,11 +194,11 @@ export default function ImportFile({
         }
         uploadedMetadata[sampleId] = {
           ...existingMetadataEntry,
-          ...pick(uploadedMetadataEntry, uploadedFieldsWithData),
+          ...filledInUploadedMetadata,
         };
         changedMetadataUpdated[sampleId] = {
           ...existingChangedMetadataEntry,
-          ...pick(uploadedMetadataEntry, uploadedFieldsWithData),
+          ...filledInUploadedMetadata,
         };
       }
     }
