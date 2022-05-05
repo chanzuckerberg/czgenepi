@@ -94,7 +94,7 @@ function MessageExtraneousEntrySampleEdit({
   const tablePreamble =
     "The following IDs in your file’s “Current Private ID” column did not match any selected " +
     "samples, and weren’t imported. Please double check and correct any errors. ";
-  const columnHeaders = [SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.currentPrivateID];
+  const columnHeaders = ["Unknown Private IDs: "];
   const rows = extraneousSampleIds.map((sampleId) => [sampleId]);
   return (
     <ProblemTable
@@ -114,10 +114,7 @@ export function WarningExtraneousEntrySampleEdit({
   const title = `${count} ${pluralize(
     "Sample",
     count
-  )} in metadata file ${pluralize(
-    "was",
-    count
-  )} couldn't be matched and weren't imported.`;
+  )} in metadata file couldn't be matched and ${pluralize("was", count)} not imported.`;
   return (
     <AlertAccordion
       title={title}
@@ -191,13 +188,10 @@ export function WarningAbsentSampleEdit({
 }: PropsAbsentSample): JSX.Element {
   const count = absentSampleIds.length;
   // "X Samples were not found in metadata file."
-  const title = `${count} ${pluralize(
-    "Sample",
-    count
-  )} in metadata file couldn't be matched and ${pluralize(
+  const title = `${count} selected ${pluralize("Sample", count)} ${pluralize(
     "was",
     count
-  )} not imported`;
+  )} not found in metadata file, and have not been updated below.`;
   return (
     <AlertAccordion
       title={title}
