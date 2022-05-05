@@ -4,6 +4,9 @@ import { DateFilterMenu } from "src/components/DateFilterMenu";
 
 export const StyledInputDropdown = styled(InputDropdown)`
   width: 224px;
+  span {
+    color: black;
+  }
 `;
 
 export const StyledDateFilterMenu = styled(DateFilterMenu)`

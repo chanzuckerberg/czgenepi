@@ -86,7 +86,7 @@ export const Title = styled.span`
     const colors = getColors(props);
     const spaces = getSpaces(props);
     return `
-      color: ${colors?.gray[500]};
+      color: ${colors?.gray[600]};
       margin-bottom: ${spaces?.l}px;
     `;
   }}

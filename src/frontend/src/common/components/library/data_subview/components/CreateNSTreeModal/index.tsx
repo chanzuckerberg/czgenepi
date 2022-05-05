@@ -242,7 +242,7 @@ export const CreateNSTreeModal = ({
           <TreeNameInput
             setTreeName={setTreeName}
             treeName={treeName}
-            instructionHeader={"Tree Name: "}
+            instructionHeader="Tree Name: "
           />
           <TreeTypeSection>
             <TreeNameInfoWrapper>
