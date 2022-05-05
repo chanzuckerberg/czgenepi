@@ -249,14 +249,14 @@ function MessageMissingDataEdit({ missingData }: PropsMissingData) {
     "You can add the required data in the table below, " +
     "or update your file and re-import.";
   const columnHeaders = [
-    SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sampleId,
+    "Sample " + SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.privateId,
     "Missing Data",
   ];
   const idsMissingData = Object.keys(missingData);
   const rows = idsMissingData.map((sampleId) => {
     const missingHeaders = Array.from(
       missingData[sampleId],
-      (missingKey) => SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS[missingKey]
+      (missingKey) => SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[missingKey]
     );
     const missingDataDescription = missingHeaders.join(", ");
     return [sampleId, missingDataDescription];
@@ -293,6 +293,7 @@ export function WarningMissingData({
 export function WarningMissingDataEdit({
   missingData,
 }: PropsMissingDataEdit): JSX.Element {
+  console.log("from warningmissingdataedit missingData", missingData); // REMOVE
   const count = Object.keys(missingData).length;
   // "X Samples were missing data in required fields."
   const title = `${count} ${pluralize("Sample", count)} ${pluralize(

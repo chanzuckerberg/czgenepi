@@ -62,7 +62,6 @@ export default function ImportFile({
     null
   );
 
-
   useEffect(() => {
     // If no file uploaded yet, do nothing.
     if (!parseResult) return;
@@ -176,17 +175,12 @@ export default function ImportFile({
             | NamedGisaidLocation
             | undefined) = passOrDeleteEntry(value);
         }
-        const ALWAYS_REQUIRED: Array<keyof SampleEditTsvMetadata> = [
-          "newPrivateID",
-          "collectionDate",
-          "collectionLocation",
-        ];
         if (!isEmpty(uploadedMetadataEntry)) {
           setMissingData((prevMissingData) => {
-            const rowMissingMetadataWarnings = warnMissingMetadata(
-              uploadedMetadataEntry,
-              ALWAYS_REQUIRED
-            );
+            const rowMissingMetadataWarnings = warnMissingMetadata({
+              ...existingMetadataEntry,
+              ...pick(uploadedMetadataEntry, uploadedFieldsWithData),
+            });
             return {
               ...prevMissingData,
               [sampleId]: rowMissingMetadataWarnings,
