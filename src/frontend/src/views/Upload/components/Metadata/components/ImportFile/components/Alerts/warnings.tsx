@@ -261,8 +261,6 @@ function MessageMissingDataEdit({ missingData }: PropsMissingData) {
     const missingDataDescription = missingHeaders.join(", ");
     return [sampleId, missingDataDescription];
   });
-  // console.log("columnHeaders", columnHeaders); // REMOVE
-  // console.log("rows", rows); // REMOVE
   return (
     <ProblemTable
       tablePreamble={tablePreamble}
@@ -293,7 +291,6 @@ export function WarningMissingData({
 export function WarningMissingDataEdit({
   missingData,
 }: PropsMissingDataEdit): JSX.Element {
-  console.log("from warningmissingdataedit missingData", missingData); // REMOVE
   const count = Object.keys(missingData).length;
   // "X Samples were missing data in required fields."
   const title = `${count} ${pluralize("Sample", count)} ${pluralize(

@@ -80,6 +80,17 @@ export default function ImportFile({
     setAbsentSampleIds(absentSampleIds);
   }, [parseResult, metadata, missingFields]);
 
+  function clearState() {
+    console.log("in clear state"); // REMOVE
+    setExtraneousSampleIds([]);
+    setAbsentSampleIds([]);
+    setUnknownDataFields(false);
+    setMissingData(EMPTY_OBJECT);
+    setBadFormatData(EMPTY_OBJECT);
+    setDuplicatePrivateIds([]);
+    setDuplicatePublicIds([]);
+  }
+
   // Used by file upload parser to convert location strings to Locations
   const stringToLocationFinder = useMemo(() => {
     return createStringToLocationFinder(namedLocations);
@@ -87,6 +98,8 @@ export default function ImportFile({
 
   const handleFiles = async (files: FileList | null) => {
     if (!files) return;
+    // clear old error messages before importing new tsv
+    clearState();
 
     // start
     const sampleIds = Object.keys(metadata || EMPTY_OBJECT);
@@ -138,7 +151,6 @@ export default function ImportFile({
     resetMetadataFromCheckedSamples();
 
     const { data: sampleIdToUploadedMetadata, warningMessages } = result;
-    const missingData = {};
 
     const uploadedMetadata: SampleIdToEditMetadataWebform = {};
     const changedMetadataUpdated: SampleIdToEditMetadataWebform = {};

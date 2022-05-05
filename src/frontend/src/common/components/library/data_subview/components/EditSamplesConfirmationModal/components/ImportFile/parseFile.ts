@@ -110,13 +110,17 @@ function getDuplicateIds(
 
 function filterExtraneousSampleIds(
   rows: Record<string, string>[],
-  editableSampleIds: Set<string>
+  editableSampleIds: Set<string>,
+  exampleSampleIds: Set<string>,
 ) {
   const extraneousUniqueSampleIds = new Set();
 
   const filteredRows = rows.filter((item) => {
     const currentPID = item.currentPrivateID;
-    if (!editableSampleIds.has(currentPID)) {
+    if (
+      !editableSampleIds.has(currentPID) &&
+      !exampleSampleIds.has(currentPID)
+    ) {
       extraneousUniqueSampleIds.add(currentPID);
     } else {
       return item;
@@ -238,13 +242,15 @@ export function parseFileEdit(
           WARNING_CODE,
           SampleIdToWarningMessages
         >();
+        const IGNORED_SAMPLE_IDS = new Set(EXAMPLE_CURRENT_PRIVATE_IDENTIFIERS);
         let hasUnknownFields = false;
         const missingHeaderFields = getMissingHeaderFields(uploadedHeaders);
         const duplicatePublicIds = getDuplicateIds(rows, "publicId");
         const duplicatePrivateIds = getDuplicateIds(rows, "newPrivateID");
         const { extraneousSampleIds, filteredRows } = filterExtraneousSampleIds(
           rows,
-          editableSampleIds
+          editableSampleIds,
+          IGNORED_SAMPLE_IDS
         );
 
         if (missingHeaderFields) {
@@ -267,9 +273,6 @@ export function parseFileEdit(
 
         if (!uploadErrors) {
           // We only ingest file's data if user had all expected fields. and if there are no duplicate identifiers in the upload
-          const IGNORED_SAMPLE_IDS = new Set(
-            EXAMPLE_CURRENT_PRIVATE_IDENTIFIERS
-          );
           // find if any extraneous field data was added in the tsv
           const expectedHeaders = Object.keys(
             SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS
