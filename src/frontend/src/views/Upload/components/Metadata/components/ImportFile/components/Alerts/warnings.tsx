@@ -5,7 +5,6 @@ import { pluralize } from "src/common/utils/strUtils";
 import AlertAccordion from "src/components/AlertAccordion";
 import {
   OPTIONAL_HEADER_MARKER,
-  SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS,
   SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS,
 } from "src/components/DownloadMetadataTemplate/common/constants";
 import { SampleIdToWarningMessages } from "../../parseFile";
@@ -114,7 +113,10 @@ export function WarningExtraneousEntrySampleEdit({
   const title = `${count} ${pluralize(
     "Sample",
     count
-  )} in metadata file couldn't be matched and ${pluralize("was", count)} not imported.`;
+  )} in metadata file couldn't be matched and ${pluralize(
+    "was",
+    count
+  )} not imported.`;
   return (
     <AlertAccordion
       title={title}

@@ -63,7 +63,6 @@ export default function ImportFile({
 
   useEffect(() => {
     // If no file uploaded yet, do nothing.
-    console.log("in useEffect"); // REMOVE
     if (!parseResult) return;
     // If file was missing any col header fields, we parsed no data from it
     // and only display that error to the user to force them to fix problems.
