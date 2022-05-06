@@ -29,6 +29,15 @@ const appTheme = { ...defaultAppTheme };
 
 appTheme.colors.primary = primaryColors;
 appTheme.colors.info = infoColors;
+
+appTheme.borders = appTheme.borders ?? {
+  error: {},
+  gray: {},
+  link: {},
+  primary: {},
+  success: {},
+  warning: {},
+};
 appTheme.borders.primary = primaryBorders;
 
 export const theme = createTheme(makeThemeOptions(appTheme));
