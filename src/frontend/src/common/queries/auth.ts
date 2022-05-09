@@ -56,7 +56,7 @@ export const fetchUserInfo = (): Promise<RawUserRequest> => {
 };
 
 const updateUserInfo = (user: Partial<RawUserRequest>): Promise<Response> => {
-  return fetch(API_URL + API.USER_INFO, {
+  return fetch(API_URL + API.USERDATA, {
     ...DEFAULT_PUT_OPTIONS,
     body: JSON.stringify(user),
   });

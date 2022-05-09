@@ -24,9 +24,7 @@ import { MutationCallbacks } from "./types";
  * Download fasta file for samples
  */
 interface SampleFastaDownloadPayload {
-  requested_sequences: {
-    sample_ids: string[];
-  };
+  sample_ids: string[];
 }
 
 export async function downloadSamplesFasta({
@@ -35,7 +33,7 @@ export async function downloadSamplesFasta({
   sampleIds: string[];
 }): Promise<unknown> {
   const payload: SampleFastaDownloadPayload = {
-    requested_sequences: { sample_ids: sampleIds },
+    sample_ids: sampleIds,
   };
   const response = await fetch(API_URL + API.SAMPLES_FASTA_DOWNLOAD, {
     ...DEFAULT_POST_OPTIONS,

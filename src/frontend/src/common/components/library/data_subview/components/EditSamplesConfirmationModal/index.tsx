@@ -2,19 +2,12 @@ import CloseIcon from "@material-ui/icons/Close";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
-import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { useNamedLocations } from "src/common/queries/locations";
 import { pluralize } from "src/common/utils/strUtils";
 import { Content, Title } from "src/components/BaseDialog/style";
-import { CollapsibleInstructions } from "src/components/CollapsibleInstructions";
 import Dialog from "src/components/Dialog";
-import { SampleEditTsvTemplateDownload } from "src/components/DownloadMetadataTemplate";
 import { prepEditMetadataTemplate } from "src/components/DownloadMetadataTemplate/prepMetadataTemplate";
-import {
-  InstructionsNotSemiBold,
-  InstructionsSemiBold,
-} from "src/components/TreeNameInput/style";
 import { WebformTable } from "src/components/WebformTable";
 import {
   Metadata,
@@ -24,11 +17,11 @@ import {
 import { ContinueButton } from "src/views/Upload/components/common/style";
 import { NamedGisaidLocation } from "src/views/Upload/components/common/types";
 import { SampleIdToWarningMessages } from "src/views/Upload/components/Metadata/components/ImportFile/parseFile";
+import { EditSampleMetaDataInstructions } from "./components/EditSampleMetadataInstructions";
 import { EditSamplesReviewDialog } from "./components/EditSamplesReviewDialog";
 import ImportFile from "./components/ImportFile";
 import { LoseProgressModal } from "./components/LoseProgressModal";
 import {
-  StyledButton,
   StyledDiv,
   StyledIconButton,
   StyledPreTitle,
@@ -52,6 +45,14 @@ enum Steps {
   REVIEW = 2,
 }
 
+type MetadataType = SampleIdToEditMetadataWebform | null;
+
+export interface FileUploadProps {
+  uploadedMetadata: MetadataType;
+  changedMetadataUpdated: MetadataType;
+  autocorrectWarnings: SampleIdToWarningMessages;
+}
+
 const EditSamplesConfirmationModal = ({
   checkedSamples,
   onClose,
@@ -59,14 +60,12 @@ const EditSamplesConfirmationModal = ({
 }: Props): JSX.Element | null => {
   const [currentModalStep, setCurrentModalStep] = useState<Steps>(Steps.EDIT);
   const [isValid, setIsValid] = useState(false);
-  const [metadata, setMetadata] =
-    useState<SampleIdToEditMetadataWebform | null>(null);
+  const [metadata, setMetadata] = useState<MetadataType>(null);
   const [isContinueButtonActive, setIsContinueButtonActive] =
     useState<boolean>(false);
   const [isLoseProgessModalOpen, setLoseProgressModalOpen] =
     useState<boolean>(false);
-  const [changedMetadata, setChangedMetadata] =
-    useState<SampleIdToEditMetadataWebform | null>(null);
+  const [changedMetadata, setChangedMetadata] = useState<MetadataType>(null);
   const { data: namedLocationsData } = useNamedLocations();
   const namedLocations: NamedGisaidLocation[] =
     namedLocationsData?.namedLocations ?? [];
@@ -94,6 +93,26 @@ const EditSamplesConfirmationModal = ({
 
   const handleClose = function () {
     setLoseProgressModalOpen(true);
+  };
+
+  const handleCloseLoseProgressModal = () => {
+    setLoseProgressModalOpen(false);
+  };
+
+  const handleConfirmLoseProgressModal = () => {
+    onClose();
+    clearState();
+  };
+
+  const handleMetadataFileUploaded = ({
+    uploadedMetadata,
+    changedMetadataUpdated,
+    autocorrectWarnings,
+  }: FileUploadProps) => {
+    setMetadata(uploadedMetadata);
+    setChangedMetadata(changedMetadataUpdated);
+    setHasImportedMetadataFile(true);
+    setAutocorrectWarnings(autocorrectWarnings);
   };
 
   const updateChangedMetadata = useCallback(
@@ -176,51 +195,6 @@ const EditSamplesConfirmationModal = ({
   }, [checkedSamples, metadata]);
 
   const numSamples = checkedSamples.length;
-  const title = "Edit Sample Metadata";
-
-  const HREF =
-    "https://docs.google.com/document/d/1QxNcDip31DA40SRIOmdV1I_ZC7rWDz5YQGk26Mr2kfA/edit";
-  const instructionItems = [
-    <InstructionsSemiBold key="1">
-      Please refer to the
-      <NewTabLink href={HREF}>
-        {" "}
-        Upload and Updating Metadata help documentation
-      </NewTabLink>{" "}
-      detailed instructions on setting up your file and troubleshooting errors
-      and warnings.
-    </InstructionsSemiBold>,
-    <InstructionsNotSemiBold key="2">
-      You can only import one file at a time. Importing a new file will
-      overwrite previously imported data.
-    </InstructionsNotSemiBold>,
-    <InstructionsNotSemiBold key="3">
-      Metadata will be imported to the webform table below, and any changes will
-      be highlighted.
-    </InstructionsNotSemiBold>,
-  ];
-
-  const secondSetInstructionItems = [
-    <InstructionsSemiBold key="1">
-      We recommend you copy your metadata into our TSV template, but you can
-      import your own file as well. Accepted file formats: TSV, CSV.
-    </InstructionsSemiBold>,
-    <InstructionsNotSemiBold key="2">
-      Column header naming conventions and metadata value formatting must match
-      those found in the TSV template. See the help documentation above for more
-      details.
-    </InstructionsNotSemiBold>,
-    <InstructionsNotSemiBold key="3">
-      Do not include any personal identifying information (PII) in the Private
-      or Public Sample IDs.
-    </InstructionsNotSemiBold>,
-  ];
-
-  const closeIcon = (
-    <StyledIconButton onClick={handleClose}>
-      <CloseIcon />
-    </StyledIconButton>
-  );
 
   const { templateInstructionRows, templateHeaders, templateRows } =
     useMemo(() => {
@@ -234,18 +208,6 @@ const EditSamplesConfirmationModal = ({
         collectionLocation
       );
     }, [checkedSamples]);
-
-  const downloadTSVButton = (
-    <SampleEditTsvTemplateDownload
-      headers={templateHeaders}
-      rows={templateRows}
-      instructions={templateInstructionRows}
-    >
-      <StyledButton sdsType="secondary">
-        Download Metadata Template (TSV)
-      </StyledButton>
-    </SampleEditTsvTemplateDownload>
-  );
 
   return (
     <>
@@ -267,38 +229,37 @@ const EditSamplesConfirmationModal = ({
         onClose={handleClose}
       >
         <DialogTitle>
-          <StyledDiv>{closeIcon}</StyledDiv>
+          <StyledDiv>
+            <StyledIconButton onClick={handleClose}>
+              <CloseIcon />
+            </StyledIconButton>
+          </StyledDiv>
           <StyledPreTitle>Step {currentModalStep} of 2</StyledPreTitle>
-          <Title>{title}</Title>
+          <Title>Edit Sample Metadata</Title>
           <StyledSubTitle>
             {numSamples} {pluralize("Sample", numSamples)} Selected
           </StyledSubTitle>
         </DialogTitle>
         <DialogContent>
           <Content>
+            <LoseProgressModal
+              isModalOpen={isLoseProgessModalOpen}
+              onClose={handleCloseLoseProgressModal}
+              onConfirm={handleConfirmLoseProgressModal}
+            />
             {currentModalStep === Steps.EDIT && (
               <>
-                <CollapsibleInstructions
-                  additionalHeaderLink={downloadTSVButton}
-                  header="Import Data from TSV or CSV File"
-                  headerSize="s"
-                  instructionListTitle="Importing Files"
-                  items={instructionItems}
-                  shouldStartOpen
-                  secondInstructionListTitle="File Requirements"
-                  secondSetItems={secondSetInstructionItems}
-                  InstructionsTitleMarginBottom="xxs"
-                  listItemFontSize="xs"
+                <EditSampleMetaDataInstructions
+                  templateInstructionRows={templateInstructionRows}
+                  templateRows={templateRows}
+                  templateHeaders={templateHeaders}
                 />
                 <ImportFile
                   metadata={metadata}
                   changedMetadata={changedMetadata}
                   namedLocations={namedLocations}
-                  setMetadata={setMetadata}
-                  setChangedMetadata={setChangedMetadata}
                   hasImportedMetadataFile={hasImportedMetadataFile}
-                  setHasImportedMetadataFile={setHasImportedMetadataFile}
-                  setAutocorrectWarnings={setAutocorrectWarnings}
+                  onMetadataFileUploaded={handleMetadataFileUploaded}
                 />
                 <WebformTable
                   setIsValid={setIsValid}
