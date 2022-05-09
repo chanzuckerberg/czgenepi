@@ -320,19 +320,19 @@ def update_me(ctx, agreed_to_tos, ack_policy_version):
 @click.argument("email")
 @click.option("--name", required=True, type=str, help="The user's name.")
 @click.option(
-    "--group_id",
+    "--group-id",
     required=True,
     type=str,
     help="The id of the group to create the user in.",
 )
 @click.option(
-    "--auth0_user_id",
+    "--auth0-user-id",
     required=True,
     type=str,
     help="The auth0 identifier attached to the user's auth0 account.",
 )
-@click.option("--group_admin", is_flag=True, default=False)
-@click.option("--system_admin", is_flag=True, default=False)
+@click.option("--group-admin", is_flag=True, default=False)
+@click.option("--system-admin", is_flag=True, default=False)
 @click.pass_context
 def create(
     ctx,
