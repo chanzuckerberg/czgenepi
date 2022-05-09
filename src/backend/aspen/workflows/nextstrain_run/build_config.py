@@ -169,7 +169,7 @@ def apply_filters(config, subsampling, template_args):
         # Techically pango_lineages should be a *python* encoded list, but we're
         # cheating since json is interoperable as long as we remove bad characters
         clean_values = [re.sub(r"[^0-9a-zA-Z.]", "", item) for item in pango_lineages]
-        config["builds"]["aspen"]["pango_lineage"] = json.dumps(clean_values)
+        config["builds"]["aspen"]["pango_lineage"] = clean_values
         # Remove the last " from our old query so we can inject more filters
         old_query = subsampling["group"]["query"][:-1]
         pango_query = " & (pango_lineage in {pango_lineage})"
