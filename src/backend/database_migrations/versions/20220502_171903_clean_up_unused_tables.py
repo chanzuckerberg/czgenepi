@@ -23,6 +23,12 @@ def upgrade():
     op.drop_table("sequencing_protocol_types", schema="aspen")
     op.drop_table("bams", schema="aspen")
     op.drop_table("called_pathogen_genomes", schema="aspen")
+
+    # Drop dummy data tied to our enums, relevant for dev environments
+    op.execute(
+        "DELETE FROM aspen.entities WHERE entity_type IN ('SEQUENCING_READS', 'BAM', 'CALLED_PATHOGEN_GENOME', 'HOST_FILTERED_SEQUENCE_READS')"
+    )
+
     op.enum_delete(
         "entity_types",
         [
