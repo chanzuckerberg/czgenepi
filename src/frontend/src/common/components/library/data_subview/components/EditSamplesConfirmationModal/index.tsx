@@ -282,7 +282,12 @@ const EditSamplesConfirmationModal = ({
                 </ContinueButton>
               </>
             )}
-            {currentModalStep === Steps.REVIEW && <EditSamplesReviewDialog />}
+            {currentModalStep === Steps.REVIEW && (
+              <EditSamplesReviewDialog
+                changedMetaData={changedMetadata}
+                onClickBack={() => setCurrentModalStep(Steps.EDIT)}
+              />
+            )}
           </Content>
         </DialogContent>
       </Dialog>
