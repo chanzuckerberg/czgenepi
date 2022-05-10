@@ -1,4 +1,5 @@
 import CloseIcon from "@material-ui/icons/Close";
+import { Button } from "czifui";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
@@ -14,7 +15,6 @@ import {
   SampleEditMetadataWebform,
   SampleIdToEditMetadataWebform,
 } from "src/components/WebformTable/common/types";
-import { ContinueButton } from "src/views/Upload/components/common/style";
 import { NamedGisaidLocation } from "src/views/Upload/components/common/types";
 import { SampleIdToWarningMessages } from "src/views/Upload/components/Metadata/components/ImportFile/parseFile";
 import { EditSampleMetaDataInstructions } from "./components/EditSampleMetadataInstructions";
@@ -266,14 +266,14 @@ const EditSamplesConfirmationModal = ({
                   handleRowMetadata={handleRowMetadata}
                   webformTableType="EDIT"
                 />
-                <ContinueButton
+                <Button
                   disabled={!isContinueButtonActive}
                   onClick={() => setCurrentModalStep(Steps.REVIEW)}
                   sdsType="primary"
                   sdsStyle="rounded"
                 >
                   Continue
-                </ContinueButton>
+                </Button>
               </>
             )}
             {currentModalStep === Steps.REVIEW && (
