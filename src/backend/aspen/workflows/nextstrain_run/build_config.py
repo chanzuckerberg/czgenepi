@@ -45,8 +45,9 @@ class OverviewBuilder(BaseNextstrainConfigBuilder):
             subsampling["country"]["max_sequences"] = 800
             subsampling["international"]["max_sequences"] = 200
 
-        # If there aren't any selected samples this is probably a scheduled run
-        # and we should use the reference sequences
+        # If there aren't any selected samples
+        # Either due to being a scheduled run or no user selection
+        # Put reference sequences in include.txt so tree run don't break
         if self.num_included_samples == 0:
             del config["files"]["include"]
 
@@ -61,6 +62,11 @@ class NonContextualizedBuilder(BaseNextstrainConfigBuilder):
 
         # Update our sampling for state/country level builds if necessary
         update_subsampling_for_location(self.tree_build_level, subsampling)
+
+        # If there aren't any selected samples due to no user selection
+        # Put reference sequences in include.txt so tree run don't break
+        if self.num_included_samples == 0:
+            del config["files"]["include"]
 
 
 # Set max_sequences for targeted builds.
