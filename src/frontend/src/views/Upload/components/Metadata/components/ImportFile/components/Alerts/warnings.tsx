@@ -119,7 +119,7 @@ export function WarningExtraneousEntrySampleEdit({
   )} not imported.`;
   return (
     <AlertAccordion
-      title={title}
+      title={<B>{title}</B>}
       collapseContent={
         <MessageExtraneousEntrySampleEdit
           extraneousSampleIds={extraneousSampleIds}
@@ -190,10 +190,15 @@ export function WarningAbsentSampleEdit({
 }: PropsAbsentSample): JSX.Element {
   const count = absentSampleIds.length;
   // "X Samples were not found in metadata file."
-  const title = `${count} selected ${pluralize("Sample", count)} ${pluralize(
-    "was",
-    count
-  )} not found in metadata file, and have not been updated below.`;
+  const title = (
+    <>
+      <B>
+        {count} selected {pluralize("Sample", count)} {pluralize("was", count)}{" "}
+        not found in metadata file,{" "}
+      </B>
+      and have not been updated below.
+    </>
+  );
   return (
     <AlertAccordion
       title={title}
@@ -270,7 +275,7 @@ export function WarningMissingData({
   )} missing data in required fields.`;
   return (
     <AlertAccordion
-      title={title}
+      title={<B>{title}</B>}
       collapseContent={<MessageMissingData missingData={missingData} />}
       intent={WARNING_SEVERITY}
     />
@@ -288,7 +293,7 @@ export function WarningMissingDataEdit({
   )} missing data in required fields.`;
   return (
     <AlertAccordion
-      title={title}
+      title={<B>{title}</B>}
       collapseContent={<MessageMissingDataEdit missingData={missingData} />}
       intent={WARNING_SEVERITY}
     />
@@ -358,9 +363,13 @@ export function ErrorBadFormatData({
   badFormatData,
   IdColumnNameForWarnings,
 }: PropsBadFormatData): JSX.Element {
-  const title =
-    "Some of your data is not formatted correctly. " +
-    "Please update before proceeding.";
+  const title = (
+    <>
+      <B>Some of your data is not formatted correctly. </B>
+      Please update before proceeding.
+    </>
+  );
+
   return (
     <AlertAccordion
       title={title}

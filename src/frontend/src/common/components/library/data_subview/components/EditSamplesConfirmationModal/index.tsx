@@ -175,7 +175,7 @@ const EditSamplesConfirmationModal = ({
     setMetadata(structuredMetadata);
   }
 
-  useEffect(() => {
+  useMemo(() => {
     // this is a bit of a hack, currently the modal rerenders itself and the user
     // loses userinput if focus is taken away from the modal,
     // to keep things less frustrating we're checking if the checkedSamples privateIds
