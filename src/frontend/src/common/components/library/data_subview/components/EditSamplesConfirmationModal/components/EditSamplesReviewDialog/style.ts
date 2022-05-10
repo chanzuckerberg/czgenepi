@@ -1,5 +1,12 @@
 import styled from "@emotion/styled";
-import { Button, Callout, fontBodyXs, getColors, getSpaces } from "czifui";
+import {
+  Button,
+  Callout,
+  fontBodyXs,
+  getBorders,
+  getColors,
+  getSpaces,
+} from "czifui";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 
 export const StyledButton = styled(Button)`
@@ -51,4 +58,11 @@ export const CheckboxWrapper = styled.div`
 
 export const StyledNewTabLink = styled(NewTabLink)`
   color: black;
+  border-bottom: 1px dashed;
+
+  &:hover,
+  &:focus {
+    text-decoration: none;
+    border-bottom: 1px solid;
+  }
 `;
