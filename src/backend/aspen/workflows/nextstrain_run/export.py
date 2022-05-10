@@ -77,10 +77,10 @@ METADATA_CSV_FIELDS = [
 @click.option("--dump-config", type=bool, is_flag=True)
 def cli(
     phylo_run_id: int,
-    sequences_fh: io.TextIOBase,
-    selected_fh: io.TextIOBase,
-    metadata_fh: io.TextIOBase,
-    builds_file_fh: io.TextIOBase,
+    sequences_fh: io.TextIOWrapper,
+    selected_fh: io.TextIOWrapper,
+    metadata_fh: io.TextIOWrapper,
+    builds_file_fh: io.TextIOWrapper,
     reset_status: bool,
     test: bool,
     dump_config: bool,
@@ -105,7 +105,7 @@ def cli(
 
 def dump_yaml_template(
     phylo_run_id: int,
-    builds_file_fh: io.TextIOBase,
+    builds_file_fh: io.TextIOWrapper,
 ):
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
 
