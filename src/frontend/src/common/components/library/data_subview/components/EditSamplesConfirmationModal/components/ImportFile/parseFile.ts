@@ -84,7 +84,7 @@ function warnBadFormatMetadata(
 function getMissingHeaderFields(uploadedHeaders: string[]): Set<string> | null {
   const missingFields = new Set<string>();
   if (!uploadedHeaders.includes("currentPrivateID")) {
-    missingFields.add("Current Private ID");
+    missingFields.add(SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.currentPrivateID);
   }
   return missingFields.size !== 0 ? missingFields : null;
 }

@@ -188,9 +188,8 @@ export default function ImportFile({
                 ...prevMissingData,
                 [sampleId]: rowMissingMetadataWarnings,
               };
-            } else {
-              return { ...prevMissingData };
             }
+            return { ...prevMissingData };
           });
         }
         uploadedMetadata[sampleId] = {
