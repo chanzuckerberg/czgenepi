@@ -32,7 +32,7 @@ export const StyledCollapseContent = styled.div`
 
     return `
       padding: ${spaces?.l}px;
-    background-color: #f4eee4;
+      background-color: #f4eee4;
     `;
   }}
 `;
