@@ -45,7 +45,7 @@ enum Steps {
   REVIEW = 2,
 }
 
-type MetadataType = SampleIdToEditMetadataWebform | null;
+export type MetadataType = SampleIdToEditMetadataWebform | null;
 
 export interface FileUploadProps {
   uploadedMetadata: MetadataType;
@@ -278,7 +278,7 @@ const EditSamplesConfirmationModal = ({
             )}
             {currentModalStep === Steps.REVIEW && (
               <EditSamplesReviewDialog
-                changedMetaData={changedMetadata}
+                changedMetadata={changedMetadata}
                 onClickBack={() => setCurrentModalStep(Steps.EDIT)}
               />
             )}

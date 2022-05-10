@@ -1,10 +1,12 @@
 import { Checkbox } from "czifui";
+import { filter } from "lodash";
 import React, { useState } from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { ROUTES } from "src/common/routes";
 import { B } from "src/common/styles/basicStyle";
 import { pluralize } from "src/common/utils/strUtils";
 import AlertAccordion from "src/components/AlertAccordion";
+import { MetadataType } from "../../index";
 import { Table } from "./components/Table";
 import {
   CalloutContainer,
@@ -16,21 +18,26 @@ import {
 } from "./style";
 
 interface Props {
-  changedMetaData: any;
+  changedMetadata: MetadataType;
   onClickBack(): void;
 }
 
 const EditSamplesReviewDialog = ({
-  changedMetaData,
+  changedMetadata,
   onClickBack,
 }: Props): JSX.Element => {
   const [isChecked, setChecked] = useState<boolean>(false);
-  const numChangedSamples = changedMetaData.length ?? 0;
+
+  const privacyChangedSamples = filter(Object.keys(changedMetadata), (key) =>
+    Object.hasOwn(changedMetadata[key], "keepPrivate")
+  );
+  const numPrivacyChanged = privacyChangedSamples.length;
+
   const warningTitle = (
     <>
       <B>
-        {numChangedSamples} {pluralize("Sample", numChangedSamples)} have
-        updated privacy settings,
+        {numPrivacyChanged} {pluralize("Sample", numPrivacyChanged)}{" "}
+        {pluralize("has", numPrivacyChanged)} updated privacy settings,
       </B>{" "}
       which will impact who can see your de-identified sample data. Read our{" "}
       <StyledNewTabLink href={ROUTES.PRIVACY}>Privacy Policy</StyledNewTabLink>{" "}
@@ -41,7 +48,7 @@ const EditSamplesReviewDialog = ({
   const collapseContent = (
     <>
       <StyledCollapseContent>
-        <B>Changed Samples (Private ID):</B>
+        <B>Changed Samples (Private ID):</B> {privacyChangedSamples.join(", ")}
       </StyledCollapseContent>
     </>
   );
@@ -69,11 +76,13 @@ const EditSamplesReviewDialog = ({
           Once saved, the sample metadata above will overwrite all exisiting
           data. <B>This action cannot be undone.</B>
         </StyledCallout>
-        <AlertAccordion
-          intent="warning"
-          title={warningTitle}
-          collapseContent={collapseContent}
-        ></AlertAccordion>
+        {numPrivacyChanged > 0 && (
+          <AlertAccordion
+            intent="warning"
+            title={warningTitle}
+            collapseContent={collapseContent}
+          />
+        )}
       </CalloutContainer>
       <div>
         <StyledButton sdsType="primary" sdsStyle="rounded">
