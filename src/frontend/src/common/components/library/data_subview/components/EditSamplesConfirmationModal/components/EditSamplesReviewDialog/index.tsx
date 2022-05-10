@@ -85,7 +85,11 @@ const EditSamplesReviewDialog = ({
         )}
       </CalloutContainer>
       <div>
-        <StyledButton sdsType="primary" sdsStyle="rounded">
+        <StyledButton
+          sdsType="primary"
+          sdsStyle="rounded"
+          disabled={!isChecked}
+        >
           Save
         </StyledButton>
         <StyledButton
