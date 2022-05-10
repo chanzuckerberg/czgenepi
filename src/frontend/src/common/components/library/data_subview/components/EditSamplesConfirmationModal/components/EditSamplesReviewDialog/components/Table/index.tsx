@@ -8,7 +8,7 @@ import {
   StyledTableCell,
   StyledTableContainer,
   StyledTableRow,
-} from "src/views/upload/components/Review/components/Table/style";
+} from "src/views/Upload/components/Review/components/Table/style";
 
 interface Props {
   metadata: CommonProps["metadata"];

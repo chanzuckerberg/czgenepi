@@ -1,5 +1,5 @@
 import { Checkbox } from "czifui";
-import React from "react";
+import React, { useState } from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { ROUTES } from "src/common/routes";
 import { B } from "src/common/styles/basicStyle";
@@ -24,6 +24,7 @@ const EditSamplesReviewDialog = ({
   changedMetaData,
   onClickBack,
 }: Props): JSX.Element => {
+  const [isChecked, setChecked] = useState<boolean>(false);
   const numChangedSamples = changedMetaData.length ?? 0;
   const warningTitle = (
     <>
@@ -32,9 +33,7 @@ const EditSamplesReviewDialog = ({
         updated privacy settings,
       </B>{" "}
       which will impact who can see your de-identified sample data. Read our{" "}
-      <StyledNewTabLink href={ROUTES.PRIVACY} sdsStyle="dashed">
-        Privacy Policy
-      </StyledNewTabLink>{" "}
+      <StyledNewTabLink href={ROUTES.PRIVACY}>Privacy Policy</StyledNewTabLink>{" "}
       for more information.
     </>
   );
@@ -49,9 +48,12 @@ const EditSamplesReviewDialog = ({
 
   return (
     <>
-      <Table />
+      <Table metadata={{}} />
       <CheckboxWrapper>
-        <Checkbox />
+        <Checkbox
+          stage={isChecked ? "checked" : "unchecked"}
+          onClick={() => setChecked(!isChecked)}
+        />
         <div>
           I agree that the data I am uploading to CZ GEN EPI has been lawfully
           collected and that I have all the necessary consents, permissions, and

@@ -211,12 +211,6 @@ const EditSamplesConfirmationModal = ({
 
   return (
     <>
-      <LoseProgressModal
-        isModalOpen={isLoseProgessModalOpen}
-        setIsModalOpen={setLoseProgressModalOpen}
-        onClose={onClose}
-        clearState={clearState}
-      />
       <Dialog
         disableBackdropClick
         // Dialogs and modals automatically focus themselves if some other element tries to steal the focus while they are open
