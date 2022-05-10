@@ -106,7 +106,7 @@ def cli(
 def dump_yaml_template(
     phylo_run_id: int,
     builds_file_fh: io.TextIOBase,
-    ):
+):
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
 
     num_sequences: int = 0
