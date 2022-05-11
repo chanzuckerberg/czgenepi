@@ -2,6 +2,7 @@ import { Checkbox } from "czifui";
 import { filter } from "lodash";
 import React, { useState } from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
+import { useEditSamples } from "src/common/queries/samples";
 import { ROUTES } from "src/common/routes";
 import { B } from "src/common/styles/basicStyle";
 import { pluralize } from "src/common/utils/strUtils";
@@ -19,16 +20,36 @@ import {
 
 interface Props {
   changedMetadata: MetadataType;
+  metadata: MetadataType;
   onClickBack(): void;
 }
 
 const EditSamplesReviewDialog = ({
   changedMetadata,
+  metadata,
   onClickBack,
 }: Props): JSX.Element => {
   const [isChecked, setChecked] = useState<boolean>(false);
 
-  const privacyChangedSamples = filter(Object.keys(changedMetadata), (key) =>
+  const editSampleMutation = useEditSamples({
+    componentOnSuccess: () => {
+      // will be defined as part of https://app.shortcut.com/genepi/story/180633
+    },
+    componentOnError: () => {
+      // will be defined as part of https://app.shortcut.com/genepi/story/180633
+    },
+  });
+
+  const handleSave = () => {
+    editSampleMutation.mutate({
+      samples: Object.values(metadata) ?? [],
+    });
+  };
+
+  // determine whether any samples have changed privacy settings so
+  // we know to show the warning
+  const changedKeys = Object.keys(changedMetadata) ?? [];
+  const privacyChangedSamples = filter(changedKeys, (key) =>
     Object.hasOwn(changedMetadata[key], "keepPrivate")
   );
   const numPrivacyChanged = privacyChangedSamples.length;
@@ -55,7 +76,7 @@ const EditSamplesReviewDialog = ({
 
   return (
     <>
-      <Table metadata={{}} />
+      <Table metadata={metadata} />
       <CheckboxWrapper>
         <Checkbox
           stage={isChecked ? "checked" : "unchecked"}
@@ -89,6 +110,7 @@ const EditSamplesReviewDialog = ({
           sdsType="primary"
           sdsStyle="rounded"
           disabled={!isChecked}
+          onClick={handleSave}
         >
           Save
         </StyledButton>

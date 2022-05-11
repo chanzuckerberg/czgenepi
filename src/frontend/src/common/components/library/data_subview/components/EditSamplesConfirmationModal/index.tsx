@@ -188,7 +188,10 @@ const EditSamplesConfirmationModal = ({
     ) {
       const structuredMetadata: SampleIdToEditMetadataWebform = {};
       checkedSamples.forEach((item) => {
-        structuredMetadata[item.privateId] = structureInitialMetadata(item);
+        structuredMetadata[item.privateId] = {
+          ...structureInitialMetadata(item),
+          id: item.id,
+        };
       });
       setMetadata(structuredMetadata);
     }
@@ -279,6 +282,7 @@ const EditSamplesConfirmationModal = ({
             {currentModalStep === Steps.REVIEW && (
               <EditSamplesReviewDialog
                 changedMetadata={changedMetadata}
+                metadata={metadata}
                 onClickBack={() => setCurrentModalStep(Steps.EDIT)}
               />
             )}
