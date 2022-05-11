@@ -74,7 +74,7 @@ METADATA_CSV_FIELDS = [
     help="Should the status of this workflow be set to 'STARTED'?",
 )
 @click.option("--test", type=bool, is_flag=True)
-@click.option("--dump-config", type=bool, is_flag=True)
+@click.option("--builds-file-only", type=bool, is_flag=True)
 def cli(
     phylo_run_id: int,
     sequences_fh: io.TextIOWrapper,
@@ -83,11 +83,10 @@ def cli(
     builds_file_fh: io.TextIOWrapper,
     reset_status: bool,
     test: bool,
-    dump_config: bool,
+    builds_file_only: bool,
 ):
-    if dump_config:
-        msg = dump_yaml_template(phylo_run_id, builds_file_fh)
-        print(msg)
+    if builds_file_only:
+        dump_yaml_template(phylo_run_id, builds_file_fh)
         return
     if test:
         print("Success!")
@@ -103,6 +102,7 @@ def cli(
     print(json.dumps(aligned_gisaid_dump))
 
 
+# For local debugging of our yaml building process.
 def dump_yaml_template(
     phylo_run_id: int,
     builds_file_fh: io.TextIOWrapper,
@@ -126,7 +126,7 @@ def dump_yaml_template(
         )
         builder.write_file(builds_file_fh)
 
-        return f"YAML Build Config dumped to {builds_file_fh.name}"
+        print(f"YAML Build Config dumped to {builds_file_fh.name}")
 
 
 def export_run_config(
