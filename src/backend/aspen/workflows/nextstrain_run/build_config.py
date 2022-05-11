@@ -1,4 +1,3 @@
-import json
 import re
 from math import ceil
 
@@ -172,10 +171,11 @@ def apply_filters(config, subsampling, template_args):
 
     pango_lineages = template_args.get("filter_pango_lineages")
     if pango_lineages:
-        # Techically pango_lineages should be a *python* encoded list, but we're
-        # cheating since json is interoperable as long as we remove bad characters
+        # Nextstrain is rather particular about the acceptable syntax for
+        # values in the pango_lineages key. Before modifying please see
+        # https://discussion.nextstrain.org/t/failure-when-specifying-multiple-pango-lineages-in-a-build/670
         clean_values = [re.sub(r"[^0-9a-zA-Z.]", "", item) for item in pango_lineages]
-        config["builds"]["aspen"]["pango_lineage"] = json.dumps(clean_values)
+        config["builds"]["aspen"]["pango_lineage"] = clean_values
         # Remove the last " from our old query so we can inject more filters
         old_query = subsampling["group"]["query"][:-1]
         pango_query = " & (pango_lineage in {pango_lineage})"
