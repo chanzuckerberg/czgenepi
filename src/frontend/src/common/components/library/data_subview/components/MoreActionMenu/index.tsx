@@ -1,19 +1,20 @@
 import { Menu, MenuItem } from "czifui";
 import React, { MouseEventHandler, useState } from "react";
 import { StyledEditIcon, StyledTrashIcon } from "src/common/styles/iconStyle";
-import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import { StyledText } from "src/views/Data/components/TreeActionMenu/components/MoreActionsMenu/style";
 import { TooltipDescriptionText, TooltipHeaderText } from "../../style";
 import { IconButton } from "../IconButton";
 
 interface Props {
   disabled: boolean;
+  sampleEditDisabled: boolean;
   onDeleteSelected(): void;
   onEditSelected(): void;
 }
 
 const MoreActionsMenu = ({
   disabled,
+  sampleEditDisabled,
   onDeleteSelected,
   onEditSelected,
 }: Props): JSX.Element => {
