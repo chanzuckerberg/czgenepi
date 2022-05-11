@@ -66,13 +66,14 @@ const EditSamplesConfirmationModal = ({
   const [isLoseProgessModalOpen, setLoseProgressModalOpen] =
     useState<boolean>(false);
   const [changedMetadata, setChangedMetadata] = useState<MetadataType>(null);
-  const { data: namedLocationsData } = useNamedLocations();
-  const namedLocations: NamedGisaidLocation[] =
-    namedLocationsData?.namedLocations ?? [];
   const [hasImportedMetadataFile, setHasImportedMetadataFile] =
     useState<boolean>(false);
   const [autocorrectWarnings, setAutocorrectWarnings] =
     useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
+
+  const { data: namedLocationsData } = useNamedLocations();
+  const namedLocations: NamedGisaidLocation[] =
+    namedLocationsData?.namedLocations ?? [];
 
   useEffect(() => {
     // continue button should only be active if the user has metadata
@@ -85,10 +86,14 @@ const EditSamplesConfirmationModal = ({
   }, [changedMetadata, isValid]);
 
   const clearState = function () {
-    setChangedMetadata(null);
+    setCurrentModalStep(Steps.EDIT);
+    setIsValid(false);
     setMetadata(null);
-    setHasImportedMetadataFile(false);
+    setIsContinueButtonActive(false);
     setLoseProgressModalOpen(false);
+    setChangedMetadata(null);
+    setHasImportedMetadataFile(false);
+    setAutocorrectWarnings(EMPTY_OBJECT);
   };
 
   const handleClose = function () {
