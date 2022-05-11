@@ -256,6 +256,9 @@ const EditSamplesConfirmationModal = ({
                 <ImportFile
                   metadata={metadata}
                   changedMetadata={changedMetadata}
+                  resetMetadataFromCheckedSamples={
+                    resetMetadataFromCheckedSamples
+                  }
                   namedLocations={namedLocations}
                   hasImportedMetadataFile={hasImportedMetadataFile}
                   onMetadataFileUploaded={handleMetadataFileUploaded}
