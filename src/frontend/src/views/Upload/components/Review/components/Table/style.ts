@@ -9,8 +9,7 @@ export const Overflow = styled.div`
     const spaces = getSpaces(props);
 
     return `
-      padding-bottom: ${spaces?.m}px;
-      margin-bottom: ${spaces?.xxl}px;
+      margin-bottom: ${spaces?.l}px;
     `;
   }}
 `;
@@ -38,7 +37,7 @@ export const StyledTableCell = styled(TableCell)`
 
     return `
       color: ${colors?.gray[500]};
-      padding: ${spaces?.l}px ${spaces?.l}px ${spaces?.l}px 0;
+      padding: ${spaces?.m}px;
       border-bottom: solid 2px ${colors?.gray[200]};
     `;
   }}
