@@ -128,3 +128,14 @@ export function createStringToLocationFinder(
     );
   };
 }
+
+export const getNameFromCollectionLocation = (
+  collectionLocation: NamedGisaidLocation | string
+): string => {
+  // collection location will always be a NamedGisaidLocation at this stage,
+  // the only time collectionLocation will be a string is during tsv upload
+  // where collectionLocation can be "DELETE" (when a user wants to clear a value)
+  if (collectionLocation && typeof collectionLocation !== "string") {
+    return collectionLocation.name;
+  }
+};
