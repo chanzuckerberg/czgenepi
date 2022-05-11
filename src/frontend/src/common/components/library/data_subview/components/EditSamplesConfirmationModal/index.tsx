@@ -99,7 +99,7 @@ const EditSamplesConfirmationModal = ({
     setLoseProgressModalOpen(false);
   };
 
-  const handleConfirmLoseProgressModal = () => {
+  const closeEditModal = () => {
     onClose();
     clearState();
   };
@@ -242,7 +242,7 @@ const EditSamplesConfirmationModal = ({
             <LoseProgressModal
               isModalOpen={isLoseProgessModalOpen}
               onClose={handleCloseLoseProgressModal}
-              onConfirm={handleConfirmLoseProgressModal}
+              onConfirm={closeEditModal}
             />
             {currentModalStep === Steps.EDIT && (
               <>
@@ -284,6 +284,7 @@ const EditSamplesConfirmationModal = ({
                 changedMetadata={changedMetadata}
                 metadata={metadata}
                 onClickBack={() => setCurrentModalStep(Steps.EDIT)}
+                onSave={closeEditModal}
               />
             )}
           </Content>

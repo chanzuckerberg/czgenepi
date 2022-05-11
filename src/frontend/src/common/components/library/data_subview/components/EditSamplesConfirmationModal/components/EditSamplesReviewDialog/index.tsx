@@ -22,12 +22,14 @@ interface Props {
   changedMetadata: MetadataType;
   metadata: MetadataType;
   onClickBack(): void;
+  onSave(): void;
 }
 
 const EditSamplesReviewDialog = ({
   changedMetadata,
   metadata,
   onClickBack,
+  onSave,
 }: Props): JSX.Element => {
   const [isChecked, setChecked] = useState<boolean>(false);
 
@@ -42,13 +44,15 @@ const EditSamplesReviewDialog = ({
 
   const handleSave = () => {
     editSampleMutation.mutate({
-      samples: Object.values(metadata) ?? [],
+      samples: Object.values(metadata ?? {}),
     });
+
+    onSave();
   };
 
   // determine whether any samples have changed privacy settings so
   // we know to show the warning
-  const changedKeys = Object.keys(changedMetadata) ?? [];
+  const changedKeys = Object.keys(changedMetadata ?? {});
   const privacyChangedSamples = filter(changedKeys, (key) =>
     Object.hasOwn(changedMetadata[key], "keepPrivate")
   );
