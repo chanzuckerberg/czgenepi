@@ -18,6 +18,7 @@ import { ContinueButton } from "src/views/Upload/components/common/style";
 import { NamedGisaidLocation } from "src/views/Upload/components/common/types";
 import { SampleIdToWarningMessages } from "src/views/Upload/components/Metadata/components/ImportFile/parseFile";
 import { EditSampleMetaDataInstructions } from "./components/EditSampleMetadataInstructions";
+import { EditSamplesReviewDialog } from "./components/EditSamplesReviewDialog";
 import ImportFile from "./components/ImportFile";
 import { LoseProgressModal } from "./components/LoseProgressModal";
 import {
@@ -39,6 +40,11 @@ interface Props {
   open: boolean;
 }
 
+enum Steps {
+  EDIT = 1,
+  REVIEW = 2,
+}
+
 type MetadataType = SampleIdToEditMetadataWebform | null;
 
 export interface FileUploadProps {
@@ -52,6 +58,7 @@ const EditSamplesConfirmationModal = ({
   onClose,
   open,
 }: Props): JSX.Element | null => {
+  const [currentModalStep, setCurrentModalStep] = useState<Steps>(Steps.EDIT);
   const [isValid, setIsValid] = useState(false);
   const [metadata, setMetadata] = useState<MetadataType>(null);
   const [isContinueButtonActive, setIsContinueButtonActive] =
@@ -226,7 +233,7 @@ const EditSamplesConfirmationModal = ({
               <CloseIcon />
             </StyledIconButton>
           </StyledDiv>
-          <StyledPreTitle>Step 1 of 2</StyledPreTitle>
+          <StyledPreTitle>Step {currentModalStep} of 2</StyledPreTitle>
           <Title>Edit Sample Metadata</Title>
           <StyledSubTitle>
             {numSamples} {pluralize("Sample", numSamples)} Selected
@@ -239,37 +246,47 @@ const EditSamplesConfirmationModal = ({
               onClose={handleCloseLoseProgressModal}
               onConfirm={handleConfirmLoseProgressModal}
             />
-            <EditSampleMetaDataInstructions
-              templateInstructionRows={templateInstructionRows}
-              templateRows={templateRows}
-              templateHeaders={templateHeaders}
-            />
-            <ImportFile
-              metadata={metadata}
-              changedMetadata={changedMetadata}
-              namedLocations={namedLocations}
-              hasImportedMetadataFile={hasImportedMetadataFile}
-              resetMetadataFromCheckedSamples={resetMetadataFromCheckedSamples}
-              onMetadataFileUploaded={handleMetadataFileUploaded}
-            />
-            <WebformTable
-              setIsValid={setIsValid}
-              metadata={metadata}
-              hasImportedMetadataFile={hasImportedMetadataFile}
-              setMetadata={setMetadata}
-              autocorrectWarnings={autocorrectWarnings}
-              locations={namedLocations}
-              applyToAllColumn={applyToAllColumn}
-              handleRowMetadata={handleRowMetadata}
-              webformTableType="EDIT"
-            />
-            <ContinueButton
-              disabled={!isContinueButtonActive}
-              sdsType="primary"
-              sdsStyle="rounded"
-            >
-              Continue
-            </ContinueButton>
+            {currentModalStep === Steps.EDIT && (
+              <>
+                <EditSampleMetaDataInstructions
+                  templateInstructionRows={templateInstructionRows}
+                  templateRows={templateRows}
+                  templateHeaders={templateHeaders}
+                />
+                <ImportFile
+                  metadata={metadata}
+                  changedMetadata={changedMetadata}
+                  namedLocations={namedLocations}
+                  hasImportedMetadataFile={hasImportedMetadataFile}
+                  onMetadataFileUploaded={handleMetadataFileUploaded}
+                />
+                <WebformTable
+                  setIsValid={setIsValid}
+                  metadata={metadata}
+                  hasImportedMetadataFile={hasImportedMetadataFile}
+                  setMetadata={setMetadata}
+                  autocorrectWarnings={autocorrectWarnings}
+                  locations={namedLocations}
+                  applyToAllColumn={applyToAllColumn}
+                  handleRowMetadata={handleRowMetadata}
+                  webformTableType="EDIT"
+                />
+                <ContinueButton
+                  disabled={!isContinueButtonActive}
+                  onClick={() => setCurrentModalStep(Steps.REVIEW)}
+                  sdsType="primary"
+                  sdsStyle="rounded"
+                >
+                  Continue
+                </ContinueButton>
+              </>
+            )}
+            {currentModalStep === Steps.REVIEW && (
+              <EditSamplesReviewDialog
+                changedMetaData={changedMetadata}
+                onClickBack={() => setCurrentModalStep(Steps.EDIT)}
+              />
+            )}
           </Content>
         </DialogContent>
       </Dialog>

@@ -60,7 +60,7 @@ const TreeNameInput = ({
   const instructions = withCollapsibleInstructions ? (
     // in create Tree Dialog the instructions are collapsible and start closed
     // in edit Tree Dialog the instructions are not collapsible, and therefore should start open
-    <CollapsibleInstructions header={header} items={items} />
+    <CollapsibleInstructions header={header} headerSize="m" items={items} />
   ) : (
     <StyledInstructions items={items} title={"Instructions"} />
   );

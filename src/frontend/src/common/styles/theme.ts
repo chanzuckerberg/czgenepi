@@ -17,9 +17,27 @@ const infoColors = {
   "600": "#371680",
 };
 
+const primaryBorders = {
+  300: `1px solid ${primaryColors[300]}`,
+  400: `1px solid ${primaryColors[400]}`,
+  500: `1px solid ${primaryColors[500]}`,
+  600: `1px solid ${primaryColors[600]}`,
+  dashed: `2px dashed ${primaryColors[400]}`,
+};
+
 const appTheme = { ...defaultAppTheme };
 
 appTheme.colors.primary = primaryColors;
 appTheme.colors.info = infoColors;
+
+appTheme.borders = appTheme.borders ?? {
+  error: {},
+  gray: {},
+  link: {},
+  primary: {},
+  success: {},
+  warning: {},
+};
+appTheme.borders.primary = primaryBorders;
 
 export const theme = createTheme(makeThemeOptions(appTheme));

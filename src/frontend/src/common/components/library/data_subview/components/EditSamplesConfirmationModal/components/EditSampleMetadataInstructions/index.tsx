@@ -81,7 +81,7 @@ const EditSampleMetaDataInstructions = ({
       shouldStartOpen
       secondInstructionListTitle="File Requirements"
       secondSetItems={secondSetInstructionItems}
-      InstructionsTitleMarginBottom="xxs"
+      instructionsTitleMarginBottom="xxs"
       listItemFontSize="xs"
     />
   );

@@ -50,6 +50,7 @@ const InputInstructions = (): JSX.Element => {
     <StyledWrapper>
       <CollapsibleInstructions
         header="Force-Include Samples by ID (optional)"
+        headerSize="m"
         items={[
           <div key={0}>
             <SemiBold>
