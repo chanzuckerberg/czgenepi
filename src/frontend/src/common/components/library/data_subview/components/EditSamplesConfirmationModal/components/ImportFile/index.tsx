@@ -23,8 +23,12 @@ import {
   parseFileEdit,
   ParseResult,
   SampleIdToWarningMessages,
-  warnMissingMetadata,
 } from "./parseFile";
+import {
+  getMissingMetadata,
+  getNonEmptyUploadedMetadataFields,
+  passOrDeleteEntry,
+} from "./utils";
 
 interface Props {
   metadata: SampleIdToEditMetadataWebform | null;
@@ -116,17 +120,6 @@ export default function ImportFile({
     handleMetadataFileUpload(result);
   };
 
-  // we need to decide if a user wants to delete a sample (if they provide a delete keyword in the cell)
-  // if no delete keyword is detected, return the existing value, else return "".
-  function passOrDeleteEntry(
-    value: string | boolean | NamedGisaidLocation
-  ): string | boolean | NamedGisaidLocation | undefined {
-    if (value && value.toString().toLowerCase() === "delete") {
-      return "";
-    }
-    return value;
-  }
-
   function handleMetadataFileUpload(result: ParseResult) {
     // If they're on the page but somehow have no samples (eg, refreshing on
     // Metadata page), short-circuit and do nothing to avoid any weirdness.
@@ -154,17 +147,12 @@ export default function ImportFile({
           sampleId
         );
 
-        // get metadata entries from upload that are not empty (means user wants to import new data)
-        const uploadedFieldsWithData: string[] = [];
-        // TODO: replace with a filter call instead
-        Object.keys(uploadedMetadataEntry).forEach(function (item) {
-          const uploadedEntry =
-            uploadedMetadataEntry[item as keyof SampleEditMetadataWebform];
-          if (uploadedEntry !== "" && uploadedEntry !== undefined)
-            uploadedFieldsWithData.push(item);
-        });
+        // get all fields where user wants to update data
+        const uploadedFieldsWithData = getNonEmptyUploadedMetadataFields(
+          uploadedMetadataEntry
+        );
 
-        // check if any entries need to be deleted/ cleared
+        // check if any entries need to be deleted/ cleared (replace delete keyword with empty string)
         for (const [key, value] of Object.entries(uploadedMetadataEntry)) {
           (uploadedMetadataEntry[key as keyof SampleEditMetadataWebform] as
             | string
@@ -172,6 +160,8 @@ export default function ImportFile({
             | NamedGisaidLocation
             | undefined) = passOrDeleteEntry(value);
         }
+
+        // only take uploaded metadata that the user wants changed, (empty strings are filled with existing metadata)
         const filledInUploadedMetadata = {
           ...pick(uploadedMetadataEntry, uploadedFieldsWithData),
         };
@@ -179,19 +169,15 @@ export default function ImportFile({
         if (!isEmpty(uploadedMetadataEntry)) {
           // check if there is any missing data that the user needs to fill in before proceeding
           setMissingData((prevMissingData) => {
-            const rowMissingMetadataWarnings = warnMissingMetadata({
-              ...existingMetadataEntry,
-              ...filledInUploadedMetadata,
-            });
-            if (rowMissingMetadataWarnings) {
-              return {
-                ...prevMissingData,
-                [sampleId]: rowMissingMetadataWarnings,
-              };
-            }
-            return { ...prevMissingData };
+            return getMissingMetadata(
+              existingMetadataEntry,
+              filledInUploadedMetadata,
+              prevMissingData,
+              sampleId
+            );
           });
         }
+        // merge uploaded metadata with changes from user, fill in blank fields with existing data
         uploadedMetadata[sampleId] = {
           ...existingMetadataEntry,
           ...filledInUploadedMetadata,
