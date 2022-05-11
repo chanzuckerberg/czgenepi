@@ -86,13 +86,15 @@ const MoreActionsMenu = ({
             placement="top"
             title={sampleEditDisabledTooltipContent}
           >
-            <StyledMenuItem
-              onClick={handleEditSamples}
-              disabled={sampleEditDisabled}
-            >
-              <StyledEditIcon />
-              <StyledText>Edit Samples</StyledText>
-            </StyledMenuItem>
+            <div>
+              <MenuItem
+                onClick={handleEditSamples}
+                disabled={sampleEditDisabled}
+              >
+                <StyledEditIcon />
+                <StyledText>Edit Samples</StyledText>
+              </MenuItem>
+            </div>
           </Tooltip>
         )}
         <MenuItem onClick={handleDeleteSamples}>
