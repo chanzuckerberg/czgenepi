@@ -4,6 +4,7 @@ import CloseIcon from "src/common/images/close-icon.svg";
 import HeaderLogo from "src/common/images/gen-epi-logo.svg";
 import { useUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
+import { API } from "src/common/api";
 import UserMenu from "./components/UserMenu";
 import {
   Bar,
@@ -68,7 +69,7 @@ export default function NavBarLanding(): JSX.Element {
   } else {
     MobileSignInLink = (
       <MobileNavLink
-        href={API_URL + ROUTES.LOGIN}
+        href={API_URL + API.LOG_IN}
         style={menuOpen ? { opacity: "1" } : { opacity: "0" }}
         rel="noreferrer"
         aria-label="Log into CZI GEN EPI"
@@ -79,7 +80,7 @@ export default function NavBarLanding(): JSX.Element {
     SignInLink = (
       <ButtonLink
         data-test-id="navbar-sign-in-link"
-        href={API_URL + ROUTES.LOGIN}
+        href={API_URL + API.LOG_IN}
       >
         Sign in
       </ButtonLink>
