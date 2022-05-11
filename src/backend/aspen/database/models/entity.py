@@ -19,6 +19,7 @@ from sqlalchemy.orm import backref, relationship
 
 from aspen.database.models.base import base, idbase
 from aspen.database.models.enum import Enum
+from aspen.database.models.usergroup import Group
 
 if TYPE_CHECKING:
     from aspen.database.models.workflow import Workflow
@@ -61,6 +62,12 @@ class Entity(idbase):  # type: ignore
     __mapper_args__: Mapping[str, Union[EntityType, Column]] = {
         "polymorphic_on": entity_type
     }
+    group_id = Column(
+        Integer,
+        ForeignKey(Group.id),
+        nullable=True,
+    )
+    group = relationship(Group, backref=backref("entities", uselist=True))  # type: ignore
 
     consuming_workflows: MutableSequence[Workflow]
 
