@@ -98,6 +98,7 @@ def cli(
             s3_key=key,
             constituent_samples=included_samples,
             name=phylo_run.name,
+            group=phylo_run.group,
             tree_type=phylo_run.tree_type,
         )
 

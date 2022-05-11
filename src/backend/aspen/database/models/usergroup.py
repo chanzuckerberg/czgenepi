@@ -5,7 +5,8 @@ import string
 from collections.abc import MutableSequence
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, Column, Date, ForeignKey, Integer, String
+from sqlalchemy import Boolean, Column, Date, ForeignKey, Integer, String, text
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import backref, relationship
 
 from aspen.database.models.base import idbase
@@ -39,6 +40,18 @@ class Group(idbase, DictMixin):  # type: ignore
         nullable=True,
     )
     default_tree_location = relationship("Location")  # type: ignore
+
+    # Expected json structure:
+    # { schedule_expression: list[int] }
+    # where the list is days of the week as ints
+    # where 0 is Monday and 6 is Sunday
+    # e.g. [1, 3] for Tuesday and Thursday
+    tree_parameters = Column(
+        JSONB,
+        nullable=True,
+        default=text("'{}'::jsonb"),
+        server_default=text("'{}'::jsonb"),
+    )
 
     can_see: MutableSequence[CanSee]
     can_be_seen_by: MutableSequence[CanSee]

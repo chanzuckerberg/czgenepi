@@ -2,7 +2,7 @@ import styled from "@emotion/styled";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import {
   fontBodyXxs,
-  fontHeaderXs,
+  fontHeaderS,
   getColors,
   getFontWeights,
   getSpaces,
@@ -14,13 +14,13 @@ export const Label = styled.div`
   ${(props) => {
     const spaces = getSpaces(props);
     return `
-      margin-bottom: ${spaces?.xxxs}px;
+      margin-bottom: ${spaces?.xs}px;
     `;
   }}
 `;
 
 export const LabelMain = styled.span`
-  ${fontHeaderXs}
+  ${fontHeaderS}
   color: black;
   ${(props) => {
     const spaces = getSpaces(props);
@@ -32,25 +32,17 @@ export const LabelMain = styled.span`
   }}
 `;
 
-export const LabelLight = styled.span`
-  ${fontHeaderXs}
-  ${(props) => {
-    const fontWeights = getFontWeights(props);
-    const spaces = getSpaces(props);
-    const colors = getColors(props);
-    return `
-      font-weight: ${fontWeights?.regular};
-      margin-top: ${spaces?.l}px;
-      margin-right: ${spaces?.m}px;
-      margin-bottom: ${spaces?.xxxs}px;
-      color: ${colors?.gray[500]};
-    `;
-  }}
-`;
-
 export const StyledList = styled.ul`
   padding: 0;
   margin: 0;
+
+  ${(props) => {
+    const spaces = getSpaces(props);
+    return `
+      margin-top: ${spaces?.l}px;
+      margin-left: ${spaces?.xxxs}px;
+    `;
+  }}
 `;
 
 export const StyledListItem = styled.li`

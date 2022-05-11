@@ -1,4 +1,3 @@
-import json
 import re
 from math import ceil
 
@@ -45,8 +44,9 @@ class OverviewBuilder(BaseNextstrainConfigBuilder):
             subsampling["country"]["max_sequences"] = 800
             subsampling["international"]["max_sequences"] = 200
 
-        # If there aren't any selected samples this is probably a scheduled run
-        # and we should use the reference sequences
+        # If there aren't any selected samples
+        # Either due to being a scheduled run or no user selection
+        # Put reference sequences in include.txt so tree run don't break
         if self.num_included_samples == 0:
             del config["files"]["include"]
 
@@ -61,6 +61,11 @@ class NonContextualizedBuilder(BaseNextstrainConfigBuilder):
 
         # Update our sampling for state/country level builds if necessary
         update_subsampling_for_location(self.tree_build_level, subsampling)
+
+        # If there aren't any selected samples due to no user selection
+        # Put reference sequences in include.txt so tree run don't break
+        if self.num_included_samples == 0:
+            del config["files"]["include"]
 
 
 # Set max_sequences for targeted builds.
@@ -166,10 +171,11 @@ def apply_filters(config, subsampling, template_args):
 
     pango_lineages = template_args.get("filter_pango_lineages")
     if pango_lineages:
-        # Techically pango_lineages should be a *python* encoded list, but we're
-        # cheating since json is interoperable as long as we remove bad characters
+        # Nextstrain is rather particular about the acceptable syntax for
+        # values in the pango_lineages key. Before modifying please see
+        # https://discussion.nextstrain.org/t/failure-when-specifying-multiple-pango-lineages-in-a-build/670
         clean_values = [re.sub(r"[^0-9a-zA-Z.]", "", item) for item in pango_lineages]
-        config["builds"]["aspen"]["pango_lineage"] = json.dumps(clean_values)
+        config["builds"]["aspen"]["pango_lineage"] = clean_values
         # Remove the last " from our old query so we can inject more filters
         old_query = subsampling["group"]["query"][:-1]
         pango_query = " & (pango_lineage in {pango_lineage})"
