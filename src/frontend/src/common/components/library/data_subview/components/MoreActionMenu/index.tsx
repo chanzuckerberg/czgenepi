@@ -8,14 +8,14 @@ import { IconButton } from "../IconButton";
 
 interface Props {
   disabled: boolean;
-  sampleEditDisabled: boolean;
+  isSampleEditDisabled: boolean;
   onDeleteSelected(): void;
   onEditSelected(): void;
 }
 
 const MoreActionsMenu = ({
   disabled,
-  sampleEditDisabled,
+  isSampleEditDisabled,
   onDeleteSelected,
   onEditSelected,
 }: Props): JSX.Element => {
@@ -81,14 +81,14 @@ const MoreActionsMenu = ({
         {usesFeatureFlag(FEATURE_FLAGS.editSamples) && (
           <Tooltip
             arrow
-            disableHoverListener={!sampleEditDisabled}
+            disableHoverListener={!isSampleEditDisabled}
             placement="top"
             title={sampleEditDisabledTooltipContent}
           >
             <div>
               <MenuItem
                 onClick={handleEditSamples}
-                disabled={sampleEditDisabled}
+                disabled={isSampleEditDisabled}
               >
                 <StyledEditIcon />
                 <StyledText>Edit Samples</StyledText>

@@ -281,7 +281,7 @@ const DataSubview: FunctionComponent<Props> = ({
           />
           <MoreActionsMenu
             disabled={!hasCheckedSamples}
-            sampleEditDisabled={isSampleEditDisabled}
+            isSampleEditDisabled={isSampleEditDisabled}
             onDeleteSelected={() => setDeleteSampleConfirmationOpen(true)}
             onEditSelected={() => setEditSampleConfirmationOpen(true)}
           />
