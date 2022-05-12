@@ -93,7 +93,8 @@ const EditSamplesReviewDialog = ({
   const collapseContent = (
     <>
       <StyledCollapseContent>
-        <B>Changed Samples (Private ID):</B> {privacyChangedSamples.join(", ")}
+        <B>Changed Samples (Private ID):</B>{" "}
+        {privacyChangedSamples.map((s) => s.privateId).join(", ")}
       </StyledCollapseContent>
     </>
   );
