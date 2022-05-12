@@ -74,15 +74,20 @@ METADATA_CSV_FIELDS = [
     help="Should the status of this workflow be set to 'STARTED'?",
 )
 @click.option("--test", type=bool, is_flag=True)
+@click.option("--builds-file-only", type=bool, is_flag=True)
 def cli(
     phylo_run_id: int,
-    sequences_fh: io.TextIOBase,
-    selected_fh: io.TextIOBase,
-    metadata_fh: io.TextIOBase,
-    builds_file_fh: io.TextIOBase,
+    sequences_fh: io.TextIOWrapper,
+    selected_fh: io.TextIOWrapper,
+    metadata_fh: io.TextIOWrapper,
+    builds_file_fh: io.TextIOWrapper,
     reset_status: bool,
     test: bool,
+    builds_file_only: bool,
 ):
+    if builds_file_only:
+        dump_yaml_template(phylo_run_id, builds_file_fh)
+        return
     if test:
         print("Success!")
         return
@@ -95,6 +100,33 @@ def cli(
         reset_status,
     )
     print(json.dumps(aligned_gisaid_dump))
+
+
+# For local debugging of our yaml building process.
+def dump_yaml_template(
+    phylo_run_id: int,
+    builds_file_fh: io.TextIOWrapper,
+):
+    interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
+
+    num_sequences: int = 0
+    num_included_samples: int = 0
+
+    with session_scope(interface) as session:
+        phylo_run = get_phylo_run(session, phylo_run_id)
+        group: Group = phylo_run.group
+
+        # Give the nexstrain config builder some info to make decisions
+        context = {
+            "num_sequences": num_sequences,
+            "num_included_samples": num_included_samples,
+        }
+        builder: BaseNextstrainConfigBuilder = builder_factory(
+            phylo_run.tree_type, group, phylo_run.template_args, **context
+        )
+        builder.write_file(builds_file_fh)
+
+        print(f"YAML Build Config dumped to {builds_file_fh.name}")
 
 
 def export_run_config(
