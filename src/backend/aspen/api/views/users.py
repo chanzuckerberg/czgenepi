@@ -1,4 +1,3 @@
-import sentry_sdk
 from fastapi import APIRouter, Depends
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
