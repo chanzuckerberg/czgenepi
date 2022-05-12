@@ -7,7 +7,7 @@ import {
   fontBodyS,
   fontBodyXxs,
   fontBodyXxxs,
-  fontHeaderXs,
+  fontHeaderM,
   getColors,
   getFontWeights,
   getSpaces,
@@ -86,7 +86,7 @@ export const Title = styled.span`
     const colors = getColors(props);
     const spaces = getSpaces(props);
     return `
-      color: ${colors?.gray[500]};
+      color: ${colors?.gray[600]};
       margin-bottom: ${spaces?.l}px;
     `;
   }}
@@ -115,14 +115,8 @@ export const StyledTextField = styled(TextField)`
 `;
 
 export const FieldTitle = styled.div`
-  ${fontHeaderXs}
+  ${fontHeaderM}
   color: black;
-  ${(props) => {
-    const spaces = getSpaces(props);
-    return `
-      margin-bottom: ${spaces?.xxs}px;
-    `;
-  }}
 `;
 
 export const StyledRadio = styled(Radio)`
@@ -157,6 +151,13 @@ export const TreeTypeSection = styled.div`
 export const TreeNameInfoWrapper = styled.div`
   display: flex;
   align-items: center;
+
+  ${(props) => {
+    const spaces = getSpaces(props);
+    return `
+      margin-bottom: ${spaces?.s}px;
+    `;
+  }}
 `;
 
 export const TreeNameTooLongAlert = styled.div`

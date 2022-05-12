@@ -1,4 +1,4 @@
-import { Menu, MenuItem } from "czifui";
+import { Menu, MenuItem, Tooltip } from "czifui";
 import React, { MouseEventHandler, useState } from "react";
 import { StyledEditIcon, StyledTrashIcon } from "src/common/styles/iconStyle";
 import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
@@ -8,12 +8,14 @@ import { IconButton } from "../IconButton";
 
 interface Props {
   disabled: boolean;
+  isSampleEditDisabled: boolean;
   onDeleteSelected(): void;
   onEditSelected(): void;
 }
 
 const MoreActionsMenu = ({
   disabled,
+  isSampleEditDisabled,
   onDeleteSelected,
   onEditSelected,
 }: Props): JSX.Element => {
@@ -50,6 +52,8 @@ const MoreActionsMenu = ({
     handleClose();
   };
 
+  const sampleEditDisabledTooltipContent =
+    "You can only edit 100 samples or less at a time.";
   return (
     <>
       <IconButton
@@ -75,10 +79,22 @@ const MoreActionsMenu = ({
         getContentAnchorEl={null}
       >
         {usesFeatureFlag(FEATURE_FLAGS.editSamples) && (
-          <MenuItem onClick={handleEditSamples}>
-            <StyledEditIcon />
-            <StyledText>Edit Samples</StyledText>
-          </MenuItem>
+          <Tooltip
+            arrow
+            disableHoverListener={!isSampleEditDisabled}
+            placement="top"
+            title={sampleEditDisabledTooltipContent}
+          >
+            <div>
+              <MenuItem
+                onClick={handleEditSamples}
+                disabled={isSampleEditDisabled}
+              >
+                <StyledEditIcon />
+                <StyledText>Edit Samples</StyledText>
+              </MenuItem>
+            </div>
+          </Tooltip>
         )}
         <MenuItem onClick={handleDeleteSamples}>
           <StyledTrashIcon />
