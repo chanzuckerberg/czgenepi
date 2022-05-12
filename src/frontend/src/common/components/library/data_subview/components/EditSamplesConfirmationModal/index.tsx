@@ -18,7 +18,10 @@ import {
 import { NamedGisaidLocation } from "src/views/Upload/components/common/types";
 import { SampleIdToWarningMessages } from "src/views/Upload/components/Metadata/components/ImportFile/parseFile";
 import { EditSampleMetaDataInstructions } from "./components/EditSampleMetadataInstructions";
-import { EditSamplesReviewDialog } from "./components/EditSamplesReviewDialog";
+import {
+  EditSamplesReviewDialog,
+  MetadataWithIdType,
+} from "./components/EditSamplesReviewDialog";
 import ImportFile from "./components/ImportFile";
 import { LoseProgressModal } from "./components/LoseProgressModal";
 import {
@@ -61,6 +64,8 @@ const EditSamplesConfirmationModal = ({
   const [currentModalStep, setCurrentModalStep] = useState<Steps>(Steps.EDIT);
   const [isValid, setIsValid] = useState(false);
   const [metadata, setMetadata] = useState<MetadataType>(null);
+  const [metadataWithId, setMetadataWithId] =
+    useState<MetadataWithIdType>(null);
   const [isContinueButtonActive, setIsContinueButtonActive] =
     useState<boolean>(false);
   const [isLoseProgessModalOpen, setLoseProgressModalOpen] =
@@ -193,13 +198,28 @@ const EditSamplesConfirmationModal = ({
     ) {
       const structuredMetadata: SampleIdToEditMetadataWebform = {};
       checkedSamples.forEach((item) => {
-        structuredMetadata[item.privateId] = {
-          ...structureInitialMetadata(item),
-          id: item.id,
-        };
+        const { privateId } = item;
+        structuredMetadata[privateId] = structureInitialMetadata(item);
       });
       setMetadata(structuredMetadata);
     }
+  }, [checkedSamples, metadata]);
+
+  // we need to send the sample id when we make the BE request to update
+  // the sample, so let's track a version of metadata that has it
+  useEffect(() => {
+    if (!metadata) return;
+
+    const metadataWithId: MetadataWithIdType = {};
+    checkedSamples.forEach((item) => {
+      const { id, privateId } = item;
+      const data = metadata[privateId] ?? {};
+      metadataWithId[privateId] = {
+        ...data,
+        id,
+      };
+    });
+    setMetadataWithId(metadataWithId);
   }, [checkedSamples, metadata]);
 
   const numSamples = checkedSamples.length;
@@ -287,7 +307,7 @@ const EditSamplesConfirmationModal = ({
             {currentModalStep === Steps.REVIEW && (
               <EditSamplesReviewDialog
                 changedMetadata={changedMetadata}
-                metadata={metadata}
+                metadataWithId={metadataWithId}
                 onClickBack={() => setCurrentModalStep(Steps.EDIT)}
                 onSave={closeEditModal}
               />

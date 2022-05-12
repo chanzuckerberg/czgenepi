@@ -7,6 +7,7 @@ import { ROUTES } from "src/common/routes";
 import { B } from "src/common/styles/basicStyle";
 import { pluralize } from "src/common/utils/strUtils";
 import AlertAccordion from "src/components/AlertAccordion";
+import { SampleEditMetadataWebform } from "src/components/WebformTable/common/types";
 import { MetadataType } from "../../index";
 import { Table } from "./components/Table";
 import {
@@ -18,16 +19,21 @@ import {
   StyledNewTabLink,
 } from "./style";
 
+export type MetadataWithIdType = Record<
+  string,
+  SampleEditMetadataWebform & { id: number }
+> | null;
+
 interface Props {
   changedMetadata: MetadataType;
-  metadata: MetadataType;
+  metadataWithId: MetadataWithIdType;
   onClickBack(): void;
   onSave(): void;
 }
 
 const EditSamplesReviewDialog = ({
   changedMetadata,
-  metadata,
+  metadataWithId,
   onClickBack,
   onSave,
 }: Props): JSX.Element => {
@@ -35,27 +41,30 @@ const EditSamplesReviewDialog = ({
 
   const editSampleMutation = useEditSamples({
     componentOnSuccess: () => {
-      // will be defined as part of https://app.shortcut.com/genepi/story/180633
+      // TODO (mlila): will be defined as part of https://app.shortcut.com/genepi/story/180633
     },
     componentOnError: () => {
-      // will be defined as part of https://app.shortcut.com/genepi/story/180633
+      // TODO (mlila): will be defined as part of https://app.shortcut.com/genepi/story/180633
     },
   });
 
   const handleSave = () => {
-    editSampleMutation.mutate({
-      samples: Object.values(metadata ?? {}),
-    });
+    if (metadataWithId) {
+      editSampleMutation.mutate({
+        samples: Object.values(metadataWithId),
+      });
+    }
 
     onSave();
+    setChecked(false);
   };
 
   // determine whether any samples have changed privacy settings so
   // we know to show the warning
-  const changedKeys = Object.keys(changedMetadata ?? {});
-  const privacyChangedSamples = filter(changedKeys, (key) =>
-    Object.hasOwn(changedMetadata[key], "keepPrivate")
-  );
+  if (!changedMetadata) changedMetadata = {};
+  const privacyChangedSamples = filter(changedMetadata, (data) => {
+    return Object.prototype.hasOwnProperty.call(data, "keepPrivate");
+  });
   const numPrivacyChanged = privacyChangedSamples.length;
 
   const warningTitle = (
@@ -80,7 +89,7 @@ const EditSamplesReviewDialog = ({
 
   return (
     <>
-      <Table metadata={metadata} />
+      <Table metadata={metadataWithId} />
       <CheckboxWrapper>
         <Checkbox
           stage={isChecked ? "checked" : "unchecked"}

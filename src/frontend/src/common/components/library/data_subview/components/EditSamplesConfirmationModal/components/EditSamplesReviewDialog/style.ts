@@ -1,12 +1,5 @@
 import styled from "@emotion/styled";
-import {
-  Button,
-  Callout,
-  fontBodyXs,
-  getBorders,
-  getColors,
-  getSpaces,
-} from "czifui";
+import { Button, Callout, fontBodyXs, getColors, getSpaces } from "czifui";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 
 export const StyledButton = styled(Button)`

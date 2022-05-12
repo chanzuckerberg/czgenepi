@@ -1,7 +1,6 @@
 import { Table as MuiTable, TableBody, TableHead } from "@material-ui/core";
 import React from "react";
 import { SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS } from "src/components/DownloadMetadataTemplate/common/constants";
-import { Props as CommonProps } from "src/views/Upload/components/common/types";
 import {
   IdColumn,
   IsPrivateTableCell,
@@ -10,10 +9,11 @@ import {
   StyledTableContainer,
   StyledTableRow,
 } from "src/views/Upload/components/Review/components/Table/style";
+import { MetadataWithIdType } from "../../index";
 import Row from "./components/Row";
 
 interface Props {
-  metadata: CommonProps["metadata"];
+  metadata: MetadataWithIdType;
 }
 
 const Table = ({ metadata }: Props): JSX.Element => {

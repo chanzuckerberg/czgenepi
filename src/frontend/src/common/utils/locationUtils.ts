@@ -130,7 +130,7 @@ export function createStringToLocationFinder(
 }
 
 export const getNameFromCollectionLocation = (
-  collectionLocation: NamedGisaidLocation | string
+  collectionLocation: NamedGisaidLocation | string | undefined
 ): string => {
   // collection location will always be a NamedGisaidLocation at this stage,
   // the only time collectionLocation will be a string is during tsv upload
@@ -138,4 +138,6 @@ export const getNameFromCollectionLocation = (
   if (collectionLocation && typeof collectionLocation !== "string") {
     return collectionLocation.name;
   }
+
+  return "";
 };
