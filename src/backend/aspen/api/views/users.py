@@ -1,10 +1,13 @@
 from fastapi import APIRouter, Depends
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.requests import Request
 
-from aspen.api.auth import get_auth_user
+from aspen.api.auth import get_admin_user, get_auth_user, get_usergroup_query
 from aspen.api.deps import get_db
-from aspen.api.schemas.users import UserMeResponse, UserUpdateRequest
+from aspen.api.schemas.users import UserMeResponse, UserPostRequest, UserUpdateRequest
+from aspen.database.models import User
+from aspen.error import http_exceptions as ex
 
 router = APIRouter()
 
@@ -30,3 +33,22 @@ async def update_user_info(
         )
     await db.commit()
     return UserMeResponse.from_orm(user)
+
+
+# Requires prior auth0 account for the new user.
+@router.post("/")
+async def post_usergroup(
+    user_creation_request: UserPostRequest,
+    db: AsyncSession = Depends(get_db),
+    user=Depends(get_admin_user),
+) -> UserMeResponse:
+    new_user = User(**dict(user_creation_request))
+    db.add(new_user)
+    try:
+        await db.commit()
+    except IntegrityError:
+        raise ex.BadRequestException("User already exists")
+    user_query = get_usergroup_query(db, user_creation_request.auth0_user_id)
+    user_query_result = await db.execute(user_query)
+    created_user = user_query_result.unique().scalars().one()
+    return UserMeResponse.from_orm(created_user)

@@ -350,12 +350,10 @@ def create(
         "group_id": group_id,
         "group_admin": group_admin,
         "system_admin": system_admin,
+        "auth0_user_id": auth0_user_id,
     }
-    if auth0_user_id:
-        user["auth0_user_id"] = auth0_user_id
-    # Remove None fields
     print(user)
-    resp = api_client.post("/api/usergroup", json=user)
+    resp = api_client.post("/v2/users/", json=user)
     print(resp.text)
 
 
