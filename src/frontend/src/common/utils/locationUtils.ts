@@ -141,3 +141,11 @@ export const getNameFromCollectionLocation = (
 
   return "";
 };
+
+export const getIdFromCollectionLocation = (
+  collectionLocation: NamedGisaidLocation | string | undefined
+): number | undefined => {
+  if (collectionLocation && typeof collectionLocation !== "string") {
+    return collectionLocation.id;
+  }
+};

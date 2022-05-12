@@ -250,7 +250,7 @@ interface SamplesEditPayloadType {
   private_identifier?: string;
   public_identifier?: string;
   private?: boolean;
-  collection_location?: string;
+  collection_location?: number;
   sequencing_date?: string;
   collection_date?: string;
 }

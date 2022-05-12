@@ -1,10 +1,11 @@
 import { Checkbox } from "czifui";
-import { filter } from "lodash";
+import { filter, map } from "lodash";
 import React, { useState } from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { useEditSamples } from "src/common/queries/samples";
 import { ROUTES } from "src/common/routes";
 import { B } from "src/common/styles/basicStyle";
+import { getIdFromCollectionLocation } from "src/common/utils/locationUtils";
 import { pluralize } from "src/common/utils/strUtils";
 import AlertAccordion from "src/components/AlertAccordion";
 import { SampleEditMetadataWebform } from "src/components/WebformTable/common/types";
@@ -50,8 +51,18 @@ const EditSamplesReviewDialog = ({
 
   const handleSave = () => {
     if (metadataWithId) {
+      const samples = map(metadataWithId, (m) => ({
+        collection_date: m.collectionDate,
+        collection_location: getIdFromCollectionLocation(m.collectionLocation),
+        id: m.id,
+        private: m.keepPrivate,
+        private_identifier: m.privateId,
+        public_identifier: m.publicId,
+        sequencing_date: m.sequencingDate,
+      }));
+
       editSampleMutation.mutate({
-        samples: Object.values(metadataWithId),
+        samples,
       });
     }
 
