@@ -37,7 +37,6 @@ export default function FilePicker({
     current.value = "";
 
     current.click();
-
     if (isOpen) {
       setIsOpen(false);
     }
@@ -45,7 +44,6 @@ export default function FilePicker({
 
   function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     const files = (event.target as HTMLInputElement).files;
-
     handleFiles(files);
   }
 

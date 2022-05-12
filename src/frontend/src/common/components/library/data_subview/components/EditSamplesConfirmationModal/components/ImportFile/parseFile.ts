@@ -37,6 +37,7 @@ export interface ParseResult {
   warningMessages: WarningMessages;
   filename: string;
   hasUnknownFields: boolean;
+  extraneousSampleIds: string[];
 }
 
 export type SampleEditIdToWarningMessages = Record<
@@ -83,7 +84,7 @@ function warnBadFormatMetadata(
 function getMissingHeaderFields(uploadedHeaders: string[]): Set<string> | null {
   const missingFields = new Set<string>();
   if (!uploadedHeaders.includes("currentPrivateID")) {
-    missingFields.add("currentPrivateID");
+    missingFields.add(SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.currentPrivateID);
   }
   return missingFields.size !== 0 ? missingFields : null;
 }
@@ -104,6 +105,45 @@ function getDuplicateIds(
     }
   }
   return dups;
+}
+
+function filterExtraneousSampleIds(
+  rows: Record<string, string>[],
+  editableSampleIds: Set<string>,
+  exampleSampleIds: Set<string>
+) {
+  const extraneousUniqueSampleIds = new Set<string>();
+
+  const filteredRows = rows.filter((item) => {
+    const currentPID = item.currentPrivateID;
+    if (
+      !editableSampleIds.has(currentPID) &&
+      !exampleSampleIds.has(currentPID)
+    ) {
+      extraneousUniqueSampleIds.add(currentPID);
+    } else {
+      return item;
+    }
+  });
+  const extraneousSampleIds: string[] = [...extraneousUniqueSampleIds];
+  return { extraneousSampleIds, filteredRows };
+}
+
+export function warnMissingMetadata(
+  metadata: SampleEditMetadataWebform
+): Set<keyof SampleEditMetadataWebform> | null {
+  const missingMetadata = new Set<keyof SampleEditMetadataWebform>();
+  const ALWAYS_REQUIRED: Array<keyof SampleEditMetadataWebform> = [
+    "privateId",
+    "collectionDate",
+    "collectionLocation",
+  ];
+  ALWAYS_REQUIRED.forEach((keyRequiredMetadata) => {
+    if (!metadata[keyRequiredMetadata]) {
+      missingMetadata.add(keyRequiredMetadata);
+    }
+  });
+  return missingMetadata.size ? missingMetadata : null;
 }
 
 /**
@@ -197,6 +237,7 @@ function convertHeaderToMetadataKey(headerName: string): string {
 
 export function parseFileEdit(
   file: File,
+  editableSampleIds: Set<string>,
   stringToLocationFinder: StringToLocationFinder
 ): Promise<ParseResult> {
   return new Promise((resolve) => {
@@ -218,10 +259,16 @@ export function parseFileEdit(
           WARNING_CODE,
           SampleIdToWarningMessages
         >();
+        const IGNORED_SAMPLE_IDS = new Set(EXAMPLE_CURRENT_PRIVATE_IDENTIFIERS);
         let hasUnknownFields = false;
         const missingHeaderFields = getMissingHeaderFields(uploadedHeaders);
         const duplicatePublicIds = getDuplicateIds(rows, "publicId");
         const duplicatePrivateIds = getDuplicateIds(rows, "newPrivateID");
+        const { extraneousSampleIds, filteredRows } = filterExtraneousSampleIds(
+          rows,
+          editableSampleIds,
+          IGNORED_SAMPLE_IDS
+        );
 
         if (missingHeaderFields) {
           errorMessages.set(ERROR_CODE.MISSING_FIELD, missingHeaderFields);
@@ -243,9 +290,6 @@ export function parseFileEdit(
 
         if (!uploadErrors) {
           // We only ingest file's data if user had all expected fields. and if there are no duplicate identifiers in the upload
-          const IGNORED_SAMPLE_IDS = new Set(
-            EXAMPLE_CURRENT_PRIVATE_IDENTIFIERS
-          );
           // find if any extraneous field data was added in the tsv
           const expectedHeaders = Object.keys(
             SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS
@@ -258,7 +302,7 @@ export function parseFileEdit(
           if (!isEmpty(unknownFields)) {
             hasUnknownFields = true;
           }
-          rows.forEach((row) => {
+          filteredRows.forEach((row) => {
             const { rowMetadata, rowWarnings } = parseRow(
               row,
               stringToLocationFinder,
@@ -296,6 +340,7 @@ export function parseFileEdit(
         resolve({
           data: sampleIdToMetadata,
           errorMessages,
+          extraneousSampleIds,
           filename: file.name,
           hasUnknownFields,
           warningMessages,

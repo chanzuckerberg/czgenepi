@@ -33,3 +33,12 @@ class UserResponse(UserBaseResponse):
 
 class UsersResponse(BaseResponse):
     items: List[UserResponse]
+
+
+class UserPostRequest(BaseRequest):
+    name: str
+    email: str
+    group_id: int
+    group_admin: Optional[bool] = False
+    system_admin: Optional[bool] = False
+    auth0_user_id: str

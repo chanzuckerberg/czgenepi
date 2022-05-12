@@ -1,10 +1,10 @@
 import React from "react";
+import { SampleEditIdToWarningMessages } from "src/common/components/library/data_subview/components/EditSamplesConfirmationModal/components/ImportFile/parseFile";
 import { B } from "src/common/styles/basicStyle";
 import { pluralize } from "src/common/utils/strUtils";
 import AlertAccordion from "src/components/AlertAccordion";
 import {
   OPTIONAL_HEADER_MARKER,
-  SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS,
   SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS,
 } from "src/components/DownloadMetadataTemplate/common/constants";
 import { SampleIdToWarningMessages } from "../../parseFile";
@@ -93,7 +93,7 @@ function MessageExtraneousEntrySampleEdit({
   const tablePreamble =
     "The following IDs in your file’s “Current Private ID” column did not match any selected " +
     "samples, and weren’t imported. Please double check and correct any errors. ";
-  const columnHeaders = [SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.currentPrivateID];
+  const columnHeaders = ["Unknown Private IDs: "];
   const rows = extraneousSampleIds.map((sampleId) => [sampleId]);
   return (
     <ProblemTable
@@ -113,13 +113,13 @@ export function WarningExtraneousEntrySampleEdit({
   const title = `${count} ${pluralize(
     "Sample",
     count
-  )} in metadata file ${pluralize(
+  )} in metadata file couldn't be matched and ${pluralize(
     "was",
     count
-  )} couldn't be matched and weren't imported.`;
+  )} not imported.`;
   return (
     <AlertAccordion
-      title={title}
+      title={<B>{title}</B>}
       collapseContent={
         <MessageExtraneousEntrySampleEdit
           extraneousSampleIds={extraneousSampleIds}
@@ -153,8 +153,8 @@ function MessageAbsentSample({ absentSampleIds }: PropsAbsentSample) {
 
 function MessageAbsentSampleEdit({ absentSampleIds }: PropsAbsentSample) {
   const tablePreamble =
-    "The following IDs in your file’s “Current Private ID” column did not match any selected samples, and weren’t imported. Please double check and correct any errors. ";
-  const columnHeaders = [SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.currentPrivateID];
+    "We were unable to match the following selected samples with the “Current Private ID”s provided in your file. You can update them below, or update your file and re-import.";
+  const columnHeaders = ["Unmatched Private IDs: "];
   const rows = absentSampleIds.map((sampleId) => [sampleId]);
   return (
     <ProblemTable
@@ -170,10 +170,10 @@ export function WarningAbsentSample({
 }: PropsAbsentSample): JSX.Element {
   const count = absentSampleIds.length;
   // "X Samples were not found in metadata file."
-  const title = `${count} ${pluralize("Sample", count)} ${pluralize(
+  const title = `${count} selected ${pluralize("Sample", count)} ${pluralize(
     "was",
     count
-  )} not found in metadata file.`;
+  )} not found in metadata file, and have not been updated below`;
   return (
     <AlertAccordion
       title={title}
@@ -190,13 +190,15 @@ export function WarningAbsentSampleEdit({
 }: PropsAbsentSample): JSX.Element {
   const count = absentSampleIds.length;
   // "X Samples were not found in metadata file."
-  const title = `${count} ${pluralize(
-    "Sample",
-    count
-  )} in metadata file couldn't be matched and ${pluralize(
-    "was",
-    count
-  )} not imported`;
+  const title = (
+    <>
+      <B>
+        {count} selected {pluralize("Sample", count)} {pluralize("was", count)}{" "}
+        not found in metadata file,{" "}
+      </B>
+      and have not been updated below.
+    </>
+  );
   return (
     <AlertAccordion
       title={title}
@@ -212,7 +214,7 @@ export function WarningAbsentSampleEdit({
  * WARNING_CODE.MISSING_DATA
  */
 interface PropsMissingData {
-  missingData: SampleIdToWarningMessages;
+  missingData: SampleIdToWarningMessages | SampleEditIdToWarningMessages;
 }
 function MessageMissingData({ missingData }: PropsMissingData) {
   const tablePreamble =
@@ -222,15 +224,7 @@ function MessageMissingData({ missingData }: PropsMissingData) {
     SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sampleId,
     "Missing Data",
   ];
-  const idsMissingData = Object.keys(missingData);
-  const rows = idsMissingData.map((sampleId) => {
-    const missingHeaders = Array.from(
-      missingData[sampleId],
-      (missingKey) => SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[missingKey]
-    );
-    const missingDataDescription = missingHeaders.join(", ");
-    return [sampleId, missingDataDescription];
-  });
+  const rows = getSampleIdsWithMissingData(missingData);
   return (
     <ProblemTable
       tablePreamble={tablePreamble}
@@ -239,6 +233,37 @@ function MessageMissingData({ missingData }: PropsMissingData) {
     />
   );
 }
+
+function getSampleIdsWithMissingData(missingData: SampleIdToWarningMessages) {
+  const idsMissingData = Object.keys(missingData);
+  return idsMissingData.map((sampleId) => {
+    const missingHeaders = Array.from(
+      missingData[sampleId],
+      (missingKey) => SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[missingKey]
+    );
+    const missingDataDescription = missingHeaders.join(", ");
+    return [sampleId, missingDataDescription];
+  });
+}
+
+function MessageMissingDataEdit({ missingData }: PropsMissingData) {
+  const tablePreamble =
+    "You can add the required data in the table below, " +
+    "or update your file and re-import.";
+  const columnHeaders = [
+    "Sample " + SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.privateId,
+    "Missing Data",
+  ];
+  const rows = getSampleIdsWithMissingData(missingData);
+  return (
+    <ProblemTable
+      tablePreamble={tablePreamble}
+      columnHeaders={columnHeaders}
+      rows={rows}
+    />
+  );
+}
+
 export function WarningMissingData({
   missingData,
 }: PropsMissingData): JSX.Element {
@@ -250,8 +275,26 @@ export function WarningMissingData({
   )} missing data in required fields.`;
   return (
     <AlertAccordion
-      title={title}
+      title={<B>{title}</B>}
       collapseContent={<MessageMissingData missingData={missingData} />}
+      intent={WARNING_SEVERITY}
+    />
+  );
+}
+
+export function WarningMissingDataEdit({
+  missingData,
+}: PropsMissingData): JSX.Element {
+  const count = Object.keys(missingData).length;
+  // "X Samples were missing data in required fields."
+  const title = `${count} ${pluralize("Sample", count)} ${pluralize(
+    "was",
+    count
+  )} missing data in required fields.`;
+  return (
+    <AlertAccordion
+      title={<B>{title}</B>}
+      collapseContent={<MessageMissingDataEdit missingData={missingData} />}
       intent={WARNING_SEVERITY}
     />
   );
@@ -320,9 +363,13 @@ export function ErrorBadFormatData({
   badFormatData,
   IdColumnNameForWarnings,
 }: PropsBadFormatData): JSX.Element {
-  const title =
-    "Some of your data is not formatted correctly. " +
-    "Please update before proceeding.";
+  const title = (
+    <>
+      <B>Some of your data is not formatted correctly. </B>
+      Please update before proceeding.
+    </>
+  );
+
   return (
     <AlertAccordion
       title={title}

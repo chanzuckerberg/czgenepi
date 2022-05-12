@@ -183,7 +183,16 @@ const EditSamplesConfirmationModal = ({
     changedMetadata,
   ]);
 
-  useMemo(() => {
+  function resetMetadataFromCheckedSamples() {
+    const structuredMetadata: SampleIdToEditMetadataWebform = {};
+    checkedSamples.forEach((item) => {
+      structuredMetadata[item.privateId] = structureInitialMetadata(item);
+    });
+    setChangedMetadata(null);
+    setMetadata(structuredMetadata);
+  }
+
+  useEffect(() => {
     // this is a bit of a hack, currently the modal rerenders itself and the user
     // loses userinput if focus is taken away from the modal,
     // to keep things less frustrating we're checking if the checkedSamples privateIds
@@ -196,12 +205,7 @@ const EditSamplesConfirmationModal = ({
       JSON.stringify(currentPrivateIdentifiers) !=
       JSON.stringify(metadataPrivateIdentifiers)
     ) {
-      const structuredMetadata: SampleIdToEditMetadataWebform = {};
-      checkedSamples.forEach((item) => {
-        const { privateId } = item;
-        structuredMetadata[privateId] = structureInitialMetadata(item);
-      });
-      setMetadata(structuredMetadata);
+      resetMetadataFromCheckedSamples();
     }
   }, [checkedSamples, metadata]);
 
@@ -279,6 +283,9 @@ const EditSamplesConfirmationModal = ({
                 <ImportFile
                   metadata={metadata}
                   changedMetadata={changedMetadata}
+                  resetMetadataFromCheckedSamples={
+                    resetMetadataFromCheckedSamples
+                  }
                   namedLocations={namedLocations}
                   hasImportedMetadataFile={hasImportedMetadataFile}
                   onMetadataFileUploaded={handleMetadataFileUploaded}

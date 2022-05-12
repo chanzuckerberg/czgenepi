@@ -1,4 +1,4 @@
-import { pick } from "lodash";
+import { isEmpty, pick } from "lodash";
 import React, { useEffect, useMemo, useState } from "react";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { createStringToLocationFinder } from "src/common/utils/locationUtils";
@@ -24,12 +24,18 @@ import {
   ParseResult,
   SampleIdToWarningMessages,
 } from "./parseFile";
+import {
+  getMissingMetadata,
+  getNonEmptyUploadedMetadataFields,
+  passOrDeleteEntry,
+} from "./utils";
 
 interface Props {
   metadata: SampleIdToEditMetadataWebform | null;
   changedMetadata: SampleIdToEditMetadataWebform | null;
   namedLocations: NamedGisaidLocation[];
   hasImportedMetadataFile: boolean;
+  resetMetadataFromCheckedSamples(): void;
   onMetadataFileUploaded(props: FileUploadProps): void;
 }
 
@@ -38,6 +44,7 @@ export default function ImportFile({
   namedLocations,
   hasImportedMetadataFile,
   changedMetadata,
+  resetMetadataFromCheckedSamples,
   onMetadataFileUploaded,
 }: Props): JSX.Element {
   const [missingFields, setMissingFields] = useState<string[] | null>(null);
@@ -69,18 +76,12 @@ export default function ImportFile({
     const parseResultSampleIds = Object.keys(data);
     const sampleIds = Object.keys(metadata || EMPTY_OBJECT);
 
-    const sampleIdsSet = new Set(sampleIds);
-    const extraneousSampleIds = parseResultSampleIds.filter((parseId) => {
-      return !sampleIdsSet.has(parseId);
-    });
-    setExtraneousSampleIds(extraneousSampleIds);
-
     const parseResultSampleIdsSet = new Set(parseResultSampleIds);
     const absentSampleIds = sampleIds.filter((sampleId) => {
       return !parseResultSampleIdsSet.has(sampleId);
     });
     setAbsentSampleIds(absentSampleIds);
-  }, [parseResult, metadata, missingFields]);
+  }, [parseResult, missingFields]);
 
   // Used by file upload parser to convert location strings to Locations
   const stringToLocationFinder = useMemo(() => {
@@ -90,23 +91,28 @@ export default function ImportFile({
   const handleFiles = async (files: FileList | null) => {
     if (!files) return;
 
-    const result = await parseFileEdit(files[0], stringToLocationFinder);
+    const sampleIds = Object.keys(metadata || EMPTY_OBJECT);
+    const sampleIdsSet = new Set(sampleIds);
+    const result = await parseFileEdit(
+      files[0],
+      sampleIdsSet,
+      stringToLocationFinder
+    );
 
-    const { warningMessages, filename, hasUnknownFields } = result;
+    const { warningMessages, filename, hasUnknownFields, extraneousSampleIds } =
+      result;
     const missingFields = getMissingFields(result);
     const duplicatePrivateIds = getDuplicatePrivateIds(result);
     const duplicatePublicIds = getDuplicatePublicIds(result);
     const autocorrectCount =
       getAutocorrectCount(warningMessages.get(WARNING_CODE.AUTO_CORRECT)) || 0;
+    setExtraneousSampleIds(extraneousSampleIds);
     setMissingFields(missingFields);
     setDuplicatePrivateIds(duplicatePrivateIds);
     setDuplicatePublicIds(duplicatePublicIds);
     setAutocorrectCount(autocorrectCount);
     setFilename(filename);
     setParseResult(result);
-    setMissingData(
-      warningMessages.get(WARNING_CODE.MISSING_DATA) || EMPTY_OBJECT
-    );
     setBadFormatData(
       warningMessages.get(WARNING_CODE.BAD_FORMAT_DATA) || EMPTY_OBJECT
     );
@@ -114,21 +120,13 @@ export default function ImportFile({
     handleMetadataFileUpload(result);
   };
 
-  // we need to decide if a user wants to delete a sample (if they provide a delete keyword in the cell)
-  // if no delete keyword is detected, return the existing value, else return "".
-  function passOrDeleteEntry(
-    value: string | boolean | NamedGisaidLocation
-  ): string | boolean | NamedGisaidLocation | undefined {
-    if (value && value.toString().toLowerCase() === "delete") {
-      return "";
-    }
-    return value;
-  }
-
   function handleMetadataFileUpload(result: ParseResult) {
     // If they're on the page but somehow have no samples (eg, refreshing on
     // Metadata page), short-circuit and do nothing to avoid any weirdness.
     if (!metadata) return;
+
+    // clear all metadata before importing tsv file
+    resetMetadataFromCheckedSamples();
 
     const { data: sampleIdToUploadedMetadata, warningMessages } = result;
 
@@ -149,17 +147,12 @@ export default function ImportFile({
           sampleId
         );
 
-        // get metadata entries from upload that are not empty (means user wants to import new data)
-        const uploadedFieldsWithData: string[] = [];
-        // TODO: replace with a filter call instead
-        Object.keys(uploadedMetadataEntry).forEach(function (item) {
-          const uploadedEntry =
-            uploadedMetadataEntry[item as keyof SampleEditMetadataWebform];
-          if (uploadedEntry !== "" && uploadedEntry !== undefined)
-            uploadedFieldsWithData.push(item);
-        });
+        // get all fields where user wants to update data
+        const uploadedFieldsWithData = getNonEmptyUploadedMetadataFields(
+          uploadedMetadataEntry
+        );
 
-        // check if any entries need to be deleted/ cleared
+        // check if any entries need to be deleted/ cleared (replace delete keyword with empty string)
         for (const [key, value] of Object.entries(uploadedMetadataEntry)) {
           (uploadedMetadataEntry[key as keyof SampleEditMetadataWebform] as
             | string
@@ -167,13 +160,31 @@ export default function ImportFile({
             | NamedGisaidLocation
             | undefined) = passOrDeleteEntry(value);
         }
+
+        // only take uploaded metadata that the user wants changed, (empty strings are filled with existing metadata)
+        const filledInUploadedMetadata = {
+          ...pick(uploadedMetadataEntry, uploadedFieldsWithData),
+        };
+
+        if (!isEmpty(uploadedMetadataEntry)) {
+          // check if there is any missing data that the user needs to fill in before proceeding
+          setMissingData((prevMissingData) => {
+            return getMissingMetadata(
+              existingMetadataEntry,
+              filledInUploadedMetadata,
+              prevMissingData,
+              sampleId
+            );
+          });
+        }
+        // merge uploaded metadata with changes from user, fill in blank fields with existing data
         uploadedMetadata[sampleId] = {
           ...existingMetadataEntry,
-          ...pick(uploadedMetadataEntry, uploadedFieldsWithData),
+          ...filledInUploadedMetadata,
         };
         changedMetadataUpdated[sampleId] = {
           ...existingChangedMetadataEntry,
-          ...pick(uploadedMetadataEntry, uploadedFieldsWithData),
+          ...filledInUploadedMetadata,
         };
       }
     }
