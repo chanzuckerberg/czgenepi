@@ -159,7 +159,7 @@ export async function createSamples({
     payload.push(samplePayload);
   }
 
-  const response = await fetch(API_URL + API.SAMPLES_CREATE, {
+  const response = await fetch(API_URL + API.SAMPLES, {
     ...DEFAULT_POST_OPTIONS,
     body: JSON.stringify(payload),
   });
