@@ -1,10 +1,10 @@
 import React, { useState } from "react";
+import { API } from "src/common/api";
 import ENV from "src/common/constants/ENV";
 import CloseIcon from "src/common/images/close-icon.svg";
 import HeaderLogo from "src/common/images/gen-epi-logo.svg";
 import { useUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
-import { API } from "src/common/api";
 import UserMenu from "./components/UserMenu";
 import {
   Bar,
