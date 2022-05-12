@@ -1,8 +1,6 @@
 import os
 from urllib.parse import urlencode
 
-import logging
-
 from authlib.integrations.base_client.errors import OAuthError
 from authlib.integrations.starlette_client import StarletteOAuth2App
 from fastapi import APIRouter, Depends
@@ -18,8 +16,6 @@ from aspen.api.settings import Settings
 # https://github.com/authlib/demo-oauth-client/tree/master/fastapi-google-login
 router = APIRouter()
 
-dbg = logging.getLogger(__name__)
-dbg.setLevel(logging.DEBUG)
 
 @router.get("/login")
 async def login(
@@ -38,11 +34,9 @@ async def auth(
 ) -> Response:
     try:
         token = await auth0.authorize_access_token(request)
-        dbg.debug(f"token: {token}")
     except OAuthError:
         raise ex.UnauthorizedException("Invalid token")
     userinfo = token["userinfo"]
-    dbg.debug(f"userinfo: {userinfo}")
     if userinfo:
         # Store the user information in flask session.
         request.session["jwt_payload"] = userinfo
@@ -50,7 +44,6 @@ async def auth(
             "user_id": userinfo["sub"],
             "name": userinfo["name"],
         }
-        dbg.debug(f"request.session: {request.session}")
     return RedirectResponse(os.getenv("FRONTEND_URL", "") + "/data/samples")
 
 
