@@ -41,7 +41,8 @@ const validationSchema = yup.object({
     .string()
     .matches(DATE_REGEX, DATE_ERROR_MESSAGE)
     .min(10, DATE_ERROR_MESSAGE)
-    .max(10, DATE_ERROR_MESSAGE),
+    .max(10, DATE_ERROR_MESSAGE)
+    .nullable(),
   privateId: yup
     .string()
     .required("Required")
