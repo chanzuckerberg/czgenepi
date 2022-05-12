@@ -152,6 +152,16 @@ const DataSubview: FunctionComponent<Props> = ({
   const [isEditTreeConfirmationOpen, setEditTreeConfirmationOpen] =
     useState<boolean>(false);
   const [phyloRunToEdit, setPhyloRunToEdit] = useState<PhyloRun>();
+  const [isSampleEditDisabled, setSampleEditDisabled] = useState<boolean>(true);
+
+  useEffect(() => {
+    const numberOfCheckedSamples = checkedSampleIds.length;
+    if (numberOfCheckedSamples > 0 && numberOfCheckedSamples <= 100) {
+      setSampleEditDisabled(false);
+    } else {
+      setSampleEditDisabled(true);
+    }
+  }, [checkedSampleIds]);
 
   const handleDownloadClickOpen = () => {
     setDownloadModalOpen(true);
@@ -271,6 +281,7 @@ const DataSubview: FunctionComponent<Props> = ({
           />
           <MoreActionsMenu
             disabled={!hasCheckedSamples}
+            isSampleEditDisabled={isSampleEditDisabled}
             onDeleteSelected={() => setDeleteSampleConfirmationOpen(true)}
             onEditSelected={() => setEditSampleConfirmationOpen(true)}
           />

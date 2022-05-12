@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.requests import Request
 
-from aspen.api.auth import get_auth_user, get_usergroup_query
+from aspen.api.auth import get_admin_user, get_auth_user, get_usergroup_query
 from aspen.api.deps import get_db
 from aspen.api.schemas.users import UserMeResponse, UserPostRequest, UserUpdateRequest
 from aspen.database.models import User
@@ -37,17 +37,12 @@ async def update_user_info(
 
 
 # Requires prior auth0 account for the new user.
-@router.post("/new")
+@router.post("/")
 async def post_usergroup(
     user_creation_request: UserPostRequest,
     db: AsyncSession = Depends(get_db),
-    user=Depends(get_auth_user),
+    user=Depends(get_admin_user),
 ) -> UserMeResponse:
-    if not user.system_admin:
-        sentry_sdk.capture_message(
-            f"Unauthorized user creation request for {user_creation_request.email} initiated by {user.email}"
-        )
-        raise ex.UnauthorizedException("Not authorized")
     new_user = User(**dict(user_creation_request))
     db.add(new_user)
     try:

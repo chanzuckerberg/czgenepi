@@ -353,7 +353,7 @@ def create(
         "auth0_user_id": auth0_user_id,
     }
     print(user)
-    resp = api_client.post("/v2/users/new", json=user)
+    resp = api_client.post("/v2/users/", json=user)
     print(resp.text)
 
 
