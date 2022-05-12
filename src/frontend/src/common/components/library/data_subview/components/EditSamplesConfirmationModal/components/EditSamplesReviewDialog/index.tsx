@@ -1,5 +1,5 @@
 import { Checkbox } from "czifui";
-import { filter, map } from "lodash";
+import { map, pickBy } from "lodash";
 import React, { useState } from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { useEditSamples } from "src/common/queries/samples";
@@ -73,9 +73,11 @@ const EditSamplesReviewDialog = ({
   // determine whether any samples have changed privacy settings so
   // we know to show the warning
   if (!changedMetadata) changedMetadata = {};
-  const privacyChangedSamples = filter(changedMetadata, (data) => {
-    return Object.prototype.hasOwnProperty.call(data, "keepPrivate");
-  });
+  const privacyChangedSamples = Object.keys(
+    pickBy(changedMetadata, (data) => {
+      return Object.prototype.hasOwnProperty.call(data, "keepPrivate");
+    })
+  );
   const numPrivacyChanged = privacyChangedSamples.length;
 
   const warningTitle = (
@@ -93,8 +95,7 @@ const EditSamplesReviewDialog = ({
   const collapseContent = (
     <>
       <StyledCollapseContent>
-        <B>Changed Samples (Private ID):</B>{" "}
-        {privacyChangedSamples.map((s) => s.privateId).join(", ")}
+        <B>Changed Samples (Private ID):</B> {privacyChangedSamples.join(", ")}
       </StyledCollapseContent>
     </>
   );
