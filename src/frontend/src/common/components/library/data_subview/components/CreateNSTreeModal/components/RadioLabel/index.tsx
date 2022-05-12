@@ -1,9 +1,7 @@
 // eslint-disable @typescript-eslint/explicit-member-accessibility
 import ListItemText from "@material-ui/core/ListItemText";
-import { useTreatments } from "@splitsoftware/splitio-react";
 import { List } from "czifui";
 import React from "react";
-import { FEATURE_FLAGS, isFlagOn } from "src/components/Split";
 import { SampleFiltering } from "../SampleFiltering";
 import {
   Label,
@@ -40,12 +38,6 @@ export const RadioLabelOverview = ({
   setStartDate,
   setEndDate,
 }: TreeChoiceWithFilteringProps): JSX.Element => {
-  const flag = useTreatments([FEATURE_FLAGS.sample_filtering_tree_creation]);
-  const isSampleFilteringEnabled = isFlagOn(
-    flag,
-    FEATURE_FLAGS.sample_filtering_tree_creation
-  );
-
   return (
     <div>
       <Label>
@@ -55,49 +47,7 @@ export const RadioLabelOverview = ({
         Includes samples from both within and outside of your jurisdiction, at a
         ratio of roughly 2:1.
       </SmallText>
-      {/* TODO (mlila): remove these when isSampleFilteringEnabled turned on */}
-      {selected && !isSampleFilteringEnabled && (
-        <>
-          <ul>
-            <StyledListItem>
-              <StyledListItemIcon>
-                <StyledIconCheckSmall />
-              </StyledListItemIcon>
-              <ListItemText>
-                <SmallText>
-                  Best for seeing an overall picture of viral diversity within
-                  your jurisdiction in the past 12 weeks, in the context of
-                  genetically similar GISAID samples from outside of your
-                  jurisdiction.
-                </SmallText>
-              </ListItemText>
-            </StyledListItem>
-            <StyledListItem>
-              <StyledListItemIcon>
-                <StyledIconCheckSmall />
-              </StyledListItemIcon>
-              <ListItemText>
-                <SmallText>
-                  Good for identifying possible local outbreaks.
-                </SmallText>
-              </ListItemText>
-            </StyledListItem>
-            <StyledListItem>
-              <StyledListItemIcon>
-                <StyledIconCheckSmall />
-              </StyledListItemIcon>
-              <ListItemText>
-                <SmallText>
-                  Good for creating the same tree type as the CZ GEN EPI
-                  automatic build, while ensuring that all selected samples will
-                  be included in the tree.
-                </SmallText>
-              </ListItemText>
-            </StyledListItem>
-          </ul>
-        </>
-      )}
-      {selected && isSampleFilteringEnabled && (
+      {selected && (
         <>
           <StyledList>
             <StyledListItem>
@@ -201,12 +151,6 @@ export const RadioLabelNonContextualized = ({
   setStartDate,
   setEndDate,
 }: TreeChoiceWithFilteringProps): JSX.Element => {
-  const flag = useTreatments([FEATURE_FLAGS.sample_filtering_tree_creation]);
-  const isSampleFilteringEnabled = isFlagOn(
-    flag,
-    FEATURE_FLAGS.sample_filtering_tree_creation
-  );
-
   return (
     <div>
       <Label>
@@ -253,17 +197,15 @@ export const RadioLabelNonContextualized = ({
               </ListItemText>
             </StyledListItem>
           </List>
-          {isSampleFilteringEnabled && (
-            <SampleFiltering
-              availableLineages={availableLineages}
-              selectedLineages={selectedLineages}
-              setSelectedLineages={setSelectedLineages}
-              startDate={startDate}
-              endDate={endDate}
-              setStartDate={setStartDate}
-              setEndDate={setEndDate}
-            />
-          )}
+          <SampleFiltering
+            availableLineages={availableLineages}
+            selectedLineages={selectedLineages}
+            setSelectedLineages={setSelectedLineages}
+            startDate={startDate}
+            endDate={endDate}
+            setStartDate={setStartDate}
+            setEndDate={setEndDate}
+          />
         </>
       )}
     </div>
