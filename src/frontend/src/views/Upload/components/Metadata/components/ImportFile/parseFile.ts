@@ -104,7 +104,7 @@ const METADATA_KEYS_TO_EXTRACT = Object.values(HEADERS_TO_METADATA_KEYS);
  *  https://stackoverflow.com/q/64440400
  * So we're just duplicating that aspect here.
  */
-function warnMissingMetadata(
+export function warnMissingMetadata(
   metadata: SampleUploadTsvMetadata
 ): Set<keyof SampleUploadTsvMetadata> | null {
   const missingMetadata = new Set<keyof SampleUploadTsvMetadata>();
@@ -224,6 +224,7 @@ function parseRow(
   METADATA_KEYS_TO_EXTRACT.forEach((key) => {
     inferMetadata(row, key, rowMetadata, stringToLocationFinder);
   });
+
   const rowMissingMetadataWarnings = warnMissingMetadata(rowMetadata);
   if (rowMissingMetadataWarnings) {
     rowWarnings.set(WARNING_CODE.MISSING_DATA, rowMissingMetadataWarnings);
