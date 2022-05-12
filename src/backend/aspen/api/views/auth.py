@@ -36,7 +36,7 @@ async def auth(
         token = await auth0.authorize_access_token(request)
     except OAuthError:
         raise ex.UnauthorizedException("Invalid token")
-    userinfo = token["userinfo"]
+    userinfo = token.get("userinfo")
     if userinfo:
         # Store the user information in flask session.
         request.session["jwt_payload"] = userinfo
@@ -44,6 +44,8 @@ async def auth(
             "user_id": userinfo["sub"],
             "name": userinfo["name"],
         }
+    else:
+        raise ex.UnauthorizedException("No user info in token")
     return RedirectResponse(os.getenv("FRONTEND_URL", "") + "/data/samples")
 
 
