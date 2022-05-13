@@ -7,7 +7,6 @@ export enum API {
   LOG_IN = "/v2/auth/login",
   LOG_OUT = "/v2/auth/logout",
   PHYLO_RUNS = "/v2/phylo_runs/",
-  SAMPLES_CREATE = "/v2/samples/",
   SAMPLES_FASTA_DOWNLOAD = "/v2/sequences/",
   GET_FASTA_URL = "/v2/sequences/getfastaurl",
   USHER_TREE_OPTIONS = "/v2/usher/tree_versions/",

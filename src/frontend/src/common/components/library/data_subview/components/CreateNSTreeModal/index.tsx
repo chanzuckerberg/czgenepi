@@ -74,7 +74,6 @@ export const CreateNSTreeModal = ({
   const [validatedInputSamples, setValidatedInputSamples] = useState<string[]>(
     []
   );
-  const [isValidTreeType, setIsValidTreeType] = useState<boolean>(false);
 
   // Certain tree types can filter based on lineages and date ranges
   const { data: lineagesData } = useLineages();
@@ -87,19 +86,10 @@ export const CreateNSTreeModal = ({
     if (shouldReset) setShouldReset(false);
   }, [shouldReset]);
 
-  useEffect(() => {
-    if (treeType !== undefined && Object.values(TreeTypes).includes(treeType)) {
-      setIsValidTreeType(true);
-    } else {
-      setIsValidTreeType(false);
-    }
-  }, [treeType]);
-
   const clearState = function () {
     setShouldReset(true);
     setTreeName("");
     setTreeType(undefined);
-    setIsValidTreeType(false);
     setMissingInputSamples([]);
     setValidatedInputSamples([]);
     setStartDate(undefined);
@@ -321,7 +311,7 @@ export const CreateNSTreeModal = ({
             hasValidName={hasValidName}
             hasSamples={allValidSamplesForTreeCreation.length > 0}
             isInEditMode={isInputInEditMode}
-            isValidTreeType={isValidTreeType}
+            treeType={treeType}
             onClick={handleSubmit}
           />
           <CreateTreeInfo>

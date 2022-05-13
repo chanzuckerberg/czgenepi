@@ -1,10 +1,15 @@
 import { Checkbox } from "czifui";
+import { map, pickBy } from "lodash";
 import React, { useState } from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
+import { useEditSamples } from "src/common/queries/samples";
 import { ROUTES } from "src/common/routes";
 import { B } from "src/common/styles/basicStyle";
+import { getIdFromCollectionLocation } from "src/common/utils/locationUtils";
 import { pluralize } from "src/common/utils/strUtils";
 import AlertAccordion from "src/components/AlertAccordion";
+import { SampleEditMetadataWebform } from "src/components/WebformTable/common/types";
+import { MetadataType } from "../../index";
 import { Table } from "./components/Table";
 import {
   CalloutContainer,
@@ -15,22 +20,71 @@ import {
   StyledNewTabLink,
 } from "./style";
 
+export type MetadataWithIdType = Record<
+  string,
+  SampleEditMetadataWebform & { id: number }
+> | null;
+
 interface Props {
-  changedMetaData: any;
+  changedMetadata: MetadataType;
+  metadataWithId: MetadataWithIdType;
   onClickBack(): void;
+  onSave(): void;
 }
 
 const EditSamplesReviewDialog = ({
-  changedMetaData,
+  changedMetadata,
+  metadataWithId,
   onClickBack,
+  onSave,
 }: Props): JSX.Element => {
   const [isChecked, setChecked] = useState<boolean>(false);
-  const numChangedSamples = changedMetaData.length ?? 0;
+
+  const editSampleMutation = useEditSamples({
+    componentOnSuccess: () => {
+      // TODO (mlila): will be defined as part of https://app.shortcut.com/genepi/story/180633
+    },
+    componentOnError: () => {
+      // TODO (mlila): will be defined as part of https://app.shortcut.com/genepi/story/180633
+    },
+  });
+
+  const handleSave = () => {
+    if (metadataWithId) {
+      const samples = map(metadataWithId, (m) => ({
+        collection_date: m.collectionDate,
+        collection_location: getIdFromCollectionLocation(m.collectionLocation),
+        id: m.id,
+        private: m.keepPrivate,
+        private_identifier: m.privateId,
+        public_identifier: m.publicId,
+        sequencing_date: m.sequencingDate,
+      }));
+
+      editSampleMutation.mutate({
+        samples,
+      });
+    }
+
+    onSave();
+    setChecked(false);
+  };
+
+  // determine whether any samples have changed privacy settings so
+  // we know to show the warning
+  if (!changedMetadata) changedMetadata = {};
+  const privacyChangedSamples = Object.keys(
+    pickBy(changedMetadata, (data) => {
+      return Object.prototype.hasOwnProperty.call(data, "keepPrivate");
+    })
+  );
+  const numPrivacyChanged = privacyChangedSamples.length;
+
   const warningTitle = (
     <>
       <B>
-        {numChangedSamples} {pluralize("Sample", numChangedSamples)} have
-        updated privacy settings,
+        {numPrivacyChanged} {pluralize("Sample", numPrivacyChanged)}{" "}
+        {pluralize("has", numPrivacyChanged)} updated privacy settings,
       </B>{" "}
       which will impact who can see your de-identified sample data. Read our{" "}
       <StyledNewTabLink href={ROUTES.PRIVACY}>Privacy Policy</StyledNewTabLink>{" "}
@@ -41,14 +95,14 @@ const EditSamplesReviewDialog = ({
   const collapseContent = (
     <>
       <StyledCollapseContent>
-        <B>Changed Samples (Private ID):</B>
+        <B>Changed Samples (Private ID):</B> {privacyChangedSamples.join(", ")}
       </StyledCollapseContent>
     </>
   );
 
   return (
     <>
-      <Table metadata={{}} />
+      <Table metadata={metadataWithId} />
       <CheckboxWrapper>
         <Checkbox
           stage={isChecked ? "checked" : "unchecked"}
@@ -69,14 +123,21 @@ const EditSamplesReviewDialog = ({
           Once saved, the sample metadata above will overwrite all exisiting
           data. <B>This action cannot be undone.</B>
         </StyledCallout>
-        <AlertAccordion
-          intent="warning"
-          title={warningTitle}
-          collapseContent={collapseContent}
-        ></AlertAccordion>
+        {numPrivacyChanged > 0 && (
+          <AlertAccordion
+            intent="warning"
+            title={warningTitle}
+            collapseContent={collapseContent}
+          />
+        )}
       </CalloutContainer>
       <div>
-        <StyledButton sdsType="primary" sdsStyle="rounded">
+        <StyledButton
+          sdsType="primary"
+          sdsStyle="rounded"
+          disabled={!isChecked}
+          onClick={handleSave}
+        >
           Save
         </StyledButton>
         <StyledButton

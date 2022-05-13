@@ -51,4 +51,11 @@ export const CheckboxWrapper = styled.div`
 
 export const StyledNewTabLink = styled(NewTabLink)`
   color: black;
+  border-bottom: 1px dashed;
+
+  &:hover,
+  &:focus {
+    text-decoration: none;
+    border-bottom: 1px solid;
+  }
 `;

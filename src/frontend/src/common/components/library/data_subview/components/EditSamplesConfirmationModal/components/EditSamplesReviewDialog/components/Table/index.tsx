@@ -1,6 +1,6 @@
 import { Table as MuiTable, TableBody, TableHead } from "@material-ui/core";
 import React from "react";
-import { Props as CommonProps } from "src/views/Upload/components/common/types";
+import { SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS } from "src/components/DownloadMetadataTemplate/common/constants";
 import {
   IdColumn,
   IsPrivateTableCell,
@@ -9,9 +9,11 @@ import {
   StyledTableContainer,
   StyledTableRow,
 } from "src/views/Upload/components/Review/components/Table/style";
+import { MetadataWithIdType } from "../../index";
+import Row from "./components/Row";
 
 interface Props {
-  metadata: CommonProps["metadata"];
+  metadata: MetadataWithIdType;
 }
 
 const Table = ({ metadata }: Props): JSX.Element => {
@@ -26,13 +28,13 @@ const Table = ({ metadata }: Props): JSX.Element => {
                   <IdColumn>Private ID</IdColumn>
                 </StyledTableCell>
                 <StyledTableCell component="div">
-                  Public ID (GISAID ID)
+                  {SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.publicId}
                 </StyledTableCell>
                 <StyledTableCell component="div">
-                  Collection Date
+                  {SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.collectionDate}
                 </StyledTableCell>
                 <StyledTableCell component="div">
-                  Collection Location
+                  {SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.collectionLocation}
                 </StyledTableCell>
                 <StyledTableCell component="div">
                   Sequencing Date
@@ -42,7 +44,13 @@ const Table = ({ metadata }: Props): JSX.Element => {
                 </IsPrivateTableCell>
               </StyledTableRow>
             </TableHead>
-            {metadata && <TableBody component="div"></TableBody>}
+            {metadata && (
+              <TableBody component="div">
+                {Object.entries(metadata).map(([sampleId, sampleMetadata]) => {
+                  return <Row key={sampleId} metadata={sampleMetadata} />;
+                })}
+              </TableBody>
+            )}
           </MuiTable>
         </StyledTableContainer>
       </form>

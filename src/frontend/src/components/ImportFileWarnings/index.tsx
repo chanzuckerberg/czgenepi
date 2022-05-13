@@ -16,6 +16,7 @@ import {
   WarningExtraneousEntry,
   WarningExtraneousEntrySampleEdit,
   WarningMissingData,
+  WarningMissingDataEdit,
 } from "src/views/Upload/components/Metadata/components/ImportFile/components/Alerts/warnings";
 import {
   ParseResult as ParseResultUpload,
@@ -72,6 +73,7 @@ export default function ImportFileWarnings({
   return (
     <>
       {hasImportedFile &&
+        filename !== "" &&
         !getIsParseResultCompletelyUnused(extraneousSampleIds, parseResult) && (
           <Success filename={filename} />
         )}
@@ -112,9 +114,15 @@ export default function ImportFileWarnings({
           <WarningAbsentSample absentSampleIds={absentSampleIds} />
         )}
 
-      {!isEmpty(missingData) && (
-        <WarningMissingData missingData={missingData} />
-      )}
+      {metadataUploadType == MetadataUploadTypeOption.Upload &&
+        !isEmpty(missingData) && (
+          <WarningMissingData missingData={missingData} />
+        )}
+
+      {metadataUploadType == MetadataUploadTypeOption.Edit &&
+        !isEmpty(missingData) && (
+          <WarningMissingDataEdit missingData={missingData} />
+        )}
 
       {(!isEmpty(duplicatePublicIds) || !isEmpty(duplicatePrivateIds)) && (
         <DuplicateIdsError
