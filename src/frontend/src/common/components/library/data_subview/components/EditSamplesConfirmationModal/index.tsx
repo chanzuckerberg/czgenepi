@@ -178,7 +178,7 @@ const EditSamplesConfirmationModal = ({
     checkedSamples.forEach((item) => {
       structuredMetadata[item.privateId] = structureInitialMetadata(item);
     });
-    setChangedMetadata({});
+    setChangedMetadata(null);
     setMetadata(structuredMetadata);
   }
 
