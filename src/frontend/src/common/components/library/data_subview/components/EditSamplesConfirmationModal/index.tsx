@@ -4,8 +4,11 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
+import { useUserInfo } from "src/common/queries/auth";
 import { useNamedLocations } from "src/common/queries/locations";
+import { B } from "src/common/styles/basicStyle";
 import { pluralize } from "src/common/utils/strUtils";
+import { StyledCallout } from "src/components/AlertAccordion/style";
 import { Content, Title } from "src/components/BaseDialog/style";
 import Dialog from "src/components/Dialog";
 import { prepEditMetadataTemplate } from "src/components/DownloadMetadataTemplate/prepMetadataTemplate";
@@ -76,10 +79,22 @@ const EditSamplesConfirmationModal = ({
     useState<boolean>(false);
   const [autocorrectWarnings, setAutocorrectWarnings] =
     useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
+  const [samplesCanEdit, setSamplesCanEdit] = useState<Sample[]>([]);
+
+  const { data: userInfo } = useUserInfo();
+  const { group: userGroup } = userInfo ?? {};
 
   const { data: namedLocationsData } = useNamedLocations();
   const namedLocations: NamedGisaidLocation[] =
     namedLocationsData?.namedLocations ?? [];
+  const numSamplesCantEdit = checkedSamples.length - samplesCanEdit.length;
+
+  useEffect(() => {
+    const samplesToEdit = checkedSamples.filter(
+      (sample) => sample.submittingGroup?.name === userGroup?.name
+    );
+    setSamplesCanEdit(samplesToEdit);
+  }, [checkedSamples, userGroup?.name]);
 
   useEffect(() => {
     // continue button should only be active if the user has metadata
@@ -184,9 +199,9 @@ const EditSamplesConfirmationModal = ({
     changedMetadata,
   ]);
 
-  function resetMetadataFromCheckedSamples() {
+  function resetMetadataFromEditableSamples() {
     const structuredMetadata: SampleIdToEditMetadataWebform = {};
-    checkedSamples.forEach((item) => {
+    samplesCanEdit.forEach((item) => {
       structuredMetadata[item.privateId] = structureInitialMetadata(item);
     });
     setChangedMetadata(EMPTY_OBJECT);
@@ -198,17 +213,17 @@ const EditSamplesConfirmationModal = ({
     // loses userinput if focus is taken away from the modal,
     // to keep things less frustrating we're checking if the checkedSamples privateIds
     // match the privateIds in metadata to prevent rerendering before a user is finished making updates
-    const currentPrivateIdentifiers = checkedSamples.map(
-      (checkedSample) => checkedSample.privateId
+    const currentPrivateIdentifiers = samplesCanEdit.map(
+      (sample) => sample.privateId
     );
     const metadataPrivateIdentifiers = metadata && Object.keys(metadata);
     if (
       JSON.stringify(currentPrivateIdentifiers) !=
       JSON.stringify(metadataPrivateIdentifiers)
     ) {
-      resetMetadataFromCheckedSamples();
+      resetMetadataFromEditableSamples();
     }
-  }, [checkedSamples, metadata]);
+  }, [samplesCanEdit, metadata]);
 
   // we need to send the sample id when we make the BE request to update
   // the sample, so let's track a version of metadata that has it
@@ -216,7 +231,7 @@ const EditSamplesConfirmationModal = ({
     if (!metadata) return;
 
     const metadataWithId: MetadataWithIdType = {};
-    checkedSamples.forEach((item) => {
+    samplesCanEdit.forEach((item) => {
       const { id, privateId } = item;
       const data = metadata[privateId] ?? {};
       metadataWithId[privateId] = {
@@ -225,22 +240,32 @@ const EditSamplesConfirmationModal = ({
       };
     });
     setMetadataWithId(metadataWithId);
-  }, [checkedSamples, metadata]);
+  }, [samplesCanEdit, metadata]);
 
   const numSamples = checkedSamples.length;
 
   const { templateInstructionRows, templateHeaders, templateRows } =
     useMemo(() => {
       // take the first collection location to populate Collection Location example rows of the sample edit tsv
-      const collectionLocation = checkedSamples[0]?.collectionLocation;
-      const currentPrivateIdentifiers = checkedSamples.map(
-        (checkedSample) => checkedSample.privateId
+      const collectionLocation = samplesCanEdit[0]?.collectionLocation;
+      const currentPrivateIdentifiers = samplesCanEdit.map(
+        (sample) => sample.privateId
       );
       return prepEditMetadataTemplate(
         currentPrivateIdentifiers,
         collectionLocation
       );
-    }, [checkedSamples]);
+    }, [samplesCanEdit]);
+
+  const warningCantEditSamplesTitle = (
+    <>
+      <B>
+        {numSamplesCantEdit} Selected {pluralize("Sample", numSamplesCantEdit)}{" "}
+        can’t be edited
+      </B>{" "}
+      and has been removed because it is managed by another jurisdiction.
+    </>
+  );
 
   return (
     <>
@@ -284,8 +309,8 @@ const EditSamplesConfirmationModal = ({
                 <ImportFile
                   metadata={metadata}
                   changedMetadata={changedMetadata}
-                  resetMetadataFromCheckedSamples={
-                    resetMetadataFromCheckedSamples
+                  resetMetadataFromEditableSamples={
+                    resetMetadataFromEditableSamples
                   }
                   namedLocations={namedLocations}
                   hasImportedMetadataFile={hasImportedMetadataFile}
@@ -302,6 +327,11 @@ const EditSamplesConfirmationModal = ({
                   handleRowMetadata={handleRowMetadata}
                   webformTableType="EDIT"
                 />
+                {numSamplesCantEdit > 0 && (
+                  <StyledCallout intent={"warning"}>
+                    {warningCantEditSamplesTitle}
+                  </StyledCallout>
+                )}
                 <Button
                   disabled={!isContinueButtonActive}
                   onClick={() => setCurrentModalStep(Steps.REVIEW)}

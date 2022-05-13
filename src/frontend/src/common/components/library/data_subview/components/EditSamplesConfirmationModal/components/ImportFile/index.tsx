@@ -35,7 +35,7 @@ interface Props {
   changedMetadata: SampleIdToEditMetadataWebform | null;
   namedLocations: NamedGisaidLocation[];
   hasImportedMetadataFile: boolean;
-  resetMetadataFromCheckedSamples(): void;
+  resetMetadataFromEditableSamples(): void;
   onMetadataFileUploaded(props: FileUploadProps): void;
 }
 
@@ -44,7 +44,7 @@ export default function ImportFile({
   namedLocations,
   hasImportedMetadataFile,
   changedMetadata,
-  resetMetadataFromCheckedSamples,
+  resetMetadataFromEditableSamples,
   onMetadataFileUploaded,
 }: Props): JSX.Element {
   const [missingFields, setMissingFields] = useState<string[] | null>(null);
@@ -104,7 +104,7 @@ export default function ImportFile({
   const handleFiles = async (files: FileList | null) => {
     if (!files) return;
     // clear all metadata before importing tsv file
-    resetMetadataFromCheckedSamples();
+    resetMetadataFromEditableSamples();
     clearState();
 
     const sampleIds = Object.keys(metadata || EMPTY_OBJECT);
@@ -148,7 +148,6 @@ export default function ImportFile({
     // If they're on the page but somehow have no samples (eg, refreshing on
     // Metadata page), short-circuit and do nothing to avoid any weirdness.
     if (!metadata) return;
-
     const { data: sampleIdToUploadedMetadata, warningMessages } = result;
 
     const uploadedMetadata: SampleIdToEditMetadataWebform = {};
