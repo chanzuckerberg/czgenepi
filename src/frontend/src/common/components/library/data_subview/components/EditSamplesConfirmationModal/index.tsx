@@ -70,7 +70,8 @@ const EditSamplesConfirmationModal = ({
     useState<boolean>(false);
   const [isLoseProgessModalOpen, setLoseProgressModalOpen] =
     useState<boolean>(false);
-  const [changedMetadata, setChangedMetadata] = useState<MetadataType>(null);
+  const [changedMetadata, setChangedMetadata] =
+    useState<MetadataType>(EMPTY_OBJECT);
   const [hasImportedMetadataFile, setHasImportedMetadataFile] =
     useState<boolean>(false);
   const [autocorrectWarnings, setAutocorrectWarnings] =
@@ -188,7 +189,7 @@ const EditSamplesConfirmationModal = ({
     checkedSamples.forEach((item) => {
       structuredMetadata[item.privateId] = structureInitialMetadata(item);
     });
-    setChangedMetadata(null);
+    setChangedMetadata(EMPTY_OBJECT);
     setMetadata(structuredMetadata);
   }
 
