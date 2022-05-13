@@ -81,7 +81,7 @@ export default function ImportFile({
       return !parseResultSampleIdsSet.has(sampleId);
     });
     setAbsentSampleIds(absentSampleIds);
-  }, [parseResult, missingFields]);
+  }, [parseResult, missingFields, metadata]);
 
   // Used by file upload parser to convert location strings to Locations
   const stringToLocationFinder = useMemo(() => {
@@ -104,12 +104,16 @@ export default function ImportFile({
     const missingFields = getMissingFields(result);
     const duplicatePrivateIds = getDuplicatePrivateIds(result);
     const duplicatePublicIds = getDuplicatePublicIds(result);
-    const autocorrectCount =
-      getAutocorrectCount(warningMessages.get(WARNING_CODE.AUTO_CORRECT)) || 0;
-    setExtraneousSampleIds(extraneousSampleIds);
     setMissingFields(missingFields);
     setDuplicatePrivateIds(duplicatePrivateIds);
     setDuplicatePublicIds(duplicatePublicIds);
+    // if any of the above errors are present we do not want to continue with upload
+    if (missingFields || duplicatePrivateIds || duplicatePublicIds) {
+      return;
+    }
+    const autocorrectCount =
+      getAutocorrectCount(warningMessages.get(WARNING_CODE.AUTO_CORRECT)) || 0;
+    setExtraneousSampleIds(extraneousSampleIds);
     setAutocorrectCount(autocorrectCount);
     setFilename(filename);
     setParseResult(result);
