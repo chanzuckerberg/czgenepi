@@ -159,7 +159,7 @@ export async function createSamples({
     payload.push(samplePayload);
   }
 
-  const response = await fetch(API_URL + API.SAMPLES_CREATE, {
+  const response = await fetch(API_URL + API.SAMPLES, {
     ...DEFAULT_POST_OPTIONS,
     body: JSON.stringify(payload),
   });
@@ -250,7 +250,7 @@ interface SamplesEditPayloadType {
   private_identifier?: string;
   public_identifier?: string;
   private?: boolean;
-  collection_location?: string;
+  collection_location?: number;
   sequencing_date?: string;
   collection_date?: string;
 }

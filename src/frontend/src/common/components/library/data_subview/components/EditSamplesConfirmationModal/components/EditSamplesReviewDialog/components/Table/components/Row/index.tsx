@@ -8,14 +8,13 @@ import {
   StyledLock,
   StyledTableCell,
   StyledTableRow,
-} from "./style";
+} from "src/views/Upload/components/Review/components/Table/components/Row/style";
 
 interface Props {
-  id: string;
   metadata: Metadata;
 }
 
-export default React.memo(function Row({ id, metadata }: Props): JSX.Element {
+export default React.memo(function Row({ metadata }: Props): JSX.Element {
   const {
     privateId,
     collectionDate,
@@ -28,9 +27,8 @@ export default React.memo(function Row({ id, metadata }: Props): JSX.Element {
   return (
     <StyledTableRow component="div">
       <StyledTableCell component="div">
-        <Id>{id}</Id>
+        <Id>{privateId}</Id>
       </StyledTableCell>
-      <StyledTableCell component="div">{privateId}</StyledTableCell>
       <StyledTableCell component="div">{publicId || "--"}</StyledTableCell>
       <StyledTableCell component="div">{collectionDate}</StyledTableCell>
       <StyledTableCell component="div">
