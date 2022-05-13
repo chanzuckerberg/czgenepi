@@ -65,7 +65,8 @@ const EditSamplesConfirmationModal = ({
     useState<boolean>(false);
   const [isLoseProgessModalOpen, setLoseProgressModalOpen] =
     useState<boolean>(false);
-  const [changedMetadata, setChangedMetadata] = useState<MetadataType>(EMPTY_OBJECT);
+  const [changedMetadata, setChangedMetadata] =
+    useState<MetadataType>(EMPTY_OBJECT);
   const { data: namedLocationsData } = useNamedLocations();
   const namedLocations: NamedGisaidLocation[] =
     namedLocationsData?.namedLocations ?? [];

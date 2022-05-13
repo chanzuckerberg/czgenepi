@@ -83,7 +83,6 @@ export default function ImportFile({
     setAbsentSampleIds(absentSampleIds);
   }, [parseResult, missingFields, metadata]);
 
-
   function clearState() {
     setFilename("");
     setExtraneousSampleIds([]);
@@ -95,7 +94,7 @@ export default function ImportFile({
     setDuplicatePublicIds(null);
     setAutocorrectCount(0);
     setMissingFields(null);
-  };
+  }
 
   // Used by file upload parser to convert location strings to Locations
   const stringToLocationFinder = useMemo(() => {
