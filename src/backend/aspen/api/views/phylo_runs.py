@@ -93,11 +93,6 @@ async def kick_off_phylo_run(
     pathogen_genomes: MutableSequence[PathogenGenome] = list()
     for sample in user_visible_samples:
         pathogen_genomes.append(sample.uploaded_pathogen_genome)
-    if len(pathogen_genomes) == 0 and len(gisaid_ids) == 0:
-        sentry_sdk.capture_message(
-            f"No sequences selected for run from {sample_ids}.", "error"
-        )
-        raise ex.BadRequestException("No sequences selected for run")
 
     # 4B - AlignedGisaidDump
     aligned_gisaid_dump_query = (  # type: ignore
