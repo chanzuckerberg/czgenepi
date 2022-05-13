@@ -80,7 +80,7 @@ export const StyledLock = styled(Lock)`
     const spaces = getSpaces(props);
 
     return `
-      margin-right: ${spaces?.xs}px;
+      margin-right: ${spaces?.xxs}px;
     `;
   }}
 `;

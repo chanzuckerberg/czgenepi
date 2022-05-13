@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
-import { Callout, CommonThemeProps, getIconSizes } from "czifui";
+import { Collapse } from "@material-ui/core";
+import { Callout, CommonThemeProps, getIconSizes, getSpaces } from "czifui";
 import ArrowDownIcon from "src/common/icons/IconArrowDownSmall.svg";
 import ArrowUpIcon from "src/common/icons/IconArrowUpSmall.svg";
 import { transparentScrollbars } from "src/common/styles/basicStyle";
@@ -50,4 +51,15 @@ export const StyledCallout = styled(Callout)`
   .MuiAlert-message {
     width: 100%;
   }
+`;
+
+export const StyledCollapse = styled(Collapse)`
+  ${(props) => {
+    const spaces = getSpaces(props);
+    return `
+      .MuiCollapse-wrapper {
+        margin-top: ${spaces?.xs}px;
+      }
+    `;
+  }}
 `;
