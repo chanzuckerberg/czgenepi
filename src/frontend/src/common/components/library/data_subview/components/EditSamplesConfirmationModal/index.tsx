@@ -65,7 +65,7 @@ const EditSamplesConfirmationModal = ({
     useState<boolean>(false);
   const [isLoseProgessModalOpen, setLoseProgressModalOpen] =
     useState<boolean>(false);
-  const [changedMetadata, setChangedMetadata] = useState<MetadataType>(null);
+  const [changedMetadata, setChangedMetadata] = useState<MetadataType>(EMPTY_OBJECT);
   const { data: namedLocationsData } = useNamedLocations();
   const namedLocations: NamedGisaidLocation[] =
     namedLocationsData?.namedLocations ?? [];
@@ -178,7 +178,7 @@ const EditSamplesConfirmationModal = ({
     checkedSamples.forEach((item) => {
       structuredMetadata[item.privateId] = structureInitialMetadata(item);
     });
-    setChangedMetadata(null);
+    setChangedMetadata(EMPTY_OBJECT);
     setMetadata(structuredMetadata);
   }
 
