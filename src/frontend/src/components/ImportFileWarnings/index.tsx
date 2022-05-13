@@ -73,6 +73,7 @@ export default function ImportFileWarnings({
   return (
     <>
       {hasImportedFile &&
+        filename !== "" &&
         !getIsParseResultCompletelyUnused(extraneousSampleIds, parseResult) && (
           <Success filename={filename} />
         )}

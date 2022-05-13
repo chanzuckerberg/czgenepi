@@ -83,6 +83,20 @@ export default function ImportFile({
     setAbsentSampleIds(absentSampleIds);
   }, [parseResult, missingFields, metadata]);
 
+
+  function clearState() {
+    setFilename("");
+    setExtraneousSampleIds([]);
+    setAbsentSampleIds([]);
+    setUnknownDataFields(false);
+    setMissingData(EMPTY_OBJECT);
+    setBadFormatData(EMPTY_OBJECT);
+    setDuplicatePrivateIds(null);
+    setDuplicatePublicIds(null);
+    setAutocorrectCount(0);
+    setMissingFields(null);
+  };
+
   // Used by file upload parser to convert location strings to Locations
   const stringToLocationFinder = useMemo(() => {
     return createStringToLocationFinder(namedLocations);
@@ -90,6 +104,9 @@ export default function ImportFile({
 
   const handleFiles = async (files: FileList | null) => {
     if (!files) return;
+    // clear all metadata before importing tsv file
+    resetMetadataFromCheckedSamples();
+    clearState();
 
     const sampleIds = Object.keys(metadata || EMPTY_OBJECT);
     const sampleIdsSet = new Set(sampleIds);
@@ -108,7 +125,11 @@ export default function ImportFile({
     setDuplicatePrivateIds(duplicatePrivateIds);
     setDuplicatePublicIds(duplicatePublicIds);
     // if any of the above errors are present we do not want to continue with upload
-    if (missingFields || duplicatePrivateIds || duplicatePublicIds) {
+    if (
+      missingFields ||
+      !isEmpty(duplicatePrivateIds) ||
+      !isEmpty(duplicatePublicIds)
+    ) {
       return;
     }
     const autocorrectCount =
@@ -128,9 +149,6 @@ export default function ImportFile({
     // If they're on the page but somehow have no samples (eg, refreshing on
     // Metadata page), short-circuit and do nothing to avoid any weirdness.
     if (!metadata) return;
-
-    // clear all metadata before importing tsv file
-    resetMetadataFromCheckedSamples();
 
     const { data: sampleIdToUploadedMetadata, warningMessages } = result;
 
