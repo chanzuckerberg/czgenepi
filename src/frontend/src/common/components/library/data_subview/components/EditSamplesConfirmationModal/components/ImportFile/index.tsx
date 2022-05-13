@@ -81,7 +81,20 @@ export default function ImportFile({
       return !parseResultSampleIdsSet.has(sampleId);
     });
     setAbsentSampleIds(absentSampleIds);
-  }, [parseResult, missingFields]);
+  }, [parseResult, missingFields, metadata]);
+
+  function clearState() {
+    setFilename("");
+    setExtraneousSampleIds([]);
+    setAbsentSampleIds([]);
+    setUnknownDataFields(false);
+    setMissingData(EMPTY_OBJECT);
+    setBadFormatData(EMPTY_OBJECT);
+    setDuplicatePrivateIds(null);
+    setDuplicatePublicIds(null);
+    setAutocorrectCount(0);
+    setMissingFields(null);
+  }
 
   // Used by file upload parser to convert location strings to Locations
   const stringToLocationFinder = useMemo(() => {
@@ -90,6 +103,9 @@ export default function ImportFile({
 
   const handleFiles = async (files: FileList | null) => {
     if (!files) return;
+    // clear all metadata before importing tsv file
+    resetMetadataFromCheckedSamples();
+    clearState();
 
     const sampleIds = Object.keys(metadata || EMPTY_OBJECT);
     const sampleIdsSet = new Set(sampleIds);
@@ -104,12 +120,20 @@ export default function ImportFile({
     const missingFields = getMissingFields(result);
     const duplicatePrivateIds = getDuplicatePrivateIds(result);
     const duplicatePublicIds = getDuplicatePublicIds(result);
-    const autocorrectCount =
-      getAutocorrectCount(warningMessages.get(WARNING_CODE.AUTO_CORRECT)) || 0;
-    setExtraneousSampleIds(extraneousSampleIds);
     setMissingFields(missingFields);
     setDuplicatePrivateIds(duplicatePrivateIds);
     setDuplicatePublicIds(duplicatePublicIds);
+    // if any of the above errors are present we do not want to continue with upload
+    if (
+      missingFields ||
+      !isEmpty(duplicatePrivateIds) ||
+      !isEmpty(duplicatePublicIds)
+    ) {
+      return;
+    }
+    const autocorrectCount =
+      getAutocorrectCount(warningMessages.get(WARNING_CODE.AUTO_CORRECT)) || 0;
+    setExtraneousSampleIds(extraneousSampleIds);
     setAutocorrectCount(autocorrectCount);
     setFilename(filename);
     setParseResult(result);
@@ -124,9 +148,6 @@ export default function ImportFile({
     // If they're on the page but somehow have no samples (eg, refreshing on
     // Metadata page), short-circuit and do nothing to avoid any weirdness.
     if (!metadata) return;
-
-    // clear all metadata before importing tsv file
-    resetMetadataFromCheckedSamples();
 
     const { data: sampleIdToUploadedMetadata, warningMessages } = result;
 

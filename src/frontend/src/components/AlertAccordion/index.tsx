@@ -1,4 +1,3 @@
-import { Collapse } from "@material-ui/core";
 import React, { useState } from "react";
 import {
   ColumnFlexContainer,
@@ -7,6 +6,7 @@ import {
   StyledArrowDownIcon,
   StyledArrowUpIcon,
   StyledCallout,
+  StyledCollapse,
 } from "./style";
 
 interface Props {
@@ -33,7 +33,7 @@ export default function AlertAccordion({
       <RowFlexContainer>
         <ColumnFlexContainer>
           <StaticSizeDiv>{title}</StaticSizeDiv>
-          <Collapse in={isCollapseOpen}>{collapseContent}</Collapse>
+          <StyledCollapse in={isCollapseOpen}>{collapseContent}</StyledCollapse>
         </ColumnFlexContainer>
         {isCollapseOpen ? <StyledArrowUpIcon /> : <StyledArrowDownIcon />}
       </RowFlexContainer>

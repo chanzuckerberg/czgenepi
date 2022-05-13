@@ -1,4 +1,5 @@
 import CloseIcon from "@material-ui/icons/Close";
+import { Button } from "czifui";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
@@ -14,11 +15,13 @@ import {
   SampleEditMetadataWebform,
   SampleIdToEditMetadataWebform,
 } from "src/components/WebformTable/common/types";
-import { ContinueButton } from "src/views/Upload/components/common/style";
 import { NamedGisaidLocation } from "src/views/Upload/components/common/types";
 import { SampleIdToWarningMessages } from "src/views/Upload/components/Metadata/components/ImportFile/parseFile";
 import { EditSampleMetaDataInstructions } from "./components/EditSampleMetadataInstructions";
-import { EditSamplesReviewDialog } from "./components/EditSamplesReviewDialog";
+import {
+  EditSamplesReviewDialog,
+  MetadataWithIdType,
+} from "./components/EditSamplesReviewDialog";
 import ImportFile from "./components/ImportFile";
 import { LoseProgressModal } from "./components/LoseProgressModal";
 import {
@@ -45,7 +48,7 @@ enum Steps {
   REVIEW = 2,
 }
 
-type MetadataType = SampleIdToEditMetadataWebform | null;
+export type MetadataType = SampleIdToEditMetadataWebform | null;
 
 export interface FileUploadProps {
   uploadedMetadata: MetadataType;
@@ -61,18 +64,22 @@ const EditSamplesConfirmationModal = ({
   const [currentModalStep, setCurrentModalStep] = useState<Steps>(Steps.EDIT);
   const [isValid, setIsValid] = useState(false);
   const [metadata, setMetadata] = useState<MetadataType>(null);
+  const [metadataWithId, setMetadataWithId] =
+    useState<MetadataWithIdType>(null);
   const [isContinueButtonActive, setIsContinueButtonActive] =
     useState<boolean>(false);
   const [isLoseProgessModalOpen, setLoseProgressModalOpen] =
     useState<boolean>(false);
-  const [changedMetadata, setChangedMetadata] = useState<MetadataType>(null);
-  const { data: namedLocationsData } = useNamedLocations();
-  const namedLocations: NamedGisaidLocation[] =
-    namedLocationsData?.namedLocations ?? [];
+  const [changedMetadata, setChangedMetadata] =
+    useState<MetadataType>(EMPTY_OBJECT);
   const [hasImportedMetadataFile, setHasImportedMetadataFile] =
     useState<boolean>(false);
   const [autocorrectWarnings, setAutocorrectWarnings] =
     useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
+
+  const { data: namedLocationsData } = useNamedLocations();
+  const namedLocations: NamedGisaidLocation[] =
+    namedLocationsData?.namedLocations ?? [];
 
   useEffect(() => {
     // continue button should only be active if the user has metadata
@@ -85,10 +92,14 @@ const EditSamplesConfirmationModal = ({
   }, [changedMetadata, isValid]);
 
   const clearState = function () {
-    setChangedMetadata(null);
+    setCurrentModalStep(Steps.EDIT);
+    setIsValid(false);
     setMetadata(null);
-    setHasImportedMetadataFile(false);
+    setIsContinueButtonActive(false);
     setLoseProgressModalOpen(false);
+    setChangedMetadata(null);
+    setHasImportedMetadataFile(false);
+    setAutocorrectWarnings(EMPTY_OBJECT);
   };
 
   const handleClose = function () {
@@ -99,7 +110,7 @@ const EditSamplesConfirmationModal = ({
     setLoseProgressModalOpen(false);
   };
 
-  const handleConfirmLoseProgressModal = () => {
+  const closeEditModal = () => {
     onClose();
     clearState();
   };
@@ -178,7 +189,7 @@ const EditSamplesConfirmationModal = ({
     checkedSamples.forEach((item) => {
       structuredMetadata[item.privateId] = structureInitialMetadata(item);
     });
-    setChangedMetadata(null);
+    setChangedMetadata(EMPTY_OBJECT);
     setMetadata(structuredMetadata);
   }
 
@@ -197,6 +208,23 @@ const EditSamplesConfirmationModal = ({
     ) {
       resetMetadataFromCheckedSamples();
     }
+  }, [checkedSamples, metadata]);
+
+  // we need to send the sample id when we make the BE request to update
+  // the sample, so let's track a version of metadata that has it
+  useEffect(() => {
+    if (!metadata) return;
+
+    const metadataWithId: MetadataWithIdType = {};
+    checkedSamples.forEach((item) => {
+      const { id, privateId } = item;
+      const data = metadata[privateId] ?? {};
+      metadataWithId[privateId] = {
+        ...data,
+        id,
+      };
+    });
+    setMetadataWithId(metadataWithId);
   }, [checkedSamples, metadata]);
 
   const numSamples = checkedSamples.length;
@@ -244,7 +272,7 @@ const EditSamplesConfirmationModal = ({
             <LoseProgressModal
               isModalOpen={isLoseProgessModalOpen}
               onClose={handleCloseLoseProgressModal}
-              onConfirm={handleConfirmLoseProgressModal}
+              onConfirm={closeEditModal}
             />
             {currentModalStep === Steps.EDIT && (
               <>
@@ -274,20 +302,22 @@ const EditSamplesConfirmationModal = ({
                   handleRowMetadata={handleRowMetadata}
                   webformTableType="EDIT"
                 />
-                <ContinueButton
+                <Button
                   disabled={!isContinueButtonActive}
                   onClick={() => setCurrentModalStep(Steps.REVIEW)}
                   sdsType="primary"
                   sdsStyle="rounded"
                 >
                   Continue
-                </ContinueButton>
+                </Button>
               </>
             )}
             {currentModalStep === Steps.REVIEW && (
               <EditSamplesReviewDialog
-                changedMetaData={changedMetadata}
+                changedMetadata={changedMetadata}
+                metadataWithId={metadataWithId}
                 onClickBack={() => setCurrentModalStep(Steps.EDIT)}
+                onSave={closeEditModal}
               />
             )}
           </Content>
