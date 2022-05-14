@@ -1,5 +1,6 @@
 import CloseIcon from "@material-ui/icons/Close";
 import { Button } from "czifui";
+import { isEmpty } from "lodash";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
@@ -35,9 +36,9 @@ import {
 } from "./style";
 import {
   findMetadataChanges,
+  getInitialMetadata,
   getMetadataEntryOrEmpty,
   setApplyAllValueToPrevMetadata,
-  structureInitialMetadata,
 } from "./utils";
 
 interface Props {
@@ -83,6 +84,7 @@ const EditSamplesConfirmationModal = ({
 
   const { data: userInfo } = useUserInfo();
   const { group: userGroup } = userInfo ?? {};
+  console.log("changedMetadata", changedMetadata); // REMOVE
 
   const { data: namedLocationsData } = useNamedLocations();
   const namedLocations: NamedGisaidLocation[] =
@@ -99,7 +101,7 @@ const EditSamplesConfirmationModal = ({
   useEffect(() => {
     // continue button should only be active if the user has metadata
     // changes and that all form fields are filled out correctly
-    if (changedMetadata && isValid) {
+    if (!isEmpty(changedMetadata) && isValid) {
       setIsContinueButtonActive(true);
     } else {
       setIsContinueButtonActive(false);
@@ -200,10 +202,7 @@ const EditSamplesConfirmationModal = ({
   ]);
 
   function resetMetadataFromEditableSamples() {
-    const structuredMetadata: SampleIdToEditMetadataWebform = {};
-    samplesCanEdit.forEach((item) => {
-      structuredMetadata[item.privateId] = structureInitialMetadata(item);
-    });
+    const structuredMetadata = getInitialMetadata(samplesCanEdit);
     setChangedMetadata(EMPTY_OBJECT);
     setMetadata(structuredMetadata);
   }
@@ -308,10 +307,7 @@ const EditSamplesConfirmationModal = ({
                 />
                 <ImportFile
                   metadata={metadata}
-                  changedMetadata={changedMetadata}
-                  resetMetadataFromEditableSamples={
-                    resetMetadataFromEditableSamples
-                  }
+                  samplesCanEdit={samplesCanEdit}
                   namedLocations={namedLocations}
                   hasImportedMetadataFile={hasImportedMetadataFile}
                   onMetadataFileUploaded={handleMetadataFileUploaded}
