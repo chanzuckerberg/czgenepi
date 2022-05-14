@@ -25,6 +25,10 @@ import {
   EditSamplesReviewDialog,
   MetadataWithIdType,
 } from "./components/EditSamplesReviewDialog";
+import {
+  EditSampleStatusModal,
+  StatusModalView,
+} from "./components/EditSampleStatusModal";
 import ImportFile from "./components/ImportFile";
 import { LoseProgressModal } from "./components/LoseProgressModal";
 import {
@@ -80,9 +84,11 @@ const EditSamplesConfirmationModal = ({
   const [autocorrectWarnings, setAutocorrectWarnings] =
     useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
   const [samplesCanEdit, setSamplesCanEdit] = useState<Sample[]>([]);
-
   const { data: userInfo } = useUserInfo();
   const { group: userGroup } = userInfo ?? {};
+  const [statusModalView, setStatusModalView] = useState<StatusModalView>(
+    StatusModalView.NONE
+  );
 
   const { data: namedLocationsData } = useNamedLocations();
   const namedLocations: NamedGisaidLocation[] =
@@ -99,7 +105,7 @@ const EditSamplesConfirmationModal = ({
   useEffect(() => {
     // continue button should only be active if the user has metadata
     // changes and that all form fields are filled out correctly
-    if (changedMetadata && isValid) {
+    if (changedMetadata && Object.keys(changedMetadata).length > 0 && isValid) {
       setIsContinueButtonActive(true);
     } else {
       setIsContinueButtonActive(false);
@@ -115,6 +121,7 @@ const EditSamplesConfirmationModal = ({
     setChangedMetadata(null);
     setHasImportedMetadataFile(false);
     setAutocorrectWarnings(EMPTY_OBJECT);
+    setStatusModalView(StatusModalView.NONE);
   };
 
   const handleClose = function () {
@@ -126,8 +133,8 @@ const EditSamplesConfirmationModal = ({
   };
 
   const closeEditModal = () => {
-    onClose();
     clearState();
+    onClose();
   };
 
   const handleMetadataFileUploaded = ({
@@ -347,7 +354,26 @@ const EditSamplesConfirmationModal = ({
                 changedMetadata={changedMetadata}
                 metadataWithId={metadataWithId}
                 onClickBack={() => setCurrentModalStep(Steps.EDIT)}
-                onSave={closeEditModal}
+                onSave={() => setStatusModalView(StatusModalView.LOADING)}
+                onSaveFailure={() =>
+                  setStatusModalView(StatusModalView.FAILURE)
+                }
+                onSaveSuccess={() =>
+                  setStatusModalView(StatusModalView.SUCCESS)
+                }
+              />
+            )}
+            {statusModalView !== StatusModalView.NONE && (
+              <EditSampleStatusModal
+                statusModalView={statusModalView}
+                onClose={() => {
+                  if (statusModalView === StatusModalView.SUCCESS) {
+                    closeEditModal();
+                  } else {
+                    setCurrentModalStep(Steps.EDIT);
+                    setStatusModalView(StatusModalView.NONE);
+                  }
+                }}
               />
             )}
           </Content>
