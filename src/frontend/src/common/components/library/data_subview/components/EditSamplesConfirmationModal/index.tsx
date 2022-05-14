@@ -87,7 +87,6 @@ const EditSamplesConfirmationModal = ({
   const [samplesCanEdit, setSamplesCanEdit] = useState<Sample[]>([]);
   const { data: userInfo } = useUserInfo();
   const { group: userGroup } = userInfo ?? {};
-  console.log("changedMetadata", changedMetadata); // REMOVE
   const [statusModalView, setStatusModalView] = useState<StatusModalView>(
     StatusModalView.NONE
   );

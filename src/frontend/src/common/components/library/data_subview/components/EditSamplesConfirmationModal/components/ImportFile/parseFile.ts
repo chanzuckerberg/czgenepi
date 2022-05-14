@@ -161,7 +161,7 @@ function inferMetadata({
   if (originalValue) {
     inferValue({ key, row, stringToLocationFinder, rowMetadata });
   } else {
-    rowMetadata[key] = originalValue;
+    (rowMetadata[key] as string | undefined) = originalValue;
   }
 }
 
