@@ -30,6 +30,8 @@ interface Props {
   metadataWithId: MetadataWithIdType;
   onClickBack(): void;
   onSave(): void;
+  onSaveFailure(): void;
+  onSaveSuccess(): void;
 }
 
 const EditSamplesReviewDialog = ({
@@ -37,15 +39,17 @@ const EditSamplesReviewDialog = ({
   metadataWithId,
   onClickBack,
   onSave,
+  onSaveFailure,
+  onSaveSuccess,
 }: Props): JSX.Element => {
   const [isChecked, setChecked] = useState<boolean>(false);
 
   const editSampleMutation = useEditSamples({
     componentOnSuccess: () => {
-      // TODO (mlila): will be defined as part of https://app.shortcut.com/genepi/story/180633
+      onSaveSuccess();
     },
     componentOnError: () => {
-      // TODO (mlila): will be defined as part of https://app.shortcut.com/genepi/story/180633
+      onSaveFailure();
     },
   });
 
@@ -103,11 +107,8 @@ const EditSamplesReviewDialog = ({
   return (
     <>
       <Table metadata={metadataWithId} />
-      <CheckboxWrapper>
-        <Checkbox
-          stage={isChecked ? "checked" : "unchecked"}
-          onClick={() => setChecked(!isChecked)}
-        />
+      <CheckboxWrapper onClick={() => setChecked(!isChecked)}>
+        <Checkbox stage={isChecked ? "checked" : "unchecked"} />
         <div>
           I agree that the data I am uploading to CZ GEN EPI has been lawfully
           collected and that I have all the necessary consents, permissions, and
