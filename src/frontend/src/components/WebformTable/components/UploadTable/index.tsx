@@ -17,15 +17,13 @@ import Row from "../Row";
 
 export interface TableProps {
   metadata: CommonProps["metadata"];
-  // TODO (phoenix): once sample edit has import option remove this as optional
-  hasImportedMetadataFile?: boolean;
+  hasImportedMetadataFile: boolean;
   handleRowMetadata(id: string, sampleMetadata: Metadata): void;
   applyToAllColumn(fieldKey: keyof Metadata, value: unknown): void;
   handleRowValidation(id: string, isValid: boolean): void;
   setMetadata: CommonProps["setMetadata"];
   setIsValid: React.Dispatch<React.SetStateAction<boolean>>;
-  // TODO (phoenix): once sample edit has import option remove this as optional
-  autocorrectWarnings?: SampleIdToWarningMessages;
+  autocorrectWarnings: SampleIdToWarningMessages;
   locations: NamedGisaidLocation[];
 }
 

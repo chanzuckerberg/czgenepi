@@ -54,12 +54,12 @@ interface Props {
   id: string;
   metadata: Metadata;
   // TODO (phoenix): once sample edit has import option remove this as optional
-  hasImportedMetadataFile?: boolean;
+  hasImportedMetadataFile: boolean;
   handleMetadata: (id: string, sampleMetadata: Metadata) => void;
   applyToAllColumn: (fieldKey: keyof Metadata, value: unknown) => void;
   isFirstRow: boolean;
   handleRowValidation: (id: string, isValid: boolean) => void;
-  warnings?: Set<keyof Metadata>;
+  warnings: Set<keyof Metadata>;
   locations: NamedGisaidLocation[];
   shouldSkipIdColumn?: boolean;
 }

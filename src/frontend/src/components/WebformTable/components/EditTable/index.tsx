@@ -11,9 +11,11 @@ import { TableProps } from "../UploadTable";
 
 export default function EditTable({
   metadata,
+  hasImportedMetadataFile,
   handleRowMetadata,
   applyToAllColumn,
   handleRowValidation,
+  autocorrectWarnings,
   locations,
 }: TableProps): JSX.Element {
   return (
@@ -49,9 +51,11 @@ export default function EditTable({
                 key={sampleId}
                 id={sampleId}
                 metadata={sampleMetadata}
+                hasImportedMetadataFile={hasImportedMetadataFile}
                 handleMetadata={handleRowMetadata}
                 applyToAllColumn={applyToAllColumn}
                 handleRowValidation={handleRowValidation}
+                warnings={autocorrectWarnings[sampleId]}
                 locations={locations}
                 shouldSkipIdColumn
               />
