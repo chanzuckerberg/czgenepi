@@ -1,16 +1,9 @@
 import styled from "@emotion/styled";
-import {
-  CommonThemeProps,
-  Dropdown,
-  getBorders,
-  getColors,
-  getSpaces,
-} from "czifui";
+import { Dropdown, getBorders, getColors, getSpaces } from "czifui";
 import {
   doNotForwardProps,
   FormFieldProps,
 } from "src/components/DateField/style";
-
 
 export const StyledDiv = styled("div")`
   ${(props) => {
