@@ -58,6 +58,7 @@ export default function EditTable({
                 warnings={autocorrectWarnings[sampleId]}
                 locations={locations}
                 shouldSkipIdColumn
+                shouldShowEditedCellsAsMarked
               />
             );
           })}

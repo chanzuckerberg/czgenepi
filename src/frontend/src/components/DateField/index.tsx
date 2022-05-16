@@ -1,5 +1,6 @@
 import { FormikContextType } from "formik";
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
+import { valueType } from "../WebformTable/components/Row/components/FreeTextField";
 import { StyledTextField } from "./style";
 
 const DATE_LENGTH = 10;
@@ -14,6 +15,7 @@ interface Props {
   formik: FormikContextType<any>;
   helperText?: any;
   onChange?: (d: ChangeEvent) => void;
+  shouldShowEditedCellsAsMarked?: boolean;
 }
 
 export default function DateField({
@@ -21,12 +23,31 @@ export default function DateField({
   formik,
   helperText,
   onChange,
+  shouldShowEditedCellsAsMarked,
 }: Props): JSX.Element {
-  const { handleChange, handleBlur, values, touched, errors } = formik;
+  const { handleChange, handleBlur, values, touched, errors, initialValues } =
+    formik;
+  const [isBackgroundColorShown, setBackgroundColorShown] =
+    useState<boolean>(false);
+  const [changedValue, setChangedValue] = useState<valueType>(undefined);
+  const [initialValue, setInitialValue] = useState<valueType>(undefined);
+
+  useEffect(() => {
+    setChangedValue(values[fieldKey]);
+    setInitialValue(initialValues[fieldKey]);
+  }, [fieldKey, initialValues, values]);
+
+  useEffect(() => {
+    if (initialValue !== changedValue && shouldShowEditedCellsAsMarked) {
+      setBackgroundColorShown(true);
+    } else {
+      setBackgroundColorShown(false);
+    }
+  }, [initialValue, changedValue, shouldShowEditedCellsAsMarked]);
 
   const errorMessage = touched[fieldKey] && errors[fieldKey];
 
-  const value = values[fieldKey] || "";
+  const value = changedValue || "";
 
   return (
     <StyledTextField
@@ -43,6 +64,7 @@ export default function DateField({
       value={value}
       error={Boolean(errorMessage)}
       helperText={helperText}
+      isBackgroundColorShown={isBackgroundColorShown}
     />
   );
 }

@@ -1,11 +1,12 @@
 import FormHelperText from "@material-ui/core/FormHelperText";
 import { DefaultMenuSelectOption, DropdownPopper } from "czifui";
 import { FormikContextType } from "formik";
-import { escapeRegExp } from "lodash/fp";
-import React from "react";
+import { escapeRegExp, isEqual } from "lodash/fp";
+import React, { useEffect, useState } from "react";
 import { Metadata } from "src/components/WebformTable/common/types";
 import { NamedGisaidLocation } from "src/views/Upload/components/common/types";
 import ApplyToAllColumn from "../common/ApplyToAllColumn";
+import { valueType } from "../FreeTextField";
 import { StyledDiv, StyledDropdown } from "./style";
 
 interface Props {
@@ -14,6 +15,7 @@ interface Props {
   applyToAllColumn: (fieldKey: keyof Metadata, value: unknown) => void;
   isFirstRow: boolean;
   locations: NamedGisaidLocation[];
+  shouldShowEditedCellsAsMarked?: boolean; // used to mark edited cells as purple for crud
 }
 
 interface AutocompleteState {
@@ -29,8 +31,25 @@ export default function LocationField({
   applyToAllColumn,
   isFirstRow,
   locations,
+  shouldShowEditedCellsAsMarked = false,
 }: Props): JSX.Element {
-  const { handleBlur, setFieldValue, values, touched, errors } = formik;
+  const { handleBlur, setFieldValue, values, touched, errors, initialValues } = formik;
+  const [isBackgroundColorShown, setBackgroundColorShown] =
+    useState<boolean>(false);
+  const [changedValue, setChangedValue] = useState<valueType>(undefined);
+  const [initialValue, setInitialValue] = useState<valueType>(undefined);
+
+  useEffect(() => {
+    setChangedValue(values[fieldKey]);
+    setInitialValue(initialValues[fieldKey]);
+  }, [fieldKey, initialValues, values]);
+  useEffect(() => {
+    if (!isEqual(initialValue, changedValue) && shouldShowEditedCellsAsMarked) {
+      setBackgroundColorShown(true);
+    } else {
+      setBackgroundColorShown(false);
+    }
+  }, [initialValue, changedValue, shouldShowEditedCellsAsMarked]);
 
   let value: NamedGisaidLocation | undefined = undefined;
   if (values[fieldKey]) {
@@ -108,6 +127,7 @@ export default function LocationField({
         label={value?.name || "Search For Location"}
         value={value}
         onChange={handleLocationChange}
+        isBackgroundColorShown={isBackgroundColorShown}
         options={locations}
         search
         MenuSelectProps={{
