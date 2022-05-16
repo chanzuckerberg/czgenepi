@@ -2,8 +2,8 @@ import styled from "@emotion/styled";
 import { fontBodyS, fontHeaderXl, getColors, getSpaces } from "czifui";
 import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
-import UploadImage from "./Upload.svg";
-import UploadFailedImage from "./UploadFailed.svg";
+import UploadImage from "src/common/images/Upload.svg";
+import UploadFailedImage from "src/common/images/UploadFailed.svg";
 
 export const Title = styled.span`
   ${fontHeaderXl}
