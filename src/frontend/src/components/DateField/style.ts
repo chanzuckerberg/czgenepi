@@ -19,7 +19,7 @@ export const StyledTextField = styled(TextField, {
       width: ${(spaces?.l || 0) + 120}px;
       margin: 0;
       input {
-        background-color: ${isBackgroundColorShown && colors?.primary[200]}
+        background-color: ${isBackgroundColorShown && colors?.primary[200]};
       }
     `;
   }}
