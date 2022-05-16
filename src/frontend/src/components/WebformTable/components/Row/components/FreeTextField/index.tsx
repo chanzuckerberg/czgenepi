@@ -1,5 +1,6 @@
 import { FormikContextType } from "formik";
 import React, { useEffect, useState } from "react";
+import { valueType } from "src/components/DateField";
 import { Metadata } from "src/components/WebformTable/common/types";
 import { StyledTextField } from "./style";
 
@@ -9,8 +10,6 @@ interface Props {
   isShown?: boolean;
   shouldShowEditedCellsAsMarked?: boolean; // used to mark edited cells as purple for crud
 }
-
-type valueType = string | boolean | NamedGisaidLocation | undefined;
 
 export default function FreeTextField({
   fieldKey,

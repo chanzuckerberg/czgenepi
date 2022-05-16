@@ -1,6 +1,5 @@
 import { FormikContextType } from "formik";
 import React, { ChangeEvent, useEffect, useState } from "react";
-import { valueType } from "../WebformTable/components/Row/components/FreeTextField";
 import { StyledTextField } from "./style";
 
 const DATE_LENGTH = 10;
@@ -17,6 +16,8 @@ interface Props {
   onChange?: (d: ChangeEvent) => void;
   shouldShowEditedCellsAsMarked?: boolean;
 }
+
+export type valueType = string | boolean | NamedGisaidLocation | undefined;
 
 export default function DateField({
   fieldKey,
