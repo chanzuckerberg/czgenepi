@@ -71,7 +71,6 @@ def get_app() -> FastAPI:
         access_token_url=settings.AUTH0_ACCESS_TOKEN_URL,
         authorize_url=settings.AUTH0_AUTHORIZE_URL,
         client_kwargs=settings.AUTH0_CLIENT_KWARGS,
-        server_metadata_url=settings.AUTH0_SERVER_METADATA_URL,
     )
     _app.state.auth0_client = auth0
 
