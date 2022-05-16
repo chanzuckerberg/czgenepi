@@ -6,12 +6,11 @@ import {
   getColors,
   getSpaces,
 } from "czifui";
+import {
+  doNotForwardProps,
+  FormFieldProps,
+} from "src/components/DateField/style";
 
-interface FormFieldProps extends CommonThemeProps {
-  isBackgroundColorShown: boolean;
-}
-
-const doNotForwardProps = ["isBackgroundColorShown"];
 
 export const StyledDiv = styled("div")`
   ${(props) => {

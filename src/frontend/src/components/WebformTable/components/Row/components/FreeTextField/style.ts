@@ -1,12 +1,10 @@
 import styled from "@emotion/styled";
 import TextField from "@material-ui/core/TextField";
-import { CommonThemeProps, getColors, getSpaces } from "czifui";
-
-interface FormFieldProps extends CommonThemeProps {
-  isBackgroundColorShown: boolean;
-}
-
-const doNotForwardProps = ["isBackgroundColorShown"];
+import { getColors, getSpaces } from "czifui";
+import {
+  doNotForwardProps,
+  FormFieldProps,
+} from "src/components/DateField/style";
 
 export const StyledTextField = styled(TextField, {
   shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
