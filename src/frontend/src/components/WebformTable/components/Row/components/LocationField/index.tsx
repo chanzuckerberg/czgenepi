@@ -6,7 +6,6 @@ import React, { useEffect, useState } from "react";
 import { Metadata } from "src/components/WebformTable/common/types";
 import { NamedGisaidLocation } from "src/views/Upload/components/common/types";
 import ApplyToAllColumn from "../common/ApplyToAllColumn";
-import { valueType } from "../FreeTextField";
 import { StyledDiv, StyledDropdown } from "./style";
 
 interface Props {
@@ -33,7 +32,8 @@ export default function LocationField({
   locations,
   shouldShowEditedCellsAsMarked = false,
 }: Props): JSX.Element {
-  const { handleBlur, setFieldValue, values, touched, errors, initialValues } = formik;
+  const { handleBlur, setFieldValue, values, touched, errors, initialValues } =
+    formik;
   const [isBackgroundColorShown, setBackgroundColorShown] =
     useState<boolean>(false);
   const [changedValue, setChangedValue] = useState<valueType>(undefined);

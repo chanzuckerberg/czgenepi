@@ -18,7 +18,9 @@ export const StyledTextField = styled(TextField, {
     return `
       width: ${(spaces?.l || 0) + 120}px;
       margin: 0;
-      background-color: ${isBackgroundColorShown && colors?.primary[200]}
+      input {
+        background-color: ${isBackgroundColorShown && colors?.primary[200]}
+      }
     `;
   }}
 `;
