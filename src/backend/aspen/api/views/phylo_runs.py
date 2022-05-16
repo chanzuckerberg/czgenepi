@@ -24,11 +24,8 @@ from aspen.api.schemas.phylo_runs import (
     PhyloRunUpdateRequest,
 )
 from aspen.api.settings import Settings
-from aspen.api.utils import (
-    authz_sample_filters,
-    get_matching_gisaid_ids,
-    get_missing_and_found_sample_ids,
-)
+from aspen.api.utils import get_matching_gisaid_ids, get_missing_and_found_sample_ids
+from aspen.app.views.api_utils import authz_sample_filters
 from aspen.database.models import (
     AlignedGisaidDump,
     DataType,

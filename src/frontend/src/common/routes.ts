@@ -6,6 +6,7 @@ export enum ROUTES {
   DATA = "/data",
   GISAID = "https://www.gisaid.org/",
   GITHUB = "https://github.com/chanzuckerberg/czgenepi/",
+  LOGIN = "/login",
   NEXTSTRAIN = "https://nextstrain.org/",
   TERMS = "/terms",
   PANGOLIN = "https://pangolin.cog-uk.io/",
