@@ -31,7 +31,7 @@ import {
 } from "./utils";
 
 interface Props {
-  samplesCanEdit: Sample[];
+  userEditableSamples: Sample[];
   metadata: SampleIdToEditMetadataWebform | null;
   namedLocations: NamedGisaidLocation[];
   hasImportedMetadataFile: boolean;
@@ -39,7 +39,7 @@ interface Props {
 }
 
 export default function ImportFile({
-  samplesCanEdit,
+  userEditableSamples,
   metadata,
   namedLocations,
   hasImportedMetadataFile,
@@ -144,7 +144,7 @@ export default function ImportFile({
     const { data: sampleIdToUploadedMetadata, warningMessages } = result;
 
     // we need to reset metadata and changedMetadata when a new file is imported
-    const initialMetadata = getInitialMetadata(samplesCanEdit);
+    const initialMetadata = getInitialMetadata(userEditableSamples);
     const emptyChangedMetadata = {};
 
     const uploadedMetadata: SampleIdToEditMetadataWebform = {};
