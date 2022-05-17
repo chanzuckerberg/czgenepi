@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import { isEmpty } from "lodash";
+import React, { useEffect, useState } from "react";
 import { useUserInfo } from "src/common/queries/auth";
 import { useDeleteSamples } from "src/common/queries/samples";
 import { B } from "src/common/styles/basicStyle";
@@ -23,12 +24,21 @@ const DeleteSamplesConfirmationModal = ({
   const [shouldShowSuccessNotification, setShouldShowSuccessNotification] =
     useState<boolean>(false);
   const [numDeletedSamples, setNumDeletedSamples] = useState<number>(0);
+  const [isDeleteDisabled, setIsDeleteDisabled] = useState<boolean>(false);
   const { data: userInfo } = useUserInfo();
   const { group: userGroup } = userInfo ?? {};
 
   const samplesToDelete = checkedSamples
     .filter((sample) => sample.submittingGroup?.name === userGroup?.name)
     .map((sample) => sample.id);
+
+  useEffect(() => {
+    if (isEmpty(samplesToDelete)) {
+      setIsDeleteDisabled(true);
+    } else {
+      setIsDeleteDisabled(false);
+    }
+  }, [samplesToDelete]);
 
   const deleteSampleMutation = useDeleteSamples({
     componentOnError: () => {
@@ -105,6 +115,7 @@ const DeleteSamplesConfirmationModal = ({
         open={open}
         onClose={onClose}
         onDelete={onDelete}
+        isDeleteDisabled={isDeleteDisabled}
         title={title}
         content={content}
       />
