@@ -22,6 +22,7 @@ export function structureInitialMetadata(
   if (i.collectionLocation && typeof i.collectionLocation !== "string") {
     i.collectionLocation.name = stringifyGisaidLocation(i.collectionLocation);
   }
+  i.keepPrivate = item.private;
   return i;
 }
 export function findMetadataChanges(
@@ -75,4 +76,14 @@ export function initSampleMetadata(
   const metadata = { ...EMPTY_METADATA };
   metadata.privateId = sampleId;
   return metadata;
+}
+
+export function getInitialMetadata(
+  samplesCanEdit: Sample[]
+): SampleIdToEditMetadataWebform {
+  const initialMetadata: SampleIdToEditMetadataWebform = {};
+  samplesCanEdit.forEach((item) => {
+    initialMetadata[item.privateId] = structureInitialMetadata(item);
+  });
+  return initialMetadata;
 }

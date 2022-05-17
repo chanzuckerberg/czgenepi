@@ -18,7 +18,10 @@ import {
   FORBIDDEN_NAME_CHARACTERS_REGEX,
   MAX_NAME_LENGTH,
 } from "src/views/Upload/components/common/constants";
-import { inferMetadata } from "src/views/Upload/components/Metadata/components/ImportFile/parseFile";
+import {
+  inferMetadataType,
+  inferValue,
+} from "src/views/Upload/components/Metadata/components/ImportFile/parseFile";
 
 type MergedSampleEditTsvWebformMetadata = SampleEditTsvMetadata &
   SampleEditMetadataWebform;
@@ -99,7 +102,8 @@ function getDuplicateIds(
   for (const [key, value] of Object.entries(idCounts)) {
     // duplicates don't count for '' (as that means user does not want to change these values)
     // duplicates also do not count if undefined (this means a user deleted this non required column)
-    const keyIsAValue = key !== "" && key !== "undefined";
+    const keyIsAValue =
+      key !== "" && key !== "undefined" && key.toLowerCase() !== "delete";
     if (value.length > 1 && keyIsAValue) {
       dups.add(key);
     }
@@ -146,6 +150,21 @@ export function warnMissingMetadata(
   return missingMetadata.size ? missingMetadata : null;
 }
 
+function inferMetadata({
+  row,
+  key,
+  rowMetadata,
+  stringToLocationFinder,
+}: inferMetadataType): void {
+  const originalValue: string | undefined = row[key];
+  // Only overwrite sane defaults if a "real" value was pulled for key
+  if (originalValue) {
+    inferValue({ key, row, stringToLocationFinder, rowMetadata });
+  } else {
+    (rowMetadata[key] as string | undefined) = originalValue;
+  }
+}
+
 /**
  * Parses a single data row. If issues during parse, also reports warnings.
  *
@@ -183,9 +202,8 @@ function parseRow(
   };
   // Only extract info we care about from the row. Set `rowMetadata` with it.
   SAMPLE_EDIT_METADATA_KEYS_TO_EXTRACT.forEach((key) => {
-    inferMetadata(row, key, rowMetadata, stringToLocationFinder);
+    inferMetadata({ key, row, stringToLocationFinder, rowMetadata });
   });
-
   const rowBadFormatWarnings = warnBadFormatMetadata(rowMetadata);
   if (rowBadFormatWarnings) {
     rowWarnings.set(WARNING_CODE.BAD_FORMAT_DATA, rowBadFormatWarnings);
