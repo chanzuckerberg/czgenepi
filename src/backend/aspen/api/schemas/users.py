@@ -28,7 +28,8 @@ class UserMeResponse(UserBaseResponse):
 
 
 class UserResponse(UserBaseResponse):
-    pass
+    email: str
+    group_admin: bool
 
 
 class UsersResponse(BaseResponse):
