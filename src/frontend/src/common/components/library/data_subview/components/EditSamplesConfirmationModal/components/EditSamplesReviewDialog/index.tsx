@@ -62,7 +62,7 @@ const EditSamplesReviewDialog = ({
         private: m.keepPrivate,
         private_identifier: m.privateId,
         public_identifier: m.publicId,
-        sequencing_date: m.sequencingDate,
+        sequencing_date: m.sequencingDate === "" ? null : m.sequencingDate,
       }));
 
       editSampleMutation.mutate({
