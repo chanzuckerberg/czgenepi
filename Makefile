@@ -207,10 +207,8 @@ local-clean: local-nohostconfig ## Remove everything related to the local dev en
 	fi;
 	-rm -rf ./oauth/pkcs12/server*
 	-rm -rf ./oauth/pkcs12/certificate*
-	$(docker_compose) rm -sf
-	-docker rm -f aspen_utility_1
-	-docker volume rm aspen_localstack
-	-docker network rm aspen_genepinet
+	$(docker_compose) rm -sfv
+	-docker volume rm czgenepi_localstack
 
 .PHONY: local-logs
 local-logs: ## Tail the logs of the dev env containers. ex: make local-logs CONTAINER=backend
