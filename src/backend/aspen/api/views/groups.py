@@ -22,9 +22,6 @@ async def get_group_members(
 ) -> AllGroupsMembersResponse:
     # For now a user only has one group
     usergroups = [user.group]
-    # For now a user can only be an administrator of one group
-    if not user.group_admin:
-        raise ex.UnauthorizedException("Not authorized")
     group_member_data = []
     for group in usergroups:
         group_members_query = sa.select(User).where(User.group == group).order_by(User.name.asc())
