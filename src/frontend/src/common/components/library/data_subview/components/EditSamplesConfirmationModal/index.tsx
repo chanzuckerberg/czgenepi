@@ -84,7 +84,7 @@ const EditSamplesConfirmationModal = ({
     useState<boolean>(false);
   const [autocorrectWarnings, setAutocorrectWarnings] =
     useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
-  const [samplesCanEdit, setSamplesCanEdit] = useState<Sample[]>([]);
+  const [userEditableSamples, setUserEditableSamples] = useState<Sample[]>([]);
   const { data: userInfo } = useUserInfo();
   const { group: userGroup } = userInfo ?? {};
   const [statusModalView, setStatusModalView] = useState<StatusModalView>(
@@ -94,13 +94,13 @@ const EditSamplesConfirmationModal = ({
   const { data: namedLocationsData } = useNamedLocations();
   const namedLocations: NamedGisaidLocation[] =
     namedLocationsData?.namedLocations ?? [];
-  const numSamplesCantEdit = checkedSamples.length - samplesCanEdit.length;
+  const numSamplesCantEdit = checkedSamples.length - userEditableSamples.length;
 
   useEffect(() => {
     const samplesToEdit = checkedSamples.filter(
-      (sample) => sample.submittingGroup?.name === userGroup?.name
+      (sample) => sample.submittingGroup?.id === userGroup?.id
     );
-    setSamplesCanEdit(samplesToEdit);
+    setUserEditableSamples(samplesToEdit);
   }, [checkedSamples, userGroup?.name]);
 
   useEffect(() => {
@@ -208,7 +208,7 @@ const EditSamplesConfirmationModal = ({
   ]);
 
   function resetMetadataFromEditableSamples() {
-    const structuredMetadata = getInitialMetadata(samplesCanEdit);
+    const structuredMetadata = getInitialMetadata(userEditableSamples);
     setChangedMetadata(EMPTY_OBJECT);
     setMetadata(structuredMetadata);
   }
@@ -218,7 +218,7 @@ const EditSamplesConfirmationModal = ({
     // loses userinput if focus is taken away from the modal,
     // to keep things less frustrating we're checking if the checkedSamples privateIds
     // match the privateIds in metadata to prevent rerendering before a user is finished making updates
-    const currentPrivateIdentifiers = samplesCanEdit.map(
+    const currentPrivateIdentifiers = userEditableSamples.map(
       (sample) => sample.privateId
     );
     const metadataPrivateIdentifiers = metadata && Object.keys(metadata);
@@ -228,7 +228,7 @@ const EditSamplesConfirmationModal = ({
     ) {
       resetMetadataFromEditableSamples();
     }
-  }, [samplesCanEdit, metadata]);
+  }, [userEditableSamples, metadata]);
 
   // we need to send the sample id when we make the BE request to update
   // the sample, so let's track a version of metadata that has it
@@ -236,7 +236,7 @@ const EditSamplesConfirmationModal = ({
     if (!metadata) return;
 
     const metadataWithId: MetadataWithIdType = {};
-    samplesCanEdit.forEach((item) => {
+    userEditableSamples.forEach((item) => {
       const { id, privateId } = item;
       const data = metadata[privateId] ?? {};
       metadataWithId[privateId] = {
@@ -245,22 +245,22 @@ const EditSamplesConfirmationModal = ({
       };
     });
     setMetadataWithId(metadataWithId);
-  }, [samplesCanEdit, metadata]);
+  }, [userEditableSamples, metadata]);
 
   const numSamples = checkedSamples.length;
 
   const { templateInstructionRows, templateHeaders, templateRows } =
     useMemo(() => {
       // take the first collection location to populate Collection Location example rows of the sample edit tsv
-      const collectionLocation = samplesCanEdit[0]?.collectionLocation;
-      const currentPrivateIdentifiers = samplesCanEdit.map(
+      const collectionLocation = userEditableSamples[0]?.collectionLocation;
+      const currentPrivateIdentifiers = userEditableSamples.map(
         (sample) => sample.privateId
       );
       return prepEditMetadataTemplate(
         currentPrivateIdentifiers,
         collectionLocation
       );
-    }, [samplesCanEdit]);
+    }, [userEditableSamples]);
 
   const warningCantEditSamplesTitle = (
     <>
@@ -268,7 +268,8 @@ const EditSamplesConfirmationModal = ({
         {numSamplesCantEdit} Selected {pluralize("Sample", numSamplesCantEdit)}{" "}
         can’t be edited
       </B>{" "}
-      and has been removed because it is managed by another jurisdiction.
+      and {pluralize("has", numSamplesCantEdit)} been removed because it is
+      managed by another jurisdiction.
     </>
   );
 
@@ -313,7 +314,7 @@ const EditSamplesConfirmationModal = ({
                 />
                 <ImportFile
                   metadata={metadata}
-                  samplesCanEdit={samplesCanEdit}
+                  userEditableSamples={userEditableSamples}
                   namedLocations={namedLocations}
                   hasImportedMetadataFile={hasImportedMetadataFile}
                   onMetadataFileUploaded={handleMetadataFileUploaded}
