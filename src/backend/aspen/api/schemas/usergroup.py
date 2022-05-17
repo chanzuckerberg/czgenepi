@@ -45,5 +45,6 @@ class GroupMembersResponse(BaseResponse):
     group: GroupResponse
     members: List[MemberResponse]
 
+
 class AllGroupsMembersResponse(BaseResponse):
     groups: List[GroupMembersResponse]

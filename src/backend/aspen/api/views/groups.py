@@ -1,15 +1,12 @@
-from fastapi import APIRouter, Depends
 import sqlalchemy as sa
-from sqlalchemy.exc import IntegrityError
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.requests import Request
 
-from aspen.api.auth import get_admin_user, get_auth_user, get_usergroup_query
+from aspen.api.auth import get_auth_user
 from aspen.api.deps import get_db
 from aspen.api.schemas.usergroup import AllGroupsMembersResponse
-from aspen.database.models import User, Group
-from aspen.error import http_exceptions as ex
-
+from aspen.database.models import User
 
 router = APIRouter()
 
@@ -24,8 +21,10 @@ async def get_group_members(
     usergroups = [user.group]
     group_member_data = []
     for group in usergroups:
-        group_members_query = sa.select(User).where(User.group == group).order_by(User.name.asc())
+        group_members_query = (
+            sa.select(User).where(User.group == group).order_by(User.name.asc())  # type: ignore
+        )
         group_members_result = await db.execute(group_members_query)
         group_members = group_members_result.scalars().all()
-        group_member_data.append({ "group": group, "members": group_members })
-    return AllGroupsMembersResponse.parse_obj({ "groups": group_member_data })
+        group_member_data.append({"group": group, "members": group_members})
+    return AllGroupsMembersResponse.parse_obj({"groups": group_member_data})

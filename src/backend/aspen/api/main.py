@@ -133,7 +133,9 @@ def get_app() -> FastAPI:
         dependencies=[Depends(get_auth_user)],
     )
 
-    _app.include_router(groups.router, prefix="/v2/groups", dependencies=[Depends(get_auth_user)])
+    _app.include_router(
+        groups.router, prefix="/v2/groups", dependencies=[Depends(get_auth_user)]
+    )
 
     _app.add_exception_handler(
         AspenException,
