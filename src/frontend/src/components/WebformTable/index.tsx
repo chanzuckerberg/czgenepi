@@ -20,13 +20,13 @@ export type WebformTableType = Record<WebformTableTypeOptions, string>;
 
 interface Props {
   metadata: CommonProps["metadata"];
-  hasImportedMetadataFile?: boolean;
+  hasImportedMetadataFile: boolean;
   setMetadata: CommonProps["setMetadata"];
   // TODO: update value type to be something other than unknown
   applyToAllColumn(fieldKey: keyof Metadata, value: unknown): void;
   setIsValid: React.Dispatch<React.SetStateAction<boolean>>;
   handleRowMetadata(id: string, sampleMetadata: Metadata): void;
-  autocorrectWarnings?: SampleIdToWarningMessages;
+  autocorrectWarnings: SampleIdToWarningMessages;
   locations: NamedGisaidLocation[];
   webformTableType: string;
 }
@@ -111,11 +111,13 @@ export function WebformTable({
           {webformTableType == WebformTableTypeOptions.Edit && (
             <EditTable
               metadata={metadata}
+              hasImportedMetadataFile={hasImportedMetadataFile}
               handleRowMetadata={handleRowMetadata}
               applyToAllColumn={applyToAllColumn}
               handleRowValidation={handleRowValidation}
               setMetadata={setMetadata}
               setIsValid={setIsValid}
+              autocorrectWarnings={autocorrectWarnings}
               locations={locations}
             />
           )}

@@ -156,32 +156,49 @@ function warnBadFormatMetadata(
   return badFormatMetadata.size ? badFormatMetadata : null;
 }
 
-export function inferMetadata(
-  row: Record<string, string>,
-  key: keyof (SampleUploadTsvMetadata & SampleEditTsvMetadata),
-  rowMetadata: SampleUploadTsvMetadata & SampleEditTsvMetadata,
+export interface inferMetadataType {
+  key: keyof (SampleUploadTsvMetadata & SampleEditTsvMetadata);
+  row: Record<string, string>;
   stringToLocationFinder: {
     (locationString: string): NamedGisaidLocation | undefined;
+  };
+  rowMetadata: SampleUploadTsvMetadata & SampleEditTsvMetadata;
+}
+
+export function inferValue({
+  key,
+  row,
+  stringToLocationFinder,
+  rowMetadata,
+}: inferMetadataType): void {
+  // Depending on the key being extracted, we handle it differently.
+  const originalValue = row[key];
+  if (key === "collectionLocation") {
+    // Incoming `collectionLocation` is a string, but the app uses objects
+    // to represent location, so we convert before folding it in.
+    let parsedCollectionLocation = undefined;
+    // If they didn't enter enough, ignore as typo, leave as undefined
+    if (originalValue.length > 2) {
+      parsedCollectionLocation = stringToLocationFinder(originalValue);
+    }
+    rowMetadata.collectionLocation = parsedCollectionLocation;
+  } else if (key === "keepPrivate") {
+    rowMetadata[key] = convertYesNoToBool(originalValue);
+  } else {
+    rowMetadata[key] = originalValue;
   }
-): void {
+}
+
+function inferMetadata({
+  row,
+  key,
+  rowMetadata,
+  stringToLocationFinder,
+}: inferMetadataType): void {
   const originalValue: string | undefined = row[key];
   // Only overwrite sane defaults if a "real" value was pulled for key
   if (originalValue) {
-    // Depending on the key being extracted, we handle it differently.
-    if (key === "collectionLocation") {
-      // Incoming `collectionLocation` is a string, but the app uses objects
-      // to represent location, so we convert before folding it in.
-      let parsedCollectionLocation = undefined;
-      // If they didn't enter enough, ignore as typo, leave as undefined
-      if (originalValue.length > 2) {
-        parsedCollectionLocation = stringToLocationFinder(originalValue);
-      }
-      rowMetadata.collectionLocation = parsedCollectionLocation;
-    } else if (key === "keepPrivate") {
-      rowMetadata[key] = convertYesNoToBool(originalValue);
-    } else {
-      rowMetadata[key] = originalValue;
-    }
+    inferValue({ key, row, stringToLocationFinder, rowMetadata });
   }
 }
 
@@ -222,7 +239,7 @@ function parseRow(
 
   // Only extract info we care about from the row. Set `rowMetadata` with it.
   METADATA_KEYS_TO_EXTRACT.forEach((key) => {
-    inferMetadata(row, key, rowMetadata, stringToLocationFinder);
+    inferMetadata({ row, key, rowMetadata, stringToLocationFinder });
   });
 
   const rowMissingMetadataWarnings = warnMissingMetadata(rowMetadata);

@@ -1,11 +1,15 @@
 import CloseIcon from "@material-ui/icons/Close";
 import { Button } from "czifui";
+import { isEmpty } from "lodash";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
+import { useUserInfo } from "src/common/queries/auth";
 import { useNamedLocations } from "src/common/queries/locations";
+import { B } from "src/common/styles/basicStyle";
 import { pluralize } from "src/common/utils/strUtils";
+import { StyledCallout } from "src/components/AlertAccordion/style";
 import { Content, Title } from "src/components/BaseDialog/style";
 import Dialog from "src/components/Dialog";
 import { prepEditMetadataTemplate } from "src/components/DownloadMetadataTemplate/prepMetadataTemplate";
@@ -36,9 +40,9 @@ import {
 } from "./style";
 import {
   findMetadataChanges,
+  getInitialMetadata,
   getMetadataEntryOrEmpty,
   setApplyAllValueToPrevMetadata,
-  structureInitialMetadata,
 } from "./utils";
 
 interface Props {
@@ -80,6 +84,9 @@ const EditSamplesConfirmationModal = ({
     useState<boolean>(false);
   const [autocorrectWarnings, setAutocorrectWarnings] =
     useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
+  const [userEditableSamples, setUserEditableSamples] = useState<Sample[]>([]);
+  const { data: userInfo } = useUserInfo();
+  const { group: userGroup } = userInfo ?? {};
   const [statusModalView, setStatusModalView] = useState<StatusModalView>(
     StatusModalView.NONE
   );
@@ -87,11 +94,19 @@ const EditSamplesConfirmationModal = ({
   const { data: namedLocationsData } = useNamedLocations();
   const namedLocations: NamedGisaidLocation[] =
     namedLocationsData?.namedLocations ?? [];
+  const numSamplesCantEdit = checkedSamples.length - userEditableSamples.length;
+
+  useEffect(() => {
+    const samplesToEdit = checkedSamples.filter(
+      (sample) => sample.submittingGroup?.id === userGroup?.id
+    );
+    setUserEditableSamples(samplesToEdit);
+  }, [checkedSamples, userGroup?.name]);
 
   useEffect(() => {
     // continue button should only be active if the user has metadata
     // changes and that all form fields are filled out correctly
-    if (changedMetadata && Object.keys(changedMetadata).length > 0 && isValid) {
+    if (!isEmpty(changedMetadata) && isValid) {
       setIsContinueButtonActive(true);
     } else {
       setIsContinueButtonActive(false);
@@ -192,11 +207,8 @@ const EditSamplesConfirmationModal = ({
     changedMetadata,
   ]);
 
-  function resetMetadataFromCheckedSamples() {
-    const structuredMetadata: SampleIdToEditMetadataWebform = {};
-    checkedSamples.forEach((item) => {
-      structuredMetadata[item.privateId] = structureInitialMetadata(item);
-    });
+  function resetMetadataFromEditableSamples() {
+    const structuredMetadata = getInitialMetadata(userEditableSamples);
     setChangedMetadata(EMPTY_OBJECT);
     setMetadata(structuredMetadata);
   }
@@ -206,17 +218,17 @@ const EditSamplesConfirmationModal = ({
     // loses userinput if focus is taken away from the modal,
     // to keep things less frustrating we're checking if the checkedSamples privateIds
     // match the privateIds in metadata to prevent rerendering before a user is finished making updates
-    const currentPrivateIdentifiers = checkedSamples.map(
-      (checkedSample) => checkedSample.privateId
+    const currentPrivateIdentifiers = userEditableSamples.map(
+      (sample) => sample.privateId
     );
     const metadataPrivateIdentifiers = metadata && Object.keys(metadata);
     if (
       JSON.stringify(currentPrivateIdentifiers) !=
       JSON.stringify(metadataPrivateIdentifiers)
     ) {
-      resetMetadataFromCheckedSamples();
+      resetMetadataFromEditableSamples();
     }
-  }, [checkedSamples, metadata]);
+  }, [userEditableSamples, metadata]);
 
   // we need to send the sample id when we make the BE request to update
   // the sample, so let's track a version of metadata that has it
@@ -224,7 +236,7 @@ const EditSamplesConfirmationModal = ({
     if (!metadata) return;
 
     const metadataWithId: MetadataWithIdType = {};
-    checkedSamples.forEach((item) => {
+    userEditableSamples.forEach((item) => {
       const { id, privateId } = item;
       const data = metadata[privateId] ?? {};
       metadataWithId[privateId] = {
@@ -233,22 +245,34 @@ const EditSamplesConfirmationModal = ({
       };
     });
     setMetadataWithId(metadataWithId);
-  }, [checkedSamples, metadata]);
+  }, [userEditableSamples, metadata]);
 
   const numSamples = checkedSamples.length;
 
   const { templateInstructionRows, templateHeaders, templateRows } =
     useMemo(() => {
       // take the first collection location to populate Collection Location example rows of the sample edit tsv
-      const collectionLocation = checkedSamples[0]?.collectionLocation;
-      const currentPrivateIdentifiers = checkedSamples.map(
-        (checkedSample) => checkedSample.privateId
+      const collectionLocation = userEditableSamples[0]?.collectionLocation;
+      const currentPrivateIdentifiers = userEditableSamples.map(
+        (sample) => sample.privateId
       );
       return prepEditMetadataTemplate(
         currentPrivateIdentifiers,
         collectionLocation
       );
-    }, [checkedSamples]);
+    }, [userEditableSamples]);
+
+  const warningCantEditSamplesTitle = (
+    <>
+      <B>
+        {numSamplesCantEdit} Selected {pluralize("Sample", numSamplesCantEdit)}{" "}
+        can’t be edited
+      </B>{" "}
+      and {pluralize("has", numSamplesCantEdit)} been removed because{" "}
+      {pluralize("it", numSamplesCantEdit)}{" "}
+      {pluralize("is", numSamplesCantEdit)} managed by another jurisdiction.
+    </>
+  );
 
   return (
     <>
@@ -291,10 +315,7 @@ const EditSamplesConfirmationModal = ({
                 />
                 <ImportFile
                   metadata={metadata}
-                  changedMetadata={changedMetadata}
-                  resetMetadataFromCheckedSamples={
-                    resetMetadataFromCheckedSamples
-                  }
+                  userEditableSamples={userEditableSamples}
                   namedLocations={namedLocations}
                   hasImportedMetadataFile={hasImportedMetadataFile}
                   onMetadataFileUploaded={handleMetadataFileUploaded}
@@ -310,6 +331,11 @@ const EditSamplesConfirmationModal = ({
                   handleRowMetadata={handleRowMetadata}
                   webformTableType="EDIT"
                 />
+                {numSamplesCantEdit > 0 && (
+                  <StyledCallout intent={"warning"}>
+                    {warningCantEditSamplesTitle}
+                  </StyledCallout>
+                )}
                 <Button
                   disabled={!isContinueButtonActive}
                   onClick={() => setCurrentModalStep(Steps.REVIEW)}
