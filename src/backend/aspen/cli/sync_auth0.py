@@ -1,6 +1,6 @@
 import logging
 import os
-from functools import partial
+from functools import cache, partial
 from typing import MutableSequence
 
 import click
@@ -25,7 +25,6 @@ class Auth0Client:
         client_id = os.environ.get("AUTH0_CLIENT_ID")
         client_secret = os.environ.get("AUTH0_CLIENT_SECRET")
         domain = os.environ.get("AUTH0_DOMAIN")
-
         auth_req = auth0_authentication.GetToken(domain)
         token = auth_req.client_credentials(
             client_id, client_secret, f"https://{domain}/api/v2/"
@@ -55,10 +54,35 @@ class Auth0Client:
             self.client.organizations.all_organizations, "organizations"
         )
 
+    @cache
+    def get_auth0_role(self, role_name):
+        all_roles = self.get_roles()
+        for role in all_roles:
+            if role["name"] == role_name:
+                return role
+
+    @cache
+    def get_roles(self):
+        return self.get_all_results(self.client.roles.list, "roles")
+
     def get_org_members(self, org):
         return self.get_all_results(
             partial(self.client.organizations.all_organization_members, org["id"]),
             "members",
+        )
+
+    def add_org_member(self, org, user_id):
+        self.client.organizations.create_organization_members(
+            org["id"], {"members": [user_id]}
+        )
+        member_role = self.get_auth0_role("member")
+        self.client.organizations.create_organization_member_roles(
+            org["id"], user_id, {"roles": [member_role["id"]]}
+        )
+
+    def remove_org_member(self, org, user_id):
+        self.client.organizations.delete_organization_members(
+            org["id"], {"members": [user_id]}
         )
 
 
@@ -71,35 +95,50 @@ def compare_stuff(auth0_objects, db_objects, auth0_match_field, db_match_field):
 
 
 class UserGroupManager:
-    def __init__(self, auth0_client, db, dry_run, auth0_group_id, db_group_id):
+    def __init__(self, auth0_client, db, dry_run, auth0_group, db_group):
         self.auth0_client = auth0_client
         self.db = db
         self.dry_run = dry_run
-        self.db_group_id = db_group_id
-        self.auth0_group_id = auth0_group_id
+        self.db_group = db_group
+        self.auth0_group = auth0_group
 
-    def auth0_delete(self, user):
-        logging.info(f"Deleting auth0 user {user} from group {self.auth0_group_id}")
+    def auth0_delete(self, auth0_user_id):
+        logging.info(
+            f"Deleting auth0 user {auth0_user_id} from group {self.auth0_group['display_name']}"
+        )
         if self.dry_run:
             return
+        self.auth0_client.remove_org_member(self.auth0_group, auth0_user_id)
         logging.info("...done")
 
-    def db_delete(self, user):
-        logging.info(f"Deleting user {user} from db group {self.db_group_id}")
+    def db_delete(self, auth0_user_id):
+        logging.info(
+            f"Deleting user {auth0_user_id} from db group {self.db_group.name}"
+        )
         if self.dry_run:
             return
+        auth0_user_id.group = self.db_group
         logging.info("...done")
 
-    def auth0_create(self, user):
-        logging.info(f"Adding auth0 user {user} to group {self.auth0_group_id}")
+    def auth0_create(self, auth0_user_id):
+        logging.info(
+            f"Adding auth0 user {auth0_user_id} to group {self.auth0_group['display_name']}"
+        )
         if self.dry_run:
             return
+        self.auth0_client.add_org_member(self.auth0_group, auth0_user_id)
         logging.info("...done")
 
-    def db_create(self, user):
-        logging.info(f"Adding db user {user} to group {self.db_group_id}")
+    def db_create(self, auth0_user_id):
+        logging.info(f"Adding db user {auth0_user_id} to group {self.db_group.name}")
         if self.dry_run:
             return
+        user = (
+            self.db.execute(sa.select(User).where(User.auth0_user_id == auth0_user_id))
+            .scalars()
+            .one()
+        )
+        user.group = self.db_group
         logging.info("...done")
 
 
@@ -226,15 +265,19 @@ class SuperSyncer:
             # TODO, we might want to stuff the auth0 group ID's into the groups table to
             # make this simpler.
             db_group = [
-                group.id for group in db_groups if group.name == org["display_name"]
+                group for group in db_groups if group.name == org["display_name"]
             ]
             if not db_group:
                 # We're assuming that at this point in the script, we've already sync'd
                 # whatever groups we plan to sync, and if we don't find matching groups
                 # in both data stores, it's intentional for some reason.
+                logging.warning(
+                    f"Skipping sync of group {org['display_name']} - no DB row"
+                )
                 continue
+            db_group = db_group[0]
             db_group_users = (
-                self.db.execute(sa.select(User).where(User.group_id.in_(db_group)))
+                self.db.execute(sa.select(User).where(User.group == db_group))
                 .scalars()
                 .all()
             )
@@ -242,7 +285,7 @@ class SuperSyncer:
                 auth0_memberships, db_group_users, "user_id", "auth0_user_id"
             )
             group_manager = UserGroupManager(
-                self.auth0_client, self.db, self.dry_run, org["id"], db_group[0]
+                self.auth0_client, self.db, self.dry_run, org, db_group
             )
             self.update_objects(auth0_only, db_only, group_manager)
 
