@@ -1,5 +1,4 @@
 import datetime
-from typing import Optional
 
 import pytest
 import sqlalchemy as sa
@@ -7,6 +6,7 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
+from aspen.app.views import api_utils
 from aspen.database.models import Sample, UploadedPathogenGenome
 from aspen.test_infra.models.gisaid_metadata import gisaid_metadata_factory
 from aspen.test_infra.models.location import location_factory
@@ -19,15 +19,9 @@ pytestmark = pytest.mark.asyncio
 
 VALID_SEQUENCE = "AGTCAGTCAG" * 100  # 1000 char minimum sample length
 
-
-def format_date(dt: Optional[datetime.date], format="%Y-%m-%d") -> str:
-    if dt is not None:
-        return dt.strftime(format)
-    else:
-        return "N/A"
-
-
 # test CREATE samples #
+
+
 async def test_samples_create_view_pass_no_public_id(
     async_session: AsyncSession,
     http_client: AsyncClient,
@@ -46,25 +40,25 @@ async def test_samples_create_view_pass_no_public_id(
         {
             "sample": {
                 "private_identifier": "private",
-                "collection_date": format_date(test_date),
+                "collection_date": api_utils.format_date(test_date),
                 "location_id": location.id,
                 "private": True,
             },
             "pathogen_genome": {
                 "sequence": VALID_SEQUENCE + "MN",
-                "sequencing_date": format_date(test_date),
+                "sequencing_date": api_utils.format_date(test_date),
             },
         },
         {
             "sample": {
                 "private_identifier": "private2",
-                "collection_date": format_date(test_date),
+                "collection_date": api_utils.format_date(test_date),
                 "location_id": location.id,
                 "private": True,
             },
             "pathogen_genome": {
                 "sequence": VALID_SEQUENCE + "MN",
-                "sequencing_date": format_date(test_date),
+                "sequencing_date": api_utils.format_date(test_date),
             },
         },
     ]
@@ -131,7 +125,7 @@ async def test_samples_create_view_pass_no_sequencing_date(
             "sample": {
                 "private_identifier": "private",
                 "public_identifier": "",
-                "collection_date": format_date(test_date),
+                "collection_date": api_utils.format_date(test_date),
                 "location_id": location.id,
                 "private": True,
             },
@@ -144,7 +138,7 @@ async def test_samples_create_view_pass_no_sequencing_date(
             "sample": {
                 "private_identifier": "private2",
                 "public_identifier": "",
-                "collection_date": format_date(test_date),
+                "collection_date": api_utils.format_date(test_date),
                 "location_id": location.id,
                 "private": True,
             },
@@ -221,7 +215,7 @@ async def test_samples_create_view_invalid_sequence(
             "sample": {
                 "private_identifier": "private",
                 "public_identifier": "",
-                "collection_date": format_date(datetime.datetime.now()),
+                "collection_date": api_utils.format_date(datetime.datetime.now()),
                 "location_id": location.id,
                 "private": True,
             },
@@ -273,7 +267,7 @@ async def test_samples_create_view_fail_duplicate_ids(
             "sample": {
                 "private_identifier": "private",
                 "public_identifier": "public",
-                "collection_date": format_date(datetime.datetime.now()),
+                "collection_date": api_utils.format_date(datetime.datetime.now()),
                 "location_id": location.id,
                 "private": True,
             },
@@ -286,7 +280,7 @@ async def test_samples_create_view_fail_duplicate_ids(
             "sample": {
                 "private_identifier": "private1",
                 "public_identifier": "",
-                "collection_date": format_date(datetime.datetime.now()),
+                "collection_date": api_utils.format_date(datetime.datetime.now()),
                 "location_id": location.id,
                 "private": True,
             },
@@ -332,7 +326,7 @@ async def test_samples_create_view_fail_duplicate_ids_in_request_data(
             "sample": {
                 "private_identifier": "private",
                 "public_identifier": "public",
-                "collection_date": format_date(datetime.datetime.now()),
+                "collection_date": api_utils.format_date(datetime.datetime.now()),
                 "location_id": location.id,
                 "private": True,
             },
@@ -345,7 +339,7 @@ async def test_samples_create_view_fail_duplicate_ids_in_request_data(
             "sample": {
                 "private_identifier": "private",
                 "public_identifier": "",
-                "collection_date": format_date(datetime.datetime.now()),
+                "collection_date": api_utils.format_date(datetime.datetime.now()),
                 "location_id": location.id,
                 "private": True,
             },
@@ -387,7 +381,7 @@ async def test_samples_create_view_fail_missing_required_fields(
             "sample": {
                 "private_identifier": "private",
                 "public_identifier": "",
-                "collection_date": format_date(datetime.datetime.now()),
+                "collection_date": api_utils.format_date(datetime.datetime.now()),
             },
             "pathogen_genome": {
                 "sequence": VALID_SEQUENCE,
@@ -396,7 +390,7 @@ async def test_samples_create_view_fail_missing_required_fields(
         {
             "sample": {
                 "private_identifier": "private2",
-                "collection_date": format_date(datetime.datetime.now()),
+                "collection_date": api_utils.format_date(datetime.datetime.now()),
                 "location_id": location.id,
                 "private": True,
             },

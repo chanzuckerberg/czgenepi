@@ -152,7 +152,7 @@ module backend_service {
   api_url               = local.backend_url
   frontend_url          = local.frontend_url
   remote_dev_prefix     = local.remote_dev_prefix
-  health_check_path     = "/v2/health"
+  health_check_path     = "/v2/health/"  # the trailing slash here is vital.
 
   wait_for_steady_state = local.wait_for_steady_state
 }
