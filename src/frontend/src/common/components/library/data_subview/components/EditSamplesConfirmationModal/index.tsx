@@ -268,7 +268,8 @@ const EditSamplesConfirmationModal = ({
         {numSamplesCantEdit} Selected {pluralize("Sample", numSamplesCantEdit)}{" "}
         can’t be edited
       </B>{" "}
-      and has been removed because it is managed by another jurisdiction.
+      and {pluralize("has", numSamplesCantEdit)} been removed because it is
+      managed by another jurisdiction.
     </>
   );
 
