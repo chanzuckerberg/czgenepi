@@ -3,7 +3,6 @@ import { DefaultMenuSelectOption, DropdownPopper } from "czifui";
 import { FormikContextType } from "formik";
 import { escapeRegExp, isEqual } from "lodash/fp";
 import React, { useEffect, useState } from "react";
-import { valueType } from "src/components/DateField";
 import { Metadata } from "src/components/WebformTable/common/types";
 import { NamedGisaidLocation } from "src/views/Upload/components/common/types";
 import ApplyToAllColumn from "../common/ApplyToAllColumn";
@@ -37,13 +36,10 @@ export default function LocationField({
     formik;
   const [isBackgroundColorShown, setIsBackgroundColorShown] =
     useState<boolean>(false);
-  const [changedValue, setChangedValue] = useState<valueType>(undefined);
-  const [initialValue, setInitialValue] = useState<valueType>(undefined);
 
-  useEffect(() => {
-    setChangedValue(values[fieldKey]);
-    setInitialValue(initialValues[fieldKey]);
-  }, [fieldKey, initialValues, values]);
+  const initialValue = initialValues[fieldKey];
+  const changedValue = values[fieldKey];
+
   useEffect(() => {
     if (!isEqual(initialValue, changedValue) && shouldShowEditedInputAsMarked) {
       setIsBackgroundColorShown(true);

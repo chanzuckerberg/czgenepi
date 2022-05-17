@@ -1,6 +1,5 @@
 import { FormikContextType } from "formik";
 import React, { useEffect, useState } from "react";
-import { valueType } from "src/components/DateField";
 import { Metadata } from "src/components/WebformTable/common/types";
 import { StyledTextField } from "./style";
 
@@ -19,15 +18,12 @@ export default function FreeTextField({
 }: Props): JSX.Element | null {
   const [isBackgroundColorShown, setIsBackgroundColorShown] =
     useState<boolean>(false);
-  const [changedValue, setChangedValue] = useState<valueType>(undefined);
-  const [initialValue, setInitialValue] = useState<valueType>(undefined);
 
   const { handleChange, handleBlur, values, touched, errors, initialValues } =
     formik;
-  useEffect(() => {
-    setChangedValue(values[fieldKey]);
-    setInitialValue(initialValues[fieldKey]);
-  }, [fieldKey, initialValues, values]);
+
+  const initialValue = initialValues[fieldKey];
+  const changedValue = values[fieldKey];
 
   useEffect(() => {
     if (initialValue !== changedValue && shouldShowEditedInputAsMarked) {

@@ -26,17 +26,14 @@ export default function DateField({
   onChange,
   shouldShowEditedInputAsMarked,
 }: Props): JSX.Element {
-  const { handleChange, handleBlur, values, touched, errors, initialValues } =
-    formik;
   const [isBackgroundColorShown, setIsBackgroundColorShown] =
     useState<boolean>(false);
-  const [changedValue, setChangedValue] = useState<valueType>(undefined);
-  const [initialValue, setInitialValue] = useState<valueType>(undefined);
 
-  useEffect(() => {
-    setChangedValue(values[fieldKey]);
-    setInitialValue(initialValues[fieldKey]);
-  }, [fieldKey, initialValues, values]);
+  const { handleChange, handleBlur, values, touched, errors, initialValues } =
+    formik;
+
+  const initialValue = initialValues[fieldKey];
+  const changedValue = values[fieldKey];
 
   useEffect(() => {
     if (initialValue !== changedValue && shouldShowEditedInputAsMarked) {
@@ -47,8 +44,6 @@ export default function DateField({
   }, [initialValue, changedValue, shouldShowEditedInputAsMarked]);
 
   const errorMessage = touched[fieldKey] && errors[fieldKey];
-
-  const value = changedValue || "";
 
   return (
     <StyledTextField
@@ -62,7 +57,7 @@ export default function DateField({
         handleChange(e);
       }}
       onBlur={handleBlur}
-      value={value}
+      value={changedValue || ""}
       error={Boolean(errorMessage)}
       helperText={helperText}
       isBackgroundColorShown={isBackgroundColorShown}
