@@ -14,7 +14,7 @@ interface Props {
   formik: FormikContextType<any>;
   helperText?: any;
   onChange?: (d: ChangeEvent) => void;
-  shouldShowEditedCellsAsMarked?: boolean;
+  shouldShowEditedInputAsMarked?: boolean;
 }
 
 export type valueType = string | boolean | NamedGisaidLocation | undefined;
@@ -24,11 +24,11 @@ export default function DateField({
   formik,
   helperText,
   onChange,
-  shouldShowEditedCellsAsMarked,
+  shouldShowEditedInputAsMarked,
 }: Props): JSX.Element {
   const { handleChange, handleBlur, values, touched, errors, initialValues } =
     formik;
-  const [isBackgroundColorShown, setBackgroundColorShown] =
+  const [isBackgroundColorShown, setIsBackgroundColorShown] =
     useState<boolean>(false);
   const [changedValue, setChangedValue] = useState<valueType>(undefined);
   const [initialValue, setInitialValue] = useState<valueType>(undefined);
@@ -39,12 +39,12 @@ export default function DateField({
   }, [fieldKey, initialValues, values]);
 
   useEffect(() => {
-    if (initialValue !== changedValue && shouldShowEditedCellsAsMarked) {
-      setBackgroundColorShown(true);
+    if (initialValue !== changedValue && shouldShowEditedInputAsMarked) {
+      setIsBackgroundColorShown(true);
     } else {
-      setBackgroundColorShown(false);
+      setIsBackgroundColorShown(false);
     }
-  }, [initialValue, changedValue, shouldShowEditedCellsAsMarked]);
+  }, [initialValue, changedValue, shouldShowEditedInputAsMarked]);
 
   const errorMessage = touched[fieldKey] && errors[fieldKey];
 

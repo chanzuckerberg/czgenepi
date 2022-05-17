@@ -12,7 +12,7 @@ interface Props {
     value: unknown
   ) => void;
   isFirstRow: boolean;
-  shouldShowEditedCellsAsMarked?: boolean; // used to mark edited cells as purple for crud
+  shouldShowEditedInputAsMarked?: boolean; // used to mark edited cells as purple for crud
 }
 
 export default function UploadDateField({
@@ -20,7 +20,7 @@ export default function UploadDateField({
   formik,
   applyToAllColumn,
   isFirstRow,
-  shouldShowEditedCellsAsMarked = false,
+  shouldShowEditedInputAsMarked = false,
 }: Props): JSX.Element {
   const { values, touched, errors } = formik;
 
@@ -32,7 +32,7 @@ export default function UploadDateField({
     <DateField
       fieldKey={fieldKey}
       formik={formik}
-      shouldShowEditedCellsAsMarked={shouldShowEditedCellsAsMarked}
+      shouldShowEditedInputAsMarked={shouldShowEditedInputAsMarked}
       helperText={
         errorMessage ||
         (isFirstRow && value && (

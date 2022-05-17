@@ -15,7 +15,7 @@ interface Props {
   applyToAllColumn: (fieldKey: keyof Metadata, value: unknown) => void;
   isFirstRow: boolean;
   locations: NamedGisaidLocation[];
-  shouldShowEditedCellsAsMarked?: boolean; // used to mark edited cells as purple for crud
+  shouldShowEditedInputAsMarked?: boolean; // used to mark edited cells as purple for crud
 }
 
 interface AutocompleteState {
@@ -31,11 +31,11 @@ export default function LocationField({
   applyToAllColumn,
   isFirstRow,
   locations,
-  shouldShowEditedCellsAsMarked = false,
+  shouldShowEditedInputAsMarked = false,
 }: Props): JSX.Element {
   const { handleBlur, setFieldValue, values, touched, errors, initialValues } =
     formik;
-  const [isBackgroundColorShown, setBackgroundColorShown] =
+  const [isBackgroundColorShown, setIsBackgroundColorShown] =
     useState<boolean>(false);
   const [changedValue, setChangedValue] = useState<valueType>(undefined);
   const [initialValue, setInitialValue] = useState<valueType>(undefined);
@@ -45,12 +45,12 @@ export default function LocationField({
     setInitialValue(initialValues[fieldKey]);
   }, [fieldKey, initialValues, values]);
   useEffect(() => {
-    if (!isEqual(initialValue, changedValue) && shouldShowEditedCellsAsMarked) {
-      setBackgroundColorShown(true);
+    if (!isEqual(initialValue, changedValue) && shouldShowEditedInputAsMarked) {
+      setIsBackgroundColorShown(true);
     } else {
-      setBackgroundColorShown(false);
+      setIsBackgroundColorShown(false);
     }
-  }, [initialValue, changedValue, shouldShowEditedCellsAsMarked]);
+  }, [initialValue, changedValue, shouldShowEditedInputAsMarked]);
 
   let value: NamedGisaidLocation | undefined = undefined;
   if (values[fieldKey]) {

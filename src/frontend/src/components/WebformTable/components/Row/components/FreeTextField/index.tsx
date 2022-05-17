@@ -8,16 +8,16 @@ interface Props {
   fieldKey: keyof Metadata;
   formik: FormikContextType<Metadata>;
   isShown?: boolean;
-  shouldShowEditedCellsAsMarked?: boolean; // used to mark edited cells as purple for crud
+  shouldShowEditedInputAsMarked?: boolean; // used to mark edited cells as purple for crud
 }
 
 export default function FreeTextField({
   fieldKey,
   formik,
   isShown = true,
-  shouldShowEditedCellsAsMarked = false,
+  shouldShowEditedInputAsMarked = false,
 }: Props): JSX.Element | null {
-  const [isBackgroundColorShown, setBackgroundColorShown] =
+  const [isBackgroundColorShown, setIsBackgroundColorShown] =
     useState<boolean>(false);
   const [changedValue, setChangedValue] = useState<valueType>(undefined);
   const [initialValue, setInitialValue] = useState<valueType>(undefined);
@@ -30,12 +30,12 @@ export default function FreeTextField({
   }, [fieldKey, initialValues, values]);
 
   useEffect(() => {
-    if (initialValue !== changedValue && shouldShowEditedCellsAsMarked) {
-      setBackgroundColorShown(true);
+    if (initialValue !== changedValue && shouldShowEditedInputAsMarked) {
+      setIsBackgroundColorShown(true);
     } else {
-      setBackgroundColorShown(false);
+      setIsBackgroundColorShown(false);
     }
-  }, [initialValue, changedValue, shouldShowEditedCellsAsMarked]);
+  }, [initialValue, changedValue, shouldShowEditedInputAsMarked]);
 
   const errorMessage = touched[fieldKey] && errors[fieldKey];
 

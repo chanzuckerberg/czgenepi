@@ -62,7 +62,7 @@ interface Props {
   warnings: Set<keyof Metadata>;
   locations: NamedGisaidLocation[];
   shouldSkipIdColumn?: boolean;
-  shouldShowEditedCellsAsMarked?: boolean;
+  shouldShowEditedInputAsMarked?: boolean;
 }
 
 export default React.memo(function Row({
@@ -76,7 +76,7 @@ export default React.memo(function Row({
   warnings = new Set(),
   locations,
   shouldSkipIdColumn,
-  shouldShowEditedCellsAsMarked,
+  shouldShowEditedInputAsMarked,
 }: Props): JSX.Element {
   /**
    * Below preps the metadata values form should initialize to.
@@ -181,14 +181,14 @@ export default React.memo(function Row({
         <FreeTextField
           formik={formik}
           fieldKey="privateId"
-          shouldShowEditedCellsAsMarked={shouldShowEditedCellsAsMarked}
+          shouldShowEditedInputAsMarked={shouldShowEditedInputAsMarked}
         />
       </StyledTableCell>
       <StyledTableCell component="div">
         <FreeTextField
           formik={formik}
           fieldKey="publicId"
-          shouldShowEditedCellsAsMarked={shouldShowEditedCellsAsMarked}
+          shouldShowEditedInputAsMarked={shouldShowEditedInputAsMarked}
         />
       </StyledTableCell>
       <StyledTableCell component="div">
@@ -198,7 +198,7 @@ export default React.memo(function Row({
             applyToAllColumn={applyToAllColumn}
             formik={formik}
             fieldKey="collectionDate"
-            shouldShowEditedCellsAsMarked={shouldShowEditedCellsAsMarked}
+            shouldShowEditedInputAsMarked={shouldShowEditedInputAsMarked}
           />
         </StyledDiv>
       </StyledTableCell>
@@ -209,7 +209,7 @@ export default React.memo(function Row({
           formik={formik}
           fieldKey="collectionLocation"
           locations={locations}
-          shouldShowEditedCellsAsMarked={shouldShowEditedCellsAsMarked}
+          shouldShowEditedInputAsMarked={shouldShowEditedInputAsMarked}
         />
       </StyledTableCell>
       <StyledTableCell component="div">
@@ -219,7 +219,7 @@ export default React.memo(function Row({
             applyToAllColumn={applyToAllColumn}
             formik={formik}
             fieldKey="sequencingDate"
-            shouldShowEditedCellsAsMarked={shouldShowEditedCellsAsMarked}
+            shouldShowEditedInputAsMarked={shouldShowEditedInputAsMarked}
           />
         </StyledDiv>
       </StyledTableCell>
