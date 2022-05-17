@@ -1,5 +1,6 @@
 import logging
 import os
+from functools import partial
 from typing import MutableSequence
 
 import click
@@ -54,6 +55,12 @@ class Auth0Client:
             self.client.organizations.all_organizations, "organizations"
         )
 
+    def get_org_members(self, org):
+        return self.get_all_results(
+            partial(self.client.organizations.all_organization_members, org["id"]),
+            "members",
+        )
+
 
 def compare_stuff(auth0_objects, db_objects, auth0_match_field, db_match_field):
     db_identifiers = {getattr(obj, db_match_field) for obj in db_objects}
@@ -61,6 +68,39 @@ def compare_stuff(auth0_objects, db_objects, auth0_match_field, db_match_field):
     auth0_only = auth0_identifiers - db_identifiers
     db_only = db_identifiers - auth0_identifiers
     return auth0_only, db_only
+
+
+class UserGroupManager:
+    def __init__(self, auth0_client, db, dry_run, auth0_group_id, db_group_id):
+        self.auth0_client = auth0_client
+        self.db = db
+        self.dry_run = dry_run
+        self.db_group_id = db_group_id
+        self.auth0_group_id = auth0_group_id
+
+    def auth0_delete(self, user):
+        logging.info(f"Deleting auth0 user {user} from group {self.auth0_group_id}")
+        if self.dry_run:
+            return
+        logging.info("...done")
+
+    def db_delete(self, user):
+        logging.info(f"Deleting user {user} from db group {self.db_group_id}")
+        if self.dry_run:
+            return
+        logging.info("...done")
+
+    def auth0_create(self, user):
+        logging.info(f"Adding auth0 user {user} to group {self.auth0_group_id}")
+        if self.dry_run:
+            return
+        logging.info("...done")
+
+    def db_create(self, user):
+        logging.info(f"Adding db user {user} to group {self.db_group_id}")
+        if self.dry_run:
+            return
+        logging.info("...done")
 
 
 class GroupManager:
@@ -176,6 +216,36 @@ class SuperSyncer:
         group_manager = GroupManager(self.auth0_client, self.db, self.dry_run)
         self.update_objects(auth0_only, db_only, group_manager)
 
+    def sync_memberships(self):
+        auth0_orgs = self.auth0_client.get_orgs()
+        db_groups: MutableSequence[Group] = (
+            (self.db.execute(sa.select(Group))).scalars().all()
+        )
+        for org in auth0_orgs:
+            auth0_memberships = self.auth0_client.get_org_members(org)
+            # TODO, we might want to stuff the auth0 group ID's into the groups table to
+            # make this simpler.
+            db_group = [
+                group.id for group in db_groups if group.name == org["display_name"]
+            ]
+            if not db_group:
+                # We're assuming that at this point in the script, we've already sync'd
+                # whatever groups we plan to sync, and if we don't find matching groups
+                # in both data stores, it's intentional for some reason.
+                continue
+            db_group_users = (
+                self.db.execute(sa.select(User).where(User.group_id.in_(db_group)))
+                .scalars()
+                .all()
+            )
+            auth0_only, db_only = compare_stuff(
+                auth0_memberships, db_group_users, "user_id", "auth0_user_id"
+            )
+            group_manager = UserGroupManager(
+                self.auth0_client, self.db, self.dry_run, org["id"], db_group[0]
+            )
+            self.update_objects(auth0_only, db_only, group_manager)
+
 
 @click.command("sync_users")
 @click.option(
@@ -203,12 +273,12 @@ class SuperSyncer:
     "--sync-users/--no-sync-users", is_flag=True, default=True, help="Sync users"
 )
 @click.option(
-    "--sync-membership/--no-sync-membership",
+    "--sync-memberships/--no-sync-memberships",
     is_flag=True,
     default=True,
     help="Sync membership",
 )
-def cli(source_of_truth, dry_run, delete_ok, sync_groups, sync_users, sync_membership):
+def cli(source_of_truth, dry_run, delete_ok, sync_groups, sync_users, sync_memberships):
     settings = Settings()
     auth0_client = Auth0Client()
 
@@ -232,9 +302,9 @@ def cli(source_of_truth, dry_run, delete_ok, sync_groups, sync_users, sync_membe
         if sync_users:
             logging.info("Syncing users")
             syncer.sync_users()
-        if sync_membership:
+        if sync_memberships:
             logging.info("Syncing memberships")
-            syncer.sync_membership()
+            syncer.sync_memberships()
 
 
 if __name__ == "__main__":
