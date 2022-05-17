@@ -43,3 +43,11 @@ class UserPostRequest(BaseRequest):
     group_admin: Optional[bool] = False
     system_admin: Optional[bool] = False
     auth0_user_id: str
+
+
+class GroupMembersResponse(BaseResponse):
+    group: GroupResponse
+    members: List[UserResponse]
+
+class AllGroupsMembersResponse(BaseResponse):
+    groups: List[GroupMembersResponse]
