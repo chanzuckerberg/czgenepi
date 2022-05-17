@@ -19,21 +19,6 @@ interface Props {
 
 export type valueType = string | boolean | NamedGisaidLocation | undefined;
 
-export function checkIfCellShouldBeHighlighted(
-  shouldShowEditedCellsAsMarked: boolean,
-  initialValues: any,
-  values: any,
-  fieldKey: string,
-) {
-  const initialValue = initialValues[fieldKey];
-  const changedValue = values[fieldKey];
-
-  if (initialValue !== changedValue && shouldShowEditedCellsAsMarked) {
-    return true;
-  }
-  return false;
-}
-
 export default function DateField({
   fieldKey,
   formik,
@@ -43,32 +28,23 @@ export default function DateField({
 }: Props): JSX.Element {
   const { handleChange, handleBlur, values, touched, errors, initialValues } =
     formik;
+  const [isBackgroundColorShown, setBackgroundColorShown] =
+    useState<boolean>(false);
+  const [changedValue, setChangedValue] = useState<valueType>(undefined);
+  const [initialValue, setInitialValue] = useState<valueType>(undefined);
 
-  const initialValue = initialValues && initialValues[fieldKey];
-  const changedValue = values[fieldKey];
-  // const [isBackgroundColorShown, setBackgroundColorShown] =
-  //   useState<boolean>(false);
-  // const [changedValue, setChangedValue] = useState<valueType>(undefined);
-  // const [initialValue, setInitialValue] = useState<valueType>(undefined);
+  useEffect(() => {
+    setChangedValue(values[fieldKey]);
+    setInitialValue(initialValues[fieldKey]);
+  }, [fieldKey, initialValues, values]);
 
-  // useEffect(() => {
-  //   setChangedValue(values[fieldKey]);
-  //   setInitialValue(initialValues[fieldKey]);
-  // }, [fieldKey, initialValues, values]);
-
-  // useEffect(() => {
-  //   if (initialValue !== changedValue && shouldShowEditedCellsAsMarked) {
-  //     setBackgroundColorShown(true);
-  //   } else {
-  //     setBackgroundColorShown(false);
-  //   }
-  // }, [initialValue, changedValue, shouldShowEditedCellsAsMarked]);
-  const isBackgroundColorShown = checkIfCellShouldBeHighlighted(
-    shouldShowEditedCellsAsMarked,
-    initialValue,
-    changedValue,
-    fieldKey
-  );
+  useEffect(() => {
+    if (initialValue !== changedValue && shouldShowEditedCellsAsMarked) {
+      setBackgroundColorShown(true);
+    } else {
+      setBackgroundColorShown(false);
+    }
+  }, [initialValue, changedValue, shouldShowEditedCellsAsMarked]);
 
   const errorMessage = touched[fieldKey] && errors[fieldKey];
 
