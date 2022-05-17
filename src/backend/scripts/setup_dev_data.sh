@@ -17,11 +17,6 @@ export OIDC_INTERNAL_URL=http://oidc.genepinet.localdev
 # How a web browser can reach the OIDC idp
 export OIDC_BROWSER_URL=https://oidc.genepinet.localdev:8443
 
-# Wait for localstack to start up
-wget --retry-connrefused -t 100 --content-on-error -nv -O- -T 1 $LOCALSTACK_URL/health
-# Wait for oidc to start up
-wget --retry-connrefused -t 100 --content-on-error -nv -O- -T 1 $OIDC_INTERNAL_URL/.well-known/openid-configuration
-
 echo "Creating secretsmanager secrets"
 local_aws="aws --endpoint-url=${LOCALSTACK_URL}"
 ${local_aws} secretsmanager create-secret --name genepi-config &> /dev/null || true
@@ -33,7 +28,7 @@ ${local_aws} secretsmanager update-secret --secret-id genepi-config --secret-str
   "AUTH0_CLIENT_SECRET": "local-client-secret",
   "AUTH0_DOMAIN": "oidc.genepinet.localdev:8443",
   "AUTH0_BASE_URL": "'"${OIDC_INTERNAL_URL}"'",
-  "AUTH0_SERVER_METADATA_URL": "'"${OIDC_INTERNAL_URL}"'/.well-known/openid-configuration",
+  "AUTH0_USERINFO_URL": "connect/userinfo",
   "AUTH0_ACCESS_TOKEN_URL": "'"${OIDC_INTERNAL_URL}"'/connect/token",
   "AUTH0_AUTHORIZE_URL": "'"${OIDC_BROWSER_URL}"'/connect/authorize",
   "AUTH0_CLIENT_KWARGS": {"scope": "openid profile email offline_access"},
