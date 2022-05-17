@@ -27,7 +27,7 @@ async def get_group_members(
         raise ex.UnauthorizedException("Not authorized")
     group_member_data = []
     for group in usergroups:
-        group_members_query = sa.select(User).where(User.group == group)
+        group_members_query = sa.select(User).where(User.group == group).order_by(User.name.asc())
         group_members_result = await db.execute(group_members_query)
         group_members = group_members_result.scalars().all()
         group_member_data.append({ "group": group, "members": group_members })
