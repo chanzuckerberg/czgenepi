@@ -1,7 +1,9 @@
 import logging
 import os
+import random
+import string
 from functools import cache, partial
-from typing import MutableSequence
+from typing import Any, MutableSequence, Tuple, TypedDict
 
 import click
 import sqlalchemy as sa
@@ -17,6 +19,24 @@ from aspen.database.connection import (
     SqlAlchemyInterface,
 )
 from aspen.database.models import Group, User
+
+
+class Auth0Org(TypedDict):
+    id: str
+    name: str
+    display_name: str
+
+
+class Auth0User(TypedDict):
+    id: str
+    name: str
+
+
+def generate_password(length=22):
+    possible_characters = (
+        string.ascii_uppercase + string.ascii_lowercase + string.digits
+    )
+    return "".join(random.choice(possible_characters) for _ in range(length))
 
 
 class Auth0Client:
@@ -80,61 +100,92 @@ class Auth0Client:
             org["id"], user_id, {"roles": [member_role["id"]]}
         )
 
-    def remove_org_member(self, org, user_id):
+    def remove_org_member(self, org: Auth0Org, user_id: int):
         self.client.organizations.delete_organization_members(
             org["id"], {"members": [user_id]}
         )
 
+    def add_org(self, group_id: int, org_name: str):
+        body = {
+            "name": f"group-{group_id}",
+            "display_name": org_name,
+        }
+        self.client.organizations.create_organization(body)
+
+    def delete_org(self, org_id: int):
+        self.client.organizations.delete_organization(org_id)
+
+    def create_user(self, email, name):
+        body = {
+            "email": email,
+            "user_metadata": {},
+            "email_verified": True,
+            "name": name,
+            "verify_email": False,
+            "password": generate_password(),
+            "connection": "Username-Password-Authentication",
+        }
+        self.client.users.create(body)
+
+    def delete_user(self, auth0_user_id):
+        self.client.users.delete(auth0_user_id)
+
 
 def compare_stuff(auth0_objects, db_objects, auth0_match_field, db_match_field):
-    db_identifiers = {getattr(obj, db_match_field) for obj in db_objects}
-    auth0_identifiers = {obj[auth0_match_field] for obj in auth0_objects}
-    auth0_only = auth0_identifiers - db_identifiers
-    db_only = db_identifiers - auth0_identifiers
+    db_map = {getattr(obj, db_match_field): obj for obj in db_objects}
+    auth0_map = {obj[auth0_match_field]: obj for obj in auth0_objects}
+    auth0_only = [auth0_map[key] for key in auth0_map.keys() - db_map.keys()]
+    db_only = [db_map[key] for key in db_map.keys() - auth0_map.keys()]
     return auth0_only, db_only
 
 
 class UserGroupManager:
-    def __init__(self, auth0_client, db, dry_run, auth0_group, db_group):
+    def __init__(
+        self, auth0_client, db, dry_run: bool, auth0_group: Auth0Org, db_group: Group
+    ):
         self.auth0_client = auth0_client
         self.db = db
         self.dry_run = dry_run
         self.db_group = db_group
         self.auth0_group = auth0_group
 
-    def auth0_delete(self, auth0_user_id):
+    def auth0_delete(self, auth0_user: Auth0User):
         logging.info(
-            f"Deleting auth0 user {auth0_user_id} from group {self.auth0_group['display_name']}"
+            f"Deleting auth0 user {auth0_user['user_id']} from group {self.auth0_group['display_name']}"
         )
         if self.dry_run:
             return
-        self.auth0_client.remove_org_member(self.auth0_group, auth0_user_id)
+        self.auth0_client.remove_org_member(self.auth0_group, auth0_user["user_id"])
         logging.info("...done")
 
-    def db_delete(self, auth0_user_id):
+    def db_delete(self, db_user: User):
         logging.info(
-            f"Deleting user {auth0_user_id} from db group {self.db_group.name}"
+            f"Deleting user {db_user.auth0_user_id} from db group {self.db_group.name}"
         )
         if self.dry_run:
             return
-        auth0_user_id.group = self.db_group
-        logging.info("...done")
+        # TODO - this is complicated and we don't even know if we want it.
+        raise Exception("Removing users from DB groups is not supported")
 
-    def auth0_create(self, auth0_user_id):
+    def auth0_create(self, db_user: User):
         logging.info(
-            f"Adding auth0 user {auth0_user_id} to group {self.auth0_group['display_name']}"
+            f"Adding db user {db_user.auth0_user_id} to group {self.auth0_group['display_name']}"
         )
         if self.dry_run:
             return
-        self.auth0_client.add_org_member(self.auth0_group, auth0_user_id)
+        self.auth0_client.add_org_member(self.auth0_group, db_user.auth0_user_id)
         logging.info("...done")
 
-    def db_create(self, auth0_user_id):
-        logging.info(f"Adding db user {auth0_user_id} to group {self.db_group.name}")
+    def db_create(self, auth0_user):
+        logging.info(
+            f"Adding db user {auth0_user['user_id']} to group {self.db_group.name}"
+        )
         if self.dry_run:
             return
         user = (
-            self.db.execute(sa.select(User).where(User.auth0_user_id == auth0_user_id))
+            self.db.execute(
+                sa.select(User).where(User.auth0_user_id == auth0_user["user_id"])
+            )
             .scalars()
             .one()
         )
@@ -148,29 +199,35 @@ class GroupManager:
         self.db = db
         self.dry_run = dry_run
 
-    def auth0_delete(self, group):
-        logging.info(f"Deleting auth0 group {group}")
+    def auth0_delete(self, auth0_group: Auth0Org):
+        logging.info(f"Deleting auth0 group {auth0_group['name']}")
         if self.dry_run:
             return
+        self.auth0_client.delete_org(auth0_group["id"])
         logging.info("...done")
 
-    def db_delete(self, group):
-        logging.info(f"Deleting db group {group}")
+    def db_delete(self, db_group):
+        logging.info(f"Deleting db group {db_group.name}")
         if self.dry_run:
             return
+        # TODO - this is complicated and we don't even know if we want it.
+        raise Exception("deleting orgs is not currently supported")
+
+    def auth0_create(self, db_group):
+        logging.info(f"Adding auth0 group {db_group.name}")
+        if self.dry_run:
+            return
+        self.auth0_client.add_org(db_group.id, db_group.name)
         logging.info("...done")
 
-    def auth0_create(self, group):
-        logging.info(f"Adding auth0 group {group}")
+    def db_create(self, auth0_group):
+        logging.info(f"Adding db group {auth0_group['display_name']}")
         if self.dry_run:
             return
+        group = Group(name=auth0_group["display_name"], prefix=auth0_group["name"])
+        self.db.add(group)
         logging.info("...done")
-
-    def db_create(self, group):
-        logging.info(f"Adding db group {group}")
-        if self.dry_run:
-            return
-        logging.info("...done")
+        return group
 
 
 class UserManager:
@@ -179,29 +236,33 @@ class UserManager:
         self.db = db
         self.dry_run = dry_run
 
-    def auth0_delete(self, user):
-        logging.info(f"Deleting auth0 user {user}")
+    def auth0_delete(self, auth0_user):
+        logging.info(f"Deleting auth0 user {auth0_user['email']}")
         if self.dry_run:
             return
+        self.auth0_client.delete_user(auth0_user["user_id"])
         logging.info("...done")
 
-    def db_delete(self, user):
-        logging.info(f"Deleting db user {user}")
+    def db_delete(self, db_user):
+        logging.info(f"Deleting db user {db_user.auth0_user_id}")
         if self.dry_run:
             return
+        # TODO - this is complicated and we don't even know if we want it.
+        raise Exception("Removing users from DB groups is not supported")
+
+    def auth0_create(self, db_user):
+        logging.info(f"Adding db user {db_user.email} to auth0")
+        if self.dry_run:
+            return
+        self.auth0_client.create_user(db_user.email, db_user.name)
         logging.info("...done")
 
-    def auth0_create(self, user):
-        logging.info(f"Adding auth0 user {user}")
+    def db_create(self, auth0_user):
+        logging.info(f"Adding auth0 user {auth0_user['email']} to db")
         if self.dry_run:
             return
-        logging.info("...done")
-
-    def db_create(self, user):
-        logging.info(f"Adding db user {user}")
-        if self.dry_run:
-            return
-        logging.info("...done")
+        # TODO - this is complicated and we don't even know if we want it.
+        raise Exception("Creating db users from DB groups is not supported")
 
 
 class SuperSyncer:
@@ -214,7 +275,7 @@ class SuperSyncer:
         self.source_of_truth = source_of_truth
         self.delete_ok = delete_ok
 
-    def update_objects(self, auth0_only, db_only, object_manager):
+    def update_objects(self, auth0_only: Any, db_only: Any, object_manager):
         # Only add/create entries in the data store that is NOT our designated
         # source of truth.
         if self.source_of_truth == "auth0":
@@ -281,6 +342,10 @@ class SuperSyncer:
                 .scalars()
                 .all()
             )
+            # TODO - right now if a user is a member of an auth0 org, we consider
+            # that "good enough" for the purposes of this sync script. We need to *ALSO*
+            # validate that they have the correct role, but that will be more important
+            # in the next version, so we're skipping that right now.
             auth0_only, db_only = compare_stuff(
                 auth0_memberships, db_group_users, "user_id", "auth0_user_id"
             )
