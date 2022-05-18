@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { StyledTooltip } from "src/common/components/library/data_subview/components/CreateNSTreeModal/style";
-import dataTableStyle from "src/common/components/library/data_table/index.module.scss";
 import { TREE_STATUS } from "src/common/constants/types";
-import TreeIcon from "src/common/icons/PhyloTree.svg";
 import NextstrainConfirmationModal from "../NextstrainConfirmationModal";
 import { PhyloTreeStatusTag } from "./components/PhyloTreeStatusTag";
 import {
@@ -11,6 +9,7 @@ import {
   StyledNameWrapper,
   StyledRowContent,
   StyledTreeCreator,
+  StyledTreeIcon,
 } from "./style";
 
 interface Props {
@@ -46,13 +45,9 @@ const TreeTableNameCell = ({ value, item }: Props): JSX.Element => {
           treeId={treeId}
         />
       )}
-      <StyledRowContent
-        className={dataTableStyle.cell}
-        onClick={handleClickOpen}
-        disabled={isDisabled}
-      >
+      <StyledRowContent onClick={handleClickOpen} disabled={isDisabled}>
         <CellWrapper data-test-id="tree-name-cell">
-          <TreeIcon className={dataTableStyle.icon} />
+          <StyledTreeIcon />
           <StyledNameWrapper>
             <span>
               {value} <PhyloTreeStatusTag treeStatus={status} />

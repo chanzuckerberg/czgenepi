@@ -1,7 +1,16 @@
 import styled from "@emotion/styled";
-import { Chip, fontBodyXs, fontBodyXxs, fontHeaderM, getColors, getSpaces } from "czifui";
+import {
+  Chip,
+  fontBodyXs,
+  fontBodyXxs,
+  fontHeaderM,
+  fontHeaderXs,
+  getColors,
+  getSpaces,
+} from "czifui";
 import { Menu } from "semantic-ui-react";
 import { RowContent } from "src/common/components/library/data_table/style";
+import SampleIcon from "src/common/icons/Sample.svg";
 import { PageContent } from "src/common/styles/mixins/global";
 
 export const Container = styled(PageContent)`
@@ -50,8 +59,18 @@ export const StyledChip = styled(Chip)`
 `;
 
 export const GISAIDCell = styled.div`
-  flex-direction: column;
-  align-items: unset;
+  ${fontHeaderXs}
+
+  ${(props) => {
+    const spaces = getSpaces(props);
+
+    return `
+      display: flex;
+      align-items: unset;
+      margin: ${spaces?.xs}px 0;
+      flex-direction: column;
+    `;
+  }}
 `;
 
 export const PrivateIdValueWrapper = styled.div`
@@ -166,4 +185,16 @@ export const StyledMenu = styled(Menu)`
 
 export const StyledMenuItem = styled(Menu.Item)`
   height: 100%;
+`;
+
+export const StyledSampleIcon = styled(SampleIcon)`
+  ${(props) => {
+    const colors = getColors(props);
+    const spaces = getSpaces(props);
+
+    return `
+      margin: 0 ${spaces?.l}px;
+      fill: ${colors?.gray[500]};
+    `;
+  }}
 `;

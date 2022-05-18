@@ -14,8 +14,15 @@ import { useUserInfo } from "src/common/queries/auth";
 import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import { EmptyState } from "../data_subview/components/EmptyState";
 import { HeaderRow } from "./components/HeaderRow";
-import style from "./index.module.scss";
-import { RowCheckbox, RowContent, TableRow, TreeRowContent } from "./style";
+import {
+  Cell,
+  Container,
+  RowCheckbox,
+  RowContent,
+  TableContent,
+  TableRow,
+  TreeRowContent,
+} from "./style";
 
 interface Props {
   data?: TableItem[];
@@ -47,9 +54,7 @@ export function defaultSampleCellRenderer({
 
   return (
     <RowContent header={header}>
-      <div className={style.cell} data-test-id={`row-${header.key}`}>
-        {displayData}
-      </div>
+      <Cell data-test-id={`row-${header.key}`}>{displayData}</Cell>
     </RowContent>
   );
 }
@@ -62,9 +67,7 @@ export function defaultTreeCellRenderer({
 
   return (
     <TreeRowContent>
-      <div className={style.cell} data-test-id={`row-${header.key}`}>
-        {displayData}
-      </div>
+      <Cell data-test-id={`row-${header.key}`}>{displayData}</Cell>
     </TreeRowContent>
   );
 }
@@ -329,7 +332,7 @@ export const DataTable: FunctionComponent<Props> = ({
     }
 
     return (
-      <div className={style.container}>
+      <Container>
         <HeaderRow
           handleHeaderCheckboxClick={handleHeaderCheckboxClick}
           handleSortClick={handleSortClick}
@@ -340,7 +343,7 @@ export const DataTable: FunctionComponent<Props> = ({
           isSampleTable={isSampleTable}
           sortColKey={state.sortKey}
         />
-        <div className={style.tableContent}>
+        <TableContent>
           <AutoSizer>
             {({ height, width }) => {
               return (
@@ -358,8 +361,8 @@ export const DataTable: FunctionComponent<Props> = ({
               );
             }}
           </AutoSizer>
-        </div>
-      </div>
+        </TableContent>
+      </Container>
     );
   };
 

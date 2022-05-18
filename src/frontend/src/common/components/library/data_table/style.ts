@@ -65,16 +65,6 @@ export const TreeRowContent = styled.div`
   }}
 `;
 
-export const icon = (props: CommonThemeProps): string => {
-  const colors = getColors(props);
-  const spaces = getSpaces(props);
-
-  return `
-    margin: 0 ${spaces?.l}px;
-    fill: ${colors?.gray[500]};
-  `;
-};
-
 export const RowCheckbox = styled(Checkbox)`
   padding-right: 0px;
   &:hover {
@@ -82,5 +72,33 @@ export const RowCheckbox = styled(Checkbox)`
     &.Mui-checked {
       background-color: transparent;
     }
+  }
+`;
+
+export const Cell = styled.div`
+  ${fontHeaderXs}
+
+  ${(props) => {
+    const spaces = getSpaces(props);
+
+    return `
+      display: flex;
+      align-items: center;
+      margin: ${spaces?.xs}px 0;
+    `;
+  }}
+`;
+
+export const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+export const TableContent = styled.div`
+  height: 77vh;
+  width: 100%;
+
+  > div {
+    display: inline-block;
   }
 `;
