@@ -19,10 +19,12 @@ import { MoreActionsMenu } from "./components/MoreActionMenu";
 import { TreeCreateHelpLink } from "./components/TreeCreateHelpLink";
 import { TreeSelectionMenu } from "./components/TreeSelectionMenu";
 import { UsherTreeFlow } from "./components/UsherTreeFlow";
-import style from "./index.module.scss";
 import {
   Divider,
   DownloadWrapper,
+  SamplesTable,
+  SearchBar,
+  SearchInput,
   StyledChip,
   StyledDiv,
   StyledFlexChildDiv,
@@ -347,9 +349,9 @@ const DataSubview: FunctionComponent<Props> = ({
             />
           </>
         )}
-        <StyledFlexChildDiv className={style.samplesRoot}>
-          <div className={style.searchBar}>
-            <div className={style.searchInput}>
+        <StyledFlexChildDiv>
+          <SearchBar>
+            <SearchInput>
               <Input
                 icon="search"
                 placeholder="Search"
@@ -357,13 +359,13 @@ const DataSubview: FunctionComponent<Props> = ({
                 onChange={onChange}
                 data-test-id="search"
               />
-            </div>
+            </SearchInput>
             <div>
               {viewName === VIEWNAME.TREES && <TreeCreateHelpLink />}
               {sampleActions}
             </div>
-          </div>
-          <div className={style.samplesTable}>
+          </SearchBar>
+          <SamplesTable>
             <DataTable
               isLoading={isLoading}
               checkedSampleIds={checkedSampleIds}
@@ -383,7 +385,7 @@ const DataSubview: FunctionComponent<Props> = ({
               handleDeleteTreeModalOpen={handleDeleteTreeModalOpen}
               handleEditTreeModalOpen={handleEditTreeModalOpen}
             />
-          </div>
+          </SamplesTable>
         </StyledFlexChildDiv>
       </>
     );
