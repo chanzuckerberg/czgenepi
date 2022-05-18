@@ -6,13 +6,13 @@ import { useRouter } from "next/router";
 import React, { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import "semantic-ui-css/semantic.min.css";
-import style from "src/App.module.scss";
 import { ROUTES } from "src/common/routes";
 import { theme } from "src/common/styles/theme";
 import { setFeatureFlagsFromQueryParams } from "src/common/utils/featureFlags";
 import NavBarLoggedIn from "src/components/NavBar";
 import NavBarLanding from "src/components/NavBarV2";
 import SplitInitializer from "src/components/Split";
+import { StyledApp } from "./style";
 
 const queryClient = new QueryClient();
 setFeatureFlagsFromQueryParams();
@@ -51,10 +51,10 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
           <StylesProvider injectFirst>
             <ThemeProvider theme={theme}>
               <EmotionThemeProvider theme={theme}>
-                <div className={style.app}>
+                <StyledApp>
                   <Nav />
                   <Component {...pageProps} />
-                </div>
+                </StyledApp>
               </EmotionThemeProvider>
             </ThemeProvider>
           </StylesProvider>
