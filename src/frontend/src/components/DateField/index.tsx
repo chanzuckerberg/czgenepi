@@ -1,5 +1,5 @@
 import { FormikContextType } from "formik";
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { StyledTextField } from "./style";
 
 const DATE_LENGTH = 10;
@@ -14,19 +14,36 @@ interface Props {
   formik: FormikContextType<any>;
   helperText?: any;
   onChange?: (d: ChangeEvent) => void;
+  shouldShowEditedInputAsMarked?: boolean;
 }
+
+export type valueType = string | boolean | NamedGisaidLocation | undefined;
 
 export default function DateField({
   fieldKey,
   formik,
   helperText,
   onChange,
+  shouldShowEditedInputAsMarked,
 }: Props): JSX.Element {
-  const { handleChange, handleBlur, values, touched, errors } = formik;
+  const [isBackgroundColorShown, setIsBackgroundColorShown] =
+    useState<boolean>(false);
+
+  const { handleChange, handleBlur, values, touched, errors, initialValues } =
+    formik;
+
+  const initialValue = initialValues[fieldKey];
+  const changedValue = values[fieldKey];
+
+  useEffect(() => {
+    if (initialValue !== changedValue && shouldShowEditedInputAsMarked) {
+      setIsBackgroundColorShown(true);
+    } else {
+      setIsBackgroundColorShown(false);
+    }
+  }, [initialValue, changedValue, shouldShowEditedInputAsMarked]);
 
   const errorMessage = touched[fieldKey] && errors[fieldKey];
-
-  const value = values[fieldKey] || "";
 
   return (
     <StyledTextField
@@ -40,9 +57,10 @@ export default function DateField({
         handleChange(e);
       }}
       onBlur={handleBlur}
-      value={value}
+      value={changedValue || ""}
       error={Boolean(errorMessage)}
       helperText={helperText}
+      isBackgroundColorShown={isBackgroundColorShown}
     />
   );
 }

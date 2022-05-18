@@ -1,8 +1,8 @@
 import FormHelperText from "@material-ui/core/FormHelperText";
 import { DefaultMenuSelectOption, DropdownPopper } from "czifui";
 import { FormikContextType } from "formik";
-import { escapeRegExp } from "lodash/fp";
-import React from "react";
+import { escapeRegExp, isEqual } from "lodash/fp";
+import React, { useEffect, useState } from "react";
 import { Metadata } from "src/components/WebformTable/common/types";
 import { NamedGisaidLocation } from "src/views/Upload/components/common/types";
 import ApplyToAllColumn from "../common/ApplyToAllColumn";
@@ -14,6 +14,7 @@ interface Props {
   applyToAllColumn: (fieldKey: keyof Metadata, value: unknown) => void;
   isFirstRow: boolean;
   locations: NamedGisaidLocation[];
+  shouldShowEditedInputAsMarked?: boolean; // used to mark edited cells as purple for crud
 }
 
 interface AutocompleteState {
@@ -29,8 +30,23 @@ export default function LocationField({
   applyToAllColumn,
   isFirstRow,
   locations,
+  shouldShowEditedInputAsMarked = false,
 }: Props): JSX.Element {
-  const { handleBlur, setFieldValue, values, touched, errors } = formik;
+  const { handleBlur, setFieldValue, values, touched, errors, initialValues } =
+    formik;
+  const [isBackgroundColorShown, setIsBackgroundColorShown] =
+    useState<boolean>(false);
+
+  const initialValue = initialValues[fieldKey];
+  const changedValue = values[fieldKey];
+
+  useEffect(() => {
+    if (!isEqual(initialValue, changedValue) && shouldShowEditedInputAsMarked) {
+      setIsBackgroundColorShown(true);
+    } else {
+      setIsBackgroundColorShown(false);
+    }
+  }, [initialValue, changedValue, shouldShowEditedInputAsMarked]);
 
   let value: NamedGisaidLocation | undefined = undefined;
   if (values[fieldKey]) {
@@ -108,6 +124,7 @@ export default function LocationField({
         label={value?.name || "Search For Location"}
         value={value}
         onChange={handleLocationChange}
+        isBackgroundColorShown={isBackgroundColorShown}
         options={locations}
         search
         MenuSelectProps={{
