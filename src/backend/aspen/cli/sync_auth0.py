@@ -131,7 +131,7 @@ class Auth0Client:
         self.client.users.delete(auth0_user_id)
 
 
-def compare_stuff(auth0_objects, db_objects, auth0_match_field, db_match_field):
+def find_missing_objects(auth0_objects, db_objects, auth0_match_field, db_match_field):
     db_map = {getattr(obj, db_match_field): obj for obj in db_objects}
     auth0_map = {obj[auth0_match_field]: obj for obj in auth0_objects}
     auth0_only = [auth0_map[key] for key in auth0_map.keys() - db_map.keys()]
@@ -299,7 +299,7 @@ class SuperSyncer:
             self.db.execute(sa.select(User)).scalars().all()
         )
         auth0_users = self.auth0_client.get_users()
-        auth0_only, db_only = compare_stuff(
+        auth0_only, db_only = find_missing_objects(
             auth0_users, db_users, "user_id", "auth0_user_id"
         )
         user_manager = UserManager(self.auth0_client, self.db, self.dry_run)
@@ -310,7 +310,7 @@ class SuperSyncer:
             self.db.execute(sa.select(Group)).scalars().all()
         )
         auth0_orgs = self.auth0_client.get_orgs()
-        auth0_only, db_only = compare_stuff(
+        auth0_only, db_only = find_missing_objects(
             auth0_orgs, db_groups, "display_name", "name"
         )
         group_manager = GroupManager(self.auth0_client, self.db, self.dry_run)
@@ -346,7 +346,7 @@ class SuperSyncer:
             # that "good enough" for the purposes of this sync script. We need to *ALSO*
             # validate that they have the correct role, but that will be more important
             # in the next version, so we're skipping that right now.
-            auth0_only, db_only = compare_stuff(
+            auth0_only, db_only = find_missing_objects(
                 auth0_memberships, db_group_users, "user_id", "auth0_user_id"
             )
             group_manager = UserGroupManager(
