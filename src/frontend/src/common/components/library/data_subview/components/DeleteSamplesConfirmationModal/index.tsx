@@ -1,3 +1,4 @@
+import { isEmpty } from "lodash";
 import React, { useState } from "react";
 import { useUserInfo } from "src/common/queries/auth";
 import { useDeleteSamples } from "src/common/queries/samples";
@@ -105,6 +106,7 @@ const DeleteSamplesConfirmationModal = ({
         open={open}
         onClose={onClose}
         onDelete={onDelete}
+        isDeleteDisabled={isEmpty(samplesToDelete)}
         title={title}
         content={content}
       />
