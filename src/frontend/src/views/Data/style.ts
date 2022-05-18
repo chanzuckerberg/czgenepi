@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
-import { Chip, fontBodyXxs, getColors, getSpaces } from "czifui";
+import { Chip, fontBodyXs, fontBodyXxs, fontHeaderM, getColors, getSpaces } from "czifui";
+import { Menu } from "semantic-ui-react";
 import { RowContent } from "src/common/components/library/data_table/style";
 import { PageContent } from "src/common/styles/mixins/global";
 
@@ -68,8 +69,18 @@ export const PrivacyIcon = styled.span`
   bottom: -2px;
 `;
 
-export const FlexContainer = styled.div`
+export const Navigation = styled.div`
   display: flex;
+  width: 100%;
+
+  ${(props) => {
+    const colors = getColors(props);
+    const spaces = getSpaces(props);
+
+    return `
+      border-bottom: ${spaces?.xxs}px solid ${colors?.gray[200]};
+    `;
+  }}
 `;
 
 export const CenteredFlexContainer = styled.div`
@@ -89,4 +100,70 @@ export const StyledUploaderName = styled.span`
       margin-top: ${spaces?.xxxs}px;
     `;
   }}
+`;
+
+export const Category = styled.div`
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+`;
+
+const doNotForwardProps = ["isActive"];
+
+export const CategoryTitle = styled("div", {
+  shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
+})`
+  ${fontHeaderM}
+
+  ${(props) => {
+    const { isActive } = props;
+    const colors = getColors(props);
+    const spaces = getSpaces(props);
+
+    return `
+      margin-right: ${spaces?.m}px;
+      color: ${colors?.gray[500]};
+
+      ${
+        isActive &&
+        `
+        color: black;
+        border-bottom: ${spaces?.xxs}px solid ${colors?.primary[400]};`
+      }
+    `;
+  }}
+`;
+
+export const View = styled.div`
+  /* (thuang): 74px is the navigation height + margin
+  This is needed to ensure the div doesn't disappear
+  when the viewport height is too short */
+  height: calc(100% - 74px);
+  width: calc(100% - 14px);
+  display: flex;
+`;
+
+export const StyledCount = styled.div`
+  ${fontBodyXs}
+
+  ${(props) => {
+    const colors = getColors(props);
+    return `
+      color: ${colors?.gray[500]};
+    `;
+  }}
+`;
+
+export const StyledMenu = styled(Menu)`
+  align-items: center;
+  margin: 0 !important;
+
+  a div {
+    /* overwrite semantic-ui style */
+    padding-left: 0 !important;
+  }
+`;
+
+export const StyledMenuItem = styled(Menu.Item)`
+  height: 100%;
 `;
