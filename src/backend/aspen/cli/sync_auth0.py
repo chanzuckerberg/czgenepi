@@ -4,14 +4,13 @@ import os
 import random
 import string
 from functools import cache, partial
-from typing import Any, MutableSequence, Tuple, TypedDict
+from typing import Any, MutableSequence, TypedDict
 
 import click
 import sqlalchemy as sa
 from auth0.v3 import authentication as auth0_authentication
 from auth0.v3.management import Auth0
 
-from aspen.api.settings import Settings
 from aspen.config.config import Config
 from aspen.database.connection import (
     get_db_uri,
@@ -388,7 +387,6 @@ class SuperSyncer:
     help="Sync membership",
 )
 def cli(source_of_truth, dry_run, delete_ok, sync_groups, sync_users, sync_memberships):
-    settings = Settings()
     auth0_client = Auth0Client()
 
     logging.basicConfig(
