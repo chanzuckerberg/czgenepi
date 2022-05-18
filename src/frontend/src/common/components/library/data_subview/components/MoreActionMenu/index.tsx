@@ -1,7 +1,6 @@
 import { Menu, MenuItem, Tooltip } from "czifui";
 import React, { MouseEventHandler, useState } from "react";
 import { StyledEditIcon, StyledTrashIcon } from "src/common/styles/iconStyle";
-import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import { StyledText } from "src/views/Data/components/TreeActionMenu/components/MoreActionsMenu/style";
 import { TooltipDescriptionText, TooltipHeaderText } from "../../style";
 import { IconButton } from "../IconButton";
