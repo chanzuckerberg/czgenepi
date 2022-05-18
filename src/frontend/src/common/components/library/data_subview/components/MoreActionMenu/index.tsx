@@ -78,24 +78,22 @@ const MoreActionsMenu = ({
         onClose={handleClose}
         getContentAnchorEl={null}
       >
-        {usesFeatureFlag(FEATURE_FLAGS.editSamples) && (
-          <Tooltip
-            arrow
-            disableHoverListener={!isSampleEditDisabled}
-            placement="top"
-            title={sampleEditDisabledTooltipContent}
-          >
-            <div>
-              <MenuItem
-                onClick={handleEditSamples}
-                disabled={isSampleEditDisabled}
-              >
-                <StyledEditIcon />
-                <StyledText>Edit Samples</StyledText>
-              </MenuItem>
-            </div>
-          </Tooltip>
-        )}
+        <Tooltip
+          arrow
+          disableHoverListener={!isSampleEditDisabled}
+          placement="top"
+          title={sampleEditDisabledTooltipContent}
+        >
+          <div>
+            <MenuItem
+              onClick={handleEditSamples}
+              disabled={isSampleEditDisabled}
+            >
+              <StyledEditIcon />
+              <StyledText>Edit Samples</StyledText>
+            </MenuItem>
+          </div>
+        </Tooltip>
         <MenuItem onClick={handleDeleteSamples}>
           <StyledTrashIcon />
           <StyledText isWarning>Delete Samples</StyledText>
