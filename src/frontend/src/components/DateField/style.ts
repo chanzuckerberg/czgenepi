@@ -1,14 +1,26 @@
 import styled from "@emotion/styled";
 import TextField from "@material-ui/core/TextField";
-import { getSpaces } from "czifui";
+import { CommonThemeProps, getColors, getSpaces } from "czifui";
 
-export const StyledTextField = styled(TextField)`
-  ${(props) => {
+export interface FormFieldProps extends CommonThemeProps {
+  isBackgroundColorShown: boolean | undefined;
+}
+
+export const doNotForwardProps = ["isBackgroundColorShown"];
+
+export const StyledTextField = styled(TextField, {
+  shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
+})`
+  ${(props: FormFieldProps) => {
     const spaces = getSpaces(props);
-
+    const colors = getColors(props);
+    const { isBackgroundColorShown } = props;
     return `
       width: ${(spaces?.l || 0) + 120}px;
       margin: 0;
+      input {
+        background-color: ${isBackgroundColorShown && colors?.primary[200]};
+      }
     `;
   }}
 `;

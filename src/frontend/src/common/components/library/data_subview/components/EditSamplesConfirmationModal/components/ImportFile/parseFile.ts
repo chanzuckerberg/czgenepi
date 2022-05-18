@@ -124,7 +124,10 @@ function filterExtraneousSampleIds(
       !editableSampleIds.has(currentPID) &&
       !exampleSampleIds.has(currentPID)
     ) {
-      extraneousUniqueSampleIds.add(currentPID);
+      // if currentPID is a blank string don't import data for that row (most likely this is an empty line)
+      if (currentPID !== "") {
+        extraneousUniqueSampleIds.add(currentPID);
+      }
     } else {
       return item;
     }

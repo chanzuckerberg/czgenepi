@@ -4,8 +4,8 @@ import { jsonToType } from "src/common/utils";
 export enum API {
   USERDATA = "/v2/users/me",
   SAMPLES = "/v2/samples/",
-  LOG_IN = "/login",
-  LOG_OUT = "/logout",
+  LOG_IN = "/v2/auth/login",
+  LOG_OUT = "/v2/auth/logout",
   PHYLO_RUNS = "/v2/phylo_runs/",
   SAMPLES_FASTA_DOWNLOAD = "/v2/sequences/",
   GET_FASTA_URL = "/v2/sequences/getfastaurl",

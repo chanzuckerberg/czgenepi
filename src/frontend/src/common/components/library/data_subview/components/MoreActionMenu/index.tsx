@@ -1,7 +1,6 @@
 import { Menu, MenuItem, Tooltip } from "czifui";
 import React, { MouseEventHandler, useState } from "react";
 import { StyledEditIcon, StyledTrashIcon } from "src/common/styles/iconStyle";
-import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import { StyledText } from "src/views/Data/components/TreeActionMenu/components/MoreActionsMenu/style";
 import { TooltipDescriptionText, TooltipHeaderText } from "../../style";
 import { IconButton } from "../IconButton";
@@ -78,24 +77,22 @@ const MoreActionsMenu = ({
         onClose={handleClose}
         getContentAnchorEl={null}
       >
-        {usesFeatureFlag(FEATURE_FLAGS.editSamples) && (
-          <Tooltip
-            arrow
-            disableHoverListener={!isSampleEditDisabled}
-            placement="top"
-            title={sampleEditDisabledTooltipContent}
-          >
-            <div>
-              <MenuItem
-                onClick={handleEditSamples}
-                disabled={isSampleEditDisabled}
-              >
-                <StyledEditIcon />
-                <StyledText>Edit Samples</StyledText>
-              </MenuItem>
-            </div>
-          </Tooltip>
-        )}
+        <Tooltip
+          arrow
+          disableHoverListener={!isSampleEditDisabled}
+          placement="top"
+          title={sampleEditDisabledTooltipContent}
+        >
+          <div>
+            <MenuItem
+              onClick={handleEditSamples}
+              disabled={isSampleEditDisabled}
+            >
+              <StyledEditIcon />
+              <StyledText>Edit Samples</StyledText>
+            </MenuItem>
+          </div>
+        </Tooltip>
         <MenuItem onClick={handleDeleteSamples}>
           <StyledTrashIcon />
           <StyledText isWarning>Delete Samples</StyledText>
