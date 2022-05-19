@@ -3,6 +3,8 @@
 // Uses immediately invoked function to not pollute global namespace.
 // TODO [Vince] -- Uncomment from here down once ready to start releasing
 // analytics (either b/c behind OneTrust or a feature flag).
+// NOTE: Make sure to discuss release timing with Product since we need
+// to communicate info about analytics with users.
 // Commenting out for now as way to absolutely ensure analytics remains off.
 // (function () {
 //   const segmentKey = document.querySelector(
