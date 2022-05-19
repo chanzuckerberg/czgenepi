@@ -27,6 +27,9 @@ class UserMeResponse(UserBaseResponse):
     group: GroupResponse
 
 
+class GroupInvitationRequest(BaseRequest):
+    emails: List[str]
+
 class UserPostRequest(BaseRequest):
     name: str
     email: str
