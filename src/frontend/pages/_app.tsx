@@ -6,8 +6,8 @@ import { useRouter } from "next/router";
 import React, { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import "semantic-ui-css/semantic.min.css";
-import style from "src/App.module.scss";
 import { ROUTES } from "src/common/routes";
+import { StyledApp } from "src/common/styles/appStyle";
 import { theme } from "src/common/styles/theme";
 import { setFeatureFlagsFromQueryParams } from "src/common/utils/featureFlags";
 import NavBarLoggedIn from "src/components/NavBar";
@@ -51,10 +51,10 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
           <StylesProvider injectFirst>
             <ThemeProvider theme={theme}>
               <EmotionThemeProvider theme={theme}>
-                <div className={style.app}>
+                <StyledApp>
                   <Nav />
                   <Component {...pageProps} />
-                </div>
+                </StyledApp>
               </EmotionThemeProvider>
             </ThemeProvider>
           </StylesProvider>

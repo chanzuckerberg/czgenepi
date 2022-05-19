@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { Button, getColors, getSpaces } from "czifui";
+import { Button, fontBodyXs, getColors, getSpaces } from "czifui";
 
 const whiteBorder = "border: 1px solid white;";
 export const UploadButton = styled(Button)`
@@ -32,6 +32,21 @@ export const ResourcesLink = styled.div`
 
     return `
       margin-right: ${spaces?.xxl}px;
+    `;
+  }}
+`;
+
+export const StyledDiv = styled.div`
+  ${fontBodyXs}
+
+  display: flex;
+  justify-content: flex-end;
+  flex: auto;
+
+  ${(props) => {
+    const spaces = getSpaces(props);
+    return `
+      margin-right: ${spaces?.l}px;
     `;
   }}
 `;
