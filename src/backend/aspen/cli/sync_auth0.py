@@ -57,9 +57,7 @@ class Auth0Client:
             client_id, client_secret, f"https://{domain}/api/v2/"
         )
 
-        print(type(token))
         self.client: Auth0 = Auth0(domain=domain, token=token["access_token"])
-        print(type(self.client))
 
     def get_all_results(self, endpoint: Callable, key: str) -> List[Any]:
         # Auth0 paginates results. We don't have a crazy amount of data in auth0 so we can
