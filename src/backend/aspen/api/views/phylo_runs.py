@@ -45,7 +45,7 @@ from aspen.database.models import (
 router = APIRouter()
 
 
-@router.post("/")
+@router.post("/", response_model=PhyloRunResponse)
 async def kick_off_phylo_run(
     phylo_run_request: PhyloRunRequest,
     request: Request,
@@ -237,7 +237,7 @@ async def get_readable_phylo_runs(db, user, run_id=None):
     return await _get_accessible_phylo_runs(db, user, run_id, editable=False)
 
 
-@router.get("/")
+@router.get("/", response_model=PhyloRunsListResponse)
 async def list_runs(
     request: Request,
     db: AsyncSession = Depends(get_db),
@@ -255,14 +255,14 @@ async def list_runs(
     return PhyloRunsListResponse(phylo_runs=results)
 
 
-@router.delete("/{item_id}")
+@router.delete("/{item_id}", response_model=PhyloRunDeleteResponse)
 async def delete_run(
     item_id: int,
     request: Request,
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_auth_user),
-) -> bool:
+) -> PhyloRunDeleteResponse:
     item = await get_editable_phylo_runs(db, user, item_id)
     item_db_id = item.id
 
@@ -273,13 +273,13 @@ async def delete_run(
     return PhyloRunDeleteResponse(id=item_db_id)
 
 
-@router.put("/{item_id}")
+@router.put("/{item_id}", response_model=PhyloRunResponse)
 async def update_phylo_tree_and_run(
     item_id: int,
     phylo_run_update_request: PhyloRunUpdateRequest,
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_auth_user),
-):
+) -> PhyloRunResponse:
     # get phylo_run and check that user has permission to update PhyloRun/PhyloTree
     phylo_run = await get_editable_phylo_runs(db, user, item_id)
 

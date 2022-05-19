@@ -51,7 +51,7 @@ router = APIRouter()
 GISAID_REJECTION_TIME = datetime.timedelta(days=4)
 
 
-@router.get("/")
+@router.get("/", response_model=SamplesResponse)
 async def list_samples(
     request: Request,
     db: AsyncSession = Depends(get_db),
@@ -121,7 +121,7 @@ async def get_owned_samples_by_ids(
     return results.scalars()
 
 
-@router.delete("/")
+@router.delete("/", response_model=SampleDeleteResponse)
 async def delete_samples(
     sample_info: SampleBulkDeleteRequest,
     request: Request,
@@ -144,7 +144,7 @@ async def delete_samples(
     return SampleBulkDeleteResponse(ids=db_ids)
 
 
-@router.delete("/{sample_id}")
+@router.delete("/{sample_id}", response_model=SampleDeleteResponse)
 async def delete_sample(
     sample_id: int,
     request: Request,
@@ -165,7 +165,7 @@ async def delete_sample(
     return SampleDeleteResponse(id=sample_db_id)
 
 
-@router.put("/")
+@router.put("/", response_model=SamplesResponse)
 async def update_samples(
     update_samples_request: UpdateSamplesRequest,
     db: AsyncSession = Depends(get_db),
@@ -222,7 +222,7 @@ async def update_samples(
     return res
 
 
-@router.post("/validate_ids/")
+@router.post("/validate_ids/", response_model=ValidateIDsResponse)
 async def validate_ids(
     request_data: ValidateIDsRequest,
     db: AsyncSession = Depends(get_db),
@@ -299,7 +299,7 @@ def _kick_off_pangolin(group_prefix: str, sample_ids: Sequence[str], settings):
     )
 
 
-@router.post("/")
+@router.post("/", response_model=SamplesResponse)
 async def create_samples(
     create_samples_request: List[CreateSampleRequest],
     db: AsyncSession = Depends(get_db),
