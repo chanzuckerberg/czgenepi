@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import {
   Chip,
+  CommonThemeProps,
   fontBodyXs,
   fontBodyXxs,
   fontHeaderM,
@@ -127,6 +128,10 @@ export const Category = styled.div`
   box-sizing: border-box;
 `;
 
+interface Props extends CommonThemeProps {
+  isActive?: boolean;
+}
+
 const doNotForwardProps = ["isActive"];
 
 export const CategoryTitle = styled("div", {
@@ -134,7 +139,7 @@ export const CategoryTitle = styled("div", {
 })`
   ${fontHeaderM}
 
-  ${(props) => {
+  ${(props: Props) => {
     const { isActive } = props;
     const colors = getColors(props);
     const spaces = getSpaces(props);

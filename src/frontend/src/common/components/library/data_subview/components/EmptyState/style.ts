@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
-import { getColors, getSpaces } from "czifui";
+import { CommonThemeProps, getColors, getSpaces } from "czifui";
 
-const loadingBackgroundAnimation = (props) => {
+const loadingBackgroundAnimation = (props: CommonThemeProps) => {
   const colors = getColors(props);
   return `
     @keyframes loadingBackgroundAnimation {
@@ -48,7 +48,7 @@ export const Cell = styled.div`
   height: 12px;
 `;
 
-const commonLoadingStyles = (props) => {
+const commonLoadingStyles = (props: CommonThemeProps) => {
   const spaces = getSpaces(props);
   return `
     ${loadingBackgroundAnimation}
@@ -72,7 +72,7 @@ export const Square = styled.div`
     return `
       margin-right: ${spaces?.l}px 0;
     `;
-}}
+  }}
 `;
 
 export const Bars = styled.div`
