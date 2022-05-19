@@ -354,10 +354,10 @@ class SuperSyncer:
         )
         for org in auth0_orgs:
             auth0_memberships: List[Auth0User] = self.auth0_client.get_org_members(org)
-            # TODO, we might want to stuff the auth0 group ID's into the groups table to
+            # TODO, we might want to stuff the auth0 group IDs into the groups table to
             # make this simpler.
             found_groups: MutableSequence[Group] = [
-                group for group in found_groups if group.name == org["display_name"]
+                group for group in db_groups if group.name == org["display_name"]
             ]
             if not found_groups:
                 # We're assuming that at this point in the script, we've already sync'd
