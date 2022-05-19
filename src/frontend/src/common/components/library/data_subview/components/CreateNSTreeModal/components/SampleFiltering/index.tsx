@@ -142,7 +142,7 @@ const SAMPLE_FILTERING_TOOLTIP_TEXT = (
   <div>
     Samples already selected on the sample table or included by ID in the box
     below will still be force-included on your tree.{" "}
-    <StyledNewTabLink href="https://docs.google.com/document/d/1NhDW42YZQ7DMhPhUOIBWp04n51FO8GItCZPaw7hRtQk/edit?usp=sharing">
+    <StyledNewTabLink href="https://docs.google.com/document/d/1_iQgwl3hn_pjlZLX-n0alUbbhgSPZvpW_0620Hk_kB4/edit#heading=h.lmtbntly6tx9">
       Learn More
     </StyledNewTabLink>
   </div>

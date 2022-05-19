@@ -54,14 +54,15 @@ interface Props {
   id: string;
   metadata: Metadata;
   // TODO (phoenix): once sample edit has import option remove this as optional
-  hasImportedMetadataFile?: boolean;
+  hasImportedMetadataFile: boolean;
   handleMetadata: (id: string, sampleMetadata: Metadata) => void;
   applyToAllColumn: (fieldKey: keyof Metadata, value: unknown) => void;
   isFirstRow: boolean;
   handleRowValidation: (id: string, isValid: boolean) => void;
-  warnings?: Set<keyof Metadata>;
+  warnings: Set<keyof Metadata>;
   locations: NamedGisaidLocation[];
   shouldSkipIdColumn?: boolean;
+  shouldShowEditedInputAsMarked?: boolean;
 }
 
 export default React.memo(function Row({
@@ -75,6 +76,7 @@ export default React.memo(function Row({
   warnings = new Set(),
   locations,
   shouldSkipIdColumn,
+  shouldShowEditedInputAsMarked,
 }: Props): JSX.Element {
   /**
    * Below preps the metadata values form should initialize to.
@@ -176,10 +178,18 @@ export default React.memo(function Row({
         </StyledTableCell>
       )}
       <StyledTableCell component="div">
-        <FreeTextField formik={formik} fieldKey="privateId" />
+        <FreeTextField
+          formik={formik}
+          fieldKey="privateId"
+          shouldShowEditedInputAsMarked={shouldShowEditedInputAsMarked}
+        />
       </StyledTableCell>
       <StyledTableCell component="div">
-        <FreeTextField formik={formik} fieldKey="publicId" />
+        <FreeTextField
+          formik={formik}
+          fieldKey="publicId"
+          shouldShowEditedInputAsMarked={shouldShowEditedInputAsMarked}
+        />
       </StyledTableCell>
       <StyledTableCell component="div">
         <StyledDiv>
@@ -188,6 +198,7 @@ export default React.memo(function Row({
             applyToAllColumn={applyToAllColumn}
             formik={formik}
             fieldKey="collectionDate"
+            shouldShowEditedInputAsMarked={shouldShowEditedInputAsMarked}
           />
         </StyledDiv>
       </StyledTableCell>
@@ -198,6 +209,7 @@ export default React.memo(function Row({
           formik={formik}
           fieldKey="collectionLocation"
           locations={locations}
+          shouldShowEditedInputAsMarked={shouldShowEditedInputAsMarked}
         />
       </StyledTableCell>
       <StyledTableCell component="div">
@@ -207,6 +219,7 @@ export default React.memo(function Row({
             applyToAllColumn={applyToAllColumn}
             formik={formik}
             fieldKey="sequencingDate"
+            shouldShowEditedInputAsMarked={shouldShowEditedInputAsMarked}
           />
         </StyledDiv>
       </StyledTableCell>

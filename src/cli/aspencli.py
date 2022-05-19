@@ -358,9 +358,28 @@ def create(
 
 
 @cli.group()
-def userinfo():
+def group():
     pass
 
+@group.command(name="get")
+@click.argument("group_id")
+@click.pass_context
+def get_group_info(ctx, group_id):
+    api_client = ctx.obj["api_client"]
+    resp = api_client.get(f"/v2/groups/{group_id}")
+    print(resp.text)
+
+@group.command(name="members")
+@click.argument("group_id")
+@click.pass_context
+def get_group_imembers(ctx, group_id):
+    api_client = ctx.obj["api_client"]
+    resp = api_client.get(f"/v2/groups/{group_id}/members")
+    print(resp.text)
+
+@cli.group()
+def userinfo():
+    pass
 
 @userinfo.command(name="get")
 @click.pass_context
