@@ -14,7 +14,7 @@ module.exports = {
   moduleDirectories: ["node_modules", "src"],
   moduleFileExtensions: ["ts", "tsx", "js", "jsx"],
   moduleNameMapper: {
-    "\\.(css|scss)$": "identity-obj-proxy",
+    "\\.(css)$": "identity-obj-proxy",
     "\\.(jpg|jpeg|png|eot|woff|ttf|otf)$":
       "<rootDir>/jest/mocks/emptyObject.js",
     // (thuang): Since we load SVG as React Components via `@svgr/webpack`
@@ -23,6 +23,6 @@ module.exports = {
   },
   modulePaths: ["<rootDir>/"],
   rootDir: "../",
-  testMatch: ["<rootDir>/**/**/*.{spec,test}.{js,jsx,ts,tsx,scss}"],
+  testMatch: ["<rootDir>/**/**/*.{spec,test}.{js,jsx,ts,tsx}"],
   testPathIgnorePatterns: ["<rootDir>/node_modules/", "<rootDir>/build/"],
 };
