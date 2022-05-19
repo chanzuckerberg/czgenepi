@@ -194,7 +194,7 @@ export const StyledSampleIcon = styled(SampleIcon)`
 
     return `
       margin: 0 ${spaces?.l}px;
-      fill: ${colors?.gray[500]};
+      fill: ${colors?.gray[300]};
     `;
   }}
 `;

@@ -1,5 +1,14 @@
 import React from "react";
-import style from "./index.module.scss";
+import {
+  Bars,
+  Cell,
+  CellContainer,
+  Column,
+  Container,
+  Long,
+  Short,
+  Square,
+} from "./style";
 
 interface Props {
   numOfColumns: number;
@@ -7,9 +16,9 @@ interface Props {
 
 const EmptyState = ({ numOfColumns }: Props): JSX.Element => {
   return (
-    <div className={style.container}>
+    <Container>
       <EmptyCells numOfColumns={numOfColumns} />
-    </div>
+    </Container>
   );
 };
 
@@ -18,13 +27,9 @@ function EmptyCells({ numOfColumns = 0 }): JSX.Element {
     <>
       {Array.from(Array(numOfColumns)).map((_, index) => {
         return (
-          <div
-            key={index}
-            className={style.cellContainer}
-            data-test-id="loading-cell"
-          >
-            {index ? <div className={style.cell} /> : <FirstColumn />}
-          </div>
+          <CellContainer key={index} data-test-id="loading-cell">
+            {index ? <Cell /> : <FirstColumn />}
+          </CellContainer>
         );
       })}
     </>
@@ -33,13 +38,13 @@ function EmptyCells({ numOfColumns = 0 }): JSX.Element {
 
 function FirstColumn() {
   return (
-    <div className={style.firstColumn}>
-      <div className={style.square} />
-      <div className={style.bars}>
-        <div className={style.long} />
-        <div className={style.short} />
-      </div>
-    </div>
+    <Column>
+      <Square />
+      <Bars>
+        <Long />
+        <Short />
+      </Bars>
+    </Column>
   );
 }
 
