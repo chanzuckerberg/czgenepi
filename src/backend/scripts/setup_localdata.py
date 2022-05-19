@@ -301,8 +301,27 @@ def create_samples(session, group, user, location, num_successful, num_failures)
         _ = create_sample(session, group, user, location, suffix, True)
 
 
+def get_default_file(s3_resource):
+    default_bucket = "genepi-db-data"
+    default_key = "localdev_default_tree.json"
+    def_file = s3_resource.Object(default_bucket, default_key)
+    try:
+        _ = def_file.content_length
+        print("default tree file located")
+        return def_file
+    except:  # noqa
+        pass
+    print("downloading default tree json")
+    document_body = requests.get(
+        "https://data.nextstrain.org/files/ncov/open/oceania/oceania.json"
+    ).content
+    default_file = s3_resource.Object(default_bucket, default_key)
+    default_file.put(Body=document_body)
+    return default_file
+
+
 def upload_tree_files(session):
-    document_body = None
+    default_file = None
     s3_resource = boto3.resource(
         "s3",
         endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None,
@@ -316,13 +335,12 @@ def upload_tree_files(session):
             continue
         except:  # noqa
             pass
-        if not document_body:
-            print("downloading defaul tree json")
-            document_body = requests.get(
-                "https://data.nextstrain.org/files/ncov/open/oceania/oceania.json"
-            ).content
+        if not default_file:
+            default_file = get_default_file(s3_resource)
         print(f"uploading {tree.s3_bucket}/{tree.s3_key}")
-        s3file.put(Body=document_body)
+        s3file.copy_from(
+            CopySource={"Bucket": default_file.bucket_name, "Key": default_file.key}
+        )
 
 
 def create_test_data(engine):

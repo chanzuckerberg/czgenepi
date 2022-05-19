@@ -118,6 +118,7 @@ class Settings(BaseSettings):
     SECRET_AUTH0_AUTHORIZE_URL: Optional[str] = None
     SECRET_AUTH0_BASE_URL: Optional[str] = None
     SECRET_AUTH0_ACCESS_TOKEN_URL: Optional[str] = None
+    SECRET_AUTH0_SERVER_METADATA_URL: Optional[str] = None
 
     # Env vars usually pulled from AWS SSM Parameters
     AWS_NEXTSTRAIN_SFN_PARAMETERS: Dict
@@ -158,6 +159,13 @@ class Settings(BaseSettings):
             return self.SECRET_AUTH0_AUTHORIZE_URL
         else:
             return f"{self.AUTH0_BASE_URL}/authorize"
+
+    @property
+    def AUTH0_SERVER_METADATA_URL(self) -> str:
+        if self.SECRET_AUTH0_SERVER_METADATA_URL:
+            return self.SECRET_AUTH0_SERVER_METADATA_URL
+        else:
+            return f"https://{self.AUTH0_DOMAIN}/.well-known/openid-configuration"
 
     ####################################################################################
     # database properties
@@ -220,6 +228,7 @@ class Settings(BaseSettings):
             "AUTH0_BASE_URL": "SECRET_AUTH0_BASE_URL",
             "AUTH0_ACCESS_TOKEN_URL": "SECRET_AUTH0_ACCESS_TOKEN_URL",
             "AUTH0_AUTHORIZE_URL": "SECRET_AUTH0_AUTHORIZE_URL",
+            "AUTH0_SERVER_METADATA_URL": "SECRET_AUTH0_SERVER_METADATA_URL",
         }
         aws_secret_keys = [
             "SENTRY_BACKEND_DSN",

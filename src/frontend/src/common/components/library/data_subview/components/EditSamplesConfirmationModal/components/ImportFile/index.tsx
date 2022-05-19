@@ -18,7 +18,7 @@ import {
 } from "src/components/WebformTable/common/types";
 import { NamedGisaidLocation } from "src/views/Upload/components/common/types";
 import { FileUploadProps } from "../../index";
-import { getMetadataEntryOrEmpty } from "../../utils";
+import { getInitialMetadata, getMetadataEntryOrEmpty } from "../../utils";
 import {
   parseFileEdit,
   ParseResult,
@@ -31,20 +31,18 @@ import {
 } from "./utils";
 
 interface Props {
+  userEditableSamples: Sample[];
   metadata: SampleIdToEditMetadataWebform | null;
-  changedMetadata: SampleIdToEditMetadataWebform | null;
   namedLocations: NamedGisaidLocation[];
   hasImportedMetadataFile: boolean;
-  resetMetadataFromCheckedSamples(): void;
   onMetadataFileUploaded(props: FileUploadProps): void;
 }
 
 export default function ImportFile({
+  userEditableSamples,
   metadata,
   namedLocations,
   hasImportedMetadataFile,
-  changedMetadata,
-  resetMetadataFromCheckedSamples,
   onMetadataFileUploaded,
 }: Props): JSX.Element {
   const [missingFields, setMissingFields] = useState<string[] | null>(null);
@@ -103,8 +101,6 @@ export default function ImportFile({
 
   const handleFiles = async (files: FileList | null) => {
     if (!files) return;
-    // clear all metadata before importing tsv file
-    resetMetadataFromCheckedSamples();
     clearState();
 
     const sampleIds = Object.keys(metadata || EMPTY_OBJECT);
@@ -145,20 +141,20 @@ export default function ImportFile({
   };
 
   function handleMetadataFileUpload(result: ParseResult) {
-    // If they're on the page but somehow have no samples (eg, refreshing on
-    // Metadata page), short-circuit and do nothing to avoid any weirdness.
-    if (!metadata) return;
-
     const { data: sampleIdToUploadedMetadata, warningMessages } = result;
+
+    // we need to reset metadata and changedMetadata when a new file is imported
+    const initialMetadata = getInitialMetadata(userEditableSamples);
+    const emptyChangedMetadata = {};
 
     const uploadedMetadata: SampleIdToEditMetadataWebform = {};
     const changedMetadataUpdated: SampleIdToEditMetadataWebform = {};
-    for (const sampleId of Object.keys(metadata)) {
+    for (const sampleId of Object.keys(initialMetadata)) {
       // get current metadata and changed metadata entry for a sampleId
-      const existingMetadataEntry = metadata[sampleId];
+      const existingMetadataEntry = initialMetadata[sampleId];
 
       const existingChangedMetadataEntry = getMetadataEntryOrEmpty(
-        changedMetadata,
+        emptyChangedMetadata,
         sampleId
       );
 
@@ -203,13 +199,17 @@ export default function ImportFile({
           ...existingMetadataEntry,
           ...filledInUploadedMetadata,
         };
-        changedMetadataUpdated[sampleId] = {
-          ...existingChangedMetadataEntry,
-          ...filledInUploadedMetadata,
-        };
+        if (
+          !isEmpty(existingChangedMetadataEntry) ||
+          !isEmpty(filledInUploadedMetadata)
+        ) {
+          changedMetadataUpdated[sampleId] = {
+            ...existingChangedMetadataEntry,
+            ...filledInUploadedMetadata,
+          };
+        }
       }
     }
-
     onMetadataFileUploaded({
       uploadedMetadata,
       changedMetadataUpdated,

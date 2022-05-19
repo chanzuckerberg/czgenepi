@@ -15,6 +15,7 @@ from aspen.api.settings import Settings
 from aspen.api.views import (
     auspice,
     auth,
+    groups,
     health,
     lineages,
     locations,
@@ -71,6 +72,7 @@ def get_app() -> FastAPI:
         access_token_url=settings.AUTH0_ACCESS_TOKEN_URL,
         authorize_url=settings.AUTH0_AUTHORIZE_URL,
         client_kwargs=settings.AUTH0_CLIENT_KWARGS,
+        server_metadata_url=settings.AUTH0_SERVER_METADATA_URL,
     )
     _app.state.auth0_client = auth0
 
@@ -130,6 +132,10 @@ def get_app() -> FastAPI:
         sequences.router,
         prefix="/v2/sequences",
         dependencies=[Depends(get_auth_user)],
+    )
+
+    _app.include_router(
+        groups.router, prefix="/v2/groups", dependencies=[Depends(get_auth_user)]
     )
 
     _app.add_exception_handler(
