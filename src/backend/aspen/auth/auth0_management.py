@@ -24,6 +24,11 @@ class Auth0Role(TypedDict):
     name: str
 
 
+class Auth0Connection(TypedDict):
+    id: str
+    name: str
+
+
 def generate_password(length: int = 22) -> str:
     possible_characters = (
         string.ascii_uppercase + string.ascii_lowercase + string.digits
@@ -61,6 +66,15 @@ class Auth0Client:
     def get_users(self) -> List[Auth0User]:
         return self.get_all_results(self.client.users.list, "users")
 
+    @cache
+    def get_org(self, org_name: str) -> Auth0Org:
+        orgs = self.get_orgs
+        for org in orgs:
+            if org["name"] == org_name:
+                return org
+        raise Exception("Organization not found")
+
+    @cache
     def get_orgs(self) -> List[Auth0Org]:
         return self.get_all_results(
             self.client.organizations.all_organizations, "organizations"
@@ -77,6 +91,22 @@ class Auth0Client:
     @cache
     def get_roles(self) -> List[Auth0Role]:
         return self.get_all_results(self.client.roles.list, "roles")
+
+    @cache
+    def get_connection(self, conn_name: str) -> Auth0Connection:
+        all_conns = self.get_connections()
+        for conn in all_conns:
+            if conn["name"] == conn_name:
+                return conn
+        raise Exception("Connection not found")
+
+    @cache
+    def get_connections(self) -> List[Auth0Connection]:
+        extra_params = {"include_totals": "true"}
+        return self.get_all_results(
+            partial(self.client.connections.all, extra_params=extra_params),
+            "connections",
+        )
 
     def get_org_members(self, org: Auth0Org) -> List[Auth0User]:
         return self.get_all_results(
@@ -99,9 +129,17 @@ class Auth0Client:
         )
 
     def add_org(self, group_id: int, org_name: str) -> None:
+        # TODO, learn more about connections! For now we only have this one, let's use it wherever we need to.
+        connection = self.get_connection("Username-Password-Authentication")
         body = {
             "name": f"group-{group_id}",
             "display_name": org_name,
+            "enabled_connections": [
+                {
+                    "connection_id": connection["id"],
+                    "assign_membership_on_login": False,
+                }
+            ],
         }
         self.client.organizations.create_organization(body)
 
@@ -122,3 +160,31 @@ class Auth0Client:
 
     def delete_user(self, auth0_user_id: str) -> None:
         self.client.users.delete(auth0_user_id)
+
+    def invite_member(
+        self,
+        organization_id: str,
+        client_id: str,
+        invited_by: str,
+        invite_email: str,
+        role_name: str,
+    ) -> None:
+        role = self.get_auth0_role(role_name)
+        client_id = who_knows
+        connection = self.get_connection("Username-Password-Authentication")
+        body = {
+            "inviter": {
+                "name": invited_by,
+            },
+            "invitee": {
+                "email": invite_email,
+            },
+            "client_id": client_id,
+            "connection_id": connection["id"],
+            "app_metadata": {},
+            "user_metadata": {},
+            "ttl_sec": 0,
+            "roles": [role],
+            "send_invitation_email": True,
+        }
+        self.client.organizations.create_organization_invitation(organization_id, body)

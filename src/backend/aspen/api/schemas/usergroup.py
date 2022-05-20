@@ -27,8 +27,19 @@ class UserMeResponse(UserBaseResponse):
     group: GroupResponse
 
 
-class GroupInvitationRequest(BaseRequest):
+class GroupInvitationsRequest(BaseRequest):
+    role: str
     emails: List[str]
+
+
+class GroupInvitationResponse(BaseRequest):
+    email: str
+    success: bool
+
+
+class GroupInvitationsResponse(BaseRequest):
+    invitations: List[GroupInvitationResponse]
+
 
 class UserPostRequest(BaseRequest):
     name: str

@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 import logging
+from typing import Any, List, MutableSequence, Tuple
 
 import click
 import sqlalchemy as sa
 from sqlalchemy.orm.session import Session
-from aspen.auth.auth0_management import Auth0Client, Auth0Org, Auth0User
 
+from aspen.auth.auth0_management import Auth0Client, Auth0Org, Auth0User
 from aspen.config.config import Config
 from aspen.database.connection import (
     get_db_uri,
@@ -13,7 +14,6 @@ from aspen.database.connection import (
     session_scope,
     SqlAlchemyInterface,
 )
-from aspen.config.config import Config
 from aspen.database.models import Group, User
 
 
@@ -235,7 +235,7 @@ class SuperSyncer:
             # TODO, we might want to stuff the auth0 group ID's into the groups table to
             # make this simpler.
             found_groups: MutableSequence[Group] = [
-                group for group in found_groups if group.name == org["display_name"]
+                group for group in db_groups if group.name == org["display_name"]
             ]
             if not found_groups:
                 # We're assuming that at this point in the script, we've already sync'd
@@ -325,6 +325,9 @@ def cli(
         logging.info("Dry run mode enabled - no objects will actually be modified")
     with session_scope(interface) as db:
         syncer = SuperSyncer(auth0_client, source_of_truth, db, dry_run, delete_ok)
+        # TODO delete me
+        syncer.sync_memberships()
+        exit(0)
         if sync_groups:
             logging.info("Syncing groups")
             syncer.sync_groups()
