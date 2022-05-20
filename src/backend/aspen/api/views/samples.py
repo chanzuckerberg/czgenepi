@@ -203,10 +203,9 @@ async def update_samples(
                 raise ex.BadRequestException("location is invalid")
             sample.collection_location = loc
         # Sequencing date is handled specially
-        if update_data.sequencing_date:
-            sample.uploaded_pathogen_genome.sequencing_date = (
-                update_data.sequencing_date
-            )
+        sample.uploaded_pathogen_genome.sequencing_date = (
+            update_data.sequencing_date
+        )
         sample.show_private_identifier = True
         sample.generate_public_identifier(already_exists=True)
         #res.samples.append(SampleResponse.from_orm(sample))

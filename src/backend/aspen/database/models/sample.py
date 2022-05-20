@@ -204,7 +204,6 @@ class Sample(idbase, DictMixin):  # type: ignore
         group_prefix = self.submitting_group.prefix
         current_year: str = datetime.today().strftime("%Y")
         if already_exists:
-            print("already exists")
             id = self.id
             self.public_identifier = f"hCoV-19/{country}/{group_prefix}-{id}/{current_year}"
         else:
