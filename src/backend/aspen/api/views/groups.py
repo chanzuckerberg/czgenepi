@@ -1,4 +1,6 @@
+import sentry_sdk
 import sqlalchemy as sa
+from auth0.v3.exceptions import Auth0Error
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.requests import Request
@@ -58,7 +60,9 @@ async def invite_group_members(
             auth0_client.invite_member(
                 organization["id"], client_id, user.name, email, "member"
             )
-        except:
+        except Auth0Error as err:
+            # TODO - we need to learn more about possible exceptions here.
+            sentry_sdk.capture_exception(err)
             success = False
         responses.append({"email": email, "success": success})
 

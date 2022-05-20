@@ -68,9 +68,9 @@ class Auth0Client:
 
     @cache
     def get_org(self, org_name: str) -> Auth0Org:
-        orgs = self.get_orgs
+        orgs = self.get_orgs()
         for org in orgs:
-            if org["name"] == org_name:
+            if org["display_name"] == org_name:
                 return org
         raise Exception("Organization not found")
 
@@ -170,7 +170,6 @@ class Auth0Client:
         role_name: str,
     ) -> None:
         role = self.get_auth0_role(role_name)
-        client_id = who_knows
         connection = self.get_connection("Username-Password-Authentication")
         body = {
             "inviter": {
@@ -184,7 +183,7 @@ class Auth0Client:
             "app_metadata": {},
             "user_metadata": {},
             "ttl_sec": 0,
-            "roles": [role],
+            "roles": [role["id"]],
             "send_invitation_email": True,
         }
         self.client.organizations.create_organization_invitation(organization_id, body)

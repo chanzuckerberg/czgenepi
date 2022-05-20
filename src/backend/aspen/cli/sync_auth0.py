@@ -303,8 +303,6 @@ def cli(
     sync_users: bool,
     sync_memberships: bool,
 ) -> None:
-    # TODO - pass in client id, secret, domain here!!!
-
     config = Config()
     client_id: str = config.AUTH0_MANAGEMENT_CLIENT_ID
     client_secret: str = config.AUTH0_MANAGEMENT_CLIENT_SECRET
@@ -325,9 +323,6 @@ def cli(
         logging.info("Dry run mode enabled - no objects will actually be modified")
     with session_scope(interface) as db:
         syncer = SuperSyncer(auth0_client, source_of_truth, db, dry_run, delete_ok)
-        # TODO delete me
-        syncer.sync_memberships()
-        exit(0)
         if sync_groups:
             logging.info("Syncing groups")
             syncer.sync_groups()
