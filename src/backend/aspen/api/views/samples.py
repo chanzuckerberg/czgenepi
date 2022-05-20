@@ -194,8 +194,8 @@ async def update_samples(
         for key, value in update_data:
             if key in ["collection_location", "sequencing_date"]:
                 continue
-            if value is not None:  # We need to be able to set private to False!
-                setattr(sample, key, value)
+            #if value is not None:  # We need to be able to set private to False!
+            setattr(sample, key, value)
         # Location id is handled specially
         if update_data.collection_location:
             loc = await db.get(Location, update_data.collection_location)
@@ -208,7 +208,13 @@ async def update_samples(
                 update_data.sequencing_date
             )
         sample.show_private_identifier = True
-        res.samples.append(SampleResponse.from_orm(sample))
+        if sample.public_identifier == None:
+            print("SAMPLE: ", sample)
+            sample.generate_public_identifier()
+            print("sample Public id: ", sample.public_identifier)
+        #res.samples.append(SampleResponse.from_orm(sample))
+        res.samples.append(sample)
+    print("RES: ", res)
 
     try:
         await db.commit()

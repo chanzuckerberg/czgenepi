@@ -29,44 +29,6 @@ if TYPE_CHECKING:
     from .sequences import UploadedPathogenGenome
 
 
-def create_public_ids(
-    group_id: int, db_session: Session, num_needed: int, country: str = "USA"
-) -> List[str]:
-    """
-    Generate a list of viable public ids for a specific group
-
-    Parameters
-    ----------
-    group_id :
-        The group_id to generate public ids for
-    session :
-        An open DB session object
-    number_needed :
-        The number of aspen public ids to generate
-
-    Returns
-    --------
-    A list of newly generated public_ids
-    """
-
-    group: Group = db_session.query(Group).filter(Group.id == group_id).one()
-    next_id: Optional[int] = db_session.query(func.max(Sample.id)).scalar()
-
-    # catch if no max
-    if not next_id:
-        next_id = 0
-    next_id += 1
-    ids: List[str] = []
-    # some group prefixes already have a dash, but if they don't add a dash to the end
-    group_prefix = group.prefix if group.prefix[-1] == "-" else f"{group.prefix}-"
-    for i in range(num_needed):
-        current_year: str = datetime.today().strftime("%Y")
-        country: str = country  # type: ignore
-        ids.append(f"hCoV-19/{country}/{group_prefix}{next_id}/{current_year}")
-        next_id += 1
-    return ids
-
-
 class Sample(idbase, DictMixin):  # type: ignore
     """A physical sample.  Multiple sequences can be taken of each physical sample."""
 

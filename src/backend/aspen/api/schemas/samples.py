@@ -86,7 +86,7 @@ class SampleResponse(BaseResponse):
     lineage: Optional[SampleLineageResponse]
     private: bool
     private_identifier: Optional[str]
-    public_identifier: str
+    public_identifier: Optional[str]
     sequencing_date: Optional[datetime.date]
     submitting_group: SampleGroupResponse
     uploaded_by: SampleUserResponse
@@ -115,7 +115,7 @@ class UpdateSamplesBaseRequest(BaseRequest):
     collection_location: Optional[int]
     private: Optional[bool]
     private_identifier: Optional[constr(min_length=1, max_length=128, strict=True)]  # type: ignore
-    public_identifier: Optional[constr(min_length=1, max_length=128, strict=True)]  # type: ignore
+    public_identifier: Optional[constr(min_length=1, max_length=128, strict=True)]   # type: ignore
     sequencing_date: Optional[datetime.date]
 
 
