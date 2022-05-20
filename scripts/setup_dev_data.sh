@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 export AWS_REGION=us-west-2
 export AWS_DEFAULT_REGION=us-west-2
 export AWS_ACCESS_KEY_ID=nonce
@@ -20,7 +21,7 @@ export OIDC_BROWSER_URL=https://oidc.genepinet.localdev:8443
 # Wait for localstack to start up
 wget --retry-connrefused -t 100 --content-on-error -nv -O- -T 1 $LOCALSTACK_URL/health
 # Wait for oidc to start up
-wget --retry-connrefused -t 100 --content-on-error -nv -O- -T 1 $OIDC_INTERNAL_URL/.well-known/openid-configuration
+wget --retry-connrefused -t 100 --content-on-error -nv -O- -T 1 $OIDC_BROWSER_URL/.well-known/openid-configuration
 
 echo "Creating secretsmanager secrets"
 local_aws="aws --endpoint-url=${LOCALSTACK_URL}"
