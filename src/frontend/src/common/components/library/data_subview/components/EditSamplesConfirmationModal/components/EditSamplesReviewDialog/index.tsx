@@ -64,8 +64,6 @@ const EditSamplesReviewDialog = ({
         public_identifier: m.publicId,
         sequencing_date: m.sequencingDate,
       }));
-      console.log("samples", samples); // REMOVE
-
       editSampleMutation.mutate({
         samples,
       });

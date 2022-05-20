@@ -210,8 +210,6 @@ async def update_samples(
         sample.generate_public_identifier(already_exists=True)
         #res.samples.append(SampleResponse.from_orm(sample))
         res.samples.append(sample)
-    print("RES: ", res)
-
 
     try:
         await db.commit()
