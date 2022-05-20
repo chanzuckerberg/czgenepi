@@ -208,7 +208,7 @@ async def update_samples(
                 update_data.sequencing_date
             )
         sample.show_private_identifier = True
-        sample.generate_public_identifier()
+        sample.generate_public_identifier(already_exists=True)
         #res.samples.append(SampleResponse.from_orm(sample))
         res.samples.append(sample)
     print("RES: ", res)
@@ -362,7 +362,6 @@ async def create_samples(
             sequence=pathogen_genome_input.sequence,
             sequencing_date=pathogen_genome_input.sequencing_date,
         )
-
         db.add(sample)
         db.add(uploaded_pathogen_genome)
         created_samples.append(sample)

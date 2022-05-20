@@ -194,7 +194,7 @@ class Sample(idbase, DictMixin):  # type: ignore
 
     uploaded_pathogen_genome: Optional[UploadedPathogenGenome]
 
-    def generate_public_identifier(self):
+    def generate_public_identifier(self, already_exists=False):
         # If we don't have an explicit public identifier, generate one from
         # our current model context
         if self.public_identifier:
@@ -203,9 +203,13 @@ class Sample(idbase, DictMixin):  # type: ignore
         country = self.collection_location.country
         group_prefix = self.submitting_group.prefix
         current_year: str = datetime.today().strftime("%Y")
-
-        self.public_identifier = func.concat(
-            f"hCoV-19/{country}/{group_prefix}-",
-            text("currval('aspen.samples_id_seq')"),
-            f"/{current_year}",
-        )
+        if already_exists:
+            print("already exists")
+            id = self.id
+            self.public_identifier = f"hCoV-19/{country}/{group_prefix}-{id}/{current_year}"
+        else:
+            self.public_identifier = func.concat(
+                f"hCoV-19/{country}/{group_prefix}-",
+                text("currval('aspen.samples_id_seq')"),
+                f"/{current_year}",
+            )
