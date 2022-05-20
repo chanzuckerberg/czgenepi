@@ -1,5 +1,10 @@
 #!/bin/bash
-set -x
+# Fetch certain secrets that make local dev work better from *real* AWS
+# so we can feed them to localstack (fake aws)
+# TODO this is going to make CI mad, since it doesn't use profiles!!!
+# TODO CI needs access to this secret.
+EXTRA_SECRETS=$(aws --profile genepi-dev secretsmanager get-secret-value --secret-id localdev/genepi-config-secrets --query SecretString --output text)
+
 export AWS_REGION=us-west-2
 export AWS_DEFAULT_REGION=us-west-2
 export AWS_ACCESS_KEY_ID=nonce
@@ -23,6 +28,7 @@ wget --retry-connrefused -t 100 --content-on-error -nv -O- -T 1 $LOCALSTACK_URL/
 # Wait for oidc to start up
 wget --retry-connrefused -t 100 --content-on-error -nv -O- -T 1 $OIDC_BROWSER_URL/.well-known/openid-configuration
 
+ONETRUST_FRONTEND_KEY=$(jq -c .ONETRUST_FRONTEND_KEY <<< "${EXTRA_SECRETS}")
 echo "Creating secretsmanager secrets"
 local_aws="aws --endpoint-url=${LOCALSTACK_URL}"
 ${local_aws} secretsmanager create-secret --name genepi-config &> /dev/null || true
@@ -44,7 +50,8 @@ ${local_aws} secretsmanager update-secret --secret-id genepi-config --secret-str
   "DB_rw_password": "password_rw",
   "DB_address": "database.genepinet.localdev",
   "S3_external_auspice_bucket": "genepi-external-auspice-data",
-  "S3_db_bucket": "genepi-db-data"
+  "S3_db_bucket": "genepi-db-data",
+  "ONETRUST_FRONTEND_KEY": '"${ONETRUST_FRONTEND_KEY}"'
 }' || true
 
 echo "Creating IAM role"
