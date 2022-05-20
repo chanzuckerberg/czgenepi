@@ -208,13 +208,11 @@ async def update_samples(
                 update_data.sequencing_date
             )
         sample.show_private_identifier = True
-        if sample.public_identifier == None:
-            print("SAMPLE: ", sample)
-            sample.generate_public_identifier()
-            print("sample Public id: ", sample.public_identifier)
+        sample.generate_public_identifier()
         #res.samples.append(SampleResponse.from_orm(sample))
         res.samples.append(sample)
     print("RES: ", res)
+
 
     try:
         await db.commit()
