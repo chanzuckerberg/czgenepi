@@ -69,3 +69,21 @@ export const NavOrg = styled.div`
     color: white;
   }
 `;
+
+export const StyledIcon = styled.div`
+  ${(props) => {
+    const spaces = getSpaces(props);
+
+    return `
+      path {
+        fill: white;
+      }
+      margin: 0 ${spaces?.l}px;
+    `;
+  }}
+`;
+
+export const DropdownClickTarget = styled.span`
+  cursor: pointer;
+  display: flex;
+`;
