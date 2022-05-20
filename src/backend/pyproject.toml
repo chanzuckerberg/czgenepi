@@ -8,10 +8,10 @@ authors = ["CZ Gen Epi Team <info@chanzuckerberg.com>"]
 aspen-cli = "aspen.cli.toplevel:cli"
 
 [tool.poetry.dependencies]
-auth0-python = "3.16.2"
+auth0-python = "3.23.0"
 awscli = "^1.16.180"
 python = "^3.7.12"
-Authlib = "0.15.4"
+Authlib = "1.0.1"
 blinker = "1.4"
 boto3 = "1.18.0"
 botocore = "1.21.23"

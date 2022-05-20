@@ -2,7 +2,7 @@ import os
 from urllib.parse import urlencode
 
 from authlib.integrations.base_client.errors import OAuthError
-from authlib.integrations.starlette_client import StarletteRemoteApp
+from authlib.integrations.starlette_client import StarletteOAuth2App
 from fastapi import APIRouter, Depends
 from fastapi.responses import RedirectResponse
 from starlette.requests import Request
@@ -20,7 +20,7 @@ router = APIRouter()
 @router.get("/login")
 async def login(
     request: Request,
-    auth0: StarletteRemoteApp = Depends(get_auth0_client),
+    auth0: StarletteOAuth2App = Depends(get_auth0_client),
     settings: Settings = Depends(get_settings),
 ) -> Response:
     return await auth0.authorize_redirect(request, settings.AUTH0_CALLBACK_URL)
@@ -28,7 +28,9 @@ async def login(
 
 @router.get("/callback")
 async def auth(
-    request: Request, auth0: StarletteRemoteApp = Depends(get_auth0_client)
+    request: Request,
+    auth0: StarletteOAuth2App = Depends(get_auth0_client),
+    settings: Settings = Depends(get_settings),
 ) -> Response:
     try:
         token = await auth0.authorize_access_token(request)
@@ -42,6 +44,8 @@ async def auth(
             "user_id": userinfo["sub"],
             "name": userinfo["name"],
         }
+    else:
+        raise ex.UnauthorizedException("No user info in token")
     return RedirectResponse(os.getenv("FRONTEND_URL", "") + "/data/samples")
 
 

@@ -6,18 +6,23 @@ import { StyledButton, StyledSpan } from "./style";
 
 interface Props extends Omit<ConfirmDialogProps, "onConfirm"> {
   onDelete(): void;
+  isDeleteDisabled?: boolean;
 }
 
 const DeleteDialog = ({
   onDelete,
+  isDeleteDisabled = false,
   open,
   title,
   ...props
 }: Props): JSX.Element | null => {
   if (!open) return null;
-
   const deleteButton = (
-    <StyledButton sdsType="primary" sdsStyle="rounded">
+    <StyledButton
+      sdsType="primary"
+      sdsStyle="rounded"
+      disabled={isDeleteDisabled}
+    >
       Delete
     </StyledButton>
   );
