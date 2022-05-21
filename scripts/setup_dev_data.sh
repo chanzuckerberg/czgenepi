@@ -1,9 +1,15 @@
 #!/bin/bash
 # Fetch certain secrets that make local dev work better from *real* AWS
 # so we can feed them to localstack (fake aws)
-# TODO this is going to make CI mad, since it doesn't use profiles!!!
-# TODO CI needs access to this secret.
-EXTRA_SECRETS=$(aws --profile genepi-dev secretsmanager get-secret-value --secret-id localdev/genepi-config-secrets --query SecretString --output text)
+set -x
+
+# CI doesn't support profiles right now, so work around it.
+PROFILE="--profile genepi-dev"
+if [ -n "${CI}" ]; then
+	PROFILE=""
+fi
+EXTRA_SECRETS=$(aws ${PROFILE} secretsmanager get-secret-value --secret-id localdev/genepi-config-secrets --query SecretString --output text)
+exit
 
 export AWS_REGION=us-west-2
 export AWS_DEFAULT_REGION=us-west-2
@@ -13,9 +19,6 @@ export AWS_SECRET_ACCESS_KEY=nonce
 export FRONTEND_URL=http://frontend.genepinet.localdev:8000
 export BACKEND_URL=http://backend.genepinet.localdev:3000
 
-# NOTE: This script is intended to run INSIDE the dockerized dev environment!
-# If you need to run it directly on your laptop for some reason, change
-# localstack below to localhost
 export LOCALSTACK_URL=http://localstack.genepinet.localdev:4566
 
 # How the backend can reach the OIDC idp

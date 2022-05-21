@@ -42,6 +42,7 @@ services:
       API_URL: http://backend.genepinet.localdev:3000
       SPLIT_FRONTEND_KEY: ${SPLIT_FRONTEND_KEY}
       CHOKIDAR_USEPOLLING: "true"
+      ONETRUST_FRONTEND_KEY: ${ONETRUST_FRONTEND_KEY}
     ports:
       - "8000:8000"
     volumes:

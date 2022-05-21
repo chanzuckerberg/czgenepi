@@ -120,6 +120,7 @@ local-init: oauth/pkcs12/certificate.pfx .env.ecr local-ecr-login local-hostconf
 	./scripts/setup_dev_data.sh
 	$(docker_compose) exec -T backend alembic upgrade head
 	$(docker_compose) exec -T backend python scripts/setup_localdata.py
+	./scripts/startup_compose_env.sh
 
 # Assumes you've already run `make local-init` to configure localstack resources!
 .PHONY: prepare-new-db-snapshot
@@ -172,19 +173,20 @@ local-status: ## Show the status of the containers in the dev environment.
 .PHONY: local-rebuild
 local-rebuild: .env.ecr local-ecr-login ## Rebuild local dev without re-importing data
 	$(docker_compose) --profile $(LOCALDEV_PROFILE) build
-	$(docker_compose) --profile $(LOCALDEV_PROFILE) up -d
+	./scripts/startup_compose_env.sh
 
 .PHONY: local-rebuild-workflows
 local-rebuild-workflows: .env.ecr local-ecr-login ## Rebuild batch containers
 	$(docker_compose) --profile all build
-	$(docker_compose) --profile all up -d
+	# TODO - make sure we can pass profiles to our startup script!!
+	./scripts/startup_compose_env.sh
 
 .PHONY: local-sync
 local-sync: local-rebuild local-init local-hostconfig ## Re-sync the local-environment state after modifying library deps or docker configs
 
 .PHONY: local-start
 local-start: .env.ecr ## Start a local dev environment that's been stopped.
-	$(docker_compose) --profile $(LOCALDEV_PROFILE) up -d
+	./scripts/startup_compose_env.sh
 
 .PHONY: local-stop
 local-stop: ## Stop the local dev environment.
