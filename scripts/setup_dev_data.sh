@@ -1,7 +1,6 @@
 #!/bin/bash
 # Fetch certain secrets that make local dev work better from *real* AWS
 # so we can feed them to localstack (fake aws)
-set -x
 
 # CI doesn't support profiles right now, so work around it.
 PROFILE="--profile genepi-dev"
