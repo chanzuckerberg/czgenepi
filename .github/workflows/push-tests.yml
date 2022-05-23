@@ -15,6 +15,157 @@ env:
   DOCKER_REPO: ${{ secrets.ECR_REPO }}/
 
 jobs:
+  wdl-lint:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: run wdl check
+        run: |
+          pip3 install miniwdl==1.1.4
+          sudo apt-get install -y shellcheck
+          make wdl-lint
+  tf-lint:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: terraform-linters/setup-tflint@v1
+        name: Setup TFLint
+        with:
+          tflint_version: v0.28.1
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 0.13.5
+      - uses: actions/checkout@v2
+      - name: run tflint
+        run: |
+          make tf-lint
+  ts-lint:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Configure AWS prod Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-duration-seconds: 900
+      - name: Login to ECR
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ secrets.ECR_REPO }}
+      - uses: actions/checkout@v2
+      - name: Lint ts
+        run: |
+          echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
+          # Build frontend image
+          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/genepi-frontend:branch-trunk -t ${{ secrets.ECR_REPO }}/genepi-frontend:latest src/frontend
+          make frontend-check-style
+  ts-test:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Configure AWS prod Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-duration-seconds: 900
+      - name: Login to ECR
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ secrets.ECR_REPO }}
+      - uses: actions/checkout@v2
+      - name: Test ts
+        run: |
+          echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
+          # Build frontend
+          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/genepi-frontend:branch-trunk -t ${{ secrets.ECR_REPO }}/genepi-frontend:latest src/frontend
+          make frontend-tests
+  ts-test-build:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Configure AWS prod Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-duration-seconds: 900
+      - name: Login to ECR
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ secrets.ECR_REPO }}
+      - uses: actions/checkout@v2
+      - name: Test ts build
+        run: |
+          echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
+          mkdir src/frontend/build
+          chmod -R a+w src/frontend/build
+          # Build frontend
+          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/genepi-frontend:branch-trunk -t ${{ secrets.ECR_REPO }}/genepi-frontend:latest src/frontend
+          make frontend-test-build
+  py-lint:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Configure AWS prod Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-duration-seconds: 900
+      - name: Login to ECR
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ secrets.ECR_REPO }}
+      - uses: actions/checkout@v2
+      - name: Lint Python
+        run: |
+          echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
+          # Build backend
+          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/genepi-backend:branch-trunk -t ${{ secrets.ECR_REPO }}/genepi-backend:latest src/backend
+          make backend-check-style
+# Test has been flaky for a couple months (~April 2022). Commenting out until we have
+# some test engineering support to suss out the issue and clean things up.
+#  e2e-test:
+#    runs-on: ubuntu-20.04
+#    steps:
+#      - name: Configure AWS prod Credentials
+#        uses: aws-actions/configure-aws-credentials@v1
+#        with:
+#          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          aws-region: us-west-2
+#          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+#          role-duration-seconds: 900
+#      - name: Login to ECR
+#        uses: docker/login-action@v1
+#        with:
+#          registry: ${{ secrets.ECR_REPO }}
+#      - uses: actions/checkout@v2
+#      - name: Install happy
+#        uses: chanzuckerberg/github-actions/.github/actions/install-happy@405f86e7f30b41403677c5df2d8d3339afa3c6d7
+#        with:
+#          happy_version: "0.19.0"
+#      - name: Playwright tests
+#        run: |
+#          echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
+#          # Build backend image
+#          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/genepi-backend:branch-trunk -t ${{ secrets.ECR_REPO }}/genepi-backend:latest src/backend
+#          # Build frontend
+#          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/genepi-frontend:branch-trunk -t ${{ secrets.ECR_REPO }}/genepi-frontend:latest src/frontend
+#          mkdir -p src/frontend/build
+#          chmod a+rwx src/frontend/build # TODO temp hack - need a better plan for the build dir.
+#          make local-init
+#          echo "Init complete - testing web service"
+#          # docker-compose exec -T frontend wget -T 10 --tries 20 localhost:8000/
+#          echo "Webserver up, running tests!"
+#          docker-compose logs -f frontend &
+#          export S3_PREFIX=${{ secrets.CI_SCREENSHOT_PREFIX }}/${{ github.run_id }}/
+#          make frontend-e2e-ci
   py-test:
     runs-on: ubuntu-20.04
     steps:
@@ -43,3 +194,89 @@ jobs:
           docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/genepi-backend:branch-trunk -t ${{ secrets.ECR_REPO }}/genepi-backend:latest src/backend
           make local-init LOCALDEV_PROFILE=backend
           make backend-test
+  build-push-images:
+    if: github.ref == 'refs/heads/trunk'
+    runs-on: ubuntu-20.04
+    needs:
+      - tf-lint
+      - ts-lint
+      - ts-test
+      - ts-test-build
+      - py-lint
+      - py-test
+    strategy:
+      matrix:
+        image:
+          - dockerfile: src/backend/Dockerfile.gisaid
+            context: ./src/backend/
+            name: genepi-gisaid
+          - dockerfile: src/backend/Dockerfile.nextstrain
+            context: ./src/backend/
+            name: genepi-nextstrain
+          - dockerfile: src/backend/Dockerfile.pangolin
+            context: ./src/backend/
+            name: genepi-pangolin
+          - dockerfile: src/backend/Dockerfile
+            context: ./src/backend/
+            name: genepi-backend
+          - dockerfile: src/frontend/Dockerfile
+            context: ./src/frontend/
+            name: genepi-frontend
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-duration-seconds: 900
+      - name: Login to ECR
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ secrets.ECR_REPO }}
+      - uses: actions/checkout@v2
+      - run: docker buildx build --build-arg HAPPY_COMMIT=${GITHUB_SHA} --build-arg HAPPY_BRANCH=${GITHUB_REF} --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/${{ matrix.image.name }}:branch-trunk --cache-to=type=inline,mode=max -t ${{ secrets.ECR_REPO }}/${{ matrix.image.name }}:sha-${GITHUB_SHA:0:8} -f ${{ matrix.image.dockerfile }} --push ${{ matrix.image.context }}
+      - run: make imagecheck-${{ matrix.image.name }} IMAGE=${{ secrets.ECR_REPO }}/${{ matrix.image.name }}:sha-${GITHUB_SHA:0:8}
+  update-stage:
+    needs:
+      - build-push-images
+    runs-on: ubuntu-20.04
+    if: github.ref == 'refs/heads/trunk'
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-duration-seconds: 900
+      - name: Login to ECR
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ secrets.ECR_REPO }}
+      - uses: actions/checkout@v2
+      - name: Docker build, push, and tag
+        shell: bash
+        run: |
+          pip install -r .happy/requirements.txt
+          scripts/happy --profile="" addtags --source-tag sha-${GITHUB_SHA:0:8} --dest-tag branch-$(echo ${GITHUB_REF#refs/heads/} | sed 's/[\+\/]/-/g')
+      - name: Generate payload
+        run: |
+          echo "payload={\"tag\":\"sha-${GITHUB_SHA:0:8}\"}" >> $GITHUB_ENV
+      - uses: avakar/create-deployment@v1.0.2
+        with:
+          auto_merge: false
+          environment: staging
+          payload: ${{ env.payload }}
+          required_contexts: "" # Temporary hack to avoid checking Github Status for the commit
+          # TODO: Avoid circular dependency on the deploy step; this step hasn't finished yet so
+          # it's not considered ready for deploy normally by required_contexts, but we need to
+          # deploy for this to be considered ready.
+          # Unfortunately there is no blocklist for required_contexts, only an allowlist, so
+          # we'd have to enumerate every other Github PR status here, which can be constantly changing.
+          # For now, we just ignore required_contexts to deploy on every success.
+          # See https://github.community/t/can-i-avoid-creating-a-check-run-from-a-job-needed-for-deployments-api/16426
+        env:
+          GITHUB_TOKEN: ${{ secrets.CZIBUILDBOT_GITHUB_TOKEN }}
