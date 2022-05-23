@@ -101,12 +101,12 @@ services:
         aliases:
           - backend.genepinet.localdev
   localstack:
-    image: localstack/localstack@sha256:7c6635493185d25165979995fb073fd789c72b6d8b17ef3a70b798d55576732f
+    image: localstack/localstack:0.14.3
     profiles: [ "backend", "web", "all" ]
-    platform: linux/amd64
     ports:
       - "4566:4566"
     environment:
+      - EAGER_SERVICE_LOADING=1
       - HOSTNAME_EXTERNAL=localstack
       - SERVICES=s3,secretsmanager,stepfunctions,ssm,iam
       - DEBUG=1
