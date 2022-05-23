@@ -1,17 +1,17 @@
 import Script from "next/script";
 import React from "react";
-// import ENV from "src/common/constants/ENV";
+import ENV from "src/common/constants/ENV";
 
-// TODO Convert `data-domain-script` to being pulled from an ENV var
 // The non-secret API key used to identify the app to OneTrust.
-const ONE_TRUST_KEY = "c3428097-e56e-4f3a-ae48-5d1d26761bed-test";
+const ONETRUST_KEY = ENV.ONETRUST_FRONTEND_KEY;
 
-// Not totally clear on purpose of this script, but it's part of OneTrust
-// install instructions. TODO Figure out what it's doing, maybe remove?
-const ONE_TRUST_ADD_ON_SCRIPT = "/oneTrustWrapperScript.js";
+// Sets up callback function that OneTrust will run after init and any change
+// to settings. Important because we're a single page app. See below docs.
+const ONETRUST_ADD_ON_SCRIPT = "/oneTrustWrapperScript.js";
 
 // Keyword to enable scripts with that class if user opts-in via OneTrust.
-export const ONE_TRUST_ENABLING_CLASS = "optanon-category-C0002";
+// TODO break out the C0002 aspect probably?
+export const ONETRUST_ENABLING_CLASS = "optanon-category-C0002";
 
 /**
  * Initializes OneTrust usage, enabling user to opt-in/out of analytics, etc.
@@ -20,17 +20,23 @@ export const ONE_TRUST_ENABLING_CLASS = "optanon-category-C0002";
  * It mounts <script> tags that do the OneTrust initialization.
  *
  * TODO [Vince]: Write some docs explaining method of action for OneTrust
+ *
+ * TODO [Vince]: Explain add on script
  */
 export function OneTrustInitializer() {
-  return (
+  // Every environment should have a ONETRUST_KEY env var available, but if
+  // it's not there for some reason, we keep OneTrust off, which, in turn,
+  // will prevent any scripts it controls from running (eg, analytics).
+  console.log("ONETRUST_KEY", ONETRUST_KEY); // REMOVE
+  return ONETRUST_KEY ? (
     <>
       <Script
         src="https://cdn.cookielaw.org/scripttemplates/otSDKStub.js"
         type="text/javascript"
         charSet="UTF-8"
-        data-domain-script={ONE_TRUST_KEY}
+        data-domain-script={ONETRUST_KEY}
       />
-      <Script type="text/javascript" src={ONE_TRUST_ADD_ON_SCRIPT} />
+      <Script type="text/javascript" src={ONETRUST_ADD_ON_SCRIPT} />
     </>
-  );
+  ) : null;
 }

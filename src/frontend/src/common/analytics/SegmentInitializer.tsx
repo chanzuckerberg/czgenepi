@@ -1,6 +1,6 @@
 import Script from "next/script";
 import React from "react";
-import { ONE_TRUST_ENABLING_CLASS } from "src/common/analytics/OneTrustInitializer";
+import { ONETRUST_ENABLING_CLASS } from "src/common/analytics/OneTrustInitializer";
 import ENV from "src/common/constants/ENV";
 
 /**
@@ -42,7 +42,7 @@ const INITIAL_SCRIPT_TYPE = "text/plain";
  *      "text/plain". This is connected to our use of OneTrust: if a user
  *      allows analytics, OneTrust will flip that to "text/javascript",
  *      causing the referenced script to run and initialize analytics.
- *      (it finds the script to flip via class `ONE_TRUST_ENABLING_CLASS`)
+ *      (it finds the script to flip via class `ONETRUST_ENABLING_CLASS`)
  *      TODO: Implement this once OneTrust can be integrated.
  *            For right now, we need to do an initial OneTrust scan with
  *            live analytics. We'll confine this to Staging for the scan to
@@ -74,7 +74,7 @@ export function SegmentInitializer() {
       type={INITIAL_SCRIPT_TYPE}
       src={SEGMENT_INIT_SCRIPT_ROUTE}
       data-segment-key={SEGMENT_WRITE_KEY}
-      className={ONE_TRUST_ENABLING_CLASS}
+      className={ONETRUST_ENABLING_CLASS}
     />
   ) : null;
 }
