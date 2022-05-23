@@ -56,9 +56,7 @@ remote-dbconsole: .env.ecr # Get a python console on a remote db (from OSX only!
 ### DOCKER LOCAL DEV #########################################
 .PHONY: local-hostconfig
 local-hostconfig:
-	if [ "$$(uname -s)" == "Darwin" ]; then \
-	  sudo ./scripts/happy hosts install; \
-	fi
+	sudo ./scripts/happy hosts install; \
 
 .PHONY: local-nohostconfig
 local-nohostconfig:
