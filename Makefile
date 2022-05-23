@@ -176,7 +176,7 @@ local-rebuild: .env.ecr local-ecr-login ## Rebuild local dev without re-importin
 .PHONY: local-rebuild-workflows
 local-rebuild-workflows: .env.ecr local-ecr-login ## Rebuild batch containers
 	$(docker_compose) --profile all build
-	$(docker_compose) --profile $(LOCALDEV_PROFILE) up -d
+	$(docker_compose) --profile all up -d
 
 .PHONY: local-sync
 local-sync: local-rebuild local-init local-hostconfig ## Re-sync the local-environment state after modifying library deps or docker configs
