@@ -147,7 +147,7 @@ jobs:
 #          registry: ${{ secrets.ECR_REPO }}
 #      - uses: actions/checkout@v2
 #      - name: Install happy
-#        uses: chanzuckerberg/github-actions/.github/actions/install-happy@install-happy-v1.0.1
+#        uses: chanzuckerberg/github-actions/.github/actions/install-happy@405f86e7f30b41403677c5df2d8d3339afa3c6d7
 #        with:
 #          happy_version: "0.19.0"
 #      - name: Playwright tests
@@ -189,11 +189,6 @@ jobs:
           install_globally: "true"
       - name: Test Python
         run: |
-          echo $PATH
-          happy version
-          which happy
-          sudo sh -c 'echo $PATH'
-          sudo happy version
           echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
           # Build backend image
           docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/genepi-backend:branch-trunk -t ${{ secrets.ECR_REPO }}/genepi-backend:latest src/backend
