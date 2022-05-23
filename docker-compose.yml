@@ -111,7 +111,6 @@ services:
       - SERVICES=s3,secretsmanager,stepfunctions,ssm,iam
       - DEBUG=1
       - DATA_DIR=/tmp/localstack/data
-      - PORT_WEB_UI=${PORT_WEB_UI- }
       - DEFAULT_REGION=us-west-2
     volumes:
       - localstack:/tmp/localstack
