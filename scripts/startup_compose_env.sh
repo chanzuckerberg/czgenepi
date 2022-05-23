@@ -7,4 +7,5 @@ SECRETS=$(aws --endpoint-url http://localhost:4566 secretsmanager get-secret-val
 eval "$(jq -r '.| to_entries | .[] | select(.key != "AUTH0_CLIENT_KWARGS") | "export " + .key + "=" + (.value | @sh)' <<< "${SECRETS}")"
 export docker_compose="docker compose --env-file .env.ecr"
 export LOCALDEV_PROFILE="web"
-${docker_compose} --profile ${LOCALDEV_PROFILE} up -d
+# We only really need to restart the frontend.
+${docker_compose} --profile ${LOCALDEV_PROFILE} up -d frontend

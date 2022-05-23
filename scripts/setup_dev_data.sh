@@ -8,6 +8,7 @@ PROFILE="--profile genepi-dev"
 if [ -n "${CI}" ]; then
 	PROFILE=""
 fi
+# Fetch some additional data from real-aws to populate in our fake-aws secret.
 EXTRA_SECRETS=$(aws ${PROFILE} secretsmanager get-secret-value --secret-id localdev/genepi-config-secrets --query SecretString --output text)
 
 export AWS_REGION=us-west-2
