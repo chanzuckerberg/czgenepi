@@ -4,8 +4,13 @@
 
 # CI doesn't support profiles right now, so work around it.
 PROFILE="--profile genepi-dev"
+LOCALSTACK_URL=http://localstack.genepinet.localdev:4566
+OIDC_CHECK_URL=https://oidc.genepinet.localdev:8443
+# GitHub actions can't handle our remapped DNS or AWS profiles :'(
 if [ -n "${CI}" ]; then
 	PROFILE=""
+	LOCALSTACK_URL=http://localhost:4566
+	OIDC_CHECK_URL=https://localhost:8443
 fi
 EXTRA_SECRETS=$(aws ${PROFILE} secretsmanager get-secret-value --secret-id localdev/genepi-config-secrets --query SecretString --output text)
 
@@ -17,8 +22,6 @@ export AWS_SECRET_ACCESS_KEY=nonce
 export FRONTEND_URL=http://frontend.genepinet.localdev:8000
 export BACKEND_URL=http://backend.genepinet.localdev:3000
 
-export LOCALSTACK_URL=http://localstack.genepinet.localdev:4566
-
 # How the backend can reach the OIDC idp
 export OIDC_INTERNAL_URL=http://oidc.genepinet.localdev
 # How a web browser can reach the OIDC idp
@@ -27,7 +30,7 @@ export OIDC_BROWSER_URL=https://oidc.genepinet.localdev:8443
 # Wait for localstack to start up
 wget --retry-connrefused -t 100 --content-on-error -nv -O- -T 1 $LOCALSTACK_URL/health
 # Wait for oidc to start up
-wget --retry-connrefused -t 100 --content-on-error -nv -O- -T 1 $OIDC_BROWSER_URL/.well-known/openid-configuration
+wget --retry-connrefused -t 100 --content-on-error -nv -O- -T 1 $OIDC_CHECK_URL/.well-known/openid-configuration
 
 ONETRUST_FRONTEND_KEY=$(jq -c .ONETRUST_FRONTEND_KEY <<< "${EXTRA_SECRETS}")
 echo "Creating secretsmanager secrets"
