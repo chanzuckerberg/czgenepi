@@ -191,7 +191,7 @@ jobs:
           echo $PATH
           happy version
           which happy
-          sudo echo $PATH
+          sudo sh -c 'echo $PATH'
           sudo happy version
           echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
           # Build backend image
