@@ -164,3 +164,9 @@ echo
 echo "Dev env is up and running!"
 echo "  Frontend: ${FRONTEND_URL}"
 echo "  Backend: ${BACKEND_URL}"
+
+# Add onetrust to .env.ecr
+REPO=$(cat .env.ecr | grep DOCKER_REPO)
+SECRETS=$($local_aws secretsmanager get-secret-value --secret-id genepi-config --query SecretString --output text)
+jq -r '.| to_entries | .[] | select(.key == "ONETRUST_FRONTEND_KEY") | .key + "=" + (.value | @sh)' <<< "${SECRETS}" > .env.ecr
+echo $REPO >> .env.ecr
