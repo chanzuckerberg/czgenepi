@@ -1,5 +1,14 @@
-// [Vince]: I only have a vague grasp on what the purpose of this is, but it's
-// part of the standard OneTrust setup. I think OneTrust expects a global func
-// with this name for a callback...? Honestly, not sure, since it's currently
-// a no-op, but I'm going to keep it for now since it's SOP for OneTrust.
-function OptanonWrapper() { }
+// Callback function for OneTrust. Fires on load and on OT settings changes.
+// See docs in `OneTrustInitializer` component for explanation of use.
+function OptanonWrapper() {
+  // OneTrust API is poorly documented, feels shaky. Try/catch everything, JIC.
+  try {
+    const ANALYTICS_GROUP = "C0002";  // Needs to match `OneTrustInitializer`
+    const currentActiveGroups = window.OnetrustActiveGroups;
+    const isAnalyticsEnabled = currentActiveGroups.includes(ANALYTICS_GROUP);
+    // Attach to window so we can access in React
+    window.isCzGenEpiAnalyticsEnabled = isAnalyticsEnabled;
+  } catch (error) {
+    console.warn("Something went wrong with OneTrust. Please refresh. Debug:", error);
+  }
+}

@@ -10,9 +10,10 @@ const ONETRUST_KEY = ENV.ONETRUST_FRONTEND_KEY;
 // to settings. Important because we're a single page app. See below docs.
 const ONETRUST_ADD_ON_SCRIPT = "/oneTrustWrapperScript.js";
 
+// Internal value used by OneTrust to describe group of analytics.
+const ANALYTICS_GROUP = "C0002"; // Needs to match in ONETRUST_ADD_ON_SCRIPT
 // Keyword to enable scripts with that class if user opts-in via OneTrust.
-// TODO break out the C0002 aspect probably?
-export const ONETRUST_ENABLING_CLASS = "optanon-category-C0002";
+export const ONETRUST_ENABLING_CLASS = `optanon-category-${ANALYTICS_GROUP}`;
 
 /**
  * Initializes OneTrust usage, enabling user to opt-in/out of analytics, etc.
@@ -45,8 +46,23 @@ export const ONETRUST_ENABLING_CLASS = "optanon-category-C0002";
  * "text/javascript" instead, and the browser picks up the change, sees it as
  * a runnable script, and the script runs like usual at that point.
  *
- * --- OptanonWrapper callback func: ONETRUST_ADD_ON_SCRIPT ---
- * TODO [Vince]: Explain add on script
+ * --- ONETRUST_ADD_ON_SCRIPT: OptanonWrapper callback function  ---
+ * OneTrust provides a callback via the global function `OptanonWrapper` which
+ * we define in the ONETRUST_ADD_ON_SCRIPT. It gets fired off once OneTrust
+ * has loaded, and then also on any subsequent changes the user makes to their
+ * OneTrust settings. Because we are a single page app (SPA), this is very
+ * important to us: since OneTrust only enables/disables a <script> tag from
+ * loading, if OneTrust enables analytics, but then later disables it, all that
+ * gets disabled is the script that initially loaded analytics. Since CZ GE is
+ * a SPA, analytics would continue to run until user refreshes their browser.
+ *
+ * To solve this, we create a window-level var `isCzGenEpiAnalyticsEnabled`
+ * inside the callback function. On any change to OneTrust settings, it will
+ * properly set that variable. Thus we can rely on it to tell us if the user
+ * is currently opting-in to analytics, and not just assuming that because
+ * analytics once got loaded, they remain opted-in. As long as our analytics
+ * events first check for `isCzGenEpiAnalyticsEnabled`, we can be sure our
+ * user remains opted-in and fire off the analytics event.
  */
 export function OneTrustInitializer() {
   // `userInfo` will be false-y if user is not logged in
