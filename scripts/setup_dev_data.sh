@@ -24,10 +24,20 @@ export OIDC_INTERNAL_URL=http://oidc.genepinet.localdev
 # How a web browser can reach the OIDC idp
 export OIDC_BROWSER_URL=https://oidc.genepinet.localdev:8443
 
-# Wait for localstack to start up
-wget --retry-connrefused -t 100 --content-on-error -nv -O- -T 1 $LOCALSTACK_URL/health
+# Wait for localstack services to start up
+echo "wait for localstack to start"
+until [ $(curl -m 1 -s $LOCALSTACK_URL/health | grep -o running | wc -l) -eq "5" ]; do 
+  curl -m 1 -s $LOCALSTACK_URL/health
+  echo
+  sleep 1;
+done
+
 # Wait for oidc to start up
-wget --retry-connrefused -t 100 --content-on-error -nv -O- -T 1 $OIDC_BROWSER_URL/.well-known/openid-configuration
+echo "wait for oidc to start"
+until curl -m 1 -sk $OIDC_BROWSER_URL/.well-known/openid-configuration; do
+  sleep 1;
+done
+
 
 ONETRUST_FRONTEND_KEY=$(jq -c .ONETRUST_FRONTEND_KEY <<< "${EXTRA_SECRETS}")
 echo "Creating secretsmanager secrets"
