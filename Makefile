@@ -56,13 +56,11 @@ remote-dbconsole: .env.ecr # Get a python console on a remote db (from OSX only!
 ### DOCKER LOCAL DEV #########################################
 .PHONY: local-hostconfig
 local-hostconfig:
-	sudo ./scripts/happy hosts install; \
+	sudo happy hosts install
 
 .PHONY: local-nohostconfig
 local-nohostconfig:
-	if [ "$$(uname -s)" == "Darwin" ]; then \
-	  sudo ./scripts/happy hosts uninstall; \
-	fi
+	sudo happy hosts uninstall
 
 oauth/pkcs12/certificate.pfx:
 	# All calls to the openssl cli happen in the oidc-server-mock container.
