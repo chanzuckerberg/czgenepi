@@ -6,6 +6,6 @@ export AWS_SECRET_ACCESS_KEY=nonce
 SECRETS=$(aws --endpoint-url http://localhost:4566 secretsmanager get-secret-value --secret-id genepi-config --query SecretString --output text)
 eval "$(jq -r '.| to_entries | .[] | select(.key != "AUTH0_CLIENT_KWARGS") | "export " + .key + "=" + (.value | @sh)' <<< "${SECRETS}")"
 export docker_compose="docker compose --env-file .env.ecr"
-export LOCALDEV_PROFILE="web"
+export LOCALDEV_PROFILE="${LOCALDEV_PROFILE:-web}"
 # We only really need to restart the frontend.
-${docker_compose} --profile ${LOCALDEV_PROFILE} up -d frontend
+${docker_compose} --profile ${LOCALDEV_PROFILE} up -d

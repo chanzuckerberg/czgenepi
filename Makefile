@@ -116,7 +116,7 @@ local-init: oauth/pkcs12/certificate.pfx .env.ecr local-ecr-login local-hostconf
 	./scripts/setup_dev_data.sh
 	$(docker_compose) exec -T backend alembic upgrade head
 	$(docker_compose) exec -T backend python scripts/setup_localdata.py
-	./scripts/startup_compose_env.sh
+	export LOCALDEV_PROFILE=$(LOCALDEV_PROFILE); ./scripts/startup_compose_env.sh
 
 # Assumes you've already run `make local-init` to configure localstack resources!
 .PHONY: prepare-new-db-snapshot
