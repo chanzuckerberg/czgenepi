@@ -57,9 +57,9 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
           content="minimum-scale=1, initial-scale=1, width=device-width"
         />
       </Head>
-      <OneTrustInitializer />
-      <SegmentInitializer />
       <QueryClientProvider client={queryClient}>
+        <OneTrustInitializer />
+        <SegmentInitializer />
         <SplitInitializer>
           <StylesProvider injectFirst>
             <ThemeProvider theme={theme}>
