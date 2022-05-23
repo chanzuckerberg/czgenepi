@@ -35,7 +35,6 @@ run-autoflake:
 
 ### TESTING #############################################
 test: # run pytest
-	export AWS_DEFAULT_REGION=us-west-2; aws --endpoint-url $$BOTO_ENDPOINT_URL secretsmanager list-secrets
 	pytest -n8 aspen
 
 ### ALEMBIC #############################################
