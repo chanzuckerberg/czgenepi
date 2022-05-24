@@ -40,15 +40,6 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
     }
   }, []);
 
-  // TODO [Vince]: Move somewhere permanent, very ugly smushing in right now
-  const OneTrustSettingsOpener = () => {
-    return (
-      <a href="#" className="optanon-show-settings">
-        Cookie Settings
-      </a>
-    );
-  };
-
   return (
     <>
       <Head>
@@ -66,7 +57,6 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
               <EmotionThemeProvider theme={theme}>
                 <StyledApp>
                   <Nav />
-                  <OneTrustSettingsOpener />
                   <Component {...pageProps} />
                 </StyledApp>
               </EmotionThemeProvider>

@@ -28,6 +28,13 @@ export const ONETRUST_ENABLING_CLASS = `optanon-category-${ANALYTICS_GROUP}`;
  * /should/ have a key, but just in case it's missing, it defaults to empty
  * string and we do not attempt to use OneTrust (and thus, analytics either).
  *
+ * Usage note: Weirdly, even though this boils down to being a <script> tag,
+ * Next.js does not like it to be present in a Next `Head` or `Html` component.
+ * Instead, just put it anywhere in the "normal" flow of components. This uses
+ * a react-query call, so it also needs to be in the `QueryClientProvider`,
+ * but beyond that it just needs to be somewhere fairly high up so it mounts
+ * on every logged-in view/page.
+ *
  *  --- Method of Action: how does OneTrust work? ---
  * The core idea of OneTrust is that it can block other <script> tags from
  * loading on the page unless the user's OneTrust settings opt them in. While
