@@ -4,11 +4,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.requests import Request
 
 from aspen.api.auth import get_auth_user
-from aspen.api.deps import get_db, get_settings
+from aspen.api.deps import get_db
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.usergroup import GroupMembersResponse, InvitationsResponse
-from aspen.api.settings import Settings
-from aspen.cli.sync_auth0 import Auth0Client, Auth0Org
+from aspen.auth.auth0_management import Auth0Client, Auth0Org
 from aspen.database.models import Group, User
 
 router = APIRouter()
@@ -36,7 +35,7 @@ async def get_group_invitations(
     group_id: int,
     request: Request,
     db: AsyncSession = Depends(get_db),
-    settings: Settings = Depends(get_settings),
+    auth0_client: Auth0Client = Depends(get_auth0_client),
     user: User = Depends(get_auth_user),
 ) -> InvitationsResponse:
     # TODO: Figure out how a db group relates to an auth0 org
@@ -46,19 +45,9 @@ async def get_group_invitations(
     requested_group_result = await db.execute(requested_group_query)
     requested_group: Group = requested_group_result.scalars().one()  # noqa: F841
 
-    auth0_client_id = settings.AUTH0_MANAGEMENT_CLIENT_ID
-    auth0_client_secret = settings.AUTH0_MANAGEMENT_CLIENT_SECRET
-    auth0_domain = settings.AUTH0_DOMAIN
-    auth0_client = Auth0Client(
-        client_id=auth0_client_id,
-        client_secret=auth0_client_secret,
-        domain=auth0_domain,
-    )
-    orgs = auth0_client.get_orgs()
-    # Presumably the org-db connection would look something like this
-    # auth0_org: Auth0Org = next(org for org in orgs if org["id"] == requested_group.auth0_org_id)
-    auth0_org: Auth0Org = next(
-        org for org in orgs if org["display_name"] == user.group.name
-    )
+    try:
+        auth0_org: Auth0Org = auth0_client.get_org_by_id(requested_group.auth0_org_id)
+    except Exception:
+        raise ex.BadRequestException("Not found")
     invitations = auth0_client.get_org_invitations(auth0_org)
     return InvitationsResponse.parse_obj({"invitations": invitations})
