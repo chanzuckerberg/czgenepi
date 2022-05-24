@@ -3,7 +3,7 @@ import json
 import os
 import re
 import threading
-from typing import Any, List, Mapping, Optional, Sequence, Set, Union, MutableSequence
+from typing import Any, List, Mapping, MutableSequence, Optional, Sequence, Set, Union
 
 import sentry_sdk
 import sqlalchemy as sa
@@ -203,9 +203,7 @@ async def update_samples(
             sample.collection_location = loc
 
         # Sequencing date is handled specially
-        sample.uploaded_pathogen_genome.sequencing_date = (
-            update_data.sequencing_date
-        )
+        sample.uploaded_pathogen_genome.sequencing_date = update_data.sequencing_date
         # workaround for our response serializer
         sample.show_private_identifier = True
 

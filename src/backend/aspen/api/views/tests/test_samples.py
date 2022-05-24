@@ -837,10 +837,7 @@ async def test_update_samples_success(
     # For any fields that got updated in our API request, update those values.
     for updated in request_data["samples"]:
         reorganized_data[updated["id"]].update(
-            {
-                key: updated.get(key)
-                for key in keys_to_check
-            }
+            {key: updated.get(key) for key in keys_to_check}
         )
 
     # Tell SqlAlchemy to forget about the samples in its identity map
@@ -888,12 +885,16 @@ async def test_update_samples_success(
                 api_response_value = api_response_value["id"]
             # Handle UploadedPathogenGenome fields
             elif field in genome_fields:
-                db_field_value = getattr(sample_pulled_from_db.uploaded_pathogen_genome, field)
+                db_field_value = getattr(
+                    sample_pulled_from_db.uploaded_pathogen_genome, field
+                )
             else:
                 db_field_value = getattr(sample_pulled_from_db, field)
             if "date" in field:
                 db_field_value = str(db_field_value) if db_field_value else None
-                request_field_value = str(request_field_value) if request_field_value else None
+                request_field_value = (
+                    str(request_field_value) if request_field_value else None
+                )
             # Check that the DB and our API Request match
             # TODO - this isn't handling auto generated values !!!!
             assert db_field_value == request_field_value

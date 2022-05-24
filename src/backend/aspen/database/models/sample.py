@@ -205,7 +205,9 @@ class Sample(idbase, DictMixin):  # type: ignore
         current_year: str = datetime.today().strftime("%Y")
         if already_exists:
             id = self.id
-            self.public_identifier = f"hCoV-19/{country}/{group_prefix}-{id}/{current_year}"
+            self.public_identifier = (
+                f"hCoV-19/{country}/{group_prefix}-{id}/{current_year}"
+            )
         else:
             self.public_identifier = func.concat(
                 f"hCoV-19/{country}/{group_prefix}-",
