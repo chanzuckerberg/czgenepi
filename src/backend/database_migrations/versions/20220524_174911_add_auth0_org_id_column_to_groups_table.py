@@ -17,7 +17,7 @@ depends_on = None
 def upgrade():
     op.add_column(
         "groups",
-        sa.Column("auth0_org_id", sa.String(), nullable=True),
+        sa.Column("auth0_org_id", sa.String(), nullable=False),
         schema="aspen",
     )
     op.create_unique_constraint(
