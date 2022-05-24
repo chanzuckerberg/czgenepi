@@ -121,7 +121,7 @@ async def get_owned_samples_by_ids(
     return results.scalars()
 
 
-@router.delete("/", response_model=SampleDeleteResponse)
+@router.delete("/", responses={200: {"model": SampleBulkDeleteResponse}})
 async def delete_samples(
     sample_info: SampleBulkDeleteRequest,
     request: Request,
@@ -144,7 +144,7 @@ async def delete_samples(
     return SampleBulkDeleteResponse(ids=db_ids)
 
 
-@router.delete("/{sample_id}", response_model=SampleDeleteResponse)
+@router.delete("/{sample_id}", responses={200: {"model": SampleDeleteResponse}})
 async def delete_sample(
     sample_id: int,
     request: Request,
