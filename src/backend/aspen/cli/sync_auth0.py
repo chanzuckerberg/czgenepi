@@ -39,18 +39,20 @@ class Auth0Role(TypedDict):
     name: str
 
 
+class Auth0Inviter(TypedDict):
+    name: str
+
+
+class Auth0Invitee(TypedDict):
+    email: str
+
+
 class Auth0Invitation(TypedDict):
-    class Inviter(TypedDict):
-        name: str
-
-    class Invitee(TypedDict):
-        email: str
-
     id: str
     created_at: str
     expires_at: str
-    inviter: Inviter
-    invitee: Invitee
+    inviter: Auth0Inviter
+    invitee: Auth0Invitee
 
 
 def generate_password(length: int = 22) -> str:

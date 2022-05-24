@@ -44,7 +44,7 @@ async def get_group_invitations(
         raise ex.UnauthorizedException("Not authorized")
     requested_group_query = sa.select(Group).where(Group.id == group_id)  # type: ignore
     requested_group_result = await db.execute(requested_group_query)
-    requested_group: Group = requested_group_result.scalars().one()
+    requested_group: Group = requested_group_result.scalars().one()  # noqa: F841
 
     auth0_client_id = settings.AUTH0_MANAGEMENT_CLIENT_ID
     auth0_client_secret = settings.AUTH0_MANAGEMENT_CLIENT_SECRET
