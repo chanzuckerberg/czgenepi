@@ -14,6 +14,7 @@ from starlette.requests import Request
 import aspen.api.error.http_exceptions as ex
 from aspen.api.deps import get_db, get_settings
 from aspen.api.settings import Settings
+from aspen.auth.auth0_management import Auth0Client
 from aspen.auth.device_auth import validate_auth_header
 from aspen.database.models import Group, User
 
@@ -87,3 +88,13 @@ async def get_auth_user(
 async def get_admin_user(auth_user: User = Depends(get_auth_user)) -> None:
     if not auth_user.system_admin:
         raise ex.UnauthorizedException("Not authorized")
+
+
+async def get_auth0_client(
+    request: Request, settings: Settings = Depends(get_settings)
+):
+    client_id: str = settings.AUTH0_MANAGEMENT_CLIENT_ID
+    client_secret: str = settings.AUTH0_MANAGEMENT_CLIENT_SECRET
+    domain: str = settings.AUTH0_MANAGEMENT_DOMAIN
+    auth0_client = Auth0Client(client_id, client_secret, domain)
+    return auth0_client
