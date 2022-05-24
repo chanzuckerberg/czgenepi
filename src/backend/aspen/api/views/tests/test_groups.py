@@ -26,7 +26,7 @@ async def test_list_members(
     await async_session.commit()
 
     response = await http_client.get(
-        f"/v2/groups/{group.id}/members", headers={"user_id": user.auth0_user_id}
+        f"/v2/groups/{group.id}/members/", headers={"user_id": user.auth0_user_id}
     )
     assert response.status_code == 200
     expected = {
@@ -69,7 +69,7 @@ async def test_list_members_unauthorized(
     await async_session.commit()
 
     response = await http_client.get(
-        f"/v2/groups/{group2.id}/members", headers={"user_id": user.auth0_user_id}
+        f"/v2/groups/{group2.id}/members/", headers={"user_id": user.auth0_user_id}
     )
     assert response.status_code == 403
 
@@ -83,8 +83,9 @@ async def test_list_group_invitations(
     await async_session.commit()
 
     response = await http_client.get(
-        f"/v2/groups/{group2.id}/invitations", headers={"user_id": user.auth0_user_id}
+        f"/v2/groups/{group.id}/invitations/", headers={"user_id": user.auth0_user_id}
     )
+    print(response.json())
     assert response.status_code == 200
 
 
@@ -103,6 +104,6 @@ async def test_list_group_invitations_unauthorized(
     await async_session.commit()
 
     response = await http_client.get(
-        f"/v2/groups/{group2.id}/invitations", headers={"user_id": user.auth0_user_id}
+        f"/v2/groups/{group2.id}/invitations/", headers={"user_id": user.auth0_user_id}
     )
     assert response.status_code == 403

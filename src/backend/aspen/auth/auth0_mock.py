@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from typing import List
 from uuid import uuid1
 
 from aspen.auth.auth0_management import Auth0Client, Auth0Invitation, Auth0Org

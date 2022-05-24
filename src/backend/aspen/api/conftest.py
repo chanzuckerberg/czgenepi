@@ -9,10 +9,12 @@ from fastapi import Depends, FastAPI, Request
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from aspen.api.auth import get_auth_user, setup_userinfo
-from aspen.api.deps import get_db
+from aspen.api.auth import get_auth0_client, get_auth_user, setup_userinfo
+from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.main import get_app
+from aspen.api.settings import Settings
+from aspen.auth.auth0_management import Auth0Client
 from aspen.auth.auth0_mock import MockAuth0Client
 from aspen.database import connection as aspen_connection
 from aspen.database import schema

@@ -12,6 +12,7 @@ from aspen.api.schemas.usergroup import (
     GroupInvitationsRequest,
     GroupInvitationsResponse,
     GroupMembersResponse,
+    InvitationsResponse,
 )
 from aspen.api.settings import Settings
 from aspen.auth.auth0_management import Auth0Client, Auth0Org
@@ -37,7 +38,7 @@ async def get_group_members(
     return GroupMembersResponse.parse_obj({"members": group_members})
 
 
-@router.get("/{group_id}/invitations", response_model=InvitationsResponse)
+@router.get("/{group_id}/invitations/", response_model=InvitationsResponse)
 async def get_group_invitations(
     group_id: int,
     request: Request,
