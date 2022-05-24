@@ -84,6 +84,7 @@ class Auth0Client:
         per_page = 25
         while True:
             resp = endpoint(page=page, per_page=per_page)
+            print("Endpoint response: ", resp)
             last_result = resp["start"] + resp["limit"]
             results.extend(resp[key])
             if last_result >= resp["total"]:
@@ -117,8 +118,20 @@ class Auth0Client:
         )
 
     def get_org_invitations(self, org: Auth0Org) -> List[Auth0Invitation]:
-        # Not a paginated endpoint
-        return self.client.organizations.all_organization_invitations(org["id"])
+        # Wow I love an endpoint with unique behavior!
+        # organizations.all_organization_invitations() returns a bare array, instead of
+        # the usual { 'start': 0, 'limit': 25, 'length': 25, 'keyword': [...] }
+        results = []
+        page = 0
+        per_page = 25
+        while True:
+            resp = self.client.organizations.all_organization_invitations(
+                org["id"], page=page, per_page=per_page
+            )
+            if not resp:
+                return results
+            results.extend(resp)
+            page += 1
 
     def add_org_member(self, org: Auth0Org, user_id: str) -> None:
         self.client.organizations.create_organization_members(
