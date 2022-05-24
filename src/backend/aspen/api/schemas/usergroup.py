@@ -46,10 +46,12 @@ class GroupMembersResponse(BaseResponse):
 
 
 class InvitationResponse(BaseResponse):
-    class Inviter(TypedDict):
+    class Inviter(BaseResponse):
         name: str
-    class Invitee(TypedDict):
+
+    class Invitee(BaseResponse):
         email: str
+
     id: str
     created_at: str
     expires_at: str

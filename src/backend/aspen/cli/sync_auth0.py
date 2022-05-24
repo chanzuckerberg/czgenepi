@@ -12,7 +12,6 @@ from auth0.v3 import authentication as auth0_authentication
 from auth0.v3.management import Auth0
 from sqlalchemy.orm.session import Session
 
-from aspen.api.settings import Settings
 from aspen.config.config import Config
 from aspen.database.connection import (
     get_db_uri,
@@ -43,8 +42,10 @@ class Auth0Role(TypedDict):
 class Auth0Invitation(TypedDict):
     class Inviter(TypedDict):
         name: str
+
     class Invitee(TypedDict):
         email: str
+
     id: str
     created_at: str
     expires_at: str
@@ -65,7 +66,7 @@ class Auth0Client:
         client_id: str,
         client_secret: str,
         domain: str,
-        ) -> None:
+    ) -> None:
         auth_req = auth0_authentication.GetToken(domain)
         token = auth_req.client_credentials(
             client_id, client_secret, f"https://{domain}/api/v2/"
@@ -446,7 +447,9 @@ def cli(
     client_id = os.environ["AUTH0_CLIENT_ID"]
     client_secret = os.environ["AUTH0_CLIENT_SECRET"]
     domain = os.environ["AUTH0_DOMAIN"]
-    auth0_client = Auth0Client(client_id=client_id, client_secret=client_secret, domain=domain)
+    auth0_client = Auth0Client(
+        client_id=client_id, client_secret=client_secret, domain=domain
+    )
 
     logging.basicConfig(
         format="%(levelname)s %(asctime)s - %(message)s", level=logging.INFO

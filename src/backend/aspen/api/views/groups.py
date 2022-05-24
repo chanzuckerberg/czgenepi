@@ -1,5 +1,3 @@
-import json
-
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -45,7 +43,11 @@ async def get_group_invitations(
     auth0_client_id = settings.AUTH0_MANAGEMENT_CLIENT_ID
     auth0_client_secret = settings.AUTH0_MANAGEMENT_CLIENT_SECRET
     auth0_domain = settings.AUTH0_DOMAIN
-    auth0_client = Auth0Client(client_id=auth0_client_id, client_secret=auth0_client_secret, domain=auth0_domain)
+    auth0_client = Auth0Client(
+        client_id=auth0_client_id,
+        client_secret=auth0_client_secret,
+        domain=auth0_domain,
+    )
     orgs = auth0_client.get_orgs()
     czi_org: Auth0Org = next(org for org in orgs if org["display_name"] == "CZI")
     invitations = auth0_client.get_org_invitations(czi_org)
