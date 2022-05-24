@@ -920,6 +920,11 @@ async def test_update_samples_access_denied(
             {
                 "id": samples2[0].id,
                 "private_identifier": "new_private_identifier",
+                "public_identifier": "new_public_identifier",
+                "collection_location": samples2[0].location_id,
+                "private": True,
+                "sequencing_date": None,
+                "collection_date": "2021-11-11",
             }
         ]
     }
@@ -947,14 +952,26 @@ async def test_update_samples_request_failures(
         [
             {
                 "id": samples[0].id,
-                "collection_location": 9999,  # Use a location id that doesn't exist
+                "collection_location": 9999, 
+                "private_identifier": "new_private_identifier",
+                "public_identifier": "new_public_identifier",
+                "private": True,
+                "sequencing_date": None,
+                "collection_date": "2021-11-11",
+                 # Use a location id that doesn't exist
             },
             400,
         ],
         [
             {
                 "id": samples[0].id,
-                "sequencing_date": "kapow",  # date deserialization failure
+                "sequencing_date": "kapow", # date deserialization failure
+                "private_identifier": "new_private_identifier_1",
+                "public_identifier": "new_public_identifier_1",
+                "private": True,
+                "sequencing_date": None,
+                "collection_date": "2021-11-11", 
+                "collection_location": samples[0].location_id,
             },
             422,
         ],
@@ -962,6 +979,11 @@ async def test_update_samples_request_failures(
             {
                 "id": samples[0].id,
                 "private": "something",  # Bad boolean
+                "private_identifier": "new_private_identifier_2",
+                "public_identifier": "new_public_identifier_2",
+                "sequencing_date": None,
+                "collection_date": "2021-11-11", 
+                "collection_location": samples[0].location_id,
             },
             422,
         ],
@@ -971,6 +993,11 @@ async def test_update_samples_request_failures(
                 "public_identifier": samples[
                     1
                 ].public_identifier,  # Trigger duplicate identifier error
+                "private_identifier": "new_private_identifier_3",
+                "private": True,
+                "sequencing_date": None,
+                "collection_date": "2021-11-11", 
+                "collection_location": samples[0].location_id,
             },
             400,
         ],
@@ -980,6 +1007,11 @@ async def test_update_samples_request_failures(
                 "private_identifier": samples[
                     1
                 ].private_identifier,  # Trigger duplicate identifier error
+                "public_identifier": "new_public_identifier_4",
+                "private": True,
+                "sequencing_date": None,
+                "collection_date": "2021-11-11", 
+                "collection_location": samples[0].location_id,
             },
             400,
         ],
@@ -992,6 +1024,8 @@ async def test_update_samples_request_failures(
             json=data,
             headers=auth_headers,
         )
+        if res.status_code != response_code:
+            import pdb; pdb.set_trace()
         assert res.status_code == response_code
 
 
