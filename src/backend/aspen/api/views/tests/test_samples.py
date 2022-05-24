@@ -978,7 +978,7 @@ async def test_update_samples_request_failures(
                 "id": samples[0].id,
                 "private": True,
                 "private_identifier": "new_private_identifier_2",
-                "public_identifier": "", # empty strings not allowed
+                "public_identifier": "",  # empty strings not allowed
                 "sequencing_date": None,
                 "collection_date": "2021-11-11",
                 "collection_location": samples[0].location_id,
