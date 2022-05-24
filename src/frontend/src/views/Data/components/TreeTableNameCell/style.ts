@@ -2,12 +2,14 @@ import styled from "@emotion/styled";
 import {
   CommonThemeProps,
   fontBodyXxs,
+  fontHeaderXs,
   getColors,
   getIconSizes,
   getSpaces,
 } from "czifui";
 import { StyledInfoOutlinedIcon as InfoIcon } from "src/common/components/library/data_subview/components/CreateNSTreeModal/style";
 import { TreeRowContent } from "src/common/components/library/data_table/style";
+import TreeIcon from "src/common/icons/PhyloTree.svg";
 
 export interface ExtraProps extends CommonThemeProps {
   disabled?: boolean;
@@ -18,6 +20,10 @@ const doNotForwardProps = ["disabled"];
 export const StyledRowContent = styled(TreeRowContent, {
   shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
 })`
+  ${fontHeaderXs}
+
+  display: flex;
+  align-items: center;
   flex: 2 0 40%;
   justify-content: left;
 
@@ -27,7 +33,6 @@ export const StyledRowContent = styled(TreeRowContent, {
     if (disabled) return;
 
     return `
-
       cursor: pointer;
     `;
   }}
@@ -71,4 +76,16 @@ const xSmallIcon = (props: CommonThemeProps) => {
 
 export const StyledInfoIcon = styled(InfoIcon)`
   ${xSmallIcon}
+`;
+
+export const StyledTreeIcon = styled(TreeIcon)`
+  ${(props) => {
+    const colors = getColors(props);
+    const spaces = getSpaces(props);
+
+    return `
+      margin: 0 ${spaces?.l}px;
+      fill: ${colors?.gray[500]};
+    `;
+  }}
 `;

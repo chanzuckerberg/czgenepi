@@ -7,12 +7,11 @@ import {
   defaultSampleCellRenderer,
   defaultTreeCellRenderer,
 } from "src/common/components/library/data_table";
-import dataTableStyle from "src/common/components/library/data_table/index.module.scss";
 import {
+  Cell,
   RowContent,
   TreeRowContent,
 } from "src/common/components/library/data_table/style";
-import SampleIcon from "src/common/icons/Sample.svg";
 import { createTableCellRenderer } from "src/common/utils";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { CZ_BIOHUB_GROUP } from "src/views/Data/constants";
@@ -27,6 +26,7 @@ import {
   PrivateIdValueWrapper,
   SampleIconWrapper,
   StyledChip,
+  StyledSampleIcon,
   StyledUploaderName,
   Subtext,
   UnderlinedCell,
@@ -52,12 +52,7 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
     const location = value.location ?? value.division;
     return (
       <RowContent>
-        <div
-          className={dataTableStyle.cell}
-          data-test-id={`row-collectionLocation`}
-        >
-          {location}
-        </div>
+        <Cell data-test-id={`row-collectionLocation`}>{location}</Cell>
       </RowContent>
     );
   },
@@ -66,7 +61,7 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
 
     return (
       <RowContent>
-        <GISAIDCell className={dataTableStyle.cell}>
+        <GISAIDCell>
           {status}
           {gisaid_id && <Subtext>{gisaid_id}</Subtext>}
         </GISAIDCell>
@@ -80,9 +75,7 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
 
     const Content = (
       <Component>
-        <UnderlinedCell className={dataTableStyle.cell}>
-          {value.lineage || "Not Yet Processed"}
-        </UnderlinedCell>
+        <Cell>{value.lineage || "Not Yet Processed"}</Cell>
       </Component>
     );
 
@@ -122,9 +115,9 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
 
     return (
       <RowContent>
-        <div className={dataTableStyle.cell}>
+        <Cell>
           <SampleIconWrapper>
-            <SampleIcon className={dataTableStyle.icon} />
+            <StyledSampleIcon />
             <PrivacyIcon>
               {isPrivate ? (
                 <Lock color="primary" />
@@ -145,7 +138,7 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
             </CenteredFlexContainer>
             <StyledUploaderName>{displayName}</StyledUploaderName>
           </PrivateIdValueWrapper>
-        </div>
+        </Cell>
       </RowContent>
     );
   },

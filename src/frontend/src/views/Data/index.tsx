@@ -1,9 +1,7 @@
-import cx from "classnames";
 import { compact, map, uniq } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { FunctionComponent, useEffect, useMemo, useState } from "react";
-import { Menu } from "semantic-ui-react";
 import { HeadAppTitle } from "src/common/components";
 import { useProtectedRoute } from "src/common/queries/auth";
 import { usePhyloRunInfo } from "src/common/queries/phyloRuns";
@@ -17,8 +15,16 @@ import { PAGE_TITLES } from "../../common/titles";
 import { SampleRenderer, TreeRenderer } from "./cellRenderers";
 import { FilterPanelToggle } from "./components/FilterPanelToggle";
 import { SAMPLE_HEADERS, SAMPLE_SUBHEADERS, TREE_HEADERS } from "./headers";
-import style from "./index.module.scss";
-import { Container, FlexContainer } from "./style";
+import {
+  Category,
+  CategoryTitle,
+  Container,
+  Navigation,
+  StyledCount,
+  StyledMenu,
+  StyledMenuItem,
+  View,
+} from "./style";
 import { PHYLO_RUN_TRANSFORMS } from "./transforms";
 
 // reduces an array of objects to a mapping between the keyString arg and the objects
@@ -128,28 +134,20 @@ const Data: FunctionComponent = () => {
 
   // create JSX elements from categories
   dataCategories.forEach((category) => {
-    let focusStyle = null;
-
-    if (router.asPath === category.to) {
-      focusStyle = style.active;
-    }
-
     dataJSX.menuItems.push(
       <Link href={category.to} key={category.text} passHref>
         <a href="passHref">
-          <Menu.Item className={style.menuItem}>
-            <div className={style.category}>
-              <div
-                className={cx(style.title, focusStyle)}
+          <StyledMenuItem>
+            <Category>
+              <CategoryTitle
+                isActive={router.asPath === category.to}
                 data-test-id="data-menu-item"
               >
                 {category.text}
-              </div>
-              <div className={style.count}>
-                {Object.keys(category.data).length}
-              </div>
-            </div>
-          </Menu.Item>
+              </CategoryTitle>
+              <StyledCount>{Object.keys(category.data).length}</StyledCount>
+            </Category>
+          </StyledMenuItem>
         </a>
       </Link>
     );
@@ -175,24 +173,19 @@ const Data: FunctionComponent = () => {
     });
 
   return (
-    <Container className={style.dataRoot}>
+    <Container>
       <HeadAppTitle subTitle={subTitle} />
 
-      <FlexContainer
-        className={style.navigation}
-        data-test-id="data-menu-items"
-      >
+      <Navigation data-test-id="data-menu-items">
         <FilterPanelToggle
           activeFilterCount={activeFilterCount}
           onClick={() => {
             setShouldShowFilters(!shouldShowFilters);
           }}
         />
-        <Menu className={style.menu} secondary>
-          {dataJSX.menuItems}
-        </Menu>
-      </FlexContainer>
-      <FlexContainer className={style.view}>
+        <StyledMenu secondary>{dataJSX.menuItems}</StyledMenu>
+      </Navigation>
+      <View>
         {viewName === "Samples" && (
           // TODO (mlila): replace with sds filterpanel once it's complete
           <FilterPanel
@@ -213,7 +206,7 @@ const Data: FunctionComponent = () => {
           viewName={viewName}
           dataFilterFunc={viewName === "Samples" ? dataFilterFunc : undefined}
         />
-      </FlexContainer>
+      </View>
     </Container>
   );
 };

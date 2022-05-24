@@ -95,8 +95,6 @@ For more details, visit Emotion's styled component doc [here](https://emotion.sh
 
 For using `czifui`, please visit the repo [here](https://github.com/chanzuckerberg/sci-components)
 
-NOTE: The app still has deprecated CSS Module and scss usage that needs to be refactored
-
 ### Theming
 
 CZ Gen Epi customizes the default `czifui` theme, in order to have its unique brand identity. As a result, when styling the components in CZ Gen Epi we need to use the custom theme object when writing CSS rules.
@@ -110,7 +108,7 @@ export const Foo = styled.div`
   // This is the design system's font body medium mixin we import from czifui
   ${fontBodyM}
 
-  // This is the regular css rules
+  // This is where the regular css rules go
   overflow: auto;
 
   // This is a callback function that returns more CSS rules, but the only way
