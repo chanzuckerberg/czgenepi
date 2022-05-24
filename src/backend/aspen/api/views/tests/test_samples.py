@@ -976,9 +976,21 @@ async def test_update_samples_request_failures(
         [
             {
                 "id": samples[0].id,
-                "private": "something",  # Bad boolean
+                "private": True,
                 "private_identifier": "new_private_identifier_2",
-                "public_identifier": "new_public_identifier_2",
+                "public_identifier": "", # empty strings not allowed
+                "sequencing_date": None,
+                "collection_date": "2021-11-11",
+                "collection_location": samples[0].location_id,
+            },
+            422,
+        ],
+        [
+            {
+                "id": samples[0].id,
+                "private": "something",  # Bad boolean
+                "private_identifier": "new_private_identifier_3",
+                "public_identifier": "new_public_identifier_3",
                 "sequencing_date": None,
                 "collection_date": "2021-11-11",
                 "collection_location": samples[0].location_id,
@@ -991,7 +1003,7 @@ async def test_update_samples_request_failures(
                 "public_identifier": samples[
                     1
                 ].public_identifier,  # Trigger duplicate identifier error
-                "private_identifier": "new_private_identifier_3",
+                "private_identifier": "new_private_identifier_4",
                 "private": True,
                 "sequencing_date": None,
                 "collection_date": "2021-11-11",
@@ -1005,7 +1017,7 @@ async def test_update_samples_request_failures(
                 "private_identifier": samples[
                     1
                 ].private_identifier,  # Trigger duplicate identifier error
-                "public_identifier": "new_public_identifier_4",
+                "public_identifier": "new_public_identifier_5",
                 "private": True,
                 "sequencing_date": None,
                 "collection_date": "2021-11-11",
