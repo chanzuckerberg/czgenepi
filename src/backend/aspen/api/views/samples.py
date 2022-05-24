@@ -208,7 +208,7 @@ async def update_samples(
         )
         # workaround for our response serializer
         sample.show_private_identifier = True
-        
+
         sample.generate_public_identifier(already_exists=True)
         res.samples.append(SampleResponse.from_orm(sample))
 

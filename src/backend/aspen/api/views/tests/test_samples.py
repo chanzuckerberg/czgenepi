@@ -825,7 +825,7 @@ async def test_update_samples_success(
         sample_dict = {
             key: getattr(sample, key)
             for key in keys_to_check
-            if key not in ["sequencing_date"] 
+            if key not in ["sequencing_date"]
         }
         if sample.uploaded_pathogen_genome:
             sample_dict[
@@ -833,7 +833,7 @@ async def test_update_samples_success(
             ] = sample.uploaded_pathogen_genome.sequencing_date
         sample_dict["collection_location"] = sample.collection_location.id
         reorganized_data[sample.id] = sample_dict
-    
+
     # For any fields that got updated in our API request, update those values.
     for updated in request_data["samples"]:
         reorganized_data[updated["id"]].update(
@@ -952,25 +952,23 @@ async def test_update_samples_request_failures(
         [
             {
                 "id": samples[0].id,
-                "collection_location": 9999, 
+                "collection_location": 9999,  # Use a location id that doesn't exist
                 "private_identifier": "new_private_identifier",
                 "public_identifier": "new_public_identifier",
                 "private": True,
                 "sequencing_date": None,
                 "collection_date": "2021-11-11",
-                 # Use a location id that doesn't exist
             },
             400,
         ],
         [
             {
                 "id": samples[0].id,
-                "sequencing_date": "kapow", # date deserialization failure
+                "sequencing_date": "kapow",  # date deserialization failure
                 "private_identifier": "new_private_identifier_1",
                 "public_identifier": "new_public_identifier_1",
                 "private": True,
-                "sequencing_date": None,
-                "collection_date": "2021-11-11", 
+                "collection_date": "2021-11-11",
                 "collection_location": samples[0].location_id,
             },
             422,
@@ -982,7 +980,7 @@ async def test_update_samples_request_failures(
                 "private_identifier": "new_private_identifier_2",
                 "public_identifier": "new_public_identifier_2",
                 "sequencing_date": None,
-                "collection_date": "2021-11-11", 
+                "collection_date": "2021-11-11",
                 "collection_location": samples[0].location_id,
             },
             422,
@@ -996,7 +994,7 @@ async def test_update_samples_request_failures(
                 "private_identifier": "new_private_identifier_3",
                 "private": True,
                 "sequencing_date": None,
-                "collection_date": "2021-11-11", 
+                "collection_date": "2021-11-11",
                 "collection_location": samples[0].location_id,
             },
             400,
@@ -1010,7 +1008,7 @@ async def test_update_samples_request_failures(
                 "public_identifier": "new_public_identifier_4",
                 "private": True,
                 "sequencing_date": None,
-                "collection_date": "2021-11-11", 
+                "collection_date": "2021-11-11",
                 "collection_location": samples[0].location_id,
             },
             400,
@@ -1024,8 +1022,6 @@ async def test_update_samples_request_failures(
             json=data,
             headers=auth_headers,
         )
-        if res.status_code != response_code:
-            import pdb; pdb.set_trace()
         assert res.status_code == response_code
 
 
