@@ -33,6 +33,8 @@ class Group(idbase, DictMixin):  # type: ignore
     division = Column(String, nullable=True)
     location = Column(String, nullable=True)
 
+    auth0_org_id = Column(String, unique=True, nullable=False)
+
     # Default location context (int'l or division or location level)
     default_tree_location_id = Column(
         Integer,
