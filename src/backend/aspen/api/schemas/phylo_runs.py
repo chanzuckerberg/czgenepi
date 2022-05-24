@@ -68,6 +68,8 @@ class PhyloRunResponse(BaseResponse):
     # Workarounds for our SQLAlchemy enums
     @validator("tree_type", "workflow_status", pre=True)
     def resolve_enums(cls, v):
+        if isinstance(v, str):
+            return v
         return v.value
 
     @root_validator(pre=False)

@@ -40,7 +40,7 @@ async def update_user_info(
 
 
 # Requires prior auth0 account for the new user.
-@router.post("/")
+@router.post("/", response_model=UserMeResponse)
 async def post_usergroup(
     user_creation_request: UserPostRequest,
     db: AsyncSession = Depends(get_db),

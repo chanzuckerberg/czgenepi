@@ -377,6 +377,22 @@ def get_group_imembers(ctx, group_id):
     resp = api_client.get(f"/v2/groups/{group_id}/members")
     print(resp.text)
 
+@group.command(name="invite")
+@click.argument("group_id")
+@click.argument("email")
+@click.option("--role", help="Role to invite the user to",
+    type=click.Choice(["admin", "member"], case_sensitive=False),
+    default="member")
+@click.pass_context
+def invite_group_members(ctx, group_id, email, role):
+    api_client = ctx.obj["api_client"]
+    body = {
+        "role": role,
+        "emails": [email],
+    }
+    resp = api_client.post(f"/v2/groups/{group_id}/invitations/", json=body)
+    print(resp.text)
+
 @cli.group()
 def userinfo():
     pass

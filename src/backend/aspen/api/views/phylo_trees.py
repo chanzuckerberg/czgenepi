@@ -29,7 +29,7 @@ async def get_single_phylo_tree(
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_auth_user),
-):
+) -> JSONResponse:
     phylo_tree_data = await process_phylo_tree(
         db, user, item_id, request.query_params.get("id_style")
     )
