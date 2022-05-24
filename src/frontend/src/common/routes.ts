@@ -22,4 +22,5 @@ export enum ROUTES {
   UPLOAD_STEP2 = "/upload/2",
   UPLOAD_STEP3 = "/upload/3",
   USHER = "https://genome.ucsc.edu/cgi-bin/hgPhyloPlace",
+  GROUP_MEMBERS = "/members",
 }
