@@ -850,7 +850,6 @@ async def test_update_samples_success(
         headers=auth_headers,
     )
     api_response = {row["id"]: row for row in res.json()["samples"]}
-    print("api_response: ", api_response)
 
     assert res.status_code == 200
 

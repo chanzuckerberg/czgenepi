@@ -203,7 +203,7 @@ async def update_samples(
             sample.collection_location = loc
 
         # Sequencing date is handled specially
-        sample.uploaded_pathogen_genome.sequencing_date = update_data.sequencing_date
+        sample.uploaded_pathogen_genome.sequencing_date = update_data.sequencing_date  # type: ignore
         # workaround for our response serializer
         sample.show_private_identifier = True
 
