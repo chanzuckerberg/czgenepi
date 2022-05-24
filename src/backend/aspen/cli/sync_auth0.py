@@ -12,6 +12,7 @@ from auth0.v3 import authentication as auth0_authentication
 from auth0.v3.management import Auth0
 from sqlalchemy.orm.session import Session
 
+from aspen.api.settings import Settings
 from aspen.config.config import Config
 from aspen.database.connection import (
     get_db_uri,
@@ -39,6 +40,18 @@ class Auth0Role(TypedDict):
     name: str
 
 
+class Auth0Invitation(TypedDict):
+    class Inviter(TypedDict):
+        name: str
+    class Invitee(TypedDict):
+        email: str
+    id: str
+    created_at: str
+    expires_at: str
+    inviter: Inviter
+    invitee: Invitee
+
+
 def generate_password(length: int = 22) -> str:
     possible_characters = (
         string.ascii_uppercase + string.ascii_lowercase + string.digits
@@ -47,11 +60,12 @@ def generate_password(length: int = 22) -> str:
 
 
 class Auth0Client:
-    def __init__(self) -> None:
-        # TODO these will need to be read from settings instead of env.
-        client_id: str = os.environ["AUTH0_CLIENT_ID"]
-        client_secret: str = os.environ["AUTH0_CLIENT_SECRET"]
-        domain: str = os.environ["AUTH0_DOMAIN"]
+    def __init__(
+        self,
+        client_id: str,
+        client_secret: str,
+        domain: str,
+        ) -> None:
         auth_req = auth0_authentication.GetToken(domain)
         token = auth_req.client_credentials(
             client_id, client_secret, f"https://{domain}/api/v2/"
@@ -98,6 +112,10 @@ class Auth0Client:
             partial(self.client.organizations.all_organization_members, org["id"]),
             "members",
         )
+
+    def get_org_invitations(self, org: Auth0Org) -> List[Auth0Invitation]:
+        # Not a paginated endpoint
+        return self.client.organizations.all_organization_invitations(org["id"])
 
     def add_org_member(self, org: Auth0Org, user_id: str) -> None:
         self.client.organizations.create_organization_members(
@@ -425,7 +443,10 @@ def cli(
     sync_users: bool,
     sync_memberships: bool,
 ) -> None:
-    auth0_client = Auth0Client()
+    client_id = os.environ["AUTH0_CLIENT_ID"]
+    client_secret = os.environ["AUTH0_CLIENT_SECRET"]
+    domain = os.environ["AUTH0_DOMAIN"]
+    auth0_client = Auth0Client(client_id=client_id, client_secret=client_secret, domain=domain)
 
     logging.basicConfig(
         format="%(levelname)s %(asctime)s - %(message)s", level=logging.INFO
