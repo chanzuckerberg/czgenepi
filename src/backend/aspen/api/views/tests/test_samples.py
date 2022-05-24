@@ -785,6 +785,11 @@ async def test_update_samples_success(
             {
                 "id": samples[0].id,
                 "private_identifier": "new_private_identifier",
+                "public_identifier": "new_public_identifier1",
+                "private": True,
+                "collection_location": newlocation.id,
+                "sequencing_date": "2021-10-10",
+                "collection_date": "2021-11-11",
             },
             {
                 "id": samples[1].id,
@@ -797,9 +802,12 @@ async def test_update_samples_success(
             },
             {
                 "id": samples[2].id,
+                "public_identifier": None,
                 "private_identifier": "new_public_identifier3",
-                "public_identifier": "",
-                "sequencing_date": "",
+                "collection_location": newlocation.id,
+                "private": True,
+                "sequencing_date": None,
+                "collection_date": "2021-11-11",
             },
         ]
     }
@@ -832,7 +840,6 @@ async def test_update_samples_success(
             {
                 key: updated.get(key)
                 for key in keys_to_check
-                if updated.get(key) is not None
             }
         )
 
@@ -845,11 +852,9 @@ async def test_update_samples_success(
         json=request_data,
         headers=auth_headers,
     )
-    print("res.json", res.json())
-    print("res: ", res)
     api_response = {row["id"]: row for row in res.json()["samples"]}
-    print("original sample data: (expected)", reorganized_data)
-    print("api_response:", api_response)
+    print("api_response: ", api_response)
+
     assert res.status_code == 200
 
     sample_fields = [
@@ -875,6 +880,8 @@ async def test_update_samples_success(
         for field in sample_fields + location_fields + genome_fields:
             api_response_value = api_response[sample_id].get(field)
             request_field_value = expected[field]
+            if field == "public_identifier" and request_field_value is None:
+                request_field_value = f"hCoV-19/USA/testgroupNone-{sample_id}/2022"
             # Handle location fields
             if field in location_fields:
                 db_field_value = getattr(sample_pulled_from_db, field).id
@@ -885,11 +892,12 @@ async def test_update_samples_success(
             else:
                 db_field_value = getattr(sample_pulled_from_db, field)
             if "date" in field:
-                db_field_value = str(db_field_value)
-                request_field_value = str(request_field_value)
+                db_field_value = str(db_field_value) if db_field_value else None
+                request_field_value = str(request_field_value) if request_field_value else None
             # Check that the DB and our API Request match
+            # TODO - this isn't handling auto generated values !!!!
             assert db_field_value == request_field_value
-            # Check that the DB an dour API Response match.
+            # Check that the DB and our API Response match.
             assert db_field_value == api_response_value
 
 

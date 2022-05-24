@@ -3,7 +3,7 @@ import json
 import os
 import re
 import threading
-from typing import Any, List, Mapping, Optional, Sequence, Set, Union
+from typing import Any, List, Mapping, Optional, Sequence, Set, Union, MutableSequence
 
 import sentry_sdk
 import sqlalchemy as sa
@@ -179,7 +179,7 @@ async def update_samples(
 
     # Make sure these samples exist and are delete-able by the current user.
     sample_db_res = await get_owned_samples_by_ids(db, sample_ids_to_update, user)
-    editable_samples = sample_db_res.all()
+    editable_samples: MutableSequence[Sample] = sample_db_res.all()
 
     # are there any samples that can't be updated?
     uneditable_samples = [
@@ -187,43 +187,30 @@ async def update_samples(
     ]
     if uneditable_samples:
         raise ex.NotFoundException("some samples cannot be updated")
-    # Fields we have to fill (or not):
-    # collection_location: Optional[int]
-    # sequencing_date: Optional[datetime.date]
-
-    # private: Optional[bool]
-    # private_identifier: Optional[constr(min_length=1, max_length=128, strict=True)]  # type: ignore
-    # public_identifier: Optional[constr(min_length=1, max_length=128, strict=True)]   # type: ignore
 
     res = SamplesResponse(samples=[])
     for sample in editable_samples:
         update_data = reorganized_request_data[sample.id]
-        print("update data: ", update_data)
         for key, value in update_data:
             if key in ["collection_location", "sequencing_date"]:
-                if value is None:
-                    setattr(sample, key, value)
                 continue
-            #if value is not None:  # We need to be able to set private to False!
-            # elif key in ["private", "private_identifier", "public_identifier", "collection_date"]:
-            # if value is not None:
             setattr(sample, key, value)
-            # else:
-            #     setattr(sample, key, value)
         # Location id is handled specially
         if update_data.collection_location:
             loc = await db.get(Location, update_data.collection_location)
             if not loc:
                 raise ex.BadRequestException("location is invalid")
             sample.collection_location = loc
+
         # Sequencing date is handled specially
         sample.uploaded_pathogen_genome.sequencing_date = (
             update_data.sequencing_date
         )
+        # workaround for our response serializer
         sample.show_private_identifier = True
+        
         sample.generate_public_identifier(already_exists=True)
         res.samples.append(SampleResponse.from_orm(sample))
-        # res.samples.append(sample)
 
     try:
         await db.commit()

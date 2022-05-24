@@ -248,10 +248,10 @@ export function useDeleteSamples({
 interface SamplesEditPayloadType {
   id: number;
   private_identifier?: string;
-  public_identifier?: string;
+  public_identifier?: string | null;
   private?: boolean;
   collection_location?: number;
-  sequencing_date?: string;
+  sequencing_date?: string | null;
   collection_date?: string;
 }
 
