@@ -20,10 +20,10 @@ def upgrade():
         sa.Column("auth0_org_id", sa.String(), nullable=True),
         schema="aspen",
     )
+    op.execute(sa.sql.text("UPDATE aspen.groups SET auth0_org_id = 'MIGRATION PLACEHOLDER'"))
     op.create_unique_constraint(
         op.f("uq_groups_auth0_org_id"), "groups", ["auth0_org_id"], schema="aspen"
     )
-    op.execute(sa.sql.text("UPDATE aspen.groups SET auth0_org_id = 'MIGRATION PLACEHOLDER'"))
     op.alter_column("groups", "auth0_org_id", nullable=False)
 
 
