@@ -9,7 +9,7 @@ from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.usergroup import GroupMembersResponse, InvitationsResponse
 from aspen.api.settings import Settings
 from aspen.cli.sync_auth0 import Auth0Client, Auth0Org
-from aspen.database.models import User
+from aspen.database.models import Group, User
 
 router = APIRouter()
 
@@ -21,7 +21,7 @@ async def get_group_members(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_auth_user),
 ) -> GroupMembersResponse:
-    if user.group.id != group_id:
+    if user.group.id != group_id and not user.system_admin:
         raise ex.UnauthorizedException("Not authorized")
     group_members_query = (
         sa.select(User).where(User.group_id == group_id).order_by(User.name.asc())  # type: ignore
@@ -40,6 +40,12 @@ async def get_group_invitations(
     user: User = Depends(get_auth_user),
 ) -> InvitationsResponse:
     # TODO: Figure out how a db group relates to an auth0 org
+    if user.group.id != group_id and not user.system_admin:
+        raise ex.UnauthorizedException("Not authorized")
+    requested_group_query = sa.select(Group).where(Group.id == group_id)  # type: ignore
+    requested_group_result = await db.execute(requested_group_query)
+    requested_group: Group = requested_group_result.scalars().one()
+
     auth0_client_id = settings.AUTH0_MANAGEMENT_CLIENT_ID
     auth0_client_secret = settings.AUTH0_MANAGEMENT_CLIENT_SECRET
     auth0_domain = settings.AUTH0_DOMAIN
@@ -49,6 +55,10 @@ async def get_group_invitations(
         domain=auth0_domain,
     )
     orgs = auth0_client.get_orgs()
-    czi_org: Auth0Org = next(org for org in orgs if org["display_name"] == "CZI")
-    invitations = auth0_client.get_org_invitations(czi_org)
+    # Presumably the org-db connection would look something like this
+    # auth0_org: Auth0Org = next(org for org in orgs if org["id"] == requested_group.auth0_org_id)
+    auth0_org: Auth0Org = next(
+        org for org in orgs if org["display_name"] == user.group.name
+    )
+    invitations = auth0_client.get_org_invitations(auth0_org)
     return InvitationsResponse.parse_obj({"invitations": invitations})
