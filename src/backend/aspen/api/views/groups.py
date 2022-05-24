@@ -49,7 +49,7 @@ async def invite_group_members(
     if user.group.id != group_id:
         raise ex.UnauthorizedException("Not authorized")
     group = (
-        (await db.execute(sa.select(Group).where(Group.id == group_id))).scalars().one()
+        (await db.execute(sa.select(Group).where(Group.id == group_id))).scalars().one()  # type: ignore
     )
     organization = auth0_client.get_org(group.name)
     client_id = settings.AUTH0_CLIENT_ID

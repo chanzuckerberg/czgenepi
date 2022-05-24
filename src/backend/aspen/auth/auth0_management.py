@@ -38,10 +38,6 @@ def generate_password(length: int = 22) -> str:
 
 class Auth0Client:
     def __init__(self, client_id, client_secret, domain) -> None:
-        # TODO these will need to be read from settings instead of env.
-        # client_id: str = settings.AUTH0_MANAGEMENT_CLIENT_ID
-        # client_secret: str = settings.AUTH0_MANAGEMENT_CLIENT_SECRET
-        # domain: str = settings.AUTH0_MANAGEMENT_DOMAIN
         auth_req = auth0_authentication.GetToken(domain)
         token = auth_req.client_credentials(
             client_id, client_secret, f"https://{domain}/api/v2/"
