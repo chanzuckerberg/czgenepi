@@ -187,15 +187,29 @@ async def update_samples(
     ]
     if uneditable_samples:
         raise ex.NotFoundException("some samples cannot be updated")
+    # Fields we have to fill (or not):
+    # collection_location: Optional[int]
+    # sequencing_date: Optional[datetime.date]
+
+    # private: Optional[bool]
+    # private_identifier: Optional[constr(min_length=1, max_length=128, strict=True)]  # type: ignore
+    # public_identifier: Optional[constr(min_length=1, max_length=128, strict=True)]   # type: ignore
 
     res = SamplesResponse(samples=[])
     for sample in editable_samples:
         update_data = reorganized_request_data[sample.id]
+        print("update data: ", update_data)
         for key, value in update_data:
             if key in ["collection_location", "sequencing_date"]:
+                if value is None:
+                    setattr(sample, key, value)
                 continue
             #if value is not None:  # We need to be able to set private to False!
+            # elif key in ["private", "private_identifier", "public_identifier", "collection_date"]:
+            # if value is not None:
             setattr(sample, key, value)
+            # else:
+            #     setattr(sample, key, value)
         # Location id is handled specially
         if update_data.collection_location:
             loc = await db.get(Location, update_data.collection_location)
@@ -208,8 +222,8 @@ async def update_samples(
         )
         sample.show_private_identifier = True
         sample.generate_public_identifier(already_exists=True)
-        #res.samples.append(SampleResponse.from_orm(sample))
-        res.samples.append(sample)
+        res.samples.append(SampleResponse.from_orm(sample))
+        # res.samples.append(sample)
 
     try:
         await db.commit()

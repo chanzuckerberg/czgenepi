@@ -113,8 +113,8 @@ class UpdateSamplesBaseRequest(BaseRequest):
     id: int
     collection_date: Optional[datetime.date]
     collection_location: Optional[int]
-    private: Optional[bool]
-    private_identifier: Optional[constr(min_length=1, max_length=128, strict=True)]  # type: ignore
+    private: bool
+    private_identifier: constr(min_length=1, max_length=128, strict=True)  # type: ignore
     public_identifier: Optional[constr(min_length=1, max_length=128, strict=True)]   # type: ignore
     sequencing_date: Optional[datetime.date]
 

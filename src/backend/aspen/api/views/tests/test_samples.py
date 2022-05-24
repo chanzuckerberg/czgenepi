@@ -780,7 +780,7 @@ async def test_update_samples_success(
 
     auth_headers = {"user_id": user.auth0_user_id}
 
-    data = {
+    request_data = {
         "samples": [
             {
                 "id": samples[0].id,
@@ -798,6 +798,8 @@ async def test_update_samples_success(
             {
                 "id": samples[2].id,
                 "private_identifier": "new_public_identifier3",
+                "public_identifier": "",
+                "sequencing_date": "",
             },
         ]
     }
@@ -815,7 +817,7 @@ async def test_update_samples_success(
         sample_dict = {
             key: getattr(sample, key)
             for key in keys_to_check
-            if key not in ["sequencing_date"]
+            if key not in ["sequencing_date"] 
         }
         if sample.uploaded_pathogen_genome:
             sample_dict[
@@ -823,8 +825,9 @@ async def test_update_samples_success(
             ] = sample.uploaded_pathogen_genome.sequencing_date
         sample_dict["collection_location"] = sample.collection_location.id
         reorganized_data[sample.id] = sample_dict
+    
     # For any fields that got updated in our API request, update those values.
-    for updated in data["samples"]:
+    for updated in request_data["samples"]:
         reorganized_data[updated["id"]].update(
             {
                 key: updated.get(key)
@@ -839,10 +842,14 @@ async def test_update_samples_success(
 
     res = await http_client.put(
         "/v2/samples",
-        json=data,
+        json=request_data,
         headers=auth_headers,
     )
+    print("res.json", res.json())
+    print("res: ", res)
     api_response = {row["id"]: row for row in res.json()["samples"]}
+    print("original sample data: (expected)", reorganized_data)
+    print("api_response:", api_response)
     assert res.status_code == 200
 
     sample_fields = [
@@ -854,6 +861,7 @@ async def test_update_samples_success(
     location_fields = ["collection_location"]
     genome_fields = ["sequencing_date"]
     for sample_id, expected in reorganized_data.items():
+        # pull sample from the database to verify sample was updated correctly
         q = await async_session.execute(
             sa.select(Sample)  # type: ignore
             .options(
@@ -862,20 +870,20 @@ async def test_update_samples_success(
             )
             .filter(Sample.id == sample_id)
         )
-        r = q.scalars().one()
+        sample_pulled_from_db = q.scalars().one()
+
         for field in sample_fields + location_fields + genome_fields:
-            api_response_value = api_response[sample_id][field]
+            api_response_value = api_response[sample_id].get(field)
             request_field_value = expected[field]
             # Handle location fields
             if field in location_fields:
-                db_field_value = getattr(r, field).id
+                db_field_value = getattr(sample_pulled_from_db, field).id
                 api_response_value = api_response_value["id"]
             # Handle UploadedPathogenGenome fields
             elif field in genome_fields:
-                db_field_value = getattr(r.uploaded_pathogen_genome, field)
+                db_field_value = getattr(sample_pulled_from_db.uploaded_pathogen_genome, field)
             else:
-                db_field_value = getattr(r, field)
-                print(expected)
+                db_field_value = getattr(sample_pulled_from_db, field)
             if "date" in field:
                 db_field_value = str(db_field_value)
                 request_field_value = str(request_field_value)
@@ -946,13 +954,6 @@ async def test_update_samples_request_failures(
             {
                 "id": samples[0].id,
                 "private": "something",  # Bad boolean
-            },
-            422,
-        ],
-        [
-            {
-                "id": samples[0].id,
-                "public_identifier": "",  # Empty strings not allowed
             },
             422,
         ],

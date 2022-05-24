@@ -61,9 +61,10 @@ const EditSamplesReviewDialog = ({
         id: m.id,
         private: m.keepPrivate,
         private_identifier: m.privateId,
-        public_identifier: m.publicId,
-        sequencing_date: m.sequencingDate,
+        public_identifier: m.publicId ? m.publicId : null,
+        sequencing_date: m.sequencingDate ? m.sequencingDate : null,
       }));
+      console.log("samples", samples); // REMOVE
       editSampleMutation.mutate({
         samples,
       });
