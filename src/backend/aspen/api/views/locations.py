@@ -12,7 +12,7 @@ from aspen.database.models import Location, User
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("/", response_model=LocationListResponse)
 async def list_locations(
     request: Request,
     db: AsyncSession = Depends(get_db),

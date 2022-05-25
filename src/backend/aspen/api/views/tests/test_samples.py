@@ -575,6 +575,72 @@ async def test_samples_view_no_pangolin(
 # test DELETE samples #
 
 
+async def test_bulk_delete_sample_success(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+):
+    """
+    Test successful sample deletion by ID
+    """
+    group = group_factory()
+    user = user_factory(group)
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
+    samples = [
+        sample_factory(
+            group,
+            user,
+            location,
+            public_identifier="path/to/sample_id1",
+            private_identifier="i_dont_have_spaces1",
+        ),
+        sample_factory(
+            group,
+            user,
+            location,
+            public_identifier="path/to/sample id2",
+            private_identifier="i have spaces2",
+        ),
+        sample_factory(
+            group,
+            user,
+            location,
+            public_identifier="path/to/sample_id3",
+            private_identifier="i have spaces3",
+        ),
+    ]
+    for sample in samples:
+        upg = uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
+        async_session.add(upg)
+    async_session.add(group)
+    await async_session.commit()
+
+    body = {"ids": [sample.id for sample in samples]}
+    auth_headers = {"user_id": user.auth0_user_id}
+    res = await http_client.request(
+        "DELETE",
+        "/v2/samples/",
+        json=body,
+        headers=auth_headers,
+    )
+    assert res.status_code == 200
+    response = res.json()
+    assert set(response["ids"]) == set(body["ids"])
+    # Make sure all our samples were deleted
+    rows = 0
+    for sample in samples:
+        res = await async_session.execute(
+            sa.select(Sample).filter(Sample.id == sample.id)  # type: ignore
+        )
+        try:
+            _ = res.scalars().one()  # type: ignore
+        except NoResultFound:
+            rows += 1
+    # Make sure we actually processed the results above.
+    assert rows == 3
+
+
 async def test_delete_sample_success(
     async_session: AsyncSession,
     http_client: AsyncClient,

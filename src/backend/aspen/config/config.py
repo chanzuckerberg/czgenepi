@@ -168,6 +168,10 @@ class Config(object):
         return self.AWS_SECRET["AUTH0_MANAGEMENT_CLIENT_SECRET"]
 
     @property
+    def AUTH0_MANAGEMENT_DOMAIN(self) -> str:
+        return self.AWS_SECRET["AUTH0_MANAGEMENT_DOMAIN"]
+
+    @property
     def AUTH0_DOMAIN(self) -> str:
         return self.AWS_SECRET["AUTH0_DOMAIN"]
 
