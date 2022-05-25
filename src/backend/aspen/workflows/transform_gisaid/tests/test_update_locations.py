@@ -3,10 +3,10 @@ from typing import Optional
 
 from sqlalchemy.sql.expression import and_
 
-from aspen.database.models import Group, Location, User
+from aspen.database.models import Location, User
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.sample import sample_factory
-from aspen.test_infra.models.usergroup import user_factory
+from aspen.test_infra.models.usergroup import group_factory, user_factory
 from aspen.workflows.transform_gisaid.update_locations import update_locations
 
 
@@ -43,7 +43,7 @@ def create_test_data(
             )
         db_locations.append(db_loc)
 
-    group = Group(
+    group = group_factory(
         name=group_name,
         address="none",
         prefix="GRP-",
