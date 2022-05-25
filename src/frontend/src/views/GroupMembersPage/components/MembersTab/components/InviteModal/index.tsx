@@ -52,7 +52,6 @@ const InviteModal = ({ onClose }: Props): JSX.Element => {
   const onInputChange = (e: ChangeEvent) => {
     const value = e.target.value;
     setInputValue(value);
-    validate();
   };
 
   const title = (
@@ -103,6 +102,7 @@ const InviteModal = ({ onClose }: Props): JSX.Element => {
             placeholder="e.g. userone@domain.com, usertwo@domain.com"
             intent={inputIntent}
             value={inputValue}
+            maxRows={4}
           />
           {hasMoreThan50Invites && (
             <StyledCallout intent="error">
@@ -116,7 +116,7 @@ const InviteModal = ({ onClose }: Props): JSX.Element => {
           <Button
             sdsType="primary"
             sdsStyle="rounded"
-            disabled={!inputValue || invalidAddresses.length > 0}
+            disabled={!inputValue}
             onClick={handleFormSubmit}
           >
             Send Invites

@@ -12,12 +12,18 @@ import {
 import Instructions from "src/components/Instructions";
 
 export const StyledInputText = styled(InputText)`
-  margin-right: 0;
-  height: 70px;
+  margin: 0;
+  min-height: 70px;
+  height: auto;
 
-  div,
-  textarea {
+  div {
     width: 100%;
+  }
+
+  /* MUI has a really specific selector for resize on this input, for some reason */
+  textarea.MuiInputBase-input.MuiInputBase-inputMultiline {
+    width: 100%;
+    resize: vertical;
   }
 `;
 
