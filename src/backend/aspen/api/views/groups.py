@@ -46,12 +46,11 @@ async def get_group_invitations(
     auth0_client: Auth0Client = Depends(get_auth0_client),
     user: User = Depends(get_auth_user),
 ) -> InvitationsResponse:
-    # TODO: Figure out how a db group relates to an auth0 org
     if user.group.id != group_id and not user.system_admin:
         raise ex.UnauthorizedException("Not authorized")
     requested_group_query = sa.select(Group).where(Group.id == group_id)  # type: ignore
     requested_group_result = await db.execute(requested_group_query)
-    requested_group: Group = requested_group_result.scalars().one()  # noqa: F841
+    requested_group: Group = requested_group_result.scalars().one()
 
     try:
         auth0_org: Auth0Org = auth0_client.get_org_by_id(requested_group.auth0_org_id)

@@ -85,8 +85,12 @@ async def test_list_group_invitations(
     response = await http_client.get(
         f"/v2/groups/{group.id}/invitations/", headers={"user_id": user.auth0_user_id}
     )
-    print(response.json())
+
     assert response.status_code == 200
+    resp_data = response.json()
+    assert "invitations" in resp_data
+    invitations = resp_data["invitations"]
+    assert isinstance(invitations, list)
 
 
 async def test_list_group_invitations_unauthorized(

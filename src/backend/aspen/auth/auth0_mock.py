@@ -43,6 +43,5 @@ class MockAuth0Client(Auth0Client):
         }
         return org_with_id
 
-    @cache
     def get_org_invitations(self, org: Auth0Org) -> List[Auth0Invitation]:
         return [MOCK_INVITE]

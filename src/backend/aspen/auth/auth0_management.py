@@ -181,7 +181,6 @@ class Auth0Client:
     def delete_user(self, auth0_user_id: str) -> None:
         self.client.users.delete(auth0_user_id)
 
-    @cache
     def get_org_invitations(self, org: Auth0Org) -> List[Auth0Invitation]:
         # This an endpoint with unique behavior!
         # organizations.all_organization_invitations() returns a bare array, instead of
