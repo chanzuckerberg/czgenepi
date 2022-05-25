@@ -506,7 +506,7 @@ def delete_samples(ctx, sample_ids):
 
 
 @samples.command(name="update")
-@click.argument("sample_id")
+@click.argument("sample_id", required=False)
 @click.option(
     "--private-id", required=False, type=str, help="Update the sample private id"
 )
@@ -531,6 +531,9 @@ def delete_samples(ctx, sample_ids):
 @click.option(
     "--location", required=False, type=int, help="Set the sample's collection location"
 )
+@click.option(
+    "--json-data", required=False, type=str, help="provide json for update"
+)
 @click.pass_context
 def update_samples(
     ctx,
@@ -541,30 +544,35 @@ def update_samples(
     sequencing_date,
     private,
     location,
+    json_data,
 ):
     api_client = ctx.obj["api_client"]
-    if collection_date:
-        collection_date = dateparser.parse(collection_date).strftime("%Y-%m-%d")
-    if sequencing_date:
-        sequencing_date = dateparser.parse(sequencing_date).strftime("%Y-%m-%d")
-    all_fields = {
-        "id": sample_id,
-        "public_identifier": public_id,
-        "private_identifier": private_id,
-        "collection_date": collection_date,
-        "sequencing_date": sequencing_date,
-        "collection_location": location,
-        "private": private,
-    }
-    # Remove None fields
-    sample = {k: v for k, v in all_fields.items() if v != None}
-    print(sample)
-    if public_id:
-        sample["public_identifier"] = public_id
-    if private_id:
-        sample["private_identifier"] = private_id
-    resp = api_client.put(f"/v2/samples/", json={"samples": [sample]})
-    print(resp.text)
+    if json:
+        resp = api_client.put(f"/v2/samples/", json=json.loads(json_data))
+        print(resp.text)
+    else:
+        if collection_date:
+            collection_date = dateparser.parse(collection_date).strftime("%Y-%m-%d")
+        if sequencing_date:
+            sequencing_date = dateparser.parse(sequencing_date).strftime("%Y-%m-%d")
+        all_fields = {
+            "id": sample_id,
+            "public_identifier": public_id,
+            "private_identifier": private_id,
+            "collection_date": collection_date,
+            "sequencing_date": sequencing_date,
+            "collection_location": location,
+            "private": private,
+        }
+        # Remove None fields
+        sample = {k: v for k, v in all_fields.items() if v != None}
+        print(sample)
+        if public_id:
+            sample["public_identifier"] = public_id
+        if private_id:
+            sample["private_identifier"] = private_id
+        resp = api_client.put(f"/v2/samples/", json={"samples": [sample]})
+        print(resp.text)
 
 
 @samples.command(name="create")

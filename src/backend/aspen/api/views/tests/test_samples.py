@@ -846,11 +846,16 @@ async def test_update_samples_success(
 
     auth_headers = {"user_id": user.auth0_user_id}
 
-    data = {
+    request_data = {
         "samples": [
             {
                 "id": samples[0].id,
                 "private_identifier": "new_private_identifier",
+                "public_identifier": "new_public_identifier1",
+                "private": True,
+                "collection_location": newlocation.id,
+                "sequencing_date": "2021-10-10",
+                "collection_date": "2021-11-11",
             },
             {
                 "id": samples[1].id,
@@ -863,7 +868,12 @@ async def test_update_samples_success(
             },
             {
                 "id": samples[2].id,
+                "public_identifier": None,
                 "private_identifier": "new_public_identifier3",
+                "collection_location": newlocation.id,
+                "private": True,
+                "sequencing_date": None,
+                "collection_date": "2021-11-11",
             },
         ]
     }
@@ -889,14 +899,11 @@ async def test_update_samples_success(
             ] = sample.uploaded_pathogen_genome.sequencing_date
         sample_dict["collection_location"] = sample.collection_location.id
         reorganized_data[sample.id] = sample_dict
+
     # For any fields that got updated in our API request, update those values.
-    for updated in data["samples"]:
+    for updated in request_data["samples"]:
         reorganized_data[updated["id"]].update(
-            {
-                key: updated.get(key)
-                for key in keys_to_check
-                if updated.get(key) is not None
-            }
+            {key: updated.get(key) for key in keys_to_check}
         )
 
     # Tell SqlAlchemy to forget about the samples in its identity map
@@ -905,10 +912,11 @@ async def test_update_samples_success(
 
     res = await http_client.put(
         "/v2/samples",
-        json=data,
+        json=request_data,
         headers=auth_headers,
     )
     api_response = {row["id"]: row for row in res.json()["samples"]}
+
     assert res.status_code == 200
 
     sample_fields = [
@@ -920,6 +928,7 @@ async def test_update_samples_success(
     location_fields = ["collection_location"]
     genome_fields = ["sequencing_date"]
     for sample_id, expected in reorganized_data.items():
+        # pull sample from the database to verify sample was updated correctly
         q = await async_session.execute(
             sa.select(Sample)  # type: ignore
             .options(
@@ -928,26 +937,33 @@ async def test_update_samples_success(
             )
             .filter(Sample.id == sample_id)
         )
-        r = q.scalars().one()
+        sample_pulled_from_db = q.scalars().one()
+
         for field in sample_fields + location_fields + genome_fields:
-            api_response_value = api_response[sample_id][field]
+            api_response_value = api_response[sample_id].get(field)
             request_field_value = expected[field]
+            if field == "public_identifier" and request_field_value is None:
+                request_field_value = f"hCoV-19/USA/testgroupNone-{sample_id}/2022"
             # Handle location fields
             if field in location_fields:
-                db_field_value = getattr(r, field).id
+                db_field_value = getattr(sample_pulled_from_db, field).id
                 api_response_value = api_response_value["id"]
             # Handle UploadedPathogenGenome fields
             elif field in genome_fields:
-                db_field_value = getattr(r.uploaded_pathogen_genome, field)
+                db_field_value = getattr(
+                    sample_pulled_from_db.uploaded_pathogen_genome, field
+                )
             else:
-                db_field_value = getattr(r, field)
-                print(expected)
+                db_field_value = getattr(sample_pulled_from_db, field)
             if "date" in field:
-                db_field_value = str(db_field_value)
-                request_field_value = str(request_field_value)
+                db_field_value = str(db_field_value) if db_field_value else None
+                request_field_value = (
+                    str(request_field_value) if request_field_value else None
+                )
             # Check that the DB and our API Request match
+            # TODO - this isn't handling auto generated values !!!!
             assert db_field_value == request_field_value
-            # Check that the DB an dour API Response match.
+            # Check that the DB and our API Response match.
             assert db_field_value == api_response_value
 
 
@@ -970,6 +986,11 @@ async def test_update_samples_access_denied(
             {
                 "id": samples2[0].id,
                 "private_identifier": "new_private_identifier",
+                "public_identifier": "new_public_identifier",
+                "collection_location": samples2[0].location_id,
+                "private": True,
+                "sequencing_date": None,
+                "collection_date": "2021-11-11",
             }
         ]
     }
@@ -998,6 +1019,11 @@ async def test_update_samples_request_failures(
             {
                 "id": samples[0].id,
                 "collection_location": 9999,  # Use a location id that doesn't exist
+                "private_identifier": "new_private_identifier",
+                "public_identifier": "new_public_identifier",
+                "private": True,
+                "sequencing_date": None,
+                "collection_date": "2021-11-11",
             },
             400,
         ],
@@ -1005,6 +1031,23 @@ async def test_update_samples_request_failures(
             {
                 "id": samples[0].id,
                 "sequencing_date": "kapow",  # date deserialization failure
+                "private_identifier": "new_private_identifier_1",
+                "public_identifier": "new_public_identifier_1",
+                "private": True,
+                "collection_date": "2021-11-11",
+                "collection_location": samples[0].location_id,
+            },
+            422,
+        ],
+        [
+            {
+                "id": samples[0].id,
+                "private": True,
+                "private_identifier": "new_private_identifier_2",
+                "public_identifier": "",  # empty strings not allowed
+                "sequencing_date": None,
+                "collection_date": "2021-11-11",
+                "collection_location": samples[0].location_id,
             },
             422,
         ],
@@ -1012,13 +1055,11 @@ async def test_update_samples_request_failures(
             {
                 "id": samples[0].id,
                 "private": "something",  # Bad boolean
-            },
-            422,
-        ],
-        [
-            {
-                "id": samples[0].id,
-                "public_identifier": "",  # Empty strings not allowed
+                "private_identifier": "new_private_identifier_3",
+                "public_identifier": "new_public_identifier_3",
+                "sequencing_date": None,
+                "collection_date": "2021-11-11",
+                "collection_location": samples[0].location_id,
             },
             422,
         ],
@@ -1028,6 +1069,11 @@ async def test_update_samples_request_failures(
                 "public_identifier": samples[
                     1
                 ].public_identifier,  # Trigger duplicate identifier error
+                "private_identifier": "new_private_identifier_4",
+                "private": True,
+                "sequencing_date": None,
+                "collection_date": "2021-11-11",
+                "collection_location": samples[0].location_id,
             },
             400,
         ],
@@ -1037,6 +1083,11 @@ async def test_update_samples_request_failures(
                 "private_identifier": samples[
                     1
                 ].private_identifier,  # Trigger duplicate identifier error
+                "public_identifier": "new_public_identifier_5",
+                "private": True,
+                "sequencing_date": None,
+                "collection_date": "2021-11-11",
+                "collection_location": samples[0].location_id,
             },
             400,
         ],
