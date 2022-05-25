@@ -3,7 +3,7 @@ import json
 import os
 import re
 import threading
-from typing import Any, List, Mapping, Optional, Sequence, Set, Union
+from typing import Any, List, Mapping, MutableSequence, Optional, Sequence, Set, Union
 
 import sentry_sdk
 import sqlalchemy as sa
@@ -179,7 +179,7 @@ async def update_samples(
 
     # Make sure these samples exist and are delete-able by the current user.
     sample_db_res = await get_owned_samples_by_ids(db, sample_ids_to_update, user)
-    editable_samples = sample_db_res.all()
+    editable_samples: MutableSequence[Sample] = sample_db_res.all()
 
     # are there any samples that can't be updated?
     uneditable_samples = [
@@ -194,20 +194,20 @@ async def update_samples(
         for key, value in update_data:
             if key in ["collection_location", "sequencing_date"]:
                 continue
-            if value is not None:  # We need to be able to set private to False!
-                setattr(sample, key, value)
+            setattr(sample, key, value)
         # Location id is handled specially
         if update_data.collection_location:
             loc = await db.get(Location, update_data.collection_location)
             if not loc:
                 raise ex.BadRequestException("location is invalid")
             sample.collection_location = loc
+
         # Sequencing date is handled specially
-        if update_data.sequencing_date:
-            sample.uploaded_pathogen_genome.sequencing_date = (
-                update_data.sequencing_date
-            )
+        sample.uploaded_pathogen_genome.sequencing_date = update_data.sequencing_date  # type: ignore
+        # workaround for our response serializer
         sample.show_private_identifier = True
+
+        sample.generate_public_identifier(already_exists=True)
         res.samples.append(SampleResponse.from_orm(sample))
 
     try:
@@ -358,7 +358,6 @@ async def create_samples(
             sequence=pathogen_genome_input.sequence,
             sequencing_date=pathogen_genome_input.sequencing_date,
         )
-
         db.add(sample)
         db.add(uploaded_pathogen_genome)
         created_samples.append(sample)
