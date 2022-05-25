@@ -1,3 +1,5 @@
+from uuid import uuid1
+
 from aspen.database.models import Group, Location, User
 
 
@@ -7,6 +9,7 @@ def group_factory(
     prefix=None,
     location=None,
     division=None,
+    auth0_org_id=None,
 ) -> Group:
     # shortcut so we don't need to specify prefix
     if not prefix:
@@ -19,6 +22,8 @@ def group_factory(
     tree_loc = Location(
         region="North America", country="USA", location=location, division=division
     )
+    if auth0_org_id is None:
+        auth0_org_id = f"org_test_{uuid1()}"
     return Group(
         name=name,
         address=address,
@@ -26,6 +31,7 @@ def group_factory(
         location=location,
         division=division,
         default_tree_location=tree_loc,
+        auth0_org_id=auth0_org_id,
     )
 
 
