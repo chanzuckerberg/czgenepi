@@ -75,7 +75,7 @@ async def invite_group_members(
     group = (
         (await db.execute(sa.select(Group).where(Group.id == group_id))).scalars().one()  # type: ignore
     )
-    organization = auth0_client.get_org(group.name)
+    organization = auth0_client.get_org_by_name(group.name)
     client_id = settings.AUTH0_CLIENT_ID
     responses = []
     for email in group_invitation_request.emails:
