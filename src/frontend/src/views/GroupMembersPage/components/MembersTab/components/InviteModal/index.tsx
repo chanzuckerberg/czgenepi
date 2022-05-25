@@ -89,7 +89,12 @@ const InviteModal = ({ onClose }: Props): JSX.Element => {
       <Dialog open onClose={onClose} sdsSize="s">
         <DialogTitle title={title} onClose={onClose} />
         <StyledDialogContent>
-          <StyledInstructions title="Instructions" items={instructions} />
+          <StyledInstructions
+            title="Instructions"
+            titleSize="s"
+            bodySize="xs"
+            items={instructions}
+          />
           <StyledInputText
             id="invite-email-input"
             sdsType="textArea"
