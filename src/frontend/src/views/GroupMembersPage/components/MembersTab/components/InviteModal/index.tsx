@@ -11,7 +11,6 @@ import {
   StyledDialogContent,
   StyledInputText,
   StyledInstructions,
-  StyledSpan,
 } from "./style";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/g;
@@ -25,6 +24,7 @@ const InviteModal = ({ onClose }: Props): JSX.Element => {
   const [hasMoreThan50Invites, setHasMoreThan50Invites] =
     useState<boolean>(false);
   const [invalidAddresses, setInvalidAddresses] = useState<string[]>([]);
+  // @ts-expect-error remove when api call finished
   const [shouldValidateOnChange, setShouldValidateOnChange] = // eslint-disable-line @typescript-eslint/no-unused-vars
     useState<boolean>(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState<boolean>(false);
@@ -49,16 +49,16 @@ const InviteModal = ({ onClose }: Props): JSX.Element => {
     );
   };
 
-  const onInputChange = (e: ChangeEvent) => {
+  const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setInputValue(value);
   };
 
-  const title = (
-    <StyledSpan>
-      Invite to <B>Santa Clara County</B>
-    </StyledSpan>
-  );
+  // const title = (
+  //   <StyledSpan>
+  //     Invite to <B>Santa Clara County</B>
+  //   </StyledSpan>
+  // );
 
   const instructions = [
     <span key={0}>You can send a maximum of 50 invitations at a time.</span>,
@@ -86,7 +86,8 @@ const InviteModal = ({ onClose }: Props): JSX.Element => {
         open={isNotificationOpen}
       />
       <Dialog open onClose={onClose} sdsSize="s">
-        <DialogTitle title={title} onClose={onClose} />
+        <DialogTitle title="Invite to Santa Clara County" onClose={onClose} />{" "}
+        {/* TODO (mlila): make group name bold after sds dialog allows ReactNode */}
         <StyledDialogContent>
           <StyledInstructions
             title="Instructions"
@@ -97,7 +98,7 @@ const InviteModal = ({ onClose }: Props): JSX.Element => {
           <StyledInputText
             id="invite-email-input"
             sdsType="textArea"
-            label={<B>Emails</B>}
+            label="Emails"
             onChange={onInputChange}
             placeholder="e.g. userone@domain.com, usertwo@domain.com"
             intent={inputIntent}

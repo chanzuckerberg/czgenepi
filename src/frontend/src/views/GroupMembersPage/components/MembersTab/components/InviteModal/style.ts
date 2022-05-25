@@ -64,9 +64,12 @@ export const StyledCallout = styled(Callout)`
 
 export const StyledDialogContent = styled(DialogContent)`
   ${(props) => {
+    const fontWeights = getFontWeights(props);
     const spaces = getSpaces(props);
+
     return `
       label {
+        font-weight: ${fontWeights?.semibold};
         margin-bottom: ${spaces?.s}px;
         margin-top: ${spaces?.l}px;
       }

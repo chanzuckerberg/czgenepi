@@ -2,13 +2,15 @@ import { List, ListItem } from "czifui";
 import React from "react";
 import { Title, Wrapper } from "./style";
 
+export type TitleSize = "s" | "m" | "l" | "xs" | "xxxs" | "xxs";
+
 interface Props {
   title?: string | undefined;
   items: React.ReactNode[];
   ordered?: boolean;
   className?: string;
-  titleSize?: string;
-  bodySize?: string;
+  titleSize?: TitleSize;
+  bodySize?: TitleSize;
 }
 
 export default function Instructions({
