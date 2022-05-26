@@ -64,15 +64,14 @@ class Auth0Client:
     def get_all_results(self, endpoint: Callable, key: str) -> List[Any]:
         # Auth0 paginates results. We don't have a crazy amount of data in auth0 so we can
         # afford to just paginate through all the results and hold everything in memory.
-        results = []
+        results: List[Any] = []
         page = 0
         per_page = 25
         while True:
             resp = endpoint(page=page, per_page=per_page)
-            last_result = resp["start"] + resp["limit"]
-            results.extend(resp[key])
-            if last_result >= resp["total"]:
+            if len(resp[key]) == 0:
                 return results
+            results.extend(resp[key])
             page += 1
 
     def get_users(self) -> List[Auth0User]:
@@ -181,21 +180,32 @@ class Auth0Client:
     def delete_user(self, auth0_user_id: str) -> None:
         self.client.users.delete(auth0_user_id)
 
+    def _call_organization_invitations_endpoint(
+        self,
+        organizations_object,
+        id: str,
+        page=None,
+        per_page=None,
+        include_totals=True,
+    ):
+        params = {
+            "page": page,
+            "per_page": per_page,
+            "include_totals": str(include_totals).lower(),
+        }
+        return organizations_object.client.get(
+            organizations_object._url(id, "invitations"), params=params
+        )
+
     def get_org_invitations(self, org: Auth0Org) -> List[Auth0Invitation]:
-        # This an endpoint with unique behavior!
-        # organizations.all_organization_invitations() returns a bare array, instead of
-        # the usual { 'start': 0, 'limit': 25, 'length': 25, 'keyword': [...] }
-        results: List[Auth0Invitation] = []
-        page = 0
-        per_page = 25
-        while True:
-            resp = self.client.organizations.all_organization_invitations(
-                org["id"], page=page, per_page=per_page
-            )
-            if not resp:
-                return results
-            results.extend(resp)
-            page += 1
+        return self.get_all_results(
+            partial(
+                self._call_organization_invitations_endpoint,
+                self.client.organizations,
+                org["id"],
+            ),
+            "invitations",
+        )
 
     def invite_member(
         self,
