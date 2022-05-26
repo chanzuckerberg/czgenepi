@@ -29,6 +29,22 @@ class Auth0Connection(TypedDict):
     name: str
 
 
+class Auth0Inviter(TypedDict):
+    name: str
+
+
+class Auth0Invitee(TypedDict):
+    email: str
+
+
+class Auth0Invitation(TypedDict):
+    id: str
+    created_at: str
+    expires_at: str
+    inviter: Auth0Inviter
+    invitee: Auth0Invitee
+
+
 def generate_password(length: int = 22) -> str:
     possible_characters = (
         string.ascii_uppercase + string.ascii_lowercase + string.digits
@@ -48,25 +64,32 @@ class Auth0Client:
     def get_all_results(self, endpoint: Callable, key: str) -> List[Any]:
         # Auth0 paginates results. We don't have a crazy amount of data in auth0 so we can
         # afford to just paginate through all the results and hold everything in memory.
-        results = []
+        results: List[Any] = []
         page = 0
         per_page = 25
         while True:
             resp = endpoint(page=page, per_page=per_page)
-            last_result = resp["start"] + resp["limit"]
-            results.extend(resp[key])
-            if last_result >= resp["total"]:
+            if len(resp[key]) == 0:
                 return results
+            results.extend(resp[key])
             page += 1
 
     def get_users(self) -> List[Auth0User]:
         return self.get_all_results(self.client.users.list, "users")
 
     @cache
-    def get_org(self, org_name: str) -> Auth0Org:
+    def get_org_by_name(self, org_name: str) -> Auth0Org:
         orgs = self.get_orgs()
         for org in orgs:
             if org["display_name"] == org_name:
+                return org
+        raise Exception("Organization not found")
+
+    @cache
+    def get_org_by_id(self, org_id: str) -> Auth0Org:
+        orgs = self.get_orgs()
+        for org in orgs:
+            if org["id"] == org_id:
                 return org
         raise Exception("Organization not found")
 
@@ -156,6 +179,33 @@ class Auth0Client:
 
     def delete_user(self, auth0_user_id: str) -> None:
         self.client.users.delete(auth0_user_id)
+
+    def _call_organization_invitations_endpoint(
+        self,
+        organizations_object,
+        id: str,
+        page=None,
+        per_page=None,
+        include_totals=True,
+    ):
+        params = {
+            "page": page,
+            "per_page": per_page,
+            "include_totals": str(include_totals).lower(),
+        }
+        return organizations_object.client.get(
+            organizations_object._url(id, "invitations"), params=params
+        )
+
+    def get_org_invitations(self, org: Auth0Org) -> List[Auth0Invitation]:
+        return self.get_all_results(
+            partial(
+                self._call_organization_invitations_endpoint,
+                self.client.organizations,
+                org["id"],
+            ),
+            "invitations",
+        )
 
     def invite_member(
         self,

@@ -377,6 +377,14 @@ def get_group_imembers(ctx, group_id):
     resp = api_client.get(f"/v2/groups/{group_id}/members")
     print(resp.text)
 
+@group.command(name="invites")
+@click.argument("group_id")
+@click.pass_context
+def get_group_invitations(ctx, group_id):
+    api_client = ctx.obj["api_client"]
+    resp = api_client.get(f"/v2/groups/{group_id}/invitations/")
+    print(resp.text)
+
 @group.command(name="invite")
 @click.argument("group_id")
 @click.argument("email")

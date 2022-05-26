@@ -9,10 +9,13 @@ from fastapi import Depends, FastAPI, Request
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from aspen.api.auth import get_auth_user, setup_userinfo
-from aspen.api.deps import get_db
+from aspen.api.auth import get_auth0_client, get_auth_user, setup_userinfo
+from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.main import get_app
+from aspen.api.settings import Settings
+from aspen.auth.auth0_management import Auth0Client
+from aspen.auth.auth0_mock import MockAuth0Client
 from aspen.database import connection as aspen_connection
 from aspen.database import schema
 from aspen.database.connection import init_async_db
@@ -124,6 +127,17 @@ async def override_get_auth_user(
     return found_auth_user
 
 
+async def override_get_auth0_client(
+    request: Request,
+    settings: Settings = Depends(get_settings),
+) -> Auth0Client:
+    client_id: str = settings.AUTH0_MANAGEMENT_CLIENT_ID
+    client_secret: str = settings.AUTH0_MANAGEMENT_CLIENT_SECRET
+    domain: str = settings.AUTH0_MANAGEMENT_DOMAIN
+    auth0_client = MockAuth0Client(client_id, client_secret, domain)
+    return auth0_client
+
+
 @pytest.fixture()
 async def api(
     async_db: AsyncPostgresDatabase,
@@ -131,6 +145,7 @@ async def api(
     api = get_app()
     api.dependency_overrides[get_db] = partial(override_get_db, async_db)
     api.dependency_overrides[get_auth_user] = override_get_auth_user
+    api.dependency_overrides[get_auth0_client] = override_get_auth0_client
     return api
 
 
