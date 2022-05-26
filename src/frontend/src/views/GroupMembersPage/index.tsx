@@ -10,7 +10,11 @@ const GroupMembersPage = (): JSX.Element => {
   const [tabValue, setTabValue] = useState<PrimaryTabType>("members");
 
   const group = {
-    name: "Santa Clara County",
+    address: `1234 South Main Street
+Suite 210
+Santa Clara, CA 95050
+United States`,
+    location: "North America/USA/California/Santa Clara County",
     members: [
       {
         name: "Albert",
@@ -37,6 +41,8 @@ const GroupMembersPage = (): JSX.Element => {
         role: "member",
       },
     ],
+    name: "Santa Clara County",
+    prefix: "CA-CZB",
   };
 
   const invites = [
@@ -62,9 +68,11 @@ const GroupMembersPage = (): JSX.Element => {
     setTabValue(value);
   };
 
+  const { address, location, name, prefix } = group;
+
   return (
     <StyledPageContent>
-      <StyledHeader>{group.name}</StyledHeader>
+      <StyledHeader>{name}</StyledHeader>
       <Tabs
         value={tabValue}
         sdsSize="large"
@@ -77,7 +85,13 @@ const GroupMembersPage = (): JSX.Element => {
       {tabValue === "members" && (
         <MembersTab invites={invites} members={group.members} />
       )}
-      {tabValue === "details" && <GroupDetailsTab />}
+      {tabValue === "details" && (
+        <GroupDetailsTab
+          address={address}
+          location={location}
+          prefix={prefix}
+        />
+      )}
     </StyledPageContent>
   );
 };
