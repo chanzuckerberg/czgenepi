@@ -26,12 +26,12 @@ export const DetailDisplay = styled.div`
 
 export const DetailHeader = styled.div`
   ${fontHeaderXl}
-  order: 1;
 
   ${(props) => {
     const spaces = getSpaces(props);
     return `
       margin-bottom: ${spaces?.l}px;
+      width: 100%;
     `;
   }}
 `;
@@ -39,14 +39,16 @@ export const DetailHeader = styled.div`
 export const DetailSection = styled.div`
   @media only screen and (min-width: 768px) {
     ${(props) => {
+      const colors = getColors(props);
       const spaces = getSpaces(props);
       return `
         &:first-child {
-          margin-right: ${spaces?.xl}px;
+          padding-right: ${spaces?.xl}px;
+          border-right: 1px solid ${colors?.gray[300]};
         }
 
         &:last-child {
-          margin-right: ${spaces?.xl}px;
+          padding-left: ${spaces?.xl}px;
         }
       `;
     }}
@@ -70,6 +72,13 @@ export const Text = styled.div`
 `;
 
 export const DetailPage = styled.div`
+  @media only screen and (min-width: 768px) {
+    display: flex;
+    flex-wrap: wrap;
+  }
+`;
+
+export const Content = styled.div`
   @media only screen and (min-width: 768px) {
     display: flex;
   }
