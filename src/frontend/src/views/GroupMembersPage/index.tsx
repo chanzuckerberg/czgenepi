@@ -1,8 +1,13 @@
-import { Tab, Tabs } from "czifui";
+import { Tab } from "czifui";
 import React, { useState } from "react";
 import { GroupDetailsTab } from "./components/GroupDetailsTab";
 import { MembersTab } from "./components/MembersTab";
-import { StyledHeader, StyledPageContent } from "./style";
+import {
+  StyledHeader,
+  StyledName,
+  StyledPageContent,
+  StyledTabs,
+} from "./style";
 
 type PrimaryTabType = "members" | "details";
 
@@ -71,28 +76,32 @@ United States`,
   const { address, location, name, prefix } = group;
 
   return (
-    <StyledPageContent>
-      <StyledHeader>{name}</StyledHeader>
-      <Tabs
-        value={tabValue}
-        sdsSize="large"
-        onChange={handleTabClick}
-        underlined
-      >
-        <Tab value="members" label="Members" />
-        <Tab value="details" label="Details" />
-      </Tabs>
-      {tabValue === "members" && (
-        <MembersTab invites={invites} members={group.members} />
-      )}
-      {tabValue === "details" && (
-        <GroupDetailsTab
-          address={address}
-          location={location}
-          prefix={prefix}
-        />
-      )}
-    </StyledPageContent>
+    <>
+      <StyledHeader>
+        <StyledName>{name}</StyledName>
+        <StyledTabs
+          value={tabValue}
+          sdsSize="large"
+          onChange={handleTabClick}
+          underlined
+        >
+          <Tab value="members" label="Members" />
+          <Tab value="details" label="Details" />
+        </StyledTabs>
+      </StyledHeader>
+      <StyledPageContent>
+        {tabValue === "members" && (
+          <MembersTab invites={invites} members={group.members} />
+        )}
+        {tabValue === "details" && (
+          <GroupDetailsTab
+            address={address}
+            location={location}
+            prefix={prefix}
+          />
+        )}
+      </StyledPageContent>
+    </>
   );
 };
 

@@ -8,7 +8,7 @@ import {
   getSpaces,
 } from "czifui";
 
-export const DetailsDisplay = styled.div`
+export const DetailDisplay = styled.div`
   ${fontBodyM}
   ${(props) => {
     const colors = getColors(props);
@@ -19,11 +19,12 @@ export const DetailsDisplay = styled.div`
       background-color: ${colors?.gray[100]};
       margin-bottom: ${spaces?.xl}px;
       white-space: pre-wrap;
+      overflow-wrap: break-word;
     `;
   }}
 `;
 
-export const DetailsHeader = styled.div`
+export const DetailHeader = styled.div`
   ${fontHeaderXl}
   order: 1;
 
@@ -35,7 +36,22 @@ export const DetailsHeader = styled.div`
   }}
 `;
 
-export const DetailSection = styled.div``;
+export const DetailSection = styled.div`
+  @media only screen and (min-width: 768px) {
+    ${(props) => {
+      const spaces = getSpaces(props);
+      return `
+        &:first-child {
+          margin-right: ${spaces?.xl}px;
+        }
+
+        &:last-child {
+          margin-right: ${spaces?.xl}px;
+        }
+      `;
+    }}
+  }
+`;
 
 export const DetailSubheader = styled.div`
   ${fontHeaderM}
@@ -53,3 +69,8 @@ export const Text = styled.div`
   }}
 `;
 
+export const DetailPage = styled.div`
+  @media only screen and (min-width: 768px) {
+    display: flex;
+  }
+`;

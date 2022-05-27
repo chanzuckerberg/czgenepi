@@ -1,8 +1,9 @@
 import React from "react";
 import {
-  DetailsDisplay,
+  DetailDisplay,
+  DetailHeader,
+  DetailPage,
   DetailSection,
-  DetailsHeader,
   DetailSubheader,
   Text,
 } from "./style";
@@ -15,24 +16,22 @@ interface Props {
 
 const GroupDetailsTab = ({ address, location, prefix }: Props): JSX.Element => {
   return (
-    <div>
-      <DetailsHeader>Group Details</DetailsHeader>
+    <DetailPage>
       <DetailSection>
+        <DetailHeader>Group Details</DetailHeader>
         <DetailSubheader>Default Location for Trees</DetailSubheader>
         <Text>
           Group’s full Nextstrain location ID. CZ GEN EPI uses this as the
           default location parameters when building trees for this group. Learn
           More.
         </Text>
-        <DetailsDisplay>{location}</DetailsDisplay>
-      </DetailSection>
-      <DetailSection>
+        <DetailDisplay>{location}</DetailDisplay>
         <DetailSubheader>Address</DetailSubheader>
         <Text>
           Group’s primary address. CZ GEN EPI uses this information to help
           prepare samples for GISAID submisions. Learn More.
         </Text>
-        <DetailsDisplay>{address}</DetailsDisplay>
+        <DetailDisplay>{address}</DetailDisplay>
       </DetailSection>
       <DetailSection>
         <DetailSubheader>Sample Public ID Prefix</DetailSubheader>
@@ -41,9 +40,9 @@ const GroupDetailsTab = ({ address, location, prefix }: Props): JSX.Element => {
           for samples uploaded to this Group if a Public or GISAID ID is not
           provided. Learn More.
         </Text>
-        <DetailsDisplay>{prefix}</DetailsDisplay>
+        <DetailDisplay>{prefix}</DetailDisplay>
       </DetailSection>
-    </div>
+    </DetailPage>
   );
 };
 
