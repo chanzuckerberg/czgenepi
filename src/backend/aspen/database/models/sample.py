@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import List, Optional, TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING
 
 from sqlalchemy import (
     Boolean,
@@ -17,7 +17,7 @@ from sqlalchemy import (
     UniqueConstraint,
 )
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import backref, relationship, Session
+from sqlalchemy.orm import backref, relationship
 
 from aspen.database.models.accessions import Accession
 from aspen.database.models.base import idbase
@@ -27,44 +27,6 @@ from aspen.database.models.usergroup import Group, User
 
 if TYPE_CHECKING:
     from .sequences import UploadedPathogenGenome
-
-
-def create_public_ids(
-    group_id: int, db_session: Session, num_needed: int, country: str = "USA"
-) -> List[str]:
-    """
-    Generate a list of viable public ids for a specific group
-
-    Parameters
-    ----------
-    group_id :
-        The group_id to generate public ids for
-    session :
-        An open DB session object
-    number_needed :
-        The number of aspen public ids to generate
-
-    Returns
-    --------
-    A list of newly generated public_ids
-    """
-
-    group: Group = db_session.query(Group).filter(Group.id == group_id).one()
-    next_id: Optional[int] = db_session.query(func.max(Sample.id)).scalar()
-
-    # catch if no max
-    if not next_id:
-        next_id = 0
-    next_id += 1
-    ids: List[str] = []
-    # some group prefixes already have a dash, but if they don't add a dash to the end
-    group_prefix = group.prefix if group.prefix[-1] == "-" else f"{group.prefix}-"
-    for i in range(num_needed):
-        current_year: str = datetime.today().strftime("%Y")
-        country: str = country  # type: ignore
-        ids.append(f"hCoV-19/{country}/{group_prefix}{next_id}/{current_year}")
-        next_id += 1
-    return ids
 
 
 class Sample(idbase, DictMixin):  # type: ignore
@@ -232,7 +194,7 @@ class Sample(idbase, DictMixin):  # type: ignore
 
     uploaded_pathogen_genome: Optional[UploadedPathogenGenome]
 
-    def generate_public_identifier(self):
+    def generate_public_identifier(self, already_exists=False):
         # If we don't have an explicit public identifier, generate one from
         # our current model context
         if self.public_identifier:
@@ -241,9 +203,14 @@ class Sample(idbase, DictMixin):  # type: ignore
         country = self.collection_location.country
         group_prefix = self.submitting_group.prefix
         current_year: str = datetime.today().strftime("%Y")
-
-        self.public_identifier = func.concat(
-            f"hCoV-19/{country}/{group_prefix}-",
-            text("currval('aspen.samples_id_seq')"),
-            f"/{current_year}",
-        )
+        if already_exists:
+            id = self.id
+            self.public_identifier = (
+                f"hCoV-19/{country}/{group_prefix}-{id}/{current_year}"
+            )
+        else:
+            self.public_identifier = func.concat(
+                f"hCoV-19/{country}/{group_prefix}-",
+                text("currval('aspen.samples_id_seq')"),
+                f"/{current_year}",
+            )

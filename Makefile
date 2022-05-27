@@ -56,15 +56,11 @@ remote-dbconsole: .env.ecr # Get a python console on a remote db (from OSX only!
 ### DOCKER LOCAL DEV #########################################
 .PHONY: local-hostconfig
 local-hostconfig:
-	if [ "$$(uname -s)" == "Darwin" ]; then \
-	  sudo ./scripts/happy hosts install; \
-	fi
+	sudo happy hosts install
 
 .PHONY: local-nohostconfig
 local-nohostconfig:
-	if [ "$$(uname -s)" == "Darwin" ]; then \
-	  sudo ./scripts/happy hosts uninstall; \
-	fi
+	sudo happy hosts uninstall
 
 oauth/pkcs12/certificate.pfx:
 	# All calls to the openssl cli happen in the oidc-server-mock container.
@@ -117,9 +113,12 @@ local-init: oauth/pkcs12/certificate.pfx .env.ecr local-ecr-login local-hostconf
 	# Wait for psql to be up
 	while [ -z "$$($(docker_compose) exec -T database psql $(LOCAL_DB_CONN_STRING) -c 'select 1')" ]; do echo "waiting for db to start..."; sleep 1; done;
 	@$(docker_compose) exec -T database psql $(LOCAL_DB_CONN_STRING) -c "alter user $(LOCAL_DB_ADMIN_USERNAME) with password '$(LOCAL_DB_ADMIN_PASSWORD)';"
-	$(docker_compose) exec -T backend $(BACKEND_APP_ROOT)/scripts/setup_dev_data.sh
+	# Hack - CI keeps recreating localstack for some reason :'(
+	$(docker_compose) --profile $(LOCALDEV_PROFILE) up -d
+	./scripts/setup_dev_data.sh
 	$(docker_compose) exec -T backend alembic upgrade head
 	$(docker_compose) exec -T backend python scripts/setup_localdata.py
+	$(docker_compose) --profile $(LOCALDEV_PROFILE) up -d
 
 # Assumes you've already run `make local-init` to configure localstack resources!
 .PHONY: prepare-new-db-snapshot
