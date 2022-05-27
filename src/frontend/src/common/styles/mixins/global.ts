@@ -10,6 +10,12 @@ export const ContentStyles = (props: CommonThemeProps) => {
   const spaces = getSpaces(props);
 
   return `
-    padding: ${spaces?.xl}px 125px ${spaces?.l}px 125px;
+    @media only screen and (min-width: 768px) {
+      padding: ${spaces?.xl}px 125px;
+    }
+
+    @media only screen and (max-width: 768px) {
+      padding: ${spaces?.xl}px;
+    }
   `;
 };

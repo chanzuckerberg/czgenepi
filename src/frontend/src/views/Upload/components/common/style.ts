@@ -19,16 +19,16 @@ export function marginBottom(props: CommonThemeProps): string {
 }
 
 export const Header = styled.div`
+  ${ContentStyles}
+
   display: flex;
   justify-content: space-between;
   align-items: center;
 
   ${(props) => {
-    const spaces = getSpaces(props);
     const colors = getColors(props);
 
     return `
-      padding: ${spaces?.xl}px 125px;
       border-bottom: 5px solid ${colors?.gray[100]};
     `;
   }}
