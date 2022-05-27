@@ -7,6 +7,9 @@ from aspen.api.schemas.base import BaseRequest, BaseResponse
 class GroupResponse(BaseResponse):
     id: int
     name: str
+    address: str
+    prefix: str
+    location: str
 
 
 class UserBaseResponse(BaseResponse):
