@@ -27,7 +27,7 @@ async def prepare_sequences_download(
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_auth_user),
-):
+) -> StreamingResponse:
     # stream output file
     fasta_filename = f"{user.group.name}_sample_sequences.fasta"
 
@@ -53,7 +53,7 @@ async def getfastaurl(
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_auth_user),
-):
+) -> FastaURLResponse:
     sample_ids = request.samples
     downstream_consumer = request.downstream_consumer
 

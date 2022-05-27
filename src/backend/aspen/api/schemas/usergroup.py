@@ -27,6 +27,20 @@ class UserMeResponse(UserBaseResponse):
     group: GroupResponse
 
 
+class GroupInvitationsRequest(BaseRequest):
+    role: str
+    emails: List[str]
+
+
+class GroupInvitationResponse(BaseRequest):
+    email: str
+    success: bool
+
+
+class GroupInvitationsResponse(BaseRequest):
+    invitations: List[GroupInvitationResponse]
+
+
 class UserPostRequest(BaseRequest):
     name: str
     email: str
@@ -43,3 +57,21 @@ class MemberResponse(UserBaseResponse):
 
 class GroupMembersResponse(BaseResponse):
     members: List[MemberResponse]
+
+
+class InvitationResponse(BaseResponse):
+    class Inviter(BaseResponse):
+        name: str
+
+    class Invitee(BaseResponse):
+        email: str
+
+    id: str
+    created_at: str
+    expires_at: str
+    inviter: Inviter
+    invitee: Invitee
+
+
+class InvitationsResponse(BaseResponse):
+    invitations: List[InvitationResponse]

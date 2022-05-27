@@ -42,6 +42,7 @@ services:
       API_URL: http://backend.genepinet.localdev:3000
       SPLIT_FRONTEND_KEY: ${SPLIT_FRONTEND_KEY}
       CHOKIDAR_USEPOLLING: "true"
+      ONETRUST_FRONTEND_KEY: ${ONETRUST_FRONTEND_KEY}
     ports:
       - "8000:8000"
     volumes:
@@ -100,18 +101,16 @@ services:
         aliases:
           - backend.genepinet.localdev
   localstack:
-    image: localstack/localstack@sha256:7c6635493185d25165979995fb073fd789c72b6d8b17ef3a70b798d55576732f
+    image: localstack/localstack:0.14.3
     profiles: [ "backend", "web", "all" ]
-    platform: linux/amd64
     ports:
       - "4566:4566"
     environment:
+      - EAGER_SERVICE_LOADING=1
       - HOSTNAME_EXTERNAL=localstack
       - SERVICES=s3,secretsmanager,stepfunctions,ssm,iam
       - DEBUG=1
       - DATA_DIR=/tmp/localstack/data
-      - PORT_WEB_UI=${PORT_WEB_UI- }
-      - HOST_TMP_FOLDER=${TMPDIR}
       - DEFAULT_REGION=us-west-2
     volumes:
       - localstack:/tmp/localstack

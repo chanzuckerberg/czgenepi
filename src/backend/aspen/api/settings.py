@@ -107,6 +107,7 @@ class Settings(BaseSettings):
     AUTH0_CLIENT_SECRET: str
     AUTH0_MANAGEMENT_CLIENT_ID: str = ""
     AUTH0_MANAGEMENT_CLIENT_SECRET: str = ""
+    AUTH0_MANAGEMENT_DOMAIN: str = ""
     AUTH0_DOMAIN: str
     AUTH0_CLIENT_KWARGS: Dict[str, Any] = {
         "scope": "openid profile email",
@@ -242,6 +243,7 @@ class Settings(BaseSettings):
             "AUTH0_CLIENT_SECRET",
             "AUTH0_MANAGEMENT_CLIENT_ID",
             "AUTH0_MANAGEMENT_CLIENT_SECRET",
+            "AUTH0_MANAGEMENT_DOMAIN",
             "AUTH0_DOMAIN",
             "AUTH0_CLIENT_KWARGS",
             "AUSPICE_MAC_KEY",

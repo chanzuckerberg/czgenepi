@@ -21,7 +21,7 @@
  *   1) Create the flag in Split, add it to the `FEATURE_FLAGS` enum.
  *      * If it's a simple flag of just "on"/"off", local dev defaults to on
  *   2) To pull the flag in a component in app, do the following
- *        import { useTreatments } from '@splitsoftware/splitio-react';
+ *        import { useTreatments } from "@splitsoftware/splitio-react";
  *        import { FEATURE_FLAGS } from <<This file right here>>;
  *        const flag = useTreatments([FEATURE_FLAGS.my_flag_name]);
  *   3) If the flag is just a simple "on"/"off" type flag, helper to get bool
@@ -46,6 +46,7 @@ import { useUserInfo } from "src/common/queries/auth";
 export enum FEATURE_FLAGS {
   // my_flag_name = "my_flag_name", (<-- format example)
   sample_filtering_tree_creation = "sample_filtering_tree_creation",
+  user_onboarding_v0 = "user_onboarding_v0",
 }
 
 // Keyword to tell Split client it's running in local-only mode.

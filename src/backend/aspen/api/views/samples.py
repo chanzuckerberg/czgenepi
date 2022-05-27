@@ -3,7 +3,7 @@ import json
 import os
 import re
 import threading
-from typing import Any, List, Mapping, Optional, Sequence, Set, Union
+from typing import Any, List, Mapping, MutableSequence, Optional, Sequence, Set, Union
 
 import sentry_sdk
 import sqlalchemy as sa
@@ -51,7 +51,7 @@ router = APIRouter()
 GISAID_REJECTION_TIME = datetime.timedelta(days=4)
 
 
-@router.get("/")
+@router.get("/", response_model=SamplesResponse)
 async def list_samples(
     request: Request,
     db: AsyncSession = Depends(get_db),
@@ -121,7 +121,7 @@ async def get_owned_samples_by_ids(
     return results.scalars()
 
 
-@router.delete("/")
+@router.delete("/", responses={200: {"model": SampleBulkDeleteResponse}})
 async def delete_samples(
     sample_info: SampleBulkDeleteRequest,
     request: Request,
@@ -144,7 +144,7 @@ async def delete_samples(
     return SampleBulkDeleteResponse(ids=db_ids)
 
 
-@router.delete("/{sample_id}")
+@router.delete("/{sample_id}", responses={200: {"model": SampleDeleteResponse}})
 async def delete_sample(
     sample_id: int,
     request: Request,
@@ -165,7 +165,7 @@ async def delete_sample(
     return SampleDeleteResponse(id=sample_db_id)
 
 
-@router.put("/")
+@router.put("/", response_model=SamplesResponse)
 async def update_samples(
     update_samples_request: UpdateSamplesRequest,
     db: AsyncSession = Depends(get_db),
@@ -179,7 +179,7 @@ async def update_samples(
 
     # Make sure these samples exist and are delete-able by the current user.
     sample_db_res = await get_owned_samples_by_ids(db, sample_ids_to_update, user)
-    editable_samples = sample_db_res.all()
+    editable_samples: MutableSequence[Sample] = sample_db_res.all()
 
     # are there any samples that can't be updated?
     uneditable_samples = [
@@ -194,20 +194,20 @@ async def update_samples(
         for key, value in update_data:
             if key in ["collection_location", "sequencing_date"]:
                 continue
-            if value is not None:  # We need to be able to set private to False!
-                setattr(sample, key, value)
+            setattr(sample, key, value)
         # Location id is handled specially
         if update_data.collection_location:
             loc = await db.get(Location, update_data.collection_location)
             if not loc:
                 raise ex.BadRequestException("location is invalid")
             sample.collection_location = loc
+
         # Sequencing date is handled specially
-        if update_data.sequencing_date:
-            sample.uploaded_pathogen_genome.sequencing_date = (
-                update_data.sequencing_date
-            )
+        sample.uploaded_pathogen_genome.sequencing_date = update_data.sequencing_date  # type: ignore
+        # workaround for our response serializer
         sample.show_private_identifier = True
+
+        sample.generate_public_identifier(already_exists=True)
         res.samples.append(SampleResponse.from_orm(sample))
 
     try:
@@ -222,7 +222,7 @@ async def update_samples(
     return res
 
 
-@router.post("/validate_ids/")
+@router.post("/validate_ids/", response_model=ValidateIDsResponse)
 async def validate_ids(
     request_data: ValidateIDsRequest,
     db: AsyncSession = Depends(get_db),
@@ -299,7 +299,7 @@ def _kick_off_pangolin(group_prefix: str, sample_ids: Sequence[str], settings):
     )
 
 
-@router.post("/")
+@router.post("/", response_model=SamplesResponse)
 async def create_samples(
     create_samples_request: List[CreateSampleRequest],
     db: AsyncSession = Depends(get_db),
@@ -358,7 +358,6 @@ async def create_samples(
             sequence=pathogen_genome_input.sequence,
             sequencing_date=pathogen_genome_input.sequencing_date,
         )
-
         db.add(sample)
         db.add(uploaded_pathogen_genome)
         created_samples.append(sample)
