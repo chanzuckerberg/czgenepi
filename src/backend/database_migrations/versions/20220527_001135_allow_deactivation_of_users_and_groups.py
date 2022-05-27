@@ -17,8 +17,12 @@ depends_on = None
 def upgrade():
     op.add_column(
         "groups",
-        sa.Column("active", sa.Boolean(), nullable=False, server_default=sa.sql.expression.true()),
-        nullable=False,
+        sa.Column(
+            "active",
+            sa.Boolean(),
+            nullable=False,
+            server_default=sa.sql.expression.true(),
+        ),
         schema="aspen",
     )
     op.alter_column(
@@ -30,8 +34,12 @@ def upgrade():
 
     op.add_column(
         "users",
-        sa.Column("active", sa.Boolean(), nullable=False, server_default=sa.sql.expression.true()),
-        nullable=False,
+        sa.Column(
+            "active",
+            sa.Boolean(),
+            nullable=False,
+            server_default=sa.sql.expression.true(),
+        ),
         schema="aspen",
     )
     op.alter_column(
