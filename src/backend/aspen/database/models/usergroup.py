@@ -23,6 +23,7 @@ class Group(idbase, DictMixin):  # type: ignore
     __tablename__ = "groups"
 
     name = Column(String, unique=True, nullable=False)
+    active = Column(Boolean, nullable=False, default=True)
     address = Column(String, nullable=True)
     prefix = Column(
         String,
@@ -33,7 +34,7 @@ class Group(idbase, DictMixin):  # type: ignore
     division = Column(String, nullable=True)
     location = Column(String, nullable=True)
 
-    auth0_org_id = Column(String, unique=True, nullable=False)
+    auth0_org_id = Column(String, unique=True, nullable=True)
 
     # Default location context (int'l or division or location level)
     default_tree_location_id = Column(
@@ -74,7 +75,8 @@ class User(idbase, DictMixin):  # type: ignore
 
     name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
-    auth0_user_id = Column(String, unique=True, nullable=False)
+    active = Column(Boolean, nullable=False, default=True)
+    auth0_user_id = Column(String, unique=True, nullable=True)
     group_admin = Column(Boolean, nullable=False)
     system_admin = Column(Boolean, nullable=False)
     agreed_to_tos = Column(Boolean, nullable=False, default=False)
