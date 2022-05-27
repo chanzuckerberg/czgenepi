@@ -1,5 +1,6 @@
 import Script from "next/script";
 import React from "react";
+import { ONETRUST_ENABLING_CLASS } from "src/common/analytics/OneTrustInitializer";
 import ENV from "src/common/constants/ENV";
 
 /**
@@ -25,8 +26,7 @@ const SEGMENT_WRITE_KEY = ENV.SEGMENT_FRONTEND_KEY;
 
 // What `type` attr the script starts with to prevent early firing.
 // See docs below regarding interaction with OneTrust.
-// const INITIAL_SCRIPT_TYPE = "text/plain"; // TODO Use once OneTrust avail
-const INITIAL_SCRIPT_TYPE = "text/javascript"; // TEMPORARY for initial scan
+const INITIAL_SCRIPT_TYPE = "text/plain";
 
 /**
  * Initializes Segment analytics, enabling later analytics calls in app.
@@ -42,22 +42,13 @@ const INITIAL_SCRIPT_TYPE = "text/javascript"; // TEMPORARY for initial scan
  *      "text/plain". This is connected to our use of OneTrust: if a user
  *      allows analytics, OneTrust will flip that to "text/javascript",
  *      causing the referenced script to run and initialize analytics.
- *      TODO: Implement this once OneTrust can be integrated.
- *            For right now, we need to do an initial OneTrust scan with
- *            live analytics. We'll confine this to Staging for the scan to
- *            prevent accidental analytics before we can use OneTrust.
+ *      (it finds the script to flip via class `ONETRUST_ENABLING_CLASS`)
  *   2) There must be a truth-y value present for the SEGMENT_FRONTEND_KEY.
  *      We default to empty string when no env var present.
  *      As of right now, during initial development, there is no Segment key
  *      in Prod (we've also avoided creating a Prod integration on the Segment
  *      side for now). This means that, even if this code gets to Prod,
  *      no analytics will run right now on Prod.
- *
- * TODO: Eventually use this component. Right now, this is unused until we're
- * have additional processes in place to ensure we don't run analytics on
- * users until they can allow/deny analytics (either by using OneTrust, or
- * by putting it behind a feature flag that only internal dev team would have
- * enabled, or both).
  *
  * Usage note: Weirdly, even though this boils down to being a <script> tag,
  * Next.js does not like it to be present in a Next `Head` or `Html` component.
@@ -73,6 +64,7 @@ export function SegmentInitializer() {
       type={INITIAL_SCRIPT_TYPE}
       src={SEGMENT_INIT_SCRIPT_ROUTE}
       data-segment-key={SEGMENT_WRITE_KEY}
+      className={ONETRUST_ENABLING_CLASS}
     />
   ) : null;
 }

@@ -6,6 +6,8 @@ import { useRouter } from "next/router";
 import React, { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import "semantic-ui-css/semantic.min.css";
+import { OneTrustInitializer } from "src/common/analytics/OneTrustInitializer";
+import { SegmentInitializer } from "src/common/analytics/SegmentInitializer";
 import { ROUTES } from "src/common/routes";
 import { StyledApp } from "src/common/styles/appStyle";
 import { theme } from "src/common/styles/theme";
@@ -47,6 +49,8 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
         />
       </Head>
       <QueryClientProvider client={queryClient}>
+        <OneTrustInitializer />
+        <SegmentInitializer />
         <SplitInitializer>
           <StylesProvider injectFirst>
             <ThemeProvider theme={theme}>

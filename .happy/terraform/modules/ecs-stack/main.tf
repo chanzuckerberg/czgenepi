@@ -124,7 +124,8 @@ module frontend_service {
   remote_dev_prefix     = local.remote_dev_prefix
   extra_env_vars        = {
     "SPLIT_FRONTEND_KEY": local.app_secret["SPLIT_FRONTEND_KEY"],
-    "SEGMENT_FRONTEND_KEY": local.app_secret["SEGMENT_FRONTEND_KEY"]
+    "SEGMENT_FRONTEND_KEY": local.app_secret["SEGMENT_FRONTEND_KEY"],
+    "ONETRUST_FRONTEND_KEY": local.app_secret["ONETRUST_FRONTEND_KEY"]
     }
 
   wait_for_steady_state = local.wait_for_steady_state

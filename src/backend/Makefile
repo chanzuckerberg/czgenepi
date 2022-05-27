@@ -13,7 +13,7 @@ black:
 	black --check $(STYLE_CHECK_PYTHON_CODE_DIRECTORIES) --exclude $(STYLE_CHECK_PYTHON_CODE_SKIPPED_DIRECTORIES)
 
 isort:
-	isort --profile black --check $(STYLE_CHECK_PYTHON_CODE_DIRECTORIES) --skip $(STYLE_CHECK_PYTHON_CODE_SKIPPED_DIRECTORIES) 
+	isort --profile black --check $(STYLE_CHECK_PYTHON_CODE_DIRECTORIES) --skip $(STYLE_CHECK_PYTHON_CODE_SKIPPED_DIRECTORIES)
 
 mypy:
 	mypy --ignore-missing-imports aspen
@@ -27,7 +27,7 @@ run-black:
 	black $(STYLE_CHECK_PYTHON_CODE_DIRECTORIES) --exclude $(STYLE_CHECK_PYTHON_CODE_SKIPPED_DIRECTORIES)
 
 run-isort:
-	isort --profile black $(STYLE_CHECK_PYTHON_CODE_DIRECTORIES) --skip $(STYLE_CHECK_PYTHON_CODE_SKIPPED_DIRECTORIES) 
+	isort --profile black $(STYLE_CHECK_PYTHON_CODE_DIRECTORIES) --skip $(STYLE_CHECK_PYTHON_CODE_SKIPPED_DIRECTORIES)
 
 run-autoflake:
 	autoflake -v -i --ignore-init-module-imports --remove-all-unused-imports --remove-unused-variables -r $(TYPE_CHECK_BASE_PYTHON_CODE_DIRECTORIES)
