@@ -64,7 +64,7 @@ const InviteModal = ({ onClose }: Props): JSX.Element => {
     <span key={0}>You can send a maximum of 50 invitations at a time.</span>,
     <span key={1}>Separate emails by tabs, commas, or enter one per row.</span>,
     <span key={2}>
-      Members have full access to group samples and phyogenetic trees; they are
+      Members have full access to group samples and phylogenetic trees; they are
       able to build trees, upload, download, edit, and delete data.
     </span>,
   ];
