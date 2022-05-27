@@ -11,6 +11,11 @@ import {
 
 type PrimaryTabType = "members" | "details";
 
+export type TabEventHandler = (
+  _: React.SyntheticEvent<Record<string, unknown>>,
+  tabsValue: never
+) => void;
+
 const GroupMembersPage = (): JSX.Element => {
   const [tabValue, setTabValue] = useState<PrimaryTabType>("members");
 
@@ -69,7 +74,7 @@ United States`,
   group.members.sort((a, b) => (a.name > b.name ? 1 : -1));
   invites.sort((a, b) => (a.date > b.date ? 1 : -1));
 
-  const handleTabClick = (_, value) => {
+  const handleTabClick: TabEventHandler = (_, value) => {
     setTabValue(value);
   };
 

@@ -1,6 +1,7 @@
 import { Button, Tab } from "czifui";
 import React, { useState } from "react";
 import { Table } from "src/common/components/library/Table";
+import { TabEventHandler } from "../../index";
 import { Header, StyledTabs } from "./style";
 
 type TabType = "active" | "invitations";
@@ -14,7 +15,7 @@ const MembersTab = ({ invites, members }: Props): JSX.Element => {
   const [tabValue, setTabValue] = useState<TabType>("active");
   const numActive = Object.keys(members).length;
 
-  const handleTabClick = (_, value) => {
+  const handleTabClick: TabEventHandler = (_, value) => {
     setTabValue(value);
   };
 
@@ -36,10 +37,18 @@ const MembersTab = ({ invites, members }: Props): JSX.Element => {
       </Header>
       <Table />
       {tabValue === "active" && (
-        <div>{members.map((m) => <div>{m.name}</div>)}</div>
+        <div>
+          {members.map((m) => (
+            <div key={m.name}>{m.name}</div>
+          ))}
+        </div>
       )}
       {tabValue === "invitations" && (
-        <div>{invites.map((i) => <div>{i.email}</div>)}</div>
+        <div>
+          {invites.map((i) => (
+            <div key={i.email}>{i.email}</div>
+          ))}
+        </div>
       )}
     </>
   );
