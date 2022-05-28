@@ -24,7 +24,7 @@ interface RawGroupRequest {
   name: string;
 }
 
-interface RawUserRequest {
+export interface RawUserRequest {
   id: number;
   name: string;
   group: RawGroupRequest;
@@ -33,15 +33,19 @@ interface RawUserRequest {
   split_id: string;
 }
 
-const mapUserData = (obj: any): User => {
-  return {
+export const mapUserData = (obj: any): User => {
+  const mappedUserData = {
     acknowledgedPolicyVersion: obj.acknowledged_policy_version,
     agreedToTos: obj.agreed_to_tos,
-    group: mapGroupData(obj.group),
     id: obj.id,
+    isGroupAdmin: obj.group_admin,
     name: obj.name,
     splitId: obj.split_id,
   };
+
+  if (obj.group) mappedUserData.group = mapGroupData(obj.group);
+
+  return mappedUserData;
 };
 
 function mapGroupData(obj: any): Group {

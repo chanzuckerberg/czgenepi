@@ -1,5 +1,8 @@
 import { Icon } from "czifui";
+import { find } from "lodash";
 import React from "react";
+import { useUserInfo } from "src/common/queries/auth";
+import { useGroupMembersInfo } from "src/common/queries/groups";
 import { pluralize } from "src/common/utils/strUtils";
 import { GroupMenuItem } from "./components/GroupMenuItem";
 import {
@@ -21,6 +24,12 @@ const GroupDetailsDropdown = ({
   anchorEl,
   open,
 }: Props): JSX.Element | null => {
+  const { data: userInfo } = useUserInfo();
+  const { data: members } = useGroupMembersInfo(userInfo);
+
+  // how many people are in the current group
+  const memberCount = members?.length;
+
   if (!open) return null;
 
   // TODO (mlila): remove fake data
@@ -39,12 +48,11 @@ const GroupDetailsDropdown = ({
   };
 
   const usersGroups = [groupInfo, groupInfo2];
-  const { memberCount, name, location } = groupInfo;
+  const { name, location } = groupInfo;
 
-  const userInfo = {
-    isOwner: true,
-  };
-  const { isOwner } = userInfo;
+  // is the current user a group owner
+  const currentUser = find(members, (m) => m.id === userInfo.id);
+  const isOwner = currentUser.isGroupAdmin === true;
 
   const onClickGroupDetails = () => {
     // redirect to group details page when it exists
