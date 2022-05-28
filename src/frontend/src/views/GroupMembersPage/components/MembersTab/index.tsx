@@ -1,18 +1,19 @@
 import { Button, Tab } from "czifui";
 import React, { useState } from "react";
 import { Table } from "src/common/components/library/Table";
-import { TabEventHandler } from "../../index";
+import { TabEventHandler, ValidPathTokens } from "../../index";
 import { Header, StyledTabs } from "./style";
 
 type TabType = "active" | "invitations";
 
 interface Props {
+  initialSecondaryTab: ValidPathTokens;
   invites: any[];
   members: any[];
 }
 
-const MembersTab = ({ invites, members }: Props): JSX.Element => {
-  const [tabValue, setTabValue] = useState<TabType>("active");
+const MembersTab = ({ initialSecondaryTab = "active", invites, members }: Props): JSX.Element => {
+  const [tabValue, setTabValue] = useState<TabType>(initialSecondaryTab);
   const numActive = Object.keys(members).length;
 
   const handleTabClick: TabEventHandler = (_, value) => {

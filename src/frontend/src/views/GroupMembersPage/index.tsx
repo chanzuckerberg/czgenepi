@@ -1,4 +1,5 @@
 import { Tab } from "czifui";
+import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { GroupDetailsTab } from "./components/GroupDetailsTab";
 import { MembersTab } from "./components/MembersTab";
@@ -16,8 +17,16 @@ export type TabEventHandler = (
   tabsValue: never
 ) => void;
 
-const GroupMembersPage = (): JSX.Element => {
-  const [tabValue, setTabValue] = useState<PrimaryTabType>("members");
+type ValidPathTokens = "members" | "details" | "active" | "invitations";
+interface Props {
+  pathTokens?: ValidPathTokens[];
+}
+
+const GroupMembersPage = ({ pathTokens }: Props): JSX.Element => {
+  const initialPrimaryTab = pathTokens?.[0] ?? "members";
+  const initialSecondaryTab = pathTokens?.[1];
+
+  const [tabValue, setTabValue] = useState<PrimaryTabType>(initialPrimaryTab);
 
   const group = {
     address: `1234 South Main Street
@@ -96,7 +105,7 @@ United States`,
       </StyledHeader>
       <StyledPageContent>
         {tabValue === "members" && (
-          <MembersTab invites={invites} members={group.members} />
+          <MembersTab initialSecondaryTab={initialSecondaryTab} invites={invites} members={group.members} />
         )}
         {tabValue === "details" && (
           <GroupDetailsTab
