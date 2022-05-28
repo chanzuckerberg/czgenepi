@@ -1,8 +1,10 @@
 import { Icon } from "czifui";
 import { find } from "lodash";
-import React from "react";
+import { useRouter } from "next/router";
+import React, { useState } from "react";
 import { useUserInfo } from "src/common/queries/auth";
 import { useGroupMembersInfo } from "src/common/queries/groups";
+import { ROUTES } from "src/common/routes";
 import { pluralize } from "src/common/utils/strUtils";
 import { GroupMenuItem } from "./components/GroupMenuItem";
 import {
@@ -17,13 +19,16 @@ import {
 
 interface Props {
   anchorEl?: Element | null;
+  onClickInvite(): void;
   open: boolean;
 }
 
 const GroupDetailsDropdown = ({
   anchorEl,
+  onClickInvite,
   open,
 }: Props): JSX.Element | null => {
+  const router = useRouter();
   const { data: userInfo } = useUserInfo();
   const { data: members } = useGroupMembersInfo(userInfo);
 
@@ -55,11 +60,8 @@ const GroupDetailsDropdown = ({
   const isOwner = currentUser.isGroupAdmin === true;
 
   const onClickGroupDetails = () => {
-    // redirect to group details page when it exists
-  };
-
-  const onClickInvite = () => {
-    //open invite modal
+    // TODO (mlila): will 404 until final group details PR merged in
+    router.push(ROUTES.GROUP);
   };
 
   return (
