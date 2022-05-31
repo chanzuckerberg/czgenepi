@@ -270,7 +270,7 @@ def test_non_contextualized_regions(mocker, session, postgres_database):
             )
 
         # Just some placeholder sanity-checks
-        assert subsampling_scheme["group"]["max_sequences"] == 2000
+        assert subsampling_scheme["group"]["max_sequences"] == 3000
         assert len(selected.splitlines()) == 10  # 5 gisaid samples + 5 selected samples
         assert len(metadata.splitlines()) == 11  # 10 samples + 1 header line
         assert len(sequences.splitlines()) == 20  # 10 county samples, @2 lines each
