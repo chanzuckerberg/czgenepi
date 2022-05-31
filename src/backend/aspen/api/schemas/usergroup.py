@@ -2,11 +2,18 @@ import datetime
 from typing import List, Optional
 
 from aspen.api.schemas.base import BaseRequest, BaseResponse
+from aspen.api.schemas.locations import LocationResponse
 
 
 class GroupResponse(BaseResponse):
     id: int
     name: str
+
+
+class GroupInfoResponse(GroupResponse):
+    address: Optional[str]
+    prefix: str
+    default_tree_location: LocationResponse
 
 
 class UserBaseResponse(BaseResponse):
