@@ -3,12 +3,14 @@ import sqlalchemy as sa
 from auth0.v3.exceptions import Auth0Error
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 from starlette.requests import Request
 
 from aspen.api.auth import get_auth0_client, get_auth_user
 from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.usergroup import (
+    GroupInfoResponse,
     GroupInvitationsRequest,
     GroupInvitationsResponse,
     GroupMembersResponse,
@@ -19,6 +21,25 @@ from aspen.auth.auth0_management import Auth0Client, Auth0Org
 from aspen.database.models import Group, User
 
 router = APIRouter()
+
+
+@router.get("/{group_id}/", response_model=GroupInfoResponse)
+async def get_group_info(
+    group_id: int,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_auth_user),
+) -> GroupInfoResponse:
+    if user.group.id != group_id and not user.system_admin:
+        raise ex.UnauthorizedException("Not authorized")
+    group_query = (
+        sa.select(Group)  # type: ignore
+        .options(joinedload(Group.default_tree_location))
+        .where(Group.id == group_id)
+    )
+    group_query_result = await db.execute(group_query)
+    group = group_query_result.scalars().one()
+    return GroupInfoResponse.from_orm(group)
 
 
 @router.get("/{group_id}/members/", response_model=GroupMembersResponse)
