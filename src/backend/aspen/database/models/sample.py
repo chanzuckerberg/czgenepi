@@ -53,7 +53,7 @@ class Sample(idbase, DictMixin):  # type: ignore
     uploaded_by_id = Column(
         Integer,
         ForeignKey(User.id),
-        nullable=False,
+        nullable=True,
     )
     uploaded_by = relationship(User, backref=backref("samples", uselist=True))  # type: ignore
     private = Column(Boolean, nullable=False, default=False)
