@@ -136,5 +136,5 @@ subsampling:
 
     group:
       group_by: "year month"
-      max_sequences: 2000
+      max_sequences: 3000
       query: --query "(location == '{location}') & (division == '{division}')"
