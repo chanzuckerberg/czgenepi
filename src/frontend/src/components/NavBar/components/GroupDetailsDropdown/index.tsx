@@ -33,24 +33,26 @@ const GroupDetailsDropdown = ({
   const router = useRouter();
   const { data: userInfo } = useUserInfo();
   const groupId = getGroupIdFromUser(userInfo);
-  const { data: members } = useGroupMembersInfo(groupId);
+  const { data: members } = useGroupMembersInfo(groupId) ?? [];
   const { data: groupInfo } = useGroupInfo(groupId);
 
-  if (!open) return null;
+  if (!open || !userInfo || !groupInfo) return null;
 
   // how many people are in the current group
-  const memberCount = members?.length;
+  const memberCount = members?.length ?? 0;
 
   // right now users can only have one group, but will be able to have more in the future.
   // ui already knows how to render for multiple groups, so we still want to give an array.
-  const usersGroups = [groupInfo];
+  const usersGroups: Group[] = [groupInfo];
 
-  const { name, location } = groupInfo;
+  const { name, location } = groupInfo ?? {};
   const displayLocation = stringifyGisaidLocation(location);
-  console.log(groupInfo, location, displayLocation);
 
   // is the current user a group owner
   const currentUser = find(members, (m) => m.id === userInfo.id);
+
+  if (!currentUser) return null;
+
   const isOwner = currentUser.isGroupAdmin === true;
 
   const onClickGroupDetails = () => {

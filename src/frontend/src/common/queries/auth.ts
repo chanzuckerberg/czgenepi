@@ -11,6 +11,7 @@ import ENV from "src/common/constants/ENV";
 import { API, DEFAULT_PUT_OPTIONS, getBackendApiJson } from "../api";
 import { ROUTES } from "../routes";
 import { ENTITIES } from "./entities";
+import { mapGroupData, RawGroupRequest } from "./groups";
 
 const { API_URL } = ENV;
 
@@ -19,11 +20,6 @@ export const USE_USER_INFO = {
   id: "userInfo",
 };
 
-interface RawGroupRequest {
-  id: number;
-  name: string;
-}
-
 export interface RawUserRequest {
   id: number;
   name: string;
@@ -31,10 +27,11 @@ export interface RawUserRequest {
   agreed_to_tos: boolean;
   acknowledged_policy_version: string | null; // Date or null in DB. ISO 8601: "YYYY-MM-DD"
   split_id: string;
+  group_admin: boolean;
 }
 
-export const mapUserData = (obj: any): User => {
-  const mappedUserData = {
+export const mapUserData = (obj: RawUserRequest): User => {
+  const mappedUserData: User = {
     acknowledgedPolicyVersion: obj.acknowledged_policy_version,
     agreedToTos: obj.agreed_to_tos,
     id: obj.id,
@@ -47,13 +44,6 @@ export const mapUserData = (obj: any): User => {
 
   return mappedUserData;
 };
-
-function mapGroupData(obj: any): Group {
-  return {
-    id: obj.id,
-    name: obj.name,
-  };
-}
 
 export const fetchUserInfo = (): Promise<RawUserRequest> => {
   return getBackendApiJson(API.USERDATA);

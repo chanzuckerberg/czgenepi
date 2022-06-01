@@ -1,10 +1,18 @@
 import { useQuery, UseQueryResult } from "react-query";
 import { API, DEFAULT_FETCH_OPTIONS } from "../api";
 import { API_URL } from "../constants/ENV";
-import { mapUserData } from "./auth";
+import { mapUserData, RawUserRequest } from "./auth";
 import { ENTITIES } from "./entities";
 
-const mapGroupData = (obj: tmp): Group => {
+export interface RawGroupRequest {
+  address: string;
+  id: number;
+  default_tree_location: GisaidLocation;
+  name: string;
+  prefix: string;
+}
+
+export const mapGroupData = (obj: RawGroupRequest): Group => {
   return {
     address: obj.address,
     id: obj.id,
@@ -18,26 +26,22 @@ const mapGroupData = (obj: tmp): Group => {
  * fetch group info
  */
 export const USE_GROUP_INFO = {
-  entities: [ENTITIES.USE_GROUP_INFO],
+  entities: [ENTITIES.GROUP_INFO],
   id: "groupInfo",
 };
 
-export function useGroupInfo(groupId: number): UseQueryResult<tmp, unknown> {
+export function useGroupInfo(groupId?: number): UseQueryResult<Group, unknown> {
   return useQuery([USE_GROUP_INFO], () => fetchGroup({ groupId }), {
     retry: false,
     select: mapGroupData,
   });
 }
 
-interface GroupFetchResponseType {
-  // members: User[];
-}
-
 export async function fetchGroup({
   groupId,
 }: {
-  groupId: number;
-}): Promise<GroupFetchResponseType> {
+  groupId?: number;
+}): Promise<RawGroupRequest> {
   const response = await fetch(API_URL + API.GROUPS + groupId, {
     ...DEFAULT_FETCH_OPTIONS,
   });
@@ -49,14 +53,19 @@ export async function fetchGroup({
 /**
  * fetch group members
  */
+
+interface GroupMembersFetchResponseType {
+  members: RawUserRequest[];
+}
+
 export const USE_GROUP_MEMBER_INFO = {
-  entities: [ENTITIES.USE_GROUP_MEMBER_INFO],
+  entities: [ENTITIES.GROUP_MEMBER_INFO],
   id: "groupMemberInfo",
 };
 
 export function useGroupMembersInfo(
-  groupId: number
-): UseQueryResult<tmp, unknown> {
+  groupId?: number
+): UseQueryResult<User[], unknown> {
   return useQuery(
     [USE_GROUP_MEMBER_INFO],
     () => fetchGroupMembers({ groupId }),
@@ -70,14 +79,10 @@ export function useGroupMembersInfo(
   );
 }
 
-interface GroupMembersFetchResponseType {
-  members: User[];
-}
-
 export async function fetchGroupMembers({
   groupId,
 }: {
-  groupId: number;
+  groupId?: number;
 }): Promise<GroupMembersFetchResponseType> {
   const response = await fetch(API_URL + API.GROUPS + groupId + "/members", {
     ...DEFAULT_FETCH_OPTIONS,
