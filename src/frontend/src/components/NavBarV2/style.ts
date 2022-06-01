@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import { SmallerThanBreakpoint } from "src/common/styles/mixins/global";
 
 export const Bar = styled.div`
   width: 17px;
@@ -33,9 +34,9 @@ export const HeaderTopLinks = styled.div`
     font-size: 14px;
   }
 
-  @media (max-width: 768px) {
+  ${SmallerThanBreakpoint(`
     display: none;
-  }
+  `)}
 `;
 
 export const HeaderContainer = styled.div`
@@ -59,10 +60,10 @@ export const HeaderLogoContainer = styled.a`
   display: flex;
   align-items: center;
 
-  @media (max-width: 768px) {
+  ${SmallerThanBreakpoint(`
     flex-direction: column;
     align-items: flex-start;
-  }
+  `)}
 `;
 
 export const HeaderMaxWidthContainer = styled.div`
@@ -76,9 +77,9 @@ export const HeaderTopContainer = styled.div`
   justify-content: space-between;
   padding: 38px 60px;
 
-  @media (max-width: 768px) {
+  ${SmallerThanBreakpoint(`
     padding: 17px 20px;
-  }
+  `)}
 `;
 
 export const MobileNavClose = styled.span`
@@ -118,10 +119,10 @@ export const MobileNavToggle = styled.div`
   position: relative;
   z-index: 2;
 
-  @media (max-width: 768px) {
+  ${SmallerThanBreakpoint(`
     display: inline-block;
     cursor: pointer;
-  }
+  `)}
 `;
 
 export const MobileNavTray = styled.div`

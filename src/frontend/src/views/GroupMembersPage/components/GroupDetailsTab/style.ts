@@ -7,6 +7,7 @@ import {
   getColors,
   getSpaces,
 } from "czifui";
+import { LargerThanBreakpoint } from "src/common/styles/mixins/global";
 
 export const DetailDisplay = styled.div`
   ${fontBodyM}
@@ -37,11 +38,11 @@ export const DetailHeader = styled.div`
 `;
 
 export const DetailSection = styled.div`
-  @media only screen and (min-width: 768px) {
-    ${(props) => {
-      const colors = getColors(props);
-      const spaces = getSpaces(props);
-      return `
+  ${(props) => {
+    const colors = getColors(props);
+    const spaces = getSpaces(props);
+    return `
+      ${LargerThanBreakpoint(`
         &:first-child {
           padding-right: ${spaces?.xl}px;
           border-right: 1px solid ${colors?.gray[300]};
@@ -50,9 +51,9 @@ export const DetailSection = styled.div`
         &:last-child {
           padding-left: ${spaces?.xl}px;
         }
-      `;
-    }}
-  }
+      `)}
+    `;
+  }}
 `;
 
 export const DetailSubheader = styled.div`
@@ -72,14 +73,14 @@ export const Text = styled.div`
 `;
 
 export const DetailPage = styled.div`
-  @media only screen and (min-width: 768px) {
-    display: flex;
-    flex-wrap: wrap;
-  }
+  ${LargerThanBreakpoint(`
+      display: flex;
+      flex-wrap: wrap;
+  `)}
 `;
 
 export const Content = styled.div`
-  @media only screen and (min-width: 768px) {
+  ${LargerThanBreakpoint(`
     display: flex;
-  }
+  `)}
 `;

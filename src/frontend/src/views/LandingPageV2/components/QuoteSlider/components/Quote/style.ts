@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import { SmallerThanBreakpoint } from "src/common/styles/mixins/global";
 
 export const Citation = styled.span`
   text-align: center;
@@ -23,11 +24,11 @@ export const QuoteContainer = styled.div`
     max-width: 600px;
   }
 
-  @media (max-width: 768px) {
+  ${SmallerThanBreakpoint(`
     padding-left: 20px;
     padding-right: 20px;
     padding-top: 30px;
-  }
+  `)}
 `;
 
 export const QuoteIcon = styled.span`
@@ -36,13 +37,13 @@ export const QuoteIcon = styled.span`
   left: -8%;
   z-index: 2;
 
-  @media (max-width: 768px) {
+  ${SmallerThanBreakpoint(`
     position: relative;
     left: 0;
     top: 0;
     align-self: flex-start;
     padding-bottom: 30px;
-  }
+  `)}
 `;
 
 export const QuoteText = styled.p`
@@ -53,8 +54,8 @@ export const QuoteText = styled.p`
   letter-spacing: 0.3px;
   color: #fff;
 
-  @media (max-width: 768px) {
+  ${SmallerThanBreakpoint(`
     font-size: 16px;
     line-height: 22px;
-  }
+  `)}
 `;

@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import { SmallerThanBreakpoint } from "src/common/styles/mixins/global";
 
 export const UseCasesContainer = styled.div`
   margin: 105px auto;
@@ -25,12 +26,12 @@ export const UseCasesHeader = styled.h2`
     top: 7%;
   }
 
-  @media (max-width: 768px) {
+  ${SmallerThanBreakpoint(`
     position: relative;
     font-size: 18px;
     line-height: 24px;
     top: -10px;
-  }
+  `)}
 `;
 
 export const UseCasesImage = styled.div`
@@ -38,19 +39,19 @@ export const UseCasesImage = styled.div`
   height: auto;
   z-index: 1;
 
-  @media (max-width: 768px) {
+  ${SmallerThanBreakpoint(`
     display: none;
-  }
+  `)}
 `;
 
 export const UseCasesImageMobile = styled.div`
   display: none;
 
-  @media (max-width: 768px) {
+  ${SmallerThanBreakpoint(`
     display: block;
     width: 100%;
     max-width: 300px;
     height: auto;
     margin: 0 auto;
-  }
+  `)}
 `;
