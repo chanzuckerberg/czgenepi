@@ -56,8 +56,7 @@ const GroupDetailsDropdown = ({
   const isOwner = currentUser.isGroupAdmin === true;
 
   const onClickGroupDetails = () => {
-    // TODO (mlila): will 404 until final group details PR merged in
-    router.push(ROUTES.GROUP);
+    // redirect to group details page when it exists
   };
 
   return (
