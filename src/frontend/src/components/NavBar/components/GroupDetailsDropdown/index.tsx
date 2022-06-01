@@ -1,11 +1,12 @@
 import { Icon } from "czifui";
 import { find } from "lodash";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React from "react";
 import { useUserInfo } from "src/common/queries/auth";
 import { useGroupMembersInfo } from "src/common/queries/groups";
 import { ROUTES } from "src/common/routes";
 import { pluralize } from "src/common/utils/strUtils";
+import { getGroupIdFromUser } from "src/common/utils/userUtils";
 import { GroupMenuItem } from "./components/GroupMenuItem";
 import {
   CurrentGroup,
@@ -30,7 +31,8 @@ const GroupDetailsDropdown = ({
 }: Props): JSX.Element | null => {
   const router = useRouter();
   const { data: userInfo } = useUserInfo();
-  const { data: members } = useGroupMembersInfo(userInfo);
+  const groupId = getGroupIdFromUser(userInfo);
+  const { data: members } = useGroupMembersInfo(groupId);
 
   // how many people are in the current group
   const memberCount = members?.length;
