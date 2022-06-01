@@ -1,6 +1,5 @@
 import { Icon } from "czifui";
 import { find } from "lodash";
-import { useRouter } from "next/router";
 import React from "react";
 import { useUserInfo } from "src/common/queries/auth";
 import { useGroupInfo, useGroupMembersInfo } from "src/common/queries/groups";
