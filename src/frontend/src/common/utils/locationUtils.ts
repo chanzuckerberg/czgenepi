@@ -1,7 +1,9 @@
 import { distance } from "fastest-levenshtein";
 
 // Produce unique string to name a GISAID location from its various attributes
-export function stringifyGisaidLocation(location: GisaidLocation): string {
+export function stringifyGisaidLocation(location?: GisaidLocation): string {
+  if (!location) return;
+
   let stringName = "";
   const orderedKeys: Array<keyof GisaidLocation> = [
     "region",

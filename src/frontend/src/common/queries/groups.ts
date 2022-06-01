@@ -4,6 +4,16 @@ import { API_URL } from "../constants/ENV";
 import { mapUserData } from "./auth";
 import { ENTITIES } from "./entities";
 
+const mapGroupData = (obj: tmp): Group => {
+  return {
+    address: obj.address,
+    id: obj.id,
+    location: obj.default_tree_location,
+    name: obj.name,
+    prefix: obj.prefix,
+  };
+};
+
 /**
  * fetch group info
  */
@@ -15,6 +25,7 @@ export const USE_GROUP_INFO = {
 export function useGroupInfo(groupId: number): UseQueryResult<tmp, unknown> {
   return useQuery([USE_GROUP_INFO], () => fetchGroup({ groupId }), {
     retry: false,
+    select: mapGroupData,
   });
 }
 

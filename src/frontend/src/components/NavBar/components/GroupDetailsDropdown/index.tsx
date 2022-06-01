@@ -3,8 +3,9 @@ import { find } from "lodash";
 import { useRouter } from "next/router";
 import React from "react";
 import { useUserInfo } from "src/common/queries/auth";
-import { useGroupMembersInfo } from "src/common/queries/groups";
+import { useGroupInfo, useGroupMembersInfo } from "src/common/queries/groups";
 import { ROUTES } from "src/common/routes";
+import { stringifyGisaidLocation } from "src/common/utils/locationUtils";
 import { pluralize } from "src/common/utils/strUtils";
 import { getGroupIdFromUser } from "src/common/utils/userUtils";
 import { GroupMenuItem } from "./components/GroupMenuItem";
@@ -33,29 +34,20 @@ const GroupDetailsDropdown = ({
   const { data: userInfo } = useUserInfo();
   const groupId = getGroupIdFromUser(userInfo);
   const { data: members } = useGroupMembersInfo(groupId);
+  const { data: groupInfo } = useGroupInfo(groupId);
+
+  if (!open) return null;
 
   // how many people are in the current group
   const memberCount = members?.length;
 
-  if (!open) return null;
+  // right now users can only have one group, but will be able to have more in the future.
+  // ui already knows how to render for multiple groups, so we still want to give an array.
+  const usersGroups = [groupInfo];
 
-  // TODO (mlila): remove fake data
-  const groupInfo = {
-    id: 123,
-    name: "Santa Clara County",
-    location: "California/Santa Clara County",
-    memberCount: 4,
-  };
-
-  const groupInfo2 = {
-    id: 234,
-    name: "Santa Clara County and this group has a really really long name idk why",
-    location: "California/Santa Clara County",
-    memberCount: 6,
-  };
-
-  const usersGroups = [groupInfo, groupInfo2];
   const { name, location } = groupInfo;
+  const displayLocation = stringifyGisaidLocation(location);
+  console.log(groupInfo, location, displayLocation);
 
   // is the current user a group owner
   const currentUser = find(members, (m) => m.id === userInfo.id);
@@ -86,7 +78,7 @@ const GroupDetailsDropdown = ({
           <StyledIcon>
             <Icon sdsIcon="pinLocation" sdsSize="s" sdsType="static" />
           </StyledIcon>
-          {location}
+          {displayLocation}
         </Details>
         <Details>
           <StyledIcon>
