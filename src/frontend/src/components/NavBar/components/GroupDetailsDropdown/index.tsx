@@ -1,6 +1,11 @@
 import { Icon } from "czifui";
+import { find } from "lodash";
 import React from "react";
+import { useUserInfo } from "src/common/queries/auth";
+import { useGroupInfo, useGroupMembersInfo } from "src/common/queries/groups";
+import { stringifyGisaidLocation } from "src/common/utils/locationUtils";
 import { pluralize } from "src/common/utils/strUtils";
+import { getGroupIdFromUser } from "src/common/utils/userUtils";
 import { GroupMenuItem } from "./components/GroupMenuItem";
 import {
   CurrentGroup,
@@ -14,44 +19,41 @@ import {
 
 interface Props {
   anchorEl?: Element | null;
+  onClickInvite(): void;
   open: boolean;
 }
 
 const GroupDetailsDropdown = ({
   anchorEl,
+  onClickInvite,
   open,
 }: Props): JSX.Element | null => {
-  if (!open) return null;
+  const { data: userInfo } = useUserInfo();
+  const groupId = getGroupIdFromUser(userInfo);
+  const { data: members } = useGroupMembersInfo(groupId) ?? [];
+  const { data: groupInfo } = useGroupInfo(groupId);
 
-  // TODO (mlila): remove fake data
-  const groupInfo = {
-    id: 123,
-    name: "Santa Clara County",
-    location: "California/Santa Clara County",
-    memberCount: 4,
-  };
+  if (!open || !userInfo || !groupInfo) return null;
 
-  const groupInfo2 = {
-    id: 234,
-    name: "Santa Clara County and this group has a really really long name idk why",
-    location: "California/Santa Clara County",
-    memberCount: 6,
-  };
+  // how many people are in the current group
+  const memberCount = members?.length ?? 0;
 
-  const usersGroups = [groupInfo, groupInfo2];
-  const { memberCount, name, location } = groupInfo;
+  // right now users can only have one group, but will be able to have more in the future.
+  // ui already knows how to render for multiple groups, so we still want to give an array.
+  const usersGroups: Group[] = [groupInfo];
 
-  const userInfo = {
-    isOwner: true,
-  };
-  const { isOwner } = userInfo;
+  const { name, location } = groupInfo ?? {};
+  const displayLocation = stringifyGisaidLocation(location);
+
+  // is the current user a group owner
+  const currentUser = find(members, (m) => m.id === userInfo.id);
+
+  if (!currentUser) return null;
+
+  const isOwner = currentUser.isGroupAdmin === true;
 
   const onClickGroupDetails = () => {
     // redirect to group details page when it exists
-  };
-
-  const onClickInvite = () => {
-    //open invite modal
   };
 
   return (
@@ -74,7 +76,7 @@ const GroupDetailsDropdown = ({
           <StyledIcon>
             <Icon sdsIcon="pinLocation" sdsSize="s" sdsType="static" />
           </StyledIcon>
-          {location}
+          {displayLocation}
         </Details>
         <Details>
           <StyledIcon>

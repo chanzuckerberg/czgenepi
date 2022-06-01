@@ -56,6 +56,7 @@ export const Details = styled.div`
     const spaces = getSpaces(props);
 
     return `
+      display: flex;
       color: ${colors?.gray[600]};
       margin-bottom: ${spaces?.xs}px;
     `;
