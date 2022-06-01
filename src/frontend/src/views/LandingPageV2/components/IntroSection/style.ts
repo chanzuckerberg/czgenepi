@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
 import { getSpaces } from "czifui";
+import { SmallerThanBreakpoint } from "src/common/styles/mixins/global";
 
 export const IntroContainer = styled.div`
   display: flex;
@@ -16,10 +17,10 @@ export const IntroContainer = styled.div`
         padding: 0 ${spaces?.l}px 0 0;
       }
 
-      @media (max-width: 768px) {
+      ${SmallerThanBreakpoint(`
         flex-direction: column;
         padding: 0 ${spaces?.l}px;
-      }
+      `)}
     `;
   }}
 `;
@@ -49,10 +50,10 @@ export const IntroHeading = styled.h2`
     line-height: 34px;
   }
 
-  @media (max-width: 768px) {
+  ${SmallerThanBreakpoint(`
     font-size: 18px;
     line-height: 24px;
-  }
+  `)}
 `;
 
 export const IntroImage = styled.div`
@@ -64,9 +65,9 @@ export const IntroImage = styled.div`
     margin-top: -80px;
   }
 
-  @media (max-width: 768px) {
+  ${SmallerThanBreakpoint(`
     margin-top: -120px;
-  }
+  `)}
 `;
 
 export const IntroTextContainer = styled.div`
@@ -79,8 +80,8 @@ export const IntroTextContainer = styled.div`
     width: 100%;
   }
 
-  @media (max-width: 768px) {
+  ${SmallerThanBreakpoint(`
     width: 100%;
     margin: 0 auto;
-  }
+  `)}
 `;

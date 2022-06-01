@@ -2,6 +2,24 @@ import styled from "@emotion/styled";
 import { CommonThemeProps, getSpaces } from "czifui";
 import { NAV_BAR_HEIGHT_PX } from "src/components/NavBar";
 
+const BREAKPOINT = "768px";
+
+export const SmallerThanBreakpoint = (styles: string): string => {
+  return `
+    @media (max-width: ${BREAKPOINT}) {
+      ${styles}
+    }
+  `;
+};
+
+export const LargerThanBreakpoint = (styles: string): string => {
+  return `
+    @media (min-width: ${BREAKPOINT}) {
+      ${styles}
+    }
+  `;
+};
+
 export const PAGE_PADDING = 125;
 
 export const PageContent = styled.div`
@@ -12,12 +30,12 @@ export const ContentStyles = (props: CommonThemeProps) => {
   const spaces = getSpaces(props);
 
   return `
-    @media only screen and (min-width: 768px) {
+    ${LargerThanBreakpoint(`
       padding: ${spaces?.xl}px ${PAGE_PADDING}px;
-    }
+    `)}
 
-    @media only screen and (max-width: 768px) {
+    ${SmallerThanBreakpoint(`
       padding: ${spaces?.xl}px;
-    }
+    `)}
   `;
 };

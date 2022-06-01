@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
 import { fontBodyM } from "czifui";
+import { SmallerThanBreakpoint } from "src/common/styles/mixins/global";
 
 export const Heading = styled.h1`
   color: white;
@@ -13,9 +14,9 @@ export const Heading = styled.h1`
     line-height: 34px;
   }
 
-  @media (max-width: 768px) {
+  ${SmallerThanBreakpoint(`
     font-size: 24px;
-  }
+  `)}
 `;
 
 export const HeroContainer = styled.div`
@@ -32,7 +33,7 @@ export const HeroTextSection = styled.div`
   left: 120px;
   padding-top: 25px;
 
-  @media (max-width: 768px) {
+  ${SmallerThanBreakpoint(`
     position: relative;
     left: 0;
     margin: 0 auto;
@@ -40,7 +41,7 @@ export const HeroTextSection = styled.div`
     padding-left: 20px;
     padding-right: 20px;
     margin-bottom: 200px;
-  }
+  `)}
 `;
 
 export const HeroMaxWidthContainer = styled.div`
@@ -51,19 +52,19 @@ export const HeroMaxWidthContainer = styled.div`
   justify-content: center;
   position: relative;
 
-  @media (max-width: 768px) {
+  ${SmallerThanBreakpoint(`
     flex-direction: column-reverse;
-  }
+  `)}
 `;
 
 export const HeroImage = styled.div`
   margin-top: -120px;
   margin-left: auto;
 
-  @media (max-width: 768px) {
+  ${SmallerThanBreakpoint(`
     width: 100%;
     height: auto;
-  }
+  `)}
 `;
 
 export const NextstrainContainer = styled.div`
@@ -75,9 +76,9 @@ export const NextstrainContainer = styled.div`
   width: 140px;
   cursor: pointer;
 
-  @media (max-width: 768px) {
+  ${SmallerThanBreakpoint(`
     display: none;
-  }
+  `)}
 `;
 
 export const NextstrainLink = styled.a``;

@@ -4,6 +4,7 @@ import {
   ContentStyles,
   PageContent,
   PAGE_PADDING,
+  SmallerThanBreakpoint,
 } from "src/common/styles/mixins/global";
 
 export const StyledName = styled.div`
@@ -35,9 +36,9 @@ export const StyledHeader = styled.div`
       border-bottom: 2px solid ${colors?.gray[200]};
       padding: 0 ${PAGE_PADDING}px;
 
-      @media only screen and (max-width: 768px) {
+      ${SmallerThanBreakpoint(`
         padding: 0 ${spaces?.xl}px;
-      }
+      `)}
     `;
   }}
 `;
