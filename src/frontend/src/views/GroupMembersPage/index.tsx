@@ -44,6 +44,7 @@ const GroupMembersPage = ({ pathTokens }: Props): JSX.Element => {
     router.push(`${ROUTES.GROUP}/${tabValue}`, undefined, { shallow: true });
   }, [tabValue]);
 
+  // TODO (mlila): api calls
   const group = {
     address: `1234 South Main Street
 Suite 210
@@ -83,21 +84,21 @@ United States`,
   const invites = [
     {
       email: "erica@fake.com",
-      state: "pending",
-      date: "2022-05-24",
+      status: "pending",
+      dateSent: "2022-05-24",
       role: "Member",
     },
     {
       email: "frank@fake.com",
-      state: "expired",
-      date: "2022-03-24",
+      status: "expired",
+      dateSent: "2022-03-24",
       role: "Member",
     },
   ];
 
   // sort group members by name before display
   group.members.sort((a, b) => (a.name > b.name ? 1 : -1));
-  invites.sort((a, b) => (a.date > b.date ? 1 : -1));
+  invites.sort((a, b) => (a.dateSent > b.dateSent ? 1 : -1));
 
   const handleTabClick: TabEventHandler = (_, value) => {
     setTabValue(value);
