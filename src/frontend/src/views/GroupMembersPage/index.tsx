@@ -1,5 +1,7 @@
 import { Tab } from "czifui";
-import React, { useState } from "react";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import { ROUTES } from "src/common/routes";
 import { GroupDetailsTab } from "./components/GroupDetailsTab";
 import { MembersTab } from "./components/MembersTab";
 import {
@@ -9,15 +11,38 @@ import {
   StyledTabs,
 } from "./style";
 
-type PrimaryTabType = "members" | "details";
+enum PrimaryTabType {
+  MEMBERS = "members",
+  DETAILS = "details",
+}
 
 export type TabEventHandler = (
   _: React.SyntheticEvent<Record<string, unknown>>,
   tabsValue: never
 ) => void;
 
-const GroupMembersPage = (): JSX.Element => {
-  const [tabValue, setTabValue] = useState<PrimaryTabType>("members");
+interface Props {
+  pathTokens?: string[];
+}
+
+const isValidPrimaryTab = (token?: string) => {
+  return token === PrimaryTabType.MEMBERS || token === PrimaryTabType.DETAILS;
+};
+
+const GroupMembersPage = ({ pathTokens }: Props): JSX.Element => {
+  const [primaryQueryParam, secondaryQueryParam] = pathTokens ?? [];
+  const initialPrimaryTab = (
+    isValidPrimaryTab(primaryQueryParam)
+      ? primaryQueryParam
+      : PrimaryTabType.MEMBERS
+  ) as PrimaryTabType;
+
+  const [tabValue, setTabValue] = useState<PrimaryTabType>(initialPrimaryTab);
+  const router = useRouter();
+
+  useEffect(() => {
+    router.push(`${ROUTES.GROUP}/${tabValue}`, undefined, { shallow: true });
+  }, [tabValue]);
 
   const group = {
     address: `1234 South Main Street
@@ -90,15 +115,19 @@ United States`,
           onChange={handleTabClick}
           underlined
         >
-          <Tab value="members" label="Members" />
-          <Tab value="details" label="Details" />
+          <Tab value={PrimaryTabType.MEMBERS} label="Members" />
+          <Tab value={PrimaryTabType.DETAILS} label="Details" />
         </StyledTabs>
       </StyledHeader>
       <StyledPageContent>
-        {tabValue === "members" && (
-          <MembersTab invites={invites} members={group.members} />
+        {tabValue === PrimaryTabType.MEMBERS && (
+          <MembersTab
+            secondaryQueryParam={secondaryQueryParam}
+            invites={invites}
+            members={group.members}
+          />
         )}
-        {tabValue === "details" && (
+        {tabValue === PrimaryTabType.DETAILS && (
           <GroupDetailsTab
             address={address}
             location={location}
