@@ -5,6 +5,7 @@ import { HeadAppTitle } from "src/common/components";
 import { ROUTES } from "src/common/routes";
 import { TabEventHandler } from "../../index";
 import { ActiveMembersTable } from "./components/ActiveMembersTable";
+import { InviteModal } from "./components/InviteModal";
 import { MemberInvitationsTable } from "./components/MemberInvitationsTable";
 import { Header, StyledTabs } from "./style";
 
@@ -40,6 +41,7 @@ const MembersTab = ({
 
   const [tabValue, setTabValue] =
     useState<SecondaryTabType>(initialSecondaryTab);
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState<boolean>(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -57,6 +59,9 @@ const MembersTab = ({
   return (
     <>
       <HeadAppTitle subTitle="Group Details" />
+      {isInviteModalOpen && (
+        <InviteModal onClose={() => setIsInviteModalOpen(false)} />
+      )}
       <Header>
         <StyledTabs
           value={tabValue}
@@ -75,7 +80,11 @@ const MembersTab = ({
             count={invites.length}
           />
         </StyledTabs>
-        <Button sdsType="primary" sdsStyle="rounded">
+        <Button
+          sdsType="primary"
+          sdsStyle="rounded"
+          onClick={() => setIsInviteModalOpen(true)}
+        >
           Invite
         </Button>
       </Header>
