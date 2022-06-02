@@ -13,7 +13,7 @@ const EmailCell = ({ email, status }: Props): JSX.Element => {
 
   return (
     <Wrapper>
-      <PersonIconCell key={0} content={email} />
+      <PersonIconCell content={email} />
       <Tag
         color={color}
         sdsType="secondary"
