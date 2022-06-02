@@ -19,6 +19,7 @@ export type TabEventHandler = (
 const GroupMembersPage = (): JSX.Element => {
   const [tabValue, setTabValue] = useState<PrimaryTabType>("members");
 
+  // TODO (mlila): api calls
   const group = {
     address: `1234 South Main Street
 Suite 210
@@ -58,14 +59,14 @@ United States`,
   const invites = [
     {
       email: "erica@fake.com",
-      state: "pending",
-      date: "2022-05-24",
+      status: "pending",
+      dateSent: "2022-05-24",
       role: "Member",
     },
     {
       email: "frank@fake.com",
-      state: "expired",
-      date: "2022-03-24",
+      status: "expired",
+      dateSent: "2022-03-24",
       role: "Member",
     },
   ];

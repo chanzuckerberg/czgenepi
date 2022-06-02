@@ -41,11 +41,7 @@ const MembersTab = ({ invites, members }: Props): JSX.Element => {
       </Header>
       {tabValue === "active" && <ActiveMembersTable members={members} />}
       {tabValue === "invitations" && (
-        <div>
-          {invites.map((i) => (
-            <div key={i.email}>{i.email}</div>
-          ))}
-        </div>
+        <MemberInvitationsTable invites={invites} />
       )}
     </>
   );
