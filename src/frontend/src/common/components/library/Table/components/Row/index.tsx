@@ -10,23 +10,13 @@ interface Props {
 const Row = ({ cells, isHeader }: Props): JSX.Element | null => {
   if (cells.length === 0) return null;
 
+  const mappedCells = cells.map((c, i) => <Cell key={i} content={c} />);
+
   if (isHeader) {
-    return (
-      <StyledHeader>
-        {cells.map((c, i) => (
-          <Cell key={i} content={c} />
-        ))}
-      </StyledHeader>
-    );
+    return <StyledHeader>{mappedCells}</StyledHeader>;
   }
 
-  return (
-    <StyledRow>
-      {cells.map((c, i) => (
-        <Cell key={i} content={c} />
-      ))}
-    </StyledRow>
-  );
+  return <StyledRow>{mappedCells}</StyledRow>;
 };
 
 export { Row };
