@@ -147,7 +147,7 @@ class Auth0Client:
             org["id"], {"members": [user_id]}
         )
 
-    def add_org(self, group_id: int, org_name: str) -> None:
+    def add_org(self, group_id: int, org_name: str):
         # TODO, learn more about connections! For now we only have this one, let's use it wherever we need to.
         connection = self.get_connection("Username-Password-Authentication")
         body = {
@@ -160,12 +160,12 @@ class Auth0Client:
                 }
             ],
         }
-        self.client.organizations.create_organization(body)
+        return self.client.organizations.create_organization(body)
 
     def delete_org(self, org_id: str) -> None:
         self.client.organizations.delete_organization(org_id)
 
-    def create_user(self, email: str, name: str) -> None:
+    def create_user(self, email: str, name: str):
         body = {
             "email": email,
             "user_metadata": {},
@@ -175,7 +175,7 @@ class Auth0Client:
             "password": generate_password(),
             "connection": "Username-Password-Authentication",
         }
-        self.client.users.create(body)
+        return self.client.users.create(body)
 
     def delete_user(self, auth0_user_id: str) -> None:
         self.client.users.delete(auth0_user_id)
