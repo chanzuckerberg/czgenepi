@@ -1,8 +1,10 @@
 import { Icon } from "czifui";
 import { find } from "lodash";
+import { useRouter } from "next/router";
 import React from "react";
 import { useUserInfo } from "src/common/queries/auth";
 import { useGroupInfo, useGroupMembersInfo } from "src/common/queries/groups";
+import { ROUTES } from "src/common/routes";
 import { stringifyGisaidLocation } from "src/common/utils/locationUtils";
 import { pluralize } from "src/common/utils/strUtils";
 import { getGroupIdFromUser } from "src/common/utils/userUtils";
@@ -28,6 +30,8 @@ const GroupDetailsDropdown = ({
   onClickInvite,
   open,
 }: Props): JSX.Element | null => {
+  const router = useRouter();
+
   const { data: userInfo } = useUserInfo();
   const groupId = getGroupIdFromUser(userInfo);
   const { data: members } = useGroupMembersInfo(groupId) ?? [];
@@ -53,7 +57,7 @@ const GroupDetailsDropdown = ({
   const isOwner = currentUser.isGroupAdmin === true;
 
   const onClickGroupDetails = () => {
-    // redirect to group details page when it exists
+    router.push(ROUTES.GROUP_DETAILS);
   };
 
   return (
