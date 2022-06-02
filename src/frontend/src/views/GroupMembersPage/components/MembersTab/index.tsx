@@ -1,11 +1,14 @@
 import { Button, Tab } from "czifui";
 import React, { useState } from "react";
-import { Table } from "src/common/components/library/Table";
+import { HeadAppTitle } from "src/common/components";
 import { TabEventHandler } from "../../index";
+import { ActiveMembersTable } from "./components/ActiveMembersTable";
+import { MemberInvitationsTable } from "./components/MemberInvitationsTable";
 import { Header, StyledTabs } from "./style";
 
 type TabType = "active" | "invitations";
 
+//TODO (mlila): types
 interface Props {
   invites: any[];
   members: any[];
@@ -21,6 +24,7 @@ const MembersTab = ({ invites, members }: Props): JSX.Element => {
 
   return (
     <>
+      <HeadAppTitle subTitle="Group Details" />
       <Header>
         <StyledTabs
           value={tabValue}
