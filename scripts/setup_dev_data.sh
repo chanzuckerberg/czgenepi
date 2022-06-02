@@ -41,8 +41,11 @@ done
 
 
 ONETRUST_FRONTEND_KEY=$(jq -c .ONETRUST_FRONTEND_KEY <<< "${EXTRA_SECRETS}")
+AUTH0_MANAGEMENT_CLIENT_ID=$(jq -c .AUTH0_MANAGEMENT_CLIENT_ID <<< "${EXTRA_SECRETS}")
+AUTH0_MANAGEMENT_CLIENT_SECRET=$(jq -c .AUTH0_MANAGEMENT_CLIENT_SECRET <<< "${EXTRA_SECRETS}")
+AUTH0_MANAGEMENT_DOMAIN=$(jq -c .AUTH0_MANAGEMENT_DOMAIN <<< "${EXTRA_SECRETS}")
 echo "Creating secretsmanager secrets"
-local_aws="aws --endpoint-url=${LOCALSTACK_URL}"
+local_aws="aws --no-paginate --endpoint-url=${LOCALSTACK_URL}"
 ${local_aws} secretsmanager create-secret --name genepi-config &> /dev/null || true
 # AUSPICE_MAC_KEY is just the result of urlsafe_b64encode(b'auspice-mac-key')
 ${local_aws} secretsmanager update-secret --secret-id genepi-config --secret-string '{
@@ -63,7 +66,10 @@ ${local_aws} secretsmanager update-secret --secret-id genepi-config --secret-str
   "DB_address": "database.genepinet.localdev",
   "S3_external_auspice_bucket": "genepi-external-auspice-data",
   "S3_db_bucket": "genepi-db-data",
-  "ONETRUST_FRONTEND_KEY": '"${ONETRUST_FRONTEND_KEY}"'
+  "ONETRUST_FRONTEND_KEY": '"${ONETRUST_FRONTEND_KEY}"',
+  "AUTH0_MANAGEMENT_CLIENT_ID": '"${AUTH0_MANAGEMENT_CLIENT_ID}"',
+  "AUTH0_MANAGEMENT_CLIENT_SECRET": '"${AUTH0_MANAGEMENT_CLIENT_SECRET}"',
+  "AUTH0_MANAGEMENT_DOMAIN": '"${AUTH0_MANAGEMENT_DOMAIN}"'
 }' || true
 
 echo "Creating IAM role"
