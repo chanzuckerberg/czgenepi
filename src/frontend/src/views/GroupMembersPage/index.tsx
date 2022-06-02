@@ -1,7 +1,11 @@
 import { Tab } from "czifui";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
+import { useUserInfo } from "src/common/queries/auth";
+import { useGroupInfo, useGroupMembersInfo } from "src/common/queries/groups";
 import { ROUTES } from "src/common/routes";
+import { stringifyGisaidLocation } from "src/common/utils/locationUtils";
+import { getGroupIdFromUser } from "src/common/utils/userUtils";
 import { GroupDetailsTab } from "./components/GroupDetailsTab";
 import { MembersTab } from "./components/MembersTab";
 import {
@@ -40,47 +44,17 @@ const GroupMembersPage = ({ pathTokens }: Props): JSX.Element => {
   const [tabValue, setTabValue] = useState<PrimaryTabType>(initialPrimaryTab);
   const router = useRouter();
 
+  const { data: userInfo } = useUserInfo();
+  const groupId = getGroupIdFromUser(userInfo);
+  const { data: members = [] } = useGroupMembersInfo(groupId);
+  const { data: groupInfo = {} } = useGroupInfo(groupId);
+  const { address, location, name, prefix } = groupInfo;
+
   useEffect(() => {
     router.push(`${ROUTES.GROUP}/${tabValue}`, undefined, { shallow: true });
   }, [tabValue]);
 
   // TODO (mlila): api calls
-  const group = {
-    address: `1234 South Main Street
-Suite 210
-Santa Clara, CA 95050
-United States`,
-    location: "North America/USA/California/Santa Clara County",
-    members: [
-      {
-        name: "Albert",
-        email: "albert@fake.com",
-        joinedDate: "2022-02-02",
-        role: "member",
-      },
-      {
-        name: "Charles",
-        email: "charles@fake.com",
-        joinedDate: "2021-06-06",
-        role: "member",
-      },
-      {
-        name: "Beatrice",
-        email: "beatrice@fake.com",
-        joinedDate: "2021-01-01",
-        role: "member",
-      },
-      {
-        name: "Danielle",
-        email: "danielle@fake.com",
-        joinedDate: "2022-03-03",
-        role: "member",
-      },
-    ],
-    name: "Santa Clara County",
-    prefix: "CA-CZB",
-  };
-
   const invites = [
     {
       email: "erica@fake.com",
@@ -97,14 +71,14 @@ United States`,
   ];
 
   // sort group members by name before display
-  group.members.sort((a, b) => (a.name > b.name ? 1 : -1));
+  members.sort((a, b) => (a.name > b.name ? 1 : -1));
   invites.sort((a, b) => (a.dateSent > b.dateSent ? 1 : -1));
+
+  const displayLocation = stringifyGisaidLocation(location);
 
   const handleTabClick: TabEventHandler = (_, value) => {
     setTabValue(value);
   };
-
-  const { address, location, name, prefix } = group;
 
   return (
     <>
@@ -125,13 +99,13 @@ United States`,
           <MembersTab
             secondaryQueryParam={secondaryQueryParam}
             invites={invites}
-            members={group.members}
+            members={members}
           />
         )}
         {tabValue === PrimaryTabType.DETAILS && (
           <GroupDetailsTab
             address={address}
-            location={location}
+            location={displayLocation}
             prefix={prefix}
           />
         )}

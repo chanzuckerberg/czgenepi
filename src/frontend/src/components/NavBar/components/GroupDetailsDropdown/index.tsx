@@ -34,8 +34,8 @@ const GroupDetailsDropdown = ({
 
   const { data: userInfo } = useUserInfo();
   const groupId = getGroupIdFromUser(userInfo);
-  const { data: members } = useGroupMembersInfo(groupId) ?? [];
-  const { data: groupInfo } = useGroupInfo(groupId);
+  const { data: members = [] } = useGroupMembersInfo(groupId);
+  const { data: groupInfo = {} } = useGroupInfo(groupId);
 
   if (!open || !userInfo || !groupInfo) return null;
 
@@ -46,7 +46,7 @@ const GroupDetailsDropdown = ({
   // ui already knows how to render for multiple groups, so we still want to give an array.
   const usersGroups: Group[] = [groupInfo];
 
-  const { name, location } = groupInfo ?? {};
+  const { name, location } = groupInfo;
   const displayLocation = stringifyGisaidLocation(location);
 
   // is the current user a group owner
