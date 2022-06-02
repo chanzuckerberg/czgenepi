@@ -25,13 +25,12 @@ interface Props {
   pathTokens?: string[];
 }
 
-const isValidPrimaryTab = (token: string) => {
+const isValidPrimaryTab = (token?: string) => {
   return token === PrimaryTabType.MEMBERS || token === PrimaryTabType.DETAILS;
 };
 
 const GroupMembersPage = ({ pathTokens }: Props): JSX.Element => {
-  const [primaryQueryParam = "members", secondaryQueryParam = "details"] =
-    pathTokens ?? [];
+  const [primaryQueryParam, secondaryQueryParam] = pathTokens ?? [];
   const initialPrimaryTab = (
     isValidPrimaryTab(primaryQueryParam)
       ? primaryQueryParam
