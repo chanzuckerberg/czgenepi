@@ -8,7 +8,9 @@ interface Props {
 
 const MemberInvitationsTable = ({ invites }: Props): JSX.Element => {
   const headers = ["Email", "Date Sent", "Role"];
-  const rows = invites.map((i) => [
+
+  // TODO (mlila): types
+  const rows = invites.map((i: any) => [
     <EmailCell key={0} email={i.email} status={i.status} />,
     i.dateSent,
     i.role,

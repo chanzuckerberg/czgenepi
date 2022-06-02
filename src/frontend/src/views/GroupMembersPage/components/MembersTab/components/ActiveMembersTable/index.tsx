@@ -9,7 +9,8 @@ interface Props {
 const ActiveMembersTable = ({ members }: Props): JSX.Element => {
   const headers = ["Member Name", "Email", "Date Added", "Role"];
 
-  const rows = members.map((m) => {
+  // TODO (mlila): types
+  const rows = members.map((m: any) => {
     return [
       <PersonIconCell key={0} content={m.name} />,
       m.email,

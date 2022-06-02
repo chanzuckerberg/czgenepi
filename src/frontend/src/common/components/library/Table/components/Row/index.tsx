@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { Cell } from "../Cell";
 import { StyledHeader, StyledRow } from "./style";
 
@@ -13,14 +13,18 @@ const Row = ({ cells, isHeader }: Props): JSX.Element | null => {
   if (isHeader) {
     return (
       <StyledHeader>
-        {cells.map((c) => <Cell content={c} />)}
+        {cells.map((c, i) => (
+          <Cell key={i} content={c} />
+        ))}
       </StyledHeader>
     );
   }
 
   return (
     <StyledRow>
-      {cells.map((c) => <Cell content={c} />)}
+      {cells.map((c, i) => (
+        <Cell key={i} content={c} />
+      ))}
     </StyledRow>
   );
 };

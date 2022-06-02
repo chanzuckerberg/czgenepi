@@ -73,7 +73,7 @@ United States`,
 
   // sort group members by name before display
   group.members.sort((a, b) => (a.name > b.name ? 1 : -1));
-  invites.sort((a, b) => (a.date > b.date ? 1 : -1));
+  invites.sort((a, b) => (a.dateSent > b.dateSent ? 1 : -1));
 
   const handleTabClick: TabEventHandler = (_, value) => {
     setTabValue(value);
