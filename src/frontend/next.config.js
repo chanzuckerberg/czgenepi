@@ -6,7 +6,11 @@ const { createSecureHeaders } = require("next-secure-headers");
 
 const isProdBuild = ENV.NODE_ENV === nodeEnv.PRODUCTION;
 
-const SCRIPT_SRC = ["'self'", "https://cdn.segment.com"];
+const SCRIPT_SRC = [
+  "'self'",
+  "https://cdn.segment.com",
+  "https://plausible.io",
+];
 
 module.exports = {
   distDir: ENV.BUILD_PATH,
@@ -34,6 +38,7 @@ module.exports = {
                 "streaming.split.io",
                 "https://cdn.segment.com",
                 "https://api.segment.io",
+                "https://plausible.io",
                 ENV.API_URL,
               ],
               defaultSrc: ["'self'"],

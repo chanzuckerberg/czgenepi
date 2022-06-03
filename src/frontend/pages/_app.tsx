@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import React, { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import "semantic-ui-css/semantic.min.css";
+import { PlausibleInitializer } from "src/common/analytics/PlausibleInitializer";
 import { ROUTES } from "src/common/routes";
 import { StyledApp } from "src/common/styles/appStyle";
 import { theme } from "src/common/styles/theme";
@@ -46,6 +47,7 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
           content="minimum-scale=1, initial-scale=1, width=device-width"
         />
       </Head>
+      <PlausibleInitializer />
       <QueryClientProvider client={queryClient}>
         <SplitInitializer>
           <StylesProvider injectFirst>
