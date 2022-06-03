@@ -7,6 +7,7 @@ import React, { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import "semantic-ui-css/semantic.min.css";
 import { OneTrustInitializer } from "src/common/analytics/OneTrustInitializer";
+import { PlausibleInitializer } from "src/common/analytics/PlausibleInitializer";
 import { SegmentInitializer } from "src/common/analytics/SegmentInitializer";
 import { ROUTES } from "src/common/routes";
 import { StyledApp } from "src/common/styles/appStyle";
@@ -48,6 +49,7 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
           content="minimum-scale=1, initial-scale=1, width=device-width"
         />
       </Head>
+      <PlausibleInitializer />
       <QueryClientProvider client={queryClient}>
         <OneTrustInitializer />
         <SegmentInitializer />
