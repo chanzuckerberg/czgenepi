@@ -38,8 +38,8 @@ async def test_create_new_user_if_not_exists(
     user = (
         (
             await async_session.execute(
-                sa.select(User)
-                .options(joinedload(User.group, innerjoin=True))
+                sa.select(User)  # type: ignore
+                .options(joinedload(User.group, innerjoin=True))  # type: ignore
                 .filter(User.auth0_user_id == userinfo["sub"])  # type: ignore
             )
         )
@@ -73,8 +73,8 @@ async def test_dont_create_new_user_if_exists(
     db_user = (
         (
             await async_session.execute(
-                sa.select(User)
-                .options(joinedload(User.group, innerjoin=True))
+                sa.select(User)  # type: ignore
+                .options(joinedload(User.group, innerjoin=True))  # type: ignore
                 .filter(User.auth0_user_id == userinfo["sub"])  # type: ignore
             )
         )
