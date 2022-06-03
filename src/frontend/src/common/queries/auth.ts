@@ -11,6 +11,7 @@ import ENV from "src/common/constants/ENV";
 import { API, DEFAULT_PUT_OPTIONS, getBackendApiJson } from "../api";
 import { ROUTES } from "../routes";
 import { ENTITIES } from "./entities";
+import { mapGroupData, RawGroupRequest } from "./groups";
 
 const { API_URL } = ENV;
 
@@ -19,37 +20,32 @@ export const USE_USER_INFO = {
   id: "userInfo",
 };
 
-interface RawGroupRequest {
-  id: number;
-  name: string;
-}
-
-interface RawUserRequest {
+export interface RawUserRequest {
   id: number;
   name: string;
   group: RawGroupRequest;
   agreed_to_tos: boolean;
   acknowledged_policy_version: string | null; // Date or null in DB. ISO 8601: "YYYY-MM-DD"
   split_id: string;
+  group_admin: boolean;
 }
 
-const mapUserData = (obj: any): User => {
-  return {
+export const mapUserData = (obj: RawUserRequest): User => {
+  const mappedUserData: User = {
     acknowledgedPolicyVersion: obj.acknowledged_policy_version,
     agreedToTos: obj.agreed_to_tos,
-    group: mapGroupData(obj.group),
+    // @ts-expect-error TODO (mlila): types
+    email: obj.email,
     id: obj.id,
+    isGroupAdmin: obj.group_admin,
     name: obj.name,
     splitId: obj.split_id,
   };
-};
 
-function mapGroupData(obj: any): Group {
-  return {
-    id: obj.id,
-    name: obj.name,
-  };
-}
+  if (obj.group) mappedUserData.group = mapGroupData(obj.group);
+
+  return mappedUserData;
+};
 
 export const fetchUserInfo = (): Promise<RawUserRequest> => {
   return getBackendApiJson(API.USERDATA);

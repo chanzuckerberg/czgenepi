@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
 import { getColors } from "czifui";
+import { SmallerThanBreakpoint } from "src/common/styles/mixins/global";
 
 const centeredFlex = () => {
   return `
@@ -34,9 +35,9 @@ export const PartnerLink = styled.a`
   &:nth-of-type(2) {
     margin-left: 45px;
 
-    @media (max-width: 768px) {
+    ${SmallerThanBreakpoint(`
       margin: 45px 0;
-    }
+    `)}
   }
 
   ${(props) => {
@@ -56,10 +57,10 @@ export const PartnerLinkRow = styled.div`
   margin-bottom: 45px;
   width: 100%;
 
-  @media (max-width: 768px) {
+  ${SmallerThanBreakpoint(`
     flex-direction: column;
     margin-bottom: 0;
-  }
+  `)}
 `;
 
 export const PartnersSectionContainer = styled.div`

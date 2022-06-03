@@ -40,7 +40,7 @@ interface Props {
 }
 
 // (thuang): If item height changes, we need to update this value!
-const ITEM_HEIGHT_PX = 68;
+export const ITEM_HEIGHT_PX = 68;
 
 const LOADING_STATE_ROW_COUNT = 10;
 

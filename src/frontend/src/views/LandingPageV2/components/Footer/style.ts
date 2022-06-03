@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
 import { getColors, getSpaces } from "czifui";
+import { SmallerThanBreakpoint } from "src/common/styles/mixins/global";
 
 export const CZBiohubLogo = styled.a`
   max-width: 120px;
@@ -43,9 +44,9 @@ export const FooterBottomContainer = styled.div`
   align-items: center;
   justify-content: space-between;
 
-  @media (max-width: 768px) {
+  ${SmallerThanBreakpoint(`
     flex-direction: column-reverse;
-  }
+  `)}
 `;
 
 export const FooterBottomLink = styled.a``;
@@ -64,13 +65,13 @@ export const FooterBottomSeparator = styled.div`
     const spaces = getSpaces(props);
 
     return `
-      @media (max-width: 768px) {
+      ${SmallerThanBreakpoint(`
         display: block;
         width: 100%;
         margin: ${spaces?.l}px auto;
         height: 1px;
         background: ${colors?.gray[600]};
-      }
+      `)}
     `;
   }}
 `;
@@ -89,9 +90,9 @@ export const FooterContainer = styled.div`
   color: white;
   padding: 64px 115px;
 
-  @media (max-width: 768px) {
+  ${SmallerThanBreakpoint(`
     padding: 32px 20px 42px 20px;
-  }
+  `)}
 
   & a {
     color: white;
@@ -111,9 +112,9 @@ export const FooterPartnerships = styled.div`
   align-items: center;
   font-style: italic;
 
-  @media (max-width: 768px) {
+  ${SmallerThanBreakpoint(`
     flex-direction: column;
-  }
+  `)}
 `;
 
 export const FooterTopContainer = styled.div`
@@ -122,40 +123,40 @@ export const FooterTopContainer = styled.div`
   justify-content: space-between;
   margin-bottom: 72px;
 
-  @media (max-width: 768px) {
+  ${SmallerThanBreakpoint(`
     flex-direction: column;
     align-items: flex-start;
     margin-bottom: 50px;
-  }
+  `)}
 `;
 
 export const FooterTopLink = styled.a`
-  @media (max-width: 768px) {
+  ${SmallerThanBreakpoint(`
     background: #262525;
     border-radius: 24px;
     padding: 7px 14px;
     width: 100%;
     max-width: 280px;
     text-align: center;
-  }
+  `)}
 `;
 
 export const FooterTopLinks = styled.div`
-  @media (max-width: 768px) {
+  ${SmallerThanBreakpoint(`
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 100%;
     margin-top: 28px;
-  }
+  `)}
 
   a + a {
     margin-left: 39px;
 
-    @media (max-width: 768px) {
+    ${SmallerThanBreakpoint(`
       margin-left: 0;
       margin-top: 11px;
-    }
+    `)}
   }
 `;
 
