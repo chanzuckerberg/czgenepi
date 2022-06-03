@@ -5,6 +5,7 @@ import React, { MouseEventHandler, useState } from "react";
 import { useUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
 import { FEATURE_FLAGS, isFlagOn } from "src/components/Split";
+import { InviteModal } from "src/views/GroupMembersPage/components/MembersTab/components/InviteModal";
 import { GroupDetailsDropdown } from "./components/GroupDetailsDropdown";
 import RightNav from "./components/RightNav";
 import {
@@ -25,6 +26,7 @@ const NavBarLoggedIn = (): JSX.Element => {
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
   const [isGroupDetailsDropdownOpen, setIsGroupDetailsDropdownOpen] =
     useState<boolean>(false);
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState<boolean>(false);
   const { data: userInfo } = useUserInfo();
 
   const group = userInfo?.group;
@@ -71,6 +73,9 @@ const NavBarLoggedIn = (): JSX.Element => {
         {group?.name && isUserOnboardingFlagOn && (
           <>
             <Separator />
+            {isInviteModalOpen && (
+              <InviteModal onClose={() => setIsInviteModalOpen(false)} />
+            )}
             <DropdownClickTarget onClick={toggleDropdown}>
               <NavOrg>{group?.name}</NavOrg>
               <StyledIcon>
@@ -78,6 +83,7 @@ const NavBarLoggedIn = (): JSX.Element => {
               </StyledIcon>
               <GroupDetailsDropdown
                 anchorEl={anchorEl}
+                onClickInvite={() => setIsInviteModalOpen(true)}
                 open={isGroupDetailsDropdownOpen}
               />
             </DropdownClickTarget>

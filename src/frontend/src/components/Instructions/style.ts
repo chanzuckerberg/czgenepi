@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
-import { fontHeaderXs, getColors, getSpaces } from "czifui";
+import { CommonThemeProps, fontHeader, getColors, getSpaces } from "czifui";
+import { TitleSize } from "./index";
 
 export const Wrapper = styled.div`
   ${(props) => {
@@ -13,10 +14,21 @@ export const Wrapper = styled.div`
   }}
 `;
 
-export const Title = styled.div`
-  ${fontHeaderXs}
+interface TitleProps extends CommonThemeProps {
+  titleSize: TitleSize;
+}
 
-  ${(props) => {
+const doNotForwardProps = ["titleSize"];
+
+export const Title = styled("div", {
+  shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
+})`
+  ${(props: TitleProps) => {
+    const { titleSize } = props;
+    return fontHeader(titleSize);
+  }}
+
+  ${(props: TitleProps) => {
     const spaces = getSpaces(props);
     return `
       margin-bottom: ${spaces?.xxs}px;

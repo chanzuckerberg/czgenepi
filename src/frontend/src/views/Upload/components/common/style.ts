@@ -7,28 +7,29 @@ import {
   getColors,
   getSpaces,
 } from "czifui";
+import { ContentStyles } from "src/common/styles/mixins/global";
 import Instructions from "src/components/Instructions";
 
 export function marginBottom(props: CommonThemeProps): string {
   const spaces = getSpaces(props);
 
   return `
-      margin-bottom: ${spaces?.xl}px;
-    `;
+    margin-bottom: ${spaces?.xl}px;
+  `;
 }
 
 export const Header = styled.div`
+  ${ContentStyles}
+
   display: flex;
   justify-content: space-between;
   align-items: center;
 
   ${(props) => {
-    const spaces = getSpaces(props);
     const colors = getColors(props);
 
     return `
-        padding: ${spaces?.xl}px 125px;
-        border-bottom: 5px solid ${colors?.gray[100]};
+      border-bottom: 5px solid ${colors?.gray[100]};
     `;
   }}
 `;
@@ -36,13 +37,7 @@ export const Header = styled.div`
 export const Content = styled.div`
   flex: 2;
 
-  ${(props) => {
-    const spaces = getSpaces(props);
-
-    return `
-        margin: ${spaces?.xxl}px 125px ${spaces?.l}px 125px;
-    `;
-  }}
+  ${ContentStyles}
 `;
 
 export const Title = styled.div`

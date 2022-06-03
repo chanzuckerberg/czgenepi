@@ -13,6 +13,7 @@ export enum API {
   SAMPLES_VALIDATE_IDS = "/v2/samples/validate_ids/",
   LOCATIONS = "/v2/locations/",
   PANGO_LINEAGES = "/v2/lineages/pango",
+  GROUPS = "/v2/groups/",
 }
 
 export const DEFAULT_HEADERS_MUTATION_OPTIONS: RequestInit = {

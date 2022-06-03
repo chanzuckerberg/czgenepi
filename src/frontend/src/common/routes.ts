@@ -6,6 +6,7 @@ export enum ROUTES {
   DATA = "/data",
   GISAID = "https://www.gisaid.org/",
   GITHUB = "https://github.com/chanzuckerberg/czgenepi/",
+  INVITATIONS = "/members/invitations",
   NEXTSTRAIN = "https://nextstrain.org/",
   TERMS = "/terms",
   PANGOLIN = "https://pangolin.cog-uk.io/",
@@ -22,4 +23,6 @@ export enum ROUTES {
   UPLOAD_STEP2 = "/upload/2",
   UPLOAD_STEP3 = "/upload/3",
   USHER = "https://genome.ucsc.edu/cgi-bin/hgPhyloPlace",
+  GROUP = "/group",
+  GROUP_MEMBERS = "/group/members",
 }

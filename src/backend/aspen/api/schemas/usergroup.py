@@ -2,11 +2,18 @@ import datetime
 from typing import List, Optional
 
 from aspen.api.schemas.base import BaseRequest, BaseResponse
+from aspen.api.schemas.locations import LocationResponse
 
 
 class GroupResponse(BaseResponse):
     id: int
     name: str
+
+
+class GroupInfoResponse(GroupResponse):
+    address: Optional[str]
+    prefix: str
+    default_tree_location: LocationResponse
 
 
 class UserBaseResponse(BaseResponse):
@@ -57,3 +64,21 @@ class MemberResponse(UserBaseResponse):
 
 class GroupMembersResponse(BaseResponse):
     members: List[MemberResponse]
+
+
+class InvitationResponse(BaseResponse):
+    class Inviter(BaseResponse):
+        name: str
+
+    class Invitee(BaseResponse):
+        email: str
+
+    id: str
+    created_at: str
+    expires_at: str
+    inviter: Inviter
+    invitee: Invitee
+
+
+class InvitationsResponse(BaseResponse):
+    invitations: List[InvitationResponse]

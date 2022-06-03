@@ -1,5 +1,6 @@
 import { compact, filter } from "lodash";
 import React, { ChangeEvent, useCallback, useEffect, useState } from "react";
+import { INPUT_DELIMITERS } from "src/common/constants/inputDelimiters";
 import {
   SampleValidationResponseType,
   useValidateSampleIds,
@@ -67,7 +68,7 @@ const SampleIdInput = ({
   }, [handleInputModeChange, hasUnsavedChanges, isInEditMode]);
 
   const parseInputIds = useCallback(() => {
-    const tokens = inputValue.split(/[\n\t,]/g);
+    const tokens = inputValue.split(INPUT_DELIMITERS);
     const trimmedTokens = tokens.map((t) => t.trim());
     return compact(trimmedTokens);
   }, [inputValue]);

@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import { SmallerThanBreakpoint } from "src/common/styles/mixins/global";
 
 export const HeroEmailForm = styled.form`
   filter: drop-shadow(0px 100px 80px rgba(0, 0, 0, 0.24))
@@ -13,10 +14,10 @@ export const HeroEmailForm = styled.form`
   border-radius: 999px;
   display: flex;
 
-  @media (max-width: 768px) {
+  ${SmallerThanBreakpoint(`
     flex-direction: column;
     align-items: center;
-  }
+  `)}
 
   @-moz-document url-prefix() {
     filter: initial;
@@ -42,13 +43,13 @@ export const EmailInput = styled.input`
     line-height: 21px;
   }
 
-  @media (max-width: 768px) {
+  ${SmallerThanBreakpoint(`
     border-radius: 999px;
     margin-bottom: 7px;
     width: 100%;
     padding: 13px;
     text-align: center;
-  }
+  `)}
 `;
 
 export const SubmitButton = styled.button`
@@ -69,10 +70,10 @@ export const SubmitButton = styled.button`
     line-height: 21px;
   }
 
-  @media (max-width: 768px) {
+  ${SmallerThanBreakpoint(`
     border-radius: 999px;
     width: 100%;
-  }
+  `)}
 `;
 
 export const SubmitIcon = styled.span`
