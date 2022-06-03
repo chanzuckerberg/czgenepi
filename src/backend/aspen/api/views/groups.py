@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from starlette.requests import Request
 
-from aspen.api.auth import get_auth0_client, get_auth_user
+from aspen.api.auth import get_auth0_apiclient, get_auth_user
 from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.usergroup import (
@@ -64,7 +64,7 @@ async def get_group_invitations(
     group_id: int,
     request: Request,
     db: AsyncSession = Depends(get_db),
-    auth0_client: Auth0Client = Depends(get_auth0_client),
+    auth0_client: Auth0Client = Depends(get_auth0_apiclient),
     user: User = Depends(get_auth_user),
 ) -> InvitationsResponse:
     if user.group.id != group_id and not user.system_admin:
@@ -85,7 +85,7 @@ async def get_group_invitations(
 async def invite_group_members(
     group_id: int,
     group_invitation_request: GroupInvitationsRequest,
-    auth0_client: Auth0Client = Depends(get_auth0_client),
+    auth0_client: Auth0Client = Depends(get_auth0_apiclient),
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_auth_user),

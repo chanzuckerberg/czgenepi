@@ -9,7 +9,7 @@ from fastapi import Depends, FastAPI, Request
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from aspen.api.auth import get_auth0_client, get_auth_user, setup_userinfo
+from aspen.api.auth import get_auth0_apiclient, get_auth_user, setup_userinfo
 from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.main import get_app
@@ -127,15 +127,15 @@ async def override_get_auth_user(
     return found_auth_user
 
 
-async def override_get_auth0_client(
+async def override_get_auth0_apiclient(
     request: Request,
     settings: Settings = Depends(get_settings),
 ) -> Auth0Client:
     client_id: str = settings.AUTH0_MANAGEMENT_CLIENT_ID
     client_secret: str = settings.AUTH0_MANAGEMENT_CLIENT_SECRET
     domain: str = settings.AUTH0_MANAGEMENT_DOMAIN
-    auth0_client = MockAuth0Client(client_id, client_secret, domain)
-    return auth0_client
+    auth0_apiclient = MockAuth0Client(client_id, client_secret, domain)
+    return auth0_apiclient
 
 
 @pytest.fixture()
@@ -145,7 +145,7 @@ async def api(
     api = get_app()
     api.dependency_overrides[get_db] = partial(override_get_db, async_db)
     api.dependency_overrides[get_auth_user] = override_get_auth_user
-    api.dependency_overrides[get_auth0_client] = override_get_auth0_client
+    api.dependency_overrides[get_auth0_apiclient] = override_get_auth0_apiclient
     return api
 
 
