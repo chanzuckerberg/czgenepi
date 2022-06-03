@@ -60,6 +60,7 @@ const NavBarLoggedIn = (): JSX.Element => {
   }
 
   const orgSplash = hasOrg();
+  const name = group?.name;
 
   return (
     <NavBar data-test-id="navbar">
@@ -70,14 +71,16 @@ const NavBarLoggedIn = (): JSX.Element => {
             {!isUserOnboardingFlagOn && orgSplash}
           </LogoAnchor>
         </Link>
-        {group?.name && isUserOnboardingFlagOn && (
+        {name && isUserOnboardingFlagOn && (
           <>
             <Separator />
-            {isInviteModalOpen && (
-              <InviteModal onClose={() => setIsInviteModalOpen(false)} />
-            )}
+            <InviteModal
+              onClose={() => setIsInviteModalOpen(false)}
+              open={isInviteModalOpen}
+              groupName={name}
+            />
             <DropdownClickTarget onClick={toggleDropdown}>
-              <NavOrg>{group?.name}</NavOrg>
+              <NavOrg>{name}</NavOrg>
               <StyledIcon>
                 <Icon sdsIcon="chevronDown" sdsSize="xs" sdsType="static" />
               </StyledIcon>
