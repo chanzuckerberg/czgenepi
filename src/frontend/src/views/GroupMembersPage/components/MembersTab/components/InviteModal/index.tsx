@@ -1,8 +1,12 @@
 import { Button, Dialog, DialogActions, DialogTitle } from "czifui";
 import { compact } from "lodash";
 import React, { ChangeEvent, useState } from "react";
+import { noop } from "src/common/constants/empty";
 import { INPUT_DELIMITERS } from "src/common/constants/inputDelimiters";
+import { useUserInfo } from "src/common/queries/auth";
+import { useSendGroupInvitations } from "src/common/queries/groups";
 import { B } from "src/common/styles/basicStyle";
+import { getGroupIdFromUser } from "src/common/utils/userUtils";
 import { InvalidEmailError } from "./components/InvalidEmailError";
 import { SentNotification } from "./components/InvalidEmailError/components/SentNotification";
 import {
@@ -16,10 +20,12 @@ import {
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/g;
 
 interface Props {
+  groupName: string;
   onClose(): void;
+  open: boolean;
 }
 
-const InviteModal = ({ onClose }: Props): JSX.Element => {
+const InviteModal = ({ groupName, onClose, open }: Props): JSX.Element => {
   const [inputValue, setInputValue] = useState<string>("");
   const [hasMoreThan50Invites, setHasMoreThan50Invites] =
     useState<boolean>(false);
@@ -28,9 +34,26 @@ const InviteModal = ({ onClose }: Props): JSX.Element => {
   const [shouldValidateOnChange, setShouldValidateOnChange] = // eslint-disable-line @typescript-eslint/no-unused-vars
     useState<boolean>(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState<boolean>(false);
+  const [sentCount, setSentCount] = useState<number>(0);
+
+  const { data: userInfo } = useUserInfo();
+  const groupId = getGroupIdFromUser(userInfo);
+
+  const handleClose = () => {
+    setInputValue("");
+    setHasMoreThan50Invites(false);
+    setInvalidAddresses([]);
+    setShouldValidateOnChange(false);
+
+    onClose();
+  };
+
+  const getAddressArrayFromInputValue = () => {
+    return inputValue.trim().split(INPUT_DELIMITERS);
+  };
 
   const validate = (): boolean => {
-    const addresses = inputValue.trim().split(INPUT_DELIMITERS);
+    const addresses = getAddressArrayFromInputValue();
     const newInvalidAddresses = compact(
       addresses.filter((address) => !address.match(EMAIL_REGEX))
     );
@@ -54,12 +77,6 @@ const InviteModal = ({ onClose }: Props): JSX.Element => {
     setInputValue(value);
   };
 
-  // const title = (
-  //   <StyledSpan>
-  //     Invite to <B>Santa Clara County</B>
-  //   </StyledSpan>
-  // );
-
   const instructions = [
     <span key={0}>You can send a maximum of 50 invitations at a time.</span>,
     <span key={1}>Separate emails by tabs, commas, or enter one per row.</span>,
@@ -71,22 +88,32 @@ const InviteModal = ({ onClose }: Props): JSX.Element => {
 
   const inputIntent = invalidAddresses.length > 0 ? "error" : "default";
 
+  const sendInvitationMutation = useSendGroupInvitations({
+    componentOnSuccess: ({ invitations }) => {
+      setSentCount(invitations.length);
+      setIsNotificationOpen(true);
+      handleClose();
+    },
+    componentOnError: noop,
+  });
+
   const handleFormSubmit = () => {
     const areAllAddressesValid = validate();
     if (!areAllAddressesValid) return;
 
-    // TODO (mlila): api call
+    const emails = getAddressArrayFromInputValue();
+    sendInvitationMutation.mutate({ emails, groupId });
   };
 
   return (
     <>
       <SentNotification
-        numSent={5} // TODO (mlila): update after API call return
+        numSent={sentCount}
         onDismiss={() => setIsNotificationOpen(false)}
         open={isNotificationOpen}
       />
-      <Dialog open onClose={onClose} sdsSize="s">
-        <DialogTitle title="Invite to Santa Clara County" onClose={onClose} />{" "}
+      <Dialog open={open} onClose={handleClose} sdsSize="s">
+        <DialogTitle title={`Invite to ${groupName}`} onClose={handleClose} />{" "}
         {/* TODO (mlila): make group name bold after sds dialog allows ReactNode */}
         <StyledDialogContent>
           <StyledInstructions

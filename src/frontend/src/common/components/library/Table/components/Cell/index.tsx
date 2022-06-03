@@ -5,8 +5,10 @@ interface Props {
   content: ReactNode;
 }
 
+const NO_CONTENT_FALLBACK = "--";
+
 const Cell = ({ content }: Props): JSX.Element => {
-  return <StyledCell>{content}</StyledCell>;
+  return <StyledCell>{content ?? NO_CONTENT_FALLBACK}</StyledCell>;
 };
 
 export { Cell };

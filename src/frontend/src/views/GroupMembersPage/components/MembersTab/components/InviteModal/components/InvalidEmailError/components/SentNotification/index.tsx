@@ -22,7 +22,7 @@ const SentNotification = ({ numSent, onDismiss, open }: Props): JSX.Element => {
     >
       {numSent} {pluralize("Invitation", numSent)} {pluralize("has", numSent)}{" "}
       been sent.{" "}
-      <Link sdsStyle="dashed" href={ROUTES.INVITATIONS}>
+      <Link sdsStyle="dashed" href={ROUTES.GROUP_INVITATIONS}>
         View Invitations
       </Link>
       .
