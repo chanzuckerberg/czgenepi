@@ -34,6 +34,8 @@ export const mapUserData = (obj: RawUserRequest): User => {
   const mappedUserData: User = {
     acknowledgedPolicyVersion: obj.acknowledged_policy_version,
     agreedToTos: obj.agreed_to_tos,
+    // @ts-expect-error TODO (mlila): types
+    email: obj.email,
     id: obj.id,
     isGroupAdmin: obj.group_admin,
     name: obj.name,

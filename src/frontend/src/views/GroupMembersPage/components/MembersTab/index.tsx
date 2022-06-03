@@ -1,9 +1,11 @@
 import { Button, Tab } from "czifui";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import { Table } from "src/common/components/library/Table";
+import { HeadAppTitle } from "src/common/components";
 import { ROUTES } from "src/common/routes";
 import { TabEventHandler } from "../../index";
+import { ActiveMembersTable } from "./components/ActiveMembersTable";
+import { MemberInvitationsTable } from "./components/MemberInvitationsTable";
 import { Header, StyledTabs } from "./style";
 
 enum SecondaryTabType {
@@ -11,6 +13,7 @@ enum SecondaryTabType {
   INVITATIONS = "invitations",
 }
 
+//TODO (mlila): types
 interface Props {
   secondaryQueryParam?: string;
   invites: any[];
@@ -53,6 +56,7 @@ const MembersTab = ({
 
   return (
     <>
+      <HeadAppTitle subTitle="Group Details" />
       <Header>
         <StyledTabs
           value={tabValue}
@@ -75,20 +79,11 @@ const MembersTab = ({
           Invite
         </Button>
       </Header>
-      <Table />
       {tabValue === SecondaryTabType.ACTIVE && (
-        <div>
-          {members.map((m) => (
-            <div key={m.name}>{m.name}</div>
-          ))}
-        </div>
+        <ActiveMembersTable members={members} />
       )}
       {tabValue === SecondaryTabType.INVITATIONS && (
-        <div>
-          {invites.map((i) => (
-            <div key={i.email}>{i.email}</div>
-          ))}
-        </div>
+        <MemberInvitationsTable invites={invites} />
       )}
     </>
   );

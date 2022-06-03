@@ -5,5 +5,4 @@ export const PAGE_TITLES: Record<string, string> = {
   [ROUTES.HOMEPAGE]: "Public Health Open-Source Tool",
   [ROUTES.DATA_SAMPLES]: "Samples",
   [ROUTES.PHYLO_TREES]: "Phylogenetic Trees",
-  [ROUTES.GROUP_MEMBERS]: "Group Details",
 };
