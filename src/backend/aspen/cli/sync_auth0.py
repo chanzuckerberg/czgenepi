@@ -18,6 +18,7 @@ from aspen.database.models import Group, User
 
 
 class ObjectManager:
+    db_auth0_id_field: Optional[str] = None
     auth0_id_field: Optional[str] = None
     auth0_match_field: str = ""
     db_match_field: str = ""
@@ -101,7 +102,8 @@ class UserGroupManager(ObjectManager):
 
 
 class GroupManager(ObjectManager):
-    auth0_id_field = "auth0_org_id"
+    auth0_id_field = "id"
+    db_auth0_id_field = "auth0_org_id"
     auth0_match_field = "display_name"
     db_match_field = "name"
 
@@ -141,7 +143,8 @@ class GroupManager(ObjectManager):
 
 
 class UserManager(ObjectManager):
-    auth0_id_field = "auth0_user_id"
+    auth0_id_field = "user_id"
+    db_auth0_id_field = "auth0_user_id"
     auth0_match_field = "user_id"
     db_match_field = "auth0_user_id"
 
@@ -221,10 +224,10 @@ class SuperSyncer:
             object_manager.db_match_field,
         )
         # Set db object ID's to use the proper auth0 id wherever possible:
-        db_key_name = object_manager.auth0_id_field
+        db_key_name = object_manager.db_auth0_id_field
         if db_key_name:
             for db_obj, auth0_obj in matching_tuples:
-                setattr(db_obj, db_key_name, auth0_obj["id"])
+                setattr(db_obj, db_key_name, auth0_obj[object_manager.auth0_id_field])
         if self.source_of_truth == "auth0":
             delete_callback = object_manager.db_delete
             create_callback = object_manager.db_create
@@ -238,8 +241,7 @@ class SuperSyncer:
         for obj in to_add:
             res = create_callback(obj)
             if res:
-                print(res)
-                setattr(obj, object_manager.auth0_id_field, res["id"])
+                setattr(obj, object_manager.db_auth0_id_field, res[object_manager.auth0_id_field])
         if self.delete_ok:
             for obj in to_delete:
                 delete_callback(obj)
