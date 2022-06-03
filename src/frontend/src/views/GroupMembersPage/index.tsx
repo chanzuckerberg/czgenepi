@@ -98,7 +98,7 @@ const GroupMembersPage = ({ pathTokens }: Props): JSX.Element => {
         {tabValue === PrimaryTabType.MEMBERS && (
           <MembersTab
             secondaryQueryParam={secondaryQueryParam}
-            invites={invites}
+            groupName={name}
             members={members}
           />
         )}

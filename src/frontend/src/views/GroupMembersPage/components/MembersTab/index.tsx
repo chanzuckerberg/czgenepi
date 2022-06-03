@@ -17,7 +17,7 @@ enum SecondaryTabType {
 //TODO (mlila): types
 interface Props {
   secondaryQueryParam?: string;
-  invites: any[];
+  groupName: string;
   members: any[];
 }
 
@@ -30,7 +30,7 @@ const isValidSecondaryTab = (token?: string) => {
 
 const MembersTab = ({
   secondaryQueryParam,
-  invites,
+  groupName,
   members,
 }: Props): JSX.Element => {
   const initialSecondaryTab = (
@@ -59,9 +59,11 @@ const MembersTab = ({
   return (
     <>
       <HeadAppTitle subTitle="Group Details" />
-      {isInviteModalOpen && (
-        <InviteModal onClose={() => setIsInviteModalOpen(false)} />
-      )}
+      <InviteModal
+        onClose={() => setIsInviteModalOpen(false)}
+        groupName={groupName}
+        open={isInviteModalOpen}
+      />
       <Header>
         <StyledTabs
           value={tabValue}
