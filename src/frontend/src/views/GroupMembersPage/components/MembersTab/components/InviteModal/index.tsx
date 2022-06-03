@@ -1,6 +1,7 @@
 import { Button, Dialog, DialogActions, DialogTitle } from "czifui";
 import { compact } from "lodash";
 import React, { ChangeEvent, useState } from "react";
+import { noop } from "src/common/constants/empty";
 import { INPUT_DELIMITERS } from "src/common/constants/inputDelimiters";
 import { useUserInfo } from "src/common/queries/auth";
 import { useSendGroupInvitations } from "src/common/queries/groups";
@@ -29,7 +30,8 @@ const InviteModal = ({ groupName, onClose, open }: Props): JSX.Element => {
   const [hasMoreThan50Invites, setHasMoreThan50Invites] =
     useState<boolean>(false);
   const [invalidAddresses, setInvalidAddresses] = useState<string[]>([]);
-  const [shouldValidateOnChange, setShouldValidateOnChange] =
+  // @ts-expect-error remove when api call finished
+  const [shouldValidateOnChange, setShouldValidateOnChange] = // eslint-disable-line @typescript-eslint/no-unused-vars
     useState<boolean>(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState<boolean>(false);
   const [sentCount, setSentCount] = useState<number>(0);
@@ -42,7 +44,6 @@ const InviteModal = ({ groupName, onClose, open }: Props): JSX.Element => {
     setHasMoreThan50Invites(false);
     setInvalidAddresses([]);
     setShouldValidateOnChange(false);
-    setIsNotificationOpen(false);
 
     onClose();
   };
@@ -88,11 +89,12 @@ const InviteModal = ({ groupName, onClose, open }: Props): JSX.Element => {
   const inputIntent = invalidAddresses.length > 0 ? "error" : "default";
 
   const sendInvitationMutation = useSendGroupInvitations({
-    componentOnSuccess: (emails) => {
-      setSentCount(emails.length);
+    componentOnSuccess: ({ invitations }) => {
+      setSentCount(invitations.length);
       setIsNotificationOpen(true);
       handleClose();
     },
+    componentOnError: noop,
   });
 
   const handleFormSubmit = () => {

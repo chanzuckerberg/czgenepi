@@ -56,6 +56,24 @@ const MembersTab = ({
     setTabValue(value);
   };
 
+  // TODO (mlila): api call
+  const invites = [
+    {
+      email: "erica@fake.com",
+      status: "pending",
+      dateSent: "2022-05-24",
+      role: "Member",
+    },
+    {
+      email: "frank@fake.com",
+      status: "expired",
+      dateSent: "2022-03-24",
+      role: "Member",
+    },
+  ];
+
+  invites.sort((a, b) => (a.dateSent > b.dateSent ? 1 : -1));
+
   return (
     <>
       <HeadAppTitle subTitle="Group Details" />

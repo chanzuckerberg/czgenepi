@@ -71,7 +71,7 @@ const NavBarLoggedIn = (): JSX.Element => {
             {!isUserOnboardingFlagOn && orgSplash}
           </LogoAnchor>
         </Link>
-        {group?.name && isUserOnboardingFlagOn && (
+        {name && isUserOnboardingFlagOn && (
           <>
             <Separator />
             <InviteModal

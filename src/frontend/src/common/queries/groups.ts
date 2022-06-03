@@ -8,6 +8,7 @@ import { API, DEFAULT_FETCH_OPTIONS, DEFAULT_POST_OPTIONS } from "../api";
 import { API_URL } from "../constants/ENV";
 import { mapUserData, RawUserRequest } from "./auth";
 import { ENTITIES } from "./entities";
+import { MutationCallbacks } from "./types";
 
 export interface RawGroupRequest {
   address: string;
@@ -101,10 +102,6 @@ export async function fetchGroupMembers({
  * fetch group invitations
  */
 
-interface InvitationsFetchResponseType {
-  members: RawInvitationRequest[];
-}
-
 export const USE_GROUP_INVITATION_INFO = {
   entities: [ENTITIES.GROUP_INVITATION_INFO],
   id: "groupInvitationInfo",
@@ -112,7 +109,7 @@ export const USE_GROUP_INVITATION_INFO = {
 
 export function useGroupInvitations(
   groupId?: number
-): UseQueryResult<User[], unknown> {
+): UseQueryResult<string[], unknown> {
   return useQuery(
     [USE_GROUP_INVITATION_INFO],
     () => fetchGroupInvitations({ groupId }),
@@ -126,7 +123,7 @@ export async function fetchGroupInvitations({
   groupId,
 }: {
   groupId?: number;
-}): Promise<GroupMembersFetchResponseType> {
+}): Promise<InvitationResponseType> {
   const response = await fetch(
     API_URL + API.GROUPS + groupId + "/invitations/",
     {
@@ -144,15 +141,16 @@ export async function fetchGroupInvitations({
 
 interface InvitationPayload {
   emails: string[];
+  role: string;
 }
 
 interface InvitationRequestType {
   emails: string[];
-  groupId: number;
+  groupId?: number;
 }
 
 interface InvitationResponseType {
-  emails: string[];
+  invitations: string[];
 }
 
 type InvitationCallbacks = MutationCallbacks<InvitationResponseType>;
