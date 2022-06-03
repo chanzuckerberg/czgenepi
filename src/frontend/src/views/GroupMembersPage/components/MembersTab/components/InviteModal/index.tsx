@@ -1,5 +1,5 @@
 import { Button, Dialog, DialogActions, DialogTitle } from "czifui";
-import { compact } from "lodash";
+import { compact, uniq } from "lodash";
 import React, { ChangeEvent, useState } from "react";
 import { noop } from "src/common/constants/empty";
 import { INPUT_DELIMITERS } from "src/common/constants/inputDelimiters";
@@ -49,7 +49,7 @@ const InviteModal = ({ groupName, onClose, open }: Props): JSX.Element => {
   };
 
   const getAddressArrayFromInputValue = () => {
-    return inputValue.trim().split(INPUT_DELIMITERS);
+    return uniq(inputValue.trim().split(INPUT_DELIMITERS));
   };
 
   const validate = (): boolean => {
