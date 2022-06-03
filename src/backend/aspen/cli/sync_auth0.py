@@ -241,7 +241,11 @@ class SuperSyncer:
         for obj in to_add:
             res = create_callback(obj)
             if res:
-                setattr(obj, object_manager.db_auth0_id_field, res[object_manager.auth0_id_field])
+                setattr(
+                    obj,
+                    object_manager.db_auth0_id_field,
+                    res[object_manager.auth0_id_field],
+                )
         if self.delete_ok:
             for obj in to_delete:
                 delete_callback(obj)
