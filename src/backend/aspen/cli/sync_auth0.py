@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import logging
-from typing import Any, List, MutableSequence, Tuple
+from typing import Any, List, MutableSequence, Optional, Tuple
 
 import click
 import sqlalchemy as sa
@@ -18,6 +18,10 @@ from aspen.database.models import Group, User
 
 
 class ObjectManager:
+    auth0_id_field: Optional[str] = None
+    auth0_match_field: str = ""
+    db_match_field: str = ""
+
     def __init__(self, auth0_client: Auth0Client, db: Session, dry_run: bool) -> None:
         self.auth0_client = auth0_client
         self.db = db
@@ -29,7 +33,7 @@ class ObjectManager:
     def db_delete(self, ojbect: Any) -> None:
         raise NotImplementedError("Please implement this method")
 
-    def auth0_create(self, ojbect: Any) -> None:
+    def auth0_create(self, ojbect: Any) -> Optional[Any]:
         raise NotImplementedError("Please implement this method")
 
     def db_create(self, ojbect: Any) -> None:
@@ -97,7 +101,7 @@ class UserGroupManager(ObjectManager):
 
 
 class GroupManager(ObjectManager):
-    auth0_field = "auth0_org_id"
+    auth0_id_field = "auth0_org_id"
     auth0_match_field = "display_name"
     db_match_field = "name"
 
@@ -115,10 +119,10 @@ class GroupManager(ObjectManager):
         # TODO - this is complicated and we don't even know if we want it.
         raise Exception("deleting orgs is not currently supported")
 
-    def auth0_create(self, db_group: Group) -> Auth0Org:
+    def auth0_create(self, db_group: Group) -> Optional[Auth0Org]:
         logging.info(f"Adding auth0 group {db_group.name}")
         if self.dry_run:
-            return
+            return None
         res = self.auth0_client.add_org(db_group.id, db_group.name)
         logging.info("...done")
         return res
@@ -137,7 +141,7 @@ class GroupManager(ObjectManager):
 
 
 class UserManager(ObjectManager):
-    auth0_field = "auth0_user_id"
+    auth0_id_field = "auth0_user_id"
     auth0_match_field = "user_id"
     db_match_field = "auth0_user_id"
 
@@ -155,10 +159,10 @@ class UserManager(ObjectManager):
         # TODO - this is complicated and we don't even know if we want it.
         raise Exception("Removing users from DB groups is not supported")
 
-    def auth0_create(self, db_user: User) -> Auth0User:
+    def auth0_create(self, db_user: User) -> Optional[Auth0User]:
         logging.info(f"Adding db user {db_user.email} to auth0")
         if self.dry_run:
-            return
+            return None
         res = self.auth0_client.create_user(db_user.email, db_user.name)
         logging.info("...done")
         return res
@@ -192,7 +196,9 @@ class SuperSyncer:
         db_objects: MutableSequence[Any],
         auth0_match_field: str,
         db_match_field: str,
-    ) -> Tuple[MutableSequence[Any], MutableSequence[Any]]:
+    ) -> Tuple[
+        MutableSequence[Any], MutableSequence[Any], MutableSequence[Tuple[Any, Any]]
+    ]:
         db_map = {getattr(obj, db_match_field): obj for obj in db_objects}
         auth0_map = {obj[auth0_match_field]: obj for obj in auth0_objects}
         auth0_only = [auth0_map[key] for key in auth0_map.keys() - db_map.keys()]
@@ -215,13 +221,10 @@ class SuperSyncer:
             object_manager.db_match_field,
         )
         # Set db object ID's to use the proper auth0 id wherever possible:
-        try:
-            db_key_name = object_manager.auth0_field
+        db_key_name = object_manager.auth0_id_field
+        if db_key_name:
             for db_obj, auth0_obj in matching_tuples:
                 setattr(db_obj, db_key_name, auth0_obj["id"])
-        except AttributeError:
-            # There is no identifier key to sync, that's ok.
-            pass
         if self.source_of_truth == "auth0":
             delete_callback = object_manager.db_delete
             create_callback = object_manager.db_create
@@ -236,7 +239,7 @@ class SuperSyncer:
             res = create_callback(obj)
             if res:
                 print(res)
-                setattr(obj, object_manager.auth0_field, res["id"])
+                setattr(obj, object_manager.auth0_id_field, res["id"])
         if self.delete_ok:
             for obj in to_delete:
                 delete_callback(obj)
