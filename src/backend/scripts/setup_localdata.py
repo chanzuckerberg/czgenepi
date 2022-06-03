@@ -55,7 +55,7 @@ def create_test_user(session, group, user_id, name):
         name=name,
         auth0_user_id=user_id,
         split_id=user_id,
-        email=f"{user_id}@chanzuckerberg.com",
+        email=f"{user_id}@czgenepi.org",
         group_admin=True,
         system_admin=True,
         group=group,
