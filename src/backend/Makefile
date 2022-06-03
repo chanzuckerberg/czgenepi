@@ -55,6 +55,8 @@ remote-db-migrations:
 		aspen-cli db --remote setup; \
 	fi
 	DB=remote alembic upgrade head
+	sleep 60
+# REMOVE HACK sleep 60 should not be merged for real, just here to launch rdev
 
 .PHONY: remote-db-drop
 remote-db-drop:
