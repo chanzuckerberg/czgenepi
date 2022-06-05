@@ -41,7 +41,7 @@ const MembersTab = ({
     router.push(`${ROUTES.GROUP_MEMBERS}/${value}`);
   };
 
-  invitations.sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1));
+  invitations.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
 
   return (
     <>
