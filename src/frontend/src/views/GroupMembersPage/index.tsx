@@ -42,13 +42,7 @@ const GroupMembersPage = ({
   const { data: members = [] } = useGroupMembersInfo(groupId);
   const { data: groupInfo } = useGroupInfo(groupId);
 
-  useEffect(() => {
-    router.push(`${ROUTES.GROUP}/${tabValue}`, undefined, { shallow: true });
-  }, [tabValue]);
-
-  if (!groupInfo) return null;
-
-  const { address, location, name, prefix } = groupInfo;
+  const { address, location, name, prefix } = groupInfo ?? {};
 
   // sort group members by name before display
   members.sort((a, b) => (a.name > b.name ? 1 : -1));
@@ -79,6 +73,7 @@ const GroupMembersPage = ({
           <MembersTab
             initialSecondaryTab={initialSecondaryTab}
             groupName={name}
+            groupId={groupId}
             members={members}
           />
         )}
