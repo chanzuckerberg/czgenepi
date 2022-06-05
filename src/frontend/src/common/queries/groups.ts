@@ -6,7 +6,6 @@ import {
 } from "react-query";
 import { API, DEFAULT_FETCH_OPTIONS, DEFAULT_POST_OPTIONS } from "../api";
 import { API_URL } from "../constants/ENV";
-import { mapUserData, RawUserRequest } from "./auth";
 import { ENTITIES } from "./entities";
 import { MutationCallbacks } from "./types";
 
@@ -26,6 +25,17 @@ interface RawInvitationResponse {
   inviter: { name: string };
 }
 
+export interface RawGroupMemberRequest {
+  id: number;
+  name: string;
+  agreed_to_tos: boolean;
+  acknowledged_policy_version: string | null;
+  group_admin: boolean;
+  email: string;
+  created_at: string;
+  role: GroupRole;
+}
+
 export const mapGroupData = (obj: RawGroupRequest): Group => {
   return {
     address: obj.address,
@@ -43,6 +53,19 @@ const mapGroupInvitations = (obj: RawInvitationResponse): Invitation => {
     id: obj.id,
     invitee: obj.invitee,
     inviter: obj.inviter,
+  };
+};
+
+export const mapGroupMemberData = (obj: RawGroupMemberRequest): GroupMember => {
+  return {
+    acknowledgedPolicyVersion: obj.acknowledged_policy_version,
+    agreedToTos: obj.agreed_to_tos,
+    createdAt: obj.created_at,
+    email: obj.email,
+    id: obj.id,
+    isGroupAdmin: obj.group_admin,
+    name: obj.name,
+    role: obj.role,
   };
 };
 
@@ -79,7 +102,7 @@ export async function fetchGroup({
  */
 
 interface GroupMembersFetchResponseType {
-  members: RawUserRequest[];
+  members: RawGroupMemberRequest[];
 }
 
 export const USE_GROUP_MEMBER_INFO = {
@@ -89,7 +112,7 @@ export const USE_GROUP_MEMBER_INFO = {
 
 export function useGroupMembersInfo(
   groupId?: number
-): UseQueryResult<User[], unknown> {
+): UseQueryResult<GroupMember[], unknown> {
   return useQuery(
     [USE_GROUP_MEMBER_INFO],
     () => fetchGroupMembers({ groupId }),
@@ -97,7 +120,7 @@ export function useGroupMembersInfo(
       retry: false,
       select: (data) => {
         const { members } = data;
-        return members.map((m) => mapUserData(m));
+        return members.map((m) => mapGroupMemberData(m));
       },
     }
   );

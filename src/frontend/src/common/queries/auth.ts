@@ -31,20 +31,14 @@ export interface RawUserRequest {
 }
 
 export const mapUserData = (obj: RawUserRequest): User => {
-  const mappedUserData: User = {
+  return {
     acknowledgedPolicyVersion: obj.acknowledged_policy_version,
     agreedToTos: obj.agreed_to_tos,
-    // @ts-expect-error TODO (mlila): types
-    email: obj.email,
+    group: mapGroupData(obj.group),
     id: obj.id,
-    isGroupAdmin: obj.group_admin,
     name: obj.name,
     splitId: obj.split_id,
   };
-
-  if (obj.group) mappedUserData.group = mapGroupData(obj.group);
-
-  return mappedUserData;
 };
 
 export const fetchUserInfo = (): Promise<RawUserRequest> => {

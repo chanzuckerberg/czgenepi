@@ -17,11 +17,10 @@ enum SecondaryTabType {
   INVITATIONS = "invitations",
 }
 
-//TODO (mlila): types
 interface Props {
   secondaryQueryParam?: string;
   groupName: string;
-  members: any[];
+  members: GroupMember[];
 }
 
 const isValidSecondaryTab = (token?: string) => {
