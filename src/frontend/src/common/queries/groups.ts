@@ -18,6 +18,14 @@ export interface RawGroupRequest {
   prefix: string;
 }
 
+interface RawInvitationResponse {
+  created_at: string;
+  expires_at: string;
+  id: string;
+  invitee: { email: string };
+  inviter: { name: string };
+}
+
 export const mapGroupData = (obj: RawGroupRequest): Group => {
   return {
     address: obj.address,
@@ -25,6 +33,16 @@ export const mapGroupData = (obj: RawGroupRequest): Group => {
     location: obj.default_tree_location,
     name: obj.name,
     prefix: obj.prefix,
+  };
+};
+
+const mapGroupInvitations = (obj: RawInvitationResponse): Invitation => {
+  return {
+    createdAt: obj.created_at,
+    expiresAt: obj.expires_at,
+    id: obj.id,
+    invitee: obj.invitee,
+    inviter: obj.inviter,
   };
 };
 
@@ -102,6 +120,10 @@ export async function fetchGroupMembers({
  * fetch group invitations
  */
 
+interface FetchInvitationResponseType {
+  invitations: RawInvitationResponse[];
+}
+
 export const USE_GROUP_INVITATION_INFO = {
   entities: [ENTITIES.GROUP_INVITATION_INFO],
   id: "groupInvitationInfo",
@@ -109,12 +131,16 @@ export const USE_GROUP_INVITATION_INFO = {
 
 export function useGroupInvitations(
   groupId?: number
-): UseQueryResult<string[], unknown> {
+): UseQueryResult<Invitation[], unknown> {
   return useQuery(
     [USE_GROUP_INVITATION_INFO],
     () => fetchGroupInvitations({ groupId }),
     {
       retry: false,
+      select: (data) => {
+        const { invitations } = data;
+        return invitations.map((i) => mapGroupInvitations(i));
+      },
     }
   );
 }
@@ -123,7 +149,7 @@ export async function fetchGroupInvitations({
   groupId,
 }: {
   groupId?: number;
-}): Promise<InvitationResponseType> {
+}): Promise<FetchInvitationResponseType> {
   const response = await fetch(
     API_URL + API.GROUPS + groupId + "/invitations/",
     {
@@ -150,6 +176,7 @@ interface InvitationRequestType {
 }
 
 interface InvitationResponseType {
+  // a list of emails that were successfully invited
   invitations: string[];
 }
 

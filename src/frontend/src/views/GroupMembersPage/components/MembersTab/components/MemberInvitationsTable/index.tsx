@@ -3,18 +3,24 @@ import { Table } from "src/common/components/library/Table";
 import { EmailCell } from "./components/EmailCell";
 
 interface Props {
-  invites: any;
+  invites: Invitation[];
 }
 
 const MemberInvitationsTable = ({ invites }: Props): JSX.Element => {
   const headers = ["Email", "Date Sent", "Role"];
 
-  // TODO (mlila): types
-  const rows = invites.map((i: any) => [
-    <EmailCell key={0} email={i.email} status={i.status} />,
-    i.dateSent,
-    i.role,
-  ]);
+  const rows = invites.map((i: Invitation) => {
+    const { invitee, expiresAt, createdAt } = i;
+    const expirationDate = Date.parse(expiresAt);
+    const hasExpired = expirationDate < Date.now();
+    const status = hasExpired ? "expired" : "pending";
+
+    return [
+      <EmailCell key={0} email={invitee.email} status={status} />,
+      createdAt,
+      "member", // this may vary in the future, but for now only one type of invitation is available
+    ];
+  });
 
   return <Table headers={headers} rows={rows} />;
 };
