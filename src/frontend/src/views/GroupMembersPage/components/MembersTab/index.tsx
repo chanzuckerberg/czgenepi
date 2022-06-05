@@ -8,7 +8,7 @@ import { TabEventHandler } from "../../index";
 import { ActiveMembersTable } from "./components/ActiveMembersTable";
 import { InviteModal } from "./components/InviteModal";
 import { MemberInvitationsTable } from "./components/MemberInvitationsTable";
-import { Header, StyledTabs } from "./style";
+import { Container, Header, StyledTabs } from "./style";
 
 export enum SecondaryTabType {
   ACTIVE = "active",
@@ -44,7 +44,7 @@ const MembersTab = ({
   invitations.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
 
   return (
-    <>
+    <Container>
       <HeadAppTitle subTitle="Group Details" />
       <InviteModal
         onClose={() => setIsInviteModalOpen(false)}
@@ -78,7 +78,7 @@ const MembersTab = ({
       {tabValue === SecondaryTabType.INVITATIONS && (
         <MemberInvitationsTable invites={invitations} />
       )}
-    </>
+    </Container>
   );
 };
 

@@ -39,3 +39,5 @@ export const ContentStyles = (props: CommonThemeProps) => {
     `)}
   `;
 };
+
+export const MAX_CONTENT_WIDTH = 1308;
