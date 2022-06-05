@@ -12,35 +12,22 @@ import { InviteModal } from "./components/InviteModal";
 import { MemberInvitationsTable } from "./components/MemberInvitationsTable";
 import { Header, StyledTabs } from "./style";
 
-enum SecondaryTabType {
+export enum SecondaryTabType {
   ACTIVE = "active",
   INVITATIONS = "invitations",
 }
 
 interface Props {
-  secondaryQueryParam?: string;
+  initialSecondaryTab?: SecondaryTabType;
   groupName: string;
   members: GroupMember[];
 }
 
-const isValidSecondaryTab = (token?: string) => {
-  if (!token) return false;
-  return (
-    token === SecondaryTabType.ACTIVE || token === SecondaryTabType.INVITATIONS
-  );
-};
-
 const MembersTab = ({
-  secondaryQueryParam,
+  initialSecondaryTab = SecondaryTabType.ACTIVE,
   groupName,
   members,
 }: Props): JSX.Element => {
-  const initialSecondaryTab = (
-    isValidSecondaryTab(secondaryQueryParam)
-      ? secondaryQueryParam
-      : SecondaryTabType.ACTIVE
-  ) as SecondaryTabType;
-
   const [tabValue, setTabValue] =
     useState<SecondaryTabType>(initialSecondaryTab);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState<boolean>(false);

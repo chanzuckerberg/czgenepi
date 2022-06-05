@@ -7,7 +7,7 @@ import { ROUTES } from "src/common/routes";
 import { stringifyGisaidLocation } from "src/common/utils/locationUtils";
 import { getGroupIdFromUser } from "src/common/utils/userUtils";
 import { GroupDetailsTab } from "./components/GroupDetailsTab";
-import { MembersTab } from "./components/MembersTab";
+import { MembersTab, SecondaryTabType } from "./components/MembersTab";
 import {
   StyledHeader,
   StyledName,
@@ -15,7 +15,7 @@ import {
   StyledTabs,
 } from "./style";
 
-enum PrimaryTabType {
+export enum PrimaryTabType {
   MEMBERS = "members",
   DETAILS = "details",
 }
@@ -26,21 +26,14 @@ export type TabEventHandler = (
 ) => void;
 
 interface Props {
-  pathTokens?: string[];
+  initialPrimaryTab?: PrimaryTabType;
+  initialSecondaryTab?: SecondaryTabType;
 }
 
-const isValidPrimaryTab = (token?: string) => {
-  return token === PrimaryTabType.MEMBERS || token === PrimaryTabType.DETAILS;
-};
-
-const GroupMembersPage = ({ pathTokens }: Props): JSX.Element | null => {
-  const [primaryQueryParam, secondaryQueryParam] = pathTokens ?? [];
-  const initialPrimaryTab = (
-    isValidPrimaryTab(primaryQueryParam)
-      ? primaryQueryParam
-      : PrimaryTabType.MEMBERS
-  ) as PrimaryTabType;
-
+const GroupMembersPage = ({
+  initialPrimaryTab = PrimaryTabType.MEMBERS,
+  initialSecondaryTab,
+}: Props): JSX.Element | null => {
   const [tabValue, setTabValue] = useState<PrimaryTabType>(initialPrimaryTab);
   const router = useRouter();
 
@@ -83,7 +76,7 @@ const GroupMembersPage = ({ pathTokens }: Props): JSX.Element | null => {
       <StyledPageContent>
         {tabValue === PrimaryTabType.MEMBERS && (
           <MembersTab
-            secondaryQueryParam={secondaryQueryParam}
+            initialSecondaryTab={initialSecondaryTab}
             groupName={name}
             members={members}
           />
