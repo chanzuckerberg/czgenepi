@@ -88,7 +88,7 @@ export async function fetchGroup({
   groupId,
 }: {
   groupId?: number;
-}): Promise<RawGroupRequest> {
+}): Promise<RawGroupRequest> | undefined {
   if (!groupId) return;
 
   const response = await fetch(API_URL + API.GROUPS + groupId, {
@@ -132,7 +132,7 @@ export async function fetchGroupMembers({
   groupId,
 }: {
   groupId?: number;
-}): Promise<GroupMembersFetchResponseType> {
+}): Promise<GroupMembersFetchResponseType> | undefined {
   if (!groupId) return;
 
   const response = await fetch(API_URL + API.GROUPS + groupId + "/members", {

@@ -16,8 +16,8 @@ export enum SecondaryTabType {
 }
 
 interface Props {
-  initialSecondaryTab?: SecondaryTabType;
-  groupName: string;
+  initialSecondaryTab: SecondaryTabType;
+  groupName?: string;
   groupId?: number;
   members: GroupMember[];
 }
@@ -46,11 +46,13 @@ const MembersTab = ({
   return (
     <Container>
       <HeadAppTitle subTitle="Group Details" />
-      <InviteModal
-        onClose={() => setIsInviteModalOpen(false)}
-        groupName={groupName}
-        open={isInviteModalOpen}
-      />
+      {groupName && (
+        <InviteModal
+          onClose={() => setIsInviteModalOpen(false)}
+          groupName={groupName}
+          open={isInviteModalOpen}
+        />
+      )}
       <Header>
         <StyledTabs value={tabValue} sdsSize="small" onChange={handleTabClick}>
           <Tab

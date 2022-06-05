@@ -26,8 +26,8 @@ export type TabEventHandler = (
 ) => void;
 
 interface Props {
-  initialPrimaryTab?: PrimaryTabType;
-  initialSecondaryTab?: SecondaryTabType;
+  initialPrimaryTab: PrimaryTabType;
+  initialSecondaryTab: SecondaryTabType;
 }
 
 const GroupMembersPage = ({
