@@ -18,7 +18,7 @@ const MemberInvitationsTable = ({ invites }: Props): JSX.Element => {
     return [
       <EmailCell key={0} email={invitee.email} status={status} />,
       createdAt,
-      "member", // this may vary in the future, but for now only one type of invitation is available
+      "Member", // this may vary in the future, but for now only one type of invitation is available
     ];
   });
 
