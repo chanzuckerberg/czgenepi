@@ -1,16 +1,21 @@
 import os
+from typing import Optional
 from urllib.parse import urlencode
 
+import sqlalchemy as sa
 from authlib.integrations.base_client.errors import OAuthError
 from authlib.integrations.starlette_client import StarletteOAuth2App
 from fastapi import APIRouter, Depends
 from fastapi.responses import RedirectResponse
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm.exc import NoResultFound
 from starlette.requests import Request
 from starlette.responses import Response
 
 import aspen.api.error.http_exceptions as ex
-from aspen.api.deps import get_auth0_client, get_settings
+from aspen.api.deps import get_auth0_client, get_db, get_settings
 from aspen.api.settings import Settings
+from aspen.database.models import Group, User
 
 # From the example here:
 # https://github.com/authlib/demo-oauth-client/tree/master/fastapi-google-login
@@ -20,10 +25,58 @@ router = APIRouter()
 @router.get("/login")
 async def login(
     request: Request,
+    organization: Optional[str] = None,
+    invitation: Optional[str] = None,
+    organization_name: Optional[str] = None,
     auth0: StarletteOAuth2App = Depends(get_auth0_client),
     settings: Settings = Depends(get_settings),
 ) -> Response:
-    return await auth0.authorize_redirect(request, settings.AUTH0_CALLBACK_URL)
+    kwargs = {}
+    if invitation:
+        kwargs["invitation"] = invitation
+    if organization:
+        kwargs["organization"] = organization
+    if organization_name:
+        kwargs["organization_name"] = organization_name
+    return await auth0.authorize_redirect(
+        request, settings.AUTH0_CALLBACK_URL, **kwargs
+    )
+
+
+async def create_user_if_not_exists(db, userinfo):
+    if "org_id" not in userinfo:
+        return  # We're currently only creating new users if they're confirming an org invitation
+    auth0_user_id = userinfo.get("sub")
+    if not auth0_user_id:
+        return  # User ID really needs to be present
+    userquery = await db.execute(
+        sa.select(User).filter(User.auth0_user_id == auth0_user_id)  # type: ignore
+    )
+    user = None
+    try:
+        user = userquery.scalars().one()
+    except NoResultFound:
+        pass
+    if user:
+        return  # We already have a matching user, no need to create one now
+    groupquery = await db.execute(
+        sa.select(Group).filter(Group.auth0_org_id == userinfo["org_id"])  # type: ignore
+    )
+    try:
+        group = groupquery.scalars().one()  # type: ignore
+    except NoResultFound:
+        return  # We didn't find a matching group, we can't create this user.
+    user_fields = {
+        "name": userinfo["email"],
+        "email": userinfo["email"],
+        "auth0_user_id": auth0_user_id,
+        "group_admin": False,
+        "system_admin": False,
+        "group": group,
+    }
+    newuser = User(**user_fields)
+    db.add(newuser)
+    await db.commit()
 
 
 @router.get("/callback")
@@ -31,6 +84,7 @@ async def auth(
     request: Request,
     auth0: StarletteOAuth2App = Depends(get_auth0_client),
     settings: Settings = Depends(get_settings),
+    db: AsyncSession = Depends(get_db),
 ) -> Response:
     try:
         token = await auth0.authorize_access_token(request)
@@ -44,6 +98,7 @@ async def auth(
             "user_id": userinfo["sub"],
             "name": userinfo["name"],
         }
+        await create_user_if_not_exists(db, userinfo)
     else:
         raise ex.UnauthorizedException("No user info in token")
     return RedirectResponse(os.getenv("FRONTEND_URL", "") + "/data/samples")
