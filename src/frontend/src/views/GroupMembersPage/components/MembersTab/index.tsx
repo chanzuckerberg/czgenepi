@@ -52,12 +52,7 @@ const MembersTab = ({
         open={isInviteModalOpen}
       />
       <Header>
-        <StyledTabs
-          value={tabValue}
-          sdsSize="small"
-          onChange={handleTabClick}
-          underlined
-        >
+        <StyledTabs value={tabValue} sdsSize="small" onChange={handleTabClick}>
           <Tab
             value={SecondaryTabType.ACTIVE}
             label="Active"
