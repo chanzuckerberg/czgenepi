@@ -18,7 +18,7 @@ export enum SecondaryTabType {
 interface Props {
   initialSecondaryTab: SecondaryTabType;
   groupName?: string;
-  groupId?: number;
+  groupId: number;
   members: GroupMember[];
 }
 

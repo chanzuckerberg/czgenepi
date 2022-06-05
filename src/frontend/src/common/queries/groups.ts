@@ -77,7 +77,7 @@ export const USE_GROUP_INFO = {
   id: "groupInfo",
 };
 
-export function useGroupInfo(groupId?: number): UseQueryResult<Group, unknown> {
+export function useGroupInfo(groupId: number): UseQueryResult<Group, unknown> {
   return useQuery([USE_GROUP_INFO], () => fetchGroup({ groupId }), {
     retry: false,
     select: mapGroupData,
@@ -87,10 +87,8 @@ export function useGroupInfo(groupId?: number): UseQueryResult<Group, unknown> {
 export async function fetchGroup({
   groupId,
 }: {
-  groupId?: number;
-}): Promise<RawGroupRequest> | undefined {
-  if (!groupId) return;
-
+  groupId: number;
+}): Promise<RawGroupRequest> {
   const response = await fetch(API_URL + API.GROUPS + groupId, {
     ...DEFAULT_FETCH_OPTIONS,
   });
@@ -113,7 +111,7 @@ export const USE_GROUP_MEMBER_INFO = {
 };
 
 export function useGroupMembersInfo(
-  groupId?: number
+  groupId: number
 ): UseQueryResult<GroupMember[], unknown> {
   return useQuery(
     [USE_GROUP_MEMBER_INFO],
@@ -131,10 +129,8 @@ export function useGroupMembersInfo(
 export async function fetchGroupMembers({
   groupId,
 }: {
-  groupId?: number;
-}): Promise<GroupMembersFetchResponseType> | undefined {
-  if (!groupId) return;
-
+  groupId: number;
+}): Promise<GroupMembersFetchResponseType> {
   const response = await fetch(API_URL + API.GROUPS + groupId + "/members", {
     ...DEFAULT_FETCH_OPTIONS,
   });
@@ -157,7 +153,7 @@ export const USE_GROUP_INVITATION_INFO = {
 };
 
 export function useGroupInvitations(
-  groupId?: number
+  groupId: number
 ): UseQueryResult<Invitation[], unknown> {
   return useQuery(
     [USE_GROUP_INVITATION_INFO],
@@ -175,7 +171,7 @@ export function useGroupInvitations(
 export async function fetchGroupInvitations({
   groupId,
 }: {
-  groupId?: number;
+  groupId: number;
 }): Promise<FetchInvitationResponseType> {
   const response = await fetch(
     API_URL + API.GROUPS + groupId + "/invitations/",
@@ -199,7 +195,7 @@ interface InvitationPayload {
 
 interface InvitationRequestType {
   emails: string[];
-  groupId?: number;
+  groupId: number;
 }
 
 interface InvitationResponseType {
