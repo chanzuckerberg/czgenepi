@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { getColors } from "czifui";
+import { getColors, getSpaces } from "czifui";
 
 export const StyledCell = styled.span`
   display: flex;
@@ -14,8 +14,13 @@ export const StyledCell = styled.span`
 
   ${(props) => {
     const colors = getColors(props);
+    const spaces = getSpaces(props);
 
     return `
+      svg {
+        margin-right: ${spaces?.m}px;
+      }
+
       path {
         fill: ${colors?.gray[300]};
       }
