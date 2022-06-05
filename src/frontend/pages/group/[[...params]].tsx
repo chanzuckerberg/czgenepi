@@ -11,8 +11,8 @@ const Page = (): JSX.Element => {
   const primaryToken = pathTokens.length > 0 && pathTokens[0];
   const secondaryToken = pathTokens.length > 1 && pathTokens[1];
 
-  let initialPrimaryTab;
-  let initialSecondaryTab;
+  let initialPrimaryTab = PrimaryTabType.MEMBERS;
+  let initialSecondaryTab = SecondaryTabType.ACTIVE;
 
   if (
     primaryToken === PrimaryTabType.MEMBERS ||

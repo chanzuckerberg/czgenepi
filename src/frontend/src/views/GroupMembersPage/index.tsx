@@ -1,6 +1,6 @@
 import { Tab } from "czifui";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useUserInfo } from "src/common/queries/auth";
 import { useGroupInfo, useGroupMembersInfo } from "src/common/queries/groups";
 import { ROUTES } from "src/common/routes";
@@ -31,7 +31,7 @@ interface Props {
 }
 
 const GroupMembersPage = ({
-  initialPrimaryTab = PrimaryTabType.MEMBERS,
+  initialPrimaryTab,
   initialSecondaryTab,
 }: Props): JSX.Element | null => {
   const [tabValue, setTabValue] = useState<PrimaryTabType>(initialPrimaryTab);
@@ -57,6 +57,7 @@ const GroupMembersPage = ({
 
   const handleTabClick: TabEventHandler = (_, value) => {
     setTabValue(value);
+    router.push(`${ROUTES.GROUP}/${value}`);
   };
 
   return (
