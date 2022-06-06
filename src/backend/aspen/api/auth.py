@@ -90,7 +90,7 @@ async def get_admin_user(auth_user: User = Depends(get_auth_user)) -> None:
         raise ex.UnauthorizedException("Not authorized")
 
 
-async def get_auth0_client(
+async def get_auth0_apiclient(
     request: Request, settings: Settings = Depends(get_settings)
 ):
     client_id: str = settings.AUTH0_MANAGEMENT_CLIENT_ID
