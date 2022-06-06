@@ -1,7 +1,6 @@
 import React from "react";
-import { Tag } from "src/common/components/library/Tag";
 import { PersonIconCell } from "../../../PersonIconCell";
-import { Wrapper } from "./style";
+import { StyledChip, Wrapper } from "./style";
 
 interface Props {
   email: string;
@@ -9,17 +8,12 @@ interface Props {
 }
 
 const EmailCell = ({ email, status }: Props): JSX.Element => {
-  const color = status === "expired" ? "warning" : "primary";
+  const color = status === "expired" ? "warning" : "info";
 
   return (
     <Wrapper>
       <PersonIconCell content={email} />
-      <Tag
-        color={color}
-        sdsType="secondary"
-        sdsStyle="rounded"
-        label={status}
-      />
+      <StyledChip status={color} isRounded size="small" label={status} />
     </Wrapper>
   );
 };
