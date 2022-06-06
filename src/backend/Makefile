@@ -55,6 +55,7 @@ remote-db-migrations:
 		aspen-cli db --remote setup; \
 	fi
 	DB=remote alembic upgrade head
+	sleep 60
 
 .PHONY: remote-db-drop
 remote-db-drop:

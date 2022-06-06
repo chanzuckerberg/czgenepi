@@ -34,12 +34,21 @@ jobs:
       - name: Install happy dependencies
         run: |
           pip install -r .happy/requirements.txt
-      - name: Update deployment
+      # Setting an environment variable: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
+      - name: Determine the tag
         env:
           TFE_TOKEN: ${{ secrets.TFE_TOKEN }}
         run: |
-          export DEPLOY_SHA=sha-$(python3 ./scripts/happy-deploy.py gestaging --get-latest)
-          ./scripts/happy --profile="" --env prod update geprodstack --tag $DEPLOY_SHA
+          echo "DEPLOY_SHA=sha-$(python3 ./scripts/happy-deploy.py gestaging --get-latest)" >> $GITHUB_ENV
+      - name: Update deployment
+        uses: chanzuckerberg/github-actions/.github/actions/deploy-happy-stack@v1.3.0
+        with:
+          tfe-token: ${{ secrets.TFE_TOKEN }}
+          stack-name: geprodstack
+          happy_version: "0.20.0"
+          create-tag: "false"
+          tag: ${{ env.DEPLOY_SHA }}
+          env: prod 
       - uses: act10ns/slack@v1
         with:
           status: ${{ job.status }}
