@@ -38,7 +38,7 @@ const MembersTab = ({
 
   const handleTabClick: TabEventHandler = (_, value) => {
     setTabValue(value);
-    router.push(`${ROUTES.GROUP_MEMBERS}/${value}`);
+    router.push(`${ROUTES.GROUP_MEMBERS}/${value}/`);
   };
 
   invitations.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
