@@ -45,7 +45,7 @@ const MembersTab = ({
   const router = useRouter();
 
   useEffect(() => {
-    router.push(`${ROUTES.GROUP_MEMBERS}/${tabValue}`, undefined, {
+    router.push(`${ROUTES.GROUP_MEMBERS}/${tabValue}/`, undefined, {
       shallow: true,
     });
   }, [tabValue]);
