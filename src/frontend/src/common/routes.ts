@@ -24,6 +24,6 @@ export enum ROUTES {
   USHER = "https://genome.ucsc.edu/cgi-bin/hgPhyloPlace",
   GROUP = "/group",
   GROUP_DETAILS = "/group/details",
-  GROUP_MEMBERS = "/group/members/",
-  GROUP_INVITATIONS = "/group/members/invitations/",
+  GROUP_MEMBERS = "/group/members",
+  GROUP_INVITATIONS = "/group/members/invitations",
 }
