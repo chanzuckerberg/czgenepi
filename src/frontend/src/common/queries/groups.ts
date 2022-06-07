@@ -89,7 +89,7 @@ export async function fetchGroup({
 }: {
   groupId: number;
 }): Promise<RawGroupRequest> {
-  const response = await fetch(API_URL + API.GROUPS + groupId + '/', {
+  const response = await fetch(API_URL + API.GROUPS + groupId + "/", {
     ...DEFAULT_FETCH_OPTIONS,
   });
 
