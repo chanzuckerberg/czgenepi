@@ -1,7 +1,7 @@
 import { Tab } from "czifui";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
-import { useUserInfo } from "src/common/queries/auth";
+import { useProtectedRoute, useUserInfo } from "src/common/queries/auth";
 import { useGroupInfo, useGroupMembersInfo } from "src/common/queries/groups";
 import { ROUTES } from "src/common/routes";
 import { stringifyGisaidLocation } from "src/common/utils/locationUtils";
@@ -34,6 +34,8 @@ const GroupMembersPage = ({
   initialPrimaryTab,
   initialSecondaryTab,
 }: Props): JSX.Element | null => {
+  useProtectedRoute();
+
   const [tabValue, setTabValue] = useState<PrimaryTabType>(initialPrimaryTab);
   const router = useRouter();
 
