@@ -152,7 +152,7 @@ async def test_tampered_magic_link(
     )
 
 
-# This tests assumes we are using a group in the USA,
+# This tests assumes we are using a group from Santa Barbara, CA, USA
 # and the test location data at the top of this file
 async def test_country_color_labeling(
     async_session: AsyncSession,
@@ -210,9 +210,21 @@ async def test_country_color_labeling(
             country_colorings = category
     assert country_colorings is not None
 
+    # It turns out Tokyo is closer than Paris to Santa Barbara,
+    # in terms of great circle distance
+
     test_data_countries = set([point.country for point in TEST_COUNTRY_DATA])
     test_data_countries.add(group.default_tree_location.country)
-    test_country_names = ["USA", "Mexico", "Canada", "France", "Germany", "China"]
+    test_country_names = [
+        "USA",
+        "Mexico",
+        "Canada",
+        "Panama",
+        "Dominican Republic",
+        "Curaçao",
+        "Japan",
+        "Denmark",
+    ]
 
     assert "scale" in country_colorings
 
@@ -225,7 +237,7 @@ async def test_country_color_labeling(
     assert len(unique_countries) == len(country_colorings["scale"])
     for entry in test_country_names:
         assert entry in unique_countries
-    assert "Japan" not in unique_countries
+    assert "France" not in unique_countries
 
 
 # This tests assumes we are using a group in the USA,
@@ -290,7 +302,14 @@ async def test_division_color_labeling(
         [point.division for point in TEST_COUNTRY_DATA if point.division is not None]
     )
     test_data_divisions.add(group.default_tree_location.division)
-    test_division_names = ["California", "Nevada"]
+    test_division_names = [
+        "California",
+        "Nevada",
+        "La Habana",
+        "National District",
+        "Willemstad",
+        "Kantō",
+    ]
 
     assert "scale" in division_colorings
 
@@ -303,7 +322,8 @@ async def test_division_color_labeling(
     assert len(unique_divisions) == len(division_colorings["scale"])
     for entry in test_division_names:
         assert entry in unique_divisions
-    assert "Kantō" not in unique_divisions
+    # Denmark should now be crowded out because we have two USA division
+    assert "Hovedstaden" not in unique_divisions
 
 
 # This tests assumes we are using a group in the USA,
@@ -368,7 +388,16 @@ async def test_location_color_labeling(
         [point.location for point in TEST_COUNTRY_DATA if point.location is not None]
     )
     test_data_locations.add(group.default_tree_location.location)
-    test_location_names = ["Clark County", "Alameda County"]
+    test_location_names = [
+        "Santa Barbara County",
+        "Clark County",
+        "Alameda County",
+        "Vancouver",
+        "Nassau",
+        "Port-au-Prince",
+        "Santo Domingo",
+        "Willemstad",
+    ]
 
     assert "scale" in location_colorings
 
@@ -381,4 +410,5 @@ async def test_location_color_labeling(
     assert len(unique_locations) == len(location_colorings["scale"])
     for entry in test_location_names:
         assert entry in unique_locations
+    # Tokyo should now be crowded out because we have 3 USA locations
     assert "Tokyo" not in unique_locations

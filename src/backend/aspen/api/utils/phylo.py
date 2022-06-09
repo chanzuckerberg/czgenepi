@@ -49,6 +49,12 @@ ExtractedLocation = namedtuple(
 )
 LOCATION_KEYS = ExtractedLocation._fields
 
+CATEGORY_NAMES = {
+    "country": "Country",
+    "division": "Admin Division",
+    "location": "Location",
+}
+
 
 def _rename_nodes_on_tree(
     node: dict,
@@ -214,7 +220,7 @@ async def _set_colors_for_location_category(
         tree_json["meta"]["colorings"].append(
             {
                 "key": category,
-                "title": category.capitalize(),
+                "title": CATEGORY_NAMES[category],
                 "type": "categorical",
                 "scale": colorings_entry,
             }

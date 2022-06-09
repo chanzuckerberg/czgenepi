@@ -6,7 +6,19 @@ TEST_TREE = {
                 "scale": [["USA", "#571EA2"]],
                 "title": "Country",
                 "type": "categorical",
-            }
+            },
+            {
+                "key": "division",
+                "scale": [["California", "#571EA2"]],
+                "title": "Admin Division",
+                "type": "categorical",
+            },
+            {
+                "key": "location",
+                "scale": [["Alameda County", "#571EA2"]],
+                "title": "Location",
+                "type": "categorical",
+            },
         ],
     },
     "tree": {
@@ -138,6 +150,94 @@ TEST_TREE = {
                     "country": {"value": "USA"},
                     "division": {"value": "Nevada"},
                     "location": {"value": "Clark County"},
+                },
+            },
+            {
+                "name": "public_identifier_18",
+                "node_attrs": {
+                    "country": {"value": "Madagascar"},
+                    "division": {"value": "Analamangra"},
+                    "location": {"value": "Antananarivo"},
+                },
+            },
+            {
+                "name": "public_identifier_19",
+                "node_attrs": {
+                    "country": {"value": "Kenya"},
+                    "division": {"value": "Nairobi"},
+                    "location": {"value": "Nairobi"},
+                },
+            },
+            {
+                "name": "public_identifier_20",
+                "node_attrs": {
+                    "country": {"value": "Singapore"},
+                    "division": {"value": "Singapore"},
+                    "location": {"value": "Singapore"},
+                },
+            },
+            {
+                "name": "public_identifier_21",
+                "node_attrs": {
+                    "country": {"value": "Italy"},
+                    "division": {"value": "Lazio"},
+                    "location": {"value": "Rome"},
+                },
+            },
+            {
+                "name": "public_identifier_22",
+                "node_attrs": {
+                    "country": {"value": "Brazil"},
+                    "division": {"value": "São Paulo"},
+                    "location": {"value": "São Paulo"},
+                },
+            },
+            {
+                "name": "public_identifier_23",
+                "node_attrs": {
+                    "country": {"value": "Angola"},
+                    "division": {"value": "Luanda"},
+                    "location": {"value": "Luanda"},
+                },
+            },
+            {
+                "name": "public_identifier_24",
+                "node_attrs": {
+                    "country": {"value": "Slovenia"},
+                    "division": {"value": "Ljubljana"},
+                    "location": {"value": "Ljubljana"},
+                },
+            },
+            {
+                "name": "public_identifier_25",
+                "node_attrs": {
+                    "country": {"value": "Denmark"},
+                    "division": {"value": "Hovedstaden"},
+                    "location": {"value": "Copenhagen"},
+                },
+            },
+            {
+                "name": "public_identifier_26",
+                "node_attrs": {
+                    "country": {"value": "Curaçao"},
+                    "division": {"value": "Willemstad"},
+                    "location": {"value": "Willemstad"},
+                },
+            },
+            {
+                "name": "public_identifier_27",
+                "node_attrs": {
+                    "country": {"value": "South Africa"},
+                    "division": {"value": "Western Cape"},
+                    "location": {"value": "Cape Town"},
+                },
+            },
+            {
+                "name": "public_identifier_28",
+                "node_attrs": {
+                    "country": {"value": "Japan"},
+                    "division": {"value": "Kantō"},
+                    "location": {"value": "Tokyo"},
                 },
             },
         ],
