@@ -345,4 +345,13 @@ TEST_COUNTRY_DATA = [
     Point("Africa", "South Africa", None, None, -33.928992, 18.417396),
     Point("Africa", "South Africa", "Western Cape", None, -33.928992, 18.417396),
     Point("Africa", "South Africa", "Western Cape", "Cape Town", -33.928992, 18.417396),
+    Point("Oceania", "New Zealand", None, None, -41.500083, 172.8344077),
+    Point("Oceania", "New Zealand", "Auckland", None, -36.837842, 174.800853),
+    Point("Oceania", "New Zealand", "Auckland", "Auckland", -36.8314, 174.7606),
+    Point("Oceania", "New Zealand", "Wellington", None, -41.168408, 174.867814),
+    Point("Oceania", "New Zealand", "Wellington", "Wellington", -41.168408, 174.867814),
+    Point("Oceania", "New Zealand", "Canterbury", None, -43.346635, 172.190743),
+    Point(
+        "Oceania", "New Zealand", "Canterbury", "Christchurch", -43.346635, 172.190743
+    ),
 ]

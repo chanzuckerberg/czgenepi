@@ -240,6 +240,30 @@ TEST_TREE = {
                     "location": {"value": "Tokyo"},
                 },
             },
+            {
+                "name": "public_identifier_28",
+                "node_attrs": {
+                    "country": {"value": "New Zealand"},
+                    "division": {"value": "Auckland"},
+                    "location": {"value": "Auckland"},
+                },
+            },
+            {
+                "name": "public_identifier_28",
+                "node_attrs": {
+                    "country": {"value": "New Zealand"},
+                    "division": {"value": "Wellington"},
+                    "location": {"value": "Wellington"},
+                },
+            },
+            {
+                "name": "public_identifier_28",
+                "node_attrs": {
+                    "country": {"value": "New Zealand"},
+                    "division": {"value": "Canterbury"},
+                    "location": {"value": "Christchurch"},
+                },
+            },
         ],
         "name": "ROOT",
         "node_attrs": {"country": {"value": "China"}},

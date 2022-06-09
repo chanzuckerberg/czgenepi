@@ -9,7 +9,7 @@ import sqlalchemy as sa
 from sqlalchemy import asc
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased, selectinload
-from sqlalchemy.sql.expression import and_
+from sqlalchemy.sql.expression import and_, not_, or_
 
 from aspen.api.error import http_exceptions as ex
 from aspen.api.utils import authz_phylo_tree_filters
@@ -44,9 +44,7 @@ NEXTSTRAIN_COLOR_SCALE = [
 ]
 
 
-ExtractedLocation = namedtuple(
-    "ExtractedLocation", ("region", "country", "division", "location")
-)
+ExtractedLocation = namedtuple("ExtractedLocation", ("country", "division", "location"))
 LOCATION_KEYS = ExtractedLocation._fields
 
 CATEGORY_NAMES = {
@@ -133,35 +131,30 @@ async def _set_colors_for_location_category(
         if defines["key"] == category:
             category_defines_index = index
 
-    locs_in_tree = set(extracted_locations)
+    locs_in_tree = extracted_locations.copy()
     origin_location = aliased(Location)
-
+    # print("Category:", category)
     # SQLAlchemy black magic going on here
     # (aka the == and != operators are overloaded for columns)
-    and_args = [Location.country.in_([location.country for location in locs_in_tree])]
-    for key in ("division", "location"):
-        if LOCATION_KEYS.index(key) > LOCATION_KEYS.index(category):
-            and_args.append(getattr(Location, key).__eq__(None))
-        else:
+    and_clauses = []
+    for location in locs_in_tree:
+        and_args = []
+        if getattr(location, category) is not None:
             and_args.append(
-                getattr(Location, key).in_(
-                    [
-                        getattr(location, key)
-                        for location in locs_in_tree
-                        if getattr(location, key) is not None
-                    ]
-                )
+                getattr(Location, category).__eq__(getattr(location, category))
             )
-    and_args.append(
-        getattr(Location, category).__ne__(getattr(tree_location, category))
-    )
+        else:
+            and_args.append(False)
+        for key in reversed(LOCATION_KEYS):
+            if LOCATION_KEYS.index(key) > LOCATION_KEYS.index(category):
+                and_args.append(getattr(Location, key).__eq__(None))
+            else:
+                break
+        and_clauses.append(and_(True, *and_args).self_group())
 
     sorting_query = (
         sa.select(  # type: ignore
-            Location.region,  # type: ignore
-            Location.country,  # type: ignore
-            Location.division,  # type: ignore
-            Location.location,  # type: ignore
+            getattr(Location, category),
             sa.func.earth_distance(
                 sa.func.ll_to_earth(Location.latitude, Location.longitude),
                 sa.func.ll_to_earth(
@@ -172,45 +165,57 @@ async def _set_colors_for_location_category(
         .select_from(origin_location)  # type: ignore
         .join(
             Location,  # type: ignore
-            and_(*and_args),
+            and_(
+                True,
+                or_(False, *and_clauses),
+                not_(
+                    getattr(Location, category).__eq__(getattr(tree_location, category))
+                ),
+            ),
         )
         .where(
             and_(
                 origin_location.country == tree_location.country,
-                origin_location.division == tree_location.division,  # noqa: E711
-                origin_location.location == tree_location.location,  # noqa: E711
+                origin_location.division == tree_location.division,
+                origin_location.location == tree_location.location,
             )
         )
         .order_by(asc("distance"))
         .limit(15)
     )
+
+    # raw_sql = sorting_query.compile(
+    #     dialect=postgresql.dialect(), compile_kwargs={"literal_binds": True}
+    # )
+    # print(raw_sql)
+
     sorted_locations_result = await db.execute(sorting_query)
-    sorted_locations = [
-        ExtractedLocation(
-            row["region"], row["country"], row["division"], row["location"]
-        )
-        for row in sorted_locations_result
-    ]
+    sorted_locations = [row[category] for row in sorted_locations_result]
+    # print("Sorted locations:", sorted_locations)
 
     # Add the locations we found location data for
     # If we still have fewer than 16, add whatever is left from the set we collected
     # in the tree, even if we don't have spatial data on them.
     location_strings = [getattr(tree_location, category)]
-    location_strings.extend(
-        [getattr(location, category) for location in sorted_locations]
-    )
+    location_strings.extend([location for location in sorted_locations])
+    # print("Location strings from SQL result:", location_strings)
+    # print("Number of location strings:", len(location_strings))
     if len(location_strings) < 16:
-        locs_in_tree -= set(sorted_locations)
-        remaining_category_locs_in_tree = [
-            getattr(loc, category)
-            for loc in locs_in_tree
-            if getattr(loc, category) not in location_strings
-        ]
-        location_strings.extend(
-            remaining_category_locs_in_tree[: 16 - len(location_strings)]
+        remaining_category_locs_in_tree = set(
+            [
+                getattr(loc, category)
+                for loc in locs_in_tree
+                if getattr(loc, category) not in location_strings
+                and getattr(loc, category) is not None
+            ]
         )
+        location_strings.extend(
+            list(remaining_category_locs_in_tree)[: 16 - len(location_strings)]
+        )
+    # print("Location strings after adding filler:", location_strings)
 
     colorings_entry = list(zip(location_strings, NEXTSTRAIN_COLOR_SCALE))
+    # print("Colorings entry to add:", colorings_entry)
 
     if category_defines_index is not None:
         tree_json["meta"]["colorings"][category_defines_index][
@@ -225,6 +230,7 @@ async def _set_colors_for_location_category(
                 "scale": colorings_entry,
             }
         )
+    # print("State of tree_json:", tree_json["meta"]["colorings"][category_defines_index]["scale"])
 
     return tree_json
 
@@ -232,10 +238,11 @@ async def _set_colors_for_location_category(
 async def _set_colors(db: AsyncSession, tree_json: dict, phylo_run: PhyloRun) -> dict:
     extracted_locations = _collect_locations(tree_json["tree"])
     tree_location = phylo_run.group.default_tree_location
-    for key in ("country", "division", "location"):
+    for key in LOCATION_KEYS:
         tree_json = await _set_colors_for_location_category(
             db, tree_json, tree_location, extracted_locations, key
         )
+
     return tree_json
 
 

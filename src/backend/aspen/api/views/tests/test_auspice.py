@@ -233,7 +233,8 @@ async def test_country_color_labeling(
         assert country in test_data_countries
         assert re.search(r"^#(?:[0-9a-fA-F]{3}){1,2}$", hex_color) is not None
         unique_countries.add(country)
-
+    print(unique_countries)
+    print(country_colorings["scale"])
     assert len(unique_countries) == len(country_colorings["scale"])
     for entry in test_country_names:
         assert entry in unique_countries
@@ -318,11 +319,12 @@ async def test_division_color_labeling(
         assert location in test_data_divisions
         assert re.search(r"^#(?:[0-9a-fA-F]{3}){1,2}$", hex_color) is not None
         unique_divisions.add(location)
-
+    print(unique_divisions)
+    print(division_colorings["scale"])
     assert len(unique_divisions) == len(division_colorings["scale"])
     for entry in test_division_names:
         assert entry in unique_divisions
-    # Denmark should now be crowded out because we have two USA division
+    # Denmark should now be crowded out because we have two USA divisions
     assert "Hovedstaden" not in unique_divisions
 
 
@@ -406,7 +408,8 @@ async def test_location_color_labeling(
         assert location in test_data_locations
         assert re.search(r"^#(?:[0-9a-fA-F]{3}){1,2}$", hex_color) is not None
         unique_locations.add(location)
-
+    print(unique_locations)
+    print(location_colorings["scale"])
     assert len(unique_locations) == len(location_colorings["scale"])
     for entry in test_location_names:
         assert entry in unique_locations
