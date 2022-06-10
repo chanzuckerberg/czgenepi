@@ -2,7 +2,10 @@ import { Button, Dialog, DialogActions, DialogTitle } from "czifui";
 import { compact, uniq } from "lodash";
 import React, { ChangeEvent, useState } from "react";
 import { noop } from "src/common/constants/empty";
-import { INPUT_DELIMITERS } from "src/common/constants/inputDelimiters";
+import {
+  GREEDY_SPACES,
+  INPUT_DELIMITERS,
+} from "src/common/constants/inputDelimiters";
 import { useUserInfo } from "src/common/queries/auth";
 import { useSendGroupInvitations } from "src/common/queries/groups";
 import { B } from "src/common/styles/basicStyle";
@@ -48,12 +51,31 @@ const InviteModal = ({ groupName, onClose, open }: Props): JSX.Element => {
     onClose();
   };
 
-  const getAddressArrayFromInputValue = () => {
-    return uniq(inputValue.trim().split(INPUT_DELIMITERS));
+  /**
+   * Gets user input and chunks into (what should be) email addresses.
+   *
+   * Original user input text is broken into chunks by delimiters. Repeated
+   * delimiters between chunks are taken as a single delimiter. Leading and
+   * trailing delimiters are dropped. If a given chunk is found multiple times
+   * in the input, only one copy of the chunk is returned in output array.
+   *
+   * Example:
+   *     user1@example.com,   user2@example.com, ,, ,,  , user3@example.com,,
+   *   user2@example.com, user4@example.com,,
+   * Would return as four emails in total, as you'd expect to read them.
+   */
+  const getAddressArrayFromInputValue = (): string[] => {
+    // First pass may have multiple spaces between chunks or pre/suffix spaces
+    const delimitBySpaces = inputValue.replace(INPUT_DELIMITERS, " ");
+    const delimitBySingleSpaceTrimmed = delimitBySpaces
+      .trim()
+      .replace(GREEDY_SPACES, " ");
+    const addressChunks = delimitBySingleSpaceTrimmed.split(" ");
+    return uniq(addressChunks);
   };
 
-  const validate = (): boolean => {
-    const addresses = getAddressArrayFromInputValue();
+  // Returns bool of if emails valid. If not, sets the state to show errors.
+  const validate = (addresses: string[]): boolean => {
     const newInvalidAddresses = compact(
       addresses.filter((address) => !address.match(EMAIL_REGEX))
     );
@@ -65,6 +87,7 @@ const InviteModal = ({ groupName, onClose, open }: Props): JSX.Element => {
 
     // after they click the button to send invites once, we should debounce validate on
     // all subsequent changes
+    // TODO: debounce check validation on subsequent changes
     setShouldValidateOnChange(true);
 
     return (
@@ -98,11 +121,12 @@ const InviteModal = ({ groupName, onClose, open }: Props): JSX.Element => {
   });
 
   const handleFormSubmit = () => {
-    const areAllAddressesValid = validate();
-    if (!areAllAddressesValid) return;
-
     const emails = getAddressArrayFromInputValue();
-    sendInvitationMutation.mutate({ emails, groupId });
+    // If invalid, `validate` will alter state and cause error display
+    const areAllAddressesValid = validate(emails);
+    if (areAllAddressesValid) {
+      sendInvitationMutation.mutate({ emails, groupId });
+    }
   };
 
   return (
