@@ -63,10 +63,6 @@ const InviteModal = ({ groupName, onClose, open }: Props): JSX.Element => {
    *     user1@example.com,   user2@example.com, ,, ,,  , user3@example.com,,
    *   user2@example.com, user4@example.com,,
    * Would return as four emails in total, as you'd expect to read them.
-   *
-   * Arguable if it's best UX -- should double commas bring up an error? etc --
-   * but it's easiest to code and reasonably sane to just ignore that sort
-   * of stuff. Approach was approved by Design.
    */
   const getAddressArrayFromInputValue = (): string[] => {
     // First pass may have multiple spaces between chunks or pre/suffix spaces
