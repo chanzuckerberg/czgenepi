@@ -17,8 +17,8 @@
         id="bodyTable"
       >
         <tr>
-          <td>
-            <div class="banner" style='background-color:black;height:58px;'>
+          <td bgcolor="#000000">
+          	<div style='height:58px;'>
               <a href="https://staging.czgenepi.org/CZGenEpiLogoWhite.png">
               <img
                    src="https://staging.czgenepi.org/CZGenEpiLogoWhite.png"
@@ -28,12 +28,12 @@
                    style="display:block;float:left;margin:10px;border: 0;height: auto;outline: none;text-decoration: none;"
                />
               </a>
-          </div>
-          <div style='height:90px;border-bottom: 5px solid #511CC1;overflow:hidden;'>
-              <div style='background-color:black;width:30%;height:90px; float:left;'></div>
+	        </div>
+         	<div style='height:90px;border-bottom: 5px solid #511CC1;overflow:hidden;'>
+            	<div style='width:30%;height:90px; float:left;'></div>
                 <div style='background-image:url("https://staging.czgenepi.org/phyloTreeBackground.png");background-color:black; height:90px;width:70%;float:right;background-position:right;background-size:cover;'>
                 </div> 
-          </div>
+        	</div>
           </td>
         </tr>
         <tr>
@@ -45,9 +45,8 @@
           >
             <div class="main">
               
-
-              <div style='padding: 20px;font-size:25px;font-weight:700;font-size:22px;line-height:25.3px;font-family:helvetica;color:black'> You've been invited to join {{organization.display_name}}'s group on CZ GEN EPI</div>
-
+							<div style='padding: 20px;font-size:25px;font-weight:700;font-size:22px;line-height:25.3px;font-family:helvetica;color:black'> You've been invited to join {% if organization.name %}{{organization.name}}'s {% else %} a {% endif %} group on CZ GEN EPI</div>
+            
               <div style='text-align:left;margin-top:20px;color:black'>Click on the link below to accept this invite and get started. If you do not already have an account with CZ GEN EPI, you will need to make one to get started. This invitation will expire after 14 days. </div>
 
               <button style='margin-top: 40px;background-color:#511CC1;border-radius:40px;border:none;padding: 10px 30px;font-size:13px;line-height:18px;font-weight:400;'>
