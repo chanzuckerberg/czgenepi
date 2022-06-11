@@ -27,7 +27,7 @@ export OIDC_BROWSER_URL=https://oidc.genepinet.localdev:8443
 
 # Wait for localstack services to start up
 echo "wait for localstack to start"
-until [ $(curl -m 1 -s $LOCALSTACK_URL/health | grep -o running | wc -l) -eq "5" ]; do 
+until [ $(curl -m 1 -s $LOCALSTACK_URL/health | grep -o running | wc -l) -eq "5" ]; do
   curl -m 1 -s $LOCALSTACK_URL/health
   echo
   sleep 1;
@@ -41,6 +41,7 @@ done
 
 
 ONETRUST_FRONTEND_KEY=$(jq -c .ONETRUST_FRONTEND_KEY <<< "${EXTRA_SECRETS}")
+PLAUSIBLE_FRONTEND_KEY=$(jq -c .PLAUSIBLE_FRONTEND_KEY <<< "${EXTRA_SECRETS}")
 AUTH0_MANAGEMENT_CLIENT_ID=$(jq -c .AUTH0_MANAGEMENT_CLIENT_ID <<< "${EXTRA_SECRETS}")
 AUTH0_MANAGEMENT_CLIENT_SECRET=$(jq -c .AUTH0_MANAGEMENT_CLIENT_SECRET <<< "${EXTRA_SECRETS}")
 AUTH0_MANAGEMENT_DOMAIN=$(jq -c .AUTH0_MANAGEMENT_DOMAIN <<< "${EXTRA_SECRETS}")
@@ -67,6 +68,7 @@ ${local_aws} secretsmanager update-secret --secret-id genepi-config --secret-str
   "S3_external_auspice_bucket": "genepi-external-auspice-data",
   "S3_db_bucket": "genepi-db-data",
   "ONETRUST_FRONTEND_KEY": '"${ONETRUST_FRONTEND_KEY}"',
+  "PLAUSIBLE_FRONTEND_KEY": '"${PLAUSIBLE_FRONTEND_KEY}"',
   "AUTH0_MANAGEMENT_CLIENT_ID": '"${AUTH0_MANAGEMENT_CLIENT_ID}"',
   "AUTH0_MANAGEMENT_CLIENT_SECRET": '"${AUTH0_MANAGEMENT_CLIENT_SECRET}"',
   "AUTH0_MANAGEMENT_DOMAIN": '"${AUTH0_MANAGEMENT_DOMAIN}"'
@@ -171,8 +173,9 @@ echo "Dev env is up and running!"
 echo "  Frontend: ${FRONTEND_URL}"
 echo "  Backend: ${BACKEND_URL}"
 
-# Add onetrust to .env.ecr
+# Add FE vars (onetrust, etc) to .env.ecr so we can pull in via docker-compose
 REPO=$(cat .env.ecr | grep DOCKER_REPO)
 SECRETS=$($local_aws secretsmanager get-secret-value --secret-id genepi-config --query SecretString --output text)
 jq -r '.| to_entries | .[] | select(.key == "ONETRUST_FRONTEND_KEY") | .key + "=" + (.value | @sh)' <<< "${SECRETS}" > .env.ecr
+jq -r '.| to_entries | .[] | select(.key == "PLAUSIBLE_FRONTEND_KEY") | .key + "=" + (.value | @sh)' <<< "${SECRETS}" > .env.ecr
 echo $REPO >> .env.ecr
