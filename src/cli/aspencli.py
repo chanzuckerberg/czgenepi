@@ -361,21 +361,24 @@ def create(
 def group():
     pass
 
+
 @group.command(name="get")
 @click.argument("group_id")
 @click.pass_context
 def get_group_info(ctx, group_id):
     api_client = ctx.obj["api_client"]
-    resp = api_client.get(f"/v2/groups/{group_id}")
+    resp = api_client.get(f"/v2/groups/{group_id}/")
     print(resp.text)
+
 
 @group.command(name="members")
 @click.argument("group_id")
 @click.pass_context
-def get_group_imembers(ctx, group_id):
+def get_group_members(ctx, group_id):
     api_client = ctx.obj["api_client"]
-    resp = api_client.get(f"/v2/groups/{group_id}/members")
+    resp = api_client.get(f"/v2/groups/{group_id}/members/")
     print(resp.text)
+
 
 @group.command(name="invites")
 @click.argument("group_id")
@@ -385,12 +388,16 @@ def get_group_invitations(ctx, group_id):
     resp = api_client.get(f"/v2/groups/{group_id}/invitations/")
     print(resp.text)
 
+
 @group.command(name="invite")
 @click.argument("group_id")
 @click.argument("email")
-@click.option("--role", help="Role to invite the user to",
+@click.option(
+    "--role",
+    help="Role to invite the user to",
     type=click.Choice(["admin", "member"], case_sensitive=False),
-    default="member")
+    default="member",
+)
 @click.pass_context
 def invite_group_members(ctx, group_id, email, role):
     api_client = ctx.obj["api_client"]
@@ -401,16 +408,10 @@ def invite_group_members(ctx, group_id, email, role):
     resp = api_client.post(f"/v2/groups/{group_id}/invitations/", json=body)
     print(resp.text)
 
+
 @cli.group()
 def userinfo():
     pass
-
-@userinfo.command(name="get")
-@click.pass_context
-def get_userinfo(ctx):
-    api_client = ctx.obj["api_client"]
-    resp = api_client.get("/api/usergroup")
-    print(resp.text)
 
 
 @cli.group()
@@ -539,9 +540,7 @@ def delete_samples(ctx, sample_ids):
 @click.option(
     "--location", required=False, type=int, help="Set the sample's collection location"
 )
-@click.option(
-    "--json-data", required=False, type=str, help="provide json for update"
-)
+@click.option("--json-data", required=False, type=str, help="provide json for update")
 @click.pass_context
 def update_samples(
     ctx,
