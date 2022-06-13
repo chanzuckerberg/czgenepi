@@ -128,7 +128,7 @@ async def test_stripping_whitespace(
     data = [
         {
             "sample": {
-                "private_identifier": "   private   ",
+                "private_identifier": "\t   private   ",
                 "public_identifier": "   public   ",
                 "collection_date": format_date(test_date),
                 "location_id": location.id,
