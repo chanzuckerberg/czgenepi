@@ -7,7 +7,7 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
-from aspen.database.models import Sample, UploadedPathogenGenome
+from aspen.database.models import PathogenGenome, Sample, UploadedPathogenGenome
 from aspen.test_infra.models.gisaid_metadata import gisaid_metadata_factory
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.sample import sample_factory
@@ -94,7 +94,6 @@ async def test_samples_create_view_pass_no_public_id(
     # check that creating new public identifiers works
     sample_res = await async_session.execute(sa.select(Sample))  # type: ignore
     public_ids = sorted([i.public_identifier for i in sample_res.scalars().all()])
-    datetime.datetime.now().year
     assert [
         f"hCoV-19/USA/groupname-1/{test_date.year}",
         f"hCoV-19/USA/groupname-2/{test_date.year}",
@@ -110,6 +109,65 @@ async def test_samples_create_view_pass_no_public_id(
     assert sample_1.uploaded_pathogen_genome.num_mixed == 1
     assert sample_1.uploaded_pathogen_genome.num_unambiguous_sites == 1000
     assert sample_1.uploaded_pathogen_genome.num_missing_alleles == 1
+
+
+async def test_stripping_whitespace(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+):
+    group = group_factory()
+    user = user_factory(group)
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
+    async_session.add(group)
+    async_session.add(location)
+    await async_session.commit()
+    test_date = datetime.datetime.now()
+
+    data = [
+        {
+            "sample": {
+                "private_identifier": "   private   ",
+                "public_identifier": "   public   ",
+                "collection_date": format_date(test_date),
+                "location_id": location.id,
+                "private": True,
+            },
+            "pathogen_genome": {
+                "sequence": f"     {VALID_SEQUENCE}   ",
+                "sequencing_date": "",
+            },
+        },
+    ]
+    auth_headers = {"user_id": user.auth0_user_id}
+    res = await http_client.post(
+        "/v2/samples/",
+        json=data,
+        headers=auth_headers,
+    )
+    assert res.status_code == 200
+    await async_session.commit()
+
+    sample = (
+        (
+            await async_session.execute(
+                sa.select(Sample)  # type: ignore
+                .options(
+                    joinedload(Sample.uploaded_pathogen_genome).undefer(  # type: ignore
+                        PathogenGenome.sequence
+                    ),
+                )
+                .filter(Sample.private_identifier == "private")
+            )
+        )
+        .scalars()
+        .one()
+    )
+
+    assert sample.uploaded_pathogen_genome.sequence == VALID_SEQUENCE
+    assert sample.public_identifier == "public"
+    assert sample.private_identifier == "private"
 
 
 async def test_samples_create_view_pass_no_sequencing_date(
@@ -180,7 +238,6 @@ async def test_samples_create_view_pass_no_sequencing_date(
             for i in (await async_session.execute(sa.select(Sample))).scalars().all()  # type: ignore
         ]
     )
-    datetime.datetime.now().year
     assert [
         f"hCoV-19/USA/groupname-1/{test_date.year}",
         f"hCoV-19/USA/groupname-2/{test_date.year}",
