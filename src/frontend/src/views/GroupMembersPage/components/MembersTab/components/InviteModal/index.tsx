@@ -4,7 +4,7 @@ import React, { ChangeEvent, useState } from "react";
 import { noop } from "src/common/constants/empty";
 import {
   GREEDY_SPACES,
-  INPUT_DELIMITERS,
+  INPUT_DELIMITERS_WITH_SPACE,
 } from "src/common/constants/inputDelimiters";
 import { useUserInfo } from "src/common/queries/auth";
 import { useSendGroupInvitations } from "src/common/queries/groups";
@@ -66,7 +66,10 @@ const InviteModal = ({ groupName, onClose, open }: Props): JSX.Element => {
    */
   const getAddressArrayFromInputValue = (): string[] => {
     // First pass may have multiple spaces between chunks or pre/suffix spaces
-    const delimitBySpaces = inputValue.replace(INPUT_DELIMITERS, " ");
+    const delimitBySpaces = inputValue.replace(
+      INPUT_DELIMITERS_WITH_SPACE,
+      " "
+    );
     const delimitBySingleSpaceTrimmed = delimitBySpaces
       .trim()
       .replace(GREEDY_SPACES, " ");
