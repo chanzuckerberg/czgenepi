@@ -67,7 +67,6 @@ class TokenHandler:
         return creds["id_token"]
 
     def decode_token(self, token):
-        f"{self.auth_url}/"
         payload = self.sv.verify_signature(token)
         return payload
 
