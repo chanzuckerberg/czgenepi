@@ -15,8 +15,6 @@ env:
 jobs:
   upgrade:
     runs-on: ubuntu-20.04
-    environment:
-      name: prod
     steps:
       - uses: act10ns/slack@v1
         with:
