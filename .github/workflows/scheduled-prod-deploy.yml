@@ -38,7 +38,7 @@ jobs:
         env:
           TFE_TOKEN: ${{ secrets.TFE_TOKEN }}
         run: |
-          echo "DEPLOY_SHA=sha-$(python3 ./scripts/happy-deploy.py gestaging --get-latest)" >> $GITHUB_ENV
+          echo "DEPLOY_SHA=$(python3 ./scripts/happy-deploy.py gestaging --get-latest)" >> $GITHUB_ENV
       - name: Generate payload
         run: |
           echo "payload={\"tag\":\"sha-${DEPLOY_SHA:0:8}\"}" >> $GITHUB_ENV
