@@ -117,7 +117,7 @@ async def invite_group_members(
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_auth_user),
 ) -> GroupInvitationsResponse:
-    if user.group.id != group_id:
+    if user.group.id != group_id and not user.system_admin:
         raise ex.UnauthorizedException("Not authorized")
     group = (
         (await db.execute(sa.select(Group).where(Group.id == group_id))).scalars().one()  # type: ignore
