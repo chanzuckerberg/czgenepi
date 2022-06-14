@@ -69,13 +69,13 @@ class BaseNextstrainConfigBuilder:
                 ).strftime("%Y-%m-%d"),
                 end_date=dateparser.parse(
                     self.template_args.get("filter_end_date")
-                ).strftime("%Y-%m-%d")
+                ).strftime("%Y-%m-%d"),
             )
         else:
             title_template = "{tree_type} tree for samples collected in {location}"
             build["title"] = title_template.format(
                 tree_type=self.subsampling_scheme.title(),
-                location=", ".join(location_values)
+                location=", ".join(location_values),
             )
 
         config["files"]["description"] = config["files"]["description"].format(
