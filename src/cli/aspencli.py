@@ -462,6 +462,33 @@ def list_locations(ctx):
     print(resp.text)
 
 
+@locations.command(name="search")
+@click.option("--region", required=False, type=str, help="A continental-level region, e.g. North America, Asia.")
+@click.option("--country", required=False, type=str, help="A country, e.g. USA, Canada.")
+@click.option("--division", required=False, type=str, help="A top-level division of a country, e.g. California, British Columbia.")
+@click.option("--location", required=False, type=str, help="A secondary division of a country, e.g. Alameda County, Toronto.")
+@click.pass_context
+def search_locations(
+    ctx,
+    region: Optional[str],
+    country: Optional[str],
+    division: Optional[str],
+    location: Optional[str],
+):
+    if not region and not country and not division and not location:
+        print("Must provide at least one of region, country, division, or location.")
+        return
+        
+    api_client = ctx.obj["api_client"]
+    payload = {
+        "region": region,
+        "country": country,
+        "division": division,
+        "location": location,
+    }
+    resp = api_client.post(f"/v2/locations/search/", json=payload)
+    print(resp.text)
+
 @cli.group()
 def lineages():
     pass
