@@ -1,7 +1,7 @@
 from typing import Any, Mapping
 
-import yaml
 import dateparser
+import yaml
 
 from aspen.database.models import Group
 
