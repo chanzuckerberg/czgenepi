@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from starlette.requests import Request
 
-from aspen.api.auth import get_auth0_apiclient, get_auth_user
+from aspen.api.auth import get_admin_user, get_auth0_apiclient, get_auth_user
 from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.usergroup import (
@@ -30,13 +30,13 @@ async def create_group(
     db: AsyncSession = Depends(get_db),
     auth0_client: Auth0Client = Depends(get_auth0_apiclient),
     settings: Settings = Depends(get_settings),
-    user: User = Depends(get_auth_user),
+    user: User = Depends(get_admin_user),
 ) -> GroupInfoResponse:
-    if not user.system_admin:
-        raise ex.UnauthorizedException("Not authorized")
-    group = Group(**dict(group_creation_request))
-    organization = auth0_client.add_org(group.id, group.name)
-    group.auth0_org_id = organization["id"]
+    organization = auth0_client.add_org(
+        group_creation_request.prefix.lower(), group_creation_request.name
+    )
+    group_values = dict(group_creation_request) | {"auth0_org_id": organization["id"]}
+    group = Group(**group_values)
     db.add(group)
     await db.commit()
 

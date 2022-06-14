@@ -193,12 +193,6 @@ class CliConfig:
             "verify": True,
             "oauth_api_config": default_oauth_api,
         },
-        "rdev": {
-            "auth_url": "https://covidtracker-rdev.auth0.com",
-            "client_id": "TBA",
-            "verify": True,
-            "oauth_api_config": default_oauth_api,
-        },
         "local": {
             "auth_url": "https://oidc.genepinet.localdev:8443",
             "client_id": "local-client-id",

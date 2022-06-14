@@ -47,6 +47,10 @@ class MockAuth0Client(Auth0Client):
         return [MOCK_INVITE]
 
     def add_org(self, group_id: int, org_name: str) -> Auth0Org:
+        if group_id is None or org_name is None:
+            raise Exception(
+                f"Missing one of group_id, org_name. Values given: {group_id}, {org_name}"
+            )
         created_org: Auth0Org = {
             "id": MOCK_ORG["id"],
             "name": f"group-{group_id}",

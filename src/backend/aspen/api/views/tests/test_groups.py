@@ -149,3 +149,54 @@ async def test_create_group(
         json=create_group_request,
     )
     assert response.status_code == 200
+
+    resp_data = response.json()
+
+    assert resp_data["address"] == create_group_request["address"]
+    assert resp_data["name"] == create_group_request["name"]
+    assert resp_data["prefix"] == create_group_request["prefix"]
+    assert isinstance(resp_data["id"], int)
+
+    resp_loc = resp_data["default_tree_location"]
+    assert resp_loc["region"] == location.region
+    assert resp_loc["country"] == location.country
+    assert resp_loc["division"] == location.division
+    assert resp_loc["location"] == location.location
+    assert isinstance(resp_loc["id"], int)
+
+
+async def test_create_group_unauthorized(
+    http_client: AsyncClient, async_session: AsyncSession
+) -> None:
+    group = group_factory(division="California", location="San Mateo County")
+    user = user_factory(
+        group,
+        name="Alice",
+        auth0_user_id="auth0_id_01",
+        email="alice@chanzuckerberg.com",
+        system_admin=False,
+    )
+    location = location_factory(
+        region="North America",
+        country="USA",
+        division="California",
+        location="Alameda County",
+    )
+    async_session.add_all([group, user, location])
+    await async_session.commit()
+
+    create_group_request = {
+        "name": "Alameda County Department of Public Health",
+        "prefix": "ALAMEDA-CA",
+        "address": "123 Telegraph Ave., Oakland, CA 94612",
+        "division": "California",
+        "location": "Alameda County",
+        "default_tree_location_id": location.id,
+    }
+
+    response = await http_client.post(
+        "/v2/groups/",
+        headers={"user_id": user.auth0_user_id},
+        json=create_group_request,
+    )
+    assert response.status_code == 403
