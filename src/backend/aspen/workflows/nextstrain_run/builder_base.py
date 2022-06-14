@@ -63,7 +63,7 @@ class BaseNextstrainConfigBuilder:
                         tree_type=self.subsampling_scheme.title(),
                         location=", ".join(location_values),
                         start_date=dateparser.parse(self.template_args.get("filter_start_date")).strftime("%Y-%m-%d"),
-                        end_data=dateparser.parse(self.template_args.get("filter_end_date")).strftime("%Y-%m-%d")
+                        end_date=dateparser.parse(self.template_args.get("filter_end_date")).strftime("%Y-%m-%d")
                     )
         else:
             title_template = "{tree_type} tree for samples collected in {location}"
