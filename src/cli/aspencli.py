@@ -3,6 +3,7 @@ import json
 import os.path
 import time
 import webbrowser
+from typing import Optional
 from urllib.parse import quote, urlparse
 
 import click
@@ -189,6 +190,12 @@ class CliConfig:
         "default": {
             "auth_url": "https://covidtracker-staging.auth0.com",
             "client_id": "YIKBzdeiwgSoMZ88Fo1F65Ebd16Rj5mP",
+            "verify": True,
+            "oauth_api_config": default_oauth_api,
+        },
+        "rdev": {
+            "auth_url": "https://covidtracker-rdev.auth0.com",
+            "client_id": "TBA",
             "verify": True,
             "oauth_api_config": default_oauth_api,
         },
@@ -383,6 +390,7 @@ def group():
     type=str,
     help="The location within a regional division the group is located in.",
 )
+@click.pass_context
 def create_group(
     ctx,
     name: str,
