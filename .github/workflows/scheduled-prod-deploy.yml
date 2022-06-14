@@ -62,7 +62,7 @@ jobs:
           payload: ${{ env.payload }}
           required_contexts: ""
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.CZIBUILDBOT_GITHUB_TOKEN }}
       - uses: act10ns/slack@v1
         with:
           status: ${{ job.status }}
