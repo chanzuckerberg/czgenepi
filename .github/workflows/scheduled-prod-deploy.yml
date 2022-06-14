@@ -1,4 +1,4 @@
-name: Scheduled Prod Deploy
+name: Scheduled Deploy
 
 on:
   schedule:
