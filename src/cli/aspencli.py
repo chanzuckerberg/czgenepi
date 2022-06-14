@@ -364,8 +364,8 @@ def group():
 
 
 @group.command(name="create")
-@click.option("--name", required=True, type=str, help="The group's name.")
-@click.option("--prefix", required=True, type=str, help="The group's prefix.")
+@click.option("--name", required=True, type=str, help="The group's name. Must be at least 3 characters.")
+@click.option("--prefix", required=True, type=str, help="The group's prefix. Must be at least 2 characters, max 20.")
 @click.option(
     "--tree-location",
     required=True,
