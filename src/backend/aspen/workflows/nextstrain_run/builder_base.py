@@ -1,6 +1,7 @@
 from typing import Any, Mapping
 
 import yaml
+import dateparser
 
 from aspen.database.models import Group
 
@@ -55,14 +56,17 @@ class BaseNextstrainConfigBuilder:
         #   - It's title-case'd and included in the tree title as human-readable text
         build["subsampling_scheme"] = self.subsampling_scheme
 
-        # Update the tree's title with build type & location.
-        if self.subsampling_scheme == "OVERVIEW":
-            title_template = "Contextualized tree for samples collected in {location} in the last 3 months"
+        # Update the tree's title with build type, location and date range.
+        if (self.template_args.get("filter_start_date") is not None) and (self.template_args.get("filter_end_date") is not None):
+            title_template = "{tree_type} tree for samples collected in {location} between {start_date} and {end_date}"
         else:
             title_template = "{tree_type} tree for samples collected in {location}"
+
         build["title"] = title_template.format(
             tree_type=self.subsampling_scheme.title(),
             location=", ".join(location_values),
+            start_date=dateparser.parse(self.template_args.get("filter_start_date")).strftime("%Y-%m-%d"),
+            end_data=dateparser.parse(self.template_args.get("filter_end_date")).strftime("%Y-%m-%d")
         )
         config["files"]["description"] = config["files"]["description"].format(
             tree_type=self.subsampling_scheme.lower()
