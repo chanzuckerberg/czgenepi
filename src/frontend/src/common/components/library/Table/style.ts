@@ -12,5 +12,4 @@ export const DataRows = styled.div`
 
 export const Container = styled.div`
   max-width: ${MAX_CONTENT_WIDTH}px;
-  margin: 0 auto;
 `;
