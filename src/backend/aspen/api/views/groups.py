@@ -36,10 +36,18 @@ async def create_group(
         raise ex.UnauthorizedException("Not authorized")
     group = Group(**dict(group_creation_request))
     organization = auth0_client.add_org(group.id, group.name)
-    group.auth0_org_id = organization.id
+    group.auth0_org_id = organization["id"]
     db.add(group)
     await db.commit()
-    return GroupInfoResponse.from_orm(group)
+
+    created_group_query = (
+        sa.select(Group)  # type: ignore
+        .options(joinedload(Group.default_tree_location))
+        .where(Group.auth0_org_id == group.auth0_org_id)
+    )
+    created_group_query_result = await db.execute(created_group_query)
+    created_group = created_group_query_result.scalars().one()
+    return GroupInfoResponse.from_orm(created_group)
 
 
 @router.get("/{group_id}/", response_model=GroupInfoResponse)
