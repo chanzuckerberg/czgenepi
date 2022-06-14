@@ -1,16 +1,18 @@
 import datetime
 from typing import List, Optional
 
+from pydantic import constr
+
 from aspen.api.schemas.base import BaseRequest, BaseResponse
 from aspen.api.schemas.locations import LocationResponse
 
 
 class GroupCreationRequest(BaseRequest):
-    name: str
-    prefix: str
-    address: Optional[str]
-    division: Optional[str]
-    location: Optional[str]
+    name: constr(min_length=3, max_length=128, strict=True)  # type: ignore
+    prefix: constr(min_length=2, max_length=20, strict=True)  # type: ignore
+    address: Optional[constr(min_length=1, max_length=128, strict=True)]  # type: ignore
+    division: Optional[constr(min_length=1, max_length=128, strict=True)]  # type: ignore
+    location: Optional[constr(min_length=1, max_length=128, strict=True)]  # type: ignore
     default_tree_location_id: int
 
 
