@@ -1,9 +1,19 @@
-name: Scheduled Prod Deploy
+name: Scheduled Deploy
 
 on:
   schedule:
     # Weekly Tuesday & Thursdays @ 16:00 UTC (8am PST [winter] / 9am PDT [summer])
      - cron: '0 16 * * 2,4'
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'Docker image tag to use for a deploy (defaults to latest successful staging deploy)'
+        required: false
+        default: ''
+      environment:
+        description: 'deploy to staging or prod'
+        required: false
+        default: 'prod'
 
 env:
   DOCKER_BUILDKIT: 1
@@ -39,11 +49,16 @@ jobs:
           echo "DEPLOY_SHA=$(python3 ./scripts/happy-deploy.py gestaging --get-latest)" >> $GITHUB_ENV
       - name: Generate payload
         run: |
-          echo "payload={\"tag\":\"sha-${DEPLOY_SHA:0:8}\"}" >> $GITHUB_ENV
+          if [ -n "${{ github.event.inputs.image_tag }}" ]; then
+              echo "Using workflow dispatch to deploy tag ${{ github.event.inputs.image_tag }}"
+              echo "payload={\"tag\":\"${{ github.event.inputs.image_tag }}\"}" >> $GITHUB_ENV
+          else
+              echo "payload={\"tag\":\"sha-${DEPLOY_SHA:0:8}\"}" >> $GITHUB_ENV
+          fi
       - uses: avakar/create-deployment@v1.0.2
         with:
           auto_merge: false
-          environment: prod
+          environment: ${{ github.event.inputs.image_tag || 'prod' }}
           payload: ${{ env.payload }}
           required_contexts: ""
         env:
