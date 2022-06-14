@@ -10,6 +10,7 @@ from aspen.api.auth import get_auth0_apiclient, get_auth_user
 from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.usergroup import (
+    GroupCreationRequest,
     GroupInfoResponse,
     GroupInvitationsRequest,
     GroupInvitationsResponse,
@@ -21,6 +22,24 @@ from aspen.auth.auth0_management import Auth0Client, Auth0Org
 from aspen.database.models import Group, User
 
 router = APIRouter()
+
+
+@router.post("/", response_model=GroupInfoResponse)
+async def create_group(
+    group_creation_request: GroupCreationRequest,
+    db: AsyncSession = Depends(get_db),
+    auth0_client: Auth0Client = Depends(get_auth0_apiclient),
+    settings: Settings = Depends(get_settings),
+    user: User = Depends(get_auth_user),
+) -> GroupInfoResponse:
+    if not user.system_admin:
+        raise ex.UnauthorizedException("Not authorized")
+    group = Group(**dict(group_creation_request))
+    organization = auth0_client.add_org(group.id, group.name)
+    group.auth0_org_id = organization.id
+    db.add(group)
+    await db.commit()
+    return GroupInfoResponse.from_orm(group)
 
 
 @router.get("/{group_id}/", response_model=GroupInfoResponse)

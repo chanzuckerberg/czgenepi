@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import csv
 import json
 import os.path
 import time
@@ -11,7 +10,9 @@ import dateparser
 import keyring
 import requests
 from auth0.v3.authentication.token_verifier import (
-    AsymmetricSignatureVerifier, JwksFetcher, TokenVerifier)
+    AsymmetricSignatureVerifier,
+    JwksFetcher,
+)
 
 
 class InsecureJwksFetcher(JwksFetcher):
@@ -65,7 +66,7 @@ class TokenHandler:
         return creds["id_token"]
 
     def decode_token(self, token):
-        issuer = f"{self.auth_url}/"
+        f"{self.auth_url}/"
         payload = self.sv.verify_signature(token)
         return payload
 
@@ -361,6 +362,50 @@ def create(
 def group():
     pass
 
+
+@group.command(name="create")
+@click.option("--name", required=True, type=str, help="The group's name.")
+@click.option("--prefix", required=True, type=str, help="The group's prefix.")
+@click.option(
+    "--tree-location",
+    required=True,
+    type=int,
+    help="The default tree location for the group. Must be an integer corresponding to a location in the database.",
+)
+@click.option("--address", type=str, help="The group's full address.")
+@click.option(
+    "--division",
+    type=str,
+    help="The regional division of the country the group is located in.",
+)
+@click.option(
+    "--location",
+    type=str,
+    help="The location within a regional division the group is located in.",
+)
+def create_group(
+    ctx,
+    name: str,
+    prefix: str,
+    tree_location: int,
+    address: Optional[str],
+    division: Optional[str],
+    location: Optional[str],
+):
+    api_client = ctx.obj["api_client"]
+    group = {
+        "name": name,
+        "prefix": prefix,
+        "default_tree_location_id": tree_location,
+        "address": address,
+        "division": division,
+        "location": location,
+    }
+    print(group)
+    resp = api_client.post("/v2/groups/", json=group)
+    print(resp.text)
+
+
 @group.command(name="get")
 @click.argument("group_id")
 @click.pass_context
@@ -368,6 +413,7 @@ def get_group_info(ctx, group_id):
     api_client = ctx.obj["api_client"]
     resp = api_client.get(f"/v2/groups/{group_id}")
     print(resp.text)
+
 
 @group.command(name="members")
 @click.argument("group_id")
@@ -377,6 +423,7 @@ def get_group_imembers(ctx, group_id):
     resp = api_client.get(f"/v2/groups/{group_id}/members")
     print(resp.text)
 
+
 @group.command(name="invites")
 @click.argument("group_id")
 @click.pass_context
@@ -385,12 +432,16 @@ def get_group_invitations(ctx, group_id):
     resp = api_client.get(f"/v2/groups/{group_id}/invitations/")
     print(resp.text)
 
+
 @group.command(name="invite")
 @click.argument("group_id")
 @click.argument("email")
-@click.option("--role", help="Role to invite the user to",
+@click.option(
+    "--role",
+    help="Role to invite the user to",
     type=click.Choice(["admin", "member"], case_sensitive=False),
-    default="member")
+    default="member",
+)
 @click.pass_context
 def invite_group_members(ctx, group_id, email, role):
     api_client = ctx.obj["api_client"]
@@ -401,9 +452,11 @@ def invite_group_members(ctx, group_id, email, role):
     resp = api_client.post(f"/v2/groups/{group_id}/invitations/", json=body)
     print(resp.text)
 
+
 @cli.group()
 def userinfo():
     pass
+
 
 @userinfo.command(name="get")
 @click.pass_context
@@ -539,9 +592,7 @@ def delete_samples(ctx, sample_ids):
 @click.option(
     "--location", required=False, type=int, help="Set the sample's collection location"
 )
-@click.option(
-    "--json-data", required=False, type=str, help="provide json for update"
-)
+@click.option("--json-data", required=False, type=str, help="provide json for update")
 @click.pass_context
 def update_samples(
     ctx,

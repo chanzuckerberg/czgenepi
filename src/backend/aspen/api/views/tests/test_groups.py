@@ -2,6 +2,7 @@ import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.usergroup import group_factory, user_factory
 
 # All test coroutines will be treated as marked.
@@ -111,3 +112,40 @@ async def test_list_group_invitations_unauthorized(
         f"/v2/groups/{group2.id}/invitations/", headers={"user_id": user.auth0_user_id}
     )
     assert response.status_code == 403
+
+
+async def test_create_group(
+    http_client: AsyncClient, async_session: AsyncSession
+) -> None:
+    group = group_factory(division="California", location="San Mateo County")
+    user = user_factory(
+        group,
+        name="Alice",
+        auth0_user_id="admin_id_01",
+        email="alice@chanzuckerberg.com",
+        system_admin=True,
+    )
+    location = location_factory(
+        region="North America",
+        country="USA",
+        division="California",
+        location="Alameda County",
+    )
+    async_session.add_all([group, user, location])
+    await async_session.commit()
+
+    create_group_request = {
+        "name": "Alameda County Department of Public Health",
+        "prefix": "ALAMEDA-CA",
+        "address": "123 Telegraph Ave., Oakland, CA 94612",
+        "division": "California",
+        "location": "Alameda County",
+        "default_tree_location_id": location.id,
+    }
+
+    response = await http_client.post(
+        "/v2/groups/",
+        headers={"user_id": user.auth0_user_id},
+        json=create_group_request,
+    )
+    assert response.status_code == 200

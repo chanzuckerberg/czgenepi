@@ -45,3 +45,11 @@ class MockAuth0Client(Auth0Client):
 
     def get_org_invitations(self, org: Auth0Org) -> List[Auth0Invitation]:
         return [MOCK_INVITE]
+
+    def add_org(self, group_id: int, org_name: str) -> Auth0Org:
+        created_org: Auth0Org = {
+            "id": MOCK_ORG["id"],
+            "name": f"group-{group_id}",
+            "display_name": org_name,
+        }
+        return created_org

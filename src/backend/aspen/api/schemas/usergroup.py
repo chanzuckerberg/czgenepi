@@ -5,6 +5,15 @@ from aspen.api.schemas.base import BaseRequest, BaseResponse
 from aspen.api.schemas.locations import LocationResponse
 
 
+class GroupCreationRequest(BaseRequest):
+    name: str
+    prefix: str
+    address: Optional[str]
+    division: Optional[str]
+    location: Optional[str]
+    default_tree_location_id: int
+
+
 class GroupResponse(BaseResponse):
     id: int
     name: str
