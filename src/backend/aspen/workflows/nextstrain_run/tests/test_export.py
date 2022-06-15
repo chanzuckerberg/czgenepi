@@ -117,10 +117,7 @@ def test_build_config(mocker, session, postgres_database):
         sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
         build = nextstrain_config["builds"]["aspen"]
         assert build["subsampling_scheme"] == tree_type.value
-        if tree_type.value == "OVERVIEW":
-            assert build["title"].startswith("Contextualized tree for samples")
-        else:
-            assert build["title"].startswith(tree_type.value.title())
+        assert build["title"].startswith(tree_type.value.title())
         assert phylo_run.group.default_tree_location.location in build["title"]
         assert phylo_run.group.default_tree_location.division in build["title"]
         assert build["division"] == phylo_run.group.default_tree_location.division
