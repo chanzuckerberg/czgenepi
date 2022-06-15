@@ -2,18 +2,24 @@
 
 ## Required software
 Install general pre-requisites:
-1. Install homebrew: https://brew.sh/
-2. Install CZI homebrew tap:
+1. Install basic developer tools:
+```
+xcode-select --install
+```
+2. Install homebrew: https://brew.sh/
+```
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+3. Install CZI homebrew tap:
 ```
 brew tap chanzuckerberg/tap
 ```
-3. Install base software:
+4. Install base software:
 ```
 brew install chanzuckerberg/tap/happy aws-oidc blessclient@1 fogg pre-commit
 brew install awscli@2 python3 jq docker terraform
-xcode-select --install
 ```
-3. Configure aws access:
+5. Configure aws access:
 ```
 aws-oidc configure --issuer-url https://czi-prod.okta.com --client-id aws-config --config-url https://aws-config-generation.prod.si.czi.technology
 blessclient import-config git@github.com:/chanzuckerberg/genepi-infra/blessconfig.yml
