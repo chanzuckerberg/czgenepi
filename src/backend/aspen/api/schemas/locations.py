@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from aspen.api.schemas.base import BaseResponse, BaseRequest
+from aspen.api.schemas.base import BaseRequest, BaseResponse
 
 
 class LocationResponse(BaseResponse):

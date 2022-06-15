@@ -14,6 +14,7 @@ from auth0.v3.authentication.token_verifier import (
     AsymmetricSignatureVerifier,
     JwksFetcher,
 )
+from tabulate import tabulate
 
 
 class InsecureJwksFetcher(JwksFetcher):
@@ -508,7 +509,7 @@ def list_locations(ctx):
 
 
 @locations.command(name="search")
-@click.option("--region", required=False, type=str, help="A continental-level region, e.g. North America, Asia.")
+@click.option("--region", required=False, type=str, help="A continental-level region, e.g. North America, Asia. In practice, you do not need to provide this.")
 @click.option("--country", required=False, type=str, help="A country, e.g. USA, Canada.")
 @click.option("--division", required=False, type=str, help="A top-level division of a country, e.g. California, British Columbia.")
 @click.option("--location", required=False, type=str, help="A secondary division of a country, e.g. Alameda County, Toronto.")
@@ -532,7 +533,11 @@ def search_locations(
         "location": location,
     }
     resp = api_client.post(f"/v2/locations/search/", json=payload)
-    print(resp.text)
+    locations = resp.json()["locations"]
+    location_columns = ["region", "country", "division", "location", "id"]
+    location_values = [[entry.get(column) for column in location_columns] for entry in locations]
+    print(tabulate(location_values, headers=location_columns, tablefmt="psql"))
+
 
 @cli.group()
 def lineages():
