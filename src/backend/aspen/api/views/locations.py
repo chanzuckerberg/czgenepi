@@ -1,10 +1,11 @@
 import functools
+from typing import Dict, Optional
 
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends
 from sqlalchemy import asc
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.sql.expression import and_, literal
+from sqlalchemy.sql.expression import and_
 from starlette.requests import Request
 
 from aspen.api.auth import get_auth_user
@@ -18,11 +19,6 @@ from aspen.api.settings import Settings
 from aspen.database.models import Location, User
 
 router = APIRouter()
-
-import logging
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
 
 
 LOCATION_KEYS = ("region", "country", "division", "location")
@@ -53,19 +49,19 @@ async def search_locations(
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_auth_user),
 ):
-    # Since most searches are going to be done at the division or location level,
-    # if a user includes a country in the query we want to find the closest match
-    # for that value and search for divisions and locations *within* that country.
-    # The same goes for regions, though in practice including a region is wholly
-    # unnecessary.
-    set_categories = []
-    for category in "region", "country":
+    set_categories: Dict[str, Optional[str]] = {
+        "region": None,
+        "country": None,
+        "division": None,
+    }
+    for category in set_categories.keys():
         query_value = getattr(search_query, category)
         if query_value is not None:
+            target_column = getattr(Location, category)
             category_search_query = (
                 sa.select(
-                    Location,
-                    sa.func.levenshtein(getattr(Location, category), query_value).label(
+                    target_column.distinct(),
+                    sa.func.levenshtein(target_column, query_value).label(
                         "levenshtein"
                     ),
                 )
@@ -74,38 +70,52 @@ async def search_locations(
             )
             category_result = await db.execute(category_search_query)
             category_value = category_result.scalars().one()
-            set_categories.append(
-                (getattr(Location, category) == getattr(category_value, category))
-            )
+            set_categories[category] = category_value
 
-    # We generally want to compare on columns with the most specificity.
-    comparable_columns = {
-        "division": search_query.division,
-        "location": search_query.location,
-    }
+    set_category_conditionals = [
+        (getattr(Location, category) == location_match)
+        for category, location_match in set_categories.items()
+        if location_match is not None
+    ]
+
     levenshtein_columns = [
         sa.func.levenshtein(getattr(Location, category), value)
-        for category, value in dict(comparable_columns).items()
+        for category, value in dict(search_query).items()
         if value is not None
     ]
-    # But we can also support searches with only a region or country.
-    if levenshtein_columns:
-        summed_columns = functools.reduce(lambda x, y: x + y, levenshtein_columns)
-    else:
-        summed_columns = literal(0)
+    summed_columns = functools.reduce(lambda x, y: x + y, levenshtein_columns)
 
     results = []
-    # Allow for searches for a division to show its entry in the locations table
-    # where the location column is null
+    # show all divisions in a country
     if (
-        comparable_columns["location"] is None
-        and comparable_columns["division"] is not None
+        search_query.country
+        and search_query.division is None
+        and search_query.location is None
     ):
+        divisions_search_query = (
+            sa.select(Location)  # type: ignore
+            .where(
+                and_(
+                    Location.country == set_categories["country"],
+                    Location.location == None,  # noqa: E711
+                )
+            )
+            .order_by(asc(Location.division))
+        )
+        divisions_search = await db.execute(divisions_search_query)
+        all_divisions_in_country = divisions_search.scalars().all()
+        results.extend(all_divisions_in_country)
+    # show all locations in a division
+    elif search_query.location is None and search_query.division:
         divison_search_query = (
             sa.select(
                 Location, sa.sql.expression.label("levenshtein_total", summed_columns)  # type: ignore
             )
-            .where(and_(Location.location == None, *set_categories))  # noqa: E711
+            .where(
+                and_(
+                    Location.location == None, *set_category_conditionals  # noqa: E711
+                )
+            )
             .order_by(asc("levenshtein_total"))
             .limit(1)
         )
@@ -113,17 +123,39 @@ async def search_locations(
         closest_division = division_search.scalars().one()
         results.append(closest_division)
 
-    location_search_query = (
-        sa.select(
-            Location, sa.sql.expression.label("levenshtein_total", summed_columns)  # type: ignore
+        all_locations_in_division_query = (
+            sa.select(Location)  # type: ignore
+            .where(
+                and_(
+                    Location.region == closest_division.region,
+                    Location.country == closest_division.country,
+                    Location.division == closest_division.division,
+                    Location.location != None,  # noqa: E711
+                )
+            )
+            .order_by(asc(Location.location))
         )
-        .where(and_(Location.location != None, *set_categories))  # noqa: E711
-        .order_by(asc("levenshtein_total"))
-        .limit(20)
-    )
+        all_locations_in_division_result = await db.execute(
+            all_locations_in_division_query
+        )
+        all_locations_in_division = all_locations_in_division_result.scalars().all()
+        results.extend(all_locations_in_division)
+    else:
+        location_search_query = (
+            sa.select(
+                Location, sa.sql.expression.label("levenshtein_total", summed_columns)  # type: ignore
+            )
+            .where(
+                and_(
+                    Location.location != None, *set_category_conditionals  # noqa: E711
+                )
+            )
+            .order_by(asc("levenshtein_total"))
+            .limit(30)
+        )
 
-    location_search = await db.execute(location_search_query)
-    locations = location_search.scalars().all()
-    results.extend(locations)
+        location_search = await db.execute(location_search_query)
+        locations = location_search.scalars().all()
+        results.extend(locations)
 
     return LocationListResponse.parse_obj({"locations": results})
