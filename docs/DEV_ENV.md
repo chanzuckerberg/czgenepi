@@ -1,11 +1,26 @@
 # Local Development Environment
 
-This uses the [Happy Path setup](https://czi.atlassian.net/wiki/spaces/SI/pages/2050588714/Happy+CLI#Installation) created by the shared infra team.
+## Required software
+Install general pre-requisites:
+1. Install homebrew: https://brew.sh/
+2. Install CZI homebrew tap:
+```
+brew tap chanzuckerberg/tap
+```
+3. Install base software:
+```
+brew install chanzuckerberg/tap/happy aws-oidc blessclient@1 fogg pre-commit
+brew install awscli@2 python3 jq docker terraform
+xcode-select --install
+```
+3. Configure aws access:
+```
+aws-oidc configure --issuer-url https://czi-prod.okta.com --client-id aws-config --config-url https://aws-config-generation.prod.si.czi.technology
+blessclient import-config git@github.com:/chanzuckerberg/genepi-infra/blessconfig.yml
+```
 
 ## Development quickstart
 
-1. [install docker](https://docs.docker.com/get-docker/). If brew is installed run `brew install docker`.
-1. [install pre-commit](https://pre-commit.com/#install). `pip install pre-commit` or `brew install pre-commit`
 1. Run `pre-commit install` to install all the git pre-commit hooks
 1. From the root of this repository, run `make local-init` to build and run the dev environment. The first build takes awhile, but subsequent runs will use cached artifacts.
 1. Visit [http://backend.genepinet.localdev:3000](http://backend.genepinet.localdev:3000) to view the backend, and [http://frontend.genepinet.localdev:8000](http://frontend.genepinet.localdev:8000) for the frontend.
@@ -98,21 +113,3 @@ self-signed cert in for convenience.
 
 Follow the instructions in [the wiki](https://czi.atlassian.net/wiki/spaces/SI/pages/1801100933/PyCharm+configuration+for+Happy+Path)
 
-
-#### Quickstart setup from scratch:
-
-* [Install docker](https://www.docker.com/products/docker-desktop)
-* [Install homebrew](https://docs.brew.sh/Installation)
-
-```
-brew install awscli jq
-brew tap chanzuckerberg/tap
-brew install aws-oidc
-mkdir -p ~/.aws  # Temp workaround for aws-oidc bug.
-touch ~/.aws/config  # Temp workaround for aws-oidc bug.
-aws-oidc configure --issuer-url https://czi-prod.okta.com --client-id aws-config --config-url https://aws-config-generation.staging.si.czi.technology # Just use the defaults
-git clone git@github.com:chanzuckerberg/czgenepi.git
-cd czgenepi
-/usr/bin/env/python3 -m pip install .happy/requirements.txt # You may need to use `sudo` here if you're using osx system python instead of homebrew python
-make local-init
-```
