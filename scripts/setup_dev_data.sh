@@ -15,6 +15,7 @@ export AWS_REGION=us-west-2
 export AWS_DEFAULT_REGION=us-west-2
 export AWS_ACCESS_KEY_ID=nonce
 export AWS_SECRET_ACCESS_KEY=nonce
+export AWS_PAGER=""
 
 export FRONTEND_URL=http://frontend.genepinet.localdev:8000
 export BACKEND_URL=http://backend.genepinet.localdev:3000
