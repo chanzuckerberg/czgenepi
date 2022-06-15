@@ -1,3 +1,104 @@
+# Backend documentation
+
+## Core technologies
+CZGE's Backend application is built with the following stack:
+- [FastAPI](https://fastapi.tiangolo.com/) is an async Python API framework
+  - [pydantic](https://pydantic-docs.helpmanual.io/) is a data validation library used to de/serialize and validate api requests and responses
+- [SQLAlchemy](https://www.sqlalchemy.org/) is an ORM
+- [Alembic](https://alembic.sqlalchemy.org/en/latest/) is a tool for managing database migrations
+- [pytest](https://docs.pytest.org/en/7.1.x/) is a testing framework
+
+In addition it depends on some core external tools for data storage
+- [PostgreSQL](https://www.postgresql.org/) is an RDBMS that stores most of our metadata
+- [Amazon S3](https://aws.amazon.com/aws/s3) is a blob storage service that stores most of our job output
+
+## App structure
+The root of our backend application is in `src/backend`. noteworthy subdirectories are annotated here:
+- `aspen` - Most of our backend application lives here
+  - `api` - entrypoint for our backend API service
+    - `schemas` - API input/output validation models live here
+    - `utils` - Code used by multiple endpoints (this could be better organized)
+    - `views` - API endpoint code lives here
+  - `workflows` - code related to our compute jobs
+  - `database` - code related to establishing DB connections / sessions
+    - `models` - SQLAlchemy models used across our backend application
+- `database_migrations` - alembic migrations
+- `etc` - some basic setup configuration for our backend container
+
+## Discoverability
+Our backend API is self-documenting via OpenAPI and JSON-Schema:
+- API documentation: https://api.czgenepi.org/v2/docs
+- JSON Schema: https://api.czgenepi.org/v2/openapi.json
+
+## Creating a new API endpoint.
+Some endpoints will only need the last few steps, but this is the maximal case:
+1. Create a new module in `src/backend/aspen/api/views` and add a router:
+```python
+# src/backend/aspen/api/views/new_module.py
+from fastapi import APIRouter
+router = APIRouter()
+```
+2. Import it into `src/backend/aspen/api.main.py` and create a route for it:
+```python
+# src/backend/aspen/api/main.py
+import new_module from api.views
+...
+    _app.include_router(
+        new_module.router,
+        prefix="/v2/new_module",
+        dependencies=[Depends(get_auth_user)],  # If all endpoints require authentication
+    )
+```
+3. Add any new pydantic validation schemas as necessary:
+```python
+# src/backend/aspen/api/schemas/new_module.py
+from aspen.api.schemas.base import BaseResponse, BaseRequest
+
+
+class NewRequest(BaseRequest):
+    foo: str
+
+class NewResponseItem(BaseResponse):
+    id: int
+    bar: str
+
+class NewResponseList(BaseResponse):
+    rows: List[NewResponseItem]
+```
+4. Add endpoints to your view module.
+```python
+# src/backend/aspen/api/schemas/new_schemas.py
+import sqlalchemy as sa
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from aspen.api.auth import get_auth_user
+from aspen.api.deps import get_db, get_settings
+from aspen.api.schemas.new_module import NewRequest, NewResponseList
+from aspen.api.settings import Settings
+from aspen.database.models import User, SomeModel
+
+router = APIRouter()
+
+
+# Specify the HTTP method, sub-path (appending to the path added to main.py) and response model type.
+# The response model type here populates our API documentation.
+@router.get("/", response_model=NewResponseList) # All endpoints that return a list must end with a trailing slash
+async def list_items(
+    request: NewRequest, # GET requests often don't need input model validation, but this is here for completeness.
+    db: AsyncSession = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    user: User = Depends(get_auth_user),
+) -> NewResponseList:
+
+    rows = (await db.execute(sa.select(SomeModel).filter(SomeModel.somefield == request.bar))).scalars().all()
+    return NewResponseList.parse_obj({"rows": rows})
+
+```
+
+
+
+
 ## Database concerns
 
 ### Interacting with the local database in sql
