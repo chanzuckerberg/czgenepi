@@ -5,12 +5,36 @@ from auth0.v3.exceptions import Auth0Error
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from aspen.auth.auth0_management import Auth0Client, Auth0Org
+from aspen.auth.auth0_management import (
+    Auth0Client,
+    Auth0Invitation,
+    Auth0Org,
+    Auth0User,
+)
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.usergroup import group_factory, user_factory
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
+
+DEFAULT_AUTH0_ORG: Auth0Org = {
+    "id": "testid",
+    "name": "testname",
+    "display_name": "testdisplayname",
+}
+
+DEFAULT_AUTH0_USER: Auth0User = {
+    "user_id": "testuserid",
+    "name": "test user",
+    "email": "test@czgenepi.org",
+}
+DEFAULT_AUTH0_INVITATION: Auth0Invitation = {
+    "id": "inv_id",
+    "created_at": "2022-01-01",
+    "expires_at": "2022-06-01",
+    "inviter": {"name": "Bob"},
+    "invitee": {"email": "invitee@czgenepi.org"},
+}
 
 
 async def test_list_members(
@@ -90,13 +114,9 @@ async def test_send_group_invitations(
     async_session.add_all([group, user])
     await async_session.commit()
 
-    auth0_apiclient.get_org_by_name.return_value: Auth0Org = {
-        "id": "testid",
-        "name": "testname",
-        "display_name": "testdisplayname",
-    }
-    auth0_apiclient.get_user_by_email.side_effect = [False, False, True]
-    auth0_apiclient.invite_member.side_effect = [
+    auth0_apiclient.get_org_by_name.return_value = DEFAULT_AUTH0_ORG  # type: ignore
+    auth0_apiclient.get_user_by_email.side_effect = [[], [], [DEFAULT_AUTH0_USER]]  # type: ignore
+    auth0_apiclient.invite_member.side_effect = [  # type: ignore
         True,
         Auth0Error(True, 500, "something broke"),
     ]
@@ -134,20 +154,8 @@ async def test_list_group_invitations(
     async_session.add_all([group, user])
     await async_session.commit()
 
-    auth0_apiclient.get_org_by_id.side_effect: List[Auth0Org] = [
-        {"id": "a0id", "name": "a0name", "display_name": "a0dispname"}
-    ]
-    auth0_apiclient.get_org_invitations.side_effect = [
-        [
-            {
-                "id": "aaa",
-                "created_at": "asdf",
-                "expires_at": "asdf",
-                "inviter": {"name": "Bob"},
-                "invitee": {"email": "aaa@bbb.com"},
-            }
-        ],
-    ]
+    auth0_apiclient.get_org_by_id.side_effect = [DEFAULT_AUTH0_ORG]  # type: ignore
+    auth0_apiclient.get_org_invitations.side_effect = [[DEFAULT_AUTH0_INVITATION]]  # type: ignore
     response = await http_client.get(
         f"/v2/groups/{group.id}/invitations/", headers={"user_id": user.auth0_user_id}
     )
@@ -157,7 +165,10 @@ async def test_list_group_invitations(
     assert "invitations" in resp_data
     invitations = resp_data["invitations"]
     assert isinstance(invitations, list)
-    assert invitations[0]["invitee"]["email"] == "aaa@bbb.com"
+    assert (
+        invitations[0]["invitee"]["email"]
+        == DEFAULT_AUTH0_INVITATION["invitee"]["email"]
+    )
 
 
 async def test_list_group_invitations_unauthorized(
@@ -209,9 +220,7 @@ async def test_create_group(
         "default_tree_location_id": location.id,
     }
 
-    auth0_apiclient.add_org.side_effect = [
-        {"id": "a0id", "name": "name", "display_name": "display_name"}
-    ]
+    auth0_apiclient.add_org.side_effect = [DEFAULT_AUTH0_ORG]  # type: ignore
     response = await http_client.post(
         "/v2/groups/",
         headers={"user_id": user.auth0_user_id},
