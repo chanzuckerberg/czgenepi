@@ -2,18 +2,8 @@
 
 #### Note: remote dev is still somewhat experimental. Work with #team-happy if you run into trouble.
 
-## Remote Dev Pre-requisites
-1. Ensure your `awscli` is configured with the
-   [required credentials and profiles](../docs/awscli.md).
-1. Make sure you have the *latest version* of the AWS CLI installed. `brew upgrade awscli` if you're not sure:
-   ```
-   % aws --version
-   aws-cli/2.1.8 Python/3.9.0 Darwin/19.6.0 source/x86_64 prompt/off
-   ```
-1. Run the following command to install prerequisites:
-   ```
-   pip install -r .happy/requirements.txt
-   ```
+## Install / configure dependencies
+1. Please see the "Required Software" section of [DEV_ENV.md](../docs/DEV_ENV.md)
 
 ### Overview
 Each engineer can run as many remote development *stacks* as they like. Each stack can represent a feature branch, experiment, or whatever's useful to you. Stacks are managed using the remote dev cli utility called `happy`.
@@ -21,23 +11,23 @@ Each engineer can run as many remote development *stacks* as they like. Each sta
 The general remote dev workflow is:
 
 1. Make some code changes
-1. Run `./scripts/happy create <your-stack-name>` to create a new stack (note: some special characters including underscores are not supported)
+1. Run `happy create <your-stack-name>` to create a new stack (note: some special characters including underscores are not supported)
 1. Visit the URL printed by the create step, share it with the team, etc.
-1. Run `./scripts/happy logs <your-stack-name> backend` to tail the logs of the aspen api.
+1. Run `happy logs <your-stack-name> backend` to tail the logs of the aspen api.
 1. Make some more code changes
-1. Run `./scripts/happy update <your-stack-name>` to update the remote stack with your latest changes.
-1. When you don't need your stack anymore, run `./scripts/happy delete <your-stack-name>` to free up remote dev resources.
-1. Run `./scripts/happy shell <your-stack-name> backend` to ssh into an ecs backend container for debugging
+1. Run `happy update <your-stack-name>` to update the remote stack with your latest changes.
+1. When you don't need your stack anymore, run `happy delete <your-stack-name>` to free up remote dev resources.
+1. Run `happy shell <your-stack-name> backend` to ssh into an ecs backend container for debugging
 
-If you forget which stacks you've created, just run `./scripts/happy list` at any time to list the current remote dev stacks.
+If you forget which stacks you've created, just run `happy list` at any time to list the current remote dev stacks.
 
-If you need to reset your remote dev stack DB run `./scripts/happy migrate <your-stack-name> --reset`.
+If you need to reset your remote dev stack DB run `happy migrate <your-stack-name> --reset`.
 
 ### Slices
 If you're only working on a subset of the CZ Gen Epi application, there's no need to build and push all docker images to test your changes in remote-dev. Both `happy create` and `happy update` commands support a `--slice` option that uses the latest `trunk` build of all docker images except the ones you're working on. For example, if you're only making changes to the frontend/backend images, you don't care to build & push the gisaid image. The following command will create an rdev with your changes reflected in only the `frontend` and `backend` images:
 
 ```
-./scripts/happy create mynewrdev --slice fullstack
+happy create mynewrdev --slice fullstack
 ```
 
 The currently supported slices are:
@@ -61,7 +51,7 @@ From the root of this repo, run `make remote-dbconsole DB=STACK_NAME_HERE` (repl
 The CLI utility is evolving rapidly, so the best reference for which commands are available and how to use them is the CLI itself. All commands support a `--help` flag to print usage docs. For example:
 
 ```
-% ./scripts/happy create --help
+% happy create --help
 Usage: happy create [OPTIONS] STACK_NAME
 
   Create a dev stack with a given tag

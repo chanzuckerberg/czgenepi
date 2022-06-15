@@ -1,15 +1,37 @@
 # Local Development Environment
 
-This uses the [Happy Path setup](https://czi.atlassian.net/wiki/spaces/SI/pages/2050588714/Happy+CLI#Installation) created by the shared infra team.
+## Required software
+Install general pre-requisites:
+1. Install basic developer tools:
+```
+xcode-select --install
+```
+2. Install homebrew: https://brew.sh/
+```
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+3. Install CZI homebrew tap:
+```
+brew tap chanzuckerberg/tap
+```
+4. Install base software:
+```
+brew install chanzuckerberg/tap/happy aws-oidc blessclient@1 fogg pre-commit
+brew install awscli@2 python3 jq docker terraform
+brew install --cask session-manager-plugin
+```
+5. Configure aws access:
+```
+aws-oidc configure --issuer-url https://czi-prod.okta.com --client-id aws-config --config-url https://aws-config-generation.prod.si.czi.technology
+blessclient import-config git@github.com:/chanzuckerberg/genepi-infra/blessconfig.yml
+```
 
 ## Development quickstart
 
-1. [install docker](https://docs.docker.com/get-docker/). If brew is installed run `brew install docker`.
-1. [install pre-commit](https://pre-commit.com/#install). `pip install pre-commit` or `brew install pre-commit`
 1. Run `pre-commit install` to install all the git pre-commit hooks
 1. From the root of this repository, run `make local-init` to build and run the dev environment. The first build takes awhile, but subsequent runs will use cached artifacts.
 1. Visit [http://backend.genepinet.localdev:3000](http://backend.genepinet.localdev:3000) to view the backend, and [http://frontend.genepinet.localdev:8000](http://frontend.genepinet.localdev:8000) for the frontend.
-1. `make local-dbconsole` starts a connection with the local postgresql db.
+1. `make local-pgconsole` starts a connection with the local postgresql db.
 1. **Open the source code and start editing!**
    - Modify code in the `src/frontend` directory, save your changes and the browser will update in real time.
    - Modify code in the `src/backend` directory, and the backend api will reload automatically.
@@ -52,7 +74,8 @@ The dev environment is initialized with AWS Secrets/S3 data in the [src/backend/
 | `make local-init`                                                 | Launch a new local dev env and populate it with test data.                         |                                                                                                                                                     |
 | `make local-start`                                                | Start a local dev environment that's been stopped.                                 |                                                                                                                                                     |
 | `make local-stop`                                                 | Stop the local dev environment.                                                    |                                                                                                                                                     |
-| `make local-dbconsole`                                            | Connect to the local database.                                                     |                                                                                                                                                     |
+| `make local-pgconsole`                                            | Connect to the local database via the psql CLI.                                    |                                                                                                                                                     |
+| `make local-dbconsole`                                            | Connect to the local database with a python interpreter.                           |                                                                                                                                                     |
 | `make local-logs`                                                 | Tail the logs of the dev env containers.                                           | Run `make local-logs CONTAINER=backend` to tail the logs of a specific container. Dev containers are: backend, frontend, localstack, database, oidc |
 | `make local-shell CONTAINER=frontend`                             | Open a command shell in one of the dev containers                                  | Dev containers are: backend, frontend, localstack, database, oidc                                                                                   |
 | `make local-status`                                               | Show the status of the containers in the dev environment.                          |                                                                                                                                                     |
@@ -98,21 +121,3 @@ self-signed cert in for convenience.
 
 Follow the instructions in [the wiki](https://czi.atlassian.net/wiki/spaces/SI/pages/1801100933/PyCharm+configuration+for+Happy+Path)
 
-
-#### Quickstart setup from scratch:
-
-* [Install docker](https://www.docker.com/products/docker-desktop)
-* [Install homebrew](https://docs.brew.sh/Installation)
-
-```
-brew install awscli jq
-brew tap chanzuckerberg/tap
-brew install aws-oidc
-mkdir -p ~/.aws  # Temp workaround for aws-oidc bug.
-touch ~/.aws/config  # Temp workaround for aws-oidc bug.
-aws-oidc configure --issuer-url https://czi-prod.okta.com --client-id aws-config --config-url https://aws-config-generation.staging.si.czi.technology # Just use the defaults
-git clone git@github.com:chanzuckerberg/czgenepi.git
-cd czgenepi
-/usr/bin/env/python3 -m pip install .happy/requirements.txt # You may need to use `sudo` here if you're using osx system python instead of homebrew python
-make local-init
-```
