@@ -1,3 +1,5 @@
+from typing import List
+
 import pytest
 from auth0.v3.exceptions import Auth0Error
 from httpx import AsyncClient
@@ -125,13 +127,27 @@ async def test_send_group_invitations(
 
 
 async def test_list_group_invitations(
-    http_client: AsyncClient, async_session: AsyncSession
+    auth0_apiclient: Auth0Client, http_client: AsyncClient, async_session: AsyncSession
 ) -> None:
     group = group_factory()
     user = user_factory(group)
     async_session.add_all([group, user])
     await async_session.commit()
 
+    auth0_apiclient.get_org_by_id.side_effect: List[Auth0Org] = [
+        {"id": "a0id", "name": "a0name", "display_name": "a0dispname"}
+    ]
+    auth0_apiclient.get_org_invitations.side_effect = [
+        [
+            {
+                "id": "aaa",
+                "created_at": "asdf",
+                "expires_at": "asdf",
+                "inviter": {"name": "Bob"},
+                "invitee": {"email": "aaa@bbb.com"},
+            }
+        ],
+    ]
     response = await http_client.get(
         f"/v2/groups/{group.id}/invitations/", headers={"user_id": user.auth0_user_id}
     )
@@ -141,6 +157,7 @@ async def test_list_group_invitations(
     assert "invitations" in resp_data
     invitations = resp_data["invitations"]
     assert isinstance(invitations, list)
+    assert invitations[0]["invitee"]["email"] == "aaa@bbb.com"
 
 
 async def test_list_group_invitations_unauthorized(
@@ -164,7 +181,7 @@ async def test_list_group_invitations_unauthorized(
 
 
 async def test_create_group(
-    http_client: AsyncClient, async_session: AsyncSession
+    auth0_apiclient: Auth0Client, http_client: AsyncClient, async_session: AsyncSession
 ) -> None:
     group = group_factory(division="California", location="San Mateo County")
     user = user_factory(
@@ -192,6 +209,9 @@ async def test_create_group(
         "default_tree_location_id": location.id,
     }
 
+    auth0_apiclient.add_org.side_effect = [
+        {"id": "a0id", "name": "name", "display_name": "display_name"}
+    ]
     response = await http_client.post(
         "/v2/groups/",
         headers={"user_id": user.auth0_user_id},
