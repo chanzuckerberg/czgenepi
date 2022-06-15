@@ -120,7 +120,7 @@ services:
         aliases:
           - localstack.genepinet.localdev
   oidc:
-    image: soluto/oidc-server-mock:0.3.0
+    image: ghcr.io/soluto/oidc-server-mock:latest
     profiles: [ "backend", "web", "all" ]
     ports:
       - "4011:80"
