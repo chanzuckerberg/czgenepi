@@ -1,11 +1,11 @@
 import functools
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends
 from sqlalchemy import asc
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.sql.expression import and_
+from sqlalchemy.sql.expression import and_, BinaryExpression
 from starlette.requests import Request
 
 from aspen.api.auth import get_auth_user
@@ -42,6 +42,11 @@ async def list_locations(
     return LocationListResponse.parse_obj({"locations": response})
 
 
+# The idea in this route is that,
+# given a country, show all divisions in that country,
+# given a division, show all locations in that division,
+# given a location, do a text-distance-based search for that location,
+# and restrict searches based on higher-order category values.
 @router.post("/search/")
 async def search_locations(
     search_query: LocationSearchRequest,
@@ -54,6 +59,7 @@ async def search_locations(
         "country": None,
         "division": None,
     }
+    set_category_conditionals: List[BinaryExpression] = []
     for category in set_categories.keys():
         query_value = getattr(search_query, category)
         if query_value is not None:
@@ -65,18 +71,16 @@ async def search_locations(
                         "levenshtein"
                     ),
                 )
+                .where(and_(True, *set_category_conditionals))
                 .order_by(asc("levenshtein"))
                 .limit(1)
             )
             category_result = await db.execute(category_search_query)
             category_value = category_result.scalars().one()
             set_categories[category] = category_value
-
-    set_category_conditionals = [
-        (getattr(Location, category) == location_match)
-        for category, location_match in set_categories.items()
-        if location_match is not None
-    ]
+            set_category_conditionals.append(
+                getattr(Location, category) == category_value
+            )
 
     levenshtein_columns = [
         sa.func.levenshtein(getattr(Location, category), value)
