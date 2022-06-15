@@ -1,7 +1,9 @@
 import pytest
+from auth0.v3.exceptions import Auth0Error
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from aspen.auth.auth0_management import Auth0Client, Auth0Org
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.usergroup import group_factory, user_factory
 
@@ -73,6 +75,53 @@ async def test_list_members_unauthorized(
         f"/v2/groups/{group2.id}/members/", headers={"user_id": user.auth0_user_id}
     )
     assert response.status_code == 403
+
+
+async def test_send_group_invitations(
+    # Technically Auth0Client will be a magicmock, but we want mypy to treat it like an auth0 client.
+    auth0_apiclient: Auth0Client,
+    http_client: AsyncClient,
+    async_session: AsyncSession,
+) -> None:
+    group = group_factory()
+    user = user_factory(group)
+    async_session.add_all([group, user])
+    await async_session.commit()
+
+    auth0_apiclient.get_org_by_name.return_value: Auth0Org = {
+        "id": "testid",
+        "name": "testname",
+        "display_name": "testdisplayname",
+    }
+    auth0_apiclient.get_user_by_email.side_effect = [False, False, True]
+    auth0_apiclient.invite_member.side_effect = [
+        True,
+        Auth0Error(True, 500, "something broke"),
+    ]
+    create_invitations_request = {
+        "role": "member",
+        "emails": [
+            "success@onetwothree.com",
+            "exception@onetwothree.com",
+            "alreadyexists@onetwothree.com",
+        ],
+    }
+    response = await http_client.post(
+        f"/v2/groups/{group.id}/invitations/",
+        headers={"user_id": user.auth0_user_id},
+        json=create_invitations_request,
+    )
+
+    assert response.status_code == 200
+    resp_data = response.json()
+    assert "invitations" in resp_data
+    invitations = {item["email"]: item["success"] for item in resp_data["invitations"]}
+    expected = {
+        "success@onetwothree.com": True,
+        "alreadyexists@onetwothree.com": False,
+        "exception@onetwothree.com": False,
+    }
+    assert invitations == expected
 
 
 async def test_list_group_invitations(

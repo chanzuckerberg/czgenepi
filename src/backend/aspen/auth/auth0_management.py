@@ -74,6 +74,9 @@ class Auth0Client:
             results.extend(resp[key])
             page += 1
 
+    def get_user_by_email(self, email) -> List[Auth0User]:
+        return self.client.users_by_email.search_users_by_email(email)
+
     def get_users(self) -> List[Auth0User]:
         return self.get_all_results(self.client.users.list, "users")
 
