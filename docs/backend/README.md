@@ -88,6 +88,11 @@ async def list_items(
     request: NewRequest, # GET requests often don't need input model validation, but this is here for completeness.
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    # If this endpoint requires authentication, we need to make sure to depend on get_auth_user
+    # or get_admin_user here to validate the user's credentials and return 401/403 responses
+    # if their credentials are invalid. For most endpoints, get_auth_user is added at the root
+    # router in aspen/api/main.py, and it only needs to be included again here if we want to
+    # *use* the user object in our endpoint.
     user: User = Depends(get_auth_user),
 ) -> NewResponseList:
 
