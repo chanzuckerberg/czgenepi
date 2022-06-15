@@ -18,6 +18,7 @@ brew tap chanzuckerberg/tap
 ```
 brew install chanzuckerberg/tap/happy aws-oidc blessclient@1 fogg pre-commit
 brew install awscli@2 python3 jq docker terraform
+brew install --cask session-manager-plugin
 ```
 5. Configure aws access:
 ```
