@@ -14,6 +14,7 @@ from auth0.v3.authentication.token_verifier import (
     AsymmetricSignatureVerifier,
     JwksFetcher,
 )
+from tabulate import tabulate
 
 
 class InsecureJwksFetcher(JwksFetcher):
@@ -505,6 +506,37 @@ def list_locations(ctx):
     api_client = ctx.obj["api_client"]
     resp = api_client.get("/v2/locations/")
     print(resp.text)
+
+
+@locations.command(name="search")
+@click.option("--region", required=False, type=str, help="A continental-level region, e.g. North America, Asia. In practice, you do not need to provide this.")
+@click.option("--country", required=False, type=str, help="A country, e.g. USA, Canada.")
+@click.option("--division", required=False, type=str, help="A top-level division of a country, e.g. California, British Columbia.")
+@click.option("--location", required=False, type=str, help="A secondary division of a country, e.g. Alameda County, Toronto.")
+@click.pass_context
+def search_locations(
+    ctx,
+    region: Optional[str],
+    country: Optional[str],
+    division: Optional[str],
+    location: Optional[str],
+):
+    if not region and not country and not division and not location:
+        print("Must provide at least one of region, country, division, or location.")
+        return
+        
+    api_client = ctx.obj["api_client"]
+    payload = {
+        "region": region,
+        "country": country,
+        "division": division,
+        "location": location,
+    }
+    resp = api_client.post(f"/v2/locations/search/", json=payload)
+    locations = resp.json()["locations"]
+    location_columns = ["region", "country", "division", "location", "id"]
+    location_values = [[entry.get(column) for column in location_columns] for entry in locations]
+    print(tabulate(location_values, headers=location_columns, tablefmt="psql"))
 
 
 @cli.group()
