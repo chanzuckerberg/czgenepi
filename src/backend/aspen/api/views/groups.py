@@ -126,11 +126,16 @@ async def invite_group_members(
     client_id = settings.AUTH0_CLIENT_ID
     responses = []
     for email in group_invitation_request.emails:
+        # Temporary: We only support adding users to a single group right now,
+        # so skip sending emails to users that already exist elsewhere.
         success = True
+        if auth0_client.get_user_by_email(email):
+            success = False
         try:
-            auth0_client.invite_member(
-                organization["id"], client_id, user.name, email, "member"
-            )
+            if success:
+                auth0_client.invite_member(
+                    organization["id"], client_id, user.name, email, "member"
+                )
         except Auth0Error as err:
             # TODO - we need to learn more about possible exceptions here.
             sentry_sdk.capture_exception(err)

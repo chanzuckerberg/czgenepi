@@ -1,12 +1,38 @@
 import pytest
+from auth0.v3.exceptions import Auth0Error
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from aspen.auth.auth0_management import (
+    Auth0Client,
+    Auth0Invitation,
+    Auth0Org,
+    Auth0User,
+)
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.usergroup import group_factory, user_factory
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
+
+DEFAULT_AUTH0_ORG: Auth0Org = {
+    "id": "testid",
+    "name": "testname",
+    "display_name": "testdisplayname",
+}
+
+DEFAULT_AUTH0_USER: Auth0User = {
+    "user_id": "testuserid",
+    "name": "test user",
+    "email": "test@czgenepi.org",
+}
+DEFAULT_AUTH0_INVITATION: Auth0Invitation = {
+    "id": "inv_id",
+    "created_at": "2022-01-01",
+    "expires_at": "2022-06-01",
+    "inviter": {"name": "Bob"},
+    "invitee": {"email": "invitee@czgenepi.org"},
+}
 
 
 async def test_list_members(
@@ -75,14 +101,59 @@ async def test_list_members_unauthorized(
     assert response.status_code == 403
 
 
-async def test_list_group_invitations(
-    http_client: AsyncClient, async_session: AsyncSession
+async def test_send_group_invitations(
+    # Technically Auth0Client will be a magicmock, but we want mypy to treat it like an auth0 client.
+    auth0_apiclient: Auth0Client,
+    http_client: AsyncClient,
+    async_session: AsyncSession,
 ) -> None:
     group = group_factory()
     user = user_factory(group)
     async_session.add_all([group, user])
     await async_session.commit()
 
+    auth0_apiclient.get_org_by_name.return_value = DEFAULT_AUTH0_ORG  # type: ignore
+    auth0_apiclient.get_user_by_email.side_effect = [[], [], [DEFAULT_AUTH0_USER]]  # type: ignore
+    auth0_apiclient.invite_member.side_effect = [  # type: ignore
+        True,
+        Auth0Error(True, 500, "something broke"),
+    ]
+    create_invitations_request = {
+        "role": "member",
+        "emails": [
+            "success@onetwothree.com",
+            "exception@onetwothree.com",
+            "alreadyexists@onetwothree.com",
+        ],
+    }
+    response = await http_client.post(
+        f"/v2/groups/{group.id}/invitations/",
+        headers={"user_id": user.auth0_user_id},
+        json=create_invitations_request,
+    )
+
+    assert response.status_code == 200
+    resp_data = response.json()
+    assert "invitations" in resp_data
+    invitations = {item["email"]: item["success"] for item in resp_data["invitations"]}
+    expected = {
+        "success@onetwothree.com": True,
+        "alreadyexists@onetwothree.com": False,
+        "exception@onetwothree.com": False,
+    }
+    assert invitations == expected
+
+
+async def test_list_group_invitations(
+    auth0_apiclient: Auth0Client, http_client: AsyncClient, async_session: AsyncSession
+) -> None:
+    group = group_factory()
+    user = user_factory(group)
+    async_session.add_all([group, user])
+    await async_session.commit()
+
+    auth0_apiclient.get_org_by_id.side_effect = [DEFAULT_AUTH0_ORG]  # type: ignore
+    auth0_apiclient.get_org_invitations.side_effect = [[DEFAULT_AUTH0_INVITATION]]  # type: ignore
     response = await http_client.get(
         f"/v2/groups/{group.id}/invitations/", headers={"user_id": user.auth0_user_id}
     )
@@ -92,6 +163,10 @@ async def test_list_group_invitations(
     assert "invitations" in resp_data
     invitations = resp_data["invitations"]
     assert isinstance(invitations, list)
+    assert (
+        invitations[0]["invitee"]["email"]
+        == DEFAULT_AUTH0_INVITATION["invitee"]["email"]
+    )
 
 
 async def test_list_group_invitations_unauthorized(
@@ -115,7 +190,7 @@ async def test_list_group_invitations_unauthorized(
 
 
 async def test_create_group(
-    http_client: AsyncClient, async_session: AsyncSession
+    auth0_apiclient: Auth0Client, http_client: AsyncClient, async_session: AsyncSession
 ) -> None:
     group = group_factory(division="California", location="San Mateo County")
     user = user_factory(
@@ -143,6 +218,7 @@ async def test_create_group(
         "default_tree_location_id": location.id,
     }
 
+    auth0_apiclient.add_org.side_effect = [DEFAULT_AUTH0_ORG]  # type: ignore
     response = await http_client.post(
         "/v2/groups/",
         headers={"user_id": user.auth0_user_id},
