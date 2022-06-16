@@ -1,4 +1,3 @@
-from typing import List
 
 import pytest
 from auth0.v3.exceptions import Auth0Error
