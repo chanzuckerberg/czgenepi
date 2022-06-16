@@ -22,28 +22,10 @@ from aspen.database.models import (
 
 def register_classes(oso):
     oso.register_class(
-        AuthContext,
-        fields={
-            "user": User,
-            "group": Group,
-            "roles": list,
-        },
+        AuthContext, fields={"user": User, "group": Group, "roles": list}
     )
-    oso.register_class(
-        Group,
-        fields={
-            "id": int,
-        },
-    )
-
-    oso.register_class(
-        Role,
-        fields={
-            "id": int,
-            "name": str,
-        },
-    )
-
+    oso.register_class(Group, fields={"id": int})
+    oso.register_class(Role, fields={"id": int, "name": str})
     oso.register_class(
         User,
         fields={
@@ -56,7 +38,6 @@ def register_classes(oso):
             ),
         },
     )
-
     oso.register_class(
         UserRole,
         fields={
@@ -74,15 +55,6 @@ def register_classes(oso):
     )
 
     oso.register_class(
-        PhyloRun,
-        fields={
-            "id": int,
-            "group": Relation(
-                kind="one", other_type="Group", my_field="group_id", other_field="id"
-            ),
-        },
-    )
-    oso.register_class(
         Sample,
         fields={
             "id": int,
@@ -95,21 +67,9 @@ def register_classes(oso):
             ),
         },
     )
-    oso.register_class(
-        PhyloTree,
-        fields={
-            "id": str,
-            "phylo_run": Relation(
-                kind="one",
-                other_type="PhyloRun",
-                my_field="producing_workflow_id",
-                other_field="workflow_id",
-            ),
-        },
-    )
 
 
-async def get_read_session(
+async def get_oso_session(
     request: Request,
     session: AsyncSession = Depends(get_db),
 ) -> AsyncOso:

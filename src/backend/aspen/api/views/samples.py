@@ -16,7 +16,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from starlette.requests import Request
 
 from aspen.api.auth import AuthContext, get_auth_context, get_auth_user
-from aspen.api.authz import get_read_session
+from aspen.api.authz import get_oso_session
 from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.samples import (
@@ -58,8 +58,7 @@ async def list_samples(
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
     ac: AuthContext = Depends(get_auth_context),
-    oso: AsyncSession = Depends(get_read_session),
-    user: User = Depends(get_auth_user),
+    oso: AsyncSession = Depends(get_oso_session),
 ) -> SamplesResponse:
 
     # load the samples.

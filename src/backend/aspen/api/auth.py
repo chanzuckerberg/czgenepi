@@ -143,12 +143,9 @@ async def require_group_membership(
 
 
 async def get_auth_context(
-    org_id: Optional[int],
-    request: Request,
+    org_id: Optional[int],  # NOTE - This comes from our route!
     user: AsyncSession = Depends(get_auth_user),
     user_roles: AsyncSession = Depends(require_group_membership),
-    session: AsyncSession = Depends(get_db),
-    settings: Settings = Depends(get_settings),
 ) -> AuthContext:
     group = None
     roles = []
