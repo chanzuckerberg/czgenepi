@@ -16,7 +16,7 @@ from aspen.api.deps import get_db, get_settings
 from aspen.api.settings import Settings
 from aspen.auth.auth0_management import Auth0Client
 from aspen.auth.device_auth import validate_auth_header
-from aspen.database.models import Group, User, UserRole
+from aspen.database.models import Group, User, UserRole, GroupRole
 
 
 def get_usergroup_query(session: AsyncSession, auth0_user_id: str) -> Query:
@@ -111,10 +111,12 @@ class AuthContext:
         user: User,
         group: Group,
         user_roles: MutableSequence[UserRole],
+        group_roles: MutableSequence[GroupRole],
     ):
         self.user = user
         self.group = group
         self.user_roles = user_roles
+        self.group_roles = group_roles
 
 
 async def require_group_membership(
@@ -145,6 +147,7 @@ async def require_group_membership(
 async def get_auth_context(
     org_id: Optional[int],  # NOTE - This comes from our route!
     user: User = Depends(get_auth_user),
+    session: AsyncSession = Depends(get_db),
     user_roles: MutableSequence[UserRole] = Depends(require_group_membership),
 ) -> AuthContext:
     group = None
@@ -152,5 +155,15 @@ async def get_auth_context(
     for row in user_roles:
         roles.append(row.role.name)
         group = row.group
-    ac = AuthContext(user, group, roles)
+    query = (
+        sa.select(GroupRole)  # type: ignore
+        .options(
+            joinedload(GroupRole.role, innerjoin=True),  # type: ignore
+            joinedload(GroupRole.grantor_group, innerjoin=True),  # type: ignore
+        )
+        .filter(GroupRole.grantee_group_id == org_id)  # type: ignore
+    )
+    rolewait = await session.execute(query)
+    group_roles = rolewait.unique().scalars().all()
+    ac = AuthContext(user, group, roles, group_roles)
     return ac

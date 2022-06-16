@@ -107,3 +107,19 @@ class UserRole(base):
     group = relationship(Group, backref=backref("user_roles", uselist=True))  # type: ignore
     user_id = Column(Integer, ForeignKey(User.id), nullable=False, primary_key=True)
     user = relationship(User, backref=backref("user_roles", uselist=True))  # type: ignore
+
+
+class GroupRole(base):
+    """Group role grants"""
+
+    __tablename__ = "group_roles"
+    role_id = Column(Integer, ForeignKey(Role.id), nullable=False)
+    role = relationship(Role, backref=backref("group_roles", uselist=True))  # type: ignore
+    grantor_group_id = Column(
+        Integer, ForeignKey(Group.id), nullable=False, primary_key=True
+    )
+    grantor_group = relationship(Group, foreign_keys=[grantor_group_id], backref=backref("grantor_roles", uselist=True))  # type: ignore
+    grantee_group_id = Column(
+        Integer, ForeignKey(Group.id), nullable=False, primary_key=True
+    )
+    grantee_group = relationship(Group, foreign_keys=[grantee_group_id], backref=backref("grantee_roles", uselist=True))  # type: ignore

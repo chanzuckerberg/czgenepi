@@ -17,6 +17,7 @@ from aspen.database.models import (
     Sample,
     User,
     UserRole,
+    GroupRole,
 )
 
 
@@ -24,7 +25,19 @@ def register_classes(oso):
     oso.register_class(
         AuthContext, fields={"user": User, "group": Group, "roles": list}
     )
-    oso.register_class(Group, fields={"id": int})
+    oso.register_class(
+        GroupRole,
+        fields={
+            "id": int,
+            "grantor_group": Relation(kind="one", other_type="Group", my_field="grantor_group_id", other_field="id"),
+            "role": Relation(kind="one", other_type="Role", my_field="role_id", other_field="id"),
+            "grantee_group": Relation(kind="one", other_type="Group", my_field="grantee_group_id", other_field="id"),
+        }
+    )
+    oso.register_class(Group, fields={
+        "id": int,
+        "group_roles": Relation(kind="many", other_type="GroupRole", my_field="id", other_field="grantee_group_id"),
+    })
     oso.register_class(Role, fields={"id": int, "name": str})
     oso.register_class(
         User,
