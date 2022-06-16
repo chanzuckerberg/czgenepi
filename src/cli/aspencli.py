@@ -327,12 +327,6 @@ def update_me(ctx, agreed_to_tos, ack_policy_version):
     type=str,
     help="The id of the group to create the user in.",
 )
-@click.option(
-    "--auth0-user-id",
-    required=True,
-    type=str,
-    help="The auth0 identifier attached to the user's auth0 account.",
-)
 @click.option("--group-admin", is_flag=True, default=False)
 @click.option("--system-admin", is_flag=True, default=False)
 @click.pass_context
@@ -352,7 +346,6 @@ def create(
         "group_id": group_id,
         "group_admin": group_admin,
         "system_admin": system_admin,
-        "auth0_user_id": auth0_user_id,
     }
     print(user)
     resp = api_client.post("/v2/users/", json=user)
