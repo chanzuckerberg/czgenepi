@@ -7,7 +7,6 @@ from typing import Any, List, Mapping, MutableSequence, Optional, Sequence, Set,
 
 import sentry_sdk
 import sqlalchemy as sa
-from aspen.api.authz import get_read_session
 from boto3 import Session
 from fastapi import APIRouter, Depends
 from sqlalchemy.exc import IntegrityError
@@ -16,7 +15,8 @@ from sqlalchemy.orm import joinedload, selectinload
 from sqlalchemy.orm.exc import NoResultFound
 from starlette.requests import Request
 
-from aspen.api.auth import get_auth_user, get_auth_context, AuthContext
+from aspen.api.auth import AuthContext, get_auth_context, get_auth_user
+from aspen.api.authz import get_read_session
 from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.samples import (
@@ -71,28 +71,27 @@ async def list_samples(
         joinedload(Sample.collection_location),
         joinedload(Sample.accessions),
     )
-    #user_visible_samples_query = authz_samples_cansee(all_samples_query, None, user)
+    # user_visible_samples_query = authz_samples_cansee(all_samples_query, None, user)
     user_visible_samples_result = await db.execute(user_visible_samples_query)
     user_visible_samples: List[Sample] = (
         user_visible_samples_result.unique().scalars().all()
     )
 
-    for row in user_visible_samples:
-        print(row.id, row.submitting_group_id, row.private)
-    return SamplesResponse(samples=[])
     # populate sample object using pydantic response schema
     result = SamplesResponse(samples=[])
     for sample in user_visible_samples:
+        print(sample.id, sample.submitting_group_id, sample.private)
         sample.gisaid = determine_gisaid_status(
             sample,
         )
         sample.show_private_identifier = False
-        if (
-            sample.submitting_group_id == user.group_id
-            or sample.submitting_group_id in cansee_groups_private_identifiers
-            or user.system_admin
-        ):
-            sample.show_private_identifier = True
+        # TODO - re-enable smart private identifier display.
+        # if (
+        # sample.submitting_group_id == ac.group.id
+        # or sample.submitting_group_id in cansee_groups_private_identifiers
+        # or user.system_admin
+        # ):
+        #    sample.show_private_identifier = True
 
         sampleinfo = SampleResponse.from_orm(sample)
         result.samples.append(sampleinfo)

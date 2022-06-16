@@ -18,7 +18,7 @@ resource UserRole {
 }
 
 has_role(ac: AuthContext, name: String, group: Group) if
-    name in ac.roles and ac.group == group;
+    name in ac.user_roles and ac.group == group;
 
 resource Sample {
   roles = ["admin", "viewer", "member"];
@@ -36,8 +36,16 @@ resource Sample {
   "read" if "member";
   "write" if "member";
 }
-has_permission(user: User, "read", sample: Sample) if has_role(user, "member", sample) or (has_role(user, "viewer", sample) and sample.private = false);
-has_permission(authcontext: AuthContext, "read", sample: Sample) if has_role(authcontext, "member", sample) or (has_role(authcontext, "viewer", sample) and sample.private = false);
+
+has_permission(user: User, "read", sample: Sample)
+  if has_role(user, "member", sample)
+  or (has_role(user, "viewer", sample)
+  and sample.private = false);
+
+has_permission(authcontext: AuthContext, "read", sample: Sample)
+if has_role(authcontext, "member", sample)
+or (has_role(authcontext, "viewer", sample)
+and sample.private = false);
 
 resource PhyloRun {
   roles = ["admin", "viewer", "member"];
