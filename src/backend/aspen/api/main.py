@@ -1,14 +1,17 @@
 import os
+from pathlib import Path
 from typing import List
 
 import sentry_sdk
 from authlib.integrations.starlette_client import OAuth
 from fastapi import Depends, FastAPI
 from fastapi.responses import ORJSONResponse
+from oso import Oso
 from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
+from sqlalchemy_oso import register_models
 from starlette.middleware.cors import CORSMiddleware
 
-from aspen.api.auth import get_auth_user
+from aspen.api.auth import AuthContext, get_auth_user
 from aspen.api.error.http_exceptions import AspenException, exception_handler
 from aspen.api.middleware.session import SessionMiddleware
 from aspen.api.settings import Settings
@@ -26,6 +29,7 @@ from aspen.api.views import (
     users,
     usher,
 )
+from aspen.database.models.base import base, idbase
 from aspen.util.split import SplitClient
 
 
@@ -61,6 +65,14 @@ def get_app() -> FastAPI:
 
     # Add a global splitio object to the app that we can use as a dependency
     _app.state.splitio = splitio
+
+    # Add a global oso object to the app that we can use as a dependency
+    oso = Oso()
+    oso.register_class(AuthContext)
+    register_models(oso, idbase)
+    register_models(oso, base)
+    oso.load_files([Path.joinpath(Path(__file__).parent.absolute(), "policy.polar")])
+    _app.state.oso = oso
 
     # Add a global oauth client to the app that we can use as a dependency
     oauth = OAuth()
@@ -113,8 +125,23 @@ def get_app() -> FastAPI:
         dependencies=[Depends(get_auth_user)],
     )
     _app.include_router(
+        phylo_runs.router,
+        prefix="/v2/org/{org_id}/phylo_runs",
+        dependencies=[Depends(get_auth_user)],
+    )
+    _app.include_router(
         phylo_trees.router,
         prefix="/v2/phylo_trees",
+        dependencies=[Depends(get_auth_user)],
+    )
+    _app.include_router(
+        phylo_trees.router,
+        prefix="/v2/orgs/{org_id}/phylo_trees",
+        dependencies=[Depends(get_auth_user)],
+    )
+    _app.include_router(
+        samples.router,
+        prefix="/v2/org/{org_id}/samples",
         dependencies=[Depends(get_auth_user)],
     )
     _app.include_router(

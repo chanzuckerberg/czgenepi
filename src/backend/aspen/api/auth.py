@@ -1,5 +1,5 @@
 import logging
-from typing import Optional
+from typing import MutableSequence, Optional
 
 import sentry_sdk
 import sqlalchemy as sa
@@ -16,13 +16,15 @@ from aspen.api.deps import get_db, get_settings
 from aspen.api.settings import Settings
 from aspen.auth.auth0_management import Auth0Client
 from aspen.auth.device_auth import validate_auth_header
-from aspen.database.models import Group, User
+from aspen.database.models import Group, User, UserRole
 
 
 def get_usergroup_query(session: AsyncSession, auth0_user_id: str) -> Query:
     return (
         sa.select(User)  # type: ignore
-        .options(joinedload(User.group).joinedload(Group.can_see))  # type: ignore
+        .options(
+            joinedload(User.user_roles).joinedload(UserRole.role),
+        )  # type: ignore
         .filter(User.auth0_user_id == auth0_user_id)  # type: ignore
     )
 
@@ -37,6 +39,9 @@ async def setup_userinfo(session: AsyncSession, auth0_user_id: str) -> Optional[
         userquery = get_usergroup_query(session, auth0_user_id)
         userwait = await session.execute(userquery)
         user = userwait.unique().scalars().one()
+        for urole in user.user_roles:
+            print(urole.group_id)
+            print(urole.role.name)
     except NoResultFound:
         sentry_sdk.capture_message(
             f"Requested auth0_user_id {auth0_user_id} not found in usergroup query."
@@ -98,3 +103,57 @@ async def get_auth0_apiclient(
     domain: str = settings.AUTH0_MANAGEMENT_DOMAIN
     auth0_client = Auth0Client(client_id, client_secret, domain)
     return auth0_client
+
+
+class AuthContext:
+    def __init__(
+        self,
+        user: User,
+        group: Group,
+        user_roles: MutableSequence[UserRole],
+    ):
+        self.user = user
+        self.group = group
+        self.user_roles = user_roles
+
+
+async def require_group_membership(
+    org_id: Optional[int],
+    request: Request,
+    user: AsyncSession = Depends(get_auth_user),
+    session: AsyncSession = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+) -> UserRole:
+    if org_id is None:
+        return
+    # Figure out whether this user is a *direct member* of the group
+    # we're trying to get context for.
+    query = (
+        sa.select(UserRole)  # type: ignore
+        .options(
+            joinedload(UserRole.role, innerjoin=True),  # type: ignore
+            joinedload(UserRole.group, innerjoin=True),  # type: ignore
+        )
+        .filter(UserRole.user == user)  # type: ignore
+        .filter(UserRole.group_id == org_id)  # type: ignore
+    )
+    rolewait = await session.execute(query)
+    user_roles = rolewait.unique().scalars().all()
+    return user_roles
+
+
+async def get_auth_context(
+    org_id: Optional[int],
+    request: Request,
+    user: AsyncSession = Depends(get_auth_user),
+    user_roles: AsyncSession = Depends(require_group_membership),
+    session: AsyncSession = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+) -> AuthContext:
+    group = None
+    roles = []
+    for row in user_roles:
+        roles.append(row.role.name)
+        group = row.group
+    ac = AuthContext(user, group, roles)
+    return ac

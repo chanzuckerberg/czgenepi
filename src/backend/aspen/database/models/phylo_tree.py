@@ -11,7 +11,8 @@ from sqlalchemy import (
     UniqueConstraint,
 )
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import backref, relationship
+from sqlalchemy.orm import backref, foreign, relationship, remote
+from sqlalchemy.sql.expression import and_
 
 from aspen.database.models.base import base
 from aspen.database.models.entity import Entity, EntityType
@@ -88,9 +89,31 @@ class PhyloRun(Workflow):
         ForeignKey(Group.id),
         nullable=False,
     )
+    trees = relationship(
+        PhyloTree,
+        viewonly=True,
+        primaryjoin=and_(
+            workflow_id == foreign(remote(PhyloTree.producing_workflow_id)),
+        ),
+        backref=backref(
+            "phylo_run",
+            # lazy="joined",
+            primaryjoin=(
+                remote(workflow_id) == foreign(PhyloTree.producing_workflow_id)
+            ),
+        ),
+    )
+
     group = relationship(Group, backref=backref("phylo_runs", uselist=True))  # type: ignore
 
     template_file_path = Column(String, nullable=True)
+
+    # phylo_trees = relationship(
+    #    PhyloTree,
+    #    backref='phylo_run',
+    #    primaryjoin='PhyloRun.id==PhyloTree.producing_workflow_id',
+    #    viewonly=True,
+    # )
 
     # Store a list of gisaid ID's we're going to use as inputs
     # to the phylo run.
