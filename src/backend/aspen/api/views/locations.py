@@ -96,11 +96,23 @@ async def search_locations(
         and search_query.division is None
         and search_query.location is None
     ):
+        country_search_query = sa.select(Location).where(  # type: ignore
+            and_(
+                Location.country == set_categories["country"],
+                Location.division == None,  # noqa: E711
+                Location.location == None,  # noqa: E711
+            )
+        )
+        country_search = await db.execute(country_search_query)
+        closest_country = country_search.scalars().one()
+        results.append(closest_country)
+
         divisions_search_query = (
             sa.select(Location)  # type: ignore
             .where(
                 and_(
                     Location.country == set_categories["country"],
+                    Location.division != None,  # noqa: E711
                     Location.location == None,  # noqa: E711
                 )
             )
@@ -111,17 +123,14 @@ async def search_locations(
         results.extend(all_divisions_in_country)
     # show all locations in a division
     elif search_query.location is None and search_query.division:
-        divison_search_query = (
-            sa.select(
-                Location, sa.sql.expression.label("levenshtein_total", summed_columns)  # type: ignore
-            )
-            .where(
-                and_(
-                    Location.location == None, *set_category_conditionals  # noqa: E711
-                )
-            )
-            .order_by(asc("levenshtein_total"))
-            .limit(1)
+        and_arguments = [
+            Location.division == set_categories["division"],
+            Location.location == None,  # noqa: E711,
+        ]
+        if set_categories["country"]:
+            and_arguments.append(Location.country == set_categories["country"])
+        divison_search_query = sa.select(Location).where(  # type: ignore
+            and_(True, *and_arguments)
         )
         division_search = await db.execute(divison_search_query)
         closest_division = division_search.scalars().one()
