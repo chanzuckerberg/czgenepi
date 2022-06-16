@@ -14,10 +14,11 @@ export const Capitalized = styled.span`
 export const Wrapper = styled.div`
   ${StyledHeader},
   ${StyledRow} {
-    justify-content: space-evenly;
+    justify-content: flex-start;
 
     ${StyledCell} {
-      flex: unset;
+      display: unset;
+      flex: 1 1 50%;
     }
   }
 `;
