@@ -18,7 +18,7 @@ resource UserRole {
 }
 
 has_role(ac: AuthContext, name: String, group: Group) if
-    name in ac.roles and ac.group == group
+    name in ac.roles and ac.group == group;
 
 resource Sample {
   roles = ["admin", "viewer", "member"];
