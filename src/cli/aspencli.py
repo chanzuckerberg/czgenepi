@@ -335,7 +335,6 @@ def create(
     email,
     name,
     group_id,
-    auth0_user_id,
     group_admin,
     system_admin,
 ):
