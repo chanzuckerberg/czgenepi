@@ -23,7 +23,7 @@ const Table = ({ headers, rows }: Props): JSX.Element => (
               itemSize={ITEM_HEIGHT_PX}
               width={width}
             >
-              {({ index }) => <Row cells={rows[index]} />}
+              {({ index, style }) => <Row cells={rows[index]} style={style} />}
             </FixedSizeList>
           );
         }}
