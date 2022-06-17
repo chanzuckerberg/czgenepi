@@ -35,10 +35,7 @@ const MembersTab = ({
   const [isInviteModalOpen, setIsInviteModalOpen] = useState<boolean>(false);
   const router = useRouter();
   const { data: invitations = [] } = useGroupInvitations(groupId);
-  const { data: userInfo } = useUserInfo();
-  const currentUser = find(members, (m) => m.id === userInfo?.id);
 
-  const isOwner = currentUser?.isGroupAdmin === true;
   const numActive = Object.keys(members).length;
 
   const handleTabClick: TabEventHandler = (_, value) => {
@@ -71,15 +68,13 @@ const MembersTab = ({
             count={invitations.length}
           />
         </StyledTabs>
-        {isOwner && (
-          <Button
-            sdsType="primary"
-            sdsStyle="rounded"
-            onClick={() => setIsInviteModalOpen(true)}
-          >
-            Invite
-          </Button>
-        )}
+        <Button
+          sdsType="primary"
+          sdsStyle="rounded"
+          onClick={() => setIsInviteModalOpen(true)}
+        >
+          Invite
+        </Button>
       </Header>
       {tabValue === SecondaryTabType.ACTIVE && (
         <ActiveMembersTable members={members} />

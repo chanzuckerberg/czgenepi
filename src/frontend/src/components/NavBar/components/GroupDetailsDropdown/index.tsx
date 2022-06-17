@@ -54,8 +54,6 @@ const GroupDetailsDropdown = ({
 
   if (!currentUser) return null;
 
-  const isOwner = currentUser.isGroupAdmin === true;
-
   const onClickGroupDetails = () => {
     router.push(ROUTES.GROUP_DETAILS);
   };
@@ -89,15 +87,13 @@ const GroupDetailsDropdown = ({
           {memberCount} {pluralize("Member", memberCount)}
         </Details>
         <div>
-          {isOwner && (
-            <StyledButton
-              sdsType="primary"
-              sdsStyle="rounded"
-              onClick={onClickInvite}
-            >
-              Invite Members
-            </StyledButton>
-          )}
+          <StyledButton
+            sdsType="primary"
+            sdsStyle="rounded"
+            onClick={onClickInvite}
+          >
+            Invite Members
+          </StyledButton>
           <StyledButton
             sdsType="secondary"
             sdsStyle="rounded"
