@@ -2,7 +2,7 @@
   <body>
     <div>Hi {% if user.given_name %}{{ user.given_name }}{% else %}there{% endif %},</div>
     <br />
-    <div>Congratulations! You have been added to {% if organization.name %}the {{ organization.name }} Group on {% endif %}CZ GEN EPI!</div>
+    <div>Congratulations! You have been added to {% if organization.display_name %}the {{ organization.display_name }} Group on {% endif %}CZ GEN EPI!</div>
     <br />
     <div>My name is Mikala, and I’m the product application scientist for the Chan Zuckerberg Initiative’s GEN EPI platform. CZ GEN EPI is an open-source, free, no-code genomic epidemiology analysis platform for public health. Our goal is to enable public health departments to identify the most effective interventions and policies to stop the spread of infectious diseases using genomic epidemiology. The secure, cloud-based platform streamlines the analysis of pathogen genomic data and generates phylogenetic trees with a single click—no need to install software or write code.</div>
     <br />
