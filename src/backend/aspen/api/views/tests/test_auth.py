@@ -51,7 +51,7 @@ async def test_create_new_admin_user_if_not_exists(
     )
     assert user.group_id == group.id
     assert user.email == userinfo["email"]
-    assert user.group_admin == True
+    assert user.group_admin is True
 
 
 async def test_create_new_user_if_not_exists(
@@ -86,7 +86,7 @@ async def test_create_new_user_if_not_exists(
     )
     assert user.group_id == group.id
     assert user.email == userinfo["email"]
-    assert user.group_admin == False
+    assert user.group_admin is False
 
 
 async def test_dont_create_new_user_if_exists(
