@@ -80,6 +80,10 @@ class Auth0Client:
     def get_users(self) -> List[Auth0User]:
         return self.get_all_results(self.client.users.list, "users")
 
+    def get_org_user_roles(self, org_id: str, user_id: str) -> List[str]:
+        res = self.client.organizations.all_organization_member_roles(org_id, user_id)
+        return [item["name"] for item in res]
+
     @cache
     def get_org_by_name(self, org_name: str) -> Auth0Org:
         orgs = self.get_orgs()

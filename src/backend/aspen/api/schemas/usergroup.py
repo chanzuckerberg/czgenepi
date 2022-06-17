@@ -43,6 +43,7 @@ class UserUpdateRequest(BaseRequest):
 class UserMeResponse(UserBaseResponse):
     split_id: str
     group: GroupResponse
+    group_admin: bool
 
 
 class GroupInvitationsRequest(BaseRequest):
