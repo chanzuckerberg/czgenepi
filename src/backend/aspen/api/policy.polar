@@ -1,16 +1,11 @@
 allow(actor, action, resource) if
   has_permission(actor, action, resource);
 
-actor AuthContext {
-  permissions = ["read"];
-}
+actor AuthContext { }
 
 resource Group {
   roles = ["admin", "member"];
 }
-
-has_role(ac: AuthContext, name: String, group: Group) if
-    name in ac.user_roles and ac.group == group;
 
 resource Sample {
   roles = ["admin", "member"];
@@ -24,6 +19,9 @@ resource Sample {
   "read" if "member";
   "write" if "member";
 }
+
+has_role(ac: AuthContext, name: String, group: Group) if
+    name in ac.user_roles and ac.group == group;
 
 has_permission(authcontext: AuthContext, "read", sample: Sample)
   if has_role(authcontext, "member", sample);
