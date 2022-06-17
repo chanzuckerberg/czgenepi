@@ -36,6 +36,8 @@ async def create_group(
 ) -> GroupInfoResponse:
     # Auth0 requires we only have alphanumerics, "-" and "_" in a group name.
     # This regex replaces all other characters with an underscore, "_".
+    # There is also a 50 character limit, but we limit prefixes to 20 characters
+    # anyways.
     auth0_safe_prefix = re.sub(
         r"[^a-zA-Z0-9_-]+", "_", group_creation_request.prefix.lower()
     )
