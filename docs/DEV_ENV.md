@@ -64,7 +64,7 @@ To update backend dependencies:
 
 ### Update Dev Data
 
-The dev environment is initialized with AWS Secrets/S3 data in the [src/backend/scripts/setup_localdata.sh](src/backend/scripts/setup_localdata.py) script, as well as DB migrations from [src/backend/database_migrations](src/backend/database_migrations). To add more data or run migrations, modify these scripts and run `make local-init` to reload the dev environment's data stores.
+The dev environment is initialized with AWS Secrets/S3 data in the [src/backend/scripts/setup_localdata.py](src/backend/scripts/setup_localdata.py) script, as well as DB migrations from [src/backend/database_migrations](src/backend/database_migrations). To add more data or run migrations, modify these scripts and run `make local-init` to reload the dev environment's data stores.
 
 ### Make targets for managing dev:
 
