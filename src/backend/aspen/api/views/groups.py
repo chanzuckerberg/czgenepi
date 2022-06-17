@@ -134,7 +134,11 @@ async def invite_group_members(
         try:
             if success:
                 auth0_client.invite_member(
-                    organization["id"], client_id, user.name, email, "member"
+                    organization["id"],
+                    client_id,
+                    user.name,
+                    email,
+                    group_invitation_request.role,
                 )
         except Auth0Error as err:
             # TODO - we need to learn more about possible exceptions here.
