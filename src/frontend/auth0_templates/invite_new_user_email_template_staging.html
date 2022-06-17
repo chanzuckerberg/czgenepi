@@ -4,7 +4,7 @@
       .ExternalClass,.ExternalClass div,.ExternalClass font,.ExternalClass p,.ExternalClass span,.ExternalClass td,img {line-height: 100%;}#outlook a {padding: 0;}.ExternalClass,.ReadMsgBody {width: 100%;}a,blockquote,body,li,p,table,td {-webkit-text-size-adjust: 100%;-ms-text-size-adjust: 100%;}table,td {mso-table-lspace: 0;mso-table-rspace: 0;}img {-ms-interpolation-mode: bicubic;border: 0;height: auto;outline: 0;text-decoration: none;}table {border-collapse: collapse !important;}#bodyCell,#bodyTable,body {height: 100% !important;margin: 0;padding: 0;font-family: ProximaNova, sans-serif;}#bodyCell {padding: 20px;}#bodyTable {width: 600px;}@font-face {font-family: ProximaNova;src: url(https://cdn.auth0.com/fonts/proxima-nova/proximanova-regular-webfont-webfont.eot);src: url(https://cdn.auth0.com/fonts/proxima-nova/proximanova-regular-webfont-webfont.eot?#iefix)format("embedded-opentype"),url(https://cdn.auth0.com/fonts/proxima-nova/proximanova-regular-webfont-webfont.woff) format("woff");font-weight: 400;font-style: normal;}@font-face {font-family: ProximaNova;src: url(https://cdn.auth0.com/fonts/proxima-nova/proximanova-semibold-webfont-webfont.eot);src: url(https://cdn.auth0.com/fonts/proxima-nova/proximanova-semibold-webfont-webfont.eot?#iefix)format("embedded-opentype"),url(https://cdn.auth0.com/fonts/proxima-nova/proximanova-semibold-webfont-webfont.woff) format("woff");font-weight: 600;font-style: normal;}@media only screen and (max-width: 480px) {#bodyTable,body {width: 100% !important;}a,blockquote,body,li,p,table,td {-webkit-text-size-adjust: none !important;}body {min-width: 100% !important;}#bodyTable {max-width: 600px !important;}#signIn {max-width: 280px !important;}}
     </style>
   </head>
-  <body>
+  <body style="max-width:620px; margin:0 auto;">
     <center>
       <table
         style='width: 100%;-webkit-text-size-adjust: 100%;-ms-text-size-adjust: 100%;mso-table-lspace: 0pt;mso-table-rspace: 0pt;margin: 0;padding: 0;font-family: "ProximaNova", sans-serif;border-collapse: collapse !important;height: 100% !important;background-color:white;'
@@ -17,23 +17,22 @@
         id="bodyTable"
       >
         <tr>
-          <td bgcolor="#000000">
-          	<div style='height:58px;'>
-              <a href="https://staging.czgenepi.org/CZGenEpiLogoWhite.png">
-              <img
-                   src="https://staging.czgenepi.org/CZGenEpiLogoWhite.png"
-                   alt="czgenepi-logo" 
-                   title="czgenepi-logo"
-                   width="150"
-                   style="display:block;float:left;margin:10px;border: 0;height: auto;outline: none;text-decoration: none;"
-               />
-              </a>
-	        </div>
-         	<div style='height:90px;border-bottom: 5px solid #511CC1;overflow:hidden;'>
-            	<div style='width:30%;height:90px; float:left;'></div>
-                <div style='background-image:url("https://staging.czgenepi.org/phyloTreeBackground.png");background-color:black; height:90px;width:70%;float:right;background-position:right;background-size:cover;'>
-                </div> 
-        	</div>
+          <td>
+            <div style='height:90px;border-bottom:5px solid #511CC1;overflow:hidden;display:flex;'>
+              <div style='background-color:black;'>
+                <a href="https://staging.czgenepi.org/">
+                <img
+                  src="https://staging.czgenepi.org/CZGenEpiLogoWhite.png"
+                  alt="czgenepi-logo"
+                  title="czgenepi-logo"
+                  width="182"
+                  style="margin:10px;"
+                />
+                </a>
+              </div>
+              <div style='background-image:url("https://staging.czgenepi.org/phyloTreeBackground.png");background-color:black;height:90px;width:70%;background-position:right;background-size:cover;'>
+              </div>
+            </div>
           </td>
         </tr>
         <tr>
@@ -44,20 +43,16 @@
             style='-webkit-text-size-adjust: 100%;-ms-text-size-adjust: 100%;mso-table-lspace: 0pt;mso-table-rspace: 0pt;margin: 0;padding: 20px;font-family: "ProximaNova", sans-serif;height: 100% !important;'
           >
             <div class="main">
-              
-							<div style='padding: 20px;font-size:25px;font-weight:700;font-size:22px;line-height:25.3px;font-family:helvetica;color:black'> You've been invited to join {% if organization.name %}{{organization.name}}'s {% else %} a {% endif %} group on CZ GEN EPI</div>
-            
-              <div style='text-align:left;margin-top:20px;color:black'>Click on the link below to accept this invite and get started. If you do not already have an account with CZ GEN EPI, you will need to make one to get started. This invitation will expire after 14 days. </div>
-
-              <button style='margin-top: 40px;background-color:#511CC1;border-radius:40px;border:none;padding: 10px 30px;font-size:13px;line-height:18px;font-weight:400;'>
-                <span style='color:white;text-decoration:none'>
-                  <a style='color:white;text-decoration:none' href={{ url }} >Accept Invitation</a>
+              <div style='padding: 20px;font-size:25px;font-weight:700;font-size:22px;line-height:25.3px;font-family:helvetica;color:black;'> You've been invited to join {% if organization.name %}{{organization.name}}'s {% else %} a {% endif %} group on CZ GEN EPI</div>
+              <div style='text-align:left;margin-top:20px;color:black;font-weight:400;font-size:16px;'>Click on the link below to accept this invite and get started. If you do not already have an account with CZ GEN EPI, you will need to make one to get started. This invitation will expire after 14 days.</div>
+              <button style='margin-top: 40px;background-color:#511CC1;border-radius:40px;border:none;padding: 10px 30px;font-size:13px;line-height:18px;font-weight:600;'>
+                <span style='color:white;text-decoration:none;'>
+                  <a style='color:white;text-decoration:none;' href={{ url }}>Accept Invitation</a>
                 </span>
-               </button>
-
+              </button>
+              <div style='margin-top:40px;'>Click above button or copy this link to your browser: {{url}}</div>
               <br /><br />
               <hr style="border: 2px solid #EAEEF3; border-bottom: 0; margin: 20px 0;" />
-
             </div>
           </td>
         </tr>
