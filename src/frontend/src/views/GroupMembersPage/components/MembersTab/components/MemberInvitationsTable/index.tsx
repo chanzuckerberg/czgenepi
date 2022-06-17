@@ -1,5 +1,6 @@
 import React from "react";
 import { Table } from "src/common/components/library/Table";
+import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { EmailCell } from "./components/EmailCell";
 
 interface Props {
@@ -17,7 +18,7 @@ const MemberInvitationsTable = ({ invites }: Props): JSX.Element => {
 
     return [
       <EmailCell key={0} email={invitee.email} status={status} />,
-      createdAt,
+      datetimeWithTzToLocalDate(createdAt),
       "Member", // this may vary in the future, but for now only one type of invitation is available
     ];
   });
