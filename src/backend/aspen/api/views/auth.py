@@ -13,8 +13,10 @@ from starlette.requests import Request
 from starlette.responses import Response
 
 import aspen.api.error.http_exceptions as ex
+from aspen.api.auth import get_auth0_apiclient
 from aspen.api.deps import get_auth0_client, get_db, get_settings
 from aspen.api.settings import Settings
+from aspen.auth.auth0_management import Auth0Client
 from aspen.database.models import Group, User
 
 # From the example here:
@@ -43,7 +45,7 @@ async def login(
     )
 
 
-async def create_user_if_not_exists(db, userinfo):
+async def create_user_if_not_exists(db, auth0_mgmt, userinfo):
     if "org_id" not in userinfo:
         return  # We're currently only creating new users if they're confirming an org invitation
     auth0_user_id = userinfo.get("sub")
@@ -66,11 +68,14 @@ async def create_user_if_not_exists(db, userinfo):
         group = groupquery.scalars().one()  # type: ignore
     except NoResultFound:
         return  # We didn't find a matching group, we can't create this user.
+    # Get the user's roles for this organization and tag them as group admins if necessary.
+    roles = auth0_mgmt.get_org_user_roles(userinfo["org_id"], auth0_user_id)
+
     user_fields = {
         "name": userinfo["email"],
         "email": userinfo["email"],
         "auth0_user_id": auth0_user_id,
-        "group_admin": False,
+        "group_admin": "admin" in roles,
         "system_admin": False,
         "group": group,
     }
@@ -85,6 +90,7 @@ async def auth(
     auth0: StarletteOAuth2App = Depends(get_auth0_client),
     settings: Settings = Depends(get_settings),
     db: AsyncSession = Depends(get_db),
+    auth0_mgmt: Auth0Client = Depends(get_auth0_apiclient),
 ) -> Response:
     try:
         token = await auth0.authorize_access_token(request)
@@ -98,7 +104,7 @@ async def auth(
             "user_id": userinfo["sub"],
             "name": userinfo["name"],
         }
-        await create_user_if_not_exists(db, userinfo)
+        await create_user_if_not_exists(db, auth0_mgmt, userinfo)
     else:
         raise ex.UnauthorizedException("No user info in token")
     return RedirectResponse(os.getenv("FRONTEND_URL", "") + "/data/samples")
