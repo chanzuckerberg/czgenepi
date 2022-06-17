@@ -120,10 +120,10 @@ class AuthContext:
 async def require_group_membership(
     org_id: Optional[int],
     request: Request,
-    user: AsyncSession = Depends(get_auth_user),
+    user: User = Depends(get_auth_user),
     session: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
-) -> UserRole:
+) -> MutableSequence[UserRole]:
     if org_id is None:
         return
     # Figure out whether this user is a *direct member* of the group
@@ -144,8 +144,8 @@ async def require_group_membership(
 
 async def get_auth_context(
     org_id: Optional[int],  # NOTE - This comes from our route!
-    user: AsyncSession = Depends(get_auth_user),
-    user_roles: AsyncSession = Depends(require_group_membership),
+    user: User = Depends(get_auth_user),
+    user_roles: MutableSequence[UserRole] = Depends(require_group_membership),
 ) -> AuthContext:
     group = None
     roles = []
