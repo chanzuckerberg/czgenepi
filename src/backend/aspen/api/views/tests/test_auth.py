@@ -34,7 +34,7 @@ async def test_create_new_admin_user_if_not_exists(
     }
     group = group_factory(auth0_org_id=userinfo["org_id"])
     async_session.add(group)
-    auth0_apiclient.get_org_user_roles.side_effect = [["admin"]]
+    auth0_apiclient.get_org_user_roles.side_effect = [["admin"]]  # type: ignore
     await start_new_transaction(async_session)
     await create_user_if_not_exists(async_session, auth0_apiclient, userinfo)
     await start_new_transaction(async_session)
@@ -69,7 +69,7 @@ async def test_create_new_user_if_not_exists(
     }
     group = group_factory(auth0_org_id=userinfo["org_id"])
     async_session.add(group)
-    auth0_apiclient.get_org_user_roles.side_effect = [["member"]]
+    auth0_apiclient.get_org_user_roles.side_effect = [["member"]]  # type: ignore
     await start_new_transaction(async_session)
     await create_user_if_not_exists(async_session, auth0_apiclient, userinfo)
     await start_new_transaction(async_session)
