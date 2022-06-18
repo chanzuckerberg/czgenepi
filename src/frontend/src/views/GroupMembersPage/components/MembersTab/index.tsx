@@ -22,6 +22,7 @@ interface Props {
   groupName?: string;
   groupId: number;
   members: GroupMember[];
+  userInfo: User;
 }
 
 const MembersTab = ({
@@ -29,13 +30,13 @@ const MembersTab = ({
   groupName,
   groupId,
   members,
+  userInfo,
 }: Props): JSX.Element | null => {
   const [tabValue, setTabValue] =
     useState<SecondaryTabType>(initialSecondaryTab);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState<boolean>(false);
   const router = useRouter();
   const { data: invitations = [] } = useGroupInvitations(groupId);
-  const { data: userInfo } = useUserInfo();
   const currentUser = find(members, (m) => m.id === userInfo?.id);
 
   const isOwner = currentUser?.isGroupAdmin === true;
