@@ -11,27 +11,27 @@ const Page = (): JSX.Element => {
   const primaryToken = pathTokens.length > 0 && pathTokens[0];
   const secondaryToken = pathTokens.length > 1 && pathTokens[1];
 
-  let initialPrimaryTab = PrimaryTabType.MEMBERS;
-  let initialSecondaryTab = SecondaryTabType.ACTIVE;
+  let requestedPrimaryTab = PrimaryTabType.MEMBERS;
+  let requestedSecondaryTab = SecondaryTabType.ACTIVE;
 
   if (
     primaryToken === PrimaryTabType.MEMBERS ||
     primaryToken === PrimaryTabType.DETAILS
   ) {
-    initialPrimaryTab = primaryToken;
+    requestedPrimaryTab = primaryToken;
   }
 
   if (
     secondaryToken === SecondaryTabType.ACTIVE ||
     secondaryToken === SecondaryTabType.INVITATIONS
   ) {
-    initialSecondaryTab = secondaryToken;
+    requestedSecondaryTab = secondaryToken;
   }
 
   return (
     <GroupMembersPage
-      initialPrimaryTab={initialPrimaryTab}
-      initialSecondaryTab={initialSecondaryTab}
+      requestedPrimaryTab={requestedPrimaryTab}
+      requestedSecondaryTab={requestedSecondaryTab}
     />
   );
 };
