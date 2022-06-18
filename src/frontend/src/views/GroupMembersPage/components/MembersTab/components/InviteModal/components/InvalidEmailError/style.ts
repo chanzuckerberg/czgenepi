@@ -1,19 +1,15 @@
 import styled from "@emotion/styled";
 import { getSpaces } from "czifui";
+import { ZebraStripes } from "src/common/styles/mixins/global";
 
 export const StyledDiv = styled.div`
+  ${ZebraStripes}
+
   ${(props) => {
     const spaces = getSpaces(props);
-
-    // TODO (mlila): overlay colors not yet available from sds,
-    // TODO          so hardcoding this for now.
     return `
       padding: ${spaces?.l}px;
-
-      :nth-of-type(odd) {
-        background-color: #F6EAEA;
-        width: 100%;
-      }
+      width: 100%;
     `;
   }}
 `;
