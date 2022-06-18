@@ -6,6 +6,7 @@ import {
   fontHeaderXs,
   getSpaces,
 } from "czifui";
+import { ZebraStripes } from "src/common/styles/mixins/global";
 
 const mPadding = (props: CommonThemeProps) => {
   const spaces = getSpaces(props);
@@ -52,7 +53,7 @@ export const Table = styled.table`
 `;
 
 export const TbodyZebra = styled.tbody`
-  tr:nth-of-type(odd) {
-    background-color: rgba(0, 0, 0, 0.04);
+  tr {
+    ${ZebraStripes}
   }
 `;

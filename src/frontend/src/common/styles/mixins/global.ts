@@ -1,6 +1,5 @@
 import styled from "@emotion/styled";
 import { CommonThemeProps, getSpaces } from "czifui";
-import { NAV_BAR_HEIGHT_PX } from "src/components/NavBar";
 
 const BREAKPOINT = "768px";
 
@@ -22,11 +21,12 @@ export const LargerThanBreakpoint = (styles: string): string => {
 
 export const PAGE_PADDING = 125;
 
+const NAV_BAR_HEIGHT_PX = 46;
 export const PageContent = styled.div`
   height: calc(100% - ${NAV_BAR_HEIGHT_PX}px);
 `;
 
-export const ContentStyles = (props: CommonThemeProps) => {
+export const ContentStyles = (props: CommonThemeProps): string => {
   const spaces = getSpaces(props);
 
   return `
@@ -41,3 +41,11 @@ export const ContentStyles = (props: CommonThemeProps) => {
 };
 
 export const MAX_CONTENT_WIDTH = 1308;
+
+export const ZebraStripes = (): string => {
+  return `
+    :nth-of-type(odd) {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+  `;
+};
