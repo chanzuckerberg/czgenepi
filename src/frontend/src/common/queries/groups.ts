@@ -2,6 +2,7 @@ import {
   useMutation,
   UseMutationResult,
   useQuery,
+  useQueryClient,
   UseQueryResult,
 } from "react-query";
 import { API, DEFAULT_FETCH_OPTIONS, DEFAULT_POST_OPTIONS } from "../api";
@@ -235,8 +236,12 @@ export function useSendGroupInvitations({
   InvitationRequestType,
   unknown
 > {
+  const queryClient = useQueryClient();
   return useMutation(sendGroupInvitations, {
     onError: componentOnError,
-    onSuccess: componentOnSuccess,
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries([USE_GROUP_INVITATION_INFO]);
+      componentOnSuccess(data);
+    },
   });
 }
