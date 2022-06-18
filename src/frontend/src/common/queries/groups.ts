@@ -78,7 +78,7 @@ export const USE_GROUP_INFO = {
 };
 
 export function useGroupInfo(groupId: number): UseQueryResult<Group, unknown> {
-  return useQuery([USE_GROUP_INFO], () => fetchGroup({ groupId }), {
+  return useQuery([USE_GROUP_INFO, groupId], () => fetchGroup({ groupId }), {
     retry: false,
     select: mapGroupData,
   });
@@ -114,7 +114,7 @@ export function useGroupMembersInfo(
   groupId: number
 ): UseQueryResult<GroupMember[], unknown> {
   return useQuery(
-    [USE_GROUP_MEMBER_INFO],
+    [USE_GROUP_MEMBER_INFO, groupId],
     () => fetchGroupMembers({ groupId }),
     {
       retry: false,
@@ -156,7 +156,7 @@ export function useGroupInvitations(
   groupId: number
 ): UseQueryResult<Invitation[], unknown> {
   return useQuery(
-    [USE_GROUP_INVITATION_INFO],
+    [USE_GROUP_INVITATION_INFO, groupId],
     () => fetchGroupInvitations({ groupId }),
     {
       retry: false,
