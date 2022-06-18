@@ -3,7 +3,6 @@ import { find } from "lodash";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { HeadAppTitle } from "src/common/components";
-import { useUserInfo } from "src/common/queries/auth";
 import { useGroupInvitations } from "src/common/queries/groups";
 import { ROUTES } from "src/common/routes";
 import { TabEventHandler } from "../../index";
@@ -22,7 +21,7 @@ interface Props {
   groupName?: string;
   groupId: number;
   members: GroupMember[];
-  userInfo: User;
+  userInfo: User | undefined;
 }
 
 const MembersTab = ({
