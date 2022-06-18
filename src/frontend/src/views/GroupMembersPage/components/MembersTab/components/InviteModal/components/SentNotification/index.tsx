@@ -1,9 +1,8 @@
-import { Link } from "czifui";
+import { Link, Notification } from "czifui";
 import { useRouter } from "next/router";
 import React from "react";
 import { ROUTES } from "src/common/routes";
 import { pluralize } from "src/common/utils/strUtils";
-import Notification from "src/components/Notification";
 
 interface Props {
   onDismiss(): void;

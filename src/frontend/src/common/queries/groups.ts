@@ -201,7 +201,10 @@ interface InvitationRequestType {
 
 interface InvitationResponseType {
   // a list of emails that were successfully invited
-  invitations: string[];
+  invitations: {
+    email: string;
+    success: boolean;
+  }[];
 }
 
 type InvitationCallbacks = MutationCallbacks<InvitationResponseType>;

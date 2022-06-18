@@ -1,11 +1,12 @@
 import styled from "@emotion/styled";
 import { fontBodyXs, getFontWeights, getSpaces } from "czifui";
+import { ZebraStripes } from "src/common/styles/mixins/global";
 
 export const StyledList = styled.ul`
   padding: 0;
 
-  li:nth-of-type(odd) {
-    background-color: #f4eee4;
+  li {
+    ${ZebraStripes}
   }
 `;
 
