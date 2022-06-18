@@ -52,14 +52,10 @@ ${local_aws} secretsmanager create-secret --name genepi-config &> /dev/null || t
 # AUSPICE_MAC_KEY is just the result of urlsafe_b64encode(b'auspice-mac-key')
 ${local_aws} secretsmanager update-secret --secret-id genepi-config --secret-string '{
   "AUSPICE_MAC_KEY": "YXVzcGljZS1tYWMta2V5",
-  "AUTH0_CLIENT_ID": "local-client-id",
   "AUTH0_CALLBACK_URL": "'"${BACKEND_URL}"'/callback",
-  "AUTH0_CLIENT_SECRET": "local-client-secret",
-  "AUTH0_DOMAIN": "oidc.genepinet.localdev:8443",
-  "AUTH0_BASE_URL": "'"${OIDC_INTERNAL_URL}"'",
-  "AUTH0_SERVER_METADATA_URL": "'"${OIDC_INTERNAL_URL}"'/.well-known/openid-configuration",
-  "AUTH0_ACCESS_TOKEN_URL": "'"${OIDC_INTERNAL_URL}"'/connect/token",
-  "AUTH0_AUTHORIZE_URL": "'"${OIDC_BROWSER_URL}"'/connect/authorize",
+  "AUTH0_CLIENT_ID": "REPLACE_ME",
+  "AUTH0_CLIENT_SECRET": "REPLACE_ME",
+  "AUTH0_DOMAIN": '"${AUTH0_MANAGEMENT_DOMAIN}"',
   "AUTH0_CLIENT_KWARGS": {"scope": "openid profile email offline_access"},
   "FLASK_SECRET": "DevelopmentKey",
   "SPLIT_BACKEND_KEY": "localhost",
