@@ -43,7 +43,6 @@ const MembersTab = ({
     setTabValue(requestedSecondaryTab);
   }, [requestedSecondaryTab]);
 
-  const currentUser = find(members, (m) => m.id === userInfo?.id);
   const isOwner = currentUser?.isGroupAdmin === true;
   const numActive = Object.keys(members).length;
 
