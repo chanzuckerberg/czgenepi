@@ -3,7 +3,6 @@ import { find } from "lodash";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { HeadAppTitle } from "src/common/components";
-import { useUserInfo } from "src/common/queries/auth";
 import { useGroupInvitations } from "src/common/queries/groups";
 import { ROUTES } from "src/common/routes";
 import { TabEventHandler } from "../../index";
@@ -22,6 +21,7 @@ interface Props {
   groupName?: string;
   groupId: number;
   members: GroupMember[];
+  userInfo: User | undefined;
 }
 
 const MembersTab = ({
@@ -29,6 +29,7 @@ const MembersTab = ({
   groupName,
   groupId,
   members,
+  userInfo,
 }: Props): JSX.Element | null => {
   const [tabValue, setTabValue] = useState<SecondaryTabType>(
     requestedSecondaryTab
@@ -36,13 +37,12 @@ const MembersTab = ({
   const [isInviteModalOpen, setIsInviteModalOpen] = useState<boolean>(false);
   const router = useRouter();
   const { data: invitations = [] } = useGroupInvitations(groupId);
-  const { data: userInfo } = useUserInfo();
+  const currentUser = find(members, (m) => m.id === userInfo?.id);
 
   useEffect(() => {
     setTabValue(requestedSecondaryTab);
   }, [requestedSecondaryTab]);
 
-  const currentUser = find(members, (m) => m.id === userInfo?.id);
   const isOwner = currentUser?.isGroupAdmin === true;
   const numActive = Object.keys(members).length;
 

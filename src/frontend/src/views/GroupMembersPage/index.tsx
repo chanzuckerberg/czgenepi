@@ -81,6 +81,7 @@ const GroupMembersPage = ({
             groupName={name}
             groupId={groupId}
             members={members}
+            userInfo={userInfo}
           />
         )}
         {tabValue === PrimaryTabType.DETAILS && (
