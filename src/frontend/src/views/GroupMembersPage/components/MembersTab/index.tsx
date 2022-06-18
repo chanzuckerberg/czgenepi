@@ -39,7 +39,6 @@ const MembersTab = ({
   const { data: invitations = [] } = useGroupInvitations(groupId);
   const currentUser = find(members, (m) => m.id === userInfo?.id);
 
-
   useEffect(() => {
     setTabValue(requestedSecondaryTab);
   }, [requestedSecondaryTab]);
