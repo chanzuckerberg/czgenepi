@@ -150,11 +150,20 @@ async def get_auth_context(
     session: AsyncSession = Depends(get_db),
     user_roles: MutableSequence[UserRole] = Depends(require_group_membership),
 ) -> AuthContext:
+    # TODO TODO TODO
+    # there needs to be a switch in here to use our old groups tables/columns
+    # if we don't have an org ID in our request!
+    # FURTHERMORE we need to be able to generate an authcontext without any
+    # org info *intentionally* for user self-management endpoints (get all my
+    # roles, change my username, etc) so we need to handle that case
     group = None
     roles = []
     for row in user_roles:
         roles.append(row.role.name)
         group = row.group
+    # If you don't have any roles in this group, go away
+    if not group:
+        raise ex.UnauthorizedException("not authorized")
     query = (
         sa.select(GroupRole)  # type: ignore
         .options(

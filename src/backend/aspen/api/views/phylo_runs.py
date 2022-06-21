@@ -14,7 +14,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from starlette.requests import Request
 
 from aspen.api.auth import AuthContext, get_auth_context, get_auth_user
-from aspen.api.authz import get_oso_session
+from aspen.api.authz import AuthZSession, get_authz_session
 from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.phylo_runs import (
@@ -227,7 +227,7 @@ async def get_readable_phylo_runs(db, user, run_id=None):
 async def list_runs(
     request: Request,
     db: AsyncSession = Depends(get_db),
-    oso: AsyncSession = Depends(get_oso_session),
+    az: AuthZSession = Depends(get_authz_session),
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_auth_user),
 ) -> PhyloRunsListResponse:
@@ -246,7 +246,7 @@ async def list_runs(
     #  - can edit samples
     #  - can see private samples
 
-    query = await oso.authorized_query(user, "read", PhyloRun)
+    query = await az.authorized_query(user, "read", PhyloRun)
     query = query.options(
         joinedload(PhyloRun.outputs.of_type(PhyloTree)),
         joinedload(PhyloRun.user),  # For Pydantic serialization

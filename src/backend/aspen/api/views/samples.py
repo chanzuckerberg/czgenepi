@@ -16,7 +16,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from starlette.requests import Request
 
 from aspen.api.auth import AuthContext, get_auth_context, get_auth_user
-from aspen.api.authz import get_oso_session
+from aspen.api.authz import AuthZSession, get_authz_session
 from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.samples import (
@@ -58,11 +58,11 @@ async def list_samples(
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
     ac: AuthContext = Depends(get_auth_context),
-    oso: AsyncSession = Depends(get_oso_session),
+    az: AuthZSession = Depends(get_authz_session),
 ) -> SamplesResponse:
 
     # load the samples.
-    user_visible_samples_query = await oso.authorized_query(ac, "read", Sample)
+    user_visible_samples_query = await az.authorized_query(ac, "write", Sample)
     user_visible_samples_query = user_visible_samples_query.options(
         joinedload(Sample.uploaded_pathogen_genome),
         joinedload(Sample.submitting_group),
@@ -116,6 +116,7 @@ async def get_owned_samples_by_ids(
             )
         )
     )
+    print(query)
     results = await db.execute(query)
     return results.scalars()
 
