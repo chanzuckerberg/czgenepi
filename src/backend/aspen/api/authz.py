@@ -80,6 +80,19 @@ def register_classes(oso):
             ),
         },
     )
+    oso.register_class(
+        PhyloTree,
+        fields={
+            "id": int,
+            "private": bool,
+            "submitting_group": Relation(
+                kind="one",
+                other_type="Group",
+                my_field="submitting_group_id",
+                other_field="id",
+            ),
+        },
+    )
 
 
 async def get_oso_session(
