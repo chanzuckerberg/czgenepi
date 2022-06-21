@@ -16,15 +16,13 @@ from aspen.api.deps import get_db, get_settings
 from aspen.api.settings import Settings
 from aspen.auth.auth0_management import Auth0Client
 from aspen.auth.device_auth import validate_auth_header
-from aspen.database.models import Group, User, UserRole, GroupRole
+from aspen.database.models import Group, GroupRole, User, UserRole
 
 
 def get_usergroup_query(session: AsyncSession, auth0_user_id: str) -> Query:
     return (
         sa.select(User)  # type: ignore
-        .options(
-            joinedload(User.user_roles).joinedload(UserRole.role),
-        )  # type: ignore
+        .options(joinedload(User.group).joinedload(Group.can_see))  # type: ignore
         .filter(User.auth0_user_id == auth0_user_id)  # type: ignore
     )
 
@@ -39,9 +37,6 @@ async def setup_userinfo(session: AsyncSession, auth0_user_id: str) -> Optional[
         userquery = get_usergroup_query(session, auth0_user_id)
         userwait = await session.execute(userquery)
         user = userwait.unique().scalars().one()
-        for urole in user.user_roles:
-            print(urole.group_id)
-            print(urole.role.name)
     except NoResultFound:
         sentry_sdk.capture_message(
             f"Requested auth0_user_id {auth0_user_id} not found in usergroup query."
