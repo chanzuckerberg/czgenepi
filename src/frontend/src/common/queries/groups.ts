@@ -2,6 +2,7 @@ import {
   useMutation,
   UseMutationResult,
   useQuery,
+  useQueryClient,
   UseQueryResult,
 } from "react-query";
 import { API, DEFAULT_FETCH_OPTIONS, DEFAULT_POST_OPTIONS } from "../api";
@@ -78,7 +79,7 @@ export const USE_GROUP_INFO = {
 };
 
 export function useGroupInfo(groupId: number): UseQueryResult<Group, unknown> {
-  return useQuery([USE_GROUP_INFO], () => fetchGroup({ groupId }), {
+  return useQuery([USE_GROUP_INFO, groupId], () => fetchGroup({ groupId }), {
     retry: false,
     select: mapGroupData,
   });
@@ -114,7 +115,7 @@ export function useGroupMembersInfo(
   groupId: number
 ): UseQueryResult<GroupMember[], unknown> {
   return useQuery(
-    [USE_GROUP_MEMBER_INFO],
+    [USE_GROUP_MEMBER_INFO, groupId],
     () => fetchGroupMembers({ groupId }),
     {
       retry: false,
@@ -156,7 +157,7 @@ export function useGroupInvitations(
   groupId: number
 ): UseQueryResult<Invitation[], unknown> {
   return useQuery(
-    [USE_GROUP_INVITATION_INFO],
+    [USE_GROUP_INVITATION_INFO, groupId],
     () => fetchGroupInvitations({ groupId }),
     {
       retry: false,
@@ -200,7 +201,10 @@ interface InvitationRequestType {
 
 interface InvitationResponseType {
   // a list of emails that were successfully invited
-  invitations: string[];
+  invitations: {
+    email: string;
+    success: boolean;
+  }[];
 }
 
 type InvitationCallbacks = MutationCallbacks<InvitationResponseType>;
@@ -235,8 +239,12 @@ export function useSendGroupInvitations({
   InvitationRequestType,
   unknown
 > {
+  const queryClient = useQueryClient();
   return useMutation(sendGroupInvitations, {
     onError: componentOnError,
-    onSuccess: componentOnSuccess,
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries([USE_GROUP_INVITATION_INFO]);
+      componentOnSuccess(data);
+    },
   });
 }

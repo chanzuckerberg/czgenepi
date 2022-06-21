@@ -11,7 +11,13 @@ import ENV from "src/common/constants/ENV";
 import { API, DEFAULT_PUT_OPTIONS, getBackendApiJson } from "../api";
 import { ROUTES } from "../routes";
 import { ENTITIES } from "./entities";
-import { mapGroupData, RawGroupRequest } from "./groups";
+import {
+  mapGroupData,
+  RawGroupRequest,
+  USE_GROUP_INFO,
+  USE_GROUP_INVITATION_INFO,
+  USE_GROUP_MEMBER_INFO,
+} from "./groups";
 
 const { API_URL } = ENV;
 
@@ -62,7 +68,12 @@ export function useUpdateUserInfo(): UseMutationResult<
 
   return useMutation(updateUserInfo, {
     onSuccess: async () => {
-      await queryClient.invalidateQueries([USE_USER_INFO]);
+      await queryClient.invalidateQueries([
+        USE_USER_INFO,
+        USE_GROUP_INFO,
+        USE_GROUP_INVITATION_INFO,
+        USE_GROUP_MEMBER_INFO,
+      ]);
     },
   });
 }

@@ -1,6 +1,6 @@
 import { Tab } from "czifui";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useProtectedRoute, useUserInfo } from "src/common/queries/auth";
 import { useGroupInfo, useGroupMembersInfo } from "src/common/queries/groups";
 import { ROUTES } from "src/common/routes";
@@ -26,17 +26,17 @@ export type TabEventHandler = (
 ) => void;
 
 interface Props {
-  initialPrimaryTab: PrimaryTabType;
-  initialSecondaryTab: SecondaryTabType;
+  requestedPrimaryTab: PrimaryTabType;
+  requestedSecondaryTab: SecondaryTabType;
 }
 
 const GroupMembersPage = ({
-  initialPrimaryTab,
-  initialSecondaryTab,
+  requestedPrimaryTab,
+  requestedSecondaryTab,
 }: Props): JSX.Element | null => {
   useProtectedRoute();
 
-  const [tabValue, setTabValue] = useState<PrimaryTabType>(initialPrimaryTab);
+  const [tabValue, setTabValue] = useState<PrimaryTabType>(requestedPrimaryTab);
   const router = useRouter();
 
   const { data: userInfo } = useUserInfo();
@@ -45,6 +45,10 @@ const GroupMembersPage = ({
   const { data: groupInfo } = useGroupInfo(groupId);
 
   const { address, location, name, prefix } = groupInfo ?? {};
+
+  useEffect(() => {
+    setTabValue(requestedPrimaryTab);
+  }, [requestedPrimaryTab]);
 
   // sort group members by name before display
   members.sort((a, b) => (a.name > b.name ? 1 : -1));
@@ -73,10 +77,11 @@ const GroupMembersPage = ({
       <StyledPageContent>
         {tabValue === PrimaryTabType.MEMBERS && (
           <MembersTab
-            initialSecondaryTab={initialSecondaryTab}
+            requestedSecondaryTab={requestedSecondaryTab}
             groupName={name}
             groupId={groupId}
             members={members}
+            userInfo={userInfo}
           />
         )}
         {tabValue === PrimaryTabType.DETAILS && (

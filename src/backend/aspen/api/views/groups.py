@@ -1,3 +1,5 @@
+import re
+
 import sentry_sdk
 import sqlalchemy as sa
 from auth0.v3.exceptions import Auth0Error
@@ -32,9 +34,14 @@ async def create_group(
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_admin_user),
 ) -> GroupInfoResponse:
-    organization = auth0_client.add_org(
-        group_creation_request.prefix.lower(), group_creation_request.name
+    # Auth0 requires we only have alphanumerics, "-" and "_" in a group name.
+    # This regex replaces all other characters with an underscore, "_".
+    # There is also a 50 character limit, but we limit prefixes to 20 characters
+    # anyways.
+    auth0_safe_prefix = re.sub(
+        r"[^a-zA-Z0-9_-]+", "_", group_creation_request.prefix.lower()
     )
+    organization = auth0_client.add_org(auth0_safe_prefix, group_creation_request.name)
     group_values = dict(group_creation_request) | {"auth0_org_id": organization["id"]}
     group = Group(**group_values)
     db.add(group)
@@ -134,7 +141,11 @@ async def invite_group_members(
         try:
             if success:
                 auth0_client.invite_member(
-                    organization["id"], client_id, user.name, email, "member"
+                    organization["id"],
+                    client_id,
+                    user.name,
+                    email,
+                    group_invitation_request.role,
                 )
         except Auth0Error as err:
             # TODO - we need to learn more about possible exceptions here.

@@ -9,7 +9,6 @@ export const StyledDiv = styled.div`
     const spaces = getSpaces(props);
     return `
       padding: ${spaces?.l}px;
-      width: 100%;
     `;
   }}
 `;

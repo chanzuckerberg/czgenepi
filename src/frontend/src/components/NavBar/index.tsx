@@ -19,9 +19,6 @@ import {
   StyledIcon,
 } from "./style";
 
-// (thuang): Please make sure this value is in sync with what we have in css
-export const NAV_BAR_HEIGHT_PX = 46;
-
 const NavBarLoggedIn = (): JSX.Element => {
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
   const [isGroupDetailsDropdownOpen, setIsGroupDetailsDropdownOpen] =

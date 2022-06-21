@@ -67,9 +67,9 @@ async def search_locations(
             category_search_query = (
                 sa.select(
                     target_column.distinct(),
-                    sa.func.levenshtein(target_column, query_value).label(
-                        "levenshtein"
-                    ),
+                    sa.func.levenshtein(
+                        sa.func.lower(target_column), sa.func.lower(query_value)
+                    ).label("levenshtein"),
                 )
                 .where(and_(True, *set_category_conditionals))
                 .order_by(asc("levenshtein"))
@@ -83,7 +83,9 @@ async def search_locations(
             )
 
     levenshtein_columns = [
-        sa.func.levenshtein(getattr(Location, category), value)
+        sa.func.levenshtein(
+            sa.func.lower(getattr(Location, category)), sa.func.lower(value)
+        )
         for category, value in dict(search_query).items()
         if value is not None
     ]

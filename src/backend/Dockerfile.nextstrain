@@ -1,7 +1,7 @@
 ## Dockerfile for aspen batch jobs
 ##
 ##
-FROM nextstrain/base
+FROM nextstrain/base@sha256:9d65e6d5dee02fc59c57e0a5043af082ccf42c728aa0dfa867f7585a816a67c2
 ARG DEBIAN_FRONTEND=noninteractive
 
 LABEL maintainer = "CZ Gen Epi"
