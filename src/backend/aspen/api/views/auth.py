@@ -13,7 +13,7 @@ from starlette.requests import Request
 from starlette.responses import Response
 
 import aspen.api.error.http_exceptions as ex
-from aspen.api.auth import get_auth0_apiclient
+from aspen.api.authn import get_auth0_apiclient
 from aspen.api.deps import get_auth0_client, get_db, get_settings
 from aspen.api.settings import Settings
 from aspen.auth.auth0_management import Auth0Client

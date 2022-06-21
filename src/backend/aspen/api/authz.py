@@ -6,7 +6,7 @@ from polar.data.adapter.async_sqlalchemy2_adapter import AsyncSqlAlchemyAdapter
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.requests import Request
 
-from aspen.api.auth import AuthContext
+from aspen.api.authn import AuthContext
 from aspen.api.deps import get_db
 from aspen.database.models import (
     Group,
