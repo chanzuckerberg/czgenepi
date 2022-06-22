@@ -1,5 +1,4 @@
 import json
-from sqlalchemy.dialects import postgresql
 import os
 import re
 from collections import namedtuple
@@ -8,6 +7,7 @@ from typing import Dict, Mapping, Optional, Set, Tuple
 import boto3
 import sqlalchemy as sa
 from sqlalchemy import asc
+from sqlalchemy.dialects import postgresql
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased, selectinload
 from sqlalchemy.sql.expression import and_, not_, or_
@@ -126,7 +126,7 @@ async def _set_colors_for_location_category(
     category: str,
 ) -> dict:
     # information stored in tree_json["meta"]["colorings"], which is an
-    # array of objects. we grab the index of the one for "country"
+    # array of objects. we grab the index of the one for "{category}"
     category_defines_index = None
     for index, defines in enumerate(tree_json["meta"]["colorings"]):
         if defines["key"] == category:
@@ -135,19 +135,38 @@ async def _set_colors_for_location_category(
     and_clauses = []
     if category == "country":
         # Make sure we only have country-level locations in our set.
-        sample_locations = {ExtractedLocation(country=loc.country, division=None, location=None) for loc in extracted_locations}
+        sample_locations = {
+            ExtractedLocation(country=loc.country, division=None, location=None)
+            for loc in extracted_locations
+        }
     elif category == "division":
         # Make sure we only have division-level locations in our set.
-        sample_locations = {ExtractedLocation(country=loc.country, division=loc.division, location=None) for loc in extracted_locations if loc.division is not None}
+        sample_locations = {
+            ExtractedLocation(country=loc.country, division=loc.division, location=None)
+            for loc in extracted_locations
+            if loc.division is not None
+        }
     else:
-        sample_locations = {ExtractedLocation(country=loc.country, division=loc.division, location=loc.location) for loc in extracted_locations if loc.location is not None}
+        sample_locations = {
+            ExtractedLocation(
+                country=loc.country, division=loc.division, location=loc.location
+            )
+            for loc in extracted_locations
+            if loc.location is not None
+        }
     # This builds up a list of SQL filters that looks like this:
     #  location.country = 'USA' AND location.division = 'CA' AND location.location = 'San Francisco'
-    # Or for divisionl-level locations for example:
+    # Or for division-level locations for example:
     #  location.country = 'USA' AND location.division = 'CA' AND location.location IS NULL
     for location in sample_locations:
-        and_clauses.append(and_(Location.country == location.country, Location.division == location.division, Location.location == location.location))
-    
+        and_clauses.append(
+            and_(
+                Location.country == location.country,
+                Location.division == location.division,
+                Location.location == location.location,
+            )
+        )
+
     # If we didn't find any locations on the tree, we probably have bigger problems
     if not and_clauses:
         return tree_json
@@ -182,7 +201,7 @@ async def _set_colors_for_location_category(
     )
 
     # raw_sql = sorting_query.compile(
-        # dialect=postgresql.dialect(), compile_kwargs={"literal_binds": True}
+    # dialect=postgresql.dialect(), compile_kwargs={"literal_binds": True}
     # )
     # print(raw_sql)
 
