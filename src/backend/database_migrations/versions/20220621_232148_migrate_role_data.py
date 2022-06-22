@@ -8,7 +8,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = "20220621_232148"
-down_revision = "20220616_232147"
+down_revision = "20220616_232148"
 branch_labels = None
 depends_on = None
 
@@ -23,7 +23,7 @@ def upgrade():
 
     conn = op.get_bind()
     user_role_inserts = sa.sql.text(
-        "INSERT INTO aspen.user_roles (role_id, user_id, group_id) SELECT IF(users.group_admin, admin_role.id, member_role.id), user_id, group_id FROM aspen.users AS users "
+        "INSERT INTO aspen.user_roles (role_id, user_id, group_id) SELECT case when users.group_admin then admin_role.id else member_role.id end, users.id, users.group_id FROM aspen.users AS users "
         "LEFT JOIN aspen.roles admin_role ON admin_role.name = 'admin' "
         "LEFT JOIN aspen.roles member_role ON member_role.name = 'member' "
         "ON CONFLICT DO NOTHING "
