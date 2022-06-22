@@ -173,9 +173,7 @@ async def _set_colors_for_location_category(
     origin_location = aliased(Location)
     sorting_query = (
         sa.select(  # type: ignore
-            Location.country,
-            Location.division,
-            Location.location,
+            getattr(Location, category),
             sa.func.earth_distance(
                 sa.func.ll_to_earth(Location.latitude, Location.longitude),
                 sa.func.ll_to_earth(
