@@ -39,13 +39,7 @@ from aspen.api.utils import (
     get_matching_gisaid_ids,
     get_missing_and_found_sample_ids,
 )
-from aspen.database.models import (
-    DataType,
-    Location,
-    Sample,
-    UploadedPathogenGenome,
-    User,
-)
+from aspen.database.models import Location, Sample, UploadedPathogenGenome, User
 
 router = APIRouter()
 

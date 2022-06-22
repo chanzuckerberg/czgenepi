@@ -15,10 +15,16 @@ depends_on = None
 
 def upgrade():
     op.create_unique_constraint(  # type: ignore
-        "uq_user_roles_user_group_role", "user_roles", ["user_id", "group_id", "role_id"], schema="aspen"
+        "uq_user_roles_user_group_role",
+        "user_roles",
+        ["user_id", "group_id", "role_id"],
+        schema="aspen",
     )
     op.create_unique_constraint(  # type: ignore
-        "uq_group_roles_grantee_grantor_role", "group_roles", ["grantee_group_id", "grantor_group_id", "role_id"], schema="aspen"
+        "uq_group_roles_grantee_grantor_role",
+        "group_roles",
+        ["grantee_group_id", "grantor_group_id", "role_id"],
+        schema="aspen",
     )
 
     conn = op.get_bind()
@@ -35,7 +41,7 @@ def upgrade():
         "SELECT role.id, owner_group_id, viewer_group_id FROM aspen.can_see "
         "LEFT JOIN aspen.roles AS roles on roles.name = 'viewer' WHERE data_type = 'TREES' "
     )
-    conn.execute(user_role_inserts)
+    conn.execute(group_role_inserts)
 
 
 def downgrade():

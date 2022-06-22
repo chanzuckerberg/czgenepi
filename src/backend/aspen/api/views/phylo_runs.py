@@ -2,7 +2,7 @@ import datetime
 import json
 import os
 import re
-from typing import Iterable, List, MutableSequence, Set
+from typing import Iterable, List, MutableSequence
 
 import sentry_sdk
 import sqlalchemy as sa
@@ -13,7 +13,7 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
 from starlette.requests import Request
 
-from aspen.api.authn import AuthContext, get_auth_context, get_auth_user
+from aspen.api.authn import get_auth_user
 from aspen.api.authz import AuthZSession, get_authz_session
 from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
@@ -32,7 +32,6 @@ from aspen.api.utils import (
 )
 from aspen.database.models import (
     AlignedGisaidDump,
-    DataType,
     PathogenGenome,
     PhyloRun,
     PhyloTree,

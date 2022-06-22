@@ -25,7 +25,13 @@ from aspen.database.models.sequences import (  # noqa: F401
     PathogenGenome,
     UploadedPathogenGenome,
 )
-from aspen.database.models.usergroup import Group, Role, User, UserRole, GroupRole  # noqa: F401
+from aspen.database.models.usergroup import (  # noqa: F401
+    Group,
+    GroupRole,
+    Role,
+    User,
+    UserRole,
+)
 from aspen.database.models.usher import UsherOption  # noqa: F401
 from aspen.database.models.workflow import (  # noqa: F401
     Workflow,

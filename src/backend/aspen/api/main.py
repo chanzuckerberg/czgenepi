@@ -11,7 +11,7 @@ from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 from sqlalchemy_oso import register_models
 from starlette.middleware.cors import CORSMiddleware
 
-from aspen.api.authn import AuthContext, get_auth_user, get_auth_context
+from aspen.api.authn import AuthContext, get_auth_context, get_auth_user
 from aspen.api.error.http_exceptions import AspenException, exception_handler
 from aspen.api.middleware.session import SessionMiddleware
 from aspen.api.settings import Settings
