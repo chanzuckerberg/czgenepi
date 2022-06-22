@@ -264,14 +264,9 @@ jobs:
       - name: Docker re-tag
         uses: chanzuckerberg/github-actions/.github/actions/retag-happy@v1.4.0
         with:
-          source-tag: {{env.SOURCE_TAG}}
-          dest-tag: branch-$(echo ${GITHUB_REF#refs/heads/} | sed 's/[\+\/]/-/g')
+          source-tag: ${{ env.SOURCE_TAG }}
+          dest-tag: ${{ env.DEST_TAG }}
           happy_version: "0.23.0"
-      - name: Docker build, push, and tag
-        shell: bash
-        run: |
-          pip install -r .happy/requirements.txt
-          scripts/happy --profile="" addtags --source-tag sha-${GITHUB_SHA:0:8} --dest-tag branch-$(echo ${GITHUB_REF#refs/heads/} | sed 's/[\+\/]/-/g')
       - name: Generate payload
         run: |
           echo "payload={\"tag\":\"sha-${GITHUB_SHA:0:8}\"}" >> $GITHUB_ENV
