@@ -29,7 +29,8 @@ def upgrade():
 
     conn = op.get_bind()
     user_role_inserts = sa.sql.text(
-        "INSERT INTO aspen.user_roles (role_id, user_id, group_id) SELECT case when users.group_admin then admin_role.id else member_role.id end, users.id, users.group_id FROM aspen.users AS users "
+        "INSERT INTO aspen.user_roles (role_id, user_id, group_id) "
+        "SELECT case when users.group_admin then admin_role.id else member_role.id end, users.id, users.group_id FROM aspen.users AS users "
         "LEFT JOIN aspen.roles admin_role ON admin_role.name = 'admin' "
         "LEFT JOIN aspen.roles member_role ON member_role.name = 'member' "
         "ON CONFLICT DO NOTHING "
@@ -38,7 +39,7 @@ def upgrade():
 
     group_role_inserts = sa.sql.text(
         "INSERT INTO aspen.group_roles (role_id, grantor_group_id, grantee_group_id) "
-        "SELECT role.id, owner_group_id, viewer_group_id FROM aspen.can_see "
+        "SELECT roles.id, can_see.owner_group_id, can_see.viewer_group_id FROM aspen.can_see "
         "LEFT JOIN aspen.roles AS roles on roles.name = 'viewer' WHERE data_type = 'TREES' "
     )
     conn.execute(group_role_inserts)
