@@ -257,6 +257,16 @@ jobs:
         with:
           registry: ${{ secrets.ECR_REPO }}
       - uses: actions/checkout@v2
+      - name: Determine source and destination tags
+        run: |
+          echo "SOURCE_TAG=sha-${GITHUB_SHA:0:8}" >> $GITHUB_ENV
+          echo "DEST_TAG=branch-$(echo ${GITHUB_REF#refs/heads/} | sed 's/[\+\/]/-/g')" >> $GITHUB_ENV
+      - name: Docker re-tag
+        uses: chanzuckerberg/github-actions/.github/actions/retag-happy@v1.4.0
+        with:
+          source-tag: {{env.SOURCE_TAG}}
+          dest-tag: branch-$(echo ${GITHUB_REF#refs/heads/} | sed 's/[\+\/]/-/g')
+          happy_version: "0.23.0"
       - name: Docker build, push, and tag
         shell: bash
         run: |

@@ -39,14 +39,13 @@ jobs:
           role-to-assume: ${{ secrets.AWS_PROD_ROLE_TO_ASSUME }}
           role-duration-seconds: 900
       - uses: actions/checkout@v2
-      - name: Install happy dependencies
-        run: |
-          pip install -r .happy/requirements.txt
       - name: Determine the tag
-        env:
-          TFE_TOKEN: ${{ secrets.TFE_TOKEN }}
-        run: |
-          echo "DEPLOY_SHA=$(python3 ./scripts/happy-deploy.py gestaging --get-latest)" >> $GITHUB_ENV
+        uses: chanzuckerberg/github-actions/.github/actions/latest-successful-deployment@v1.4.0
+        with:
+          environmnent: staging
+          owner: chanzuckerberg
+          repo: czgenepi
+          happy_version: "0.23.0"
       - name: Generate payload
         run: |
           if [ -n "${{ github.event.inputs.image_tag }}" ]; then
