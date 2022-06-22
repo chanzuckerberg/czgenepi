@@ -85,7 +85,7 @@ async def test_phylo_tree_id_style_public(
         headers=auth_headers,
     )
     returned_tree = result.json()
-    assert returned_tree['tree'] == TEST_TREE['tree']
+    assert returned_tree["tree"] == TEST_TREE["tree"]
 
 
 async def test_phylo_tree_no_can_see(
