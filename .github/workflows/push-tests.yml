@@ -262,7 +262,7 @@ jobs:
           echo "SOURCE_TAG=sha-${GITHUB_SHA:0:8}" >> $GITHUB_ENV
           echo "DEST_TAG=branch-$(echo ${GITHUB_REF#refs/heads/} | sed 's/[\+\/]/-/g')" >> $GITHUB_ENV
       - name: Docker re-tag
-        uses: chanzuckerberg/github-actions/.github/actions/retag-happy@v1.5.0
+        uses: chanzuckerberg/github-actions/.github/actions/retag-happy@v1.6.0
         with:
           source-tag: ${{ env.SOURCE_TAG }}
           dest-tag: ${{ env.DEST_TAG }}
