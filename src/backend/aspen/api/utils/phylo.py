@@ -1,4 +1,5 @@
 import json
+from sqlalchemy.dialects import postgresql
 import os
 import re
 from collections import namedtuple
@@ -131,30 +132,32 @@ async def _set_colors_for_location_category(
         if defines["key"] == category:
             category_defines_index = index
 
-    locs_in_tree = extracted_locations.copy()
-    origin_location = aliased(Location)
-    # print("Category:", category)
-    # SQLAlchemy black magic going on here
-    # (aka the == and != operators are overloaded for columns)
     and_clauses = []
-    for location in locs_in_tree:
-        and_args = []
-        if getattr(location, category) is not None:
-            and_args.append(
-                getattr(Location, category).__eq__(getattr(location, category))
-            )
-        else:
-            and_args.append(False)
-        for key in reversed(LOCATION_KEYS):
-            if LOCATION_KEYS.index(key) > LOCATION_KEYS.index(category):
-                and_args.append(getattr(Location, key).__eq__(None))
-            else:
-                break
-        and_clauses.append(and_(True, *and_args).self_group())
+    if category == "country":
+        # Make sure we only have country-level locations in our set.
+        sample_locations = {ExtractedLocation(country=loc.country, division=None, location=None) for loc in extracted_locations}
+    elif category == "division":
+        # Make sure we only have division-level locations in our set.
+        sample_locations = {ExtractedLocation(country=loc.country, division=loc.division, location=None) for loc in extracted_locations if loc.division is not None}
+    else:
+        sample_locations = {ExtractedLocation(country=loc.country, division=loc.division, location=loc.location) for loc in extracted_locations if loc.location is not None}
+    # This builds up a list of SQL filters that looks like this:
+    #  location.country = 'USA' AND location.division = 'CA' AND location.location = 'San Francisco'
+    # Or for divisionl-level locations for example:
+    #  location.country = 'USA' AND location.division = 'CA' AND location.location IS NULL
+    for location in sample_locations:
+        and_clauses.append(and_(Location.country == location.country, Location.division == location.division, Location.location == location.location))
+    
+    # If we didn't find any locations on the tree, we probably have bigger problems
+    if not and_clauses:
+        return tree_json
 
+    origin_location = aliased(Location)
     sorting_query = (
         sa.select(  # type: ignore
-            getattr(Location, category),
+            Location.country,
+            Location.division,
+            Location.location,
             sa.func.earth_distance(
                 sa.func.ll_to_earth(Location.latitude, Location.longitude),
                 sa.func.ll_to_earth(
@@ -165,13 +168,7 @@ async def _set_colors_for_location_category(
         .select_from(origin_location)  # type: ignore
         .join(
             Location,  # type: ignore
-            and_(
-                True,
-                or_(False, *and_clauses),
-                not_(
-                    getattr(Location, category).__eq__(getattr(tree_location, category))
-                ),
-            ),
+            or_(*and_clauses),
         )
         .where(
             and_(
@@ -185,13 +182,12 @@ async def _set_colors_for_location_category(
     )
 
     # raw_sql = sorting_query.compile(
-    #     dialect=postgresql.dialect(), compile_kwargs={"literal_binds": True}
+        # dialect=postgresql.dialect(), compile_kwargs={"literal_binds": True}
     # )
     # print(raw_sql)
 
     sorted_locations_result = await db.execute(sorting_query)
     sorted_locations = [row[category] for row in sorted_locations_result]
-    # print("Sorted locations:", sorted_locations)
 
     # Add the locations we found location data for
     # If we still have fewer than 16, add whatever is left from the set we collected
@@ -204,7 +200,7 @@ async def _set_colors_for_location_category(
         remaining_category_locs_in_tree = set(
             [
                 getattr(loc, category)
-                for loc in locs_in_tree
+                for loc in extracted_locations
                 if getattr(loc, category) not in location_strings
                 and getattr(loc, category) is not None
             ]
