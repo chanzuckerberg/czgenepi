@@ -203,11 +203,15 @@ async def _set_colors_for_location_category(
     # print(raw_sql)
 
     sorted_locations_result = await db.execute(sorting_query)
-    location_strings = [row[category] for row in sorted_locations_result]
+    sorted_locations = [row[category] for row in sorted_locations_result]
 
     # Add the locations we found location data for
     # If we still have fewer than 16, add whatever is left from the set we collected
     # in the tree, even if we don't have spatial data on them.
+    location_strings = [getattr(tree_location, category)]
+    location_strings.extend(
+        [location for location in sorted_locations if location not in location_strings]
+    )
     # print("Location strings from SQL result:", location_strings)
     # print("Number of location strings:", len(location_strings))
     if len(location_strings) < 16:
