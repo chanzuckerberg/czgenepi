@@ -266,7 +266,7 @@ jobs:
         with:
           source-tag: ${{ env.SOURCE_TAG }}
           dest-tag: ${{ env.DEST_TAG }}
-          happy_version: "0.23.0"
+          happy_version: "0.24.0"
       - name: Generate payload
         run: |
           echo "payload={\"tag\":\"sha-${GITHUB_SHA:0:8}\"}" >> $GITHUB_ENV
