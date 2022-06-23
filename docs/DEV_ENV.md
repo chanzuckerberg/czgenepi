@@ -31,7 +31,7 @@ blessclient import-config git@github.com:/chanzuckerberg/genepi-infra/blessconfi
 1. Run `pre-commit install` to install all the git pre-commit hooks
 1. From the root of this repository, run `make local-init` to build and run the dev environment. The first build takes awhile, but subsequent runs will use cached artifacts.
 1. Visit [http://backend.genepinet.localdev:3000](http://backend.genepinet.localdev:3000) to view the backend, and [http://frontend.genepinet.localdev:8000](http://frontend.genepinet.localdev:8000) for the frontend.
-1. `make local-pgconsole` starts a connection with the local postgresql db.
+1. `make local-pgconsole` starts a connection with the local postgresql db. 
 1. **Open the source code and start editing!**
    - Modify code in the `src/frontend` directory, save your changes and the browser will update in real time.
    - Modify code in the `src/backend` directory, and the backend api will reload automatically.
@@ -64,7 +64,11 @@ To update backend dependencies:
 
 ### Update Dev Data
 
-The dev environment is initialized with AWS Secrets/S3 data in the [scripts/setup_dev_data.sh](../scripts/setup_dev_data.sh),  [src/backend/scripts/setup_localdata.py](../src/backend/scripts/setup_localdata.py) script, as well as DB migrations from [src/backend/database_migrations](../src/backend/database_migrations). To add more data or run migrations, modify these scripts and run `make local-init` to reload the dev environment's data stores. Some data such as tree jsons may be cached and need `make local-clean` and `make local-init` to update.
+The dev environment is initialized with AWS Secrets/S3 data in the [scripts/setup_dev_data.sh](../scripts/setup_dev_data.sh),  [src/backend/scripts/setup_localdata.py](../src/backend/scripts/setup_localdata.py) script, as well as DB migrations from [src/backend/database_migrations](../src/backend/database_migrations). 
+
+- To add more data or run migrations, modify these scripts and run `make local-init` to reload the dev environment's data stores. 
+- Some data such as tree jsons may be cached and need `make local-clean` before `make local-init` to update.
+- Changes to the postgresql database via `make local-pgconsole` are live immediately.
 
 ### Make targets for managing dev:
 
