@@ -13,7 +13,7 @@ RUN wget https://raw.githubusercontent.com/python-poetry/poetry/1.1.10/get-poetr
 
 WORKDIR /usr/src/app
 
-RUN apt-get update && apt-get install -y make wget git jq gcc
+RUN apt-get update && apt-get install -y make wget git jq gcc unzip
 
 # install miniconda
 RUN wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh

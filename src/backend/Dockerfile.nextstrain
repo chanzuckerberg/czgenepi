@@ -19,6 +19,7 @@ RUN apt-get -qq update && apt-get -qq -y install \
     zstd \
     nano \
     seqtk \
+    unzip \
     build-essential \
     && locale-gen en_US.UTF-8
 
