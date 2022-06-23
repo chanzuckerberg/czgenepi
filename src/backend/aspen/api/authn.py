@@ -146,9 +146,7 @@ async def get_auth_context(
     user_roles: MutableSequence[UserRole] = Depends(require_group_membership),
 ) -> AuthContext:
     # TODO TODO TODO
-    # there needs to be a switch in here to use our old groups tables/columns
-    # if we don't have an org ID in our request!
-    # FURTHERMORE we need to be able to generate an authcontext without any
+    # we need to be able to generate an authcontext without any
     # org info *intentionally* for user self-management endpoints (get all my
     # roles, change my username, etc) so we need to handle that case
     group = None
