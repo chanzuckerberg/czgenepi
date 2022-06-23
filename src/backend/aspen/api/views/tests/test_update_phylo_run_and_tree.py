@@ -18,11 +18,16 @@ pytestmark = pytest.mark.asyncio
 async def make_shared_test_data(
     async_session: AsyncSession, no_trees: bool = False, system_admin=False
 ) -> Tuple[User, Group, List[Sample], PhyloRun, Union[PhyloTree, None]]:
-    group = group_factory()
-    user = user_factory(group, system_admin=system_admin)
     location = location_factory(
-        "North America", "USA", "California", "Santa Barbara County"
+        "North America",
+        "USA",
+        "California",
+        "Santa Barbara County",
+        34.7136533,
+        -119.9858232,
     )
+    group = group_factory(default_tree_location=location)
+    user = user_factory(group, system_admin=system_admin)
     samples = [
         sample_factory(
             group,
