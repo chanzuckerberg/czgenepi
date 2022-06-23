@@ -10,7 +10,7 @@ from fastapi import Depends, FastAPI, Request
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from aspen.api.auth import get_auth0_apiclient, get_auth_user, setup_userinfo
+from aspen.api.authn import get_auth0_apiclient, get_auth_user, setup_userinfo
 from aspen.api.deps import get_db
 from aspen.api.error import http_exceptions as ex
 from aspen.api.main import get_app
@@ -18,7 +18,7 @@ from aspen.auth.auth0_management import Auth0Client
 from aspen.database import connection as aspen_connection
 from aspen.database import schema
 from aspen.database.connection import init_async_db
-from aspen.database.models import User
+from aspen.database.models import Role, User
 
 USERNAME = "user_rw"
 PASSWORD = "password_rw"
@@ -87,6 +87,14 @@ async def async_sqlalchemy_interface(
     """initialize schema and yield interface"""
     test_db_interface = aspen_connection.init_async_db(async_db.as_uri())
     await schema.async_create_tables_and_schema(test_db_interface)
+
+    # Insert any core level data we're going to need for tests.
+    session = test_db_interface.make_session()
+    roles = [Role(name="admin"), Role(name="viewer"), Role(name="member")]
+    session.add_all(roles)
+    await session.commit()  # type: ignore
+    await session.close()  # type: ignore
+
     connection = await test_db_interface.engine.connect()  # type: ignore
     try:
         yield test_db_interface
