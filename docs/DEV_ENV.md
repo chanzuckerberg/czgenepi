@@ -58,9 +58,7 @@ To update frontend changes:
 
 To update backend dependencies:
 
-1. add the dependency to [src/backend/Pipfile](../src/backend/Pipfile)
-2. run `make local-update-backend-deps` (updates Pipfile.lock and updates requirements)
-3. run `make local-sync` (rebuilds and initializes containers with new dependency)
+1. run 'docker compose exec backend /opt/poetry/bin/poetry add PACKAGE_NAME_HERE`
 
 ### Update Dev Data
 
