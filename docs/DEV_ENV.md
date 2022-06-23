@@ -42,7 +42,7 @@ Username: User1 / Password: pwd ([users are defined here](../oauth/users.json))
 
 ### Containers managed by the dev environment
 
-The Aspen dev environment is a set of containers defined in [docker-compose.yml](docker-compose.yml). The [backend docker image](src/backend/Dockerfile) and [frontend docker image](src/frontend/Dockerfile) are built locally. Update any of these files as necessary and run `make local-sync` to sync your dev environment with these configs.
+The Aspen dev environment is a set of containers defined in [docker-compose.yml](../docker-compose.yml). The [backend docker image](../src/backend/Dockerfile) and [frontend docker image](../src/frontend/Dockerfile) are built locally. Update any of these files as necessary and run `make local-sync` to sync your dev environment with these configs.
 
 ![Dev Environment Containers](images/genepi-localdev.png)
 
@@ -52,19 +52,19 @@ Both the frontend and backend services will automatically reload when their sour
 
 To update frontend changes:
 
-1. add dependency to [src/frontend/package.json](src/frontend/package.json) (or add a new scripts command)
+1. add dependency to [src/frontend/package.json](../src/frontend/package.json) (or add a new scripts command)
 2. run `make local-update-frontend-deps` (updates package-lock.json)
 2. run `make local-sync`
 
 To update backend dependencies:
 
-1. add the dependency to [src/backend/Pipfile](src/backend/Pipfile)
+1. add the dependency to [src/backend/Pipfile](../src/backend/Pipfile)
 2. run `make local-update-backend-deps` (updates Pipfile.lock and updates requirements)
 3. run `make local-sync` (rebuilds and initializes containers with new dependency)
 
 ### Update Dev Data
 
-The dev environment is initialized with AWS Secrets/S3 data in the [src/backend/scripts/setup_dev_data.sh](src/backend/scripts/setup_dev_data.sh) script, as well as DB migrations from [src/backend/database_migrations](src/backend/database_migrations). To add more data or run migrations, modify these scripts and run `make local-init` to reload the dev environment's data stores.
+The dev environment is initialized with AWS Secrets/S3 data in the [src/backend/scripts/setup_localdata.py](../src/backend/scripts/setup_localdata.py) script, as well as DB migrations from [src/backend/database_migrations](../src/backend/database_migrations). To add more data or run migrations, modify these scripts and run `make local-init` to reload the dev environment's data stores.
 
 ### Make targets for managing dev:
 
