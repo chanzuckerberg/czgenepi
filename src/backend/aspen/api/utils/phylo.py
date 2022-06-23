@@ -197,11 +197,6 @@ async def _set_colors_for_location_category(
         .limit(16)
     )
 
-    # raw_sql = sorting_query.compile(
-    # dialect=postgresql.dialect(), compile_kwargs={"literal_binds": True}
-    # )
-    # print(raw_sql)
-
     sorted_locations_result = await db.execute(sorting_query)
     sorted_locations = [row[category] for row in sorted_locations_result]
 
@@ -212,8 +207,6 @@ async def _set_colors_for_location_category(
     location_strings.extend(
         [location for location in sorted_locations if location not in location_strings]
     )
-    # print("Location strings from SQL result:", location_strings)
-    # print("Number of location strings:", len(location_strings))
     if len(location_strings) < 16:
         remaining_category_locs_in_tree = set(
             [
@@ -226,10 +219,8 @@ async def _set_colors_for_location_category(
         location_strings.extend(
             list(remaining_category_locs_in_tree)[: 16 - len(location_strings)]
         )
-    # print("Location strings after adding filler:", location_strings)
 
     colorings_entry = list(zip(location_strings, NEXTSTRAIN_COLOR_SCALE))
-    # print("Colorings entry to add:", colorings_entry)
 
     if category_defines_index is not None:
         tree_json["meta"]["colorings"][category_defines_index][
@@ -244,7 +235,6 @@ async def _set_colors_for_location_category(
                 "scale": colorings_entry,
             }
         )
-    # print("State of tree_json:", tree_json["meta"]["colorings"][category_defines_index]["scale"])
 
     return tree_json
 
