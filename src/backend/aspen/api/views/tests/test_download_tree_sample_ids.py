@@ -7,12 +7,16 @@ from botocore.client import ClientError
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from aspen.database.models import CanSee, DataType, Group, PhyloTree, Sample
+from aspen.database.models import Group, PhyloTree, Sample
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
-from aspen.test_infra.models.usergroup import group_factory, userrole_factory
+from aspen.test_infra.models.usergroup import (
+    group_factory,
+    grouprole_factory,
+    userrole_factory,
+)
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
@@ -175,35 +179,16 @@ async def test_private_id_matrix(
     samples sequence data but not private ids
     """
     owner_group = group_factory(name="owner_group")
-    private_ids_group = group_factory(name="private_ids_group")
     noaccess_group = group_factory(name="noaccess_group")
     viewer_group = group_factory(name="viewer_group")
     viewer_user = await create_unique_user(async_session, viewer_group, "viewer")
-    private_ids_user = await create_unique_user(
-        async_session, private_ids_group, "private_ids"
-    )
     noaccess_user = await create_unique_user(async_session, noaccess_group, "noaccess")
     phylo_tree, phylo_run, samples = await create_phylotree_with_inputs(
         mock_s3_resource, async_session, owner_group
     )
     # give the viewer group access to trees from the owner group
-    CanSee(
-        viewer_group=viewer_group,
-        owner_group=owner_group,
-        data_type=DataType.TREES,
-    )
-    # give the private ids group access to private ids from the owner group
-    CanSee(
-        viewer_group=private_ids_group,
-        owner_group=owner_group,
-        data_type=DataType.PRIVATE_IDENTIFIERS,
-    )
-    CanSee(
-        viewer_group=private_ids_group,
-        owner_group=owner_group,
-        data_type=DataType.TREES,
-    )
-    async_session.add_all([noaccess_user, viewer_user, private_ids_user, phylo_tree])
+    roles = await grouprole_factory(async_session, owner_group, viewer_group)
+    async_session.add_all(roles + [noaccess_user, viewer_user, phylo_tree])
     await async_session.commit()
 
     matrix = [
@@ -219,17 +204,6 @@ async def test_private_id_matrix(
                 "Sample Identifier\tSelected\r\n"
                 f"root_identifier_1	no\r\n"
                 f"{samples[0].public_identifier}	yes\r\n"
-                f"gisaid_identifier	yes\r\n"
-                f"GISAID_identifier2	yes\r\n"
-            ),
-        },
-        {
-            "user": private_ids_user,
-            "expected_status": 200,
-            "expected_data": (
-                "Sample Identifier\tSelected\r\n"
-                f"root_identifier_1	no\r\n"
-                f"{samples[0].private_identifier}	yes\r\n"
                 f"gisaid_identifier	yes\r\n"
                 f"GISAID_identifier2	yes\r\n"
             ),

@@ -38,13 +38,7 @@ from aspen.api.utils import (
     get_matching_gisaid_ids,
     get_missing_and_found_sample_ids,
 )
-from aspen.database.models import (
-    DataType,
-    Location,
-    Sample,
-    UploadedPathogenGenome,
-    User,
-)
+from aspen.database.models import Location, Sample, UploadedPathogenGenome, User
 
 router = APIRouter()
 
@@ -58,12 +52,6 @@ async def list_samples(
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_auth_user),
 ) -> SamplesResponse:
-
-    cansee_groups_private_identifiers: Set[int] = {
-        cansee.owner_group_id
-        for cansee in user.group.can_see
-        if cansee.data_type == DataType.PRIVATE_IDENTIFIERS
-    }
 
     # load the samples.
     all_samples_query = sa.select(Sample).options(  # type: ignore
@@ -86,11 +74,7 @@ async def list_samples(
             sample,
         )
         sample.show_private_identifier = False
-        if (
-            sample.submitting_group_id == user.group_id
-            or sample.submitting_group_id in cansee_groups_private_identifiers
-            or user.system_admin
-        ):
+        if sample.submitting_group_id == user.group_id or user.system_admin:
             sample.show_private_identifier = True
 
         sampleinfo = SampleResponse.from_orm(sample)

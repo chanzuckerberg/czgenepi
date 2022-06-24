@@ -4,8 +4,6 @@ from typing import Collection, Sequence, Tuple
 import pytest
 
 from aspen.database.models import (
-    CanSee,
-    DataType,
     Group,
     Location,
     PhyloRun,
@@ -19,7 +17,11 @@ from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
-from aspen.test_infra.models.usergroup import group_factory, userrole_factory
+from aspen.test_infra.models.usergroup import (
+    group_factory,
+    grouprole_factory,
+    userrole_factory,
+)
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
@@ -191,8 +193,8 @@ async def test_phylo_trees_can_see(
     )
     _, _, trees, _ = make_all_test_data(owner_group, user, location, n_samples, n_trees)
 
-    CanSee(viewer_group=viewer_group, owner_group=owner_group, data_type=DataType.TREES)
-    async_session.add_all((owner_group, viewer_group))
+    role_objs = await grouprole_factory(async_session, owner_group, viewer_group)
+    async_session.add_all(role_objs)
     await async_session.commit()
 
     await check_results(http_client, user, trees)

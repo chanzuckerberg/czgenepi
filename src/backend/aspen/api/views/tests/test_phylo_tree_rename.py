@@ -6,11 +6,14 @@ from botocore.client import ClientError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.api.utils import process_phylo_tree
-from aspen.database.models import CanSee, DataType
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
 from aspen.test_infra.models.sample import sample_factory
-from aspen.test_infra.models.usergroup import group_factory, userrole_factory
+from aspen.test_infra.models.usergroup import (
+    group_factory,
+    grouprole_factory,
+    userrole_factory,
+)
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
@@ -43,23 +46,17 @@ async def test_phylo_tree_rename(
     can_see_group = group_factory("can_see")
     wrong_can_see_group = group_factory("wrong_can_see")
     no_can_see_group = group_factory("no_can_see")
-    can_see_group.can_be_seen_by.append(
-        CanSee(
-            viewer_group=viewer_group,
-            owner_group=can_see_group,
-            data_type=DataType.PRIVATE_IDENTIFIERS,
-        )
+    admin_roles = await grouprole_factory(
+        async_session, can_see_group, viewer_group, "admin"
     )
-    wrong_can_see_group.can_be_seen_by.append(
-        CanSee(
-            viewer_group=viewer_group,
-            owner_group=wrong_can_see_group,
-            data_type=DataType.SEQUENCES,
-        )
+    viewer_roles = await grouprole_factory(
+        async_session, wrong_can_see_group, viewer_group, "viewer"
     )
     user = await userrole_factory(async_session, viewer_group)
     async_session.add_all(
-        [viewer_group, can_see_group, wrong_can_see_group, no_can_see_group]
+        admin_roles
+        + viewer_roles
+        + [viewer_group, can_see_group, wrong_can_see_group, no_can_see_group]
     )
 
     location = location_factory(
