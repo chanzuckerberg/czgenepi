@@ -20,7 +20,7 @@ export enum ROUTES {
   PHYLO_TREES = "/data/phylogenetic_trees",
   PRIVACY = "/privacy",
   REQUEST_ACCESS = "https://airtable.com/shrblHnTRd9dtu6c0",
-  RESOURCES = "/resources",
+  RESOURCES = "https://help.czgenepi.org/hc/en-us/categories/6217716150804-Genomic-Epidemiology-Learning-Center",
   TERMS = "/terms",
   UPLOAD = "/upload",
   UPLOAD_STEP1 = "/upload/1",
