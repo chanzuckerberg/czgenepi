@@ -7,7 +7,7 @@ from sqlalchemy.orm import joinedload
 from aspen.api.views.auth import create_user_if_not_exists
 from aspen.auth.auth0_management import Auth0Client
 from aspen.database.models import User
-from aspen.test_infra.models.usergroup import group_factory, user_factory
+from aspen.test_infra.models.usergroup import group_factory, userrole_factory
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
@@ -103,7 +103,7 @@ async def test_dont_create_new_user_if_exists(
         "email": "hello@czgenepi.org",
     }
     group = group_factory(auth0_org_id=userinfo["org_id"])
-    user = user_factory(auth0_user_id=userinfo["sub"], group=group)
+    user = await userrole_factory(async_session, auth0_user_id=userinfo["sub"], group=group)
     async_session.add(user)
     await start_new_transaction(async_session)
     await create_user_if_not_exists(async_session, auth0_apiclient, userinfo)

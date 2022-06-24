@@ -10,7 +10,7 @@ from aspen.api.views.tests.data.auth0_mock_responses import (
 )
 from aspen.auth.auth0_management import Auth0Client
 from aspen.test_infra.models.location import location_factory
-from aspen.test_infra.models.usergroup import group_factory, user_factory
+from aspen.test_infra.models.usergroup import group_factory, userrole_factory
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
@@ -20,15 +20,15 @@ async def test_list_members(
     http_client: AsyncClient, async_session: AsyncSession
 ) -> None:
     group = group_factory()
-    user = user_factory(
+    user = await userrole_factory(async_session, 
         group, name="Bob", auth0_user_id="testid02", email="bob@dph.org"
     )
-    user2 = user_factory(
+    user2 = await userrole_factory(async_session, 
         group,
         name="Alice",
         auth0_user_id="testid01",
         email="alice@dph.org",
-        group_admin=True,
+        roles=["admin"]
     )
     async_session.add(group)
     await async_session.commit()
@@ -67,10 +67,10 @@ async def test_list_members_unauthorized(
 ) -> None:
     group = group_factory()
     group2 = group_factory(name="test_group2")
-    user = user_factory(
+    user = await userrole_factory(async_session, 
         group, name="Bob", auth0_user_id="testid02", email="bob@dph.org"
     )
-    user2 = user_factory(
+    user2 = await userrole_factory(async_session, 
         group2, name="Alice", auth0_user_id="testid01", email="alice@dph.org"
     )
     async_session.add_all([group, group2, user, user2])
@@ -89,7 +89,7 @@ async def test_send_group_invitations(
     async_session: AsyncSession,
 ) -> None:
     group = group_factory()
-    user = user_factory(group)
+    user = await userrole_factory(async_session, group)
     async_session.add_all([group, user])
     await async_session.commit()
 
@@ -129,7 +129,7 @@ async def test_list_group_invitations(
     auth0_apiclient: Auth0Client, http_client: AsyncClient, async_session: AsyncSession
 ) -> None:
     group = group_factory()
-    user = user_factory(group)
+    user = await userrole_factory(async_session, group)
     async_session.add_all([group, user])
     await async_session.commit()
 
@@ -155,10 +155,10 @@ async def test_list_group_invitations_unauthorized(
 ) -> None:
     group = group_factory()
     group2 = group_factory(name="test_group2")
-    user = user_factory(
+    user = await userrole_factory(async_session, 
         group, name="Bob", auth0_user_id="testid02", email="bob@dph.org"
     )
-    user2 = user_factory(
+    user2 = await userrole_factory(async_session, 
         group2, name="Alice", auth0_user_id="testid01", email="alice@dph.org"
     )
     async_session.add_all([group, group2, user, user2])
@@ -174,7 +174,7 @@ async def test_create_group(
     auth0_apiclient: Auth0Client, http_client: AsyncClient, async_session: AsyncSession
 ) -> None:
     group = group_factory(division="California", location="San Mateo County")
-    user = user_factory(
+    user = await userrole_factory(async_session, 
         group,
         name="Alice",
         auth0_user_id="admin_id_01",
@@ -226,7 +226,7 @@ async def test_create_group_unauthorized(
     http_client: AsyncClient, async_session: AsyncSession
 ) -> None:
     group = group_factory(division="California", location="San Mateo County")
-    user = user_factory(
+    user = await userrole_factory(async_session, 
         group,
         name="Alice",
         auth0_user_id="auth0_id_01",

@@ -12,7 +12,7 @@ from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
-from aspen.test_infra.models.usergroup import group_factory, user_factory
+from aspen.test_infra.models.usergroup import group_factory, userrole_factory
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
@@ -60,8 +60,12 @@ async def create_phylotree_with_inputs(
     mock_s3_resource: boto3.resource, async_session: AsyncSession, owner_group: Group
 ):
     username = "owner"
-    user = user_factory(
-        owner_group, name=username, auth0_user_id=username, email=username
+    user = await userrole_factory(
+        async_session,
+        owner_group,
+        name=username,
+        auth0_user_id=username,
+        email=username,
     )
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
@@ -98,7 +102,7 @@ async def create_phylotree(
     mock_s3_resource: boto3.resource, async_session: AsyncSession, sample_as_input=False
 ):
     owner_group = group_factory()
-    user = user_factory(owner_group)
+    user = await userrole_factory(async_session, owner_group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
@@ -154,8 +158,10 @@ async def test_tree_metadata_download(
     )
 
 
-def create_unique_user(group: Group, username: str):
-    user = user_factory(group, name=username, auth0_user_id=username, email=username)
+async def create_unique_user(db: AsyncSession, group: Group, username: str):
+    user = await userrole_factory(
+        db, group, name=username, auth0_user_id=username, email=username
+    )
     return user
 
 
@@ -172,9 +178,11 @@ async def test_private_id_matrix(
     private_ids_group = group_factory(name="private_ids_group")
     noaccess_group = group_factory(name="noaccess_group")
     viewer_group = group_factory(name="viewer_group")
-    viewer_user = create_unique_user(viewer_group, "viewer")
-    private_ids_user = create_unique_user(private_ids_group, "private_ids")
-    noaccess_user = create_unique_user(noaccess_group, "noaccess")
+    viewer_user = await create_unique_user(async_session, viewer_group, "viewer")
+    private_ids_user = await create_unique_user(
+        async_session, private_ids_group, "private_ids"
+    )
+    noaccess_user = await create_unique_user(async_session, noaccess_group, "noaccess")
     phylo_tree, phylo_run, samples = await create_phylotree_with_inputs(
         mock_s3_resource, async_session, owner_group
     )

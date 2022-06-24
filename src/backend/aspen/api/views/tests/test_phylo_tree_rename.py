@@ -10,7 +10,7 @@ from aspen.database.models import CanSee, DataType
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
 from aspen.test_infra.models.sample import sample_factory
-from aspen.test_infra.models.usergroup import group_factory, user_factory
+from aspen.test_infra.models.usergroup import group_factory, userrole_factory
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
@@ -57,7 +57,7 @@ async def test_phylo_tree_rename(
             data_type=DataType.SEQUENCES,
         )
     )
-    user = user_factory(viewer_group)
+    user = await userrole_factory(async_session, viewer_group)
     async_session.add_all(
         [viewer_group, can_see_group, wrong_can_see_group, no_can_see_group]
     )
@@ -143,7 +143,7 @@ async def test_phylo_tree_rename_admin(
     viewer is an admin.  Verify that the nodes are renamed correctly."""
     viewer_group = group_factory()
     owner_group = group_factory("no_can_see")
-    user = user_factory(viewer_group)
+    user = await userrole_factory(async_session, viewer_group)
     viewer_group.can_see = []
     async_session.add_all([viewer_group, owner_group])
 
