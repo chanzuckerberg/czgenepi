@@ -98,7 +98,7 @@ export default function NavBarLanding(): JSX.Element {
           <HeaderTopLinks>
             {userInfo ? null : (
               <TextLink href={ROUTES.RESOURCES} target="_blank">
-                Resources
+                Learning Center
               </TextLink>
             )}
             {userInfo ? null : (
@@ -152,7 +152,7 @@ export default function NavBarLanding(): JSX.Element {
                 rel="noreferrer"
                 aria-label="View the Aspen Help page (opens in new window)"
               >
-                Resources
+                Learning Center
               </MobileNavLink>
               <MobileNavSeparator
                 style={menuOpen ? { opacity: "1" } : { opacity: "0" }}
