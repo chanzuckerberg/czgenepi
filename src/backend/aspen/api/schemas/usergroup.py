@@ -39,11 +39,18 @@ class UserUpdateRequest(BaseRequest):
     acknowledged_policy_version: Optional[datetime.date] = None
 
 
+class GroupRoleResponse(BaseResponse):
+    id: int
+    name: str
+    roles: List[str]
+
+
 # Only expose split id and groups to the user it belongs to.
 class UserMeResponse(UserBaseResponse):
     split_id: str
     group: GroupResponse
     group_admin: bool
+    groups: List[GroupRoleResponse]
 
 
 class GroupInvitationsRequest(BaseRequest):

@@ -20,6 +20,18 @@ router = APIRouter()
 async def get_current_user(
     request: Request, db: AsyncSession = Depends(get_db), user=Depends(get_auth_user)
 ) -> UserMeResponse:
+    groups = {}
+    for row in user.user_roles:
+        if groups.get(row.group.id):
+            groups[row.group.id]["roles"].append(row.role.name)
+        else:
+            groups[row.group.id] = {
+                "id": row.group.id,
+                "name": row.group.name,
+                "roles": [row.role.name],
+            }
+    user.groups = list(groups.values())
+
     return UserMeResponse.from_orm(user)
 
 
