@@ -8,7 +8,7 @@ from aspen.database.models import CanSee, DataType, Sample
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
-from aspen.test_infra.models.usergroup import group_factory, user_factory
+from aspen.test_infra.models.usergroup import group_factory, userrole_factory
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
@@ -22,7 +22,7 @@ async def test_prepare_sequences_download(
     Test a regular sequence download for a sample submitted by the user's group
     """
     group = group_factory()
-    user = user_factory(group)
+    user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
@@ -57,8 +57,8 @@ async def test_prepare_sequences_download_no_access(
     # create a sample for one group and another viewer group
     owner_group = group_factory()
     viewer_group = group_factory(name="County")
-    viewer = user_factory(viewer_group)
-    owner = user_factory(
+    viewer = await userrole_factory(async_session, viewer_group)
+    owner = await userrole_factory(async_session, 
         owner_group,
         name="Owner",
         auth0_user_id="owner_id",
@@ -93,7 +93,7 @@ async def test_prepare_sequences_download_no_private_id_access(
     """
     owner_group = group_factory()
     viewer_group = group_factory(name="CDPH")
-    user = user_factory(viewer_group)
+    user = await userrole_factory(async_session, viewer_group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
@@ -137,8 +137,8 @@ async def test_access_matrix(
     owner_group1 = group_factory(name="group1")
     owner_group2 = group_factory(name="group2")
     viewer_group = group_factory(name="CDPH")
-    user = user_factory(viewer_group)
-    owner = user_factory(
+    user = await userrole_factory(async_session, viewer_group)
+    owner = await userrole_factory(async_session, 
         owner_group1,
         email="owner@ownersite.com",
         name="Owner User",

@@ -7,7 +7,7 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.database.models import User
-from aspen.test_infra.models.usergroup import group_factory, user_factory
+from aspen.test_infra.models.usergroup import group_factory, userrole_factory
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
@@ -15,7 +15,7 @@ pytestmark = pytest.mark.asyncio
 
 async def test_users_me(http_client: AsyncClient, async_session: AsyncSession) -> None:
     group = group_factory()
-    user = user_factory(group)
+    user = await userrole_factory(async_session, group)
     async_session.add(group)
     await async_session.commit()
 
@@ -29,6 +29,9 @@ async def test_users_me(http_client: AsyncClient, async_session: AsyncSession) -
         "group": {"id": 1, "name": "groupname"},
         "acknowledged_policy_version": None,
         "agreed_to_tos": True,
+        "groups": [
+            {"id": group.id, "name": group.name, "roles": ["member"]},
+        ]
     }
     resp_data = response.json()
     for key in expected:
@@ -40,7 +43,7 @@ async def test_usergroup_view_put_pass(
     http_client: AsyncClient, async_session: AsyncSession
 ):
     group = group_factory()
-    user = user_factory(group, agreed_to_tos=False)
+    user = await userrole_factory(async_session, group, agreed_to_tos=False)
     async_session.add(group)
     await async_session.commit()
     headers = {"user_id": user.auth0_user_id}
@@ -80,7 +83,7 @@ async def test_usergroup_view_put_fail(
     http_client: AsyncClient, async_session: AsyncSession
 ):
     group = group_factory()
-    user = user_factory(group, agreed_to_tos=False)
+    user = await userrole_factory(async_session, group, agreed_to_tos=False)
     async_session.add(group)
     await async_session.commit()
     headers = {"user_id": user.auth0_user_id}
