@@ -483,19 +483,3 @@ async def test_samples_create_view_fail_missing_required_fields(
             },
         ]
     }
-
-
-async def setup_validation_data(session: AsyncSession, client: AsyncClient):
-    group = group_factory()
-    user = await userrole_factory(async_session, group)
-    location = location_factory(
-        "North America", "USA", "California", "Santa Barbara County"
-    )
-    sample = sample_factory(group, user, location)
-    gisaid_sample = gisaid_metadata_factory()
-    session.add(group)
-    session.add(sample)
-    session.add(gisaid_sample)
-    await session.commit()
-
-    return client, sample, gisaid_sample

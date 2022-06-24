@@ -1,5 +1,5 @@
 import json
-from typing import Any, List, Optional, Sequence, Tuple
+from typing import Any, List, Optional, Tuple
 
 import pytest
 import sqlalchemy as sa
@@ -11,8 +11,6 @@ from sqlalchemy.orm.exc import NoResultFound
 from aspen.api.schemas.base import convert_datetime_to_iso_8601
 from aspen.database.models import (
     Accession,
-    CanSee,
-    DataType,
     Group,
     Location,
     Sample,
@@ -23,7 +21,11 @@ from aspen.test_infra.models.gisaid_metadata import gisaid_metadata_factory
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
-from aspen.test_infra.models.usergroup import group_factory, userrole_factory
+from aspen.test_infra.models.usergroup import (
+    group_factory,
+    grouprole_factory,
+    userrole_factory,
+)
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
@@ -304,7 +306,7 @@ async def test_samples_view_gisaid_not_eligible(
 async def _test_samples_view_cansee(
     async_session: AsyncSession,
     http_client: AsyncClient,
-    cansee_datatypes: Sequence[DataType],
+    group_roles: List[str],
     user_factory_kwargs: Optional[dict] = None,
 ) -> Tuple[Sample, UploadedPathogenGenome, Any]:
     user_factory_kwargs = user_factory_kwargs or {}
@@ -329,13 +331,12 @@ async def _test_samples_view_cansee(
     )
 
     uploaded_pathogen_genome = uploaded_pathogen_genome_factory(sample)
-    for cansee_datatype in cansee_datatypes:
-        CanSee(
-            viewer_group=viewer_group,
-            owner_group=owner_group,
-            data_type=cansee_datatype,
+    roles = []
+    for role in group_roles:
+        roles.extend(
+            await grouprole_factory(async_session, owner_group, viewer_group, role)
         )
-    async_session.add_all((owner_group, viewer_group))
+    async_session.add_all(roles + [owner_group, viewer_group])
     await async_session.commit()
 
     auth_headers = {"user_id": user.auth0_user_id}
@@ -358,7 +359,7 @@ async def test_samples_view_no_cansee(
     _, _, response = await _test_samples_view_cansee(
         async_session,
         http_client,
-        cansee_datatypes=(),
+        group_roles=[],
     )
     assert response["samples"] == []
 
@@ -371,7 +372,7 @@ async def test_samples_view_system_admin(
     sample, uploaded_pathogen_genome, response = await _test_samples_view_cansee(
         async_session,
         http_client,
-        cansee_datatypes=(),
+        group_roles=[],
         user_factory_kwargs={
             "system_admin": True,
         },
@@ -385,38 +386,14 @@ async def test_samples_view_system_admin(
     assert private == {True, False}
 
 
-async def test_samples_view_cansee_trees(
-    async_session: AsyncSession,
-    http_client: AsyncClient,
-):
-    _, _, response = await _test_samples_view_cansee(
-        async_session,
-        http_client,
-        cansee_datatypes=(DataType.TREES,),
-    )
-    assert response["samples"] == []
-
-
-async def test_samples_view_cansee_sequences(
-    async_session: AsyncSession,
-    http_client: AsyncClient,
-):
-    _, _, response = await _test_samples_view_cansee(
-        async_session,
-        http_client,
-        cansee_datatypes=(DataType.SEQUENCES,),
-    )
-    assert response["samples"] == []
-
-
-async def test_samples_view_cansee_metadata(
+async def test_samples_view_cansee(
     async_session: AsyncSession,
     http_client: AsyncClient,
 ):
     sample, uploaded_pathogen_genome, response = await _test_samples_view_cansee(
         async_session,
         http_client,
-        cansee_datatypes=(DataType.METADATA,),
+        group_roles=["viewer"],
     )
 
     # no private identifier in the output.
@@ -424,25 +401,6 @@ async def test_samples_view_cansee_metadata(
     assert len(samples) == 1
     assert isinstance(samples[0].get("public_identifier", None), str)
     assert samples[0].get("private_identifier", None) is None
-
-
-async def test_samples_view_cansee_private_identifiers(
-    async_session: AsyncSession,
-    http_client: AsyncClient,
-):
-    """This state really makes no sense because why would you be able to see private
-    identifiers but not metadata??  But we'll ensure it still does the right thing."""
-    _, _, response = await _test_samples_view_cansee(
-        async_session,
-        http_client,
-        cansee_datatypes=(DataType.PRIVATE_IDENTIFIERS,),
-    )
-
-    # yes private identifier in the output.
-    samples = response["samples"]
-    assert len(samples) == 1
-    assert isinstance(samples[0].get("public_identifier", None), str)
-    assert isinstance(samples[0].get("private_identifier", None), str)
 
 
 async def test_samples_view_cansee_all(
@@ -453,7 +411,7 @@ async def test_samples_view_cansee_all(
     sample, uploaded_pathogen_genome, response = await _test_samples_view_cansee(
         async_session,
         http_client,
-        cansee_datatypes=(DataType.METADATA, DataType.PRIVATE_IDENTIFIERS),
+        group_roles=["viewer"],
     )
 
     # yes private identifier in the output.
@@ -473,7 +431,7 @@ async def test_samples_view_cansee_all(
                 "status": "Accepted",
                 "gisaid_id": sample.accessions[0].accession,
             },
-            "private_identifier": sample.private_identifier,
+            "private_identifier": None,
             "public_identifier": sample.public_identifier,
             "upload_date": convert_datetime_to_iso_8601(
                 uploaded_pathogen_genome.upload_date
@@ -492,7 +450,7 @@ async def test_samples_view_cansee_all(
             },
             "private": False,
             "submitting_group": {
-                "id": 1,
+                "id": sample.submitting_group.id,
                 "name": "groupname",
             },
             "uploaded_by": {
@@ -745,8 +703,11 @@ async def test_delete_sample_failures(
 
     # A group that doesn't have access to our sample.
     group2 = group_factory(name="The Other Group")
-    user2 = await userrole_factory(async_session, 
-        group2, email="test_user@othergroup.org", auth0_user_id="other_test_auth0_id"
+    user2 = await userrole_factory(
+        async_session,
+        group2,
+        email="test_user@othergroup.org",
+        auth0_user_id="other_test_auth0_id",
     )
     location2 = location_factory(
         "North America", "USA", "California", "San Francisco County"
@@ -794,8 +755,11 @@ async def make_test_samples(
     async_session: AsyncSession, suffix=None
 ) -> Tuple[User, Group, List[Sample], Location]:
     group = group_factory(name=f"testgroup{suffix}")
-    user = await userrole_factory(async_session, 
-        group, email=f"testemail{suffix}", auth0_user_id=f"testemail{suffix}"
+    user = await userrole_factory(
+        async_session,
+        group,
+        email=f"testemail{suffix}",
+        auth0_user_id=f"testemail{suffix}",
     )
     location1 = location_factory(
         "North America", "USA", "California", f"Santa Barbara County{suffix}"

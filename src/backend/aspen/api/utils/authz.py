@@ -21,20 +21,12 @@ def authz_sample_filters(query: Query, sample_ids: Set[str], user: User) -> Quer
     cansee_groups: Set[int] = {
         cansee.owner_group_id
         for cansee in user.group.can_see
-        if cansee.data_type == DataType.SEQUENCES
+        if cansee.data_type == DataType.TREES
     }
     # add the user's own group
     cansee_groups.add(user.group_id)
 
-    # Which groups can this user query private identifiers for?
-    # NOTE - this asssumes PRIVATE_IDENTIFIERS permission is a superset of SEQUENCES
-    cansee_groups_private_identifiers: Set[int] = {
-        cansee.owner_group_id
-        for cansee in user.group.can_see
-        if cansee.data_type == DataType.PRIVATE_IDENTIFIERS
-    }
-    # add the user's own group
-    cansee_groups_private_identifiers.add(user.group_id)
+    cansee_groups_private_identifiers: Set[int] = {user.group_id}
 
     cansee_groups.add(user.group_id)
     query = query.filter(
@@ -73,20 +65,12 @@ def authz_samples_cansee(
     cansee_groups: Set[int] = {
         cansee.owner_group_id
         for cansee in user.group.can_see
-        if cansee.data_type == DataType.METADATA
+        if cansee.data_type == DataType.TREES
     }
     # add the user's own group
     cansee_groups.add(user.group_id)
 
-    # Which groups can this user query private identifiers for?
-    # NOTE - this asssumes PRIVATE_IDENTIFIERS permission is a superset of METADATA
-    cansee_groups_private_identifiers: Set[int] = {
-        cansee.owner_group_id
-        for cansee in user.group.can_see
-        if cansee.data_type == DataType.PRIVATE_IDENTIFIERS
-    }
-    # add the user's own group
-    cansee_groups_private_identifiers.add(user.group_id)
+    cansee_groups_private_identifiers: Set[int] = {user.group_id}
 
     public_identifier_filter = True
     private_identifier_filter = True

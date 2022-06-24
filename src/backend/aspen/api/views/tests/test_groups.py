@@ -39,15 +39,16 @@ async def test_list_members(
     http_client: AsyncClient, async_session: AsyncSession
 ) -> None:
     group = group_factory()
-    user = await userrole_factory(async_session, 
-        group, name="Bob", auth0_user_id="testid02", email="bob@dph.org"
+    user = await userrole_factory(
+        async_session, group, name="Bob", auth0_user_id="testid02", email="bob@dph.org"
     )
-    user2 = await userrole_factory(async_session, 
+    user2 = await userrole_factory(
+        async_session,
         group,
         name="Alice",
         auth0_user_id="testid01",
         email="alice@dph.org",
-        roles=["admin"]
+        roles=["admin"],
     )
     async_session.add(group)
     await async_session.commit()
@@ -86,11 +87,15 @@ async def test_list_members_unauthorized(
 ) -> None:
     group = group_factory()
     group2 = group_factory(name="test_group2")
-    user = await userrole_factory(async_session, 
-        group, name="Bob", auth0_user_id="testid02", email="bob@dph.org"
+    user = await userrole_factory(
+        async_session, group, name="Bob", auth0_user_id="testid02", email="bob@dph.org"
     )
-    user2 = await userrole_factory(async_session, 
-        group2, name="Alice", auth0_user_id="testid01", email="alice@dph.org"
+    user2 = await userrole_factory(
+        async_session,
+        group2,
+        name="Alice",
+        auth0_user_id="testid01",
+        email="alice@dph.org",
     )
     async_session.add_all([group, group2, user, user2])
     await async_session.commit()
@@ -174,11 +179,15 @@ async def test_list_group_invitations_unauthorized(
 ) -> None:
     group = group_factory()
     group2 = group_factory(name="test_group2")
-    user = await userrole_factory(async_session, 
-        group, name="Bob", auth0_user_id="testid02", email="bob@dph.org"
+    user = await userrole_factory(
+        async_session, group, name="Bob", auth0_user_id="testid02", email="bob@dph.org"
     )
-    user2 = await userrole_factory(async_session, 
-        group2, name="Alice", auth0_user_id="testid01", email="alice@dph.org"
+    user2 = await userrole_factory(
+        async_session,
+        group2,
+        name="Alice",
+        auth0_user_id="testid01",
+        email="alice@dph.org",
     )
     async_session.add_all([group, group2, user, user2])
     await async_session.commit()
@@ -193,7 +202,8 @@ async def test_create_group(
     auth0_apiclient: Auth0Client, http_client: AsyncClient, async_session: AsyncSession
 ) -> None:
     group = group_factory(division="California", location="San Mateo County")
-    user = await userrole_factory(async_session, 
+    user = await userrole_factory(
+        async_session,
         group,
         name="Alice",
         auth0_user_id="admin_id_01",
@@ -245,7 +255,8 @@ async def test_create_group_unauthorized(
     http_client: AsyncClient, async_session: AsyncSession
 ) -> None:
     group = group_factory(division="California", location="San Mateo County")
-    user = await userrole_factory(async_session, 
+    user = await userrole_factory(
+        async_session,
         group,
         name="Alice",
         auth0_user_id="auth0_id_01",

@@ -42,8 +42,12 @@ async def test_delete_phylo_run_matrix(
     """
     group = group_factory(name="group1")
     group2 = group_factory(name="group2")
-    user = await userrole_factory(async_session, group, auth0_user_id="user1", email="user1")
-    user2 = await userrole_factory(async_session, group2, auth0_user_id="user2", email="user2")
+    user = await userrole_factory(
+        async_session, group, auth0_user_id="user1", email="user1"
+    )
+    user2 = await userrole_factory(
+        async_session, group2, auth0_user_id="user2", email="user2"
+    )
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )

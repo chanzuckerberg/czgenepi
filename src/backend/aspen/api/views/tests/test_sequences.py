@@ -4,11 +4,15 @@ import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from aspen.database.models import CanSee, DataType, Sample
+from aspen.database.models import Sample
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
-from aspen.test_infra.models.usergroup import group_factory, userrole_factory
+from aspen.test_infra.models.usergroup import (
+    group_factory,
+    grouprole_factory,
+    userrole_factory,
+)
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
@@ -58,7 +62,8 @@ async def test_prepare_sequences_download_no_access(
     owner_group = group_factory()
     viewer_group = group_factory(name="County")
     viewer = await userrole_factory(async_session, viewer_group)
-    owner = await userrole_factory(async_session, 
+    owner = await userrole_factory(
+        async_session,
         owner_group,
         name="Owner",
         auth0_user_id="owner_id",
@@ -100,12 +105,8 @@ async def test_prepare_sequences_download_no_private_id_access(
     sample = sample_factory(owner_group, user, location)
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     # give the viewer group access to the sequences from the owner group
-    CanSee(
-        viewer_group=viewer_group,
-        owner_group=owner_group,
-        data_type=DataType.SEQUENCES,
-    )
-    async_session.add_all((owner_group, viewer_group, user, sample))
+    group_roles = await grouprole_factory(async_session, owner_group, viewer_group)
+    async_session.add_all(group_roles + [owner_group, viewer_group, user, sample])
     await async_session.commit()
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
@@ -138,7 +139,8 @@ async def test_access_matrix(
     owner_group2 = group_factory(name="group2")
     viewer_group = group_factory(name="CDPH")
     user = await userrole_factory(async_session, viewer_group)
-    owner = await userrole_factory(async_session, 
+    owner = await userrole_factory(
+        async_session,
         owner_group1,
         email="owner@ownersite.com",
         name="Owner User",
@@ -148,16 +150,9 @@ async def test_access_matrix(
         "North America", "USA", "California", "Santa Barbara County"
     )
     # give the viewer group access to the sequences from the owner group
-    CanSee(
-        viewer_group=viewer_group,
-        owner_group=owner_group1,
-        data_type=DataType.SEQUENCES,
-    )
-    CanSee(
-        viewer_group=viewer_group,
-        owner_group=owner_group2,
-        data_type=DataType.PRIVATE_IDENTIFIERS,
-    )
+    roles = []
+    roles.extend(await grouprole_factory(async_session, owner_group1, viewer_group))
+    roles.extend(await grouprole_factory(async_session, owner_group2, viewer_group))
     sample1 = sample_factory(
         owner_group1,
         user,
@@ -194,7 +189,7 @@ async def test_access_matrix(
     uploaded_pathogen_genome_factory(sample3, sequence="ATC")
     uploaded_pathogen_genome_factory(sample4, sequence="CCC")
 
-    async_session.add_all((owner_group1, owner_group2, viewer_group, owner))
+    async_session.add_all(roles + [owner_group1, owner_group2, viewer_group, owner])
     await async_session.commit()
 
     # Make sure sample owners can see their own (shared & private) samples.
@@ -235,17 +230,18 @@ async def test_access_matrix(
             "samples": samples_public_ids,
             "expected_public": [
                 sample1,
+                sample2,
             ],
             "expected_private": [
                 sample3,
             ],
-            "not_expected": [sample2, sample4],
+            "not_expected": [sample4],
         },
         {
             "samples": samples_private_ids,
             "expected_public": [],
-            "expected_private": [sample2, sample3],
-            "not_expected": [sample1, sample4],
+            "expected_private": [sample3],
+            "not_expected": [sample1, sample2, sample4],
         },
     ]
     for case in matrix:
@@ -261,6 +257,7 @@ async def test_access_matrix(
             == f"attachment; filename={expected_filename}"
         )
         file_contents = str(res.content, encoding="UTF-8")
+        print(file_contents)
 
         # Assert that we get the correct public, private id's and sequences.
         for sample in case["expected_public"]:

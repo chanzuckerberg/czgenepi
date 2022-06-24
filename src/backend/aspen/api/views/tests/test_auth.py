@@ -103,7 +103,9 @@ async def test_dont_create_new_user_if_exists(
         "email": "hello@czgenepi.org",
     }
     group = group_factory(auth0_org_id=userinfo["org_id"])
-    user = await userrole_factory(async_session, auth0_user_id=userinfo["sub"], group=group)
+    user = await userrole_factory(
+        async_session, auth0_user_id=userinfo["sub"], group=group
+    )
     async_session.add(user)
     await start_new_transaction(async_session)
     await create_user_if_not_exists(async_session, auth0_apiclient, userinfo)

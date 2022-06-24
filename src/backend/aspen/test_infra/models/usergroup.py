@@ -1,10 +1,11 @@
-from typing import Optional
+from typing import List, Optional
 from uuid import uuid1
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.auth.role_manager import RoleManager
-from aspen.database.models import Group, Location, User
+from aspen.database.models import CanSee, DataType, Group, Location, User
+from aspen.database.models.base import base
 
 
 def group_factory(
@@ -89,3 +90,19 @@ async def userrole_factory(
             await RoleManager.generate_user_role(db, user, group, role)
         )
     return user
+
+
+async def grouprole_factory(
+    db: AsyncSession, owner_group: Group, viewer_group: Group, role_name: str = "viewer"
+) -> List[base]:
+    data_types = [DataType.TREES]
+    model_objs = []
+    for dt in data_types:
+        model_objs.append(
+            CanSee(viewer_group=viewer_group, owner_group=owner_group, data_type=dt)
+        )
+
+    model_objs.append(
+        await RoleManager.generate_group_role(db, owner_group, viewer_group, role_name)
+    )
+    return model_objs
