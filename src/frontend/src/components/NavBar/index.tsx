@@ -5,7 +5,7 @@ import AppNavBar from "src/components/NavBar/components/AppNavBar";
 import StaticPageNavBar from "src/components/NavBar/components/StaticPageNavBar";
 
 // we show a different nav bar for paths in the app vs not in the app
-const pathsNotInApp = [
+const pathsNotInApp: string[] = [
   ROUTES.HOMEPAGE,
   ROUTES.FAQ,
   ROUTES.PRIVACY,
