@@ -33,7 +33,7 @@ async def test_users_me(http_client: AsyncClient, async_session: AsyncSession) -
         "agreed_to_tos": True,
         "groups": [
             {"id": group.id, "name": group.name, "roles": ["member"]},
-        ]
+        ],
     }
     resp_data = response.json()
     for key in expected:

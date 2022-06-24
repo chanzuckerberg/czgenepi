@@ -745,8 +745,11 @@ async def test_delete_sample_failures(
 
     # A group that doesn't have access to our sample.
     group2 = group_factory(name="The Other Group")
-    user2 = await userrole_factory(async_session, 
-        group2, email="test_user@othergroup.org", auth0_user_id="other_test_auth0_id"
+    user2 = await userrole_factory(
+        async_session,
+        group2,
+        email="test_user@othergroup.org",
+        auth0_user_id="other_test_auth0_id",
     )
     location2 = location_factory(
         "North America", "USA", "California", "San Francisco County"
@@ -794,8 +797,11 @@ async def make_test_samples(
     async_session: AsyncSession, suffix=None
 ) -> Tuple[User, Group, List[Sample], Location]:
     group = group_factory(name=f"testgroup{suffix}")
-    user = await userrole_factory(async_session, 
-        group, email=f"testemail{suffix}", auth0_user_id=f"testemail{suffix}"
+    user = await userrole_factory(
+        async_session,
+        group,
+        email=f"testemail{suffix}",
+        auth0_user_id=f"testemail{suffix}",
     )
     location1 = location_factory(
         "North America", "USA", "California", f"Santa Barbara County{suffix}"

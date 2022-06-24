@@ -119,7 +119,8 @@ async def test_update_phylo_tree_wrong_group(
         phylo_tree,
     ) = await make_shared_test_data(async_session)
     group_that_did_not_make_tree = group_factory(name="i_want_to_see_trees")
-    user_that_did_not_make_tree = await userrole_factory(async_session, 
+    user_that_did_not_make_tree = await userrole_factory(
+        async_session,
         group_that_did_not_make_tree,
         name="trying_to_see",
         email="trying_to_see@hotmail.com",

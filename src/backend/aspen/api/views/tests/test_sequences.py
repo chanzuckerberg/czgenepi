@@ -58,7 +58,8 @@ async def test_prepare_sequences_download_no_access(
     owner_group = group_factory()
     viewer_group = group_factory(name="County")
     viewer = await userrole_factory(async_session, viewer_group)
-    owner = await userrole_factory(async_session, 
+    owner = await userrole_factory(
+        async_session,
         owner_group,
         name="Owner",
         auth0_user_id="owner_id",
@@ -138,7 +139,8 @@ async def test_access_matrix(
     owner_group2 = group_factory(name="group2")
     viewer_group = group_factory(name="CDPH")
     user = await userrole_factory(async_session, viewer_group)
-    owner = await userrole_factory(async_session, 
+    owner = await userrole_factory(
+        async_session,
         owner_group1,
         email="owner@ownersite.com",
         name="Owner User",

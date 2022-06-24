@@ -35,6 +35,7 @@ def set_user_groups(user):
             }
     user.groups = list(groups.values())
 
+
 @router.get("/me", response_model=UserMeResponse)
 async def get_current_user(
     request: Request, db: AsyncSession = Depends(get_db), user=Depends(get_auth_user)

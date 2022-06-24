@@ -328,7 +328,10 @@ async def test_create_invalid_phylo_run_sample_cannot_see(
 
     group2 = group_factory(name="The Other Group")
     user2 = await userrole_factory(
-        async_session, group2, email="test_user@othergroup.org", auth0_user_id="other_test_auth0_id"
+        async_session,
+        group2,
+        email="test_user@othergroup.org",
+        auth0_user_id="other_test_auth0_id",
     )
     location2 = location_factory(
         "North America", "USA", "California", "San Francisco County"
