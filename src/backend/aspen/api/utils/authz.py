@@ -17,18 +17,10 @@ def authz_sample_filters(query: Query, sample_ids: Set[str], user: User) -> Quer
         )
         return query
 
-    # Which groups can this user query public identifiers for?
-    cansee_groups: Set[int] = {
-        cansee.owner_group_id
-        for cansee in user.group.can_see
-        if cansee.data_type == DataType.TREES
-    }
-    # add the user's own group
-    cansee_groups.add(user.group_id)
-
+    # Users can only see samples and private identifiers for their own group.
+    cansee_groups: Set[int] = {user.group_id}
     cansee_groups_private_identifiers: Set[int] = {user.group_id}
 
-    cansee_groups.add(user.group_id)
     query = query.filter(
         or_(
             and_(

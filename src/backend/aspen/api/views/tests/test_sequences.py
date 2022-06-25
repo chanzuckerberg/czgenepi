@@ -88,13 +88,12 @@ async def test_prepare_sequences_download_no_access(
     assert res.content == b""
 
 
-async def test_prepare_sequences_download_no_private_id_access(
+async def test_prepare_sequences_download_viewer_no_access(
     async_session: AsyncSession,
     http_client: AsyncClient,
 ):
     """
-    Test that we use public ids in the fasta file if the requester only has access to the samples
-    sequence data but not private ids
+    Test that we don't allow download of other groups' sequences
     """
     owner_group = group_factory()
     viewer_group = group_factory(name="CDPH")
@@ -116,15 +115,7 @@ async def test_prepare_sequences_download_no_private_id_access(
     res = await http_client.post("/v2/sequences/", headers=auth_headers, json=data)
 
     assert res.status_code == 200
-    expected_filename = f"{user.group.name}_sample_sequences.fasta"
-    assert (
-        res.headers["Content-Disposition"]
-        == f"attachment; filename={expected_filename}"
-    )
-    file_contents = str(res.content, encoding="UTF-8")
-
-    # Assert that the public id was used
-    assert sample.public_identifier in file_contents
+    assert res.content == b""
 
 
 async def test_access_matrix(
@@ -228,14 +219,11 @@ async def test_access_matrix(
     matrix: list[SequenceTestCase] = [
         {
             "samples": samples_public_ids,
-            "expected_public": [
-                sample1,
-                sample2,
-            ],
+            "expected_public": [],
             "expected_private": [
                 sample3,
             ],
-            "not_expected": [sample4],
+            "not_expected": [sample1, sample2, sample4],
         },
         {
             "samples": samples_private_ids,
