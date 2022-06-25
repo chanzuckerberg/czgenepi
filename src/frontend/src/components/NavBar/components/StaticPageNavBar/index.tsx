@@ -25,6 +25,11 @@ import {
   TextLink,
 } from "./style";
 
+/*
+ * This nav bar is shown when a user is either not authenticated or
+ * viewing pages that are "outside" the application, such as the
+ * landing page, privacy page, etc.
+ */
 export default function StaticPageNavBar(): JSX.Element {
   const [menuOpen, setMenuOpen] = useState(false);
 

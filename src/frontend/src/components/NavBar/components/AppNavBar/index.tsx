@@ -19,6 +19,11 @@ import {
   StyledIcon,
 } from "./style";
 
+/*
+ * This nav bar is shown when a user is both authenticated and
+ * viewing pages that are "inside" the application
+ * aka behind auth logic
+ */
 const AppNavBar = (): JSX.Element => {
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
   const [isGroupDetailsDropdownOpen, setIsGroupDetailsDropdownOpen] =
