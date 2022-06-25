@@ -5,7 +5,7 @@ import CloseIcon from "src/common/images/close-icon.svg";
 import HeaderLogo from "src/common/images/gen-epi-logo.svg";
 import { useUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
-import UserMenu from "./components/UserMenu";
+import UserMenu from "../RightNav/components/UserMenu";
 import {
   Bar,
   ButtonLink,
@@ -25,7 +25,12 @@ import {
   TextLink,
 } from "./style";
 
-export default function NavBarLanding(): JSX.Element {
+/*
+ * This nav bar is shown when a user is either not authenticated or
+ * viewing pages that are "outside" the application, such as the
+ * landing page, privacy page, etc.
+ */
+export default function StaticPageNavBar(): JSX.Element {
   const [menuOpen, setMenuOpen] = useState(false);
 
   function toggleMobileNav() {
@@ -50,11 +55,11 @@ export default function NavBarLanding(): JSX.Element {
 
   const orgSplash = hasOrg();
 
-  let MobileSignInLink;
-  let SignInLink;
+  let MobileRightNav;
+  let RightNav;
 
   if (userInfo) {
-    MobileSignInLink = (
+    MobileRightNav = (
       <MobileNavLink
         href={ROUTES.UPLOAD_STEP1}
         style={menuOpen ? { opacity: "1" } : { opacity: "0" }}
@@ -65,25 +70,43 @@ export default function NavBarLanding(): JSX.Element {
       </MobileNavLink>
     );
 
-    SignInLink = <ButtonLink href={ROUTES.UPLOAD_STEP1}>Upload</ButtonLink>;
+    RightNav = <UserMenu user={userInfo.name} />;
   } else {
-    MobileSignInLink = (
-      <MobileNavLink
-        href={API_URL + API.LOG_IN}
-        style={menuOpen ? { opacity: "1" } : { opacity: "0" }}
-        rel="noreferrer"
-        aria-label="Log into CZI GEN EPI"
-      >
-        Sign In
-      </MobileNavLink>
+    MobileRightNav = (
+      <>
+        <MobileNavLink
+          href={API_URL + API.LOG_IN}
+          style={menuOpen ? { opacity: "1" } : { opacity: "0" }}
+          rel="noreferrer"
+          aria-label="Log into CZI GEN EPI"
+        >
+          Sign In
+        </MobileNavLink>
+        <MobileNavLink
+          href={ROUTES.REQUEST_ACCESS}
+          style={menuOpen ? { opacity: "1" } : { opacity: "0" }}
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Request access to Aspen (opens in new window)"
+        >
+          Request Access
+        </MobileNavLink>
+      </>
     );
-    SignInLink = (
-      <ButtonLink
-        data-test-id="navbar-sign-in-link"
-        href={API_URL + API.LOG_IN}
-      >
-        Sign in
-      </ButtonLink>
+
+    RightNav = (
+      <>
+        <TextLink href={ROUTES.RESOURCES} target="_blank">
+          Resources
+        </TextLink>
+        <ButtonLink
+          data-test-id="navbar-sign-in-link"
+          href={API_URL + API.LOG_IN}
+        >
+          Sign in
+        </ButtonLink>
+        <ButtonLink href={ROUTES.REQUEST_ACCESS}>Request Access</ButtonLink>
+      </>
     );
   }
 
@@ -95,20 +118,7 @@ export default function NavBarLanding(): JSX.Element {
             <HeaderLogo data-test-id="logo" />
             {orgSplash ? <OrgSplash>{orgSplash}</OrgSplash> : null}
           </HeaderLogoContainer>
-          <HeaderTopLinks>
-            {userInfo ? null : (
-              <TextLink href={ROUTES.RESOURCES} target="_blank">
-                Resources
-              </TextLink>
-            )}
-            {userInfo ? null : (
-              <ButtonLink href={ROUTES.REQUEST_ACCESS}>
-                Request Access
-              </ButtonLink>
-            )}
-            {SignInLink}
-            {userInfo ? <UserMenu user={userInfo.name} /> : null}
-          </HeaderTopLinks>
+          <HeaderTopLinks>{RightNav}</HeaderTopLinks>
           <MobileNavToggle
             onClick={toggleMobileNav}
             onKeyDown={toggleMobileNav}
@@ -157,18 +167,7 @@ export default function NavBarLanding(): JSX.Element {
               <MobileNavSeparator
                 style={menuOpen ? { opacity: "1" } : { opacity: "0" }}
               ></MobileNavSeparator>
-              {MobileSignInLink}
-              {userInfo ? null : (
-                <MobileNavLink
-                  href={ROUTES.REQUEST_ACCESS}
-                  style={menuOpen ? { opacity: "1" } : { opacity: "0" }}
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label="Request access to Aspen (opens in new window)"
-                >
-                  Request Access
-                </MobileNavLink>
-              )}
+              {MobileRightNav}
             </MobileNavLinkContainer>
           </MobileNavTray>
         </HeaderTopContainer>
