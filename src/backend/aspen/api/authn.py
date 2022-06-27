@@ -16,7 +16,7 @@ from aspen.api.deps import get_db, get_settings
 from aspen.api.settings import Settings
 from aspen.auth.auth0_management import Auth0Client
 from aspen.auth.device_auth import validate_auth_header
-from aspen.database.models import Group, GroupRole, User, UserRole, Role
+from aspen.database.models import Group, GroupRole, User, UserRole
 
 
 def get_usergroup_query(session: AsyncSession, auth0_user_id: str) -> Query:
