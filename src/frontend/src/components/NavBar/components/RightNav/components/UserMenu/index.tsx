@@ -54,17 +54,17 @@ const UserMenu = ({ user }: UserMenuProps): JSX.Element => {
         <a href={ROUTES.CONTACT_US_EMAIL} target="_blank" rel="noopener">
           <MenuItem onClick={handleClose}>Contact us</MenuItem>
         </a>
+        <a href={ROUTES.HELP_CENTER} target="_blank" rel="noopener">
+          <MenuItem onClick={handleClose}>Help Center</MenuItem>
+        </a>
         <a href={ROUTES.RESOURCES} target="_blank" rel="noopener">
-          <MenuItem onClick={handleClose}>Gen Epi Resources</MenuItem>
+          <MenuItem onClick={handleClose}>Learning Center</MenuItem>
         </a>
         <a href={ROUTES.TERMS} target="_blank" rel="noopener">
           <MenuItem onClick={handleClose}>Terms of Use</MenuItem>
         </a>
         <a href={ROUTES.PRIVACY} target="_blank" rel="noopener">
           <MenuItem onClick={handleClose}>Privacy Policy</MenuItem>
-        </a>
-        <a href={ROUTES.FAQ} target="_blank" rel="noopener">
-          <MenuItem onClick={handleClose}>FAQ</MenuItem>
         </a>
         <a href={ENV.API_URL + API.LOG_OUT}>
           <MenuItem onClick={handleClose}>Logout</MenuItem>

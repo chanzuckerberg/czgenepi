@@ -5,7 +5,7 @@ import { StyledDiv, StyledNewTabLink, StyledSpan } from "./styles";
 
 const TreeCreateHelpLink = (): JSX.Element => {
   const HREF =
-    "https://docs.google.com/document/d/1_iQgwl3hn_pjlZLX-n0alUbbhgSPZvpW_0620Hk_kB4/edit?usp=sharing";
+    "https://help.czgenepi.org/hc/en-us/articles/6712563575956-Build-on-demand-trees#customizing";
   return (
     <StyledDiv>
       <StyledNewTabLink href={HREF}>

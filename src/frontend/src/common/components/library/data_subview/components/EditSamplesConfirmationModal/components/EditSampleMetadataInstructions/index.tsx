@@ -32,18 +32,18 @@ const EditSampleMetaDataInstructions = ({
     </SampleEditTsvTemplateDownload>
   );
 
-  const HREF =
-    "https://docs.google.com/document/d/1QxNcDip31DA40SRIOmdV1I_ZC7rWDz5YQGk26Mr2kfA/edit";
-
   const instructionItems = [
     <InstructionsSemiBold key="1">
-      Please refer to the
-      <NewTabLink href={HREF}>
-        {" "}
-        Upload and Updating Metadata help documentation
+      Please refer to the Updating Metadata help documentation for detailed
+      instructions on{" "}
+      <NewTabLink href="https://help.czgenepi.org/hc/en-us/articles/6430483116180-Editing-metadata">
+        setting up your file
       </NewTabLink>{" "}
-      detailed instructions on setting up your file and troubleshooting errors
-      and warnings.
+      and{" "}
+      <NewTabLink href="https://help.czgenepi.org/hc/en-us/articles/6846628453652-Troubleshooting-guide-Updating-metadata">
+        troubleshooting errors and warnings
+      </NewTabLink>
+      .
     </InstructionsSemiBold>,
     <InstructionsNotSemiBold key="2">
       You can only import one file at a time. Importing a new file will

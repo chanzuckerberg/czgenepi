@@ -130,8 +130,9 @@ export const CreateNSTreeModal = ({
 
   const TREE_TYPE_TOOLTIP_TEXT = (
     <div>
-      Select the Tree Type best suited for the question you are trying to anwer.{" "}
-      <NewTabLink href="https://docs.google.com/document/d/1_iQgwl3hn_pjlZLX-n0alUbbhgSPZvpW_0620Hk_kB4/edit">
+      Select the Tree Type best suited for the question you are trying to
+      answer.{" "}
+      <NewTabLink href="https://help.czgenepi.org/hc/en-us/articles/6707491998996-Understand-phylogenetic-tree-types">
         Read our guide to learn more.
       </NewTabLink>
     </div>
