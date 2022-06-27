@@ -364,28 +364,6 @@ async def test_samples_view_no_cansee(
     assert response["samples"] == []
 
 
-async def test_samples_view_system_admin(
-    async_session: AsyncSession,
-    http_client: AsyncClient,
-):
-
-    sample, uploaded_pathogen_genome, response = await _test_samples_view_cansee(
-        async_session,
-        http_client,
-        group_roles=[],
-        user_factory_kwargs={
-            "system_admin": True,
-        },
-    )
-    # assert that we get both the public and private samples back
-    samples = response["samples"]
-    assert len(samples) == 2
-    private_ids = {sample["private_identifier"] for sample in samples}
-    private = {sample["private"] for sample in samples}
-    assert private_ids == {"private_identifer", "private_id"}
-    assert private == {True, False}
-
-
 async def test_samples_view_cansee(
     async_session: AsyncSession,
     http_client: AsyncClient,
