@@ -6,7 +6,7 @@ from polar.data.adapter.async_sqlalchemy2_adapter import AsyncSqlAlchemyAdapter
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.requests import Request
 
-from aspen.api.authn import AuthContext
+from aspen.api.authn import AuthContext, get_auth_context
 from aspen.api.deps import get_db
 from aspen.database.models import (
     Group,
@@ -126,10 +126,11 @@ def register_classes(oso):
 # This is just a thin indirection/wrapper for Oso's interface in case we need to swap it out
 # with something else in the future.
 class AuthZSession:
-    def __init__(self, session):
+    def __init__(self, session, auth_context):
         oso = AsyncOso()
         oso.set_data_filtering_adapter(AsyncSqlAlchemyAdapter(session))
         register_classes(oso)
+        self.auth_context = auth_context
         self.oso = oso
         self.config_loaded = False
 
@@ -139,15 +140,16 @@ class AuthZSession:
         )
         self.config_loaded = True
 
-    async def authorized_query(self, ac: AuthContext, privilege: str, model: idbase):
+    async def authorized_query(self, privilege: str, model: idbase):
         # Temp hack to avoid an await in __init__
         if not self.config_loaded:
             await self.load_config()
-        return await self.oso.authorized_query(ac, privilege, model)
+        return await self.oso.authorized_query(self.auth_context, privilege, model)
 
 
 async def get_authz_session(
     request: Request,
+    auth_context: AuthContext = Depends(get_auth_context),
     session: AsyncSession = Depends(get_db),
 ) -> AuthZSession:
-    return AuthZSession(session)
+    return AuthZSession(session, auth_context)

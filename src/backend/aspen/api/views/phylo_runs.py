@@ -242,11 +242,10 @@ async def get_readable_phylo_runs(db, user, run_id=None):
 async def list_runs(
     db: AsyncSession = Depends(get_db),
     az: AuthZSession = Depends(get_authz_session),
-    ac: AuthContext = Depends(get_auth_context),
     user: User = Depends(get_auth_user),
 ) -> PhyloRunsListResponse:
 
-    query = await az.authorized_query(user, "read", PhyloRun)
+    query = await az.authorized_query("read", PhyloRun)
     query = query.options(
         joinedload(PhyloRun.outputs.of_type(PhyloTree)),
         joinedload(PhyloRun.user),  # For Pydantic serialization

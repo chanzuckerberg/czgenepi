@@ -54,7 +54,7 @@ async def list_samples(
 ) -> SamplesResponse:
 
     # load the samples.
-    user_visible_samples_query = await az.authorized_query(user, "read", Sample)
+    user_visible_samples_query = await az.authorized_query("read", Sample)
     user_visible_samples_query = user_visible_samples_query.options(  # type: ignore
         selectinload(Sample.uploaded_pathogen_genome),
         selectinload(Sample.submitting_group),
