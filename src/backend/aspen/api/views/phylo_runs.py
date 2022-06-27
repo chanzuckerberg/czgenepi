@@ -13,7 +13,8 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
 from starlette.requests import Request
 
-from aspen.api.authn import get_auth_user
+from aspen.api.authn import get_auth_user, get_auth_context, AuthContext
+from aspen.api.authz import get_authz_session, AuthZSession
 from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.phylo_runs import (
@@ -239,13 +240,20 @@ async def get_readable_phylo_runs(db, user, run_id=None):
 
 @router.get("/", responses={200: {"model": PhyloRunsListResponse}})
 async def list_runs(
-    request: Request,
     db: AsyncSession = Depends(get_db),
-    settings: Settings = Depends(get_settings),
+    az: AuthZSession = Depends(get_authz_session),
+    ac: AuthContext = Depends(get_auth_context),
     user: User = Depends(get_auth_user),
 ) -> PhyloRunsListResponse:
 
-    phylo_runs: Iterable[PhyloRun] = await get_readable_phylo_runs(db, user)
+    query = await az.authorized_query(user, "read", PhyloRun)
+    query = query.options(
+        joinedload(PhyloRun.outputs.of_type(PhyloTree)),
+        joinedload(PhyloRun.user),  # For Pydantic serialization
+        joinedload(PhyloRun.group),  # For Pydantic serialization
+    )
+
+    phylo_runs: Iterable[PhyloRun] = (await db.execute(query)).unique().scalars().all()
 
     # filter for only information we need in sample table view
     results: List[PhyloRunResponse] = []

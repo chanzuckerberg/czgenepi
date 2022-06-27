@@ -16,7 +16,7 @@ from aspen.api.deps import get_db, get_settings
 from aspen.api.settings import Settings
 from aspen.auth.auth0_management import Auth0Client
 from aspen.auth.device_auth import validate_auth_header
-from aspen.database.models import Group, GroupRole, User, UserRole
+from aspen.database.models import Group, GroupRole, User, UserRole, Role
 
 
 def get_usergroup_query(session: AsyncSession, auth0_user_id: str) -> Query:
@@ -117,14 +117,13 @@ class AuthContext:
 
 
 async def require_group_membership(
-    org_id: Optional[int],
-    request: Request,
+    org_id: Optional[int] = None,
     user: User = Depends(get_auth_user),
     session: AsyncSession = Depends(get_db),
-    settings: Settings = Depends(get_settings),
 ) -> MutableSequence[UserRole]:
+    # Default to the user's old primary group if we don't get an explicit org id in the URL
     if org_id is None:
-        return []
+        org_id = user.group.id
     # Figure out whether this user is a *direct member* of the group
     # we're trying to get context for.
     query = (
@@ -142,7 +141,7 @@ async def require_group_membership(
 
 
 async def get_auth_context(
-    org_id: Optional[int],  # NOTE - This comes from our route!
+    org_id: Optional[int] = None,  # NOTE - This comes from our route!
     user: User = Depends(get_auth_user),
     session: AsyncSession = Depends(get_db),
     user_roles: MutableSequence[UserRole] = Depends(require_group_membership),
@@ -152,6 +151,8 @@ async def get_auth_context(
     # org info *intentionally* for user self-management endpoints (get all my
     # roles, change my username, etc) so we need to handle that case
     group = None
+    if org_id is None:
+        org_id = user.group.id
     roles = []
     for row in user_roles:
         roles.append(row.role.name)

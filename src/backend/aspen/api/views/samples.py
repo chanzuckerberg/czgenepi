@@ -15,6 +15,7 @@ from sqlalchemy.orm import joinedload, selectinload
 from sqlalchemy.orm.exc import NoResultFound
 from starlette.requests import Request
 
+from aspen.api.authz import get_authz_session, AuthZSession
 from aspen.api.authn import get_auth_user
 from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
@@ -47,21 +48,20 @@ GISAID_REJECTION_TIME = datetime.timedelta(days=4)
 
 @router.get("/", response_model=SamplesResponse)
 async def list_samples(
-    request: Request,
     db: AsyncSession = Depends(get_db),
-    settings: Settings = Depends(get_settings),
+    az: AuthZSession = Depends(get_authz_session),
     user: User = Depends(get_auth_user),
 ) -> SamplesResponse:
 
     # load the samples.
-    all_samples_query = sa.select(Sample).options(  # type: ignore
+    user_visible_samples_query = await az.authorized_query(user, "read", Sample)
+    user_visible_samples_query = user_visible_samples_query.options(  # type: ignore
         selectinload(Sample.uploaded_pathogen_genome),
         selectinload(Sample.submitting_group),
         selectinload(Sample.uploaded_by),
         selectinload(Sample.collection_location),
         selectinload(Sample.accessions),
     )
-    user_visible_samples_query = authz_samples_cansee(all_samples_query, None, user)
     user_visible_samples_result = await db.execute(user_visible_samples_query)
     user_visible_samples: List[Sample] = (
         user_visible_samples_result.unique().scalars().all()
