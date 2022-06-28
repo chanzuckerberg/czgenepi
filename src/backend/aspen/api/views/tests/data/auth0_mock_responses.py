@@ -1,9 +1,4 @@
-from aspen.auth.auth0_management import (
-    Auth0Invitation,
-    Auth0Org,
-    Auth0User,
-)
-
+from aspen.auth.auth0_management import Auth0Invitation, Auth0Org, Auth0User
 
 DEFAULT_AUTH0_ORG: Auth0Org = {
     "id": "testid",

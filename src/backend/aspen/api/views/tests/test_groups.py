@@ -3,13 +3,12 @@ from auth0.v3.exceptions import Auth0Error
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from aspen.auth.auth0_management import (
-    Auth0Client,
-    Auth0Invitation,
-    Auth0Org,
-    Auth0User,
+from aspen.api.views.tests.data.auth0_mock_responses import (
+    DEFAULT_AUTH0_INVITATION,
+    DEFAULT_AUTH0_ORG,
+    DEFAULT_AUTH0_USER,
 )
-from aspen.api.views.tests.data.auth0_mock_responses import DEFAULT_AUTH0_ORG, DEFAULT_AUTH0_INVITATION, DEFAULT_AUTH0_USER
+from aspen.auth.auth0_management import Auth0Client
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.usergroup import group_factory, user_factory
 
