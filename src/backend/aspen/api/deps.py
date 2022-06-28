@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.requests import Request
 
 from aspen.api.settings import Settings
-from aspen.database.connection import init_async_db
+from aspen.database.connection import init_async_db, SqlAlchemyInterface
 from aspen.util.split import SplitClient
 
 
@@ -28,12 +28,22 @@ def get_splitio(request: Request) -> SplitClient:
     return splitio
 
 
-async def get_db(
+async def get_engine(
     request: Request, settings: Settings = Depends(get_settings)
+) -> AsyncGenerator[SqlAlchemyInterface, None]:
+    """Store db session in the context var and reset it"""
+    engine = init_async_db(settings.DB_DSN)
+    try:
+        yield engine
+    finally:
+        pass
+
+
+async def get_db(
+    request: Request, engine: SqlAlchemyInterface = Depends(get_engine)
 ) -> AsyncGenerator[AsyncSession, None]:
     """Store db session in the context var and reset it"""
-    db = init_async_db(settings.DB_DSN)
-    session = db.make_session()
+    session = engine.make_session()
     try:
         yield session
     finally:

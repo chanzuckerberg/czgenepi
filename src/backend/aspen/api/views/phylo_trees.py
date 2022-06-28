@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased, contains_eager
 from starlette.requests import Request
 
-from aspen.api.auth import get_auth_user
+from aspen.api.authn import get_auth_user
 from aspen.api.deps import get_db, get_settings
 from aspen.api.settings import Settings
 from aspen.api.utils import extract_accessions, MetadataTSVStreamer, process_phylo_tree
