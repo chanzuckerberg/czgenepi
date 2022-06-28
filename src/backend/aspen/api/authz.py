@@ -29,6 +29,8 @@ def register_classes(oso):
         GroupRole,
         fields={
             "id": int,
+            "grantor_group_id": int,
+            "grantee_group_id": int,
             "grantor_group": Relation(
                 kind="one",
                 other_type="Group",
@@ -75,6 +77,9 @@ def register_classes(oso):
         UserRole,
         fields={
             "id": int,
+            "group_id": int,
+            "role_id": int,
+            "user_id": int,
             "group": Relation(
                 kind="one", other_type="Group", my_field="group_id", other_field="id"
             ),
