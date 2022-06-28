@@ -36,6 +36,8 @@ async def update_user_info(
     auth0_client: Auth0Client = Depends(get_auth0_apiclient),
     user=Depends(get_auth_user),
 ) -> UserMeResponse:
+    auth0_update_items = {}
+
     if user_update_request.agreed_to_tos is not None:
         user.agreed_to_tos = user_update_request.agreed_to_tos
     if user_update_request.acknowledged_policy_version is not None:
@@ -44,8 +46,11 @@ async def update_user_info(
         )
     if user_update_request.name is not None:
         user.name = user_update_request.name
-        auth0_client.update_user(user.auth0_user_id, name=user_update_request.name)
+        auth0_update_items["name"] = user_update_request.name
     await db.commit()
+
+    if user.auth0_user_id:
+        auth0_client.update_user(user.auth0_user_id, **auth0_update_items)
     return UserMeResponse.from_orm(user)
 
 

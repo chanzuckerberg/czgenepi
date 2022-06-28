@@ -49,7 +49,7 @@ async def test_users_view_put_pass(
     await async_session.commit()
 
     new_name = "Alice Alison"
-    auth0_apiclient.update_user.return_value = DEFAULT_AUTH0_USER.copy().update(
+    auth0_apiclient.update_user.return_value = DEFAULT_AUTH0_USER.copy().update(  # type: ignore
         name=new_name
     )
 

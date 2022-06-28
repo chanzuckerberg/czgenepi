@@ -28,16 +28,22 @@ class ObjectManager:
         self.db = db
         self.dry_run = dry_run
 
-    def auth0_delete(self, ojbect: Any) -> None:
+    def auth0_delete(self, object: Any) -> None:
         raise NotImplementedError("Please implement this method")
 
-    def db_delete(self, ojbect: Any) -> None:
+    def db_delete(self, object: Any) -> None:
         raise NotImplementedError("Please implement this method")
 
-    def auth0_create(self, ojbect: Any) -> Optional[Any]:
+    def auth0_create(self, object: Any) -> Optional[Any]:
         raise NotImplementedError("Please implement this method")
 
-    def db_create(self, ojbect: Any) -> None:
+    def db_create(self, object: Any) -> None:
+        raise NotImplementedError("Please implement this method")
+
+    def auth0_update(self, db_object: Any, auth0_object: Any) -> Optional[Any]:
+        raise NotImplementedError("Please implement this method")
+
+    def db_update(self, db_object: Any, auth0_object: Any) -> Optional[Any]:
         raise NotImplementedError("Please implement this method")
 
 
@@ -177,6 +183,20 @@ class UserManager(ObjectManager):
         # TODO - this is complicated and we don't even know if we want it.
         raise Exception("Creating db users from DB groups is not supported")
 
+    def auth0_update(self, db_user: User, auth0_user: Auth0User) -> Optional[Auth0User]:
+        updateable_fields = ["name"]
+        logging.info(
+            f"Updating fields: {', '.join(updateable_fields)} for db user {db_user.email} in auth0"
+        )
+        if self.dry_run:
+            return None
+        auth0_update_items = {}
+        for field in updateable_fields:
+            auth0_update_items[field] = getattr(db_user, field)
+        res = self.auth0_client.update_user(auth0_user["user_id"], **auth0_update_items)
+        logging.info("...done")
+        return res
+
 
 class SuperSyncer:
     def __init__(
@@ -193,7 +213,7 @@ class SuperSyncer:
         self.source_of_truth = source_of_truth
         self.delete_ok = delete_ok
 
-    def find_missing_objects(
+    def compare_objects(
         self,
         auth0_objects: MutableSequence[Any],
         db_objects: MutableSequence[Any],
@@ -217,7 +237,7 @@ class SuperSyncer:
     ) -> None:
         # Only add/create entries in the data store that is NOT our designated
         # source of truth.
-        auth0_only, db_only, matching_tuples = self.find_missing_objects(
+        auth0_only, db_only, matching_tuples = self.compare_objects(
             auth0_objects,
             db_objects,
             object_manager.auth0_match_field,
@@ -249,6 +269,23 @@ class SuperSyncer:
         if self.delete_ok:
             for obj in to_delete:
                 delete_callback(obj)
+
+    def update_attributes(
+        self, object_manager: ObjectManager, auth0_objects: Any, db_objects: Any
+    ) -> None:
+        # Only update attributes for objects that exist on both the db and auth0
+        _, _, matching_tuples = self.compare_objects(
+            auth0_objects,
+            db_objects,
+            object_manager.auth0_match_field,
+            object_manager.db_match_field,
+        )
+        if self.source_of_truth == "auth0":
+            update_callback = object_manager.db_update
+        else:
+            update_callback = object_manager.auth0_update
+        for db_obj, auth0_obj in matching_tuples:
+            update_callback(db_obj, auth0_obj)
 
     def sync_users(self) -> None:
         db_users: MutableSequence[User] = (
@@ -301,6 +338,14 @@ class SuperSyncer:
             )
             self.update_objects(group_manager, auth0_memberships, db_group_users)
 
+    def sync_user_attributes(self) -> None:
+        db_users: MutableSequence[User] = (
+            self.db.execute(sa.select(User)).scalars().all()  # type: ignore
+        )
+        auth0_users: List[Auth0User] = self.auth0_client.get_users()
+        user_manager = UserManager(self.auth0_client, self.db, self.dry_run)
+        self.update_attributes(user_manager, auth0_users, db_users)
+
 
 @click.command("sync_users")
 @click.option(
@@ -333,6 +378,12 @@ class SuperSyncer:
     default=True,
     help="Sync membership",
 )
+@click.option(
+    "--sync-user-attributes/--no-sync-user-attributes",
+    is_flag=True,
+    default=True,
+    help="Sync user attributes",
+)
 def cli(
     source_of_truth: str,
     dry_run: bool,
@@ -340,6 +391,7 @@ def cli(
     sync_groups: bool,
     sync_users: bool,
     sync_memberships: bool,
+    sync_user_attributes: bool,
 ) -> None:
     config = Config()
     client_id: str = config.AUTH0_MANAGEMENT_CLIENT_ID
@@ -374,6 +426,11 @@ def cli(
         if sync_memberships:
             logging.info("Syncing memberships")
             syncer.sync_memberships()
+    with session_scope(interface) as db:
+        syncer = SuperSyncer(auth0_client, source_of_truth, db, dry_run, delete_ok)
+        if sync_user_attributes:
+            logging.info("Syncing user attributes")
+            syncer.sync_user_attributes()
 
 
 if __name__ == "__main__":
