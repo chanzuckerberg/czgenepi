@@ -7,6 +7,8 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.database.models import User
+from aspen.api.views.tests.data.auth0_mock_responses import DEFAULT_AUTH0_USER
+from aspen.auth.auth0_management import Auth0Client
 from aspen.test_infra.models.usergroup import group_factory, user_factory
 
 # All test coroutines will be treated as marked.
@@ -36,18 +38,25 @@ async def test_users_me(http_client: AsyncClient, async_session: AsyncSession) -
     assert len(resp_data["split_id"]) == 20
 
 
-async def test_usergroup_view_put_pass(
-    http_client: AsyncClient, async_session: AsyncSession
+async def test_users_view_put_pass(
+    auth0_apiclient: Auth0Client,
+    http_client: AsyncClient,
+    async_session: AsyncSession,
 ):
     group = group_factory()
     user = user_factory(group, agreed_to_tos=False)
     async_session.add(group)
     await async_session.commit()
+
+    new_name = "Alice Alison"
+    auth0_apiclient.update_user.return_value = DEFAULT_AUTH0_USER.copy().update(name=new_name)
+
     headers = {"user_id": user.auth0_user_id}
     requests: List[Dict] = [
         {"agreed_to_tos": True, "acknowledged_policy_version": "2022-06-22"},
         {"agreed_to_tos": False},
         {"acknowledged_policy_version": "2020-07-22"},
+        {"name": new_name}
     ]
     for req in requests:
         res = await http_client.put("/v2/users/me", headers=headers, json=req)
@@ -74,6 +83,8 @@ async def test_usergroup_view_put_pass(
                     req["acknowledged_policy_version"], "%Y-%m-%d"
                 ).date()
             )
+        if "name" in req:
+            assert updated_user.name == req["name"]
 
 
 async def test_usergroup_view_put_fail(

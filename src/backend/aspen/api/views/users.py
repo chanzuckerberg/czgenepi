@@ -3,7 +3,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.requests import Request
 
-from aspen.api.auth import get_admin_user, get_auth_user, get_usergroup_query
+from aspen.api.auth import get_admin_user, get_auth_user, get_auth0_apiclient, get_usergroup_query
 from aspen.api.deps import get_db
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.usergroup import (
@@ -11,6 +11,7 @@ from aspen.api.schemas.usergroup import (
     UserPostRequest,
     UserUpdateRequest,
 )
+from aspen.auth.auth0_management import Auth0Client
 from aspen.database.models import User
 
 router = APIRouter()
@@ -38,7 +39,7 @@ async def update_user_info(
         )
     if user_update_request.name is not None:
         user.name = user_update_request.name
-        auth0_client.update_user(user.auth0_user_id, { "name": user_update_request.name })
+        auth0_client.update_user(user.auth0_user_id, name=user_update_request.name)
     await db.commit()
     return UserMeResponse.from_orm(user)
 
