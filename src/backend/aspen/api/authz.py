@@ -23,7 +23,7 @@ from aspen.database.models.base import idbase
 
 def register_classes(oso):
     oso.register_class(
-        AuthContext, fields={"user": User, "group": Group, "roles": list}
+        AuthContext, fields={"user": User, "group": Group, "roles": list, "group_roles": list}
     )
     oso.register_class(
         GroupRole,
@@ -52,7 +52,7 @@ def register_classes(oso):
         Group,
         fields={
             "id": int,
-            "group_roles": Relation(
+            "grantee_roles": Relation(
                 kind="many",
                 other_type="GroupRole",
                 my_field="id",
@@ -97,6 +97,7 @@ def register_classes(oso):
         fields={
             "id": int,
             "private": bool,
+            "submitting_group_id": int,
             "submitting_group": Relation(
                 kind="one",
                 other_type="Group",
@@ -109,6 +110,8 @@ def register_classes(oso):
         PhyloRun,
         fields={
             "id": int,
+            "group_id": int,
+            "workflow_id": int,
             "group": Relation(
                 kind="one", other_type="Group", my_field="group_id", other_field="id"
             ),
@@ -118,6 +121,7 @@ def register_classes(oso):
         PhyloTree,
         fields={
             "id": str,
+            "producing_workflow_id": int,
             "phylo_run": Relation(
                 kind="one",
                 other_type="PhyloRun",

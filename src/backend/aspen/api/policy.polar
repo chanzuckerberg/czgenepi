@@ -10,11 +10,10 @@ resource Group {
 resource Sample {
   roles = ["admin", "viewer", "member"];
   permissions = [ "read", "write" ];
-  relations = { owner: Group };
+#  relations = { owner: Group };
 
-  "viewer" if "viewer" on "owner";
-  "member" if "member" on "owner";
-  "admin" if "admin" on "owner";
+#  "member" if "member" on "owner";
+#  "admin" if "admin" on "owner";
 
   "read" if "viewer";
   "read" if "admin";
@@ -31,7 +30,6 @@ resource PhyloRun {
   "member" if "member" on "owner";
   "admin" if "admin" on "owner";
 
-  "read" if "viewer";
   "read" if "admin";
   "read" if "member";
   "write" if "member";
@@ -39,15 +37,17 @@ resource PhyloRun {
 }
 
 has_role(ac: AuthContext, name: String, group: Group) if
-    ( name in ac.user_roles and ac.group == group) or (
-    grole in ac.group.group_roles and
-    grole.role.name = name and
-    grole.grantor_group_id = group.id);
+    grole in ac.group_roles and
+    grole.role = name and
+    grole.group_id = group.id;
 
-has_permission(authcontext: AuthContext, "read", sample: Sample)
-  if has_role(authcontext, "member", sample)
-    or (has_role(authcontext, "viewer", sample)
-        and sample.private = false);
+has_role(ac: AuthContext, name: String, sample: Sample) if
+    (name in ac.user_roles and
+    sample.submitting_group_id = ac.group.id) or (
+        grole in ac.group_roles and
+        grole.role = name and
+        grole.group_id = sample.submitting_group_id and
+        sample.private = false
+    );
 
-has_relation(group: Group, "owner", sample: Sample) if sample.submitting_group = group;
 has_relation(group: Group, "owner", phylo_run: PhyloRun) if phylo_run.group = group;

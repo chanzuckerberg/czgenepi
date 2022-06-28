@@ -23,8 +23,9 @@ def get_usergroup_query(session: AsyncSession, auth0_user_id: str) -> Query:
     return (
         sa.select(User)  # type: ignore
         .options(joinedload(User.group).joinedload(Group.can_see))  # type: ignore
-        .options(joinedload(User.user_roles).joinedload(UserRole.group, innerjoin=True))  # type: ignore
-        .options(joinedload(User.user_roles).joinedload(UserRole.role, innerjoin=True))  # type: ignore
+        .options(joinedload(User.user_roles).options(  # type: ignore
+            joinedload(UserRole.group, innerjoin=True),  # type: ignore
+            joinedload(UserRole.role, innerjoin=True)))  # type: ignore
         .filter(User.auth0_user_id == auth0_user_id)  # type: ignore
     )
 
@@ -170,5 +171,8 @@ async def get_auth_context(
     )
     rolewait = await session.execute(query)
     group_roles = rolewait.unique().scalars().all()
-    ac = AuthContext(user, group, roles, group_roles)
+    groles = []
+    for row in group_roles:
+        groles.append({"group_id": row.grantor_group.id, "role": row.role.name})
+    ac = AuthContext(user, group, roles, groles)
     return ac
