@@ -184,6 +184,9 @@ class Auth0Client:
         }
         return self.client.users.create(body)
 
+    def update_user(self, auth0_user_id: str, body: Dict[str, Any]):
+        return self.client.users.update(auth0_user_id, body)
+
     def delete_user(self, auth0_user_id: str) -> None:
         self.client.users.delete(auth0_user_id)
 
