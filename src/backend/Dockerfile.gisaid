@@ -64,6 +64,9 @@ RUN mkdir /ncov && \
 WORKDIR /usr/src/app
 COPY pyproject.toml poetry.lock environment.yaml ./
 COPY third-party ./third-party
+RUN wget https://github.com/chanzuckerberg/oso/archive/czge-oso25.zip -O oso.zip && \
+    unzip oso.zip && \
+    mv oso-czge-oso25/languages/python/sqlalchemy-oso sqlalchemy-oso && rm oso.zip
 RUN /opt/poetry/bin/poetry config virtualenvs.create false && \
     /opt/poetry/bin/poetry install
 ENV PYTHONPATH=.

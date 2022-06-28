@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from aspen.api.auth import get_auth_user
+from aspen.api.authn import get_auth_user
 from aspen.api.deps import get_db, get_settings
 from aspen.api.schemas.sequences import (
     FastaURLRequest,
