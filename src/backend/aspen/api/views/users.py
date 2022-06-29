@@ -49,7 +49,7 @@ async def update_user_info(
         auth0_update_items["name"] = user_update_request.name
     await db.commit()
 
-    if user.auth0_user_id:
+    if user.auth0_user_id and len(auth0_update_items) > 0:
         auth0_client.update_user(user.auth0_user_id, **auth0_update_items)
     return UserMeResponse.from_orm(user)
 

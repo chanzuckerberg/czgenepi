@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 import logging
+import time
+from datetime import datetime, timezone
 from typing import Any, List, MutableSequence, Optional, Tuple
 
 import click
 import sqlalchemy as sa
+from auth0.v3.exceptions import RateLimitError
 from sqlalchemy.orm.session import Session
 
 from aspen.auth.auth0_management import Auth0Client, Auth0Org, Auth0User
@@ -284,8 +287,20 @@ class SuperSyncer:
             update_callback = object_manager.db_update
         else:
             update_callback = object_manager.auth0_update
-        for db_obj, auth0_obj in matching_tuples:
-            update_callback(db_obj, auth0_obj)
+        i = 0
+        while i < len(matching_tuples):
+            try:
+                db_obj, auth0_obj = matching_tuples[i]
+                update_callback(db_obj, auth0_obj)
+            except RateLimitError as e:
+                logging.info("Rate limited, backing off...")
+                reset_at = getattr(e, "reset_at")
+                backoff_time = datetime.fromtimestamp(
+                    reset_at, timezone.utc
+                ) - datetime.now(timezone.utc)
+                time.sleep(backoff_time.total_seconds())
+            else:
+                i += 1
 
     def sync_users(self) -> None:
         db_users: MutableSequence[User] = (
