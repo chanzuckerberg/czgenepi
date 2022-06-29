@@ -1,5 +1,15 @@
 from collections import Counter
-from typing import Any, Dict, Iterable, List, Mapping, Optional, Tuple, TYPE_CHECKING
+from typing import (
+    Any,
+    Dict,
+    Iterable,
+    List,
+    Mapping,
+    Optional,
+    Set,
+    Tuple,
+    TYPE_CHECKING,
+)
 
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,8 +20,9 @@ if TYPE_CHECKING:
     from aspen.api.schemas.samples import CreateSampleRequest
 
 
-async def get_matching_epi_isls(session: AsyncSession, sample_ids: Iterable[str]
-) -> Set[str]:
+async def get_matching_gisaid_ids_by_epi_isl(
+    session: AsyncSession, sample_ids: Iterable[str]
+) -> Tuple[Set[str], Set[str]]:
     """
     Check if a list of identifiers exist as epi isl numbers.
 
@@ -28,10 +39,14 @@ async def get_matching_epi_isls(session: AsyncSession, sample_ids: Iterable[str]
         GisaidMetadata.gisaid_epi_isl.in_(sample_ids)
     )
     isl_matches: Iterable[GisaidMetadata] = (
-        await session.execute(isl_matches_query)
-    ).scalars().all()
-    epi_isls = set([match.gisaid_epi_isl for match in isl_matches])
-    return epi_isls
+        (await session.execute(isl_matches_query)).scalars().all()
+    )
+    gisaid_ids = set()
+    epi_isls = set()
+    for match in isl_matches:
+        gisaid_ids.add(match.strain)
+        epi_isls.add(match.gisaid_epi_isl)
+    return gisaid_ids, epi_isls
 
 
 def get_all_identifiers_in_request(

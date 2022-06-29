@@ -35,8 +35,8 @@ from aspen.api.utils import (
     check_duplicate_samples,
     check_duplicate_samples_in_request,
     determine_gisaid_status,
-    get_matching_epi_isls
     get_matching_gisaid_ids,
+    get_matching_gisaid_ids_by_epi_isl,
     get_missing_and_found_sample_ids,
 )
 from aspen.database.models import (
@@ -261,7 +261,8 @@ async def validate_ids(
     missing_sample_ids -= gisaid_ids
 
     # Do the same, but for epi isls
-    epi_isls: Set[str] = await get_matching_epi_isls(db, missing_sample_ids)
+    epi_isls: Set[str]
+    _, epi_isls = await get_matching_gisaid_ids_by_epi_isl(db, missing_sample_ids)
     missing_sample_ids -= epi_isls
 
     return ValidateIDsResponse(missing_sample_ids=missing_sample_ids)
