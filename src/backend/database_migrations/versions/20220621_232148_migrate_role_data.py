@@ -39,7 +39,7 @@ def upgrade():
 
     group_role_inserts = sa.sql.text(
         "INSERT INTO aspen.group_roles (role_id, grantor_group_id, grantee_group_id) "
-        "SELECT roles.id, can_see.owner_group_id, can_see.viewer_group_id FROM aspen.can_see "
+        "SELECT DISTINCT roles.id, can_see.owner_group_id, can_see.viewer_group_id FROM aspen.can_see "
         "LEFT JOIN aspen.roles AS roles on roles.name = 'viewer' WHERE data_type = 'TREES' "
     )
     conn.execute(group_role_inserts)
