@@ -3,36 +3,17 @@ from auth0.v3.exceptions import Auth0Error
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from aspen.auth.auth0_management import (
-    Auth0Client,
-    Auth0Invitation,
-    Auth0Org,
-    Auth0User,
+from aspen.api.views.tests.data.auth0_mock_responses import (
+    DEFAULT_AUTH0_INVITATION,
+    DEFAULT_AUTH0_ORG,
+    DEFAULT_AUTH0_USER,
 )
+from aspen.auth.auth0_management import Auth0Client
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.usergroup import group_factory, user_factory
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
-
-DEFAULT_AUTH0_ORG: Auth0Org = {
-    "id": "testid",
-    "name": "testname",
-    "display_name": "testdisplayname",
-}
-
-DEFAULT_AUTH0_USER: Auth0User = {
-    "user_id": "testuserid",
-    "name": "test user",
-    "email": "test@czgenepi.org",
-}
-DEFAULT_AUTH0_INVITATION: Auth0Invitation = {
-    "id": "inv_id",
-    "created_at": "2022-01-01",
-    "expires_at": "2022-06-01",
-    "inviter": {"name": "Bob"},
-    "invitee": {"email": "invitee@czgenepi.org"},
-}
 
 
 async def test_list_members(

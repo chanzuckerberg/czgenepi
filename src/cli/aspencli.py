@@ -307,12 +307,14 @@ def me(ctx):
     type=str,
     help="YYYY-MM-DD of the policy version the user agreed to",
 )
+@click.option("--name", required=False, type=str, help="The user's full name.")
 @click.pass_context
-def update_me(ctx, agreed_to_tos, ack_policy_version):
+def update_me(ctx, agreed_to_tos, ack_policy_version, name):
     api_client = ctx.obj["api_client"]
     params = {
         "agreed_to_tos": agreed_to_tos,
         "acknowledged_policy_version": ack_policy_version,
+        "name": name,
     }
     resp = api_client.put("/v2/users/me", json=params)
     print(resp.text)
@@ -365,8 +367,18 @@ def group():
 
 
 @group.command(name="create")
-@click.option("--name", required=True, type=str, help="The group's name. Must be at least 3 characters.")
-@click.option("--prefix", required=True, type=str, help="The group's prefix. Must be at least 2 characters, max 20.")
+@click.option(
+    "--name",
+    required=True,
+    type=str,
+    help="The group's name. Must be at least 3 characters.",
+)
+@click.option(
+    "--prefix",
+    required=True,
+    type=str,
+    help="The group's prefix. Must be at least 2 characters, max 20.",
+)
 @click.option(
     "--tree-location",
     required=True,
@@ -509,10 +521,27 @@ def list_locations(ctx):
 
 
 @locations.command(name="search")
-@click.option("--region", required=False, type=str, help="A continental-level region, e.g. North America, Asia. In practice, you do not need to provide this.")
-@click.option("--country", required=False, type=str, help="A country, e.g. USA, Canada.")
-@click.option("--division", required=False, type=str, help="A top-level division of a country, e.g. California, British Columbia.")
-@click.option("--location", required=False, type=str, help="A secondary division of a country, e.g. Alameda County, Toronto.")
+@click.option(
+    "--region",
+    required=False,
+    type=str,
+    help="A continental-level region, e.g. North America, Asia. In practice, you do not need to provide this.",
+)
+@click.option(
+    "--country", required=False, type=str, help="A country, e.g. USA, Canada."
+)
+@click.option(
+    "--division",
+    required=False,
+    type=str,
+    help="A top-level division of a country, e.g. California, British Columbia.",
+)
+@click.option(
+    "--location",
+    required=False,
+    type=str,
+    help="A secondary division of a country, e.g. Alameda County, Toronto.",
+)
 @click.pass_context
 def search_locations(
     ctx,
@@ -524,7 +553,7 @@ def search_locations(
     if not region and not country and not division and not location:
         print("Must provide at least one of region, country, division, or location.")
         return
-        
+
     api_client = ctx.obj["api_client"]
     payload = {
         "region": region,
@@ -535,7 +564,9 @@ def search_locations(
     resp = api_client.post(f"/v2/locations/search/", json=payload)
     locations = resp.json()["locations"]
     location_columns = ["region", "country", "division", "location", "id"]
-    location_values = [[entry.get(column) for column in location_columns] for entry in locations]
+    location_values = [
+        [entry.get(column) for column in location_columns] for entry in locations
+    ]
     print(tabulate(location_values, headers=location_columns, tablefmt="psql"))
 
 

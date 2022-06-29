@@ -184,6 +184,14 @@ class Auth0Client:
         }
         return self.client.users.create(body)
 
+    def update_user(self, auth0_user_id: str, **kwargs):
+        updateable_fields = ["name"]
+        for field in kwargs.keys():
+            if field not in updateable_fields:
+                raise KeyError(f"{field} is not an updateable user field.")
+        body = {**kwargs}
+        return self.client.users.update(auth0_user_id, body)
+
     def delete_user(self, auth0_user_id: str) -> None:
         self.client.users.delete(auth0_user_id)
 

@@ -37,6 +37,7 @@ class UserBaseResponse(BaseResponse):
 class UserUpdateRequest(BaseRequest):
     agreed_to_tos: Optional[bool] = None
     acknowledged_policy_version: Optional[datetime.date] = None
+    name: Optional[str] = None
 
 
 # Only expose split id and groups to the user it belongs to.
