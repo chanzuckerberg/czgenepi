@@ -222,23 +222,3 @@ async def test_phylo_trees_no_can_see(
     results = res.json()["phylo_runs"]
 
     assert len(results) == 0
-
-
-async def test_phylo_trees_admin(
-    async_session,
-    http_client,
-    n_samples=5,
-    n_trees=3,
-):
-    owner_group: Group = group_factory()
-    viewer_group: Group = group_factory("admin")
-    user: User = await userrole_factory(async_session, viewer_group, system_admin=True)
-    location: Location = location_factory(
-        "North America", "USA", "California", "Santa Barbara County"
-    )
-    _, _, trees, _ = make_all_test_data(owner_group, user, location, n_samples, n_trees)
-
-    async_session.add_all((owner_group, viewer_group))
-    await async_session.commit()
-
-    await check_results(http_client, user, trees)

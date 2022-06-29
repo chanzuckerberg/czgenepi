@@ -247,7 +247,7 @@ async def list_runs(
 
     query = await az.authorized_query("read", PhyloRun)
     query = query.options(
-        joinedload(PhyloRun.outputs.of_type(PhyloTree)),
+        joinedload(PhyloRun.outputs.of_type(PhyloTree)),  # type: ignore
         joinedload(PhyloRun.user),  # For Pydantic serialization
         joinedload(PhyloRun.group),  # For Pydantic serialization
     )

@@ -23,7 +23,8 @@ from aspen.database.models.base import idbase
 
 def register_classes(oso):
     oso.register_class(
-        AuthContext, fields={"user": User, "group": Group, "roles": list, "group_roles": list}
+        AuthContext,
+        fields={"user": User, "group": Group, "roles": list, "group_roles": list},
     )
     oso.register_class(
         GroupRole,

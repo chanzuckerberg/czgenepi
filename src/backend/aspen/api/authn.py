@@ -23,9 +23,12 @@ def get_usergroup_query(session: AsyncSession, auth0_user_id: str) -> Query:
     return (
         sa.select(User)  # type: ignore
         .options(joinedload(User.group).joinedload(Group.can_see))  # type: ignore
-        .options(joinedload(User.user_roles).options(  # type: ignore
-            joinedload(UserRole.group, innerjoin=True),  # type: ignore
-            joinedload(UserRole.role, innerjoin=True)))  # type: ignore
+        .options(
+            joinedload(User.user_roles).options(  # type: ignore
+                joinedload(UserRole.group, innerjoin=True),  # type: ignore
+                joinedload(UserRole.role, innerjoin=True),
+            )
+        )  # type: ignore
         .filter(User.auth0_user_id == auth0_user_id)  # type: ignore
     )
 
