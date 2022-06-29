@@ -18,5 +18,6 @@ from aspen.api.utils.sample import (  # noqa: F401
     check_duplicate_samples_in_request,
     determine_gisaid_status,
     format_sample_lineage,
+    get_matching_epi_isls,
 )
 from aspen.api.utils.tsv_streamer import MetadataTSVStreamer  # noqa: F401

@@ -35,6 +35,7 @@ from aspen.api.utils import (
     check_duplicate_samples,
     check_duplicate_samples_in_request,
     determine_gisaid_status,
+    get_matching_epi_isls
     get_matching_gisaid_ids,
     get_missing_and_found_sample_ids,
 )
@@ -258,6 +259,10 @@ async def validate_ids(
 
     # Do we have any samples that are not aspen private or public identifiers or gisaid identifiers?
     missing_sample_ids -= gisaid_ids
+
+    # Do the same, but for epi isls
+    epi_isls: Set[str] = await get_matching_epi_isls(db, missing_sample_ids)
+    missing_sample_ids -= epi_isls
 
     return ValidateIDsResponse(missing_sample_ids=missing_sample_ids)
 
