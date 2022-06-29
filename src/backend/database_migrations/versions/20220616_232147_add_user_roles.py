@@ -32,6 +32,7 @@ def upgrade():
             index=True,
             autoincrement=False,
             nullable=False,
+            primary_key=True,
         ),
         sa.Column(
             "user_id",

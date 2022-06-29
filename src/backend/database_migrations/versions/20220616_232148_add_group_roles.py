@@ -23,6 +23,7 @@ def upgrade():
             index=True,
             autoincrement=False,
             nullable=False,
+            primary_key=True,
         ),
         sa.Column(
             "grantor_group_id",
