@@ -19,7 +19,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-2
           role-to-assume: ${{ secrets.AWS_PROD_ROLE_TO_ASSUME }}
-          role-duration-seconds: 900
+          role-duration-seconds: 2000
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         if: github.event.deployment.environment != 'prod'
@@ -28,7 +28,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-2
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-duration-seconds: 900
+          role-duration-seconds: 2000
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.event.deployment.sha }}
