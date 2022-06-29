@@ -2,3 +2,4 @@ keyring==23.0.1
 click==7.1.2
 auth0-python==3.16.2
 dateparser==1.1.0
+tabulate==0.8.9

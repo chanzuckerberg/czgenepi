@@ -1,94 +1,70 @@
 import { Button, Tab } from "czifui";
+import { find } from "lodash";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { HeadAppTitle } from "src/common/components";
+import { useGroupInvitations } from "src/common/queries/groups";
 import { ROUTES } from "src/common/routes";
 import { TabEventHandler } from "../../index";
 import { ActiveMembersTable } from "./components/ActiveMembersTable";
 import { InviteModal } from "./components/InviteModal";
 import { MemberInvitationsTable } from "./components/MemberInvitationsTable";
-import { Header, StyledTabs } from "./style";
+import { Container, Header, StyledTabs } from "./style";
 
-enum SecondaryTabType {
+export enum SecondaryTabType {
   ACTIVE = "active",
   INVITATIONS = "invitations",
 }
 
-//TODO (mlila): types
 interface Props {
-  secondaryQueryParam?: string;
-  groupName: string;
-  members: any[];
+  requestedSecondaryTab: SecondaryTabType;
+  groupName?: string;
+  groupId: number;
+  members: GroupMember[];
+  userInfo: User | undefined;
 }
 
-const isValidSecondaryTab = (token?: string) => {
-  if (!token) return false;
-  return (
-    token === SecondaryTabType.ACTIVE || token === SecondaryTabType.INVITATIONS
-  );
-};
-
 const MembersTab = ({
-  secondaryQueryParam,
+  requestedSecondaryTab,
   groupName,
+  groupId,
   members,
-}: Props): JSX.Element => {
-  const initialSecondaryTab = (
-    isValidSecondaryTab(secondaryQueryParam)
-      ? secondaryQueryParam
-      : SecondaryTabType.ACTIVE
-  ) as SecondaryTabType;
-
-  const [tabValue, setTabValue] =
-    useState<SecondaryTabType>(initialSecondaryTab);
+  userInfo,
+}: Props): JSX.Element | null => {
+  const [tabValue, setTabValue] = useState<SecondaryTabType>(
+    requestedSecondaryTab
+  );
   const [isInviteModalOpen, setIsInviteModalOpen] = useState<boolean>(false);
   const router = useRouter();
+  const { data: invitations = [] } = useGroupInvitations(groupId);
+  const currentUser = find(members, (m) => m.id === userInfo?.id);
 
   useEffect(() => {
-    router.push(`${ROUTES.GROUP_MEMBERS}/${tabValue}`, undefined, {
-      shallow: true,
-    });
-  }, [tabValue]);
+    setTabValue(requestedSecondaryTab);
+  }, [requestedSecondaryTab]);
 
+  const isOwner = currentUser?.isGroupAdmin === true;
   const numActive = Object.keys(members).length;
 
   const handleTabClick: TabEventHandler = (_, value) => {
     setTabValue(value);
+    router.push(`${ROUTES.GROUP_MEMBERS}/${value}/`);
   };
 
-  // TODO (mlila): api call
-  const invites = [
-    {
-      email: "erica@fake.com",
-      status: "pending",
-      dateSent: "2022-05-24",
-      role: "Member",
-    },
-    {
-      email: "frank@fake.com",
-      status: "expired",
-      dateSent: "2022-03-24",
-      role: "Member",
-    },
-  ];
-
-  invites.sort((a, b) => (a.dateSent > b.dateSent ? 1 : -1));
+  invitations.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
 
   return (
-    <>
+    <Container>
       <HeadAppTitle subTitle="Group Details" />
-      <InviteModal
-        onClose={() => setIsInviteModalOpen(false)}
-        groupName={groupName}
-        open={isInviteModalOpen}
-      />
+      {groupName && (
+        <InviteModal
+          onClose={() => setIsInviteModalOpen(false)}
+          groupName={groupName}
+          open={isInviteModalOpen}
+        />
+      )}
       <Header>
-        <StyledTabs
-          value={tabValue}
-          sdsSize="small"
-          onChange={handleTabClick}
-          underlined
-        >
+        <StyledTabs value={tabValue} sdsSize="small" onChange={handleTabClick}>
           <Tab
             value={SecondaryTabType.ACTIVE}
             label="Active"
@@ -97,24 +73,26 @@ const MembersTab = ({
           <Tab
             value={SecondaryTabType.INVITATIONS}
             label="Invitations"
-            count={invites.length}
+            count={invitations.length}
           />
         </StyledTabs>
-        <Button
-          sdsType="primary"
-          sdsStyle="rounded"
-          onClick={() => setIsInviteModalOpen(true)}
-        >
-          Invite
-        </Button>
+        {isOwner && (
+          <Button
+            sdsType="primary"
+            sdsStyle="rounded"
+            onClick={() => setIsInviteModalOpen(true)}
+          >
+            Invite
+          </Button>
+        )}
       </Header>
       {tabValue === SecondaryTabType.ACTIVE && (
         <ActiveMembersTable members={members} />
       )}
       {tabValue === SecondaryTabType.INVITATIONS && (
-        <MemberInvitationsTable invites={invites} />
+        <MemberInvitationsTable invites={invitations} />
       )}
-    </>
+    </Container>
   );
 };
 

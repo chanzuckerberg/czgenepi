@@ -45,8 +45,8 @@ def create_test_group(session, group_name, prefix, default_tree_location):
     return g
 
 
-def create_test_user(session, group, user_id, name):
-    u = session.query(User).filter(User.auth0_user_id == user_id).one_or_none()
+def create_test_user(session, email, group, user_id, name):
+    u = session.query(User).filter(User.email == email).one_or_none()
     if u:
         print("User already exists")
         return u
@@ -55,7 +55,7 @@ def create_test_user(session, group, user_id, name):
         name=name,
         auth0_user_id=user_id,
         split_id=user_id,
-        email=f"{user_id}@czgenepi.org",
+        email=email,
         group_admin=True,
         system_admin=True,
         group=group,
@@ -352,7 +352,7 @@ def create_test_data(engine):
         session, "North America", "USA", "California", "San Mateo County"
     )
     group = create_test_group(session, "CZI", "CZI", location)
-    user = create_test_user(session, group, "User1", "Test User")
+    user = create_test_user(session, "user1@czgenepi.org", group, "User1", "Test User")
     create_samples(session, group, user, location, 10, 5)
     create_test_trees(session, group, user)
 
@@ -361,7 +361,9 @@ def create_test_data(engine):
     group2 = create_test_group(
         session, "Timbuktu Dept of Public Health", "TBK", location2
     )
-    user2 = create_test_user(session, group2, "tbktu", "Timbuktu User")
+    user2 = create_test_user(
+        session, "tbktu@czgenepi.org", group2, "tbktu", "Timbuktu User"
+    )
     create_samples(session, group2, user2, location2, 10, 10)
     create_test_trees(session, group2, user2)
 

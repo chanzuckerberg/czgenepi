@@ -10,9 +10,9 @@ import {
 } from "./style";
 
 interface Props {
-  address: string;
-  location: string;
-  prefix: string;
+  address?: string;
+  location?: string;
+  prefix?: string;
 }
 
 const GroupDetailsTab = ({ address, location, prefix }: Props): JSX.Element => {

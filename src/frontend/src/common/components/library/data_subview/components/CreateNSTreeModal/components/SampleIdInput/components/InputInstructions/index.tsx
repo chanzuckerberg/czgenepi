@@ -15,7 +15,7 @@ const InputInstructions = (): JSX.Element => {
               Samples selected on the Sample table or added here will be
               force-included on your tree without undergoing QC.
             </SemiBold>{" "}
-            <NewTabLink href="https://docs.google.com/document/d/1qjS6gRaKwpiw8WE2LbBNh9-m5ZFXm9X_H7O6UsXXiAw/edit#heading=h.61og0yhc0ua3">
+            <NewTabLink href="https://help.czgenepi.org/hc/en-us/articles/6712563575956-Build-on-demand-trees#generating">
               Learn More
             </NewTabLink>
           </div>,

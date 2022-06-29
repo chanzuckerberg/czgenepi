@@ -1,14 +1,19 @@
 import { Button, Dialog, DialogActions, DialogTitle } from "czifui";
-import { compact } from "lodash";
+import { compact, filter, uniq } from "lodash";
 import React, { ChangeEvent, useState } from "react";
 import { noop } from "src/common/constants/empty";
-import { INPUT_DELIMITERS } from "src/common/constants/inputDelimiters";
+import {
+  GREEDY_SPACES,
+  INPUT_DELIMITERS_WITH_SPACE,
+} from "src/common/constants/inputDelimiters";
 import { useUserInfo } from "src/common/queries/auth";
 import { useSendGroupInvitations } from "src/common/queries/groups";
 import { B } from "src/common/styles/basicStyle";
 import { getGroupIdFromUser } from "src/common/utils/userUtils";
+import { StyledNotificationContainer } from "src/components/Notification/style";
+import { FailedToSendNotification } from "./components/FailedToSendNotification";
 import { InvalidEmailError } from "./components/InvalidEmailError";
-import { SentNotification } from "./components/InvalidEmailError/components/SentNotification";
+import { SentNotification } from "./components/SentNotification";
 import {
   SmallText,
   StyledCallout,
@@ -33,8 +38,14 @@ const InviteModal = ({ groupName, onClose, open }: Props): JSX.Element => {
   // @ts-expect-error remove when api call finished
   const [shouldValidateOnChange, setShouldValidateOnChange] = // eslint-disable-line @typescript-eslint/no-unused-vars
     useState<boolean>(false);
-  const [isNotificationOpen, setIsNotificationOpen] = useState<boolean>(false);
+  const [isSuccessNotificationOpen, setIsSuccessNotificationOpen] =
+    useState<boolean>(false);
+  const [isFailureNotificationOpen, setIsFailureNotificationOpen] =
+    useState<boolean>(false);
   const [sentCount, setSentCount] = useState<number>(0);
+  const [failedToSendAddresses, setFailedToSendAddresses] = useState<string[]>(
+    []
+  );
 
   const { data: userInfo } = useUserInfo();
   const groupId = getGroupIdFromUser(userInfo);
@@ -48,12 +59,34 @@ const InviteModal = ({ groupName, onClose, open }: Props): JSX.Element => {
     onClose();
   };
 
-  const getAddressArrayFromInputValue = () => {
-    return inputValue.trim().split(INPUT_DELIMITERS);
+  /**
+   * Gets user input and chunks into (what should be) email addresses.
+   *
+   * Original user input text is broken into chunks by delimiters. Repeated
+   * delimiters between chunks are taken as a single delimiter. Leading and
+   * trailing delimiters are dropped. If a given chunk is found multiple times
+   * in the input, only one copy of the chunk is returned in output array.
+   *
+   * Example:
+   *     user1@example.com,   user2@example.com, ,, ,,  , user3@example.com,,
+   *   user2@example.com, user4@example.com,,
+   * Would return as four emails in total, as you'd expect to read them.
+   */
+  const getAddressArrayFromInputValue = (): string[] => {
+    // First pass may have multiple spaces between chunks or pre/suffix spaces
+    const delimitBySpaces = inputValue.replace(
+      INPUT_DELIMITERS_WITH_SPACE,
+      " "
+    );
+    const delimitBySingleSpaceTrimmed = delimitBySpaces
+      .trim()
+      .replace(GREEDY_SPACES, " ");
+    const addressChunks = delimitBySingleSpaceTrimmed.split(" ");
+    return uniq(addressChunks);
   };
 
-  const validate = (): boolean => {
-    const addresses = getAddressArrayFromInputValue();
+  // Returns bool of if emails valid. If not, sets the state to show errors.
+  const validate = (addresses: string[]): boolean => {
     const newInvalidAddresses = compact(
       addresses.filter((address) => !address.match(EMAIL_REGEX))
     );
@@ -65,6 +98,7 @@ const InviteModal = ({ groupName, onClose, open }: Props): JSX.Element => {
 
     // after they click the button to send invites once, we should debounce validate on
     // all subsequent changes
+    // TODO: debounce check validation on subsequent changes
     setShouldValidateOnChange(true);
 
     return (
@@ -90,28 +124,44 @@ const InviteModal = ({ groupName, onClose, open }: Props): JSX.Element => {
 
   const sendInvitationMutation = useSendGroupInvitations({
     componentOnSuccess: ({ invitations }) => {
-      setSentCount(invitations.length);
-      setIsNotificationOpen(true);
+      // show a warning if we aren't sending invites for existing users
+      const failedInvites = filter(invitations, (i) => !i.success);
+      setFailedToSendAddresses(failedInvites.map((i) => i.email));
+      if (failedInvites.length > 0) setIsFailureNotificationOpen(true);
+
+      // show success for any invites we did send
+      const successCount = invitations.length - failedInvites.length;
+      setSentCount(successCount);
+      if (successCount > 0) setIsSuccessNotificationOpen(true);
+
       handleClose();
     },
     componentOnError: noop,
   });
 
   const handleFormSubmit = () => {
-    const areAllAddressesValid = validate();
-    if (!areAllAddressesValid) return;
-
     const emails = getAddressArrayFromInputValue();
-    sendInvitationMutation.mutate({ emails, groupId });
+    // If invalid, `validate` will alter state and cause error display
+    const areAllAddressesValid = validate(emails);
+    if (areAllAddressesValid) {
+      sendInvitationMutation.mutate({ emails, groupId });
+    }
   };
 
   return (
     <>
-      <SentNotification
-        numSent={sentCount}
-        onDismiss={() => setIsNotificationOpen(false)}
-        open={isNotificationOpen}
-      />
+      <StyledNotificationContainer>
+        <SentNotification
+          numSent={sentCount}
+          onDismiss={() => setIsSuccessNotificationOpen(false)}
+          open={isSuccessNotificationOpen}
+        />
+        <FailedToSendNotification
+          failedToSendAddresses={failedToSendAddresses}
+          onDismiss={() => setIsFailureNotificationOpen(false)}
+          open={isFailureNotificationOpen}
+        />
+      </StyledNotificationContainer>
       <Dialog open={open} onClose={handleClose} sdsSize="s">
         <DialogTitle title={`Invite to ${groupName}`} onClose={handleClose} />{" "}
         {/* TODO (mlila): make group name bold after sds dialog allows ReactNode */}

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-import csv
 import json
 import os.path
 import time
 import webbrowser
+from typing import Optional
 from urllib.parse import quote, urlparse
 
 import click
@@ -11,7 +11,10 @@ import dateparser
 import keyring
 import requests
 from auth0.v3.authentication.token_verifier import (
-    AsymmetricSignatureVerifier, JwksFetcher, TokenVerifier)
+    AsymmetricSignatureVerifier,
+    JwksFetcher,
+)
+from tabulate import tabulate
 
 
 class InsecureJwksFetcher(JwksFetcher):
@@ -65,7 +68,6 @@ class TokenHandler:
         return creds["id_token"]
 
     def decode_token(self, token):
-        issuer = f"{self.auth_url}/"
         payload = self.sv.verify_signature(token)
         return payload
 
@@ -305,12 +307,14 @@ def me(ctx):
     type=str,
     help="YYYY-MM-DD of the policy version the user agreed to",
 )
+@click.option("--name", required=False, type=str, help="The user's full name.")
 @click.pass_context
-def update_me(ctx, agreed_to_tos, ack_policy_version):
+def update_me(ctx, agreed_to_tos, ack_policy_version, name):
     api_client = ctx.obj["api_client"]
     params = {
         "agreed_to_tos": agreed_to_tos,
         "acknowledged_policy_version": ack_policy_version,
+        "name": name,
     }
     resp = api_client.put("/v2/users/me", json=params)
     print(resp.text)
@@ -361,21 +365,78 @@ def create(
 def group():
     pass
 
+
+@group.command(name="create")
+@click.option(
+    "--name",
+    required=True,
+    type=str,
+    help="The group's name. Must be at least 3 characters.",
+)
+@click.option(
+    "--prefix",
+    required=True,
+    type=str,
+    help="The group's prefix. Must be at least 2 characters, max 20.",
+)
+@click.option(
+    "--tree-location",
+    required=True,
+    type=int,
+    help="The default tree location for the group. Must be an integer corresponding to a location in the database.",
+)
+@click.option("--address", type=str, help="The group's full address.")
+@click.option(
+    "--division",
+    type=str,
+    help="The regional division of the country the group is located in.",
+)
+@click.option(
+    "--location",
+    type=str,
+    help="The location within a regional division the group is located in.",
+)
+@click.pass_context
+def create_group(
+    ctx,
+    name: str,
+    prefix: str,
+    tree_location: int,
+    address: Optional[str],
+    division: Optional[str],
+    location: Optional[str],
+):
+    api_client = ctx.obj["api_client"]
+    group = {
+        "name": name,
+        "prefix": prefix,
+        "default_tree_location_id": tree_location,
+        "address": address,
+        "division": division,
+        "location": location,
+    }
+    print(group)
+    resp = api_client.post("/v2/groups/", json=group)
+    print(resp.text)
+
+
 @group.command(name="get")
 @click.argument("group_id")
 @click.pass_context
 def get_group_info(ctx, group_id):
     api_client = ctx.obj["api_client"]
-    resp = api_client.get(f"/v2/groups/{group_id}")
+    resp = api_client.get(f"/v2/groups/{group_id}/")
     print(resp.text)
+
 
 @group.command(name="members")
 @click.argument("group_id")
 @click.pass_context
-def get_group_imembers(ctx, group_id):
+def get_group_members(ctx, group_id):
     api_client = ctx.obj["api_client"]
-    resp = api_client.get(f"/v2/groups/{group_id}/members")
+    resp = api_client.get(f"/v2/groups/{group_id}/members/")
     print(resp.text)
+
 
 @group.command(name="invites")
 @click.argument("group_id")
@@ -385,12 +446,16 @@ def get_group_invitations(ctx, group_id):
     resp = api_client.get(f"/v2/groups/{group_id}/invitations/")
     print(resp.text)
 
+
 @group.command(name="invite")
 @click.argument("group_id")
 @click.argument("email")
-@click.option("--role", help="Role to invite the user to",
+@click.option(
+    "--role",
+    help="Role to invite the user to",
     type=click.Choice(["admin", "member"], case_sensitive=False),
-    default="member")
+    default="member",
+)
 @click.pass_context
 def invite_group_members(ctx, group_id, email, role):
     api_client = ctx.obj["api_client"]
@@ -401,16 +466,10 @@ def invite_group_members(ctx, group_id, email, role):
     resp = api_client.post(f"/v2/groups/{group_id}/invitations/", json=body)
     print(resp.text)
 
+
 @cli.group()
 def userinfo():
     pass
-
-@userinfo.command(name="get")
-@click.pass_context
-def get_userinfo(ctx):
-    api_client = ctx.obj["api_client"]
-    resp = api_client.get("/api/usergroup")
-    print(resp.text)
 
 
 @cli.group()
@@ -459,6 +518,56 @@ def list_locations(ctx):
     api_client = ctx.obj["api_client"]
     resp = api_client.get("/v2/locations/")
     print(resp.text)
+
+
+@locations.command(name="search")
+@click.option(
+    "--region",
+    required=False,
+    type=str,
+    help="A continental-level region, e.g. North America, Asia. In practice, you do not need to provide this.",
+)
+@click.option(
+    "--country", required=False, type=str, help="A country, e.g. USA, Canada."
+)
+@click.option(
+    "--division",
+    required=False,
+    type=str,
+    help="A top-level division of a country, e.g. California, British Columbia.",
+)
+@click.option(
+    "--location",
+    required=False,
+    type=str,
+    help="A secondary division of a country, e.g. Alameda County, Toronto.",
+)
+@click.pass_context
+def search_locations(
+    ctx,
+    region: Optional[str],
+    country: Optional[str],
+    division: Optional[str],
+    location: Optional[str],
+):
+    if not region and not country and not division and not location:
+        print("Must provide at least one of region, country, division, or location.")
+        return
+
+    api_client = ctx.obj["api_client"]
+    payload = {
+        "region": region,
+        "country": country,
+        "division": division,
+        "location": location,
+    }
+    resp = api_client.post(f"/v2/locations/search/", json=payload)
+    locations = resp.json()["locations"]
+    location_columns = ["region", "country", "division", "location", "id"]
+    location_values = [
+        [entry.get(column) for column in location_columns] for entry in locations
+    ]
+    print(tabulate(location_values, headers=location_columns, tablefmt="psql"))
 
 
 @cli.group()
@@ -539,9 +648,7 @@ def delete_samples(ctx, sample_ids):
 @click.option(
     "--location", required=False, type=int, help="Set the sample's collection location"
 )
-@click.option(
-    "--json-data", required=False, type=str, help="provide json for update"
-)
+@click.option("--json-data", required=False, type=str, help="provide json for update")
 @click.pass_context
 def update_samples(
     ctx,

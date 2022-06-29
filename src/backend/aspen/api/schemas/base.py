@@ -4,7 +4,12 @@ from pydantic import BaseModel
 
 
 class BaseRequest(BaseModel):
-    pass
+    class Config:
+        """Extra configuration options"""
+
+        anystr_strip_whitespace = (
+            True  # remove leading/trailing whitespace from strings
+        )
 
 
 def convert_datetime_to_iso_8601(dt: datetime) -> str:

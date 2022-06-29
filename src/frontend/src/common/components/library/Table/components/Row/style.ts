@@ -1,18 +1,32 @@
 import styled from "@emotion/styled";
-import { fontHeaderS, fontHeaderXs, getColors, getSpaces } from "czifui";
+import {
+  CommonThemeProps,
+  fontHeaderS,
+  fontHeaderXs,
+  getColors,
+  getSpaces,
+} from "czifui";
+
+const sharedRowStyles = (props: CommonThemeProps) => {
+  const spaces = getSpaces(props);
+
+  return `
+    display: flex;
+    align-items: center;
+    padding: ${spaces?.l}px;
+  `;
+};
 
 export const StyledRow = styled.div`
   ${fontHeaderXs}
-  display: flex;
+  ${sharedRowStyles}
+
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 
   ${(props) => {
     const colors = getColors(props);
-    const spaces = getSpaces(props);
 
     return `
-      padding: ${spaces?.l}px;
-
       &:hover {
         background-color: ${colors?.primary[100]};
       }
@@ -22,17 +36,16 @@ export const StyledRow = styled.div`
 
 export const StyledHeader = styled.div`
   ${fontHeaderS}
-  display: flex;
+  ${sharedRowStyles}
+
   margin: 0;
 
   ${(props) => {
     const colors = getColors(props);
-    const spaces = getSpaces(props);
 
     return `
       color: ${colors?.gray[500]};
       border-bottom: 4px ${colors?.gray[100]} solid;
-      padding: ${spaces?.l}px;
     `;
   }}
 `;

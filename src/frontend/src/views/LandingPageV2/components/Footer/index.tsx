@@ -49,7 +49,7 @@ export default function Footer(): JSX.Element {
             Careers
           </FooterTopLink>
           <FooterTopLink href={ROUTES.RESOURCES} target="_blank">
-            Resources
+            Learning Center
           </FooterTopLink>
         </FooterTopLinks>
       </FooterTopContainer>

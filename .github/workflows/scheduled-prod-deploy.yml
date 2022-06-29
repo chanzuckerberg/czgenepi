@@ -1,9 +1,19 @@
-name: Scheduled Prod Deploy
+name: Scheduled Deploy
 
 on:
   schedule:
     # Weekly Tuesday & Thursdays @ 16:00 UTC (8am PST [winter] / 9am PDT [summer])
      - cron: '0 16 * * 2,4'
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'Docker image tag to use for a deploy (defaults to latest successful staging deploy)'
+        required: false
+        default: ''
+      environment:
+        description: 'deploy to staging or prod'
+        required: false
+        default: 'prod'
 
 env:
   DOCKER_BUILDKIT: 1
@@ -15,8 +25,6 @@ env:
 jobs:
   upgrade:
     runs-on: ubuntu-20.04
-    environment:
-      name: prod
     steps:
       - uses: act10ns/slack@v1
         with:
@@ -31,24 +39,29 @@ jobs:
           role-to-assume: ${{ secrets.AWS_PROD_ROLE_TO_ASSUME }}
           role-duration-seconds: 900
       - uses: actions/checkout@v2
-      - name: Install happy dependencies
-        run: |
-          pip install -r .happy/requirements.txt
-      # Setting an environment variable: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
       - name: Determine the tag
-        env:
-          TFE_TOKEN: ${{ secrets.TFE_TOKEN }}
-        run: |
-          echo "DEPLOY_SHA=sha-$(python3 ./scripts/happy-deploy.py gestaging --get-latest)" >> $GITHUB_ENV
-      - name: Update deployment
-        uses: chanzuckerberg/github-actions/.github/actions/deploy-happy-stack@v1.3.0
+        uses: chanzuckerberg/github-actions/.github/actions/latest-successful-deployment@v1.6.1
         with:
-          tfe-token: ${{ secrets.TFE_TOKEN }}
-          stack-name: geprodstack
-          happy_version: "0.20.0"
-          create-tag: "false"
-          tag: ${{ env.DEPLOY_SHA }}
-          env: prod 
+          environment: staging
+          owner: chanzuckerberg
+          repo: czgenepi
+          happy_version: "0.23.0"
+      - name: Generate payload
+        run: |
+          if [ -n "${{ github.event.inputs.image_tag }}" ]; then
+              echo "Using workflow dispatch to deploy tag ${{ github.event.inputs.image_tag }}"
+              echo "payload={\"tag\":\"${{ github.event.inputs.image_tag }}\"}" >> $GITHUB_ENV
+          else
+              echo "payload={\"tag\":\"sha-${DEPLOY_SHA:0:8}\"}" >> $GITHUB_ENV
+          fi
+      - uses: avakar/create-deployment@v1.0.2
+        with:
+          auto_merge: false
+          environment: ${{ github.event.inputs.image_tag || 'prod' }}
+          payload: ${{ env.payload }}
+          required_contexts: ""
+        env:
+          GITHUB_TOKEN: ${{ secrets.CZIBUILDBOT_GITHUB_TOKEN }}
       - uses: act10ns/slack@v1
         with:
           status: ${{ job.status }}

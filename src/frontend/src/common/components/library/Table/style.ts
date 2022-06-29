@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import { MAX_CONTENT_WIDTH } from "src/common/styles/mixins/global";
 
 export const DataRows = styled.div`
   height: 77vh;
@@ -10,6 +11,5 @@ export const DataRows = styled.div`
 `;
 
 export const Container = styled.div`
-  max-width: 1308px;
-  margin: 0 auto;
+  max-width: ${MAX_CONTENT_WIDTH}px;
 `;

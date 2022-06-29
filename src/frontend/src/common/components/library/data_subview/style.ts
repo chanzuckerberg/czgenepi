@@ -7,6 +7,7 @@ import {
   getFontWeights,
   getSpaces,
 } from "czifui";
+import { MAX_CONTENT_WIDTH } from "src/common/styles/mixins/global";
 
 export const StyledDiv = styled.div`
   ${fontHeaderXs}
@@ -68,7 +69,7 @@ export const TooltipDescriptionText = styled.div`
 export const StyledFlexChildDiv = styled.div`
   flex: 1 1 0;
   margin: 0 auto;
-  max-width: 1308px;
+  max-width: ${MAX_CONTENT_WIDTH}px;
   align-items: stretch;
   flex-direction: column;
 

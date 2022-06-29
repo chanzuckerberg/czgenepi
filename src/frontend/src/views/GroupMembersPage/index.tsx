@@ -1,13 +1,13 @@
 import { Tab } from "czifui";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import { useUserInfo } from "src/common/queries/auth";
+import { useProtectedRoute, useUserInfo } from "src/common/queries/auth";
 import { useGroupInfo, useGroupMembersInfo } from "src/common/queries/groups";
 import { ROUTES } from "src/common/routes";
 import { stringifyGisaidLocation } from "src/common/utils/locationUtils";
 import { getGroupIdFromUser } from "src/common/utils/userUtils";
 import { GroupDetailsTab } from "./components/GroupDetailsTab";
-import { MembersTab } from "./components/MembersTab";
+import { MembersTab, SecondaryTabType } from "./components/MembersTab";
 import {
   StyledHeader,
   StyledName,
@@ -15,7 +15,7 @@ import {
   StyledTabs,
 } from "./style";
 
-enum PrimaryTabType {
+export enum PrimaryTabType {
   MEMBERS = "members",
   DETAILS = "details",
 }
@@ -26,22 +26,17 @@ export type TabEventHandler = (
 ) => void;
 
 interface Props {
-  pathTokens?: string[];
+  requestedPrimaryTab: PrimaryTabType;
+  requestedSecondaryTab: SecondaryTabType;
 }
 
-const isValidPrimaryTab = (token?: string) => {
-  return token === PrimaryTabType.MEMBERS || token === PrimaryTabType.DETAILS;
-};
+const GroupMembersPage = ({
+  requestedPrimaryTab,
+  requestedSecondaryTab,
+}: Props): JSX.Element | null => {
+  useProtectedRoute();
 
-const GroupMembersPage = ({ pathTokens }: Props): JSX.Element | null => {
-  const [primaryQueryParam, secondaryQueryParam] = pathTokens ?? [];
-  const initialPrimaryTab = (
-    isValidPrimaryTab(primaryQueryParam)
-      ? primaryQueryParam
-      : PrimaryTabType.MEMBERS
-  ) as PrimaryTabType;
-
-  const [tabValue, setTabValue] = useState<PrimaryTabType>(initialPrimaryTab);
+  const [tabValue, setTabValue] = useState<PrimaryTabType>(requestedPrimaryTab);
   const router = useRouter();
 
   const { data: userInfo } = useUserInfo();
@@ -49,13 +44,11 @@ const GroupMembersPage = ({ pathTokens }: Props): JSX.Element | null => {
   const { data: members = [] } = useGroupMembersInfo(groupId);
   const { data: groupInfo } = useGroupInfo(groupId);
 
+  const { address, location, name, prefix } = groupInfo ?? {};
+
   useEffect(() => {
-    router.push(`${ROUTES.GROUP}/${tabValue}`, undefined, { shallow: true });
-  }, [tabValue]);
-
-  if (!groupInfo) return null;
-
-  const { address, location, name, prefix } = groupInfo;
+    setTabValue(requestedPrimaryTab);
+  }, [requestedPrimaryTab]);
 
   // sort group members by name before display
   members.sort((a, b) => (a.name > b.name ? 1 : -1));
@@ -64,6 +57,7 @@ const GroupMembersPage = ({ pathTokens }: Props): JSX.Element | null => {
 
   const handleTabClick: TabEventHandler = (_, value) => {
     setTabValue(value);
+    router.push(`${ROUTES.GROUP}/${value}`);
   };
 
   return (
@@ -83,9 +77,11 @@ const GroupMembersPage = ({ pathTokens }: Props): JSX.Element | null => {
       <StyledPageContent>
         {tabValue === PrimaryTabType.MEMBERS && (
           <MembersTab
-            secondaryQueryParam={secondaryQueryParam}
+            requestedSecondaryTab={requestedSecondaryTab}
             groupName={name}
+            groupId={groupId}
             members={members}
+            userInfo={userInfo}
           />
         )}
         {tabValue === PrimaryTabType.DETAILS && (

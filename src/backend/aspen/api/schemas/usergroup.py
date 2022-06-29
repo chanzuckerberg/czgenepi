@@ -1,8 +1,19 @@
 import datetime
 from typing import List, Optional
 
+from pydantic import constr
+
 from aspen.api.schemas.base import BaseRequest, BaseResponse
 from aspen.api.schemas.locations import LocationResponse
+
+
+class GroupCreationRequest(BaseRequest):
+    name: constr(min_length=3, max_length=128, strict=True)  # type: ignore
+    prefix: constr(min_length=2, max_length=20, strict=True)  # type: ignore
+    address: Optional[constr(min_length=1, max_length=128, strict=True)]  # type: ignore
+    division: Optional[constr(min_length=1, max_length=128, strict=True)]  # type: ignore
+    location: Optional[constr(min_length=1, max_length=128, strict=True)]  # type: ignore
+    default_tree_location_id: int
 
 
 class GroupResponse(BaseResponse):
@@ -26,12 +37,14 @@ class UserBaseResponse(BaseResponse):
 class UserUpdateRequest(BaseRequest):
     agreed_to_tos: Optional[bool] = None
     acknowledged_policy_version: Optional[datetime.date] = None
+    name: Optional[str] = None
 
 
 # Only expose split id and groups to the user it belongs to.
 class UserMeResponse(UserBaseResponse):
     split_id: str
     group: GroupResponse
+    group_admin: bool
 
 
 class GroupInvitationsRequest(BaseRequest):

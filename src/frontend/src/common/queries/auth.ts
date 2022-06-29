@@ -11,7 +11,13 @@ import ENV from "src/common/constants/ENV";
 import { API, DEFAULT_PUT_OPTIONS, getBackendApiJson } from "../api";
 import { ROUTES } from "../routes";
 import { ENTITIES } from "./entities";
-import { mapGroupData, RawGroupRequest } from "./groups";
+import {
+  mapGroupData,
+  RawGroupRequest,
+  USE_GROUP_INFO,
+  USE_GROUP_INVITATION_INFO,
+  USE_GROUP_MEMBER_INFO,
+} from "./groups";
 
 const { API_URL } = ENV;
 
@@ -31,20 +37,14 @@ export interface RawUserRequest {
 }
 
 export const mapUserData = (obj: RawUserRequest): User => {
-  const mappedUserData: User = {
+  return {
     acknowledgedPolicyVersion: obj.acknowledged_policy_version,
     agreedToTos: obj.agreed_to_tos,
-    // @ts-expect-error TODO (mlila): types
-    email: obj.email,
+    group: mapGroupData(obj.group),
     id: obj.id,
-    isGroupAdmin: obj.group_admin,
     name: obj.name,
     splitId: obj.split_id,
   };
-
-  if (obj.group) mappedUserData.group = mapGroupData(obj.group);
-
-  return mappedUserData;
 };
 
 export const fetchUserInfo = (): Promise<RawUserRequest> => {
@@ -68,7 +68,12 @@ export function useUpdateUserInfo(): UseMutationResult<
 
   return useMutation(updateUserInfo, {
     onSuccess: async () => {
-      await queryClient.invalidateQueries([USE_USER_INFO]);
+      await queryClient.invalidateQueries([
+        USE_USER_INFO,
+        USE_GROUP_INFO,
+        USE_GROUP_INVITATION_INFO,
+        USE_GROUP_MEMBER_INFO,
+      ]);
     },
   });
 }

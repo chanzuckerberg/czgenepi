@@ -74,8 +74,15 @@ class Auth0Client:
             results.extend(resp[key])
             page += 1
 
+    def get_user_by_email(self, email) -> List[Auth0User]:
+        return self.client.users_by_email.search_users_by_email(email)
+
     def get_users(self) -> List[Auth0User]:
         return self.get_all_results(self.client.users.list, "users")
+
+    def get_org_user_roles(self, org_id: str, user_id: str) -> List[str]:
+        res = self.client.organizations.all_organization_member_roles(org_id, user_id)
+        return [item["name"] for item in res]
 
     @cache
     def get_org_by_name(self, org_name: str) -> Auth0Org:
@@ -176,6 +183,14 @@ class Auth0Client:
             "connection": "Username-Password-Authentication",
         }
         return self.client.users.create(body)
+
+    def update_user(self, auth0_user_id: str, **kwargs):
+        updateable_fields = ["name"]
+        for field in kwargs.keys():
+            if field not in updateable_fields:
+                raise KeyError(f"{field} is not an updateable user field.")
+        body = {**kwargs}
+        return self.client.users.update(auth0_user_id, body)
 
     def delete_user(self, auth0_user_id: str) -> None:
         self.client.users.delete(auth0_user_id)

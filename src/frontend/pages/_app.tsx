@@ -2,32 +2,20 @@ import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
 import { StylesProvider, ThemeProvider } from "@material-ui/core/styles";
 import { AppProps } from "next/app";
 import Head from "next/head";
-import { useRouter } from "next/router";
 import React, { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import "semantic-ui-css/semantic.min.css";
 import { OneTrustInitializer } from "src/common/analytics/OneTrustInitializer";
 import { PlausibleInitializer } from "src/common/analytics/PlausibleInitializer";
 import { SegmentInitializer } from "src/common/analytics/SegmentInitializer";
-import { ROUTES } from "src/common/routes";
 import { StyledApp } from "src/common/styles/appStyle";
 import { theme } from "src/common/styles/theme";
 import { setFeatureFlagsFromQueryParams } from "src/common/utils/featureFlags";
-import NavBarLoggedIn from "src/components/NavBar";
-import NavBarLanding from "src/components/NavBarV2";
+import Nav from "src/components/NavBar";
 import SplitInitializer from "src/components/Split";
 
 const queryClient = new QueryClient();
 setFeatureFlagsFromQueryParams();
-
-function Nav(): JSX.Element {
-  const router = useRouter();
-  return router.asPath === ROUTES.HOMEPAGE ? (
-    <NavBarLanding />
-  ) : (
-    <NavBarLoggedIn />
-  );
-}
 
 const App = ({ Component, pageProps }: AppProps): JSX.Element => {
   // (thuang): MUI related SSR setup

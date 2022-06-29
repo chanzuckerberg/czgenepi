@@ -79,6 +79,12 @@ module.exports = {
         destination: "/.well-known/security.txt",
         permanent: true,
       },
+      {
+        source: "/resources",
+        destination:
+          "https://help.czgenepi.org/hc/en-us/categories/6217716150804-Genomic-Epidemiology-Learning-Center",
+        permanent: true,
+      },
     ];
   },
 

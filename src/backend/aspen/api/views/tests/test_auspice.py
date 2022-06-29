@@ -152,7 +152,7 @@ async def test_tampered_magic_link(
     )
 
 
-# This tests assumes we are using a group in the USA,
+# This tests assumes we are using a group from Santa Barbara, CA, USA
 # and the test location data at the top of this file
 async def test_country_color_labeling(
     async_session: AsyncSession,
@@ -167,6 +167,8 @@ async def test_country_color_labeling(
         country_entry = location_factory(
             point.region,
             point.country,
+            division=point.division,
+            location=point.location,
             latitude=point.latitude,
             longitude=point.longitude,
         )
@@ -208,8 +210,21 @@ async def test_country_color_labeling(
             country_colorings = category
     assert country_colorings is not None
 
-    test_data_countries = [point.country for point in TEST_COUNTRY_DATA]
-    test_country_names = ["USA", "Mexico", "Canada", "France", "Germany", "China"]
+    # It turns out Tokyo is closer than Paris to Santa Barbara,
+    # in terms of great circle distance
+
+    test_data_countries = set([point.country for point in TEST_COUNTRY_DATA])
+    test_data_countries.add(group.default_tree_location.country)
+    test_country_names = [
+        "USA",
+        "Mexico",
+        "Canada",
+        "Panama",
+        "Dominican Republic",
+        "Curaçao",
+        "Japan",
+        "Denmark",
+    ]
 
     assert "scale" in country_colorings
 
@@ -218,8 +233,185 @@ async def test_country_color_labeling(
         assert country in test_data_countries
         assert re.search(r"^#(?:[0-9a-fA-F]{3}){1,2}$", hex_color) is not None
         unique_countries.add(country)
-
+    print(unique_countries)
+    print(country_colorings["scale"])
     assert len(unique_countries) == len(country_colorings["scale"])
     for entry in test_country_names:
         assert entry in unique_countries
-    assert "Japan" not in unique_countries
+    assert "France" not in unique_countries
+
+
+# This tests assumes we are using a group in the USA,
+# and the test location data at the top of this file
+async def test_division_color_labeling(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+    mock_s3_resource: boto3.resource,
+):
+    user, group, samples, phylo_run, phylo_tree = await make_shared_test_data(
+        async_session
+    )
+
+    for point in TEST_COUNTRY_DATA:
+        country_entry = location_factory(
+            point.region,
+            point.country,
+            division=point.division,
+            location=point.location,
+            latitude=point.latitude,
+            longitude=point.longitude,
+        )
+        async_session.add(country_entry)
+    await async_session.commit()
+
+    # We need to create the bucket since this is all in Moto's 'virtual' AWS account
+    try:
+        mock_s3_resource.meta.client.head_bucket(Bucket=phylo_tree.s3_bucket)
+    except ClientError:
+        # The bucket does not exist or you have no access.
+        mock_s3_resource.create_bucket(Bucket=phylo_tree.s3_bucket)
+
+    test_json = json.dumps(TEST_TREE)
+    mock_s3_resource.Bucket(phylo_tree.s3_bucket).Object(phylo_tree.s3_key).put(
+        Body=test_json
+    )
+
+    auth_headers = {"user_id": user.auth0_user_id}
+    request_body = {"tree_id": phylo_tree.entity_id}
+    generate_res = await http_client.post(
+        "/v2/auspice/generate", json=request_body, headers=auth_headers
+    )
+
+    assert generate_res.status_code == 200
+    generate_response = generate_res.json()
+    magic_link = generate_response["url"]
+
+    access_res = await http_client.get(magic_link.removeprefix("test"))
+    assert access_res.status_code == 200
+    res_json = access_res.json()
+
+    assert "meta" in res_json
+    assert "colorings" in res_json["meta"]
+
+    division_colorings = None
+    for category in res_json["meta"]["colorings"]:
+        if category["key"] == "division":
+            division_colorings = category
+    assert division_colorings is not None
+
+    test_data_divisions = set(
+        [point.division for point in TEST_COUNTRY_DATA if point.division is not None]
+    )
+    test_data_divisions.add(group.default_tree_location.division)
+    test_division_names = [
+        "California",
+        "Nevada",
+        "La Habana",
+        "National District",
+        "Willemstad",
+        "Kantō",
+    ]
+
+    assert "scale" in division_colorings
+
+    unique_divisions = set()
+    for location, hex_color in division_colorings["scale"]:
+        assert location in test_data_divisions
+        assert re.search(r"^#(?:[0-9a-fA-F]{3}){1,2}$", hex_color) is not None
+        unique_divisions.add(location)
+    print(unique_divisions)
+    print(division_colorings["scale"])
+    assert len(unique_divisions) == len(division_colorings["scale"])
+    for entry in test_division_names:
+        assert entry in unique_divisions
+    # Denmark should now be crowded out because we have two USA divisions
+    assert "Hovedstaden" not in unique_divisions
+
+
+# This tests assumes we are using a group in the USA,
+# and the test location data at the top of this file
+async def test_location_color_labeling(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+    mock_s3_resource: boto3.resource,
+):
+    user, group, samples, phylo_run, phylo_tree = await make_shared_test_data(
+        async_session
+    )
+
+    for point in TEST_COUNTRY_DATA:
+        country_entry = location_factory(
+            point.region,
+            point.country,
+            division=point.division,
+            location=point.location,
+            latitude=point.latitude,
+            longitude=point.longitude,
+        )
+        async_session.add(country_entry)
+    await async_session.commit()
+
+    # We need to create the bucket since this is all in Moto's 'virtual' AWS account
+    try:
+        mock_s3_resource.meta.client.head_bucket(Bucket=phylo_tree.s3_bucket)
+    except ClientError:
+        # The bucket does not exist or you have no access.
+        mock_s3_resource.create_bucket(Bucket=phylo_tree.s3_bucket)
+
+    test_json = json.dumps(TEST_TREE)
+    mock_s3_resource.Bucket(phylo_tree.s3_bucket).Object(phylo_tree.s3_key).put(
+        Body=test_json
+    )
+
+    auth_headers = {"user_id": user.auth0_user_id}
+    request_body = {"tree_id": phylo_tree.entity_id}
+    generate_res = await http_client.post(
+        "/v2/auspice/generate", json=request_body, headers=auth_headers
+    )
+
+    assert generate_res.status_code == 200
+    generate_response = generate_res.json()
+    magic_link = generate_response["url"]
+
+    access_res = await http_client.get(magic_link.removeprefix("test"))
+    assert access_res.status_code == 200
+    res_json = access_res.json()
+
+    assert "meta" in res_json
+    assert "colorings" in res_json["meta"]
+
+    location_colorings = None
+    for category in res_json["meta"]["colorings"]:
+        if category["key"] == "location":
+            location_colorings = category
+    assert location_colorings is not None
+
+    test_data_locations = set(
+        [point.location for point in TEST_COUNTRY_DATA if point.location is not None]
+    )
+    test_data_locations.add(group.default_tree_location.location)
+    test_location_names = [
+        "Santa Barbara County",
+        "Clark County",
+        "Alameda County",
+        "Vancouver",
+        "Nassau",
+        "Port-au-Prince",
+        "Santo Domingo",
+        "Willemstad",
+    ]
+
+    assert "scale" in location_colorings
+
+    unique_locations = set()
+    for location, hex_color in location_colorings["scale"]:
+        assert location in test_data_locations
+        assert re.search(r"^#(?:[0-9a-fA-F]{3}){1,2}$", hex_color) is not None
+        unique_locations.add(location)
+    print(unique_locations)
+    print(location_colorings["scale"])
+    assert len(unique_locations) == len(location_colorings["scale"])
+    for entry in test_location_names:
+        assert entry in unique_locations
+    # Tokyo should now be crowded out because we have 3 USA locations
+    assert "Tokyo" not in unique_locations
