@@ -1,11 +1,11 @@
 import { Icon } from "czifui";
 import React from "react";
-import { useDispatch } from "react-redux";
 import { setGroup } from "src/common/redux/actions";
+import { useDispatch } from "src/common/redux/hooks";
 import { MenuItem, StyledIcon, StyledIconButton, StyledName } from "./style";
 
 interface Props {
-  id?: number;
+  id: number;
   name: string;
 }
 

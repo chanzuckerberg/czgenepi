@@ -4,14 +4,12 @@
  * to learn more about how these functions work.
  */
 
-import { Action, Store } from "redux";
+import { AnyAction, Middleware } from "redux";
 import { setLocalStorage } from "src/common/utils/localStorage";
-import { setGroupActionType, groupPersistedName } from "../actions";
+import { groupPersistedName, setGroupActionType } from "../actions";
 
-export const setGroupMiddleware =
-  (storeAPI: Store) =>
-  (next) =>
-  (action: Action) => {
+export const setGroupMiddleware: Middleware =
+  () => (next) => (action: AnyAction) => {
     if (action.type === setGroupActionType) {
       setLocalStorage(groupPersistedName, action.payload);
     }
