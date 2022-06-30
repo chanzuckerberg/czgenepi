@@ -1,11 +1,17 @@
 import { applyMiddleware, createStore } from "redux";
 import { composeWithDevTools } from "redux-devtools-extension";
 import { getLocalStorage } from "../utils/localStorage";
+import {
+  setGroupActionType,
+  groupPersistedName,
+  setPathogenActionType,
+  pathogenPersistedName,
+} from "./actions";
 import { setGroupMiddleware } from "./middleware";
 
 const getInitialState = () => {
-  const storedGroup = getLocalStorage("currentGroup");
-  const storedPathogen = getLocalStorage("currentPathogen");
+  const storedGroup = parseInt(getLocalStorage(groupPersistedName));
+  const storedPathogen = getLocalStorage(pathogenPersistedName);
 
   return {
     current: {
@@ -18,7 +24,7 @@ const getInitialState = () => {
 // set up redux store!
 const reduxReducer = (state = getInitialState(), action) => {
   switch (action.type) {
-    case "group/setGroup":
+    case setGroupActionType:
       return {
         ...state,
         current: {
@@ -26,7 +32,7 @@ const reduxReducer = (state = getInitialState(), action) => {
           group: action.payload,
         },
       };
-    case "pathogen/setPathogen":
+    case setPathogenActionType:
       return {
         ...state,
         current: {

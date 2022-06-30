@@ -6,14 +6,14 @@
 
 import { Action, Store } from "redux";
 import { setLocalStorage } from "src/common/utils/localStorage";
-import { setGroupActionType } from "../actions";
+import { setGroupActionType, groupPersistedName } from "../actions";
 
 export const setGroupMiddleware =
   (storeAPI: Store) =>
   (next) =>
   (action: Action) => {
     if (action.type === setGroupActionType) {
-      setLocalStorage("currentGroup", action.payload);
+      setLocalStorage(groupPersistedName, action.payload);
     }
 
     return next(action);

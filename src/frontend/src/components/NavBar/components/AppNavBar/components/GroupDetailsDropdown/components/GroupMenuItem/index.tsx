@@ -5,7 +5,7 @@ import { setGroup } from "src/common/redux/actions";
 import { MenuItem, StyledIcon, StyledIconButton, StyledName } from "./style";
 
 interface Props {
-  id?: number; // this will be used once we hook up click handler to switch group
+  id?: number;
   name: string;
 }
 
