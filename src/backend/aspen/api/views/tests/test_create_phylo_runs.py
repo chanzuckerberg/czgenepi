@@ -233,7 +233,7 @@ async def test_create_phylo_run_with_epi_isls(
     Test phylo tree creation that includes a reference to a GISAID sequence.
     """
     group = group_factory()
-    user = user_factory(group)
+    user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
