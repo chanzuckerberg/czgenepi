@@ -1,6 +1,7 @@
-import { createStore } from "redux";
+import { applyMiddleware, createStore } from "redux";
 import { composeWithDevTools } from "redux-devtools-extension";
 import { getLocalStorage } from "../utils/localStorage";
+import { setGroupMiddleware } from "./middleware";
 
 const getInitialState = () => {
   const storedGroup = getLocalStorage("currentGroup");
@@ -38,7 +39,9 @@ const reduxReducer = (state = getInitialState(), action) => {
   }
 };
 
-const composedEnhancer = composeWithDevTools();
+const composedEnhancer = composeWithDevTools(
+  applyMiddleware(setGroupMiddleware)
+);
 export const store = createStore(reduxReducer, composedEnhancer);
 
 export type RootStateType = ReturnType<typeof store.getState>;
