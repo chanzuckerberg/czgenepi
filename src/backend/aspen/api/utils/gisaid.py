@@ -1,4 +1,4 @@
-from typing import Iterable, Mapping, Set
+from typing import Iterable, Mapping, Set, Tuple
 
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -45,3 +45,32 @@ async def get_matching_gisaid_ids(
         gisaid_ids.add(stripped_mapping[gisaid_match.strain])
 
     return gisaid_ids
+
+
+async def get_matching_gisaid_ids_by_epi_isl(
+    session: AsyncSession, sample_ids: Iterable[str]
+) -> Tuple[Set[str], Set[str]]:
+    """
+    Check if a list of identifiers exist as epi isl numbers.
+
+    Parameters:
+        sample_ids Iterable[str]: A list of identifiers (usually submitted by a user)
+                                  that need to be checked if they exist as epi_isl identifiers
+        session (Session): An open sql alchemy session
+
+    Returns:
+            epi_isls (Set[str]): Set of idenitifiers that matched against GisaidMetadata table
+
+    """
+    isl_matches_query = sa.select(GisaidMetadata).where(  # type: ignore
+        GisaidMetadata.gisaid_epi_isl.in_(sample_ids)
+    )
+    isl_matches: Iterable[GisaidMetadata] = (
+        (await session.execute(isl_matches_query)).scalars().all()
+    )
+    gisaid_ids = set()
+    epi_isls = set()
+    for match in isl_matches:
+        gisaid_ids.add(match.strain)
+        epi_isls.add(match.gisaid_epi_isl)
+    return gisaid_ids, epi_isls

@@ -7,6 +7,7 @@ def gisaid_metadata_factory(
     strain="gisaid_identifier/hCoV-19",
     pango_lineage="B.1.617.2",
     gisaid_clade="T",  # T for test
+    gisaid_epi_isl="EPI_ISL_8675309",
     date=None,
     region="North America",  # Not necessarily in our Sample/RegionType enum
     division="California",
@@ -17,6 +18,7 @@ def gisaid_metadata_factory(
         strain=strain,
         pango_lineage=pango_lineage,
         gisaid_clade=gisaid_clade,
+        gisaid_epi_isl=gisaid_epi_isl,
         date=date,
         region=region,
         division=division,

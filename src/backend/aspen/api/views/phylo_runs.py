@@ -27,6 +27,7 @@ from aspen.api.settings import Settings
 from aspen.api.utils import (
     authz_sample_filters,
     get_matching_gisaid_ids,
+    get_matching_gisaid_ids_by_epi_isl,
     get_missing_and_found_sample_ids,
 )
 from aspen.database.models import (
@@ -79,10 +80,19 @@ async def kick_off_phylo_run(
     )
 
     # See if these missing_sample_ids match any Gisaid IDs
-    gisaid_ids = await get_matching_gisaid_ids(db, missing_sample_ids)
+    gisaid_ids: Set[str] = await get_matching_gisaid_ids(db, missing_sample_ids)
 
     # Do we have any samples that are not aspen private or public identifiers or gisaid identifiers?
     missing_sample_ids = missing_sample_ids - gisaid_ids
+
+    # Do the same, but for epi isls
+    gisaid_ids_from_isls: Set[str]
+    epi_isls: Set[str]
+    gisaid_ids_from_isls, epi_isls = await get_matching_gisaid_ids_by_epi_isl(
+        db, missing_sample_ids
+    )
+    missing_sample_ids -= epi_isls
+    gisaid_ids |= gisaid_ids_from_isls
 
     # Throw an error if we have any sample ID's that didn't match county samples OR gisaid samples.
     if missing_sample_ids:

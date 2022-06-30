@@ -225,6 +225,42 @@ async def test_create_phylo_run_with_gisaid_ids(
     assert "id" in response
 
 
+async def test_create_phylo_run_with_epi_isls(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+):
+    """
+    Test phylo tree creation that includes a reference to a GISAID sequence.
+    """
+    group = group_factory()
+    user = await userrole_factory(async_session, group)
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
+    sample = sample_factory(group, user, location)
+    uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
+    gisaid_dump = aligned_gisaid_dump_factory()
+    gisaid_isl_sample = gisaid_metadata_factory()
+    async_session.add(group)
+    async_session.add(gisaid_dump)
+    async_session.add(gisaid_isl_sample)
+    await async_session.commit()
+
+    auth_headers = {"user_id": user.auth0_user_id}
+    data = {
+        "name": "test phylorun",
+        "tree_type": "non_contextualized",
+        "samples": [sample.public_identifier, gisaid_isl_sample.gisaid_epi_isl],
+    }
+    res = await http_client.post("/v2/phylo_runs/", json=data, headers=auth_headers)
+    assert res.status_code == 200
+    response = res.json()
+    assert response["template_args"] == {}
+    assert response["workflow_status"] == "STARTED"
+    assert response["group"]["name"] == group.name
+    assert "id" in response
+
+
 async def test_create_invalid_phylo_run_name(
     async_session: AsyncSession,
     http_client: AsyncClient,
