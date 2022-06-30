@@ -24,7 +24,7 @@ async def samples_by_identifiers(
     )
     private_samples_query = (
         (await az.authorized_query("read_private", Sample))
-         .filter(Sample.public_identifier.in_(sample_ids))  # type: ignore
+        .filter(Sample.public_identifier.in_(sample_ids))  # type: ignore
         .subquery()  # type: ignore
     )
     query = (
