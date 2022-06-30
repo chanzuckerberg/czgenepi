@@ -1111,12 +1111,13 @@ async def setup_validation_data(async_session: AsyncSession):
     )
     sample = sample_factory(group, user, location)
     gisaid_sample = gisaid_metadata_factory()
-    async_session.add(group)
-    async_session.add(sample)
-    async_session.add(gisaid_sample)
+    isl_sample = gisaid_metadata_factory(
+        strain="USA/ISL-TEST/hCov-19", gisaid_epi_isl="EPI_ISL_3141592"
+    )
+    async_session.add_all([group, sample, gisaid_sample, isl_sample])
     await async_session.commit()
 
-    return user, sample, gisaid_sample
+    return user, sample, gisaid_sample, isl_sample
 
 
 async def test_validation_endpoint(
@@ -1127,11 +1128,15 @@ async def test_validation_endpoint(
     Test that validation endpoint is correctly identifying identifiers that are in the DB, and that samples are properly stripped of hCoV-19/ prefix
     """
 
-    user, sample, gisaid_sample = await setup_validation_data(async_session)
+    user, sample, gisaid_sample, isl_sample = await setup_validation_data(async_session)
 
     # add hCoV-19/ as prefix to gisaid identifier to check that stripping of prefix is being done correctly
     data = {
-        "sample_ids": [sample.public_identifier, f"hCoV-19/{gisaid_sample.strain}"],
+        "sample_ids": [
+            sample.public_identifier,
+            f"hCoV-19/{gisaid_sample.strain}",
+            isl_sample.gisaid_epi_isl,
+        ],
     }
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
@@ -1153,11 +1158,12 @@ async def test_validation_endpoint_missing_identifier(
     Test that validation endpoint is correctly identifying identifiers that are not aspen public or private ids or gisaid ids
     """
 
-    user, sample, gisaid_sample = await setup_validation_data(async_session)
+    user, sample, gisaid_sample, isl_sample = await setup_validation_data(async_session)
     data = {
         "sample_ids": [
             sample.public_identifier,
             gisaid_sample.strain,
+            isl_sample.gisaid_epi_isl,
             "this_is_missing",
         ],
     }
