@@ -12,7 +12,7 @@ from aspen.api.views.tests.data.location_data import TEST_COUNTRY_DATA
 from aspen.api.views.tests.data.phylo_tree_data import TEST_TREE
 from aspen.api.views.tests.test_update_phylo_run_and_tree import make_shared_test_data
 from aspen.test_infra.models.location import location_factory
-from aspen.test_infra.models.usergroup import group_factory, user_factory
+from aspen.test_infra.models.usergroup import group_factory, userrole_factory
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
@@ -93,7 +93,8 @@ async def test_unauth_user_auspice_link_generation(
         async_session
     )
     group_that_did_not_make_tree = group_factory(name="i_want_to_see_trees")
-    user_that_did_not_make_tree = user_factory(
+    user_that_did_not_make_tree = await userrole_factory(
+        async_session,
         group_that_did_not_make_tree,
         name="trying_to_see",
         email="trying_to_see@hotmail.com",

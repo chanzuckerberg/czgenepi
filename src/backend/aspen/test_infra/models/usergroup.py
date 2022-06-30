@@ -1,6 +1,9 @@
 from typing import Optional
 from uuid import uuid1
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from aspen.auth.role_manager import RoleManager
 from aspen.database.models import Group, Location, User
 
 
@@ -47,7 +50,7 @@ def user_factory(
     system_admin=False,
     agreed_to_tos=True,
 ) -> User:
-    return User(
+    user = User(
         name=name,
         auth0_user_id=auth0_user_id,
         email=email,
@@ -56,3 +59,33 @@ def user_factory(
         agreed_to_tos=agreed_to_tos,
         group=group,
     )
+    return user
+
+
+async def userrole_factory(
+    db: AsyncSession,
+    group: Group,
+    name="test",
+    auth0_user_id="test_auth0_id",
+    email="test_user@dph.org",
+    roles=["member"],
+    system_admin=False,
+    agreed_to_tos=True,
+) -> User:
+    group_admin = False
+    if "admin" in roles:
+        group_admin = True
+    user = User(
+        name=name,
+        auth0_user_id=auth0_user_id,
+        email=email,
+        group_admin=group_admin,
+        system_admin=system_admin,
+        agreed_to_tos=agreed_to_tos,
+        group=group,
+    )
+    for role in roles:
+        user.user_roles.append(
+            await RoleManager.generate_user_role(db, user, group, role)
+        )
+    return user

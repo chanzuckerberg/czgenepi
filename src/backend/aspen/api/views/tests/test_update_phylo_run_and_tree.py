@@ -9,7 +9,7 @@ from aspen.database.models import Group, PhyloRun, PhyloTree, Sample, User
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
 from aspen.test_infra.models.sample import sample_factory
-from aspen.test_infra.models.usergroup import group_factory, user_factory
+from aspen.test_infra.models.usergroup import group_factory, userrole_factory
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
@@ -27,7 +27,7 @@ async def make_shared_test_data(
         -119.9858232,
     )
     group = group_factory(default_tree_location=location)
-    user = user_factory(group, system_admin=system_admin)
+    user = await userrole_factory(async_session, group, system_admin=system_admin)
     samples = [
         sample_factory(
             group,
@@ -119,7 +119,8 @@ async def test_update_phylo_tree_wrong_group(
         phylo_tree,
     ) = await make_shared_test_data(async_session)
     group_that_did_not_make_tree = group_factory(name="i_want_to_see_trees")
-    user_that_did_not_make_tree = user_factory(
+    user_that_did_not_make_tree = await userrole_factory(
+        async_session,
         group_that_did_not_make_tree,
         name="trying_to_see",
         email="trying_to_see@hotmail.com",

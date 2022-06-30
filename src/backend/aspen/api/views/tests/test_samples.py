@@ -23,7 +23,7 @@ from aspen.test_infra.models.gisaid_metadata import gisaid_metadata_factory
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
-from aspen.test_infra.models.usergroup import group_factory, user_factory
+from aspen.test_infra.models.usergroup import group_factory, userrole_factory
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
@@ -37,7 +37,7 @@ async def test_samples_view(
     http_client: AsyncClient,
 ):
     group = group_factory()
-    user = user_factory(group)
+    user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
@@ -110,7 +110,7 @@ async def test_samples_view_gisaid_rejected(
     http_client: AsyncClient,
 ):
     group = group_factory()
-    user = user_factory(group)
+    user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
@@ -176,7 +176,7 @@ async def test_samples_view_gisaid_no_info(
     http_client: AsyncClient,
 ):
     group = group_factory()
-    user = user_factory(group)
+    user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
@@ -243,7 +243,7 @@ async def test_samples_view_gisaid_not_eligible(
     async_session: AsyncSession, http_client: AsyncClient
 ):
     group = group_factory()
-    user = user_factory(group)
+    user = await userrole_factory(async_session, group)
     # Mark the sample as failed
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
@@ -310,7 +310,7 @@ async def _test_samples_view_cansee(
     user_factory_kwargs = user_factory_kwargs or {}
     owner_group = group_factory()
     viewer_group = group_factory(name="cdph")
-    user = user_factory(viewer_group, **user_factory_kwargs)
+    user = await userrole_factory(async_session, viewer_group, **user_factory_kwargs)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
@@ -507,7 +507,7 @@ async def test_samples_view_no_pangolin(
     async_session: AsyncSession, http_client: AsyncClient
 ):
     group = group_factory()
-    user = user_factory(group)
+    user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
@@ -583,7 +583,7 @@ async def test_bulk_delete_sample_success(
     Test successful sample deletion by ID
     """
     group = group_factory()
-    user = user_factory(group)
+    user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
@@ -649,7 +649,7 @@ async def test_delete_sample_success(
     Test successful sample deletion by ID
     """
     group = group_factory()
-    user = user_factory(group)
+    user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
@@ -734,7 +734,7 @@ async def test_delete_sample_failures(
     Test a sample deletion failure by a user without write access
     """
     group = group_factory()
-    user = user_factory(group)
+    user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
@@ -745,8 +745,11 @@ async def test_delete_sample_failures(
 
     # A group that doesn't have access to our sample.
     group2 = group_factory(name="The Other Group")
-    user2 = user_factory(
-        group2, email="test_user@othergroup.org", auth0_user_id="other_test_auth0_id"
+    user2 = await userrole_factory(
+        async_session,
+        group2,
+        email="test_user@othergroup.org",
+        auth0_user_id="other_test_auth0_id",
     )
     location2 = location_factory(
         "North America", "USA", "California", "San Francisco County"
@@ -794,8 +797,11 @@ async def make_test_samples(
     async_session: AsyncSession, suffix=None
 ) -> Tuple[User, Group, List[Sample], Location]:
     group = group_factory(name=f"testgroup{suffix}")
-    user = user_factory(
-        group, email=f"testemail{suffix}", auth0_user_id=f"testemail{suffix}"
+    user = await userrole_factory(
+        async_session,
+        group,
+        email=f"testemail{suffix}",
+        auth0_user_id=f"testemail{suffix}",
     )
     location1 = location_factory(
         "North America", "USA", "California", f"Santa Barbara County{suffix}"
@@ -1105,7 +1111,7 @@ async def test_update_samples_request_failures(
 
 async def setup_validation_data(async_session: AsyncSession):
     group = group_factory()
-    user = user_factory(group)
+    user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )

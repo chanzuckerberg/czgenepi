@@ -17,7 +17,7 @@ from aspen.api.views.tests.utils.phylo_tree_utils import (
 )
 from aspen.database.models import Group, Location, User
 from aspen.test_infra.models.location import location_factory
-from aspen.test_infra.models.usergroup import group_factory, user_factory
+from aspen.test_infra.models.usergroup import group_factory, userrole_factory
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
@@ -97,7 +97,7 @@ async def test_phylo_tree_no_can_see(
 ):
     owner_group: Group = group_factory()
     viewer_group: Group = group_factory(name="CADPH")
-    user: User = user_factory(viewer_group)
+    user: User = await userrole_factory(async_session, viewer_group)
     location: Location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
@@ -143,7 +143,7 @@ async def test_phylo_tree_admin(
 ):
     owner_group: Group = group_factory()
     viewer_group: Group = group_factory("admin")
-    user: User = user_factory(viewer_group, system_admin=True)
+    user: User = await userrole_factory(async_session, viewer_group, system_admin=True)
     location: Location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
