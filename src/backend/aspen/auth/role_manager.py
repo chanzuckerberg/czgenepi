@@ -1,7 +1,7 @@
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from aspen.database.models import Group, Role, User, UserRole
+from aspen.database.models import Group, GroupRole, Role, User, UserRole
 
 
 class RoleManager:
@@ -15,6 +15,20 @@ class RoleManager:
             .one()
         )
         return role
+
+    @classmethod
+    async def generate_group_role(
+        cls,
+        db: AsyncSession,
+        grantor_group: Group,
+        grantee_group: Group,
+        role_name: str,
+    ) -> GroupRole:
+        role = await cls.get_role_by_name(db, role_name)
+        gr = GroupRole(
+            grantor_group=grantor_group, grantee_group=grantee_group, role=role
+        )
+        return gr
 
     @classmethod
     async def generate_user_role(

@@ -8,10 +8,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
 from aspen.database.models import PathogenGenome, Sample, UploadedPathogenGenome
-from aspen.test_infra.models.gisaid_metadata import gisaid_metadata_factory
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.sample import sample_factory
-from aspen.test_infra.models.usergroup import group_factory, user_factory
+from aspen.test_infra.models.usergroup import group_factory, userrole_factory
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
@@ -33,7 +32,7 @@ async def test_samples_create_view_pass_no_public_id(
     http_client: AsyncClient,
 ):
     group = group_factory()
-    user = user_factory(group)
+    user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
@@ -116,7 +115,7 @@ async def test_stripping_whitespace(
     http_client: AsyncClient,
 ):
     group = group_factory()
-    user = user_factory(group)
+    user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
@@ -175,7 +174,7 @@ async def test_samples_create_view_pass_no_sequencing_date(
     http_client: AsyncClient,
 ):
     group = group_factory()
-    user = user_factory(group)
+    user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
@@ -265,7 +264,7 @@ async def test_samples_create_view_invalid_sequence(
     http_client: AsyncClient,
 ):
     group = group_factory()
-    user = user_factory(group)
+    user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
@@ -313,7 +312,7 @@ async def test_samples_create_view_fail_duplicate_ids(
     http_client: AsyncClient,
 ):
     group = group_factory()
-    user = user_factory(group)
+    user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
@@ -372,7 +371,7 @@ async def test_samples_create_view_fail_duplicate_ids_in_request_data(
     http_client: AsyncClient,
 ):
     group = group_factory()
-    user = user_factory(group)
+    user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
@@ -431,7 +430,7 @@ async def test_samples_create_view_fail_missing_required_fields(
     http_client: AsyncClient,
 ):
     group = group_factory()
-    user = user_factory(group)
+    user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
@@ -483,19 +482,3 @@ async def test_samples_create_view_fail_missing_required_fields(
             },
         ]
     }
-
-
-async def setup_validation_data(session: AsyncSession, client: AsyncClient):
-    group = group_factory()
-    user = user_factory(group)
-    location = location_factory(
-        "North America", "USA", "California", "Santa Barbara County"
-    )
-    sample = sample_factory(group, user, location)
-    gisaid_sample = gisaid_metadata_factory()
-    session.add(group)
-    session.add(sample)
-    session.add(gisaid_sample)
-    await session.commit()
-
-    return client, sample, gisaid_sample

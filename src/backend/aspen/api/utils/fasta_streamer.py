@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
 from aspen.api.utils import authz_sample_filters
-from aspen.database.models import DataType, Sample, UploadedPathogenGenome
+from aspen.database.models import Sample, UploadedPathogenGenome
 from aspen.database.models.usergroup import User
 
 
@@ -27,11 +27,6 @@ class FastaStreamer:
     ):
         self.db = db
         self.user = user
-        self.cansee_groups_private_identifiers: Set[int] = {
-            cansee.owner_group_id
-            for cansee in user.group.can_see
-            if cansee.data_type == DataType.PRIVATE_IDENTIFIERS
-        }
         # query for samples
         all_samples_query = sa.select(Sample).options(  # type: ignore
             joinedload(Sample.uploaded_pathogen_genome, innerjoin=True).undefer(  # type: ignore
@@ -64,8 +59,6 @@ class FastaStreamer:
                 # use private id if the user has access to it, else public id
                 if (
                     sample.submitting_group_id == self.user.group_id
-                    or sample.submitting_group_id
-                    in self.cansee_groups_private_identifiers
                     or self.user.system_admin
                 ):
                     yield self._output_id_line(sample.private_identifier)
