@@ -1,5 +1,7 @@
 import { Icon } from "czifui";
 import React from "react";
+import { useDispatch } from "react-redux";
+import { setGroup } from "src/common/redux/actions";
 import { MenuItem, StyledIcon, StyledIconButton, StyledName } from "./style";
 
 interface Props {
@@ -7,9 +9,11 @@ interface Props {
   name: string;
 }
 
-const GroupMenuItem = ({ name }: Props): JSX.Element => {
+const GroupMenuItem = ({ id, name }: Props): JSX.Element => {
+  const dispatch = useDispatch();
   const onClick = () => {
     // switch group
+    dispatch(setGroup(id));
   };
 
   return (
