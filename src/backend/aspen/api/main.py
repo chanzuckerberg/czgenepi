@@ -145,7 +145,6 @@ def get_app() -> FastAPI:
     # Which routes are "ready" to accept org prefixes?
     org_routers = {
         "phylo_runs": phylo_runs.router,
-        "phylo_trees": phylo_trees.router,
         "samples": samples.router,
     }
     for suffix, router in org_routers.items():
