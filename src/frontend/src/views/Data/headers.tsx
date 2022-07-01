@@ -78,7 +78,7 @@ export const SAMPLE_HEADERS: Header[] = [
     tooltip: {
       boldText: "GISAID Status",
       regularText:
-        "Whether your sample has been Not Yet Submitted, Submitted, Accepted (with GISAID ID), Rejected, or Not Eligible (marked private).",
+        "Whether your sample has been Not Yet Submitted, Submitted, Accepted (with GISAID accession), Rejected, or Not Eligible (marked private).",
     },
   },
 ];
