@@ -6,9 +6,11 @@ from auth0.v3.exceptions import Auth0Error
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
+from sqlalchemy.orm.exc import NoResultFound
 from starlette.requests import Request
 
 from aspen.api.authn import get_admin_user, get_auth0_apiclient, get_auth_user
+from aspen.api.authz import AuthZSession, get_authz_session
 from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.usergroup import (
@@ -31,7 +33,6 @@ async def create_group(
     group_creation_request: GroupCreationRequest,
     db: AsyncSession = Depends(get_db),
     auth0_client: Auth0Client = Depends(get_auth0_apiclient),
-    settings: Settings = Depends(get_settings),
     user: User = Depends(get_admin_user),
 ) -> GroupInfoResponse:
     # Auth0 requires we only have alphanumerics, "-" and "_" in a group name.
@@ -49,7 +50,7 @@ async def create_group(
 
     created_group_query = (
         sa.select(Group)  # type: ignore
-        .options(joinedload(Group.default_tree_location))
+        .options(joinedload(Group.default_tree_location))  # type: ignore
         .where(Group.auth0_org_id == group.auth0_org_id)
     )
     created_group_query_result = await db.execute(created_group_query)
@@ -57,22 +58,33 @@ async def create_group(
     return GroupInfoResponse.from_orm(created_group)
 
 
+async def get_serializable_groups(
+    db: AsyncSession, az: AuthZSession, privilege="read", id=None
+):
+    query = await az.authorized_query(privilege, Group)
+    query = query.options(
+        joinedload(Group.default_tree_location)  # For Pydantic serialization
+    )
+    if id:
+        query = query.filter(Group.id == id)
+    res = await db.execute(query)
+    if id:
+        try:
+            item = res.unique().scalars().one()
+        except NoResultFound:
+            raise ex.NotFoundException("group not found")
+        return item
+
+    return res.unique().scalars().all()
+
+
 @router.get("/{group_id}/", response_model=GroupInfoResponse)
 async def get_group_info(
     group_id: int,
-    request: Request,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_auth_user),
+    az: AuthZSession = Depends(get_authz_session),
 ) -> GroupInfoResponse:
-    if user.group.id != group_id and not user.system_admin:
-        raise ex.UnauthorizedException("Not authorized")
-    group_query = (
-        sa.select(Group)  # type: ignore
-        .options(joinedload(Group.default_tree_location))
-        .where(Group.id == group_id)
-    )
-    group_query_result = await db.execute(group_query)
-    group = group_query_result.scalars().one()
+    group = await get_serializable_groups(db, az, id=group_id)
     return GroupInfoResponse.from_orm(group)
 
 

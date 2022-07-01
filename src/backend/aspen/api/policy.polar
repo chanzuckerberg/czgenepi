@@ -28,6 +28,17 @@ resource Sample {
   "write" if "member";
 }
 
+resource Group {
+  roles = ["admin", "viewer", "member"];
+  permissions = ["read", "write"];
+
+  # admin permissions
+  "read" if "admin";
+  "write" if "admin";
+  # member permissions
+  "read" if "member";
+}
+
 resource PhyloRun {
   roles = ["admin", "viewer", "member"];
   permissions = ["read", "write"];
