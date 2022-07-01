@@ -82,7 +82,7 @@ jobs:
             console.log(`stackName: ${stackName}`)
             core.setOutput('stack-name', stackName)
       - name: Create or update rdev
-        uses: chanzuckerberg/github-actions/.github/actions/deploy-happy-stack@v1.2.1
+        uses: chanzuckerberg/github-actions/.github/actions/deploy-happy-stack@v1.5.2
         with:
           tfe-token: ${{ secrets.TFE_TOKEN }}
           stack-name: ${{ steps.stack-name.outputs.stack-name }}
