@@ -1,5 +1,5 @@
 import logging
-from typing import MutableSequence, Optional
+from typing import List, MutableSequence, Optional, TypedDict
 
 import sentry_sdk
 import sqlalchemy as sa
@@ -23,8 +23,12 @@ def get_usergroup_query(session: AsyncSession, auth0_user_id: str) -> Query:
     return (
         sa.select(User)  # type: ignore
         .options(joinedload(User.group).joinedload(Group.can_see))  # type: ignore
-        .options(joinedload(User.user_roles).joinedload(UserRole.group, innerjoin=True))  # type: ignore
-        .options(joinedload(User.user_roles).joinedload(UserRole.role, innerjoin=True))  # type: ignore
+        .options(
+            joinedload(User.user_roles).options(  # type: ignore
+                joinedload(UserRole.group, innerjoin=True),  # type: ignore
+                joinedload(UserRole.role, innerjoin=True),
+            )
+        )  # type: ignore
         .filter(User.auth0_user_id == auth0_user_id)  # type: ignore
     )
 
@@ -102,13 +106,18 @@ async def get_auth0_apiclient(
     return auth0_client
 
 
+class ACGroupRole(TypedDict):
+    group_id: int
+    role: str
+
+
 class AuthContext:
     def __init__(
         self,
         user: User,
         group: Group,
-        user_roles: MutableSequence[UserRole],
-        group_roles: MutableSequence[GroupRole],
+        user_roles: List[str],
+        group_roles: List[ACGroupRole],
     ):
         self.user = user
         self.group = group
@@ -117,14 +126,13 @@ class AuthContext:
 
 
 async def require_group_membership(
-    org_id: Optional[int],
-    request: Request,
+    org_id: Optional[int] = None,
     user: User = Depends(get_auth_user),
     session: AsyncSession = Depends(get_db),
-    settings: Settings = Depends(get_settings),
 ) -> MutableSequence[UserRole]:
+    # Default to the user's old primary group if we don't get an explicit org id in the URL
     if org_id is None:
-        return []
+        org_id = user.group.id
     # Figure out whether this user is a *direct member* of the group
     # we're trying to get context for.
     query = (
@@ -142,7 +150,7 @@ async def require_group_membership(
 
 
 async def get_auth_context(
-    org_id: Optional[int],  # NOTE - This comes from our route!
+    org_id: Optional[int] = None,  # NOTE - This comes from our route!
     user: User = Depends(get_auth_user),
     session: AsyncSession = Depends(get_db),
     user_roles: MutableSequence[UserRole] = Depends(require_group_membership),
@@ -152,7 +160,9 @@ async def get_auth_context(
     # org info *intentionally* for user self-management endpoints (get all my
     # roles, change my username, etc) so we need to handle that case
     group = None
-    roles = []
+    if org_id is None:
+        org_id = user.group.id
+    roles: List[str] = []
     for row in user_roles:
         roles.append(row.role.name)
         group = row.group
@@ -169,5 +179,8 @@ async def get_auth_context(
     )
     rolewait = await session.execute(query)
     group_roles = rolewait.unique().scalars().all()
-    ac = AuthContext(user, group, roles, group_roles)
+    groles: List[ACGroupRole] = []
+    for row in group_roles:
+        groles.append({"group_id": row.grantor_group.id, "role": row.role.name})
+    ac = AuthContext(user, group, roles, groles)
     return ac

@@ -8,7 +8,7 @@ from fastapi.responses import ORJSONResponse
 from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 from starlette.middleware.cors import CORSMiddleware
 
-from aspen.api.authn import get_auth_user
+from aspen.api.authn import get_auth_user, require_group_membership
 from aspen.api.error.http_exceptions import AspenException, exception_handler
 from aspen.api.middleware.session import SessionMiddleware
 from aspen.api.settings import Settings
@@ -141,6 +141,18 @@ def get_app() -> FastAPI:
         AspenException,
         exception_handler,
     )
+
+    # Which routes are "ready" to accept org prefixes?
+    org_routers = {
+        "phylo_runs": phylo_runs.router,
+        "samples": samples.router,
+    }
+    for suffix, router in org_routers.items():
+        _app.include_router(
+            router,
+            prefix="/v2/orgs/{org_id}/" + suffix,
+            dependencies=[Depends(require_group_membership)],
+        )
 
     return _app
 

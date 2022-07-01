@@ -1,13 +1,44 @@
 from collections import Counter
-from typing import Any, Dict, List, Mapping, Optional, Tuple, TYPE_CHECKING
+from typing import Any, Dict, List, Mapping, Optional, Set, Tuple, TYPE_CHECKING
 
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm.query import Query
+from sqlalchemy.sql.expression import or_
 
+from aspen.api.authz import AuthZSession
 from aspen.database.models import Accession, AccessionType, Sample
 
 if TYPE_CHECKING:
     from aspen.api.schemas.samples import CreateSampleRequest
+
+
+async def samples_by_identifiers(
+    az: AuthZSession, sample_ids: Optional[Set[str]]
+) -> Query:
+    # TODO, this query can be updated to use an "id in (select id from...)" clause when we get a chance to fix it.
+    public_samples_query = (
+        (await az.authorized_query("read_public", Sample))
+        .filter(Sample.public_identifier.in_(sample_ids))  # type: ignore
+        .subquery()  # type: ignore
+    )
+    private_samples_query = (
+        (await az.authorized_query("read_private", Sample))
+        .filter(Sample.public_identifier.in_(sample_ids))  # type: ignore
+        .subquery()  # type: ignore
+    )
+    query = (
+        sa.select(Sample)  # type: ignore
+        .outerjoin(public_samples_query, Sample.id == public_samples_query.c.id)  # type: ignore
+        .outerjoin(private_samples_query, Sample.id == private_samples_query.c.id)  # type: ignore
+        .where(
+            or_(
+                public_samples_query.c.id != None,  # noqa: E711
+                private_samples_query.c.id != None,  # noqa: E711
+            )
+        )
+    )
+    return query
 
 
 def get_all_identifiers_in_request(
