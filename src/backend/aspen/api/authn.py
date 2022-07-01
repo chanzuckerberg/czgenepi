@@ -1,5 +1,5 @@
 import logging
-from typing import MutableSequence, Optional
+from typing import List, MutableSequence, Optional, TypedDict
 
 import sentry_sdk
 import sqlalchemy as sa
@@ -106,13 +106,18 @@ async def get_auth0_apiclient(
     return auth0_client
 
 
+class ACGroupRole(TypedDict):
+    group_id: int
+    role: str
+
+
 class AuthContext:
     def __init__(
         self,
         user: User,
         group: Group,
-        user_roles: MutableSequence[UserRole],
-        group_roles: MutableSequence[GroupRole],
+        user_roles: List[str],
+        group_roles: List[ACGroupRole],
     ):
         self.user = user
         self.group = group
@@ -157,7 +162,7 @@ async def get_auth_context(
     group = None
     if org_id is None:
         org_id = user.group.id
-    roles = []
+    roles: List[str] = []
     for row in user_roles:
         roles.append(row.role.name)
         group = row.group
@@ -174,7 +179,7 @@ async def get_auth_context(
     )
     rolewait = await session.execute(query)
     group_roles = rolewait.unique().scalars().all()
-    groles = []
+    groles: List[ACGroupRole] = []
     for row in group_roles:
         groles.append({"group_id": row.grantor_group.id, "role": row.role.name})
     ac = AuthContext(user, group, roles, groles)
