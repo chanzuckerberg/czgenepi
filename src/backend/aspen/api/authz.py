@@ -163,3 +163,38 @@ async def get_authz_session(
     session: AsyncSession = Depends(get_db),
 ) -> AuthZSession:
     return AuthZSession(session, auth_context)
+
+
+async def get_oso(session: AsyncSession = Depends(get_db)) -> AsyncOso:
+    oso = AsyncOso()
+    oso.set_data_filtering_adapter(AsyncSqlAlchemyAdapter(session))
+    register_classes(oso)
+    await oso.load_files(
+        [Path.joinpath(Path(__file__).parent.absolute(), "policy.polar")]
+    )
+    return oso
+
+
+class AuthorizedSession():
+    def __init__(self, privilege: str, model: idbase):
+        self.privilege = privilege
+        self.model = model
+
+    async def __call__(
+        self,
+        auth_context: AuthContext = Depends(get_auth_context),
+        oso: AsyncOso = Depends(get_oso),
+    ):
+        self.auth_context = auth_context
+        self.oso = oso
+        return self
+
+    async def authorized_query(self):
+        return await self.oso.authorized_query(self.auth_context, self.privilege, self.model)
+
+
+def require_access( 
+    privilege: str,
+    model: idbase,
+) -> AuthorizedSession:
+    return AuthorizedSession(privilege, model)
