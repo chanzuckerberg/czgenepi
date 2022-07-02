@@ -15,7 +15,12 @@ from sqlalchemy.orm import joinedload, selectinload
 from sqlalchemy.orm.exc import NoResultFound
 
 from aspen.api.authn import get_auth_user
-from aspen.api.authz import AuthZSession, get_authz_session, require_access, AuthorizedSession
+from aspen.api.authz import (
+    AuthorizedSession,
+    AuthZSession,
+    get_authz_session,
+    require_access,
+)
 from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.samples import (

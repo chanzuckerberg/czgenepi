@@ -175,7 +175,7 @@ async def get_oso(session: AsyncSession = Depends(get_db)) -> AsyncOso:
     return oso
 
 
-class AuthorizedSession():
+class AuthorizedSession:
     def __init__(self, privilege: str, model: idbase):
         self.privilege = privilege
         self.model = model
@@ -190,10 +190,12 @@ class AuthorizedSession():
         return self
 
     async def authorized_query(self):
-        return await self.oso.authorized_query(self.auth_context, self.privilege, self.model)
+        return await self.oso.authorized_query(
+            self.auth_context, self.privilege, self.model
+        )
 
 
-def require_access( 
+def require_access(
     privilege: str,
     model: idbase,
 ) -> AuthorizedSession:
