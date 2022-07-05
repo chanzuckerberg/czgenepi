@@ -1,6 +1,6 @@
-type ActionType<T> = (payload: T | null) => {
+type ActionType<T> = (payload?: T) => {
   type: CZGEReduxActions;
-  payload: T | null;
+  payload?: T;
 };
 
 enum Pathogen {
