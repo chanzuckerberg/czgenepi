@@ -6,18 +6,12 @@
 
 import { AnyAction, Middleware } from "redux";
 import { setLocalStorage } from "src/common/utils/localStorage";
-import {
-  groupPersistedName,
-  pathogenPersistedName,
-  setGroupActionType,
-  setPathogenActionType,
-} from "../actions";
 
 export const setGroupMiddleware: Middleware =
   () => (next) => (action: AnyAction) => {
     const { type, payload } = action;
-    if (type === setGroupActionType) {
-      setLocalStorage(groupPersistedName, payload);
+    if (type === CZGEReduxActions.SET_GROUP_ACTION_TYPE) {
+      setLocalStorage(ReduxPersistenceTokens.GROUP, payload);
     }
 
     return next(action);
@@ -26,8 +20,8 @@ export const setGroupMiddleware: Middleware =
 export const setPathogenMiddleware: Middleware =
   () => (next) => (action: AnyAction) => {
     const { type, payload } = action;
-    if (type === setPathogenActionType) {
-      setLocalStorage(pathogenPersistedName, payload);
+    if (type === CZGEReduxActions.SET_PATHOGEN_ACTION_TYPE) {
+      setLocalStorage(ReduxPersistenceTokens.PATHOGEN, payload);
     }
 
     return next(action);

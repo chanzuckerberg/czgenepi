@@ -1,19 +1,13 @@
 import { AnyAction, applyMiddleware, createStore } from "redux";
 import { composeWithDevTools } from "redux-devtools-extension";
 import { getLocalStorage } from "../utils/localStorage";
-import {
-  groupPersistedName,
-  pathogenPersistedName,
-  setGroupActionType,
-  setPathogenActionType,
-} from "./actions";
 import { setGroupMiddleware } from "./middleware";
 
 const getInitialState = () => {
-  const storedGroupStr = getLocalStorage(groupPersistedName);
+  const storedGroupStr = getLocalStorage(ReduxPersistenceTokens.GROUP);
   const storedGroup = storedGroupStr ? parseInt(storedGroupStr) : null;
 
-  const storedPathogenStr = getLocalStorage(pathogenPersistedName);
+  const storedPathogenStr = getLocalStorage(ReduxPersistenceTokens.PATHOGEN);
   const storedPathogen =
     storedPathogenStr && storedPathogenStr in Pathogen
       ? storedPathogenStr
@@ -29,21 +23,22 @@ const getInitialState = () => {
 
 // set up redux store!
 const reduxReducer = (state = getInitialState(), action: AnyAction) => {
-  switch (action.type) {
-    case setGroupActionType:
+  const { type, payload } = action;
+  switch (type) {
+    case CZGEReduxActions.SET_GROUP_ACTION_TYPE:
       return {
         ...state,
         current: {
           ...state.current,
-          group: action.payload,
+          group: payload,
         },
       };
-    case setPathogenActionType:
+    case CZGEReduxActions.SET_PATHOGEN_ACTION_TYPE:
       return {
         ...state,
         current: {
           ...state.current,
-          pathogen: action.payload,
+          pathogen: payload,
         },
       };
     default:
