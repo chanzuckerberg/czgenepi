@@ -15,12 +15,7 @@ from sqlalchemy.orm import joinedload, selectinload
 from sqlalchemy.orm.exc import NoResultFound
 
 from aspen.api.authn import get_auth_user
-from aspen.api.authz import (
-    AuthorizedSession,
-    AuthZSession,
-    get_authz_session,
-    require_access,
-)
+from aspen.api.authz import AuthZSession, get_authz_session
 from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.samples import (
@@ -54,12 +49,12 @@ GISAID_REJECTION_TIME = datetime.timedelta(days=4)
 @router.get("/", response_model=SamplesResponse)
 async def list_samples(
     db: AsyncSession = Depends(get_db),
-    az: AuthorizedSession = Depends(require_access("read", Sample)),
+    az: AuthZSession = Depends(get_authz_session),
     user: User = Depends(get_auth_user),
 ) -> SamplesResponse:
 
     # load the samples.
-    user_visible_samples_query = await az.authorized_query()
+    user_visible_samples_query = await az.authorized_query("read", Sample)
     user_visible_samples_query = user_visible_samples_query.options(  # type: ignore
         selectinload(Sample.uploaded_pathogen_genome),
         selectinload(Sample.submitting_group),

@@ -1,3 +1,4 @@
+from functools import lru_cache
 from pathlib import Path
 
 from fastapi import Depends
@@ -187,7 +188,7 @@ class AuthorizedSession:
     ):
         self.auth_context = auth_context
         self.oso = oso
-        return self
+        return await self.authorized_query()
 
     async def authorized_query(self):
         return await self.oso.authorized_query(
@@ -195,6 +196,7 @@ class AuthorizedSession:
         )
 
 
+@lru_cache
 def require_access(
     privilege: str,
     model: idbase,
