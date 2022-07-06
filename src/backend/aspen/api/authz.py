@@ -1,3 +1,4 @@
+from functools import lru_cache
 from pathlib import Path
 
 from fastapi import Depends
@@ -167,3 +168,25 @@ async def get_authz_session(
     session: AsyncSession = Depends(get_db),
 ) -> AuthZSession:
     return AuthZSession(session, auth_context)
+
+
+class AuthorizedSession:
+    def __init__(self, privilege: str, model: idbase):
+        self.privilege = privilege
+        self.model = model
+
+    async def __call__(
+        self,
+        auth_context: AuthContext = Depends(get_auth_context),
+        session: AsyncSession = Depends(get_db),
+    ):
+        authz_session = AuthZSession(session, auth_context)
+        return await authz_session.authorized_query(self.privilege, self.model)
+
+
+@lru_cache
+def require_access(
+    privilege: str,
+    model: idbase,
+) -> AuthorizedSession:
+    return AuthorizedSession(privilege, model)

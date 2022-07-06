@@ -4,8 +4,10 @@ import { AppProps } from "next/app";
 import Head from "next/head";
 import React, { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
+import { Provider } from "react-redux";
 import "semantic-ui-css/semantic.min.css";
 import { PlausibleInitializer } from "src/common/analytics/PlausibleInitializer";
+import { store } from "src/common/redux";
 import { StyledApp } from "src/common/styles/appStyle";
 import { theme } from "src/common/styles/theme";
 import { setFeatureFlagsFromQueryParams } from "src/common/utils/featureFlags";
@@ -28,7 +30,7 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
   }, []);
 
   return (
-    <>
+    <Provider store={store}>
       <Head>
         <meta
           name="viewport"
@@ -50,7 +52,7 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
           </StylesProvider>
         </SplitInitializer>
       </QueryClientProvider>
-    </>
+    </Provider>
   );
 };
 
