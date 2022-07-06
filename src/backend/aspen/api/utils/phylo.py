@@ -87,12 +87,6 @@ async def verify_and_access_phylo_tree(
     return True, phylo_tree, phylo_run
 
 
-def _sample_filter(sample: Sample, can_see_pi_group_ids: Set[int], system_admin: bool):
-    if system_admin:
-        return True
-    return sample.submitting_group_id in can_see_pi_group_ids
-
-
 def _collect_locations(node: dict) -> Set[ExtractedLocation]:
     locations = set()
     extracted_location_list = [
@@ -287,7 +281,7 @@ async def process_phylo_tree(
     identifier_map: Dict[str, str] = {}
     tree_owner_group = phylo_run.group
     all_translatable_samples: list[Sample] = []
-    if user.system_admin or tree_owner_group.id in can_see_pi_group_ids:
+    if tree_owner_group.id in can_see_pi_group_ids:
         all_translatable_samples_query = sa.select(Sample).where(  # type: ignore
             Sample.submitting_group == tree_owner_group
         )

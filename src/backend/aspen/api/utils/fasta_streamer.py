@@ -62,7 +62,6 @@ class FastaStreamer:
                 # use private id if the user has access to it, else public id
                 if (
                     sample.submitting_group_id == self.user.group_id
-                    or self.user.system_admin
                 ):
                     yield self._output_id_line(sample.private_identifier)
                 else:
