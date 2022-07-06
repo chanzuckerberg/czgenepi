@@ -3,9 +3,10 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useProtectedRoute, useUserInfo } from "src/common/queries/auth";
 import { useGroupInfo, useGroupMembersInfo } from "src/common/queries/groups";
+import { useSelector } from "src/common/redux/hooks";
+import { selectCurrentGroup } from "src/common/redux/selectors";
 import { ROUTES } from "src/common/routes";
 import { stringifyGisaidLocation } from "src/common/utils/locationUtils";
-import { getGroupIdFromUser } from "src/common/utils/userUtils";
 import { GroupDetailsTab } from "./components/GroupDetailsTab";
 import { MembersTab, SecondaryTabType } from "./components/MembersTab";
 import {
@@ -39,8 +40,8 @@ const GroupMembersPage = ({
   const [tabValue, setTabValue] = useState<PrimaryTabType>(requestedPrimaryTab);
   const router = useRouter();
 
+  const groupId = useSelector(selectCurrentGroup);
   const { data: userInfo } = useUserInfo();
-  const groupId = getGroupIdFromUser(userInfo);
   const { data: members = [] } = useGroupMembersInfo(groupId);
   const { data: groupInfo } = useGroupInfo(groupId);
 
@@ -79,7 +80,6 @@ const GroupMembersPage = ({
           <MembersTab
             requestedSecondaryTab={requestedSecondaryTab}
             groupName={name}
-            groupId={groupId}
             members={members}
             userInfo={userInfo}
           />

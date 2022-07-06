@@ -1,15 +1,15 @@
 import { Button, Dialog, DialogActions, DialogTitle } from "czifui";
 import { compact, filter, uniq } from "lodash";
 import React, { ChangeEvent, useState } from "react";
+import { useSelector } from "react-redux";
 import { noop } from "src/common/constants/empty";
 import {
   GREEDY_SPACES,
   INPUT_DELIMITERS_WITH_SPACE,
 } from "src/common/constants/inputDelimiters";
-import { useUserInfo } from "src/common/queries/auth";
 import { useSendGroupInvitations } from "src/common/queries/groups";
+import { selectCurrentGroup } from "src/common/redux/selectors";
 import { B } from "src/common/styles/basicStyle";
-import { getGroupIdFromUser } from "src/common/utils/userUtils";
 import { StyledNotificationContainer } from "src/components/Notification/style";
 import { FailedToSendNotification } from "./components/FailedToSendNotification";
 import { InvalidEmailError } from "./components/InvalidEmailError";
@@ -47,8 +47,9 @@ const InviteModal = ({ groupName, onClose, open }: Props): JSX.Element => {
     []
   );
 
-  const { data: userInfo } = useUserInfo();
-  const groupId = getGroupIdFromUser(userInfo);
+  // can't send invites if we don't know what group they are in
+  const groupId = useSelector(selectCurrentGroup);
+  if (!groupId) return;
 
   const handleClose = () => {
     setInputValue("");

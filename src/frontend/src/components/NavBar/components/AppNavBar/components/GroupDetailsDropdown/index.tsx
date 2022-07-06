@@ -1,13 +1,13 @@
 import { Icon } from "czifui";
-import { find } from "lodash";
 import { useRouter } from "next/router";
 import React from "react";
+import { useSelector } from "react-redux";
 import { useUserInfo } from "src/common/queries/auth";
 import { useGroupInfo, useGroupMembersInfo } from "src/common/queries/groups";
+import { selectCurrentGroup } from "src/common/redux/selectors";
 import { ROUTES } from "src/common/routes";
 import { stringifyGisaidLocation } from "src/common/utils/locationUtils";
 import { pluralize } from "src/common/utils/strUtils";
-import { getGroupIdFromUser } from "src/common/utils/userUtils";
 import { GroupMenuItem } from "./components/GroupMenuItem";
 import {
   CurrentGroup,
@@ -32,8 +32,8 @@ const GroupDetailsDropdown = ({
 }: Props): JSX.Element | null => {
   const router = useRouter();
 
+  const groupId = useSelector(selectCurrentGroup);
   const { data: userInfo } = useUserInfo();
-  const groupId = getGroupIdFromUser(userInfo);
   const { data: members = [] } = useGroupMembersInfo(groupId);
   const { data: groupInfo } = useGroupInfo(groupId);
 
@@ -48,13 +48,6 @@ const GroupDetailsDropdown = ({
 
   const { name, location } = groupInfo ?? {};
   const displayLocation = stringifyGisaidLocation(location);
-
-  // is the current user a group owner
-  const currentUser = find(members, (m) => m.id === userInfo.id);
-
-  if (!currentUser) return null;
-
-  const isOwner = currentUser.isGroupAdmin === true;
 
   const onClickGroupDetails = () => {
     router.push(ROUTES.GROUP_DETAILS);
@@ -89,7 +82,7 @@ const GroupDetailsDropdown = ({
           {memberCount} {pluralize("Member", memberCount)}
         </Details>
         <div>
-          {isOwner && (
+          {userInfo.isGroupAdmin && (
             <StyledButton
               sdsType="primary"
               sdsStyle="rounded"

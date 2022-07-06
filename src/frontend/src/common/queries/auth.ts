@@ -41,7 +41,9 @@ export const mapUserData = (obj: RawUserRequest): User => {
     acknowledgedPolicyVersion: obj.acknowledged_policy_version,
     agreedToTos: obj.agreed_to_tos,
     group: mapGroupData(obj.group),
+    groups: obj.groups,
     id: obj.id,
+    isGroupAdmin: obj.group_admin,
     name: obj.name,
     splitId: obj.split_id,
   };
