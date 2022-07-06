@@ -3,9 +3,9 @@ import json
 import boto3
 import pytest
 from botocore.client import ClientError
+from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from aspen.api.utils import process_phylo_tree
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
 from aspen.test_infra.models.sample import sample_factory
@@ -37,7 +37,9 @@ TEST_TREE = {
 
 
 async def test_phylo_tree_rename(
-    async_session: AsyncSession, mock_s3_resource: boto3.resource
+    http_client: AsyncClient,
+    async_session: AsyncSession,
+    mock_s3_resource: boto3.resource,
 ):
     """Create a set of samples belonging to different groups with different levels of
     can-see relationships.  Rename the nodes according to the can-see rules, and verify
@@ -112,13 +114,15 @@ async def test_phylo_tree_rename(
     mock_s3_resource.Bucket(phylo_tree.s3_bucket).Object(phylo_tree.s3_key).put(
         Body=test_json
     )
-
-    # this is mandatory because we use an id to reference the tree.
     async_session.add(phylo_tree)
     await async_session.commit()
 
-    tree = await process_phylo_tree(async_session, user, phylo_tree.entity_id)
+    auth_headers = {"user_id": user.auth0_user_id}
+    result = await http_client.get(
+        f"/v2/phylo_trees/{phylo_tree.entity_id}/download", headers=auth_headers
+    )
 
+    tree = result.json()
     assert tree["tree"] == {
         "name": "private_identifier_1",
         "GISAID_ID": "public_identifier_1",

@@ -419,4 +419,5 @@ async def test_create_phylo_run_unauthorized_access_redirect(
         "samples": [sample.public_identifier],
     }
     res = await http_client.post("/v2/phylo_runs/", json=data)
-    assert res.status_code == 403
+    # No authorization header, so we should be prompted to log in.
+    assert res.status_code == 401
