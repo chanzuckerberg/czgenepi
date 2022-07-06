@@ -14,6 +14,7 @@ from aspen.api.views.tests.test_update_phylo_run_and_tree import make_shared_tes
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.usergroup import group_factory, userrole_factory
 
+
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
 
@@ -334,6 +335,7 @@ async def test_division_color_labeling(
 async def test_location_color_labeling(
     async_session: AsyncSession,
     http_client: AsyncClient,
+    api,
     mock_s3_resource: boto3.resource,
 ):
     user, group, samples, phylo_run, phylo_tree = await make_shared_test_data(
@@ -373,7 +375,6 @@ async def test_location_color_labeling(
     assert generate_res.status_code == 200
     generate_response = generate_res.json()
     magic_link = generate_response["url"]
-
     access_res = await http_client.get(magic_link.removeprefix("test"))
     assert access_res.status_code == 200
     res_json = access_res.json()

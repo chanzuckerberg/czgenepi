@@ -124,7 +124,7 @@ async def test_phylo_tree_no_can_see(
     )
 
     expected_response = {
-        "error": f"PhyloTree with id {phylo_tree.id} not viewable by user with id: {user.id}"
+        "error": f"PhyloTree with id {phylo_tree.id} not viewable by user"
     }
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
@@ -132,52 +132,3 @@ async def test_phylo_tree_no_can_see(
         f"/v2/phylo_trees/{phylo_tree.entity_id}/download", headers=auth_headers
     )
     assert result.json() == expected_response
-
-
-async def test_phylo_tree_admin(
-    async_session: AsyncSession,
-    http_client: AsyncClient,
-    mock_s3_resource: boto3.resource,
-    n_trees=1,
-    n_samples=5,
-):
-    owner_group: Group = group_factory()
-    viewer_group: Group = group_factory("admin")
-    user: User = await userrole_factory(async_session, viewer_group, system_admin=True)
-    location: Location = location_factory(
-        "North America", "USA", "California", "Santa Barbara County"
-    )
-    _, _, trees, runs = make_all_test_data(
-        owner_group, user, location, n_samples, n_trees
-    )
-
-    phylo_tree = trees[0]  # we only have one
-    phylo_run = runs[0]
-    async_session.add_all((owner_group, viewer_group, user, phylo_run, phylo_tree))
-    await async_session.commit()
-
-    # make_all_test_data() randomly selects samples for trees, so we have to make sure we are expecting the right json
-    matching_tree_json: Dict = align_json_with_model(deepcopy(TEST_TREE), phylo_tree)
-
-    matching_mapped_json: Dict = create_id_mapped_tree(
-        align_json_with_model(deepcopy(TEST_TREE), phylo_tree)
-    )
-
-    # Create the bucket if it doesn't exist in localstack.
-    try:
-        mock_s3_resource.meta.client.head_bucket(Bucket=phylo_tree.s3_bucket)
-    except ClientError:
-        # The bucket does not exist or you have no access.
-        mock_s3_resource.create_bucket(Bucket=phylo_tree.s3_bucket)
-
-    test_json = json.dumps(matching_tree_json)
-
-    mock_s3_resource.Bucket(phylo_tree.s3_bucket).Object(phylo_tree.s3_key).put(
-        Body=test_json
-    )
-
-    auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
-    result = await http_client.get(
-        f"/v2/phylo_trees/{phylo_tree.entity_id}/download", headers=auth_headers
-    )
-    assert result.json()["tree"] == matching_mapped_json["tree"]

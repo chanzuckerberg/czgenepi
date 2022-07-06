@@ -123,6 +123,10 @@ def register_classes(oso):
         fields={
             "id": str,
             "producing_workflow_id": int,
+            "group_id": int,
+            "group": Relation(
+                kind="one", other_type="Group", my_field="group_id", other_field="id"
+            ),
             "phylo_run": Relation(
                 kind="one",
                 other_type="PhyloRun",

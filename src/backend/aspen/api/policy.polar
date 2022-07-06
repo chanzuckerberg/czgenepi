@@ -57,6 +57,24 @@ resource PhyloRun {
   "write" if "member";
 }
 
+resource PhyloTree {
+  roles = ["admin", "viewer", "member"];
+  permissions = ["read", "write"];
+  relations = { owner: Group };
+
+  "viewer" if "viewer" on "owner";
+  "member" if "member" on "owner";
+  "admin" if "admin" on "owner";
+
+  # viewer permissions
+  "read" if "viewer";
+  # admin permissions
+  "read" if "admin";
+  # member permissions
+  "read" if "member";
+  "write" if "member";
+}
+
 has_permission(ac: AuthContext, "read", sample: Sample) if
   has_permission(ac, "read_private", sample) or (
     has_permission(ac, "read_public", sample) and
@@ -73,3 +91,4 @@ has_role(ac: AuthContext, name: String, group: Group) if
 
 has_relation(group: Group, "owner", phylo_run: PhyloRun) if phylo_run.group = group;
 has_relation(group: Group, "owner", sample: Sample) if sample.submitting_group = group;
+has_relation(group: Group, "owner", phylotree: PhyloTree) if phylotree.group = group;
