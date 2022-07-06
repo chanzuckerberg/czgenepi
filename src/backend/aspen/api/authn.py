@@ -1,7 +1,9 @@
-import logging
-import json
-import hmac
 import hashlib
+import hmac
+import json
+import logging
+from base64 import urlsafe_b64decode
+from datetime import datetime, timezone
 from typing import List, MutableSequence, Optional, TypedDict
 
 import sentry_sdk
@@ -13,8 +15,6 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.query import Query
 from starlette.requests import Request
-from base64 import urlsafe_b64decode, urlsafe_b64encode
-from datetime import datetime, timedelta, timezone
 
 import aspen.api.error.http_exceptions as ex
 from aspen.api.deps import get_db, get_settings
@@ -24,7 +24,11 @@ from aspen.auth.device_auth import validate_auth_header
 from aspen.database.models import Group, GroupRole, User, UserRole
 
 
-def get_usergroup_query(session: AsyncSession, auth0_user_id: Optional[str] = None, user_id: Optional[str] = None) -> Query:
+def get_usergroup_query(
+    session: AsyncSession,
+    auth0_user_id: Optional[str] = None,
+    user_id: Optional[str] = None,
+) -> Query:
     query = (
         sa.select(User)  # type: ignore
         .options(joinedload(User.group).joinedload(Group.can_see))  # type: ignore
@@ -42,8 +46,11 @@ def get_usergroup_query(session: AsyncSession, auth0_user_id: Optional[str] = No
     return query
 
 
-
-async def setup_userinfo(session: AsyncSession, auth0_user_id: Optional[str] = None, user_id: Optional[str] = None) -> Optional[User]:
+async def setup_userinfo(
+    session: AsyncSession,
+    auth0_user_id: Optional[str] = None,
+    user_id: Optional[str] = None,
+) -> Optional[User]:
     if auth0_user_id:
         sentry_sdk.set_user(
             {
@@ -67,14 +74,15 @@ async def setup_userinfo(session: AsyncSession, auth0_user_id: Optional[str] = N
     )
     return user
 
+
 class MagicLinkPayload(TypedDict):
     user_id: str
     expiry: str
 
 
 async def magic_link_payload(
-    settings: Settings = Depends(get_settings),
-    magic_link: Optional[str] = None) -> Optional[MagicLinkPayload]:
+    settings: Settings = Depends(get_settings), magic_link: Optional[str] = None
+) -> Optional[MagicLinkPayload]:
     if not magic_link:
         return None
 
@@ -103,13 +111,18 @@ async def magic_link_payload(
     payload: MagicLinkPayload = json.loads(decoded_payload_message)
     return payload
 
+
 async def magic_link_userid(
-    magic_payload: Optional[MagicLinkPayload] = Depends(magic_link_payload)) -> Optional[str]:
+    magic_payload: Optional[MagicLinkPayload] = Depends(magic_link_payload),
+) -> Optional[str]:
     if not magic_payload:
         return None
     return magic_payload["user_id"]
 
-def get_token_userid(request: Request, settings: Settings = Depends(get_settings)) -> Optional[str]:
+
+def get_token_userid(
+    request: Request, settings: Settings = Depends(get_settings)
+) -> Optional[str]:
     auth_header = request.headers.get("authorization")
     if not auth_header:
         return
@@ -121,9 +134,11 @@ def get_token_userid(request: Request, settings: Settings = Depends(get_settings
     except TokenValidationError as err:
         logging.warn(f"Token validation error: {err}")
 
+
 def get_cookie_userid(request: Request) -> Optional[str]:
     if "profile" in request.session:
         return request.session["profile"].get("user_id")
+
 
 async def get_auth_user(
     request: Request,

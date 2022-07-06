@@ -11,7 +11,6 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
-from starlette.requests import Request
 
 from aspen.api.authn import get_auth_user
 from aspen.api.authz import AuthZSession, get_authz_session
@@ -26,10 +25,10 @@ from aspen.api.schemas.phylo_runs import (
 )
 from aspen.api.settings import Settings
 from aspen.api.utils import (
-    authz_sample_filters,
     get_matching_gisaid_ids,
     get_matching_gisaid_ids_by_epi_isl,
     get_missing_and_found_sample_ids,
+    samples_by_identifiers,
 )
 from aspen.database.models import (
     AlignedGisaidDump,
@@ -49,29 +48,23 @@ router = APIRouter()
 @router.post("/", responses={200: {"model": PhyloRunResponse}})
 async def kick_off_phylo_run(
     phylo_run_request: PhyloRunRequest,
-    request: Request,
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    az: AuthZSession = Depends(get_authz_session),
     user: User = Depends(get_auth_user),
 ) -> PhyloRunResponse:
-    # Note - sample run will be associated with users's primary group.
-    #    (do we want admins to be able to start runs on behalf of other dph's ?)
+    # TODO AUTHFIXME - sample run needs to be associated with org_id if this user sent it and has permission
     group = user.group
 
     # validation happens in input schema
-
     sample_ids = phylo_run_request.samples
 
-    # Step 2 - prepare big sample query per the old db cli
-    all_samples_query = sa.select(Sample).options(  # type: ignore
+    # Enforce AuthZ (check if user has permission to see private identifiers and scope down the search for matching ID's to groups that the user has read access to.)
+    user_visible_samples_query = await samples_by_identifiers(az, set(sample_ids))
+    user_visible_samples_query = user_visible_samples_query.options(  # type: ignore
         joinedload(Sample.uploaded_pathogen_genome, innerjoin=True),
     )
-
-    # Step 3 - Enforce AuthZ (check if user has permission to see private identifiers and scope down the search for matching ID's to groups that the user has read access to.)
-    user_visible_sample_query = authz_sample_filters(
-        all_samples_query, sample_ids, user
-    )
-    user_visible_samples = await db.execute(user_visible_sample_query)
+    user_visible_samples = await db.execute(user_visible_samples_query)
     user_visible_samples = user_visible_samples.unique().scalars().all()
 
     # Are there any sample ID's that don't match sample table public and private identifiers

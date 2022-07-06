@@ -11,9 +11,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased, selectinload
 from sqlalchemy.sql.expression import and_, or_
 
+from aspen.api.authz import AuthZSession
 from aspen.api.error import http_exceptions as ex
 from aspen.database.models import Group, Location, PhyloRun, PhyloTree, Sample, User
-from aspen.api.authz import AuthZSession
 
 # 16 colors
 NEXTSTRAIN_COLOR_SCALE = [
@@ -243,7 +243,11 @@ async def _set_colors(db: AsyncSession, tree_json: dict, phylo_run: PhyloRun) ->
 
 
 async def process_phylo_tree(
-    db: AsyncSession, az: AuthZSession, user: User, phylo_tree_id: int, id_style: Optional[str] = None
+    db: AsyncSession,
+    az: AuthZSession,
+    user: User,
+    phylo_tree_id: int,
+    id_style: Optional[str] = None,
 ) -> dict:
     (
         authorized,

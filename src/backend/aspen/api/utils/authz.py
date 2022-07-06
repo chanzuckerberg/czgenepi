@@ -3,7 +3,7 @@ from typing import Set
 from sqlalchemy.orm.query import Query
 from sqlalchemy.sql.expression import and_, or_
 
-from aspen.database.models import DataType, PhyloRun, PhyloTree, Sample, User
+from aspen.database.models import Sample, User
 
 
 def authz_sample_filters(query: Query, sample_ids: Set[str], user: User) -> Query:

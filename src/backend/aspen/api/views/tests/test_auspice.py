@@ -14,7 +14,6 @@ from aspen.api.views.tests.test_update_phylo_run_and_tree import make_shared_tes
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.usergroup import group_factory, userrole_factory
 
-
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
 

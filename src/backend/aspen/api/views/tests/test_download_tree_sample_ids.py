@@ -195,7 +195,7 @@ async def test_private_id_matrix(
         {
             "user": noaccess_user,
             "expected_status": 400,
-            "expected_data": f'{{"error":"PhyloTree with id {phylo_tree.id} not viewable by user with id: {noaccess_user.id}"}}',
+            "expected_data": f'{{"error":"PhyloTree with id {phylo_tree.id} not viewable by user"}}',
         },
         {
             "user": viewer_user,
