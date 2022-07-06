@@ -6,6 +6,7 @@
 
 import { AnyAction, Middleware } from "redux";
 import { setLocalStorage } from "src/common/utils/localStorage";
+import { CZGEReduxActions, ReduxPersistenceTokens } from "../types";
 
 export const setGroupMiddleware: Middleware =
   () => (next) => (action: AnyAction) => {

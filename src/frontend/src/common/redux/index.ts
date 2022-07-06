@@ -2,6 +2,7 @@ import { AnyAction, applyMiddleware, createStore } from "redux";
 import { composeWithDevTools } from "redux-devtools-extension";
 import { getLocalStorage } from "../utils/localStorage";
 import { setGroupMiddleware } from "./middleware";
+import { CZGEReduxActions, Pathogen, ReduxPersistenceTokens } from "./types";
 
 const getInitialState = () => {
   const storedGroupStr = getLocalStorage(ReduxPersistenceTokens.GROUP);
