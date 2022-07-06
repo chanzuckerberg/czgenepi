@@ -9,7 +9,7 @@ resource Group {
 
 resource Sample {
   roles = ["admin", "viewer", "member"];
-  permissions = [ "read", "read_private", "read_public", "write"];
+  permissions = [ "read", "read_private", "read_public", "sequences", "write"];
   relations = { owner: Group };
 
   "viewer" if "viewer" on "owner";
@@ -21,10 +21,12 @@ resource Sample {
   # admin permissions
   "read_public" if "admin";
   "read_private" if "admin";
+  "sequences" if "admin";
   "write" if "admin";
   # member permissions
   "read_public" if "member";
   "read_private" if "member";
+  "sequences" if "member";
   "write" if "member";
 }
 

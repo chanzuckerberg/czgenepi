@@ -8,6 +8,7 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.api.authn import get_auth_user
+from aspen.api.authz import AuthZSession, get_authz_session
 from aspen.api.deps import get_db, get_settings
 from aspen.api.schemas.sequences import (
     FastaURLRequest,
@@ -15,7 +16,7 @@ from aspen.api.schemas.sequences import (
     SequenceRequest,
 )
 from aspen.api.settings import Settings
-from aspen.api.utils import FastaStreamer
+from aspen.api.utils.fasta_streamer import FastaStreamer
 from aspen.database.models import User
 
 router = APIRouter()
@@ -25,7 +26,7 @@ router = APIRouter()
 async def prepare_sequences_download(
     request: SequenceRequest,
     db: AsyncSession = Depends(get_db),
-    settings: Settings = Depends(get_settings),
+    az: AuthZSession = Depends(get_authz_session),
     user: User = Depends(get_auth_user),
 ) -> StreamingResponse:
     # stream output file
@@ -33,7 +34,7 @@ async def prepare_sequences_download(
 
     async def stream_samples():
         sample_ids = request.sample_ids
-        streamer = FastaStreamer(db, user, sample_ids)
+        streamer = FastaStreamer(db, az, user, set(sample_ids))
         async for line in streamer.stream():
             yield line
 
@@ -52,6 +53,7 @@ async def getfastaurl(
     request: FastaURLRequest,
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    az: AuthZSession = Depends(get_authz_session),
     user: User = Depends(get_auth_user),
 ) -> FastaURLResponse:
     sample_ids = request.samples
@@ -70,7 +72,7 @@ async def getfastaurl(
         f"s3://{s3_bucket}/{s3_key}", "w", transport_params=dict(client=s3_client)
     )
     # Write selected samples to s3
-    streamer = FastaStreamer(db, user, sample_ids, downstream_consumer)
+    streamer = FastaStreamer(db, az, user, sample_ids, downstream_consumer)
     async for line in streamer.stream():
         s3_write_fh.write(line)
     s3_write_fh.close()

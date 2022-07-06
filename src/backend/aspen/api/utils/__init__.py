@@ -1,5 +1,3 @@
-from aspen.api.utils.authz import authz_sample_filters  # noqa: F401
-from aspen.api.utils.fasta_streamer import FastaStreamer  # noqa: F401
 from aspen.api.utils.find_samples_by_id import (  # noqa: F401
     get_missing_and_found_sample_ids,
 )

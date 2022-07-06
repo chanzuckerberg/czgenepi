@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 
 async def samples_by_identifiers(
-    az: AuthZSession, sample_ids: Optional[Set[str]]
+    az: AuthZSession, sample_ids: Optional[Set[str]], permission="read"
 ) -> Query:
     # TODO, this query can be updated to use an "id in (select id from...)" clause when we get a chance to fix it.
     public_samples_query = (
@@ -24,11 +24,11 @@ async def samples_by_identifiers(
     )
     private_samples_query = (
         (await az.authorized_query("read_private", Sample))
-        .filter(Sample.public_identifier.in_(sample_ids))  # type: ignore
+        .filter(Sample.private_identifier.in_(sample_ids))  # type: ignore
         .subquery()  # type: ignore
     )
     query = (
-        sa.select(Sample)  # type: ignore
+        (await az.authorized_query(permission, Sample))
         .outerjoin(public_samples_query, Sample.id == public_samples_query.c.id)  # type: ignore
         .outerjoin(private_samples_query, Sample.id == private_samples_query.c.id)  # type: ignore
         .where(

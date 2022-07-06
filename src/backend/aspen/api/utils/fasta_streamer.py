@@ -2,11 +2,11 @@ import re
 from enum import Enum
 from typing import AsyncGenerator, Optional, Set
 
-import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
-from aspen.api.utils import authz_sample_filters
+from aspen.api.authz import AuthZSession
+from aspen.api.utils import samples_by_identifiers
 from aspen.database.models import Sample, UploadedPathogenGenome
 from aspen.database.models.usergroup import User
 
@@ -21,28 +21,31 @@ class FastaStreamer:
     def __init__(
         self,
         db: AsyncSession,
+        az: AuthZSession,
         user: User,
         sample_ids: Set[str],
         downstream_consumer: Optional[str] = None,
     ):
         self.db = db
         self.user = user
-        # query for samples
-        all_samples_query = sa.select(Sample).options(  # type: ignore
-            joinedload(Sample.uploaded_pathogen_genome, innerjoin=True).undefer(  # type: ignore
-                UploadedPathogenGenome.sequence
-            ),
-        )
-        # Enforce AuthZ
-        self.authz_samples_query = authz_sample_filters(
-            all_samples_query, sample_ids, user
-        )
-        # Stream results
+        self.az = az
+        self.sample_ids = sample_ids
         # Certain consumers have different requirements on fasta
         self.downstream_consumer = downstream_consumer
 
     async def stream(self) -> AsyncGenerator[str, None]:
-        all_samples = await self.db.stream(self.authz_samples_query)
+        # query for samples
+        sample_query = await samples_by_identifiers(
+            self.az, self.sample_ids, "sequences"
+        )
+        sample_query = sample_query.options(  # type: ignore
+            joinedload(Sample.uploaded_pathogen_genome, innerjoin=True).undefer(  # type: ignore
+                UploadedPathogenGenome.sequence
+            ),
+        )
+
+        # Stream results
+        all_samples = await self.db.stream(sample_query)
         async for sample in all_samples.scalars():
             if sample.uploaded_pathogen_genome:
                 pathogen_genome: UploadedPathogenGenome = (
