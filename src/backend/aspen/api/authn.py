@@ -125,7 +125,7 @@ def get_token_userid(
 ) -> Optional[str]:
     auth_header = request.headers.get("authorization")
     if not auth_header:
-        return
+        return None
     try:
         payload = validate_auth_header(
             auth_header, settings.AUTH0_DOMAIN, settings.AUTH0_CLIENT_ID
@@ -133,11 +133,13 @@ def get_token_userid(
         return payload["sub"]
     except TokenValidationError as err:
         logging.warn(f"Token validation error: {err}")
+    return None
 
 
 def get_cookie_userid(request: Request) -> Optional[str]:
     if "profile" in request.session:
         return request.session["profile"].get("user_id")
+    return None
 
 
 async def get_auth_user(
