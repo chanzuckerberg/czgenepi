@@ -60,9 +60,7 @@ class FastaStreamer:
                 )
                 stripped_sequence: str = sequence.strip("Nn")
                 # use private id if the user has access to it, else public id
-                if (
-                    sample.submitting_group_id == self.user.group_id
-                ):
+                if sample.submitting_group_id == self.user.group_id:
                     yield self._output_id_line(sample.private_identifier)
                 else:
                     yield self._output_id_line(sample.public_identifier)
