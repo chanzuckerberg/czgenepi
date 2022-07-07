@@ -1,14 +1,17 @@
 import re
+from typing import Union
 
 import sentry_sdk
 import sqlalchemy as sa
 from auth0.v3.exceptions import Auth0Error
 from fastapi import APIRouter, Depends
+from sqlalchemy.sql.expression import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from starlette.requests import Request
 
 from aspen.api.authn import get_admin_user, get_auth0_apiclient, get_auth_user
+from aspen.api.authz import require_access
 from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.usergroup import (
@@ -25,6 +28,10 @@ from aspen.database.models import Group, User
 
 router = APIRouter()
 
+import logging
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 @router.post("/", response_model=GroupInfoResponse)
 async def create_group(
@@ -57,22 +64,23 @@ async def create_group(
     return GroupInfoResponse.from_orm(created_group)
 
 
-@router.get("/{group_id}/", response_model=GroupInfoResponse)
+@router.get("/{group_id}/", response_model=Union[GroupInfoResponse, dict])
 async def get_group_info(
     group_id: int,
     request: Request,
     db: AsyncSession = Depends(get_db),
+    authorized_query: Select = Depends(require_access("read", Group)),
     user: User = Depends(get_auth_user),
-) -> GroupInfoResponse:
-    if user.group.id != group_id and not user.system_admin:
-        raise ex.UnauthorizedException("Not authorized")
+) -> Union[GroupInfoResponse, dict]:
     group_query = (
-        sa.select(Group)  # type: ignore
+        authorized_query
         .options(joinedload(Group.default_tree_location))
         .where(Group.id == group_id)
     )
     group_query_result = await db.execute(group_query)
-    group = group_query_result.scalars().one()
+    group = group_query_result.scalars().one_or_none()
+    if not group:
+        return {}
     return GroupInfoResponse.from_orm(group)
 
 
