@@ -7,17 +7,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased, contains_eager
 from starlette.requests import Request
 
-from aspen.api.authn import get_auth_user
-from aspen.api.deps import get_db, get_settings
-from aspen.api.settings import Settings
+from aspen.api.authn import AuthContext, get_auth_context
+from aspen.api.authz import AuthZSession, get_authz_session
+from aspen.api.deps import get_db
 from aspen.api.utils import extract_accessions, MetadataTSVStreamer, process_phylo_tree
-from aspen.database.models import (
-    PhyloRun,
-    PhyloTree,
-    Sample,
-    UploadedPathogenGenome,
-    User,
-)
+from aspen.database.models import PhyloRun, PhyloTree, Sample, UploadedPathogenGenome
 
 router = APIRouter()
 
@@ -27,11 +21,11 @@ async def get_single_phylo_tree(
     item_id: int,
     request: Request,
     db: AsyncSession = Depends(get_db),
-    settings: Settings = Depends(get_settings),
-    user: User = Depends(get_auth_user),
+    az: AuthZSession = Depends(get_authz_session),
+    ac: AuthContext = Depends(get_auth_context),
 ) -> JSONResponse:
     phylo_tree_data = await process_phylo_tree(
-        db, user, item_id, request.query_params.get("id_style")
+        db, az, ac, item_id, request.query_params.get("id_style")
     )
     headers = {
         "Content-Type": "application/json",
@@ -79,11 +73,11 @@ async def get_tree_metadata(
     item_id: int,
     request: Request,
     db: AsyncSession = Depends(get_db),
-    settings: Settings = Depends(get_settings),
-    user: User = Depends(get_auth_user),
+    az: AuthZSession = Depends(get_authz_session),
+    ac: AuthContext = Depends(get_auth_context),
 ):
     phylo_tree_data = await process_phylo_tree(
-        db, user, item_id, request.query_params.get("id_style")
+        db, az, ac, item_id, request.query_params.get("id_style")
     )
     accessions = extract_accessions([], phylo_tree_data["tree"])
     selected_samples = await _get_selected_samples(db, item_id)

@@ -1,4 +1,9 @@
+import hashlib
+import hmac
+import json
 import logging
+from base64 import urlsafe_b64decode
+from datetime import datetime, timezone
 from typing import List, MutableSequence, Optional, TypedDict
 
 import sentry_sdk
@@ -19,8 +24,12 @@ from aspen.auth.device_auth import validate_auth_header
 from aspen.database.models import Group, GroupRole, User, UserRole
 
 
-def get_usergroup_query(session: AsyncSession, auth0_user_id: str) -> Query:
-    return (
+def get_usergroup_query(
+    session: AsyncSession,
+    auth0_user_id: Optional[str] = None,
+    user_id: Optional[str] = None,
+) -> Query:
+    query = (
         sa.select(User)  # type: ignore
         .options(joinedload(User.group).joinedload(Group.can_see))  # type: ignore
         .options(
@@ -29,18 +38,27 @@ def get_usergroup_query(session: AsyncSession, auth0_user_id: str) -> Query:
                 joinedload(UserRole.role, innerjoin=True),
             )
         )  # type: ignore
-        .filter(User.auth0_user_id == auth0_user_id)  # type: ignore
     )
+    if auth0_user_id:
+        query = query.filter(User.auth0_user_id == auth0_user_id)  # type: ignore
+    else:
+        query = query.filter(User.id == int(user_id))  # type: ignore
+    return query
 
 
-async def setup_userinfo(session: AsyncSession, auth0_user_id: str) -> Optional[User]:
-    sentry_sdk.set_user(
-        {
-            "requested_user_id": auth0_user_id,
-        }
-    )
+async def setup_userinfo(
+    session: AsyncSession,
+    auth0_user_id: Optional[str] = None,
+    user_id: Optional[str] = None,
+) -> Optional[User]:
+    if auth0_user_id:
+        sentry_sdk.set_user(
+            {
+                "requested_user_id": auth0_user_id,
+            }
+        )
     try:
-        userquery = get_usergroup_query(session, auth0_user_id)
+        userquery = get_usergroup_query(session, auth0_user_id, user_id)
         userwait = await session.execute(userquery)
         user = userwait.unique().scalars().one()
     except NoResultFound:
@@ -57,28 +75,91 @@ async def setup_userinfo(session: AsyncSession, auth0_user_id: str) -> Optional[
     return user
 
 
+class MagicLinkPayload(TypedDict):
+    user_id: str
+    expiry: str
+
+
+async def magic_link_payload(
+    settings: Settings = Depends(get_settings), magic_link: Optional[str] = None
+) -> Optional[MagicLinkPayload]:
+    if not magic_link:
+        return None
+
+    # First, verify the MAC tag.
+    payload_message, payload_mac_tag = magic_link.split(".")
+    encoded_payload_message = payload_message.encode("utf8")
+
+    mac_key = urlsafe_b64decode(settings.AUSPICE_MAC_KEY)
+    digest_maker = hmac.new(mac_key, encoded_payload_message, hashlib.sha3_512)
+    correct_mac_tag = digest_maker.hexdigest()
+
+    authenticated = hmac.compare_digest(payload_mac_tag, correct_mac_tag)
+    if not authenticated:
+        raise ex.BadRequestException(
+            "Unauthenticated attempt to access an auspice magic link"
+        )
+
+    # Then decode the payload.
+    decoded_payload_message = urlsafe_b64decode(encoded_payload_message).decode("utf8")
+    recovered_payload = json.loads(decoded_payload_message)
+
+    # Test the expiry
+    expiry_time = datetime.fromisoformat(recovered_payload["expiry"])
+    if expiry_time <= datetime.now(timezone.utc):
+        raise ex.BadRequestException("Expired auspice view magic link")
+    payload: MagicLinkPayload = json.loads(decoded_payload_message)
+    return payload
+
+
+async def magic_link_userid(
+    magic_payload: Optional[MagicLinkPayload] = Depends(magic_link_payload),
+) -> Optional[str]:
+    if not magic_payload:
+        return None
+    return magic_payload["user_id"]
+
+
+def get_token_userid(
+    request: Request, settings: Settings = Depends(get_settings)
+) -> Optional[str]:
+    auth_header = request.headers.get("authorization")
+    if not auth_header:
+        return None
+    try:
+        payload = validate_auth_header(
+            auth_header, settings.AUTH0_DOMAIN, settings.AUTH0_CLIENT_ID
+        )
+        return payload["sub"]
+    except TokenValidationError as err:
+        logging.warn(f"Token validation error: {err}")
+    return None
+
+
+def get_cookie_userid(request: Request) -> Optional[str]:
+    if "profile" in request.session:
+        return request.session["profile"].get("user_id")
+    return None
+
+
 async def get_auth_user(
     request: Request,
     session: AsyncSession = Depends(get_db),
-    settings: Settings = Depends(get_settings),
+    magic_link_userid: Optional[str] = Depends(magic_link_userid),
+    cookie_userid: Optional[str] = Depends(get_cookie_userid),
+    token_userid: Optional[str] = Depends(get_token_userid),
 ) -> User:
-    auth_header = request.headers.get("authorization")
     auth0_user_id = None
-    if auth_header:
-        try:
-            payload = validate_auth_header(
-                auth_header, settings.AUTH0_DOMAIN, settings.AUTH0_CLIENT_ID
-            )
-            auth0_user_id = payload["sub"]
-        except TokenValidationError as err:
-            logging.warn(f"Token validation error: {err}")
-    elif "profile" in request.session:
-        auth0_user_id = request.session["profile"].get("user_id")
+    user_id = None
+    if magic_link_userid:
+        user_id = magic_link_userid
+    else:
+        auth0_user_id = cookie_userid or token_userid
     # Redirect to Login page
-    if not auth0_user_id:
+    if not auth0_user_id and not user_id:
         # TODO - redirect to login.
         raise ex.UnauthenticatedException("Login failure")
-    found_auth_user = await setup_userinfo(session, auth0_user_id)
+    found_auth_user = await setup_userinfo(session, auth0_user_id, user_id)
     if not found_auth_user:
         # login attempt from user not in DB
         # TODO - redirect to login.
