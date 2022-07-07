@@ -5,10 +5,10 @@ from typing import AsyncGenerator, Optional, Set
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
+from aspen.api.authn import AuthContext
 from aspen.api.authz import AuthZSession
 from aspen.api.utils import samples_by_identifiers
 from aspen.database.models import Sample, UploadedPathogenGenome
-from aspen.database.models.usergroup import User
 
 
 class SpecialtyDownstreams(Enum):
@@ -22,12 +22,12 @@ class FastaStreamer:
         self,
         db: AsyncSession,
         az: AuthZSession,
-        user: User,
+        ac: AuthContext,
         sample_ids: Set[str],
         downstream_consumer: Optional[str] = None,
     ):
         self.db = db
-        self.user = user
+        self.ac = ac
         self.az = az
         self.sample_ids = sample_ids
         # Certain consumers have different requirements on fasta
@@ -60,7 +60,7 @@ class FastaStreamer:
                 )
                 stripped_sequence: str = sequence.strip("Nn")
                 # use private id if the user has access to it, else public id
-                if sample.submitting_group_id == self.user.group_id:
+                if sample.submitting_group_id == self.ac.group.id:
                     yield self._output_id_line(sample.private_identifier)
                 else:
                     yield self._output_id_line(sample.public_identifier)
