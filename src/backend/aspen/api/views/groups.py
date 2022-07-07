@@ -70,7 +70,6 @@ async def get_group_info(
     request: Request,
     db: AsyncSession = Depends(get_db),
     authorized_query: Select = Depends(require_access("read", Group)),
-    user: User = Depends(get_auth_user),
 ) -> Union[GroupInfoResponse, dict]:
     group_query = (
         authorized_query
@@ -84,21 +83,24 @@ async def get_group_info(
     return GroupInfoResponse.from_orm(group)
 
 
-@router.get("/{group_id}/members/", response_model=GroupMembersResponse)
+@router.get("/{group_id}/members/", response_model=Union[GroupMembersResponse, dict])
 async def get_group_members(
     group_id: int,
     request: Request,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_auth_user),
-) -> GroupMembersResponse:
-    if user.group.id != group_id and not user.system_admin:
-        raise ex.UnauthorizedException("Not authorized")
-    group_members_query = (
-        sa.select(User).where(User.group_id == group_id).order_by(User.name.asc())  # type: ignore
+    authorized_query: Select = Depends(require_access("read", Group)),
+) -> Union[GroupMembersResponse, dict]:
+    group_with_members_query = (
+        authorized_query
+        .options(joinedload(Group.members))
+        .where(Group.id == group_id)
     )
-    group_members_result = await db.execute(group_members_query)
-    group_members = group_members_result.scalars().all()
-    return GroupMembersResponse.parse_obj({"members": group_members})
+    group_with_members_result = await db.execute(group_with_members_query)
+    group_with_members = group_with_members_result.unique().scalars().one_or_none()
+    logger.info(group_with_members)
+    if not group_with_members:
+        return { "members": [] }
+    return GroupMembersResponse.parse_obj({"members": group_with_members.members})
 
 
 @router.get("/{group_id}/invitations/", response_model=InvitationsResponse)
