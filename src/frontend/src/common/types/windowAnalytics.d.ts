@@ -21,9 +21,10 @@ declare global {
   interface Window {
     // Below **adds** to Window properties, not a replacement.
     analytics?: {
-      identify: (userId: string, traits: Record<string, unknown>) => void;
+      identify: (userId?: string, traits: Record<string, unknown>) => void;
       page: () => void;
       track: (eventType: string, properties: Record<string, unknown>) => void;
     };
+    isCzGenEpiAnalyticsEnabled?: boolean;
   }
 }

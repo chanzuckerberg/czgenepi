@@ -7,6 +7,7 @@ import {
   useQueryClient,
   UseQueryResult,
 } from "react-query";
+import { analyticsSendUserInfo } from "src/common/analytics/methods";
 import ENV from "src/common/constants/ENV";
 import { API, DEFAULT_PUT_OPTIONS, getBackendApiJson } from "../api";
 import { ROUTES } from "../routes";
@@ -78,10 +79,19 @@ export function useUpdateUserInfo(): UseMutationResult<
   });
 }
 
+// Performs the needed `select` for `useUserInfo`, but also inserts a call
+// to analytics as a way to easily catch any changes to user info over time.
+function mapUserDataAndHandleAnalytics(obj: RawUserRequest): User {
+  const user = mapUserData(obj);
+  analyticsSendUserInfo(user);
+  return user;
+}
+
 export function useUserInfo(): UseQueryResult<User, unknown> {
   return useQuery([USE_USER_INFO], fetchUserInfo, {
     retry: false,
-    select: mapUserData,
+    // Analytics rides along here as a way to capture user info changes
+    select: mapUserDataAndHandleAnalytics,
   });
 }
 
