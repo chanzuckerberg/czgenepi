@@ -1,13 +1,12 @@
 import re
-from typing import Union
 
 import sentry_sdk
 import sqlalchemy as sa
 from auth0.v3.exceptions import Auth0Error
 from fastapi import APIRouter, Depends
-from sqlalchemy.sql.expression import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
+from sqlalchemy.sql.expression import Select
 from starlette.requests import Request
 
 from aspen.api.authn import get_admin_user, get_auth0_apiclient, get_auth_user
@@ -28,10 +27,6 @@ from aspen.database.models import Group, User
 
 router = APIRouter()
 
-import logging
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
 
 @router.post("/", response_model=GroupInfoResponse)
 async def create_group(
@@ -64,42 +59,37 @@ async def create_group(
     return GroupInfoResponse.from_orm(created_group)
 
 
-@router.get("/{group_id}/", response_model=Union[GroupInfoResponse, dict])
+@router.get("/{group_id}/", response_model=GroupInfoResponse)
 async def get_group_info(
     group_id: int,
     request: Request,
     db: AsyncSession = Depends(get_db),
     authorized_query: Select = Depends(require_access("read", Group)),
-) -> Union[GroupInfoResponse, dict]:
-    group_query = (
-        authorized_query
-        .options(joinedload(Group.default_tree_location))
-        .where(Group.id == group_id)
-    )
+) -> GroupInfoResponse:
+    group_query = authorized_query.options(  # type: ignore
+        joinedload(Group.default_tree_location)
+    ).where(Group.id == group_id)
     group_query_result = await db.execute(group_query)
     group = group_query_result.scalars().one_or_none()
     if not group:
-        return {}
+        raise ex.BadRequestException("Not found")
     return GroupInfoResponse.from_orm(group)
 
 
-@router.get("/{group_id}/members/", response_model=Union[GroupMembersResponse, dict])
+@router.get("/{group_id}/members/", response_model=GroupMembersResponse)
 async def get_group_members(
     group_id: int,
     request: Request,
     db: AsyncSession = Depends(get_db),
     authorized_query: Select = Depends(require_access("read", Group)),
-) -> Union[GroupMembersResponse, dict]:
-    group_with_members_query = (
-        authorized_query
-        .options(joinedload(Group.members))
-        .where(Group.id == group_id)
-    )
+) -> GroupMembersResponse:
+    group_with_members_query = authorized_query.options(  # type: ignore
+        joinedload(Group.members)
+    ).where(Group.id == group_id)
     group_with_members_result = await db.execute(group_with_members_query)
     group_with_members = group_with_members_result.unique().scalars().one_or_none()
-    logger.info(group_with_members)
     if not group_with_members:
-        return { "members": [] }
+        raise ex.BadRequestException("Not found")
     return GroupMembersResponse.parse_obj({"members": group_with_members.members})
 
 
@@ -108,15 +98,14 @@ async def get_group_invitations(
     group_id: int,
     request: Request,
     db: AsyncSession = Depends(get_db),
+    authorized_query: Select = Depends(require_access("read", Group)),
     auth0_client: Auth0Client = Depends(get_auth0_apiclient),
-    user: User = Depends(get_auth_user),
 ) -> InvitationsResponse:
-    if user.group.id != group_id and not user.system_admin:
-        raise ex.UnauthorizedException("Not authorized")
-    requested_group_query = sa.select(Group).where(Group.id == group_id)  # type: ignore
+    requested_group_query = authorized_query.where(Group.id == group_id)
     requested_group_result = await db.execute(requested_group_query)
-    requested_group: Group = requested_group_result.scalars().one()
-
+    requested_group: Group = requested_group_result.scalars().one_or_none()
+    if not requested_group:
+        raise ex.BadRequestException("Not found")
     try:
         auth0_org: Auth0Org = auth0_client.get_org_by_id(requested_group.auth0_org_id)
     except Exception:
@@ -131,14 +120,15 @@ async def invite_group_members(
     group_invitation_request: GroupInvitationsRequest,
     auth0_client: Auth0Client = Depends(get_auth0_apiclient),
     db: AsyncSession = Depends(get_db),
+    authorized_query: Select = Depends(require_access("write", Group)),
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_auth_user),
 ) -> GroupInvitationsResponse:
-    if user.group.id != group_id and not user.system_admin:
-        raise ex.UnauthorizedException("Not authorized")
     group = (
-        (await db.execute(sa.select(Group).where(Group.id == group_id))).scalars().one()  # type: ignore
+        (await db.execute(authorized_query.where(Group.id == group_id))).scalars().one_or_none()  # type: ignore
     )
+    if not group:
+        raise ex.BadRequestException("Not found")
     organization = auth0_client.get_org_by_name(group.name)
     client_id = settings.AUTH0_CLIENT_ID
     responses = []

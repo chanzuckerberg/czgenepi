@@ -55,7 +55,7 @@ class Group(idbase, DictMixin):  # type: ignore
         server_default=text("'{}'::jsonb"),
     )
 
-    members = relationship("User", back_populates="group")
+    members = relationship("User", back_populates="group")  # type: ignore
 
     can_see: MutableSequence[CanSee]
     can_be_seen_by: MutableSequence[CanSee]
