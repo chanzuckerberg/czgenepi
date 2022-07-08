@@ -204,11 +204,11 @@ async def test_sample_read(
     results = [
         groups[0].test_samples,
         groups[1].test_samples
-        + [sample for sample in groups[2].test_samples if sample.private == False]
-        + [sample for sample in groups[3].test_samples if sample.private == False],
+        + [sample for sample in groups[2].test_samples if sample.private is False]
+        + [sample for sample in groups[3].test_samples if sample.private is False],
         groups[2].test_samples + groups[3].test_samples,
         groups[3].test_samples
-        + [sample for sample in groups[2].test_samples if sample.private == False],
+        + [sample for sample in groups[2].test_samples if sample.private is False],
     ]
     matrix = [[azs[i], results[i]] for i in range(len(results))]
     await check_matrix(Sample, "read", async_session, matrix)
