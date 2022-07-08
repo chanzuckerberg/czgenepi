@@ -58,6 +58,7 @@ resource PhyloRun {
   "read" if "viewer";
   # admin permissions
   "read" if "admin";
+  "write" if "admin";
   # member permissions
   "read" if "member";
   "write" if "member";
@@ -76,6 +77,7 @@ resource PhyloTree {
   "read" if "viewer";
   # admin permissions
   "read" if "admin";
+  "write" if "admin";
   # member permissions
   "read" if "member";
   "write" if "member";
