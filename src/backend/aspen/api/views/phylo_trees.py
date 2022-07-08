@@ -25,7 +25,7 @@ async def get_single_phylo_tree(
     ac: AuthContext = Depends(get_auth_context),
 ) -> JSONResponse:
     phylo_tree_data = await process_phylo_tree(
-        db, az, ac, item_id, request.query_params.get("id_style")
+        db, az, item_id, request.query_params.get("id_style")
     )
     headers = {
         "Content-Type": "application/json",
@@ -77,7 +77,7 @@ async def get_tree_metadata(
     ac: AuthContext = Depends(get_auth_context),
 ):
     phylo_tree_data = await process_phylo_tree(
-        db, az, ac, item_id, request.query_params.get("id_style")
+        db, az, item_id, request.query_params.get("id_style")
     )
     accessions = extract_accessions([], phylo_tree_data["tree"])
     selected_samples = await _get_selected_samples(db, item_id)

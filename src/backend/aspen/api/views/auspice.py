@@ -8,13 +8,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.requests import Request
 
-from aspen.api.authn import (
-    AuthContext,
-    get_auth_context,
-    get_auth_user,
-    magic_link_payload,
-    MagicLinkPayload,
-)
+from aspen.api.authn import get_auth_user, magic_link_payload, MagicLinkPayload
 from aspen.api.authz import AuthZSession, get_authz_session
 from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
@@ -79,12 +73,11 @@ async def auspice_view(
     magic_link: str,
     payload: AuspicePayload = Depends(magic_link_payload),
     az: AuthZSession = Depends(get_authz_session),
-    ac: AuthContext = Depends(get_auth_context),
     db: AsyncSession = Depends(get_db),
 ):
     # Load tree
     phylo_tree_id = payload["tree_id"]
-    tree_json = await process_phylo_tree(db, az, ac, phylo_tree_id)
+    tree_json = await process_phylo_tree(db, az, phylo_tree_id)
 
     # Return the tree
     return tree_json

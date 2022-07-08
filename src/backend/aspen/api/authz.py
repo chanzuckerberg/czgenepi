@@ -5,10 +5,10 @@ from fastapi import Depends
 from oso import AsyncOso, Relation
 from polar.data.adapter.async_sqlalchemy2_adapter import AsyncSqlAlchemyAdapter
 from sqlalchemy.ext.asyncio import AsyncSession
-from starlette.requests import Request
 
 from aspen.api.authn import AuthContext, get_auth_context
 from aspen.api.deps import get_db
+from aspen.api.error import http_exceptions as ex
 from aspen.database.models import (
     Group,
     GroupRole,
@@ -163,14 +163,13 @@ class AuthZSession:
 
 
 async def get_authz_session(
-    request: Request,
     auth_context: AuthContext = Depends(get_auth_context),
     session: AsyncSession = Depends(get_db),
 ) -> AuthZSession:
     return AuthZSession(session, auth_context)
 
 
-class AuthorizedSession:
+class AuthorizedQuery:
     def __init__(self, privilege: str, model: idbase):
         self.privilege = privilege
         self.model = model
@@ -188,5 +187,30 @@ class AuthorizedSession:
 def require_access(
     privilege: str,
     model: idbase,
-) -> AuthorizedSession:
-    return AuthorizedSession(privilege, model)
+) -> AuthorizedQuery:
+    return AuthorizedQuery(privilege, model)
+
+
+class AuthorizedGroup:
+    def __init__(self, privilege: str):
+        self.privilege = privilege
+
+    async def __call__(
+        self,
+        ac: AuthContext = Depends(get_auth_context),
+        db: AsyncSession = Depends(get_db),
+    ):
+        authz_session = AuthZSession(db, ac)
+        query = (await authz_session.authorized_query(self.privilege, Group)).where(Group.id == ac.group.id)  # type: ignore
+        res = await (db.execute(query))
+        group = res.scalars().one_or_none()
+        if not group:
+            raise ex.UnauthorizedException("access denied")
+        return group
+
+
+@lru_cache
+def require_group_privilege(
+    privilege: str,
+) -> AuthorizedGroup:
+    return AuthorizedGroup(privilege)
