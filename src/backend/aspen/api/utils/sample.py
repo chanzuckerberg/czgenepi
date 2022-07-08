@@ -18,7 +18,7 @@ async def samples_by_identifiers(
 ) -> Query:
     # TODO, this query can be updated to use an "id in (select id from...)" clause when we get a chance to fix it.
     public_samples_query = (
-        (await az.authorized_query("read_public", Sample))
+        (await az.authorized_query("read", Sample))
         .filter(Sample.public_identifier.in_(sample_ids))  # type: ignore
         .subquery()  # type: ignore
     )

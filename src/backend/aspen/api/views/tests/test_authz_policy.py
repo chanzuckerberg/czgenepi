@@ -1,14 +1,14 @@
-from typing import List, Any
+from typing import Any, List
 
 import pytest
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
-from aspen.database.models.base import idbase
 
 from aspen.api.authn import get_auth_context, require_group_membership, setup_userinfo
 from aspen.api.authz import AuthZSession, get_authz_session
-from aspen.database.models import Group, GroupRole, PhyloTree, Sample, User, PhyloRun
+from aspen.database.models import Group, GroupRole, PhyloRun, PhyloTree, Sample, User
+from aspen.database.models.base import idbase
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
 from aspen.test_infra.models.sample import sample_factory
@@ -151,32 +151,37 @@ async def azs(
         sessions.append(await make_authcontext(async_session, group, user))
     return sessions
 
-async def debug_group_roles(async_session, ac):
-     print(
-         f"user {ac.user.auth0_user_id} / group {ac.group.name} / roles {ac.user_roles} / group_roles: {ac.group_roles}"
-     )
-     return
-     group_roles = (
-         (
-             await async_session.execute(
-                 sa.select(GroupRole).options(
-                     joinedload(GroupRole.grantor_group),
-                     joinedload(GroupRole.grantee_group),
-                     joinedload(GroupRole.role),
-                 )
-             )
-         )
-         .scalars()
-         .all()
-     )
-     for gr in group_roles:
-         print(f"{gr.grantor_group.name} / {gr.grantee_group.name} / {gr.role.name}")
 
-async def check_matrix(model_class: idbase, permission: str, async_session, matrix: List[Any]):
+# Enable debugging - print more info about users/groups/roles.
+async def debug_group_roles(async_session, az):
+    ac = az.auth_context
+    print(
+        f"user {ac.user.auth0_user_id} / group {ac.group.name} / roles {ac.user_roles} / group_roles: {ac.group_roles}"
+    )
+    group_roles = (
+        (
+            await async_session.execute(
+                sa.select(GroupRole).options(
+                    joinedload(GroupRole.grantor_group),
+                    joinedload(GroupRole.grantee_group),
+                    joinedload(GroupRole.role),
+                )
+            )
+        )
+        .scalars()
+        .all()
+    )
+    for gr in group_roles:
+        print(f"{gr.grantor_group.name} / {gr.grantee_group.name} / {gr.role.name}")
+
+
+async def check_matrix(
+    model_class: idbase, permission: str, async_session, matrix: List[Any]
+):
     for (az, expected) in matrix:
         expected_items = [item.id for item in expected]
-        ac = az.auth_context
-        await debug_group_roles(async_session, ac)
+        # uncomment below for more debug
+        # await debug_group_roles(async_session, az)
         results = (
             (
                 await async_session.execute(
@@ -189,6 +194,7 @@ async def check_matrix(model_class: idbase, permission: str, async_session, matr
         actual_items = [item.id for item in results]
         assert set(actual_items) == set(expected_items)
 
+
 async def test_sample_read(
     async_session: AsyncSession,
     groups: List[Group],
@@ -198,16 +204,19 @@ async def test_sample_read(
     results = [
         groups[0].test_samples,
         groups[1].test_samples
-         + [sample for sample in groups[2].test_samples if sample.private == False]
-         + [sample for sample in groups[3].test_samples if sample.private == False],
+        + [sample for sample in groups[2].test_samples if sample.private == False]
+        + [sample for sample in groups[3].test_samples if sample.private == False],
         groups[2].test_samples + groups[3].test_samples,
         groups[3].test_samples
-         + [sample for sample in groups[2].test_samples if sample.private == False]
+        + [sample for sample in groups[2].test_samples if sample.private == False],
     ]
     matrix = [[azs[i], results[i]] for i in range(len(results))]
     await check_matrix(Sample, "read", async_session, matrix)
 
-async def test_sample_write(
+
+# NOTE - This is a permission that's *internal* to our oso policies and should
+# never be used directly by our application!
+async def test_sample_read_public(
     async_session: AsyncSession,
     groups: List[Group],
     appdata: List[PhyloTree],
@@ -215,14 +224,15 @@ async def test_sample_write(
 ):
     results = [
         groups[0].test_samples,
-        groups[1].test_samples ,
-        groups[2].test_samples + groups[3].test_samples, 
-        groups[3].test_samples ,
+        groups[1].test_samples + groups[2].test_samples + groups[3].test_samples,
+        groups[2].test_samples + groups[3].test_samples,
+        groups[3].test_samples + groups[2].test_samples,
     ]
     matrix = [[azs[i], results[i]] for i in range(len(results))]
-    await check_matrix(Sample, "write", async_session, matrix)
+    await check_matrix(Sample, "read_public", async_session, matrix)
 
-async def test_sample_read_private(
+
+async def test_sample_write(
     async_session: AsyncSession,
     groups: List[Group],
     appdata: List[PhyloTree],
@@ -236,6 +246,9 @@ async def test_sample_read_private(
     ]
     matrix = [[azs[i], results[i]] for i in range(len(results))]
     await check_matrix(Sample, "write", async_session, matrix)
+    await check_matrix(Sample, "read_private", async_session, matrix)
+    await check_matrix(Sample, "sequences", async_session, matrix)
+
 
 async def test_phyloruns_read(
     async_session: AsyncSession,
@@ -252,6 +265,7 @@ async def test_phyloruns_read(
     matrix = [[azs[i], results[i]] for i in range(len(results))]
     await check_matrix(PhyloRun, "read", async_session, matrix)
 
+
 async def test_phyloruns_write(
     async_session: AsyncSession,
     groups: List[Group],
@@ -266,6 +280,7 @@ async def test_phyloruns_write(
     ]
     matrix = [[azs[i], results[i]] for i in range(len(results))]
     await check_matrix(PhyloRun, "write", async_session, matrix)
+
 
 async def test_phylotrees_read(
     async_session: AsyncSession,
@@ -282,6 +297,7 @@ async def test_phylotrees_read(
     matrix = [[azs[i], results[i]] for i in range(len(results))]
     await check_matrix(PhyloTree, "read", async_session, matrix)
 
+
 async def test_phylotrees_write(
     async_session: AsyncSession,
     groups: List[Group],
@@ -296,3 +312,37 @@ async def test_phylotrees_write(
     ]
     matrix = [[azs[i], results[i]] for i in range(len(results))]
     await check_matrix(PhyloTree, "write", async_session, matrix)
+
+
+async def test_groups_read(
+    async_session: AsyncSession,
+    groups: List[Group],
+    appdata: List[PhyloTree],
+    azs: List[AuthZSession],
+):
+    results = [
+        [groups[0]],
+        [groups[1]],
+        [groups[2], groups[3]],
+        [groups[3]],
+    ]
+    matrix = [[azs[i], results[i]] for i in range(len(results))]
+    await check_matrix(Group, "read", async_session, matrix)
+    await check_matrix(Group, "create_sample", async_session, matrix)
+    await check_matrix(Group, "create_phylorun", async_session, matrix)
+
+
+async def test_groups_write(
+    async_session: AsyncSession,
+    groups: List[Group],
+    appdata: List[PhyloTree],
+    azs: List[AuthZSession],
+):
+    results = [
+        [],
+        [],
+        [groups[2]],
+        [groups[3]],
+    ]
+    matrix = [[azs[i], results[i]] for i in range(len(results))]
+    await check_matrix(Group, "write", async_session, matrix)
