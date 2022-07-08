@@ -13,7 +13,7 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
 
 from aspen.api.authn import AuthContext, get_auth_context, get_auth_user
-from aspen.api.authz import AuthZSession, get_authz_session
+from aspen.api.authz import AuthZSession, get_authz_session, require_group_privilege
 from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.phylo_runs import (
@@ -32,6 +32,7 @@ from aspen.api.utils import (
 )
 from aspen.database.models import (
     AlignedGisaidDump,
+    Group,
     PathogenGenome,
     PhyloRun,
     PhyloTree,
@@ -53,9 +54,8 @@ async def kick_off_phylo_run(
     az: AuthZSession = Depends(get_authz_session),
     ac: AuthContext = Depends(get_auth_context),
     user: User = Depends(get_auth_user),
+    group: Group = Depends(require_group_privilege("create_phylorun")),
 ) -> PhyloRunResponse:
-    # TODO AUTHFIXME - sample run needs to be associated with org_id if this user sent it and has permission
-    group = ac.group
 
     # validation happens in input schema
     sample_ids = phylo_run_request.samples

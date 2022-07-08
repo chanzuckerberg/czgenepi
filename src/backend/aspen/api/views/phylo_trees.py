@@ -1,6 +1,5 @@
 import re
 
-import sqlalchemy as sa
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -25,7 +24,7 @@ async def get_single_phylo_tree(
     ac: AuthContext = Depends(get_auth_context),
 ) -> JSONResponse:
     phylo_tree_data = await process_phylo_tree(
-        db, az, ac, item_id, request.query_params.get("id_style")
+        db, az, item_id, request.query_params.get("id_style")
     )
     headers = {
         "Content-Type": "application/json",
@@ -35,13 +34,13 @@ async def get_single_phylo_tree(
 
 
 # supporting function for get_tree_metadata()
-async def _get_selected_samples(db: AsyncSession, phylo_tree_id: int):
+async def _get_selected_samples(db: AsyncSession, az: AuthZSession, phylo_tree_id: int):
     # SqlAlchemy requires aliasing for any queries that join to the same table (in this case, entities)
     # multiple times via joined table inheritance
     # ref: https://github.com/sqlalchemy/sqlalchemy/discussions/6972
     entity_alias = aliased(UploadedPathogenGenome, flat=True)
     phylo_tree_query = (
-        sa.select(PhyloTree)  # type: ignore
+        (await az.authorized_query("read", PhyloTree))  # type: ignore
         .join(PhyloRun, PhyloTree.producing_workflow.of_type(PhyloRun))  # type: ignore
         .outerjoin(entity_alias, PhyloRun.inputs.of_type(entity_alias))  # type: ignore
         .outerjoin(Sample)  # type: ignore
@@ -61,6 +60,10 @@ async def _get_selected_samples(db: AsyncSession, phylo_tree_id: int):
     selected_samples = selected_samples.union(
         set(prefix_regex.sub("", item) for item in phylo_run.gisaid_ids)
     )
+    # AuthZ note: We're not adding an additional sample access or public/private
+    # identifier check here since the process_phylo_tree method already does that
+    # filtering, and this data is only used to match any identifiers that are
+    # *already* on the tree.
     for uploaded_pathogen_genome in phylo_run.inputs:
         sample = uploaded_pathogen_genome.sample
         selected_samples.add(prefix_regex.sub("", sample.public_identifier))
@@ -74,13 +77,12 @@ async def get_tree_metadata(
     request: Request,
     db: AsyncSession = Depends(get_db),
     az: AuthZSession = Depends(get_authz_session),
-    ac: AuthContext = Depends(get_auth_context),
 ):
     phylo_tree_data = await process_phylo_tree(
-        db, az, ac, item_id, request.query_params.get("id_style")
+        db, az, item_id, request.query_params.get("id_style")
     )
     accessions = extract_accessions([], phylo_tree_data["tree"])
-    selected_samples = await _get_selected_samples(db, item_id)
+    selected_samples = await _get_selected_samples(db, az, item_id)
 
     filename: str = f"{item_id}_sample_ids.tsv"
     streamer = MetadataTSVStreamer(filename, accessions, selected_samples)

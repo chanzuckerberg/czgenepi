@@ -15,7 +15,7 @@ from sqlalchemy.orm import joinedload, selectinload
 from sqlalchemy.orm.exc import NoResultFound
 
 from aspen.api.authn import AuthContext, get_auth_context, get_auth_user
-from aspen.api.authz import AuthZSession, get_authz_session
+from aspen.api.authz import AuthZSession, get_authz_session, require_group_privilege
 from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.samples import (
@@ -39,7 +39,7 @@ from aspen.api.utils import (
     get_missing_and_found_sample_ids,
     samples_by_identifiers,
 )
-from aspen.database.models import Location, Sample, UploadedPathogenGenome, User
+from aspen.database.models import Group, Location, Sample, UploadedPathogenGenome, User
 
 router = APIRouter()
 
@@ -279,8 +279,8 @@ async def create_samples(
     create_samples_request: List[CreateSampleRequest],
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
-    ac: AuthContext = Depends(get_auth_context),
     user: User = Depends(get_auth_user),
+    group: Group = Depends(require_group_privilege("create_sample")),
 ) -> SamplesResponse:
 
     duplicates_in_request: Union[
@@ -293,7 +293,7 @@ async def create_samples(
 
     already_exists: Union[
         None, Mapping[str, list[str]]
-    ] = await check_duplicate_samples(create_samples_request, db, ac.group.id)
+    ] = await check_duplicate_samples(create_samples_request, db, group.id)
     if already_exists:
         raise ex.BadRequestException(
             f"Error inserting data, private_identifiers {already_exists['existing_private_ids']} or public_identifiers: {already_exists['existing_public_ids']} already exist in our database, please remove these samples before proceeding with upload.",
@@ -314,16 +314,16 @@ async def create_samples(
             raise ex.BadRequestException("Invalid location id for sample")
 
         sample_args: Mapping[str, Any] = {
-            "submitting_group": ac.group,
+            "submitting_group": group,
             "uploaded_by": user,
-            "sample_collected_by": ac.group.name,
-            "sample_collector_contact_address": ac.group.address,
+            "sample_collected_by": group.name,
+            "sample_collector_contact_address": group.address,
             "organism": sample_input.organism,
             "private_identifier": sample_input.private_identifier,
             "collection_date": sample_input.collection_date,
             "private": sample_input.private,
             "public_identifier": sample_input.public_identifier,
-            "authors": sample_input.authors or [ac.group.name],
+            "authors": sample_input.authors or [group.name],
             "collection_location": valid_location,
         }
 
@@ -372,7 +372,7 @@ async def create_samples(
     # Run as a separate thread, so any errors here won't affect sample uploads
     pangolin_job = threading.Thread(
         target=_kick_off_pangolin,
-        args=(ac.group.prefix, pangolin_sample_ids, settings),
+        args=(group.prefix, pangolin_sample_ids, settings),
     )
     pangolin_job.start()
 

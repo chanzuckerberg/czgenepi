@@ -32,13 +32,17 @@ resource Sample {
 
 resource Group {
   roles = ["admin", "viewer", "member"];
-  permissions = ["read", "write"];
+  permissions = ["read", "write", "create_phylorun", "create_sample"];
 
   # admin permissions
   "read" if "admin";
   "write" if "admin";
+  "create_phylorun" if "admin";
+  "create_sample" if "admin";
   # member permissions
   "read" if "member";
+  "create_phylorun" if "member";
+  "create_sample" if "member";
 }
 
 resource PhyloRun {
