@@ -75,7 +75,7 @@ const MembersTab = ({
             count={invitations.length}
           />
         </StyledTabs>
-        {userInfo.isGroupAdmin && (
+        {userInfo?.isGroupAdmin && (
           <Button
             sdsType="primary"
             sdsStyle="rounded"

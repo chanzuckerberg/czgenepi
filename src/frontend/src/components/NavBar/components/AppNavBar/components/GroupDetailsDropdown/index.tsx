@@ -82,7 +82,7 @@ const GroupDetailsDropdown = ({
           {memberCount} {pluralize("Member", memberCount)}
         </Details>
         <div>
-          {userInfo.isGroupAdmin && (
+          {userInfo?.isGroupAdmin && (
             <StyledButton
               sdsType="primary"
               sdsStyle="rounded"
