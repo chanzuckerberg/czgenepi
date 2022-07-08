@@ -72,9 +72,7 @@ async def test_phylo_tree_rename(
         private_identifier="private_identifier_1",
         public_identifier="public_identifier_1",
     )
-    # NOTE - our test user *can see* private identifiers for samples from
-    # this group, but we're *only* translating ID's for the samples that belong
-    # *to the group the tree belongs to* so these won't be translated right now.
+    # NOTE - our test user *can see* private identifiers for samples from this group!
     can_see_sample = sample_factory(
         can_see_group,
         user,
@@ -127,7 +125,7 @@ async def test_phylo_tree_rename(
         "name": "private_identifier_1",
         "GISAID_ID": "public_identifier_1",
         "children": [
-            {"name": "public_identifier_2"},
+            {"GISAID_ID": "public_identifier_2", "name": "private_identifier_2"},
             {"name": "public_identifier_3"},
             {
                 "name": "public_identifier_4",
