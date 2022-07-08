@@ -73,6 +73,7 @@ async def test_samples_create_view_pass_no_public_id(
         json=data,
         headers=auth_headers,
     )
+    print(res.json())
     assert [row["private_identifier"] for row in res.json()["samples"]] == [
         "private",
         "private2",
