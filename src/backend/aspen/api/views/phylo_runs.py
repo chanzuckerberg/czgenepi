@@ -56,7 +56,6 @@ async def kick_off_phylo_run(
     user: User = Depends(get_auth_user),
     group: Group = Depends(require_group_privilege("create_phylorun")),
 ) -> PhyloRunResponse:
-    group = ac.group
 
     # validation happens in input schema
     sample_ids = phylo_run_request.samples

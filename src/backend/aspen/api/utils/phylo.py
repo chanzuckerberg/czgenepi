@@ -75,10 +75,11 @@ async def verify_and_access_phylo_tree(
         tree_query = tree_query.options(selectinload(PhyloTree.constituent_samples))  # type: ignore
     tree_query = tree_query.filter(PhyloTree.entity_id.in_({phylo_tree_id}))  # type: ignore
     authz_tree_query_result = await db.execute(tree_query)
-    phylo_tree: Optional[PhyloTree]
-    try:
-        phylo_tree = authz_tree_query_result.scalars().unique().one()
-    except sa.exc.NoResultFound:  # type: ignore
+    phylo_tree: Optional[PhyloTree] = (
+        authz_tree_query_result.scalars().unique().one_or_none()
+    )
+    if not phylo_tree:
+        # Either the tree doesn't exist or we don't have access to it.
         return False, None, None
     run_query = (
         (await az.authorized_query("read", PhyloRun))
