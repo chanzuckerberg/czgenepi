@@ -37,7 +37,7 @@ export interface RawGroupMemberRequest {
   role: GroupRole;
 }
 
-export const mapGroupData = (obj: RawGroupRequest): Group => {
+export const mapGroupData = (obj: RawGroupRequest): GroupDetails => {
   return {
     address: obj.address,
     id: obj.id,
@@ -78,7 +78,9 @@ export const USE_GROUP_INFO = {
   id: "groupInfo",
 };
 
-export function useGroupInfo(groupId: number): UseQueryResult<Group, unknown> {
+export function useGroupInfo(
+  groupId: number
+): UseQueryResult<GroupDetails, unknown> {
   return useQuery([USE_GROUP_INFO, groupId], () => fetchGroup({ groupId }), {
     retry: false,
     select: mapGroupData,

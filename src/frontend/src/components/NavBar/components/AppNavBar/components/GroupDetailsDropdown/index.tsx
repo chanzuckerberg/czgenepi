@@ -44,7 +44,7 @@ const GroupDetailsDropdown = ({
 
   // right now users can only have one group, but will be able to have more in the future.
   // ui already knows how to render for multiple groups, so we still want to give an array.
-  const usersGroups: Group[] = [groupInfo];
+  const usersGroups: GroupDetails[] = [groupInfo];
 
   const { name, location } = groupInfo ?? {};
   const displayLocation = stringifyGisaidLocation(location);

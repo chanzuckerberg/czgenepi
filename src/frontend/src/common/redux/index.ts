@@ -6,10 +6,28 @@ import { setGroup, setPathogen } from "./actions";
 import { setGroupMiddleware, setPathogenMiddleware } from "./middleware";
 import { CZGEReduxActions, Pathogen, ReduxPersistenceTokens } from "./types";
 
+/**
+ * A note about how our redux store is initialized ...
+ * Before we create the store, we make an initial state object.
+ * We try to read from localstorage to create the initial state.
+ * If we can't, we use reasonable defaults that match the types we want
+ * each state field to have.
+ * We create the store with the initial state, also registering middleware with it.
+ * Then we set "true" defaults.
+ * Why set defaults after instead of in initial state?
+ * Because otherwise those updates cannot be persisted to localstorage using the predefined
+ * middleware, since the store doesn't actually exist yet.
+ * Although it would be possible to make requests to calculate and manually store the data,
+ * this request would be async, meaning the state would not reliably be set before the ui
+ * comes online.
+ * So we have a compromise to use defaults for a fast initial hydration, and then immediately
+ * make reqeusts for "true" default values from the server if needed.
+ */
+
 // first, load state from localstorage if any exists and use it to initialize redux
 const getInitialState = () => {
   const storedGroupStr = getLocalStorage(ReduxPersistenceTokens.GROUP);
-  const storedGroup = storedGroupStr ? parseInt(storedGroupStr) : null;
+  const storedGroup = storedGroupStr ? parseInt(storedGroupStr) : -1;
 
   const storedPathogenStr = getLocalStorage(ReduxPersistenceTokens.PATHOGEN);
   const storedPathogen =
@@ -64,7 +82,7 @@ const setDefaults = async () => {
   const { group, pathogen } = current;
 
   // set user group
-  if (!group) {
+  if (group === -1) {
     const userInfo = await fetchUserInfo();
     const { groups } = userInfo;
 

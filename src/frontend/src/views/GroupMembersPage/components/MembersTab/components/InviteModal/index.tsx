@@ -30,7 +30,11 @@ interface Props {
   open: boolean;
 }
 
-const InviteModal = ({ groupName, onClose, open }: Props): JSX.Element => {
+const InviteModal = ({
+  groupName,
+  onClose,
+  open,
+}: Props): JSX.Element | null => {
   const [inputValue, setInputValue] = useState<string>("");
   const [hasMoreThan50Invites, setHasMoreThan50Invites] =
     useState<boolean>(false);
@@ -47,9 +51,26 @@ const InviteModal = ({ groupName, onClose, open }: Props): JSX.Element => {
     []
   );
 
+  const sendInvitationMutation = useSendGroupInvitations({
+    componentOnSuccess: ({ invitations }) => {
+      // show a warning if we aren't sending invites for existing users
+      const failedInvites = filter(invitations, (i) => !i.success);
+      setFailedToSendAddresses(failedInvites.map((i) => i.email));
+      if (failedInvites.length > 0) setIsFailureNotificationOpen(true);
+
+      // show success for any invites we did send
+      const successCount = invitations.length - failedInvites.length;
+      setSentCount(successCount);
+      if (successCount > 0) setIsSuccessNotificationOpen(true);
+
+      handleClose();
+    },
+    componentOnError: noop,
+  });
+
   // can't send invites if we don't know what group they are in
   const groupId = useSelector(selectCurrentGroup);
-  if (!groupId) return;
+  if (!groupId) return null;
 
   const handleClose = () => {
     setInputValue("");
@@ -122,23 +143,6 @@ const InviteModal = ({ groupName, onClose, open }: Props): JSX.Element => {
   ];
 
   const inputIntent = invalidAddresses.length > 0 ? "error" : "default";
-
-  const sendInvitationMutation = useSendGroupInvitations({
-    componentOnSuccess: ({ invitations }) => {
-      // show a warning if we aren't sending invites for existing users
-      const failedInvites = filter(invitations, (i) => !i.success);
-      setFailedToSendAddresses(failedInvites.map((i) => i.email));
-      if (failedInvites.length > 0) setIsFailureNotificationOpen(true);
-
-      // show success for any invites we did send
-      const successCount = invitations.length - failedInvites.length;
-      setSentCount(successCount);
-      if (successCount > 0) setIsSuccessNotificationOpen(true);
-
-      handleClose();
-    },
-    componentOnError: noop,
-  });
 
   const handleFormSubmit = () => {
     const emails = getAddressArrayFromInputValue();
