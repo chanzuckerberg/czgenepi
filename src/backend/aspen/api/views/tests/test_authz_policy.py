@@ -214,24 +214,6 @@ async def test_sample_read(
     await check_matrix(Sample, "read", async_session, matrix)
 
 
-# NOTE - This is a permission that's *internal* to our oso policies and should
-# never be used directly by our application!
-async def test_sample_read_public(
-    async_session: AsyncSession,
-    groups: List[Group],
-    appdata: List[PhyloTree],
-    azs: List[AuthZSession],
-):
-    results = [
-        groups[0].test_samples,
-        groups[1].test_samples + groups[2].test_samples + groups[3].test_samples,
-        groups[2].test_samples + groups[3].test_samples,
-        groups[3].test_samples + groups[2].test_samples,
-    ]
-    matrix = [[azs[i], results[i]] for i in range(len(results))]
-    await check_matrix(Sample, "read_public", async_session, matrix)
-
-
 async def test_sample_write(
     async_session: AsyncSession,
     groups: List[Group],

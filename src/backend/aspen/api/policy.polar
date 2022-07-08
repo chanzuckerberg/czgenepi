@@ -9,7 +9,7 @@ resource Group {
 
 resource Sample {
   roles = ["admin", "viewer", "member"];
-  permissions = [ "read", "read_private", "read_public", "sequences", "write"];
+  permissions = [ "read", "read_private", "sequences", "write"];
   relations = { owner: Group };
 
   "viewer" if "viewer" on "owner";
@@ -17,14 +17,11 @@ resource Sample {
   "admin" if "admin" on "owner";
 
   # viewer permissions
-  "read_public" if "viewer";
   # admin permissions
-  "read_public" if "admin";
   "read_private" if "admin";
   "sequences" if "admin";
   "write" if "admin";
   # member permissions
-  "read_public" if "member";
   "read_private" if "member";
   "sequences" if "member";
   "write" if "member";
@@ -85,7 +82,7 @@ resource PhyloTree {
 
 has_permission(ac: AuthContext, "read", sample: Sample) if
   has_permission(ac, "read_private", sample) or (
-    has_permission(ac, "read_public", sample) and
+    has_role(ac, "viewer", sample) and
     sample.private = false
   );
 
