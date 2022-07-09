@@ -94,7 +94,7 @@ async def get_group_members(
     group_with_members_result = await db.execute(group_with_members_query)
     group_with_members = group_with_members_result.unique().scalars().one_or_none()
     if not group_with_members:
-        raise ex.BadRequestException("Not found")
+        raise ex.UnauthorizedException("Not authorized")
     group_members = []
     # users can only have one role per group
     for member in group_with_members.members:
@@ -119,7 +119,7 @@ async def get_group_invitations(
     requested_group_result = await db.execute(requested_group_query)
     requested_group: Group = requested_group_result.scalars().one_or_none()
     if not requested_group:
-        raise ex.BadRequestException("Not found")
+        raise ex.UnauthorizedException("Not authorized")
     try:
         auth0_org: Auth0Org = auth0_client.get_org_by_id(requested_group.auth0_org_id)
     except Exception:
@@ -142,7 +142,7 @@ async def invite_group_members(
         (await db.execute(authorized_query.where(Group.id == group_id))).scalars().one_or_none()  # type: ignore
     )
     if not group:
-        raise ex.BadRequestException("Not found")
+        raise ex.UnauthorizedException("Not authorized")
     organization = auth0_client.get_org_by_name(group.name)
     client_id = settings.AUTH0_CLIENT_ID
     responses = []

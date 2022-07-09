@@ -41,20 +41,22 @@ async def test_list_members(
     expected = {
         "members": [
             {
-                "id": user2.id,
-                "name": user2.name,
-                "agreed_to_tos": True,
-                "acknowledged_policy_version": None,
-                "email": user2.email,
-                "group_admin": True,
-            },
-            {
                 "id": user.id,
                 "name": user.name,
                 "agreed_to_tos": True,
                 "acknowledged_policy_version": None,
                 "email": user.email,
                 "group_admin": False,
+                "role": "member",
+            },
+            {
+                "id": user2.id,
+                "name": user2.name,
+                "agreed_to_tos": True,
+                "acknowledged_policy_version": None,
+                "email": user2.email,
+                "group_admin": True,
+                "role": "admin",
             },
         ]
     }
@@ -94,7 +96,7 @@ async def test_send_group_invitations(
     async_session: AsyncSession,
 ) -> None:
     group = group_factory()
-    user = await userrole_factory(async_session, group)
+    user = await userrole_factory(async_session, group, roles=["admin"])
     async_session.add_all([group, user])
     await async_session.commit()
 
