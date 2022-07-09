@@ -32,6 +32,7 @@ class UserBaseResponse(BaseResponse):
     name: str
     agreed_to_tos: bool = False
     acknowledged_policy_version: Optional[datetime.date] = None
+    group_admin: bool
 
 
 class UserUpdateRequest(BaseRequest):
@@ -50,7 +51,6 @@ class GroupRoleResponse(BaseResponse):
 class UserMeResponse(UserBaseResponse):
     split_id: str
     group: GroupResponse
-    group_admin: bool
     groups: List[GroupRoleResponse]
 
 
@@ -79,7 +79,7 @@ class UserPostRequest(BaseRequest):
 
 class MemberResponse(UserBaseResponse):
     email: str
-    group_admin: bool
+    role: str
 
 
 class GroupMembersResponse(BaseResponse):

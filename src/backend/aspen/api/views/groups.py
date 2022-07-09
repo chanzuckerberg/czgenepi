@@ -23,7 +23,7 @@ from aspen.api.schemas.usergroup import (
 )
 from aspen.api.settings import Settings
 from aspen.auth.auth0_management import Auth0Client, Auth0Org
-from aspen.database.models import Group, User
+from aspen.database.models import Group, User, UserRole
 
 router = APIRouter()
 
@@ -84,13 +84,27 @@ async def get_group_members(
     authorized_query: Select = Depends(require_access("read", Group)),
 ) -> GroupMembersResponse:
     group_with_members_query = authorized_query.options(  # type: ignore
-        joinedload(Group.members)
+        joinedload(Group.members).options(
+            joinedload(User.user_roles).options(  # type: ignore
+                joinedload(UserRole.group, innerjoin=True),  # type: ignore
+                joinedload(UserRole.role, innerjoin=True),
+            )
+        )
     ).where(Group.id == group_id)
     group_with_members_result = await db.execute(group_with_members_query)
     group_with_members = group_with_members_result.unique().scalars().one_or_none()
     if not group_with_members:
         raise ex.BadRequestException("Not found")
-    return GroupMembersResponse.parse_obj({"members": group_with_members.members})
+    group_members = []
+    # users can only have one role per group
+    for member in group_with_members.members:
+        member.role = next(
+            user_role.role.name
+            for user_role in member.user_roles
+            if user_role.group.id == group_id
+        )
+        group_members.append(member)
+    return GroupMembersResponse.parse_obj({"members": group_members})
 
 
 @router.get("/{group_id}/invitations/", response_model=InvitationsResponse)
