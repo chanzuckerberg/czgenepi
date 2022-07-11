@@ -7,7 +7,8 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from aspen.api.authn import get_auth_user
+from aspen.api.authn import AuthContext, get_auth_context
+from aspen.api.authz import AuthZSession, get_authz_session
 from aspen.api.deps import get_db, get_settings
 from aspen.api.schemas.sequences import (
     FastaURLRequest,
@@ -15,8 +16,7 @@ from aspen.api.schemas.sequences import (
     SequenceRequest,
 )
 from aspen.api.settings import Settings
-from aspen.api.utils import FastaStreamer
-from aspen.database.models import User
+from aspen.api.utils.fasta_streamer import FastaStreamer
 
 router = APIRouter()
 
@@ -25,15 +25,15 @@ router = APIRouter()
 async def prepare_sequences_download(
     request: SequenceRequest,
     db: AsyncSession = Depends(get_db),
-    settings: Settings = Depends(get_settings),
-    user: User = Depends(get_auth_user),
+    az: AuthZSession = Depends(get_authz_session),
+    ac: AuthContext = Depends(get_auth_context),
 ) -> StreamingResponse:
     # stream output file
-    fasta_filename = f"{user.group.name}_sample_sequences.fasta"
+    fasta_filename = f"{ac.group.name}_sample_sequences.fasta"
 
     async def stream_samples():
         sample_ids = request.sample_ids
-        streamer = FastaStreamer(db, user, sample_ids)
+        streamer = FastaStreamer(db, az, ac, set(sample_ids))
         async for line in streamer.stream():
             yield line
 
@@ -52,7 +52,8 @@ async def getfastaurl(
     request: FastaURLRequest,
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
-    user: User = Depends(get_auth_user),
+    az: AuthZSession = Depends(get_authz_session),
+    ac: AuthContext = Depends(get_auth_context),
 ) -> FastaURLResponse:
     sample_ids = request.samples
     downstream_consumer = request.downstream_consumer
@@ -65,12 +66,12 @@ async def getfastaurl(
     )
     s3_client = s3_resource.meta.client
     uuid = uuid4()
-    s3_key = f"fasta-url-files/{user.group.name}/{uuid}.fasta"
+    s3_key = f"fasta-url-files/{ac.group.name}/{uuid}.fasta"
     s3_write_fh = smart_open.open(
         f"s3://{s3_bucket}/{s3_key}", "w", transport_params=dict(client=s3_client)
     )
     # Write selected samples to s3
-    streamer = FastaStreamer(db, user, sample_ids, downstream_consumer)
+    streamer = FastaStreamer(db, az, ac, sample_ids, downstream_consumer)
     async for line in streamer.stream():
         s3_write_fh.write(line)
     s3_write_fh.close()

@@ -11,9 +11,7 @@ import dateparser
 import keyring
 import requests
 from auth0.v3.authentication.token_verifier import (
-    AsymmetricSignatureVerifier,
-    JwksFetcher,
-)
+    AsymmetricSignatureVerifier, JwksFetcher)
 from tabulate import tabulate
 
 
@@ -134,8 +132,9 @@ class TokenHandler:
 
 
 class ApiClient:
-    def __init__(self, url, token_handler):
+    def __init__(self, url, token_handler, org_id):
         self.url = url
+        self.org_id = org_id
         self.token_handler = token_handler
 
     def get_headers(self):
@@ -144,6 +143,28 @@ class ApiClient:
         if os.getenv("OAUTH2_PROXY_COOKIE"):
             headers["Cookie"] = f"_oauth2_proxy={os.getenv('OAUTH2_PROXY_COOKIE')}"
         return headers
+
+    def url_with_org(self, path):
+        if self.org_id:
+            path = path.replace("/v2/", f"/v2/orgs/{self.org_id}/")
+        print(f"path: {path}")
+        return path
+
+    def get_with_org(self, path, **kwargs):
+        url = self.url_with_org(path)
+        return self.get(url, **kwargs)
+
+    def delete_with_org(self, path, **kwargs):
+        url = self.url_with_org(path)
+        return self.delete(url, **kwargs)
+
+    def put_with_org(self, path, **kwargs):
+        url = self.url_with_org(path)
+        return self.put(url, **kwargs)
+
+    def post_with_org(self, path, **kwargs):
+        url = self.url_with_org(path)
+        return self.post(url, **kwargs)
 
     def get(self, path, **kwargs):
         headers = self.get_headers()
@@ -215,8 +236,9 @@ class CliConfig:
         self.api = api
         self.env = env
 
-    def get_api_client(self):
+    def get_api_client(self, org_id):
         auth_config = self.oauth_config["default"]
+        self.org_id = org_id
         if self.env in self.oauth_config:
             auth_config = self.oauth_config[self.env]
 
@@ -227,7 +249,7 @@ class CliConfig:
             oauth_api_config=auth_config["oauth_api_config"],
             verify=auth_config["verify"],
         )
-        api_client = ApiClient(self.api, token_handler)
+        api_client = ApiClient(self.api, token_handler, org_id)
         return api_client
 
 
@@ -239,6 +261,13 @@ class CliConfig:
     help="Aspen API to call",
 )
 @click.option(
+    "--org",
+    required=False,
+    default=lambda: os.environ.get("CZGE_ORG"),
+    type=int,
+    help="Org context for requests",
+)
+@click.option(
     "--api",
     help="Aspen API endpoint to use - this overrides the default value chosen by the --env flag",
 )
@@ -247,11 +276,11 @@ class CliConfig:
     help="Aspen rdev stack to query",
 )
 @click.pass_context
-def cli(ctx, env, api, stack):
+def cli(ctx, env, org, api, stack):
     ctx.ensure_object(dict)
     config = CliConfig(env, api, stack)
     ctx.obj["config"] = config
-    ctx.obj["api_client"] = config.get_api_client()
+    ctx.obj["api_client"] = config.get_api_client(org)
 
 
 @cli.group()
@@ -592,7 +621,7 @@ def samples():
 @click.pass_context
 def list_samples(ctx):
     api_client = ctx.obj["api_client"]
-    resp = api_client.get("/v2/samples/")
+    resp = api_client.get_with_org("/v2/samples/")
     print(resp.text)
 
 
@@ -613,11 +642,11 @@ def download_samples(ctx, sample_ids):
 def delete_samples(ctx, sample_ids):
     api_client = ctx.obj["api_client"]
     if len(sample_ids) == 1:
-        resp = api_client.delete(f"/v2/samples/{sample_ids[0]}")
+        resp = api_client.delete_with_org(f"/v2/samples/{sample_ids[0]}")
         print(resp.headers)
         print(resp.text)
         return
-    resp = api_client.delete(f"/v2/samples/", json={"ids": sample_ids})
+    resp = api_client.delete_with_org(f"/v2/samples/", json={"ids": sample_ids})
     print(resp.headers)
     print(resp.text)
 
@@ -663,7 +692,7 @@ def update_samples(
 ):
     api_client = ctx.obj["api_client"]
     if json:
-        resp = api_client.put(f"/v2/samples/", json=json.loads(json_data))
+        resp = api_client.put_with_org(f"/v2/samples/", json=json.loads(json_data))
         print(resp.text)
     else:
         if collection_date:
@@ -807,7 +836,7 @@ def update_phylorun(ctx, run_id, name):
 def validate_sample_ids(ctx, sample_ids, show_headers):
     api_client = ctx.obj["api_client"]
     payload = {"sample_ids": sample_ids}
-    resp = api_client.post("/v2/samples/validate_ids/", json=payload)
+    resp = api_client.post_with_org("/v2/samples/validate_ids/", json=payload)
     if show_headers:
         print(resp.headers)
     print(resp.text)
@@ -830,7 +859,7 @@ def delete_runs(ctx, run_ids):
 @click.pass_context
 def list_runs(ctx, print_headers):
     api_client = ctx.obj["api_client"]
-    resp = api_client.get(f"/v2/phylo_runs/")
+    resp = api_client.get_with_org(f"/v2/phylo_runs/")
     if print_headers:
         print(resp.headers)
     print(resp.text)

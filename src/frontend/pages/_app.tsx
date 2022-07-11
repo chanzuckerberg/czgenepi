@@ -5,11 +5,13 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
+import { Provider } from "react-redux";
 import "semantic-ui-css/semantic.min.css";
 import { analyticsRecordRouteChange } from "src/common/analytics/methods";
 import { OneTrustInitializer } from "src/common/analytics/OneTrustInitializer";
 import { PlausibleInitializer } from "src/common/analytics/PlausibleInitializer";
 import { SegmentInitializer } from "src/common/analytics/SegmentInitializer";
+import { store } from "src/common/redux";
 import { StyledApp } from "src/common/styles/appStyle";
 import { theme } from "src/common/styles/theme";
 import { setFeatureFlagsFromQueryParams } from "src/common/utils/featureFlags";
@@ -56,7 +58,7 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
   }, [router]);
 
   return (
-    <>
+    <Provider store={store}>
       <Head>
         <meta
           name="viewport"
@@ -80,7 +82,7 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
           </StylesProvider>
         </SplitInitializer>
       </QueryClientProvider>
-    </>
+    </Provider>
   );
 };
 

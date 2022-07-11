@@ -2,13 +2,13 @@ import re
 from enum import Enum
 from typing import AsyncGenerator, Optional, Set
 
-import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
-from aspen.api.utils import authz_sample_filters
-from aspen.database.models import DataType, Sample, UploadedPathogenGenome
-from aspen.database.models.usergroup import User
+from aspen.api.authn import AuthContext
+from aspen.api.authz import AuthZSession
+from aspen.api.utils import samples_by_identifiers
+from aspen.database.models import Sample, UploadedPathogenGenome
 
 
 class SpecialtyDownstreams(Enum):
@@ -21,33 +21,31 @@ class FastaStreamer:
     def __init__(
         self,
         db: AsyncSession,
-        user: User,
+        az: AuthZSession,
+        ac: AuthContext,
         sample_ids: Set[str],
         downstream_consumer: Optional[str] = None,
     ):
         self.db = db
-        self.user = user
-        self.cansee_groups_private_identifiers: Set[int] = {
-            cansee.owner_group_id
-            for cansee in user.group.can_see
-            if cansee.data_type == DataType.PRIVATE_IDENTIFIERS
-        }
-        # query for samples
-        all_samples_query = sa.select(Sample).options(  # type: ignore
-            joinedload(Sample.uploaded_pathogen_genome, innerjoin=True).undefer(  # type: ignore
-                UploadedPathogenGenome.sequence
-            ),
-        )
-        # Enforce AuthZ
-        self.authz_samples_query = authz_sample_filters(
-            all_samples_query, sample_ids, user
-        )
-        # Stream results
+        self.ac = ac
+        self.az = az
+        self.sample_ids = sample_ids
         # Certain consumers have different requirements on fasta
         self.downstream_consumer = downstream_consumer
 
     async def stream(self) -> AsyncGenerator[str, None]:
-        all_samples = await self.db.stream(self.authz_samples_query)
+        # query for samples
+        sample_query = await samples_by_identifiers(
+            self.az, self.sample_ids, "sequences"
+        )
+        sample_query = sample_query.options(  # type: ignore
+            joinedload(Sample.uploaded_pathogen_genome, innerjoin=True).undefer(  # type: ignore
+                UploadedPathogenGenome.sequence
+            ),
+        )
+
+        # Stream results
+        all_samples = await self.db.stream(sample_query)
         async for sample in all_samples.scalars():
             if sample.uploaded_pathogen_genome:
                 pathogen_genome: UploadedPathogenGenome = (
@@ -62,12 +60,7 @@ class FastaStreamer:
                 )
                 stripped_sequence: str = sequence.strip("Nn")
                 # use private id if the user has access to it, else public id
-                if (
-                    sample.submitting_group_id == self.user.group_id
-                    or sample.submitting_group_id
-                    in self.cansee_groups_private_identifiers
-                    or self.user.system_admin
-                ):
+                if sample.submitting_group_id == self.ac.group.id:
                     yield self._output_id_line(sample.private_identifier)
                 else:
                     yield self._output_id_line(sample.public_identifier)

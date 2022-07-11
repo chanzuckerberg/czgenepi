@@ -10,9 +10,8 @@ from fastapi import Depends, FastAPI, Request
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from aspen.api.authn import get_auth0_apiclient, get_auth_user, setup_userinfo
+from aspen.api.authn import get_auth0_apiclient, get_cookie_userid
 from aspen.api.deps import get_db
-from aspen.api.error import http_exceptions as ex
 from aspen.api.main import get_app
 from aspen.auth.auth0_management import Auth0Client
 from aspen.database import connection as aspen_connection
@@ -124,14 +123,10 @@ async def override_get_db(
         await session.close()  # type: ignore
 
 
-async def override_get_auth_user(
+async def override_get_cookie_userid(
     request: Request, session: AsyncSession = Depends(get_db)
 ) -> User:
-    found_auth_user = await setup_userinfo(session, request.headers.get("user_id"))
-    if not found_auth_user:
-        raise ex.UnauthorizedException("invalid user")
-    request.state.auth_user = found_auth_user
-    return found_auth_user
+    return request.headers.get("user_id")
 
 
 @pytest.fixture()
@@ -146,7 +141,7 @@ async def api(
 ) -> FastAPI:
     api = get_app()
     api.dependency_overrides[get_db] = partial(override_get_db, async_db)
-    api.dependency_overrides[get_auth_user] = override_get_auth_user
+    api.dependency_overrides[get_cookie_userid] = override_get_cookie_userid
     api.dependency_overrides[get_auth0_apiclient] = lambda: auth0_apiclient
     return api
 

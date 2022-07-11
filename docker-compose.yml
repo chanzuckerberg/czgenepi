@@ -74,6 +74,7 @@ services:
       - API_URL=http://backend.genepinet.localdev:3000
       - FLASK_ENV=development
       - PYTHONUNBUFFERED=1
+      - WORKERS=2
       - RESTART_ON_FAILURE=yes
       - BOTO_ENDPOINT_URL=http://localstack.genepinet.localdev:4566
       - AWS_ACCESS_KEY_ID=dev_access_key_id

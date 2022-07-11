@@ -129,30 +129,7 @@ export const Foo = styled.div`
 ```
 
 ## Feature Flags
-The front end of CZ Gen Epi has a feature flag system that aids in developing features without creating huge, long running feature branches. This allows us to:
-1. Develop multiple features in parallel with full visibility.
-2. Develop front end features without showing our WIP dust to users.
-3. Allow internal stakeholders to optionally view/hide WIP during development by modifying the app url.
-4. Prevent drift between `trunk` and feature branches during development by removing the need for feature branches in many cases.
-
-To add a new feature flag, create a new flag in `...../utils/featureFlags.tsx`. This creates a new flag that can be used to optionally show/hide components, or run/not run loops, logic, etc.
-
-```
-import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
-
-const render = () => {
-  if (usesFeatureFlag(FEATURE_FLAGS.mayasFlag)) {
-    return <div>FEATURE FLAG IN USE...</div>;  // or whatever new feature you are writing
-  }
-
-  // the old/default code that the user should see until development is complete
-  return <div>I'm the old feature</div>;
-};
-```
-
-In order to see code hidden behind a feature flag, simply add a query parameter to the url in your address bar. For example, http://frontend.genepinet.localdev:8000/data/samples becomes http://frontend.genepinet.localdev:8000/data/samples?mayasFlag=true. Please note, the value _must_ be set to `true` in the query param to turn the feature flag on.
-
-The feature flag will persist in local storage after it is set. That means *the feature flag will remain ON until you turn it off or clear your cookies, even if you do not modify url in the future*. As a result, please remember to clear your feature flags by periodically removing cookies, or by manually unsetting previously activated flags. For example, http://frontend.genepinet.localdev:8000/data/samples becomes http://frontend.genepinet.localdev:8000/data/samples?mayasFlag=false.
+[Documented here](https://czi.atlassian.net/wiki/spaces/SCI/pages/2442035223/GenEpi+--+Feature+Flags+Split.io+--+HowTo)
 
 ## Gotchas
 

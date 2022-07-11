@@ -13,9 +13,9 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncResult, AsyncSession
 from sqlalchemy.orm import joinedload, selectinload
 from sqlalchemy.orm.exc import NoResultFound
-from starlette.requests import Request
 
-from aspen.api.authn import get_auth_user
+from aspen.api.authn import AuthContext, get_auth_context, get_auth_user
+from aspen.api.authz import AuthZSession, get_authz_session, require_group_privilege
 from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.samples import (
@@ -31,20 +31,15 @@ from aspen.api.schemas.samples import (
 )
 from aspen.api.settings import Settings
 from aspen.api.utils import (
-    authz_samples_cansee,
     check_duplicate_samples,
     check_duplicate_samples_in_request,
     determine_gisaid_status,
     get_matching_gisaid_ids,
+    get_matching_gisaid_ids_by_epi_isl,
     get_missing_and_found_sample_ids,
+    samples_by_identifiers,
 )
-from aspen.database.models import (
-    DataType,
-    Location,
-    Sample,
-    UploadedPathogenGenome,
-    User,
-)
+from aspen.database.models import Group, Location, Sample, UploadedPathogenGenome, User
 
 router = APIRouter()
 
@@ -53,27 +48,20 @@ GISAID_REJECTION_TIME = datetime.timedelta(days=4)
 
 @router.get("/", response_model=SamplesResponse)
 async def list_samples(
-    request: Request,
     db: AsyncSession = Depends(get_db),
-    settings: Settings = Depends(get_settings),
-    user: User = Depends(get_auth_user),
+    az: AuthZSession = Depends(get_authz_session),
+    ac: AuthContext = Depends(get_auth_context),
 ) -> SamplesResponse:
 
-    cansee_groups_private_identifiers: Set[int] = {
-        cansee.owner_group_id
-        for cansee in user.group.can_see
-        if cansee.data_type == DataType.PRIVATE_IDENTIFIERS
-    }
-
     # load the samples.
-    all_samples_query = sa.select(Sample).options(  # type: ignore
+    user_visible_samples_query = await az.authorized_query("read", Sample)
+    user_visible_samples_query = user_visible_samples_query.options(  # type: ignore
         selectinload(Sample.uploaded_pathogen_genome),
         selectinload(Sample.submitting_group),
         selectinload(Sample.uploaded_by),
         selectinload(Sample.collection_location),
         selectinload(Sample.accessions),
     )
-    user_visible_samples_query = authz_samples_cansee(all_samples_query, None, user)
     user_visible_samples_result = await db.execute(user_visible_samples_query)
     user_visible_samples: List[Sample] = (
         user_visible_samples_result.unique().scalars().all()
@@ -81,16 +69,15 @@ async def list_samples(
 
     # populate sample object using pydantic response schema
     result = SamplesResponse(samples=[])
+    tot_rows = 0
     for sample in user_visible_samples:
+        tot_rows += 1
         sample.gisaid = determine_gisaid_status(
             sample,
         )
         sample.show_private_identifier = False
-        if (
-            sample.submitting_group_id == user.group_id
-            or sample.submitting_group_id in cansee_groups_private_identifiers
-            or user.system_admin
-        ):
+        # TODO - convert this to an oso check.
+        if sample.submitting_group_id == ac.group.id:
             sample.show_private_identifier = True
 
         sampleinfo = SampleResponse.from_orm(sample)
@@ -98,25 +85,18 @@ async def list_samples(
     return result
 
 
-async def get_owned_samples_by_ids(
-    db: AsyncSession, sample_ids: List[int], user: User
+async def get_write_samples_by_ids(
+    db: AsyncSession, az: AuthZSession, sample_ids: List[int]
 ) -> AsyncResult:
-    query = (
-        sa.select(Sample)  # type: ignore
-        .options(
-            joinedload(Sample.uploaded_pathogen_genome),
-            joinedload(Sample.submitting_group),
-            joinedload(Sample.uploaded_by),
-            joinedload(Sample.collection_location),
-        )
-        .filter(  # type: ignore
-            sa.and_(
-                Sample.submitting_group
-                == user.group,  # This is an access control check!
-                Sample.id.in_(sample_ids),
-            )
-        )
-    )
+    query = await az.authorized_query("write", Sample)
+    query = query.options(
+        joinedload(Sample.uploaded_pathogen_genome),
+        joinedload(Sample.submitting_group),
+        joinedload(Sample.uploaded_by),
+        joinedload(Sample.collection_location),
+    ).filter(
+        Sample.id.in_(sample_ids)
+    )  # type: ignore
     results = await db.execute(query)
     return results.scalars()
 
@@ -124,13 +104,11 @@ async def get_owned_samples_by_ids(
 @router.delete("/", responses={200: {"model": SampleBulkDeleteResponse}})
 async def delete_samples(
     sample_info: SampleBulkDeleteRequest,
-    request: Request,
     db: AsyncSession = Depends(get_db),
-    settings: Settings = Depends(get_settings),
-    user: User = Depends(get_auth_user),
+    az: AuthZSession = Depends(get_authz_session),
 ) -> SampleDeleteResponse:
     # Make sure this sample exists and is delete-able by the current user.
-    samples_res = await get_owned_samples_by_ids(db, sample_info.ids, user)
+    samples_res = await get_write_samples_by_ids(db, az, sample_info.ids)
     samples = samples_res.all()
     if len(samples) != len(sample_info.ids):
         raise ex.NotFoundException("samples not found")
@@ -147,13 +125,11 @@ async def delete_samples(
 @router.delete("/{sample_id}", responses={200: {"model": SampleDeleteResponse}})
 async def delete_sample(
     sample_id: int,
-    request: Request,
     db: AsyncSession = Depends(get_db),
-    settings: Settings = Depends(get_settings),
-    user: User = Depends(get_auth_user),
+    az: AuthZSession = Depends(get_authz_session),
 ) -> SampleDeleteResponse:
     # Make sure this sample exists and is delete-able by the current user.
-    sample_db_res = await get_owned_samples_by_ids(db, [sample_id], user)
+    sample_db_res = await get_write_samples_by_ids(db, az, [sample_id])
     try:
         sample = sample_db_res.one()
     except NoResultFound:
@@ -169,8 +145,7 @@ async def delete_sample(
 async def update_samples(
     update_samples_request: UpdateSamplesRequest,
     db: AsyncSession = Depends(get_db),
-    settings: Settings = Depends(get_settings),
-    user: User = Depends(get_auth_user),
+    az: AuthZSession = Depends(get_authz_session),
 ) -> SamplesResponse:
 
     # reorganize request data to make it easier to update
@@ -178,7 +153,7 @@ async def update_samples(
     sample_ids_to_update = list(reorganized_request_data.keys())
 
     # Make sure these samples exist and are delete-able by the current user.
-    sample_db_res = await get_owned_samples_by_ids(db, sample_ids_to_update, user)
+    sample_db_res = await get_write_samples_by_ids(db, az, sample_ids_to_update)
     editable_samples: MutableSequence[Sample] = sample_db_res.all()
 
     # are there any samples that can't be updated?
@@ -226,8 +201,7 @@ async def update_samples(
 async def validate_ids(
     request_data: ValidateIDsRequest,
     db: AsyncSession = Depends(get_db),
-    settings: Settings = Depends(get_settings),
-    user: User = Depends(get_auth_user),
+    az: AuthZSession = Depends(get_authz_session),
 ) -> ValidateIDsResponse:
 
     """
@@ -238,13 +212,9 @@ async def validate_ids(
 
     sample_ids: Set[str] = {item for item in request_data.sample_ids}
 
-    all_samples_query = sa.select(Sample).options()  # type: ignore
-
     # get all samples from request that the user has permission to use and scope down
     # the search for matching ID's to groups that the user has read access to.
-    user_visible_samples_query = authz_samples_cansee(
-        all_samples_query, sample_ids, user
-    )
+    user_visible_samples_query = await samples_by_identifiers(az, sample_ids)
     user_visible_samples_res = await (db.execute(user_visible_samples_query))
     user_visible_samples = user_visible_samples_res.scalars().all()
 
@@ -258,6 +228,11 @@ async def validate_ids(
 
     # Do we have any samples that are not aspen private or public identifiers or gisaid identifiers?
     missing_sample_ids -= gisaid_ids
+
+    # Do the same, but for epi isls
+    epi_isls: Set[str]
+    _, epi_isls = await get_matching_gisaid_ids_by_epi_isl(db, missing_sample_ids)
+    missing_sample_ids -= epi_isls
 
     return ValidateIDsResponse(missing_sample_ids=missing_sample_ids)
 
@@ -305,6 +280,7 @@ async def create_samples(
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_auth_user),
+    group: Group = Depends(require_group_privilege("create_sample")),
 ) -> SamplesResponse:
 
     duplicates_in_request: Union[
@@ -317,7 +293,7 @@ async def create_samples(
 
     already_exists: Union[
         None, Mapping[str, list[str]]
-    ] = await check_duplicate_samples(create_samples_request, db, user.group_id)
+    ] = await check_duplicate_samples(create_samples_request, db, group.id)
     if already_exists:
         raise ex.BadRequestException(
             f"Error inserting data, private_identifiers {already_exists['existing_private_ids']} or public_identifiers: {already_exists['existing_public_ids']} already exist in our database, please remove these samples before proceeding with upload.",
@@ -338,16 +314,16 @@ async def create_samples(
             raise ex.BadRequestException("Invalid location id for sample")
 
         sample_args: Mapping[str, Any] = {
-            "submitting_group": user.group,
+            "submitting_group": group,
             "uploaded_by": user,
-            "sample_collected_by": user.group.name,
-            "sample_collector_contact_address": user.group.address,
+            "sample_collected_by": group.name,
+            "sample_collector_contact_address": group.address,
             "organism": sample_input.organism,
             "private_identifier": sample_input.private_identifier,
             "collection_date": sample_input.collection_date,
             "private": sample_input.private,
             "public_identifier": sample_input.public_identifier,
-            "authors": sample_input.authors or [user.group.name],
+            "authors": sample_input.authors or [group.name],
             "collection_location": valid_location,
         }
 
@@ -396,7 +372,7 @@ async def create_samples(
     # Run as a separate thread, so any errors here won't affect sample uploads
     pangolin_job = threading.Thread(
         target=_kick_off_pangolin,
-        args=(user.group.prefix, pangolin_sample_ids, settings),
+        args=(group.prefix, pangolin_sample_ids, settings),
     )
     pangolin_job.start()
 

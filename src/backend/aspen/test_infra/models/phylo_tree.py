@@ -67,6 +67,7 @@ def phylotree_factory(
     return PhyloTree(
         s3_bucket=bucket,
         s3_key=key,
+        group=phylorun.group,
         constituent_samples=constituent_samples,
         producing_workflow=phylorun,
         tree_type=phylorun.tree_type,

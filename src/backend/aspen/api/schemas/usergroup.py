@@ -32,6 +32,7 @@ class UserBaseResponse(BaseResponse):
     name: str
     agreed_to_tos: bool = False
     acknowledged_policy_version: Optional[datetime.date] = None
+    group_admin: bool
 
 
 class UserUpdateRequest(BaseRequest):
@@ -40,11 +41,17 @@ class UserUpdateRequest(BaseRequest):
     name: Optional[str] = None
 
 
+class GroupRoleResponse(BaseResponse):
+    id: int
+    name: str
+    roles: List[str]
+
+
 # Only expose split id and groups to the user it belongs to.
 class UserMeResponse(UserBaseResponse):
     split_id: str
     group: GroupResponse
-    group_admin: bool
+    groups: List[GroupRoleResponse]
 
 
 class GroupInvitationsRequest(BaseRequest):
@@ -72,7 +79,7 @@ class UserPostRequest(BaseRequest):
 
 class MemberResponse(UserBaseResponse):
     email: str
-    group_admin: bool
+    role: str
 
 
 class GroupMembersResponse(BaseResponse):

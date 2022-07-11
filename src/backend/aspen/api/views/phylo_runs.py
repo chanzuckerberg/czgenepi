@@ -11,9 +11,9 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
-from starlette.requests import Request
 
-from aspen.api.authn import get_auth_user
+from aspen.api.authn import AuthContext, get_auth_context, get_auth_user
+from aspen.api.authz import AuthZSession, get_authz_session, require_group_privilege
 from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.phylo_runs import (
@@ -25,13 +25,14 @@ from aspen.api.schemas.phylo_runs import (
 )
 from aspen.api.settings import Settings
 from aspen.api.utils import (
-    authz_sample_filters,
     get_matching_gisaid_ids,
+    get_matching_gisaid_ids_by_epi_isl,
     get_missing_and_found_sample_ids,
+    samples_by_identifiers,
 )
 from aspen.database.models import (
     AlignedGisaidDump,
-    DataType,
+    Group,
     PathogenGenome,
     PhyloRun,
     PhyloTree,
@@ -48,29 +49,23 @@ router = APIRouter()
 @router.post("/", responses={200: {"model": PhyloRunResponse}})
 async def kick_off_phylo_run(
     phylo_run_request: PhyloRunRequest,
-    request: Request,
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    az: AuthZSession = Depends(get_authz_session),
+    ac: AuthContext = Depends(get_auth_context),
     user: User = Depends(get_auth_user),
+    group: Group = Depends(require_group_privilege("create_phylorun")),
 ) -> PhyloRunResponse:
-    # Note - sample run will be associated with users's primary group.
-    #    (do we want admins to be able to start runs on behalf of other dph's ?)
-    group = user.group
 
     # validation happens in input schema
-
     sample_ids = phylo_run_request.samples
 
-    # Step 2 - prepare big sample query per the old db cli
-    all_samples_query = sa.select(Sample).options(  # type: ignore
+    # Enforce AuthZ (check if user has permission to see private identifiers and scope down the search for matching ID's to groups that the user has read access to.)
+    user_visible_samples_query = await samples_by_identifiers(az, set(sample_ids))
+    user_visible_samples_query = user_visible_samples_query.options(  # type: ignore
         joinedload(Sample.uploaded_pathogen_genome, innerjoin=True),
     )
-
-    # Step 3 - Enforce AuthZ (check if user has permission to see private identifiers and scope down the search for matching ID's to groups that the user has read access to.)
-    user_visible_sample_query = authz_sample_filters(
-        all_samples_query, sample_ids, user
-    )
-    user_visible_samples = await db.execute(user_visible_sample_query)
+    user_visible_samples = await db.execute(user_visible_samples_query)
     user_visible_samples = user_visible_samples.unique().scalars().all()
 
     # Are there any sample ID's that don't match sample table public and private identifiers
@@ -79,10 +74,19 @@ async def kick_off_phylo_run(
     )
 
     # See if these missing_sample_ids match any Gisaid IDs
-    gisaid_ids = await get_matching_gisaid_ids(db, missing_sample_ids)
+    gisaid_ids: Set[str] = await get_matching_gisaid_ids(db, missing_sample_ids)
 
     # Do we have any samples that are not aspen private or public identifiers or gisaid identifiers?
     missing_sample_ids = missing_sample_ids - gisaid_ids
+
+    # Do the same, but for epi isls
+    gisaid_ids_from_isls: Set[str]
+    epi_isls: Set[str]
+    gisaid_ids_from_isls, epi_isls = await get_matching_gisaid_ids_by_epi_isl(
+        db, missing_sample_ids
+    )
+    missing_sample_ids -= epi_isls
+    gisaid_ids |= gisaid_ids_from_isls
 
     # Throw an error if we have any sample ID's that didn't match county samples OR gisaid samples.
     if missing_sample_ids:
@@ -185,67 +189,37 @@ async def kick_off_phylo_run(
     return PhyloRunResponse.from_orm(workflow)
 
 
-async def _get_accessible_phylo_runs(db, user, run_id=None, editable=False):
-    # get phylo_runs viewable or editable by a user, optionally filtered by id
-    cansee_owner_group_ids: Set[int] = {
-        cansee.owner_group_id
-        for cansee in user.group.can_see
-        if cansee.data_type == DataType.TREES
-    }
-    query = sa.select(PhyloRun).options(
-        joinedload(PhyloRun.outputs.of_type(PhyloTree)),
+async def get_serializable_runs(
+    db: AsyncSession, az: AuthZSession, privilege="read", run_id=None
+):
+    query = await az.authorized_query(privilege, PhyloRun)
+    query = query.options(
+        joinedload(PhyloRun.outputs.of_type(PhyloTree)),  # type: ignore
         joinedload(PhyloRun.user),  # For Pydantic serialization
         joinedload(PhyloRun.group),  # For Pydantic serialization
     )
-
-    # These are access control checks!
-    if editable:
-        # for update and delete views return only trees that are in the users group
-        query = query.filter(
-            PhyloRun.group == user.group,
-        )
-    else:
-        # this is for list view, return all runs that are viewable
-        query = query.filter(
-            sa.or_(
-                PhyloRun.group == user.group,
-                user.system_admin,
-                PhyloRun.group_id.in_(cansee_owner_group_ids),
-            ),
-        )
-
     if run_id:
         query = query.filter(PhyloRun.id == run_id)
-        results = await db.execute(query)
+    res = await db.execute(query)
+    if run_id:
         try:
-            run = results.scalars().unique().one()
+            run = res.unique().scalars().one()
         except NoResultFound:
             raise ex.NotFoundException("phylo run not found")
         if run.workflow_status == WorkflowStatusType.STARTED:
             raise ex.BadRequestException("Can't modify an in-progress phylo run")
         return run
 
-    results = await db.execute(query)
-    return results.unique().scalars().all()
-
-
-async def get_editable_phylo_runs(db, user, run_id=None):
-    return await _get_accessible_phylo_runs(db, user, run_id, editable=True)
-
-
-async def get_readable_phylo_runs(db, user, run_id=None):
-    return await _get_accessible_phylo_runs(db, user, run_id, editable=False)
+    return res.unique().scalars().all()
 
 
 @router.get("/", responses={200: {"model": PhyloRunsListResponse}})
 async def list_runs(
-    request: Request,
     db: AsyncSession = Depends(get_db),
-    settings: Settings = Depends(get_settings),
-    user: User = Depends(get_auth_user),
+    az: AuthZSession = Depends(get_authz_session),
 ) -> PhyloRunsListResponse:
 
-    phylo_runs: Iterable[PhyloRun] = await get_readable_phylo_runs(db, user)
+    phylo_runs: Iterable[PhyloRun] = await get_serializable_runs(db, az, "read")
 
     # filter for only information we need in sample table view
     results: List[PhyloRunResponse] = []
@@ -258,12 +232,10 @@ async def list_runs(
 @router.delete("/{item_id}", responses={200: {"model": PhyloRunDeleteResponse}})
 async def delete_run(
     item_id: int,
-    request: Request,
     db: AsyncSession = Depends(get_db),
-    settings: Settings = Depends(get_settings),
-    user: User = Depends(get_auth_user),
+    az: AuthZSession = Depends(get_authz_session),
 ) -> PhyloRunDeleteResponse:
-    item = await get_editable_phylo_runs(db, user, item_id)
+    item = await get_serializable_runs(db, az, "write", item_id)
     item_db_id = item.id
 
     for output in item.outputs:
@@ -278,10 +250,10 @@ async def update_phylo_tree_and_run(
     item_id: int,
     phylo_run_update_request: PhyloRunUpdateRequest,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_auth_user),
+    az: AuthZSession = Depends(get_authz_session),
 ) -> PhyloRunResponse:
     # get phylo_run and check that user has permission to update PhyloRun/PhyloTree
-    phylo_run = await get_editable_phylo_runs(db, user, item_id)
+    phylo_run = await get_serializable_runs(db, az, "write", item_id)
 
     # update phylorun name
     phylo_run.name = phylo_run_update_request.name

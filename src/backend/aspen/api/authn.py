@@ -1,5 +1,10 @@
+import hashlib
+import hmac
+import json
 import logging
-from typing import MutableSequence, Optional
+from base64 import urlsafe_b64decode
+from datetime import datetime, timezone
+from typing import List, MutableSequence, Optional, TypedDict
 
 import sentry_sdk
 import sqlalchemy as sa
@@ -19,22 +24,41 @@ from aspen.auth.device_auth import validate_auth_header
 from aspen.database.models import Group, GroupRole, User, UserRole
 
 
-def get_usergroup_query(session: AsyncSession, auth0_user_id: str) -> Query:
-    return (
+def get_usergroup_query(
+    session: AsyncSession,
+    auth0_user_id: Optional[str] = None,
+    user_id: Optional[str] = None,
+) -> Query:
+    query = (
         sa.select(User)  # type: ignore
         .options(joinedload(User.group).joinedload(Group.can_see))  # type: ignore
-        .filter(User.auth0_user_id == auth0_user_id)  # type: ignore
+        .options(
+            joinedload(User.user_roles).options(  # type: ignore
+                joinedload(UserRole.group, innerjoin=True),  # type: ignore
+                joinedload(UserRole.role, innerjoin=True),
+            )
+        )  # type: ignore
     )
+    if auth0_user_id:
+        query = query.filter(User.auth0_user_id == auth0_user_id)  # type: ignore
+    else:
+        query = query.filter(User.id == int(user_id))  # type: ignore
+    return query
 
 
-async def setup_userinfo(session: AsyncSession, auth0_user_id: str) -> Optional[User]:
-    sentry_sdk.set_user(
-        {
-            "requested_user_id": auth0_user_id,
-        }
-    )
+async def setup_userinfo(
+    session: AsyncSession,
+    auth0_user_id: Optional[str] = None,
+    user_id: Optional[str] = None,
+) -> Optional[User]:
+    if auth0_user_id:
+        sentry_sdk.set_user(
+            {
+                "requested_user_id": auth0_user_id,
+            }
+        )
     try:
-        userquery = get_usergroup_query(session, auth0_user_id)
+        userquery = get_usergroup_query(session, auth0_user_id, user_id)
         userwait = await session.execute(userquery)
         user = userwait.unique().scalars().one()
     except NoResultFound:
@@ -51,28 +75,91 @@ async def setup_userinfo(session: AsyncSession, auth0_user_id: str) -> Optional[
     return user
 
 
+class MagicLinkPayload(TypedDict):
+    user_id: str
+    expiry: str
+
+
+async def magic_link_payload(
+    settings: Settings = Depends(get_settings), magic_link: Optional[str] = None
+) -> Optional[MagicLinkPayload]:
+    if not magic_link:
+        return None
+
+    # First, verify the MAC tag.
+    payload_message, payload_mac_tag = magic_link.split(".")
+    encoded_payload_message = payload_message.encode("utf8")
+
+    mac_key = urlsafe_b64decode(settings.AUSPICE_MAC_KEY)
+    digest_maker = hmac.new(mac_key, encoded_payload_message, hashlib.sha3_512)
+    correct_mac_tag = digest_maker.hexdigest()
+
+    authenticated = hmac.compare_digest(payload_mac_tag, correct_mac_tag)
+    if not authenticated:
+        raise ex.BadRequestException(
+            "Unauthenticated attempt to access an auspice magic link"
+        )
+
+    # Then decode the payload.
+    decoded_payload_message = urlsafe_b64decode(encoded_payload_message).decode("utf8")
+    recovered_payload = json.loads(decoded_payload_message)
+
+    # Test the expiry
+    expiry_time = datetime.fromisoformat(recovered_payload["expiry"])
+    if expiry_time <= datetime.now(timezone.utc):
+        raise ex.BadRequestException("Expired auspice view magic link")
+    payload: MagicLinkPayload = json.loads(decoded_payload_message)
+    return payload
+
+
+async def magic_link_userid(
+    magic_payload: Optional[MagicLinkPayload] = Depends(magic_link_payload),
+) -> Optional[str]:
+    if not magic_payload:
+        return None
+    return magic_payload["user_id"]
+
+
+def get_token_userid(
+    request: Request, settings: Settings = Depends(get_settings)
+) -> Optional[str]:
+    auth_header = request.headers.get("authorization")
+    if not auth_header:
+        return None
+    try:
+        payload = validate_auth_header(
+            auth_header, settings.AUTH0_DOMAIN, settings.AUTH0_CLIENT_ID
+        )
+        return payload["sub"]
+    except TokenValidationError as err:
+        logging.warn(f"Token validation error: {err}")
+    return None
+
+
+def get_cookie_userid(request: Request) -> Optional[str]:
+    if "profile" in request.session:
+        return request.session["profile"].get("user_id")
+    return None
+
+
 async def get_auth_user(
     request: Request,
     session: AsyncSession = Depends(get_db),
-    settings: Settings = Depends(get_settings),
+    magic_link_userid: Optional[str] = Depends(magic_link_userid),
+    cookie_userid: Optional[str] = Depends(get_cookie_userid),
+    token_userid: Optional[str] = Depends(get_token_userid),
 ) -> User:
-    auth_header = request.headers.get("authorization")
     auth0_user_id = None
-    if auth_header:
-        try:
-            payload = validate_auth_header(
-                auth_header, settings.AUTH0_DOMAIN, settings.AUTH0_CLIENT_ID
-            )
-            auth0_user_id = payload["sub"]
-        except TokenValidationError as err:
-            logging.warn(f"Token validation error: {err}")
-    elif "profile" in request.session:
-        auth0_user_id = request.session["profile"].get("user_id")
+    user_id = None
+    if magic_link_userid:
+        user_id = magic_link_userid
+    else:
+        auth0_user_id = cookie_userid or token_userid
     # Redirect to Login page
-    if not auth0_user_id:
+    if not auth0_user_id and not user_id:
         # TODO - redirect to login.
         raise ex.UnauthenticatedException("Login failure")
-    found_auth_user = await setup_userinfo(session, auth0_user_id)
+    found_auth_user = await setup_userinfo(session, auth0_user_id, user_id)
     if not found_auth_user:
         # login attempt from user not in DB
         # TODO - redirect to login.
@@ -100,13 +187,18 @@ async def get_auth0_apiclient(
     return auth0_client
 
 
+class ACGroupRole(TypedDict):
+    group_id: int
+    role: str
+
+
 class AuthContext:
     def __init__(
         self,
         user: User,
         group: Group,
-        user_roles: MutableSequence[UserRole],
-        group_roles: MutableSequence[GroupRole],
+        user_roles: List[str],
+        group_roles: List[ACGroupRole],
     ):
         self.user = user
         self.group = group
@@ -115,14 +207,13 @@ class AuthContext:
 
 
 async def require_group_membership(
-    org_id: Optional[int],
-    request: Request,
+    org_id: Optional[int] = None,
     user: User = Depends(get_auth_user),
     session: AsyncSession = Depends(get_db),
-    settings: Settings = Depends(get_settings),
 ) -> MutableSequence[UserRole]:
+    # Default to the user's old primary group if we don't get an explicit org id in the URL
     if org_id is None:
-        return []
+        org_id = user.group.id
     # Figure out whether this user is a *direct member* of the group
     # we're trying to get context for.
     query = (
@@ -140,7 +231,7 @@ async def require_group_membership(
 
 
 async def get_auth_context(
-    org_id: Optional[int],  # NOTE - This comes from our route!
+    org_id: Optional[int] = None,  # NOTE - This comes from our route!
     user: User = Depends(get_auth_user),
     session: AsyncSession = Depends(get_db),
     user_roles: MutableSequence[UserRole] = Depends(require_group_membership),
@@ -150,7 +241,9 @@ async def get_auth_context(
     # org info *intentionally* for user self-management endpoints (get all my
     # roles, change my username, etc) so we need to handle that case
     group = None
-    roles = []
+    if org_id is None:
+        org_id = user.group.id
+    roles: List[str] = []
     for row in user_roles:
         roles.append(row.role.name)
         group = row.group
@@ -167,5 +260,8 @@ async def get_auth_context(
     )
     rolewait = await session.execute(query)
     group_roles = rolewait.unique().scalars().all()
-    ac = AuthContext(user, group, roles, group_roles)
+    groles: List[ACGroupRole] = []
+    for row in group_roles:
+        groles.append({"group_id": row.grantor_group.id, "role": row.role.name})
+    ac = AuthContext(user, group, roles, groles)
     return ac
