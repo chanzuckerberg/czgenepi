@@ -25,7 +25,6 @@ from aspen.database.models import Group, GroupRole, User, UserRole
 
 
 def get_usergroup_query(
-    session: AsyncSession,
     auth0_user_id: Optional[str] = None,
     user_id: Optional[str] = None,
 ) -> Query:
@@ -58,7 +57,7 @@ async def setup_userinfo(
             }
         )
     try:
-        userquery = get_usergroup_query(session, auth0_user_id, user_id)
+        userquery = get_usergroup_query(auth0_user_id, user_id)
         userwait = await session.execute(userquery)
         user = userwait.unique().scalars().one()
     except NoResultFound:
@@ -177,9 +176,7 @@ async def get_admin_user(auth_user: User = Depends(get_auth_user)) -> None:
         raise ex.UnauthorizedException("Not authorized")
 
 
-async def get_auth0_apiclient(
-    request: Request, settings: Settings = Depends(get_settings)
-):
+async def get_auth0_apiclient(settings: Settings = Depends(get_settings)):
     client_id: str = settings.AUTH0_MANAGEMENT_CLIENT_ID
     client_secret: str = settings.AUTH0_MANAGEMENT_CLIENT_SECRET
     domain: str = settings.AUTH0_MANAGEMENT_DOMAIN

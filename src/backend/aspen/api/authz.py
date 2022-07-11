@@ -11,13 +11,10 @@ from aspen.api.deps import get_db
 from aspen.api.error import http_exceptions as ex
 from aspen.database.models import (
     Group,
-    GroupRole,
     PhyloRun,
     PhyloTree,
-    Role,
     Sample,
     User,
-    UserRole,
 )
 from aspen.database.models.base import idbase
 
@@ -28,72 +25,13 @@ def register_classes(oso):
         fields={"user": User, "group": Group, "roles": list, "group_roles": list},
     )
     oso.register_class(
-        GroupRole,
-        fields={
-            "id": int,
-            "grantor_group_id": int,
-            "grantee_group_id": int,
-            "grantor_group": Relation(
-                kind="one",
-                other_type="Group",
-                my_field="grantor_group_id",
-                other_field="id",
-            ),
-            "role": Relation(
-                kind="one", other_type="Role", my_field="role_id", other_field="id"
-            ),
-            "grantee_group": Relation(
-                kind="one",
-                other_type="Group",
-                my_field="grantee_group_id",
-                other_field="id",
-            ),
-        },
-    )
-    oso.register_class(
         Group,
-        fields={
-            "id": int,
-            "grantee_roles": Relation(
-                kind="many",
-                other_type="GroupRole",
-                my_field="id",
-                other_field="grantee_group_id",
-            ),
-        },
+        fields={"id": int},
     )
-    oso.register_class(Role, fields={"id": int, "name": str})
     oso.register_class(
         User,
-        fields={
-            "id": str,
-            "user_roles": Relation(
-                kind="many",
-                other_type="UserRole",
-                my_field="id",
-                other_field="user_id",
-            ),
-        },
+        fields={"id": str},
     )
-    oso.register_class(
-        UserRole,
-        fields={
-            "id": int,
-            "group_id": int,
-            "role_id": int,
-            "user_id": int,
-            "group": Relation(
-                kind="one", other_type="Group", my_field="group_id", other_field="id"
-            ),
-            "role": Relation(
-                kind="one", other_type="Role", my_field="role_id", other_field="id"
-            ),
-            "user": Relation(
-                kind="one", other_type="User", my_field="user_id", other_field="id"
-            ),
-        },
-    )
-
     oso.register_class(
         Sample,
         fields={
@@ -141,7 +79,7 @@ def register_classes(oso):
 # This is just a thin indirection/wrapper for Oso's interface in case we need to swap it out
 # with something else in the future.
 class AuthZSession:
-    def __init__(self, session, auth_context):
+    def __init__(self, session: AsyncSession, auth_context: AuthContext):
         oso = AsyncOso()
         oso.set_data_filtering_adapter(AsyncSqlAlchemyAdapter(session))
         register_classes(oso)
