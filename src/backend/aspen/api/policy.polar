@@ -3,10 +3,6 @@ allow(actor, action, resource) if
 
 actor AuthContext { }
 
-resource Group {
-  roles = ["admin", "viewer", "member"];
-}
-
 resource Sample {
   roles = ["admin", "viewer", "member"];
   permissions = [ "read", "read_private", "read_public", "sequences", "write"];

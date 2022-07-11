@@ -55,6 +55,8 @@ class Group(idbase, DictMixin):  # type: ignore
         server_default=text("'{}'::jsonb"),
     )
 
+    members = relationship("User", back_populates="group")  # type: ignore
+
     can_see: MutableSequence[CanSee]
     can_be_seen_by: MutableSequence[CanSee]
 
@@ -84,7 +86,7 @@ class User(idbase, DictMixin):  # type: ignore
     split_id = Column(String, nullable=False, default=generate_split_id)
 
     group_id = Column(Integer, ForeignKey(Group.id), nullable=False)
-    group = relationship(Group, backref=backref("users", uselist=True))  # type: ignore
+    group = relationship("Group", back_populates="members")  # type: ignore
 
     def __repr__(self):
         return f"User <{self.name}>"
