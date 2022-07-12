@@ -83,8 +83,7 @@ async def verify_and_access_phylo_tree(
         return False, None, None
     run_query = (
         (await az.authorized_query("read", PhyloRun))
-        .join(PhyloTree)
-        .filter(PhyloTree.entity_id == phylo_tree.entity_id)
+        .filter(PhyloRun.id == phylo_tree.producing_workflow_id)
         .options(selectinload(PhyloRun.group).joinedload(Group.default_tree_location))
     )  # type: ignore
     run_query_result = await db.execute(run_query)
