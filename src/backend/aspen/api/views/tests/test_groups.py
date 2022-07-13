@@ -33,7 +33,11 @@ async def test_list_members(
         roles=["admin"],
     )
     user3 = await userrole_factory(
-        async_session, group2, name="Jane", auth0_user_id="testid03", email="jane@dph.org"
+        async_session,
+        group2,
+        name="Jane",
+        auth0_user_id="testid03",
+        email="jane@dph.org",
     )
     async_session.add(group)
     async_session.add(user3)
