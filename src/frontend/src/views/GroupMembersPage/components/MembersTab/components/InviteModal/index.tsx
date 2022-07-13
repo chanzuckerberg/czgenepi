@@ -8,6 +8,7 @@ import {
   INPUT_DELIMITERS_WITH_SPACE,
 } from "src/common/constants/inputDelimiters";
 import { useSendGroupInvitations } from "src/common/queries/groups";
+import { FALLBACK_GROUP_ID } from "src/common/redux";
 import { selectCurrentGroup } from "src/common/redux/selectors";
 import { B } from "src/common/styles/basicStyle";
 import { StyledNotificationContainer } from "src/components/Notification/style";
@@ -70,7 +71,7 @@ const InviteModal = ({
 
   // can't send invites if we don't know what group they are in
   const groupId = useSelector(selectCurrentGroup);
-  if (!groupId) return null;
+  if (groupId === FALLBACK_GROUP_ID) return null;
 
   const handleClose = () => {
     setInputValue("");

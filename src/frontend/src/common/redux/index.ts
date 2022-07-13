@@ -24,10 +24,14 @@ import { CZGEReduxActions, Pathogen, ReduxPersistenceTokens } from "./types";
  * make reqeusts for "true" default values from the server if needed.
  */
 
+export const FALLBACK_GROUP_ID = -1;
+
 // first, load state from localstorage if any exists and use it to initialize redux
 const getInitialState = () => {
   const storedGroupStr = getLocalStorage(ReduxPersistenceTokens.GROUP);
-  const storedGroup = storedGroupStr ? parseInt(storedGroupStr) : -1;
+  const storedGroup = storedGroupStr
+    ? parseInt(storedGroupStr)
+    : FALLBACK_GROUP_ID;
 
   const storedPathogenStr = getLocalStorage(ReduxPersistenceTokens.PATHOGEN);
   const storedPathogen =
@@ -82,7 +86,7 @@ const setDefaults = async () => {
   const { group, pathogen } = current;
 
   // set user group
-  if (group === -1) {
+  if (group === FALLBACK_GROUP_ID) {
     const userInfo = await fetchUserInfo();
     const { groups } = userInfo;
 
