@@ -53,17 +53,21 @@ interface ValidateSampleIdentifiersPayload {
   sample_ids: string[];
 }
 
-export async function validateSampleIdentifiers({
-  sampleIdsToValidate,
-}: SampleValidationRequestType): Promise<SampleValidationResponseType> {
+export async function validateSampleIdentifiers(
+  groupId: number,
+  { sampleIdsToValidate }: SampleValidationRequestType
+): Promise<SampleValidationResponseType> {
   const payload: ValidateSampleIdentifiersPayload = {
     sample_ids: sampleIdsToValidate,
   };
 
-  const response = await fetch(API_URL + API.SAMPLES_VALIDATE_IDS, {
-    ...DEFAULT_POST_OPTIONS,
-    body: JSON.stringify(payload),
-  });
+  const response = await fetch(
+    API_URL + generateGroupSpecificUrl(ORG_API.SAMPLES_VALIDATE_IDS, groupId),
+    {
+      ...DEFAULT_POST_OPTIONS,
+      body: JSON.stringify(payload),
+    }
+  );
   if (response.ok) return await response.json();
 
   throw Error(`${response.statusText}: ${await response.text()}`);
@@ -80,19 +84,22 @@ export interface SampleValidationResponseType {
 type SampleValidationCallbacks =
   MutationCallbacks<SampleValidationResponseType>;
 
-export function useValidateSampleIds({
-  componentOnError,
-  componentOnSuccess,
-}: SampleValidationCallbacks): UseMutationResult<
+export function useValidateSampleIds(
+  groupId: number,
+  { componentOnError, componentOnSuccess }: SampleValidationCallbacks
+): UseMutationResult<
   SampleValidationResponseType,
   unknown,
   SampleValidationRequestType,
   unknown
 > {
-  return useMutation(validateSampleIdentifiers, {
-    onError: componentOnError,
-    onSuccess: componentOnSuccess,
-  });
+  return useMutation(
+    (toMutate) => validateSampleIdentifiers(groupId, toMutate),
+    {
+      onError: componentOnError,
+      onSuccess: componentOnSuccess,
+    }
+  );
 }
 
 /**
