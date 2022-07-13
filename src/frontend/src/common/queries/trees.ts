@@ -5,6 +5,8 @@ import {
   DEFAULT_HEADERS_MUTATION_OPTIONS,
   DEFAULT_POST_OPTIONS,
   DEFAULT_PUT_OPTIONS,
+  generateGroupSpecificUrl,
+  ORG_API,
 } from "../api";
 import { API_URL } from "../constants/ENV";
 import { USE_PHYLO_RUN_INFO } from "./phyloRuns";
@@ -105,35 +107,33 @@ export interface FastaResponseType {
 
 type FastaFetchCallbacks = MutationCallbacks<FastaResponseType>;
 
-async function getFastaURL({
-  sampleIds,
-  downstreamConsumer,
-}: FastaRequestType): Promise<FastaResponseType> {
+async function getFastaURL(
+  groupId: number,
+  { sampleIds, downstreamConsumer }: FastaRequestType
+): Promise<FastaResponseType> {
   const payload: FastaURLPayloadType = {
     samples: sampleIds,
     // If specialty downstream consumer, set this to have FASTA generate accordingly
     // If left as undefined, will be stripped out from payload during JSON.stringify
     downstream_consumer: downstreamConsumer,
   };
-  const response = await fetch(API_URL + API.GET_FASTA_URL, {
-    ...DEFAULT_POST_OPTIONS,
-    body: JSON.stringify(payload),
-  });
+  const response = await fetch(
+    API_URL + generateGroupSpecificUrl(ORG_API.GET_FASTA_URL, groupId),
+    {
+      ...DEFAULT_POST_OPTIONS,
+      body: JSON.stringify(payload),
+    }
+  );
   if (response.ok) return await response.json();
 
   throw Error(`${response.statusText}: ${await response.text()}`);
 }
 
-export function useFastaFetch({
-  componentOnError,
-  componentOnSuccess,
-}: FastaFetchCallbacks): UseMutationResult<
-  FastaResponseType,
-  unknown,
-  FastaRequestType,
-  unknown
-> {
-  return useMutation(getFastaURL, {
+export function useFastaFetch(
+  groupId: number,
+  { componentOnError, componentOnSuccess }: FastaFetchCallbacks
+): UseMutationResult<FastaResponseType, unknown, FastaRequestType, unknown> {
+  return useMutation((toMutate) => getFastaURL(groupId, toMutate), {
     onError: componentOnError,
     onSuccess: componentOnSuccess,
   });
