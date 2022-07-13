@@ -304,23 +304,27 @@ interface SamplesEditResponseType {
 
 type SamplesEditCallbacks = MutationCallbacks<SamplesEditResponseType[]>;
 
-export async function editSamples({
-  samples,
-}: SamplesEditRequestType): Promise<SamplesEditResponseType[]> {
-  return putBackendApiJson(API.SAMPLES, JSON.stringify({ samples }));
+export async function editSamples(
+  groupId: number,
+  { samples }: SamplesEditRequestType
+): Promise<SamplesEditResponseType[]> {
+  return putBackendApiJson(
+    generateGroupSpecificUrl(ORG_API.SAMPLES, groupId),
+    JSON.stringify({ samples })
+  );
 }
 
-export function useEditSamples({
-  componentOnError,
-  componentOnSuccess,
-}: SamplesEditCallbacks): UseMutationResult<
+export function useEditSamples(
+  groupId: number,
+  { componentOnError, componentOnSuccess }: SamplesEditCallbacks
+): UseMutationResult<
   SamplesEditResponseType[],
   unknown,
   SamplesEditRequestType,
   unknown
 > {
   const queryClient = useQueryClient();
-  return useMutation(editSamples, {
+  return useMutation((toMutate) => editSamples(groupId, toMutate), {
     onError: componentOnError,
     onSuccess: async (data) => {
       await queryClient.invalidateQueries([USE_SAMPLE_INFO]);
