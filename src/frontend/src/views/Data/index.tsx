@@ -78,7 +78,6 @@ const Data: FunctionComponent = () => {
 
   const groupId = useSelector(selectCurrentGroup);
   const sampleResponse = useSampleInfo(groupId);
-  const groupId = useSelector(selectCurrentGroup);
   const PhyloRunResponse = usePhyloRunInfo(groupId);
   const { data: sampleData, isLoading: isSampleInfoLoading } = sampleResponse;
   const { data: phyloRunData, isLoading: isTreeInfoLoading } = PhyloRunResponse;

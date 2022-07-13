@@ -57,7 +57,7 @@ async function createTree(
   };
 
   const response = await fetch(
-    API_URL + generateGroupSpecificUrl(ORG_API.PHYLO_RUN, groupId),
+    API_URL + generateGroupSpecificUrl(ORG_API.PHYLO_RUNS, groupId),
     {
       ...DEFAULT_POST_OPTIONS,
       body: JSON.stringify(payload),

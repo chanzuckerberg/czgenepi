@@ -40,7 +40,6 @@ export function usePhyloRunInfo(
 
 type PhyloRunDeleteCallbacks = MutationCallbacks<PhyloRunDeleteResponseType>;
 interface PhyloRunDeleteRequestType {
-  groupId: number;
   phyloRunIdToDelete: number;
 }
 
@@ -49,7 +48,7 @@ interface PhyloRunDeleteResponseType {
 }
 
 async function deletePhyloRun(
-  groupId,
+  groupId: number,
   { phyloRunIdToDelete }: PhyloRunDeleteRequestType
 ): Promise<PhyloRunDeleteResponseType> {
   const response = await fetch(
@@ -65,11 +64,10 @@ async function deletePhyloRun(
   throw Error(`${response.statusText}: ${await response.text()}`);
 }
 
-export function useDeletePhyloRun({
-  componentOnError,
-  componentOnSuccess,
-  groupId,
-}: PhyloRunDeleteCallbacks): UseMutationResult<
+export function useDeletePhyloRun(
+  groupId: number,
+  { componentOnError, componentOnSuccess }: PhyloRunDeleteCallbacks
+): UseMutationResult<
   PhyloRunDeleteResponseType,
   unknown,
   PhyloRunDeleteRequestType,
