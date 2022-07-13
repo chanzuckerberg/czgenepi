@@ -1,3 +1,5 @@
+import re
+
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -21,5 +23,11 @@ async def list_pango_lineages(db: AsyncSession = Depends(get_db)):
     """
     all_lineages_query = sa.select(PangoLineage.lineage)  # type: ignore
     result = await db.execute(all_lineages_query)
-    all_lineages = result.scalars().all()
-    return {"lineages": all_lineages}
+    all_lineages = set(result.scalars().all())
+
+    all_lineages.update([re.sub(r'(?<=\.)[0-9]+$', '*', lineage) for lineage in all_lineages])
+
+    all_lineages_list = list(all_lineages)
+    all_lineages_list.sort()
+
+    return {"lineages": all_lineages_list}
