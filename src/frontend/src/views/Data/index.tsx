@@ -76,7 +76,8 @@ const Data: FunctionComponent = () => {
 
   const router = useRouter();
 
-  const sampleResponse = useSampleInfo();
+  const groupId = useSelector(selectCurrentGroup);
+  const sampleResponse = useSampleInfo(groupId);
   const groupId = useSelector(selectCurrentGroup);
   const PhyloRunResponse = usePhyloRunInfo(groupId);
   const { data: sampleData, isLoading: isSampleInfoLoading } = sampleResponse;

@@ -203,8 +203,12 @@ const SAMPLE_MAP = new Map<string, keyof Sample>([
   ["czb_failed_genome_recovery", "CZBFailedGenomeRecovery"],
 ]);
 
-export const fetchSamples = (): Promise<SampleResponse> =>
-  apiResponse<SampleResponse>(["samples"], [SAMPLE_MAP], API.SAMPLES);
+export const fetchSamples = (groupId: number): Promise<SampleResponse> =>
+  apiResponse<SampleResponse>(
+    ["samples"],
+    [SAMPLE_MAP],
+    generateGroupSpecificUrl(ORG_API.SAMPLES, groupId)
+  );
 
 export interface PhyloRunResponse extends APIResponse {
   phylo_trees: PhyloRun[];

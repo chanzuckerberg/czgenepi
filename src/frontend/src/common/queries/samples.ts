@@ -178,8 +178,10 @@ export const USE_SAMPLE_INFO = {
   id: "sampleInfo",
 };
 
-export function useSampleInfo(): UseQueryResult<SampleResponse, unknown> {
-  return useQuery([USE_SAMPLE_INFO], fetchSamples, {
+export function useSampleInfo(
+  groupId: number
+): UseQueryResult<SampleResponse, unknown> {
+  return useQuery([USE_SAMPLE_INFO], () => fetchSamples(groupId), {
     retry: false,
   });
 }
