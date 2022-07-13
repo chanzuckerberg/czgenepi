@@ -5,8 +5,10 @@ import React, { useState } from "react";
 import { useMutation } from "react-query";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { createSamples } from "src/common/queries/samples";
+import { useSelector } from "src/common/redux/hooks";
 import { ROUTES } from "src/common/routes";
 import Dialog from "src/components/Dialog";
+import { CurrentGroup } from "src/components/NavBar/components/AppNavBar/components/GroupDetailsDropdown/style";
 import { SampleIdToMetadata } from "src/components/WebformTable/common/types";
 import { ContinueButton } from "../../../common/style";
 import { Samples } from "../../../common/types";
@@ -34,9 +36,10 @@ export default function Upload({
   cancelPrompt,
 }: Props): JSX.Element {
   const [isOpen, setIsOpen] = useState(false);
+  const groupId = useSelector(CurrentGroup);
 
   const { mutate, isLoading, isSuccess, isError, error } = useMutation(
-    createSamples,
+    (toMutate) => createSamples(groupId, toMutate),
     {
       onSuccess: () => {
         cancelPrompt();

@@ -13,6 +13,8 @@ import {
   DEFAULT_DELETE_OPTIONS,
   DEFAULT_POST_OPTIONS,
   fetchSamples,
+  generateGroupSpecificUrl,
+  ORG_API,
   putBackendApiJson,
   SampleResponse,
 } from "../api";
@@ -108,13 +110,16 @@ interface SamplePayload {
   };
 }
 
-export async function createSamples({
-  samples,
-  metadata,
-}: {
-  samples: Samples | null;
-  metadata: SampleIdToMetadata | null;
-}): Promise<unknown> {
+export async function createSamples(
+  groupId: number,
+  {
+    samples,
+    metadata,
+  }: {
+    samples: Samples | null;
+    metadata: SampleIdToMetadata | null;
+  }
+): Promise<unknown> {
   const payload: SamplePayload[] = [];
 
   if (!samples || !metadata) {
@@ -159,10 +164,13 @@ export async function createSamples({
     payload.push(samplePayload);
   }
 
-  const response = await fetch(API_URL + API.SAMPLES, {
-    ...DEFAULT_POST_OPTIONS,
-    body: JSON.stringify(payload),
-  });
+  const response = await fetch(
+    API_URL + generateGroupSpecificUrl(ORG_API.SAMPLES, groupId),
+    {
+      ...DEFAULT_POST_OPTIONS,
+      body: JSON.stringify(payload),
+    }
+  );
 
   if (response.ok) return await response.json();
 
