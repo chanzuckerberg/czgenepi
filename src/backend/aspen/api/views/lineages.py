@@ -25,7 +25,9 @@ async def list_pango_lineages(db: AsyncSession = Depends(get_db)):
     result = await db.execute(all_lineages_query)
     all_lineages = set(result.scalars().all())
 
-    all_lineages.update([re.sub(r'(?<=\.)[0-9]+$', '*', lineage) for lineage in all_lineages])
+    all_lineages.update(
+        [re.sub(r"(?<=\.)[0-9]+$", "*", lineage) for lineage in all_lineages]
+    )
 
     all_lineages_list = list(all_lineages)
     all_lineages_list.sort()
