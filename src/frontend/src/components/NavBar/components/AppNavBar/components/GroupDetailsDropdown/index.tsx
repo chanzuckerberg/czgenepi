@@ -39,12 +39,10 @@ const GroupDetailsDropdown = ({
 
   if (!open || !userInfo || !groupInfo) return null;
 
+  const { groups, isGroupAdmin } = userInfo;
+
   // how many people are in the current group
   const memberCount = members?.length ?? 0;
-
-  // right now users can only have one group, but will be able to have more in the future.
-  // ui already knows how to render for multiple groups, so we still want to give an array.
-  const usersGroups: GroupDetails[] = [groupInfo];
 
   const { name, location } = groupInfo ?? {};
   const displayLocation = stringifyGisaidLocation(location);
@@ -82,7 +80,7 @@ const GroupDetailsDropdown = ({
           {memberCount} {pluralize("Member", memberCount)}
         </Details>
         <div>
-          {userInfo?.isGroupAdmin && (
+          {isGroupAdmin && (
             <StyledButton
               sdsType="primary"
               sdsStyle="rounded"
@@ -100,9 +98,9 @@ const GroupDetailsDropdown = ({
           </StyledButton>
         </div>
       </CurrentGroup>
-      {usersGroups.length > 1 && (
+      {groups.length > 1 && (
         <GroupList>
-          {usersGroups.map((group) => (
+          {groups.map((group) => (
             <GroupMenuItem key={group.id} id={group.id} name={group.name} />
           ))}
         </GroupList>
