@@ -40,12 +40,10 @@ interface CreateTreeType {
 
 type CreateTreeCallbacks = MutationCallbacks<void>;
 
-async function createTree({
-  sampleIds,
-  treeName,
-  treeType,
-  filters,
-}: CreateTreeType): Promise<unknown> {
+async function createTree(
+  groupId: number,
+  { sampleIds, treeName, treeType, filters }: CreateTreeType
+): Promise<unknown> {
   const { startDate, endDate, lineages } = filters;
   const payload: CreateTreePayload = {
     name: treeName,
@@ -58,27 +56,25 @@ async function createTree({
     },
   };
 
-  const response = await fetch(API_URL + API.PHYLO_RUNS, {
-    ...DEFAULT_POST_OPTIONS,
-    body: JSON.stringify(payload),
-  });
+  const response = await fetch(
+    API_URL + generateGroupSpecificUrl(ORG_API.PHYLO_RUN, groupId),
+    {
+      ...DEFAULT_POST_OPTIONS,
+      body: JSON.stringify(payload),
+    }
+  );
   if (response.ok) return await response.json();
 
   throw Error(`${response.statusText}: ${await response.text()}`);
 }
 
-export function useCreateTree({
-  componentOnError,
-  componentOnSuccess,
-}: CreateTreeCallbacks): UseMutationResult<
-  unknown,
-  unknown,
-  CreateTreeType,
-  unknown
-> {
+export function useCreateTree(
+  groupId: number,
+  { componentOnError, componentOnSuccess }: CreateTreeCallbacks
+): UseMutationResult<unknown, unknown, CreateTreeType, unknown> {
   const queryClient = useQueryClient();
 
-  return useMutation(createTree, {
+  return useMutation((toMutate) => createTree(groupId, toMutate), {
     onError: componentOnError,
     onSuccess: async () => {
       await queryClient.invalidateQueries([USE_PHYLO_RUN_INFO]);
