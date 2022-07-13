@@ -204,17 +204,21 @@ interface DeleteSamplesPayload {
   ids: number[];
 }
 
-export async function deleteSamples({
-  samplesToDelete,
-}: SampleDeleteRequestType): Promise<SampleDeleteResponseType> {
+export async function deleteSamples(
+  groupId: number,
+  { samplesToDelete }: SampleDeleteRequestType
+): Promise<SampleDeleteResponseType> {
   const payload: DeleteSamplesPayload = {
     ids: samplesToDelete,
   };
 
-  const response = await fetch(API_URL + API.SAMPLES, {
-    ...DEFAULT_DELETE_OPTIONS,
-    body: JSON.stringify(payload),
-  });
+  const response = await fetch(
+    API_URL + generateGroupSpecificUrl(ORG_API.SAMPLES, groupId),
+    {
+      ...DEFAULT_DELETE_OPTIONS,
+      body: JSON.stringify(payload),
+    }
+  );
 
   if (response.ok) return await response.json();
 
@@ -231,10 +235,10 @@ export interface SampleDeleteResponseType {
 
 type SampleDeleteCallbacks = MutationCallbacks<SampleDeleteResponseType>;
 
-export function useDeleteSamples({
-  componentOnError,
-  componentOnSuccess,
-}: SampleDeleteCallbacks): UseMutationResult<
+export function useDeleteSamples(
+  groupId: number,
+  { componentOnError, componentOnSuccess }: SampleDeleteCallbacks
+): UseMutationResult<
   SampleDeleteResponseType,
   unknown,
   SampleDeleteRequestType,
@@ -242,7 +246,7 @@ export function useDeleteSamples({
 > {
   const queryClient = useQueryClient();
   // TODO (mlila): pick less confusing name choices for callbacks/params
-  return useMutation(deleteSamples, {
+  return useMutation((toMutate) => deleteSamples(groupId, toMutate), {
     onError: componentOnError,
     onSuccess: async (data) => {
       await queryClient.invalidateQueries([USE_SAMPLE_INFO]);
