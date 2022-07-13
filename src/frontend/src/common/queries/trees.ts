@@ -168,34 +168,39 @@ interface TreeEditResponseType {
 
 type TreeEditCallbacks = MutationCallbacks<TreeEditResponseType>;
 
-export async function editTree({
-  treeIdToEdit,
-  newTreeName,
-}: TreeEditRequestType): Promise<TreeEditResponseType> {
+export async function editTree(
+  groupId: number,
+  { treeIdToEdit, newTreeName }: TreeEditRequestType
+): Promise<TreeEditResponseType> {
   const payload: EditTreePayloadType = {
     name: newTreeName,
   };
-  const response = await fetch(API_URL + API.PHYLO_RUNS + treeIdToEdit, {
-    ...DEFAULT_PUT_OPTIONS,
-    ...DEFAULT_HEADERS_MUTATION_OPTIONS,
-    body: JSON.stringify(payload),
-  });
+  const response = await fetch(
+    API_URL +
+      generateGroupSpecificUrl(ORG_API.PHYLO_RUNS, groupId) +
+      treeIdToEdit,
+    {
+      ...DEFAULT_PUT_OPTIONS,
+      ...DEFAULT_HEADERS_MUTATION_OPTIONS,
+      body: JSON.stringify(payload),
+    }
+  );
 
   if (response.ok) return await response.json();
   throw Error(`${response.statusText}: ${await response.text()}`);
 }
 
-export function useEditTree({
-  componentOnError,
-  componentOnSuccess,
-}: TreeEditCallbacks): UseMutationResult<
+export function useEditTree(
+  groupId: number,
+  { componentOnError, componentOnSuccess }: TreeEditCallbacks
+): UseMutationResult<
   TreeEditResponseType,
   unknown,
   TreeEditRequestType,
   unknown
 > {
   const queryClient = useQueryClient();
-  return useMutation(editTree, {
+  return useMutation((toMutate) => editTree(groupId, toMutate), {
     onError: componentOnError,
     onSuccess: async (data) => {
       await queryClient.invalidateQueries([USE_PHYLO_RUN_INFO]);
