@@ -5,7 +5,7 @@ import sqlalchemy as sa
 from auth0.v3.exceptions import Auth0Error
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import contains_eager, joinedload
 from sqlalchemy.sql.expression import Select
 from starlette.requests import Request
 
@@ -79,25 +79,30 @@ async def get_group_info(
 @router.get("/{group_id}/members/", response_model=GroupMembersResponse)
 async def get_group_members(
     group_id: int,
-    request: Request,
     db: AsyncSession = Depends(get_db),
     authorized_query: Select = Depends(require_access("read", Group)),
 ) -> GroupMembersResponse:
-    group_with_members_query = authorized_query.options(  # type: ignore
-        joinedload(Group.members).options(
-            joinedload(User.user_roles).options(  # type: ignore
-                joinedload(UserRole.group, innerjoin=True),  # type: ignore
-                joinedload(UserRole.role, innerjoin=True),
-            )
-        )
-    ).where(Group.id == group_id)
-    group_with_members_result = await db.execute(group_with_members_query)
-    group_with_members = group_with_members_result.unique().scalars().one_or_none()
-    if not group_with_members:
+    group = (
+        (await (db.execute(authorized_query.where(Group.id == group_id))))
+        .scalars()
+        .one_or_none()
+    )
+    if not group:
         raise ex.UnauthorizedException("Not authorized")
+    members_query = (
+        sa.select(User)  # type: ignore
+        .join(User.user_roles)  # type: ignore
+        .join(UserRole.role)  # type: ignore
+        .options(  # type: ignore
+            contains_eager(User.user_roles).contains_eager(UserRole.role)
+        )
+        .where(UserRole.group == group)
+    )
+
+    members = (await db.execute(members_query)).unique().scalars().all()
     group_members = []
     # users can only have one role per group
-    for member in group_with_members.members:
+    for member in members:
         member.role = next(
             user_role.role.name
             for user_role in member.user_roles

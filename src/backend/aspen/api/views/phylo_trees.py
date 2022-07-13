@@ -1,5 +1,6 @@
 import re
 
+import sqlalchemy as sa
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -34,17 +35,18 @@ async def get_single_phylo_tree(
 
 
 # supporting function for get_tree_metadata()
-async def _get_selected_samples(db: AsyncSession, az: AuthZSession, phylo_tree_id: int):
+async def _get_selected_samples(db: AsyncSession, phylo_tree_id: int):
     # SqlAlchemy requires aliasing for any queries that join to the same table (in this case, entities)
     # multiple times via joined table inheritance
     # ref: https://github.com/sqlalchemy/sqlalchemy/discussions/6972
     entity_alias = aliased(UploadedPathogenGenome, flat=True)
+    # We've already validated that the user has access to a phylo tree at this point.
     phylo_tree_query = (
-        (await az.authorized_query("read", PhyloTree))  # type: ignore
+        sa.select(PhyloTree)  # type: ignore
         .join(PhyloRun, PhyloTree.producing_workflow.of_type(PhyloRun))  # type: ignore
         .outerjoin(entity_alias, PhyloRun.inputs.of_type(entity_alias))  # type: ignore
         .outerjoin(Sample)  # type: ignore
-        .filter(PhyloTree.entity_id == phylo_tree_id)
+        .filter(PhyloTree.entity_id == phylo_tree_id)  # type: ignore
         .options(
             contains_eager(PhyloTree.producing_workflow.of_type(PhyloRun))
             .contains_eager(PhyloRun.inputs.of_type(entity_alias))
@@ -68,6 +70,7 @@ async def _get_selected_samples(db: AsyncSession, az: AuthZSession, phylo_tree_i
         sample = uploaded_pathogen_genome.sample
         selected_samples.add(prefix_regex.sub("", sample.public_identifier))
         selected_samples.add(sample.private_identifier)
+    print(selected_samples)
     return selected_samples
 
 
@@ -82,7 +85,7 @@ async def get_tree_metadata(
         db, az, item_id, request.query_params.get("id_style")
     )
     accessions = extract_accessions([], phylo_tree_data["tree"])
-    selected_samples = await _get_selected_samples(db, az, item_id)
+    selected_samples = await _get_selected_samples(db, item_id)
 
     filename: str = f"{item_id}_sample_ids.tsv"
     streamer = MetadataTSVStreamer(filename, accessions, selected_samples)
