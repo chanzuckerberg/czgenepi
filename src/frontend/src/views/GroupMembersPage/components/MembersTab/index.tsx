@@ -1,9 +1,10 @@
 import { Button, Tab } from "czifui";
-import { find } from "lodash";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { HeadAppTitle } from "src/common/components";
 import { useGroupInvitations } from "src/common/queries/groups";
+import { selectCurrentGroup } from "src/common/redux/selectors";
 import { ROUTES } from "src/common/routes";
 import { TabEventHandler } from "../../index";
 import { ActiveMembersTable } from "./components/ActiveMembersTable";
@@ -19,7 +20,6 @@ export enum SecondaryTabType {
 interface Props {
   requestedSecondaryTab: SecondaryTabType;
   groupName?: string;
-  groupId: number;
   members: GroupMember[];
   userInfo: User | undefined;
 }
@@ -27,7 +27,6 @@ interface Props {
 const MembersTab = ({
   requestedSecondaryTab,
   groupName,
-  groupId,
   members,
   userInfo,
 }: Props): JSX.Element | null => {
@@ -36,14 +35,14 @@ const MembersTab = ({
   );
   const [isInviteModalOpen, setIsInviteModalOpen] = useState<boolean>(false);
   const router = useRouter();
+
+  const groupId = useSelector(selectCurrentGroup);
   const { data: invitations = [] } = useGroupInvitations(groupId);
-  const currentUser = find(members, (m) => m.id === userInfo?.id);
 
   useEffect(() => {
     setTabValue(requestedSecondaryTab);
   }, [requestedSecondaryTab]);
 
-  const isOwner = currentUser?.isGroupAdmin === true;
   const numActive = Object.keys(members).length;
 
   const handleTabClick: TabEventHandler = (_, value) => {
@@ -76,7 +75,7 @@ const MembersTab = ({
             count={invitations.length}
           />
         </StyledTabs>
-        {isOwner && (
+        {userInfo?.isGroupAdmin && (
           <Button
             sdsType="primary"
             sdsStyle="rounded"

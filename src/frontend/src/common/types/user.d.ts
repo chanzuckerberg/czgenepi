@@ -1,4 +1,10 @@
-interface Group {
+interface UserGroup {
+  id: number;
+  name: string;
+  roles: GroupRole[];
+}
+
+interface GroupDetails {
   address: string;
   id: number;
   location: GisaidLocation;
@@ -14,7 +20,9 @@ type BaseUser = {
 };
 
 interface User extends BaseUser {
-  group: Group;
+  group: GroupDetails;
+  groups: UserGroup[];
+  isGroupAdmin: boolean;
   splitId: string;
 }
 
