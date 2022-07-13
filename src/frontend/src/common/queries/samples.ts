@@ -9,7 +9,6 @@ import { SampleIdToMetadata } from "src/components/WebformTable/common/types";
 import { METADATA_KEYS_TO_API_KEYS } from "src/views/Upload/components/common/constants";
 import { Samples } from "src/views/Upload/components/common/types";
 import {
-  API,
   DEFAULT_DELETE_OPTIONS,
   DEFAULT_POST_OPTIONS,
   fetchSamples,
@@ -29,18 +28,24 @@ interface SampleFastaDownloadPayload {
   sample_ids: string[];
 }
 
-export async function downloadSamplesFasta({
-  sampleIds,
-}: {
-  sampleIds: string[];
-}): Promise<unknown> {
+export async function downloadSamplesFasta(
+  groupId: number,
+  {
+    sampleIds,
+  }: {
+    sampleIds: string[];
+  }
+): Promise<unknown> {
   const payload: SampleFastaDownloadPayload = {
     sample_ids: sampleIds,
   };
-  const response = await fetch(API_URL + API.SAMPLES_FASTA_DOWNLOAD, {
-    ...DEFAULT_POST_OPTIONS,
-    body: JSON.stringify(payload),
-  });
+  const response = await fetch(
+    API_URL + generateGroupSpecificUrl(ORG_API.SAMPLES_FASTA_DOWNLOAD, groupId),
+    {
+      ...DEFAULT_POST_OPTIONS,
+      body: JSON.stringify(payload),
+    }
+  );
   if (response.ok) return await response.blob();
 
   throw Error(`${response.statusText}: ${await response.text()}`);

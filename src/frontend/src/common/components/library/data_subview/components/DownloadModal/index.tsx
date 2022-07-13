@@ -9,6 +9,8 @@ import DialogContent from "src/common/components/library/Dialog/components/Dialo
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import { useUserInfo } from "src/common/queries/auth";
 import { downloadSamplesFasta } from "src/common/queries/samples";
+import { useSelector } from "src/common/redux/hooks";
+import { selectCurrentGroup } from "src/common/redux/selectors";
 import { B } from "src/common/styles/basicStyle";
 import { pluralize } from "src/common/utils/strUtils";
 import Dialog from "src/components/Dialog";
@@ -95,20 +97,25 @@ const DownloadModal = ({
     onClose();
   };
 
-  const fastaDownloadMutation = useMutation(downloadSamplesFasta, {
-    onError: () => {
-      setShouldShowError(true);
-      handleCloseModal();
-    },
-    onSuccess: (data: any) => {
-      const link = document.createElement("a");
-      link.href = window.URL.createObjectURL(data);
-      link.download = fastaDownloadName;
-      link.click();
-      link.remove();
-      handleCloseModal();
-    },
-  });
+  const groupId = useSelector(selectCurrentGroup);
+
+  const fastaDownloadMutation = useMutation(
+    (toMutate) => downloadSamplesFasta(groupId, toMutate),
+    {
+      onError: () => {
+        setShouldShowError(true);
+        handleCloseModal();
+      },
+      onSuccess: (data: any) => {
+        const link = document.createElement("a");
+        link.href = window.URL.createObjectURL(data);
+        link.download = fastaDownloadName;
+        link.click();
+        link.remove();
+        handleCloseModal();
+      },
+    }
+  );
 
   const FASTA_DISABLED_TOOLTIP_TEXT = (
     <div>
