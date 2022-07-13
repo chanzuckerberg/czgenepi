@@ -217,9 +217,9 @@ const PHYLO_RUN_MAP = new Map<string, keyof PhyloRun>([
   ["workflow_id", "workflowId"],
   ["workflow_status", "status"],
 ]);
-export const fetchPhyloRuns = (): Promise<PhyloRunResponse> =>
+export const fetchPhyloRuns = (groupId: number): Promise<PhyloRunResponse> =>
   apiResponse<PhyloRunResponse>(
     ["phylo_runs"],
     [PHYLO_RUN_MAP],
-    API.PHYLO_RUNS
+    generateGroupSpecificUrl(ORG_API.PHYLO_RUNS, groupId)
   );
