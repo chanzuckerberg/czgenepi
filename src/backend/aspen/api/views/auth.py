@@ -83,6 +83,7 @@ async def create_user_if_not_exists(db, auth0_mgmt, userinfo) -> Optional[User]:
     }
     newuser = User(**user_fields)
     db.add(newuser)
+    return newuser
 
 
 @router.get("/callback")
