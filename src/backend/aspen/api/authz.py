@@ -67,6 +67,7 @@ def register_classes(oso):
         User,
         fields={
             "id": str,
+            "system_admin": bool,
             "user_roles": Relation(
                 kind="many",
                 other_type="UserRole",
