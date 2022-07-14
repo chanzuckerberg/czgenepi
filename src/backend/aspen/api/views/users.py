@@ -41,12 +41,8 @@ def set_user_groups(user):
 
 @router.get("/me", response_model=UserMeResponse)
 async def get_current_user(
-    request: Request, db: AsyncSession = Depends(get_db), user=Depends(get_auth_user),
-    auth0_mgmt: Auth0Client = Depends(get_auth0_apiclient),
+    user=Depends(get_auth_user),
 ) -> UserMeResponse:
-    user = (await(db.execute(sa.select(User).where(User.id == 1)))).scalars().one()
-    await RoleManager.sync_user_roles(db, auth0_mgmt, user)
-    await db.commit()
     return UserMeResponse.from_orm(user)
 
 
