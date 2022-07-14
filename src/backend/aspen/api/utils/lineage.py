@@ -34,9 +34,9 @@ async def expand_lineage_wildcards(db: AsyncSession, lineage_list: List[str]):
 
     expanded_lineage_list = set()
     for entry in lineage_list:
-        base_entry = entry.partition(" ")[
-            0
-        ]  # strip any tacked-on identifiers like "21K"
+        # strip any tacked-on identifiers like "21K"
+        base_entry = entry.partition(" ")[0]
+
         wildcard_base_match = re.match(r".+(?=\*$)", base_entry)
         if not wildcard_base_match:
             expanded_lineage_list.add(entry)
