@@ -57,7 +57,7 @@ jobs:
       - uses: avakar/create-deployment@v1.0.2
         with:
           auto_merge: false
-          environment: ${{ github.event.inputs.image_tag || 'prod' }}
+          environment: ${{ github.event.inputs.environment || 'prod' }}
           payload: ${{ env.payload }}
           required_contexts: ""
         env:
