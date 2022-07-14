@@ -36,9 +36,7 @@ def set_user_groups(user):
 
 
 @router.get("/me", response_model=UserMeResponse)
-async def get_current_user(
-    user=Depends(get_auth_user)
-) -> UserMeResponse:
+async def get_current_user(user=Depends(get_auth_user)) -> UserMeResponse:
     set_user_groups(user)
     return UserMeResponse.from_orm(user)
 
