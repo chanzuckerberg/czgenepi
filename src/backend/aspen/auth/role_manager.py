@@ -1,12 +1,10 @@
-import json
-import sentry_sdk
-from collections import defaultdict
+from typing import Dict, Set, Tuple
 
+import sentry_sdk
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import contains_eager, joinedload
+from sqlalchemy.orm import contains_eager
 from sqlalchemy.orm.exc import NoResultFound
-
 
 from aspen.auth.auth0_management import Auth0Client
 from aspen.database.models import Group, GroupRole, Role, User, UserRole
@@ -62,55 +60,45 @@ class RoleManager:
             .filter(UserRole.user == user)
         )
 
-        old_groups = old_groups.unique().scalars().all()
-        old_group_roles = defaultdict(dict)
-        for old_group in old_groups:
-            if not old_group.auth0_org_id:
-                # This really shouldn't happen, but skip groups that don't make sense.
-                continue
+        old_groups_rows = old_groups.unique().scalars().all()
+        old_roles: Set[Tuple[str, str]] = set()
+        userrole_objs: Dict[Tuple[str, str], UserRole] = {}
+        for old_group in old_groups_rows:
             for urole in old_group.user_roles:
-                old_group_roles[old_group.auth0_org_id][urole.role.name] = urole
+                found_role = (old_group.auth0_org_id, urole.role.name)
+                old_roles.add(found_role)
+                userrole_objs[found_role] = urole
 
-        current_group_roles = {}
+        current_roles: Set[Tuple[str, str]] = set()
         current_groups = a0.get_user_orgs(user.auth0_user_id)
         for group in current_groups:
             group_id = group["id"]
-            current_roles = set(a0.get_org_user_roles(group_id, user.auth0_user_id))
-            current_group_roles[group_id] = current_roles
+            group_roles = set(a0.get_org_user_roles(group_id, user.auth0_user_id))
+            for role in group_roles:
+                current_roles.add((group_id, role))
 
-        # Wipe out all roles for these groups.
-        groups_to_delete = set(old_group_roles.keys()) - set(current_group_roles.keys())
-        for groupid in groups_to_delete:
-            for urole in old_group_roles[groupid].values():
-                await db.delete(urole)
+        # Wipe out any existing user roles that are no longer relevant
+        roles_to_delete = old_roles - current_roles
+        for rolerow in roles_to_delete:
+            await db.delete(userrole_objs[rolerow])
 
         # Add or update the rest.
-        for org_id, roles in current_group_roles.items():
-            existing_roles = set(old_group_roles[org_id].keys())
-            new_roles = set(roles)
-            for role in new_roles - existing_roles:
-                try:
-                    group = (
-                        (
-                            await db.execute(
-                                sa.select(Group).where(Group.auth0_org_id == org_id)
-                            )
+        roles_to_add = current_roles - old_roles
+        for group_id, role_name in roles_to_add:
+            try:
+                group = (
+                    (
+                        await db.execute(
+                            sa.select(Group).where(Group.auth0_org_id == group_id)
                         )
-                        .scalars()
-                        .one()
                     )
-                except NoResultFound:
-                    # This also shouldn't happen, but we can freak out about it behind the scenes
-                    sentry_sdk.capture_message(
-                        f"Cannot sync membership for group ({org_id})"
-                    )
-                    continue 
-                db.add(await cls.generate_user_role(db, user, group, role))
-            for role in existing_roles - new_roles:
-                await db.delete(old_group_roles[org_id][role])
-
-        if False:
-            for remove_role_name in old_roles - current_roles:
-                await db.delete(old_roles_by_name[remove_role_name])
-            for add_role_name in current_roles - old_roles:
-                db.add(await cls.generate_user_role(db, user, old_group, add_role_name))
+                    .scalars()
+                    .one()
+                )
+            except NoResultFound:
+                # This also shouldn't happen, but we can freak out about it behind the scenes
+                sentry_sdk.capture_message(
+                    f"Cannot sync membership for group ({group_id})"
+                )
+                continue
+            db.add(await cls.generate_user_role(db, user, group, role_name))

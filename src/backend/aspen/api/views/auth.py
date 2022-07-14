@@ -46,27 +46,31 @@ async def login(
     )
 
 
-async def create_user_if_not_exists(db, auth0_mgmt, userinfo) -> Optional[User]:
-    if "org_id" not in userinfo:
-        return  # We're currently only creating new users if they're confirming an org invitation
+async def create_user_if_not_exists(db, auth0_mgmt, userinfo) -> User:
     auth0_user_id = userinfo.get("sub")
     if not auth0_user_id:
-        return  # User ID really needs to be present
+        # User ID really needs to be present
+        raise ex.UnauthorizedException("Invalid user id")
     userquery = await db.execute(
         sa.select(User).filter(User.auth0_user_id == auth0_user_id)  # type: ignore
     )
     try:
+        # Return early if this user already exists
         user = userquery.scalars().one()
         return user
     except NoResultFound:
         pass
+    # We're currently only creating new users if they're confirming an org invitation
+    if "org_id" not in userinfo:
+        raise ex.UnauthorizedException("Invalid group id")
     groupquery = await db.execute(
         sa.select(Group).filter(Group.auth0_org_id == userinfo["org_id"])  # type: ignore
     )
+    # If the group doesn't exist, we can't create a user for it
     try:
         group = groupquery.scalars().one()  # type: ignore
     except NoResultFound:
-        return  # We didn't find a matching group, we can't create this user.
+        raise ex.UnauthorizedException("Unknown group")
 
     # Get the user's roles for this organization and tag them as group admins if necessary.
     # TODO - user.group_admin and user.group_id are going away very soon, so we should
@@ -106,8 +110,8 @@ async def auth(
             "name": userinfo["name"],
         }
         user = await create_user_if_not_exists(db, auth0_mgmt, userinfo)
-        if user:
-            await RoleManager.sync_user_roles(db, auth0_mgmt, user)
+        # Always re-sync auth0 groups to our db on login!
+        await RoleManager.sync_user_roles(db, auth0_mgmt, user)
         await db.commit()
     else:
         raise ex.UnauthorizedException("No user info in token")
