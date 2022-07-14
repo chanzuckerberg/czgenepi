@@ -3,12 +3,11 @@ import { Alert, Tooltip } from "czifui";
 import { isEqual, noop } from "lodash";
 import React, { useCallback, useEffect, useState } from "react";
 import { CSVLink } from "react-csv";
-import { useMutation } from "react-query";
 import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import { useUserInfo } from "src/common/queries/auth";
-import { downloadSamplesFasta } from "src/common/queries/samples";
+import { useFastaDownload } from "src/common/queries/samples";
 import { useSelector } from "src/common/redux/hooks";
 import { selectCurrentGroup } from "src/common/redux/selectors";
 import { B } from "src/common/styles/basicStyle";
@@ -98,24 +97,20 @@ const DownloadModal = ({
   };
 
   const groupId = useSelector(selectCurrentGroup);
-
-  const fastaDownloadMutation = useMutation(
-    (toMutate) => downloadSamplesFasta(groupId, toMutate),
-    {
-      onError: () => {
-        setShouldShowError(true);
-        handleCloseModal();
-      },
-      onSuccess: (data: any) => {
-        const link = document.createElement("a");
-        link.href = window.URL.createObjectURL(data);
-        link.download = fastaDownloadName;
-        link.click();
-        link.remove();
-        handleCloseModal();
-      },
-    }
-  );
+  const fastaDownloadMutation = useFastaDownload(groupId, {
+    componentOnError: () => {
+      setShouldShowError(true);
+      handleCloseModal();
+    },
+    componentOnSuccess: (data: Blob) => {
+      const link = document.createElement("a");
+      link.href = window.URL.createObjectURL(data);
+      link.download = fastaDownloadName;
+      link.click();
+      link.remove();
+      handleCloseModal();
+    },
+  });
 
   const FASTA_DISABLED_TOOLTIP_TEXT = (
     <div>

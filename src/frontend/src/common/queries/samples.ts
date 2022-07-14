@@ -25,8 +25,10 @@ import { MutationCallbacks } from "./types";
  * Download fasta file for samples
  */
 interface SampleFastaDownloadPayload {
-  sample_ids: string[];
+  sampleIds: string[];
 }
+
+type FastaDownloadCallbacks = MutationCallbacks<Blob>;
 
 export async function downloadSamplesFasta(
   groupId: number,
@@ -35,8 +37,8 @@ export async function downloadSamplesFasta(
   }: {
     sampleIds: string[];
   }
-): Promise<unknown> {
-  const payload: SampleFastaDownloadPayload = {
+): Promise<Blob> {
+  const payload = {
     sample_ids: sampleIds,
   };
   const response = await fetch(
@@ -49,6 +51,16 @@ export async function downloadSamplesFasta(
   if (response.ok) return await response.blob();
 
   throw Error(`${response.statusText}: ${await response.text()}`);
+}
+
+export function useFastaDownload(
+  groupId: number,
+  { componentOnError, componentOnSuccess }: FastaDownloadCallbacks
+): UseMutationResult<Blob, unknown, SampleFastaDownloadPayload, unknown> {
+  return useMutation((toMutate) => downloadSamplesFasta(groupId, toMutate), {
+    onError: componentOnError,
+    onSuccess: componentOnSuccess,
+  });
 }
 
 /**
@@ -122,15 +134,14 @@ interface SamplePayload {
   };
 }
 
+interface SampleCreateRequestType {
+  samples: Samples | null;
+  metadata: SampleIdToMetadata | null;
+}
+
 export async function createSamples(
   groupId: number,
-  {
-    samples,
-    metadata,
-  }: {
-    samples: Samples | null;
-    metadata: SampleIdToMetadata | null;
-  }
+  { samples, metadata }: SampleCreateRequestType
 ): Promise<unknown> {
   const payload: SamplePayload[] = [];
 
@@ -187,6 +198,15 @@ export async function createSamples(
   if (response.ok) return await response.json();
 
   throw Error(`${response.statusText}: ${await response.text()}`);
+}
+
+export function useCreateSamples(
+  groupId: number,
+  { componentOnSuccess }: { componentOnSuccess: () => void }
+): UseMutationResult<unknown, unknown, SampleCreateRequestType, unknown> {
+  return useMutation((toMutate) => createSamples(groupId, toMutate), {
+    onSuccess: componentOnSuccess,
+  });
 }
 
 /**
