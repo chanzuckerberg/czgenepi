@@ -90,8 +90,6 @@ async def test_create_new_admin_user_if_not_exists(
     assert user.group_id == group.id
     assert user.email == userinfo["email"]
     assert user.group_admin is True
-    expected_roles = {(group.auth0_org_id, "admin")}
-    await check_roles(async_session, userinfo["sub"], expected_roles)
 
 
 async def test_create_new_user_if_not_exists(
@@ -127,8 +125,6 @@ async def test_create_new_user_if_not_exists(
     assert user.group_id == group.id
     assert user.email == userinfo["email"]
     assert user.group_admin is False
-    expected_roles = {(group.auth0_org_id, "member")}
-    await check_roles(async_session, userinfo["sub"], expected_roles)
 
 
 async def test_dont_create_new_user_if_exists(
@@ -166,8 +162,6 @@ async def test_dont_create_new_user_if_exists(
         .one()
     )
     assert db_user.id == original_user_id
-    expected_roles = {(group.auth0_org_id, "member")}
-    await check_roles(async_session, userinfo["sub"], expected_roles)
 
 
 async def test_create_new_user_and_sync_roles(
@@ -211,8 +205,6 @@ async def test_create_new_user_and_sync_roles(
     assert user.group_id == group1.id
     assert user.email == userinfo["email"]
     assert user.group_admin is False
-    expected_roles = {(group1.auth0_org_id, "member"), (group3.auth0_org_id, "admin")}
-    await check_roles(async_session, userinfo["sub"], expected_roles)
 
 
 async def test_sync_complicated_roles(

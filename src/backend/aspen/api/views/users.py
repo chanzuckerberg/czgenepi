@@ -1,10 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
-from starlette.requests import Request
-from aspen.auth.role_manager import RoleManager
-import sqlalchemy as sa
 
 from aspen.api.authn import (
     get_admin_user,
@@ -41,8 +37,9 @@ def set_user_groups(user):
 
 @router.get("/me", response_model=UserMeResponse)
 async def get_current_user(
-    user=Depends(get_auth_user),
+    user=Depends(get_auth_user)
 ) -> UserMeResponse:
+    set_user_groups(user)
     return UserMeResponse.from_orm(user)
 
 
