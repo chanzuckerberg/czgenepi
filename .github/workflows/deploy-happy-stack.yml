@@ -48,7 +48,7 @@ jobs:
           happy_version: "0.23.0"
           create-tag: "false"
           tag: ${{ github.event.deployment.payload.tag }}
-          env: ${{ github.event.deployment.environment }}
+          env: ${{ github.event.deployment.environment }} 
       - name: Run integration tests
         env:
           TFE_TOKEN: ${{ secrets.TFE_TOKEN }}
