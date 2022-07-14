@@ -1,0 +1,55 @@
+{
+  "cookies": [
+    {
+      "sameSite": "Lax",
+      "name": "session",
+      "value": ".eJx9kF9rwjAUxb9LwL7o-m-rLYUyKqxD5tDpxLmXEpO7GleTkEQ3K373xYLgwzZIuHBP7j2_nCMqtcEGSrwza79cNW_L0TgPQ_1qxriuDXuJcj3aNBN18OcoPSKKDT5XLjgBlCKfLGaNKsbx43AAcs6n-WaBekgBZQqIKXeK2VdrY6ROPQ9L5lq_ivHKJU0FHGxDqMrbh96ZwCPWdIXJp12xU_XVJBF7Ro2yEqiby4oW2iVi2w4LxRq4V6Cl4BpKc5CQEUHBITUDbkpGs-XwadBQYF_VTDy_J0khgqIfPaxo0J9uou3EuebOWu_Obd4JC3v-YrfSPjzrFsGWyw8cTYQFsJcz2pVKfLAaurDFrHbayLP_w3bahLNf8z31EHxLlAb9KE6CJA59N_H9OLk7nX4AW4OhmA.YtBAUQ.yTqhLW7_ZNf_N3_n6P_1Lr8ZpBI",
+      "domain": "api.staging.czgenepi.org",
+      "path": "/",
+      "expires": 1659024721.611961,
+      "httpOnly": true,
+      "secure": false
+    },
+    {
+      "sameSite": "None",
+      "name": "did",
+      "value": "s%3Av0%3Ab1c185d0-038f-11ed-835d-ed7f923efcf7.zOQPa4hPrrhRFdrgvgH1vVmbOw%2BiVgsMjZdJOePjxWM",
+      "domain": "covidtracker-staging.auth0.com",
+      "path": "/",
+      "expires": 1689372721.704836,
+      "httpOnly": true,
+      "secure": true
+    },
+    {
+      "sameSite": "None",
+      "name": "auth0",
+      "value": "s%3Av1.gadzZXNzaW9ugqZoYW5kbGXEQPdKm8VdriNTSWo-LbI922WHzvjLREUfR6cKQnqq-g6hcjqZpkF6a8VhnK22nauoZR_NjBJJU7vWgxbMWL4zlaWmY29va2llg6dleHBpcmVz1_-br_UAYtQ00a5vcmlnaW5hbE1heEFnZc4PcxQAqHNhbWVTaXRlpG5vbmU.6g7AMoYZIGLtxBY2qp5Vs5QjGTiFR1M2LGZ%2BxJEvtt8",
+      "domain": "covidtracker-staging.auth0.com",
+      "path": "/",
+      "expires": 1658074321.704918,
+      "httpOnly": true,
+      "secure": true
+    },
+    {
+      "sameSite": "Lax",
+      "name": "did_compat",
+      "value": "s%3Av0%3Ab1c185d0-038f-11ed-835d-ed7f923efcf7.zOQPa4hPrrhRFdrgvgH1vVmbOw%2BiVgsMjZdJOePjxWM",
+      "domain": "covidtracker-staging.auth0.com",
+      "path": "/",
+      "expires": 1689372721.704983,
+      "httpOnly": true,
+      "secure": true
+    },
+    {
+      "sameSite": "Lax",
+      "name": "auth0_compat",
+      "value": "s%3Av1.gadzZXNzaW9ugqZoYW5kbGXEQPdKm8VdriNTSWo-LbI922WHzvjLREUfR6cKQnqq-g6hcjqZpkF6a8VhnK22nauoZR_NjBJJU7vWgxbMWL4zlaWmY29va2llg6dleHBpcmVz1_-br_UAYtQ00a5vcmlnaW5hbE1heEFnZc4PcxQAqHNhbWVTaXRlpG5vbmU.6g7AMoYZIGLtxBY2qp5Vs5QjGTiFR1M2LGZ%2BxJEvtt8",
+      "domain": "covidtracker-staging.auth0.com",
+      "path": "/",
+      "expires": 1658074321.704999,
+      "httpOnly": true,
+      "secure": true
+    }
+  ],
+  "origins": []
+}
