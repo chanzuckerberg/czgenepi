@@ -51,8 +51,8 @@ class RoleManager:
         This might be slightly overkill, but it should help to keep auth0 and our db in sync
         """
         old_groups = await db.execute(
-            sa.select(Group)
-            .join(UserRole, Group.user_roles)
+            sa.select(Group)  # type: ignore
+            .join(UserRole, Group.user_roles)  # type: ignore
             .join(Role, UserRole.role)  # type: ignore
             .options(  # type: ignore
                 contains_eager(Group.user_roles).contains_eager(UserRole.role),  # type: ignore
@@ -86,10 +86,10 @@ class RoleManager:
         roles_to_add = current_roles - old_roles
         for group_id, role_name in roles_to_add:
             try:
-                group = (
+                db_group = (
                     (
                         await db.execute(
-                            sa.select(Group).where(Group.auth0_org_id == group_id)
+                            sa.select(Group).where(Group.auth0_org_id == group_id)  # type: ignore
                         )
                     )
                     .scalars()
@@ -101,4 +101,4 @@ class RoleManager:
                     f"Cannot sync membership for group ({group_id})"
                 )
                 continue
-            db.add(await cls.generate_user_role(db, user, group, role_name))
+            db.add(await cls.generate_user_role(db, user, db_group, role_name))

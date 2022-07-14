@@ -1,4 +1,4 @@
-from typing import Optional, Set, Tuple
+from typing import List, Optional, Set, Tuple
 
 import pytest
 import sqlalchemy as sa
@@ -9,7 +9,7 @@ from sqlalchemy.orm import joinedload
 from aspen.api.views.auth import create_user_if_not_exists
 from aspen.auth.auth0_management import Auth0Client
 from aspen.auth.role_manager import RoleManager
-from aspen.database.models import User, UserRole
+from aspen.database.models import Group, User, UserRole
 from aspen.test_infra.models.usergroup import (
     group_factory,
     user_factory,
@@ -233,27 +233,27 @@ async def test_sync_complicated_roles(
     await start_new_transaction(async_session)
 
     # NOTE - DO NOT USE groups[0] in our test for fear of the SA identity map dragon!!!
-    matrix = [
+    matrix: List[Tuple[User, List[Tuple[Group, str]], List[Tuple[Group, str]]]] = [
         # Add a role where there was nothing
-        [users[0], [], [(groups[1], "admin")]],
+        (users[0], [], [(groups[1], "admin")]),
         # leave one role intact and add another
-        [
+        (
             users[1],
             [(groups[2], "member")],
             [(groups[2], "member"), (groups[3], "admin")],
-        ],
+        ),
         # wipe everything out
-        [
+        (
             users[2],
             [(groups[3], "member"), (groups[4], "member"), (groups[5], "member")],
             [],
-        ],
+        ),
         # add and remove 2 of each
-        [
+        (
             users[3],
             [(groups[6], "member"), (groups[7], "member"), (groups[8], "member")],
             [(groups[6], "member"), (groups[9], "admin"), (groups[10], "member")],
-        ],
+        ),
     ]
 
     # Back to our regularly scheduled testing programming
@@ -264,8 +264,8 @@ async def test_sync_complicated_roles(
             )
         orgs_response = [{"id": group.auth0_org_id} for group, _ in final_roles]
         members_responses = [[role] for _, role in final_roles]
-        auth0_apiclient.get_org_user_roles.side_effect = members_responses
-        auth0_apiclient.get_user_orgs.side_effect = [orgs_response]
+        auth0_apiclient.get_org_user_roles.side_effect = members_responses  # type: ignore
+        auth0_apiclient.get_user_orgs.side_effect = [orgs_response]  # type: ignore
         await RoleManager.sync_user_roles(async_session, auth0_apiclient, user)
         await start_new_transaction(async_session)
 
