@@ -23,6 +23,23 @@ import { debounce, isEmpty, isEqual } from "lodash";
 import { EVENT_TYPES } from "./eventTypes";
 
 /**
+ * We send the below pieces of info with every analytics call if possible.
+ *
+ * These are common pieces of data we want attached to every analytics message
+ * so they're available downstream for easier analytics works. In some cases,
+ * the data might not be available or exist for some reason. It is okay for
+ * them to occasionally not be available, so long as it's rare (< 1%).
+ *
+ * Right now, this is just a set of user info traits, but over time it could
+ * evolve to include things like current software version, etc. That said,
+ * try to be sparing about adding to this collection since they have to go
+ * on every message up to analytics platform.
+ */
+interface CommonAnalyticsInfo {
+  group_id?: number;
+}
+
+/**
  * Values we consider reasonable to send to Segment as properties of event.
  *
  * Note that `undefined` is also acceptable within the event properties object
@@ -52,6 +69,11 @@ type EventValue = string | number | boolean | null;
  * expected in the Segment debugger before considering any work around
  * implementing or changing an event complete.
  *
+ * All events include some generic, common info (CommonAnalyticsInfo). It
+ * is possible to overwrite those with your `additionalEventData` if there
+ * is a key collision. This is intentional -- some events could potentially
+ * overrule the common info aspect -- but should be pretty unusual.
+ *
  * Args:
  *   eventType (str, from EVENT_TYPES enum): canonical, unique name for event
  *   additionalEventData (obj): any additional data pertaining to event
@@ -69,7 +91,11 @@ export function analyticsTrackEvent(
   additionalEventData: Record<string, EventValue | undefined> = {}
 ): void {
   if (window.analytics && window.isCzGenEpiAnalyticsEnabled) {
-    window.analytics.track(eventType, additionalEventData);
+    const eventData = {
+      ...getCommonUserInfo(),
+      ...additionalEventData,
+    };
+    window.analytics.track(eventType, eventData);
   }
 }
 
@@ -155,6 +181,27 @@ export const analyticsSendUserInfo = debounce(analyticsSendUserInfo_, 500, {
 });
 
 /**
+ * Pulls common info pertaining to the user (eg, active group, etc)
+ *
+ * This relies on the Segment analytics framework `user().traits()` call,
+ * which basically looks up the last set of user info sent to Segment by the
+ * browser and returns that. We could achieve something similar by relying on
+ * the `previouslySentUserInfo` variable elsewhere, but this should be more
+ * reliable because it provides whatever was last sent, no matter whether it
+ * was from the `segmentInitScript` call or from normal methods.
+ */
+function getCommonUserInfo(): CommonAnalyticsInfo {
+  let commonUserInfo = {}; // Default case if we have no traits yet
+  if (window?.analytics?.user) {
+    const traits = window.analytics.user().traits();
+    commonUserInfo = {
+      group_id: traits.group_id,
+    };
+  }
+  return commonUserInfo;
+}
+
+/**
  * Record page change in Segment. Meant for use in Nextjs router.events.
  *
  * The Nextjs `router` allows you to subscribe to various events. This func is
@@ -178,7 +225,8 @@ export function analyticsRecordRouteChange(pageUrl: string): void {
     window.isCzGenEpiAnalyticsEnabled &&
     previouslyRecordedRoute !== pageUrl
   ) {
-    window.analytics.page();
+    const commonAnalyticsInfo = getCommonUserInfo();
+    window.analytics.page(commonAnalyticsInfo);
     previouslyRecordedRoute = pageUrl;
   }
 }
