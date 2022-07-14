@@ -9,13 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from aspen.api.authn import AuthContext, get_auth_context
 from aspen.api.deps import get_db
 from aspen.api.error import http_exceptions as ex
-from aspen.database.models import (
-    Group,
-    PhyloRun,
-    PhyloTree,
-    Sample,
-    User,
-)
+from aspen.database.models import Group, PhyloRun, PhyloTree, Sample, User
 from aspen.database.models.base import idbase
 
 
