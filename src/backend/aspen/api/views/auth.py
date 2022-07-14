@@ -46,30 +46,35 @@ async def login(
     )
 
 
-async def create_user_if_not_exists(db, auth0_mgmt, userinfo):
-    if "org_id" not in userinfo:
-        return  # We're currently only creating new users if they're confirming an org invitation
+async def create_user_if_not_exists(db, auth0_mgmt, userinfo) -> User:
     auth0_user_id = userinfo.get("sub")
     if not auth0_user_id:
-        return  # User ID really needs to be present
+        # User ID really needs to be present
+        raise ex.UnauthorizedException("Invalid user id")
     userquery = await db.execute(
         sa.select(User).filter(User.auth0_user_id == auth0_user_id)  # type: ignore
     )
-    user = None
     try:
+        # Return early if this user already exists
         user = userquery.scalars().one()
+        return user
     except NoResultFound:
         pass
-    if user:
-        return  # We already have a matching user, no need to create one now
+    # We're currently only creating new users if they're confirming an org invitation
+    if "org_id" not in userinfo:
+        raise ex.UnauthorizedException("Invalid group id")
     groupquery = await db.execute(
         sa.select(Group).filter(Group.auth0_org_id == userinfo["org_id"])  # type: ignore
     )
+    # If the group doesn't exist, we can't create a user for it
     try:
         group = groupquery.scalars().one()  # type: ignore
     except NoResultFound:
-        return  # We didn't find a matching group, we can't create this user.
+        raise ex.UnauthorizedException("Unknown group")
+
     # Get the user's roles for this organization and tag them as group admins if necessary.
+    # TODO - user.group_admin and user.group_id are going away very soon, so we should
+    #        clean this up when we're ready.
     roles = auth0_mgmt.get_org_user_roles(userinfo["org_id"], auth0_user_id)
 
     user_fields = {
@@ -82,18 +87,13 @@ async def create_user_if_not_exists(db, auth0_mgmt, userinfo):
     }
     newuser = User(**user_fields)
     db.add(newuser)
-    role_name = (
-        "admin" if "admin" in roles else "member"
-    )  # TODO support more types of roles.
-    db.add(await RoleManager.generate_user_role(db, newuser, group, role_name))
-    await db.commit()
+    return newuser
 
 
 @router.get("/callback")
 async def auth(
     request: Request,
     auth0: StarletteOAuth2App = Depends(get_auth0_client),
-    settings: Settings = Depends(get_settings),
     db: AsyncSession = Depends(get_db),
     auth0_mgmt: Auth0Client = Depends(get_auth0_apiclient),
 ) -> Response:
@@ -109,7 +109,10 @@ async def auth(
             "user_id": userinfo["sub"],
             "name": userinfo["name"],
         }
-        await create_user_if_not_exists(db, auth0_mgmt, userinfo)
+        user = await create_user_if_not_exists(db, auth0_mgmt, userinfo)
+        # Always re-sync auth0 groups to our db on login!
+        await RoleManager.sync_user_roles(db, auth0_mgmt, user)
+        await db.commit()
     else:
         raise ex.UnauthorizedException("No user info in token")
     return RedirectResponse(os.getenv("FRONTEND_URL", "") + "/data/samples")

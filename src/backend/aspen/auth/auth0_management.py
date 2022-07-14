@@ -61,14 +61,14 @@ class Auth0Client:
 
         self.client: Auth0 = Auth0(domain=domain, token=token["access_token"])
 
-    def get_all_results(self, endpoint: Callable, key: str) -> List[Any]:
+    def get_all_results(self, endpoint: Callable, key: str, **kwargs) -> List[Any]:
         # Auth0 paginates results. We don't have a crazy amount of data in auth0 so we can
         # afford to just paginate through all the results and hold everything in memory.
         results: List[Any] = []
         page = 0
         per_page = 25
         while True:
-            resp = endpoint(page=page, per_page=per_page)
+            resp = endpoint(**kwargs, page=page, per_page=per_page)
             if len(resp[key]) == 0:
                 return results
             results.extend(resp[key])
@@ -99,6 +99,12 @@ class Auth0Client:
             if org["id"] == org_id:
                 return org
         raise Exception("Organization not found")
+
+    @cache
+    def get_user_orgs(self, user_id: str) -> List[Auth0Org]:
+        return self.get_all_results(
+            self.client.users.list_organizations, "organizations", id=user_id
+        )
 
     @cache
     def get_orgs(self) -> List[Auth0Org]:
