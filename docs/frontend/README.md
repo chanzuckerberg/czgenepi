@@ -12,6 +12,7 @@ CZ Gen Epi frontend application is built with the following stack. If you are un
 1. [Material UI](https://material-ui.com/)
 1. [czifui](https://github.com/chanzuckerberg/sci-components)
 1. [Playwright](https://playwright.dev/)
+1. [Redux](https://redux.js.org/)
 
 ## App Structure
 
@@ -68,6 +69,18 @@ The basic way to build a React component is to follow the steps below:
 1. And if `Bar` component uses `Baz`, we can create `./src/views/Foo/components/Bar/components/Baz` to encapsulate `Baz` component's implementation details
 
 As you can see, a component is typically made of other components and/or sub-components, so we can use the basic component file structure illustrated above to recursively build out a component at any level. One benefit of this recursive structure is that the component interface and boundaries are well defined, so extracting a component to a different directory is as easy as cut and paste
+
+## Redux Store Structure
+All code related to the configuration of the Redux store lives in `./src/common/redux/`.
+
+Here's what you'll find:
+- `index.ts` -- store set up, including defining the initial store state on app load.
+- `actions/` -- code used to update/write state to the store
+- `selectors/` -- code used to read state from the store
+- `middleware/` -- code that executes side effects from state updates
+- `hooks/` -- pre-typed hooks that you can use in the app without having to do TS declarations every time you use them
+
+Currently, each directory only has one file (`index.ts`) because our store is very small and only holds a couple pieces of state. This dir structure is set up so that we can maintain order as the app grows and potentially add more granular-sized files.
 
 ## Data Fetching
 
