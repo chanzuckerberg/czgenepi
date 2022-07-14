@@ -6,9 +6,10 @@ import {
   UseQueryResult,
 } from "react-query";
 import {
-  API,
   DEFAULT_DELETE_OPTIONS,
   fetchPhyloRuns,
+  generateGroupSpecificUrl,
+  ORG_API,
   PhyloRunResponse,
 } from "../api";
 import { API_URL } from "../constants/ENV";
@@ -22,8 +23,10 @@ export const USE_PHYLO_RUN_INFO = {
   id: "phyloRunInfo",
 };
 
-export function usePhyloRunInfo(): UseQueryResult<PhyloRunResponse, unknown> {
-  return useQuery([USE_PHYLO_RUN_INFO], fetchPhyloRuns, {
+export function usePhyloRunInfo(
+  groupId: number
+): UseQueryResult<PhyloRunResponse, unknown> {
+  return useQuery([USE_PHYLO_RUN_INFO], () => fetchPhyloRuns(groupId), {
     retry: false,
   });
 }
@@ -44,28 +47,34 @@ interface PhyloRunDeleteResponseType {
   id: string;
 }
 
-export async function deletePhyloRun({
-  phyloRunIdToDelete,
-}: PhyloRunDeleteRequestType): Promise<PhyloRunDeleteResponseType> {
-  const response = await fetch(API_URL + API.PHYLO_RUNS + phyloRunIdToDelete, {
-    ...DEFAULT_DELETE_OPTIONS,
-  });
+async function deletePhyloRun(
+  groupId: number,
+  { phyloRunIdToDelete }: PhyloRunDeleteRequestType
+): Promise<PhyloRunDeleteResponseType> {
+  const response = await fetch(
+    API_URL +
+      generateGroupSpecificUrl(ORG_API.PHYLO_RUNS, groupId) +
+      phyloRunIdToDelete,
+    {
+      ...DEFAULT_DELETE_OPTIONS,
+    }
+  );
 
   if (response.ok) return await response.json();
   throw Error(`${response.statusText}: ${await response.text()}`);
 }
 
-export function useDeletePhyloRun({
-  componentOnError,
-  componentOnSuccess,
-}: PhyloRunDeleteCallbacks): UseMutationResult<
+export function useDeletePhyloRun(
+  groupId: number,
+  { componentOnError, componentOnSuccess }: PhyloRunDeleteCallbacks
+): UseMutationResult<
   PhyloRunDeleteResponseType,
   unknown,
   PhyloRunDeleteRequestType,
   unknown
 > {
   const queryClient = useQueryClient();
-  return useMutation(deletePhyloRun, {
+  return useMutation((toMutate) => deletePhyloRun(groupId, toMutate), {
     onError: componentOnError,
     onSuccess: async (data) => {
       await queryClient.invalidateQueries([USE_PHYLO_RUN_INFO]);
