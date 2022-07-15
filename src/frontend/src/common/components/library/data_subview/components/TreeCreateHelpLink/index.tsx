@@ -1,6 +1,5 @@
 import React from "react";
-import IconArrowRightSmall from "src/common/icons/IconArrowRightSmall.svg";
-import IconInsightSmall from "src/common/icons/IconInsightSmall.svg";
+import { Icon } from "czifui";
 import { StyledDiv, StyledNewTabLink, StyledSpan } from "./styles";
 
 const TreeCreateHelpLink = (): JSX.Element => {
@@ -9,9 +8,9 @@ const TreeCreateHelpLink = (): JSX.Element => {
   return (
     <StyledDiv>
       <StyledNewTabLink href={HREF}>
-        <IconInsightSmall />
+        <Icon sdsIcon="lightBulb" sdsSize="s" sdsType="static" />
         <StyledSpan>How can I create my own tree?</StyledSpan>
-        <IconArrowRightSmall />
+        <Icon sdsIcon="chevronRight" sdsSize="xs" sdsType="static" />
       </StyledNewTabLink>
     </StyledDiv>
   );
