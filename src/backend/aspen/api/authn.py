@@ -245,13 +245,10 @@ async def get_auth_context(
     session: AsyncSession = Depends(get_db),
     user_roles: MutableSequence[UserRole] = Depends(get_user_roles),
 ) -> AuthContext:
-    # TODO TODO TODO
-    # we need to be able to generate an authcontext without any
-    # org info *intentionally* for user self-management endpoints (get all my
-    # roles, change my username, etc) so we need to handle that case
     group = None
     roles: List[str] = []
     groles: List[ACGroupRole] = []
+    # Figure out whether we can attach a group to this auth context
     for row in user_roles:
         roles.append(row.role.name)
         group = row.group
@@ -268,10 +265,17 @@ async def get_auth_context(
         group_roles = rolewait.unique().scalars().all()
         for row in group_roles:
             groles.append({"group_id": row.grantor_group.id, "role": row.role.name})
+
+    # Generate an auth context with or without group info.
     ac = AuthContext(user, group, roles, groles)
     return ac
 
 
+# We *specifically* want to allow authcontexts to be generated without
+# group context in several situations, however some endpoints *require*
+# a group role, so this is here to enforce that requirement.
+# This is a *stopgap* -- it's better to integrate Oso to do endpoint-level
+# policy enforcement, which will let us check membership and access more flexibly.
 async def require_group_membership(
     ac: AuthContext = Depends(get_auth_context),
 ):

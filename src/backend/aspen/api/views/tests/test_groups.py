@@ -111,7 +111,7 @@ async def test_send_group_invitations(
     async_session.add_all([group, user])
     await async_session.commit()
 
-    auth0_apiclient.get_org_by_name.return_value = DEFAULT_AUTH0_ORG  # type: ignore
+    auth0_apiclient.get_org_by_id.return_value = DEFAULT_AUTH0_ORG  # type: ignore
     auth0_apiclient.get_user_by_email.side_effect = [[], [], [DEFAULT_AUTH0_USER]]  # type: ignore
     auth0_apiclient.invite_member.side_effect = [  # type: ignore
         True,

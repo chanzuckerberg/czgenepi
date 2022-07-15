@@ -108,29 +108,8 @@ def get_app() -> FastAPI:
         dependencies=[Depends(get_auth_user)],
     )
     _app.include_router(
-        phylo_runs.router,
-        prefix="/v2/phylo_runs",
-        dependencies=[Depends(get_auth_user)],
-    )
-    _app.include_router(
-        phylo_trees.router,
-        prefix="/v2/phylo_trees",
-        dependencies=[Depends(get_auth_user)],
-    )
-    _app.include_router(
-        samples.router,
-        prefix="/v2/samples",
-        dependencies=[Depends(get_auth_user)],
-    )
-    _app.include_router(
         locations.router,
         prefix="/v2/locations",
-        dependencies=[Depends(get_auth_user)],
-    )
-    _app.include_router(auspice.router, prefix="/v2/auspice")
-    _app.include_router(
-        sequences.router,
-        prefix="/v2/sequences",
         dependencies=[Depends(get_auth_user)],
     )
     _app.include_router(
@@ -142,15 +121,21 @@ def get_app() -> FastAPI:
         exception_handler,
     )
 
+    _app.include_router(auspice.router, prefix="/v2/auspice")
+    _app.include_router(auspice.router, prefix="/v2/orgs/{org_id}/auspice")
     # Which routes are "ready" to accept org prefixes?
     org_routers = {
-        "auspice": auspice.router,
         "sequences": sequences.router,
         "phylo_trees": phylo_trees.router,
         "phylo_runs": phylo_runs.router,
         "samples": samples.router,
     }
     for suffix, router in org_routers.items():
+        _app.include_router(
+            router,
+            prefix="/v2/" + suffix,
+            dependencies=[Depends(require_group_membership)],
+        )
         _app.include_router(
             router,
             prefix="/v2/orgs/{org_id}/" + suffix,
