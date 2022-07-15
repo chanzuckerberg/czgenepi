@@ -121,6 +121,7 @@ def get_app() -> FastAPI:
         exception_handler,
     )
 
+    # Auspice endpoints don't all require authentication, they can do their own login checks.
     _app.include_router(auspice.router, prefix="/v2/auspice")
     _app.include_router(auspice.router, prefix="/v2/orgs/{org_id}/auspice")
     # Which routes are "ready" to accept org prefixes?
