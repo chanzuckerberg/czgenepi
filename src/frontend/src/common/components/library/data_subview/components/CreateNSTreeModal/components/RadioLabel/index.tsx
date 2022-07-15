@@ -7,9 +7,9 @@ import {
   Label,
   LabelMain,
   SmallText,
-  StyledIconXSmall,
   StyledList,
   StyledListItem,
+  StyledListItemCloseIcon,
   StyledListItemIcon,
 } from "./style";
 
@@ -184,9 +184,9 @@ export const RadioLabelNonContextualized = ({
               </ListItemText>
             </StyledListItem>
             <StyledListItem>
-              <StyledListItemIcon>
-                <StyledIconXSmall />
-              </StyledListItemIcon>
+              <StyledListItemCloseIcon>
+                <Icon sdsIcon="xMark" sdsSize="xs" sdsType="static" />
+              </StyledListItemCloseIcon>
               <ListItemText>
                 <SmallText>
                   Not recommended for epidemiological interpretation due to lack

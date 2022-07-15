@@ -73,18 +73,8 @@ export const StyledListItemIcon = styled(ListItemIcon)`
   }}
 `;
 
-const smallIconSize = `
-  width: 14px;
-  height: 14px;
-  transform: scale(0.7);
-`;
-
-export const StyledIconXSmall = styled(IconCloseSmall)`
-  ${smallIconSize}
-  ${(props) => {
-    const colors = getColors(props);
-    return `
-      fill: ${colors?.error[400]};
-    `;
-  }}
+export const StyledListItemCloseIcon = styled(StyledListItemIcon)`
+  svg {
+    fill: red;
+  }
 `;
