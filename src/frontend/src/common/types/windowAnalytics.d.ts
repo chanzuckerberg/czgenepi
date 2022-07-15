@@ -22,10 +22,10 @@ declare global {
     // Below **adds** to Window properties, not a replacement.
     analytics?: {
       identify: (userId?: string, traits: Record<string, unknown>) => void;
-      page: (properties: Record<string, unknown> | {}) => void;
+      page: (properties: Record<string, unknown>) => void;
       track: (eventType: string, properties: Record<string, unknown>) => void;
       // Unlike above methods, `user` only present once library finishes load
-      user?: () => {traits: () => Record<string, unknown>};
+      user?: () => { traits: () => Record<string, unknown> };
     };
     isCzGenEpiAnalyticsEnabled?: boolean;
   }

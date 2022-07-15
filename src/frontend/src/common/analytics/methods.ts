@@ -34,10 +34,14 @@ import { EVENT_TYPES } from "./eventTypes";
  * evolve to include things like current software version, etc. That said,
  * try to be sparing about adding to this collection since they have to go
  * on every message up to analytics platform.
+ *
+ * Necessary to be a `type` rather than `interface` so TS is happy with is use
+ * downstream as a generic object. See this TypeScript issue and comment:
+ * https://github.com/microsoft/TypeScript/issues/15300#issuecomment-371353444
  */
-interface CommonAnalyticsInfo {
+type CommonAnalyticsInfo = {
   group_id?: number;
-}
+};
 
 /**
  * Values we consider reasonable to send to Segment as properties of event.
