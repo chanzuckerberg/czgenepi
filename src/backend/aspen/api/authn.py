@@ -239,6 +239,7 @@ async def get_user_roles(
     user_roles = rolewait.unique().scalars().all()
     return user_roles
 
+
 async def get_auth_context(
     group_id: Optional[int] = Depends(get_group_context),
     user: User = Depends(get_auth_user),
@@ -281,6 +282,4 @@ async def require_group_membership(
 ):
     # If you don't have any roles in this group, go away
     if not ac.group:
-        print(f"HAHAHAHA NOPE")
         raise ex.UnauthorizedException("Not authorized")
-    print(f"FOUND GROUP {ac.group} ACCESS ?!?!?!?!")

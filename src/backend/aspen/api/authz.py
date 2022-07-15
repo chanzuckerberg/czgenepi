@@ -7,7 +7,6 @@ from polar.data.adapter.async_sqlalchemy2_adapter import AsyncSqlAlchemyAdapter
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.exc import NoResultFound
 
-
 from aspen.api.authn import AuthContext, get_auth_context
 from aspen.api.deps import get_db
 from aspen.api.error import http_exceptions as ex
@@ -233,12 +232,14 @@ class AuthorizedRow:
         authz_session = AuthZSession(session, auth_context)
         query = await authz_session.authorized_query(self.privilege, self.model)
         try:
-            res = (await (session.execute(query.where(self.model.id == row_id)))).scalars().one()
+            res = (
+                (await (session.execute(query.where(self.model.id == row_id))))
+                .scalars()
+                .one()
+            )
             return res
         except NoResultFound:
-            raise ex.NotFoundException(f"unauthorized")
-
-        
+            raise ex.UnauthorizedException("unauthorized")
 
 
 # NOTE - any endpoint that uses `fetch_authorized_row` must use "row_id" as the path

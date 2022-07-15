@@ -7,10 +7,9 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import contains_eager, joinedload
 from sqlalchemy.sql.expression import Select
-from starlette.requests import Request
 
 from aspen.api.authn import get_admin_user, get_auth0_apiclient, get_auth_user
-from aspen.api.authz import require_access, fetch_authorized_row
+from aspen.api.authz import fetch_authorized_row, require_access
 from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.usergroup import (
@@ -58,15 +57,15 @@ async def create_group(
     return GroupInfoResponse.from_orm(created_group)
 
 
-@router.get("/{group_id}/", response_model=GroupInfoResponse)
+@router.get("/{row_id}/", response_model=GroupInfoResponse)
 async def get_group_info(
-    group_id: int,
+    row_id: int,
     db: AsyncSession = Depends(get_db),
     authorized_query: Select = Depends(require_access("read", Group)),
 ) -> GroupInfoResponse:
     group_query = authorized_query.options(  # type: ignore
         joinedload(Group.default_tree_location)
-    ).where(Group.id == group_id)
+    ).where(Group.id == row_id)
     group_query_result = await db.execute(group_query)
     group = group_query_result.scalars().one_or_none()
     if not group:
@@ -74,9 +73,9 @@ async def get_group_info(
     return GroupInfoResponse.from_orm(group)
 
 
-@router.get("/{group_id}/members/", response_model=GroupMembersResponse)
+@router.get("/{row_id}/members/", response_model=GroupMembersResponse)
 async def get_group_members(
-    group_id: int,
+    row_id: int,
     db: AsyncSession = Depends(get_db),
     group: Group = Depends(fetch_authorized_row("read", Group)),
 ) -> GroupMembersResponse:
@@ -97,13 +96,13 @@ async def get_group_members(
         member.role = next(
             user_role.role.name
             for user_role in member.user_roles
-            if user_role.group.id == group_id
+            if user_role.group.id == row_id
         )
         group_members.append(member)
     return GroupMembersResponse.parse_obj({"members": group_members})
 
 
-@router.get("/{group_id}/invitations/", response_model=InvitationsResponse)
+@router.get("/{row_id}/invitations/", response_model=InvitationsResponse)
 async def get_group_invitations(
     group: Group = Depends(fetch_authorized_row("read", Group)),
     auth0_client: Auth0Client = Depends(get_auth0_apiclient),
@@ -128,8 +127,6 @@ async def invite_group_members(
     client_id = settings.AUTH0_CLIENT_ID
     responses = []
     for email in group_invitation_request.emails:
-        # Temporary: We only support adding users to a single group right now,
-        # so skip sending emails to users that already exist elsewhere.
         success = True
         try:
             auth0_client.invite_member(
