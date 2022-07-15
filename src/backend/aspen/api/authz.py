@@ -5,6 +5,8 @@ from fastapi import Depends
 from oso import AsyncOso, Relation
 from polar.data.adapter.async_sqlalchemy2_adapter import AsyncSqlAlchemyAdapter
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm.exc import NoResultFound
+
 
 from aspen.api.authn import AuthContext, get_auth_context
 from aspen.api.deps import get_db
@@ -215,3 +217,35 @@ def require_group_privilege(
     privilege: str,
 ) -> AuthorizedGroup:
     return AuthorizedGroup(privilege)
+
+
+class AuthorizedRow:
+    def __init__(self, privilege: str, model: idbase):
+        self.privilege = privilege
+        self.model = model
+
+    async def __call__(
+        self,
+        row_id: int,
+        auth_context: AuthContext = Depends(get_auth_context),
+        session: AsyncSession = Depends(get_db),
+    ) -> idbase:
+        authz_session = AuthZSession(session, auth_context)
+        query = await authz_session.authorized_query(self.privilege, self.model)
+        try:
+            res = (await (session.execute(query.where(self.model.id == row_id)))).scalars().one()
+            return res
+        except NoResultFound:
+            raise ex.NotFoundException(f"unauthorized")
+
+        
+
+
+# NOTE - any endpoint that uses `fetch_authorized_row` must use "row_id" as the path
+#        parameter name to identify the row to be fetched.
+@lru_cache
+def fetch_authorized_row(
+    privilege: str,
+    model: idbase,
+) -> idbase:
+    return AuthorizedRow(privilege, model)
