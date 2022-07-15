@@ -1,13 +1,12 @@
 // eslint-disable @typescript-eslint/explicit-member-accessibility
 import ListItemText from "@material-ui/core/ListItemText";
-import { List } from "czifui";
+import { Icon, List } from "czifui";
 import React from "react";
 import { SampleFiltering } from "../SampleFiltering";
 import {
   Label,
   LabelMain,
   SmallText,
-  StyledIconCheckSmall,
   StyledIconXSmall,
   StyledList,
   StyledListItem,
@@ -52,7 +51,7 @@ export const RadioLabelOverview = ({
           <StyledList>
             <StyledListItem>
               <StyledListItemIcon>
-                <StyledIconCheckSmall />
+                <Icon sdsIcon="check" sdsSize="xs" sdsType="static" />
               </StyledListItemIcon>
               <ListItemText>
                 <SmallText>
@@ -64,7 +63,7 @@ export const RadioLabelOverview = ({
             </StyledListItem>
             <StyledListItem>
               <StyledListItemIcon>
-                <StyledIconCheckSmall />
+                <Icon sdsIcon="check" sdsSize="xs" sdsType="static" />
               </StyledListItemIcon>
               <ListItemText>
                 <SmallText>
@@ -74,7 +73,7 @@ export const RadioLabelOverview = ({
             </StyledListItem>
             <StyledListItem>
               <StyledListItemIcon>
-                <StyledIconCheckSmall />
+                <Icon sdsIcon="check" sdsSize="xs" sdsType="static" />
               </StyledListItemIcon>
               <ListItemText>
                 <SmallText>
@@ -115,7 +114,7 @@ export const RadioLabelTargeted = ({
         <List>
           <StyledListItem>
             <StyledListItemIcon>
-              <StyledIconCheckSmall />
+              <Icon sdsIcon="check" sdsSize="xs" sdsType="static" />
             </StyledListItemIcon>
             <ListItemText>
               <SmallText>
@@ -125,7 +124,7 @@ export const RadioLabelTargeted = ({
           </StyledListItem>
           <StyledListItem>
             <StyledListItemIcon>
-              <StyledIconCheckSmall />
+              <Icon sdsIcon="check" sdsSize="xs" sdsType="static" />
             </StyledListItemIcon>
             <ListItemText>
               <SmallText>
@@ -165,7 +164,7 @@ export const RadioLabelNonContextualized = ({
           <List>
             <StyledListItem>
               <StyledListItemIcon>
-                <StyledIconCheckSmall />
+                <Icon sdsIcon="check" sdsSize="xs" sdsType="static" />
               </StyledListItemIcon>
               <ListItemText>
                 <SmallText>
@@ -175,7 +174,7 @@ export const RadioLabelNonContextualized = ({
             </StyledListItem>
             <StyledListItem>
               <StyledListItemIcon>
-                <StyledIconCheckSmall />
+                <Icon sdsIcon="check" sdsSize="xs" sdsType="static" />
               </StyledListItemIcon>
               <ListItemText>
                 <SmallText>

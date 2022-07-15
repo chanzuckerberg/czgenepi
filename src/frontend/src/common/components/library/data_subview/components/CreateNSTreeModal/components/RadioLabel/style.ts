@@ -7,7 +7,6 @@ import {
   getFontWeights,
   getSpaces,
 } from "czifui";
-import IconCheckSmall from "src/common/icons/IconCheckSmall.svg";
 import IconCloseSmall from "src/common/icons/IconCloseSmall.svg";
 
 export const Label = styled.div`
@@ -78,16 +77,6 @@ const smallIconSize = `
   width: 14px;
   height: 14px;
   transform: scale(0.7);
-`;
-
-export const StyledIconCheckSmall = styled(IconCheckSmall)`
-  ${smallIconSize}
-  ${(props) => {
-    const colors = getColors(props);
-    return `
-      fill: ${colors?.primary[400]};
-    `;
-  }}
 `;
 
 export const StyledIconXSmall = styled(IconCloseSmall)`
