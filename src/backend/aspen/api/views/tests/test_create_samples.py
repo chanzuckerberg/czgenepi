@@ -69,7 +69,7 @@ async def test_samples_create_view_pass_no_public_id(
     ]
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        "/v2/samples/",
+        f"/v2/orgs/{group.id}/samples/",
         json=data,
         headers=auth_headers,
     )
@@ -110,6 +110,46 @@ async def test_samples_create_view_pass_no_public_id(
     assert sample_1.uploaded_pathogen_genome.num_missing_alleles == 1
 
 
+async def test_authz_failure(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+):
+    no_access_group = group_factory(name="Unauthorized")
+    group = group_factory()
+    user = await userrole_factory(async_session, group)
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
+    async_session.add(no_access_group)
+    async_session.add(group)
+    async_session.add(location)
+    await async_session.commit()
+    test_date = datetime.datetime.now()
+
+    data = [
+        {
+            "sample": {
+                "private_identifier": "private",
+                "public_identifier": "public",
+                "collection_date": format_date(test_date),
+                "location_id": location.id,
+                "private": True,
+            },
+            "pathogen_genome": {
+                "sequence": VALID_SEQUENCE,
+                "sequencing_date": "",
+            },
+        },
+    ]
+    auth_headers = {"user_id": user.auth0_user_id}
+    res = await http_client.post(
+        f"/v2/orgs/{no_access_group.id}/samples/",
+        json=data,
+        headers=auth_headers,
+    )
+    assert res.status_code == 403
+
+
 async def test_stripping_whitespace(
     async_session: AsyncSession,
     http_client: AsyncClient,
@@ -141,7 +181,7 @@ async def test_stripping_whitespace(
     ]
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        "/v2/samples/",
+        f"/v2/orgs/{group.id}/samples/",
         json=data,
         headers=auth_headers,
     )
@@ -213,7 +253,7 @@ async def test_samples_create_view_pass_no_sequencing_date(
     ]
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        "/v2/samples/",
+        f"/v2/orgs/{group.id}/samples/",
         json=data,
         headers=auth_headers,
     )
@@ -289,7 +329,7 @@ async def test_samples_create_view_invalid_sequence(
     ]
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        "/v2/samples/",
+        f"/v2/orgs/{group.id}/samples/",
         json=data,
         headers=auth_headers,
     )
@@ -354,7 +394,7 @@ async def test_samples_create_view_fail_duplicate_ids(
     ]
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        "/v2/samples/",
+        f"/v2/orgs/{group.id}/samples/",
         json=data,
         headers=auth_headers,
     )
@@ -413,7 +453,7 @@ async def test_samples_create_view_fail_duplicate_ids_in_request_data(
     ]
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        "/v2/samples/",
+        f"/v2/orgs/{group.id}/samples/",
         json=data,
         headers=auth_headers,
     )
@@ -463,7 +503,7 @@ async def test_samples_create_view_fail_missing_required_fields(
     ]
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        "/v2/samples/",
+        f"/v2/orgs/{group.id}/samples/",
         json=data,
         headers=auth_headers,
     )

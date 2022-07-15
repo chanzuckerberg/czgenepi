@@ -74,22 +74,28 @@ async def create_phylotree_with_inputs(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    sample = sample_factory(
-        owner_group,
-        user,
-        location,
-        public_identifier=str(uuid.uuid4()),
-        private_identifier=str(uuid.uuid4()),
-    )
-    input_entity = uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
+    samples = []
+    input_entities = []
+    for i in range(3):
+        sample = sample_factory(
+            owner_group,
+            user,
+            location,
+            public_identifier=str(uuid.uuid4()),
+            private_identifier=str(uuid.uuid4()),
+        )
+        input_entity = uploaded_pathogen_genome_factory(
+            sample, sequence="ATGCAAAAAA" * i
+        )
+        samples.append(sample)
+        input_entities.append(input_entity)
 
     db_gisaid_samples = ["gisaid_identifier", "hCoV-19/gisaid_identifier2"]
     phylo_run = phylorun_factory(
         owner_group,
-        inputs=[input_entity],
+        inputs=input_entities,
         gisaid_ids=db_gisaid_samples,
     )
-    samples = [sample]
     phylo_tree = phylotree_factory(
         phylo_run,
         samples,
@@ -131,7 +137,7 @@ async def create_phylotree(
 
     async_session.add_all([phylo_tree, owner_group, owner_group])
     await async_session.commit()
-    return user, phylo_tree, samples
+    return user, owner_group, phylo_tree, samples
 
 
 async def test_tree_metadata_download(
@@ -142,11 +148,14 @@ async def test_tree_metadata_download(
     """
     Test a regular tsv download for a sample submitted by the user's group
     """
-    user, phylo_tree, samples = await create_phylotree(mock_s3_resource, async_session)
+    user, group, phylo_tree, samples = await create_phylotree(
+        mock_s3_resource, async_session
+    )
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     res = await http_client.get(
-        f"/v2/phylo_trees/{phylo_tree.entity_id}/sample_ids", headers=auth_headers
+        f"/v2/orgs/{group.id}/phylo_trees/{phylo_tree.entity_id}/sample_ids",
+        headers=auth_headers,
     )
     expected_filename = f"{phylo_tree.id}_sample_ids.tsv"
     expected_document = "Sample Identifier\tSelected\r\n" "root_identifier_1	no\r\n"
@@ -194,16 +203,20 @@ async def test_private_id_matrix(
     matrix = [
         {
             "user": noaccess_user,
+            "group": noaccess_group,
             "expected_status": 400,
             "expected_data": f'{{"error":"PhyloTree with id {phylo_tree.id} not viewable by user"}}',
         },
         {
             "user": viewer_user,
+            "group": viewer_group,
             "expected_status": 200,
             "expected_data": (
                 "Sample Identifier\tSelected\r\n"
                 f"root_identifier_1	no\r\n"
                 f"{samples[0].public_identifier}	yes\r\n"
+                f"{samples[1].public_identifier}	yes\r\n"
+                f"{samples[2].public_identifier}	yes\r\n"
                 f"gisaid_identifier	yes\r\n"
                 f"GISAID_identifier2	yes\r\n"
             ),
@@ -213,7 +226,8 @@ async def test_private_id_matrix(
         user = case["user"]
         auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
         res = await http_client.get(
-            f"/v2/phylo_trees/{phylo_tree.entity_id}/sample_ids", headers=auth_headers
+            f"/v2/orgs/{case['group'].id}/phylo_trees/{phylo_tree.entity_id}/sample_ids",
+            headers=auth_headers,
         )
         assert res.status_code == case["expected_status"]
         file_contents = str(res.content, encoding="UTF-8")
@@ -228,7 +242,7 @@ async def test_tree_metadata_replaces_all_ids(
     """
     Test a regular tsv download for a sample submitted by the user's group
     """
-    user, phylo_tree, samples = await create_phylotree(
+    user, group, phylo_tree, samples = await create_phylotree(
         mock_s3_resource, async_session, True
     )
 
@@ -251,7 +265,8 @@ async def test_tree_metadata_replaces_all_ids(
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     res = await http_client.get(
-        f"/v2/phylo_trees/{phylo_tree.entity_id}/sample_ids", headers=auth_headers
+        f"/v2/orgs/{group.id}/phylo_trees/{phylo_tree.entity_id}/sample_ids",
+        headers=auth_headers,
     )
     assert res.status_code == 200
     expected_data = (
@@ -272,7 +287,7 @@ async def test_public_tree_metadata_replaces_all_ids(
     """
     Test a regular tsv download for public identifiers
     """
-    user, phylo_tree, samples = await create_phylotree(
+    user, group, phylo_tree, samples = await create_phylotree(
         mock_s3_resource, async_session, True
     )
 
@@ -295,7 +310,7 @@ async def test_public_tree_metadata_replaces_all_ids(
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     res = await http_client.get(
-        f"/v2/phylo_trees/{phylo_tree.entity_id}/sample_ids?id_style=public",
+        f"/v2/orgs/{group.id}/phylo_trees/{phylo_tree.entity_id}/sample_ids?id_style=public",
         headers=auth_headers,
     )
     assert res.status_code == 200
@@ -307,3 +322,35 @@ async def test_public_tree_metadata_replaces_all_ids(
     )
     file_contents = str(res.content, encoding="UTF-8")
     assert file_contents == expected_data
+
+
+async def test_download_samples_unauthorized(
+    mock_s3_resource: boto3.resource,
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+):
+    """
+    Test downloading samples for a tree you don't have access to.
+    """
+    user, group, phylo_tree, samples = await create_phylotree(
+        mock_s3_resource, async_session, True
+    )
+
+    noaccess_group = group_factory(name="meanie")
+    noaccess_user = await userrole_factory(
+        async_session,
+        noaccess_group,
+        auth0_user_id="meanie",
+        email="meanie@czgenepi.org",
+    )
+    async_session.add(noaccess_user)
+    async_session.add(noaccess_group)
+    await async_session.commit()
+    await async_session.flush()
+
+    auth_headers = {"name": noaccess_user.name, "user_id": noaccess_user.auth0_user_id}
+    res = await http_client.get(
+        f"/v2/orgs/{group.id}/phylo_trees/{phylo_tree.entity_id}/sample_ids?id_style=public",
+        headers=auth_headers,
+    )
+    assert res.status_code == 403

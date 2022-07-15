@@ -23,13 +23,18 @@ TEST_TREE = {
         "colorings": [],
     },
     "tree": {
-        "name": "public_identifier_1",
+        "name": "public_identifier_0",
         "children": [
-            {"name": "public_identifier_2"},
-            {"name": "public_identifier_3"},
+            {"name": "public_identifier_can_see_0"},
+            {"name": "public_identifier_can_see_1"},
             {
-                "name": "public_identifier_4",
-                "children": [{"name": "public_identifier_5"}],
+                "name": "public_identifier_wrong_0",
+                "children": [
+                    {"name": "public_identifier_1"},
+                    {"name": "public_identifier_wrong_1"},
+                    {"name": "public_identifier_nosee_0"},
+                    {"name": "public_identifier_nosee_1"},
+                ],
             },
         ],
     },
@@ -65,39 +70,51 @@ async def test_phylo_tree_rename(
         "North America", "USA", "California", "Santa Barbara County"
     )
 
-    local_sample = sample_factory(
-        viewer_group,
-        user,
-        location,
-        private_identifier="private_identifier_1",
-        public_identifier="public_identifier_1",
-    )
+    local_samples = [
+        sample_factory(
+            viewer_group,
+            user,
+            location,
+            private_identifier=f"private_identifier_{i}",
+            public_identifier=f"public_identifier_{i}",
+        )
+        for i in range(2)
+    ]
     # NOTE - our test user *can see* private identifiers for samples from this group!
-    can_see_sample = sample_factory(
-        can_see_group,
-        user,
-        location,
-        private_identifier="private_identifier_2",
-        public_identifier="public_identifier_2",
-    )
-    wrong_can_see_sample = sample_factory(
-        wrong_can_see_group,
-        user,
-        location,
-        private_identifier="private_identifer_3",
-        public_identifier="public_identifier_3",
-    )
-    no_can_see_sample = sample_factory(
-        no_can_see_group,
-        user,
-        location,
-        private_identifier="private_identifer_4",
-        public_identifier="public_identifier_4",
-    )
+    can_see_samples = [
+        sample_factory(
+            can_see_group,
+            user,
+            location,
+            private_identifier=f"private_identifier_can_see_{i}",
+            public_identifier=f"public_identifier_can_see_{i}",
+        )
+        for i in range(2)
+    ]
+    wrong_can_see_samples = [
+        sample_factory(
+            wrong_can_see_group,
+            user,
+            location,
+            private_identifier=f"private_identifer_wrong_{i}",
+            public_identifier=f"public_identifier_wrong_{i}",
+        )
+        for i in range(2)
+    ]
+    no_can_see_samples = [
+        sample_factory(
+            no_can_see_group,
+            user,
+            location,
+            private_identifier=f"private_identifer_nosee_{i}",
+            public_identifier=f"public_identifier_nosee_{i}",
+        )
+        for i in range(2)
+    ]
 
     phylo_tree = phylotree_factory(
         phylorun_factory(viewer_group),
-        [local_sample, can_see_sample, wrong_can_see_sample, no_can_see_sample],
+        local_samples + can_see_samples + wrong_can_see_samples + no_can_see_samples,
     )
 
     # Create the bucket if it doesn't exist in localstack.
@@ -122,14 +139,28 @@ async def test_phylo_tree_rename(
 
     tree = result.json()
     assert tree["tree"] == {
-        "name": "private_identifier_1",
-        "GISAID_ID": "public_identifier_1",
+        "name": "private_identifier_0",
+        "GISAID_ID": "public_identifier_0",
         "children": [
-            {"GISAID_ID": "public_identifier_2", "name": "private_identifier_2"},
-            {"name": "public_identifier_3"},
             {
-                "name": "public_identifier_4",
-                "children": [{"name": "public_identifier_5"}],
+                "GISAID_ID": "public_identifier_can_see_0",
+                "name": "private_identifier_can_see_0",
+            },
+            {
+                "GISAID_ID": "public_identifier_can_see_1",
+                "name": "private_identifier_can_see_1",
+            },
+            {
+                "name": "public_identifier_wrong_0",
+                "children": [
+                    {
+                        "GISAID_ID": "public_identifier_1",
+                        "name": "private_identifier_1",
+                    },
+                    {"name": "public_identifier_wrong_1"},
+                    {"name": "public_identifier_nosee_0"},
+                    {"name": "public_identifier_nosee_1"},
+                ],
             },
         ],
     }

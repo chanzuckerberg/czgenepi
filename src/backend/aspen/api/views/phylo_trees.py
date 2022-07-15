@@ -70,7 +70,6 @@ async def _get_selected_samples(db: AsyncSession, phylo_tree_id: int):
         sample = uploaded_pathogen_genome.sample
         selected_samples.add(prefix_regex.sub("", sample.public_identifier))
         selected_samples.add(sample.private_identifier)
-    print(selected_samples)
     return selected_samples
 
 
