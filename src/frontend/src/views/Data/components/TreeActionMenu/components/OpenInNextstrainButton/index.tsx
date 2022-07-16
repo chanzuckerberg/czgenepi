@@ -1,9 +1,7 @@
-import { Tooltip } from "czifui";
+import { Icon, IconButton, Tooltip } from "czifui";
 import React, { useState } from "react";
 import { TREE_STATUS } from "src/common/constants/types";
-import OpenInNewIcon from "src/common/icons/IconOpenSmall.svg";
 import NextstrainConfirmationModal from "../../../NextstrainConfirmationModal";
-import { StyledIcon } from "../../style";
 
 interface Props {
   item: PhyloRun;
@@ -35,9 +33,15 @@ const OpenInNextstrainButton = ({ item }: Props): JSX.Element => {
         }
         placement="top"
       >
-        <StyledIcon onClick={handleClickOpen} disabled={isDisabled}>
-          <OpenInNewIcon />
-        </StyledIcon>
+        <IconButton
+          aria-label="view in Nextstrain"
+          disabled={isDisabled}
+          onClick={handleClickOpen}
+          sdsSize="small"
+          sdsType="primary"
+        >
+          <Icon sdsIcon="open" sdsSize="s" sdsType="iconButton" />
+        </IconButton>
       </Tooltip>
       {treeId && (
         <NextstrainConfirmationModal
