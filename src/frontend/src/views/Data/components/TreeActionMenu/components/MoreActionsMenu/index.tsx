@@ -1,9 +1,7 @@
-import { Menu, MenuItem, Tooltip } from "czifui";
+import { Icon, IconButton, Menu, MenuItem, Tooltip } from "czifui";
 import React, { MouseEventHandler, useState } from "react";
 import { TREE_STATUS } from "src/common/constants/types";
-import { Icon, IconButton } from "czifui";
 import { StyledEditIcon, StyledTrashIcon } from "src/common/styles/iconStyle";
-import { StyledIcon, StyledIconWrapper } from "../../style";
 import { StyledText } from "./style";
 
 interface Props {
@@ -59,7 +57,7 @@ const MoreActionsMenu = ({
         placement="top"
       >
         <IconButton
-          aria-label="tree actions" // TODO: it would be helpful for this to indicate which tree it's for
+          aria-label="more actions" // TODO: it would be helpful for this to indicate which tree it's for
           disabled={isDisabled}
           onClick={handleClick}
           sdsSize="small"

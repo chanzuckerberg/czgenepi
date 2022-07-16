@@ -7,6 +7,8 @@ export interface ExtraProps extends CommonThemeProps {
 
 const doNotForwardProps = ["disabled"];
 
+// TODO BEFORE MERGE! Remove these!
+
 // This wrapper appropriately places a gap between the top of the menu
 // and the icon that it is anchored to
 export const StyledIconWrapper = styled.div`
