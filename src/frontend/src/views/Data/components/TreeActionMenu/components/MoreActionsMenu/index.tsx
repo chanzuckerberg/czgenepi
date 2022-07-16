@@ -1,7 +1,7 @@
 import { Menu, MenuItem, Tooltip } from "czifui";
 import React, { MouseEventHandler, useState } from "react";
 import { TREE_STATUS } from "src/common/constants/types";
-import MoreActionsIcon from "src/common/icons/IconDotsHorizontal3Large.svg";
+import { Icon, IconButton } from "czifui";
 import { StyledEditIcon, StyledTrashIcon } from "src/common/styles/iconStyle";
 import { StyledIcon, StyledIconWrapper } from "../../style";
 import { StyledText } from "./style";
@@ -58,11 +58,15 @@ const MoreActionsMenu = ({
         title={tooltipText}
         placement="top"
       >
-        <StyledIconWrapper onClick={handleClick}>
-          <StyledIcon disabled={isDisabled}>
-            <MoreActionsIcon />
-          </StyledIcon>
-        </StyledIconWrapper>
+        <IconButton
+          aria-label="tree actions" // TODO: it would be helpful for this to indicate which tree it's for
+          disabled={isDisabled}
+          onClick={handleClick}
+          sdsSize="small"
+          sdsType="primary"
+        >
+          <Icon sdsIcon="dotsHorizontal" sdsSize="s" sdsType="iconButton" />
+        </IconButton>
       </Tooltip>
       {open && (
         <Menu
