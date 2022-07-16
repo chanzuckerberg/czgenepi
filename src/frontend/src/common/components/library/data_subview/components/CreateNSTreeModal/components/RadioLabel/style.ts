@@ -1,13 +1,6 @@
 import styled from "@emotion/styled";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
-import {
-  fontBodyXxs,
-  fontHeaderS,
-  getColors,
-  getFontWeights,
-  getSpaces,
-} from "czifui";
-import IconCloseSmall from "src/common/icons/IconCloseSmall.svg";
+import { fontBodyXxs, fontHeaderS, getFontWeights, getSpaces } from "czifui";
 
 export const Label = styled.div`
   ${(props) => {
