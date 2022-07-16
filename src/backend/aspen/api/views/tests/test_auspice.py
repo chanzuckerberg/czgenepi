@@ -136,7 +136,7 @@ async def test_tampered_magic_link(
     magic_link = generate_response["url"]
 
     # Now we tamper with the link! We want to see a different tree!
-    payload_plus_tag = magic_link.removeprefix("test/v2/auspice/access/")
+    payload_plus_tag = magic_link.removeprefix("test/v2/orgs/1/auspice/access/")
     payload, tag = payload_plus_tag.split(".")
     decoded_payload = urlsafe_b64decode(payload).decode("utf8")
     recovered_payload = json.loads(decoded_payload)
