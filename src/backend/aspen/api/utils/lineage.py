@@ -13,6 +13,11 @@ NEXTSTRAIN_LINEAGE_MAP = {
     "BA.5*": "22B",
 }
 
+WHO_LINEAGE_MAP = {
+    "Delta": ["B.1.617.2*", "AY*"],
+    "Omicron": ["B.1.1.529*", "BA*"],
+}
+
 
 async def expand_lineage_wildcards(db: AsyncSession, lineage_list: List[str]):
     """
@@ -32,11 +37,19 @@ async def expand_lineage_wildcards(db: AsyncSession, lineage_list: List[str]):
     result = await db.execute(all_lineages_query)
     all_lineages = set(result.scalars().all())
 
-    expanded_lineage_list = set()
+    # Expand WHO aliases
+    who_mapped_lineage_list = []
     for entry in lineage_list:
+        if entry in WHO_LINEAGE_MAP:
+            who_mapped_lineage_list.extend(WHO_LINEAGE_MAP[entry])
+        else:
+            who_mapped_lineage_list.append(entry)
+
+    expanded_lineage_list = set()
+    for entry in who_mapped_lineage_list:
         # strip any tacked-on identifiers like "21K"
         base_entry = entry.partition(" ")[0]
-
+        # Check for a wildcard entry
         wildcard_base_match = re.match(r".+(?=\*$)", base_entry)
         if not wildcard_base_match:
             expanded_lineage_list.add(entry)
@@ -45,5 +58,4 @@ async def expand_lineage_wildcards(db: AsyncSession, lineage_list: List[str]):
         for lineage in all_lineages:
             if lineage == wildcard_base or lineage.startswith(f"{wildcard_base}."):
                 expanded_lineage_list.add(lineage)
-
     return list(expanded_lineage_list)

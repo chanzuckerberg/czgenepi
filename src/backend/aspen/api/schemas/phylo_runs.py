@@ -17,7 +17,7 @@ PHYLO_TREE_TYPES = [
 class TemplateArgsRequest(BaseRequest):
     filter_start_date: Optional[datetime.date]
     filter_end_date: Optional[datetime.date]
-    filter_pango_lineages: Optional[List[constr(regex=r"^[0-9A-Z. *\/]+$")]]  # type: ignore # noqa
+    filter_pango_lineages: Optional[List[constr(regex=r"^[0-9A-Za-z. *\/]+$")]]  # type: ignore # noqa
 
 
 class PhyloRunRequest(BaseRequest):
