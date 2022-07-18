@@ -3,6 +3,7 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.test_infra.models.gisaid_metadata import gisaid_metadata_factory
+from aspen.test_infra.models.lineage import pango_lineage_factory
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
@@ -442,3 +443,63 @@ async def test_create_phylo_run_unauthorized(
         f"/v2/orgs/{group.id}/phylo_runs/", json=data, headers=auth_headers
     )
     assert res.status_code == 403
+
+
+async def test_create_phylo_run_with_lineage_aliases(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+):
+    TEST_LINEAGES = [
+        # Delta lineages
+        "B.1.617.2",
+        "AY.1",
+        "AY.2",
+        # Omicron lineages
+        "B.1.1.529",
+        "BA.1",
+        "BA.1.1",
+        "BA.2",
+        "BA.3",
+        "BA.4",
+        "BA.5",
+        # Other
+        "B.1.1.7",
+    ]
+    pango_lineages = []
+    for lineage in TEST_LINEAGES:
+        pango_lineages.append(pango_lineage_factory(lineage))
+
+    group = group_factory()
+    user = await userrole_factory(async_session, group)
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
+    sample = sample_factory(group, user, location)
+    gisaid_dump = aligned_gisaid_dump_factory()
+    uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
+    async_session.add(group)
+    async_session.add(gisaid_dump)
+    async_session.add_all(pango_lineages)
+    await async_session.commit()
+
+    auth_headers = {"user_id": user.auth0_user_id}
+    data = {
+        "name": "test phylorun",
+        "tree_type": "targeted",
+        "samples": [sample.public_identifier],
+        "template_args": {"filter_pango_lineages": ["Delta", "BA.1* / 21K", "B.1.1.7"]},
+    }
+    res = await http_client.post("/v2/phylo_runs/", json=data, headers=auth_headers)
+    assert res.status_code == 200
+    response = res.json()
+
+    assert response["workflow_status"] == "STARTED"
+    assert response["group"]["name"] == group.name
+    assert response["user"]["name"] == user.name
+    assert response["user"]["id"] == user.id
+    assert "id" in response
+
+    assert "filter_pango_lineages" in response["template_args"]
+    submitted_lineages = set(response["template_args"]["filter_pango_lineages"])
+    expected_linages = set(["B.1.617.2", "AY.1", "AY.2", "BA.1", "BA.1.1", "B.1.1.7"])
+    assert len(submitted_lineages - expected_linages) == 0

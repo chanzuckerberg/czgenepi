@@ -5,6 +5,7 @@ from aspen.api.utils.gisaid import (  # noqa: F401
     get_matching_gisaid_ids,
     get_matching_gisaid_ids_by_epi_isl,
 )
+from aspen.api.utils.lineage import expand_lineage_wildcards  # noqa: F401
 from aspen.api.utils.phylo import (  # noqa: F401
     extract_accessions,
     process_phylo_tree,
