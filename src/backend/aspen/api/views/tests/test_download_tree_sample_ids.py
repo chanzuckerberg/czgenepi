@@ -247,7 +247,7 @@ async def test_tree_metadata_replaces_all_ids(
     )
 
     extra_sample = sample_factory(
-        user.group,
+        group,
         user,
         samples[0].collection_location,
         public_identifier=str(uuid.uuid4()),
@@ -292,7 +292,7 @@ async def test_public_tree_metadata_replaces_all_ids(
     )
 
     extra_sample = sample_factory(
-        user.group,
+        group,
         user,
         samples[0].collection_location,
         public_identifier=str(uuid.uuid4()),

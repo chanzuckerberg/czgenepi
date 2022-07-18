@@ -2,6 +2,8 @@ from splitio import get_factory
 from splitio.client.client import Client as SplitioClient
 from splitio.exceptions import TimeoutException
 
+from aspen.database.models import Group, User
+
 
 class SplitClient:
     split_config = {
@@ -22,11 +24,13 @@ class SplitClient:
         self.split_factory = factory
         self.split_client: SplitioClient = factory.client()
 
-    def generate_parameters(self, user):
-        user_parameters = {"user_id": user.id, "group_id": user.group.id}
+    def generate_parameters(self, user, group):
+        user_parameters = {"user_id": user.split_id, "group_id": group.id}
         return user_parameters
 
-    def get_flag(self, user, treatment):
-        parameters = self.generate_parameters(user)
-        treatment = self.split_client.get_treatment(user.id, treatment, parameters)
+    def get_flag(self, user: User, group: Group, treatment):
+        parameters = self.generate_parameters(user, group)
+        treatment = self.split_client.get_treatment(
+            user.split_id, treatment, parameters
+        )
         return treatment

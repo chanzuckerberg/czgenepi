@@ -134,7 +134,8 @@ async def test_phylo_tree_rename(
 
     auth_headers = {"user_id": user.auth0_user_id}
     result = await http_client.get(
-        f"/v2/phylo_trees/{phylo_tree.entity_id}/download", headers=auth_headers
+        f"/v2/orgs/{viewer_group.id}/phylo_trees/{phylo_tree.entity_id}/download",
+        headers=auth_headers,
     )
 
     tree = result.json()

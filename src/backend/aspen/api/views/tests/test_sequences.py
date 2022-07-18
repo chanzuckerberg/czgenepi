@@ -43,7 +43,7 @@ async def test_prepare_sequences_download(
         f"/v2/orgs/{group.id}/sequences/", headers=auth_headers, json=data
     )
     assert res.status_code == 200
-    expected_filename = f"{user.group.name}_sample_sequences.fasta"
+    expected_filename = f"{group.name}_sample_sequences.fasta"
     assert (
         res.headers["Content-Disposition"]
         == f"attachment; filename={expected_filename}"
@@ -249,7 +249,7 @@ async def test_access_matrix(
         )
 
         assert res.status_code == 200
-        expected_filename = f"{user.group.name}_sample_sequences.fasta"
+        expected_filename = f"{viewer_group.name}_sample_sequences.fasta"
         assert (
             res.headers["Content-Disposition"]
             == f"attachment; filename={expected_filename}"
