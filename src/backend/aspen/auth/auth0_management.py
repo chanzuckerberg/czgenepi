@@ -85,20 +85,8 @@ class Auth0Client:
         return [item["name"] for item in res]
 
     @cache
-    def get_org_by_name(self, org_name: str) -> Auth0Org:
-        orgs = self.get_orgs()
-        for org in orgs:
-            if org["display_name"] == org_name:
-                return org
-        raise Exception("Organization not found")
-
-    @cache
     def get_org_by_id(self, org_id: str) -> Auth0Org:
-        orgs = self.get_orgs()
-        for org in orgs:
-            if org["id"] == org_id:
-                return org
-        raise Exception("Organization not found")
+        return self.client.organizations.get_organization(org_id)
 
     @cache
     def get_user_orgs(self, user_id: str) -> List[Auth0Org]:
