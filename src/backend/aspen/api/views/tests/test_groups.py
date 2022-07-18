@@ -6,7 +6,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from aspen.api.views.tests.data.auth0_mock_responses import (
     DEFAULT_AUTH0_INVITATION,
     DEFAULT_AUTH0_ORG,
-    DEFAULT_AUTH0_USER,
 )
 from aspen.auth.auth0_management import Auth0Client
 from aspen.test_infra.models.location import location_factory
@@ -111,9 +110,9 @@ async def test_send_group_invitations(
     async_session.add_all([group, user])
     await async_session.commit()
 
-    auth0_apiclient.get_org_by_name.return_value = DEFAULT_AUTH0_ORG  # type: ignore
-    auth0_apiclient.get_user_by_email.side_effect = [[], [], [DEFAULT_AUTH0_USER]]  # type: ignore
+    auth0_apiclient.get_org_by_id.return_value = DEFAULT_AUTH0_ORG  # type: ignore
     auth0_apiclient.invite_member.side_effect = [  # type: ignore
+        True,
         True,
         Auth0Error(True, 500, "something broke"),
     ]
@@ -121,8 +120,8 @@ async def test_send_group_invitations(
         "role": "member",
         "emails": [
             "success@onetwothree.com",
+            "success2@onetwothree.com",
             "exception@onetwothree.com",
-            "alreadyexists@onetwothree.com",
         ],
     }
     response = await http_client.post(
@@ -137,7 +136,7 @@ async def test_send_group_invitations(
     invitations = {item["email"]: item["success"] for item in resp_data["invitations"]}
     expected = {
         "success@onetwothree.com": True,
-        "alreadyexists@onetwothree.com": False,
+        "success2@onetwothree.com": True,
         "exception@onetwothree.com": False,
     }
     assert invitations == expected

@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import {
   Button,
+  Checkbox,
   fontBodyXs,
   fontHeaderL,
   fontHeaderXs,
@@ -18,11 +19,22 @@ export const ContentTitleWrapper = styled.div`
   align-items: center;
 `;
 
+export const StyledCheckbox = styled(Checkbox)`
+  ${(props) => {
+    const spaces = getSpaces(props);
+
+    return `
+      padding: 0;
+      margin-right: ${spaces?.m}px;
+    `;
+  }}
+`;
+
 export const CheckboxText = styled.div`
   ${fontBodyXs}
 
   display: flex;
-  align-items: center;
+  align-items: flex-start;
 
   &:hover {
     cursor: pointer;
@@ -30,9 +42,11 @@ export const CheckboxText = styled.div`
 
   ${(props) => {
     const colors = getColors(props);
+    const spaces = getSpaces(props);
 
     return `
       color: ${colors?.gray[600]};
+      margin-bottom: ${spaces?.m}px;
     `;
   }}
 `;

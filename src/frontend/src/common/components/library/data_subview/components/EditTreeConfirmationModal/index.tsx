@@ -1,6 +1,8 @@
 import { Button, Icon } from "czifui";
 import React, { useEffect, useState } from "react";
 import { useEditTree } from "src/common/queries/trees";
+import { useSelector } from "src/common/redux/hooks";
+import { selectCurrentGroup } from "src/common/redux/selectors";
 import BaseDialog from "src/components/BaseDialog";
 import Notification from "src/components/Notification";
 import { TreeNameInput } from "src/components/TreeNameInput";
@@ -45,7 +47,8 @@ export const EditTreeConfirmationModal = ({
     setShouldShowErrorNotification,
   ]);
 
-  const editTreeMutation = useEditTree({
+  const groupId = useSelector(selectCurrentGroup);
+  const editTreeMutation = useEditTree(groupId, {
     componentOnSuccess: () => {
       setShouldShowSuccessNotification(true);
     },

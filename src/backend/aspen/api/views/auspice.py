@@ -8,7 +8,14 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.requests import Request
 
-from aspen.api.authn import get_auth_user, magic_link_payload, MagicLinkPayload
+from aspen.api.authn import (
+    AuthContext,
+    get_auth_context,
+    get_auth_user,
+    magic_link_payload,
+    MagicLinkPayload,
+    require_group_membership,
+)
 from aspen.api.authz import AuthZSession, get_authz_session
 from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
@@ -18,7 +25,7 @@ from aspen.api.schemas.auspice import (
 )
 from aspen.api.settings import Settings
 from aspen.api.utils import process_phylo_tree, verify_and_access_phylo_tree
-from aspen.database.models import User
+from aspen.database.models import Group, User
 
 router = APIRouter()
 
@@ -34,6 +41,8 @@ async def generate_auspice_string(
     settings: Settings = Depends(get_settings),
     az: AuthZSession = Depends(get_authz_session),
     user: User = Depends(get_auth_user),
+    ac: AuthContext = Depends(get_auth_context),
+    group: Group = Depends(require_group_membership),
 ):
     request_body = await request.json()
     validated_body = GenerateAuspiceMagicLinkRequest.parse_obj(request_body)
@@ -64,7 +73,7 @@ async def generate_auspice_string(
     mac_tag = digest_maker.hexdigest()
 
     return GenerateAuspiceMagicLinkResponse(
-        url=f'{request.url.netloc}/v2/auspice/access/{message.decode("utf8")}.{mac_tag}'
+        url=f'{request.url.netloc}/v2/orgs/{ac.group.id}/auspice/access/{message.decode("utf8")}.{mac_tag}'  # type: ignore
     )
 
 

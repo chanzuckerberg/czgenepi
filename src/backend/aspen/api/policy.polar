@@ -25,7 +25,7 @@ resource Sample {
 
 resource Group {
   roles = ["admin", "viewer", "member"];
-  permissions = ["read", "write", "create_phylorun", "create_sample"];
+  permissions = ["read", "write", "create_phylorun", "create_sample", "invite_members"];
 
   # admin permissions
   "read" if "admin";
@@ -75,6 +75,9 @@ resource PhyloTree {
   "read" if "member";
   "write" if "member";
 }
+
+has_permission(ac: AuthContext, "invite_members", group: Group) if
+    has_role(ac, "admin", group) or ac.user.system_admin;
 
 has_permission(ac: AuthContext, "read", sample: Sample) if
   has_permission(ac, "read_private", sample) or (
