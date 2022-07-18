@@ -1,5 +1,7 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import { useDeletePhyloRun } from "src/common/queries/phyloRuns";
+import { selectCurrentGroup } from "src/common/redux/selectors";
 import { DeleteDialog } from "src/components/DeleteDialog";
 import Notification from "src/components/Notification";
 
@@ -19,7 +21,9 @@ const DeleteTreeConfirmationModal = ({
   const [shouldShowSuccessNotification, setShouldShowSuccessNotification] =
     useState<boolean>(false);
 
-  const deletePhyloRunMutation = useDeletePhyloRun({
+  const groupId = useSelector(selectCurrentGroup);
+
+  const deletePhyloRunMutation = useDeletePhyloRun(groupId, {
     componentOnSuccess: () => {
       setShouldShowSuccessNotification(true);
     },

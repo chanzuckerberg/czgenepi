@@ -196,7 +196,7 @@ class AuthContext:
     def __init__(
         self,
         user: User,
-        group: Group,
+        group: Optional[Group],
         user_roles: List[str],
         group_roles: List[ACGroupRole],
     ):
@@ -206,24 +206,34 @@ class AuthContext:
         self.group_roles = group_roles
 
 
-async def require_group_membership(
-    org_id: Optional[int] = None,
+async def get_group_context(
+    org_id: Optional[int] = None,  # NOTE - This comes from our route!
+    group_id: Optional[
+        int
+    ] = None,  # NOTE - This comes from our route for group endpoints!
+    user: User = Depends(get_auth_user),
+) -> Optional[int]:
+    # Look for a group context in one of these places.
+    # NOTE - user.group_id is going to go away soon but we need it temporarily.
+    group = group_id or org_id or user.group_id
+    return group
+
+
+async def get_user_roles(
+    group_id: Optional[int] = Depends(get_group_context),
     user: User = Depends(get_auth_user),
     session: AsyncSession = Depends(get_db),
 ) -> MutableSequence[UserRole]:
-    # Default to the user's old primary group if we don't get an explicit org id in the URL
-    if org_id is None:
-        org_id = user.group.id
     # Figure out whether this user is a *direct member* of the group
     # we're trying to get context for.
     query = (
         sa.select(UserRole)  # type: ignore
-        .options(
+        .options(  # type: ignore
             joinedload(UserRole.role, innerjoin=True),  # type: ignore
             joinedload(UserRole.group, innerjoin=True),  # type: ignore
         )
         .filter(UserRole.user == user)  # type: ignore
-        .filter(UserRole.group_id == org_id)  # type: ignore
+        .filter(UserRole.group_id == group_id)  # type: ignore
     )
     rolewait = await session.execute(query)
     user_roles = rolewait.unique().scalars().all()
@@ -231,37 +241,45 @@ async def require_group_membership(
 
 
 async def get_auth_context(
-    org_id: Optional[int] = None,  # NOTE - This comes from our route!
+    group_id: Optional[int] = Depends(get_group_context),
     user: User = Depends(get_auth_user),
     session: AsyncSession = Depends(get_db),
-    user_roles: MutableSequence[UserRole] = Depends(require_group_membership),
+    user_roles: MutableSequence[UserRole] = Depends(get_user_roles),
 ) -> AuthContext:
-    # TODO TODO TODO
-    # we need to be able to generate an authcontext without any
-    # org info *intentionally* for user self-management endpoints (get all my
-    # roles, change my username, etc) so we need to handle that case
     group = None
-    if org_id is None:
-        org_id = user.group.id
     roles: List[str] = []
+    groles: List[ACGroupRole] = []
+    # Figure out whether we can attach a group to this auth context
     for row in user_roles:
         roles.append(row.role.name)
         group = row.group
-    # If you don't have any roles in this group, go away
-    if not group:
-        raise ex.UnauthorizedException("not authorized")
-    query = (
-        sa.select(GroupRole)  # type: ignore
-        .options(
-            joinedload(GroupRole.role, innerjoin=True),  # type: ignore
-            joinedload(GroupRole.grantor_group, innerjoin=True),  # type: ignore
+    if group:
+        query = (
+            sa.select(GroupRole)  # type: ignore
+            .options(  # type: ignore
+                joinedload(GroupRole.role, innerjoin=True),  # type: ignore
+                joinedload(GroupRole.grantor_group, innerjoin=True),  # type: ignore
+            )
+            .filter(GroupRole.grantee_group_id == group_id)  # type: ignore
         )
-        .filter(GroupRole.grantee_group_id == org_id)  # type: ignore
-    )
-    rolewait = await session.execute(query)
-    group_roles = rolewait.unique().scalars().all()
-    groles: List[ACGroupRole] = []
-    for row in group_roles:
-        groles.append({"group_id": row.grantor_group.id, "role": row.role.name})
+        rolewait = await session.execute(query)
+        group_roles = rolewait.unique().scalars().all()
+        for row in group_roles:
+            groles.append({"group_id": row.grantor_group.id, "role": row.role.name})
+
+    # Generate an auth context with or without group info.
     ac = AuthContext(user, group, roles, groles)
     return ac
+
+
+# We *specifically* want to allow authcontexts to be generated without
+# group context in several situations, however some endpoints *require*
+# a group role, so this is here to enforce that requirement.
+# This is a *stopgap* -- it's better to integrate Oso to do endpoint-level
+# policy enforcement, which will let us check membership and access more flexibly.
+async def require_group_membership(
+    ac: AuthContext = Depends(get_auth_context),
+):
+    # If you don't have any roles in this group, go away
+    if not ac.group:
+        raise ex.UnauthorizedException("Not authorized")

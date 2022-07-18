@@ -1,4 +1,4 @@
-import { Button, Checkbox } from "czifui";
+import { Button } from "czifui";
 import NextLink from "next/link";
 import React, { useState } from "react";
 import { HeadAppTitle } from "src/common/components";
@@ -6,6 +6,7 @@ import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { useUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
+import { B } from "src/common/styles/basicStyle";
 import { pluralize } from "src/common/utils/strUtils";
 import Progress from "../common/Progress";
 import {
@@ -24,6 +25,7 @@ import {
   ContentTitle,
   ContentTitleWrapper,
   StyledButton,
+  StyledCheckbox,
 } from "./style";
 
 export default function Review({
@@ -32,15 +34,23 @@ export default function Review({
   cancelPrompt,
 }: Props): JSX.Element {
   const { data: userInfo } = useUserInfo();
+  const [isGroupConfirmationChecked, setIsGroupConfirmationChecked] =
+    useState<boolean>(false);
   const [isConsentChecked, setIsConsentChecked] = useState(false);
 
   const group = userInfo?.group;
 
   const numOfSamples = Object.keys(samples || EMPTY_OBJECT).length;
 
-  function handleConsentCheck() {
-    setIsConsentChecked((prevState: boolean) => !prevState);
-  }
+  const toggleState = (prevState: boolean) => !prevState;
+
+  const handleConsentCheck = () => {
+    setIsConsentChecked(toggleState);
+  };
+
+  const handleGroupConfCheck = () => {
+    setIsGroupConfirmationChecked(toggleState);
+  };
 
   return (
     <>
@@ -50,7 +60,7 @@ export default function Review({
           <Title>Review</Title>
           <Subtitle>
             Uploading {numOfSamples} {pluralize("Sample", numOfSamples)} to{" "}
-            {group?.name}
+            <B>{group?.name}</B>
           </Subtitle>
         </div>
         <Progress step="3" />
@@ -77,8 +87,19 @@ export default function Review({
         <Table metadata={metadata} />
 
         <CheckboxWrapper>
+          <CheckboxText onClick={handleGroupConfCheck}>
+            <StyledCheckbox
+              checked={isGroupConfirmationChecked}
+              stage={isGroupConfirmationChecked ? "checked" : "unchecked"}
+            />
+            <span>
+              I confirm that this data should be uploaded to {group?.name}, and
+              acknowledge that by uploading to this group this data will be
+              accessible to all group members.
+            </span>
+          </CheckboxText>
           <CheckboxText onClick={handleConsentCheck}>
-            <Checkbox
+            <StyledCheckbox
               checked={isConsentChecked}
               stage={isConsentChecked ? "checked" : "unchecked"}
             />
@@ -99,7 +120,7 @@ export default function Review({
           <Upload
             samples={samples}
             metadata={metadata}
-            isDisabled={!isConsentChecked}
+            isDisabled={!isGroupConfirmationChecked || !isConsentChecked}
             cancelPrompt={cancelPrompt}
           />
           <NextLink href={ROUTES.UPLOAD_STEP2} passHref>

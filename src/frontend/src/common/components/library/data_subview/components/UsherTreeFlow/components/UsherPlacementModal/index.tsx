@@ -8,6 +8,8 @@ import {
   getUsherOptions,
   useFastaFetch,
 } from "src/common/queries/trees";
+import { useSelector } from "src/common/redux/hooks";
+import { selectCurrentGroup } from "src/common/redux/selectors";
 import { pluralize } from "src/common/utils/strUtils";
 import Dialog from "src/components/Dialog";
 import {
@@ -110,7 +112,8 @@ export const UsherPlacementModal = ({
     setUsherDisabled(shouldDisable);
   }, [checkedSampleIds, failedSampleIds, isLoading]);
 
-  const fastaFetch = useFastaFetch({
+  const groupId = useSelector(selectCurrentGroup);
+  const fastaFetch = useFastaFetch(groupId, {
     componentOnError: () => {
       setIsLoading(false);
       onClose();

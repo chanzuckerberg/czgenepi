@@ -1,15 +1,16 @@
 import { Button, Dialog, DialogActions, DialogTitle } from "czifui";
 import { compact, filter, uniq } from "lodash";
 import React, { ChangeEvent, useState } from "react";
+import { useSelector } from "react-redux";
 import { noop } from "src/common/constants/empty";
 import {
   GREEDY_SPACES,
   INPUT_DELIMITERS_WITH_SPACE,
 } from "src/common/constants/inputDelimiters";
-import { useUserInfo } from "src/common/queries/auth";
 import { useSendGroupInvitations } from "src/common/queries/groups";
+import { FALLBACK_GROUP_ID } from "src/common/redux";
+import { selectCurrentGroup } from "src/common/redux/selectors";
 import { B } from "src/common/styles/basicStyle";
-import { getGroupIdFromUser } from "src/common/utils/userUtils";
 import { StyledNotificationContainer } from "src/components/Notification/style";
 import { FailedToSendNotification } from "./components/FailedToSendNotification";
 import { InvalidEmailError } from "./components/InvalidEmailError";
@@ -30,7 +31,11 @@ interface Props {
   open: boolean;
 }
 
-const InviteModal = ({ groupName, onClose, open }: Props): JSX.Element => {
+const InviteModal = ({
+  groupName,
+  onClose,
+  open,
+}: Props): JSX.Element | null => {
   const [inputValue, setInputValue] = useState<string>("");
   const [hasMoreThan50Invites, setHasMoreThan50Invites] =
     useState<boolean>(false);
@@ -47,8 +52,26 @@ const InviteModal = ({ groupName, onClose, open }: Props): JSX.Element => {
     []
   );
 
-  const { data: userInfo } = useUserInfo();
-  const groupId = getGroupIdFromUser(userInfo);
+  const sendInvitationMutation = useSendGroupInvitations({
+    componentOnSuccess: ({ invitations }) => {
+      // show a warning if we aren't sending invites for existing users
+      const failedInvites = filter(invitations, (i) => !i.success);
+      setFailedToSendAddresses(failedInvites.map((i) => i.email));
+      if (failedInvites.length > 0) setIsFailureNotificationOpen(true);
+
+      // show success for any invites we did send
+      const successCount = invitations.length - failedInvites.length;
+      setSentCount(successCount);
+      if (successCount > 0) setIsSuccessNotificationOpen(true);
+
+      handleClose();
+    },
+    componentOnError: noop,
+  });
+
+  // can't send invites if we don't know what group they are in
+  const groupId = useSelector(selectCurrentGroup);
+  if (groupId === FALLBACK_GROUP_ID) return null;
 
   const handleClose = () => {
     setInputValue("");
@@ -121,23 +144,6 @@ const InviteModal = ({ groupName, onClose, open }: Props): JSX.Element => {
   ];
 
   const inputIntent = invalidAddresses.length > 0 ? "error" : "default";
-
-  const sendInvitationMutation = useSendGroupInvitations({
-    componentOnSuccess: ({ invitations }) => {
-      // show a warning if we aren't sending invites for existing users
-      const failedInvites = filter(invitations, (i) => !i.success);
-      setFailedToSendAddresses(failedInvites.map((i) => i.email));
-      if (failedInvites.length > 0) setIsFailureNotificationOpen(true);
-
-      // show success for any invites we did send
-      const successCount = invitations.length - failedInvites.length;
-      setSentCount(successCount);
-      if (successCount > 0) setIsSuccessNotificationOpen(true);
-
-      handleClose();
-    },
-    componentOnError: noop,
-  });
 
   const handleFormSubmit = () => {
     const emails = getAddressArrayFromInputValue();

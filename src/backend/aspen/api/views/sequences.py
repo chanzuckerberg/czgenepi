@@ -29,7 +29,7 @@ async def prepare_sequences_download(
     ac: AuthContext = Depends(get_auth_context),
 ) -> StreamingResponse:
     # stream output file
-    fasta_filename = f"{ac.group.name}_sample_sequences.fasta"
+    fasta_filename = f"{ac.group.name}_sample_sequences.fasta"  # type: ignore
 
     async def stream_samples():
         sample_ids = request.sample_ids
@@ -66,7 +66,7 @@ async def getfastaurl(
     )
     s3_client = s3_resource.meta.client
     uuid = uuid4()
-    s3_key = f"fasta-url-files/{ac.group.name}/{uuid}.fasta"
+    s3_key = f"fasta-url-files/{ac.group.name}/{uuid}.fasta"  # type: ignore
     s3_write_fh = smart_open.open(
         f"s3://{s3_bucket}/{s3_key}", "w", transport_params=dict(client=s3_client)
     )

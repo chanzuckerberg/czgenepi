@@ -5,6 +5,8 @@ import {
   DEFAULT_HEADERS_MUTATION_OPTIONS,
   DEFAULT_POST_OPTIONS,
   DEFAULT_PUT_OPTIONS,
+  generateGroupSpecificUrl,
+  ORG_API,
 } from "../api";
 import { API_URL } from "../constants/ENV";
 import { USE_PHYLO_RUN_INFO } from "./phyloRuns";
@@ -38,12 +40,10 @@ interface CreateTreeType {
 
 type CreateTreeCallbacks = MutationCallbacks<void>;
 
-async function createTree({
-  sampleIds,
-  treeName,
-  treeType,
-  filters,
-}: CreateTreeType): Promise<unknown> {
+async function createTree(
+  groupId: number,
+  { sampleIds, treeName, treeType, filters }: CreateTreeType
+): Promise<unknown> {
   const { startDate, endDate, lineages } = filters;
   const payload: CreateTreePayload = {
     name: treeName,
@@ -56,27 +56,25 @@ async function createTree({
     },
   };
 
-  const response = await fetch(API_URL + API.PHYLO_RUNS, {
-    ...DEFAULT_POST_OPTIONS,
-    body: JSON.stringify(payload),
-  });
+  const response = await fetch(
+    API_URL + generateGroupSpecificUrl(ORG_API.PHYLO_RUNS, groupId),
+    {
+      ...DEFAULT_POST_OPTIONS,
+      body: JSON.stringify(payload),
+    }
+  );
   if (response.ok) return await response.json();
 
   throw Error(`${response.statusText}: ${await response.text()}`);
 }
 
-export function useCreateTree({
-  componentOnError,
-  componentOnSuccess,
-}: CreateTreeCallbacks): UseMutationResult<
-  unknown,
-  unknown,
-  CreateTreeType,
-  unknown
-> {
+export function useCreateTree(
+  groupId: number,
+  { componentOnError, componentOnSuccess }: CreateTreeCallbacks
+): UseMutationResult<unknown, unknown, CreateTreeType, unknown> {
   const queryClient = useQueryClient();
 
-  return useMutation(createTree, {
+  return useMutation((toMutate) => createTree(groupId, toMutate), {
     onError: componentOnError,
     onSuccess: async () => {
       await queryClient.invalidateQueries([USE_PHYLO_RUN_INFO]);
@@ -105,35 +103,33 @@ export interface FastaResponseType {
 
 type FastaFetchCallbacks = MutationCallbacks<FastaResponseType>;
 
-async function getFastaURL({
-  sampleIds,
-  downstreamConsumer,
-}: FastaRequestType): Promise<FastaResponseType> {
+async function getFastaURL(
+  groupId: number,
+  { sampleIds, downstreamConsumer }: FastaRequestType
+): Promise<FastaResponseType> {
   const payload: FastaURLPayloadType = {
     samples: sampleIds,
     // If specialty downstream consumer, set this to have FASTA generate accordingly
     // If left as undefined, will be stripped out from payload during JSON.stringify
     downstream_consumer: downstreamConsumer,
   };
-  const response = await fetch(API_URL + API.GET_FASTA_URL, {
-    ...DEFAULT_POST_OPTIONS,
-    body: JSON.stringify(payload),
-  });
+  const response = await fetch(
+    API_URL + generateGroupSpecificUrl(ORG_API.GET_FASTA_URL, groupId),
+    {
+      ...DEFAULT_POST_OPTIONS,
+      body: JSON.stringify(payload),
+    }
+  );
   if (response.ok) return await response.json();
 
   throw Error(`${response.statusText}: ${await response.text()}`);
 }
 
-export function useFastaFetch({
-  componentOnError,
-  componentOnSuccess,
-}: FastaFetchCallbacks): UseMutationResult<
-  FastaResponseType,
-  unknown,
-  FastaRequestType,
-  unknown
-> {
-  return useMutation(getFastaURL, {
+export function useFastaFetch(
+  groupId: number,
+  { componentOnError, componentOnSuccess }: FastaFetchCallbacks
+): UseMutationResult<FastaResponseType, unknown, FastaRequestType, unknown> {
+  return useMutation((toMutate) => getFastaURL(groupId, toMutate), {
     onError: componentOnError,
     onSuccess: componentOnSuccess,
   });
@@ -168,34 +164,39 @@ interface TreeEditResponseType {
 
 type TreeEditCallbacks = MutationCallbacks<TreeEditResponseType>;
 
-export async function editTree({
-  treeIdToEdit,
-  newTreeName,
-}: TreeEditRequestType): Promise<TreeEditResponseType> {
+export async function editTree(
+  groupId: number,
+  { treeIdToEdit, newTreeName }: TreeEditRequestType
+): Promise<TreeEditResponseType> {
   const payload: EditTreePayloadType = {
     name: newTreeName,
   };
-  const response = await fetch(API_URL + API.PHYLO_RUNS + treeIdToEdit, {
-    ...DEFAULT_PUT_OPTIONS,
-    ...DEFAULT_HEADERS_MUTATION_OPTIONS,
-    body: JSON.stringify(payload),
-  });
+  const response = await fetch(
+    API_URL +
+      generateGroupSpecificUrl(ORG_API.PHYLO_RUNS, groupId) +
+      treeIdToEdit,
+    {
+      ...DEFAULT_PUT_OPTIONS,
+      ...DEFAULT_HEADERS_MUTATION_OPTIONS,
+      body: JSON.stringify(payload),
+    }
+  );
 
   if (response.ok) return await response.json();
   throw Error(`${response.statusText}: ${await response.text()}`);
 }
 
-export function useEditTree({
-  componentOnError,
-  componentOnSuccess,
-}: TreeEditCallbacks): UseMutationResult<
+export function useEditTree(
+  groupId: number,
+  { componentOnError, componentOnSuccess }: TreeEditCallbacks
+): UseMutationResult<
   TreeEditResponseType,
   unknown,
   TreeEditRequestType,
   unknown
 > {
   const queryClient = useQueryClient();
-  return useMutation(editTree, {
+  return useMutation((toMutate) => editTree(groupId, toMutate), {
     onError: componentOnError,
     onSuccess: async (data) => {
       await queryClient.invalidateQueries([USE_PHYLO_RUN_INFO]);

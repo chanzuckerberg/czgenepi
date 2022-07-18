@@ -294,7 +294,7 @@ def usher():
 def get_link(ctx, sample_ids):
     api_client = ctx.obj["api_client"]
     payload = {"samples": sample_ids, "downstream_consumer": "USHER"}
-    resp = api_client.post("/v2/sequences/getfastaurl", json=payload)
+    resp = api_client.post_with_org("/v2/sequences/getfastaurl", json=payload)
     resp_info = resp.json()
     s3_url = resp_info["url"]
     print(
@@ -506,6 +506,18 @@ def phylo_trees():
     pass
 
 
+@phylo_trees.command(name="selected-samples")
+@click.argument("tree_id")
+@click.pass_context
+def selected_samples(ctx, tree_id):
+    api_client = ctx.obj["api_client"]
+    params = {}
+    resp = api_client.get_with_org(
+        f"/v2/phylo_trees/{tree_id}/sample_ids", params=params
+    )
+    print(resp.text)
+
+
 @phylo_trees.command(name="download")
 @click.argument("tree_id")
 @click.option("--public-ids/--private-ids", is_flag=True, default=False)
@@ -517,7 +529,7 @@ def download_tree(ctx, tree_id, public_ids):
         params["id_style"] = "public"
     else:
         params["id_style"] = "private"
-    resp = api_client.get(f"/v2/phylo_trees/{tree_id}/download", params=params)
+    resp = api_client.get_with_org(f"/v2/phylo_trees/{tree_id}/download", params=params)
     print(resp.text)
 
 
@@ -532,7 +544,9 @@ def get_tree_sample_ids(ctx, tree_id, public_ids):
         params["id_style"] = "public"
     else:
         params["id_style"] = "private"
-    resp = api_client.get(f"/v2/phylo_trees/{tree_id}/sample_ids", params=params)
+    resp = api_client.get_with_org(
+        f"/v2/phylo_trees/{tree_id}/sample_ids", params=params
+    )
     print(resp.text)
 
 
@@ -631,7 +645,7 @@ def list_samples(ctx):
 def download_samples(ctx, sample_ids):
     api_client = ctx.obj["api_client"]
     payload = {"requested_sequences": {"sample_ids": sample_ids}}
-    resp = api_client.post("/v2/sequences", json=payload)
+    resp = api_client.post_with_org("/v2/sequences", json=payload)
     print(resp.headers)
     print(resp.text)
 
@@ -715,7 +729,7 @@ def update_samples(
             sample["public_identifier"] = public_id
         if private_id:
             sample["private_identifier"] = private_id
-        resp = api_client.put(f"/v2/samples/", json={"samples": [sample]})
+        resp = api_client.put_with_org(f"/v2/samples/", json={"samples": [sample]})
         print(resp.text)
 
 
@@ -778,7 +792,7 @@ def create_samples(
     # Remove None fields
     print(sample)
     body = [sample]
-    resp = api_client.post("/v2/samples/", json=body)
+    resp = api_client.post_with_org("/v2/samples/", json=body)
     print(resp.text)
 
 
@@ -808,7 +822,7 @@ def start_phylo_run_v2(ctx, name, tree_type, template_args, sample_ids, show_hea
     if template_args:
         payload["template_args"] = json.loads(template_args)
     print(json.dumps(payload))
-    resp = api_client.post("/v2/phylo_runs/", json=payload)
+    resp = api_client.post_with_org("/v2/phylo_runs/", json=payload)
     if show_headers:
         print(resp.headers)
     print(resp.text)
@@ -824,7 +838,7 @@ def update_phylorun(ctx, run_id, name):
     body = {
         "name": name,
     }
-    resp = api_client.put(f"/v2/phylo_runs/{run_id}", json=body)
+    resp = api_client.put_with_org(f"/v2/phylo_runs/{run_id}", json=body)
     print(resp.headers)
     print(resp.text)
 
@@ -849,7 +863,7 @@ def validate_sample_ids(ctx, sample_ids, show_headers):
 def delete_runs(ctx, run_ids):
     api_client = ctx.obj["api_client"]
     for run_id in run_ids:
-        resp = api_client.delete(f"/v2/phylo_runs/{run_id}")
+        resp = api_client.delete_with_org(f"/v2/phylo_runs/{run_id}")
         print(resp.headers)
         print(resp.text)
 
