@@ -39,9 +39,11 @@ async def test_prepare_sequences_download(
     data = {
         "sample_ids": [sample.public_identifier],
     }
-    res = await http_client.post("/v2/sequences/", headers=auth_headers, json=data)
+    res = await http_client.post(
+        f"/v2/orgs/{group.id}/sequences/", headers=auth_headers, json=data
+    )
     assert res.status_code == 200
-    expected_filename = f"{user.group.name}_sample_sequences.fasta"
+    expected_filename = f"{group.name}_sample_sequences.fasta"
     assert (
         res.headers["Content-Disposition"]
         == f"attachment; filename={expected_filename}"
@@ -83,7 +85,9 @@ async def test_prepare_sequences_download_no_access(
     data = {
         "sample_ids": [sample.public_identifier],
     }
-    res = await http_client.post("/v2/sequences/", headers=auth_headers, json=data)
+    res = await http_client.post(
+        f"/v2/orgs/{viewer_group.id}/sequences/", headers=auth_headers, json=data
+    )
     assert res.status_code == 200
     assert res.content == b""
 
@@ -112,7 +116,9 @@ async def test_prepare_sequences_download_viewer_no_access(
     data = {
         "sample_ids": [sample.public_identifier],
     }
-    res = await http_client.post("/v2/sequences/", headers=auth_headers, json=data)
+    res = await http_client.post(
+        f"/v2/orgs/{viewer_group.id}/sequences/", headers=auth_headers, json=data
+    )
 
     assert res.status_code == 200
     assert res.content == b""
@@ -186,7 +192,9 @@ async def test_access_matrix(
     # Make sure sample owners can see their own (shared & private) samples.
     owner_headers = {"name": owner.name, "user_id": owner.auth0_user_id}
     data = {"sample_ids": [sample1.public_identifier, sample4.public_identifier]}
-    res = await http_client.post("/v2/sequences/", headers=owner_headers, json=data)
+    res = await http_client.post(
+        f"/v2/orgs/{owner_group1.id}/sequences/", headers=owner_headers, json=data
+    )
 
     assert res.status_code == 200
     file_contents = str(res.content, encoding="UTF-8")
@@ -236,10 +244,12 @@ async def test_access_matrix(
         data = {
             "sample_ids": case["samples"],
         }
-        res = await http_client.post("/v2/sequences/", headers=user_headers, json=data)
+        res = await http_client.post(
+            f"/v2/orgs/{viewer_group.id}/sequences/", headers=user_headers, json=data
+        )
 
         assert res.status_code == 200
-        expected_filename = f"{user.group.name}_sample_sequences.fasta"
+        expected_filename = f"{viewer_group.name}_sample_sequences.fasta"
         assert (
             res.headers["Content-Disposition"]
             == f"attachment; filename={expected_filename}"
