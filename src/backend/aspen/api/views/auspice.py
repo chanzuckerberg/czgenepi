@@ -73,7 +73,7 @@ async def generate_auspice_string(
     mac_tag = digest_maker.hexdigest()
 
     return GenerateAuspiceMagicLinkResponse(
-        url=f'{request.url.netloc}/v2/orgs/{ac.group.id}/auspice/access/{message.decode("utf8")}.{mac_tag}'
+        url=f'{request.url.netloc}/v2/orgs/{ac.group.id}/auspice/access/{message.decode("utf8")}.{mac_tag}'  # type: ignore
     )
 
 

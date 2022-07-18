@@ -96,7 +96,7 @@ async def test_delete_phylo_run_matrix(
         auth_headers = {"user_id": str(case["user"])}
         # We want to be able to fetch the tree that belongs to `group`
         res = await http_client.delete(
-            f"/v2/orgs/{case['group'].id}/phylo_runs/{case['tree']}",
+            f"/v2/orgs/{case['group'].id}/phylo_runs/{case['tree']}",  # type: ignore
             headers=auth_headers,
         )
         assert res.status_code == case["status_code"]
