@@ -29,7 +29,11 @@ const NextstrainConfirmationModal = ({
   const confirmButton = (
     <ConfirmButton
       treeId={treeId}
-      onClick={() => analyticsTrackEvent(EVENT_TYPES.TREE_VIEW_NEXTSTRAIN)}
+      onClick={() =>
+        analyticsTrackEvent(EVENT_TYPES.TREE_VIEW_NEXTSTRAIN, {
+          tree_id: treeId,
+        })
+      }
     />
   );
 
