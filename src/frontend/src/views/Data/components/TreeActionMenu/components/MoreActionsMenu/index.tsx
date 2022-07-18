@@ -1,7 +1,11 @@
 import { Icon, IconButton, Menu, MenuItem, Tooltip } from "czifui";
 import React, { MouseEventHandler, useState } from "react";
 import { TREE_STATUS } from "src/common/constants/types";
-import { StyledEditIcon, StyledTrashIcon } from "src/common/styles/iconStyle";
+import {
+  StyledEditIconWrapper,
+  StyledTrashIconWrapper,
+} from "src/common/styles/iconStyle";
+import { StyledMenuItemWrapper } from "src/common/styles/menuStyle";
 import { StyledText } from "./style";
 
 interface Props {
@@ -83,12 +87,20 @@ const MoreActionsMenu = ({
           getContentAnchorEl={null}
         >
           <MenuItem onClick={() => onEditTreeModalOpen(item)}>
-            <StyledEditIcon />
-            <StyledText>Edit Tree Name</StyledText>
+            <StyledMenuItemWrapper>
+              <StyledEditIconWrapper>
+                <Icon sdsIcon="edit" sdsSize="xs" sdsType="static" />
+              </StyledEditIconWrapper>
+              <StyledText>Edit Tree Name</StyledText>
+            </StyledMenuItemWrapper>
           </MenuItem>
           <MenuItem onClick={() => onDeleteTreeModalOpen(item)}>
-            <StyledTrashIcon />
-            <StyledText isWarning>Delete Tree</StyledText>
+            <StyledMenuItemWrapper>
+              <StyledTrashIconWrapper>
+                <Icon sdsIcon="trashCan" sdsSize="xs" sdsType="static" />
+              </StyledTrashIconWrapper>
+              <StyledText isWarning>Delete Tree</StyledText>
+            </StyledMenuItemWrapper>
           </MenuItem>
         </Menu>
       )}

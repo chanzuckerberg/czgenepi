@@ -1,6 +1,10 @@
-import { Menu, MenuItem, Tooltip } from "czifui";
+import { Icon, Menu, MenuItem, Tooltip } from "czifui";
 import React, { MouseEventHandler, useState } from "react";
-import { StyledEditIcon, StyledTrashIcon } from "src/common/styles/iconStyle";
+import {
+  StyledEditIconWrapper,
+  StyledTrashIconWrapper,
+} from "src/common/styles/iconStyle";
+import { StyledMenuItemWrapper } from "src/common/styles/menuStyle";
 import { StyledText } from "src/views/Data/components/TreeActionMenu/components/MoreActionsMenu/style";
 import { TooltipDescriptionText, TooltipHeaderText } from "../../style";
 import { IconButton } from "../IconButton";
@@ -88,14 +92,22 @@ const MoreActionsMenu = ({
               onClick={handleEditSamples}
               disabled={isSampleEditDisabled}
             >
-              <StyledEditIcon />
-              <StyledText>Edit Samples</StyledText>
+              <StyledMenuItemWrapper>
+                <StyledEditIconWrapper>
+                  <Icon sdsIcon="edit" sdsSize="xs" sdsType="static" />
+                </StyledEditIconWrapper>
+                <StyledText>Edit Samples</StyledText>
+              </StyledMenuItemWrapper>
             </MenuItem>
           </div>
         </Tooltip>
         <MenuItem onClick={handleDeleteSamples}>
-          <StyledTrashIcon />
-          <StyledText isWarning>Delete Samples</StyledText>
+          <StyledMenuItemWrapper>
+            <StyledTrashIconWrapper>
+              <Icon sdsIcon="trashCan" sdsSize="xs" sdsType="static" />
+            </StyledTrashIconWrapper>
+            <StyledText isWarning>Delete Samples</StyledText>
+          </StyledMenuItemWrapper>
         </MenuItem>
       </Menu>
     </>

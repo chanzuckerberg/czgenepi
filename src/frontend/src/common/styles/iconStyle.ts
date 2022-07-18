@@ -1,33 +1,30 @@
 // includes shared styles for icons
 import styled from "@emotion/styled";
-import { getColors, getIconSizes, getSpaces } from "czifui";
-import EditIcon from "src/common/icons/IconEditSmall.svg";
-import TrashIcon from "src/common/icons/IconTrashCanSmall.svg";
+import { getColors, getSpaces } from "czifui";
 
-export const StyledTrashIcon = styled(TrashIcon)`
+export const StyledEditIconWrapper = styled.div`
   ${(props) => {
-    const colors = getColors(props);
-    const iconSizes = getIconSizes(props);
     const spaces = getSpaces(props);
-
     return `
-      fill: ${colors?.error[400]};
-      height: ${iconSizes?.xs.height}px;
-      width: ${iconSizes?.xs.width}px;
       margin-right: ${spaces?.m}px;
+
     `;
   }}
+
+  svg {
+    fill: black;
+  }
 `;
 
-export const StyledEditIcon = styled(EditIcon)`
-  fill: black;
+export const StyledTrashIconWrapper = styled.div`
   ${(props) => {
-    const iconSizes = getIconSizes(props);
+    const colors = getColors(props);
     const spaces = getSpaces(props);
     return `
-      height: ${iconSizes?.xs.height}px;
-      width: ${iconSizes?.xs.width}px;
       margin-right: ${spaces?.m}px;
+      svg {
+        fill: ${colors?.error[400]};
+      }
     `;
   }}
 `;
