@@ -57,15 +57,15 @@ async def create_group(
     return GroupInfoResponse.from_orm(created_group)
 
 
-@router.get("/{row_id}/", response_model=GroupInfoResponse)
+@router.get("/{group_id}/", response_model=GroupInfoResponse)
 async def get_group_info(
-    row_id: int,
+    group_id: int,
     db: AsyncSession = Depends(get_db),
     authorized_query: Select = Depends(require_access("read", Group)),
 ) -> GroupInfoResponse:
     group_query = authorized_query.options(  # type: ignore
         joinedload(Group.default_tree_location)
-    ).where(Group.id == row_id)
+    ).where(Group.id == group_id)
     group_query_result = await db.execute(group_query)
     group = group_query_result.scalars().one_or_none()
     if not group:
@@ -73,11 +73,11 @@ async def get_group_info(
     return GroupInfoResponse.from_orm(group)
 
 
-@router.get("/{row_id}/members/", response_model=GroupMembersResponse)
+@router.get("/{group_id}/members/", response_model=GroupMembersResponse)
 async def get_group_members(
-    row_id: int,
+    group_id: int,
     db: AsyncSession = Depends(get_db),
-    group: Group = Depends(fetch_authorized_row("read", Group)),
+    group: Group = Depends(fetch_authorized_row("read", Group, "group_id")),
 ) -> GroupMembersResponse:
     members_query = (
         sa.select(User)  # type: ignore
@@ -96,15 +96,15 @@ async def get_group_members(
         member.role = next(
             user_role.role.name
             for user_role in member.user_roles
-            if user_role.group.id == row_id
+            if user_role.group.id == group_id
         )
         group_members.append(member)
     return GroupMembersResponse.parse_obj({"members": group_members})
 
 
-@router.get("/{row_id}/invitations/", response_model=InvitationsResponse)
+@router.get("/{group_id}/invitations/", response_model=InvitationsResponse)
 async def get_group_invitations(
-    group: Group = Depends(fetch_authorized_row("read", Group)),
+    group: Group = Depends(fetch_authorized_row("read", Group, "group_id")),
     auth0_client: Auth0Client = Depends(get_auth0_apiclient),
 ) -> InvitationsResponse:
     try:
@@ -115,11 +115,11 @@ async def get_group_invitations(
     return InvitationsResponse.parse_obj({"invitations": invitations})
 
 
-@router.post("/{row_id}/invitations/", response_model=GroupInvitationsResponse)
+@router.post("/{group_id}/invitations/", response_model=GroupInvitationsResponse)
 async def invite_group_members(
     group_invitation_request: GroupInvitationsRequest,
     auth0_client: Auth0Client = Depends(get_auth0_apiclient),
-    group: Group = Depends(fetch_authorized_row("invite_members", Group)),
+    group: Group = Depends(fetch_authorized_row("invite_members", Group, "group_id")),
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_auth_user),
 ) -> GroupInvitationsResponse:
