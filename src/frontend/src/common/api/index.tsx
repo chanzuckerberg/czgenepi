@@ -3,18 +3,29 @@ import { jsonToType } from "src/common/utils";
 
 export enum API {
   USERDATA = "/v2/users/me",
-  SAMPLES = "/v2/samples/",
   LOG_IN = "/v2/auth/login",
   LOG_OUT = "/v2/auth/logout",
-  PHYLO_RUNS = "/v2/phylo_runs/",
-  SAMPLES_FASTA_DOWNLOAD = "/v2/sequences/",
-  GET_FASTA_URL = "/v2/sequences/getfastaurl",
   USHER_TREE_OPTIONS = "/v2/usher/tree_versions/",
-  SAMPLES_VALIDATE_IDS = "/v2/samples/validate_ids/",
   LOCATIONS = "/v2/locations/",
   PANGO_LINEAGES = "/v2/lineages/pango",
   GROUPS = "/v2/groups/",
 }
+
+export enum ORG_API {
+  AUSPICE = "auspice/generate",
+  PHYLO_RUNS = "phylo_runs/",
+  SAMPLES = "samples/",
+  SAMPLES_VALIDATE_IDS = "samples/validate_ids/",
+  SAMPLES_FASTA_DOWNLOAD = "sequences/",
+  GET_FASTA_URL = "sequences/getfastaurl",
+}
+
+export const generateGroupSpecificUrl = (
+  path: ORG_API,
+  groupId: number
+): string => {
+  return `/v2/orgs/${groupId}/${path}`;
+};
 
 export const DEFAULT_HEADERS_MUTATION_OPTIONS: RequestInit = {
   headers: {
@@ -193,8 +204,12 @@ const SAMPLE_MAP = new Map<string, keyof Sample>([
   ["czb_failed_genome_recovery", "CZBFailedGenomeRecovery"],
 ]);
 
-export const fetchSamples = (): Promise<SampleResponse> =>
-  apiResponse<SampleResponse>(["samples"], [SAMPLE_MAP], API.SAMPLES);
+export const fetchSamples = (groupId: number): Promise<SampleResponse> =>
+  apiResponse<SampleResponse>(
+    ["samples"],
+    [SAMPLE_MAP],
+    generateGroupSpecificUrl(ORG_API.SAMPLES, groupId)
+  );
 
 export interface PhyloRunResponse extends APIResponse {
   phylo_trees: PhyloRun[];
@@ -207,9 +222,9 @@ const PHYLO_RUN_MAP = new Map<string, keyof PhyloRun>([
   ["workflow_id", "workflowId"],
   ["workflow_status", "status"],
 ]);
-export const fetchPhyloRuns = (): Promise<PhyloRunResponse> =>
+export const fetchPhyloRuns = (groupId: number): Promise<PhyloRunResponse> =>
   apiResponse<PhyloRunResponse>(
     ["phylo_runs"],
     [PHYLO_RUN_MAP],
-    API.PHYLO_RUNS
+    generateGroupSpecificUrl(ORG_API.PHYLO_RUNS, groupId)
   );

@@ -93,9 +93,13 @@ def make_all_test_data(
     return samples, uploaded_pathogen_genomes, trees, treeless_runs
 
 
-async def check_results(http_client, user: User, trees: Collection[PhyloTree]):
+async def check_results(
+    http_client, user: User, group: Group, trees: Collection[PhyloTree]
+):
     auth_headers = {"user_id": str(user.auth0_user_id)}
-    res = await http_client.get("/v2/phylo_runs/", headers=auth_headers)
+    res = await http_client.get(
+        f"/v2/orgs/{group.id}/phylo_runs/", headers=auth_headers
+    )
     results = res.json()["phylo_runs"]
 
     for tree in trees:
@@ -123,7 +127,7 @@ async def test_phylo_tree_view(
     async_session.add(group)
     await async_session.commit()
 
-    await check_results(http_client, user, trees)
+    await check_results(http_client, user, group, trees)
 
 
 async def test_in_progress_and_failed_trees(
@@ -145,7 +149,9 @@ async def test_in_progress_and_failed_trees(
     await async_session.commit()
 
     auth_headers = {"user_id": str(user.auth0_user_id)}
-    res = await http_client.get("/v2/phylo_runs/", headers=auth_headers)
+    res = await http_client.get(
+        f"/v2/orgs/{group.id}/phylo_runs/", headers=auth_headers
+    )
     results = res.json()["phylo_runs"]
 
     results_incomplete_trees = [
@@ -197,7 +203,7 @@ async def test_phylo_trees_can_see(
     async_session.add_all(role_objs)
     await async_session.commit()
 
-    await check_results(http_client, user, trees)
+    await check_results(http_client, user, viewer_group, trees)
 
 
 async def test_phylo_trees_no_can_see(
@@ -218,7 +224,7 @@ async def test_phylo_trees_no_can_see(
     await async_session.commit()
 
     auth_headers = {"user_id": str(user.auth0_user_id)}
-    res = await http_client.get("/v2/phylo_runs/", headers=auth_headers)
-    results = res.json()["phylo_runs"]
-
-    assert len(results) == 0
+    res = await http_client.get(
+        f"/v2/orgs/{owner_group.id}/phylo_runs/", headers=auth_headers
+    )
+    assert res.status_code == 403

@@ -3,6 +3,7 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.test_infra.models.gisaid_metadata import gisaid_metadata_factory
+from aspen.test_infra.models.lineage import pango_lineage_factory
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
@@ -38,7 +39,9 @@ async def test_create_phylo_run(
         "tree_type": "targeted",
         "samples": [sample.public_identifier],
     }
-    res = await http_client.post("/v2/phylo_runs/", json=data, headers=auth_headers)
+    res = await http_client.post(
+        f"/v2/orgs/{group.id}/phylo_runs/", json=data, headers=auth_headers
+    )
     assert res.status_code == 200
     response = res.json()
     assert response["template_args"] == {}
@@ -75,7 +78,9 @@ async def test_create_phylo_run_with_failed_sample(
         "tree_type": "targeted",
         "samples": [sample.public_identifier],
     }
-    res = await http_client.post("/v2/phylo_runs/", json=data, headers=auth_headers)
+    res = await http_client.post(
+        f"/v2/orgs/{group.id}/phylo_runs/", json=data, headers=auth_headers
+    )
     assert res.status_code == 400
 
 
@@ -124,7 +129,7 @@ async def test_create_phylo_run_with_invalid_args(
     for args in requests:
         request_body["template_args"] = args  # type: ignore
         res = await http_client.post(
-            "/v2/phylo_runs/", json=request_body, headers=auth_headers
+            f"/v2/orgs/{group.id}/phylo_runs/", json=request_body, headers=auth_headers
         )
         assert res.status_code == 422
 
@@ -180,7 +185,9 @@ async def test_create_phylo_run_with_template_args(
         },
     ]
     for data in requests:
-        res = await http_client.post("/v2/phylo_runs/", json=data, headers=auth_headers)
+        res = await http_client.post(
+            f"/v2/orgs/{group.id}/phylo_runs/", json=data, headers=auth_headers
+        )
         assert res.status_code == 200
         response = res.json()
         assert response["template_args"] == data["template_args"]
@@ -216,7 +223,9 @@ async def test_create_phylo_run_with_gisaid_ids(
         "tree_type": "non_contextualized",
         "samples": [sample.public_identifier, gisaid_sample.strain],
     }
-    res = await http_client.post("/v2/phylo_runs/", json=data, headers=auth_headers)
+    res = await http_client.post(
+        f"/v2/orgs/{group.id}/phylo_runs/", json=data, headers=auth_headers
+    )
     assert res.status_code == 200
     response = res.json()
     assert response["template_args"] == {}
@@ -252,7 +261,9 @@ async def test_create_phylo_run_with_epi_isls(
         "tree_type": "non_contextualized",
         "samples": [sample.public_identifier, gisaid_isl_sample.gisaid_epi_isl],
     }
-    res = await http_client.post("/v2/phylo_runs/", json=data, headers=auth_headers)
+    res = await http_client.post(
+        f"/v2/orgs/{group.id}/phylo_runs/", json=data, headers=auth_headers
+    )
     assert res.status_code == 200
     response = res.json()
     assert response["template_args"] == {}
@@ -286,7 +297,9 @@ async def test_create_invalid_phylo_run_name(
         "tree_type": "targeted",
         "samples": [sample.public_identifier],
     }
-    res = await http_client.post("/v2/phylo_runs/", json=data, headers=auth_headers)
+    res = await http_client.post(
+        f"/v2/orgs/{group.id}/phylo_runs/", json=data, headers=auth_headers
+    )
     assert res.status_code == 422
 
 
@@ -315,7 +328,9 @@ async def test_create_invalid_phylo_run_tree_type(
         "tree_type": "global",
         "samples": [sample.public_identifier],
     }
-    res = await http_client.post("/v2/phylo_runs/", json=data, headers=auth_headers)
+    res = await http_client.post(
+        f"/v2/orgs/{group.id}/phylo_runs/", json=data, headers=auth_headers
+    )
     assert res.status_code == 422
 
 
@@ -344,7 +359,9 @@ async def test_create_invalid_phylo_run_bad_sample_id(
         "tree_type": "non_contextualized",
         "samples": [sample.public_identifier, "bad_sample_identifier"],
     }
-    res = await http_client.post("/v2/phylo_runs/", json=data, headers=auth_headers)
+    res = await http_client.post(
+        f"/v2/orgs/{group.id}/phylo_runs/", json=data, headers=auth_headers
+    )
     assert res.status_code == 400
 
 
@@ -389,35 +406,100 @@ async def test_create_invalid_phylo_run_sample_cannot_see(
         "tree_type": "non_contextualized",
         "samples": [sample.public_identifier, sample2.public_identifier],
     }
-    res = await http_client.post("/v2/phylo_runs/", json=data, headers=auth_headers)
+    res = await http_client.post(
+        f"/v2/orgs/{group.id}/phylo_runs/", json=data, headers=auth_headers
+    )
     assert res.status_code == 400
 
 
-async def test_create_phylo_run_unauthorized_access_redirect(
+async def test_create_phylo_run_unauthorized(
     async_session: AsyncSession,
     http_client: AsyncClient,
 ):
     """
-    Test a request from an outside, unauthorized source.
+    Make sure a user can't create runs in a group they don't have access to.
     """
+    group = group_factory()
+    user_group = group_factory(name="User's group")
+    user = await userrole_factory(async_session, user_group)
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
+    sample = sample_factory(group, user, location)
+    gisaid_dump = aligned_gisaid_dump_factory()
+    uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
+    async_session.add(group)
+    async_session.add(user_group)
+    async_session.add(gisaid_dump)
+    await async_session.commit()
+
+    auth_headers = {"user_id": user.auth0_user_id}
+    data = {
+        "name": "test phylorun",
+        "tree_type": "targeted",
+        "samples": [sample.public_identifier],
+    }
+    res = await http_client.post(
+        f"/v2/orgs/{group.id}/phylo_runs/", json=data, headers=auth_headers
+    )
+    assert res.status_code == 403
+
+
+async def test_create_phylo_run_with_lineage_aliases(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+):
+    TEST_LINEAGES = [
+        # Delta lineages
+        "B.1.617.2",
+        "AY.1",
+        "AY.2",
+        # Omicron lineages
+        "B.1.1.529",
+        "BA.1",
+        "BA.1.1",
+        "BA.2",
+        "BA.3",
+        "BA.4",
+        "BA.5",
+        # Other
+        "B.1.1.7",
+    ]
+    pango_lineages = []
+    for lineage in TEST_LINEAGES:
+        pango_lineages.append(pango_lineage_factory(lineage))
+
     group = group_factory()
     user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
     sample = sample_factory(group, user, location)
-
     gisaid_dump = aligned_gisaid_dump_factory()
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     async_session.add(group)
     async_session.add(gisaid_dump)
+    async_session.add_all(pango_lineages)
     await async_session.commit()
 
+    auth_headers = {"user_id": user.auth0_user_id}
     data = {
         "name": "test phylorun",
-        "tree_type": "non_contextualized",
+        "tree_type": "targeted",
         "samples": [sample.public_identifier],
+        "template_args": {"filter_pango_lineages": ["Delta", "BA.1* / 21K", "B.1.1.7"]},
     }
-    res = await http_client.post("/v2/phylo_runs/", json=data)
-    # No authorization header, so we should be prompted to log in.
-    assert res.status_code == 401
+    res = await http_client.post("/v2/phylo_runs/", json=data, headers=auth_headers)
+    assert res.status_code == 200
+    response = res.json()
+
+    assert response["workflow_status"] == "STARTED"
+    assert response["group"]["name"] == group.name
+    assert response["user"]["name"] == user.name
+    assert response["user"]["id"] == user.id
+    assert "id" in response
+
+    assert "filter_pango_lineages" in response["template_args"]
+    submitted_lineages = set(response["template_args"]["filter_pango_lineages"])
+    expected_linages = set(["B.1.617.2", "AY.1", "AY.2", "BA.1", "BA.1.1", "B.1.1.7"])
+    assert len(submitted_lineages - expected_linages) == 0

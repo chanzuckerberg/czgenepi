@@ -1,9 +1,12 @@
+import re
+
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.api.deps import get_db
 from aspen.api.schemas.pango_lineages import PangoLineagesResponse
+from aspen.api.utils.lineage import NEXTSTRAIN_LINEAGE_MAP, WHO_LINEAGE_MAP
 from aspen.database.models import PangoLineage
 
 router = APIRouter()
@@ -21,5 +24,19 @@ async def list_pango_lineages(db: AsyncSession = Depends(get_db)):
     """
     all_lineages_query = sa.select(PangoLineage.lineage)  # type: ignore
     result = await db.execute(all_lineages_query)
-    all_lineages = result.scalars().all()
-    return {"lineages": all_lineages}
+    all_lineages = set(result.scalars().all())
+
+    all_lineages.update(
+        [re.sub(r"\.[0-9]+$", "*", lineage) for lineage in all_lineages]
+    )
+    all_lineages.update(WHO_LINEAGE_MAP.keys())
+
+    all_lineages_list = [
+        f"{lineage} / {NEXTSTRAIN_LINEAGE_MAP[lineage]}"
+        if lineage in NEXTSTRAIN_LINEAGE_MAP
+        else lineage
+        for lineage in all_lineages
+    ]
+    all_lineages_list.sort()
+
+    return {"lineages": all_lineages_list}

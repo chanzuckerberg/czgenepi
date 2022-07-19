@@ -3,12 +3,13 @@ import { Alert, Tooltip } from "czifui";
 import { isEqual, noop } from "lodash";
 import React, { useCallback, useEffect, useState } from "react";
 import { CSVLink } from "react-csv";
-import { useMutation } from "react-query";
 import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import { useUserInfo } from "src/common/queries/auth";
-import { downloadSamplesFasta } from "src/common/queries/samples";
+import { useFastaDownload } from "src/common/queries/samples";
+import { useSelector } from "src/common/redux/hooks";
+import { selectCurrentGroup } from "src/common/redux/selectors";
 import { B } from "src/common/styles/basicStyle";
 import { pluralize } from "src/common/utils/strUtils";
 import Dialog from "src/components/Dialog";
@@ -95,12 +96,13 @@ const DownloadModal = ({
     onClose();
   };
 
-  const fastaDownloadMutation = useMutation(downloadSamplesFasta, {
-    onError: () => {
+  const groupId = useSelector(selectCurrentGroup);
+  const fastaDownloadMutation = useFastaDownload(groupId, {
+    componentOnError: () => {
       setShouldShowError(true);
       handleCloseModal();
     },
-    onSuccess: (data: any) => {
+    componentOnSuccess: (data: Blob) => {
       const link = document.createElement("a");
       link.href = window.URL.createObjectURL(data);
       link.download = fastaDownloadName;
