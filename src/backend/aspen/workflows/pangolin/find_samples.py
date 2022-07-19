@@ -17,7 +17,7 @@ from aspen.database.models import Sample
 
 def check_latest_pangolin_version() -> str:
     contents = urllib.request.urlopen(
-        "https://github.com/cov-lineages/pangolin-data/releases/latest"
+        "https://github.com/cov-lineages/pangoLEARN/releases/latest"
     )
     # get latest version from redirected url:
     redirected_url: str = contents.url
