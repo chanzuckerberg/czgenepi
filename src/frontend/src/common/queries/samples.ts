@@ -12,7 +12,7 @@ import {
   DEFAULT_DELETE_OPTIONS,
   DEFAULT_POST_OPTIONS,
   fetchSamples,
-  generateGroupSpecificUrl,
+  generateOrgSpecificUrl,
   ORG_API,
   putBackendApiJson,
   SampleResponse,
@@ -39,7 +39,7 @@ export async function downloadSamplesFasta({
     sample_ids: sampleIds,
   };
   const response = await fetch(
-    API_URL + generateGroupSpecificUrl(ORG_API.SAMPLES_FASTA_DOWNLOAD),
+    API_URL + generateOrgSpecificUrl(ORG_API.SAMPLES_FASTA_DOWNLOAD),
     {
       ...DEFAULT_POST_OPTIONS,
       body: JSON.stringify(payload),
@@ -80,7 +80,7 @@ export async function validateSampleIdentifiers({
   };
 
   const response = await fetch(
-    API_URL + generateGroupSpecificUrl(ORG_API.SAMPLES_VALIDATE_IDS),
+    API_URL + generateOrgSpecificUrl(ORG_API.SAMPLES_VALIDATE_IDS),
     {
       ...DEFAULT_POST_OPTIONS,
       body: JSON.stringify(payload),
@@ -186,7 +186,7 @@ export async function createSamples({
   }
 
   const response = await fetch(
-    API_URL + generateGroupSpecificUrl(ORG_API.SAMPLES),
+    API_URL + generateOrgSpecificUrl(ORG_API.SAMPLES),
     {
       ...DEFAULT_POST_OPTIONS,
       body: JSON.stringify(payload),
@@ -241,7 +241,7 @@ export async function deleteSamples({
   };
 
   const response = await fetch(
-    API_URL + generateGroupSpecificUrl(ORG_API.SAMPLES),
+    API_URL + generateOrgSpecificUrl(ORG_API.SAMPLES),
     {
       ...DEFAULT_DELETE_OPTIONS,
       body: JSON.stringify(payload),
@@ -336,7 +336,7 @@ export async function editSamples({
   samples,
 }: SamplesEditRequestType): Promise<SamplesEditResponseType[]> {
   return putBackendApiJson(
-    generateGroupSpecificUrl(ORG_API.SAMPLES),
+    generateOrgSpecificUrl(ORG_API.SAMPLES),
     JSON.stringify({ samples })
   );
 }

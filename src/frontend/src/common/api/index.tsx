@@ -11,6 +11,7 @@ export enum API {
   LOCATIONS = "/v2/locations/",
   PANGO_LINEAGES = "/v2/lineages/pango",
   GROUPS = "/v2/groups/",
+  ORGS = "/v2/orgs/",
 }
 
 export enum ORG_API {
@@ -213,7 +214,7 @@ export const fetchSamples = (): Promise<SampleResponse> =>
   apiResponse<SampleResponse>(
     ["samples"],
     [SAMPLE_MAP],
-    generateGroupSpecificUrl(ORG_API.SAMPLES)
+    generateOrgSpecificUrl(ORG_API.SAMPLES)
   );
 
 export interface PhyloRunResponse extends APIResponse {
@@ -231,5 +232,5 @@ export const fetchPhyloRuns = (): Promise<PhyloRunResponse> =>
   apiResponse<PhyloRunResponse>(
     ["phylo_runs"],
     [PHYLO_RUN_MAP],
-    generateGroupSpecificUrl(ORG_API.PHYLO_RUNS)
+    generateOrgSpecificUrl(ORG_API.PHYLO_RUNS)
   );

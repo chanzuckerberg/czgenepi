@@ -6,7 +6,11 @@ import {
   useQueryClient,
   UseQueryResult,
 } from "react-query";
-import { API, DEFAULT_FETCH_OPTIONS, DEFAULT_POST_OPTIONS } from "../api";
+import {
+  DEFAULT_FETCH_OPTIONS,
+  DEFAULT_POST_OPTIONS,
+  generateGroupSpecificUrl,
+} from "../api";
 import { API_URL } from "../constants/ENV";
 import { store } from "../redux";
 import { selectCurrentGroup } from "../redux/selectors";
@@ -91,8 +95,7 @@ export function useGroupInfo(): UseQueryResult<GroupDetails, unknown> {
 }
 
 export async function fetchGroup(): Promise<RawGroupRequest> {
-  const groupId = selectCurrentGroup(store);
-  const response = await fetch(API_URL + API.GROUPS + groupId + "/", {
+  const response = await fetch(API_URL + generateGroupSpecificUrl(""), {
     ...DEFAULT_FETCH_OPTIONS,
   });
 
@@ -125,8 +128,7 @@ export function useGroupMembersInfo(): UseQueryResult<GroupMember[], unknown> {
 }
 
 export async function fetchGroupMembers(): Promise<GroupMembersFetchResponseType> {
-  const groupId = selectCurrentGroup(store);
-  const response = await fetch(API_URL + API.GROUPS + groupId + "/members/", {
+  const response = await fetch(API_URL + generateGroupSpecificUrl("members/"), {
     ...DEFAULT_FETCH_OPTIONS,
   });
 
@@ -159,9 +161,8 @@ export function useGroupInvitations(): UseQueryResult<Invitation[], unknown> {
 }
 
 export async function fetchGroupInvitations(): Promise<FetchInvitationResponseType> {
-  const groupId = selectCurrentGroup(store);
   const response = await fetch(
-    API_URL + API.GROUPS + groupId + "/invitations/",
+    API_URL + generateGroupSpecificUrl("invitations/"),
     {
       ...DEFAULT_FETCH_OPTIONS,
     }
@@ -182,7 +183,6 @@ interface InvitationPayload {
 
 interface InvitationRequestType {
   emails: string[];
-  groupId: number;
 }
 
 interface InvitationResponseType {
@@ -203,9 +203,8 @@ async function sendGroupInvitations({
     role: "member",
   };
 
-  const groupId = selectCurrentGroup(store);
   const response = await fetch(
-    API_URL + API.GROUPS + groupId + "/invitations/",
+    API_URL + generateGroupSpecificUrl("invitations/"),
     {
       ...DEFAULT_POST_OPTIONS,
       body: JSON.stringify(payload),

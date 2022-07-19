@@ -8,7 +8,7 @@ import {
 import {
   DEFAULT_DELETE_OPTIONS,
   fetchPhyloRuns,
-  generateGroupSpecificUrl,
+  generateOrgSpecificUrl,
   ORG_API,
   PhyloRunResponse,
 } from "../api";
@@ -49,7 +49,7 @@ async function deletePhyloRun({
   phyloRunIdToDelete,
 }: PhyloRunDeleteRequestType): Promise<PhyloRunDeleteResponseType> {
   const response = await fetch(
-    API_URL + generateGroupSpecificUrl(ORG_API.PHYLO_RUNS) + phyloRunIdToDelete,
+    API_URL + generateOrgSpecificUrl(ORG_API.PHYLO_RUNS) + phyloRunIdToDelete,
     {
       ...DEFAULT_DELETE_OPTIONS,
     }

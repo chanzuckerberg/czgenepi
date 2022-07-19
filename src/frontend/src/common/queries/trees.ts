@@ -5,7 +5,7 @@ import {
   DEFAULT_HEADERS_MUTATION_OPTIONS,
   DEFAULT_POST_OPTIONS,
   DEFAULT_PUT_OPTIONS,
-  generateGroupSpecificUrl,
+  generateOrgSpecificUrl,
   ORG_API,
 } from "../api";
 import { API_URL } from "../constants/ENV";
@@ -59,7 +59,7 @@ async function createTree({
   };
 
   const response = await fetch(
-    API_URL + generateGroupSpecificUrl(ORG_API.PHYLO_RUNS),
+    API_URL + generateOrgSpecificUrl(ORG_API.PHYLO_RUNS),
     {
       ...DEFAULT_POST_OPTIONS,
       body: JSON.stringify(payload),
@@ -122,7 +122,7 @@ async function getFastaURL({
   };
 
   const response = await fetch(
-    API_URL + generateGroupSpecificUrl(ORG_API.GET_FASTA_URL),
+    API_URL + generateOrgSpecificUrl(ORG_API.GET_FASTA_URL),
     {
       ...DEFAULT_POST_OPTIONS,
       body: JSON.stringify(payload),
@@ -185,7 +185,7 @@ export async function editTree({
     name: newTreeName,
   };
   const response = await fetch(
-    API_URL + generateGroupSpecificUrl(ORG_API.PHYLO_RUNS) + treeIdToEdit,
+    API_URL + generateOrgSpecificUrl(ORG_API.PHYLO_RUNS) + treeIdToEdit,
     {
       ...DEFAULT_PUT_OPTIONS,
       ...DEFAULT_HEADERS_MUTATION_OPTIONS,
