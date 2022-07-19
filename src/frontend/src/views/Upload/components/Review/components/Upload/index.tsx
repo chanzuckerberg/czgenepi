@@ -4,8 +4,6 @@ import NextLink from "next/link";
 import React, { useState } from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { useCreateSamples } from "src/common/queries/samples";
-import { useSelector } from "src/common/redux/hooks";
-import { selectCurrentGroup } from "src/common/redux/selectors";
 import { ROUTES } from "src/common/routes";
 import Dialog from "src/components/Dialog";
 import { SampleIdToMetadata } from "src/components/WebformTable/common/types";
@@ -35,16 +33,12 @@ export default function Upload({
   cancelPrompt,
 }: Props): JSX.Element {
   const [isOpen, setIsOpen] = useState(false);
-  const groupId = useSelector(selectCurrentGroup);
 
-  const { mutate, isLoading, isSuccess, isError, error } = useCreateSamples(
-    groupId,
-    {
-      componentOnSuccess: () => {
-        cancelPrompt();
-      },
-    }
-  );
+  const { mutate, isLoading, isSuccess, isError, error } = useCreateSamples({
+    componentOnSuccess: () => {
+      cancelPrompt();
+    },
+  });
 
   return (
     <>

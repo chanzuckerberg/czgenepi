@@ -1,10 +1,8 @@
 import { Icon } from "czifui";
 import { useRouter } from "next/router";
 import React from "react";
-import { useSelector } from "react-redux";
 import { useUserInfo } from "src/common/queries/auth";
 import { useGroupInfo, useGroupMembersInfo } from "src/common/queries/groups";
-import { selectCurrentGroup } from "src/common/redux/selectors";
 import { ROUTES } from "src/common/routes";
 import { stringifyGisaidLocation } from "src/common/utils/locationUtils";
 import { pluralize } from "src/common/utils/strUtils";
@@ -32,10 +30,9 @@ const GroupDetailsDropdown = ({
 }: Props): JSX.Element | null => {
   const router = useRouter();
 
-  const groupId = useSelector(selectCurrentGroup);
   const { data: userInfo } = useUserInfo();
-  const { data: members = [] } = useGroupMembersInfo(groupId);
-  const { data: groupInfo } = useGroupInfo(groupId);
+  const { data: members = [] } = useGroupMembersInfo();
+  const { data: groupInfo } = useGroupInfo();
 
   if (!open || !userInfo || !groupInfo) return null;
 

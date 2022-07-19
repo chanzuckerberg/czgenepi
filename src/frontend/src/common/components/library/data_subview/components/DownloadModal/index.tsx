@@ -8,8 +8,6 @@ import DialogContent from "src/common/components/library/Dialog/components/Dialo
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import { useUserInfo } from "src/common/queries/auth";
 import { useFastaDownload } from "src/common/queries/samples";
-import { useSelector } from "src/common/redux/hooks";
-import { selectCurrentGroup } from "src/common/redux/selectors";
 import { B } from "src/common/styles/basicStyle";
 import { pluralize } from "src/common/utils/strUtils";
 import Dialog from "src/components/Dialog";
@@ -96,8 +94,7 @@ const DownloadModal = ({
     onClose();
   };
 
-  const groupId = useSelector(selectCurrentGroup);
-  const fastaDownloadMutation = useFastaDownload(groupId, {
+  const fastaDownloadMutation = useFastaDownload({
     componentOnError: () => {
       setShouldShowError(true);
       handleCloseModal();

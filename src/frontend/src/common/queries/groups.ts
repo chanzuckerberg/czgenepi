@@ -1,4 +1,5 @@
 import {
+  QueryClient,
   useMutation,
   UseMutationResult,
   useQuery,
@@ -7,7 +8,10 @@ import {
 } from "react-query";
 import { API, DEFAULT_FETCH_OPTIONS, DEFAULT_POST_OPTIONS } from "../api";
 import { API_URL } from "../constants/ENV";
+import { store } from "../redux";
+import { selectCurrentGroup } from "../redux/selectors";
 import { ENTITIES } from "./entities";
+import { USE_SAMPLE_INFO } from "./samples";
 import { MutationCallbacks } from "./types";
 
 export interface RawGroupRequest {
@@ -78,20 +82,16 @@ export const USE_GROUP_INFO = {
   id: "groupInfo",
 };
 
-export function useGroupInfo(
-  groupId: number
-): UseQueryResult<GroupDetails, unknown> {
-  return useQuery([USE_GROUP_INFO, groupId], () => fetchGroup({ groupId }), {
+export function useGroupInfo(): UseQueryResult<GroupDetails, unknown> {
+  const groupId = selectCurrentGroup(store.getState());
+  return useQuery([USE_GROUP_INFO, groupId], () => fetchGroup(), {
     retry: false,
     select: mapGroupData,
   });
 }
 
-export async function fetchGroup({
-  groupId,
-}: {
-  groupId: number;
-}): Promise<RawGroupRequest> {
+export async function fetchGroup(): Promise<RawGroupRequest> {
+  const groupId = selectCurrentGroup(store);
   const response = await fetch(API_URL + API.GROUPS + groupId + "/", {
     ...DEFAULT_FETCH_OPTIONS,
   });
@@ -113,27 +113,19 @@ export const USE_GROUP_MEMBER_INFO = {
   id: "groupMemberInfo",
 };
 
-export function useGroupMembersInfo(
-  groupId: number
-): UseQueryResult<GroupMember[], unknown> {
-  return useQuery(
-    [USE_GROUP_MEMBER_INFO, groupId],
-    () => fetchGroupMembers({ groupId }),
-    {
-      retry: false,
-      select: (data) => {
-        const { members } = data;
-        return members.map((m) => mapGroupMemberData(m));
-      },
-    }
-  );
+export function useGroupMembersInfo(): UseQueryResult<GroupMember[], unknown> {
+  const groupId = selectCurrentGroup(store.getState());
+  return useQuery([USE_GROUP_MEMBER_INFO, groupId], fetchGroupMembers, {
+    retry: false,
+    select: (data) => {
+      const { members } = data;
+      return members.map((m) => mapGroupMemberData(m));
+    },
+  });
 }
 
-export async function fetchGroupMembers({
-  groupId,
-}: {
-  groupId: number;
-}): Promise<GroupMembersFetchResponseType> {
+export async function fetchGroupMembers(): Promise<GroupMembersFetchResponseType> {
+  const groupId = selectCurrentGroup(store);
   const response = await fetch(API_URL + API.GROUPS + groupId + "/members/", {
     ...DEFAULT_FETCH_OPTIONS,
   });
@@ -155,27 +147,19 @@ export const USE_GROUP_INVITATION_INFO = {
   id: "groupInvitationInfo",
 };
 
-export function useGroupInvitations(
-  groupId: number
-): UseQueryResult<Invitation[], unknown> {
-  return useQuery(
-    [USE_GROUP_INVITATION_INFO, groupId],
-    () => fetchGroupInvitations({ groupId }),
-    {
-      retry: false,
-      select: (data) => {
-        const { invitations } = data;
-        return invitations.map((i) => mapGroupInvitations(i));
-      },
-    }
-  );
+export function useGroupInvitations(): UseQueryResult<Invitation[], unknown> {
+  const groupId = selectCurrentGroup(store.getState());
+  return useQuery([USE_GROUP_INVITATION_INFO, groupId], fetchGroupInvitations, {
+    retry: false,
+    select: (data) => {
+      const { invitations } = data;
+      return invitations.map((i) => mapGroupInvitations(i));
+    },
+  });
 }
 
-export async function fetchGroupInvitations({
-  groupId,
-}: {
-  groupId: number;
-}): Promise<FetchInvitationResponseType> {
+export async function fetchGroupInvitations(): Promise<FetchInvitationResponseType> {
+  const groupId = selectCurrentGroup(store);
   const response = await fetch(
     API_URL + API.GROUPS + groupId + "/invitations/",
     {
@@ -213,13 +197,13 @@ type InvitationCallbacks = MutationCallbacks<InvitationResponseType>;
 
 async function sendGroupInvitations({
   emails,
-  groupId,
 }: InvitationRequestType): Promise<InvitationResponseType> {
   const payload: InvitationPayload = {
     emails,
     role: "member",
   };
 
+  const groupId = selectCurrentGroup(store);
   const response = await fetch(
     API_URL + API.GROUPS + groupId + "/invitations/",
     {

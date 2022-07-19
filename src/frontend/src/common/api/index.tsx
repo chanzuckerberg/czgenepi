@@ -1,5 +1,7 @@
 import ENV from "src/common/constants/ENV";
 import { jsonToType } from "src/common/utils";
+import { store } from "../redux";
+import { selectCurrentGroup } from "../redux/selectors";
 
 export enum API {
   USERDATA = "/v2/users/me",
@@ -20,11 +22,14 @@ export enum ORG_API {
   GET_FASTA_URL = "sequences/getfastaurl",
 }
 
-export const generateGroupSpecificUrl = (
-  path: ORG_API,
-  groupId: number
-): string => {
-  return `/v2/orgs/${groupId}/${path}`;
+export const generateOrgSpecificUrl = (path: ORG_API): string => {
+  const groupId = selectCurrentGroup(store.getState());
+  return `${API.ORGS}${groupId}/${path}`;
+};
+
+export const generateGroupSpecificUrl = (path: string): string => {
+  const groupId = selectCurrentGroup(store.getState());
+  return `${API.GROUPS}${groupId}/${path}`;
 };
 
 export const DEFAULT_HEADERS_MUTATION_OPTIONS: RequestInit = {
@@ -204,11 +209,11 @@ const SAMPLE_MAP = new Map<string, keyof Sample>([
   ["czb_failed_genome_recovery", "CZBFailedGenomeRecovery"],
 ]);
 
-export const fetchSamples = (groupId: number): Promise<SampleResponse> =>
+export const fetchSamples = (): Promise<SampleResponse> =>
   apiResponse<SampleResponse>(
     ["samples"],
     [SAMPLE_MAP],
-    generateGroupSpecificUrl(ORG_API.SAMPLES, groupId)
+    generateGroupSpecificUrl(ORG_API.SAMPLES)
   );
 
 export interface PhyloRunResponse extends APIResponse {
@@ -222,9 +227,9 @@ const PHYLO_RUN_MAP = new Map<string, keyof PhyloRun>([
   ["workflow_id", "workflowId"],
   ["workflow_status", "status"],
 ]);
-export const fetchPhyloRuns = (groupId: number): Promise<PhyloRunResponse> =>
+export const fetchPhyloRuns = (): Promise<PhyloRunResponse> =>
   apiResponse<PhyloRunResponse>(
     ["phylo_runs"],
     [PHYLO_RUN_MAP],
-    generateGroupSpecificUrl(ORG_API.PHYLO_RUNS, groupId)
+    generateGroupSpecificUrl(ORG_API.PHYLO_RUNS)
   );

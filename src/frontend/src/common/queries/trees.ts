@@ -40,10 +40,12 @@ interface CreateTreeType {
 
 type CreateTreeCallbacks = MutationCallbacks<void>;
 
-async function createTree(
-  groupId: number,
-  { sampleIds, treeName, treeType, filters }: CreateTreeType
-): Promise<unknown> {
+async function createTree({
+  sampleIds,
+  treeName,
+  treeType,
+  filters,
+}: CreateTreeType): Promise<unknown> {
   const { startDate, endDate, lineages } = filters;
   const payload: CreateTreePayload = {
     name: treeName,
@@ -57,7 +59,7 @@ async function createTree(
   };
 
   const response = await fetch(
-    API_URL + generateGroupSpecificUrl(ORG_API.PHYLO_RUNS, groupId),
+    API_URL + generateGroupSpecificUrl(ORG_API.PHYLO_RUNS),
     {
       ...DEFAULT_POST_OPTIONS,
       body: JSON.stringify(payload),
@@ -68,13 +70,18 @@ async function createTree(
   throw Error(`${response.statusText}: ${await response.text()}`);
 }
 
-export function useCreateTree(
-  groupId: number,
-  { componentOnError, componentOnSuccess }: CreateTreeCallbacks
-): UseMutationResult<unknown, unknown, CreateTreeType, unknown> {
+export function useCreateTree({
+  componentOnError,
+  componentOnSuccess,
+}: CreateTreeCallbacks): UseMutationResult<
+  unknown,
+  unknown,
+  CreateTreeType,
+  unknown
+> {
   const queryClient = useQueryClient();
 
-  return useMutation((toMutate) => createTree(groupId, toMutate), {
+  return useMutation(createTree, {
     onError: componentOnError,
     onSuccess: async () => {
       await queryClient.invalidateQueries([USE_PHYLO_RUN_INFO]);
@@ -103,18 +110,19 @@ export interface FastaResponseType {
 
 type FastaFetchCallbacks = MutationCallbacks<FastaResponseType>;
 
-async function getFastaURL(
-  groupId: number,
-  { sampleIds, downstreamConsumer }: FastaRequestType
-): Promise<FastaResponseType> {
+async function getFastaURL({
+  sampleIds,
+  downstreamConsumer,
+}: FastaRequestType): Promise<FastaResponseType> {
   const payload: FastaURLPayloadType = {
     samples: sampleIds,
     // If specialty downstream consumer, set this to have FASTA generate accordingly
     // If left as undefined, will be stripped out from payload during JSON.stringify
     downstream_consumer: downstreamConsumer,
   };
+
   const response = await fetch(
-    API_URL + generateGroupSpecificUrl(ORG_API.GET_FASTA_URL, groupId),
+    API_URL + generateGroupSpecificUrl(ORG_API.GET_FASTA_URL),
     {
       ...DEFAULT_POST_OPTIONS,
       body: JSON.stringify(payload),
@@ -125,11 +133,16 @@ async function getFastaURL(
   throw Error(`${response.statusText}: ${await response.text()}`);
 }
 
-export function useFastaFetch(
-  groupId: number,
-  { componentOnError, componentOnSuccess }: FastaFetchCallbacks
-): UseMutationResult<FastaResponseType, unknown, FastaRequestType, unknown> {
-  return useMutation((toMutate) => getFastaURL(groupId, toMutate), {
+export function useFastaFetch({
+  componentOnError,
+  componentOnSuccess,
+}: FastaFetchCallbacks): UseMutationResult<
+  FastaResponseType,
+  unknown,
+  FastaRequestType,
+  unknown
+> {
+  return useMutation(getFastaURL, {
     onError: componentOnError,
     onSuccess: componentOnSuccess,
   });
@@ -164,17 +177,15 @@ interface TreeEditResponseType {
 
 type TreeEditCallbacks = MutationCallbacks<TreeEditResponseType>;
 
-export async function editTree(
-  groupId: number,
-  { treeIdToEdit, newTreeName }: TreeEditRequestType
-): Promise<TreeEditResponseType> {
+export async function editTree({
+  treeIdToEdit,
+  newTreeName,
+}: TreeEditRequestType): Promise<TreeEditResponseType> {
   const payload: EditTreePayloadType = {
     name: newTreeName,
   };
   const response = await fetch(
-    API_URL +
-      generateGroupSpecificUrl(ORG_API.PHYLO_RUNS, groupId) +
-      treeIdToEdit,
+    API_URL + generateGroupSpecificUrl(ORG_API.PHYLO_RUNS) + treeIdToEdit,
     {
       ...DEFAULT_PUT_OPTIONS,
       ...DEFAULT_HEADERS_MUTATION_OPTIONS,
@@ -186,17 +197,17 @@ export async function editTree(
   throw Error(`${response.statusText}: ${await response.text()}`);
 }
 
-export function useEditTree(
-  groupId: number,
-  { componentOnError, componentOnSuccess }: TreeEditCallbacks
-): UseMutationResult<
+export function useEditTree({
+  componentOnError,
+  componentOnSuccess,
+}: TreeEditCallbacks): UseMutationResult<
   TreeEditResponseType,
   unknown,
   TreeEditRequestType,
   unknown
 > {
   const queryClient = useQueryClient();
-  return useMutation((toMutate) => editTree(groupId, toMutate), {
+  return useMutation(editTree, {
     onError: componentOnError,
     onSuccess: async (data) => {
       await queryClient.invalidateQueries([USE_PHYLO_RUN_INFO]);

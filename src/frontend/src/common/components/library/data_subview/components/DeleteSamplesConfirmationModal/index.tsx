@@ -2,8 +2,6 @@ import { isEmpty } from "lodash";
 import React, { useState } from "react";
 import { useUserInfo } from "src/common/queries/auth";
 import { useDeleteSamples } from "src/common/queries/samples";
-import { useSelector } from "src/common/redux/hooks";
-import { selectCurrentGroup } from "src/common/redux/selectors";
 import { B } from "src/common/styles/basicStyle";
 import { pluralize } from "src/common/utils/strUtils";
 import { DeleteDialog } from "src/components/DeleteDialog";
@@ -33,8 +31,7 @@ const DeleteSamplesConfirmationModal = ({
     .filter((sample) => sample.submittingGroup?.name === userGroup?.name)
     .map((sample) => sample.id);
 
-  const groupId = useSelector(selectCurrentGroup);
-  const deleteSampleMutation = useDeleteSamples(groupId, {
+  const deleteSampleMutation = useDeleteSamples({
     componentOnError: () => {
       setShouldShowErrorNotification(true);
     },
