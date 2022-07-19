@@ -34,7 +34,7 @@ const GroupDetailsDropdown = ({
   const { data: members = [] } = useGroupMembersInfo();
   const { data: groupInfo } = useGroupInfo();
 
-  if (!open || !userInfo || !groupInfo) return null;
+  if (!open || !userInfo) return null;
 
   const { groups, isGroupAdmin } = userInfo;
 
