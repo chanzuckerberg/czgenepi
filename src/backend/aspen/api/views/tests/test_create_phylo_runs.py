@@ -1,3 +1,5 @@
+from typing import Any, Dict, List
+
 import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -156,7 +158,7 @@ async def test_create_phylo_run_with_template_args(
     await async_session.commit()
 
     auth_headers = {"user_id": user.auth0_user_id}
-    requests = [
+    requests: List[Dict[str, Any]] = [
         {
             "name": "test phylorun",
             "tree_type": "overview",
@@ -189,8 +191,15 @@ async def test_create_phylo_run_with_template_args(
             f"/v2/orgs/{group.id}/phylo_runs/", json=data, headers=auth_headers
         )
         assert res.status_code == 200
-        response = res.json()
-        assert response["template_args"] == data["template_args"]
+        response: Dict[str, Any] = res.json()
+        for key in data["template_args"]:
+            assert key in response["template_args"]
+            if key == "filter_pango_lineages":
+                assert set(response["template_args"][key]) == set(
+                    data["template_args"][key]
+                )
+            else:
+                assert response["template_args"][key] == data["template_args"][key]
         assert response["workflow_status"] == "STARTED"
         assert response["group"]["name"] == group.name
         assert "id" in response
@@ -481,8 +490,8 @@ async def test_create_phylo_run_with_lineage_aliases(
     async_session.add(gisaid_dump)
     async_session.add_all(pango_lineages)
     await async_session.commit()
-
     auth_headers = {"user_id": user.auth0_user_id}
+
     data = {
         "name": "test phylorun",
         "tree_type": "targeted",
@@ -502,4 +511,4 @@ async def test_create_phylo_run_with_lineage_aliases(
     assert "filter_pango_lineages" in response["template_args"]
     submitted_lineages = set(response["template_args"]["filter_pango_lineages"])
     expected_linages = set(["B.1.617.2", "AY.1", "AY.2", "BA.1", "BA.1.1", "B.1.1.7"])
-    assert len(submitted_lineages - expected_linages) == 0
+    assert submitted_lineages == expected_linages
