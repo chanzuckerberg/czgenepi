@@ -1,5 +1,5 @@
 import RadioGroup from "@material-ui/core/RadioGroup";
-import CloseIcon from "@material-ui/icons/Close";
+import { Icon } from "czifui";
 import { uniq } from "lodash";
 import Image from "next/image";
 import NextLink from "next/link";
@@ -14,11 +14,16 @@ import { useCreateTree } from "src/common/queries/trees";
 import { selectCurrentGroup } from "src/common/redux/selectors";
 import { ROUTES } from "src/common/routes";
 import { B } from "src/common/styles/basicStyle";
+import {
+  IconWrapperGray500,
+  InfoIconWrapper,
+  StyledCloseIconButton,
+} from "src/common/styles/iconStyle";
 import { pluralize } from "src/common/utils/strUtils";
 import Notification from "src/components/Notification";
 import { TreeNameInput } from "src/components/TreeNameInput";
 import { ContactUsLink } from "../ContactUsLink";
-import { Header, StyledIconButton } from "../DownloadModal/style";
+import { Header } from "../DownloadModal/style";
 import { FailedSampleAlert } from "../FailedSampleAlert";
 import { CreateTreeButton } from "./components/CreateTreeButton";
 import { MissingSampleAlert } from "./components/MissingSampleAlert";
@@ -41,7 +46,6 @@ import {
   StyledDialogTitle,
   StyledFooter,
   StyledFormControlLabel,
-  StyledInfoOutlinedIcon,
   StyledRadio,
   StyledTooltip,
   Title,
@@ -214,9 +218,11 @@ export const CreateNSTreeModal = ({
         onClose={handleClose}
       >
         <StyledDialogTitle>
-          <StyledIconButton onClick={handleClose}>
-            <CloseIcon />
-          </StyledIconButton>
+          <StyledCloseIconButton aria-label="close modal" onClick={handleClose}>
+            <IconWrapperGray500>
+              <Icon sdsIcon="xMark" sdsSize="l" sdsType="static" />
+            </IconWrapperGray500>
+          </StyledCloseIconButton>
           <Header>Create New Phylogenetic Tree</Header>
           <Title>
             {allSamplesRequestedTableAndInput.length}{" "}
@@ -247,7 +253,13 @@ export const CreateNSTreeModal = ({
                 title={TREE_TYPE_TOOLTIP_TEXT}
                 placement="top"
               >
-                <StyledInfoOutlinedIcon />
+                <InfoIconWrapper>
+                  <Icon
+                    sdsIcon="infoCircle"
+                    sdsSize="xs"
+                    sdsType="interactive"
+                  />
+                </InfoIconWrapper>
               </StyledTooltip>
             </TreeNameInfoWrapper>
             <RadioGroup

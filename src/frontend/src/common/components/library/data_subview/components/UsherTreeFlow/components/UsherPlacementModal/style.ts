@@ -1,6 +1,5 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-import CloseIcon from "@material-ui/icons/Close";
 import ErrorOutlineOutlinedIcon from "@material-ui/icons/ErrorOutlineOutlined";
 import {
   Button,
@@ -169,22 +168,6 @@ export const StyledInputDropdown = styled(InputDropdown)`
       margin-bottom: ${spaces?.l}px;
       width: 100%;
       height: ${INPUT_HEIGHT};
-    `;
-  }}
-`;
-
-export const StyledCloseIcon = styled(CloseIcon)`
-  position: absolute;
-  cursor: pointer;
-
-  ${(props) => {
-    const colors = getColors(props);
-    const spaces = getSpaces(props);
-
-    return `
-      color: ${colors?.gray[400]};
-      right: ${spaces?.xl}px;
-      top: ${spaces?.xl}px;
     `;
   }}
 `;

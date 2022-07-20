@@ -10,6 +10,10 @@ import {
 } from "src/common/queries/trees";
 import { useSelector } from "src/common/redux/hooks";
 import { selectCurrentGroup } from "src/common/redux/selectors";
+import {
+  IconWrapperGray500,
+  StyledCloseIconButton,
+} from "src/common/styles/iconStyle";
 import { pluralize } from "src/common/utils/strUtils";
 import Dialog from "src/components/Dialog";
 import {
@@ -24,7 +28,6 @@ import {
   Content,
   FlexWrapper,
   StyledButton,
-  StyledCloseIcon,
   StyledDialogContent,
   StyledFieldTitleText,
   StyledInfoIconWrapper,
@@ -197,7 +200,14 @@ export const UsherPlacementModal = ({
       maxWidth={"sm"}
     >
       <StyledDialogTitle>
-        <StyledCloseIcon onClick={onClose} />
+        <StyledCloseIconButton
+          aria-label="Close UShER phylogenetic placement modal"
+          onClick={onClose}
+        >
+          <IconWrapperGray500>
+            <Icon sdsIcon="xMark" sdsSize="l" sdsType="static" />
+          </IconWrapperGray500>
+        </StyledCloseIconButton>
         <FlexWrapper>
           <Header>Run Phylogenetic Placement with UShER</Header>
           <StyledTooltip

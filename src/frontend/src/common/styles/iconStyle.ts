@@ -1,6 +1,6 @@
 // includes shared styles for icons
 import styled from "@emotion/styled";
-import { CommonThemeProps, getColors, getSpaces } from "czifui";
+import { CommonThemeProps, getColors, getSpaces, IconButton } from "czifui";
 
 const iconFillGray = (props: CommonThemeProps) => {
   const colors = getColors(props);
@@ -26,7 +26,7 @@ export const StyledEditIconWrapper = styled.div`
   }
 `;
 
-export const LoadingSpinnerWrapper = styled.div`
+export const IconWrapperGray500 = styled.div`
   ${iconFillGray}
 `;
 
@@ -66,4 +66,8 @@ export const InfoIconWrapper = styled.div`
       }
     `;
   }}
+`;
+
+export const StyledCloseIconButton = styled(IconButton)`
+  float: right;
 `;

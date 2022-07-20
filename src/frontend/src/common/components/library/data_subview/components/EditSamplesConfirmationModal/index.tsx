@@ -1,5 +1,4 @@
-import CloseIcon from "@material-ui/icons/Close";
-import { Button } from "czifui";
+import { Button, Icon } from "czifui";
 import { isEmpty } from "lodash";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
@@ -8,6 +7,10 @@ import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { useUserInfo } from "src/common/queries/auth";
 import { useNamedLocations } from "src/common/queries/locations";
 import { B } from "src/common/styles/basicStyle";
+import {
+  IconWrapperGray500,
+  StyledCloseIconButton,
+} from "src/common/styles/iconStyle";
 import { pluralize } from "src/common/utils/strUtils";
 import { StyledCallout } from "src/components/AlertAccordion/style";
 import { Content, Title } from "src/components/BaseDialog/style";
@@ -32,12 +35,7 @@ import {
 } from "./components/EditSampleStatusModal";
 import ImportFile from "./components/ImportFile";
 import { LoseProgressModal } from "./components/LoseProgressModal";
-import {
-  StyledDiv,
-  StyledIconButton,
-  StyledPreTitle,
-  StyledSubTitle,
-} from "./style";
+import { StyledPreTitle, StyledSubTitle } from "./style";
 import {
   findMetadataChanges,
   getInitialMetadata,
@@ -288,11 +286,16 @@ const EditSamplesConfirmationModal = ({
         onClose={handleClose}
       >
         <DialogTitle>
-          <StyledDiv>
-            <StyledIconButton onClick={handleClose}>
-              <CloseIcon />
-            </StyledIconButton>
-          </StyledDiv>
+          <div>
+            <StyledCloseIconButton
+              aria-label="Close edit samples modal"
+              onClick={handleClose}
+            >
+              <IconWrapperGray500>
+                <Icon sdsIcon="xMark" sdsSize="l" sdsType="static" />
+              </IconWrapperGray500>
+            </StyledCloseIconButton>
+          </div>
           <StyledPreTitle>Step {currentModalStep} of 2</StyledPreTitle>
           <Title>Edit Sample Metadata</Title>
           <StyledSubTitle>

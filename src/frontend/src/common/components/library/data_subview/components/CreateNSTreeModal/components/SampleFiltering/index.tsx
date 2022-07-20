@@ -1,14 +1,15 @@
 import { FilterOptionsState } from "@material-ui/lab";
 import { createFilterOptions } from "@material-ui/lab/Autocomplete";
-import { DefaultMenuSelectOption } from "czifui";
+import { DefaultMenuSelectOption, Icon } from "czifui";
 import { isEqual } from "lodash";
 import React from "react";
 import { noop } from "src/common/constants/empty";
+import { InfoIconWrapper } from "src/common/styles/iconStyle";
 import {
   MENU_OPTIONS_COLLECTION_DATE,
   MENU_OPTION_ALL_TIME,
 } from "src/components/DateFilterMenu/constants";
-import { StyledInfoOutlinedIcon, StyledTooltip } from "../../style";
+import { StyledTooltip } from "../../style";
 import { CollectionDateFilter } from "./components/CollectionDateFilter";
 import {
   StyledContainer,
@@ -286,7 +287,9 @@ export function SampleFiltering({
           title={SAMPLE_FILTERING_TOOLTIP_TEXT}
           placement="top"
         >
-          <StyledInfoOutlinedIcon />
+          <InfoIconWrapper>
+            <Icon sdsIcon="infoCircle" sdsSize="xs" sdsType="static" />
+          </InfoIconWrapper>
         </StyledTooltip>
       </StyledExplainerTitle>
 

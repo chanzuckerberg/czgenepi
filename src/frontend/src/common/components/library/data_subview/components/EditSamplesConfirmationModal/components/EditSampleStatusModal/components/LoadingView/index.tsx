@@ -1,7 +1,7 @@
 import { Button, Icon } from "czifui";
 import React from "react";
 import UploadImage from "src/common/images/Upload.svg";
-import { LoadingSpinnerWrapper } from "src/common/styles/iconStyle";
+import { IconWrapperGray500 } from "src/common/styles/iconStyle";
 import {
   StyledImg,
   StyledSubtitle,
@@ -23,9 +23,9 @@ const LoadingView = (): JSX.Element => {
           sdsType="primary"
           sdsStyle="rounded"
           startIcon={
-            <LoadingSpinnerWrapper>
+            <IconWrapperGray500>
               <Icon sdsIcon="loading" sdsSize="l" sdsType="static" />
-            </LoadingSpinnerWrapper>
+            </IconWrapperGray500>
           }
         >
           Upload In-progress

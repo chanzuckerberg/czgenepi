@@ -1,5 +1,4 @@
 import styled from "@emotion/styled";
-import IconButton from "@material-ui/core/IconButton";
 import {
   Button,
   Checkbox,
@@ -107,20 +106,6 @@ export const StyledButton = styled(Button)`
 export const DownloadTypeInfo = styled.div`
   ${fontBodyXxs}
   width: 400px;
-`;
-
-export const StyledIconButton = styled(IconButton)`
-  float: right;
-  padding: 0;
-  &:hover {
-    background-color: transparent;
-  }
-  ${(props) => {
-    const spaces = getSpaces(props);
-    return `
-      padding-bottom: ${spaces?.l}px;
-    `;
-  }}
 `;
 
 export const StyledCheckbox = styled(Checkbox)`
