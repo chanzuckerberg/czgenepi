@@ -19,6 +19,18 @@ const rightMarginM = (props: CommonThemeProps) => {
 };
 
 // Icon Wrappers change icon colors. Additional attributes can be added in other styled components.
+export const ErrorIconWrapper = styled.div`
+  ${(props) => {
+    const colors = getColors(props);
+
+    return `
+      svg {
+        fill: ${colors?.error[400]};
+      }
+    `;
+  }}
+`;
+
 export const IconWrapperGray500 = styled.div`
   ${iconFillGray}
 `;
@@ -41,6 +53,18 @@ export const NavIconWrapper = styled.div`
   svg {
     fill: white;
   }
+`;
+
+export const WarningIconWrapper = styled.div`
+  ${(props) => {
+    const colors = getColors(props);
+
+    return `
+      svg {
+        fill: ${colors?.warning[600]};
+      }
+    `;
+  }}
 `;
 
 // Styled Icon Wrappers include attributes other than color, i.e. spacing
@@ -72,18 +96,6 @@ export const StyledTreeIconWrapper = styled.div`
 
     return `
       margin: 0 ${spaces?.l}px;
-    `;
-  }}
-`;
-
-export const WarningIconWrapper = styled.div`
-  ${(props) => {
-    const colors = getColors(props);
-
-    return `
-      svg {
-        fill: ${colors?.warning[600]};
-      }
     `;
   }}
 `;
