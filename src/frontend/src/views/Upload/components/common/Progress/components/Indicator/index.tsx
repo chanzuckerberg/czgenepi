@@ -1,5 +1,6 @@
-import { Check } from "@material-ui/icons";
+import { Icon } from "czifui";
 import React from "react";
+import { StyledIconWrapperWhite } from "src/common/styles/iconStyle";
 import { Status } from "../common";
 import { Container, StyledCircle, Text } from "./style";
 
@@ -13,7 +14,13 @@ export default function Indicator({ status, text, step }: Props): JSX.Element {
   return (
     <Container>
       <StyledCircle status={status}>
-        {status === "complete" ? <Check fontSize="small" /> : step}
+        {status === "complete" ? (
+          <StyledIconWrapperWhite>
+            <Icon sdsIcon="check" sdsSize="s" sdsType="static" />{" "}
+          </StyledIconWrapperWhite>
+        ) : (
+          step
+        )}
       </StyledCircle>
       <Text>{text}</Text>
     </Container>

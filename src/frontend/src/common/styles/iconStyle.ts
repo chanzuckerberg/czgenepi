@@ -76,6 +76,13 @@ export const StyledEditIconWrapper = styled.div`
   }
 `;
 
+export const StyledIconWrapperWhite = styled.div`
+  display: flex;
+  svg {
+    fill: white;
+  }
+`;
+
 export const StyledTrashIconWrapper = styled.div`
   ${rightMarginM}
 
