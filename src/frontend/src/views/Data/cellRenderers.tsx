@@ -1,7 +1,6 @@
 /* eslint-disable react/display-name */
 
-import { Lock, Public } from "@material-ui/icons";
-import { ChipProps, Tooltip } from "czifui";
+import { ChipProps, Icon, Tooltip } from "czifui";
 import React from "react";
 import {
   defaultSampleCellRenderer,
@@ -22,11 +21,9 @@ import { TreeTypeTooltip } from "./components/TreeTypeTooltip";
 import {
   CenteredFlexContainer,
   GISAIDCell,
-  PrivacyIcon,
   PrivateIdValueWrapper,
   SampleIconWrapper,
   StyledChip,
-  StyledSampleIcon,
   StyledUploaderName,
   Subtext,
   UnderlinedCell,
@@ -117,14 +114,11 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
       <RowContent>
         <Cell>
           <SampleIconWrapper>
-            <StyledSampleIcon />
-            <PrivacyIcon>
-              {isPrivate ? (
-                <Lock color="primary" />
-              ) : (
-                <Public color="primary" />
-              )}
-            </PrivacyIcon>
+            {isPrivate ? (
+              <Icon sdsIcon="flaskPrivate" sdsSize="xl" sdsType="static" />
+            ) : (
+              <Icon sdsIcon="flaskPublic" sdsSize="xl" sdsType="static" />
+            )}
           </SampleIconWrapper>
           <PrivateIdValueWrapper>
             <CenteredFlexContainer>
