@@ -74,13 +74,3 @@ export const IsPrivateContent = styled.div`
   align-items: center;
   height: 20px;
 `;
-
-export const StyledLock = styled(Lock)`
-  ${(props) => {
-    const spaces = getSpaces(props);
-
-    return `
-      margin-right: ${spaces?.xxs}px;
-    `;
-  }}
-`;

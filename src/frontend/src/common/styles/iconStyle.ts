@@ -83,6 +83,16 @@ export const StyledIconWrapperWhite = styled.div`
   }
 `;
 
+export const StyledLockIconWrapper = styled.div`
+  ${(props) => {
+    const spaces = getSpaces(props);
+
+    return `
+      margin-right: ${spaces?.xxs}px;
+    `;
+  }}
+`;
+
 export const StyledTrashIconWrapper = styled.div`
   ${rightMarginM}
 

@@ -1,11 +1,12 @@
+import { Icon } from "czifui";
 import React from "react";
+import { StyledLockIconWrapper } from "src/common/styles/iconStyle";
 import { getNameFromCollectionLocation } from "src/common/utils/locationUtils";
 import { Metadata } from "src/components/WebformTable/common/types";
 import {
   Id,
   IsPrivateContent,
   IsPrivateTableCell,
-  StyledLock,
   StyledTableCell,
   StyledTableRow,
 } from "./style";
@@ -42,7 +43,9 @@ export default React.memo(function Row({ id, metadata }: Props): JSX.Element {
       <IsPrivateTableCell align="center" component="div">
         {keepPrivate ? (
           <IsPrivateContent>
-            <StyledLock fontSize="small" />
+            <StyledLockIconWrapper>
+              <Icon sdsIcon="lock" sdsSize="s" sdsType="static" />
+            </StyledLockIconWrapper>
             Private
           </IsPrivateContent>
         ) : (
