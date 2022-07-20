@@ -28,3 +28,15 @@ export const StyledTrashIconWrapper = styled.div`
     `;
   }}
 `;
+
+export const LoadingSpinnerWrapper = styled.div`
+  ${(props) => {
+    const colors = getColors(props);
+
+    return `
+      svg {
+        fill: ${colors?.gray[400]};
+      }
+    `;
+  }}
+`;

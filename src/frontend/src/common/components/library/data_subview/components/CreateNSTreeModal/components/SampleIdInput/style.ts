@@ -6,11 +6,10 @@ import {
   fontBodyXs,
   getColors,
   getCorners,
-  getIconSizes,
   getSpaces,
 } from "czifui";
-import LoadingAnimation from "src/common/icons/IconLoadingAnimated.svg";
 import { transparentScrollbars } from "src/common/styles/basicStyle";
+import { LoadingSpinnerWrapper } from "src/common/styles/iconStyle";
 
 const inputPadding = (props: CommonThemeProps) => {
   const spaces = getSpaces(props);
@@ -78,18 +77,11 @@ export const BaselineFlexContainer = styled.div`
   align-items: baseline;
 `;
 
-export const StyledLoadingAnimation = styled(LoadingAnimation)`
+export const StyledLoadingSpinnerWrapper = styled(LoadingSpinnerWrapper)`
   ${(props) => {
-    const colors = getColors(props);
-    const iconSizes = getIconSizes(props);
     const spaces = getSpaces(props);
 
     return `
-      path {
-        fill: ${colors?.gray[400]};
-      }
-      height: ${iconSizes?.l.height}px;
-      width: ${iconSizes?.l.width}px;
       margin-right: ${spaces?.m}px;
     `;
   }}

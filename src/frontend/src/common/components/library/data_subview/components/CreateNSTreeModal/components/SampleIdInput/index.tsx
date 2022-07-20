@@ -1,3 +1,4 @@
+import { Icon } from "czifui";
 import { compact, filter } from "lodash";
 import React, { ChangeEvent, useCallback, useEffect, useState } from "react";
 import { INPUT_DELIMITERS } from "src/common/constants/inputDelimiters";
@@ -14,7 +15,7 @@ import {
   FlexContainer,
   StyledAddButton,
   StyledEditButton,
-  StyledLoadingAnimation,
+  StyledLoadingSpinnerWrapper,
   StyledSampleCount,
   StyledTextArea,
 } from "./style";
@@ -169,7 +170,9 @@ const SampleIdInput = ({
         >
           {isValidating ? (
             <FlexContainer>
-              <StyledLoadingAnimation />
+              <StyledLoadingSpinnerWrapper>
+                <Icon sdsIcon="loading" sdsSize="l" sdsType="static" />
+              </StyledLoadingSpinnerWrapper>
               Adding
             </FlexContainer>
           ) : (
