@@ -71,3 +71,15 @@ export const InfoIconWrapper = styled.div`
 export const StyledCloseIconButton = styled(IconButton)`
   float: right;
 `;
+
+export const WarningIconWrapper = styled.div`
+  ${(props) => {
+    const colors = getColors(props);
+
+    return `
+      svg {
+        fill: ${colors?.warning[600]};
+      }
+    `;
+  }}
+`;

@@ -1,6 +1,5 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-import ErrorOutlineOutlinedIcon from "@material-ui/icons/ErrorOutlineOutlined";
 import {
   Button,
   fontBodyS,
@@ -9,7 +8,6 @@ import {
   fontHeaderM,
   fontHeaderXs,
   getColors,
-  getIconSizes,
   getSpaces,
   InputDropdown,
   List,
@@ -117,7 +115,7 @@ export const StyledSuggestionText = styled.div`
 
     return `
       color: ${colors?.warning[600]};
-      margin-left: ${spaces?.s}px;
+      margin-left: ${spaces?.xxs}px;
     `;
   }}
 `;
@@ -128,20 +126,6 @@ export const StyledSuggestionWrapper = styled.div`
     const spaces = getSpaces(props);
     return `
       margin-top: ${spaces?.xxs}px;
-    `;
-  }}
-`;
-
-export const StyledWarningIcon = styled(ErrorOutlineOutlinedIcon)`
-  ${(props) => {
-    const colors = getColors(props);
-    const iconSizes = getIconSizes(props);
-
-    return `
-      color: ${colors?.warning[400]};
-      height: ${iconSizes?.s.height}px;
-      width: ${iconSizes?.s.width}px;
-      margin-top: 0;
     `;
   }}
 `;

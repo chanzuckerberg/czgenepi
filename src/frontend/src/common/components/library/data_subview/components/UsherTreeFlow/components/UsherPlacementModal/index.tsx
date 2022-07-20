@@ -13,6 +13,7 @@ import { selectCurrentGroup } from "src/common/redux/selectors";
 import {
   IconWrapperGray500,
   StyledCloseIconButton,
+  WarningIconWrapper,
 } from "src/common/styles/iconStyle";
 import { pluralize } from "src/common/utils/strUtils";
 import Dialog from "src/components/Dialog";
@@ -38,7 +39,6 @@ import {
   StyledSuggestionText,
   StyledSuggestionWrapper,
   StyledTextField,
-  StyledWarningIcon,
 } from "./style";
 
 interface Props {
@@ -312,7 +312,13 @@ export const UsherPlacementModal = ({
                 />
                 {shouldShowWarning && (
                   <StyledSuggestionWrapper>
-                    <StyledWarningIcon />
+                    <WarningIconWrapper>
+                      <Icon
+                        sdsIcon="exclamationMarkCircle"
+                        sdsSize="s"
+                        sdsType="static"
+                      />
+                    </WarningIconWrapper>
                     <StyledSuggestionText>
                       We recommend a value no lower than 50.
                     </StyledSuggestionText>
