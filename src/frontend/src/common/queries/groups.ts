@@ -233,3 +233,20 @@ export function useSendGroupInvitations({
     },
   });
 }
+
+/**
+ * expire all group-specific caches when group is changed in UI.
+ * this will not expire caches such as lists of locations
+ * or lineages because those won't change or vary depending on
+ * which group you are viewing
+ */
+export function expireAllCaches(): void {
+  const queryClient = new QueryClient();
+  queryClient.invalidateQueries([
+    USE_PHYLO_RUN_INFO,
+    USE_SAMPLE_INFO,
+    USE_GROUP_INFO,
+    USE_GROUP_INVITATION_INFO,
+    USE_GROUP_MEMBER_INFO,
+  ]);
+}
