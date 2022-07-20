@@ -2,6 +2,7 @@ from typing import List, Optional, Set, Tuple
 
 import pytest
 import sqlalchemy as sa
+from authlib.integrations.starlette_client import StarletteOAuth2App
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
@@ -273,3 +274,58 @@ async def test_sync_complicated_roles(
             [(group.auth0_org_id, role) for group, role in final_roles]
         )
         await check_roles(async_session, user.auth0_user_id, expected_roles)
+
+
+async def test_callback_syncs_auth0_user_roles(
+    async_session: AsyncSession,
+    auth0_apiclient: Auth0Client,
+    auth0_oauth: StarletteOAuth2App,
+    http_client: AsyncClient,
+):
+    userinfo = {
+        "sub": "auth0|user123-asdf",
+        "org_id": "123456",
+        "email": "hello@czgenepi.org",
+        "name": "Bob",
+    }
+    group = group_factory(auth0_org_id=userinfo["org_id"])
+    async_session.add(group)
+    await async_session.commit()
+
+    auth0_apiclient.get_org_user_roles.side_effect = [["admin"]]  # type: ignore
+    auth0_oauth.authorize_access_token.side_effect = [{"userinfo": userinfo}]  # type: ignore
+    auth0_apiclient.get_user_orgs.side_effect = [[]]  # type: ignore
+
+    res = await http_client.get(
+        "/v2/auth/callback",
+        allow_redirects=False,
+    )
+    assert res.status_code == 307
+    assert auth0_apiclient.get_user_orgs.call_count == 1  # type: ignore
+
+
+async def test_callback_doesnt_sync_localdev_roles(
+    async_session: AsyncSession,
+    auth0_apiclient: Auth0Client,
+    auth0_oauth: StarletteOAuth2App,
+    http_client: AsyncClient,
+):
+    userinfo = {
+        "sub": "User1",
+        "org_id": "123456",
+        "email": "hello@czgenepi.org",
+        "name": "Bob",
+    }
+    group = group_factory(auth0_org_id=userinfo["org_id"])
+    async_session.add(group)
+    await async_session.commit()
+
+    auth0_apiclient.get_org_user_roles.side_effect = [["admin"]]  # type: ignore
+    auth0_oauth.authorize_access_token.side_effect = [{"userinfo": userinfo}]  # type: ignore
+
+    res = await http_client.get(
+        "/v2/auth/callback",
+        allow_redirects=False,
+    )
+    assert res.status_code == 307
+    assert auth0_apiclient.get_user_orgs.call_count == 0  # type: ignore
