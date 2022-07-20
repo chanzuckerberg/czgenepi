@@ -78,7 +78,10 @@ function getMissingHeaderFields(
   for (const [headerField, metadataKey] of Object.entries(
     headersToMetadataKeys
   )) {
-    if (!uploadedHeaders.includes(metadataKey)) {
+    if (
+      !uploadedHeaders.includes(metadataKey) &&
+      !headerField.includes("Optional")
+    ) {
       missingFields.add(headerField);
     }
   }
