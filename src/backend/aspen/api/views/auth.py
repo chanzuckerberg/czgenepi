@@ -111,7 +111,10 @@ async def auth(
         }
         user = await create_user_if_not_exists(db, auth0_mgmt, userinfo)
         # Always re-sync auth0 groups to our db on login!
-        await RoleManager.sync_user_roles(db, auth0_mgmt, user)
+        # Make sure the user is in auth0 before sync'ing roles.
+        #  ex: User1 in local dev doesn't exist in auth0
+        if user.auth0_user_id.startswith("auth0|"):
+            await RoleManager.sync_user_roles(db, auth0_mgmt, user)
         await db.commit()
     else:
         raise ex.UnauthorizedException("No user info in token")

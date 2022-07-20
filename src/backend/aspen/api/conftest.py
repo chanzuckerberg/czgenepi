@@ -6,12 +6,13 @@ from typing import AsyncGenerator
 from unittest.mock import create_autospec, MagicMock
 
 import pytest
+from authlib.integrations.starlette_client import StarletteOAuth2App
 from fastapi import Depends, FastAPI, Request
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.api.authn import get_auth0_apiclient, get_cookie_userid
-from aspen.api.deps import get_db
+from aspen.api.deps import get_auth0_client, get_db
 from aspen.api.main import get_app
 from aspen.auth.auth0_management import Auth0Client
 from aspen.database import connection as aspen_connection
@@ -135,14 +136,21 @@ async def auth0_apiclient() -> MagicMock:
 
 
 @pytest.fixture()
+async def auth0_oauth() -> MagicMock:
+    return create_autospec(StarletteOAuth2App)
+
+
+@pytest.fixture()
 async def api(
     async_db: AsyncPostgresDatabase,
     auth0_apiclient: MagicMock,
+    auth0_oauth: MagicMock,
 ) -> FastAPI:
     api = get_app()
     api.dependency_overrides[get_db] = partial(override_get_db, async_db)
     api.dependency_overrides[get_cookie_userid] = override_get_cookie_userid
     api.dependency_overrides[get_auth0_apiclient] = lambda: auth0_apiclient
+    api.dependency_overrides[get_auth0_client] = lambda: auth0_oauth
     return api
 
 
