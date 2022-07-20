@@ -1,11 +1,11 @@
 import { Button } from "@material-ui/core";
-import { ExpandMore } from "@material-ui/icons";
 import { createStyles, makeStyles } from "@material-ui/styles";
-import { AppThemeOptions, Menu, MenuItem } from "czifui";
+import { AppThemeOptions, Icon, Menu, MenuItem } from "czifui";
 import React from "react";
 import { API } from "src/common/api";
 import ENV from "src/common/constants/ENV";
 import { ROUTES } from "src/common/routes";
+import { NavIconWrapper } from "src/common/styles/iconStyle";
 
 const useStyles = makeStyles((theme: AppThemeOptions) => {
   const palette = theme.palette;
@@ -40,7 +40,11 @@ const UserMenu = ({ user }: UserMenuProps): JSX.Element => {
         data-test-id="nav-user-menu"
         onClick={handleClick}
         classes={classes}
-        endIcon={<ExpandMore />}
+        endIcon={
+          <NavIconWrapper>
+            <Icon sdsIcon="chevronDown" sdsSize="xs" sdsType="static" />
+          </NavIconWrapper>
+        }
       >
         {user}
       </Button>

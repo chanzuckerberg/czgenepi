@@ -18,16 +18,38 @@ const rightMarginM = (props: CommonThemeProps) => {
   `;
 };
 
+// Icon Wrappers change icon colors. Additional attributes can be added in other styled components.
+export const IconWrapperGray500 = styled.div`
+  ${iconFillGray}
+`;
+
+export const InfoIconWrapper = styled.div`
+  ${iconFillGray}
+  ${(props) => {
+    const colors = getColors(props);
+    return `
+      :hover {
+        svg {
+          fill: ${colors?.primary[400]};
+        }
+      }
+    `;
+  }}
+`;
+
+export const NavIconWrapper = styled.div`
+  svg {
+    fill: white;
+  }
+`;
+
+// Styled Icon Wrappers include attributes other than color, i.e. spacing
 export const StyledEditIconWrapper = styled.div`
   ${rightMarginM}
 
   svg {
     fill: black;
   }
-`;
-
-export const IconWrapperGray500 = styled.div`
-  ${iconFillGray}
 `;
 
 export const StyledTrashIconWrapper = styled.div`
@@ -54,24 +76,6 @@ export const StyledTreeIconWrapper = styled.div`
   }}
 `;
 
-export const InfoIconWrapper = styled.div`
-  ${iconFillGray}
-  ${(props) => {
-    const colors = getColors(props);
-    return `
-      :hover {
-        svg {
-          fill: ${colors?.primary[400]};
-        }
-      }
-    `;
-  }}
-`;
-
-export const StyledCloseIconButton = styled(IconButton)`
-  float: right;
-`;
-
 export const WarningIconWrapper = styled.div`
   ${(props) => {
     const colors = getColors(props);
@@ -82,4 +86,10 @@ export const WarningIconWrapper = styled.div`
       }
     `;
   }}
+`;
+
+// Keeping IconButton style in here for now. May need to move if there are
+// more IconButton styles in the future.
+export const StyledCloseIconButton = styled(IconButton)`
+  float: right;
 `;
