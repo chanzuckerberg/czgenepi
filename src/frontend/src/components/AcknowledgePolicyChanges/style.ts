@@ -1,8 +1,6 @@
 import styled from "@emotion/styled";
-import CloseIcon from "@material-ui/icons/Close";
-import { fontBodyS, getColors, getIconSizes, getSpaces } from "czifui";
+import { fontBodyS, getColors, getSpaces } from "czifui";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
-import IconInfo from "src/common/icons/IconInfo.svg";
 
 // Note that how we use flex here depends on `DummyCenteringSpacer`.
 // Explanation of what's going on commented with that component below.
@@ -22,18 +20,16 @@ export const Container = styled.div`
   }}
 `;
 
-export const StyledIconInfo = styled(IconInfo)`
-  fill: white;
-  vertical-align: middle;
+export const StyledInfoIconWrapper = styled.div`
   ${(props) => {
-    const iconSizes = getIconSizes(props);
     const spaces = getSpaces(props);
     return `
-      width: ${iconSizes?.l.width}px;
-      height: ${iconSizes?.l.height}px;
       margin-right: ${spaces?.m}px;
     `;
   }}
+  svg {
+    fill: white;
+  }
 `;
 
 // This exists to help center up the central block of text in the banner.
@@ -65,22 +61,4 @@ export const StyledNewTabLink = styled(NewTabLink)`
     text-decoration-line: underline;
     text-decoration-style: solid;
   }
-`;
-
-export const StyledCloseIcon = styled(CloseIcon)`
-  color: white;
-  ${(props) => {
-    const colors = getColors(props);
-    const iconSizes = getIconSizes(props);
-    const spaces = getSpaces(props);
-    return `
-      width: ${iconSizes?.l.width}px;
-      height: ${iconSizes?.l.height}px;
-      margin-left: ${spaces?.m}px;
-      &:hover {
-        color: ${colors?.primary[300]};
-        cursor: pointer;
-      }
-    `;
-  }}
 `;
