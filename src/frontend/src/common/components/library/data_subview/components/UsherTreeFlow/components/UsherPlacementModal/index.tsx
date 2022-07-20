@@ -1,5 +1,5 @@
 import { TextField } from "@material-ui/core";
-import { DefaultMenuSelectOption, Dropdown, InputDropdown } from "czifui";
+import { DefaultMenuSelectOption, Dropdown, Icon, InputDropdown } from "czifui";
 import { cloneDeep, debounce } from "lodash";
 import React, { SyntheticEvent, useEffect, useState } from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
@@ -27,7 +27,7 @@ import {
   StyledCloseIcon,
   StyledDialogContent,
   StyledFieldTitleText,
-  StyledInfoIcon,
+  StyledInfoIconWrapper,
   StyledInputDropdown,
   StyledList,
   StyledListItem,
@@ -206,7 +206,9 @@ export const UsherPlacementModal = ({
             title={MAIN_USHER_TOOLTIP_TEXT}
             placement="top"
           >
-            <StyledInfoIcon />
+            <StyledInfoIconWrapper>
+              <Icon sdsIcon="infoCircle" sdsSize="s" sdsType="interactive" />
+            </StyledInfoIconWrapper>
           </StyledTooltip>
         </FlexWrapper>
         <Title>
@@ -255,7 +257,13 @@ export const UsherPlacementModal = ({
                   title={PHYLOGENETIC_TREE_VERSION_TOOLTIP_TEXT}
                   placement="top"
                 >
-                  <StyledInfoIcon />
+                  <StyledInfoIconWrapper>
+                    <Icon
+                      sdsIcon="infoCircle"
+                      sdsSize="xs"
+                      sdsType="interactive"
+                    />
+                  </StyledInfoIconWrapper>
                 </StyledTooltip>
               </StyledFieldTitleText>
               <Dropdown
@@ -276,7 +284,13 @@ export const UsherPlacementModal = ({
                   title={SAMPLES_PER_SUBTREE_TOOLTIP_TEXT}
                   placement="top"
                 >
-                  <StyledInfoIcon />
+                  <StyledInfoIconWrapper>
+                    <Icon
+                      sdsIcon="infoCircle"
+                      sdsSize="xs"
+                      sdsType="interactive"
+                    />
+                  </StyledInfoIconWrapper>
                 </StyledTooltip>
               </StyledFieldTitleText>
               <StyledTextField>

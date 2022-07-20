@@ -20,7 +20,7 @@ export const Container = styled.div`
   }}
 `;
 
-export const StyledInfoIconWrapper = styled.div`
+export const InfoIconWrapper = styled.div`
   ${(props) => {
     const spaces = getSpaces(props);
     return `

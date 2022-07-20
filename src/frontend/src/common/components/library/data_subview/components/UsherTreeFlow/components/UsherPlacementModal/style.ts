@@ -16,10 +16,8 @@ import {
   List,
   ListItem,
 } from "czifui";
-import {
-  StyledDialogContent as DialogContent,
-  StyledInfoOutlinedIcon as InfoIcon,
-} from "../../../CreateNSTreeModal/style";
+import { InfoIconWrapper } from "src/common/styles/iconStyle";
+import { StyledDialogContent as DialogContent } from "../../../CreateNSTreeModal/style";
 
 const INPUT_HEIGHT = "34px";
 
@@ -191,7 +189,7 @@ export const StyledCloseIcon = styled(CloseIcon)`
   }}
 `;
 
-export const StyledInfoIcon = styled(InfoIcon)`
+export const StyledInfoIconWrapper = styled(InfoIconWrapper)`
   margin-top: 3px;
 `;
 

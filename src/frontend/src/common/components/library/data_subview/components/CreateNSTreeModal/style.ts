@@ -217,21 +217,6 @@ export const StyledTooltip = styled(Tooltip)`
   }}
 `;
 
-export const StyledInfoOutlinedIcon = styled(InfoOutlinedIcon)`
-  width: 14px;
-  height: 15px;
-  ${(props) => {
-    const colors = getColors(props);
-    return `
-      color: ${colors?.gray[500]};
-      &:hover {
-        color: ${colors?.primary[400]};
-      }
-
-    `;
-  }}
-`;
-
 export const TextFieldAlert = styled.div`
   ${(props) => {
     const colors = getColors(props);

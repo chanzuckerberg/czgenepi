@@ -19,7 +19,7 @@ import {
   Container,
   DummyCenteringSpacer,
   MainText,
-  StyledInfoIconWrapper,
+  InfoIconWrapper,
   StyledNewTabLink,
 } from "./style";
 
@@ -73,9 +73,9 @@ const AcknowledgePolicyChanges = () => {
     <Container>
       <DummyCenteringSpacer />
       <MainText>
-        <StyledInfoIconWrapper>
+        <InfoIconWrapper>
           <Icon sdsIcon="infoCircle" sdsSize="l" sdsType="static" />
-        </StyledInfoIconWrapper>
+        </InfoIconWrapper>
         <B>We are no longer supporting automatic GISAID submissions. </B>
         This change is reflected in our updated{" "}
         <StyledNewTabLink href={ROUTES.TERMS}>
