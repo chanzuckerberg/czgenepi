@@ -1,5 +1,6 @@
+import { forEach } from "lodash";
+import { queryClient } from "pages/_app";
 import {
-  QueryClient,
   useMutation,
   UseMutationResult,
   useQuery,
@@ -12,8 +13,6 @@ import {
   generateGroupSpecificUrl,
 } from "../api";
 import { API_URL } from "../constants/ENV";
-import { store } from "../redux";
-import { selectCurrentGroup } from "../redux/selectors";
 import { ENTITIES } from "./entities";
 import { USE_PHYLO_RUN_INFO } from "./phyloRuns";
 import { USE_SAMPLE_INFO } from "./samples";
@@ -87,8 +86,7 @@ export const USE_GROUP_INFO = {
 };
 
 export function useGroupInfo(): UseQueryResult<GroupDetails, unknown> {
-  const groupId = selectCurrentGroup(store.getState());
-  return useQuery([USE_GROUP_INFO, groupId], () => fetchGroup(), {
+  return useQuery([USE_GROUP_INFO], () => fetchGroup(), {
     retry: false,
     select: mapGroupData,
   });
@@ -117,8 +115,7 @@ export const USE_GROUP_MEMBER_INFO = {
 };
 
 export function useGroupMembersInfo(): UseQueryResult<GroupMember[], unknown> {
-  const groupId = selectCurrentGroup(store.getState());
-  return useQuery([USE_GROUP_MEMBER_INFO, groupId], fetchGroupMembers, {
+  return useQuery([USE_GROUP_MEMBER_INFO], fetchGroupMembers, {
     retry: false,
     select: (data) => {
       const { members } = data;
@@ -150,8 +147,7 @@ export const USE_GROUP_INVITATION_INFO = {
 };
 
 export function useGroupInvitations(): UseQueryResult<Invitation[], unknown> {
-  const groupId = selectCurrentGroup(store.getState());
-  return useQuery([USE_GROUP_INVITATION_INFO, groupId], fetchGroupInvitations, {
+  return useQuery([USE_GROUP_INVITATION_INFO], fetchGroupInvitations, {
     retry: false,
     select: (data) => {
       const { invitations } = data;
@@ -240,13 +236,17 @@ export function useSendGroupInvitations({
  * or lineages because those won't change or vary depending on
  * which group you are viewing
  */
-export function expireAllCaches(): void {
-  const queryClient = new QueryClient();
-  queryClient.invalidateQueries([
+export async function expireAllCaches(): void {
+  const queriesToRefetch = [
     USE_PHYLO_RUN_INFO,
     USE_SAMPLE_INFO,
     USE_GROUP_INFO,
     USE_GROUP_INVITATION_INFO,
     USE_GROUP_MEMBER_INFO,
-  ]);
+  ];
+
+  forEach(queriesToRefetch, async (q) => {
+    await queryClient.fetchQuery([q]);
+    await queryClient.invalidateQueries([q]);
+  });
 }

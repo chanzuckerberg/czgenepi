@@ -76,14 +76,33 @@ const Data: FunctionComponent = () => {
 
   const sampleResponse = useSampleInfo();
   const PhyloRunResponse = usePhyloRunInfo();
-  const { data: sampleData, isLoading: isSampleInfoLoading } = sampleResponse;
-  const { data: phyloRunData, isLoading: isTreeInfoLoading } = PhyloRunResponse;
+  const {
+    data: sampleData,
+    isLoading: isSampleInfoLoading,
+    isFetching: isSampleInfoFetching,
+  } = sampleResponse;
+  const {
+    data: phyloRunData,
+    isLoading: isTreeInfoLoading,
+    isFetching: isTreeInfoFetching,
+  } = PhyloRunResponse;
 
   useEffect(() => {
     setIsDataLoading(true);
-    if (isTreeInfoLoading || isSampleInfoLoading) return;
+    if (
+      isTreeInfoLoading ||
+      isSampleInfoLoading ||
+      isTreeInfoFetching ||
+      isSampleInfoFetching
+    )
+      return;
     setIsDataLoading(false);
-  }, [isTreeInfoLoading, isSampleInfoLoading]);
+  }, [
+    isTreeInfoLoading,
+    isSampleInfoLoading,
+    isTreeInfoFetching,
+    isSampleInfoFetching,
+  ]);
 
   const { samples, phyloRuns } = useMemo(
     () => ({
