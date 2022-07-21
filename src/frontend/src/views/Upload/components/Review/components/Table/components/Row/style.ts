@@ -4,7 +4,6 @@ import {
   TableRow,
   TableRowProps as MuiTableRowProps,
 } from "@material-ui/core";
-import { Lock } from "@material-ui/icons";
 import { CommonThemeProps, fontHeaderS, getColors, getSpaces } from "czifui";
 
 export const Id = styled.div`
