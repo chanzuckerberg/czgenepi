@@ -12,6 +12,7 @@ import {
   StyledCloseIconButton,
 } from "src/common/styles/iconStyle";
 import { pluralize } from "src/common/utils/strUtils";
+import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
 import { StyledCallout } from "src/components/AlertAccordion/style";
 import { Content, Title } from "src/components/BaseDialog/style";
 import Dialog from "src/components/Dialog";
@@ -83,11 +84,11 @@ const EditSamplesConfirmationModal = ({
   const [autocorrectWarnings, setAutocorrectWarnings] =
     useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
   const [userEditableSamples, setUserEditableSamples] = useState<Sample[]>([]);
-  const { data: userInfo } = useUserInfo();
-  const { group: userGroup } = userInfo ?? {};
   const [statusModalView, setStatusModalView] = useState<StatusModalView>(
     StatusModalView.NONE
   );
+  const { data: userInfo } = useUserInfo();
+  const currentGroup = getCurrentGroupFromUserInfo(userInfo);
 
   const { data: namedLocationsData } = useNamedLocations();
   const namedLocations: NamedGisaidLocation[] =
@@ -96,10 +97,10 @@ const EditSamplesConfirmationModal = ({
 
   useEffect(() => {
     const samplesToEdit = checkedSamples.filter(
-      (sample) => sample.submittingGroup?.id === userGroup?.id
+      (sample) => sample.submittingGroup?.id === currentGroup?.id
     );
     setUserEditableSamples(samplesToEdit);
-  }, [checkedSamples, userGroup?.name]);
+  }, [checkedSamples, currentGroup?.name]);
 
   useEffect(() => {
     // continue button should only be active if the user has metadata

@@ -5,6 +5,7 @@ import CloseIcon from "src/common/images/close-icon.svg";
 import HeaderLogo from "src/common/images/gen-epi-logo.svg";
 import { useUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
+import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
 import UserMenu from "../RightNav/components/UserMenu";
 import {
   Bar,
@@ -40,8 +41,7 @@ export default function StaticPageNavBar(): JSX.Element {
   const { API_URL } = ENV;
 
   const { data: userInfo } = useUserInfo();
-
-  const group = userInfo?.group;
+  const group = getCurrentGroupFromUserInfo(userInfo);
 
   const orgElements = <React.Fragment>{group?.name}</React.Fragment>;
 

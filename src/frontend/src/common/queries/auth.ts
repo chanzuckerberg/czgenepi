@@ -12,8 +12,6 @@ import { API, DEFAULT_PUT_OPTIONS, getBackendApiJson } from "../api";
 import { ROUTES } from "../routes";
 import { ENTITIES } from "./entities";
 import {
-  mapGroupData,
-  RawGroupRequest,
   USE_GROUP_INFO,
   USE_GROUP_INVITATION_INFO,
   USE_GROUP_MEMBER_INFO,
@@ -29,7 +27,6 @@ export const USE_USER_INFO = {
 export interface RawUserRequest {
   id: number;
   name: string;
-  group: RawGroupRequest;
   groups: UserGroup[];
   agreed_to_tos: boolean;
   acknowledged_policy_version: string | null; // Date or null in DB. ISO 8601: "YYYY-MM-DD"
@@ -41,10 +38,8 @@ export const mapUserData = (obj: RawUserRequest): User => {
   return {
     acknowledgedPolicyVersion: obj.acknowledged_policy_version,
     agreedToTos: obj.agreed_to_tos,
-    group: mapGroupData(obj.group),
     groups: obj.groups,
     id: obj.id,
-    isGroupAdmin: obj.group_admin,
     name: obj.name,
     splitId: obj.split_id,
   };

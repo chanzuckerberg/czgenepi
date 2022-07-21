@@ -6,6 +6,7 @@ import {
   StyledTrashIconWrapper,
 } from "src/common/styles/iconStyle";
 import { StyledMenuItemWrapper } from "src/common/styles/menuStyle";
+import { getCurrentGroupFrVomUserInfo } from "src/common/utils/userInfo";
 import { StyledText } from "./style";
 
 interface Props {
@@ -23,11 +24,11 @@ const MoreActionsMenu = ({
 }: Props): JSX.Element => {
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 
-  const { group: userGroup } = userInfo;
+  const currentGroup = getCurrentGroupFromUserInfo(userInfo);
   const { group, status } = item;
 
   const isAutoBuild = group?.name === "";
-  const isTreeInUserOrg = userGroup?.name === group?.name;
+  const isTreeInUserOrg = currentGroup?.name === group?.name;
   const canUserDeleteTree = isAutoBuild || isTreeInUserOrg;
   // FIXME: allow users to edit/delete FAILED runs once phylotrees V2 endpoint has been updated to better reflect tree status
   const isDisabled = status === TREE_STATUS.Started || !canUserDeleteTree;

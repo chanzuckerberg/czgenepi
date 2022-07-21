@@ -5,7 +5,7 @@ import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
-from aspen.api.authn import get_auth_context, require_group_membership, setup_userinfo
+from aspen.api.authn import get_auth_context, get_user_roles, setup_userinfo
 from aspen.api.authz import AuthZSession, get_authz_session
 from aspen.database.models import Group, GroupRole, PhyloRun, PhyloTree, Sample, User
 from aspen.database.models.base import idbase
@@ -132,7 +132,7 @@ async def make_authcontext(async_session: AsyncSession, group: Group, user: User
     auth_user = await setup_userinfo(async_session, user.auth0_user_id)
     if not auth_user:
         raise Exception("could not find user")
-    user_roles = await require_group_membership(group.id, auth_user, async_session)
+    user_roles = await get_user_roles(group.id, auth_user, async_session)
     authcontext = await get_auth_context(group.id, user, async_session, user_roles)
     authzsession = await get_authz_session(authcontext, async_session)
     return authzsession

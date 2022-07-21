@@ -8,7 +8,7 @@ import {
 import {
   DEFAULT_DELETE_OPTIONS,
   fetchPhyloRuns,
-  generateGroupSpecificUrl,
+  generateOrgSpecificUrl,
   ORG_API,
   PhyloRunResponse,
 } from "../api";
@@ -23,10 +23,8 @@ export const USE_PHYLO_RUN_INFO = {
   id: "phyloRunInfo",
 };
 
-export function usePhyloRunInfo(
-  groupId: number
-): UseQueryResult<PhyloRunResponse, unknown> {
-  return useQuery([USE_PHYLO_RUN_INFO], () => fetchPhyloRuns(groupId), {
+export function usePhyloRunInfo(): UseQueryResult<PhyloRunResponse, unknown> {
+  return useQuery([USE_PHYLO_RUN_INFO], fetchPhyloRuns, {
     retry: false,
   });
 }
@@ -47,14 +45,11 @@ interface PhyloRunDeleteResponseType {
   id: string;
 }
 
-async function deletePhyloRun(
-  groupId: number,
-  { phyloRunIdToDelete }: PhyloRunDeleteRequestType
-): Promise<PhyloRunDeleteResponseType> {
+async function deletePhyloRun({
+  phyloRunIdToDelete,
+}: PhyloRunDeleteRequestType): Promise<PhyloRunDeleteResponseType> {
   const response = await fetch(
-    API_URL +
-      generateGroupSpecificUrl(ORG_API.PHYLO_RUNS, groupId) +
-      phyloRunIdToDelete,
+    API_URL + generateOrgSpecificUrl(ORG_API.PHYLO_RUNS) + phyloRunIdToDelete,
     {
       ...DEFAULT_DELETE_OPTIONS,
     }
@@ -64,17 +59,17 @@ async function deletePhyloRun(
   throw Error(`${response.statusText}: ${await response.text()}`);
 }
 
-export function useDeletePhyloRun(
-  groupId: number,
-  { componentOnError, componentOnSuccess }: PhyloRunDeleteCallbacks
-): UseMutationResult<
+export function useDeletePhyloRun({
+  componentOnError,
+  componentOnSuccess,
+}: PhyloRunDeleteCallbacks): UseMutationResult<
   PhyloRunDeleteResponseType,
   unknown,
   PhyloRunDeleteRequestType,
   unknown
 > {
   const queryClient = useQueryClient();
-  return useMutation((toMutate) => deletePhyloRun(groupId, toMutate), {
+  return useMutation(deletePhyloRun, {
     onError: componentOnError,
     onSuccess: async (data) => {
       await queryClient.invalidateQueries([USE_PHYLO_RUN_INFO]);

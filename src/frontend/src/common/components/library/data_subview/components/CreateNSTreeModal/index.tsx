@@ -4,14 +4,12 @@ import { uniq } from "lodash";
 import Image from "next/image";
 import NextLink from "next/link";
 import React, { SyntheticEvent, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import type { TreeType } from "src/common/constants/types";
 import { TreeTypes } from "src/common/constants/types";
 import GisaidLogo from "src/common/images/gisaid-logo-full.png";
 import { useLineages } from "src/common/queries/lineages";
 import { useCreateTree } from "src/common/queries/trees";
-import { selectCurrentGroup } from "src/common/redux/selectors";
 import { ROUTES } from "src/common/routes";
 import { B } from "src/common/styles/basicStyle";
 import {
@@ -123,8 +121,7 @@ export const CreateNSTreeModal = ({
   const treeNameLength = treeName.length;
   const hasValidName = treeNameLength > 0 && treeNameLength <= 128;
 
-  const groupId = useSelector(selectCurrentGroup);
-  const mutation = useCreateTree(groupId, {
+  const mutation = useCreateTree({
     componentOnError: () => {
       setShouldShowErrorNotification(true);
       handleClose();

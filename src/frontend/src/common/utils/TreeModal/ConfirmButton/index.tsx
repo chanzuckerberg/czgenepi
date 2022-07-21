@@ -1,23 +1,21 @@
 import { Button, ButtonProps } from "czifui";
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import {
   DEFAULT_POST_OPTIONS,
-  generateGroupSpecificUrl,
+  generateOrgSpecificUrl,
   ORG_API,
 } from "src/common/api";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import ENV from "src/common/constants/ENV";
-import { selectCurrentGroup } from "src/common/redux/selectors";
 
 interface Props extends ButtonProps {
   treeId: number;
 }
 
-const getTreeUrl = async (treeId: number, groupId: number) => {
+const getTreeUrl = async (treeId: number) => {
   const requestData = { tree_id: treeId };
   const result = await fetch(
-    `${ENV.API_URL}${generateGroupSpecificUrl(ORG_API.AUSPICE, groupId)}`,
+    `${ENV.API_URL}${generateOrgSpecificUrl(ORG_API.AUSPICE)}`,
     {
       body: JSON.stringify(requestData),
       ...DEFAULT_POST_OPTIONS,
@@ -47,12 +45,11 @@ export const ConfirmButton = (props: Props): JSX.Element => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [url, setUrl] = useState("");
-  const groupId = useSelector(selectCurrentGroup);
 
   useEffect(() => {
     const getUrl = async () => {
       try {
-        setUrl(await getTreeUrl(treeId, groupId));
+        setUrl(await getTreeUrl(treeId));
         setIsLoading(false);
       } catch {
         setIsLoading(false);

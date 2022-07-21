@@ -34,7 +34,7 @@ pytestmark = pytest.mark.asyncio
 # test LIST samples #
 
 
-async def test_samples_view(
+async def test_samples_list(
     async_session: AsyncSession,
     http_client: AsyncClient,
 ):
@@ -43,29 +43,44 @@ async def test_samples_view(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    sample = sample_factory(group, user, location, private=True)
     pangolin_output = {
         "scorpio_call": "B.1.167",
         "scorpio_support": "0.775",
         "qc_status": "pass",
     }
-    uploaded_pathogen_genome = uploaded_pathogen_genome_factory(
-        sample, pangolin_output=pangolin_output
-    )
+    # Make multiple samples
+    samples: List[Sample] = []
+    uploaded_pathogen_genomes: List[UploadedPathogenGenome] = []
+    for i in range(2):
+        samples.append(
+            sample_factory(
+                group,
+                user,
+                location,
+                private=True,
+                private_identifier=f"private{i}",
+                public_identifier=f"public{i}",
+            )
+        )
+        uploaded_pathogen_genomes.append(
+            uploaded_pathogen_genome_factory(
+                samples[i], pangolin_output=pangolin_output
+            )
+        )
     async_session.add(group)
     await async_session.commit()
 
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.get(
-        "/v2/samples/",
+        f"/v2/orgs/{group.id}/samples/",
         headers=auth_headers,
     )
     response = res.json()
     expected = {
         "samples": [
             {
-                "id": sample.id,
-                "collection_date": str(sample.collection_date),
+                "id": samples[i].id,
+                "collection_date": str(samples[i].collection_date),
                 "collection_location": {
                     "id": location.id,
                     "region": location.region,
@@ -76,20 +91,20 @@ async def test_samples_view(
                 "czb_failed_genome_recovery": False,
                 "gisaid": {
                     "status": "Accepted",
-                    "gisaid_id": sample.accessions[0].accession,
+                    "gisaid_id": samples[i].accessions[0].accession,
                 },
-                "private_identifier": sample.private_identifier,
-                "public_identifier": sample.public_identifier,
+                "private_identifier": samples[i].private_identifier,
+                "public_identifier": samples[i].public_identifier,
                 "upload_date": convert_datetime_to_iso_8601(
-                    uploaded_pathogen_genome.upload_date
+                    uploaded_pathogen_genomes[i].upload_date
                 ),
-                "sequencing_date": str(uploaded_pathogen_genome.sequencing_date),
+                "sequencing_date": str(uploaded_pathogen_genomes[i].sequencing_date),
                 "lineage": {
-                    "lineage": uploaded_pathogen_genome.pangolin_lineage,
-                    "confidence": uploaded_pathogen_genome.pangolin_probability,
-                    "version": uploaded_pathogen_genome.pangolin_version,
+                    "lineage": uploaded_pathogen_genomes[i].pangolin_lineage,
+                    "confidence": uploaded_pathogen_genomes[i].pangolin_probability,
+                    "version": uploaded_pathogen_genomes[i].pangolin_version,
                     "last_updated": convert_datetime_to_iso_8601(
-                        uploaded_pathogen_genome.pangolin_last_updated
+                        uploaded_pathogen_genomes[i].pangolin_last_updated
                     ),
                     "scorpio_call": pangolin_output["scorpio_call"],
                     "scorpio_support": float(pangolin_output["scorpio_support"]),
@@ -102,6 +117,7 @@ async def test_samples_view(
                 },
                 "uploaded_by": {"id": user.id, "name": user.name},
             }
+            for i in range(2)
         ]
     }
     assert response == expected
@@ -126,7 +142,7 @@ async def test_samples_view_gisaid_rejected(
 
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.get(
-        "/v2/samples/",
+        f"/v2/orgs/{group.id}/samples/",
         headers=auth_headers,
     )
     response = res.json()
@@ -193,7 +209,7 @@ async def test_samples_view_gisaid_no_info(
 
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.get(
-        "/v2/samples/",
+        f"/v2/orgs/{group.id}/samples/",
         headers=auth_headers,
     )
     response = res.json()
@@ -256,7 +272,7 @@ async def test_samples_view_gisaid_not_eligible(
 
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.get(
-        "/v2/samples/",
+        f"/v2/orgs/{group.id}/samples/",
         headers=auth_headers,
     )
     response = res.json()
@@ -341,7 +357,7 @@ async def _test_samples_view_cansee(
 
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.get(
-        "/v2/samples/",
+        f"/v2/orgs/{viewer_group.id}/samples/",
         headers=auth_headers,
     )
     response = res.json()
@@ -460,7 +476,7 @@ async def test_samples_view_no_pangolin(
 
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.get(
-        "/v2/samples/",
+        f"/v2/orgs/{group.id}/samples/",
         headers=auth_headers,
     )
     response = res.json()
@@ -556,7 +572,7 @@ async def test_bulk_delete_sample_success(
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.request(
         "DELETE",
-        "/v2/samples/",
+        f"/v2/orgs/{group.id}/samples/",
         json=body,
         headers=auth_headers,
     )
@@ -621,7 +637,7 @@ async def test_delete_sample_success(
     for sample in [samples[0], samples[1]]:
         auth_headers = {"user_id": user.auth0_user_id}
         res = await http_client.delete(
-            f"/v2/samples/{sample.id}",
+            f"/v2/orgs/{group.id}/samples/{sample.id}",
             headers=auth_headers,
         )
         assert res.status_code == 200
@@ -699,10 +715,19 @@ async def test_delete_sample_failures(
     # Request this sample as a user who shouldn't be able to delete it.
     auth_headers = {"user_id": user2.auth0_user_id}
     res = await http_client.delete(
-        f"/v2/samples/{sample.id}",
+        f"/v2/orgs/{group.id}/samples/{sample.id}",
+        headers=auth_headers,
+    )
+    assert res.status_code == 403
+
+    # Make sure this sample isn't found under the user's group context
+    auth_headers = {"user_id": user2.auth0_user_id}
+    res = await http_client.delete(
+        f"/v2/orgs/{group2.id}/samples/{sample.id}",
         headers=auth_headers,
     )
     assert res.status_code == 404
+
     # Make sure our sample is still in the db.
     res = await async_session.execute(sa.select(Sample).filter(Sample.id == sample.id))  # type: ignore
     found_sample = res.scalars().one()  # type: ignore
@@ -713,7 +738,15 @@ async def test_delete_sample_failures(
     # https://www.python-httpx.org/compatibility/#request-body-on-http-methods
     res = await http_client.request(
         method="DELETE",
-        url="/v2/samples/",
+        url=f"/v2/orgs/{group.id}/samples/",
+        content=json.dumps({"ids": [sample.id, sample2.id]}),
+        headers=auth_headers,
+    )
+    assert res.status_code == 403
+
+    res = await http_client.request(
+        method="DELETE",
+        url=f"/v2/orgs/{group2.id}/samples/",
         content=json.dumps({"ids": [sample.id, sample2.id]}),
         headers=auth_headers,
     )
@@ -722,7 +755,7 @@ async def test_delete_sample_failures(
     # Test that our multi-delete endpoint succeeds if we only specify an owned sample
     res = await http_client.request(
         method="DELETE",
-        url="/v2/samples/",
+        url=f"/v2/orgs/{group2.id}/samples/",
         content=json.dumps({"ids": [sample2.id]}),
         headers=auth_headers,
     )
@@ -850,10 +883,11 @@ async def test_update_samples_success(
 
     # Tell SqlAlchemy to forget about the samples in its identity map
     # TODO FIXME- we shouldn't have to do this!
+    group_id = group.id  # Stash this id so we can use it
     async_session.expire_all()
 
     res = await http_client.put(
-        "/v2/samples",
+        f"/v2/orgs/{group_id}/samples",
         json=request_data,
         headers=auth_headers,
     )
@@ -938,7 +972,7 @@ async def test_update_samples_access_denied(
     }
 
     res = await http_client.put(
-        "/v2/samples",
+        f"/v2/orgs/{group.id}/samples",
         json=data,
         headers=auth_headers,
     )
@@ -1038,7 +1072,7 @@ async def test_update_samples_request_failures(
         data = {"samples": [request]}
 
         res = await http_client.put(
-            "/v2/samples",
+            f"/v2/orgs/{group.id}/samples",
             json=data,
             headers=auth_headers,
         )
@@ -1059,7 +1093,7 @@ async def setup_validation_data(async_session: AsyncSession):
     async_session.add_all([group, sample, gisaid_sample, isl_sample])
     await async_session.commit()
 
-    return user, sample, gisaid_sample, isl_sample
+    return user, group, sample, gisaid_sample, isl_sample
 
 
 async def test_validation_endpoint(
@@ -1070,7 +1104,9 @@ async def test_validation_endpoint(
     Test that validation endpoint is correctly identifying identifiers that are in the DB, and that samples are properly stripped of hCoV-19/ prefix
     """
 
-    user, sample, gisaid_sample, isl_sample = await setup_validation_data(async_session)
+    user, group, sample, gisaid_sample, isl_sample = await setup_validation_data(
+        async_session
+    )
 
     # add hCoV-19/ as prefix to gisaid identifier to check that stripping of prefix is being done correctly
     data = {
@@ -1082,7 +1118,7 @@ async def test_validation_endpoint(
     }
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        "/v2/samples/validate_ids/",
+        f"/v2/orgs/{group.id}/samples/validate_ids/",
         json=data,
         headers=auth_headers,
     )
@@ -1100,7 +1136,9 @@ async def test_validation_endpoint_missing_identifier(
     Test that validation endpoint is correctly identifying identifiers that are not aspen public or private ids or gisaid ids
     """
 
-    user, sample, gisaid_sample, isl_sample = await setup_validation_data(async_session)
+    user, group, sample, gisaid_sample, isl_sample = await setup_validation_data(
+        async_session
+    )
     data = {
         "sample_ids": [
             sample.public_identifier,
@@ -1111,7 +1149,7 @@ async def test_validation_endpoint_missing_identifier(
     }
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        "/v2/samples/validate_ids/", json=data, headers=auth_headers
+        f"/v2/orgs/{group.id}/samples/validate_ids/", json=data, headers=auth_headers
     )
 
     # request should not fail, should return list of samples that are missing from the DB

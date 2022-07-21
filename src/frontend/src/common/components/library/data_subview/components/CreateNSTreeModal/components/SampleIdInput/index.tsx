@@ -6,8 +6,6 @@ import {
   SampleValidationResponseType,
   useValidateSampleIds,
 } from "src/common/queries/samples";
-import { useSelector } from "src/common/redux/hooks";
-import { selectCurrentGroup } from "src/common/redux/selectors";
 import { pluralize } from "src/common/utils/strUtils";
 import { InputInstructions } from "./components/InputInstructions";
 import {
@@ -76,11 +74,9 @@ const SampleIdInput = ({
     return compact(trimmedTokens);
   }, [inputValue]);
 
-  const groupId = useSelector(selectCurrentGroup);
-
   // TODO (mlila): we don't actually surface this error to the user anywhere, but in the
   // TODO          future we probably should if this happens with any frequency.
-  const validateSampleIdentifiersMutation = useValidateSampleIds(groupId, {
+  const validateSampleIdentifiersMutation = useValidateSampleIds({
     componentOnError: () => {
       setValidating(false);
       setShowAddButton(false);

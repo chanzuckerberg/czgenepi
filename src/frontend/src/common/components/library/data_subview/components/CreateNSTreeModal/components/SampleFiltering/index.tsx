@@ -126,12 +126,12 @@ function generateLineageDropdownOptions(
   selectedLineages: string[],
   availableLineages: string[]
 ): DefaultMenuSelectOption[] {
-  const sortedSelection = availableLineages.filter((lineage) =>
-    selectedLineages.includes(lineage)
-  );
-  const remainingAvailable = availableLineages.filter(
-    (lineage) => !selectedLineages.includes(lineage)
-  );
+  const sortedSelection = availableLineages
+    .filter((lineage) => selectedLineages.includes(lineage))
+    .sort();
+  const remainingAvailable = availableLineages
+    .filter((lineage) => !selectedLineages.includes(lineage))
+    .sort();
   return [
     ALL_LINEAGES_CHOICE,
     ...sortedSelection.map(makeDropdownOption),

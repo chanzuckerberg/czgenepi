@@ -7,14 +7,13 @@ import DialogContent from "src/common/components/library/Dialog/components/Dialo
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import { useUserInfo } from "src/common/queries/auth";
 import { useFastaDownload } from "src/common/queries/samples";
-import { useSelector } from "src/common/redux/hooks";
-import { selectCurrentGroup } from "src/common/redux/selectors";
 import { B } from "src/common/styles/basicStyle";
 import {
   IconWrapperGray500,
   StyledCloseIconButton,
 } from "src/common/styles/iconStyle";
 import { pluralize } from "src/common/utils/strUtils";
+import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
 import Dialog from "src/components/Dialog";
 import Notification from "src/components/Notification";
 import { TooltipDescriptionText, TooltipHeaderText } from "../../style";
@@ -49,7 +48,8 @@ const DownloadModal = ({
   onClose,
 }: Props): JSX.Element => {
   const { data: userInfo } = useUserInfo();
-  const groupName = userInfo?.group?.name.toLowerCase().replace(/ /g, "_"); // format group name for sequences download file
+  const currentGroup = getCurrentGroupFromUserInfo(userInfo);
+  const groupName = currentGroup?.name.toLowerCase().replace(/ /g, "_"); // format group name for sequences download file
   const downloadDate = new Date();
   const separator = "\t";
   const fastaDownloadName = `${groupName}_sample_sequences_${downloadDate
@@ -98,8 +98,7 @@ const DownloadModal = ({
     onClose();
   };
 
-  const groupId = useSelector(selectCurrentGroup);
-  const fastaDownloadMutation = useFastaDownload(groupId, {
+  const fastaDownloadMutation = useFastaDownload({
     componentOnError: () => {
       setShouldShowError(true);
       handleCloseModal();

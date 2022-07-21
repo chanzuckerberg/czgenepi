@@ -115,8 +115,7 @@ export const UsherPlacementModal = ({
     setUsherDisabled(shouldDisable);
   }, [checkedSampleIds, failedSampleIds, isLoading]);
 
-  const groupId = useSelector(selectCurrentGroup);
-  const fastaFetch = useFastaFetch(groupId, {
+  const fastaFetch = useFastaFetch({
     componentOnError: () => {
       setIsLoading(false);
       onClose();
