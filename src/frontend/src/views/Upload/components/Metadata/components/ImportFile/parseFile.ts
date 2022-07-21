@@ -17,6 +17,7 @@ import {
   FORBIDDEN_NAME_CHARACTERS_REGEX,
   HEADERS_TO_METADATA_KEYS,
   MAX_NAME_LENGTH,
+  NEXTSTRAIN_FORMAT_HEADERS_TO_METADATA_KEYS,
 } from "../../../common/constants";
 /**
  * (Vince) Regarding interfaces for Warnings/Errors:
@@ -63,7 +64,13 @@ interface ParsedRow {
 // Helper -- Takes column header from file, converts to internal metadata key
 // If header is unrecognized, leaves it alone (useful for warnings, etc).
 function convertHeaderToMetadataKey(headerName: string): string {
-  return HEADERS_TO_METADATA_KEYS[headerName] || headerName;
+  if (headerName in HEADERS_TO_METADATA_KEYS) {
+    return HEADERS_TO_METADATA_KEYS[headerName];
+  } else if (headerName in NEXTSTRAIN_FORMAT_HEADERS_TO_METADATA_KEYS) {
+    return NEXTSTRAIN_FORMAT_HEADERS_TO_METADATA_KEYS[headerName];
+  } else {
+    return headerName;
+  }
 }
 
 // Helper -- Returns any missing col header field names based on what header
