@@ -6,6 +6,7 @@ import { useGroupInfo, useGroupMembersInfo } from "src/common/queries/groups";
 import { ROUTES } from "src/common/routes";
 import { stringifyGisaidLocation } from "src/common/utils/locationUtils";
 import { pluralize } from "src/common/utils/strUtils";
+import { getIsGroupAdminFromUserInfo } from "src/common/utils/userInfo";
 import { GroupMenuItem } from "./components/GroupMenuItem";
 import {
   CurrentGroup,
@@ -36,7 +37,8 @@ const GroupDetailsDropdown = ({
 
   if (!open || !userInfo) return null;
 
-  const { groups, isGroupAdmin } = userInfo;
+  const { groups } = userInfo;
+  const isGroupAdmin = getIsGroupAdminFromUserInfo(userInfo);
 
   // how many people are in the current group
   const memberCount = members?.length ?? 0;

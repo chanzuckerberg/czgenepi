@@ -3,6 +3,7 @@ import React, { MouseEventHandler, useState } from "react";
 import { TREE_STATUS } from "src/common/constants/types";
 import MoreActionsIcon from "src/common/icons/IconDotsHorizontal3Large.svg";
 import { StyledEditIcon, StyledTrashIcon } from "src/common/styles/iconStyle";
+import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
 import { StyledIcon, StyledIconWrapper } from "../../style";
 import { StyledText } from "./style";
 
@@ -21,11 +22,11 @@ const MoreActionsMenu = ({
 }: Props): JSX.Element => {
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 
-  const { group: userGroup } = userInfo;
+  const currentGroup = getCurrentGroupFromUserInfo(userInfo);
   const { group, status } = item;
 
   const isAutoBuild = group?.name === "";
-  const isTreeInUserOrg = userGroup?.name === group?.name;
+  const isTreeInUserOrg = currentGroup?.name === group?.name;
   const canUserDeleteTree = isAutoBuild || isTreeInUserOrg;
   // FIXME: allow users to edit/delete FAILED runs once phylotrees V2 endpoint has been updated to better reflect tree status
   const isDisabled = status === TREE_STATUS.Started || !canUserDeleteTree;

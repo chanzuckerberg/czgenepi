@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { HeadAppTitle } from "src/common/components";
 import { useGroupInvitations } from "src/common/queries/groups";
 import { ROUTES } from "src/common/routes";
+import { getIsGroupAdminFromUserInfo } from "src/common/utils/userInfo";
 import { TabEventHandler } from "../../index";
 import { ActiveMembersTable } from "./components/ActiveMembersTable";
 import { InviteModal } from "./components/InviteModal";
@@ -35,6 +36,7 @@ const MembersTab = ({
   const router = useRouter();
 
   const { data: invitations = [] } = useGroupInvitations();
+  const isGroupAdmin = getIsGroupAdminFromUserInfo(userInfo);
 
   useEffect(() => {
     setTabValue(requestedSecondaryTab);
@@ -72,7 +74,7 @@ const MembersTab = ({
             count={invitations.length}
           />
         </StyledTabs>
-        {userInfo?.isGroupAdmin && (
+        {isGroupAdmin && (
           <Button
             sdsType="primary"
             sdsStyle="rounded"

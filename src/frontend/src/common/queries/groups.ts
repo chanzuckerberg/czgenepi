@@ -15,6 +15,7 @@ import { API_URL } from "../constants/ENV";
 import { store } from "../redux";
 import { selectCurrentGroup } from "../redux/selectors";
 import { ENTITIES } from "./entities";
+import { USE_PHYLO_RUN_INFO } from "./phyloRuns";
 import { USE_SAMPLE_INFO } from "./samples";
 import { MutationCallbacks } from "./types";
 
@@ -72,7 +73,6 @@ export const mapGroupMemberData = (obj: RawGroupMemberRequest): GroupMember => {
     createdAt: obj.created_at,
     email: obj.email,
     id: obj.id,
-    isGroupAdmin: obj.group_admin,
     name: obj.name,
     role: obj.role,
   };

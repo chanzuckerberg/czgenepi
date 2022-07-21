@@ -8,6 +8,7 @@ import { useUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
 import { B } from "src/common/styles/basicStyle";
 import { pluralize } from "src/common/utils/strUtils";
+import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
 import Progress from "../common/Progress";
 import {
   ButtonWrapper,
@@ -38,7 +39,7 @@ export default function Review({
     useState<boolean>(false);
   const [isConsentChecked, setIsConsentChecked] = useState(false);
 
-  const group = userInfo?.group;
+  const group = getCurrentGroupFromUserInfo(userInfo);
 
   const numOfSamples = Object.keys(samples || EMPTY_OBJECT).length;
 
