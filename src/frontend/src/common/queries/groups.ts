@@ -246,7 +246,7 @@ export async function expireAllCaches(): Promise<void> {
   ];
 
   forEach(queriesToRefetch, async (q) => {
-    await queryClient.fetchQuery([q]);
     await queryClient.invalidateQueries([q]);
+    await queryClient.fetchQuery([q]);
   });
 }
