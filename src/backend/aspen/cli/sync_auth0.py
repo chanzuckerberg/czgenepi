@@ -21,79 +21,95 @@ from aspen.database.connection import (
 from aspen.database.models import Group, Role, User, UserRole
 
 
-def sync_user_roles(
-    db: Session,
-    a0: Auth0Client,
-    user: User,
-    source_of_truth: str,
-    dry_run: bool,
-    rolemap: Dict[str, Role],
-    groupmap: Dict[str, Group],
-) -> None:
-    """
-    Sync a user's DB groups/roles to/from Auth0.
-    """
-    userroles = db.execute(
-        sa.select(UserRole)  # type: ignore
-        .options(joinedload(UserRole.group), joinedload(UserRole.role))  # type: ignore
-        .filter(UserRole.user == user)
-    )
+# This isn't following the same conventions as the rest of the syncer classes :(
+class RoleManager:
+    def __init__(self, db: Session, a0: Auth0Client, dry_run: bool):
+        self.db = db
+        self.a0 = a0
+        self.dry_run = dry_run
+        self.groupmap: Dict[str, Group] = {}
+        self.rolemap: Dict[str, Role] = {}
 
-    db_rows = userroles.unique().scalars().all()
-    db_roles: Set[Tuple[str, str]] = set()
-    userrole_objs: Dict[Tuple[str, str], UserRole] = {}
-    for urole in db_rows:
-        found_role = (urole.group.auth0_org_id, urole.role.name)
-        db_roles.add(found_role)
-        userrole_objs[found_role] = urole
+    def load_context(self):
+        roles = self.db.execute(sa.select(Role)).scalars().all()
+        self.rolemap = {role.name: role for role in roles}
 
-    a0_roles: Set[Tuple[str, str]] = set()
-    a0_groups = a0.get_user_orgs(user.auth0_user_id)
-    for group in a0_groups:
-        group_id = group["id"]
-        group_roles = set(a0.get_org_user_roles(group_id, user.auth0_user_id))
-        for role in group_roles:
-            a0_roles.add((group_id, role))
+        groups = self.db.execute(sa.select(Group)).scalars().all()
+        self.groupmap = {group.auth0_org_id: group for group in groups}
 
-    if source_of_truth == "db":
-        # Wipe out any existing user roles that are no longer relevant
-        roles_to_delete = a0_roles - db_roles
-        for group_id, role_name in roles_to_delete:
-            print(f"A0 --- {role_name} / {user.email} / {groupmap[group_id].name}")
-            if dry_run:
-                continue
-            orgobj = Auth0Org(id=group_id, name="", display_name="")
-            a0.remove_org_roles(orgobj, user.auth0_user_id, [role_name])
+    def sync_user(self, user: User, source_of_truth: str):
+        """
+        Sync a user's DB groups/roles to/from Auth0.
+        """
+        userroles = self.db.execute(
+            sa.select(UserRole)  # type: ignore
+            .options(joinedload(UserRole.group), joinedload(UserRole.role))  # type: ignore
+            .filter(UserRole.user == user)
+        )
 
-        # Add or update the rest.
-        roles_to_add = db_roles - a0_roles
-        for group_id, role_name in roles_to_add:
-            print(f"A0 +++ {role_name} / {user.email} / {groupmap[group_id].name}")
-            if dry_run:
-                continue
-            orgobj = Auth0Org(id=group_id, name="", display_name="")
-            a0.add_org_roles(orgobj, user.auth0_user_id, [role_name])
-    else:
-        # Wipe out any existing user roles that are no longer relevant
-        roles_to_delete = db_roles - a0_roles
-        for rolerow in roles_to_delete:
-            group_id, role_name = rolerow
-            print(f"DB --- {role_name} / {groupmap[group_id].name} / {user.email}")
-            if dry_run:
-                continue
-            db.delete(userrole_objs[rolerow])
+        db_rows = userroles.unique().scalars().all()
+        db_roles: Set[Tuple[str, str]] = set()
+        userrole_objs: Dict[Tuple[str, str], UserRole] = {}
+        for urole in db_rows:
+            found_role = (urole.group.auth0_org_id, urole.role.name)
+            db_roles.add(found_role)
+            userrole_objs[found_role] = urole
 
-        # Add or update the rest.
-        roles_to_add = a0_roles - db_roles
-        for group_id, role_name in roles_to_add:
-            db_group = groupmap.get(group_id)
-            if not db_group:
-                print("No group found for", group_id)
-                continue
-            print(f"DB +++ {role_name} / {user.email} / {db_group.name}")
-            if dry_run:
-                continue
-            db.add(UserRole(user=user, role=rolemap[role_name], group=db_group))
+        a0_roles: Set[Tuple[str, str]] = set()
+        a0_groups = self.a0.get_user_orgs(user.auth0_user_id)
+        for group in a0_groups:
+            group_id = group["id"]
+            group_roles = set(self.a0.get_org_user_roles(group_id, user.auth0_user_id))
+            for role in group_roles:
+                a0_roles.add((group_id, role))
+
+        if source_of_truth == "db":
+            # Wipe out any existing user roles that are no longer relevant
+            roles_to_delete = a0_roles - db_roles
+            for group_id, role_name in roles_to_delete:
+                print(
+                    f"A0 --- {role_name} / {user.email} / {self.groupmap[group_id].name}"
+                )
+                if self.dry_run:
+                    continue
+                orgobj = Auth0Org(id=group_id, name="", display_name="")
+                self.a0.remove_org_roles(orgobj, user.auth0_user_id, [role_name])
+
+            # Add or update the rest.
+            roles_to_add = db_roles - a0_roles
+            for group_id, role_name in roles_to_add:
+                print(
+                    f"A0 +++ {role_name} / {user.email} / {self.groupmap[group_id].name}"
+                )
+                if self.dry_run:
+                    continue
+                orgobj = Auth0Org(id=group_id, name="", display_name="")
+                self.a0.add_org_roles(orgobj, user.auth0_user_id, [role_name])
+        else:
+            # Wipe out any existing user roles that are no longer relevant
+            roles_to_delete = db_roles - a0_roles
+            for rolerow in roles_to_delete:
+                group_id, role_name = rolerow
+                print(
+                    f"DB --- {role_name} / {self.groupmap[group_id].name} / {user.email}"
+                )
+                if self.dry_run:
+                    continue
+                self.db.delete(userrole_objs[rolerow])
+
+            # Add or update the rest.
+            roles_to_add = a0_roles - db_roles
+            for group_id, role_name in roles_to_add:
+                db_group = self.groupmap.get(group_id)
+                if not db_group:
+                    print("No group found for", group_id)
+                    continue
+                print(f"DB +++ {role_name} / {user.email} / {db_group.name}")
+                if self.dry_run:
+                    continue
+                self.db.add(
+                    UserRole(user=user, role=self.rolemap[role_name], group=db_group)
+                )
 
 
 class ObjectManager:
@@ -430,26 +446,14 @@ class SuperSyncer:
             self.update_objects(group_manager, auth0_memberships, db_group_users)
 
     def sync_roles(self) -> None:
-        # TODO this needs some love, but the pseudocode is there.
-        roles = self.db.execute(sa.select(Role)).scalars().all()
-        rolemap = {role.name: role for role in roles}
-
-        groups = self.db.execute(sa.select(Group)).scalars().all()
-        groupmap = {group.auth0_org_id: group for group in groups}
-
+        # This isn't following the same conventions as previous syncer classes, but it'll get the job done.
+        rm = RoleManager(self.db, self.auth0_client, self.dry_run)
+        rm.load_context()
         users = self.db.execute(sa.select(User)).scalars().all()
         for user in users:
             if not user.auth0_user_id.startswith("auth0|"):
                 continue
-            sync_user_roles(
-                self.db,
-                self.auth0_client,
-                user,
-                self.source_of_truth,
-                self.dry_run,
-                rolemap,
-                groupmap,
-            )
+            rm.sync_user(user, source_of_truth=self.source_of_truth)
 
     def sync_user_attributes(self) -> None:
         db_users: MutableSequence[User] = (
