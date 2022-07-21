@@ -8,8 +8,6 @@ import {
   getUsherOptions,
   useFastaFetch,
 } from "src/common/queries/trees";
-import { useSelector } from "src/common/redux/hooks";
-import { selectCurrentGroup } from "src/common/redux/selectors";
 import {
   IconWrapperGray500,
   StyledCloseIconButton,

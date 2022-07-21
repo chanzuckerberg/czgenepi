@@ -6,7 +6,7 @@ import {
   StyledTrashIconWrapper,
 } from "src/common/styles/iconStyle";
 import { StyledMenuItemWrapper } from "src/common/styles/menuStyle";
-import { getCurrentGroupFrVomUserInfo } from "src/common/utils/userInfo";
+import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
 import { StyledText } from "./style";
 
 interface Props {
