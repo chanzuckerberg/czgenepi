@@ -1,3 +1,5 @@
+import { forEach } from "lodash";
+import { queryClient } from "pages/_app";
 import {
   useMutation,
   UseMutationResult,
@@ -5,9 +7,15 @@ import {
   useQueryClient,
   UseQueryResult,
 } from "react-query";
-import { API, DEFAULT_FETCH_OPTIONS, DEFAULT_POST_OPTIONS } from "../api";
+import {
+  DEFAULT_FETCH_OPTIONS,
+  DEFAULT_POST_OPTIONS,
+  generateGroupSpecificUrl,
+} from "../api";
 import { API_URL } from "../constants/ENV";
 import { ENTITIES } from "./entities";
+import { USE_PHYLO_RUN_INFO } from "./phyloRuns";
+import { USE_SAMPLE_INFO } from "./samples";
 import { MutationCallbacks } from "./types";
 
 export interface RawGroupRequest {
@@ -64,7 +72,6 @@ export const mapGroupMemberData = (obj: RawGroupMemberRequest): GroupMember => {
     createdAt: obj.created_at,
     email: obj.email,
     id: obj.id,
-    isGroupAdmin: obj.group_admin,
     name: obj.name,
     role: obj.role,
   };
@@ -78,21 +85,15 @@ export const USE_GROUP_INFO = {
   id: "groupInfo",
 };
 
-export function useGroupInfo(
-  groupId: number
-): UseQueryResult<GroupDetails, unknown> {
-  return useQuery([USE_GROUP_INFO, groupId], () => fetchGroup({ groupId }), {
+export function useGroupInfo(): UseQueryResult<GroupDetails, unknown> {
+  return useQuery([USE_GROUP_INFO], () => fetchGroup(), {
     retry: false,
     select: mapGroupData,
   });
 }
 
-export async function fetchGroup({
-  groupId,
-}: {
-  groupId: number;
-}): Promise<RawGroupRequest> {
-  const response = await fetch(API_URL + API.GROUPS + groupId + "/", {
+export async function fetchGroup(): Promise<RawGroupRequest> {
+  const response = await fetch(API_URL + generateGroupSpecificUrl(""), {
     ...DEFAULT_FETCH_OPTIONS,
   });
 
@@ -113,28 +114,18 @@ export const USE_GROUP_MEMBER_INFO = {
   id: "groupMemberInfo",
 };
 
-export function useGroupMembersInfo(
-  groupId: number
-): UseQueryResult<GroupMember[], unknown> {
-  return useQuery(
-    [USE_GROUP_MEMBER_INFO, groupId],
-    () => fetchGroupMembers({ groupId }),
-    {
-      retry: false,
-      select: (data) => {
-        const { members } = data;
-        return members.map((m) => mapGroupMemberData(m));
-      },
-    }
-  );
+export function useGroupMembersInfo(): UseQueryResult<GroupMember[], unknown> {
+  return useQuery([USE_GROUP_MEMBER_INFO], fetchGroupMembers, {
+    retry: false,
+    select: (data) => {
+      const { members } = data;
+      return members.map((m) => mapGroupMemberData(m));
+    },
+  });
 }
 
-export async function fetchGroupMembers({
-  groupId,
-}: {
-  groupId: number;
-}): Promise<GroupMembersFetchResponseType> {
-  const response = await fetch(API_URL + API.GROUPS + groupId + "/members/", {
+export async function fetchGroupMembers(): Promise<GroupMembersFetchResponseType> {
+  const response = await fetch(API_URL + generateGroupSpecificUrl("members/"), {
     ...DEFAULT_FETCH_OPTIONS,
   });
 
@@ -155,29 +146,19 @@ export const USE_GROUP_INVITATION_INFO = {
   id: "groupInvitationInfo",
 };
 
-export function useGroupInvitations(
-  groupId: number
-): UseQueryResult<Invitation[], unknown> {
-  return useQuery(
-    [USE_GROUP_INVITATION_INFO, groupId],
-    () => fetchGroupInvitations({ groupId }),
-    {
-      retry: false,
-      select: (data) => {
-        const { invitations } = data;
-        return invitations.map((i) => mapGroupInvitations(i));
-      },
-    }
-  );
+export function useGroupInvitations(): UseQueryResult<Invitation[], unknown> {
+  return useQuery([USE_GROUP_INVITATION_INFO], fetchGroupInvitations, {
+    retry: false,
+    select: (data) => {
+      const { invitations } = data;
+      return invitations.map((i) => mapGroupInvitations(i));
+    },
+  });
 }
 
-export async function fetchGroupInvitations({
-  groupId,
-}: {
-  groupId: number;
-}): Promise<FetchInvitationResponseType> {
+export async function fetchGroupInvitations(): Promise<FetchInvitationResponseType> {
   const response = await fetch(
-    API_URL + API.GROUPS + groupId + "/invitations/",
+    API_URL + generateGroupSpecificUrl("invitations/"),
     {
       ...DEFAULT_FETCH_OPTIONS,
     }
@@ -198,7 +179,6 @@ interface InvitationPayload {
 
 interface InvitationRequestType {
   emails: string[];
-  groupId: number;
 }
 
 interface InvitationResponseType {
@@ -213,7 +193,6 @@ type InvitationCallbacks = MutationCallbacks<InvitationResponseType>;
 
 async function sendGroupInvitations({
   emails,
-  groupId,
 }: InvitationRequestType): Promise<InvitationResponseType> {
   const payload: InvitationPayload = {
     emails,
@@ -221,7 +200,7 @@ async function sendGroupInvitations({
   };
 
   const response = await fetch(
-    API_URL + API.GROUPS + groupId + "/invitations/",
+    API_URL + generateGroupSpecificUrl("invitations/"),
     {
       ...DEFAULT_POST_OPTIONS,
       body: JSON.stringify(payload),
@@ -248,5 +227,26 @@ export function useSendGroupInvitations({
       await queryClient.invalidateQueries([USE_GROUP_INVITATION_INFO]);
       componentOnSuccess(data);
     },
+  });
+}
+
+/**
+ * expire all group-specific caches when group is changed in UI.
+ * this will not expire caches such as lists of locations
+ * or lineages because those won't change or vary depending on
+ * which group you are viewing
+ */
+export async function expireAllCaches(): Promise<void> {
+  const queriesToRefetch = [
+    USE_PHYLO_RUN_INFO,
+    USE_SAMPLE_INFO,
+    USE_GROUP_INFO,
+    USE_GROUP_INVITATION_INFO,
+    USE_GROUP_MEMBER_INFO,
+  ];
+
+  forEach(queriesToRefetch, async (q) => {
+    await queryClient.invalidateQueries([q]);
+    await queryClient.fetchQuery([q]);
   });
 }

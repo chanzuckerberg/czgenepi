@@ -1,11 +1,10 @@
 import { Button, Tab } from "czifui";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import { HeadAppTitle } from "src/common/components";
 import { useGroupInvitations } from "src/common/queries/groups";
-import { selectCurrentGroup } from "src/common/redux/selectors";
 import { ROUTES } from "src/common/routes";
+import { getIsGroupAdminFromUserInfo } from "src/common/utils/userInfo";
 import { TabEventHandler } from "../../index";
 import { ActiveMembersTable } from "./components/ActiveMembersTable";
 import { InviteModal } from "./components/InviteModal";
@@ -36,8 +35,8 @@ const MembersTab = ({
   const [isInviteModalOpen, setIsInviteModalOpen] = useState<boolean>(false);
   const router = useRouter();
 
-  const groupId = useSelector(selectCurrentGroup);
-  const { data: invitations = [] } = useGroupInvitations(groupId);
+  const { data: invitations = [] } = useGroupInvitations();
+  const isGroupAdmin = getIsGroupAdminFromUserInfo(userInfo);
 
   useEffect(() => {
     setTabValue(requestedSecondaryTab);
@@ -75,7 +74,7 @@ const MembersTab = ({
             count={invitations.length}
           />
         </StyledTabs>
-        {userInfo?.isGroupAdmin && (
+        {isGroupAdmin && (
           <Button
             sdsType="primary"
             sdsStyle="rounded"

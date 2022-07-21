@@ -150,7 +150,7 @@ const InviteModal = ({
     // If invalid, `validate` will alter state and cause error display
     const areAllAddressesValid = validate(emails);
     if (areAllAddressesValid) {
-      sendInvitationMutation.mutate({ emails, groupId });
+      sendInvitationMutation.mutate({ emails });
     }
   };
 
