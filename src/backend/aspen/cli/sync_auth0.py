@@ -2,11 +2,12 @@
 import logging
 import time
 from datetime import datetime, timezone
-from typing import Any, List, MutableSequence, Optional, Tuple
+from typing import Any, Dict, List, MutableSequence, Optional, Set, Tuple
 
 import click
 import sqlalchemy as sa
 from auth0.v3.exceptions import RateLimitError
+from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.session import Session
 
 from aspen.auth.auth0_management import Auth0Client, Auth0Org, Auth0User
@@ -17,7 +18,82 @@ from aspen.database.connection import (
     session_scope,
     SqlAlchemyInterface,
 )
-from aspen.database.models import Group, User
+from aspen.database.models import Group, Role, User, UserRole
+
+
+def sync_user_roles(
+    db: Session,
+    a0: Auth0Client,
+    user: User,
+    source_of_truth: str,
+    dry_run: bool,
+    rolemap: Dict[str, Role],
+    groupmap: Dict[str, Group],
+) -> None:
+    """
+    Sync a user's DB groups/roles to/from Auth0.
+    """
+    userroles = db.execute(
+        sa.select(UserRole)  # type: ignore
+        .options(joinedload(UserRole.group), joinedload(UserRole.role))  # type: ignore
+        .filter(UserRole.user == user)
+    )
+
+    db_rows = userroles.unique().scalars().all()
+    db_roles: Set[Tuple[str, str]] = set()
+    userrole_objs: Dict[Tuple[str, str], UserRole] = {}
+    for urole in db_rows:
+        found_role = (urole.group.auth0_org_id, urole.role.name)
+        db_roles.add(found_role)
+        userrole_objs[found_role] = urole
+
+    a0_roles: Set[Tuple[str, str]] = set()
+    a0_groups = a0.get_user_orgs(user.auth0_user_id)
+    for group in a0_groups:
+        group_id = group["id"]
+        group_roles = set(a0.get_org_user_roles(group_id, user.auth0_user_id))
+        for role in group_roles:
+            a0_roles.add((group_id, role))
+
+    if source_of_truth == "db":
+        # Wipe out any existing user roles that are no longer relevant
+        roles_to_delete = a0_roles - db_roles
+        for group_id, role_name in roles_to_delete:
+            print(f"A0 --- {role_name} / {user.email} / {groupmap[group_id].name}")
+            if dry_run:
+                continue
+            orgobj = Auth0Org(id=group_id, name="", display_name="")
+            a0.remove_org_roles(orgobj, user.auth0_user_id, [role_name])
+
+        # Add or update the rest.
+        roles_to_add = db_roles - a0_roles
+        for group_id, role_name in roles_to_add:
+            print(f"A0 +++ {role_name} / {user.email} / {groupmap[group_id].name}")
+            if dry_run:
+                continue
+            orgobj = Auth0Org(id=group_id, name="", display_name="")
+            a0.add_org_roles(orgobj, user.auth0_user_id, [role_name])
+    else:
+        # Wipe out any existing user roles that are no longer relevant
+        roles_to_delete = db_roles - a0_roles
+        for rolerow in roles_to_delete:
+            group_id, role_name = rolerow
+            print(f"DB --- {role_name} / {groupmap[group_id].name} / {user.email}")
+            if dry_run:
+                continue
+            db.delete(userrole_objs[rolerow])
+
+        # Add or update the rest.
+        roles_to_add = a0_roles - db_roles
+        for group_id, role_name in roles_to_add:
+            db_group = groupmap.get(group_id)
+            if not db_group:
+                print("No group found for", group_id)
+                continue
+            print(f"DB +++ {role_name} / {user.email} / {db_group.name}")
+            if dry_run:
+                continue
+            db.add(UserRole(user=user, role=rolemap[role_name], group=db_group))
 
 
 class ObjectManager:
@@ -353,6 +429,28 @@ class SuperSyncer:
             )
             self.update_objects(group_manager, auth0_memberships, db_group_users)
 
+    def sync_roles(self) -> None:
+        # TODO this needs some love, but the pseudocode is there.
+        roles = self.db.execute(sa.select(Role)).scalars().all()
+        rolemap = {role.name: role for role in roles}
+
+        groups = self.db.execute(sa.select(Group)).scalars().all()
+        groupmap = {group.auth0_org_id: group for group in groups}
+
+        users = self.db.execute(sa.select(User)).scalars().all()
+        for user in users:
+            if not user.auth0_user_id.startswith("auth0|"):
+                continue
+            sync_user_roles(
+                self.db,
+                self.auth0_client,
+                user,
+                self.source_of_truth,
+                self.dry_run,
+                rolemap,
+                groupmap,
+            )
+
     def sync_user_attributes(self) -> None:
         db_users: MutableSequence[User] = (
             self.db.execute(sa.select(User)).scalars().all()  # type: ignore
@@ -391,7 +489,13 @@ class SuperSyncer:
     "--sync-memberships/--no-sync-memberships",
     is_flag=True,
     default=True,
-    help="Sync membership",
+    help="Sync memberships",
+)
+@click.option(
+    "--sync-roles/--no-sync-roles",
+    is_flag=True,
+    default=True,
+    help="Sync roles",
 )
 @click.option(
     "--sync-user-attributes/--no-sync-user-attributes",
@@ -406,6 +510,7 @@ def cli(
     sync_groups: bool,
     sync_users: bool,
     sync_memberships: bool,
+    sync_roles: bool,
     sync_user_attributes: bool,
 ) -> None:
     config = Config()
@@ -441,6 +546,11 @@ def cli(
         if sync_memberships:
             logging.info("Syncing memberships")
             syncer.sync_memberships()
+    with session_scope(interface) as db:
+        syncer = SuperSyncer(auth0_client, source_of_truth, db, dry_run, delete_ok)
+        if sync_roles:
+            logging.info("Syncing org roles")
+            syncer.sync_roles()
     with session_scope(interface) as db:
         syncer = SuperSyncer(auth0_client, source_of_truth, db, dry_run, delete_ok)
         if sync_user_attributes:
