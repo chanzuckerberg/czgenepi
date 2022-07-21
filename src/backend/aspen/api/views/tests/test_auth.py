@@ -16,6 +16,7 @@ from aspen.test_infra.models.usergroup import (
     user_factory,
     userrole_factory,
 )
+from aspen.util.split import SplitClient
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
@@ -281,6 +282,7 @@ async def test_callback_syncs_auth0_user_roles(
     auth0_apiclient: Auth0Client,
     auth0_oauth: StarletteOAuth2App,
     http_client: AsyncClient,
+    split_client: SplitClient,
 ):
     userinfo = {
         "sub": "auth0|user123-asdf",
@@ -292,6 +294,7 @@ async def test_callback_syncs_auth0_user_roles(
     async_session.add(group)
     await async_session.commit()
 
+    split_client.get_flag.side_effect = ["on"]  # type: ignore
     auth0_apiclient.get_org_user_roles.side_effect = [["admin"]]  # type: ignore
     auth0_oauth.authorize_access_token.side_effect = [{"userinfo": userinfo}]  # type: ignore
     auth0_apiclient.get_user_orgs.side_effect = [[]]  # type: ignore
@@ -322,6 +325,36 @@ async def test_callback_doesnt_sync_localdev_roles(
 
     auth0_apiclient.get_org_user_roles.side_effect = [["admin"]]  # type: ignore
     auth0_oauth.authorize_access_token.side_effect = [{"userinfo": userinfo}]  # type: ignore
+
+    res = await http_client.get(
+        "/v2/auth/callback",
+        allow_redirects=False,
+    )
+    assert res.status_code == 307
+    assert auth0_apiclient.get_user_orgs.call_count == 0  # type: ignore
+
+
+async def test_callback_ff_doesnt_sync_auth0_user_roles(
+    async_session: AsyncSession,
+    auth0_apiclient: Auth0Client,
+    auth0_oauth: StarletteOAuth2App,
+    http_client: AsyncClient,
+    split_client: SplitClient,
+):
+    userinfo = {
+        "sub": "auth0|user123-asdf",
+        "org_id": "123456",
+        "email": "hello@czgenepi.org",
+        "name": "Bob",
+    }
+    group = group_factory(auth0_org_id=userinfo["org_id"])
+    async_session.add(group)
+    await async_session.commit()
+
+    split_client.get_flag.side_effect = ["control"]  # type: ignore
+    auth0_apiclient.get_org_user_roles.side_effect = [["admin"]]  # type: ignore
+    auth0_oauth.authorize_access_token.side_effect = [{"userinfo": userinfo}]  # type: ignore
+    auth0_apiclient.get_user_orgs.side_effect = [[]]  # type: ignore
 
     res = await http_client.get(
         "/v2/auth/callback",

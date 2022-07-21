@@ -14,11 +14,12 @@ from starlette.responses import Response
 
 import aspen.api.error.http_exceptions as ex
 from aspen.api.authn import get_auth0_apiclient
-from aspen.api.deps import get_auth0_client, get_db, get_settings
+from aspen.api.deps import get_auth0_client, get_db, get_settings, get_splitio
 from aspen.api.settings import Settings
 from aspen.auth.auth0_management import Auth0Client
 from aspen.auth.role_manager import RoleManager
 from aspen.database.models import Group, User
+from aspen.util.split import SplitClient
 
 # From the example here:
 # https://github.com/authlib/demo-oauth-client/tree/master/fastapi-google-login
@@ -94,6 +95,7 @@ async def create_user_if_not_exists(db, auth0_mgmt, userinfo) -> User:
 async def auth(
     request: Request,
     auth0: StarletteOAuth2App = Depends(get_auth0_client),
+    splitio: SplitClient = Depends(get_splitio),
     db: AsyncSession = Depends(get_db),
     auth0_mgmt: Auth0Client = Depends(get_auth0_apiclient),
 ) -> Response:
@@ -113,9 +115,11 @@ async def auth(
         # Always re-sync auth0 groups to our db on login!
         # Make sure the user is in auth0 before sync'ing roles.
         #  ex: User1 in local dev doesn't exist in auth0
-        if user.auth0_user_id.startswith("auth0|"):
-            await RoleManager.sync_user_roles(db, auth0_mgmt, user)
-        await db.commit()
+        sync_roles = splitio.get_flag("sync_auth0_roles", user)
+        if sync_roles == "on":
+            if user.auth0_user_id.startswith("auth0|"):
+                await RoleManager.sync_user_roles(db, auth0_mgmt, user)
+            await db.commit()
     else:
         raise ex.UnauthorizedException("No user info in token")
     return RedirectResponse(os.getenv("FRONTEND_URL", "") + "/data/samples")
