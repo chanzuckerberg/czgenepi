@@ -33,15 +33,17 @@ const OpenInNextstrainButton = ({ item }: Props): JSX.Element => {
         }
         placement="top"
       >
-        <IconButton
-          aria-label="view in Nextstrain"
-          disabled={isDisabled}
-          onClick={handleClickOpen}
-          sdsSize="small"
-          sdsType="primary"
-        >
-          <Icon sdsIcon="open" sdsSize="s" sdsType="iconButton" />
-        </IconButton>
+        <span>
+          <IconButton
+            aria-label="view in Nextstrain"
+            disabled={isDisabled}
+            onClick={handleClickOpen}
+            sdsSize="small"
+            sdsType="primary"
+          >
+            <Icon sdsIcon="open" sdsSize="s" sdsType="iconButton" />
+          </IconButton>
+        </span>
       </Tooltip>
       {treeId && (
         <NextstrainConfirmationModal

@@ -60,15 +60,17 @@ const MoreActionsMenu = ({
         title={tooltipText}
         placement="top"
       >
-        <IconButton
-          aria-label="more actions" // TODO: it would be helpful for this to indicate which tree it's for
-          disabled={isDisabled}
-          onClick={handleClick}
-          sdsSize="small"
-          sdsType="primary"
-        >
-          <Icon sdsIcon="dotsHorizontal" sdsSize="s" sdsType="iconButton" />
-        </IconButton>
+        <span>
+          <IconButton
+            aria-label="more actions" // TODO: it would be helpful for this to indicate which tree it's for
+            disabled={isDisabled}
+            onClick={handleClick}
+            sdsSize="small"
+            sdsType="primary"
+          >
+            <Icon sdsIcon="dotsHorizontal" sdsSize="s" sdsType="iconButton" />
+          </IconButton>
+        </span>
       </Tooltip>
       {open && (
         <Menu
