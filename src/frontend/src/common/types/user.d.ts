@@ -20,9 +20,7 @@ type BaseUser = {
 };
 
 interface User extends BaseUser {
-  group: GroupDetails;
   groups: UserGroup[];
-  isGroupAdmin: boolean;
   splitId: string;
 }
 
@@ -31,6 +29,5 @@ type GroupRole = "member" | "admin";
 interface GroupMember extends BaseUser {
   createdAt: string; // not yet returned from backend
   email: string;
-  isGroupAdmin: boolean;
-  role: GroupRole; // not yet returned from backend
+  role: GroupRole;
 }
