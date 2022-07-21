@@ -236,7 +236,7 @@ export function useSendGroupInvitations({
  * or lineages because those won't change or vary depending on
  * which group you are viewing
  */
-export async function expireAllCaches(): void {
+export async function expireAllCaches(): Promise<void> {
   const queriesToRefetch = [
     USE_PHYLO_RUN_INFO,
     USE_SAMPLE_INFO,
