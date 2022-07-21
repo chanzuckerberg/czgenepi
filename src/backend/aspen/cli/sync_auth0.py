@@ -449,7 +449,7 @@ class SuperSyncer:
         # This isn't following the same conventions as previous syncer classes, but it'll get the job done.
         rm = RoleManager(self.db, self.auth0_client, self.dry_run)
         rm.load_context()
-        users = self.db.execute(sa.select(User)).scalars().all()
+        users = self.db.execute(sa.select(User)).scalars().all()  # type: ignore
         for user in users:
             if not user.auth0_user_id.startswith("auth0|"):
                 continue
