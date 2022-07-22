@@ -18,8 +18,8 @@ import { B } from "src/common/styles/basicStyle";
 import {
   Container,
   DummyCenteringSpacer,
-  MainText,
   InfoIconWrapper,
+  MainText,
   StyledNewTabLink,
 } from "./style";
 
@@ -53,7 +53,7 @@ const determineIfAcknowledgmentNeeded = (user: User | undefined): boolean => {
   return true;
 };
 
-const AcknowledgePolicyChanges = () => {
+const AcknowledgePolicyChanges = (): JSX.Element | null => {
   const { data: userInfo } = useUserInfo();
   const isAcknowledgmentNeeded = determineIfAcknowledgmentNeeded(userInfo);
 

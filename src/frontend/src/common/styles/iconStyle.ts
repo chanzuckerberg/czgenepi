@@ -2,6 +2,15 @@
 import styled from "@emotion/styled";
 import { CommonThemeProps, getColors, getSpaces, IconButton } from "czifui";
 
+const iconFillError = (props: CommonThemeProps) => {
+  const colors = getColors(props);
+  return `
+    svg {
+      fill: ${colors?.error[400]};
+    }
+  `;
+};
+
 const iconFillGray = (props: CommonThemeProps) => {
   const colors = getColors(props);
   return `
@@ -20,15 +29,7 @@ const rightMarginM = (props: CommonThemeProps) => {
 
 // Icon Wrappers change icon colors. Additional attributes can be added in other styled components.
 export const ErrorIconWrapper = styled.div`
-  ${(props) => {
-    const colors = getColors(props);
-
-    return `
-      svg {
-        fill: ${colors?.error[400]};
-      }
-    `;
-  }}
+  ${iconFillError}
 `;
 
 export const IconWrapperGray500 = styled.div`
@@ -95,15 +96,7 @@ export const StyledLockIconWrapper = styled.div`
 
 export const StyledTrashIconWrapper = styled.div`
   ${rightMarginM}
-
-  ${(props) => {
-    const colors = getColors(props);
-    return `
-      svg {
-        fill: ${colors?.error[400]};
-      }
-    `;
-  }}
+  ${iconFillError}
 `;
 
 export const StyledTreeIconWrapper = styled.div`
