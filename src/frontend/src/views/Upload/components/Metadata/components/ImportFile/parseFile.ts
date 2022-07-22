@@ -63,6 +63,7 @@ interface ParsedRow {
 
 // Helper -- Takes column header from file, converts to internal metadata key
 // If header is unrecognized, leaves it alone (useful for warnings, etc).
+// User can also use Nextstrain header defaults as an alias
 function convertHeaderToMetadataKey(headerName: string): string {
   if (headerName in HEADERS_TO_METADATA_KEYS) {
     return HEADERS_TO_METADATA_KEYS[headerName];

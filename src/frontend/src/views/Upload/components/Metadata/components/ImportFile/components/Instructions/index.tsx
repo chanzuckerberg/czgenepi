@@ -1,5 +1,6 @@
 import { List, ListItem } from "czifui";
 import React from "react";
+import { NewTabLink } from "src/common/components/library/NewTabLink";
 import {
   ReImportDataItem,
   StyleDownloadTemplate,
@@ -23,14 +24,21 @@ export default function Instructions({ headers, rows }: Props): JSX.Element {
           included in your import file.
         </ListItem>
         <ListItem ordered fontSize="xs">
-          We recommend that you copy your metadata into our{" "}
+          We recommend that you copy your metadata into our
           <StyleDownloadTemplate headers={headers} rows={rows}>
             TSV template
           </StyleDownloadTemplate>
           , but you can use your own TSV or CSV file as well.
         </ListItem>
         <ListItem ordered fontSize="xs">
-          Make sure your column headers match our naming convention.
+          Make sure your column headers match our naming convention or the&nbsp;
+          <NewTabLink
+            href={
+              "https://docs.nextstrain.org/projects/ncov/en/latest/reference/metadata-fields.html"
+            }
+          >
+            Nextstrain defaults.
+          </NewTabLink>
         </ListItem>
         <ListItem ordered fontSize="xs">
           Make sure your metadata values are in the correct format.
