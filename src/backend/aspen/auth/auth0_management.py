@@ -144,15 +144,15 @@ class Auth0Client:
         )
 
     def add_org_roles(self, org: Auth0Org, user_id: str, roles: List[str]) -> None:
-        roleids = [self.get_auth0_role(role)["id"] for role in roles]
+        role_ids = [self.get_auth0_role(role)["id"] for role in roles]
         self.client.organizations.create_organization_member_roles(
-            org["id"], user_id, {"roles": roleids}
+            org["id"], user_id, {"roles": role_ids}
         )
 
     def remove_org_roles(self, org: Auth0Org, user_id: str, roles: List[str]) -> None:
-        roleids = [self.get_auth0_role(role)["id"] for role in roles]
+        role_ids = [self.get_auth0_role(role)["id"] for role in roles]
         self.client.organizations.delete_organization_member_roles(
-            org["id"], user_id, {"roles": roleids}
+            org["id"], user_id, {"roles": role_ids}
         )
 
     def remove_org_member(self, org: Auth0Org, user_id: str) -> None:

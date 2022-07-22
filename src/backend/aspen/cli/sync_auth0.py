@@ -42,8 +42,8 @@ class RoleManager:
         Sync a user's DB groups/roles to/from Auth0.
         """
         userroles = self.db.execute(
-            sa.select(UserRole)  # type: ignore
-            .options(joinedload(UserRole.group), joinedload(UserRole.role))  # type: ignore
+            sa.select(UserRole)
+            .options(joinedload(UserRole.group), joinedload(UserRole.role))
             .filter(UserRole.user == user)
         )
 
