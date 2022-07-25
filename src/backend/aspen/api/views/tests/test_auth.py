@@ -362,3 +362,17 @@ async def test_callback_ff_doesnt_sync_auth0_user_roles(
     )
     assert res.status_code == 307
     assert auth0_apiclient.get_user_orgs.call_count == 0  # type: ignore
+
+    # Make sure our new user got added to the db.
+    user = (
+        (
+            await async_session.execute(
+                sa.select(User)  # type: ignore
+                .options(joinedload(User.group, innerjoin=True))  # type: ignore
+                .filter(User.auth0_user_id == userinfo["sub"])  # type: ignore
+            )
+        )
+        .scalars()
+        .one()
+    )
+    assert user.auth0_user_id == userinfo["sub"]

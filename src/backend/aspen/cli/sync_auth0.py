@@ -6,7 +6,7 @@ from typing import Any, Dict, List, MutableSequence, Optional, Set, Tuple
 
 import click
 import sqlalchemy as sa
-from auth0.v3.exceptions import RateLimitError
+from auth0.v3.exceptions import Auth0Error, RateLimitError
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.session import Session
 
@@ -56,7 +56,11 @@ class RoleManager:
             userrole_objs[found_role] = urole
 
         a0_roles: Set[Tuple[str, str]] = set()
-        a0_groups = self.a0.get_user_orgs(user.auth0_user_id)
+        try:
+            a0_groups = self.a0.get_user_orgs(user.auth0_user_id)
+        except Auth0Error:
+            print(f"User {user.email} / {user.auth0_user_id} does not exist in auth0!")
+            return
         for group in a0_groups:
             group_id = group["id"]
             group_roles = set(self.a0.get_org_user_roles(group_id, user.auth0_user_id))
@@ -84,6 +88,7 @@ class RoleManager:
                 if self.dry_run:
                     continue
                 orgobj = Auth0Org(id=group_id, name="", display_name="")
+                self.a0.add_org_member(orgobj, user.auth0_user_id)
                 self.a0.add_org_roles(orgobj, user.auth0_user_id, [role_name])
         else:
             # Wipe out any existing user roles that are no longer relevant

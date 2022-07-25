@@ -88,6 +88,7 @@ async def create_user_if_not_exists(db, auth0_mgmt, userinfo) -> User:
     }
     newuser = User(**user_fields)
     db.add(newuser)
+    await db.commit()
     return newuser
 
 
