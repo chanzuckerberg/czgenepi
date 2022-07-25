@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
 
-async function login(
+export async function login(
   page: Page,
   username: string,
   password: string,
@@ -15,5 +15,3 @@ async function login(
     page.locator('button[type=submit] >> "Continue"').click(),
   ]);
 }
-
-export default login;

@@ -1,5 +1,7 @@
 {
   "devDependencies": {
-    "@playwright/test": "^1.23.3"
+    "@playwright/test": "^1.23.3",
+    "cypress-wait-until": "^1.7.2",
+    "lodash": "^4.17.21"
   }
 }

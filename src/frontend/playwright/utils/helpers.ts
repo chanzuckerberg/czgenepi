@@ -1,7 +1,7 @@
 import { expect, Page, test, TestInfo } from "@playwright/test";
 import ENV from "src/common/constants/ENV";
 import nodeEnv from "src/common/constants/nodeEnv";
-import { getTestID, getText } from "./selectors";
+import { getByTestID, getByText } from "./selectors";
 
 export const TIMEOUT_MS = 30 * 1000;
 
@@ -28,10 +28,10 @@ export async function login(page: Page, testInfo: TestInfo): Promise<void> {
   goToPage(page);
 
   try {
-    await expect(page.locator(getTestID("nav-user-menu"))).toBeVisible();
+    await expect(page.locator(getByTestID("nav-user-menu"))).toBeVisible();
     await screenshot(page, testInfo);
   } catch (error) {
-    await page.locator(getText("Sign in")).first().click();
+    await page.locator(getByText("Sign in")).first().click();
 
     await page.fill('[name="Username"], [name="username"]', ENV.E2E_USERNAME);
     await page.fill('[name="Password"], [name="password"]', ENV.E2E_PASSWORD);

@@ -28,9 +28,13 @@
     "target": "esnext",
     "types": [
       "jest",
-      "playwright"
+      "playwright",
+      "cypress"
     ],
-    "incremental": false
+    "incremental": false,
+    "typeRoots": [
+      "cypress/types/*"
+    ]
   },
   "exclude": [
     "node_modules",
@@ -42,6 +46,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "src/common/constants/ENV.js"
+    "src/common/constants/ENV.js",
+    "./node_modules/cypress-wait-until/cypress/types/plugin.spec.ts"
   ]
 }
