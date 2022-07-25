@@ -306,6 +306,7 @@ async def test_callback_syncs_auth0_user_roles(
     assert res.status_code == 307
     assert auth0_apiclient.get_user_orgs.call_count == 1  # type: ignore
 
+
 async def test_callback_doesnt_sync_localdev_roles(
     async_session: AsyncSession,
     auth0_apiclient: Auth0Client,

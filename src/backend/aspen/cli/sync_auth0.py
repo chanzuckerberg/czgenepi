@@ -6,7 +6,7 @@ from typing import Any, Dict, List, MutableSequence, Optional, Set, Tuple
 
 import click
 import sqlalchemy as sa
-from auth0.v3.exceptions import RateLimitError
+from auth0.v3.exceptions import Auth0Error, RateLimitError
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.session import Session
 
@@ -58,7 +58,7 @@ class RoleManager:
         a0_roles: Set[Tuple[str, str]] = set()
         try:
             a0_groups = self.a0.get_user_orgs(user.auth0_user_id)
-        except:
+        except Auth0Error:
             print(f"User {user.email} / {user.auth0_user_id} does not exist in auth0!")
             return
         for group in a0_groups:
