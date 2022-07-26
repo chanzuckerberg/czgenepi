@@ -61,14 +61,14 @@ class Auth0Client:
 
         self.client: Auth0 = Auth0(domain=domain, token=token["access_token"])
 
-    def get_all_results(self, endpoint: Callable, key: str) -> List[Any]:
+    def get_all_results(self, endpoint: Callable, key: str, **kwargs) -> List[Any]:
         # Auth0 paginates results. We don't have a crazy amount of data in auth0 so we can
         # afford to just paginate through all the results and hold everything in memory.
         results: List[Any] = []
         page = 0
         per_page = 25
         while True:
-            resp = endpoint(page=page, per_page=per_page)
+            resp = endpoint(**kwargs, page=page, per_page=per_page)
             if len(resp[key]) == 0:
                 return results
             results.extend(resp[key])
@@ -85,20 +85,14 @@ class Auth0Client:
         return [item["name"] for item in res]
 
     @cache
-    def get_org_by_name(self, org_name: str) -> Auth0Org:
-        orgs = self.get_orgs()
-        for org in orgs:
-            if org["display_name"] == org_name:
-                return org
-        raise Exception("Organization not found")
+    def get_org_by_id(self, org_id: str) -> Auth0Org:
+        return self.client.organizations.get_organization(org_id)
 
     @cache
-    def get_org_by_id(self, org_id: str) -> Auth0Org:
-        orgs = self.get_orgs()
-        for org in orgs:
-            if org["id"] == org_id:
-                return org
-        raise Exception("Organization not found")
+    def get_user_orgs(self, user_id: str) -> List[Auth0Org]:
+        return self.get_all_results(
+            self.client.users.list_organizations, "organizations", id=user_id
+        )
 
     @cache
     def get_orgs(self) -> List[Auth0Org]:
@@ -147,6 +141,18 @@ class Auth0Client:
         member_role = self.get_auth0_role("member")
         self.client.organizations.create_organization_member_roles(
             org["id"], user_id, {"roles": [member_role["id"]]}
+        )
+
+    def add_org_roles(self, org: Auth0Org, user_id: str, roles: List[str]) -> None:
+        role_ids = [self.get_auth0_role(role)["id"] for role in roles]
+        self.client.organizations.create_organization_member_roles(
+            org["id"], user_id, {"roles": role_ids}
+        )
+
+    def remove_org_roles(self, org: Auth0Org, user_id: str, roles: List[str]) -> None:
+        role_ids = [self.get_auth0_role(role)["id"] for role in roles]
+        self.client.organizations.delete_organization_member_roles(
+            org["id"], user_id, {"roles": role_ids}
         )
 
     def remove_org_member(self, org: Auth0Org, user_id: str) -> None:

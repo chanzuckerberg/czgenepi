@@ -7,10 +7,9 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import contains_eager, joinedload
 from sqlalchemy.sql.expression import Select
-from starlette.requests import Request
 
 from aspen.api.authn import get_admin_user, get_auth0_apiclient, get_auth_user
-from aspen.api.authz import require_access
+from aspen.api.authz import fetch_authorized_row, require_access
 from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.usergroup import (
@@ -33,7 +32,6 @@ async def create_group(
     group_creation_request: GroupCreationRequest,
     db: AsyncSession = Depends(get_db),
     auth0_client: Auth0Client = Depends(get_auth0_apiclient),
-    settings: Settings = Depends(get_settings),
     user: User = Depends(get_admin_user),
 ) -> GroupInfoResponse:
     # Auth0 requires we only have alphanumerics, "-" and "_" in a group name.
@@ -62,7 +60,6 @@ async def create_group(
 @router.get("/{group_id}/", response_model=GroupInfoResponse)
 async def get_group_info(
     group_id: int,
-    request: Request,
     db: AsyncSession = Depends(get_db),
     authorized_query: Select = Depends(require_access("read", Group)),
 ) -> GroupInfoResponse:
@@ -80,15 +77,8 @@ async def get_group_info(
 async def get_group_members(
     group_id: int,
     db: AsyncSession = Depends(get_db),
-    authorized_query: Select = Depends(require_access("read", Group)),
+    group: Group = Depends(fetch_authorized_row("read", Group, "group_id")),
 ) -> GroupMembersResponse:
-    group = (
-        (await (db.execute(authorized_query.where(Group.id == group_id))))
-        .scalars()
-        .one_or_none()
-    )
-    if not group:
-        raise ex.UnauthorizedException("Not authorized")
     members_query = (
         sa.select(User)  # type: ignore
         .join(User.user_roles)  # type: ignore
@@ -114,19 +104,11 @@ async def get_group_members(
 
 @router.get("/{group_id}/invitations/", response_model=InvitationsResponse)
 async def get_group_invitations(
-    group_id: int,
-    request: Request,
-    db: AsyncSession = Depends(get_db),
-    authorized_query: Select = Depends(require_access("read", Group)),
+    group: Group = Depends(fetch_authorized_row("read", Group, "group_id")),
     auth0_client: Auth0Client = Depends(get_auth0_apiclient),
 ) -> InvitationsResponse:
-    requested_group_query = authorized_query.where(Group.id == group_id)
-    requested_group_result = await db.execute(requested_group_query)
-    requested_group: Group = requested_group_result.scalars().one_or_none()
-    if not requested_group:
-        raise ex.UnauthorizedException("Not authorized")
     try:
-        auth0_org: Auth0Org = auth0_client.get_org_by_id(requested_group.auth0_org_id)
+        auth0_org: Auth0Org = auth0_client.get_org_by_id(group.auth0_org_id)
     except Exception:
         raise ex.BadRequestException("Not found")
     invitations = auth0_client.get_org_invitations(auth0_org)
@@ -135,41 +117,28 @@ async def get_group_invitations(
 
 @router.post("/{group_id}/invitations/", response_model=GroupInvitationsResponse)
 async def invite_group_members(
-    group_id: int,
     group_invitation_request: GroupInvitationsRequest,
     auth0_client: Auth0Client = Depends(get_auth0_apiclient),
-    db: AsyncSession = Depends(get_db),
-    authorized_query: Select = Depends(require_access("write", Group)),
+    group: Group = Depends(fetch_authorized_row("invite_members", Group, "group_id")),
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_auth_user),
 ) -> GroupInvitationsResponse:
-    group = (
-        (await db.execute(authorized_query.where(Group.id == group_id))).scalars().one_or_none()  # type: ignore
-    )
-    if not group:
-        raise ex.UnauthorizedException("Not authorized")
-    organization = auth0_client.get_org_by_name(group.name)
+    organization = auth0_client.get_org_by_id(group.auth0_org_id)
     client_id = settings.AUTH0_CLIENT_ID
     responses = []
     for email in group_invitation_request.emails:
-        # Temporary: We only support adding users to a single group right now,
-        # so skip sending emails to users that already exist elsewhere.
         success = True
-        if auth0_client.get_user_by_email(email):
-            success = False
         try:
-            if success:
-                auth0_client.invite_member(
-                    organization["id"],
-                    client_id,
-                    user.name,
-                    email,
-                    group_invitation_request.role,
-                )
+            auth0_client.invite_member(
+                organization["id"],
+                client_id,
+                user.name,
+                email,
+                group_invitation_request.role,
+            )
         except Auth0Error as err:
             # TODO - we need to learn more about possible exceptions here.
             sentry_sdk.capture_exception(err)
             success = False
         responses.append({"email": email, "success": success})
-
     return GroupInvitationsResponse.parse_obj({"invitations": responses})

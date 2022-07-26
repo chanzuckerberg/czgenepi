@@ -4,6 +4,7 @@ import { useUserInfo } from "src/common/queries/auth";
 import { useDeleteSamples } from "src/common/queries/samples";
 import { B } from "src/common/styles/basicStyle";
 import { pluralize } from "src/common/utils/strUtils";
+import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
 import { DeleteDialog } from "src/components/DeleteDialog";
 import Notification from "src/components/Notification";
 import { StyledCallout } from "./style";
@@ -25,10 +26,10 @@ const DeleteSamplesConfirmationModal = ({
     useState<boolean>(false);
   const [numDeletedSamples, setNumDeletedSamples] = useState<number>(0);
   const { data: userInfo } = useUserInfo();
-  const { group: userGroup } = userInfo ?? {};
+  const currentGroup = getCurrentGroupFromUserInfo(userInfo);
 
   const samplesToDelete = checkedSamples
-    .filter((sample) => sample.submittingGroup?.name === userGroup?.name)
+    .filter((sample) => sample.submittingGroup?.name === currentGroup?.name)
     .map((sample) => sample.id);
 
   const deleteSampleMutation = useDeleteSamples({

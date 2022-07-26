@@ -43,7 +43,6 @@ const EditSamplesReviewDialog = ({
   onSaveSuccess,
 }: Props): JSX.Element => {
   const [isChecked, setChecked] = useState<boolean>(false);
-
   const editSampleMutation = useEditSamples({
     componentOnSuccess: () => {
       onSaveSuccess();

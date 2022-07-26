@@ -9,10 +9,11 @@ import { SampleIdToMetadata } from "src/components/WebformTable/common/types";
 import { METADATA_KEYS_TO_API_KEYS } from "src/views/Upload/components/common/constants";
 import { Samples } from "src/views/Upload/components/common/types";
 import {
-  API,
   DEFAULT_DELETE_OPTIONS,
   DEFAULT_POST_OPTIONS,
   fetchSamples,
+  generateOrgSpecificUrl,
+  ORG_API,
   putBackendApiJson,
   SampleResponse,
 } from "../api";
@@ -24,24 +25,44 @@ import { MutationCallbacks } from "./types";
  * Download fasta file for samples
  */
 interface SampleFastaDownloadPayload {
-  sample_ids: string[];
+  sampleIds: string[];
 }
+
+type FastaDownloadCallbacks = MutationCallbacks<Blob>;
 
 export async function downloadSamplesFasta({
   sampleIds,
 }: {
   sampleIds: string[];
-}): Promise<unknown> {
-  const payload: SampleFastaDownloadPayload = {
+}): Promise<Blob> {
+  const payload = {
     sample_ids: sampleIds,
   };
-  const response = await fetch(API_URL + API.SAMPLES_FASTA_DOWNLOAD, {
-    ...DEFAULT_POST_OPTIONS,
-    body: JSON.stringify(payload),
-  });
+  const response = await fetch(
+    API_URL + generateOrgSpecificUrl(ORG_API.SAMPLES_FASTA_DOWNLOAD),
+    {
+      ...DEFAULT_POST_OPTIONS,
+      body: JSON.stringify(payload),
+    }
+  );
   if (response.ok) return await response.blob();
 
   throw Error(`${response.statusText}: ${await response.text()}`);
+}
+
+export function useFastaDownload({
+  componentOnError,
+  componentOnSuccess,
+}: FastaDownloadCallbacks): UseMutationResult<
+  Blob,
+  unknown,
+  SampleFastaDownloadPayload,
+  unknown
+> {
+  return useMutation(downloadSamplesFasta, {
+    onError: componentOnError,
+    onSuccess: componentOnSuccess,
+  });
 }
 
 /**
@@ -58,10 +79,13 @@ export async function validateSampleIdentifiers({
     sample_ids: sampleIdsToValidate,
   };
 
-  const response = await fetch(API_URL + API.SAMPLES_VALIDATE_IDS, {
-    ...DEFAULT_POST_OPTIONS,
-    body: JSON.stringify(payload),
-  });
+  const response = await fetch(
+    API_URL + generateOrgSpecificUrl(ORG_API.SAMPLES_VALIDATE_IDS),
+    {
+      ...DEFAULT_POST_OPTIONS,
+      body: JSON.stringify(payload),
+    }
+  );
   if (response.ok) return await response.json();
 
   throw Error(`${response.statusText}: ${await response.text()}`);
@@ -108,13 +132,15 @@ interface SamplePayload {
   };
 }
 
+interface SampleCreateRequestType {
+  samples: Samples | null;
+  metadata: SampleIdToMetadata | null;
+}
+
 export async function createSamples({
   samples,
   metadata,
-}: {
-  samples: Samples | null;
-  metadata: SampleIdToMetadata | null;
-}): Promise<unknown> {
+}: SampleCreateRequestType): Promise<unknown> {
   const payload: SamplePayload[] = [];
 
   if (!samples || !metadata) {
@@ -159,14 +185,27 @@ export async function createSamples({
     payload.push(samplePayload);
   }
 
-  const response = await fetch(API_URL + API.SAMPLES, {
-    ...DEFAULT_POST_OPTIONS,
-    body: JSON.stringify(payload),
-  });
+  const response = await fetch(
+    API_URL + generateOrgSpecificUrl(ORG_API.SAMPLES),
+    {
+      ...DEFAULT_POST_OPTIONS,
+      body: JSON.stringify(payload),
+    }
+  );
 
   if (response.ok) return await response.json();
 
   throw Error(`${response.statusText}: ${await response.text()}`);
+}
+
+export function useCreateSamples({
+  componentOnSuccess,
+}: {
+  componentOnSuccess: () => void;
+}): UseMutationResult<unknown, unknown, SampleCreateRequestType, unknown> {
+  return useMutation(createSamples, {
+    onSuccess: componentOnSuccess,
+  });
 }
 
 /**
@@ -179,7 +218,7 @@ export const USE_SAMPLE_INFO = {
 };
 
 export function useSampleInfo(): UseQueryResult<SampleResponse, unknown> {
-  return useQuery([USE_SAMPLE_INFO], fetchSamples, {
+  return useQuery([USE_SAMPLE_INFO], () => fetchSamples(), {
     retry: false,
   });
 }
@@ -201,10 +240,13 @@ export async function deleteSamples({
     ids: samplesToDelete,
   };
 
-  const response = await fetch(API_URL + API.SAMPLES, {
-    ...DEFAULT_DELETE_OPTIONS,
-    body: JSON.stringify(payload),
-  });
+  const response = await fetch(
+    API_URL + generateOrgSpecificUrl(ORG_API.SAMPLES),
+    {
+      ...DEFAULT_DELETE_OPTIONS,
+      body: JSON.stringify(payload),
+    }
+  );
 
   if (response.ok) return await response.json();
 
@@ -293,7 +335,10 @@ type SamplesEditCallbacks = MutationCallbacks<SamplesEditResponseType[]>;
 export async function editSamples({
   samples,
 }: SamplesEditRequestType): Promise<SamplesEditResponseType[]> {
-  return putBackendApiJson(API.SAMPLES, JSON.stringify({ samples }));
+  return putBackendApiJson(
+    generateOrgSpecificUrl(ORG_API.SAMPLES),
+    JSON.stringify({ samples })
+  );
 }
 
 export function useEditSamples({

@@ -6,9 +6,10 @@ import {
   UseQueryResult,
 } from "react-query";
 import {
-  API,
   DEFAULT_DELETE_OPTIONS,
   fetchPhyloRuns,
+  generateOrgSpecificUrl,
+  ORG_API,
   PhyloRunResponse,
 } from "../api";
 import { API_URL } from "../constants/ENV";
@@ -44,12 +45,15 @@ interface PhyloRunDeleteResponseType {
   id: string;
 }
 
-export async function deletePhyloRun({
+async function deletePhyloRun({
   phyloRunIdToDelete,
 }: PhyloRunDeleteRequestType): Promise<PhyloRunDeleteResponseType> {
-  const response = await fetch(API_URL + API.PHYLO_RUNS + phyloRunIdToDelete, {
-    ...DEFAULT_DELETE_OPTIONS,
-  });
+  const response = await fetch(
+    API_URL + generateOrgSpecificUrl(ORG_API.PHYLO_RUNS) + phyloRunIdToDelete,
+    {
+      ...DEFAULT_DELETE_OPTIONS,
+    }
+  );
 
   if (response.ok) return await response.json();
   throw Error(`${response.statusText}: ${await response.text()}`);

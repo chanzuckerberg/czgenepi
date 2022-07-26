@@ -1,6 +1,10 @@
 import { Button, ButtonProps } from "czifui";
 import React, { useEffect, useState } from "react";
-import { DEFAULT_POST_OPTIONS } from "src/common/api";
+import {
+  DEFAULT_POST_OPTIONS,
+  generateOrgSpecificUrl,
+  ORG_API,
+} from "src/common/api";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import ENV from "src/common/constants/ENV";
 
@@ -10,10 +14,13 @@ interface Props extends ButtonProps {
 
 const getTreeUrl = async (treeId: number) => {
   const requestData = { tree_id: treeId };
-  const result = await fetch(`${ENV.API_URL}/v2/auspice/generate`, {
-    body: JSON.stringify(requestData),
-    ...DEFAULT_POST_OPTIONS,
-  });
+  const result = await fetch(
+    `${ENV.API_URL}${generateOrgSpecificUrl(ORG_API.AUSPICE)}`,
+    {
+      body: JSON.stringify(requestData),
+      ...DEFAULT_POST_OPTIONS,
+    }
+  );
 
   const json = await result.json();
 

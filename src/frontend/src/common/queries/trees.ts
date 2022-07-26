@@ -5,6 +5,8 @@ import {
   DEFAULT_HEADERS_MUTATION_OPTIONS,
   DEFAULT_POST_OPTIONS,
   DEFAULT_PUT_OPTIONS,
+  generateOrgSpecificUrl,
+  ORG_API,
 } from "../api";
 import { API_URL } from "../constants/ENV";
 import { USE_PHYLO_RUN_INFO } from "./phyloRuns";
@@ -56,10 +58,13 @@ async function createTree({
     },
   };
 
-  const response = await fetch(API_URL + API.PHYLO_RUNS, {
-    ...DEFAULT_POST_OPTIONS,
-    body: JSON.stringify(payload),
-  });
+  const response = await fetch(
+    API_URL + generateOrgSpecificUrl(ORG_API.PHYLO_RUNS),
+    {
+      ...DEFAULT_POST_OPTIONS,
+      body: JSON.stringify(payload),
+    }
+  );
   if (response.ok) return await response.json();
 
   throw Error(`${response.statusText}: ${await response.text()}`);
@@ -115,10 +120,14 @@ async function getFastaURL({
     // If left as undefined, will be stripped out from payload during JSON.stringify
     downstream_consumer: downstreamConsumer,
   };
-  const response = await fetch(API_URL + API.GET_FASTA_URL, {
-    ...DEFAULT_POST_OPTIONS,
-    body: JSON.stringify(payload),
-  });
+
+  const response = await fetch(
+    API_URL + generateOrgSpecificUrl(ORG_API.GET_FASTA_URL),
+    {
+      ...DEFAULT_POST_OPTIONS,
+      body: JSON.stringify(payload),
+    }
+  );
   if (response.ok) return await response.json();
 
   throw Error(`${response.statusText}: ${await response.text()}`);
@@ -175,11 +184,14 @@ export async function editTree({
   const payload: EditTreePayloadType = {
     name: newTreeName,
   };
-  const response = await fetch(API_URL + API.PHYLO_RUNS + treeIdToEdit, {
-    ...DEFAULT_PUT_OPTIONS,
-    ...DEFAULT_HEADERS_MUTATION_OPTIONS,
-    body: JSON.stringify(payload),
-  });
+  const response = await fetch(
+    API_URL + generateOrgSpecificUrl(ORG_API.PHYLO_RUNS) + treeIdToEdit,
+    {
+      ...DEFAULT_PUT_OPTIONS,
+      ...DEFAULT_HEADERS_MUTATION_OPTIONS,
+      body: JSON.stringify(payload),
+    }
+  );
 
   if (response.ok) return await response.json();
   throw Error(`${response.statusText}: ${await response.text()}`);

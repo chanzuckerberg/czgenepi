@@ -1,20 +1,37 @@
 import ENV from "src/common/constants/ENV";
 import { jsonToType } from "src/common/utils";
+import { store } from "../redux";
+import { selectCurrentGroup } from "../redux/selectors";
 
 export enum API {
   USERDATA = "/v2/users/me",
-  SAMPLES = "/v2/samples/",
   LOG_IN = "/v2/auth/login",
   LOG_OUT = "/v2/auth/logout",
-  PHYLO_RUNS = "/v2/phylo_runs/",
-  SAMPLES_FASTA_DOWNLOAD = "/v2/sequences/",
-  GET_FASTA_URL = "/v2/sequences/getfastaurl",
   USHER_TREE_OPTIONS = "/v2/usher/tree_versions/",
-  SAMPLES_VALIDATE_IDS = "/v2/samples/validate_ids/",
   LOCATIONS = "/v2/locations/",
   PANGO_LINEAGES = "/v2/lineages/pango",
   GROUPS = "/v2/groups/",
+  ORGS = "/v2/orgs/",
 }
+
+export enum ORG_API {
+  AUSPICE = "auspice/generate",
+  PHYLO_RUNS = "phylo_runs/",
+  SAMPLES = "samples/",
+  SAMPLES_VALIDATE_IDS = "samples/validate_ids/",
+  SAMPLES_FASTA_DOWNLOAD = "sequences/",
+  GET_FASTA_URL = "sequences/getfastaurl",
+}
+
+export const generateOrgSpecificUrl = (path: ORG_API): string => {
+  const groupId = selectCurrentGroup(store.getState());
+  return `${API.ORGS}${groupId}/${path}`;
+};
+
+export const generateGroupSpecificUrl = (path: string): string => {
+  const groupId = selectCurrentGroup(store.getState());
+  return `${API.GROUPS}${groupId}/${path}`;
+};
 
 export const DEFAULT_HEADERS_MUTATION_OPTIONS: RequestInit = {
   headers: {
@@ -194,7 +211,11 @@ const SAMPLE_MAP = new Map<string, keyof Sample>([
 ]);
 
 export const fetchSamples = (): Promise<SampleResponse> =>
-  apiResponse<SampleResponse>(["samples"], [SAMPLE_MAP], API.SAMPLES);
+  apiResponse<SampleResponse>(
+    ["samples"],
+    [SAMPLE_MAP],
+    generateOrgSpecificUrl(ORG_API.SAMPLES)
+  );
 
 export interface PhyloRunResponse extends APIResponse {
   phylo_trees: PhyloRun[];
@@ -211,5 +232,5 @@ export const fetchPhyloRuns = (): Promise<PhyloRunResponse> =>
   apiResponse<PhyloRunResponse>(
     ["phylo_runs"],
     [PHYLO_RUN_MAP],
-    API.PHYLO_RUNS
+    generateOrgSpecificUrl(ORG_API.PHYLO_RUNS)
   );

@@ -77,7 +77,7 @@ async def list_samples(
         )
         sample.show_private_identifier = False
         # TODO - convert this to an oso check.
-        if sample.submitting_group_id == ac.group.id:
+        if sample.submitting_group_id == ac.group.id:  # type: ignore
             sample.show_private_identifier = True
 
         sampleinfo = SampleResponse.from_orm(sample)

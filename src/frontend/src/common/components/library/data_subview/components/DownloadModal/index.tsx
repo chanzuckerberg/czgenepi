@@ -3,14 +3,14 @@ import { Alert, Tooltip } from "czifui";
 import { isEqual, noop } from "lodash";
 import React, { useCallback, useEffect, useState } from "react";
 import { CSVLink } from "react-csv";
-import { useMutation } from "react-query";
 import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import { useUserInfo } from "src/common/queries/auth";
-import { downloadSamplesFasta } from "src/common/queries/samples";
+import { useFastaDownload } from "src/common/queries/samples";
 import { B } from "src/common/styles/basicStyle";
 import { pluralize } from "src/common/utils/strUtils";
+import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
 import Dialog from "src/components/Dialog";
 import Notification from "src/components/Notification";
 import { TooltipDescriptionText, TooltipHeaderText } from "../../style";
@@ -46,7 +46,8 @@ const DownloadModal = ({
   onClose,
 }: Props): JSX.Element => {
   const { data: userInfo } = useUserInfo();
-  const groupName = userInfo?.group?.name.toLowerCase().replace(/ /g, "_"); // format group name for sequences download file
+  const currentGroup = getCurrentGroupFromUserInfo(userInfo);
+  const groupName = currentGroup?.name.toLowerCase().replace(/ /g, "_"); // format group name for sequences download file
   const downloadDate = new Date();
   const separator = "\t";
   const fastaDownloadName = `${groupName}_sample_sequences_${downloadDate
@@ -95,12 +96,12 @@ const DownloadModal = ({
     onClose();
   };
 
-  const fastaDownloadMutation = useMutation(downloadSamplesFasta, {
-    onError: () => {
+  const fastaDownloadMutation = useFastaDownload({
+    componentOnError: () => {
       setShouldShowError(true);
       handleCloseModal();
     },
-    onSuccess: (data: any) => {
+    componentOnSuccess: (data: Blob) => {
       const link = document.createElement("a");
       link.href = window.URL.createObjectURL(data);
       link.download = fastaDownloadName;

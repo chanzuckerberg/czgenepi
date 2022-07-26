@@ -1,24 +1,18 @@
 from functools import lru_cache
 from pathlib import Path
+from typing import Optional
 
 from fastapi import Depends
 from oso import AsyncOso, Relation
 from polar.data.adapter.async_sqlalchemy2_adapter import AsyncSqlAlchemyAdapter
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm.exc import NoResultFound
+from starlette.requests import Request
 
 from aspen.api.authn import AuthContext, get_auth_context
 from aspen.api.deps import get_db
 from aspen.api.error import http_exceptions as ex
-from aspen.database.models import (
-    Group,
-    GroupRole,
-    PhyloRun,
-    PhyloTree,
-    Role,
-    Sample,
-    User,
-    UserRole,
-)
+from aspen.database.models import Group, PhyloRun, PhyloTree, Sample, User
 from aspen.database.models.base import idbase
 
 
@@ -28,72 +22,16 @@ def register_classes(oso):
         fields={"user": User, "group": Group, "roles": list, "group_roles": list},
     )
     oso.register_class(
-        GroupRole,
-        fields={
-            "id": int,
-            "grantor_group_id": int,
-            "grantee_group_id": int,
-            "grantor_group": Relation(
-                kind="one",
-                other_type="Group",
-                my_field="grantor_group_id",
-                other_field="id",
-            ),
-            "role": Relation(
-                kind="one", other_type="Role", my_field="role_id", other_field="id"
-            ),
-            "grantee_group": Relation(
-                kind="one",
-                other_type="Group",
-                my_field="grantee_group_id",
-                other_field="id",
-            ),
-        },
-    )
-    oso.register_class(
         Group,
-        fields={
-            "id": int,
-            "grantee_roles": Relation(
-                kind="many",
-                other_type="GroupRole",
-                my_field="id",
-                other_field="grantee_group_id",
-            ),
-        },
+        fields={"id": int},
     )
-    oso.register_class(Role, fields={"id": int, "name": str})
     oso.register_class(
         User,
         fields={
             "id": str,
-            "user_roles": Relation(
-                kind="many",
-                other_type="UserRole",
-                my_field="id",
-                other_field="user_id",
-            ),
+            "system_admin": bool,
         },
     )
-    oso.register_class(
-        UserRole,
-        fields={
-            "id": int,
-            "group_id": int,
-            "role_id": int,
-            "user_id": int,
-            "group": Relation(
-                kind="one", other_type="Group", my_field="group_id", other_field="id"
-            ),
-            "role": Relation(
-                kind="one", other_type="Role", my_field="role_id", other_field="id"
-            ),
-            "user": Relation(
-                kind="one", other_type="User", my_field="user_id", other_field="id"
-            ),
-        },
-    )
-
     oso.register_class(
         Sample,
         fields={
@@ -141,7 +79,7 @@ def register_classes(oso):
 # This is just a thin indirection/wrapper for Oso's interface in case we need to swap it out
 # with something else in the future.
 class AuthZSession:
-    def __init__(self, session, auth_context):
+    def __init__(self, session: AsyncSession, auth_context: AuthContext):
         oso = AsyncOso()
         oso.set_data_filtering_adapter(AsyncSqlAlchemyAdapter(session))
         register_classes(oso)
@@ -214,3 +152,40 @@ def require_group_privilege(
     privilege: str,
 ) -> AuthorizedGroup:
     return AuthorizedGroup(privilege)
+
+
+class AuthorizedRow:
+    def __init__(self, privilege: str, model: idbase, id_field: Optional[str] = None):
+        self.privilege = privilege
+        self.model = model
+        if not id_field:
+            id_field = "row_id"
+        self.id_field = id_field
+
+    async def __call__(
+        self,
+        request: Request,
+        auth_context: AuthContext = Depends(get_auth_context),
+        session: AsyncSession = Depends(get_db),
+    ) -> idbase:
+        authz_session = AuthZSession(session, auth_context)
+        query = await authz_session.authorized_query(self.privilege, self.model)
+        id_value = int(request.path_params[self.id_field])
+        try:
+            res = (
+                (await (session.execute(query.where(self.model.id == id_value))))
+                .scalars()
+                .one()
+            )
+            return res
+        except NoResultFound:
+            raise ex.UnauthorizedException("unauthorized")
+
+
+@lru_cache
+def fetch_authorized_row(
+    privilege: str,
+    model: idbase,
+    id_field: Optional[str] = None,
+) -> idbase:
+    return AuthorizedRow(privilege, model, id_field)

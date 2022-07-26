@@ -103,7 +103,7 @@ class UserRole(base):  # type: ignore
     """User role grants"""
 
     __tablename__ = "user_roles"
-    role_id = Column(Integer, ForeignKey(Role.id), nullable=False)
+    role_id = Column(Integer, ForeignKey(Role.id), nullable=False, primary_key=True)
     role = relationship(Role, backref=backref("user_roles", uselist=True))  # type: ignore
     group_id = Column(Integer, ForeignKey(Group.id), nullable=False, primary_key=True)
     group = relationship(Group, backref=backref("user_roles", uselist=True))  # type: ignore

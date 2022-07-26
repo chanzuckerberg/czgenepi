@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
-from starlette.requests import Request
 
 from aspen.api.authn import (
     get_admin_user,
@@ -37,9 +36,7 @@ def set_user_groups(user):
 
 
 @router.get("/me", response_model=UserMeResponse)
-async def get_current_user(
-    request: Request, db: AsyncSession = Depends(get_db), user=Depends(get_auth_user)
-) -> UserMeResponse:
+async def get_current_user(user=Depends(get_auth_user)) -> UserMeResponse:
     set_user_groups(user)
     return UserMeResponse.from_orm(user)
 
@@ -83,7 +80,7 @@ async def post_usergroup(
         await db.commit()
     except IntegrityError:
         raise ex.BadRequestException("User already exists")
-    user_query = get_usergroup_query(db, user_creation_request.auth0_user_id)
+    user_query = get_usergroup_query(user_creation_request.auth0_user_id)
     user_query_result = await db.execute(user_query)
     created_user = user_query_result.unique().scalars().one()
     set_user_groups(created_user)
