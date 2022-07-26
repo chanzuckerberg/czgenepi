@@ -18,6 +18,6 @@ export const pluralizeVerb = (str: string, count: number): string => {
 };
 
 type SortResponse = -1 | 0 | 1;
-export const caseInsensitiveSort = (a: string, b: string): SortReponse => {
+export const caseInsensitiveSort = (a: string, b: string): SortResponse => {
   return a.toLowerCase() > b.toLowerCase() ? 1 : -1;
 };
