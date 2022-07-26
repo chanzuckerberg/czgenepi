@@ -17,7 +17,7 @@ export const pluralizeVerb = (str: string, count: number): string => {
   return str;
 };
 
-type SortReponse = -1 | 0 | 1;
+type SortResponse = -1 | 0 | 1;
 export const caseInsensitiveSort = (a: string, b: string): SortReponse => {
   return a.toLowerCase() > b.toLowerCase() ? 1 : -1;
 };
