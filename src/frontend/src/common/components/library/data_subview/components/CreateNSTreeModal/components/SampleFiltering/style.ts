@@ -7,6 +7,7 @@ import {
   getSpaces,
 } from "czifui";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
+import { iconFillGrayHoverPrimary } from "src/common/styles/iconStyle";
 
 export const StyledContainer = styled.div`
   ${(props) => {
@@ -53,6 +54,10 @@ export const StyledFilterGroupName = styled.p`
       margin-bottom: ${spaces?.xxs}px;
     `;
   }}
+`;
+
+export const StyledInfoIconWrapper = styled.div`
+  ${iconFillGrayHoverPrimary}
 `;
 
 export const StyledNewTabLink = styled(NewTabLink)`

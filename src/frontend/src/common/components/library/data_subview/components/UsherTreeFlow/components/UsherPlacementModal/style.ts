@@ -13,7 +13,10 @@ import {
   List,
   ListItem,
 } from "czifui";
-import { InfoIconWrapper } from "src/common/styles/iconStyle";
+import {
+  iconFillGrayHoverPrimary,
+  iconFillWarning,
+} from "src/common/styles/iconStyle";
 import { StyledDialogContent as DialogContent } from "../../../CreateNSTreeModal/style";
 
 const INPUT_HEIGHT = "34px";
@@ -156,7 +159,8 @@ export const StyledInputDropdown = styled(InputDropdown)`
   }}
 `;
 
-export const StyledInfoIconWrapper = styled(InfoIconWrapper)`
+export const StyledInfoIconWrapper = styled.div`
+  ${iconFillGrayHoverPrimary}
   margin-top: 3px;
 `;
 
@@ -168,4 +172,8 @@ export const Content = styled.div`
       color: ${colors?.gray[500]};
     `;
   }}
+`;
+
+export const StyledWarningIconWrapper = styled.div`
+  ${iconFillWarning}
 `;

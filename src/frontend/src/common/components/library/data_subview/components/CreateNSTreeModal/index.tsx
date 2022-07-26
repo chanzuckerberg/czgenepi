@@ -13,9 +13,8 @@ import { useCreateTree } from "src/common/queries/trees";
 import { ROUTES } from "src/common/routes";
 import { B } from "src/common/styles/basicStyle";
 import {
-  IconWrapperGray500,
-  InfoIconWrapper,
   StyledCloseIconButton,
+  StyledCloseIconWrapper,
 } from "src/common/styles/iconStyle";
 import { pluralize } from "src/common/utils/strUtils";
 import Notification from "src/components/Notification";
@@ -44,6 +43,7 @@ import {
   StyledDialogTitle,
   StyledFooter,
   StyledFormControlLabel,
+  StyledInfoIconWrapper,
   StyledRadio,
   StyledTooltip,
   Title,
@@ -216,9 +216,9 @@ export const CreateNSTreeModal = ({
       >
         <StyledDialogTitle>
           <StyledCloseIconButton aria-label="close modal" onClick={handleClose}>
-            <IconWrapperGray500>
+            <StyledCloseIconWrapper>
               <Icon sdsIcon="xMark" sdsSize="l" sdsType="static" />
-            </IconWrapperGray500>
+            </StyledCloseIconWrapper>
           </StyledCloseIconButton>
           <Header>Create New Phylogenetic Tree</Header>
           <Title>
@@ -250,13 +250,13 @@ export const CreateNSTreeModal = ({
                 title={TREE_TYPE_TOOLTIP_TEXT}
                 placement="top"
               >
-                <InfoIconWrapper>
+                <StyledInfoIconWrapper>
                   <Icon
                     sdsIcon="infoCircle"
                     sdsSize="xs"
                     sdsType="interactive"
                   />
-                </InfoIconWrapper>
+                </StyledInfoIconWrapper>
               </StyledTooltip>
             </TreeNameInfoWrapper>
             <RadioGroup

@@ -1,8 +1,7 @@
 import { Icon } from "czifui";
 import React from "react";
-import { StyledIconWrapperWhite } from "src/common/styles/iconStyle";
 import { Status } from "../common";
-import { Container, StyledCircle, Text } from "./style";
+import { Container, StyledCircle, StyledIconWrapperWhite, Text } from "./style";
 
 export interface Props {
   text: string;

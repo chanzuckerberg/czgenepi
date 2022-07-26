@@ -7,7 +7,7 @@ import {
   getFontWeights,
   getSpaces,
 } from "czifui";
-import { ErrorIconWrapper } from "src/common/styles/iconStyle";
+import { iconFillError } from "src/common/styles/iconStyle";
 import Instructions from "src/components/Instructions";
 
 export const StyledInstructions = styled(Instructions)`
@@ -53,7 +53,8 @@ export const TextInputLabelTitle = styled.div`
   }}
 `;
 
-export const StyledErrorIconWrapper = styled(ErrorIconWrapper)`
+export const StyledErrorIconWrapper = styled.div`
+  ${iconFillError}
   ${(props) => {
     const spaces = getSpaces(props);
 

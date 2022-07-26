@@ -7,6 +7,10 @@ import {
   getSpaces,
 } from "czifui";
 import { TreeRowContent } from "src/common/components/library/data_table/style";
+import {
+  iconFillGray,
+  iconFillGrayHoverPrimary,
+} from "src/common/styles/iconStyle";
 
 export interface ExtraProps extends CommonThemeProps {
   disabled?: boolean;
@@ -40,6 +44,10 @@ export const CellWrapper = styled.div`
   align-items: center;
 `;
 
+export const StyledInfoIconWrapper = styled.div`
+  ${iconFillGrayHoverPrimary}
+`;
+
 export const StyledNameWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -58,6 +66,17 @@ export const StyledTreeCreator = styled.div`
     return `
       color: ${colors?.gray[500]};
       margin-top: ${spaces?.xxxs}px;
+    `;
+  }}
+`;
+
+export const StyledTreeIconWrapper = styled.div`
+  ${iconFillGray}
+  ${(props) => {
+    const spaces = getSpaces(props);
+
+    return `
+      margin: 0 ${spaces?.l}px;
     `;
   }}
 `;

@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import { fontHeaderL, getColors, getSpaces } from "czifui";
 import LogoImage from "src/common/images/logo_complete_white.svg";
-import { NavIconWrapper } from "src/common/styles/iconStyle";
+import { iconFillWhite } from "src/common/styles/iconStyle";
 
 export const Logo = styled(LogoImage)`
   height: 25px;
@@ -76,7 +76,8 @@ export const DropdownClickTarget = styled.span`
   display: flex;
 `;
 
-export const StyledNavIconWrapper = styled(NavIconWrapper)`
+export const StyledNavIconWrapper = styled.div`
+  ${iconFillWhite}
   ${(props) => {
     const spaces = getSpaces(props);
 

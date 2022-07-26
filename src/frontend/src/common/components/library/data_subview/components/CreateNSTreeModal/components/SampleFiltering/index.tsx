@@ -4,7 +4,6 @@ import { DefaultMenuSelectOption, Icon } from "czifui";
 import { isEqual } from "lodash";
 import React from "react";
 import { noop } from "src/common/constants/empty";
-import { InfoIconWrapper } from "src/common/styles/iconStyle";
 import {
   MENU_OPTIONS_COLLECTION_DATE,
   MENU_OPTION_ALL_TIME,
@@ -19,6 +18,7 @@ import {
   StyledFilterGroup,
   StyledFilterGroupName,
   StyledFiltersSection,
+  StyledInfoIconWrapper,
   StyledNewTabLink,
 } from "./style";
 
@@ -287,9 +287,9 @@ export function SampleFiltering({
           title={SAMPLE_FILTERING_TOOLTIP_TEXT}
           placement="top"
         >
-          <InfoIconWrapper>
+          <StyledInfoIconWrapper>
             <Icon sdsIcon="infoCircle" sdsSize="xs" sdsType="static" />
-          </InfoIconWrapper>
+          </StyledInfoIconWrapper>
         </StyledTooltip>
       </StyledExplainerTitle>
 

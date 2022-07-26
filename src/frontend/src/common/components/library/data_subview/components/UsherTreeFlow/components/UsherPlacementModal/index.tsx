@@ -9,9 +9,8 @@ import {
   useFastaFetch,
 } from "src/common/queries/trees";
 import {
-  IconWrapperGray500,
   StyledCloseIconButton,
-  WarningIconWrapper,
+  StyledCloseIconWrapper,
 } from "src/common/styles/iconStyle";
 import { pluralize } from "src/common/utils/strUtils";
 import Dialog from "src/components/Dialog";
@@ -37,6 +36,7 @@ import {
   StyledSuggestionText,
   StyledSuggestionWrapper,
   StyledTextField,
+  StyledWarningIconWrapper,
 } from "./style";
 
 interface Props {
@@ -201,9 +201,9 @@ export const UsherPlacementModal = ({
           aria-label="Close UShER phylogenetic placement modal"
           onClick={onClose}
         >
-          <IconWrapperGray500>
+          <StyledCloseIconWrapper>
             <Icon sdsIcon="xMark" sdsSize="l" sdsType="static" />
-          </IconWrapperGray500>
+          </StyledCloseIconWrapper>
         </StyledCloseIconButton>
         <FlexWrapper>
           <Header>Run Phylogenetic Placement with UShER</Header>
@@ -309,13 +309,13 @@ export const UsherPlacementModal = ({
                 />
                 {shouldShowWarning && (
                   <StyledSuggestionWrapper>
-                    <WarningIconWrapper>
+                    <StyledWarningIconWrapper>
                       <Icon
                         sdsIcon="exclamationMarkCircle"
                         sdsSize="s"
                         sdsType="static"
                       />
-                    </WarningIconWrapper>
+                    </StyledWarningIconWrapper>
                     <StyledSuggestionText>
                       We recommend a value no lower than 50.
                     </StyledSuggestionText>

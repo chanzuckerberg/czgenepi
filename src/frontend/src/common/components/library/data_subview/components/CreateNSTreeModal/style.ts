@@ -16,6 +16,7 @@ import DialogContent from "src/common/components/library/Dialog/components/Dialo
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import NextstrainLogoImg from "src/common/images/nextstrain-inline.svg";
 import { transparentScrollbars } from "src/common/styles/basicStyle";
+import { iconFillGrayHoverPrimary } from "src/common/styles/iconStyle";
 import Dialog from "src/components/Dialog";
 
 export const Attribution = styled.div`
@@ -116,6 +117,10 @@ export const StyledTextField = styled(TextField)`
 export const FieldTitle = styled.div`
   ${fontHeaderM}
   color: black;
+`;
+
+export const StyledInfoIconWrapper = styled.div`
+  ${iconFillGrayHoverPrimary}
 `;
 
 export const StyledRadio = styled(Radio)`

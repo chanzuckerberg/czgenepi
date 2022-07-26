@@ -8,7 +8,7 @@ import { useUserInfo } from "src/common/queries/auth";
 import { useNamedLocations } from "src/common/queries/locations";
 import { B } from "src/common/styles/basicStyle";
 import {
-  IconWrapperGray500,
+  StyledCloseIconWrapper,
   StyledCloseIconButton,
 } from "src/common/styles/iconStyle";
 import { pluralize } from "src/common/utils/strUtils";
@@ -292,9 +292,9 @@ const EditSamplesConfirmationModal = ({
               aria-label="Close edit samples modal"
               onClick={handleClose}
             >
-              <IconWrapperGray500>
+              <StyledCloseIconWrapper>
                 <Icon sdsIcon="xMark" sdsSize="l" sdsType="static" />
-              </IconWrapperGray500>
+              </StyledCloseIconWrapper>
             </StyledCloseIconButton>
           </div>
           <StyledPreTitle>Step {currentModalStep} of 2</StyledPreTitle>

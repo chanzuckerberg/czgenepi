@@ -9,7 +9,7 @@ import {
   getSpaces,
 } from "czifui";
 import { transparentScrollbars } from "src/common/styles/basicStyle";
-import { IconWrapperGray500 } from "src/common/styles/iconStyle";
+import { iconFillGray } from "src/common/styles/iconStyle";
 
 const inputPadding = (props: CommonThemeProps) => {
   const spaces = getSpaces(props);
@@ -77,7 +77,8 @@ export const BaselineFlexContainer = styled.div`
   align-items: baseline;
 `;
 
-export const StyledLoadingSpinnerWrapper = styled(IconWrapperGray500)`
+export const StyledLoadingSpinnerWrapper = styled.div`
+  ${iconFillGray}
   ${(props) => {
     const spaces = getSpaces(props);
 

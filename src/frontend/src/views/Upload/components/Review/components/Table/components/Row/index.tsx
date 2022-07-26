@@ -1,12 +1,12 @@
 import { Icon } from "czifui";
 import React from "react";
-import { StyledLockIconWrapper } from "src/common/styles/iconStyle";
 import { getNameFromCollectionLocation } from "src/common/utils/locationUtils";
 import { Metadata } from "src/components/WebformTable/common/types";
 import {
   Id,
   IsPrivateContent,
   IsPrivateTableCell,
+  StyledLockIconWrapper,
   StyledTableCell,
   StyledTableRow,
 } from "./style";

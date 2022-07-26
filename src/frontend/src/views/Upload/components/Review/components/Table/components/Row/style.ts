@@ -5,6 +5,7 @@ import {
   TableRowProps as MuiTableRowProps,
 } from "@material-ui/core";
 import { CommonThemeProps, fontHeaderS, getColors, getSpaces } from "czifui";
+import { rightMarginXxs } from "src/common/styles/iconStyle";
 
 export const Id = styled.div`
   ${fontHeaderS}
@@ -72,4 +73,8 @@ export const IsPrivateContent = styled.div`
   justify-content: center;
   align-items: center;
   height: 20px;
+`;
+
+export const StyledLockIconWrapper = styled.div`
+  ${rightMarginXxs}
 `;

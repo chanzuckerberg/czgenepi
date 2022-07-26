@@ -1,13 +1,13 @@
 import { Icon, IconButton, Menu, MenuItem, Tooltip } from "czifui";
 import React, { MouseEventHandler, useState } from "react";
 import { TREE_STATUS } from "src/common/constants/types";
-import {
-  StyledEditIconWrapper,
-  StyledTrashIconWrapper,
-} from "src/common/styles/iconStyle";
 import { StyledMenuItemWrapper } from "src/common/styles/menuStyle";
 import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
-import { StyledText } from "./style";
+import {
+  StyledEditIconWrapper,
+  StyledText,
+  StyledTrashIconWrapper,
+} from "./style";
 
 interface Props {
   item: PhyloRun;

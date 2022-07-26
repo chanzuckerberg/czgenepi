@@ -5,7 +5,7 @@ import React from "react";
 import { API } from "src/common/api";
 import ENV from "src/common/constants/ENV";
 import { ROUTES } from "src/common/routes";
-import { NavIconWrapper } from "src/common/styles/iconStyle";
+import { StyledNavIconWrapper } from "./style";
 
 const useStyles = makeStyles((theme: AppThemeOptions) => {
   const palette = theme.palette;
@@ -41,9 +41,9 @@ const UserMenu = ({ user }: UserMenuProps): JSX.Element => {
         onClick={handleClick}
         classes={classes}
         endIcon={
-          <NavIconWrapper>
+          <StyledNavIconWrapper>
             <Icon sdsIcon="chevronDown" sdsSize="xs" sdsType="static" />
-          </NavIconWrapper>
+          </StyledNavIconWrapper>
         }
       >
         {user}

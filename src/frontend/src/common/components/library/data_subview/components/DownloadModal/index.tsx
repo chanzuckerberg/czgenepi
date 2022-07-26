@@ -9,7 +9,7 @@ import { useUserInfo } from "src/common/queries/auth";
 import { useFastaDownload } from "src/common/queries/samples";
 import { B } from "src/common/styles/basicStyle";
 import {
-  IconWrapperGray500,
+  StyledCloseIconWrapper,
   StyledCloseIconButton,
 } from "src/common/styles/iconStyle";
 import { pluralize } from "src/common/utils/strUtils";
@@ -150,9 +150,9 @@ const DownloadModal = ({
             aria-label="close download modal"
             onClick={handleCloseModal}
           >
-            <IconWrapperGray500>
+            <StyledCloseIconWrapper>
               <Icon sdsIcon="xMark" sdsSize="l" sdsType="static" />
-            </IconWrapperGray500>
+            </StyledCloseIconWrapper>
           </StyledCloseIconButton>
           <Header>Select Download</Header>
           <Title>

@@ -2,7 +2,15 @@
 import styled from "@emotion/styled";
 import { CommonThemeProps, getColors, getSpaces, IconButton } from "czifui";
 
-const iconFillError = (props: CommonThemeProps) => {
+export const iconFillBlack = () => {
+  return `
+    svg {
+      fill: black;
+    }
+  `;
+};
+
+export const iconFillError = (props: CommonThemeProps) => {
   const colors = getColors(props);
   return `
     svg {
@@ -11,7 +19,7 @@ const iconFillError = (props: CommonThemeProps) => {
   `;
 };
 
-const iconFillGray = (props: CommonThemeProps) => {
+export const iconFillGray = (props: CommonThemeProps) => {
   const colors = getColors(props);
   return `
     svg {
@@ -20,98 +28,55 @@ const iconFillGray = (props: CommonThemeProps) => {
   `;
 };
 
-const rightMarginM = (props: CommonThemeProps) => {
+export const iconFillGrayHoverPrimary = (props: CommonThemeProps) => {
+  const colors = getColors(props);
+  return `
+    ${iconFillGray}
+    :hover {
+      svg {
+        fill: ${colors?.primary[400]};
+      }
+    }
+  `;
+};
+
+export const iconFillWarning = (props: CommonThemeProps) => {
+  const colors = getColors(props);
+
+  return `
+    svg {
+      fill: ${colors?.warning[600]};
+    }
+  `;
+};
+
+export const iconFillWhite = () => {
+  return `
+    svg {
+      fill: white;
+    }
+  `;
+};
+
+export const rightMarginM = (props: CommonThemeProps) => {
   const spaces = getSpaces(props);
   return `
     margin-right: ${spaces?.m}px;
   `;
 };
 
-// Icon Wrappers change icon colors. Additional attributes can be added in other styled components.
-export const ErrorIconWrapper = styled.div`
-  ${iconFillError}
-`;
+export const rightMarginXxs = (props: CommonThemeProps) => {
+  const spaces = getSpaces(props);
+  return `
+    margin-right: ${spaces?.xxs}px;
+  `;
+};
 
-export const IconWrapperGray500 = styled.div`
-  ${iconFillGray}
-`;
-
-export const InfoIconWrapper = styled.div`
-  ${iconFillGray}
-  ${(props) => {
-    const colors = getColors(props);
-    return `
-      :hover {
-        svg {
-          fill: ${colors?.primary[400]};
-        }
-      }
-    `;
-  }}
-`;
-
-export const NavIconWrapper = styled.div`
-  svg {
-    fill: white;
-  }
-`;
-
-export const WarningIconWrapper = styled.div`
-  ${(props) => {
-    const colors = getColors(props);
-
-    return `
-      svg {
-        fill: ${colors?.warning[600]};
-      }
-    `;
-  }}
-`;
-
-// Styled Icon Wrappers include attributes other than color, i.e. spacing
-export const StyledEditIconWrapper = styled.div`
-  ${rightMarginM}
-
-  svg {
-    fill: black;
-  }
-`;
-
-export const StyledIconWrapperWhite = styled.div`
-  display: flex;
-  svg {
-    fill: white;
-  }
-`;
-
-export const StyledLockIconWrapper = styled.div`
-  ${(props) => {
-    const spaces = getSpaces(props);
-
-    return `
-      margin-right: ${spaces?.xxs}px;
-    `;
-  }}
-`;
-
-export const StyledTrashIconWrapper = styled.div`
-  ${rightMarginM}
-  ${iconFillError}
-`;
-
-export const StyledTreeIconWrapper = styled.div`
-  ${iconFillGray}
-  ${(props) => {
-    const spaces = getSpaces(props);
-
-    return `
-      margin: 0 ${spaces?.l}px;
-    `;
-  }}
-`;
-
-// Keeping IconButton style in here for now. May need to move if there are
-// more IconButton styles in the future.
+// Dialog Icon styles
 export const StyledCloseIconButton = styled(IconButton)`
   float: right;
+`;
+
+export const StyledCloseIconWrapper = styled.div`
+  ${iconFillGray}
 `;

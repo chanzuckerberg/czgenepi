@@ -2,17 +2,15 @@ import { Icon } from "czifui";
 import React, { useState } from "react";
 import { StyledTooltip } from "src/common/components/library/data_subview/components/CreateNSTreeModal/style";
 import { TREE_STATUS } from "src/common/constants/types";
-import {
-  InfoIconWrapper,
-  StyledTreeIconWrapper,
-} from "src/common/styles/iconStyle";
 import NextstrainConfirmationModal from "../NextstrainConfirmationModal";
 import { PhyloTreeStatusTag } from "./components/PhyloTreeStatusTag";
 import {
   CellWrapper,
+  StyledInfoIconWrapper,
   StyledNameWrapper,
   StyledRowContent,
   StyledTreeCreator,
+  StyledTreeIconWrapper,
 } from "./style";
 
 interface Props {
@@ -66,13 +64,13 @@ const TreeTableNameCell = ({ value, item }: Props): JSX.Element => {
                   title="This tree is automatically built by CZ GEN EPI every Monday"
                   placement="bottom"
                 >
-                  <InfoIconWrapper>
+                  <StyledInfoIconWrapper>
                     <Icon
                       sdsIcon="infoCircle"
                       sdsSize="xs"
                       sdsType="interactive"
                     />
-                  </InfoIconWrapper>
+                  </StyledInfoIconWrapper>
                 </StyledTooltip>
               )}
             </StyledTreeCreator>
