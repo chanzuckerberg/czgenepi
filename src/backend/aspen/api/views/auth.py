@@ -99,7 +99,20 @@ async def auth(
     splitio: SplitClient = Depends(get_splitio),
     db: AsyncSession = Depends(get_db),
     auth0_mgmt: Auth0Client = Depends(get_auth0_apiclient),
+    error_description: Optional[str] = None,
 ) -> Response:
+    if error_description:
+        # Note: Auth0 sends the message "invitation not found or already used" for *both* expired and
+        # already-used tokens, so users will typically only see the already_accepted error. The "expired"
+        # page becomes fallback in case there are any unknown errors auth0 sends.
+        if "already used" in error_description:
+            return RedirectResponse(
+                os.getenv("FRONTEND_URL", "") + "/auth/invite/already_accepted"
+            )
+        else:
+            return RedirectResponse(
+                os.getenv("FRONTEND_URL", "") + "/auth/invite/expired"
+            )
     try:
         token = await auth0.authorize_access_token(request)
     except OAuthError:
