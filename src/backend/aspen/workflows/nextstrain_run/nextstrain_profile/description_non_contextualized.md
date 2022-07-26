@@ -12,6 +12,6 @@ At the specific request of GISAID, we:
  - disable download of full metadata TSV and provide instead an acknowledgments TSV in the "Download Data" link at the bottom of the page
  - refrain from sharing alignments or other intermediate files computed in our pipeline
 
-Data used in this web application remain subject to GISAID’s Terms and Conditions http://www.gisaid.org/DAA/
+Data used in this web application remain subject to [GISAID’s Terms and Conditions](http://www.gisaid.org/DAA/).
 
 Citation: (a) Elbe, S., and Buckland-Merrett, G. (2017) Data, disease and diplomacy: GISAID’s innovative contribution to global health. Global Challenges, 1:33-46. DOI: 10.1002/gch2.1018 and / or (b) Shu, Y., McCauley, J. (2017) GISAID: From vision to reality. EuroSurveillance, 22(13) DOI: 10.2807/1560-7917.ES.2017.22.13.30494.
