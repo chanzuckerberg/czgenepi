@@ -1,26 +1,7 @@
 import styled from "@emotion/styled";
 import { Collapse } from "@material-ui/core";
-import { Callout, CommonThemeProps, getIconSizes, getSpaces } from "czifui";
-import ArrowDownIcon from "src/common/icons/IconArrowDownSmall.svg";
-import ArrowUpIcon from "src/common/icons/IconArrowUpSmall.svg";
+import { Callout, getSpaces } from "czifui";
 import { transparentScrollbars } from "src/common/styles/basicStyle";
-
-const smallIcon = (props: CommonThemeProps) => {
-  const iconSizes = getIconSizes(props);
-  return `
-    flex: 0 0 auto;
-    height: ${iconSizes?.s.height}px;
-    width: ${iconSizes?.s.width}px;
-  `;
-};
-
-export const StyledArrowDownIcon = styled(ArrowDownIcon)`
-  ${smallIcon}
-`;
-
-export const StyledArrowUpIcon = styled(ArrowUpIcon)`
-  ${smallIcon}
-`;
 
 export const RowFlexContainer = styled.div`
   display: flex;
@@ -28,6 +9,10 @@ export const RowFlexContainer = styled.div`
 
   .MuiCollapse-root {
     overflow-y: auto;
+  }
+
+  svg {
+    fill: black;
   }
 `;
 

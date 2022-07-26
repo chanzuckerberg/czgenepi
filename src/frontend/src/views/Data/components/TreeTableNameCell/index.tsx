@@ -1,3 +1,4 @@
+import { Icon } from "czifui";
 import React, { useState } from "react";
 import { StyledTooltip } from "src/common/components/library/data_subview/components/CreateNSTreeModal/style";
 import { TREE_STATUS } from "src/common/constants/types";
@@ -5,11 +6,11 @@ import NextstrainConfirmationModal from "../NextstrainConfirmationModal";
 import { PhyloTreeStatusTag } from "./components/PhyloTreeStatusTag";
 import {
   CellWrapper,
-  StyledInfoIcon,
+  StyledInfoIconWrapper,
   StyledNameWrapper,
   StyledRowContent,
   StyledTreeCreator,
-  StyledTreeIcon,
+  StyledTreeIconWrapper,
 } from "./style";
 
 interface Props {
@@ -47,7 +48,9 @@ const TreeTableNameCell = ({ value, item }: Props): JSX.Element => {
       )}
       <StyledRowContent onClick={handleClickOpen} disabled={isDisabled}>
         <CellWrapper data-test-id="tree-name-cell">
-          <StyledTreeIcon />
+          <StyledTreeIconWrapper>
+            <Icon sdsIcon="treeHorizontal" sdsSize="xl" sdsType="static" />
+          </StyledTreeIconWrapper>
           <StyledNameWrapper>
             <span>
               {value} <PhyloTreeStatusTag treeStatus={status} />
@@ -61,7 +64,13 @@ const TreeTableNameCell = ({ value, item }: Props): JSX.Element => {
                   title="This tree is automatically built by CZ GEN EPI every Monday"
                   placement="bottom"
                 >
-                  <StyledInfoIcon />
+                  <StyledInfoIconWrapper>
+                    <Icon
+                      sdsIcon="infoCircle"
+                      sdsSize="xs"
+                      sdsType="interactive"
+                    />
+                  </StyledInfoIconWrapper>
                 </StyledTooltip>
               )}
             </StyledTreeCreator>

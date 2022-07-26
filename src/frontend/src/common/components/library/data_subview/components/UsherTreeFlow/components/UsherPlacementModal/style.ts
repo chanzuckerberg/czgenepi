@@ -1,7 +1,5 @@
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-import CloseIcon from "@material-ui/icons/Close";
-import ErrorOutlineOutlinedIcon from "@material-ui/icons/ErrorOutlineOutlined";
 import {
   Button,
   fontBodyS,
@@ -10,16 +8,16 @@ import {
   fontHeaderM,
   fontHeaderXs,
   getColors,
-  getIconSizes,
   getSpaces,
   InputDropdown,
   List,
   ListItem,
 } from "czifui";
 import {
-  StyledDialogContent as DialogContent,
-  StyledInfoOutlinedIcon as InfoIcon,
-} from "../../../CreateNSTreeModal/style";
+  iconFillGrayHoverPrimary,
+  iconFillWarning,
+} from "src/common/styles/iconStyle";
+import { StyledDialogContent as DialogContent } from "../../../CreateNSTreeModal/style";
 
 const INPUT_HEIGHT = "34px";
 
@@ -120,7 +118,7 @@ export const StyledSuggestionText = styled.div`
 
     return `
       color: ${colors?.warning[600]};
-      margin-left: ${spaces?.s}px;
+      margin-left: ${spaces?.xxs}px;
     `;
   }}
 `;
@@ -131,20 +129,6 @@ export const StyledSuggestionWrapper = styled.div`
     const spaces = getSpaces(props);
     return `
       margin-top: ${spaces?.xxs}px;
-    `;
-  }}
-`;
-
-export const StyledWarningIcon = styled(ErrorOutlineOutlinedIcon)`
-  ${(props) => {
-    const colors = getColors(props);
-    const iconSizes = getIconSizes(props);
-
-    return `
-      color: ${colors?.warning[400]};
-      height: ${iconSizes?.s.height}px;
-      width: ${iconSizes?.s.width}px;
-      margin-top: 0;
     `;
   }}
 `;
@@ -175,23 +159,8 @@ export const StyledInputDropdown = styled(InputDropdown)`
   }}
 `;
 
-export const StyledCloseIcon = styled(CloseIcon)`
-  position: absolute;
-  cursor: pointer;
-
-  ${(props) => {
-    const colors = getColors(props);
-    const spaces = getSpaces(props);
-
-    return `
-      color: ${colors?.gray[400]};
-      right: ${spaces?.xl}px;
-      top: ${spaces?.xl}px;
-    `;
-  }}
-`;
-
-export const StyledInfoIcon = styled(InfoIcon)`
+export const StyledInfoIconWrapper = styled.div`
+  ${iconFillGrayHoverPrimary}
   margin-top: 3px;
 `;
 
@@ -203,4 +172,8 @@ export const Content = styled.div`
       color: ${colors?.gray[500]};
     `;
   }}
+`;
+
+export const StyledWarningIconWrapper = styled.div`
+  ${iconFillWarning}
 `;

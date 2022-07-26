@@ -1,14 +1,6 @@
 import styled from "@emotion/styled";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
-import {
-  fontBodyXxs,
-  fontHeaderS,
-  getColors,
-  getFontWeights,
-  getSpaces,
-} from "czifui";
-import IconCheckSmall from "src/common/icons/IconCheckSmall.svg";
-import IconCloseSmall from "src/common/icons/IconCloseSmall.svg";
+import { fontBodyXxs, fontHeaderS, getFontWeights, getSpaces } from "czifui";
 
 export const Label = styled.div`
   ${(props) => {
@@ -74,28 +66,8 @@ export const StyledListItemIcon = styled(ListItemIcon)`
   }}
 `;
 
-const smallIconSize = `
-  width: 14px;
-  height: 14px;
-  transform: scale(0.7);
-`;
-
-export const StyledIconCheckSmall = styled(IconCheckSmall)`
-  ${smallIconSize}
-  ${(props) => {
-    const colors = getColors(props);
-    return `
-      fill: ${colors?.primary[400]};
-    `;
-  }}
-`;
-
-export const StyledIconXSmall = styled(IconCloseSmall)`
-  ${smallIconSize}
-  ${(props) => {
-    const colors = getColors(props);
-    return `
-      fill: ${colors?.error[400]};
-    `;
-  }}
+export const StyledListItemCloseIcon = styled(StyledListItemIcon)`
+  svg {
+    fill: red;
+  }
 `;

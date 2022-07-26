@@ -1,5 +1,4 @@
-import CloseIcon from "@material-ui/icons/Close";
-import { Alert, Tooltip } from "czifui";
+import { Alert, Icon, Tooltip } from "czifui";
 import { isEqual, noop } from "lodash";
 import React, { useCallback, useEffect, useState } from "react";
 import { CSVLink } from "react-csv";
@@ -9,6 +8,10 @@ import DialogTitle from "src/common/components/library/Dialog/components/DialogT
 import { useUserInfo } from "src/common/queries/auth";
 import { useFastaDownload } from "src/common/queries/samples";
 import { B } from "src/common/styles/basicStyle";
+import {
+  StyledCloseIconButton,
+  StyledCloseIconWrapper,
+} from "src/common/styles/iconStyle";
 import { pluralize } from "src/common/utils/strUtils";
 import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
 import Dialog from "src/components/Dialog";
@@ -25,7 +28,6 @@ import {
   Header,
   StyledButton,
   StyledCheckbox,
-  StyledIconButton,
   StyledSpan,
   Title,
 } from "./style";
@@ -144,9 +146,14 @@ const DownloadModal = ({
         onClose={handleCloseModal}
       >
         <DialogTitle>
-          <StyledIconButton onClick={handleCloseModal}>
-            <CloseIcon />
-          </StyledIconButton>
+          <StyledCloseIconButton
+            aria-label="close download modal"
+            onClick={handleCloseModal}
+          >
+            <StyledCloseIconWrapper>
+              <Icon sdsIcon="xMark" sdsSize="l" sdsType="static" />
+            </StyledCloseIconWrapper>
+          </StyledCloseIconButton>
           <Header>Select Download</Header>
           <Title>
             {checkedSampleIds.length}{" "}
