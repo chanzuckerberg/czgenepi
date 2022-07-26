@@ -9,8 +9,8 @@ import { useUserInfo } from "src/common/queries/auth";
 import { useFastaDownload } from "src/common/queries/samples";
 import { B } from "src/common/styles/basicStyle";
 import {
-  StyledCloseIconWrapper,
   StyledCloseIconButton,
+  StyledCloseIconWrapper,
 } from "src/common/styles/iconStyle";
 import { pluralize } from "src/common/utils/strUtils";
 import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
