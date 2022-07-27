@@ -1,5 +1,5 @@
-import { chromium, browser } from '@playwright/test';
-import login from '../utils/login';
+import { chromium, FullConfig } from '@playwright/test';
+import { login } from '../utils/login';
 
 const username = process.env.USERNAME ?? '';
 const password = process.env.PASSWORD ?? '';
@@ -13,5 +13,6 @@ async function globalSetup(config: FullConfig): Promise<void> {
     await page.context().storageState({
         path: storageState,
     });
+    await browser.close()
 }
 export default globalSetup;

@@ -11,11 +11,10 @@ const config: PlaywrightTestConfig = {
     timeout: 60000,
   },
   reporter: [ ['html', {open: 'never'} ] ],
-  //globalSetup: './global-setup',
+  globalSetup: './global-setup',
   use: {
     storageState: 'playwright/storage/state.json',
     actionTimeout: 0,
-    baseUrl: 'https://staging.czgenepi.org',
     trace: 'on-first-retry',
     screenshot: "only-on-failure",
     ignoreHTTPSErrors: true,

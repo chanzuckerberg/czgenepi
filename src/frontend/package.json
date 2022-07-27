@@ -16,6 +16,7 @@
     "lint": "concurrently \"node_modules/.bin/eslint **/*.{ts,tsx} --quiet --fix\" \"node_modules/.bin/stylelint --fix '**/*.{js,ts,tsx,css}'\"  \"npm run type-check\"",
     "lint-ci": "concurrently \"node_modules/.bin/eslint **/*.{ts,tsx}\" \"node_modules/.bin/stylelint '**/*.{js,ts,tsx,css}'\"  \"npm run type-check\"",
     "e2e:staging:headed": "npx playwright test --headed -c ./playwright/setup/staging.config.ts",
+    "e2e:staging:debug": "npx playwright test --debug -c ./playwright/setup/staging.config.ts",
     "cy:staging:open": "npx cypress open  --config-file ./cypress/staging.config.ts --record --key cd6a00ec-760f-492b-a3d0-b798ea6f88b9"
   },
   "dependencies": {

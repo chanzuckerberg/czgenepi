@@ -19,6 +19,17 @@ const tableHeaders = [
   'GISAID'
 ]
 
+const sampleData = [
+  "20SCPH11281",
+  "hCoV-19/USA/ADMIN-18181/2022",
+  "A",
+  "2022-07-10",
+  "2022-07-18",
+  "San Mateo County",
+  "2022-07-12",
+  "Not Found"
+];
+
 const sampleDataWithIds: Record<string, string> = {
   "row-publicId": "hCoV-19/USA/ADMIN-18181/2022",
   "row-collectionDate": "2022-07-10",
@@ -26,21 +37,9 @@ const sampleDataWithIds: Record<string, string> = {
   "row-sequencingDate": "2022-07-12"
 };
 
-const sampleDataWithIndex: Record<number, string> = {
-  3: "20SCPH11281",
-  10: "A",
-  11: "2022-07-18",
-  17: "Not Found"
-};
-
-test.afterEach(async ({ page }) => {
-  await page.locator(getByTestID('nav-user-menu')).first().click();
-  await page.locator(getByText('Logout')).first().click();
-});
-
 test.describe("Samples page tests", () => {
     test("Should verify sample listing", async ({page,}: { page: Page }) => {
-      await login(page, username, password);
+      await page.goto('https://staging.czgenepi.org/data/samples');
       tableHeaders.forEach((header) => {
         expect(page.locator(getByText(header)).first()).not.toBeEmpty();
       })
@@ -49,20 +48,22 @@ test.describe("Samples page tests", () => {
       );
     });
 
-    test("Should verify sample data", async ({page,}: { page: Page }) => {
-      await login(page, username, password); 
-      // verify sample attributes test ids    
-      Object.keys(sampleDataWithIds).forEach((testId) => {
-        expect(
-          page.locator(getByTestID(testId)).first()
-        ).toHaveText(sampleDataWithIds[testId]);
+    test.only("Should verify sample data", async ({page,}: { page: Page }) => {
+      await page.goto('https://staging.czgenepi.org/data/samples');
+      
+      //wait until data is displayed
+      await page.waitForSelector('[data-test-id="table-row"]') 
+      
+      const firstRow = await page.locator('[data-test-id="table-row"]').first();
+      const divs = await firstRow.locator('div')
 
-    // verify sample attributes that have no test ids
-    Object.keys(sampleDataWithIndex).forEach((index) => {
-      expect(
-        page.locator('div').nth(Number(index))
-      ).toHaveText(sampleDataWithIds[testId]);
-    });
-  });
+      console.log("**************")
+      console.log(await divs.count());
+      expect(await firstRow.locator('[data-test-id="row-publicId"]').first()).not.toBeEmpty()
+
+      // sampleData.forEach((data) => {
+      //   expect(
+      //      page.locator('div', {hasText: data}).first()).not.toBeEmpty();
+      // });
   });
 });

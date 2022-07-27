@@ -3,50 +3,50 @@
     {
       "sameSite": "None",
       "name": "did",
-      "value": "s%3Av0%3Acc083c30-042b-11ed-8983-2db0b851427a%3A35e2b9ae01e06b697f9509d1778b05355eb45297761b97d1fff800b540657ed3.kekqx%2FTFdawTViuVO6aC%2Bu0b9XVb64iqQh2l3%2Bk6PtI",
+      "value": "s%3Av0%3Ae57bdb40-0db3-11ed-af14-65f9fbb0ebe7%3A35e2b9ae01e06b697f9509d1778b05355eb45297761b97d1fff800b540657ed3.IHpVN25oz8LYYcaBwOdDcPN%2FxvKKCs1k0LJCu84sFQc",
       "domain": "covidtracker-staging.auth0.com",
       "path": "/",
-      "expires": 1689439768.472375,
+      "expires": 1690487783.824823,
       "httpOnly": true,
       "secure": true
     },
     {
       "sameSite": "Lax",
       "name": "did_compat",
-      "value": "s%3Av0%3Acc083c30-042b-11ed-8983-2db0b851427a%3A35e2b9ae01e06b697f9509d1778b05355eb45297761b97d1fff800b540657ed3.kekqx%2FTFdawTViuVO6aC%2Bu0b9XVb64iqQh2l3%2Bk6PtI",
+      "value": "s%3Av0%3Ae57bdb40-0db3-11ed-af14-65f9fbb0ebe7%3A35e2b9ae01e06b697f9509d1778b05355eb45297761b97d1fff800b540657ed3.IHpVN25oz8LYYcaBwOdDcPN%2FxvKKCs1k0LJCu84sFQc",
       "domain": "covidtracker-staging.auth0.com",
       "path": "/",
-      "expires": 1689439768.47259,
+      "expires": 1690487783.825045,
       "httpOnly": true,
       "secure": true
     },
     {
       "sameSite": "None",
       "name": "auth0",
-      "value": "s%3A5zSIVGtCC0Y4NSQ-SoVaheTrt7Qi0fkO.%2BB5x2Zo3zhjxA57J3T%2FTazZqyAvai0S08eZyt%2FvdD8E",
+      "value": "s%3AT4yBZ2niL8cr0P8xnJsB3FK0OmnRUqyv.z0Tq3tut0ccLOFMRldCihmB8ovFgOab%2Bw2ccfW%2Fhm34",
       "domain": "covidtracker-staging.auth0.com",
       "path": "/",
-      "expires": 1658141368.941846,
+      "expires": 1659189384.246808,
       "httpOnly": true,
       "secure": true
     },
     {
       "sameSite": "Lax",
       "name": "auth0_compat",
-      "value": "s%3A5zSIVGtCC0Y4NSQ-SoVaheTrt7Qi0fkO.%2BB5x2Zo3zhjxA57J3T%2FTazZqyAvai0S08eZyt%2FvdD8E",
+      "value": "s%3AT4yBZ2niL8cr0P8xnJsB3FK0OmnRUqyv.z0Tq3tut0ccLOFMRldCihmB8ovFgOab%2Bw2ccfW%2Fhm34",
       "domain": "covidtracker-staging.auth0.com",
       "path": "/",
-      "expires": 1658141368.942041,
+      "expires": 1659189384.246993,
       "httpOnly": true,
       "secure": true
     },
     {
       "sameSite": "Lax",
       "name": "session",
-      "value": ".eJyVUWFr2zAQ_S-C9lPjWLKlyIawrdDACAtbUijtl3CWZEdNLHmSnHZt898rJ4z2W1sQSPfu3b13p2d0_xDWHfzbWZCofEbQxwvd_pxfPkmlH5qV_XXH-cziGaNXlcRseU_b3-gCqRb0LlJFaxv4LqwJDkSwLhEbME-92CpXKdckwrb_2eu9crrWKioE16uIPnaoxIxOCswxKy6QhnACOCcnwPuosQmh8-V4LOxey0EnNh_5AI02TQJ92KSDzDjqGGjVp00ZLbbvCwbIGjHE201r6OPiRpNlUfzdz_-sFnlMd1qE3ql3lnzSONhDAHe0cHqOMVS1nORScZbVVGUM15IKGgdjWZVB9c1Pc56eu2nXnMvpsddZ9uOMzOIR0rzNFONTSz9k2qQzTbTh-ypaOJJeGJGY0LTmJGVkInNCpUorRiKt7yQEJdfDUhFJCRmlkxGm1zgt86IkPMkYu0OHOJaztd6p4f-_tMDeK7fW8mMvh8Mr0wvGnA.YtFGOw.jRaFjXqNLKMHv3mTZvc_Qslg6XE",
+      "value": ".eJyVUe9PwjAQ_V-a6CcZa0e7sYT4I5EE0YSoMZEv5NZ2o8DWpe0AQf53O9DoNzVp0t67d_feXfdosXGzGt5WGgRK9wgaf6HX0fhmJ6TaFE_6YZokQ42HjN5mArPHBS0n6ALJEtTKU3mpC7jiunIGuNMm4HOodg1fSpNJUwRcl1_s2VoalSvpFZxppEe3NUoxo0mfMZz0LpAC9wlE4Qmw1mvMnatt2u1yvVai1fHNO9ZBoaoigMbNw1am63UqKOWfTVWKL38WtJCueBtn2_k2MVhOeX8xGb2Y8d39jU_XirvGyB-WbFAYWIMDc7RwenYxZLmIe0ImLMqpjBjOBeWU0ZhFWQTZpR30kvDcDOriXAyOvc6i6zMy9IeL6nsmH59a2jZTBnVVeBu2ybyFI-mdEYEJDfOEhIzEokeokGHGiKc1tQAnxaxdKiIhIZ0w7pD4GUcpZSmJghizKTr4sYzO1Uq2__-vBTZWmpkSv3s5HD4A95TGug.YuFECw.adFzzAx5tVJ3vkz__DQlEq5Rt3k",
       "domain": "api.staging.czgenepi.org",
       "path": "/",
-      "expires": 1659091771.148384,
+      "expires": 1660139787.436397,
       "httpOnly": true,
       "secure": false
     }
