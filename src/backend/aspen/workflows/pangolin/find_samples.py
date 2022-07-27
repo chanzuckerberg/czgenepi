@@ -1,6 +1,7 @@
+import re
 import subprocess
-import urllib.request
-from typing import Iterable
+from re import Match
+from typing import Iterable, List, Optional
 
 import click
 from sqlalchemy.orm import joinedload
@@ -14,20 +15,23 @@ from aspen.database.connection import (
 )
 from aspen.database.models import Sample
 
+VERSION_REGEX = re.compile(r"[0-9.]+$")
 
-def check_latest_pangolin_version() -> str:
-    contents = urllib.request.urlopen(
-        "https://github.com/cov-lineages/pangoLEARN/releases/latest"
+
+def same_pangolin_version(sample_version_string: str, pangolin_version_string: str):
+    sample_version_match: Optional[Match] = VERSION_REGEX.search(sample_version_string)
+    pangolin_version_match: Optional[Match] = VERSION_REGEX.search(
+        pangolin_version_string
     )
-    # get latest version from redirected url:
-    redirected_url: str = contents.url
-    latest_version: str = redirected_url.split("/")[-1]
-    return latest_version
+    if not sample_version_match or not pangolin_version_match:
+        raise ValueError(
+            f"No version number found in one of {sample_version_string}, {pangolin_version_string}"
+        )
+    return sample_version_match.group(0) == pangolin_version_match.group(0)
 
 
-def find_samples():
+def find_samples(pangolin_version: str) -> List[str]:
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
-    most_recent_pango_version: str = check_latest_pangolin_version()
 
     with session_scope(interface) as session:
         # filter for sequences that were run with an older version of pangolin
@@ -36,16 +40,16 @@ def find_samples():
             joinedload(Sample.uploaded_pathogen_genome)
         )
 
-        # TODO: update this comparison to be <= most_recent_pango_version
-        # once we update this field to be a date instead of string
+        # version comparisons are a nightmare, just check if they differ
 
-        samples_to_be_updated: Iterable[str] = [
+        samples_to_be_updated: List[str] = [
             sample.public_identifier
             for sample in all_samples
             if (
                 sample.uploaded_pathogen_genome is not None
-                and sample.uploaded_pathogen_genome.pangolin_version
-                != most_recent_pango_version
+                and not same_pangolin_version(
+                    sample.uploaded_pathogen_genome.pangolin_version, pangolin_version
+                )
             )
         ]
 
@@ -54,11 +58,12 @@ def find_samples():
 
 @click.command("find_samples")
 @click.option("--test", type=bool, is_flag=True)
-def run_command(test: bool):
+@click.option("--pangolin-version", type=str, required=True)
+def run_command(test: bool, pangolin_version: str):
     if test:
         print("Success!")
         return
-    samples = find_samples()
+    samples = find_samples(pangolin_version)
     subprocess.run(["bash", "run_pangolin.sh"] + samples)
 
 

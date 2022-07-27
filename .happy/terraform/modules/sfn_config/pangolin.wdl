@@ -40,7 +40,7 @@ task pangolin_workflow {
 
     cd /usr/src/app/aspen/workflows/pangolin
     ./update_pangolin.sh
-    /usr/local/bin/python3.9 find_samples.py
+    ./run_mass_update.sh
     >>>
 
     runtime {
