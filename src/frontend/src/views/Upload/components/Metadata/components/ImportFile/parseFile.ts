@@ -50,6 +50,7 @@ export interface ParseResult {
   data: SampleIdToMetadata;
   errorMessages: ErrorMessages;
   warningMessages: WarningMessages;
+  hasUnknownFields: boolean;
   filename: string;
 }
 
@@ -94,6 +95,26 @@ function getMissingHeaderFields(
     }
   }
   return missingFields.size !== 0 ? missingFields : null;
+}
+
+/**
+ * Helper -- Returns true if any col header name does not match one of
+ * our specified headers. Returns false if all column headers are known.
+ */
+function hasUnknownHeaderFields(
+  uploadedHeaders: string[],
+  headersToMetadataKeys: Dictionary<keyof SampleUploadTsvMetadata>
+): boolean {
+  // Compare strings since we are checking for values that are not in our
+  // defined list of headers.
+  const knownHeaderFields: string[] = Object.values(headersToMetadataKeys);
+  for (const headerField of uploadedHeaders) {
+    if (!knownHeaderFields.includes(headerField)) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 // Helper -- Upload uses YES/NO to represent booleans for some columns
@@ -273,14 +294,14 @@ function parseRow(
  *
  * In addition to parsing out the data appropriately, records any warnings
  * and errors that were encountered (eg, a field was missing, etc) so that
- * those can be displayed to the user after pasing is complete.
+ * those can be displayed to the user after parsing is complete.
  *
  * In the case of some errors -- eg, missing column headers -- we consider it
  * so egregious we do not load any data from the file. User just gets an
  * error message telling them they need to fix it before we allow loading.
  *
  * Generally, this parses all entries in file and makes no attempt fo filter
- * the uploaded metadata down to the samples user user has previously uploaded.
+ * the uploaded metadata down to the samples the user has previously uploaded.
  * For example, if user uploaded only sample A, but then uploads metadata for
  * both A and B, this function will parse out both A and B. Filtering that
  * result down (in prior example, filtering to just A) is the responsibility
@@ -325,6 +346,11 @@ export function parseFile(
           SampleIdToWarningMessages
         >();
 
+        const hasUnknownFields = hasUnknownHeaderFields(
+          uploadedHeaders,
+          HEADERS_TO_METADATA_KEYS
+        );
+
         const missingHeaderFields = getMissingHeaderFields(
           uploadedHeaders,
           HEADERS_TO_METADATA_KEYS
@@ -364,8 +390,9 @@ export function parseFile(
         resolve({
           data: sampleIdToMetadata,
           errorMessages,
-          warningMessages,
           filename: file.name,
+          hasUnknownFields,
+          warningMessages,
         });
       },
     });
