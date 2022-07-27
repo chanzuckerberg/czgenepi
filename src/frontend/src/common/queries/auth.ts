@@ -7,9 +7,12 @@ import {
   useQueryClient,
   UseQueryResult,
 } from "react-query";
+import { useSelector } from "react-redux";
 import ENV from "src/common/constants/ENV";
 import { API, DEFAULT_PUT_OPTIONS, getBackendApiJson } from "../api";
+import { selectCurrentGroup } from "../redux/selectors";
 import { ROUTES } from "../routes";
+import { setValidGroup } from "../utils/groupUtils";
 import { ENTITIES } from "./entities";
 import {
   USE_GROUP_INFO,
@@ -109,6 +112,7 @@ export function useUserInfo(): UseQueryResult<User, unknown> {
 export function useProtectedRoute(): UseQueryResult<User, unknown> {
   const router = useRouter();
   const result = useUserInfo();
+  const currentGroup = useSelector(selectCurrentGroup);
 
   const { isLoading, data: userInfo } = result;
 
@@ -121,9 +125,12 @@ export function useProtectedRoute(): UseQueryResult<User, unknown> {
         router.push(ROUTES.HOMEPAGE);
       } else if (!agreedToTOS && router.asPath !== ROUTES.AGREE_TERMS) {
         router.push(ROUTES.AGREE_TERMS);
-      } // else case: User is logged in and has agreed to ToS. Leave them be.
+      } else if (!userInfo.groups.includes(currentGroup)) {
+        // user is not authorized to view the group set in their cache. Set it to one they can see.
+        setValidGroup();
+      } // else case: User is logged in, in a valid group, and has agreed to ToS. Leave them be.
     }
-  }, [isLoading, userInfo, router]);
+  }, [isLoading, userInfo, router, currentGroup]);
 
   return result;
 }
