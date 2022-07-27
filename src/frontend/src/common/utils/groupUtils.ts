@@ -2,7 +2,7 @@ import { fetchUserInfo } from "../queries/auth";
 import { store } from "../redux";
 import { setGroup } from "../redux/actions";
 
-export const setValidGroup = async (): void => {
+export const setValidGroup = async (): Promise<void> => {
   const { dispatch } = store;
   const userInfo = await fetchUserInfo();
   const { groups } = userInfo;

@@ -9,18 +9,18 @@ import { ROUTES } from "src/common/routes";
 const Welcome = (): JSX.Element => {
   useProtectedRoute();
 
+  const dispatch = useDispatch();
   const router = useRouter();
   const { groupId } = router.query;
-
-  const dispatch = useDispatch();
+  const groupIdInt = parseInt(groupId as string);
 
   useEffect(() => {
-    if (groupId) {
-      dispatch(setGroup(groupId));
+    if (groupIdInt) {
+      dispatch(setGroup(groupIdInt));
     }
 
     router.push(ROUTES.DATA);
-  }, [groupId, dispatch, router]);
+  }, [groupIdInt, dispatch, router]);
 
   return <HeadAppTitle subTitle="Welcome to CZ Gen Epi!" />;
 };
