@@ -78,6 +78,7 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
 
     return hasLineage ? (
       <Tooltip
+        followCursor
         title={<LineageTooltip lineage={value as Lineage} />}
         width="wide"
       >
