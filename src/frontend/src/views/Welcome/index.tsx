@@ -1,14 +1,11 @@
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
 import { HeadAppTitle } from "src/common/components";
-import { useProtectedRoute } from "src/common/queries/auth";
 import { setGroup } from "src/common/redux/actions";
 import { useDispatch } from "src/common/redux/hooks";
 import { ROUTES } from "src/common/routes";
 
 const Welcome = (): JSX.Element => {
-  useProtectedRoute();
-
   const dispatch = useDispatch();
   const router = useRouter();
   const { groupId } = router.query;
