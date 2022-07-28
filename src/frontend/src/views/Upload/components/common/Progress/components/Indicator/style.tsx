@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
 import { CommonThemeProps, fontHeaderXxs, getColors } from "czifui";
+import { iconFillWhite } from "src/common/styles/iconStyle";
 import { Circle } from "src/components/Circle";
 import { Status } from "../common";
 
@@ -47,4 +48,9 @@ export const StyledCircle = styled(Circle)`
       };
     `;
   }}
+`;
+
+export const StyledIconWrapperWhite = styled.div`
+  ${iconFillWhite}
+  display: flex;
 `;

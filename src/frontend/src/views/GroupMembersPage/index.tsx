@@ -5,6 +5,7 @@ import { useProtectedRoute, useUserInfo } from "src/common/queries/auth";
 import { useGroupInfo, useGroupMembersInfo } from "src/common/queries/groups";
 import { ROUTES } from "src/common/routes";
 import { stringifyGisaidLocation } from "src/common/utils/locationUtils";
+import { caseInsensitiveSort } from "src/common/utils/strUtils";
 import { GroupDetailsTab } from "./components/GroupDetailsTab";
 import { MembersTab, SecondaryTabType } from "./components/MembersTab";
 import {
@@ -49,7 +50,7 @@ const GroupMembersPage = ({
   }, [requestedPrimaryTab]);
 
   // sort group members by name before display
-  members.sort((a, b) => (a.name > b.name ? 1 : -1));
+  members.sort((a, b) => caseInsensitiveSort(a.name, b.name));
 
   const displayLocation = stringifyGisaidLocation(location);
 

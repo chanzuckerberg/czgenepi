@@ -1,11 +1,13 @@
-import { Menu, MenuItem, Tooltip } from "czifui";
+import { Icon, IconButton, Menu, MenuItem, Tooltip } from "czifui";
 import React, { MouseEventHandler, useState } from "react";
 import { TREE_STATUS } from "src/common/constants/types";
-import MoreActionsIcon from "src/common/icons/IconDotsHorizontal3Large.svg";
-import { StyledEditIcon, StyledTrashIcon } from "src/common/styles/iconStyle";
+import { StyledMenuItemWrapper } from "src/common/styles/menuStyle";
 import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
-import { StyledIcon, StyledIconWrapper } from "../../style";
-import { StyledText } from "./style";
+import {
+  StyledEditIconWrapper,
+  StyledText,
+  StyledTrashIconWrapper,
+} from "./style";
 
 interface Props {
   item: PhyloRun;
@@ -59,11 +61,17 @@ const MoreActionsMenu = ({
         title={tooltipText}
         placement="top"
       >
-        <StyledIconWrapper onClick={handleClick}>
-          <StyledIcon disabled={isDisabled}>
-            <MoreActionsIcon />
-          </StyledIcon>
-        </StyledIconWrapper>
+        <span>
+          <IconButton
+            aria-label="more actions" // TODO: it would be helpful for this to indicate which tree it's for
+            disabled={isDisabled}
+            onClick={handleClick}
+            sdsSize="small"
+            sdsType="primary"
+          >
+            <Icon sdsIcon="dotsHorizontal" sdsSize="s" sdsType="iconButton" />
+          </IconButton>
+        </span>
       </Tooltip>
       {open && (
         <Menu
@@ -82,12 +90,20 @@ const MoreActionsMenu = ({
           getContentAnchorEl={null}
         >
           <MenuItem onClick={() => onEditTreeModalOpen(item)}>
-            <StyledEditIcon />
-            <StyledText>Edit Tree Name</StyledText>
+            <StyledMenuItemWrapper>
+              <StyledEditIconWrapper>
+                <Icon sdsIcon="edit" sdsSize="xs" sdsType="static" />
+              </StyledEditIconWrapper>
+              <StyledText>Edit Tree Name</StyledText>
+            </StyledMenuItemWrapper>
           </MenuItem>
           <MenuItem onClick={() => onDeleteTreeModalOpen(item)}>
-            <StyledTrashIcon />
-            <StyledText isWarning>Delete Tree</StyledText>
+            <StyledMenuItemWrapper>
+              <StyledTrashIconWrapper>
+                <Icon sdsIcon="trashCan" sdsSize="xs" sdsType="static" />
+              </StyledTrashIconWrapper>
+              <StyledText isWarning>Delete Tree</StyledText>
+            </StyledMenuItemWrapper>
           </MenuItem>
         </Menu>
       )}

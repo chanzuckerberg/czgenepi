@@ -1,5 +1,10 @@
 import styled from "@emotion/styled";
 import { CommonThemeProps, getColors } from "czifui";
+import {
+  iconFillBlack,
+  iconFillError,
+  rightMarginM,
+} from "src/common/styles/iconStyle";
 
 interface ExtraProps extends CommonThemeProps {
   isWarning?: boolean;
@@ -18,4 +23,14 @@ export const StyledText = styled("span", {
       color: ${isWarning ? colors?.error[600] : ""};
     `;
   }}
+`;
+
+export const StyledTrashIconWrapper = styled.div`
+  ${rightMarginM}
+  ${iconFillError}
+`;
+
+export const StyledEditIconWrapper = styled.div`
+  ${iconFillBlack}
+  ${rightMarginM}
 `;

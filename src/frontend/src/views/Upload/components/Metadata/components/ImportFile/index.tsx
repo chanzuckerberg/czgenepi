@@ -44,6 +44,7 @@ export default function ImportFile({
   const [isInstructionsShown, setIsInstructionsShown] = useState(false);
   const [hasImportedFile, setHasImportedFile] = useState(false);
   const [missingFields, setMissingFields] = useState<string[] | null>(null);
+  const [hasUnknownFields, setHasUnknownFields] = useState<boolean>(false);
   const [autocorrectCount, setAutocorrectCount] = useState<number>(0);
   const [filename, setFilename] = useState("");
   const [parseResult, setParseResult] = useState<
@@ -96,13 +97,14 @@ export default function ImportFile({
 
     const result = await parseFile(files[0], stringToLocationFinder);
 
-    const { warningMessages, filename } = result;
+    const { warningMessages, filename, hasUnknownFields } = result;
     const missingFields = getMissingFields(result);
     const autocorrectCount =
       getAutocorrectCount(warningMessages.get(WARNING_CODE.AUTO_CORRECT)) || 0;
 
     setHasImportedFile(true);
     setMissingFields(missingFields);
+    setHasUnknownFields(hasUnknownFields);
     setAutocorrectCount(autocorrectCount);
     setFilename(filename);
     setParseResult(result);
@@ -164,6 +166,7 @@ export default function ImportFile({
         parseResult={parseResult}
         filename={filename}
         missingFields={missingFields}
+        hasUnknownDataFields={hasUnknownFields}
         autocorrectCount={autocorrectCount}
         absentSampleIds={absentSampleIds}
         missingData={missingData}

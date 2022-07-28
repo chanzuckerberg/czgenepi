@@ -17,7 +17,7 @@ import {
   NavBar,
   NavOrg,
   Separator,
-  StyledIcon,
+  StyledNavIconWrapper,
 } from "./style";
 
 /*
@@ -84,9 +84,9 @@ const AppNavBar = (): JSX.Element => {
             />
             <DropdownClickTarget onClick={toggleDropdown}>
               <NavOrg>{name}</NavOrg>
-              <StyledIcon>
+              <StyledNavIconWrapper>
                 <Icon sdsIcon="chevronDown" sdsSize="xs" sdsType="static" />
-              </StyledIcon>
+              </StyledNavIconWrapper>
               <GroupDetailsDropdown
                 anchorEl={anchorEl}
                 onClickInvite={() => setIsInviteModalOpen(true)}

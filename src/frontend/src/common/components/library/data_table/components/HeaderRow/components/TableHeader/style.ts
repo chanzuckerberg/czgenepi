@@ -1,11 +1,5 @@
 import styled from "@emotion/styled";
-import {
-  CommonThemeProps,
-  fontHeaderS,
-  getColors,
-  getIconSizes,
-  getSpaces,
-} from "czifui";
+import { CommonThemeProps, fontHeaderS, getColors, getSpaces } from "czifui";
 
 interface AlignProps extends CommonThemeProps {
   align?: string;
@@ -16,12 +10,11 @@ export const StyledSampleTableHeader = styled("div")`
     const { align } = props;
     const justify = align ?? "center";
 
-    const iconSizes = getIconSizes(props);
     const spaces = getSpaces(props);
 
     return `
       display: flex;
-      align-items: baseline;
+      align-items: center;
       flex-direction: row;
       justify-content: ${justify};
       padding-bottom: ${spaces?.m}px;
@@ -29,7 +22,6 @@ export const StyledSampleTableHeader = styled("div")`
 
       svg {
         fill: black;
-        width: ${iconSizes?.xs.width}px;
       }
   `;
   }}
@@ -38,7 +30,7 @@ export const StyledSampleTableHeader = styled("div")`
 export const StyledTreeTableHeader = styled.div`
   display: flex;
   flex: 0 0 auto;
-  align-items: baseline;
+  align-items: center;
   flex-direction: row;
   justify-content: center;
   width: 150px;
@@ -50,7 +42,6 @@ export const StyledTreeTableHeader = styled.div`
   }
 
   ${(props) => {
-    const iconSizes = getIconSizes(props);
     const spaces = getSpaces(props);
 
     return `
@@ -58,7 +49,6 @@ export const StyledTreeTableHeader = styled.div`
       margin: 0 ${spaces?.m}px;
       svg {
         fill: black;
-        width: ${iconSizes?.xs.width}px;
       }
   `;
   }}

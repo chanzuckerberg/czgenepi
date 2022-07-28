@@ -1,10 +1,8 @@
-import { Menu, MenuItem, Tooltip } from "czifui";
+import { Icon, IconButton, Menu, MenuItem, Tooltip } from "czifui";
 import React, { MouseEventHandler, ReactNode, useState } from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { TREE_STATUS } from "src/common/constants/types";
-import DownloadIcon from "src/common/icons/IconDownloadSmall.svg";
 import { stringGuard } from "src/common/utils";
-import { StyledIcon, StyledIconWrapper } from "../../style";
 
 interface Props {
   item: TableItem;
@@ -54,11 +52,14 @@ const TreeTableDownloadMenu = ({ item }: Props): JSX.Element => {
   return (
     <>
       <Tooltip arrow sdsStyle="dark" title="Download" placement="top">
-        <StyledIconWrapper onClick={handleClick}>
-          <StyledIcon>
-            <DownloadIcon />
-          </StyledIcon>
-        </StyledIconWrapper>
+        <IconButton
+          aria-label="download tree"
+          onClick={handleClick}
+          sdsSize="small"
+          sdsType="primary"
+        >
+          <Icon sdsIcon="download" sdsSize="s" sdsType="iconButton" />
+        </IconButton>
       </Tooltip>
       {open && (
         <Menu

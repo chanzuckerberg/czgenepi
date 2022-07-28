@@ -4,8 +4,8 @@ import {
   TableRow,
   TableRowProps as MuiTableRowProps,
 } from "@material-ui/core";
-import { Lock } from "@material-ui/icons";
 import { CommonThemeProps, fontHeaderS, getColors, getSpaces } from "czifui";
+import { rightMarginXxs } from "src/common/styles/iconStyle";
 
 export const Id = styled.div`
   ${fontHeaderS}
@@ -75,12 +75,6 @@ export const IsPrivateContent = styled.div`
   height: 20px;
 `;
 
-export const StyledLock = styled(Lock)`
-  ${(props) => {
-    const spaces = getSpaces(props);
-
-    return `
-      margin-right: ${spaces?.xxs}px;
-    `;
-  }}
+export const StyledLockIconWrapper = styled.div`
+  ${rightMarginXxs}
 `;

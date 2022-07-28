@@ -376,3 +376,25 @@ async def test_callback_ff_doesnt_sync_auth0_user_roles(
         .one()
     )
     assert user.auth0_user_id == userinfo["sub"]
+
+
+async def test_callback_error_redirects(
+    http_client: AsyncClient,
+):
+    res = await http_client.get(
+        "/v2/auth/callback",
+        allow_redirects=False,
+        params={"error_description": "invitation not found or already used"},
+    )
+    assert res.status_code == 307
+    assert res.is_redirect
+    assert "already_accepted" in res.headers["Location"]
+
+    res = await http_client.get(
+        "/v2/auth/callback",
+        allow_redirects=False,
+        params={"error_description": "expired"},
+    )
+    assert res.status_code == 307
+    assert res.is_redirect
+    assert "expired" in res.headers["Location"]

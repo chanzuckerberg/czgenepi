@@ -1,13 +1,13 @@
-import { Button } from "czifui";
+import { Button, Icon } from "czifui";
 import React from "react";
 import UploadImage from "src/common/images/Upload.svg";
+import { StyledCloseIconWrapper } from "src/common/styles/iconStyle";
 import {
   StyledImg,
   StyledSubtitle,
   StyledTitle,
   ViewWrapper,
 } from "../../style";
-import { StyledLoadingSpinner } from "./style";
 
 const LoadingView = (): JSX.Element => {
   return (
@@ -22,7 +22,11 @@ const LoadingView = (): JSX.Element => {
           disabled
           sdsType="primary"
           sdsStyle="rounded"
-          startIcon={<StyledLoadingSpinner />}
+          startIcon={
+            <StyledCloseIconWrapper>
+              <Icon sdsIcon="loading" sdsSize="l" sdsType="static" />
+            </StyledCloseIconWrapper>
+          }
         >
           Upload In-progress
         </Button>

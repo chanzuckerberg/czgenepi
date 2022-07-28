@@ -11,7 +11,6 @@ import {
 } from "czifui";
 import { Menu } from "semantic-ui-react";
 import { RowContent } from "src/common/components/library/data_table/style";
-import SampleIcon from "src/common/icons/Sample.svg";
 import { PageContent } from "src/common/styles/mixins/global";
 
 export const Container = styled(PageContent)`
@@ -81,12 +80,13 @@ export const PrivateIdValueWrapper = styled.div`
 
 export const SampleIconWrapper = styled.span`
   position: relative;
-`;
+  ${(props) => {
+    const spaces = getSpaces(props);
 
-export const PrivacyIcon = styled.span`
-  position: absolute;
-  left: 30px;
-  bottom: -2px;
+    return `
+      margin: 0 ${spaces?.l}px;
+    `;
+  }}
 `;
 
 export const Navigation = styled.div`
@@ -190,16 +190,4 @@ export const StyledMenu = styled(Menu)`
 
 export const StyledMenuItem = styled(Menu.Item)`
   height: 100%;
-`;
-
-export const StyledSampleIcon = styled(SampleIcon)`
-  ${(props) => {
-    const colors = getColors(props);
-    const spaces = getSpaces(props);
-
-    return `
-      margin: 0 ${spaces?.l}px;
-      fill: ${colors?.gray[300]};
-    `;
-  }}
 `;

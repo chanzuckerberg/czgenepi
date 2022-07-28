@@ -1,8 +1,6 @@
-import { Tooltip } from "czifui";
+import { Icon, Tooltip } from "czifui";
 import React, { ReactNode } from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
-import SortArrowDownIcon from "src/common/icons/IconArrowDownSmall.svg";
-import SortArrowUpIcon from "src/common/icons/IconArrowUpSmall.svg";
 import {
   StyledHeaderCellContent,
   StyledSampleTableHeader,
@@ -44,9 +42,9 @@ const TableHeader = ({
 
   if (doesSortOnThisCol) {
     sortIndicator = isSortedAscending ? (
-      <SortArrowUpIcon />
+      <Icon sdsIcon="chevronUp" sdsSize="xs" sdsType="static" />
     ) : (
-      <SortArrowDownIcon />
+      <Icon sdsIcon="chevronDown" sdsSize="xs" sdsType="static" />
     );
   }
 

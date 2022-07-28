@@ -20,16 +20,25 @@ brew install chanzuckerberg/tap/happy aws-oidc blessclient@1 fogg pre-commit
 brew install awscli@2 python3 jq docker terraform
 brew install --cask session-manager-plugin
 ```
-5. Configure aws access:
+5. Install and start [docker desktop](https://docs.docker.com/desktop/)
+
+6. Ask a CZGE engineer to add your email to [this list of authorized users](https://github.com/chanzuckerberg/shared-infra/blob/71a93d8493b597be063a03c17e78a73cb3b0a764/terraform/accounts/okta-czi-prod/sci-genepi-teams.tf#L36) for access to CZGE AWS accounts.
+
+7. Request read access to the [czgenepi-infra repo](https://github.com/chanzuckerberg/genepi-infra)
+
+8. Configure aws access:
 ```
 aws-oidc configure --issuer-url https://czi-prod.okta.com --client-id aws-config --config-url https://aws-config-generation.prod.si.czi.technology
 blessclient import-config git@github.com:/chanzuckerberg/genepi-infra/blessconfig.yml
+
+# accept defaults for region (us-west-2) and AWS default role (poweruser)
 ```
 
 ## Development quickstart
 
 1. Run `pre-commit install` to install all the git pre-commit hooks
-1. From the root of this repository, run `make local-init` to build and run the dev environment. The first build takes awhile, but subsequent runs will use cached artifacts.
+1. Clone the CZ Gen Epi repository. 
+1. From the root of this repository (`cd czgenepi`), run `make local-init` to build and run the dev environment. The first build takes awhile, but subsequent runs will use cached artifacts.
 1. Visit [http://backend.genepinet.localdev:3000](http://backend.genepinet.localdev:3000) to view the backend, and [http://frontend.genepinet.localdev:8000](http://frontend.genepinet.localdev:8000) for the frontend.
 1. `make local-pgconsole` starts a connection with the local postgresql db.
 1. **Open the source code and start editing!**
