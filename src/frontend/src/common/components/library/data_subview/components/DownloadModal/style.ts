@@ -39,17 +39,23 @@ export const Title = styled.span`
   }}
 `;
 
+const checkBoxInfoSpacing = (props: CommonThemeProps) => {
+  const spaces = getSpaces(props);
+  return `
+    position: inline-block;
+    float: left;
+    margin-top: ${spaces?.l}px;
+    margin-bottom: ${spaces?.l}px;
+  `;
+};
+
 export const CheckBoxInfo = styled.div`
+  ${checkBoxInfoSpacing};
+`;
+
+export const CheckboxLabel = styled.label`
   ${fontBodyS}
-  position: inline-block;
-  float: left;
-  ${(props) => {
-    const spaces = getSpaces(props);
-    return `
-      margin-top: ${spaces?.l}px;
-      margin-bottom: ${spaces?.l}px;
-    `;
-  }}
+  ${checkBoxInfoSpacing}
 `;
 
 export const Container = styled.ul`

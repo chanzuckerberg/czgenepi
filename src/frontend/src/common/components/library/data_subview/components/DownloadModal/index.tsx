@@ -20,6 +20,7 @@ import { TooltipDescriptionText, TooltipHeaderText } from "../../style";
 import { ContactUsLink } from "../ContactUsLink";
 import {
   CheckBoxInfo,
+  CheckboxLabel,
   Container,
   Content,
   DownloadType,
@@ -65,6 +66,7 @@ const DownloadModal = ({
   const [isFastaDisabled, setFastaDisabled] = useState<boolean>(false);
   const [isFastaSelected, setFastaSelected] = useState<boolean>(false);
   const [isMetadataSelected, setMetadataSelected] = useState<boolean>(false);
+  const [isGisaidSelected, setGisaidSelected] = useState<boolean>(false);
   const [shouldShouldError, setShouldShowError] = useState<boolean>(false);
 
   useEffect(() => {
@@ -89,6 +91,10 @@ const DownloadModal = ({
 
   const handleFastaClick = function () {
     setFastaSelected(!isFastaSelected);
+  };
+
+  const handleGisaidClick = function () {
+    setGisaidSelected(!isGisaidSelected);
   };
 
   const handleCloseModal = () => {
@@ -177,36 +183,57 @@ const DownloadModal = ({
                   isSelected={isFastaSelected}
                 >
                   <CheckBoxInfo>
-                    {/* @ts-expect-error need to update checkbox state after upgrading sds */}
                     <StyledCheckbox
-                      onChange={handleFastaClick}
                       disabled={isFastaDisabled}
+                      id="download-fasta-checkbox"
+                      onChange={handleFastaClick}
+                      stage={isFastaSelected ? "checked" : "unchecked"}
                     />
                   </CheckBoxInfo>
-                  <CheckBoxInfo>
+                  <CheckboxLabel htmlFor="download-fasta-checkbox">
                     <DownloadType>Consensus Genome</DownloadType>{" "}
                     <span ref={tooltipRef}>(.fasta)</span>
                     <DownloadTypeInfo>
                       Download multiple consensus genomes in a single,
                       concatenated file
                     </DownloadTypeInfo>
-                  </CheckBoxInfo>
+                  </CheckboxLabel>
                 </StyledFileTypeItem>
               </Tooltip>
               <div style={{ height: "4px" }}></div>
               <StyledFileTypeItem isSelected={isMetadataSelected}>
                 <CheckBoxInfo>
-                  {/* @ts-expect-error need to update checkbox state after upgrading sds */}
-                  <StyledCheckbox onChange={handleMetadataClick} />
+                  <StyledCheckbox
+                    id="download-metadata-checkbox"
+                    onChange={handleMetadataClick}
+                    stage={isMetadataSelected ? "checked" : "unchecked"}
+                  />
                 </CheckBoxInfo>
-                <CheckBoxInfo>
+                <CheckboxLabel htmlFor="download-metadata-checkbox">
                   <DownloadType>Sample Metadata </DownloadType> (.tsv)
                   <DownloadTypeInfo>
                     Sample metadata including Private and Public IDs, Collection
                     Date, Sequencing Date, Lineage, GISAID Status, and ISL
                     Accession #.
                   </DownloadTypeInfo>
+                </CheckboxLabel>
+              </StyledFileTypeItem>
+              <StyledFileTypeItem>
+                <CheckBoxInfo>
+                  <StyledCheckbox
+                    id="download-gisaid-checkbox"
+                    onChange={handleGisaidClick}
+                    stage={isGisaidSelected ? "checked" : "unchecked"}
+                  />
                 </CheckBoxInfo>
+                <CheckboxLabel htmlFor="download-gisaid-checkbox">
+                  <DownloadType>GISAID Submission Template </DownloadType>{" "}
+                  (.fasta, .csv)
+                  <DownloadTypeInfo>
+                    Download concatenated consensus genomes and metadata files
+                    formatted to prepare samples for submission to GISAID.
+                  </DownloadTypeInfo>
+                </CheckboxLabel>
               </StyledFileTypeItem>
             </Container>
             {failedSampleIds.length > 0 &&
