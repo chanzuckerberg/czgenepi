@@ -1,3 +1,4 @@
+import { PopperProps } from "@material-ui/core";
 import { FilterOptionsState } from "@material-ui/lab";
 import { createFilterOptions } from "@material-ui/lab/Autocomplete";
 import { DefaultMenuSelectOption, Icon } from "czifui";
@@ -157,7 +158,7 @@ const InputDropdownProps = {
 
 // DropdownPopper (for use with Dropdown's PopperComponent prop) needs to
 // have a `placement` prop to set where it anchors against Dropdown opener.
-const BottomPlacementDropdownPopper = (props: any) => {
+const BottomPlacementDropdownPopper = (props: PopperProps) => {
   return <StyledDropdownPopper placement="bottom-start" {...props} />;
 };
 

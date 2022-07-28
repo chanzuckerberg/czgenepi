@@ -65,7 +65,7 @@ const INITIAL_SCRIPT_TYPE = "text/javascript"; // TEMPORARY for initial scan
  * place to put it is just under the `</Head>` in `_app.tsx`, but you could
  * put it somewhere else as well.
  */
-export function SegmentInitializer() {
+export function SegmentInitializer(): JSX.Element | null {
   const segmentWriteKey = ENV.SEGMENT_FRONTEND_KEY;
   return segmentWriteKey ? (
     <Script
