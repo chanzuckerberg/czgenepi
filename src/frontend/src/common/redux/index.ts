@@ -1,8 +1,8 @@
 import { AnyAction, applyMiddleware, createStore } from "redux";
 import { composeWithDevTools } from "redux-devtools-extension";
-import { fetchUserInfo } from "../queries/auth";
+import { setValidGroup } from "../utils/groupUtils";
 import { getLocalStorage } from "../utils/localStorage";
-import { setGroup, setPathogen } from "./actions";
+import { setPathogen } from "./actions";
 import { setGroupMiddleware, setPathogenMiddleware } from "./middleware";
 import { CZGEReduxActions, Pathogen, ReduxPersistenceTokens } from "./types";
 
@@ -87,14 +87,7 @@ const setDefaults = async () => {
 
   // set user group
   if (group === FALLBACK_GROUP_ID) {
-    const userInfo = await fetchUserInfo();
-    const { groups } = userInfo;
-
-    if (!groups) return;
-
-    // sort groups by id to put the oldest one into the first position
-    groups.sort((a, b) => (a.id > b.id ? 1 : -1));
-    dispatch(setGroup(groups[0].id));
+    setValidGroup();
   }
 
   // set pathogen
