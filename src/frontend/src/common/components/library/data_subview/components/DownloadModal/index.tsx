@@ -20,7 +20,6 @@ import { TooltipDescriptionText, TooltipHeaderText } from "../../style";
 import { ContactUsLink } from "../ContactUsLink";
 import {
   CheckBoxInfo,
-  CheckBoxWrapper,
   Container,
   Content,
   DownloadType,
@@ -28,7 +27,7 @@ import {
   Header,
   StyledButton,
   StyledCheckbox,
-  StyledSpan,
+  StyledFileTypeItem,
   Title,
 } from "./style";
 
@@ -173,30 +172,29 @@ const DownloadModal = ({
                   anchorEl,
                 }}
               >
-                <StyledSpan style={getBackgroundFastaColor()}>
-                  <CheckBoxWrapper>
-                    <CheckBoxInfo>
-                      {/* @ts-expect-error need to update checkbox state after upgrading sds */}
-                      <StyledCheckbox
-                        onChange={handleFastaClick}
-                        disabled={isFastaDisabled}
-                      />
-                    </CheckBoxInfo>
-                    <CheckBoxInfo>
-                      <DownloadType style={getBackgroundFastaColor()}>
-                        Consensus Genome{" "}
-                      </DownloadType>{" "}
-                      <span ref={tooltipRef}>(.fasta)</span>
-                      <DownloadTypeInfo>
-                        Download multiple consensus genomes in a single,
-                        concatenated file
-                      </DownloadTypeInfo>
-                    </CheckBoxInfo>
-                  </CheckBoxWrapper>
-                </StyledSpan>
+                <StyledFileTypeItem
+                  isDisabled={isFastaDisabled}
+                  isSelected={isFastaSelected}
+                >
+                  <CheckBoxInfo>
+                    {/* @ts-expect-error need to update checkbox state after upgrading sds */}
+                    <StyledCheckbox
+                      onChange={handleFastaClick}
+                      disabled={isFastaDisabled}
+                    />
+                  </CheckBoxInfo>
+                  <CheckBoxInfo>
+                    <DownloadType>Consensus Genome</DownloadType>{" "}
+                    <span ref={tooltipRef}>(.fasta)</span>
+                    <DownloadTypeInfo>
+                      Download multiple consensus genomes in a single,
+                      concatenated file
+                    </DownloadTypeInfo>
+                  </CheckBoxInfo>
+                </StyledFileTypeItem>
               </Tooltip>
               <div style={{ height: "4px" }}></div>
-              <CheckBoxWrapper style={getBackgroundColor(isMetadataSelected)}>
+              <StyledFileTypeItem isSelected={isMetadataSelected}>
                 <CheckBoxInfo>
                   {/* @ts-expect-error need to update checkbox state after upgrading sds */}
                   <StyledCheckbox onChange={handleMetadataClick} />
@@ -209,7 +207,7 @@ const DownloadModal = ({
                     Accession #.
                   </DownloadTypeInfo>
                 </CheckBoxInfo>
-              </CheckBoxWrapper>
+              </StyledFileTypeItem>
             </Container>
             {failedSampleIds.length > 0 &&
               !isFastaDisabled && ( //ignore alert if fasta is already disabled
@@ -232,22 +230,6 @@ const DownloadModal = ({
       </Dialog>
     </>
   );
-
-  function getBackgroundFastaColor() {
-    if (isFastaDisabled) {
-      // TODO: access this styling with props instead of hardcoding
-      return { backgroundColor: "transparent", color: "#999999" };
-    } else {
-      return getBackgroundColor(isFastaSelected);
-    }
-  }
-
-  function getBackgroundColor(parameterSelected: boolean) {
-    if (parameterSelected) {
-      // TODO: access this styling with props instead of hardcoding
-      return { backgroundColor: "#F8F8F8" };
-    }
-  }
 
   function getDownloadButton(): JSX.Element | undefined {
     // button will have different functionality depending on download type selected
