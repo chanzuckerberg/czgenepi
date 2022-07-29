@@ -2,7 +2,7 @@
 import styled from "@emotion/styled";
 import { CommonThemeProps, getColors, getSpaces, IconButton } from "czifui";
 
-export const iconFillBlack = () => {
+export const iconFillBlack = (): string => {
   return `
     svg {
       fill: black;
@@ -10,7 +10,7 @@ export const iconFillBlack = () => {
   `;
 };
 
-export const iconFillError = (props: CommonThemeProps) => {
+export const iconFillError = (props: CommonThemeProps): string => {
   const colors = getColors(props);
   return `
     svg {
@@ -19,7 +19,7 @@ export const iconFillError = (props: CommonThemeProps) => {
   `;
 };
 
-export const iconFillGray = (props: CommonThemeProps) => {
+export const iconFillGray = (props: CommonThemeProps): string => {
   const colors = getColors(props);
   return `
     svg {
@@ -28,7 +28,7 @@ export const iconFillGray = (props: CommonThemeProps) => {
   `;
 };
 
-export const iconFillGrayHoverPrimary = (props: CommonThemeProps) => {
+export const iconFillGrayHoverPrimary = (props: CommonThemeProps): string => {
   const colors = getColors(props);
   return `
     ${iconFillGray}
@@ -40,7 +40,7 @@ export const iconFillGrayHoverPrimary = (props: CommonThemeProps) => {
   `;
 };
 
-export const iconFillWarning = (props: CommonThemeProps) => {
+export const iconFillWarning = (props: CommonThemeProps): string => {
   const colors = getColors(props);
 
   return `
@@ -50,7 +50,7 @@ export const iconFillWarning = (props: CommonThemeProps) => {
   `;
 };
 
-export const iconFillWhite = () => {
+export const iconFillWhite = (): string => {
   return `
     svg {
       fill: white;
@@ -58,14 +58,14 @@ export const iconFillWhite = () => {
   `;
 };
 
-export const rightMarginM = (props: CommonThemeProps) => {
+export const rightMarginM = (props: CommonThemeProps): string => {
   const spaces = getSpaces(props);
   return `
     margin-right: ${spaces?.m}px;
   `;
 };
 
-export const rightMarginXxs = (props: CommonThemeProps) => {
+export const rightMarginXxs = (props: CommonThemeProps): string => {
   const spaces = getSpaces(props);
   return `
     margin-right: ${spaces?.xxs}px;
