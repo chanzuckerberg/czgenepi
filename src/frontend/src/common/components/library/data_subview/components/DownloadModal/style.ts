@@ -50,7 +50,7 @@ const checkBoxInfoSpacing = (props: CommonThemeProps) => {
 };
 
 export const CheckBoxInfo = styled.div`
-  ${checkBoxInfoSpacing};
+  ${checkBoxInfoSpacing}
 `;
 
 export const CheckboxLabel = styled.label`
