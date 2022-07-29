@@ -1,4 +1,5 @@
-import { Alert, Icon, Tooltip } from "czifui";
+import { useTreatments } from "@splitsoftware/splitio-react";
+import { Alert, Icon, Link, Tooltip } from "czifui";
 import { isEqual, noop } from "lodash";
 import React, { useCallback, useEffect, useState } from "react";
 import { CSVLink } from "react-csv";
@@ -16,11 +17,12 @@ import { pluralize } from "src/common/utils/strUtils";
 import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
 import Dialog from "src/components/Dialog";
 import Notification from "src/components/Notification";
+import { FEATURE_FLAGS, isFlagOn } from "src/components/Split";
 import { TooltipDescriptionText, TooltipHeaderText } from "../../style";
 import { ContactUsLink } from "../ContactUsLink";
 import {
   CheckBoxInfo,
-  CheckBoxWrapper,
+  CheckboxLabel,
   Container,
   Content,
   DownloadType,
@@ -28,7 +30,7 @@ import {
   Header,
   StyledButton,
   StyledCheckbox,
-  StyledSpan,
+  StyledFileTypeItem,
   Title,
 } from "./style";
 
@@ -66,7 +68,11 @@ const DownloadModal = ({
   const [isFastaDisabled, setFastaDisabled] = useState<boolean>(false);
   const [isFastaSelected, setFastaSelected] = useState<boolean>(false);
   const [isMetadataSelected, setMetadataSelected] = useState<boolean>(false);
+  const [isGisaidSelected, setGisaidSelected] = useState<boolean>(false);
   const [shouldShouldError, setShouldShowError] = useState<boolean>(false);
+
+  const flag = useTreatments([FEATURE_FLAGS.prep_files]);
+  const isPrepFilesFlagOn = isFlagOn(flag, FEATURE_FLAGS.prep_files);
 
   useEffect(() => {
     if (tsvData) {
@@ -90,6 +96,10 @@ const DownloadModal = ({
 
   const handleFastaClick = function () {
     setFastaSelected(!isFastaSelected);
+  };
+
+  const handleGisaidClick = function () {
+    setGisaidSelected(!isGisaidSelected);
   };
 
   const handleCloseModal = () => {
@@ -173,43 +183,69 @@ const DownloadModal = ({
                   anchorEl,
                 }}
               >
-                <StyledSpan style={getBackgroundFastaColor()}>
-                  <CheckBoxWrapper>
-                    <CheckBoxInfo>
-                      {/* @ts-expect-error need to update checkbox state after upgrading sds */}
-                      <StyledCheckbox
-                        onChange={handleFastaClick}
-                        disabled={isFastaDisabled}
-                      />
-                    </CheckBoxInfo>
-                    <CheckBoxInfo>
-                      <DownloadType style={getBackgroundFastaColor()}>
-                        Consensus Genome{" "}
-                      </DownloadType>{" "}
-                      <span ref={tooltipRef}>(.fasta)</span>
-                      <DownloadTypeInfo>
-                        Download multiple consensus genomes in a single,
-                        concatenated file
-                      </DownloadTypeInfo>
-                    </CheckBoxInfo>
-                  </CheckBoxWrapper>
-                </StyledSpan>
+                <StyledFileTypeItem
+                  isDisabled={isFastaDisabled}
+                  isSelected={isFastaSelected}
+                >
+                  <CheckBoxInfo>
+                    <StyledCheckbox
+                      disabled={isFastaDisabled}
+                      id="download-fasta-checkbox"
+                      onChange={handleFastaClick}
+                      stage={isFastaSelected ? "checked" : "unchecked"}
+                    />
+                  </CheckBoxInfo>
+                  <CheckboxLabel htmlFor="download-fasta-checkbox">
+                    <DownloadType>Consensus Genome</DownloadType>{" "}
+                    <span ref={tooltipRef}>(.fasta)</span>
+                    <DownloadTypeInfo>
+                      Download multiple consensus genomes in a single,
+                      concatenated file
+                    </DownloadTypeInfo>
+                  </CheckboxLabel>
+                </StyledFileTypeItem>
               </Tooltip>
               <div style={{ height: "4px" }}></div>
-              <CheckBoxWrapper style={getBackgroundColor(isMetadataSelected)}>
+              <StyledFileTypeItem isSelected={isMetadataSelected}>
                 <CheckBoxInfo>
-                  {/* @ts-expect-error need to update checkbox state after upgrading sds */}
-                  <StyledCheckbox onChange={handleMetadataClick} />
+                  <StyledCheckbox
+                    id="download-metadata-checkbox"
+                    onChange={handleMetadataClick}
+                    stage={isMetadataSelected ? "checked" : "unchecked"}
+                  />
                 </CheckBoxInfo>
-                <CheckBoxInfo>
+                <CheckboxLabel htmlFor="download-metadata-checkbox">
                   <DownloadType>Sample Metadata </DownloadType> (.tsv)
                   <DownloadTypeInfo>
                     Sample metadata including Private and Public IDs, Collection
                     Date, Sequencing Date, Lineage, GISAID Status, and ISL
                     Accession #.
                   </DownloadTypeInfo>
-                </CheckBoxInfo>
-              </CheckBoxWrapper>
+                </CheckboxLabel>
+              </StyledFileTypeItem>
+              {isPrepFilesFlagOn && (
+                <StyledFileTypeItem>
+                  <CheckBoxInfo>
+                    <StyledCheckbox
+                      id="download-gisaid-checkbox"
+                      onChange={handleGisaidClick}
+                      stage={isGisaidSelected ? "checked" : "unchecked"}
+                    />
+                  </CheckBoxInfo>
+                  <CheckboxLabel htmlFor="download-gisaid-checkbox">
+                    <DownloadType>GISAID Submission Template </DownloadType>{" "}
+                    (.fasta, .csv)
+                    <DownloadTypeInfo>
+                      Download concatenated consensus genomes and metadata files
+                      formatted to prepare samples for submission to GISAID.{" "}
+                      {/* TODO: (194961) - update href */}
+                      <Link href="" target="_blank" rel="noreferrer">
+                        Learn More.
+                      </Link>
+                    </DownloadTypeInfo>
+                  </CheckboxLabel>
+                </StyledFileTypeItem>
+              )}
             </Container>
             {failedSampleIds.length > 0 &&
               !isFastaDisabled && ( //ignore alert if fasta is already disabled
@@ -233,22 +269,7 @@ const DownloadModal = ({
     </>
   );
 
-  function getBackgroundFastaColor() {
-    if (isFastaDisabled) {
-      // TODO: access this styling with props instead of hardcoding
-      return { backgroundColor: "transparent", color: "#999999" };
-    } else {
-      return getBackgroundColor(isFastaSelected);
-    }
-  }
-
-  function getBackgroundColor(parameterSelected: boolean) {
-    if (parameterSelected) {
-      // TODO: access this styling with props instead of hardcoding
-      return { backgroundColor: "#F8F8F8" };
-    }
-  }
-
+  // TODO:(194961) update for GISAID template download
   function getDownloadButton(): JSX.Element | undefined {
     // button will have different functionality depending on download type selected
 
