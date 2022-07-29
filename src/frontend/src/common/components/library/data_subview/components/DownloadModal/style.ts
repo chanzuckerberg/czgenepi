@@ -56,6 +56,12 @@ export const CheckBoxInfo = styled.div`
 export const CheckboxLabel = styled.label`
   ${fontBodyS}
   ${checkBoxInfoSpacing}
+  ${(props: CommonThemeProps) => {
+    const spaces = getSpaces(props);
+    return `
+      margin-top: ${spaces?.m}px;
+    `;
+  }}
 `;
 
 export const Container = styled.ul`
