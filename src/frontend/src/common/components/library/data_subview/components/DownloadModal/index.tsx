@@ -1,4 +1,5 @@
-import { Alert, Icon, Tooltip } from "czifui";
+import { useTreatments } from "@splitsoftware/splitio-react";
+import { Alert, Icon, Link, Tooltip } from "czifui";
 import { isEqual, noop } from "lodash";
 import React, { useCallback, useEffect, useState } from "react";
 import { CSVLink } from "react-csv";
@@ -16,6 +17,7 @@ import { pluralize } from "src/common/utils/strUtils";
 import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
 import Dialog from "src/components/Dialog";
 import Notification from "src/components/Notification";
+import { FEATURE_FLAGS, isFlagOn } from "src/components/Split";
 import { TooltipDescriptionText, TooltipHeaderText } from "../../style";
 import { ContactUsLink } from "../ContactUsLink";
 import {
@@ -68,6 +70,9 @@ const DownloadModal = ({
   const [isMetadataSelected, setMetadataSelected] = useState<boolean>(false);
   const [isGisaidSelected, setGisaidSelected] = useState<boolean>(false);
   const [shouldShouldError, setShouldShowError] = useState<boolean>(false);
+
+  const flag = useTreatments([FEATURE_FLAGS.prep_files]);
+  const isPrepFilesFlagOn = isFlagOn(flag, FEATURE_FLAGS.prep_files);
 
   useEffect(() => {
     if (tsvData) {
@@ -218,23 +223,29 @@ const DownloadModal = ({
                   </DownloadTypeInfo>
                 </CheckboxLabel>
               </StyledFileTypeItem>
-              <StyledFileTypeItem>
-                <CheckBoxInfo>
-                  <StyledCheckbox
-                    id="download-gisaid-checkbox"
-                    onChange={handleGisaidClick}
-                    stage={isGisaidSelected ? "checked" : "unchecked"}
-                  />
-                </CheckBoxInfo>
-                <CheckboxLabel htmlFor="download-gisaid-checkbox">
-                  <DownloadType>GISAID Submission Template </DownloadType>{" "}
-                  (.fasta, .csv)
-                  <DownloadTypeInfo>
-                    Download concatenated consensus genomes and metadata files
-                    formatted to prepare samples for submission to GISAID.
-                  </DownloadTypeInfo>
-                </CheckboxLabel>
-              </StyledFileTypeItem>
+              {isPrepFilesFlagOn && (
+                <StyledFileTypeItem>
+                  <CheckBoxInfo>
+                    <StyledCheckbox
+                      id="download-gisaid-checkbox"
+                      onChange={handleGisaidClick}
+                      stage={isGisaidSelected ? "checked" : "unchecked"}
+                    />
+                  </CheckBoxInfo>
+                  <CheckboxLabel htmlFor="download-gisaid-checkbox">
+                    <DownloadType>GISAID Submission Template </DownloadType>{" "}
+                    (.fasta, .csv)
+                    <DownloadTypeInfo>
+                      Download concatenated consensus genomes and metadata files
+                      formatted to prepare samples for submission to GISAID.{" "}
+                      {/* TODO: (194961) - update href */}
+                      <Link href="" target="_blank" rel="noreferrer">
+                        Learn More.
+                      </Link>
+                    </DownloadTypeInfo>
+                  </CheckboxLabel>
+                </StyledFileTypeItem>
+              )}
             </Container>
             {failedSampleIds.length > 0 &&
               !isFastaDisabled && ( //ignore alert if fasta is already disabled
@@ -258,6 +269,7 @@ const DownloadModal = ({
     </>
   );
 
+  // TODO:(194961) update for GISAID template download
   function getDownloadButton(): JSX.Element | undefined {
     // button will have different functionality depending on download type selected
 
