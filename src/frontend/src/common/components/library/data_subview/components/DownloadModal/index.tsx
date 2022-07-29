@@ -69,6 +69,7 @@ const DownloadModal = ({
   const [isFastaSelected, setFastaSelected] = useState<boolean>(false);
   const [isMetadataSelected, setMetadataSelected] = useState<boolean>(false);
   const [isGisaidSelected, setGisaidSelected] = useState<boolean>(false);
+  const [isGenbankSelected, setGenbankSelected] = useState<boolean>(false);
   const [shouldShouldError, setShouldShowError] = useState<boolean>(false);
 
   const flag = useTreatments([FEATURE_FLAGS.prep_files]);
@@ -100,6 +101,10 @@ const DownloadModal = ({
 
   const handleGisaidClick = function () {
     setGisaidSelected(!isGisaidSelected);
+  };
+
+  const handleGenbankClick = function () {
+    setGenbankSelected(!isGenbankSelected);
   };
 
   const handleCloseModal = () => {
@@ -224,7 +229,7 @@ const DownloadModal = ({
                 </CheckboxLabel>
               </StyledFileTypeItem>
               {isPrepFilesFlagOn && (
-                <StyledFileTypeItem>
+                <StyledFileTypeItem isSelected={isGisaidSelected}>
                   <CheckBoxInfo>
                     <StyledCheckbox
                       id="download-gisaid-checkbox"
@@ -239,6 +244,29 @@ const DownloadModal = ({
                       Download concatenated consensus genomes and metadata files
                       formatted to prepare samples for submission to GISAID.{" "}
                       {/* TODO: (194961) - update href */}
+                      <Link href="" target="_blank" rel="noreferrer">
+                        Learn More.
+                      </Link>
+                    </DownloadTypeInfo>
+                  </CheckboxLabel>
+                </StyledFileTypeItem>
+              )}
+              {isPrepFilesFlagOn && (
+                <StyledFileTypeItem isSelected={isGenbankSelected}>
+                  <CheckBoxInfo>
+                    <StyledCheckbox
+                      id="download-genbank-checkbox"
+                      onChange={handleGenbankClick}
+                      stage={isGenbankSelected ? "checked" : "unchecked"}
+                    />
+                  </CheckBoxInfo>
+                  <CheckboxLabel htmlFor="download-genbank-checkbox">
+                    <DownloadType>Genbank Submission Template </DownloadType>{" "}
+                    (.fasta, .tsv)
+                    <DownloadTypeInfo>
+                      Download concatenated consensus genomes and metadata files
+                      formatted to prepare samples for submission to Genbank.{" "}
+                      {/* TODO: (194962) - update href */}
                       <Link href="" target="_blank" rel="noreferrer">
                         Learn More.
                       </Link>
@@ -270,6 +298,7 @@ const DownloadModal = ({
   );
 
   // TODO:(194961) update for GISAID template download
+  // TODO:(194962) update for GenBank template download
   function getDownloadButton(): JSX.Element | undefined {
     // button will have different functionality depending on download type selected
 
