@@ -1,5 +1,5 @@
 import os
-from typing import Optional
+from typing import Optional, Tuple
 from urllib.parse import urlencode
 
 import sqlalchemy as sa
@@ -47,7 +47,9 @@ async def login(
     )
 
 
-async def create_user_if_not_exists(db, auth0_mgmt, userinfo) -> User:
+async def create_user_if_not_exists(
+    db, auth0_mgmt, userinfo
+) -> Tuple[User, Optional[Group]]:
     auth0_user_id = userinfo.get("sub")
     if not auth0_user_id:
         # User ID really needs to be present
@@ -58,7 +60,7 @@ async def create_user_if_not_exists(db, auth0_mgmt, userinfo) -> User:
     try:
         # Return early if this user already exists
         user = userquery.scalars().one()
-        return user
+        return user, None
     except NoResultFound:
         pass
     # We're currently only creating new users if they're confirming an org invitation
@@ -89,7 +91,7 @@ async def create_user_if_not_exists(db, auth0_mgmt, userinfo) -> User:
     newuser = User(**user_fields)
     db.add(newuser)
     await db.commit()
-    return newuser
+    return newuser, group
 
 
 @router.get("/callback")
@@ -118,25 +120,30 @@ async def auth(
     except OAuthError:
         raise ex.UnauthorizedException("Invalid token")
     userinfo = token.get("userinfo")
-    if userinfo:
-        # Store the user information in flask session.
-        request.session["jwt_payload"] = userinfo
-        request.session["profile"] = {
-            "user_id": userinfo["sub"],
-            "name": userinfo["name"],
-        }
-        user = await create_user_if_not_exists(db, auth0_mgmt, userinfo)
-        # Always re-sync auth0 groups to our db on login!
-        # Make sure the user is in auth0 before sync'ing roles.
-        #  ex: User1 in local dev doesn't exist in auth0
-        sync_roles = splitio.get_flag("sync_auth0_roles", user)
-        if sync_roles == "on":
-            if user.auth0_user_id.startswith("auth0|"):
-                await RoleManager.sync_user_roles(db, auth0_mgmt, user)
-            await db.commit()
-    else:
+    if not userinfo:
         raise ex.UnauthorizedException("No user info in token")
-    return RedirectResponse(os.getenv("FRONTEND_URL", "") + "/data/samples")
+    # Store the user information in flask session.
+    request.session["jwt_payload"] = userinfo
+    request.session["profile"] = {
+        "user_id": userinfo["sub"],
+        "name": userinfo["name"],
+    }
+    user, newuser_group = await create_user_if_not_exists(db, auth0_mgmt, userinfo)
+    # Always re-sync auth0 groups to our db on login!
+    # Make sure the user is in auth0 before sync'ing roles.
+    #  ex: User1 in local dev doesn't exist in auth0
+    sync_roles = splitio.get_flag("sync_auth0_roles", user)
+    if sync_roles == "on":
+        if user.auth0_user_id.startswith("auth0|"):
+            await RoleManager.sync_user_roles(db, auth0_mgmt, user)
+        await db.commit()
+
+    if userinfo.get("org_id") and newuser_group:
+        return RedirectResponse(
+            os.getenv("FRONTEND_URL", "") + f"/welcome/{newuser_group.id}"
+        )
+    else:
+        return RedirectResponse(os.getenv("FRONTEND_URL", "") + "/data/samples")
 
 
 @router.get("/logout")
