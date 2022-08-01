@@ -8,11 +8,14 @@ from aspen.api.schemas.locations import LocationResponse
 
 
 class GroupCreationRequest(BaseRequest):
-    name: constr(min_length=3, max_length=128, strict=True)  # type: ignore
-    prefix: constr(min_length=2, max_length=20, strict=True)  # type: ignore
-    address: Optional[constr(min_length=1, max_length=128, strict=True)]  # type: ignore
-    division: Optional[constr(min_length=1, max_length=128, strict=True)]  # type: ignore
-    location: Optional[constr(min_length=1, max_length=128, strict=True)]  # type: ignore
+    name: constr(min_length=3, max_length=1000, strict=True)  # type: ignore
+    # group prefix currently is used in the SFN name, which has max char limit
+    # `prefix` cannot be arbitrarily increased until this ticket is resolved:
+    # https://app.shortcut.com/genepi/story/209498
+    prefix: constr(min_length=2, max_length=25, strict=True)  # type: ignore
+    address: Optional[constr(min_length=1, max_length=1000, strict=True)]  # type: ignore
+    division: Optional[constr(min_length=1, max_length=1000, strict=True)]  # type: ignore
+    location: Optional[constr(min_length=1, max_length=1000, strict=True)]  # type: ignore
     default_tree_location_id: int
 
 
