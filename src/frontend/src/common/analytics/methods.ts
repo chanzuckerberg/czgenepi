@@ -20,7 +20,7 @@
  * in the rest of our code and all of the opt-in/out logic is taken care of.
  */
 import { debounce, isEmpty, isEqual } from "lodash";
-import { EVENT_TYPES } from "./eventTypes";
+import { EventData, EVENT_TYPES } from "./eventTypes";
 
 /**
  * We send the below pieces of info with every analytics call if possible.
@@ -44,26 +44,37 @@ type CommonAnalyticsInfo = {
 };
 
 /**
- * Values we consider reasonable to send to Segment as properties of event.
- *
- * Note that `undefined` is also acceptable within the event properties object
- * as a value, but it is instead interpreted as "delete this key" when Segment
- * receives. The `analyticsTrackEvent` function allows undefined, but for
- * clarity it's not considered an EventValue since it's not a value, per se.
- *
- * This is a convention we are choosing to make. Segment does not care what is
- * sent, this could be `any` type, but we want to ensure a flat structure of
- * key-value pairs for downstream analysis since the structure of the event
- * properties implicitly determines the schema used for the event table when
- * Segment syncs with the data warehouse.
- */
-type EventValue = string | number | boolean | null;
-
-/**
  * Send occurrence of an event we track to Segment for analytics.
  *
  * Fires off a Segment `track` event. If user is opted-out of analytics, this
  * function does nothing.
+ *
+ * --- Usage ---
+ * Most `track` events involve additional data beyond simply noting the type
+ * of event that just occurred. This additional data is passed as an optional,
+ * but generally used, second arg. Also, if this second arg is used, the
+ * event's TS type /must/ be given as well. A few track events may require
+ * no additional info beyond noting the event happened: in that case, the func
+ * takes a single arg and /no/ TS event type.
+ *
+ * Example: Including additional event info (more commonly used case)
+ *   analyticsTrackEvent<AnalyticsFooEvent>(
+ *     EVENT_TYPES.FOO_EVENT, {
+ *       foo_bar: "additional event data",
+ *       fizz_buzz: "as structured by AnalyticsFooEvent type"
+ *     });
+ * Example: No additional event info (less commonly used case)
+ *   analyticsTrackEvent(EVENT_TYPES.BAR_EVENT);
+ *
+ * All the enumerated EVENT_TYPES and their associated event TS types should
+ * live in the `eventTypes.ts` file. There are more docs in there about how
+ * to structure the additionalEventData object payloads.
+ *
+ * --- Other Notes ---
+ * All events include some generic, common info (CommonAnalyticsInfo). It
+ * is possible to overwrite those with your `additionalEventData` if there
+ * is a key collision. This is intentional -- some events could potentially
+ * overrule the common info aspect -- but should be very unusual.
  *
  * When calling this function, be careful to ensure it only gets called once
  * per event. There are a couple gotchas in our app around components double
@@ -73,31 +84,64 @@ type EventValue = string | number | boolean | null;
  * expected in the Segment debugger before considering any work around
  * implementing or changing an event complete.
  *
- * All events include some generic, common info (CommonAnalyticsInfo). It
- * is possible to overwrite those with your `additionalEventData` if there
- * is a key collision. This is intentional -- some events could potentially
- * overrule the common info aspect -- but should be pretty unusual.
+ * When passing additionalEventData, it's best to directly construct it as an
+ * object in part of the function call to trigger "Excess Property Checking"
+ * and help ensure that the passed event data matches the event TS type being
+ * specified for the event. If instead you do it like this,
+ *     NOT GREAT  ---> analyticsTrackEvent<AnalyticsFooEvent>(
+ *     PLZ AVOID  --->   EVENT_TYPES.FOO_EVENT, additionalFooEventData);
+ * then it's possible for the passed `additionalFooEventData` to have extra
+ * properties beyond what the `AnalyticsFooEvent` specifies and you won't get
+ * any kind of TS warning. But if you construct the object within the function
+ * call, TS will complain if that object has keys beyond its specified TS type.
  *
- * Args:
- *   eventType (str, from EVENT_TYPES enum): canonical, unique name for event
- *   additionalEventData (obj): any additional data pertaining to event
- *     --- IMPORTANT USAGE NOTES ---
- *     The structure of this object will determine the (implicitly created)
- *     schema that Segment makes when it lands event in data warehouse. So:
- *     - All the keys in additionalEventData should be in **snake_case** to
- *     match expectation when working with analytics database.
- *     - additionalEventData should be a flat object of simple key-value pairs.
- *     You can send `undefined` for a value, but it will cause the key to be
- *     considered deleted for that event when it lands in Segment.
+ * --- TypesScript Apologia ---
+ * There is a lot of TS fanciness going on here. I'm (Vince) sorry for that.
+ *
+ * The goal here was to create A) a clear and documented set of event structures
+ * for downstream analysts to reference (by viewing the `eventTypes.ts` file)
+ * and also B) ensure some level of dev guardrails to prevent accidentally
+ * changing how `additionalEventData` for any given event is structured as the
+ * codebase changes or if the same event can come from multiple places in code.
+ *
+ * Part (A) is pretty self-explanatory, but (B) is less so and it's why we need
+ * all the complicated TS stuff below. Basically, whatever event data we send
+ * up to Segment via a `track` call will **implicitly** define the DB schema
+ * used to store that event downstream. But because this creation is implicit,
+ * if we change the structure of that payload later it can cause problems for
+ * downstream analysis. It's possible to do without issue, but accidentally
+ * changing it is generally bad. So all the TS fanciness is to ensure that,
+ * when additionalEventData is being sent, we have a clear structure for the
+ * additional data, we adhere to that, and we only change it on purpose.
+ *
+ * One weak spot in the current TS implementation is that an event type that
+ * /should/ have additionalEventData could get used in the single arg format
+ * and thus would not send up any additional data yet cause no TS errors. I
+ * (Vince) couldn't come up with a reasonable way to avoid that problem, so
+ * there are no guardrails around it, but hopefully it would be an uncommon
+ * mistake and easy to catch in a code review. Also, some of the TS error
+ * messages are a bit obtuse, but the confusing ones at least point you to
+ * this function and hopefully will be easy to fix once the dev sees the docs.
  */
+// Single arg, no additionalEventData and no TS event type
+export function analyticsTrackEvent(eventType: EVENT_TYPES): void;
+// Two args, has additionalEventData and requires a TS event type
+// The weird `never` default combines with second `extends` to require TS type
+// For details of why, see https://stackoverflow.com/a/57683742
+export function analyticsTrackEvent<
+  T extends EventData = never,
+  EventType extends T = T
+>(eventType: EVENT_TYPES, additionalEventData: EventType): void;
+// Implementation signature
 export function analyticsTrackEvent(
   eventType: EVENT_TYPES,
-  additionalEventData: Record<string, EventValue | undefined> = {}
-): void {
+  additionalEventData?: EventData
+) {
+  const addlEventData = additionalEventData || {};
   if (window.analytics && window.isCzGenEpiAnalyticsEnabled) {
     const eventData = {
       ...getCommonUserInfo(),
-      ...additionalEventData,
+      ...addlEventData,
     };
     window.analytics.track(eventType, eventData);
   }

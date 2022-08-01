@@ -1,5 +1,8 @@
 import React from "react";
-import { EVENT_TYPES } from "src/common/analytics/eventTypes";
+import {
+  AnalyticsTreeViewNextstrain,
+  EVENT_TYPES,
+} from "src/common/analytics/eventTypes";
 import { analyticsTrackEvent } from "src/common/analytics/methods";
 import { RedirectConfirmationModal } from "src/common/components/library/data_subview/components/RedirectConfirmationModal";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
@@ -30,9 +33,12 @@ const NextstrainConfirmationModal = ({
     <ConfirmButton
       treeId={treeId}
       onClick={() =>
-        analyticsTrackEvent(EVENT_TYPES.TREE_VIEW_NEXTSTRAIN, {
-          tree_id: treeId,
-        })
+        analyticsTrackEvent<AnalyticsTreeViewNextstrain>(
+          EVENT_TYPES.TREE_VIEW_NEXTSTRAIN,
+          {
+            tree_id: treeId,
+          }
+        )
       }
     />
   );
