@@ -1,21 +1,9 @@
-import { Button } from "@material-ui/core";
-import { createStyles, makeStyles } from "@material-ui/styles";
-import { AppThemeOptions, Icon, Menu, MenuItem } from "czifui";
+import { Icon, Menu, MenuItem } from "czifui";
 import React from "react";
 import { API } from "src/common/api";
 import ENV from "src/common/constants/ENV";
 import { ROUTES } from "src/common/routes";
-import { StyledNavIconWrapper } from "./style";
-
-const useStyles = makeStyles((theme: AppThemeOptions) => {
-  const palette = theme.palette;
-
-  return createStyles({
-    text: {
-      color: palette?.common?.white,
-    },
-  });
-});
+import { StyledNavButton, StyledNavIconWrapper } from "./style";
 
 interface UserMenuProps {
   user: string | undefined;
@@ -23,8 +11,6 @@ interface UserMenuProps {
 
 const UserMenu = ({ user }: UserMenuProps): JSX.Element => {
   const [anchorEl, setAnchorEl] = React.useState<Element | null>(null);
-
-  const classes = useStyles();
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = (event) => {
     setAnchorEl(event.currentTarget);
@@ -36,10 +22,9 @@ const UserMenu = ({ user }: UserMenuProps): JSX.Element => {
 
   return (
     <>
-      <Button
+      <StyledNavButton
         data-test-id="nav-user-menu"
         onClick={handleClick}
-        classes={classes}
         endIcon={
           <StyledNavIconWrapper>
             <Icon sdsIcon="chevronDown" sdsSize="xs" sdsType="static" />
@@ -47,7 +32,7 @@ const UserMenu = ({ user }: UserMenuProps): JSX.Element => {
         }
       >
         {user}
-      </Button>
+      </StyledNavButton>
       <Menu
         anchorEl={anchorEl}
         keepMounted
