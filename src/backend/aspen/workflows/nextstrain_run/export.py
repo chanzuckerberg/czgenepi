@@ -308,8 +308,8 @@ def write_sequences_files(session, pathogen_genomes, sequences_fh, metadata_fh):
         aspen_metadata_row: MutableMapping[str, Any] = {
             "strain": sample.public_identifier,
             "virus": "ncov",
-            "gisaid_epi_isl": gisaid_accession.accession or "",
-            "genbank_accession": genbank_accession.accession or "",
+            "gisaid_epi_isl": getattr(gisaid_accession, "accession", None) or "",
+            "genbank_accession": getattr(genbank_accession, "accession", None) or "",
             "date": sample.collection_date.strftime("%Y-%m-%d"),
             "date_submitted": upload_date,
             "region": sample.collection_location.region,
