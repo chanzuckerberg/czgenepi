@@ -130,8 +130,10 @@ def test_build_config(mocker, session, postgres_database):
         # Test that we are careful with printing data from our models
         metadata_reader = csv.DictReader(StringIO(metadata), delimiter="\t")
         for row in metadata_reader:
-            for value in row.values():
+            for key, value in row.items():
                 assert not value.startswith("<aspen.database.models")
+                if key == "gisaid_epi_isl":
+                    assert value.startswith("EPI_ISL_")
 
 
 # Make sure that configs specific to an Overview tree are working.
