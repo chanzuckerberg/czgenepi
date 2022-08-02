@@ -18,6 +18,9 @@
 export enum EVENT_TYPES {
   // User has been sent to Nextstrain to view a phylo tree
   TREE_VIEW_NEXTSTRAIN = "TREE_VIEW_NEXTSTRAIN",
+
+  // User has successfully uploaded new samples
+  SAMPLES_UPLOAD_SUCCESS = "SAMPLES_UPLOAD_SUCCESS",
 }
 
 /**
@@ -43,7 +46,7 @@ export type EventData = Record<string, EventValue | undefined>;
 
 // While we only send values of EventValue, sometimes we send a JSON string.
 // For ease of readability below, we alias string for those cases.
-// type JsonString = string; // TODO VOODOO uncomment on first use
+type JsonString = string;
 
 /**
  * Structure of additionalEventData for each EVENT_TYPES type that sends it.
@@ -87,4 +90,12 @@ export type EventData = Record<string, EventValue | undefined>;
 export type AnalyticsTreeViewNextstrain = {
   // Tree that user is being sent to view
   tree_id: number;
+};
+
+/** EVENT_TYPES.SAMPLES_UPLOAD_SUCCESS*/
+export type AnalyticsSamplesUploadSuccess = {
+  // How many samples the user just uploaded
+  sample_count: number;
+  // JSON array of all the IDs for newly created samples for this upload
+  sample_ids: JsonString;
 };

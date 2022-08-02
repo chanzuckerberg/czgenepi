@@ -2,8 +2,13 @@ import { AlertTitle } from "@material-ui/lab";
 import { Alert, Button } from "czifui";
 import NextLink from "next/link";
 import React, { useState } from "react";
+import {
+  AnalyticsSamplesUploadSuccess,
+  EVENT_TYPES,
+} from "src/common/analytics/eventTypes";
+import { analyticsTrackEvent } from "src/common/analytics/methods";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
-import { useCreateSamples } from "src/common/queries/samples";
+import { RawSamplesWithId, useCreateSamples } from "src/common/queries/samples";
 import { useSelector } from "src/common/redux/hooks";
 import { selectCurrentGroup } from "src/common/redux/selectors";
 import { ROUTES } from "src/common/routes";
@@ -40,7 +45,18 @@ export default function Upload({
   const { mutate, isLoading, isSuccess, isError, error } = useCreateSamples(
     groupId,
     {
-      componentOnSuccess: () => {
+      componentOnSuccess: (respData: RawSamplesWithId) => {
+        // Analytics event: successful upload of samples
+        const createdSamples = respData.samples;
+        const createdIds = createdSamples.map((sample) => sample.id);
+        analyticsTrackEvent<AnalyticsSamplesUploadSuccess>(
+          EVENT_TYPES.SAMPLES_UPLOAD_SUCCESS,
+          {
+            sample_count: createdIds.length,
+            sample_ids: JSON.stringify(createdIds),
+          }
+        );
+
         cancelPrompt();
       },
     }
