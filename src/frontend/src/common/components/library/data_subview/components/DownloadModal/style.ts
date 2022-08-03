@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import {
   Button,
+  Callout,
   Checkbox,
   CommonThemeProps,
   fontBodyM,
@@ -18,6 +19,8 @@ export const Header = styled.div`
 `;
 
 export const Content = styled.div`
+  display: flex;
+  flex-direction: column;
   ${fontBodyS}
   ${(props) => {
     const colors = getColors(props);
@@ -68,6 +71,7 @@ export const Container = styled.ul`
   list-style-type: none;
   display: grid;
   padding: 0;
+  margin: 0;
 `;
 
 interface StyledFileTypeItemProps extends CommonThemeProps {
@@ -89,10 +93,13 @@ export const StyledFileTypeItem = styled.li`
       : "transparent"; // Default to "transparent if not disabled or selected"
 
     return `
-      margin-bottom: ${spaces?.xxs}px;
       background-color: ${backgroundColor};
       &:hover {
         background-color: ${colors?.gray[100]};
+      }
+      margin-bottom: ${spaces?.xxs}px;
+      &:last-child {
+        margin-bottom: 0;
       }
     `;
   }}
@@ -111,6 +118,7 @@ export const DownloadType = styled.div`
 `;
 
 export const StyledButton = styled(Button)`
+  max-width: fit-content;
   ${(props) => {
     const spaces = getSpaces(props);
     return `
@@ -132,4 +140,17 @@ export const StyledCheckbox = styled(Checkbox)`
       background-color: transparent;
     }
   }
+`;
+
+export const StyledCallout = styled(Callout)`
+  ${fontBodyXxs}
+  width: 100%;
+  max-width: 434px;
+  ${(props) => {
+    const spaces = getSpaces(props);
+    return `
+      margin-top: ${spaces?.xl}px;
+      margin-bottom: 0;
+    `;
+  }}
 `;

@@ -29,6 +29,7 @@ import {
   DownloadTypeInfo,
   Header,
   StyledButton,
+  StyledCallout,
   StyledCheckbox,
   StyledFileTypeItem,
   Title,
@@ -288,6 +289,14 @@ const DownloadModal = ({
                     still be included in your Sample Metadata download.
                   </DownloadTypeInfo>
                 </Alert>
+              )}
+            {checkedSampleIds.length - failedSampleIds.length > 999 &&
+              (isGisaidSelected || isGenbankSelected) && (
+                <StyledCallout intent="info" autoDismiss={false}>
+                  Your submission template download will be generated in
+                  multiple files of up to 999 samples in order to comply with
+                  GISAID/GenBank upload limits.
+                </StyledCallout>
               )}
             {getDownloadButton()}
           </Content>
