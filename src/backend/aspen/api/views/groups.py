@@ -43,6 +43,8 @@ async def create_group(
     )
     organization = auth0_client.add_org(auth0_safe_prefix, group_creation_request.name)
     group_values = dict(group_creation_request) | {"auth0_org_id": organization["id"]}
+    if group_values.get("submitting_lab") is None:
+        group_values["submitting_lab"] = group_values["name"]
     group = Group(**group_values)
     db.add(group)
     await db.commit()

@@ -23,6 +23,7 @@ class Group(idbase, DictMixin):  # type: ignore
     __tablename__ = "groups"
 
     name = Column(String, unique=True, nullable=False)
+    submitting_lab = Column(String, nullable=True)
     address = Column(String, nullable=True)
     prefix = Column(
         String,
