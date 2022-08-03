@@ -21,6 +21,11 @@ export enum EVENT_TYPES {
 
   // User has successfully uploaded new samples
   SAMPLES_UPLOAD_SUCCESS = "SAMPLES_UPLOAD_SUCCESS",
+
+  // User downloading data about samples to a file(s)
+  // Does not currently address success/failure, but download failures are very
+  // rare, so generally safe to not be concerned about that aspect for now.
+  SAMPLES_DOWNLOAD_FILE = "SAMPLES_DOWNLOAD_FILE",
 }
 
 /**
@@ -98,4 +103,18 @@ export type AnalyticsSamplesUploadSuccess = {
   sample_count: number;
   // JSON array of all the IDs for newly created samples for this upload
   sample_ids: JsonString;
+};
+
+/** EVENT_TYPES.SAMPLES_DOWNLOAD_FILE*/
+export type AnalyticsSamplesDownloadFile = {
+  // How many samples the user is downloading info on
+  sample_count: number;
+  // JSON array of the public identifiers for these samples
+  // Not the same as a sample PK, but it plus group_id is unique in DB
+  // (based on context of how download happens, PKs are hard to obtain)
+  sample_public_ids: JsonString;
+  // User downloaded info on consensus genome (FASTA) for these samples
+  includes_consensus_genome: boolean;
+  // User downloaded info on metadata for these samples
+  includes_sample_metadata: boolean;
 };
