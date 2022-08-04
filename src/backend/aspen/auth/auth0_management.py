@@ -1,7 +1,7 @@
 import random
 import string
 from functools import cache, partial
-from typing import Any, Callable, List, TypedDict
+from typing import Any, Callable, Dict, List, Optional, TypedDict
 
 from auth0.v3 import authentication as auth0_authentication
 from auth0.v3.management import Auth0
@@ -11,6 +11,18 @@ class Auth0Org(TypedDict):
     id: str
     name: str
     display_name: str
+
+
+class Auth0OrgInvitation(TypedDict):
+    id: str
+    organization_id: str
+    inviter: Dict[str, str]
+    inviteee: Dict[str, str]
+    invitation_url: str
+    roles: List[str]
+    ticket_id: str
+    client_id: str
+    connection_id: str
 
 
 class Auth0User(TypedDict):
@@ -74,6 +86,14 @@ class Auth0Client:
             results.extend(resp[key])
             page += 1
 
+    def get_organization_invitation(self, org_id, invitation_id) -> Auth0OrgInvitation:
+        return self.client.organizations.get_organization_invitation(
+            org_id, invitation_id
+        )
+
+    def delete_organization_invitation(self, org_id, invitation_id) -> None:
+        self.client.organizations.delete_organization_invitation(org_id, invitation_id)
+
     def get_user_by_email(self, email) -> List[Auth0User]:
         return self.client.users_by_email.search_users_by_email(email)
 
@@ -134,13 +154,22 @@ class Auth0Client:
             "members",
         )
 
-    def add_org_member(self, org: Auth0Org, user_id: str) -> None:
+    def add_org_member(
+        self,
+        org: Auth0Org,
+        user_id: str,
+        roles: Optional[List[str]] = None,
+        translate_roles=True,
+    ) -> None:
         self.client.organizations.create_organization_members(
             org["id"], {"members": [user_id]}
         )
-        member_role = self.get_auth0_role("member")
+        if not roles:
+            roles = ["member"]
+        if translate_roles:
+            roles = [self.get_auth0_role(role)["id"] for role in roles]
         self.client.organizations.create_organization_member_roles(
-            org["id"], user_id, {"roles": [member_role["id"]]}
+            org["id"], user_id, {"roles": roles}
         )
 
     def add_org_roles(self, org: Auth0Org, user_id: str, roles: List[str]) -> None:
@@ -218,7 +247,7 @@ class Auth0Client:
             organizations_object._url(id, "invitations"), params=params
         )
 
-    def get_org_invitations(self, org: Auth0Org) -> List[Auth0Invitation]:
+    def get_org_invitations(self, org: Auth0Org) -> List[Auth0OrgInvitation]:
         return self.get_all_results(
             partial(
                 self._call_organization_invitations_endpoint,
