@@ -1,24 +1,13 @@
 import styled from "@emotion/styled";
-import { CommonThemeProps, getColors, getSpaces } from "czifui";
+import { getColors, getSpaces } from "czifui";
 import { H3, P } from "src/common/styles/basicStyle";
 import { iconFillGray400, iconFillWhite } from "src/common/styles/iconStyle";
-import {
-  MAX_CONTENT_WIDTH,
-  PAGE_PADDING,
-} from "src/common/styles/mixins/global";
-
-const layoutPadding = (props: CommonThemeProps) => {
-  const spaces = getSpaces(props);
-  return `
-      padding: ${spaces?.xl}px ${PAGE_PADDING}px;
-      max-width: ${MAX_CONTENT_WIDTH}px;
-    `;
-};
+import { ContentStyles } from "src/common/styles/mixins/global";
 
 export const StyledHeaderRow = styled.div`
   display: flex;
   justify-content: space-between;
-  ${layoutPadding}
+  ${ContentStyles}
 `;
 
 export const StyledDivider = styled.div`
@@ -34,7 +23,7 @@ export const StyledDivider = styled.div`
 `;
 
 export const StyledSection = styled.section`
-  ${layoutPadding}
+  ${ContentStyles}
   max-width: 800px;
 `;
 

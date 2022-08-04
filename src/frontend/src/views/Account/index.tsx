@@ -1,6 +1,7 @@
 import { Button, Icon, InputText, Link } from "czifui";
 import React, { ChangeEvent, useState } from "react";
 import { H1, H2, P } from "src/common/styles/basicStyle";
+import AbandonChangesModal from "./components/AbandonChangesModal";
 import {
   GrayIconWrapper,
   StyledDivider,
@@ -23,6 +24,7 @@ export default function Account(): JSX.Element {
   const [saveButtonState, setSaveButtonState] = useState<SAVE_BUTTON_STATE>(
     SAVE_BUTTON_STATE.SAVED
   );
+  const [isModalOpen, setModalOpen] = useState<boolean>(false);
 
   // TODO: 194969 - implement save once API is ready
   const handleSave = () => {
@@ -35,6 +37,14 @@ export default function Account(): JSX.Element {
     const value = e.target.value;
     setGisaidId(value);
     setSaveButtonState(SAVE_BUTTON_STATE.NOT_SAVED);
+  };
+
+  const openModal = () => {
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
   };
 
   return (
@@ -89,6 +99,7 @@ export default function Account(): JSX.Element {
           onChange={handleNewIdInput}
         />
       </StyledSection>
+      <AbandonChangesModal open={isModalOpen} onClose={closeModal} />
     </>
   );
 }

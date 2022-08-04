@@ -84,6 +84,10 @@ export const rightMarginXxs = (props: CommonThemeProps): string => {
 // Dialog Icon styles
 export const StyledCloseIconButton = styled(IconButton)`
   float: right;
+  &:focus {
+    outline: 5px auto Highlight;
+    outline: 5px auto -webkit-focus-ring-color;
+  }
 `;
 
 export const StyledCloseIconWrapper = styled.div`
