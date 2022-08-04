@@ -1,9 +1,13 @@
 import { expect, Page, test, TestInfo } from "@playwright/test";
 import ENV from "src/common/constants/ENV";
 import nodeEnv from "src/common/constants/nodeEnv";
-import { getByTestID, getByText } from "./selectors";
 
 export const TIMEOUT_MS = 30 * 1000;
+export const getByTestID = (id: string): string => `[data-test-id="${id}"]`;
+export const getByText = (text: string): string => `text=${text}`;
+export const getByClassName = (className: string): string => `css=${className}`;
+export const getByID = (id: string): string => `[id="${id}"]`;
+export const getByName = (name: string): string => `[name="${name}"]`;
 
 export async function goToPage(
   page: Page,
