@@ -29,4 +29,4 @@ def upgrade():
 
 
 def downgrade():
-    pass
+    raise NotImplementedError("Reversing this migration is not supported")
