@@ -2,81 +2,26 @@ import { Button, Icon, InputText, Link } from "czifui";
 import React, { ChangeEvent, useState } from "react";
 import { H1, H2, P } from "src/common/styles/basicStyle";
 import {
-  GrayIcon,
+  GrayIconWrapper,
+  StyledDivider,
   StyledH3,
   StyledHeaderRow,
   StyledRow,
   StyledSection,
   SubText,
-  WhiteIcon,
+  WhiteIconWrapper,
 } from "./style";
 
 enum SAVE_BUTTON_STATE {
-  NO_CHANGE = "no change",
   NOT_SAVED = "not saved",
   SAVED = "saved",
 }
 
-const getSaveButton = (
-  saveButtonState: SAVE_BUTTON_STATE,
-  handleSave: React.MouseEventHandler<HTMLButtonElement>
-): JSX.Element => {
-  /*
-      no change
-      gray save icon, "Save" text, disabled
-
-      not saved
-      white save icon, "Save" text, not disabled
-
-      saved
-      gray checkCircle icon, "Saved" text, disabled
-  */
-
-  switch (saveButtonState) {
-    case SAVE_BUTTON_STATE.NO_CHANGE:
-      return (
-        <Button
-          onClick={handleSave}
-          disabled
-          sdsStyle="rounded"
-          sdsType="primary"
-          startIcon={<GrayIcon sdsIcon="save" sdsSize="l" sdsType="static" />}
-        >
-          Save
-        </Button>
-      );
-    case SAVE_BUTTON_STATE.NOT_SAVED:
-      return (
-        <Button
-          onClick={handleSave}
-          sdsStyle="rounded"
-          sdsType="primary"
-          startIcon={<WhiteIcon sdsIcon="save" sdsSize="l" sdsType="static" />}
-        >
-          Save
-        </Button>
-      );
-    case SAVE_BUTTON_STATE.SAVED:
-      return (
-        <Button
-          onClick={handleSave}
-          disabled
-          sdsStyle="rounded"
-          sdsType="primary"
-          startIcon={
-            <GrayIcon sdsIcon="checkCircle" sdsSize="l" sdsType="static" />
-          }
-        >
-          Saved
-        </Button>
-      );
-  }
-};
-
 export default function Account(): JSX.Element {
+  // TODO:194969 - get user's current gisaid id for the default value
   const [gisaidId, setGisaidId] = useState("");
   const [saveButtonState, setSaveButtonState] = useState<SAVE_BUTTON_STATE>(
-    SAVE_BUTTON_STATE.NO_CHANGE
+    SAVE_BUTTON_STATE.SAVED
   );
 
   // TODO: 194969 - implement save once API is ready
@@ -96,8 +41,28 @@ export default function Account(): JSX.Element {
     <>
       <StyledHeaderRow>
         <H1>My Account</H1>
-        {getSaveButton(saveButtonState, handleSave)}
+        <Button
+          onClick={handleSave}
+          sdsStyle="rounded"
+          sdsType="primary"
+          startIcon={
+            <>
+              {saveButtonState === SAVE_BUTTON_STATE.NOT_SAVED ? (
+                <WhiteIconWrapper>
+                  <Icon sdsIcon="save" sdsSize="l" sdsType="static" />
+                </WhiteIconWrapper>
+              ) : (
+                <GrayIconWrapper>
+                  <Icon sdsIcon="checkCircle" sdsSize="l" sdsType="static" />
+                </GrayIconWrapper>
+              )}
+            </>
+          }
+        >
+          {saveButtonState === SAVE_BUTTON_STATE.NOT_SAVED ? "Save" : "Saved"}
+        </Button>
       </StyledHeaderRow>
+      <StyledDivider />
       <StyledSection>
         <H2>Details</H2>
         <StyledRow>
@@ -114,10 +79,8 @@ export default function Account(): JSX.Element {
             </span>
           </P>
         </StyledRow>
-
         <InputText
           id="gisaid-id-input"
-          aria-label="GISAID ID"
           label="GISAID ID"
           placeholder="GISAID ID"
           hideLabel

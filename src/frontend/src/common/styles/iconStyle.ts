@@ -28,6 +28,15 @@ export const iconFillGray = (props: CommonThemeProps): string => {
   `;
 };
 
+export const iconFillGray400 = (props: CommonThemeProps): string => {
+  const colors = getColors(props);
+  return `
+    svg {
+      fill: ${colors?.gray[400]};
+    }
+  `;
+};
+
 export const iconFillGrayHoverPrimary = (props: CommonThemeProps): string => {
   const colors = getColors(props);
   return `
