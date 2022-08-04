@@ -45,6 +45,7 @@ export default function Account(): JSX.Element {
           onClick={handleSave}
           sdsStyle="rounded"
           sdsType="primary"
+          disabled={saveButtonState === SAVE_BUTTON_STATE.SAVED}
           startIcon={
             <>
               {saveButtonState === SAVE_BUTTON_STATE.NOT_SAVED ? (
