@@ -9,6 +9,7 @@ from aspen.api.schemas.locations import LocationResponse
 
 class GroupCreationRequest(BaseRequest):
     name: constr(min_length=3, max_length=128, strict=True)  # type: ignore
+    submitting_lab: Optional[constr(min_length=3, max_length=128, strict=True)]  # type: ignore
     # group prefix currently is used in the SFN name, which has max char limit
     # `prefix` cannot be arbitrarily increased until this ticket is resolved:
     # https://app.shortcut.com/genepi/story/209498
@@ -28,6 +29,7 @@ class GroupInfoResponse(GroupResponse):
     address: Optional[str]
     prefix: str
     default_tree_location: LocationResponse
+    submitting_lab: Optional[str]
 
 
 class UserBaseResponse(BaseResponse):
