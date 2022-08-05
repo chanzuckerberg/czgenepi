@@ -22,6 +22,11 @@ export enum EVENT_TYPES {
   // User has kicked off the creation of a Nextstrain phylo tree
   TREE_CREATION_NEXTSTRAIN = "TREE_CREATION_NEXTSTRAIN",
 
+  // User has been sent over to UShER site. UShER will now create tree and
+  // display it on their site. External, so can't tell if tree succeeds/fails.
+  // Event has no `additionalEventData`. Just tracking occurrence right now.
+  TREE_CREATION_VIEW_USHER = "TREE_CREATION_VIEW_USHER",
+
   // User has successfully uploaded new samples
   SAMPLES_UPLOAD_SUCCESS = "SAMPLES_UPLOAD_SUCCESS",
 
