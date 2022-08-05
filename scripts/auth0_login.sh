@@ -54,4 +54,4 @@ ${local_aws} secretsmanager update-secret --secret-id genepi-config --secret-str
   "AUTH0_MANAGEMENT_DOMAIN": '"${AUTH0_MANAGEMENT_DOMAIN}"'
 }' || true
 
-docker compose restart backend
+docker compose exec backend supervisorctl restart fastapi
