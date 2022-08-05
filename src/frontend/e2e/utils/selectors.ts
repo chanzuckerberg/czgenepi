@@ -11,6 +11,8 @@ export const SELECTORS  = {
         LOGIN_BTN: "Input.Button"
     },
     "STAGING": {
-
+        USERNAME: "Input_Username",
+        PASSWORD: "Input_Password",
+        LOGIN_BTN: "Input.Button"
     }
 }

@@ -1,6 +1,5 @@
 import { expect, Page, test } from "@playwright/test";
-import { getByClassName, getByTestID, getByText } from "../utils/selectors";
-import { login } from "../utils/login";
+import { getByTestID, getByText } from "../utils/selectors";
 
 const TAB_COUNT = 2;
 
