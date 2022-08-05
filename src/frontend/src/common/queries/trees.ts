@@ -38,12 +38,26 @@ interface CreateTreeType {
   };
 }
 
-type CreateTreeCallbacks = MutationCallbacks<void>;
+/**
+ * Response from BE for creating new phylo tree.
+ *
+ * Actual response has more info than just `id` -- basically matches a single
+ * `PhyloRun` type -- but the only thing we use downstream right now is id.
+ * This is all just for analytics as of this writing, so I [Vince] am taking
+ * the easy way out and only going to care about the key needed for analytics.
+ * That said, if we ever start using the POST tree creation response more
+ * fully, this should be re-worked.
+ */
+export interface RawTreeCreationWithId {
+  id: number; // phylo_runs PK workflow_id for tree that just got kicked off
+}
+
+type CreateTreeCallbacks = MutationCallbacks<RawTreeCreationWithId>;
 
 async function createTree(
   groupId: number,
   { sampleIds, treeName, treeType, filters }: CreateTreeType
-): Promise<unknown> {
+): Promise<RawTreeCreationWithId> {
   const { startDate, endDate, lineages } = filters;
   const payload: CreateTreePayload = {
     name: treeName,
@@ -76,9 +90,9 @@ export function useCreateTree(
 
   return useMutation((toMutate) => createTree(groupId, toMutate), {
     onError: componentOnError,
-    onSuccess: async () => {
+    onSuccess: async (data: RawTreeCreationWithId) => {
       await queryClient.invalidateQueries([USE_PHYLO_RUN_INFO]);
-      componentOnSuccess();
+      componentOnSuccess(data);
     },
   });
 }

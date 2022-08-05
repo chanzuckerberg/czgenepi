@@ -19,6 +19,9 @@ export enum EVENT_TYPES {
   // User has been sent to Nextstrain to view a phylo tree
   TREE_VIEW_NEXTSTRAIN = "TREE_VIEW_NEXTSTRAIN",
 
+  // User has kicked off the creation of a Nextstrain phylo tree
+  TREE_CREATION_NEXTSTRAIN = "TREE_CREATION_NEXTSTRAIN",
+
   // User has successfully uploaded new samples
   SAMPLES_UPLOAD_SUCCESS = "SAMPLES_UPLOAD_SUCCESS",
 
@@ -95,6 +98,15 @@ type JsonString = string;
 export type AnalyticsTreeViewNextstrain = {
   // Tree that user is being sent to view
   tree_id: number;
+};
+
+/** EVENT_TYPES.TREE_CREATION_NEXTSTRAIN */
+export type AnalyticsTreeCreationNextstrain = {
+  // PK of the workflow that kicks off the creation of requested tree
+  // Note: creating a tree kicks off process, it could still fail in pipeline.
+  phylo_run_workflow_id: number;
+  // Type of tree being created
+  tree_type: string;
 };
 
 /** EVENT_TYPES.SAMPLES_UPLOAD_SUCCESS*/
