@@ -15,18 +15,10 @@ export default function AbandonChangesModal({
   open,
   onClose,
 }: AbandonChangesModalProps): JSX.Element {
-  // TODO: if this doesn't get more complicated, remove and just use onClose
-  const handleCloseModal = () => {
-    onClose();
-  };
-
   return (
     <Dialog open={open} onClose={onClose} sdsSize="xs">
       <StyledDialogTitle>
-        <StyledCloseIconButton
-          aria-label="Keep editing"
-          onClick={handleCloseModal}
-        >
+        <StyledCloseIconButton aria-label="Keep editing" onClick={onClose}>
           <StyledCloseIconWrapper>
             <Icon sdsIcon="xMark" sdsSize="l" sdsType="static" />
           </StyledCloseIconWrapper>
@@ -41,7 +33,7 @@ export default function AbandonChangesModal({
         <StyledButton sdsType="primary" sdsStyle="rounded">
           Leave
         </StyledButton>
-        <Button sdsType="secondary" sdsStyle="rounded">
+        <Button sdsType="secondary" sdsStyle="rounded" onClick={onClose}>
           Keep Editing
         </Button>
       </DialogContent>

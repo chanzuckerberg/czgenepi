@@ -1,5 +1,6 @@
 import { Button, Icon, InputText, Link } from "czifui";
-import React, { ChangeEvent, useState } from "react";
+import { useRouter } from "next/router";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { H1, H2, P } from "src/common/styles/basicStyle";
 import AbandonChangesModal from "./components/AbandonChangesModal";
 import {
@@ -13,30 +14,25 @@ import {
   WhiteIconWrapper,
 } from "./style";
 
-enum SAVE_BUTTON_STATE {
-  NOT_SAVED = "not saved",
-  SAVED = "saved",
-}
-
 export default function Account(): JSX.Element {
+  const router = useRouter();
   // TODO:194969 - get user's current gisaid id for the default value
   const [gisaidId, setGisaidId] = useState("");
-  const [saveButtonState, setSaveButtonState] = useState<SAVE_BUTTON_STATE>(
-    SAVE_BUTTON_STATE.SAVED
-  );
+  const [hasUnsavedChanges, setUnsavedChanges] = useState<boolean>(false);
+
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
 
   // TODO: 194969 - implement save once API is ready
   const handleSave = () => {
     // eslint-disable-next-line
     console.log(gisaidId);
-    setSaveButtonState(SAVE_BUTTON_STATE.SAVED);
+    setUnsavedChanges(false);
   };
 
   const handleNewIdInput = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setGisaidId(value);
-    setSaveButtonState(SAVE_BUTTON_STATE.NOT_SAVED);
+    setUnsavedChanges(true);
   };
 
   const openModal = () => {
@@ -47,6 +43,28 @@ export default function Account(): JSX.Element {
     setModalOpen(false);
   };
 
+  // prompt the user if they try and leave with unsaved changes
+  useEffect(() => {
+    const handleWindowClose = (e: BeforeUnloadEvent) => {
+      if (!hasUnsavedChanges) return;
+      e.preventDefault();
+      openModal();
+      return false;
+    };
+    const handleBrowseAway = () => {
+      if (!hasUnsavedChanges) return;
+      openModal();
+      router.events.emit("routeChangeError");
+      throw "routeChange aborted.";
+    };
+    window.addEventListener("beforeunload", handleWindowClose);
+    router.events.on("routeChangeStart", handleBrowseAway);
+    return () => {
+      window.removeEventListener("beforeunload", handleWindowClose);
+      router.events.off("routeChangeStart", handleBrowseAway);
+    };
+  }, [router, hasUnsavedChanges]);
+
   return (
     <>
       <StyledHeaderRow>
@@ -55,10 +73,10 @@ export default function Account(): JSX.Element {
           onClick={handleSave}
           sdsStyle="rounded"
           sdsType="primary"
-          disabled={saveButtonState === SAVE_BUTTON_STATE.SAVED}
+          disabled={!hasUnsavedChanges}
           startIcon={
             <>
-              {saveButtonState === SAVE_BUTTON_STATE.NOT_SAVED ? (
+              {hasUnsavedChanges ? (
                 <WhiteIconWrapper>
                   <Icon sdsIcon="save" sdsSize="l" sdsType="static" />
                 </WhiteIconWrapper>
@@ -70,7 +88,7 @@ export default function Account(): JSX.Element {
             </>
           }
         >
-          {saveButtonState === SAVE_BUTTON_STATE.NOT_SAVED ? "Save" : "Saved"}
+          {hasUnsavedChanges ? "Save" : "Saved"}
         </Button>
       </StyledHeaderRow>
       <StyledDivider />
@@ -99,7 +117,9 @@ export default function Account(): JSX.Element {
           onChange={handleNewIdInput}
         />
       </StyledSection>
-      <AbandonChangesModal open={isModalOpen} onClose={closeModal} />
+      {isModalOpen && (
+        <AbandonChangesModal open={isModalOpen} onClose={closeModal} />
+      )}
     </>
   );
 }
