@@ -1,4 +1,4 @@
-import RadioGroup from "@material-ui/core/RadioGroup";
+import RadioGroup from "@mui/material/RadioGroup";
 import { Icon } from "czifui";
 import { uniq } from "lodash";
 import Image from "next/image";

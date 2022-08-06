@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import TextField from "@material-ui/core/TextField";
+import TextField from "@mui/material/TextField";
 import { CommonThemeProps, getColors, getSpaces } from "czifui";
 
 export interface FormFieldProps extends CommonThemeProps {

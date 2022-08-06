@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { TableCell, TableContainer, TableHead } from "@material-ui/core";
+import { TableCell, TableContainer, TableHead } from "@mui/material";
 import {
   fontBodyM,
   fontBodyXs,

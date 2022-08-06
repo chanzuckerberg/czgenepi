@@ -280,6 +280,7 @@ const DataSubview: FunctionComponent<Props> = ({
             sdsIcon="download"
             tooltipTextDisabled={DOWNLOAD_TOOLTIP_TEXT_DISABLED}
             tooltipTextEnabled={DOWNLOAD_TOOLTIP_TEXT_ENABLED}
+            size="large"
           />
           <MoreActionsMenu
             disabled={!hasCheckedSamples}

@@ -31,12 +31,7 @@ export default function BaseDialog({
   closeIcon = false,
 }: BaseDialogProps): JSX.Element {
   return (
-    <Dialog
-      disableBackdropClick={disableBackdropClick}
-      disableEscapeKeyDown
-      open={open}
-      onClose={onClose}
-    >
+    <Dialog disableEscapeKeyDown open={open} onClose={onClose}>
       <DialogTitle narrow>
         <StyledDiv>{closeIcon}</StyledDiv>
         <Title>{title}</Title>

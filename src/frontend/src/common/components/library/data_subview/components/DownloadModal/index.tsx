@@ -155,12 +155,7 @@ const DownloadModal = ({
         </B>{" "}
         <ContactUsLink />
       </Notification>
-      <Dialog
-        disableEscapeKeyDown
-        disableBackdropClick
-        open={open}
-        onClose={handleCloseModal}
-      >
+      <Dialog disableEscapeKeyDown open={open} onClose={handleCloseModal}>
         <DialogTitle>
           <StyledCloseIconButton
             aria-label="close download modal"

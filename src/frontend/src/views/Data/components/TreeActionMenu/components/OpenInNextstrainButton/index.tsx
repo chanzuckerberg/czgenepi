@@ -40,6 +40,7 @@ const OpenInNextstrainButton = ({ item }: Props): JSX.Element => {
             onClick={handleClickOpen}
             sdsSize="small"
             sdsType="primary"
+            size="large"
           >
             <Icon sdsIcon="open" sdsSize="s" sdsType="iconButton" />
           </IconButton>

@@ -57,6 +57,7 @@ const TreeTableDownloadMenu = ({ item }: Props): JSX.Element => {
           onClick={handleClick}
           sdsSize="small"
           sdsType="primary"
+          size="large"
         >
           <Icon sdsIcon="download" sdsSize="s" sdsType="iconButton" />
         </IconButton>

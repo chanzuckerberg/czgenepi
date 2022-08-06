@@ -1,5 +1,5 @@
-import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
-import { StylesProvider, ThemeProvider } from "@material-ui/core/styles";
+import { ThemeProvider as EmotionThemeProvider, Theme } from "@emotion/react";
+import { StyledEngineProvider, ThemeProvider } from "@mui/material";
 import { AppProps } from "next/app";
 import Head from "next/head";
 import React, { useEffect } from "react";
@@ -13,6 +13,11 @@ import { theme } from "src/common/styles/theme";
 import { setFeatureFlagsFromQueryParams } from "src/common/utils/featureFlags";
 import Nav from "src/components/NavBar";
 import SplitInitializer from "src/components/Split";
+
+declare module "@mui/styles/defaultTheme" {
+  // eslint-disable-next-line @typescript-eslint/no-empty-interface
+  interface DefaultTheme extends Theme {}
+}
 
 export const queryClient = new QueryClient();
 setFeatureFlagsFromQueryParams();
@@ -40,7 +45,7 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
       <PlausibleInitializer />
       <QueryClientProvider client={queryClient}>
         <SplitInitializer>
-          <StylesProvider injectFirst>
+          <StyledEngineProvider injectFirst>
             <ThemeProvider theme={theme}>
               <EmotionThemeProvider theme={theme}>
                 <StyledApp>
@@ -49,7 +54,7 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
                 </StyledApp>
               </EmotionThemeProvider>
             </ThemeProvider>
-          </StylesProvider>
+          </StyledEngineProvider>
         </SplitInitializer>
       </QueryClientProvider>
     </Provider>

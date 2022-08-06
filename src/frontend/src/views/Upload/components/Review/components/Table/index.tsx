@@ -1,4 +1,4 @@
-import { Table as MuiTable, TableBody, TableHead } from "@material-ui/core";
+import { Table as MuiTable, TableBody, TableHead } from "@mui/material";
 import React from "react";
 import { SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS } from "src/components/DownloadMetadataTemplate/common/constants";
 import { Props as CommonProps } from "../../../common/types";

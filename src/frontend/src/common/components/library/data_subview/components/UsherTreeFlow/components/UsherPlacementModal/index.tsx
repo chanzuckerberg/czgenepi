@@ -1,4 +1,4 @@
-import { TextField } from "@material-ui/core";
+import { TextField } from "@mui/material";
 import { DefaultMenuSelectOption, Dropdown, Icon, InputDropdown } from "czifui";
 import { cloneDeep, debounce } from "lodash";
 import React, { SyntheticEvent, useEffect, useState } from "react";
@@ -188,7 +188,6 @@ export const UsherPlacementModal = ({
 
   return (
     <Dialog
-      disableBackdropClick
       disableEnforceFocus
       disableEscapeKeyDown
       open={open}

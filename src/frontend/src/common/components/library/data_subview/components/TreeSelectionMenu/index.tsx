@@ -58,6 +58,7 @@ const TreeSelectionMenu = ({
         sdsIcon="treeHorizontal"
         tooltipTextDisabled={TREE_BUILD_TOOLTIP_TEXT(true)}
         tooltipTextEnabled={TREE_BUILD_TOOLTIP_TEXT(false)}
+        size="large"
       />
       <Menu
         anchorEl={anchorEl}

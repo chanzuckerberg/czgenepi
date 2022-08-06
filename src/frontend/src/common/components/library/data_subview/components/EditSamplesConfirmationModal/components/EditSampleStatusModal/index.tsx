@@ -42,7 +42,7 @@ const EditSampleStatusModal = ({
     <StyledDialog open sdsSize="s">
       {statusModalView !== StatusModalView.LOADING && (
         <StyledDiv onClick={onClose}>
-          <IconButton sdsType="tertiary" sdsSize="small">
+          <IconButton sdsType="tertiary" sdsSize="small" size="large">
             <Icon sdsIcon="xMark" sdsType="iconButton" sdsSize="s" />
           </IconButton>
         </StyledDiv>

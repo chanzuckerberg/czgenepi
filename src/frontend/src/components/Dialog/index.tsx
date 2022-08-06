@@ -1,7 +1,7 @@
 import {
   Dialog as MuiDialog,
   DialogProps as MuiDialogProps,
-} from "@material-ui/core";
+} from "@mui/material";
 import React from "react";
 
 interface Props extends MuiDialogProps {

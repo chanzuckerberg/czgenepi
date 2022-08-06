@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { Collapse } from "@material-ui/core";
+import { Collapse } from "@mui/material";
 import { Callout, getSpaces } from "czifui";
 import { transparentScrollbars } from "src/common/styles/basicStyle";
 

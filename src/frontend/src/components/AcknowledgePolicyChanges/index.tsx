@@ -92,6 +92,7 @@ const AcknowledgePolicyChanges = (): JSX.Element | null => {
         aria-label="Acknowledge policy changes"
         sdsSize="large"
         sdsType="secondary"
+        size="large"
       >
         <Icon sdsIcon="xMark" sdsSize="l" sdsType="iconButton" />
       </IconButton>

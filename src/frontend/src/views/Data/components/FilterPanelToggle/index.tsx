@@ -34,6 +34,7 @@ export const FilterPanelToggle: FC<Props> = ({
           onClick={handleclick}
           sdsSize="large"
           sdsType="secondary"
+          size="large"
         >
           <Icon sdsIcon="slidersHorizontal" sdsSize="l" sdsType="static" />
           {activeFilterCount > 0 && (

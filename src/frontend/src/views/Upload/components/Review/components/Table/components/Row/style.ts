@@ -3,7 +3,7 @@ import {
   TableCell,
   TableRow,
   TableRowProps as MuiTableRowProps,
-} from "@material-ui/core";
+} from "@mui/material";
 import { CommonThemeProps, fontHeaderS, getColors, getSpaces } from "czifui";
 import { rightMarginXxs } from "src/common/styles/iconStyle";
 

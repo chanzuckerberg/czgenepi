@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { TableCell, TableContainer, TableRow } from "@material-ui/core";
+import { TableCell, TableContainer, TableRow } from "@mui/material";
 import { fontHeaderXs, getColors, getSpaces } from "czifui";
 
 export const Overflow = styled.div`

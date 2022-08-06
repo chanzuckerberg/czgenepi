@@ -1,6 +1,6 @@
-import { PopperProps } from "@material-ui/core";
-import { FilterOptionsState } from "@material-ui/lab";
-import { createFilterOptions } from "@material-ui/lab/Autocomplete";
+import { PopperProps } from "@mui/material";
+import { FilterOptionsState } from "@mui/lab";
+import { createFilterOptions } from "@mui/lab/Autocomplete";
 import { DefaultMenuSelectOption, Icon } from "czifui";
 import { isEqual } from "lodash";
 import React from "react";

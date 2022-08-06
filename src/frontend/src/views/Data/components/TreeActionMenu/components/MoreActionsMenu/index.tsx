@@ -63,11 +63,13 @@ const MoreActionsMenu = ({
       >
         <span>
           <IconButton
-            aria-label="more actions" // TODO: it would be helpful for this to indicate which tree it's for
+            // TODO: it would be helpful for this to indicate which tree it's for
+            aria-label="more actions"
             disabled={isDisabled}
             onClick={handleClick}
             sdsSize="small"
             sdsType="primary"
+            size="large"
           >
             <Icon sdsIcon="dotsHorizontal" sdsSize="s" sdsType="iconButton" />
           </IconButton>

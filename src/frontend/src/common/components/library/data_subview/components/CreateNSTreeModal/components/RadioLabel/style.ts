@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
+import ListItemIcon from "@mui/material/ListItemIcon";
 import { fontBodyXxs, fontHeaderS, getFontWeights, getSpaces } from "czifui";
 
 export const Label = styled.div`

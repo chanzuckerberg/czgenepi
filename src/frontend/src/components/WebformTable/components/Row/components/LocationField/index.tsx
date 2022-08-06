@@ -1,4 +1,4 @@
-import FormHelperText from "@material-ui/core/FormHelperText";
+import FormHelperText from "@mui/material/FormHelperText";
 import { DefaultMenuSelectOption, DropdownPopper } from "czifui";
 import { FormikContextType } from "formik";
 import { escapeRegExp, isEqual } from "lodash/fp";

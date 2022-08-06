@@ -1,4 +1,4 @@
-import { createTheme } from "@material-ui/core/styles";
+import { adaptV4Theme, createTheme } from "@mui/material/styles";
 import { defaultAppTheme, makeThemeOptions } from "czifui";
 
 const primaryColors = {
@@ -40,4 +40,4 @@ appTheme.borders = appTheme.borders ?? {
 };
 appTheme.borders.primary = primaryBorders;
 
-export const theme = createTheme(makeThemeOptions(appTheme));
+export const theme = createTheme(adaptV4Theme(makeThemeOptions(appTheme)));

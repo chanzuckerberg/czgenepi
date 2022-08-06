@@ -1,4 +1,4 @@
-import { Table as MuiTable, TableBody, TableRow } from "@material-ui/core";
+import { Table as MuiTable, TableBody, TableRow } from "@mui/material";
 import { map } from "lodash";
 import React from "react";
 import {

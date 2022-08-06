@@ -1,5 +1,5 @@
 // eslint-disable @typescript-eslint/explicit-member-accessibility
-import ListItemText from "@material-ui/core/ListItemText";
+import ListItemText from "@mui/material/ListItemText";
 import { Icon, List } from "czifui";
 import React from "react";
 import { SampleFiltering } from "../SampleFiltering";

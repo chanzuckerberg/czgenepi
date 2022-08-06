@@ -276,7 +276,6 @@ const EditSamplesConfirmationModal = ({
   return (
     <>
       <Dialog
-        disableBackdropClick
         // Dialogs and modals automatically focus themselves if some other element tries to steal the focus while they are open
         // We need disableEnforceFocus to allow the collectionLocation DropdownPopper component to work properly
         disableEnforceFocus

@@ -1,4 +1,4 @@
-import { DialogContentProps } from "@material-ui/core";
+import { DialogContentProps } from "@mui/material";
 import React from "react";
 import { ExtraProps, StyledDialogContent } from "./style";
 
