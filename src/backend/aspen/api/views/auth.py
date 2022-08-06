@@ -21,6 +21,8 @@ from aspen.auth.role_manager import RoleManager
 from aspen.database.models import Group, User
 from aspen.util.split import SplitClient
 
+from datetime import datetime
+
 # From the example here:
 # https://github.com/authlib/demo-oauth-client/tree/master/fastapi-google-login
 router = APIRouter()
@@ -38,6 +40,10 @@ def get_invitation_ticket(
     # so this is the next best thing.
     tickets = a0.get_org_invitations(org)
     for ticket in tickets:
+        expires = ticket.get("expires_at")
+        # Don't process expired invitations
+        if datetime.fromisoformat(expires.rstrip('Z')) < datetime.now():
+            continue
         if ticket.get("ticket_id") == invitation:
             return ticket
 
@@ -55,8 +61,8 @@ async def get_invitation_redirect(
     # If this invitation is for an email address that already exists in our db,
     # we'll use our custom invitation acceptance flow to associate their existing
     # account with the invitation. If we haven't seen that email address before,
-    # we'll send them to the standard auth0 "create a new acct" flow.
-
+    # we'll send them to the standard auth0 "create a new account" flow.
+    
     # Load more information about the invitation from auth0
     ticket_info = get_invitation_ticket(a0, organization, invitation)
     if not ticket_info:
@@ -70,6 +76,7 @@ async def get_invitation_redirect(
         return
     # If we're already logged in as this user, just process the invitation and redirect to welcome.
     logged_in_userid = request.session.get("profile", {}).get("user_id")
+    user = None
     try:
         user = (
             (
@@ -81,15 +88,17 @@ async def get_invitation_redirect(
             .one()
         )
     except NoResultFound:
-        raise ex.UnauthorizedException("Invalid user id")
-    if invitee == user.email:
+        pass
+    # If we're already logged in as the invited user, process the invitation!
+    if user and invitee == user.email:
         # Redirect to process_invitation endpoint
         redirect_url = (
             settings.API_URL
             + f"/v2/auth/process_invitation?invitation={invitation}&organization={organization}&organization_name={organization_name}"
         )
         return RedirectResponse(redirect_url)
-    # If we're logged in as a *different* user, we'll need to stash the invitation in the session and redirect to the login page.
+    # If we're not logged in, or logged in as a *different* user, we'll need to stash
+    # the invitation in the session and redirect to the login page.
     request.session["process_invitation"] = {
         "invitation": invitation,
         "organization": organization,
