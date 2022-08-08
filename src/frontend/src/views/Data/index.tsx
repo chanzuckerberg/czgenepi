@@ -154,9 +154,9 @@ const Data: FunctionComponent = () => {
   // create JSX elements from categories
   dataCategories.forEach((category) => {
     dataJSX.menuItems.push(
-      <Link href={category.to} key={category.text} passHref>
-        <a href="passHref">
-          <StyledMenuItem>
+      <StyledMenuItem>
+        <Link href={category.to} key={category.text} passHref>
+          <a href="passHref">
             <Category>
               <CategoryTitle
                 isActive={router.asPath === category.to}
@@ -166,9 +166,9 @@ const Data: FunctionComponent = () => {
               </CategoryTitle>
               <StyledCount>{Object.keys(category.data).length}</StyledCount>
             </Category>
-          </StyledMenuItem>
-        </a>
-      </Link>
+          </a>
+        </Link>
+      </StyledMenuItem>
     );
   });
 
@@ -202,7 +202,7 @@ const Data: FunctionComponent = () => {
             setShouldShowFilters(!shouldShowFilters);
           }}
         />
-        <StyledMenu secondary>{dataJSX.menuItems}</StyledMenu>
+        <StyledMenu>{dataJSX.menuItems}</StyledMenu>
       </Navigation>
       <View>
         {viewName === "Samples" && (

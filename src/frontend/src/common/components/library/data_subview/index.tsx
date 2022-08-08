@@ -1,3 +1,4 @@
+import { InputSearch } from "czifui";
 import { compact, escapeRegExp, filter } from "lodash";
 import React, {
   FunctionComponent,
@@ -5,7 +6,6 @@ import React, {
   useReducer,
   useState,
 } from "react";
-import { Input } from "semantic-ui-react";
 import { DataTable } from "src/common/components";
 import { VIEWNAME } from "src/common/constants/types";
 import { CreateNSTreeModal } from "./components/CreateNSTreeModal";
@@ -218,15 +218,6 @@ const DataSubview: FunctionComponent<Props> = ({
     setEditTreeConfirmationOpen(true);
   };
 
-  const onChange = (
-    _event: React.ChangeEvent<HTMLInputElement>,
-    fieldInput: InputOnChangeData
-  ) => {
-    const query = fieldInput.value;
-    searcher(query);
-    setSearchQuery(query);
-  };
-
   // search functions
   const searcher = (query: string): void => {
     if (data === undefined) {
@@ -241,6 +232,11 @@ const DataSubview: FunctionComponent<Props> = ({
     const regex = new RegExp(escapeRegExp(query), "i");
     const filteredData = filter(data, (item) => recursiveTest(item, regex));
     dispatch({ results: filteredData, searching: false });
+  };
+
+  const onSearchChange = (query: string): void => {
+    searcher(query);
+    setSearchQuery(query);
   };
 
   const DOWNLOAD_TOOLTIP_TEXT_DISABLED = (
@@ -352,11 +348,13 @@ const DataSubview: FunctionComponent<Props> = ({
         <StyledFlexChildDiv>
           <SearchBar>
             <SearchInput>
-              <Input
-                icon="search"
+              <InputSearch
+                id="sample-search"
+                label="Search samples"
+                sdsStyle="rounded"
                 placeholder="Search"
-                loading={state.searching}
-                onChange={onChange}
+                // loading={state.searching}
+                handleSubmit={onSearchChange}
                 data-test-id="search"
               />
             </SearchInput>
