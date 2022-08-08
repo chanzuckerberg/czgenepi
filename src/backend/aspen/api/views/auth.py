@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from typing import Optional, Tuple
 from urllib.parse import urlencode
 
@@ -13,15 +14,13 @@ from starlette.requests import Request
 from starlette.responses import Response
 
 import aspen.api.error.http_exceptions as ex
-from aspen.api.authn import get_auth0_apiclient, get_auth_user
+from aspen.api.authn import get_auth0_apiclient, get_auth_user, get_cookie_userid
 from aspen.api.deps import get_auth0_client, get_db, get_settings, get_splitio
 from aspen.api.settings import Settings
 from aspen.auth.auth0_management import Auth0Client, Auth0Invitation, Auth0Org
 from aspen.auth.role_manager import RoleManager
 from aspen.database.models import Group, User
 from aspen.util.split import SplitClient
-
-from datetime import datetime
 
 # From the example here:
 # https://github.com/authlib/demo-oauth-client/tree/master/fastapi-google-login
@@ -42,7 +41,7 @@ def get_invitation_ticket(
     for ticket in tickets:
         expires = ticket.get("expires_at")
         # Don't process expired invitations
-        if datetime.fromisoformat(expires.rstrip('Z')) < datetime.now():
+        if datetime.fromisoformat(expires.rstrip("Z")) < datetime.now():
             continue
         if ticket.get("ticket_id") == invitation:
             return ticket
@@ -57,12 +56,13 @@ async def get_invitation_redirect(
     invitation: str,
     organization: str,
     organization_name: Optional[str] = None,
+    cookie_userid: Optional[str] = None,
 ) -> Optional[Response]:
     # If this invitation is for an email address that already exists in our db,
     # we'll use our custom invitation acceptance flow to associate their existing
     # account with the invitation. If we haven't seen that email address before,
     # we'll send them to the standard auth0 "create a new account" flow.
-    
+
     # Load more information about the invitation from auth0
     ticket_info = get_invitation_ticket(a0, organization, invitation)
     if not ticket_info:
@@ -75,13 +75,12 @@ async def get_invitation_redirect(
         # If the user isn't in our db, proceed with regular auth0 flow.
         return
     # If we're already logged in as this user, just process the invitation and redirect to welcome.
-    logged_in_userid = request.session.get("profile", {}).get("user_id")
     user = None
     try:
         user = (
             (
                 await db.execute(
-                    sa.select(User).where(User.auth0_user_id == logged_in_userid)
+                    sa.select(User).where(User.auth0_user_id == cookie_userid)
                 )
             )
             .scalars()
@@ -119,6 +118,7 @@ async def login(
     oauth: StarletteOAuth2App = Depends(get_auth0_client),
     a0: Auth0Client = Depends(get_auth0_apiclient),
     settings: Settings = Depends(get_settings),
+    cookie_userid: Optional[str] = Depends(get_cookie_userid),
 ) -> Response:
     kwargs = {}
     if invitation and organization:
@@ -131,7 +131,9 @@ async def login(
             invitation,
             organization,
             organization_name,
+            cookie_userid,
         )
+        print(f"Resp: {resp}")
         if resp:
             return resp
         kwargs["invitation"] = invitation
@@ -270,6 +272,7 @@ async def process_invitation(
     settings: Settings = Depends(get_settings),
     user=Depends(get_auth_user),
 ) -> Response:
+    raise ex.BadRequestException("boo")
     # Load more information about the invitation from auth0
     org: Auth0Org = {
         "id": organization,
