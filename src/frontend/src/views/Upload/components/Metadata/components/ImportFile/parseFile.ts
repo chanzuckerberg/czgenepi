@@ -66,6 +66,8 @@ interface ParsedRow {
 // If header is unrecognized, leaves it alone (useful for warnings, etc).
 // User can also use Nextstrain header defaults as an alias
 function convertHeaderToMetadataKey(headerName: string): string {
+  // console.log("headerName in convert headers", headerName); // REMOVE
+  // console.log("headerName in convertHeader", headerName); // REMOVE
   if (headerName in HEADERS_TO_METADATA_KEYS) {
     return HEADERS_TO_METADATA_KEYS[headerName];
   } else if (headerName in NEXTSTRAIN_FORMAT_HEADERS_TO_METADATA_KEYS) {
@@ -83,15 +85,23 @@ function getMissingHeaderFields(
   uploadedHeaders: string[],
   headersToMetadataKeys: Dictionary<keyof SampleUploadTsvMetadata>
 ): Set<string> | null {
+  console.log("uploadedHeaders in missingHeaders: ", uploadedHeaders); // REMOVE
   const missingFields = new Set<string>();
   for (const [headerField, metadataKey] of Object.entries(
     headersToMetadataKeys
   )) {
     if (
-      !uploadedHeaders.includes(metadataKey) &&
-      !headerField.includes("Optional")
+      !(uploadedHeaders.includes(metadataKey)) &&
+      !headerField.includes("Optional") 
     ) {
-      missingFields.add(headerField);
+      if (
+        ["privateId", "sampleId"].includes(metadataKey) && 
+        (uploadedHeaders.includes("strain"))
+        ) {
+          // pass, use strain to populate sample and privateID
+      } else {
+        missingFields.add(headerField);
+      } 
     }
   }
   return missingFields.size !== 0 ? missingFields : null;
@@ -337,6 +347,10 @@ export function parseFile(
         meta: papaParseMeta,
       }: Papa.ParseResult<Record<string, string>>) => {
         const uploadedHeaders = papaParseMeta.fields as string[]; // available b/c `header: true`
+        if (uploadedHeaders.includes("strain")) {
+          // User is using the nextstrain metadata template headers, populate privateId and sampleId with strain
+            rows = rows.map(obj => ({ ...obj, privateId: obj['strain'], sampleId: obj['strain'] }))
+        }
 
         // Init -- Will modify these in place as we work through incoming rows.
         const sampleIdToMetadata: SampleIdToMetadata = {};
