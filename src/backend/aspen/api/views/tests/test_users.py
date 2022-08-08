@@ -39,6 +39,7 @@ async def test_users_me(http_client: AsyncClient, async_session: AsyncSession) -
     for key in expected:
         assert resp_data[key] == expected[key]
     assert len(resp_data["split_id"]) == 20
+    assert len(resp_data["analytics_id"]) == 20
 
 
 async def test_users_view_put_pass(
