@@ -1,5 +1,5 @@
-import { ThemeProvider as EmotionThemeProvider, Theme } from "@emotion/react";
-import { StyledEngineProvider, ThemeProvider } from "@mui/material";
+import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
+import { StyledEngineProvider, ThemeProvider } from "@mui/material/styles";
 import { AppProps } from "next/app";
 import Head from "next/head";
 import React, { useEffect } from "react";
@@ -13,11 +13,6 @@ import { theme } from "src/common/styles/theme";
 import { setFeatureFlagsFromQueryParams } from "src/common/utils/featureFlags";
 import Nav from "src/components/NavBar";
 import SplitInitializer from "src/components/Split";
-
-declare module "@mui/styles/defaultTheme" {
-  // eslint-disable-next-line @typescript-eslint/no-empty-interface
-  interface DefaultTheme extends Theme {}
-}
 
 export const queryClient = new QueryClient();
 setFeatureFlagsFromQueryParams();
