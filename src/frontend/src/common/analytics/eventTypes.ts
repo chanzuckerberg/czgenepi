@@ -24,8 +24,15 @@ export enum EVENT_TYPES {
 
   // User has been sent over to UShER site. UShER will now create tree and
   // display it on their site. External, so can't tell if tree succeeds/fails.
-  // Event has no `additionalEventData`. Just tracking occurrence right now.
+  // **No `additionalEventData`**. Just tracking event occurrence right now.
   TREE_CREATION_VIEW_USHER = "TREE_CREATION_VIEW_USHER",
+
+  // User has downloaded a file of the actual phylo tree
+  TREE_DOWNLOAD_TREE_FILE = "TREE_DOWNLOAD_TREE_FILE",
+
+  // User downloaded a template with sample identifiers and metadata showing
+  // which selected. User could then add more metadata to overlay on tree view.
+  TREE_DOWNLOAD_SELECTED_SAMPLES_TEMPLATE = "TREE_DOWNLOAD_SELECTED_SAMPLES_TEMPLATE",
 
   // User has successfully uploaded new samples
   SAMPLES_UPLOAD_SUCCESS = "SAMPLES_UPLOAD_SUCCESS",
@@ -112,6 +119,33 @@ export type AnalyticsTreeCreationNextstrain = {
   phylo_run_workflow_id: number;
   // Type of tree being created
   tree_type: string;
+};
+
+/** EVENT_TYPES.TREE_DOWNLOAD_TREE_FILE */
+export type AnalyticsTreeDownloadTreeFile = {
+  // Tree user is downloading.
+  // null indicates tree does not exist, but should be impossible if user
+  // is downloading it. Mostly here to make TS happy, but if we ever get null
+  // in this event for tree_id, it very likely indicates a bug with app.
+  tree_id: number | null;
+  // PK of the workflow that kicked off the creation of this tree.
+  // Should never be null, but TS for underlying item does not guarantee it, so
+  // the null possibility is mostly to keep TS happy. If null, app has a bug.
+  phylo_run_workflow_id: number | null;
+  // User can download tree with samples using either their Private IDs or
+  // their Public IDs.
+  sample_id_type: "PRIVATE" | "PUBLIC";
+};
+
+/** EVENT_TYPES.TREE_DOWNLOAD_SELECTED_SAMPLES_TEMPLATE */
+export type AnalyticsTreeDownloadSelectedSamplesTemplate = {
+  // Tree user is downloading template in regards to.
+  // Can download template before tree done or tree failed. Null indicates such
+  tree_id: number | null;
+  // PK of the workflow that kicked off the creation of this tree.
+  // Should never be null, but TS for underlying item does not guarantee it, so
+  // the null possibility is mostly to keep TS happy. If null, app has a bug.
+  phylo_run_workflow_id: number | null;
 };
 
 /** EVENT_TYPES.SAMPLES_UPLOAD_SUCCESS*/
