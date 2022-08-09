@@ -1,5 +1,6 @@
+import { Link } from "czifui";
 import { compact, map, uniq } from "lodash";
-import Link from "next/link";
+import NextLink from "next/link";
 import { useRouter } from "next/router";
 import React, { FunctionComponent, useEffect, useMemo, useState } from "react";
 import { HeadAppTitle } from "src/common/components";
@@ -21,6 +22,7 @@ import {
   Container,
   Navigation,
   StyledCount,
+  StyledLink,
   StyledMenu,
   StyledMenuItem,
   View,
@@ -155,8 +157,8 @@ const Data: FunctionComponent = () => {
   dataCategories.forEach((category) => {
     dataJSX.menuItems.push(
       <StyledMenuItem>
-        <Link href={category.to} key={category.text} passHref>
-          <a href="passHref">
+        <NextLink href={category.to} key={category.text} passHref>
+          <StyledLink href="passHref">
             <Category>
               <CategoryTitle
                 isActive={router.asPath === category.to}
@@ -166,8 +168,8 @@ const Data: FunctionComponent = () => {
               </CategoryTitle>
               <StyledCount>{Object.keys(category.data).length}</StyledCount>
             </Category>
-          </a>
-        </Link>
+          </StyledLink>
+        </NextLink>
       </StyledMenuItem>
     );
   });

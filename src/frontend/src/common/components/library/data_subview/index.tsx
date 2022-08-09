@@ -43,11 +43,6 @@ interface Props {
   dataFilterFunc?: (data: TableItem[]) => TableItem[];
 }
 
-interface InputOnChangeData {
-  [key: string]: string;
-  value: string;
-}
-
 interface SearchState {
   searching?: boolean;
   results?: TableItem[];
@@ -219,6 +214,12 @@ const DataSubview: FunctionComponent<Props> = ({
   };
 
   // search functions
+  const onSearchChange = (_event: React.ChangeEvent<HTMLInputElement>) => {
+    const query = _event.target.value;
+    searcher(query);
+    setSearchQuery(query);
+  };
+
   const searcher = (query: string): void => {
     if (data === undefined) {
       return;
@@ -232,11 +233,6 @@ const DataSubview: FunctionComponent<Props> = ({
     const regex = new RegExp(escapeRegExp(query), "i");
     const filteredData = filter(data, (item) => recursiveTest(item, regex));
     dispatch({ results: filteredData, searching: false });
-  };
-
-  const onSearchChange = (query: string): void => {
-    searcher(query);
-    setSearchQuery(query);
   };
 
   const DOWNLOAD_TOOLTIP_TEXT_DISABLED = (
@@ -349,12 +345,12 @@ const DataSubview: FunctionComponent<Props> = ({
           <SearchBar>
             <SearchInput>
               <InputSearch
-                id="sample-search"
-                label="Search samples"
+                id="search-samples"
+                label="search samples"
                 sdsStyle="rounded"
                 placeholder="Search"
-                // loading={state.searching}
-                handleSubmit={onSearchChange}
+                onChange={onSearchChange}
+                value={searchQuery}
                 data-test-id="search"
               />
             </SearchInput>

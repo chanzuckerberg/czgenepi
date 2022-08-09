@@ -1,0 +1,15 @@
+/* 
+ * Styles here replace semantic-ui global styles.
+ * We should add new styles elsewhere.
+*/
+body {
+  margin: 0;
+}
+
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: none;
+}
