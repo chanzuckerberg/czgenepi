@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, Column, Date, ForeignKey, Integer, String, text
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.engine.default import DefaultExecutionContext
 from sqlalchemy.orm import backref, relationship
 
 from aspen.database.models.base import base, idbase
@@ -17,12 +18,18 @@ if TYPE_CHECKING:
     from aspen.database.models.cansee import CanSee
 
 
+def submitting_lab_default(context: DefaultExecutionContext) -> str:
+    # mypy complains, but yes this class has this method
+    return context.get_current_parameters()["name"]  # type: ignore
+
+
 class Group(idbase, DictMixin):  # type: ignore
     """A group of users, generally a department of public health."""
 
     __tablename__ = "groups"
 
     name = Column(String, unique=True, nullable=False)
+    submitting_lab = Column(String, nullable=True, default=submitting_lab_default)
     address = Column(String, nullable=True)
     prefix = Column(
         String,
