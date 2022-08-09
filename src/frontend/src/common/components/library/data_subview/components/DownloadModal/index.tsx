@@ -1,8 +1,13 @@
 import CloseIcon from "@material-ui/icons/Close";
 import { Alert, Tooltip } from "czifui";
-import { isEqual, noop } from "lodash";
+import { isEqual } from "lodash";
 import React, { useCallback, useEffect, useState } from "react";
 import { CSVLink } from "react-csv";
+import {
+  AnalyticsSamplesDownloadFile,
+  EVENT_TYPES,
+} from "src/common/analytics/eventTypes";
+import { analyticsTrackEvent } from "src/common/analytics/methods";
 import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
@@ -243,14 +248,38 @@ const DownloadModal = ({
     }
   }
 
+  /**
+   * Handle firing off analytics event when a samples download is initiated.
+   *
+   * Download button kicks off download, but underlying components within it
+   * change depending on if fasta selected and/or if metadata selected.
+   * This function deals with the analytics event for downloads, but need
+   * to ensure it only gets called once, regardless of what combination
+   * of fasta/metadata selection is in place.
+   */
+  function analyticsHandleDownload(): void {
+    analyticsTrackEvent<AnalyticsSamplesDownloadFile>(
+      EVENT_TYPES.SAMPLES_DOWNLOAD_FILE,
+      {
+        sample_count: checkedSampleIds.length,
+        sample_public_ids: JSON.stringify(checkedSampleIds),
+        includes_consensus_genome: isFastaSelected,
+        includes_sample_metadata: isMetadataSelected,
+      }
+    );
+  }
+
   function getDownloadButton(): JSX.Element | undefined {
     // button will have different functionality depending on download type selected
 
     const isButtonDisabled = !isFastaSelected && !isMetadataSelected;
     const downloadFasta = () => {
       fastaDownloadMutation.mutate({ sampleIds: checkedSampleIds });
+      // Analytics: When fasta download happens, kick off download event.
+      analyticsHandleDownload();
     };
-    const onClick = isFastaSelected ? downloadFasta : noop;
+    // Analytics: If downloading fasta is not happening, still fire event.
+    const onClick = isFastaSelected ? downloadFasta : analyticsHandleDownload;
 
     const downloadButton = (
       <StyledButton

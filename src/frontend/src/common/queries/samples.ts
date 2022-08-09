@@ -139,10 +139,34 @@ interface SampleCreateRequestType {
   metadata: SampleIdToMetadata | null;
 }
 
+/**
+ * Response from BE for creating new samples.
+ *
+ * Actual response has way, way more info than just `id` -- basically matches
+ * a `Sample` type -- but the only thing we use downstream right now is id.
+ * This is pretty much the same as a `SampleResponse` interface from elsewhere,
+ * but that assumes it's been parsed into camelCase via the `apiResponse` func,
+ * and because this is associated with sending a payload via POST, we'd either
+ * need to fully re-create a snake_case version of otherwise the same interface
+ * or we'd need to jury-rig the parsing step from that somewhere for no gain
+ * since we only care about pulling the id value anyway.
+ *
+ * This is all just for analytics as of this writing, so I [Vince] am taking
+ * the easy way out and only going to care about the key actually being used.
+ * That said, if we ever start using those POST sample creation responses more
+ * fully, this should be re-worked.
+ */
+interface RawSampleWithId {
+  id: number;
+}
+export interface RawSamplesWithId {
+  samples: RawSampleWithId[];
+}
+
 export async function createSamples(
   groupId: number,
   { samples, metadata }: SampleCreateRequestType
-): Promise<unknown> {
+): Promise<RawSamplesWithId> {
   const payload: SamplePayload[] = [];
 
   if (!samples || !metadata) {
@@ -202,7 +226,9 @@ export async function createSamples(
 
 export function useCreateSamples(
   groupId: number,
-  { componentOnSuccess }: { componentOnSuccess: () => void }
+  {
+    componentOnSuccess,
+  }: { componentOnSuccess: (respData: RawSamplesWithId) => void }
 ): UseMutationResult<unknown, unknown, SampleCreateRequestType, unknown> {
   return useMutation((toMutate) => createSamples(groupId, toMutate), {
     onSuccess: componentOnSuccess,
