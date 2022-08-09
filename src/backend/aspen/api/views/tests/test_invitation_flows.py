@@ -3,16 +3,19 @@ from typing import Dict, Optional, Tuple
 from urllib.parse import parse_qsl, urlparse
 
 import pytest
+import sqlalchemy as sa
 from authlib.integrations.starlette_client import StarletteOAuth2App
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
+from sqlalchemy.sql.expression import and_
 from starlette.responses import Response
 
 from aspen.api.middleware.session import SessionMiddleware
 from aspen.auth.auth0_management import Auth0Client, Auth0OrgInvitation
-from aspen.database.models import Group, User
+from aspen.database.models import Group, User, UserRole
 from aspen.test_infra.models.usergroup import group_factory, user_factory
 from aspen.util.split import SplitClient
 
@@ -48,14 +51,13 @@ async def setup_invitation_flows(
     # todo fix this
     userinfo = {
         "sub": "user123-asdf",
-        "org_id": "123456",
+        "org_id": group.auth0_org_id,
         "email": "hello@czgenepi.org",
+        "name": "user1",
     }
 
     split_client.get_flag.return_value = "on"  # type: ignore
-    auth0_apiclient.get_org_user_roles.side_effect = [["admin"]]  # type: ignore
-    auth0_oauth.authorize_access_token.side_effect = [{"userinfo": userinfo}]  # type: ignore
-    auth0_apiclient.get_user_orgs.side_effect = [[]]  # type: ignore
+    auth0_oauth.authorize_access_token.return_value = {"userinfo": userinfo}  # type: ignore
     return user1, user2, group
 
 
@@ -84,7 +86,6 @@ async def generate_invitation(
         "organization": group.auth0_org_id,
         "organization_name": group.name,
     }
-    print("get org invitations setting -- ")
     auth0_apiclient.get_org_invitations.return_value = [invitation]  # type: ignore
     return invitation, login_params
 
@@ -95,7 +96,6 @@ async def make_login_request(
     auth_headers = {}
     if auth_user:
         auth_headers = {"user_id": auth_user.auth0_user_id}
-    print(auth_headers)
     res = await http_client.get(
         f"/v2/auth/login",
         params=login_params,
@@ -128,7 +128,7 @@ async def test_redirect_without_prompt(
         ["zzyzx@czgenepi.org", None],
     ]
 
-    auth0_oauth.authorize_redirect.side_effect = [RedirectResponse("/auth0_test"), RedirectResponse("/auth0_test")]  # type: ignore
+    auth0_oauth.authorize_redirect.return_value = RedirectResponse("/v2/auth/callback")  # type: ignore
     for test_case in test_cases:
         invitation_email, expires_at = test_case
         invitation, login_params = await generate_invitation(
@@ -136,7 +136,7 @@ async def test_redirect_without_prompt(
         )
         res = await make_login_request(http_client, login_params, auth_user)
 
-        assert res.headers["Location"] == "/auth0_test"
+        assert res.headers["Location"] == "/v2/auth/callback"
         redirect_kwargs = auth0_oauth.authorize_redirect.call_args.kwargs
         assert redirect_kwargs["invitation"] == invitation["ticket_id"]
         assert redirect_kwargs["organization"] == group.auth0_org_id
@@ -213,11 +213,11 @@ async def test_redirect_with_prompt(
     invitation, login_params = await generate_invitation(
         auth0_apiclient, group=group, email=invitation_email, expires_at=expires_at
     )
-    auth0_oauth.authorize_redirect.side_effect = [RedirectResponse("/auth0_test"), RedirectResponse("/auth0_test")]  # type: ignore
+    auth0_oauth.authorize_redirect.return_value = RedirectResponse("/v2/auth/callback")  # type: ignore
     for auth_user in [user1, None]:
         res = await make_login_request(http_client, login_params, auth_user)
 
-        assert res.headers["Location"] == "/auth0_test"
+        assert res.headers["Location"] == "/v2/auth/callback"
         redirect_kwargs = auth0_oauth.authorize_redirect.call_args.kwargs
         assert redirect_kwargs["prompt"] == "login"
         assert redirect_kwargs["login_hint"] == invitation_email
@@ -227,3 +227,163 @@ async def test_redirect_with_prompt(
             "organization": group.auth0_org_id,
             "organization_name": group.name,
         }
+
+
+# Test callback endpoint with and without session stuff
+async def test_callback_redirect(
+    async_session: AsyncSession,
+    auth0_apiclient: Auth0Client,
+    auth0_oauth: StarletteOAuth2App,
+    http_client: AsyncClient,
+    split_client: SplitClient,
+):
+    """
+    Make sure the callback endpoint can redirect to the process_invitation endpoint if we have the appropriate session vars
+    """
+    user1, _, group = await setup_invitation_flows(
+        async_session=async_session,
+        auth0_apiclient=auth0_apiclient,
+        auth0_oauth=auth0_oauth,
+        split_client=split_client,
+    )
+
+    invitation_email = user1.email
+    expires_at = None
+
+    auth0_oauth.authorize_redirect.return_value = RedirectResponse("/v2/auth/callback")  # type: ignore
+    invitation, login_params = await generate_invitation(
+        auth0_apiclient, group=group, email=invitation_email, expires_at=expires_at
+    )
+    # Do this to set a cookie
+    await make_login_request(http_client, login_params, None)
+    # And make sure the callback can read that cookie
+    auth_headers = {"user_id": user1.auth0_user_id}
+
+    res = await http_client.get(
+        f"/v2/auth/callback",
+        headers=auth_headers,
+        allow_redirects=False,
+    )
+    assert f"process_invitation" in res.headers["Location"]
+    _, _, path, _, query, _ = urlparse(res.headers["Location"])
+    query_params = dict(parse_qsl(query))
+    assert "process_invitation" in path
+    assert query_params["invitation"] == invitation["ticket_id"]
+    assert query_params["organization"] == group.auth0_org_id
+    assert query_params["organization_name"] == group.name
+
+
+# Test process invitation endpoint successes.
+async def test_process_invitation_success(
+    async_session: AsyncSession,
+    auth0_apiclient: Auth0Client,
+    auth0_oauth: StarletteOAuth2App,
+    http_client: AsyncClient,
+    split_client: SplitClient,
+):
+    """
+    if the email exists and we're either not logged in, or logged in as a different user, redirect to auth0 with a prompt
+    """
+    user1, _, group = await setup_invitation_flows(
+        async_session=async_session,
+        auth0_apiclient=auth0_apiclient,
+        auth0_oauth=auth0_oauth,
+        split_client=split_client,
+    )
+
+    invitation_email = user1.email
+    expires_at = None
+
+    invitation, login_params = await generate_invitation(
+        auth0_apiclient, group=group, email=invitation_email, expires_at=expires_at
+    )
+    auth_headers = {"user_id": user1.auth0_user_id}
+    auth0_apiclient.get_user_orgs.side_effect = [[{"id": group.auth0_org_id}]]  # type: ignore
+    auth0_apiclient.get_org_user_roles.side_effect = [["admin"]]  # type: ignore
+    res = await http_client.get(
+        f"/v2/auth/process_invitation",
+        params=login_params,
+        headers=auth_headers,
+        allow_redirects=False,
+    )
+    auth0_org = {"id": group.auth0_org_id, "display_name": "", "name": ""}
+    auth0_apiclient.add_org_member.assert_called_once_with(
+        auth0_org, user1.auth0_user_id, ["member"], False
+    )
+    auth0_apiclient.delete_organization_invitation.assert_called_once_with(
+        group.auth0_org_id, invitation["id"]
+    )
+    # make sure user roles made it to the db.
+    userrole = (await async_session.execute(sa.select(UserRole).options(joinedload(UserRole.role)).where(and_(UserRole.user_id == user1.id, UserRole.group_id == group.id)))).scalars().one()  # type: ignore
+    assert userrole.role.name == "admin"
+    # Make sure we redirected to the correct welcome
+    assert f"/welcome/{group.id}" in res.headers["Location"]
+
+
+# Test process invitation endpoint successes.
+async def test_process_invitation_failures(
+    async_session: AsyncSession,
+    auth0_apiclient: Auth0Client,
+    auth0_oauth: StarletteOAuth2App,
+    http_client: AsyncClient,
+    split_client: SplitClient,
+):
+    """
+    if the email exists and we're either not logged in, or logged in as a different user, redirect to auth0 with a prompt
+    """
+    user1, user2, group = await setup_invitation_flows(
+        async_session=async_session,
+        auth0_apiclient=auth0_apiclient,
+        auth0_oauth=auth0_oauth,
+        split_client=split_client,
+    )
+
+    expires_at = None
+    auth0_oauth.authorize_redirect.return_value = RedirectResponse("/v2/auth/callback")  # type: ignore
+
+    # Make sure if there's a mismatch between the logged in user and the invited user, we get an error
+    invitation_email = user2.email
+    _, login_params = await generate_invitation(
+        auth0_apiclient, group=group, email=invitation_email, expires_at=expires_at
+    )
+    auth_headers = {"user_id": user1.auth0_user_id}
+    res = await http_client.get(
+        f"/v2/auth/process_invitation",
+        params=login_params,
+        headers=auth_headers,
+        allow_redirects=False,
+    )
+    assert res.status_code == 400
+
+    # Make sure if the invitation is expired, we get redirected
+    invitation_email = user1.email
+    expires_at = datetime.now() - timedelta(days=2)
+    invitation, login_params = await generate_invitation(
+        auth0_apiclient, group=group, email=invitation_email, expires_at=expires_at
+    )
+    auth_headers = {"user_id": user1.auth0_user_id}
+    res = await http_client.get(
+        f"/v2/auth/process_invitation",
+        params=login_params,
+        headers=auth_headers,
+        allow_redirects=False,
+    )
+    assert res.headers["Location"] == "/v2/auth/callback"
+    redirect_kwargs = auth0_oauth.authorize_redirect.call_args.kwargs
+    assert redirect_kwargs["invitation"] == invitation["ticket_id"]
+    assert redirect_kwargs["organization"] == group.auth0_org_id
+    assert redirect_kwargs["organization_name"] == group.name
+
+    # Make we get an auth failure if the user is not logged in
+    invitation_email = user1.email
+    invitation, login_params = await generate_invitation(
+        auth0_apiclient, group=group, email=invitation_email, expires_at=expires_at
+    )
+    auth_headers = {}
+    res = await http_client.get(
+        f"/v2/auth/process_invitation",
+        params=login_params,
+        headers=auth_headers,
+        allow_redirects=False,
+    )
+    assert res.status_code == 401

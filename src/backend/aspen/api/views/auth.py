@@ -133,7 +133,6 @@ async def login(
             organization_name,
             cookie_userid,
         )
-        print(f"Resp: {resp}")
         if resp:
             return resp
         kwargs["invitation"] = invitation
@@ -272,7 +271,6 @@ async def process_invitation(
     settings: Settings = Depends(get_settings),
     user=Depends(get_auth_user),
 ) -> Response:
-    raise ex.BadRequestException("boo")
     # Load more information about the invitation from auth0
     org: Auth0Org = {
         "id": organization,
