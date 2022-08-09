@@ -52,9 +52,10 @@ class GroupRoleResponse(BaseResponse):
     roles: List[str]
 
 
-# Only expose split id and groups to the user it belongs to.
+# Only expose split_id, analytics_id, and groups to the user they belong to.
 class UserMeResponse(UserBaseResponse):
     split_id: str
+    analytics_id: str
     group: GroupResponse
     groups: List[GroupRoleResponse]
 
