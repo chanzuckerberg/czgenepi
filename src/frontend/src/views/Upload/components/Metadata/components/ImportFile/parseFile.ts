@@ -88,18 +88,18 @@ function getMissingHeaderFields(
     headersToMetadataKeys
   )) {
     if (
-      !(uploadedHeaders.includes(metadataKey)) &&
+      !uploadedHeaders.includes(metadataKey) &&
       !headerField.includes("Optional") &&
-      !(metadataKey === "keepPrivate") // TODO: rename field to have -Optional flag
+      metadataKey !== "keepPrivate" // TODO: rename field to have -Optional flag
     ) {
       if (
-        ["privateId", "sampleId"].includes(metadataKey) && 
-        (uploadedHeaders.includes("strain"))
-        ) {
-          // pass, use strain to populate sample and privateID
+        ["privateId", "sampleId"].includes(metadataKey) &&
+        uploadedHeaders.includes("strain")
+      ) {
+        // pass, use strain to populate sample and privateID
       } else {
         missingFields.add(headerField);
-      } 
+      }
     }
   }
   return missingFields.size !== 0 ? missingFields : null;
@@ -116,10 +116,14 @@ function hasUnknownHeaderFields(
   // Compare strings since we are checking for values that are not in our
   // defined list of headers.
   const knownHeaderFields: string[] = Object.values(headersToMetadataKeys);
-  const knownNextstrainFields: string[] = Object.values(NEXTSTRAIN_FORMAT_HEADERS_TO_METADATA_KEYS);
-  console.log("knownNextstrainFields", knownNextstrainFields); // REMOVE
+  const knownNextstrainFields: string[] = Object.values(
+    NEXTSTRAIN_FORMAT_HEADERS_TO_METADATA_KEYS
+  );
   for (const headerField of uploadedHeaders) {
-    if (!knownHeaderFields.includes(headerField) && !knownNextstrainFields.includes(headerField)) {
+    if (
+      !knownHeaderFields.includes(headerField) &&
+      !knownNextstrainFields.includes(headerField)
+    ) {
       return true;
     }
   }
@@ -349,7 +353,11 @@ export function parseFile(
         const uploadedHeaders = papaParseMeta.fields as string[]; // available b/c `header: true`
         if (uploadedHeaders.includes("strain")) {
           // User is using the nextstrain metadata template headers, populate privateId and sampleId with strain
-            rows = rows.map(obj => ({ ...obj, privateId: obj['strain'], sampleId: obj['strain'] }))
+          rows = rows.map((obj) => ({
+            ...obj,
+            privateId: obj["strain"],
+            sampleId: obj["strain"],
+          }));
         }
 
         // Init -- Will modify these in place as we work through incoming rows.
