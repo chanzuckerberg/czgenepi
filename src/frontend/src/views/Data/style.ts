@@ -196,9 +196,3 @@ export const StyledMenuItem = styled.li`
     `;
   }};
 `;
-
-export const StyledLink = styled(Link)`
-  &:hover {
-    text-decoration: none;
-  }
-`;

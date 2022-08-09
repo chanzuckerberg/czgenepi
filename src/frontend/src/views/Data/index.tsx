@@ -1,4 +1,3 @@
-import { Link } from "czifui";
 import { compact, map, uniq } from "lodash";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
@@ -22,7 +21,6 @@ import {
   Container,
   Navigation,
   StyledCount,
-  StyledLink,
   StyledMenu,
   StyledMenuItem,
   View,
@@ -158,7 +156,7 @@ const Data: FunctionComponent = () => {
     dataJSX.menuItems.push(
       <StyledMenuItem>
         <NextLink href={category.to} key={category.text} passHref>
-          <StyledLink href="passHref">
+          <a href="passHref">
             <Category>
               <CategoryTitle
                 isActive={router.asPath === category.to}
@@ -168,7 +166,7 @@ const Data: FunctionComponent = () => {
               </CategoryTitle>
               <StyledCount>{Object.keys(category.data).length}</StyledCount>
             </Category>
-          </StyledLink>
+          </a>
         </NextLink>
       </StyledMenuItem>
     );
