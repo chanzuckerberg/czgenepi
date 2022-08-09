@@ -1,4 +1,4 @@
-import { AlertTitle } from "@mui/lab";
+import AlertTitle from "@mui/material/AlertTitle";
 import { Alert, Button } from "czifui";
 import NextLink from "next/link";
 import React, { useState } from "react";
