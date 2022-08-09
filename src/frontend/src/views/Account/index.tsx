@@ -95,7 +95,7 @@ export default function Account(): JSX.Element {
       <StyledSection>
         <H2>Details</H2>
         <StyledRow>
-          <StyledH3>GISAID Submitter ID &nbsp;</StyledH3>
+          <StyledH3>GISAID Submitter ID</StyledH3>
           <SubText>Optional</SubText>
         </StyledRow>
         <StyledRow>

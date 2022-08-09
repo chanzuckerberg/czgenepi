@@ -40,6 +40,12 @@ export const StyledRow = styled.div`
 
 export const StyledH3 = styled(H3)`
   margin: 0;
+  ${(props) => {
+    const spaces = getSpaces(props);
+    return `
+      margin-right: ${spaces?.xs}px;
+    `;
+  }}
 `;
 
 export const SubText = styled(P)`
