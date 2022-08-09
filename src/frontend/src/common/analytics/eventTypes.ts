@@ -30,8 +30,8 @@ export enum EVENT_TYPES {
   // User has downloaded a file of the actual phylo tree
   TREE_DOWNLOAD_TREE_FILE = "TREE_DOWNLOAD_TREE_FILE",
 
-  // User downloaded a template with sample identifiers and metadata showing
-  // which selected. User could then add more metadata to overlay on tree view.
+  // User downloaded a template of sample identifiers and metadata that shows
+  // the selected samples. User can add more metadata to overlay on tree view.
   TREE_DOWNLOAD_SELECTED_SAMPLES_TEMPLATE = "TREE_DOWNLOAD_SELECTED_SAMPLES_TEMPLATE",
 
   // User has successfully uploaded new samples
