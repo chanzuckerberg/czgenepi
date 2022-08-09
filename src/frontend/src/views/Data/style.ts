@@ -191,7 +191,7 @@ export const StyledMenuItem = styled.li`
     const spaces = getSpaces(props);
 
     return `
-      margin: 0 ${spaces?.m}px
+      margin: 0 ${spaces?.m}px;
     `;
-  }};
+  }}
 `;
