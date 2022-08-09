@@ -13,6 +13,7 @@ DEFAULT_AUTH0_USER: Auth0User = {
 }
 DEFAULT_AUTH0_INVITATION: Auth0OrgInvitation = {
     "id": "inv_id",
+    "created_at": "",
     "expires_at": "2022-06-01",
     "inviter": {"name": "Bob"},
     "invitee": {"email": "invitee@czgenepi.org"},

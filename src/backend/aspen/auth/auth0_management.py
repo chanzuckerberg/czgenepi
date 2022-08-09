@@ -40,6 +40,7 @@ class Auth0Invitee(TypedDict):
 class Auth0OrgInvitation(TypedDict):
     id: str
     organization_id: str
+    created_at: Optional[str]
     inviter: Auth0Inviter
     invitee: Auth0Invitee
     invitation_url: Optional[str]
