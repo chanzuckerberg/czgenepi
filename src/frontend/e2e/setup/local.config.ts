@@ -13,6 +13,7 @@ const config: PlaywrightTestConfig = {
   reporter: [ ['html', {open: 'never'} ] ],
   globalSetup: './global-setup',
   use: {
+    baseURL: "http://frontend.genepinet.localdev:8000/",
     storageState: 'playwright/storage/state.json',
     actionTimeout: 0,
     trace: 'on-first-retry',

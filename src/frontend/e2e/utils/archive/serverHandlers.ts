@@ -3,9 +3,9 @@
 // as well as my development in the browser. Pretty sweet!
 
 import { rest } from "msw";
-import { API } from "../../src/common/api";
-import ENV from "../../src/common/constants/ENV";
-import { userInfo } from "../fixtures/userInfo";
+import { API } from "../../../src/common/api";
+import ENV from "../../../src/common/constants/ENV";
+import { userInfo } from "../../fixtures/userInfo";
 
 export const handlers = [
   rest.get(ENV.API_URL + API.USERDATA, (req, res, context) => {
