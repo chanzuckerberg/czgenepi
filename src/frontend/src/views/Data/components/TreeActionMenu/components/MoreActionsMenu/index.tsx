@@ -1,4 +1,4 @@
-import { Icon, IconButton, Menu, MenuItem, Tooltip } from "czifui";
+import { Icon, ButtonIcon, Menu, MenuItem, Tooltip } from "czifui";
 import React, { MouseEventHandler, useState } from "react";
 import { TREE_STATUS } from "src/common/constants/types";
 import { StyledMenuItemWrapper } from "src/common/styles/menuStyle";
@@ -62,7 +62,7 @@ const MoreActionsMenu = ({
         placement="top"
       >
         <span>
-          <IconButton
+          <ButtonIcon
             // TODO: it would be helpful for this to indicate which tree it's for
             aria-label="more actions"
             disabled={isDisabled}
@@ -72,7 +72,7 @@ const MoreActionsMenu = ({
             size="large"
           >
             <Icon sdsIcon="dotsHorizontal" sdsSize="s" sdsType="iconButton" />
-          </IconButton>
+          </ButtonIcon>
         </span>
       </Tooltip>
       {open && (

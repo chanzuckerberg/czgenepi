@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { fontHeaderXl, getSpaces, IconButton } from "czifui";
+import { fontHeaderXl, getSpaces, ButtonIcon } from "czifui";
 
 export const StyledTitle = styled.div`
   ${fontHeaderXl}
@@ -14,7 +14,7 @@ export const StyledDiv = styled.div`
   }}
 `;
 
-export const StyledIconButton = styled(IconButton)`
+export const StyledIconButton = styled(ButtonIcon)`
   display: flex;
   align-self: flex-end;
   padding: 0;

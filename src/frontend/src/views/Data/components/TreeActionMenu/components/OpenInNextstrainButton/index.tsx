@@ -1,4 +1,4 @@
-import { Icon, IconButton, Tooltip } from "czifui";
+import { Icon, ButtonIcon, Tooltip } from "czifui";
 import React, { useState } from "react";
 import { TREE_STATUS } from "src/common/constants/types";
 import NextstrainConfirmationModal from "../../../NextstrainConfirmationModal";
@@ -34,7 +34,7 @@ const OpenInNextstrainButton = ({ item }: Props): JSX.Element => {
         placement="top"
       >
         <span>
-          <IconButton
+          <ButtonIcon
             aria-label="view in Nextstrain"
             disabled={isDisabled}
             onClick={handleClickOpen}
@@ -43,7 +43,7 @@ const OpenInNextstrainButton = ({ item }: Props): JSX.Element => {
             size="large"
           >
             <Icon sdsIcon="open" sdsSize="s" sdsType="iconButton" />
-          </IconButton>
+          </ButtonIcon>
         </span>
       </Tooltip>
       {treeId && (

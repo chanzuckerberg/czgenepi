@@ -1,5 +1,5 @@
 import type { IconNameToSizes } from "czifui";
-import { Icon, IconButton as LibIconButton, Tooltip } from "czifui";
+import { ButtonIcon as LibButtonIcon, Icon, Tooltip } from "czifui";
 import React, { FunctionComponent, MouseEventHandler, useState } from "react";
 import { StyledSpan } from "./style";
 
@@ -32,14 +32,14 @@ export const IconButton: FunctionComponent<Props> = ({
       placement="top"
     >
       <StyledSpan>
-        <LibIconButton
+        <LibButtonIcon
           onClick={handleClick}
           disabled={disabled}
           sdsSize="large"
           sdsType="primary"
         >
           <Icon sdsIcon={sdsIcon} sdsSize="xl" sdsType="iconButton" />
-        </LibIconButton>
+        </LibButtonIcon>
       </StyledSpan>
     </Tooltip>
   );

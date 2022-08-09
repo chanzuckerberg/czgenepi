@@ -62,7 +62,6 @@ const MoreActionsMenu = ({
         sdsIcon="dotsHorizontal"
         tooltipTextDisabled={TOOLTIP_TEXT_DISABLED}
         tooltipTextEnabled={TOOLTIP_TEXT_ENABLED}
-        size="large"
       />
       <Menu
         anchorEl={anchorEl}

@@ -1,10 +1,10 @@
 import styled from "@emotion/styled";
 import {
+  ButtonIcon,
   fontBodyXs,
   getColors,
   getFontWeights,
   getSpaces,
-  IconButton,
   MenuItem as LibMenuItem,
 } from "czifui";
 
@@ -61,6 +61,6 @@ export const StyledIcon = styled.span`
   }}
 `;
 
-export const StyledIconButton = styled(IconButton)`
+export const StyledIconButton = styled(ButtonIcon)`
   flex: 0 0 auto;
 `;

@@ -10,7 +10,7 @@
  * for previously acknowledged users by changing date of CURRENT_POLICY_VERSION.
  */
 
-import { Icon, IconButton } from "czifui";
+import { Icon, ButtonIcon } from "czifui";
 import React from "react";
 import { useUpdateUserInfo, useUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
@@ -87,7 +87,7 @@ const AcknowledgePolicyChanges = (): JSX.Element | null => {
         </StyledNewTabLink>{" "}
         effective September 30.
       </MainText>
-      <IconButton
+      <ButtonIcon
         onClick={handleClick}
         aria-label="Acknowledge policy changes"
         sdsSize="large"
@@ -95,7 +95,7 @@ const AcknowledgePolicyChanges = (): JSX.Element | null => {
         size="large"
       >
         <Icon sdsIcon="xMark" sdsSize="l" sdsType="iconButton" />
-      </IconButton>
+      </ButtonIcon>
     </Container>
   );
 };

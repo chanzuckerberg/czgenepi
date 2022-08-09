@@ -1,4 +1,4 @@
-import { Icon, IconButton, Tooltip } from "czifui";
+import { ButtonIcon, Icon, Tooltip } from "czifui";
 import React, { FC, useState } from "react";
 import { StyledBadge, StyledDiv, tooltipStyles } from "./style";
 
@@ -28,7 +28,7 @@ export const FilterPanelToggle: FC<Props> = ({
       classes={{ tooltip: tooltipStyles }}
     >
       <StyledDiv>
-        <IconButton
+        <ButtonIcon
           aria-label={`${activeFilterCount} active filters`}
           active={isActive}
           onClick={handleclick}
@@ -40,7 +40,7 @@ export const FilterPanelToggle: FC<Props> = ({
           {activeFilterCount > 0 && (
             <StyledBadge>{activeFilterCount}</StyledBadge>
           )}
-        </IconButton>
+        </ButtonIcon>
       </StyledDiv>
     </Tooltip>
   );
