@@ -17,7 +17,7 @@ import aspen.api.error.http_exceptions as ex
 from aspen.api.authn import get_auth0_apiclient, get_auth_user, get_cookie_userid
 from aspen.api.deps import get_auth0_client, get_db, get_settings, get_splitio
 from aspen.api.settings import Settings
-from aspen.auth.auth0_management import Auth0Client, Auth0Invitation, Auth0Org
+from aspen.auth.auth0_management import Auth0Client, Auth0Org, Auth0OrgInvitation
 from aspen.auth.role_manager import RoleManager
 from aspen.database.models import Group, User
 from aspen.util.split import SplitClient
@@ -29,7 +29,7 @@ router = APIRouter()
 
 def get_invitation_ticket(
     a0: Auth0Client, organization: str, invitation: str
-) -> Optional[Auth0Invitation]:
+) -> Optional[Auth0OrgInvitation]:
     org: Auth0Org = {
         "id": organization,
         "name": organization,
@@ -39,12 +39,13 @@ def get_invitation_ticket(
     # so this is the next best thing.
     tickets = a0.get_org_invitations(org)
     for ticket in tickets:
-        expires = ticket.get("expires_at")
+        expires = ticket["expires_at"]
         # Don't process expired invitations
         if datetime.fromisoformat(expires.rstrip("Z")) < datetime.now():
             continue
         if ticket.get("ticket_id") == invitation:
             return ticket
+    return None
 
 
 async def get_invitation_redirect(
@@ -66,21 +67,21 @@ async def get_invitation_redirect(
     # Load more information about the invitation from auth0
     ticket_info = get_invitation_ticket(a0, organization, invitation)
     if not ticket_info:
-        return
+        return None
     # Check to see if the user is already in our db.
     invitee = ticket_info["invitee"]["email"]
     try:
-        (await db.execute(sa.select(User).where(User.email == invitee))).scalars().one()
+        (await db.execute(sa.select(User).where(User.email == invitee))).scalars().one()  # type: ignore
     except NoResultFound:
         # If the user isn't in our db, proceed with regular auth0 flow.
-        return
+        return None
     # If we're already logged in as this user, just process the invitation and redirect to welcome.
     user = None
     try:
         user = (
             (
                 await db.execute(
-                    sa.select(User).where(User.auth0_user_id == cookie_userid)
+                    sa.select(User).where(User.auth0_user_id == cookie_userid)  # type: ignore
                 )
             )
             .scalars()
@@ -272,11 +273,6 @@ async def process_invitation(
     user=Depends(get_auth_user),
 ) -> Response:
     # Load more information about the invitation from auth0
-    org: Auth0Org = {
-        "id": organization,
-        "name": organization,
-        "display_name": organization,
-    }
     ticket_info = get_invitation_ticket(a0, organization, invitation)
     if not ticket_info:
         # Let Auth0 complain about the invalid invitation.
@@ -317,8 +313,8 @@ async def process_invitation(
         group = (
             (
                 await db.execute(
-                    sa.select(Group).where(
-                        Group.auth0_org_id == ticket_info["organization_id"]
+                    sa.select(Group).where(  # type: ignore
+                        Group.auth0_org_id == ticket_info["organization_id"]  # type: ignore
                     )
                 )
             )
@@ -328,7 +324,7 @@ async def process_invitation(
         return RedirectResponse(os.getenv("FRONTEND_URL", "") + f"/welcome/{group.id}")
     except NoResultFound:
         # This really shouldn't have happened, but send them to the frontend.
-        return RedirectResponse(os.getenv("FRONTEND_URL", "") + f"/data/samples")
+        return RedirectResponse(os.getenv("FRONTEND_URL", "") + "/data/samples")
 
 
 @router.get("/logout")

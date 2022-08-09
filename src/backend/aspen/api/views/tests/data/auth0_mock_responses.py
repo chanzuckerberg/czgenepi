@@ -1,4 +1,4 @@
-from aspen.auth.auth0_management import Auth0Invitation, Auth0Org, Auth0User
+from aspen.auth.auth0_management import Auth0Org, Auth0OrgInvitation, Auth0User
 
 DEFAULT_AUTH0_ORG: Auth0Org = {
     "id": "testid",
@@ -11,10 +11,15 @@ DEFAULT_AUTH0_USER: Auth0User = {
     "name": "test user",
     "email": "test@czgenepi.org",
 }
-DEFAULT_AUTH0_INVITATION: Auth0Invitation = {
+DEFAULT_AUTH0_INVITATION: Auth0OrgInvitation = {
     "id": "inv_id",
-    "created_at": "2022-01-01",
     "expires_at": "2022-06-01",
     "inviter": {"name": "Bob"},
     "invitee": {"email": "invitee@czgenepi.org"},
+    "organization_id": "org-1234",
+    "invitation_url": "",
+    "roles": ["member"],
+    "ticket_id": "ticket_id",
+    "client_id": "",
+    "connection_id": "",
 }

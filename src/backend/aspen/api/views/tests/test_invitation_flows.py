@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Dict, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 from urllib.parse import parse_qsl, urlparse
 
 import pytest
@@ -8,10 +8,10 @@ from authlib.integrations.starlette_client import StarletteOAuth2App
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from httpx import AsyncClient
+from httpx._models import Response
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql.expression import and_
-from starlette.responses import Response
 
 from aspen.api.middleware.session import SessionMiddleware
 from aspen.auth.auth0_management import Auth0Client, Auth0OrgInvitation
@@ -73,13 +73,14 @@ async def generate_invitation(
     invitation: Auth0OrgInvitation = {
         "id": "foo",
         "organization_id": group.auth0_org_id,
-        "created_at": "",
         "invitee": {"email": email},
-        "inviter": {"email": ""},
+        "inviter": {"name": ""},
         "expires_at": expiration_str,
         "ticket_id": "ticket_1",
         "roles": ["member"],
         "client_id": "",
+        "invitation_url": "",
+        "connection_id": "",
     }
     login_params = {
         "invitation": invitation["ticket_id"],
@@ -97,7 +98,7 @@ async def make_login_request(
     if auth_user:
         auth_headers = {"user_id": auth_user.auth0_user_id}
     res = await http_client.get(
-        f"/v2/auth/login",
+        "/v2/auth/login",
         params=login_params,
         headers=auth_headers,
         allow_redirects=False,
@@ -123,9 +124,9 @@ async def test_redirect_without_prompt(
     )
 
     auth_user = None
-    test_cases = [
-        [user.email, datetime.now() - timedelta(days=2)],
-        ["zzyzx@czgenepi.org", None],
+    test_cases: List[Tuple[str, Optional[datetime]]] = [
+        (user.email, datetime.now() - timedelta(days=2)),
+        ("zzyzx@czgenepi.org", None),
     ]
 
     auth0_oauth.authorize_redirect.return_value = RedirectResponse("/v2/auth/callback")  # type: ignore
@@ -260,11 +261,11 @@ async def test_callback_redirect(
     auth_headers = {"user_id": user1.auth0_user_id}
 
     res = await http_client.get(
-        f"/v2/auth/callback",
+        "/v2/auth/callback",
         headers=auth_headers,
         allow_redirects=False,
     )
-    assert f"process_invitation" in res.headers["Location"]
+    assert "process_invitation" in res.headers["Location"]
     _, _, path, _, query, _ = urlparse(res.headers["Location"])
     query_params = dict(parse_qsl(query))
     assert "process_invitation" in path
@@ -301,16 +302,16 @@ async def test_process_invitation_success(
     auth0_apiclient.get_user_orgs.side_effect = [[{"id": group.auth0_org_id}]]  # type: ignore
     auth0_apiclient.get_org_user_roles.side_effect = [["admin"]]  # type: ignore
     res = await http_client.get(
-        f"/v2/auth/process_invitation",
+        "/v2/auth/process_invitation",
         params=login_params,
         headers=auth_headers,
         allow_redirects=False,
     )
     auth0_org = {"id": group.auth0_org_id, "display_name": "", "name": ""}
-    auth0_apiclient.add_org_member.assert_called_once_with(
+    auth0_apiclient.add_org_member.assert_called_once_with(  # type: ignore
         auth0_org, user1.auth0_user_id, ["member"], False
     )
-    auth0_apiclient.delete_organization_invitation.assert_called_once_with(
+    auth0_apiclient.delete_organization_invitation.assert_called_once_with(  # type: ignore
         group.auth0_org_id, invitation["id"]
     )
     # make sure user roles made it to the db.
@@ -348,7 +349,7 @@ async def test_process_invitation_failures(
     )
     auth_headers = {"user_id": user1.auth0_user_id}
     res = await http_client.get(
-        f"/v2/auth/process_invitation",
+        "/v2/auth/process_invitation",
         params=login_params,
         headers=auth_headers,
         allow_redirects=False,
@@ -363,7 +364,7 @@ async def test_process_invitation_failures(
     )
     auth_headers = {"user_id": user1.auth0_user_id}
     res = await http_client.get(
-        f"/v2/auth/process_invitation",
+        "/v2/auth/process_invitation",
         params=login_params,
         headers=auth_headers,
         allow_redirects=False,
@@ -381,7 +382,7 @@ async def test_process_invitation_failures(
     )
     auth_headers = {}
     res = await http_client.get(
-        f"/v2/auth/process_invitation",
+        "/v2/auth/process_invitation",
         params=login_params,
         headers=auth_headers,
         allow_redirects=False,

@@ -1,7 +1,7 @@
 import random
 import string
 from functools import cache, partial
-from typing import Any, Callable, Dict, List, Optional, TypedDict
+from typing import Any, Callable, List, Optional, TypedDict
 
 from auth0.v3 import authentication as auth0_authentication
 from auth0.v3.management import Auth0
@@ -11,18 +11,6 @@ class Auth0Org(TypedDict):
     id: str
     name: str
     display_name: str
-
-
-class Auth0OrgInvitation(TypedDict):
-    id: str
-    organization_id: str
-    inviter: Dict[str, str]
-    inviteee: Dict[str, str]
-    invitation_url: str
-    roles: List[str]
-    ticket_id: str
-    client_id: str
-    connection_id: str
 
 
 class Auth0User(TypedDict):
@@ -49,12 +37,17 @@ class Auth0Invitee(TypedDict):
     email: str
 
 
-class Auth0Invitation(TypedDict):
+class Auth0OrgInvitation(TypedDict):
     id: str
-    created_at: str
-    expires_at: str
+    organization_id: str
     inviter: Auth0Inviter
     invitee: Auth0Invitee
+    invitation_url: Optional[str]
+    roles: List[str]
+    ticket_id: str
+    client_id: Optional[str]
+    connection_id: Optional[str]
+    expires_at: str
 
 
 def generate_password(length: int = 22) -> str:
