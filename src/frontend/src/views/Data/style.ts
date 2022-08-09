@@ -8,7 +8,6 @@ import {
   fontHeaderXs,
   getColors,
   getSpaces,
-  Link,
 } from "czifui";
 import { RowContent } from "src/common/components/library/data_table/style";
 import { PageContent } from "src/common/styles/mixins/global";
@@ -192,7 +191,7 @@ export const StyledMenuItem = styled.li`
     const spaces = getSpaces(props);
 
     return `
-      margin: 0 ${spaces?.m}px;
+      margin: 0 ${spaces?.m}px
     `;
   }};
 `;
