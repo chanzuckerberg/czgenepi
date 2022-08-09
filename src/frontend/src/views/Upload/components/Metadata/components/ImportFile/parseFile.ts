@@ -66,8 +66,6 @@ interface ParsedRow {
 // If header is unrecognized, leaves it alone (useful for warnings, etc).
 // User can also use Nextstrain header defaults as an alias
 function convertHeaderToMetadataKey(headerName: string): string {
-  // console.log("headerName in convert headers", headerName); // REMOVE
-  // console.log("headerName in convertHeader", headerName); // REMOVE
   if (headerName in HEADERS_TO_METADATA_KEYS) {
     return HEADERS_TO_METADATA_KEYS[headerName];
   } else if (headerName in NEXTSTRAIN_FORMAT_HEADERS_TO_METADATA_KEYS) {
@@ -85,14 +83,14 @@ function getMissingHeaderFields(
   uploadedHeaders: string[],
   headersToMetadataKeys: Dictionary<keyof SampleUploadTsvMetadata>
 ): Set<string> | null {
-  console.log("uploadedHeaders in missingHeaders: ", uploadedHeaders); // REMOVE
   const missingFields = new Set<string>();
   for (const [headerField, metadataKey] of Object.entries(
     headersToMetadataKeys
   )) {
     if (
       !(uploadedHeaders.includes(metadataKey)) &&
-      !headerField.includes("Optional") 
+      !headerField.includes("Optional") &&
+      !(metadataKey === "keepPrivate") // TODO: rename field to have -Optional flag
     ) {
       if (
         ["privateId", "sampleId"].includes(metadataKey) && 
@@ -118,8 +116,10 @@ function hasUnknownHeaderFields(
   // Compare strings since we are checking for values that are not in our
   // defined list of headers.
   const knownHeaderFields: string[] = Object.values(headersToMetadataKeys);
+  const knownNextstrainFields: string[] = Object.values(NEXTSTRAIN_FORMAT_HEADERS_TO_METADATA_KEYS);
+  console.log("knownNextstrainFields", knownNextstrainFields); // REMOVE
   for (const headerField of uploadedHeaders) {
-    if (!knownHeaderFields.includes(headerField)) {
+    if (!knownHeaderFields.includes(headerField) && !knownNextstrainFields.includes(headerField)) {
       return true;
     }
   }
