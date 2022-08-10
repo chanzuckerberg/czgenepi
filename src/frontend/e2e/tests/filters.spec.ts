@@ -10,6 +10,8 @@ test.describe("Filter Test Suite",()=>{
         await page.type('#password','Br@mb1la');
         await page.click("main.login button[type='submit']");
         await expect(page).toHaveURL('https://staging.czgenepi.org/data/samples');
+        await page.waitForURL("https://staging.czgenepi.org/data/samples");
+        await page.waitForTimeout(1000);
     })
 
     test("Genome Recovery filter by [complete] test",async ({ page })=>{
@@ -28,9 +30,8 @@ test.describe("Filter Test Suite",()=>{
     })
     
     test("Lineage filter test",async ({ page })=>{
-        await expect(page).toHaveURL('https://staging.czgenepi.org/data/samples');
         await filterLineage(page,['BA.1.1','BA.1.15']);
-    })
+    })    
 });
     
         

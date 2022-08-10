@@ -76,8 +76,6 @@ export async function getSampleStatuses(page: Page,desireStatus: string): Promis
 }
 
 export async function filterLineage(page: Page,lineages: string[]){
-  await page.waitForURL("https://staging.czgenepi.org/data/samples");
-  await page.waitForTimeout(1000);
   let actualLineage = 0;
   while(actualLineage < lineages.length){
     await page.click("button[label='Lineage']");
@@ -104,9 +102,9 @@ export async function filterLineage(page: Page,lineages: string[]){
 export async function filterCollectionDate(page: Page, filterDate:string){
     await page.click("button[label='Collection Date']");
     const periods =  await page.locator("div[style*='194'] span > span");
-
-}
-
-export async function filterCustomCollectionDate(page: Page,initialDate:string,endDate:string){
+    periods.filter({ hasText: filterDate }).click();
+    const filterOn = await page.locator('div > .MuiChip-deletable');
+    await expect(filterOn).toHaveText(filterDate);
+    await page.waitForTimeout(4000);
 
 }
