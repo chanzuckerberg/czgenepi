@@ -49,16 +49,14 @@ async def update_user_info(
     user=Depends(get_auth_user),
 ) -> UserMeResponse:
     auth0_update_items = {}
+    auth0_attributes = ["name"]
 
-    if user_update_request.agreed_to_tos is not None:
-        user.agreed_to_tos = user_update_request.agreed_to_tos
-    if user_update_request.acknowledged_policy_version is not None:
-        user.acknowledged_policy_version = (
-            user_update_request.acknowledged_policy_version
-        )
-    if user_update_request.name is not None:
-        user.name = user_update_request.name
-        auth0_update_items["name"] = user_update_request.name
+    for attribute, value in user_update_request:
+        if value is not None:
+            setattr(user, attribute, value)
+            if attribute in auth0_attributes:
+                auth0_update_items[attribute] = value
+
     await db.commit()
 
     if user.auth0_user_id and len(auth0_update_items) > 0:
