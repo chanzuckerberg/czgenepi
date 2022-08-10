@@ -1,4 +1,4 @@
-import { adaptV4Theme, createTheme, Theme } from "@mui/material/styles";
+import { createTheme, Theme } from "@mui/material/styles";
 import { defaultAppTheme, makeThemeOptions } from "czifui";
 
 declare module "@mui/styles" {
@@ -45,4 +45,4 @@ appTheme.borders = appTheme.borders ?? {
 };
 appTheme.borders.primary = primaryBorders;
 
-export const theme = createTheme(adaptV4Theme(makeThemeOptions(appTheme)));
+export const theme = createTheme(makeThemeOptions(appTheme));
