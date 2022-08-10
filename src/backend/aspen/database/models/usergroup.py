@@ -102,6 +102,7 @@ class User(idbase, DictMixin):  # type: ignore
     analytics_id = Column(
         String, unique=True, nullable=False, default=generate_random_id
     )
+    gisaid_submitter_id = Column(String, nullable=True, default=None)
 
     group_id = Column(Integer, ForeignKey(Group.id), nullable=False)
     group = relationship("Group", back_populates="members")  # type: ignore
