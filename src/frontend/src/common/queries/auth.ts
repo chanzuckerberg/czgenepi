@@ -7,14 +7,15 @@ import {
   useQueryClient,
   UseQueryResult,
 } from "react-query";
+import { useSelector } from "react-redux";
 import { analyticsSendUserInfo } from "src/common/analytics/methods";
 import ENV from "src/common/constants/ENV";
 import { API, DEFAULT_PUT_OPTIONS, getBackendApiJson } from "../api";
+import { selectCurrentGroup } from "../redux/selectors";
 import { ROUTES } from "../routes";
+import { setValidGroup } from "../utils/groupUtils";
 import { ENTITIES } from "./entities";
 import {
-  mapGroupData,
-  RawGroupRequest,
   USE_GROUP_INFO,
   USE_GROUP_INVITATION_INFO,
   USE_GROUP_MEMBER_INFO,
@@ -30,7 +31,6 @@ export const USE_USER_INFO = {
 export interface RawUserRequest {
   id: number;
   name: string;
-  group: RawGroupRequest;
   groups: UserGroup[];
   agreed_to_tos: boolean;
   acknowledged_policy_version: string | null; // Date or null in DB. ISO 8601: "YYYY-MM-DD"
@@ -42,10 +42,8 @@ export const mapUserData = (obj: RawUserRequest): User => {
   return {
     acknowledgedPolicyVersion: obj.acknowledged_policy_version,
     agreedToTos: obj.agreed_to_tos,
-    group: mapGroupData(obj.group),
     groups: obj.groups,
     id: obj.id,
-    isGroupAdmin: obj.group_admin,
     name: obj.name,
     splitId: obj.split_id,
   };
@@ -124,6 +122,7 @@ export function useUserInfo(): UseQueryResult<User, unknown> {
 export function useProtectedRoute(): UseQueryResult<User, unknown> {
   const router = useRouter();
   const result = useUserInfo();
+  const currentGroup = useSelector(selectCurrentGroup);
 
   const { isLoading, data: userInfo } = result;
 
@@ -136,9 +135,12 @@ export function useProtectedRoute(): UseQueryResult<User, unknown> {
         router.push(ROUTES.HOMEPAGE);
       } else if (!agreedToTOS && router.asPath !== ROUTES.AGREE_TERMS) {
         router.push(ROUTES.AGREE_TERMS);
-      } // else case: User is logged in and has agreed to ToS. Leave them be.
+      } else if (!userInfo.groups.find((g) => g.id === currentGroup)) {
+        // user is not authorized to view the group set in their cache. Set it to one they can see.
+        setValidGroup();
+      } // else case: User is logged in, in a valid group, and has agreed to ToS. Leave them be.
     }
-  }, [isLoading, userInfo, router]);
+  }, [isLoading, userInfo, router, currentGroup]);
 
   return result;
 }

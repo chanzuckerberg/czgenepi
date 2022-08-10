@@ -80,7 +80,7 @@ async def post_usergroup(
         await db.commit()
     except IntegrityError:
         raise ex.BadRequestException("User already exists")
-    user_query = get_usergroup_query(db, user_creation_request.auth0_user_id)
+    user_query = get_usergroup_query(user_creation_request.auth0_user_id)
     user_query_result = await db.execute(user_query)
     created_user = user_query_result.unique().scalars().one()
     set_user_groups(created_user)

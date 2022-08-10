@@ -67,7 +67,7 @@ const INITIAL_SCRIPT_TYPE = "text/plain";
  * place to put it is just under the `</Head>` in `_app.tsx`, but you could
  * put it somewhere else as well.
  */
-export function SegmentInitializer() {
+export function SegmentInitializer(): JSX.Element | null {
   // `userInfo` will be false-y if user is not logged in
   const { data: userInfo } = useUserInfo();
   if (!userInfo) return null;
@@ -76,7 +76,7 @@ export function SegmentInitializer() {
   // that the user info we pass to segmentInitScript and use there matches
   // the structure of what is sent in the `analyticsSendUserInfo` function.
   const analyticsUserInfo = extractAnalyticsUserInfo(userInfo);
-  return userInfo && SEGMENT_WRITE_KEY ? (
+  return SEGMENT_WRITE_KEY ? (
     <Script
       id={SEGMENT_SCRIPT_TAG_ID}
       type={INITIAL_SCRIPT_TYPE}

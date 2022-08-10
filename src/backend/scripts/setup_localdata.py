@@ -55,6 +55,7 @@ def create_test_user(session, email, group, user_id, name):
         name=name,
         auth0_user_id=user_id,
         split_id=user_id,
+        analytics_id=user_id,
         email=email,
         group_admin=True,
         system_admin=True,

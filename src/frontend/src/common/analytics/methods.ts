@@ -169,6 +169,8 @@ interface AnalyticsUserInfo {
  * TODO -- This function will need to grow in complexity and probably alter
  * its signature once we have multi-group membership in place.
  */
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore VOODOO REMOVE `userInfo` workaround for merge conflict
 export function extractAnalyticsUserInfo(userInfo: User): AnalyticsUserInfo {
   // TODO [Vincent, near future] Below is a temporary anonymous ID for dev work
   // and will be replaced soon by a proper anonymized user ID once that aspect
@@ -176,8 +178,11 @@ export function extractAnalyticsUserInfo(userInfo: User): AnalyticsUserInfo {
   const PLACEHOLDER_ANON_USER_ID = "warrrbargl";
   return {
     anonUserId: PLACEHOLDER_ANON_USER_ID,
-    groupId: userInfo.group.id,
-    groupName: userInfo.group.name,
+    // TODO VOODOO FIXME -- Both the below got afflicted by merge conflict
+    // Need to adjust how we pull group info because underlying approach to
+    // groups has changed since initial writing of this code.
+    groupId: 47,
+    groupName: "MERGE CONFLICTED",
   };
 }
 

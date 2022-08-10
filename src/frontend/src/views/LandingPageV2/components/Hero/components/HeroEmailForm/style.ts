@@ -14,14 +14,14 @@ export const HeroEmailForm = styled.form`
   border-radius: 999px;
   display: flex;
 
+  @-moz-document url-prefix() {
+    filter: initial;
+  }
+
   ${SmallerThanBreakpoint(`
     flex-direction: column;
     align-items: center;
   `)}
-
-  @-moz-document url-prefix() {
-    filter: initial;
-  }
 `;
 
 export const EmailInput = styled.input`

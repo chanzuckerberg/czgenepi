@@ -1,33 +1,82 @@
 // includes shared styles for icons
 import styled from "@emotion/styled";
-import { getColors, getIconSizes, getSpaces } from "czifui";
-import EditIcon from "src/common/icons/IconEditSmall.svg";
-import TrashIcon from "src/common/icons/IconTrashCanSmall.svg";
+import { CommonThemeProps, getColors, getSpaces, IconButton } from "czifui";
 
-export const StyledTrashIcon = styled(TrashIcon)`
-  ${(props) => {
-    const colors = getColors(props);
-    const iconSizes = getIconSizes(props);
-    const spaces = getSpaces(props);
+export const iconFillBlack = (): string => {
+  return `
+    svg {
+      fill: black;
+    }
+  `;
+};
 
-    return `
+export const iconFillError = (props: CommonThemeProps): string => {
+  const colors = getColors(props);
+  return `
+    svg {
       fill: ${colors?.error[400]};
-      height: ${iconSizes?.xs.height}px;
-      width: ${iconSizes?.xs.width}px;
-      margin-right: ${spaces?.m}px;
-    `;
-  }}
+    }
+  `;
+};
+
+export const iconFillGray = (props: CommonThemeProps): string => {
+  const colors = getColors(props);
+  return `
+    svg {
+      fill: ${colors?.gray[500]};
+    }
+  `;
+};
+
+export const iconFillGrayHoverPrimary = (props: CommonThemeProps): string => {
+  const colors = getColors(props);
+  return `
+    ${iconFillGray}
+    :hover {
+      svg {
+        fill: ${colors?.primary[400]};
+      }
+    }
+  `;
+};
+
+export const iconFillWarning = (props: CommonThemeProps): string => {
+  const colors = getColors(props);
+
+  return `
+    svg {
+      fill: ${colors?.warning[600]};
+    }
+  `;
+};
+
+export const iconFillWhite = (): string => {
+  return `
+    svg {
+      fill: white;
+    }
+  `;
+};
+
+export const rightMarginM = (props: CommonThemeProps): string => {
+  const spaces = getSpaces(props);
+  return `
+    margin-right: ${spaces?.m}px;
+  `;
+};
+
+export const rightMarginXxs = (props: CommonThemeProps): string => {
+  const spaces = getSpaces(props);
+  return `
+    margin-right: ${spaces?.xxs}px;
+  `;
+};
+
+// Dialog Icon styles
+export const StyledCloseIconButton = styled(IconButton)`
+  float: right;
 `;
 
-export const StyledEditIcon = styled(EditIcon)`
-  fill: black;
-  ${(props) => {
-    const iconSizes = getIconSizes(props);
-    const spaces = getSpaces(props);
-    return `
-      height: ${iconSizes?.xs.height}px;
-      width: ${iconSizes?.xs.width}px;
-      margin-right: ${spaces?.m}px;
-    `;
-  }}
+export const StyledCloseIconWrapper = styled.div`
+  ${iconFillGray}
 `;

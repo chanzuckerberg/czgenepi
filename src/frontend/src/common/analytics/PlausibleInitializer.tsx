@@ -38,7 +38,7 @@ const PLAUSIBLE_KEY = ENV.PLAUSIBLE_FRONTEND_KEY;
  * prevent Next from re-mounting the script, so I cargo-culted that. I don't
  * think it's why I never saw problem, but harmless enough to leave in.
  */
-export function PlausibleInitializer() {
+export function PlausibleInitializer(): JSX.Element | null {
   // PLAUSIBLE_KEY should exist in all envs, but if empty/missing, don't run.
   return PLAUSIBLE_KEY ? (
     <Script

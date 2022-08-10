@@ -3,7 +3,7 @@ name: Scheduled Deploy
 on:
   schedule:
     # Weekly Tuesday & Thursdays @ 16:00 UTC (8am PST [winter] / 9am PDT [summer])
-     - cron: '0 16 * * 2'
+     - cron: '0 16 * * 2,4'
   workflow_dispatch:
     inputs:
       image_tag:
@@ -19,17 +19,12 @@ env:
   DOCKER_BUILDKIT: 1
   COMPOSE_DOCKER_CLI_BUILD: 1
   DOCKER_REPO: ${{ secrets.ECR_REPO }}/
-  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   upgrade:
     runs-on: ubuntu-20.04
     steps:
-      - uses: act10ns/slack@v1
-        with:
-          status: starting
-        if: always()
       - name: Configure AWS Prod Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -62,8 +57,3 @@ jobs:
           required_contexts: ""
         env:
           GITHUB_TOKEN: ${{ secrets.CZIBUILDBOT_GITHUB_TOKEN }}
-      - uses: act10ns/slack@v1
-        with:
-          status: ${{ job.status }}
-          steps: ${{ toJson(steps) }}
-        if: always()

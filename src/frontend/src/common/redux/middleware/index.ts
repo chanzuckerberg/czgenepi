@@ -5,14 +5,25 @@
  */
 
 import { AnyAction, Middleware } from "redux";
+import { expireAllCaches } from "src/common/queries/groups";
 import { setLocalStorage } from "src/common/utils/localStorage";
+import { selectCurrentGroup } from "../selectors";
 import { CZGEReduxActions, ReduxPersistenceTokens } from "../types";
 
 export const setGroupMiddleware: Middleware =
-  () => (next) => (action: AnyAction) => {
+  ({ getState }) =>
+  (next) =>
+  (action: AnyAction) => {
     const { type, payload } = action;
     if (type === CZGEReduxActions.SET_GROUP_ACTION_TYPE) {
       setLocalStorage(ReduxPersistenceTokens.GROUP, payload);
+
+      // if the group changes, expire caches, as samples, members
+      // and tress for new group must be fetched.
+      const state = getState();
+      if (selectCurrentGroup(state) !== payload) {
+        expireAllCaches();
+      }
     }
 
     return next(action);

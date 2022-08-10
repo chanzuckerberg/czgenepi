@@ -1,10 +1,9 @@
+import { Icon } from "czifui";
 import React, { useState } from "react";
 import {
   ColumnFlexContainer,
   RowFlexContainer,
   StaticSizeDiv,
-  StyledArrowDownIcon,
-  StyledArrowUpIcon,
   StyledCallout,
   StyledCollapse,
 } from "./style";
@@ -35,7 +34,11 @@ export default function AlertAccordion({
           <StaticSizeDiv>{title}</StaticSizeDiv>
           <StyledCollapse in={isCollapseOpen}>{collapseContent}</StyledCollapse>
         </ColumnFlexContainer>
-        {isCollapseOpen ? <StyledArrowUpIcon /> : <StyledArrowDownIcon />}
+        {isCollapseOpen ? (
+          <Icon sdsIcon="chevronUp" sdsSize="s" sdsType="static" />
+        ) : (
+          <Icon sdsIcon="chevronDown" sdsSize="s" sdsType="static" />
+        )}
       </RowFlexContainer>
     </StyledCallout>
   );

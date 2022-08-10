@@ -18,7 +18,7 @@ import { setFeatureFlagsFromQueryParams } from "src/common/utils/featureFlags";
 import Nav from "src/components/NavBar";
 import SplitInitializer from "src/components/Split";
 
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 setFeatureFlagsFromQueryParams();
 
 const App = ({ Component, pageProps }: AppProps): JSX.Element => {

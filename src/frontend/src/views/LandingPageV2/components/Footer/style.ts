@@ -90,14 +90,14 @@ export const FooterContainer = styled.div`
   color: white;
   padding: 64px 115px;
 
-  ${SmallerThanBreakpoint(`
-    padding: 32px 20px 42px 20px;
-  `)}
-
   & a {
     color: white;
     ${footerText}
   }
+
+  ${SmallerThanBreakpoint(`
+    padding: 32px 20px 42px 20px;
+  `)}
 `;
 
 export const FooterLogoContainer = styled.a`
@@ -142,14 +142,6 @@ export const FooterTopLink = styled.a`
 `;
 
 export const FooterTopLinks = styled.div`
-  ${SmallerThanBreakpoint(`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    margin-top: 28px;
-  `)}
-
   a + a {
     margin-left: 39px;
 
@@ -158,6 +150,14 @@ export const FooterTopLinks = styled.div`
       margin-top: 11px;
     `)}
   }
+
+  ${SmallerThanBreakpoint(`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-top: 28px;
+  `)}
 `;
 
 export const Span = styled.span``;

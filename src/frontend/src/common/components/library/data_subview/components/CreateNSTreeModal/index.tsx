@@ -1,10 +1,9 @@
 import RadioGroup from "@material-ui/core/RadioGroup";
-import CloseIcon from "@material-ui/icons/Close";
+import { Icon } from "czifui";
 import { uniq } from "lodash";
 import Image from "next/image";
 import NextLink from "next/link";
 import React, { SyntheticEvent, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import {
   AnalyticsTreeCreationNextstrain,
   EVENT_TYPES,
@@ -16,14 +15,17 @@ import { TreeTypes } from "src/common/constants/types";
 import GisaidLogo from "src/common/images/gisaid-logo-full.png";
 import { useLineages } from "src/common/queries/lineages";
 import { RawTreeCreationWithId, useCreateTree } from "src/common/queries/trees";
-import { selectCurrentGroup } from "src/common/redux/selectors";
 import { ROUTES } from "src/common/routes";
 import { B } from "src/common/styles/basicStyle";
+import {
+  StyledCloseIconButton,
+  StyledCloseIconWrapper,
+} from "src/common/styles/iconStyle";
 import { pluralize } from "src/common/utils/strUtils";
 import Notification from "src/components/Notification";
 import { TreeNameInput } from "src/components/TreeNameInput";
 import { ContactUsLink } from "../ContactUsLink";
-import { Header, StyledIconButton } from "../DownloadModal/style";
+import { Header } from "../DownloadModal/style";
 import { FailedSampleAlert } from "../FailedSampleAlert";
 import { CreateTreeButton } from "./components/CreateTreeButton";
 import { MissingSampleAlert } from "./components/MissingSampleAlert";
@@ -46,7 +48,7 @@ import {
   StyledDialogTitle,
   StyledFooter,
   StyledFormControlLabel,
-  StyledInfoOutlinedIcon,
+  StyledInfoIconWrapper,
   StyledRadio,
   StyledTooltip,
   Title,
@@ -124,8 +126,7 @@ export const CreateNSTreeModal = ({
   const treeNameLength = treeName.length;
   const hasValidName = treeNameLength > 0 && treeNameLength <= 128;
 
-  const groupId = useSelector(selectCurrentGroup);
-  const mutation = useCreateTree(groupId, {
+  const mutation = useCreateTree({
     componentOnError: () => {
       setShouldShowErrorNotification(true);
       handleClose();
@@ -229,9 +230,11 @@ export const CreateNSTreeModal = ({
         onClose={handleClose}
       >
         <StyledDialogTitle>
-          <StyledIconButton onClick={handleClose}>
-            <CloseIcon />
-          </StyledIconButton>
+          <StyledCloseIconButton aria-label="close modal" onClick={handleClose}>
+            <StyledCloseIconWrapper>
+              <Icon sdsIcon="xMark" sdsSize="l" sdsType="static" />
+            </StyledCloseIconWrapper>
+          </StyledCloseIconButton>
           <Header>Create New Phylogenetic Tree</Header>
           <Title>
             {allSamplesRequestedTableAndInput.length}{" "}
@@ -262,7 +265,13 @@ export const CreateNSTreeModal = ({
                 title={TREE_TYPE_TOOLTIP_TEXT}
                 placement="top"
               >
-                <StyledInfoOutlinedIcon />
+                <StyledInfoIconWrapper>
+                  <Icon
+                    sdsIcon="infoCircle"
+                    sdsSize="xs"
+                    sdsType="interactive"
+                  />
+                </StyledInfoIconWrapper>
               </StyledTooltip>
             </TreeNameInfoWrapper>
             <RadioGroup

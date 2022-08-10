@@ -6,11 +6,16 @@ env:
   DOCKER_BUILDKIT: 1
   COMPOSE_DOCKER_CLI_BUILD: 1
   DOCKER_REPO: ${{ secrets.ECR_REPO }}/
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
 jobs:
   upgrade:
     runs-on: ubuntu-20.04
     steps:
+      - uses: act10ns/slack@v1
+        with:
+          status: starting
+        if: github.event.deployment.environment == 'prod'
       - name: Configure AWS Prod Credentials
         uses: aws-actions/configure-aws-credentials@v1
         if: github.event.deployment.environment == 'prod'
@@ -65,6 +70,11 @@ jobs:
           state: success
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: act10ns/slack@v1
+        with:
+          status: ${{ job.status }}
+          steps: ${{ toJson(steps) }}
+        if: github.event.deployment.environment == 'prod' || failure()
       - name: Set deployment status to failure if errors
         uses: avakar/set-deployment-status@v1
         if: failure()

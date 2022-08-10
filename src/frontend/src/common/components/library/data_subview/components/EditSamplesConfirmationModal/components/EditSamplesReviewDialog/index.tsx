@@ -1,10 +1,8 @@
 import { Checkbox } from "czifui";
 import { map, pickBy } from "lodash";
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { useEditSamples } from "src/common/queries/samples";
-import { selectCurrentGroup } from "src/common/redux/selectors";
 import { ROUTES } from "src/common/routes";
 import { B } from "src/common/styles/basicStyle";
 import { getIdFromCollectionLocation } from "src/common/utils/locationUtils";
@@ -45,8 +43,7 @@ const EditSamplesReviewDialog = ({
   onSaveSuccess,
 }: Props): JSX.Element => {
   const [isChecked, setChecked] = useState<boolean>(false);
-  const groupId = useSelector(selectCurrentGroup);
-  const editSampleMutation = useEditSamples(groupId, {
+  const editSampleMutation = useEditSamples({
     componentOnSuccess: () => {
       onSaveSuccess();
     },

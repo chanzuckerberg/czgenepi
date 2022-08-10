@@ -1,6 +1,10 @@
+from typing import Optional
+
 from splitio import get_factory
 from splitio.client.client import Client as SplitioClient
 from splitio.exceptions import TimeoutException
+
+from aspen.database.models import Group, User
 
 
 class SplitClient:
@@ -22,11 +26,15 @@ class SplitClient:
         self.split_factory = factory
         self.split_client: SplitioClient = factory.client()
 
-    def generate_parameters(self, user):
-        user_parameters = {"user_id": user.id, "group_id": user.group.id}
-        return user_parameters
+    def generate_parameters(self, user: User, group: Optional[Group]):
+        params = {"user_id": user.split_id}
+        if group:
+            params["group_id"] = group.id
+        return params
 
-    def get_flag(self, user, treatment):
-        parameters = self.generate_parameters(user)
-        treatment = self.split_client.get_treatment(user.id, treatment, parameters)
+    def get_flag(self, treatment: str, user: User, group: Optional[Group] = None):
+        parameters = self.generate_parameters(user, group)
+        treatment = self.split_client.get_treatment(
+            user.split_id, treatment, parameters
+        )
         return treatment

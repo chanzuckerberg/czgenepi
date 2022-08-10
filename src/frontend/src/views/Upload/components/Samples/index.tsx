@@ -1,5 +1,4 @@
-import { Close } from "@material-ui/icons";
-import { Button } from "czifui";
+import { Button, Icon } from "czifui";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { HeadAppTitle } from "src/common/components";
@@ -143,7 +142,9 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
                   sdsType="primary"
                   sdsStyle="minimal"
                   onClick={handleRemoveAllClick}
-                  startIcon={<Close />}
+                  startIcon={
+                    <Icon sdsIcon="xMark" sdsSize="s" sdsType="static" />
+                  }
                 >
                   REMOVE ALL
                 </StyledRemoveAllButton>

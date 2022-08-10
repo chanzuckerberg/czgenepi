@@ -1,5 +1,5 @@
 import os
-from typing import Optional
+from typing import Optional, Tuple
 from urllib.parse import urlencode
 
 import sqlalchemy as sa
@@ -14,11 +14,12 @@ from starlette.responses import Response
 
 import aspen.api.error.http_exceptions as ex
 from aspen.api.authn import get_auth0_apiclient
-from aspen.api.deps import get_auth0_client, get_db, get_settings
+from aspen.api.deps import get_auth0_client, get_db, get_settings, get_splitio
 from aspen.api.settings import Settings
 from aspen.auth.auth0_management import Auth0Client
 from aspen.auth.role_manager import RoleManager
 from aspen.database.models import Group, User
+from aspen.util.split import SplitClient
 
 # From the example here:
 # https://github.com/authlib/demo-oauth-client/tree/master/fastapi-google-login
@@ -46,7 +47,9 @@ async def login(
     )
 
 
-async def create_user_if_not_exists(db, auth0_mgmt, userinfo) -> User:
+async def create_user_if_not_exists(
+    db, auth0_mgmt, userinfo
+) -> Tuple[User, Optional[Group]]:
     auth0_user_id = userinfo.get("sub")
     if not auth0_user_id:
         # User ID really needs to be present
@@ -57,7 +60,7 @@ async def create_user_if_not_exists(db, auth0_mgmt, userinfo) -> User:
     try:
         # Return early if this user already exists
         user = userquery.scalars().one()
-        return user
+        return user, None
     except NoResultFound:
         pass
     # We're currently only creating new users if they're confirming an org invitation
@@ -87,35 +90,60 @@ async def create_user_if_not_exists(db, auth0_mgmt, userinfo) -> User:
     }
     newuser = User(**user_fields)
     db.add(newuser)
-    return newuser
+    await db.commit()
+    return newuser, group
 
 
 @router.get("/callback")
 async def auth(
     request: Request,
     auth0: StarletteOAuth2App = Depends(get_auth0_client),
+    splitio: SplitClient = Depends(get_splitio),
     db: AsyncSession = Depends(get_db),
     auth0_mgmt: Auth0Client = Depends(get_auth0_apiclient),
+    error_description: Optional[str] = None,
 ) -> Response:
+    if error_description:
+        # Note: Auth0 sends the message "invitation not found or already used" for *both* expired and
+        # already-used tokens, so users will typically only see the already_accepted error. The "expired"
+        # page becomes fallback in case there are any unknown errors auth0 sends.
+        if "already used" in error_description:
+            return RedirectResponse(
+                os.getenv("FRONTEND_URL", "") + "/auth/invite/already_accepted"
+            )
+        else:
+            return RedirectResponse(
+                os.getenv("FRONTEND_URL", "") + "/auth/invite/expired"
+            )
     try:
         token = await auth0.authorize_access_token(request)
     except OAuthError:
         raise ex.UnauthorizedException("Invalid token")
     userinfo = token.get("userinfo")
-    if userinfo:
-        # Store the user information in flask session.
-        request.session["jwt_payload"] = userinfo
-        request.session["profile"] = {
-            "user_id": userinfo["sub"],
-            "name": userinfo["name"],
-        }
-        user = await create_user_if_not_exists(db, auth0_mgmt, userinfo)
-        # Always re-sync auth0 groups to our db on login!
-        await RoleManager.sync_user_roles(db, auth0_mgmt, user)
-        await db.commit()
-    else:
+    if not userinfo:
         raise ex.UnauthorizedException("No user info in token")
-    return RedirectResponse(os.getenv("FRONTEND_URL", "") + "/data/samples")
+    # Store the user information in flask session.
+    request.session["jwt_payload"] = userinfo
+    request.session["profile"] = {
+        "user_id": userinfo["sub"],
+        "name": userinfo["name"],
+    }
+    user, newuser_group = await create_user_if_not_exists(db, auth0_mgmt, userinfo)
+    # Always re-sync auth0 groups to our db on login!
+    # Make sure the user is in auth0 before sync'ing roles.
+    #  ex: User1 in local dev doesn't exist in auth0
+    sync_roles = splitio.get_flag("sync_auth0_roles", user)
+    if sync_roles == "on":
+        if user.auth0_user_id.startswith("auth0|"):
+            await RoleManager.sync_user_roles(db, auth0_mgmt, user)
+        await db.commit()
+
+    if userinfo.get("org_id") and newuser_group:
+        return RedirectResponse(
+            os.getenv("FRONTEND_URL", "") + f"/welcome/{newuser_group.id}"
+        )
+    else:
+        return RedirectResponse(os.getenv("FRONTEND_URL", "") + "/data/samples")
 
 
 @router.get("/logout")

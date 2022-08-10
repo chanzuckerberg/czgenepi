@@ -9,8 +9,6 @@ import {
 import { analyticsTrackEvent } from "src/common/analytics/methods";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { RawSamplesWithId, useCreateSamples } from "src/common/queries/samples";
-import { useSelector } from "src/common/redux/hooks";
-import { selectCurrentGroup } from "src/common/redux/selectors";
 import { ROUTES } from "src/common/routes";
 import Dialog from "src/components/Dialog";
 import { SampleIdToMetadata } from "src/components/WebformTable/common/types";
@@ -40,27 +38,23 @@ export default function Upload({
   cancelPrompt,
 }: Props): JSX.Element {
   const [isOpen, setIsOpen] = useState(false);
-  const groupId = useSelector(selectCurrentGroup);
 
-  const { mutate, isLoading, isSuccess, isError, error } = useCreateSamples(
-    groupId,
-    {
-      componentOnSuccess: (respData: RawSamplesWithId) => {
-        // Analytics event: successful upload of samples
-        const createdSamples = respData.samples;
-        const createdIds = createdSamples.map((sample) => sample.id);
-        analyticsTrackEvent<AnalyticsSamplesUploadSuccess>(
-          EVENT_TYPES.SAMPLES_UPLOAD_SUCCESS,
-          {
-            sample_count: createdIds.length,
-            sample_ids: JSON.stringify(createdIds),
-          }
-        );
+  const { mutate, isLoading, isSuccess, isError, error } = useCreateSamples({
+    componentOnSuccess: (respData: RawSamplesWithId) => {
+      // Analytics event: successful upload of samples
+      const createdSamples = respData.samples;
+      const createdIds = createdSamples.map((sample) => sample.id);
+      analyticsTrackEvent<AnalyticsSamplesUploadSuccess>(
+        EVENT_TYPES.SAMPLES_UPLOAD_SUCCESS,
+        {
+          sample_count: createdIds.length,
+          sample_ids: JSON.stringify(createdIds),
+        }
+      );
 
-        cancelPrompt();
-      },
-    }
-  );
+      cancelPrompt();
+    },
+  });
 
   return (
     <>

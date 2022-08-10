@@ -4,12 +4,13 @@ import {
   fontBodyXxs,
   fontHeaderXs,
   getColors,
-  getIconSizes,
   getSpaces,
 } from "czifui";
-import { StyledInfoOutlinedIcon as InfoIcon } from "src/common/components/library/data_subview/components/CreateNSTreeModal/style";
 import { TreeRowContent } from "src/common/components/library/data_table/style";
-import TreeIcon from "src/common/icons/PhyloTree.svg";
+import {
+  iconFillGray,
+  iconFillGrayHoverPrimary,
+} from "src/common/styles/iconStyle";
 
 export interface ExtraProps extends CommonThemeProps {
   disabled?: boolean;
@@ -43,6 +44,10 @@ export const CellWrapper = styled.div`
   align-items: center;
 `;
 
+export const StyledInfoIconWrapper = styled.div`
+  ${iconFillGrayHoverPrimary}
+`;
+
 export const StyledNameWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -65,27 +70,13 @@ export const StyledTreeCreator = styled.div`
   }}
 `;
 
-const xSmallIcon = (props: CommonThemeProps) => {
-  const iconSizes = getIconSizes(props);
-  return `
-    flex: 0 0 auto;
-    height: ${iconSizes?.xs.height}px;
-    width: ${iconSizes?.xs.width}px;
-  `;
-};
-
-export const StyledInfoIcon = styled(InfoIcon)`
-  ${xSmallIcon}
-`;
-
-export const StyledTreeIcon = styled(TreeIcon)`
+export const StyledTreeIconWrapper = styled.div`
+  ${iconFillGray}
   ${(props) => {
-    const colors = getColors(props);
     const spaces = getSpaces(props);
 
     return `
       margin: 0 ${spaces?.l}px;
-      fill: ${colors?.gray[500]};
     `;
   }}
 `;

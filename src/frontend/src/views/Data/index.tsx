@@ -2,12 +2,10 @@ import { compact, map, uniq } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { FunctionComponent, useEffect, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
 import { HeadAppTitle } from "src/common/components";
 import { useProtectedRoute } from "src/common/queries/auth";
 import { usePhyloRunInfo } from "src/common/queries/phyloRuns";
 import { useSampleInfo } from "src/common/queries/samples";
-import { selectCurrentGroup } from "src/common/redux/selectors";
 import { FilterPanel } from "src/components/FilterPanel";
 import { DataSubview } from "../../common/components";
 import { EMPTY_OBJECT } from "../../common/constants/empty";
@@ -76,17 +74,35 @@ const Data: FunctionComponent = () => {
 
   const router = useRouter();
 
-  const groupId = useSelector(selectCurrentGroup);
-  const sampleResponse = useSampleInfo(groupId);
-  const PhyloRunResponse = usePhyloRunInfo(groupId);
-  const { data: sampleData, isLoading: isSampleInfoLoading } = sampleResponse;
-  const { data: phyloRunData, isLoading: isTreeInfoLoading } = PhyloRunResponse;
+  const sampleResponse = useSampleInfo();
+  const PhyloRunResponse = usePhyloRunInfo();
+  const {
+    data: sampleData,
+    isLoading: isSampleInfoLoading,
+    isFetching: isSampleInfoFetching,
+  } = sampleResponse;
+  const {
+    data: phyloRunData,
+    isLoading: isTreeInfoLoading,
+    isFetching: isTreeInfoFetching,
+  } = PhyloRunResponse;
 
   useEffect(() => {
     setIsDataLoading(true);
-    if (isTreeInfoLoading || isSampleInfoLoading) return;
+    if (
+      isTreeInfoLoading ||
+      isSampleInfoLoading ||
+      isTreeInfoFetching ||
+      isSampleInfoFetching
+    )
+      return;
     setIsDataLoading(false);
-  }, [isTreeInfoLoading, isSampleInfoLoading]);
+  }, [
+    isTreeInfoLoading,
+    isSampleInfoLoading,
+    isTreeInfoFetching,
+    isSampleInfoFetching,
+  ]);
 
   const { samples, phyloRuns } = useMemo(
     () => ({

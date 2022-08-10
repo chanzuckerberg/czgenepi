@@ -1,6 +1,5 @@
 import styled from "@emotion/styled";
 import { FormControlLabel, Radio, TextField } from "@material-ui/core";
-import InfoOutlinedIcon from "@material-ui/icons/InfoOutlined";
 import {
   Button,
   CommonThemeProps,
@@ -17,6 +16,7 @@ import DialogContent from "src/common/components/library/Dialog/components/Dialo
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import NextstrainLogoImg from "src/common/images/nextstrain-inline.svg";
 import { transparentScrollbars } from "src/common/styles/basicStyle";
+import { iconFillGrayHoverPrimary } from "src/common/styles/iconStyle";
 import Dialog from "src/components/Dialog";
 
 export const Attribution = styled.div`
@@ -119,6 +119,10 @@ export const FieldTitle = styled.div`
   color: black;
 `;
 
+export const StyledInfoIconWrapper = styled.div`
+  ${iconFillGrayHoverPrimary}
+`;
+
 export const StyledRadio = styled(Radio)`
   vertical-align: top;
   height: 20px;
@@ -213,21 +217,6 @@ export const StyledTooltip = styled(Tooltip)`
     const spaces = getSpaces(props);
     return `
       margin-left: ${spaces?.xxs}px;
-    `;
-  }}
-`;
-
-export const StyledInfoOutlinedIcon = styled(InfoOutlinedIcon)`
-  width: 14px;
-  height: 15px;
-  ${(props) => {
-    const colors = getColors(props);
-    return `
-      color: ${colors?.gray[500]};
-      &:hover {
-        color: ${colors?.primary[400]};
-      }
-
     `;
   }}
 `;

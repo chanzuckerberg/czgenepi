@@ -10,6 +10,7 @@
  * for previously acknowledged users by changing date of CURRENT_POLICY_VERSION.
  */
 
+import { Icon, IconButton } from "czifui";
 import React from "react";
 import { useUpdateUserInfo, useUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
@@ -17,9 +18,8 @@ import { B } from "src/common/styles/basicStyle";
 import {
   Container,
   DummyCenteringSpacer,
+  InfoIconWrapper,
   MainText,
-  StyledCloseIcon,
-  StyledIconInfo,
   StyledNewTabLink,
 } from "./style";
 
@@ -53,7 +53,7 @@ const determineIfAcknowledgmentNeeded = (user: User | undefined): boolean => {
   return true;
 };
 
-const AcknowledgePolicyChanges = () => {
+const AcknowledgePolicyChanges = (): JSX.Element | null => {
   const { data: userInfo } = useUserInfo();
   const isAcknowledgmentNeeded = determineIfAcknowledgmentNeeded(userInfo);
 
@@ -73,7 +73,9 @@ const AcknowledgePolicyChanges = () => {
     <Container>
       <DummyCenteringSpacer />
       <MainText>
-        <StyledIconInfo />
+        <InfoIconWrapper>
+          <Icon sdsIcon="infoCircle" sdsSize="l" sdsType="static" />
+        </InfoIconWrapper>
         <B>We are no longer supporting automatic GISAID submissions. </B>
         This change is reflected in our updated{" "}
         <StyledNewTabLink href={ROUTES.TERMS}>
@@ -85,7 +87,14 @@ const AcknowledgePolicyChanges = () => {
         </StyledNewTabLink>{" "}
         effective September 30.
       </MainText>
-      <StyledCloseIcon onClick={handleClick} />
+      <IconButton
+        onClick={handleClick}
+        aria-label="Acknowledge policy changes"
+        sdsSize="large"
+        sdsType="secondary"
+      >
+        <Icon sdsIcon="xMark" sdsSize="l" sdsType="iconButton" />
+      </IconButton>
     </Container>
   );
 };

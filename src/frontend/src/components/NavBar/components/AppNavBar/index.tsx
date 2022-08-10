@@ -4,6 +4,7 @@ import Link from "next/link";
 import React, { MouseEventHandler, useState } from "react";
 import { useUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
+import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
 import { FEATURE_FLAGS, isFlagOn } from "src/components/Split";
 import { InviteModal } from "src/views/GroupMembersPage/components/MembersTab/components/InviteModal";
 import RightNav from "../RightNav";
@@ -16,7 +17,7 @@ import {
   NavBar,
   NavOrg,
   Separator,
-  StyledIcon,
+  StyledNavIconWrapper,
 } from "./style";
 
 /*
@@ -31,7 +32,7 @@ const AppNavBar = (): JSX.Element => {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState<boolean>(false);
   const { data: userInfo } = useUserInfo();
 
-  const group = userInfo?.group;
+  const group = getCurrentGroupFromUserInfo(userInfo);
   const route = userInfo ? ROUTES.DATA : ROUTES.HOMEPAGE;
 
   const flag = useTreatments([FEATURE_FLAGS.user_onboarding_v0]);
@@ -46,10 +47,11 @@ const AppNavBar = (): JSX.Element => {
     setIsGroupDetailsDropdownOpen(!isGroupDetailsDropdownOpen);
   };
 
+  const name = group?.name;
   const orgElements = (
     <React.Fragment>
       <Separator />
-      <NavOrg>{group?.name}</NavOrg>
+      <NavOrg>{name}</NavOrg>
     </React.Fragment>
   );
 
@@ -62,7 +64,6 @@ const AppNavBar = (): JSX.Element => {
   }
 
   const orgSplash = hasOrg();
-  const name = group?.name;
 
   return (
     <NavBar data-test-id="navbar">
@@ -83,9 +84,9 @@ const AppNavBar = (): JSX.Element => {
             />
             <DropdownClickTarget onClick={toggleDropdown}>
               <NavOrg>{name}</NavOrg>
-              <StyledIcon>
+              <StyledNavIconWrapper>
                 <Icon sdsIcon="chevronDown" sdsSize="xs" sdsType="static" />
-              </StyledIcon>
+              </StyledNavIconWrapper>
               <GroupDetailsDropdown
                 anchorEl={anchorEl}
                 onClickInvite={() => setIsInviteModalOpen(true)}

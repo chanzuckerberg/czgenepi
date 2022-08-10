@@ -10,6 +10,16 @@ export const HEADERS_TO_METADATA_KEYS = invert(
   SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS
 ) as Dictionary<keyof SampleUploadTsvMetadata>;
 
+export const NEXTSTRAIN_FORMAT_HEADERS_TO_METADATA_KEYS: Record<
+  string,
+  string
+> = {
+  date: "collectionDate",
+  location: "collectionLocation",
+  gisaid_epi_isl: "publicId",
+  strain: "strain",
+};
+
 // We don't send all metadata keys to API. sampleId is not persisted.
 type KEYS_SENT_TO_API = Omit<SampleUploadTsvMetadata, "sampleId">;
 export const METADATA_KEYS_TO_API_KEYS: Record<keyof KEYS_SENT_TO_API, string> =

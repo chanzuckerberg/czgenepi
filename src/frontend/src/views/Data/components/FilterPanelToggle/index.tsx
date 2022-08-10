@@ -1,7 +1,5 @@
-import { SvgIcon } from "@material-ui/core";
-import { IconButton, Tooltip } from "czifui";
+import { Icon, IconButton, Tooltip } from "czifui";
 import React, { FC, useState } from "react";
-import IconFilters from "src/common/icons/IconFilters.svg";
 import { StyledBadge, StyledDiv, tooltipStyles } from "./style";
 
 interface Props {
@@ -31,12 +29,13 @@ export const FilterPanelToggle: FC<Props> = ({
     >
       <StyledDiv>
         <IconButton
+          aria-label={`${activeFilterCount} active filters`}
           active={isActive}
           onClick={handleclick}
           sdsSize="large"
           sdsType="secondary"
         >
-          <SvgIcon viewBox="0 0 32 32" component={IconFilters} />
+          <Icon sdsIcon="slidersHorizontal" sdsSize="l" sdsType="static" />
           {activeFilterCount > 0 && (
             <StyledBadge>{activeFilterCount}</StyledBadge>
           )}

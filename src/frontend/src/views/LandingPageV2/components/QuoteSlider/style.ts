@@ -5,14 +5,6 @@ export const QuoteSliderContainer = styled.div`
   padding-bottom: 100px;
   text-align: center;
 
-  ${(props) => {
-    const colors = getColors(props);
-
-    return `
-      background: ${colors?.primary[400]};
-    `;
-  }}
-
   & .slick-dots {
     bottom: -22%;
 
@@ -31,4 +23,12 @@ export const QuoteSliderContainer = styled.div`
       }
     }
   }
+
+  ${(props) => {
+    const colors = getColors(props);
+
+    return `
+      background: ${colors?.primary[400]};
+    `;
+  }}
 `;

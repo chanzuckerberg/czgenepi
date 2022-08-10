@@ -16,3 +16,8 @@ export const pluralizeVerb = (str: string, count: number): string => {
   if (WORDS_TO_PLURALIZE[str]) return WORDS_TO_PLURALIZE[str];
   return str;
 };
+
+type SortResponse = -1 | 0 | 1;
+export const caseInsensitiveSort = (a: string, b: string): SortResponse => {
+  return a.toLowerCase() > b.toLowerCase() ? 1 : -1;
+};

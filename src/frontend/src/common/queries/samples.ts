@@ -12,7 +12,7 @@ import {
   DEFAULT_DELETE_OPTIONS,
   DEFAULT_POST_OPTIONS,
   fetchSamples,
-  generateGroupSpecificUrl,
+  generateOrgSpecificUrl,
   ORG_API,
   putBackendApiJson,
   SampleResponse,
@@ -30,19 +30,16 @@ interface SampleFastaDownloadPayload {
 
 type FastaDownloadCallbacks = MutationCallbacks<Blob>;
 
-export async function downloadSamplesFasta(
-  groupId: number,
-  {
-    sampleIds,
-  }: {
-    sampleIds: string[];
-  }
-): Promise<Blob> {
+export async function downloadSamplesFasta({
+  sampleIds,
+}: {
+  sampleIds: string[];
+}): Promise<Blob> {
   const payload = {
     sample_ids: sampleIds,
   };
   const response = await fetch(
-    API_URL + generateGroupSpecificUrl(ORG_API.SAMPLES_FASTA_DOWNLOAD, groupId),
+    API_URL + generateOrgSpecificUrl(ORG_API.SAMPLES_FASTA_DOWNLOAD),
     {
       ...DEFAULT_POST_OPTIONS,
       body: JSON.stringify(payload),
@@ -53,11 +50,16 @@ export async function downloadSamplesFasta(
   throw Error(`${response.statusText}: ${await response.text()}`);
 }
 
-export function useFastaDownload(
-  groupId: number,
-  { componentOnError, componentOnSuccess }: FastaDownloadCallbacks
-): UseMutationResult<Blob, unknown, SampleFastaDownloadPayload, unknown> {
-  return useMutation((toMutate) => downloadSamplesFasta(groupId, toMutate), {
+export function useFastaDownload({
+  componentOnError,
+  componentOnSuccess,
+}: FastaDownloadCallbacks): UseMutationResult<
+  Blob,
+  unknown,
+  SampleFastaDownloadPayload,
+  unknown
+> {
+  return useMutation(downloadSamplesFasta, {
     onError: componentOnError,
     onSuccess: componentOnSuccess,
   });
@@ -70,16 +72,15 @@ interface ValidateSampleIdentifiersPayload {
   sample_ids: string[];
 }
 
-export async function validateSampleIdentifiers(
-  groupId: number,
-  { sampleIdsToValidate }: SampleValidationRequestType
-): Promise<SampleValidationResponseType> {
+export async function validateSampleIdentifiers({
+  sampleIdsToValidate,
+}: SampleValidationRequestType): Promise<SampleValidationResponseType> {
   const payload: ValidateSampleIdentifiersPayload = {
     sample_ids: sampleIdsToValidate,
   };
 
   const response = await fetch(
-    API_URL + generateGroupSpecificUrl(ORG_API.SAMPLES_VALIDATE_IDS, groupId),
+    API_URL + generateOrgSpecificUrl(ORG_API.SAMPLES_VALIDATE_IDS),
     {
       ...DEFAULT_POST_OPTIONS,
       body: JSON.stringify(payload),
@@ -101,22 +102,19 @@ export interface SampleValidationResponseType {
 type SampleValidationCallbacks =
   MutationCallbacks<SampleValidationResponseType>;
 
-export function useValidateSampleIds(
-  groupId: number,
-  { componentOnError, componentOnSuccess }: SampleValidationCallbacks
-): UseMutationResult<
+export function useValidateSampleIds({
+  componentOnError,
+  componentOnSuccess,
+}: SampleValidationCallbacks): UseMutationResult<
   SampleValidationResponseType,
   unknown,
   SampleValidationRequestType,
   unknown
 > {
-  return useMutation(
-    (toMutate) => validateSampleIdentifiers(groupId, toMutate),
-    {
-      onError: componentOnError,
-      onSuccess: componentOnSuccess,
-    }
-  );
+  return useMutation(validateSampleIdentifiers, {
+    onError: componentOnError,
+    onSuccess: componentOnSuccess,
+  });
 }
 
 /**
@@ -163,10 +161,10 @@ export interface RawSamplesWithId {
   samples: RawSampleWithId[];
 }
 
-export async function createSamples(
-  groupId: number,
-  { samples, metadata }: SampleCreateRequestType
-): Promise<RawSamplesWithId> {
+export async function createSamples({
+  samples,
+  metadata,
+}: SampleCreateRequestType): Promise<RawSamplesWithId> {
   const payload: SamplePayload[] = [];
 
   if (!samples || !metadata) {
@@ -212,7 +210,7 @@ export async function createSamples(
   }
 
   const response = await fetch(
-    API_URL + generateGroupSpecificUrl(ORG_API.SAMPLES, groupId),
+    API_URL + generateOrgSpecificUrl(ORG_API.SAMPLES),
     {
       ...DEFAULT_POST_OPTIONS,
       body: JSON.stringify(payload),
@@ -224,13 +222,12 @@ export async function createSamples(
   throw Error(`${response.statusText}: ${await response.text()}`);
 }
 
-export function useCreateSamples(
-  groupId: number,
-  {
-    componentOnSuccess,
-  }: { componentOnSuccess: (respData: RawSamplesWithId) => void }
-): UseMutationResult<unknown, unknown, SampleCreateRequestType, unknown> {
-  return useMutation((toMutate) => createSamples(groupId, toMutate), {
+export function useCreateSamples({
+  componentOnSuccess,
+}: {
+  componentOnSuccess: (respData: RawSamplesWithId) => void;
+}): UseMutationResult<unknown, unknown, SampleCreateRequestType, unknown> {
+  return useMutation(createSamples, {
     onSuccess: componentOnSuccess,
   });
 }
@@ -244,10 +241,8 @@ export const USE_SAMPLE_INFO = {
   id: "sampleInfo",
 };
 
-export function useSampleInfo(
-  groupId: number
-): UseQueryResult<SampleResponse, unknown> {
-  return useQuery([USE_SAMPLE_INFO], () => fetchSamples(groupId), {
+export function useSampleInfo(): UseQueryResult<SampleResponse, unknown> {
+  return useQuery([USE_SAMPLE_INFO], () => fetchSamples(), {
     retry: false,
   });
 }
@@ -262,16 +257,15 @@ interface DeleteSamplesPayload {
   ids: number[];
 }
 
-export async function deleteSamples(
-  groupId: number,
-  { samplesToDelete }: SampleDeleteRequestType
-): Promise<SampleDeleteResponseType> {
+export async function deleteSamples({
+  samplesToDelete,
+}: SampleDeleteRequestType): Promise<SampleDeleteResponseType> {
   const payload: DeleteSamplesPayload = {
     ids: samplesToDelete,
   };
 
   const response = await fetch(
-    API_URL + generateGroupSpecificUrl(ORG_API.SAMPLES, groupId),
+    API_URL + generateOrgSpecificUrl(ORG_API.SAMPLES),
     {
       ...DEFAULT_DELETE_OPTIONS,
       body: JSON.stringify(payload),
@@ -293,10 +287,10 @@ export interface SampleDeleteResponseType {
 
 type SampleDeleteCallbacks = MutationCallbacks<SampleDeleteResponseType>;
 
-export function useDeleteSamples(
-  groupId: number,
-  { componentOnError, componentOnSuccess }: SampleDeleteCallbacks
-): UseMutationResult<
+export function useDeleteSamples({
+  componentOnError,
+  componentOnSuccess,
+}: SampleDeleteCallbacks): UseMutationResult<
   SampleDeleteResponseType,
   unknown,
   SampleDeleteRequestType,
@@ -304,7 +298,7 @@ export function useDeleteSamples(
 > {
   const queryClient = useQueryClient();
   // TODO (mlila): pick less confusing name choices for callbacks/params
-  return useMutation((toMutate) => deleteSamples(groupId, toMutate), {
+  return useMutation(deleteSamples, {
     onError: componentOnError,
     onSuccess: async (data) => {
       await queryClient.invalidateQueries([USE_SAMPLE_INFO]);
@@ -362,27 +356,26 @@ interface SamplesEditResponseType {
 
 type SamplesEditCallbacks = MutationCallbacks<SamplesEditResponseType[]>;
 
-export async function editSamples(
-  groupId: number,
-  { samples }: SamplesEditRequestType
-): Promise<SamplesEditResponseType[]> {
+export async function editSamples({
+  samples,
+}: SamplesEditRequestType): Promise<SamplesEditResponseType[]> {
   return putBackendApiJson(
-    generateGroupSpecificUrl(ORG_API.SAMPLES, groupId),
+    generateOrgSpecificUrl(ORG_API.SAMPLES),
     JSON.stringify({ samples })
   );
 }
 
-export function useEditSamples(
-  groupId: number,
-  { componentOnError, componentOnSuccess }: SamplesEditCallbacks
-): UseMutationResult<
+export function useEditSamples({
+  componentOnError,
+  componentOnSuccess,
+}: SamplesEditCallbacks): UseMutationResult<
   SamplesEditResponseType[],
   unknown,
   SamplesEditRequestType,
   unknown
 > {
   const queryClient = useQueryClient();
-  return useMutation((toMutate) => editSamples(groupId, toMutate), {
+  return useMutation(editSamples, {
     onError: componentOnError,
     onSuccess: async (data) => {
       await queryClient.invalidateQueries([USE_SAMPLE_INFO]);

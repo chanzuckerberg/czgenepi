@@ -1,6 +1,7 @@
+import { PopperProps } from "@material-ui/core";
 import { FilterOptionsState } from "@material-ui/lab";
 import { createFilterOptions } from "@material-ui/lab/Autocomplete";
-import { DefaultMenuSelectOption } from "czifui";
+import { DefaultMenuSelectOption, Icon } from "czifui";
 import { isEqual } from "lodash";
 import React from "react";
 import { noop } from "src/common/constants/empty";
@@ -8,7 +9,7 @@ import {
   MENU_OPTIONS_COLLECTION_DATE,
   MENU_OPTION_ALL_TIME,
 } from "src/components/DateFilterMenu/constants";
-import { StyledInfoOutlinedIcon, StyledTooltip } from "../../style";
+import { StyledTooltip } from "../../style";
 import { CollectionDateFilter } from "./components/CollectionDateFilter";
 import {
   StyledContainer,
@@ -18,6 +19,7 @@ import {
   StyledFilterGroup,
   StyledFilterGroupName,
   StyledFiltersSection,
+  StyledInfoIconWrapper,
   StyledNewTabLink,
 } from "./style";
 
@@ -156,7 +158,7 @@ const InputDropdownProps = {
 
 // DropdownPopper (for use with Dropdown's PopperComponent prop) needs to
 // have a `placement` prop to set where it anchors against Dropdown opener.
-const BottomPlacementDropdownPopper = (props: any) => {
+const BottomPlacementDropdownPopper = (props: PopperProps) => {
   return <StyledDropdownPopper placement="bottom-start" {...props} />;
 };
 
@@ -286,7 +288,9 @@ export function SampleFiltering({
           title={SAMPLE_FILTERING_TOOLTIP_TEXT}
           placement="top"
         >
-          <StyledInfoOutlinedIcon />
+          <StyledInfoIconWrapper>
+            <Icon sdsIcon="infoCircle" sdsSize="xs" sdsType="static" />
+          </StyledInfoIconWrapper>
         </StyledTooltip>
       </StyledExplainerTitle>
 

@@ -1,3 +1,4 @@
+import { Icon } from "czifui";
 import React, { useEffect, useState } from "react";
 import {
   StyledTextField,
@@ -8,7 +9,7 @@ import { CollapsibleInstructions } from "src/components/CollapsibleInstructions"
 import {
   InstructionsNotSemiBold,
   InstructionsSemiBold,
-  StyledErrorOutlinedIcon,
+  StyledErrorIconWrapper,
   StyledInstructions,
   TextInputLabelTitle,
 } from "./style";
@@ -84,7 +85,13 @@ const TreeNameInput = ({
       />
       {isTreeNameTooLong && (
         <TreeNameTooLongAlert>
-          <StyledErrorOutlinedIcon />
+          <StyledErrorIconWrapper>
+            <Icon
+              sdsIcon="exclamationMarkCircle"
+              sdsSize="s"
+              sdsType="static"
+            />
+          </StyledErrorIconWrapper>
           <TextFieldAlert>Name exceeds the 128 character limit.</TextFieldAlert>
         </TreeNameTooLongAlert>
       )}

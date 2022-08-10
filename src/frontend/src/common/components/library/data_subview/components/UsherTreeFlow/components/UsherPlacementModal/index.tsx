@@ -1,5 +1,5 @@
 import { TextField } from "@material-ui/core";
-import { DefaultMenuSelectOption, Dropdown, InputDropdown } from "czifui";
+import { DefaultMenuSelectOption, Dropdown, Icon, InputDropdown } from "czifui";
 import { cloneDeep, debounce } from "lodash";
 import React, { SyntheticEvent, useEffect, useState } from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
@@ -8,8 +8,10 @@ import {
   getUsherOptions,
   useFastaFetch,
 } from "src/common/queries/trees";
-import { useSelector } from "src/common/redux/hooks";
-import { selectCurrentGroup } from "src/common/redux/selectors";
+import {
+  StyledCloseIconButton,
+  StyledCloseIconWrapper,
+} from "src/common/styles/iconStyle";
 import { pluralize } from "src/common/utils/strUtils";
 import Dialog from "src/components/Dialog";
 import {
@@ -24,10 +26,9 @@ import {
   Content,
   FlexWrapper,
   StyledButton,
-  StyledCloseIcon,
   StyledDialogContent,
   StyledFieldTitleText,
-  StyledInfoIcon,
+  StyledInfoIconWrapper,
   StyledInputDropdown,
   StyledList,
   StyledListItem,
@@ -35,7 +36,7 @@ import {
   StyledSuggestionText,
   StyledSuggestionWrapper,
   StyledTextField,
-  StyledWarningIcon,
+  StyledWarningIconWrapper,
 } from "./style";
 
 interface Props {
@@ -112,8 +113,7 @@ export const UsherPlacementModal = ({
     setUsherDisabled(shouldDisable);
   }, [checkedSampleIds, failedSampleIds, isLoading]);
 
-  const groupId = useSelector(selectCurrentGroup);
-  const fastaFetch = useFastaFetch(groupId, {
+  const fastaFetch = useFastaFetch({
     componentOnError: () => {
       setIsLoading(false);
       onClose();
@@ -197,7 +197,14 @@ export const UsherPlacementModal = ({
       maxWidth={"sm"}
     >
       <StyledDialogTitle>
-        <StyledCloseIcon onClick={onClose} />
+        <StyledCloseIconButton
+          aria-label="Close UShER phylogenetic placement modal"
+          onClick={onClose}
+        >
+          <StyledCloseIconWrapper>
+            <Icon sdsIcon="xMark" sdsSize="l" sdsType="static" />
+          </StyledCloseIconWrapper>
+        </StyledCloseIconButton>
         <FlexWrapper>
           <Header>Run Phylogenetic Placement with UShER</Header>
           <StyledTooltip
@@ -206,7 +213,9 @@ export const UsherPlacementModal = ({
             title={MAIN_USHER_TOOLTIP_TEXT}
             placement="top"
           >
-            <StyledInfoIcon />
+            <StyledInfoIconWrapper>
+              <Icon sdsIcon="infoCircle" sdsSize="s" sdsType="interactive" />
+            </StyledInfoIconWrapper>
           </StyledTooltip>
         </FlexWrapper>
         <Title>
@@ -255,7 +264,13 @@ export const UsherPlacementModal = ({
                   title={PHYLOGENETIC_TREE_VERSION_TOOLTIP_TEXT}
                   placement="top"
                 >
-                  <StyledInfoIcon />
+                  <StyledInfoIconWrapper>
+                    <Icon
+                      sdsIcon="infoCircle"
+                      sdsSize="xs"
+                      sdsType="interactive"
+                    />
+                  </StyledInfoIconWrapper>
                 </StyledTooltip>
               </StyledFieldTitleText>
               <Dropdown
@@ -276,7 +291,13 @@ export const UsherPlacementModal = ({
                   title={SAMPLES_PER_SUBTREE_TOOLTIP_TEXT}
                   placement="top"
                 >
-                  <StyledInfoIcon />
+                  <StyledInfoIconWrapper>
+                    <Icon
+                      sdsIcon="infoCircle"
+                      sdsSize="xs"
+                      sdsType="interactive"
+                    />
+                  </StyledInfoIconWrapper>
                 </StyledTooltip>
               </StyledFieldTitleText>
               <StyledTextField>
@@ -288,7 +309,13 @@ export const UsherPlacementModal = ({
                 />
                 {shouldShowWarning && (
                   <StyledSuggestionWrapper>
-                    <StyledWarningIcon />
+                    <StyledWarningIconWrapper>
+                      <Icon
+                        sdsIcon="exclamationMarkCircle"
+                        sdsSize="s"
+                        sdsType="static"
+                      />
+                    </StyledWarningIconWrapper>
                     <StyledSuggestionText>
                       We recommend a value no lower than 50.
                     </StyledSuggestionText>

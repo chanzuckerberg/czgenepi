@@ -25,6 +25,7 @@ from aspen.api.schemas.phylo_runs import (
 )
 from aspen.api.settings import Settings
 from aspen.api.utils import (
+    expand_lineage_wildcards,
     get_matching_gisaid_ids,
     get_matching_gisaid_ids_by_epi_isl,
     get_missing_and_found_sample_ids,
@@ -123,12 +124,14 @@ async def kick_off_phylo_run(
     template_args = {}
     # Not all template_args keys are required, and we don't want to save empty fields.
     if phylo_run_request.template_args:
-        for k, v in dict(phylo_run_request.template_args).items():
-            if not v:
+        for key, value in dict(phylo_run_request.template_args).items():
+            if not value:
                 continue  # Skip this field
-            if "date" in k:
-                v = v.strftime("%Y-%m-%d")
-            template_args[k] = v
+            if "date" in key:
+                value = value.strftime("%Y-%m-%d")
+            if key == "filter_pango_lineages":
+                value = await expand_lineage_wildcards(db, value)
+            template_args[key] = value
     workflow: PhyloRun = PhyloRun(
         start_datetime=start_datetime,
         workflow_status=WorkflowStatusType.STARTED,

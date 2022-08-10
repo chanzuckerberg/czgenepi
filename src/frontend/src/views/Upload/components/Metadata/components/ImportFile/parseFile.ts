@@ -17,6 +17,7 @@ import {
   FORBIDDEN_NAME_CHARACTERS_REGEX,
   HEADERS_TO_METADATA_KEYS,
   MAX_NAME_LENGTH,
+  NEXTSTRAIN_FORMAT_HEADERS_TO_METADATA_KEYS,
 } from "../../../common/constants";
 /**
  * (Vince) Regarding interfaces for Warnings/Errors:
@@ -49,6 +50,7 @@ export interface ParseResult {
   data: SampleIdToMetadata;
   errorMessages: ErrorMessages;
   warningMessages: WarningMessages;
+  hasUnknownFields: boolean;
   filename: string;
 }
 
@@ -62,8 +64,15 @@ interface ParsedRow {
 
 // Helper -- Takes column header from file, converts to internal metadata key
 // If header is unrecognized, leaves it alone (useful for warnings, etc).
+// User can also use Nextstrain header defaults as an alias
 function convertHeaderToMetadataKey(headerName: string): string {
-  return HEADERS_TO_METADATA_KEYS[headerName] || headerName;
+  if (headerName in HEADERS_TO_METADATA_KEYS) {
+    return HEADERS_TO_METADATA_KEYS[headerName];
+  } else if (headerName in NEXTSTRAIN_FORMAT_HEADERS_TO_METADATA_KEYS) {
+    return NEXTSTRAIN_FORMAT_HEADERS_TO_METADATA_KEYS[headerName];
+  } else {
+    return headerName;
+  }
 }
 
 // Helper -- Returns any missing col header field names based on what header
@@ -78,11 +87,48 @@ function getMissingHeaderFields(
   for (const [headerField, metadataKey] of Object.entries(
     headersToMetadataKeys
   )) {
-    if (!uploadedHeaders.includes(metadataKey)) {
-      missingFields.add(headerField);
+    if (
+      !uploadedHeaders.includes(metadataKey) &&
+      !headerField.includes("Optional") &&
+      metadataKey !== "keepPrivate" // TODO: rename field to have -Optional flag
+    ) {
+      if (
+        ["privateId", "sampleId"].includes(metadataKey) &&
+        uploadedHeaders.includes("strain")
+      ) {
+        // pass, use strain to populate sample and privateID
+      } else {
+        missingFields.add(headerField);
+      }
     }
   }
   return missingFields.size !== 0 ? missingFields : null;
+}
+
+/**
+ * Helper -- Returns true if any col header name does not match one of
+ * our specified headers. Returns false if all column headers are known.
+ */
+function hasUnknownHeaderFields(
+  uploadedHeaders: string[],
+  headersToMetadataKeys: Dictionary<keyof SampleUploadTsvMetadata>
+): boolean {
+  // Compare strings since we are checking for values that are not in our
+  // defined list of headers.
+  const knownHeaderFields: string[] = Object.values(headersToMetadataKeys);
+  const knownNextstrainFields: string[] = Object.values(
+    NEXTSTRAIN_FORMAT_HEADERS_TO_METADATA_KEYS
+  );
+  for (const headerField of uploadedHeaders) {
+    if (
+      !knownHeaderFields.includes(headerField) &&
+      !knownNextstrainFields.includes(headerField)
+    ) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 // Helper -- Upload uses YES/NO to represent booleans for some columns
@@ -262,14 +308,14 @@ function parseRow(
  *
  * In addition to parsing out the data appropriately, records any warnings
  * and errors that were encountered (eg, a field was missing, etc) so that
- * those can be displayed to the user after pasing is complete.
+ * those can be displayed to the user after parsing is complete.
  *
  * In the case of some errors -- eg, missing column headers -- we consider it
  * so egregious we do not load any data from the file. User just gets an
  * error message telling them they need to fix it before we allow loading.
  *
  * Generally, this parses all entries in file and makes no attempt fo filter
- * the uploaded metadata down to the samples user user has previously uploaded.
+ * the uploaded metadata down to the samples the user has previously uploaded.
  * For example, if user uploaded only sample A, but then uploads metadata for
  * both A and B, this function will parse out both A and B. Filtering that
  * result down (in prior example, filtering to just A) is the responsibility
@@ -305,6 +351,14 @@ export function parseFile(
         meta: papaParseMeta,
       }: Papa.ParseResult<Record<string, string>>) => {
         const uploadedHeaders = papaParseMeta.fields as string[]; // available b/c `header: true`
+        if (uploadedHeaders.includes("strain")) {
+          // User is using the nextstrain metadata template headers, populate privateId and sampleId with strain
+          rows = rows.map((obj) => ({
+            ...obj,
+            privateId: obj["strain"],
+            sampleId: obj["strain"],
+          }));
+        }
 
         // Init -- Will modify these in place as we work through incoming rows.
         const sampleIdToMetadata: SampleIdToMetadata = {};
@@ -313,6 +367,11 @@ export function parseFile(
           WARNING_CODE,
           SampleIdToWarningMessages
         >();
+
+        const hasUnknownFields = hasUnknownHeaderFields(
+          uploadedHeaders,
+          HEADERS_TO_METADATA_KEYS
+        );
 
         const missingHeaderFields = getMissingHeaderFields(
           uploadedHeaders,
@@ -353,8 +412,9 @@ export function parseFile(
         resolve({
           data: sampleIdToMetadata,
           errorMessages,
-          warningMessages,
           filename: file.name,
+          hasUnknownFields,
+          warningMessages,
         });
       },
     });

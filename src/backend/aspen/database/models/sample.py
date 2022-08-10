@@ -100,7 +100,7 @@ class Sample(idbase, DictMixin):  # type: ignore
 
     sample_collector_contact_address = Column(
         String,
-        nullable=False,
+        nullable=True,
         info={
             "schema_mappings": {
                 "PHA4GE": "sample_collector_contact_address",

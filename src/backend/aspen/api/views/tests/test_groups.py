@@ -8,6 +8,7 @@ from aspen.api.views.tests.data.auth0_mock_responses import (
     DEFAULT_AUTH0_ORG,
 )
 from aspen.auth.auth0_management import Auth0Client
+from aspen.auth.role_manager import RoleManager
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.usergroup import group_factory, userrole_factory
 
@@ -40,6 +41,7 @@ async def test_list_members(
     )
     async_session.add(group)
     async_session.add(user3)
+    async_session.add(user2)
     async_session.add(group2)
     await async_session.commit()
 
@@ -65,6 +67,70 @@ async def test_list_members(
                 "agreed_to_tos": True,
                 "acknowledged_policy_version": None,
                 "email": user.email,
+                "group_admin": False,
+                "role": "member",
+            },
+        ]
+    }
+    resp_data = response.json()
+    for key in expected:
+        assert resp_data[key] == expected[key]
+
+
+async def test_list_members_secondary_group(
+    http_client: AsyncClient, async_session: AsyncSession
+) -> None:
+    group = group_factory()
+    group2 = group_factory(name="test_group2")
+    user = await userrole_factory(
+        async_session, group, name="Bob", auth0_user_id="testid02", email="bob@dph.org"
+    )
+    user2 = await userrole_factory(
+        async_session,
+        group,
+        name="Alice",
+        auth0_user_id="testid01",
+        email="alice@dph.org",
+        roles=["admin"],
+    )
+    user3 = await userrole_factory(
+        async_session,
+        group2,
+        name="Jane",
+        auth0_user_id="testid03",
+        email="jane@dph.org",
+    )
+    async_session.add(
+        await RoleManager.generate_user_role(async_session, user, group2, "member")
+    )
+    async_session.add(group)
+    async_session.add(user2)
+    async_session.add(user3)
+    async_session.add(group2)
+    await async_session.commit()
+
+    response = await http_client.get(
+        f"/v2/groups/{group2.id}/members/", headers={"user_id": user.auth0_user_id}
+    )
+    assert response.status_code == 200
+    # TODO - this response isn't sorted, so our test should handle unordered results.
+    expected = {
+        "members": [
+            {
+                "id": user.id,
+                "name": user.name,
+                "agreed_to_tos": True,
+                "acknowledged_policy_version": None,
+                "email": user.email,
+                "group_admin": False,
+                "role": "member",
+            },
+            {
+                "id": user3.id,
+                "name": user3.name,
+                "agreed_to_tos": True,
+                "acknowledged_policy_version": None,
+                "email": user3.email,
                 "group_admin": False,
                 "role": "member",
             },
@@ -234,6 +300,7 @@ async def test_create_group(
     assert resp_data["address"] == create_group_request["address"]
     assert resp_data["name"] == create_group_request["name"]
     assert resp_data["prefix"] == create_group_request["prefix"]
+    assert resp_data["submitting_lab"] == create_group_request["name"]
     assert isinstance(resp_data["id"], int)
 
     resp_loc = resp_data["default_tree_location"]

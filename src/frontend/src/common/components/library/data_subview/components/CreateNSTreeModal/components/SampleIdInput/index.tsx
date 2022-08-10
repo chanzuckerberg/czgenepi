@@ -1,3 +1,4 @@
+import { Icon } from "czifui";
 import { compact, filter } from "lodash";
 import React, { ChangeEvent, useCallback, useEffect, useState } from "react";
 import { INPUT_DELIMITERS } from "src/common/constants/inputDelimiters";
@@ -5,8 +6,6 @@ import {
   SampleValidationResponseType,
   useValidateSampleIds,
 } from "src/common/queries/samples";
-import { useSelector } from "src/common/redux/hooks";
-import { selectCurrentGroup } from "src/common/redux/selectors";
 import { pluralize } from "src/common/utils/strUtils";
 import { InputInstructions } from "./components/InputInstructions";
 import {
@@ -14,7 +13,7 @@ import {
   FlexContainer,
   StyledAddButton,
   StyledEditButton,
-  StyledLoadingAnimation,
+  StyledLoadingSpinnerWrapper,
   StyledSampleCount,
   StyledTextArea,
 } from "./style";
@@ -75,11 +74,9 @@ const SampleIdInput = ({
     return compact(trimmedTokens);
   }, [inputValue]);
 
-  const groupId = useSelector(selectCurrentGroup);
-
   // TODO (mlila): we don't actually surface this error to the user anywhere, but in the
   // TODO          future we probably should if this happens with any frequency.
-  const validateSampleIdentifiersMutation = useValidateSampleIds(groupId, {
+  const validateSampleIdentifiersMutation = useValidateSampleIds({
     componentOnError: () => {
       setValidating(false);
       setShowAddButton(false);
@@ -169,7 +166,9 @@ const SampleIdInput = ({
         >
           {isValidating ? (
             <FlexContainer>
-              <StyledLoadingAnimation />
+              <StyledLoadingSpinnerWrapper>
+                <Icon sdsIcon="loading" sdsSize="l" sdsType="static" />
+              </StyledLoadingSpinnerWrapper>
               Adding
             </FlexContainer>
           ) : (
