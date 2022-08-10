@@ -76,6 +76,7 @@ async def generate_invitation(
         "invitee": {"email": email},
         "inviter": {"name": ""},
         "expires_at": expiration_str,
+        "created_at": expiration_str,
         "ticket_id": "ticket_1",
         "roles": ["member"],
         "client_id": "",
