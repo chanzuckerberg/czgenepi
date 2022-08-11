@@ -5,8 +5,16 @@
  */
 
 import { AnyAction, Middleware } from "redux";
-import { analyticsSendUserInfo } from "src/common/analytics/methods";
+import {
+  AnalyticsActiveGroupChange,
+  EVENT_TYPES,
+} from "src/common/analytics/eventTypes";
+import {
+  analyticsSendUserInfo,
+  analyticsTrackEvent,
+} from "src/common/analytics/methods";
 import { expireAllCaches } from "src/common/queries/groups";
+import { FALLBACK_GROUP_ID } from "src/common/redux";
 import { setLocalStorage } from "src/common/utils/localStorage";
 import { getCurrentUserInfo } from "src/common/utils/userInfo";
 import { selectCurrentGroup } from "../selectors";
@@ -23,12 +31,23 @@ export const setGroupMiddleware: Middleware =
       // if the group changes, expire caches, as samples, members
       // and tress for new group must be fetched.
       const state = getState();
-      if (selectCurrentGroup(state) !== payload) {
+      const currentGroupId = selectCurrentGroup(state);
+      if (currentGroupId !== payload) {
         expireAllCaches();
-        // Need to update analytics with the group user is changing to
+
+        // Update analytics with the group user is changing to.
+        // Only concerned with change if user/group info fully initialized.
         const currentUserInfo = getCurrentUserInfo();
-        if (currentUserInfo) {
-          // Need to use latest group ID explicitly since redux is updating
+        if (currentUserInfo && currentGroupId !== FALLBACK_GROUP_ID) {
+          analyticsTrackEvent<AnalyticsActiveGroupChange>(
+            EVENT_TYPES.ACTIVE_GROUP_CHANGE,
+            {
+              previous_group_id: currentGroupId,
+              new_group_id: payload,
+            }
+          );
+          // We also update user info to record that user's group has changed.
+          // Need to explicitly set new group ID since redux is doing update.
           analyticsSendUserInfo(currentUserInfo, payload);
         }
       }

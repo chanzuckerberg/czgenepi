@@ -41,6 +41,9 @@ export enum EVENT_TYPES {
   // Does not currently address success/failure, but download failures are very
   // rare, so generally safe to not be concerned about that aspect for now.
   SAMPLES_DOWNLOAD_FILE = "SAMPLES_DOWNLOAD_FILE",
+
+  // User is in multiple groups and is changing which group they are acting in.
+  ACTIVE_GROUP_CHANGE = "ACTIVE_GROUP_CHANGE",
 }
 
 /**
@@ -168,4 +171,15 @@ export type AnalyticsSamplesDownloadFile = {
   includes_consensus_genome: boolean;
   // User downloaded info on metadata for these samples
   includes_sample_metadata: boolean;
+};
+
+/** EVENT_TYPES.ACTIVE_GROUP_CHANGE*/
+export type AnalyticsActiveGroupChange = {
+  // The group ID user had been actively viewing before changing groups.
+  // NOTE: the `group_id` common analytics field should be identical to this
+  // previous_group_id because we fire event at start of change. Nonetheless,
+  // we track it as an explicit field to avoid any ambiguity.
+  previous_group_id: number;
+  // The group ID that the user is switching to viewing/acting as.
+  new_group_id: number;
 };
