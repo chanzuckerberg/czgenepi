@@ -1,9 +1,15 @@
 import styled from "@emotion/styled";
 import ListItemIcon from "@mui/material/ListItemIcon";
-import { fontBodyXxs, fontHeaderS, getFontWeights, getSpaces } from "czifui";
+import {
+  CommonThemeProps,
+  fontBodyXxs,
+  fontHeaderS,
+  getFontWeights,
+  getSpaces,
+} from "czifui";
 
 export const Label = styled.div`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-bottom: ${spaces?.xs}px;
@@ -14,7 +20,7 @@ export const Label = styled.div`
 export const LabelMain = styled.span`
   ${fontHeaderS}
   color: black;
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-top: ${spaces?.l}px;
@@ -28,7 +34,7 @@ export const StyledList = styled.ul`
   padding: 0;
   margin: 0;
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-top: ${spaces?.l}px;
@@ -42,7 +48,7 @@ export const StyledListItem = styled.li`
   display: flex;
   align-items: flex-start;
   padding: 0px;
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const fontWeights = getFontWeights(props);
     const spaces = getSpaces(props);
     return `
@@ -58,7 +64,7 @@ export const SmallText = styled.span`
 
 export const StyledListItemIcon = styled(ListItemIcon)`
   min-width: 24px;
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-top: ${spaces?.s}px;

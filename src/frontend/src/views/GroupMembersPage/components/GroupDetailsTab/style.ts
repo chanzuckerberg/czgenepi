@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
 import {
+  CommonThemeProps,
   fontBodyM,
   fontBodyS,
   fontHeaderM,
@@ -11,7 +12,7 @@ import { LargerThanBreakpoint } from "src/common/styles/mixins/global";
 
 export const DetailDisplay = styled.div`
   ${fontBodyM}
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
 
@@ -28,7 +29,7 @@ export const DetailDisplay = styled.div`
 export const DetailHeader = styled.div`
   ${fontHeaderXl}
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-bottom: ${spaces?.l}px;
@@ -38,7 +39,7 @@ export const DetailHeader = styled.div`
 `;
 
 export const DetailSection = styled.div`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
     return `
@@ -63,7 +64,7 @@ export const DetailSubheader = styled.div`
 export const Text = styled.div`
   ${fontBodyS}
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-top: ${spaces?.s}px;

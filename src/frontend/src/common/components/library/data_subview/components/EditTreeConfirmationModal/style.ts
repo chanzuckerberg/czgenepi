@@ -1,12 +1,12 @@
 import styled from "@emotion/styled";
-import { ButtonIcon, fontHeaderXl, getSpaces } from "czifui";
+import { ButtonIcon, CommonThemeProps, fontHeaderXl, getSpaces } from "czifui";
 
 export const StyledTitle = styled.div`
   ${fontHeaderXl}
 `;
 
 export const StyledDiv = styled.div`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       padding-top: ${spaces?.l}px;

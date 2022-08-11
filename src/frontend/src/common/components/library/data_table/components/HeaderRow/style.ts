@@ -33,7 +33,7 @@ export const HeaderCheckbox = styled(Checkbox)`
       background-color: transparent;
     }
   }
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     const colors = getColors(props);
 

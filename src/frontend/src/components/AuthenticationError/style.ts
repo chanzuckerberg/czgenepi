@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import {
   Button,
+  CommonThemeProps,
   fontBodyS,
   fontHeaderXl,
   getColors,
@@ -18,7 +19,7 @@ export const StyledNarrowContainer = styled(NarrowContainer)`
 export const ErrorContainer = styled.div`
   text-align: center;
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const corners = getCorners(props);
     const shadows = getShadows(props);
 
@@ -39,7 +40,7 @@ export const Header = styled.div`
   align-items: center;
   justify-content: center;
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
 
     return `
@@ -49,7 +50,7 @@ export const Header = styled.div`
 `;
 
 export const Body = styled.div`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
@@ -59,7 +60,7 @@ export const Body = styled.div`
 `;
 
 export const IconWrapper = styled.div`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
 
@@ -91,7 +92,7 @@ export const Text = styled.div`
 `;
 
 export const StyledButton = styled(Button)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin: ${spaces?.xxl}px 0;

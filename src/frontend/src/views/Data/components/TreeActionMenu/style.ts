@@ -1,8 +1,8 @@
 import styled from "@emotion/styled";
-import { getSpaces } from "czifui";
+import { CommonThemeProps, getSpaces } from "czifui";
 
 export const StyledActionWrapper = styled.div`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
@@ -21,7 +21,7 @@ export const StyledTreeActionMenu = styled.div`
   justify-content: right;
   width: 150px;
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `

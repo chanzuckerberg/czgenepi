@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import {
   Chip,
+  CommonThemeProps,
   fontHeaderXs,
   getColors,
   getCorners,
@@ -11,7 +12,7 @@ import { MAX_CONTENT_WIDTH } from "src/common/styles/mixins/global";
 
 export const StyledDiv = styled.div`
   ${fontHeaderXs}
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     const fontWeights = getFontWeights(props);
     return `
@@ -25,7 +26,7 @@ export const StyledDiv = styled.div`
 export const Divider = styled.div`
   height: 28px;
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     const colors = getColors(props);
     return `
@@ -36,7 +37,7 @@ export const Divider = styled.div`
 `;
 
 export const StyledChip = styled(Chip)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const fontWeights = getFontWeights(props);
     return `
@@ -58,7 +59,7 @@ export const TooltipHeaderText = styled.div`
 
 export const TooltipDescriptionText = styled.div`
   text-align: center;
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     return `
       color: ${colors?.gray[400]};
@@ -73,7 +74,7 @@ export const StyledFlexChildDiv = styled.div`
   align-items: stretch;
   flex-direction: column;
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       padding: ${spaces?.xl}px;
@@ -88,7 +89,7 @@ export const SearchBar = styled.div`
   justify-content: space-between;
   width: 100%;
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const corners = getCorners(props);
     const spaces = getSpaces(props);
@@ -121,7 +122,7 @@ export const SearchInput = styled.div`
 `;
 
 export const SamplesTable = styled.div`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-top: ${spaces?.m}px;

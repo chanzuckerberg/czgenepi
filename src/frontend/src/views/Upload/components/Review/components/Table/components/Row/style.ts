@@ -16,7 +16,7 @@ export const Id = styled.div`
   display: flex;
   flex-direction: column;
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
@@ -45,7 +45,7 @@ export const StyledTableCell = styled(TableCell)`
   max-width: 300px;
   word-break: break-word;
   min-width: 150px;
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
@@ -56,7 +56,7 @@ export const StyledTableCell = styled(TableCell)`
 
 export const IsPrivateTableCell = styled(TableCell)`
   min-width: 100px;
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     const colors = getColors(props);
 

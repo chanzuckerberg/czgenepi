@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { getSpaces } from "czifui";
+import { CommonThemeProps, getSpaces } from "czifui";
 
 // TODO (mlila): when we add FE state management, we should have one piece of
 // TODO          state that keeps track of all current notifications, and then have only
@@ -10,7 +10,7 @@ export const StyledNotificationContainer = styled.div`
   display: flex;
   flex-direction: column;
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       right: ${spaces?.l}px;

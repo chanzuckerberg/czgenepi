@@ -1,12 +1,18 @@
 import styled from "@emotion/styled";
-import { Dropdown, getBorders, getColors, getSpaces } from "czifui";
+import {
+  CommonThemeProps,
+  Dropdown,
+  getBorders,
+  getColors,
+  getSpaces,
+} from "czifui";
 import {
   doNotForwardProps,
   FormFieldProps,
 } from "src/components/DateField/style";
 
 export const StyledDiv = styled("div")`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       padding-right: ${spaces?.l}px;

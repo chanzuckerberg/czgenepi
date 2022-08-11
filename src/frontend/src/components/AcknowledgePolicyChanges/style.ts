@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { fontBodyS, getColors, getSpaces } from "czifui";
+import { CommonThemeProps, fontBodyS, getColors, getSpaces } from "czifui";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 
 // Note that how we use flex here depends on `DummyCenteringSpacer`.
@@ -10,7 +10,7 @@ export const Container = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
     return `
@@ -21,7 +21,7 @@ export const Container = styled.div`
 `;
 
 export const InfoIconWrapper = styled.div`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-right: ${spaces?.m}px;

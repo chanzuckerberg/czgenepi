@@ -79,7 +79,7 @@ export const BaselineFlexContainer = styled.div`
 
 export const StyledLoadingSpinnerWrapper = styled.div`
   ${iconFillGray}
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
@@ -89,7 +89,7 @@ export const StyledLoadingSpinnerWrapper = styled.div`
 `;
 
 export const StyledAddButton = styled(Button)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-top: ${spaces?.m}px;
@@ -108,7 +108,7 @@ export const StyledEditButton = styled(Button)`
 
 export const StyledSampleCount = styled.span`
   ${fontBodyXs}
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
 

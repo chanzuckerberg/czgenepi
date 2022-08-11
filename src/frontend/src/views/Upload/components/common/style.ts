@@ -57,7 +57,7 @@ export const StyledInstructions = styled(Instructions)`
 `;
 
 export const ContinueButton = styled(Button)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `

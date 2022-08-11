@@ -1,5 +1,11 @@
 import styled from "@emotion/styled";
-import { fontHeaderXxl, getColors, getSpaces, Tabs } from "czifui";
+import {
+  CommonThemeProps,
+  fontHeaderXxl,
+  getColors,
+  getSpaces,
+  Tabs,
+} from "czifui";
 import {
   ContentStyles,
   PageContent,
@@ -28,7 +34,7 @@ export const StyledTabs = styled(Tabs)`
 `;
 
 export const StyledHeader = styled.div`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
 

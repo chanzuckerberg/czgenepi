@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { getColors, getSpaces } from "czifui";
+import { CommonThemeProps, getColors, getSpaces } from "czifui";
 import { SmallerThanBreakpoint } from "src/common/styles/mixins/global";
 
 export const CZBiohubLogo = styled.a`
@@ -28,7 +28,7 @@ export const CZLogoContainer = styled.div`
 `;
 
 export const CZILogo = styled.a`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     return `
       border-right: 1px solid ${colors?.gray[500]};
@@ -60,7 +60,7 @@ export const FooterBottomLinks = styled.div``;
 export const FooterBottomSeparator = styled.div`
   display: none;
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
 

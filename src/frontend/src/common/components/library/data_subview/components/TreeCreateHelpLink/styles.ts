@@ -1,9 +1,15 @@
 import styled from "@emotion/styled";
-import { fontBodyXs, getColors, getFontWeights, getSpaces } from "czifui";
+import {
+  CommonThemeProps,
+  fontBodyXs,
+  getColors,
+  getFontWeights,
+  getSpaces,
+} from "czifui";
 import { NewTabLink } from "../../../NewTabLink";
 
 export const StyledDiv = styled.div`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
 
@@ -32,7 +38,7 @@ export const StyledNewTabLink = styled(NewTabLink)`
 
 export const StyledSpan = styled.span`
   ${fontBodyXs}
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const fontWeights = getFontWeights(props);
     const spaces = getSpaces(props);
 

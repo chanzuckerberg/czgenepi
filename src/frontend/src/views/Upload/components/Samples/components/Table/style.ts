@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import { TableCell, TableContainer, TableHead } from "@mui/material";
 import {
+  CommonThemeProps,
   fontBodyM,
   fontBodyXs,
   fontHeaderXs,
@@ -10,7 +11,7 @@ import {
 
 export const Overflow = styled.div`
   overflow: auto;
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       padding-bottom: ${spaces?.m}px;

@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import {
   ButtonIcon,
+  CommonThemeProps,
   fontBodyXs,
   getColors,
   getFontWeights,
@@ -11,7 +12,7 @@ import {
 export const MenuItem = styled(LibMenuItem)`
   ${fontBodyXs}
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const fontWeights = getFontWeights(props);
     const spaces = getSpaces(props);
@@ -48,7 +49,7 @@ export const StyledName = styled.div`
 export const StyledIcon = styled.span`
   flex: 0 0 auto;
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
 

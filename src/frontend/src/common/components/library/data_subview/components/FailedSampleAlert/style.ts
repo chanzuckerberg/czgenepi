@@ -1,8 +1,8 @@
 import styled from "@emotion/styled";
-import { Callout, getFontWeights } from "czifui";
+import { Callout, CommonThemeProps, getFontWeights } from "czifui";
 
 export const SemiBold = styled.span`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const fontWeights = getFontWeights(props);
     return `
       font-weight: ${fontWeights?.semibold};

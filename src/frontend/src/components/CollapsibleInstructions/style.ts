@@ -42,7 +42,7 @@ export const HeaderWrapper = styled("div", {
 
   ${headerSize}
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-bottom: ${spaces?.s}px;
@@ -69,7 +69,7 @@ export const SecondInstructionsTitle = styled("div", {
   shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
 })`
   ${marginBottomInstructionsTitle}
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-top: ${spaces?.l}px;
@@ -85,7 +85,7 @@ interface InstructionsButtonProps extends CommonThemeProps {
 export const StyledInstructionsButton = styled(Button, {
   shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
 })`
-  ${(props) => {
+  ${(props: InstructionsButtonProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
 
@@ -129,7 +129,7 @@ export const InstructionsWrapper = styled("div", {
 `;
 
 export const Divider = styled.span`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     return `
       color: ${colors?.gray[400]};
