@@ -1,9 +1,9 @@
 import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
 import { StyledEngineProvider, ThemeProvider } from "@mui/material/styles";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AppProps } from "next/app";
 import Head from "next/head";
 import React, { useEffect } from "react";
-import { QueryClient, QueryClientProvider } from "react-query";
 import { Provider } from "react-redux";
 import { PlausibleInitializer } from "src/common/analytics/PlausibleInitializer";
 import { store } from "src/common/redux";
