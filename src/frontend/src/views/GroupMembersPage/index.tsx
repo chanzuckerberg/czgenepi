@@ -20,9 +20,9 @@ export enum PrimaryTabType {
   DETAILS = "details",
 }
 
-export type TabEventHandler = (
-  _: React.SyntheticEvent<Record<string, unknown>>,
-  tabsValue: never
+type PrimaryTabEventHandler = (
+  event: React.SyntheticEvent<Element, Event>,
+  tabsValue: PrimaryTabType
 ) => void;
 
 interface Props {
@@ -54,7 +54,7 @@ const GroupMembersPage = ({
 
   const displayLocation = stringifyGisaidLocation(location);
 
-  const handleTabClick: TabEventHandler = (_, value) => {
+  const handleTabClick: PrimaryTabEventHandler = (_, value) => {
     setTabValue(value);
     router.push(`${ROUTES.GROUP}/${value}`);
   };

@@ -89,7 +89,6 @@ const MoreActionsMenu = ({
           keepMounted
           open={open}
           onClose={handleClose}
-          getContentAnchorEl={null}
         >
           <MenuItem onClick={() => onEditTreeModalOpen(item)}>
             <StyledMenuItemWrapper>

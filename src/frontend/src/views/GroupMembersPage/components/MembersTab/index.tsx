@@ -5,7 +5,6 @@ import { HeadAppTitle } from "src/common/components";
 import { useGroupInvitations } from "src/common/queries/groups";
 import { ROUTES } from "src/common/routes";
 import { getIsGroupAdminFromUserInfo } from "src/common/utils/userInfo";
-import { TabEventHandler } from "../../index";
 import { ActiveMembersTable } from "./components/ActiveMembersTable";
 import { InviteModal } from "./components/InviteModal";
 import { MemberInvitationsTable } from "./components/MemberInvitationsTable";
@@ -15,6 +14,11 @@ export enum SecondaryTabType {
   ACTIVE = "active",
   INVITATIONS = "invitations",
 }
+
+type SecondaryTabEventHandler = (
+  event: React.SyntheticEvent<Element, Event>,
+  tabsValue: SecondaryTabType
+) => void;
 
 interface Props {
   requestedSecondaryTab: SecondaryTabType;
@@ -44,7 +48,7 @@ const MembersTab = ({
 
   const numActive = Object.keys(members).length;
 
-  const handleTabClick: TabEventHandler = (_, value) => {
+  const handleTabClick: SecondaryTabEventHandler = (_, value) => {
     setTabValue(value);
     router.push(`${ROUTES.GROUP_MEMBERS}/${value}/`);
   };
