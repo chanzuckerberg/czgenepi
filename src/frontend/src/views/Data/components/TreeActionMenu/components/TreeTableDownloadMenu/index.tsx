@@ -1,4 +1,4 @@
-import { Icon, ButtonIcon, Menu, MenuItem, Tooltip } from "czifui";
+import { ButtonIcon, Icon, Menu, MenuItem, Tooltip } from "czifui";
 import React, { MouseEventHandler, ReactNode, useState } from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { TREE_STATUS } from "src/common/constants/types";

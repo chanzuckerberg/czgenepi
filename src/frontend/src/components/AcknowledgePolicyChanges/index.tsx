@@ -10,7 +10,7 @@
  * for previously acknowledged users by changing date of CURRENT_POLICY_VERSION.
  */
 
-import { Icon, ButtonIcon } from "czifui";
+import { ButtonIcon, Icon } from "czifui";
 import React from "react";
 import { useUpdateUserInfo, useUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";

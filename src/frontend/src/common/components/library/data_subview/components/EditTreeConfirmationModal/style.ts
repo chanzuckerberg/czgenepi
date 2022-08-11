@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { fontHeaderXl, getSpaces, ButtonIcon } from "czifui";
+import { ButtonIcon, fontHeaderXl, getSpaces } from "czifui";
 
 export const StyledTitle = styled.div`
   ${fontHeaderXl}

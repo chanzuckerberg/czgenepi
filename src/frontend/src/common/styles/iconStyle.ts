@@ -1,6 +1,6 @@
 // includes shared styles for icons
 import styled from "@emotion/styled";
-import { CommonThemeProps, getColors, getSpaces, ButtonIcon } from "czifui";
+import { ButtonIcon, CommonThemeProps, getColors, getSpaces } from "czifui";
 
 export const iconFillBlack = (): string => {
   return `
