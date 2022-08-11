@@ -1,15 +1,7 @@
 import styled from "@emotion/styled";
-import {
-  CommonThemeProps,
-  fontHeaderS,
-  fontHeaderXs,
-  getColors,
-  getSpaces,
-} from "czifui";
+import { fontHeaderS, fontHeaderXs, getColors } from "czifui";
 
-const sharedRowStyles = (props: CommonThemeProps) => {
-  const spaces = getSpaces(props);
-
+const sharedRowStyles = () => {
   return `
     display: flex;
     align-items: center;
