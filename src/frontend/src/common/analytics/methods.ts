@@ -20,6 +20,10 @@
  * in the rest of our code and all of the opt-in/out logic is taken care of.
  */
 import { debounce, isEmpty, isEqual } from "lodash";
+import {
+  getCurrentGroupFromUserInfo,
+  getUserGroupInfoByGroupId,
+} from "src/common/utils/userInfo";
 import { EventData, EVENT_TYPES } from "./eventTypes";
 
 /**
@@ -156,46 +160,58 @@ interface AnalyticsUserInfo {
 /**
  * Helper to extract de-identified user info for sending to analytics.
  *
- * Important to have a standardized way because we need to ensure that the
- * data being pulled is consistent across the different ways we `identify`:
- * both initial app load via segmentInitScript and later user info changes
- * via analyticsSendUserInfo. For more info, see analyticsSendUserInfo docs.
+ * Returns the necessary info for analytics or `undefined` if info is
+ * not ready yet because user/group info still undergoing initialization.
+ * If returning `undefined`, do NOT fire off an `identify` call, not ready yet.
+ *
+ * Optional second arg of `explicitGroupId`. Usually we want the redux state
+ * to determine user's current group, but in some cases -- like when user is
+ * changing from viewing one group to another -- we can have a race condition
+ * with the redux state. In those cases, we can explictly set the groupId
+ * the user should be identified as belonging to.
+ *
+ * Important to have a standardized way we extract de-identified user info
+ * because we need to ensure the data being pulled is consistent across the
+ * different ways we `identify`: both initial app load via segmentInitScript
+ * and later user/group info changes via analyticsSendUserInfo.
+ * For more info, see analyticsSendUserInfo docs.
  *
  * Also important because we need to be sure that we don't accidentally pull
  * PII and send as part of an `identify`. The data this helper pulls is the
  * non-PII data that's safe for analytics and we don't want to inadvertently
  * expose any sensitive data from FE to analytics.
- *
- * TODO -- This function will need to grow in complexity and probably alter
- * its signature once we have multi-group membership in place.
  */
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore VOODOO REMOVE `userInfo` workaround for merge conflict
-export function extractAnalyticsUserInfo(userInfo: User): AnalyticsUserInfo {
-  // TODO [Vincent, near future] Below is a temporary anonymous ID for dev work
-  // and will be replaced soon by a proper anonymized user ID once that aspect
-  // is in place in the backend and comes with rest of userInfo data.
-  const PLACEHOLDER_ANON_USER_ID = "warrrbargl";
+export function extractAnalyticsUserInfo(
+  userInfo: User,
+  explicitGroupId?: number
+): AnalyticsUserInfo | undefined {
+  let group = undefined;
+  if (explicitGroupId) {
+    group = getUserGroupInfoByGroupId(userInfo, explicitGroupId);
+  } else {
+    group = getCurrentGroupFromUserInfo(userInfo);
+  }
+  // If group false-y, user info is loaded but group info is not ready yet.
+  if (!group) {
+    return undefined;
+  }
   return {
-    anonUserId: PLACEHOLDER_ANON_USER_ID,
-    // TODO VOODOO FIXME -- Both the below got afflicted by merge conflict
-    // Need to adjust how we pull group info because underlying approach to
-    // groups has changed since initial writing of this code.
-    groupId: 47,
-    groupName: "MERGE CONFLICTED",
+    anonUserId: userInfo.analyticsId,
+    groupId: group.id,
+    groupName: group.name,
   };
 }
 
 /**
  * Send user info to Segment. Initial app load handled elsewhere, see below.
  *
- * Sends de-identified user info to Segment. It tracks user's current group
- * and should be re-fired every time the user changes the group that they
- * are currently operating as (if they're in multiple groups). If user is
- * opted-out of analytics, this function does nothing.
+ * Sends de-identified user and group info to Segment. It should be re-fired
+ * every time the user changes the group they are currently operating as
+ * (if they're in multiple groups). If user is opted-out of analytics,
+ * then this function will do nothing.
  *
- * Because of how our app loads user info and the Segment analytics framework,
- * there is a race condition: we don't know if user info from BE or analytics
+ * Because of how our app loads and the Segment analytics framework, there is
+ * a race condition: we don't know if the user/group info init or analytics
  * will finish first. As such, we do **not** use this function as part of the
  * app's initial load. We fire off first `identify` method (assuming opt-in)
  * as part of the SegmentInitializer -> segmentInitScript interaction. By
@@ -208,8 +224,15 @@ export function extractAnalyticsUserInfo(userInfo: User): AnalyticsUserInfo {
  *   on where it came from and it will cause problems for our data analyst.
  */
 let previouslySentUserInfo: AnalyticsUserInfo = {};
-function analyticsSendUserInfo_(userInfo: User): void {
-  const analyticsUserInfo = extractAnalyticsUserInfo(userInfo);
+function analyticsSendUserInfo_(
+  userInfo: User,
+  explicitGroupId?: number
+): void {
+  const analyticsUserInfo = extractAnalyticsUserInfo(userInfo, explicitGroupId);
+  // User info loaded, but user/group init not complete. Do nothing for now.
+  if (!analyticsUserInfo) {
+    return;
+  }
   if (isEmpty(previouslySentUserInfo)) {
     // Very first user info payload handled by Segment init script.
     // If this is empty now, record info, but skip doing anything.
@@ -226,9 +249,10 @@ function analyticsSendUserInfo_(userInfo: User): void {
     previouslySentUserInfo = analyticsUserInfo;
   }
 }
-// Sending user info (ignoring app load `identify` call) usually happens based
-// on `useUserInfo` calls. Since these tend to bunch up and get called one on
-// top of the other, we debounce so we don't spam analytics.
+// Sending user info (ignoring app load `identify` call) can happen based on
+// `useUserInfo` calls. Since these tend to bunch up and get called one on
+// top of the other, we debounce so we don't spam analytics. Also beneficial
+// because short pause generally ensures group init is complete in redux.
 export const analyticsSendUserInfo = debounce(analyticsSendUserInfo_, 500, {
   trailing: true,
 });

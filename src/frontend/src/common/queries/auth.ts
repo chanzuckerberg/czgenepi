@@ -35,6 +35,7 @@ export interface RawUserRequest {
   agreed_to_tos: boolean;
   acknowledged_policy_version: string | null; // Date or null in DB. ISO 8601: "YYYY-MM-DD"
   split_id: string;
+  analytics_id: string;
   group_admin: boolean;
 }
 
@@ -42,6 +43,7 @@ export const mapUserData = (obj: RawUserRequest): User => {
   return {
     acknowledgedPolicyVersion: obj.acknowledged_policy_version,
     agreedToTos: obj.agreed_to_tos,
+    analyticsId: obj.analytics_id,
     groups: obj.groups,
     id: obj.id,
     name: obj.name,
@@ -84,6 +86,7 @@ export function useUpdateUserInfo(): UseMutationResult<
 // to analytics as a way to easily catch any changes to user info over time.
 function mapUserDataAndHandleAnalytics(obj: RawUserRequest): User {
   const user = mapUserData(obj);
+  // Downstream will handle figuring out group info (and if it's ready yet).
   analyticsSendUserInfo(user);
   return user;
 }
