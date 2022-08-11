@@ -5,7 +5,7 @@ import string
 from collections.abc import MutableSequence
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, Column, Date, ForeignKey, Integer, String, text
+from sqlalchemy import Boolean, Column, Date, ForeignKey, Index, Integer, String, text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.engine.default import DefaultExecutionContext
 from sqlalchemy.orm import backref, relationship
@@ -71,7 +71,8 @@ class Group(idbase, DictMixin):  # type: ignore
         return f"Group <{self.name}>"
 
 
-def generate_split_id(length=20):
+def generate_random_id(length=20):
+    """Generates random id for cases we need de-identified ID for user"""
     possible_characters = string.ascii_lowercase + string.digits
     return "".join(random.choice(possible_characters) for _ in range(length))
 
@@ -80,6 +81,11 @@ class User(idbase, DictMixin):  # type: ignore
     """A user."""
 
     __tablename__ = "users"
+    __table_args__ = (
+        # For historical reasons, split_id uniqueness is via unique index
+        # rather than direct unique constraint on Column. Same effect though.
+        Index("uq_users_split_id", "split_id", unique=True),
+    )
 
     name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
@@ -90,7 +96,12 @@ class User(idbase, DictMixin):  # type: ignore
     # Date of policies (any of Privacy Policy, Terms of Service, etc, etc) the user
     # has last acknowledged. Used to display notification to user when policies change.
     acknowledged_policy_version = Column(Date, nullable=True, default=None)
-    split_id = Column(String, nullable=False, default=generate_split_id)
+    # `split_id` is unique, but set via index, rather than Column, see above.
+    split_id = Column(String, nullable=False, default=generate_random_id)
+    # `analytics_id` used for keeping users anonymized for analytics
+    analytics_id = Column(
+        String, unique=True, nullable=False, default=generate_random_id
+    )
 
     group_id = Column(Integer, ForeignKey(Group.id), nullable=False)
     group = relationship("Group", back_populates="members")  # type: ignore

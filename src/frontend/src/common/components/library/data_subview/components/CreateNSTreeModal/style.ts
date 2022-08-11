@@ -65,7 +65,6 @@ export const StyledDialogContent = styled(DialogContent)`
   ${fontBodyS}
   ${transparentScrollbars}
 
-  width: 600px;
   padding-bottom: 0;
   overflow-y: auto;
   & > div:last-child {
