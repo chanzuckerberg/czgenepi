@@ -87,6 +87,7 @@ const setDefaults = async () => {
 
   // set user group
   if (group === FALLBACK_GROUP_ID) {
+    console.log("it me, setDefaults"); // REMOVE
     setValidGroup();
   }
 
