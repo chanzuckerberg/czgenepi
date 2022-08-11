@@ -1,4 +1,4 @@
-import { Button } from "czifui";
+import { Button, Link } from "czifui";
 import NextLink from "next/link";
 import React, { useCallback, useMemo, useState } from "react";
 import { HeadAppTitle } from "src/common/components";
@@ -154,11 +154,11 @@ export default function Metadata({
             </ContinueButton>
           </NextStepWrapper>
           <NextLink href={ROUTES.UPLOAD_STEP1} passHref>
-            <a href="passHref">
+            <Link href="passHref">
               <Button sdsType="secondary" sdsStyle="rounded">
                 Back
               </Button>
-            </a>
+            </Link>
           </NextLink>
         </ButtonWrapper>
       </Content>
@@ -175,7 +175,7 @@ function NextStepWrapper({
 }): JSX.Element {
   return isValid ? (
     <NextLink href={ROUTES.UPLOAD_STEP3} passHref>
-      <a href="passHref">{children}</a>
+      <Link href="passHref">{children}</Link>
     </NextLink>
   ) : (
     <>{children}</>
