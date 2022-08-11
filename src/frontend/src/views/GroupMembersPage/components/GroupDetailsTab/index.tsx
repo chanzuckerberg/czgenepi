@@ -15,18 +15,26 @@ interface Props {
   address?: string;
   location?: string;
   prefix?: string;
+  shouldShowChangeDetailsCallout: boolean;
 }
 
-const GroupDetailsTab = ({ address, location, prefix }: Props): JSX.Element => {
+const GroupDetailsTab = ({
+  address,
+  location,
+  prefix,
+  shouldShowChangeDetailsCallout,
+}: Props): JSX.Element => {
   return (
     <DetailPage>
-      <StyledCallout intent="info">
-        Contact us at{" "}
-        <Link sdsStyle="dashed" href="mailto:support@czgenepi.org">
-          support@czgenepi.org
-        </Link>{" "}
-        to add or update your group’s details.
-      </StyledCallout>
+      {shouldShowChangeDetailsCallout && (
+        <StyledCallout intent="info">
+          Contact us at{" "}
+          <Link sdsStyle="dashed" href="mailto:support@czgenepi.org">
+            support@czgenepi.org
+          </Link>{" "}
+          to add or update your group’s details.
+        </StyledCallout>
+      )}
       <DetailHeader>Group Details</DetailHeader>
       <Content>
         <DetailSection>
