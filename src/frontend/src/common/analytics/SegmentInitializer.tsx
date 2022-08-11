@@ -47,10 +47,8 @@ const INITIAL_SCRIPT_TYPE = "text/plain";
  *      (it finds the script to flip via class `ONETRUST_ENABLING_CLASS`)
  *   2) There must be a truth-y value present for the SEGMENT_FRONTEND_KEY.
  *      We default to empty string when no env var present.
- *      As of right now, during initial development, there is no Segment key
- *      in Prod (we've also avoided creating a Prod integration on the Segment
- *      side for now). This means that, even if this code gets to Prod,
- *      no analytics will run right now on Prod.
+ *   3) The user/group info must be finished with initialization, as we use
+ *      some of that info during Segment load (see below).
  *
  * In addition to initializing the Segment analytics framework, the init script
  * also kicks off an initial `page` call to record what page the user starts on
@@ -76,6 +74,11 @@ export function SegmentInitializer(): JSX.Element | null {
   // that the user info we pass to segmentInitScript and use there matches
   // the structure of what is sent in the `analyticsSendUserInfo` function.
   const analyticsUserInfo = extractAnalyticsUserInfo(userInfo);
+  // `analyticsUserInfo` will be false-y if user/group info not done with init
+  if (!analyticsUserInfo) return null;
+
+  // If we've made it here and have a SEGMENT_WRITE_KEY, we are ready to load
+  // Segment and fire first events (if user opts-in to analytics via OneTrust).
   return SEGMENT_WRITE_KEY ? (
     <Script
       id={SEGMENT_SCRIPT_TAG_ID}

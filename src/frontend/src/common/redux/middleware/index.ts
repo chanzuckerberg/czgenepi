@@ -5,8 +5,10 @@
  */
 
 import { AnyAction, Middleware } from "redux";
+import { analyticsSendUserInfo } from "src/common/analytics/methods";
 import { expireAllCaches } from "src/common/queries/groups";
 import { setLocalStorage } from "src/common/utils/localStorage";
+import { getCurrentUserInfo } from "src/common/utils/userInfo";
 import { selectCurrentGroup } from "../selectors";
 import { CZGEReduxActions, ReduxPersistenceTokens } from "../types";
 
@@ -23,6 +25,12 @@ export const setGroupMiddleware: Middleware =
       const state = getState();
       if (selectCurrentGroup(state) !== payload) {
         expireAllCaches();
+        // Need to update analytics with the group user is changing to
+        const currentUserInfo = getCurrentUserInfo();
+        if (currentUserInfo) {
+          // Need to use latest group ID explicitly since redux is updating
+          analyticsSendUserInfo(currentUserInfo, payload);
+        }
       }
     }
 
