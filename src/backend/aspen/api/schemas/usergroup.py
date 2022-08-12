@@ -44,6 +44,7 @@ class UserUpdateRequest(BaseRequest):
     agreed_to_tos: Optional[bool] = None
     acknowledged_policy_version: Optional[datetime.date] = None
     name: Optional[str] = None
+    gisaid_submitter_id: Optional[str] = None
 
 
 class GroupRoleResponse(BaseResponse):
@@ -52,9 +53,11 @@ class GroupRoleResponse(BaseResponse):
     roles: List[str]
 
 
-# Only expose split id and groups to the user it belongs to.
+# Only expose split_id, analytics_id, and groups to the user they belong to.
 class UserMeResponse(UserBaseResponse):
     split_id: str
+    analytics_id: str
+    gisaid_submitter_id: Optional[str]
     group: GroupResponse
     groups: List[GroupRoleResponse]
 
