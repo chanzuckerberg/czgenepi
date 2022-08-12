@@ -11,7 +11,7 @@ async function globalSetup(config: FullConfig): Promise<void> {
     const page = await browser.newPage();
     await login(page, username, password);
     await page.context().storageState({
-        path: storageState,
+        path: storageState as string,
     });
     await browser.close()
 }
