@@ -149,11 +149,11 @@ const EditSamplesConfirmationModal = ({
   };
 
   const updateChangedMetadata = useCallback(
-    (id, sampleMetadata) => {
+    (id: string, sampleMetadata: Metadata) => {
       // get all current metadata properties for a sample, if metadata is undefined return empty object
       const currentMetadata = getMetadataEntryOrEmpty(metadata, id);
       // combine current metadata with any new metadata requests from user
-      const combinedMetadata: string | boolean | NamedGisaidLocation = {
+      const combinedMetadata: Partial<SampleEditMetadataWebform> = {
         ...currentMetadata,
         ...sampleMetadata,
       };

@@ -8,7 +8,7 @@ import {
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import ENV from "src/common/constants/ENV";
 
-interface Props extends ButtonProps<"button"> {
+interface Props extends ButtonProps {
   treeId: number;
 }
 

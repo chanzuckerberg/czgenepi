@@ -7,6 +7,7 @@ interface Props {
   onClick: MouseEventHandler;
   disabled: boolean;
   sdsIcon: keyof IconNameToSizes;
+  size: "small" | "medium" | "large";
   tooltipTextEnabled: JSX.Element;
   tooltipTextDisabled: JSX.Element;
 }
@@ -15,6 +16,7 @@ export const IconButton: FunctionComponent<Props> = ({
   onClick,
   disabled,
   sdsIcon,
+  size = "large",
   tooltipTextEnabled,
   tooltipTextDisabled,
 }: Props) => {
@@ -35,7 +37,7 @@ export const IconButton: FunctionComponent<Props> = ({
         <LibButtonIcon
           onClick={handleClick}
           disabled={disabled}
-          sdsSize="large"
+          sdsSize={size}
           sdsType="primary"
         >
           <Icon sdsIcon={sdsIcon} sdsSize="xl" sdsType="iconButton" />
