@@ -57,7 +57,6 @@ const GroupDetailsDropdown = ({
     <Dropdown
       open
       anchorEl={anchorEl}
-      getContentAnchorEl={null}
       anchorOrigin={{
         vertical: "bottom",
         horizontal: "left",

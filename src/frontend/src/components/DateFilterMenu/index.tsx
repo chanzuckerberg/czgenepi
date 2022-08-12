@@ -130,7 +130,6 @@ export const DateFilterMenu: FC<Props> = ({
       keepMounted
       open={Boolean(anchorEl)}
       onClose={onClose}
-      getContentAnchorEl={null}
     >
       <StyledManualDate>
         <StyledDateRange>

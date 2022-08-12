@@ -76,7 +76,6 @@ const MoreActionsMenu = ({
         keepMounted
         open={Boolean(anchorEl)}
         onClose={handleClose}
-        getContentAnchorEl={null}
       >
         <Tooltip
           arrow

@@ -72,7 +72,6 @@ const TreeSelectionMenu = ({
         keepMounted
         open={Boolean(anchorEl)}
         onClose={handleClose}
-        getContentAnchorEl={null}
       >
         <MenuItem onClick={handleClickNS}>
           Nextstrain Phylogenetic Tree

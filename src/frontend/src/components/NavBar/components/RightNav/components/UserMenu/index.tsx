@@ -38,7 +38,6 @@ const UserMenu = ({ user }: UserMenuProps): JSX.Element => {
         keepMounted
         open={Boolean(anchorEl)}
         onClose={handleClose}
-        getContentAnchorEl={null}
       >
         <a href={ROUTES.CONTACT_US_EMAIL} target="_blank" rel="noopener">
           <MenuItem onClick={handleClose}>Contact us</MenuItem>
