@@ -79,7 +79,7 @@ oauth/pkcs12/certificate.pfx:
 	# On Linux, the pkcs12 directory gets written to with root permission. Force ownership to our user.
 	sudo chown -R $$(id -u):$$(id -g) $(PWD)/oauth/pkcs12
 	# If the OIDC server is already running, restart it to use the new certs
-	docker compose restart oidc
+	$(docker_compose) restart oidc
 
 .env.ecr:
 	export AWS_ACCOUNT_ID=$$(aws sts get-caller-identity --profile $(AWS_DEV_PROFILE) | jq -r .Account); \
