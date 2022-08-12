@@ -229,13 +229,17 @@ export const TextFieldAlert = styled.div`
   }}
 `;
 
+interface FormControlProps extends CommonThemeProps {
+  checked: boolean;
+}
+
 export const StyledFormControlLabel = styled(FormControlLabel)`
   display: flex;
   align-items: flex-start;
   border-radius: 5px;
   margin-left: 0px;
   margin-right: 0px;
-  ${(props: CommonThemeProps) => {
+  ${(props: FormControlProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
     const checked = props.checked;

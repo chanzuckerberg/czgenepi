@@ -7,7 +7,7 @@ interface Props {
   onClick: MouseEventHandler;
   disabled: boolean;
   sdsIcon: keyof IconNameToSizes;
-  size: "small" | "medium" | "large";
+  size?: "small" | "medium" | "large";
   tooltipTextEnabled: JSX.Element;
   tooltipTextDisabled: JSX.Element;
 }

@@ -64,7 +64,7 @@ const DownloadModal = ({
   const [tsvRows, setTsvRows] = useState<string[][]>([]);
   const [tsvHeaders, setTsvHeaders] = useState<string[]>([]);
   const [anchorEl, setAnchorEl] = useState<HTMLElement>();
-  const tooltipRef = useCallback((node) => setAnchorEl(node), []);
+  const tooltipRef = useCallback((node: HTMLElement) => setAnchorEl(node), []);
 
   const [isFastaDisabled, setFastaDisabled] = useState<boolean>(false);
   const [isFastaSelected, setFastaSelected] = useState<boolean>(false);
