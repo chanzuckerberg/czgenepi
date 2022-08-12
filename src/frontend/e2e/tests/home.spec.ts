@@ -1,13 +1,10 @@
-import { expect, test , Page} from "@playwright/test";
-import { getByTestID, getByText } from "../utils/selectors";
+import { expect, test } from "@playwright/test";
+import { getByTestID } from "../utils/selectors";
 
 const footer: Record<string, string> = {
     "Github": "https://github.com/chanzuckerberg/czgenepi/",
     "Careers":  "https://chanzuckerberg.com/careers/career-opportunities/?initiative=science",
     "Learning Center":  "https://help.czgenepi.org/hc/en-us/categories/6217716150804-Genomic-Epidemiology-Learning-Center",
-    //"Privacy":  "/privacy",
-    //"Terms":  "/terms",
-    //"Contact Us":  "mailto:hello@czgenepi.org"
 }
 
 test.describe("Home page tests", () => {
