@@ -14,6 +14,7 @@ import { queryClient } from "src/common/queries/queryClient";
 import { store } from "src/common/redux";
 import { StyledApp } from "src/common/styles/appStyle";
 import "src/common/styles/global.css";
+import "src/common/styles/oneTrust.css";
 import { theme } from "src/common/styles/theme";
 import { setFeatureFlagsFromQueryParams } from "src/common/utils/featureFlags";
 import Nav from "src/components/NavBar";

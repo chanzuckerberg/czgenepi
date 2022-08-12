@@ -1,0 +1,285 @@
+/*
+ * IMPORTANT NOTE
+ * This is literally the only Sass stylesheet we have and one of very, very few
+ * raw CSS-type stylesheets our app uses. It is likely this will almost never
+ * or literally never need to be updated. As such, we are not installing a
+ * Sass dev dependency to our app for this one file. If you need to update
+ * the styles for OneTrust banner/modal, update this file, then cd to this dir,
+ * and run the command
+ *   npx sass oneTrust.scss ./oneTrust.css
+ * to compile it to CSS for React to actually use in the app.
+ *
+ * If we have to do the above more than once a year, I (Vince) was wrong and
+ * silly and we should totally install a Sass dev dep and do this the right
+ * way. But from where I'm standing right now, I think we'll probably
+ * never update this unless we go through a huge re-styling of the entire app.
+ */
+html body #onetrust-consent-sdk {
+  box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.3);
+}
+@media only screen and (min-width: 1024px) {
+  html body #onetrust-consent-sdk #onetrust-policy {
+    margin-top: 1.65em !important;
+  }
+}
+html body #onetrust-consent-sdk #ot-pc-desc a {
+  margin-left: 0;
+  color: #511CC1;
+  text-decoration: none;
+}
+html body #onetrust-consent-sdk #onetrust-button-group {
+  margin-top: 0 !important;
+}
+html body #onetrust-consent-sdk #onetrust-banner-sdk:focus-visible {
+  outline-color: transparent;
+}
+html body #onetrust-consent-sdk .ot-switch-nob:before {
+  bottom: 1px;
+}
+html body #onetrust-consent-sdk .ot-pc-footer-logo {
+  display: none !important;
+}
+html body #onetrust-consent-sdk *::-webkit-scrollbar-track {
+  background-color: #FFFFFF;
+}
+html body #onetrust-consent-sdk #ot-pc-title,
+html body #onetrust-consent-sdk #ot-pc-desc,
+html body #onetrust-consent-sdk .ot-cat-item p,
+html body #onetrust-consent-sdk #ot-pc-title,
+html body #onetrust-consent-sdk * {
+  font-family: "Open Sans", -apple-system, "Helvetica Neue", Helvetica, sans-serif !important;
+}
+html body #onetrust-consent-sdk #ot-pc-desc,
+html body #onetrust-consent-sdk .ot-cat-item p {
+  font-size: 14px;
+  line-height: 24px;
+}
+html body #onetrust-consent-sdk #ot-pc-desc strong {
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 22px;
+  color: #000000 !important;
+}
+html body #onetrust-consent-sdk #ot-pc-title {
+  font-size: 22px !important;
+  line-height: 30px !important;
+  font-weight: 500 !important;
+}
+html body #onetrust-consent-sdk #ot-category-title {
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 600;
+}
+html body #onetrust-consent-sdk .ot-cat-header {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600 !important;
+}
+html body #onetrust-consent-sdk #onetrust-policy-text a {
+  margin-left: unset;
+  font-weight: unset;
+  text-decoration: none;
+}
+@media only screen and (min-width: 1024px) {
+  html body #onetrust-consent-sdk #onetrust-group-container {
+    width: 72% !important;
+  }
+}
+@media only screen and (min-width: 1024px) {
+  html body #onetrust-consent-sdk #onetrust-button-group-parent {
+    width: 20% !important;
+    left: 80% !important;
+  }
+}
+@media only screen and (min-width: 1024px) {
+  html body #onetrust-consent-sdk #onetrust-button-group-parent button {
+    width: 100% !important;
+  }
+}
+html body #onetrust-consent-sdk #onetrust-reject-all-handler {
+  order: 2;
+}
+@media only screen and (min-width: 890px) {
+  html body #onetrust-consent-sdk #onetrust-reject-all-handler {
+    margin-top: 5px !important;
+  }
+}
+html body #onetrust-consent-sdk button#onetrust-pc-btn-handler {
+  background-color: #FFFFFF !important;
+  color: #511CC1 !important;
+  order: 3;
+}
+html body #onetrust-consent-sdk button#onetrust-pc-btn-handler:hover {
+  background-color: #511CC1 !important;
+  color: #FFFFFF !important;
+  opacity: 1;
+}
+@media only screen and (min-width: 890px) {
+  html body #onetrust-consent-sdk button#onetrust-pc-btn-handler {
+    width: 100% !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+}
+html body #onetrust-consent-sdk button#onetrust-accept-btn-handler {
+  order: 1;
+}
+@media only screen and (min-width: 890px) {
+  html body #onetrust-consent-sdk button#onetrust-accept-btn-handler {
+    margin-bottom: 0 !important;
+  }
+}
+@media only screen and (min-width: 1024px) {
+  html body #onetrust-consent-sdk #onetrust-close-btn-container {
+    top: 30px;
+    right: -7px;
+  }
+}
+html body #onetrust-consent-sdk #onetrust-button-group {
+  display: flex !important;
+  flex-flow: column !important;
+}
+@media only screen and (min-width: 890px) {
+  html body #onetrust-consent-sdk #onetrust-accept-btn-handler {
+    margin-bottom: 10px !important;
+  }
+}
+html body #onetrust-consent-sdk .ot-pc-header {
+  border-bottom: none;
+}
+html body #onetrust-consent-sdk .ot-pc-footer {
+  border-top: none;
+}
+@media only screen and (min-width: 890px) {
+  html body #onetrust-consent-sdk .ot-pc-footer {
+    bottom: 26px !important;
+  }
+}
+html body #onetrust-consent-sdk .ot-btn-container {
+  text-align: left;
+  margin-left: 30px;
+}
+html body #onetrust-consent-sdk .ot-pc-logo {
+  height: 60px;
+  width: 170px;
+}
+html body #onetrust-consent-sdk .onetrust-pc-dark-filter.ot-fade-in {
+  background: #FFFFFF;
+  opacity: 0.8;
+}
+html body #onetrust-consent-sdk #ot-pc-content {
+  border-bottom: 1px solid #EAEAEA;
+}
+html body #onetrust-consent-sdk .ot-cat-grp {
+  padding-top: 20px !important;
+  margin-top: 5px;
+  border-top: 1px solid #EAEAEA;
+}
+html body #onetrust-consent-sdk #onetrust-policy-text a,
+html body #onetrust-consent-sdk .ot-always-active {
+  color: #511CC1 !important;
+}
+html body #onetrust-consent-sdk .ot-always-active {
+  font-weight: 400;
+}
+html body #onetrust-consent-sdk .ot-category-desc {
+  color: #545454 !important;
+}
+html body #onetrust-consent-sdk #onetrust-reject-all-handler,
+html body #onetrust-consent-sdk #onetrust-accept-btn-handler,
+html body #onetrust-consent-sdk #accept-recommended-btn-handler,
+html body #onetrust-consent-sdk .ot-pc-refuse-all-handler,
+html body #onetrust-consent-sdk .save-preference-btn-handler,
+html body #onetrust-consent-sdk #onetrust-pc-btn-handler {
+  font-size: 13px;
+  line-height: 20px;
+  border-radius: 16px !important;
+  font: 400 13px/20px "Open Sans", "OpenSans-Regular", -apple-system, "Helvetica Neue", Helvetica, sans-serif !important;
+  letter-spacing: 0.3px !important;
+  padding: 7px 13px !important;
+  min-width: 120px;
+  background-color: #511CC1 !important;
+  color: #FFFFFF !important;
+}
+html body #onetrust-consent-sdk #onetrust-reject-all-handler:hover, html body #onetrust-consent-sdk #onetrust-reject-all-handler:active, html body #onetrust-consent-sdk #onetrust-reject-all-handler:focus,
+html body #onetrust-consent-sdk #onetrust-accept-btn-handler:hover,
+html body #onetrust-consent-sdk #onetrust-accept-btn-handler:active,
+html body #onetrust-consent-sdk #onetrust-accept-btn-handler:focus,
+html body #onetrust-consent-sdk #accept-recommended-btn-handler:hover,
+html body #onetrust-consent-sdk #accept-recommended-btn-handler:active,
+html body #onetrust-consent-sdk #accept-recommended-btn-handler:focus,
+html body #onetrust-consent-sdk .ot-pc-refuse-all-handler:hover,
+html body #onetrust-consent-sdk .ot-pc-refuse-all-handler:active,
+html body #onetrust-consent-sdk .ot-pc-refuse-all-handler:focus,
+html body #onetrust-consent-sdk .save-preference-btn-handler:hover,
+html body #onetrust-consent-sdk .save-preference-btn-handler:active,
+html body #onetrust-consent-sdk .save-preference-btn-handler:focus,
+html body #onetrust-consent-sdk #onetrust-pc-btn-handler:hover,
+html body #onetrust-consent-sdk #onetrust-pc-btn-handler:active,
+html body #onetrust-consent-sdk #onetrust-pc-btn-handler:focus {
+  opacity: 1 !important;
+}
+html body #onetrust-consent-sdk #onetrust-reject-all-handler:focus,
+html body #onetrust-consent-sdk #onetrust-accept-btn-handler:focus,
+html body #onetrust-consent-sdk #accept-recommended-btn-handler:focus,
+html body #onetrust-consent-sdk .ot-pc-refuse-all-handler:focus,
+html body #onetrust-consent-sdk .save-preference-btn-handler:focus,
+html body #onetrust-consent-sdk #onetrust-pc-btn-handler:focus {
+  outline: none !important;
+}
+html body #onetrust-consent-sdk #onetrust-reject-all-handler:hover,
+html body #onetrust-consent-sdk #onetrust-accept-btn-handler:hover,
+html body #onetrust-consent-sdk #accept-recommended-btn-handler:hover,
+html body #onetrust-consent-sdk .ot-pc-refuse-all-handler:hover,
+html body #onetrust-consent-sdk .save-preference-btn-handler:hover,
+html body #onetrust-consent-sdk #onetrust-pc-btn-handler:hover {
+  background-color: #511CC1 !important;
+  color: #FFFFFF;
+}
+html body #onetrust-consent-sdk #onetrust-reject-all-handler:active,
+html body #onetrust-consent-sdk #onetrust-accept-btn-handler:active,
+html body #onetrust-consent-sdk #accept-recommended-btn-handler:active,
+html body #onetrust-consent-sdk .ot-pc-refuse-all-handler:active,
+html body #onetrust-consent-sdk .save-preference-btn-handler:active,
+html body #onetrust-consent-sdk #onetrust-pc-btn-handler:active {
+  background-color: #511CC1 !important;
+  color: #FFFFFF;
+}
+html body #onetrust-consent-sdk #accept-recommended-btn-handler {
+  display: inline-block !important;
+}
+@media only screen and (min-width: 1024px) {
+  html body #onetrust-consent-sdk #accept-recommended-btn-handler {
+    margin-top: 0 !important;
+  }
+}
+html body #onetrust-consent-sdk .ot-tgl .ot-switch {
+  width: 62px;
+  outline: none !important;
+}
+html body #onetrust-consent-sdk .ot-tgl .ot-switch-nob {
+  background-color: #FFFFFF !important;
+}
+html body #onetrust-consent-sdk .ot-tgl .ot-switch-nob::after {
+  display: inline-block;
+  content: "Off";
+  font-size: 13px;
+  padding-left: 30px;
+}
+html body #onetrust-consent-sdk .ot-tgl .ot-switch-nob::before {
+  transform: translateX(2px) !important;
+}
+html body #onetrust-consent-sdk .ot-tgl input:checked + .ot-switch .ot-switch-nob {
+  border-color: #511CC1 !important;
+}
+html body #onetrust-consent-sdk .ot-tgl input:checked + .ot-switch .ot-switch-nob::after {
+  content: "On";
+  padding-left: 10px;
+}
+html body #onetrust-consent-sdk .ot-tgl input:checked + .ot-switch .ot-switch-nob::before {
+  background-color: #511CC1 !important;
+  border-color: #511CC1 !important;
+  transform: translateX(37px) !important;
+}
+
+/*# sourceMappingURL=oneTrust.css.map */

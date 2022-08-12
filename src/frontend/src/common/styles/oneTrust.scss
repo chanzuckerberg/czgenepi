@@ -1,0 +1,313 @@
+/*
+ * IMPORTANT NOTE
+ * This is literally the only Sass stylesheet we have and one of very, very few
+ * raw stylesheets our app uses. It is likely this will almost never or
+ * literally never need to be updated. As such, we are not installing a
+ * Sass dev dependency to our app for this one file. If you need to update
+ * the styles for OneTrust banner/modal, update this file, cd to this dir,
+ * and then run the command
+ *   npx sass oneTrust.scss ./oneTrust.css
+ * to compile it to CSS for React to actually use in the app.
+ *
+ * If we have to do the above more than once a year, I (Vince) was wrong and
+ * silly and we should totally install a Sass dev dep and do this the right
+ * way. But from where I'm standing right now, I think we'll probably
+ * never update this unless we go through a huge re-styling of the entire app.
+ * Also, resulting CSS is currently stylelint ignored b/c it has some
+ * minor, but not-worth-solving issues. If we have to actively develop this
+ * stylesheet, we should remove that and probably fix those.
+ */
+$color-purple: #511CC1;
+$color-grey: #545454;
+$color-grey-light: #EAEAEA;
+
+@mixin above1279px {
+    @media only screen and (min-width: 1024px) {
+        @content;
+    }
+}
+
+@mixin above1023px {
+    @media only screen and (min-width: 1024px) {
+        @content;
+    }
+}
+
+@mixin above889px {
+    @media only screen and (min-width: 890px) {
+        @content;
+    }
+}
+
+@mixin inlineBannerLinksReset {
+
+    font-size: 13px;
+    line-height: 20px;
+
+    &:hover,
+    &:active,
+    &:focus {
+        opacity: 1 !important;
+    }
+
+    &:focus {
+        outline: none !important;
+    }
+}
+
+html body #onetrust-consent-sdk {
+    box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.3);
+
+    #onetrust-policy { @include above1023px { margin-top: 1.65em !important; } }
+    #ot-pc-desc a { margin-left: 0; color: $color-purple; text-decoration: none;}
+    #onetrust-button-group { margin-top: 0 !important; }
+    #onetrust-banner-sdk:focus-visible { outline-color: transparent; }
+    .ot-switch-nob:before { bottom: 1px; }
+    .ot-pc-footer-logo { display: none !important }
+    *::-webkit-scrollbar-track { background-color: #FFFFFF; }
+
+
+    #ot-pc-title,
+    #ot-pc-desc,
+    .ot-cat-item p,
+    #ot-pc-title,
+    * {
+        font-family: 'Open Sans', -apple-system, 'Helvetica Neue', Helvetica, sans-serif !important;
+    }
+
+    #ot-pc-desc,
+    .ot-cat-item p {
+        font-size: 14px;
+        line-height: 24px;
+    }
+
+    #ot-pc-desc {
+        strong {
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 22px;
+            color: #000000 !important;
+        }
+    }
+
+    #ot-pc-title {
+        font-size: 22px !important;
+        line-height: 30px !important;
+        font-weight: 500 !important;
+    }
+
+    #ot-category-title {
+        font-size: 16px;
+        line-height: 22px;
+        font-weight: 600;
+    }
+
+    .ot-cat-header {
+        font-size: 14px;
+        line-height: 20px;
+        font-weight: 600 !important;
+    }
+
+    #onetrust-policy-text a {
+        margin-left: unset;
+        font-weight: unset;
+        text-decoration: none;
+    }
+
+    #onetrust-group-container {
+        @include above1279px() {
+            width: 72% !important;
+        }
+    }
+
+    #onetrust-button-group-parent {
+        @include above1279px() {
+            width: 20% !important;
+            left: 80% !important;
+        }
+
+        @include above1023px() {
+            button {
+                width: 100% !important;
+            }
+        }
+    }
+
+    #onetrust-reject-all-handler {
+        order: 2;
+
+        @include above889px {
+            margin-top: 5px !important;
+        }
+    }
+
+    button#onetrust-pc-btn-handler {
+        background-color: #FFFFFF !important;
+        color: $color-purple !important;
+        order: 3;
+
+        &:hover {
+            background-color: $color-purple !important;
+            color: #FFFFFF !important;
+            opacity: 1;
+        }
+
+        @include above889px {
+            width: 100% !important;
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+        }
+    }
+
+    button#onetrust-accept-btn-handler {
+        order: 1;
+
+        @include above889px {
+            margin-bottom: 0 !important;
+        }
+    }
+
+    #onetrust-close-btn-container {
+        @include above1023px {
+            top: 30px;
+            right: -7px;
+        }
+    }
+
+    #onetrust-button-group {
+        display: flex !important;
+        flex-flow: column !important;
+    }
+
+    #onetrust-accept-btn-handler {
+        @include above889px {
+            margin-bottom: 10px !important;
+        }
+    }
+
+    .ot-pc-header {
+        border-bottom: none;
+    }
+
+    .ot-pc-footer {
+        border-top: none;
+        @include above889px {
+            bottom: 26px !important;
+        }
+    }
+
+    .ot-btn-container {
+        text-align: left;
+        margin-left: 30px;
+    }
+
+    .ot-pc-logo {
+        height: 60px;
+        width: 170px;
+    }
+
+    .onetrust-pc-dark-filter.ot-fade-in {
+        background: #FFFFFF;
+        opacity: 0.8;
+    }
+
+    #ot-pc-content {
+        border-bottom: 1px solid $color-grey-light;
+    }
+
+    .ot-cat-grp {
+        padding-top: 20px!important;
+        margin-top: 5px;
+        border-top: 1px solid $color-grey-light;
+     }
+
+    #onetrust-policy-text a,
+    .ot-always-active
+    {
+        color: $color-purple !important;
+    }
+
+    .ot-always-active {
+        font-weight: 400;
+    }
+
+    .ot-category-desc {
+        color: $color-grey !important ;
+    }
+
+    #onetrust-reject-all-handler,
+    #onetrust-accept-btn-handler,
+    #accept-recommended-btn-handler,
+    .ot-pc-refuse-all-handler,
+    .save-preference-btn-handler,
+    #onetrust-pc-btn-handler {
+        @include inlineBannerLinksReset;
+        border-radius: 16px !important;
+        font: 400 13px/20px 'Open Sans','OpenSans-Regular', -apple-system, 'Helvetica Neue', Helvetica, sans-serif !important;
+        letter-spacing: .3px !important;
+        padding: 7px 13px !important;
+        min-width: 120px;
+
+        background-color: $color-purple !important;
+        color: #FFFFFF !important;
+
+        &:hover {
+            background-color: $color-purple !important;
+            color: #FFFFFF;
+        }
+
+        &:active {
+            background-color: $color-purple !important;
+            color: #FFFFFF;
+        }
+    }
+
+    #accept-recommended-btn-handler {
+        display: inline-block !important;
+
+        @include above1023px {
+            margin-top: 0 !important;
+        }
+    }
+
+    .ot-tgl {
+        .ot-switch {
+            width: 62px;
+            outline: none !important;
+        }
+
+        .ot-switch-nob{
+            background-color: #FFFFFF !important;
+
+            &::after {
+                display: inline-block;
+                content: "Off";
+                font-size: 13px;
+                padding-left: 30px;
+            }
+
+            &::before {
+                transform: translateX(2px) !important;
+            }
+        }
+
+        input:checked+.ot-switch{
+            .ot-switch-nob{
+                border-color: $color-purple !important;
+
+                &::after {
+                    content: "On";
+                    padding-left: 10px;
+                }
+            }
+
+            .ot-switch-nob {
+                &::before {
+                    background-color: $color-purple !important;
+                    border-color: $color-purple !important;
+                    transform: translateX(37px) !important;
+                }
+            }
+        }
+    }
+}
