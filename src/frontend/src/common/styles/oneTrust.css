@@ -1,18 +1,10 @@
 /*
- * IMPORTANT NOTE
- * This is literally the only Sass stylesheet we have and one of very, very few
- * raw CSS-type stylesheets our app uses. It is likely this will almost never
- * or literally never need to be updated. As such, we are not installing a
- * Sass dev dependency to our app for this one file. If you need to update
- * the styles for OneTrust banner/modal, update this file, then cd to this dir,
- * and run the command
- *   npx sass oneTrust.scss ./oneTrust.css
- * to compile it to CSS for React to actually use in the app.
+ * This stylesheet sets the styles for the OneTrust banner/modal.
  *
- * If we have to do the above more than once a year, I (Vince) was wrong and
- * silly and we should totally install a Sass dev dep and do this the right
- * way. But from where I'm standing right now, I think we'll probably
- * never update this unless we go through a huge re-styling of the entire app.
+ * IMPORTANT NOTE
+ * `oneTrust.css` is built from `oneTrust.scss`. If you need to update the
+ * stylesheet, do not update the CSS directly, instead update it via the
+ * Sass (.scss). You can read more info about that process in `oneTrust.scss`.
  */
 html body #onetrust-consent-sdk {
   box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.3);
@@ -21,6 +13,19 @@ html body #onetrust-consent-sdk {
   html body #onetrust-consent-sdk #onetrust-policy {
     margin-top: 1.65em !important;
   }
+}
+html body #onetrust-consent-sdk #onetrust-policy #onetrust-policy-title::before {
+  content: "";
+  display: inline-block;
+  width: 1.5em;
+  height: 1em;
+  background-image: url(/CZGenEpiMonogramBlack.svg);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  margin: 0 0.6em -0.1em -0.6em;
+  border-right: 1px solid black;
+  padding-right: 0.75em;
 }
 html body #onetrust-consent-sdk #ot-pc-desc a {
   margin-left: 0;
@@ -80,12 +85,12 @@ html body #onetrust-consent-sdk #onetrust-policy-text a {
   font-weight: unset;
   text-decoration: none;
 }
-@media only screen and (min-width: 1024px) {
+@media only screen and (min-width: 1280px) {
   html body #onetrust-consent-sdk #onetrust-group-container {
     width: 72% !important;
   }
 }
-@media only screen and (min-width: 1024px) {
+@media only screen and (min-width: 1280px) {
   html body #onetrust-consent-sdk #onetrust-button-group-parent {
     width: 20% !important;
     left: 80% !important;
@@ -135,6 +140,19 @@ html body #onetrust-consent-sdk button#onetrust-accept-btn-handler {
     right: -7px;
   }
 }
+html body #onetrust-consent-sdk #onetrust-close-btn-container .ot-close-icon {
+  background-image: url(/OneTrustCloseIcon.svg);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  height: 24px;
+  margin: 24px 0 0 0;
+}
+@media only screen and (min-width: 1801px) {
+  html body #onetrust-consent-sdk #onetrust-close-btn-container .ot-close-icon {
+    right: 0px;
+  }
+}
 html body #onetrust-consent-sdk #onetrust-button-group {
   display: flex !important;
   flex-flow: column !important;
@@ -146,6 +164,10 @@ html body #onetrust-consent-sdk #onetrust-button-group {
 }
 html body #onetrust-consent-sdk .ot-pc-header {
   border-bottom: none;
+}
+html body #onetrust-consent-sdk #onetrust-pc-sdk .ot-pc-header #close-pc-btn-handler {
+  background-image: url(/OneTrustCloseIcon.svg);
+  background-size: 24px;
 }
 html body #onetrust-consent-sdk .ot-pc-footer {
   border-top: none;

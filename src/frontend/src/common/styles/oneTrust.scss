@@ -1,28 +1,40 @@
 /*
- * IMPORTANT NOTE
- * This is literally the only Sass stylesheet we have and one of very, very few
- * raw stylesheets our app uses. It is likely this will almost never or
- * literally never need to be updated. As such, we are not installing a
- * Sass dev dependency to our app for this one file. If you need to update
- * the styles for OneTrust banner/modal, update this file, cd to this dir,
- * and then run the command
- *   npx sass oneTrust.scss ./oneTrust.css
- * to compile it to CSS for React to actually use in the app.
+ * This stylesheet sets the styles for the OneTrust banner/modal.
  *
- * If we have to do the above more than once a year, I (Vince) was wrong and
- * silly and we should totally install a Sass dev dep and do this the right
- * way. But from where I'm standing right now, I think we'll probably
- * never update this unless we go through a huge re-styling of the entire app.
- * Also, resulting CSS is currently stylelint ignored b/c it has some
- * minor, but not-worth-solving issues. If we have to actively develop this
- * stylesheet, we should remove that and probably fix those.
+ * IMPORTANT NOTE
+ * `oneTrust.css` is built from `oneTrust.scss`. If you need to update the
+ * stylesheet, do not update the CSS directly, instead update it via the
+ * Sass (.scss). You can read more info about that process in `oneTrust.scss`.
  */
+// This file, `oneTrust.scss`, is literally the only Sass stylesheet we have
+// and one of very, very few raw stylesheets our app uses. It is likely this
+// will almost never or literally never need to be updated. As such, we are
+// not installing a Sass dev dependency to our app for this one file. If you
+// need to update the styles for OneTrust banner/modal, update this file,
+// cd to this dir, and then run the command
+//   npx sass oneTrust.scss ./oneTrust.css
+// to compile it to CSS for React to actually use in the app.
+//
+// If we have to do the above more than once a year, I (Vince) was wrong and
+// silly and we should totally install a Sass dev dep and do this the right
+// way. But from where I'm standing right now, I think we'll probably
+// never update this unless we go through a huge re-styling of the entire app.
+// Also, resulting CSS is currently stylelint ignored b/c it has some
+// minor, but not-worth-solving issues. If we have to actively develop this
+// stylesheet, we should remove that and probably fix those.
+
 $color-purple: #511CC1;
 $color-grey: #545454;
 $color-grey-light: #EAEAEA;
 
+@mixin above1800px {
+    @media only screen and (min-width: 1801px) {
+        @content;
+    }
+}
+
 @mixin above1279px {
-    @media only screen and (min-width: 1024px) {
+    @media only screen and (min-width: 1280px) {
         @content;
     }
 }
@@ -58,7 +70,25 @@ $color-grey-light: #EAEAEA;
 html body #onetrust-consent-sdk {
     box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.3);
 
-    #onetrust-policy { @include above1023px { margin-top: 1.65em !important; } }
+    #onetrust-policy {
+        @include above1023px { margin-top: 1.65em !important; }
+
+        #onetrust-policy-title::before {
+            content: "";
+            display: inline-block;
+            width: 1.5em;
+            height: 1em;
+            background-image: url(/CZGenEpiMonogramBlack.svg);
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin: 0 0.6em -0.1em -0.6em;
+            border-right: 1px solid black;
+            padding-right: 0.75em;
+        }
+    }
+
+
     #ot-pc-desc a { margin-left: 0; color: $color-purple; text-decoration: none;}
     #onetrust-button-group { margin-top: 0 !important; }
     #onetrust-banner-sdk:focus-visible { outline-color: transparent; }
@@ -172,6 +202,24 @@ html body #onetrust-consent-sdk {
             top: 30px;
             right: -7px;
         }
+
+        .ot-close-icon {
+            background-image: url(/OneTrustCloseIcon.svg);
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            height: 24px;
+            // shorthand because need to override a OneTrust shorthand
+            margin: 24px 0 0 0
+        }
+
+        @include above1800px {
+            .ot-close-icon {
+                right: 0px;
+            }
+        }
+
+
     }
 
     #onetrust-button-group {
@@ -187,6 +235,11 @@ html body #onetrust-consent-sdk {
 
     .ot-pc-header {
         border-bottom: none;
+    }
+
+    #onetrust-pc-sdk .ot-pc-header #close-pc-btn-handler {
+        background-image: url(/OneTrustCloseIcon.svg);
+        background-size: 24px;
     }
 
     .ot-pc-footer {
