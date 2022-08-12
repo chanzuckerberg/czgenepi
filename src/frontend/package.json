@@ -9,7 +9,9 @@
     "build": "node --max_old_space_size=8192 node_modules/.bin/next build",
     "dev": "node --max_old_space_size=8192 node_modules/.bin/next dev",
     "local-dev": "API_URL=http://backend.genepinet.localdev:3000 npm run dev --  -p 8000",
-    "e2e": "mkdir -p /tmp/screenshots; DEBUG=pw:api npx playwright test --output /tmp/screenshots -c tests/features/playwright.config.ts -j 2 tests/features",
+    "test": "mkdir -p /tmp/screenshots; DEBUG=pw:api npx playwright test --output /tmp/screenshots -c playwright-component.config.ts",
+    "e2e": "mkdir -p /tmp/screenshots; DEBUG=pw:api npx playwright test --output /tmp/screenshots -c ./e2e/setup/local.config.ts",
+    "e2e-staging": "mkdir -p /tmp/screenshots; DEBUG=pw:api npx playwright test --output /tmp/screenshots -c ./e2e/setup/staging.config.ts",
     "e2e-staging-from-local": "AWS_PROFILE=genepi-dev FRONTEND_URL=https://staging.genepi.czi.technology DEPLOYMENT_STAGE=staging make e2e",
     "type-check": "tsc --noEmit",
     "lint": "concurrently \"node_modules/.bin/eslint **/*.{ts,tsx} --quiet --fix\" \"node_modules/.bin/stylelint --fix '**/*.{js,ts,tsx,css}'\"  \"npm run type-check\"",
@@ -18,8 +20,7 @@
     "pl:local:headed": "npx playwright test --headed -c ./e2e/setup/staging.config.ts",
     "pl:staging:headless": "npx playwright test --headed -c ./e2e/setup/staging.config.ts",
     "pl:staging:debug": "npx playwright test --debug -c ./e2e/setup/staging.config.ts",
-    "pl:report": "npx playwright show-report",
-    "test": "playwright test -c playwright-component.config.ts"
+    "pl:report": "npx playwright show-report"
   },
   "dependencies": {
     "@emotion/css": "^11.1.3",
