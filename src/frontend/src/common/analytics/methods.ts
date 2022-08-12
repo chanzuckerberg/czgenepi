@@ -141,7 +141,6 @@ export function analyticsTrackEvent(
   eventType: EVENT_TYPES,
   additionalEventData?: EventData
 ) {
-  console.log("it me, analyticsTrackEvent"); // REMOVE
   const addlEventData = additionalEventData || {};
   if (window.analytics && window.isCzGenEpiAnalyticsEnabled) {
     const eventData = {
@@ -186,9 +185,7 @@ export function extractAnalyticsUserInfo(
   userInfo: User,
   explicitGroupId?: number
 ): AnalyticsUserInfo | undefined {
-  console.log("it me, extractAnalyticsUserInfo"); // REMOVE
   let group = undefined;
-  console.log("group", group); // REMOVE
   if (explicitGroupId) {
     group = getUserGroupInfoByGroupId(userInfo, explicitGroupId);
   } else {
@@ -231,7 +228,6 @@ function analyticsSendUserInfo_(
   userInfo: User,
   explicitGroupId?: number
 ): void {
-  console.log("it me, analyticsSendUserInfo_"); // REMOVE
   const analyticsUserInfo = extractAnalyticsUserInfo(userInfo, explicitGroupId);
   // User info loaded, but user/group init not complete. Do nothing for now.
   if (!analyticsUserInfo) {
@@ -306,7 +302,6 @@ export function analyticsRecordRouteChange(pageUrl: string): void {
     window.isCzGenEpiAnalyticsEnabled &&
     previouslyRecordedRoute !== pageUrl
   ) {
-    console.log("it me, analyticsRecordRouteChange"); // REMOVE
     const commonAnalyticsInfo = getCommonUserInfo();
     window.analytics.page(commonAnalyticsInfo);
     previouslyRecordedRoute = pageUrl;

@@ -1,5 +1,4 @@
 import { forEach } from "lodash";
-import { queryClient } from "pages/_app";
 import {
   useMutation,
   UseMutationResult,
@@ -7,6 +6,7 @@ import {
   useQueryClient,
   UseQueryResult,
 } from "react-query";
+import { queryClient } from "src/common/queries/queryClient";
 import {
   DEFAULT_FETCH_OPTIONS,
   DEFAULT_POST_OPTIONS,

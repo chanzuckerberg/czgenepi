@@ -4,12 +4,13 @@ import { AppProps } from "next/app";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
-import { QueryClient, QueryClientProvider } from "react-query";
+import { QueryClientProvider } from "react-query";
 import { Provider } from "react-redux";
 import { analyticsRecordRouteChange } from "src/common/analytics/methods";
 import { OneTrustInitializer } from "src/common/analytics/OneTrustInitializer";
 import { PlausibleInitializer } from "src/common/analytics/PlausibleInitializer";
 import { SegmentInitializer } from "src/common/analytics/SegmentInitializer";
+import { queryClient } from "src/common/queries/queryClient";
 import { store } from "src/common/redux";
 import { StyledApp } from "src/common/styles/appStyle";
 import "src/common/styles/global.css";
@@ -18,7 +19,6 @@ import { setFeatureFlagsFromQueryParams } from "src/common/utils/featureFlags";
 import Nav from "src/components/NavBar";
 import SplitInitializer from "src/components/Split";
 
-export const queryClient = new QueryClient();
 setFeatureFlagsFromQueryParams();
 
 const App = ({ Component, pageProps }: AppProps): JSX.Element => {
