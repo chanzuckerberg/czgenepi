@@ -13,7 +13,7 @@ const footer: Record<string, string> = {
 test.describe("Home page tests", () => {
   test('Should verify home page', async ({ page }) => {
     await page.goto('https://staging.czgenepi.org');
-    await expect(page.locator(getByTestID("navbar-landing"))).not.toBeEmpty();
+    await expect(page.locator(getByTestID("navbar-landing"))).not.toBeVisible();
     await expect(page.locator(getByTestID("navbar-sign-in-link"))).toBeVisible();
     await expect(page.locator(getByTestID("logo"))).toBeVisible();
     Object.keys(footer).forEach((key) => {

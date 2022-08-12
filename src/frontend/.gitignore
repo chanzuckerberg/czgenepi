@@ -1,3 +1,11 @@
 .env
 playwright-report
 playwright/storage
+test-results
+node_modules/
+/test-results/
+/playwright-report/
+/playwright/.cache/
+/test-results/
+/playwright-report/
+/playwright/.cache/

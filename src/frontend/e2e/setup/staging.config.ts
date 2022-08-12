@@ -14,7 +14,7 @@ const config: PlaywrightTestConfig = {
   globalSetup: './global-setup',
   use: {
     baseURL: "https://staging.czgenepi.org",
-    //storageState: 'playwright/storage/state.json',
+    storageState: 'e2e/storage/state.json',
     actionTimeout: 0,
     trace: 'on-first-retry',
     screenshot: "only-on-failure",
