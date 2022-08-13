@@ -121,6 +121,7 @@ local-init: oauth/pkcs12/certificate.pfx .env.ecr local-ecr-login local-hostconf
 	# Hack - CI keeps recreating localstack for some reason :'(
 	$(docker_compose) --profile $(LOCALDEV_PROFILE) up -d
 	./scripts/setup_dev_data.sh
+	$(docker_compose) restart backend
 	$(docker_compose) exec -T backend alembic upgrade head
 	$(docker_compose) exec -T backend python scripts/setup_localdata.py
 	$(docker_compose) --profile $(LOCALDEV_PROFILE) up -d
