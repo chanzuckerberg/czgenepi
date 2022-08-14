@@ -28,13 +28,9 @@
     "target": "esnext",
     "types": [
       "jest",
-      "playwright",
-      "cypress"
+      "playwright"
     ],
     "incremental": false,
-    "typeRoots": [
-      "cypress/types/*"
-    ]
   },
   "exclude": [
     "node_modules",
