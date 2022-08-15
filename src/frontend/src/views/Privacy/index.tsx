@@ -225,15 +225,15 @@ const PrivacyPolicy = (): JSX.Element => {
                 <P>
                   This data is also accessible by technical partners (CZ Biohub
                   and CZI, LLC) and Service Providers (ex: AWS) that help
-                  operate and secure CZ GEN EPI. For example, we need to be able
-                  to access your data in order to back up and maintain the
-                  database.
+                  operate, secure, and improve CZ GEN EPI. For example, we need
+                  to be able to access your data in order to back up and
+                  maintain the database.
                 </P>
 
                 <P>
                   This Privacy Policy applies to all parties that access data to
                   support CZ GEN EPI and they will not use the data for any
-                  purpose beyond operating and securing CZ GEN EPI.
+                  purpose beyond operating, securing, and improving CZ GEN EPI.
                 </P>
 
                 <P>
