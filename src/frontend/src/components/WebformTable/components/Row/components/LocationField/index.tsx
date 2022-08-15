@@ -127,7 +127,7 @@ export default function LocationField({
         isBackgroundColorShown={isBackgroundColorShown}
         options={locations}
         search
-        MenuSelectProps={{
+        DropdownMenuProps={{
           filterOptions: filter,
           sdsStage: "userInput",
         }}

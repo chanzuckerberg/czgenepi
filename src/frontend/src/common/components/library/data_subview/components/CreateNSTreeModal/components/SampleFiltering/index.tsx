@@ -79,7 +79,7 @@ function filterLineageOptions(
   return [...addlPrependResults, ...baseFilteredResults.slice(0, 99)];
 }
 // `Dropdown` doesn't directly handle above, it's done by its child MenuSelect
-const lineageMenuSelectProps = {
+const lineageDropdownMenuProps = {
   getOptionSelected,
   filterOptions: filterLineageOptions,
 };
@@ -303,7 +303,7 @@ export function SampleFiltering({
             value={lineageDropdownValue}
             multiple
             search
-            MenuSelectProps={lineageMenuSelectProps}
+            DropdownMenuProps={lineageDropdownMenuProps}
             InputDropdownProps={InputDropdownProps}
             PopperComponent={BottomPlacementDropdownPopper}
           />
