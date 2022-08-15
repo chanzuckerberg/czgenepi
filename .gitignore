@@ -309,4 +309,4 @@ static
 
 # Next.js
 .next
-/src/frontend/playwright/storage/
+/src/frontend/e2e/storage/
