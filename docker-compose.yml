@@ -103,16 +103,19 @@ services:
         aliases:
           - backend.genepinet.localdev
   localstack:
-    image: localstack/localstack:0.14.3
+    image: localstack/localstack:0.13.0
     profiles: [ "backend", "web", "all" ]
     ports:
       - "4566:4566"
     environment:
-      - EAGER_SERVICE_LOADING=1
       - HOSTNAME_EXTERNAL=localstack
+      - LEGACY_PERSISTENCE=1
+      - EAGER_SERVICE_LOADING=1
       - SERVICES=s3,secretsmanager,stepfunctions,ssm,iam
       - DEBUG=1
       - DATA_DIR=/tmp/localstack/data
+      - PORT_WEB_UI=${PORT_WEB_UI- }
+      - HOST_TMP_FOLDER=${TMPDIR}
       - DEFAULT_REGION=us-west-2
     volumes:
       - localstack:/tmp/localstack
