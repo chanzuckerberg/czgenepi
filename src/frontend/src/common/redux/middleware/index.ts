@@ -13,10 +13,10 @@ import {
   analyticsSendUserInfo,
   analyticsTrackEvent,
 } from "src/common/analytics/methods";
+import { getCurrentUserInfo } from "src/common/queries/auth";
 import { expireAllCaches } from "src/common/queries/groups";
 import { FALLBACK_GROUP_ID } from "src/common/redux";
 import { setLocalStorage } from "src/common/utils/localStorage";
-import { getCurrentUserInfo } from "src/common/utils/userInfo";
 import { selectCurrentGroup } from "../selectors";
 import { CZGEReduxActions, ReduxPersistenceTokens } from "../types";
 

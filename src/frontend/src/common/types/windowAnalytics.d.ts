@@ -7,6 +7,11 @@
  * is not an exhaustive listing of everything available via Segment, it's
  * just the methods we use in our app.
  *
+ * Additionally, the cookie management / opt-in, opt-out library we use,
+ * OneTrust, adds the `OneTrust` (and some others) object to the global
+ * namespace. It has lots of methods, but we only use one, so that's all
+ * we detail here.
+ *
  * I [Vince] found this a bit surprising as the way to add types to a global
  * object, but after some searching, it seems like the best way to do it.
  * References:
@@ -26,6 +31,9 @@ declare global {
       track: (eventType: string, properties: Record<string, unknown>) => void;
       // Unlike above methods, `user` only present once library finishes load
       user?: () => { traits: () => Record<string, unknown> };
+    };
+    OneTrust?: {
+      ToggleInfoDisplay: () => void;
     };
     isCzGenEpiAnalyticsEnabled?: boolean;
   }
