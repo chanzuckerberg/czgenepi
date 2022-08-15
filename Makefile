@@ -78,6 +78,11 @@ oauth/pkcs12/certificate.pfx:
 	docker run -v $(PWD)/oauth/pkcs12:/tmp/certs --workdir /tmp/certs --rm=true --entrypoint bash soluto/oidc-server-mock:0.3.0 ./generate_pfx.sh
 	# On Linux, the pkcs12 directory gets written to with root permission. Force ownership to our user.
 	sudo chown -R $$(id -u):$$(id -g) $(PWD)/oauth/pkcs12
+	# If the OIDC server is already running, restart it to use the new certs
+	if [ -n "$$(docker ps -q -f name=oidc)" ]; then \
+		echo "Restarting OIDC server"; \
+		$(docker_compose) restart oidc; \
+	fi
 
 .env.ecr:
 	export AWS_ACCOUNT_ID=$$(aws sts get-caller-identity --profile $(AWS_DEV_PROFILE) | jq -r .Account); \
