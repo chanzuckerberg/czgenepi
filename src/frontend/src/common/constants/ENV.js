@@ -14,7 +14,5 @@ module.exports = {
   SPLIT_FRONTEND_KEY: process.env.SPLIT_FRONTEND_KEY || "localhost",
   ONETRUST_FRONTEND_KEY: process.env.ONETRUST_FRONTEND_KEY || "",
   PLAUSIBLE_FRONTEND_KEY: process.env.PLAUSIBLE_FRONTEND_KEY || "",
-  // If Segment env var not present, use of empty string indicates
-  // to app that Segment analytics should be kept completely off.
   SEGMENT_FRONTEND_KEY: process.env.SEGMENT_FRONTEND_KEY || "",
 };
