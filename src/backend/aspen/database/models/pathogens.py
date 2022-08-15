@@ -3,7 +3,11 @@ from __future__ import annotations
 from sqlalchemy import (
     Column,
     String,
+    Integer,
+    ForeignKey
 )
+from sqlalchemy.orm import relationship
+
 
 from aspen.database.models.base import idbase
 
@@ -27,3 +31,15 @@ class Pathogen(idbase):  # type: ignore
             "full pathogen abbreviated name, ex: SARS-CoV-2"
         ),
     )
+
+
+class PathogenPrefix(idbase):  # type: ignore
+    """prefix for sample identifiers """
+
+    prefix = Column(String, nullable=False)
+
+    pathogen_id = Column(Integer, ForeignKey("pathogen.id"))
+    pathogen = relationship("Pathogen")
+
+    public_repository_id = Column(Integer, ForeignKey("public_repository.id"))
+    public_repository = relationship("PublicRepository")
