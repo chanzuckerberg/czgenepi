@@ -3,7 +3,7 @@ import { noop } from "lodash";
 import React from "react";
 import { Provider } from "react-redux";
 import { store } from "src/common/redux";
-import { ReactQueryWrapper } from "tests/utils/helpers";
+import { ReactQueryWrapper } from "jest/utils/helpers";
 import { CreateNSTreeModal } from "./index";
 
 test("shows NS and GISAID attribution", async () => {
