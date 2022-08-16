@@ -1,3 +1,4 @@
+import { Link } from "czifui";
 import React from "react";
 import {
   Content,
@@ -6,6 +7,7 @@ import {
   DetailPage,
   DetailSection,
   DetailSubheader,
+  StyledCallout,
   Text,
 } from "./style";
 
@@ -13,11 +15,26 @@ interface Props {
   address?: string;
   location?: string;
   prefix?: string;
+  shouldShowChangeDetailsCallout: boolean;
 }
 
-const GroupDetailsTab = ({ address, location, prefix }: Props): JSX.Element => {
+const GroupDetailsTab = ({
+  address,
+  location,
+  prefix,
+  shouldShowChangeDetailsCallout,
+}: Props): JSX.Element => {
   return (
     <DetailPage>
+      {shouldShowChangeDetailsCallout && (
+        <StyledCallout intent="info">
+          Contact us at{" "}
+          <Link sdsStyle="dashed" href="mailto:support@czgenepi.org">
+            support@czgenepi.org
+          </Link>{" "}
+          to add or update your group’s details.
+        </StyledCallout>
+      )}
       <DetailHeader>Group Details</DetailHeader>
       <Content>
         <DetailSection>
