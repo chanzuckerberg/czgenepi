@@ -36,10 +36,12 @@ class Pathogen(idbase):  # type: ignore
 class PathogenPrefix(idbase):  # type: ignore
     """prefix for sample identifiers """
 
-    prefix = Column(String, nullable=False)
+    __tablename__ = "pathogen_prefixes"
 
-    pathogen_id = Column(Integer, ForeignKey("pathogen.id"))
-    pathogen = relationship("Pathogen")
+    prefix = Column(String, nullable=False)
 
     public_repository_id = Column(Integer, ForeignKey("public_repository.id"))
     public_repository = relationship("PublicRepository")
+
+    pathogen_id = Column(Integer, ForeignKey("pathogen.id"))
+    pathogen = relationship("Pathogen")
