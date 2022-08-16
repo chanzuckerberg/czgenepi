@@ -27,19 +27,21 @@ class Pathogen(idbase):  # type: ignore
     )
 
 
-class PathogenPrefix(idbase):  # type: ignore
-    """prefix for sample identifiers"""
+class PathogenRepoConfig(idbase):  # type: ignore
+    """pathogen specific data required for interacting with public databases such as GISAID and GenBank"""
 
-    __tablename__ = "pathogen_prefixes"
+    __tablename__ = "pathogen_repo_configs"
     __table_args__ = (
         UniqueConstraint(
             "public_repository_id",
             "pathogen_id",
-            name="uq_pathogen_prefixes_public_repository_id_pathogen_id",
+            name="uq_pathogen_repo_configs_public_repository_id_pathogen_id",
         ),
     )
 
-    prefix = Column(String, nullable=False)
+    prefix = Column(
+        String, nullable=False, comment="identifier samples prefix, ex: hCoV-19"
+    )
 
     public_repository_id = Column(Integer, ForeignKey("public_repository.id"))
     public_repository = relationship("PublicRepository")

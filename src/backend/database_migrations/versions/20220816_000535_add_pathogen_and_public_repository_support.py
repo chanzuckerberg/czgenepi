@@ -35,7 +35,7 @@ def upgrade():
     )
 
     op.create_table(
-        "pathogen_prefixes",
+        "pathogen_repo_configs",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
         sa.Column("prefix", sa.String(), nullable=False),
         sa.Column("public_repository_id", sa.Integer(), nullable=False),
@@ -43,19 +43,21 @@ def upgrade():
         sa.ForeignKeyConstraint(
             ["public_repository_id"],
             ["aspen.public_repositories.id"],
-            name=op.f("fk_pathogen_prefixes_public_repository_id_public_repositories"),
+            name=op.f(
+                "fk_pathogen_repo_configs_public_repository_id_public_repositories"
+            ),
         ),
         sa.ForeignKeyConstraint(
             ["pathogen_id"],
             ["aspen.pathogens.id"],
-            name=op.f("fk_pathogen_prefixes_pathogen_id_pathogens"),
+            name=op.f("fk_pathogen_repo_configs_pathogen_id_pathogens"),
         ),
         sa.UniqueConstraint(
             "public_repository_id",
             "pathogen_id",
-            name=op.f("uq_pathogen_prefixes_public_repository_id_pathogen_id"),
+            name=op.f("uq_pathogen_repo_configs_public_repository_id_pathogen_id"),
         ),
-        sa.PrimaryKeyConstraint("id", name=op.f("pk_pathogen_prefixes")),
+        sa.PrimaryKeyConstraint("id", name=op.f("pk_pathogen_repo_configs")),
         schema="aspen",
     )
 
@@ -73,7 +75,7 @@ def upgrade():
 
     op.execute(
         """
-        INSERT INTO aspen.pathogen_prefixes (id, prefix, public_repository_id, pathogen_id) VALUES
+        INSERT INTO aspen.pathogen_repo_configs (id, prefix, public_repository_id, pathogen_id) VALUES
              ( 1, 'hCoV-19', (SELECT id from aspen.public_repositories WHERE name='GISAID'), (SELECT id from aspen.pathogens WHERE name='SARS-CoV-2') ),
              ( 2, 'SARS-CoV-2/human', (SELECT id from aspen.public_repositories WHERE name='GenBank'), (SELECT id from aspen.pathogens WHERE name='SARS-CoV-2') )
     """
