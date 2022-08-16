@@ -2,7 +2,7 @@ import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
 import { StylesProvider, ThemeProvider } from "@material-ui/core/styles";
 import { AppProps } from "next/app";
 import Head from "next/head";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { Provider } from "react-redux";
 import { PlausibleInitializer } from "src/common/analytics/PlausibleInitializer";
