@@ -47,7 +47,7 @@ class PathogenRepoConfig(idbase):  # type: ignore
     public_repository_id = Column(
         Integer, ForeignKey(PublicRepository.id), nullable=False
     )
-    public_repository: PublicRepository = relationship("PublicRepository")
+    public_repository: PublicRepository = relationship(PublicRepository)  # type: ignore
 
     pathogen_id = Column(Integer, ForeignKey(Pathogen.id), nullable=False)
-    pathogen: Pathogen = relationship("Pathogen")
+    pathogen: Pathogen = relationship(Pathogen)  # type: ignore
