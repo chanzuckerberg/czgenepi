@@ -17,7 +17,7 @@ def upgrade():
     op.create_table(
         "pathogens",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
-        sa.Column("slug", sa.String(), nullable=False)
+        sa.Column("slug", sa.String(), nullable=False),
         sa.Column("name", sa.String(), nullable=False),
         schema="aspen",
     )
