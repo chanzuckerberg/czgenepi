@@ -1,4 +1,6 @@
+from inspect import Parameter
 from typing import Optional
+from aspen.database.models.pathogens import Pathogen
 
 from splitio import get_factory
 from splitio.client.client import Client as SplitioClient
@@ -32,9 +34,17 @@ class SplitClient:
             params["group_id"] = group.id
         return params
 
-    def get_flag(self, treatment: str, user: User, group: Optional[Group] = None):
+    def get_flag(self, feature: str, user: User, group: Optional[Group] = None):
+        # feature: ex: usher_enabled, a functionality block
         parameters = self.generate_parameters(user, group)
         treatment = self.split_client.get_treatment(
-            user.split_id, treatment, parameters
+            user.split_id, feature, parameters
+        )
+        return treatment
+
+    def get_pathogen_flag(self, feature: str, pathogen: Pathogen):
+        params = {} # empty for now, but we may want to make more complicated desicions with split later.
+        treatment = self.split_client.get_treatment(
+            pathogen.slug, feature, params
         )
         return treatment

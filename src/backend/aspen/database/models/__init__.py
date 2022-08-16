@@ -39,5 +39,7 @@ from aspen.database.models.workflow import (  # noqa: F401
     WorkflowStatusType,
     WorkflowType,
 )
+from aspen.database.models.pathogens import Pathogen, PathogenRepoConfig
+from aspen.database.models.public_repositories import PublicRepository
 
 configure_mappers()
