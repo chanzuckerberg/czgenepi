@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { EVENT_TYPES } from "src/common/analytics/eventTypes";
+import { analyticsTrackEvent } from "src/common/analytics/methods";
 import Notification from "src/components/Notification";
 import { UsherConfirmationModal } from "./components/UsherConfirmationModal";
 import { UsherPlacementModal } from "./components/UsherPlacementModal";
@@ -58,6 +60,7 @@ const UsherTreeFlow = ({
 
   const handleConfirmationConfirm = () => {
     openUsher();
+    analyticsTrackEvent(EVENT_TYPES.TREE_CREATION_VIEW_USHER);
     setIsConfirmOpen(false);
     setIsPlacementOpen(false);
     setIsAlertShown(true);
