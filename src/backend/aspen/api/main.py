@@ -150,6 +150,8 @@ def get_app() -> FastAPI:
 app = get_app()
 
 if __name__ == "__main__":
-    config = uvicorn.Config("aspen.api.main:app", host="0.0.0.0", port=3000, log_level="info")
+    config = uvicorn.Config(
+        "aspen.api.main:app", host="0.0.0.0", port=3000, log_level="info"
+    )
     server = uvicorn.Server(config)
     server.run()
