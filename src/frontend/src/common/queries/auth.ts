@@ -113,7 +113,6 @@ export function useProtectedRoute(): UseQueryResult<User, unknown> {
   const router = useRouter();
   const result = useUserInfo();
   const currentGroup = useSelector(selectCurrentGroup);
-
   const { isLoading, data: userInfo } = result;
 
   useEffect(() => {

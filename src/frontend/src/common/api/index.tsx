@@ -159,7 +159,11 @@ export async function apiResponse<T extends APIResponse>(
 export async function makeBackendApiJsonCall<T>(
   route: string,
   requestOptions: RequestInit
-): Promise<T> {
+): Promise<T | null> {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const response = await fetch(ENV.API_URL + route, {
     ...requestOptions,
   });
@@ -172,7 +176,7 @@ export async function makeBackendApiJsonCall<T>(
 export async function getBackendApiJson<T>(
   route: string,
   additionalRequestOptions: RequestInit = {}
-): Promise<T> {
+): Promise<T | null> {
   const requestOptions = {
     ...DEFAULT_FETCH_OPTIONS,
     ...additionalRequestOptions,
@@ -184,7 +188,7 @@ export async function putBackendApiJson<T>(
   route: string,
   requestBody: string,
   additionalRequestOptions: RequestInit = {}
-): Promise<T> {
+): Promise<T | null> {
   const requestOptions = {
     ...DEFAULT_PUT_OPTIONS,
     ...additionalRequestOptions,
