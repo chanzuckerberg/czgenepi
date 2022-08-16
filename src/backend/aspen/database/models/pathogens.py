@@ -1,14 +1,7 @@
 from __future__ import annotations
 
-from sqlalchemy import (
-    Column,
-    String,
-    Integer,
-    ForeignKey,
-    UniqueConstraint
-)
+from sqlalchemy import Column, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import relationship
-
 
 from aspen.database.models.base import idbase
 
@@ -30,14 +23,12 @@ class Pathogen(idbase):  # type: ignore
         String,
         nullable=False,
         unique=True,
-        comment=(
-            "full pathogen abbreviated name, ex: SARS-CoV-2"
-        ),
+        comment=("full pathogen abbreviated name, ex: SARS-CoV-2"),
     )
 
 
 class PathogenPrefix(idbase):  # type: ignore
-    """prefix for sample identifiers """
+    """prefix for sample identifiers"""
 
     __tablename__ = "pathogen_prefixes"
     __table_args__ = (

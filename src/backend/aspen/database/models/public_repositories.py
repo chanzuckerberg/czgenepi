@@ -1,9 +1,6 @@
 from __future__ import annotations
 
-from sqlalchemy import (
-    Column,
-    String,
-)
+from sqlalchemy import Column, String
 
 from aspen.database.models.base import idbase
 
@@ -17,7 +14,5 @@ class PublicRepository(idbase):  # type: ignore
         String,
         nullable=False,
         unique=True,
-        comment=(
-            "Public Repository abbreviated name (ex: GISAID/GenBank)"
-        ),
+        comment=("Public Repository abbreviated name (ex: GISAID/GenBank)"),
     )

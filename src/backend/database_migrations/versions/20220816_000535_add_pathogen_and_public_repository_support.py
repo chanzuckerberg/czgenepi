@@ -59,19 +59,25 @@ def upgrade():
         schema="aspen",
     )
 
-    op.execute("INSERT INTO aspen.pathogens (id, slug, name) VALUES (1, 'SC2', 'SARS-CoV-2')")
+    op.execute(
+        "INSERT INTO aspen.pathogens (id, slug, name) VALUES (1, 'SC2', 'SARS-CoV-2')"
+    )
 
-    op.execute("""
+    op.execute(
+        """
         INSERT INTO aspen.public_repositories (id, name) VALUES
              ( 1, 'GISAID' ),
              ( 2, 'GenBank' )
-    """)
+    """
+    )
 
-    op.execute("""
+    op.execute(
+        """
         INSERT INTO aspen.pathogen_prefixes (id, prefix, public_repository_id, pathogen_id) VALUES
              ( 1, 'hCoV-19', (SELECT id from aspen.public_repositories WHERE name='GISAID'), (SELECT id from aspen.pathogens WHERE name='SARS-CoV-2') ),
              ( 2, 'SARS-CoV-2/human', (SELECT id from aspen.public_repositories WHERE name='GenBank'), (SELECT id from aspen.pathogens WHERE name='SARS-CoV-2') )
-    """)
+    """
+    )
 
 
 def downgrade():
