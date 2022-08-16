@@ -16,6 +16,8 @@
     "type-check": "tsc --noEmit",
     "lint": "concurrently \"node_modules/.bin/eslint **/*.{ts,tsx} --quiet --fix\" \"node_modules/.bin/stylelint --fix '**/*.{js,ts,tsx,css}'\"  \"npm run type-check\"",
     "lint-ci": "concurrently \"node_modules/.bin/eslint **/*.{ts,tsx}\" \"node_modules/.bin/stylelint '**/*.{js,ts,tsx,css}'\"  \"npm run type-check\"",
+    "prettier": "prettier --check e2e",
+    "prettier:fix": "prettier --write e2e",
     "pl:staging:headed": "npx playwright test --headed -c ./e2e/setup/staging.config.ts",
     "pl:local:headed": "npx playwright test --headed -c ./e2e/setup/staging.config.ts",
     "pl:staging:headless": "npx playwright test --headed -c ./e2e/setup/staging.config.ts",

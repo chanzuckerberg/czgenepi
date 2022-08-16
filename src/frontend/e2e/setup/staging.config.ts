@@ -1,4 +1,4 @@
-import { PlaywrightTestConfig, devices } from "@playwright/test";
+import { devices, PlaywrightTestConfig } from "@playwright/test";
 //import { devices } from "@playwright/test";
 import dotenv from "dotenv";
 
@@ -10,7 +10,7 @@ const config: PlaywrightTestConfig = {
   expect: {
     timeout: 30000,
   },
-  reporter: [ ["html", {open: "never"} ] ],
+  reporter: [["html", { open: "never" }]],
   globalSetup: "./global-setup",
   use: {
     baseURL: "https://staging.czgenepi.org",
@@ -19,15 +19,15 @@ const config: PlaywrightTestConfig = {
     trace: "on-first-retry",
     screenshot: "only-on-failure",
     ignoreHTTPSErrors: true,
-    viewport: {width: 1280, height: 720}
+    viewport: { width: 1280, height: 720 },
   },
   projects: [
     {
-        name: "chromium",
-        use: {
-            ...devices["Desktop Chrome"]
-        }
-    }
-  ]
+      name: "chromium",
+      use: {
+        ...devices["Desktop Chrome"],
+      },
+    },
+  ],
 };
 export default config;

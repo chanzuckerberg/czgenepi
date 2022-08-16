@@ -6,14 +6,16 @@ export async function login(
   username: string,
   password: string
 ): Promise<void> {
-  await page.goto("https://staging.czgenepi.org"); 
-  await page.locator(getByTestID("navbar-sign-in-link")).click(); 
-  await page.locator(getByID("username")).first().fill(username); 
-  await page.locator(getByID("password")).first().fill(password); 
+  await page.goto("https://staging.czgenepi.org");
+  await page.locator(getByTestID("navbar-sign-in-link")).click();
+  await page.locator(getByID("username")).first().fill(username);
+  await page.locator(getByID("password")).first().fill(password);
 
   await Promise.all([
     page.waitForNavigation(),
-    page.locator('button[type=submit] >> "Continue"').first().click(), 
-    process.env.SESSION_STORAGE = await page.evaluate(() => JSON.stringify(sessionStorage)),
+    page.locator('button[type=submit] >> "Continue"').first().click(),
+    (process.env.SESSION_STORAGE = await page.evaluate(() =>
+      JSON.stringify(sessionStorage)
+    )),
   ]);
 }
