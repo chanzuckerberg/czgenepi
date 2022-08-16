@@ -44,7 +44,7 @@ const GroupMembersPage = ({
   const { data: members = [] } = useGroupMembersInfo();
   const { data: groupInfo } = useGroupInfo();
 
-  const { address, location, name, prefix } = groupInfo ?? {};
+  const { name } = groupInfo ?? {};
 
   useEffect(() => {
     setTabValue(requestedPrimaryTab);
@@ -52,8 +52,6 @@ const GroupMembersPage = ({
 
   // sort group members by name before display
   members.sort((a, b) => caseInsensitiveSort(a.name, b.name));
-
-  const displayLocation = stringifyGisaidLocation(location);
 
   const handleTabClick: TabEventHandler = (_, value) => {
     setTabValue(value);
@@ -87,9 +85,7 @@ const GroupMembersPage = ({
         )}
         {tabValue === PrimaryTabType.DETAILS && (
           <GroupDetailsTab
-            address={address}
-            location={displayLocation}
-            prefix={prefix}
+            group={groupInfo}
             shouldShowChangeDetailsCallout={isGroupAdmin}
           />
         )}
