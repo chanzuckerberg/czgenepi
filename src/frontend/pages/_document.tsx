@@ -112,10 +112,6 @@ MyDocument.getInitialProps = async (ctx) => {
     />
   ));
 
-  // console.log("---------")
-  // console.log({emotionStyleTags});
-  // console.log("---------")
-
   return {
     ...initialProps,
     styles: (
