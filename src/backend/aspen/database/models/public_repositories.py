@@ -16,6 +16,7 @@ class PublicRepository(idbase):  # type: ignore
     name = Column(
         String,
         nullable=False,
+        unique=True,
         comment=(
             "Public Repository abbreviated name (ex: GISAID/GenBank)"
         ),

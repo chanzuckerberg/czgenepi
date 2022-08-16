@@ -19,6 +19,9 @@ def upgrade():
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
         sa.Column("slug", sa.String(), nullable=False),
         sa.Column("name", sa.String(), nullable=False),
+        sa.UniqueConstraint("slug", name=op.f("uq_pathogens_slug")),
+        sa.UniqueConstraint("name", name=op.f("uq_pathogens_name")),
+        sa.PrimaryKeyConstraint("id", name=op.f("pk_pathogens")),
         schema="aspen",
     )
 
@@ -26,6 +29,8 @@ def upgrade():
         "public_repositories",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
         sa.Column("name", sa.String(), nullable=False),
+        sa.UniqueConstraint("name", name=op.f("uq_public_repositories_name")),
+        sa.PrimaryKeyConstraint("id", name=op.f("pk_public_repositories")),
         schema="aspen",
     )
 
@@ -33,31 +38,39 @@ def upgrade():
         "pathogen_prefixes",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
         sa.Column("prefix", sa.String(), nullable=False),
+        sa.Column("public_repository_id", sa.Integer(), nullable=False),
+        sa.Column("pathogen_id", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
             ["public_repository_id"],
-            ["aspen.public_repository.id"],
+            ["aspen.public_repositories.id"],
             name=op.f("fk_pathogen_prefixes_public_repository_id_public_repositories"),
         ),
         sa.ForeignKeyConstraint(
             ["pathogen_id"],
-            ["aspen.pathogen.id"],
+            ["aspen.pathogens.id"],
             name=op.f("fk_pathogen_prefixes_pathogen_id_pathogens"),
         ),
+        sa.UniqueConstraint(
+            "public_repository_id",
+            "pathogen_id",
+            name=op.f("uq_pathogen_prefixes_public_repository_id_pathogen_id"),
+        ),
+        sa.PrimaryKeyConstraint("id", name=op.f("pk_pathogen_prefixes")),
         schema="aspen",
     )
 
-    op.execute("INSERT INTO table pathogens (id, slug, name) VALUES (1, 'SC2', 'SARS-CoV-2')")
+    op.execute("INSERT INTO aspen.pathogens (id, slug, name) VALUES (1, 'SC2', 'SARS-CoV-2')")
 
     op.execute("""
-        INSERT INTO public_repositories (id, name) VALUES
+        INSERT INTO aspen.public_repositories (id, name) VALUES
              ( 1, 'GISAID' ),
              ( 2, 'GenBank' )
     """)
 
     op.execute("""
-        INSERT INTO pathogen_prefixes (id, prefix, public_repository_id, pathogen_id) VALUES
-             ( 1, 'hCoV-19', (SELECT id from public_repositories WHERE name='GISAID'), (SELECT id from pathogens WHERE name='SARS-CoV-2') ),
-             ( 2, 'SARS-CoV-2/human', (SELECT id from public_repositories WHERE name='GenBank'), (SELECT id from pathogens WHERE name='SARS-CoV-2') )
+        INSERT INTO aspen.pathogen_prefixes (id, prefix, public_repository_id, pathogen_id) VALUES
+             ( 1, 'hCoV-19', (SELECT id from aspen.public_repositories WHERE name='GISAID'), (SELECT id from aspen.pathogens WHERE name='SARS-CoV-2') ),
+             ( 2, 'SARS-CoV-2/human', (SELECT id from aspen.public_repositories WHERE name='GenBank'), (SELECT id from aspen.pathogens WHERE name='SARS-CoV-2') )
     """)
 
 

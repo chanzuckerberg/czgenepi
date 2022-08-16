@@ -4,7 +4,8 @@ from sqlalchemy import (
     Column,
     String,
     Integer,
-    ForeignKey
+    ForeignKey,
+    UniqueConstraint
 )
 from sqlalchemy.orm import relationship
 
@@ -20,6 +21,7 @@ class Pathogen(idbase):  # type: ignore
     slug = Column(
         String,
         nullable=False,
+        unique=True,
         comment=(
             "Used as a URL param for differentiating functionality within CZGE, ex: SC2"
         ),
@@ -27,6 +29,7 @@ class Pathogen(idbase):  # type: ignore
     name = Column(
         String,
         nullable=False,
+        unique=True,
         comment=(
             "full pathogen abbreviated name, ex: SARS-CoV-2"
         ),
@@ -37,6 +40,13 @@ class PathogenPrefix(idbase):  # type: ignore
     """prefix for sample identifiers """
 
     __tablename__ = "pathogen_prefixes"
+    __table_args__ = (
+        UniqueConstraint(
+            "public_repository_id",
+            "pathogen_id",
+            name="uq_pathogen_prefixes_public_repository_id_pathogen_id",
+        ),
+    )
 
     prefix = Column(String, nullable=False)
 
