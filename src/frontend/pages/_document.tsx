@@ -87,8 +87,7 @@ MyDocument.getInitialProps = async (ctx) => {
   // You can consider sharing the same Emotion cache between all the SSR requests to speed up performance.
   // However, be aware that it can have global side effects.
   const cache = createEmotionCache();
-  const { extractCriticalToChunks, constructStyleTagsFromChunks } =
-    createEmotionServer(cache);
+  const { extractCriticalToChunks } = createEmotionServer(cache);
 
   ctx.renderPage = () =>
     originalRenderPage({
@@ -103,22 +102,24 @@ MyDocument.getInitialProps = async (ctx) => {
   // See https://github.com/mui/material-ui/issues/26561#issuecomment-855286153
   const emotionStyles = extractCriticalToChunks(initialProps.html);
 
-  const emotionStyleTags = emotionStyles.styles.map((style) => (
-    <style
-      data-emotion={`${style.key} ${style.ids.join(" ")}`}
-      key={style.key}
-      // eslint-disable-next-line react/no-danger
-      dangerouslySetInnerHTML={{ __html: style.css }}
-    />
-  ));
+  const emotionStyleTags = emotionStyles.styles.map(
+    (style: { key: string; ids: Array<string>; css: string }) => (
+      <style
+        data-emotion={`${style.key} ${style.ids.join(" ")}`}
+        key={`${style.key}-${style.id}`}
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: style.css }}
+      />
+    )
+  );
 
   return {
     ...initialProps,
-    styles: (
-      <React.Fragment>
+    styles: [
+      <>
         {initialProps.styles}
         {emotionStyleTags}
-      </React.Fragment>
-    ),
+      </>,
+    ],
   };
 };
