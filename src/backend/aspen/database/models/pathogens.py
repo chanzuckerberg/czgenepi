@@ -4,6 +4,7 @@ from sqlalchemy import Column, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import relationship
 
 from aspen.database.models.base import idbase
+from .public_repositories import PublicRepository
 
 
 class Pathogen(idbase):  # type: ignore
@@ -43,8 +44,10 @@ class PathogenRepoConfig(idbase):  # type: ignore
         String, nullable=False, comment="identifier samples prefix, ex: hCoV-19"
     )
 
-    public_repository_id = Column(Integer, ForeignKey("public_repository.id"))
-    public_repository = relationship("PublicRepository")
+    public_repository_id = Column(
+        Integer, ForeignKey(PublicRepository.id), nullable=False
+    )
+    public_repository: PublicRepository = relationship(PublicRepository)
 
-    pathogen_id = Column(Integer, ForeignKey("pathogen.id"))
-    pathogen = relationship("Pathogen")
+    pathogen_id = Column(Integer, ForeignKey(Pathogen.id), nullable=False)
+    pathogen: Pathogen = relationship(Pathogen)
