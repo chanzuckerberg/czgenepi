@@ -2,7 +2,7 @@ import styled from "@emotion/styled";
 import {
   Callout,
   fontBodyM,
-  fontBodyS,
+  fontBodyXs,
   fontHeaderM,
   fontHeaderXl,
   getColors,
@@ -78,7 +78,7 @@ export const DetailSubheader = styled.div`
 `;
 
 export const Text = styled.div`
-  ${fontBodyS}
+  ${fontBodyXs}
 
   ${(props) => {
     const colors = getColors(props);

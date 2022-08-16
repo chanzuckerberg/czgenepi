@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { useProtectedRoute, useUserInfo } from "src/common/queries/auth";
 import { useGroupInfo, useGroupMembersInfo } from "src/common/queries/groups";
 import { ROUTES } from "src/common/routes";
-import { stringifyGisaidLocation } from "src/common/utils/locationUtils";
 import { caseInsensitiveSort } from "src/common/utils/strUtils";
 import { getIsGroupAdminFromUserInfo } from "src/common/utils/userInfo";
 import { GroupDetailsTab } from "./components/GroupDetailsTab";

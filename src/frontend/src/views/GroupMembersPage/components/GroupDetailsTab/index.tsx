@@ -28,7 +28,7 @@ const GroupDetailsTab = ({
   const { address, name, prefix, location } = group;
   const displayLocation = stringifyGisaidLocation(location);
 
-  const InfoTooltip = ({ title }) => (
+  const InfoTooltip = ({ title }: { title: string }) => (
     <Tooltip arrow title={title} placement="top">
       <StyledInfoIconWrapper>
         <Icon sdsIcon="infoCircle" sdsSize="s" sdsType="interactive" />
@@ -75,10 +75,6 @@ const GroupDetailsTab = ({
             Submitting Lab
             <InfoTooltip title="Where sequence data have been generated and submitted to GISAID." />
           </DetailSubheader>
-          <Text>
-            Group’s primary address. CZ GEN EPI uses this information to help
-            prepare samples for GISAID submisions. Learn More.
-          </Text>
           <DetailDisplay>
             <B>{name}</B>
             <div>{address}</div>
