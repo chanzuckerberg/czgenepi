@@ -4,7 +4,7 @@ from sqlalchemy import Column, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import relationship
 
 from aspen.database.models.base import idbase
-from .public_repositories import PublicRepository
+from aspen.database.models.public_repositories import PublicRepository
 
 
 class Pathogen(idbase):  # type: ignore
