@@ -28,7 +28,7 @@ const SentNotification = ({ numSent, onDismiss, open }: Props): JSX.Element => {
     >
       {numSent} {pluralize("Invitation", numSent)} {pluralize("has", numSent)}{" "}
       been sent.{" "}
-      <Link sdsStyle="dashed" onClick={onClick}>
+      <Link component="button" sdsStyle="dashed" onClick={onClick}>
         View Invitations
       </Link>
       .
