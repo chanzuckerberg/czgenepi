@@ -14,12 +14,14 @@ from aspen.database.models.gisaid_dump import (  # noqa: F401
 from aspen.database.models.gisaid_metadata import GisaidMetadata  # noqa: F401
 from aspen.database.models.locations import Location  # noqa: F401
 from aspen.database.models.pango_lineages import PangoLineage  # noqa: F401
+from aspen.database.models.pathogens import Pathogen, PathogenRepoConfig
 from aspen.database.models.phylo_tree import (  # noqa: F401
     PhyloRun,
     PhyloTree,
     PhyloTreeSamples,
     TreeType,
 )
+from aspen.database.models.public_repositories import PublicRepository
 from aspen.database.models.sample import Sample  # noqa: F401
 from aspen.database.models.sequences import (  # noqa: F401
     PathogenGenome,
@@ -39,7 +41,5 @@ from aspen.database.models.workflow import (  # noqa: F401
     WorkflowStatusType,
     WorkflowType,
 )
-from aspen.database.models.pathogens import Pathogen, PathogenRepoConfig
-from aspen.database.models.public_repositories import PublicRepository
 
 configure_mappers()
