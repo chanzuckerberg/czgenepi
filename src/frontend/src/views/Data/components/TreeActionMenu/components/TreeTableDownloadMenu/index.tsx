@@ -112,8 +112,7 @@ const TreeTableDownloadMenu = ({ item }: Props): JSX.Element => {
           }}
           keepMounted
           open={open}
-          onClose={handleClose}
-          getContentAnchorEl={null}
+          onClose={baseHandleClose}
         >
           <NewTabLink href={jsonLinkIdStylePrivateIdentifiers}>
             <MenuItemTooltip>
