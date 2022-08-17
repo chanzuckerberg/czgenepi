@@ -57,9 +57,10 @@ def _rename_nodes_on_tree(
     gisaid_prefix = "hCoV-19/"
 
     # The mixed situations we're dealing with here:
-    #  - The public identifiers in our database *do not* have gisaid prefixes on them
-    #  - The samples on a tree *sometimes* do and sometimes don't have gisaid prefixes on them.
-    #  - At the end of this method, we want gisaid prefixes added to *all* tree samples.
+    #  - The public identifiers in our database *sometimes* have gisaid prefixes on them
+    #  - The samples on a tree *sometimes* have gisaid prefixes on them.
+    #  - We want to match identifiers from trees and the db with the prefix *stripped*
+    #  - At the end of this method, we want *all* tree samples to have gisaid prefixes on them.
     # So this means we have to:
     #  - Strip gisaid prefixes from tree nodes before trying to match them to db samples
     #  - Add gisaid prefixes to all public tree identifiers if they aren't already prefixed

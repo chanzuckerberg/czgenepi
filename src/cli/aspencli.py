@@ -508,18 +508,6 @@ def phylo_trees():
     pass
 
 
-@phylo_trees.command(name="selected-samples")
-@click.argument("tree_id")
-@click.pass_context
-def selected_samples(ctx, tree_id):
-    api_client = ctx.obj["api_client"]
-    params = {}
-    resp = api_client.get_with_org(
-        f"/v2/phylo_trees/{tree_id}/sample_ids", params=params
-    )
-    print(resp.text)
-
-
 @phylo_trees.command(name="download")
 @click.argument("tree_id")
 @click.option("--public-ids/--private-ids", is_flag=True, default=False)
@@ -535,11 +523,11 @@ def download_tree(ctx, tree_id, public_ids):
     print(resp.text)
 
 
-@phylo_trees.command(name="get-sample-ids")
+@phylo_trees.command(name="selected-samples")
 @click.argument("tree_id")
 @click.option("--public-ids/--private-ids", is_flag=True, default=False)
 @click.pass_context
-def get_tree_sample_ids(ctx, tree_id, public_ids):
+def get_selected_samples(ctx, tree_id, public_ids):
     api_client = ctx.obj["api_client"]
     params = {}
     if public_ids:
