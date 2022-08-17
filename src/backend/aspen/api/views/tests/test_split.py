@@ -9,9 +9,9 @@ def test_treatments():
     settings = Settings()
     splitio = SplitClient(settings)
 
-    treatment = splitio.get_pathogen_flag("pathogen_feature", pathogen)
+    treatment = splitio.get_pathogen_treatment("pathogen_feature", pathogen)
     assert treatment == "on"
 
     pathogen.slug = "MPX"
-    treatment = splitio.get_pathogen_flag("pathogen_feature", pathogen)
+    treatment = splitio.get_pathogen_treatment("pathogen_feature", pathogen)
     assert treatment == "control"  # this is the default
