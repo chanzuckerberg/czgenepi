@@ -54,13 +54,30 @@ def _rename_nodes_on_tree(
     """Given a tree, a mapping of identifiers to their replacements, rename the nodes on
     the tree.  If `save_key` is provided, then the original identifier is saved using
     that as the key."""
-    name = node["name"]
-    renamed_value = name_map.get(name, None)
+    gisaid_prefix = "hCoV-19/"
+
+    # The mixed situations we're dealing with here:
+    #  - The public identifiers in our database *do not* have gisaid prefixes on them
+    #  - The samples on a tree *sometimes* do and sometimes don't have gisaid prefixes on them.
+    #  - At the end of this method, we want gisaid prefixes added to *all* tree samples.
+    # So this means we have to:
+    #  - Strip gisaid prefixes from tree nodes before trying to match them to db samples
+    #  - Add gisaid prefixes to all public tree identifiers if they aren't already prefixed
+
+    # Strip the gisaid prefix from our tree identifier if it's present
+    tree_identifier = node["name"]
+    if tree_identifier.lower().startswith(gisaid_prefix.lower()):
+        tree_identifier = tree_identifier[len(gisaid_prefix) :]
+
+    renamed_value = name_map.get(tree_identifier, None)
+
+    # Make sure we have the gisaid prefix on this node when we output it.
+    node["name"] = f"{gisaid_prefix}{tree_identifier}"
     if renamed_value is not None:
         # we found the replacement value! first, save the old value if the caller
         # requested.
         if save_key is not None:
-            node[save_key] = name
+            node[save_key] = node["name"]
         node["name"] = renamed_value
     for child in node.get("children", []):
         _rename_nodes_on_tree(child, name_map, save_key)
@@ -274,6 +291,7 @@ async def process_phylo_tree(
 
     if id_style == "public":
         json_data = await _set_colors(db, json_data, phylo_run)
+        json_data["tree"] = _rename_nodes_on_tree(json_data["tree"], {}, "GISAID_ID")
         return json_data
 
     # Load all the public:private sample mappings this user/group has access to.

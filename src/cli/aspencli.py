@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import json
+import logging
 import os.path
 import time
 import webbrowser
@@ -147,7 +148,7 @@ class ApiClient:
     def url_with_org(self, path):
         if self.org_id:
             path = path.replace("/v2/", f"/v2/orgs/{self.org_id}/")
-        print(f"path: {path}")
+        logging.info(f"path: {path}")
         return path
 
     def get_with_org(self, path, **kwargs):
