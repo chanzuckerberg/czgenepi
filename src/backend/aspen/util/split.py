@@ -43,8 +43,10 @@ class SplitClient:
 
     def get_pathogen_treatment(self, feature: str, pathogen: Pathogen):
         # feature refers to a functionality block (split) ex: usher_enabled, public_repository
+
+        # params is empty for now, but we may want to use it later to make more complicated desicions with split.
         params = (
             {}
-        )  # empty for now, but we may want to use it later to make more complicated desicions with split.
+        )
         treatment = self.split_client.get_treatment(pathogen.slug, feature, params)
         return treatment
