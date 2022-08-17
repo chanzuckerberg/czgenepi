@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Dict, Optional
 
 from splitio import get_factory
 from splitio.client.client import Client as SplitioClient
@@ -45,8 +45,6 @@ class SplitClient:
         # feature refers to a functionality block (split) ex: usher_enabled, public_repository
 
         # params is empty for now, but we may want to use it later to make more complicated desicions with split.
-        params = (
-            {}
-        )
+        params: Dict[str, str] = {}
         treatment = self.split_client.get_treatment(pathogen.slug, feature, params)
         return treatment
