@@ -116,9 +116,11 @@ export default function AgreeTerms(): JSX.Element | null {
                 <NewTabLink href={ROUTES.TERMS}>Terms of Service</NewTabLink>{" "}
                 and{" "}
                 <NewTabLink href={ROUTES.PRIVACY}>Privacy Policy</NewTabLink>.
-                We’ve put together an{" "}
-                <NewTabLink href={ROUTES.FAQ}>FAQ</NewTabLink> to make these
-                easier to understand. Please{" "}
+                We’ve put together a{" "}
+                <NewTabLink href={ROUTES.PRIVACY_DATA_SHARING_FAQ}>
+                  Privacy &amp; Data Sharing FAQ
+                </NewTabLink>{" "}
+                to make these easier to understand. Please{" "}
                 <NewTabLink href={ROUTES.CONTACT_US_EMAIL}>
                   get in touch
                 </NewTabLink>{" "}
