@@ -6,7 +6,7 @@ import {
   UseQueryResult,
 } from "@tanstack/react-query";
 import { forEach } from "lodash";
-import { queryClient } from "pages/_app";
+import { queryClient } from "src/common/queries/queryClient";
 import {
   DEFAULT_FETCH_OPTIONS,
   DEFAULT_POST_OPTIONS,

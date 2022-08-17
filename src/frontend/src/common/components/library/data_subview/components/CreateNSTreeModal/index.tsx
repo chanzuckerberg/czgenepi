@@ -4,12 +4,17 @@ import { uniq } from "lodash";
 import Image from "next/image";
 import NextLink from "next/link";
 import React, { SyntheticEvent, useEffect, useState } from "react";
+import {
+  AnalyticsTreeCreationNextstrain,
+  EVENT_TYPES,
+} from "src/common/analytics/eventTypes";
+import { analyticsTrackEvent } from "src/common/analytics/methods";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import type { TreeType } from "src/common/constants/types";
 import { TreeTypes } from "src/common/constants/types";
 import GisaidLogo from "src/common/images/gisaid-logo-full.png";
 import { useLineages } from "src/common/queries/lineages";
-import { useCreateTree } from "src/common/queries/trees";
+import { RawTreeCreationWithId, useCreateTree } from "src/common/queries/trees";
 import { ROUTES } from "src/common/routes";
 import { B } from "src/common/styles/basicStyle";
 import {
@@ -126,7 +131,17 @@ export const CreateNSTreeModal = ({
       setShouldShowErrorNotification(true);
       handleClose();
     },
-    componentOnSuccess: () => {
+    componentOnSuccess: (respData: RawTreeCreationWithId) => {
+      analyticsTrackEvent<AnalyticsTreeCreationNextstrain>(
+        EVENT_TYPES.TREE_CREATION_NEXTSTRAIN,
+        {
+          phylo_run_workflow_id: respData.id,
+          // Safe to assert treeType is not undefined here, can't create tree
+          // otherwise, it's just that checking happens in a child component.
+          tree_type: treeType!,
+        }
+      );
+
       setShouldShowTreeCreatedNotification(true);
       handleClose();
     },

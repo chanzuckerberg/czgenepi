@@ -20,6 +20,14 @@ const UserMenu = ({ user }: UserMenuProps): JSX.Element => {
     setAnchorEl(null);
   };
 
+  const handleCookieSettings = () => {
+    // OneTrust _should_ always be loaded by time user doing real interaction
+    if (window.OneTrust) {
+      window.OneTrust.ToggleInfoDisplay(); // Open OT cookie settings modal
+    }
+    handleClose();
+  };
+
   return (
     <>
       <StyledNavButton
@@ -54,6 +62,7 @@ const UserMenu = ({ user }: UserMenuProps): JSX.Element => {
         <a href={ROUTES.PRIVACY} target="_blank" rel="noopener">
           <MenuItem onClick={handleClose}>Privacy Policy</MenuItem>
         </a>
+        <MenuItem onClick={handleCookieSettings}>Cookie Settings</MenuItem>
         <a href={ENV.API_URL + API.LOG_OUT}>
           <MenuItem onClick={handleClose}>Logout</MenuItem>
         </a>

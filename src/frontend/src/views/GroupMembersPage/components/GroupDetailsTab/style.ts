@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
 import {
+  Callout,
   CommonThemeProps,
   fontBodyM,
   fontBodyS,
@@ -84,4 +85,16 @@ export const Content = styled.div`
   ${LargerThanBreakpoint(`
     display: flex;
   `)}
+`;
+
+export const StyledCallout = styled(Callout)`
+  width: 100%;
+  margin-top: 0;
+
+  ${(props: CommonThemeProps) => {
+    const spaces = getSpaces(props);
+    return `
+      margin-bottom: ${spaces?.xl}px;
+    `;
+  }}
 `;

@@ -1,0 +1,15 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "stopservices",
+            "command": "supervisorctl",
+            "args": ["-c", "/usr/src/app/etc/supervisord.conf", "stop", "all"]
+        },
+        {
+            "label": "startservices",
+            "command": "supervisorctl",
+            "args": ["-c", "/usr/src/app/etc/supervisord.conf", "start", "all"]
+        }
+    ]
+}

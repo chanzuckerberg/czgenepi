@@ -125,6 +125,7 @@ module frontend_service {
   extra_env_vars        = {
     "SPLIT_FRONTEND_KEY": local.app_secret["SPLIT_FRONTEND_KEY"],
     "SEGMENT_FRONTEND_KEY": local.app_secret["SEGMENT_FRONTEND_KEY"],
+    "ONETRUST_FRONTEND_KEY": local.app_secret["ONETRUST_FRONTEND_KEY"],
     "PLAUSIBLE_FRONTEND_KEY": local.app_secret["PLAUSIBLE_FRONTEND_KEY"]
     }
 
