@@ -8,6 +8,7 @@ const isProdBuild = ENV.NODE_ENV === nodeEnv.PRODUCTION;
 
 const SCRIPT_SRC = [
   "'self'",
+  "https://cdn.cookielaw.org",
   "https://cdn.segment.com",
   "https://plausible.io",
 ];
@@ -36,6 +37,9 @@ module.exports = {
                 "sdk.split.io",
                 "events.split.io",
                 "streaming.split.io",
+                "https://cdn.cookielaw.org",
+                "https://geolocation.onetrust.com",
+                "https://cookies-data.onetrust.io",
                 "https://cdn.segment.com",
                 "https://api.segment.io",
                 "https://plausible.io",
@@ -46,7 +50,7 @@ module.exports = {
               formAction: "'self'",
               frameAncestors: ["'none'"],
               frameSrc: ["'self'"],
-              imgSrc: ["'self'", "data:"],
+              imgSrc: ["'self'", "data:", "https://cdn.cookielaw.org"],
               manifestSrc: ["'self'"],
               mediaSrc: ["'self'"],
               objectSrc: ["'none'"],

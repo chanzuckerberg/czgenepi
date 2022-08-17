@@ -28,7 +28,7 @@ const PrivacyPolicy = (): JSX.Element => {
     <>
       <Title>
         <H1>Chan Zuckerberg GEN EPI (formerly Aspen) Privacy Policy</H1>
-        <H4>Last Updated: December 6, 2021</H4>
+        <H4>Last Updated: August 18, 2022</H4>
       </Title>
       <P>
         The Chan Zuckerberg Initiative Foundation, a 501(c)(3) nonprofit private
@@ -194,7 +194,8 @@ const PrivacyPolicy = (): JSX.Element => {
                 <NewTabLink href="mailto:hello@czgenepi.org">
                   hello@czgenepi.org
                 </NewTabLink>{" "}
-                and we will fulfill the request within 60 days.
+                and we will fulfill the request within 60 days or sooner
+                depending on applicable privacy laws.
               </P>
               <P>
                 Please be aware, however, that we cannot delete any Pathogen
@@ -224,15 +225,15 @@ const PrivacyPolicy = (): JSX.Element => {
                 <P>
                   This data is also accessible by technical partners (CZ Biohub
                   and CZI, LLC) and Service Providers (ex: AWS) that help
-                  operate and secure CZ GEN EPI. For example, we need to be able
-                  to access your data in order to back up and maintain the
-                  database.
+                  operate, secure, and improve CZ GEN EPI. For example, we need
+                  to be able to access your data in order to back up and
+                  maintain the database.
                 </P>
 
                 <P>
                   This Privacy Policy applies to all parties that access data to
                   support CZ GEN EPI and they will not use the data for any
-                  purpose beyond operating and securing CZ GEN EPI.
+                  purpose beyond operating, securing, and improving CZ GEN EPI.
                 </P>
 
                 <P>
@@ -316,13 +317,13 @@ const PrivacyPolicy = (): JSX.Element => {
               </P>
               <P>
                 This data is also shared with technical partners (CZ Biohub and
-                CZI, LLC) and Service Providers (ex: AWS) that help operate and
-                secure CZ GEN EPI.
+                CZI, LLC) and Service Providers (ex: AWS) that help operate,
+                secure, and improve CZ GEN EPI.
               </P>
               <P>
                 This Privacy Policy applies to all parties that access data to
                 support CZ GEN EPI and they will not use the data for any
-                purpose beyond operating and securing CZ GEN EPI.
+                purpose beyond operating, securing, and improving CZ GEN EPI.
               </P>
               <P>
                 We will never sell your data or share it with anyone that does.
@@ -334,7 +335,8 @@ const PrivacyPolicy = (): JSX.Element => {
               <NewTabLink href="mailto:hello@czgenepi.org">
                 hello@czgenepi.org
               </NewTabLink>{" "}
-              and we will fulfill the request within 60 days.
+              and we will fulfill the request within 60 days or sooner depending
+              on applicable privacy laws.
             </td>
           </ContentRow>
           <ContentRow>
@@ -585,7 +587,7 @@ const PrivacyPolicy = (): JSX.Element => {
         </ListItem>
         <ListItem>
           <span>
-            <ListItemLabel>Analytics</ListItemLabel>
+            <ListItemLabel>Analytics.</ListItemLabel>
             When Users visit or use our Service, we may automatically collect
             some information so that we can understand the way in which our tool
             is being used. We may collect some Device Data or Analytics
@@ -600,6 +602,25 @@ const PrivacyPolicy = (): JSX.Element => {
             data that is not able to be aggregated and de-identified will not be
             shared beyond the CZ GEN EPI team and will be stored for no longer
             than is necessary.
+          </span>
+        </ListItem>
+        <ListItem>
+          <span>
+            <ListItemLabel>
+              Cookies, Web Beacons, and other Technologies.
+            </ListItemLabel>
+            A cookie is a small file that may be stored on your computer or
+            other device. Web beacons and similar technologies are small bits of
+            code embedded in web pages or email, for example, that communicate
+            with a third party service provider. We use these technologies to
+            recognize your device and browser and do things such as keep you
+            logged in or to understand usage patterns. We do not use cookies for
+            marketing and advertising purposes. For more information about our
+            use of cookies, please see our{" "}
+            <NewTabLink href={ROUTES.PRIVACY_DATA_SHARING_FAQ}>
+              Privacy &amp; Data Sharing FAQ
+            </NewTabLink>
+            .
           </span>
         </ListItem>
       </List>
@@ -636,7 +657,7 @@ const PrivacyPolicy = (): JSX.Element => {
       <P>
         We (along with CZB and CZI LLC) have a legitimate interest in using
         personal data within User Data in the ways described in this Privacy
-        Policy to provide, protect, and improve CZ GEN EPI. This allows us to
+        Policy to operate, secure, and improve CZ GEN EPI. This allows us to
         improve the service that we provide to Users which, in turn, supports
         research regarding the study of infectious disease with the potential to
         benefit global public health.
@@ -659,10 +680,15 @@ const PrivacyPolicy = (): JSX.Element => {
         use data as described in this Privacy Policy.
       </P>
       <P>
-        We also use service providers, such as database providers like Amazon
-        Web Services, to support the operation of CZ GEN EPI. These service
-        providers are data processors and their use is limited to the purposes
-        disclosed in this Privacy Policy.
+        We also use service providers, such as a database provider and analytics
+        providers, to support and improve the operation of CZ GEN EPI. These
+        service providers are data processors and their use is limited to the
+        purposes disclosed in this Privacy Policy. For more information about
+        our use of service providers, please see our{" "}
+        <NewTabLink href={ROUTES.PRIVACY_DATA_SHARING_FAQ}>
+          Privacy &amp; Data Sharing FAQ
+        </NewTabLink>
+        .
       </P>
       <P>
         Users have the option to share their analytical outputs with certain
@@ -763,7 +789,7 @@ const PrivacyPolicy = (): JSX.Element => {
               hello@czgenepi.org
             </NewTabLink>
             . We will delete personal data within 60 days following the closure
-            of your account.
+            of your account or sooner depending on applicable privacy laws.
           </span>
         </ListItem>
       </List>
@@ -783,7 +809,7 @@ const PrivacyPolicy = (): JSX.Element => {
       <P>Users have the following choices:</P>
       <List>
         <ListItem>
-          `Users are able to request the deletion of User Data that constitutes
+          Users are able to request the deletion of User Data that constitutes
           their personal data, or Upload Data that they submitted to CZ GEN EPI.
           Users may also request the deletion from CZ GEN EPI of the Pathogen
           Consensus Genomes created by CZ GEN EPI on the basis of their Upload
@@ -823,8 +849,8 @@ const PrivacyPolicy = (): JSX.Element => {
         must first agree to our{" "}
         <NewTabLink href={ROUTES.TERMS}>Terms</NewTabLink>, which set out the
         contract between CZ GEN EPI and our Users. We operate in the United
-        States, and use technical infrastructure in the United States to to
-        deliver the Services to you.
+        States, and use technical infrastructure in the United States to deliver
+        the Services to you.
       </P>
     </>
   );

@@ -6,6 +6,7 @@ import { useGroupInfo, useGroupMembersInfo } from "src/common/queries/groups";
 import { ROUTES } from "src/common/routes";
 import { stringifyGisaidLocation } from "src/common/utils/locationUtils";
 import { caseInsensitiveSort } from "src/common/utils/strUtils";
+import { getIsGroupAdminFromUserInfo } from "src/common/utils/userInfo";
 import { GroupDetailsTab } from "./components/GroupDetailsTab";
 import { MembersTab, SecondaryTabType } from "./components/MembersTab";
 import {
@@ -59,6 +60,8 @@ const GroupMembersPage = ({
     router.push(`${ROUTES.GROUP}/${value}`);
   };
 
+  const isGroupAdmin = getIsGroupAdminFromUserInfo(userInfo);
+
   return (
     <>
       <StyledHeader>
@@ -87,6 +90,7 @@ const GroupMembersPage = ({
             address={address}
             location={displayLocation}
             prefix={prefix}
+            shouldShowChangeDetailsCallout={isGroupAdmin}
           />
         )}
       </StyledPageContent>
