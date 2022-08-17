@@ -34,7 +34,7 @@ export default function AlertTable({ parseErrors }: Props): JSX.Element {
     <Overflow>
       <StyledTableContainer>
         <MuiTable aria-label="simple table" component="div">
-          <StyledTableHead {...({ component: "div" } as unknown)}>
+          <StyledTableHead {...({ component: "div" } as object)}>
             <TableRow component="div">
               <StyledHeaderTableCell component="div">
                 Files

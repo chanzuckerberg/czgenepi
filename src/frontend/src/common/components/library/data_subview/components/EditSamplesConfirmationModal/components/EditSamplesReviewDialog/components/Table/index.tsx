@@ -23,7 +23,7 @@ const Table = ({ metadata }: Props): JSX.Element => {
         <StyledTableContainer>
           <MuiTable component="div" stickyHeader>
             <TableHead component="div">
-              <StyledTableRow {...({ component: "div" } as unknown)}>
+              <StyledTableRow {...({ component: "div" } as object)}>
                 <StyledTableCell component="div">
                   <IdColumn>Private ID</IdColumn>
                 </StyledTableCell>
