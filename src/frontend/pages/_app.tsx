@@ -9,6 +9,7 @@ import React, { useEffect } from "react";
 import { Provider } from "react-redux";
 import { analyticsRecordRouteChange } from "src/common/analytics/methods";
 import { OneTrustInitializer } from "src/common/analytics/OneTrustInitializer";
+import { PlausibleInitializer } from "src/common/analytics/PlausibleInitializer";
 import { SegmentInitializer } from "src/common/analytics/SegmentInitializer";
 import { queryClient } from "src/common/queries/queryClient";
 import { store } from "src/common/redux";
@@ -79,6 +80,7 @@ const App = ({
             content="minimum-scale=1, initial-scale=1, width=device-width"
           />
         </Head>
+        <PlausibleInitializer />
         <QueryClientProvider client={queryClient}>
           <OneTrustInitializer />
           <SegmentInitializer />

@@ -13,3 +13,6 @@
     treatment: "on"
 - test_feature:
     treatment: "off"
+- pathogen_feature:
+    treatment: "on"
+    keys: "SC2"
