@@ -1,5 +1,5 @@
 import { AnyAction, applyMiddleware, createStore } from "redux";
-import { composeWithDevTools } from "redux-devtools-extension";
+import { composeWithDevTools } from "@redux-devtools/extension";
 import { setValidGroup } from "../utils/groupUtils";
 import { getLocalStorage } from "../utils/localStorage";
 import { setPathogen } from "./actions";

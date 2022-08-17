@@ -11,7 +11,7 @@ module.exports = {
     "plugin:react/recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:sonarjs/recommended",
-    "plugin:jest-playwright/recommended",
+    "plugin:jest",
     "prettier",
     "plugin:prettier/recommended",
     "plugin:react-hooks/recommended",
