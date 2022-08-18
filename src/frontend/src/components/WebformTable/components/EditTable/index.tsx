@@ -21,7 +21,7 @@ export default function EditTable({
   return (
     <MuiTable component="div" stickyHeader>
       <TableHead component="div">
-        <StyledTableRow {...({ component: "div" } as object)}>
+        <StyledTableRow {...({ component: "div" } as Record<string, unknown>)}>
           <StyledTableCell component="div">
             {SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS.privateId}
           </StyledTableCell>

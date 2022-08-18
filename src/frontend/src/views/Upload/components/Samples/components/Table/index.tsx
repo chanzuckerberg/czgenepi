@@ -45,7 +45,7 @@ export default function Table({ samples }: Props): JSX.Element {
     <Overflow>
       <StyledTableContainer>
         <MuiTable aria-label="simple table" component="div">
-          <StyledTableHead {...({ component: "div" } as object)}>
+          <StyledTableHead {...({ component: "div" } as Record<string, unknown>)}>
             <TableRow component="div">
               <StyledHeaderTableCell component="div">
                 Sample Name (from FASTA)
