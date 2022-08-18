@@ -85,6 +85,12 @@ module.exports = {
           "https://help.czgenepi.org/hc/en-us/categories/6217716150804-Genomic-Epidemiology-Learning-Center",
         permanent: true,
       },
+      {
+        source: "/faq",
+        destination:
+          "https://help.czgenepi.org/hc/en-us/sections/5686564086548-FAQ",
+        permanent: true,
+      },
     ];
   },
 

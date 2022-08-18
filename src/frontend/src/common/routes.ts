@@ -7,7 +7,6 @@ export enum ROUTES {
   CZI = "https://chanzuckerberg.com/",
   DATA = "/data",
   DATA_SAMPLES = "/data/samples",
-  FAQ = "/faq",
   GISAID = "https://www.gisaid.org/",
   GITHUB = "https://github.com/chanzuckerberg/czgenepi/",
   GROUP = "/group",

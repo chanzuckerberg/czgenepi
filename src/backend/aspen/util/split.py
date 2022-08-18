@@ -1,10 +1,11 @@
-from typing import Optional
+from typing import Dict, Optional
 
 from splitio import get_factory
 from splitio.client.client import Client as SplitioClient
 from splitio.exceptions import TimeoutException
 
 from aspen.database.models import Group, User
+from aspen.database.models.pathogens import Pathogen
 
 
 class SplitClient:
@@ -32,9 +33,18 @@ class SplitClient:
             params["group_id"] = group.id
         return params
 
-    def get_flag(self, treatment: str, user: User, group: Optional[Group] = None):
+    def get_usergroup_treatment(
+        self, feature: str, user: User, group: Optional[Group] = None
+    ):
+
         parameters = self.generate_parameters(user, group)
-        treatment = self.split_client.get_treatment(
-            user.split_id, treatment, parameters
-        )
+        treatment = self.split_client.get_treatment(user.split_id, feature, parameters)
+        return treatment
+
+    def get_pathogen_treatment(self, feature: str, pathogen: Pathogen):
+        # feature refers to a functionality block (split) ex: usher_enabled, public_repository
+
+        # params is empty for now, but we may want to use it later to make more complicated desicions with split.
+        params: Dict[str, str] = {}
+        treatment = self.split_client.get_treatment(pathogen.slug, feature, params)
         return treatment

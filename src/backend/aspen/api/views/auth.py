@@ -232,7 +232,7 @@ async def auth(
     # Always re-sync auth0 groups to our db on login!
     # Make sure the user is in auth0 before sync'ing roles.
     #  ex: User1 in local dev doesn't exist in auth0
-    sync_roles = splitio.get_flag("sync_auth0_roles", user)
+    sync_roles = splitio.get_usergroup_treatment("sync_auth0_roles", user)
     if sync_roles == "on":
         if user.auth0_user_id.startswith("auth0|"):
             await RoleManager.sync_user_roles(db, a0, user)
@@ -303,7 +303,7 @@ async def process_invitation(
     a0.delete_organization_invitation(ticket_info["organization_id"], ticket_info["id"])
 
     # ok, now sync a0 roles to the db.
-    sync_roles = splitio.get_flag("sync_auth0_roles", user)
+    sync_roles = splitio.get_usergroup_treatment("sync_auth0_roles", user)
     if sync_roles == "on":
         await RoleManager.sync_user_roles(db, a0, user)
         await db.commit()
