@@ -1,7 +1,7 @@
 import { TextField } from "@mui/material";
 import { DefaultMenuSelectOption, Dropdown, Icon, InputDropdown } from "czifui";
 import { cloneDeep, debounce } from "lodash";
-import React, { SyntheticEvent, useEffect, useState } from "react";
+import { SyntheticEvent, useEffect, useState } from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import {
   FastaResponseType,

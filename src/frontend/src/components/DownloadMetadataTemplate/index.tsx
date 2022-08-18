@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import { CSVLink } from "react-csv";
 
 const TSV_SEPARATOR = "\t";

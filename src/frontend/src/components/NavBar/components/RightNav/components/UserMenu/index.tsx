@@ -1,5 +1,5 @@
 import { Icon, Menu, MenuItem } from "czifui";
-import React from "react";
+import * as React from "react";
 import { API } from "src/common/api";
 import ENV from "src/common/constants/ENV";
 import { ROUTES } from "src/common/routes";

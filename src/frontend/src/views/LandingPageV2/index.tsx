@@ -1,6 +1,6 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { ROUTES } from "src/common/routes";
 import { useUserInfo } from "../../common/queries/auth";
 import Footer from "./components/Footer";

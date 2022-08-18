@@ -1,5 +1,4 @@
 import { isEqual } from "lodash";
-import React from "react";
 import { TableHeader } from "./components/TableHeader";
 import { HeaderCheckbox, StyledHeaderRow } from "./style";
 

@@ -1,7 +1,6 @@
 /* eslint-disable react/display-name */
 
 import { ChipProps, Icon, Tooltip } from "czifui";
-import React from "react";
 import {
   defaultSampleCellRenderer,
   defaultTreeCellRenderer,

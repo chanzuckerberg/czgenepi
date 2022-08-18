@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import * as React from "react";
 import { getDateRangeLabel } from "src/common/utils/dateUtils";
 import { DateFilterMenu } from "src/components/DateFilterMenu";
 import { DateChip } from "./components/DateChip";

@@ -1,5 +1,5 @@
 import { ButtonIcon, Icon, Menu, MenuItem, Tooltip } from "czifui";
-import React, { MouseEventHandler, useState } from "react";
+import { MouseEventHandler, useState } from "react";
 import { TREE_STATUS } from "src/common/constants/types";
 import { StyledMenuItemWrapper } from "src/common/styles/menuStyle";
 import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";

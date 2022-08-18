@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import * as React from "react";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { Metadata } from "src/components/WebformTable/common/types";
 import { SAMPLE_COUNT } from "src/views/Upload/components/common/constants";

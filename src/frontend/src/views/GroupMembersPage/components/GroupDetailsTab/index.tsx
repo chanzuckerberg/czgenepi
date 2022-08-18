@@ -1,5 +1,4 @@
 import { Link } from "czifui";
-import React from "react";
 import {
   Content,
   DetailDisplay,

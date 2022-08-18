@@ -1,4 +1,3 @@
-import React from "react";
 import ConfirmDialog from "src/components/ConfirmDialog";
 
 interface Props {

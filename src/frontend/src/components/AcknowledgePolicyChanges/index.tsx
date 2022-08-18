@@ -11,7 +11,6 @@
  */
 
 import { ButtonIcon, Icon } from "czifui";
-import React from "react";
 import { useUpdateUserInfo, useUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
 import { B } from "src/common/styles/basicStyle";

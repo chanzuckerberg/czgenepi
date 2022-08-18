@@ -1,5 +1,4 @@
 import { Table as MuiTable, TableBody, TableHead } from "@mui/material";
-import React from "react";
 import { SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS } from "src/components/DownloadMetadataTemplate/common/constants";
 import {
   IdColumn,

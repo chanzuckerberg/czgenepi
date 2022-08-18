@@ -9,7 +9,6 @@
  * in a custom Head for the specific page with special requirements.
  */
 import Head from "next/head";
-import React from "react";
 
 const APP_NAME = "CZ GEN EPI";
 

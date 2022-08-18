@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useDeletePhyloRun } from "src/common/queries/phyloRuns";
 import { DeleteDialog } from "src/components/DeleteDialog";
 import Notification from "src/components/Notification";

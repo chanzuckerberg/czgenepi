@@ -1,5 +1,5 @@
 import { Tooltip } from "czifui";
-import React from "react";
+import * as React from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 
 interface Props {

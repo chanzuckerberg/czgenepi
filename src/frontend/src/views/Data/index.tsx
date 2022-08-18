@@ -1,7 +1,7 @@
 import { compact, map, uniq } from "lodash";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
-import React, { FunctionComponent, useEffect, useMemo, useState } from "react";
+import { FunctionComponent, useEffect, useMemo, useState } from "react";
 import { HeadAppTitle } from "src/common/components";
 import { useProtectedRoute } from "src/common/queries/auth";
 import { usePhyloRunInfo } from "src/common/queries/phyloRuns";

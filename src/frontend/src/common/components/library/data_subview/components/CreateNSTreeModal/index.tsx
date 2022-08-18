@@ -3,7 +3,7 @@ import { Icon } from "czifui";
 import { uniq } from "lodash";
 import Image from "next/image";
 import NextLink from "next/link";
-import React, { SyntheticEvent, useEffect, useState } from "react";
+import { SyntheticEvent, useEffect, useState } from "react";
 import {
   AnalyticsTreeCreationNextstrain,
   EVENT_TYPES,

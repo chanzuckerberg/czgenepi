@@ -1,4 +1,3 @@
-import React from "react";
 import { StyledNewTabLink } from "./style";
 
 const ContactUsLink = (): JSX.Element => (

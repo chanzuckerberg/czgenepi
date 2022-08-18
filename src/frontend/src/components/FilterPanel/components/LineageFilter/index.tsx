@@ -1,5 +1,5 @@
 import { DefaultMenuSelectOption } from "czifui";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { StyledComplexFilter } from "../../style";
 
 interface Props {

@@ -2,7 +2,6 @@ import { FilterOptionsState, PopperProps } from "@mui/material";
 import { createFilterOptions } from "@mui/material/Autocomplete";
 import { DefaultMenuSelectOption, Icon } from "czifui";
 import { isEqual } from "lodash";
-import React from "react";
 import { noop } from "src/common/constants/empty";
 import {
   MENU_OPTIONS_COLLECTION_DATE,

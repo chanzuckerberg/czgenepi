@@ -1,5 +1,4 @@
 import { useRouter } from "next/router";
-import React from "react";
 import { ROUTES } from "src/common/routes";
 import AppNavBar from "src/components/NavBar/components/AppNavBar";
 import StaticPageNavBar from "src/components/NavBar/components/StaticPageNavBar";

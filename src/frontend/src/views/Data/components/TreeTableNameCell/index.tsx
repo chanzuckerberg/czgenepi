@@ -1,5 +1,5 @@
 import { Icon } from "czifui";
-import React, { useState } from "react";
+import { useState } from "react";
 import { StyledTooltip } from "src/common/components/library/data_subview/components/CreateNSTreeModal/style";
 import { TREE_STATUS } from "src/common/constants/types";
 import NextstrainConfirmationModal from "../NextstrainConfirmationModal";

@@ -1,5 +1,5 @@
 import { Table as MuiTable, TableBody, TableHead } from "@mui/material";
-import React from "react";
+import * as React from "react";
 import { SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS } from "src/components/DownloadMetadataTemplate/common/constants";
 import { Metadata } from "src/components/WebformTable/common/types";
 import {

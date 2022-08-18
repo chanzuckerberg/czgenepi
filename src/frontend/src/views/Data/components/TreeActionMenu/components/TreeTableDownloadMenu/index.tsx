@@ -1,5 +1,5 @@
 import { ButtonIcon, Icon, Menu, MenuItem, Tooltip } from "czifui";
-import React, { MouseEventHandler, ReactNode, useState } from "react";
+import { MouseEventHandler, ReactNode, useState } from "react";
 import {
   AnalyticsTreeDownloadSelectedSamplesTemplate,
   AnalyticsTreeDownloadTreeFile,

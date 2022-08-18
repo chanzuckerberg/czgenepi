@@ -1,7 +1,7 @@
 import { useTreatments } from "@splitsoftware/splitio-react";
 import { Alert, Icon, Link, Tooltip } from "czifui";
 import { isEqual } from "lodash";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { CSVLink } from "react-csv";
 import {
   AnalyticsSamplesDownloadFile,

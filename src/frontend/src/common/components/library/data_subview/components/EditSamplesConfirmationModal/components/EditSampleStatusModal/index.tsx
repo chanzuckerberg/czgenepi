@@ -1,5 +1,4 @@
 import { ButtonIcon, Icon } from "czifui";
-import React from "react";
 import { FailureView } from "./components/FailureView";
 import { LoadingView } from "./components/LoadingView";
 import { SuccessView } from "./components/SuccessView";

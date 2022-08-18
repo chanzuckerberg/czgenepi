@@ -1,5 +1,5 @@
 import { Table as MuiTable, TableBody, TableRow } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { SAMPLE_COUNT } from "../../../common/constants";
 import { Samples } from "../../../common/types";
 import {

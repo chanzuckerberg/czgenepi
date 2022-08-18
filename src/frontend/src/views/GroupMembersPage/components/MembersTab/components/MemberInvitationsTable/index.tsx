@@ -1,4 +1,3 @@
-import React from "react";
 import { Table } from "src/common/components/library/Table";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { EmailCell } from "./components/EmailCell";

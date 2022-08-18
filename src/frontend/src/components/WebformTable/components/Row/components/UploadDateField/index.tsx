@@ -1,5 +1,4 @@
 import { FormikContextType } from "formik";
-import React from "react";
 import DateField from "src/components/DateField";
 import { SampleUploadTsvMetadata } from "src/components/DownloadMetadataTemplate/common/types";
 import ApplyToAllColumn from "../common/ApplyToAllColumn";

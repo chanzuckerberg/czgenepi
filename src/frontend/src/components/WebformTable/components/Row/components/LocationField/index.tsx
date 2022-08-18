@@ -2,7 +2,7 @@ import FormHelperText from "@mui/material/FormHelperText";
 import { DefaultMenuSelectOption, DropdownPopper } from "czifui";
 import { FormikContextType } from "formik";
 import { escapeRegExp, isEqual } from "lodash/fp";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Metadata } from "src/components/WebformTable/common/types";
 import { NamedGisaidLocation } from "src/views/Upload/components/common/types";
 import ApplyToAllColumn from "../common/ApplyToAllColumn";

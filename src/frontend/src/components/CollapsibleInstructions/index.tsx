@@ -1,5 +1,6 @@
 import { List, ListItem } from "czifui";
-import React, { useState } from "react";
+import { useState } from "react";
+import * as React from "react";
 import {
   CapsSizeType,
   Divider,

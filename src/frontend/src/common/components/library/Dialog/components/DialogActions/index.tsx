@@ -1,5 +1,4 @@
 import { DialogActionsProps } from "@mui/material";
-import React from "react";
 import { ExtraProps, StyledDialogActions } from "./style";
 
 type Props = ExtraProps & DialogActionsProps;

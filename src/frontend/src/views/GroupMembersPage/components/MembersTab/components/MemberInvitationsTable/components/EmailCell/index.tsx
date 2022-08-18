@@ -1,4 +1,3 @@
-import React from "react";
 import { PersonIconCell } from "../../../PersonIconCell";
 import { StyledChip, Wrapper } from "./style";
 

@@ -1,7 +1,8 @@
 import AlertTitle from "@mui/material/AlertTitle";
 import { Alert, Button } from "czifui";
 import NextLink from "next/link";
-import React, { useState } from "react";
+import { useState } from "react";
+import * as React from "react";
 import {
   AnalyticsSamplesUploadSuccess,
   EVENT_TYPES,

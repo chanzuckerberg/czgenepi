@@ -1,5 +1,5 @@
 // unstyled component, taken from https://reactjs.org/docs/error-boundaries.html
-import React from "react";
+import * as React from "react";
 
 interface Props {
   children: React.ReactNode;

@@ -1,5 +1,5 @@
 import { List, ListItem } from "czifui";
-import React from "react";
+import * as React from "react";
 import { Title, Wrapper } from "./style";
 
 export type TitleSize = "s" | "m" | "l" | "xs" | "xxxs" | "xxs";

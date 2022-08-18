@@ -1,5 +1,5 @@
 import { ButtonIcon, Icon, Tooltip } from "czifui";
-import React, { useState } from "react";
+import { useState } from "react";
 import { TREE_STATUS } from "src/common/constants/types";
 import NextstrainConfirmationModal from "../../../NextstrainConfirmationModal";
 

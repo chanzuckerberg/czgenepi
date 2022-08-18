@@ -1,7 +1,7 @@
 import { Menu, MenuItem } from "czifui";
 import { useFormik } from "formik";
 import { noop } from "lodash";
-import React, { FC, useMemo } from "react";
+import { FC, useMemo } from "react";
 import DateField from "src/components/DateField";
 import {
   DATE_ERROR_MESSAGE,

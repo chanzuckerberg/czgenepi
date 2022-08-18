@@ -1,5 +1,5 @@
 import { Tooltip } from "czifui";
-import React, { MouseEventHandler } from "react";
+import { MouseEventHandler } from "react";
 import { TreeType, TreeTypes } from "src/common/constants/types";
 import { StyledButton, StyledButtonWrapper } from "./style";
 

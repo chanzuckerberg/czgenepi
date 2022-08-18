@@ -1,6 +1,5 @@
 import { Link, Notification } from "czifui";
 import { useRouter } from "next/router";
-import React from "react";
 import { ROUTES } from "src/common/routes";
 import { pluralize } from "src/common/utils/strUtils";
 

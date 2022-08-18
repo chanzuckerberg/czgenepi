@@ -1,6 +1,6 @@
 import { Button, Icon } from "czifui";
 import { isEmpty } from "lodash";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import { EMPTY_OBJECT } from "src/common/constants/empty";

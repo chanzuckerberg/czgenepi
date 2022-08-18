@@ -1,5 +1,5 @@
 import { ButtonIcon, Icon, Tooltip } from "czifui";
-import React, { FC, useState } from "react";
+import { FC, useState } from "react";
 import { StyledBadge, StyledDiv, tooltipStyles } from "./style";
 
 interface Props {
