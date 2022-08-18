@@ -34,6 +34,8 @@ export default function AlertTable({ parseErrors }: Props): JSX.Element {
     <Overflow>
       <StyledTableContainer>
         <MuiTable aria-label="simple table" component="div">
+          {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+          {/* @ts-ignore: spread types error */}
           <StyledTableHead {...({ component: "div" } as unknown)}>
             <TableRow component="div">
               <StyledHeaderTableCell component="div">

@@ -39,6 +39,8 @@ export default function UploadTable({
   return (
     <MuiTable component="div" stickyHeader>
       <TableHead component="div">
+        {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+        {/* @ts-ignore: spread types error */}
         <StyledTableRow {...({ component: "div" } as unknown)}>
           <StyledTableCell component="div">
             <IdColumn>
