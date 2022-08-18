@@ -5,7 +5,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { AppProps } from "next/app";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { Provider } from "react-redux";
 import { analyticsRecordRouteChange } from "src/common/analytics/methods";
 import { OneTrustInitializer } from "src/common/analytics/OneTrustInitializer";
