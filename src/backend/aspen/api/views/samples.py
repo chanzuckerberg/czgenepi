@@ -45,12 +45,19 @@ router = APIRouter()
 
 GISAID_REJECTION_TIME = datetime.timedelta(days=4)
 
+def get_pathogen_slug(pathogen_slug=None):
+    if pathogen_slug is None: 
+        return "SC2"
+
+    return pathogen_slug
+
 
 @router.get("/", response_model=SamplesResponse)
 async def list_samples(
     db: AsyncSession = Depends(get_db),
     az: AuthZSession = Depends(get_authz_session),
     ac: AuthContext = Depends(get_auth_context),
+    ps=Depends(get_pathogen_slug),
 ) -> SamplesResponse:
 
     # load the samples.
