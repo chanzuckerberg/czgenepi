@@ -1,5 +1,5 @@
 import { Icon, Menu, MenuItem } from "czifui";
-import * as React from "react";
+import { useState } from "react";
 import { API } from "src/common/api";
 import ENV from "src/common/constants/ENV";
 import { ROUTES } from "src/common/routes";
@@ -10,7 +10,7 @@ interface UserMenuProps {
 }
 
 const UserMenu = ({ user }: UserMenuProps): JSX.Element => {
-  const [anchorEl, setAnchorEl] = React.useState<Element | null>(null);
+  const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = (event) => {
     setAnchorEl(event.currentTarget);

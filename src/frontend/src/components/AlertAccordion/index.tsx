@@ -1,6 +1,5 @@
 import { Icon } from "czifui";
 import { useState } from "react";
-import * as React from "react";
 import {
   ColumnFlexContainer,
   RowFlexContainer,

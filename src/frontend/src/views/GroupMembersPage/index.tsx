@@ -1,7 +1,6 @@
 import { Tab } from "czifui";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import * as React from "react";
 import { useProtectedRoute, useUserInfo } from "src/common/queries/auth";
 import { useGroupInfo, useGroupMembersInfo } from "src/common/queries/groups";
 import { ROUTES } from "src/common/routes";

@@ -1,6 +1,5 @@
 import { Button } from "czifui";
 import { useRef, useState } from "react";
-import * as React from "react";
 import ConfirmDialog from "../ConfirmDialog";
 import { HiddenInput } from "./style";
 

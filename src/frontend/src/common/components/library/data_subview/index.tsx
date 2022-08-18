@@ -1,7 +1,6 @@
 import { InputSearch } from "czifui";
 import { compact, escapeRegExp, filter } from "lodash";
 import { FunctionComponent, useEffect, useReducer, useState } from "react";
-import * as React from "react";
 import { DataTable } from "src/common/components";
 import { VIEWNAME } from "src/common/constants/types";
 import { CreateNSTreeModal } from "./components/CreateNSTreeModal";

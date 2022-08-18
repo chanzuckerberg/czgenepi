@@ -1,5 +1,4 @@
 import { useState } from "react";
-import * as React from "react";
 import { getDateRangeLabel } from "src/common/utils/dateUtils";
 import { MENU_OPTION_ALL_TIME } from "src/components/DateFilterMenu/constants";
 import { StyledDateFilterMenu, StyledInputDropdown } from "./style";

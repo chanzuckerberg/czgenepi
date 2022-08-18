@@ -1,7 +1,6 @@
 import type { IconNameToSizes } from "czifui";
 import { ButtonIcon as LibButtonIcon, Icon, Tooltip } from "czifui";
 import { FunctionComponent, MouseEventHandler, useState } from "react";
-import * as React from "react";
 import { StyledSpan } from "./style";
 
 interface Props {

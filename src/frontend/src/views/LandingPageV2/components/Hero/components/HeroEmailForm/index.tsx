@@ -1,5 +1,4 @@
 import { useState } from "react";
-import * as React from "react";
 import FormSubmitArrow from "src/common/images/form-submit-arrow.svg";
 import { EmailInput, HeroEmailForm, SubmitButton, SubmitIcon } from "./style";
 

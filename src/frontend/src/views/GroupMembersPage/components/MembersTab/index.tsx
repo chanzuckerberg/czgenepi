@@ -1,7 +1,6 @@
 import { Button, Tab } from "czifui";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import * as React from "react";
 import { HeadAppTitle } from "src/common/components";
 import { useGroupInvitations } from "src/common/queries/groups";
 import { ROUTES } from "src/common/routes";

@@ -32,7 +32,6 @@
 import { SplitFactory } from "@splitsoftware/splitio-react";
 import { TreatmentsWithConfig } from "@splitsoftware/splitio/types/splitio";
 import { useEffect, useState } from "react";
-import * as React from "react";
 import ENV from "src/common/constants/ENV";
 import { useUserInfo } from "src/common/queries/auth";
 

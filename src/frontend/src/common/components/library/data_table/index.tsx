@@ -6,7 +6,6 @@ import {
   useReducer,
   useState,
 } from "react";
-import * as React from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import { noop } from "src/common/constants/empty";
