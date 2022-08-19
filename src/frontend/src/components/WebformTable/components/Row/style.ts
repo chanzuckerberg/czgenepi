@@ -19,7 +19,7 @@ export const Id = styled.div`
     const spaces = getSpaces(props);
 
     return `
-      padding: ${spaces?.m}px 0 ${spaces?.m}px ${spaces?.s}px
+    padding: ${spaces?.m}px ${spaces?.m}px ${spaces?.m}px ${spaces?.s}px;    
     `;
   }}
 `;
