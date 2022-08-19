@@ -226,7 +226,10 @@ export function SampleFiltering({
    * refactor -- the above interactions cause a lot of edge cases.
    */
   function handleLineageDropdownChange(
-    newSelectedOptions: DefaultMenuSelectOption[] | null
+    newSelectedOptions:
+      | DefaultMenuSelectOption
+      | DefaultMenuSelectOption[]
+      | null
   ): void {
     // No selection at all means empty all lineage choices.
     // (Vince) Poked around: I don't think Dropdown emits this in our case?
@@ -236,7 +239,19 @@ export function SampleFiltering({
       return;
     }
 
-    const newSelectedLineages = newSelectedOptions.map((option) => option.name);
+    // czifui v 7.0.0 upgrade - now newSelectOptions can be a single option
+    // (at least according to typescript).
+    // To keep this consistent, check for the single option and return a list
+    // with jus the one option. It's unclear if this will happen when multi-
+    // select is enabled.
+    if (!Array.isArray(newSelectedOptions)) {
+      setSelectedLineages([newSelectedOptions.name]);
+      return;
+    }
+
+    const newSelectedLineages = newSelectedOptions.map(
+      (option: DefaultMenuSelectOption) => option.name
+    );
     // What we actually emit as selection does not always match user selected.
     let emittedSelection: string[];
 
