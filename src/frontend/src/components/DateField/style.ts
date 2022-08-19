@@ -20,6 +20,7 @@ export const StyledTextField = styled(TextField, {
       margin: 0;
       input {
         background-color: ${isBackgroundColorShown && colors?.primary[200]};
+        padding: ${spaces?.s}px ${spaces?.l}px;
       }
     `;
   }}

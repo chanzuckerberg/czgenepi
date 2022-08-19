@@ -6,6 +6,7 @@ import {
   fontBodyXs,
   getColors,
   getCorners,
+  getPalette,
   getSpaces,
 } from "czifui";
 import { transparentScrollbars } from "src/common/styles/basicStyle";
@@ -43,6 +44,7 @@ export const StyledTextArea = styled(TextField)`
     if (disabled) {
       const colors = getColors(props);
       const corners = getCorners(props);
+      const palette = getPalette(props);
       const spaces = getSpaces(props);
 
       return `
@@ -59,8 +61,11 @@ export const StyledTextArea = styled(TextField)`
         }
 
         textarea {
-          color: black;
           resize: none;
+        }
+
+        .Mui-disabled {
+          -webkit-text-fill-color: ${palette?.common?.black};
         }
       `;
     }

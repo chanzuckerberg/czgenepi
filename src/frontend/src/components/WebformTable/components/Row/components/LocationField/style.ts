@@ -32,8 +32,15 @@ export const StyledDropdown = styled(Dropdown, {
     return `
       padding-right: ${spaces?.l}px;
       background-color: ${isBackgroundColorShown && colors?.primary[200]};
+      border: ${borders?.gray[300]};
+      path {
+        fill: ${colors?.gray[300]};
+      }
       &:hover {
-        border: ${borders?.gray[500]}
+        border: ${borders?.gray[500]};
+        path {
+          fill: ${colors?.gray[600]}; 
+        }
       }
     `;
   }}
