@@ -77,7 +77,8 @@ function filterLineageOptions(
   // Cap the actual search results returned to keep render speed sane.
   return [...addlPrependResults, ...baseFilteredResults.slice(0, 99)];
 }
-// `Dropdown` doesn't directly handle above, it's done by its child MenuSelect
+// `Dropdown` doesn't directly handle above, it's done by its child MenuSelect.
+// This prop was renamed to DropdownMenuProps
 const lineageDropdownMenuProps = {
   getOptionSelected,
   filterOptions: filterLineageOptions,

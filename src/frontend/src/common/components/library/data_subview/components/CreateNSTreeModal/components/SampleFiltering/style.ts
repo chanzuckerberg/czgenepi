@@ -5,6 +5,7 @@ import {
   DropdownPopper,
   fontHeaderXs,
   getColors,
+  getPalette,
   getSpaces,
 } from "czifui";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
@@ -76,22 +77,30 @@ export const StyledNewTabLink = styled(NewTabLink)`
 
 const DROPDOWN_WIDTH = "209px";
 
-// High specificity label styling is to beat out czifui coloring.
 export const StyledDropdown = styled(Dropdown)`
   width: ${DROPDOWN_WIDTH};
-  .MuiButton-label > span {
-    color: black;
-  }
 
   ${(props: CommonThemeProps) => {
     const colors = getColors(props);
+    const palette = getPalette(props);
     return `
+      border-color: ${colors?.gray[500]};
       path {
         fill: ${colors?.gray[500]};
       }
+      span {
+        color: ${palette?.common?.black};
+      }
+
+      &:hover {
+        border-color: ${colors?.gray[600]};
+        path {
+          fill: ${colors?.gray[600]};
+        }
+      }
     `;
   }}
-` as typeof Dropdown; // assert b/c `styled` causes an interface hiccup;
+`;
 
 // The `min-width` property is necessary to cancel out a hardcoded czifui
 // value since we want to set a smaller `width` than that hardcoded number
