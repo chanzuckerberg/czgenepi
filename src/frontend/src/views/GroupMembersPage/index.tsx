@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { useProtectedRoute, useUserInfo } from "src/common/queries/auth";
 import { useGroupInfo, useGroupMembersInfo } from "src/common/queries/groups";
 import { ROUTES } from "src/common/routes";
-import { stringifyGisaidLocation } from "src/common/utils/locationUtils";
 import { caseInsensitiveSort } from "src/common/utils/strUtils";
 import { getIsGroupAdminFromUserInfo } from "src/common/utils/userInfo";
 import { GroupDetailsTab } from "./components/GroupDetailsTab";
@@ -44,7 +43,7 @@ const GroupMembersPage = ({
   const { data: members = [] } = useGroupMembersInfo();
   const { data: groupInfo } = useGroupInfo();
 
-  const { address, location, name, prefix } = groupInfo ?? {};
+  const { name } = groupInfo ?? {};
 
   useEffect(() => {
     setTabValue(requestedPrimaryTab);
@@ -52,8 +51,6 @@ const GroupMembersPage = ({
 
   // sort group members by name before display
   members.sort((a, b) => caseInsensitiveSort(a.name, b.name));
-
-  const displayLocation = stringifyGisaidLocation(location);
 
   const handleTabClick: TabEventHandler = (_, value) => {
     setTabValue(value);
@@ -87,9 +84,7 @@ const GroupMembersPage = ({
         )}
         {tabValue === PrimaryTabType.DETAILS && (
           <GroupDetailsTab
-            address={address}
-            location={displayLocation}
-            prefix={prefix}
+            group={groupInfo}
             shouldShowChangeDetailsCallout={isGroupAdmin}
           />
         )}
