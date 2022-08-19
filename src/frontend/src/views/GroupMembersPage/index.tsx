@@ -52,7 +52,7 @@ const GroupMembersPage = ({
   // sort group members by name before display
   members.sort((a, b) => caseInsensitiveSort(a.name, b.name));
 
-  const handleTabClick: TabEventHandler = (_, value) => {
+  const handleTabClick: PrimaryTabEventHandler = (_, value) => {
     setTabValue(value);
     router.push(`${ROUTES.GROUP}/${value}`);
   };

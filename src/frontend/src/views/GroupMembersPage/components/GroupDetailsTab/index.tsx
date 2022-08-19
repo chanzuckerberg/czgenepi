@@ -1,5 +1,4 @@
 import { Icon, Link, Tooltip } from "czifui";
-import React from "react";
 import { B } from "src/common/styles/basicStyle";
 import { stringifyGisaidLocation } from "src/common/utils/locationUtils";
 import {
