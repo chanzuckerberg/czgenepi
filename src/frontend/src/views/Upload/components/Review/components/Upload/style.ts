@@ -28,7 +28,7 @@ export const ImageWrapper = styled.div`
     const spaces = getSpaces(props);
 
     return `
-      margin-bottom: ${spaces?.xl}px;
+      margin: ${spaces?.xl}px 0;
     `;
   }}
 `;
