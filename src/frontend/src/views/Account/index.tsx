@@ -1,8 +1,7 @@
 import { Button, Icon, InputText, Link } from "czifui";
 import { useRouter } from "next/router";
-import React, { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { H1, H2, P } from "src/common/styles/basicStyle";
-import AbandonChangesModal from "./components/AbandonChangesModal";
 import {
   GrayIconWrapper,
   StyledDivider,
@@ -14,56 +13,67 @@ import {
   WhiteIconWrapper,
 } from "./style";
 
+const UNSAVED_CHANGES_MESSAGE = "Leave?"; // TODO: fill in text
+
 export default function Account(): JSX.Element {
   const router = useRouter();
   // TODO:194969 - get user's current gisaid id for the default value
   const [gisaidId, setGisaidId] = useState("");
-  const [hasUnsavedChanges, setUnsavedChanges] = useState<boolean>(false);
-
-  const [isModalOpen, setModalOpen] = useState<boolean>(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false);
 
   // TODO: 194969 - implement save once API is ready
   const handleSave = () => {
     // eslint-disable-next-line
     console.log(gisaidId);
-    setUnsavedChanges(false);
+    setHasUnsavedChanges(false);
   };
 
   const handleNewIdInput = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setGisaidId(value);
-    setUnsavedChanges(true);
-  };
-
-  const openModal = () => {
-    setModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setModalOpen(false);
+    setHasUnsavedChanges(true);
   };
 
   // prompt the user if they try and leave with unsaved changes
   useEffect(() => {
     const handleWindowClose = (e: BeforeUnloadEvent) => {
       if (!hasUnsavedChanges) return;
+
+      /**
+       * (ehoops): The custom message doesn't work, but we still need to
+       * assign returnValue for prompt to happen - same as upload page
+       * https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event
+       */
       e.preventDefault();
-      openModal();
-      return false;
+      e.returnValue = UNSAVED_CHANGES_MESSAGE;
+      return UNSAVED_CHANGES_MESSAGE;
     };
-    const handleBrowseAway = () => {
-      if (!hasUnsavedChanges) return;
-      openModal();
-      router.events.emit("routeChangeError");
-      throw "routeChange aborted.";
-    };
+
     window.addEventListener("beforeunload", handleWindowClose);
-    router.events.on("routeChangeStart", handleBrowseAway);
+
     return () => {
       window.removeEventListener("beforeunload", handleWindowClose);
-      router.events.off("routeChangeStart", handleBrowseAway);
     };
-  }, [router, hasUnsavedChanges]);
+  }, [hasUnsavedChanges]);
+
+  useEffect(() => {
+    const handleRouteChangeStart = () => {
+      if (!hasUnsavedChanges) return;
+
+      if (window.confirm(UNSAVED_CHANGES_MESSAGE)) {
+        return;
+      } else {
+        router.events.emit("routeChangeError");
+        throw "routeChange aborted.";
+      }
+    };
+
+    router.events.on("routeChangeStart", handleRouteChangeStart);
+
+    return () => {
+      router.events.off("routeChangeStart", handleRouteChangeStart);
+    };
+  }, [router.events, hasUnsavedChanges]);
 
   return (
     <>
@@ -117,9 +127,6 @@ export default function Account(): JSX.Element {
           onChange={handleNewIdInput}
         />
       </StyledSection>
-      {isModalOpen && (
-        <AbandonChangesModal open={isModalOpen} onClose={closeModal} />
-      )}
     </>
   );
 }

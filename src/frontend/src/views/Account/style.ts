@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { getColors, getSpaces } from "czifui";
+import { CommonThemeProps, getColors, getSpaces } from "czifui";
 import { H3, P } from "src/common/styles/basicStyle";
 import { iconFillGray400, iconFillWhite } from "src/common/styles/iconStyle";
 import { ContentStyles } from "src/common/styles/mixins/global";
@@ -11,7 +11,7 @@ export const StyledHeaderRow = styled.div`
 `;
 
 export const StyledDivider = styled.div`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
     return `
@@ -29,7 +29,7 @@ export const StyledSection = styled.section`
 
 export const StyledRow = styled.div`
   display: flex;
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-top: 0;
@@ -40,7 +40,7 @@ export const StyledRow = styled.div`
 
 export const StyledH3 = styled(H3)`
   margin: 0;
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-right: ${spaces?.xs}px;
@@ -50,7 +50,7 @@ export const StyledH3 = styled(H3)`
 
 export const SubText = styled(P)`
   margin: 0;
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     return `
       color: ${colors?.gray[500]};
