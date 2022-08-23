@@ -8,11 +8,12 @@ import {
   EVENT_TYPES,
 } from "src/common/analytics/eventTypes";
 import { analyticsTrackEvent } from "src/common/analytics/methods";
+import { ORG_API } from "src/common/api";
 import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import { useUserInfo } from "src/common/queries/auth";
-import { useFastaDownload } from "src/common/queries/samples";
+import { useFileDownload } from "src/common/queries/samples";
 import { B } from "src/common/styles/basicStyle";
 import {
   StyledCloseIconButton,
@@ -66,6 +67,7 @@ const DownloadModal = ({
   const metadataDownloadName = `${groupName}_sample_metadata_${downloadDate
     .toISOString()
     .slice(0, 10)}.tsv`;
+
   const [tsvRows, setTsvRows] = useState<string[][]>([]);
   const [tsvHeaders, setTsvHeaders] = useState<string[]>([]);
   const [anchorEl, setAnchorEl] = useState<HTMLElement>();
@@ -119,20 +121,23 @@ const DownloadModal = ({
     onClose();
   };
 
-  const fastaDownloadMutation = useFastaDownload({
-    componentOnError: () => {
-      setShouldShowError(true);
-      handleCloseModal();
-    },
-    componentOnSuccess: (data: Blob) => {
-      const link = document.createElement("a");
-      link.href = window.URL.createObjectURL(data);
-      link.download = fastaDownloadName;
-      link.click();
-      link.remove();
-      handleCloseModal();
-    },
-  });
+  const fastaDownloadMutation = useFileDownload(
+    ORG_API.SAMPLES_FASTA_DOWNLOAD,
+    {
+      componentOnError: () => {
+        setShouldShowError(true);
+        handleCloseModal();
+      },
+      componentOnSuccess: (data: Blob) => {
+        const link = document.createElement("a");
+        link.href = window.URL.createObjectURL(data);
+        link.download = fastaDownloadName;
+        link.click();
+        link.remove();
+        handleCloseModal();
+      },
+    }
+  );
 
   const FASTA_DISABLED_TOOLTIP_TEXT = (
     <div>
@@ -249,8 +254,11 @@ const DownloadModal = ({
                     <DownloadTypeInfo>
                       Download concatenated consensus genomes and metadata files
                       formatted to prepare samples for submission to GISAID.{" "}
-                      {/* TODO: (194961) - update href */}
-                      <Link href="" target="_blank" rel="noreferrer">
+                      <Link
+                        href="https://help.czgenepi.org/hc/en-us/articles/8179880474260"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
                         Learn More.
                       </Link>
                     </DownloadTypeInfo>
@@ -272,8 +280,11 @@ const DownloadModal = ({
                     <DownloadTypeInfo>
                       Download concatenated consensus genomes and metadata files
                       formatted to prepare samples for submission to Genbank.{" "}
-                      {/* TODO: (194962) - update href */}
-                      <Link href="" target="_blank" rel="noreferrer">
+                      <Link
+                        href="https://help.czgenepi.org/hc/en-us/articles/8179961027604"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
                         Learn More.
                       </Link>
                     </DownloadTypeInfo>
@@ -324,27 +335,34 @@ const DownloadModal = ({
     analyticsTrackEvent<AnalyticsSamplesDownloadFile>(
       EVENT_TYPES.SAMPLES_DOWNLOAD_FILE,
       {
+        includes_consensus_genome: isFastaSelected,
+        includes_genbank_template: isGenbankSelected,
+        includes_gisaid_template: isGisaidSelected,
+        includes_sample_metadata: isMetadataSelected,
         sample_count: checkedSampleIds.length,
         sample_public_ids: JSON.stringify(checkedSampleIds),
-        includes_consensus_genome: isFastaSelected,
-        includes_sample_metadata: isMetadataSelected,
       }
     );
   }
 
-  // TODO:(194961) update for GISAID template download
-  // TODO:(194962) update for GenBank template download
   function getDownloadButton(): JSX.Element | undefined {
     // button will have different functionality depending on download type selected
 
-    const isButtonDisabled = !isFastaSelected && !isMetadataSelected;
-    const downloadFasta = () => {
-      fastaDownloadMutation.mutate({ sampleIds: checkedSampleIds });
-      // Analytics: When fasta download happens, kick off download event.
+    const isButtonDisabled = !(
+      isFastaSelected ||
+      isMetadataSelected ||
+      isGisaidSelected ||
+      isGenbankSelected
+    );
+
+    // Analytics: If downloading fasta is not happening, still fire event.
+    const onClick = () => {
+      if (isFastaSelected) {
+        fastaDownloadMutation.mutate({ sampleIds: checkedSampleIds });
+      }
+
       analyticsHandleDownload();
     };
-    // Analytics: If downloading fasta is not happening, still fire event.
-    const onClick = isFastaSelected ? downloadFasta : analyticsHandleDownload;
 
     const downloadButton = (
       <StyledButton

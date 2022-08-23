@@ -24,45 +24,48 @@ import { MutationCallbacks } from "./types";
 /**
  * Download fasta file for samples
  */
-interface SampleFastaDownloadPayload {
+interface SampleFileDownloadPayload {
   sampleIds: string[];
 }
 
-type FastaDownloadCallbacks = MutationCallbacks<Blob>;
+type FileDownloadEndpointType =
+  | ORG_API.SAMPLES_FASTA_DOWNLOAD
+  | ORG_API.SAMPLES_GENBANK_DOWNLOAD
+  | ORG_API.SAMPLES_GISAID_DOWNLOAD;
+type FileDownloadCallbacks = MutationCallbacks<Blob>;
 
-export async function downloadSamplesFasta({
+export async function downloadSamplesFile({
+  endpoint,
   sampleIds,
 }: {
+  endpoint: FileDownloadEndpointType;
   sampleIds: string[];
 }): Promise<Blob> {
   const payload = {
     sample_ids: sampleIds,
   };
-  const response = await fetch(
-    API_URL + generateOrgSpecificUrl(ORG_API.SAMPLES_FASTA_DOWNLOAD),
-    {
-      ...DEFAULT_POST_OPTIONS,
-      body: JSON.stringify(payload),
-    }
-  );
+  const response = await fetch(API_URL + generateOrgSpecificUrl(endpoint), {
+    ...DEFAULT_POST_OPTIONS,
+    body: JSON.stringify(payload),
+  });
   if (response.ok) return await response.blob();
 
   throw Error(`${response.statusText}: ${await response.text()}`);
 }
 
-export function useFastaDownload({
-  componentOnError,
-  componentOnSuccess,
-}: FastaDownloadCallbacks): UseMutationResult<
-  Blob,
-  unknown,
-  SampleFastaDownloadPayload,
-  unknown
-> {
-  return useMutation(downloadSamplesFasta, {
-    onError: componentOnError,
-    onSuccess: componentOnSuccess,
-  });
+export function useFileDownload(
+  endpoint: FileDownloadEndpointType,
+  { componentOnError, componentOnSuccess }: FileDownloadCallbacks
+): UseMutationResult<Blob, unknown, SampleFileDownloadPayload, unknown> {
+  return useMutation(
+    (sampleIds) => {
+      downloadSamplesFile({ endpoint, sampleIds });
+    },
+    {
+      onError: componentOnError,
+      onSuccess: componentOnSuccess,
+    }
+  );
 }
 
 /**
