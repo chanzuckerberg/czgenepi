@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { CommonThemeProps, getColors, getSpaces, InputText } from "czifui";
+import { CommonThemeProps, getColors, getSpaces } from "czifui";
 import { H3, P } from "src/common/styles/basicStyle";
 import { iconFillGray400, iconFillWhite } from "src/common/styles/iconStyle";
 import { ContentStyles } from "src/common/styles/mixins/global";
