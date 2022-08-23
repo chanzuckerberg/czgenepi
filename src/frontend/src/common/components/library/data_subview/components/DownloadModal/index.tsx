@@ -57,16 +57,6 @@ const DownloadModal = ({
   onClose,
 }: Props): JSX.Element => {
   const { data: userInfo } = useUserInfo();
-  const currentGroup = getCurrentGroupFromUserInfo(userInfo);
-  const groupName = currentGroup?.name.toLowerCase().replace(/ /g, "_"); // format group name for sequences download file
-  const downloadDate = new Date();
-  const separator = "\t";
-  const fastaDownloadName = `${groupName}_sample_sequences_${downloadDate
-    .toISOString()
-    .slice(0, 10)}.fasta`;
-  const metadataDownloadName = `${groupName}_sample_metadata_${downloadDate
-    .toISOString()
-    .slice(0, 10)}.tsv`;
 
   const [tsvRows, setTsvRows] = useState<string[][]>([]);
   const [tsvHeaders, setTsvHeaders] = useState<string[]>([]);
@@ -118,12 +108,22 @@ const DownloadModal = ({
   const handleCloseModal = () => {
     setFastaSelected(false);
     setMetadataSelected(false);
+    setGenbankSelected(false);
+    setGisaidSelected(false);
     onClose();
   };
 
-  const fastaDownloadMutation = useFileDownload(
-    ORG_API.SAMPLES_FASTA_DOWNLOAD,
-    {
+  // format file names for download files
+  const currentGroup = getCurrentGroupFromUserInfo(userInfo);
+  const groupName = currentGroup?.name.toLowerCase().replace(/ /g, "_");
+  const downloadDate = new Date().toISOString().slice(0, 10);
+  const separator = "\t";
+  const fastaDownloadName = `${groupName}_sample_sequences_${downloadDate}.fasta`;
+  const gisaidDownloadName = `${groupName}_template_gisaid_${downloadDate}.txt`;
+  const genbankDownloadName = `${groupName}_template_genbank_${downloadDate}.tsv`;
+
+  const useFileMutationGenerator = (downloadFileName) =>
+    useFileDownload({
       componentOnError: () => {
         setShouldShowError(true);
         handleCloseModal();
@@ -131,13 +131,16 @@ const DownloadModal = ({
       componentOnSuccess: (data: Blob) => {
         const link = document.createElement("a");
         link.href = window.URL.createObjectURL(data);
-        link.download = fastaDownloadName;
+        link.download = downloadFileName;
         link.click();
         link.remove();
         handleCloseModal();
       },
-    }
-  );
+    });
+
+  const fastaDownloadMutation = useFileMutationGenerator(fastaDownloadName);
+  const gisaidDownloadMutation = useFileMutationGenerator(gisaidDownloadName);
+  const genbankDownloadMutation = useFileMutationGenerator(genbankDownloadName);
 
   const FASTA_DISABLED_TOOLTIP_TEXT = (
     <div>
@@ -355,10 +358,26 @@ const DownloadModal = ({
       isGenbankSelected
     );
 
-    // Analytics: If downloading fasta is not happening, still fire event.
     const onClick = () => {
       if (isFastaSelected) {
-        fastaDownloadMutation.mutate({ sampleIds: checkedSampleIds });
+        fastaDownloadMutation.mutate({
+          sampleIds: checkedSampleIds,
+          endpoint: ORG_API.SAMPLES_FASTA_DOWNLOAD,
+        });
+      }
+
+      if (isGisaidSelected) {
+        gisaidDownloadMutation.mutate({
+          sampleIds: checkedSampleIds,
+          endpoint: ORG_API.SAMPLES_GISAID_DOWNLOAD,
+        });
+      }
+
+      if (isGenbankSelected) {
+        genbankDownloadMutation.mutate({
+          sampleIds: checkedSampleIds,
+          endpoint: ORG_API.SAMPLES_GENBANK_DOWNLOAD,
+        });
       }
 
       analyticsHandleDownload();

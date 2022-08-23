@@ -53,19 +53,19 @@ export async function downloadSamplesFile({
   throw Error(`${response.statusText}: ${await response.text()}`);
 }
 
-export function useFileDownload(
-  endpoint: FileDownloadEndpointType,
-  { componentOnError, componentOnSuccess }: FileDownloadCallbacks
-): UseMutationResult<Blob, unknown, SampleFileDownloadPayload, unknown> {
-  return useMutation(
-    (sampleIds) => {
-      downloadSamplesFile({ endpoint, sampleIds });
-    },
-    {
-      onError: componentOnError,
-      onSuccess: componentOnSuccess,
-    }
-  );
+export function useFileDownload({
+  componentOnError,
+  componentOnSuccess,
+}: FileDownloadCallbacks): UseMutationResult<
+  Blob,
+  unknown,
+  SampleFileDownloadPayload,
+  unknown
+> {
+  return useMutation(downloadSamplesFile, {
+    onError: componentOnError,
+    onSuccess: componentOnSuccess,
+  });
 }
 
 /**

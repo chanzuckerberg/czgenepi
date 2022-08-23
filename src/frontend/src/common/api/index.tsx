@@ -20,8 +20,8 @@ export enum ORG_API {
   SAMPLES = "samples/",
   SAMPLES_VALIDATE_IDS = "samples/validate_ids/",
   SAMPLES_FASTA_DOWNLOAD = "sequences/",
-  SAMPLES_GENBANK_DOWNLOAD = "",
-  SAMPLES_GISAID_DOWNLOAD = "",
+  SAMPLES_GENBANK_DOWNLOAD = "samples/genbank_template",
+  SAMPLES_GISAID_DOWNLOAD = "samples/gisaid_template",
   GET_FASTA_URL = "sequences/getfastaurl",
 }
 
