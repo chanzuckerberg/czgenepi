@@ -1,7 +1,9 @@
 import styled from "@emotion/styled";
 import {
   Button,
+  Callout,
   Checkbox,
+  CommonThemeProps,
   fontBodyM,
   fontBodyS,
   fontBodyXs,
@@ -17,6 +19,8 @@ export const Header = styled.div`
 `;
 
 export const Content = styled.div`
+  display: flex;
+  flex-direction: column;
   ${fontBodyS}
   ${(props) => {
     const colors = getColors(props);
@@ -38,45 +42,64 @@ export const Title = styled.span`
   }}
 `;
 
+const checkBoxInfoSpacing = (props: CommonThemeProps) => {
+  const spaces = getSpaces(props);
+  return `
+    position: inline-block;
+    float: left;
+    margin-top: ${spaces?.l}px;
+    margin-bottom: ${spaces?.l}px;
+  `;
+};
+
 export const CheckBoxInfo = styled.div`
+  ${checkBoxInfoSpacing}
+`;
+
+export const CheckboxLabel = styled.label`
   ${fontBodyS}
-  position: inline-block;
-  float: left;
-  ${(props) => {
+  ${checkBoxInfoSpacing}
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
-      margin-top: ${spaces?.l}px;
-      margin-bottom: ${spaces?.l}px;
+      margin-top: ${spaces?.m}px;
     `;
   }}
 `;
 
-export const Container = styled.div`
+export const Container = styled.ul`
+  list-style-type: none;
   display: grid;
+  padding: 0;
+  margin: 0;
 `;
 
-export const StyledSpan = styled.span`
+interface StyledFileTypeItemProps extends CommonThemeProps {
+  isDisabled?: boolean;
+  isSelected?: boolean;
+}
+
+export const StyledFileTypeItem = styled.li`
   border-radius: 5px;
-  ${(props) => {
+  ${(props: StyledFileTypeItemProps) => {
     const colors = getColors(props);
+    const spaces = getSpaces(props);
+    const { isDisabled, isSelected } = props;
+
+    const backgroundColor = isDisabled
+      ? `${colors?.gray[400]}`
+      : isSelected
+      ? `${colors?.gray[100]}`
+      : "transparent"; // Default to "transparent if not disabled or selected"
+
     return `
+      background-color: ${backgroundColor};
       &:hover {
         background-color: ${colors?.gray[100]};
       }
-    `;
-  }}
-`;
-
-export const CheckBoxWrapper = styled.div`
-  width: 500px;
-  border-radius: 5px;
-  ${(props) => {
-    const spaces = getSpaces(props);
-    const colors = getColors(props);
-    return `
       margin-bottom: ${spaces?.xxs}px;
-      &:hover {
-        background-color: ${colors?.gray[100]};
+      &:last-child {
+        margin-bottom: 0;
       }
     `;
   }}
@@ -95,6 +118,7 @@ export const DownloadType = styled.div`
 `;
 
 export const StyledButton = styled(Button)`
+  max-width: fit-content;
   ${(props) => {
     const spaces = getSpaces(props);
     return `
@@ -116,4 +140,17 @@ export const StyledCheckbox = styled(Checkbox)`
       background-color: transparent;
     }
   }
+`;
+
+export const StyledCallout = styled(Callout)`
+  ${fontBodyXxs}
+  width: 100%;
+  max-width: 434px;
+  ${(props) => {
+    const spaces = getSpaces(props);
+    return `
+      margin-top: ${spaces?.xl}px;
+      margin-bottom: 0;
+    `;
+  }}
 `;

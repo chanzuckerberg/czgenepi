@@ -1,4 +1,4 @@
-from typing import List, Optional, Set, Tuple
+from typing import List, Set, Tuple
 
 import pytest
 import sqlalchemy as sa
@@ -185,7 +185,7 @@ async def test_create_new_user_and_sync_roles(
     auth0_apiclient.get_org_user_roles.side_effect = [["member"], ["member"], ["admin"]]  # type: ignore
     auth0_apiclient.get_user_orgs.side_effect = [[{"id": group1.auth0_org_id}, {"id": group3.auth0_org_id}]]  # type: ignore
     await start_new_transaction(async_session)
-    user_obj: Optional[User] = await create_user_if_not_exists(
+    user_obj, _ = await create_user_if_not_exists(
         async_session, auth0_apiclient, userinfo
     )
     assert user_obj is not None
@@ -294,7 +294,7 @@ async def test_callback_syncs_auth0_user_roles(
     async_session.add(group)
     await async_session.commit()
 
-    split_client.get_flag.side_effect = ["on"]  # type: ignore
+    split_client.get_usergroup_treatment.side_effect = ["on"]  # type: ignore
     auth0_apiclient.get_org_user_roles.side_effect = [["admin"]]  # type: ignore
     auth0_oauth.authorize_access_token.side_effect = [{"userinfo": userinfo}]  # type: ignore
     auth0_apiclient.get_user_orgs.side_effect = [[]]  # type: ignore
@@ -351,7 +351,7 @@ async def test_callback_ff_doesnt_sync_auth0_user_roles(
     async_session.add(group)
     await async_session.commit()
 
-    split_client.get_flag.side_effect = ["control"]  # type: ignore
+    split_client.get_usergroup_treatment.side_effect = ["control"]  # type: ignore
     auth0_apiclient.get_org_user_roles.side_effect = [["admin"]]  # type: ignore
     auth0_oauth.authorize_access_token.side_effect = [{"userinfo": userinfo}]  # type: ignore
     auth0_apiclient.get_user_orgs.side_effect = [[]]  # type: ignore
@@ -398,3 +398,75 @@ async def test_callback_error_redirects(
     assert res.status_code == 307
     assert res.is_redirect
     assert "expired" in res.headers["Location"]
+
+
+async def test_redirect_to_samples_if_exists(
+    async_session: AsyncSession,
+    auth0_apiclient: Auth0Client,
+    auth0_oauth: StarletteOAuth2App,
+    http_client: AsyncClient,
+    split_client: SplitClient,
+):
+    """
+    Test creating a new auth0 user on login
+    """
+    userinfo = {
+        "sub": "user123-asdf",
+        "org_id": "123456",
+        "email": "hello@czgenepi.org",
+        "name": "Name Goes Here",
+    }
+    group = group_factory(auth0_org_id=userinfo["org_id"])
+    user = await userrole_factory(
+        async_session, auth0_user_id=userinfo["sub"], group=group
+    )
+    async_session.add(user)
+    await async_session.commit()
+
+    split_client.get_usergroup_treatment.side_effect = ["control"]  # type: ignore
+    auth0_apiclient.get_org_user_roles.side_effect = [["admin"]]  # type: ignore
+    auth0_oauth.authorize_access_token.side_effect = [{"userinfo": userinfo}]  # type: ignore
+    auth0_apiclient.get_user_orgs.side_effect = [[]]  # type: ignore
+
+    res = await http_client.get(
+        "/v2/auth/callback",
+        allow_redirects=False,
+    )
+    assert res.status_code == 307
+    assert auth0_apiclient.get_user_orgs.call_count == 0  # type: ignore
+    assert res.is_redirect
+    assert "data/samples" in res.headers["Location"]
+
+
+async def test_redirect_to_group_welcome_if_new(
+    async_session: AsyncSession,
+    auth0_apiclient: Auth0Client,
+    auth0_oauth: StarletteOAuth2App,
+    http_client: AsyncClient,
+    split_client: SplitClient,
+):
+    """
+    Test creating a new auth0 user on login
+    """
+    userinfo = {
+        "sub": "user123-asdf",
+        "org_id": "123456",
+        "email": "hello@czgenepi.org",
+        "name": "Name Goes Here",
+    }
+    group = group_factory(auth0_org_id=userinfo["org_id"])
+    async_session.add(group)
+    await async_session.commit()
+
+    split_client.get_usergroup_treatment.side_effect = ["control"]  # type: ignore
+    auth0_apiclient.get_org_user_roles.side_effect = [["admin"]]  # type: ignore
+    auth0_oauth.authorize_access_token.side_effect = [{"userinfo": userinfo}]  # type: ignore
+    auth0_apiclient.get_user_orgs.side_effect = [[]]  # type: ignore
+
+    res = await http_client.get(
+        "/v2/auth/callback",
+        allow_redirects=False,
+    )
+    assert res.status_code == 307
+    assert res.is_redirect
+    assert f"welcome/{group.id}" in res.headers["Location"]

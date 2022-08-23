@@ -36,7 +36,6 @@ const centerContent = `
 export const StyledDialogContent = styled(DialogContent)`
   ${centerContent}
 
-  width: 600px;
   flex-direction: column;
 `;
 

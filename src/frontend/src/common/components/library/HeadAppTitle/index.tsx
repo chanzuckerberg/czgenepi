@@ -26,7 +26,7 @@ function makeHeadTitle(subTitle?: string): string {
   return headTitle;
 }
 
-function HeadAppTitle({ subTitle }: Props) {
+function HeadAppTitle({ subTitle }: Props): JSX.Element {
   const headTitle = makeHeadTitle(subTitle);
 
   return (

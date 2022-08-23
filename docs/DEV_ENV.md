@@ -114,7 +114,7 @@ The dev environment has no network dependencies, but it launches some extra cont
 - [OIDC server mock](https://github.com/Soluto/oidc-server-mock) in place of Auth0.
 - [postgres](https://hub.docker.com/_/postgres) in place of RDS.
 
-#### TLS Certificate for mock authentication service
+### TLS Certificate for mock authentication service
 
 Due to browser security considerations, we must run the mock authentication
 service using a self-signed certificate. The local-init and local-clean make targets
@@ -128,7 +128,23 @@ is over a secure network connection i.e. TLS. Thus we need to run even a local
 development auth service behind a certificate. We bundle a pre-generated
 self-signed cert in for convenience.
 
-#### Configuring Pycharm with Docker Compose:
 
-Follow the instructions in [the wiki](https://czi.atlassian.net/wiki/spaces/SI/pages/1801100933/PyCharm+configuration+for+Happy+Path)
+### Attaching the backend remote container and entering debug mode in VSCode:
+
+* Run the `Remote-Containers: Open Folder in Container` command
+* navigate to the `Run and Debug` panel option (debug icon in left side, see debugging guide link below for help)
+* hit the green play button next to `Python: FastAPI`
+* wait until terminal is listening on port 3000
+* enter breakpoints
+* navigate to api endpoint url
+
+Notes:
+* you can leave debugger on while navigating to different endpoints to debug
+* make sure you clean up spare breakpoints
+* [VSCode guide on remote containers](https://code.visualstudio.com/docs/remote/containers)
+* [VSCode debugger guide](https://code.visualstudio.com/Docs/editor/debugging)
+
+
+Drop out of remote container mode:
+* Run the `Remote-Containers: Reopen Folder Locally` command
 

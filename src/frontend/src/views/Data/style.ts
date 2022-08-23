@@ -9,7 +9,6 @@ import {
   getColors,
   getSpaces,
 } from "czifui";
-import { Menu } from "semantic-ui-react";
 import { RowContent } from "src/common/components/library/data_table/style";
 import { PageContent } from "src/common/styles/mixins/global";
 
@@ -178,16 +177,21 @@ export const StyledCount = styled.div`
   }}
 `;
 
-export const StyledMenu = styled(Menu)`
+export const StyledMenu = styled.ul`
   align-items: center;
-  margin: 0 !important;
-
-  a div {
-    /* overwrite semantic-ui style */
-    padding-left: 0 !important;
-  }
+  display: flex;
+  flex-direction: row;
+  padding: 0;
 `;
 
-export const StyledMenuItem = styled(Menu.Item)`
-  height: 100%;
+export const StyledMenuItem = styled.li`
+  list-style: none;
+  padding: 0;
+  ${(props) => {
+    const spaces = getSpaces(props);
+
+    return `
+      margin: 0 ${spaces?.m}px;
+    `;
+  }}
 `;

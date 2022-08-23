@@ -1,7 +1,13 @@
-import { Alert, Icon, Tooltip } from "czifui";
-import { isEqual, noop } from "lodash";
+import { useTreatments } from "@splitsoftware/splitio-react";
+import { Alert, Icon, Link, Tooltip } from "czifui";
+import { isEqual } from "lodash";
 import React, { useCallback, useEffect, useState } from "react";
 import { CSVLink } from "react-csv";
+import {
+  AnalyticsSamplesDownloadFile,
+  EVENT_TYPES,
+} from "src/common/analytics/eventTypes";
+import { analyticsTrackEvent } from "src/common/analytics/methods";
 import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
@@ -16,19 +22,21 @@ import { pluralize } from "src/common/utils/strUtils";
 import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
 import Dialog from "src/components/Dialog";
 import Notification from "src/components/Notification";
+import { FEATURE_FLAGS, isFlagOn } from "src/components/Split";
 import { TooltipDescriptionText, TooltipHeaderText } from "../../style";
 import { ContactUsLink } from "../ContactUsLink";
 import {
   CheckBoxInfo,
-  CheckBoxWrapper,
+  CheckboxLabel,
   Container,
   Content,
   DownloadType,
   DownloadTypeInfo,
   Header,
   StyledButton,
+  StyledCallout,
   StyledCheckbox,
-  StyledSpan,
+  StyledFileTypeItem,
   Title,
 } from "./style";
 
@@ -66,7 +74,12 @@ const DownloadModal = ({
   const [isFastaDisabled, setFastaDisabled] = useState<boolean>(false);
   const [isFastaSelected, setFastaSelected] = useState<boolean>(false);
   const [isMetadataSelected, setMetadataSelected] = useState<boolean>(false);
+  const [isGisaidSelected, setGisaidSelected] = useState<boolean>(false);
+  const [isGenbankSelected, setGenbankSelected] = useState<boolean>(false);
   const [shouldShouldError, setShouldShowError] = useState<boolean>(false);
+
+  const flag = useTreatments([FEATURE_FLAGS.prep_files]);
+  const isPrepFilesFlagOn = isFlagOn(flag, FEATURE_FLAGS.prep_files);
 
   useEffect(() => {
     if (tsvData) {
@@ -90,6 +103,14 @@ const DownloadModal = ({
 
   const handleFastaClick = function () {
     setFastaSelected(!isFastaSelected);
+  };
+
+  const handleGisaidClick = function () {
+    setGisaidSelected(!isGisaidSelected);
+  };
+
+  const handleGenbankClick = function () {
+    setGenbankSelected(!isGenbankSelected);
   };
 
   const handleCloseModal = () => {
@@ -173,43 +194,92 @@ const DownloadModal = ({
                   anchorEl,
                 }}
               >
-                <StyledSpan style={getBackgroundFastaColor()}>
-                  <CheckBoxWrapper>
-                    <CheckBoxInfo>
-                      {/* @ts-expect-error need to update checkbox state after upgrading sds */}
-                      <StyledCheckbox
-                        onChange={handleFastaClick}
-                        disabled={isFastaDisabled}
-                      />
-                    </CheckBoxInfo>
-                    <CheckBoxInfo>
-                      <DownloadType style={getBackgroundFastaColor()}>
-                        Consensus Genome{" "}
-                      </DownloadType>{" "}
-                      <span ref={tooltipRef}>(.fasta)</span>
-                      <DownloadTypeInfo>
-                        Download multiple consensus genomes in a single,
-                        concatenated file
-                      </DownloadTypeInfo>
-                    </CheckBoxInfo>
-                  </CheckBoxWrapper>
-                </StyledSpan>
+                <StyledFileTypeItem
+                  isDisabled={isFastaDisabled}
+                  isSelected={isFastaSelected}
+                >
+                  <CheckBoxInfo>
+                    <StyledCheckbox
+                      disabled={isFastaDisabled}
+                      id="download-fasta-checkbox"
+                      onChange={handleFastaClick}
+                      stage={isFastaSelected ? "checked" : "unchecked"}
+                    />
+                  </CheckBoxInfo>
+                  <CheckboxLabel htmlFor="download-fasta-checkbox">
+                    <DownloadType>Consensus Genome</DownloadType>{" "}
+                    <span ref={tooltipRef}>(.fasta)</span>
+                    <DownloadTypeInfo>
+                      Download multiple consensus genomes in a single,
+                      concatenated file
+                    </DownloadTypeInfo>
+                  </CheckboxLabel>
+                </StyledFileTypeItem>
               </Tooltip>
               <div style={{ height: "4px" }}></div>
-              <CheckBoxWrapper style={getBackgroundColor(isMetadataSelected)}>
+              <StyledFileTypeItem isSelected={isMetadataSelected}>
                 <CheckBoxInfo>
-                  {/* @ts-expect-error need to update checkbox state after upgrading sds */}
-                  <StyledCheckbox onChange={handleMetadataClick} />
+                  <StyledCheckbox
+                    id="download-metadata-checkbox"
+                    onChange={handleMetadataClick}
+                    stage={isMetadataSelected ? "checked" : "unchecked"}
+                  />
                 </CheckBoxInfo>
-                <CheckBoxInfo>
+                <CheckboxLabel htmlFor="download-metadata-checkbox">
                   <DownloadType>Sample Metadata </DownloadType> (.tsv)
                   <DownloadTypeInfo>
                     Sample metadata including Private and Public IDs, Collection
                     Date, Sequencing Date, Lineage, GISAID Status, and ISL
                     Accession #.
                   </DownloadTypeInfo>
-                </CheckBoxInfo>
-              </CheckBoxWrapper>
+                </CheckboxLabel>
+              </StyledFileTypeItem>
+              {isPrepFilesFlagOn && (
+                <StyledFileTypeItem isSelected={isGisaidSelected}>
+                  <CheckBoxInfo>
+                    <StyledCheckbox
+                      id="download-gisaid-checkbox"
+                      onChange={handleGisaidClick}
+                      stage={isGisaidSelected ? "checked" : "unchecked"}
+                    />
+                  </CheckBoxInfo>
+                  <CheckboxLabel htmlFor="download-gisaid-checkbox">
+                    <DownloadType>GISAID Submission Template </DownloadType>{" "}
+                    (.fasta, .csv)
+                    <DownloadTypeInfo>
+                      Download concatenated consensus genomes and metadata files
+                      formatted to prepare samples for submission to GISAID.{" "}
+                      {/* TODO: (194961) - update href */}
+                      <Link href="" target="_blank" rel="noreferrer">
+                        Learn More.
+                      </Link>
+                    </DownloadTypeInfo>
+                  </CheckboxLabel>
+                </StyledFileTypeItem>
+              )}
+              {isPrepFilesFlagOn && (
+                <StyledFileTypeItem isSelected={isGenbankSelected}>
+                  <CheckBoxInfo>
+                    <StyledCheckbox
+                      id="download-genbank-checkbox"
+                      onChange={handleGenbankClick}
+                      stage={isGenbankSelected ? "checked" : "unchecked"}
+                    />
+                  </CheckBoxInfo>
+                  <CheckboxLabel htmlFor="download-genbank-checkbox">
+                    <DownloadType>Genbank Submission Template </DownloadType>{" "}
+                    (.fasta, .tsv)
+                    <DownloadTypeInfo>
+                      Download concatenated consensus genomes and metadata files
+                      formatted to prepare samples for submission to Genbank.{" "}
+                      {/* TODO: (194962) - update href */}
+                      <Link href="" target="_blank" rel="noreferrer">
+                        Learn More.
+                      </Link>
+                    </DownloadTypeInfo>
+                  </CheckboxLabel>
+                </StyledFileTypeItem>
+              )}
             </Container>
             {failedSampleIds.length > 0 &&
               !isFastaDisabled && ( //ignore alert if fasta is already disabled
@@ -225,6 +295,14 @@ const DownloadModal = ({
                   </DownloadTypeInfo>
                 </Alert>
               )}
+            {checkedSampleIds.length - failedSampleIds.length > 999 &&
+              (isGisaidSelected || isGenbankSelected) && (
+                <StyledCallout intent="info" autoDismiss={false}>
+                  Your submission template download will be generated in
+                  multiple files of up to 999 samples in order to comply with
+                  GISAID/GenBank upload limits.
+                </StyledCallout>
+              )}
             {getDownloadButton()}
           </Content>
         </DialogContent>
@@ -233,30 +311,40 @@ const DownloadModal = ({
     </>
   );
 
-  function getBackgroundFastaColor() {
-    if (isFastaDisabled) {
-      // TODO: access this styling with props instead of hardcoding
-      return { backgroundColor: "transparent", color: "#999999" };
-    } else {
-      return getBackgroundColor(isFastaSelected);
-    }
+  /**
+   * Handle firing off analytics event when a samples download is initiated.
+   *
+   * Download button kicks off download, but underlying components within it
+   * change depending on if fasta selected and/or if metadata selected.
+   * This function deals with the analytics event for downloads, but need
+   * to ensure it only gets called once, regardless of what combination
+   * of fasta/metadata selection is in place.
+   */
+  function analyticsHandleDownload(): void {
+    analyticsTrackEvent<AnalyticsSamplesDownloadFile>(
+      EVENT_TYPES.SAMPLES_DOWNLOAD_FILE,
+      {
+        sample_count: checkedSampleIds.length,
+        sample_public_ids: JSON.stringify(checkedSampleIds),
+        includes_consensus_genome: isFastaSelected,
+        includes_sample_metadata: isMetadataSelected,
+      }
+    );
   }
 
-  function getBackgroundColor(parameterSelected: boolean) {
-    if (parameterSelected) {
-      // TODO: access this styling with props instead of hardcoding
-      return { backgroundColor: "#F8F8F8" };
-    }
-  }
-
+  // TODO:(194961) update for GISAID template download
+  // TODO:(194962) update for GenBank template download
   function getDownloadButton(): JSX.Element | undefined {
     // button will have different functionality depending on download type selected
 
     const isButtonDisabled = !isFastaSelected && !isMetadataSelected;
     const downloadFasta = () => {
       fastaDownloadMutation.mutate({ sampleIds: checkedSampleIds });
+      // Analytics: When fasta download happens, kick off download event.
+      analyticsHandleDownload();
     };
-    const onClick = isFastaSelected ? downloadFasta : noop;
+    // Analytics: If downloading fasta is not happening, still fire event.
+    const onClick = isFastaSelected ? downloadFasta : analyticsHandleDownload;
 
     const downloadButton = (
       <StyledButton

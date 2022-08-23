@@ -1,3 +1,4 @@
+import { InputSearch } from "czifui";
 import { compact, escapeRegExp, filter } from "lodash";
 import React, {
   FunctionComponent,
@@ -5,7 +6,6 @@ import React, {
   useReducer,
   useState,
 } from "react";
-import { Input } from "semantic-ui-react";
 import { DataTable } from "src/common/components";
 import { VIEWNAME } from "src/common/constants/types";
 import { CreateNSTreeModal } from "./components/CreateNSTreeModal";
@@ -41,11 +41,6 @@ interface Props {
   renderer?: CustomRenderer;
   viewName: VIEWNAME;
   dataFilterFunc?: (data: TableItem[]) => TableItem[];
-}
-
-interface InputOnChangeData {
-  [key: string]: string;
-  value: string;
 }
 
 interface SearchState {
@@ -218,16 +213,13 @@ const DataSubview: FunctionComponent<Props> = ({
     setEditTreeConfirmationOpen(true);
   };
 
-  const onChange = (
-    _event: React.ChangeEvent<HTMLInputElement>,
-    fieldInput: InputOnChangeData
-  ) => {
-    const query = fieldInput.value;
+  // search functions
+  const onSearchChange = (_event: React.ChangeEvent<HTMLInputElement>) => {
+    const query = _event.target.value;
     searcher(query);
     setSearchQuery(query);
   };
 
-  // search functions
   const searcher = (query: string): void => {
     if (data === undefined) {
       return;
@@ -352,11 +344,13 @@ const DataSubview: FunctionComponent<Props> = ({
         <StyledFlexChildDiv>
           <SearchBar>
             <SearchInput>
-              <Input
-                icon="search"
+              <InputSearch
+                id="search-samples"
+                label="search samples"
+                sdsStyle="rounded"
                 placeholder="Search"
-                loading={state.searching}
-                onChange={onChange}
+                onChange={onSearchChange}
+                value={searchQuery}
                 data-test-id="search"
               />
             </SearchInput>

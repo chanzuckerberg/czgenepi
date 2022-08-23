@@ -300,6 +300,7 @@ async def test_create_group(
     assert resp_data["address"] == create_group_request["address"]
     assert resp_data["name"] == create_group_request["name"]
     assert resp_data["prefix"] == create_group_request["prefix"]
+    assert resp_data["submitting_lab"] == create_group_request["name"]
     assert isinstance(resp_data["id"], int)
 
     resp_loc = resp_data["default_tree_location"]

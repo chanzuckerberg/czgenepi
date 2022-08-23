@@ -45,6 +45,7 @@ import { useUserInfo } from "src/common/queries/auth";
  */
 export enum FEATURE_FLAGS {
   // my_flag_name = "my_flag_name", (<-- format example)
+  prep_files = "prep_files",
   sample_filtering_tree_creation = "sample_filtering_tree_creation",
   user_onboarding_v0 = "user_onboarding_v0",
 }

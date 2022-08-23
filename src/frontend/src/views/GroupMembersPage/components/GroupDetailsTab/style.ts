@@ -1,13 +1,18 @@
 import styled from "@emotion/styled";
 import {
+  Callout,
   fontBodyM,
-  fontBodyS,
+  fontBodyXs,
   fontHeaderM,
   fontHeaderXl,
   getColors,
   getSpaces,
 } from "czifui";
-import { LargerThanBreakpoint } from "src/common/styles/mixins/global";
+import { iconFillGrayHoverPrimary } from "src/common/styles/iconStyle";
+import {
+  LargerThanBreakpoint,
+  MAX_CONTENT_WIDTH,
+} from "src/common/styles/mixins/global";
 
 export const DetailDisplay = styled.div`
   ${fontBodyM}
@@ -31,7 +36,7 @@ export const DetailHeader = styled.div`
   ${(props) => {
     const spaces = getSpaces(props);
     return `
-      margin-bottom: ${spaces?.l}px;
+      margin-bottom: ${spaces?.xxxs}px;
       width: 100%;
     `;
   }}
@@ -43,6 +48,8 @@ export const DetailSection = styled.div`
     const spaces = getSpaces(props);
     return `
       ${LargerThanBreakpoint(`
+        width: 50%;
+
         &:first-child {
           padding-right: ${spaces?.xl}px;
           border-right: 1px solid ${colors?.gray[300]};
@@ -58,15 +65,27 @@ export const DetailSection = styled.div`
 
 export const DetailSubheader = styled.div`
   ${fontHeaderM}
-`;
 
-export const Text = styled.div`
-  ${fontBodyS}
+  display: flex;
 
   ${(props) => {
     const spaces = getSpaces(props);
+
     return `
-      margin-top: ${spaces?.s}px;
+      margin-bottom: ${spaces?.m}px;
+    `;
+  }}
+`;
+
+export const Text = styled.div`
+  ${fontBodyXs}
+
+  ${(props) => {
+    const colors = getColors(props);
+    const spaces = getSpaces(props);
+
+    return `
+      color: ${colors?.gray[600]};
       margin-bottom: ${spaces?.l}px;
     `;
   }}
@@ -76,11 +95,39 @@ export const DetailPage = styled.div`
   ${LargerThanBreakpoint(`
       display: flex;
       flex-wrap: wrap;
+      max-width: ${MAX_CONTENT_WIDTH}px;
+      margin: auto;
   `)}
 `;
 
 export const Content = styled.div`
   ${LargerThanBreakpoint(`
     display: flex;
+    justify-content: center;
   `)}
+`;
+
+export const StyledCallout = styled(Callout)`
+  flex: 1 1 auto;
+  width: auto;
+  margin-top: 0;
+
+  ${(props) => {
+    const spaces = getSpaces(props);
+    return `
+      margin-bottom: ${spaces?.xl}px;
+    `;
+  }}
+`;
+
+export const StyledInfoIconWrapper = styled.div`
+  ${iconFillGrayHoverPrimary}
+
+  ${(props) => {
+    const spaces = getSpaces(props);
+    return `
+      margin-left: ${spaces?.xs}px;
+      margin-top: ${spaces?.xxxs}px;
+    `;
+  }}
 `;

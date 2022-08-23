@@ -1,3 +1,4 @@
+import csv
 from io import StringIO
 from typing import List, Optional
 
@@ -126,6 +127,13 @@ def test_build_config(mocker, session, postgres_database):
         assert nextstrain_config["files"]["description"].endswith(".md")
         assert len(sequences.splitlines()) == 20  # 10 county samples @2 lines each
         assert len(metadata.splitlines()) == 11  # 10 samples + 1 header line
+        # Test that we are careful with printing data from our models
+        metadata_reader = csv.DictReader(StringIO(metadata), delimiter="\t")
+        for row in metadata_reader:
+            for key, value in row.items():
+                assert not value.startswith("<aspen.database.models")
+                if key == "gisaid_epi_isl":
+                    assert value.startswith("EPI_ISL_")
 
 
 # Make sure that configs specific to an Overview tree are working.
