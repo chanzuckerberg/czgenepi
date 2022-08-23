@@ -1,6 +1,7 @@
 import { Button, Icon, InputText, Link } from "czifui";
 import { useRouter } from "next/router";
 import { ChangeEvent, useEffect, useState } from "react";
+import { useUpdateUserInfo, useUserInfo } from "src/common/queries/auth";
 import { H1, H2, P } from "src/common/styles/basicStyle";
 import {
   GrayIconWrapper,
@@ -13,28 +14,24 @@ import {
   WhiteIconWrapper,
 } from "./style";
 
-const UNSAVED_CHANGES_MESSAGE = "Leave?"; // TODO: fill in text
+const UNSAVED_CHANGES_MESSAGE =
+  "Leave without saving? If you leave, your changes will be canceled and your work will not be saved.";
 
 export default function Account(): JSX.Element {
   const router = useRouter();
-  // TODO:194969 - get user's current gisaid id for the default value
+  const { data: userInfo } = useUserInfo();
+  const { mutate: updateUserInfo } = useUpdateUserInfo();
+
   const [gisaidId, setGisaidId] = useState("");
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false);
 
-  // TODO: 194969 - implement save once API is ready
-  const handleSave = () => {
-    // eslint-disable-next-line
-    console.log(gisaidId);
-    setHasUnsavedChanges(false);
-  };
+  useEffect(() => {
+    if (userInfo?.gisaidSubmitterId) {
+      setGisaidId(userInfo.gisaidSubmitterId);
+    }
+  }, [userInfo?.gisaidSubmitterId]);
 
-  const handleNewIdInput = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setGisaidId(value);
-    setHasUnsavedChanges(true);
-  };
-
-  // prompt the user if they try and leave with unsaved changes
+  // prompt the user if they try to close the page with unsaved changes
   useEffect(() => {
     const handleWindowClose = (e: BeforeUnloadEvent) => {
       if (!hasUnsavedChanges) return;
@@ -56,6 +53,7 @@ export default function Account(): JSX.Element {
     };
   }, [hasUnsavedChanges]);
 
+  // prompt the user if they try to change routes with unsaved changes
   useEffect(() => {
     const handleRouteChangeStart = () => {
       if (!hasUnsavedChanges) return;
@@ -74,6 +72,17 @@ export default function Account(): JSX.Element {
       router.events.off("routeChangeStart", handleRouteChangeStart);
     };
   }, [router.events, hasUnsavedChanges]);
+
+  const handleSave = () => {
+    updateUserInfo({ gisaid_submitter_id: gisaidId });
+    setHasUnsavedChanges(false);
+  };
+
+  const handleNewIdInput = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setGisaidId(value);
+    setHasUnsavedChanges(true);
+  };
 
   return (
     <>

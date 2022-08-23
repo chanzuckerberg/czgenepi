@@ -23,6 +23,7 @@ interface User extends BaseUser {
   groups: UserGroup[];
   splitId: string;
   analyticsId: string;
+  gisaidSubmitterId: string;
 }
 
 type GroupRole = "member" | "admin";
