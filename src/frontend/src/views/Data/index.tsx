@@ -154,7 +154,7 @@ const Data: FunctionComponent = () => {
   // create JSX elements from categories
   dataCategories.forEach((category) => {
     dataJSX.menuItems.push(
-      <StyledMenuItem key={`${category.text}`}>
+      <StyledMenuItem key={category.text}>
         <NextLink href={category.to} key={category.text} passHref>
           <a href="passHref">
             <Category>

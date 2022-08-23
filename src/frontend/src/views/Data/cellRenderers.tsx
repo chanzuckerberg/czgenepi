@@ -178,7 +178,7 @@ const TREE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
     <TreeTypeTooltip value={value as string}>
       <TreeRowContent>
         <UnderlinedCell data-test-id={`row-${header.key}`}>
-          {`${value}`}
+          {String(value)}
         </UnderlinedCell>
       </TreeRowContent>
     </TreeTypeTooltip>
