@@ -20,6 +20,7 @@ from aspen.api.views import (
     health,
     lineages,
     locations,
+    pathogens,
     phylo_runs,
     phylo_trees,
     samples,
@@ -116,7 +117,9 @@ def get_app() -> FastAPI:
     _app.include_router(
         groups.router, prefix="/v2/groups", dependencies=[Depends(get_auth_user)]
     )
-
+    _app.include_router(
+        pathogens.router, prefix="/v2/pathogens", dependencies=[Depends(get_auth_user)]
+    )
     _app.add_exception_handler(
         AspenException,
         exception_handler,
