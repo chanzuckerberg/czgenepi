@@ -17,7 +17,5 @@ async def list_pathogens(
 ) -> PathogensResponse:
     query = sa.select(Pathogen)
     results = await db.execute(query)
-    t = []
-    for row in results.scalars():
-        t.append(PathogenResponse.from_orm(row))
-    return PathogensResponse.parse_obj({"pathogens": t})
+    pathogens = [PathogenResponse.from_orm(row) for row in results.scalars()]
+    return PathogensResponse.parse_obj({"pathogens": pathogens})
