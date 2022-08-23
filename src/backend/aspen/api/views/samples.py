@@ -16,7 +16,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from aspen.api.authn import AuthContext, get_auth_context, get_auth_user
 from aspen.api.authz import AuthZSession, get_authz_session, require_group_privilege
-from aspen.api.deps import get_db, get_settings
+from aspen.api.deps import get_db, get_pathogen_slug, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.samples import (
     CreateSampleRequest,
@@ -44,12 +44,6 @@ from aspen.database.models import Group, Location, Sample, UploadedPathogenGenom
 router = APIRouter()
 
 GISAID_REJECTION_TIME = datetime.timedelta(days=4)
-
-def get_pathogen_slug(pathogen_slug=None):
-    if pathogen_slug is None: 
-        return "SC2"
-
-    return pathogen_slug
 
 
 @router.get("/", response_model=SamplesResponse)
@@ -288,6 +282,7 @@ async def create_samples(
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_auth_user),
     group: Group = Depends(require_group_privilege("create_sample")),
+    ps=Depends(get_pathogen_slug),
 ) -> SamplesResponse:
 
     duplicates_in_request: Union[

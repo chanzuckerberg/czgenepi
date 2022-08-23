@@ -124,8 +124,10 @@ def get_app() -> FastAPI:
 
     # Auspice endpoints don't all require authentication, they can do their own login checks.
     _app.include_router(auspice.router, prefix="/v2/auspice")
-    _app.include_router(auspice.router, prefix="/v2/orgs/{org_id}/{pathogen_slug}/auspice")
-    # Which routes are "ready" to accept org prefixes?
+    _app.include_router(
+        auspice.router, prefix="/v2/orgs/{org_id}/pathogens/{pathogen_slug}/auspice"
+    )
+
     org_routers = {
         "sequences": sequences.router,
         "phylo_trees": phylo_trees.router,
@@ -139,7 +141,7 @@ def get_app() -> FastAPI:
             prefix="/v2/orgs/{org_id}/pathogens/{pathogen_slug}/" + suffix,
             dependencies=[Depends(require_group_membership)],
         )
-        # old paths
+        # urls don't need to include pathogen_slugs, (default to SC2)
         _app.include_router(
             router,
             prefix="/v2/orgs/{org_id}/" + suffix,
