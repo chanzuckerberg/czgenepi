@@ -1,11 +1,11 @@
 import styled from "@emotion/styled";
-import { getSpaces } from "czifui";
+import { CommonThemeProps, getSpaces } from "czifui";
 import { ZebraStripes } from "src/common/styles/mixins/global";
 
 export const StyledDiv = styled.div`
   ${ZebraStripes}
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       padding: ${spaces?.l}px;

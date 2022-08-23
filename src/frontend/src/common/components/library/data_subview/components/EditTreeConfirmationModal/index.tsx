@@ -1,5 +1,5 @@
 import { Button, Icon } from "czifui";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useEditTree } from "src/common/queries/trees";
 import BaseDialog from "src/components/BaseDialog";
 import Notification from "src/components/Notification";

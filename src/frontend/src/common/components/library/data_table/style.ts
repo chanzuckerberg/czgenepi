@@ -11,7 +11,7 @@ export const TableRow = styled.div`
   display: flex;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
 
     return `
@@ -78,7 +78,7 @@ export const RowCheckbox = styled(Checkbox)`
 export const Cell = styled.div`
   ${fontHeaderXs}
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `

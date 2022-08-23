@@ -1,16 +1,18 @@
 import styled from "@emotion/styled";
 import {
+  CommonThemeProps,
   Dropdown,
   DropdownPopper,
   fontHeaderXs,
   getColors,
+  getPalette,
   getSpaces,
 } from "czifui";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { iconFillGrayHoverPrimary } from "src/common/styles/iconStyle";
 
 export const StyledContainer = styled.div`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-top: ${spaces?.l}px;
@@ -28,7 +30,7 @@ export const StyledExplainerTitle = styled.div`
 export const StyledFiltersSection = styled.div`
   display: flex;
   flex-direction: row;
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-top: ${spaces?.m}px;
@@ -37,7 +39,7 @@ export const StyledFiltersSection = styled.div`
 `;
 
 export const StyledFilterGroup = styled.div`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-left: ${spaces?.xl}px;
@@ -48,7 +50,7 @@ export const StyledFilterGroup = styled.div`
 export const StyledFilterGroupName = styled.p`
   ${fontHeaderXs}
   color: black;
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-bottom: ${spaces?.xxs}px;
@@ -61,7 +63,7 @@ export const StyledInfoIconWrapper = styled.div`
 `;
 
 export const StyledNewTabLink = styled(NewTabLink)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
 
     return `
@@ -75,29 +77,37 @@ export const StyledNewTabLink = styled(NewTabLink)`
 
 const DROPDOWN_WIDTH = "209px";
 
-// High specificity label styling is to beat out czifui coloring.
 export const StyledDropdown = styled(Dropdown)`
   width: ${DROPDOWN_WIDTH};
-  .MuiButton-label > span {
-    color: black;
-  }
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
+    const palette = getPalette(props);
     return `
+      border-color: ${colors?.gray[500]};
       path {
         fill: ${colors?.gray[500]};
       }
+      span {
+        color: ${palette?.common?.black};
+      }
+
+      &:hover {
+        border-color: ${colors?.gray[600]};
+        path {
+          fill: ${colors?.gray[600]};
+        }
+      }
     `;
   }}
-` as typeof Dropdown; // assert b/c `styled` causes an interface hiccup;
+`;
 
 // The `min-width` property is necessary to cancel out a hardcoded czifui
 // value since we want to set a smaller `width` than that hardcoded number
 export const StyledDropdownPopper = styled(DropdownPopper)`
   min-width: auto;
   width: ${DROPDOWN_WIDTH};
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-top: ${spaces?.xs}px;

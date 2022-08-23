@@ -1,5 +1,4 @@
 import { Icon } from "czifui";
-import React from "react";
 import { Status } from "../common";
 import { Container, StyledCircle, StyledIconWrapperWhite, Text } from "./style";
 

@@ -1,8 +1,13 @@
 import styled from "@emotion/styled";
-import { fontCapsXxxs, getSpaces, InputDropdown } from "czifui";
+import {
+  CommonThemeProps,
+  fontCapsXxxs,
+  getSpaces,
+  InputDropdown,
+} from "czifui";
 
 export const StyledFilterWrapper = styled.div`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin: ${spaces?.l}px 0;

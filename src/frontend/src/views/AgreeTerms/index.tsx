@@ -1,7 +1,7 @@
-import { Dialog } from "@material-ui/core";
+import { Dialog } from "@mui/material";
 import { Button, List, ListItem, ListSubheader } from "czifui";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { API } from "src/common/api";
 import { HeadAppTitle } from "src/common/components";
 import DialogActions from "src/common/components/library/Dialog/components/DialogActions";

@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import {
   Callout,
+  CommonThemeProps,
   fontBodyM,
   fontBodyXs,
   fontHeaderM,
@@ -16,7 +17,7 @@ import {
 
 export const DetailDisplay = styled.div`
   ${fontBodyM}
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
 
@@ -33,7 +34,7 @@ export const DetailDisplay = styled.div`
 export const DetailHeader = styled.div`
   ${fontHeaderXl}
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-bottom: ${spaces?.xxxs}px;
@@ -43,7 +44,7 @@ export const DetailHeader = styled.div`
 `;
 
 export const DetailSection = styled.div`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
     return `
@@ -80,7 +81,7 @@ export const DetailSubheader = styled.div`
 export const Text = styled.div`
   ${fontBodyXs}
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
 
@@ -112,7 +113,7 @@ export const StyledCallout = styled(Callout)`
   width: auto;
   margin-top: 0;
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-bottom: ${spaces?.xl}px;
@@ -123,7 +124,7 @@ export const StyledCallout = styled(Callout)`
 export const StyledInfoIconWrapper = styled.div`
   ${iconFillGrayHoverPrimary}
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-left: ${spaces?.xs}px;

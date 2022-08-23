@@ -1,4 +1,3 @@
-import React from "react";
 import { Status } from "../common";
 import { Left, Right } from "./style";
 

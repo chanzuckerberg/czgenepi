@@ -1,5 +1,4 @@
-import { Table as MuiTable, TableBody, TableHead } from "@material-ui/core";
-import React from "react";
+import { Table as MuiTable, TableBody, TableHead } from "@mui/material";
 import { SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS } from "../../common/constants";
 import {
   IsPrivateTableCell,
@@ -21,6 +20,8 @@ export default function EditTable({
   return (
     <MuiTable component="div" stickyHeader>
       <TableHead component="div">
+        {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+        {/* @ts-ignore: spread types error */}
         <StyledTableRow {...({ component: "div" } as unknown)}>
           <StyledTableCell component="div">
             {SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS.privateId}

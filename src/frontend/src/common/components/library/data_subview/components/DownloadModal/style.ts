@@ -109,7 +109,7 @@ export const DownloadType = styled.div`
   ${fontBodyXs}
   display: inline-block;
   color: black;
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const fontWeights = getFontWeights(props);
     return `
       font-weight: ${fontWeights?.semibold};
@@ -119,7 +119,7 @@ export const DownloadType = styled.div`
 
 export const StyledButton = styled(Button)`
   max-width: fit-content;
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-top: ${spaces?.xxl}px;

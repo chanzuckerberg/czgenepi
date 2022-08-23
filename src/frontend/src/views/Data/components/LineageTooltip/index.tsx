@@ -1,4 +1,3 @@
-import React from "react";
 import { Label, Text, Wrapper } from "./style";
 
 interface Props {

@@ -1,5 +1,4 @@
 import { Icon } from "czifui";
-import React from "react";
 import AlertAccordion from "src/components/AlertAccordion";
 
 interface Props {

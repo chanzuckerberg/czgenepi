@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { getSpaces, Tabs } from "czifui";
+import { CommonThemeProps, getSpaces, Tabs } from "czifui";
 import { MAX_CONTENT_WIDTH } from "src/common/styles/mixins/global";
 
 export const Container = styled.div`
@@ -15,7 +15,7 @@ export const Header = styled.div`
 `;
 
 export const StyledTabs = styled(Tabs)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-bottom: ${spaces?.m}px;

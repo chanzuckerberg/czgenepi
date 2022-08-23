@@ -1,6 +1,5 @@
 import { Icon } from "czifui";
 import { useRouter } from "next/router";
-import React from "react";
 import { ROUTES } from "src/common/routes";
 import {
   Body,

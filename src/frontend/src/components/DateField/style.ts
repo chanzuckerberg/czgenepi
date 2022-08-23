@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import TextField from "@material-ui/core/TextField";
+import TextField from "@mui/material/TextField";
 import { CommonThemeProps, getColors, getSpaces } from "czifui";
 
 export interface FormFieldProps extends CommonThemeProps {
@@ -20,6 +20,7 @@ export const StyledTextField = styled(TextField, {
       margin: 0;
       input {
         background-color: ${isBackgroundColorShown && colors?.primary[200]};
+        padding: ${spaces?.s}px ${spaces?.l}px;
       }
     `;
   }}

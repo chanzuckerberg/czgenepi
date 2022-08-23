@@ -1,5 +1,4 @@
 import { List, ListItem, ListItemLabel } from "czifui";
-import React from "react";
 import { HeadAppTitle } from "src/common/components";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { ROUTES } from "src/common/routes";

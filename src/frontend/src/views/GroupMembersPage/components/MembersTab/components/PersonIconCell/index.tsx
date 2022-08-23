@@ -1,5 +1,4 @@
 import { Icon } from "czifui";
-import React from "react";
 import { StyledCell } from "./style";
 
 interface Props {

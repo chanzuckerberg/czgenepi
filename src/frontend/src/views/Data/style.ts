@@ -20,7 +20,7 @@ export const Container = styled(PageContent)`
 
 export const Subtext = styled.div`
   ${fontBodyXxs}
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
 
     return `
@@ -36,7 +36,7 @@ export const UnderlinedCell = styled.div`
 export const UnderlinedRowContent = styled(RowContent)`
   &:hover {
     ${UnderlinedCell} {
-      ${(props) => {
+      ${(props: CommonThemeProps) => {
         const colors = getColors(props);
 
         return `
@@ -48,7 +48,7 @@ export const UnderlinedRowContent = styled(RowContent)`
 `;
 
 export const StyledChip = styled(Chip)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
@@ -60,7 +60,7 @@ export const StyledChip = styled(Chip)`
 export const GISAIDCell = styled.div`
   ${fontHeaderXs}
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
@@ -79,7 +79,7 @@ export const PrivateIdValueWrapper = styled.div`
 
 export const SampleIconWrapper = styled.span`
   position: relative;
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
@@ -92,7 +92,7 @@ export const Navigation = styled.div`
   display: flex;
   width: 100%;
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
 
@@ -110,7 +110,7 @@ export const CenteredFlexContainer = styled.div`
 export const StyledUploaderName = styled.span`
   ${fontBodyXxs}
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
 
@@ -169,7 +169,7 @@ export const View = styled.div`
 export const StyledCount = styled.div`
   ${fontBodyXs}
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     return `
       color: ${colors?.gray[500]};
@@ -187,7 +187,7 @@ export const StyledMenu = styled.ul`
 export const StyledMenuItem = styled.li`
   list-style: none;
   padding: 0;
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
