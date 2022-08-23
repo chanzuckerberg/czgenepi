@@ -9,9 +9,6 @@ from aspen.test_infra.models.usergroup import group_factory, userrole_factory
 pytestmark = pytest.mark.asyncio
 
 
-# test LIST samples #
-
-
 async def test_samples_list(
     async_session: AsyncSession,
     http_client: AsyncClient,
@@ -44,7 +41,4 @@ async def test_samples_list(
             {"id": p2.id, "slug": p2.slug, "name": p2.name},
         ]
     }
-    import pdb
-
-    pdb.set_trace()
     assert response == expected
