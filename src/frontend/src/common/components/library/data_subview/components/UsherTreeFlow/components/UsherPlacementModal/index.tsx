@@ -1,13 +1,14 @@
-import { TextField } from "@material-ui/core";
+import { TextField } from "@mui/material";
 import { DefaultMenuSelectOption, Dropdown, Icon, InputDropdown } from "czifui";
 import { cloneDeep, debounce } from "lodash";
-import React, { SyntheticEvent, useEffect, useState } from "react";
+import { SyntheticEvent, useEffect, useState } from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import {
   FastaResponseType,
   getUsherOptions,
   useFastaFetch,
 } from "src/common/queries/trees";
+import { ROUTES } from "src/common/routes";
 import {
   StyledCloseIconButton,
   StyledCloseIconWrapper,
@@ -44,7 +45,7 @@ interface Props {
   failedSampleIds: string[];
   open: boolean;
   onClose: () => void;
-  onLinkCreateSuccess(url: string, treeType: string): void;
+  onLinkCreateSuccess(url: string, treeType: string, sampleCount: number): void;
 }
 
 interface DropdownOptionProps extends DefaultMenuSelectOption {
@@ -79,6 +80,9 @@ export const UsherPlacementModal = ({
   const [isUsherDisabled, setUsherDisabled] = useState<boolean>(false);
   const [shouldShowWarning, setShouldShowWarning] = useState<boolean>(false);
   const [treeType, setTreeType] = useState<string>("");
+  const [numSamplesPerSubtree, setNumSamplesPerSubtree] = useState<number>(
+    SUGGESTED_MIN_SAMPLES
+  );
 
   const defaultNumSamples = getDefaultNumSamplesPerSubtree(
     checkedSampleIds?.length
@@ -120,7 +124,7 @@ export const UsherPlacementModal = ({
     },
     componentOnSuccess: (data: FastaResponseType) => {
       const url = data?.url;
-      if (url) onLinkCreateSuccess(data.url, treeType);
+      if (url) onLinkCreateSuccess(data.url, treeType, numSamplesPerSubtree);
       setIsLoading(false);
     },
   });
@@ -140,9 +144,7 @@ export const UsherPlacementModal = ({
   const MAIN_USHER_TOOLTIP_TEXT = (
     <div>
       UShER is a third-party tool and has its own policies.{" "}
-      <NewTabLink href="https://genome.ucsc.edu/cgi-bin/hgPhyloPlace">
-        Learn more about UShER.
-      </NewTabLink>
+      <NewTabLink href={ROUTES.USHER}>Learn more about UShER.</NewTabLink>
     </div>
   );
 
@@ -180,6 +182,7 @@ export const UsherPlacementModal = ({
     (e) => {
       const numSamples = e?.target?.value;
       const showWarning = !numSamples || numSamples < SUGGESTED_MIN_SAMPLES;
+      setNumSamplesPerSubtree(numSamples);
       setShouldShowWarning(showWarning);
     },
     ONE_SECOND,
@@ -188,7 +191,6 @@ export const UsherPlacementModal = ({
 
   return (
     <Dialog
-      disableBackdropClick
       disableEnforceFocus
       disableEscapeKeyDown
       open={open}

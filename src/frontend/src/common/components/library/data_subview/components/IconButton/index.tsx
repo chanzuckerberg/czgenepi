@@ -1,12 +1,13 @@
 import type { IconNameToSizes } from "czifui";
-import { Icon, IconButton as LibIconButton, Tooltip } from "czifui";
-import React, { FunctionComponent, MouseEventHandler, useState } from "react";
+import { ButtonIcon as LibButtonIcon, Icon, Tooltip } from "czifui";
+import { FunctionComponent, MouseEventHandler, useState } from "react";
 import { StyledSpan } from "./style";
 
 interface Props {
   onClick: MouseEventHandler;
   disabled: boolean;
   sdsIcon: keyof IconNameToSizes;
+  size?: "small" | "medium" | "large";
   tooltipTextEnabled: JSX.Element;
   tooltipTextDisabled: JSX.Element;
 }
@@ -15,6 +16,7 @@ export const IconButton: FunctionComponent<Props> = ({
   onClick,
   disabled,
   sdsIcon,
+  size = "large",
   tooltipTextEnabled,
   tooltipTextDisabled,
 }: Props) => {
@@ -32,14 +34,14 @@ export const IconButton: FunctionComponent<Props> = ({
       placement="top"
     >
       <StyledSpan>
-        <LibIconButton
+        <LibButtonIcon
           onClick={handleClick}
           disabled={disabled}
-          sdsSize="large"
+          sdsSize={size}
           sdsType="primary"
         >
           <Icon sdsIcon={sdsIcon} sdsSize="xl" sdsType="iconButton" />
-        </LibIconButton>
+        </LibButtonIcon>
       </StyledSpan>
     </Tooltip>
   );

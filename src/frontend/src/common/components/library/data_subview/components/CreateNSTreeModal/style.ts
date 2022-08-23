@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { FormControlLabel, Radio, TextField } from "@material-ui/core";
+import { FormControlLabel, Radio, TextField } from "@mui/material";
 import {
   Button,
   CommonThemeProps,
@@ -42,7 +42,7 @@ export const ImageSizer = styled.div`
   display: flex;
   width: 42px;
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
@@ -65,7 +65,6 @@ export const StyledDialogContent = styled(DialogContent)`
   ${fontBodyS}
   ${transparentScrollbars}
 
-  width: 600px;
   padding-bottom: 0;
   overflow-y: auto;
   & > div:last-child {
@@ -106,7 +105,7 @@ export const StyledDialogTitle = styled(DialogTitle)`
 export const StyledTextField = styled(TextField)`
   color: black;
   padding: 0px;
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       padding-bottom: ${spaces?.s}px;
@@ -127,7 +126,7 @@ export const StyledRadio = styled(Radio)`
   vertical-align: top;
   height: 20px;
   width: 20px;
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
     return `
@@ -144,7 +143,7 @@ export const StyledRadio = styled(Radio)`
 `;
 
 export const TreeTypeSection = styled.div`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-top: ${spaces?.s}px;
@@ -156,7 +155,7 @@ export const TreeNameInfoWrapper = styled.div`
   display: flex;
   align-items: center;
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-bottom: ${spaces?.s}px;
@@ -168,7 +167,7 @@ export const TreeNameTooLongAlert = styled.div`
   ${fontBodyXxxs}
   display: flex;
   align-items: center;
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-top: ${spaces?.xxxs}px;
@@ -179,7 +178,7 @@ export const TreeNameTooLongAlert = styled.div`
 
 export const CreateTreeInfo = styled.div`
   ${fontBodyXxs}
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
     return `
@@ -213,7 +212,7 @@ export const Separator = styled("div", {
 `;
 
 export const StyledTooltip = styled(Tooltip)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-left: ${spaces?.xxs}px;
@@ -222,7 +221,7 @@ export const StyledTooltip = styled(Tooltip)`
 `;
 
 export const TextFieldAlert = styled.div`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     return `
       color: ${colors?.error[400]};
@@ -230,13 +229,17 @@ export const TextFieldAlert = styled.div`
   }}
 `;
 
+interface FormControlProps extends CommonThemeProps {
+  checked: boolean;
+}
+
 export const StyledFormControlLabel = styled(FormControlLabel)`
   display: flex;
   align-items: flex-start;
   border-radius: 5px;
   margin-left: 0px;
   margin-right: 0px;
-  ${(props) => {
+  ${(props: FormControlProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
     const checked = props.checked;
@@ -254,7 +257,7 @@ export const StyledFormControlLabel = styled(FormControlLabel)`
 export const StyledFooter = styled.div`
   flex: 0 0 auto;
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-bottom: ${spaces?.xxl}px;
@@ -270,7 +273,7 @@ export const StyledButton = styled(Button)`
   &:hover {
     background-color: transparent;
   }
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     const fontWeights = getFontWeights(props);
     return `

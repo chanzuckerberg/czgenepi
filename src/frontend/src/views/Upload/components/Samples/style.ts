@@ -1,5 +1,11 @@
 import styled from "@emotion/styled";
-import { Button, fontCapsXxs, getColors, getSpaces } from "czifui";
+import {
+  Button,
+  CommonThemeProps,
+  fontCapsXxs,
+  getColors,
+  getSpaces,
+} from "czifui";
 import FilePicker from "src/components/FilePicker";
 import { marginBottom } from "../common/style";
 
@@ -8,7 +14,7 @@ export const SemiBold = styled.span`
 `;
 
 export const StyledButton = styled(Button)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-right: ${spaces?.s}px;
@@ -17,7 +23,7 @@ export const StyledButton = styled(Button)`
 `;
 
 export const StyledFilePicker = styled(FilePicker)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-right: ${spaces?.m}px;
@@ -28,7 +34,7 @@ export const StyledFilePicker = styled(FilePicker)`
 `;
 
 export const StyledContainerSpaceBetween = styled.div`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       flex: 1;
@@ -42,7 +48,7 @@ export const StyledContainerSpaceBetween = styled.div`
 
 export const StyledRemoveAllButton = styled(Button)`
   ${fontCapsXxs}
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     const colors = getColors(props);
     return `
@@ -57,7 +63,7 @@ export const StyledRemoveAllButton = styled(Button)`
 `;
 
 export const StyledUploadCount = styled.span`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
     font-weight: 600;

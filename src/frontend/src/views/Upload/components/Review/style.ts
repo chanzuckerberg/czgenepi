@@ -2,6 +2,7 @@ import styled from "@emotion/styled";
 import {
   Button,
   Checkbox,
+  CommonThemeProps,
   fontBodyXs,
   fontHeaderL,
   fontHeaderXs,
@@ -20,7 +21,7 @@ export const ContentTitleWrapper = styled.div`
 `;
 
 export const StyledCheckbox = styled(Checkbox)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
@@ -40,7 +41,7 @@ export const CheckboxText = styled.div`
     cursor: pointer;
   }
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
 
@@ -57,7 +58,7 @@ export const CheckboxWrapper = styled.div`
 
 export const StyledButton = styled(Button)`
   ${fontHeaderXs}
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
 

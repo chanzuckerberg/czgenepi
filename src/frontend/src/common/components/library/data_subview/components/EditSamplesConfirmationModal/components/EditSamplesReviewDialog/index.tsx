@@ -1,6 +1,6 @@
 import { Checkbox } from "czifui";
 import { map, pickBy } from "lodash";
-import React, { useState } from "react";
+import { useState } from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { useEditSamples } from "src/common/queries/samples";
 import { ROUTES } from "src/common/routes";

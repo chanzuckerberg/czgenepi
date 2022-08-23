@@ -1,5 +1,4 @@
 import Image from "next/image";
-import React from "react";
 import GisaidLogoImg from "src/common/images/gisaid-logo-full.png";
 import NextstrainLogoImg from "src/common/images/nextstrain-logo-full.png";
 import PangolinLogoImg from "src/common/images/pangolin-logo.png";

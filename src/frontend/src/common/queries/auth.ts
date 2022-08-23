@@ -1,14 +1,16 @@
-import { useRouter } from "next/router";
-import { useEffect } from "react";
 import {
   useMutation,
   UseMutationResult,
   useQuery,
   useQueryClient,
   UseQueryResult,
-} from "react-query";
+} from "@tanstack/react-query";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 import { useSelector } from "react-redux";
+import { analyticsSendUserInfo } from "src/common/analytics/methods";
 import ENV from "src/common/constants/ENV";
+import { queryClient } from "src/common/queries/queryClient";
 import { API, DEFAULT_PUT_OPTIONS, getBackendApiJson } from "../api";
 import { selectCurrentGroup } from "../redux/selectors";
 import { ROUTES } from "../routes";
@@ -34,6 +36,7 @@ export interface RawUserRequest {
   agreed_to_tos: boolean;
   acknowledged_policy_version: string | null; // Date or null in DB. ISO 8601: "YYYY-MM-DD"
   split_id: string;
+  analytics_id: string;
   group_admin: boolean;
 }
 
@@ -41,6 +44,7 @@ export const mapUserData = (obj: RawUserRequest): User => {
   return {
     acknowledgedPolicyVersion: obj.acknowledged_policy_version,
     agreedToTos: obj.agreed_to_tos,
+    analyticsId: obj.analytics_id,
     groups: obj.groups,
     id: obj.id,
     name: obj.name,
@@ -79,12 +83,43 @@ export function useUpdateUserInfo(): UseMutationResult<
   });
 }
 
+// Performs the needed `select` for `useUserInfo`, but also inserts a call
+// to analytics as a way to easily catch any changes to user info over time.
+function mapUserDataAndHandleAnalytics(obj: RawUserRequest): User {
+  const user = mapUserData(obj);
+  // Downstream will handle figuring out group info (and if it's ready yet).
+  analyticsSendUserInfo(user);
+  return user;
+}
+
 export function useUserInfo(): UseQueryResult<User, unknown> {
   return useQuery([USE_USER_INFO], fetchUserInfo, {
     retry: false,
-    select: mapUserData,
+    // Analytics rides along here as a way to capture user info changes
+    select: mapUserDataAndHandleAnalytics,
   });
 }
+
+/**
+ * WARNING -- please AVOID using unless you have no choice but to use it.
+ *
+ * Gets the currently cached data for user info.
+ * Generally, you **should** be using `useUserInfo` to get access to user info,
+ * but that will only work within React components. If you find yourself in a
+ * situation where you need access to user info, but you are outside of a React
+ * component and there is no reasonable way to pass that info down to where
+ * your code is happening, you can call this and it will return the currently
+ * held info or `undefined` if user info not pulled yet or there was an error.
+ *
+ * Note that this implementation is also a bit brittle since we must manually
+ * map the raw response data from the user info request into the JS object keys
+ * we use in FE app. That's normally taken care of by `useUserInfo` because
+ * of how it's set up, but we must manually call that func here.
+ */
+export const getCurrentUserInfo = (): User | undefined => {
+  const rawUser = queryClient.getQueryData<RawUserRequest>([USE_USER_INFO]);
+  return rawUser && mapUserData(rawUser);
+};
 
 /**
  * Moves users away from pages they should not see depending on user status.

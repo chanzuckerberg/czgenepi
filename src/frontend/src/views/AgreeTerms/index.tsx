@@ -1,7 +1,7 @@
-import { Dialog } from "@material-ui/core";
+import { Dialog } from "@mui/material";
 import { Button, List, ListItem, ListSubheader } from "czifui";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { API } from "src/common/api";
 import { HeadAppTitle } from "src/common/components";
 import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
@@ -116,9 +116,11 @@ export default function AgreeTerms(): JSX.Element | null {
                 <NewTabLink href={ROUTES.TERMS}>Terms of Service</NewTabLink>{" "}
                 and{" "}
                 <NewTabLink href={ROUTES.PRIVACY}>Privacy Policy</NewTabLink>.
-                We’ve put together an{" "}
-                <NewTabLink href={ROUTES.FAQ}>FAQ</NewTabLink> to make these
-                easier to understand. Please{" "}
+                We’ve put together a{" "}
+                <NewTabLink href={ROUTES.PRIVACY_DATA_SHARING_FAQ}>
+                  Privacy &amp; Data Sharing FAQ
+                </NewTabLink>{" "}
+                to make these easier to understand. Please{" "}
                 <NewTabLink href={ROUTES.CONTACT_US_EMAIL}>
                   get in touch
                 </NewTabLink>{" "}

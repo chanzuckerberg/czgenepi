@@ -1,4 +1,3 @@
-import React from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { CollapsibleInstructions } from "src/components/CollapsibleInstructions";
 import { SemiBold, StyledWrapper } from "./style";

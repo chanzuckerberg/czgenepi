@@ -1,5 +1,5 @@
 import { Icon, Tooltip } from "czifui";
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import {
   StyledHeaderCellContent,

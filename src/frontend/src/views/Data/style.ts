@@ -9,7 +9,6 @@ import {
   getColors,
   getSpaces,
 } from "czifui";
-import { Menu } from "semantic-ui-react";
 import { RowContent } from "src/common/components/library/data_table/style";
 import { PageContent } from "src/common/styles/mixins/global";
 
@@ -21,7 +20,7 @@ export const Container = styled(PageContent)`
 
 export const Subtext = styled.div`
   ${fontBodyXxs}
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
 
     return `
@@ -37,7 +36,7 @@ export const UnderlinedCell = styled.div`
 export const UnderlinedRowContent = styled(RowContent)`
   &:hover {
     ${UnderlinedCell} {
-      ${(props) => {
+      ${(props: CommonThemeProps) => {
         const colors = getColors(props);
 
         return `
@@ -49,7 +48,7 @@ export const UnderlinedRowContent = styled(RowContent)`
 `;
 
 export const StyledChip = styled(Chip)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
@@ -61,7 +60,7 @@ export const StyledChip = styled(Chip)`
 export const GISAIDCell = styled.div`
   ${fontHeaderXs}
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
@@ -80,7 +79,7 @@ export const PrivateIdValueWrapper = styled.div`
 
 export const SampleIconWrapper = styled.span`
   position: relative;
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
@@ -93,7 +92,7 @@ export const Navigation = styled.div`
   display: flex;
   width: 100%;
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
 
@@ -111,7 +110,7 @@ export const CenteredFlexContainer = styled.div`
 export const StyledUploaderName = styled.span`
   ${fontBodyXxs}
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
 
@@ -170,7 +169,7 @@ export const View = styled.div`
 export const StyledCount = styled.div`
   ${fontBodyXs}
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     return `
       color: ${colors?.gray[500]};
@@ -178,16 +177,21 @@ export const StyledCount = styled.div`
   }}
 `;
 
-export const StyledMenu = styled(Menu)`
+export const StyledMenu = styled.ul`
   align-items: center;
-  margin: 0 !important;
-
-  a div {
-    /* overwrite semantic-ui style */
-    padding-left: 0 !important;
-  }
+  display: flex;
+  flex-direction: row;
+  padding: 0;
 `;
 
-export const StyledMenuItem = styled(Menu.Item)`
-  height: 100%;
+export const StyledMenuItem = styled.li`
+  list-style: none;
+  padding: 0;
+  ${(props: CommonThemeProps) => {
+    const spaces = getSpaces(props);
+
+    return `
+      margin: 0 ${spaces?.m}px;
+    `;
+  }}
 `;

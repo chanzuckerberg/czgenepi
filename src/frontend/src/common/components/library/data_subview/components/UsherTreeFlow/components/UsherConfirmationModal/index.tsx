@@ -1,4 +1,3 @@
-import React from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import usherLogo from "src/common/images/usher.png";
 import { RedirectConfirmationModal } from "../../../RedirectConfirmationModal";

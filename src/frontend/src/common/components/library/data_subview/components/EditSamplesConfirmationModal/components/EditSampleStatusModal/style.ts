@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import {
   Button,
+  CommonThemeProps,
   Dialog,
   fontBodyM,
   fontHeaderXl,
@@ -10,7 +11,7 @@ import {
 } from "czifui";
 
 export const StyledDialog = styled(Dialog)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const shadows = getShadows(props);
 
@@ -25,7 +26,7 @@ export const StyledDialog = styled(Dialog)`
 `;
 
 export const StyledDiv = styled.div`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
@@ -48,7 +49,7 @@ export const StyledTitle = styled.div`
 
 export const StyledSubtitle = styled.div`
   ${fontBodyM}
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-top: ${spaces?.s}px;
@@ -58,7 +59,7 @@ export const StyledSubtitle = styled.div`
 `;
 
 export const StyledImg = styled.div`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
 

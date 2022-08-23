@@ -34,11 +34,13 @@ async def test_users_me(http_client: AsyncClient, async_session: AsyncSession) -
         "groups": [
             {"id": group.id, "name": group.name, "roles": ["member"]},
         ],
+        "gisaid_submitter_id": None,
     }
     resp_data = response.json()
     for key in expected:
         assert resp_data[key] == expected[key]
     assert len(resp_data["split_id"]) == 20
+    assert len(resp_data["analytics_id"]) == 20
 
 
 async def test_users_view_put_pass(
@@ -62,6 +64,7 @@ async def test_users_view_put_pass(
         {"agreed_to_tos": False},
         {"acknowledged_policy_version": "2020-07-22"},
         {"name": new_name},
+        {"gisaid_submitter_id": "alice_phd"},
     ]
     for req in requests:
         res = await http_client.put("/v2/users/me", headers=headers, json=req)
@@ -90,6 +93,8 @@ async def test_users_view_put_pass(
             )
         if "name" in req:
             assert updated_user.name == req["name"]
+        if "gisaid_submitter_id" in req:
+            assert updated_user.gisaid_submitter_id == req["gisaid_submitter_id"]
 
 
 async def test_usergroup_view_put_fail(

@@ -1,4 +1,3 @@
-import React from "react";
 import { pluralize } from "src/common/utils/strUtils";
 import { SemiBold, StyledCallout } from "./style";
 

@@ -1,5 +1,11 @@
 import styled from "@emotion/styled";
-import { fontBodyS, fontHeaderXl, getColors, getSpaces } from "czifui";
+import {
+  CommonThemeProps,
+  fontBodyS,
+  fontHeaderXl,
+  getColors,
+  getSpaces,
+} from "czifui";
 import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import UploadImage from "src/common/images/Upload.svg";
@@ -18,11 +24,11 @@ export const ImageWrapper = styled.div`
   align-items: center;
   justify-content: center;
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
-      margin-bottom: ${spaces?.xl}px;
+      margin: ${spaces?.xl}px 0;
     `;
   }}
 `;
@@ -36,7 +42,6 @@ const centerContent = `
 export const StyledDialogContent = styled(DialogContent)`
   ${centerContent}
 
-  width: 600px;
   flex-direction: column;
 `;
 
@@ -45,7 +50,7 @@ export const StyledDialogActions = styled(DialogActions)`
 `;
 
 export const StyledUploadImage = styled(UploadImage)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
 
     return `
@@ -55,7 +60,7 @@ export const StyledUploadImage = styled(UploadImage)`
 `;
 
 export const StyledUploadFailedImage = styled(UploadFailedImage)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
 
     return `

@@ -1,7 +1,7 @@
 import { compact, map, uniq } from "lodash";
-import Link from "next/link";
+import NextLink from "next/link";
 import { useRouter } from "next/router";
-import React, { FunctionComponent, useEffect, useMemo, useState } from "react";
+import { FunctionComponent, useEffect, useMemo, useState } from "react";
 import { HeadAppTitle } from "src/common/components";
 import { useProtectedRoute } from "src/common/queries/auth";
 import { usePhyloRunInfo } from "src/common/queries/phyloRuns";
@@ -154,9 +154,9 @@ const Data: FunctionComponent = () => {
   // create JSX elements from categories
   dataCategories.forEach((category) => {
     dataJSX.menuItems.push(
-      <Link href={category.to} key={category.text} passHref>
-        <a href="passHref">
-          <StyledMenuItem>
+      <StyledMenuItem key={category.text}>
+        <NextLink href={category.to} key={category.text} passHref>
+          <a href="passHref">
             <Category>
               <CategoryTitle
                 isActive={router.asPath === category.to}
@@ -166,9 +166,9 @@ const Data: FunctionComponent = () => {
               </CategoryTitle>
               <StyledCount>{Object.keys(category.data).length}</StyledCount>
             </Category>
-          </StyledMenuItem>
-        </a>
-      </Link>
+          </a>
+        </NextLink>
+      </StyledMenuItem>
     );
   });
 
@@ -202,7 +202,7 @@ const Data: FunctionComponent = () => {
             setShouldShowFilters(!shouldShowFilters);
           }}
         />
-        <StyledMenu secondary>{dataJSX.menuItems}</StyledMenu>
+        <StyledMenu>{dataJSX.menuItems}</StyledMenu>
       </Navigation>
       <View>
         {viewName === "Samples" && (

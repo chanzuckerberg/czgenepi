@@ -1,5 +1,4 @@
 import Image from "next/image";
-import React from "react";
 import HeroBackgroundSvg from "src/common/images/landingv2-hero.svg";
 import NextstrainLogo from "src/common/images/Nextstrain-Logo-crop.png";
 import { ROUTES } from "src/common/routes";

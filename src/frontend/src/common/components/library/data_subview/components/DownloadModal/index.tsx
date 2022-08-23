@@ -1,8 +1,13 @@
 import { useTreatments } from "@splitsoftware/splitio-react";
 import { Alert, Icon, Link, Tooltip } from "czifui";
-import { isEqual, noop } from "lodash";
-import React, { useCallback, useEffect, useState } from "react";
+import { isEqual } from "lodash";
+import { useCallback, useEffect, useState } from "react";
 import { CSVLink } from "react-csv";
+import {
+  AnalyticsSamplesDownloadFile,
+  EVENT_TYPES,
+} from "src/common/analytics/eventTypes";
+import { analyticsTrackEvent } from "src/common/analytics/methods";
 import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
@@ -64,7 +69,7 @@ const DownloadModal = ({
   const [tsvRows, setTsvRows] = useState<string[][]>([]);
   const [tsvHeaders, setTsvHeaders] = useState<string[]>([]);
   const [anchorEl, setAnchorEl] = useState<HTMLElement>();
-  const tooltipRef = useCallback((node) => setAnchorEl(node), []);
+  const tooltipRef = useCallback((node: HTMLElement) => setAnchorEl(node), []);
 
   const [isFastaDisabled, setFastaDisabled] = useState<boolean>(false);
   const [isFastaSelected, setFastaSelected] = useState<boolean>(false);
@@ -155,12 +160,7 @@ const DownloadModal = ({
         </B>{" "}
         <ContactUsLink />
       </Notification>
-      <Dialog
-        disableEscapeKeyDown
-        disableBackdropClick
-        open={open}
-        onClose={handleCloseModal}
-      >
+      <Dialog disableEscapeKeyDown open={open} onClose={handleCloseModal}>
         <DialogTitle>
           <StyledCloseIconButton
             aria-label="close download modal"
@@ -306,6 +306,27 @@ const DownloadModal = ({
     </>
   );
 
+  /**
+   * Handle firing off analytics event when a samples download is initiated.
+   *
+   * Download button kicks off download, but underlying components within it
+   * change depending on if fasta selected and/or if metadata selected.
+   * This function deals with the analytics event for downloads, but need
+   * to ensure it only gets called once, regardless of what combination
+   * of fasta/metadata selection is in place.
+   */
+  function analyticsHandleDownload(): void {
+    analyticsTrackEvent<AnalyticsSamplesDownloadFile>(
+      EVENT_TYPES.SAMPLES_DOWNLOAD_FILE,
+      {
+        sample_count: checkedSampleIds.length,
+        sample_public_ids: JSON.stringify(checkedSampleIds),
+        includes_consensus_genome: isFastaSelected,
+        includes_sample_metadata: isMetadataSelected,
+      }
+    );
+  }
+
   // TODO:(194961) update for GISAID template download
   // TODO:(194962) update for GenBank template download
   function getDownloadButton(): JSX.Element | undefined {
@@ -314,8 +335,11 @@ const DownloadModal = ({
     const isButtonDisabled = !isFastaSelected && !isMetadataSelected;
     const downloadFasta = () => {
       fastaDownloadMutation.mutate({ sampleIds: checkedSampleIds });
+      // Analytics: When fasta download happens, kick off download event.
+      analyticsHandleDownload();
     };
-    const onClick = isFastaSelected ? downloadFasta : noop;
+    // Analytics: If downloading fasta is not happening, still fire event.
+    const onClick = isFastaSelected ? downloadFasta : analyticsHandleDownload;
 
     const downloadButton = (
       <StyledButton

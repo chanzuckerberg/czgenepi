@@ -8,13 +8,13 @@ const isProdBuild = ENV.NODE_ENV === nodeEnv.PRODUCTION;
 
 const SCRIPT_SRC = [
   "'self'",
+  "https://cdn.cookielaw.org",
   "https://cdn.segment.com",
   "https://plausible.io",
 ];
 
 module.exports = {
   distDir: ENV.BUILD_PATH,
-  fileExtensions: ["jpg", "jpeg", "png", "gif", "ico", "webp", "jp2", "avif"],
 
   async generateBuildId() {
     // Return null to allow next.js to fallback to default behavior
@@ -36,6 +36,9 @@ module.exports = {
                 "sdk.split.io",
                 "events.split.io",
                 "streaming.split.io",
+                "https://cdn.cookielaw.org",
+                "https://geolocation.onetrust.com",
+                "https://cookies-data.onetrust.io",
                 "https://cdn.segment.com",
                 "https://api.segment.io",
                 "https://plausible.io",
@@ -46,7 +49,7 @@ module.exports = {
               formAction: "'self'",
               frameAncestors: ["'none'"],
               frameSrc: ["'self'"],
-              imgSrc: ["'self'", "data:"],
+              imgSrc: ["'self'", "data:", "https://cdn.cookielaw.org"],
               manifestSrc: ["'self'"],
               mediaSrc: ["'self'"],
               objectSrc: ["'none'"],
@@ -79,6 +82,12 @@ module.exports = {
         source: "/resources",
         destination:
           "https://help.czgenepi.org/hc/en-us/categories/6217716150804-Genomic-Epidemiology-Learning-Center",
+        permanent: true,
+      },
+      {
+        source: "/faq",
+        destination:
+          "https://help.czgenepi.org/hc/en-us/sections/5686564086548-FAQ",
         permanent: true,
       },
     ];

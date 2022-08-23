@@ -1,6 +1,6 @@
 // includes shared styles for icons
 import styled from "@emotion/styled";
-import { CommonThemeProps, getColors, getSpaces, IconButton } from "czifui";
+import { ButtonIcon, CommonThemeProps, getColors, getSpaces } from "czifui";
 
 export const iconFillBlack = (): string => {
   return `
@@ -82,7 +82,7 @@ export const rightMarginXxs = (props: CommonThemeProps): string => {
 };
 
 // Dialog Icon styles
-export const StyledCloseIconButton = styled(IconButton)`
+export const StyledCloseIconButton = styled(ButtonIcon)`
   float: right;
   &:focus {
     outline: 5px auto Highlight;

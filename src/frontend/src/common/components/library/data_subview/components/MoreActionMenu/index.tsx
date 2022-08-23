@@ -1,5 +1,5 @@
 import { Icon, Menu, MenuItem, Tooltip } from "czifui";
-import React, { MouseEventHandler, useState } from "react";
+import { MouseEventHandler, useState } from "react";
 import { StyledMenuItemWrapper } from "src/common/styles/menuStyle";
 import { StyledText } from "src/views/Data/components/TreeActionMenu/components/MoreActionsMenu/style";
 import { TooltipDescriptionText, TooltipHeaderText } from "../../style";
@@ -76,7 +76,6 @@ const MoreActionsMenu = ({
         keepMounted
         open={Boolean(anchorEl)}
         onClose={handleClose}
-        getContentAnchorEl={null}
       >
         <Tooltip
           arrow

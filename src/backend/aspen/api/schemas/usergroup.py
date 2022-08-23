@@ -9,6 +9,7 @@ from aspen.api.schemas.locations import LocationResponse
 
 class GroupCreationRequest(BaseRequest):
     name: constr(min_length=3, max_length=128, strict=True)  # type: ignore
+    submitting_lab: Optional[constr(min_length=3, max_length=128, strict=True)]  # type: ignore
     # group prefix currently is used in the SFN name, which has max char limit
     # `prefix` cannot be arbitrarily increased until this ticket is resolved:
     # https://app.shortcut.com/genepi/story/209498
@@ -28,6 +29,7 @@ class GroupInfoResponse(GroupResponse):
     address: Optional[str]
     prefix: str
     default_tree_location: LocationResponse
+    submitting_lab: Optional[str]
 
 
 class UserBaseResponse(BaseResponse):
@@ -42,6 +44,7 @@ class UserUpdateRequest(BaseRequest):
     agreed_to_tos: Optional[bool] = None
     acknowledged_policy_version: Optional[datetime.date] = None
     name: Optional[str] = None
+    gisaid_submitter_id: Optional[str] = None
 
 
 class GroupRoleResponse(BaseResponse):
@@ -50,9 +53,11 @@ class GroupRoleResponse(BaseResponse):
     roles: List[str]
 
 
-# Only expose split id and groups to the user it belongs to.
+# Only expose split_id, analytics_id, and groups to the user they belong to.
 class UserMeResponse(UserBaseResponse):
     split_id: str
+    analytics_id: str
+    gisaid_submitter_id: Optional[str]
     group: GroupResponse
     groups: List[GroupRoleResponse]
 

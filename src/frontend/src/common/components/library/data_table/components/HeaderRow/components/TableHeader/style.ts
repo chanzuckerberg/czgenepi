@@ -41,7 +41,7 @@ export const StyledTreeTableHeader = styled.div`
     justify-content: left;
   }
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
@@ -57,7 +57,7 @@ export const StyledTreeTableHeader = styled.div`
 export const StyledHeaderCellContent = styled.div`
   ${fontHeaderS}
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
 

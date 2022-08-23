@@ -17,7 +17,7 @@ export const NEXTSTRAIN_FORMAT_HEADERS_TO_METADATA_KEYS: Record<
   date: "collectionDate",
   location: "collectionLocation",
   gisaid_epi_isl: "publicId",
-  strain: "sampleId",
+  strain: "strain",
 };
 
 // We don't send all metadata keys to API. sampleId is not persisted.
