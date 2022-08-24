@@ -28,7 +28,7 @@ export default function RightNav(): JSX.Element {
             Upload
           </UploadButton>
         </Link>
-        <HiddenLabel id="feedback-label">Submit issues or Feedback</HiddenLabel>
+        <HiddenLabel id="feedback-label">Submit issues or feedback</HiddenLabel>
         <Tooltip
           arrow
           title="Submit Issues or Feedback"

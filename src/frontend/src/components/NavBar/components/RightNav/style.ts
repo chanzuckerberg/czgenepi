@@ -70,7 +70,7 @@ export const StyledIconWrapper = styled.div`
       svg {
         fill: ${colors?.gray[300]};
         &:hover, &:focus, &:active {
-          fill: ${palette?.common?.white}
+          fill: ${palette?.common?.white};
         }
       }
     `;
