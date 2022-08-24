@@ -13,6 +13,9 @@ export class SamplesPage {
     readonly lineageList: Locator
     readonly collectionDateDropDown: Locator
     readonly uploadButton: Locator
+    readonly treeButton: Locator
+    readonly nextStrainPhylogeneticTreeOption: Locator
+    readonly treeNameInput: Locator
 
     constructor(page: Page){
         this.page = page
@@ -26,6 +29,9 @@ export class SamplesPage {
         this.lineageList = page.locator("div[data-test-id='table-row'] > div:nth-of-type(4) > div");
         this.collectionDateDropDown = page.locator("button[label='Collection Date']");
         this.uploadButton = page.locator("a[href$='/upload/1'] > button");
+        this.treeButton = page.locator('div[status="info"] + div + div + span');
+        this.nextStrainPhylogeneticTreeOption = page.locator("//span[text()='Nextstrain Phylogenetic Tree']");
+        this.treeNameInput = page.locator("#outlined-basic");
     }
 
     async navigateToUpload(){
@@ -70,6 +76,19 @@ export class SamplesPage {
         console.log("CURRENT LINEAGE FILTERED: "+ arrayStatus);
         return arrayStatus;
     }
+
+    async clickOnTreeButton(){
+      this.treeButton.click();
+    }
+
+    async openNextstrainPhylogeneticTreeModal(){
+      await this.clickOnTreeButton();
+      await this.nextStrainPhylogeneticTreeOption.click();
+    }
+
+
+
+
 }
 
 
