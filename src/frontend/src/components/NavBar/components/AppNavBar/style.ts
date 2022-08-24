@@ -1,5 +1,11 @@
 import styled from "@emotion/styled";
-import { CommonThemeProps, fontHeaderL, getColors, getSpaces } from "czifui";
+import {
+  CommonThemeProps,
+  fontHeaderL,
+  getColors,
+  getPalette,
+  getSpaces,
+} from "czifui";
 import LogoImage from "src/common/images/logo_complete_white.svg";
 import { iconFillWhite } from "src/common/styles/iconStyle";
 
@@ -71,9 +77,17 @@ export const NavOrg = styled.div`
   }
 `;
 
-export const DropdownClickTarget = styled.span`
-  cursor: pointer;
+export const DropdownClickTarget = styled.button`
   display: flex;
+  align-items: center;
+  border: none;
+  ${(props: CommonThemeProps) => {
+    const palette = getPalette(props);
+
+    return `
+      background-color: ${palette?.common?.black};
+    `;
+  }}
 `;
 
 export const StyledNavIconWrapper = styled.div`
