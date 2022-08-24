@@ -1,8 +1,8 @@
 import styled from "@emotion/styled";
-import { getFontWeights, getSpaces, Tag } from "czifui";
+import { CommonThemeProps, getFontWeights, getSpaces, Tag } from "czifui";
 
 export const StyledTag = styled(Tag)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const fontWeights = getFontWeights(props);
     const spaces = getSpaces(props);
 

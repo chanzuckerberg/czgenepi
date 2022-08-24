@@ -1,4 +1,3 @@
-import React from "react";
 import { pluralize } from "src/common/utils/strUtils";
 import AlertAccordion from "src/components/AlertAccordion";
 import { SemiBold, StyledList, StyledListItem } from "./style";

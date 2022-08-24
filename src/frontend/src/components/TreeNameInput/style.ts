@@ -11,7 +11,7 @@ import { iconFillError } from "src/common/styles/iconStyle";
 import Instructions from "src/components/Instructions";
 
 export const StyledInstructions = styled(Instructions)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const corners = getCorners(props);
     const spaces = getSpaces(props);
 
@@ -43,7 +43,7 @@ export const InstructionsNotSemiBold = styled.span`
 export const TextInputLabelTitle = styled.div`
   ${fontHeaderM}
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
@@ -55,7 +55,7 @@ export const TextInputLabelTitle = styled.div`
 
 export const StyledErrorIconWrapper = styled.div`
   ${iconFillError}
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `

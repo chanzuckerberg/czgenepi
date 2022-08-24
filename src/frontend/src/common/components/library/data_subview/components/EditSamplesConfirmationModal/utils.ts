@@ -26,13 +26,15 @@ export function structureInitialMetadata(
   return i;
 }
 export function findMetadataChanges(
-  combinedMetadata: string | boolean | NamedGisaidLocation,
+  combinedMetadata: SampleEditMetadataWebform,
   currentMetadata: SampleEditMetadataWebform
 ): SampleEditMetadataWebform {
   // see where the current and incoming metadata diverges (compare values or current and incoming metadata)
   return Object.entries(combinedMetadata).reduce(
     (acc: SampleEditMetadataWebform, [key, value]) => {
       if (!Object.values(currentMetadata).includes(value)) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore - ignoring as part of muiV5/czifuiV7 upgrade. Would be good to fix this later.
         acc[key as keyof SampleEditMetadataWebform] = value;
       }
       return acc;

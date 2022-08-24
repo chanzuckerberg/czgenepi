@@ -1,11 +1,12 @@
 import styled from "@emotion/styled";
-import { TextField } from "@material-ui/core";
+import { TextField } from "@mui/material";
 import {
   Button,
   CommonThemeProps,
   fontBodyXs,
   getColors,
   getCorners,
+  getPalette,
   getSpaces,
 } from "czifui";
 import { transparentScrollbars } from "src/common/styles/basicStyle";
@@ -43,6 +44,7 @@ export const StyledTextArea = styled(TextField)`
     if (disabled) {
       const colors = getColors(props);
       const corners = getCorners(props);
+      const palette = getPalette(props);
       const spaces = getSpaces(props);
 
       return `
@@ -59,8 +61,11 @@ export const StyledTextArea = styled(TextField)`
         }
 
         textarea {
-          color: black;
           resize: none;
+        }
+
+        .Mui-disabled {
+          -webkit-text-fill-color: ${palette?.common?.black};
         }
       `;
     }
@@ -79,7 +84,7 @@ export const BaselineFlexContainer = styled.div`
 
 export const StyledLoadingSpinnerWrapper = styled.div`
   ${iconFillGray}
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
@@ -89,7 +94,7 @@ export const StyledLoadingSpinnerWrapper = styled.div`
 `;
 
 export const StyledAddButton = styled(Button)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-top: ${spaces?.m}px;
@@ -108,7 +113,7 @@ export const StyledEditButton = styled(Button)`
 
 export const StyledSampleCount = styled.span`
   ${fontBodyXs}
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
 

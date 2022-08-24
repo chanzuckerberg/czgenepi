@@ -1,8 +1,8 @@
 import styled from "@emotion/styled";
-import { getSpaces } from "czifui";
+import { CommonThemeProps, getSpaces } from "czifui";
 
 export const StyledTable = styled.table`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     // TODO (mlila): overlay colors not yet available from sds,

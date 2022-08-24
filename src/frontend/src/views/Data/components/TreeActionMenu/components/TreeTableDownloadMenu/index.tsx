@@ -1,5 +1,5 @@
-import { Icon, IconButton, Menu, MenuItem, Tooltip } from "czifui";
-import React, { MouseEventHandler, ReactNode, useState } from "react";
+import { ButtonIcon, Icon, Menu, MenuItem, Tooltip } from "czifui";
+import { MouseEventHandler, ReactNode, useState } from "react";
 import {
   AnalyticsTreeDownloadSelectedSamplesTemplate,
   AnalyticsTreeDownloadTreeFile,
@@ -89,14 +89,15 @@ const TreeTableDownloadMenu = ({ item }: Props): JSX.Element => {
   return (
     <>
       <Tooltip arrow sdsStyle="dark" title="Download" placement="top">
-        <IconButton
+        <ButtonIcon
           aria-label="download tree"
           onClick={handleClick}
           sdsSize="small"
           sdsType="primary"
+          size="large"
         >
           <Icon sdsIcon="download" sdsSize="s" sdsType="iconButton" />
-        </IconButton>
+        </ButtonIcon>
       </Tooltip>
       {open && (
         <Menu
@@ -112,7 +113,6 @@ const TreeTableDownloadMenu = ({ item }: Props): JSX.Element => {
           keepMounted
           open={open}
           onClose={baseHandleClose}
-          getContentAnchorEl={null}
         >
           <NewTabLink href={jsonLinkIdStylePrivateIdentifiers}>
             <MenuItemTooltip>

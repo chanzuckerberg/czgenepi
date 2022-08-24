@@ -1,5 +1,11 @@
 import styled from "@emotion/styled";
-import { fontBodyS, fontHeaderS, getColors, getSpaces } from "czifui";
+import {
+  CommonThemeProps,
+  fontBodyS,
+  fontHeaderS,
+  getColors,
+  getSpaces,
+} from "czifui";
 
 export const Table = styled.table`
   margin: 25px 0px;
@@ -12,7 +18,7 @@ export const Table = styled.table`
   td {
     text-align: left;
 
-    ${(props) => {
+    ${(props: CommonThemeProps) => {
       const spaces = getSpaces(props);
       const colors = getColors(props);
 
@@ -27,7 +33,7 @@ export const Table = styled.table`
 export const TopRow = styled.tr`
   ${fontHeaderS}
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
 
     return `

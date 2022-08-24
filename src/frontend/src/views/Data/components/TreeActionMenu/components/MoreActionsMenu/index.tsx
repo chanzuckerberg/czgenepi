@@ -1,5 +1,5 @@
-import { Icon, IconButton, Menu, MenuItem, Tooltip } from "czifui";
-import React, { MouseEventHandler, useState } from "react";
+import { ButtonIcon, Icon, Menu, MenuItem, Tooltip } from "czifui";
+import { MouseEventHandler, useState } from "react";
 import { TREE_STATUS } from "src/common/constants/types";
 import { StyledMenuItemWrapper } from "src/common/styles/menuStyle";
 import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
@@ -62,15 +62,17 @@ const MoreActionsMenu = ({
         placement="top"
       >
         <span>
-          <IconButton
-            aria-label="more actions" // TODO: it would be helpful for this to indicate which tree it's for
+          <ButtonIcon
+            // TODO: it would be helpful for this to indicate which tree it's for
+            aria-label="more actions"
             disabled={isDisabled}
             onClick={handleClick}
             sdsSize="small"
             sdsType="primary"
+            size="large"
           >
             <Icon sdsIcon="dotsHorizontal" sdsSize="s" sdsType="iconButton" />
-          </IconButton>
+          </ButtonIcon>
         </span>
       </Tooltip>
       {open && (
@@ -87,7 +89,6 @@ const MoreActionsMenu = ({
           keepMounted
           open={open}
           onClose={handleClose}
-          getContentAnchorEl={null}
         >
           <MenuItem onClick={() => onEditTreeModalOpen(item)}>
             <StyledMenuItemWrapper>

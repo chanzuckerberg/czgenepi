@@ -1,5 +1,4 @@
 import Image from "next/image";
-import React from "react";
 import ComputerImg from "src/common/images/landingv2-gen-epi-comp.png";
 import {
   IntroContainer,

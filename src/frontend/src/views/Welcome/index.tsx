@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { HeadAppTitle } from "src/common/components";
 import { setGroup } from "src/common/redux/actions";
 import { useDispatch } from "src/common/redux/hooks";

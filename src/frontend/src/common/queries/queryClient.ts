@@ -1,4 +1,4 @@
-import { QueryClient } from "react-query";
+import { QueryClient } from "@tanstack/react-query";
 
 /**
  * WARNING -- please AVOID importing and using unless you really, really gotta.

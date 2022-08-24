@@ -1,6 +1,6 @@
 import { Button, Link } from "czifui";
 import NextLink from "next/link";
-import React, { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { HeadAppTitle } from "src/common/components";
 import { setApplyAllValueToPrevMetadata } from "src/common/components/library/data_subview/components/EditSamplesConfirmationModal/utils";
 import { NewTabLink } from "src/common/components/library/NewTabLink";

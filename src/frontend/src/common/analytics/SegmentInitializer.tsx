@@ -1,5 +1,4 @@
 import Script from "next/script";
-import React from "react";
 import { extractAnalyticsUserInfo } from "src/common/analytics/methods";
 import { ONETRUST_ENABLING_CLASS } from "src/common/analytics/OneTrustInitializer";
 import ENV from "src/common/constants/ENV";

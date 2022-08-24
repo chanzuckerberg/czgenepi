@@ -1,7 +1,7 @@
 import { useTreatments } from "@splitsoftware/splitio-react";
 import { Alert, Icon, Link, Tooltip } from "czifui";
 import { isEqual } from "lodash";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { CSVLink } from "react-csv";
 import {
   AnalyticsSamplesDownloadFile,
@@ -69,7 +69,7 @@ const DownloadModal = ({
   const [tsvRows, setTsvRows] = useState<string[][]>([]);
   const [tsvHeaders, setTsvHeaders] = useState<string[]>([]);
   const [anchorEl, setAnchorEl] = useState<HTMLElement>();
-  const tooltipRef = useCallback((node) => setAnchorEl(node), []);
+  const tooltipRef = useCallback((node: HTMLElement) => setAnchorEl(node), []);
 
   const [isFastaDisabled, setFastaDisabled] = useState<boolean>(false);
   const [isFastaSelected, setFastaSelected] = useState<boolean>(false);
@@ -160,12 +160,7 @@ const DownloadModal = ({
         </B>{" "}
         <ContactUsLink />
       </Notification>
-      <Dialog
-        disableEscapeKeyDown
-        disableBackdropClick
-        open={open}
-        onClose={handleCloseModal}
-      >
+      <Dialog disableEscapeKeyDown open={open} onClose={handleCloseModal}>
         <DialogTitle>
           <StyledCloseIconButton
             aria-label="close download modal"

@@ -1,7 +1,7 @@
-import { AlertTitle } from "@material-ui/lab";
+import AlertTitle from "@mui/material/AlertTitle";
 import { Alert, Button } from "czifui";
 import NextLink from "next/link";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   AnalyticsSamplesUploadSuccess,
   EVENT_TYPES,
@@ -58,12 +58,7 @@ export default function Upload({
 
   return (
     <>
-      <Dialog
-        disableBackdropClick
-        disableEscapeKeyDown
-        open={isOpen}
-        onClose={handleClose}
-      >
+      <Dialog disableEscapeKeyDown open={isOpen} onClose={handleClose}>
         <StyledDialogContent>
           <ImageWrapper>{getImage()}</ImageWrapper>
           <Title>{getTitleText()}</Title>

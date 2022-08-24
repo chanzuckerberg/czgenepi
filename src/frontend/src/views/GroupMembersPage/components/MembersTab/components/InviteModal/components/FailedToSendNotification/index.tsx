@@ -1,5 +1,4 @@
 import { Notification } from "czifui";
-import React from "react";
 import { pluralize, pluralizeVerb } from "src/common/utils/strUtils";
 import { StyledDiv } from "./style";
 

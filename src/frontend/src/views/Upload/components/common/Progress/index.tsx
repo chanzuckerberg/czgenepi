@@ -1,4 +1,3 @@
-import React from "react";
 import { Status } from "./components/common";
 import Indicator from "./components/Indicator";
 import { Container, StepWrapper, StyledBar } from "./style";

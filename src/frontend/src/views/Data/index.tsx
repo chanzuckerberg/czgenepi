@@ -1,7 +1,7 @@
 import { compact, map, uniq } from "lodash";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
-import React, { FunctionComponent, useEffect, useMemo, useState } from "react";
+import { FunctionComponent, useEffect, useMemo, useState } from "react";
 import { HeadAppTitle } from "src/common/components";
 import { useProtectedRoute } from "src/common/queries/auth";
 import { usePhyloRunInfo } from "src/common/queries/phyloRuns";
@@ -154,7 +154,7 @@ const Data: FunctionComponent = () => {
   // create JSX elements from categories
   dataCategories.forEach((category) => {
     dataJSX.menuItems.push(
-      <StyledMenuItem>
+      <StyledMenuItem key={category.text}>
         <NextLink href={category.to} key={category.text} passHref>
           <a href="passHref">
             <Category>

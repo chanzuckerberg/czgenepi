@@ -1,5 +1,4 @@
 import Script from "next/script";
-import React from "react";
 import ENV from "src/common/constants/ENV";
 import { useUserInfo } from "src/common/queries/auth";
 

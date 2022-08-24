@@ -25,7 +25,7 @@ export const StyledFilterPanel = styled("div", {
 `;
 
 export const StyledComplexFilter = styled(ComplexFilter)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin: ${spaces?.l}px 0;

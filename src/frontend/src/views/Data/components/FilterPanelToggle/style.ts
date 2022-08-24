@@ -1,6 +1,12 @@
 import { css } from "@emotion/css";
 import styled from "@emotion/styled";
-import { fontHeaderXxxs, getColors, getCorners, getSpaces } from "czifui";
+import {
+  CommonThemeProps,
+  fontHeaderXxxs,
+  getColors,
+  getCorners,
+  getSpaces,
+} from "czifui";
 
 export const StyledDiv = styled.div`
   display: flex;
@@ -9,7 +15,7 @@ export const StyledDiv = styled.div`
   cursor: pointer;
   position: relative;
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
@@ -18,7 +24,7 @@ export const StyledDiv = styled.div`
   }}
 
   :active {
-    ${(props) => {
+    ${(props: CommonThemeProps) => {
       const colors = getColors(props);
 
       return `

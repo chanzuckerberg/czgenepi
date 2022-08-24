@@ -1,5 +1,5 @@
 import { FormikContextType } from "formik";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Metadata } from "src/components/WebformTable/common/types";
 import { StyledTextField } from "./style";
 

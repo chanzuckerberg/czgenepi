@@ -1,9 +1,15 @@
 import styled from "@emotion/styled";
-import { fontBodyXs, fontHeaderXs, getColors, getSpaces } from "czifui";
+import {
+  CommonThemeProps,
+  fontBodyXs,
+  fontHeaderXs,
+  getColors,
+  getSpaces,
+} from "czifui";
 import { SampleUploadDownloadTemplate } from "src/components/DownloadMetadataTemplate";
 
 export const Wrapper = styled.div`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
 
@@ -17,7 +23,7 @@ export const Wrapper = styled.div`
 export const Title = styled.div`
   ${fontHeaderXs}
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
@@ -33,7 +39,7 @@ export const ReImportDataItem = styled.p`
 `;
 
 export const StyleDownloadTemplate = styled(SampleUploadDownloadTemplate)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
 
     return `

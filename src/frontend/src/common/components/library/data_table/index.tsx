@@ -1,5 +1,5 @@
 import { get, isEqual } from "lodash/fp";
-import React, {
+import {
   Fragment,
   FunctionComponent,
   useEffect,
@@ -54,7 +54,7 @@ export function defaultSampleCellRenderer({
 
   return (
     <RowContent header={header}>
-      <Cell data-test-id={`row-${header.key}`}>{displayData}</Cell>
+      <Cell data-test-id={`row-${header.key}`}>{String(displayData)}</Cell>
     </RowContent>
   );
 }
@@ -67,7 +67,7 @@ export function defaultTreeCellRenderer({
 
   return (
     <TreeRowContent>
-      <Cell data-test-id={`row-${header.key}`}>{displayData}</Cell>
+      <Cell data-test-id={`row-${header.key}`}>{String(displayData)}</Cell>
     </TreeRowContent>
   );
 }

@@ -1,12 +1,12 @@
-import { useRouter } from "next/router";
-import { useEffect } from "react";
 import {
   useMutation,
   UseMutationResult,
   useQuery,
   useQueryClient,
   UseQueryResult,
-} from "react-query";
+} from "@tanstack/react-query";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { analyticsSendUserInfo } from "src/common/analytics/methods";
 import ENV from "src/common/constants/ENV";

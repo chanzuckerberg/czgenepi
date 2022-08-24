@@ -1,5 +1,5 @@
 import { FormikContextType } from "formik";
-import React, { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { StyledTextField } from "./style";
 
 const DATE_LENGTH = 10;

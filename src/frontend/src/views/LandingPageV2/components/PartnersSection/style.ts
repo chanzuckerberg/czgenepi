@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { getColors } from "czifui";
+import { CommonThemeProps, getColors } from "czifui";
 import { SmallerThanBreakpoint } from "src/common/styles/mixins/global";
 
 const centeredFlex = () => {
@@ -40,7 +40,7 @@ export const PartnerLink = styled.a`
     `)}
   }
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     return `
       border: 1px solid ${colors?.gray[300]};

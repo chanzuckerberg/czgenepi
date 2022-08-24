@@ -1,4 +1,3 @@
-import React from "react";
 import ConfirmDialog, {
   ConfirmDialogProps,
 } from "src/components/ConfirmDialog";

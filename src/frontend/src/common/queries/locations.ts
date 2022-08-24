@@ -1,4 +1,4 @@
-import { useQuery, UseQueryResult } from "react-query";
+import { useQuery, UseQueryResult } from "@tanstack/react-query";
 import { stringifyGisaidLocation } from "src/common/utils/locationUtils";
 import { API, getBackendApiJson } from "../api";
 import { ENTITIES } from "./entities";
