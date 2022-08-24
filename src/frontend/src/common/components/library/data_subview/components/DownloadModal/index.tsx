@@ -119,16 +119,19 @@ const DownloadModal = ({
   const downloadDate = new Date().toISOString().slice(0, 10);
   const separator = "\t";
   const fastaDownloadName = `${groupName}_sample_sequences_${downloadDate}.fasta`;
+  const metadataDownloadName = `${groupName}_sample_metadata_${downloadDate}.tsv`;
+  // TODO (mlila): may need to modify gisaid/genbank filenames slightly for multi-file download
   const gisaidDownloadName = `${groupName}_template_gisaid_${downloadDate}.txt`;
   const genbankDownloadName = `${groupName}_template_genbank_${downloadDate}.tsv`;
 
-  const useFileMutationGenerator = (downloadFileName) =>
+  const useFileMutationGenerator = (downloadFileName: string) =>
     useFileDownload({
       componentOnError: () => {
         setShouldShowError(true);
         handleCloseModal();
       },
       componentOnSuccess: (data: Blob) => {
+        // TODO (mlila): may need to modify behavior here for gisaid/genbank multi-file download
         const link = document.createElement("a");
         link.href = window.URL.createObjectURL(data);
         link.download = downloadFileName;

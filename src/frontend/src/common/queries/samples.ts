@@ -24,23 +24,21 @@ import { MutationCallbacks } from "./types";
 /**
  * Download fasta file for samples
  */
-interface SampleFileDownloadPayload {
-  sampleIds: string[];
-}
 
 type FileDownloadEndpointType =
   | ORG_API.SAMPLES_FASTA_DOWNLOAD
   | ORG_API.SAMPLES_GENBANK_DOWNLOAD
   | ORG_API.SAMPLES_GISAID_DOWNLOAD;
+interface SampleFileDownloadType {
+  endpoint: FileDownloadEndpointType;
+  sampleIds: string[];
+}
 type FileDownloadCallbacks = MutationCallbacks<Blob>;
 
 export async function downloadSamplesFile({
   endpoint,
   sampleIds,
-}: {
-  endpoint: FileDownloadEndpointType;
-  sampleIds: string[];
-}): Promise<Blob> {
+}: SampleFileDownloadType): Promise<Blob> {
   const payload = {
     sample_ids: sampleIds,
   };
@@ -59,7 +57,7 @@ export function useFileDownload({
 }: FileDownloadCallbacks): UseMutationResult<
   Blob,
   unknown,
-  SampleFileDownloadPayload,
+  SampleFileDownloadType,
   unknown
 > {
   return useMutation(downloadSamplesFile, {
