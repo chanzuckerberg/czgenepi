@@ -37,6 +37,7 @@ export interface RawUserRequest {
   acknowledged_policy_version: string | null; // Date or null in DB. ISO 8601: "YYYY-MM-DD"
   split_id: string;
   analytics_id: string;
+  gisaid_submitter_id: string;
   group_admin: boolean;
 }
 
@@ -45,6 +46,7 @@ export const mapUserData = (obj: RawUserRequest): User => {
     acknowledgedPolicyVersion: obj.acknowledged_policy_version,
     agreedToTos: obj.agreed_to_tos,
     analyticsId: obj.analytics_id,
+    gisaidSubmitterId: obj.gisaid_submitter_id,
     groups: obj.groups,
     id: obj.id,
     name: obj.name,
