@@ -28,6 +28,15 @@ export const iconFillGray = (props: CommonThemeProps): string => {
   `;
 };
 
+export const iconFillGray400 = (props: CommonThemeProps): string => {
+  const colors = getColors(props);
+  return `
+    svg {
+      fill: ${colors?.gray[400]};
+    }
+  `;
+};
+
 export const iconFillGrayHoverPrimary = (props: CommonThemeProps): string => {
   const colors = getColors(props);
   return `
@@ -75,6 +84,10 @@ export const rightMarginXxs = (props: CommonThemeProps): string => {
 // Dialog Icon styles
 export const StyledCloseIconButton = styled(ButtonIcon)`
   float: right;
+  &:focus {
+    outline: 5px auto Highlight;
+    outline: 5px auto -webkit-focus-ring-color;
+  }
 `;
 
 export const StyledCloseIconWrapper = styled.div`
