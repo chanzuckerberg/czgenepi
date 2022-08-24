@@ -17,20 +17,27 @@ export default function RightNav(): JSX.Element {
     return (
       <StyledDiv>
         <Link href={ROUTES.UPLOAD_STEP1} passHref>
-          <a href="passHref">
-            <UploadButton sdsType="secondary" sdsStyle="rounded">
-              Upload
-            </UploadButton>
-          </a>
+          <UploadButton
+            component="a"
+            href="passHref"
+            sdsType="secondary"
+            sdsStyle="rounded"
+          >
+            Upload
+          </UploadButton>
         </Link>
         <Link href="https://airtable.com/shr2SrkMN8DK1mLEK" passHref>
-          <StyledLink href="passHref" target="_blank" rel="noreferrer">
+          <StyledLink
+            aria-label="Send issues or feedback"
+            href="passHref"
+            target="_blank"
+            rel="noreferrer"
+          >
             <StyledIconWrapper>
               <FeedbackIcon />
             </StyledIconWrapper>
           </StyledLink>
         </Link>
-
         <UserMenu user={userInfo?.name} />
       </StyledDiv>
     );
