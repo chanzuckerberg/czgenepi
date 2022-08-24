@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Fragment, MouseEventHandler, useState } from "react";
 import { useUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
+import { HiddenLabel } from "src/common/styles/accessibility";
 import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
 import { FEATURE_FLAGS, isFlagOn } from "src/components/Split";
 import { InviteModal } from "src/views/GroupMembersPage/components/MembersTab/components/InviteModal";
@@ -68,9 +69,10 @@ const AppNavBar = (): JSX.Element => {
   return (
     <NavBar data-test-id="navbar">
       <LeftNav>
+        <HiddenLabel id="logo-label">CZ Gen Epi Logo. Go to data.</HiddenLabel>
         <Link href={route} passHref>
-          <LogoAnchor href="passHref">
-            <Logo data-test-id="logo" />
+          <LogoAnchor aria-labelledby="logo-label" href="passHref">
+            <Logo data-test-id="logo" aria-hidden="true" />
             {!isUserOnboardingFlagOn && orgSplash}
           </LogoAnchor>
         </Link>

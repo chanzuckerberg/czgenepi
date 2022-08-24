@@ -71,8 +71,7 @@ export const NavOrg = styled.div`
   }
 `;
 
-export const DropdownClickTarget = styled.span`
-  cursor: pointer;
+export const DropdownClickTarget = styled.button`
   display: flex;
 `;
 

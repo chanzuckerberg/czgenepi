@@ -2,10 +2,10 @@ import { Tooltip } from "czifui";
 import Link from "next/link";
 import FeedbackIcon from "src/common/icons/feedback.svg";
 import { useUserInfo } from "src/common/queries/auth";
+import { HiddenLabel } from "src/common/styles/accessibility";
 import { ROUTES } from "../../../../common/routes";
 import UserMenu from "./components/UserMenu";
 import {
-  HiddenLabel,
   StyledDiv,
   StyledIconWrapper,
   StyledLink,

@@ -1,6 +1,7 @@
 // includes shared styles for icons
 import styled from "@emotion/styled";
 import { ButtonIcon, CommonThemeProps, getColors, getSpaces } from "czifui";
+import { accessibleFocusBorder } from "./accessibility";
 
 export const iconFillBlack = (): string => {
   return `
@@ -84,10 +85,7 @@ export const rightMarginXxs = (props: CommonThemeProps): string => {
 // Dialog Icon styles
 export const StyledCloseIconButton = styled(ButtonIcon)`
   float: right;
-  &:focus {
-    outline: 5px auto Highlight;
-    outline: 5px auto -webkit-focus-ring-color;
-  }
+  ${accessibleFocusBorder}
 `;
 
 export const StyledCloseIconWrapper = styled.div`
