@@ -310,3 +310,4 @@ static
 # Next.js
 .next
 /src/frontend/playwright/storage/
+.env*

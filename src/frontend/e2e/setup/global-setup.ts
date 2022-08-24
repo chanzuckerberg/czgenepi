@@ -1,5 +1,7 @@
-import { chromium, FullConfig, request } from "@playwright/test";
+import { chromium, FullConfig } from "@playwright/test";
 import { getByID, getByTestID } from "../utils/selectors";
+import { find } from "lodash";
+
 const fs = require("fs");
 
 const username = process.env.USERNAME ?? "";
@@ -7,7 +9,7 @@ const password = process.env.PASSWORD ?? "";
 
 async function globalSetup(config: FullConfig): Promise<void> {
   const { storageState } = config.projects[0].use;
-  const storageCookie = "e2e/storage/cookie.json";
+  const storageCookie = "e2e/storage/cookies.json";
   const { baseURL } = config.projects[0].use;
   const browser = await chromium.launch();
 
@@ -20,8 +22,18 @@ async function globalSetup(config: FullConfig): Promise<void> {
   await page.context().storageState({ path: storageState as string });
 
   const cookies = await page.context().cookies();
-  const cookieJson = JSON.stringify(cookies);
-  fs.writeFileSync(storageCookie, cookieJson);
+  const cookieString = JSON.stringify(cookies);
+  const cookieJson = JSON.parse(cookieString) as Array<any>;
+  const cookie = cookieJson.find((item) => item["name"] == "session");
+  process.env.COOKIE = cookie.value;
+
+  //intercept get user details request
+  await page.route("**/v2/users/me", async (route) => {
+    await page.request.fetch(route.request()).then((b) => {
+      const data = JSON.parse(b.toString());
+      process.env.GROUPID = data.group.id;
+    });
+  });
   await browser.close();
 }
 export default globalSetup;

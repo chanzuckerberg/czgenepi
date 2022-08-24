@@ -19,7 +19,11 @@ test.describe("Samples page tests", () => {
     console.log(`Running ${testInfo.title}`);
     await page.goto("https://staging.czgenepi.org/data/samples");
   });
-  test("Should verify sample listing", async ({ page }: { page: Page }) => {
+  test.skip("Should verify sample listing", async ({
+    page,
+  }: {
+    page: Page;
+  }) => {
     tableHeaders.forEach((header) => {
       expect(page.locator(getByText(header)).first()).not.toBeEmpty();
     });
@@ -28,11 +32,13 @@ test.describe("Samples page tests", () => {
     );
   });
 
-  test("Should verify sample data", async ({page,}: { page: Page }) => {
+  test.skip("Should verify sample data", async ({ page }: { page: Page }) => {
     //wait until data is displayed
-    await page.waitForSelector('[data-test-id="table-row"]')
-    
+    await page.waitForSelector('[data-test-id="table-row"]');
+
     // assert table is populated with at least one record
-    expect((await page.locator(getByTestID("table-row")).count())).toBeGreaterThan(0)
+    expect(
+      await page.locator(getByTestID("table-row")).count()
+    ).toBeGreaterThan(0);
   });
 });
