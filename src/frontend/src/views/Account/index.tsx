@@ -123,7 +123,13 @@ export default function Account(): JSX.Element {
             samples for GISAID submission.
             <span>
               &nbsp;
-              <Link>Learn More.</Link>
+              <Link
+                href="https://help.czgenepi.org/hc/en-us/articles/8179880474260-Download-data-and-upload-it-into-the-GISAID-data-repository"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Learn More.
+              </Link>
             </span>
           </P>
         </StyledRow>
