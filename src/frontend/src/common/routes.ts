@@ -28,3 +28,9 @@ export enum ROUTES {
   UPLOAD_STEP3 = "/upload/3",
   USHER = "https://genome.ucsc.edu/cgi-bin/hgPhyloPlace",
 }
+
+export const publicPaths: string[] = [
+  ROUTES.HOMEPAGE,
+  ROUTES.PRIVACY,
+  ROUTES.TERMS,
+];
