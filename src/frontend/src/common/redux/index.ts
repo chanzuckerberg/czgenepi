@@ -1,10 +1,15 @@
 import { AnyAction, applyMiddleware, createStore } from "redux";
 import { composeWithDevTools } from "redux-devtools-extension";
-import { getLocalStorage } from "../utils/localStorage";
 import { setGroupMiddleware, setPathogenMiddleware } from "./middleware";
-import { CZGEReduxActions, Pathogen, ReduxPersistenceTokens } from "./types";
-import { ensureValidGroup } from "./utils/groupUtils";
-import { ensureValidPathogen } from "./utils/pathogenUtils";
+import { CZGEReduxActions, Pathogen } from "./types";
+import {
+  ensureValidGroup,
+  getGroupIdFromLocalStorage,
+} from "./utils/groupUtils";
+import {
+  ensureValidPathogen,
+  getPathogenFromLocalStorage,
+} from "./utils/pathogenUtils";
 
 /**
  * A note about how our redux store is initialized ...
@@ -28,16 +33,8 @@ export const FALLBACK_GROUP_ID = -1;
 
 // first, load state from localstorage if any exists and use it to initialize redux
 const getInitialState = () => {
-  const storedGroupStr = getLocalStorage(ReduxPersistenceTokens.GROUP);
-  const storedGroup = storedGroupStr
-    ? parseInt(storedGroupStr)
-    : FALLBACK_GROUP_ID;
-
-  const storedPathogenStr = getLocalStorage(ReduxPersistenceTokens.PATHOGEN);
-  const storedPathogen =
-    storedPathogenStr && storedPathogenStr in Pathogen
-      ? storedPathogenStr
-      : null;
+  const storedGroup = getGroupIdFromLocalStorage() ?? FALLBACK_GROUP_ID;
+  const storedPathogen = getPathogenFromLocalStorage() ?? null;
 
   return {
     current: {

@@ -31,3 +31,10 @@ export const getIsGroupAdminFromUserInfo = (userInfo?: User): boolean => {
   const roles: GroupRole[] = currentGroup?.roles ?? [];
   return roles.includes("admin");
 };
+
+/**
+ * Determines whether or not a user has permission to view the given group
+ */
+export const canUserViewGroup = (userInfo?: User, groupId: number): boolean => {
+  return getUserGroupInfoByGroupId(userInfo, groupId) ? true : false;
+};
