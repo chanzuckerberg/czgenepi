@@ -1,5 +1,4 @@
-import { Table as MuiTable, TableBody, TableHead } from "@material-ui/core";
-import React from "react";
+import { Table as MuiTable, TableBody, TableHead } from "@mui/material";
 import { SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS } from "src/components/DownloadMetadataTemplate/common/constants";
 import { Metadata } from "src/components/WebformTable/common/types";
 import {
@@ -39,7 +38,9 @@ export default function UploadTable({
   return (
     <MuiTable component="div" stickyHeader>
       <TableHead component="div">
-        <StyledTableRow {...({ component: "div" } as Record<string, unknown>)}>
+        {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+        {/* @ts-ignore: spread types error */}
+        <StyledTableRow {...({ component: "div" } as unknown)}>
           <StyledTableCell component="div">
             <IdColumn>
               {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sampleId}

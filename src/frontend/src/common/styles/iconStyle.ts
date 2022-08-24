@@ -1,6 +1,6 @@
 // includes shared styles for icons
 import styled from "@emotion/styled";
-import { CommonThemeProps, getColors, getSpaces, IconButton } from "czifui";
+import { ButtonIcon, CommonThemeProps, getColors, getSpaces } from "czifui";
 
 export const iconFillBlack = (): string => {
   return `
@@ -24,6 +24,15 @@ export const iconFillGray = (props: CommonThemeProps): string => {
   return `
     svg {
       fill: ${colors?.gray[500]};
+    }
+  `;
+};
+
+export const iconFillGray400 = (props: CommonThemeProps): string => {
+  const colors = getColors(props);
+  return `
+    svg {
+      fill: ${colors?.gray[400]};
     }
   `;
 };
@@ -73,8 +82,12 @@ export const rightMarginXxs = (props: CommonThemeProps): string => {
 };
 
 // Dialog Icon styles
-export const StyledCloseIconButton = styled(IconButton)`
+export const StyledCloseIconButton = styled(ButtonIcon)`
   float: right;
+  &:focus {
+    outline: 5px auto Highlight;
+    outline: 5px auto -webkit-focus-ring-color;
+  }
 `;
 
 export const StyledCloseIconWrapper = styled.div`

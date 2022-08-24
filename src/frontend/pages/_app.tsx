@@ -1,10 +1,11 @@
-import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
-import { StylesProvider, ThemeProvider } from "@material-ui/core/styles";
+import { CacheProvider, EmotionCache } from "@emotion/react";
+import CssBaseline from "@mui/material/CssBaseline";
+import { ThemeProvider } from "@mui/material/styles";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { AppProps } from "next/app";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useEffect } from "react";
-import { QueryClientProvider } from "react-query";
+import { useEffect } from "react";
 import { Provider } from "react-redux";
 import { analyticsRecordRouteChange } from "src/common/analytics/methods";
 import { OneTrustInitializer } from "src/common/analytics/OneTrustInitializer";
@@ -19,10 +20,22 @@ import { theme } from "src/common/styles/theme";
 import { setFeatureFlagsFromQueryParams } from "src/common/utils/featureFlags";
 import Nav from "src/components/NavBar";
 import SplitInitializer from "src/components/Split";
+import createEmotionCache from "src/createEmotionCache";
 
 setFeatureFlagsFromQueryParams();
 
-const App = ({ Component, pageProps }: AppProps): JSX.Element => {
+// Client-side cache, shared for the whole session of the user in the browser.
+const clientSideEmotionCache = createEmotionCache();
+
+interface MyAppProps extends AppProps {
+  emotionCache?: EmotionCache;
+}
+
+const App = ({
+  Component,
+  emotionCache = clientSideEmotionCache,
+  pageProps,
+}: MyAppProps): JSX.Element => {
   // (thuang): MUI related SSR setup
   // https://material-ui.com/guides/server-rendering/
   useEffect(() => {
@@ -60,29 +73,28 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
 
   return (
     <Provider store={store}>
-      <Head>
-        <meta
-          name="viewport"
-          content="minimum-scale=1, initial-scale=1, width=device-width"
-        />
-      </Head>
-      <PlausibleInitializer />
-      <QueryClientProvider client={queryClient}>
-        <OneTrustInitializer />
-        <SegmentInitializer />
-        <SplitInitializer>
-          <StylesProvider injectFirst>
+      <CacheProvider value={emotionCache}>
+        <Head>
+          <meta
+            name="viewport"
+            content="minimum-scale=1, initial-scale=1, width=device-width"
+          />
+        </Head>
+        <PlausibleInitializer />
+        <QueryClientProvider client={queryClient}>
+          <OneTrustInitializer />
+          <SegmentInitializer />
+          <SplitInitializer>
             <ThemeProvider theme={theme}>
-              <EmotionThemeProvider theme={theme}>
-                <StyledApp>
-                  <Nav />
-                  <Component {...pageProps} />
-                </StyledApp>
-              </EmotionThemeProvider>
+              <CssBaseline />
+              <StyledApp>
+                <Nav />
+                <Component {...pageProps} />
+              </StyledApp>
             </ThemeProvider>
-          </StylesProvider>
-        </SplitInitializer>
-      </QueryClientProvider>
+          </SplitInitializer>
+        </QueryClientProvider>
+      </CacheProvider>
     </Provider>
   );
 };

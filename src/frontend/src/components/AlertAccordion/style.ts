@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
-import { Collapse } from "@material-ui/core";
-import { Callout, getSpaces } from "czifui";
+import { Collapse } from "@mui/material";
+import { Callout, CommonThemeProps, getSpaces } from "czifui";
 import { transparentScrollbars } from "src/common/styles/basicStyle";
 
 export const RowFlexContainer = styled.div`
@@ -39,7 +39,7 @@ export const StyledCallout = styled(Callout)`
 `;
 
 export const StyledCollapse = styled(Collapse)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       .MuiCollapse-wrapper {

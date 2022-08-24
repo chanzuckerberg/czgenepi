@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { getColors, getSpaces } from "czifui";
+import { CommonThemeProps, getColors, getSpaces } from "czifui";
 
 export const StyledCell = styled.span`
   display: flex;
@@ -12,7 +12,7 @@ export const StyledCell = styled.span`
     transform: scale(1.33);
   }
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
 

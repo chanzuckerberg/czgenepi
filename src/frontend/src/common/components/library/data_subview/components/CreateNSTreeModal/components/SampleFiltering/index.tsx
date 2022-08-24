@@ -1,9 +1,7 @@
-import { PopperProps } from "@material-ui/core";
-import { FilterOptionsState } from "@material-ui/lab";
-import { createFilterOptions } from "@material-ui/lab/Autocomplete";
+import { FilterOptionsState, PopperProps } from "@mui/material";
+import { createFilterOptions } from "@mui/material/Autocomplete";
 import { DefaultMenuSelectOption, Icon } from "czifui";
 import { isEqual } from "lodash";
-import React from "react";
 import { noop } from "src/common/constants/empty";
 import {
   MENU_OPTIONS_COLLECTION_DATE,
@@ -79,8 +77,9 @@ function filterLineageOptions(
   // Cap the actual search results returned to keep render speed sane.
   return [...addlPrependResults, ...baseFilteredResults.slice(0, 99)];
 }
-// `Dropdown` doesn't directly handle above, it's done by its child MenuSelect
-const lineageMenuSelectProps = {
+// `Dropdown` doesn't directly handle above, it's done by its child MenuSelect.
+// This prop was renamed to DropdownMenuProps
+const lineageDropdownMenuProps = {
   getOptionSelected,
   filterOptions: filterLineageOptions,
 };
@@ -227,7 +226,10 @@ export function SampleFiltering({
    * refactor -- the above interactions cause a lot of edge cases.
    */
   function handleLineageDropdownChange(
-    newSelectedOptions: DefaultMenuSelectOption[] | null
+    newSelectedOptions:
+      | DefaultMenuSelectOption
+      | DefaultMenuSelectOption[]
+      | null
   ): void {
     // No selection at all means empty all lineage choices.
     // (Vince) Poked around: I don't think Dropdown emits this in our case?
@@ -237,7 +239,19 @@ export function SampleFiltering({
       return;
     }
 
-    const newSelectedLineages = newSelectedOptions.map((option) => option.name);
+    // czifui v 7.0.0 upgrade - now newSelectOptions can be a single option
+    // (at least according to typescript).
+    // To keep this consistent, check for the single option and return a list
+    // with jus the one option. It's unclear if this will happen when multi-
+    // select is enabled.
+    if (!Array.isArray(newSelectedOptions)) {
+      setSelectedLineages([newSelectedOptions.name]);
+      return;
+    }
+
+    const newSelectedLineages = newSelectedOptions.map(
+      (option: DefaultMenuSelectOption) => option.name
+    );
     // What we actually emit as selection does not always match user selected.
     let emittedSelection: string[];
 
@@ -304,7 +318,7 @@ export function SampleFiltering({
             value={lineageDropdownValue}
             multiple
             search
-            MenuSelectProps={lineageMenuSelectProps}
+            DropdownMenuProps={lineageDropdownMenuProps}
             InputDropdownProps={InputDropdownProps}
             PopperComponent={BottomPlacementDropdownPopper}
           />

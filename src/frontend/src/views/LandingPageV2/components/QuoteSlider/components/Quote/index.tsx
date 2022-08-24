@@ -1,4 +1,3 @@
-import React from "react";
 import QuoteIconImg from "src/common/images/quote-icon.svg";
 import { Citation, QuoteContainer, QuoteIcon, QuoteText } from "./style";
 

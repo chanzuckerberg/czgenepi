@@ -1,12 +1,18 @@
 import styled from "@emotion/styled";
-import { Dropdown, getBorders, getColors, getSpaces } from "czifui";
+import {
+  CommonThemeProps,
+  Dropdown,
+  getBorders,
+  getColors,
+  getSpaces,
+} from "czifui";
 import {
   doNotForwardProps,
   FormFieldProps,
 } from "src/components/DateField/style";
 
 export const StyledDiv = styled("div")`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       padding-right: ${spaces?.l}px;
@@ -26,8 +32,15 @@ export const StyledDropdown = styled(Dropdown, {
     return `
       padding-right: ${spaces?.l}px;
       background-color: ${isBackgroundColorShown && colors?.primary[200]};
+      border: ${borders?.gray[300]};
+      path {
+        fill: ${colors?.gray[300]};
+      }
       &:hover {
-        border: ${borders?.gray[500]}
+        border: ${borders?.gray[500]};
+        path {
+          fill: ${colors?.gray[600]}; 
+        }
       }
     `;
   }}

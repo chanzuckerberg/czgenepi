@@ -1,6 +1,6 @@
 import { Button, Icon } from "czifui";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { HeadAppTitle } from "src/common/components";
 import { ROUTES } from "src/common/routes";
 import AlertAccordion from "src/components/AlertAccordion";

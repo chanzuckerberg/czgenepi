@@ -2,6 +2,7 @@ import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import {
   Button,
+  CommonThemeProps,
   fontBodyS,
   fontBodyXs,
   fontBodyXxxs,
@@ -22,7 +23,7 @@ import { StyledDialogContent as DialogContent } from "../../../CreateNSTreeModal
 const INPUT_HEIGHT = "34px";
 
 export const StyledDialogContent = styled(DialogContent)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       padding-bottom: ${spaces?.xxl}px;
@@ -35,7 +36,7 @@ export const StyledListItem = styled(ListItem)`
     ${fontBodyXs}
   }
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
     return `
@@ -50,7 +51,7 @@ export const StyledListItem = styled(ListItem)`
 `;
 
 export const StyledList = styled(List)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-bottom: ${spaces?.xl}px;
@@ -60,7 +61,7 @@ export const StyledList = styled(List)`
 
 export const StyledSectionHeader = styled.div`
   ${fontHeaderM}
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       color: black;
@@ -75,7 +76,7 @@ export const StyledFieldTitleText = styled.div`
   display: flex;
   align-items: center;
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-bottom: ${spaces?.xs}px;
@@ -84,7 +85,7 @@ export const StyledFieldTitleText = styled.div`
 `;
 
 export const StyledTextField = styled.div`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
@@ -112,7 +113,7 @@ export const FlexWrapper = styled.div`
 export const StyledSuggestionText = styled.div`
   ${fontBodyXxxs}
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
 
@@ -125,7 +126,7 @@ export const StyledSuggestionText = styled.div`
 
 export const StyledSuggestionWrapper = styled.div`
   ${flex}
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-top: ${spaces?.xxs}px;
@@ -134,7 +135,7 @@ export const StyledSuggestionWrapper = styled.div`
 `;
 
 export const StyledButton = styled(Button)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
     return `
@@ -148,7 +149,7 @@ export const StyledButton = styled(Button)`
 `;
 
 export const StyledInputDropdown = styled(InputDropdown)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
@@ -166,7 +167,7 @@ export const StyledInfoIconWrapper = styled.div`
 
 export const Content = styled.div`
   ${fontBodyS}
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     return `
       color: ${colors?.gray[500]};

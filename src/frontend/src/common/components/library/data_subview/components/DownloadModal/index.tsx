@@ -1,18 +1,19 @@
 import { useTreatments } from "@splitsoftware/splitio-react";
 import { Alert, Icon, Link, Tooltip } from "czifui";
 import { isEqual } from "lodash";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { CSVLink } from "react-csv";
 import {
   AnalyticsSamplesDownloadFile,
   EVENT_TYPES,
 } from "src/common/analytics/eventTypes";
 import { analyticsTrackEvent } from "src/common/analytics/methods";
+import { ORG_API } from "src/common/api";
 import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import { useUserInfo } from "src/common/queries/auth";
-import { useFastaDownload } from "src/common/queries/samples";
+import { useFileDownload } from "src/common/queries/samples";
 import { B } from "src/common/styles/basicStyle";
 import {
   StyledCloseIconButton,
@@ -56,20 +57,11 @@ const DownloadModal = ({
   onClose,
 }: Props): JSX.Element => {
   const { data: userInfo } = useUserInfo();
-  const currentGroup = getCurrentGroupFromUserInfo(userInfo);
-  const groupName = currentGroup?.name.toLowerCase().replace(/ /g, "_"); // format group name for sequences download file
-  const downloadDate = new Date();
-  const separator = "\t";
-  const fastaDownloadName = `${groupName}_sample_sequences_${downloadDate
-    .toISOString()
-    .slice(0, 10)}.fasta`;
-  const metadataDownloadName = `${groupName}_sample_metadata_${downloadDate
-    .toISOString()
-    .slice(0, 10)}.tsv`;
+
   const [tsvRows, setTsvRows] = useState<string[][]>([]);
   const [tsvHeaders, setTsvHeaders] = useState<string[]>([]);
   const [anchorEl, setAnchorEl] = useState<HTMLElement>();
-  const tooltipRef = useCallback((node) => setAnchorEl(node), []);
+  const tooltipRef = useCallback((node: HTMLElement) => setAnchorEl(node), []);
 
   const [isFastaDisabled, setFastaDisabled] = useState<boolean>(false);
   const [isFastaSelected, setFastaSelected] = useState<boolean>(false);
@@ -116,23 +108,42 @@ const DownloadModal = ({
   const handleCloseModal = () => {
     setFastaSelected(false);
     setMetadataSelected(false);
+    setGenbankSelected(false);
+    setGisaidSelected(false);
     onClose();
   };
 
-  const fastaDownloadMutation = useFastaDownload({
-    componentOnError: () => {
-      setShouldShowError(true);
-      handleCloseModal();
-    },
-    componentOnSuccess: (data: Blob) => {
-      const link = document.createElement("a");
-      link.href = window.URL.createObjectURL(data);
-      link.download = fastaDownloadName;
-      link.click();
-      link.remove();
-      handleCloseModal();
-    },
-  });
+  // format file names for download files
+  const currentGroup = getCurrentGroupFromUserInfo(userInfo);
+  const groupName = currentGroup?.name.toLowerCase().replace(/ /g, "_");
+  const downloadDate = new Date().toISOString().slice(0, 10);
+  const separator = "\t";
+  const fastaDownloadName = `${groupName}_sample_sequences_${downloadDate}.fasta`;
+  const metadataDownloadName = `${groupName}_sample_metadata_${downloadDate}.tsv`;
+  // TODO (mlila): may need to modify gisaid/genbank filenames slightly for multi-file download
+  const gisaidDownloadName = `${groupName}_template_gisaid_${downloadDate}.txt`;
+  const genbankDownloadName = `${groupName}_template_genbank_${downloadDate}.tsv`;
+
+  const useFileMutationGenerator = (downloadFileName: string) =>
+    useFileDownload({
+      componentOnError: () => {
+        setShouldShowError(true);
+        handleCloseModal();
+      },
+      componentOnSuccess: (data: Blob) => {
+        // TODO (mlila): may need to modify behavior here for gisaid/genbank multi-file download
+        const link = document.createElement("a");
+        link.href = window.URL.createObjectURL(data);
+        link.download = downloadFileName;
+        link.click();
+        link.remove();
+        handleCloseModal();
+      },
+    });
+
+  const fastaDownloadMutation = useFileMutationGenerator(fastaDownloadName);
+  const gisaidDownloadMutation = useFileMutationGenerator(gisaidDownloadName);
+  const genbankDownloadMutation = useFileMutationGenerator(genbankDownloadName);
 
   const FASTA_DISABLED_TOOLTIP_TEXT = (
     <div>
@@ -160,12 +171,7 @@ const DownloadModal = ({
         </B>{" "}
         <ContactUsLink />
       </Notification>
-      <Dialog
-        disableEscapeKeyDown
-        disableBackdropClick
-        open={open}
-        onClose={handleCloseModal}
-      >
+      <Dialog disableEscapeKeyDown open={open} onClose={handleCloseModal}>
         <DialogTitle>
           <StyledCloseIconButton
             aria-label="close download modal"
@@ -249,8 +255,11 @@ const DownloadModal = ({
                     <DownloadTypeInfo>
                       Download concatenated consensus genomes and metadata files
                       formatted to prepare samples for submission to GISAID.{" "}
-                      {/* TODO: (194961) - update href */}
-                      <Link href="" target="_blank" rel="noreferrer">
+                      <Link
+                        href="https://help.czgenepi.org/hc/en-us/articles/8179880474260"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
                         Learn More.
                       </Link>
                     </DownloadTypeInfo>
@@ -272,8 +281,11 @@ const DownloadModal = ({
                     <DownloadTypeInfo>
                       Download concatenated consensus genomes and metadata files
                       formatted to prepare samples for submission to Genbank.{" "}
-                      {/* TODO: (194962) - update href */}
-                      <Link href="" target="_blank" rel="noreferrer">
+                      <Link
+                        href="https://help.czgenepi.org/hc/en-us/articles/8179961027604"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
                         Learn More.
                       </Link>
                     </DownloadTypeInfo>
@@ -324,27 +336,50 @@ const DownloadModal = ({
     analyticsTrackEvent<AnalyticsSamplesDownloadFile>(
       EVENT_TYPES.SAMPLES_DOWNLOAD_FILE,
       {
+        includes_consensus_genome: isFastaSelected,
+        includes_genbank_template: isGenbankSelected,
+        includes_gisaid_template: isGisaidSelected,
+        includes_sample_metadata: isMetadataSelected,
         sample_count: checkedSampleIds.length,
         sample_public_ids: JSON.stringify(checkedSampleIds),
-        includes_consensus_genome: isFastaSelected,
-        includes_sample_metadata: isMetadataSelected,
       }
     );
   }
 
-  // TODO:(194961) update for GISAID template download
-  // TODO:(194962) update for GenBank template download
   function getDownloadButton(): JSX.Element | undefined {
     // button will have different functionality depending on download type selected
 
-    const isButtonDisabled = !isFastaSelected && !isMetadataSelected;
-    const downloadFasta = () => {
-      fastaDownloadMutation.mutate({ sampleIds: checkedSampleIds });
-      // Analytics: When fasta download happens, kick off download event.
+    const isButtonDisabled = !(
+      isFastaSelected ||
+      isMetadataSelected ||
+      isGisaidSelected ||
+      isGenbankSelected
+    );
+
+    const onClick = () => {
+      if (isFastaSelected) {
+        fastaDownloadMutation.mutate({
+          sampleIds: checkedSampleIds,
+          endpoint: ORG_API.SAMPLES_FASTA_DOWNLOAD,
+        });
+      }
+
+      if (isGisaidSelected) {
+        gisaidDownloadMutation.mutate({
+          sampleIds: checkedSampleIds,
+          endpoint: ORG_API.SAMPLES_GISAID_DOWNLOAD,
+        });
+      }
+
+      if (isGenbankSelected) {
+        genbankDownloadMutation.mutate({
+          sampleIds: checkedSampleIds,
+          endpoint: ORG_API.SAMPLES_GENBANK_DOWNLOAD,
+        });
+      }
+
       analyticsHandleDownload();
     };
-    // Analytics: If downloading fasta is not happening, still fire event.
-    const onClick = isFastaSelected ? downloadFasta : analyticsHandleDownload;
 
     const downloadButton = (
       <StyledButton

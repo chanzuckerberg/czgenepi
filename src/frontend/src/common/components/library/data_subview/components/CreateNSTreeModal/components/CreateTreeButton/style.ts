@@ -1,10 +1,10 @@
 import styled from "@emotion/styled";
-import { Button, getColors } from "czifui";
+import { Button, CommonThemeProps, getColors } from "czifui";
 
 export const StyledButton = styled(Button)`
   margin-top: 0;
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     return `
       &:active {

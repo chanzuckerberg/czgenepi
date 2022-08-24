@@ -1,6 +1,6 @@
 import { Button, Icon } from "czifui";
 import { isEmpty } from "lodash";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
@@ -149,11 +149,11 @@ const EditSamplesConfirmationModal = ({
   };
 
   const updateChangedMetadata = useCallback(
-    (id, sampleMetadata) => {
+    (id: string, sampleMetadata: Metadata) => {
       // get all current metadata properties for a sample, if metadata is undefined return empty object
       const currentMetadata = getMetadataEntryOrEmpty(metadata, id);
       // combine current metadata with any new metadata requests from user
-      const combinedMetadata: string | boolean | NamedGisaidLocation = {
+      const combinedMetadata: Partial<SampleEditMetadataWebform> = {
         ...currentMetadata,
         ...sampleMetadata,
       };
@@ -276,7 +276,6 @@ const EditSamplesConfirmationModal = ({
   return (
     <>
       <Dialog
-        disableBackdropClick
         // Dialogs and modals automatically focus themselves if some other element tries to steal the focus while they are open
         // We need disableEnforceFocus to allow the collectionLocation DropdownPopper component to work properly
         disableEnforceFocus

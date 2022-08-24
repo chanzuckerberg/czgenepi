@@ -36,7 +36,7 @@ export const FullWidthContainer = styled.div`
 export const CappedHeightScrollableContainer = styled.div`
   max-height: 200px;
   overflow-y: auto;
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-top: ${spaces?.m}px;

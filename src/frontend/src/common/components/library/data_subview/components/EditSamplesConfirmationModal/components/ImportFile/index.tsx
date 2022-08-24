@@ -1,5 +1,5 @@
 import { isEmpty, pick } from "lodash";
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { createStringToLocationFinder } from "src/common/utils/locationUtils";
 import FilePicker from "src/components/FilePicker";

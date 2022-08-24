@@ -1,5 +1,6 @@
-import { Link } from "czifui";
-import React from "react";
+import { Icon, Link, Tooltip } from "czifui";
+import { B } from "src/common/styles/basicStyle";
+import { stringifyGisaidLocation } from "src/common/utils/locationUtils";
 import {
   Content,
   DetailDisplay,
@@ -8,22 +9,32 @@ import {
   DetailSection,
   DetailSubheader,
   StyledCallout,
+  StyledInfoIconWrapper,
   Text,
 } from "./style";
 
 interface Props {
-  address?: string;
-  location?: string;
-  prefix?: string;
+  group?: GroupDetails;
   shouldShowChangeDetailsCallout: boolean;
 }
 
 const GroupDetailsTab = ({
-  address,
-  location,
-  prefix,
+  group,
   shouldShowChangeDetailsCallout,
-}: Props): JSX.Element => {
+}: Props): JSX.Element | null => {
+  if (!group) return null;
+
+  const { address, name, prefix, location } = group;
+  const displayLocation = stringifyGisaidLocation(location);
+
+  const InfoTooltip = ({ title }: { title: string }) => (
+    <Tooltip arrow title={title} placement="top">
+      <StyledInfoIconWrapper>
+        <Icon sdsIcon="infoCircle" sdsSize="s" sdsType="interactive" />
+      </StyledInfoIconWrapper>
+    </Tooltip>
+  );
+
   return (
     <DetailPage>
       {shouldShowChangeDetailsCallout && (
@@ -35,31 +46,38 @@ const GroupDetailsTab = ({
           to add or update your group’s details.
         </StyledCallout>
       )}
-      <DetailHeader>Group Details</DetailHeader>
       <Content>
         <DetailSection>
-          <DetailSubheader>Default Location for Trees</DetailSubheader>
+          <DetailHeader>General</DetailHeader>
           <Text>
-            Group’s full Nextstrain location ID. CZ GEN EPI uses this as the
-            default location parameters when building trees for this group.
-            Learn More.
+            The information in this section is used to support CZ GEN EPI
+            functionality.
           </Text>
-          <DetailDisplay>{location}</DetailDisplay>
-          <DetailSubheader>Address</DetailSubheader>
-          <Text>
-            Group’s primary address. CZ GEN EPI uses this information to help
-            prepare samples for GISAID submisions. Learn More.
-          </Text>
-          <DetailDisplay>{address}</DetailDisplay>
+          <DetailSubheader>
+            Default Location for Trees
+            <InfoTooltip title="Group’s full Nextstrain location ID. CZ GEN EPI uses this as the default location parameters when building trees for this group." />
+          </DetailSubheader>
+          <DetailDisplay>{displayLocation}</DetailDisplay>
+          <DetailSubheader>
+            Sample Public ID Prefix
+            <InfoTooltip title="Set of characters used when auto-generating unique Public IDs for samples uploaded to this Group if a Public or GISAID ID is not provided." />
+          </DetailSubheader>
+          <DetailDisplay>{prefix}</DetailDisplay>
         </DetailSection>
         <DetailSection>
-          <DetailSubheader>Sample Public ID Prefix</DetailSubheader>
+          <DetailHeader>GISAID Submission Details</DetailHeader>
           <Text>
-            This set of characters is used when auto-generating unique Public
-            IDs for samples uploaded to this Group if a Public or GISAID ID is
-            not provided. Learn More.
+            The information in this section is used to pre-fill metadata in CZ
+            GEN EPI’s GISAID sample submission template.
           </Text>
-          <DetailDisplay>{prefix}</DetailDisplay>
+          <DetailSubheader>
+            Submitting Lab
+            <InfoTooltip title="Where sequence data have been generated and submitted to GISAID." />
+          </DetailSubheader>
+          <DetailDisplay>
+            <B>{name}</B>
+            <div>{address}</div>
+          </DetailDisplay>
         </DetailSection>
       </Content>
     </DetailPage>

@@ -14,6 +14,7 @@ module.exports = {
     "prettier",
     "plugin:prettier/recommended",
     "plugin:react-hooks/recommended",
+    "plugin:react/jsx-runtime",
   ],
   overrides: [
     // Override some TypeScript rules just for .js files
@@ -52,7 +53,7 @@ module.exports = {
         natural: false,
       },
     ],
-    'prettier/prettier': 0,
+    "prettier/prettier": 0,
   },
   settings: {
     react: {

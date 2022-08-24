@@ -15,7 +15,6 @@ const SCRIPT_SRC = [
 
 module.exports = {
   distDir: ENV.BUILD_PATH,
-  fileExtensions: ["jpg", "jpeg", "png", "gif", "ico", "webp", "jp2", "avif"],
 
   async generateBuildId() {
     // Return null to allow next.js to fallback to default behavior

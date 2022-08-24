@@ -1,4 +1,3 @@
-import React from "react";
 import { Table } from "src/common/components/library/Table";
 import { PersonIconCell } from "../PersonIconCell";
 import { Wrapper } from "./style";

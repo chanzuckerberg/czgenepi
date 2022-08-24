@@ -1,6 +1,5 @@
 import { Icon } from "czifui";
 import { useRouter } from "next/router";
-import React from "react";
 import { useUserInfo } from "src/common/queries/auth";
 import { useGroupInfo, useGroupMembersInfo } from "src/common/queries/groups";
 import { useSelector } from "src/common/redux/hooks";
@@ -57,7 +56,6 @@ const GroupDetailsDropdown = ({
     <Dropdown
       open
       anchorEl={anchorEl}
-      getContentAnchorEl={null}
       anchorOrigin={{
         vertical: "bottom",
         horizontal: "left",

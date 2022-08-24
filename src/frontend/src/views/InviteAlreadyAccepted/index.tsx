@@ -1,4 +1,3 @@
-import React from "react";
 import { HeadAppTitle } from "src/common/components";
 import { AuthenticationError } from "src/components/AuthenticationError";
 

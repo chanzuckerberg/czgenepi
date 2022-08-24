@@ -4,7 +4,7 @@ import {
   useQuery,
   useQueryClient,
   UseQueryResult,
-} from "react-query";
+} from "@tanstack/react-query";
 import { SampleIdToMetadata } from "src/components/WebformTable/common/types";
 import { METADATA_KEYS_TO_API_KEYS } from "src/views/Upload/components/common/constants";
 import { Samples } from "src/views/Upload/components/common/types";
@@ -24,42 +24,43 @@ import { MutationCallbacks } from "./types";
 /**
  * Download fasta file for samples
  */
-interface SampleFastaDownloadPayload {
+
+type FileDownloadEndpointType =
+  | ORG_API.SAMPLES_FASTA_DOWNLOAD
+  | ORG_API.SAMPLES_GENBANK_DOWNLOAD
+  | ORG_API.SAMPLES_GISAID_DOWNLOAD;
+interface SampleFileDownloadType {
+  endpoint: FileDownloadEndpointType;
   sampleIds: string[];
 }
+type FileDownloadCallbacks = MutationCallbacks<Blob>;
 
-type FastaDownloadCallbacks = MutationCallbacks<Blob>;
-
-export async function downloadSamplesFasta({
+export async function downloadSamplesFile({
+  endpoint,
   sampleIds,
-}: {
-  sampleIds: string[];
-}): Promise<Blob> {
+}: SampleFileDownloadType): Promise<Blob> {
   const payload = {
     sample_ids: sampleIds,
   };
-  const response = await fetch(
-    API_URL + generateOrgSpecificUrl(ORG_API.SAMPLES_FASTA_DOWNLOAD),
-    {
-      ...DEFAULT_POST_OPTIONS,
-      body: JSON.stringify(payload),
-    }
-  );
+  const response = await fetch(API_URL + generateOrgSpecificUrl(endpoint), {
+    ...DEFAULT_POST_OPTIONS,
+    body: JSON.stringify(payload),
+  });
   if (response.ok) return await response.blob();
 
   throw Error(`${response.statusText}: ${await response.text()}`);
 }
 
-export function useFastaDownload({
+export function useFileDownload({
   componentOnError,
   componentOnSuccess,
-}: FastaDownloadCallbacks): UseMutationResult<
+}: FileDownloadCallbacks): UseMutationResult<
   Blob,
   unknown,
-  SampleFastaDownloadPayload,
+  SampleFileDownloadType,
   unknown
 > {
-  return useMutation(downloadSamplesFasta, {
+  return useMutation(downloadSamplesFile, {
     onError: componentOnError,
     onSuccess: componentOnSuccess,
   });

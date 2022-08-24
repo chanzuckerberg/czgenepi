@@ -1,9 +1,16 @@
 import styled from "@emotion/styled";
-import { Button, Callout, fontBodyXs, getColors, getSpaces } from "czifui";
+import {
+  Button,
+  Callout,
+  CommonThemeProps,
+  fontBodyXs,
+  getColors,
+  getSpaces,
+} from "czifui";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 
 export const StyledButton = styled(Button)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-right: ${spaces?.m}px;
@@ -12,7 +19,7 @@ export const StyledButton = styled(Button)`
 `;
 
 export const CalloutContainer = styled.div`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-top: ${spaces?.xl}px;
@@ -27,7 +34,7 @@ export const StyledCallout = styled(Callout)`
 
 export const StyledCollapseContent = styled.div`
   ${fontBodyXs}
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
@@ -39,7 +46,7 @@ export const StyledCollapseContent = styled.div`
 
 export const CheckboxWrapper = styled.div`
   ${fontBodyXs}
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     return `
       color: ${colors?.gray[600]};

@@ -1,5 +1,10 @@
 import styled from "@emotion/styled";
-import { fontBodyXs, getFontWeights, getSpaces } from "czifui";
+import {
+  CommonThemeProps,
+  fontBodyXs,
+  getFontWeights,
+  getSpaces,
+} from "czifui";
 import { ZebraStripes } from "src/common/styles/mixins/global";
 
 export const StyledList = styled.ul`
@@ -14,7 +19,7 @@ export const StyledListItem = styled.li`
   ${fontBodyXs}
   list-style-type: none;
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
@@ -24,7 +29,7 @@ export const StyledListItem = styled.li`
 `;
 
 export const SemiBold = styled.span`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const fontWeights = getFontWeights(props);
     return `
       font-weight: ${fontWeights?.semibold};

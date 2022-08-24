@@ -1,4 +1,3 @@
-import React from "react";
 import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
@@ -32,8 +31,8 @@ export default function BaseDialog({
 }: BaseDialogProps): JSX.Element {
   return (
     <Dialog
+      disableEscapeKeyDown={disableBackdropClick}
       disableBackdropClick={disableBackdropClick}
-      disableEscapeKeyDown
       open={open}
       onClose={onClose}
     >

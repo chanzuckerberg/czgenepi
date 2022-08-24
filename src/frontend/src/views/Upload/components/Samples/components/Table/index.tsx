@@ -1,5 +1,5 @@
-import { Table as MuiTable, TableBody, TableRow } from "@material-ui/core";
-import React, { useEffect, useState } from "react";
+import { Table as MuiTable, TableBody, TableRow } from "@mui/material";
+import { useEffect, useState } from "react";
 import { SAMPLE_COUNT } from "../../../common/constants";
 import { Samples } from "../../../common/types";
 import {
@@ -45,7 +45,9 @@ export default function Table({ samples }: Props): JSX.Element {
     <Overflow>
       <StyledTableContainer>
         <MuiTable aria-label="simple table" component="div">
-          <StyledTableHead {...({ component: "div" } as Record<string, unknown>)}>
+          {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+          {/* @ts-ignore: spread types error */}
+          <StyledTableHead {...({ component: "div" } as unknown)}>
             <TableRow component="div">
               <StyledHeaderTableCell component="div">
                 Sample Name (from FASTA)

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import React from "react";
 import { useUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "../../../../common/routes";
 import UserMenu from "./components/UserMenu";
