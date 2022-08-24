@@ -23,9 +23,9 @@ export enum ROUTES {
   RESOURCES = "https://help.czgenepi.org/hc/en-us/categories/6217716150804-Genomic-Epidemiology-Learning-Center",
   TERMS = "/terms",
   UPLOAD = "/upload",
-  UPLOAD_STEP1 = "/upload/1",
-  UPLOAD_STEP2 = "/upload/2",
-  UPLOAD_STEP3 = "/upload/3",
+  UPLOAD_STEP1 = "/upload/step1",
+  UPLOAD_STEP2 = "/upload/step2",
+  UPLOAD_STEP3 = "/upload/step3",
   USHER = "https://genome.ucsc.edu/cgi-bin/hgPhyloPlace",
 }
 

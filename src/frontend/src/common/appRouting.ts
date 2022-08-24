@@ -1,4 +1,5 @@
 import { useRouter } from "next/router";
+import { fetchUserInfo } from "./queries/auth";
 import { store } from "./redux";
 import { setGroup, setPathogen } from "./redux/actions";
 import { selectCurrentGroup, selectCurrentPathogen } from "./redux/selectors";
@@ -32,7 +33,7 @@ const setCurrentWorkspace = async (router) => {
   const urlPathogen = await setWorkspacePathogen(potentialUrlPathogen);
 
   const path = generateAppPagePath(router, params, urlGroupId, urlPathogen);
-  router.push(path);
+  // router.push(path);
 };
 
 const setWorkspaceGroupId = async (potentialUrlGroupId: string): number => {
