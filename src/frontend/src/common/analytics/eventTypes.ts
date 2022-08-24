@@ -169,6 +169,10 @@ export type AnalyticsSamplesDownloadFile = {
   sample_public_ids: JsonString;
   // User downloaded info on consensus genome (FASTA) for these samples
   includes_consensus_genome: boolean;
+  // User downloaded genbank template for these samples
+  includes_genbank_template: boolean;
+  // User downloaded gisaid template for these samples
+  includes_gisaid_template: boolean;
   // User downloaded info on metadata for these samples
   includes_sample_metadata: boolean;
 };
