@@ -1,9 +1,11 @@
+import { Tooltip } from "czifui";
 import Link from "next/link";
 import FeedbackIcon from "src/common/icons/feedback.svg";
 import { useUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "../../../../common/routes";
 import UserMenu from "./components/UserMenu";
 import {
+  HiddenLabel,
   StyledDiv,
   StyledIconWrapper,
   StyledLink,
@@ -26,18 +28,24 @@ export default function RightNav(): JSX.Element {
             Upload
           </UploadButton>
         </Link>
-        <Link href="https://airtable.com/shr2SrkMN8DK1mLEK" passHref>
+        <HiddenLabel id="feedback-label">Submit issues or Feedback</HiddenLabel>
+        <Tooltip
+          arrow
+          title="Submit Issues or Feedback"
+          sdsStyle="dark"
+          placement="bottom"
+        >
           <StyledLink
-            aria-label="Send issues or feedback"
-            href="passHref"
+            aria-labelledby="feedback-label"
+            href="https://airtable.com/shr2SrkMN8DK1mLEK"
             target="_blank"
             rel="noreferrer"
           >
             <StyledIconWrapper>
-              <FeedbackIcon />
+              <FeedbackIcon aria-hidden="true" />
             </StyledIconWrapper>
           </StyledLink>
-        </Link>
+        </Tooltip>
         <UserMenu user={userInfo?.name} />
       </StyledDiv>
     );

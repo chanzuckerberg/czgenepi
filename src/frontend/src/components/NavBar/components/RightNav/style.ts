@@ -7,6 +7,7 @@ import {
   getPalette,
   getSpaces,
 } from "czifui";
+import { srOnly } from "src/common/styles/mixins/accessibility";
 
 const whiteBorder = "border: 1px solid white;";
 export const UploadButton = styled(Button)`
@@ -75,4 +76,8 @@ export const StyledIconWrapper = styled.div`
       }
     `;
   }}
+`;
+
+export const HiddenLabel = styled.label`
+  ${srOnly}
 `;
