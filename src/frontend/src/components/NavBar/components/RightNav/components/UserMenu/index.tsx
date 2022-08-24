@@ -1,5 +1,5 @@
 import { Icon, Menu, MenuItem } from "czifui";
-import React from "react";
+import { useState } from "react";
 import { API } from "src/common/api";
 import ENV from "src/common/constants/ENV";
 import { ROUTES } from "src/common/routes";
@@ -10,7 +10,7 @@ interface UserMenuProps {
 }
 
 const UserMenu = ({ user }: UserMenuProps): JSX.Element => {
-  const [anchorEl, setAnchorEl] = React.useState<Element | null>(null);
+  const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = (event) => {
     setAnchorEl(event.currentTarget);
@@ -46,7 +46,6 @@ const UserMenu = ({ user }: UserMenuProps): JSX.Element => {
         keepMounted
         open={Boolean(anchorEl)}
         onClose={handleClose}
-        getContentAnchorEl={null}
       >
         <a href={ROUTES.CONTACT_US_EMAIL} target="_blank" rel="noopener">
           <MenuItem onClick={handleClose}>Contact us</MenuItem>

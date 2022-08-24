@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { EVENT_TYPES } from "src/common/analytics/eventTypes";
 import { analyticsTrackEvent } from "src/common/analytics/methods";
 import { ROUTES } from "src/common/routes";

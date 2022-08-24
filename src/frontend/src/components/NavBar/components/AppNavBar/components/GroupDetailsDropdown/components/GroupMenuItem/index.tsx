@@ -1,5 +1,4 @@
 import { Icon } from "czifui";
-import React from "react";
 import { setGroup } from "src/common/redux/actions";
 import { useDispatch } from "src/common/redux/hooks";
 import { MenuItem, StyledIcon, StyledIconButton, StyledName } from "./style";

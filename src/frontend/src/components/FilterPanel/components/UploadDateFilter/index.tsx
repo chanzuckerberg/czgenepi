@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import { FC } from "react";
 import { MENU_OPTIONS_UPLOAD_DATE } from "src/components/DateFilterMenu/constants";
 import { DateFilter } from "../DateFilter";
 

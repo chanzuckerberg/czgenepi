@@ -1,4 +1,3 @@
-import React from "react";
 import { MoreActionsMenu } from "./components/MoreActionsMenu";
 import { OpenInNextstrainButton } from "./components/OpenInNextstrainButton";
 import TreeTableDownloadMenu from "./components/TreeTableDownloadMenu";

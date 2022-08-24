@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import {
-  AppThemeOptions,
+  CommonThemeProps,
   fontBodyM,
   fontBodyS,
   fontBodyXs,
@@ -28,7 +28,7 @@ export const Card = styled.div`
   display: flex;
   flex-direction: column;
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const shadows = getShadows(props);
     const spaces = getSpaces(props);
 
@@ -66,7 +66,7 @@ export const Content = styled.div`
 
   ${fontBodyM}
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
@@ -129,7 +129,7 @@ export const FooterButtonContainer = styled.div`
   }}
 `;
 
-function marginBottom(props: { theme?: AppThemeOptions }) {
+function marginBottom(props: CommonThemeProps) {
   const spaces = getSpaces(props);
 
   return `

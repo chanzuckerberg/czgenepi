@@ -1,5 +1,4 @@
-import { Table as MuiTable, TableBody, TableHead } from "@material-ui/core";
-import React from "react";
+import { Table as MuiTable, TableBody, TableHead } from "@mui/material";
 import { SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS } from "src/components/DownloadMetadataTemplate/common/constants";
 import { Props as CommonProps } from "../../../common/types";
 import Row from "./components/Row";
@@ -23,6 +22,8 @@ export default function Table({ metadata }: Props): JSX.Element {
         <StyledTableContainer>
           <MuiTable component="div" stickyHeader>
             <TableHead component="div">
+              {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+              {/* @ts-ignore: spread types error */}
               <StyledTableRow {...({ component: "div" } as unknown)}>
                 <StyledTableCell component="div">
                   <IdColumn>

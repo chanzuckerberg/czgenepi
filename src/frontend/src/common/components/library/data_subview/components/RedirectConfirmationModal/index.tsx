@@ -1,5 +1,4 @@
 import Image from "next/image";
-import React from "react";
 import ConfirmDialog from "src/components/ConfirmDialog";
 import { StyledHeader, StyledP } from "./style";
 

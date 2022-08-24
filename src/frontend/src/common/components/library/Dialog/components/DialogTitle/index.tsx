@@ -1,5 +1,4 @@
-import { DialogTitleProps } from "@material-ui/core";
-import React from "react";
+import { DialogTitleProps } from "@mui/material";
 import { ExtraProps, StyledDialogTitle } from "./style";
 
 type Props = ExtraProps & DialogTitleProps;

@@ -1,7 +1,7 @@
 import { useTreatments } from "@splitsoftware/splitio-react";
 import { Icon } from "czifui";
 import Link from "next/link";
-import React, { MouseEventHandler, useState } from "react";
+import { Fragment, MouseEventHandler, useState } from "react";
 import { useUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
 import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
@@ -49,10 +49,10 @@ const AppNavBar = (): JSX.Element => {
 
   const name = group?.name;
   const orgElements = (
-    <React.Fragment>
+    <Fragment>
       <Separator />
       <NavOrg>{name}</NavOrg>
-    </React.Fragment>
+    </Fragment>
   );
 
   function hasOrg(): JSX.Element | null {

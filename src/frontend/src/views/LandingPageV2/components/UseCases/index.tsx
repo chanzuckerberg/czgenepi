@@ -1,5 +1,4 @@
 import Image from "next/image";
-import React from "react";
 import UseCasesImg from "src/common/images/gen-epi-chart-desktop.png";
 import UseCasesImgMobile from "src/common/images/gen-epi-chart-mobile.png";
 import {

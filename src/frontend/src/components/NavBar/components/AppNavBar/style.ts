@@ -1,12 +1,12 @@
 import styled from "@emotion/styled";
-import { fontHeaderL, getColors, getSpaces } from "czifui";
+import { CommonThemeProps, fontHeaderL, getColors, getSpaces } from "czifui";
 import LogoImage from "src/common/images/logo_complete_white.svg";
 import { iconFillWhite } from "src/common/styles/iconStyle";
 
 export const Logo = styled(LogoImage)`
   height: 25px;
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
@@ -23,7 +23,7 @@ export const LogoAnchor = styled.a`
 `;
 
 export const Separator = styled.div`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
 
@@ -42,7 +42,7 @@ export const LeftNav = styled.div`
   flex: auto;
   height: 25px;
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
@@ -78,7 +78,7 @@ export const DropdownClickTarget = styled.span`
 
 export const StyledNavIconWrapper = styled.div`
   ${iconFillWhite}
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `

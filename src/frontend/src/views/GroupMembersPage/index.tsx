@@ -1,6 +1,6 @@
 import { Tab } from "czifui";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useProtectedRoute, useUserInfo } from "src/common/queries/auth";
 import { useGroupInfo, useGroupMembersInfo } from "src/common/queries/groups";
 import { ROUTES } from "src/common/routes";
@@ -20,9 +20,9 @@ export enum PrimaryTabType {
   DETAILS = "details",
 }
 
-export type TabEventHandler = (
-  _: React.SyntheticEvent<Record<string, unknown>>,
-  tabsValue: never
+type PrimaryTabEventHandler = (
+  event: React.SyntheticEvent<Element, Event>,
+  tabsValue: PrimaryTabType
 ) => void;
 
 interface Props {
@@ -52,7 +52,7 @@ const GroupMembersPage = ({
   // sort group members by name before display
   members.sort((a, b) => caseInsensitiveSort(a.name, b.name));
 
-  const handleTabClick: TabEventHandler = (_, value) => {
+  const handleTabClick: PrimaryTabEventHandler = (_, value) => {
     setTabValue(value);
     router.push(`${ROUTES.GROUP}/${value}`);
   };

@@ -9,7 +9,7 @@
  * have to break it out into its own query or sub-fetch or something once
  * we begin to bring in other types of lineage.
  */
-import { useQuery, UseQueryResult } from "react-query";
+import { useQuery, UseQueryResult } from "@tanstack/react-query";
 import { API, getBackendApiJson } from "../api";
 import { ENTITIES } from "./entities";
 

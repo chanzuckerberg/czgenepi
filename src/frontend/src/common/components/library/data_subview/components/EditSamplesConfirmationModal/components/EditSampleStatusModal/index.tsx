@@ -1,5 +1,4 @@
-import { Icon, IconButton } from "czifui";
-import React from "react";
+import { ButtonIcon, Icon } from "czifui";
 import { FailureView } from "./components/FailureView";
 import { LoadingView } from "./components/LoadingView";
 import { SuccessView } from "./components/SuccessView";
@@ -42,9 +41,9 @@ const EditSampleStatusModal = ({
     <StyledDialog open sdsSize="s">
       {statusModalView !== StatusModalView.LOADING && (
         <StyledDiv onClick={onClose}>
-          <IconButton sdsType="tertiary" sdsSize="small">
+          <ButtonIcon sdsType="tertiary" sdsSize="small" size="large">
             <Icon sdsIcon="xMark" sdsType="iconButton" sdsSize="s" />
-          </IconButton>
+          </ButtonIcon>
         </StyledDiv>
       )}
       {view}

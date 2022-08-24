@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { DialogContent } from "@material-ui/core";
+import { DialogContent } from "@mui/material";
 import { CommonThemeProps, getSpaces } from "czifui";
 import { narrow } from "../common";
 

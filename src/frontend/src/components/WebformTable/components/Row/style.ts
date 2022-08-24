@@ -3,7 +3,7 @@ import {
   TableCell,
   TableRow,
   TableRowProps as MuiTableRowProps,
-} from "@material-ui/core";
+} from "@mui/material";
 import { CommonThemeProps, fontHeaderS, getColors, getSpaces } from "czifui";
 
 export const Id = styled.div`
@@ -19,7 +19,7 @@ export const Id = styled.div`
     const spaces = getSpaces(props);
 
     return `
-      padding: ${spaces?.m}px 0 ${spaces?.m}px ${spaces?.s}px
+      padding: ${spaces?.m}px ${spaces?.m}px ${spaces?.m}px ${spaces?.s}px;
     `;
   }}
 `;
@@ -41,7 +41,7 @@ export const StyledTableRow = styled(TableRow)`
 `;
 
 export const StyledTableCell = styled(TableCell)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
@@ -51,7 +51,7 @@ export const StyledTableCell = styled(TableCell)`
 `;
 
 export const IsPrivateTableCell = styled(TableCell)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     const colors = getColors(props);
 
@@ -63,7 +63,7 @@ export const IsPrivateTableCell = styled(TableCell)`
 `;
 
 export const StyledDiv = styled.div`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `

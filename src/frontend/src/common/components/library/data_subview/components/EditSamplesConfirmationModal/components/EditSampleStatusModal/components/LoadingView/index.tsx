@@ -1,5 +1,4 @@
 import { Button, Icon } from "czifui";
-import React from "react";
 import UploadImage from "src/common/images/Upload.svg";
 import { StyledCloseIconWrapper } from "src/common/styles/iconStyle";
 import {

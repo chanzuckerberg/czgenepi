@@ -1,5 +1,4 @@
 import Script from "next/script";
-import React from "react";
 import ENV from "src/common/constants/ENV";
 
 // The non-secret API key used to identify the app to Plausible.io

@@ -1,5 +1,4 @@
 import { map } from "lodash";
-import React from "react";
 import { B } from "src/common/styles/basicStyle";
 import AlertAccordion from "src/components/AlertAccordion";
 import { SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS } from "src/components/DownloadMetadataTemplate/common/constants";

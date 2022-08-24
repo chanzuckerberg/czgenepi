@@ -1,5 +1,5 @@
 import { isEmpty } from "lodash";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useUserInfo } from "src/common/queries/auth";
 import { useDeleteSamples } from "src/common/queries/samples";
 import { B } from "src/common/styles/basicStyle";

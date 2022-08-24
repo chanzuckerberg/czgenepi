@@ -4,7 +4,7 @@ import {
   useQuery,
   useQueryClient,
   UseQueryResult,
-} from "react-query";
+} from "@tanstack/react-query";
 import { SampleIdToMetadata } from "src/components/WebformTable/common/types";
 import { METADATA_KEYS_TO_API_KEYS } from "src/views/Upload/components/common/constants";
 import { Samples } from "src/views/Upload/components/common/types";

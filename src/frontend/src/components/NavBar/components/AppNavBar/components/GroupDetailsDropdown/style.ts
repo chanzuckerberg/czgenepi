@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import {
   Button,
+  CommonThemeProps,
   fontBodyXs,
   fontHeaderXl,
   getColors,
@@ -11,7 +12,7 @@ import {
 } from "czifui";
 
 export const Dropdown = styled(Menu)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const corners = getCorners(props);
     const shadows = getShadows(props);
 
@@ -27,7 +28,7 @@ export const Dropdown = styled(Menu)`
 `;
 
 export const GroupList = styled.div`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
     return `
@@ -39,7 +40,7 @@ export const GroupList = styled.div`
 
 export const GroupName = styled.div`
   ${fontHeaderXl}
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
@@ -51,7 +52,7 @@ export const GroupName = styled.div`
 export const Details = styled.div`
   ${fontBodyXs}
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
 
@@ -64,7 +65,7 @@ export const Details = styled.div`
 `;
 
 export const StyledButton = styled(Button)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
@@ -75,7 +76,7 @@ export const StyledButton = styled(Button)`
 `;
 
 export const StyledIcon = styled.span`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
 
@@ -91,7 +92,7 @@ export const StyledIcon = styled.span`
 `;
 
 export const CurrentGroup = styled.div`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       padding: ${spaces?.xl}px;

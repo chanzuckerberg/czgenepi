@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import FormSubmitArrow from "src/common/images/form-submit-arrow.svg";
 import { EmailInput, HeroEmailForm, SubmitButton, SubmitIcon } from "./style";
 
