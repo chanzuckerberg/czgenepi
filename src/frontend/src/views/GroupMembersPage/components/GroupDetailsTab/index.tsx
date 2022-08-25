@@ -24,7 +24,7 @@ const GroupDetailsTab = ({
 }: Props): JSX.Element | null => {
   if (!group) return null;
 
-  const { address, name, prefix, location } = group;
+  const { address, name, location } = group;
   const displayLocation = stringifyGisaidLocation(location);
 
   const InfoTooltip = ({ title }: { title: string }) => (
