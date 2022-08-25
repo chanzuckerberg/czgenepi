@@ -1,3 +1,4 @@
+import { forEach } from "lodash";
 import { NextRouter, useRouter } from "next/router";
 import { fetchUserInfo, mapUserData } from "./queries/auth";
 import { store } from "./redux";
@@ -12,6 +13,8 @@ import {
 import { workspacePaths } from "./routes";
 import { canUserViewGroup } from "./utils/userInfo";
 
+const ROUTER_PARAMS_SUFFIX = "/[[...params]]";
+
 // TODO (mlila): if we end up with more than two workspace values (groupId, pathogen)
 // TODO          consider creating a map with these indicators. This would allow us
 // TODO          to construct the url more programmatically. For example, we would not have
@@ -23,14 +26,18 @@ const PATHOGEN_URL_INDICATOR = "pathogen";
 
 export const useAppRouting = (): void => {
   const router = useRouter();
-  const path = router.basePath;
+  const { pathname } = router;
+  const realPath = pathname.replace(ROUTER_PARAMS_SUFFIX, "");
 
   // public page paths shouldn't ever occur with the extra params
   // so if a user navigates to a public page, just do nothing --
   // they're already in the right place
-  if (path in workspacePaths) {
-    setCurrentWorkspacePath(router);
-  }
+  forEach(workspacePaths, (wsPath) => {
+    if (realPath.startsWith(wsPath)) {
+      setCurrentWorkspacePath(router);
+      return false;
+    }
+  });
 };
 
 /**

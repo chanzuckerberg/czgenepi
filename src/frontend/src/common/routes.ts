@@ -36,9 +36,7 @@ export const publicPaths: string[] = [
 ];
 
 export const workspacePaths: string[] = [
-  ROUTES.DATA_SAMPLES,
+  ROUTES.DATA,
   ROUTES.PHYLO_TREES,
-  ROUTES.UPLOAD_STEP1,
-  ROUTES.UPLOAD_STEP2,
-  ROUTES.UPLOAD_STEP3,
+  ROUTES.UPLOAD,
 ];
