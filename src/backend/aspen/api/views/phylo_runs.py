@@ -56,7 +56,6 @@ async def kick_off_phylo_run(
     ac: AuthContext = Depends(get_auth_context),
     user: User = Depends(get_auth_user),
     group: Group = Depends(require_group_privilege("create_phylorun")),
-    ps=Depends(get_pathogen_slug),
 ) -> PhyloRunResponse:
 
     # validation happens in input schema
@@ -221,7 +220,7 @@ async def get_serializable_runs(
 async def list_runs(
     db: AsyncSession = Depends(get_db),
     az: AuthZSession = Depends(get_authz_session),
-    ps=Depends(get_pathogen_slug),
+    pathogen_slug=Depends(get_pathogen_slug),
 ) -> PhyloRunsListResponse:
 
     phylo_runs: Iterable[PhyloRun] = await get_serializable_runs(db, az, "read")

@@ -51,7 +51,7 @@ async def list_samples(
     db: AsyncSession = Depends(get_db),
     az: AuthZSession = Depends(get_authz_session),
     ac: AuthContext = Depends(get_auth_context),
-    ps=Depends(get_pathogen_slug),
+    pathogen_slug=Depends(get_pathogen_slug),
 ) -> SamplesResponse:
 
     # load the samples.

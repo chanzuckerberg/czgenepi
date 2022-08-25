@@ -135,7 +135,7 @@ def get_app() -> FastAPI:
         "samples": samples.router,
     }
     for suffix, router in org_routers.items():
-        # newer paths with pathogen support
+        # add pathogen support to list endpoints
         _app.include_router(
             router,
             prefix="/v2/orgs/{org_id}/pathogens/{pathogen_slug}/" + suffix,
