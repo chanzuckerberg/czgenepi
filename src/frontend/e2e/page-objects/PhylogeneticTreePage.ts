@@ -1,4 +1,5 @@
-import {expect, Locator, Page} from '@playwright/test'
+import {Locator, Page} from '@playwright/test'
+import {TreeInfo} from '../utils/schemas/treeInfo'
 
 export class PhylogeneticTreePage {
 
@@ -13,6 +14,7 @@ export class PhylogeneticTreePage {
         readonly forcedIncludeTextArea: Locator
         readonly addForcedSamplesButton: Locator
         readonly createTreeButton: Locator
+        readonly radiosTreeType: Locator
 
     constructor(page: Page){
         this.page = page
@@ -25,8 +27,16 @@ export class PhylogeneticTreePage {
         this.forcedIncludeTextArea = page.locator("textarea");
         this.addForcedSamplesButton = page.locator("button[type='button'][class*='MuiButton-containedPrimary'] > span");
         this.createTreeButton = page.locator("//span[text()='Create Tree']");
+        this.radiosTreeType = page.locator("span[class*='Radio'] > input");
     }
 
+    async createTree(treeInfo: TreeInfo){
+        await this.treeNameInput.type(treeInfo.treeName);
+        const types = await this.radiosTreeType.evaluateAll(radios => radios.map( element =>  element.getAttribute('value')))
+        console.log("ESTOS SON LOS RATIOS "+types);
+        // if(typeof Array.isArray(await treeInfo.lineage)){
 
+        // }
+    }
 
 }
