@@ -1,4 +1,4 @@
-const { request } = require("@playwright/test");
+const { request, expect } = require("@playwright/test");
 import fs from "fs";
 const path = require("path");
 // import { path } from "lodash/fp";

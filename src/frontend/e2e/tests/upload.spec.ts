@@ -4,11 +4,13 @@ import SampleUtil from "../utils/sample";
 
 test.describe("API tests", () => {
   test.beforeEach(async ({ page }, testInfo) => {
-    console.log(`Running ${testInfo.title}`);
     await page.goto("https://staging.czgenepi.org/data/samples");
   });
   test.only("Should get samples", async ({ page }: { page: Page }) => {
-    const samples = await SampleUtil.getSamples();
-    expect(samples.count()).toBeGreaterThan(0);
+    await SampleUtil.getSamples().then((samples) => {
+      console.log("*******************");
+      console.log(samples);
+      expect(samples.count()).toBeGreaterThan(0);
+    });
   });
 });

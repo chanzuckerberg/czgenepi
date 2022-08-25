@@ -1,10 +1,13 @@
 import { faker } from "@faker-js/faker";
 import ApiUtil from "./api";
+const fs = require("fs");
+const { request, expect } = require("@playwright/test");
 
 const defaultSequence =
   "ATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTC";
 const locationId = 166768;
 
+const cookieStorage = "e2e/storage/cookies.json";
 export default abstract class SampleUtil {
   /*
 This method generates sample data that can be used for uploading
@@ -49,11 +52,11 @@ This method generates sample data that can be used for uploading
           private_identifier:
             private_identifier !== undefined
               ? private_identifier
-              : SampleUtil.getSampleId(),
+              : SampleUtil.generateSampleId(),
           public_identifier:
             public_identifier !== undefined
               ? public_identifier
-              : SampleUtil.getSampleId(),
+              : SampleUtil.generateSampleId(),
         },
       });
     }
@@ -66,7 +69,7 @@ This method generates sample data that can be used for uploading
   @param {string} country: country where sample was taken, defaults to randomly generated
   @param {boolean} privateSample: we use this to determine we should include "hCoV-19" as prefix or generate random ID
   */
-  public static getSampleId(country?: string, privateId?: boolean) {
+  public static generateSampleId(country?: string, privateId?: boolean) {
     if (privateId) {
       const charSet =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -95,7 +98,10 @@ This method generates sample data that can be used for uploading
   @param {number} howRecent: how recent the date should be, defaults to 10, meaning the date can be 1 - 10 days in the past
   @param {string} refDate: reference date to use, especially useful for sequencing date that needs to be older that collection date
   */
-  public static getPastDate(howRecent?: number, refDate?: string): string {
+  public static getADateInThePast(
+    howRecent?: number,
+    refDate?: string
+  ): string {
     const days =
       howRecent !== undefined
         ? howRecent
@@ -131,10 +137,43 @@ This method generates sample data that can be used for uploading
   */
   public static async getSamples(): Promise<any> {
     const groupId = process.env.GROUPID ?? "";
-    const url = `v2/orgs/${groupId}/samples/`;
-    ApiUtil.getRequest(url).then((response) => {
-      return response.samples;
+    const endpoint = `v2/orgs/${groupId}/samples/`;
+
+    const context = await request.newContext({
+      baseURL: process.env.BASEAPI,
     });
+    await context
+      .get(endpoint, {
+        headers: SampleUtil.setHeaders(),
+      })
+      .then((response: { ok: () => any; json: () => any }) => {
+        console.log("****** been here **********");
+        console.log(response);
+        expect(response.ok()).toBeTruthy();
+        return response.json();
+      });
+  }
+
+  /*
+    Helper function for HTTP request headers. It reads cookie from file and attaches to the header
+    @return {object} return header object
+    */
+  public static setHeaders() {
+    const cookies = `OptanonAlertBoxClosed=2022-08-19T09:28:00.361Z;
+      ajs_anonymous_id=c2718103-b052-4c40-a5c5-74442fd24165;
+      ajs_user_id=llhznbdsa6q7jr0hnhtg;
+      OptanonConsent=isIABGlobal=false&datestamp=Thu+Aug+25+2022+11%3A19%3A45+GMT%2B0100+(British+Summer+Time)
+      &version=6.34.0
+      &hosts=
+      &landingPath=NotLandingPage
+      &groups=C0001%3A1%2CC0002%3A1
+      &geolocation=GB%3BENG
+      &AwaitingReconsent=false;
+      session=${process.env.COOKIES}`;
+    return {
+      accept: "application/json",
+      cookie: cookies.replace(/\r?\n|\r/g, ""),
+    };
   }
 }
 

@@ -21,10 +21,6 @@ const config: PlaywrightTestConfig = {
     screenshot: "only-on-failure",
     ignoreHTTPSErrors: true,
     viewport: { width: 1280, height: 720 },
-    extraHTTPHeaders: {
-      Accept: "application/json",
-      Cookie: `token ${process.env.API_TOKEN}`,
-    },
   },
   projects: [
     {
