@@ -3,7 +3,6 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.api.authn import get_auth_user
-from aspen.database.models import pathogens
 from aspen.api.deps import get_db
 from aspen.api.schemas.pathogens import PathogenResponse, PathogensResponse
 from aspen.database.models import Pathogen, User
@@ -16,7 +15,7 @@ async def list_pathogens(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_auth_user),
 ) -> PathogensResponse:
-    query = sa.select(Pathogen)
+    query = sa.select(Pathogen)  # type: ignore
     results = await db.execute(query)
     pathogens = [PathogenResponse.from_orm(row) for row in results.scalars()]
     return PathogensResponse(pathogens=pathogens)
