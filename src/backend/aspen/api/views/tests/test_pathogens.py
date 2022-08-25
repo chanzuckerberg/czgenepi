@@ -27,7 +27,7 @@ async def test_samples_list(
 
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.get(
-        f"/v2/pathogens/",
+        "/v2/pathogens/",
         headers=auth_headers,
     )
     response = res.json()
