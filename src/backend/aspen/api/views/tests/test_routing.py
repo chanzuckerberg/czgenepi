@@ -21,16 +21,19 @@ async def test_sample_routing_w_pathogen_slug(
 
     auth_headers = {"user_id": user.auth0_user_id}
 
-    # test sample routing works with both paths,
+    # test routing works for both paths,
     # TODO: add more test cases and test response data for when we add more filtering/ query logic based on optional pathogen slug params
-    res = await http_client.get(
-        f"/v2/orgs/{group.id}/samples/",
-        headers=auth_headers,
-    )
-    assert res.status_code == 200
 
-    res = await http_client.get(
-        f"/v2/orgs/{group.id}/pathogens/SC2/samples/",
-        headers=auth_headers,
-    )
-    assert res.status_code == 200
+    for route in ["samples", "phylo_runs"]:
+
+        res = await http_client.get(
+            f"/v2/orgs/{group.id}/{route}/",
+            headers=auth_headers,
+        )
+        assert res.status_code == 200
+
+        res = await http_client.get(
+            f"/v2/orgs/{group.id}/pathogens/SC2/{route}/",
+            headers=auth_headers,
+        )
+        assert res.status_code == 200
