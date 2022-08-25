@@ -282,7 +282,7 @@ async def create_samples(
     settings: Settings = Depends(get_settings),
     user: User = Depends(get_auth_user),
     group: Group = Depends(require_group_privilege("create_sample")),
-    ps=Depends(get_pathogen_slug),
+    pathogen_slug=Depends(get_pathogen_slug),
 ) -> SamplesResponse:
 
     duplicates_in_request: Union[
