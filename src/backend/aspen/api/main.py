@@ -135,18 +135,20 @@ def get_app() -> FastAPI:
         "samples": samples.router,
     }
     for suffix, router in org_routers.items():
-        # add pathogen support to list endpoints
+        # add pathogen support to endpoints
         _app.include_router(
             router,
             prefix="/v2/orgs/{org_id}/pathogens/{pathogen_slug}/" + suffix,
             dependencies=[Depends(require_group_membership)],
         )
-        # urls don't need to include pathogen_slugs, (default to SC2)
+
+        # if urls don't include pathogen_slugs, default to SC2
         _app.include_router(
             router,
             prefix="/v2/orgs/{org_id}/" + suffix,
             dependencies=[Depends(require_group_membership)],
         )
+
         # old urls (TODO: remove this soonish?)
         _app.include_router(
             router,
