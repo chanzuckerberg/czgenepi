@@ -7,6 +7,9 @@ import { setPathogen } from "../actions";
 import { selectCurrentPathogen } from "../selectors";
 import { Pathogen, ReduxPersistenceTokens } from "../types";
 
+const isValidPathogen = (pathogen): boolean =>
+  Object.values(Pathogen).includes(pathogen);
+
 export const ensureValidPathogen = async (): Promise<void> => {
   if (!isWindowDefined) return;
 
@@ -17,7 +20,7 @@ export const ensureValidPathogen = async (): Promise<void> => {
 
   // do nothing if valid pathogen already set
   const currentPathogen = selectCurrentPathogen(state);
-  if (currentPathogen in Pathogen) return;
+  if (isValidPathogen(currentPathogen)) return;
 
   // TODO (mlila): in the future, if we ever put pathogens behind feature flags, we'll
   // TODO          want to check for that here.
@@ -28,7 +31,7 @@ export const ensureValidPathogen = async (): Promise<void> => {
 
 export const getPathogenFromLocalStorage = (): Pathogen | undefined => {
   const storedPathogenStr = getLocalStorage(ReduxPersistenceTokens.PATHOGEN);
-  return storedPathogenStr && storedPathogenStr in Pathogen
-    ? storedPathogenStr
-    : undefined;
+  const isValid = isValidPathogen(storedPathogenStr);
+
+  return storedPathogenStr && isValid ? storedPathogenStr : undefined;
 };
