@@ -1,4 +1,5 @@
 import { faker } from "@faker-js/faker";
+import { Http2ServerResponse } from "http2";
 import ApiUtil from "./api";
 const fs = require("fs");
 const { request, expect } = require("@playwright/test");
@@ -137,21 +138,20 @@ This method generates sample data that can be used for uploading
   */
   public static async getSamples(): Promise<any> {
     const groupId = process.env.GROUPID ?? "";
-    const endpoint = `v2/orgs/${groupId}/samples/`;
-
+    const endpoint = `/v2/orgs/${groupId}/samples/`;
     const context = await request.newContext({
       baseURL: process.env.BASEAPI,
     });
-    await context
-      .get(endpoint, {
-        headers: SampleUtil.setHeaders(),
-      })
-      .then((response: { ok: () => any; json: () => any }) => {
-        console.log("****** been here **********");
-        console.log(response);
-        expect(response.ok()).toBeTruthy();
-        return response.json();
-      });
+    const response = await context.get(endpoint, {
+      headers: SampleUtil.setHeaders(),
+    });
+    //.then( (response: APIResponse) => {
+    //console.log("****** been here **********");
+    console.log(response.json());
+    expect(response.ok()).toBeTruthy();
+    console.log("****** been here 1 **********");
+    return response.json();
+    //});
   }
 
   /*

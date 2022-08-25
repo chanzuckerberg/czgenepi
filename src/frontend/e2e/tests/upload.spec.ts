@@ -7,10 +7,10 @@ test.describe("API tests", () => {
     await page.goto("https://staging.czgenepi.org/data/samples");
   });
   test.only("Should get samples", async ({ page }: { page: Page }) => {
-    await SampleUtil.getSamples().then((samples) => {
-      console.log("*******************");
+    await SampleUtil.getSamples().then((data) => {
+      const samples = data.samples as Array<any>;
       console.log(samples);
-      expect(samples.count()).toBeGreaterThan(0);
+      expect(samples.length).toBeGreaterThan(0);
     });
   });
 });
