@@ -58,11 +58,6 @@ const GroupDetailsTab = ({
             <InfoTooltip title="Group’s full Nextstrain location ID. CZ GEN EPI uses this as the default location parameters when building trees for this group." />
           </DetailSubheader>
           <DetailDisplay>{displayLocation}</DetailDisplay>
-          <DetailSubheader>
-            Sample Public ID Prefix
-            <InfoTooltip title="Set of characters used when auto-generating unique Public IDs for samples uploaded to this Group if a Public or GISAID ID is not provided." />
-          </DetailSubheader>
-          <DetailDisplay>{prefix}</DetailDisplay>
         </DetailSection>
         <DetailSection>
           <DetailHeader>GISAID Submission Details</DetailHeader>
