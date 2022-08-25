@@ -9,7 +9,7 @@ import {
   ensureValidPathogen,
   isValidPathogen,
 } from "./redux/utils/pathogenUtils";
-import { publicPaths } from "./routes";
+import { workspacePaths } from "./routes";
 import { canUserViewGroup } from "./utils/userInfo";
 
 // TODO (mlila): if we end up with more than two workspace values (groupId, pathogen)
@@ -28,7 +28,7 @@ export const useAppRouting = (): void => {
   // public page paths shouldn't ever occur with the extra params
   // so if a user navigates to a public page, just do nothing --
   // they're already in the right place
-  if (!(path in publicPaths)) {
+  if (path in workspacePaths) {
     setCurrentWorkspacePath(router);
   }
 };
