@@ -5,10 +5,19 @@ import { setGroup, setPathogen } from "./redux/actions";
 import { selectCurrentGroup, selectCurrentPathogen } from "./redux/selectors";
 import { Pathogen } from "./redux/types";
 import { ensureValidGroup } from "./redux/utils/groupUtils";
-import { ensureValidPathogen } from "./redux/utils/pathogenUtils";
+import {
+  ensureValidPathogen,
+  isValidPathogen,
+} from "./redux/utils/pathogenUtils";
 import { publicPaths } from "./routes";
 import { canUserViewGroup } from "./utils/userInfo";
 
+// TODO (mlila): if we end up with more than two workspace values (groupId, pathogen)
+// TODO          consider creating a map with these indicators. This would allow us
+// TODO          to construct the url more programmatically. For example, we would not have
+// TODO          to enumerate conditional statements in setCurrentWorkspacePath and
+// TODO          replacePathParams. Doing so with only 2 variables feels a little heavy
+// TODO          handed at the moment, though.
 const GROUP_URL_INDICATOR = "group";
 const PATHOGEN_URL_INDICATOR = "pathogen";
 
@@ -34,31 +43,48 @@ const setCurrentWorkspacePath = async (router) => {
   // nothing to parse here
   if (!params) return;
 
+  let groupTokenIndex;
+  let pathogenTokenIndex;
   let potentialUrlPathogen;
   let potentialUrlGroupId;
 
   for (let i = 0; i < params.length - 1; i++) {
+    const nextIndex = i + 1;
+
     if (params[i] === GROUP_URL_INDICATOR) {
-      potentialUrlGroupId = params[i + 1];
+      groupTokenIndex = nextIndex;
+      potentialUrlGroupId = params[nextIndex];
     }
 
     if (params[i] === PATHOGEN_URL_INDICATOR) {
-      potentialUrlPathogen = params[i + 1];
+      pathogenTokenIndex = nextIndex;
+      potentialUrlPathogen = params[nextIndex];
     }
   }
 
   const urlGroupId = await setWorkspaceGroupId(potentialUrlGroupId);
   const urlPathogen = await setWorkspacePathogen(potentialUrlPathogen);
 
-  const path = generateAppPagePath(router, params, urlGroupId, urlPathogen);
-  // router.push(path);
+  const newPath = replacePathParams({
+    groupTokenIndex,
+    params,
+    pathogenTokenIndex,
+    router,
+    urlGroupId,
+    urlPathogen,
+  });
+
+  // don't redirect if user already viewing correct workspace
+  if (router.asPath !== newPath) {
+    router.push(newPath);
+  }
 };
 
 /**
  * Ensures the groupId in the url are valid and the user can
  * access it. If not, returns a group the user can access.
  */
-const setWorkspaceGroupId = async (potentialUrlGroupId: string): number => {
+const setWorkspaceGroupId = async (potentialUrlGroupId?: string): number => {
   const userInfo = await fetchUserInfo();
   const { dispatch, getState } = store;
   const state = getState();
@@ -83,12 +109,14 @@ const setWorkspaceGroupId = async (potentialUrlGroupId: string): number => {
  * Ensures the pathogen in the url are valid and the user can
  * access it. If not, returns a pathogen the user can access.
  */
-const setWorkspacePathogen = async (potentialUrlPathogen: string): Pathogen => {
+const setWorkspacePathogen = async (
+  potentialUrlPathogen?: string
+): Pathogen => {
   const { dispatch, getState } = store;
   const state = getState();
 
   // if they are requesting a pathogen our app supports, we're good to go
-  if (potentialUrlPathogen in Pathogen) {
+  if (isValidPathogen(potentialUrlPathogen)) {
     dispatch(setPathogen(potentialUrlPathogen));
     return potentialUrlPathogen;
   }
@@ -103,11 +131,44 @@ const setWorkspacePathogen = async (potentialUrlPathogen: string): Pathogen => {
   return selectCurrentPathogen(state);
 };
 
-const generateAppPagePath = (router, params, urlGroupId, urlPathogen): string => {
-  console.log(router);
-};
+/**
+ * Takes an old url and some new params, then constructs a new url based on
+ * the page viewed and new workspace values (groupId, pathogen, etc)
+ */
+const replacePathParams = ({
+  router,
+  params,
+  groupTokenIndex,
+  pathogenTokenIndex,
+  urlGroupId,
+  urlPathogen,
+}): string => {
+  // this removes the `[[...params]]` that next.js appends to page paths which accept
+  // parameters. Unfortunately, there doesn't seem to be a way to get the base path
+  // without this piece from the router.
+  const oldPathTokens: [] = router.pathname?.split("/") ?? [];
+  oldPathTokens.pop();
 
-const setPublicPagePath = (router): string => {
-  const path = router.path;
-  console.log(path);
+  // make a copy of params to keep anything else that was in the path before
+  const newPathParams = [...params];
+
+  // groupTokenIndex may be undefined if the user simply navigates to, eg, /data/samples
+  // without providing a group id in the url. May happen from existing bookmarks or
+  // muscle memory for users who typed in url before we had param handling
+  if (!groupTokenIndex) {
+    newPathParams.push(GROUP_URL_INDICATOR);
+    newPathParams.push(urlGroupId);
+  } else {
+    newPathParams[groupTokenIndex] = urlGroupId;
+  }
+
+  if (!pathogenTokenIndex) {
+    newPathParams.push(PATHOGEN_URL_INDICATOR);
+    newPathParams.push(urlPathogen);
+  } else {
+    newPathParams[pathogenTokenIndex] = urlPathogen;
+  }
+
+  const newTokens = oldPathTokens.concat(newPathParams);
+  return newTokens.join("/");
 };

@@ -7,7 +7,7 @@ import { setPathogen } from "../actions";
 import { selectCurrentPathogen } from "../selectors";
 import { Pathogen, ReduxPersistenceTokens } from "../types";
 
-const isValidPathogen = (pathogen): boolean =>
+export const isValidPathogen = (pathogen?: Pathogen): boolean =>
   Object.values(Pathogen).includes(pathogen);
 
 export const ensureValidPathogen = async (): Promise<void> => {
