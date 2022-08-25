@@ -35,6 +35,9 @@ export const getIsGroupAdminFromUserInfo = (userInfo?: User): boolean => {
 /**
  * Determines whether or not a user has permission to view the given group
  */
-export const canUserViewGroup = (userInfo?: User, groupId: number): boolean => {
+export const canUserViewGroup = (
+  userInfo: User | undefined,
+  groupId: number
+): boolean => {
   return getUserGroupInfoByGroupId(userInfo, groupId) ? true : false;
 };

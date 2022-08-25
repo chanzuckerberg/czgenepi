@@ -1,6 +1,6 @@
 import { Pathogen } from "../redux/types";
 
-enum BackendPathogen {
+export enum BackendPathogen {
   COVID = "SC2",
 }
 

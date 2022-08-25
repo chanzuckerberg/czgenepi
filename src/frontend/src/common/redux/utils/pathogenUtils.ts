@@ -7,13 +7,17 @@ import { setPathogen } from "../actions";
 import { selectCurrentPathogen } from "../selectors";
 import { Pathogen, ReduxPersistenceTokens } from "../types";
 
-export const isValidPathogen = (pathogen?: Pathogen): boolean =>
-  Object.values(Pathogen).includes(pathogen);
+export const isValidPathogen = (pathogen: string): boolean => {
+  // make TS happy enough to search Pthogen enum for arbitrary strings
+  const pathogenStrs: string[] = Object.values(Pathogen);
+  return pathogenStrs.includes(pathogen);
+};
 
 export const ensureValidPathogen = async (): Promise<void> => {
   if (!isWindowDefined) return;
 
-  const { dispatch, state } = store;
+  const { dispatch, getState } = store;
+  const state = getState();
 
   // wait until app state initialized
   if (!state) return;
@@ -33,5 +37,7 @@ export const getPathogenFromLocalStorage = (): Pathogen | undefined => {
   const storedPathogenStr = getLocalStorage(ReduxPersistenceTokens.PATHOGEN);
   const isValid = isValidPathogen(storedPathogenStr);
 
-  return storedPathogenStr && isValid ? storedPathogenStr : undefined;
+  return storedPathogenStr && isValid
+    ? (storedPathogenStr as Pathogen)
+    : undefined;
 };

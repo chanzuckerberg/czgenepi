@@ -1,8 +1,8 @@
 import ENV from "src/common/constants/ENV";
 import { jsonToType } from "src/common/utils";
-import { pathogenMap } from "../queries/pathogens";
+import { BackendPathogen, pathogenMap } from "../queries/pathogens";
 import { store } from "../redux";
-import { selectCurrentGroup } from "../redux/selectors";
+import { selectCurrentGroup, selectCurrentPathogen } from "../redux/selectors";
 
 export enum API {
   USERDATA = "/v2/users/me",
@@ -28,7 +28,7 @@ export const generateOrgSpecificUrl = (path: ORG_API): string => {
   const state = store.getState();
   const groupId = selectCurrentGroup(state);
   const pathogen = selectCurrentPathogen(state);
-  const requestPathogen = pathogenMap[pathogen];
+  const requestPathogen: BackendPathogen = pathogenMap[pathogen];
 
   return `${API.ORGS}${groupId}/pathogens/${requestPathogen}/${path}`;
 };

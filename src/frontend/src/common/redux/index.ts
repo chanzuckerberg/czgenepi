@@ -34,12 +34,12 @@ export const FALLBACK_GROUP_ID = -1;
 // first, load state from localstorage if any exists and use it to initialize redux
 const getInitialState = () => {
   const storedGroup = getGroupIdFromLocalStorage() ?? FALLBACK_GROUP_ID;
-  const storedPathogen = getPathogenFromLocalStorage() ?? null;
+  const storedPathogen = getPathogenFromLocalStorage() ?? Pathogen.COVID;
 
   return {
     current: {
       group: storedGroup,
-      pathogen: storedPathogen as Pathogen,
+      pathogen: storedPathogen,
     },
   };
 };

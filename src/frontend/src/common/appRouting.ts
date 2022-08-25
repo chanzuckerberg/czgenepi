@@ -1,5 +1,5 @@
-import { useRouter } from "next/router";
-import { fetchUserInfo } from "./queries/auth";
+import { NextRouter, useRouter } from "next/router";
+import { fetchUserInfo, mapUserData } from "./queries/auth";
 import { store } from "./redux";
 import { setGroup, setPathogen } from "./redux/actions";
 import { selectCurrentGroup, selectCurrentPathogen } from "./redux/selectors";
@@ -37,7 +37,7 @@ export const useAppRouting = (): void => {
  * Ensures the groupId and pathogen in the url are valid and the user can
  * access them. If not, redirects the user to a group/pathogen they _can_ access.
  */
-const setCurrentWorkspacePath = async (router) => {
+const setCurrentWorkspacePath = async (router: NextRouter) => {
   const { params } = router.query;
 
   // nothing to parse here
@@ -67,7 +67,6 @@ const setCurrentWorkspacePath = async (router) => {
 
   const newPath = replacePathParams({
     groupTokenIndex,
-    params,
     pathogenTokenIndex,
     router,
     urlGroupId,
@@ -84,16 +83,20 @@ const setCurrentWorkspacePath = async (router) => {
  * Ensures the groupId in the url are valid and the user can
  * access it. If not, returns a group the user can access.
  */
-const setWorkspaceGroupId = async (potentialUrlGroupId?: string): number => {
-  const userInfo = await fetchUserInfo();
+const setWorkspaceGroupId = async (
+  potentialUrlGroupId = ""
+): Promise<string> => {
+  const rawUserInfo = await fetchUserInfo();
+  const userInfo = mapUserData(rawUserInfo);
   const { dispatch, getState } = store;
   const state = getState();
 
   // ensure that the group passed via url can be viewed by user
   // if so, that's the group they will be looking at now
-  const canUserView = await canUserViewGroup(userInfo, potentialUrlGroupId);
+  const potentialUrlGroupInt = parseInt(potentialUrlGroupId);
+  const canUserView = await canUserViewGroup(userInfo, potentialUrlGroupInt);
   if (canUserView) {
-    dispatch(setGroup(potentialUrlGroupId));
+    dispatch(setGroup(potentialUrlGroupInt));
     return potentialUrlGroupId;
   }
 
@@ -102,7 +105,7 @@ const setWorkspaceGroupId = async (potentialUrlGroupId?: string): number => {
   await ensureValidGroup();
 
   // now that we know the groupId is valid, return it
-  return selectCurrentGroup(state);
+  return selectCurrentGroup(state).toString();
 };
 
 /**
@@ -110,15 +113,16 @@ const setWorkspaceGroupId = async (potentialUrlGroupId?: string): number => {
  * access it. If not, returns a pathogen the user can access.
  */
 const setWorkspacePathogen = async (
-  potentialUrlPathogen?: string
-): Pathogen => {
+  potentialUrlPathogen = ""
+): Promise<Pathogen> => {
   const { dispatch, getState } = store;
   const state = getState();
 
   // if they are requesting a pathogen our app supports, we're good to go
   if (isValidPathogen(potentialUrlPathogen)) {
-    dispatch(setPathogen(potentialUrlPathogen));
-    return potentialUrlPathogen;
+    const verifiedPathogen = potentialUrlPathogen as Pathogen;
+    dispatch(setPathogen(verifiedPathogen));
+    return verifiedPathogen;
   }
 
   // TODO (mlila): in the future, if we add pathogens behind feature flags
@@ -135,22 +139,30 @@ const setWorkspacePathogen = async (
  * Takes an old url and some new params, then constructs a new url based on
  * the page viewed and new workspace values (groupId, pathogen, etc)
  */
+interface Props {
+  router: NextRouter;
+  groupTokenIndex?: number;
+  pathogenTokenIndex?: number;
+  urlGroupId: string;
+  urlPathogen: string;
+}
+
 const replacePathParams = ({
   router,
-  params,
   groupTokenIndex,
   pathogenTokenIndex,
   urlGroupId,
   urlPathogen,
-}): string => {
+}: Props): string => {
+  const { pathname, query } = router;
   // this removes the `[[...params]]` that next.js appends to page paths which accept
   // parameters. Unfortunately, there doesn't seem to be a way to get the base path
   // without this piece from the router.
-  const oldPathTokens: [] = router.pathname?.split("/") ?? [];
+  const oldPathTokens: string[] = pathname?.split("/") ?? [];
   oldPathTokens.pop();
 
   // make a copy of params to keep anything else that was in the path before
-  const newPathParams = [...params];
+  const newPathParams = [...query.params];
 
   // groupTokenIndex may be undefined if the user simply navigates to, eg, /data/samples
   // without providing a group id in the url. May happen from existing bookmarks or

@@ -34,7 +34,7 @@ export const usesFeatureFlag = (flag: FeatureFlag): boolean => {
   const { isDisabled, key } = flag;
 
   const storedValue = getLocalStorage(FEATURE_FLAG_PREFIX + key);
-  const isBrowserUsingFlag = isStrTrue(storedValue ?? "");
+  const isBrowserUsingFlag = isStrTrue(storedValue);
 
   if (!isDisabled && isBrowserUsingFlag) return true;
   return false;
