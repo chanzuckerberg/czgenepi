@@ -22,14 +22,14 @@ test.describe('Phylogenetic Tree', ()=>{
     test("tree test",async ()=>{
         const tree: TreeInfo = {
             treeName: "juan",
-            treeType: "juan",
-            lineage: "any",
-            collectionDate: "any",
-            forceIncludedSamples: "any"
+            treeType: "Overview",
+            lineage: ["A.15","A.2.4","A.19"],
+            collectionDate: "Last 7 Days",
+            forceIncludedSamples: "usdfasdfalsdjf"
         }
         await samplePage.openNextstrainPhylogeneticTreeModal()
         await treesPage.createTree(tree);
- 
+        
      })
  
 
