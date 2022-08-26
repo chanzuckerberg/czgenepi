@@ -3,6 +3,9 @@ import { store } from "../redux";
 import { setGroup } from "../redux/actions";
 
 export const setValidGroup = async (): Promise<void> => {
+  if (typeof window === "undefined") {
+    return;
+  }
   const { dispatch } = store;
   const userInfo = await fetchUserInfo();
   const { groups } = userInfo;

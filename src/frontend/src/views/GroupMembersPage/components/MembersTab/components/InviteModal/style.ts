@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import {
   Callout,
+  CommonThemeProps,
   DialogContent,
   fontBodyXxs,
   fontHeaderXl,
@@ -29,7 +30,7 @@ export const StyledInputText = styled(InputText)`
 
 export const SmallText = styled.span`
   ${fontBodyXxs}
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
 
@@ -43,7 +44,7 @@ export const SmallText = styled.span`
 export const StyledSpan = styled.span`
   ${fontHeaderXl}
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const fontWeights = getFontWeights(props);
     return `
       font-weight: ${fontWeights?.regular};
@@ -54,7 +55,7 @@ export const StyledSpan = styled.span`
 export const StyledCallout = styled(Callout)`
   width: 100%;
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-bottom: ${spaces?.xs}px;
@@ -63,7 +64,7 @@ export const StyledCallout = styled(Callout)`
 `;
 
 export const StyledDialogContent = styled(DialogContent)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const fontWeights = getFontWeights(props);
     const spaces = getSpaces(props);
 
@@ -78,7 +79,7 @@ export const StyledDialogContent = styled(DialogContent)`
 `;
 
 export const StyledInstructions = styled(Instructions)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `

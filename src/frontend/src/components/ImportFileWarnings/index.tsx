@@ -1,5 +1,4 @@
 import { isEmpty } from "lodash";
-import React from "react";
 import {
   ParseResult as ParseResultEdit,
   SampleIdToWarningMessages as SampleIdToWarningMessagesEdit,

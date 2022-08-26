@@ -15,7 +15,6 @@ const SCRIPT_SRC = [
 
 module.exports = {
   distDir: ENV.BUILD_PATH,
-  fileExtensions: ["jpg", "jpeg", "png", "gif", "ico", "webp", "jp2", "avif"],
 
   async generateBuildId() {
     // Return null to allow next.js to fallback to default behavior
@@ -83,6 +82,12 @@ module.exports = {
         source: "/resources",
         destination:
           "https://help.czgenepi.org/hc/en-us/categories/6217716150804-Genomic-Epidemiology-Learning-Center",
+        permanent: true,
+      },
+      {
+        source: "/faq",
+        destination:
+          "https://help.czgenepi.org/hc/en-us/sections/5686564086548-FAQ",
         permanent: true,
       },
     ];

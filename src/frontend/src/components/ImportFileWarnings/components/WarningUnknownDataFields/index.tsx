@@ -1,4 +1,3 @@
-import React from "react";
 import { B } from "src/common/styles/basicStyle";
 import AlertAccordion from "src/components/AlertAccordion";
 

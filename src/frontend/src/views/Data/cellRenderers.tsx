@@ -1,7 +1,6 @@
 /* eslint-disable react/display-name */
 
 import { ChipProps, Icon, Tooltip } from "czifui";
-import React from "react";
 import {
   defaultSampleCellRenderer,
   defaultTreeCellRenderer,
@@ -179,7 +178,7 @@ const TREE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
     <TreeTypeTooltip value={value as string}>
       <TreeRowContent>
         <UnderlinedCell data-test-id={`row-${header.key}`}>
-          {value}
+          {String(value)}
         </UnderlinedCell>
       </TreeRowContent>
     </TreeTypeTooltip>

@@ -1,11 +1,17 @@
 import styled from "@emotion/styled";
-import { TableCell, TableContainer, TableRow } from "@material-ui/core";
-import { fontBodyM, fontHeaderXs, getColors, getSpaces } from "czifui";
+import { TableCell, TableContainer, TableRow } from "@mui/material";
+import {
+  CommonThemeProps,
+  fontBodyM,
+  fontHeaderXs,
+  getColors,
+  getSpaces,
+} from "czifui";
 
 export const Overflow = styled.div`
   overflow: auto;
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
@@ -20,7 +26,7 @@ export const StyledTableContainer = styled(TableContainer)`
 `;
 
 export const IdColumn = styled.div`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
@@ -32,7 +38,7 @@ export const IdColumn = styled.div`
 export const StyledTableCell = styled(TableCell)`
   ${fontHeaderXs}
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
 
@@ -45,7 +51,7 @@ export const StyledTableCell = styled(TableCell)`
 `;
 
 export const IsPrivateTableCell = styled(StyledTableCell)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
 

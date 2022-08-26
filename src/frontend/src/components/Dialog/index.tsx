@@ -1,8 +1,7 @@
 import {
   Dialog as MuiDialog,
   DialogProps as MuiDialogProps,
-} from "@material-ui/core";
-import React from "react";
+} from "@mui/material";
 
 interface Props extends MuiDialogProps {
   disableBackdropClick?: boolean;

@@ -11,8 +11,8 @@ module.exports = {
   HEADFUL: process.env.HEADFUL || false,
   HEADLESS: process.env.HEADLESS || true,
   NODE_ENV: process.env.NODE_ENV || "development",
-  SPLIT_FRONTEND_KEY: process.env.SPLIT_FRONTEND_KEY || "localhost",
   ONETRUST_FRONTEND_KEY: process.env.ONETRUST_FRONTEND_KEY || "",
   PLAUSIBLE_FRONTEND_KEY: process.env.PLAUSIBLE_FRONTEND_KEY || "",
   SEGMENT_FRONTEND_KEY: process.env.SEGMENT_FRONTEND_KEY || "",
+  SPLIT_FRONTEND_KEY: process.env.SPLIT_FRONTEND_KEY || "localhost",
 };

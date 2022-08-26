@@ -1,8 +1,10 @@
+import { useTreatments } from "@splitsoftware/splitio-react";
 import { Icon, Menu, MenuItem } from "czifui";
-import React from "react";
+import { useState } from "react";
 import { API } from "src/common/api";
 import ENV from "src/common/constants/ENV";
 import { ROUTES } from "src/common/routes";
+import { FEATURE_FLAGS, isFlagOn } from "src/components/Split";
 import { StyledNavButton, StyledNavIconWrapper } from "./style";
 
 interface UserMenuProps {
@@ -10,7 +12,7 @@ interface UserMenuProps {
 }
 
 const UserMenu = ({ user }: UserMenuProps): JSX.Element => {
-  const [anchorEl, setAnchorEl] = React.useState<Element | null>(null);
+  const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = (event) => {
     setAnchorEl(event.currentTarget);
@@ -27,6 +29,9 @@ const UserMenu = ({ user }: UserMenuProps): JSX.Element => {
     }
     handleClose();
   };
+
+  const flag = useTreatments([FEATURE_FLAGS.prep_files]);
+  const isPrepFilesFlagOn = isFlagOn(flag, FEATURE_FLAGS.prep_files);
 
   return (
     <>
@@ -46,8 +51,12 @@ const UserMenu = ({ user }: UserMenuProps): JSX.Element => {
         keepMounted
         open={Boolean(anchorEl)}
         onClose={handleClose}
-        getContentAnchorEl={null}
       >
+        {isPrepFilesFlagOn && (
+          <a href={ROUTES.ACCOUNT}>
+            <MenuItem onClick={handleClose}>My Account</MenuItem>
+          </a>
+        )}
         <a href={ROUTES.CONTACT_US_EMAIL} target="_blank" rel="noopener">
           <MenuItem onClick={handleClose}>Contact us</MenuItem>
         </a>

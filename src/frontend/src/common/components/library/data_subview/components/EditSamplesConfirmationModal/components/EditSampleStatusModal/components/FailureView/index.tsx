@@ -1,4 +1,3 @@
-import React from "react";
 import UploadFailedImage from "src/common/images/UploadFailed.svg";
 import { B } from "src/common/styles/basicStyle";
 import {

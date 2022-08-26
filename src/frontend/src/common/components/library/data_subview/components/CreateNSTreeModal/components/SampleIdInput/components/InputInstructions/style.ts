@@ -1,8 +1,13 @@
 import styled from "@emotion/styled";
-import { fontBodyXs, getFontWeights, getSpaces } from "czifui";
+import {
+  CommonThemeProps,
+  fontBodyXs,
+  getFontWeights,
+  getSpaces,
+} from "czifui";
 
 export const SemiBold = styled.span`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const fontWeights = getFontWeights(props);
     return `
       font-weight: ${fontWeights?.semibold};
@@ -15,7 +20,7 @@ export const StyledWrapper = styled.div`
     ${fontBodyXs}
   }
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-bottom: ${spaces?.xxxs}px;

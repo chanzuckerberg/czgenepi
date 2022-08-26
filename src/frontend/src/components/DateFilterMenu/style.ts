@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import {
   Button,
+  CommonThemeProps,
   fontBodyXs,
   fontBodyXxxs,
   getColors,
@@ -14,7 +15,7 @@ export const StyledDateRange = styled.div`
 `;
 
 export const StyledManualDate = styled.div`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
     return `
@@ -29,7 +30,7 @@ export const StyledManualDate = styled.div`
 
 export const StyledText = styled.span`
   ${fontBodyXs}
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const fontWeights = getFontWeights(props);
     const spaces = getSpaces(props);
     return `
@@ -40,7 +41,7 @@ export const StyledText = styled.span`
 `;
 
 export const StyledButton = styled(Button)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin-top: ${spaces?.xs}px;
@@ -57,7 +58,7 @@ export const StyledErrorMessage = styled.span`
   /* set max-width here so that there's space for both error messages to be present and be spaced appropriately */
   max-width: 159px;
   ${fontBodyXxxs}
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     return `
       color: ${colors?.error[600]};

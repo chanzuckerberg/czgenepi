@@ -1,6 +1,6 @@
 import { Icon } from "czifui";
 import { compact, filter } from "lodash";
-import React, { ChangeEvent, useCallback, useEffect, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useState } from "react";
 import { INPUT_DELIMITERS } from "src/common/constants/inputDelimiters";
 import {
   SampleValidationResponseType,

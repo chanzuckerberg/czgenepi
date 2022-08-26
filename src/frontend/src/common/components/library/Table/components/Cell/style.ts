@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { getSpaces } from "czifui";
+import { CommonThemeProps, getSpaces } from "czifui";
 
 export const StyledCell = styled.div`
   display: flex;
@@ -16,7 +16,7 @@ export const StyledCell = styled.div`
     justify-content: unset;
   }
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `

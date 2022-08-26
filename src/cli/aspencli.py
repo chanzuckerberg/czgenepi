@@ -290,15 +290,16 @@ def usher():
 
 @usher.command(name="get-link")
 @click.argument("sample_ids", nargs=-1)
+@click.argument("sample_count", nargs=1)
 @click.pass_context
-def get_link(ctx, sample_ids):
+def get_link(ctx, sample_ids, sample_count = 50):
     api_client = ctx.obj["api_client"]
     payload = {"samples": sample_ids, "downstream_consumer": "USHER"}
     resp = api_client.post_with_org("/v2/sequences/getfastaurl", json=payload)
     resp_info = resp.json()
     s3_url = resp_info["url"]
     print(
-        f"https://genome.ucsc.edu/cgi-bin/hgPhyloPlace?db=wuhCor1&remoteFile={quote(s3_url)}"
+        f"https://genome.ucsc.edu/cgi-bin/hgPhyloPlace?db=wuhCor1&subtreeSize={sample_count}&remoteFile={quote(s3_url)}"
     )
 
 

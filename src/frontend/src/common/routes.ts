@@ -1,5 +1,6 @@
 export enum ROUTES {
   HOMEPAGE = "/",
+  ACCOUNT = "/account",
   AGREE_TERMS = "/agreeTerms",
   BIOHUB = "https://www.czbiohub.org/",
   CAREERS = "https://chanzuckerberg.com/careers/career-opportunities/?initiative=science",
@@ -7,7 +8,6 @@ export enum ROUTES {
   CZI = "https://chanzuckerberg.com/",
   DATA = "/data",
   DATA_SAMPLES = "/data/samples",
-  FAQ = "/faq",
   GISAID = "https://www.gisaid.org/",
   GITHUB = "https://github.com/chanzuckerberg/czgenepi/",
   GROUP = "/group",

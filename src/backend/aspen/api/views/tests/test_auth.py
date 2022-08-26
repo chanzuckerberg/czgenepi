@@ -294,7 +294,7 @@ async def test_callback_syncs_auth0_user_roles(
     async_session.add(group)
     await async_session.commit()
 
-    split_client.get_flag.side_effect = ["on"]  # type: ignore
+    split_client.get_usergroup_treatment.side_effect = ["on"]  # type: ignore
     auth0_apiclient.get_org_user_roles.side_effect = [["admin"]]  # type: ignore
     auth0_oauth.authorize_access_token.side_effect = [{"userinfo": userinfo}]  # type: ignore
     auth0_apiclient.get_user_orgs.side_effect = [[]]  # type: ignore
@@ -351,7 +351,7 @@ async def test_callback_ff_doesnt_sync_auth0_user_roles(
     async_session.add(group)
     await async_session.commit()
 
-    split_client.get_flag.side_effect = ["control"]  # type: ignore
+    split_client.get_usergroup_treatment.side_effect = ["control"]  # type: ignore
     auth0_apiclient.get_org_user_roles.side_effect = [["admin"]]  # type: ignore
     auth0_oauth.authorize_access_token.side_effect = [{"userinfo": userinfo}]  # type: ignore
     auth0_apiclient.get_user_orgs.side_effect = [[]]  # type: ignore
@@ -423,7 +423,7 @@ async def test_redirect_to_samples_if_exists(
     async_session.add(user)
     await async_session.commit()
 
-    split_client.get_flag.side_effect = ["control"]  # type: ignore
+    split_client.get_usergroup_treatment.side_effect = ["control"]  # type: ignore
     auth0_apiclient.get_org_user_roles.side_effect = [["admin"]]  # type: ignore
     auth0_oauth.authorize_access_token.side_effect = [{"userinfo": userinfo}]  # type: ignore
     auth0_apiclient.get_user_orgs.side_effect = [[]]  # type: ignore
@@ -458,7 +458,7 @@ async def test_redirect_to_group_welcome_if_new(
     async_session.add(group)
     await async_session.commit()
 
-    split_client.get_flag.side_effect = ["control"]  # type: ignore
+    split_client.get_usergroup_treatment.side_effect = ["control"]  # type: ignore
     auth0_apiclient.get_org_user_roles.side_effect = [["admin"]]  # type: ignore
     auth0_oauth.authorize_access_token.side_effect = [{"userinfo": userinfo}]  # type: ignore
     auth0_apiclient.get_user_orgs.side_effect = [[]]  # type: ignore

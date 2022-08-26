@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { getSpaces } from "czifui";
+import { CommonThemeProps, getSpaces } from "czifui";
 import { SmallerThanBreakpoint } from "src/common/styles/mixins/global";
 
 export const IntroContainer = styled.div`
@@ -9,7 +9,7 @@ export const IntroContainer = styled.div`
   max-width: 1440px;
   margin: 0 auto;
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `

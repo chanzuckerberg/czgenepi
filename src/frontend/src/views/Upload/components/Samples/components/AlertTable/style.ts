@@ -5,7 +5,7 @@ import {
   TableHead,
   TableRow,
   TableRowProps as MuiTableRowProps,
-} from "@material-ui/core";
+} from "@mui/material";
 import { CommonThemeProps, fontBodyXs, fontHeaderXs, getColors } from "czifui";
 
 export const Overflow = styled.div`

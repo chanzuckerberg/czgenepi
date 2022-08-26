@@ -1,10 +1,9 @@
 import { Tab } from "czifui";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useProtectedRoute, useUserInfo } from "src/common/queries/auth";
 import { useGroupInfo, useGroupMembersInfo } from "src/common/queries/groups";
 import { ROUTES } from "src/common/routes";
-import { stringifyGisaidLocation } from "src/common/utils/locationUtils";
 import { caseInsensitiveSort } from "src/common/utils/strUtils";
 import { getIsGroupAdminFromUserInfo } from "src/common/utils/userInfo";
 import { GroupDetailsTab } from "./components/GroupDetailsTab";
@@ -21,9 +20,9 @@ export enum PrimaryTabType {
   DETAILS = "details",
 }
 
-export type TabEventHandler = (
-  _: React.SyntheticEvent<Record<string, unknown>>,
-  tabsValue: never
+type PrimaryTabEventHandler = (
+  event: React.SyntheticEvent<Element, Event>,
+  tabsValue: PrimaryTabType
 ) => void;
 
 interface Props {
@@ -44,7 +43,7 @@ const GroupMembersPage = ({
   const { data: members = [] } = useGroupMembersInfo();
   const { data: groupInfo } = useGroupInfo();
 
-  const { address, location, name, prefix } = groupInfo ?? {};
+  const { name } = groupInfo ?? {};
 
   useEffect(() => {
     setTabValue(requestedPrimaryTab);
@@ -53,9 +52,7 @@ const GroupMembersPage = ({
   // sort group members by name before display
   members.sort((a, b) => caseInsensitiveSort(a.name, b.name));
 
-  const displayLocation = stringifyGisaidLocation(location);
-
-  const handleTabClick: TabEventHandler = (_, value) => {
+  const handleTabClick: PrimaryTabEventHandler = (_, value) => {
     setTabValue(value);
     router.push(`${ROUTES.GROUP}/${value}`);
   };
@@ -87,9 +84,7 @@ const GroupMembersPage = ({
         )}
         {tabValue === PrimaryTabType.DETAILS && (
           <GroupDetailsTab
-            address={address}
-            location={displayLocation}
-            prefix={prefix}
+            group={groupInfo}
             shouldShowChangeDetailsCallout={isGroupAdmin}
           />
         )}

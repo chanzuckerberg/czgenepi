@@ -1,6 +1,6 @@
 import deepEqual from "deep-equal";
 import { useFormik } from "formik";
-import React, { useEffect, useMemo } from "react";
+import { memo, useEffect, useMemo } from "react";
 import { noop } from "src/common/constants/empty";
 import {
   DATE_ERROR_MESSAGE,
@@ -65,7 +65,7 @@ interface Props {
   shouldShowEditedInputAsMarked?: boolean;
 }
 
-export default React.memo(function Row({
+export default memo(function Row({
   id,
   metadata,
   hasImportedMetadataFile,

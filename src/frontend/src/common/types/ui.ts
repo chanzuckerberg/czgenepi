@@ -5,7 +5,7 @@ export interface ButtonInfo {
   content?: string | JSX.Element;
   type?: "primary" | "secondary";
   link?: string | "cancel";
-  Button?: FC<ButtonProps>;
+  Button?: FC<ButtonProps<"button">>;
 }
 
 export interface ModalInfo {
