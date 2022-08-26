@@ -30,14 +30,13 @@ const getRealBasePath = (path = ""): string =>
 
 export const useAppRouting = (): void => {
   const router = useRouter();
-  const { pathname } = router;
-  const realPath = getRealBasePath(pathname);
+  const { asPath: currentPath } = router;
 
   let shouldRemoveExtraParams = true;
 
   // extra params shouldn't be removed if the user is on a page where they are used
   forEach(workspacePaths, (wsPath) => {
-    if (realPath.startsWith(wsPath)) {
+    if (currentPath.startsWith(wsPath)) {
       setCurrentWorkspacePath(router);
       shouldRemoveExtraParams = false;
       return false;
