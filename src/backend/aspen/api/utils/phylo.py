@@ -73,7 +73,11 @@ def _rename_nodes_on_tree(
     renamed_value = name_map.get(tree_identifier, None)
 
     # Make sure we have the gisaid prefix on this node when we output it.
-    node["name"] = f"{gisaid_prefix}{tree_identifier}"
+    node["name"] = (
+        f"{gisaid_prefix}{tree_identifier}"
+        if not tree_identifier.startswith("NODE_")
+        else tree_identifier
+    )
     if renamed_value is not None:
         # we found the replacement value! first, save the old value if the caller
         # requested.
