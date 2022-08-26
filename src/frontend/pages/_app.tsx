@@ -18,12 +18,9 @@ import { StyledApp } from "src/common/styles/appStyle";
 import "src/common/styles/global.css";
 import "src/common/styles/oneTrust.css";
 import { theme } from "src/common/styles/theme";
-import { setFeatureFlagsFromQueryParams } from "src/common/utils/featureFlags";
 import Nav from "src/components/NavBar";
 import SplitInitializer from "src/components/Split";
 import createEmotionCache from "src/createEmotionCache";
-
-setFeatureFlagsFromQueryParams();
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
