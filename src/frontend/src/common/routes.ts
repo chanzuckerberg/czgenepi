@@ -1,5 +1,6 @@
 export enum ROUTES {
   HOMEPAGE = "/",
+  ACCOUNT = "/account",
   AGREE_TERMS = "/agreeTerms",
   BIOHUB = "https://www.czbiohub.org/",
   CAREERS = "https://chanzuckerberg.com/careers/career-opportunities/?initiative=science",
