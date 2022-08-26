@@ -58,15 +58,17 @@ export default function Upload(): JSX.Element | null {
     router.push(ROUTES.UPLOAD_STEP1);
   }
 
-  let Component = null;
+  let matchedPath = "";
   const currentPath = router.asPath;
 
-  forEach(routeToComponent, (component, route) => {
+  forEach(Object.keys(routeToComponent), (route) => {
     if (currentPath.startsWith(route)) {
-      Component = component;
+      matchedPath = route;
       return false;
     }
   });
+
+  const Component = routeToComponent[matchedPath as Routes] || null;
 
   return (
     <StyledPageContent>

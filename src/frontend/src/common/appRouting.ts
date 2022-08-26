@@ -205,7 +205,7 @@ export const removeExtraParams = (router: NextRouter): void => {
 
   if (!params || !pathname) return;
 
-  const idxToRemove = [];
+  const idxToRemove: number[] = [];
 
   forEach(params, (param, i) => {
     const nextIndex = i + 1;
