@@ -35,8 +35,6 @@ refine:
   
 priorities:
   crowding_penalty: {crowding_penalty_per_tree_type}
-  
-include_hcov19_prefix: True
 
 ## Subsampling schemas
 subsampling:
