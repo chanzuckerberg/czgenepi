@@ -26,7 +26,12 @@ interface InstructionTitleProps extends HeaderProps {
   marginBottom?: SizeType;
 }
 
-const doNotForwardProps = ["buttonSize", "headerSize", "listPadding"];
+const doNotForwardProps = [
+  "buttonSize",
+  "headerSize",
+  "listPadding",
+  "marginBottom",
+];
 
 const headerSize = (props: HeaderProps) => {
   const { headerSize } = props;
