@@ -13,31 +13,39 @@ import {
 import { workspacePaths } from "./routes";
 import { canUserViewGroup } from "./utils/userInfo";
 
-const ROUTER_PARAMS_SUFFIX = "/[[...params]]";
-
 // TODO (mlila): if we end up with more than two workspace values (groupId, pathogen)
 // TODO          consider creating a map with these indicators. This would allow us
 // TODO          to construct the url more programmatically. For example, we would not have
 // TODO          to enumerate conditional statements in setCurrentWorkspacePath and
 // TODO          replacePathParams. Doing so with only 2 variables feels a little heavy
 // TODO          handed at the moment, though.
-const GROUP_URL_INDICATOR = "group";
+const GROUP_URL_INDICATOR = "groupId";
 const PATHOGEN_URL_INDICATOR = "pathogen";
+const PATH_INDICATORS = [GROUP_URL_INDICATOR, PATHOGEN_URL_INDICATOR];
+
+const SLASH = "/";
+
+const getRealBasePath = (path = ""): string =>
+  path.replace("/[[...params]]", "");
 
 export const useAppRouting = (): void => {
   const router = useRouter();
   const { pathname } = router;
-  const realPath = pathname.replace(ROUTER_PARAMS_SUFFIX, "");
+  const realPath = getRealBasePath(pathname);
 
-  // public page paths shouldn't ever occur with the extra params
-  // so if a user navigates to a public page, just do nothing --
-  // they're already in the right place
+  let shouldRemoveExtraParams = true;
+
+  // extra params shouldn't be removed if the user is on a page where they are used
   forEach(workspacePaths, (wsPath) => {
     if (realPath.startsWith(wsPath)) {
       setCurrentWorkspacePath(router);
+      shouldRemoveExtraParams = false;
       return false;
     }
   });
+
+  // public pages, and certain app pages like group details, don't need the extra params
+  if (shouldRemoveExtraParams) removeExtraParams(router);
 };
 
 /**
@@ -55,19 +63,19 @@ const setCurrentWorkspacePath = async (router: NextRouter) => {
   let potentialUrlPathogen;
   let potentialUrlGroupId;
 
-  for (let i = 0; i < params.length - 1; i++) {
+  forEach(params, (param, i) => {
     const nextIndex = i + 1;
 
-    if (params[i] === GROUP_URL_INDICATOR) {
+    if (param === GROUP_URL_INDICATOR) {
       groupTokenIndex = nextIndex;
       potentialUrlGroupId = params[nextIndex];
     }
 
-    if (params[i] === PATHOGEN_URL_INDICATOR) {
+    if (param === PATHOGEN_URL_INDICATOR) {
       pathogenTokenIndex = nextIndex;
       potentialUrlPathogen = params[nextIndex];
     }
-  }
+  });
 
   const urlGroupId = await setWorkspaceGroupId(potentialUrlGroupId);
   const urlPathogen = await setWorkspacePathogen(potentialUrlPathogen);
@@ -165,7 +173,7 @@ const replacePathParams = ({
   // this removes the `[[...params]]` that next.js appends to page paths which accept
   // parameters. Unfortunately, there doesn't seem to be a way to get the base path
   // without this piece from the router.
-  const oldPathTokens: string[] = pathname?.split("/") ?? [];
+  const oldPathTokens: string[] = pathname?.split(SLASH) ?? [];
   oldPathTokens.pop();
 
   // make a copy of params to keep anything else that was in the path before
@@ -189,5 +197,41 @@ const replacePathParams = ({
   }
 
   const newTokens = oldPathTokens.concat(newPathParams);
-  return newTokens.join("/");
+  return newTokens.join(SLASH);
+};
+
+export const removeExtraParams = (router: NextRouter): void => {
+  const { asPath: currentPath, pathname, query } = router;
+  const { params } = query;
+
+  if (!params || !pathname) return;
+
+  const idxToRemove = [];
+
+  forEach(params, (param, i) => {
+    const nextIndex = i + 1;
+
+    if (PATH_INDICATORS.includes(param)) {
+      idxToRemove.push(i);
+      idxToRemove.push(nextIndex);
+    }
+  });
+
+  // reverse the array of indices, because if you remove the ones closer to the end first
+  // it does not change the index of params stored earlier in the array
+  const reversed = idxToRemove.reverse();
+
+  const newParams = [...params];
+  forEach(reversed, (i) => {
+    newParams.splice(i, 1);
+  });
+
+  const realPath = getRealBasePath(pathname);
+  const newPath = realPath.concat(SLASH).concat(newParams.join(SLASH));
+
+  if (currentPath !== newPath) {
+    router.replace({
+      pathname: newPath,
+    });
+  }
 };
