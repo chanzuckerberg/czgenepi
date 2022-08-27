@@ -24,7 +24,7 @@ const GroupDetailsTab = ({
 }: Props): JSX.Element | null => {
   if (!group) return null;
 
-  const { address, name, prefix, location } = group;
+  const { address, name, location } = group;
   const displayLocation = stringifyGisaidLocation(location);
 
   const InfoTooltip = ({ title }: { title: string }) => (
@@ -58,11 +58,6 @@ const GroupDetailsTab = ({
             <InfoTooltip title="Group’s full Nextstrain location ID. CZ GEN EPI uses this as the default location parameters when building trees for this group." />
           </DetailSubheader>
           <DetailDisplay>{displayLocation}</DetailDisplay>
-          <DetailSubheader>
-            Sample Public ID Prefix
-            <InfoTooltip title="Set of characters used when auto-generating unique Public IDs for samples uploaded to this Group if a Public or GISAID ID is not provided." />
-          </DetailSubheader>
-          <DetailDisplay>{prefix}</DetailDisplay>
         </DetailSection>
         <DetailSection>
           <DetailHeader>GISAID Submission Details</DetailHeader>

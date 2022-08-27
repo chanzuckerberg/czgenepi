@@ -4,6 +4,7 @@ import {
   CommonThemeProps,
   fontBodyXs,
   getColors,
+  getPalette,
   getSpaces,
 } from "czifui";
 
@@ -43,6 +44,35 @@ export const StyledDiv = styled.div`
     const spaces = getSpaces(props);
     return `
       margin-right: ${spaces?.l}px;
+    `;
+  }}
+`;
+
+export const StyledLink = styled.a`
+  display: flex;
+  align-items: center;
+  ${(props: CommonThemeProps) => {
+    const spaces = getSpaces(props);
+
+    return `
+      padding: ${spaces?.xxxs}px;
+      margin-right: ${spaces?.xs}px;
+    `;
+  }}
+`;
+
+export const StyledIconWrapper = styled.div`
+  ${(props: CommonThemeProps) => {
+    const colors = getColors(props);
+    const palette = getPalette(props);
+
+    return `
+      svg {
+        fill: ${colors?.gray[300]};
+        &:hover, &:focus, &:active {
+          fill: ${palette?.common?.white};
+        }
+      }
     `;
   }}
 `;

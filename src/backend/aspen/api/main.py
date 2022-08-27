@@ -20,6 +20,7 @@ from aspen.api.views import (
     health,
     lineages,
     locations,
+    pathogens,
     phylo_runs,
     phylo_trees,
     samples,
@@ -116,16 +117,20 @@ def get_app() -> FastAPI:
     _app.include_router(
         groups.router, prefix="/v2/groups", dependencies=[Depends(get_auth_user)]
     )
-
+    _app.include_router(
+        pathogens.router, prefix="/v2/pathogens", dependencies=[Depends(get_auth_user)]
+    )
     _app.add_exception_handler(
         AspenException,
         exception_handler,
     )
 
     # Auspice endpoints don't all require authentication, they can do their own login checks.
-    _app.include_router(auspice.router, prefix="/v2/auspice")
     _app.include_router(auspice.router, prefix="/v2/orgs/{org_id}/auspice")
-    # Which routes are "ready" to accept org prefixes?
+    _app.include_router(
+        auspice.router, prefix="/v2/orgs/{org_id}/pathogens/{pathogen_slug}/auspice"
+    )
+
     org_routers = {
         "sequences": sequences.router,
         "phylo_trees": phylo_trees.router,
@@ -133,14 +138,24 @@ def get_app() -> FastAPI:
         "samples": samples.router,
     }
     for suffix, router in org_routers.items():
+        # add pathogen support to endpoints
         _app.include_router(
             router,
-            prefix="/v2/" + suffix,
+            prefix="/v2/orgs/{org_id}/pathogens/{pathogen_slug}/" + suffix,
             dependencies=[Depends(require_group_membership)],
         )
+
+        # if urls don't include pathogen_slugs, default to SC2
         _app.include_router(
             router,
             prefix="/v2/orgs/{org_id}/" + suffix,
+            dependencies=[Depends(require_group_membership)],
+        )
+
+        # old urls (TODO: remove this soonish?)
+        _app.include_router(
+            router,
+            prefix="/v2/" + suffix,
             dependencies=[Depends(require_group_membership)],
         )
 
