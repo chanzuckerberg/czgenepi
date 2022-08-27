@@ -2,13 +2,20 @@ import re
 from enum import Enum
 from typing import AsyncGenerator, Optional, Set
 
+import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import and_, joinedload
 
 from aspen.api.authn import AuthContext
 from aspen.api.authz import AuthZSession
 from aspen.api.utils import samples_by_identifiers
-from aspen.database.models import Sample, UploadedPathogenGenome
+from aspen.database.models import (
+    Pathogen,
+    PathogenRepoConfig,
+    PublicRepository,
+    Sample,
+    UploadedPathogenGenome,
+)
 
 
 class SpecialtyDownstreams(Enum):
