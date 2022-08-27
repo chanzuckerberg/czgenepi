@@ -4,8 +4,7 @@ from aspen.api.schemas.base import BaseRequest, BaseResponse
 
 
 class SequenceRequest(BaseRequest):
-    # TODO: replace with GenBank once we role out decovidify
-    public_repository_name: Optional[str] = "GISAID"
+    public_repository_name: Optional[str] = None
     sample_ids: list[str]
 
 

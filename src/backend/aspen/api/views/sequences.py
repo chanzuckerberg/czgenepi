@@ -22,9 +22,13 @@ from aspen.api.utils.fasta_streamer import FastaStreamer
 router = APIRouter()
 
 
-def get_fasta_filename(public_repository_name):
+def get_fasta_filename(public_repository_name, group_name):
+    # get filename depending on public_repository, else default to generic filename with group name
     todays_date = datetime.today().strftime("%Y%m%d")
-    return f"{todays_date}_{public_repository_name}_sequences.fasta"
+    if public_repository_name is not None:
+        return f"{todays_date}_{public_repository_name}_sequences.fasta"
+    # user wants to download samples with no intent to submit to a public repository
+    return f"{group_name}_sample_sequences.fasta"
 
 
 @router.post("/")
@@ -37,7 +41,7 @@ async def prepare_sequences_download(
 ) -> StreamingResponse:
     # stream output file
 
-    fasta_filename = get_fasta_filename(request.public_repository_name)
+    fasta_filename = get_fasta_filename(request.public_repository_name, ac.group.name)
 
     async def stream_samples():
         sample_ids = request.sample_ids

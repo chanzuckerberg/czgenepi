@@ -81,11 +81,15 @@ class FastaStreamer:
         used in the ID. Also handles any modifications that must be made to ID
         characters so they don't break the downstream consumer."""
 
-        # get the sample id prefix for given public_repository
-        prefix = await get_public_repository_prefix(
-            self.public_repository_type, self.pathogen_slug, self.db
-        )
-        output_id = f'{prefix}/{identifier.lstrip("hCoV-19/")}'  # default, might get changed if specialty case
+        if self.public_repository_type:
+            # get the sample id prefix for given public_repository
+            prefix = await get_public_repository_prefix(
+                self.public_repository_type, self.pathogen_slug, self.db
+            )
+            output_id = f'{prefix}/{identifier.lstrip("hCoV-19/")}'  # default, might get changed if specialty case
+        else:
+            # user is proceeding with normal download, and does not wish to submit to gisaid or genbank
+            output_id = identifier
         if self.downstream_consumer == SpecialtyDownstreams.USHER.value:
             output_id = self._handle_usher_id(identifier)
         return f">{output_id}\n"

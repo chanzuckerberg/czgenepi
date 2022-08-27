@@ -4,6 +4,7 @@ import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from aspen.api.views.sequences import get_fasta_filename
 from aspen.database.models import Sample
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.pathogen_repo_config import (
@@ -46,18 +47,18 @@ async def test_prepare_sequences_download_gisaid(
     Test a regular sequence download for a sample submitted by the user's group, test prefixes are correctly added for GISAID
     """
 
-    group, user, sample = setup_sequences_download_test_data(async_session)
+    group, user, sample = await setup_sequences_download_test_data(async_session)
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     data = {
         "sample_ids": [sample.public_identifier],
-        "public_repository_type": "GISAID",
+        "public_repository_name": "GISAID",
     }
     res = await http_client.post(
         f"/v2/orgs/{group.id}/sequences/", headers=auth_headers, json=data
     )
     assert res.status_code == 200
-    expected_filename = f"{group.name}_sample_sequences.fasta"
+    expected_filename = get_fasta_filename("GISAID", group.name)
     assert (
         res.headers["Content-Disposition"]
         == f"attachment; filename={expected_filename}"
@@ -75,18 +76,18 @@ async def test_prepare_sequences_download_genbank(
     """
     Test a regular sequence download for a sample submitted by the user's group, test prefixes are correctly added for GenBank
     """
-    group, user, sample = setup_sequences_download_test_data(async_session)
+    group, user, sample = await setup_sequences_download_test_data(async_session)
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     data = {
         "sample_ids": [sample.public_identifier],
-        "public_repository_type": "GenBank",
+        "public_repository_name": "GenBank",
     }
     res = await http_client.post(
         f"/v2/orgs/{group.id}/sequences/", headers=auth_headers, json=data
     )
     assert res.status_code == 200
-    expected_filename = f"{group.name}_sample_sequences.fasta"
+    expected_filename = get_fasta_filename("GenBank", group.name)
     assert (
         res.headers["Content-Disposition"]
         == f"attachment; filename={expected_filename}"
@@ -94,6 +95,34 @@ async def test_prepare_sequences_download_genbank(
     file_contents = str(res.content, encoding="UTF-8")
     assert "ATGCAAAAAA" in file_contents
     assert file_contents.startswith(">SARS-CoV-2/human/")
+    assert sample.private_identifier in file_contents
+
+
+async def test_prepare_sequences_download_no_submission(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+):
+    """
+    Test a regular sequence download for a sample submitted by the user's group, test prefixes are correctly added for GenBank
+    """
+    group, user, sample = await setup_sequences_download_test_data(async_session)
+
+    auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
+    data = {
+        "sample_ids": [sample.public_identifier],
+    }
+    res = await http_client.post(
+        f"/v2/orgs/{group.id}/sequences/", headers=auth_headers, json=data
+    )
+    assert res.status_code == 200
+    expected_filename = get_fasta_filename(None, group.name)
+    assert (
+        res.headers["Content-Disposition"]
+        == f"attachment; filename={expected_filename}"
+    )
+    file_contents = str(res.content, encoding="UTF-8")
+    assert "ATGCAAAAAA" in file_contents
+    assert file_contents.startswith(f">{sample.private_identifier}")
     assert sample.private_identifier in file_contents
 
 
@@ -190,6 +219,7 @@ async def test_access_matrix(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
+    setup_gisaid_and_genbank_repo_configs(async_session)
     # give the viewer group access to the sequences from the owner group
     roles = []
     roles.extend(await grouprole_factory(async_session, owner_group1, viewer_group))
