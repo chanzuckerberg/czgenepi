@@ -6,6 +6,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.database.models import Sample
 from aspen.test_infra.models.location import location_factory
+from aspen.test_infra.models.pathogen_repo_config import (
+    setup_gisaid_and_genbank_repo_configs,
+)
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
 from aspen.test_infra.models.usergroup import (
@@ -18,13 +21,9 @@ from aspen.test_infra.models.usergroup import (
 pytestmark = pytest.mark.asyncio
 
 
-async def test_prepare_sequences_download(
+async def setup_sequences_download_test_data(
     async_session: AsyncSession,
-    http_client: AsyncClient,
 ):
-    """
-    Test a regular sequence download for a sample submitted by the user's group
-    """
     group = group_factory()
     user = await userrole_factory(async_session, group)
     location = location_factory(
@@ -32,12 +31,27 @@ async def test_prepare_sequences_download(
     )
     sample = sample_factory(group, user, location)
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
+    setup_gisaid_and_genbank_repo_configs(async_session)
+
     async_session.add(group)
     await async_session.commit()
+    return group, user, sample
+
+
+async def test_prepare_sequences_download_gisaid(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+):
+    """
+    Test a regular sequence download for a sample submitted by the user's group, test prefixes are correctly added for GISAID
+    """
+
+    group, user, sample = setup_sequences_download_test_data(async_session)
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     data = {
         "sample_ids": [sample.public_identifier],
+        "public_repository_type": "GISAID",
     }
     res = await http_client.post(
         f"/v2/orgs/{group.id}/sequences/", headers=auth_headers, json=data
@@ -50,6 +64,36 @@ async def test_prepare_sequences_download(
     )
     file_contents = str(res.content, encoding="UTF-8")
     assert "ATGCAAAAAA" in file_contents
+    assert file_contents.startswith(">hCoV-19/")
+    assert sample.private_identifier in file_contents
+
+
+async def test_prepare_sequences_download_genbank(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+):
+    """
+    Test a regular sequence download for a sample submitted by the user's group, test prefixes are correctly added for GenBank
+    """
+    group, user, sample = setup_sequences_download_test_data(async_session)
+
+    auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
+    data = {
+        "sample_ids": [sample.public_identifier],
+        "public_repository_type": "GenBank",
+    }
+    res = await http_client.post(
+        f"/v2/orgs/{group.id}/sequences/", headers=auth_headers, json=data
+    )
+    assert res.status_code == 200
+    expected_filename = f"{group.name}_sample_sequences.fasta"
+    assert (
+        res.headers["Content-Disposition"]
+        == f"attachment; filename={expected_filename}"
+    )
+    file_contents = str(res.content, encoding="UTF-8")
+    assert "ATGCAAAAAA" in file_contents
+    assert file_contents.startswith(">SARS-CoV-2/human/")
     assert sample.private_identifier in file_contents
 
 

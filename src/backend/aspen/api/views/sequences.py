@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from uuid import uuid4
 
 import boto3
@@ -9,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.api.authn import AuthContext, get_auth_context
 from aspen.api.authz import AuthZSession, get_authz_session
-from aspen.api.deps import get_db, get_settings
+from aspen.api.deps import get_db, get_pathogen_slug, get_settings
 from aspen.api.schemas.sequences import (
     FastaURLRequest,
     FastaURLResponse,
@@ -21,19 +22,28 @@ from aspen.api.utils.fasta_streamer import FastaStreamer
 router = APIRouter()
 
 
+def get_fasta_filename(public_repository_name):
+    todays_date = datetime.today().strftime("%Y%m%d")
+    return f"{todays_date}_{public_repository_name}_sequences.fasta"
+
+
 @router.post("/")
 async def prepare_sequences_download(
     request: SequenceRequest,
     db: AsyncSession = Depends(get_db),
     az: AuthZSession = Depends(get_authz_session),
     ac: AuthContext = Depends(get_auth_context),
+    pathogen_slug=Depends(get_pathogen_slug),
 ) -> StreamingResponse:
     # stream output file
-    fasta_filename = f"{ac.group.name}_sample_sequences.fasta"  # type: ignore
+
+    fasta_filename = get_fasta_filename(request.public_repository_name)
 
     async def stream_samples():
         sample_ids = request.sample_ids
-        streamer = FastaStreamer(db, az, ac, set(sample_ids))
+        streamer = FastaStreamer(
+            db, az, ac, set(sample_ids), request.public_repository_name, pathogen_slug
+        )
         async for line in streamer.stream():
             yield line
 

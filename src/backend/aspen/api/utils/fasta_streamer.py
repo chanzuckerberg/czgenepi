@@ -8,6 +8,9 @@ from sqlalchemy.orm import joinedload
 from aspen.api.authn import AuthContext
 from aspen.api.authz import AuthZSession
 from aspen.api.utils import samples_by_identifiers
+from aspen.api.utils.sample import (  # #### phoenix move this to init file
+    get_public_repository_prefix,
+)
 from aspen.database.models import Sample, UploadedPathogenGenome
 
 
@@ -24,12 +27,16 @@ class FastaStreamer:
         az: AuthZSession,
         ac: AuthContext,
         sample_ids: Set[str],
+        public_repository_type: str,
+        pathogen_slug: str,
         downstream_consumer: Optional[str] = None,
     ):
         self.db = db
         self.ac = ac
         self.az = az
         self.sample_ids = sample_ids
+        self.public_repository_type = public_repository_type
+        self.pathogen_slug = pathogen_slug
         # Certain consumers have different requirements on fasta
         self.downstream_consumer = downstream_consumer
 
@@ -41,7 +48,7 @@ class FastaStreamer:
         sample_query = sample_query.options(  # type: ignore
             joinedload(Sample.uploaded_pathogen_genome, innerjoin=True).undefer(  # type: ignore
                 UploadedPathogenGenome.sequence
-            ),
+            )
         )
 
         # Stream results
@@ -61,19 +68,24 @@ class FastaStreamer:
                 stripped_sequence: str = sequence.strip("Nn")
                 # use private id if the user has access to it, else public id
                 if sample.submitting_group_id == self.ac.group.id:  # type: ignore
-                    yield self._output_id_line(sample.private_identifier)
+                    yield await self._output_id_line(sample.private_identifier)
                 else:
-                    yield self._output_id_line(sample.public_identifier)
+                    yield await self._output_id_line(sample.public_identifier)
                 yield stripped_sequence
                 yield "\n"
 
-    def _output_id_line(self, identifier) -> str:
+    async def _output_id_line(self, identifier) -> str:
         """Produces the ID line for current sequence in fasta.
 
         Certain downstream consumers (eg, UShER) restrict what characters can be
         used in the ID. Also handles any modifications that must be made to ID
         characters so they don't break the downstream consumer."""
-        output_id = identifier  # default, might get changed if specialty case
+
+        # get the sample id prefix for given public_repository
+        prefix = await get_public_repository_prefix(
+            self.public_repository_type, self.pathogen_slug, self.db
+        )
+        output_id = f'{prefix}/{identifier.lstrip("hCoV-19/")}'  # default, might get changed if specialty case
         if self.downstream_consumer == SpecialtyDownstreams.USHER.value:
             output_id = self._handle_usher_id(identifier)
         return f">{output_id}\n"
