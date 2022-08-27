@@ -8,9 +8,6 @@ from sqlalchemy.orm import joinedload
 from aspen.api.authn import AuthContext
 from aspen.api.authz import AuthZSession
 from aspen.api.utils import samples_by_identifiers
-from aspen.api.utils.sample import (  # #### phoenix move this to init file
-    get_public_repository_prefix,
-)
 from aspen.database.models import Sample, UploadedPathogenGenome
 
 
@@ -18,6 +15,26 @@ class SpecialtyDownstreams(Enum):
     """Canonical internal/external names for downstreams that require special logic."""
 
     USHER = "USHER"
+
+
+async def get_public_repository_prefix(
+    public_repository: str, pathogen_slug: str, session: AsyncSession
+):
+    # get prefix depending on db type
+    prefix = (
+        sa.select(PathogenRepoConfig)
+        .join(Pathogen)
+        .join(PublicRepository)
+        .filter(
+            and_(
+                Pathogen.slug == pathogen_slug,
+                PublicRepository.name == public_repository,
+            )
+        )
+    )
+    res = await session.execute(prefix)
+    prefix = res.scalars().one().prefix
+    return prefix
 
 
 class FastaStreamer:

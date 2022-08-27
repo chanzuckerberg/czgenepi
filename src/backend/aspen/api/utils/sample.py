@@ -4,17 +4,10 @@ from typing import Any, Dict, List, Mapping, Optional, Set, Tuple, TYPE_CHECKING
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.query import Query
-from sqlalchemy.sql.expression import and_, or_
+from sqlalchemy.sql.expression import or_
 
 from aspen.api.authz import AuthZSession
-from aspen.database.models import (
-    Accession,
-    AccessionType,
-    Pathogen,
-    PathogenRepoConfig,
-    PublicRepository,
-    Sample,
-)
+from aspen.database.models import Accession, AccessionType, Sample
 
 if TYPE_CHECKING:
     from aspen.api.schemas.samples import CreateSampleRequest
@@ -72,26 +65,6 @@ async def get_existing_private_ids(
 
     res = await session.execute(samples)
     return [i.private_identifier for i in res.scalars().all()]
-
-
-async def get_public_repository_prefix(
-    public_repository: str, pathogen_slug: str, session: AsyncSession
-):
-    # get prefix depending on db type
-    prefix = (
-        sa.select(PathogenRepoConfig)
-        .join(Pathogen)
-        .join(PublicRepository)
-        .filter(
-            and_(
-                Pathogen.slug == pathogen_slug,
-                PublicRepository.name == public_repository,
-            )
-        )
-    )
-    res = await session.execute(prefix)
-    prefix = res.scalars().one().prefix
-    return prefix
 
 
 async def get_existing_public_ids(
