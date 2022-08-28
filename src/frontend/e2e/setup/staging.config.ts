@@ -11,7 +11,7 @@ const config: PlaywrightTestConfig = {
   expect: {
     timeout: 30000,
   },
-  reporter: [["html", { open: "never" }]],
+  reporter: process.env.CI ? "github" : "list",
   globalSetup: "./global-setup",
   use: {
     baseURL: "https://staging.czgenepi.org",

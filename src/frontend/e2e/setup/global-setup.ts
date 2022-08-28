@@ -28,13 +28,15 @@ async function globalSetup(config: FullConfig): Promise<void> {
   const cookie = cookieJson.find((item) => item["name"] == "session");
   process.env.COOKIES = cookie.value;
 
-  //intercept get user details request
-  await page.route("**/v2/users/me", async (route) => {
-    await page.request.fetch(route.request()).then((b) => {
-      const data = JSON.parse(b.toString());
-      process.env.GROUPID = data.group.id;
-    });
-  });
+  //intercept get user details request and save group id
+  // await page.route("**/v2/users/me", async (route) => {
+  //   await page.request.fetch(route.request()).then((b) => {
+  //     const data = JSON.parse(b.toString());
+  //     console.log(data)
+  //     console.log("***********************")
+  //     process.env.GROUPID = data.group.id;
+  //   });
+  // });
   await browser.close();
 }
 export default globalSetup;

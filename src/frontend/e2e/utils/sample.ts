@@ -1,63 +1,35 @@
 import { faker } from "@faker-js/faker";
-import { Http2ServerResponse } from "http2";
-import ApiUtil from "./api";
-const fs = require("fs");
 const { request, expect } = require("@playwright/test");
 
 const defaultSequence =
   "ATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTC";
 const locationId = 166768;
 
-const cookieStorage = "e2e/storage/cookies.json";
 export default abstract class SampleUtil {
   /*
 This method generates sample data that can be used for uploading
 @param {number} total: total samples to generate, defaults to 1
-@param {string} sequence: genome sequence; defaults to a const
-@param {string} collection_date: sample collection date, defaults to a date within the past 10 days
-@param {number} location_id: location where sample was taken, defaults to a const
-@param {boolean} privateSample: if sample is private or not, default is false
-@param {string} private_identifier: private id, defaults to randomly generated using faker-js
-@params {string} public_identifier: public id, defaults to randomly generated using faker-js 
 */
-  public static generateSampleData(
-    total: number = 1,
-    sequence?: string,
-    sequencing_date?: string,
-    collection_date?: string,
-    location_id?: number,
-    privateSample?: boolean,
-    private_identifier?: string,
-    public_identifier?: string
-  ): Array<SampleData> {
-    const collectionDate =
-      collection_date !== undefined
-        ? collection_date
-        : SampleUtil.getPastDate(10);
-
+  public static generateRandomSampleData(total: number = 1): Array<SampleData> {
+    const pastDays = 10;
+    const collectionDate = SampleUtil.getADateInThePast(pastDays);
     let results = [];
 
     for (let i = 1; i <= total; i++) {
       results.push({
         pathogen_genome: {
-          sequence: sequence !== undefined ? sequence : defaultSequence,
-          sequencing_date:
-            sequencing_date !== undefined
-              ? sequencing_date
-              : SampleUtil.getPastDate(10, collectionDate),
+          sequence: defaultSequence,
+          sequencing_date: SampleUtil.getADateInThePast(
+            pastDays,
+            collectionDate
+          ),
         },
         sample: {
-          collection_date: collectionDate,
-          location_id: location_id !== undefined ? location_id : locationId,
-          private: privateSample !== undefined ? privateSample : false,
-          private_identifier:
-            private_identifier !== undefined
-              ? private_identifier
-              : SampleUtil.generateSampleId(),
-          public_identifier:
-            public_identifier !== undefined
-              ? public_identifier
-              : SampleUtil.generateSampleId(),
+          collection_date: SampleUtil.getADateInThePast(pastDays),
+          location_id: locationId,
+          private: false,
+          private_identifier: SampleUtil.generateSampleId(),
+          public_identifier: SampleUtil.generateSampleId(),
         },
       });
     }
@@ -70,7 +42,10 @@ This method generates sample data that can be used for uploading
   @param {string} country: country where sample was taken, defaults to randomly generated
   @param {boolean} privateSample: we use this to determine we should include "hCoV-19" as prefix or generate random ID
   */
-  public static generateSampleId(country?: string, privateId?: boolean) {
+  public static generateSampleId(
+    country?: string,
+    privateId: boolean = false
+  ): string {
     if (privateId) {
       const charSet =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -82,7 +57,8 @@ This method generates sample data that can be used for uploading
       return randomString;
     } else {
       const prefix = "hCoV-19";
-      const _country = country !== undefined ? country : faker.address.country;
+      const _country =
+        country !== undefined ? country : faker.address.country();
       const _number = faker.datatype.number({
         min: 10000,
         max: 99999,
@@ -120,38 +96,39 @@ This method generates sample data that can be used for uploading
   /*
   Method for posting sample upload data. This method will first make a GET request
   to obtain the group of the user, which is needed to construct the URL.
+  @param { object } - payload with array of sample data;
   */
-  public static async uploadSample(data: SampleData) {
-    let url = `/v2/users/me`;
-    await ApiUtil.getRequest(url).then((response) => {
-      const group = response.group;
-      url = `/v2/orgs/${group.id}/samples/`;
-      ApiUtil.postRequest(url, data).then((response) => {
-        expect(response.samples).toBeGreaterThan(0);
-        return response.samples;
-      });
+  public static async uploadSample(payload: Array<SampleData>) {
+    const groupId = process.env.GROUPID;
+    const endpoint = `/v2/orgs/74/samples/`;
+    console.log(process.env.BASEAPI);
+    const context = await request.newContext({
+      baseURL: "https://api.staging.czgenepi.org",
     });
+    const response = await context.post(endpoint, {
+      headers: SampleUtil.setHeaders(),
+      data: payload,
+    });
+    expect(response.ok()).toBeTruthy();
+    return response.json();
   }
 
   /*
-  Method for getting samples.
+  Method for getting samples. reads users group ID from process.env
+  where it was saved when user first logged in. 
+  @returns - project of the body json.
   */
   public static async getSamples(): Promise<any> {
-    const groupId = process.env.GROUPID ?? "";
-    const endpoint = `/v2/orgs/${groupId}/samples/`;
+    const groupId = process.env.GROUPID;
+    const endpoint = `/v2/orgs/74/samples/`;
     const context = await request.newContext({
-      baseURL: process.env.BASEAPI,
+      baseURL: "https://api.staging.czgenepi.org",
     });
     const response = await context.get(endpoint, {
       headers: SampleUtil.setHeaders(),
     });
-    //.then( (response: APIResponse) => {
-    //console.log("****** been here **********");
-    console.log(response.json());
-    expect(response.ok()).toBeTruthy();
-    console.log("****** been here 1 **********");
-    return response.json();
-    //});
+    //expect(response.ok()).toBeTruthy();
+    return response;
   }
 
   /*
@@ -159,10 +136,11 @@ This method generates sample data that can be used for uploading
     @return {object} return header object
     */
   public static setHeaders() {
-    const cookies = `OptanonAlertBoxClosed=2022-08-19T09:28:00.361Z;
-      ajs_anonymous_id=c2718103-b052-4c40-a5c5-74442fd24165;
-      ajs_user_id=llhznbdsa6q7jr0hnhtg;
-      OptanonConsent=isIABGlobal=false&datestamp=Thu+Aug+25+2022+11%3A19%3A45+GMT%2B0100+(British+Summer+Time)
+    const cookies = `OptanonAlertBoxClosed=2022-08-19T09:28:00.361Z; 
+      ajs_anonymous_id=16229f03-caaf-4803-8d16-e39168c89339;  
+      ajs_user_id=0g4u6x3nhde5p8m8wmad;
+      OptanonConsent=isIABGlobal=false
+      &datestamp=Fri+Aug+26+2022+13%3A40%3A31+GMT%2B0100+(British+Summer+Time)
       &version=6.34.0
       &hosts=
       &landingPath=NotLandingPage
@@ -174,6 +152,25 @@ This method generates sample data that can be used for uploading
       accept: "application/json",
       cookie: cookies.replace(/\r?\n|\r/g, ""),
     };
+  }
+
+  public static getGroupId() {
+    if (process.env.GROUPID === undefined) return process.env.GROUPID;
+    SampleUtil.getUserDetails().then((data) => {
+      return data.group.id;
+    });
+  }
+
+  public static async getUserDetails() {
+    const endpoint = `/v2/users/me`;
+    const context = await request.newContext({
+      baseURL: process.env.BASEAPI,
+    });
+    const response = await context.get(endpoint, {
+      headers: SampleUtil.setHeaders(),
+    });
+    expect(response.ok()).toBeTruthy();
+    return response.json();
   }
 }
 
