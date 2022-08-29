@@ -4,7 +4,8 @@ from typing import AsyncGenerator, Optional, Set
 
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import and_, joinedload
+from sqlalchemy.orm import joinedload
+from sqlalchemy.sql.expression import and_
 
 from aspen.api.authn import AuthContext
 from aspen.api.authz import AuthZSession
@@ -24,26 +25,6 @@ class SpecialtyDownstreams(Enum):
     USHER = "USHER"
 
 
-async def get_public_repository_prefix(
-    public_repository: str, pathogen_slug: str, session: AsyncSession
-):
-    # get prefix depending on db type
-    prefix = (
-        sa.select(PathogenRepoConfig)
-        .join(Pathogen)
-        .join(PublicRepository)
-        .filter(
-            and_(
-                Pathogen.slug == pathogen_slug,
-                PublicRepository.name == public_repository,
-            )
-        )
-    )
-    res = await session.execute(prefix)
-    prefix = res.scalars().one().prefix
-    return prefix
-
-
 class FastaStreamer:
     def __init__(
         self,
@@ -51,7 +32,7 @@ class FastaStreamer:
         az: AuthZSession,
         ac: AuthContext,
         sample_ids: Set[str],
-        public_repository_type: str,
+        public_repository_name: str,
         pathogen_slug: str,
         downstream_consumer: Optional[str] = None,
     ):
@@ -59,7 +40,7 @@ class FastaStreamer:
         self.ac = ac
         self.az = az
         self.sample_ids = sample_ids
-        self.public_repository_type = public_repository_type
+        self.public_repository_name = public_repository_name
         self.pathogen_slug = pathogen_slug
         # Certain consumers have different requirements on fasta
         self.downstream_consumer = downstream_consumer
@@ -74,6 +55,8 @@ class FastaStreamer:
                 UploadedPathogenGenome.sequence
             )
         )
+        # get the sample id prefix for given public_repository
+        prefix = await self.get_public_repository_prefix()
 
         # Stream results
         all_samples = await self.db.stream(sample_query)
@@ -92,24 +75,38 @@ class FastaStreamer:
                 stripped_sequence: str = sequence.strip("Nn")
                 # use private id if the user has access to it, else public id
                 if sample.submitting_group_id == self.ac.group.id:  # type: ignore
-                    yield await self._output_id_line(sample.private_identifier)
+                    yield await self._output_id_line(prefix, sample.private_identifier)
                 else:
-                    yield await self._output_id_line(sample.public_identifier)
+                    yield await self._output_id_line(prefix, sample.public_identifier)
                 yield stripped_sequence
                 yield "\n"
 
-    async def _output_id_line(self, identifier) -> str:
+    async def get_public_repository_prefix(self):
+     # get prefix depending on db type
+        prefix = (
+            sa.select(PathogenRepoConfig)
+            .join(Pathogen)
+            .join(PublicRepository)
+            .where(
+                and_(
+                    Pathogen.slug == self.pathogen_slug,
+                    PublicRepository.name == self.public_repository_name,
+                )
+            )
+        )
+        res = await self.db.execute(prefix)
+        pathogen_repo_config = res.scalars().one_or_none()
+        if pathogen_repo_config:
+            return pathogen_repo_config.prefix
+
+    async def _output_id_line(self, prefix, identifier) -> str:
         """Produces the ID line for current sequence in fasta.
 
         Certain downstream consumers (eg, UShER) restrict what characters can be
         used in the ID. Also handles any modifications that must be made to ID
         characters so they don't break the downstream consumer."""
 
-        if self.public_repository_type:
-            # get the sample id prefix for given public_repository
-            prefix = await get_public_repository_prefix(
-                self.public_repository_type, self.pathogen_slug, self.db
-            )
+        if self.public_repository_name and prefix is not None:
             output_id = f'{prefix}/{identifier.lstrip("hCoV-19/")}'  # default, might get changed if specialty case
         else:
             # user is proceeding with normal download, and does not wish to submit to gisaid or genbank
