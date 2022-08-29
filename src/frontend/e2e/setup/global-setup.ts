@@ -1,7 +1,6 @@
 import { chromium, FullConfig } from "@playwright/test";
 import { getByID, getByTestID } from "../utils/selectors";
-
-const fs = require("fs");
+import * as fs from "fs";
 
 const username = process.env.USERNAME ?? "";
 const password = process.env.PASSWORD ?? "";
