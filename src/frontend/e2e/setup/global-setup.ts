@@ -27,6 +27,8 @@ async function globalSetup(config: FullConfig): Promise<void> {
   const cookieJson = JSON.parse(cookieString) as Array<any>;
   const cookie = cookieJson.find((item) => item["name"] == "session");
   process.env.COOKIES = cookie.value;
+  console.log(cookie.value);
+  fs.writeFileSync(cookieStorage, cookieString);
 
   //intercept get user details request and save group id
   // await page.route("**/v2/users/me", async (route) => {

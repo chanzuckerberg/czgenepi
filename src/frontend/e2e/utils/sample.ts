@@ -128,6 +128,7 @@ This method generates sample data that can be used for uploading
       headers: SampleUtil.setHeaders(),
     });
     //expect(response.ok()).toBeTruthy();
+    console.log(response);
     return response;
   }
 
@@ -136,18 +137,20 @@ This method generates sample data that can be used for uploading
     @return {object} return header object
     */
   public static setHeaders() {
-    const cookies = `OptanonAlertBoxClosed=2022-08-19T09:28:00.361Z; 
-      ajs_anonymous_id=16229f03-caaf-4803-8d16-e39168c89339;  
-      ajs_user_id=0g4u6x3nhde5p8m8wmad;
-      OptanonConsent=isIABGlobal=false
-      &datestamp=Fri+Aug+26+2022+13%3A40%3A31+GMT%2B0100+(British+Summer+Time)
-      &version=6.34.0
-      &hosts=
-      &landingPath=NotLandingPage
-      &groups=C0001%3A1%2CC0002%3A1
-      &geolocation=GB%3BENG
-      &AwaitingReconsent=false;
-      session=${process.env.COOKIES}`;
+    let cookies = "OptanonAlertBoxClosed=2022-08-19T09:28:00.361Z; ";
+    cookies += "ajs_user_id=0g4u6x3nhde5p8m8wmad; ";
+    cookies += "ajs_anonymous_id=16229f03-caaf-4803-8d16-e39168c89339; ";
+    cookies += "OptanonConsent=isIABGlobal=false";
+    cookies +=
+      "&datestamp=Fri+Aug+26+2022+16%3A38%3A43+GMT%2B0100+(British+Summer+Time)";
+    cookies += "&version=6.34.0";
+    cookies += "&hosts=&landingPath=NotLandingPage";
+    cookies += "&groups=C0001%3A1%2CC0002%3A1";
+    cookies += "&geolocation=GB%3BENG";
+    cookies += "&AwaitingReconsent=false; ";
+    cookies += `session=${process.env.COOKIES}`;
+    console.log(process.env.COOKIES);
+    //console.log(cookies)
     return {
       accept: "application/json",
       cookie: cookies.replace(/\r?\n|\r/g, ""),
