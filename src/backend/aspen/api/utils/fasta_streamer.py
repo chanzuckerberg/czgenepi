@@ -82,7 +82,6 @@ class FastaStreamer:
                 yield "\n"
 
     async def get_public_repository_prefix(self):
-     # get prefix depending on db type
         prefix = (
             sa.select(PathogenRepoConfig)
             .join(Pathogen)
