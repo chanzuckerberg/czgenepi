@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { DialogActions } from "@material-ui/core";
+import { DialogActions } from "@mui/material";
 import { CommonThemeProps, getSpaces } from "czifui";
 import { narrow } from "../common";
 
@@ -21,8 +21,8 @@ export const StyledDialogActions = styled(DialogActions, {
     return `
       padding: 0 ${spaces?.xxl}px ${spaces?.xxl}px ${spaces?.xxl}px;
 
-      &.MuiDialogActions-spacing > :not(:first-of-type) {
-        margin-left: ${spaces?.m}px;
+      &.MuiDialogActions-spacing > * {
+        margin-right: ${spaces?.m}px;
       }
     `;
   }}

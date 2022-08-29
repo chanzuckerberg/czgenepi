@@ -1,5 +1,5 @@
 import { get, isEqual } from "lodash/fp";
-import React, {
+import {
   Fragment,
   FunctionComponent,
   useEffect,
@@ -11,7 +11,6 @@ import { FixedSizeList, ListChildComponentProps } from "react-window";
 import { noop } from "src/common/constants/empty";
 import { VIEWNAME } from "src/common/constants/types";
 import { useUserInfo } from "src/common/queries/auth";
-import { FEATURE_FLAGS, usesFeatureFlag } from "src/common/utils/featureFlags";
 import { EmptyState } from "../data_subview/components/EmptyState";
 import { HeaderRow } from "./components/HeaderRow";
 import {
@@ -54,7 +53,7 @@ export function defaultSampleCellRenderer({
 
   return (
     <RowContent header={header}>
-      <Cell data-test-id={`row-${header.key}`}>{displayData}</Cell>
+      <Cell data-test-id={`row-${header.key}`}>{String(displayData)}</Cell>
     </RowContent>
   );
 }
@@ -67,7 +66,7 @@ export function defaultTreeCellRenderer({
 
   return (
     <TreeRowContent>
-      <Cell data-test-id={`row-${header.key}`}>{displayData}</Cell>
+      <Cell data-test-id={`row-${header.key}`}>{String(displayData)}</Cell>
     </TreeRowContent>
   );
 }
@@ -310,10 +309,6 @@ export const DataTable: FunctionComponent<Props> = ({
   const isSampleTable = viewName === VIEWNAME.SAMPLES;
 
   const render = (tableData: TableItem[]) => {
-    if (usesFeatureFlag(FEATURE_FLAGS.mayasFlag)) {
-      return <div>FEATURE FLAG IN USE...</div>;
-    }
-
     // TODO (mlila): this is the source of constant rerendering in the table. Because the rows are
     // TODO          rendered with a function instead of a react component, it generates a new node
     // TODO          every time the parent rerenders, instead of only updating, eg, when props change

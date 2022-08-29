@@ -3,7 +3,7 @@ import { CommonThemeProps, fontHeader, getColors, getSpaces } from "czifui";
 import { TitleSize } from "./index";
 
 export const Wrapper = styled.div`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
 

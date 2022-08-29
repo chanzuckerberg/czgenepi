@@ -48,3 +48,10 @@ async def get_db(
         yield session
     finally:
         await session.close()  # type: ignore
+
+
+def get_pathogen_slug(pathogen_slug=None):
+    # get pathogen slug from URL
+    if pathogen_slug is None:
+        return "SC2"
+    return pathogen_slug

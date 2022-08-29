@@ -1,6 +1,8 @@
 import Script from "next/script";
-import React from "react";
+import { extractAnalyticsUserInfo } from "src/common/analytics/methods";
+import { ONETRUST_ENABLING_CLASS } from "src/common/analytics/OneTrustInitializer";
 import ENV from "src/common/constants/ENV";
+import { useUserInfo } from "src/common/queries/auth";
 
 /**
  * Actual initialization of Segment done by raw JS script at below route.
@@ -25,8 +27,7 @@ const SEGMENT_WRITE_KEY = ENV.SEGMENT_FRONTEND_KEY;
 
 // What `type` attr the script starts with to prevent early firing.
 // See docs below regarding interaction with OneTrust.
-// const INITIAL_SCRIPT_TYPE = "text/plain"; // TODO Use once OneTrust avail
-const INITIAL_SCRIPT_TYPE = "text/javascript"; // TEMPORARY for initial scan
+const INITIAL_SCRIPT_TYPE = "text/plain";
 
 /**
  * Initializes Segment analytics, enabling later analytics calls in app.
@@ -42,22 +43,20 @@ const INITIAL_SCRIPT_TYPE = "text/javascript"; // TEMPORARY for initial scan
  *      "text/plain". This is connected to our use of OneTrust: if a user
  *      allows analytics, OneTrust will flip that to "text/javascript",
  *      causing the referenced script to run and initialize analytics.
- *      TODO: Implement this once OneTrust can be integrated.
- *            For right now, we need to do an initial OneTrust scan with
- *            live analytics. We'll confine this to Staging for the scan to
- *            prevent accidental analytics before we can use OneTrust.
+ *      (it finds the script to flip via class `ONETRUST_ENABLING_CLASS`)
  *   2) There must be a truth-y value present for the SEGMENT_FRONTEND_KEY.
  *      We default to empty string when no env var present.
- *      As of right now, during initial development, there is no Segment key
- *      in Prod (we've also avoided creating a Prod integration on the Segment
- *      side for now). This means that, even if this code gets to Prod,
- *      no analytics will run right now on Prod.
+ *   3) The user/group info must be finished with initialization, as we use
+ *      some of that info during Segment load (see below).
  *
- * TODO: Eventually use this component. Right now, this is unused until we're
- * have additional processes in place to ensure we don't run analytics on
- * users until they can allow/deny analytics (either by using OneTrust, or
- * by putting it behind a feature flag that only internal dev team would have
- * enabled, or both).
+ * In addition to initializing the Segment analytics framework, the init script
+ * also kicks off an initial `page` call to record what page the user starts on
+ * and an initial `identify` (but using non-PII info only) to send info about
+ * the user. Subsequent changes to the page or user info are captured via
+ * `analyticsRecordRouteChange` and `analyticsSendUserInfo`, for more details
+ * read their documentation. This bifurcation between how the Segment method
+ * calls happen is necessary to avoid race conditions and to avoid spamming
+ * our analytics data with duplicate entries.
  *
  * Usage note: Weirdly, even though this boils down to being a <script> tag,
  * Next.js does not like it to be present in a Next `Head` or `Html` component.
@@ -66,13 +65,29 @@ const INITIAL_SCRIPT_TYPE = "text/javascript"; // TEMPORARY for initial scan
  * put it somewhere else as well.
  */
 export function SegmentInitializer(): JSX.Element | null {
-  const segmentWriteKey = ENV.SEGMENT_FRONTEND_KEY;
-  return segmentWriteKey ? (
+  // `userInfo` will be false-y if user is not logged in
+  const { data: userInfo } = useUserInfo();
+  if (!userInfo) return null;
+
+  // IMPORTANT: If `extractAnalyticsUserInfo` changes at any point, be sure
+  // that the user info we pass to segmentInitScript and use there matches
+  // the structure of what is sent in the `analyticsSendUserInfo` function.
+  const analyticsUserInfo = extractAnalyticsUserInfo(userInfo);
+  // `analyticsUserInfo` will be false-y if user/group info not done with init
+  if (!analyticsUserInfo) return null;
+
+  // If we've made it here and have a SEGMENT_WRITE_KEY, we are ready to load
+  // Segment and fire first events (if user opts-in to analytics via OneTrust).
+  return SEGMENT_WRITE_KEY ? (
     <Script
       id={SEGMENT_SCRIPT_TAG_ID}
       type={INITIAL_SCRIPT_TYPE}
       src={SEGMENT_INIT_SCRIPT_ROUTE}
+      className={ONETRUST_ENABLING_CLASS}
       data-segment-key={SEGMENT_WRITE_KEY}
+      data-anon-user-id={analyticsUserInfo.anonUserId}
+      data-group-id={analyticsUserInfo.groupId}
+      data-group-name={analyticsUserInfo.groupName}
     />
   ) : null;
 }

@@ -1,4 +1,3 @@
-import React from "react";
 import { TREE_STATUS } from "src/common/constants/types";
 import { StyledChip } from "./style";
 

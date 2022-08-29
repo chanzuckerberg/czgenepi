@@ -1,5 +1,4 @@
 import { useRouter } from "next/router";
-import React from "react";
 import GroupMembersPage, { PrimaryTabType } from "src/views/GroupMembersPage";
 import { SecondaryTabType } from "src/views/GroupMembersPage/components/MembersTab";
 

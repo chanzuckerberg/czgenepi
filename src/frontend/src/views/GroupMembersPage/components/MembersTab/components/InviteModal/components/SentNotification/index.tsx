@@ -1,6 +1,5 @@
 import { Link, Notification } from "czifui";
 import { useRouter } from "next/router";
-import React from "react";
 import { ROUTES } from "src/common/routes";
 import { pluralize } from "src/common/utils/strUtils";
 
@@ -28,7 +27,7 @@ const SentNotification = ({ numSent, onDismiss, open }: Props): JSX.Element => {
     >
       {numSent} {pluralize("Invitation", numSent)} {pluralize("has", numSent)}{" "}
       been sent.{" "}
-      <Link sdsStyle="dashed" onClick={onClick}>
+      <Link component="button" sdsStyle="dashed" onClick={onClick}>
         View Invitations
       </Link>
       .

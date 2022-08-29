@@ -6,7 +6,6 @@ dotenv.config();
 
 const config: PlaywrightTestConfig = {
   testDir: "../tests",
-  testResultsDir: "../report",
   outputDir: "../report",
   timeout: 30000,
   expect: {

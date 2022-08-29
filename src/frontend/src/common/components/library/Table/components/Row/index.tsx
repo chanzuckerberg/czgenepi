@@ -1,4 +1,4 @@
-import React, { CSSProperties, ReactNode } from "react";
+import { CSSProperties, ReactNode } from "react";
 import { Cell } from "../Cell";
 import { StyledHeader, StyledRow } from "./style";
 

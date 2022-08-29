@@ -1,11 +1,6 @@
 import { InputSearch } from "czifui";
 import { compact, escapeRegExp, filter } from "lodash";
-import React, {
-  FunctionComponent,
-  useEffect,
-  useReducer,
-  useState,
-} from "react";
+import { FunctionComponent, useEffect, useReducer, useState } from "react";
 import { DataTable } from "src/common/components";
 import { VIEWNAME } from "src/common/constants/types";
 import { CreateNSTreeModal } from "./components/CreateNSTreeModal";
@@ -272,6 +267,7 @@ const DataSubview: FunctionComponent<Props> = ({
             sdsIcon="download"
             tooltipTextDisabled={DOWNLOAD_TOOLTIP_TEXT_DISABLED}
             tooltipTextEnabled={DOWNLOAD_TOOLTIP_TEXT_ENABLED}
+            size="large"
           />
           <MoreActionsMenu
             disabled={!hasCheckedSamples}

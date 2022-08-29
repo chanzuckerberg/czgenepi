@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { getColors, getCorners, getSpaces } from "czifui";
+import { CommonThemeProps, getColors, getCorners, getSpaces } from "czifui";
 
 export const Circle = styled.div`
   display: flex;
@@ -11,7 +11,7 @@ export const Circle = styled.div`
 
   color: "white";
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const corners = getCorners(props);
     const spaces = getSpaces(props);

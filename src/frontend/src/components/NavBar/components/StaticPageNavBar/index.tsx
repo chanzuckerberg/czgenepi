@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { Fragment, useState } from "react";
 import { API } from "src/common/api";
 import ENV from "src/common/constants/ENV";
 import CloseIcon from "src/common/images/close-icon.svg";
@@ -43,7 +43,7 @@ export default function StaticPageNavBar(): JSX.Element {
   const { data: userInfo } = useUserInfo();
   const group = getCurrentGroupFromUserInfo(userInfo);
 
-  const orgElements = <React.Fragment>{group?.name}</React.Fragment>;
+  const orgElements = <Fragment>{group?.name}</Fragment>;
 
   function hasOrg(): JSX.Element | null {
     if (group === undefined) {

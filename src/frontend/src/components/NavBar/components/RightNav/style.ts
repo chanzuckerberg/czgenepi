@@ -1,12 +1,19 @@
 import styled from "@emotion/styled";
-import { Button, fontBodyXs, getColors, getSpaces } from "czifui";
+import {
+  Button,
+  CommonThemeProps,
+  fontBodyXs,
+  getColors,
+  getPalette,
+  getSpaces,
+} from "czifui";
 
 const whiteBorder = "border: 1px solid white;";
 export const UploadButton = styled(Button)`
   color: white;
   ${whiteBorder}
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     const colors = getColors(props);
 
@@ -37,6 +44,35 @@ export const StyledDiv = styled.div`
     const spaces = getSpaces(props);
     return `
       margin-right: ${spaces?.l}px;
+    `;
+  }}
+`;
+
+export const StyledLink = styled.a`
+  display: flex;
+  align-items: center;
+  ${(props: CommonThemeProps) => {
+    const spaces = getSpaces(props);
+
+    return `
+      padding: ${spaces?.xxxs}px;
+      margin-right: ${spaces?.xs}px;
+    `;
+  }}
+`;
+
+export const StyledIconWrapper = styled.div`
+  ${(props: CommonThemeProps) => {
+    const colors = getColors(props);
+    const palette = getPalette(props);
+
+    return `
+      svg {
+        fill: ${colors?.gray[300]};
+        &:hover, &:focus, &:active {
+          fill: ${palette?.common?.white};
+        }
+      }
     `;
   }}
 `;

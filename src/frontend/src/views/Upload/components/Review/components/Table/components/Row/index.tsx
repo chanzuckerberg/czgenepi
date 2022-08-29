@@ -1,5 +1,5 @@
 import { Icon } from "czifui";
-import React from "react";
+import { memo } from "react";
 import { getNameFromCollectionLocation } from "src/common/utils/locationUtils";
 import { Metadata } from "src/components/WebformTable/common/types";
 import {
@@ -16,7 +16,7 @@ interface Props {
   metadata: Metadata;
 }
 
-export default React.memo(function Row({ id, metadata }: Props): JSX.Element {
+export default memo(function Row({ id, metadata }: Props): JSX.Element {
   const {
     privateId,
     collectionDate,

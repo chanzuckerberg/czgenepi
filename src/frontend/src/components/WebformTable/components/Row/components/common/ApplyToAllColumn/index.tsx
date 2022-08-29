@@ -1,4 +1,3 @@
-import React from "react";
 import { Metadata } from "src/components/WebformTable/common/types";
 import { StyledButton } from "./style";
 

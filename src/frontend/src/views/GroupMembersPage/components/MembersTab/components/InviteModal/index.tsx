@@ -1,6 +1,6 @@
 import { Button, Dialog, DialogActions, DialogTitle } from "czifui";
 import { compact, filter, uniq } from "lodash";
-import React, { ChangeEvent, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { useSelector } from "react-redux";
 import { noop } from "src/common/constants/empty";
 import {

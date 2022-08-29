@@ -11,10 +11,10 @@ module.exports = {
     "plugin:react/recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:sonarjs/recommended",
-    "plugin:jest-playwright/recommended",
     "prettier",
     "plugin:prettier/recommended",
     "plugin:react-hooks/recommended",
+    "plugin:react/jsx-runtime",
   ],
   overrides: [
     // Override some TypeScript rules just for .js files

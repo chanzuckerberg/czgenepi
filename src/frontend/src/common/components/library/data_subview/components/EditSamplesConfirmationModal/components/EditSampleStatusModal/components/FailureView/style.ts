@@ -1,12 +1,12 @@
 import styled from "@emotion/styled";
-import { Callout, getColors } from "czifui";
+import { Callout, CommonThemeProps, getColors } from "czifui";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 
 export const StyledImg = styled.div`
   height: 150px;
   width: 150px;
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
 
     return `

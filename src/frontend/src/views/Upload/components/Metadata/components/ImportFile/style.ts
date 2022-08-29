@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import {
   Button,
+  CommonThemeProps,
   fontBodyXs,
   fontCapsXxxxs,
   fontHeaderL,
@@ -17,7 +18,7 @@ export const TitleWrapper = styled.div`
   display: flex;
   align-items: center;
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
@@ -30,7 +31,7 @@ export const IntroWrapper = styled.div`
   display: flex;
   flex-direction: column;
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
@@ -40,7 +41,7 @@ export const IntroWrapper = styled.div`
 `;
 
 export const Wrapper = styled.div`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
@@ -51,7 +52,7 @@ export const Wrapper = styled.div`
 
 export const StyledUpdatedDate = styled.p`
   ${fontCapsXxxxs}
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     return `
       color: ${colors?.gray[500]};
@@ -61,7 +62,7 @@ export const StyledUpdatedDate = styled.p`
 
 export const StyledButton = styled(Button)`
   ${fontBodyXs}
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const fontWeights = getFontWeights(props);
     const spaces = getSpaces(props);

@@ -1,12 +1,18 @@
 import styled from "@emotion/styled";
-import { Button, fontHeaderXl, getColors, getSpaces } from "czifui";
+import {
+  Button,
+  CommonThemeProps,
+  fontHeaderXl,
+  getColors,
+  getSpaces,
+} from "czifui";
 
 export const StyledSpan = styled.span`
   ${fontHeaderXl}
 `;
 
 export const StyledButton = styled(Button)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
 

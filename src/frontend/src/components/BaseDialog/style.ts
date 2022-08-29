@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
-import IconButton from "@material-ui/core/IconButton";
 import {
+  ButtonIcon,
   fontBodyS,
   fontBodyXxs,
   fontHeaderL,
@@ -46,7 +46,7 @@ export const StyledDiv = styled.div`
   padding-bottom: 0px;
 `;
 
-export const StyledIconButton = styled(IconButton)`
+export const StyledIconButton = styled(ButtonIcon)`
   display: flex;
   flex-direction: column;
   align-self: flex-end;

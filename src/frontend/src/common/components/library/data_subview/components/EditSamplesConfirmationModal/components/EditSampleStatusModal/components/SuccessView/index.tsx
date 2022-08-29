@@ -1,4 +1,3 @@
-import React from "react";
 import UploadImage from "src/common/images/Upload.svg";
 import {
   StyledButton,

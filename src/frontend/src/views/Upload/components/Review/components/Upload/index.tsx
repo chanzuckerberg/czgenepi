@@ -1,9 +1,14 @@
-import { AlertTitle } from "@material-ui/lab";
+import AlertTitle from "@mui/material/AlertTitle";
 import { Alert, Button } from "czifui";
 import NextLink from "next/link";
-import React, { useState } from "react";
+import { useState } from "react";
+import {
+  AnalyticsSamplesUploadSuccess,
+  EVENT_TYPES,
+} from "src/common/analytics/eventTypes";
+import { analyticsTrackEvent } from "src/common/analytics/methods";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
-import { useCreateSamples } from "src/common/queries/samples";
+import { RawSamplesWithId, useCreateSamples } from "src/common/queries/samples";
 import { ROUTES } from "src/common/routes";
 import Dialog from "src/components/Dialog";
 import { SampleIdToMetadata } from "src/components/WebformTable/common/types";
@@ -35,19 +40,25 @@ export default function Upload({
   const [isOpen, setIsOpen] = useState(false);
 
   const { mutate, isLoading, isSuccess, isError, error } = useCreateSamples({
-    componentOnSuccess: () => {
+    componentOnSuccess: (respData: RawSamplesWithId) => {
+      // Analytics event: successful upload of samples
+      const createdSamples = respData.samples;
+      const createdIds = createdSamples.map((sample) => sample.id);
+      analyticsTrackEvent<AnalyticsSamplesUploadSuccess>(
+        EVENT_TYPES.SAMPLES_UPLOAD_SUCCESS,
+        {
+          sample_count: createdIds.length,
+          sample_ids: JSON.stringify(createdIds),
+        }
+      );
+
       cancelPrompt();
     },
   });
 
   return (
     <>
-      <Dialog
-        disableBackdropClick
-        disableEscapeKeyDown
-        open={isOpen}
-        onClose={handleClose}
-      >
+      <Dialog disableEscapeKeyDown open={isOpen} onClose={handleClose}>
         <StyledDialogContent>
           <ImageWrapper>{getImage()}</ImageWrapper>
           <Title>{getTitleText()}</Title>

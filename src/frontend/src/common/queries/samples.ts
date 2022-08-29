@@ -4,7 +4,7 @@ import {
   useQuery,
   useQueryClient,
   UseQueryResult,
-} from "react-query";
+} from "@tanstack/react-query";
 import { SampleIdToMetadata } from "src/components/WebformTable/common/types";
 import { METADATA_KEYS_TO_API_KEYS } from "src/views/Upload/components/common/constants";
 import { Samples } from "src/views/Upload/components/common/types";
@@ -24,42 +24,43 @@ import { MutationCallbacks } from "./types";
 /**
  * Download fasta file for samples
  */
-interface SampleFastaDownloadPayload {
+
+type FileDownloadEndpointType =
+  | ORG_API.SAMPLES_FASTA_DOWNLOAD
+  | ORG_API.SAMPLES_GENBANK_DOWNLOAD
+  | ORG_API.SAMPLES_GISAID_DOWNLOAD;
+interface SampleFileDownloadType {
+  endpoint: FileDownloadEndpointType;
   sampleIds: string[];
 }
+type FileDownloadCallbacks = MutationCallbacks<Blob>;
 
-type FastaDownloadCallbacks = MutationCallbacks<Blob>;
-
-export async function downloadSamplesFasta({
+export async function downloadSamplesFile({
+  endpoint,
   sampleIds,
-}: {
-  sampleIds: string[];
-}): Promise<Blob> {
+}: SampleFileDownloadType): Promise<Blob> {
   const payload = {
     sample_ids: sampleIds,
   };
-  const response = await fetch(
-    API_URL + generateOrgSpecificUrl(ORG_API.SAMPLES_FASTA_DOWNLOAD),
-    {
-      ...DEFAULT_POST_OPTIONS,
-      body: JSON.stringify(payload),
-    }
-  );
+  const response = await fetch(API_URL + generateOrgSpecificUrl(endpoint), {
+    ...DEFAULT_POST_OPTIONS,
+    body: JSON.stringify(payload),
+  });
   if (response.ok) return await response.blob();
 
   throw Error(`${response.statusText}: ${await response.text()}`);
 }
 
-export function useFastaDownload({
+export function useFileDownload({
   componentOnError,
   componentOnSuccess,
-}: FastaDownloadCallbacks): UseMutationResult<
+}: FileDownloadCallbacks): UseMutationResult<
   Blob,
   unknown,
-  SampleFastaDownloadPayload,
+  SampleFileDownloadType,
   unknown
 > {
-  return useMutation(downloadSamplesFasta, {
+  return useMutation(downloadSamplesFile, {
     onError: componentOnError,
     onSuccess: componentOnSuccess,
   });
@@ -137,10 +138,34 @@ interface SampleCreateRequestType {
   metadata: SampleIdToMetadata | null;
 }
 
+/**
+ * Response from BE for creating new samples.
+ *
+ * Actual response has way, way more info than just `id` -- basically matches
+ * a `Sample` type -- but the only thing we use downstream right now is id.
+ * This is pretty much the same as a `SampleResponse` interface from elsewhere,
+ * but that assumes it's been parsed into camelCase via the `apiResponse` func,
+ * and because this is associated with sending a payload via POST, we'd either
+ * need to fully re-create a snake_case version of otherwise the same interface
+ * or we'd need to jury-rig the parsing step from that somewhere for no gain
+ * since we only care about pulling the id value anyway.
+ *
+ * This is all just for analytics as of this writing, so I [Vince] am taking
+ * the easy way out and only going to care about the key actually being used.
+ * That said, if we ever start using those POST sample creation responses more
+ * fully, this should be re-worked.
+ */
+interface RawSampleWithId {
+  id: number;
+}
+export interface RawSamplesWithId {
+  samples: RawSampleWithId[];
+}
+
 export async function createSamples({
   samples,
   metadata,
-}: SampleCreateRequestType): Promise<unknown> {
+}: SampleCreateRequestType): Promise<RawSamplesWithId> {
   const payload: SamplePayload[] = [];
 
   if (!samples || !metadata) {
@@ -201,7 +226,7 @@ export async function createSamples({
 export function useCreateSamples({
   componentOnSuccess,
 }: {
-  componentOnSuccess: () => void;
+  componentOnSuccess: (respData: RawSamplesWithId) => void;
 }): UseMutationResult<unknown, unknown, SampleCreateRequestType, unknown> {
   return useMutation(createSamples, {
     onSuccess: componentOnSuccess,

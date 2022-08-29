@@ -1,5 +1,6 @@
 export enum ROUTES {
   HOMEPAGE = "/",
+  ACCOUNT = "/account",
   AGREE_TERMS = "/agreeTerms",
   BIOHUB = "https://www.czbiohub.org/",
   CAREERS = "https://chanzuckerberg.com/careers/career-opportunities/?initiative=science",
@@ -7,7 +8,6 @@ export enum ROUTES {
   CZI = "https://chanzuckerberg.com/",
   DATA = "/data",
   DATA_SAMPLES = "/data/samples",
-  FAQ = "/faq",
   GISAID = "https://www.gisaid.org/",
   GITHUB = "https://github.com/chanzuckerberg/czgenepi/",
   GROUP = "/group",
@@ -19,6 +19,7 @@ export enum ROUTES {
   PANGOLIN = "https://pangolin.cog-uk.io/",
   PHYLO_TREES = "/data/phylogenetic_trees",
   PRIVACY = "/privacy",
+  PRIVACY_DATA_SHARING_FAQ = "https://help.czgenepi.org/hc/en-us/sections/6406789491732",
   REQUEST_ACCESS = "https://airtable.com/shrblHnTRd9dtu6c0",
   RESOURCES = "https://help.czgenepi.org/hc/en-us/categories/6217716150804-Genomic-Epidemiology-Learning-Center",
   TERMS = "/terms",

@@ -1,6 +1,7 @@
 // includes shared styles for basic html elements
 import styled from "@emotion/styled";
 import {
+  CommonThemeProps,
   fontBodyS,
   fontBodyXxs,
   fontHeaderM,
@@ -17,7 +18,7 @@ export const NarrowContainer = styled.div`
 `;
 
 export const B = styled.b`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const fontWeights = getFontWeights(props);
 
     return `
@@ -58,7 +59,7 @@ export const H4 = styled.h4`
 
   margin-top: 5px;
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
 
     return `

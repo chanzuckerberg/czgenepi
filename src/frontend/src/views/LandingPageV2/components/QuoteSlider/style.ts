@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { getColors } from "czifui";
+import { CommonThemeProps, getColors } from "czifui";
 
 export const QuoteSliderContainer = styled.div`
   padding-bottom: 100px;
@@ -24,7 +24,7 @@ export const QuoteSliderContainer = styled.div`
     }
   }
 
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
 
     return `
