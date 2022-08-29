@@ -32,8 +32,8 @@ class FastaStreamer:
         az: AuthZSession,
         ac: AuthContext,
         sample_ids: Set[str],
-        public_repository_name: str,
-        pathogen_slug: str,
+        public_repository_name: str = None,
+        pathogen_slug: str = None,
         downstream_consumer: Optional[str] = None,
     ):
         self.db = db
@@ -82,21 +82,23 @@ class FastaStreamer:
                 yield "\n"
 
     async def get_public_repository_prefix(self):
-        prefix = (
-            sa.select(PathogenRepoConfig)
-            .join(Pathogen)
-            .join(PublicRepository)
-            .where(
-                and_(
-                    Pathogen.slug == self.pathogen_slug,
-                    PublicRepository.name == self.public_repository_name,
+        if self.pathogen_slug and self.public_repository_name:
+            # only get the prefix if we have enough information to proceed
+            prefix = (
+                sa.select(PathogenRepoConfig)
+                .join(Pathogen)
+                .join(PublicRepository)
+                .where(
+                    and_(
+                        Pathogen.slug == self.pathogen_slug,
+                        PublicRepository.name == self.public_repository_name,
+                    )
                 )
             )
-        )
-        res = await self.db.execute(prefix)
-        pathogen_repo_config = res.scalars().one_or_none()
-        if pathogen_repo_config:
-            return pathogen_repo_config.prefix
+            res = await self.db.execute(prefix)
+            pathogen_repo_config = res.scalars().one_or_none()
+            if pathogen_repo_config:
+                return pathogen_repo_config.prefix
 
     async def _output_id_line(self, prefix, identifier) -> str:
         """Produces the ID line for current sequence in fasta.
