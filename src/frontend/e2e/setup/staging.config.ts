@@ -5,14 +5,11 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const config: PlaywrightTestConfig = {
-  outputDir: "../report",
-  testDir: "../tests",
   expect: {
     timeout: 30000,
   },
-  timeout: 30000,
-  reporter: process.env.CI ? "github" : "list",
   globalSetup: "./global-setup",
+  outputDir: "../report",
   projects: [
     {
       name: "chromium",
@@ -21,11 +18,14 @@ const config: PlaywrightTestConfig = {
       },
     },
   ],
+  reporter: process.env.CI ? "github" : "list",
+  testDir: "../tests",
+  timeout: 30000,
   use: {
-    baseURL: "https://staging.czgenepi.org",
     actionTimeout: 0,
-    storageState: "e2e/storage/state.json",
+    baseURL: "https://staging.czgenepi.org",
     ignoreHTTPSErrors: true,
+    storageState: "e2e/storage/state.json",
     screenshot: "only-on-failure",
     trace: "on-first-retry",
     viewport: { width: 1280, height: 720 },
