@@ -5,23 +5,14 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const config: PlaywrightTestConfig = {
-  testDir: "../tests",
   outputDir: "../report",
-  timeout: 30000,
+  testDir: "../tests",
   expect: {
     timeout: 30000,
   },
-  reporter: [["html", { open: "never" }]],
+  timeout: 30000,
+  reporter: process.env.CI ? "github" : "list",
   globalSetup: "./global-setup",
-  use: {
-    baseURL: "http://frontend.genepinet.localdev:8000/",
-    storageState: "playwright/storage/state.json",
-    actionTimeout: 0,
-    trace: "on-first-retry",
-    screenshot: "only-on-failure",
-    ignoreHTTPSErrors: true,
-    viewport: { width: 1280, height: 720 },
-  },
   projects: [
     {
       name: "chromium",
@@ -30,5 +21,14 @@ const config: PlaywrightTestConfig = {
       },
     },
   ],
+  use: {
+    baseURL: "https://staging.czgenepi.org",
+    actionTimeout: 0,
+    storageState: "e2e/storage/state.json",
+    ignoreHTTPSErrors: true,
+    screenshot: "only-on-failure",
+    trace: "on-first-retry",
+    viewport: { width: 1280, height: 720 },
+  },
 };
 export default config;
