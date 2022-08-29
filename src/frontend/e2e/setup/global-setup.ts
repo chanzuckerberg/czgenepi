@@ -1,27 +1,27 @@
-import { chromium, BrowserContext } from "@playwright/test";
-import { login } from "../utils/login";
+import { chromium, FullConfig } from "@playwright/test";
+import { getByID, getByTestID } from "../utils/selectors";
+import * as fs from "fs";
 
 const username = process.env.USERNAME ?? "";
 const password = process.env.PASSWORD ?? "";
 
-async function globalSetup(
-  context: BrowserContext
-): Promise<void> {
+async function globalSetup(config: FullConfig): Promise<void> {
+  const { storageState } = config.projects[0].use;
+  const cookieStorage = "e2e/storage/cookies.json";
+  const { baseURL } = config.projects[0].use;
   const browser = await chromium.launch();
-  context = await browser.newContext();
 
   const page = await browser.newPage();
-  await login(page, username, password);
-  // Set session storage in a new context
-  const sessionStorage = process.env.SESSION_STORAGE;
-  console.log("Reading session from storage");
-  console.log(sessionStorage);
-  await context.addInitScript((storage) => {
-    const entries = JSON.parse(storage);
-    Object.keys(entries).forEach((key) => {
-    window.sessionStorage.setItem(key, entries[key]);
-    });
-  }, sessionStorage);
+  await page.goto(baseURL as string);
+  await page.locator(getByTestID("navbar-sign-in-link")).click();
+  await page.locator(getByID("username")).first().fill(username);
+  await page.locator(getByID("password")).first().fill(password);
+  await page.locator('button[type=submit] >> "Continue"').first().click();
+  await page.context().storageState({ path: storageState as string });
+
+  const cookies = await page.context().cookies();
+  const cookieString = JSON.stringify(cookies);
+  fs.writeFileSync(cookieStorage, cookieString);
   await browser.close();
 }
 export default globalSetup;
