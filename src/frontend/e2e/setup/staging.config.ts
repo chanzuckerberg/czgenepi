@@ -6,13 +6,12 @@ dotenv.config();
 
 const config: PlaywrightTestConfig = {
   testDir: "../tests",
-  testResultsDir: "../report",
   outputDir: "../report",
   timeout: 30000,
   expect: {
     timeout: 30000,
   },
-  reporter: [["html", { open: "never" }]],
+  reporter: process.env.CI ? "github" : "list",
   globalSetup: "./global-setup",
   use: {
     baseURL: "https://staging.czgenepi.org",

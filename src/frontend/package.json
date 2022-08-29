@@ -16,9 +16,9 @@
     "type-check": "tsc --noEmit",
     "lint": "concurrently \"node_modules/.bin/eslint **/*.{ts,tsx} --quiet --fix\" \"node_modules/.bin/stylelint --fix '**/*.{js,ts,tsx,css}'\"  \"npm run type-check\"",
     "lint-ci": "concurrently \"node_modules/.bin/eslint **/*.{ts,tsx}\" \"node_modules/.bin/stylelint '**/*.{js,ts,tsx,css}'\"  \"npm run type-check\"",
-    "pl:staging": "dotenv -e env.staging -- npx playwright test --headed -c ./e2e/setup/staging.config.ts",
-    "pl:local:headed": "npx playwright test --headed -c ./e2e/setup/staging.config.ts",
-    "pl:staging:headless": "npx playwright test --headed -c ./e2e/setup/staging.config.ts",
+    "pl:staging": "NODE_ENV=staging npx playwright test --headed -c ./e2e/setup/staging.config.ts",
+    "pl:local": "NODE_ENV=local npx playwright test --headed -c ./e2e/setup/staging.config.ts",
+    "pl:staging:headless": "npx playwright test --headless -c ./e2e/setup/staging.config.ts",
     "pl:staging:debug": "npx playwright test --debug -c ./e2e/setup/staging.config.ts",
     "pl:report": "npx playwright show-report"
   },
