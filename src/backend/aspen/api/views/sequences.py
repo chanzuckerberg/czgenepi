@@ -40,8 +40,7 @@ async def prepare_sequences_download(
     pathogen_slug=Depends(get_pathogen_slug),
 ) -> StreamingResponse:
     # stream output file
-
-    fasta_filename = get_fasta_filename(request.public_repository_name, ac.group.name)
+    fasta_filename = get_fasta_filename(request.public_repository_name, ac.group.name)  # type: ignore
 
     async def stream_samples():
         sample_ids = request.sample_ids
