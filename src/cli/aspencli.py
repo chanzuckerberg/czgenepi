@@ -642,11 +642,16 @@ def list_samples(ctx):
 
 @samples.command(name="download")
 @click.argument("sample_ids", nargs=-1)
+@click.option(
+    "--repository", required=False, type=str, help="Public repository to format sample names for"
+)
 @click.pass_context
-def download_samples(ctx, sample_ids):
+def download_samples(ctx, sample_ids, repository):
     api_client = ctx.obj["api_client"]
-    payload = {"requested_sequences": {"sample_ids": sample_ids}}
-    resp = api_client.post_with_org("/v2/sequences", json=payload)
+    payload = {"sample_ids": sample_ids}
+    if repository:
+        payload["public_repository_name"] = repository
+    resp = api_client.post_with_org("/v2/sequences/", json=payload)
     print(resp.headers)
     print(resp.text)
 
