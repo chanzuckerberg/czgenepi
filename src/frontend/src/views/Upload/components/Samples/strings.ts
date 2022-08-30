@@ -1,11 +1,11 @@
 import { StringsType } from "src/common/types/strings";
 
-interface SamplesStrings {
+interface UploadSamplesStrings {
   header: string;
   acceptedFormats: string;
 }
 
-export const strings: StringsType<SamplesStrings> = {
+export const pathogenStrings: StringsType<UploadSamplesStrings> = {
   covid: {
     header: "Select SARS-CoV-2 Consensus Genome Files",
     acceptedFormats:
