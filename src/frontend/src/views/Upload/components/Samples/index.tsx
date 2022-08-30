@@ -16,6 +16,7 @@ import {
 import { ParseErrors, Props } from "../common/types";
 import AlertTable from "./components/AlertTable";
 import Table from "./components/Table";
+import { pathogenStrings } from "./strings";
 import {
   ContentWrapper,
   SemiBold,
@@ -88,7 +89,7 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
       <Content>
         <CollapsibleInstructions
           buttonSize="xxs"
-          header="Select SARS-CoV-2 Consensus Genome Files"
+          header={pathogenStrings.covid.header}
           headerSize="xl"
           instructionListTitle="File instructions"
           listPadding="xl"
@@ -100,10 +101,7 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
               </SemiBold>{" "}
               Your sample name should be the sample&apos;s Private ID.
             </span>,
-            <span key="2">
-              Accepted file formats: fasta (.fa or .fasta), fasta.gz (.fa.gz),
-              fasta.zip, plain text (.txt)
-            </span>,
+            <span key="2">{pathogenStrings.covid.acceptedFormats}</span>,
             <span key="3">
               Sample names must be no longer than 120 characters and can only
               contain letters from the English alphabet (A-Z, upper and lower
