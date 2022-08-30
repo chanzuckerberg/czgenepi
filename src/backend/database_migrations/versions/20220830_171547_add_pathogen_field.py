@@ -64,7 +64,7 @@ def upgrade():
     # backpopulate pathogen fields to sars-cov-2
     op.execute(
         """
-        UPDATE aspen.samples 
+        UPDATE aspen.samples
         SET pathogen_id=(
             SELECT id from aspen.pathogens WHERE name='SARS-CoV-2'
         )
@@ -72,7 +72,7 @@ def upgrade():
     )
     op.execute(
         """
-        UPDATE aspen.phylo_runs 
+        UPDATE aspen.phylo_runs
         SET pathogen_id=(
             SELECT id from aspen.pathogens WHERE name='SARS-CoV-2'
         )
@@ -80,7 +80,7 @@ def upgrade():
     )
     op.execute(
         """
-        UPDATE aspen.pathogen_genomes 
+        UPDATE aspen.pathogen_genomes
         SET pathogen_id=(
             SELECT id from aspen.pathogens WHERE name='SARS-CoV-2'
         )
