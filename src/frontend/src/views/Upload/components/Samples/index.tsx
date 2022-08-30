@@ -16,6 +16,7 @@ import {
 import { ParseErrors, Props } from "../common/types";
 import AlertTable from "./components/AlertTable";
 import Table from "./components/Table";
+import { strings } from "./strings";
 import {
   ContentWrapper,
   SemiBold,
@@ -88,7 +89,7 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
       <Content>
         <CollapsibleInstructions
           buttonSize="xxs"
-          header="Select SARS-CoV-2 Consensus Genome Files"
+          header={strings.covid.header}
           headerSize="xl"
           instructionListTitle="File instructions"
           listPadding="xl"
