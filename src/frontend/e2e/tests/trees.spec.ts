@@ -1,8 +1,8 @@
 import { test, expect } from "@playwright/test";
 import { TreeInfo } from "../utils/schemas/treeInfo";
-import { LoginPage } from "../page-objects/LoginPage";
-import { SamplesPage } from "../page-objects/SamplesPage";
-import { PhylogeneticTreePage } from "../page-objects/PhylogeneticTreePage";
+import { LoginPage } from "../pages/LoginPage";
+import { SamplesPage } from "../pages/SamplesPage";
+import { PhylogeneticTreePage } from "../pages/PhylogeneticTreePage";
 
 test.describe("Phylogenetic Tree", () => {
   let loginPage: LoginPage;

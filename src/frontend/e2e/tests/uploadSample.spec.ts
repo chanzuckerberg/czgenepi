@@ -1,8 +1,8 @@
 import { test, expect } from "@playwright/test";
 import { SampleData } from "../utils/schemas/sampleData";
-import { LoginPage } from "../page-objects/LoginPage";
-import { SamplesPage } from "../page-objects/SamplesPage";
-import { UploadPage } from "../page-objects/UploadPage";
+import { LoginPage } from "../pages/LoginPage";
+import { SamplesPage } from "../pages/SamplesPage";
+import { UploadPage } from "../pages/UploadPage";
 
 test.describe("Filter Test Suite", () => {
   let loginPage: LoginPage;
