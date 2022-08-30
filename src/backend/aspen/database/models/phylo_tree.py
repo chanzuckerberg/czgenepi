@@ -91,7 +91,7 @@ class PhyloRun(Workflow):
     )
     group = relationship(Group, backref=backref("phylo_runs", uselist=True))  # type: ignore
 
-    pathogen_id = Column(Integer, ForeignKey(Pathogen.id), nullable=False)
+    pathogen_id = Column(Integer, ForeignKey(Pathogen.id)) # TODO: change to nullable=False once we update workflows
     pathogen = relationship(Pathogen, back_populates="phylo_runs")
 
     template_file_path = Column(String, nullable=True)

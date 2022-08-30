@@ -26,7 +26,7 @@ class PathogenGenome(Entity):
     sequence = deferred(Column(String, nullable=False), raiseload=True)
     sequencing_date = Column(Date, nullable=True)
 
-    pathogen_id = Column(Integer, ForeignKey(Pathogen.id), nullable=False)
+    pathogen_id = Column(Integer, ForeignKey(Pathogen.id))  # TODO: change to nullable=False once we update workflows
     pathogen = relationship(Pathogen, back_populates="pathogen_genomes")
 
     # statistics for the pathogen genome
