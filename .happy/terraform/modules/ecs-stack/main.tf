@@ -182,7 +182,7 @@ module gisaid_sfn_config {
   app_name = "gisaid-sfn"
   image    = local.gisaid_image
   vcpus    = 32
-  memory   = 420000
+  memory   = 128000
   wdl_path = "workflows/gisaid.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -204,7 +204,7 @@ module pangolin_sfn_config {
   source   = "../sfn_config"
   app_name = "pangolin-sfn"
   image    = local.pangolin_image
-  memory   = 120000
+  memory   = 16000
   wdl_path = "workflows/pangolin.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -225,7 +225,7 @@ module pangolin_ondemand_sfn_config {
   source   = "../sfn_config"
   app_name = "pangolin-ondemand-sfn"
   image    = local.pangolin_image
-  memory   = 120000
+  memory   = 16000
   wdl_path = "workflows/pangolin-ondemand.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -249,7 +249,7 @@ module nextstrain_template_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-sfn"
   image    = local.nextstrain_image
-  vcpus    = 10
+  vcpus    = 8
   memory   = 64000
   wdl_path = "workflows/nextstrain.wdl"
   custom_stack_name     = local.custom_stack_name
@@ -270,7 +270,7 @@ module nextstrain_autorun_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-autorun-sfn"
   image    = local.backend_image
-  vcpus    = 10
+  vcpus    = 8
   memory   = 64000
   wdl_path = "workflows/nextstrain-autorun.wdl"
   custom_stack_name     = local.custom_stack_name
@@ -293,7 +293,7 @@ module nextstrain_ondemand_template_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-ondemand-sfn"
   image    = local.nextstrain_image
-  vcpus    = 10
+  vcpus    = 8
   memory   = 64000
   wdl_path = "workflows/nextstrain-ondemand.wdl"
   custom_stack_name     = local.custom_stack_name

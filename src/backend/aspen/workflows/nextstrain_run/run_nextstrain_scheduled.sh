@@ -28,21 +28,6 @@ fi
 genepi_config="$($aws secretsmanager get-secret-value --secret-id $GENEPI_CONFIG_SECRET_NAME --query SecretString --output text)"
 aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$genepi_config")"
 
-# Recover template args
-TEMPLATE_ARGS=$(jq -c . < "${TEMPLATE_ARGS_FILE}")
-
-# Create a workflow run
-WORKFLOW_ID=$(aspen-cli db create-phylo-run                                       \
-                  --group-name "${GROUP_NAME}"                                    \
-                  --builds-template-args "${TEMPLATE_ARGS}"                       \
-                  --tree-name "${GROUP_NAME} Contextual Recency-Focused Build"   \
-                  --user hello@czgenepi.org                                       \
-                  --tree-type "${TREE_TYPE}"
-)
-echo "${WORKFLOW_ID}" >| "/tmp/workflow_id"
-
-type_titlecase="$(tr '[:lower:]' '[:upper:]' <<< ${TREE_TYPE:0:1})$(tr '[:upper:]' '[:lower:]' <<< ${TREE_TYPE:1})"
-key_prefix="phylo_run/${S3_FILESTEM}/${type_titlecase}/${WORKFLOW_ID}"
 s3_prefix="s3://${aspen_s3_db_bucket}/${key_prefix}"
 
 # set up ncov
@@ -56,10 +41,10 @@ cp /usr/src/app/aspen/workflows/nextstrain_run/nextstrain_profile/* /ncov/my_pro
 aligned_gisaid_location=$(
     python3 /usr/src/app/aspen/workflows/nextstrain_run/export.py \
            --phylo-run-id "${WORKFLOW_ID}"                        \
-           --sequences /ncov/data/sequences_aspen.fasta     \
-           --metadata /ncov/data/metadata_aspen.tsv         \
-           --selected /ncov/data/include.txt                       \
-           --builds-file /ncov/my_profiles/aspen/builds.yaml       \
+           --sequences /ncov/data/sequences_aspen.fasta           \
+           --metadata /ncov/data/metadata_aspen.tsv               \
+           --selected /ncov/data/include.txt                      \
+           --builds-file /ncov/my_profiles/aspen/builds.yaml      \
 )
 
 # Persist the build config we generated.
