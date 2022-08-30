@@ -16,6 +16,7 @@ from sqlalchemy.orm import backref, deferred, relationship
 
 from aspen.database.models.entity import Entity, EntityType
 from aspen.database.models.sample import Sample
+from aspen.database.models.pathogens import Pathogen
 
 
 class PathogenGenome(Entity):
@@ -24,6 +25,9 @@ class PathogenGenome(Entity):
     entity_id = Column(Integer, ForeignKey(Entity.id), primary_key=True)
     sequence = deferred(Column(String, nullable=False), raiseload=True)
     sequencing_date = Column(Date, nullable=True)
+
+    pathogen_id = Column(Integer, ForeignKey(Pathogen.id), nullable=False)
+    pathogen = relationship(Pathogen, back_populates="pathogen_genomes")
 
     # statistics for the pathogen genome
     def calculate_num_unambiguous_sites(self):

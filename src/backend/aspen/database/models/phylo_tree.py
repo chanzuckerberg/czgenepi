@@ -19,6 +19,7 @@ from aspen.database.models.enum import Enum
 from aspen.database.models.sample import Sample
 from aspen.database.models.usergroup import Group
 from aspen.database.models.workflow import Workflow, WorkflowType
+from aspen.database.models.pathogens import Pathogen
 
 _PHYLO_TREE_TABLENAME = "phylo_trees"
 
@@ -89,6 +90,9 @@ class PhyloRun(Workflow):
         nullable=False,
     )
     group = relationship(Group, backref=backref("phylo_runs", uselist=True))  # type: ignore
+
+    pathogen_id = Column(Integer, ForeignKey(Pathogen.id), nullable=False)
+    pathogen = relationship(Pathogen, back_populates="phylo_runs")
 
     template_file_path = Column(String, nullable=True)
 

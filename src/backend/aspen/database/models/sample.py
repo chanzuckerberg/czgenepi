@@ -24,6 +24,7 @@ from aspen.database.models.base import idbase
 from aspen.database.models.locations import Location
 from aspen.database.models.mixins import DictMixin
 from aspen.database.models.usergroup import Group, User
+from aspen.database.models.pathogens import Pathogen
 
 if TYPE_CHECKING:
     from .sequences import UploadedPathogenGenome
@@ -56,6 +57,9 @@ class Sample(idbase, DictMixin):  # type: ignore
         nullable=False,
     )
     uploaded_by = relationship(User, backref=backref("samples", uselist=True))  # type: ignore
+    pathogen_id = Column(Integer, ForeignKey(Pathogen.id), nullable=False)
+
+    pathogen = relationship(Pathogen, back_populates="samples")
     private = Column(Boolean, nullable=False, default=False)
     private_identifier = Column(
         String,
