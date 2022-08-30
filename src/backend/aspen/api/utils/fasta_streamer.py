@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql.expression import and_
 
+import aspen.api.error.http_exceptions as ex
 from aspen.api.authn import AuthContext
 from aspen.api.authz import AuthZSession
 from aspen.api.utils import samples_by_identifiers
@@ -99,6 +100,9 @@ class FastaStreamer:
             pathogen_repo_config = res.scalars().one_or_none()
             if pathogen_repo_config:
                 return pathogen_repo_config.prefix
+            raise ex.BadRequestException(
+                "no prefix found for given pathogen_slug and public_repository combination"
+            )
 
     async def _output_id_line(self, prefix, identifier) -> str:
         """Produces the ID line for current sequence in fasta.

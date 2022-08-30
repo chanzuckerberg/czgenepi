@@ -65,7 +65,7 @@ async def test_prepare_sequences_download_gisaid(
     )
     file_contents = str(res.content, encoding="UTF-8")
     assert "ATGCAAAAAA" in file_contents
-    assert file_contents.startswith(">hCoV-19/")
+    assert file_contents.startswith(f">hCoV-19/{sample.private_identifier}")
     assert sample.private_identifier in file_contents
 
 
@@ -94,7 +94,7 @@ async def test_prepare_sequences_download_genbank(
     )
     file_contents = str(res.content, encoding="UTF-8")
     assert "ATGCAAAAAA" in file_contents
-    assert file_contents.startswith(">SARS-CoV-2/human/")
+    assert file_contents.startswith(f">SARS-CoV-2/human/{sample.private_identifier}")
     assert sample.private_identifier in file_contents
 
 
