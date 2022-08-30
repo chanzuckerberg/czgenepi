@@ -1,5 +1,8 @@
 import { expect, Locator, Page } from "@playwright/test";
 
+const collectionDateLocator = "button[label='Collection Date']";
+const collectionDateStartLocator = "input[name='collectionDateStart']";
+
 export class SamplesPage {
   readonly page: Page;
   readonly genomeRecoveryDropDown: Locator;
@@ -30,9 +33,7 @@ export class SamplesPage {
     this.lineageList = page.locator(
       "div[data-test-id='table-row'] > div:nth-of-type(4) > div"
     );
-    this.collectionDateDropDown = page.locator(
-      "button[label='Collection Date']"
-    );
+    this.collectionDateDropDown = page.locator(collectionDateLocator);
     this.uploadButton = page.locator("a[href$='/upload/1'] > button");
     this.treeButton = page.locator('div[status="info"] + div + div + span');
     this.nextStrainPhylogeneticTreeOption = page.locator(
@@ -61,7 +62,6 @@ export class SamplesPage {
     for (let i = 0; i < count; ++i) {
       arrayStatus.push((await statuses.nth(i).textContent()) as string);
     }
-    console.log("CURRENT STATUSES FILTERED: " + arrayStatus);
     return arrayStatus;
   }
 
@@ -85,7 +85,6 @@ export class SamplesPage {
     for (let i = 0; i < count; ++i) {
       arrayStatus.push((await lineages.nth(i).textContent()) as string);
     }
-    console.log("CURRENT LINEAGE FILTERED: " + arrayStatus);
     return arrayStatus;
   }
 
@@ -144,13 +143,12 @@ export class SamplesPage {
 //   }
 
 export async function filterCollectionDate(page: Page, filterDate: string) {
-  await page.click("button[label='Collection Date']");
+  await page.click(collectionDateLocator);
   const periods = await page.locator("div[style*='194'] span > span");
   periods.filter({ hasText: filterDate }).click();
   const filterOn = await page.locator("div > .MuiChip-deletable");
   await expect(filterOn).toHaveText(filterDate);
   await page.waitForTimeout(2000);
-  console.log("FILTER BY: [" + filterDate + "]" + "\n");
 }
 
 export async function filterCustomCollectionDate(
@@ -158,9 +156,9 @@ export async function filterCustomCollectionDate(
   initialDate: string,
   endDate: string
 ) {
-  await page.click("button[label='Collection Date']");
-  await page.type("input[name='collectionDateStart']", initialDate);
-  await page.type("input[name='collectionDateStart']", endDate);
+  await page.click(collectionDateLocator);
+  await page.type(collectionDateStartLocator, initialDate);
+  await page.type(collectionDateStartLocator, endDate);
 }
 
 export async function getCollectionDate(page: Page): Promise<any[]> {
@@ -188,24 +186,9 @@ export async function measureDateTimes(page: Page, timeLapse: string) {
         const sampleDate = parseInt(collectionDates[i].split("-")[2]);
         const dayDifference: number = day - sampleDate;
         if (dayDifference <= totalTime) {
-          console.log(
-            "amount of days between [" +
-              collectionDates[i] +
-              "]" +
-              " & " +
-              "[" +
-              today.toDateString() +
-              "] --> days: " +
-              dayDifference +
-              "\n"
-          );
           timesOkFlags.push(true);
         } else {
           timesOkFlags.push(false);
-          console.log(
-            `fecha incorrecta esta fuera de los ${totalTime} dias ` +
-              collectionDates[i]
-          );
         }
         break;
 
@@ -226,26 +209,9 @@ export async function measureDateTimes(page: Page, timeLapse: string) {
         const days = Math.ceil(monthlyDiff / (1000 * 3600 * 24));
 
         if (days <= totalTime * 30) {
-          console.log(
-            "amount of days between [" +
-              collectionDates[i] +
-              "]" +
-              " & " +
-              "[" +
-              today.toDateString() +
-              "] --> days: " +
-              days +
-              "\n"
-          );
           timesOkFlags.push(true);
         } else {
           timesOkFlags.push(false);
-          console.log(
-            `fecha incorrecta esta fuera de los ${totalTime} meses ` +
-              collectionDates[i] +
-              " dias fueron " +
-              days
-          );
         }
         break;
 
@@ -264,30 +230,13 @@ export async function measureDateTimes(page: Page, timeLapse: string) {
         );
         const diffDays = Math.ceil(diff / (1000 * 3600 * 24));
         if (diffDays <= 366 * totalTime) {
-          console.log(
-            "amount of days between [" +
-              collectionDates[i] +
-              "]" +
-              " & " +
-              "[" +
-              today.toDateString() +
-              "] --> " +
-              diffDays +
-              "\n"
-          );
           timesOkFlags.push(true);
         } else {
           timesOkFlags.push(false);
-          console.log(
-            `fecha incorrecta esta fuera de los ${totalTime} anos ` +
-              collectionDates[i]
-          );
         }
         break;
       default:
-        console.log("NINGUNA OPCION DE TIEMPO VALIDA");
         break;
     }
   }
-  console.log(timesOkFlags);
 }

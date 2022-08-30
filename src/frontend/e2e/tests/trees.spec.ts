@@ -18,12 +18,12 @@ test.describe("Phylogenetic Tree", () => {
 
   test("Tree name limit character amount test", async () => {
     const tree: TreeInfo = {
+      collectionDate: "Last 7 Days",
+      forceIncludedSamples: "usdfasdfalsdjf",
+      lineage: ["A.15", "A.2.4", "A.19"],
       treeName:
         "Bacon ipsum dolor amet kevin burgdoggen sirloin, shoulder shankle chislic ham. Salami capicola fatback chislic alcatra strip steak jerky boudin doner shoulder pork loin ball tip. Shank prosciutto pork",
       treeType: "Overview",
-      lineage: ["A.15", "A.2.4", "A.19"],
-      collectionDate: "Last 7 Days",
-      forceIncludedSamples: "usdfasdfalsdjf",
     };
     await samplePage.openNextstrainPhylogeneticTreeModal();
     await treesPage.fillTreeInfo(tree);
@@ -34,11 +34,11 @@ test.describe("Phylogenetic Tree", () => {
 
   test("Tree name missing test", async () => {
     const tree: TreeInfo = {
-      treeName: "",
-      treeType: "Overview",
-      lineage: ["A.15", "A.2.4", "A.19"],
       collectionDate: "Last 7 Days",
       forceIncludedSamples: "usdfasdfalsdjf",
+      lineage: ["A.15", "A.2.4", "A.19"],
+      treeName: "",
+      treeType: "Overview",
     };
     await samplePage.openNextstrainPhylogeneticTreeModal();
     await treesPage.fillTreeInfo(tree);
@@ -49,12 +49,12 @@ test.describe("Phylogenetic Tree", () => {
 
   test("Tree type missing test", async () => {
     const tree: TreeInfo = {
-      treeName: "Randon name",
-      treeType: "",
-      lineage: null,
       collectionDate: null,
       forceIncludedSamples:
         "MAYA-private_identifier_10,MAYA-private_identifier_11,MAYA-private_identifier_41,MAYA-private_identifier_5,MAYA-private_identifier_2",
+      lineage: null,
+      treeName: "Randon name",
+      treeType: "",
     };
     await samplePage.openNextstrainPhylogeneticTreeModal();
     await treesPage.fillTreeInfo(tree);
@@ -65,12 +65,12 @@ test.describe("Phylogenetic Tree", () => {
 
   test("Incorrect Force-include test", async () => {
     const tree: TreeInfo = {
-      treeName: "",
-      treeType: "Overview",
-      lineage: ["AE.1", "AA.2", "A.17"],
       collectionDate: "Last 6 Months",
       forceIncludedSamples:
         "MAYA-private_identifier_10,MAYA-private_identifier_11,MAYA-private_identifier_41,MAYA-private_identifier_5,MAYA-private_identifier_2",
+      lineage: ["AE.1", "AA.2", "A.17"],
+      treeName: "",
+      treeType: "Overview",
     };
     await samplePage.openNextstrainPhylogeneticTreeModal();
     await treesPage.fillTreeInfo(tree);
@@ -81,11 +81,11 @@ test.describe("Phylogenetic Tree", () => {
 
   test("Tree type: Overview test", async ({ page }) => {
     const tree: TreeInfo = {
-      treeName: "This is an overview Type tree",
-      treeType: "Overview",
-      lineage: ["A.2"],
       collectionDate: ["2021-02-20", "2021-03-20"],
       forceIncludedSamples: "",
+      lineage: ["A.2"],
+      treeName: "This is an overview Type tree",
+      treeType: "Overview",
     };
     await samplePage.openNextstrainPhylogeneticTreeModal();
     await treesPage.fillTreeInfo(tree);
@@ -95,11 +95,11 @@ test.describe("Phylogenetic Tree", () => {
 
   test("Tree type: Targeted test", async ({ page }) => {
     const tree: TreeInfo = {
-      treeName: "This is an Targeted Type tree",
-      treeType: "targeted",
-      lineage: null,
       collectionDate: null,
       forceIncludedSamples: "",
+      lineage: null,
+      treeName: "This is an Targeted Type tree",
+      treeType: "targeted",
     };
     await samplePage.openNextstrainPhylogeneticTreeModal();
     await treesPage.fillTreeInfo(tree);
@@ -109,11 +109,11 @@ test.describe("Phylogenetic Tree", () => {
 
   test("Tree type: Non-Contextualized test", async ({ page }) => {
     const tree: TreeInfo = {
-      treeName: "This is an Non-Contextualized Type tree",
-      treeType: "Non_Contextualized",
-      lineage: null,
       collectionDate: null,
       forceIncludedSamples: "",
+      lineage: null,
+      treeName: "This is an Non-Contextualized Type tree",
+      treeType: "Non_Contextualized",
     };
     await samplePage.openNextstrainPhylogeneticTreeModal();
     await treesPage.fillTreeInfo(tree);

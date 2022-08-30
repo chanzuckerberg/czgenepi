@@ -1,6 +1,8 @@
 import { Locator, Page } from "@playwright/test";
 import { TreeInfo } from "../utils/schemas/treeInfo";
 
+const inputIdentifier = "//div[@role='tooltip']/descendant::input";
+
 export class PhylogeneticTreePage {
   readonly page: Page;
 
@@ -63,22 +65,17 @@ export class PhylogeneticTreePage {
     if (Array.isArray(treeInfo.lineage)) {
       await this.lineageDropDown.click();
       for (let j = 0; j < treeInfo.lineage.length; j++) {
-        await this.page
-          .locator("//div[@role='tooltip']/descendant::input")
-          .type(treeInfo.lineage[j]);
+        await this.page.locator(inputIdentifier).type(treeInfo.lineage[j]);
         const lineageOption =
           "//div[@role='menuitem']/descendant::div[text()='${VAR}']".replace(
             "${VAR}",
             treeInfo.lineage[j]
           );
         await this.page.locator(lineageOption).click();
-        await this.page
-          .locator("//div[@role='tooltip']/descendant::input")
-          .click();
+        await this.page.locator(inputIdentifier).click();
         while (
-          (await this.page
-            .locator("//div[@role='tooltip']/descendant::input")
-            .getAttribute("value")) !== ""
+          (await this.page.locator(inputIdentifier).getAttribute("value")) !==
+          ""
         ) {
           await this.page.keyboard.press("Backspace");
           await this.page.keyboard.press("Delete");

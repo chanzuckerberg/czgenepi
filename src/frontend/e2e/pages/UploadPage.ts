@@ -67,11 +67,6 @@ export class UploadPage {
   }
 
   async getImportedFileNameList(): Promise<string[]> {
-    for (let i = 0; i < (await this.importedFileNameList.count()); i++) {
-      console.log(
-        "NAME " + (await this.importedFileNameList.nth(i).textContent())
-      );
-    }
     return this.importedFileNameList.allTextContents();
   }
 

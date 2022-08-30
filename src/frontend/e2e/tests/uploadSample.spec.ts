@@ -4,6 +4,12 @@ import { LoginPage } from "../pages/LoginPage";
 import { SamplesPage } from "../pages/SamplesPage";
 import { UploadPage } from "../pages/UploadPage";
 
+const textFile = "test_data.txt";
+const publicId8 = "hCoV-19/USA/CA-CCC_Ex8";
+const publicId9 = "hCoV-19/USA/CA-CCC_Ex9";
+const publicId10 = "hCoV-19/USA/CA-CCC_Ex10";
+const updateDateMsg = "Update format to YYYY-MM-DD";
+
 test.describe("Filter Test Suite", () => {
   let loginPage: LoginPage;
   let samplePage: SamplesPage;
@@ -18,7 +24,7 @@ test.describe("Filter Test Suite", () => {
 
   test("upload extension files test", async () => {
     await samplePage.navigateToUpload();
-    await uploadPage.uploadSampleFiles("test_data.txt");
+    await uploadPage.uploadSampleFiles(textFile);
     await expect(uploadPage.importedFileNameList).toHaveText(
       await uploadPage.getImportedFileNameList()
     );
@@ -50,61 +56,53 @@ test.describe("Filter Test Suite", () => {
 
   test("sample form test1", async ({ page }) => {
     const sampleData1: SampleData = {
-      privateId: "my name",
-      publicId: "juan camaney",
       collectionDate: "   ",
       collectionLocation: "Africa/Angola/Luanda/Calemba",
-      sequencingDate: "    ",
       isPrivate: true,
+      privateId: "my name",
+      publicId: "juan camaney",
+      sequencingDate: "    ",
     };
     const sampleData2: SampleData = {
-      privateId: "her name",
-      publicId: "this is public",
       collectionDate: "2022-08-lou",
       collectionLocation: "israel",
-      sequencingDate: "2022-04-768",
       isPrivate: true,
+      privateId: "her name",
+      publicId: "this is public",
+      sequencingDate: "2022-04-768",
     };
     const sampleData3: SampleData = {
-      privateId: "no more names here",
-      publicId: "could be public ",
       collectionDate: "2022-02-04",
       collectionLocation: "South America/Brazil/Santa Catarina/Itapoa",
-      sequencingDate: "2022-07-04",
       isPrivate: true,
+      privateId: "no more names here",
+      publicId: "could be public ",
+      sequencingDate: "2022-07-04",
     };
     await samplePage.navigateToUpload();
-    await uploadPage.uploadSampleFiles("test_data.txt");
+    await uploadPage.uploadSampleFiles(textFile);
     await uploadPage.clickContinue();
-    await uploadPage.fillSampleInfo("hCoV-19/USA/CA-CCC_Ex8", sampleData1);
+    await uploadPage.fillSampleInfo(publicId8, sampleData1);
     await expect(
-      await uploadPage.getCollectionDateInvalidFormatMessage(
-        "hCoV-19/USA/CA-CCC_Ex8"
-      )
-    ).toBe("Update format to YYYY-MM-DD");
+      await uploadPage.getCollectionDateInvalidFormatMessage(publicId8)
+    ).toBe(updateDateMsg);
     await expect(
-      await uploadPage.getsequencingDateInvalidFormatMessage(
-        "hCoV-19/USA/CA-CCC_Ex8"
-      )
-    ).toBe("Update format to YYYY-MM-DD");
-    await uploadPage.fillSampleInfo("hCoV-19/USA/CA-CCC_Ex9", sampleData2);
+      await uploadPage.getsequencingDateInvalidFormatMessage(publicId8)
+    ).toBe(updateDateMsg);
+    await uploadPage.fillSampleInfo(publicId9, sampleData2);
     await expect(
-      await uploadPage.getCollectionDateInvalidFormatMessage(
-        "hCoV-19/USA/CA-CCC_Ex9"
-      )
-    ).toBe("Update format to YYYY-MM-DD");
+      await uploadPage.getCollectionDateInvalidFormatMessage(publicId9)
+    ).toBe(updateDateMsg);
     await expect(
-      await uploadPage.getsequencingDateInvalidFormatMessage(
-        "hCoV-19/USA/CA-CCC_Ex9"
-      )
-    ).toBe("Update format to YYYY-MM-DD");
+      await uploadPage.getsequencingDateInvalidFormatMessage(publicId9)
+    ).toBe(updateDateMsg);
     await uploadPage.fillSampleInfo("hCoV-19/USA/CA-CCC_Ex10", sampleData3);
     await expect(
       await page
         .locator(
           await uploadPage.collectionDateInvalidFormatMsg.replace(
             "${VAR}",
-            "hCoV-19/USA/CA-CCC_Ex10"
+            publicId10
           )
         )
         .isVisible()
@@ -114,7 +112,7 @@ test.describe("Filter Test Suite", () => {
         .locator(
           await uploadPage.sequencingDateInvalidFormatMsg.replace(
             "${VAR}",
-            "hCoV-19/USA/CA-CCC_Ex10"
+            publicId10
           )
         )
         .isVisible()
@@ -124,35 +122,35 @@ test.describe("Filter Test Suite", () => {
 
   test("sample form test2", async () => {
     const sampleData1: SampleData = {
-      privateId: "random name",
-      publicId: "juan camaney",
       collectionDate: "2022-04-12",
       collectionLocation: "Africa/Angola/Luanda/Calemba",
-      sequencingDate: "2022-04-12",
       isPrivate: true,
+      privateId: "random name",
+      publicId: "juan camaney",
+      sequencingDate: "2022-04-12",
     };
     const sampleData2: SampleData = {
-      privateId: "another big name",
-      publicId: "pedro paramo",
       collectionDate: "2022-08-08",
       collectionLocation: "North America/Mexico",
-      sequencingDate: "2022-04-23",
       isPrivate: true,
+      privateId: "another big name",
+      publicId: "pedro paramo",
+      sequencingDate: "2022-04-23",
     };
     const sampleData3: SampleData = {
-      privateId: "the largest name ever",
-      publicId: "john mclane",
       collectionDate: "2022-02-04",
       collectionLocation: "South America/Brazil/Santa Catarina/Itapoa",
-      sequencingDate: "2022-07-04",
       isPrivate: true,
+      privateId: "the largest name ever",
+      publicId: "john mclane",
+      sequencingDate: "2022-07-04",
     };
     await samplePage.navigateToUpload();
-    await uploadPage.uploadSampleFiles("test_data.txt");
+    await uploadPage.uploadSampleFiles(textFile);
     await uploadPage.clickContinue();
-    await uploadPage.fillSampleInfo("hCoV-19/USA/CA-CCC_Ex9", sampleData1);
-    await uploadPage.fillSampleInfo("hCoV-19/USA/CA-CCC_Ex8", sampleData2);
-    await uploadPage.fillSampleInfo("hCoV-19/USA/CA-CCC_Ex10", sampleData3);
+    await uploadPage.fillSampleInfo(publicId9, sampleData1);
+    await uploadPage.fillSampleInfo(publicId8, sampleData2);
+    await uploadPage.fillSampleInfo(publicId10, sampleData3);
     await expect(await uploadPage.submitSamplesButton.isVisible()).toBe(true);
   });
 });

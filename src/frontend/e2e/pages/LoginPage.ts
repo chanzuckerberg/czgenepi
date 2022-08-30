@@ -1,4 +1,4 @@
-import { expect, Locator, Page } from "@playwright/test";
+import { Locator, Page } from "@playwright/test";
 
 export class LoginPage {
   readonly page: Page;
@@ -22,7 +22,7 @@ export class LoginPage {
     await this.passwordInput.type(password);
     await this.continueButton.click();
     await this.page.waitForURL("https://staging.czgenepi.org/data/samples");
-    await this.page.click(
+    return await this.page.click(
       "body #onetrust-banner-sdk #onetrust-accept-btn-handler"
     );
   }
