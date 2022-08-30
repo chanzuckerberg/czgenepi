@@ -98,6 +98,32 @@ async def test_prepare_sequences_download_genbank(
     assert sample.private_identifier in file_contents
 
 
+async def test_prepare_sequences_download_public_database_DNE(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+):
+    """
+    Test that error message is returned if public repository name is not found
+    """
+
+    group, user, sample = await setup_sequences_download_test_data(async_session)
+
+    auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
+    data = {
+        "sample_ids": [sample.public_identifier],
+        "public_repository_name": "does not exist",
+    }
+    res = await http_client.post(
+        f"/v2/orgs/{group.id}/sequences/", headers=auth_headers, json=data
+    )
+
+    assert (
+        res.text
+        == '{"error":"no prefix found for given pathogen_slug and public_repository combination"}'
+    )
+    assert res.status_code == 500
+
+
 async def test_prepare_sequences_download_no_submission(
     async_session: AsyncSession,
     http_client: AsyncClient,

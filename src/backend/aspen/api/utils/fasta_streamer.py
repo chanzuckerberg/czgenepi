@@ -2,22 +2,13 @@ import re
 from enum import Enum
 from typing import AsyncGenerator, Optional, Set
 
-import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
-from sqlalchemy.sql.expression import and_
 
-import aspen.api.error.http_exceptions as ex
 from aspen.api.authn import AuthContext
 from aspen.api.authz import AuthZSession
 from aspen.api.utils import samples_by_identifiers
-from aspen.database.models import (
-    Pathogen,
-    PathogenRepoConfig,
-    PublicRepository,
-    Sample,
-    UploadedPathogenGenome,
-)
+from aspen.database.models import Sample, UploadedPathogenGenome
 
 
 class SpecialtyDownstreams(Enum):
@@ -33,16 +24,14 @@ class FastaStreamer:
         az: AuthZSession,
         ac: AuthContext,
         sample_ids: Set[str],
-        public_repository_name: str = None,
-        pathogen_slug: str = None,
+        prefix: Optional[str] = None,
         downstream_consumer: Optional[str] = None,
     ):
         self.db = db
         self.ac = ac
         self.az = az
         self.sample_ids = sample_ids
-        self.public_repository_name = public_repository_name
-        self.pathogen_slug = pathogen_slug
+        self.prefix = prefix
         # Certain consumers have different requirements on fasta
         self.downstream_consumer = downstream_consumer
 
@@ -56,8 +45,6 @@ class FastaStreamer:
                 UploadedPathogenGenome.sequence
             )
         )
-        # get the sample id prefix for given public_repository
-        prefix = await self.get_public_repository_prefix()
 
         # Stream results
         all_samples = await self.db.stream(sample_query)
@@ -76,43 +63,21 @@ class FastaStreamer:
                 stripped_sequence: str = sequence.strip("Nn")
                 # use private id if the user has access to it, else public id
                 if sample.submitting_group_id == self.ac.group.id:  # type: ignore
-                    yield await self._output_id_line(prefix, sample.private_identifier)
+                    yield await self._output_id_line(sample.private_identifier)
                 else:
-                    yield await self._output_id_line(prefix, sample.public_identifier)
+                    yield await self._output_id_line(sample.public_identifier)
                 yield stripped_sequence
                 yield "\n"
 
-    async def get_public_repository_prefix(self):
-        if self.pathogen_slug and self.public_repository_name:
-            # only get the prefix if we have enough information to proceed
-            prefix = (
-                sa.select(PathogenRepoConfig)
-                .join(Pathogen)
-                .join(PublicRepository)
-                .where(
-                    and_(
-                        Pathogen.slug == self.pathogen_slug,
-                        PublicRepository.name == self.public_repository_name,
-                    )
-                )
-            )
-            res = await self.db.execute(prefix)
-            pathogen_repo_config = res.scalars().one_or_none()
-            if pathogen_repo_config:
-                return pathogen_repo_config.prefix
-            raise ex.BadRequestException(
-                "no prefix found for given pathogen_slug and public_repository combination"
-            )
-
-    async def _output_id_line(self, prefix, identifier) -> str:
+    async def _output_id_line(self, identifier) -> str:
         """Produces the ID line for current sequence in fasta.
 
         Certain downstream consumers (eg, UShER) restrict what characters can be
         used in the ID. Also handles any modifications that must be made to ID
         characters so they don't break the downstream consumer."""
 
-        if self.public_repository_name and prefix is not None:
-            output_id = f'{prefix}/{identifier.lstrip("hCoV-19/")}'  # default, might get changed if specialty case
+        if self.prefix is not None:
+            output_id = f'{self.prefix}/{identifier.lstrip("hCoV-19/")}'  # default, might get changed if specialty case
         else:
             # user is proceeding with normal download, and does not wish to submit to gisaid or genbank
             output_id = identifier
