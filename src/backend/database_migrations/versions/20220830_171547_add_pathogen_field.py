@@ -88,6 +88,5 @@ def upgrade():
     )
 
 
-
 def downgrade():
     raise NotImplementedError("downgrading the DB is not allowed")
