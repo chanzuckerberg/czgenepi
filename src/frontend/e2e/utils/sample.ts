@@ -1,10 +1,13 @@
 import { faker } from "@faker-js/faker";
 const { request, expect } = require("@playwright/test");
+const fs = require("fs");
 
 const defaultSequence =
   "ATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTC";
 const locationId = 166768;
+const storageStateFile = "e2e/storage/state.json";
 
+const storageState = fs.readFileSync(storageStateFile);
 export default abstract class SampleUtil {
   /*
 This method generates sample data that can be used for uploading
@@ -121,39 +124,40 @@ This method generates sample data that can be used for uploading
   public static async getSamples(): Promise<any> {
     const groupId = process.env.GROUPID;
     const endpoint = `/v2/orgs/74/samples/`;
+    //console.log(storageState)
     const context = await request.newContext({
       baseURL: "https://api.staging.czgenepi.org",
+      storageState: storageStateFile,
     });
     const response = await context.get(endpoint, {
-      headers: SampleUtil.setHeaders(),
+      //headers: SampleUtil.setHeaders(),
     });
     //expect(response.ok()).toBeTruthy();
     console.log(response);
-    return response;
+    return response.json();
   }
 
   /*
     Helper function for HTTP request headers. It reads cookie from file and attaches to the header
     @return {object} return header object
-    */
+  */
   public static setHeaders() {
     let cookies = "OptanonAlertBoxClosed=2022-08-19T09:28:00.361Z; ";
     cookies += "ajs_user_id=0g4u6x3nhde5p8m8wmad; ";
     cookies += "ajs_anonymous_id=16229f03-caaf-4803-8d16-e39168c89339; ";
     cookies += "OptanonConsent=isIABGlobal=false";
     cookies +=
-      "&datestamp=Fri+Aug+26+2022+16%3A38%3A43+GMT%2B0100+(British+Summer+Time)";
+      "&datestamp=Fri+Aug+29+2022+16%3A38%3A43+GMT%2B0100+(British+Summer+Time)";
     cookies += "&version=6.34.0";
     cookies += "&hosts=&landingPath=NotLandingPage";
     cookies += "&groups=C0001%3A1%2CC0002%3A1";
     cookies += "&geolocation=GB%3BENG";
     cookies += "&AwaitingReconsent=false; ";
-    cookies += `session=${process.env.COOKIES}`;
-    console.log(process.env.COOKIES);
-    //console.log(cookies)
+    cookies += `session=.eJx9kG9LwzAQxr9LYH2zua6trWuhiEqrMsShTtnelCw5u3RpUpPsjxv77maFwV6okOPgntzd7549KrTBBgq8MotB4T3WH5mE7WY8_RpVVRAsF5PsCh7uBuw5MyjZI4oNPmYhBQGUIDzLR3Rq3ptKh5M3fa85F6iHFFCmgJhipZj9tTCm0Ynr4ob17b6SibJPdiUIsAWpSnftu0cCl2DO55gs7YiV4medRK4ZNcpKoC5OI1roPpF12ywV28G1At1IoaEw3w2kRFJwCGcgTMFoOn0c3e4osE35Kp9mw2EuvTwKszn1opcqrMfOOXfa7u4ENx0_t-8vdiut_aNuEWw6XeBoIi2ADcFot1Hyk3HoQo0Zd1rL0__NdlqH01_9PfQQbBuUeFHkxaEf-F7fu4yDOB4eDj9MQ6JR.Yw9TNA.RDYpTy8es0ScAMxz3n3cpcS6Cr8`;
+    console.log(cookies);
     return {
-      accept: "application/json",
-      cookie: cookies.replace(/\r?\n|\r/g, ""),
+      accept: "*/*",
+      cookie: cookies,
     };
   }
 

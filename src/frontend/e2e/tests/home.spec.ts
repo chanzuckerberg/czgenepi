@@ -11,7 +11,7 @@ const footer: Record<string, string> = {
 };
 
 test.describe("Home page tests", () => {
-  test.skip("Should verify home page", async ({ page }, workerInfo) => {
+  test("Should verify home page", async ({ page }, workerInfo) => {
     const { baseURL } = workerInfo.config.projects[0].use;
     await page.goto(`${baseURL}` as string);
     await expect(page.locator(getByTestID("navbar-landing"))).toBeVisible();

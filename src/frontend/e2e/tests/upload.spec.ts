@@ -5,7 +5,7 @@ test.describe("API tests", () => {
   test.only("Should get samples", async () => {
     await SampleUtil.getSamples().then((data) => {
       const samples = data.samples as Array<any>;
-      console.log(samples);
+      console.log(data);
       //expect(samples.length).toBeGreaterThan(0);
     });
   });

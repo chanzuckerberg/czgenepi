@@ -6,17 +6,16 @@ dotenv.config();
 
 const config: PlaywrightTestConfig = {
   testDir: "../tests",
-  testResultsDir: "../report",
   outputDir: "../report",
   timeout: 30000,
   expect: {
     timeout: 30000,
   },
-  reporter: [["html", { open: "never" }]],
+  reporter: process.env.CI ? "github" : "list",
   globalSetup: "./global-setup",
   use: {
-    baseURL: "http://frontend.genepinet.localdev:8000/",
-    storageState: "playwright/storage/state.json",
+    baseURL: "https://staging.czgenepi.org",
+    storageState: "e2e/storage/state.json",
     actionTimeout: 0,
     trace: "on-first-retry",
     screenshot: "only-on-failure",
