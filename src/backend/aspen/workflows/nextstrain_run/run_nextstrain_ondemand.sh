@@ -71,8 +71,7 @@ $aws s3 cp --no-progress "s3://${aligned_gisaid_s3_bucket}/${aligned_gisaid_meta
 (cd /ncov && snakemake --printshellcmds auspice/ncov_aspen.json --profile my_profiles/aspen/ --resources=mem_mb=312320) || { $aws s3 cp /ncov/.snakemake/log/ "${s3_prefix}/logs/snakemake/" --recursive ; $aws s3 cp /ncov/logs/ "${s3_prefix}/logs/ncov/" --recursive ; }
 
 # upload the tree to S3
-key="${key_prefix}/ncov_aspen.json"
-$aws s3 cp /ncov/auspice/ncov_aspen.json "s3://${aspen_s3_db_bucket}/${key}"
+$aws s3 cp /ncov/auspice/ncov_aspen.json "${s3_prefix}/ncov_aspen.json"
 
 # update aspen
 aspen_workflow_rev=WHATEVER
