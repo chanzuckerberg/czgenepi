@@ -26,7 +26,7 @@ export const StyledIcon = styled(Icon)`
     const colors = getColors(props);
 
     return `
-      fill: ${colors?.gray[500]};
+      fill: ${colors?.gray[400]};
     `;
   }}
 `;
