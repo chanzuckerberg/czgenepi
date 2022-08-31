@@ -77,7 +77,7 @@ class FastaStreamer:
         characters so they don't break the downstream consumer."""
 
         if self.prefix is not None:
-            output_id = f'{self.prefix}/{identifier.lstrip("hCoV-19/")}'  # default, might get changed if specialty case
+            output_id = f'{self.prefix}/{identifier.removeprefix("hCoV-19/")}'  # default, might get changed if specialty case
         else:
             # user is proceeding with normal download, and does not wish to submit to gisaid or genbank
             output_id = identifier
