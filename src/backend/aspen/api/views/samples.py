@@ -20,6 +20,7 @@ from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.samples import (
     CreateSampleRequest,
+    GisaidGenbankSubmitFormRequest,
     SampleBulkDeleteRequest,
     SampleBulkDeleteResponse,
     SampleDeleteResponse,
@@ -33,10 +34,12 @@ from aspen.api.settings import Settings
 from aspen.api.utils import (
     check_duplicate_samples,
     check_duplicate_samples_in_request,
+    collect_submission_information,
     determine_gisaid_status,
     get_matching_gisaid_ids,
     get_matching_gisaid_ids_by_epi_isl,
     get_missing_and_found_sample_ids,
+    GisaidSubmissionFormCSVStreamer,
     samples_by_identifiers,
 )
 from aspen.database.models import Group, Location, Sample, UploadedPathogenGenome, User
@@ -377,3 +380,45 @@ async def create_samples(
     pangolin_job.start()
 
     return result
+
+
+@router.post("/gisaid_template")
+async def fill_gisaid_submission_template(
+    request_data: GisaidGenbankSubmitFormRequest,
+    db: AsyncSession = Depends(get_db),
+    az: AuthZSession = Depends(get_authz_session),
+    ac: AuthContext = Depends(get_auth_context),
+):
+    sample_ids: Set[str] = {item for item in request_data.sample_ids}
+
+    # get all samples from request that the user has permission to use and scope down
+    # the search for matching ID's to groups that the user has read access to.
+    user_visible_samples_query = await samples_by_identifiers(az, sample_ids)
+    user_visible_samples_res = await (
+        db.execute(user_visible_samples_query.joinedload(Location))
+    )
+    user_visible_samples = user_visible_samples_res.scalars().all()
+
+    submission_information = collect_submission_information(
+        ac.user, ac.group, user_visible_samples
+    )
+
+    # Affix GISAID prefixes to public ids and translate to GISAID fields
+    today = datetime.date.today().strftime("%Y%m%d")
+    gisaid_metadata_rows = [
+        {
+            "submitter": sample_info["gisaid_submitter_id"],
+            "fn": f"{today}_GISAID_sequences.fasta",
+            "covv_virus_name": f"hCoV-19/{sample_info['public_identifier']}",
+            "covv_collection_date": sample_info["collection_date"],
+            "covv_subm_lab": sample_info["submitting_lab"],
+            "covv_subm_lab_addr": sample_info["group_address"],
+        }
+        for sample_info in submission_information
+    ]
+
+    # sort alphabetically by public identifier
+
+    filename: str = f"{today}_GISAID_metadata.csv"
+    streamer = GisaidSubmissionFormCSVStreamer(filename, gisaid_metadata_rows)
+    return streamer.get_response()

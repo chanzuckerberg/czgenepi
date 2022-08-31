@@ -127,6 +127,10 @@ class ValidateIDsRequest(BaseRequest):
     sample_ids: List[str]
 
 
+class GisaidGenbankSubmitFormRequest(ValidateIDsRequest):
+    pass
+
+
 class ValidateIDsResponse(BaseResponse):
     missing_sample_ids: List[str]
 

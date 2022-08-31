@@ -7,7 +7,7 @@ from sqlalchemy.orm.query import Query
 from sqlalchemy.sql.expression import or_
 
 from aspen.api.authz import AuthZSession
-from aspen.database.models import Accession, AccessionType, Sample
+from aspen.database.models import Accession, AccessionType, Group, Sample, User
 
 if TYPE_CHECKING:
     from aspen.api.schemas.samples import CreateSampleRequest
@@ -173,3 +173,35 @@ def format_sample_lineage(sample: Sample) -> Dict[str, Any]:
             lineage["scorpio_support"] = float(pango_output.get("scorpio_support"))  # type: ignore
 
     return lineage
+
+
+def collect_submission_information(
+    user: User, group: Group, samples: Sequence[Sample]
+) -> Sequence[Dict[str, Any]]:
+    submission_information: Sequence[Dict[str, Any]] = []
+
+    for sample in samples:
+        sample_info = {}
+        sample_location = sample.get("collection_location")
+        if sample_location:
+            location_string = " / ".join(
+                [
+                    sample_location.get("region", ""),
+                    sample_location.get("country", ""),
+                    sample_location.get("division", ""),
+                    sample_location.get("location", ""),
+                ]
+            )
+            sample_info["collection_location"] = location_string
+        sample_info = {
+            "gisaid_submitter_id": user.get("gisaid_submitter_id"),
+            "public_identifier": sample.public_identifier,
+            "collection_date": sample.collection_date,
+            "submitting_lab": group.get("submitting_lab")
+            if group.get("submitting_lab")
+            else group.name,
+            "group_address": group.get("address"),
+        }
+        submission_information.append(sample_info)
+
+    return submission_information
