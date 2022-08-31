@@ -1,5 +1,15 @@
 from collections import Counter
-from typing import Any, Dict, List, Mapping, Optional, Set, Tuple, TYPE_CHECKING
+from typing import (
+    Any,
+    Dict,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    TYPE_CHECKING,
+)
 
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -183,16 +193,8 @@ def collect_submission_information(
     for sample in samples:
         sample_info = {}
         sample_location = sample.get("collection_location")
-        if sample_location:
-            location_string = " / ".join(
-                [
-                    sample_location.get("region", ""),
-                    sample_location.get("country", ""),
-                    sample_location.get("division", ""),
-                    sample_location.get("location", ""),
-                ]
-            )
-            sample_info["collection_location"] = location_string
+        if not sample_location:
+            sample_location = {}
         sample_info = {
             "gisaid_submitter_id": user.get("gisaid_submitter_id"),
             "public_identifier": sample.public_identifier,
@@ -201,7 +203,48 @@ def collect_submission_information(
             if group.get("submitting_lab")
             else group.name,
             "group_address": group.get("address"),
+            "region": sample_location.get("region", ""),
+            "country": sample_location.get("country", ""),
+            "division": sample_location.get("division", ""),
+            "location": sample_location.get("location", ""),
         }
         submission_information.append(sample_info)
 
     return submission_information
+
+
+def sample_info_to_gisaid_rows(
+    submission_information: Sequence[Dict[str, Any]], today: str
+) -> Sequence[Dict[str, str]]:
+    gisaid_metadata_rows = []
+    for sample_info in submission_information:
+        gisaid_location = "/".join(
+            [sample_info[key] for key in ["region", "country", "division", "location"]]
+        )
+        metadata_row = {
+            "submitter": sample_info["gisaid_submitter_id"],
+            "fn": f"{today}_GISAID_sequences.fasta",
+            "covv_virus_name": f"hCoV-19/{sample_info['public_identifier']}",
+            "covv_location": gisaid_location,
+            "covv_collection_date": sample_info["collection_date"],  # FIX FORMAT
+            "covv_subm_lab": sample_info["submitting_lab"],
+            "covv_subm_lab_addr": sample_info["group_address"],
+        }
+        gisaid_metadata_rows.append(metadata_row)
+    return gisaid_metadata_rows
+
+
+def sample_info_to_genbank_rows(
+    submission_information: Sequence[Dict[str, Any]]
+) -> Sequence[Dict[str, str]]:
+    genbank_metadata_rows = []
+    for sample_info in submission_information:
+        genbank_location = f"{sample_info['country']}: {sample_info['division']}, {sample_info['location']}"
+        metadata_row = {
+            "Sequence_ID": f"SARS-CoV-2/{sample_info['public_identifier']}",
+            "collection-date": sample_info["collection_date"],  # FIX FORMAT
+            "country": genbank_location,
+            "isolate": f"SARS-CoV-2/{sample_info['public_identifier']}",
+        }
+        genbank_metadata_rows.append(metadata_row)
+    return genbank_metadata_rows

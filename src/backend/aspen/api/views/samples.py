@@ -20,12 +20,12 @@ from aspen.api.deps import get_db, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.samples import (
     CreateSampleRequest,
-    GisaidGenbankSubmitFormRequest,
     SampleBulkDeleteRequest,
     SampleBulkDeleteResponse,
     SampleDeleteResponse,
     SampleResponse,
     SamplesResponse,
+    SubmissionTemplateRequest,
     UpdateSamplesRequest,
     ValidateIDsRequest,
     ValidateIDsResponse,
@@ -36,10 +36,13 @@ from aspen.api.utils import (
     check_duplicate_samples_in_request,
     collect_submission_information,
     determine_gisaid_status,
+    GenBankSubmissionFormTSVStreamer,
     get_matching_gisaid_ids,
     get_matching_gisaid_ids_by_epi_isl,
     get_missing_and_found_sample_ids,
-    GisaidSubmissionFormCSVStreamer,
+    GisaidSubmissionFormTSVStreamer,
+    sample_info_to_genbank_rows,
+    sample_info_to_gisaid_rows,
     samples_by_identifiers,
 )
 from aspen.database.models import Group, Location, Sample, UploadedPathogenGenome, User
@@ -382,9 +385,9 @@ async def create_samples(
     return result
 
 
-@router.post("/gisaid_template")
-async def fill_gisaid_submission_template(
-    request_data: GisaidGenbankSubmitFormRequest,
+@router.post("/submission_template")
+async def fill_submission_template(
+    request_data: SubmissionTemplateRequest,
     db: AsyncSession = Depends(get_db),
     az: AuthZSession = Depends(get_authz_session),
     ac: AuthContext = Depends(get_auth_context),
@@ -404,21 +407,23 @@ async def fill_gisaid_submission_template(
     )
 
     # Affix GISAID prefixes to public ids and translate to GISAID fields
-    today = datetime.date.today().strftime("%Y%m%d")
-    gisaid_metadata_rows = [
-        {
-            "submitter": sample_info["gisaid_submitter_id"],
-            "fn": f"{today}_GISAID_sequences.fasta",
-            "covv_virus_name": f"hCoV-19/{sample_info['public_identifier']}",
-            "covv_collection_date": sample_info["collection_date"],
-            "covv_subm_lab": sample_info["submitting_lab"],
-            "covv_subm_lab_addr": sample_info["group_address"],
-        }
-        for sample_info in submission_information
-    ]
+    today = request_data.date.strftime("%Y%m%d")
+    metadata_rows: Sequence[Dict[str, str]] = []
+    filename: str = f""
+    streamer: Optional[FieldSeparatedStreamer]
+    if request_data.public_repository_name.lower() == "gisaid":
+        metadata_rows = sample_info_to_gisaid_rows(submission_information, today)
+        metadata_rows.sort(key=lambda row: row.get("covv_virus_name"))
+        filename: str = (
+            f"{today}_GISAID_metadata.csv"  # yes, we want a TSV with a .csv extension
+        )
+        streamer = GisaidSubmissionFormTSVStreamer(filename, metadata_rows)
+    elif request_data.public_repository_name.lower() == "genbank":
+        metadata_rows = sample_info_to_genbank_rows(submission_information)
+        metadata_rows.sort(key=lambda row: row.get("Sequence_ID"))
+        filename = f"{today}_GenBank_metadata.tsv"
+        streamer = GenBankSubmissionFormTSVStreamer(filename, metadata_rows)
 
-    # sort alphabetically by public identifier
-
-    filename: str = f"{today}_GISAID_metadata.csv"
-    streamer = GisaidSubmissionFormCSVStreamer(filename, gisaid_metadata_rows)
+    if request_data.page:
+        filename = filename.replace("metadata.csv", f"metadata_{request_data.page}.csv")
     return streamer.get_response()
