@@ -30,7 +30,7 @@ async def setup_sequences_download_test_data(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    sample = sample_factory(group, user, location)
+    sample = sample_factory(group, user, location, private_identifier="hCoV-19/private_identifer",)
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     setup_gisaid_and_genbank_repo_configs(async_session)
 
@@ -94,8 +94,8 @@ async def test_prepare_sequences_download_genbank(
     )
     file_contents = str(res.content, encoding="UTF-8")
     assert "ATGCAAAAAA" in file_contents
-    assert file_contents.startswith(f">SARS-CoV-2/human/{sample.private_identifier}")
-    assert sample.private_identifier in file_contents
+    id_w_new_prefix = sample.private_identifier.lstrip("hCoV-19/")
+    assert file_contents.startswith(f">SARS-CoV-2/human/{id_w_new_prefix}")
 
 
 async def test_prepare_sequences_download_public_database_DNE(

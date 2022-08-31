@@ -82,7 +82,7 @@ class FastaStreamer:
             # user is proceeding with normal download, and does not wish to submit to gisaid or genbank
             output_id = identifier
         if self.downstream_consumer == SpecialtyDownstreams.USHER.value:
-            output_id = self._handle_usher_id(identifier)
+            output_id = self._handle_usher_id(output_id)
         return f">{output_id}\n"
 
     def _handle_usher_id(self, identifier) -> str:
