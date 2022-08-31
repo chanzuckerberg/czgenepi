@@ -50,6 +50,7 @@ aligned_gisaid_location=$(
 
 # Persist the build config we generated.
 $aws s3 cp /ncov/my_profiles/aspen/builds.yaml "${s3_prefix}/builds.yaml"
+$aws s3 cp /ncov/data/include.txt "${s3_prefix}/include.txt"
 
 # If we don't have any county samples, copy the reference genomes to to our county file
 if [ ! -e /ncov/data/sequences_aspen.fasta ]; then
