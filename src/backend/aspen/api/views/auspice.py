@@ -23,7 +23,7 @@ from aspen.api.schemas.auspice import (
     GenerateAuspiceMagicLinkRequest,
     GenerateAuspiceMagicLinkResponse,
 )
-from aspen.api.settings import Settings
+from aspen.api.settings import APISettings
 from aspen.api.utils import process_phylo_tree, verify_and_access_phylo_tree
 from aspen.database.models import Group, User
 
@@ -38,7 +38,7 @@ class AuspicePayload(MagicLinkPayload):
 async def generate_auspice_string(
     request: Request,
     db: AsyncSession = Depends(get_db),
-    settings: Settings = Depends(get_settings),
+    settings: APISettings = Depends(get_settings),
     az: AuthZSession = Depends(get_authz_session),
     user: User = Depends(get_auth_user),
     ac: AuthContext = Depends(get_auth_context),

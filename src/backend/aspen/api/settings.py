@@ -68,7 +68,6 @@ def aws_ssm_settings(settings) -> Dict[str, Any]:
         response[key_name] = json.loads(param_value)
     return response
 
-
 class Settings(BaseSettings):
     """Pydantic Settings object - do not instantiate it directly, please use get_settings() as a dependency where possible"""
 
@@ -87,8 +86,6 @@ class Settings(BaseSettings):
 
     # Env vars usually read from env vars
     AWS_REGION: str
-    FLASK_ENV: str
-    API_URL: str
     REMOTE_DEV_PREFIX: str = ""
     DEPLOYMENT_STAGE: str = ""
     GENEPI_CONFIG_SECRET_NAME: str = "genepi-config"
@@ -124,49 +121,6 @@ class Settings(BaseSettings):
     # Env vars usually pulled from AWS SSM Parameters
     AWS_NEXTSTRAIN_SFN_PARAMETERS: Dict
     AWS_PANGOLIN_SFN_PARAMETERS: Dict
-
-    ####################################################################################
-    # Stack name
-    @cached_property
-    def AUTH0_LOGOUT_URL(self) -> str:
-        flask_env = self.FLASK_ENV
-        if flask_env == "production":
-            return f"{self.AUTH0_BASE_URL}/v2/logout"
-        else:
-            return f"https://{self.AUTH0_DOMAIN}/Account/Logout"
-
-    @cached_property
-    def AUTH0_CALLBACK_URL(self) -> str:
-        api_url = self.API_URL
-        return f"{api_url}/v2/auth/callback"
-
-    @cached_property
-    def AUTH0_BASE_URL(self) -> str:
-        if self.SECRET_AUTH0_BASE_URL:
-            return self.SECRET_AUTH0_BASE_URL
-        else:
-            return f"https://{self.AUTH0_DOMAIN}"
-
-    @cached_property
-    def AUTH0_ACCESS_TOKEN_URL(self) -> str:
-        if self.SECRET_AUTH0_ACCESS_TOKEN_URL:
-            return self.SECRET_AUTH0_ACCESS_TOKEN_URL
-        else:
-            return f"{self.AUTH0_BASE_URL}/oauth/token"
-
-    @cached_property
-    def AUTH0_AUTHORIZE_URL(self) -> str:
-        if self.SECRET_AUTH0_AUTHORIZE_URL:
-            return self.SECRET_AUTH0_AUTHORIZE_URL
-        else:
-            return f"{self.AUTH0_BASE_URL}/authorize"
-
-    @property
-    def AUTH0_SERVER_METADATA_URL(self) -> str:
-        if self.SECRET_AUTH0_SERVER_METADATA_URL:
-            return self.SECRET_AUTH0_SERVER_METADATA_URL
-        else:
-            return f"https://{self.AUTH0_DOMAIN}/.well-known/openid-configuration"
 
     ####################################################################################
     # database properties
@@ -270,3 +224,58 @@ class Settings(BaseSettings):
                 aws_secret_settings,
                 aws_ssm_settings,
             )
+
+class APISettings(Settings):
+    """Pydantic Settings object - do not instantiate it directly, please use get_settings() as a dependency where possible"""
+
+    # Env vars usually read from env vars
+    FLASK_ENV: str
+    API_URL: str
+
+    ####################################################################################
+    # Stack name
+    @cached_property
+    def AUTH0_LOGOUT_URL(self) -> str:
+        flask_env = self.FLASK_ENV
+        if flask_env == "production":
+            return f"{self.AUTH0_BASE_URL}/v2/logout"
+        else:
+            return f"https://{self.AUTH0_DOMAIN}/Account/Logout"
+
+    @cached_property
+    def AUTH0_CALLBACK_URL(self) -> str:
+        api_url = self.API_URL
+        return f"{api_url}/v2/auth/callback"
+
+    @cached_property
+    def AUTH0_BASE_URL(self) -> str:
+        if self.SECRET_AUTH0_BASE_URL:
+            return self.SECRET_AUTH0_BASE_URL
+        else:
+            return f"https://{self.AUTH0_DOMAIN}"
+
+    @cached_property
+    def AUTH0_ACCESS_TOKEN_URL(self) -> str:
+        if self.SECRET_AUTH0_ACCESS_TOKEN_URL:
+            return self.SECRET_AUTH0_ACCESS_TOKEN_URL
+        else:
+            return f"{self.AUTH0_BASE_URL}/oauth/token"
+
+    @cached_property
+    def AUTH0_AUTHORIZE_URL(self) -> str:
+        if self.SECRET_AUTH0_AUTHORIZE_URL:
+            return self.SECRET_AUTH0_AUTHORIZE_URL
+        else:
+            return f"{self.AUTH0_BASE_URL}/authorize"
+
+    @property
+    def AUTH0_SERVER_METADATA_URL(self) -> str:
+        if self.SECRET_AUTH0_SERVER_METADATA_URL:
+            return self.SECRET_AUTH0_SERVER_METADATA_URL
+        else:
+            return f"https://{self.AUTH0_DOMAIN}/.well-known/openid-configuration"
+
+
+class CLISettings(Settings):
+    """This is a special case of our settings class for CLI scripts that don't require the same configuration that our API service does""" 
+    pass

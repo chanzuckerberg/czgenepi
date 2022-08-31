@@ -1,41 +1,17 @@
-import datetime
-import io
-import json
 import os
 import subprocess
-from typing import Iterable, Sequence, Type
+from typing import Type
 
 import boto3
 import click
 from IPython.terminal.embed import InteractiveShellEmbed
-from sqlalchemy import and_
-from sqlalchemy.dialects import postgresql
-from sqlalchemy.orm import joinedload
 from sqlalchemy_utils import create_database, database_exists, drop_database
 
 from aspen.cli.toplevel import cli
 from aspen.config.config import Config
 from aspen.config.docker_compose import DockerComposeConfig
-from aspen.database.connection import (
-    enable_profiling,
-    get_db_uri,
-    init_db,
-    session_scope,
-)
+from aspen.database.connection import enable_profiling, get_db_uri, init_db
 from aspen.database.models import *  # noqa: F401, F403
-from aspen.database.models import (
-    AlignedGisaidDump,
-    CanSee,
-    DataType,
-    Group,
-    PhyloRun,
-    Sample,
-    TreeType,
-    UploadedPathogenGenome,
-    User,
-    Workflow,
-    WorkflowStatusType,
-)
 from aspen.database.schema import create_tables_and_schema
 
 
@@ -130,90 +106,3 @@ def interact(ctx, connect):
 
     shell = InteractiveShellEmbed()
     shell()
-
-
-@db.command("create-phylo-run")
-@click.option(
-    "--tree-name",
-    type=str,
-    required=False,
-    help="Name of tree being created",
-)
-@click.option(
-    "--user",
-    type=str,
-    required=False,
-    help="Email address of the user to associate with the build",
-)
-@click.option(
-    "--group-name",
-    type=str,
-    required=True,
-    help="Name of the group to create the phylo run under.",
-)
-@click.option(
-    "--builds-template-args",
-    type=str,
-    required=True,
-    help=(
-        "This should be a json dictionary that is used to generate the builds file,"
-        " using string interpolation."
-    ),
-)
-@click.option(
-    "--git-refspec",
-    type=str,
-    required=True,
-    default="trunk",
-    help="The git refspec used to launch the workflow.",
-)
-@click.option(
-    "--tree-type",
-    "tree_type",
-    required=True,
-    type=click.Choice(
-        ["OVERVIEW", "TARGETED", "NON_CONTEXTUALIZED"], case_sensitive=False
-    ),
-    help="The type of phylo tree to create.",
-)
-@click.pass_context
-def create_phylo_run(
-    ctx,
-    tree_name: str,
-    user: str,
-    group_name: str,
-    builds_template_args: str,
-    git_refspec: str,
-    tree_type: str,
-):
-    # these are injected into the IPython scope, but they appear to be unused.
-    engine = ctx.obj["ENGINE"]
-
-    with session_scope(engine) as session:
-        group = session.query(Group).filter(Group.name == group_name).one()
-
-        aligned_gisaid_dump = (
-            session.query(AlignedGisaidDump)
-            .join(AlignedGisaidDump.producing_workflow)
-            .order_by(Workflow.end_datetime.desc())
-            .first()
-        )
-
-        workflow: PhyloRun = PhyloRun(
-            start_datetime=datetime.datetime.now(),
-            workflow_status=WorkflowStatusType.STARTED,
-            software_versions={},
-            group=group,
-            tree_type=TreeType(tree_type),
-        )
-        workflow.inputs = [aligned_gisaid_dump]
-        workflow.template_args = json.loads(builds_template_args)
-        if tree_name:
-            workflow.name = tree_name
-        if user:
-            workflow.user = session.query(User).filter(User.email == user).one()
-
-        session.add(workflow)
-        session.flush()
-        workflow_id = workflow.workflow_id
-    print(workflow_id)

@@ -1,12 +1,8 @@
 import datetime
-import json
-import os
-import re
 from typing import Iterable, List, MutableSequence, Set
 
 import sentry_sdk
 import sqlalchemy as sa
-from boto3 import Session
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
@@ -23,7 +19,7 @@ from aspen.api.schemas.phylo_runs import (
     PhyloRunsListResponse,
     PhyloRunUpdateRequest,
 )
-from aspen.api.settings import Settings
+from aspen.api.settings import APISettings
 from aspen.api.utils import (
     expand_lineage_wildcards,
     get_matching_gisaid_ids,
@@ -43,6 +39,7 @@ from aspen.database.models import (
     Workflow,
     WorkflowStatusType,
 )
+from aspen.util.swipe import SwipeJob
 
 router = APIRouter()
 
@@ -51,7 +48,7 @@ router = APIRouter()
 async def kick_off_phylo_run(
     phylo_run_request: PhyloRunRequest,
     db: AsyncSession = Depends(get_db),
-    settings: Settings = Depends(get_settings),
+    settings: APISettings = Depends(get_settings),
     az: AuthZSession = Depends(get_authz_session),
     ac: AuthContext = Depends(get_auth_context),
     user: User = Depends(get_auth_user),
@@ -151,43 +148,8 @@ async def kick_off_phylo_run(
     await db.commit()
 
     # Step 5 - Kick off the phylo run job.
-    aws_region = os.environ.get("AWS_REGION")
-    sfn_params = settings.AWS_NEXTSTRAIN_SFN_PARAMETERS
-    sfn_input_json = {
-        "Input": {
-            "Run": {
-                "genepi_config_secret_name": os.environ.get(
-                    "GENEPI_CONFIG_SECRET_NAME", "genepi-config"
-                ),
-                "aws_region": aws_region,
-                "docker_image_id": sfn_params["Input"]["Run"]["docker_image_id"],
-                "remote_dev_prefix": os.getenv("REMOTE_DEV_PREFIX"),
-                "s3_filestem": f"{group.location}/{phylo_run_request.tree_type.capitalize()}",
-                "workflow_id": workflow.id,
-            },
-        },
-        "OutputPrefix": f"{sfn_params['OutputPrefix']}/{workflow.id}",
-        "RUN_WDL_URI": sfn_params["RUN_WDL_URI"],
-        "RunEC2Memory": sfn_params["RunEC2Memory"],
-        "RunEC2Vcpu": sfn_params["RunEC2Vcpu"],
-        "RunSPOTMemory": sfn_params["RunSPOTMemory"],
-        "RunSPOTVcpu": sfn_params["RunSPOTVcpu"],
-    }
-
-    session = Session(region_name=aws_region)
-    client = session.client(
-        service_name="stepfunctions",
-        endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None,
-    )
-
-    execution_name = f"{group.prefix}-ondemand-nextstrain-{str(start_datetime)}"
-    execution_name = re.sub(r"[^0-9a-zA-Z-]", r"-", execution_name)
-
-    client.start_execution(
-        stateMachineArn=sfn_params["StateMachineArn"],
-        name=execution_name,
-        input=json.dumps(sfn_input_json),
-    )
+    job = SwipeJob(settings)
+    job.start(workflow)
 
     return PhyloRunResponse.from_orm(workflow)
 

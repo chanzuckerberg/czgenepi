@@ -29,7 +29,7 @@ from aspen.api.schemas.samples import (
     ValidateIDsRequest,
     ValidateIDsResponse,
 )
-from aspen.api.settings import Settings
+from aspen.api.settings import APISettings
 from aspen.api.utils import (
     check_duplicate_samples,
     check_duplicate_samples_in_request,
@@ -279,7 +279,7 @@ def _kick_off_pangolin(group_prefix: str, sample_ids: Sequence[str], settings):
 async def create_samples(
     create_samples_request: List[CreateSampleRequest],
     db: AsyncSession = Depends(get_db),
-    settings: Settings = Depends(get_settings),
+    settings: APISettings = Depends(get_settings),
     user: User = Depends(get_auth_user),
     group: Group = Depends(require_group_privilege("create_sample")),
     pathogen_slug=Depends(get_pathogen_slug),
