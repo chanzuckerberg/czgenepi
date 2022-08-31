@@ -78,6 +78,12 @@ export const mapGroupMemberData = (obj: RawGroupMemberRequest): GroupMember => {
 };
 
 /**
+ * starting all group-related queries with "group" allows us to invalidate
+ * all of the queries in a single call to queryClient.invalidateQueries(["group"])
+ */
+export const GROUP_QUERY_PREFIX = "group";
+
+/**
  * fetch group info
  */
 export const USE_GROUP_INFO = {

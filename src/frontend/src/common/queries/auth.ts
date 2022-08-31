@@ -16,11 +16,7 @@ import { selectCurrentGroup } from "../redux/selectors";
 import { ensureValidGroup } from "../redux/utils/groupUtils";
 import { ROUTES } from "../routes";
 import { ENTITIES } from "./entities";
-import {
-  USE_GROUP_INFO,
-  USE_GROUP_INVITATION_INFO,
-  USE_GROUP_MEMBER_INFO,
-} from "./groups";
+import { GROUP_QUERY_PREFIX } from "./groups";
 
 const { API_URL } = ENV;
 
@@ -75,12 +71,10 @@ export function useUpdateUserInfo(): UseMutationResult<
 
   return useMutation(updateUserInfo, {
     onSuccess: async () => {
-      await queryClient.invalidateQueries([
-        USE_USER_INFO,
-        USE_GROUP_INFO,
-        USE_GROUP_INVITATION_INFO,
-        USE_GROUP_MEMBER_INFO,
-      ]);
+      // invalidateQueries only works for multiple queries if they start with the same key
+      // https://github.com/TanStack/query/discussions/2057#discussioncomment-549333
+      await queryClient.invalidateQueries([USE_USER_INFO]);
+      await queryClient.invalidateQueries([GROUP_QUERY_PREFIX]);
     },
   });
 }
