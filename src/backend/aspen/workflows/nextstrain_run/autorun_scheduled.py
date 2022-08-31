@@ -21,7 +21,7 @@ from aspen.database.models import (
     Workflow,
     WorkflowStatusType,
 )
-from aspen.util.swipe import NextstrainJob
+from aspen.util.swipe import NextstrainScheduledJob
 
 SCHEDULED_TREE_TYPE = "OVERVIEW"
 
@@ -75,9 +75,9 @@ def launch_all():
             ):
                 workflow = create_phylo_run(db, group, TEMPLATE_ARGS)
 
-                job = NextstrainJob(settings)
+                job = NextstrainScheduledJob(settings)
                 db.commit()
-                job.run(workflow)
+                job.run(workflow, "scheduled")
 
 
 if __name__ == "__main__":

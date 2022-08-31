@@ -69,16 +69,22 @@ class PangolinJob(SwipeJob):
 
 
 class NextstrainJob(SwipeJob):
+    job_type = "ondemand"
+
     def get_sfn_config(self):
         return self.settings.AWS_NEXTSTRAIN_SFN_PARAMETERS
 
-    def run(self, run: PhyloRun):
+    def run(self, run: PhyloRun, run_type: str):
         group = run.group
         now = datetime.datetime.now()
         output_suffix = f"{group.name}/{str(now)}"
-        execution_name = f"{group.prefix}-ondemand-nextstrain-{str(now)}"
+        execution_name = f"{group.prefix}-{self.job_type}-nextstrain-{str(now)}"
         extra_params = {
             "s3_filestem": f"{group.location}/{run.tree_type}",
             "workflow_id": run.id,
         }
         return self._start(execution_name, output_suffix, extra_params)
+
+
+class NextstrainScheduledJob(NextstrainJob):
+    job_type = "scheduled"

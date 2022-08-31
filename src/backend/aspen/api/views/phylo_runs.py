@@ -149,7 +149,7 @@ async def kick_off_phylo_run(
 
     # Step 5 - Kick off the phylo run job.
     job = NextstrainJob(settings)
-    job.run(workflow)
+    job.run(workflow, "ondemand")
 
     return PhyloRunResponse.from_orm(workflow)
 
