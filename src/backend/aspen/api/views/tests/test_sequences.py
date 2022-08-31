@@ -65,7 +65,8 @@ async def test_prepare_sequences_download_gisaid(
     )
     file_contents = str(res.content, encoding="UTF-8")
     assert "ATGCAAAAAA" in file_contents
-    assert file_contents.startswith(f">hCoV-19/{sample.private_identifier}")
+    id_w_old_prefix_stripped = sample.private_identifier.lstrip("hCoV-19/")
+    assert file_contents.startswith(f">hCoV-19/{id_w_old_prefix_stripped}")
     assert sample.private_identifier in file_contents
 
 
@@ -94,8 +95,8 @@ async def test_prepare_sequences_download_genbank(
     )
     file_contents = str(res.content, encoding="UTF-8")
     assert "ATGCAAAAAA" in file_contents
-    id_w_new_prefix = sample.private_identifier.lstrip("hCoV-19/")
-    assert file_contents.startswith(f">SARS-CoV-2/human/{id_w_new_prefix}")
+    id_w_old_prefix_stripped = sample.private_identifier.lstrip("hCoV-19/")
+    assert file_contents.startswith(f">SARS-CoV-2/human/{id_w_old_prefix_stripped}")
 
 
 async def test_prepare_sequences_download_public_database_DNE(
