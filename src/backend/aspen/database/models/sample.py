@@ -23,6 +23,7 @@ from aspen.database.models.accessions import Accession
 from aspen.database.models.base import idbase
 from aspen.database.models.locations import Location
 from aspen.database.models.mixins import DictMixin
+from aspen.database.models.pathogens import Pathogen
 from aspen.database.models.usergroup import Group, User
 
 if TYPE_CHECKING:
@@ -56,6 +57,11 @@ class Sample(idbase, DictMixin):  # type: ignore
         nullable=False,
     )
     uploaded_by = relationship(User, backref=backref("samples", uselist=True))  # type: ignore
+    pathogen_id = Column(
+        Integer, ForeignKey(Pathogen.id)
+    )  # TODO: change to nullable=False once we update workflows
+
+    pathogen = relationship(Pathogen, back_populates="samples")
     private = Column(Boolean, nullable=False, default=False)
     private_identifier = Column(
         String,

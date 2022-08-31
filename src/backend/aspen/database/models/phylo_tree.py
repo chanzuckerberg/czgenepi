@@ -16,6 +16,7 @@ from sqlalchemy.orm import backref, relationship
 from aspen.database.models.base import base
 from aspen.database.models.entity import Entity, EntityType
 from aspen.database.models.enum import Enum
+from aspen.database.models.pathogens import Pathogen
 from aspen.database.models.sample import Sample
 from aspen.database.models.usergroup import Group
 from aspen.database.models.workflow import Workflow, WorkflowType
@@ -61,6 +62,11 @@ class PhyloTree(Entity):
     s3_key = Column(String, nullable=False)
     name = Column(String, nullable=True)
 
+    pathogen_id = Column(
+        Integer, ForeignKey(Pathogen.id)
+    )  # TODO: change to nullable=False once we update workflows
+    pathogen = relationship(Pathogen, back_populates="phylo_trees")
+
     constituent_samples = relationship(  # type: ignore
         Sample,
         secondary=PhyloTreeSamples,
@@ -89,6 +95,11 @@ class PhyloRun(Workflow):
         nullable=False,
     )
     group = relationship(Group, backref=backref("phylo_runs", uselist=True))  # type: ignore
+
+    pathogen_id = Column(
+        Integer, ForeignKey(Pathogen.id)
+    )  # TODO: change to nullable=False once we update workflows
+    pathogen = relationship(Pathogen, back_populates="phylo_runs")
 
     template_file_path = Column(String, nullable=True)
 
