@@ -13,8 +13,8 @@ import ENV from "src/common/constants/ENV";
 import { queryClient } from "src/common/queries/queryClient";
 import { API, DEFAULT_PUT_OPTIONS, getBackendApiJson } from "../api";
 import { selectCurrentGroup } from "../redux/selectors";
+import { ensureValidGroup } from "../redux/utils/groupUtils";
 import { ROUTES } from "../routes";
-import { setValidGroup } from "../utils/groupUtils";
 import { ENTITIES } from "./entities";
 import {
   USE_GROUP_INFO,
@@ -162,10 +162,13 @@ export function useProtectedRoute(): UseQueryResult<User, unknown> {
         router.push(ROUTES.HOMEPAGE);
       } else if (!agreedToTOS && router.asPath !== ROUTES.AGREE_TERMS) {
         router.push(ROUTES.AGREE_TERMS);
-      } else if (!userInfo.groups.find((g) => g.id === currentGroup)) {
-        // user is not authorized to view the group set in their cache. Set it to one they can see.
-        setValidGroup();
-      } // else case: User is logged in, in a valid group, and has agreed to ToS. Leave them be.
+      }
+
+      // user may not be authorized to view the group set in their cache. Ensure it's set
+      // to one they can see.
+      ensureValidGroup();
+
+      // Now user is logged in, in a valid group, and has agreed to ToS. Leave them be.
     }
   }, [isLoading, userInfo, router, currentGroup]);
 

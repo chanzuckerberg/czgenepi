@@ -11,18 +11,16 @@ import { analyticsRecordRouteChange } from "src/common/analytics/methods";
 import { OneTrustInitializer } from "src/common/analytics/OneTrustInitializer";
 import { PlausibleInitializer } from "src/common/analytics/PlausibleInitializer";
 import { SegmentInitializer } from "src/common/analytics/SegmentInitializer";
+import { useAppRouting } from "src/common/appRouting";
 import { queryClient } from "src/common/queries/queryClient";
 import { store } from "src/common/redux";
 import { StyledApp } from "src/common/styles/appStyle";
 import "src/common/styles/global.css";
 import "src/common/styles/oneTrust.css";
 import { theme } from "src/common/styles/theme";
-import { setFeatureFlagsFromQueryParams } from "src/common/utils/featureFlags";
 import Nav from "src/components/NavBar";
 import SplitInitializer from "src/components/Split";
 import createEmotionCache from "src/createEmotionCache";
-
-setFeatureFlagsFromQueryParams();
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
@@ -70,6 +68,11 @@ const App = ({
       router.events.off("routeChangeComplete", analyticsRecordRouteChange);
     };
   }, [router]);
+
+  /**
+   * This code makes sure that groupId and pathogen exist in the url when appropriate
+   */
+  useAppRouting();
 
   return (
     <Provider store={store}>
