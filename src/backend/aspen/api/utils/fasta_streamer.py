@@ -63,13 +63,13 @@ class FastaStreamer:
                 stripped_sequence: str = sequence.strip("Nn")
                 # use private id if the user has access to it, else public id
                 if sample.submitting_group_id == self.ac.group.id:  # type: ignore
-                    yield await self._output_id_line(sample.private_identifier)
+                    yield self._output_id_line(sample.private_identifier)
                 else:
-                    yield await self._output_id_line(sample.public_identifier)
+                    yield self._output_id_line(sample.public_identifier)
                 yield stripped_sequence
                 yield "\n"
 
-    async def _output_id_line(self, identifier) -> str:
+    def _output_id_line(self, identifier) -> str:
         """Produces the ID line for current sequence in fasta.
 
         Certain downstream consumers (eg, UShER) restrict what characters can be
