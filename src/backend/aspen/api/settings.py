@@ -68,6 +68,7 @@ def aws_ssm_settings(settings) -> Dict[str, Any]:
         response[key_name] = json.loads(param_value)
     return response
 
+
 class Settings(BaseSettings):
     """Pydantic Settings object - do not instantiate it directly, please use get_settings() as a dependency where possible"""
 
@@ -89,6 +90,7 @@ class Settings(BaseSettings):
     REMOTE_DEV_PREFIX: str = ""
     DEPLOYMENT_STAGE: str = ""
     GENEPI_CONFIG_SECRET_NAME: str = "genepi-config"
+    BOTO_ENDPOINT_URL: Optional[str] = None
 
     # Env vars usually pulled from AWS Secrets Manager
     SENTRY_BACKEND_DSN: str = ""
@@ -225,6 +227,7 @@ class Settings(BaseSettings):
                 aws_ssm_settings,
             )
 
+
 class APISettings(Settings):
     """Pydantic Settings object - do not instantiate it directly, please use get_settings() as a dependency where possible"""
 
@@ -277,5 +280,4 @@ class APISettings(Settings):
 
 
 class CLISettings(Settings):
-    """This is a special case of our settings class for CLI scripts that don't require the same configuration that our API service does""" 
-    pass
+    """This is a special case of our settings class for CLI scripts that don't require the same configuration that our API service does"""

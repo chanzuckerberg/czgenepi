@@ -1,17 +1,10 @@
 import datetime
-import json
-import os
-import re
-from copy import deepcopy
 from typing import Dict, MutableSequence
-from aspen.api.settings import CLISettings
-from aspen.util.swipe import NextstrainJob
 
 import click
 import sqlalchemy as sa
-from boto3 import Session
-from botocore.exceptions import ClientError
 
+from aspen.api.settings import CLISettings
 from aspen.config.config import Config
 from aspen.database.connection import (
     get_db_uri,
@@ -19,7 +12,16 @@ from aspen.database.connection import (
     session_scope,
     SqlAlchemyInterface,
 )
-from aspen.database.models import Group, AlignedGisaidDump, WorkflowStatusType, Workflow, PhyloRun, User, TreeType
+from aspen.database.models import (
+    AlignedGisaidDump,
+    Group,
+    PhyloRun,
+    TreeType,
+    User,
+    Workflow,
+    WorkflowStatusType,
+)
+from aspen.util.swipe import NextstrainJob
 
 SCHEDULED_TREE_TYPE = "OVERVIEW"
 
@@ -47,12 +49,13 @@ def create_phylo_run(
         tree_type=TreeType("OVERVIEW"),
     )
     workflow.inputs = [aligned_gisaid_dump]
-    workflow.template_args = json.loads(template_args)
+    workflow.template_args = template_args
     workflow.name = f"{group.name} Contextual Recency-Focused Build"
     workflow.user = user
 
     session.add(workflow)
     return workflow
+
 
 @click.command("launch_all")
 def launch_all():

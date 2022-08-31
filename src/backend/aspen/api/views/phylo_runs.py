@@ -39,7 +39,7 @@ from aspen.database.models import (
     Workflow,
     WorkflowStatusType,
 )
-from aspen.util.swipe import SwipeJob
+from aspen.util.swipe import NextstrainJob
 
 router = APIRouter()
 
@@ -148,8 +148,8 @@ async def kick_off_phylo_run(
     await db.commit()
 
     # Step 5 - Kick off the phylo run job.
-    job = SwipeJob(settings)
-    job.start(workflow)
+    job = NextstrainJob(settings)
+    job.run(workflow)
 
     return PhyloRunResponse.from_orm(workflow)
 
