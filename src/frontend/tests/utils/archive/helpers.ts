@@ -83,7 +83,6 @@ export async function getSampleStatuses(
     }
   }
   await expect(statuses).toHaveLength(counter);
-  console.log("CURRENT STATUSES FILTERED: " + statuses);
 }
 
 export async function filterLineage(page: Page, lineages: string[]) {
@@ -109,7 +108,6 @@ export async function filterLineage(page: Page, lineages: string[]) {
       }
     }
     await expect(filteredLineages).toHaveLength(counter);
-    console.log("CURRENT STATUSES FILTERED: " + filteredLineages);
     await page.click("svg.MuiChip-deleteIcon");
     actualLineage++;
   }
