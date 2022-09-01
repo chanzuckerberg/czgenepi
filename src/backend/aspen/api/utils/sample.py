@@ -7,14 +7,17 @@ from sqlalchemy.orm.query import Query
 from sqlalchemy.sql.expression import or_
 
 from aspen.api.authz import AuthZSession
-from aspen.database.models import Accession, AccessionType, Sample
+from aspen.database.models import Accession, AccessionType, Pathogen, Sample
 
 if TYPE_CHECKING:
     from aspen.api.schemas.samples import CreateSampleRequest
 
 
 async def samples_by_identifiers(
-    az: AuthZSession, sample_ids: Optional[Set[str]], permission="read"
+    az: AuthZSession,
+    pathogen: Pathogen,
+    sample_ids: Optional[Set[str]],
+    permission="read",
 ) -> Query:
     # TODO, this query can be updated to use an "id in (select id from...)" clause when we get a chance to fix it.
     public_samples_query = (
@@ -35,7 +38,7 @@ async def samples_by_identifiers(
             or_(
                 public_samples_query.c.id != None,  # noqa: E711
                 private_samples_query.c.id != None,  # noqa: E711
-            )
+            ),
         )
     )
     return query

@@ -4,8 +4,10 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.requests import Request
 
+from aspen.api.error import http_exceptions as ex
 from aspen.api.settings import APISettings
 from aspen.database.connection import init_async_db, SqlAlchemyInterface
+from aspen.database.models import Pathogen
 from aspen.util.split import SplitClient
 
 
@@ -55,3 +57,12 @@ def get_pathogen_slug(pathogen_slug=None):
     if pathogen_slug is None:
         return "SC2"
     return pathogen_slug
+
+
+async def get_pathogen(
+    slug: str = Depends(get_pathogen_slug), db: AsyncSession = Depends(get_db)
+) -> Pathogen:
+    try:
+        return await Pathogen.get_by_slug(db, slug)
+    except:
+        raise ex.BadRequestException("Invalid pathogen slug")

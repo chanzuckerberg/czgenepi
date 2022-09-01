@@ -12,7 +12,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from aspen.api.authn import AuthContext, get_auth_context, get_auth_user
 from aspen.api.authz import AuthZSession, get_authz_session, require_group_privilege
-from aspen.api.deps import get_db, get_pathogen_slug, get_settings
+from aspen.api.deps import get_db, get_pathogen, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.samples import (
     CreateSampleRequest,
@@ -35,7 +35,14 @@ from aspen.api.utils import (
     get_missing_and_found_sample_ids,
     samples_by_identifiers,
 )
-from aspen.database.models import Group, Location, Sample, UploadedPathogenGenome, User
+from aspen.database.models import (
+    Group,
+    Location,
+    Pathogen,
+    Sample,
+    UploadedPathogenGenome,
+    User,
+)
 from aspen.util.swipe import PangolinJob
 
 router = APIRouter()
@@ -48,7 +55,7 @@ async def list_samples(
     db: AsyncSession = Depends(get_db),
     az: AuthZSession = Depends(get_authz_session),
     ac: AuthContext = Depends(get_auth_context),
-    pathogen_slug=Depends(get_pathogen_slug),
+    pathogen: Pathogen = Depends(get_pathogen),
 ) -> SamplesResponse:
 
     # load the samples.
@@ -200,6 +207,7 @@ async def validate_ids(
     request_data: ValidateIDsRequest,
     db: AsyncSession = Depends(get_db),
     az: AuthZSession = Depends(get_authz_session),
+    pathogen: Pathogen = Depends(get_pathogen),
 ) -> ValidateIDsResponse:
 
     """
@@ -212,7 +220,7 @@ async def validate_ids(
 
     # get all samples from request that the user has permission to use and scope down
     # the search for matching ID's to groups that the user has read access to.
-    user_visible_samples_query = await samples_by_identifiers(az, sample_ids)
+    user_visible_samples_query = await samples_by_identifiers(az, pathogen, sample_ids)
     user_visible_samples_res = await (db.execute(user_visible_samples_query))
     user_visible_samples = user_visible_samples_res.scalars().all()
 
@@ -242,7 +250,7 @@ async def create_samples(
     settings: APISettings = Depends(get_settings),
     user: User = Depends(get_auth_user),
     group: Group = Depends(require_group_privilege("create_sample")),
-    pathogen_slug=Depends(get_pathogen_slug),
+    pathogen: Pathogen = Depends(get_pathogen),
 ) -> SamplesResponse:
 
     duplicates_in_request: Union[

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import sqlalchemy as sa
 from sqlalchemy import Column, ForeignKey, Integer, String, UniqueConstraint
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import relationship
 
 from aspen.database.models.base import idbase
@@ -30,6 +32,11 @@ class Pathogen(idbase):  # type: ignore
     samples = relationship("Sample", back_populates="pathogen")  # type: ignore
     phylo_runs = relationship("PhyloRun", back_populates="pathogen")  # type: ignore
     phylo_trees = relationship("PhyloTree", back_populates="pathogen")  # type: ignore
+
+    @classmethod
+    async def get_by_slug(cls, db: AsyncSession, slug: str) -> Pathogen:
+        resp = await db.execute(sa.select(Pathogen).where(Pathogen.slug == slug))
+        return resp.scalars().one()
 
 
 class PathogenRepoConfig(idbase):  # type: ignore

@@ -4,6 +4,7 @@ from typing import Dict, List, Optional
 from pydantic import constr, Field, root_validator, StrictStr, validator
 
 from aspen.api.schemas.base import BaseRequest, BaseResponse
+from aspen.api.schemas.pathogens import PathogenResponse
 from aspen.database.models import TreeType
 
 # What kinds of ondemand nextstrain builds do we support?
@@ -103,6 +104,7 @@ class PhyloRunResponse(BaseResponse):
     group: GroupResponse
     template_file_path: Optional[StrictStr]
     tree_type: Optional[str]
+    pathogen: Optional[PathogenResponse]
     user: Optional[UserResponse]
 
     # This lets us remap phlo_run.outputs to phylo_run.phylo_tree using the validator above
