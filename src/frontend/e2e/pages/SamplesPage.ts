@@ -47,7 +47,7 @@ export class SamplesPage {
     await this.page.waitForURL("https://staging.czgenepi.org/upload/1");
   }
 
-  async filterGenomeRecovery(option: string) {
+  async filterByGenomeRecoveryStatus(option: string) {
     await this.page.waitForURL("https://staging.czgenepi.org/data/samples");
     await this.genomeRecoveryDropDown.click();
     await this.page
@@ -167,6 +167,41 @@ export async function getCollectionDate(page: Page): Promise<any[]> {
   return await page.$$eval("div[data-test-id*='collectionDate']", (list) =>
     list.map((element) => element.textContent)
   );
+}
+/*
+Method takes filter by date as unit and value and then converts into date object
+*/
+export function getFilterDate(unit: string, value: number): Date {
+  let today = new Date();
+  let filterDate = new Date(today);
+  if (unit === "d") {
+    filterDate.setDate(filterDate.getDay() - value);
+  } else if (unit === "m") {
+    filterDate.setMonth(filterDate.getMonth() - value);
+  } else if (unit === "y") {
+    filterDate.setFullYear(filterDate.getFullYear() - value);
+  } else if (unit === "yesterday") {
+    filterDate.setDate(filterDate.getDay() - 1);
+  }
+  return filterDate;
+}
+
+/*
+Method collection or sequence date is within filtering criteria
+*/
+export function validateCollectionOrSequenceDate(
+  subjectDate: Date,
+  fromDate: Date,
+  toDate?: Date
+): boolean {
+  let result = false;
+  if (subjectDate.getTime() <= fromDate.getTime()) {
+    result = true;
+  }
+  if (toDate !== undefined && subjectDate.getTime() > toDate.getTime()) {
+    result = false;
+  }
+  return result;
 }
 
 /*
