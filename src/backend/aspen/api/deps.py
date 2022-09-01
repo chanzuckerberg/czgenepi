@@ -2,6 +2,7 @@ from typing import AsyncGenerator
 
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm.exc import NoResultFound
 from starlette.requests import Request
 
 from aspen.api.error import http_exceptions as ex
@@ -64,5 +65,5 @@ async def get_pathogen(
 ) -> Pathogen:
     try:
         return await Pathogen.get_by_slug(db, slug)
-    except:
+    except NoResultFound:
         raise ex.BadRequestException("Invalid pathogen slug")

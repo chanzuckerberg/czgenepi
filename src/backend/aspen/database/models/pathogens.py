@@ -35,7 +35,7 @@ class Pathogen(idbase):  # type: ignore
 
     @classmethod
     async def get_by_slug(cls, db: AsyncSession, slug: str) -> Pathogen:
-        resp = await db.execute(sa.select(Pathogen).where(Pathogen.slug == slug))
+        resp = await db.execute(sa.select(Pathogen).where(Pathogen.slug == slug))  # type: ignore
         return resp.scalars().one()
 
 

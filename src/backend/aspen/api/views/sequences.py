@@ -39,9 +39,9 @@ async def get_public_repository_prefix(pathogen: Pathogen, public_repository_nam
     if public_repository_name:
         # only get the prefix if we have enough information to proceed
         prefix = (
-            sa.select(PathogenRepoConfig)
-            .join(PublicRepository)
-            .where(
+            sa.select(PathogenRepoConfig)  # type: ignore
+            .join(PublicRepository)  # type: ignore
+            .where(  # type: ignore
                 and_(
                     PathogenRepoConfig.pathogen == pathogen,
                     PublicRepository.name == public_repository_name,

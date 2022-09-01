@@ -170,7 +170,7 @@ async def get_serializable_runs(
     )
     # TODO - DECOVIDIFY - remove the None check!
     query = query.filter(
-        or_(PhyloRun.pathogen == pathogen, PhyloRun.pathogen_id == None)
+        or_(PhyloRun.pathogen == pathogen, PhyloRun.pathogen_id == None)  # noqa: E711
     )
     if run_id:
         query = query.filter(PhyloRun.id == run_id)
