@@ -12,7 +12,7 @@ from starlette.middleware.cors import CORSMiddleware
 from aspen.api.authn import get_auth_user, require_group_membership
 from aspen.api.error.http_exceptions import AspenException, exception_handler
 from aspen.api.middleware.session import SessionMiddleware
-from aspen.api.settings import Settings
+from aspen.api.settings import APISettings
 from aspen.api.views import (
     auspice,
     auth,
@@ -46,7 +46,7 @@ def get_allowed_origins() -> List[str]:
 
 
 def get_app() -> FastAPI:
-    settings = Settings()
+    settings = APISettings()
     _app = FastAPI(
         title=settings.SERVICE_NAME,
         debug=settings.DEBUG,

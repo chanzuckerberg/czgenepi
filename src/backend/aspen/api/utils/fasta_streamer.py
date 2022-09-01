@@ -24,12 +24,14 @@ class FastaStreamer:
         az: AuthZSession,
         ac: AuthContext,
         sample_ids: Set[str],
+        prefix: Optional[str] = None,
         downstream_consumer: Optional[str] = None,
     ):
         self.db = db
         self.ac = ac
         self.az = az
         self.sample_ids = sample_ids
+        self.prefix = prefix
         # Certain consumers have different requirements on fasta
         self.downstream_consumer = downstream_consumer
 
@@ -41,7 +43,7 @@ class FastaStreamer:
         sample_query = sample_query.options(  # type: ignore
             joinedload(Sample.uploaded_pathogen_genome, innerjoin=True).undefer(  # type: ignore
                 UploadedPathogenGenome.sequence
-            ),
+            )
         )
 
         # Stream results
@@ -73,9 +75,14 @@ class FastaStreamer:
         Certain downstream consumers (eg, UShER) restrict what characters can be
         used in the ID. Also handles any modifications that must be made to ID
         characters so they don't break the downstream consumer."""
-        output_id = identifier  # default, might get changed if specialty case
+
+        if self.prefix is not None:
+            output_id = f'{self.prefix}/{identifier.removeprefix("hCoV-19/")}'  # default, might get changed if specialty case
+        else:
+            # user is proceeding with normal download, and does not wish to submit to gisaid or genbank
+            output_id = identifier
         if self.downstream_consumer == SpecialtyDownstreams.USHER.value:
-            output_id = self._handle_usher_id(identifier)
+            output_id = self._handle_usher_id(output_id)
         return f">{output_id}\n"
 
     def _handle_usher_id(self, identifier) -> str:

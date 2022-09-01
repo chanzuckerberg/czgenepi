@@ -1,13 +1,9 @@
 import datetime
-import json
-import os
-import re
 import threading
-from typing import Any, List, Mapping, MutableSequence, Optional, Sequence, Set, Union
+from typing import Any, List, Mapping, MutableSequence, Optional, Set, Union
 
 import sentry_sdk
 import sqlalchemy as sa
-from boto3 import Session
 from fastapi import APIRouter, Depends
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncResult, AsyncSession
@@ -29,7 +25,7 @@ from aspen.api.schemas.samples import (
     ValidateIDsRequest,
     ValidateIDsResponse,
 )
-from aspen.api.settings import Settings
+from aspen.api.settings import APISettings
 from aspen.api.utils import (
     check_duplicate_samples,
     check_duplicate_samples_in_request,
@@ -40,6 +36,7 @@ from aspen.api.utils import (
     samples_by_identifiers,
 )
 from aspen.database.models import Group, Location, Sample, UploadedPathogenGenome, User
+from aspen.util.swipe import PangolinJob
 
 router = APIRouter()
 
@@ -238,48 +235,11 @@ async def validate_ids(
     return ValidateIDsResponse(missing_sample_ids=missing_sample_ids)
 
 
-# TODO this should be a general swipe calling library instead of lame copy-pasta.
-def _kick_off_pangolin(group_prefix: str, sample_ids: Sequence[str], settings):
-    sfn_params = settings.AWS_PANGOLIN_SFN_PARAMETERS
-    sfn_input_json = {
-        "Input": {
-            "Run": {
-                "aws_region": settings.AWS_REGION,
-                "docker_image_id": sfn_params["Input"]["Run"]["docker_image_id"],
-                "samples": sample_ids,
-                "remote_dev_prefix": settings.REMOTE_DEV_PREFIX,
-                "genepi_config_secret_name": settings.GENEPI_CONFIG_SECRET_NAME,
-            },
-        },
-        "OutputPrefix": f"{sfn_params['OutputPrefix']}",
-        "RUN_WDL_URI": sfn_params["RUN_WDL_URI"],
-        "RunEC2Memory": sfn_params["RunEC2Memory"],
-        "RunEC2Vcpu": sfn_params["RunEC2Vcpu"],
-        "RunSPOTMemory": sfn_params["RunSPOTMemory"],
-        "RunSPOTVcpu": sfn_params["RunSPOTVcpu"],
-    }
-
-    session = Session(region_name=settings.AWS_REGION)
-    client = session.client(
-        service_name="stepfunctions",
-        endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None,
-    )
-
-    execution_name = f"{group_prefix}-ondemand-pangolin-{str(datetime.datetime.now())}"
-    execution_name = re.sub(r"[^0-9a-zA-Z-]", r"-", execution_name)
-
-    client.start_execution(
-        stateMachineArn=sfn_params["StateMachineArn"],
-        name=execution_name,
-        input=json.dumps(sfn_input_json),
-    )
-
-
 @router.post("/", response_model=SamplesResponse)
 async def create_samples(
     create_samples_request: List[CreateSampleRequest],
     db: AsyncSession = Depends(get_db),
-    settings: Settings = Depends(get_settings),
+    settings: APISettings = Depends(get_settings),
     user: User = Depends(get_auth_user),
     group: Group = Depends(require_group_privilege("create_sample")),
     pathogen_slug=Depends(get_pathogen_slug),
@@ -371,10 +331,10 @@ async def create_samples(
 
     await db.commit()
 
-    # Run as a separate thread, so any errors here won't affect sample uploads
+    job = PangolinJob(settings)
     pangolin_job = threading.Thread(
-        target=_kick_off_pangolin,
-        args=(group.prefix, pangolin_sample_ids, settings),
+        target=job.run,
+        args=(group, pangolin_sample_ids),
     )
     pangolin_job.start()
 

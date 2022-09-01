@@ -4,6 +4,7 @@ from aspen.api.schemas.base import BaseRequest, BaseResponse
 
 
 class SequenceRequest(BaseRequest):
+    public_repository_name: Optional[str] = None
     sample_ids: list[str]
 
 
