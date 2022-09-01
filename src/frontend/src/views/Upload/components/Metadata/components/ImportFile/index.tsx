@@ -42,6 +42,7 @@ export default function ImportFile({
   stringToLocationFinder,
 }: Props): JSX.Element {
   const [isInstructionsShown, setIsInstructionsShown] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [hasImportedFile, setHasImportedFile] = useState(false);
   const [missingFields, setMissingFields] = useState<string[] | null>(null);
   const [hasUnknownFields, setHasUnknownFields] = useState<boolean>(false);
@@ -94,6 +95,8 @@ export default function ImportFile({
 
   const handleFiles = async (files: FileList | null) => {
     if (!files) return;
+    setIsLoading(true);
+    console.log({ isLoading });
 
     const result = await parseFile(files[0], stringToLocationFinder);
 
@@ -116,6 +119,8 @@ export default function ImportFile({
     );
 
     handleMetadata(result);
+    setIsLoading(false);
+    console.log("2", { isLoading });
   };
 
   return (
@@ -157,6 +162,7 @@ export default function ImportFile({
             "Your existing metadata will be replaced with the " +
             "information found in the new import file."
           }
+          isLoading={isLoading}
         />
       </div>
 
