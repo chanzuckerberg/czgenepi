@@ -78,11 +78,17 @@ export const mapGroupMemberData = (obj: RawGroupMemberRequest): GroupMember => {
 };
 
 /**
+ * starting all group-related queries with "group" allows us to invalidate
+ * all of the queries in a single call to queryClient.invalidateQueries(["group"])
+ */
+export const GROUP_QUERY_ID_PREFIX = "group";
+
+/**
  * fetch group info
  */
 export const USE_GROUP_INFO = {
   entities: [ENTITIES.GROUP_INFO],
-  id: "groupInfo",
+  id: `${GROUP_QUERY_ID_PREFIX}Info`,
 };
 
 export function useGroupInfo(): UseQueryResult<GroupDetails, unknown> {
@@ -111,7 +117,7 @@ interface GroupMembersFetchResponseType {
 
 export const USE_GROUP_MEMBER_INFO = {
   entities: [ENTITIES.GROUP_MEMBER_INFO],
-  id: "groupMemberInfo",
+  id: `${GROUP_QUERY_ID_PREFIX}MemberInfo`,
 };
 
 export function useGroupMembersInfo(): UseQueryResult<GroupMember[], unknown> {
@@ -143,7 +149,7 @@ interface FetchInvitationResponseType {
 
 export const USE_GROUP_INVITATION_INFO = {
   entities: [ENTITIES.GROUP_INVITATION_INFO],
-  id: "groupInvitationInfo",
+  id: `${GROUP_QUERY_ID_PREFIX}InvitationInfo`,
 };
 
 export function useGroupInvitations(): UseQueryResult<Invitation[], unknown> {

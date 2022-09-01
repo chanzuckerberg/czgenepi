@@ -13,14 +13,10 @@ import ENV from "src/common/constants/ENV";
 import { queryClient } from "src/common/queries/queryClient";
 import { API, DEFAULT_PUT_OPTIONS, getBackendApiJson } from "../api";
 import { selectCurrentGroup } from "../redux/selectors";
+import { ensureValidGroup } from "../redux/utils/groupUtils";
 import { ROUTES } from "../routes";
-import { setValidGroup } from "../utils/groupUtils";
 import { ENTITIES } from "./entities";
-import {
-  USE_GROUP_INFO,
-  USE_GROUP_INVITATION_INFO,
-  USE_GROUP_MEMBER_INFO,
-} from "./groups";
+import { GROUP_QUERY_ID_PREFIX } from "./groups";
 
 const { API_URL } = ENV;
 
@@ -75,12 +71,10 @@ export function useUpdateUserInfo(): UseMutationResult<
 
   return useMutation(updateUserInfo, {
     onSuccess: async () => {
-      await queryClient.invalidateQueries([
-        USE_USER_INFO,
-        USE_GROUP_INFO,
-        USE_GROUP_INVITATION_INFO,
-        USE_GROUP_MEMBER_INFO,
-      ]);
+      // invalidateQueries only works for multiple queries if they start with the same key
+      // https://github.com/TanStack/query/discussions/2057#discussioncomment-549333
+      await queryClient.invalidateQueries([USE_USER_INFO]);
+      await queryClient.invalidateQueries([GROUP_QUERY_ID_PREFIX]);
     },
   });
 }
@@ -162,10 +156,13 @@ export function useProtectedRoute(): UseQueryResult<User, unknown> {
         router.push(ROUTES.HOMEPAGE);
       } else if (!agreedToTOS && router.asPath !== ROUTES.AGREE_TERMS) {
         router.push(ROUTES.AGREE_TERMS);
-      } else if (!userInfo.groups.find((g) => g.id === currentGroup)) {
-        // user is not authorized to view the group set in their cache. Set it to one they can see.
-        setValidGroup();
-      } // else case: User is logged in, in a valid group, and has agreed to ToS. Leave them be.
+      }
+
+      // user may not be authorized to view the group set in their cache. Ensure it's set
+      // to one they can see.
+      ensureValidGroup();
+
+      // Now user is logged in, in a valid group, and has agreed to ToS. Leave them be.
     }
   }, [isLoading, userInfo, router, currentGroup]);
 
