@@ -1,22 +1,26 @@
 import {test,expect} from '@playwright/test'
 import {TreeInfo} from '../utils/schemas/treeInfo'
-import {LoginPage} from '../page-objects/LoginPage'
-import {SamplesPage} from '../page-objects/SamplesPage'
-import {PhylogeneticTreePage} from '../page-objects/PhylogeneticTreePage'
+import {LoginPage} from '../pages/LoginPage'
+import {SamplesPage} from '../pages/SamplesPage'
+import {PhylogeneticTreePage} from '../pages/PhylogeneticTreePage'
+import {login} from '../utils/login';
+import path from 'path';
+import * as dotenv from 'dotenv' 
+dotenv.config({path:path.join(__dirname,'../.env')});
 
 test.describe('Phylogenetic Tree', ()=>{
     let loginPage: LoginPage;
     let samplePage: SamplesPage;
     let treesPage: PhylogeneticTreePage;
 
-    test.beforeEach(async ({page})=>{
+    test.beforeEach(async ({page,})=>{
         loginPage = new LoginPage(page);
         samplePage = new SamplesPage(page);
         treesPage = new PhylogeneticTreePage(page);
-        await loginPage.login('lbrambila@contractor.chanzuckerberg.com','Br@mb1la');
+        await login(page,process.env.USERNAME,process.env.PWD);
     });
 
-    test("Tree name limit character amount test",async ()=>{
+    test("Should Tree name limit character amount",async ()=>{
         const tree: TreeInfo = {
             treeName: "Bacon ipsum dolor amet kevin burgdoggen sirloin, shoulder shankle chislic ham. Salami capicola fatback chislic alcatra strip steak jerky boudin doner shoulder pork loin ball tip. Shank prosciutto pork",
             treeType: "Overview",
@@ -29,7 +33,7 @@ test.describe('Phylogenetic Tree', ()=>{
         await expect(await treesPage.getExceedNumberCharactersErrorMsg()).toBe("Name exceeds the 128 character limit.");
      });
  
-     test("Tree name missing test",async ()=>{
+     test("Should Tree name missing",async ()=>{
         const tree: TreeInfo = {
             treeName: "",
             treeType: "Overview",
@@ -42,7 +46,7 @@ test.describe('Phylogenetic Tree', ()=>{
         expect(await treesPage.getToolTipErrorMsg()).toBe('Your tree requires a Tree Name.');
      });
 
-     test("Tree type missing test",async () => {
+     test("Should Tree type missing",async () => {
         const tree: TreeInfo = {
             treeName: "Randon name",
             treeType: "",
@@ -55,7 +59,7 @@ test.describe('Phylogenetic Tree', ()=>{
         expect(await treesPage.getToolTipErrorMsg()).toBe('Please select a Tree Type to proceed.');
      });
 
-     test("Incorrect Force-include test",async ()=>{
+     test("Should Incorrect Force-include",async ()=>{
         const tree: TreeInfo = {
             treeName: "",
             treeType: "Overview",
@@ -68,7 +72,7 @@ test.describe('Phylogenetic Tree', ()=>{
         expect(await treesPage.getSampleWarningMsg()).toBe('1 Sample ID couldn’t be found and will not appear on your tree.');
      });
 
-     test("Tree type: Overview test",async ({page}) => {
+     test("Should create Tree type: Overview",async () => {
         const tree: TreeInfo = {
             treeName: "This is an overview Type tree",
             treeType: "Overview",
@@ -79,10 +83,9 @@ test.describe('Phylogenetic Tree', ()=>{
         await samplePage.openNextstrainPhylogeneticTreeModal();
         await treesPage.fillTreeInfo(tree);
         await treesPage.createTreeButton.highlight();
-        await page.waitForTimeout(2000);
      });
      
-     test("Tree type: Targeted test",async ({page}) => {
+     test("Should create Tree type: Targeted",async () => {
         const tree: TreeInfo = {
             treeName: "This is an Targeted Type tree",
             treeType: "targeted",
@@ -93,10 +96,9 @@ test.describe('Phylogenetic Tree', ()=>{
         await samplePage.openNextstrainPhylogeneticTreeModal();
         await treesPage.fillTreeInfo(tree);
         await treesPage.createTreeButton.highlight();
-        await page.waitForTimeout(2000);
      });
 
-     test("Tree type: Non-Contextualized test",async ({page}) => {
+     test("Should create Tree type: Non-Contextualized",async () => {
         const tree: TreeInfo = {
             treeName: "This is an Non-Contextualized Type tree",
             treeType: "Non_Contextualized",
@@ -107,9 +109,5 @@ test.describe('Phylogenetic Tree', ()=>{
         await samplePage.openNextstrainPhylogeneticTreeModal();
         await treesPage.fillTreeInfo(tree);
         await treesPage.createTreeButton.highlight();
-        await page.waitForTimeout(2000);
      });
-
-
-     
 });

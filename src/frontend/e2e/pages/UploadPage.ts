@@ -1,5 +1,6 @@
 import {Locator, Page} from '@playwright/test'
 import {SampleData} from '../utils/schemas/sampleData'
+import path from 'path';
 
 export class UploadPage {
 
@@ -23,9 +24,9 @@ export class UploadPage {
     constructor(page: Page){
         this.page = page;
         this.selectSampleFiles = page.locator("input[type='file']");
-        this.continueButton = page.locator("a[href$='/upload/2'] > button");
+        this.continueButton = page.locator("a[href$='/upload/step2'] > button");
         this.cancelButton = page.locator("a[href$='/data/samples'] > button");
-        this.removeAll = page.locator(".MuiButton-textPrimary > .MuiButton-label > .MuiButton-iconSizeMedium");
+        this.removeAll = page.locator(".MuiButton-startIcon svg");
         this.samplePrivateId = "//div[div[text()='${VAR}']]/following-sibling::div/descendant::input[@name='privateId']";
         this.samplePublicId = "//div[div[text()='${VAR}']]/following-sibling::div/descendant::input[@name='publicId']";
         this.sampleCollectionDate = "//div[div[text()='${VAR}']]/following-sibling::div/descendant::input[@name='collectionDate']";
@@ -35,12 +36,12 @@ export class UploadPage {
         this.importedFileNameList = page.locator("div[role='table'] div[role='rowgroup']:nth-of-type(2) .MuiTableCell-alignLeft");
         this.collectionDateInvalidFormatMsg = "//div[div[text()='${VAR}']]/following-sibling::div/descendant::input[@name='collectionDate']/../following-sibling::p";
         this.sequencingDateInvalidFormatMsg = "//div[div[text()='${VAR}']]/following-sibling::div/descendant::input[@name='sequencingDate']/../following-sibling::p";
-        this.submitSamplesButton = page.locator("a[href$='/upload/3'] > button");
+        this.submitSamplesButton = page.locator("a[href$='/upload/step3'] > button");
     }
 
 
     async uploadSampleFiles(fileName: string){
-        await this.page.setInputFiles("input[type='file']",'/Users/lbrambila/projects/czgenepi/src/frontend/e2e/files/'+fileName);
+        await this.page.setInputFiles("input[type='file']",path.join(__dirname,'../files/'+fileName));
     }
 
     async removeAllImportedFiles(){
@@ -53,9 +54,6 @@ export class UploadPage {
     }
 
     async getImportedFileNameList(): Promise<string[]>{
-        for(let i = 0; i < await this.importedFileNameList.count(); i++ ){
-            console.log("NAME "+ await this.importedFileNameList.nth(i).textContent());
-        }
         return this.importedFileNameList.allTextContents();
     }
 
@@ -69,7 +67,7 @@ export class UploadPage {
        await this.page.locator(this.samplePublicId.replace('${VAR}',sampleName)).type(sampleData.publicId);
        await this.page.locator(this.sampleCollectionDate.replace('${VAR}',sampleName)).type(sampleData.collectionDate);
        await this.page.locator(this.sampleCollectionLocation.replace('${VAR}',sampleName)).click();
-       await this.page.locator("//div[@role='tooltip']/descendant::input").type(sampleData.collectionLocation,{delay:150});
+       await this.page.locator("//div[@role='tooltip']/descendant::input").type(sampleData.collectionLocation,{delay:100});
        await this.page.keyboard.press('ArrowDown');
        await this.page.keyboard.press('Enter');
        await this.page.locator(this.sampleSequencingDate.replace('${VAR}',sampleName)).type(sampleData.sequencingDate);
