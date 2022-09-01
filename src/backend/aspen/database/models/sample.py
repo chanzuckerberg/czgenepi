@@ -61,7 +61,7 @@ class Sample(idbase, DictMixin):  # type: ignore
         Integer, ForeignKey(Pathogen.id)
     )  # TODO: change to nullable=False once we update workflows
 
-    pathogen: Pathogen = relationship(Pathogen, back_populates="samples")
+    pathogen = relationship(Pathogen, back_populates="samples")  # type: ignore
     private = Column(Boolean, nullable=False, default=False)
     private_identifier = Column(
         String,
