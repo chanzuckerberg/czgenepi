@@ -4,8 +4,12 @@ import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from aspen.api.views.sequences import get_fasta_filename
 from aspen.database.models import Sample
 from aspen.test_infra.models.location import location_factory
+from aspen.test_infra.models.pathogen_repo_config import (
+    setup_gisaid_and_genbank_repo_configs,
+)
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
 from aspen.test_infra.models.usergroup import (
@@ -18,22 +22,122 @@ from aspen.test_infra.models.usergroup import (
 pytestmark = pytest.mark.asyncio
 
 
-async def test_prepare_sequences_download(
+async def setup_sequences_download_test_data(
     async_session: AsyncSession,
-    http_client: AsyncClient,
 ):
-    """
-    Test a regular sequence download for a sample submitted by the user's group
-    """
     group = group_factory()
     user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    sample = sample_factory(group, user, location)
+    sample = sample_factory(
+        group,
+        user,
+        location,
+        private_identifier="hCoV-19/private_identifer",
+    )
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
+    setup_gisaid_and_genbank_repo_configs(async_session)
+
     async_session.add(group)
     await async_session.commit()
+    return group, user, sample
+
+
+async def test_prepare_sequences_download_gisaid(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+):
+    """
+    Test a regular sequence download for a sample submitted by the user's group, test prefixes are correctly added for GISAID
+    """
+
+    group, user, sample = await setup_sequences_download_test_data(async_session)
+
+    auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
+    data = {
+        "sample_ids": [sample.public_identifier],
+        "public_repository_name": "GISAID",
+    }
+    res = await http_client.post(
+        f"/v2/orgs/{group.id}/sequences/", headers=auth_headers, json=data
+    )
+    assert res.status_code == 200
+    expected_filename = get_fasta_filename("GISAID", group.name)
+    assert (
+        res.headers["Content-Disposition"]
+        == f"attachment; filename={expected_filename}"
+    )
+    file_contents = str(res.content, encoding="UTF-8")
+    assert "ATGCAAAAAA" in file_contents
+    id_w_old_prefix_stripped = sample.private_identifier.removeprefix("hCoV-19/")
+    assert file_contents.startswith(f">hCoV-19/{id_w_old_prefix_stripped}")
+    assert sample.private_identifier in file_contents
+
+
+async def test_prepare_sequences_download_genbank(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+):
+    """
+    Test a regular sequence download for a sample submitted by the user's group, test prefixes are correctly added for GenBank
+    """
+    group, user, sample = await setup_sequences_download_test_data(async_session)
+
+    auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
+    data = {
+        "sample_ids": [sample.public_identifier],
+        "public_repository_name": "GenBank",
+    }
+    res = await http_client.post(
+        f"/v2/orgs/{group.id}/sequences/", headers=auth_headers, json=data
+    )
+    assert res.status_code == 200
+    expected_filename = get_fasta_filename("GenBank", group.name)
+    assert (
+        res.headers["Content-Disposition"]
+        == f"attachment; filename={expected_filename}"
+    )
+    file_contents = str(res.content, encoding="UTF-8")
+    assert "ATGCAAAAAA" in file_contents
+    id_w_old_prefix_stripped = sample.private_identifier.removeprefix("hCoV-19/")
+    assert file_contents.startswith(f">SARS-CoV-2/human/{id_w_old_prefix_stripped}")
+
+
+async def test_prepare_sequences_download_public_database_DNE(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+):
+    """
+    Test that error message is returned if public repository name is not found
+    """
+
+    group, user, sample = await setup_sequences_download_test_data(async_session)
+
+    auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
+    data = {
+        "sample_ids": [sample.public_identifier],
+        "public_repository_name": "does not exist",
+    }
+    res = await http_client.post(
+        f"/v2/orgs/{group.id}/sequences/", headers=auth_headers, json=data
+    )
+
+    assert (
+        res.text
+        == '{"error":"no prefix found for given pathogen_slug and public_repository combination"}'
+    )
+    assert res.status_code == 500
+
+
+async def test_prepare_sequences_download_no_submission(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+):
+    """
+    Test a regular sequence download for a sample submitted by the user's group, test prefixes are correctly added for GenBank
+    """
+    group, user, sample = await setup_sequences_download_test_data(async_session)
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     data = {
@@ -43,13 +147,14 @@ async def test_prepare_sequences_download(
         f"/v2/orgs/{group.id}/sequences/", headers=auth_headers, json=data
     )
     assert res.status_code == 200
-    expected_filename = f"{group.name}_sample_sequences.fasta"
+    expected_filename = get_fasta_filename(None, group.name)
     assert (
         res.headers["Content-Disposition"]
         == f"attachment; filename={expected_filename}"
     )
     file_contents = str(res.content, encoding="UTF-8")
     assert "ATGCAAAAAA" in file_contents
+    assert file_contents.startswith(f">{sample.private_identifier}")
     assert sample.private_identifier in file_contents
 
 
@@ -146,6 +251,7 @@ async def test_access_matrix(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
+    setup_gisaid_and_genbank_repo_configs(async_session)
     # give the viewer group access to the sequences from the owner group
     roles = []
     roles.extend(await grouprole_factory(async_session, owner_group1, viewer_group))
