@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Mapping, Optional, Set, Tuple, TYPE_CHECKING
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.query import Query
-from sqlalchemy.sql.expression import or_
+from sqlalchemy.sql.expression import and_, or_
 
 from aspen.api.authz import AuthZSession
 from aspen.database.models import Accession, AccessionType, Pathogen, Sample
@@ -35,9 +35,16 @@ async def samples_by_identifiers(
         .outerjoin(public_samples_query, Sample.id == public_samples_query.c.id)  # type: ignore
         .outerjoin(private_samples_query, Sample.id == private_samples_query.c.id)  # type: ignore
         .where(
-            or_(
-                public_samples_query.c.id != None,  # noqa: E711
-                private_samples_query.c.id != None,  # noqa: E711
+            and_(
+                or_(
+                    # TODO - DECOVIDIFY - remove the None check!
+                    Sample.pathogen == pathogen,  # noqa: E711
+                    Sample.pathogen_id == None,  # noqa: E711
+                ),
+                or_(
+                    public_samples_query.c.id != None,  # noqa: E711
+                    private_samples_query.c.id != None,  # noqa: E711
+                ),
             ),
         )
     )

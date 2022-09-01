@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.sql.expression import or_
 
 from aspen.api.authn import get_auth_user
 from aspen.api.authz import AuthZSession, get_authz_session, require_group_privilege
@@ -167,7 +168,10 @@ async def get_serializable_runs(
         joinedload(PhyloRun.user),  # For Pydantic serialization
         joinedload(PhyloRun.group),  # For Pydantic serialization
     )
-    # query = query.filter(PhyloRun.pathogen == pathogen)
+    # TODO - DECOVIDIFY - remove the None check!
+    query = query.filter(
+        or_(PhyloRun.pathogen == pathogen, PhyloRun.pathogen_id == None)
+    )
     if run_id:
         query = query.filter(PhyloRun.id == run_id)
     res = await db.execute(query)

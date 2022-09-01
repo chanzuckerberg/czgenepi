@@ -56,6 +56,7 @@ async def test_create_phylo_run(
     assert response["pathogen"]["slug"] == pathogen.slug
     assert "id" in response
 
+
 async def test_create_phylo_run_mpx(
     async_session: AsyncSession,
     http_client: AsyncClient,
@@ -83,7 +84,9 @@ async def test_create_phylo_run_mpx(
         "samples": [sample.public_identifier],
     }
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/phylo_runs/", json=data, headers=auth_headers
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/phylo_runs/",
+        json=data,
+        headers=auth_headers,
     )
     assert res.status_code == 200
     response = res.json()
@@ -451,7 +454,11 @@ async def test_create_invalid_phylo_run_sample_cannot_see(
     )
     pathogen = await Pathogen.get_by_slug(async_session, "SC2")
     sample2 = sample_factory(
-        group2, user2, location2, public_identifier="USA/OTHER/123456", pathogen=pathogen
+        group2,
+        user2,
+        location2,
+        public_identifier="USA/OTHER/123456",
+        pathogen=pathogen,
     )
 
     gisaid_dump = aligned_gisaid_dump_factory()
