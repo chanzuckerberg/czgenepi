@@ -76,7 +76,7 @@
     "@emotion/babel-plugin": "^11.3.0",
     "@mui/types": "^7.1.5",
     "@playwright/test": "^1.18.0",
-    "@redux-devtools/extension": "^3.2.3",
+    "redux-devtools-extension": "^2.13.9",
     "@svgr/webpack": "^5.5.0",
     "@testing-library/jest-dom": "^5.11.8",
     "@testing-library/react": "^11.2.2",

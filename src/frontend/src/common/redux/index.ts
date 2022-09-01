@@ -1,5 +1,5 @@
 import { AnyAction, applyMiddleware, createStore } from "redux";
-import { composeWithDevTools } from "@redux-devtools/extension";
+import { composeWithDevTools } from "redux-devtools-extension";
 import { setGroupMiddleware, setPathogenMiddleware } from "./middleware";
 import { CZGEReduxActions, Pathogen } from "./types";
 import {
