@@ -53,6 +53,7 @@ module.exports = {
         natural: false,
       },
     ],
+    "prettier/prettier": 0,
   },
   settings: {
     react: {

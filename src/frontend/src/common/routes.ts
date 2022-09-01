@@ -24,8 +24,21 @@ export enum ROUTES {
   RESOURCES = "https://help.czgenepi.org/hc/en-us/categories/6217716150804-Genomic-Epidemiology-Learning-Center",
   TERMS = "/terms",
   UPLOAD = "/upload",
-  UPLOAD_STEP1 = "/upload/1",
-  UPLOAD_STEP2 = "/upload/2",
-  UPLOAD_STEP3 = "/upload/3",
+  UPLOAD_STEP1 = "/upload/step1",
+  UPLOAD_STEP2 = "/upload/step2",
+  UPLOAD_STEP3 = "/upload/step3",
   USHER = "https://genome.ucsc.edu/cgi-bin/hgPhyloPlace",
 }
+
+export const publicPaths: string[] = [
+  ROUTES.HOMEPAGE,
+  ROUTES.PRIVACY,
+  ROUTES.TERMS,
+];
+
+export const workspacePaths: string[] = [
+  ROUTES.DATA,
+  ROUTES.DATA_SAMPLES,
+  ROUTES.PHYLO_TREES,
+  ROUTES.UPLOAD,
+];

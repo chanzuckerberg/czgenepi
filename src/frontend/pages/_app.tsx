@@ -1,5 +1,5 @@
 import { CacheProvider, EmotionCache } from "@emotion/react";
-import CssBaseline from "@mui/material/CssBaseline";
+import { CssBaseline } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { AppProps } from "next/app";
@@ -11,6 +11,7 @@ import { analyticsRecordRouteChange } from "src/common/analytics/methods";
 import { OneTrustInitializer } from "src/common/analytics/OneTrustInitializer";
 import { PlausibleInitializer } from "src/common/analytics/PlausibleInitializer";
 import { SegmentInitializer } from "src/common/analytics/SegmentInitializer";
+import { useAppRouting } from "src/common/appRouting";
 import { queryClient } from "src/common/queries/queryClient";
 import { store } from "src/common/redux";
 import { StyledApp } from "src/common/styles/appStyle";
@@ -67,6 +68,11 @@ const App = ({
       router.events.off("routeChangeComplete", analyticsRecordRouteChange);
     };
   }, [router]);
+
+  /**
+   * This code makes sure that groupId and pathogen exist in the url when appropriate
+   */
+  useAppRouting();
 
   return (
     <Provider store={store}>

@@ -1,6 +1,8 @@
 module.exports = {
   plugins: ["@emotion", transformImports()],
-  presets: ["next/babel"],
+  presets: [
+    "next/babel"
+  ],
 };
 
 function transformImports() {
