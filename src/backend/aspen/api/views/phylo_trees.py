@@ -66,9 +66,12 @@ async def _get_selected_samples(db: AsyncSession, phylo_tree_id: int):
     # identifier check here since the process_phylo_tree method already does that
     # filtering, and this data is only used to match any identifiers that are
     # *already* on the tree.
+    gisaid_prefix = "hCoV-19/"
     for uploaded_pathogen_genome in phylo_run.inputs:
         sample = uploaded_pathogen_genome.sample
-        selected_samples.add(prefix_regex.sub("", sample.public_identifier))
+        stripped_identifier = prefix_regex.sub("", sample.public_identifier)
+        selected_samples.add(stripped_identifier)
+        selected_samples.add(f"{gisaid_prefix}{stripped_identifier}")
         selected_samples.add(sample.private_identifier)
     return selected_samples
 
