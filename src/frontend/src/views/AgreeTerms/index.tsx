@@ -13,7 +13,7 @@ import { useUpdateUserInfo, useUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
 import { CURRENT_POLICY_VERSION } from "src/components/AcknowledgePolicyChanges";
 import { PageContent } from "../../common/styles/mixins/global";
-import { Details, SpacedBold, Title } from "./style";
+import { Details, SpacedBold, StyledIcon, Title } from "./style";
 
 export default function AgreeTerms(): JSX.Element | null {
   // `isTosViewable` -- Should user see ToS page?
@@ -135,6 +135,11 @@ export default function AgreeTerms(): JSX.Element | null {
           <DialogActions>
             <Button
               disabled={isUpdatingUserInfo}
+              startIcon={
+                isUpdatingUserInfo && (
+                  <StyledIcon sdsIcon="loading" sdsSize="l" sdsType="static" />
+                )
+              }
               sdsType="primary"
               sdsStyle="rounded"
               autoFocus
@@ -142,15 +147,15 @@ export default function AgreeTerms(): JSX.Element | null {
             >
               Accept
             </Button>
-            <a href={ENV.API_URL + API.LOG_OUT}>
-              <Button
-                disabled={isUpdatingUserInfo}
-                sdsType="secondary"
-                sdsStyle="rounded"
-              >
-                Decline
-              </Button>
-            </a>
+            <Button
+              component="a"
+              href={ENV.API_URL + API.LOG_OUT}
+              disabled={isUpdatingUserInfo}
+              sdsType="secondary"
+              sdsStyle="rounded"
+            >
+              Decline
+            </Button>
           </DialogActions>
         </Dialog>
       </PageContent>
