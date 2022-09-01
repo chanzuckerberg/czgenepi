@@ -8,10 +8,11 @@ import path from 'path';
 import * as dotenv from 'dotenv' 
 dotenv.config({path:path.join(__dirname,'../.env')});
 
-test.describe('Phylogenetic Tree', ()=>{
-    let loginPage: LoginPage;
-    let samplePage: SamplesPage;
-    let treesPage: PhylogeneticTreePage;
+
+test.describe("Phylogenetic Tree", () => {
+  let loginPage: LoginPage;
+  let samplePage: SamplesPage;
+  let treesPage: PhylogeneticTreePage;
 
     test.beforeEach(async ({page,})=>{
         loginPage = new LoginPage(page);

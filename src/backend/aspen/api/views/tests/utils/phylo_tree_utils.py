@@ -6,9 +6,24 @@ from aspen.database.models import PhyloTree
 
 def create_id_mapped_tree(input_json: dict) -> dict:
     clone = deepcopy(input_json)
+    clone["tree"]["name"] = f"hCoV-19/{clone['tree']['name']}"
     for node in clone["tree"]["children"]:
-        node["GISAID_ID"] = node["name"]
+        node["GISAID_ID"] = f"hCoV-19/{node['name']}"
         node["name"] = node["name"].replace("public", "private")
+    return clone
+
+
+def add_subtree_prefixes(subtree):
+    for node in subtree:
+        node["name"] = f"hCoV-19/{node['name']}"
+        if "children" in node:
+            add_subtree_prefixes(node["children"])
+
+
+def add_prefixes(input_json: dict) -> dict:
+    clone = deepcopy(input_json)
+    clone["tree"]["name"] = f"hCoV-19/{clone['tree']['name']}"
+    add_subtree_prefixes(clone["tree"]["children"])
     return clone
 
 

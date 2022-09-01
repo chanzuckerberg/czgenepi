@@ -7,9 +7,9 @@ import * as dotenv from 'dotenv'
 dotenv.config({path:path.join(__dirname,'../.env')});
 
 
-test.describe("Filter Test Suite",()=>{
-    let loginPage: LoginPage;
-    let samplePage: SamplesPage;
+test.describe("Sample filtering tests", () => {
+  let loginPage: LoginPage;
+  let samplePage: SamplesPage;
 
     test.beforeEach(async ({ page })=>{
         loginPage = new LoginPage(page);
@@ -48,5 +48,4 @@ test.describe("Filter Test Suite",()=>{
        await samplePage.filterCollectionDate('Last Year');
        expect(!await samplePage.measureDateTimes('1y')).toBe(true);
     })
-
 });

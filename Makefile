@@ -237,7 +237,7 @@ local-dbconsole-profile: ## Connect to the local postgres database and profile q
 
 .PHONY: local-update-backend-deps
 local-update-backend-deps: ## Update poetry.lock to reflect pyproject.toml file changes.
-	$(docker_compose) exec backend /opt/poetry/bin/poetry update
+	$(docker_compose) exec backend poetry update
 
 .PHONY: local-update-frontend-deps
 local-update-frontend-deps: ## Update package-lock.json to reflect package.json file changes.

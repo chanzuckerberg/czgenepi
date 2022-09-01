@@ -73,6 +73,7 @@ const Data: FunctionComponent = () => {
   const [activeFilterCount, setActiveFilterCount] = useState<number>(0);
 
   const router = useRouter();
+  const { asPath: currentPath } = router;
 
   const sampleResponse = useSampleInfo();
   const PhyloRunResponse = usePhyloRunInfo();
@@ -117,10 +118,10 @@ const Data: FunctionComponent = () => {
   );
 
   useEffect(() => {
-    if (router.asPath === ROUTES.DATA) {
+    if (currentPath === ROUTES.DATA) {
       router.push(ROUTES.DATA_SAMPLES);
     }
-  }, [router]);
+  }, [router, currentPath]);
 
   // this constant is inside the component so we can associate
   // each category with its respective variable.
@@ -159,7 +160,7 @@ const Data: FunctionComponent = () => {
           <a href="passHref">
             <Category>
               <CategoryTitle
-                isActive={router.asPath === category.to}
+                isActive={currentPath.startsWith(category.to)}
                 data-test-id="data-menu-item"
               >
                 {category.text}
@@ -172,10 +173,12 @@ const Data: FunctionComponent = () => {
     );
   });
 
-  const subTitle = PAGE_TITLES[router.asPath];
+  const subTitle = currentPath.startsWith(ROUTES.DATA_SAMPLES)
+    ? PAGE_TITLES[ROUTES.DATA_SAMPLES]
+    : PAGE_TITLES[ROUTES.PHYLO_TREES];
 
   const category =
-    dataCategories.find((category) => category.to === router.asPath) ||
+    dataCategories.find((category) => currentPath.startsWith(category.to)) ||
     dataCategories[0];
 
   const viewName = category.text;
@@ -215,7 +218,7 @@ const Data: FunctionComponent = () => {
           />
         )}
         <DataSubview
-          key={router.asPath}
+          key={currentPath}
           isLoading={category.isDataLoading}
           data={category.data}
           defaultSortKey={category.defaultSortKey}

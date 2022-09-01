@@ -1,3 +1,5 @@
 .env
+.env.local
+.env.staging
 playwright-report
-playwright/storage
+e2e/storage

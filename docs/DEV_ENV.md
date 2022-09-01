@@ -67,7 +67,7 @@ To update frontend changes:
 
 To update backend dependencies:
 
-1. run 'docker compose exec backend /opt/poetry/bin/poetry add PACKAGE_NAME_HERE`
+1. run 'docker compose exec backend poetry add PACKAGE_NAME_HERE`
 
 ### Update Dev Data
 
