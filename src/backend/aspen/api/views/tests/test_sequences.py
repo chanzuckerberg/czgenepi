@@ -30,7 +30,12 @@ async def setup_sequences_download_test_data(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    sample = sample_factory(group, user, location, private_identifier="hCoV-19/private_identifer",)
+    sample = sample_factory(
+        group,
+        user,
+        location,
+        private_identifier="hCoV-19/private_identifer",
+    )
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     setup_gisaid_and_genbank_repo_configs(async_session)
 
