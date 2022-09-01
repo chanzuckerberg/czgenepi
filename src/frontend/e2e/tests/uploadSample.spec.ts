@@ -1,6 +1,5 @@
 import {test,expect} from '@playwright/test'
 import {SampleData} from '../utils/schemas/sampleData'
-import {LoginPage} from '../pages/LoginPage'
 import {SamplesPage} from '../pages/SamplesPage'
 import {UploadPage} from '../pages/UploadPage'
 import {login} from '../utils/login';
@@ -9,23 +8,14 @@ import * as dotenv from 'dotenv'
 dotenv.config({path:path.join(__dirname,'../.env')});
 
 
-const textFile = "test_data.txt";
-const publicId8 = "hCoV-19/USA/CA-CCC_Ex8";
-const publicId9 = "hCoV-19/USA/CA-CCC_Ex9";
-const publicId10 = "hCoV-19/USA/CA-CCC_Ex10";
-const updateDateMsg = "Update format to YYYY-MM-DD";
-
 test.describe("Filter Test Suite", () => {
-  let loginPage: LoginPage;
   let samplePage: SamplesPage;
   let uploadPage: UploadPage;
 
-<<<<<<< HEAD
     test.beforeEach(async ({ page })=>{
-        loginPage = new LoginPage(page);
         samplePage = new SamplesPage(page);
         uploadPage = new UploadPage(page);
-        await login(page,process.env.USERNAME,process.env.PWD);
+        await login(page,process.env.USERNAME as string,process.env.PASSWORD as string);
     })
 
     test('Should upload extension files',async ()=>{

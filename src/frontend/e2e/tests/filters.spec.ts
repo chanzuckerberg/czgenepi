@@ -1,5 +1,4 @@
 import {test,expect} from '@playwright/test'
-import {LoginPage} from '../pages/LoginPage'
 import {SamplesPage} from '../pages/SamplesPage'
 import {login} from '../utils/login';
 import path from 'path';
@@ -8,13 +7,11 @@ dotenv.config({path:path.join(__dirname,'../.env')});
 
 
 test.describe("Sample filtering tests", () => {
-  let loginPage: LoginPage;
   let samplePage: SamplesPage;
 
     test.beforeEach(async ({ page })=>{
-        loginPage = new LoginPage(page);
         samplePage = new SamplesPage(page);
-        await login(page,process.env.USERNAME,process.env.PWD);
+        await login(page,process.env.USERNAME as string,process.env.PASSWORD as string);
     })
 
     test("Should Genome Recovery filter by completion",async ()=>{

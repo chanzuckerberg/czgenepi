@@ -1,6 +1,5 @@
 import {test,expect} from '@playwright/test'
 import {TreeInfo} from '../utils/schemas/treeInfo'
-import {LoginPage} from '../pages/LoginPage'
 import {SamplesPage} from '../pages/SamplesPage'
 import {PhylogeneticTreePage} from '../pages/PhylogeneticTreePage'
 import {login} from '../utils/login';
@@ -10,15 +9,13 @@ dotenv.config({path:path.join(__dirname,'../.env')});
 
 
 test.describe("Phylogenetic Tree", () => {
-  let loginPage: LoginPage;
   let samplePage: SamplesPage;
   let treesPage: PhylogeneticTreePage;
 
     test.beforeEach(async ({page,})=>{
-        loginPage = new LoginPage(page);
         samplePage = new SamplesPage(page);
         treesPage = new PhylogeneticTreePage(page);
-        await login(page,process.env.USERNAME,process.env.PWD);
+        await login(page,process.env.USERNAME as string,process.env.PASSWORD as string);
     });
 
     test("Should Tree name limit character amount",async ()=>{
