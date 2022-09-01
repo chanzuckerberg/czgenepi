@@ -50,6 +50,7 @@ aligned_gisaid_location=$(
 
 # Persist the build config we generated.
 $aws s3 cp /ncov/my_profiles/aspen/builds.yaml "${s3_prefix}/builds.yaml"
+$aws s3 cp /ncov/data/include.txt "${s3_prefix}/include.txt"
 
 # If we don't have any county samples, copy the reference genomes to to our county file
 if [ ! -e /ncov/data/sequences_aspen.fasta ]; then
@@ -69,7 +70,7 @@ $aws s3 cp --no-progress "s3://${aligned_gisaid_s3_bucket}/${aligned_gisaid_meta
 # run snakemake, if run fails export the logs from snakemake and ncov to s3 
 (cd /ncov && snakemake --printshellcmds auspice/ncov_aspen.json --profile my_profiles/aspen/ --resources=mem_mb=312320) || { $aws s3 cp /ncov/.snakemake/log/ "${s3_prefix}/logs/snakemake/" --recursive ; $aws s3 cp /ncov/logs/ "${s3_prefix}/logs/ncov/" --recursive ; }
 
-# upload the tree to S3
+# upload the tree to S3. The variable key is created to use later
 key="${key_prefix}/ncov_aspen.json"
 $aws s3 cp /ncov/auspice/ncov_aspen.json "s3://${aspen_s3_db_bucket}/${key}"
 

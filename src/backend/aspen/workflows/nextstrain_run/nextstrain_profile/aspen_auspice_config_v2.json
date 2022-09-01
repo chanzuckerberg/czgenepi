@@ -80,6 +80,10 @@
       "key": "submitting_lab",
       "title": "Submitting Lab",
       "type": "categorical"
+    },
+    {
+      "key": "gisaid_epi_isl",
+      "type": "categorical"
     }
   ],
   "geo_resolutions": [

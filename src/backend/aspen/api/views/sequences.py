@@ -15,7 +15,7 @@ from aspen.api.schemas.sequences import (
     FastaURLResponse,
     SequenceRequest,
 )
-from aspen.api.settings import Settings
+from aspen.api.settings import APISettings
 from aspen.api.utils.fasta_streamer import FastaStreamer
 
 router = APIRouter()
@@ -51,7 +51,7 @@ async def prepare_sequences_download(
 async def getfastaurl(
     request: FastaURLRequest,
     db: AsyncSession = Depends(get_db),
-    settings: Settings = Depends(get_settings),
+    settings: APISettings = Depends(get_settings),
     az: AuthZSession = Depends(get_authz_session),
     ac: AuthContext = Depends(get_auth_context),
 ) -> FastaURLResponse:
