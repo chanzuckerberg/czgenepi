@@ -65,7 +65,7 @@ class PhyloTree(Entity):
     pathogen_id = Column(
         Integer, ForeignKey(Pathogen.id)
     )  # TODO: change to nullable=False once we update workflows
-    pathogen = relationship(Pathogen, back_populates="phylo_trees")
+    pathogen: Pathogen = relationship(Pathogen, back_populates="phylo_trees")  # type: ignore
 
     constituent_samples = relationship(  # type: ignore
         Sample,
@@ -99,7 +99,7 @@ class PhyloRun(Workflow):
     pathogen_id = Column(
         Integer, ForeignKey(Pathogen.id)
     )  # TODO: change to nullable=False once we update workflows
-    pathogen = relationship(Pathogen, back_populates="phylo_runs")
+    pathogen: Pathogen = relationship(Pathogen, back_populates="phylo_runs")  # type: ignore
 
     template_file_path = Column(String, nullable=True)
 

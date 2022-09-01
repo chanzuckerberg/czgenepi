@@ -3,8 +3,8 @@ from __future__ import annotations
 from sqlalchemy import Column, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import relationship
 
+from aspen.database.models import PhyloRun, PhyloTree, PublicRepository, Sample
 from aspen.database.models.base import idbase
-from aspen.database.models.public_repositories import PublicRepository
 
 
 class Pathogen(idbase):  # type: ignore
@@ -27,9 +27,9 @@ class Pathogen(idbase):  # type: ignore
         comment=("full pathogen abbreviated name, ex: SARS-CoV-2"),
     )
 
-    samples = relationship("Sample", back_populates="pathogen")
-    phylo_runs = relationship("PhyloRun", back_populates="pathogen")
-    phylo_trees = relationship("PhyloTree", back_populates="pathogen")
+    samples = relationship(Sample, back_populates="pathogen")  # type: ignore
+    phylo_runs = relationship(PhyloRun, back_populates="pathogen")  # type: ignore
+    phylo_trees = relationship(PhyloTree, back_populates="pathogen")  # type: ignore
 
 
 class PathogenRepoConfig(idbase):  # type: ignore
