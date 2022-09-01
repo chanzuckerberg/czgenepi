@@ -45,13 +45,6 @@ test.describe("Filter Test Suite", () => {
     await uploadPage.page.waitForTimeout(3000);
     await uploadPage.removeAllImportedFiles();
     await uploadPage.page.waitForTimeout(3000);
-    // await uploadPage.page.waitForTimeout(2000);
-    // await uploadPage.uploadSampleFiles('test_data.gz');
-    // await uploadPage.page.waitForTimeout(3000)
-    // await uploadPage.cancelButton.click();
-    // await uploadPage.page.waitForTimeout(2000);
-    // await uploadPage.uploadSampleFiles('test_data.zip');
-    // await uploadPage.page.waitForTimeout(3000);
   });
 
   test("sample form test1", async ({ page }) => {

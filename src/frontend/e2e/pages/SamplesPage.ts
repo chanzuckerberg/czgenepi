@@ -98,50 +98,6 @@ export class SamplesPage {
   }
 }
 
-// export async function filterGenomeRecovery(option: string, page: Page): Promise<void>{
-//     await page.waitForURL("https://staging.czgenepi.org/data/samples");
-//     await page.waitForTimeout(1000);
-//     await page.click("button[label='Genome Recovery']");
-//     await page.locator("div[role='tooltip'] li span.primary-text",{hasText:`${option}`}).click();
-//   }
-
-//   export async function getSampleStatuses(page: Page,desireStatus: string): Promise<void>{
-//    const statuses = await page.$$eval("div[data-test-id='sample-status']",
-//    list => list.map(element => element.textContent));
-//    let counter = 0;
-//    for(let i = 0; i < statuses.length; i++ ){
-//         if(statuses[i] == desireStatus){
-//           counter++
-//         }
-//    }
-//    await expect(statuses).toHaveLength(counter);
-//    console.log("CURRENT STATUSES FILTERED: "+ statuses);
-//   }
-
-//   export async function filterLineage(page: Page,lineages: string[]){
-//     let actualLineage = 0;
-//     while(actualLineage < lineages.length){
-//       await page.click("button[label='Lineage']");
-//       await page.type("div[data-test-id='sample-status']",lineages[actualLineage]);
-//       await page.click("ul[role='listbox'] > li:first-of-type");
-//       await page.keyboard.press('Escape');
-//       const filterOn = await page.locator('div > .MuiChip-deletable');
-//       await expect(filterOn).toHaveText(lineages[actualLineage]);
-//       const filteredLineages = await page.$$eval("div[data-test-id='table-row'] > div:nth-of-type(4) > div",
-//       list => list.map(element => element.textContent));
-//       let counter = 0;
-//       for(let i = 0; i < filteredLineages.length; i++ ){
-//          if(filteredLineages[i] == lineages[actualLineage]){
-//            counter++
-//          }
-//       }
-//      await expect(filteredLineages).toHaveLength(counter);
-//      console.log("CURRENT STATUSES FILTERED: "+ filteredLineages);
-//      await page.click('svg.MuiChip-deleteIcon');
-//      actualLineage++;
-//     }
-//   }
-
 export async function filterCollectionDate(page: Page, filterDate: string) {
   await page.click(collectionDateLocator);
   const periods = await page.locator("div[style*='194'] span > span");

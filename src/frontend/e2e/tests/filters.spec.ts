@@ -19,12 +19,6 @@ test.describe("Sample filtering tests", () => {
     await expect(samplePage.sampleStatusesList).toHaveText(statusList);
   });
 
-  test.skip("Should by Failed Genome Recovery status", async () => {
-    await samplePage.filterByGenomeRecoveryStatus("failed");
-    const statusList = await samplePage.getSampleStatusList();
-    await expect(samplePage.sampleStatusesList).toHaveText(statusList);
-  });
-
   test("Should filter by Lineage", async ({ page }) => {
     await samplePage.filterLineage(["BA.1.1", "BA.1.15"]);
     const lineageList = await samplePage.getLineageList();
