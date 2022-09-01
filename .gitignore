@@ -309,5 +309,9 @@ static
 
 # Next.js
 .next
-/src/frontend/playwright/storage/
-.env*
+
+# e2e tests
+src/frontend/e2e/storage/
+src/frontend/.env.local
+src/frontend/.env.staging
+src/frontend/e2e/report/

@@ -14,7 +14,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from aspen.api.authn import AuthContext, get_auth_context, get_auth_user
 from aspen.api.authz import AuthZSession, get_authz_session, require_group_privilege
-from aspen.api.deps import get_db, get_settings
+from aspen.api.deps import get_db, get_pathogen_slug, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.phylo_runs import (
     PhyloRunDeleteResponse,
@@ -220,6 +220,7 @@ async def get_serializable_runs(
 async def list_runs(
     db: AsyncSession = Depends(get_db),
     az: AuthZSession = Depends(get_authz_session),
+    pathogen_slug=Depends(get_pathogen_slug),
 ) -> PhyloRunsListResponse:
 
     phylo_runs: Iterable[PhyloRun] = await get_serializable_runs(db, az, "read")

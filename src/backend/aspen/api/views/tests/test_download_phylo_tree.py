@@ -12,6 +12,7 @@ from aspen.api.views.tests.data.phylo_tree_data import TEST_TREE
 from aspen.api.views.tests.test_list_phylo_runs import make_all_test_data
 from aspen.api.views.tests.test_update_phylo_run_and_tree import make_shared_test_data
 from aspen.api.views.tests.utils.phylo_tree_utils import (
+    add_prefixes,
     align_json_with_model,
     create_id_mapped_tree,
 )
@@ -67,6 +68,8 @@ async def test_phylo_tree_id_style_public(
     user, group, samples, phylo_run, phylo_tree = await make_shared_test_data(
         async_session
     )
+    if not phylo_tree:
+        raise Exception("missing phylo tree")
 
     # Create the bucket if it doesn't exist in localstack.
     try:
@@ -85,8 +88,9 @@ async def test_phylo_tree_id_style_public(
         f"/v2/orgs/{group.id}/phylo_trees/{phylo_tree.entity_id}/download?id_style=public",
         headers=auth_headers,
     )
+    prefixed_tree = add_prefixes(TEST_TREE)
     returned_tree = result.json()
-    assert returned_tree["tree"] == TEST_TREE["tree"]
+    assert returned_tree["tree"] == prefixed_tree["tree"]
 
 
 async def test_phylo_tree_no_can_see(

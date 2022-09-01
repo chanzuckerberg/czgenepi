@@ -1,3 +1,4 @@
+import { forEach } from "lodash";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { ROUTES } from "src/common/routes";
@@ -57,7 +58,17 @@ export default function Upload(): JSX.Element | null {
     router.push(ROUTES.UPLOAD_STEP1);
   }
 
-  const Component = routeToComponent[router.asPath as Routes] || null;
+  let matchedPath = "";
+  const currentPath = router.asPath;
+
+  forEach(Object.keys(routeToComponent), (route) => {
+    if (currentPath.startsWith(route)) {
+      matchedPath = route;
+      return false;
+    }
+  });
+
+  const Component = routeToComponent[matchedPath as Routes] || null;
 
   return (
     <StyledPageContent>

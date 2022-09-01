@@ -90,7 +90,7 @@ async def create_phylotree_with_inputs(
         samples.append(sample)
         input_entities.append(input_entity)
 
-    db_gisaid_samples = ["gisaid_identifier", "hCoV-19/gisaid_identifier2"]
+    db_gisaid_samples = ["hCoV-19/gisaid_identifier", "hCoV-19/gisaid_identifier2"]
     phylo_run = phylorun_factory(
         owner_group,
         inputs=input_entities,
@@ -100,7 +100,7 @@ async def create_phylotree_with_inputs(
         phylo_run,
         samples,
     )
-    tree_gisaid_samples = ["gisaid_identifier", "GISAID_identifier2"]
+    tree_gisaid_samples = ["gisaid_identifier", "hCoV-19/GISAID_identifier2"]
     upload_s3_file(mock_s3_resource, phylo_tree, samples, tree_gisaid_samples)
 
     async_session.add_all([phylo_tree])
@@ -158,7 +158,9 @@ async def test_tree_metadata_download(
         headers=auth_headers,
     )
     expected_filename = f"{phylo_tree.id}_sample_ids.tsv"
-    expected_document = "Sample Identifier\tSelected\r\n" "root_identifier_1	no\r\n"
+    expected_document = (
+        "Sample Identifier\tSelected\r\n" "hCoV-19/root_identifier_1	no\r\n"
+    )
     for sample in samples:
         expected_document += f"{sample.private_identifier}	no\r\n"
     file_contents = str(res.content, encoding="UTF-8")
@@ -213,12 +215,12 @@ async def test_private_id_matrix(
             "expected_status": 200,
             "expected_data": (
                 "Sample Identifier\tSelected\r\n"
-                f"root_identifier_1	no\r\n"
-                f"{samples[0].public_identifier}	yes\r\n"
-                f"{samples[1].public_identifier}	yes\r\n"
-                f"{samples[2].public_identifier}	yes\r\n"
-                f"gisaid_identifier	yes\r\n"
-                f"GISAID_identifier2	yes\r\n"
+                f"hCoV-19/root_identifier_1	no\r\n"
+                f"hCoV-19/{samples[0].public_identifier}	yes\r\n"
+                f"hCoV-19/{samples[1].public_identifier}	yes\r\n"
+                f"hCoV-19/{samples[2].public_identifier}	yes\r\n"
+                f"hCoV-19/gisaid_identifier	yes\r\n"
+                f"hCoV-19/GISAID_identifier2	yes\r\n"
             ),
         },
     ]
@@ -271,7 +273,7 @@ async def test_tree_metadata_replaces_all_ids(
     assert res.status_code == 200
     expected_data = (
         "Sample Identifier\tSelected\r\n"
-        f"root_identifier_1	no\r\n"
+        f"hCoV-19/root_identifier_1	no\r\n"
         f"{samples[0].private_identifier}	yes\r\n"
         f"{extra_sample.private_identifier}	no\r\n"
     )
@@ -316,9 +318,9 @@ async def test_public_tree_metadata_replaces_all_ids(
     assert res.status_code == 200
     expected_data = (
         "Sample Identifier\tSelected\r\n"
-        f"root_identifier_1	no\r\n"
-        f"{samples[0].public_identifier}	yes\r\n"
-        f"{extra_sample.public_identifier}	no\r\n"
+        f"hCoV-19/root_identifier_1	no\r\n"
+        f"hCoV-19/{samples[0].public_identifier}	yes\r\n"
+        f"hCoV-19/{extra_sample.public_identifier}	no\r\n"
     )
     file_contents = str(res.content, encoding="UTF-8")
     assert file_contents == expected_data
