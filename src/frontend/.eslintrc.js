@@ -11,7 +11,6 @@ module.exports = {
     "plugin:react/recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:sonarjs/recommended",
-    "plugin:jest-playwright/recommended",
     "prettier",
     "plugin:prettier/recommended",
     "plugin:react-hooks/recommended",
@@ -54,6 +53,7 @@ module.exports = {
         natural: false,
       },
     ],
+    "prettier/prettier": 0,
   },
   settings: {
     react: {
