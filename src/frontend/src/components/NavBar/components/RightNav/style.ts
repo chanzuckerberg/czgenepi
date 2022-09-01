@@ -65,8 +65,10 @@ export const StyledIconWrapper = styled.div`
   ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const palette = getPalette(props);
+    const spaces = getSpaces(props);
 
     return `
+      margin-top: ${spaces?.xxs}px;
       svg {
         fill: ${colors?.gray[300]};
         &:hover, &:focus, &:active {

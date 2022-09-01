@@ -1,7 +1,10 @@
 // eslint-disable @typescript-eslint/explicit-member-accessibility
 import ListItemText from "@mui/material/ListItemText";
 import { Icon, List } from "czifui";
+import { useSelector } from "react-redux";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { SampleFiltering } from "../SampleFiltering";
+import { pathogenStrings } from "./strings";
 import {
   Label,
   LabelMain,
@@ -36,15 +39,20 @@ export const RadioLabelOverview = ({
   setStartDate,
   setEndDate,
 }: TreeChoiceWithFilteringProps): JSX.Element => {
+  const pathogen = useSelector(selectCurrentPathogen);
+  const {
+    overviewDescription = "",
+    overviewBestFor = "",
+    overviewGoodFor1 = "",
+    overviewGoodFor2 = "",
+  } = pathogen ? pathogenStrings[pathogen] : {};
+
   return (
     <div>
       <Label>
         <LabelMain>Overview </LabelMain>
       </Label>
-      <SmallText>
-        Includes samples from both within and outside of your jurisdiction, at a
-        ratio of roughly 2:1.
-      </SmallText>
+      <SmallText>{overviewDescription}</SmallText>
       {selected && (
         <>
           <StyledList>
@@ -53,11 +61,7 @@ export const RadioLabelOverview = ({
                 <Icon sdsIcon="check" sdsSize="xs" sdsType="static" />
               </StyledListItemIcon>
               <ListItemText>
-                <SmallText>
-                  Best for generating a summary tree of samples from your
-                  jurisdiction, in the context of genetically similar GISAID
-                  samples from outside of your jurisdiction.
-                </SmallText>
+                <SmallText>{overviewBestFor}</SmallText>
               </ListItemText>
             </StyledListItem>
             <StyledListItem>
@@ -65,9 +69,7 @@ export const RadioLabelOverview = ({
                 <Icon sdsIcon="check" sdsSize="xs" sdsType="static" />
               </StyledListItemIcon>
               <ListItemText>
-                <SmallText>
-                  Good for identifying possible local outbreaks.
-                </SmallText>
+                <SmallText>{overviewGoodFor1}</SmallText>
               </ListItemText>
             </StyledListItem>
             <StyledListItem>
@@ -75,10 +77,7 @@ export const RadioLabelOverview = ({
                 <Icon sdsIcon="check" sdsSize="xs" sdsType="static" />
               </StyledListItemIcon>
               <ListItemText>
-                <SmallText>
-                  Good for specifying lineage or collection date range to
-                  customize samples from your jurisdiction.
-                </SmallText>
+                <SmallText>{overviewGoodFor2}</SmallText>
               </ListItemText>
             </StyledListItem>
           </StyledList>
@@ -100,15 +99,19 @@ export const RadioLabelOverview = ({
 export const RadioLabelTargeted = ({
   selected,
 }: BaseTreeChoiceProps): JSX.Element => {
+  const pathogen = useSelector(selectCurrentPathogen);
+  const {
+    targetedDescription = "",
+    targetedBestFor = "",
+    targetedGoodFor = "",
+  } = pathogen ? pathogenStrings[pathogen] : {};
+
   return (
     <div>
       <Label>
         <LabelMain>Targeted </LabelMain>
       </Label>
-      <SmallText>
-        Includes selected samples and samples that are closely related to the
-        selected samples, at a ratio of roughly 1:2.
-      </SmallText>
+      <SmallText>{targetedDescription}</SmallText>
       {selected && (
         <List>
           <StyledListItem>
@@ -116,9 +119,7 @@ export const RadioLabelTargeted = ({
               <Icon sdsIcon="check" sdsSize="xs" sdsType="static" />
             </StyledListItemIcon>
             <ListItemText>
-              <SmallText>
-                Best for investigating an identified outbreak.
-              </SmallText>
+              <SmallText>{targetedBestFor}</SmallText>
             </ListItemText>
           </StyledListItem>
           <StyledListItem>
@@ -126,11 +127,7 @@ export const RadioLabelTargeted = ({
               <Icon sdsIcon="check" sdsSize="xs" sdsType="static" />
             </StyledListItemIcon>
             <ListItemText>
-              <SmallText>
-                Good for identifying samples most closely related to the
-                selected samples among all samples in GISAID and your CZ GEN EPI
-                samples.
-              </SmallText>
+              <SmallText>{targetedGoodFor}</SmallText>
             </ListItemText>
           </StyledListItem>
         </List>
@@ -149,15 +146,19 @@ export const RadioLabelNonContextualized = ({
   setStartDate,
   setEndDate,
 }: TreeChoiceWithFilteringProps): JSX.Element => {
+  const pathogen = useSelector(selectCurrentPathogen);
+  const {
+    nonContextualizedDescription = "",
+    nonContextualizedBestFor = "",
+    nonContextualizedGoodFor = "",
+    nonContextualizedNotRecommended = "",
+  } = pathogen ? pathogenStrings[pathogen] : {};
   return (
     <div>
       <Label>
         <LabelMain>Non-Contextualized </LabelMain>
       </Label>
-      <SmallText>
-        Includes samples from only your jurisdiction from both CZ GEN EPI and
-        GISAID.
-      </SmallText>
+      <SmallText>{nonContextualizedDescription}</SmallText>
       {selected && (
         <>
           <List>
@@ -166,9 +167,7 @@ export const RadioLabelNonContextualized = ({
                 <Icon sdsIcon="check" sdsSize="xs" sdsType="static" />
               </StyledListItemIcon>
               <ListItemText>
-                <SmallText>
-                  Best for uncovering sampling bias in your own sampling effort.
-                </SmallText>
+                <SmallText>{nonContextualizedBestFor}</SmallText>
               </ListItemText>
             </StyledListItem>
             <StyledListItem>
@@ -176,10 +175,7 @@ export const RadioLabelNonContextualized = ({
                 <Icon sdsIcon="check" sdsSize="xs" sdsType="static" />
               </StyledListItemIcon>
               <ListItemText>
-                <SmallText>
-                  Good for seeing viral diversity in your jurisdiction that may
-                  not be captured by your own sampling effort.
-                </SmallText>
+                <SmallText>{nonContextualizedGoodFor}</SmallText>
               </ListItemText>
             </StyledListItem>
             <StyledListItem>
@@ -187,11 +183,7 @@ export const RadioLabelNonContextualized = ({
                 <Icon sdsIcon="xMark" sdsSize="xs" sdsType="static" />
               </StyledListItemCloseIcon>
               <ListItemText>
-                <SmallText>
-                  Not recommended for epidemiological interpretation due to lack
-                  of visibility into viral diversity outside of your
-                  jurisdiction and omission of closely-related samples.
-                </SmallText>
+                <SmallText>{nonContextualizedNotRecommended}</SmallText>
               </ListItemText>
             </StyledListItem>
           </List>

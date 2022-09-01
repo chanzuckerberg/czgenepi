@@ -43,13 +43,9 @@ RUN apt-get -qq update && apt-get -qq -y install \
 ENV FLASK_ENV=development
 
 # Install poetry
-ENV POETRY_HOME /opt/poetry/
 RUN apt install -y libdigest-sha-perl
-RUN wget https://raw.githubusercontent.com/python-poetry/poetry/1.1.10/get-poetry.py && \
-    echo "e973b3badb95a916bfe250c22eeb7253130fd87312afa326eb02b8bdcea8f4a7  get-poetry.py" > get-poetry.py.sha256 && \
-    shasum -a 256 -c get-poetry.py.sha256 && \
-    python get-poetry.py && \
-    rm get-poetry*
+ENV POETRY_VERSION=1.1.15
+RUN python3 -m pip install poetry==$POETRY_VERSION
 
 RUN pip3 install nextstrain-cli csv-diff s3fs[boto3] aiobotocore[awscli,boto3] envdir fsspec pandas arrow
 
@@ -65,15 +61,15 @@ WORKDIR /usr/src/app
 COPY pyproject.toml poetry.lock environment.yaml ./
 COPY third-party ./third-party
 RUN wget https://github.com/chanzuckerberg/oso/archive/czge-oso25.zip -O oso.zip && \
-    unzip oso.zip && \
+    unzip -q oso.zip && \
     mv oso-czge-oso25/languages/python/sqlalchemy-oso sqlalchemy-oso && rm oso.zip
-RUN /opt/poetry/bin/poetry config virtualenvs.create false && \
-    /opt/poetry/bin/poetry install
+RUN poetry config virtualenvs.create false && \
+    poetry install
 ENV PYTHONPATH=.
 
 COPY . .
 # Install the aspen package
-RUN /opt/poetry/bin/poetry install
+RUN poetry install
 
 ARG HAPPY_BRANCH="unknown"
 ARG HAPPY_COMMIT="unknown"
