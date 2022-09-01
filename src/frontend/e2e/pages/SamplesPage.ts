@@ -163,71 +163,71 @@ export function validateCollectionOrSequenceDate(
 /*
   timeLapse = 7d,30d, 3m, 6m, 1y
   * */
-export async function measureDateTimes(page: Page, timeLapse: string) {
-  const today = new Date();
-  const collectionDates = await getCollectionDate(page);
-  const totalTime = parseInt(timeLapse.match(/[0-9]+/)?.toString()!);
-  const timeframe = timeLapse.split(/[0-9]+/)[1];
-  const timesOkFlags = [];
+// export async function measureDateTimes(page: Page, timeLapse: string) {
+//   const today = new Date();
+//   const collectionDates = await getCollectionDate(page);
+//   const totalTime = parseInt(timeLapse.match(/[0-9]+/)?.toString()!);
+//   const timeframe = timeLapse.split(/[0-9]+/)[1];
+//   const timesOkFlags = [];
 
-  for (let i = 0; i < collectionDates.length; i++) {
-    switch (timeframe) {
-      case "d":
-        const day = today.getDate();
-        const sampleDate = parseInt(collectionDates[i].split("-")[2]);
-        const dayDifference: number = day - sampleDate;
-        if (dayDifference <= totalTime) {
-          timesOkFlags.push(true);
-        } else {
-          timesOkFlags.push(false);
-        }
-        break;
+//   for (let i = 0; i < collectionDates.length; i++) {
+//     switch (timeframe) {
+//       case "d":
+//         const day = today.getDate();
+//         const sampleDate = parseInt(collectionDates[i].split("-")[2]);
+//         const dayDifference: number = day - sampleDate;
+//         if (dayDifference <= totalTime) {
+//           timesOkFlags.push(true);
+//         } else {
+//           timesOkFlags.push(false);
+//         }
+//         break;
 
-      case "m":
-        const monthlySample = new Date(
-          collectionDates[i].split("-")[0],
-          parseInt(collectionDates[i].split("-")[1]),
-          collectionDates[i].split("-")[2]
-        );
-        //new Date(2022,9,11)
-        const monthlyDiff = Math.abs(
-          new Date(
-            today.getFullYear(),
-            today.getMonth() + 1,
-            today.getDate()
-          ).getTime() - monthlySample.getTime()
-        );
-        const days = Math.ceil(monthlyDiff / (1000 * 3600 * 24));
+//       case "m":
+//         const monthlySample = new Date(
+//           collectionDates[i].split("-")[0],
+//           parseInt(collectionDates[i].split("-")[1]),
+//           collectionDates[i].split("-")[2]
+//         );
+//         //new Date(2022,9,11)
+//         const monthlyDiff = Math.abs(
+//           new Date(
+//             today.getFullYear(),
+//             today.getMonth() + 1,
+//             today.getDate()
+//           ).getTime() - monthlySample.getTime()
+//         );
+//         const days = Math.ceil(monthlyDiff / (1000 * 3600 * 24));
 
-        if (days <= totalTime * 30) {
-          timesOkFlags.push(true);
-        } else {
-          timesOkFlags.push(false);
-        }
-        break;
+//         if (days <= totalTime * 30) {
+//           timesOkFlags.push(true);
+//         } else {
+//           timesOkFlags.push(false);
+//         }
+//         break;
 
-      case "y":
-        const samDate = new Date(
-          collectionDates[i].split("-")[0],
-          collectionDates[i].split("-")[1],
-          collectionDates[i].split("-")[2]
-        );
-        const diff = Math.abs(
-          new Date(
-            today.getFullYear(),
-            today.getMonth() + 1,
-            today.getDate()
-          ).getTime() - samDate.getTime()
-        );
-        const diffDays = Math.ceil(diff / (1000 * 3600 * 24));
-        if (diffDays <= 366 * totalTime) {
-          timesOkFlags.push(true);
-        } else {
-          timesOkFlags.push(false);
-        }
-        break;
-      default:
-        break;
-    }
-  }
-}
+//       case "y":
+//         const samDate = new Date(
+//           collectionDates[i].split("-")[0],
+//           collectionDates[i].split("-")[1],
+//           collectionDates[i].split("-")[2]
+//         );
+//         const diff = Math.abs(
+//           new Date(
+//             today.getFullYear(),
+//             today.getMonth() + 1,
+//             today.getDate()
+//           ).getTime() - samDate.getTime()
+//         );
+//         const diffDays = Math.ceil(diff / (1000 * 3600 * 24));
+//         if (diffDays <= 366 * totalTime) {
+//           timesOkFlags.push(true);
+//         } else {
+//           timesOkFlags.push(false);
+//         }
+//         break;
+//       default:
+//         break;
+//     }
+//   }
+// }
