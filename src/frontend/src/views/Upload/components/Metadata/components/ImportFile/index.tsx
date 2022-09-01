@@ -96,7 +96,6 @@ export default function ImportFile({
   const handleFiles = async (files: FileList | null) => {
     if (!files) return;
     setIsLoading(true);
-    console.log({ isLoading });
 
     const result = await parseFile(files[0], stringToLocationFinder);
 
@@ -120,7 +119,6 @@ export default function ImportFile({
 
     handleMetadata(result);
     setIsLoading(false);
-    console.log("2", { isLoading });
   };
 
   return (

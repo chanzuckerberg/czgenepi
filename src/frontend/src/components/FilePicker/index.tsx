@@ -1,7 +1,7 @@
 import { Button } from "czifui";
 import { useRef, useState } from "react";
 import ConfirmDialog from "../ConfirmDialog";
-import { HiddenInput, StyledIcon } from "./style";
+import { HiddenInput } from "./style";
 
 interface Props {
   handleFiles: (files: FileList | null) => void;
@@ -62,13 +62,8 @@ export default function FilePicker({
         sdsStyle="square"
         onClick={shouldConfirm ? openDialog : handleClick}
         disabled={isLoading}
-        startIcon={
-          isLoading && (
-            <StyledIcon sdsIcon="loading" sdsSize="l" sdsType="static" />
-          )
-        }
       >
-        {isLoading ? "Loading" : text}
+        {isLoading ? "Loading..." : text}
       </Button>
 
       <HiddenInput
