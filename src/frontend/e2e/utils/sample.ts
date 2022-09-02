@@ -1,5 +1,7 @@
-import { faker } from "@faker-js/faker";
-const { request, expect } = require("@playwright/test");
+import * as faker from "@faker-js/faker";
+import { Route } from "next/dist/server/router";
+import { BrowserContext, Page } from "playwright";
+const { request, expect, context } = require("@playwright/test");
 const fs = require("fs");
 
 const defaultSequence =
@@ -8,7 +10,7 @@ const locationId = 166768;
 const storageStateFile = "e2e/storage/state.json";
 
 const storageState = fs.readFileSync(storageStateFile);
-export default abstract class SampleUtil {
+export class SampleUtil {
   /*
 This method generates sample data that can be used for uploading
 @param {number} total: total samples to generate, defaults to 1
@@ -121,63 +123,47 @@ This method generates sample data that can be used for uploading
   where it was saved when user first logged in. 
   @returns - project of the body json.
   */
-  public static async getSamples(): Promise<any> {
-    const groupId = process.env.GROUPID;
-    const endpoint = `/v2/orgs/74/samples/`;
-    //console.log(storageState)
-    const context = await request.newContext({
-      baseURL: "https://api.staging.czgenepi.org",
-      storageState: storageStateFile,
-    });
-    const response = await context.get(endpoint, {
-      //headers: SampleUtil.setHeaders(),
-    });
-    //expect(response.ok()).toBeTruthy();
-    console.log(response);
-    return response.json();
-  }
-
-  /*
-    Helper function for HTTP request headers. It reads cookie from file and attaches to the header
-    @return {object} return header object
-  */
-  public static setHeaders() {
-    let cookies = "OptanonAlertBoxClosed=2022-08-19T09:28:00.361Z; ";
-    cookies += "ajs_user_id=0g4u6x3nhde5p8m8wmad; ";
-    cookies += "ajs_anonymous_id=16229f03-caaf-4803-8d16-e39168c89339; ";
-    cookies += "OptanonConsent=isIABGlobal=false";
-    cookies +=
-      "&datestamp=Fri+Aug+29+2022+16%3A38%3A43+GMT%2B0100+(British+Summer+Time)";
-    cookies += "&version=6.34.0";
-    cookies += "&hosts=&landingPath=NotLandingPage";
-    cookies += "&groups=C0001%3A1%2CC0002%3A1";
-    cookies += "&geolocation=GB%3BENG";
-    cookies += "&AwaitingReconsent=false; ";
-    cookies += `session=.eJx9kG9LwzAQxr9LYH2zua6trWuhiEqrMsShTtnelCw5u3RpUpPsjxv77maFwV6okOPgntzd7549KrTBBgq8MotB4T3WH5mE7WY8_RpVVRAsF5PsCh7uBuw5MyjZI4oNPmYhBQGUIDzLR3Rq3ptKh5M3fa85F6iHFFCmgJhipZj9tTCm0Ynr4ob17b6SibJPdiUIsAWpSnftu0cCl2DO55gs7YiV4medRK4ZNcpKoC5OI1roPpF12ywV28G1At1IoaEw3w2kRFJwCGcgTMFoOn0c3e4osE35Kp9mw2EuvTwKszn1opcqrMfOOXfa7u4ENx0_t-8vdiut_aNuEWw6XeBoIi2ADcFot1Hyk3HoQo0Zd1rL0__NdlqH01_9PfQQbBuUeFHkxaEf-F7fu4yDOB4eDj9MQ6JR.Yw9TNA.RDYpTy8es0ScAMxz3n3cpcS6Cr8`;
-    console.log(cookies);
-    return {
-      accept: "*/*",
-      cookie: cookies,
-    };
-  }
-
-  public static getGroupId() {
-    if (process.env.GROUPID === undefined) return process.env.GROUPID;
-    SampleUtil.getUserDetails().then((data) => {
-      return data.group.id;
+  public static async getSamples(context: BrowserContext) {
+    const url = `${process.env.BASEAPI}/v2/orgs/${process.env.GROUPID}/pathogens/SC2/samples/`;
+    // await page.evaluate(async (url) => {
+    //   return await fetch(url, { method: "GET" })
+    //     .then(r => r.ok ? r.json() : Promise.reject(r))
+    // }, url)
+    console.log("******************");
+    await context.route(url, async (route) => {
+      console.log("******************");
+      const response = await context.request.fetch(route.request());
+      expect(response.ok()).toBeTruthy();
+      console.log(response);
+      console.log("******************");
+      return response.json();
     });
   }
 
-  public static async getUserDetails() {
+  async getUserDetails(page: Page) {
     const endpoint = `/v2/users/me`;
-    const context = await request.newContext({
-      baseURL: process.env.BASEAPI,
+    await page.evaluate(async () => {
+      return await fetch(`${process.env.BASEAPI}${endpoint}`, {
+        method: "GET",
+      }).then((r) => (r.ok ? r.json() : Promise.reject(r)));
     });
-    const response = await context.get(endpoint, {
-      headers: SampleUtil.setHeaders(),
-    });
-    expect(response.ok()).toBeTruthy();
-    return response.json();
+  }
+
+  async mockGetSampleApi(
+    page: Page,
+    mockData: Array<SampleData>,
+    groupId: number = 74
+  ) {
+    const url = `${process.env.BASEAPI}/v2/orgs/${groupId}/pathogens/SC2/samples/`;
+    await page.route(url, (route) =>
+      route.fulfill({
+        contentType: "application/json",
+        body: JSON.stringify(mockData),
+      })
+    );
+    await page.goto(
+      `${process.env.BASEURL}/data/samples/${groupId}/74/pathogen/covid`
+    );
   }
 }
 

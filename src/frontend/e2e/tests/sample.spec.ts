@@ -16,7 +16,6 @@ const tableHeaders = [
 
 test.describe("Samples page tests", () => {
   test.beforeEach(async ({ page }, testInfo) => {
-    console.log(`Running ${testInfo.title}`);
     await page.goto("https://staging.czgenepi.org/data/samples");
   });
   test("Should verify sample listing", async ({ page }: { page: Page }) => {
