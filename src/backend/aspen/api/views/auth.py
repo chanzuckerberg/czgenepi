@@ -16,7 +16,7 @@ from starlette.responses import Response
 import aspen.api.error.http_exceptions as ex
 from aspen.api.authn import get_auth0_apiclient, get_auth_user, get_cookie_userid
 from aspen.api.deps import get_auth0_client, get_db, get_settings, get_splitio
-from aspen.api.settings import Settings
+from aspen.api.settings import APISettings
 from aspen.auth.auth0_management import Auth0Client, Auth0Org, Auth0OrgInvitation
 from aspen.auth.role_manager import RoleManager
 from aspen.database.models import Group, User
@@ -50,7 +50,7 @@ def get_invitation_ticket(
 
 async def get_invitation_redirect(
     oauth: StarletteOAuth2App,
-    settings: Settings,
+    settings: APISettings,
     a0: Auth0Client,
     db: AsyncSession,
     request: Request,
@@ -118,7 +118,7 @@ async def login(
     organization_name: Optional[str] = None,
     oauth: StarletteOAuth2App = Depends(get_auth0_client),
     a0: Auth0Client = Depends(get_auth0_apiclient),
-    settings: Settings = Depends(get_settings),
+    settings: APISettings = Depends(get_settings),
     cookie_userid: Optional[str] = Depends(get_cookie_userid),
 ) -> Response:
     kwargs = {}
@@ -201,7 +201,7 @@ async def auth(
     db: AsyncSession = Depends(get_db),
     a0: Auth0Client = Depends(get_auth0_apiclient),
     error_description: Optional[str] = None,
-    settings: Settings = Depends(get_settings),
+    settings: APISettings = Depends(get_settings),
 ) -> Response:
     if error_description:
         # Note: Auth0 sends the message "invitation not found or already used" for *both* expired and
@@ -269,7 +269,7 @@ async def process_invitation(
     organization_name: Optional[str] = None,
     oauth: StarletteOAuth2App = Depends(get_auth0_client),
     a0: Auth0Client = Depends(get_auth0_apiclient),
-    settings: Settings = Depends(get_settings),
+    settings: APISettings = Depends(get_settings),
     user=Depends(get_auth_user),
 ) -> Response:
     # Load more information about the invitation from auth0
@@ -329,7 +329,7 @@ async def process_invitation(
 
 @router.get("/logout")
 async def logout(
-    request: Request, settings: Settings = Depends(get_settings)
+    request: Request, settings: APISettings = Depends(get_settings)
 ) -> Response:
     # Clear session stored data
     request.session.pop("jwt_payload", None)

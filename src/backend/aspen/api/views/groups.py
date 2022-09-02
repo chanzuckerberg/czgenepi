@@ -20,7 +20,7 @@ from aspen.api.schemas.usergroup import (
     GroupMembersResponse,
     InvitationsResponse,
 )
-from aspen.api.settings import Settings
+from aspen.api.settings import APISettings
 from aspen.auth.auth0_management import Auth0Client, Auth0Org
 from aspen.database.models import Group, User, UserRole
 
@@ -120,7 +120,7 @@ async def invite_group_members(
     group_invitation_request: GroupInvitationsRequest,
     auth0_client: Auth0Client = Depends(get_auth0_apiclient),
     group: Group = Depends(fetch_authorized_row("invite_members", Group, "group_id")),
-    settings: Settings = Depends(get_settings),
+    settings: APISettings = Depends(get_settings),
     user: User = Depends(get_auth_user),
 ) -> GroupInvitationsResponse:
     organization = auth0_client.get_org_by_id(group.auth0_org_id)

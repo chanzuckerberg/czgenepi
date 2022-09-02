@@ -122,11 +122,11 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
         />
         <ContentWrapper>
           <StyledFilePicker
-            text={isLoadingFile ? "Loading..." : "Select Sample Files"}
+            text={"Select Sample Files"}
             multiple
             handleFiles={handleFileChange}
             accept=".fasta,.fa,.txt,.gz,.zip"
-            isDisabled={isLoadingFile}
+            isLoading={isLoadingFile}
           />
           {parseErrors && (
             <AlertAccordion

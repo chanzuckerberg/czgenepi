@@ -27,6 +27,10 @@ class Pathogen(idbase):  # type: ignore
         comment=("full pathogen abbreviated name, ex: SARS-CoV-2"),
     )
 
+    samples = relationship("Sample", back_populates="pathogen")  # type: ignore
+    phylo_runs = relationship("PhyloRun", back_populates="pathogen")  # type: ignore
+    phylo_trees = relationship("PhyloTree", back_populates="pathogen")  # type: ignore
+
 
 class PathogenRepoConfig(idbase):  # type: ignore
     """pathogen specific data required for interacting with public databases such as GISAID and GenBank"""

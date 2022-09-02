@@ -13,6 +13,48 @@
     treatment: "on"
 - test_feature:
     treatment: "off"
-- pathogen_feature:
+- PATHOGEN_lineage_caller:
+    treatment: "Pangolin"
+    keys: "SC2"
+- PATHOGEN_lineage_caller:
+    treatment: "ncov"
+    keys: "MPX"
+- PATHOGEN_lineage_caller:
+    # default value
+    treatment: "ncov"
+- PATHOGEN_galago_linkout:
     treatment: "on"
     keys: "SC2"
+- PATHOGEN_galago_linkout:
+    treatment: "off"
+    keys: "MPX"
+- PATHOGEN_galago_linkout:
+    # default value
+    treatment: "off"
+- PATHOGEN_lineage_filter_enabled:
+    treatment: "on"
+    keys: "SC2"
+- PATHOGEN_lineage_filter_enabled:
+    treatment: "off"
+    keys: "MPX"
+- PATHOGEN_lineage_filter_enabled:
+    # default value
+    treatment: "off"
+- PATHOGEN_public_repository:
+    treatment: "GISAID"
+    keys: "SC2" 
+- PATHOGEN_public_repository:
+    treatment: "GenBank"
+    keys: "MPX"
+- PATHOGEN_public_repository:
+    # default value
+    treatment: "GenBank"
+- PATHOGEN_usher_linkout:
+    treatment: "on"
+    keys: "SC2"
+- PATHOGEN_usher_linkout:
+    treatment: "off"
+    keys: "MPX"
+- PATHOGEN_usher_linkout:
+    # default value
+    treatment: "off"
