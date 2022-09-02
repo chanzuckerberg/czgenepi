@@ -29,7 +29,8 @@
     "types": [
       "jest",
       "playwright"
-    ]
+    ],
+    "incremental": false
   },
   "exclude": [
     "node_modules",
