@@ -3,19 +3,21 @@ from typing import Any, Mapping
 import dateparser
 import yaml
 
-from aspen.database.models import Group
+from aspen.database.models import Group, Pathogen
 
 
 class BaseNextstrainConfigBuilder:
     def __init__(
         self,
         template_file: str,
+        pathogen: Pathogen,
         group: Group,
         template_args: Mapping[str, Any],
         **kwargs: Mapping[str, Any]
     ):
         self.template_file = template_file
         self.group = group
+        self.pathogen = pathogen
         self.template_args = template_args
         self.template = None
         self.tree_build_level = "location"

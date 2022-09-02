@@ -58,6 +58,7 @@ def cli(
             session.query(PhyloRun)
             .filter(PhyloRun.workflow_id == phylo_run_id)
             .options(
+                joinedload(PhyloRun.pathogen),
                 joinedload(PhyloRun.inputs.of_type(UploadedPathogenGenome))
                 # load the sample that this uploaded pathogen genome was associated with
                 .subqueryload(UploadedPathogenGenome.sample)
@@ -100,6 +101,7 @@ def cli(
             name=phylo_run.name,
             group=phylo_run.group,
             tree_type=phylo_run.tree_type,
+            pathogen=phylo_run.pathogen,
         )
 
         # update the run object with the metadata about the run.
