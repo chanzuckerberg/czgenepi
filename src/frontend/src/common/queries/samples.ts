@@ -22,31 +22,47 @@ import { ENTITIES } from "./entities";
 import { MutationCallbacks } from "./types";
 
 /**
- * Download fasta file for samples
+ * Download fasta file, GISAID template or Genbank template for samples
  */
-
-type FileDownloadEndpointType =
-  | ORG_API.SAMPLES_FASTA_DOWNLOAD
-  | ORG_API.SAMPLES_GENBANK_DOWNLOAD
-  | ORG_API.SAMPLES_GISAID_DOWNLOAD;
+export enum PUBLIC_REPOSITORY_NAME {
+  GENBANK = "GenBank",
+  GISAID = "GISAID",
+}
 interface SampleFileDownloadType {
-  endpoint: FileDownloadEndpointType;
+  publicRepositoryName?: PUBLIC_REPOSITORY_NAME;
   sampleIds: string[];
 }
-type FileDownloadCallbacks = MutationCallbacks<Blob>;
+
+export interface FileDownloadResponsePayload {
+  data: Blob;
+  filename?: string;
+}
+
+type FileDownloadCallbacks = {
+  componentOnError: () => void;
+  componentOnSuccess: ({data, filename}: FileDownloadResponsePayload) => void;
+}
 
 export async function downloadSamplesFile({
-  endpoint,
+  publicRepositoryName,
   sampleIds,
-}: SampleFileDownloadType): Promise<Blob> {
+}: SampleFileDownloadType): Promise<FileDownloadResponsePayload> {
   const payload = {
+    public_repository_name: publicRepositoryName,
     sample_ids: sampleIds,
   };
-  const response = await fetch(API_URL + generateOrgSpecificUrl(endpoint), {
+
+  const response = await fetch(API_URL + generateOrgSpecificUrl(ORG_API.SAMPLES_FASTA_DOWNLOAD), {
     ...DEFAULT_POST_OPTIONS,
     body: JSON.stringify(payload),
   });
-  if (response.ok) return await response.blob();
+
+  if (response.ok) {
+    // TODO: update filename when header is exposed
+    const filename = 'test';
+    const data = await response.blob();
+    return {data, filename}
+  }
 
   throw Error(`${response.statusText}: ${await response.text()}`);
 }
@@ -55,7 +71,7 @@ export function useFileDownload({
   componentOnError,
   componentOnSuccess,
 }: FileDownloadCallbacks): UseMutationResult<
-  Blob,
+  FileDownloadResponsePayload,
   unknown,
   SampleFileDownloadType,
   unknown

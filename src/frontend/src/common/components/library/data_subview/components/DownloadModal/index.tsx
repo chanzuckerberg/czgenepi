@@ -13,7 +13,7 @@ import DialogActions from "src/common/components/library/Dialog/components/Dialo
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import { useUserInfo } from "src/common/queries/auth";
-import { useFileDownload } from "src/common/queries/samples";
+import { FileDownloadResponsePayload, PUBLIC_REPOSITORY_NAME, useFileDownload } from "src/common/queries/samples";
 import { B } from "src/common/styles/basicStyle";
 import {
   StyledCloseIconButton,
@@ -130,7 +130,7 @@ const DownloadModal = ({
         setShouldShowError(true);
         handleCloseModal();
       },
-      componentOnSuccess: (data: Blob) => {
+      componentOnSuccess: ({data, filename}: FileDownloadResponsePayload) => {
         // TODO (mlila): may need to modify behavior here for gisaid/genbank multi-file download
         const link = document.createElement("a");
         link.href = window.URL.createObjectURL(data);
@@ -360,21 +360,20 @@ const DownloadModal = ({
       if (isFastaSelected) {
         fastaDownloadMutation.mutate({
           sampleIds: checkedSampleIds,
-          endpoint: ORG_API.SAMPLES_FASTA_DOWNLOAD,
         });
       }
 
       if (isGisaidSelected) {
         gisaidDownloadMutation.mutate({
           sampleIds: checkedSampleIds,
-          endpoint: ORG_API.SAMPLES_GISAID_DOWNLOAD,
+          publicRepositoryName: PUBLIC_REPOSITORY_NAME.GISAID,
         });
       }
 
       if (isGenbankSelected) {
         genbankDownloadMutation.mutate({
           sampleIds: checkedSampleIds,
-          endpoint: ORG_API.SAMPLES_GENBANK_DOWNLOAD,
+          publicRepositoryName: PUBLIC_REPOSITORY_NAME.GENBANK,
         });
       }
 
