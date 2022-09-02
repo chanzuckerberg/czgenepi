@@ -1,6 +1,6 @@
 import datetime
 import threading
-from typing import Any, List, Mapping, MutableSequence, Optional, Set, Union
+from typing import Any, List, Mapping, MutableSequence, Optional, Set, Type, Union
 
 import sentry_sdk
 import sqlalchemy as sa
@@ -21,6 +21,7 @@ from aspen.api.schemas.samples import (
     SampleDeleteResponse,
     SampleResponse,
     SamplesResponse,
+    SubmissionTemplateRequest,
     UpdateSamplesRequest,
     ValidateIDsRequest,
     ValidateIDsResponse,
@@ -29,10 +30,15 @@ from aspen.api.settings import APISettings
 from aspen.api.utils import (
     check_duplicate_samples,
     check_duplicate_samples_in_request,
+    collect_submission_information,
     determine_gisaid_status,
+    GenBankSubmissionFormTSVStreamer,
     get_matching_gisaid_ids,
     get_matching_gisaid_ids_by_epi_isl,
     get_missing_and_found_sample_ids,
+    GisaidSubmissionFormTSVStreamer,
+    sample_info_to_genbank_rows,
+    sample_info_to_gisaid_rows,
     samples_by_identifiers,
 )
 from aspen.database.models import Group, Location, Sample, UploadedPathogenGenome, User
@@ -339,3 +345,54 @@ async def create_samples(
     pangolin_job.start()
 
     return result
+
+
+@router.post("/submission_template")
+async def fill_submission_template(
+    request_data: SubmissionTemplateRequest,
+    db: AsyncSession = Depends(get_db),
+    az: AuthZSession = Depends(get_authz_session),
+    ac: AuthContext = Depends(get_auth_context),
+):
+    sample_ids: Set[str] = {item for item in request_data.sample_ids}
+
+    # get all samples from request that the user has permission to use and scope down
+    # the search for matching ID's to groups that the user has read access to.
+    user_visible_samples_query = await samples_by_identifiers(az, sample_ids)
+    user_visible_samples_res = await (
+        db.execute(
+            user_visible_samples_query.options(selectinload(Sample.collection_location))
+        )
+    )
+    user_visible_samples = user_visible_samples_res.scalars().all()
+
+    if not ac.group:
+        raise ex.ServerException("No group for user.")
+
+    submission_information = collect_submission_information(
+        ac.user, ac.group, user_visible_samples
+    )
+
+    # Affix GISAID prefixes to public ids and translate to GISAID fields
+    metadata_rows: list[dict[str, str]] = []
+    filename: str = ""
+    tsv_streamer: Union[
+        Type[GisaidSubmissionFormTSVStreamer], Type[GenBankSubmissionFormTSVStreamer]
+    ]
+    if request_data.public_repository_name.lower() == "gisaid":
+        metadata_rows = sample_info_to_gisaid_rows(
+            submission_information, request_data.date.strftime("%Y%m%d")
+        )
+        metadata_rows.sort(key=lambda row: row.get("covv_virus_name"))  # type: ignore
+        filename = f"{request_data.date.strftime('%Y%m%d')}_GISAID_metadata.csv"  # yes, we want a TSV with a .csv extension
+        tsv_streamer = GisaidSubmissionFormTSVStreamer
+    elif request_data.public_repository_name.lower() == "genbank":
+        metadata_rows = sample_info_to_genbank_rows(submission_information)
+        metadata_rows.sort(key=lambda row: row.get("Sequence_ID"))  # type: ignore
+        filename = f"{request_data.date.strftime('%Y%m%d')}_GenBank_metadata.tsv"
+        tsv_streamer = GenBankSubmissionFormTSVStreamer
+
+    if request_data.page:
+        filename = filename.replace("metadata.", f"metadata_{request_data.page}.")
+    file_streamer = tsv_streamer(filename, metadata_rows)
+    return file_streamer.get_response()

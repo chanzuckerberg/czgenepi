@@ -1,5 +1,15 @@
 from collections import Counter
-from typing import Any, Dict, List, Mapping, Optional, Set, Tuple, TYPE_CHECKING
+from typing import (
+    Any,
+    Dict,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    TYPE_CHECKING,
+)
 
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -7,7 +17,7 @@ from sqlalchemy.orm.query import Query
 from sqlalchemy.sql.expression import or_
 
 from aspen.api.authz import AuthZSession
-from aspen.database.models import Accession, AccessionType, Sample
+from aspen.database.models import Accession, AccessionType, Group, Sample, User
 
 if TYPE_CHECKING:
     from aspen.api.schemas.samples import CreateSampleRequest
@@ -173,3 +183,68 @@ def format_sample_lineage(sample: Sample) -> Dict[str, Any]:
             lineage["scorpio_support"] = float(pango_output.get("scorpio_support"))  # type: ignore
 
     return lineage
+
+
+def collect_submission_information(
+    user: User, group: Group, samples: Sequence[Sample]
+) -> List[Dict[str, Any]]:
+    submission_information: List[Dict[str, Any]] = []
+
+    for sample in samples:
+        sample_info = {}
+        sample_location = getattr(sample, "collection_location")
+        if not sample_location:
+            sample_location = {}
+        sample_info = {
+            "gisaid_submitter_id": getattr(user, "gisaid_submitter_id", ""),
+            "public_identifier": sample.public_identifier,
+            "collection_date": sample.collection_date,
+            "submitting_lab": getattr(group, "submitting_lab")
+            if getattr(group, "submitting_lab")
+            else group.name,
+            "group_address": getattr(group, "address", ""),
+            "region": getattr(sample_location, "region", ""),
+            "country": getattr(sample_location, "country", ""),
+            "division": getattr(sample_location, "division", ""),
+            "location": getattr(sample_location, "location", ""),
+        }
+        submission_information.append(sample_info)
+
+    return submission_information
+
+
+def sample_info_to_gisaid_rows(
+    submission_information: List[Dict[str, Any]], today: str
+) -> List[Dict[str, str]]:
+    gisaid_metadata_rows = []
+    for sample_info in submission_information:
+        gisaid_location = " / ".join(
+            [sample_info[key] for key in ["region", "country", "division", "location"]]
+        )
+        metadata_row = {
+            "submitter": sample_info["gisaid_submitter_id"],
+            "fn": f"{today}_GISAID_sequences.fasta",
+            "covv_virus_name": f"hCoV-19/{sample_info['public_identifier']}",
+            "covv_location": gisaid_location,
+            "covv_collection_date": sample_info["collection_date"].strftime("%Y-%m-%d"),
+            "covv_subm_lab": sample_info["submitting_lab"],
+            "covv_subm_lab_addr": sample_info["group_address"],
+        }
+        gisaid_metadata_rows.append(metadata_row)
+    return gisaid_metadata_rows
+
+
+def sample_info_to_genbank_rows(
+    submission_information: List[Dict[str, Any]]
+) -> List[Dict[str, str]]:
+    genbank_metadata_rows = []
+    for sample_info in submission_information:
+        genbank_location = f"{sample_info['country']}: {sample_info['division']}, {sample_info['location']}"
+        metadata_row = {
+            "Sequence_ID": f"SARS-CoV-2/{sample_info['public_identifier']}",
+            "collection-date": sample_info["collection_date"].strftime("%Y-%m-%d"),
+            "country": genbank_location,
+            "isolate": f"SARS-CoV-2/{sample_info['public_identifier']}",
+        }
+        genbank_metadata_rows.append(metadata_row)
+    return genbank_metadata_rows
