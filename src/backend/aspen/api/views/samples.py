@@ -32,6 +32,7 @@ from aspen.api.utils import (
     check_duplicate_samples_in_request,
     collect_submission_information,
     determine_gisaid_status,
+    FieldSeparatedStreamer,
     GenBankSubmissionFormTSVStreamer,
     get_matching_gisaid_ids,
     get_matching_gisaid_ids_by_epi_isl,
@@ -360,32 +361,37 @@ async def fill_submission_template(
     # the search for matching ID's to groups that the user has read access to.
     user_visible_samples_query = await samples_by_identifiers(az, sample_ids)
     user_visible_samples_res = await (
-        db.execute(user_visible_samples_query.joinedload(Location))
+        db.execute(
+            user_visible_samples_query.options(selectinload(Sample.collection_location))
+        )
     )
     user_visible_samples = user_visible_samples_res.scalars().all()
+
+    if not ac.group:
+        raise ex.ServerException("No group for user.")
 
     submission_information = collect_submission_information(
         ac.user, ac.group, user_visible_samples
     )
 
     # Affix GISAID prefixes to public ids and translate to GISAID fields
-    today = request_data.date.strftime("%Y%m%d")
-    metadata_rows: Sequence[Dict[str, str]] = []
-    filename: str = f""
-    streamer: Optional[FieldSeparatedStreamer]
+    metadata_rows: list[dict[str, str]] = []
+    filename: str = ""
+    tsv_streamer: Optional[FieldSeparatedStreamer]
     if request_data.public_repository_name.lower() == "gisaid":
-        metadata_rows = sample_info_to_gisaid_rows(submission_information, today)
-        metadata_rows.sort(key=lambda row: row.get("covv_virus_name"))
-        filename: str = (
-            f"{today}_GISAID_metadata.csv"  # yes, we want a TSV with a .csv extension
+        metadata_rows = sample_info_to_gisaid_rows(
+            submission_information, request_data.date.strftime("%Y%m%d")
         )
-        streamer = GisaidSubmissionFormTSVStreamer(filename, metadata_rows)
+        metadata_rows.sort(key=lambda row: row.get("covv_virus_name"))
+        filename = f"{request_data.date.strftime('%Y%m%d')}_GISAID_metadata.csv"  # yes, we want a TSV with a .csv extension
+        tsv_streamer = GisaidSubmissionFormTSVStreamer
     elif request_data.public_repository_name.lower() == "genbank":
         metadata_rows = sample_info_to_genbank_rows(submission_information)
         metadata_rows.sort(key=lambda row: row.get("Sequence_ID"))
-        filename = f"{today}_GenBank_metadata.tsv"
-        streamer = GenBankSubmissionFormTSVStreamer(filename, metadata_rows)
+        filename = f"{request_data.date.strftime('%Y%m%d')}_GenBank_metadata.tsv"
+        tsv_streamer = GenBankSubmissionFormTSVStreamer
 
     if request_data.page:
-        filename = filename.replace("metadata.csv", f"metadata_{request_data.page}.csv")
-    return streamer.get_response()
+        filename = filename.replace("metadata.", f"metadata_{request_data.page}.")
+    file_streamer = tsv_streamer(filename, metadata_rows)
+    return file_streamer.get_response()

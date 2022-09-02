@@ -192,21 +192,21 @@ def collect_submission_information(
 
     for sample in samples:
         sample_info = {}
-        sample_location = sample.get("collection_location")
+        sample_location = getattr(sample, "collection_location")
         if not sample_location:
             sample_location = {}
         sample_info = {
-            "gisaid_submitter_id": user.get("gisaid_submitter_id"),
+            "gisaid_submitter_id": getattr(user, "gisaid_submitter_id", ""),
             "public_identifier": sample.public_identifier,
             "collection_date": sample.collection_date,
-            "submitting_lab": group.get("submitting_lab")
-            if group.get("submitting_lab")
+            "submitting_lab": getattr(group, "submitting_lab")
+            if getattr(group, "submitting_lab")
             else group.name,
-            "group_address": group.get("address"),
-            "region": sample_location.get("region", ""),
-            "country": sample_location.get("country", ""),
-            "division": sample_location.get("division", ""),
-            "location": sample_location.get("location", ""),
+            "group_address": getattr(group, "address", ""),
+            "region": getattr(sample_location, "region", ""),
+            "country": getattr(sample_location, "country", ""),
+            "division": getattr(sample_location, "division", ""),
+            "location": getattr(sample_location, "location", ""),
         }
         submission_information.append(sample_info)
 
@@ -218,7 +218,7 @@ def sample_info_to_gisaid_rows(
 ) -> Sequence[Dict[str, str]]:
     gisaid_metadata_rows = []
     for sample_info in submission_information:
-        gisaid_location = "/".join(
+        gisaid_location = " / ".join(
             [sample_info[key] for key in ["region", "country", "division", "location"]]
         )
         metadata_row = {
@@ -226,7 +226,7 @@ def sample_info_to_gisaid_rows(
             "fn": f"{today}_GISAID_sequences.fasta",
             "covv_virus_name": f"hCoV-19/{sample_info['public_identifier']}",
             "covv_location": gisaid_location,
-            "covv_collection_date": sample_info["collection_date"],  # FIX FORMAT
+            "covv_collection_date": sample_info["collection_date"].strftime("%Y-%m-%d"),
             "covv_subm_lab": sample_info["submitting_lab"],
             "covv_subm_lab_addr": sample_info["group_address"],
         }
@@ -242,7 +242,7 @@ def sample_info_to_genbank_rows(
         genbank_location = f"{sample_info['country']}: {sample_info['division']}, {sample_info['location']}"
         metadata_row = {
             "Sequence_ID": f"SARS-CoV-2/{sample_info['public_identifier']}",
-            "collection-date": sample_info["collection_date"],  # FIX FORMAT
+            "collection-date": sample_info["collection_date"].strftime("%Y-%m-%d"),
             "country": genbank_location,
             "isolate": f"SARS-CoV-2/{sample_info['public_identifier']}",
         }
