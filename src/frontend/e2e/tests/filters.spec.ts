@@ -1,8 +1,8 @@
 import {test,expect} from '@playwright/test'
 import {SamplesPage} from '../pages/SamplesPage'
-import {login} from '../utils/login';
-import path from 'path';
-import * as dotenv from 'dotenv' 
+import {login} from '../utils/login'
+import path from 'path'
+import * as dotenv from 'dotenv'
 dotenv.config({path:path.join(__dirname,'../.env')});
 
 

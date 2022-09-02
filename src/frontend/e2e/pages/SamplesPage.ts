@@ -88,8 +88,9 @@ export class SamplesPage {
 
     async filterCollectionDate(filterDate:string){
       await this.collectionDateDropDown.click();
-      const periods =  await this.page.locator("div[style*='194'] span > span");
-      periods.filter({ hasText: filterDate }).click();
+     // const periods =  await this.page.locator("div[style*='194'] span > span");
+     // periods.filter({ hasText: filterDate }).click();
+     this.page.locator("div[style*='194'] span > span").filter({ hasText: filterDate }).click();
       await this.page.waitForTimeout(2000);
    }
 
@@ -102,8 +103,7 @@ export class SamplesPage {
    
     async getCollectionDate(): Promise<any[]>{
     await this.page.waitForTimeout(2000);
-    const dates = this.collectionDateList.allTextContents();
-    return dates;
+    return this.collectionDateList.allTextContents();
   }
 
     /*
@@ -117,18 +117,14 @@ export class SamplesPage {
     async measureDateTimes(timeLapse: string): Promise<boolean>{
     const today = new Date();
     const collectionDates = await this.getCollectionDate();
-    const totalTime  = parseInt(timeLapse.match(/[0-9]+/)?.toString()!)
+    const totalTime  = parseInt(timeLapse.match(/[0-9]+/)?.toString() as string);
     const timeframe = timeLapse.split(/[0-9]+/)[1];
-    let timesOkFlags = [];
+    const timesOkFlags = [];
 
     for(let i = 0; i < collectionDates.length; i++){
       switch(timeframe){
         case 'd':
-          const day = today.getDate();
-          const sampleDate = parseInt(collectionDates[i].split('-')[2]);
-          let dayDifference: number = day - sampleDate;
-          if(dayDifference < 0)dayDifference *= -1;
-          if(dayDifference <= totalTime){
+          if(today.getDate() - parseInt(collectionDates[i].split('-')[2]) <= totalTime){
             timesOkFlags.push(true);
           }else{
             timesOkFlags.push(false);
@@ -136,11 +132,7 @@ export class SamplesPage {
           break;
 
         case 'm':
-          const monthlySample = new Date(collectionDates[i].split('-')[0],(parseInt(collectionDates[i].split('-')[1])),collectionDates[i].split('-')[2]);
-          //new Date(2022,9,11)
-          const monthlyDiff = Math.abs(new Date(today.getFullYear(),(today.getMonth()+1),today.getDate()).getTime() - monthlySample.getTime());
-          const days = Math.ceil(monthlyDiff / (1000 * 3600 * 24));
-          if(days <= (totalTime*30)){
+         if((Math.abs(new Date(today.getFullYear(),(today.getMonth()+1),today.getDate()).getTime() - new Date(collectionDates[i].split('-')[0],(parseInt(collectionDates[i].split('-')[1])),collectionDates[i].split('-')[2]).getTime() ) <= (totalTime*30))){
             timesOkFlags.push(true);
           }else{
             timesOkFlags.push(false);
@@ -148,10 +140,7 @@ export class SamplesPage {
           break;
 
         case 'y':
-            const samDate = new Date(collectionDates[i].split('-')[0],collectionDates[i].split('-')[1],collectionDates[i].split('-')[2]);
-            const diff = Math.abs(new Date(today.getFullYear(),(today.getMonth()+1),today.getDate()).getTime() - samDate.getTime());
-            const diffDays = Math.ceil(diff / (1000 * 3600 * 24));
-            if(diffDays <= (366*totalTime)){
+            if((Math.abs(new Date(today.getFullYear(),(today.getMonth()+1),today.getDate()).getTime() - new Date(collectionDates[i].split('-')[0],collectionDates[i].split('-')[1],collectionDates[i].split('-')[2]).getTime()) <= (366*totalTime))){
               timesOkFlags.push(true);
             }else{
               timesOkFlags.push(false);
@@ -164,3 +153,4 @@ export class SamplesPage {
     return timesOkFlags.some(validDate =>{validDate === false});
   }
 }
+

@@ -15,7 +15,7 @@ export class LoginPage {
     this.continueButton = page.locator("main.login button[type='submit']");
   }
 
-  async login(username: string, password: string) {
+  async login(username: string, password: string): Promise<void> {
     await this.page.goto("https://staging.czgenepi.org/");
     await this.signButton.click();
     await this.usernameInput.type(username);
