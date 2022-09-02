@@ -88,6 +88,7 @@ async def prepare_sequences_download(
     db.expunge_all()
     generator = stream_samples()
     resp = StreamingResponse(generator, media_type="application/binary")
+    resp.headers["Access-Control-Expose-Headers"] = "Content-Disposition"
     resp.headers["Content-Disposition"] = f"attachment; filename={fasta_filename}"
     return resp
 
