@@ -35,13 +35,13 @@ interface SampleFileDownloadType {
 
 export interface FileDownloadResponsePayload {
   data: Blob;
-  filename?: string;
+  filename?: string | null;
 }
 
 type FileDownloadCallbacks = {
   componentOnError: () => void;
-  componentOnSuccess: ({data, filename}: FileDownloadResponsePayload) => void;
-}
+  componentOnSuccess: ({ data, filename }: FileDownloadResponsePayload) => void;
+};
 
 export async function downloadSamplesFile({
   publicRepositoryName,
@@ -52,16 +52,22 @@ export async function downloadSamplesFile({
     sample_ids: sampleIds,
   };
 
-  const response = await fetch(API_URL + generateOrgSpecificUrl(ORG_API.SAMPLES_FASTA_DOWNLOAD), {
-    ...DEFAULT_POST_OPTIONS,
-    body: JSON.stringify(payload),
-  });
+  const response = await fetch(
+    API_URL + generateOrgSpecificUrl(ORG_API.SAMPLES_FASTA_DOWNLOAD),
+    {
+      ...DEFAULT_POST_OPTIONS,
+      body: JSON.stringify(payload),
+    }
+  );
 
   if (response.ok) {
     // TODO: update filename when header is exposed
-    const filename = 'test';
+    const filename = response.headers
+      .get("content-disposition")
+      ?.split("filename=")[1];
+
     const data = await response.blob();
-    return {data, filename}
+    return { data, filename };
   }
 
   throw Error(`${response.statusText}: ${await response.text()}`);

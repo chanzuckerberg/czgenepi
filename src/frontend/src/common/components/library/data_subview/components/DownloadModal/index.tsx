@@ -13,7 +13,11 @@ import DialogActions from "src/common/components/library/Dialog/components/Dialo
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import { useUserInfo } from "src/common/queries/auth";
-import { FileDownloadResponsePayload, PUBLIC_REPOSITORY_NAME, useFileDownload } from "src/common/queries/samples";
+import {
+  FileDownloadResponsePayload,
+  PUBLIC_REPOSITORY_NAME,
+  useFileDownload,
+} from "src/common/queries/samples";
 import { B } from "src/common/styles/basicStyle";
 import {
   StyledCloseIconButton,
@@ -130,11 +134,11 @@ const DownloadModal = ({
         setShouldShowError(true);
         handleCloseModal();
       },
-      componentOnSuccess: ({data, filename}: FileDownloadResponsePayload) => {
+      componentOnSuccess: ({ data, filename }: FileDownloadResponsePayload) => {
         // TODO (mlila): may need to modify behavior here for gisaid/genbank multi-file download
         const link = document.createElement("a");
         link.href = window.URL.createObjectURL(data);
-        link.download = downloadFileName;
+        link.download = filename || downloadFileName;
         link.click();
         link.remove();
         handleCloseModal();
