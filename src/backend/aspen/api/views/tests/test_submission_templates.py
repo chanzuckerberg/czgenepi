@@ -58,7 +58,7 @@ async def test_gisaid_submission_template_download_gisaid(
             )
         )
     samples.sort(key=lambda sample: sample.public_identifier)
-    to_add: list[Any] = [user, group, location] + samples
+    to_add: list[Any] = [user, group, location] + samples  # type: ignore
     async_session.add_all(to_add)
     await async_session.commit()
 
@@ -84,7 +84,7 @@ async def test_gisaid_submission_template_download_gisaid(
 
     file_contents = io.StringIO(str(res.content, encoding="UTF-8"))
     tsvreader = csv.DictReader(file_contents, delimiter="\t")
-    assert set(list(tsvreader.fieldnames)) == set(
+    assert set(list(tsvreader.fieldnames)) == set(  # type: ignore
         GisaidSubmissionFormTSVStreamer.fields
     )
     tsvreader.__next__()  # skip human-readable headers
@@ -140,7 +140,7 @@ async def test_gisaid_submission_template_download_genbank(
             )
         )
     samples.sort(key=lambda sample: sample.public_identifier)
-    to_add: list[Any] = [user, group, location] + samples
+    to_add: list[Any] = [user, group, location] + samples  # type: ignore
     async_session.add_all(to_add)
     await async_session.commit()
 
@@ -166,7 +166,7 @@ async def test_gisaid_submission_template_download_genbank(
 
     file_contents = io.StringIO(str(res.content, encoding="UTF-8"))
     tsvreader = csv.DictReader(file_contents, delimiter="\t")
-    assert set(tsvreader.fieldnames) == set(GenBankSubmissionFormTSVStreamer.fields)
+    assert set(tsvreader.fieldnames) == set(GenBankSubmissionFormTSVStreamer.fields)  # type: ignore
     row_count = 0
     for row in tsvreader:
         assert (
@@ -217,7 +217,7 @@ async def test_gisaid_submission_template_download_page_number(
             )
         )
     samples.sort(key=lambda sample: sample.public_identifier)
-    to_add: list[Any] = [user, group, location] + samples
+    to_add: list[Any] = [user, group, location] + samples  # type: ignore
     async_session.add_all(to_add)
     await async_session.commit()
 

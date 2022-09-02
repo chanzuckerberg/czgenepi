@@ -187,8 +187,8 @@ def format_sample_lineage(sample: Sample) -> Dict[str, Any]:
 
 def collect_submission_information(
     user: User, group: Group, samples: Sequence[Sample]
-) -> Sequence[Dict[str, Any]]:
-    submission_information: Sequence[Dict[str, Any]] = []
+) -> List[Dict[str, Any]]:
+    submission_information: List[Dict[str, Any]] = []
 
     for sample in samples:
         sample_info = {}
@@ -214,8 +214,8 @@ def collect_submission_information(
 
 
 def sample_info_to_gisaid_rows(
-    submission_information: Sequence[Dict[str, Any]], today: str
-) -> Sequence[Dict[str, str]]:
+    submission_information: List[Dict[str, Any]], today: str
+) -> List[Dict[str, str]]:
     gisaid_metadata_rows = []
     for sample_info in submission_information:
         gisaid_location = " / ".join(
@@ -235,8 +235,8 @@ def sample_info_to_gisaid_rows(
 
 
 def sample_info_to_genbank_rows(
-    submission_information: Sequence[Dict[str, Any]]
-) -> Sequence[Dict[str, str]]:
+    submission_information: List[Dict[str, Any]]
+) -> List[Dict[str, str]]:
     genbank_metadata_rows = []
     for sample_info in submission_information:
         genbank_location = f"{sample_info['country']}: {sample_info['division']}, {sample_info['location']}"

@@ -1,6 +1,6 @@
 import datetime
 import threading
-from typing import Any, List, Mapping, MutableSequence, Optional, Set, Union
+from typing import Any, List, Mapping, MutableSequence, Optional, Set, Type, Union
 
 import sentry_sdk
 import sqlalchemy as sa
@@ -32,7 +32,6 @@ from aspen.api.utils import (
     check_duplicate_samples_in_request,
     collect_submission_information,
     determine_gisaid_status,
-    FieldSeparatedStreamer,
     GenBankSubmissionFormTSVStreamer,
     get_matching_gisaid_ids,
     get_matching_gisaid_ids_by_epi_isl,
@@ -377,17 +376,19 @@ async def fill_submission_template(
     # Affix GISAID prefixes to public ids and translate to GISAID fields
     metadata_rows: list[dict[str, str]] = []
     filename: str = ""
-    tsv_streamer: Optional[FieldSeparatedStreamer]
+    tsv_streamer: Union[
+        Type[GisaidSubmissionFormTSVStreamer], Type[GenBankSubmissionFormTSVStreamer]
+    ]
     if request_data.public_repository_name.lower() == "gisaid":
         metadata_rows = sample_info_to_gisaid_rows(
             submission_information, request_data.date.strftime("%Y%m%d")
         )
-        metadata_rows.sort(key=lambda row: row.get("covv_virus_name"))
+        metadata_rows.sort(key=lambda row: row.get("covv_virus_name"))  # type: ignore
         filename = f"{request_data.date.strftime('%Y%m%d')}_GISAID_metadata.csv"  # yes, we want a TSV with a .csv extension
         tsv_streamer = GisaidSubmissionFormTSVStreamer
     elif request_data.public_repository_name.lower() == "genbank":
         metadata_rows = sample_info_to_genbank_rows(submission_information)
-        metadata_rows.sort(key=lambda row: row.get("Sequence_ID"))
+        metadata_rows.sort(key=lambda row: row.get("Sequence_ID"))  # type: ignore
         filename = f"{request_data.date.strftime('%Y%m%d')}_GenBank_metadata.tsv"
         tsv_streamer = GenBankSubmissionFormTSVStreamer
 
