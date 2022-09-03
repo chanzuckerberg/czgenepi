@@ -1,77 +1,60 @@
-import * as faker from "@faker-js/faker";
-import { Route } from "next/dist/server/router";
+import { faker } from "@faker-js/faker";
 import { BrowserContext, Page } from "playwright";
-const { request, expect, context } = require("@playwright/test");
-const fs = require("fs");
+const { expect } = require("@playwright/test");
 
 const defaultSequence =
   "ATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTC";
 const locationId = 166768;
-const storageStateFile = "e2e/storage/state.json";
 
-const storageState = fs.readFileSync(storageStateFile);
 export class SampleUtil {
   /*
 This method generates sample data that can be used for uploading
 @param {number} total: total samples to generate, defaults to 1
 */
-  public static generateRandomSampleData(total: number = 1): Array<SampleData> {
+  public static generateRandomSampleData(defaults?: SampleData): SampleData {
     const pastDays = 10;
     const collectionDate = SampleUtil.getADateInThePast(pastDays);
-    let results = [];
-
-    for (let i = 1; i <= total; i++) {
-      results.push({
-        pathogen_genome: {
-          sequence: defaultSequence,
-          sequencing_date: SampleUtil.getADateInThePast(
-            pastDays,
-            collectionDate
-          ),
-        },
-        sample: {
-          collection_date: SampleUtil.getADateInThePast(pastDays),
-          location_id: locationId,
-          private: false,
-          private_identifier: SampleUtil.generateSampleId(),
-          public_identifier: SampleUtil.generateSampleId(),
-        },
-      });
-    }
-    return results;
+    return {
+      pathogen_genome: {
+        sequence: defaultSequence,
+        sequencing_date: SampleUtil.getADateInThePast(pastDays, collectionDate),
+      },
+      sample: {
+        collection_date: SampleUtil.getADateInThePast(pastDays),
+        location_id: locationId,
+        private: false,
+        private_identifier: SampleUtil.generatePrivateSampleId(),
+        public_identifier: SampleUtil.generatePublicSampleId(),
+      },
+    };
   }
 
   /*
-  This is a helper method for generating sample id; both private and public. For public ID
-  we use the prefix hCoV-19, whereas for private we generate random string as prefix.
+  This is a helper method for generating public sample id. 
+  We use the prefix hCoV-19
   @param {string} country: country where sample was taken, defaults to randomly generated
-  @param {boolean} privateSample: we use this to determine we should include "hCoV-19" as prefix or generate random ID
   */
-  public static generateSampleId(
-    country?: string,
-    privateId: boolean = false
-  ): string {
-    if (privateId) {
-      const charSet =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-      let randomString = "";
-      for (let i = 0; i <= 20; i++) {
-        let randomPos = Math.floor(Math.random() * charSet.length);
-        randomString += charSet.substring(randomPos, randomPos + 1);
-      }
-      return randomString;
-    } else {
-      const prefix = "hCoV-19";
-      const _country =
-        country !== undefined ? country : faker.address.country();
-      const _number = faker.datatype.number({
-        min: 10000,
-        max: 99999,
-      });
-      const year = new Date().getFullYear();
+  public static generatePublicSampleId(country?: string): string {
+    const prefix = "hCoV-19";
+    const _country = country !== undefined ? country : faker.address.country();
+    const _number = faker.datatype.number({
+      min: 10000,
+      max: 99999,
+    });
+    const year = new Date().getFullYear();
 
-      return `${prefix}/${_country}/QA-${_number}/${year}`;
+    return `${prefix}/${_country}/QA-${_number}/${year}`;
+  }
+
+  public static generatePrivateSampleId(): string {
+    const charSet =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let randomString = "";
+    for (let i = 0; i <= 20; i++) {
+      let randomPos = Math.floor(Math.random() * charSet.length);
+      randomString += charSet.substring(randomPos, randomPos + 1);
     }
+    return randomString;
   }
 
   /*
@@ -99,71 +82,27 @@ This method generates sample data that can be used for uploading
   }
 
   /*
-  Method for posting sample upload data. This method will first make a GET request
-  to obtain the group of the user, which is needed to construct the URL.
-  @param { object } - payload with array of sample data;
-  */
-  public static async uploadSample(payload: Array<SampleData>) {
-    const groupId = process.env.GROUPID;
-    const endpoint = `/v2/orgs/74/samples/`;
-    console.log(process.env.BASEAPI);
-    const context = await request.newContext({
-      baseURL: "https://api.staging.czgenepi.org",
-    });
-    const response = await context.post(endpoint, {
-      headers: SampleUtil.setHeaders(),
-      data: payload,
-    });
-    expect(response.ok()).toBeTruthy();
-    return response.json();
-  }
-
-  /*
   Method for getting samples. reads users group ID from process.env
   where it was saved when user first logged in. 
   @returns - project of the body json.
   */
-  public static async getSamples(context: BrowserContext) {
-    const url = `${process.env.BASEAPI}/v2/orgs/${process.env.GROUPID}/pathogens/SC2/samples/`;
-    // await page.evaluate(async (url) => {
-    //   return await fetch(url, { method: "GET" })
-    //     .then(r => r.ok ? r.json() : Promise.reject(r))
-    // }, url)
-    console.log("******************");
-    await context.route(url, async (route) => {
-      console.log("******************");
-      const response = await context.request.fetch(route.request());
-      expect(response.ok()).toBeTruthy();
-      console.log(response);
-      console.log("******************");
-      return response.json();
-    });
-  }
-
-  async getUserDetails(page: Page) {
-    const endpoint = `/v2/users/me`;
-    await page.evaluate(async () => {
-      return await fetch(`${process.env.BASEAPI}${endpoint}`, {
-        method: "GET",
-      }).then((r) => (r.ok ? r.json() : Promise.reject(r)));
-    });
-  }
-
-  async mockGetSampleApi(
+  public static async mockGetSamplesApi(
     page: Page,
-    mockData: Array<SampleData>,
-    groupId: number = 74
+    context: BrowserContext,
+    data: any
   ) {
-    const url = `${process.env.BASEAPI}/v2/orgs/${groupId}/pathogens/SC2/samples/`;
-    await page.route(url, (route) =>
+    const url = `${process.env.BASEURL}/data/samples/${process.env.GROUPID}/pathogen/covid`;
+    console.log(url);
+    await context.route(url, async (route) => {
+      const response = await context.request.fetch(route.request());
+      //expect(response.ok()).toBeTruthy();
       route.fulfill({
-        contentType: "application/json",
-        body: JSON.stringify(mockData),
-      })
-    );
-    await page.goto(
-      `${process.env.BASEURL}/data/samples/${groupId}/74/pathogen/covid`
-    );
+        response,
+        body: JSON.stringify(data),
+      });
+    });
+    console.log(url);
+    await page.goto(url);
   }
 }
 
