@@ -9,7 +9,7 @@ const collectionDatePeriods: { [key: string]: number } = {
   Yesterday: 1,
   "Last 7 Days": 7,
 };
-const uploadDatePeriods = {
+const uploadDatePeriods: { [key: string]: number } = {
   "Last 7 Days": 7,
   "Last 30 Days": 30,
   "Last 3 Months": 90,
@@ -17,11 +17,13 @@ const uploadDatePeriods = {
   "Last Year": 365,
 };
 test.describe("Tests for filtering sample listing view", () => {
-  test.beforeEach(async ({ page }) => {
-    //go to samples page
+  test.beforeEach(async ({ page }, workerInfo) => {
+    const baseUrl = workerInfo.config.projects[0].use;
+    const url = `${baseUrl}/data/samples`;
+    await page.goto(url);
   });
 
-  test("Should filter completed samples", async ({ page }) => {
+  test("Should filter samples by status", async ({ page }) => {
     // define filtering criteria
     const filterBy = {
       status: "Complete",
@@ -96,7 +98,7 @@ test.describe("Tests for filtering sample listing view", () => {
         (await sampleCollectionDates.nth(i).textContent()) as string
       );
       const dateFromResult =
-        actuallCollectionDate <= filterCollectionDateFrom ? true : false;
+        actuallCollectionDate >= filterCollectionDateFrom ? true : false;
       const dateToResult =
         actuallCollectionDate <= filterCollectionDateTo ? true : false;
       expect(dateFromResult).toBeTruthy();
@@ -121,9 +123,120 @@ test.describe("Tests for filtering sample listing view", () => {
           (await sampleCollectionDates.nth(i).textContent()) as string
         );
         const result =
-          actuallCollectionDate >= filterCollectionDate ? true : false;
+          actuallCollectionDate <= filterCollectionDate ? true : false;
         expect(result).toBeTruthy();
       }
     });
+  });
+
+  test("Should filter by upload date from", async ({ page }) => {
+    const filterBy = {
+      uploadDateFrom: "2022-07-01", //changes are required
+    };
+    // filter samples
+    FilterSample.filter(page, filterBy);
+
+    // verify only samples meeting date criteria are listed
+    const filterUploadDate = new Date(filterBy.uploadDateFrom);
+
+    const sampleUploadDates = page.locator("replace-me");
+    for (let i = 0; i < (await sampleUploadDates.count()); i++) {
+      const actuallUploadDate = new Date(
+        (await sampleUploadDates.nth(i).textContent()) as string
+      );
+      const result = actuallUploadDate >= filterUploadDate ? true : false;
+      expect(result).toBeTruthy();
+    }
+  });
+
+  test("Should filter by upload date to", async ({ page }) => {
+    const filterBy = {
+      uploadDateTo: "2022-09-01", //changes are required
+    };
+    // filter samples
+    FilterSample.filter(page, filterBy);
+
+    // verify only samples meeting date criteria are listed
+    const filterUploadDate = new Date(filterBy.uploadDateTo);
+
+    const sampleUploadDates = page.locator("replace-me");
+    for (let i = 0; i < (await sampleUploadDates.count()); i++) {
+      const actuallUploadDate = new Date(
+        (await sampleUploadDates.nth(i).textContent()) as string
+      );
+      const result = actuallUploadDate <= filterUploadDate ? true : false;
+      expect(result).toBeTruthy();
+    }
+  });
+
+  test("Should filter by upload date from and to", async ({ page }) => {
+    const filterBy = {
+      uploadDateFrom: "2022-07-01", //changes are required
+      uploadDateTo: "2022-09-01", //changes are required
+    };
+    // filter samples
+    FilterSample.filter(page, filterBy);
+
+    // verify only samples meeting date criteria are listed
+    const filterUploadDateFrom = new Date(filterBy.uploadDateFrom);
+    const filterUploadDateTo = new Date(filterBy.uploadDateTo);
+
+    const sampleUploadDates = page.locator("replace-me");
+    for (let i = 0; i < (await sampleUploadDates.count()); i++) {
+      const actuallUploadDate = new Date(
+        (await sampleUploadDates.nth(i).textContent()) as string
+      );
+      const dateFromResult =
+        actuallUploadDate >= filterUploadDateFrom ? true : false;
+      const dateToResult =
+        actuallUploadDate <= filterUploadDateTo ? true : false;
+      expect(dateFromResult).toBeTruthy();
+      expect(dateToResult).toBeTruthy();
+    }
+  });
+
+  test("Should filter by upload date periods", async ({ page }) => {
+    //test all date options
+    Object.keys(uploadDatePeriods).forEach(async (period) => {
+      const periodValue = uploadDatePeriods[period];
+      // filter
+      FilterSample.filter(page, { collectionDatePeriod: period });
+
+      //convert period to date object
+      const filterUploadDate = FilterSample.convertDaysToDate(periodValue);
+
+      //verify sample listing
+      const sampleUploadDates = page.locator("replace-me");
+      for (let i = 0; i < (await sampleUploadDates.count()); i++) {
+        const actuallUploadDate = new Date(
+          (await sampleUploadDates.nth(i).textContent()) as string
+        );
+        const result = actuallUploadDate >= filterUploadDate ? true : false;
+        expect(result).toBeTruthy();
+      }
+    });
+  });
+
+  test("Should filter by multiple fields", async ({ page }) => {
+    //todo: change filter values
+    const filterBy = {
+      collectionDateFrom: "2022-09-01",
+      collectionDateTo: "2022-09-01",
+      uploadDateFrom: "2022-09-01",
+      uploadDateTo: "2022-09-01",
+      lineage: "A",
+      status: "Complete",
+    };
+    // filter
+    FilterSample.filter(page, filterBy);
+
+    //verify sample listing
+    const samples = page.locator("replace-me");
+    for (let i = 0; i < (await samples.count()); i++) {
+      //verify upload date is within from-to range
+      //very collection date is within from-to range
+      //verify lineage
+      //verify status
+    }
   });
 });
