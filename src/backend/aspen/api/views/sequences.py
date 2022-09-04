@@ -1,24 +1,58 @@
 import os
+from datetime import datetime
 from uuid import uuid4
 
 import boto3
 import smart_open
+import sqlalchemy as sa
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql.expression import and_
 
+import aspen.api.error.http_exceptions as ex
 from aspen.api.authn import AuthContext, get_auth_context
 from aspen.api.authz import AuthZSession, get_authz_session
-from aspen.api.deps import get_db, get_settings
+from aspen.api.deps import get_db, get_pathogen_slug, get_settings
 from aspen.api.schemas.sequences import (
     FastaURLRequest,
     FastaURLResponse,
     SequenceRequest,
 )
-from aspen.api.settings import Settings
+from aspen.api.settings import APISettings
 from aspen.api.utils.fasta_streamer import FastaStreamer
+from aspen.database.models import Pathogen, PathogenRepoConfig, PublicRepository
 
 router = APIRouter()
+
+
+def get_fasta_filename(public_repository_name, group_name):
+    # get filename depending on public_repository, else default to generic filename with group name
+    todays_date = datetime.today().strftime("%Y%m%d")
+    if public_repository_name is not None:
+        return f"{todays_date}_{public_repository_name}_sequences.fasta"
+    # user wants to download samples with no intent to submit to a public repository
+    return f"{group_name}_sample_sequences.fasta"
+
+
+async def get_public_repository_prefix(pathogen_slug, public_repository_name, db):
+    if pathogen_slug and public_repository_name:
+        # only get the prefix if we have enough information to proceed
+        prefix = (
+            sa.select(PathogenRepoConfig)
+            .join(Pathogen)
+            .join(PublicRepository)
+            .where(
+                and_(
+                    Pathogen.slug == pathogen_slug,
+                    PublicRepository.name == public_repository_name,
+                )
+            )
+        )
+        res = await db.execute(prefix)
+        pathogen_repo_config = res.scalars().one_or_none()
+        if pathogen_repo_config:
+            return pathogen_repo_config.prefix
 
 
 @router.post("/")
@@ -27,13 +61,26 @@ async def prepare_sequences_download(
     db: AsyncSession = Depends(get_db),
     az: AuthZSession = Depends(get_authz_session),
     ac: AuthContext = Depends(get_auth_context),
+    pathogen_slug=Depends(get_pathogen_slug),
 ) -> StreamingResponse:
     # stream output file
-    fasta_filename = f"{ac.group.name}_sample_sequences.fasta"  # type: ignore
+    fasta_filename = get_fasta_filename(request.public_repository_name, ac.group.name)  # type: ignore
+
+    # get the sample id prefix for given public_repository
+    prefix = await get_public_repository_prefix(
+        pathogen_slug, request.public_repository_name, db
+    )
+    prefix_should_exist = (
+        pathogen_slug is not None and request.public_repository_name is not None
+    )
+    if prefix is None and prefix_should_exist:
+        raise ex.ServerException(
+            "no prefix found for given pathogen_slug and public_repository combination"
+        )
 
     async def stream_samples():
         sample_ids = request.sample_ids
-        streamer = FastaStreamer(db, az, ac, set(sample_ids))
+        streamer = FastaStreamer(db, az, ac, set(sample_ids), prefix)
         async for line in streamer.stream():
             yield line
 
@@ -41,6 +88,8 @@ async def prepare_sequences_download(
     db.expunge_all()
     generator = stream_samples()
     resp = StreamingResponse(generator, media_type="application/binary")
+    # Access-Control-Expose-Headers needed for FE to read Content-Disposition to get filename
+    resp.headers["Access-Control-Expose-Headers"] = "Content-Disposition"
     resp.headers["Content-Disposition"] = f"attachment; filename={fasta_filename}"
     return resp
 
@@ -51,7 +100,7 @@ async def prepare_sequences_download(
 async def getfastaurl(
     request: FastaURLRequest,
     db: AsyncSession = Depends(get_db),
-    settings: Settings = Depends(get_settings),
+    settings: APISettings = Depends(get_settings),
     az: AuthZSession = Depends(get_authz_session),
     ac: AuthContext = Depends(get_auth_context),
 ) -> FastaURLResponse:

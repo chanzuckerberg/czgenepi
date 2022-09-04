@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { getByTestID } from "../utils/selectors";
 
-//todo: populstr the remaining elements
+//todo: populate the remaining elements
 const footer: Record<string, string> = {
   Github: "https://github.com/chanzuckerberg/czgenepi/",
   Careers:

@@ -18,7 +18,7 @@ from starlette.requests import Request
 
 import aspen.api.error.http_exceptions as ex
 from aspen.api.deps import get_db, get_settings
-from aspen.api.settings import Settings
+from aspen.api.settings import APISettings
 from aspen.auth.auth0_management import Auth0Client
 from aspen.auth.device_auth import validate_auth_header
 from aspen.database.models import Group, GroupRole, User, UserRole
@@ -80,7 +80,7 @@ class MagicLinkPayload(TypedDict):
 
 
 async def magic_link_payload(
-    settings: Settings = Depends(get_settings), magic_link: Optional[str] = None
+    settings: APISettings = Depends(get_settings), magic_link: Optional[str] = None
 ) -> Optional[MagicLinkPayload]:
     if not magic_link:
         return None
@@ -120,7 +120,7 @@ async def magic_link_userid(
 
 
 def get_token_userid(
-    request: Request, settings: Settings = Depends(get_settings)
+    request: Request, settings: APISettings = Depends(get_settings)
 ) -> Optional[str]:
     auth_header = request.headers.get("authorization")
     if not auth_header:
@@ -176,7 +176,7 @@ async def get_admin_user(auth_user: User = Depends(get_auth_user)) -> None:
         raise ex.UnauthorizedException("Not authorized")
 
 
-async def get_auth0_apiclient(settings: Settings = Depends(get_settings)):
+async def get_auth0_apiclient(settings: APISettings = Depends(get_settings)):
     client_id: str = settings.AUTH0_MANAGEMENT_CLIENT_ID
     client_secret: str = settings.AUTH0_MANAGEMENT_CLIENT_SECRET
     domain: str = settings.AUTH0_MANAGEMENT_DOMAIN

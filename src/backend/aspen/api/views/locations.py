@@ -15,7 +15,7 @@ from aspen.api.schemas.locations import (
     LocationResponse,
     LocationSearchRequest,
 )
-from aspen.api.settings import Settings
+from aspen.api.settings import APISettings
 from aspen.database.models import Location, User
 
 router = APIRouter()
@@ -28,7 +28,7 @@ LOCATION_KEYS = ("region", "country", "division", "location")
 async def list_locations(
     request: Request,
     db: AsyncSession = Depends(get_db),
-    settings: Settings = Depends(get_settings),
+    settings: APISettings = Depends(get_settings),
     user: User = Depends(get_auth_user),
 ) -> LocationListResponse:
 
@@ -51,7 +51,7 @@ async def list_locations(
 async def search_locations(
     search_query: LocationSearchRequest,
     db: AsyncSession = Depends(get_db),
-    settings: Settings = Depends(get_settings),
+    settings: APISettings = Depends(get_settings),
     user: User = Depends(get_auth_user),
 ):
     set_categories: Dict[str, Optional[str]] = {

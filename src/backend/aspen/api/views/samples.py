@@ -1,13 +1,9 @@
 import datetime
-import json
-import os
-import re
 import threading
-from typing import Any, List, Mapping, MutableSequence, Optional, Sequence, Set, Union
+from typing import Any, List, Mapping, MutableSequence, Optional, Set, Type, Union
 
 import sentry_sdk
 import sqlalchemy as sa
-from boto3 import Session
 from fastapi import APIRouter, Depends
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncResult, AsyncSession
@@ -25,21 +21,28 @@ from aspen.api.schemas.samples import (
     SampleDeleteResponse,
     SampleResponse,
     SamplesResponse,
+    SubmissionTemplateRequest,
     UpdateSamplesRequest,
     ValidateIDsRequest,
     ValidateIDsResponse,
 )
-from aspen.api.settings import Settings
+from aspen.api.settings import APISettings
 from aspen.api.utils import (
     check_duplicate_samples,
     check_duplicate_samples_in_request,
+    collect_submission_information,
     determine_gisaid_status,
+    GenBankSubmissionFormTSVStreamer,
     get_matching_gisaid_ids,
     get_matching_gisaid_ids_by_epi_isl,
     get_missing_and_found_sample_ids,
+    GisaidSubmissionFormTSVStreamer,
+    sample_info_to_genbank_rows,
+    sample_info_to_gisaid_rows,
     samples_by_identifiers,
 )
 from aspen.database.models import Group, Location, Sample, UploadedPathogenGenome, User
+from aspen.util.swipe import PangolinJob
 
 router = APIRouter()
 
@@ -238,48 +241,11 @@ async def validate_ids(
     return ValidateIDsResponse(missing_sample_ids=missing_sample_ids)
 
 
-# TODO this should be a general swipe calling library instead of lame copy-pasta.
-def _kick_off_pangolin(group_prefix: str, sample_ids: Sequence[str], settings):
-    sfn_params = settings.AWS_PANGOLIN_SFN_PARAMETERS
-    sfn_input_json = {
-        "Input": {
-            "Run": {
-                "aws_region": settings.AWS_REGION,
-                "docker_image_id": sfn_params["Input"]["Run"]["docker_image_id"],
-                "samples": sample_ids,
-                "remote_dev_prefix": settings.REMOTE_DEV_PREFIX,
-                "genepi_config_secret_name": settings.GENEPI_CONFIG_SECRET_NAME,
-            },
-        },
-        "OutputPrefix": f"{sfn_params['OutputPrefix']}",
-        "RUN_WDL_URI": sfn_params["RUN_WDL_URI"],
-        "RunEC2Memory": sfn_params["RunEC2Memory"],
-        "RunEC2Vcpu": sfn_params["RunEC2Vcpu"],
-        "RunSPOTMemory": sfn_params["RunSPOTMemory"],
-        "RunSPOTVcpu": sfn_params["RunSPOTVcpu"],
-    }
-
-    session = Session(region_name=settings.AWS_REGION)
-    client = session.client(
-        service_name="stepfunctions",
-        endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None,
-    )
-
-    execution_name = f"{group_prefix}-ondemand-pangolin-{str(datetime.datetime.now())}"
-    execution_name = re.sub(r"[^0-9a-zA-Z-]", r"-", execution_name)
-
-    client.start_execution(
-        stateMachineArn=sfn_params["StateMachineArn"],
-        name=execution_name,
-        input=json.dumps(sfn_input_json),
-    )
-
-
 @router.post("/", response_model=SamplesResponse)
 async def create_samples(
     create_samples_request: List[CreateSampleRequest],
     db: AsyncSession = Depends(get_db),
-    settings: Settings = Depends(get_settings),
+    settings: APISettings = Depends(get_settings),
     user: User = Depends(get_auth_user),
     group: Group = Depends(require_group_privilege("create_sample")),
     pathogen_slug=Depends(get_pathogen_slug),
@@ -371,11 +337,62 @@ async def create_samples(
 
     await db.commit()
 
-    # Run as a separate thread, so any errors here won't affect sample uploads
+    job = PangolinJob(settings)
     pangolin_job = threading.Thread(
-        target=_kick_off_pangolin,
-        args=(group.prefix, pangolin_sample_ids, settings),
+        target=job.run,
+        args=(group, pangolin_sample_ids),
     )
     pangolin_job.start()
 
     return result
+
+
+@router.post("/submission_template")
+async def fill_submission_template(
+    request_data: SubmissionTemplateRequest,
+    db: AsyncSession = Depends(get_db),
+    az: AuthZSession = Depends(get_authz_session),
+    ac: AuthContext = Depends(get_auth_context),
+):
+    sample_ids: Set[str] = {item for item in request_data.sample_ids}
+
+    # get all samples from request that the user has permission to use and scope down
+    # the search for matching ID's to groups that the user has read access to.
+    user_visible_samples_query = await samples_by_identifiers(az, sample_ids)
+    user_visible_samples_res = await (
+        db.execute(
+            user_visible_samples_query.options(selectinload(Sample.collection_location))
+        )
+    )
+    user_visible_samples = user_visible_samples_res.scalars().all()
+
+    if not ac.group:
+        raise ex.ServerException("No group for user.")
+
+    submission_information = collect_submission_information(
+        ac.user, ac.group, user_visible_samples
+    )
+
+    # Affix GISAID prefixes to public ids and translate to GISAID fields
+    metadata_rows: list[dict[str, str]] = []
+    filename: str = ""
+    tsv_streamer: Union[
+        Type[GisaidSubmissionFormTSVStreamer], Type[GenBankSubmissionFormTSVStreamer]
+    ]
+    if request_data.public_repository_name.lower() == "gisaid":
+        metadata_rows = sample_info_to_gisaid_rows(
+            submission_information, request_data.date.strftime("%Y%m%d")
+        )
+        metadata_rows.sort(key=lambda row: row.get("covv_virus_name"))  # type: ignore
+        filename = f"{request_data.date.strftime('%Y%m%d')}_GISAID_metadata.csv"  # yes, we want a TSV with a .csv extension
+        tsv_streamer = GisaidSubmissionFormTSVStreamer
+    elif request_data.public_repository_name.lower() == "genbank":
+        metadata_rows = sample_info_to_genbank_rows(submission_information)
+        metadata_rows.sort(key=lambda row: row.get("Sequence_ID"))  # type: ignore
+        filename = f"{request_data.date.strftime('%Y%m%d')}_GenBank_metadata.tsv"
+        tsv_streamer = GenBankSubmissionFormTSVStreamer
+
+    if request_data.page:
+        filename = filename.replace("metadata.", f"metadata_{request_data.page}.")
+    file_streamer = tsv_streamer(filename, metadata_rows)
+    return file_streamer.get_response()
