@@ -30,7 +30,7 @@
       "jest",
       "playwright"
     ],
-    "incremental": false
+    "incremental": false,
   },
   "exclude": [
     "node_modules",
