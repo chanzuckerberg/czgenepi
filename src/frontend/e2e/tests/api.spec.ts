@@ -3,7 +3,7 @@ import { SampleUtil } from "../utils/sample";
 
 test.describe("API tests", () => {
   test.only("Should get samples", async ({ page, context }) => {
-    const mockData = { ublicId: "test" };
+    const mockData = { publicId: "test" };
     await SampleUtil.mockGetSamplesApi(page, context, mockData);
   });
 });
