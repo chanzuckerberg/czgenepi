@@ -101,7 +101,7 @@ This method generates sample data that can be used for uploading
         response,
         body: JSON.parse(data),
       });
-      console.log(await response.body());
+      console.log(await response);
     });
     //console.log(url);
     await page.goto(url);
