@@ -169,7 +169,7 @@ test.describe("Tests for filtering sample listing view", () => {
     }
   });
 
-  test("Should filter by upload date from and to", async ({ page }) => {
+  test("Should filter by from and to upload dates", async ({ page }) => {
     const filterBy = {
       uploadDateFrom: "2022-07-01", //changes are required
       uploadDateTo: "2022-09-01", //changes are required
