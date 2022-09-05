@@ -1,12 +1,15 @@
 import { expect, test } from "@playwright/test";
 import { SampleUtil } from "../utils/sample";
 
-test.describe("API tests", () => {
-  test.only("Should mock get samples api", async ({ page, context }) => {
+test.describe("Mock sample API data tests", () => {
+  test("Should mock get samples api", async ({ page, context }) => {
+    let samples = [];
+    for (let i = 1; i <= 3; i++) {
+      samples.push(SampleUtil.getSampleResponseData());
+    }
     const mockData = {
-      samples: [SampleUtil.generateRandomSampleData()],
+      samples: samples,
     };
-    console.log(JSON.stringify(mockData));
 
     const url = `${process.env.BASEURL}/data/samples/`;
     const api = `${process.env.BASEAPI}/v2/orgs/${process.env.GROUPID}/pathogens/SC2/samples/`;
@@ -20,6 +23,12 @@ test.describe("API tests", () => {
     });
     await page.goto(url, { waitUntil: "networkidle" });
     await page.locator('text="Accept"').first().click();
-    await page.screenshot({ path: "screenshot.png", fullPage: true });
+  });
+
+  //this test is for demo and will be deleted before merging PR
+
+  test("Should generate sample upload data", async () => {
+    const data = SampleUtil.getSampleUploadData();
+    console.log(data);
   });
 });

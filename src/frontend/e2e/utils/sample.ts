@@ -1,36 +1,112 @@
 import { faker } from "@faker-js/faker";
-import { runInContext } from "lodash";
-import { BrowserContext, Page } from "playwright";
-const { expect } = require("@playwright/test");
+import { sample } from "lodash";
 require("dotenv").config();
 
 const defaultSequence =
   "ATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTC";
 const locationId = 166768;
+const lineages = ["A", "BA.1.1", "BA.1.15"];
 
 export class SampleUtil {
   /*
-This method generates sample data that can be used for uploading
-@param {number} total: total samples to generate, defaults to 1
-*/
-  public static generateSampleUploadData(defaults?: SampleData): SampleData {
+  This method generates sample data that can be used for uploading
+  */
+  public static getSampleUploadData(
+    defaults?: SampleUploadData
+  ): SampleUploadData {
     const pastDays = 10;
-    const collectionDate = SampleUtil.getADateInThePast(pastDays);
+    const collectionDate = SampleUtil.getValueOrDefault(
+      defaults?.sample?.collection_date,
+      SampleUtil.getADateInThePast(pastDays)
+    );
     return {
       pathogen_genome: {
         sequence: defaultSequence,
-        sequencing_date: SampleUtil.getADateInThePast(pastDays, collectionDate),
+        sequencing_date: SampleUtil.getValueOrDefault(
+          defaults?.pathogen_genome?.sequencing_date,
+          SampleUtil.getADateInThePast(pastDays, collectionDate)
+        ) as string,
       },
       sample: {
-        collection_date: SampleUtil.getADateInThePast(pastDays),
-        location_id: locationId,
-        private: false,
-        private_identifier: SampleUtil.generatePrivateSampleId(),
-        public_identifier: SampleUtil.generatePublicSampleId(),
+        collection_date: collectionDate as string,
+        location_id: SampleUtil.getValueOrDefault(
+          defaults?.sample?.location_id,
+          locationId
+        ) as number,
+        private: SampleUtil.getValueOrDefault(
+          defaults?.sample?.private,
+          false
+        ) as boolean,
+        private_identifier: SampleUtil.getValueOrDefault(
+          defaults?.sample?.private_identifier,
+          SampleUtil.generatePrivateSampleId()
+        ) as string,
+        public_identifier: SampleUtil.getValueOrDefault(
+          defaults?.sample?.public_identifier,
+          SampleUtil.generatePublicSampleId()
+        ) as string,
       },
     };
   }
 
+  // method return synthetic data for stubbing get Sample api
+  public static getSampleResponseData(
+    defaults?: GetSampleResponseData
+  ): GetSampleResponseData {
+    const pastDays = 10;
+    return {
+      id: SampleUtil.getValueOrDefault(
+        defaults?.id,
+        SampleUtil.getRandomNumber()
+      ) as number,
+      collection_date: SampleUtil.getADateInThePast(pastDays),
+      collection_location: {
+        id: SampleUtil.getRandomNumber(),
+        region: faker.address.state(),
+        country: faker.address.country(),
+        division: faker.address.city(),
+        location: faker.address.county(),
+      },
+      czb_failed_genome_recovery: true,
+      gisaid: {
+        gisaid_id: "",
+        status: "Not Found",
+      },
+      lineage: {
+        last_updated: SampleUtil.getADateInThePast(),
+        lineage: sample(lineages) as string,
+        confidence: "",
+        version: "PUSHER-v1.13",
+        scorpio_call: "Omicron (BA.1-like)",
+        scorpio_support: 0.93,
+        qc_status: "pass",
+      },
+      private: true,
+      private_identifier: SampleUtil.generatePrivateSampleId(),
+      public_identifier: SampleUtil.generatePublicSampleId(),
+      sequencing_date: SampleUtil.getADateInThePast(),
+      submitting_group: {
+        id: 74,
+        name: "QA Automation",
+      },
+      uploaded_by: {
+        id: 108,
+        name: "Playwright",
+      },
+      upload_date: SampleUtil.getADateInThePast(),
+    };
+  }
+
+  public static getValueOrDefault = function <T>(value: T, defaultValue: T): T {
+    return value !== undefined ? value : defaultValue;
+  };
+
+  public static getRandomNumber(): number {
+    return faker.datatype.number({
+      min: 10000,
+      max: 99999,
+    });
+  }
   /*
   This is a helper method for generating public sample id. 
   We use the prefix hCoV-19
@@ -39,10 +115,7 @@ This method generates sample data that can be used for uploading
   public static generatePublicSampleId(country?: string): string {
     const prefix = "hCoV-19";
     const _country = country !== undefined ? country : faker.address.country();
-    const _number = faker.datatype.number({
-      min: 10000,
-      max: 99999,
-    });
+    const _number = SampleUtil.getRandomNumber();
     const year = new Date().getFullYear();
 
     return `${prefix}/${_country}/QA-${_number}/${year}`;
@@ -82,28 +155,6 @@ This method generates sample data that can be used for uploading
       return faker.date.recent(days).toISOString().substring(0, 10);
     }
   }
-
-  public static async mockGetSamplesApi(
-    page: Page,
-    context: BrowserContext,
-    data: any
-  ) {
-    const url = `${process.env.BASEURL}/data/samples/`;
-    //console.log(url);
-    await context.route(url, async (route) => {
-      const response = await context.request.fetch(route.request());
-      expect(response.ok()).toBeTruthy();
-      route.fulfill({
-        response,
-        //status: 200,
-        body: data,
-      });
-      //console.log(await response);
-      //route.continue()
-    });
-    //console.log(url);
-    return await page.goto(url, { timeout: 0 });
-  }
 }
 
 export interface SampleUploadData {
@@ -125,7 +176,7 @@ export interface Group {
   name: string;
 }
 
-export interface GetSampleData {
+export interface GetSampleResponseData {
   id: number;
   collection_date: string;
   collection_location: {
