@@ -1,5 +1,7 @@
 import { faker } from "@faker-js/faker";
 import { sample } from "lodash";
+import { GeneralUtil } from "./general";
+
 require("dotenv").config();
 
 const defaultSequence =
@@ -15,35 +17,35 @@ export class SampleUtil {
     defaults?: SampleUploadData
   ): SampleUploadData {
     const pastDays = 10;
-    const collectionDate = SampleUtil.getValueOrDefault(
+    const collectionDate = GeneralUtil.getValueOrDefault(
       defaults?.sample?.collection_date,
-      SampleUtil.getADateInThePast(pastDays)
+      GeneralUtil.getADateInThePast(pastDays)
     );
     return {
       pathogen_genome: {
         sequence: defaultSequence,
-        sequencing_date: SampleUtil.getValueOrDefault(
+        sequencing_date: GeneralUtil.getValueOrDefault(
           defaults?.pathogen_genome?.sequencing_date,
-          SampleUtil.getADateInThePast(pastDays, collectionDate)
+          GeneralUtil.getADateInThePast(pastDays, collectionDate)
         ) as string,
       },
       sample: {
         collection_date: collectionDate as string,
-        location_id: SampleUtil.getValueOrDefault(
+        location_id: GeneralUtil.getValueOrDefault(
           defaults?.sample?.location_id,
           locationId
         ) as number,
-        private: SampleUtil.getValueOrDefault(
+        private: GeneralUtil.getValueOrDefault(
           defaults?.sample?.private,
           false
         ) as boolean,
-        private_identifier: SampleUtil.getValueOrDefault(
+        private_identifier: GeneralUtil.getValueOrDefault(
           defaults?.sample?.private_identifier,
-          SampleUtil.generatePrivateSampleId()
+          GeneralUtil.generatePrivateSampleId()
         ) as string,
-        public_identifier: SampleUtil.getValueOrDefault(
+        public_identifier: GeneralUtil.getValueOrDefault(
           defaults?.sample?.public_identifier,
-          SampleUtil.generatePublicSampleId()
+          GeneralUtil.generatePublicSampleId()
         ) as string,
       },
     };
@@ -55,13 +57,13 @@ export class SampleUtil {
   ): GetSampleResponseData {
     const pastDays = 10;
     return {
-      id: SampleUtil.getValueOrDefault(
+      id: GeneralUtil.getValueOrDefault(
         defaults?.id,
-        SampleUtil.getRandomNumber()
+        GeneralUtil.getRandomNumber()
       ) as number,
-      collection_date: SampleUtil.getADateInThePast(pastDays),
+      collection_date: GeneralUtil.getADateInThePast(pastDays),
       collection_location: {
-        id: SampleUtil.getRandomNumber(),
+        id: GeneralUtil.getRandomNumber(),
         region: faker.address.state(),
         country: faker.address.country(),
         division: faker.address.city(),
@@ -73,7 +75,7 @@ export class SampleUtil {
         status: "Not Found",
       },
       lineage: {
-        last_updated: SampleUtil.getADateInThePast(),
+        last_updated: GeneralUtil.getADateInThePast(),
         lineage: sample(lineages) as string,
         confidence: "",
         version: "PUSHER-v1.13",
@@ -82,9 +84,9 @@ export class SampleUtil {
         qc_status: "pass",
       },
       private: true,
-      private_identifier: SampleUtil.generatePrivateSampleId(),
-      public_identifier: SampleUtil.generatePublicSampleId(),
-      sequencing_date: SampleUtil.getADateInThePast(),
+      private_identifier: GeneralUtil.generatePrivateSampleId(),
+      public_identifier: GeneralUtil.generatePublicSampleId(),
+      sequencing_date: GeneralUtil.getADateInThePast(),
       submitting_group: {
         id: 74,
         name: "QA Automation",
@@ -93,67 +95,8 @@ export class SampleUtil {
         id: 108,
         name: "Playwright",
       },
-      upload_date: SampleUtil.getADateInThePast(),
+      upload_date: GeneralUtil.getADateInThePast(),
     };
-  }
-
-  public static getValueOrDefault = function <T>(value: T, defaultValue: T): T {
-    return value !== undefined ? value : defaultValue;
-  };
-
-  public static getRandomNumber(): number {
-    return faker.datatype.number({
-      min: 10000,
-      max: 99999,
-    });
-  }
-  /*
-  This is a helper method for generating public sample id. 
-  We use the prefix hCoV-19
-  @param {string} country: country where sample was taken, defaults to randomly generated
-  */
-  public static generatePublicSampleId(country?: string): string {
-    const prefix = "hCoV-19";
-    const _country = country !== undefined ? country : faker.address.country();
-    const _number = SampleUtil.getRandomNumber();
-    const year = new Date().getFullYear();
-
-    return `${prefix}/${_country}/QA-${_number}/${year}`;
-  }
-
-  public static generatePrivateSampleId(): string {
-    const charSet =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    let randomString = "";
-    for (let i = 0; i <= 20; i++) {
-      let randomPos = Math.floor(Math.random() * charSet.length);
-      randomString += charSet.substring(randomPos, randomPos + 1);
-    }
-    return randomString;
-  }
-
-  /*
-  Sample collection and sequencing dates need to be in the past. 
-  This helper method generates a date in the past it does not need to be hard coded. 
-  @param {number} howRecent: how recent the date should be, defaults to 10, meaning the date can be 1 - 10 days in the past
-  @param {string} refDate: reference date to use, especially useful for sequencing date that needs to be older that collection date
-  */
-  public static getADateInThePast(
-    howRecent?: number,
-    refDate?: string
-  ): string {
-    const days =
-      howRecent !== undefined
-        ? howRecent
-        : faker.datatype.number({
-            min: 1,
-            max: 10,
-          });
-    if (refDate !== undefined) {
-      return faker.date.recent(days, refDate).toISOString().substring(0, 10);
-    } else {
-      return faker.date.recent(days).toISOString().substring(0, 10);
-    }
   }
 }
 

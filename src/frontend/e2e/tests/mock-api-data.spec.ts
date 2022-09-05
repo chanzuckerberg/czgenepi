@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { SampleUtil } from "../utils/sample";
+import { NextstrainUtil } from "../utils/nexstraintree";
 
 test.describe("Mock sample API data tests", () => {
   test("Should mock get samples api", async ({ page, context }) => {
@@ -29,6 +30,11 @@ test.describe("Mock sample API data tests", () => {
 
   test("Should generate sample upload data", async () => {
     const data = SampleUtil.getSampleUploadData();
+    console.log(data);
+  });
+
+  test("Should generate nextstrain data", async () => {
+    const data = NextstrainUtil.getNextStrainTreeData();
     console.log(data);
   });
 });
