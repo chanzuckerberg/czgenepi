@@ -1,4 +1,5 @@
 import { faker } from "@faker-js/faker";
+import { runInContext } from "lodash";
 import { BrowserContext, Page } from "playwright";
 const { expect } = require("@playwright/test");
 require("dotenv").config();
@@ -12,7 +13,7 @@ export class SampleUtil {
 This method generates sample data that can be used for uploading
 @param {number} total: total samples to generate, defaults to 1
 */
-  public static generateRandomSampleData(defaults?: SampleData): SampleData {
+  public static generateSampleUploadData(defaults?: SampleData): SampleData {
     const pastDays = 10;
     const collectionDate = SampleUtil.getADateInThePast(pastDays);
     return {
@@ -82,33 +83,30 @@ This method generates sample data that can be used for uploading
     }
   }
 
-  /*
-  Method for getting samples. reads users group ID from process.env
-  where it was saved when user first logged in. 
-  @returns - project of the body json.
-  */
   public static async mockGetSamplesApi(
     page: Page,
     context: BrowserContext,
     data: any
   ) {
-    const url = `${process.env.BASEURL}/data/samples/${process.env.GROUPID}/pathogen/covid`;
+    const url = `${process.env.BASEURL}/data/samples/`;
     //console.log(url);
     await context.route(url, async (route) => {
       const response = await context.request.fetch(route.request());
-      //expect(response.ok()).toBeTruthy();
+      expect(response.ok()).toBeTruthy();
       route.fulfill({
         response,
-        body: JSON.parse(data),
+        //status: 200,
+        body: data,
       });
-      console.log(await response);
+      //console.log(await response);
+      //route.continue()
     });
     //console.log(url);
-    await page.goto(url);
+    return await page.goto(url, { timeout: 0 });
   }
 }
 
-export interface SampleData {
+export interface SampleUploadData {
   pathogen_genome: {
     sequence: string;
     sequencing_date: string;
@@ -125,4 +123,43 @@ export interface SampleData {
 export interface Group {
   id: number;
   name: string;
+}
+
+export interface GetSampleData {
+  id: number;
+  collection_date: string;
+  collection_location: {
+    id: number;
+    region: string;
+    country: string;
+    division: string;
+    location: string;
+  };
+  czb_failed_genome_recovery: boolean;
+  gisaid: {
+    gisaid_id: string;
+    status: string;
+  };
+  lineage: {
+    last_updated: string;
+    lineage: string;
+    confidence: string;
+    version: string;
+    scorpio_call: string;
+    scorpio_support: number;
+    qc_status: string;
+  };
+  private: boolean;
+  private_identifier: string;
+  public_identifier: string;
+  sequencing_date: string;
+  submitting_group: {
+    id: number;
+    name: string;
+  };
+  uploaded_by: {
+    id: number;
+    name: string;
+  };
+  upload_date: string;
 }
