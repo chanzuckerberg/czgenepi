@@ -401,7 +401,5 @@ async def fill_submission_template(
         filename = f"{request_data.date.strftime('%Y%m%d')}_GenBank_metadata.tsv"
         tsv_streamer = GenBankSubmissionFormTSVStreamer
 
-    if request_data.page:
-        filename = filename.replace("metadata.", f"metadata_{request_data.page}.")
     file_streamer = tsv_streamer(filename, metadata_rows)
     return file_streamer.get_response()
