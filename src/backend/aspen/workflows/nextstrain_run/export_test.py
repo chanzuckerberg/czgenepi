@@ -13,7 +13,7 @@ from aspen.database.connection import (
     SqlAlchemyInterface,
 )
 from aspen.database.models import Group, Location, PathogenGenome, Sample, TreeType
-from aspen.workflows.nextstrain_run.build_config import builder_factory
+from aspen.workflows.nextstrain_run.build_config import TemplateBuilder
 from aspen.workflows.nextstrain_run.export import (
     write_includes_file,
     write_sequences_files,
@@ -115,7 +115,7 @@ def cli(
                 region=region, country=country, division=div, location=loc
             )
             group.default_tree_location = tree_location
-        builder = builder_factory(build_type, group, template_args, **context)
+        builder = TemplateBuilder(build_type, group, template_args, **context)
         builder.write_file(builds_file_fh)
 
         print("Wrote output files!")

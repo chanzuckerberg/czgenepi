@@ -5,17 +5,67 @@ import yaml
 
 from aspen.database.models import Group, Pathogen
 
+class TemplateBuilder:
+    def __init__(self, tree_type: TreeType, pathogen: Pathogen, group, template_args, **kwargs):
+        self.pathogen: Pathogen = pathogen
+        self.tree_type: TreeType = tree_type
+        self.group: Group = group
+        self.template_args = template_args
+        self.kwargs = kwargs
+        self.template = None
+        self.template_file: str = "/usr/src/app/aspen/workflows/nextstrain_run/builds_templates/mega_template.yaml"
+
+        # Update our "build" section
+        self.modifiers = [BuildConfigUpdater(pathogen, group, template_args, **kwargs)]
+        # Update our template based on the type of tree we're building
+        self.modifiers.append(self.get_type_modifier(tree_type, pathogen, group, template_args, kwargs))
+        # Update our template based on the pathogen we're working with
+        self.modifiers.append(self.get_pathogen_modifier(tree_type, pathogen, group, template_args, kwargs))
+
+    def get_pathogen_modifier(self, tree_type: TreeType, pathogen: Pathogen, group, template_args, **kwargs):
+        if pathogen.slug == "SC2":
+            return SC2Builder(pathogen, group, template_args, **kwargs)
+        if pathogen.slug == "MPX":
+            return MPXBuilder(pathogen, group, template_args, **kwargs)
+        raise Exception("Unknown build type")
+
+    def get_type_modifier(self, tree_type: TreeType, pathogen: Pathogen, group, template_args, **kwargs):
+        # This is basically a router -- We'll switch between which build types
+        # based on a variety of input.
+        if tree_type == TreeType.TARGETED:
+            return TargetedBuilder(pathogen, group, template_args, **kwargs)
+        if tree_type == TreeType.OVERVIEW:
+            return OverviewBuilder(pathogen, group, template_args, **kwargs)
+        if tree_type == TreeType.NON_CONTEXTUALIZED:
+            return NonContextualizedBuilder(pathogen, group, template_args, **kwargs)
+        raise Exception("Unknown build type")
+
+    def load_template(self):
+        if not self.template:
+            with open(self.template_file, "r") as fh:
+                self.template = yaml.load(fh, Loader=yaml.FullLoader)
+        return self.template
+
+    def write_file(self, destination_fh):
+        config = self.load_template()
+        for modifier in self.modifiers:
+            modifier.update_config(config, config["subsampling"][self.subsampling_scheme])
+
+        # Remove unused subsampling schemes from our output file
+        subsampling = config["subsampling"][self.subsampling_scheme]
+        config["subsampling"] = {self.subsampling_scheme: subsampling}
+
+        yaml.dump(config, destination_fh)
+
 
 class BaseNextstrainConfigBuilder:
     def __init__(
         self,
-        template_file: str,
         pathogen: Pathogen,
         group: Group,
         template_args: Mapping[str, Any],
         **kwargs: Mapping[str, Any]
     ):
-        self.template_file = template_file
         self.group = group
         self.pathogen = pathogen
         self.template_args = template_args
@@ -25,13 +75,11 @@ class BaseNextstrainConfigBuilder:
         for k, v in kwargs.items():
             setattr(self, k, v)
 
-    def load_template(self):
-        if not self.template:
-            with open(self.template_file, "r") as fh:
-                self.template = yaml.load(fh, Loader=yaml.FullLoader)
-        return self.template
+    def update_config(self, config):
+        raise NotImplementedError()
 
-    def update_build(self, config):
+class BuildConfigUpdater(BaseNextstrainConfigBuilder):
+    def update_config(self, config):
         build = config["builds"]["aspen"]
 
         location = self.group.default_tree_location
@@ -84,17 +132,3 @@ class BaseNextstrainConfigBuilder:
             tree_type=self.subsampling_scheme.lower()
         )
         config["priorities"]["crowding_penalty"] = self.crowding_penalty
-
-    def update_subsampling(self, config):
-        raise NotImplementedError()
-
-    def write_file(self, destination_fh):
-        config = self.load_template()
-        self.update_build(config)
-        self.update_subsampling(config, config["subsampling"][self.subsampling_scheme])
-
-        # Remove unused subsampling schemes from our output file
-        subsampling = config["subsampling"][self.subsampling_scheme]
-        config["subsampling"] = {self.subsampling_scheme: subsampling}
-
-        yaml.dump(config, destination_fh)

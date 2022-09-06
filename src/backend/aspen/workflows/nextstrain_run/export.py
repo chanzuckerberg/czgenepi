@@ -27,7 +27,7 @@ from aspen.database.models import (
 )
 from aspen.database.models.workflow import WorkflowStatusType
 from aspen.workflows.nextstrain_run.build_config import builder_factory
-from aspen.workflows.nextstrain_run.builder_base import BaseNextstrainConfigBuilder
+from aspen.workflows.nextstrain_run.builder_base import TemplateBuilder
 
 METADATA_CSV_FIELDS = [
     "strain",
@@ -121,7 +121,7 @@ def dump_yaml_template(
             "num_sequences": num_sequences,
             "num_included_samples": num_included_samples,
         }
-        builder: BaseNextstrainConfigBuilder = builder_factory(
+        builder: TemplateBuilder = TemplateBuilder(
             phylo_run.tree_type, group, phylo_run.template_args, **context
         )
         builder.write_file(builds_file_fh)

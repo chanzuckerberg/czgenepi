@@ -2,30 +2,113 @@ import re
 from math import ceil
 
 import dateparser
+from typing import Mapping, Any
 
-from aspen.database.models import TreeType
+from aspen.database.models import TreeType, Pathogen, Group
 from aspen.workflows.nextstrain_run.builder_base import BaseNextstrainConfigBuilder
 
+class BaseNextstrainConfigBuilder:
+    def __init__(
+        self,
+        pathogen: Pathogen,
+        group: Group,
+        template_args: Mapping[str, Any],
+        **kwargs: Mapping[str, Any]
+    ):
+        self.group = group
+        self.pathogen = pathogen
+        self.template_args = template_args
+        self.template = None
+        self.tree_build_level = "location"
+        # Set self.num_county_sequences, self.num_sequences, etc.
+        for k, v in kwargs.items():
+            setattr(self, k, v)
 
-def builder_factory(tree_type: TreeType, group, template_args, **kwargs):
-    # This is basically a router -- We'll switch between which build types
-    # based on a variety of input.
-    mega_template = "/usr/src/app/aspen/workflows/nextstrain_run/builds_templates/mega_template.yaml"
+    def update_config(self, config):
+        raise NotImplementedError()
 
-    if tree_type == TreeType.TARGETED:
-        return TargetedBuilder(mega_template, group, template_args, **kwargs)
-    if tree_type == TreeType.OVERVIEW:
-        return OverviewBuilder(mega_template, group, template_args, **kwargs)
-    if tree_type == TreeType.NON_CONTEXTUALIZED:
-        return NonContextualizedBuilder(mega_template, group, template_args, **kwargs)
-    raise Exception("Unknown build type")
+class BuildConfigUpdater(BaseNextstrainConfigBuilder):
+    def update_config(self, config):
+        build = config["builds"]["aspen"]
 
+        location = self.group.default_tree_location
+        # Make a shortcut to decide whether this is a location vs division vs country level build
+        if not location.division:
+            self.tree_build_level = "country"
+        elif not location.location:
+            self.tree_build_level = "division"
+        # Fill out country/division/location fields if the group has them,
+        # or remove those fields if they don't.
+        location_fields = ["country", "division", "location"]
+        location_values = []
+        for field in location_fields:
+            value = getattr(location, field)
+            if value:
+                build[field] = value
+                location_values.append(value)
+            else:
+                del build[field]
+
+        # NOTE: <BuilderClass>.subsampling_scheme is used in 3 places:
+        #   - Its lowercase'd name is used to find a markdown file with an "about this tree" description
+        #   - It refers to a subsampling_scheme key in the mega nextstrain template
+        #   - It's title-case'd and included in the tree title as human-readable text
+        build["subsampling_scheme"] = self.subsampling_scheme
+
+        # Update the tree's title with build type, location and date range.
+        if (self.template_args.get("filter_start_date") is not None) and (
+            self.template_args.get("filter_end_date") is not None
+        ):
+            title_template = "{tree_type} tree for samples collected in {location} between {start_date} and {end_date}"
+            build["title"] = title_template.format(
+                tree_type=self.subsampling_scheme.title(),
+                location=", ".join(location_values),
+                start_date=dateparser.parse(
+                    self.template_args.get("filter_start_date")
+                ).strftime("%Y-%m-%d"),
+                end_date=dateparser.parse(
+                    self.template_args.get("filter_end_date")
+                ).strftime("%Y-%m-%d"),
+            )
+        else:
+            title_template = "{tree_type} tree for samples collected in {location}"
+            build["title"] = title_template.format(
+                tree_type=self.subsampling_scheme.title(),
+                location=", ".join(location_values),
+            )
+
+        config["files"]["description"] = config["files"]["description"].format(
+            tree_type=self.subsampling_scheme.lower()
+        )
+        config["priorities"]["crowding_penalty"] = self.crowding_penalty
+
+class SC2Builder(BaseNextstrainConfigBuilder):
+    def __init__(self, tree_type: TreeType, pathogen: Pathogen, group: Group, template_args, **kwargs):
+        self.pathogen: Pathogen = pathogen
+        self.tree_type: TreeType = tree_type
+        self.group: Group = group
+        self.template_args = template_args
+        self.kwargs = kwargs
+
+    def update_config(self, config, subsampling):
+        pass
+
+class MPXBuilder(BaseNextstrainConfigBuilder):
+    def __init__(self, tree_type: TreeType, pathogen: Pathogen, group: Group, template_args, **kwargs):
+        self.pathogen: Pathogen = pathogen
+        self.tree_type: TreeType = tree_type
+        self.group: Group = group
+        self.template_args = template_args
+        self.kwargs = kwargs
+
+    def update_config(self, config, subsampling):
+        pass
 
 class OverviewBuilder(BaseNextstrainConfigBuilder):
     subsampling_scheme = "OVERVIEW"
     crowding_penalty = 0.1
 
-    def update_subsampling(self, config, subsampling):
+    def update_config(self, config, subsampling):
         if self.group.name == "Chicago Department of Public Health":
             subsampling["group"][
                 "query"
@@ -55,7 +138,7 @@ class NonContextualizedBuilder(BaseNextstrainConfigBuilder):
     subsampling_scheme = "NON_CONTEXTUALIZED"
     crowding_penalty = 0.1
 
-    def update_subsampling(self, config, subsampling):
+    def update_config(self, config, subsampling):
         # Handle sampling date & pango lineage filters
         apply_filters(config, subsampling, self.template_args)
 
@@ -73,7 +156,7 @@ class TargetedBuilder(BaseNextstrainConfigBuilder):
     subsampling_scheme = "TARGETED"
     crowding_penalty = 0
 
-    def update_subsampling(self, config, subsampling):
+    def update_config(self, config, subsampling):
         """
         DATA we can use in this function:
           config : the entire mega-template data structure, with some fields already updated by BaseNextstrainConfigBuilder.update_build()
