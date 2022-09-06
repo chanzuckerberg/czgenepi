@@ -26,7 +26,7 @@ export class GeneralUtil {
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     let randomString = "";
     for (let i = 0; i <= 20; i++) {
-      let randomPos = Math.floor(Math.random() * charSet.length);
+      const randomPos = Math.floor(Math.random() * charSet.length);
       randomString += charSet.substring(randomPos, randomPos + 1);
     }
     return randomString;

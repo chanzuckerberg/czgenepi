@@ -1,8 +1,9 @@
 import { faker } from "@faker-js/faker";
 import { sample } from "lodash";
 import { GeneralUtil } from "./general";
+import * as dotenv from "dotenv";
 
-require("dotenv").config();
+dotenv.config();
 
 const defaultSequence =
   "ATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTC";
@@ -19,7 +20,7 @@ export class SampleUtil {
    */
   public static getSampleUploadData(
     defaults?: SampleUploadData,
-    maxCollectionDateAge: number = 10
+    maxCollectionDateAge = 10
   ): SampleUploadData {
     const collectionDate = GeneralUtil.getValueOrDefault(
       defaults?.sample?.collection_date,
@@ -64,13 +65,9 @@ export class SampleUtil {
    */
   public static getSampleResponseData(
     defaults?: GetSampleResponseData,
-    maxCollectionDateAge: number = 10
+    maxCollectionDateAge = 10
   ): GetSampleResponseData {
     return {
-      id: GeneralUtil.getValueOrDefault(
-        defaults?.id,
-        GeneralUtil.getRandomNumber()
-      ) as number,
       collection_date: GeneralUtil.getADateInThePast(maxCollectionDateAge),
       collection_location: {
         id: GeneralUtil.getRandomNumber(),
@@ -84,18 +81,22 @@ export class SampleUtil {
         gisaid_id: "",
         status: "Not Found",
       },
+      id: GeneralUtil.getValueOrDefault(
+        defaults?.id,
+        GeneralUtil.getRandomNumber()
+      ) as number,
       lineage: {
+        confidence: "",
         last_updated: GeneralUtil.getADateInThePast(),
         lineage: sample(lineages) as string,
-        confidence: "",
-        version: "PUSHER-v1.13",
+        qc_status: "pass",
         scorpio_call: "Omicron (BA.1-like)",
         scorpio_support: 0.93,
-        qc_status: "pass",
+        version: "PUSHER-v1.13",
       },
+      public_identifier: GeneralUtil.generatePublicSampleId(),
       private: true,
       private_identifier: GeneralUtil.generatePrivateSampleId(),
-      public_identifier: GeneralUtil.generatePublicSampleId(),
       sequencing_date: GeneralUtil.getADateInThePast(),
       submitting_group: {
         id: 74,

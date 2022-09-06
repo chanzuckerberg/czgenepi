@@ -1,7 +1,6 @@
 import { chromium, FullConfig } from "@playwright/test";
 import { getByID, getByTestID } from "../utils/selectors";
 import * as fs from "fs";
-require("dotenv").config();
 
 const username = process.env.USERNAME ?? "";
 const password = process.env.PASSWORD ?? "";

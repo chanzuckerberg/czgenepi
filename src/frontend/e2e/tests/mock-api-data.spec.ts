@@ -4,7 +4,7 @@ import { NextstrainUtil } from "../utils/nexstraintree";
 
 test.describe("Mock sample API data tests", () => {
   test("Should mock get samples api", async ({ page, context }) => {
-    let samples = [];
+    const samples = [];
     for (let i = 1; i <= 3; i++) {
       samples.push(SampleUtil.getSampleResponseData());
     }
@@ -29,12 +29,12 @@ test.describe("Mock sample API data tests", () => {
   //this test is for demo only and will be deleted before merging PR
   test("Should generate sample upload data", async () => {
     const data = SampleUtil.getSampleUploadData();
-    console.log(data);
+    //console.log(data);
   });
 
   //this test is for demo only and will be deleted before merging PR
   test("Should generate nextstrain data", async () => {
     const data = NextstrainUtil.getNextStrainTreeData();
-    console.log(data);
+    //console.log(data);
   });
 });
