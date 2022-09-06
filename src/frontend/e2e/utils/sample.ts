@@ -6,27 +6,31 @@ require("dotenv").config();
 
 const defaultSequence =
   "ATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTC";
-const locationId = 166768;
-const lineages = ["A", "BA.1.1", "BA.1.15"];
+const locationId = 166768; //todo: will be good to get this from API and then choose randomly
+const lineages = ["A", "BA.1.1", "BA.1.15"]; //todo: will be good to get this from API and then choose randomly
 
 export class SampleUtil {
-  /*
-  This method generates sample data that can be used for uploading
-  */
+  /**
+   * This method generates sample data that can be used for uploading
+   * @param defaults - user supplied sample data to be included
+   * @param maxCollectionDateAge  - specifies earliest day of the sample.
+   * e.g. 5 means sample collection date will be no earlier than 5 days
+   * @returns SampleUploadData
+   */
   public static getSampleUploadData(
-    defaults?: SampleUploadData
+    defaults?: SampleUploadData,
+    maxCollectionDateAge: number = 10
   ): SampleUploadData {
-    const pastDays = 10;
     const collectionDate = GeneralUtil.getValueOrDefault(
       defaults?.sample?.collection_date,
-      GeneralUtil.getADateInThePast(pastDays)
+      GeneralUtil.getADateInThePast(maxCollectionDateAge)
     );
     return {
       pathogen_genome: {
         sequence: defaultSequence,
         sequencing_date: GeneralUtil.getValueOrDefault(
           defaults?.pathogen_genome?.sequencing_date,
-          GeneralUtil.getADateInThePast(pastDays, collectionDate)
+          GeneralUtil.getADateInThePast(maxCollectionDateAge, collectionDate)
         ) as string,
       },
       sample: {
@@ -51,17 +55,23 @@ export class SampleUtil {
     };
   }
 
-  // method return synthetic data for stubbing get Sample api
+  /**
+   * method creates synthetic data for stubbing get Sample api response
+   * @param defaults - user supplied sample data to be included
+   * @param maxCollectionDateAge  - specifies earliest day of the sample.
+   * e.g. 5 means sample collection date will be no earlier than 5 days
+   * @returns GetSampleResponseData
+   */
   public static getSampleResponseData(
-    defaults?: GetSampleResponseData
+    defaults?: GetSampleResponseData,
+    maxCollectionDateAge: number = 10
   ): GetSampleResponseData {
-    const pastDays = 10;
     return {
       id: GeneralUtil.getValueOrDefault(
         defaults?.id,
         GeneralUtil.getRandomNumber()
       ) as number,
-      collection_date: GeneralUtil.getADateInThePast(pastDays),
+      collection_date: GeneralUtil.getADateInThePast(maxCollectionDateAge),
       collection_location: {
         id: GeneralUtil.getRandomNumber(),
         region: faker.address.state(),
@@ -112,11 +122,6 @@ export interface SampleUploadData {
     private_identifier: string;
     public_identifier: string;
   };
-}
-
-export interface Group {
-  id: number;
-  name: string;
 }
 
 export interface GetSampleResponseData {

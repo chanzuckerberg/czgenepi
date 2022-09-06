@@ -26,13 +26,13 @@ test.describe("Mock sample API data tests", () => {
     await page.locator('text="Accept"').first().click();
   });
 
-  //this test is for demo and will be deleted before merging PR
-
+  //this test is for demo only and will be deleted before merging PR
   test("Should generate sample upload data", async () => {
     const data = SampleUtil.getSampleUploadData();
     console.log(data);
   });
 
+  //this test is for demo only and will be deleted before merging PR
   test("Should generate nextstrain data", async () => {
     const data = NextstrainUtil.getNextStrainTreeData();
     console.log(data);
