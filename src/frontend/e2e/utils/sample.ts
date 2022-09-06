@@ -94,9 +94,12 @@ export class SampleUtil {
         scorpio_support: 0.93,
         version: "PUSHER-v1.13",
       },
-      public_identifier: GeneralUtil.generatePublicSampleId(),
-      private: true,
+      private: GeneralUtil.getValueOrDefault(
+        defaults?.private,
+        true
+      ) as boolean,
       private_identifier: GeneralUtil.generatePrivateSampleId(),
+      public_identifier: GeneralUtil.generatePublicSampleId(),
       sequencing_date: GeneralUtil.getADateInThePast(),
       submitting_group: {
         id: 74,
