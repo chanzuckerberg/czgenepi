@@ -7,10 +7,11 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.sql.expression import or_
 
-from aspen.api.authn import AuthContext, get_auth_context, get_auth_user
+from aspen.api.authn import get_auth_user
 from aspen.api.authz import AuthZSession, get_authz_session, require_group_privilege
-from aspen.api.deps import get_db, get_pathogen_slug, get_settings
+from aspen.api.deps import get_db, get_pathogen, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.phylo_runs import (
     PhyloRunDeleteResponse,
@@ -30,6 +31,7 @@ from aspen.api.utils import (
 from aspen.database.models import (
     AlignedGisaidDump,
     Group,
+    Pathogen,
     PathogenGenome,
     PhyloRun,
     PhyloTree,
@@ -50,16 +52,18 @@ async def kick_off_phylo_run(
     db: AsyncSession = Depends(get_db),
     settings: APISettings = Depends(get_settings),
     az: AuthZSession = Depends(get_authz_session),
-    ac: AuthContext = Depends(get_auth_context),
     user: User = Depends(get_auth_user),
     group: Group = Depends(require_group_privilege("create_phylorun")),
+    pathogen: Pathogen = Depends(get_pathogen),
 ) -> PhyloRunResponse:
 
     # validation happens in input schema
     sample_ids = phylo_run_request.samples
 
     # Enforce AuthZ (check if user has permission to see private identifiers and scope down the search for matching ID's to groups that the user has read access to.)
-    user_visible_samples_query = await samples_by_identifiers(az, set(sample_ids))
+    user_visible_samples_query = await samples_by_identifiers(
+        az, pathogen, set(sample_ids)
+    )
     user_visible_samples_query = user_visible_samples_query.options(  # type: ignore
         joinedload(Sample.uploaded_pathogen_genome, innerjoin=True),
     )
@@ -67,7 +71,7 @@ async def kick_off_phylo_run(
     user_visible_samples = user_visible_samples.unique().scalars().all()
 
     # Are there any sample ID's that don't match sample table public and private identifiers
-    missing_sample_ids, found_sample_ids = get_missing_and_found_sample_ids(
+    missing_sample_ids, _ = get_missing_and_found_sample_ids(
         sample_ids, user_visible_samples
     )
 
@@ -134,6 +138,7 @@ async def kick_off_phylo_run(
         workflow_status=WorkflowStatusType.STARTED,
         software_versions={},
         group=group,
+        pathogen=pathogen,
         template_args=template_args,
         name=phylo_run_request.name,
         gisaid_ids=list(gisaid_ids),
@@ -155,13 +160,17 @@ async def kick_off_phylo_run(
 
 
 async def get_serializable_runs(
-    db: AsyncSession, az: AuthZSession, privilege="read", run_id=None
+    db: AsyncSession, az: AuthZSession, pathogen, privilege="read", run_id=None
 ):
     query = await az.authorized_query(privilege, PhyloRun)
     query = query.options(
         joinedload(PhyloRun.outputs.of_type(PhyloTree)),  # type: ignore
         joinedload(PhyloRun.user),  # For Pydantic serialization
         joinedload(PhyloRun.group),  # For Pydantic serialization
+    )
+    # TODO - DECOVIDIFY - remove the None check!
+    query = query.filter(
+        or_(PhyloRun.pathogen == pathogen, PhyloRun.pathogen_id == None)  # noqa: E711
     )
     if run_id:
         query = query.filter(PhyloRun.id == run_id)
@@ -182,10 +191,12 @@ async def get_serializable_runs(
 async def list_runs(
     db: AsyncSession = Depends(get_db),
     az: AuthZSession = Depends(get_authz_session),
-    pathogen_slug=Depends(get_pathogen_slug),
+    pathogen: Pathogen = Depends(get_pathogen),
 ) -> PhyloRunsListResponse:
 
-    phylo_runs: Iterable[PhyloRun] = await get_serializable_runs(db, az, "read")
+    phylo_runs: Iterable[PhyloRun] = await get_serializable_runs(
+        db, az, pathogen, "read"
+    )
 
     # filter for only information we need in sample table view
     results: List[PhyloRunResponse] = []
@@ -200,8 +211,9 @@ async def delete_run(
     item_id: int,
     db: AsyncSession = Depends(get_db),
     az: AuthZSession = Depends(get_authz_session),
+    pathogen: Pathogen = Depends(get_pathogen),
 ) -> PhyloRunDeleteResponse:
-    item = await get_serializable_runs(db, az, "write", item_id)
+    item = await get_serializable_runs(db, az, pathogen, "write", item_id)
     item_db_id = item.id
 
     for output in item.outputs:
@@ -217,9 +229,10 @@ async def update_phylo_tree_and_run(
     phylo_run_update_request: PhyloRunUpdateRequest,
     db: AsyncSession = Depends(get_db),
     az: AuthZSession = Depends(get_authz_session),
+    pathogen: Pathogen = Depends(get_pathogen),
 ) -> PhyloRunResponse:
     # get phylo_run and check that user has permission to update PhyloRun/PhyloTree
-    phylo_run = await get_serializable_runs(db, az, "write", item_id)
+    phylo_run = await get_serializable_runs(db, az, pathogen, "write", item_id)
 
     # update phylorun name
     phylo_run.name = phylo_run_update_request.name

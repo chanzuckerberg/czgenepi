@@ -15,6 +15,7 @@ from aspen.database.connection import (
 from aspen.database.models import (
     AlignedGisaidDump,
     Group,
+    Pathogen,
     PhyloRun,
     TreeType,
     User,
@@ -41,10 +42,12 @@ def create_phylo_run(
         .first()
     )
 
+    pathogen = session.query(Pathogen).filter(Pathogen.slug == "SC2").one()
     workflow: PhyloRun = PhyloRun(
         start_datetime=datetime.datetime.now(),
         workflow_status=WorkflowStatusType.STARTED,
         software_versions={},
+        pathogen=pathogen,
         group=group,
         tree_type=TreeType("OVERVIEW"),
     )

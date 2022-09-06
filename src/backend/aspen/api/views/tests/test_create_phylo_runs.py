@@ -4,6 +4,7 @@ import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from aspen.database.models import Pathogen
 from aspen.test_infra.models.gisaid_metadata import gisaid_metadata_factory
 from aspen.test_infra.models.lineage import pango_lineage_factory
 from aspen.test_infra.models.location import location_factory
@@ -28,7 +29,8 @@ async def test_create_phylo_run(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    sample = sample_factory(group, user, location)
+    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
+    sample = sample_factory(group, user, location, pathogen=pathogen)
     gisaid_dump = aligned_gisaid_dump_factory()
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     async_session.add(group)
@@ -51,6 +53,49 @@ async def test_create_phylo_run(
     assert response["group"]["name"] == group.name
     assert response["user"]["name"] == user.name
     assert response["user"]["id"] == user.id
+    assert response["pathogen"]["slug"] == pathogen.slug
+    assert "id" in response
+
+
+async def test_create_phylo_run_mpx(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+):
+    """
+    Test phylo tree creation, local-only samples.
+    """
+    group = group_factory()
+    user = await userrole_factory(async_session, group)
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
+    pathogen = await Pathogen.get_by_slug(async_session, "MPX")
+    sample = sample_factory(group, user, location, pathogen=pathogen)
+    gisaid_dump = aligned_gisaid_dump_factory()
+    uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
+    async_session.add(group)
+    async_session.add(gisaid_dump)
+    await async_session.commit()
+
+    auth_headers = {"user_id": user.auth0_user_id}
+    data = {
+        "name": "test phylorun",
+        "tree_type": "targeted",
+        "samples": [sample.public_identifier],
+    }
+    res = await http_client.post(
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/phylo_runs/",
+        json=data,
+        headers=auth_headers,
+    )
+    assert res.status_code == 200
+    response = res.json()
+    assert response["template_args"] == {}
+    assert response["workflow_status"] == "STARTED"
+    assert response["group"]["name"] == group.name
+    assert response["user"]["name"] == user.name
+    assert response["user"]["id"] == user.id
+    assert response["pathogen"]["slug"] == pathogen.slug
     assert "id" in response
 
 
@@ -66,7 +111,8 @@ async def test_create_phylo_run_with_failed_sample(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    sample = sample_factory(group, user, location)
+    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
+    sample = sample_factory(group, user, location, pathogen=pathogen)
     sample.czb_failed_genome_recovery = True
     gisaid_dump = aligned_gisaid_dump_factory()
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
@@ -98,7 +144,8 @@ async def test_create_phylo_run_with_invalid_args(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    sample = sample_factory(group, user, location)
+    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
+    sample = sample_factory(group, user, location, pathogen=pathogen)
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     gisaid_dump = aligned_gisaid_dump_factory()
     gisaid_sample = gisaid_metadata_factory()
@@ -148,7 +195,8 @@ async def test_create_phylo_run_with_template_args(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    sample = sample_factory(group, user, location)
+    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
+    sample = sample_factory(group, user, location, pathogen=pathogen)
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     gisaid_dump = aligned_gisaid_dump_factory()
     gisaid_sample = gisaid_metadata_factory()
@@ -217,7 +265,8 @@ async def test_create_phylo_run_with_gisaid_ids(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    sample = sample_factory(group, user, location)
+    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
+    sample = sample_factory(group, user, location, pathogen=pathogen)
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     gisaid_dump = aligned_gisaid_dump_factory()
     gisaid_sample = gisaid_metadata_factory()
@@ -255,7 +304,8 @@ async def test_create_phylo_run_with_epi_isls(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    sample = sample_factory(group, user, location)
+    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
+    sample = sample_factory(group, user, location, pathogen=pathogen)
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     gisaid_dump = aligned_gisaid_dump_factory()
     gisaid_isl_sample = gisaid_metadata_factory()
@@ -293,7 +343,8 @@ async def test_create_invalid_phylo_run_name(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    sample = sample_factory(group, user, location)
+    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
+    sample = sample_factory(group, user, location, pathogen=pathogen)
     gisaid_dump = aligned_gisaid_dump_factory()
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     async_session.add(group)
@@ -324,7 +375,8 @@ async def test_create_invalid_phylo_run_tree_type(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    sample = sample_factory(group, user, location)
+    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
+    sample = sample_factory(group, user, location, pathogen=pathogen)
     gisaid_dump = aligned_gisaid_dump_factory()
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     async_session.add(group)
@@ -355,7 +407,8 @@ async def test_create_invalid_phylo_run_bad_sample_id(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    sample = sample_factory(group, user, location)
+    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
+    sample = sample_factory(group, user, location, pathogen=pathogen)
     gisaid_dump = aligned_gisaid_dump_factory()
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     async_session.add(group)
@@ -386,7 +439,8 @@ async def test_create_invalid_phylo_run_sample_cannot_see(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    sample = sample_factory(group, user, location)
+    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
+    sample = sample_factory(group, user, location, pathogen=pathogen)
 
     group2 = group_factory(name="The Other Group")
     user2 = await userrole_factory(
@@ -398,8 +452,13 @@ async def test_create_invalid_phylo_run_sample_cannot_see(
     location2 = location_factory(
         "North America", "USA", "California", "San Francisco County"
     )
+    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
     sample2 = sample_factory(
-        group2, user2, location2, public_identifier="USA/OTHER/123456"
+        group2,
+        user2,
+        location2,
+        public_identifier="USA/OTHER/123456",
+        pathogen=pathogen,
     )
 
     gisaid_dump = aligned_gisaid_dump_factory()
@@ -434,7 +493,8 @@ async def test_create_phylo_run_unauthorized(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    sample = sample_factory(group, user, location)
+    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
+    sample = sample_factory(group, user, location, pathogen=pathogen)
     gisaid_dump = aligned_gisaid_dump_factory()
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     async_session.add(group)
@@ -483,7 +543,8 @@ async def test_create_phylo_run_with_lineage_aliases(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    sample = sample_factory(group, user, location)
+    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
+    sample = sample_factory(group, user, location, pathogen=pathogen)
     gisaid_dump = aligned_gisaid_dump_factory()
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     async_session.add(group)
