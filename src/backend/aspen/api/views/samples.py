@@ -361,12 +361,13 @@ async def fill_submission_template(
     db: AsyncSession = Depends(get_db),
     az: AuthZSession = Depends(get_authz_session),
     ac: AuthContext = Depends(get_auth_context),
+    pathogen: Pathogen = Depends(get_pathogen),
 ):
     sample_ids: Set[str] = {item for item in request_data.sample_ids}
 
     # get all samples from request that the user has permission to use and scope down
     # the search for matching ID's to groups that the user has read access to.
-    user_visible_samples_query = await samples_by_identifiers(az, sample_ids)
+    user_visible_samples_query = await samples_by_identifiers(az, pathogen, sample_ids)
     user_visible_samples_res = await (
         db.execute(
             user_visible_samples_query.options(selectinload(Sample.collection_location))

@@ -20,7 +20,7 @@ async def test_samples_list(
     await async_session.commit()
 
     # Load db pathogens
-    pathogens = (await async_session.execute(sa.select(Pathogen))).scalars().all()
+    pathogens = (await async_session.execute(sa.select(Pathogen))).scalars().all()  # type: ignore
 
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.get(
