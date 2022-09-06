@@ -1,6 +1,5 @@
 import { expect, test } from "@playwright/test";
 import { SampleUtil } from "../utils/sample";
-import { NextstrainUtil } from "../utils/nexstraintree";
 
 test.describe("Mock sample API data tests", () => {
   test("Should mock get samples api", async ({ page, context }) => {
