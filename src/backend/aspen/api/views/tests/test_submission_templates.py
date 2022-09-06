@@ -13,6 +13,9 @@ from aspen.api.utils import (
 )
 from aspen.database.models import Sample, UploadedPathogenGenome
 from aspen.test_infra.models.location import location_factory
+from aspen.test_infra.models.pathogen_repo_config import (
+    setup_gisaid_and_genbank_repo_configs,
+)
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
 from aspen.test_infra.models.usergroup import group_factory, userrole_factory
@@ -33,6 +36,7 @@ async def test_submission_template_download_gisaid(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
+    await setup_gisaid_and_genbank_repo_configs(async_session)
     pangolin_output = {
         "scorpio_call": "B.1.167",
         "scorpio_support": "0.775",
@@ -115,6 +119,7 @@ async def test_submission_template_download_genbank(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
+    await setup_gisaid_and_genbank_repo_configs(async_session)
     pangolin_output = {
         "scorpio_call": "B.1.167",
         "scorpio_support": "0.775",
@@ -274,6 +279,7 @@ async def test_submission_template_prefix_stripping(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
+    await setup_gisaid_and_genbank_repo_configs(async_session)
     pangolin_output = {
         "scorpio_call": "B.1.167",
         "scorpio_support": "0.775",

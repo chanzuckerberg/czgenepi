@@ -380,6 +380,13 @@ async def fill_submission_template(
     prefix = await get_public_repository_prefix(
         pathogen, request.public_repository_name, db
     )
+    prefix_should_exist = (
+        pathogen is not None and request.public_repository_name is not None
+    )
+    if prefix is None and prefix_should_exist:
+        raise ex.ServerException(
+            "no prefix found for given pathogen_slug and public_repository combination"
+        )
 
     if not ac.group:
         raise ex.ServerException("No group for user.")
