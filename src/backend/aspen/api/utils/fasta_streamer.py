@@ -7,7 +7,7 @@ from sqlalchemy.orm import joinedload
 
 from aspen.api.authn import AuthContext
 from aspen.api.authz import AuthZSession
-from aspen.api.utils import samples_by_identifiers
+from aspen.api.utils import apply_pathogen_prefix_to_identifier, samples_by_identifiers
 from aspen.database.models import Pathogen, Sample, UploadedPathogenGenome
 
 
@@ -79,7 +79,7 @@ class FastaStreamer:
         characters so they don't break the downstream consumer."""
 
         if self.prefix is not None:
-            output_id = f'{self.prefix}/{identifier.removeprefix("hCoV-19/")}'  # default, might get changed if specialty case
+            output_id = apply_pathogen_prefix_to_identifier(identifier, self.prefix)
         else:
             # user is proceeding with normal download, and does not wish to submit to gisaid or genbank
             output_id = identifier

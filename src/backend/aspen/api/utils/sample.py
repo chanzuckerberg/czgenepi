@@ -22,12 +22,50 @@ from aspen.database.models import (
     AccessionType,
     Group,
     Pathogen,
+    PathogenRepoConfig,
+    PublicRepository,
     Sample,
     User,
 )
 
 if TYPE_CHECKING:
     from aspen.api.schemas.samples import CreateSampleRequest
+
+
+PREFIXES_TO_STRIP = ["hCoV-19/"]
+
+
+def apply_pathogen_prefix_to_identifier(
+    sample_identifier: str, pathogen_prefix: str
+) -> str:
+    sequence_name = sample_identifier
+    prefix_to_strip: Optional[str]
+    for prefix in PREFIXES_TO_STRIP:
+        if sample_identifier.startswith(prefix):
+            prefix_to_strip = prefix
+    if prefix_to_strip:
+        sequence_name = sequence_name.replace(prefix, "")
+    sequence_name = pathogen_prefix + "/" + sequence_name
+    return sequence_name
+
+
+async def get_public_repository_prefix(pathogen: Pathogen, public_repository_name, db):
+    if public_repository_name:
+        # only get the prefix if we have enough information to proceed
+        prefix = (
+            sa.select(PathogenRepoConfig)  # type: ignore
+            .join(PublicRepository)  # type: ignore
+            .where(  # type: ignore
+                and_(
+                    PathogenRepoConfig.pathogen == pathogen,
+                    PublicRepository.name == public_repository_name,
+                )
+            )
+        )
+        res = await db.execute(prefix)
+        pathogen_repo_config = res.scalars().one_or_none()
+        if pathogen_repo_config:
+            return pathogen_repo_config.prefix
 
 
 async def samples_by_identifiers(
@@ -231,7 +269,7 @@ def collect_submission_information(
 
 
 def sample_info_to_gisaid_rows(
-    submission_information: List[Dict[str, Any]], today: str
+    submission_information: List[Dict[str, Any]], pathogen_prefix: str, today: str
 ) -> List[Dict[str, str]]:
     gisaid_metadata_rows = []
     for sample_info in submission_information:
@@ -241,7 +279,9 @@ def sample_info_to_gisaid_rows(
         metadata_row = {
             "submitter": sample_info["gisaid_submitter_id"],
             "fn": f"{today}_GISAID_sequences.fasta",
-            "covv_virus_name": f"hCoV-19/{sample_info['public_identifier']}",
+            "covv_virus_name": apply_pathogen_prefix_to_identifier(
+                sample_info["public_identifier"], pathogen_prefix
+            ),
             "covv_location": gisaid_location,
             "covv_collection_date": sample_info["collection_date"].strftime("%Y-%m-%d"),
             "covv_subm_lab": sample_info["submitting_lab"],
@@ -252,13 +292,15 @@ def sample_info_to_gisaid_rows(
 
 
 def sample_info_to_genbank_rows(
-    submission_information: List[Dict[str, Any]]
+    submission_information: List[Dict[str, Any]], pathogen_prefix: str
 ) -> List[Dict[str, str]]:
     genbank_metadata_rows = []
     for sample_info in submission_information:
         genbank_location = f"{sample_info['country']}: {sample_info['division']}, {sample_info['location']}"
         metadata_row = {
-            "Sequence_ID": f"SARS-CoV-2/{sample_info['public_identifier']}",
+            "Sequence_ID": apply_pathogen_prefix_to_identifier(
+                sample_info["public_identifier"], pathogen_prefix
+            ),
             "collection-date": sample_info["collection_date"].strftime("%Y-%m-%d"),
             "country": genbank_location,
             "isolate": f"SARS-CoV-2/{sample_info['public_identifier']}",
