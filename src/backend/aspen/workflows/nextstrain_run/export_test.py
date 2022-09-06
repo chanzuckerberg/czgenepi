@@ -12,7 +12,7 @@ from aspen.database.connection import (
     session_scope,
     SqlAlchemyInterface,
 )
-from aspen.database.models import Group, Location, PathogenGenome, Sample, TreeType
+from aspen.database.models import Group, Location, PathogenGenome, Sample, TreeType, Pathogen
 from aspen.workflows.nextstrain_run.build_config import TemplateBuilder
 from aspen.workflows.nextstrain_run.export import (
     write_includes_file,
@@ -61,6 +61,13 @@ from aspen.workflows.nextstrain_run.export import (
     default=None,
     help="Location for tree build in region/country/div/loc format. Country example: 'North America/Mexico//'",
 )
+@click.option(
+    "--pathogen",
+    type=str,
+    required=False,
+    default="SC2",
+    help="Pathogen to build a tree for",
+)
 def cli(
     tree_type: str,
     sequences: int,
@@ -68,6 +75,7 @@ def cli(
     gisaid: int,
     group_name: str,
     location: str,
+    pathogen: str,
 ):
     tree_types = {
         "overview": TreeType.OVERVIEW,
@@ -97,6 +105,7 @@ def cli(
             num_included_samples = write_includes_file(
                 session, gisaid_ids, pathogen_genomes[:selected], selected_fh
             )
+        pathogen_model = session.execute(sa.select(Pathogen).where(Pathogen.slug == pathogen)).scalars().one()
 
         # Give the nextstrain config builder some info to make decisions
         context = {
@@ -115,7 +124,7 @@ def cli(
                 region=region, country=country, division=div, location=loc
             )
             group.default_tree_location = tree_location
-        builder = TemplateBuilder(build_type, group, template_args, **context)
+        builder = TemplateBuilder(build_type, pathogen_model, group, template_args, **context)
         builder.write_file(builds_file_fh)
 
         print("Wrote output files!")

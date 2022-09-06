@@ -26,8 +26,7 @@ from aspen.database.models import (
     UploadedPathogenGenome,
 )
 from aspen.database.models.workflow import WorkflowStatusType
-from aspen.workflows.nextstrain_run.build_config import builder_factory
-from aspen.workflows.nextstrain_run.builder_base import TemplateBuilder
+from aspen.workflows.nextstrain_run.build_config import TemplateBuilder
 
 METADATA_CSV_FIELDS = [
     "strain",
@@ -174,8 +173,8 @@ def export_run_config(
             "num_sequences": num_sequences,
             "num_included_samples": num_included_samples,
         }
-        builder: BaseNextstrainConfigBuilder = builder_factory(
-            phylo_run.tree_type, group, phylo_run.template_args, **context
+        builder: BaseNextstrainConfigBuilder = TemplateBuilder(
+            phylo_run.tree_type, phylo_run.pathogen, group, phylo_run.template_args, **context
         )
         builder.write_file(builds_file_fh)
 
@@ -214,6 +213,7 @@ def get_phylo_run(session, phylo_run_id):
         session.query(PhyloRun)
         .filter(PhyloRun.workflow_id == phylo_run_id)
         .options(
+            joinedload(PhyloRun.pathogen),
             joinedload(PhyloRun.group),
             joinedload(PhyloRun.inputs.of_type(phylo_run_inputs)).undefer(
                 phylo_run_inputs.PathogenGenome.sequence
