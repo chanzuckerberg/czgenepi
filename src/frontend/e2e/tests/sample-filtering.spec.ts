@@ -1,8 +1,8 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, chromium, Page } from "@playwright/test";
 import { FilterSample } from "../pages/filter";
 import path from "path";
 import * as dotenv from "dotenv";
-import { getByTestID } from "e2e/utils/selectors";
+import { getByTestID } from "../utils/selectors";
 dotenv.config({ path: path.join(__dirname, "../.env") });
 
 const collectionDatePeriods: { [key: string]: number } = {
@@ -17,20 +17,23 @@ const uploadDatePeriods: { [key: string]: number } = {
   "Last 6 Months": 180,
   "Last Year": 365,
 };
+let page: Page;
 test.describe("Tests for filtering sample listing view", () => {
-  test.beforeEach(async ({ page }, workerInfo) => {
-    const baseUrl = workerInfo.config.projects[0].use;
+  test.beforeEach(async ({}, workerInfo) => {
+    const baseUrl = workerInfo.config.projects[0].use.baseURL;
     const url = `${baseUrl}/data/samples`;
+    const browser = await chromium.launch();
+    page = await browser.newPage();
     await page.goto(url);
   });
 
-  test("Should filter samples by status", async ({ page }) => {
+  test("Should filter samples by status", async () => {
     // define filtering criteria
     const filterBy = {
       status: "Complete",
     };
     // filter samples
-    FilterSample.filter(page, filterBy);
+    FilterSample.applyFilter(page, filterBy);
 
     // verify only complete samples are listed
     const sampleStatuses = page.locator(getByTestID("sample-status"));
@@ -45,7 +48,7 @@ test.describe("Tests for filtering sample listing view", () => {
       lineage: ["BA1.15"],
     };
     // filter samples
-    FilterSample.filter(page, filterBy);
+    FilterSample.applyFilter(page, filterBy);
 
     // verify only samples with selected lineages displayed
     const sampleLineages = page.locator(".ez2j8c413");
@@ -60,7 +63,7 @@ test.describe("Tests for filtering sample listing view", () => {
       collectionDateFrom: "2022-07-01", //changes are required
     };
     // filter samples
-    FilterSample.filter(page, filterBy);
+    FilterSample.applyFilter(page, filterBy);
 
     // verify only samples meeting date criteria are listed
     const filterCollectionDate = new Date(filterBy.collectionDateFrom);
@@ -83,7 +86,7 @@ test.describe("Tests for filtering sample listing view", () => {
       collectionDateTo: "2022-09-01", //change as required
     };
     // filter samples
-    FilterSample.filter(page, filterBy);
+    FilterSample.applyFilter(page, filterBy);
 
     // verify only samples meeting date criteria are listed
     const filterCollectionDate = new Date(filterBy.collectionDateTo);
@@ -107,7 +110,7 @@ test.describe("Tests for filtering sample listing view", () => {
       collectionDateTo: "2022-09-01",
     };
     // filter samples
-    FilterSample.filter(page, filterBy);
+    FilterSample.applyFilter(page, filterBy);
 
     // convert to date objects for comparison
     const filterCollectionDateFrom = new Date(filterBy.collectionDateFrom);
@@ -135,7 +138,7 @@ test.describe("Tests for filtering sample listing view", () => {
     Object.keys(collectionDatePeriods).forEach(async (period) => {
       const periodValue = collectionDatePeriods[period];
       // filter by collection date period
-      FilterSample.filter(page, { collectionDatePeriod: period });
+      FilterSample.applyFilter(page, { collectionDatePeriod: period });
 
       //convert period to date object
       const filterCollectionDate = FilterSample.convertDaysToDate(periodValue);
@@ -160,7 +163,7 @@ test.describe("Tests for filtering sample listing view", () => {
       uploadDateFrom: "2022-07-01", //change as required
     };
     // filter samples by upload date from
-    FilterSample.filter(page, filterBy);
+    FilterSample.applyFilter(page, filterBy);
 
     // verify only samples meeting date criteria are listed
     const filterUploadDate = new Date(filterBy.uploadDateFrom);
@@ -180,7 +183,7 @@ test.describe("Tests for filtering sample listing view", () => {
       uploadDateTo: "2022-09-01", //changes are required
     };
     // filter samples
-    FilterSample.filter(page, filterBy);
+    FilterSample.applyFilter(page, filterBy);
 
     // verify only samples meeting date criteria are listed
     const filterUploadDate = new Date(filterBy.uploadDateTo);
@@ -201,7 +204,7 @@ test.describe("Tests for filtering sample listing view", () => {
       uploadDateTo: "2022-09-01",
     };
     // filter samples
-    FilterSample.filter(page, filterBy);
+    FilterSample.applyFilter(page, filterBy);
 
     // verify only samples meeting date criteria are listed
     const filterUploadDateFrom = new Date(filterBy.uploadDateFrom);
@@ -226,7 +229,7 @@ test.describe("Tests for filtering sample listing view", () => {
     Object.keys(uploadDatePeriods).forEach(async (period) => {
       const periodValue = uploadDatePeriods[period];
       // filter
-      FilterSample.filter(page, { collectionDatePeriod: period });
+      FilterSample.applyFilter(page, { collectionDatePeriod: period });
 
       //convert period to date object
       const filterUploadDate = FilterSample.convertDaysToDate(periodValue);
@@ -254,7 +257,7 @@ test.describe("Tests for filtering sample listing view", () => {
       status: "Complete",
     };
     // filter
-    FilterSample.filter(page, filterBy);
+    FilterSample.applyFilter(page, filterBy);
 
     //verify sample listing
     const samples = page.locator(getByTestID("table-row"));

@@ -2,7 +2,7 @@ import { Page } from "@playwright/test";
 import { getByID, getByTestID } from "../utils/selectors";
 
 export abstract class FilterSample {
-  public static async filter(
+  public static async applyFilter(
     page: Page,
     filterData: Partial<FilterData>
   ): Promise<void> {
