@@ -59,12 +59,15 @@ export abstract class FilterSample {
     // select lineage
     if (filterData.lineage !== undefined) {
       await page.locator("button[label='Lineage']").click();
-      await page
-        .locator("ul[role='listbox']  .primary-text > div", {
-          hasText: filterData.lineage,
-        })
-        .first()
-        .click();
+      filterData.lineage.forEach(async (lineage) => {
+        await page
+          .locator("ul[role='listbox']  .primary-text > div", {
+            hasText: lineage,
+          })
+          .first()
+          .click();
+      });
+      await page.keyboard.press("Escape"); //dismiss form
     }
     //apply filter
     await Promise.all([
@@ -97,6 +100,6 @@ export interface FilterData {
   uploadDateFrom: string;
   uploadDateTo: string;
   uploadDatePeriod: string;
-  lineage: string;
+  lineage: Array<string>;
   status: string;
 }

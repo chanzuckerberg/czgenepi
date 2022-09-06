@@ -1,4 +1,4 @@
-export const SAMPLES_PAGE = {
+export const SAMPLE_PAGE = {
   GENOME_RECOVERY_DROPDOWN: "button[label='Genome Recovery']",
   GENOME_RECOVERY_OPTIONS: "div[role='tooltip'] li span.primary-text",
   SAMPLE_STATUS: "div[data-test-id='sample-status']",
