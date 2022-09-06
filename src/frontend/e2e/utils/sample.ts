@@ -70,11 +70,11 @@ export class SampleUtil {
     return {
       collection_date: GeneralUtil.getADateInThePast(maxCollectionDateAge),
       collection_location: {
-        id: GeneralUtil.getRandomNumber(),
-        region: faker.address.state(),
         country: faker.address.country(),
         division: faker.address.city(),
+        id: GeneralUtil.getRandomNumber(),
         location: faker.address.county(),
+        region: faker.address.state(),
       },
       czb_failed_genome_recovery: true,
       gisaid: {
