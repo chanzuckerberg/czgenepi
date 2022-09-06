@@ -39,7 +39,6 @@ import {
   DownloadTypeInfo,
   Header,
   StyledButton,
-  StyledCallout,
   StyledCheckbox,
   StyledFileTypeItem,
   Title,
@@ -77,6 +76,11 @@ const DownloadModal = ({
   const flag = useTreatments([FEATURE_FLAGS.prep_files]);
   const isPrepFilesFlagOn = isFlagOn(flag, FEATURE_FLAGS.prep_files);
 
+  const completedSampleIds = checkedSampleIds.filter(
+    (id) => !failedSampleIds.includes(id)
+  );
+  const nCompletedSampleIds = completedSampleIds.length;
+
   useEffect(() => {
     if (tsvData) {
       const [Headers, Rows] = tsvData;
@@ -86,12 +90,12 @@ const DownloadModal = ({
   }, [tsvData]);
 
   useEffect(() => {
-    if (isEqual(checkedSampleIds, failedSampleIds)) {
+    if (nCompletedSampleIds === 0) {
       setFastaDisabled(true);
     } else {
       setFastaDisabled(false);
     }
-  }, [checkedSampleIds, failedSampleIds, setFastaDisabled]);
+  }, [nCompletedSampleIds, setFastaDisabled]);
 
   const handleMetadataClick = function () {
     setMetadataSelected(!isMetadataSelected);
@@ -331,8 +335,8 @@ const DownloadModal = ({
         includes_genbank_template: isGenbankSelected,
         includes_gisaid_template: isGisaidSelected,
         includes_sample_metadata: isMetadataSelected,
-        sample_count: checkedSampleIds.length,
-        sample_public_ids: JSON.stringify(checkedSampleIds),
+        sample_count: nCompletedSampleIds,
+        sample_public_ids: JSON.stringify(completedSampleIds),
       }
     );
   }
@@ -351,7 +355,7 @@ const DownloadModal = ({
       if (isFastaSelected) {
         downloadMutation.mutate({
           endpoint: ORG_API.SAMPLES_FASTA_DOWNLOAD,
-          sampleIds: checkedSampleIds,
+          sampleIds: completedSampleIds,
         });
       }
 
@@ -359,12 +363,12 @@ const DownloadModal = ({
         downloadMutation.mutate({
           endpoint: ORG_API.SAMPLES_FASTA_DOWNLOAD,
           publicRepositoryName: PUBLIC_REPOSITORY_NAME.GISAID,
-          sampleIds: checkedSampleIds,
+          sampleIds: completedSampleIds,
         });
         downloadMutation.mutate({
           endpoint: ORG_API.SAMPLES_TEMPLATE_DOWNLOAD,
           publicRepositoryName: PUBLIC_REPOSITORY_NAME.GISAID,
-          sampleIds: checkedSampleIds,
+          sampleIds: completedSampleIds,
         });
       }
 
@@ -372,12 +376,12 @@ const DownloadModal = ({
         downloadMutation.mutate({
           endpoint: ORG_API.SAMPLES_FASTA_DOWNLOAD,
           publicRepositoryName: PUBLIC_REPOSITORY_NAME.GENBANK,
-          sampleIds: checkedSampleIds,
+          sampleIds: completedSampleIds,
         });
         downloadMutation.mutate({
           endpoint: ORG_API.SAMPLES_TEMPLATE_DOWNLOAD,
           publicRepositoryName: PUBLIC_REPOSITORY_NAME.GENBANK,
-          sampleIds: checkedSampleIds,
+          sampleIds: completedSampleIds,
         });
       }
 
