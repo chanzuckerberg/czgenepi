@@ -105,11 +105,11 @@ export class SampleUtil {
         id: 74,
         name: "QA Automation",
       },
+      upload_date: GeneralUtil.getADateInThePast(),
       uploaded_by: {
         id: 108,
         name: "Playwright",
       },
-      upload_date: GeneralUtil.getADateInThePast(),
     };
   }
 }
