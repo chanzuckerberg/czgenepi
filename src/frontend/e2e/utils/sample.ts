@@ -160,9 +160,9 @@ export interface GetSampleResponseData {
     id: number;
     name: string;
   };
+  upload_date: string;
   uploaded_by: {
     id: number;
     name: string;
   };
-  upload_date: string;
 }
