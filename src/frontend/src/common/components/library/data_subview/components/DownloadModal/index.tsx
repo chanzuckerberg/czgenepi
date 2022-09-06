@@ -77,7 +77,7 @@ const DownloadModal = ({
   const flag = useTreatments([FEATURE_FLAGS.prep_files]);
   const isPrepFilesFlagOn = isFlagOn(flag, FEATURE_FLAGS.prep_files);
 
-  const nCompletedSampleIds = checkedSampleIds.length - failedSampleIds.length;
+  const nCheckedSampleIds = checkedSampleIds.length;
   const N_SAMPLES_PER_PAGE = 999;
 
   useEffect(() => {
@@ -309,7 +309,7 @@ const DownloadModal = ({
                   </DownloadTypeInfo>
                 </Alert>
               )}
-            {nCompletedSampleIds > 999 &&
+            {nCheckedSampleIds > 999 &&
               (isGisaidSelected || isGenbankSelected) && (
                 <StyledCallout intent="info" autoDismiss={false}>
                   Your submission template download will be generated in
@@ -372,13 +372,16 @@ const DownloadModal = ({
           publicRepositoryName: PUBLIC_REPOSITORY_NAME.GISAID,
           sampleIds: checkedSampleIds,
         });
-        const nPages = Math.ceil(nCompletedSampleIds / N_SAMPLES_PER_PAGE);
+        const nPages = Math.ceil(nCheckedSampleIds / N_SAMPLES_PER_PAGE);
         for (let page = 0; page < nPages; page++) {
           downloadMutation.mutate({
             endpoint: ORG_API.SAMPLES_TEMPLATE_DOWNLOAD,
             page,
             publicRepositoryName: PUBLIC_REPOSITORY_NAME.GISAID,
-            sampleIds: checkedSampleIds,
+            sampleIds: checkedSampleIds.slice(
+              page * N_SAMPLES_PER_PAGE,
+              Math.min(nCheckedSampleIds, (page + 1) * N_SAMPLES_PER_PAGE)
+            ),
           });
         }
       }
@@ -389,12 +392,15 @@ const DownloadModal = ({
           publicRepositoryName: PUBLIC_REPOSITORY_NAME.GENBANK,
           sampleIds: checkedSampleIds,
         });
-        const nPages = Math.ceil(nCompletedSampleIds / N_SAMPLES_PER_PAGE);
+        const nPages = Math.ceil(nCheckedSampleIds / N_SAMPLES_PER_PAGE);
         for (let page = 0; page < nPages; page++) {
           downloadMutation.mutate({
             endpoint: ORG_API.SAMPLES_TEMPLATE_DOWNLOAD,
             publicRepositoryName: PUBLIC_REPOSITORY_NAME.GENBANK,
-            sampleIds: checkedSampleIds,
+            sampleIds: checkedSampleIds.slice(
+              page * N_SAMPLES_PER_PAGE,
+              Math.min(nCheckedSampleIds, (page + 1) * N_SAMPLES_PER_PAGE)
+            ),
           });
         }
       }
