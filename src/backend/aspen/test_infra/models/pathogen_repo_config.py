@@ -1,14 +1,13 @@
 from aspen.database.models import Pathogen, PathogenRepoConfig, PublicRepository
 
 
-def setup_gisaid_and_genbank_repo_configs(async_session):
+async def setup_gisaid_and_genbank_repo_configs(async_session):
     repo_info = {
         "GISAID": {"prefix": "hCoV-19"},
         "GenBank": {"prefix": "SARS-CoV-2/human"},
     }
 
-    pathogen = Pathogen(slug="SC2", name="sars-cov-2")
-    async_session.add(pathogen)
+    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
     for name, config in repo_info.items():
         public_repository = PublicRepository(name=name)
         async_session.add(public_repository)

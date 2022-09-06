@@ -8,7 +8,7 @@ from sqlalchemy.orm import joinedload
 from aspen.api.authn import AuthContext
 from aspen.api.authz import AuthZSession
 from aspen.api.utils import samples_by_identifiers
-from aspen.database.models import Sample, UploadedPathogenGenome
+from aspen.database.models import Pathogen, Sample, UploadedPathogenGenome
 
 
 class SpecialtyDownstreams(Enum):
@@ -23,6 +23,7 @@ class FastaStreamer:
         db: AsyncSession,
         az: AuthZSession,
         ac: AuthContext,
+        pathogen: Pathogen,
         sample_ids: Set[str],
         prefix: Optional[str] = None,
         downstream_consumer: Optional[str] = None,
@@ -32,13 +33,14 @@ class FastaStreamer:
         self.az = az
         self.sample_ids = sample_ids
         self.prefix = prefix
+        self.pathogen = pathogen
         # Certain consumers have different requirements on fasta
         self.downstream_consumer = downstream_consumer
 
     async def stream(self) -> AsyncGenerator[str, None]:
         # query for samples
         sample_query = await samples_by_identifiers(
-            self.az, self.sample_ids, "sequences"
+            self.az, self.pathogen, self.sample_ids, "sequences"
         )
         sample_query = sample_query.options(  # type: ignore
             joinedload(Sample.uploaded_pathogen_genome, innerjoin=True).undefer(  # type: ignore

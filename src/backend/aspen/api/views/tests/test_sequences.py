@@ -37,7 +37,7 @@ async def setup_sequences_download_test_data(
         private_identifier="hCoV-19/private_identifer",
     )
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
-    setup_gisaid_and_genbank_repo_configs(async_session)
+    await setup_gisaid_and_genbank_repo_configs(async_session)
 
     async_session.add(group)
     await async_session.commit()
@@ -251,7 +251,7 @@ async def test_access_matrix(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    setup_gisaid_and_genbank_repo_configs(async_session)
+    await setup_gisaid_and_genbank_repo_configs(async_session)
     # give the viewer group access to the sequences from the owner group
     roles = []
     roles.extend(await grouprole_factory(async_session, owner_group1, viewer_group))
