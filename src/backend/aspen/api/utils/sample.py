@@ -39,7 +39,7 @@ def apply_pathogen_prefix_to_identifier(
     sample_identifier: str, pathogen_prefix: str
 ) -> str:
     sequence_name = sample_identifier
-    prefix_to_strip: Optional[str]
+    prefix_to_strip: Optional[str] = None
     for prefix in PREFIXES_TO_STRIP:
         if sample_identifier.startswith(prefix):
             prefix_to_strip = prefix
