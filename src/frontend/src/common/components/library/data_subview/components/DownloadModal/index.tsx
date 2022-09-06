@@ -301,7 +301,8 @@ const DownloadModal = ({
                   <DownloadType>
                     {failedSampleIds.length}{" "}
                     {pluralize("sample", failedSampleIds.length)} will not be
-                    included in your Consensus Genome download
+                    included in your Consensus Genome or Submission Template
+                    downloads
                   </DownloadType>
                   <DownloadTypeInfo>
                     because they failed genome recovery. Failed samples will
