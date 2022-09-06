@@ -28,9 +28,21 @@ export enum PUBLIC_REPOSITORY_NAME {
   GENBANK = "GenBank",
   GISAID = "GISAID",
 }
+
+type FileDownloadEndpointType =
+  | ORG_API.SAMPLES_FASTA_DOWNLOAD
+  | ORG_API.SAMPLES_TEMPLATE_DOWNLOAD;
 interface SampleFileDownloadType {
+  endpoint: FileDownloadEndpointType;
+  page?: number;
   publicRepositoryName?: PUBLIC_REPOSITORY_NAME;
   sampleIds: string[];
+}
+interface FileDownloadRequestPayload {
+  date?: string;
+  page?: number;
+  public_repository_name?: PUBLIC_REPOSITORY_NAME;
+  sample_ids: string[];
 }
 
 export interface FileDownloadResponsePayload {
@@ -44,24 +56,29 @@ type FileDownloadCallbacks = {
 };
 
 export async function downloadSamplesFile({
+  endpoint,
+  page,
   publicRepositoryName,
   sampleIds,
 }: SampleFileDownloadType): Promise<FileDownloadResponsePayload> {
-  const payload = {
+  const payload: FileDownloadRequestPayload = {
+    page,
     public_repository_name: publicRepositoryName,
     sample_ids: sampleIds,
   };
 
-  const response = await fetch(
-    API_URL + generateOrgSpecificUrl(ORG_API.SAMPLES_FASTA_DOWNLOAD),
-    {
-      ...DEFAULT_POST_OPTIONS,
-      body: JSON.stringify(payload),
-    }
-  );
+  if (endpoint === ORG_API.SAMPLES_TEMPLATE_DOWNLOAD) {
+    const date = new Date();
+    const dateString = `${date.getFullYear()}-${date.getMonth()}-${date.getDay()}`;
+    payload.date = dateString;
+  }
+
+  const response = await fetch(API_URL + generateOrgSpecificUrl(endpoint), {
+    ...DEFAULT_POST_OPTIONS,
+    body: JSON.stringify(payload),
+  });
 
   if (response.ok) {
-    // TODO: update filename when header is exposed
     const filename = response.headers
       .get("content-disposition")
       ?.split("filename=")[1];

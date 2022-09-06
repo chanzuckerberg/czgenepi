@@ -77,6 +77,9 @@ const DownloadModal = ({
   const flag = useTreatments([FEATURE_FLAGS.prep_files]);
   const isPrepFilesFlagOn = isFlagOn(flag, FEATURE_FLAGS.prep_files);
 
+  const nCompletedSampleIds = checkedSampleIds.length - failedSampleIds.length;
+  const N_SAMPLES_PER_PAGE = 999;
+
   useEffect(() => {
     if (tsvData) {
       const [Headers, Rows] = tsvData;
@@ -117,18 +120,15 @@ const DownloadModal = ({
     onClose();
   };
 
-  // format file names for download files
+  // format metadata file name for download file
+  // fasta and template endpoints return the name
   const currentGroup = getCurrentGroupFromUserInfo(userInfo);
   const groupName = currentGroup?.name.toLowerCase().replace(/ /g, "_");
   const downloadDate = new Date().toISOString().slice(0, 10);
   const separator = "\t";
-  const fastaDownloadName = `${groupName}_sample_sequences_${downloadDate}.fasta`;
   const metadataDownloadName = `${groupName}_sample_metadata_${downloadDate}.tsv`;
-  // TODO (mlila): may need to modify gisaid/genbank filenames slightly for multi-file download
-  const gisaidDownloadName = `${groupName}_template_gisaid_${downloadDate}.txt`;
-  const genbankDownloadName = `${groupName}_template_genbank_${downloadDate}.tsv`;
 
-  const useFileMutationGenerator = (downloadFileName: string) =>
+  const useFileMutationGenerator = () =>
     useFileDownload({
       componentOnError: () => {
         setShouldShowError(true);
@@ -138,16 +138,14 @@ const DownloadModal = ({
         // TODO (mlila): may need to modify behavior here for gisaid/genbank multi-file download
         const link = document.createElement("a");
         link.href = window.URL.createObjectURL(data);
-        link.download = filename || downloadFileName;
+        link.download = filename || "file-download";
         link.click();
         link.remove();
         handleCloseModal();
       },
     });
 
-  const fastaDownloadMutation = useFileMutationGenerator(fastaDownloadName);
-  const gisaidDownloadMutation = useFileMutationGenerator(gisaidDownloadName);
-  const genbankDownloadMutation = useFileMutationGenerator(genbankDownloadName);
+  const downloadMutation = useFileMutationGenerator();
 
   const FASTA_DISABLED_TOOLTIP_TEXT = (
     <div>
@@ -311,7 +309,7 @@ const DownloadModal = ({
                   </DownloadTypeInfo>
                 </Alert>
               )}
-            {checkedSampleIds.length - failedSampleIds.length > 999 &&
+            {nCompletedSampleIds > 999 &&
               (isGisaidSelected || isGenbankSelected) && (
                 <StyledCallout intent="info" autoDismiss={false}>
                   Your submission template download will be generated in
@@ -362,23 +360,43 @@ const DownloadModal = ({
 
     const onClick = () => {
       if (isFastaSelected) {
-        fastaDownloadMutation.mutate({
+        downloadMutation.mutate({
+          endpoint: ORG_API.SAMPLES_FASTA_DOWNLOAD,
           sampleIds: checkedSampleIds,
         });
       }
 
       if (isGisaidSelected) {
-        gisaidDownloadMutation.mutate({
-          sampleIds: checkedSampleIds,
+        downloadMutation.mutate({
+          endpoint: ORG_API.SAMPLES_FASTA_DOWNLOAD,
           publicRepositoryName: PUBLIC_REPOSITORY_NAME.GISAID,
+          sampleIds: checkedSampleIds,
         });
+        const nPages = Math.ceil(nCompletedSampleIds / N_SAMPLES_PER_PAGE);
+        for (let page = 0; page < nPages; page++) {
+          downloadMutation.mutate({
+            endpoint: ORG_API.SAMPLES_TEMPLATE_DOWNLOAD,
+            page,
+            publicRepositoryName: PUBLIC_REPOSITORY_NAME.GISAID,
+            sampleIds: checkedSampleIds,
+          });
+        }
       }
 
       if (isGenbankSelected) {
-        genbankDownloadMutation.mutate({
-          sampleIds: checkedSampleIds,
+        downloadMutation.mutate({
+          endpoint: ORG_API.SAMPLES_FASTA_DOWNLOAD,
           publicRepositoryName: PUBLIC_REPOSITORY_NAME.GENBANK,
+          sampleIds: checkedSampleIds,
         });
+        const nPages = Math.ceil(nCompletedSampleIds / N_SAMPLES_PER_PAGE);
+        for (let page = 0; page < nPages; page++) {
+          downloadMutation.mutate({
+            endpoint: ORG_API.SAMPLES_TEMPLATE_DOWNLOAD,
+            publicRepositoryName: PUBLIC_REPOSITORY_NAME.GENBANK,
+            sampleIds: checkedSampleIds,
+          });
+        }
       }
 
       analyticsHandleDownload();
@@ -411,7 +429,7 @@ const DownloadModal = ({
   }
 
   function getDownloadButtonText() {
-    if (fastaDownloadMutation.isLoading) {
+    if (downloadMutation.isLoading) {
       return "Loading";
     } else {
       return "Download";
