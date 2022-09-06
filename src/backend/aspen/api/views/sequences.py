@@ -4,11 +4,9 @@ from uuid import uuid4
 
 import boto3
 import smart_open
-import sqlalchemy as sa
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.sql.expression import and_
 
 import aspen.api.error.http_exceptions as ex
 from aspen.api.authn import AuthContext, get_auth_context
@@ -20,8 +18,9 @@ from aspen.api.schemas.sequences import (
     SequenceRequest,
 )
 from aspen.api.settings import APISettings
+from aspen.api.utils import get_public_repository_prefix
 from aspen.api.utils.fasta_streamer import FastaStreamer
-from aspen.database.models import Pathogen, PathogenRepoConfig, PublicRepository
+from aspen.database.models import Pathogen
 
 router = APIRouter()
 
@@ -33,25 +32,6 @@ def get_fasta_filename(public_repository_name, group_name):
         return f"{todays_date}_{public_repository_name}_sequences.fasta"
     # user wants to download samples with no intent to submit to a public repository
     return f"{group_name}_sample_sequences.fasta"
-
-
-async def get_public_repository_prefix(pathogen: Pathogen, public_repository_name, db):
-    if public_repository_name:
-        # only get the prefix if we have enough information to proceed
-        prefix = (
-            sa.select(PathogenRepoConfig)  # type: ignore
-            .join(PublicRepository)  # type: ignore
-            .where(  # type: ignore
-                and_(
-                    PathogenRepoConfig.pathogen == pathogen,
-                    PublicRepository.name == public_repository_name,
-                )
-            )
-        )
-        res = await db.execute(prefix)
-        pathogen_repo_config = res.scalars().one_or_none()
-        if pathogen_repo_config:
-            return pathogen_repo_config.prefix
 
 
 @router.post("/")
