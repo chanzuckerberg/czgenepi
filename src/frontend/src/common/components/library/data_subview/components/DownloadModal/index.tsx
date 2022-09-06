@@ -1,6 +1,5 @@
 import { useTreatments } from "@splitsoftware/splitio-react";
 import { Alert, Icon, Link, Tooltip } from "czifui";
-import { isEqual } from "lodash";
 import { useCallback, useEffect, useState } from "react";
 import { CSVLink } from "react-csv";
 import {
@@ -13,7 +12,11 @@ import DialogActions from "src/common/components/library/Dialog/components/Dialo
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import { useUserInfo } from "src/common/queries/auth";
-import { useFileDownload } from "src/common/queries/samples";
+import {
+  FileDownloadResponsePayload,
+  PUBLIC_REPOSITORY_NAME,
+  useFileDownload,
+} from "src/common/queries/samples";
 import { B } from "src/common/styles/basicStyle";
 import {
   StyledCloseIconButton,
@@ -35,7 +38,6 @@ import {
   DownloadTypeInfo,
   Header,
   StyledButton,
-  StyledCallout,
   StyledCheckbox,
   StyledFileTypeItem,
   Title,
@@ -73,6 +75,11 @@ const DownloadModal = ({
   const flag = useTreatments([FEATURE_FLAGS.prep_files]);
   const isPrepFilesFlagOn = isFlagOn(flag, FEATURE_FLAGS.prep_files);
 
+  const completedSampleIds = checkedSampleIds.filter(
+    (id) => !failedSampleIds.includes(id)
+  );
+  const nCompletedSampleIds = completedSampleIds.length;
+
   useEffect(() => {
     if (tsvData) {
       const [Headers, Rows] = tsvData;
@@ -82,12 +89,12 @@ const DownloadModal = ({
   }, [tsvData]);
 
   useEffect(() => {
-    if (isEqual(checkedSampleIds, failedSampleIds)) {
+    if (nCompletedSampleIds === 0) {
       setFastaDisabled(true);
     } else {
       setFastaDisabled(false);
     }
-  }, [checkedSampleIds, failedSampleIds, setFastaDisabled]);
+  }, [nCompletedSampleIds, setFastaDisabled]);
 
   const handleMetadataClick = function () {
     setMetadataSelected(!isMetadataSelected);
@@ -113,37 +120,32 @@ const DownloadModal = ({
     onClose();
   };
 
-  // format file names for download files
+  // format metadata file name for download file
+  // fasta and template endpoints return the name
   const currentGroup = getCurrentGroupFromUserInfo(userInfo);
   const groupName = currentGroup?.name.toLowerCase().replace(/ /g, "_");
   const downloadDate = new Date().toISOString().slice(0, 10);
   const separator = "\t";
-  const fastaDownloadName = `${groupName}_sample_sequences_${downloadDate}.fasta`;
   const metadataDownloadName = `${groupName}_sample_metadata_${downloadDate}.tsv`;
-  // TODO (mlila): may need to modify gisaid/genbank filenames slightly for multi-file download
-  const gisaidDownloadName = `${groupName}_template_gisaid_${downloadDate}.txt`;
-  const genbankDownloadName = `${groupName}_template_genbank_${downloadDate}.tsv`;
 
-  const useFileMutationGenerator = (downloadFileName: string) =>
+  const useFileMutationGenerator = () =>
     useFileDownload({
       componentOnError: () => {
         setShouldShowError(true);
         handleCloseModal();
       },
-      componentOnSuccess: (data: Blob) => {
+      componentOnSuccess: ({ data, filename }: FileDownloadResponsePayload) => {
         // TODO (mlila): may need to modify behavior here for gisaid/genbank multi-file download
         const link = document.createElement("a");
         link.href = window.URL.createObjectURL(data);
-        link.download = downloadFileName;
+        link.download = filename || "file-download";
         link.click();
         link.remove();
         handleCloseModal();
       },
     });
 
-  const fastaDownloadMutation = useFileMutationGenerator(fastaDownloadName);
-  const gisaidDownloadMutation = useFileMutationGenerator(gisaidDownloadName);
-  const genbankDownloadMutation = useFileMutationGenerator(genbankDownloadName);
+  const downloadMutation = useFileMutationGenerator();
 
   const FASTA_DISABLED_TOOLTIP_TEXT = (
     <div>
@@ -299,21 +301,14 @@ const DownloadModal = ({
                   <DownloadType>
                     {failedSampleIds.length}{" "}
                     {pluralize("sample", failedSampleIds.length)} will not be
-                    included in your Consensus Genome download
+                    included in your Consensus Genome or Submission Template
+                    downloads
                   </DownloadType>
                   <DownloadTypeInfo>
                     because they failed genome recovery. Failed samples will
                     still be included in your Sample Metadata download.
                   </DownloadTypeInfo>
                 </Alert>
-              )}
-            {checkedSampleIds.length - failedSampleIds.length > 999 &&
-              (isGisaidSelected || isGenbankSelected) && (
-                <StyledCallout intent="info" autoDismiss={false}>
-                  Your submission template download will be generated in
-                  multiple files of up to 999 samples in order to comply with
-                  GISAID/GenBank upload limits.
-                </StyledCallout>
               )}
             {getDownloadButton()}
           </Content>
@@ -340,8 +335,8 @@ const DownloadModal = ({
         includes_genbank_template: isGenbankSelected,
         includes_gisaid_template: isGisaidSelected,
         includes_sample_metadata: isMetadataSelected,
-        sample_count: checkedSampleIds.length,
-        sample_public_ids: JSON.stringify(checkedSampleIds),
+        sample_count: nCompletedSampleIds,
+        sample_public_ids: JSON.stringify(completedSampleIds),
       }
     );
   }
@@ -358,23 +353,35 @@ const DownloadModal = ({
 
     const onClick = () => {
       if (isFastaSelected) {
-        fastaDownloadMutation.mutate({
-          sampleIds: checkedSampleIds,
+        downloadMutation.mutate({
           endpoint: ORG_API.SAMPLES_FASTA_DOWNLOAD,
+          sampleIds: completedSampleIds,
         });
       }
 
       if (isGisaidSelected) {
-        gisaidDownloadMutation.mutate({
-          sampleIds: checkedSampleIds,
-          endpoint: ORG_API.SAMPLES_GISAID_DOWNLOAD,
+        downloadMutation.mutate({
+          endpoint: ORG_API.SAMPLES_FASTA_DOWNLOAD,
+          publicRepositoryName: PUBLIC_REPOSITORY_NAME.GISAID,
+          sampleIds: completedSampleIds,
+        });
+        downloadMutation.mutate({
+          endpoint: ORG_API.SAMPLES_TEMPLATE_DOWNLOAD,
+          publicRepositoryName: PUBLIC_REPOSITORY_NAME.GISAID,
+          sampleIds: completedSampleIds,
         });
       }
 
       if (isGenbankSelected) {
-        genbankDownloadMutation.mutate({
-          sampleIds: checkedSampleIds,
-          endpoint: ORG_API.SAMPLES_GENBANK_DOWNLOAD,
+        downloadMutation.mutate({
+          endpoint: ORG_API.SAMPLES_FASTA_DOWNLOAD,
+          publicRepositoryName: PUBLIC_REPOSITORY_NAME.GENBANK,
+          sampleIds: completedSampleIds,
+        });
+        downloadMutation.mutate({
+          endpoint: ORG_API.SAMPLES_TEMPLATE_DOWNLOAD,
+          publicRepositoryName: PUBLIC_REPOSITORY_NAME.GENBANK,
+          sampleIds: completedSampleIds,
         });
       }
 
@@ -408,7 +415,7 @@ const DownloadModal = ({
   }
 
   function getDownloadButtonText() {
-    if (fastaDownloadMutation.isLoading) {
+    if (downloadMutation.isLoading) {
       return "Loading";
     } else {
       return "Download";

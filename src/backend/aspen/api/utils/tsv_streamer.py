@@ -35,6 +35,7 @@ class FieldSeparatedStreamer:
         generator = self.stream()
         resp = StreamingResponse(generator, media_type="application/binary")
         resp.headers["Content-Disposition"] = f"attachment; filename={self.filename}"
+        resp.headers["Access-Control-Expose-Headers"] = "Content-Disposition"
         resp.headers["Content-Type"] = CONTENT_TYPE[self.delimiter]
         return resp
 
