@@ -77,9 +77,6 @@ const DownloadModal = ({
   const flag = useTreatments([FEATURE_FLAGS.prep_files]);
   const isPrepFilesFlagOn = isFlagOn(flag, FEATURE_FLAGS.prep_files);
 
-  const nCheckedSampleIds = checkedSampleIds.length;
-  const N_SAMPLES_PER_PAGE = 999;
-
   useEffect(() => {
     if (tsvData) {
       const [Headers, Rows] = tsvData;
@@ -309,14 +306,6 @@ const DownloadModal = ({
                   </DownloadTypeInfo>
                 </Alert>
               )}
-            {nCheckedSampleIds > 999 &&
-              (isGisaidSelected || isGenbankSelected) && (
-                <StyledCallout intent="info" autoDismiss={false}>
-                  Your submission template download will be generated in
-                  multiple files of up to 999 samples in order to comply with
-                  GISAID/GenBank upload limits.
-                </StyledCallout>
-              )}
             {getDownloadButton()}
           </Content>
         </DialogContent>
@@ -372,18 +361,11 @@ const DownloadModal = ({
           publicRepositoryName: PUBLIC_REPOSITORY_NAME.GISAID,
           sampleIds: checkedSampleIds,
         });
-        const nPages = Math.ceil(nCheckedSampleIds / N_SAMPLES_PER_PAGE);
-        for (let page = 0; page < nPages; page++) {
-          downloadMutation.mutate({
-            endpoint: ORG_API.SAMPLES_TEMPLATE_DOWNLOAD,
-            page,
-            publicRepositoryName: PUBLIC_REPOSITORY_NAME.GISAID,
-            sampleIds: checkedSampleIds.slice(
-              page * N_SAMPLES_PER_PAGE,
-              Math.min(nCheckedSampleIds, (page + 1) * N_SAMPLES_PER_PAGE)
-            ),
-          });
-        }
+        downloadMutation.mutate({
+          endpoint: ORG_API.SAMPLES_TEMPLATE_DOWNLOAD,
+          publicRepositoryName: PUBLIC_REPOSITORY_NAME.GISAID,
+          sampleIds: checkedSampleIds,
+        });
       }
 
       if (isGenbankSelected) {
@@ -392,17 +374,11 @@ const DownloadModal = ({
           publicRepositoryName: PUBLIC_REPOSITORY_NAME.GENBANK,
           sampleIds: checkedSampleIds,
         });
-        const nPages = Math.ceil(nCheckedSampleIds / N_SAMPLES_PER_PAGE);
-        for (let page = 0; page < nPages; page++) {
-          downloadMutation.mutate({
-            endpoint: ORG_API.SAMPLES_TEMPLATE_DOWNLOAD,
-            publicRepositoryName: PUBLIC_REPOSITORY_NAME.GENBANK,
-            sampleIds: checkedSampleIds.slice(
-              page * N_SAMPLES_PER_PAGE,
-              Math.min(nCheckedSampleIds, (page + 1) * N_SAMPLES_PER_PAGE)
-            ),
-          });
-        }
+        downloadMutation.mutate({
+          endpoint: ORG_API.SAMPLES_TEMPLATE_DOWNLOAD,
+          publicRepositoryName: PUBLIC_REPOSITORY_NAME.GENBANK,
+          sampleIds: checkedSampleIds,
+        });
       }
 
       analyticsHandleDownload();
