@@ -175,7 +175,8 @@ async def test_submission_template_download_genbank(
     row_count = 0
     for row in tsvreader:
         assert (
-            row["Sequence_ID"] == f"SARS-CoV-2/human/{samples[row_count].public_identifier}"
+            row["Sequence_ID"]
+            == f"SARS-CoV-2/human/{samples[row_count].public_identifier}"
         )
         assert row["collection-date"] == samples[row_count].collection_date.strftime(
             "%Y-%m-%d"
