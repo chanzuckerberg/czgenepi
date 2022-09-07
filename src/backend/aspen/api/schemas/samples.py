@@ -179,4 +179,3 @@ class CreateSamplesResponse(BaseResponse):
 class SubmissionTemplateRequest(BaseRequest):
     sample_ids: List[str]
     public_repository_name: str
-    page: Optional[int]

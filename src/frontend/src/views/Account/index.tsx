@@ -114,12 +114,12 @@ export default function Account(): JSX.Element {
       <StyledSection>
         <H2>Details</H2>
         <StyledRow>
-          <StyledH3>GISAID Submitter ID</StyledH3>
+          <StyledH3>GISAID User Name</StyledH3>
           <SubText>Optional</SubText>
         </StyledRow>
         <StyledRow>
           <P>
-            Your personal GISAID Submitter ID. This info is used to help prepare
+            Your personal GISAID user name. This info is used to help prepare
             samples for GISAID submission.
             <span>
               &nbsp;
@@ -135,8 +135,8 @@ export default function Account(): JSX.Element {
         </StyledRow>
         <InputText
           id="gisaid-id-input"
-          label="GISAID ID"
-          placeholder="GISAID ID"
+          label="GISAID User Name"
+          placeholder="GISAID User Name"
           hideLabel
           value={gisaidId}
           onChange={handleNewIdInput}

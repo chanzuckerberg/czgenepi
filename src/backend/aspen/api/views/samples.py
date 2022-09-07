@@ -36,6 +36,7 @@ from aspen.api.utils import (
     get_matching_gisaid_ids,
     get_matching_gisaid_ids_by_epi_isl,
     get_missing_and_found_sample_ids,
+    get_public_repository_prefix,
     GisaidSubmissionFormTSVStreamer,
     sample_info_to_genbank_rows,
     sample_info_to_gisaid_rows,
@@ -363,13 +364,13 @@ def get_submission_template_filename(public_repository_name):
 
 @router.post("/submission_template")
 async def fill_submission_template(
-    request_data: SubmissionTemplateRequest,
+    request: SubmissionTemplateRequest,
     db: AsyncSession = Depends(get_db),
     az: AuthZSession = Depends(get_authz_session),
     ac: AuthContext = Depends(get_auth_context),
     pathogen: Pathogen = Depends(get_pathogen),
 ):
-    sample_ids: Set[str] = {item for item in request_data.sample_ids}
+    sample_ids: Set[str] = {item for item in request.sample_ids}
 
     # get all samples from request that the user has permission to use and scope down
     # the search for matching ID's to groups that the user has read access to.
@@ -380,6 +381,18 @@ async def fill_submission_template(
         )
     )
     user_visible_samples = user_visible_samples_res.scalars().all()
+
+    # get the sample id prefix for given public_repository
+    prefix = await get_public_repository_prefix(
+        pathogen, request.public_repository_name, db
+    )
+    prefix_should_exist = (
+        pathogen is not None and request.public_repository_name is not None
+    )
+    if prefix is None and prefix_should_exist:
+        raise ex.ServerException(
+            "no prefix found for given pathogen_slug and public_repository combination"
+        )
 
     if not ac.group:
         raise ex.ServerException("No group for user.")
@@ -394,7 +407,7 @@ async def fill_submission_template(
     tsv_streamer: Union[
         Type[GisaidSubmissionFormTSVStreamer], Type[GenBankSubmissionFormTSVStreamer]
     ]
-    if request_data.public_repository_name.lower() == "gisaid":
+    if request.public_repository_name.lower() == "gisaid":
         metadata_rows = sample_info_to_gisaid_rows(
             submission_information, datetime.date.today().strftime("%Y%m%d")
         )
@@ -404,13 +417,11 @@ async def fill_submission_template(
             ".tsv", ".csv"
         )  # yes, we want a TSV with a .csv extension
         tsv_streamer = GisaidSubmissionFormTSVStreamer
-    elif request_data.public_repository_name.lower() == "genbank":
-        metadata_rows = sample_info_to_genbank_rows(submission_information)
+    elif request.public_repository_name.lower() == "genbank":
+        metadata_rows = sample_info_to_genbank_rows(submission_information, prefix)
         metadata_rows.sort(key=lambda row: row.get("Sequence_ID"))  # type: ignore
         filename = get_submission_template_filename("GenBank")
         tsv_streamer = GenBankSubmissionFormTSVStreamer
 
-    if request_data.page:
-        filename = filename.replace("metadata.", f"metadata_{request_data.page}.")
     file_streamer = tsv_streamer(filename, metadata_rows)
     return file_streamer.get_response()
