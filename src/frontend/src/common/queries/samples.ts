@@ -39,7 +39,6 @@ interface SampleFileDownloadType {
   sampleIds: string[];
 }
 interface FileDownloadRequestPayload {
-  date?: string;
   page?: number;
   public_repository_name?: PUBLIC_REPOSITORY_NAME;
   sample_ids: string[];
@@ -66,12 +65,6 @@ export async function downloadSamplesFile({
     public_repository_name: publicRepositoryName,
     sample_ids: sampleIds,
   };
-
-  if (endpoint === ORG_API.SAMPLES_TEMPLATE_DOWNLOAD) {
-    const date = new Date();
-    const dateString = `${date.getFullYear()}-${date.getMonth()}-${date.getDay()}`;
-    payload.date = dateString;
-  }
 
   const response = await fetch(API_URL + generateOrgSpecificUrl(endpoint), {
     ...DEFAULT_POST_OPTIONS,
