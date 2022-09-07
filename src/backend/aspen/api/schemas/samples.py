@@ -178,5 +178,4 @@ class CreateSamplesResponse(BaseResponse):
 
 class SubmissionTemplateRequest(BaseRequest):
     sample_ids: List[str]
-    date: datetime.date
     public_repository_name: str

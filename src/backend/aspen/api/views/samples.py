@@ -356,6 +356,12 @@ async def create_samples(
     return result
 
 
+def get_submission_template_filename(public_repository_name):
+    # get filename depending on public_repository
+    todays_date = datetime.date.today().strftime("%Y%m%d")
+    return f"{todays_date}_{public_repository_name}_metadata.tsv"
+
+
 @router.post("/submission_template")
 async def fill_submission_template(
     request: SubmissionTemplateRequest,
@@ -403,15 +409,18 @@ async def fill_submission_template(
     ]
     if request.public_repository_name.lower() == "gisaid":
         metadata_rows = sample_info_to_gisaid_rows(
-            submission_information, prefix, request.date.strftime("%Y%m%d")
+            submission_information, prefix, datetime.date.today().strftime("%Y%m%d")
         )
         metadata_rows.sort(key=lambda row: row.get("covv_virus_name"))  # type: ignore
-        filename = f"{request.date.strftime('%Y%m%d')}_GISAID_metadata.csv"  # yes, we want a TSV with a .csv extension
+        filename = get_submission_template_filename("GISAID")
+        filename = filename.replace(
+            ".tsv", ".csv"
+        )  # yes, we want a TSV with a .csv extension
         tsv_streamer = GisaidSubmissionFormTSVStreamer
     elif request.public_repository_name.lower() == "genbank":
         metadata_rows = sample_info_to_genbank_rows(submission_information, prefix)
         metadata_rows.sort(key=lambda row: row.get("Sequence_ID"))  # type: ignore
-        filename = f"{request.date.strftime('%Y%m%d')}_GenBank_metadata.tsv"
+        filename = get_submission_template_filename("GenBank")
         tsv_streamer = GenBankSubmissionFormTSVStreamer
 
     file_streamer = tsv_streamer(filename, metadata_rows)
