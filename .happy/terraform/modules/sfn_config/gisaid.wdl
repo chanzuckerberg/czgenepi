@@ -175,8 +175,12 @@ task TransformGISAID {
     aspen_creation_rev=$COMMIT_SHA
 
     # fetch aspen config
+    set +x  # don't echo secrets
+    echo "* set \$genepi_config"
     genepi_config="$(aws secretsmanager get-secret-value --secret-id ~{genepi_config_secret_name} --query SecretString --output text)"
+    echo "* set \$aspen_s3_db_bucket"
     aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$genepi_config")"
+    set -x
 
     # get the bucket/key from the object id
     raw_gisaid_location=$(python3 /usr/src/app/aspen/workflows/transform_gisaid/lookup_raw_gisaid_object.py --raw-gisaid-object-id "~{raw_gisaid_object_id}")
@@ -256,8 +260,12 @@ task AlignGISAID {
     fi
 
     # fetch aspen config
+    set +x  # don't echo secrets
+    echo "* set \$genepi_config"
     genepi_config="$(aws secretsmanager get-secret-value --secret-id ~{genepi_config_secret_name} --query SecretString --output text)"
+    echo "* set \$aspen_s3_db_bucket"
     aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$genepi_config")"
+    set -x
 
     # get the bucket/key from the object id
     processed_gisaid_location=$(python3 /usr/src/app/aspen/workflows/align_gisaid/lookup_processed_gisaid_object.py --processed-gisaid-object-id "~{processed_gisaid_object_id}")
