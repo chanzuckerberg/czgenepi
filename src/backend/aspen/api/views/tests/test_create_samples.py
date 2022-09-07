@@ -7,7 +7,7 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
-from aspen.database.models import PathogenGenome, Sample, UploadedPathogenGenome
+from aspen.database.models import PathogenGenome, Sample, UploadedPathogenGenome, Pathogen
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.usergroup import group_factory, userrole_factory
@@ -27,6 +27,59 @@ def format_date(dt: Optional[datetime.date], format="%Y-%m-%d") -> str:
 
 
 # test CREATE samples #
+async def test_samples_create_different_pathogens(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+):
+    group = group_factory()
+    user = await userrole_factory(async_session, group)
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
+    async_session.add(group)
+    async_session.add(location)
+    await async_session.commit()
+    test_date = datetime.datetime.now()
+
+    sc2 = await Pathogen.get_by_slug(async_session, "SC2")
+    mpx = await Pathogen.get_by_slug(async_session, "MPX")
+    
+    pathogen_specific = {sc2: range(2), mpx: range(2, 4)}
+    for pathogen, id_range in pathogen_specific.items():
+        data = [
+            {
+                "sample": {
+                    "private_identifier": f"private_{i}",
+                    "collection_date": format_date(test_date),
+                    "location_id": location.id,
+                    "private": True,
+                },
+                "pathogen_genome": {
+                    "sequence": VALID_SEQUENCE + "MN",
+                    "sequencing_date": format_date(test_date),
+                },
+            } for i in id_range
+        ]
+        auth_headers = {"user_id": user.auth0_user_id}
+        res = await http_client.post(
+            f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/samples/",
+            json=data,
+            headers=auth_headers,
+        )
+
+        assert res.status_code == 200
+        await async_session.close()
+        async_session.begin()
+
+        samp_res = await async_session.execute(
+            sa.select(Sample).options(joinedload(Sample.pathogen)).filter(Sample.private_identifier.in_([f"private_{i}" for i in id_range]))  # type: ignore
+        )
+        samples = samp_res.scalars().all()
+
+        for i in samples:
+            assert i.pathogen.slug == pathogen.slug
+
+
 async def test_samples_create_view_pass_no_public_id(
     async_session: AsyncSession,
     http_client: AsyncClient,
@@ -69,7 +122,7 @@ async def test_samples_create_view_pass_no_public_id(
     ]
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/samples/",
+        f"/v2/orgs/{group.id}/pathogens/SC2/samples/",
         json=data,
         headers=auth_headers,
     )
@@ -143,7 +196,7 @@ async def test_authz_failure(
     ]
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        f"/v2/orgs/{no_access_group.id}/samples/",
+        f"/v2/orgs/{no_access_group.id}/pathogens/SC2/samples/",
         json=data,
         headers=auth_headers,
     )
@@ -181,7 +234,7 @@ async def test_stripping_whitespace(
     ]
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/samples/",
+        f"/v2/orgs/{group.id}/pathogens/SC2/samples/",
         json=data,
         headers=auth_headers,
     )
@@ -253,7 +306,7 @@ async def test_samples_create_view_pass_no_sequencing_date(
     ]
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/samples/",
+        f"/v2/orgs/{group.id}/pathogens/SC2/samples/",
         json=data,
         headers=auth_headers,
     )
@@ -329,7 +382,7 @@ async def test_samples_create_view_invalid_sequence(
     ]
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/samples/",
+        f"/v2/orgs/{group.id}/pathogens/SC2/samples/",
         json=data,
         headers=auth_headers,
     )
@@ -394,7 +447,7 @@ async def test_samples_create_view_fail_duplicate_ids(
     ]
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/samples/",
+        f"/v2/orgs/{group.id}/pathogens/SC2/samples/",
         json=data,
         headers=auth_headers,
     )
@@ -453,7 +506,7 @@ async def test_samples_create_view_fail_duplicate_ids_in_request_data(
     ]
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/samples/",
+        f"/v2/orgs/{group.id}/pathogens/SC2/samples/",
         json=data,
         headers=auth_headers,
     )
@@ -503,7 +556,7 @@ async def test_samples_create_view_fail_missing_required_fields(
     ]
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/samples/",
+        f"/v2/orgs/{group.id}/pathogens/SC2/samples/",
         json=data,
         headers=auth_headers,
     )
