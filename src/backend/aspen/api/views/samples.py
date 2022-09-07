@@ -409,7 +409,7 @@ async def fill_submission_template(
     ]
     if request.public_repository_name.lower() == "gisaid":
         metadata_rows = sample_info_to_gisaid_rows(
-            submission_information, datetime.date.today().strftime("%Y%m%d")
+            submission_information, prefix, datetime.date.today().strftime("%Y%m%d")
         )
         metadata_rows.sort(key=lambda row: row.get("covv_virus_name"))  # type: ignore
         filename = get_submission_template_filename("GISAID")
