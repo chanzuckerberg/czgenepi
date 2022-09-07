@@ -5,36 +5,14 @@ export class UploadSample {
   public static async uploadFiles(
     page: Page,
     uploadData: UploadData,
-    errors: object
-  ): Promise<void> {
+    collectionDateError = false,
+    sequencingDateError = false
+  ): Promise<any> {
     //click upload button
     await page.locator("button[@label='Upload']").click();
     //TODO verify URL
 
-    // click select sample files button
-    const [fileChooser] = await Promise.all([
-      page.waitForEvent("filechooser"),
-      page.locator("input[type='file']").click(),
-    ]);
-    // select sample files
-    await fileChooser.setFiles(
-      UploadSample.getFullSampleFilePaths(uploadData?.dataFiles)
-    );
-
-    // click continue button
-    await page.locator("button[@label='Continue']").click();
-    await page.waitForSelector("form div[role='table'] > .MuiTableBody-root");
-    //TODO verify URL
-
-    //select metadata file
-    if (uploadData?.metadataFile !== undefined) {
-      const [fileChooser] = await Promise.all([
-        page.waitForEvent("filechooser"),
-        await page.locator("button[@label='Select Metadata File']").click(),
-      ]);
-      // select metadata file
-      await fileChooser.setFiles([`../fixtures${uploadData?.metadataFile}`]);
-    }
+    UploadSample.selectSampleAndMetadaFiles(page, uploadData);
 
     //complete the form
     let collectionDateAppliedToAll = false;
@@ -51,7 +29,7 @@ export class UploadSample {
           .locator("input[@name='collectionDate']")
           .nth(i)
           .type(data.collectionDate);
-        if (uploadData.applyToAll) {
+        if (uploadData.applyToAll && !collectionDateError) {
           await page.locator("button[@label='APPLY TO ALL']").nth(i).click();
           collectionDateAppliedToAll = true;
         }
@@ -86,7 +64,7 @@ export class UploadSample {
           .locator("input[@name='sequencingDate']")
           .nth(i)
           .type(data.sequencingDate);
-        if (uploadData.applyToAll) {
+        if (uploadData.applyToAll && !sequencingDateError) {
           await page
             .locator("button[@label='APPLY TO ALL']")
             .nth(i + 2)
@@ -101,18 +79,63 @@ export class UploadSample {
       }
     }
 
+    //return collection date errors
+    if (collectionDateError) {
+      return await page.locator(
+        "input[@name='collectionDate']/../following-sibling::p"
+      );
+    }
+    //return sequencing date erros
+    if (sequencingDateError) {
+      return await page.locator(
+        "input[@name='sequencingDate']/../following-sibling::p"
+      );
+    }
+
     //continue
+    if (!collectionDateError && !sequencingDateError) {
+      await page.locator("button[@label='Continue']").click();
+      //TODO verify URL
+
+      //consent and confirm
+      await page.locator("input[@type='checkbox']").first().click();
+      await page.locator("input[@type='checkbox']").last().click();
+      //TODO verify URL
+
+      // submit
+      await page.locator("button[@label='Start Upload']").click();
+      //TODO verify data submitted
+    }
+  }
+
+  public static async selectSampleAndMetadaFiles(
+    page: Page,
+    uploadData: UploadData
+  ): Promise<void> {
+    // click select sample files button
+    const [fileChooser] = await Promise.all([
+      page.waitForEvent("filechooser"),
+      page.locator("input[type='file']").click(),
+    ]);
+    // select sample files
+    await fileChooser.setFiles(
+      UploadSample.getFullSampleFilePaths(uploadData?.dataFiles)
+    );
+
+    // click continue button
     await page.locator("button[@label='Continue']").click();
+    await page.waitForSelector("form div[role='table'] > .MuiTableBody-root");
     //TODO verify URL
 
-    //consent and confirm
-    await page.locator("input[@type='checkbox']").first().click();
-    await page.locator("input[@type='checkbox']").last().click();
-    //TODO verify URL
-
-    // submit
-    await page.locator("button[@label='Start Upload']").click();
-    //TODO verify data submitted
+    //select metadata file
+    if (uploadData?.metadataFile !== undefined) {
+      const [fileChooser] = await Promise.all([
+        page.waitForEvent("filechooser"),
+        await page.locator("button[@label='Select Metadata File']").click(),
+      ]);
+      // select metadata file
+      await fileChooser.setFiles([`../fixtures${uploadData?.metadataFile}`]);
+    }
   }
 
   // prefix each file name with path. set default if not file provided
