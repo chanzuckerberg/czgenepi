@@ -79,14 +79,41 @@ async def test_samples_list(
     await async_session.commit()
 
     auth_headers = {"user_id": user.auth0_user_id}
-    pathogen_specific = {sc2: range(2), mpx: range(2, 4)}
-    for pathogen, id_range in pathogen_specific.items():
+    pathogen_specific = {
+        sc2: {
+            "id_range": range(2),
+            "url": f"/v2/orgs/{group.id}/pathogens/SC2/samples/",
+        },
+        mpx: {
+            "id_range": range(2, 4),
+            "url": f"/v2/orgs/{group.id}/pathogens/MPX/samples/",
+        },
+        # test support for old style urls
+        "no pathogen": {
+            "id_range": range(2),
+            "url": f"/v2/orgs/{group.id}/samples/",
+        },
+    }
+    for pathogen, params in pathogen_specific.items():
 
         res = await http_client.get(
-            f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/samples/",
+            params["url"],
             headers=auth_headers,
         )
         response = res.json()
+        if pathogen != "no pathogen":
+            pathogen_data = {
+                "id": pathogen.id,
+                "slug": pathogen.slug,
+                "name": pathogen.name,
+            }
+        else:
+            # fill with sc2 as that is the current default
+            pathogen_data = {
+                "id": sc2.id,
+                "slug": sc2.slug,
+                "name": sc2.name,
+            }
         expected = {
             "samples": [
                 {
@@ -104,11 +131,7 @@ async def test_samples_list(
                         "status": "Accepted",
                         "gisaid_id": samples[i].accessions[0].accession,
                     },
-                    "pathogen": {
-                        "id": pathogen.id,
-                        "slug": pathogen.slug,
-                        "name": pathogen.name,
-                    },
+                    "pathogen": pathogen_data,
                     "private_identifier": samples[i].private_identifier,
                     "public_identifier": samples[i].public_identifier,
                     "upload_date": convert_datetime_to_iso_8601(
@@ -135,10 +158,18 @@ async def test_samples_list(
                     },
                     "uploaded_by": {"id": user.id, "name": user.name},
                 }
-                for i in id_range
+                for i in params["id_range"]
             ]
         }
         assert response == expected
+
+    # test that passing in a dud slug will raise exception
+    res = await http_client.get(
+        f"/v2/orgs/{group.id}/pathogens/WRONG/samples/",
+        headers=auth_headers,
+    )
+    assert res.status_code == 400
+    assert res.text == '{"error":"Invalid pathogen slug"}'
 
 
 async def test_samples_view_gisaid_rejected(
