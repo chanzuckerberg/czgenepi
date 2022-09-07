@@ -1,5 +1,6 @@
 import json
 from typing import Any, List, Optional, Tuple
+from backend.aspen.database.models.pathogens import Pathogen
 
 import pytest
 import sqlalchemy as sa
@@ -48,10 +49,14 @@ async def test_samples_list(
         "scorpio_support": "0.775",
         "qc_status": "pass",
     }
+    sc2 = Pathogen(slug="SC2", name="sars-cov-19")
+    mpx = Pathogen(slug="MPX", name="monkey-pox")
+
     # Make multiple samples
     samples: List[Sample] = []
     uploaded_pathogen_genomes: List[UploadedPathogenGenome] = []
-    for i in range(2):
+    for i in range(4):
+        pathogen = sc2 if i < 2 else mpx
         samples.append(
             sample_factory(
                 group,
@@ -60,6 +65,7 @@ async def test_samples_list(
                 private=True,
                 private_identifier=f"private{i}",
                 public_identifier=f"public{i}",
+                pathogen=pathogen
             )
         )
         uploaded_pathogen_genomes.append(
@@ -72,7 +78,7 @@ async def test_samples_list(
 
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.get(
-        f"/v2/orgs/{group.id}/samples/",
+        f"/v2/orgs/{group.id}/pathogens/sc2/samples/",
         headers=auth_headers,
     )
     response = res.json()
@@ -92,6 +98,11 @@ async def test_samples_list(
                 "gisaid": {
                     "status": "Accepted",
                     "gisaid_id": samples[i].accessions[0].accession,
+                },
+                "pathogen": {
+                    "id": sc2.id,
+                    "slug": sc2.slug,
+                    "name": sc2.name
                 },
                 "private_identifier": samples[i].private_identifier,
                 "public_identifier": samples[i].public_identifier,

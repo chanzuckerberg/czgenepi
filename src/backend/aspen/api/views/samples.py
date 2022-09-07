@@ -73,8 +73,12 @@ async def list_samples(
         selectinload(Sample.uploaded_by),
         selectinload(Sample.collection_location),
         selectinload(Sample.accessions),
+        selectinload(Sample.pathogen)
+    ).where(
+        Sample.pathogen.slug == pathogen
     )
     user_visible_samples_result = await db.execute(user_visible_samples_query)
+    import pdb; pdb.set_trace()
     user_visible_samples: List[Sample] = (
         user_visible_samples_result.unique().scalars().all()
     )
