@@ -176,7 +176,7 @@ task TransformGISAID {
 
     # fetch aspen config
     set +x  # don't echo secrets
-    echo "* set \$genepi_config"
+    echo "* set \$genepi_config (not printing value because contains secrets)"
     genepi_config="$(aws secretsmanager get-secret-value --secret-id ~{genepi_config_secret_name} --query SecretString --output text)"
     echo "* set \$aspen_s3_db_bucket"
     aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$genepi_config")"
@@ -261,7 +261,7 @@ task AlignGISAID {
 
     # fetch aspen config
     set +x  # don't echo secrets
-    echo "* set \$genepi_config"
+    echo "* set \$genepi_config (not printing value because contains secrets)"
     genepi_config="$(aws secretsmanager get-secret-value --secret-id ~{genepi_config_secret_name} --query SecretString --output text)"
     echo "* set \$aspen_s3_db_bucket"
     aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$genepi_config")"
