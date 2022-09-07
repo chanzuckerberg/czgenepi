@@ -70,7 +70,6 @@ async def test_submission_template_download_gisaid(
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     request_data = {
         "sample_ids": [sample.public_identifier for sample in samples],
-        "date": today.strftime("%Y-%m-%d"),
         "public_repository_name": "GISAID",
     }
     res = await http_client.post(
@@ -153,7 +152,6 @@ async def test_submission_template_download_genbank(
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     request_data = {
         "sample_ids": [sample.public_identifier for sample in samples],
-        "date": today.strftime("%Y-%m-%d"),
         "public_repository_name": "GenBank",
     }
     res = await http_client.post(
@@ -232,7 +230,6 @@ async def test_submission_template_prefix_stripping(
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     request_data = {
         "sample_ids": [sample.public_identifier for sample in samples],
-        "date": today.strftime("%Y-%m-%d"),
         "public_repository_name": "GISAID",
     }
     res = await http_client.post(
