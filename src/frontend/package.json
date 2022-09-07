@@ -82,6 +82,7 @@
     "@babel/preset-react": "^7.13.13",
     "@babel/preset-typescript": "^7.18.6",
     "@emotion/babel-plugin": "^11.3.0",
+    "@faker-js/faker": "^7.5.0",
     "@mui/types": "^7.1.5",
     "@playwright/test": "^1.24.2",
     "@svgr/webpack": "^5.5.0",
