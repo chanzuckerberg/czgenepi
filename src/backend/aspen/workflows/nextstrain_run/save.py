@@ -61,7 +61,7 @@ def cli(
                 joinedload(PhyloRun.pathogen),
                 joinedload(PhyloRun.inputs.of_type(UploadedPathogenGenome))
                 # load the sample that this uploaded pathogen genome was associated with
-                .subqueryload(UploadedPathogenGenome.sample)
+                .subqueryload(UploadedPathogenGenome.sample),
             )
             .one()
         )

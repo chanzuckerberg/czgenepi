@@ -1,17 +1,16 @@
-
 import re
 from math import ceil
 
 import dateparser
-from typing import Mapping, Any
 
-from aspen.database.models import TreeType, Pathogen, Group
+from aspen.database.models import TreeType
 from aspen.workflows.nextstrain_run.build_plugins.base_plugin import BaseConfigPlugin
 
+
 class TreeTypePlugin(BaseConfigPlugin):
-    crowding_penalty = 0
+    crowding_penalty: float = 0
     tree_type: TreeType
-    subsampling_scheme = "NONE"
+    subsampling_scheme: str = "NONE"
 
     def _update_config_params(self, config):
         build = config["builds"]["aspen"]
@@ -76,9 +75,9 @@ class TreeTypePlugin(BaseConfigPlugin):
         # Remove unused subsampling schemes from our output file
         config["subsampling"] = {self.subsampling_scheme: subsampling}
 
-    
     def run_type_config(self, config, subsampling):
         raise NotImplementedError("base class doesn't implement this")
+
 
 class OverviewPlugin(TreeTypePlugin):
     crowding_penalty = 0.1
@@ -242,4 +241,3 @@ def apply_filters(config, subsampling, template_args):
         old_query = subsampling["group"]["query"][:-1]
         pango_query = " & (pango_lineage in {pango_lineage})"
         subsampling["group"]["query"] = old_query + pango_query + '"'
-

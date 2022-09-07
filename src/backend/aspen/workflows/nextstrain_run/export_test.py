@@ -12,7 +12,14 @@ from aspen.database.connection import (
     session_scope,
     SqlAlchemyInterface,
 )
-from aspen.database.models import Group, Location, PathogenGenome, Sample, TreeType, Pathogen
+from aspen.database.models import (
+    Group,
+    Location,
+    Pathogen,
+    PathogenGenome,
+    Sample,
+    TreeType,
+)
 from aspen.workflows.nextstrain_run.build_config import TemplateBuilder
 from aspen.workflows.nextstrain_run.export import (
     write_includes_file,
@@ -105,7 +112,11 @@ def cli(
             num_included_samples = write_includes_file(
                 session, gisaid_ids, pathogen_genomes[:selected], selected_fh
             )
-        pathogen_model = session.execute(sa.select(Pathogen).where(Pathogen.slug == pathogen)).scalars().one()
+        pathogen_model = (
+            session.execute(sa.select(Pathogen).where(Pathogen.slug == pathogen))  # type: ignore
+            .scalars()
+            .one()
+        )
 
         # Give the nextstrain config builder some info to make decisions
         context = {
@@ -124,7 +135,9 @@ def cli(
                 region=region, country=country, division=div, location=loc
             )
             group.default_tree_location = tree_location
-        builder = TemplateBuilder(build_type, pathogen_model, group, template_args, **context)
+        builder = TemplateBuilder(
+            build_type, pathogen_model, group, template_args, **context
+        )
         builder.write_file(builds_file_fh)
 
         print("Wrote output files!")

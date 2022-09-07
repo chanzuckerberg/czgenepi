@@ -1,15 +1,24 @@
-from typing import Any, Mapping
-
-import dateparser
 import yaml
 
 from aspen.database.models import Group, Pathogen
-from aspen.workflows.nextstrain_run.build_plugins.type_plugins import OverviewPlugin, NonContextualizedPlugin, TargetedPlugin, TreeType
-from aspen.workflows.nextstrain_run.build_plugins.pathogen_plugins import MPXPlugin, SC2Plugin
+from aspen.workflows.nextstrain_run.build_plugins.pathogen_plugins import (
+    MPXPlugin,
+    SC2Plugin,
+)
+from aspen.workflows.nextstrain_run.build_plugins.type_plugins import (
+    NonContextualizedPlugin,
+    OverviewPlugin,
+    TargetedPlugin,
+    TreeType,
+)
+
 
 class TemplateBuilder:
     """A very simplified plugin manager that manages template modifiers for each tree type and pathogen."""
-    def __init__(self, tree_type: TreeType, pathogen: Pathogen, group, template_args, **kwargs):
+
+    def __init__(
+        self, tree_type: TreeType, pathogen: Pathogen, group, template_args, **kwargs
+    ):
         self.pathogen: Pathogen = pathogen
         self.tree_type: TreeType = tree_type
         self.group: Group = group
@@ -21,18 +30,28 @@ class TemplateBuilder:
         # Update our "build" section
         self.plugins = []
         # Update our template based on the type of tree we're building
-        self.plugins.append(self.get_type_plugin(tree_type, pathogen, group, template_args, **kwargs))
+        self.plugins.append(
+            self.get_type_plugin(tree_type, pathogen, group, template_args, **kwargs)
+        )
         # Update our template based on the pathogen we're working with
-        self.plugins.append(self.get_pathogen_plugin(tree_type, pathogen, group, template_args, **kwargs))
+        self.plugins.append(
+            self.get_pathogen_plugin(
+                tree_type, pathogen, group, template_args, **kwargs
+            )
+        )
 
-    def get_pathogen_plugin(self, tree_type: TreeType, pathogen: Pathogen, group, template_args, **kwargs):
+    def get_pathogen_plugin(
+        self, tree_type: TreeType, pathogen: Pathogen, group, template_args, **kwargs
+    ):
         if pathogen.slug == "SC2":
             return SC2Plugin(pathogen, group, template_args, **kwargs)
         if pathogen.slug == "MPX":
             return MPXPlugin(pathogen, group, template_args, **kwargs)
         raise Exception("Unknown pathogen")
 
-    def get_type_plugin(self, tree_type: TreeType, pathogen: Pathogen, group, template_args, **kwargs):
+    def get_type_plugin(
+        self, tree_type: TreeType, pathogen: Pathogen, group, template_args, **kwargs
+    ):
         # This is basically a router -- We'll switch between which build types
         # based on a variety of input.
         if tree_type == TreeType.TARGETED:
@@ -55,4 +74,3 @@ class TemplateBuilder:
             plugin.update_config(config)
 
         yaml.dump(config, destination_fh)
-

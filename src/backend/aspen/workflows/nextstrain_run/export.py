@@ -173,8 +173,12 @@ def export_run_config(
             "num_sequences": num_sequences,
             "num_included_samples": num_included_samples,
         }
-        builder: BaseNextstrainConfigBuilder = TemplateBuilder(
-            phylo_run.tree_type, phylo_run.pathogen, group, phylo_run.template_args, **context
+        builder: TemplateBuilder = TemplateBuilder(
+            phylo_run.tree_type,
+            phylo_run.pathogen,
+            group,
+            phylo_run.template_args,
+            **context,
         )
         builder.write_file(builds_file_fh)
 

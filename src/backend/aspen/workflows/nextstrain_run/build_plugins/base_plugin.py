@@ -1,10 +1,7 @@
-import re
-from math import ceil
+from typing import Any, Mapping
 
-import dateparser
-from typing import Mapping, Any
+from aspen.database.models import Group, Pathogen
 
-from aspen.database.models import TreeType, Pathogen, Group
 
 class BaseConfigPlugin:
     def __init__(
