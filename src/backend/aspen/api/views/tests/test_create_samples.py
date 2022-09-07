@@ -7,7 +7,12 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
-from aspen.database.models import PathogenGenome, Sample, UploadedPathogenGenome, Pathogen
+from aspen.database.models import (
+    Pathogen,
+    PathogenGenome,
+    Sample,
+    UploadedPathogenGenome,
+)
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.usergroup import group_factory, userrole_factory
@@ -43,7 +48,7 @@ async def test_samples_create_different_pathogens(
 
     sc2 = await Pathogen.get_by_slug(async_session, "SC2")
     mpx = await Pathogen.get_by_slug(async_session, "MPX")
-    
+
     pathogen_specific = {sc2: range(2), mpx: range(2, 4)}
     for pathogen, id_range in pathogen_specific.items():
         data = [
@@ -58,7 +63,8 @@ async def test_samples_create_different_pathogens(
                     "sequence": VALID_SEQUENCE + "MN",
                     "sequencing_date": format_date(test_date),
                 },
-            } for i in id_range
+            }
+            for i in id_range
         ]
         auth_headers = {"user_id": user.auth0_user_id}
         res = await http_client.post(

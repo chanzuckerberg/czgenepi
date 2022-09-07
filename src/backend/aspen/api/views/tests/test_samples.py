@@ -1181,7 +1181,9 @@ async def test_validation_endpoint_missing_identifier(
     }
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/pathogens/SC2/samples/validate_ids/", json=data, headers=auth_headers
+        f"/v2/orgs/{group.id}/pathogens/SC2/samples/validate_ids/",
+        json=data,
+        headers=auth_headers,
     )
 
     # request should not fail, should return list of samples that are missing from the DB
