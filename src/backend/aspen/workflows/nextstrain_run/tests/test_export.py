@@ -66,7 +66,7 @@ def create_test_data(
             f"{group.location} Test City",
         )
     pathogen: Optional[Pathogen] = (
-        session.query(Pathogen).filter(Location.slug == "SC2").one_or_none()
+        session.query(Pathogen).filter(Pathogen.slug == "SC2").one_or_none()
     )
     if not pathogen:
         pathogen = pathogen_factory("SC2", "sars-cov-2")
