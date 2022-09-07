@@ -5,8 +5,8 @@ from pydantic import constr, validator
 from pydantic.utils import GetterDict
 
 from aspen.api.schemas.base import BaseRequest, BaseResponse
-from aspen.api.schemas.pathogens import PathogenResponse
 from aspen.api.schemas.locations import LocationResponse
+from aspen.api.schemas.pathogens import PathogenResponse
 from aspen.api.utils import format_sample_lineage
 
 SEQUENCE_VALIDATION_REGEX = r"^[WSKMYRVHDBNZNATCGUwskmyrvhdbnznatcgu-]+$"
@@ -85,7 +85,7 @@ class SampleResponse(BaseResponse):
     czb_failed_genome_recovery: bool
     gisaid: Optional[SampleGisaidResponse]
     lineage: Optional[SampleLineageResponse]
-    pathogen: PathogenResponse
+    pathogen: Optional[PathogenResponse]
     private: bool
     private_identifier: Optional[str]
     public_identifier: Optional[str]

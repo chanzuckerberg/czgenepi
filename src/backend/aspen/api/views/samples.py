@@ -73,12 +73,9 @@ async def list_samples(
         selectinload(Sample.uploaded_by),
         selectinload(Sample.collection_location),
         selectinload(Sample.accessions),
-        selectinload(Sample.pathogen)
-    ).where(
-        Sample.pathogen.slug == pathogen
-    )
+        selectinload(Sample.pathogen),
+    ).filter(Sample.pathogen_id == pathogen.id)
     user_visible_samples_result = await db.execute(user_visible_samples_query)
-    import pdb; pdb.set_trace()
     user_visible_samples: List[Sample] = (
         user_visible_samples_result.unique().scalars().all()
     )
@@ -306,6 +303,7 @@ async def create_samples(
             "public_identifier": sample_input.public_identifier,
             "authors": sample_input.authors or [group.name],
             "collection_location": valid_location,
+            "pathogen": pathogen,
         }
 
         sample: Sample = Sample(**sample_args)
