@@ -15,6 +15,7 @@ def sample_factory(
     collection_date=None,
     sample_collected_by="sample_collector",
     sample_collector_contact_address="sample_collector_address",
+    pathogen=None,
     organism="SARS-CoV-2",
     czb_failed_genome_recovery=False,
     private=False,
@@ -35,6 +36,7 @@ def sample_factory(
         sample_collector_contact_address=sample_collector_contact_address,
         collection_location=collection_location,
         organism=organism,
+        pathogen=pathogen,
         czb_failed_genome_recovery=czb_failed_genome_recovery,
         private=private,
     )

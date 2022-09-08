@@ -1,4 +1,5 @@
 import pytest
+import sqlalchemy as sa
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -15,15 +16,11 @@ async def test_samples_list(
 ):
     group = group_factory()
     user = await userrole_factory(async_session, group)
-
-    # Make multiple pathogens
-    p1 = Pathogen(slug="SC2", name="SARS-CoV-2")
-    p2 = Pathogen(slug="MPX", name="monkey pox")
-
     async_session.add(group)
-    async_session.add(p1)
-    async_session.add(p2)
     await async_session.commit()
+
+    # Load db pathogens
+    pathogens = (await async_session.execute(sa.select(Pathogen))).scalars().all()  # type: ignore
 
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.get(
@@ -31,14 +28,7 @@ async def test_samples_list(
         headers=auth_headers,
     )
     response = res.json()
-    expected = {
-        "pathogens": [
-            {
-                "id": p1.id,
-                "slug": p1.slug,
-                "name": p1.name,
-            },
-            {"id": p2.id, "slug": p2.slug, "name": p2.name},
-        ]
-    }
-    assert response == expected
+    for pathogen in pathogens:
+        assert pathogen.slug in [item["slug"] for item in response["pathogens"]]
+        assert pathogen.name in [item["name"] for item in response["pathogens"]]
+    assert len(response["pathogens"]) == len(pathogens)
