@@ -1,5 +1,5 @@
 import { Page } from "@playwright/test";
-import { getByID, getByTestID } from "../utils/selectors";
+
 
 export abstract class FilterSample {
   public static async applyFilter(
@@ -68,20 +68,12 @@ export abstract class FilterSample {
       }
       await page.keyboard.press("Escape"); //dismiss form
     }
-     //apply filter
-    //  await Promise.all([
-    //   await page.waitForNavigation(),
-    //    await page
-    //      .locator("//ul[@role='menu']/descendant::button[text()='Apply']")
-    //      .click(),
-    //  ]);
-    
   }
 
   //convert days into date object based on current date
   public static convertDaysToDate(value: number): Date {
-    let today = new Date();
-    let filterDate = new Date(today);
+    const today = new Date();
+    const filterDate = new Date(today);
     if (value <= 30) {
       filterDate.setDate(filterDate.getDay() - value);
     } else if (value > 30 && value <= 180) {

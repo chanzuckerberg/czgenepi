@@ -1,29 +1,28 @@
-import { test, expect, chromium, Page } from "@playwright/test";
+import { test, expect} from "@playwright/test";
 import { FilterSample } from "../pages/filter";
 import path from "path";
 import * as dotenv from "dotenv";
 import { getByTestID } from "../utils/selectors";
 dotenv.config({ path: path.join(__dirname, "../.env") });
 
-const collectionDatePeriods: { [key: string]: number } = {
-  Today: 0,
-  Yesterday: 1,
-  "Last 7 Days": 7,
-};
 const uploadDatePeriods: { [key: string]: number } = {
-  "Last 7 Days": 7,
-  "Last 30 Days": 30,
   "Last 3 Months": 90,
+  "Last 30 Days": 30,
   "Last 6 Months": 180,
+  "Last 7 Days": 7,
   "Last Year": 365,
 };
-let page: Page;
+
+const collectionDateFrom = "2022-07-01";
+const collectionDateTo = "2022-09-01";
+const row = "row-collectionDate";
+const datesDatesFromGridLocator = "//div[@data-test-id='table-row']/descendant::div[13]";
+
+
 test.describe("Tests for filtering sample listing view", () => {
   test.beforeEach(async ({page}, workerInfo) => {
     const baseUrl = workerInfo.config.projects[0].use.baseURL;
     const url = `${baseUrl}/data/samples`;
-   // const browser = await chromium.launch();
-  //  page = await browser.newPage();
     await page.goto(url);
   });
 
@@ -53,14 +52,14 @@ test.describe("Tests for filtering sample listing view", () => {
     // verify only samples with selected lineages displayed
     const sampleLineages = await page.locator(".ez2j8c413");
     for (let i = 0; i < (await sampleLineages.count()); i++) {
-      let val = await sampleLineages.nth(i).textContent();
+      const val = await sampleLineages.nth(i).textContent();
       expect(filterBy.lineage).toContain(val);
     }
   });
 
   test("Should filter by collection date from", async ({ page }) => {
     const filterBy = {
-      collectionDateFrom: "2022-07-01", //changes are required
+      collectionDateFrom: collectionDateFrom, //changes are required
     };
     // filter samples
    await FilterSample.applyFilter(page, filterBy);
@@ -69,7 +68,7 @@ test.describe("Tests for filtering sample listing view", () => {
     const filterCollectionDate = new Date(filterBy.collectionDateFrom);
 
     const sampleCollectionDates = await page.locator(
-      getByTestID("row-collectionDate")
+      getByTestID(row)
     );
     for (let i = 0; i < (await sampleCollectionDates.count()); i++) {
       const actuallCollectionDate = new Date(
@@ -83,7 +82,7 @@ test.describe("Tests for filtering sample listing view", () => {
 
   test("Should filter by collection date to", async ({ page }) => {
     const filterBy = {
-      collectionDateTo: "2022-09-01", //change as required
+      collectionDateTo: collectionDateTo, //change as required
     };
     // filter samples
    await FilterSample.applyFilter(page, filterBy);
@@ -91,12 +90,12 @@ test.describe("Tests for filtering sample listing view", () => {
     // verify only samples meeting date criteria are listed
     const filterCollectionDate = new Date(filterBy.collectionDateTo);
 
-    const sampleCollectionDates = await page.locator(
-      getByTestID("row-collectionDate")
+    const sampDates = await page.locator(
+      getByTestID(row)
     );
-    for (let i = 0; i < (await sampleCollectionDates.count()); i++) {
+    for (let i = 0; i < (await sampDates.count()); i++) {
       const actuallCollectionDate = new Date(
-        (await sampleCollectionDates.nth(i).textContent()) as string
+        (await sampDates.nth(i).textContent()) as string
       );
       const result =
         actuallCollectionDate <= filterCollectionDate ? true : false;
@@ -106,8 +105,8 @@ test.describe("Tests for filtering sample listing view", () => {
 
   test("Should filter by collection date from and to", async ({ page }) => {
     const filterBy = {
-      collectionDateFrom: "2022-07-01", //change as required
-      collectionDateTo: "2022-09-01",
+      collectionDateFrom: collectionDateFrom, //change as required
+      collectionDateTo: collectionDateTo,
     };
     // filter samples
    await FilterSample.applyFilter(page, filterBy);
@@ -117,12 +116,12 @@ test.describe("Tests for filtering sample listing view", () => {
     const filterCollectionDateTo = new Date(filterBy.collectionDateTo);
 
     // verify only samples meeting date criteria are listed
-    const sampleCollectionDates = await page.locator(
-      getByTestID("row-collectionDate")
+    const collections = await page.locator(
+      getByTestID(row)
     );
-    for (let i = 0; i < (await sampleCollectionDates.count()); i++) {
+    for (let i = 0; i < (await collections.count()); i++) {
       const actuallCollectionDate = new Date(
-        (await sampleCollectionDates.nth(i).textContent()) as string
+        (await collections.nth(i).textContent()) as string
       );
       const dateFromResult =
         actuallCollectionDate >= filterCollectionDateFrom ? true : false;
@@ -135,7 +134,6 @@ test.describe("Tests for filtering sample listing view", () => {
 
   test("Should filter by collection date periods", async ({ page }) => {
     //test all date options
-    // Object.keys(collectionDatePeriods).forEach(async (period) => {
       const periods = Object.keys(uploadDatePeriods);
       for(const period of periods) {
       const periodValue = uploadDatePeriods[period];
@@ -146,25 +144,23 @@ test.describe("Tests for filtering sample listing view", () => {
       const filterCollectionDate =  FilterSample.convertDaysToDate(periodValue);
 
       //verify only samples meeting criteria are listed
-      const sampleCollectionDates = await page.locator(
-        getByTestID("row-collectionDate")
+      const sampleCol = await page.locator(
+        getByTestID(row)
       );
-      for (let i = 0; i < (await sampleCollectionDates.count()); i++) {
+      for (let i = 0; i < (await sampleCol.count()); i++) {
         const actuallCollectionDate = new Date(
-          (await sampleCollectionDates.nth(i).textContent()) as string
+          (await sampleCol.nth(i).textContent()) as string
         );
         const result =
           actuallCollectionDate <= filterCollectionDate ? true : false;
        expect(result).toBeFalsy();
-       //console.log(result);
       }
     }
-   // });
   });
 
   test("Should filter by upload date from", async ({ page }) => {
     const filterBy = {
-      uploadDateFrom: "2022-07-01", //change as required
+      uploadDateFrom: collectionDateFrom, //change as required
     };
     // filter samples by upload date from
    await FilterSample.applyFilter(page, filterBy);
@@ -172,10 +168,10 @@ test.describe("Tests for filtering sample listing view", () => {
     // verify only samples meeting date criteria are listed
     const filterUploadDate = new Date(filterBy.uploadDateFrom);
 
-    const sampleUploadDates = await page.locator("//div[@data-test-id='table-row']/descendant::div[13]"); //todo we need dev help to inject test ids in sample data table
-    for (let i = 0; i < (await sampleUploadDates.count()); i++) {
+    const dates = await page.locator(datesDatesFromGridLocator); //todo we need dev help to inject test ids in sample data table
+    for (let i = 0; i < (await dates.count()); i++) {
       const actuallUploadDate = new Date(
-        (await sampleUploadDates.nth(i).textContent()) as string
+        (await dates.nth(i).textContent()) as string
       );
       const result = actuallUploadDate >= filterUploadDate ? true : false;
       expect(result).toBeTruthy();
@@ -184,7 +180,7 @@ test.describe("Tests for filtering sample listing view", () => {
 
   test("Should filter by upload date to", async ({ page }) => {
     const filterBy = {
-      uploadDateTo: "2022-09-01", //changes are required
+      uploadDateTo: collectionDateTo, //changes are required
     };
     // filter samples
     await FilterSample.applyFilter(page, filterBy);
@@ -192,7 +188,7 @@ test.describe("Tests for filtering sample listing view", () => {
     // verify only samples meeting date criteria are listed
     const filterUploadDate = new Date(filterBy.uploadDateTo);
 
-    const sampleUploadDates = await page.locator("//div[@data-test-id='table-row']/descendant::div[13]"); //todo we need dev help to inject test ids in sample data table
+    const sampleUploadDates = await page.locator(datesDatesFromGridLocator); //todo we need dev help to inject test ids in sample data table
     for (let i = 0; i < (await sampleUploadDates.count()); i++) {
       const actuallUploadDate = new Date(
         (await sampleUploadDates.nth(i).textContent()) as string
@@ -205,7 +201,7 @@ test.describe("Tests for filtering sample listing view", () => {
   test("Should filter by from and to upload dates", async ({ page }) => {
     const filterBy = {
       uploadDateFrom: "2022-07-01", //change as required
-      uploadDateTo: "2022-09-01",
+      uploadDateTo: collectionDateTo,
     };
     // filter samples
    await FilterSample.applyFilter(page, filterBy);
@@ -214,10 +210,10 @@ test.describe("Tests for filtering sample listing view", () => {
     const filterUploadDateFrom = new Date(filterBy.uploadDateFrom);
     const filterUploadDateTo = new Date(filterBy.uploadDateTo);
 
-    const sampleUploadDates = await page.locator("//div[@data-test-id='table-row']/descendant::div[13]"); //todo we need dev help to inject test ids in sample data table
-    for (let i = 0; i < (await sampleUploadDates.count()); i++) {
+    const samUploadDates = await page.locator(datesDatesFromGridLocator); //todo we need dev help to inject test ids in sample data table
+    for (let i = 0; i < (await samUploadDates.count()); i++) {
       const actuallUploadDate = new Date(
-        (await sampleUploadDates.nth(i).textContent()) as string
+        (await samUploadDates.nth(i).textContent()) as string
       );
       const dateFromResult =
         actuallUploadDate >= filterUploadDateFrom ? true : false;
@@ -242,10 +238,10 @@ test.describe("Tests for filtering sample listing view", () => {
       const filterUploadDate = await FilterSample.convertDaysToDate(periodValue);
 
       //verify sample listing
-      const sampleUploadDates = await page.locator("//div[@data-test-id='table-row']/descendant::div[13]"); //todo we need dev help to inject test ids in sample data table
-      for (let i = 0; i < (await sampleUploadDates.count()); i++) {
+      const UploadDates = await page.locator(datesDatesFromGridLocator); //todo we need dev help to inject test ids in sample data table
+      for (let i = 0; i < (await UploadDates.count()); i++) {
         const actuallUploadDate = new Date(
-          (await sampleUploadDates.nth(i).textContent()) as string
+          (await UploadDates.nth(i).textContent()) as string
         );
         const result = actuallUploadDate >= filterUploadDate ? true : false;
         expect(result).toBeTruthy();
@@ -257,12 +253,12 @@ test.describe("Tests for filtering sample listing view", () => {
   test("Should filter by multiple fields", async ({ page }) => {
     //todo: change filter values
     const filterBy = {
-      collectionDateFrom: "2022-09-01",
-      collectionDateTo: "2022-09-01",
-      uploadDateFrom: "2022-09-01",
-      uploadDateTo: "2022-09-01",
+      collectionDateFrom: collectionDateTo,
+      collectionDateTo: collectionDateTo,
       lineage: ["BA.1.15"],
       status: "Complete",
+      uploadDateFrom: collectionDateTo,
+      uploadDateTo: collectionDateTo,
     };
     // filter
     await FilterSample.applyFilter(page, filterBy);
@@ -273,7 +269,7 @@ test.describe("Tests for filtering sample listing view", () => {
     for (let i = 0; i < (await samples.count()); i++) {
       //verify upload date is within from-to range
       const uploadDateText = (await page
-        .locator("//div[@data-test-id='table-row']/descendant::div[13]")
+        .locator(datesDatesFromGridLocator)
         .nth(i)
         .textContent()) as string; //todo we need dev help to inject test ids in sample data table
       const actuallUploadDate = new Date(uploadDateText);
@@ -287,7 +283,7 @@ test.describe("Tests for filtering sample listing view", () => {
      await expect(dateToResult).toBeTruthy();
       //very collection date is within from-to range
       const collectionDateText = (await page
-        .locator(getByTestID("row-collectionDate"))
+        .locator(getByTestID(row))
         .nth(i)
         .textContent()) as string;
       const actualCollectionDate = new Date(collectionDateText);
