@@ -79,7 +79,7 @@ async def test_samples_list(
     await async_session.commit()
 
     auth_headers = {"user_id": user.auth0_user_id}
-    pathogen_specific = {
+    pathogen_specific = {  # type: ignore
         sc2: {
             "id_range": range(2),
             "url": f"/v2/orgs/{group.id}/pathogens/SC2/samples/",
@@ -94,10 +94,10 @@ async def test_samples_list(
             "url": f"/v2/orgs/{group.id}/samples/",
         },
     }
-    for pathogen, params in pathogen_specific.items():
+    for pathogen, params in pathogen_specific.items():  # type: ignore
 
         res = await http_client.get(
-            params["url"],
+            params["url"],  # type: ignore
             headers=auth_headers,
         )
         response = res.json()
@@ -158,7 +158,7 @@ async def test_samples_list(
                     },
                     "uploaded_by": {"id": user.id, "name": user.name},
                 }
-                for i in params["id_range"]
+                for i in params["id_range"]  # type: ignore
             ]
         }
         assert response == expected
