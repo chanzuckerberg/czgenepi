@@ -348,6 +348,6 @@ async def test_submission_template_incomplete_location(
         ].collection_date.strftime("%Y-%m-%d")
         assert row["covv_subm_lab"] == group.name
         assert row["covv_subm_lab_addr"] == group.address
-        assert row["covv_location"] == "North America / USA / California"
+        assert row["covv_location"] == "North America / USA / California / None"
         row_count += 1
     assert row_count == len(samples)
