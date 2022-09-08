@@ -9,7 +9,7 @@ repos:
         exclude: ^src/backend/third-party/
         types: [file, python]
   - repo: https://github.com/psf/black
-    rev: 21.9b0
+    rev: 22.3.0 
     hooks:
       - id: black
         files: ^src/backend/
