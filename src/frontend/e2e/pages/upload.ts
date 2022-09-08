@@ -1,5 +1,7 @@
 import { Page } from "@playwright/test";
 import { faker } from "@faker-js/faker";
+import { Sample } from "e2e/utils/schemas/sampleData";
+import { UploadData } from "e2e/utils/schemas/uploadData";
 
 export class UploadSample {
   public static async uploadFiles(
@@ -171,20 +173,4 @@ export class UploadSample {
       },
     ];
   }
-}
-
-export interface Sample {
-  collectionDate: string;
-  collectionLocation: string;
-  privateId: string;
-  isPrivate: boolean;
-  publicId: string;
-  sequencingDate: string;
-}
-
-export interface UploadData {
-  applyToAll: boolean;
-  dataFiles: Array<string>;
-  metadataFile?: string;
-  sample: Array<Sample>;
 }
