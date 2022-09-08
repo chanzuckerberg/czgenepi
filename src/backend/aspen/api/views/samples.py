@@ -79,7 +79,7 @@ async def list_samples(
     if pathogen.slug == "SC2":
         user_visible_samples_query = user_visible_samples_query.filter(
             or_(
-                Sample.pathogen_id == pathogen.id, Sample.pathogen_id == None
+                Sample.pathogen_id == pathogen.id, Sample.pathogen_id is None
             )  # TODO: remove this once we make pathogen_id non nullable
         )
     else:
