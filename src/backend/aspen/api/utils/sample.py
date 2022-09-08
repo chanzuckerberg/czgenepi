@@ -275,6 +275,8 @@ def sample_info_to_gisaid_rows(
         for key in ["region", "country", "division", "location"]:
             if sample_info[key]:
                 location_strings.append(sample_info[key])
+            else:
+                location_strings.append("None")
         gisaid_location = " / ".join(location_strings)
 
         metadata_row = {
