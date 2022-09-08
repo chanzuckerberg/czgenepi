@@ -10,6 +10,7 @@ from aspen.api.authz import AuthZSession, get_authz_session
 from aspen.database.models import Group, GroupRole, PhyloRun, PhyloTree, Sample, User
 from aspen.database.models.base import idbase
 from aspen.test_infra.models.location import location_factory
+from aspen.test_infra.models.pathogen import pathogen_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.usergroup import (
@@ -114,7 +115,8 @@ async def appdata(
                 private_identifier=f"private_identifier_{group.name}_{i}",
                 public_identifier=f"public_identifier_{group.name}_{i}",
             )
-            phylo_run = phylorun_factory(group)
+            pathogen = pathogen_factory()
+            phylo_run = phylorun_factory(group, pathogen=pathogen)
             tree = phylotree_factory(phylo_run, [sample])
 
             group.test_samples.append(sample)

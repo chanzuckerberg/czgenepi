@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.database.models import Group, PhyloTree, Sample
 from aspen.test_infra.models.location import location_factory
+from aspen.test_infra.models.pathogen import pathogen_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
@@ -129,8 +130,9 @@ async def create_phylotree(
     run_inputs = []
     if sample_as_input:
         run_inputs = [upg]
+    pathogen = pathogen_factory()
     phylo_tree = phylotree_factory(
-        phylorun_factory(owner_group, inputs=run_inputs),
+        phylorun_factory(owner_group, pathogen=pathogen, inputs=run_inputs),
         samples,
     )
     upload_s3_file(mock_s3_resource, phylo_tree, samples)
