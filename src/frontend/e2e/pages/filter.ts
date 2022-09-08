@@ -7,27 +7,29 @@ export abstract class FilterSample {
     filterData: Partial<FilterData>
   ): Promise<void> {
     // fill in upload date(s)
+   await page.waitForFunction(() => {const samples = document.querySelector("a[href$='/data/samples'] > div > div:nth-child(2)")?.textContent; return parseInt(samples!) > 0 })
     if (
       filterData.uploadDateFrom !== undefined ||
       filterData.uploadDateTo !== undefined
     ) {
       await page.locator("button[label='Upload Date']").click();
       if (filterData.uploadDateFrom !== undefined) {
-        page
-          .locator("input[name='collectionDateStart']")
+       await page
+          .locator("input[name='uploadDateStart']")
           .fill(filterData.uploadDateFrom);
       }
       if (filterData.uploadDateTo !== undefined) {
-        page
-          .locator("input[name='collectionDateEnd']")
+       await page
+          .locator("input[name='uploadDateEnd']")
           .fill(filterData.uploadDateTo);
       }
+      await page.locator("//div[not(contains(@style,'visibility: hidden')) and contains(@class,'MuiPaper-root')]/descendant::button[text()='Apply']").click();
     }
     // select upload date period
     if (filterData.uploadDatePeriod !== undefined) {
       await page.locator("button[label='Upload Date']").click();
       await page
-        .locator("div[style*='194'] span > span")
+        .locator("div:not([style*='hidden'])[class*='MuiPaper-elevation'] li")
         .filter({ hasText: filterData.uploadDatePeriod })
         .click();
     }
@@ -43,39 +45,37 @@ export abstract class FilterSample {
           .fill(filterData.collectionDateFrom);
       }
       if (filterData.collectionDateTo !== undefined) {
-        page
+       await page
           .locator("input[name='collectionDateEnd']")
           .fill(filterData.collectionDateTo);
       }
+      await page.locator("//div[not(contains(@style,'visibility: hidden')) and contains(@class,'MuiPaper-root')]/descendant::button[text()='Apply']").click();
     }
     // select collection date period
     if (filterData.collectionDatePeriod !== undefined) {
       await page.locator("button[label='Collection Date']").click();
       await page
-        .locator("div[style*='194'] span > span")
+        .locator("div:not([style*='hidden'])[class*='MuiPaper-elevation'] li")
         .filter({ hasText: filterData.collectionDatePeriod })
         .click();
     }
     // select lineage
     if (filterData.lineage !== undefined) {
-      await page.locator("button[label='Lineage']").click();
-      filterData.lineage.forEach(async (lineage) => {
-        await page
-          .locator("ul[role='listbox']  .primary-text > div", {
-            hasText: lineage,
-          })
-          .first()
-          .click();
-      });
+       await page.locator("button[label='Lineage']").click();
+      for(const singleLineage of filterData.lineage){
+        await page.locator("div[role='tooltip'] input").fill(singleLineage);
+        await page.locator("ul[role='listbox']  .primary-text > div",{hasText:singleLineage}).first().click();
+      }
       await page.keyboard.press("Escape"); //dismiss form
     }
-    //apply filter
-    await Promise.all([
-      page.waitForNavigation(),
-      await page
-        .locator("//ul[@role='menu']/descendant::button[text()='Apply']")
-        .click(),
-    ]);
+     //apply filter
+    //  await Promise.all([
+    //   await page.waitForNavigation(),
+    //    await page
+    //      .locator("//ul[@role='menu']/descendant::button[text()='Apply']")
+    //      .click(),
+    //  ]);
+    
   }
 
   //convert days into date object based on current date
