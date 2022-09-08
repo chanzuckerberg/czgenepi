@@ -4,24 +4,23 @@ from uuid import uuid4
 
 import boto3
 import smart_open
-import sqlalchemy as sa
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.sql.expression import and_
 
 import aspen.api.error.http_exceptions as ex
 from aspen.api.authn import AuthContext, get_auth_context
 from aspen.api.authz import AuthZSession, get_authz_session
-from aspen.api.deps import get_db, get_pathogen_slug, get_settings
+from aspen.api.deps import get_db, get_pathogen, get_settings
 from aspen.api.schemas.sequences import (
     FastaURLRequest,
     FastaURLResponse,
     SequenceRequest,
 )
 from aspen.api.settings import APISettings
+from aspen.api.utils import get_public_repository_prefix
 from aspen.api.utils.fasta_streamer import FastaStreamer
-from aspen.database.models import Pathogen, PathogenRepoConfig, PublicRepository
+from aspen.database.models import Pathogen
 
 router = APIRouter()
 
@@ -35,43 +34,23 @@ def get_fasta_filename(public_repository_name, group_name):
     return f"{group_name}_sample_sequences.fasta"
 
 
-async def get_public_repository_prefix(pathogen_slug, public_repository_name, db):
-    if pathogen_slug and public_repository_name:
-        # only get the prefix if we have enough information to proceed
-        prefix = (
-            sa.select(PathogenRepoConfig)
-            .join(Pathogen)
-            .join(PublicRepository)
-            .where(
-                and_(
-                    Pathogen.slug == pathogen_slug,
-                    PublicRepository.name == public_repository_name,
-                )
-            )
-        )
-        res = await db.execute(prefix)
-        pathogen_repo_config = res.scalars().one_or_none()
-        if pathogen_repo_config:
-            return pathogen_repo_config.prefix
-
-
 @router.post("/")
 async def prepare_sequences_download(
     request: SequenceRequest,
     db: AsyncSession = Depends(get_db),
     az: AuthZSession = Depends(get_authz_session),
     ac: AuthContext = Depends(get_auth_context),
-    pathogen_slug=Depends(get_pathogen_slug),
+    pathogen: Pathogen = Depends(get_pathogen),
 ) -> StreamingResponse:
     # stream output file
     fasta_filename = get_fasta_filename(request.public_repository_name, ac.group.name)  # type: ignore
 
     # get the sample id prefix for given public_repository
     prefix = await get_public_repository_prefix(
-        pathogen_slug, request.public_repository_name, db
+        pathogen, request.public_repository_name, db
     )
     prefix_should_exist = (
-        pathogen_slug is not None and request.public_repository_name is not None
+        pathogen is not None and request.public_repository_name is not None
     )
     if prefix is None and prefix_should_exist:
         raise ex.ServerException(
@@ -80,7 +59,7 @@ async def prepare_sequences_download(
 
     async def stream_samples():
         sample_ids = request.sample_ids
-        streamer = FastaStreamer(db, az, ac, set(sample_ids), prefix)
+        streamer = FastaStreamer(db, az, ac, pathogen, set(sample_ids), prefix)
         async for line in streamer.stream():
             yield line
 

@@ -12,7 +12,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from aspen.api.authn import AuthContext, get_auth_context, get_auth_user
 from aspen.api.authz import AuthZSession, get_authz_session, require_group_privilege
-from aspen.api.deps import get_db, get_pathogen_slug, get_settings
+from aspen.api.deps import get_db, get_pathogen, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.samples import (
     CreateSampleRequest,
@@ -36,12 +36,20 @@ from aspen.api.utils import (
     get_matching_gisaid_ids,
     get_matching_gisaid_ids_by_epi_isl,
     get_missing_and_found_sample_ids,
+    get_public_repository_prefix,
     GisaidSubmissionFormTSVStreamer,
     sample_info_to_genbank_rows,
     sample_info_to_gisaid_rows,
     samples_by_identifiers,
 )
-from aspen.database.models import Group, Location, Sample, UploadedPathogenGenome, User
+from aspen.database.models import (
+    Group,
+    Location,
+    Pathogen,
+    Sample,
+    UploadedPathogenGenome,
+    User,
+)
 from aspen.util.swipe import PangolinJob
 
 router = APIRouter()
@@ -54,7 +62,7 @@ async def list_samples(
     db: AsyncSession = Depends(get_db),
     az: AuthZSession = Depends(get_authz_session),
     ac: AuthContext = Depends(get_auth_context),
-    pathogen_slug=Depends(get_pathogen_slug),
+    pathogen: Pathogen = Depends(get_pathogen),
 ) -> SamplesResponse:
 
     # load the samples.
@@ -206,6 +214,7 @@ async def validate_ids(
     request_data: ValidateIDsRequest,
     db: AsyncSession = Depends(get_db),
     az: AuthZSession = Depends(get_authz_session),
+    pathogen: Pathogen = Depends(get_pathogen),
 ) -> ValidateIDsResponse:
 
     """
@@ -218,7 +227,7 @@ async def validate_ids(
 
     # get all samples from request that the user has permission to use and scope down
     # the search for matching ID's to groups that the user has read access to.
-    user_visible_samples_query = await samples_by_identifiers(az, sample_ids)
+    user_visible_samples_query = await samples_by_identifiers(az, pathogen, sample_ids)
     user_visible_samples_res = await (db.execute(user_visible_samples_query))
     user_visible_samples = user_visible_samples_res.scalars().all()
 
@@ -248,7 +257,7 @@ async def create_samples(
     settings: APISettings = Depends(get_settings),
     user: User = Depends(get_auth_user),
     group: Group = Depends(require_group_privilege("create_sample")),
-    pathogen_slug=Depends(get_pathogen_slug),
+    pathogen: Pathogen = Depends(get_pathogen),
 ) -> SamplesResponse:
 
     duplicates_in_request: Union[
@@ -349,22 +358,35 @@ async def create_samples(
 
 @router.post("/submission_template")
 async def fill_submission_template(
-    request_data: SubmissionTemplateRequest,
+    request: SubmissionTemplateRequest,
     db: AsyncSession = Depends(get_db),
     az: AuthZSession = Depends(get_authz_session),
     ac: AuthContext = Depends(get_auth_context),
+    pathogen: Pathogen = Depends(get_pathogen),
 ):
-    sample_ids: Set[str] = {item for item in request_data.sample_ids}
+    sample_ids: Set[str] = {item for item in request.sample_ids}
 
     # get all samples from request that the user has permission to use and scope down
     # the search for matching ID's to groups that the user has read access to.
-    user_visible_samples_query = await samples_by_identifiers(az, sample_ids)
+    user_visible_samples_query = await samples_by_identifiers(az, pathogen, sample_ids)
     user_visible_samples_res = await (
         db.execute(
             user_visible_samples_query.options(selectinload(Sample.collection_location))
         )
     )
     user_visible_samples = user_visible_samples_res.scalars().all()
+
+    # get the sample id prefix for given public_repository
+    prefix = await get_public_repository_prefix(
+        pathogen, request.public_repository_name, db
+    )
+    prefix_should_exist = (
+        pathogen is not None and request.public_repository_name is not None
+    )
+    if prefix is None and prefix_should_exist:
+        raise ex.ServerException(
+            "no prefix found for given pathogen_slug and public_repository combination"
+        )
 
     if not ac.group:
         raise ex.ServerException("No group for user.")
@@ -379,20 +401,18 @@ async def fill_submission_template(
     tsv_streamer: Union[
         Type[GisaidSubmissionFormTSVStreamer], Type[GenBankSubmissionFormTSVStreamer]
     ]
-    if request_data.public_repository_name.lower() == "gisaid":
+    if request.public_repository_name.lower() == "gisaid":
         metadata_rows = sample_info_to_gisaid_rows(
-            submission_information, request_data.date.strftime("%Y%m%d")
+            submission_information, prefix, request.date.strftime("%Y%m%d")
         )
         metadata_rows.sort(key=lambda row: row.get("covv_virus_name"))  # type: ignore
-        filename = f"{request_data.date.strftime('%Y%m%d')}_GISAID_metadata.csv"  # yes, we want a TSV with a .csv extension
+        filename = f"{request.date.strftime('%Y%m%d')}_GISAID_metadata.csv"  # yes, we want a TSV with a .csv extension
         tsv_streamer = GisaidSubmissionFormTSVStreamer
-    elif request_data.public_repository_name.lower() == "genbank":
-        metadata_rows = sample_info_to_genbank_rows(submission_information)
+    elif request.public_repository_name.lower() == "genbank":
+        metadata_rows = sample_info_to_genbank_rows(submission_information, prefix)
         metadata_rows.sort(key=lambda row: row.get("Sequence_ID"))  # type: ignore
-        filename = f"{request_data.date.strftime('%Y%m%d')}_GenBank_metadata.tsv"
+        filename = f"{request.date.strftime('%Y%m%d')}_GenBank_metadata.tsv"
         tsv_streamer = GenBankSubmissionFormTSVStreamer
 
-    if request_data.page:
-        filename = filename.replace("metadata.", f"metadata_{request_data.page}.")
     file_streamer = tsv_streamer(filename, metadata_rows)
     return file_streamer.get_response()

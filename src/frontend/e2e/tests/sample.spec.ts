@@ -15,8 +15,12 @@ const tableHeaders = [
 ];
 
 test.describe("Samples page tests", () => {
+  test.beforeEach(async ({ page }, workerInfo) => {
+    const { baseURL } = workerInfo.config.projects[0].use;
+    const url = `${baseURL}` as string;
+    await page.goto(`${url}/data/samples`);
+  });
   test("Should verify sample listing", async ({ page }: { page: Page }) => {
-    await page.goto("https://staging.czgenepi.org/data/samples");
     tableHeaders.forEach((header) => {
       expect(page.locator(getByText(header)).first()).not.toBeEmpty();
     });

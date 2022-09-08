@@ -22,31 +22,70 @@ import { ENTITIES } from "./entities";
 import { MutationCallbacks } from "./types";
 
 /**
- * Download fasta file for samples
+ * Download fasta file, GISAID template or Genbank template for samples
  */
+export enum PUBLIC_REPOSITORY_NAME {
+  GENBANK = "GenBank",
+  GISAID = "GISAID",
+}
 
 type FileDownloadEndpointType =
   | ORG_API.SAMPLES_FASTA_DOWNLOAD
-  | ORG_API.SAMPLES_GENBANK_DOWNLOAD
-  | ORG_API.SAMPLES_GISAID_DOWNLOAD;
+  | ORG_API.SAMPLES_TEMPLATE_DOWNLOAD;
 interface SampleFileDownloadType {
   endpoint: FileDownloadEndpointType;
+  page?: number;
+  publicRepositoryName?: PUBLIC_REPOSITORY_NAME;
   sampleIds: string[];
 }
-type FileDownloadCallbacks = MutationCallbacks<Blob>;
+interface FileDownloadRequestPayload {
+  date?: string;
+  page?: number;
+  public_repository_name?: PUBLIC_REPOSITORY_NAME;
+  sample_ids: string[];
+}
+
+export interface FileDownloadResponsePayload {
+  data: Blob;
+  filename?: string | null;
+}
+
+type FileDownloadCallbacks = {
+  componentOnError: () => void;
+  componentOnSuccess: ({ data, filename }: FileDownloadResponsePayload) => void;
+};
 
 export async function downloadSamplesFile({
   endpoint,
+  page,
+  publicRepositoryName,
   sampleIds,
-}: SampleFileDownloadType): Promise<Blob> {
-  const payload = {
+}: SampleFileDownloadType): Promise<FileDownloadResponsePayload> {
+  const payload: FileDownloadRequestPayload = {
+    page,
+    public_repository_name: publicRepositoryName,
     sample_ids: sampleIds,
   };
+
+  if (endpoint === ORG_API.SAMPLES_TEMPLATE_DOWNLOAD) {
+    const date = new Date();
+    const dateString = `${date.getFullYear()}-${date.getMonth()}-${date.getDay()}`;
+    payload.date = dateString;
+  }
+
   const response = await fetch(API_URL + generateOrgSpecificUrl(endpoint), {
     ...DEFAULT_POST_OPTIONS,
     body: JSON.stringify(payload),
   });
-  if (response.ok) return await response.blob();
+
+  if (response.ok) {
+    const filename = response.headers
+      .get("content-disposition")
+      ?.split("filename=")[1];
+
+    const data = await response.blob();
+    return { data, filename };
+  }
 
   throw Error(`${response.statusText}: ${await response.text()}`);
 }
@@ -55,7 +94,7 @@ export function useFileDownload({
   componentOnError,
   componentOnSuccess,
 }: FileDownloadCallbacks): UseMutationResult<
-  Blob,
+  FileDownloadResponsePayload,
   unknown,
   SampleFileDownloadType,
   unknown

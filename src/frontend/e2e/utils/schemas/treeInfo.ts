@@ -1,7 +1,11 @@
 export type TreeInfo = {
-    treeName: string,
-    treeType: string,
-    lineage: any,
-    collectionDate: any,
-    forceIncludedSamples: any
+  collectionDate?: {
+    custom?: string;
+    from?: string;
+    to?: string;
+  };
+  forceIncludedSamples?: Array<string>;
+  lineage: Array<string>;
+  treeName: string;
+  treeType: string;
 };
