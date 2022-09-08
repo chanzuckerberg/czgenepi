@@ -1,29 +1,36 @@
 import { Page } from "@playwright/test";
-
-
 export abstract class FilterSample {
   public static async applyFilter(
     page: Page,
     filterData: Partial<FilterData>
   ): Promise<void> {
     // fill in upload date(s)
-   await page.waitForFunction(() => {const samples = document.querySelector("a[href$='/data/samples'] > div > div:nth-child(2)")?.textContent; return parseInt(samples!) > 0 })
+    await page.waitForFunction(() => {
+      const samples = document.querySelector(
+        "a[href$='/data/samples'] > div > div:nth-child(2)"
+      )?.textContent;
+      return parseInt(samples!) > 0;
+    });
     if (
       filterData.uploadDateFrom !== undefined ||
       filterData.uploadDateTo !== undefined
     ) {
       await page.locator("button[label='Upload Date']").click();
       if (filterData.uploadDateFrom !== undefined) {
-       await page
+        await page
           .locator("input[name='uploadDateStart']")
           .fill(filterData.uploadDateFrom);
       }
       if (filterData.uploadDateTo !== undefined) {
-       await page
+        await page
           .locator("input[name='uploadDateEnd']")
           .fill(filterData.uploadDateTo);
       }
-      await page.locator("//div[not(contains(@style,'visibility: hidden')) and contains(@class,'MuiPaper-root')]/descendant::button[text()='Apply']").click();
+      await page
+        .locator(
+          "//div[not(contains(@style,'visibility: hidden')) and contains(@class,'MuiPaper-root')]/descendant::button[text()='Apply']"
+        )
+        .click();
     }
     // select upload date period
     if (filterData.uploadDatePeriod !== undefined) {
@@ -45,11 +52,15 @@ export abstract class FilterSample {
           .fill(filterData.collectionDateFrom);
       }
       if (filterData.collectionDateTo !== undefined) {
-       await page
+        await page
           .locator("input[name='collectionDateEnd']")
           .fill(filterData.collectionDateTo);
       }
-      await page.locator("//div[not(contains(@style,'visibility: hidden')) and contains(@class,'MuiPaper-root')]/descendant::button[text()='Apply']").click();
+      await page
+        .locator(
+          "//div[not(contains(@style,'visibility: hidden')) and contains(@class,'MuiPaper-root')]/descendant::button[text()='Apply']"
+        )
+        .click();
     }
     // select collection date period
     if (filterData.collectionDatePeriod !== undefined) {
@@ -61,10 +72,15 @@ export abstract class FilterSample {
     }
     // select lineage
     if (filterData.lineage !== undefined) {
-       await page.locator("button[label='Lineage']").click();
-      for(const singleLineage of filterData.lineage){
+      await page.locator("button[label='Lineage']").click();
+      for (const singleLineage of filterData.lineage) {
         await page.locator("div[role='tooltip'] input").fill(singleLineage);
-        await page.locator("ul[role='listbox']  .primary-text > div",{hasText:singleLineage}).first().click();
+        await page
+          .locator("ul[role='listbox']  .primary-text > div", {
+            hasText: singleLineage,
+          })
+          .first()
+          .click();
       }
       await page.keyboard.press("Escape"); //dismiss form
     }

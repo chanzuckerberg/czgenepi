@@ -13,6 +13,9 @@ from aspen.api.utils import (
 )
 from aspen.database.models import Sample, UploadedPathogenGenome
 from aspen.test_infra.models.location import location_factory
+from aspen.test_infra.models.pathogen_repo_config import (
+    setup_gisaid_and_genbank_repo_configs,
+)
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
 from aspen.test_infra.models.usergroup import group_factory, userrole_factory
@@ -21,7 +24,7 @@ from aspen.test_infra.models.usergroup import group_factory, userrole_factory
 pytestmark = pytest.mark.asyncio
 
 
-async def test_gisaid_submission_template_download_gisaid(
+async def test_submission_template_download_gisaid(
     async_session: AsyncSession,
     http_client: AsyncClient,
 ):
@@ -33,6 +36,7 @@ async def test_gisaid_submission_template_download_gisaid(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
+    await setup_gisaid_and_genbank_repo_configs(async_session)
     pangolin_output = {
         "scorpio_call": "B.1.167",
         "scorpio_support": "0.775",
@@ -66,7 +70,6 @@ async def test_gisaid_submission_template_download_gisaid(
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     request_data = {
         "sample_ids": [sample.public_identifier for sample in samples],
-        "date": today.strftime("%Y-%m-%d"),
         "public_repository_name": "GISAID",
     }
     res = await http_client.post(
@@ -103,7 +106,7 @@ async def test_gisaid_submission_template_download_gisaid(
     assert row_count == len(samples)
 
 
-async def test_gisaid_submission_template_download_genbank(
+async def test_submission_template_download_genbank(
     async_session: AsyncSession,
     http_client: AsyncClient,
 ):
@@ -115,6 +118,7 @@ async def test_gisaid_submission_template_download_genbank(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
+    await setup_gisaid_and_genbank_repo_configs(async_session)
     pangolin_output = {
         "scorpio_call": "B.1.167",
         "scorpio_support": "0.775",
@@ -148,7 +152,6 @@ async def test_gisaid_submission_template_download_genbank(
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     request_data = {
         "sample_ids": [sample.public_identifier for sample in samples],
-        "date": today.strftime("%Y-%m-%d"),
         "public_repository_name": "GenBank",
     }
     res = await http_client.post(
@@ -170,7 +173,8 @@ async def test_gisaid_submission_template_download_genbank(
     row_count = 0
     for row in tsvreader:
         assert (
-            row["Sequence_ID"] == f"SARS-CoV-2/{samples[row_count].public_identifier}"
+            row["Sequence_ID"]
+            == f"SARS-CoV-2/human/{samples[row_count].public_identifier}"
         )
         assert row["collection-date"] == samples[row_count].collection_date.strftime(
             "%Y-%m-%d"
@@ -180,7 +184,7 @@ async def test_gisaid_submission_template_download_genbank(
     assert row_count == len(samples)
 
 
-async def test_gisaid_submission_template_download_page_number(
+async def test_submission_template_prefix_stripping(
     async_session: AsyncSession,
     http_client: AsyncClient,
 ):
@@ -192,6 +196,7 @@ async def test_gisaid_submission_template_download_page_number(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
+    await setup_gisaid_and_genbank_repo_configs(async_session)
     pangolin_output = {
         "scorpio_call": "B.1.167",
         "scorpio_support": "0.775",
@@ -207,8 +212,8 @@ async def test_gisaid_submission_template_download_page_number(
                 user,
                 location,
                 private=True,
-                private_identifier=f"private{i}",
-                public_identifier=f"public{i}",
+                private_identifier=f"hCoV-19/private{i}",
+                public_identifier=f"hCoV-19/public{i}",
             )
         )
         uploaded_pathogen_genomes.append(
@@ -223,18 +228,16 @@ async def test_gisaid_submission_template_download_page_number(
 
     today = datetime.date.today()
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
-    request_data_gisaid = {
+    request_data = {
         "sample_ids": [sample.public_identifier for sample in samples],
-        "date": today.strftime("%Y-%m-%d"),
         "public_repository_name": "GISAID",
-        "page": 1,
     }
     res = await http_client.post(
         f"/v2/orgs/{group.id}/samples/submission_template",
         headers=auth_headers,
-        json=request_data_gisaid,
+        json=request_data,
     )
-    expected_filename = f"{today.strftime('%Y%m%d')}_GISAID_metadata_1.csv"
+    expected_filename = f"{today.strftime('%Y%m%d')}_GISAID_metadata.csv"
     assert res.status_code == 200
     assert res.headers["Content-Type"] == "text/tsv"
     assert (
@@ -242,21 +245,25 @@ async def test_gisaid_submission_template_download_page_number(
         == f"attachment; filename={expected_filename}"
     )
 
-    request_data_genbank = {
-        "sample_ids": [sample.public_identifier for sample in samples],
-        "date": today.strftime("%Y-%m-%d"),
-        "public_repository_name": "GenBank",
-        "page": 1,
-    }
-    res = await http_client.post(
-        f"/v2/orgs/{group.id}/samples/submission_template",
-        headers=auth_headers,
-        json=request_data_genbank,
+    file_contents = io.StringIO(str(res.content, encoding="UTF-8"))
+    tsvreader = csv.DictReader(file_contents, delimiter="\t")
+    assert set(list(tsvreader.fieldnames)) == set(  # type: ignore
+        GisaidSubmissionFormTSVStreamer.fields
     )
-    expected_filename = f"{today.strftime('%Y%m%d')}_GenBank_metadata_1.tsv"
-    assert res.status_code == 200
-    assert res.headers["Content-Type"] == "text/tsv"
-    assert (
-        res.headers["Content-Disposition"]
-        == f"attachment; filename={expected_filename}"
-    )
+    tsvreader.__next__()  # skip human-readable headers
+    row_count = 0
+    for row in tsvreader:
+        assert row["fn"] == f"{today.strftime('%Y%m%d')}_GISAID_sequences.fasta"
+        assert (
+            row["covv_virus_name"]
+            == samples[
+                row_count
+            ].public_identifier  # should be the same since they have the hCoV-19 prefix in the db
+        )
+        assert row["covv_collection_date"] == samples[
+            row_count
+        ].collection_date.strftime("%Y-%m-%d")
+        assert row["covv_subm_lab"] == group.name
+        assert row["covv_subm_lab_addr"] == group.address
+        row_count += 1
+    assert row_count == len(samples)

@@ -18,24 +18,23 @@ const collectionDateTo = "2022-09-01";
 const row = "row-collectionDate";
 const datesDatesFromGridLocator = "//div[@data-test-id='table-row']/descendant::div[13]";
 
-
 test.describe("Tests for filtering sample listing view", () => {
-  test.beforeEach(async ({page}, workerInfo) => {
+  test.beforeEach(async ({ page }, workerInfo) => {
     const baseUrl = workerInfo.config.projects[0].use.baseURL;
     const url = `${baseUrl}/data/samples`;
     await page.goto(url);
   });
 
-  test("Should filter samples by status", async ({page}) => {
+  test("Should filter samples by status", async ({ page }) => {
     // define filtering criteria
     const filterBy = {
       status: "complete",
     };
     // filter samples
-   await FilterSample.applyFilter(page, filterBy);
+    await FilterSample.applyFilter(page, filterBy);
 
     // verify only complete samples are listed
-    const sampleStatuses = await page.locator("div[status='success'] > span");
+    const sampleStatuses = page.locator("div[status='success'] > span");
     for (let i = 0; i < (await sampleStatuses.count()); i++) {
       expect(sampleStatuses.nth(i)).toHaveText(filterBy.status);
     }
@@ -47,10 +46,10 @@ test.describe("Tests for filtering sample listing view", () => {
       lineage: ["BA.1.15"],
     };
     // filter samples
-   await FilterSample.applyFilter(page, filterBy);
+    await FilterSample.applyFilter(page, filterBy);
 
     // verify only samples with selected lineages displayed
-    const sampleLineages = await page.locator(".ez2j8c413");
+    const sampleLineages = page.locator(".ez2j8c413");
     for (let i = 0; i < (await sampleLineages.count()); i++) {
       const val = await sampleLineages.nth(i).textContent();
       expect(filterBy.lineage).toContain(val);
@@ -62,7 +61,7 @@ test.describe("Tests for filtering sample listing view", () => {
       collectionDateFrom: collectionDateFrom, //changes are required
     };
     // filter samples
-   await FilterSample.applyFilter(page, filterBy);
+    await FilterSample.applyFilter(page, filterBy);
 
     // verify only samples meeting date criteria are listed
     const filterCollectionDate = new Date(filterBy.collectionDateFrom);
@@ -85,7 +84,7 @@ test.describe("Tests for filtering sample listing view", () => {
       collectionDateTo: collectionDateTo, //change as required
     };
     // filter samples
-   await FilterSample.applyFilter(page, filterBy);
+    await FilterSample.applyFilter(page, filterBy);
 
     // verify only samples meeting date criteria are listed
     const filterCollectionDate = new Date(filterBy.collectionDateTo);
@@ -109,7 +108,7 @@ test.describe("Tests for filtering sample listing view", () => {
       collectionDateTo: collectionDateTo,
     };
     // filter samples
-   await FilterSample.applyFilter(page, filterBy);
+    await FilterSample.applyFilter(page, filterBy);
 
     // convert to date objects for comparison
     const filterCollectionDateFrom = new Date(filterBy.collectionDateFrom);
@@ -134,14 +133,16 @@ test.describe("Tests for filtering sample listing view", () => {
 
   test("Should filter by collection date periods", async ({ page }) => {
     //test all date options
+
       const periods = Object.keys(uploadDatePeriods);
       for(const period of periods) {
+
       const periodValue = uploadDatePeriods[period];
       // filter by collection date period
       await FilterSample.applyFilter(page, { collectionDatePeriod: period });
 
       //convert period to date object
-      const filterCollectionDate =  FilterSample.convertDaysToDate(periodValue);
+      const filterCollectionDate = FilterSample.convertDaysToDate(periodValue);
 
       //verify only samples meeting criteria are listed
       const sampleCol = await page.locator(
@@ -154,6 +155,7 @@ test.describe("Tests for filtering sample listing view", () => {
         const result =
           actuallCollectionDate <= filterCollectionDate ? true : false;
        expect(result).toBeFalsy();
+
       }
     }
   });
@@ -163,7 +165,7 @@ test.describe("Tests for filtering sample listing view", () => {
       uploadDateFrom: collectionDateFrom, //change as required
     };
     // filter samples by upload date from
-   await FilterSample.applyFilter(page, filterBy);
+    await FilterSample.applyFilter(page, filterBy);
 
     // verify only samples meeting date criteria are listed
     const filterUploadDate = new Date(filterBy.uploadDateFrom);
@@ -189,6 +191,7 @@ test.describe("Tests for filtering sample listing view", () => {
     const filterUploadDate = new Date(filterBy.uploadDateTo);
 
     const sampleUploadDates = await page.locator(datesDatesFromGridLocator); //todo we need dev help to inject test ids in sample data table
+
     for (let i = 0; i < (await sampleUploadDates.count()); i++) {
       const actuallUploadDate = new Date(
         (await sampleUploadDates.nth(i).textContent()) as string
@@ -204,7 +207,7 @@ test.describe("Tests for filtering sample listing view", () => {
       uploadDateTo: collectionDateTo,
     };
     // filter samples
-   await FilterSample.applyFilter(page, filterBy);
+    await FilterSample.applyFilter(page, filterBy);
 
     // verify only samples meeting date criteria are listed
     const filterUploadDateFrom = new Date(filterBy.uploadDateFrom);
@@ -212,6 +215,7 @@ test.describe("Tests for filtering sample listing view", () => {
 
     const samUploadDates = await page.locator(datesDatesFromGridLocator); //todo we need dev help to inject test ids in sample data table
     for (let i = 0; i < (await samUploadDates.count()); i++) {
+
       const actuallUploadDate = new Date(
         (await samUploadDates.nth(i).textContent()) as string
       );
@@ -226,27 +230,27 @@ test.describe("Tests for filtering sample listing view", () => {
 
   test("Should filter by upload date periods", async ({ page }) => {
     //test all date options
-     // Object.keys(uploadDatePeriods).forEach(async (period) => {
-      //
-      const periods = Object.keys(uploadDatePeriods);
-      for(const period of periods) {
+    const periods = Object.keys(uploadDatePeriods);
+    for (const period of periods) {
       // filter
       const periodValue = uploadDatePeriods[period];
-     await FilterSample.applyFilter(page, { collectionDatePeriod: period });
+      await FilterSample.applyFilter(page, { collectionDatePeriod: period });
 
       //convert period to date object
-      const filterUploadDate = await FilterSample.convertDaysToDate(periodValue);
+      const filterUploadDate = await FilterSample.convertDaysToDate(
+        periodValue
+      );
 
       //verify sample listing
       const UploadDates = await page.locator(datesDatesFromGridLocator); //todo we need dev help to inject test ids in sample data table
       for (let i = 0; i < (await UploadDates.count()); i++) {
+
         const actuallUploadDate = new Date(
           (await UploadDates.nth(i).textContent()) as string
         );
         const result = actuallUploadDate >= filterUploadDate ? true : false;
         expect(result).toBeTruthy();
       }
-   // });
     }
   });
 
@@ -262,7 +266,6 @@ test.describe("Tests for filtering sample listing view", () => {
     };
     // filter
     await FilterSample.applyFilter(page, filterBy);
-   
 
     //verify sample listing
     const samples = await page.locator(getByTestID("table-row"));
@@ -279,8 +282,8 @@ test.describe("Tests for filtering sample listing view", () => {
           : false;
       let dateToResult =
         actuallUploadDate <= new Date(filterBy.collectionDateTo) ? true : false;
-     await expect(dateFromResult).toBeTruthy();
-     await expect(dateToResult).toBeTruthy();
+      expect(dateFromResult).toBeTruthy();
+      expect(dateToResult).toBeTruthy();
       //very collection date is within from-to range
       const collectionDateText = (await page
         .locator(getByTestID(row))
@@ -295,15 +298,15 @@ test.describe("Tests for filtering sample listing view", () => {
         actualCollectionDate <= new Date(filterBy.collectionDateTo)
           ? true
           : false;
-    await  expect(dateFromResult).toBeTruthy();
-     await expect(dateToResult).toBeTruthy();
+      expect(dateFromResult).toBeTruthy();
+      expect(dateToResult).toBeTruthy();
       //verify lineage
       const val = page.locator(".ez2j8c413").nth(i).textContent();
-    await  expect(filterBy.lineage).toContain(val);
+      expect(filterBy.lineage).toContain(val);
       //verify status
-    await  expect(await page.locator(getByTestID("sample-status")).nth(i)).toHaveText(
-        filterBy.status
-      );
+      await expect(
+        page.locator(getByTestID("sample-status")).nth(i)
+      ).toHaveText(filterBy.status);
     }
   });
 });
