@@ -13,6 +13,7 @@ from aspen.database.models import (
     GisaidDumpWorkflow,
     Group,
     Location,
+    Pathogen,
     PhyloRun,
     PhyloTree,
     ProcessedGisaidDump,
@@ -94,9 +95,28 @@ def create_location(session, region, country, division, location):
     return location
 
 
-def create_sample(session, group, uploaded_by_user, location, suffix, is_failed=False):
-    private_id = f"{group.prefix}-private_identifier_{suffix}"
-    public_id = f"{group.prefix}-public_identifier_{suffix}"
+def create_pathogens(session):
+    get_or_create = [
+        {"name": "SARS-CoV-2", "slug": "SC2"},
+        {"name": "Monkeypox", "slug": "MPX"},
+    ]
+    pathogens = []
+    for record in get_or_create:
+        pathogen = (
+            session.query(Pathogen).where(Pathogen.slug == record["slug"]).one_or_none()
+        )
+        if not pathogen:
+            pathogen = Pathogen(name=record["name"], slug=record["slug"])
+            session.add(pathogen)
+        pathogens.append(pathogen)
+    return pathogens
+
+
+def create_sample(
+    session, group, pathogen, uploaded_by_user, location, suffix, is_failed=False
+):
+    private_id = f"{group.prefix}-private_identifier_{suffix}_{pathogen.slug}"
+    public_id = f"{group.prefix}-public_identifier_{suffix}_{pathogen.slug}"
     if is_failed:
         private_id += "_failed"
         public_id += "_failed"
@@ -105,6 +125,7 @@ def create_sample(session, group, uploaded_by_user, location, suffix, is_failed=
         .filter(Sample.private_identifier == private_id)
         .filter(Sample.submitting_group == group)
         .filter(Sample.czb_failed_genome_recovery == is_failed)
+        .filter(Sample.pathogen == pathogen)
         .order_by(Sample.id)
         .first()
     )
@@ -117,6 +138,7 @@ def create_sample(session, group, uploaded_by_user, location, suffix, is_failed=
         private_identifier=private_id,
         uploaded_by=uploaded_by_user,
         original_submission={},
+        pathogen=pathogen,
         public_identifier=public_id,
         collection_date=datetime.now(),
         czb_failed_genome_recovery=is_failed,
@@ -136,13 +158,14 @@ def create_sample(session, group, uploaded_by_user, location, suffix, is_failed=
     return sample
 
 
-def create_run(session, group, user, tree_type, status, name=None):
+def create_run(session, group, pathogen, user, tree_type, status, name=None):
     run = (
         session.query(PhyloRun)
         .filter(PhyloRun.tree_type == tree_type)
         .filter(PhyloRun.user == user)
         .filter(PhyloRun.group == group)
         .filter(PhyloRun.workflow_status == status)
+        .filter(PhyloRun.pathogen == pathogen)
         .order_by(PhyloRun.id)
         .first()
     )
@@ -163,6 +186,7 @@ def create_run(session, group, user, tree_type, status, name=None):
         software_versions={},
         name=name,
         group=group,
+        pathogen=pathogen,
         tree_type=tree_type,
         user=user,
     )
@@ -188,6 +212,7 @@ def create_tree(session, phylo_run):
         constituent_samples=[],
         name=phylo_run.name,
         tree_type=phylo_run.tree_type,
+        pathogen=phylo_run.pathogen,
     )
     # update the run object with the metadata about the run.
     phylo_run.end_datetime = datetime.now()
@@ -202,7 +227,7 @@ def create_tree(session, phylo_run):
     return phylo_tree
 
 
-def create_test_trees(session, group, user):
+def create_test_trees(session, group, pathogen, user):
     tree_types = ["OVERVIEW", "NON_CONTEXTUALIZED", "TARGETED"]
     incomplete_statuses = [WorkflowStatusType.STARTED, WorkflowStatusType.FAILED]
     # Create 3 in-progress workflows
@@ -212,9 +237,9 @@ def create_test_trees(session, group, user):
             name = None
             run_user = None
             if typename == "TARGETED":
-                name = f"{group.name} {status.value.title()} {typename.title()} Run"
+                name = f"{group.name} {status.value.title()} {typename.title()} {pathogen.slug} Run"
                 run_user = user
-            create_run(session, group, run_user, tree_type, status, name)
+            create_run(session, group, pathogen, run_user, tree_type, status, name)
     # Create 3 workflows with successful trees
     for typename in tree_types:
         status = WorkflowStatusType.COMPLETED
@@ -222,9 +247,9 @@ def create_test_trees(session, group, user):
         name = None
         run_user = None
         if typename == "TARGETED":
-            name = f"{group.name} {status.value.title()} {typename.title()} Run"
+            name = f"{group.name} {status.value.title()} {typename.title()} {pathogen.slug} Run"
             run_user = user
-        run = create_run(session, group, run_user, tree_type, status, name)
+        run = create_run(session, group, pathogen, run_user, tree_type, status, name)
         create_tree(session, run)
 
 
@@ -295,11 +320,13 @@ def create_gisaid(session):
     session.add(aligned_workflow)
 
 
-def create_samples(session, group, user, location, num_successful, num_failures):
+def create_samples(
+    session, group, user, pathogen, location, num_successful, num_failures
+):
     for suffix in range(num_successful):
-        _ = create_sample(session, group, user, location, suffix)
+        _ = create_sample(session, group, user, pathogen, location, suffix)
     for suffix in range(num_failures):
-        _ = create_sample(session, group, user, location, suffix, True)
+        _ = create_sample(session, group, user, pathogen, location, suffix, True)
 
 
 def get_default_file(s3_resource):
@@ -354,8 +381,10 @@ def create_test_data(engine):
     )
     group = create_test_group(session, "CZI", "CZI", location)
     user = create_test_user(session, "user1@czgenepi.org", group, "User1", "Test User")
-    create_samples(session, group, user, location, 10, 5)
-    create_test_trees(session, group, user)
+    pathogens = create_pathogens(session)
+    for pathogen in pathogens:
+        create_samples(session, group, pathogen, user, location, 10, 5)
+        create_test_trees(session, group, pathogen, user)
 
     # Create db rows for another group
     location2 = create_location(session, "Africa", "Mali", "Timbuktu", None)
@@ -365,8 +394,9 @@ def create_test_data(engine):
     user2 = create_test_user(
         session, "tbktu@czgenepi.org", group2, "tbktu", "Timbuktu User"
     )
-    create_samples(session, group2, user2, location2, 10, 10)
-    create_test_trees(session, group2, user2)
+    for pathogen in pathogens:
+        create_samples(session, group2, pathogen, user2, location2, 10, 10)
+        create_test_trees(session, group2, pathogen, user2)
 
     upload_tree_files(session)
 
