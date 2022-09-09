@@ -100,7 +100,7 @@ class User(idbase, DictMixin):  # type: ignore
     name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     auth0_user_id = Column(String, unique=True, nullable=False)
-    group_admin = Column(Boolean, nullable=False)
+    group_admin = Column(Boolean, nullable=True)
     system_admin = Column(Boolean, nullable=False)
     agreed_to_tos = Column(Boolean, nullable=False, default=False)
     # Date of policies (any of Privacy Policy, Terms of Service, etc, etc) the user

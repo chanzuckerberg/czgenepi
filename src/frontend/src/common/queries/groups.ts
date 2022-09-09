@@ -39,7 +39,6 @@ export interface RawGroupMemberRequest {
   name: string;
   agreed_to_tos: boolean;
   acknowledged_policy_version: string | null;
-  group_admin: boolean;
   email: string;
   created_at: string;
   role: GroupRole;
