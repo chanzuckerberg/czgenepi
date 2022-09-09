@@ -39,11 +39,13 @@ async def test_samples_create_different_pathogens(
     )
     async_session.add(group)
     async_session.add(location)
+    sc2 = pathogen_factory("SC2", "SARS-Cov-2")
+    mpx = pathogen_factory("MPX", "MPX")
+    async_session.add(mpx)
+    async_session.add(sc2)
     await async_session.commit()
     test_date = datetime.datetime.now()
 
-    sc2 = pathogen_factory("SC2", "SARS-Cov-2")
-    mpx = pathogen_factory("MPX", "MPX")
 
     pathogen_specific = {sc2: range(2), mpx: range(2, 4)}
     for pathogen, id_range in pathogen_specific.items():
