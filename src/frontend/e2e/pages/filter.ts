@@ -4,7 +4,7 @@ export abstract class FilterSample {
     page: Page,
     filterData: Partial<FilterData>
   ): Promise<void> {
-    // fill in upload date(s)
+    // wait for sample page is ready to be handled
     await page.waitForFunction(() => {
       const samples = document.querySelector(
         "a[href$='/data/samples'] > div > div:nth-child(2)"
