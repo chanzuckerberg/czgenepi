@@ -15,7 +15,7 @@ from aspen.database.models import (
     WorkflowStatusType,
 )
 from aspen.test_infra.models.location import location_factory
-from aspen.test_infra.models.pathogen import pathogen_factory
+from aspen.test_infra.models.pathogen import random_pathogen_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
@@ -95,7 +95,7 @@ def make_all_test_data(
     uploaded_pathogen_genomes: Collection[
         UploadedPathogenGenome
     ] = make_uploaded_pathogen_genomes(samples)
-    pathogen: Pathogen = pathogen_factory()
+    pathogen: Pathogen = random_pathogen_factory()
     trees: Sequence[PhyloTree] = make_trees(group, pathogen, samples, n_trees)
     treeless_runs: Collection[PhyloRun] = make_runs_with_no_trees(group, pathogen)
     return samples, uploaded_pathogen_genomes, trees, treeless_runs
@@ -105,8 +105,10 @@ async def check_results(
     http_client, user: User, group: Group, trees: Collection[PhyloTree]
 ):
     auth_headers = {"user_id": str(user.auth0_user_id)}
+    pathogen = trees[0].pathogen
     res = await http_client.get(
-        f"/v2/orgs/{group.id}/phylo_runs/", headers=auth_headers
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/phylo_runs/",
+        headers=auth_headers,
     )
     results = res.json()["phylo_runs"]
 
@@ -149,7 +151,7 @@ async def test_in_progress_and_failed_trees(
     location: Location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    _, _, _, treeless_runs = make_all_test_data(
+    _, _, trees, treeless_runs = make_all_test_data(
         group, user, location, n_samples, n_trees
     )
 
@@ -157,8 +159,10 @@ async def test_in_progress_and_failed_trees(
     await async_session.commit()
 
     auth_headers = {"user_id": str(user.auth0_user_id)}
+    pathogen = trees[0].pathogen
     res = await http_client.get(
-        f"/v2/orgs/{group.id}/phylo_runs/", headers=auth_headers
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/phylo_runs/",
+        headers=auth_headers,
     )
     results = res.json()["phylo_runs"]
 
@@ -232,7 +236,9 @@ async def test_phylo_trees_no_can_see(
     await async_session.commit()
 
     auth_headers = {"user_id": str(user.auth0_user_id)}
+    pathogen = trees[0].pathogen
     res = await http_client.get(
-        f"/v2/orgs/{owner_group.id}/phylo_runs/", headers=auth_headers
+        f"/v2/orgs/{owner_group.id}/pathogens/{pathogen.slug}/phylo_runs/",
+        headers=auth_headers,
     )
     assert res.status_code == 403
