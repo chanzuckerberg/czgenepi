@@ -4,3 +4,4 @@
 node_modules/
 e2e/storage/
 e2e/report
+playwright-report/
