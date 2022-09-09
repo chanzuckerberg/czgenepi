@@ -10,12 +10,14 @@ from sqlalchemy.sql.expression import and_
 from aspen.database.models import (
     Group,
     Location,
+    Pathogen,
     PhyloRun,
     TreeType,
     User,
     WorkflowStatusType,
 )
 from aspen.test_infra.models.location import location_factory
+from aspen.test_infra.models.pathogen import pathogen_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_multifactory
 from aspen.test_infra.models.usergroup import group_factory, user_factory
@@ -63,6 +65,11 @@ def create_test_data(
             f"{group.division} Test Division",
             f"{group.location} Test City",
         )
+    pathogen: Optional[Pathogen] = (
+        session.query(Pathogen).filter(Pathogen.slug == "SC2").one_or_none()
+    )
+    if not pathogen:
+        pathogen = pathogen_factory("SC2", "sars-cov-2")
     session.add(group)
 
     gisaid_samples: List[str] = [
@@ -83,6 +90,7 @@ def create_test_data(
     session.add_all(inputs)
     if template_args is None:
         template_args = {}
+
     phylo_run = phylorun_factory(
         group,
         inputs=inputs,
@@ -90,6 +98,7 @@ def create_test_data(
         tree_type=tree_type,
         template_args=template_args,
         workflow_status=WorkflowStatusType.STARTED,
+        pathogen=pathogen,
     )
     session.add(phylo_run)
     session.commit()

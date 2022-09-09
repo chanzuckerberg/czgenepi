@@ -1,5 +1,5 @@
 import { Icon } from "czifui";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import {
   StyledTextField,
   TextFieldAlert,
@@ -66,6 +66,22 @@ const TreeNameInput = ({
     <StyledInstructions items={items} title={"Instructions"} />
   );
 
+  // While the user is typing, don't allow spaces before other characters
+  const onChangeTreeName = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setTreeName(e.target.value?.trimStart());
+  };
+
+  // While the user is typing, we don't want to remove end spaces - otherwise
+  // they won't be able to have multi-word tree names.  However, we
+  // do want to remove trailing spaces when the user is done typing.
+  const onBlurTreeName = () => {
+    if (treeName) {
+      setTreeName(treeName?.trim());
+    }
+  };
+
   return (
     <div>
       {instructions}
@@ -79,7 +95,8 @@ const TreeNameInput = ({
         variant="outlined"
         value={treeName}
         size="small"
-        onChange={(e) => setTreeName(e.target.value)}
+        onBlur={onBlurTreeName}
+        onChange={onChangeTreeName}
         multiline={isTextInputMultiLine ? true : false}
         maxRows={isTextInputMultiLine ? 3 : undefined}
       />
