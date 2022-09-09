@@ -7,7 +7,7 @@ from botocore.client import ClientError
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from aspen.database.models import Group, PhyloTree, Sample
+from aspen.database.models import Group, Pathogen, PhyloTree, Sample
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.pathogen import pathogen_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory

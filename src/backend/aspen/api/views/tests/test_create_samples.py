@@ -46,7 +46,6 @@ async def test_samples_create_different_pathogens(
     await async_session.commit()
     test_date = datetime.datetime.now()
 
-
     pathogen_specific = {sc2: range(2), mpx: range(2, 4)}
     for pathogen, id_range in pathogen_specific.items():
         data = [
