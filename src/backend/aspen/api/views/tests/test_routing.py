@@ -2,6 +2,7 @@ import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from aspen.test_infra.models.pathogen import pathogen_factory
 from aspen.test_infra.models.usergroup import group_factory, userrole_factory
 
 # All test coroutines will be treated as marked.
@@ -14,8 +15,10 @@ async def test_sample_routing_w_pathogen_slug(
 ):
     # test that routing still works with new pathogen_slug optional parameters.
     group = group_factory()
+    pathogen = pathogen_factory()
     user = await userrole_factory(async_session, group)
     async_session.add(group)
+    async_session.add(pathogen)
     async_session.add(user)
     await async_session.commit()
 
@@ -33,7 +36,7 @@ async def test_sample_routing_w_pathogen_slug(
         assert res.status_code == 200
 
         res = await http_client.get(
-            f"/v2/orgs/{group.id}/pathogens/SC2/{route}/",
+            f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/{route}/",
             headers=auth_headers,
         )
         assert res.status_code == 200

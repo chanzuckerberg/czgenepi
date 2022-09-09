@@ -7,8 +7,9 @@ from botocore.client import ClientError
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from aspen.database.models import Group, PhyloTree, Sample
+from aspen.database.models import Group, Pathogen, PhyloTree, Sample
 from aspen.test_infra.models.location import location_factory
+from aspen.test_infra.models.pathogen import pathogen_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
@@ -91,10 +92,12 @@ async def create_phylotree_with_inputs(
         input_entities.append(input_entity)
 
     db_gisaid_samples = ["hCoV-19/gisaid_identifier", "hCoV-19/gisaid_identifier2"]
+    pathogen: Pathogen = pathogen_factory()
     phylo_run = phylorun_factory(
         owner_group,
         inputs=input_entities,
         gisaid_ids=db_gisaid_samples,
+        pathogen=pathogen,
     )
     phylo_tree = phylotree_factory(
         phylo_run,
@@ -129,8 +132,9 @@ async def create_phylotree(
     run_inputs = []
     if sample_as_input:
         run_inputs = [upg]
+    pathogen: Pathogen = pathogen_factory()
     phylo_tree = phylotree_factory(
-        phylorun_factory(owner_group, inputs=run_inputs),
+        phylorun_factory(owner_group, pathogen=pathogen, inputs=run_inputs),
         samples,
     )
     upload_s3_file(mock_s3_resource, phylo_tree, samples)

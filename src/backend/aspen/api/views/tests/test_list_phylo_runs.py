@@ -6,6 +6,7 @@ import pytest
 from aspen.database.models import (
     Group,
     Location,
+    Pathogen,
     PhyloRun,
     PhyloTree,
     Sample,
@@ -14,6 +15,7 @@ from aspen.database.models import (
     WorkflowStatusType,
 )
 from aspen.test_infra.models.location import location_factory
+from aspen.test_infra.models.pathogen import pathogen_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
@@ -50,12 +52,12 @@ def make_uploaded_pathogen_genomes(
 
 
 def make_trees(
-    group: Group, samples: Collection[Sample], n_trees: int
+    group: Group, pathogen: Pathogen, samples: Collection[Sample], n_trees: int
 ) -> Sequence[PhyloTree]:
     # make up to n trees, each with a random sample of uploaded pathogen genomes.
     return [
         phylotree_factory(
-            phylorun_factory(group),
+            phylorun_factory(group, pathogen=pathogen),
             random.sample(samples, k=random.randint(0, len(samples))),  # type: ignore
             key=f"key_{ix}",
         )  # type: ignore
@@ -63,7 +65,7 @@ def make_trees(
     ]
 
 
-def make_runs_with_no_trees(group: Group) -> Collection[PhyloRun]:
+def make_runs_with_no_trees(group: Group, pathogen: Pathogen) -> Collection[PhyloRun]:
     # Make an in-progress run and a failed run.
     other_statuses = [WorkflowStatusType.STARTED, WorkflowStatusType.FAILED]
     template_args = {
@@ -71,7 +73,12 @@ def make_runs_with_no_trees(group: Group) -> Collection[PhyloRun]:
         "location": group.location,
     }
     return [
-        phylorun_factory(group, workflow_status=status, template_args=template_args)
+        phylorun_factory(
+            group,
+            workflow_status=status,
+            template_args=template_args,
+            pathogen=pathogen,
+        )
         for status in other_statuses
     ]
 
@@ -88,8 +95,9 @@ def make_all_test_data(
     uploaded_pathogen_genomes: Collection[
         UploadedPathogenGenome
     ] = make_uploaded_pathogen_genomes(samples)
-    trees: Sequence[PhyloTree] = make_trees(group, samples, n_trees)
-    treeless_runs: Collection[PhyloRun] = make_runs_with_no_trees(group)
+    pathogen: Pathogen = pathogen_factory()
+    trees: Sequence[PhyloTree] = make_trees(group, pathogen, samples, n_trees)
+    treeless_runs: Collection[PhyloRun] = make_runs_with_no_trees(group, pathogen)
     return samples, uploaded_pathogen_genomes, trees, treeless_runs
 
 

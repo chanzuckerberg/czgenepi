@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.database.models import Group, PhyloRun, PhyloTree, Sample, User
 from aspen.test_infra.models.location import location_factory
+from aspen.test_infra.models.pathogen import pathogen_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.usergroup import group_factory, userrole_factory
@@ -38,7 +39,8 @@ async def make_shared_test_data(
         )
         for i in range(1, 3)
     ]
-    phylo_run = phylorun_factory(group)
+    pathogen = pathogen_factory()
+    phylo_run = phylorun_factory(group, pathogen=pathogen)
     phylo_tree = None
     if not no_trees:
         phylo_tree = phylotree_factory(phylo_run, samples)
