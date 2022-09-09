@@ -72,8 +72,6 @@ class Group(idbase, DictMixin):  # type: ignore
         server_default=text("'{}'::jsonb"),
     )
 
-    members = relationship("User", back_populates="group")  # type: ignore
-
     can_see: MutableSequence[CanSee]
     can_be_seen_by: MutableSequence[CanSee]
 
@@ -114,8 +112,7 @@ class User(idbase, DictMixin):  # type: ignore
     )
     gisaid_submitter_id = Column(String, nullable=True, default=None)
 
-    group_id = Column(Integer, ForeignKey(Group.id), nullable=False)
-    group = relationship("Group", back_populates="members")  # type: ignore
+    group_id = Column(Integer, ForeignKey(Group.id), nullable=True)
 
     def __repr__(self):
         return f"User <{self.name}>"

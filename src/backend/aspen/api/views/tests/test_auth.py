@@ -89,7 +89,6 @@ async def test_create_new_admin_user_if_not_exists(
         .scalars()
         .one()
     )
-    assert user.group_id == group.id
     assert user.email == userinfo["email"]
     assert user.group_admin is True
 
@@ -124,7 +123,6 @@ async def test_create_new_user_if_not_exists(
         .scalars()
         .one()
     )
-    assert user.group_id == group.id
     assert user.email == userinfo["email"]
     assert user.group_admin is False
 
@@ -204,7 +202,6 @@ async def test_create_new_user_and_sync_roles(
         .scalars()
         .one()
     )
-    assert user.group_id == group1.id
     assert user.email == userinfo["email"]
     assert user.group_admin is False
     expected_roles = {(group1.auth0_org_id, "member"), (group3.auth0_org_id, "admin")}

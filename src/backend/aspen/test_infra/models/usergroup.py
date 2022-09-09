@@ -58,7 +58,6 @@ def user_factory(
         group_admin=group_admin,
         system_admin=system_admin,
         agreed_to_tos=agreed_to_tos,
-        group=group,
     )
     return user
 
@@ -83,7 +82,6 @@ async def userrole_factory(
         group_admin=group_admin,
         system_admin=system_admin,
         agreed_to_tos=agreed_to_tos,
-        group=group,
     )
     for role in roles:
         user.user_roles.append(
