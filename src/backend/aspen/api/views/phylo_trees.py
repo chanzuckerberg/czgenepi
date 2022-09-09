@@ -52,7 +52,6 @@ async def _get_selected_samples(db: AsyncSession, phylo_tree_id: int):
         .outerjoin(entity_alias, PhyloRun.inputs.of_type(entity_alias))  # type: ignore
         .outerjoin(Sample)  # type: ignore
         .filter(PhyloTree.entity_id == phylo_tree_id)  # type: ignore
-        .filter(PhyloTree.pathogen == pathogen)  # type: ignore
         .options(
             contains_eager(PhyloTree.producing_workflow.of_type(PhyloRun))
             .contains_eager(PhyloRun.inputs.of_type(entity_alias))
