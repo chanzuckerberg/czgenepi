@@ -92,10 +92,12 @@ async def create_phylotree_with_inputs(
         input_entities.append(input_entity)
 
     db_gisaid_samples = ["hCoV-19/gisaid_identifier", "hCoV-19/gisaid_identifier2"]
+    pathogen: Pathogen = pathogen_factory()
     phylo_run = phylorun_factory(
         owner_group,
         inputs=input_entities,
         gisaid_ids=db_gisaid_samples,
+        pathogen=pathogen,
     )
     phylo_tree = phylotree_factory(
         phylo_run,
@@ -130,7 +132,7 @@ async def create_phylotree(
     run_inputs = []
     if sample_as_input:
         run_inputs = [upg]
-    pathogen = pathogen_factory()
+    pathogen: Pathogen = pathogen_factory()
     phylo_tree = phylotree_factory(
         phylorun_factory(owner_group, pathogen=pathogen, inputs=run_inputs),
         samples,

@@ -69,7 +69,7 @@ def create_test_data(
         session.query(Pathogen).filter(Pathogen.slug == "SC2").one_or_none()
     )
     if not pathogen:
-        pathogen = pathogen_factory("SC2", "sars-cov-2")
+        pathogen = pathogen_factory()
     session.add(group)
 
     gisaid_samples: List[str] = [

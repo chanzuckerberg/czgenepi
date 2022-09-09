@@ -74,24 +74,28 @@ async def test_delete_phylo_run_matrix(
             "group": group,
             "status_code": 200,
             "tree": tree1.producing_workflow_id,
+            "pathogen": tree1.pathogen,
         },
         {
             "user": user2.auth0_user_id,
             "group": group2,
             "status_code": 404,
             "tree": tree2.producing_workflow_id,
+            "pathogen": tree2.pathogen,
         },
         {
             "user": user2.auth0_user_id,
             "group": group,
             "status_code": 403,
             "tree": tree2.producing_workflow_id,
+            "pathogen": tree2.pathogen,
         },
         {
             "user": user.auth0_user_id,
             "group": group,
             "status_code": 400,
             "tree": tree2.producing_workflow_id,
+            "pathogen": tree2.pathogen,
         },
     ]
     for case in cases:
@@ -99,7 +103,7 @@ async def test_delete_phylo_run_matrix(
         auth_headers = {"user_id": str(case["user"])}
         # We want to be able to fetch the tree that belongs to `group`
         res = await http_client.delete(
-            f"/v2/orgs/{case['group'].id}/phylo_runs/{case['tree']}",  # type: ignore
+            f"/v2/orgs/{case['group'].id}/pathogens/{case['pathogen'].slug}/phylo_runs/{case['tree']}",  # type: ignore
             headers=auth_headers,
         )
         assert res.status_code == case["status_code"]
