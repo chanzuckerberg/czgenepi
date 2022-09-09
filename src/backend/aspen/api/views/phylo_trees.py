@@ -40,7 +40,9 @@ async def get_single_phylo_tree(
 
 
 # supporting function for get_tree_metadata()
-async def _get_selected_samples(db: AsyncSession, phylo_tree_id: int):
+async def _get_selected_samples(
+    db: AsyncSession, phylo_tree_id: int, pathogen: Pathogen
+):
     # SqlAlchemy requires aliasing for any queries that join to the same table (in this case, entities)
     # multiple times via joined table inheritance
     # ref: https://github.com/sqlalchemy/sqlalchemy/discussions/6972
@@ -52,6 +54,7 @@ async def _get_selected_samples(db: AsyncSession, phylo_tree_id: int):
         .outerjoin(entity_alias, PhyloRun.inputs.of_type(entity_alias))  # type: ignore
         .outerjoin(Sample)  # type: ignore
         .filter(PhyloTree.entity_id == phylo_tree_id)  # type: ignore
+        .filter(PhyloTree.pathogen == pathogen)  # type: ignore
         .options(
             contains_eager(PhyloTree.producing_workflow.of_type(PhyloRun))
             .contains_eager(PhyloRun.inputs.of_type(entity_alias))
@@ -93,7 +96,7 @@ async def get_tree_metadata(
         db, az, item_id, pathogen, request.query_params.get("id_style")
     )
     accessions = extract_accessions([], phylo_tree_data["tree"])
-    selected_samples = await _get_selected_samples(db, item_id)
+    selected_samples = await _get_selected_samples(db, item_id, pathogen)
 
     filename: str = f"{item_id}_sample_ids.tsv"
     streamer = MetadataTSVStreamer(filename, accessions, selected_samples)

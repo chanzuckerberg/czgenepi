@@ -107,7 +107,7 @@ async def test_phylo_tree_no_can_see(
         "North America", "USA", "California", "Santa Barbara County"
     )
 
-    _, _, trees, runs = make_all_test_data(
+    pathogen, _, _, trees, runs = make_all_test_data(
         owner_group, user, location, n_samples, n_trees
     )
 
@@ -134,7 +134,7 @@ async def test_phylo_tree_no_can_see(
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     result = await http_client.get(
-        f"/v2/orgs/{viewer_group.id}/pathogens/{phylo_tree.pathogen.slug}/phylo_trees/{phylo_tree.entity_id}/download",
+        f"/v2/orgs/{viewer_group.id}/pathogens/{pathogen.slug}/phylo_trees/{phylo_tree.entity_id}/download",
         headers=auth_headers,
     )
     assert result.json() == expected_response
