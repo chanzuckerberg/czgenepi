@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from aspen.api.views.sequences import get_fasta_filename
 from aspen.database.models import Sample
 from aspen.test_infra.models.location import location_factory
+from aspen.test_infra.models.pathogen import pathogen_factory
 from aspen.test_infra.models.pathogen_repo_config import (
     setup_gisaid_and_genbank_repo_configs,
 )
@@ -27,6 +28,7 @@ async def setup_sequences_download_test_data(
 ):
     group = group_factory()
     user = await userrole_factory(async_session, group)
+    pathogen = pathogen_factory()
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
@@ -37,11 +39,12 @@ async def setup_sequences_download_test_data(
         private_identifier="hCoV-19/private_identifer",
     )
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
-    await setup_gisaid_and_genbank_repo_configs(async_session)
+    pathogen = setup_gisaid_and_genbank_repo_configs(async_session)
 
     async_session.add(group)
+    async_session.add(pathogen)
     await async_session.commit()
-    return group, user, sample
+    return group, user, sample, pathogen
 
 
 async def test_prepare_sequences_download_gisaid(
@@ -52,7 +55,7 @@ async def test_prepare_sequences_download_gisaid(
     Test a regular sequence download for a sample submitted by the user's group, test prefixes are correctly added for GISAID
     """
 
-    group, user, sample = await setup_sequences_download_test_data(async_session)
+    group, user, sample, _ = await setup_sequences_download_test_data(async_session)
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     data = {
@@ -82,7 +85,7 @@ async def test_prepare_sequences_download_genbank(
     """
     Test a regular sequence download for a sample submitted by the user's group, test prefixes are correctly added for GenBank
     """
-    group, user, sample = await setup_sequences_download_test_data(async_session)
+    group, user, sample, _ = await setup_sequences_download_test_data(async_session)
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     data = {
@@ -112,7 +115,7 @@ async def test_prepare_sequences_download_public_database_DNE(
     Test that error message is returned if public repository name is not found
     """
 
-    group, user, sample = await setup_sequences_download_test_data(async_session)
+    group, user, sample, _ = await setup_sequences_download_test_data(async_session)
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     data = {
@@ -137,7 +140,7 @@ async def test_prepare_sequences_download_no_submission(
     """
     Test a regular sequence download for a sample submitted by the user's group, test prefixes are correctly added for GenBank
     """
-    group, user, sample = await setup_sequences_download_test_data(async_session)
+    group, user, sample, _ = await setup_sequences_download_test_data(async_session)
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     data = {
@@ -167,6 +170,7 @@ async def test_prepare_sequences_download_no_access(
     """
     # create a sample for one group and another viewer group
     owner_group = group_factory()
+    pathogen = pathogen_factory()
     viewer_group = group_factory(name="County")
     viewer = await userrole_factory(async_session, viewer_group)
     owner = await userrole_factory(
@@ -182,7 +186,7 @@ async def test_prepare_sequences_download_no_access(
     sample = sample_factory(owner_group, owner, location)
     uploaded_pathogen_genome_factory(sample)
 
-    async_session.add_all((owner_group, viewer_group))
+    async_session.add_all((owner_group, viewer_group, pathogen))
     await async_session.commit()
 
     # try and access the sample with the user from the group that does not have access
@@ -206,6 +210,7 @@ async def test_prepare_sequences_download_viewer_no_access(
     """
     owner_group = group_factory()
     viewer_group = group_factory(name="CDPH")
+    pathogen = pathogen_factory()
     user = await userrole_factory(async_session, viewer_group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
@@ -214,7 +219,9 @@ async def test_prepare_sequences_download_viewer_no_access(
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     # give the viewer group access to the sequences from the owner group
     group_roles = await grouprole_factory(async_session, owner_group, viewer_group)
-    async_session.add_all(group_roles + [owner_group, viewer_group, user, sample])
+    async_session.add_all(
+        group_roles + [owner_group, viewer_group, pathogen, user, sample]
+    )
     await async_session.commit()
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
@@ -251,7 +258,7 @@ async def test_access_matrix(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    await setup_gisaid_and_genbank_repo_configs(async_session)
+    setup_gisaid_and_genbank_repo_configs(async_session)
     # give the viewer group access to the sequences from the owner group
     roles = []
     roles.extend(await grouprole_factory(async_session, owner_group1, viewer_group))

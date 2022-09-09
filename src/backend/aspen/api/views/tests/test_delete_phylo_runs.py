@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.database.models import Group, PhyloTree, Sample, WorkflowStatusType
 from aspen.test_infra.models.location import location_factory
-from aspen.test_infra.models.pathogen import pathogen_factory
+from aspen.test_infra.models.pathogen import random_pathogen_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
@@ -24,7 +24,7 @@ def make_tree(
     status: WorkflowStatusType,
 ) -> PhyloTree:
     # make up to n trees, each with a random sample of uploaded pathogen genomes.
-    pathogen = pathogen_factory()
+    pathogen = random_pathogen_factory()
     return phylotree_factory(
         phylorun_factory(
             group,

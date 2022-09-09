@@ -98,6 +98,7 @@ async def appdata(
     # Put 3 samples, trees, runs in each group.
     objects_to_commit = []
     trees: List[PhyloTree] = []
+    pathogen = pathogen_factory()
     for i in range(len(groups)):
         group = groups[i]
         user = users[i]
@@ -115,7 +116,6 @@ async def appdata(
                 private_identifier=f"private_identifier_{group.name}_{i}",
                 public_identifier=f"public_identifier_{group.name}_{i}",
             )
-            pathogen = pathogen_factory()
             phylo_run = phylorun_factory(group, pathogen=pathogen)
             tree = phylotree_factory(phylo_run, [sample])
 

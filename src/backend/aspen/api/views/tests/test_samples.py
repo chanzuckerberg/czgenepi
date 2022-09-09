@@ -13,13 +13,14 @@ from aspen.database.models import (
     Accession,
     Group,
     Location,
+    Pathogen,
     Sample,
     UploadedPathogenGenome,
     User,
 )
-from aspen.database.models.pathogens import Pathogen
 from aspen.test_infra.models.gisaid_metadata import gisaid_metadata_factory
 from aspen.test_infra.models.location import location_factory
+from aspen.test_infra.models.pathogen import pathogen_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
 from aspen.test_infra.models.usergroup import (
@@ -50,8 +51,8 @@ async def test_samples_list(
         "qc_status": "pass",
     }
 
-    sc2 = await Pathogen.get_by_slug(async_session, "SC2")
-    mpx = await Pathogen.get_by_slug(async_session, "MPX")
+    sc2 = pathogen_factory("SC2", "SARS-Cov-2")
+    mpx = pathogen_factory("MPX", "MPX")
 
     # Make multiple samples
     samples: List[Sample] = []
@@ -181,7 +182,7 @@ async def test_samples_view_gisaid_rejected(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    sc2 = await Pathogen.get_by_slug(async_session, "SC2")
+    sc2 = pathogen_factory("SC2", "SARS-Cov-2")
     sample = sample_factory(group, user, location, accessions={}, pathogen=sc2)
     # Test no GISAID accession logic
     uploaded_pathogen_genome = uploaded_pathogen_genome_factory(
@@ -250,7 +251,7 @@ async def test_samples_view_gisaid_no_info(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    sc2 = await Pathogen.get_by_slug(async_session, "SC2")
+    sc2 = pathogen_factory("SC2", "SARS-Cov-2")
     sample = sample_factory(group, user, location, accessions={}, pathogen=sc2)
     # Test no GISAID accession logic
     uploaded_pathogen_genome = uploaded_pathogen_genome_factory(
@@ -320,7 +321,7 @@ async def test_samples_view_gisaid_not_eligible(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    sc2 = await Pathogen.get_by_slug(async_session, "SC2")
+    sc2 = pathogen_factory("SC2", "SARS-Cov-2")
     sample = sample_factory(
         group, user, location, czb_failed_genome_recovery=True, pathogen=sc2
     )
@@ -382,7 +383,7 @@ async def _test_samples_view_cansee(
     http_client: AsyncClient,
     group_roles: List[str],
     user_factory_kwargs: Optional[dict] = None,
-) -> Tuple[Sample, UploadedPathogenGenome, Any]:
+) -> Tuple[Sample, UploadedPathogenGenome, Pathogen, Any]:
     user_factory_kwargs = user_factory_kwargs or {}
     owner_group = group_factory()
     viewer_group = group_factory(name="cdph")
@@ -390,7 +391,7 @@ async def _test_samples_view_cansee(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    sc2 = await Pathogen.get_by_slug(async_session, "SC2")
+    sc2 = pathogen_factory("SC2", "SARS-Cov-2")
     sample = sample_factory(owner_group, user, location, pathogen=sc2)
     # create a private sample as well to make sure it doesn't get shown unless admin
     private_sample = sample_factory(
@@ -424,6 +425,7 @@ async def _test_samples_view_cansee(
     return (
         sample,
         uploaded_pathogen_genome,
+        sc2,
         response,
     )
 
@@ -431,7 +433,7 @@ async def _test_samples_view_cansee(
 async def test_samples_view_no_cansee(
     async_session: AsyncSession, http_client: AsyncClient
 ):
-    _, _, response = await _test_samples_view_cansee(
+    _, _, _, response = await _test_samples_view_cansee(
         async_session,
         http_client,
         group_roles=[],
@@ -443,7 +445,7 @@ async def test_samples_view_cansee(
     async_session: AsyncSession,
     http_client: AsyncClient,
 ):
-    sample, uploaded_pathogen_genome, response = await _test_samples_view_cansee(
+    _, _, _, response = await _test_samples_view_cansee(
         async_session,
         http_client,
         group_roles=["viewer"],
@@ -461,12 +463,16 @@ async def test_samples_view_cansee_all(
     http_client: AsyncClient,
 ):
 
-    sample, uploaded_pathogen_genome, response = await _test_samples_view_cansee(
+    (
+        sample,
+        uploaded_pathogen_genome,
+        pathogen,
+        response,
+    ) = await _test_samples_view_cansee(
         async_session,
         http_client,
         group_roles=["viewer"],
     )
-    sc2 = await Pathogen.get_by_slug(async_session, "SC2")
 
     # yes private identifier in the output.
     assert response["samples"] == [
@@ -502,7 +508,11 @@ async def test_samples_view_cansee_all(
                 "scorpio_support": None,
                 "qc_status": None,
             },
-            "pathogen": {"id": sc2.id, "slug": sc2.slug, "name": sc2.name},
+            "pathogen": {
+                "id": pathogen.id,
+                "slug": pathogen.slug,
+                "name": pathogen.name,
+            },
             "private": False,
             "submitting_group": {
                 "id": sample.submitting_group.id,
@@ -524,7 +534,7 @@ async def test_samples_view_no_pangolin(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    sc2 = await Pathogen.get_by_slug(async_session, "SC2")
+    sc2 = pathogen_factory("SC2", "SARS-Cov-2")
     sample = sample_factory(group, user, location, pathogen=sc2)
     uploaded_pathogen_genome = uploaded_pathogen_genome_factory(
         sample,
@@ -1144,6 +1154,7 @@ async def test_update_samples_request_failures(
 
 async def setup_validation_data(async_session: AsyncSession):
     group = group_factory()
+    pathogen = pathogen_factory()
     user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
@@ -1153,10 +1164,10 @@ async def setup_validation_data(async_session: AsyncSession):
     isl_sample = gisaid_metadata_factory(
         strain="USA/ISL-TEST/hCov-19", gisaid_epi_isl="EPI_ISL_3141592"
     )
-    async_session.add_all([group, sample, gisaid_sample, isl_sample])
+    async_session.add_all([group, pathogen, sample, gisaid_sample, isl_sample])
     await async_session.commit()
 
-    return user, group, sample, gisaid_sample, isl_sample
+    return user, group, pathogen, sample, gisaid_sample, isl_sample
 
 
 async def test_validation_endpoint(
@@ -1167,9 +1178,14 @@ async def test_validation_endpoint(
     Test that validation endpoint is correctly identifying identifiers that are in the DB, and that samples are properly stripped of hCoV-19/ prefix
     """
 
-    user, group, sample, gisaid_sample, isl_sample = await setup_validation_data(
-        async_session
-    )
+    (
+        user,
+        group,
+        pathogen,
+        sample,
+        gisaid_sample,
+        isl_sample,
+    ) = await setup_validation_data(async_session)
 
     # add hCoV-19/ as prefix to gisaid identifier to check that stripping of prefix is being done correctly
     data = {
@@ -1199,9 +1215,14 @@ async def test_validation_endpoint_missing_identifier(
     Test that validation endpoint is correctly identifying identifiers that are not aspen public or private ids or gisaid ids
     """
 
-    user, group, sample, gisaid_sample, isl_sample = await setup_validation_data(
-        async_session
-    )
+    (
+        user,
+        group,
+        pathogen,
+        sample,
+        gisaid_sample,
+        isl_sample,
+    ) = await setup_validation_data(async_session)
     data = {
         "sample_ids": [
             sample.public_identifier,
