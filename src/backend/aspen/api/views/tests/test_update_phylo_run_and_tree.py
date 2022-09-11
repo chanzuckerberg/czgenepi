@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.database.models import Group, PhyloRun, PhyloTree, Sample, User
 from aspen.test_infra.models.location import location_factory
+from aspen.test_infra.models.pathogen import random_pathogen_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.usergroup import group_factory, userrole_factory
@@ -38,7 +39,8 @@ async def make_shared_test_data(
         )
         for i in range(1, 3)
     ]
-    phylo_run = phylorun_factory(group)
+    pathogen = random_pathogen_factory()
+    phylo_run = phylorun_factory(group, pathogen=pathogen)
     phylo_tree = None
     if not no_trees:
         phylo_tree = phylotree_factory(phylo_run, samples)
@@ -64,7 +66,7 @@ async def test_update_phylo_tree(
     auth_headers = {"user_id": user.auth0_user_id}
     data = {"name": "new_name"}
     res = await http_client.put(
-        f"/v2/orgs/{group.id}/phylo_runs/{phylo_run.id}",
+        f"/v2/orgs/{group.id}/pathogens/{phylo_run.pathogen.slug}/phylo_runs/{phylo_run.id}",
         json=data,
         headers=auth_headers,
     )
@@ -95,7 +97,7 @@ async def test_update_phylo_run_no_trees(
     auth_headers = {"user_id": user.auth0_user_id}
     data = {"name": "new_name"}
     res = await http_client.put(
-        f"/v2/orgs/{group.id}/phylo_runs/{phylo_run.id}",
+        f"/v2/orgs/{group.id}/pathogens/{phylo_run.pathogen.slug}/phylo_runs/{phylo_run.id}",
         json=data,
         headers=auth_headers,
     )
@@ -138,7 +140,7 @@ async def test_update_phylo_tree_wrong_group(
     auth_headers = {"user_id": user_that_did_not_make_tree.auth0_user_id}
     data = {"name": "new_name"}
     res = await http_client.put(
-        f"/v2/orgs/{group_that_did_not_make_tree.id}/phylo_runs/{phylo_run.id}",
+        f"/v2/orgs/{group_that_did_not_make_tree.id}/pathogens/{phylo_run.pathogen.slug}/phylo_runs/{phylo_run.id}",
         json=data,
         headers=auth_headers,
     )

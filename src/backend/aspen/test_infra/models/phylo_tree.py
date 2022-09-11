@@ -22,6 +22,7 @@ def phylorun_factory(
     inputs: Iterable[Any] = None,
     gisaid_ids: Iterable[str] = None,
     tree_type=TreeType.OVERVIEW,
+    pathogen=None,
 ):
     if not inputs:
         inputs = []
@@ -53,6 +54,7 @@ def phylorun_factory(
         gisaid_ids=gisaid_ids,
         inputs=inputs,
         tree_type=tree_type,
+        pathogen=pathogen,
     )
 
 
@@ -67,6 +69,7 @@ def phylotree_factory(
     return PhyloTree(
         s3_bucket=bucket,
         s3_key=key,
+        pathogen=phylorun.pathogen,
         group=phylorun.group,
         constituent_samples=constituent_samples,
         producing_workflow=phylorun,

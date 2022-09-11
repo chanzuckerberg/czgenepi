@@ -4,10 +4,10 @@ import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from aspen.database.models import Pathogen
 from aspen.test_infra.models.gisaid_metadata import gisaid_metadata_factory
 from aspen.test_infra.models.lineage import pango_lineage_factory
 from aspen.test_infra.models.location import location_factory
+from aspen.test_infra.models.pathogen import random_pathogen_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
 from aspen.test_infra.models.usergroup import group_factory, userrole_factory
@@ -29,7 +29,7 @@ async def test_create_phylo_run(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
+    pathogen = random_pathogen_factory()
     sample = sample_factory(group, user, location, pathogen=pathogen)
     gisaid_dump = aligned_gisaid_dump_factory()
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
@@ -44,7 +44,9 @@ async def test_create_phylo_run(
         "samples": [sample.public_identifier],
     }
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/phylo_runs/", json=data, headers=auth_headers
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/phylo_runs/",
+        json=data,
+        headers=auth_headers,
     )
     assert res.status_code == 200
     response = res.json()
@@ -69,7 +71,7 @@ async def test_create_phylo_run_mpx(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    pathogen = await Pathogen.get_by_slug(async_session, "MPX")
+    pathogen = random_pathogen_factory()
     sample = sample_factory(group, user, location, pathogen=pathogen)
     gisaid_dump = aligned_gisaid_dump_factory()
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
@@ -111,7 +113,7 @@ async def test_create_phylo_run_with_failed_sample(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
+    pathogen = random_pathogen_factory()
     sample = sample_factory(group, user, location, pathogen=pathogen)
     sample.czb_failed_genome_recovery = True
     gisaid_dump = aligned_gisaid_dump_factory()
@@ -127,7 +129,9 @@ async def test_create_phylo_run_with_failed_sample(
         "samples": [sample.public_identifier],
     }
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/phylo_runs/", json=data, headers=auth_headers
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/phylo_runs/",
+        json=data,
+        headers=auth_headers,
     )
     assert res.status_code == 400
 
@@ -144,7 +148,7 @@ async def test_create_phylo_run_with_invalid_args(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
+    pathogen = random_pathogen_factory()
     sample = sample_factory(group, user, location, pathogen=pathogen)
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     gisaid_dump = aligned_gisaid_dump_factory()
@@ -178,7 +182,9 @@ async def test_create_phylo_run_with_invalid_args(
     for args in requests:
         request_body["template_args"] = args  # type: ignore
         res = await http_client.post(
-            f"/v2/orgs/{group.id}/phylo_runs/", json=request_body, headers=auth_headers
+            f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/phylo_runs/",
+            json=request_body,
+            headers=auth_headers,
         )
         assert res.status_code == 422
 
@@ -195,7 +201,7 @@ async def test_create_phylo_run_with_template_args(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
+    pathogen = random_pathogen_factory()
     sample = sample_factory(group, user, location, pathogen=pathogen)
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     gisaid_dump = aligned_gisaid_dump_factory()
@@ -236,7 +242,9 @@ async def test_create_phylo_run_with_template_args(
     ]
     for data in requests:
         res = await http_client.post(
-            f"/v2/orgs/{group.id}/phylo_runs/", json=data, headers=auth_headers
+            f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/phylo_runs/",
+            json=data,
+            headers=auth_headers,
         )
         assert res.status_code == 200
         response: Dict[str, Any] = res.json()
@@ -265,7 +273,7 @@ async def test_create_phylo_run_with_gisaid_ids(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
+    pathogen = random_pathogen_factory()
     sample = sample_factory(group, user, location, pathogen=pathogen)
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     gisaid_dump = aligned_gisaid_dump_factory()
@@ -282,7 +290,9 @@ async def test_create_phylo_run_with_gisaid_ids(
         "samples": [sample.public_identifier, gisaid_sample.strain],
     }
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/phylo_runs/", json=data, headers=auth_headers
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/phylo_runs/",
+        json=data,
+        headers=auth_headers,
     )
     assert res.status_code == 200
     response = res.json()
@@ -304,7 +314,7 @@ async def test_create_phylo_run_with_epi_isls(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
+    pathogen = random_pathogen_factory()
     sample = sample_factory(group, user, location, pathogen=pathogen)
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     gisaid_dump = aligned_gisaid_dump_factory()
@@ -321,7 +331,9 @@ async def test_create_phylo_run_with_epi_isls(
         "samples": [sample.public_identifier, gisaid_isl_sample.gisaid_epi_isl],
     }
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/phylo_runs/", json=data, headers=auth_headers
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/phylo_runs/",
+        json=data,
+        headers=auth_headers,
     )
     assert res.status_code == 200
     response = res.json()
@@ -343,7 +355,7 @@ async def test_create_invalid_phylo_run_name(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
+    pathogen = random_pathogen_factory()
     sample = sample_factory(group, user, location, pathogen=pathogen)
     gisaid_dump = aligned_gisaid_dump_factory()
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
@@ -358,7 +370,9 @@ async def test_create_invalid_phylo_run_name(
         "samples": [sample.public_identifier],
     }
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/phylo_runs/", json=data, headers=auth_headers
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/phylo_runs/",
+        json=data,
+        headers=auth_headers,
     )
     assert res.status_code == 422
 
@@ -375,7 +389,7 @@ async def test_create_invalid_phylo_run_tree_type(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
+    pathogen = random_pathogen_factory()
     sample = sample_factory(group, user, location, pathogen=pathogen)
     gisaid_dump = aligned_gisaid_dump_factory()
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
@@ -390,7 +404,9 @@ async def test_create_invalid_phylo_run_tree_type(
         "samples": [sample.public_identifier],
     }
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/phylo_runs/", json=data, headers=auth_headers
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/phylo_runs/",
+        json=data,
+        headers=auth_headers,
     )
     assert res.status_code == 422
 
@@ -407,7 +423,7 @@ async def test_create_invalid_phylo_run_bad_sample_id(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
+    pathogen = random_pathogen_factory()
     sample = sample_factory(group, user, location, pathogen=pathogen)
     gisaid_dump = aligned_gisaid_dump_factory()
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
@@ -422,7 +438,9 @@ async def test_create_invalid_phylo_run_bad_sample_id(
         "samples": [sample.public_identifier, "bad_sample_identifier"],
     }
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/phylo_runs/", json=data, headers=auth_headers
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/phylo_runs/",
+        json=data,
+        headers=auth_headers,
     )
     assert res.status_code == 400
 
@@ -439,7 +457,7 @@ async def test_create_invalid_phylo_run_sample_cannot_see(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
+    pathogen = random_pathogen_factory()
     sample = sample_factory(group, user, location, pathogen=pathogen)
 
     group2 = group_factory(name="The Other Group")
@@ -452,7 +470,6 @@ async def test_create_invalid_phylo_run_sample_cannot_see(
     location2 = location_factory(
         "North America", "USA", "California", "San Francisco County"
     )
-    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
     sample2 = sample_factory(
         group2,
         user2,
@@ -475,7 +492,9 @@ async def test_create_invalid_phylo_run_sample_cannot_see(
         "samples": [sample.public_identifier, sample2.public_identifier],
     }
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/phylo_runs/", json=data, headers=auth_headers
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/phylo_runs/",
+        json=data,
+        headers=auth_headers,
     )
     assert res.status_code == 400
 
@@ -493,7 +512,7 @@ async def test_create_phylo_run_unauthorized(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
+    pathogen = random_pathogen_factory()
     sample = sample_factory(group, user, location, pathogen=pathogen)
     gisaid_dump = aligned_gisaid_dump_factory()
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
@@ -509,7 +528,9 @@ async def test_create_phylo_run_unauthorized(
         "samples": [sample.public_identifier],
     }
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/phylo_runs/", json=data, headers=auth_headers
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/phylo_runs/",
+        json=data,
+        headers=auth_headers,
     )
     assert res.status_code == 403
 
@@ -543,12 +564,13 @@ async def test_create_phylo_run_with_lineage_aliases(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
+    pathogen = random_pathogen_factory()
     sample = sample_factory(group, user, location, pathogen=pathogen)
     gisaid_dump = aligned_gisaid_dump_factory()
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     async_session.add(group)
     async_session.add(gisaid_dump)
+    async_session.add(pathogen)
     async_session.add_all(pango_lineages)
     await async_session.commit()
     auth_headers = {"user_id": user.auth0_user_id}
@@ -559,7 +581,11 @@ async def test_create_phylo_run_with_lineage_aliases(
         "samples": [sample.public_identifier],
         "template_args": {"filter_pango_lineages": ["Delta", "BA.1* / 21K", "B.1.1.7"]},
     }
-    res = await http_client.post("/v2/phylo_runs/", json=data, headers=auth_headers)
+    res = await http_client.post(
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/phylo_runs/",
+        json=data,
+        headers=auth_headers,
+    )
     assert res.status_code == 200
     response = res.json()
 

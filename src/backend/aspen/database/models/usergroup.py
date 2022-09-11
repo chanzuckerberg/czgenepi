@@ -5,7 +5,17 @@ import string
 from collections.abc import MutableSequence
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, Column, Date, ForeignKey, Index, Integer, String, text
+from sqlalchemy import (
+    Boolean,
+    Column,
+    Date,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    text,
+    UniqueConstraint,
+)
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.engine.default import DefaultExecutionContext
 from sqlalchemy.orm import backref, relationship
@@ -97,7 +107,7 @@ class User(idbase, DictMixin):  # type: ignore
     # has last acknowledged. Used to display notification to user when policies change.
     acknowledged_policy_version = Column(Date, nullable=True, default=None)
     # `split_id` is unique, but set via index, rather than Column, see above.
-    split_id = Column(String, nullable=False, default=generate_random_id)
+    split_id = Column(String, default=generate_random_id)
     # `analytics_id` used for keeping users anonymized for analytics
     analytics_id = Column(
         String, unique=True, nullable=False, default=generate_random_id
@@ -122,11 +132,22 @@ class UserRole(base):  # type: ignore
     """User role grants"""
 
     __tablename__ = "user_roles"
-    role_id = Column(Integer, ForeignKey(Role.id), nullable=False, primary_key=True)
+    __table_args__ = (
+        UniqueConstraint(
+            "user_id", "group_id", "role_id", name="uq_user_roles_user_group_role"
+        ),
+    )
+    role_id = Column(
+        Integer, ForeignKey(Role.id), nullable=False, primary_key=True, index=True
+    )
     role = relationship(Role, backref=backref("user_roles", uselist=True))  # type: ignore
-    group_id = Column(Integer, ForeignKey(Group.id), nullable=False, primary_key=True)
+    group_id = Column(
+        Integer, ForeignKey(Group.id), nullable=False, primary_key=True, index=True
+    )
     group = relationship(Group, backref=backref("user_roles", uselist=True))  # type: ignore
-    user_id = Column(Integer, ForeignKey(User.id), nullable=False, primary_key=True)
+    user_id = Column(
+        Integer, ForeignKey(User.id), nullable=False, primary_key=True, index=True
+    )
     user = relationship(User, backref=backref("user_roles", uselist=True))  # type: ignore
 
 
@@ -134,13 +155,21 @@ class GroupRole(base):  # type: ignore
     """Group role grants"""
 
     __tablename__ = "group_roles"
-    role_id = Column(Integer, ForeignKey(Role.id), nullable=False)
+    __table_args__ = (
+        UniqueConstraint(
+            "grantee_group_id",
+            "grantor_group_id",
+            "role_id",
+            name="uq_group_roles_grantee_grantor_role",
+        ),
+    )
+    role_id = Column(Integer, ForeignKey(Role.id), nullable=False, index=True)
     role = relationship(Role, backref=backref("group_roles", uselist=True))  # type: ignore
     grantor_group_id = Column(
-        Integer, ForeignKey(Group.id), nullable=False, primary_key=True
+        Integer, ForeignKey(Group.id), nullable=False, primary_key=True, index=True
     )
     grantor_group = relationship(Group, foreign_keys=[grantor_group_id], backref=backref("grantor_roles", uselist=True))  # type: ignore
     grantee_group_id = Column(
-        Integer, ForeignKey(Group.id), nullable=False, primary_key=True
+        Integer, ForeignKey(Group.id), nullable=False, primary_key=True, index=True
     )
     grantee_group = relationship(Group, foreign_keys=[grantee_group_id], backref=backref("grantee_roles", uselist=True))  # type: ignore
