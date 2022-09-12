@@ -183,8 +183,7 @@ module gisaid_sfn_config {
   image    = local.gisaid_image
   # This job is actually constrained by *DISK SPACE* and swipe currently only supports NVME-mounted storage
   # so we're requesting more vcpu's than necessary in order to bump the instance size to: 2 x 900 NVMe SSD
-  vcpus    = 48
-  memory   = 128000
+  memory   = 384000
   wdl_path = "workflows/gisaid.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -249,8 +248,7 @@ module nextstrain_autorun_sfn_config {
   image    = local.backend_image
   # This job is actually constrained by *DISK SPACE* and swipe currently only supports NVME-mounted storage
   # so we're requesting more vcpu's than necessary in order to bump the instance size to: 2 x 300 NVMe SSD
-  vcpus    = 16
-  memory   = 64000
+  memory   = 16000
   wdl_path = "workflows/nextstrain-autorun.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
@@ -277,7 +275,6 @@ module nextstrain_ondemand_template_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-ondemand-sfn"
   image    = local.nextstrain_image
-  vcpus    = 8
   memory   = 64000
   wdl_path = "workflows/nextstrain-ondemand.wdl"
   custom_stack_name     = local.custom_stack_name
