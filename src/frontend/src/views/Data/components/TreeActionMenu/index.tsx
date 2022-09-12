@@ -1,4 +1,5 @@
 import { MoreActionsMenu } from "./components/MoreActionsMenu";
+import { OpenInGalagoButton } from "./components/OpenInGalagoButton";
 import { OpenInNextstrainButton } from "./components/OpenInNextstrainButton";
 import TreeTableDownloadMenu from "./components/TreeTableDownloadMenu";
 import { StyledActionWrapper, StyledTreeActionMenu } from "./style";
@@ -33,10 +34,13 @@ const TreeActionMenu = ({
   onEditTreeModalOpen,
   userInfo,
 }: Props): JSX.Element => (
-  <StyledTreeActionMenu>
+  <StyledTreeActionMenu role="group" aria-label={`${item?.name} tree actions`}>
     <StyledActionWrapper>
       <OpenInNextstrainButton item={item} />
     </StyledActionWrapper>
+    <StyledActionWrapper>
+      <OpenInGalagoButton item={item} />
+    </StyledActionWrapper> 
     <StyledActionWrapper>
       <TreeTableDownloadMenu item={item} />
     </StyledActionWrapper>
