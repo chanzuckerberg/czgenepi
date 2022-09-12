@@ -11,7 +11,7 @@ test.describe("Upload sample tests", () => {
   });
 
   fileExtensions.forEach((extenstion) => {
-    test(`Should upload ${extenstion.toUpperCase()} sample file`, async ({
+    test.only(`Should upload ${extenstion.toUpperCase()} sample file`, async ({
       page,
     }) => {
       const uploadData = {

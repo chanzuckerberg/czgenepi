@@ -14,9 +14,14 @@ async function globalSetup(config: FullConfig): Promise<void> {
   const page = await browser.newPage();
   await page.goto(baseURL as string);
   await page.locator(getByTestID("navbar-sign-in-link")).click();
-  await page.locator(getByID("username")).first().fill(username);
-  await page.locator(getByID("password")).first().fill(password);
+  await page.locator(getByID("username")).first().fill("lbrambila@contractor.chanzuckerberg.com");
+  await page.locator(getByID("password")).first().fill("Br@mb1la");
   await page.locator('button[type=submit] >> "Continue"').first().click();
+  const [banner] = await Promise.all([
+    page.waitForEvent('domcontentloaded'),
+    page.locator('button#onetrust-accept-btn-handler').click(),
+  ])
+  await banner.waitForLoadState('domcontentloaded');
   await page.context().storageState({ path: storageState as string });
 
   const cookies = await page.context().cookies();

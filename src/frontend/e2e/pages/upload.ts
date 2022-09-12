@@ -1,7 +1,7 @@
 import { Page } from "@playwright/test";
 import { faker } from "@faker-js/faker";
-import { Sample } from "e2e/utils/schemas/sampleData";
-import { UploadData } from "e2e/utils/schemas/uploadData";
+import { Sample } from "../utils/schemas/sampleData";
+import { UploadData } from "../utils/schemas/uploadData";
 
 export class UploadSample {
   public static async uploadFiles(
@@ -11,10 +11,10 @@ export class UploadSample {
     sequencingDateError = false
   ): Promise<any> {
     //click upload button
-    await page.locator("button[@label='Upload']").click();
+    await page.locator("a[href$='/upload/step1']").click();
     //TODO verify URL
 
-    UploadSample.selectSampleAndMetadaFiles(page, uploadData);
+   await UploadSample.selectSampleAndMetadaFiles(page, uploadData);
 
     //complete the form
     let collectionDateAppliedToAll = false;
@@ -22,15 +22,16 @@ export class UploadSample {
     let sequencingDateAppliedToAll = false;
     for (let i = 0; i <= uploadData.sample.length; i++) {
       const data = uploadData.sample[i];
-      //update public id
-      await page.locator("input[@name='publicId']").nth(i).type(data.publicId);
+      type key = keyof typeof data;
+      //update public id                                             data.publicId
+      await page.locator("input[@name='publicId']").nth(i).type(data['publicId' as key]);
       //collection date
       if (!collectionDateAppliedToAll) {
         // apply to all has not been applied, so fill it
         await page
           .locator("input[@name='collectionDate']")
-          .nth(i)
-          .type(data.collectionDate);
+          .nth(i) //data.collectionDate
+          .type(data['collectionDate' as key]);
         if (uploadData.applyToAll && !collectionDateError) {
           await page.locator("button[@label='APPLY TO ALL']").nth(i).click();
           collectionDateAppliedToAll = true;
@@ -46,8 +47,8 @@ export class UploadSample {
           .click();
         await page
           .locator("//div[@role='tooltip']/descendant::input")
-          .nth(i)
-          .type(data.collectionLocation, { delay: 150 });
+          .nth(i)//collectionLocation
+          .type(data['collectionLocation' as key], { delay: 150 });
         await page.keyboard.press("ArrowDown");
         await page.keyboard.press("Enter");
         if (uploadData.applyToAll) {
@@ -64,8 +65,8 @@ export class UploadSample {
         // apply to all has not been applied, so fill it
         await page
           .locator("input[@name='sequencingDate']")
-          .nth(i)
-          .type(data.sequencingDate);
+          .nth(i)//sequencingDate
+          .type(data['sequencingDate' as key]);
         if (uploadData.applyToAll && !sequencingDateError) {
           await page
             .locator("button[@label='APPLY TO ALL']")
@@ -76,7 +77,7 @@ export class UploadSample {
       }
 
       //private sample
-      if (data?.isPrivate) {
+      if (data['isPrivate' as key]) {
         await page.locator("input[@name='keepPrivate']").nth(i).click();
       }
     }
@@ -116,8 +117,8 @@ export class UploadSample {
   ): Promise<void> {
     // click select sample files button
     const [fileChooser] = await Promise.all([
-      page.waitForEvent("filechooser"),
-      page.locator("input[type='file']").click(),
+     await page.waitForEvent("filechooser"),
+     await page.locator("//button[text()='Select Sample Files']").click(),
     ]);
     // select sample files
     await fileChooser.setFiles(
