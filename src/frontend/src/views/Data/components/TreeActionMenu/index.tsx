@@ -1,3 +1,5 @@
+import { useTreatments } from "@splitsoftware/splitio-react";
+import { FEATURE_FLAGS, isFlagOn } from "src/components/Split";
 import { MoreActionsMenu } from "./components/MoreActionsMenu";
 import { OpenInGalagoButton } from "./components/OpenInGalagoButton";
 import { OpenInNextstrainButton } from "./components/OpenInNextstrainButton";
@@ -33,26 +35,39 @@ const TreeActionMenu = ({
   onDeleteTreeModalOpen,
   onEditTreeModalOpen,
   userInfo,
-}: Props): JSX.Element => (
-  <StyledTreeActionMenu role="group" aria-label={`${item?.name} tree actions`}>
-    <StyledActionWrapper>
-      <OpenInNextstrainButton item={item} />
-    </StyledActionWrapper>
-    <StyledActionWrapper>
-      <OpenInGalagoButton item={item} />
-    </StyledActionWrapper>
-    <StyledActionWrapper>
-      <TreeTableDownloadMenu item={item} />
-    </StyledActionWrapper>
-    <StyledActionWrapper>
-      <MoreActionsMenu
-        item={item}
-        onDeleteTreeModalOpen={onDeleteTreeModalOpen}
-        onEditTreeModalOpen={onEditTreeModalOpen}
-        userInfo={userInfo}
-      />
-    </StyledActionWrapper>
-  </StyledTreeActionMenu>
-);
+}: Props): JSX.Element => {
+  const flag = useTreatments([FEATURE_FLAGS.galago_integration]);
+  const isGalagoIntegrationFlagOn = isFlagOn(
+    flag,
+    FEATURE_FLAGS.galago_integration
+  );
+
+  return (
+    <StyledTreeActionMenu
+      role="group"
+      aria-label={`${item?.name} tree actions`}
+    >
+      <StyledActionWrapper>
+        <OpenInNextstrainButton item={item} />
+      </StyledActionWrapper>
+      {isGalagoIntegrationFlagOn && (
+        <StyledActionWrapper>
+          <OpenInGalagoButton item={item} />
+        </StyledActionWrapper>
+      )}
+      <StyledActionWrapper>
+        <TreeTableDownloadMenu item={item} />
+      </StyledActionWrapper>
+      <StyledActionWrapper>
+        <MoreActionsMenu
+          item={item}
+          onDeleteTreeModalOpen={onDeleteTreeModalOpen}
+          onEditTreeModalOpen={onEditTreeModalOpen}
+          userInfo={userInfo}
+        />
+      </StyledActionWrapper>
+    </StyledTreeActionMenu>
+  );
+};
 
 export { TreeActionMenu };
