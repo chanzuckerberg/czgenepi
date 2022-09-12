@@ -40,7 +40,7 @@ const TreeActionMenu = ({
     </StyledActionWrapper>
     <StyledActionWrapper>
       <OpenInGalagoButton item={item} />
-    </StyledActionWrapper> 
+    </StyledActionWrapper>
     <StyledActionWrapper>
       <TreeTableDownloadMenu item={item} />
     </StyledActionWrapper>
