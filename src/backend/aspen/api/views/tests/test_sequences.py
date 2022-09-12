@@ -63,7 +63,7 @@ async def test_prepare_sequences_download_gisaid(
         "public_repository_name": "GISAID",
     }
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/sequences/", headers=auth_headers, json=data
+        f"/v2/orgs/{group.id}/pathogens/SC2/sequences/", headers=auth_headers, json=data
     )
     assert res.status_code == 200
     expected_filename = get_fasta_filename("GISAID", group.name)
@@ -93,7 +93,7 @@ async def test_prepare_sequences_download_genbank(
         "public_repository_name": "GenBank",
     }
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/sequences/", headers=auth_headers, json=data
+        f"/v2/orgs/{group.id}/pathogens/SC2/sequences/", headers=auth_headers, json=data
     )
     assert res.status_code == 200
     expected_filename = get_fasta_filename("GenBank", group.name)
@@ -123,7 +123,7 @@ async def test_prepare_sequences_download_public_database_DNE(
         "public_repository_name": "does not exist",
     }
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/sequences/", headers=auth_headers, json=data
+        f"/v2/orgs/{group.id}/pathogens/SC2/sequences/", headers=auth_headers, json=data
     )
 
     assert (
@@ -147,7 +147,7 @@ async def test_prepare_sequences_download_no_submission(
         "sample_ids": [sample.public_identifier],
     }
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/sequences/", headers=auth_headers, json=data
+        f"/v2/orgs/{group.id}/pathogens/SC2/sequences/", headers=auth_headers, json=data
     )
     assert res.status_code == 200
     expected_filename = get_fasta_filename(None, group.name)
