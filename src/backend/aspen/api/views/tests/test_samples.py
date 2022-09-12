@@ -13,12 +13,14 @@ from aspen.database.models import (
     Accession,
     Group,
     Location,
+    Pathogen,
     Sample,
     UploadedPathogenGenome,
     User,
 )
 from aspen.test_infra.models.gisaid_metadata import gisaid_metadata_factory
 from aspen.test_infra.models.location import location_factory
+from aspen.test_infra.models.pathogen import pathogen_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
 from aspen.test_infra.models.usergroup import (
@@ -48,10 +50,15 @@ async def test_samples_list(
         "scorpio_support": "0.775",
         "qc_status": "pass",
     }
+
+    sc2 = pathogen_factory("SC2", "SARS-Cov-2")
+    mpx = pathogen_factory("MPX", "MPX")
+
     # Make multiple samples
     samples: List[Sample] = []
     uploaded_pathogen_genomes: List[UploadedPathogenGenome] = []
-    for i in range(2):
+    for i in range(4):
+        pathogen = sc2 if i < 2 else mpx
         samples.append(
             sample_factory(
                 group,
@@ -60,6 +67,7 @@ async def test_samples_list(
                 private=True,
                 private_identifier=f"private{i}",
                 public_identifier=f"public{i}",
+                pathogen=pathogen,
             )
         )
         uploaded_pathogen_genomes.append(
@@ -67,60 +75,102 @@ async def test_samples_list(
                 samples[i], pangolin_output=pangolin_output
             )
         )
+
     async_session.add(group)
     await async_session.commit()
 
     auth_headers = {"user_id": user.auth0_user_id}
+    pathogen_specific = {  # type: ignore
+        sc2: {
+            "id_range": range(2),
+            "url": f"/v2/orgs/{group.id}/pathogens/SC2/samples/",
+        },
+        mpx: {
+            "id_range": range(2, 4),
+            "url": f"/v2/orgs/{group.id}/pathogens/MPX/samples/",
+        },
+        # test support for old style urls
+        "no pathogen": {
+            "id_range": range(2),
+            "url": f"/v2/orgs/{group.id}/samples/",
+        },
+    }
+    for pathogen, params in pathogen_specific.items():  # type: ignore
+
+        res = await http_client.get(
+            params["url"],  # type: ignore
+            headers=auth_headers,
+        )
+        response = res.json()
+        if pathogen != "no pathogen":
+            pathogen_data = {
+                "id": pathogen.id,
+                "slug": pathogen.slug,
+                "name": pathogen.name,
+            }
+        else:
+            # fill with sc2 as that is the current default
+            pathogen_data = {
+                "id": sc2.id,
+                "slug": sc2.slug,
+                "name": sc2.name,
+            }
+        expected = {
+            "samples": [
+                {
+                    "id": samples[i].id,
+                    "collection_date": str(samples[i].collection_date),
+                    "collection_location": {
+                        "id": location.id,
+                        "region": location.region,
+                        "country": location.country,
+                        "division": location.division,
+                        "location": location.location,
+                    },
+                    "czb_failed_genome_recovery": False,
+                    "gisaid": {
+                        "status": "Accepted",
+                        "gisaid_id": samples[i].accessions[0].accession,
+                    },
+                    "pathogen": pathogen_data,
+                    "private_identifier": samples[i].private_identifier,
+                    "public_identifier": samples[i].public_identifier,
+                    "upload_date": convert_datetime_to_iso_8601(
+                        uploaded_pathogen_genomes[i].upload_date
+                    ),
+                    "sequencing_date": str(
+                        uploaded_pathogen_genomes[i].sequencing_date
+                    ),
+                    "lineage": {
+                        "lineage": uploaded_pathogen_genomes[i].pangolin_lineage,
+                        "confidence": uploaded_pathogen_genomes[i].pangolin_probability,
+                        "version": uploaded_pathogen_genomes[i].pangolin_version,
+                        "last_updated": convert_datetime_to_iso_8601(
+                            uploaded_pathogen_genomes[i].pangolin_last_updated
+                        ),
+                        "scorpio_call": pangolin_output["scorpio_call"],
+                        "scorpio_support": float(pangolin_output["scorpio_support"]),
+                        "qc_status": pangolin_output["qc_status"],
+                    },
+                    "private": True,
+                    "submitting_group": {
+                        "id": group.id,
+                        "name": group.name,
+                    },
+                    "uploaded_by": {"id": user.id, "name": user.name},
+                }
+                for i in params["id_range"]  # type: ignore
+            ]
+        }
+        assert response == expected
+
+    # test that passing in a dud slug will raise exception
     res = await http_client.get(
-        f"/v2/orgs/{group.id}/samples/",
+        f"/v2/orgs/{group.id}/pathogens/WRONG/samples/",
         headers=auth_headers,
     )
-    response = res.json()
-    expected = {
-        "samples": [
-            {
-                "id": samples[i].id,
-                "collection_date": str(samples[i].collection_date),
-                "collection_location": {
-                    "id": location.id,
-                    "region": location.region,
-                    "country": location.country,
-                    "division": location.division,
-                    "location": location.location,
-                },
-                "czb_failed_genome_recovery": False,
-                "gisaid": {
-                    "status": "Accepted",
-                    "gisaid_id": samples[i].accessions[0].accession,
-                },
-                "private_identifier": samples[i].private_identifier,
-                "public_identifier": samples[i].public_identifier,
-                "upload_date": convert_datetime_to_iso_8601(
-                    uploaded_pathogen_genomes[i].upload_date
-                ),
-                "sequencing_date": str(uploaded_pathogen_genomes[i].sequencing_date),
-                "lineage": {
-                    "lineage": uploaded_pathogen_genomes[i].pangolin_lineage,
-                    "confidence": uploaded_pathogen_genomes[i].pangolin_probability,
-                    "version": uploaded_pathogen_genomes[i].pangolin_version,
-                    "last_updated": convert_datetime_to_iso_8601(
-                        uploaded_pathogen_genomes[i].pangolin_last_updated
-                    ),
-                    "scorpio_call": pangolin_output["scorpio_call"],
-                    "scorpio_support": float(pangolin_output["scorpio_support"]),
-                    "qc_status": pangolin_output["qc_status"],
-                },
-                "private": True,
-                "submitting_group": {
-                    "id": group.id,
-                    "name": group.name,
-                },
-                "uploaded_by": {"id": user.id, "name": user.name},
-            }
-            for i in range(2)
-        ]
-    }
-    assert response == expected
+    assert res.status_code == 400
+    assert res.text == '{"error":"Invalid pathogen slug"}'
 
 
 async def test_samples_view_gisaid_rejected(
@@ -132,17 +182,19 @@ async def test_samples_view_gisaid_rejected(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    sample = sample_factory(group, user, location, accessions={})
+    sc2 = pathogen_factory("SC2", "SARS-Cov-2")
+    sample = sample_factory(group, user, location, accessions={}, pathogen=sc2)
     # Test no GISAID accession logic
     uploaded_pathogen_genome = uploaded_pathogen_genome_factory(
         sample,
     )
+
     async_session.add(group)
     await async_session.commit()
 
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.get(
-        f"/v2/orgs/{group.id}/samples/",
+        f"/v2/orgs/{group.id}/pathogens/{sc2.slug}/samples/",
         headers=auth_headers,
     )
     response = res.json()
@@ -177,6 +229,7 @@ async def test_samples_view_gisaid_rejected(
                     "scorpio_support": None,
                     "qc_status": None,
                 },
+                "pathogen": {"id": sc2.id, "slug": sc2.slug, "name": sc2.name},
                 "private": False,
                 "submitting_group": {
                     "id": group.id,
@@ -198,7 +251,8 @@ async def test_samples_view_gisaid_no_info(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    sample = sample_factory(group, user, location, accessions={})
+    sc2 = pathogen_factory("SC2", "SARS-Cov-2")
+    sample = sample_factory(group, user, location, accessions={}, pathogen=sc2)
     # Test no GISAID accession logic
     uploaded_pathogen_genome = uploaded_pathogen_genome_factory(
         sample,
@@ -209,7 +263,7 @@ async def test_samples_view_gisaid_no_info(
 
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.get(
-        f"/v2/orgs/{group.id}/samples/",
+        f"/v2/orgs/{group.id}/pathogens/{sc2.slug}/samples/",
         headers=auth_headers,
     )
     response = res.json()
@@ -245,6 +299,7 @@ async def test_samples_view_gisaid_no_info(
                     "scorpio_support": None,
                     "qc_status": None,
                 },
+                "pathogen": {"id": sc2.id, "slug": sc2.slug, "name": sc2.name},
                 "private": False,
                 "submitting_group": {
                     "id": group.id,
@@ -266,13 +321,16 @@ async def test_samples_view_gisaid_not_eligible(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    sample = sample_factory(group, user, location, czb_failed_genome_recovery=True)
+    sc2 = pathogen_factory("SC2", "SARS-Cov-2")
+    sample = sample_factory(
+        group, user, location, czb_failed_genome_recovery=True, pathogen=sc2
+    )
     async_session.add(group)
     await async_session.commit()
 
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.get(
-        f"/v2/orgs/{group.id}/samples/",
+        f"/v2/orgs/{group.id}/pathogens/{sc2.slug}/samples/",
         headers=auth_headers,
     )
     response = res.json()
@@ -306,6 +364,7 @@ async def test_samples_view_gisaid_not_eligible(
                     "scorpio_support": None,
                     "qc_status": None,
                 },
+                "pathogen": {"id": sc2.id, "slug": sc2.slug, "name": sc2.name},
                 "private": False,
                 "submitting_group": {
                     "id": group.id,
@@ -324,7 +383,7 @@ async def _test_samples_view_cansee(
     http_client: AsyncClient,
     group_roles: List[str],
     user_factory_kwargs: Optional[dict] = None,
-) -> Tuple[Sample, UploadedPathogenGenome, Any]:
+) -> Tuple[Sample, UploadedPathogenGenome, Pathogen, Any]:
     user_factory_kwargs = user_factory_kwargs or {}
     owner_group = group_factory()
     viewer_group = group_factory(name="cdph")
@@ -332,7 +391,8 @@ async def _test_samples_view_cansee(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    sample = sample_factory(owner_group, user, location)
+    sc2 = pathogen_factory("SC2", "SARS-Cov-2")
+    sample = sample_factory(owner_group, user, location, pathogen=sc2)
     # create a private sample as well to make sure it doesn't get shown unless admin
     private_sample = sample_factory(
         owner_group,
@@ -357,7 +417,7 @@ async def _test_samples_view_cansee(
 
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.get(
-        f"/v2/orgs/{viewer_group.id}/samples/",
+        f"/v2/orgs/{viewer_group.id}/pathogens/{sc2.slug}/samples/",
         headers=auth_headers,
     )
     response = res.json()
@@ -365,6 +425,7 @@ async def _test_samples_view_cansee(
     return (
         sample,
         uploaded_pathogen_genome,
+        sc2,
         response,
     )
 
@@ -372,7 +433,7 @@ async def _test_samples_view_cansee(
 async def test_samples_view_no_cansee(
     async_session: AsyncSession, http_client: AsyncClient
 ):
-    _, _, response = await _test_samples_view_cansee(
+    _, _, _, response = await _test_samples_view_cansee(
         async_session,
         http_client,
         group_roles=[],
@@ -384,7 +445,7 @@ async def test_samples_view_cansee(
     async_session: AsyncSession,
     http_client: AsyncClient,
 ):
-    sample, uploaded_pathogen_genome, response = await _test_samples_view_cansee(
+    _, _, _, response = await _test_samples_view_cansee(
         async_session,
         http_client,
         group_roles=["viewer"],
@@ -402,7 +463,12 @@ async def test_samples_view_cansee_all(
     http_client: AsyncClient,
 ):
 
-    sample, uploaded_pathogen_genome, response = await _test_samples_view_cansee(
+    (
+        sample,
+        uploaded_pathogen_genome,
+        pathogen,
+        response,
+    ) = await _test_samples_view_cansee(
         async_session,
         http_client,
         group_roles=["viewer"],
@@ -442,6 +508,11 @@ async def test_samples_view_cansee_all(
                 "scorpio_support": None,
                 "qc_status": None,
             },
+            "pathogen": {
+                "id": pathogen.id,
+                "slug": pathogen.slug,
+                "name": pathogen.name,
+            },
             "private": False,
             "submitting_group": {
                 "id": sample.submitting_group.id,
@@ -463,7 +534,8 @@ async def test_samples_view_no_pangolin(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    sample = sample_factory(group, user, location)
+    sc2 = pathogen_factory("SC2", "SARS-Cov-2")
+    sample = sample_factory(group, user, location, pathogen=sc2)
     uploaded_pathogen_genome = uploaded_pathogen_genome_factory(
         sample,
         pangolin_lineage=None,
@@ -476,7 +548,7 @@ async def test_samples_view_no_pangolin(
 
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.get(
-        f"/v2/orgs/{group.id}/samples/",
+        f"/v2/orgs/{group.id}/pathogens/{sc2.slug}/samples/",
         headers=auth_headers,
     )
     response = res.json()
@@ -512,6 +584,7 @@ async def test_samples_view_no_pangolin(
                     "scorpio_support": None,
                     "qc_status": None,
                 },
+                "pathogen": {"id": sc2.id, "slug": sc2.slug, "name": sc2.name},
                 "private": False,
                 "submitting_group": {
                     "id": group.id,
@@ -572,7 +645,7 @@ async def test_bulk_delete_sample_success(
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.request(
         "DELETE",
-        f"/v2/orgs/{group.id}/samples/",
+        f"/v2/orgs/{group.id}/pathogens/SC2/samples/",
         json=body,
         headers=auth_headers,
     )
@@ -637,7 +710,7 @@ async def test_delete_sample_success(
     for sample in [samples[0], samples[1]]:
         auth_headers = {"user_id": user.auth0_user_id}
         res = await http_client.delete(
-            f"/v2/orgs/{group.id}/samples/{sample.id}",
+            f"/v2/orgs/{group.id}/pathogens/SC2/samples/{sample.id}",
             headers=auth_headers,
         )
         assert res.status_code == 200
@@ -715,7 +788,7 @@ async def test_delete_sample_failures(
     # Request this sample as a user who shouldn't be able to delete it.
     auth_headers = {"user_id": user2.auth0_user_id}
     res = await http_client.delete(
-        f"/v2/orgs/{group.id}/samples/{sample.id}",
+        f"/v2/orgs/{group.id}/pathogens/SC2/samples/{sample.id}",
         headers=auth_headers,
     )
     assert res.status_code == 403
@@ -723,7 +796,7 @@ async def test_delete_sample_failures(
     # Make sure this sample isn't found under the user's group context
     auth_headers = {"user_id": user2.auth0_user_id}
     res = await http_client.delete(
-        f"/v2/orgs/{group2.id}/samples/{sample.id}",
+        f"/v2/orgs/{group2.id}/pathogens/SC2/samples/{sample.id}",
         headers=auth_headers,
     )
     assert res.status_code == 404
@@ -738,7 +811,7 @@ async def test_delete_sample_failures(
     # https://www.python-httpx.org/compatibility/#request-body-on-http-methods
     res = await http_client.request(
         method="DELETE",
-        url=f"/v2/orgs/{group.id}/samples/",
+        url=f"/v2/orgs/{group.id}/pathogens/SC2/samples/",
         content=json.dumps({"ids": [sample.id, sample2.id]}),
         headers=auth_headers,
     )
@@ -746,7 +819,7 @@ async def test_delete_sample_failures(
 
     res = await http_client.request(
         method="DELETE",
-        url=f"/v2/orgs/{group2.id}/samples/",
+        url=f"/v2/orgs/{group2.id}/pathogens/SC2/samples/",
         content=json.dumps({"ids": [sample.id, sample2.id]}),
         headers=auth_headers,
     )
@@ -755,7 +828,7 @@ async def test_delete_sample_failures(
     # Test that our multi-delete endpoint succeeds if we only specify an owned sample
     res = await http_client.request(
         method="DELETE",
-        url=f"/v2/orgs/{group2.id}/samples/",
+        url=f"/v2/orgs/{group2.id}/pathogens/SC2/samples/",
         content=json.dumps({"ids": [sample2.id]}),
         headers=auth_headers,
     )
@@ -887,7 +960,7 @@ async def test_update_samples_success(
     async_session.expire_all()
 
     res = await http_client.put(
-        f"/v2/orgs/{group_id}/samples",
+        f"/v2/orgs/{group_id}/pathogens/SC2/samples",
         json=request_data,
         headers=auth_headers,
     )
@@ -972,7 +1045,7 @@ async def test_update_samples_access_denied(
     }
 
     res = await http_client.put(
-        f"/v2/orgs/{group.id}/samples",
+        f"/v2/orgs/{group.id}/pathogens/SC2/samples",
         json=data,
         headers=auth_headers,
     )
@@ -1072,7 +1145,7 @@ async def test_update_samples_request_failures(
         data = {"samples": [request]}
 
         res = await http_client.put(
-            f"/v2/orgs/{group.id}/samples",
+            f"/v2/orgs/{group.id}/pathogens/SC2/samples",
             json=data,
             headers=auth_headers,
         )
@@ -1081,6 +1154,7 @@ async def test_update_samples_request_failures(
 
 async def setup_validation_data(async_session: AsyncSession):
     group = group_factory()
+    pathogen = pathogen_factory()
     user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
@@ -1090,10 +1164,10 @@ async def setup_validation_data(async_session: AsyncSession):
     isl_sample = gisaid_metadata_factory(
         strain="USA/ISL-TEST/hCov-19", gisaid_epi_isl="EPI_ISL_3141592"
     )
-    async_session.add_all([group, sample, gisaid_sample, isl_sample])
+    async_session.add_all([group, pathogen, sample, gisaid_sample, isl_sample])
     await async_session.commit()
 
-    return user, group, sample, gisaid_sample, isl_sample
+    return user, group, pathogen, sample, gisaid_sample, isl_sample
 
 
 async def test_validation_endpoint(
@@ -1104,9 +1178,14 @@ async def test_validation_endpoint(
     Test that validation endpoint is correctly identifying identifiers that are in the DB, and that samples are properly stripped of hCoV-19/ prefix
     """
 
-    user, group, sample, gisaid_sample, isl_sample = await setup_validation_data(
-        async_session
-    )
+    (
+        user,
+        group,
+        pathogen,
+        sample,
+        gisaid_sample,
+        isl_sample,
+    ) = await setup_validation_data(async_session)
 
     # add hCoV-19/ as prefix to gisaid identifier to check that stripping of prefix is being done correctly
     data = {
@@ -1118,7 +1197,7 @@ async def test_validation_endpoint(
     }
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/samples/validate_ids/",
+        f"/v2/orgs/{group.id}/pathogens/SC2/samples/validate_ids/",
         json=data,
         headers=auth_headers,
     )
@@ -1136,9 +1215,14 @@ async def test_validation_endpoint_missing_identifier(
     Test that validation endpoint is correctly identifying identifiers that are not aspen public or private ids or gisaid ids
     """
 
-    user, group, sample, gisaid_sample, isl_sample = await setup_validation_data(
-        async_session
-    )
+    (
+        user,
+        group,
+        pathogen,
+        sample,
+        gisaid_sample,
+        isl_sample,
+    ) = await setup_validation_data(async_session)
     data = {
         "sample_ids": [
             sample.public_identifier,
@@ -1149,7 +1233,9 @@ async def test_validation_endpoint_missing_identifier(
     }
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/samples/validate_ids/", json=data, headers=auth_headers
+        f"/v2/orgs/{group.id}/pathogens/SC2/samples/validate_ids/",
+        json=data,
+        headers=auth_headers,
     )
 
     # request should not fail, should return list of samples that are missing from the DB

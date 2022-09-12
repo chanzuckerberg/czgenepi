@@ -9,6 +9,7 @@ from sqlalchemy.orm import joinedload
 
 from aspen.database.models import PathogenGenome, Sample, UploadedPathogenGenome
 from aspen.test_infra.models.location import location_factory
+from aspen.test_infra.models.pathogen import pathogen_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.usergroup import group_factory, userrole_factory
 
@@ -27,7 +28,7 @@ def format_date(dt: Optional[datetime.date], format="%Y-%m-%d") -> str:
 
 
 # test CREATE samples #
-async def test_samples_create_view_pass_no_public_id(
+async def test_samples_create_different_pathogens(
     async_session: AsyncSession,
     http_client: AsyncClient,
 ):
@@ -37,6 +38,63 @@ async def test_samples_create_view_pass_no_public_id(
         "North America", "USA", "California", "Santa Barbara County"
     )
     async_session.add(group)
+    async_session.add(location)
+    sc2 = pathogen_factory("SC2", "SARS-Cov-2")
+    mpx = pathogen_factory("MPX", "MPX")
+    async_session.add(mpx)
+    async_session.add(sc2)
+    await async_session.commit()
+    test_date = datetime.datetime.now()
+
+    pathogen_specific = {sc2: range(2), mpx: range(2, 4)}
+    for pathogen, id_range in pathogen_specific.items():
+        data = [
+            {
+                "sample": {
+                    "private_identifier": f"private_{i}",
+                    "collection_date": format_date(test_date),
+                    "location_id": location.id,
+                    "private": True,
+                },
+                "pathogen_genome": {
+                    "sequence": VALID_SEQUENCE + "MN",
+                    "sequencing_date": format_date(test_date),
+                },
+            }
+            for i in id_range
+        ]
+        auth_headers = {"user_id": user.auth0_user_id}
+        res = await http_client.post(
+            f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/samples/",
+            json=data,
+            headers=auth_headers,
+        )
+
+        assert res.status_code == 200
+        await async_session.close()
+        async_session.begin()
+
+        samp_res = await async_session.execute(
+            sa.select(Sample).options(joinedload(Sample.pathogen)).filter(Sample.private_identifier.in_([f"private_{i}" for i in id_range]))  # type: ignore
+        )
+        samples = samp_res.scalars().all()
+
+        for i in samples:
+            assert i.pathogen.slug == pathogen.slug
+
+
+async def test_samples_create_view_pass_no_public_id(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+):
+    group = group_factory()
+    user = await userrole_factory(async_session, group)
+    pathogen = pathogen_factory()
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
+    async_session.add(group)
+    async_session.add(pathogen)
     async_session.add(location)
     await async_session.commit()
     test_date = datetime.datetime.now()
@@ -69,7 +127,7 @@ async def test_samples_create_view_pass_no_public_id(
     ]
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/samples/",
+        f"/v2/orgs/{group.id}/pathogens/SC2/samples/",
         json=data,
         headers=auth_headers,
     )
@@ -116,12 +174,14 @@ async def test_authz_failure(
 ):
     no_access_group = group_factory(name="Unauthorized")
     group = group_factory()
+    pathogen = pathogen_factory()
     user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
     async_session.add(no_access_group)
     async_session.add(group)
+    async_session.add(pathogen)
     async_session.add(location)
     await async_session.commit()
     test_date = datetime.datetime.now()
@@ -143,7 +203,7 @@ async def test_authz_failure(
     ]
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        f"/v2/orgs/{no_access_group.id}/samples/",
+        f"/v2/orgs/{no_access_group.id}/pathogens/SC2/samples/",
         json=data,
         headers=auth_headers,
     )
@@ -155,11 +215,13 @@ async def test_stripping_whitespace(
     http_client: AsyncClient,
 ):
     group = group_factory()
+    pathogen = pathogen_factory()
     user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
     async_session.add(group)
+    async_session.add(pathogen)
     async_session.add(location)
     await async_session.commit()
     test_date = datetime.datetime.now()
@@ -181,7 +243,7 @@ async def test_stripping_whitespace(
     ]
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/samples/",
+        f"/v2/orgs/{group.id}/pathogens/SC2/samples/",
         json=data,
         headers=auth_headers,
     )
@@ -215,10 +277,12 @@ async def test_samples_create_view_pass_no_sequencing_date(
 ):
     group = group_factory()
     user = await userrole_factory(async_session, group)
+    pathogen = pathogen_factory()
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
     async_session.add(group)
+    async_session.add(pathogen)
     async_session.add(location)
     await async_session.commit()
     test_date = datetime.datetime.now()
@@ -253,7 +317,7 @@ async def test_samples_create_view_pass_no_sequencing_date(
     ]
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/samples/",
+        f"/v2/orgs/{group.id}/pathogens/SC2/samples/",
         json=data,
         headers=auth_headers,
     )
@@ -304,11 +368,13 @@ async def test_samples_create_view_invalid_sequence(
     http_client: AsyncClient,
 ):
     group = group_factory()
+    pathogen = pathogen_factory()
     user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
     async_session.add(group)
+    async_session.add(pathogen)
     async_session.add(location)
     await async_session.commit()
 
@@ -329,7 +395,7 @@ async def test_samples_create_view_invalid_sequence(
     ]
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/samples/",
+        f"/v2/orgs/{group.id}/pathogens/SC2/samples/",
         json=data,
         headers=auth_headers,
     )
@@ -352,6 +418,7 @@ async def test_samples_create_view_fail_duplicate_ids(
     http_client: AsyncClient,
 ):
     group = group_factory()
+    pathogen = pathogen_factory()
     user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
@@ -360,6 +427,7 @@ async def test_samples_create_view_fail_duplicate_ids(
     sample = sample_factory(
         group, user, location, private_identifier="private", public_identifier="public"
     )
+    async_session.add(pathogen)
     async_session.add(sample)
     async_session.add(location)
     await async_session.commit()
@@ -394,7 +462,7 @@ async def test_samples_create_view_fail_duplicate_ids(
     ]
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/samples/",
+        f"/v2/orgs/{group.id}/pathogens/SC2/samples/",
         json=data,
         headers=auth_headers,
     )
@@ -411,14 +479,16 @@ async def test_samples_create_view_fail_duplicate_ids_in_request_data(
     http_client: AsyncClient,
 ):
     group = group_factory()
+    pathogen = pathogen_factory()
     user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    async_session.add(group)
     sample = sample_factory(
         group, user, location, private_identifier="private", public_identifier="public"
     )
+    async_session.add(group)
+    async_session.add(pathogen)
     async_session.add(sample)
     async_session.add(location)
     await async_session.commit()
@@ -453,7 +523,7 @@ async def test_samples_create_view_fail_duplicate_ids_in_request_data(
     ]
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/samples/",
+        f"/v2/orgs/{group.id}/pathogens/SC2/samples/",
         json=data,
         headers=auth_headers,
     )
@@ -471,10 +541,12 @@ async def test_samples_create_view_fail_missing_required_fields(
 ):
     group = group_factory()
     user = await userrole_factory(async_session, group)
+    pathogen = pathogen_factory()
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
     async_session.add(group)
+    async_session.add(pathogen)
     async_session.add(location)
     await async_session.commit()
 
@@ -503,7 +575,7 @@ async def test_samples_create_view_fail_missing_required_fields(
     ]
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/samples/",
+        f"/v2/orgs/{group.id}/pathogens/SC2/samples/",
         json=data,
         headers=auth_headers,
     )

@@ -63,7 +63,7 @@ class PhyloTree(Entity):
     name = Column(String, nullable=True)
 
     pathogen_id = Column(
-        Integer, ForeignKey(Pathogen.id)
+        Integer, ForeignKey(Pathogen.id), nullable=False
     )  # TODO: change to nullable=False once we update workflows
     pathogen: Pathogen = relationship(Pathogen, back_populates="phylo_trees")  # type: ignore
 
@@ -97,7 +97,7 @@ class PhyloRun(Workflow):
     group = relationship(Group, backref=backref("phylo_runs", uselist=True))  # type: ignore
 
     pathogen_id = Column(
-        Integer, ForeignKey(Pathogen.id)
+        Integer, ForeignKey(Pathogen.id), nullable=False
     )  # TODO: change to nullable=False once we update workflows
     pathogen: Pathogen = relationship(Pathogen, back_populates="phylo_runs")  # type: ignore
 

@@ -18,7 +18,7 @@ from aspen.auth.auth0_management import Auth0Client
 from aspen.database import connection as aspen_connection
 from aspen.database import schema
 from aspen.database.connection import init_async_db
-from aspen.database.models import Pathogen, Role, User
+from aspen.database.models import Role, User
 from aspen.util.split import SplitClient
 
 USERNAME = "user_rw"
@@ -92,12 +92,7 @@ async def async_sqlalchemy_interface(
     # Insert any core level data we're going to need for tests.
     session = test_db_interface.make_session()
     roles = [Role(name="admin"), Role(name="viewer"), Role(name="member")]
-    pathogens = [
-        Pathogen(slug="SC2", name="SARS-CoV-2"),
-        Pathogen(slug="MPX", name="Monkeypox"),
-        Pathogen(slug="TB", name="Tuberculosis"),
-    ]
-    session.add_all(roles + pathogens)
+    session.add_all(roles)
     await session.commit()  # type: ignore
     await session.close()  # type: ignore
 

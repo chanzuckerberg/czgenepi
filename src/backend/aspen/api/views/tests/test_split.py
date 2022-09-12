@@ -1,12 +1,12 @@
 from aspen.api.settings import APISettings
-from aspen.database.models.pathogens import Pathogen
+from aspen.test_infra.models.pathogen import pathogen_factory
 from aspen.util.split import SplitClient
 
 
 def test_pathogen_treatments():
     # test that treatments are returned correctly based on traffic type
 
-    pathogen = Pathogen(slug="SC2", name="SARS-CoV-2")
+    pathogen = pathogen_factory("SC2", "SARS-CoV-2")
     settings = APISettings()
     splitio = SplitClient(settings)
 

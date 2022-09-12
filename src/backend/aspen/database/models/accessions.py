@@ -33,9 +33,7 @@ class Accession(base):  # type: ignore
         ),
     )
 
-    sample_id = Column(
-        Integer, ForeignKey("samples.id", ondelete="CASCADE"), primary_key=True
-    )
+    sample_id = Column(Integer, ForeignKey("samples.id"), primary_key=True)
 
     accession_type = Column(
         Enum(AccessionType),

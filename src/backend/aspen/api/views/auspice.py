@@ -17,7 +17,7 @@ from aspen.api.authn import (
     require_group_membership,
 )
 from aspen.api.authz import AuthZSession, get_authz_session
-from aspen.api.deps import get_db, get_settings
+from aspen.api.deps import get_db, get_pathogen, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.auspice import (
     GenerateAuspiceMagicLinkRequest,
@@ -25,7 +25,7 @@ from aspen.api.schemas.auspice import (
 )
 from aspen.api.settings import APISettings
 from aspen.api.utils import process_phylo_tree, verify_and_access_phylo_tree
-from aspen.database.models import Group, User
+from aspen.database.models import Group, Pathogen, User
 
 router = APIRouter()
 
@@ -43,15 +43,16 @@ async def generate_auspice_string(
     user: User = Depends(get_auth_user),
     ac: AuthContext = Depends(get_auth_context),
     group: Group = Depends(require_group_membership),
+    pathogen: Pathogen = Depends(get_pathogen),
 ):
     request_body = await request.json()
     validated_body = GenerateAuspiceMagicLinkRequest.parse_obj(request_body)
     phylo_tree_id = validated_body.tree_id
     (
         authorized_tree_access,
-        _phylo_tree,
+        phylo_tree,
         _phylo_run,
-    ) = await verify_and_access_phylo_tree(db, az, phylo_tree_id)
+    ) = await verify_and_access_phylo_tree(db, az, phylo_tree_id, pathogen)
     if not authorized_tree_access:
         raise ex.BadRequestException(
             "No phylo run found for user to generate auspice request"
@@ -73,7 +74,7 @@ async def generate_auspice_string(
     mac_tag = digest_maker.hexdigest()
 
     return GenerateAuspiceMagicLinkResponse(
-        url=f'{request.url.netloc}/v2/orgs/{ac.group.id}/auspice/access/{message.decode("utf8")}.{mac_tag}'  # type: ignore
+        url=f'{request.url.netloc}/v2/orgs/{ac.group.id}/pathogens/{phylo_tree.pathogen.slug}/auspice/access/{message.decode("utf8")}.{mac_tag}'  # type: ignore
     )
 
 
@@ -83,10 +84,11 @@ async def auspice_view(
     payload: AuspicePayload = Depends(magic_link_payload),
     az: AuthZSession = Depends(get_authz_session),
     db: AsyncSession = Depends(get_db),
+    pathogen: Pathogen = Depends(get_pathogen),
 ):
     # Load tree
     phylo_tree_id = payload["tree_id"]
-    tree_json = await process_phylo_tree(db, az, phylo_tree_id)
+    tree_json = await process_phylo_tree(db, az, phylo_tree_id, pathogen)
 
     # Return the tree
     return tree_json

@@ -2,6 +2,7 @@ import { chromium, FullConfig } from "@playwright/test";
 import { getByID, getByTestID } from "../utils/selectors";
 import * as fs from "fs";
 
+
 const username = process.env.USERNAME ?? "";
 const password = process.env.PASSWORD ?? "";
 
@@ -18,7 +19,6 @@ async function globalSetup(config: FullConfig): Promise<void> {
   await page.locator(getByID("password")).first().fill(password);
   await page.locator('button[type=submit] >> "Continue"').first().click();
   await page.context().storageState({ path: storageState as string });
-
   const cookies = await page.context().cookies();
   const cookieString = JSON.stringify(cookies);
   fs.writeFileSync(cookieStorage, cookieString);

@@ -7,11 +7,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased, contains_eager
 from starlette.requests import Request
 
-from aspen.api.authn import AuthContext, get_auth_context
 from aspen.api.authz import AuthZSession, get_authz_session
-from aspen.api.deps import get_db
+from aspen.api.deps import get_db, get_pathogen
 from aspen.api.utils import extract_accessions, MetadataTSVStreamer, process_phylo_tree
-from aspen.database.models import PhyloRun, PhyloTree, Sample, UploadedPathogenGenome
+from aspen.database.models import (
+    Pathogen,
+    PhyloRun,
+    PhyloTree,
+    Sample,
+    UploadedPathogenGenome,
+)
 
 router = APIRouter()
 
@@ -22,10 +27,10 @@ async def get_single_phylo_tree(
     request: Request,
     db: AsyncSession = Depends(get_db),
     az: AuthZSession = Depends(get_authz_session),
-    ac: AuthContext = Depends(get_auth_context),
+    pathogen: Pathogen = Depends(get_pathogen),
 ) -> JSONResponse:
     phylo_tree_data = await process_phylo_tree(
-        db, az, item_id, request.query_params.get("id_style")
+        db, az, item_id, pathogen, request.query_params.get("id_style")
     )
     headers = {
         "Content-Type": "application/json",
@@ -35,7 +40,9 @@ async def get_single_phylo_tree(
 
 
 # supporting function for get_tree_metadata()
-async def _get_selected_samples(db: AsyncSession, phylo_tree_id: int):
+async def _get_selected_samples(
+    db: AsyncSession, phylo_tree_id: int, pathogen: Pathogen
+):
     # SqlAlchemy requires aliasing for any queries that join to the same table (in this case, entities)
     # multiple times via joined table inheritance
     # ref: https://github.com/sqlalchemy/sqlalchemy/discussions/6972
@@ -47,6 +54,7 @@ async def _get_selected_samples(db: AsyncSession, phylo_tree_id: int):
         .outerjoin(entity_alias, PhyloRun.inputs.of_type(entity_alias))  # type: ignore
         .outerjoin(Sample)  # type: ignore
         .filter(PhyloTree.entity_id == phylo_tree_id)  # type: ignore
+        .filter(PhyloTree.pathogen == pathogen)  # type: ignore
         .options(
             contains_eager(PhyloTree.producing_workflow.of_type(PhyloRun))
             .contains_eager(PhyloRun.inputs.of_type(entity_alias))
@@ -82,12 +90,13 @@ async def get_tree_metadata(
     request: Request,
     db: AsyncSession = Depends(get_db),
     az: AuthZSession = Depends(get_authz_session),
+    pathogen: Pathogen = Depends(get_pathogen),
 ):
     phylo_tree_data = await process_phylo_tree(
-        db, az, item_id, request.query_params.get("id_style")
+        db, az, item_id, pathogen, request.query_params.get("id_style")
     )
     accessions = extract_accessions([], phylo_tree_data["tree"])
-    selected_samples = await _get_selected_samples(db, item_id)
+    selected_samples = await _get_selected_samples(db, item_id, pathogen)
 
     filename: str = f"{item_id}_sample_ids.tsv"
     streamer = MetadataTSVStreamer(filename, accessions, selected_samples)
