@@ -67,13 +67,6 @@ class Group(idbase, DictMixin):  # type: ignore
         server_default=text("'{}'::jsonb"),
     )
 
-<<<<<<< HEAD
-    can_see: MutableSequence[CanSee]
-    can_be_seen_by: MutableSequence[CanSee]
-=======
-    members = relationship("User", back_populates="group")  # type: ignore
->>>>>>> origin/trunk
-
     def __repr__(self):
         return f"Group <{self.name}>"
 
