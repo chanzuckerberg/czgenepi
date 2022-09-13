@@ -59,6 +59,11 @@ export default function Footer(): JSX.Element {
             </FooterTopLink>
           </FooterTopListItem>
           <FooterTopListItem>
+            <FooterTopLink href={ROUTES.HELP_CENTER} target="_blank">
+              Help Center
+            </FooterTopLink>
+          </FooterTopListItem>
+          <FooterTopListItem>
             <FooterTopLink href={ROUTES.GALAGO} target="_blank">
               Galago (Beta)
             </FooterTopLink>
