@@ -180,7 +180,7 @@ async def test_create_new_user_and_sync_roles(
     group2 = group_factory(name="Group 2", auth0_org_id="group2")
     group3 = group_factory(name="Group 3", auth0_org_id="group3")
     async_session.add_all([group1, group2, group3])
-    auth0_apiclient.get_org_user_roles.side_effect = [["member"], ["member"], ["admin"]]  # type: ignore
+    auth0_apiclient.get_org_user_roles.side_effect = [["member"], ["admin"]]  # type: ignore
     auth0_apiclient.get_user_orgs.side_effect = [[{"id": group1.auth0_org_id}, {"id": group3.auth0_org_id}]]  # type: ignore
     await start_new_transaction(async_session)
     user_obj, _ = await create_user_if_not_exists(
