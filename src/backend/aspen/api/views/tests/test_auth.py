@@ -81,8 +81,9 @@ async def test_create_new_admin_user_if_not_exists(
     user = (
         (
             await async_session.execute(
-                sa.select(User)  # type: ignore
-                .filter(User.auth0_user_id == userinfo["sub"])  # type: ignore
+                sa.select(User).filter(  # type: ignore
+                    User.auth0_user_id == userinfo["sub"]
+                )  # type: ignore
             )
         )
         .scalars()
@@ -113,8 +114,9 @@ async def test_create_new_user_if_not_exists(
     user = (
         (
             await async_session.execute(
-                sa.select(User)  # type: ignore
-                .filter(User.auth0_user_id == userinfo["sub"])  # type: ignore
+                sa.select(User).filter(  # type: ignore
+                    User.auth0_user_id == userinfo["sub"]
+                )  # type: ignore
             )
         )
         .scalars()
@@ -149,8 +151,9 @@ async def test_dont_create_new_user_if_exists(
     db_user = (
         (
             await async_session.execute(
-                sa.select(User)  # type: ignore
-                .filter(User.auth0_user_id == userinfo["sub"])  # type: ignore
+                sa.select(User).filter(  # type: ignore
+                    User.auth0_user_id == userinfo["sub"]
+                )  # type: ignore
             )
         )
         .scalars()
@@ -189,8 +192,9 @@ async def test_create_new_user_and_sync_roles(
     user = (
         (
             await async_session.execute(
-                sa.select(User)  # type: ignore
-                .filter(User.auth0_user_id == userinfo["sub"])  # type: ignore
+                sa.select(User).filter(  # type: ignore
+                    User.auth0_user_id == userinfo["sub"]
+                )  # type: ignore
             )
         )
         .scalars()
@@ -357,8 +361,9 @@ async def test_callback_ff_doesnt_sync_auth0_user_roles(
     user = (
         (
             await async_session.execute(
-                sa.select(User)  # type: ignore
-                .filter(User.auth0_user_id == userinfo["sub"])  # type: ignore
+                sa.select(User).filter(  # type: ignore
+                    User.auth0_user_id == userinfo["sub"]
+                )  # type: ignore
             )
         )
         .scalars()
