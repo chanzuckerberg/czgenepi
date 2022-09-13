@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import random
 import string
-from collections.abc import MutableSequence
-from typing import TYPE_CHECKING
 
 from sqlalchemy import (
     Boolean,
@@ -23,9 +21,6 @@ from sqlalchemy.orm import backref, relationship
 from aspen.database.models.base import base, idbase
 from aspen.database.models.locations import Location
 from aspen.database.models.mixins import DictMixin
-
-if TYPE_CHECKING:
-    from aspen.database.models.cansee import CanSee
 
 
 def submitting_lab_default(context: DefaultExecutionContext) -> str:
@@ -73,9 +68,6 @@ class Group(idbase, DictMixin):  # type: ignore
     )
 
     members = relationship("User", back_populates="group")  # type: ignore
-
-    can_see: MutableSequence[CanSee]
-    can_be_seen_by: MutableSequence[CanSee]
 
     def __repr__(self):
         return f"Group <{self.name}>"
