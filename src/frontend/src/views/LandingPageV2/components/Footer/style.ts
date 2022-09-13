@@ -85,7 +85,7 @@ const footerText = () => {
   `;
 };
 
-export const FooterContainer = styled.div`
+export const FooterContainer = styled.footer`
   background: black;
   color: white;
   padding: 64px 115px;
@@ -130,6 +130,20 @@ export const FooterTopContainer = styled.div`
   `)}
 `;
 
+export const FooterTopListItem = styled.li`
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  margin-left: 39px;
+
+  ${SmallerThanBreakpoint(`
+    width: 100%;
+    margin-left: 0;
+    margin-top: 11px;
+`)}
+`;
+
 export const FooterTopLink = styled.a`
   ${SmallerThanBreakpoint(`
     background: #262525;
@@ -137,19 +151,13 @@ export const FooterTopLink = styled.a`
     padding: 7px 14px;
     width: 100%;
     max-width: 280px;
-    text-align: center;
   `)}
 `;
 
-export const FooterTopLinks = styled.div`
-  a + a {
-    margin-left: 39px;
-
-    ${SmallerThanBreakpoint(`
-      margin-left: 0;
-      margin-top: 11px;
-    `)}
-  }
+export const FooterTopLinks = styled.ul`
+  display: flex;
+  flex-direction: row;
+  padding: 0;
 
   ${SmallerThanBreakpoint(`
     display: flex;

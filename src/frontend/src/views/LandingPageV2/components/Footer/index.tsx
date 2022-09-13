@@ -20,6 +20,7 @@ import {
   FooterTopContainer,
   FooterTopLink,
   FooterTopLinks,
+  FooterTopListItem,
   Span,
 } from "./style";
 
@@ -42,15 +43,26 @@ export default function Footer(): JSX.Element {
           <FooterLogo />
         </FooterLogoContainer>
         <FooterTopLinks>
-          <FooterTopLink href={ROUTES.GITHUB} target="_blank">
-            Github
-          </FooterTopLink>
-          <FooterTopLink href={ROUTES.CAREERS} target="_blank">
-            Careers
-          </FooterTopLink>
-          <FooterTopLink href={ROUTES.RESOURCES} target="_blank">
-            Learning Center
-          </FooterTopLink>
+          <FooterTopListItem>
+            <FooterTopLink href={ROUTES.GITHUB} target="_blank">
+              Github
+            </FooterTopLink>
+          </FooterTopListItem>
+          <FooterTopListItem>
+            <FooterTopLink href={ROUTES.CAREERS} target="_blank">
+              Careers
+            </FooterTopLink>
+          </FooterTopListItem>
+          <FooterTopListItem>
+            <FooterTopLink href={ROUTES.RESOURCES} target="_blank">
+              Learning Center
+            </FooterTopLink>
+          </FooterTopListItem>
+          <FooterTopListItem>
+            <FooterTopLink href={ROUTES.GALAGO} target="_blank">
+              Galago (Beta)
+            </FooterTopLink>
+          </FooterTopListItem>
         </FooterTopLinks>
       </FooterTopContainer>
       <FooterBottomContainer>
