@@ -2,6 +2,7 @@ import { Page } from "@playwright/test";
 import { faker } from "@faker-js/faker";
 import { Sample } from "../utils/schemas/sampleData";
 import { UploadData } from "../utils/schemas/uploadData";
+import * as path from 'path';
 
 export class UploadSample {
   public static async uploadFiles(
@@ -14,7 +15,7 @@ export class UploadSample {
     await page.locator("a[href$='/upload/step1']").click();
     //TODO verify URL
 
-   await UploadSample.selectSampleAndMetadaFiles(page, uploadData);
+    await UploadSample.selectSampleAndMetadaFiles(page, uploadData.dataFiles[0]);
 
     //complete the form
     let collectionDateAppliedToAll = false;
@@ -113,8 +114,9 @@ export class UploadSample {
 
   public static async selectSampleAndMetadaFiles(
     page: Page,
-    uploadData: UploadData
+    fileName: string
   ): Promise<void> {
+    /*
     // click select sample files button
     const [fileChooser] = await Promise.all([
      await page.waitForEvent("filechooser"),
@@ -124,21 +126,26 @@ export class UploadSample {
     await fileChooser.setFiles(
       UploadSample.getFullSampleFilePaths(uploadData?.dataFiles)
     );
-
+*/
+//console.log("PUTO PATH DE MIERDA "+ path.resolve('e2e/fixtures'));
+   await page.setInputFiles(
+      "input[type='file']",
+      path.resolve('e2e/fixtures/'+fileName)
+    );
     // click continue button
-    await page.locator("button[@label='Continue']").click();
+    await page.locator("a[href$='/upload/step2']").click();
     await page.waitForSelector("form div[role='table'] > .MuiTableBody-root");
     //TODO verify URL
 
     //select metadata file
-    if (uploadData?.metadataFile !== undefined) {
-      const [fileChooser] = await Promise.all([
-        page.waitForEvent("filechooser"),
-        await page.locator("button[@label='Select Metadata File']").click(),
-      ]);
-      // select metadata file
-      await fileChooser.setFiles([`../fixtures${uploadData?.metadataFile}`]);
-    }
+    // if (uploadData?.metadataFile !== undefined) {
+    //   const [fileChooser] = await Promise.all([
+    //     page.waitForEvent("filechooser"),
+    //     await page.locator("button[@label='Select Metadata File']").click(),
+    //   ]);
+    //   // select metadata file
+    //   await fileChooser.setFiles([`../fixtures${uploadData?.metadataFile}`]);
+    // }
   }
 
   // prefix each file name with path. set default if not file provided
