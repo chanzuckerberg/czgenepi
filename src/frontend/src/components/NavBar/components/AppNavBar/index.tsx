@@ -1,12 +1,10 @@
-import { useTreatments } from "@splitsoftware/splitio-react";
 import { Icon } from "czifui";
 import Link from "next/link";
-import { Fragment, MouseEventHandler, useState } from "react";
+import { MouseEventHandler, useState } from "react";
 import { useUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
 import { HiddenLabel } from "src/common/styles/accessibility";
 import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
-import { FEATURE_FLAGS, isFlagOn } from "src/components/Split";
 import { InviteModal } from "src/views/GroupMembersPage/components/MembersTab/components/InviteModal";
 import RightNav from "../RightNav";
 import { GroupDetailsDropdown } from "./components/GroupDetailsDropdown";
@@ -36,12 +34,6 @@ const AppNavBar = (): JSX.Element => {
   const group = getCurrentGroupFromUserInfo(userInfo);
   const route = userInfo ? ROUTES.DATA : ROUTES.HOMEPAGE;
 
-  const flag = useTreatments([FEATURE_FLAGS.user_onboarding_v0]);
-  const isUserOnboardingFlagOn = isFlagOn(
-    flag,
-    FEATURE_FLAGS.user_onboarding_v0
-  );
-
   const toggleDropdown: MouseEventHandler = (e) => {
     const newAnchor = isGroupDetailsDropdownOpen ? null : e.currentTarget;
     setAnchorEl(newAnchor);
@@ -49,22 +41,6 @@ const AppNavBar = (): JSX.Element => {
   };
 
   const name = group?.name;
-  const orgElements = (
-    <Fragment>
-      <Separator />
-      <NavOrg>{name}</NavOrg>
-    </Fragment>
-  );
-
-  function hasOrg(): JSX.Element | null {
-    if (group === undefined) {
-      return null;
-    } else {
-      return orgElements;
-    }
-  }
-
-  const orgSplash = hasOrg();
 
   return (
     <NavBar data-test-id="navbar">
@@ -73,10 +49,9 @@ const AppNavBar = (): JSX.Element => {
         <Link href={route} passHref>
           <LogoAnchor aria-labelledby="logo-label" href="passHref">
             <Logo data-test-id="logo" aria-hidden="true" />
-            {!isUserOnboardingFlagOn && orgSplash}
           </LogoAnchor>
         </Link>
-        {name && isUserOnboardingFlagOn && (
+        {name && (
           <>
             <Separator />
             <InviteModal
