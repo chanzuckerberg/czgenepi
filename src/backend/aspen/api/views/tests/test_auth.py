@@ -59,39 +59,6 @@ async def check_roles(
     assert expected_roles == actual_roles
 
 
-async def test_create_new_admin_user_if_not_exists(
-    async_session: AsyncSession,
-    http_client: AsyncClient,
-    auth0_apiclient: Auth0Client,
-):
-    """
-    Test creating a new auth0 user on login
-    """
-    userinfo = {
-        "sub": "user123-asdf",
-        "org_id": "123456",
-        "email": "hello@czgenepi.org",
-    }
-    group = group_factory(auth0_org_id=userinfo["org_id"])
-    async_session.add(group)
-    auth0_apiclient.get_org_user_roles.side_effect = [["admin"]]  # type: ignore
-    await start_new_transaction(async_session)
-    await create_user_if_not_exists(async_session, auth0_apiclient, userinfo)
-    await start_new_transaction(async_session)
-    user = (
-        (
-            await async_session.execute(
-                sa.select(User).filter(  # type: ignore
-                    User.auth0_user_id == userinfo["sub"]
-                )  # type: ignore
-            )
-        )
-        .scalars()
-        .one()
-    )
-    assert user.email == userinfo["email"]
-
-
 async def test_create_new_user_if_not_exists(
     async_session: AsyncSession,
     http_client: AsyncClient,

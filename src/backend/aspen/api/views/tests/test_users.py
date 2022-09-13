@@ -28,7 +28,6 @@ async def test_users_me(http_client: AsyncClient, async_session: AsyncSession) -
     expected = {
         "id": 1,
         "name": "test",
-        "group": {"id": 1, "name": "groupname"},
         "acknowledged_policy_version": None,
         "agreed_to_tos": True,
         "groups": [

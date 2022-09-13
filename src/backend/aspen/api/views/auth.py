@@ -146,9 +146,7 @@ async def login(
     )
 
 
-async def create_user_if_not_exists(
-    db, auth0_mgmt, userinfo
-) -> Tuple[User, Optional[Group]]:
+async def create_user_if_not_exists(db, userinfo) -> Tuple[User, Optional[Group]]:
     auth0_user_id = userinfo.get("sub")
     if not auth0_user_id:
         # User ID really needs to be present
