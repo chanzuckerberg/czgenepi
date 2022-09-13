@@ -175,7 +175,7 @@ class GenBankSubmissionFormTSVStreamer(FieldSeparatedStreamer):
     ]
 
     preset_fields = {
-        "host": "Homo Sapiens",
+        "host": "Homo sapiens",
         "isolation-source": "Nasal/oral swab",
     }
 
