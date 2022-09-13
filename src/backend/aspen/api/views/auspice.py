@@ -58,7 +58,7 @@ async def generate_auspice_string(
             "No phylo run found for user to generate auspice request"
         )
 
-    expiry_time = datetime.now(timezone.utc) + timedelta(hours=1)
+    expiry_time = datetime.now(timezone.utc) + timedelta(hours=48)
     payload: AuspicePayload = {
         "tree_id": phylo_tree_id,
         "user_id": user.id,

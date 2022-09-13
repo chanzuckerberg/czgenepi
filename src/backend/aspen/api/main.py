@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import List, Optional
 
 import sentry_sdk
 import uvicorn
@@ -52,7 +52,7 @@ def get_allowed_origins() -> List[str]:
     return allowed_origins
 
 
-def get_allowed_origin_regex() -> List[str]:
+def get_allowed_origin_regex() -> Optional[str]:
     """Allowed origin regex for cross origin requests. See `CORSMiddleware`.
 
     This is here to enable working on Galago in localdev. Since we don't
