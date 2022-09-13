@@ -8,12 +8,12 @@ import boto3
 import sqlalchemy as sa
 from sqlalchemy import asc
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import aliased, selectinload
+from sqlalchemy.orm import aliased, joinedload, selectinload
 from sqlalchemy.sql.expression import and_, or_
 
 from aspen.api.authz import AuthZSession
 from aspen.api.error import http_exceptions as ex
-from aspen.database.models import Group, Location, PhyloRun, PhyloTree, Sample
+from aspen.database.models import Group, Location, Pathogen, PhyloRun, PhyloTree, Sample
 
 # 16 colors
 NEXTSTRAIN_COLOR_SCALE = [
@@ -90,12 +90,17 @@ def _rename_nodes_on_tree(
 
 
 async def verify_and_access_phylo_tree(
-    db: AsyncSession, az: AuthZSession, phylo_tree_id: int, load_samples: bool = False
+    db: AsyncSession,
+    az: AuthZSession,
+    phylo_tree_id: int,
+    pathogen: Pathogen,
+    load_samples: bool = False,
 ) -> Tuple[bool, Optional[PhyloTree], Optional[PhyloRun]]:
     tree_query = (await az.authorized_query("read", PhyloTree)).join(PhyloRun)  # type: ignore
     if load_samples:
-        tree_query = tree_query.options(selectinload(PhyloTree.constituent_samples))  # type: ignore
+        tree_query = tree_query.options(selectinload(PhyloTree.constituent_samples), joinedload(PhyloTree.pathogen))  # type: ignore
     tree_query = tree_query.filter(PhyloTree.entity_id.in_({phylo_tree_id}))  # type: ignore
+    tree_query = tree_query.filter(PhyloTree.pathogen == pathogen)  # type: ignore
     authz_tree_query_result = await db.execute(tree_query)
     phylo_tree: Optional[PhyloTree] = (
         authz_tree_query_result.scalars().unique().one_or_none()
@@ -106,7 +111,10 @@ async def verify_and_access_phylo_tree(
     run_query = (
         (await az.authorized_query("read", PhyloRun))
         .filter(PhyloRun.id == phylo_tree.producing_workflow_id)
-        .options(selectinload(PhyloRun.group).joinedload(Group.default_tree_location))
+        .options(
+            selectinload(PhyloRun.group).joinedload(Group.default_tree_location),
+            joinedload(PhyloRun.pathogen),
+        )
     )  # type: ignore
     run_query_result = await db.execute(run_query)
     phylo_run: Optional[PhyloRun]
@@ -267,13 +275,16 @@ async def process_phylo_tree(
     db: AsyncSession,
     az: AuthZSession,
     phylo_tree_id: int,
+    pathogen: Pathogen,
     id_style: Optional[str] = None,
 ) -> dict:
     (
         authorized,
         phylo_tree_result,
         phylo_run_result,
-    ) = await verify_and_access_phylo_tree(db, az, phylo_tree_id, load_samples=True)
+    ) = await verify_and_access_phylo_tree(
+        db, az, phylo_tree_id, pathogen, load_samples=True
+    )
     if not authorized or not phylo_tree_result:
         raise ex.BadRequestException(
             f"PhyloTree with id {phylo_tree_id} not viewable by user"

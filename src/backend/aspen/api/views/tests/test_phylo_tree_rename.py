@@ -7,6 +7,7 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.test_infra.models.location import location_factory
+from aspen.test_infra.models.pathogen import random_pathogen_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.usergroup import (
@@ -113,8 +114,9 @@ async def test_phylo_tree_rename(
         for i in range(2)
     ]
 
+    pathogen = random_pathogen_factory()
     phylo_tree = phylotree_factory(
-        phylorun_factory(viewer_group),
+        phylorun_factory(viewer_group, pathogen=pathogen),
         local_samples + can_see_samples + wrong_can_see_samples + no_can_see_samples,
     )
 
@@ -135,7 +137,7 @@ async def test_phylo_tree_rename(
 
     auth_headers = {"user_id": user.auth0_user_id}
     result = await http_client.get(
-        f"/v2/orgs/{viewer_group.id}/phylo_trees/{phylo_tree.entity_id}/download",
+        f"/v2/orgs/{viewer_group.id}/pathogens/{pathogen.slug}/phylo_trees/{phylo_tree.entity_id}/download",
         headers=auth_headers,
     )
 

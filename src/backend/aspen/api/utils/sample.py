@@ -21,6 +21,7 @@ from aspen.database.models import (
     Accession,
     AccessionType,
     Group,
+    Location,
     Pathogen,
     PathogenRepoConfig,
     PublicRepository,
@@ -247,21 +248,17 @@ def collect_submission_information(
 
     for sample in samples:
         sample_info = {}
-        sample_location = getattr(sample, "collection_location")
-        if not sample_location:
-            sample_location = {}
+        sample_location = getattr(sample, "collection_location", Location())
         sample_info = {
-            "gisaid_submitter_id": getattr(user, "gisaid_submitter_id", ""),
+            "gisaid_submitter_id": user.gisaid_submitter_id,
             "public_identifier": sample.public_identifier,
             "collection_date": sample.collection_date,
-            "submitting_lab": getattr(group, "submitting_lab")
-            if getattr(group, "submitting_lab")
-            else group.name,
-            "group_address": getattr(group, "address", ""),
-            "region": getattr(sample_location, "region", ""),
-            "country": getattr(sample_location, "country", ""),
-            "division": getattr(sample_location, "division", ""),
-            "location": getattr(sample_location, "location", ""),
+            "submitting_lab": group.submitting_lab or group.name,
+            "group_address": group.address,
+            "region": sample_location.region,
+            "country": sample_location.country,
+            "division": sample_location.division,
+            "location": sample_location.location,
         }
         submission_information.append(sample_info)
 
@@ -273,9 +270,15 @@ def sample_info_to_gisaid_rows(
 ) -> List[Dict[str, str]]:
     gisaid_metadata_rows = []
     for sample_info in submission_information:
-        gisaid_location = " / ".join(
-            [sample_info[key] for key in ["region", "country", "division", "location"]]
-        )
+        # Concat location information to a single string in Region / Country / Division / Location format
+        location_strings = []
+        for key in ["region", "country", "division", "location"]:
+            if sample_info[key]:
+                location_strings.append(sample_info[key])
+            else:
+                location_strings.append("None")
+        gisaid_location = " / ".join(location_strings)
+
         metadata_row = {
             "submitter": sample_info["gisaid_submitter_id"],
             "fn": f"{today}_GISAID_sequences.fasta",
@@ -296,6 +299,7 @@ def sample_info_to_genbank_rows(
 ) -> List[Dict[str, str]]:
     genbank_metadata_rows = []
     for sample_info in submission_information:
+        # Concat location information to a single string in Country: Division, Location format
         genbank_location = f"{sample_info['country']}: {sample_info['division']}, {sample_info['location']}"
         metadata_row = {
             "Sequence_ID": apply_pathogen_prefix_to_identifier(

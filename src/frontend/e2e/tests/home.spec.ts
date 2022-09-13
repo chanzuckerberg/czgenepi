@@ -20,11 +20,10 @@ test.describe("Home page tests", () => {
       page.locator(getByTestID("navbar-sign-in-link"))
     ).toBeVisible();
     await expect(page.locator(getByTestID("logo"))).toBeVisible();
-    Object.keys(footer).forEach((key) => {
-      expect(page.locator(`a:has-text("${key}")`).first()).toHaveAttribute(
-        "href",
-        footer[key]
-      );
+    Object.keys(footer).forEach(async (key) => {
+      await expect(
+        await page.locator(`a:has-text("${key}")`).first()
+      ).toHaveAttribute("href", footer[key]);
     });
   });
 });

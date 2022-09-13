@@ -28,7 +28,9 @@ async def test_valid_auspice_link_generation(
     auth_headers = {"user_id": user.auth0_user_id}
     request_body = {"tree_id": phylo_tree.entity_id}
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/auspice/generate", json=request_body, headers=auth_headers
+        f"/v2/orgs/{group.id}/pathogens/{phylo_tree.pathogen.slug}/auspice/generate",
+        json=request_body,
+        headers=auth_headers,
     )
 
     assert res.status_code == 200
@@ -36,7 +38,7 @@ async def test_valid_auspice_link_generation(
     assert response.get("url", None) is not None
     magic_link = response["url"]
     valid_pattern = re.compile(
-        r"\/v2\/orgs\/\d+\/auspice\/access\/[a-zA-Z\d\-_=]+\.[a-z\d]+"
+        r"\/v2\/orgs\/\d+\/pathogens\/[0-9a-zA-Z]+\/auspice\/access\/[a-zA-Z\d\-_=]+\.[a-z\d]+"
     )
     assert valid_pattern.search(magic_link) is not None
 
@@ -65,7 +67,9 @@ async def test_valid_auspice_link_access(
     auth_headers = {"user_id": user.auth0_user_id}
     request_body = {"tree_id": phylo_tree.entity_id}
     generate_res = await http_client.post(
-        f"/v2/orgs/{group.id}/auspice/generate", json=request_body, headers=auth_headers
+        f"/v2/orgs/{group.id}/pathogens/{phylo_tree.pathogen.slug}/auspice/generate",
+        json=request_body,
+        headers=auth_headers,
     )
 
     assert generate_res.status_code == 200
@@ -109,7 +113,7 @@ async def test_unauth_user_auspice_link_generation(
     auth_headers = {"user_id": user_that_did_not_make_tree.auth0_user_id}
     request_body = {"tree_id": phylo_tree.entity_id}
     res = await http_client.post(
-        f"/v2/orgs/{group_that_did_not_make_tree.id}/auspice/generate",
+        f"/v2/orgs/{group_that_did_not_make_tree.id}/pathogens/{phylo_tree.pathogen.slug}/auspice/generate",
         json=request_body,
         headers=auth_headers,
     )
@@ -128,7 +132,9 @@ async def test_tampered_magic_link(
     auth_headers = {"user_id": user.auth0_user_id}
     request_body = {"tree_id": phylo_tree.entity_id}
     generate_res = await http_client.post(
-        f"/v2/orgs/{group.id}/auspice/generate", json=request_body, headers=auth_headers
+        f"/v2/orgs/{group.id}/pathogens/{phylo_tree.pathogen.slug}/auspice/generate",
+        json=request_body,
+        headers=auth_headers,
     )
 
     assert generate_res.status_code == 200
@@ -136,7 +142,9 @@ async def test_tampered_magic_link(
     magic_link = generate_response["url"]
 
     # Now we tamper with the link! We want to see a different tree!
-    payload_plus_tag = magic_link.removeprefix("test/v2/orgs/1/auspice/access/")
+    payload_plus_tag = magic_link.removeprefix(
+        f"test/v2/orgs/1/pathogens/{phylo_tree.pathogen.slug}/auspice/access/"
+    )
     payload, tag = payload_plus_tag.split(".")
     decoded_payload = urlsafe_b64decode(payload).decode("utf8")
     recovered_payload = json.loads(decoded_payload)
@@ -148,7 +156,7 @@ async def test_tampered_magic_link(
     tampered_payload_plus_tag = f"{tampered_message.decode('utf8')}.{tag}"
 
     access_res = await http_client.get(
-        f"/v2/orgs/{group.id}/auspice/access/{tampered_payload_plus_tag}"
+        f"/v2/orgs/{group.id}/pathogens/{phylo_tree.pathogen.slug}/auspice/access/{tampered_payload_plus_tag}"
     )
     assert access_res.status_code == 400
     res_json = access_res.json()
@@ -195,7 +203,9 @@ async def test_country_color_labeling(
     auth_headers = {"user_id": user.auth0_user_id}
     request_body = {"tree_id": phylo_tree.entity_id}
     generate_res = await http_client.post(
-        f"/v2/orgs/{group.id}/auspice/generate", json=request_body, headers=auth_headers
+        f"/v2/orgs/{group.id}/pathogens/{phylo_tree.pathogen.slug}/auspice/generate",
+        json=request_body,
+        headers=auth_headers,
     )
 
     assert generate_res.status_code == 200
@@ -284,7 +294,9 @@ async def test_division_color_labeling(
     auth_headers = {"user_id": user.auth0_user_id}
     request_body = {"tree_id": phylo_tree.entity_id}
     generate_res = await http_client.post(
-        f"/v2/orgs/{group.id}/auspice/generate", json=request_body, headers=auth_headers
+        f"/v2/orgs/{group.id}/pathogens/{phylo_tree.pathogen.slug}/auspice/generate",
+        json=request_body,
+        headers=auth_headers,
     )
 
     assert generate_res.status_code == 200
@@ -372,7 +384,9 @@ async def test_location_color_labeling(
     auth_headers = {"user_id": user.auth0_user_id}
     request_body = {"tree_id": phylo_tree.entity_id}
     generate_res = await http_client.post(
-        f"/v2/orgs/{group.id}/auspice/generate", json=request_body, headers=auth_headers
+        f"/v2/orgs/{group.id}/pathogens/{phylo_tree.pathogen.slug}/auspice/generate",
+        json=request_body,
+        headers=auth_headers,
     )
 
     assert generate_res.status_code == 200
