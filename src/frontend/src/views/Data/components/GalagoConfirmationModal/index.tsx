@@ -15,7 +15,7 @@ interface Props {
   treeId: number;
 }
 
-const NextstrainConfirmationModal = ({
+export const GalagoConfirmationModal = ({
   open,
   onClose,
   treeId,
@@ -26,7 +26,7 @@ const NextstrainConfirmationModal = ({
       Galago (Beta), a separate, but related service from CZ GEN EPI. Galago is
       a serverless web application which runs entirely in the browser. Galago
       does not store or share your data; however, you may choose to share the
-      URL with others.{" "}
+      URL with others.
     </>
   );
 
@@ -57,5 +57,3 @@ const NextstrainConfirmationModal = ({
     />
   );
 };
-
-export default NextstrainConfirmationModal;

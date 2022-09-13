@@ -1,7 +1,7 @@
 import { ButtonIcon, Icon, Tooltip } from "czifui";
 import { useState } from "react";
 import { TREE_STATUS } from "src/common/constants/types";
-import GalagoConfirmationModal from "src/views/Data/components/GalagoConfirmationModal";
+import { GalagoConfirmationModal } from "src/views/Data/components/GalagoConfirmationModal";
 
 interface Props {
   item: PhyloRun;
