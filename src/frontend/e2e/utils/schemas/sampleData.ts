@@ -1,4 +1,4 @@
-export type Sample = {
+export type SampleData = {
   privateId: string;
   publicId: string;
   collectionDate: string;

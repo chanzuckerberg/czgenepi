@@ -1,6 +1,6 @@
+import { SampleData } from "./sampleData";
 export type UploadData = {
-  applyToAll: boolean;
-  dataFiles: Array<string>;
+  dataFile: string;
   metadataFile?: string;
-  sample: Array<object>;
+  samples: Array<SampleData>;
 };
