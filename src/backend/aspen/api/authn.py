@@ -30,7 +30,6 @@ def get_usergroup_query(
 ) -> Query:
     query = (
         sa.select(User)  # type: ignore
-        .options(joinedload(User.group).joinedload(Group.can_see))  # type: ignore
         .options(
             joinedload(User.user_roles).options(  # type: ignore
                 joinedload(UserRole.group, innerjoin=True),  # type: ignore

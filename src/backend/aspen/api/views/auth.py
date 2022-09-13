@@ -185,7 +185,6 @@ async def create_user_if_not_exists(
         "auth0_user_id": auth0_user_id,
         "group_admin": "admin" in roles,
         "system_admin": False,
-        "group": group,
     }
     newuser = User(**user_fields)
     db.add(newuser)

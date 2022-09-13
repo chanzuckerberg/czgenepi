@@ -82,7 +82,6 @@ async def test_create_new_admin_user_if_not_exists(
         (
             await async_session.execute(
                 sa.select(User)  # type: ignore
-                .options(joinedload(User.group, innerjoin=True))  # type: ignore
                 .filter(User.auth0_user_id == userinfo["sub"])  # type: ignore
             )
         )
@@ -116,7 +115,6 @@ async def test_create_new_user_if_not_exists(
         (
             await async_session.execute(
                 sa.select(User)  # type: ignore
-                .options(joinedload(User.group, innerjoin=True))  # type: ignore
                 .filter(User.auth0_user_id == userinfo["sub"])  # type: ignore
             )
         )
@@ -154,7 +152,6 @@ async def test_dont_create_new_user_if_exists(
         (
             await async_session.execute(
                 sa.select(User)  # type: ignore
-                .options(joinedload(User.group, innerjoin=True))  # type: ignore
                 .filter(User.auth0_user_id == userinfo["sub"])  # type: ignore
             )
         )
@@ -195,7 +192,6 @@ async def test_create_new_user_and_sync_roles(
         (
             await async_session.execute(
                 sa.select(User)  # type: ignore
-                .options(joinedload(User.group, innerjoin=True))  # type: ignore
                 .filter(User.auth0_user_id == userinfo["sub"])  # type: ignore
             )
         )
@@ -365,7 +361,6 @@ async def test_callback_ff_doesnt_sync_auth0_user_roles(
         (
             await async_session.execute(
                 sa.select(User)  # type: ignore
-                .options(joinedload(User.group, innerjoin=True))  # type: ignore
                 .filter(User.auth0_user_id == userinfo["sub"])  # type: ignore
             )
         )
