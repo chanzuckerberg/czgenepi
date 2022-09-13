@@ -73,7 +73,7 @@ class MetadataTSVStreamer(FieldSeparatedStreamer):
         return data
 
 
-class GisaidSubmissionFormTSVStreamer(FieldSeparatedStreamer):
+class GisaidSubmissionFormCSVStreamer(FieldSeparatedStreamer):
     computer_fields = [
         "submitter",
         "fn",
@@ -148,7 +148,7 @@ class GisaidSubmissionFormTSVStreamer(FieldSeparatedStreamer):
     }
 
     def __init__(self, filename: str, data: Iterable):
-        super().__init__("\t", filename, data)
+        super().__init__(",", filename, data)
 
     def generate_row(self, item):
         data: Mapping[str, Any] = {}
