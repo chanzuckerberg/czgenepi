@@ -58,7 +58,6 @@ async def test_list_members(
                 "agreed_to_tos": True,
                 "acknowledged_policy_version": None,
                 "email": user2.email,
-                "group_admin": True,
                 "role": "admin",
             },
             {
@@ -67,7 +66,6 @@ async def test_list_members(
                 "agreed_to_tos": True,
                 "acknowledged_policy_version": None,
                 "email": user.email,
-                "group_admin": False,
                 "role": "member",
             },
         ]
@@ -122,7 +120,6 @@ async def test_list_members_secondary_group(
                 "agreed_to_tos": True,
                 "acknowledged_policy_version": None,
                 "email": user.email,
-                "group_admin": False,
                 "role": "member",
             },
             {
@@ -131,7 +128,6 @@ async def test_list_members_secondary_group(
                 "agreed_to_tos": True,
                 "acknowledged_policy_version": None,
                 "email": user3.email,
-                "group_admin": False,
                 "role": "member",
             },
         ]

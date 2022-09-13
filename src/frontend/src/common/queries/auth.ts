@@ -34,7 +34,6 @@ export interface RawUserRequest {
   split_id: string;
   analytics_id: string;
   gisaid_submitter_id: string;
-  group_admin: boolean;
 }
 
 export const mapUserData = (obj: RawUserRequest): User => {

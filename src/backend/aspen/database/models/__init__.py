@@ -2,7 +2,6 @@ from sqlalchemy.orm import configure_mappers
 
 from aspen.database.models.accessions import Accession, AccessionType  # noqa: F401
 from aspen.database.models.base import meta  # noqa: F401
-from aspen.database.models.cansee import CanSee, DataType  # noqa: F401
 from aspen.database.models.entity import Entity, EntityType  # noqa: F401
 from aspen.database.models.gisaid_dump import (  # noqa: F401
     AlignedGisaidDump,

@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import random
 import string
-from collections.abc import MutableSequence
-from typing import TYPE_CHECKING
 
 from sqlalchemy import (
     Boolean,
@@ -23,9 +21,6 @@ from sqlalchemy.orm import backref, relationship
 from aspen.database.models.base import base, idbase
 from aspen.database.models.locations import Location
 from aspen.database.models.mixins import DictMixin
-
-if TYPE_CHECKING:
-    from aspen.database.models.cansee import CanSee
 
 
 def submitting_lab_default(context: DefaultExecutionContext) -> str:
@@ -72,8 +67,12 @@ class Group(idbase, DictMixin):  # type: ignore
         server_default=text("'{}'::jsonb"),
     )
 
+<<<<<<< HEAD
     can_see: MutableSequence[CanSee]
     can_be_seen_by: MutableSequence[CanSee]
+=======
+    members = relationship("User", back_populates="group")  # type: ignore
+>>>>>>> origin/trunk
 
     def __repr__(self):
         return f"Group <{self.name}>"
@@ -98,7 +97,7 @@ class User(idbase, DictMixin):  # type: ignore
     name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     auth0_user_id = Column(String, unique=True, nullable=False)
-    group_admin = Column(Boolean, nullable=False)
+    group_admin = Column(Boolean, nullable=True)
     system_admin = Column(Boolean, nullable=False)
     agreed_to_tos = Column(Boolean, nullable=False, default=False)
     # Date of policies (any of Privacy Policy, Terms of Service, etc, etc) the user

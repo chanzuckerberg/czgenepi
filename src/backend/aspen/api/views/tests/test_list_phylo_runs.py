@@ -15,7 +15,7 @@ from aspen.database.models import (
     WorkflowStatusType,
 )
 from aspen.test_infra.models.location import location_factory
-from aspen.test_infra.models.pathogen import pathogen_factory
+from aspen.test_infra.models.pathogen import random_pathogen_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
@@ -86,6 +86,7 @@ def make_runs_with_no_trees(group: Group, pathogen: Pathogen) -> Collection[Phyl
 def make_all_test_data(
     group: Group, user: User, location: Location, n_samples: int, n_trees: int
 ) -> Tuple[
+    Pathogen,
     Collection[Sample],
     Collection[UploadedPathogenGenome],
     Sequence[PhyloTree],
@@ -95,18 +96,23 @@ def make_all_test_data(
     uploaded_pathogen_genomes: Collection[
         UploadedPathogenGenome
     ] = make_uploaded_pathogen_genomes(samples)
-    pathogen: Pathogen = pathogen_factory()
+    pathogen: Pathogen = random_pathogen_factory()
     trees: Sequence[PhyloTree] = make_trees(group, pathogen, samples, n_trees)
     treeless_runs: Collection[PhyloRun] = make_runs_with_no_trees(group, pathogen)
-    return samples, uploaded_pathogen_genomes, trees, treeless_runs
+    return pathogen, samples, uploaded_pathogen_genomes, trees, treeless_runs
 
 
 async def check_results(
-    http_client, user: User, group: Group, trees: Collection[PhyloTree]
+    http_client,
+    user: User,
+    group: Group,
+    pathogen: Pathogen,
+    trees: Collection[PhyloTree],
 ):
     auth_headers = {"user_id": str(user.auth0_user_id)}
     res = await http_client.get(
-        f"/v2/orgs/{group.id}/phylo_runs/", headers=auth_headers
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/phylo_runs/",
+        headers=auth_headers,
     )
     results = res.json()["phylo_runs"]
 
@@ -130,12 +136,14 @@ async def test_phylo_tree_view(
     location: Location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    _, _, trees, _ = make_all_test_data(group, user, location, n_samples, n_trees)
+    pathogen, _, _, trees, _ = make_all_test_data(
+        group, user, location, n_samples, n_trees
+    )
 
     async_session.add(group)
     await async_session.commit()
 
-    await check_results(http_client, user, group, trees)
+    await check_results(http_client, user, group, pathogen, trees)
 
 
 async def test_in_progress_and_failed_trees(
@@ -149,7 +157,7 @@ async def test_in_progress_and_failed_trees(
     location: Location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    _, _, _, treeless_runs = make_all_test_data(
+    pathogen, _, _, trees, treeless_runs = make_all_test_data(
         group, user, location, n_samples, n_trees
     )
 
@@ -158,7 +166,8 @@ async def test_in_progress_and_failed_trees(
 
     auth_headers = {"user_id": str(user.auth0_user_id)}
     res = await http_client.get(
-        f"/v2/orgs/{group.id}/phylo_runs/", headers=auth_headers
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/phylo_runs/",
+        headers=auth_headers,
     )
     results = res.json()["phylo_runs"]
 
@@ -205,13 +214,15 @@ async def test_phylo_trees_can_see(
     location: Location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    _, _, trees, _ = make_all_test_data(owner_group, user, location, n_samples, n_trees)
+    pathogen, _, _, trees, _ = make_all_test_data(
+        owner_group, user, location, n_samples, n_trees
+    )
 
     role_objs = await grouprole_factory(async_session, owner_group, viewer_group)
     async_session.add_all(role_objs)
     await async_session.commit()
 
-    await check_results(http_client, user, viewer_group, trees)
+    await check_results(http_client, user, viewer_group, pathogen, trees)
 
 
 async def test_phylo_trees_no_can_see(
@@ -226,13 +237,16 @@ async def test_phylo_trees_no_can_see(
     location: Location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    _, _, trees, _ = make_all_test_data(owner_group, user, location, n_samples, n_trees)
+    pathogen, _, _, trees, _ = make_all_test_data(
+        owner_group, user, location, n_samples, n_trees
+    )
 
     async_session.add_all((owner_group, viewer_group))
     await async_session.commit()
 
     auth_headers = {"user_id": str(user.auth0_user_id)}
     res = await http_client.get(
-        f"/v2/orgs/{owner_group.id}/phylo_runs/", headers=auth_headers
+        f"/v2/orgs/{owner_group.id}/pathogens/{pathogen.slug}/phylo_runs/",
+        headers=auth_headers,
     )
     assert res.status_code == 403

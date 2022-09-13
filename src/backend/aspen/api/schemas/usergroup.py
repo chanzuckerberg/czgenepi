@@ -37,7 +37,6 @@ class UserBaseResponse(BaseResponse):
     name: str
     agreed_to_tos: bool = False
     acknowledged_policy_version: Optional[datetime.date] = None
-    group_admin: bool
 
 
 class UserUpdateRequest(BaseRequest):
@@ -79,7 +78,6 @@ class UserPostRequest(BaseRequest):
     name: str
     email: str
     group_id: int
-    group_admin: Optional[bool] = False
     system_admin: Optional[bool] = False
     auth0_user_id: str
 

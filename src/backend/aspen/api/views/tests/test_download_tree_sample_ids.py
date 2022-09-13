@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.database.models import Group, Pathogen, PhyloTree, Sample
 from aspen.test_infra.models.location import location_factory
-from aspen.test_infra.models.pathogen import pathogen_factory
+from aspen.test_infra.models.pathogen import random_pathogen_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
@@ -92,7 +92,7 @@ async def create_phylotree_with_inputs(
         input_entities.append(input_entity)
 
     db_gisaid_samples = ["hCoV-19/gisaid_identifier", "hCoV-19/gisaid_identifier2"]
-    pathogen: Pathogen = pathogen_factory()
+    pathogen: Pathogen = random_pathogen_factory()
     phylo_run = phylorun_factory(
         owner_group,
         inputs=input_entities,
@@ -132,7 +132,7 @@ async def create_phylotree(
     run_inputs = []
     if sample_as_input:
         run_inputs = [upg]
-    pathogen: Pathogen = pathogen_factory()
+    pathogen: Pathogen = random_pathogen_factory()
     phylo_tree = phylotree_factory(
         phylorun_factory(owner_group, pathogen=pathogen, inputs=run_inputs),
         samples,
@@ -158,7 +158,7 @@ async def test_tree_metadata_download(
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     res = await http_client.get(
-        f"/v2/orgs/{group.id}/phylo_trees/{phylo_tree.entity_id}/sample_ids",
+        f"/v2/orgs/{group.id}/pathogens/{phylo_tree.pathogen.slug}/phylo_trees/{phylo_tree.entity_id}/sample_ids",
         headers=auth_headers,
     )
     expected_filename = f"{phylo_tree.id}_sample_ids.tsv"
@@ -232,7 +232,7 @@ async def test_private_id_matrix(
         user = case["user"]
         auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
         res = await http_client.get(
-            f"/v2/orgs/{case['group'].id}/phylo_trees/{phylo_tree.entity_id}/sample_ids",
+            f"/v2/orgs/{case['group'].id}/pathogens/{phylo_tree.pathogen.slug}/phylo_trees/{phylo_tree.entity_id}/sample_ids",
             headers=auth_headers,
         )
         assert res.status_code == case["expected_status"]
@@ -271,7 +271,7 @@ async def test_tree_metadata_replaces_all_ids(
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     res = await http_client.get(
-        f"/v2/orgs/{group.id}/phylo_trees/{phylo_tree.entity_id}/sample_ids",
+        f"/v2/orgs/{group.id}/pathogens/{phylo_tree.pathogen.slug}/phylo_trees/{phylo_tree.entity_id}/sample_ids",
         headers=auth_headers,
     )
     assert res.status_code == 200
@@ -316,7 +316,7 @@ async def test_public_tree_metadata_replaces_all_ids(
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     res = await http_client.get(
-        f"/v2/orgs/{group.id}/phylo_trees/{phylo_tree.entity_id}/sample_ids?id_style=public",
+        f"/v2/orgs/{group.id}/pathogens/{phylo_tree.pathogen.slug}/phylo_trees/{phylo_tree.entity_id}/sample_ids?id_style=public",
         headers=auth_headers,
     )
     assert res.status_code == 200
@@ -356,7 +356,7 @@ async def test_download_samples_unauthorized(
 
     auth_headers = {"name": noaccess_user.name, "user_id": noaccess_user.auth0_user_id}
     res = await http_client.get(
-        f"/v2/orgs/{group.id}/phylo_trees/{phylo_tree.entity_id}/sample_ids?id_style=public",
+        f"/v2/orgs/{group.id}/pathogens/{phylo_tree.pathogen.slug}/phylo_trees/{phylo_tree.entity_id}/sample_ids?id_style=public",
         headers=auth_headers,
     )
     assert res.status_code == 403
