@@ -61,7 +61,6 @@ async def check_roles(
 
 async def test_create_new_user_if_not_exists(
     async_session: AsyncSession,
-    http_client: AsyncClient,
     auth0_apiclient: Auth0Client,
 ):
     """
@@ -76,7 +75,7 @@ async def test_create_new_user_if_not_exists(
     async_session.add(group)
     auth0_apiclient.get_org_user_roles.side_effect = [["member"]]  # type: ignore
     await start_new_transaction(async_session)
-    await create_user_if_not_exists(async_session, auth0_apiclient, userinfo)
+    await create_user_if_not_exists(async_session, userinfo)
     await start_new_transaction(async_session)
     user = (
         (
@@ -94,7 +93,6 @@ async def test_create_new_user_if_not_exists(
 
 async def test_dont_create_new_user_if_exists(
     async_session: AsyncSession,
-    http_client: AsyncClient,
     auth0_apiclient: Auth0Client,
 ):
     """
@@ -111,7 +109,7 @@ async def test_dont_create_new_user_if_exists(
     )
     async_session.add(user)
     await start_new_transaction(async_session)
-    await create_user_if_not_exists(async_session, auth0_apiclient, userinfo)
+    await create_user_if_not_exists(async_session, userinfo)
     original_user_id = user.id
     async_session.expire_all()
     await start_new_transaction(async_session)
@@ -149,7 +147,7 @@ async def test_create_new_user_and_sync_roles(
     auth0_apiclient.get_user_orgs.side_effect = [[{"id": group1.auth0_org_id}, {"id": group3.auth0_org_id}]]  # type: ignore
     await start_new_transaction(async_session)
     user_obj, _ = await create_user_if_not_exists(
-        async_session, auth0_apiclient, userinfo
+        async_session, userinfo
     )
     assert user_obj is not None
     await RoleManager.sync_user_roles(async_session, auth0_apiclient, user_obj)

@@ -220,7 +220,7 @@ async def auth(
         "user_id": userinfo["sub"],
         "name": userinfo["name"],
     }
-    user, newuser_group = await create_user_if_not_exists(db, a0, userinfo)
+    user, newuser_group = await create_user_if_not_exists(db, userinfo)
     # Always re-sync auth0 groups to our db on login!
     # Make sure the user is in auth0 before sync'ing roles.
     #  ex: User1 in local dev doesn't exist in auth0
