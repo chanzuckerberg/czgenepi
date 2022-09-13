@@ -146,9 +146,7 @@ async def test_create_new_user_and_sync_roles(
     auth0_apiclient.get_org_user_roles.side_effect = [["member"], ["admin"]]  # type: ignore
     auth0_apiclient.get_user_orgs.side_effect = [[{"id": group1.auth0_org_id}, {"id": group3.auth0_org_id}]]  # type: ignore
     await start_new_transaction(async_session)
-    user_obj, _ = await create_user_if_not_exists(
-        async_session, userinfo
-    )
+    user_obj, _ = await create_user_if_not_exists(async_session, userinfo)
     assert user_obj is not None
     await RoleManager.sync_user_roles(async_session, auth0_apiclient, user_obj)
     assert user_obj.email == userinfo["email"]

@@ -47,7 +47,6 @@ def user_factory(
     name="test",
     auth0_user_id="test_auth0_id",
     email="test_user@dph.org",
-    group_admin=False,
     system_admin=False,
     agreed_to_tos=True,
 ) -> User:
@@ -55,7 +54,6 @@ def user_factory(
         name=name,
         auth0_user_id=auth0_user_id,
         email=email,
-        group_admin=group_admin,
         system_admin=system_admin,
         agreed_to_tos=agreed_to_tos,
     )
@@ -72,14 +70,10 @@ async def userrole_factory(
     system_admin=False,
     agreed_to_tos=True,
 ) -> User:
-    group_admin = False
-    if "admin" in roles:
-        group_admin = True
     user = User(
         name=name,
         auth0_user_id=auth0_user_id,
         email=email,
-        group_admin=group_admin,
         system_admin=system_admin,
         agreed_to_tos=agreed_to_tos,
     )

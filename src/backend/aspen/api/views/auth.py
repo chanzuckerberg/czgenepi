@@ -176,7 +176,6 @@ async def create_user_if_not_exists(db, userinfo) -> Tuple[User, Optional[Group]
         "name": userinfo["email"],
         "email": userinfo["email"],
         "auth0_user_id": auth0_user_id,
-        "group_admin": False,
         "system_admin": False,
     }
     newuser = User(**user_fields)
