@@ -86,7 +86,7 @@ async def test_submission_template_download_gisaid(
     )
 
     file_contents = io.StringIO(str(res.content, encoding="UTF-8"))
-    tsvreader = csv.DictReader(file_contents, delimiter="\t")
+    tsvreader = csv.DictReader(file_contents, delimiter=",")
     assert set(list(tsvreader.fieldnames)) == set(  # type: ignore
         GisaidSubmissionFormCSVStreamer.fields
     )
@@ -246,7 +246,7 @@ async def test_submission_template_prefix_stripping(
     )
 
     file_contents = io.StringIO(str(res.content, encoding="UTF-8"))
-    tsvreader = csv.DictReader(file_contents, delimiter="\t")
+    tsvreader = csv.DictReader(file_contents, delimiter=",")
     assert set(list(tsvreader.fieldnames)) == set(  # type: ignore
         GisaidSubmissionFormCSVStreamer.fields
     )
@@ -329,7 +329,7 @@ async def test_submission_template_incomplete_location(
     )
 
     file_contents = io.StringIO(str(res.content, encoding="UTF-8"))
-    tsvreader = csv.DictReader(file_contents, delimiter="\t")
+    tsvreader = csv.DictReader(file_contents, delimiter=",")
     assert set(list(tsvreader.fieldnames)) == set(  # type: ignore
         GisaidSubmissionFormCSVStreamer.fields
     )

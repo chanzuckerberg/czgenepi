@@ -426,9 +426,7 @@ async def fill_submission_template(
         )
         metadata_rows.sort(key=lambda row: row.get("covv_virus_name"))  # type: ignore
         filename = get_submission_template_filename("GISAID")
-        filename = filename.replace(
-            ".tsv", ".csv"
-        )
+        filename = filename.replace(".tsv", ".csv")
         tsv_streamer = GisaidSubmissionFormCSVStreamer
     elif request.public_repository_name.lower() == "genbank":
         metadata_rows = sample_info_to_genbank_rows(submission_information, prefix)
