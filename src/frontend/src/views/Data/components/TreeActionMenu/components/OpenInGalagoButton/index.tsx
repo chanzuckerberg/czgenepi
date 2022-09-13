@@ -1,7 +1,7 @@
 import { ButtonIcon, Icon, Tooltip } from "czifui";
 import { useState } from "react";
 import { TREE_STATUS } from "src/common/constants/types";
-import NextstrainConfirmationModal from "../../../NextstrainConfirmationModal";
+import GalagoConfirmationModal from "src/views/Data/components/GalagoConfirmationModal";
 
 interface Props {
   item: PhyloRun;
@@ -49,7 +49,7 @@ const OpenInGalagoButton = ({ item }: Props): JSX.Element => {
       </Tooltip>
       {treeId && (
         // TODO: (ehoops): replace this with the Galago modal as part of SC-214165
-        <NextstrainConfirmationModal
+        <GalagoConfirmationModal
           open={open}
           onClose={handleClose}
           treeId={treeId as number}
