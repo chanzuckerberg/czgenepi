@@ -28,15 +28,12 @@ def get_usergroup_query(
     auth0_user_id: Optional[str] = None,
     user_id: Optional[str] = None,
 ) -> Query:
-    query = (
-        sa.select(User)  # type: ignore
-        .options(
-            joinedload(User.user_roles).options(  # type: ignore
-                joinedload(UserRole.group, innerjoin=True),  # type: ignore
-                joinedload(UserRole.role, innerjoin=True),
-            )
-        )  # type: ignore
-    )
+    query = sa.select(User).options(  # type: ignore
+        joinedload(User.user_roles).options(  # type: ignore
+            joinedload(UserRole.group, innerjoin=True),  # type: ignore
+            joinedload(UserRole.role, innerjoin=True),
+        )
+    )  # type: ignore
     if auth0_user_id:
         query = query.filter(User.auth0_user_id == auth0_user_id)  # type: ignore
     else:
