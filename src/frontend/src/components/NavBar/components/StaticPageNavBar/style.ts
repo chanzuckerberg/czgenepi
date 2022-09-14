@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import { srOnly } from "src/common/styles/accessibility";
 import { SmallerThanBreakpoint } from "src/common/styles/mixins/global";
 
 export const Bar = styled.div`
@@ -39,7 +40,7 @@ export const HeaderTopLinks = styled.div`
   `)}
 `;
 
-export const HeaderContainer = styled.div`
+export const HeaderContainer = styled.header`
   background: black;
   color: white;
 
@@ -135,6 +136,11 @@ export const MobileNavTray = styled.div`
   background-color: #ffffff;
   z-index: 10;
   transition: all 0.4s;
+  display: none;
+  ${SmallerThanBreakpoint(`
+    display: inline-block;
+    cursor: pointer;
+  `)}
 `;
 
 export const OrgSplash = styled.span`
@@ -150,4 +156,8 @@ export const OrgSplash = styled.span`
 
 export const TextLink = styled.a`
   margin: 0 10px;
+`;
+
+export const HiddenTitle = styled.title`
+  ${srOnly}
 `;

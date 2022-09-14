@@ -140,8 +140,9 @@ export function analyticsTrackEvent<
 export function analyticsTrackEvent(
   eventType: EVENT_TYPES,
   additionalEventData?: EventData
-) {
+): void {
   const addlEventData = additionalEventData || {};
+  debugger;
   if (window.analytics && window.isCzGenEpiAnalyticsEnabled) {
     const eventData = {
       ...getCommonUserInfo(),
