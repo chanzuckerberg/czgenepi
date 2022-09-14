@@ -29,7 +29,7 @@ test.describe("Samples page tests", () => {
     );
   });
 
-  test.only("Should verify sample data", async ({ page }: { page: Page }) => {
+  test("Should verify sample data", async ({ page }: { page: Page }) => {
     await page.goto("https://staging.czgenepi.org/data/samples");
 
     //wait until data is displayed
