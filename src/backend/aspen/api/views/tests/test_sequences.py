@@ -5,9 +5,9 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.api.views.sequences import get_fasta_filename
-from aspen.database.models import Pathogen, Sample
+from aspen.database.models import Sample
 from aspen.test_infra.models.location import location_factory
-from aspen.test_infra.models.pathogen import pathogen_factory
+from aspen.test_infra.models.pathogen import random_pathogen_factory
 from aspen.test_infra.models.pathogen_repo_config import (
     setup_gisaid_and_genbank_repo_configs,
 )
@@ -28,7 +28,7 @@ async def setup_sequences_download_test_data(
 ):
     group = group_factory()
     user = await userrole_factory(async_session, group)
-    pathogen = pathogen_factory()
+    pathogen = setup_gisaid_and_genbank_repo_configs(async_session)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
@@ -36,10 +36,10 @@ async def setup_sequences_download_test_data(
         group,
         user,
         location,
+        pathogen=pathogen,
         private_identifier="hCoV-19/private_identifer",
     )
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
-    pathogen = setup_gisaid_and_genbank_repo_configs(async_session)
 
     async_session.add(group)
     async_session.add(pathogen)
@@ -55,14 +55,15 @@ async def test_prepare_sequences_download_gisaid(
     Test a regular sequence download for a sample submitted by the user's group, test prefixes are correctly added for GISAID
     """
 
-    group, user, sample, _ = await setup_sequences_download_test_data(async_session)
+    group, user, sample, pathogen = await setup_sequences_download_test_data(
+        async_session
+    )
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     data = {
         "sample_ids": [sample.public_identifier],
         "public_repository_name": "GISAID",
     }
-    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
     res = await http_client.post(
         f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/sequences/",
         headers=auth_headers,
@@ -88,14 +89,15 @@ async def test_prepare_sequences_download_genbank(
     """
     Test a regular sequence download for a sample submitted by the user's group, test prefixes are correctly added for GenBank
     """
-    group, user, sample, _ = await setup_sequences_download_test_data(async_session)
+    group, user, sample, pathogen = await setup_sequences_download_test_data(
+        async_session
+    )
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     data = {
         "sample_ids": [sample.public_identifier],
         "public_repository_name": "GenBank",
     }
-    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
     res = await http_client.post(
         f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/sequences/",
         headers=auth_headers,
@@ -121,14 +123,15 @@ async def test_prepare_sequences_download_public_database_DNE(
     Test that error message is returned if public repository name is not found
     """
 
-    group, user, sample, _ = await setup_sequences_download_test_data(async_session)
+    group, user, sample, pathogen = await setup_sequences_download_test_data(
+        async_session
+    )
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     data = {
         "sample_ids": [sample.public_identifier],
         "public_repository_name": "does not exist",
     }
-    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
     res = await http_client.post(
         f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/sequences/",
         headers=auth_headers,
@@ -149,13 +152,14 @@ async def test_prepare_sequences_download_no_submission(
     """
     Test a regular sequence download for a sample submitted by the user's group, test prefixes are correctly added for GenBank
     """
-    group, user, sample, _ = await setup_sequences_download_test_data(async_session)
+    group, user, sample, pathogen = await setup_sequences_download_test_data(
+        async_session
+    )
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     data = {
         "sample_ids": [sample.public_identifier],
     }
-    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
     res = await http_client.post(
         f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/sequences/",
         headers=auth_headers,
@@ -183,7 +187,7 @@ async def test_prepare_sequences_download_no_access(
     """
     # create a sample for one group and another viewer group
     owner_group = group_factory()
-    pathogen = pathogen_factory()
+    pathogen = random_pathogen_factory()
     viewer_group = group_factory(name="County")
     viewer = await userrole_factory(async_session, viewer_group)
     owner = await userrole_factory(
@@ -196,7 +200,7 @@ async def test_prepare_sequences_download_no_access(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    sample = sample_factory(owner_group, owner, location)
+    sample = sample_factory(owner_group, owner, location, pathogen=pathogen)
     uploaded_pathogen_genome_factory(sample)
 
     async_session.add_all((owner_group, viewer_group, pathogen))
@@ -207,7 +211,6 @@ async def test_prepare_sequences_download_no_access(
     data = {
         "sample_ids": [sample.public_identifier],
     }
-    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
     res = await http_client.post(
         f"/v2/orgs/{viewer_group.id}/pathogens/{pathogen.slug}/sequences/",
         headers=auth_headers,
@@ -226,12 +229,12 @@ async def test_prepare_sequences_download_viewer_no_access(
     """
     owner_group = group_factory()
     viewer_group = group_factory(name="CDPH")
-    pathogen = pathogen_factory()
+    pathogen = random_pathogen_factory()
     user = await userrole_factory(async_session, viewer_group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    sample = sample_factory(owner_group, user, location)
+    sample = sample_factory(owner_group, user, location, pathogen=pathogen)
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     # give the viewer group access to the sequences from the owner group
     group_roles = await grouprole_factory(async_session, owner_group, viewer_group)
@@ -244,7 +247,6 @@ async def test_prepare_sequences_download_viewer_no_access(
     data = {
         "sample_ids": [sample.public_identifier],
     }
-    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
     res = await http_client.post(
         f"/v2/orgs/{viewer_group.id}/pathogens/{pathogen.slug}/sequences/",
         headers=auth_headers,
@@ -263,6 +265,7 @@ async def test_access_matrix(
     Test that we use public ids in the fasta file if the requester only has access to the samples
     sequence data but not private ids
     """
+    pathogen = setup_gisaid_and_genbank_repo_configs(async_session)
     owner_group1 = group_factory(name="group1")
     owner_group2 = group_factory(name="group2")
     viewer_group = group_factory(name="CDPH")
@@ -277,7 +280,6 @@ async def test_access_matrix(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    setup_gisaid_and_genbank_repo_configs(async_session)
     # give the viewer group access to the sequences from the owner group
     roles = []
     roles.extend(await grouprole_factory(async_session, owner_group1, viewer_group))
@@ -286,6 +288,7 @@ async def test_access_matrix(
         owner_group1,
         user,
         location,
+        pathogen=pathogen,
         private_identifier="sample1",
         public_identifier="pub1",
     )
@@ -293,6 +296,7 @@ async def test_access_matrix(
         owner_group2,
         user,
         location,
+        pathogen=pathogen,
         private_identifier="sample2",
         public_identifier="pub2",
     )
@@ -300,6 +304,7 @@ async def test_access_matrix(
         viewer_group,
         user,
         location,
+        pathogen=pathogen,
         private_identifier="sample3",
         public_identifier="pub3",
     )
@@ -307,6 +312,7 @@ async def test_access_matrix(
         owner_group1,
         user,
         location,
+        pathogen=pathogen,
         private_identifier="sample4",
         public_identifier="pub4",
         private=True,
@@ -324,7 +330,6 @@ async def test_access_matrix(
     # Make sure sample owners can see their own (shared & private) samples.
     owner_headers = {"name": owner.name, "user_id": owner.auth0_user_id}
     data = {"sample_ids": [sample1.public_identifier, sample4.public_identifier]}
-    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
     res = await http_client.post(
         f"/v2/orgs/{owner_group1.id}/pathogens/{pathogen.slug}/sequences/",
         headers=owner_headers,
@@ -379,7 +384,6 @@ async def test_access_matrix(
         data = {
             "sample_ids": case["samples"],
         }
-        pathogen = await Pathogen.get_by_slug(async_session, "SC2")
         res = await http_client.post(
             f"/v2/orgs/{viewer_group.id}/pathogens/{pathogen.slug}/sequences/",
             headers=user_headers,
