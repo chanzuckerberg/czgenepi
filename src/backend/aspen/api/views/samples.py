@@ -38,7 +38,7 @@ from aspen.api.utils import (
     get_matching_gisaid_ids_by_epi_isl,
     get_missing_and_found_sample_ids,
     get_public_repository_prefix,
-    GisaidSubmissionFormTSVStreamer,
+    GisaidSubmissionFormCSVStreamer,
     sample_info_to_genbank_rows,
     sample_info_to_gisaid_rows,
     samples_by_identifiers,
@@ -418,7 +418,7 @@ async def fill_submission_template(
     metadata_rows: list[dict[str, str]] = []
     filename: str = ""
     tsv_streamer: Union[
-        Type[GisaidSubmissionFormTSVStreamer], Type[GenBankSubmissionFormTSVStreamer]
+        Type[GisaidSubmissionFormCSVStreamer], Type[GenBankSubmissionFormTSVStreamer]
     ]
     if request.public_repository_name.lower() == "gisaid":
         metadata_rows = sample_info_to_gisaid_rows(
@@ -426,10 +426,8 @@ async def fill_submission_template(
         )
         metadata_rows.sort(key=lambda row: row.get("covv_virus_name"))  # type: ignore
         filename = get_submission_template_filename("GISAID")
-        filename = filename.replace(
-            ".tsv", ".csv"
-        )  # yes, we want a TSV with a .csv extension
-        tsv_streamer = GisaidSubmissionFormTSVStreamer
+        filename = filename.replace(".tsv", ".csv")
+        tsv_streamer = GisaidSubmissionFormCSVStreamer
     elif request.public_repository_name.lower() == "genbank":
         metadata_rows = sample_info_to_genbank_rows(submission_information, prefix)
         metadata_rows.sort(key=lambda row: row.get("Sequence_ID"))  # type: ignore

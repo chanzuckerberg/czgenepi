@@ -1,13 +1,13 @@
 import { ButtonIcon, Icon, Tooltip } from "czifui";
 import { useState } from "react";
 import { TREE_STATUS } from "src/common/constants/types";
-import NextstrainConfirmationModal from "../../../NextstrainConfirmationModal";
+import { GalagoConfirmationModal } from "src/views/Data/components/GalagoConfirmationModal";
 
 interface Props {
   item: PhyloRun;
 }
 
-const OpenInNextstrainButton = ({ item }: Props): JSX.Element => {
+const OpenInGalagoButton = ({ item }: Props): JSX.Element => {
   const [open, setOpen] = useState(false);
   const { status, phyloTree } = item;
   const treeId = phyloTree?.id;
@@ -29,26 +29,27 @@ const OpenInNextstrainButton = ({ item }: Props): JSX.Element => {
         sdsStyle={isDisabled ? "light" : "dark"}
         title={
           isDisabled
-            ? "“View in Nextstrain” is only available for completed trees."
-            : "View in Nextstrain"
+            ? "“View in Galago” is only available for completed trees."
+            : "View in Galago"
         }
         placement="top"
       >
         <span>
           <ButtonIcon
-            aria-label="view in Nextstrain"
+            aria-label="view in Galago"
             disabled={isDisabled}
             onClick={handleClickOpen}
             sdsSize="small"
             sdsType="primary"
             size="large"
           >
-            <Icon sdsIcon="treeHorizontal" sdsSize="s" sdsType="iconButton" />
+            <Icon sdsIcon="lightBulb" sdsSize="s" sdsType="iconButton" />
           </ButtonIcon>
         </span>
       </Tooltip>
       {treeId && (
-        <NextstrainConfirmationModal
+        // TODO: (ehoops): replace this with the Galago modal as part of SC-214165
+        <GalagoConfirmationModal
           open={open}
           onClose={handleClose}
           treeId={treeId as number}
@@ -58,4 +59,4 @@ const OpenInNextstrainButton = ({ item }: Props): JSX.Element => {
   );
 };
 
-export { OpenInNextstrainButton };
+export { OpenInGalagoButton };

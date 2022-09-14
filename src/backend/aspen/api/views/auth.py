@@ -174,16 +174,11 @@ async def create_user_if_not_exists(
     except NoResultFound:
         raise ex.UnauthorizedException("Unknown group")
 
-    # Get the user's roles for this organization and tag them as group admins if necessary.
-    # TODO - user.group_admin and user.group_id are going away very soon, so we should
-    #        clean this up when we're ready.
-    roles = auth0_mgmt.get_org_user_roles(userinfo["org_id"], auth0_user_id)
-
     user_fields = {
         "name": userinfo["email"],
         "email": userinfo["email"],
         "auth0_user_id": auth0_user_id,
-        "group_admin": "admin" in roles,
+        "group_admin": False,
         "system_admin": False,
         "group": group,
     }
