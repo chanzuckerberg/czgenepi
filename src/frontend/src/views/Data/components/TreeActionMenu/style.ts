@@ -1,25 +1,31 @@
 import styled from "@emotion/styled";
 import { CommonThemeProps, getSpaces } from "czifui";
+import { accessibleFocusBorder } from "src/common/styles/accessibility";
 
-export const StyledActionWrapper = styled.div`
+export const StyledActionWrapper = styled.li`
+  list-style: none;
+  ${accessibleFocusBorder}
   ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 
     return `
-      padding: 0 ${spaces?.m}px;
+      margin: 0 ${spaces?.xs}px;
 
       &:last-child {
-        padding-right: 0;
+        margin-right: 0;
       }
+
+      padding: ${spaces?.xxxs}px;
     `;
   }}
 `;
 
-export const StyledTreeActionMenu = styled.div`
+export const StyledTreeActionMenu = styled.ul`
   display: flex;
   align-items: center;
   justify-content: right;
   width: 150px;
+  padding: 0;
 
   ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);

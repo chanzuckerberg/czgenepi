@@ -307,7 +307,9 @@ def sample_info_to_genbank_rows(
             ),
             "collection-date": sample_info["collection_date"].strftime("%Y-%m-%d"),
             "country": genbank_location,
-            "isolate": f"SARS-CoV-2/{sample_info['public_identifier']}",
+            "isolate": apply_pathogen_prefix_to_identifier(
+                sample_info["public_identifier"], pathogen_prefix
+            ),
         }
         genbank_metadata_rows.append(metadata_row)
     return genbank_metadata_rows

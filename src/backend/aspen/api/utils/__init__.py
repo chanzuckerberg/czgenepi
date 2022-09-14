@@ -26,6 +26,6 @@ from aspen.api.utils.sample import (  # noqa: F401
 from aspen.api.utils.tsv_streamer import (  # noqa: F401
     FieldSeparatedStreamer,
     GenBankSubmissionFormTSVStreamer,
-    GisaidSubmissionFormTSVStreamer,
+    GisaidSubmissionFormCSVStreamer,
     MetadataTSVStreamer,
 )

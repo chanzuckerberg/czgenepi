@@ -77,7 +77,7 @@ class NextstrainJob(SwipeJob):
     def run(self, run: PhyloRun, run_type: str):
         group = run.group
         now = datetime.datetime.now()
-        output_suffix = f"{group.name}/{str(now)}"
+        output_suffix = f"/{group.name}/{str(now)}"
         execution_name = f"{group.prefix}-{self.job_type}-nextstrain-{str(now)}"
         extra_params = {
             "s3_filestem": f"{group.location}/{run.tree_type}",

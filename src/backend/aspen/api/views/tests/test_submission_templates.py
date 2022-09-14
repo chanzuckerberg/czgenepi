@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.api.utils import (
     GenBankSubmissionFormTSVStreamer,
-    GisaidSubmissionFormTSVStreamer,
+    GisaidSubmissionFormCSVStreamer,
 )
 from aspen.database.models import Sample, UploadedPathogenGenome
 from aspen.test_infra.models.location import location_factory
@@ -79,16 +79,16 @@ async def test_submission_template_download_gisaid(
     )
     expected_filename = f"{today.strftime('%Y%m%d')}_GISAID_metadata.csv"
     assert res.status_code == 200
-    assert res.headers["Content-Type"] == "text/tsv"
+    assert res.headers["Content-Type"] == "text/csv"
     assert (
         res.headers["Content-Disposition"]
         == f"attachment; filename={expected_filename}"
     )
 
     file_contents = io.StringIO(str(res.content, encoding="UTF-8"))
-    tsvreader = csv.DictReader(file_contents, delimiter="\t")
+    tsvreader = csv.DictReader(file_contents, delimiter=",")
     assert set(list(tsvreader.fieldnames)) == set(  # type: ignore
-        GisaidSubmissionFormTSVStreamer.fields
+        GisaidSubmissionFormCSVStreamer.fields
     )
     tsvreader.__next__()  # skip human-readable headers
     row_count = 0
@@ -239,16 +239,16 @@ async def test_submission_template_prefix_stripping(
     )
     expected_filename = f"{today.strftime('%Y%m%d')}_GISAID_metadata.csv"
     assert res.status_code == 200
-    assert res.headers["Content-Type"] == "text/tsv"
+    assert res.headers["Content-Type"] == "text/csv"
     assert (
         res.headers["Content-Disposition"]
         == f"attachment; filename={expected_filename}"
     )
 
     file_contents = io.StringIO(str(res.content, encoding="UTF-8"))
-    tsvreader = csv.DictReader(file_contents, delimiter="\t")
+    tsvreader = csv.DictReader(file_contents, delimiter=",")
     assert set(list(tsvreader.fieldnames)) == set(  # type: ignore
-        GisaidSubmissionFormTSVStreamer.fields
+        GisaidSubmissionFormCSVStreamer.fields
     )
     tsvreader.__next__()  # skip human-readable headers
     row_count = 0
@@ -322,16 +322,16 @@ async def test_submission_template_incomplete_location(
     )
     expected_filename = f"{today.strftime('%Y%m%d')}_GISAID_metadata.csv"
     assert res.status_code == 200
-    assert res.headers["Content-Type"] == "text/tsv"
+    assert res.headers["Content-Type"] == "text/csv"
     assert (
         res.headers["Content-Disposition"]
         == f"attachment; filename={expected_filename}"
     )
 
     file_contents = io.StringIO(str(res.content, encoding="UTF-8"))
-    tsvreader = csv.DictReader(file_contents, delimiter="\t")
+    tsvreader = csv.DictReader(file_contents, delimiter=",")
     assert set(list(tsvreader.fieldnames)) == set(  # type: ignore
-        GisaidSubmissionFormTSVStreamer.fields
+        GisaidSubmissionFormCSVStreamer.fields
     )
     tsvreader.__next__()  # skip human-readable headers
     row_count = 0
