@@ -42,14 +42,14 @@ const OpenInGalagoButton = ({ item }: Props): JSX.Element => {
         sdsStyle={isDisabled ? "light" : "dark"}
         title={
           isDisabled
-            ? "“View in Galago” is only available for completed trees."
-            : "View in Galago"
+            ? `“Interpret in Galago” is only available for completed trees.`
+            : "Interpret in Galago"
         }
         placement="top"
       >
         <span>
           <ButtonIcon
-            aria-label="view in Galago"
+            aria-label="Interpret in Galago"
             disabled={isDisabled}
             onClick={handleClickOpen}
             sdsSize="small"
