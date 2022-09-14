@@ -6,8 +6,8 @@ import dotenv from 'dotenv';
 dotenv.config({path: path.resolve(`.env.${process.env.NODE_ENV}`),});
 
 
-const username = process.env.USERNAME as string;
-const password = process.env.PASSWORD as string;
+const username: string = process.env.USERNAME as string;
+const password: string = process.env.PASSWORD as string;
 
 async function globalSetup(config: FullConfig): Promise<void> {
   const { storageState } = config.projects[0].use;
