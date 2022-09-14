@@ -25,12 +25,13 @@ export default function EmailForm(): JSX.Element {
     <HeroEmailForm onSubmit={submitEmail}>
       <EmailInput
         placeholder="Your email address"
+        aria-labelledby="join-waitlist"
         value={enteredEmail}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
           setEnteredEmail(e.target.value);
         }}
       />
-      <SubmitButton type="submit">
+      <SubmitButton id="join-waitlist" type="submit">
         Join the waitlist
         <SubmitIcon>
           <FormSubmitArrow />
