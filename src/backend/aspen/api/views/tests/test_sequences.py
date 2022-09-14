@@ -5,7 +5,7 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.api.views.sequences import get_fasta_filename
-from aspen.database.models import Sample
+from aspen.database.models import Pathogen, Sample
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.pathogen import pathogen_factory
 from aspen.test_infra.models.pathogen_repo_config import (
@@ -62,8 +62,11 @@ async def test_prepare_sequences_download_gisaid(
         "sample_ids": [sample.public_identifier],
         "public_repository_name": "GISAID",
     }
+    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/pathogens/SC2/sequences/", headers=auth_headers, json=data
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/sequences/",
+        headers=auth_headers,
+        json=data,
     )
     assert res.status_code == 200
     expected_filename = get_fasta_filename("GISAID", group.name)
@@ -92,8 +95,11 @@ async def test_prepare_sequences_download_genbank(
         "sample_ids": [sample.public_identifier],
         "public_repository_name": "GenBank",
     }
+    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/pathogens/SC2/sequences/", headers=auth_headers, json=data
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/sequences/",
+        headers=auth_headers,
+        json=data,
     )
     assert res.status_code == 200
     expected_filename = get_fasta_filename("GenBank", group.name)
@@ -122,8 +128,11 @@ async def test_prepare_sequences_download_public_database_DNE(
         "sample_ids": [sample.public_identifier],
         "public_repository_name": "does not exist",
     }
+    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/pathogens/SC2/sequences/", headers=auth_headers, json=data
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/sequences/",
+        headers=auth_headers,
+        json=data,
     )
 
     assert (
@@ -146,9 +155,13 @@ async def test_prepare_sequences_download_no_submission(
     data = {
         "sample_ids": [sample.public_identifier],
     }
+    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/pathogens/SC2/sequences/", headers=auth_headers, json=data
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/sequences/",
+        headers=auth_headers,
+        json=data,
     )
+
     assert res.status_code == 200
     expected_filename = get_fasta_filename(None, group.name)
     assert (
@@ -194,8 +207,11 @@ async def test_prepare_sequences_download_no_access(
     data = {
         "sample_ids": [sample.public_identifier],
     }
+    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
     res = await http_client.post(
-        f"/v2/orgs/{viewer_group.id}/sequences/", headers=auth_headers, json=data
+        f"/v2/orgs/{viewer_group.id}/pathogens/{pathogen.slug}/sequences/",
+        headers=auth_headers,
+        json=data,
     )
     assert res.status_code == 200
     assert res.content == b""
@@ -228,8 +244,11 @@ async def test_prepare_sequences_download_viewer_no_access(
     data = {
         "sample_ids": [sample.public_identifier],
     }
+    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
     res = await http_client.post(
-        f"/v2/orgs/{viewer_group.id}/sequences/", headers=auth_headers, json=data
+        f"/v2/orgs/{viewer_group.id}/pathogens/{pathogen.slug}/sequences/",
+        headers=auth_headers,
+        json=data,
     )
 
     assert res.status_code == 200
@@ -305,8 +324,11 @@ async def test_access_matrix(
     # Make sure sample owners can see their own (shared & private) samples.
     owner_headers = {"name": owner.name, "user_id": owner.auth0_user_id}
     data = {"sample_ids": [sample1.public_identifier, sample4.public_identifier]}
+    pathogen = await Pathogen.get_by_slug(async_session, "SC2")
     res = await http_client.post(
-        f"/v2/orgs/{owner_group1.id}/sequences/", headers=owner_headers, json=data
+        f"/v2/orgs/{owner_group1.id}/pathogens/{pathogen.slug}/sequences/",
+        headers=owner_headers,
+        json=data,
     )
 
     assert res.status_code == 200
@@ -357,8 +379,11 @@ async def test_access_matrix(
         data = {
             "sample_ids": case["samples"],
         }
+        pathogen = await Pathogen.get_by_slug(async_session, "SC2")
         res = await http_client.post(
-            f"/v2/orgs/{viewer_group.id}/sequences/", headers=user_headers, json=data
+            f"/v2/orgs/{viewer_group.id}/pathogens/{pathogen.slug}/sequences/",
+            headers=user_headers,
+            json=data,
         )
 
         assert res.status_code == 200
