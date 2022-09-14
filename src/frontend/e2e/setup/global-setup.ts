@@ -1,10 +1,10 @@
 import { chromium, FullConfig } from "@playwright/test";
 import { getByID, getByTestID } from "../utils/selectors";
 import path from "path";
+import dotenv from 'dotenv';
 
-require("dotenv").config({
-  path: path.resolve(`.env.${process.env.NODE_ENV}`),
-});
+dotenv.config({path: path.resolve(`.env.${process.env.NODE_ENV}`),});
+
 
 const username = process.env.USERNAME as string;
 const password = process.env.PASSWORD as string;
