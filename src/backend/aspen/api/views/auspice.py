@@ -1,3 +1,23 @@
+"""
+Views for generating tree fetch magic links and accessing via those links.
+
+To enable accessing a phylo tree outside of our app (eg, Auspice or Galago),
+the user can generate a magic link that has auth embedded in the link. These
+links have a fixed expiration time, but within the expiration window, anyone
+with the link can pull the tree. This lets us generate a link, then send that
+link to another service to view/interpret whatever tree the link points to.
+
+NOTE
+While this file, the routing, and the functions are all named around "auspice"
+in various ways, that's a historical artifact. The first service we used this
+for was Auspice (from Nextstrain), and it was named for that, but at this point
+it's just generally for enabling external access to trees (like for Galago).
+TODO (nice-to-have) [Vince]: Would be good to rename to a more general name
+rather than "auspice" -- "treefetch" or "fetch/tree" "magicfetch" or ???
+However the name shows up in a lot of places -- filenames, functions, tests,
+routing, and a bit on FE as well -- so I'm taking the easy way out right now
+and just leaving the name alone.
+"""
 import hashlib
 import hmac
 import json
