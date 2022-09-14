@@ -1,5 +1,9 @@
 import { expect, test } from "@playwright/test";
 import { getByTestID } from "../utils/selectors";
+import path from "path";
+import dotenv from 'dotenv';
+
+dotenv.config({path: path.resolve(`.env.${process.env.NODE_ENV}`),});
 
 const footer: Record<string, string> = {
   Github: "https://github.com/chanzuckerberg/czgenepi/",
@@ -7,14 +11,11 @@ const footer: Record<string, string> = {
     "https://chanzuckerberg.com/careers/career-opportunities/?initiative=science",
   "Learning Center":
     "https://help.czgenepi.org/hc/en-us/categories/6217716150804-Genomic-Epidemiology-Learning-Center",
-  //"Privacy":  "/privacy",
-  //"Terms":  "/terms",
-  //"Contact Us":  "mailto:hello@czgenepi.org"
 };
 
 test.describe("Home page tests", () => {
   test("Should verify home page", async ({ page }) => {
-    await page.goto("https://staging.czgenepi.org");
+    await page.goto(process.env.BASEURL as string);
     await expect(page.locator(getByTestID("navbar-landing"))).not.toBeEmpty();
     await expect(
       page.locator(getByTestID("navbar-sign-in-link"))

@@ -6,7 +6,7 @@ import * as path from 'path';
 
 
 export class UploadSample {
-  public static async uploadFiles(
+  public static async uploadSequencingFiles(
     page: Page,
     uploadData: UploadData,
   ): Promise<any> {
@@ -52,23 +52,11 @@ export class UploadSample {
     await page.waitForSelector("form div[role='table'] > .MuiTableBody-root");
   }
 
-  // prefix each file name with path. set default if not file provided
-  public static getFullSampleFilePaths(
-    fileNames?: Array<string>
-  ): Array<string> {
-    const files = fileNames !== undefined ? fileNames : ["sampleData.fasta"];
-    const fullPathFiles: Array<string> = [];
-    files.forEach((file) => {
-      fullPathFiles.push(`../fixtures/${file}`);
-    });
-    return fullPathFiles;
-  }
-
   //to be replaced by mock data in a separate PR
   public static getSampleData(): Array<SampleData> {
     return [
       {
-        collectionDate: "2022-07-01",
+        collectionDate: faker.datatype.string(8),
         collectionLocation: "Africa/Angola/Luanda/Calemba",
         isPrivate: true,
         privateId: faker.datatype.string(8),
@@ -76,7 +64,7 @@ export class UploadSample {
         sequencingDate: faker.date.recent(10).toISOString().substring(0, 10),
       },
       {
-        collectionDate: "2022-08-01",
+        collectionDate: faker.datatype.string(8),
         collectionLocation: "Europe/Russia/Kaluga/Tarusa",
         isPrivate: true,
         privateId: faker.datatype.string(8),
@@ -84,7 +72,7 @@ export class UploadSample {
         sequencingDate: faker.date.recent(10).toISOString().substring(0, 10),
       },
       {
-        collectionDate: "2022-04-01",
+        collectionDate: faker.datatype.string(8),
         collectionLocation: "Asia/China",
         isPrivate: true,
         privateId: faker.datatype.string(8),

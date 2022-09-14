@@ -18,7 +18,7 @@ test.describe("Upload sample tests", () => {
         dataFile: extenstion,
         samples: UploadSample.getSampleData(),
       };
-      await UploadSample.uploadFiles(page, uploadData);
+      await UploadSample.uploadSequencingFiles(page, uploadData);
       await expect(page.locator("//button[not(contains(@class,'Mui-disabled')) and text()='Continue']")).toBeVisible()
     });
   });
@@ -33,7 +33,7 @@ test.describe("Upload sample tests", () => {
       dataFile: ".txt",
       samples: samples,
     };
-    await UploadSample.uploadFiles(page, uploadData);
+    await UploadSample.uploadSequencingFiles(page, uploadData);
     const errors = page.locator(
       "//input[@name='collectionDate']/../../p"
     );
@@ -52,7 +52,7 @@ test.describe("Upload sample tests", () => {
       dataFile: ".txt",
       samples: samples,
     };
-    await UploadSample.uploadFiles(page, uploadData);
+    await UploadSample.uploadSequencingFiles(page, uploadData);
     const errors = page.locator(
       "//input[@name='sequencingDate']/../following-sibling::p"
     );
