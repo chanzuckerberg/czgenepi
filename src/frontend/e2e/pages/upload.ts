@@ -12,22 +12,32 @@ export class UploadSample {
   ): Promise<any> {
     //click upload button
     await page.locator("a[href$='/upload/step1']").click();
-    await UploadSample.selectSample(page,uploadData.dataFile);
+    await UploadSample.getSampleDataFile(page,uploadData.dataFile);
     // complete form
     for(let i = 0; i < uploadData.samples.length; i++){
+      // fill public ID input
+      // TODO modify selector
       await page.locator(`//div[contains(@class,'MuiTableBody-root')]/div[@role='row'][${i+1}]/descendant::input[@name='publicId']`).type(uploadData.samples[i].publicId);
+       // fill collection date input
+       // TODO modify selector
       await page.locator(`//div[contains(@class,'MuiTableBody-root')]/div[@role='row'][${i+1}]/descendant::input[@name='collectionDate']`).type(uploadData.samples[i].collectionDate);
+       // fill search for location input from emergent widget
+       // TODO modify selector
       await page.locator(`//div[contains(@class,'MuiTableBody-root')]/div[@role='row'][${i+1}]/descendant::button[@label='Search For Location']`).click();
       await page.locator("//div[@role='tooltip']/descendant::input").type(uploadData.samples[i].collectionLocation,{delay:150});
       await page.keyboard.press("ArrowDown");
       await page.keyboard.press("Enter");
+      // fill sequencing date input
+      // TODO modify selector
       await page.locator(`//div[contains(@class,'MuiTableBody-root')]/div[@role='row'][${i+1}]/descendant::input[@name='sequencingDate']`).type(uploadData.samples[i].sequencingDate);
+       // toggle keep private switch 
+       // TODO modify selector
       await page.locator(`//div[contains(@class,'MuiTableBody-root')]/div[@role='row'][${i+1}]/descendant::input[@name='keepPrivate']`).click();
     }
     
   }
 
-  public static async selectSample(
+  public static async getSampleDataFile(
     page: Page,
     fileName: string
   ): Promise<void> {
