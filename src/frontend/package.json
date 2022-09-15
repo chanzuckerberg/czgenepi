@@ -19,7 +19,7 @@
     "lint-e2e": "concurrently \"node_modules/.bin/eslint --fix e2e/**/*.ts\" \"node_modules/.bin/stylelint --fix 'e2e/**/*.ts'\"  \"npm run type-check\"",
     "pl:staging": "NODE_ENV=staging npx playwright test --headed -c ./e2e/setup/staging.config.ts",
     "pl:local": "NODE_ENV=local npx playwright test --headed -c ./e2e/setup/local.config.ts",
-    "pl:staging:headless": "NODE_ENV=local NODE_ENV=staging npx playwright test --headless -c ./e2e/setup/staging.config.ts",
+    "pl:staging:headless": "NODE_ENV=staging npx playwright test --headless -c ./e2e/setup/staging.config.ts",
     "pl:staging:debug": "NODE_ENV=staging npx playwright test --debug -c ./e2e/setup/staging.config.ts",
     "pl:report": "npx playwright show-report"
   },
