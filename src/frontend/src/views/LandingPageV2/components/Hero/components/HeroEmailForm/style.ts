@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import { iconFillWhite } from "src/common/styles/iconStyle";
 import { SmallerThanBreakpoint } from "src/common/styles/mixins/global";
 
 export const HeroEmailForm = styled.form`
@@ -78,4 +79,5 @@ export const SubmitButton = styled.button`
 
 export const SubmitIcon = styled.span`
   margin-left: 10px;
+  ${iconFillWhite}
 `;

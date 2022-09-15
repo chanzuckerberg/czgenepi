@@ -67,8 +67,6 @@ class Group(idbase, DictMixin):  # type: ignore
         server_default=text("'{}'::jsonb"),
     )
 
-    members = relationship("User", back_populates="group")  # type: ignore
-
     def __repr__(self):
         return f"Group <{self.name}>"
 
@@ -92,7 +90,6 @@ class User(idbase, DictMixin):  # type: ignore
     name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     auth0_user_id = Column(String, unique=True, nullable=False)
-    group_admin = Column(Boolean, nullable=True)
     system_admin = Column(Boolean, nullable=False)
     agreed_to_tos = Column(Boolean, nullable=False, default=False)
     # Date of policies (any of Privacy Policy, Terms of Service, etc, etc) the user
@@ -105,9 +102,6 @@ class User(idbase, DictMixin):  # type: ignore
         String, unique=True, nullable=False, default=generate_random_id
     )
     gisaid_submitter_id = Column(String, nullable=True, default=None)
-
-    group_id = Column(Integer, ForeignKey(Group.id), nullable=False)
-    group = relationship("Group", back_populates="members")  # type: ignore
 
     def __repr__(self):
         return f"User <{self.name}>"

@@ -15,7 +15,7 @@ export default function QuoteSlider(): JSX.Element {
   };
 
   return (
-    <QuoteSliderContainer>
+    <QuoteSliderContainer role="region" aria-label="User Quotes">
       <Slider {...settings}>
         <Quote
           quoteText='Obtaining adequate resources in this area is a constant challenge and we would not have been able to do this otherwise. For years, we’ve watched better-resourced regions, like LA and the Bay Area, quickly bring on technological advancements that further the field. It is wonderful to finally be able to be a part of this and, through our testing for surrounding counties, support the communities in our entire region."'

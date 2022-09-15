@@ -8,10 +8,12 @@ export default function Quote(props: {
   return (
     <QuoteContainer>
       <QuoteIcon>
-        <QuoteIconImg />
+        <QuoteIconImg title="quote" />
       </QuoteIcon>
       <QuoteText>{props.quoteText}</QuoteText>
-      <Citation>{props.citation}</Citation>
+      <Citation aria-label={`citation ${props.citation}`}>
+        {props.citation}
+      </Citation>
     </QuoteContainer>
   );
 }

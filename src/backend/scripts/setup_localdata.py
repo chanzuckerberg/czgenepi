@@ -58,9 +58,7 @@ def create_test_user(session, email, group, user_id, name):
         split_id=user_id,
         analytics_id=user_id,
         email=email,
-        group_admin=True,
         system_admin=True,
-        group=group,
         agreed_to_tos=True,  # TODO - FE tests need to be updated for agree modal!
     )
     session.add(u)
