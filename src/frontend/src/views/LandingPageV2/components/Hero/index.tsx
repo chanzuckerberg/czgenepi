@@ -28,7 +28,7 @@ export default function Hero(): JSX.Element {
           <EmailForm />
         </HeroTextSection>
         <HeroImage>
-          <HeroBackgroundSvg />
+          <HeroBackgroundSvg aria-hidden="true" />
         </HeroImage>
         <NextstrainContainer>
           <PartnershipText>In partnership with</PartnershipText>

@@ -157,7 +157,3 @@ export const OrgSplash = styled.span`
 export const TextLink = styled.a`
   margin: 0 10px;
 `;
-
-export const HiddenTitle = styled.title`
-  ${srOnly}
-`;
