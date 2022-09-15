@@ -19,7 +19,7 @@ def upgrade():
         """
         UPDATE aspen.samples
         SET pathogen_id=(
-            SELECT id from aspen.pathogens WHERE name='SARS-CoV-2'
+            SELECT id from aspen.pathogens WHERE slug='SC2'
         )
         WHERE pathogen_id IS NULL
         """
