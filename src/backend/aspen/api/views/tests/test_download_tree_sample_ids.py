@@ -77,11 +77,13 @@ async def create_phylotree_with_inputs(
     )
     samples = []
     input_entities = []
+    pathogen = random_pathogen_factory()
     for i in range(3):
         sample = sample_factory(
             owner_group,
             user,
             location,
+            pathogen=pathogen,
             public_identifier=str(uuid.uuid4()),
             private_identifier=str(uuid.uuid4()),
         )
@@ -92,7 +94,6 @@ async def create_phylotree_with_inputs(
         input_entities.append(input_entity)
 
     db_gisaid_samples = ["hCoV-19/gisaid_identifier", "hCoV-19/gisaid_identifier2"]
-    pathogen: Pathogen = random_pathogen_factory()
     phylo_run = phylorun_factory(
         owner_group,
         inputs=input_entities,
@@ -119,10 +120,12 @@ async def create_phylotree(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
+    pathogen: Pathogen = random_pathogen_factory()
     sample = sample_factory(
         owner_group,
         user,
         location,
+        pathogen=pathogen,
         public_identifier=str(uuid.uuid4()),
         private_identifier=str(uuid.uuid4()),
     )
@@ -132,7 +135,6 @@ async def create_phylotree(
     run_inputs = []
     if sample_as_input:
         run_inputs = [upg]
-    pathogen: Pathogen = random_pathogen_factory()
     phylo_tree = phylotree_factory(
         phylorun_factory(owner_group, pathogen=pathogen, inputs=run_inputs),
         samples,
@@ -256,6 +258,7 @@ async def test_tree_metadata_replaces_all_ids(
         group,
         user,
         samples[0].collection_location,
+        pathogen=phylo_tree.pathogen,
         public_identifier=str(uuid.uuid4()),
         private_identifier=str(uuid.uuid4()),
     )
@@ -301,6 +304,7 @@ async def test_public_tree_metadata_replaces_all_ids(
         group,
         user,
         samples[0].collection_location,
+        pathogen=phylo_tree.pathogen,
         public_identifier=str(uuid.uuid4()),
         private_identifier=str(uuid.uuid4()),
     )

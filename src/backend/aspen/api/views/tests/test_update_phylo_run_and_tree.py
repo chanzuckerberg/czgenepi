@@ -29,17 +29,18 @@ async def make_shared_test_data(
     )
     group = group_factory(default_tree_location=location)
     user = await userrole_factory(async_session, group, system_admin=system_admin)
+    pathogen = random_pathogen_factory()
     samples = [
         sample_factory(
             group,
             user,
             location,
+            pathogen=pathogen,
             private_identifier=f"private_identifier_{i}",
             public_identifier=f"public_identifier_{i}",
         )
         for i in range(1, 3)
     ]
-    pathogen = random_pathogen_factory()
     phylo_run = phylorun_factory(group, pathogen=pathogen)
     phylo_tree = None
     if not no_trees:

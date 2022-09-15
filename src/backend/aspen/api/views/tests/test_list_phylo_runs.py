@@ -30,13 +30,14 @@ pytestmark = pytest.mark.asyncio
 
 
 def make_sample_data(
-    group: Group, user: User, location: Location, n_samples: int
+    group: Group, user: User, location: Location, n_samples: int, pathogen: Pathogen
 ) -> Collection[Sample]:
     samples: Collection[Sample] = [
         sample_factory(
             group,
             user,
             location,
+            pathogen=pathogen,
             public_identifier=f"public_identifier_{ix}",
             private_identifier=f"private_identifier_{ix}",
         )
@@ -92,11 +93,13 @@ def make_all_test_data(
     Sequence[PhyloTree],
     Collection[PhyloRun],
 ]:
-    samples: Collection[Sample] = make_sample_data(group, user, location, n_samples)
+    pathogen: Pathogen = random_pathogen_factory()
+    samples: Collection[Sample] = make_sample_data(
+        group, user, location, n_samples, pathogen
+    )
     uploaded_pathogen_genomes: Collection[
         UploadedPathogenGenome
     ] = make_uploaded_pathogen_genomes(samples)
-    pathogen: Pathogen = random_pathogen_factory()
     trees: Sequence[PhyloTree] = make_trees(group, pathogen, samples, n_trees)
     treeless_runs: Collection[PhyloRun] = make_runs_with_no_trees(group, pathogen)
     return pathogen, samples, uploaded_pathogen_genomes, trees, treeless_runs
