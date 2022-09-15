@@ -33,7 +33,7 @@ export default function Hero(): JSX.Element {
         <NextstrainContainer>
           <PartnershipText>In partnership with</PartnershipText>
           <NextstrainLink href={ROUTES.NEXTSTRAIN} target="_blank">
-            <Image src={NextstrainLogo} alt="" />
+            <Image src={NextstrainLogo} alt="NextStrain" />
           </NextstrainLink>
         </NextstrainContainer>
       </HeroMaxWidthContainer>
