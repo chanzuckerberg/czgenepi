@@ -39,7 +39,7 @@ export const HeaderTopLinks = styled.div`
   `)}
 `;
 
-export const HeaderContainer = styled.div`
+export const HeaderContainer = styled.header`
   background: black;
   color: white;
 
@@ -135,6 +135,11 @@ export const MobileNavTray = styled.div`
   background-color: #ffffff;
   z-index: 10;
   transition: all 0.4s;
+  display: none;
+  ${SmallerThanBreakpoint(`
+    display: inline-block;
+    cursor: pointer;
+  `)}
 `;
 
 export const OrgSplash = styled.span`

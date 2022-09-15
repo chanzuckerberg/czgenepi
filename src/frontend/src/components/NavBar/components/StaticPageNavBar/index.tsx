@@ -115,7 +115,7 @@ export default function StaticPageNavBar(): JSX.Element {
       <HeaderMaxWidthContainer>
         <HeaderTopContainer>
           <HeaderLogoContainer href={userInfo ? ROUTES.DATA : ROUTES.HOMEPAGE}>
-            <HeaderLogo data-test-id="logo" />
+            <HeaderLogo data-test-id="logo" title="CZ Gen Epi Home" />
             {orgSplash ? <OrgSplash>{orgSplash}</OrgSplash> : null}
           </HeaderLogoContainer>
           <HeaderTopLinks>{RightNav}</HeaderTopLinks>
