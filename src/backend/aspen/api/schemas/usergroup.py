@@ -57,7 +57,6 @@ class UserMeResponse(UserBaseResponse):
     split_id: str
     analytics_id: str
     gisaid_submitter_id: Optional[str]
-    group: GroupResponse
     groups: List[GroupRoleResponse]
 
 

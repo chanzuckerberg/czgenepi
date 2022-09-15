@@ -207,8 +207,7 @@ async def get_group_context(
     user: User = Depends(get_auth_user),
 ) -> Optional[int]:
     # Look for a group context in one of these places.
-    # NOTE - user.group_id is going to go away soon but we need it temporarily.
-    group = group_id or org_id or user.group_id
+    group = group_id or org_id
     return group
 
 
