@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import List, Optional
 
 import sentry_sdk
 import uvicorn
@@ -32,17 +32,37 @@ from aspen.util.split import SplitClient
 
 
 def get_allowed_origins() -> List[str]:
-    allowed_origins = []
-    deployment = os.getenv("DEPLOYMENT_STAGE")
-    frontend_url = os.getenv("FRONTEND_URL")
+    """Allowed origins for cross origin requests. See `CORSMiddleware`.
 
-    if deployment not in ["gestaging", "geprod", "staging", "prod"]:
-        allowed_origins.extend(
-            [r"http://.*\.genepinet\.localdev:\d+", r"^http://localhost:\d+"]
-        )
+    Gets list of all allowed origins for cross origin requests. This is pretty
+    simple right now: we only serve the FE of our app and Galago with content
+    from our BE, so that's all this needs to cover. For ease, the Galago URLs
+    are just hardcoded. If we ever need to start handling a lot more CORS
+    requests or the Galago URLs become more dynamic, we should reevaluate
+    current process.
+    """
+    allowed_origins = [
+        "https://galago.czgenepi.org",
+        "https://galago-labs.czgenepi.org",
+    ]
+    frontend_url = os.getenv("FRONTEND_URL")
     if frontend_url:
         allowed_origins.append(frontend_url)
     return allowed_origins
+
+
+def get_allowed_origin_regex() -> Optional[str]:
+    """Allowed origin regex for cross origin requests. See `CORSMiddleware`.
+
+    This is here to enable working on Galago in localdev. Since we don't
+    have a standard port to run Galago on in localdev (everybody wants 3000),
+    this is just a catchall for all ports to enable CORS in localdev.
+    """
+    allowed_origin_regex = None  # default case, do not use regex for CORS
+    deployment = os.getenv("DEPLOYMENT_STAGE")
+    if deployment == "local":
+        allowed_origin_regex = r"^http://localhost:\d+"
+    return allowed_origin_regex
 
 
 def get_app() -> FastAPI:
@@ -82,6 +102,7 @@ def get_app() -> FastAPI:
     _app.add_middleware(
         CORSMiddleware,
         allow_origins=get_allowed_origins(),
+        allow_origin_regex=get_allowed_origin_regex(),
         allow_headers=["Content-Type"],
         allow_credentials=True,
         max_age=600,
