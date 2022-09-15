@@ -20,7 +20,7 @@ from aspen.database.models import (
 )
 from aspen.test_infra.models.gisaid_metadata import gisaid_metadata_factory
 from aspen.test_infra.models.location import location_factory
-from aspen.test_infra.models.pathogen import pathogen_factory
+from aspen.test_infra.models.pathogen import pathogen_factory, random_pathogen_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
 from aspen.test_infra.models.usergroup import (
@@ -399,6 +399,7 @@ async def _test_samples_view_cansee(
         user,
         location,
         private=True,
+        pathogen=sc2,
         private_identifier="private_id",
         public_identifier="public_id_2",
     )
@@ -607,6 +608,7 @@ async def test_bulk_delete_sample_success(
     """
     Test successful sample deletion by ID
     """
+    pathogen: Pathogen = random_pathogen_factory()
     group = group_factory()
     user = await userrole_factory(async_session, group)
     location = location_factory(
@@ -617,6 +619,7 @@ async def test_bulk_delete_sample_success(
             group,
             user,
             location,
+            pathogen=pathogen,
             public_identifier="path/to/sample_id1",
             private_identifier="i_dont_have_spaces1",
         ),
@@ -624,6 +627,7 @@ async def test_bulk_delete_sample_success(
             group,
             user,
             location,
+            pathogen=pathogen,
             public_identifier="path/to/sample id2",
             private_identifier="i have spaces2",
         ),
@@ -631,6 +635,7 @@ async def test_bulk_delete_sample_success(
             group,
             user,
             location,
+            pathogen=pathogen,
             public_identifier="path/to/sample_id3",
             private_identifier="i have spaces3",
         ),
@@ -645,7 +650,7 @@ async def test_bulk_delete_sample_success(
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.request(
         "DELETE",
-        f"/v2/orgs/{group.id}/pathogens/SC2/samples/",
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/samples/",
         json=body,
         headers=auth_headers,
     )
@@ -673,6 +678,7 @@ async def test_delete_sample_success(
     """
     Test successful sample deletion by ID
     """
+    pathogen: Pathogen = random_pathogen_factory()
     group = group_factory()
     user = await userrole_factory(async_session, group)
     location = location_factory(
@@ -683,6 +689,7 @@ async def test_delete_sample_success(
             group,
             user,
             location,
+            pathogen=pathogen,
             public_identifier="path/to/sample_id1",
             private_identifier="i_dont_have_spaces1",
         ),
@@ -690,6 +697,7 @@ async def test_delete_sample_success(
             group,
             user,
             location,
+            pathogen=pathogen,
             public_identifier="path/to/sample id2",
             private_identifier="i have spaces2",
         ),
@@ -697,6 +705,7 @@ async def test_delete_sample_success(
             group,
             user,
             location,
+            pathogen=pathogen,
             public_identifier="path/to/sample_id3",
             private_identifier="i have spaces3",
         ),
@@ -710,7 +719,7 @@ async def test_delete_sample_success(
     for sample in [samples[0], samples[1]]:
         auth_headers = {"user_id": user.auth0_user_id}
         res = await http_client.delete(
-            f"/v2/orgs/{group.id}/pathogens/SC2/samples/{sample.id}",
+            f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/samples/{sample.id}",
             headers=auth_headers,
         )
         assert res.status_code == 200
@@ -759,11 +768,12 @@ async def test_delete_sample_failures(
     Test a sample deletion failure by a user without write access
     """
     group = group_factory()
+    pathogen = random_pathogen_factory()
     user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    sample = sample_factory(group, user, location)
+    sample = sample_factory(group, user, location, pathogen=pathogen)
     upg = uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     async_session.add(upg)
     async_session.add(group)
@@ -780,7 +790,7 @@ async def test_delete_sample_failures(
         "North America", "USA", "California", "San Francisco County"
     )
     sample2 = sample_factory(
-        group2, user2, location2
+        group2, user2, location2, pathogen=pathogen
     )  # A sample that user2 *can* delete
     async_session.add(group2)
     await async_session.commit()
@@ -788,7 +798,7 @@ async def test_delete_sample_failures(
     # Request this sample as a user who shouldn't be able to delete it.
     auth_headers = {"user_id": user2.auth0_user_id}
     res = await http_client.delete(
-        f"/v2/orgs/{group.id}/pathogens/SC2/samples/{sample.id}",
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/samples/{sample.id}",
         headers=auth_headers,
     )
     assert res.status_code == 403
@@ -796,7 +806,7 @@ async def test_delete_sample_failures(
     # Make sure this sample isn't found under the user's group context
     auth_headers = {"user_id": user2.auth0_user_id}
     res = await http_client.delete(
-        f"/v2/orgs/{group2.id}/pathogens/SC2/samples/{sample.id}",
+        f"/v2/orgs/{group2.id}/pathogens/{pathogen.slug}/samples/{sample.id}",
         headers=auth_headers,
     )
     assert res.status_code == 404
@@ -811,7 +821,7 @@ async def test_delete_sample_failures(
     # https://www.python-httpx.org/compatibility/#request-body-on-http-methods
     res = await http_client.request(
         method="DELETE",
-        url=f"/v2/orgs/{group.id}/pathogens/SC2/samples/",
+        url=f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/samples/",
         content=json.dumps({"ids": [sample.id, sample2.id]}),
         headers=auth_headers,
     )
@@ -819,7 +829,7 @@ async def test_delete_sample_failures(
 
     res = await http_client.request(
         method="DELETE",
-        url=f"/v2/orgs/{group2.id}/pathogens/SC2/samples/",
+        url=f"/v2/orgs/{group2.id}/pathogens/{pathogen.slug}/samples/",
         content=json.dumps({"ids": [sample.id, sample2.id]}),
         headers=auth_headers,
     )
@@ -828,7 +838,7 @@ async def test_delete_sample_failures(
     # Test that our multi-delete endpoint succeeds if we only specify an owned sample
     res = await http_client.request(
         method="DELETE",
-        url=f"/v2/orgs/{group2.id}/pathogens/SC2/samples/",
+        url=f"/v2/orgs/{group2.id}/pathogens/{pathogen.slug}/samples/",
         content=json.dumps({"ids": [sample2.id]}),
         headers=auth_headers,
     )
@@ -836,7 +846,7 @@ async def test_delete_sample_failures(
 
 
 async def make_test_samples(
-    async_session: AsyncSession, suffix=None
+    async_session: AsyncSession, pathogen: Pathogen, suffix=None
 ) -> Tuple[User, Group, List[Sample], Location]:
     group = group_factory(name=f"testgroup{suffix}")
     user = await userrole_factory(
@@ -856,6 +866,7 @@ async def make_test_samples(
             group,
             user,
             location1,
+            pathogen=pathogen,
             public_identifier="path/to/sample_id1",
             private_identifier="i_dont_have_spaces1",
         ),
@@ -863,6 +874,7 @@ async def make_test_samples(
             group,
             user,
             location1,
+            pathogen=pathogen,
             public_identifier="path/to/sample id2",
             private_identifier="i have spaces2",
         ),
@@ -870,6 +882,7 @@ async def make_test_samples(
             group,
             user,
             location1,
+            pathogen=pathogen,
             public_identifier="path/to/sample_id3",
             private_identifier="i have spaces3",
         ),
@@ -890,7 +903,8 @@ async def test_update_samples_success(
     """
     Test successful sample update
     """
-    user, group, samples, newlocation = await make_test_samples(async_session)
+    pathogen: Pathogen = random_pathogen_factory()
+    user, group, samples, newlocation = await make_test_samples(async_session, pathogen)
 
     auth_headers = {"user_id": user.auth0_user_id}
 
@@ -957,10 +971,11 @@ async def test_update_samples_success(
     # Tell SqlAlchemy to forget about the samples in its identity map
     # TODO FIXME- we shouldn't have to do this!
     group_id = group.id  # Stash this id so we can use it
+    pathogen_slug = pathogen.slug  # Stash this id so we can use it
     async_session.expire_all()
 
     res = await http_client.put(
-        f"/v2/orgs/{group_id}/pathogens/SC2/samples",
+        f"/v2/orgs/{group_id}/pathogens/{pathogen_slug}/samples",
         json=request_data,
         headers=auth_headers,
     )
@@ -1023,9 +1038,10 @@ async def test_update_samples_access_denied(
     """
     Test update failures
     """
-    user, group, samples, newlocation = await make_test_samples(async_session)
+    pathogen: Pathogen = random_pathogen_factory()
+    user, group, samples, newlocation = await make_test_samples(async_session, pathogen)
     user2, group2, samples2, newlocation2 = await make_test_samples(
-        async_session, suffix="2"
+        async_session, pathogen, suffix="2"
     )
 
     auth_headers = {"user_id": user.auth0_user_id}
@@ -1045,7 +1061,7 @@ async def test_update_samples_access_denied(
     }
 
     res = await http_client.put(
-        f"/v2/orgs/{group.id}/pathogens/SC2/samples",
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/samples",
         json=data,
         headers=auth_headers,
     )
@@ -1059,7 +1075,8 @@ async def test_update_samples_request_failures(
     """
     Test update failures
     """
-    user, group, samples, newlocation = await make_test_samples(async_session)
+    pathogen = random_pathogen_factory()
+    user, group, samples, newlocation = await make_test_samples(async_session, pathogen)
 
     auth_headers = {"user_id": user.auth0_user_id}
 
@@ -1145,7 +1162,7 @@ async def test_update_samples_request_failures(
         data = {"samples": [request]}
 
         res = await http_client.put(
-            f"/v2/orgs/{group.id}/pathogens/SC2/samples",
+            f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/samples",
             json=data,
             headers=auth_headers,
         )
@@ -1154,7 +1171,7 @@ async def test_update_samples_request_failures(
 
 async def setup_validation_data(async_session: AsyncSession):
     group = group_factory()
-    pathogen = pathogen_factory()
+    pathogen = random_pathogen_factory()
     user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
@@ -1197,7 +1214,7 @@ async def test_validation_endpoint(
     }
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/pathogens/SC2/samples/validate_ids/",
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/samples/validate_ids/",
         json=data,
         headers=auth_headers,
     )
@@ -1233,7 +1250,7 @@ async def test_validation_endpoint_missing_identifier(
     }
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/pathogens/SC2/samples/validate_ids/",
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/samples/validate_ids/",
         json=data,
         headers=auth_headers,
     )

@@ -54,6 +54,7 @@ async def test_phylo_tree_rename(
     can_see_group = group_factory("can_see")
     wrong_can_see_group = group_factory("wrong_can_see")
     no_can_see_group = group_factory("no_can_see")
+    pathogen = random_pathogen_factory()
     admin_roles = await grouprole_factory(
         async_session, can_see_group, viewer_group, "admin"
     )
@@ -76,6 +77,7 @@ async def test_phylo_tree_rename(
             viewer_group,
             user,
             location,
+            pathogen=pathogen,
             private_identifier=f"private_identifier_{i}",
             public_identifier=f"public_identifier_{i}",
         )
@@ -87,6 +89,7 @@ async def test_phylo_tree_rename(
             can_see_group,
             user,
             location,
+            pathogen=pathogen,
             private_identifier=f"private_identifier_can_see_{i}",
             # Make sure our renaming works properly if our db samples have the gisaid prefix in them.
             public_identifier=f"hCoV-19/public_identifier_can_see_{i}",
@@ -98,6 +101,7 @@ async def test_phylo_tree_rename(
             wrong_can_see_group,
             user,
             location,
+            pathogen=pathogen,
             private_identifier=f"private_identifer_wrong_{i}",
             public_identifier=f"public_identifier_wrong_{i}",
         )
@@ -108,13 +112,13 @@ async def test_phylo_tree_rename(
             no_can_see_group,
             user,
             location,
+            pathogen=pathogen,
             private_identifier=f"private_identifer_nosee_{i}",
             public_identifier=f"public_identifier_nosee_{i}",
         )
         for i in range(2)
     ]
 
-    pathogen = random_pathogen_factory()
     phylo_tree = phylotree_factory(
         phylorun_factory(viewer_group, pathogen=pathogen),
         local_samples + can_see_samples + wrong_can_see_samples + no_can_see_samples,

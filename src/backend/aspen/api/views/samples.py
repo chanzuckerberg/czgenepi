@@ -118,6 +118,7 @@ async def get_write_samples_by_ids(
         joinedload(Sample.submitting_group),
         joinedload(Sample.uploaded_by),
         joinedload(Sample.collection_location),
+        joinedload(Sample.pathogen),
     ).filter(
         Sample.id.in_(sample_ids)
     )  # type: ignore
