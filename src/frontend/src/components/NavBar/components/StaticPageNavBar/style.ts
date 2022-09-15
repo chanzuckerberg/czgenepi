@@ -1,5 +1,4 @@
 import styled from "@emotion/styled";
-import { srOnly } from "src/common/styles/accessibility";
 import { SmallerThanBreakpoint } from "src/common/styles/mixins/global";
 
 export const Bar = styled.div`
