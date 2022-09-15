@@ -1176,7 +1176,7 @@ async def setup_validation_data(async_session: AsyncSession):
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    sample = sample_factory(group, user, location)
+    sample = sample_factory(group, user, location, pathogen=pathogen)
     gisaid_sample = gisaid_metadata_factory()
     isl_sample = gisaid_metadata_factory(
         strain="USA/ISL-TEST/hCov-19", gisaid_epi_isl="EPI_ISL_3141592"

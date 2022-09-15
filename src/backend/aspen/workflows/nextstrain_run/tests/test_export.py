@@ -69,7 +69,7 @@ def create_test_data(
         session.query(Pathogen).filter(Pathogen.slug == "SC2").one_or_none()
     )
     if not pathogen:
-        pathogen = pathogen_factory()
+        pathogen = pathogen_factory("SC2", "SARS-CoV-2")
     session.add(group)
 
     gisaid_samples: List[str] = [
@@ -77,7 +77,7 @@ def create_test_data(
     ]
 
     pathogen_genomes = uploaded_pathogen_genome_multifactory(
-        group, uploaded_by_user, location, num_county_samples
+        group, pathogen, uploaded_by_user, location, num_county_samples
     )
 
     selected_samples = pathogen_genomes[:num_selected_samples]

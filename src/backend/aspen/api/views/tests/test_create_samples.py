@@ -425,7 +425,12 @@ async def test_samples_create_view_fail_duplicate_ids(
     )
     async_session.add(group)
     sample = sample_factory(
-        group, user, location, pathogen=pathogen, private_identifier="private", public_identifier="public"
+        group,
+        user,
+        location,
+        pathogen=pathogen,
+        private_identifier="private",
+        public_identifier="public",
     )
     async_session.add(pathogen)
     async_session.add(sample)
@@ -485,7 +490,12 @@ async def test_samples_create_view_fail_duplicate_ids_in_request_data(
         "North America", "USA", "California", "Santa Barbara County"
     )
     sample = sample_factory(
-        group, user, location, pathogen=pathogen, private_identifier="private", public_identifier="public"
+        group,
+        user,
+        location,
+        pathogen=pathogen,
+        private_identifier="private",
+        public_identifier="public",
     )
     async_session.add(group)
     async_session.add(pathogen)

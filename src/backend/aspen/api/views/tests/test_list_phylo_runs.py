@@ -94,7 +94,9 @@ def make_all_test_data(
     Collection[PhyloRun],
 ]:
     pathogen: Pathogen = random_pathogen_factory()
-    samples: Collection[Sample] = make_sample_data(group, user, location, n_samples, pathogen)
+    samples: Collection[Sample] = make_sample_data(
+        group, user, location, n_samples, pathogen
+    )
     uploaded_pathogen_genomes: Collection[
         UploadedPathogenGenome
     ] = make_uploaded_pathogen_genomes(samples)
