@@ -41,11 +41,10 @@ def get_allowed_origins() -> List[str]:
     requests or the Galago URLs become more dynamic, we should reevaluate
     current process.
     """
-    GALAGO_URLS = (
+    allowed_origins = [
         "https://galago.czgenepi.org",
         "https://galago-labs.czgenepi.org",
-    )
-    allowed_origins = list(GALAGO_URLS)
+    ]
     frontend_url = os.getenv("FRONTEND_URL")
     if frontend_url:
         allowed_origins.append(frontend_url)
@@ -61,7 +60,7 @@ def get_allowed_origin_regex() -> Optional[str]:
     """
     allowed_origin_regex = None  # default case, do not use regex for CORS
     deployment = os.getenv("DEPLOYMENT_STAGE")
-    if deployment not in ["gestaging", "geprod", "staging", "prod"]:  # =>local
+    if deployment == "local":
         allowed_origin_regex = r"^http://localhost:\d+"
     return allowed_origin_regex
 
