@@ -59,7 +59,7 @@ async def prepare_sequences_download(
 
     async def stream_samples():
         sample_ids = request.sample_ids
-        streamer = FastaStreamer(db, az, ac, pathogen, set(sample_ids), prefix)
+        streamer = FastaStreamer(db, az, ac, pathogen, set(sample_ids), prefix=prefix)
         async for line in streamer.stream():
             yield line
 
