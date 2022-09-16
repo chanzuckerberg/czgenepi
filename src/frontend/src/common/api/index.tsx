@@ -18,6 +18,7 @@ export enum API {
 export enum ORG_API {
   AUSPICE = "auspice/generate",
   PHYLO_RUNS = "phylo_runs/",
+  PHYLO_TREES = "phylo_trees/",
   SAMPLES = "samples/",
   SAMPLES_VALIDATE_IDS = "samples/validate_ids/",
   SAMPLES_FASTA_DOWNLOAD = "sequences/",
