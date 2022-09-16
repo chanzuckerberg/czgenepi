@@ -1,6 +1,7 @@
 import json
 from copy import deepcopy
 from typing import Dict
+from aspen.util.split import SplitClient
 
 import boto3
 import pytest
@@ -64,7 +65,9 @@ async def test_phylo_tree_id_style_public(
     async_session: AsyncSession,
     http_client: AsyncClient,
     mock_s3_resource: boto3.resource,
+    split_client: SplitClient
 ):
+    # split_client.get_pathogen_treatment.side_effect = ["on"] 
     user, group, samples, phylo_run, phylo_tree = await make_shared_test_data(
         async_session
     )

@@ -1,4 +1,6 @@
 from typing import List, Tuple, Union
+from aspen.test_infra.models.pathogen_repo_config import setup_gisaid_and_genbank_repo_configs
+from aspen.database.models.pathogens import Pathogen
 
 import pytest
 import sqlalchemy as sa
@@ -39,7 +41,9 @@ async def make_shared_test_data(
         )
         for i in range(1, 3)
     ]
-    pathogen = random_pathogen_factory()
+    # we need SC2 so we can get the correct treatment from split
+    pathogen = Pathogen(slug="SC2", name="sars-cov-2")
+    setup_gisaid_and_genbank_repo_configs(async_session, pathogen)
     phylo_run = phylorun_factory(group, pathogen=pathogen)
     phylo_tree = None
     if not no_trees:

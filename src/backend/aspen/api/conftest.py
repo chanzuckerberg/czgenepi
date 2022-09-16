@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from functools import partial
 from typing import AsyncGenerator
 from unittest.mock import create_autospec, MagicMock
+from aspen.api.settings import APISettings
 
 import pytest
 from authlib.integrations.starlette_client import StarletteOAuth2App
@@ -143,7 +144,7 @@ async def auth0_oauth() -> MagicMock:
 
 @pytest.fixture()
 async def split_client() -> MagicMock:
-    return create_autospec(SplitClient)
+    return SplitClient(APISettings())
 
 
 @pytest.fixture()

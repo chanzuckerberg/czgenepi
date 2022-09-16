@@ -1,6 +1,8 @@
 import re
 
 import sqlalchemy as sa
+from aspen.api.deps import get_splitio
+from aspen.util.split import SplitClient
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,7 +11,7 @@ from starlette.requests import Request
 
 from aspen.api.authz import AuthZSession, get_authz_session
 from aspen.api.deps import get_db, get_pathogen
-from aspen.api.utils import extract_accessions, MetadataTSVStreamer, process_phylo_tree
+from aspen.api.utils import extract_accessions, MetadataTSVStreamer, process_phylo_tree, get_pathogen_repo_config_for_pathogen
 from aspen.database.models import (
     Pathogen,
     PhyloRun,
@@ -28,9 +30,20 @@ async def get_single_phylo_tree(
     db: AsyncSession = Depends(get_db),
     az: AuthZSession = Depends(get_authz_session),
     pathogen: Pathogen = Depends(get_pathogen),
+    splitio: SplitClient = Depends(get_splitio),
 ) -> JSONResponse:
+    # get public repository for a given pathogen
+
+    preferred_public_db = splitio.get_pathogen_treatment("PATHOGEN_public_repository", pathogen)
+    # get the pathogen_repo_config  for given public_repository and pathogen
+    import pdb; pdb.set_trace()
+    pathogen_repo_config = await get_pathogen_repo_config_for_pathogen(pathogen, preferred_public_db, db)
+    if pathogen_repo_config is None:
+        raise ex.ServerException(
+            "no public repository found for given pathogen public repository"
+        )
     phylo_tree_data = await process_phylo_tree(
-        db, az, item_id, pathogen, request.query_params.get("id_style")
+        db, az, item_id, pathogen, pathogen_repo_config, request.query_params.get("id_style")
     )
     headers = {
         "Content-Type": "application/json",
@@ -66,7 +79,8 @@ async def _get_selected_samples(
 
     phylo_run = phylo_tree.producing_workflow
     selected_samples = set(phylo_run.gisaid_ids)
-    prefix_regex = re.compile("^hcov-19/", re.IGNORECASE)
+    pathogen_repo_config = await get_pathogen_repo_config_for_pathogen(pathogen, db)
+    prefix_regex = re.compile(f"^{pathogen_repo_config.prefix}/", re.IGNORECASE)
     selected_samples = selected_samples.union(
         set(prefix_regex.sub("", item) for item in phylo_run.gisaid_ids)
     )
@@ -74,12 +88,12 @@ async def _get_selected_samples(
     # identifier check here since the process_phylo_tree method already does that
     # filtering, and this data is only used to match any identifiers that are
     # *already* on the tree.
-    gisaid_prefix = "hCoV-19/"
+
     for uploaded_pathogen_genome in phylo_run.inputs:
         sample = uploaded_pathogen_genome.sample
         stripped_identifier = prefix_regex.sub("", sample.public_identifier)
         selected_samples.add(stripped_identifier)
-        selected_samples.add(f"{gisaid_prefix}{stripped_identifier}")
+        selected_samples.add(f"{pathogen_repo_config.prefix}{stripped_identifier}")
         selected_samples.add(sample.private_identifier)
     return selected_samples
 

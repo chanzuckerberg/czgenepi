@@ -18,7 +18,6 @@ from aspen.api.utils.sample import (  # noqa: F401
     collect_submission_information,
     determine_gisaid_status,
     format_sample_lineage,
-    get_public_repository_prefix,
     sample_info_to_genbank_rows,
     sample_info_to_gisaid_rows,
     samples_by_identifiers,
@@ -28,4 +27,8 @@ from aspen.api.utils.tsv_streamer import (  # noqa: F401
     GenBankSubmissionFormTSVStreamer,
     GisaidSubmissionFormCSVStreamer,
     MetadataTSVStreamer,
+)
+from aspen.api.utils.pathogens import (
+    get_public_repository_prefix,
+    get_pathogen_repo_config_for_pathogen,
 )

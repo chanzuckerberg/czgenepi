@@ -1,5 +1,6 @@
 import json
 import uuid
+from aspen.test_infra.models.pathogen_repo_config import setup_gisaid_and_genbank_repo_configs
 
 import boto3
 import pytest
@@ -132,7 +133,11 @@ async def create_phylotree(
     run_inputs = []
     if sample_as_input:
         run_inputs = [upg]
+
     pathogen: Pathogen = random_pathogen_factory()
+    setup_gisaid_and_genbank_repo_configs(async_session, pathogen)
+
+    # pathogen: Pathogen = await Pathogen.get_by_slug(async_session, "SC2")
     phylo_tree = phylotree_factory(
         phylorun_factory(owner_group, pathogen=pathogen, inputs=run_inputs),
         samples,
