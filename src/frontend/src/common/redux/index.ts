@@ -1,7 +1,7 @@
 import { AnyAction, applyMiddleware, createStore } from "redux";
 import { composeWithDevTools } from "redux-devtools-extension";
 import { setGroupMiddleware, setPathogenMiddleware } from "./middleware";
-import { CZGEReduxActions, Pathogen } from "./types";
+import { CZGEReduxActions, Pathogen, ReduxNotification } from "./types";
 import {
   ensureValidGroup,
   getGroupIdFromLocalStorage,
@@ -35,12 +35,14 @@ export const FALLBACK_GROUP_ID = -1;
 const getInitialState = () => {
   const storedGroup = getGroupIdFromLocalStorage() ?? FALLBACK_GROUP_ID;
   const storedPathogen = getPathogenFromLocalStorage() ?? Pathogen.COVID;
+  const notifications: ReduxNotification[] = [];
 
   return {
     current: {
       group: storedGroup,
       pathogen: storedPathogen,
     },
+    notifications,
   };
 };
 
@@ -63,6 +65,16 @@ const reduxReducer = (state = getInitialState(), action: AnyAction) => {
           ...state.current,
           pathogen: payload,
         },
+      };
+    case CZGEReduxActions.ADD_NOTIFICATION_ACTION_TYPE:
+      return {
+        ...state,
+        notifications: [...state.notifications, payload],
+      };
+    case CZGEReduxActions.DELETE_NOTIFICATION_ACTION_TYPE:
+      return {
+        ...state,
+        notifications: state.notifications.filter((n) => n.id !== payload),
       };
     default:
       return state;
