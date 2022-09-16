@@ -412,3 +412,32 @@ async def test_access_matrix(
             assert f">{sample.private_identifier}" not in file_contents
             assert f">{sample.public_identifier}" not in file_contents
             assert sequences[sample.private_identifier] not in file_contents
+
+
+async def test_getfastaurl(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+):
+    """
+    Test a regular sequence download for a sample submitted by the user's group, test prefixes are correctly added for GISAID
+    """
+
+    group, user, sample, pathogen = await setup_sequences_download_test_data(async_session)
+
+    auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
+    data = {
+        "samples": [sample.public_identifier],
+    }
+    res = await http_client.post(
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/sequences/getfastaurl",
+        headers=auth_headers,
+        json=data,
+    )
+    assert res.status_code == 200
+    res_json = res.json()
+    assert "url" in res_json
+    url = res_json["url"]
+    assert url.startswith("http")
+    assert ".fasta" in url
+    assert "X-Amz-Credential=" in url
+    assert "X-Amz-Signature=" in url
