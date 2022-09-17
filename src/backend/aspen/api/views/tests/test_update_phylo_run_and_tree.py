@@ -1,6 +1,4 @@
 from typing import List, Tuple, Union
-from aspen.test_infra.models.pathogen_repo_config import setup_gisaid_and_genbank_repo_configs
-from aspen.database.models.pathogens import Pathogen
 
 import pytest
 import sqlalchemy as sa
@@ -8,8 +6,11 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.database.models import Group, PhyloRun, PhyloTree, Sample, User
+from aspen.database.models.pathogens import Pathogen
 from aspen.test_infra.models.location import location_factory
-from aspen.test_infra.models.pathogen import random_pathogen_factory
+from aspen.test_infra.models.pathogen_repo_config import (
+    setup_gisaid_and_genbank_repo_configs,
+)
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.usergroup import group_factory, userrole_factory

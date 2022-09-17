@@ -2,7 +2,6 @@ import json
 import os
 import re
 from collections import namedtuple
-import string
 from typing import Dict, Mapping, Optional, Set, Tuple
 
 import boto3
@@ -15,7 +14,6 @@ from sqlalchemy.sql.expression import and_, or_
 from aspen.api.authz import AuthZSession
 from aspen.api.error import http_exceptions as ex
 from aspen.database.models import Group, Location, Pathogen, PhyloRun, PhyloTree, Sample
-from aspen.api.utils.pathogens import get_public_repository_prefix, get_pathogen_repo_config_for_pathogen
 
 # 16 colors
 NEXTSTRAIN_COLOR_SCALE = [
@@ -48,7 +46,7 @@ CATEGORY_NAMES = {
 }
 
 
-async def _rename_nodes_on_tree(
+def _rename_nodes_on_tree(
     prefix: str,
     node: dict,
     name_map: Mapping[str, str],
@@ -76,7 +74,7 @@ async def _rename_nodes_on_tree(
 
     # Make sure we have the gisaid prefix on this node when we output it.
     node["name"] = (
-        f"{prefix}{tree_identifier}"
+        f"{prefix}/{tree_identifier}"
         if not tree_identifier.startswith("NODE_")
         else tree_identifier
     )
@@ -307,13 +305,13 @@ async def process_phylo_tree(
         s3.Bucket(phylo_tree.s3_bucket).Object(phylo_tree.s3_key).get()["Body"].read()
     )
     json_data = json.loads(data)
-
-
-
-    save_key = "{}_ID".format(pathogen_repo_config.public_repository.name.upper())
+    name = pathogen_repo_config.public_repository.name
+    save_key = "{}_ID".format(name.upper())
     if id_style == "public":
         json_data = await _set_colors(db, json_data, phylo_run)
-        json_data["tree"] = _rename_nodes_on_tree(pathogen_repo_config.prefix, json_data["tree"], {}, save_key)
+        json_data["tree"] = _rename_nodes_on_tree(
+            pathogen_repo_config.prefix, json_data["tree"], {}, save_key
+        )
         return json_data
 
     # Load all the public:private sample mappings this user/group has access to.
@@ -329,7 +327,9 @@ async def process_phylo_tree(
         .all()
     )
     for sample in translatable_samples:
-        public_id = sample.public_identifier.replace(f"{pathogen_repo_config.prefix}/", "")
+        public_id = sample.public_identifier.replace(
+            f"{pathogen_repo_config.prefix}/", ""
+        )
         identifier_map[public_id] = sample.private_identifier
 
     # we pass in the root node of the tree to the recursive naming function.

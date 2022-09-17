@@ -23,8 +23,6 @@ from aspen.database.models import (
     Group,
     Location,
     Pathogen,
-    PathogenRepoConfig,
-    PublicRepository,
     Sample,
     User,
 )

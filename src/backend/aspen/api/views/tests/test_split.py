@@ -31,5 +31,7 @@ def test_pathogen_treatments():
         for slug, expected_treatment in slug_to_treatment.items():
             pathogen.slug = slug
             treatment = splitio.get_pathogen_treatment(flag, pathogen)
-            import pdb; pdb.set_trace()
+            import pdb
+
+            pdb.set_trace()
             assert treatment == expected_treatment

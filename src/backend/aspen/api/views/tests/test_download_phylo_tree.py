@@ -1,7 +1,6 @@
 import json
 from copy import deepcopy
 from typing import Dict
-from aspen.util.split import SplitClient
 
 import boto3
 import pytest
@@ -20,6 +19,7 @@ from aspen.api.views.tests.utils.phylo_tree_utils import (
 from aspen.database.models import Group, Location, User
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.usergroup import group_factory, userrole_factory
+from aspen.util.split import SplitClient
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
@@ -65,9 +65,8 @@ async def test_phylo_tree_id_style_public(
     async_session: AsyncSession,
     http_client: AsyncClient,
     mock_s3_resource: boto3.resource,
-    split_client: SplitClient
+    split_client: SplitClient,
 ):
-    # split_client.get_pathogen_treatment.side_effect = ["on"] 
     user, group, samples, phylo_run, phylo_tree = await make_shared_test_data(
         async_session
     )
@@ -111,7 +110,7 @@ async def test_phylo_tree_no_can_see(
     )
 
     pathogen, _, _, trees, runs = make_all_test_data(
-        owner_group, user, location, n_samples, n_trees
+        async_session, owner_group, user, location, n_samples, n_trees
     )
 
     phylo_tree = trees[0]  # we only have one

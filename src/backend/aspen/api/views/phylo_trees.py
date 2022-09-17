@@ -1,8 +1,6 @@
 import re
 
 import sqlalchemy as sa
-from aspen.api.deps import get_splitio
-from aspen.util.split import SplitClient
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,8 +8,14 @@ from sqlalchemy.orm import aliased, contains_eager
 from starlette.requests import Request
 
 from aspen.api.authz import AuthZSession, get_authz_session
-from aspen.api.deps import get_db, get_pathogen
-from aspen.api.utils import extract_accessions, MetadataTSVStreamer, process_phylo_tree, get_pathogen_repo_config_for_pathogen
+from aspen.api.deps import get_db, get_pathogen, get_splitio
+from aspen.api.error import http_exceptions as ex
+from aspen.api.utils import (
+    extract_accessions,
+    get_pathogen_repo_config_for_pathogen,
+    MetadataTSVStreamer,
+    process_phylo_tree,
+)
 from aspen.database.models import (
     Pathogen,
     PhyloRun,
@@ -19,6 +23,7 @@ from aspen.database.models import (
     Sample,
     UploadedPathogenGenome,
 )
+from aspen.util.split import SplitClient
 
 router = APIRouter()
 
@@ -34,16 +39,24 @@ async def get_single_phylo_tree(
 ) -> JSONResponse:
     # get public repository for a given pathogen
 
-    preferred_public_db = splitio.get_pathogen_treatment("PATHOGEN_public_repository", pathogen)
+    preferred_public_db = splitio.get_pathogen_treatment(
+        "PATHOGEN_public_repository", pathogen
+    )
     # get the pathogen_repo_config  for given public_repository and pathogen
-    import pdb; pdb.set_trace()
-    pathogen_repo_config = await get_pathogen_repo_config_for_pathogen(pathogen, preferred_public_db, db)
+    pathogen_repo_config = await get_pathogen_repo_config_for_pathogen(
+        pathogen, preferred_public_db, db
+    )
     if pathogen_repo_config is None:
         raise ex.ServerException(
             "no public repository found for given pathogen public repository"
         )
     phylo_tree_data = await process_phylo_tree(
-        db, az, item_id, pathogen, pathogen_repo_config, request.query_params.get("id_style")
+        db,
+        az,
+        item_id,
+        pathogen,
+        pathogen_repo_config,
+        request.query_params.get("id_style"),
     )
     headers = {
         "Content-Type": "application/json",
