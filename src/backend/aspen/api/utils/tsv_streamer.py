@@ -70,6 +70,7 @@ class MetadataTSVStreamer(FieldSeparatedStreamer):
             "Sample Identifier": item,
             "Selected": "yes" if item.lower() in self.selected else "no",
         }
+        # import pdb; pdb.set_trace()
         return data
 
 

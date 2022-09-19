@@ -23,6 +23,7 @@ from aspen.database.models import (
     Sample,
     UploadedPathogenGenome,
 )
+from aspen.database.models.pathogens import PathogenRepoConfig
 from aspen.util.split import SplitClient
 
 router = APIRouter()
@@ -67,7 +68,10 @@ async def get_single_phylo_tree(
 
 # supporting function for get_tree_metadata()
 async def _get_selected_samples(
-    db: AsyncSession, phylo_tree_id: int, pathogen: Pathogen
+    db: AsyncSession,
+    phylo_tree_id: int,
+    pathogen: Pathogen,
+    pathogen_repo_config: PathogenRepoConfig,
 ):
     # SqlAlchemy requires aliasing for any queries that join to the same table (in this case, entities)
     # multiple times via joined table inheritance
@@ -92,7 +96,6 @@ async def _get_selected_samples(
 
     phylo_run = phylo_tree.producing_workflow
     selected_samples = set(phylo_run.gisaid_ids)
-    pathogen_repo_config = await get_pathogen_repo_config_for_pathogen(pathogen, db)
     prefix_regex = re.compile(f"^{pathogen_repo_config.prefix}/", re.IGNORECASE)
     selected_samples = selected_samples.union(
         set(prefix_regex.sub("", item) for item in phylo_run.gisaid_ids)
@@ -106,7 +109,7 @@ async def _get_selected_samples(
         sample = uploaded_pathogen_genome.sample
         stripped_identifier = prefix_regex.sub("", sample.public_identifier)
         selected_samples.add(stripped_identifier)
-        selected_samples.add(f"{pathogen_repo_config.prefix}{stripped_identifier}")
+        selected_samples.add(f"{pathogen_repo_config.prefix}/{stripped_identifier}")
         selected_samples.add(sample.private_identifier)
     return selected_samples
 
@@ -118,13 +121,33 @@ async def get_tree_metadata(
     db: AsyncSession = Depends(get_db),
     az: AuthZSession = Depends(get_authz_session),
     pathogen: Pathogen = Depends(get_pathogen),
+    splitio: SplitClient = Depends(get_splitio),
 ):
+    preferred_public_db = splitio.get_pathogen_treatment(
+        "PATHOGEN_public_repository", pathogen
+    )
+    # get the pathogen_repo_config  for given public_repository and pathogen
+    pathogen_repo_config = await get_pathogen_repo_config_for_pathogen(
+        pathogen, preferred_public_db, db
+    )
+    if pathogen_repo_config is None:
+        raise ex.ServerException(
+            "no public repository found for given pathogen public repository"
+        )
     phylo_tree_data = await process_phylo_tree(
-        db, az, item_id, pathogen, request.query_params.get("id_style")
+        db,
+        az,
+        item_id,
+        pathogen,
+        pathogen_repo_config,
+        request.query_params.get("id_style"),
     )
     accessions = extract_accessions([], phylo_tree_data["tree"])
-    selected_samples = await _get_selected_samples(db, item_id, pathogen)
-
+    # import pdb; pdb.set_trace()
+    selected_samples = await _get_selected_samples(
+        db, item_id, pathogen, pathogen_repo_config
+    )
+    # import pdb; pdb.set_trace()
     filename: str = f"{item_id}_sample_ids.tsv"
     streamer = MetadataTSVStreamer(filename, accessions, selected_samples)
     return streamer.get_response()

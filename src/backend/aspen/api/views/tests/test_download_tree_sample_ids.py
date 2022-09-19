@@ -7,9 +7,9 @@ from botocore.client import ClientError
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from aspen.api.views.tests.test_update_phylo_run_and_tree import make_shared_test_data
 from aspen.database.models import Group, Pathogen, PhyloTree, Sample
 from aspen.test_infra.models.location import location_factory
-from aspen.test_infra.models.pathogen import random_pathogen_factory
 from aspen.test_infra.models.pathogen_repo_config import (
     setup_gisaid_and_genbank_repo_configs,
 )
@@ -95,7 +95,9 @@ async def create_phylotree_with_inputs(
         input_entities.append(input_entity)
 
     db_gisaid_samples = ["hCoV-19/gisaid_identifier", "hCoV-19/gisaid_identifier2"]
-    pathogen: Pathogen = random_pathogen_factory()
+    # we need SC2 so we can get the correct treatment from split
+    pathogen = Pathogen(slug="SC2", name="sars-cov-2")
+    setup_gisaid_and_genbank_repo_configs(async_session, pathogen)
     phylo_run = phylorun_factory(
         owner_group,
         inputs=input_entities,
@@ -136,7 +138,8 @@ async def create_phylotree(
     if sample_as_input:
         run_inputs = [upg]
 
-    pathogen: Pathogen = random_pathogen_factory()
+    # we need SC2 so we can get the correct treatment from split
+    pathogen = Pathogen(slug="SC2", name="sars-cov-2")
     setup_gisaid_and_genbank_repo_configs(async_session, pathogen)
 
     # pathogen: Pathogen = await Pathogen.get_by_slug(async_session, "SC2")
@@ -255,6 +258,9 @@ async def test_tree_metadata_replaces_all_ids(
     """
     Test a regular tsv download for a sample submitted by the user's group
     """
+    # user, group, samples, _, phylo_tree = await make_shared_test_data(
+    #     async_session
+    # )
     user, group, phylo_tree, samples = await create_phylotree(
         mock_s3_resource, async_session, True
     )
@@ -345,9 +351,8 @@ async def test_download_samples_unauthorized(
     """
     Test downloading samples for a tree you don't have access to.
     """
-    user, group, phylo_tree, samples = await create_phylotree(
-        mock_s3_resource, async_session, True
-    )
+    user, group, samples, _, phylo_tree = await make_shared_test_data(async_session)
+    upload_s3_file(mock_s3_resource, phylo_tree, samples)
 
     noaccess_group = group_factory(name="meanie")
     noaccess_user = await userrole_factory(

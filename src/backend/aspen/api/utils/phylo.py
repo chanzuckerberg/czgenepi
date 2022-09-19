@@ -68,7 +68,7 @@ def _rename_nodes_on_tree(
     # Strip the gisaid prefix from our tree identifier if it's present
     tree_identifier = node["name"]
     if tree_identifier.lower().startswith(prefix.lower()):
-        tree_identifier = tree_identifier[len(prefix) :]
+        tree_identifier = tree_identifier[len(f"{prefix}/") :]
 
     renamed_value = name_map.get(tree_identifier, None)
 
@@ -86,6 +86,7 @@ def _rename_nodes_on_tree(
         node["name"] = renamed_value
     for child in node.get("children", []):
         _rename_nodes_on_tree(prefix, child, name_map, save_key)
+    # import pdb; pdb.set_trace()
     return node
 
 
@@ -331,12 +332,11 @@ async def process_phylo_tree(
             f"{pathogen_repo_config.prefix}/", ""
         )
         identifier_map[public_id] = sample.private_identifier
-
     # we pass in the root node of the tree to the recursive naming function.
     json_data["tree"] = _rename_nodes_on_tree(
         pathogen_repo_config.prefix, json_data["tree"], identifier_map, save_key
     )
-
+    # import pdb; pdb.set_trace()
     # set country labeling/colors
     json_data = await _set_colors(db, json_data, phylo_run)
     return json_data
