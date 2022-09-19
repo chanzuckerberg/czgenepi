@@ -147,7 +147,7 @@ async def test_phylo_tree_view(
         "North America", "USA", "California", "Santa Barbara County"
     )
     pathogen, _, _, trees, _ = make_all_test_data(
-        group, user, location, n_samples, n_trees
+        async_session, group, user, location, n_samples, n_trees
     )
 
     async_session.add(group)
@@ -168,7 +168,7 @@ async def test_in_progress_and_failed_trees(
         "North America", "USA", "California", "Santa Barbara County"
     )
     pathogen, _, _, trees, treeless_runs = make_all_test_data(
-        group, user, location, n_samples, n_trees
+        async_session, group, user, location, n_samples, n_trees
     )
 
     async_session.add(group)
@@ -225,7 +225,7 @@ async def test_phylo_trees_can_see(
         "North America", "USA", "California", "Santa Barbara County"
     )
     pathogen, _, _, trees, _ = make_all_test_data(
-        owner_group, user, location, n_samples, n_trees
+        async_session, owner_group, user, location, n_samples, n_trees
     )
 
     role_objs = await grouprole_factory(async_session, owner_group, viewer_group)
@@ -248,7 +248,7 @@ async def test_phylo_trees_no_can_see(
         "North America", "USA", "California", "Santa Barbara County"
     )
     pathogen, _, _, trees, _ = make_all_test_data(
-        owner_group, user, location, n_samples, n_trees
+        async_session, owner_group, user, location, n_samples, n_trees
     )
 
     async_session.add_all((owner_group, viewer_group))

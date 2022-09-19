@@ -86,7 +86,6 @@ def _rename_nodes_on_tree(
         node["name"] = renamed_value
     for child in node.get("children", []):
         _rename_nodes_on_tree(prefix, child, name_map, save_key)
-    # import pdb; pdb.set_trace()
     return node
 
 

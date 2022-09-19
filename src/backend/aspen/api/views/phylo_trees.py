@@ -143,11 +143,10 @@ async def get_tree_metadata(
         request.query_params.get("id_style"),
     )
     accessions = extract_accessions([], phylo_tree_data["tree"])
-    # import pdb; pdb.set_trace()
+
     selected_samples = await _get_selected_samples(
         db, item_id, pathogen, pathogen_repo_config
     )
-    # import pdb; pdb.set_trace()
     filename: str = f"{item_id}_sample_ids.tsv"
     streamer = MetadataTSVStreamer(filename, accessions, selected_samples)
     return streamer.get_response()

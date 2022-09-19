@@ -6,8 +6,11 @@ from botocore.client import ClientError
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from aspen.database.models.pathogens import Pathogen
 from aspen.test_infra.models.location import location_factory
-from aspen.test_infra.models.pathogen import random_pathogen_factory
+from aspen.test_infra.models.pathogen_repo_config import (
+    setup_gisaid_and_genbank_repo_configs,
+)
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.usergroup import (
@@ -114,7 +117,9 @@ async def test_phylo_tree_rename(
         for i in range(2)
     ]
 
-    pathogen = random_pathogen_factory()
+    # we need SC2 so we can get the correct treatment from split
+    pathogen = Pathogen(slug="SC2", name="sars-cov-2")
+    setup_gisaid_and_genbank_repo_configs(async_session, pathogen)
     phylo_tree = phylotree_factory(
         phylorun_factory(viewer_group, pathogen=pathogen),
         local_samples + can_see_samples + wrong_can_see_samples + no_can_see_samples,

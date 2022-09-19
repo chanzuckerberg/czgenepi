@@ -13,6 +13,8 @@
     treatment: "on"
 - test_feature:
     treatment: "off"
+- sync_auth0_roles:
+    treatment: "on"
 - PATHOGEN_lineage_caller:
     treatment: "Pangolin"
     keys: "SC2"
