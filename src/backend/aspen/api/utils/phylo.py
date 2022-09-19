@@ -335,7 +335,6 @@ async def process_phylo_tree(
     json_data["tree"] = _rename_nodes_on_tree(
         pathogen_repo_config.prefix, json_data["tree"], identifier_map, save_key
     )
-    # import pdb; pdb.set_trace()
     # set country labeling/colors
     json_data = await _set_colors(db, json_data, phylo_run)
     return json_data
