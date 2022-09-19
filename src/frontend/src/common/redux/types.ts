@@ -1,4 +1,5 @@
 import { ExposedNotificationProps } from "czifui";
+import React from "react";
 
 export type ActionType<T> = (payload?: T) => {
   type: CZGEReduxActions;
@@ -23,4 +24,7 @@ export enum ReduxPersistenceTokens {
   PATHOGEN = "currentPathogen",
 }
 
-export type ReduxNotification = ExposedNotificationProps & { id: number };
+export type ReduxNotification = ExposedNotificationProps & {
+  id: number;
+  content: React.ReactNode;
+};

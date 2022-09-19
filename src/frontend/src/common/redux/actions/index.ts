@@ -12,7 +12,12 @@ export const setPathogen: ActionType<Pathogen> = (pathogen) => ({
 
 export const addNotification: ActionType<ReduxNotification> = (notification) => ({
   type: CZGEReduxActions.ADD_NOTIFICATION_ACTION_TYPE,
-  payload: notification,
+  payload: {
+    buttonText: "DISMISS",
+    dismissDirection: "right",
+    intent: "error",
+    ...notification
+  },
 });
 
 export const deleteNotification: ActionType<number> = (notificationId) => ({

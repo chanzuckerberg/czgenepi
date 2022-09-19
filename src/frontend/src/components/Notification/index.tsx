@@ -1,12 +1,28 @@
-import { ExposedNotificationProps, Notification } from "czifui";
+import { Notification } from "czifui";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteNotification } from "src/common/redux/actions";
+import { selectNotifications } from "src/common/redux/selectors";
+import { ReduxNotification } from "src/common/redux/types";
 import { StyledNotificationContainer } from "./style";
 
-const Notifications = (props: ExposedNotificationProps): JSX.Element => {
+const NotificationsManager = (): JSX.Element => {
+  const dispatch = useDispatch();
+  const notifications = useSelector(selectNotifications);
+
   return (
     <StyledNotificationContainer>
-      <Notification {...props} />
+      {notifications.map((notification: ReduxNotification) => {
+        const { id, content, ...rest } = notification;
+        const onClick = () => {
+          dispatch(deleteNotification(id));
+        };
+
+        <Notification {...rest} buttonOnClick={onClick}>
+          {content}
+        </Notification>
+      })}
     </StyledNotificationContainer>
   );
 };
 
-export default Notifications;
+export default  NotificationsManager;

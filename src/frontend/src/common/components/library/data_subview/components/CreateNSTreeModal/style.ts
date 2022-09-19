@@ -1,14 +1,12 @@
 import styled from "@emotion/styled";
 import { FormControlLabel, Radio, TextField } from "@mui/material";
 import {
-  Button,
   CommonThemeProps,
   fontBodyS,
   fontBodyXxs,
   fontBodyXxxs,
   fontHeaderM,
   getColors,
-  getFontWeights,
   getSpaces,
   Tooltip,
 } from "czifui";
@@ -263,24 +261,6 @@ export const StyledFooter = styled.div`
       margin-bottom: ${spaces?.xxl}px;
       margin-left: ${spaces?.xxl}px;
       margin-top: ${spaces?.xl}px;
-    `;
-  }}
-`;
-
-export const StyledButton = styled(Button)`
-  ${fontBodyXxs}
-  color: black;
-  &:hover {
-    background-color: transparent;
-  }
-  ${(props: CommonThemeProps) => {
-    const spaces = getSpaces(props);
-    const fontWeights = getFontWeights(props);
-    return `
-      font-weight: ${fontWeights?.semibold};
-      margin-top: ${spaces?.xs}px;
-      margin-left: 0px;
-      padding-left: 0px;
     `;
   }}
 `;
