@@ -149,6 +149,7 @@ jobs:
         uses: chanzuckerberg/github-actions/.github/actions/install-happy@405f86e7f30b41403677c5df2d8d3339afa3c6d7
         with:
           happy_version: "0.19.0"
+          install_globally: "true"
       - name: Playwright tests
         run: |
           echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
