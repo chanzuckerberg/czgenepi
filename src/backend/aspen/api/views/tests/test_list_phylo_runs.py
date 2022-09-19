@@ -2,8 +2,8 @@ import random
 from typing import Collection, Sequence, Tuple
 
 import pytest
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from aspen.api.conftest import async_session
 from aspen.database.models import (
     Group,
     Location,
@@ -87,7 +87,7 @@ def make_runs_with_no_trees(group: Group, pathogen: Pathogen) -> Collection[Phyl
 
 
 def make_all_test_data(
-    async_session: async_session,
+    async_session: AsyncSession,
     group: Group,
     user: User,
     location: Location,
