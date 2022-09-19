@@ -52,6 +52,7 @@ export class SampleUtil {
           defaults?.sample?.public_identifier,
           GeneralUtil.generatePublicSampleId()
         ) as string,
+        status: ""
       },
     };
   }
@@ -101,6 +102,7 @@ export class SampleUtil {
       private_identifier: GeneralUtil.generatePrivateSampleId(),
       public_identifier: GeneralUtil.generatePublicSampleId(),
       sequencing_date: GeneralUtil.getADateInThePast(),
+      status:"",
       submitting_group: {
         id: 74,
         name: "QA Automation",
@@ -125,6 +127,7 @@ export interface SampleUploadData {
     private: boolean;
     private_identifier: string;
     public_identifier: string;
+    status: string;
   };
 }
 
@@ -165,4 +168,5 @@ export interface GetSampleResponseData {
     id: number;
     name: string;
   };
+  status: string
 }

@@ -99,6 +99,15 @@ export abstract class FilterSample {
     }
     return filterDate;
   }
+
+  //calculate days between two different dates, takings today as initial date to measure
+  public static getDaysFromDateRange(filteredDate: string){
+    const today = new Date();
+    const pastDate =  new Date(filteredDate);
+    const difference = today.getTime() - pastDate.getTime();
+    return  Math.ceil(difference / (1000 * 3600 * 24));
+  }
+
 }
 
 export interface FilterData {
