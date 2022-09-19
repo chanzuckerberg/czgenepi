@@ -142,7 +142,6 @@ async def create_phylotree(
     pathogen = Pathogen(slug="SC2", name="sars-cov-2")
     setup_gisaid_and_genbank_repo_configs(async_session, pathogen)
 
-    # pathogen: Pathogen = await Pathogen.get_by_slug(async_session, "SC2")
     phylo_tree = phylotree_factory(
         phylorun_factory(owner_group, pathogen=pathogen, inputs=run_inputs),
         samples,
@@ -258,9 +257,6 @@ async def test_tree_metadata_replaces_all_ids(
     """
     Test a regular tsv download for a sample submitted by the user's group
     """
-    # user, group, samples, _, phylo_tree = await make_shared_test_data(
-    #     async_session
-    # )
     user, group, phylo_tree, samples = await create_phylotree(
         mock_s3_resource, async_session, True
     )
