@@ -11,7 +11,7 @@ import { useSendGroupInvitations } from "src/common/queries/groups";
 import { FALLBACK_GROUP_ID } from "src/common/redux";
 import { selectCurrentGroup } from "src/common/redux/selectors";
 import { B } from "src/common/styles/basicStyle";
-import { StyledNotificationContainer } from "src/components/Notification/style";
+import { StyledNotificationContainer } from "src/components/NotificationManager/style";
 import { FailedToSendNotification } from "./components/FailedToSendNotification";
 import { InvalidEmailError } from "./components/InvalidEmailError";
 import { SentNotification } from "./components/SentNotification";

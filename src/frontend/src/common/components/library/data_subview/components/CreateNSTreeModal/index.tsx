@@ -21,8 +21,8 @@ import {
   StyledCloseIconWrapper,
 } from "src/common/styles/iconStyle";
 import { pluralize } from "src/common/utils/strUtils";
-import { CreateNSTreeFailureNotif } from "src/components/Notification/components/CreateNSTreeFailureNotif";
-import { CreateNSTreeSuccessNotif } from "src/components/Notification/components/CreateNSTreeSuccessNotif";
+import { CreateNSTreeFailureNotif } from "src/components/NotificationManager/components/CreateNSTreeFailureNotif";
+import { CreateNSTreeSuccessNotif } from "src/components/NotificationManager/components/CreateNSTreeSuccessNotif";
 import { TreeNameInput } from "src/components/TreeNameInput";
 import { Header } from "../DownloadModal/style";
 import { FailedSampleAlert } from "../FailedSampleAlert";
@@ -126,6 +126,7 @@ export const CreateNSTreeModal = ({
         id: Date.now(),
         intent: "error",
         content: CreateNSTreeFailureNotif,
+        shouldShowCloseButton: true,
       }));
       handleClose();
     },
