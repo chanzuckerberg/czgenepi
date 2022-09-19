@@ -71,11 +71,7 @@ async def samples_by_identifiers(
         .outerjoin(private_samples_query, Sample.id == private_samples_query.c.id)  # type: ignore
         .where(
             and_(
-                or_(
-                    # TODO - DECOVIDIFY - remove the None check!
-                    Sample.pathogen == pathogen,  # noqa: E711
-                    Sample.pathogen_id == None,  # noqa: E711
-                ),
+                Sample.pathogen == pathogen,  # noqa: E711
                 or_(
                     public_samples_query.c.id != None,  # noqa: E711
                     private_samples_query.c.id != None,  # noqa: E711

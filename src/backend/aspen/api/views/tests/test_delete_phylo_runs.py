@@ -45,6 +45,7 @@ async def test_delete_phylo_run_matrix(
     """
     group = group_factory(name="group1")
     group2 = group_factory(name="group2")
+    pathogen = random_pathogen_factory()
     user = await userrole_factory(
         async_session, group, auth0_user_id="user1", email="user1"
     )
@@ -54,7 +55,7 @@ async def test_delete_phylo_run_matrix(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    sample = sample_factory(group, user, location)
+    sample = sample_factory(group, user, location, pathogen=pathogen)
     gisaid_dump = aligned_gisaid_dump_factory()
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     async_session.add(group)

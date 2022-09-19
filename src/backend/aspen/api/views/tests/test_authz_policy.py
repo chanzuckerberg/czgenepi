@@ -112,6 +112,7 @@ async def appdata(
                 group,
                 user,
                 location,
+                pathogen=pathogen,
                 private=private,
                 private_identifier=f"private_identifier_{group.name}_{i}",
                 public_identifier=f"public_identifier_{group.name}_{i}",

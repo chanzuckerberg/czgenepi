@@ -80,11 +80,17 @@ async def create_phylotree_with_inputs(
     )
     samples = []
     input_entities = []
+    
+    # we need SC2 so we can get the correct treatment from split
+    pathogen = Pathogen(slug="SC2", name="sars-cov-2")
+    setup_gisaid_and_genbank_repo_configs(async_session, pathogen)
+    
     for i in range(3):
         sample = sample_factory(
             owner_group,
             user,
             location,
+            pathogen=pathogen,
             public_identifier=str(uuid.uuid4()),
             private_identifier=str(uuid.uuid4()),
         )
@@ -95,9 +101,8 @@ async def create_phylotree_with_inputs(
         input_entities.append(input_entity)
 
     db_gisaid_samples = ["hCoV-19/gisaid_identifier", "hCoV-19/gisaid_identifier2"]
-    # we need SC2 so we can get the correct treatment from split
-    pathogen = Pathogen(slug="SC2", name="sars-cov-2")
-    setup_gisaid_and_genbank_repo_configs(async_session, pathogen)
+
+
     phylo_run = phylorun_factory(
         owner_group,
         inputs=input_entities,
@@ -124,10 +129,16 @@ async def create_phylotree(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
+    
+    # we need SC2 so we can get the correct treatment from split
+    pathogen = Pathogen(slug="SC2", name="sars-cov-2")
+    setup_gisaid_and_genbank_repo_configs(async_session, pathogen)
+    
     sample = sample_factory(
         owner_group,
         user,
         location,
+        pathogen=pathogen,
         public_identifier=str(uuid.uuid4()),
         private_identifier=str(uuid.uuid4()),
     )
@@ -137,10 +148,6 @@ async def create_phylotree(
     run_inputs = []
     if sample_as_input:
         run_inputs = [upg]
-
-    # we need SC2 so we can get the correct treatment from split
-    pathogen = Pathogen(slug="SC2", name="sars-cov-2")
-    setup_gisaid_and_genbank_repo_configs(async_session, pathogen)
 
     phylo_tree = phylotree_factory(
         phylorun_factory(owner_group, pathogen=pathogen, inputs=run_inputs),
@@ -265,6 +272,7 @@ async def test_tree_metadata_replaces_all_ids(
         group,
         user,
         samples[0].collection_location,
+        pathogen=phylo_tree.pathogen,
         public_identifier=str(uuid.uuid4()),
         private_identifier=str(uuid.uuid4()),
     )
@@ -310,6 +318,7 @@ async def test_public_tree_metadata_replaces_all_ids(
         group,
         user,
         samples[0].collection_location,
+        pathogen=phylo_tree.pathogen,
         public_identifier=str(uuid.uuid4()),
         private_identifier=str(uuid.uuid4()),
     )

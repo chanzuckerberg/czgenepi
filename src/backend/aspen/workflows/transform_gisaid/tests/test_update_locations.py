@@ -5,6 +5,7 @@ from sqlalchemy.sql.expression import and_
 
 from aspen.database.models import Location, User
 from aspen.test_infra.models.location import location_factory
+from aspen.test_infra.models.pathogen import random_pathogen_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.usergroup import group_factory, user_factory
 from aspen.workflows.transform_gisaid.update_locations import update_locations
@@ -16,6 +17,7 @@ def create_test_data(
     locations=None,  # Override group location
     suffix=None,
 ):
+    pathogen = random_pathogen_factory()
     if not suffix:
         suffix = "test"
     if group_name is None:
@@ -62,6 +64,7 @@ def create_test_data(
                 group,
                 uploaded_by_user,
                 location,
+                pathogen=pathogen,
                 private_identifier=f"private_identifier_{location.location}",
                 public_identifier=f"public_identifier_{location.location}",
             )

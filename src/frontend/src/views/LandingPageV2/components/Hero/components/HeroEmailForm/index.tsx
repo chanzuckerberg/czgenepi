@@ -1,5 +1,5 @@
+import { Icon } from "czifui";
 import { useState } from "react";
-import FormSubmitArrow from "src/common/images/form-submit-arrow.svg";
 import { EmailInput, HeroEmailForm, SubmitButton, SubmitIcon } from "./style";
 
 export default function EmailForm(): JSX.Element {
@@ -25,15 +25,16 @@ export default function EmailForm(): JSX.Element {
     <HeroEmailForm onSubmit={submitEmail}>
       <EmailInput
         placeholder="Your email address"
+        aria-labelledby="join-waitlist"
         value={enteredEmail}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
           setEnteredEmail(e.target.value);
         }}
       />
-      <SubmitButton type="submit">
+      <SubmitButton id="join-waitlist" type="submit">
         Join the waitlist
         <SubmitIcon>
-          <FormSubmitArrow />
+          <Icon sdsIcon="chevronRight" sdsSize="xs" sdsType="static" />
         </SubmitIcon>
       </SubmitButton>
     </HeroEmailForm>

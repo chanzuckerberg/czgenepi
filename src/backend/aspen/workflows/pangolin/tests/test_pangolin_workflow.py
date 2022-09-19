@@ -8,6 +8,7 @@ from aspen.database.models.sample import Sample
 from aspen.database.models.sequences import UploadedPathogenGenome
 from aspen.database.models.usergroup import Group
 from aspen.test_infra.models.location import location_factory
+from aspen.test_infra.models.pathogen import random_pathogen_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
 from aspen.test_infra.models.usergroup import group_factory, user_factory
@@ -18,6 +19,7 @@ from aspen.workflows.pangolin.save import cli as save_cli
 
 def create_test_data(session):
     group: Group = group_factory()
+    pathogen = random_pathogen_factory()
     uploaded_by_user = user_factory(group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
@@ -30,6 +32,7 @@ def create_test_data(session):
             group,
             uploaded_by_user,
             location,
+            pathogen=pathogen,
             private_identifier=f"private_identifier_{i}",
             public_identifier=f"public_identifier_{i}",
         )

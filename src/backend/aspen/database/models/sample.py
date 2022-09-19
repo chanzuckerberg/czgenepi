@@ -57,9 +57,7 @@ class Sample(idbase, DictMixin):  # type: ignore
         nullable=False,
     )
     uploaded_by = relationship(User, backref=backref("samples", uselist=True))  # type: ignore
-    pathogen_id = Column(
-        Integer, ForeignKey(Pathogen.id)
-    )  # TODO: change to nullable=False once we update workflows
+    pathogen_id = Column(Integer, ForeignKey(Pathogen.id), nullable=False)
 
     pathogen = relationship(Pathogen, back_populates="samples")  # type: ignore
     private = Column(Boolean, nullable=False, default=False)

@@ -32,19 +32,21 @@ async def make_shared_test_data(
     )
     group = group_factory(default_tree_location=location)
     user = await userrole_factory(async_session, group, system_admin=system_admin)
+    # we need SC2 so we can get the correct treatment from split
+    pathogen = Pathogen(slug="SC2", name="sars-cov-2")
+    setup_gisaid_and_genbank_repo_configs(async_session, pathogen)
     samples = [
         sample_factory(
             group,
             user,
             location,
+            pathogen=pathogen,
             private_identifier=f"private_identifier_{i}",
             public_identifier=f"public_identifier_{i}",
         )
         for i in range(1, 3)
     ]
-    # we need SC2 so we can get the correct treatment from split
-    pathogen = Pathogen(slug="SC2", name="sars-cov-2")
-    setup_gisaid_and_genbank_repo_configs(async_session, pathogen)
+    
     phylo_run = phylorun_factory(group, pathogen=pathogen)
     phylo_tree = None
     if not no_trees:
