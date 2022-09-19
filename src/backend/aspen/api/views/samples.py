@@ -9,7 +9,6 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncResult, AsyncSession
 from sqlalchemy.orm import joinedload, selectinload
 from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy.sql.expression import or_
 
 from aspen.api.authn import AuthContext, get_auth_context, get_auth_user
 from aspen.api.authz import AuthZSession, get_authz_session, require_group_privilege
@@ -76,16 +75,9 @@ async def list_samples(
         selectinload(Sample.accessions),
         selectinload(Sample.pathogen),
     )
-    if pathogen.slug == "SC2":
-        user_visible_samples_query = user_visible_samples_query.filter(
-            or_(
-                Sample.pathogen_id == pathogen.id, Sample.pathogen_id is None
-            )  # TODO: remove this once we make pathogen_id non nullable
-        )
-    else:
-        user_visible_samples_query = user_visible_samples_query.filter(
-            Sample.pathogen_id == pathogen.id
-        )
+    user_visible_samples_query = user_visible_samples_query.filter(
+        Sample.pathogen_id == pathogen.id
+    )
     user_visible_samples_result = await db.execute(user_visible_samples_query)
     user_visible_samples: List[Sample] = (
         user_visible_samples_result.unique().scalars().all()

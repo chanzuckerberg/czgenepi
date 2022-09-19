@@ -59,7 +59,7 @@ async def prepare_sequences_download(
 
     async def stream_samples():
         sample_ids = request.sample_ids
-        streamer = FastaStreamer(db, az, ac, pathogen, set(sample_ids), prefix)
+        streamer = FastaStreamer(db, az, ac, pathogen, set(sample_ids), prefix=prefix)
         async for line in streamer.stream():
             yield line
 
@@ -82,6 +82,7 @@ async def getfastaurl(
     settings: APISettings = Depends(get_settings),
     az: AuthZSession = Depends(get_authz_session),
     ac: AuthContext = Depends(get_auth_context),
+    pathogen: Pathogen = Depends(get_pathogen),
 ) -> FastaURLResponse:
     sample_ids = request.samples
     downstream_consumer = request.downstream_consumer
@@ -99,7 +100,9 @@ async def getfastaurl(
         f"s3://{s3_bucket}/{s3_key}", "w", transport_params=dict(client=s3_client)
     )
     # Write selected samples to s3
-    streamer = FastaStreamer(db, az, ac, sample_ids, downstream_consumer)
+    streamer = FastaStreamer(
+        db, az, ac, pathogen, set(sample_ids), downstream_consumer=downstream_consumer
+    )
     async for line in streamer.stream():
         s3_write_fh.write(line)
     s3_write_fh.close()

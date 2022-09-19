@@ -1,3 +1,4 @@
+import { generateOrgSpecificUrl, ORG_API } from "src/common/api";
 import ENV from "src/common/constants/ENV";
 import type { TreeType } from "src/common/constants/types";
 
@@ -14,7 +15,7 @@ export const PHYLO_RUN_TRANSFORMS: Transform[] = [
       if (typeof id !== "number") {
         return undefined;
       }
-      return `${API_URL}/v2/phylo_trees/${id}/download`;
+      return `${API_URL}${generateOrgSpecificUrl(ORG_API.PHYLO_TREES)}${id}/download`;
     },
   },
   {
@@ -25,7 +26,7 @@ export const PHYLO_RUN_TRANSFORMS: Transform[] = [
       if (typeof id !== "number") {
         return undefined;
       }
-      return `${API_URL}/v2/phylo_trees/${id}/download?id_style=public`;
+      return `${API_URL}${generateOrgSpecificUrl(ORG_API.PHYLO_TREES)}${id}/download?id_style=public`;
     },
   },
   {
@@ -36,7 +37,7 @@ export const PHYLO_RUN_TRANSFORMS: Transform[] = [
       if (typeof id !== "number") {
         return undefined;
       }
-      return `${API_URL}/v2/phylo_trees/${id}/sample_ids`;
+      return `${API_URL}${generateOrgSpecificUrl(ORG_API.PHYLO_TREES)}${id}/sample_ids`;
     },
   },
   {

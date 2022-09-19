@@ -1,5 +1,5 @@
 import {
-  AnalyticsTreeViewNextstrain,
+  AnalyticsTreeViewGalago,
   EVENT_TYPES,
 } from "src/common/analytics/eventTypes";
 import { analyticsTrackEvent } from "src/common/analytics/methods";
@@ -34,9 +34,8 @@ export const GalagoConfirmationModal = ({
     <ConfirmButton
       treeId={treeId}
       onClick={() =>
-        // TODO: ehoops - update analytics event as part of sc-214167
-        analyticsTrackEvent<AnalyticsTreeViewNextstrain>(
-          EVENT_TYPES.TREE_VIEW_NEXTSTRAIN,
+        analyticsTrackEvent<AnalyticsTreeViewGalago>(
+          EVENT_TYPES.TREE_VIEW_GALAGO,
           {
             tree_id: treeId,
           }
