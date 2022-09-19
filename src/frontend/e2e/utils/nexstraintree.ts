@@ -1,4 +1,4 @@
-import { faker } from "@faker-js/faker";
+const faker = require("@faker-js/faker");
 import { sample } from "lodash";
 import { GeneralUtil } from "./general";
 

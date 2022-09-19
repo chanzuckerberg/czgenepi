@@ -1,4 +1,4 @@
-import { faker } from "@faker-js/faker";
+const faker = require("@faker-js/faker");
 
 export class GeneralUtil {
   public static getValueOrDefault = function <T>(value: T, defaultValue: T): T {

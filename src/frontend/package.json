@@ -90,6 +90,7 @@
     "@testing-library/react-hooks": "^7.0.0",
     "@testing-library/user-event": "^12.6.0",
     "@types/deep-equal": "^1.0.1",
+    "@types/faker": "^6.6.9",
     "@types/jest": "^26.0.24",
     "@types/papaparse": "^5.2.5",
     "@types/react-csv": "^1.1.1",

@@ -54,6 +54,7 @@ module.exports = {
       },
     ],
     "prettier/prettier": 0,
+    "@typescript-eslint/no-var-requires": 0,
   },
   settings: {
     react: {
