@@ -100,12 +100,22 @@ export abstract class FilterSample {
     return filterDate;
   }
 
-  //calculate days between two different dates, takings today as initial date to measure
-  public static getDaysFromDateRange(filteredDate: string){
+  //based on a given date string create a date in the past with the amount of days minus the original date
+  public static getPastDateBasedOnSampleResponse(filteredDate: string): Date{
     const today = new Date();
     const pastDate =  new Date(filteredDate);
     const difference = today.getTime() - pastDate.getTime();
-    return  Math.ceil(difference / (1000 * 3600 * 24));
+    const daysForFilter = Math.ceil(difference / (1000 * 3600 * 24));
+   if(daysForFilter <= 7){
+        today.setDate(today.getDate() - 7)
+   }else if(daysForFilter <= 30){
+         today.setDate(today.getDate() - 30)
+   }else if(daysForFilter <= 90){
+         today.setDate(today.getDate() - 90)
+   }else if(daysForFilter <= 180){
+         today.setDate(today.getDate() - 180)
+   }else {today.setDate(today.getDate() - daysForFilter)}
+   return today;
   }
 
 }

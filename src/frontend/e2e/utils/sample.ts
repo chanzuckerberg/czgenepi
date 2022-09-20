@@ -52,7 +52,7 @@ export class SampleUtil {
           defaults?.sample?.public_identifier,
           GeneralUtil.generatePublicSampleId()
         ) as string,
-        status: ""
+        status: "complete"
       },
     };
   }

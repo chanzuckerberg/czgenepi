@@ -7,11 +7,11 @@ test.describe("Mock sample API data tests", () => {
     const url = `${process.env.BASEURL}/data/samples/`;
     const api = `${process.env.BASEAPI}/v2/orgs/${process.env.GROUPID}/pathogens/SC2/samples/`;
 
-  test.only("Should filter by complete genome recovery", async ({ page, context }) => {
+  test("Should filter by complete genome recovery", async ({ page, context }) => {
     const mockData = {
       sample: SampleUtil.getSampleResponseData(),
     };
-    mockData.sample.status = 'completed';
+    mockData.sample.status = 'complete';
    
     await context.route(api, async (route) => {
       const response = await context.request.get(api);
@@ -77,18 +77,8 @@ test.describe("Mock sample API data tests", () => {
       sample: SampleUtil.getSampleResponseData(),
     };
 
-   const daysForFilter = FilterSample.getDaysFromDateRange(mockData.sample.collection_date);
-   const today = new Date();
-   if(daysForFilter <= 7){
-        today.setDate(today.getDate() - 7)
-   }else if(daysForFilter <= 30){
-         today.setDate(today.getDate() - 30)
-   }else if(daysForFilter <= 90){
-         today.setDate(today.getDate() - 90)
-   }else if(daysForFilter <= 180){
-         today.setDate(today.getDate() - 180)
-   }else {today.setDate(today.getDate() - daysForFilter)}
-
+   const today = FilterSample.getPastDateBasedOnSampleResponse(mockData.sample.collection_date);
+  
    mockData.sample.collection_date = today.getFullYear()+"/"+today.getMonth()+"/"+today.getDay();
    
     await context.route(api, async (route) => {
