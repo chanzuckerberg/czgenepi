@@ -152,6 +152,7 @@ jobs:
           install_globally: "true"
       - name: Create empty storagestate file
         run: |
+          echo ${GITHUB_WORKSPACE}
           touch ./e2e/storage/state.json
       - name: Playwright tests
         run: |
