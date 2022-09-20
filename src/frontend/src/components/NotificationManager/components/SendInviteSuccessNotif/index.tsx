@@ -16,14 +16,13 @@ const SendInviteSuccessNotif = ({ numSent, onDismiss }: Props): JSX.Element => {
   };
 
   return (
-    <>
+    <span>
       {numSent} {pluralize("Invitation", numSent)} {pluralize("has", numSent)}{" "}
       been sent.{" "}
-      <Link component="button" sdsStyle="dashed" onClick={onClick}>
+      <Link sdsStyle="dashed" onClick={onClick}>
         View Invitations
-      </Link>
-      .
-    </>
+      </Link>.
+    </span>
   );
 };
 

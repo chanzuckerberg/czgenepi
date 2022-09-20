@@ -1,15 +1,15 @@
-import { StyledNewTabLink } from "./style";
+import { NewTabLink } from "src/common/components/library/NewTabLink";
 
 interface Props {
   usherLink: string;
 }
 
 export const UsherPlacementSuccessNotif = ({ usherLink }: Props): JSX.Element => (
-  <div>
+  <span>
     Your samples were successfuly sent to UShER. It may take a few minutes for your placement to load.{" "}
-    <StyledNewTabLink href={usherLink}>
+    <NewTabLink href={usherLink} sdsStyle="dashed">
       View your placement
-    </StyledNewTabLink>
+    </NewTabLink>
     .
-  </div>
+  </span>
 );

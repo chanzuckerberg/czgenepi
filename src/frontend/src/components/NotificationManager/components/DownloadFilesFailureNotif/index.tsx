@@ -5,7 +5,7 @@ export const DownloadFilesFailureNotif = (): JSX.Element => (
   <>
     <B>
       Something went wrong and we were unable to complete one or more of
-      your downloads
+      your downloads.
     </B>{" "}
     <ContactUsLink />
   </>

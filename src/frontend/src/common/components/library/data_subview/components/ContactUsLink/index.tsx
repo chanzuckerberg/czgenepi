@@ -1,11 +1,11 @@
-import { StyledNewTabLink } from "./style";
+import { NewTabLink } from "src/common/components/library/NewTabLink";
 
 const ContactUsLink = (): JSX.Element => (
   <span>
     Please try again later or{" "}
-    <StyledNewTabLink href="mailto:hello@czgenepi.org">
+    <NewTabLink href="mailto:hello@czgenepi.org" sdsStyle="dashed">
       contact us
-    </StyledNewTabLink>{" "}
+    </NewTabLink>{" "}
     for help.
   </span>
 );
