@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useDeletePhyloRun } from "src/common/queries/phyloRuns";
 import { addNotification } from "src/common/redux/actions";
 import { useDispatch } from "src/common/redux/hooks";
@@ -20,6 +19,7 @@ const DeleteTreeConfirmationModal = ({
   const deletePhyloRunMutation = useDeletePhyloRun({
     componentOnSuccess: () => {
       dispatch(addNotification({
+        id: Date.now(),
         autoDismiss: true,
         intent: "info",
         text: "Your tree has been deleted.",
@@ -27,6 +27,7 @@ const DeleteTreeConfirmationModal = ({
     },
     componentOnError: () => {
       dispatch(addNotification({
+        id: Date.now(),
         autoDismiss: true,
         intent: "error",
         text: "We were unable to delete your tree. Please try again later.",

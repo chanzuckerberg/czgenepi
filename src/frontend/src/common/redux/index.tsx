@@ -37,6 +37,7 @@ const getInitialState = () => {
   const storedGroup = getGroupIdFromLocalStorage() ?? FALLBACK_GROUP_ID;
   const storedPathogen = getPathogenFromLocalStorage() ?? Pathogen.COVID;
 
+  // TODO (mlila): remove test notifs
   const notifications: ReduxNotification[] = [{
     id: Date.now(),
     intent: "error",

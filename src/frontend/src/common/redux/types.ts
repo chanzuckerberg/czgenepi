@@ -36,4 +36,5 @@ type WithText = {
 export type ReduxNotification = ExposedNotificationProps & {
   id: number;
   shouldShowCloseButton?: boolean;
+  componentProps: any;
 } & (WithComponentKey | WithText);

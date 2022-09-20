@@ -132,6 +132,7 @@ const DownloadModal = ({
     useFileDownload({
       componentOnError: () => {
         dispatch(addNotification({
+          id: Date.now(),
           buttonOnClick: true,
           intent: "error",
           componentKey: NotificationComponents.DOWNLOAD_FILES_FAILURE,

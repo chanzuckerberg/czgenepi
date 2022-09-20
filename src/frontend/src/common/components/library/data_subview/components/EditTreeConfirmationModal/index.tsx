@@ -41,6 +41,7 @@ export const EditTreeConfirmationModal = ({
       dispatch(addNotification({
         autoDismiss: true,
         dismissDirection: "left",
+        id: Date.now(),
         intent: "info",
         text: "Tree name was successfully updated.",
       }));
@@ -49,6 +50,7 @@ export const EditTreeConfirmationModal = ({
       dispatch(addNotification({
         autoDismiss: true,
         dismissDirection: "left",
+        id: Date.now(),
         intent: "error",
         text: "Something went wrong and we were unable to update your tree name. Please try again later.",
       }));

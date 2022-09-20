@@ -34,6 +34,7 @@ const DeleteSamplesConfirmationModal = ({
   const deleteSampleMutation = useDeleteSamples({
     componentOnError: () => {
       dispatch(addNotification({
+        id: Date.now(),
         autoDismiss: true,
         intent: "error",
         text: "We were unable to delete the selected samples. Please try again later.",
@@ -41,6 +42,7 @@ const DeleteSamplesConfirmationModal = ({
     },
     componentOnSuccess: () => {
       dispatch(addNotification({
+        id: Date.now(),
         autoDismiss: true,
         intent: "info",
         text: `${numDeletedSamples} ${pluralize("sample", numDeletedSamples)} ${pluralize("has", numDeletedSamples)} been deleted.`,

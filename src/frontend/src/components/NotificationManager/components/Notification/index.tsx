@@ -6,19 +6,35 @@ import { ReduxNotification } from "src/common/redux/types";
 import { CreateNSTreeFailureNotif } from "../CreateNSTreeFailureNotif";
 import { CreateNSTreeSuccessNotif } from "../CreateNSTreeSuccessNotif";
 import { DownloadFilesFailureNotif } from "../DownloadFilesFailureNotif";
+import { SendInviteFailureNotif } from "../SendInviteFailureNotif";
+import { SendInviteSuccessNotif } from "../SendInviteSuccessNotif";
 import { UsherPlacementSuccessNotif } from "../UsherPlacementSuccessNotif";
+
+/**
+ * We should only store things that are directly serializable (strings, numbers, etc) in redux.
+ * This enum exists so we can tell Redux which component to use (by storing a string key)
+ * without actually storing the entire component in redux.
+ */
 
 export enum NotificationComponents {
   CREATE_NS_TREE_SUCCESS = "createNSTreeSuccess",
   CREATE_NS_TREE_FAILURE = "createNSTreeFailure",
   DOWNLOAD_FILES_FAILURE = "downloadFilesFailure",
+  INVITE_USERS_SUCCESS = "inviteUserSuccess",
+  INVITE_USERS_FAILURE =  "inviteUsersFailure",
   USHER_PLACEMENT_SUCCESS = "usherPlacementSuccess",
 }
 
+/**
+ * After redux tells us which component to use, we can use the stored key to get access to the
+ * component we want to instantiate
+ */
 const componentMap: Require<NotificationComponents, ReactNode> = {
   [NotificationComponents.CREATE_NS_TREE_FAILURE]: CreateNSTreeFailureNotif,
   [NotificationComponents.CREATE_NS_TREE_SUCCESS]: CreateNSTreeSuccessNotif,
   [NotificationComponents.DOWNLOAD_FILES_FAILURE]: DownloadFilesFailureNotif,
+  [NotificationComponents.INVITE_USERS_SUCCESS]: SendInviteSuccessNotif,
+  [NotificationComponents.INVITE_USERS_FAILURE]: SendInviteFailureNotif,
   [NotificationComponents.USHER_PLACEMENT_SUCCESS]: UsherPlacementSuccessNotif,
 };
 
@@ -28,7 +44,7 @@ interface Props {
 
 const Notification = ({ notification }: Props): JSX.Element => {
   const dispatch = useDispatch();
-  const { id, componentKey, shouldShowCloseButton, text, ...rest } = notification;
+  const { id, componentKey, componentProps, shouldShowCloseButton, text, ...rest } = notification;
 
   const onDismiss = () => {
     dispatch(deleteNotification(id));
@@ -38,7 +54,7 @@ const Notification = ({ notification }: Props): JSX.Element => {
 
   if (!children) {
     const Content = componentMap[componentKey];
-    children = <Content onDismiss={onDismiss} />
+    children = <Content onDismiss={onDismiss} {...componentProps} />
   }
 
 

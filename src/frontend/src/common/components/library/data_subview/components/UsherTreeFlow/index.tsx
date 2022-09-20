@@ -85,6 +85,7 @@ const UsherTreeFlow = ({
     setIsPlacementOpen(false);
 
     dispatch(addNotification({
+      id: Date.now(),
       intent: "info",
       buttonOnClick: () => setUsherLink(""),
       componentKey: NotificationComponents.USHER_PLACEMENT_SUCCESS,

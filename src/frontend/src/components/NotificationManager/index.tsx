@@ -5,7 +5,6 @@ import { Notification } from "./components/Notification";
 import { StyledNotificationContainer } from "./style";
 
 const NotificationsManager = (): JSX.Element => {
-  console.trace();
   const notifications = useSelector(selectNotifications);
 
   return (

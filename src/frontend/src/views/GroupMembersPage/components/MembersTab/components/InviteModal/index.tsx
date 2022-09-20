@@ -13,9 +13,7 @@ import { addNotification } from "src/common/redux/actions";
 import { useDispatch } from "src/common/redux/hooks";
 import { selectCurrentGroup } from "src/common/redux/selectors";
 import { B } from "src/common/styles/basicStyle";
-import { FailedToSendNotification } from "./components/FailedToSendNotification";
 import { InvalidEmailError } from "./components/InvalidEmailError";
-import { SentNotification } from "./components/SentNotification";
 import {
   SmallText,
   StyledCallout,
@@ -50,6 +48,7 @@ const InviteModal = ({
     []
   );
 
+  // TODO (mlila): make sure all notifs that previously had buttonOnClick still have them
   const sendInvitationMutation = useSendGroupInvitations({
     componentOnSuccess: ({ invitations }) => {
       // show a warning if we aren't sending invites for existing users
@@ -57,24 +56,27 @@ const InviteModal = ({
       setFailedToSendAddresses(failedInvites.map((i) => i.email));
       if (failedInvites.length > 0) {
         dispatch(addNotification({
-
+          id: Date.now(),
+          shouldShowCloseButton: true,
+          intent: "warning",
+          componentProps: {
+            failedToSendAddresses,
+          }
         }));
-        <FailedToSendNotification
-          failedToSendAddresses={failedToSendAddresses}
-          onDismiss={() => setIsFailureNotificationOpen(false)}
-          open={isFailureNotificationOpen}
-        />
       }
 
       // show success for any invites we did send
       const successCount = invitations.length - failedInvites.length;
       setSentCount(successCount);
       if (successCount > 0) {
-        <SentNotification
-        numSent={sentCount}
-        onDismiss={() => setIsSuccessNotificationOpen(false)}
-        open={isSuccessNotificationOpen}
-      />
+        dispatch(addNotification({
+          shouldShowCloseButton: true,
+          intent: "info",
+          autoDismiss: true,
+          componentProps: {
+            numSent: sentCount,
+          }
+        }));
       }
 
       handleClose();
