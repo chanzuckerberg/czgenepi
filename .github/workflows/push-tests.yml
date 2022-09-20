@@ -152,7 +152,7 @@ jobs:
           install_globally: "true"
       - name: Create empty storagestate file
         run: |
-          touch ./src/frontend/e2e/storage/state.json
+          touch ./e2e/storage/state.json
       - name: Playwright tests
         run: |
           echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
