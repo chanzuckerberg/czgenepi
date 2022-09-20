@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { EVENT_TYPES } from "src/common/analytics/eventTypes";
 import { analyticsTrackEvent } from "src/common/analytics/methods";
+import { addNotification } from "src/common/redux/actions";
+import { useDispatch } from "src/common/redux/hooks";
 import { ROUTES } from "src/common/routes";
-import Notification from "src/components/Notification";
+import { NotificationComponents } from "src/components/NotificationManager/components/Notification";
 import { UsherConfirmationModal } from "./components/UsherConfirmationModal";
 import { UsherPlacementModal } from "./components/UsherPlacementModal";
-import { StyledNewTabLink } from "./style";
 
 interface Props {
   checkedSampleIds: string[];
@@ -40,9 +41,10 @@ const UsherTreeFlow = ({
   failedSampleIds,
   shouldStartUsherFlow,
 }: Props): JSX.Element => {
+  const dispatch = useDispatch();
+
   const [isPlacementOpen, setIsPlacementOpen] = useState<boolean>(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState<boolean>(false);
-  const [isAlertShown, setIsAlertShown] = useState<boolean>(false);
   const [usherLink, setUsherLink] = useState<string>("");
 
   useEffect(() => {
@@ -81,12 +83,12 @@ const UsherTreeFlow = ({
     analyticsTrackEvent(EVENT_TYPES.TREE_CREATION_VIEW_USHER);
     setIsConfirmOpen(false);
     setIsPlacementOpen(false);
-    setIsAlertShown(true);
-  };
 
-  const handleAlertClose = () => {
-    setIsAlertShown(false);
-    setUsherLink("");
+    dispatch(addNotification({
+      intent: "info",
+      buttonOnClick: () => setUsherLink(""),
+      componentKey: NotificationComponents.USHER_PLACEMENT_SUCCESS,
+    }));
   };
 
   return (
@@ -103,21 +105,6 @@ const UsherTreeFlow = ({
         onClose={handleConfirmationClose}
         onConfirm={handleConfirmationConfirm}
       />
-      {isAlertShown && (
-        <Notification
-          buttonOnClick={handleAlertClose}
-          buttonText="DISMISS"
-          dismissDirection="right"
-          intent="info"
-        >
-          Your samples were successfuly sent to UShER. It may take a few minutes
-          for your placement to load.{" "}
-          <StyledNewTabLink href={usherLink}>
-            View your placement
-          </StyledNewTabLink>
-          .
-        </Notification>
-      )}
     </>
   );
 };

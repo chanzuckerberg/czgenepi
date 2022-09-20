@@ -9,9 +9,10 @@ import {
 } from "src/common/constants/inputDelimiters";
 import { useSendGroupInvitations } from "src/common/queries/groups";
 import { FALLBACK_GROUP_ID } from "src/common/redux";
+import { addNotification } from "src/common/redux/actions";
+import { useDispatch } from "src/common/redux/hooks";
 import { selectCurrentGroup } from "src/common/redux/selectors";
 import { B } from "src/common/styles/basicStyle";
-import { StyledNotificationContainer } from "src/components/NotificationManager/style";
 import { FailedToSendNotification } from "./components/FailedToSendNotification";
 import { InvalidEmailError } from "./components/InvalidEmailError";
 import { SentNotification } from "./components/SentNotification";
@@ -36,16 +37,13 @@ const InviteModal = ({
   onClose,
   open,
 }: Props): JSX.Element | null => {
+  const dispatch = useDispatch();
   const [inputValue, setInputValue] = useState<string>("");
   const [hasMoreThan50Invites, setHasMoreThan50Invites] =
     useState<boolean>(false);
   const [invalidAddresses, setInvalidAddresses] = useState<string[]>([]);
   // @ts-expect-error remove when api call finished
   const [shouldValidateOnChange, setShouldValidateOnChange] = // eslint-disable-line @typescript-eslint/no-unused-vars
-    useState<boolean>(false);
-  const [isSuccessNotificationOpen, setIsSuccessNotificationOpen] =
-    useState<boolean>(false);
-  const [isFailureNotificationOpen, setIsFailureNotificationOpen] =
     useState<boolean>(false);
   const [sentCount, setSentCount] = useState<number>(0);
   const [failedToSendAddresses, setFailedToSendAddresses] = useState<string[]>(
@@ -57,12 +55,27 @@ const InviteModal = ({
       // show a warning if we aren't sending invites for existing users
       const failedInvites = filter(invitations, (i) => !i.success);
       setFailedToSendAddresses(failedInvites.map((i) => i.email));
-      if (failedInvites.length > 0) setIsFailureNotificationOpen(true);
+      if (failedInvites.length > 0) {
+        dispatch(addNotification({
+
+        }));
+        <FailedToSendNotification
+          failedToSendAddresses={failedToSendAddresses}
+          onDismiss={() => setIsFailureNotificationOpen(false)}
+          open={isFailureNotificationOpen}
+        />
+      }
 
       // show success for any invites we did send
       const successCount = invitations.length - failedInvites.length;
       setSentCount(successCount);
-      if (successCount > 0) setIsSuccessNotificationOpen(true);
+      if (successCount > 0) {
+        <SentNotification
+        numSent={sentCount}
+        onDismiss={() => setIsSuccessNotificationOpen(false)}
+        open={isSuccessNotificationOpen}
+      />
+      }
 
       handleClose();
     },
@@ -155,60 +168,46 @@ const InviteModal = ({
   };
 
   return (
-    <>
-      <StyledNotificationContainer>
-        <SentNotification
-          numSent={sentCount}
-          onDismiss={() => setIsSuccessNotificationOpen(false)}
-          open={isSuccessNotificationOpen}
+    <Dialog open={open} onClose={handleClose} sdsSize="s">
+      <DialogTitle title={`Invite to ${groupName}`} onClose={handleClose} />{" "}
+      {/* TODO (mlila): make group name bold after sds dialog allows ReactNode */}
+      <StyledDialogContent>
+        <StyledInstructions
+          title="Instructions"
+          titleSize="s"
+          bodySize="xs"
+          items={instructions}
         />
-        <FailedToSendNotification
-          failedToSendAddresses={failedToSendAddresses}
-          onDismiss={() => setIsFailureNotificationOpen(false)}
-          open={isFailureNotificationOpen}
+        <StyledInputText
+          id="invite-email-input"
+          sdsType="textArea"
+          label="Emails"
+          onChange={onInputChange}
+          placeholder="e.g. userone@domain.com, usertwo@domain.com"
+          intent={inputIntent}
+          value={inputValue}
+          maxRows={4}
         />
-      </StyledNotificationContainer>
-      <Dialog open={open} onClose={handleClose} sdsSize="s">
-        <DialogTitle title={`Invite to ${groupName}`} onClose={handleClose} />{" "}
-        {/* TODO (mlila): make group name bold after sds dialog allows ReactNode */}
-        <StyledDialogContent>
-          <StyledInstructions
-            title="Instructions"
-            titleSize="s"
-            bodySize="xs"
-            items={instructions}
-          />
-          <StyledInputText
-            id="invite-email-input"
-            sdsType="textArea"
-            label="Emails"
-            onChange={onInputChange}
-            placeholder="e.g. userone@domain.com, usertwo@domain.com"
-            intent={inputIntent}
-            value={inputValue}
-            maxRows={4}
-          />
-          {hasMoreThan50Invites && (
-            <StyledCallout intent="error">
-              <B>You can’t send more than 50 invites at a time. </B>
-              Please reduce the number of emails before continuing.
-            </StyledCallout>
-          )}
-          <InvalidEmailError invalidAddresses={invalidAddresses} />
-        </StyledDialogContent>
-        <DialogActions buttonPosition="left">
-          <Button
-            sdsType="primary"
-            sdsStyle="rounded"
-            disabled={!inputValue}
-            onClick={handleFormSubmit}
-          >
-            Send Invites
-          </Button>
-        </DialogActions>
-        <SmallText>Invites will expire 14 days after they are sent.</SmallText>
-      </Dialog>
-    </>
+        {hasMoreThan50Invites && (
+          <StyledCallout intent="error">
+            <B>You can’t send more than 50 invites at a time. </B>
+            Please reduce the number of emails before continuing.
+          </StyledCallout>
+        )}
+        <InvalidEmailError invalidAddresses={invalidAddresses} />
+      </StyledDialogContent>
+      <DialogActions buttonPosition="left">
+        <Button
+          sdsType="primary"
+          sdsStyle="rounded"
+          disabled={!inputValue}
+          onClick={handleFormSubmit}
+        >
+          Send Invites
+        </Button>
+      </DialogActions>
+      <SmallText>Invites will expire 14 days after they are sent.</SmallText>
+    </Dialog>
   );
 };
 

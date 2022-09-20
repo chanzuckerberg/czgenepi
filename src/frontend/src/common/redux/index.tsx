@@ -1,5 +1,6 @@
 import { AnyAction, applyMiddleware, createStore } from "redux";
 import { composeWithDevTools } from "redux-devtools-extension";
+import { NotificationComponents } from "src/components/NotificationManager/components/Notification";
 import { setGroupMiddleware, setPathogenMiddleware } from "./middleware";
 import { CZGEReduxActions, Pathogen, ReduxNotification } from "./types";
 import {
@@ -35,7 +36,23 @@ export const FALLBACK_GROUP_ID = -1;
 const getInitialState = () => {
   const storedGroup = getGroupIdFromLocalStorage() ?? FALLBACK_GROUP_ID;
   const storedPathogen = getPathogenFromLocalStorage() ?? Pathogen.COVID;
-  const notifications: ReduxNotification[] = [];
+
+  const notifications: ReduxNotification[] = [{
+    id: Date.now(),
+    intent: "error",
+    componentKey: NotificationComponents.CREATE_NS_TREE_FAILURE,
+    shouldShowCloseButton: true,
+  }, {
+    id: Date.now() + 1,
+    autoDismiss: 12000,
+    intent: "info",
+    componentKey: NotificationComponents.CREATE_NS_TREE_SUCCESS,
+  }, {
+    id: Date.now() + 2,
+    autoDismiss: 12000,
+    intent: "info",
+    componentKey: NotificationComponents.CREATE_NS_TREE_SUCCESS,
+  }];
 
   return {
     current: {

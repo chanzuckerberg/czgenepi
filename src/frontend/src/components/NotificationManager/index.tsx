@@ -5,15 +5,16 @@ import { Notification } from "./components/Notification";
 import { StyledNotificationContainer } from "./style";
 
 const NotificationsManager = (): JSX.Element => {
+  console.trace();
   const notifications = useSelector(selectNotifications);
 
   return (
     <StyledNotificationContainer>
-      {notifications.map((notification: ReduxNotification) => {
-        <Notification notification={notification} />
-      })}
+      {notifications.map((notification: ReduxNotification) => (
+        <Notification key={notification.id} notification={notification} />
+      ))}
     </StyledNotificationContainer>
   );
 };
 
-export default NotificationsManager;
+export { NotificationsManager };

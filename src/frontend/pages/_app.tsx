@@ -19,6 +19,7 @@ import "src/common/styles/global.css";
 import "src/common/styles/oneTrust.css";
 import { theme } from "src/common/styles/theme";
 import Nav from "src/components/NavBar";
+import { NotificationsManager } from "src/components/NotificationManager";
 import SplitInitializer from "src/components/Split";
 import createEmotionCache from "src/createEmotionCache";
 
@@ -91,6 +92,7 @@ const App = ({
             <ThemeProvider theme={theme}>
               <CssBaseline />
               <StyledApp>
+                <NotificationsManager />
                 <Nav />
                 <Component {...pageProps} />
               </StyledApp>
