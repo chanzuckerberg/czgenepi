@@ -1,6 +1,5 @@
 import { AnyAction, applyMiddleware, createStore } from "redux";
 import { composeWithDevTools } from "redux-devtools-extension";
-import { NotificationComponents } from "src/components/NotificationManager/components/Notification";
 import { setGroupMiddleware, setPathogenMiddleware } from "./middleware";
 import { CZGEReduxActions, Pathogen, ReduxNotification } from "./types";
 import {
@@ -36,24 +35,7 @@ export const FALLBACK_GROUP_ID = -1;
 const getInitialState = () => {
   const storedGroup = getGroupIdFromLocalStorage() ?? FALLBACK_GROUP_ID;
   const storedPathogen = getPathogenFromLocalStorage() ?? Pathogen.COVID;
-
-  // TODO (mlila): remove test notifs
-  const notifications: ReduxNotification[] = [{
-    id: Date.now(),
-    intent: "error",
-    componentKey: NotificationComponents.CREATE_NS_TREE_FAILURE,
-    shouldShowCloseButton: true,
-  }, {
-    id: Date.now() + 1,
-    autoDismiss: 12000,
-    intent: "info",
-    componentKey: NotificationComponents.CREATE_NS_TREE_SUCCESS,
-  }, {
-    id: Date.now() + 2,
-    autoDismiss: 12000,
-    intent: "info",
-    componentKey: NotificationComponents.CREATE_NS_TREE_SUCCESS,
-  }];
+  const notifications: ReduxNotification[] = [];
 
   return {
     current: {
@@ -92,7 +74,7 @@ const reduxReducer = (state = getInitialState(), action: AnyAction) => {
     case CZGEReduxActions.DELETE_NOTIFICATION_ACTION_TYPE:
       return {
         ...state,
-        notifications: state.notifications.filter((n) => n.id !== payload),
+        notifications: state.notifications.filter((n) => n.reduxId !== payload),
       };
     default:
       return state;

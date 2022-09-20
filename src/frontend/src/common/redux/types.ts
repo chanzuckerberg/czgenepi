@@ -1,5 +1,4 @@
 import { ExposedNotificationProps } from "czifui";
-import { ReactNode } from "react";
 import { NotificationComponents } from "src/components/NotificationManager/components/Notification";
 
 export type ActionType<T> = (payload?: T) => {
@@ -25,16 +24,10 @@ export enum ReduxPersistenceTokens {
   PATHOGEN = "currentPathogen",
 }
 
-type WithComponentKey = {
-  componentKey: NotificationComponents;
-};
-
-type WithText = {
-  text: string;
-}
-
 export type ReduxNotification = ExposedNotificationProps & {
-  id: number;
+  reduxId: number;
   shouldShowCloseButton?: boolean;
+  componentKey?: NotificationComponents;
   componentProps: any;
-} & (WithComponentKey | WithText);
+  text?: string;
+};

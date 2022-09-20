@@ -20,7 +20,7 @@ const DeleteTreeConfirmationModal = ({
     componentOnSuccess: () => {
       dispatch(addNotification({
         autoDismiss: true,
-        id: Date.now(),
+        reduxId: Date.now(),
         intent: "info",
         shouldShowCloseButton: true,
         text: "Your tree has been deleted.",
@@ -29,7 +29,7 @@ const DeleteTreeConfirmationModal = ({
     componentOnError: () => {
       dispatch(addNotification({
         autoDismiss: true,
-        id: Date.now(),
+        reduxId: Date.now(),
         intent: "error",
         shouldShowCloseButton: true,
         text: "We were unable to delete your tree. Please try again later.",

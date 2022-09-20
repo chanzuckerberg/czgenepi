@@ -1,5 +1,5 @@
 import { Notification as SDSNotification } from "czifui";
-import { ReactNode } from "react";
+import { FC, ReactNode } from "react";
 import { deleteNotification } from "src/common/redux/actions";
 import { useDispatch } from "src/common/redux/hooks";
 import { ReduxNotification } from "src/common/redux/types";
@@ -29,7 +29,7 @@ export enum NotificationComponents {
  * After redux tells us which component to use, we can use the stored key to get access to the
  * component we want to instantiate
  */
-const componentMap: Require<NotificationComponents, ReactNode> = {
+const componentMap: Record<Required<NotificationComponents>, FC<any>> = {
   [NotificationComponents.CREATE_NS_TREE_FAILURE]: CreateNSTreeFailureNotif,
   [NotificationComponents.CREATE_NS_TREE_SUCCESS]: CreateNSTreeSuccessNotif,
   [NotificationComponents.DOWNLOAD_FILES_FAILURE]: DownloadFilesFailureNotif,
@@ -44,15 +44,15 @@ interface Props {
 
 const Notification = ({ notification }: Props): JSX.Element => {
   const dispatch = useDispatch();
-  const { id, componentKey, componentProps, shouldShowCloseButton, text, ...rest } = notification;
+  const { reduxId, componentKey, componentProps, shouldShowCloseButton, text, ...rest } = notification;
 
   const onDismiss = () => {
-    dispatch(deleteNotification(id));
+    dispatch(deleteNotification(reduxId));
   };
 
-  let children = text;
+  let children: ReactNode = text;
 
-  if (!children) {
+  if (!children && componentKey) {
     const Content = componentMap[componentKey];
     children = <Content onDismiss={onDismiss} {...componentProps} />
   }

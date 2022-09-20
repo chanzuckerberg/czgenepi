@@ -41,7 +41,7 @@ export const EditTreeConfirmationModal = ({
       dispatch(addNotification({
         autoDismiss: true,
         dismissDirection: "left",
-        id: Date.now(),
+        reduxId: Date.now(),
         intent: "info",
         shouldShowCloseButton: true,
         text: "Tree name was successfully updated.",
@@ -51,7 +51,7 @@ export const EditTreeConfirmationModal = ({
       dispatch(addNotification({
         autoDismiss: true,
         dismissDirection: "left",
-        id: Date.now(),
+        reduxId: Date.now(),
         intent: "error",
         shouldShowCloseButton: true,
         text: "Something went wrong and we were unable to update your tree name. Please try again later.",

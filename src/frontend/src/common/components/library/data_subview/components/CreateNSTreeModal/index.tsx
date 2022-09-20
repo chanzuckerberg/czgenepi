@@ -122,7 +122,7 @@ export const CreateNSTreeModal = ({
   const mutation = useCreateTree({
     componentOnError: () => {
       dispatch(addNotification({
-        id: Date.now(),
+        reduxId: Date.now(),
         intent: "error",
         componentKey: NotificationComponents.CREATE_NS_TREE_FAILURE,
         shouldShowCloseButton: true,
@@ -141,7 +141,7 @@ export const CreateNSTreeModal = ({
       );
 
       dispatch(addNotification({
-        id: Date.now(),
+        reduxId: Date.now(),
         autoDismiss: 12000,
         intent: "info",
         componentKey: NotificationComponents.CREATE_NS_TREE_SUCCESS,

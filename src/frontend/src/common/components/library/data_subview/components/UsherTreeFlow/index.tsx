@@ -87,7 +87,10 @@ const UsherTreeFlow = ({
     dispatch(addNotification({
       buttonOnClick: () => setUsherLink(""),
       componentKey: NotificationComponents.USHER_PLACEMENT_SUCCESS,
-      id: Date.now(),
+      componentProps: {
+        usherLink,
+      },
+      reduxId: Date.now(),
       intent: "info",
       shouldShowCloseButton: true,
     }));

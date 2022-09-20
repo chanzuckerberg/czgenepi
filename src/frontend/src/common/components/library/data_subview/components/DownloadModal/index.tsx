@@ -132,9 +132,8 @@ const DownloadModal = ({
     useFileDownload({
       componentOnError: () => {
         dispatch(addNotification({
-          buttonOnClick: true,
           componentKey: NotificationComponents.DOWNLOAD_FILES_FAILURE,
-          id: Date.now(),
+          reduxId: Date.now(),
           intent: "error",
           shouldShowCloseButton: true,
         }));

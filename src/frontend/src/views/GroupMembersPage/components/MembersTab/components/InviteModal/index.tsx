@@ -55,7 +55,7 @@ const InviteModal = ({
       setFailedToSendAddresses(failedInvites.map((i) => i.email));
       if (failedInvites.length > 0) {
         dispatch(addNotification({
-          id: Date.now(),
+          reduxId: Date.now(),
           shouldShowCloseButton: true,
           intent: "warning",
           componentProps: {
