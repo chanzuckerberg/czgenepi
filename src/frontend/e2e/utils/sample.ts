@@ -1,4 +1,3 @@
-const faker = require("@faker-js/faker");
 import { sample } from "lodash";
 import { GeneralUtil } from "./general";
 import * as dotenv from "dotenv";
@@ -70,11 +69,11 @@ export class SampleUtil {
     return {
       collection_date: GeneralUtil.getADateInThePast(maxCollectionDateAge),
       collection_location: {
-        country: faker.address.country(),
-        division: faker.address.city(),
+        country: "USA",
+        division: "California",
         id: GeneralUtil.getRandomNumber(),
-        location: faker.address.county(),
-        region: faker.address.state(),
+        location: "Corodano",
+        region: "California",
       },
       czb_failed_genome_recovery: true,
       gisaid: {
