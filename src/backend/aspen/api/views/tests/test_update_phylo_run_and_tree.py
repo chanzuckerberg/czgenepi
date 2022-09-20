@@ -46,7 +46,7 @@ async def make_shared_test_data(
         )
         for i in range(1, 3)
     ]
-    
+
     phylo_run = phylorun_factory(group, pathogen=pathogen)
     phylo_tree = None
     if not no_trees:

@@ -104,7 +104,7 @@ def make_all_test_data(
     # we need SC2 so we can get the correct treatment from split
     pathogen: Pathogen = Pathogen(slug="SC2", name="sars-cov-2")
     setup_gisaid_and_genbank_repo_configs(async_session, pathogen)
-    
+
     samples: Collection[Sample] = make_sample_data(
         group, user, location, n_samples, pathogen
     )

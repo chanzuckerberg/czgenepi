@@ -80,11 +80,11 @@ async def create_phylotree_with_inputs(
     )
     samples = []
     input_entities = []
-    
+
     # we need SC2 so we can get the correct treatment from split
     pathogen = Pathogen(slug="SC2", name="sars-cov-2")
     setup_gisaid_and_genbank_repo_configs(async_session, pathogen)
-    
+
     for i in range(3):
         sample = sample_factory(
             owner_group,
@@ -101,7 +101,6 @@ async def create_phylotree_with_inputs(
         input_entities.append(input_entity)
 
     db_gisaid_samples = ["hCoV-19/gisaid_identifier", "hCoV-19/gisaid_identifier2"]
-
 
     phylo_run = phylorun_factory(
         owner_group,
@@ -129,11 +128,11 @@ async def create_phylotree(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    
+
     # we need SC2 so we can get the correct treatment from split
     pathogen = Pathogen(slug="SC2", name="sars-cov-2")
     setup_gisaid_and_genbank_repo_configs(async_session, pathogen)
-    
+
     sample = sample_factory(
         owner_group,
         user,
