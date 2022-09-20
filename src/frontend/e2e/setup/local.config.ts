@@ -27,6 +27,7 @@ const config: PlaywrightTestConfig = {
   use: {
     actionTimeout: 0,
     baseURL: "https://staging.czgenepi.org",
+    headless: true,
     ignoreHTTPSErrors: true,
     screenshot: "only-on-failure",
     storageState: "/tmp/state.json",
