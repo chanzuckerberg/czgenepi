@@ -127,6 +127,7 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
             handleFiles={handleFileChange}
             accept=".fasta,.fa,.txt,.gz,.zip"
             isLoading={isLoadingFile}
+            data-test-id="sample-upload-select-files-btn"
           />
           {parseErrors && (
             <AlertAccordion
@@ -138,7 +139,7 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
           {samples && (
             <>
               <StyledContainerSpaceBetween>
-                <StyledUploadCount>
+                <StyledUploadCount data-test-id="sample-upload-file-count">
                   {fileCount} {fileCount > 1 ? "files" : "file"} imported, with{" "}
                   {sampleCount} {sampleCount > 1 ? "samples" : "sample"}{" "}
                   selected for upload
@@ -150,6 +151,7 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
                   startIcon={
                     <Icon sdsIcon="xMark" sdsSize="s" sdsType="static" />
                   }
+                  data-test-id="sample-upload-remove-all-file-btn"
                 >
                   REMOVE ALL
                 </StyledRemoveAllButton>
@@ -167,6 +169,7 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
                 sdsType="primary"
                 sdsStyle="rounded"
                 disabled={!hasSamples(samples) || tooManySamples}
+                data-test-id="sample-upload-continue-btn"
               >
                 Continue
               </StyledButton>
@@ -174,7 +177,11 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
           </Link>
           <Link href={ROUTES.DATA_SAMPLES} passHref>
             <a href="passHref">
-              <Button sdsType="secondary" sdsStyle="rounded">
+              <Button
+                sdsType="secondary"
+                sdsStyle="rounded"
+                data-test-id="sample-upload-cancel-btn"
+              >
                 Cancel
               </Button>
             </a>
