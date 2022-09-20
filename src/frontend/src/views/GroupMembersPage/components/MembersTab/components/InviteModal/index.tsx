@@ -48,7 +48,6 @@ const InviteModal = ({
     []
   );
 
-  // TODO (mlila): make sure all notifs that previously had buttonOnClick still have them
   const sendInvitationMutation = useSendGroupInvitations({
     componentOnSuccess: ({ invitations }) => {
       // show a warning if we aren't sending invites for existing users

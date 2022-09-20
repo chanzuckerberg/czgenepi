@@ -19,17 +19,19 @@ const DeleteTreeConfirmationModal = ({
   const deletePhyloRunMutation = useDeletePhyloRun({
     componentOnSuccess: () => {
       dispatch(addNotification({
-        id: Date.now(),
         autoDismiss: true,
+        id: Date.now(),
         intent: "info",
+        shouldShowCloseButton: true,
         text: "Your tree has been deleted.",
       }));
     },
     componentOnError: () => {
       dispatch(addNotification({
-        id: Date.now(),
         autoDismiss: true,
+        id: Date.now(),
         intent: "error",
+        shouldShowCloseButton: true,
         text: "We were unable to delete your tree. Please try again later.",
       }));
     },
