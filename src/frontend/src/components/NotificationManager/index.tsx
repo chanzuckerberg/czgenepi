@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import { selectNotifications } from "src/common/redux/selectors";
 import { ReduxNotification } from "src/common/redux/types";
-import { Notification, NotificationComponents } from "./components/Notification";
+import { Notification } from "./components/Notification";
 import { StyledNotificationContainer } from "./style";
 
 const NotificationsManager = (): JSX.Element => {

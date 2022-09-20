@@ -58,7 +58,7 @@ const Notification = ({ notification }: Props): JSX.Element => {
   }
 
   return (
-    <SDSNotification {...rest} buttonOnClick={shouldShowCloseButton ? onDismiss : undefined}>
+    <SDSNotification {...rest} buttonOnClick={shouldShowCloseButton ? onDismiss : undefined} onClose={onDismiss}>
       {children}
     </SDSNotification>
   );
