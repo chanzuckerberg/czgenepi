@@ -150,9 +150,6 @@ jobs:
         with:
           happy_version: "0.19.0"
           install_globally: "true"
-      - name: Change owner of storage folde
-        run: |
-          chown -R 1001:1001 ./e2e/storage
       - name: Playwright tests
         run: |
           echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
