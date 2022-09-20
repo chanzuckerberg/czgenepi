@@ -8,7 +8,7 @@ const password = process.env.PASSWORD ?? "";
 
 async function globalSetup(config: FullConfig): Promise<void> {
   const { storageState } = config.projects[0].use;
-  const cookieStorage = "/tmp/state.json";
+  const cookieStorage = "/tmp/cookies.json";
   const { baseURL } = config.projects[0].use;
   const browser = await chromium.launch();
 
