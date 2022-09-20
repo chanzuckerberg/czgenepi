@@ -14,7 +14,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from aspen.api.authn import get_auth0_apiclient, get_cookie_userid
 from aspen.api.deps import get_auth0_client, get_db, get_splitio
 from aspen.api.main import get_app
-from aspen.api.settings import APISettings
 from aspen.auth.auth0_management import Auth0Client
 from aspen.database import connection as aspen_connection
 from aspen.database import schema
@@ -144,7 +143,7 @@ async def auth0_oauth() -> MagicMock:
 
 @pytest.fixture()
 async def split_client() -> MagicMock:
-    return SplitClient(APISettings())
+    return create_autospec(SplitClient)
 
 
 @pytest.fixture()

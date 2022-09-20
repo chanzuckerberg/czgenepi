@@ -1,6 +1,7 @@
 import json
 import re
 from base64 import urlsafe_b64decode, urlsafe_b64encode
+from aspen.database.models.pathogens import Pathogen
 
 import boto3
 import pytest
@@ -22,7 +23,7 @@ async def test_valid_auspice_link_generation(
     async_session: AsyncSession,
     http_client: AsyncClient,
 ):
-    user, group, samples, phylo_run, phylo_tree = await make_shared_test_data(
+    user, group, samples, phylo_run, phylo_tree, _ = await make_shared_test_data(
         async_session
     )
     auth_headers = {"user_id": user.auth0_user_id}
@@ -48,7 +49,7 @@ async def test_valid_auspice_link_access(
     http_client: AsyncClient,
     mock_s3_resource: boto3.resource,
 ):
-    user, group, samples, phylo_run, phylo_tree = await make_shared_test_data(
+    user, group, samples, phylo_run, phylo_tree, _ = await make_shared_test_data(
         async_session
     )
     # We need to create the bucket since this is all in Moto's 'virtual' AWS account
@@ -95,7 +96,7 @@ async def test_unauth_user_auspice_link_generation(
     async_session: AsyncSession,
     http_client: AsyncClient,
 ):
-    user, group, samples, phylo_run, phylo_tree = await make_shared_test_data(
+    user, group, samples, phylo_run, phylo_tree, _ = await make_shared_test_data(
         async_session
     )
     group_that_did_not_make_tree = group_factory(name="i_want_to_see_trees")
@@ -125,7 +126,7 @@ async def test_tampered_magic_link(
     http_client: AsyncClient,
     mock_s3_resource: boto3.resource,
 ):
-    user, group, samples, phylo_run, phylo_tree = await make_shared_test_data(
+    user, group, samples, phylo_run, phylo_tree, _ = await make_shared_test_data(
         async_session
     )
 
@@ -172,7 +173,7 @@ async def test_country_color_labeling(
     http_client: AsyncClient,
     mock_s3_resource: boto3.resource,
 ):
-    user, group, samples, phylo_run, phylo_tree = await make_shared_test_data(
+    user, group, samples, phylo_run, phylo_tree, _ = await make_shared_test_data(
         async_session
     )
 
@@ -353,7 +354,7 @@ async def test_location_color_labeling(
     api,
     mock_s3_resource: boto3.resource,
 ):
-    user, group, samples, phylo_run, phylo_tree = await make_shared_test_data(
+    user, group, samples, phylo_run, phylo_tree, _ = await make_shared_test_data(
         async_session
     )
 

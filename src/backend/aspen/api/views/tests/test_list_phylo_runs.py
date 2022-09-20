@@ -27,6 +27,7 @@ from aspen.test_infra.models.usergroup import (
     grouprole_factory,
     userrole_factory,
 )
+from aspen.test_infra.models.pathogen import random_pathogen_factory
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
@@ -101,8 +102,7 @@ def make_all_test_data(
     Sequence[PhyloTree],
     Collection[PhyloRun],
 ]:
-    # we need SC2 so we can get the correct treatment from split
-    pathogen: Pathogen = Pathogen(slug="SC2", name="sars-cov-2")
+    pathogen: Pathogen = random_pathogen_factory()
     setup_gisaid_and_genbank_repo_configs(async_session, pathogen)
 
     samples: Collection[Sample] = make_sample_data(

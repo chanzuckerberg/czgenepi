@@ -56,6 +56,7 @@ async def setup_invitation_flows(
         "name": "user1",
     }
 
+    split_client.get_usergroup_treatment.return_value = "on"  # type: ignore
     auth0_oauth.authorize_access_token.return_value = {"userinfo": userinfo}  # type: ignore
     return user1, user2, group
 

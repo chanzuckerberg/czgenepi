@@ -14,6 +14,7 @@ from aspen.test_infra.models.pathogen_repo_config import (
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.usergroup import group_factory, userrole_factory
+from aspen.test_infra.models.pathogen import random_pathogen_factory
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
@@ -21,7 +22,7 @@ pytestmark = pytest.mark.asyncio
 
 async def make_shared_test_data(
     async_session: AsyncSession, no_trees: bool = False, system_admin=False
-) -> Tuple[User, Group, List[Sample], PhyloRun, Union[PhyloTree, None]]:
+) -> Tuple[User, Group, List[Sample], PhyloRun, Union[PhyloTree, None], Pathogen]:
     location = location_factory(
         "North America",
         "USA",
@@ -32,8 +33,8 @@ async def make_shared_test_data(
     )
     group = group_factory(default_tree_location=location)
     user = await userrole_factory(async_session, group, system_admin=system_admin)
-    # we need SC2 so we can get the correct treatment from split
-    pathogen = Pathogen(slug="SC2", name="sars-cov-2")
+
+    pathogen = random_pathogen_factory()
     setup_gisaid_and_genbank_repo_configs(async_session, pathogen)
     samples = [
         sample_factory(
@@ -60,7 +61,7 @@ async def make_shared_test_data(
 
     await async_session.commit()
 
-    return user, group, samples, phylo_run, phylo_tree
+    return user, group, samples, phylo_run, phylo_tree, pathogen
 
 
 async def test_update_phylo_tree(

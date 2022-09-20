@@ -1,6 +1,8 @@
 import json
 from copy import deepcopy
 from typing import Dict
+from aspen.database.models.pathogens import Pathogen
+from aspen.api.utils.pathogens import get_pathogen_repo_config_for_pathogen
 
 import boto3
 import pytest
@@ -24,15 +26,14 @@ from aspen.util.split import SplitClient
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
 
-ID_MAPPED_TREE: Dict = create_id_mapped_tree(TEST_TREE)
-
 
 async def test_phylo_tree_can_see(
     async_session: AsyncSession,
     http_client: AsyncClient,
     mock_s3_resource: boto3.resource,
+    split_client: SplitClient,
 ):
-    user, group, samples, phylo_run, phylo_tree = await make_shared_test_data(
+    user, group, samples, phylo_run, phylo_tree, pathogen = await make_shared_test_data(
         async_session
     )
 
@@ -48,11 +49,15 @@ async def test_phylo_tree_can_see(
     mock_s3_resource.Bucket(phylo_tree.s3_bucket).Object(phylo_tree.s3_key).put(
         Body=test_json
     )
+    pathogen_repo_config = await get_pathogen_repo_config_for_pathogen(
+        pathogen, "GISAID", async_session
+    )
     matching_mapped_json: Dict = create_id_mapped_tree(
-        align_json_with_model(deepcopy(TEST_TREE), phylo_tree)
+        align_json_with_model(deepcopy(TEST_TREE), phylo_tree), pathogen_repo_config.prefix
     )
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
+    split_client.get_pathogen_treatment.return_value = "GISAID"
     result = await http_client.get(
         f"/v2/orgs/{group.id}/pathogens/{phylo_tree.pathogen.slug}/phylo_trees/{phylo_tree.entity_id}/download",
         headers=auth_headers,
@@ -67,7 +72,7 @@ async def test_phylo_tree_id_style_public(
     mock_s3_resource: boto3.resource,
     split_client: SplitClient,
 ):
-    user, group, samples, phylo_run, phylo_tree = await make_shared_test_data(
+    user, group, samples, phylo_run, phylo_tree, pathogen = await make_shared_test_data(
         async_session
     )
     if not phylo_tree:
@@ -86,11 +91,15 @@ async def test_phylo_tree_id_style_public(
     )
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
+    split_client.get_pathogen_treatment.return_value = "GISAID"
     result = await http_client.get(
         f"/v2/orgs/{group.id}/pathogens/{phylo_tree.pathogen.slug}/phylo_trees/{phylo_tree.entity_id}/download?id_style=public",
         headers=auth_headers,
     )
-    prefixed_tree = add_prefixes(TEST_TREE)
+    pathogen_repo_config = await get_pathogen_repo_config_for_pathogen(
+        pathogen, "GISAID", async_session
+    )
+    prefixed_tree = add_prefixes(TEST_TREE, pathogen_repo_config.prefix)
     returned_tree = result.json()
     assert returned_tree["tree"] == prefixed_tree["tree"]
 
@@ -99,8 +108,9 @@ async def test_phylo_tree_no_can_see(
     async_session: AsyncSession,
     http_client: AsyncClient,
     mock_s3_resource: boto3.resource,
+    split_client: SplitClient,
     n_trees=1,
-    n_samples=5,
+    n_samples=5,  
 ):
     owner_group: Group = group_factory()
     viewer_group: Group = group_factory(name="CADPH")
@@ -135,6 +145,7 @@ async def test_phylo_tree_no_can_see(
     }
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
+    split_client.get_pathogen_treatment.return_value = "GISAID"
     result = await http_client.get(
         f"/v2/orgs/{viewer_group.id}/pathogens/{pathogen.slug}/phylo_trees/{phylo_tree.entity_id}/download",
         headers=auth_headers,

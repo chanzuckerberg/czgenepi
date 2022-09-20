@@ -1,4 +1,6 @@
 import json
+from aspen.test_infra.models.pathogen import random_pathogen_factory
+from aspen.api.utils.pathogens import get_pathogen_repo_config_for_pathogen
 
 import boto3
 import pytest
@@ -18,6 +20,7 @@ from aspen.test_infra.models.usergroup import (
     grouprole_factory,
     userrole_factory,
 )
+from aspen.util.split import SplitClient
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
@@ -49,6 +52,7 @@ async def test_phylo_tree_rename(
     http_client: AsyncClient,
     async_session: AsyncSession,
     mock_s3_resource: boto3.resource,
+    split_client: SplitClient
 ):
     """Create a set of samples belonging to different groups with different levels of
     can-see relationships.  Rename the nodes according to the can-see rules, and verify
@@ -57,9 +61,11 @@ async def test_phylo_tree_rename(
     can_see_group = group_factory("can_see")
     wrong_can_see_group = group_factory("wrong_can_see")
     no_can_see_group = group_factory("no_can_see")
-    # we need SC2 so we can get the correct treatment from split
-    pathogen = Pathogen(slug="SC2", name="sars-cov-2")
+    pathogen = random_pathogen_factory()
     setup_gisaid_and_genbank_repo_configs(async_session, pathogen)
+    pathogen_repo_config = await get_pathogen_repo_config_for_pathogen(
+        pathogen, "GISAID", async_session
+    )
     admin_roles = await grouprole_factory(
         async_session, can_see_group, viewer_group, "admin"
     )
@@ -97,7 +103,7 @@ async def test_phylo_tree_rename(
             pathogen=pathogen,
             private_identifier=f"private_identifier_can_see_{i}",
             # Make sure our renaming works properly if our db samples have the gisaid prefix in them.
-            public_identifier=f"hCoV-19/public_identifier_can_see_{i}",
+            public_identifier=f"{pathogen_repo_config.prefix}/public_identifier_can_see_{i}",
         )
         for i in range(2)
     ]
@@ -144,6 +150,7 @@ async def test_phylo_tree_rename(
     async_session.add(phylo_tree)
     await async_session.commit()
 
+    split_client.get_pathogen_treatment.return_value = "GISAID"
     auth_headers = {"user_id": user.auth0_user_id}
     result = await http_client.get(
         f"/v2/orgs/{viewer_group.id}/pathogens/{pathogen.slug}/phylo_trees/{phylo_tree.entity_id}/download",
@@ -151,28 +158,29 @@ async def test_phylo_tree_rename(
     )
 
     tree = result.json()
+    
     assert tree["tree"] == {
         "name": "private_identifier_0",
-        "GISAID_ID": "hCoV-19/public_identifier_0",
+        "GISAID_ID": f"{pathogen_repo_config.prefix}/public_identifier_0",
         "children": [
             {
-                "GISAID_ID": "hCoV-19/public_identifier_can_see_0",
+                "GISAID_ID": f"{pathogen_repo_config.prefix}/public_identifier_can_see_0",
                 "name": "private_identifier_can_see_0",
             },
             {
-                "GISAID_ID": "hCoV-19/public_identifier_can_see_1",
+                "GISAID_ID": f"{pathogen_repo_config.prefix}/public_identifier_can_see_1",
                 "name": "private_identifier_can_see_1",
             },
             {
-                "name": "hCoV-19/public_identifier_wrong_0",
+                "name": f"{pathogen_repo_config.prefix}/public_identifier_wrong_0",
                 "children": [
                     {
-                        "GISAID_ID": "hCoV-19/public_identifier_1",
+                        "GISAID_ID": f"{pathogen_repo_config.prefix}/public_identifier_1",
                         "name": "private_identifier_1",
                     },
-                    {"name": "hCoV-19/public_identifier_wrong_1"},
-                    {"name": "hCoV-19/public_identifier_nosee_0"},
-                    {"name": "hCoV-19/public_identifier_nosee_1"},
+                    {"name": f"{pathogen_repo_config.prefix}/public_identifier_wrong_1"},
+                    {"name": f"{pathogen_repo_config.prefix}/public_identifier_nosee_0"},
+                    {"name": f"{pathogen_repo_config.prefix}/public_identifier_nosee_1"},
                 ],
             },
         ],

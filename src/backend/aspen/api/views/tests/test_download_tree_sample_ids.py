@@ -1,5 +1,7 @@
 import json
 import uuid
+from aspen.test_infra.models.pathogen import random_pathogen_factory
+from aspen.util.split import SplitClient
 
 import boto3
 import pytest
@@ -81,8 +83,7 @@ async def create_phylotree_with_inputs(
     samples = []
     input_entities = []
 
-    # we need SC2 so we can get the correct treatment from split
-    pathogen = Pathogen(slug="SC2", name="sars-cov-2")
+    pathogen = random_pathogen_factory()
     setup_gisaid_and_genbank_repo_configs(async_session, pathogen)
 
     for i in range(3):
@@ -128,9 +129,7 @@ async def create_phylotree(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-
-    # we need SC2 so we can get the correct treatment from split
-    pathogen = Pathogen(slug="SC2", name="sars-cov-2")
+    pathogen = random_pathogen_factory()
     setup_gisaid_and_genbank_repo_configs(async_session, pathogen)
 
     sample = sample_factory(
@@ -163,6 +162,7 @@ async def test_tree_metadata_download(
     mock_s3_resource: boto3.resource,
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient
 ):
     """
     Test a regular tsv download for a sample submitted by the user's group
@@ -176,6 +176,7 @@ async def test_tree_metadata_download(
         f"/v2/orgs/{group.id}/pathogens/{phylo_tree.pathogen.slug}/phylo_trees/{phylo_tree.entity_id}/sample_ids",
         headers=auth_headers,
     )
+    split_client.get_pathogen_treatment.return_value = "GISAID"
     expected_filename = f"{phylo_tree.id}_sample_ids.tsv"
     expected_document = (
         "Sample Identifier\tSelected\r\n" "hCoV-19/root_identifier_1	no\r\n"
@@ -203,6 +204,7 @@ async def test_private_id_matrix(
     mock_s3_resource: boto3.resource,
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient
 ):
     """
     Test that we use public ids in the fasta file if the requester only has access to the
@@ -220,7 +222,7 @@ async def test_private_id_matrix(
     roles = await grouprole_factory(async_session, owner_group, viewer_group)
     async_session.add_all(roles + [noaccess_user, viewer_user, phylo_tree])
     await async_session.commit()
-
+    split_client.get_pathogen_treatment.return_value = "GISAID"
     matrix = [
         {
             "user": noaccess_user,
@@ -259,6 +261,7 @@ async def test_tree_metadata_replaces_all_ids(
     mock_s3_resource: boto3.resource,
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient
 ):
     """
     Test a regular tsv download for a sample submitted by the user's group
@@ -286,6 +289,7 @@ async def test_tree_metadata_replaces_all_ids(
     await async_session.flush()
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
+    split_client.get_pathogen_treatment.return_value = "GISAID"
     res = await http_client.get(
         f"/v2/orgs/{group.id}/pathogens/{phylo_tree.pathogen.slug}/phylo_trees/{phylo_tree.entity_id}/sample_ids",
         headers=auth_headers,
@@ -305,6 +309,7 @@ async def test_public_tree_metadata_replaces_all_ids(
     mock_s3_resource: boto3.resource,
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient
 ):
     """
     Test a regular tsv download for public identifiers
@@ -332,6 +337,7 @@ async def test_public_tree_metadata_replaces_all_ids(
     await async_session.flush()
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
+    split_client.get_pathogen_treatment.return_value = "GISAID"
     res = await http_client.get(
         f"/v2/orgs/{group.id}/pathogens/{phylo_tree.pathogen.slug}/phylo_trees/{phylo_tree.entity_id}/sample_ids?id_style=public",
         headers=auth_headers,
@@ -351,6 +357,7 @@ async def test_download_samples_unauthorized(
     mock_s3_resource: boto3.resource,
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient
 ):
     """
     Test downloading samples for a tree you don't have access to.
@@ -371,6 +378,7 @@ async def test_download_samples_unauthorized(
     await async_session.flush()
 
     auth_headers = {"name": noaccess_user.name, "user_id": noaccess_user.auth0_user_id}
+    split_client.get_pathogen_treatment.return_value = "GISAID"
     res = await http_client.get(
         f"/v2/orgs/{group.id}/pathogens/{phylo_tree.pathogen.slug}/phylo_trees/{phylo_tree.entity_id}/sample_ids?id_style=public",
         headers=auth_headers,
