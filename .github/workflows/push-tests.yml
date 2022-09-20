@@ -160,8 +160,8 @@ jobs:
           docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/genepi-backend:branch-trunk -t ${{ secrets.ECR_REPO }}/genepi-backend:latest src/backend
           # Build frontend
           docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/genepi-frontend:branch-trunk -t ${{ secrets.ECR_REPO }}/genepi-frontend:latest src/frontend
-          # mkdir -p src/frontend/build
-          # chmod a+rwx src/frontend/build # TODO temp hack - need a better plan for the build dir.
+          mkdir -p src/frontend/build
+          chmod a+rwx src/frontend/build # TODO temp hack - need a better plan for the build dir.
           make local-init
           echo "Init complete - testing web service"
           # docker-compose exec -T frontend wget -T 10 --tries 20 localhost:8000/
