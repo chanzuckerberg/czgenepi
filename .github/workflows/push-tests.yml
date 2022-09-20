@@ -150,6 +150,9 @@ jobs:
         with:
           happy_version: "0.19.0"
           install_globally: "true"
+      - name: Create empty storagestate file
+        run: |
+          touch e2e/storage/state.json
       - name: Playwright tests
         run: |
           echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
