@@ -33,6 +33,7 @@ export const GalagoConfirmationModal = ({
   const confirmButton = (
     <ConfirmButton
       treeId={treeId}
+      outgoingDestination="galago"
       onClick={() =>
         analyticsTrackEvent<AnalyticsTreeViewGalago>(
           EVENT_TYPES.TREE_VIEW_GALAGO,
