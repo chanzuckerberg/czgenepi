@@ -337,7 +337,7 @@ async def test_submission_template_incomplete_location(
         headers=auth_headers,
         json=request_data,
     )
-    import pdb; pdb.set_trace()
+
     expected_filename = f"{today.strftime('%Y%m%d')}_GISAID_metadata.csv"
     assert res.status_code == 200
     assert res.headers["Content-Type"] == "text/csv"

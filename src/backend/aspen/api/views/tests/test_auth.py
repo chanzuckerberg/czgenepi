@@ -59,43 +59,8 @@ async def check_roles(
     assert expected_roles == actual_roles
 
 
-async def test_create_new_admin_user_if_not_exists(
-    async_session: AsyncSession,
-    http_client: AsyncClient,
-    auth0_apiclient: Auth0Client,
-):
-    """
-    Test creating a new auth0 user on login
-    """
-    userinfo = {
-        "sub": "user123-asdf",
-        "org_id": "123456",
-        "email": "hello@czgenepi.org",
-    }
-    group = group_factory(auth0_org_id=userinfo["org_id"])
-    async_session.add(group)
-    auth0_apiclient.get_org_user_roles.side_effect = [["admin"]]  # type: ignore
-    await start_new_transaction(async_session)
-    await create_user_if_not_exists(async_session, auth0_apiclient, userinfo)
-    await start_new_transaction(async_session)
-    user = (
-        (
-            await async_session.execute(
-                sa.select(User)  # type: ignore
-                .options(joinedload(User.group, innerjoin=True))  # type: ignore
-                .filter(User.auth0_user_id == userinfo["sub"])  # type: ignore
-            )
-        )
-        .scalars()
-        .one()
-    )
-    assert user.group_id == group.id
-    assert user.email == userinfo["email"]
-
-
 async def test_create_new_user_if_not_exists(
     async_session: AsyncSession,
-    http_client: AsyncClient,
     auth0_apiclient: Auth0Client,
 ):
     """
@@ -110,26 +75,24 @@ async def test_create_new_user_if_not_exists(
     async_session.add(group)
     auth0_apiclient.get_org_user_roles.side_effect = [["member"]]  # type: ignore
     await start_new_transaction(async_session)
-    await create_user_if_not_exists(async_session, auth0_apiclient, userinfo)
+    await create_user_if_not_exists(async_session, userinfo)
     await start_new_transaction(async_session)
     user = (
         (
             await async_session.execute(
-                sa.select(User)  # type: ignore
-                .options(joinedload(User.group, innerjoin=True))  # type: ignore
-                .filter(User.auth0_user_id == userinfo["sub"])  # type: ignore
+                sa.select(User).filter(  # type: ignore
+                    User.auth0_user_id == userinfo["sub"]
+                )  # type: ignore
             )
         )
         .scalars()
         .one()
     )
-    assert user.group_id == group.id
     assert user.email == userinfo["email"]
 
 
 async def test_dont_create_new_user_if_exists(
     async_session: AsyncSession,
-    http_client: AsyncClient,
     auth0_apiclient: Auth0Client,
 ):
     """
@@ -146,16 +109,16 @@ async def test_dont_create_new_user_if_exists(
     )
     async_session.add(user)
     await start_new_transaction(async_session)
-    await create_user_if_not_exists(async_session, auth0_apiclient, userinfo)
+    await create_user_if_not_exists(async_session, userinfo)
     original_user_id = user.id
     async_session.expire_all()
     await start_new_transaction(async_session)
     db_user = (
         (
             await async_session.execute(
-                sa.select(User)  # type: ignore
-                .options(joinedload(User.group, innerjoin=True))  # type: ignore
-                .filter(User.auth0_user_id == userinfo["sub"])  # type: ignore
+                sa.select(User).filter(  # type: ignore
+                    User.auth0_user_id == userinfo["sub"]
+                )  # type: ignore
             )
         )
         .scalars()
@@ -183,9 +146,7 @@ async def test_create_new_user_and_sync_roles(
     auth0_apiclient.get_org_user_roles.side_effect = [["member"], ["admin"]]  # type: ignore
     auth0_apiclient.get_user_orgs.side_effect = [[{"id": group1.auth0_org_id}, {"id": group3.auth0_org_id}]]  # type: ignore
     await start_new_transaction(async_session)
-    user_obj, _ = await create_user_if_not_exists(
-        async_session, auth0_apiclient, userinfo
-    )
+    user_obj, _ = await create_user_if_not_exists(async_session, userinfo)
     assert user_obj is not None
     await RoleManager.sync_user_roles(async_session, auth0_apiclient, user_obj)
     assert user_obj.email == userinfo["email"]
@@ -194,15 +155,14 @@ async def test_create_new_user_and_sync_roles(
     user = (
         (
             await async_session.execute(
-                sa.select(User)  # type: ignore
-                .options(joinedload(User.group, innerjoin=True))  # type: ignore
-                .filter(User.auth0_user_id == userinfo["sub"])  # type: ignore
+                sa.select(User).filter(  # type: ignore
+                    User.auth0_user_id == userinfo["sub"]
+                )  # type: ignore
             )
         )
         .scalars()
         .one()
     )
-    assert user.group_id == group1.id
     assert user.email == userinfo["email"]
     expected_roles = {(group1.auth0_org_id, "member"), (group3.auth0_org_id, "admin")}
     await check_roles(async_session, user.auth0_user_id, expected_roles)
@@ -364,9 +324,9 @@ async def test_callback_ff_doesnt_sync_auth0_user_roles(
     user = (
         (
             await async_session.execute(
-                sa.select(User)  # type: ignore
-                .options(joinedload(User.group, innerjoin=True))  # type: ignore
-                .filter(User.auth0_user_id == userinfo["sub"])  # type: ignore
+                sa.select(User).filter(  # type: ignore
+                    User.auth0_user_id == userinfo["sub"]
+                )  # type: ignore
             )
         )
         .scalars()

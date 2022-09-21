@@ -146,9 +146,7 @@ async def login(
     )
 
 
-async def create_user_if_not_exists(
-    db, auth0_mgmt, userinfo
-) -> Tuple[User, Optional[Group]]:
+async def create_user_if_not_exists(db, userinfo) -> Tuple[User, Optional[Group]]:
     auth0_user_id = userinfo.get("sub")
     if not auth0_user_id:
         # User ID really needs to be present
@@ -178,9 +176,7 @@ async def create_user_if_not_exists(
         "name": userinfo["email"],
         "email": userinfo["email"],
         "auth0_user_id": auth0_user_id,
-        "group_admin": False,
         "system_admin": False,
-        "group": group,
     }
     newuser = User(**user_fields)
     db.add(newuser)
@@ -223,7 +219,7 @@ async def auth(
         "user_id": userinfo["sub"],
         "name": userinfo["name"],
     }
-    user, newuser_group = await create_user_if_not_exists(db, a0, userinfo)
+    user, newuser_group = await create_user_if_not_exists(db, userinfo)
     # Always re-sync auth0 groups to our db on login!
     # Make sure the user is in auth0 before sync'ing roles.
     #  ex: User1 in local dev doesn't exist in auth0
