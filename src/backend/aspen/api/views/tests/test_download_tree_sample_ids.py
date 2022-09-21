@@ -2,6 +2,7 @@ import json
 import uuid
 from aspen.test_infra.models.pathogen import random_pathogen_factory
 from aspen.util.split import SplitClient
+from aspen.api.utils.pathogens import get_pathogen_repo_config_for_pathogen
 
 import boto3
 import pytest
@@ -118,7 +119,7 @@ async def create_phylotree_with_inputs(
 
     async_session.add_all([phylo_tree])
     await async_session.commit()
-    return phylo_tree, phylo_run, samples
+    return phylo_tree, phylo_run, samples, pathogen
 
 
 async def create_phylotree(
@@ -155,7 +156,7 @@ async def create_phylotree(
 
     async_session.add_all([phylo_tree, owner_group, owner_group])
     await async_session.commit()
-    return user, owner_group, phylo_tree, samples
+    return user, owner_group, phylo_tree, samples, pathogen
 
 
 async def test_tree_metadata_download(
@@ -167,7 +168,7 @@ async def test_tree_metadata_download(
     """
     Test a regular tsv download for a sample submitted by the user's group
     """
-    user, group, phylo_tree, samples = await create_phylotree(
+    user, group, phylo_tree, samples, pathogen = await create_phylotree(
         mock_s3_resource, async_session
     )
 
@@ -177,9 +178,12 @@ async def test_tree_metadata_download(
         headers=auth_headers,
     )
     split_client.get_pathogen_treatment.return_value = "GISAID"
+    pathogen_repo_config = await get_pathogen_repo_config_for_pathogen(
+        pathogen, "GISAID", async_session
+    )
     expected_filename = f"{phylo_tree.id}_sample_ids.tsv"
     expected_document = (
-        "Sample Identifier\tSelected\r\n" "hCoV-19/root_identifier_1	no\r\n"
+        "Sample Identifier\tSelected\r\n" f"{pathogen_repo_config.prefix}/root_identifier_1	no\r\n"
     )
     for sample in samples:
         expected_document += f"{sample.private_identifier}	no\r\n"
@@ -215,11 +219,14 @@ async def test_private_id_matrix(
     viewer_group = group_factory(name="viewer_group")
     viewer_user = await create_unique_user(async_session, viewer_group, "viewer")
     noaccess_user = await create_unique_user(async_session, noaccess_group, "noaccess")
-    phylo_tree, phylo_run, samples = await create_phylotree_with_inputs(
+    phylo_tree, phylo_run, samples, pathogen = await create_phylotree_with_inputs(
         mock_s3_resource, async_session, owner_group
     )
     # give the viewer group access to trees from the owner group
     roles = await grouprole_factory(async_session, owner_group, viewer_group)
+    pathogen_repo_config = await get_pathogen_repo_config_for_pathogen(
+        pathogen, "GISAID", async_session
+    )
     async_session.add_all(roles + [noaccess_user, viewer_user, phylo_tree])
     await async_session.commit()
     split_client.get_pathogen_treatment.return_value = "GISAID"
@@ -236,12 +243,12 @@ async def test_private_id_matrix(
             "expected_status": 200,
             "expected_data": (
                 "Sample Identifier\tSelected\r\n"
-                f"hCoV-19/root_identifier_1	no\r\n"
-                f"hCoV-19/{samples[0].public_identifier}	yes\r\n"
-                f"hCoV-19/{samples[1].public_identifier}	yes\r\n"
-                f"hCoV-19/{samples[2].public_identifier}	yes\r\n"
-                f"hCoV-19/gisaid_identifier	yes\r\n"
-                f"hCoV-19/GISAID_identifier2	yes\r\n"
+                f"{pathogen_repo_config.prefix}/root_identifier_1	no\r\n"
+                f"{pathogen_repo_config.prefix}/{samples[0].public_identifier}	yes\r\n"
+                f"{pathogen_repo_config.prefix}/{samples[1].public_identifier}	yes\r\n"
+                f"{pathogen_repo_config.prefix}/{samples[2].public_identifier}	yes\r\n"
+                f"{pathogen_repo_config.prefix}/gisaid_identifier	yes\r\n"
+                f"{pathogen_repo_config.prefix}/GISAID_identifier2	yes\r\n"
             ),
         },
     ]
@@ -252,8 +259,10 @@ async def test_private_id_matrix(
             f"/v2/orgs/{case['group'].id}/pathogens/{phylo_tree.pathogen.slug}/phylo_trees/{phylo_tree.entity_id}/sample_ids",
             headers=auth_headers,
         )
+
         assert res.status_code == case["expected_status"]
         file_contents = str(res.content, encoding="UTF-8")
+        import pdb; pdb.set_trace()
         assert file_contents == case["expected_data"]
 
 
@@ -266,7 +275,7 @@ async def test_tree_metadata_replaces_all_ids(
     """
     Test a regular tsv download for a sample submitted by the user's group
     """
-    user, group, phylo_tree, samples = await create_phylotree(
+    user, group, phylo_tree, samples, pathogen = await create_phylotree(
         mock_s3_resource, async_session, True
     )
 
@@ -294,10 +303,13 @@ async def test_tree_metadata_replaces_all_ids(
         f"/v2/orgs/{group.id}/pathogens/{phylo_tree.pathogen.slug}/phylo_trees/{phylo_tree.entity_id}/sample_ids",
         headers=auth_headers,
     )
+    pathogen_repo_config = await get_pathogen_repo_config_for_pathogen(
+        pathogen, "GISAID", async_session
+    )
     assert res.status_code == 200
     expected_data = (
         "Sample Identifier\tSelected\r\n"
-        f"hCoV-19/root_identifier_1	no\r\n"
+        f"{pathogen_repo_config.prefix}/root_identifier_1	no\r\n"
         f"{samples[0].private_identifier}	yes\r\n"
         f"{extra_sample.private_identifier}	no\r\n"
     )
@@ -314,7 +326,7 @@ async def test_public_tree_metadata_replaces_all_ids(
     """
     Test a regular tsv download for public identifiers
     """
-    user, group, phylo_tree, samples = await create_phylotree(
+    user, group, phylo_tree, samples, pathogen = await create_phylotree(
         mock_s3_resource, async_session, True
     )
 
@@ -343,11 +355,14 @@ async def test_public_tree_metadata_replaces_all_ids(
         headers=auth_headers,
     )
     assert res.status_code == 200
+    pathogen_repo_config = await get_pathogen_repo_config_for_pathogen(
+        pathogen, "GISAID", async_session
+    )
     expected_data = (
         "Sample Identifier\tSelected\r\n"
-        f"hCoV-19/root_identifier_1	no\r\n"
-        f"hCoV-19/{samples[0].public_identifier}	yes\r\n"
-        f"hCoV-19/{extra_sample.public_identifier}	no\r\n"
+        f"{pathogen_repo_config.prefix}/root_identifier_1	no\r\n"
+        f"{pathogen_repo_config.prefix}/{samples[0].public_identifier}	yes\r\n"
+        f"{pathogen_repo_config.prefix}/{extra_sample.public_identifier}	no\r\n"
     )
     file_contents = str(res.content, encoding="UTF-8")
     assert file_contents == expected_data
@@ -362,7 +377,7 @@ async def test_download_samples_unauthorized(
     """
     Test downloading samples for a tree you don't have access to.
     """
-    user, group, samples, _, phylo_tree = await make_shared_test_data(async_session)
+    user, group, samples, _, phylo_tree, _ = await make_shared_test_data(async_session)
     upload_s3_file(mock_s3_resource, phylo_tree, samples)
 
     noaccess_group = group_factory(name="meanie")
