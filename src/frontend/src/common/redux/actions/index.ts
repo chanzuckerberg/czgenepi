@@ -16,6 +16,7 @@ export const addNotification: ActionType<Partial<ReduxNotification>> = (notifica
     buttonText: "DISMISS",
     dismissDirection: "right",
     intent: "error",
+    notifId: Date.now(),
     ...notification
   },
 });

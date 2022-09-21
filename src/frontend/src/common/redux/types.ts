@@ -25,7 +25,7 @@ export enum ReduxPersistenceTokens {
 }
 
 export type ReduxNotification = ExposedNotificationProps & {
-  notifId: number;
+  notifId: EpochTimeStamp;  // typically Date.now() because that's a simple way to get unique IDs
   shouldShowCloseButton?: boolean;
   componentKey?: NotificationComponents;
   componentProps: any;

@@ -133,7 +133,6 @@ const DownloadModal = ({
       componentOnError: () => {
         dispatch(addNotification({
           componentKey: NotificationComponents.DOWNLOAD_FILES_FAILURE,
-          notifId: Date.now(),
           intent: "error",
           shouldShowCloseButton: true,
         }));
