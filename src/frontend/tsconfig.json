@@ -43,5 +43,5 @@
     "**/*.ts",
     "**/*.tsx",
     "src/common/constants/ENV.js"
-  ]
+, "e2e/tests/security.spects"  ]
 }
