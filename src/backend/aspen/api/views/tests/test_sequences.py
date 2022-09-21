@@ -1,3 +1,4 @@
+import re
 from typing import TypedDict
 
 import pytest
@@ -412,3 +413,88 @@ async def test_access_matrix(
             assert f">{sample.private_identifier}" not in file_contents
             assert f">{sample.public_identifier}" not in file_contents
             assert sequences[sample.private_identifier] not in file_contents
+
+
+async def test_getfastaurl(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+):
+    """
+    Test a regular sequence download for a sample submitted by the user's group, test prefixes are correctly added for GISAID
+    """
+
+    group, user, sample, pathogen = await setup_sequences_download_test_data(
+        async_session
+    )
+
+    auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
+    data = {
+        "samples": [sample.public_identifier],
+    }
+    res = await http_client.post(
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/sequences/getfastaurl",
+        headers=auth_headers,
+        json=data,
+    )
+    assert res.status_code == 200
+    res_json = res.json()
+    assert "url" in res_json
+    url = res_json["url"]
+    assert url.startswith("http")
+    assert ".fasta" in url
+    assert "X-Amz-Credential=" in url
+    assert "X-Amz-Signature=" in url
+
+    async with AsyncClient() as http_external:
+        s3_res = await http_external.get(url)
+        assert s3_res.status_code == 200
+        file = str(s3_res.content, "utf-8").split("\n")
+        assert file[0] == f">{sample.private_identifier}"
+        assert file[1] == sample.uploaded_pathogen_genome.sequence
+
+
+async def test_getfastaurl_usher(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+):
+    """
+    Test a regular sequence download for a sample submitted by the user's group, test prefixes are correctly added for GISAID
+    """
+
+    group, user, sample, pathogen = await setup_sequences_download_test_data(
+        async_session
+    )
+
+    USHER_UNSAFE_CHARS = r"[^a-zA-Z0-9._/-]"
+    sample.private_identifier = "u$her%20unsafe%20identifier"
+
+    async_session.add(sample)
+    await async_session.commit()
+
+    auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
+    data = {
+        "samples": [sample.public_identifier],
+        "downstream_consumer": "USHER",
+    }
+    res = await http_client.post(
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/sequences/getfastaurl",
+        headers=auth_headers,
+        json=data,
+    )
+    assert res.status_code == 200
+    res_json = res.json()
+    assert "url" in res_json
+    url = res_json["url"]
+    assert url.startswith("http")
+    assert ".fasta" in url
+    assert "X-Amz-Credential=" in url
+    assert "X-Amz-Signature=" in url
+
+    async with AsyncClient() as http_external:
+        s3_res = await http_external.get(url)
+        assert s3_res.status_code == 200
+        file = str(s3_res.content, "utf-8").split("\n")
+        assert (
+            file[0] == f">{re.sub(USHER_UNSAFE_CHARS, '_', sample.private_identifier)}"
+        )
+        assert file[1] == sample.uploaded_pathogen_genome.sequence

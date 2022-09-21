@@ -22,6 +22,12 @@ export enum EVENT_TYPES {
   // User has kicked off the creation of a Nextstrain phylo tree
   TREE_CREATION_NEXTSTRAIN = "TREE_CREATION_NEXTSTRAIN",
 
+  // User clicked on the "OpenInGalagoButton" on the phylo tree table
+  TREE_ACTIONS_CLICK_GALAGO = "TREE_ACTIONS_CLICK_GALAGO",
+
+  // User has been sent to Galago to view a phylo tree
+  TREE_VIEW_GALAGO = "TREE_VIEW_GALAGO",
+
   // User has been sent over to UShER site. UShER will now create tree and
   // display it on their site. External, so can't tell if tree succeeds/fails.
   // **No `additionalEventData`**. Just tracking event occurrence right now.
@@ -122,6 +128,18 @@ export type AnalyticsTreeCreationNextstrain = {
   phylo_run_workflow_id: number;
   // Type of tree being created
   tree_type: string;
+};
+
+/** EVENT_TYPES.TREE_ACTIONS_CLICK_GALAGO */
+export type AnalyticsTreeActionsClickGalago = {
+  // Tree that user clicked on
+  tree_id: number;
+};
+
+/** EVENT_TYPES.TREE_VIEW_GALAGO */
+export type AnalyticsTreeViewGalago = {
+  // Tree that user is being sent to view
+  tree_id: number;
 };
 
 /** EVENT_TYPES.TREE_DOWNLOAD_TREE_FILE */

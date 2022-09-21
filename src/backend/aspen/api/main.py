@@ -173,13 +173,6 @@ def get_app() -> FastAPI:
             dependencies=[Depends(require_group_membership)],
         )
 
-        # old urls (TODO: remove this soonish?)
-        _app.include_router(
-            router,
-            prefix="/v2/" + suffix,
-            dependencies=[Depends(require_group_membership)],
-        )
-
     return _app
 
 
