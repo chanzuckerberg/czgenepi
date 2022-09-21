@@ -127,7 +127,6 @@ async def get_tree_metadata(
         "PATHOGEN_public_repository", pathogen
     )
     # get the pathogen_repo_config  for given public_repository and pathogen
-    import pdb; pdb.set_trace()
     pathogen_repo_config = await get_pathogen_repo_config_for_pathogen(
         pathogen, preferred_public_db, db
     )
