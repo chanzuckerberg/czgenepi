@@ -69,6 +69,7 @@ const InviteModal = ({
       setSentCount(successCount);
       if (successCount > 0) {
         dispatch(addNotification({
+          reduxId: Date.now(),
           shouldShowCloseButton: true,
           intent: "info",
           autoDismiss: true,
