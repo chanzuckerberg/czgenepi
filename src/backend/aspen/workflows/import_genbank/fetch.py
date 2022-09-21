@@ -1,10 +1,10 @@
-import requests
-from typing import List
-import os
-import logging
-import json
 import datetime
+import json
+import logging
+import os
+from typing import List
 
+import requests
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.DEBUG)
@@ -54,7 +54,6 @@ class GenbankFetcher:
 
     def fetch_samples(self, webenv: str, query_key: str, num_results: int):
         base_url = "https://www.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
-        responses = ""
         retstart = 0
         max_responses = 100  # NOTE: this is the max allowed by the api.
         while True:
@@ -82,7 +81,6 @@ class GenbankFetcher:
     # Currently unused, but here if we need it.
     def fetch_samples_by_id(self, idlist: List):
         base_url = "https://www.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
-        responses = ""
         retstart = 0
         max_responses = 100  # NOTE: this is the max allowed by the api.
         while True:
@@ -103,7 +101,6 @@ class GenbankFetcher:
             if retstart >= num_results:
                 break
 
-
     def fetch_ids(self):
         base_url = "https://www.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
         params = {
@@ -119,18 +116,19 @@ class GenbankFetcher:
         response = requests.get(base_url, params=params)
         return response.json()
 
+
 class TuberculosisFetcher(GenbankFetcher):
     species = "Mycobacterium tuberculosis"
     pathogen_type = "bacteria"
     min_seq_length = 4000000
     max_seq_length = 4600000
 
+
 class MonkeypoxFetcher(GenbankFetcher):
     species = "Monkeypox virus"
     pathogen_type = "viruses"
     min_seq_length = 180000
     max_seq_length = 220000
-    
 
 
 if __name__ == "__main__":
@@ -149,7 +147,7 @@ if __name__ == "__main__":
     with open("big.fasta", "w") as f:
         for fasta in fetcher.fetch_samples(webenv, query_key, num_results):
             f.write(fasta)
-            
+
     # Write metadata json
     metadata = fetcher.fetch_metadata(webenv, query_key, num_results)
     with open("big.json", "w") as f:
