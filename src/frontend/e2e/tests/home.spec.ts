@@ -1,7 +1,10 @@
 import { expect, test } from "@playwright/test";
 import { getByTestID } from "../utils/selectors";
+import path from "path";
+import dotenv from 'dotenv';
 
-//todo: populate the remaining elements
+dotenv.config({path: path.resolve(`.env.${process.env.NODE_ENV}`),});
+
 const footer: Record<string, string> = {
   Github: "https://github.com/chanzuckerberg/czgenepi/",
   Careers:
