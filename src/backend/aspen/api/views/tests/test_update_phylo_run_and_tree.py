@@ -68,7 +68,7 @@ async def test_update_phylo_tree(
     async_session: AsyncSession,
     http_client: AsyncClient,
 ):
-    user, group, samples, phylo_run, phylo_tree = await make_shared_test_data(
+    user, group, samples, phylo_run, phylo_tree, _ = await make_shared_test_data(
         async_session
     )
     auth_headers = {"user_id": user.auth0_user_id}
@@ -99,7 +99,7 @@ async def test_update_phylo_run_no_trees(
     async_session: AsyncSession,
     http_client: AsyncClient,
 ):
-    user, group, samples, phylo_run, _ = await make_shared_test_data(
+    user, group, samples, phylo_run, _, _ = await make_shared_test_data(
         async_session, no_trees=True
     )
     auth_headers = {"user_id": user.auth0_user_id}
@@ -131,6 +131,7 @@ async def test_update_phylo_tree_wrong_group(
         samples,
         phylo_run,
         phylo_tree,
+        _
     ) = await make_shared_test_data(async_session)
     group_that_did_not_make_tree = group_factory(name="i_want_to_see_trees")
     user_that_did_not_make_tree = await userrole_factory(
