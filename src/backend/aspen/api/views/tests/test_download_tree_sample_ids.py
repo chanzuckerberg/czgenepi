@@ -174,13 +174,13 @@ async def test_tree_metadata_download(
     user, group, phylo_tree, samples, pathogen = await create_phylotree(
         mock_s3_resource, async_session
     )
+    split_client.get_pathogen_treatment.return_value = "GISAID"
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     res = await http_client.get(
         f"/v2/orgs/{group.id}/pathogens/{phylo_tree.pathogen.slug}/phylo_trees/{phylo_tree.entity_id}/sample_ids",
         headers=auth_headers,
     )
-    split_client.get_pathogen_treatment.return_value = "GISAID"
     pathogen_repo_config = await get_pathogen_repo_config_for_pathogen(
         pathogen, "GISAID", async_session
     )
