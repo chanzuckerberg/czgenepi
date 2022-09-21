@@ -5,8 +5,6 @@ import {
 import { analyticsTrackEvent } from "src/common/analytics/methods";
 import { RedirectConfirmationModal } from "src/common/components/library/data_subview/components/RedirectConfirmationModal";
 import galagoLogo from "src/common/images/galago-logo-beta.png";
-// TODO: (ehoops) - This button will change when we create the galago URL in sc-214181
-// currently this is just using the nextstrain url as a placeholder
 import { ConfirmButton } from "src/common/utils/TreeModal/ConfirmButton";
 
 interface Props {
@@ -33,6 +31,7 @@ export const GalagoConfirmationModal = ({
   const confirmButton = (
     <ConfirmButton
       treeId={treeId}
+      outgoingDestination="galago"
       onClick={() =>
         analyticsTrackEvent<AnalyticsTreeViewGalago>(
           EVENT_TYPES.TREE_VIEW_GALAGO,
