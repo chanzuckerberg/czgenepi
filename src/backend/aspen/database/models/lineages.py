@@ -2,7 +2,7 @@ import enum
 
 import enumtables
 from sqlalchemy import Column, Float, ForeignKey, Integer, String, UniqueConstraint
-from sqlalchemy.orm import backref, relationship
+from sqlalchemy.orm import relationship
 
 from aspen.database.models.base import base, idbase
 from aspen.database.models.enum import Enum

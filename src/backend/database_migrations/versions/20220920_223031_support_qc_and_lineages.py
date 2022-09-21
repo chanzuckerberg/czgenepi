@@ -31,9 +31,7 @@ def upgrade():
         "sample_lineages",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
         sa.Column("sample_id", sa.Integer(), nullable=True),
-        sa.Column(
-            "lineage_type", enumtables.enum_column.EnumType(), nullable=False
-        ),
+        sa.Column("lineage_type", enumtables.enum_column.EnumType(), nullable=False),
         sa.Column("lineage_software_version", sa.String(), nullable=False),
         sa.Column("lineage", sa.String(), nullable=False),
         sa.Column("lineage_probability", sa.Float(), nullable=False),
@@ -60,9 +58,7 @@ def upgrade():
         "sample_qc_metrics",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
         sa.Column("sample_id", sa.Integer(), nullable=True),
-        sa.Column(
-            "qc_type", enumtables.enum_column.EnumType(), nullable=False
-        ),
+        sa.Column("qc_type", enumtables.enum_column.EnumType(), nullable=False),
         sa.Column("qc_score", sa.String(), nullable=False),
         sa.Column("qc_software_version", sa.String(), nullable=False),
         sa.Column("qc_status", sa.String(), nullable=False),
@@ -78,9 +74,7 @@ def upgrade():
             name=op.f("fk_sample_qc_metrics_sample_id_samples"),
         ),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_sample_qc_metrics")),
-        sa.UniqueConstraint(
-            "qc_score", name=op.f("uq_sample_qc_metrics_qc_score")
-        ),
+        sa.UniqueConstraint("qc_score", name=op.f("uq_sample_qc_metrics_qc_score")),
         sa.UniqueConstraint(
             "sample_id", "qc_type", name=op.f("uq_sample_qc_metrics_sample_id")
         ),
