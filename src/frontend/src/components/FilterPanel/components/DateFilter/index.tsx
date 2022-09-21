@@ -10,6 +10,7 @@ interface Props {
   inputLabel: string;
   updateDateFilter: UpdateDateFilterType;
   menuOptions: DateMenuOption[];
+  "data-test-id": string;
 }
 
 const DateFilter = ({
@@ -52,6 +53,7 @@ const DateFilter = ({
         sdsStyle="minimal"
         sdsType="singleSelect"
         label={inputLabel}
+        data-test-id={inputLabel}
         // @ts-expect-error remove line when inputdropdown types fixed in sds
         onClick={handleClick}
       />
@@ -63,6 +65,7 @@ const DateFilter = ({
         selectedDateMenuOption={selectedDateMenuOption}
         setSelectedDateMenuOption={setSelectedDateMenuOption}
         updateDateFilter={updateDateFilter}
+        data-test-id={inputLabel}
         {...props}
       />
       <DateChip dateLabel={dateLabel} deleteDateFilterFunc={deleteDateFilter} />

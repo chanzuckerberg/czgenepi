@@ -154,6 +154,7 @@ const Data: FunctionComponent = () => {
 
   // create JSX elements from categories
   dataCategories.forEach((category) => {
+    const item = category.text.replace(" ", "-").toLowerCase();
     dataJSX.menuItems.push(
       <StyledMenuItem key={category.text}>
         <NextLink href={category.to} key={category.text} passHref>
@@ -161,11 +162,13 @@ const Data: FunctionComponent = () => {
             <Category>
               <CategoryTitle
                 isActive={currentPath.startsWith(category.to)}
-                data-test-id="data-menu-item"
+                data-test-id={`menu-item-${item}`}
               >
                 {category.text}
               </CategoryTitle>
-              <StyledCount>{Object.keys(category.data).length}</StyledCount>
+              <StyledCount data-test-id={`menu-item-${item}-count`}>
+                {Object.keys(category.data).length}
+              </StyledCount>
             </Category>
           </a>
         </NextLink>
@@ -198,7 +201,7 @@ const Data: FunctionComponent = () => {
     <Container>
       <HeadAppTitle subTitle={subTitle} />
 
-      <Navigation data-test-id="data-menu-items">
+      <Navigation data-test-id="menu-items">
         <FilterPanelToggle
           activeFilterCount={activeFilterCount}
           onClick={() => {
@@ -215,6 +218,7 @@ const Data: FunctionComponent = () => {
             isOpen={shouldShowFilters}
             setActiveFilterCount={setActiveFilterCount}
             setDataFilterFunc={setDataFilterFunc}
+            data-test-id="menu-item-sample-count"
           />
         )}
         <DataSubview

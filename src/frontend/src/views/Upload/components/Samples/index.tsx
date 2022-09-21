@@ -127,18 +127,20 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
             handleFiles={handleFileChange}
             accept=".fasta,.fa,.txt,.gz,.zip"
             isLoading={isLoadingFile}
+            data-test-id="upload-select-sample-files-btn"
           />
           {parseErrors && (
             <AlertAccordion
               intent="error"
               title="Some of your files or samples could not be imported."
               collapseContent={<AlertTable parseErrors={parseErrors} />}
+              data-test-id="upload-import-error"
             />
           )}
           {samples && (
             <>
               <StyledContainerSpaceBetween>
-                <StyledUploadCount>
+                <StyledUploadCount data-test-id="upload-selected-sample-count">
                   {fileCount} {fileCount > 1 ? "files" : "file"} imported, with{" "}
                   {sampleCount} {sampleCount > 1 ? "samples" : "sample"}{" "}
                   selected for upload
@@ -150,6 +152,7 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
                   startIcon={
                     <Icon sdsIcon="xMark" sdsSize="s" sdsType="static" />
                   }
+                  data-test-id="upload-remova-all-btn"
                 >
                   REMOVE ALL
                 </StyledRemoveAllButton>
@@ -167,6 +170,7 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
                 sdsType="primary"
                 sdsStyle="rounded"
                 disabled={!hasSamples(samples) || tooManySamples}
+                data-test-id="upload-continue-btn"
               >
                 Continue
               </StyledButton>
@@ -174,7 +178,11 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
           </Link>
           <Link href={ROUTES.DATA_SAMPLES} passHref>
             <a href="passHref">
-              <Button sdsType="secondary" sdsStyle="rounded">
+              <Button
+                sdsType="secondary"
+                sdsStyle="rounded"
+                data-test-id="upload-cancel-btn"
+              >
                 Cancel
               </Button>
             </a>

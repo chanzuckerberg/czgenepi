@@ -260,6 +260,7 @@ const DataSubview: FunctionComponent<Props> = ({
             handleCreateUsherTreeOpen={() => setShouldStartUsherFlow(true)}
             isMenuDisabled={hasTooManySamples}
             isUsherDisabled={!hasCheckedSamples}
+            data-test-id="sample-page-create-ns-tree-btn"
           />
           <IconButton
             onClick={handleDownloadClickOpen}
@@ -268,12 +269,14 @@ const DataSubview: FunctionComponent<Props> = ({
             tooltipTextDisabled={DOWNLOAD_TOOLTIP_TEXT_DISABLED}
             tooltipTextEnabled={DOWNLOAD_TOOLTIP_TEXT_ENABLED}
             size="large"
+            data-test-id="sample-page-dowload-btn"
           />
           <MoreActionsMenu
             disabled={!hasCheckedSamples}
             isSampleEditDisabled={isSampleEditDisabled}
             onDeleteSelected={() => setDeleteSampleConfirmationOpen(true)}
             onEditSelected={() => setEditSampleConfirmationOpen(true)}
+            data-test-id="sample-page-more-action-btn"
           />
         </DownloadWrapper>
       );

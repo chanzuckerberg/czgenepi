@@ -337,6 +337,7 @@ export function SampleFiltering({
             endDate={endDate}
             setStartDate={setStartDate}
             setEndDate={setEndDate}
+            data-test-id="sample-filter-collection-date"
           />
         </StyledFilterGroup>
       </StyledFiltersSection>
