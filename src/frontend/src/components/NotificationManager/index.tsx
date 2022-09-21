@@ -10,7 +10,7 @@ const NotificationsManager = (): JSX.Element => {
   return (
     <StyledNotificationContainer>
       {notifications.map((notification: ReduxNotification) => (
-        <Notification key={notification.reduxId} notification={notification} />
+        <Notification key={notification.notifId} notification={notification} />
       ))}
     </StyledNotificationContainer>
   );

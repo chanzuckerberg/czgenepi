@@ -74,7 +74,7 @@ const reduxReducer = (state = getInitialState(), action: AnyAction) => {
     case CZGEReduxActions.DELETE_NOTIFICATION_ACTION_TYPE:
       return {
         ...state,
-        notifications: state.notifications.filter((n) => n.reduxId !== payload),
+        notifications: state.notifications.filter((n) => n.notifId !== payload),
       };
     default:
       return state;

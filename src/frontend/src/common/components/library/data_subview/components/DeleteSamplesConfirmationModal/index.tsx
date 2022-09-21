@@ -35,7 +35,7 @@ const DeleteSamplesConfirmationModal = ({
     componentOnError: () => {
       dispatch(addNotification({
         autoDismiss: true,
-        reduxId: Date.now(),
+        notifId: Date.now(),
         intent: "error",
         shouldShowCloseButton: true,
         text: "We were unable to delete the selected samples. Please try again later.",
@@ -44,7 +44,7 @@ const DeleteSamplesConfirmationModal = ({
     componentOnSuccess: () => {
       dispatch(addNotification({
         autoDismiss: true,
-        reduxId: Date.now(),
+        notifId: Date.now(),
         intent: "info",
         shouldShowCloseButton: true,
         text: `${numDeletedSamples} ${pluralize("sample", numDeletedSamples)} ${pluralize("has", numDeletedSamples)} been deleted.`,

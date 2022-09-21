@@ -90,7 +90,7 @@ const UsherTreeFlow = ({
       componentProps: {
         usherLink,
       },
-      reduxId: Date.now(),
+      notifId: Date.now(),
       intent: "info",
       shouldShowCloseButton: true,
     }));

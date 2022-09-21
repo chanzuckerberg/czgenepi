@@ -25,7 +25,7 @@ export enum ReduxPersistenceTokens {
 }
 
 export type ReduxNotification = ExposedNotificationProps & {
-  reduxId: number;
+  notifId: number;
   shouldShowCloseButton?: boolean;
   componentKey?: NotificationComponents;
   componentProps: any;

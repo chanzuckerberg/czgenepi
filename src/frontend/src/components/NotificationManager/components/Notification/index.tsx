@@ -44,10 +44,10 @@ interface Props {
 
 const Notification = ({ notification }: Props): JSX.Element => {
   const dispatch = useDispatch();
-  const { reduxId, componentKey, componentProps, shouldShowCloseButton, text, ...rest } = notification;
+  const { notifId, componentKey, componentProps, shouldShowCloseButton, text, ...rest } = notification;
 
   const onDismiss = () => {
-    dispatch(deleteNotification(reduxId));
+    dispatch(deleteNotification(notifId));
   };
 
   let children: ReactNode = text;
