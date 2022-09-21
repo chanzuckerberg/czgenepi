@@ -1,10 +1,12 @@
 import { ExposedNotificationProps } from "czifui";
 import { NotificationComponents } from "src/components/NotificationManager/components/Notification";
 
-export type ActionType<T> = (payload?: T) => {
-  type: CZGEReduxActions;
-  payload?: T;
+export type ComplexActionType<T, U> = (payload: T) => {
+  type: CZGEReduxActions,
+  payload: U;
 };
+
+export type ActionType<T> = ComplexActionType<T, T>;
 
 export enum Pathogen {
   COVID = "covid",
@@ -24,10 +26,29 @@ export enum ReduxPersistenceTokens {
   PATHOGEN = "currentPathogen",
 }
 
-export type ReduxNotification = ExposedNotificationProps & {
-  notifId: EpochTimeStamp;  // typically Date.now() because that's a simple way to get unique IDs
+/**
+ * For notifs, you need to provide either a text string, or a componentKey and relevant props
+ */
+type NotifTextOrComponent = ({
+  componentKey: NotificationComponents;
+  componentProps?: any;
+  text?: never;
+} | {
+  componentKey?: never;
+  componentProps?: never;
+  text: string;
+});
+
+export type NewNotification = Omit<ExposedNotificationProps, "dismissDirection"> & NotifTextOrComponent & {
+  dismissDirection?: "right" | "left";
   shouldShowCloseButton?: boolean;
-  componentKey?: NotificationComponents;
-  componentProps: any;
-  text?: string;
+};
+
+/**
+ * Basically, text is if your notification only requires text to be shown. if it needs anything more
+ * complicated than that, for example if you need to also display a link or a list of IDs, then you
+ * make a component for the content that will be displayed in the notification and use componentKey
+ */
+export type ReduxNotification = ExposedNotificationProps & NewNotification & {
+  notifId: EpochTimeStamp;  // typically Date.now() because that's a simple way to get unique IDs
 };

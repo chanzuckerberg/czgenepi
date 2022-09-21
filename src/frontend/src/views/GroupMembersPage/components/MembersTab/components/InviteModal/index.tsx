@@ -13,6 +13,7 @@ import { addNotification } from "src/common/redux/actions";
 import { useDispatch } from "src/common/redux/hooks";
 import { selectCurrentGroup } from "src/common/redux/selectors";
 import { B } from "src/common/styles/basicStyle";
+import { NotificationComponents } from "src/components/NotificationManager/components/Notification";
 import { InvalidEmailError } from "./components/InvalidEmailError";
 import {
   SmallText,
@@ -57,6 +58,7 @@ const InviteModal = ({
         dispatch(addNotification({
           shouldShowCloseButton: true,
           intent: "warning",
+          componentKey: NotificationComponents.INVITE_USERS_FAILURE,
           componentProps: {
             failedToSendAddresses,
           }
@@ -71,6 +73,7 @@ const InviteModal = ({
           shouldShowCloseButton: true,
           intent: "info",
           autoDismiss: true,
+          componentKey: NotificationComponents.INVITE_USERS_SUCCESS,
           componentProps: {
             numSent: sentCount,
           }

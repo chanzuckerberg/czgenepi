@@ -1,4 +1,4 @@
-import { ActionType, CZGEReduxActions, Pathogen, ReduxNotification } from "../types";
+import { ActionType, ComplexActionType, CZGEReduxActions, NewNotification, Pathogen, ReduxNotification } from "../types";
 
 export const setGroup: ActionType<number> = (groupId) => ({
   type: CZGEReduxActions.SET_GROUP_ACTION_TYPE,
@@ -10,12 +10,11 @@ export const setPathogen: ActionType<Pathogen> = (pathogen) => ({
   payload: pathogen,
 });
 
-export const addNotification: ActionType<Partial<ReduxNotification>> = (notification) => ({
+export const addNotification: ComplexActionType<NewNotification, ReduxNotification> = (notification) => ({
   type: CZGEReduxActions.ADD_NOTIFICATION_ACTION_TYPE,
   payload: {
     buttonText: "DISMISS",
     dismissDirection: "right",
-    intent: "error",
     notifId: Date.now(),
     ...notification
   },
