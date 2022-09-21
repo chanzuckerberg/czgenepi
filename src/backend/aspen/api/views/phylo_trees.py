@@ -100,7 +100,6 @@ async def _get_selected_samples(
     selected_samples = selected_samples.union(
         set(prefix_regex.sub("", item) for item in phylo_run.gisaid_ids)
     )
-    import pdb; pdb.set_trace()
     # AuthZ note: We're not adding an additional sample access or public/private
     # identifier check here since the process_phylo_tree method already does that
     # filtering, and this data is only used to match any identifiers that are
@@ -128,6 +127,7 @@ async def get_tree_metadata(
         "PATHOGEN_public_repository", pathogen
     )
     # get the pathogen_repo_config  for given public_repository and pathogen
+    import pdb; pdb.set_trace()
     pathogen_repo_config = await get_pathogen_repo_config_for_pathogen(
         pathogen, preferred_public_db, db
     )
@@ -148,7 +148,6 @@ async def get_tree_metadata(
     selected_samples = await _get_selected_samples(
         db, item_id, pathogen, pathogen_repo_config
     )
-    import pdb; pdb.set_trace()
     filename: str = f"{item_id}_sample_ids.tsv"
     streamer = MetadataTSVStreamer(filename, accessions, selected_samples)
     return streamer.get_response()

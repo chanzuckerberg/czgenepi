@@ -86,6 +86,9 @@ async def create_phylotree_with_inputs(
 
     pathogen = random_pathogen_factory()
     setup_gisaid_and_genbank_repo_configs(async_session, pathogen)
+    pathogen_repo_config = await get_pathogen_repo_config_for_pathogen(
+        pathogen, "GISAID", async_session
+    )
 
     for i in range(3):
         sample = sample_factory(
@@ -102,7 +105,7 @@ async def create_phylotree_with_inputs(
         samples.append(sample)
         input_entities.append(input_entity)
 
-    db_gisaid_samples = ["hCoV-19/gisaid_identifier", "hCoV-19/gisaid_identifier2"]
+    db_gisaid_samples = [f"{pathogen_repo_config.prefix}/gisaid_identifier", f"{pathogen_repo_config.prefix}/gisaid_identifier2"]
 
     phylo_run = phylorun_factory(
         owner_group,
@@ -114,7 +117,7 @@ async def create_phylotree_with_inputs(
         phylo_run,
         samples,
     )
-    tree_gisaid_samples = ["gisaid_identifier", "hCoV-19/GISAID_identifier2"]
+    tree_gisaid_samples = ["gisaid_identifier", f"{pathogen_repo_config.prefix}/GISAID_identifier2"]
     upload_s3_file(mock_s3_resource, phylo_tree, samples, tree_gisaid_samples)
 
     async_session.add_all([phylo_tree])
@@ -188,6 +191,7 @@ async def test_tree_metadata_download(
     for sample in samples:
         expected_document += f"{sample.private_identifier}	no\r\n"
     file_contents = str(res.content, encoding="UTF-8")
+
     assert file_contents == expected_document
     assert res.status_code == 200
     assert res.headers["Content-Type"] == "text/tsv"
@@ -262,7 +266,6 @@ async def test_private_id_matrix(
 
         assert res.status_code == case["expected_status"]
         file_contents = str(res.content, encoding="UTF-8")
-        import pdb; pdb.set_trace()
         assert file_contents == case["expected_data"]
 
 
