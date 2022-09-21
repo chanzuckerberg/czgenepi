@@ -11,8 +11,8 @@ from aspen.database.models.gisaid_dump import (  # noqa: F401
     RawGisaidDump,
 )
 from aspen.database.models.gisaid_metadata import GisaidMetadata  # noqa: F401
+from aspen.database.models.lineages import PangoLineage  # noqa: F401
 from aspen.database.models.locations import Location  # noqa: F401
-from aspen.database.models.pango_lineages import PangoLineage  # noqa: F401
 from aspen.database.models.pathogens import Pathogen, PathogenRepoConfig  # noqa: F401
 from aspen.database.models.phylo_tree import (  # noqa: F401
     PhyloRun,
