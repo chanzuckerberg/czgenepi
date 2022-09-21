@@ -2,6 +2,8 @@ import json
 import re
 from base64 import urlsafe_b64decode, urlsafe_b64encode
 from aspen.database.models.pathogens import Pathogen
+from aspen.util.split import SplitClient
+from aspen.api.utils.pathogens import get_pathogen_repo_config_for_pathogen
 
 import boto3
 import pytest
@@ -48,9 +50,14 @@ async def test_valid_auspice_link_access(
     async_session: AsyncSession,
     http_client: AsyncClient,
     mock_s3_resource: boto3.resource,
+    split_client: SplitClient,
 ):
-    user, group, samples, phylo_run, phylo_tree, _ = await make_shared_test_data(
+    split_client.get_pathogen_treatment.return_value = "GISAID"
+    user, group, samples, phylo_run, phylo_tree, pathogen = await make_shared_test_data(
         async_session
+    )
+    pathogen_repo_config = await get_pathogen_repo_config_for_pathogen(
+        pathogen, "GISAID", async_session
     )
     # We need to create the bucket since this is all in Moto's 'virtual' AWS account
     try:
@@ -83,22 +90,25 @@ async def test_valid_auspice_link_access(
 
     assert "meta" in res_json.keys()
     assert "tree" in res_json.keys()
-    assert res_json["tree"]["name"] == "hCoV-19/ROOT"
+    assert res_json["tree"]["name"] == f"{pathogen_repo_config.prefix}/ROOT"
     assert res_json["tree"]["branch_attrs"]["labels"]["clade"] == "42"
     test_children = res_json["tree"]["children"]
     for index in range(1, 2):
         child = test_children[index - 1]
         assert child["name"] == f"private_identifier_{index}"
-        assert child["GISAID_ID"] == f"hCoV-19/public_identifier_{index}"
+        assert child["GISAID_ID"] == f"{pathogen_repo_config.prefix}/public_identifier_{index}"
 
 
 async def test_unauth_user_auspice_link_generation(
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient,
 ):
+    split_client.get_pathogen_treatment.return_value = "GISAID"
     user, group, samples, phylo_run, phylo_tree, _ = await make_shared_test_data(
         async_session
     )
+    split_client.get_pathogen_treatment.return_value = "GISAID"
     group_that_did_not_make_tree = group_factory(name="i_want_to_see_trees")
     user_that_did_not_make_tree = await userrole_factory(
         async_session,
@@ -125,7 +135,9 @@ async def test_tampered_magic_link(
     async_session: AsyncSession,
     http_client: AsyncClient,
     mock_s3_resource: boto3.resource,
+    split_client: SplitClient,
 ):
+    split_client.get_pathogen_treatment.return_value = "GISAID"
     user, group, samples, phylo_run, phylo_tree, _ = await make_shared_test_data(
         async_session
     )
@@ -172,7 +184,9 @@ async def test_country_color_labeling(
     async_session: AsyncSession,
     http_client: AsyncClient,
     mock_s3_resource: boto3.resource,
+    split_client: SplitClient,
 ):
+    split_client.get_pathogen_treatment.return_value = "GISAID"
     user, group, samples, phylo_run, phylo_tree, _ = await make_shared_test_data(
         async_session
     )
@@ -263,8 +277,10 @@ async def test_division_color_labeling(
     async_session: AsyncSession,
     http_client: AsyncClient,
     mock_s3_resource: boto3.resource,
+    split_client: SplitClient,
 ):
-    user, group, samples, phylo_run, phylo_tree = await make_shared_test_data(
+    split_client.get_pathogen_treatment.return_value = "GISAID"
+    user, group, samples, phylo_run, phylo_tree, _ = await make_shared_test_data(
         async_session
     )
 
@@ -353,7 +369,9 @@ async def test_location_color_labeling(
     http_client: AsyncClient,
     api,
     mock_s3_resource: boto3.resource,
+    split_client: SplitClient,
 ):
+    split_client.get_pathogen_treatment.return_value = "GISAID"
     user, group, samples, phylo_run, phylo_tree, _ = await make_shared_test_data(
         async_session
     )
