@@ -17,6 +17,8 @@ requests_log.propagate = True
 # Search documentation: https://www.ncbi.nlm.nih.gov/books/NBK25499/#chapter4.ESearch
 # Fetch metadata documentation: https://www.ncbi.nlm.nih.gov/books/NBK25499/#chapter4.ESummary
 # Fetch sequence documentation: https://www.ncbi.nlm.nih.gov/books/NBK25499/#chapter4.EFetch
+
+
 class GenbankFetcher:
     species: str
     pathogen_type: str
@@ -28,9 +30,8 @@ class GenbankFetcher:
 
     def fetch_metadata(self, webenv: str, query_key: str, num_results: int):
         base_url = "https://www.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi"
-        responses = []
         retstart = 0
-        max_responses = 500  # NOTE: this is the max allowed by the api.
+        max_responses = 20  # NOTE: this is the max allowed by the api.
         while True:
             params = {
                 "retmax": max_responses,
@@ -46,7 +47,8 @@ class GenbankFetcher:
 
             response = requests.get(base_url, params=params)
             data = response.json()
-            responses.extend(data)
+            yield data["result"]
+            exit()
             retstart += max_responses
             if retstart >= num_results:
                 break
@@ -54,6 +56,7 @@ class GenbankFetcher:
 
     def fetch_samples(self, webenv: str, query_key: str, num_results: int):
         base_url = "https://www.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
+        responses = ""
         retstart = 0
         max_responses = 100  # NOTE: this is the max allowed by the api.
         while True:
@@ -81,6 +84,7 @@ class GenbankFetcher:
     # Currently unused, but here if we need it.
     def fetch_samples_by_id(self, idlist: List):
         base_url = "https://www.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
+        responses = ""
         retstart = 0
         max_responses = 100  # NOTE: this is the max allowed by the api.
         while True:
@@ -144,11 +148,13 @@ if __name__ == "__main__":
     print("query_key", query_key)
 
     # Write fasta file
-    with open("big.fasta", "w") as f:
-        for fasta in fetcher.fetch_samples(webenv, query_key, num_results):
-            f.write(fasta)
+    # with open("big.fasta", "w") as f:
+    #    for fasta in fetcher.fetch_samples(webenv, query_key, num_results):
+    #        f.write(fasta)
 
     # Write metadata json
-    metadata = fetcher.fetch_metadata(webenv, query_key, num_results)
-    with open("big.json", "w") as f:
-        json.dump(metadata, f)
+    with open("metadata.ndjson", "w") as f:
+        for metadata in fetcher.fetch_metadata(webenv, query_key, num_results):
+            for uid in metadata["uids"]:
+                json.dump(metadata[uid], f)
+                f.write("\n")
