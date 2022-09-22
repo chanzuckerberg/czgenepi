@@ -1,6 +1,5 @@
 import { expect, test } from "@playwright/test";
 import { SampleUtil } from "../utils/sample";
-import { FilterSample } from "../pages/filter";
 import path from "path";
 import * as dotenv from "dotenv";
 
