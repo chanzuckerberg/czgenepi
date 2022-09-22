@@ -90,7 +90,10 @@ const MoreActionsMenu = ({
           open={open}
           onClose={handleClose}
         >
-          <MenuItem onClick={() => onEditTreeModalOpen(item)}>
+          <MenuItem
+            onClick={() => onEditTreeModalOpen(item)}
+            data-test-id="edit-tree-name-item"
+          >
             <StyledMenuItemWrapper>
               <StyledEditIconWrapper>
                 <Icon sdsIcon="edit" sdsSize="xs" sdsType="static" />
@@ -98,7 +101,10 @@ const MoreActionsMenu = ({
               <StyledText>Edit Tree Name</StyledText>
             </StyledMenuItemWrapper>
           </MenuItem>
-          <MenuItem onClick={() => onDeleteTreeModalOpen(item)}>
+          <MenuItem
+            onClick={() => onDeleteTreeModalOpen(item)}
+            data-test-id="edit-tree-name-item"
+          >
             <StyledMenuItemWrapper>
               <StyledTrashIconWrapper>
                 <Icon sdsIcon="trashCan" sdsSize="xs" sdsType="static" />

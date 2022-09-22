@@ -204,7 +204,7 @@ export const CreateNSTreeModal = ({
         dismissed={!shouldShowTreeCreatedNotification}
         intent="info"
       >
-        <span>
+        <span data-test-id="create-tree-confirmation-message">
           Your tree is being created. It may take up to 12 hours to process. To
           check your tree’s status, visit the Phylogenetic Tree tab.
         </span>
@@ -214,6 +214,7 @@ export const CreateNSTreeModal = ({
               sdsType="primary"
               sdsStyle="minimal"
               onClick={() => setShouldShowTreeCreatedNotification(false)}
+              data-test-id="view-my-trees"
             >
               VIEW MY TREES
             </StyledButton>
@@ -228,15 +229,20 @@ export const CreateNSTreeModal = ({
         fullWidth={true}
         maxWidth={"sm"}
         onClose={handleClose}
+        data-test-id="create-tree-dialog"
       >
         <StyledDialogTitle>
-          <StyledCloseIconButton aria-label="close modal" onClick={handleClose}>
+          <StyledCloseIconButton
+            aria-label="close modal"
+            onClick={handleClose}
+            data-test-id="close-create-tree-dialog"
+          >
             <StyledCloseIconWrapper>
               <Icon sdsIcon="xMark" sdsSize="l" sdsType="static" />
             </StyledCloseIconWrapper>
           </StyledCloseIconButton>
           <Header>Create New Phylogenetic Tree</Header>
-          <Title>
+          <Title data-test-id="title-with-sample-total">
             {allSamplesRequestedTableAndInput.length}{" "}
             {pluralize("Sample", allValidSamplesForTreeCreation.length)} Total
           </Title>
@@ -255,6 +261,7 @@ export const CreateNSTreeModal = ({
             setTreeName={setTreeName}
             treeName={treeName}
             instructionHeader="Tree Name: "
+            data-test-id="tree-name"
           />
           <TreeTypeSection>
             <TreeNameInfoWrapper>
@@ -264,6 +271,7 @@ export const CreateNSTreeModal = ({
                 leaveDelay={1000}
                 title={TREE_TYPE_TOOLTIP_TEXT}
                 placement="top"
+                data-test-id="tree-type-tooltip"
               >
                 <StyledInfoIconWrapper>
                   <Icon
@@ -294,6 +302,7 @@ export const CreateNSTreeModal = ({
                     setEndDate={setEndDate}
                   />
                 }
+                data-test-id="tree-type-overview"
               />
               <StyledFormControlLabel
                 value={TreeTypes.Targeted}
@@ -304,6 +313,7 @@ export const CreateNSTreeModal = ({
                     selected={treeType === TreeTypes.Targeted}
                   />
                 }
+                data-test-id="tree-type-targeted"
               />
               <StyledFormControlLabel
                 value={TreeTypes.NonContextualized}
@@ -321,6 +331,7 @@ export const CreateNSTreeModal = ({
                     setEndDate={setEndDate}
                   />
                 }
+                data-test-id="tree-type-non-contextual"
               />
             </RadioGroup>
           </TreeTypeSection>
@@ -341,6 +352,7 @@ export const CreateNSTreeModal = ({
             isInEditMode={isInputInEditMode}
             treeType={treeType}
             onClick={handleSubmit}
+            data-test-id="create-tree-btn"
           />
           <CreateTreeInfo>
             Creating a new tree can take up to 12 hours.

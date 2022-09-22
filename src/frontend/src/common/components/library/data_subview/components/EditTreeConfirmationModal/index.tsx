@@ -82,6 +82,7 @@ export const EditTreeConfirmationModal = ({
         withCollapsibleInstructions={false}
         textInputLabel={"Tree Name: "}
         isTextInputMultiLine={true}
+        data-test-id="tree-name-input"
       />
     </StyledDiv>
   );
@@ -92,13 +93,19 @@ export const EditTreeConfirmationModal = ({
       sdsStyle="rounded"
       disabled={!hasValidName}
       onClick={onEdit}
+      data-test-id="update-tree-name-btn"
     >
       Update
     </Button>
   );
 
   const closeIcon = (
-    <StyledIconButton onClick={onClose} sdsType="tertiary" sdsSize="small">
+    <StyledIconButton
+      onClick={onClose}
+      sdsType="tertiary"
+      sdsSize="small"
+      data-test-id="tree-name-close-btn"
+    >
       <Icon sdsIcon="xMark" sdsSize="s" sdsType="iconButton" />
     </StyledIconButton>
   );
@@ -113,6 +120,7 @@ export const EditTreeConfirmationModal = ({
           dismissDirection="left"
           dismissed={!shouldShowSuccessNotification}
           intent="info"
+          data-test-id="update-tree-name-message"
         >
           Tree name was successfully updated.
         </Notification>
@@ -125,6 +133,7 @@ export const EditTreeConfirmationModal = ({
           dismissDirection="left"
           dismissed={!shouldShowErrorNotification}
           intent="error"
+          data-test-id="update-tree-name-message"
         >
           Something went wrong and we were unable to update your tree name.
           Please try again later.
